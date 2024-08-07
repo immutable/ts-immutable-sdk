@@ -168,11 +168,14 @@ export class Orderbook {
    * Once the transactions are submitted and the message signed, call the completeListings method
    * provided in the return type with the signature. This method supports up to 20 listing creations
    * at a time. It can also be used for individual listings to simplify integration code paths.
+   * Bulk listings created through an EOA (Metamask) will only require a single signature but
+   * when using a smart contract wallet, multiple signatures (as many as the number of orders)
+   * are required.
    * @param {PrepareBulkListingsParams} prepareBulkListingsParams - Details about the listings
    * to be created.
    * @return {PrepareBulkListingsResponse} PrepareListingResponse includes
    * any unsigned approval transactions, the typed bulk order message for signing and
-   * the createListings method that can be called with the signature to create the listings.
+   * the createListings method that can be called with the signature(s) to create the listings.
    */
   async prepareBulkListings(
     {
@@ -217,10 +220,10 @@ export class Orderbook {
       };
     }
 
-    // TODO: Check the code at the address
-    const isSmartContractWallet = true
+    const isSmartContractWallet: boolean = await this.orderbookConfig.provider.getCode(makerAddress) !== '0x';
     if (isSmartContractWallet) {
-      const prepareListingResponses = await Promise.all(listingParams.map(l => this.seaport.prepareSeaportOrder(
+      // eslint-disable-next-line max-len
+      const prepareListingResponses = await Promise.all(listingParams.map((l) => this.seaport.prepareSeaportOrder(
         makerAddress,
         l.sell,
         l.buy,
@@ -230,21 +233,21 @@ export class Orderbook {
 
       return {
         // Consider: Get fancy and try remove duplicate approval actions
-        actions: prepareListingResponses.flatMap(r => r.actions),
-        completeListings: async (signatures: string | string[]) => {
-          if (typeof signatures === 'string') {
-            throw new Error('need a signature per order on this')
-          }
-
+        actions: prepareListingResponses.flatMap((r) => r.actions),
+        completeListings: async (signatures: string[]) => {
           const createListingsApiResponses = await Promise.all(
-            prepareListingResponses.map((prepareListingResponse, i) => {
+            prepareListingResponses.map(async (prepareListingResponse, i) => {
               const signature = signatures[i];
-              return this.apiClient.createListing({
-                makerFees: listingParams[i].makerFees,
-                orderComponents: prepareListingResponse.orderComponents,
-                orderHash: prepareListingResponse.orderHash,
-                orderSignature: signature,
-              }).catch(() => undefined);
+              try {
+                return await this.apiClient.createListing({
+                  makerFees: listingParams[i].makerFees,
+                  orderComponents: prepareListingResponse.orderComponents,
+                  orderHash: prepareListingResponse.orderHash,
+                  orderSignature: signature,
+                });
+              } catch {
+                return undefined;
+              }
             }),
           );
 
@@ -252,6 +255,7 @@ export class Orderbook {
             result: createListingsApiResponses.map((apiListingResponse, i) => ({
               success: !!apiListingResponse,
               orderHash: prepareListingResponses[i].orderHash,
+              // eslint-disable-next-line max-len
               order: apiListingResponse ? mapFromOpenApiOrder(apiListingResponse.result) : undefined,
             })),
           };
@@ -271,16 +275,20 @@ export class Orderbook {
 
     return {
       actions,
-      completeListings: async (bulkOrderSignature: string | string[]) => {
+      completeListings: async (signatures: string[]) => {
+        if (signatures.length !== 1) {
+          throw new Error('Only a single signature is expected for bulk listing creation');
+        }
+
         const orderComponents = preparedListings.map((orderParam) => orderParam.orderComponents);
-        const signatures = getBulkSeaportOrderSignatures(
-          bulkOrderSignature,
+        const bulkOrderSignatures = getBulkSeaportOrderSignatures(
+          signatures[0],
           orderComponents,
         );
 
         const createOrdersApiListingResponse = await Promise.all(
           orderComponents.map((orderComponent, i) => {
-            const sig = signatures[i];
+            const sig = bulkOrderSignatures[i];
             const listing = preparedListings[i];
             const listingParam = listingParams[i];
             return this.apiClient.createListing({

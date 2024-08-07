@@ -63,8 +63,8 @@ describe('prepareListing and createOrder bulk e2e', () => {
       listingParams: orderParams,
     });
 
-    const [bulkOrderSignature] = await actionAll(actions, offerer);
-    const res = await completeListings(bulkOrderSignature);
+    const bulkOrderSignatures = await actionAll(actions, offerer);
+    const res = await completeListings(bulkOrderSignatures);
 
     for (const result of res.result) {
       if (!result.order) {
