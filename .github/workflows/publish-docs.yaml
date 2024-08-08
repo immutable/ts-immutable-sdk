@@ -5,6 +5,8 @@ on:
     workflows: ["Publish to NPM", "Publish Major Version to NPM"]
     types:
       - completed
+    branches:
+      - main
 
 jobs:
   AlphaCheck:
@@ -24,10 +26,11 @@ jobs:
           VERSION=$(git describe --tags --abbrev=0)
           if echo "$VERSION" | grep -q "alpha"; then
             echo "Skipping docs generation for alpha version"
-            echo "is_alpha=true" >> $GITHUB_ENV
+            echo "is_alpha=true" >> $GITHUB_OUTPUT
             exit 0
           else
-            echo "is_alpha=false" >> $GITHUB_ENV
+            echo "Generating docs for non-alpha version"
+            echo "is_alpha=false" >> $GITHUB_OUTPUT
           fi
         shell: bash
 
@@ -45,6 +48,10 @@ jobs:
       - name: Is Alpha Version
         run: |
           echo "Is Alpha Version: ${{ env.IS_ALPHA }}"
+
+      - name: Check Public Release Branch
+        if: github.ref != 'refs/heads/main'
+        run: failure("SDK reference docs should be only published from main branch, current branch ${{ github.ref }}")
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -80,12 +87,6 @@ jobs:
           node-version-file: .nvmrc
           cache: "yarn"
 
-      - name: Update SDK package.json version
-        run: |
-          tmp=$(mktemp)
-          jq '.version = "${{ env.VERSION }}"' ./package.json > "$tmp" && mv "$tmp" ./package.json
-        shell: bash
-
       - name: Restore cached node_modules
         id: restore-cache-node_modules
         uses: actions/cache@v4
@@ -99,6 +100,12 @@ jobs:
 
       - name: Build
         run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
+
+      - name: Update SDK package.json version
+        run: |
+          tmp=$(mktemp)
+          jq '.version = "${{ env.VERSION }}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
+        shell: bash
 
       - name: Build SDK Docs
         run: yarn docs:build
@@ -128,7 +135,7 @@ jobs:
         if: ${{ success() && steps.docs_push.conclusion == 'success' && steps.netlify_build.conclusion == 'success' && steps.netlify_deploy.conclusion == 'success' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
-          message: "✅ SDK reference documents published successfully - https://docs.immutable.com/sdk-references/ts-immutable-sdk/${{ env.VERSION }}/modules/_imtbl_sdk.html\n\n>*`${{ env.GITHUB_USER }}` Please ensure you and the team updated all Sample Code + Guides on the <https://docs.immutable.com|imx-docs site> to reflect the change.*"
+          message: "✅ SDK reference documents published successfully - https://docs.immutable.com/sdk-references/ts-immutable-sdk/${{ env.VERSION }}/\n\n>*`${{ env.GITHUB_USER }}` Please ensure you and the team updated all Sample Code + Guides on the <https://docs.immutable.com|imx-docs site> to reflect the change.*"
 
       - name: Notify SDK Slack Docs Publish Failure
         if: ${{ failure() && steps.docs_version_check.conclusion == 'success' }}

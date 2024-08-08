@@ -20,3 +20,9 @@ if [ -d "$CLONE_DIR/api-docs/sdk-references/ts-immutable-sdk/$VERSION" ]; then
   echo "There is already a docs folder for v$VERSION. Please create a separate PR to update the SDK reference docs for v$VERSION."
   exit 1
 fi
+
+# check the version contains `alpha` string
+if echo "$VERSION" | grep -q "alpha"; then
+  echo "Skipping docs generation for alpha version"
+  exit 1
+fi
