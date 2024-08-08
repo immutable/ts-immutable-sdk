@@ -7,7 +7,8 @@
     "node_modules/",
     "dist/",
     "**sample-app**/",
-    "**playground**/"
+    "**playground**/",
+    "*.cjs"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
