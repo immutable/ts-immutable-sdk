@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "jsx": "react",
     "target": "es2022",
     "module": "esnext",
     "moduleResolution": "node",
@@ -11,9 +10,11 @@
     "forceConsistentCasingInFileNames": false,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "declaration": false,
+    "declaration": true,
     "resolveJsonModule": true,
-    "skipLibCheck": true
+    "skipLibCheck": false,
+    "isolatedModules": true,
+    "incremental": true
   },
   "ts-node": {
     "compilerOptions": {

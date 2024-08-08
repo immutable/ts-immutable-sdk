@@ -1,10 +1,10 @@
-{
-  "extends": ["../../../.eslintrc"],
-  "ignorePatterns": ["jest.config.*", "rollup.config.*"],
+module.exports = {
+  "extends": ["../../.eslintrc", "airbnb", "airbnb-typescript"],
+  "ignorePatterns": ["jest.config.*"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": "./tsconfig.json",
-    "tsconfigRootDir": "."
+    "tsconfigRootDir": __dirname
   },
   "rules": {
     "@typescript-eslint/naming-convention": [
@@ -15,20 +15,20 @@
       },
       {
         "selector": "objectLiteralProperty",
-        "format": ["camelCase"]
+        "format": ["camelCase","snake_case"]
       },
       {
         "selector": "variable",
-        "format": ["camelCase", "UPPER_CASE"]
+        "format": ["camelCase", "UPPER_CASE", "snake_case"]
       },
       {
         "selector": "variable",
         "types": ["function"],
-        "format": ["camelCase", "PascalCase"]
+        "format": ["camelCase"]
       },
       {
         "selector": "function",
-        "format": ["camelCase", "PascalCase"]
+        "format": ["camelCase"]
       },
       {
         "selector": "parameter",
@@ -58,16 +58,9 @@
       },
       {
         "selector": "typeProperty",
-        "format": ["camelCase"]
+        "format": ["camelCase","snake_case"]
       }
     ],
-    "prefer-promise-reject-errors": "off",
-    "class-methods-use-this": ["off"],
-    "react/require-default-props": ["off"],
-    "react/react-in-jsx-scope": ["off"],
-    "jsx-a11y/anchor-is-valid": "off",
-    "jsx-a11y/anchor-has-content": "off",
-    "jsx-a11y/control-has-associated-label": "off",
-    "react/jsx-props-no-spreading": "off",
+    "import/prefer-default-export": ["off"]
   }
 }
