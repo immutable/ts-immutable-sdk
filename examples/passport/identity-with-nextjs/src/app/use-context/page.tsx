@@ -4,18 +4,31 @@ import { passport } from '@imtbl/sdk';
 
 export default function Page() {
   const {
-    login, loginWithEthersjs, loginWithoutWallet, logout,
+    login, loginWithEthersjs, loginWithoutWallet, logout, isLoading, isLoggedIn,
   } = passport.usePassport();
   const { idToken } = passport.useIdToken();
   const { accessToken } = passport.useAccessToken();
   const { linkedAddresses } = passport.useLinkedAddresses();
   const { userInfo } = passport.useUserInfo();
+  const { accounts } = passport.useAccounts();
+  const { passportProvider } = passport.usePassportProvider();
+  const { web3Provider } = passport.useWeb3Provider();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8">
       <h1 className="text-3xl font-bold mb-8">Passport Identity Examples</h1>
       <div className="grid grid-cols-1 gap-4 text-center">
         <div>
+          <p className="mb-2">
+            <b>Loading:</b>
+            {' '}
+            {isLoading ? 'true' : 'false'}
+          </p>
+          <p className="mb-2">
+            <b>Is Logged In:</b>
+            {' '}
+            {isLoggedIn ? 'true' : 'false'}
+          </p>
           <p className="mb-2">
             <b>Access Token:</b>
             {' '}
@@ -35,6 +48,21 @@ export default function Page() {
             <b>User Info:</b>
             {' '}
             {JSON.stringify(userInfo, null, 2)}
+          </p>
+          <p className="mb-2">
+            <b>Accounts:</b>
+            {' '}
+            {JSON.stringify(accounts, null, 2)}
+          </p>
+          <p className="mb-2">
+            <b>Passport Provider:</b>
+            {' '}
+            { passportProvider ? 'true' : 'false' }
+          </p>
+          <p className="mb-2">
+            <b>Web3 Provider:</b>
+            {' '}
+            { web3Provider ? 'true' : 'false' }
           </p>
         </div>
         <button
