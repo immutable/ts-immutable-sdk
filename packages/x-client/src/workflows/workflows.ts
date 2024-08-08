@@ -32,6 +32,12 @@ import {
   RejectPrimarySalesWorkflow,
 } from './primarySales';
 
+export type {
+  AcceptPrimarySaleResponse,
+  CreatePrimarySaleResponse,
+  RejectPrimarySaleResponse,
+} from './primarySales';
+
 export class Workflows {
   private readonly mintsApi: MintsApi;
 

@@ -39,21 +39,21 @@ type RejectPrimarySaleWorkflowParams = {
   primarySalesApi: PrimarySalesApi;
 };
 
-type CreatePrimarySaleResponse =
+export type CreatePrimarySaleResponse =
   | CreatePrimarySaleBadRequestBody
   | CreatePrimarySaleCreatedBody
   | CreatePrimarySaleForbiddenBody
   | CreatePrimarySaleUnauthorizedBody
   | CreatePrimarySaleNotFoundBody;
 
-type AcceptPrimarySaleResponse =
+export type AcceptPrimarySaleResponse =
   | AcceptPrimarySaleOKBody
   | AcceptPrimarySaleBadRequestBody
   | AcceptPrimarySaleForbiddenBody
   | AcceptPrimarySaleNotFoundBody
   | AcceptPrimarySaleUnauthorizedBody;
 
-type RejectPrimarySaleResponse =
+export type RejectPrimarySaleResponse =
   | RejectPrimarySaleOKBody
   | RejectPrimarySaleBadRequestBody
   | RejectPrimarySaleForbiddenBody
