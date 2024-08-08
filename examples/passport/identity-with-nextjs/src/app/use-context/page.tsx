@@ -2,8 +2,10 @@
 
 import { passport } from '@imtbl/sdk';
 
-export default function Page () {
-  const { login, loginWithEthersjs, loginWithoutWallet, logout } = passport.usePassport();
+export default function Page() {
+  const {
+    login, loginWithEthersjs, loginWithoutWallet, logout,
+  } = passport.usePassport();
   const { idToken } = passport.useIdToken();
   const { accessToken } = passport.useAccessToken();
   const { linkedAddresses } = passport.useLinkedAddresses();
