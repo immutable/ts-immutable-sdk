@@ -16,6 +16,7 @@ type PassportContextType = {
   loginWithEthersjs: () => Promise<{ accounts: string[], provider: Web3Provider | null }>;
   isLoading: boolean;
   error: Error | null;
+  accounts: string[];
 };
 
 const PassportContext = createContext<PassportContextType>({
@@ -27,6 +28,7 @@ const PassportContext = createContext<PassportContextType>({
   loginWithEthersjs: () => { throw new Error('loginWithEthersjs must be used within a PassportProvider'); },
   isLoading: false,
   error: null,
+  accounts: [],
 });
 
 type PassportProviderProps = {
@@ -37,20 +39,23 @@ type PassportProviderProps = {
 export function PassportProvider({ children, config }: PassportProviderProps) {
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [accounts, setAccounts] = useState<string[]>([]);
   const [error, setError] = useState<Error | null>(null);
   const passportInstance = new Passport(config);
   const v = useMemo(() => ({
     passportInstance,
     isLoggedIn,
     isLoading,
+    accounts,
     error,
     login: async () => {
       try {
         setError(null);
         setIsLoading(true);
         const provider = passportInstance.connectEvm();
-        const accounts = await provider.request({ method: 'eth_requestAccounts' });
+        const acc = await provider.request({ method: 'eth_requestAccounts' });
         setLoggedIn(true);
+        setAccounts(acc);
         return accounts;
       } catch (e: any) {
         setError(e);
@@ -65,6 +70,7 @@ export function PassportProvider({ children, config }: PassportProviderProps) {
         setIsLoading(true);
         await passportInstance.logout();
         setLoggedIn(false);
+        setAccounts([]);
       } catch (e: any) {
         setError(e);
       } finally {
@@ -91,9 +97,9 @@ export function PassportProvider({ children, config }: PassportProviderProps) {
         setIsLoading(true);
         // eslint-disable-next-line new-cap
         const provider = new Web3Provider(passportInstance.connectEvm());
-        const accounts = await provider.send('eth_requestAccounts', []);
+        const acc = await provider.send('eth_requestAccounts', []);
         setLoggedIn(true);
-        return { accounts, provider };
+        return { accounts: acc, provider };
       } catch (e: any) {
         setError(e);
         return { accounts: [], provider: null };
@@ -228,4 +234,9 @@ export function useUserInfo() {
   return {
     userInfo, isLoading: isLoading || loading, error, refetch: getUserInfo,
   };
+}
+
+export function useAccounts() {
+  const { accounts, isLoading, error } = usePassport();
+  return { accounts, isLoading, error };
 }
