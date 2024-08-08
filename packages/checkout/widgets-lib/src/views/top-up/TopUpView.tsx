@@ -12,7 +12,6 @@ import {
 import { Environment } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
-import { $Dictionary } from 'i18next/typescript/helpers';
 import {
   UserJourney,
   useAnalytics,
@@ -39,6 +38,8 @@ import {
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { TopUpMenuItem, TopUpMenuItemProps } from './TopUpMenuItem';
+
+type $Dictionary<T = unknown> = { [key: string]: T };
 
 interface TopUpViewProps {
   widgetEvent: IMTBLWidgetEvents;

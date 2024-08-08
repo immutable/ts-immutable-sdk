@@ -2,7 +2,7 @@
 /* eslint-disable max-len */
 import { imx } from '@imtbl/generated-clients';
 
-export { TransactionResponse } from '@ethersproject/providers';
+export type { TransactionResponse } from '@ethersproject/providers';
 
 /**
  * Need to specifically export the classes and interfaces from the generated
@@ -99,4 +99,11 @@ export interface UpdateCollectionRequest extends imx.UpdateCollectionRequest {}
 export interface WithdrawalsApiGetWithdrawalRequest extends imx.WithdrawalsApiGetWithdrawalRequest {}
 export interface WithdrawalsApiListWithdrawalsRequest extends imx.WithdrawalsApiListWithdrawalsRequest {}
 
-export const { MetadataSchemaRequestTypeEnum } = imx;
+// eslint-disable-next-line prefer-destructuring
+export const MetadataSchemaRequestTypeEnum: {
+  readonly Enum: 'enum';
+  readonly Text: 'text';
+  readonly Boolean: 'boolean';
+  readonly Continuous: 'continuous';
+  readonly Discrete: 'discrete';
+} = imx.MetadataSchemaRequestTypeEnum;
