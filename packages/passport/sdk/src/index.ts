@@ -33,4 +33,6 @@ export {
   usePassport,
   useUserInfo,
   useAccounts,
+  usePassportProvider,
+  useWeb3Provider,
 } from './react/PassportContext';

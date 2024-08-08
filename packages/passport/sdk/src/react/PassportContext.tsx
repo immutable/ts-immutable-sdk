@@ -6,30 +6,24 @@ import React, {
 import { Web3Provider } from '@ethersproject/providers';
 import { Passport } from '../Passport';
 import { PassportModuleConfiguration, UserProfile } from '../types';
+import { Provider } from '../zkEvm/types';
 
 type PassportContextType = {
   passportInstance: Passport;
   isLoggedIn: boolean;
-  login: () => Promise<string[]>;
-  logout: () => Promise<void>;
-  loginWithoutWallet: () => Promise<UserProfile | null>;
-  loginWithEthersjs: () => Promise<{ accounts: string[], provider: Web3Provider | null }>;
   isLoading: boolean;
   error: Error | null;
   accounts: string[];
+  passportProvider: Provider | null;
+  web3Provider: Web3Provider | null;
+  login: () => Promise<string[]>;
+  logout: () => Promise<void>;
+  loginWithoutWallet: () => Promise<UserProfile | null>;
+  loginWithEthersjs: () => Promise<string[]>;
+  loginCallback: () => Promise<void>;
 };
 
-const PassportContext = createContext<PassportContextType>({
-  passportInstance: {} as Passport,
-  isLoggedIn: false,
-  login: () => { throw new Error('login must be used within a PassportProvider'); },
-  logout: () => { throw new Error('logout must be used within a PassportProvider'); },
-  loginWithoutWallet: () => { throw new Error('loginWithoutWallet must be used within a PassportProvider'); },
-  loginWithEthersjs: () => { throw new Error('loginWithEthersjs must be used within a PassportProvider'); },
-  isLoading: false,
-  error: null,
-  accounts: [],
-});
+const PassportContext = createContext<PassportContextType | null>(null);
 
 type PassportProviderProps = {
   config: PassportModuleConfiguration;
@@ -41,9 +35,28 @@ export function PassportProvider({ children, config }: PassportProviderProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [accounts, setAccounts] = useState<string[]>([]);
   const [error, setError] = useState<Error | null>(null);
+  const [passportProvider, setPassportProvider] = useState<Provider | null>(null);
+  const [web3Provider, setWeb3Provider] = useState<Web3Provider | null>(null);
   const passportInstance = new Passport(config);
+
+  const getPassportProvider = () => {
+    if (passportProvider) return passportProvider;
+    const p = passportInstance.connectEvm();
+    setPassportProvider(p);
+    return p;
+  };
+  const getWeb3Provider = () => {
+    if (web3Provider) return web3Provider;
+    const p = getPassportProvider();
+    const w = new Web3Provider(p);
+    setWeb3Provider(w);
+    return w;
+  };
+
   const v = useMemo(() => ({
     passportInstance,
+    passportProvider,
+    web3Provider,
     isLoggedIn,
     isLoading,
     accounts,
@@ -52,13 +65,15 @@ export function PassportProvider({ children, config }: PassportProviderProps) {
       try {
         setError(null);
         setIsLoading(true);
-        const provider = passportInstance.connectEvm();
+        setWeb3Provider(null);
+        const provider = getPassportProvider();
         const acc = await provider.request({ method: 'eth_requestAccounts' });
         setLoggedIn(true);
         setAccounts(acc);
         return accounts;
-      } catch (e: any) {
-        setError(e);
+      } catch (e) {
+        setError(e as Error);
+        setPassportProvider(null);
       } finally {
         setIsLoading(false);
       }
@@ -68,11 +83,13 @@ export function PassportProvider({ children, config }: PassportProviderProps) {
       try {
         setError(null);
         setIsLoading(true);
+        setPassportProvider(null);
+        setWeb3Provider(null);
         await passportInstance.logout();
         setLoggedIn(false);
         setAccounts([]);
-      } catch (e: any) {
-        setError(e);
+      } catch (e) {
+        setError(e as Error);
       } finally {
         setIsLoading(false);
       }
@@ -84,8 +101,8 @@ export function PassportProvider({ children, config }: PassportProviderProps) {
         const profile = await passportInstance.login();
         setLoggedIn(true);
         return profile;
-      } catch (e: any) {
-        setError(e);
+      } catch (e) {
+        setError(e as Error);
         return null;
       } finally {
         setIsLoading(false);
@@ -96,16 +113,21 @@ export function PassportProvider({ children, config }: PassportProviderProps) {
         setError(null);
         setIsLoading(true);
         // eslint-disable-next-line new-cap
-        const provider = new Web3Provider(passportInstance.connectEvm());
+        const provider = getWeb3Provider();
         const acc = await provider.send('eth_requestAccounts', []);
         setLoggedIn(true);
-        return { accounts: acc, provider };
-      } catch (e: any) {
-        setError(e);
-        return { accounts: [], provider: null };
+        return acc;
+      } catch (e) {
+        setError(e as Error);
+        setPassportProvider(null);
+        setWeb3Provider(null);
+        return [];
       } finally {
         setIsLoading(false);
       }
+    },
+    loginCallback: async () => {
+      await passportInstance.loginCallback();
     },
   }), [config, isLoggedIn]);
 
@@ -116,7 +138,7 @@ export function PassportProvider({ children, config }: PassportProviderProps) {
   );
 }
 
-export function usePassport() {
+export function usePassport(): PassportContextType {
   const c = useContext(PassportContext);
   if (!c) {
     throw new Error('usePassport must be used within a PassportProvider');
@@ -210,7 +232,7 @@ export function useLinkedAddresses() {
 
 export function useUserInfo() {
   const { passportInstance, isLoading, isLoggedIn } = usePassport();
-  const [userInfo, setUserInfo] = useState<Record<string, unknown> | null>(null);
+  const [userInfo, setUserInfo] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -239,4 +261,14 @@ export function useUserInfo() {
 export function useAccounts() {
   const { accounts, isLoading, error } = usePassport();
   return { accounts, isLoading, error };
+}
+
+export function usePassportProvider() {
+  const { passportProvider, isLoading, error } = usePassport();
+  return { passportProvider, isLoading, error };
+}
+
+export function useWeb3Provider() {
+  const { web3Provider, isLoading, error } = usePassport();
+  return { web3Provider, isLoading, error };
 }
