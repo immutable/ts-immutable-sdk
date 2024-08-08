@@ -100,6 +100,11 @@ export class Orderbook {
     );
   }
 
+  // Default order expiry to 2 years from now
+  static defaultOrderExpiry(): Date {
+    return new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2);
+  }
+
   /**
    * Return the configuration for the orderbook module.
    * @return {OrderbookModuleConfiguration} The configuration for the orderbook module.
@@ -169,9 +174,11 @@ export class Orderbook {
    * Once the transactions are submitted and the message signed, call the completeListings method
    * provided in the return type with the signature. This method supports up to 20 listing creations
    * at a time. It can also be used for individual listings to simplify integration code paths.
-   * Bulk listings created through an EOA (Metamask) will only require a single signature but
-   * when using a smart contract wallet, multiple signatures (as many as the number of orders)
-   * are required.
+   *
+   * Bulk listings created using an EOA (Metamask) will require a single listing confirmation
+   * signature.
+   * Bulk listings creating using a smart contract wallet will require multiple listing confirmation
+   * signatures(as many as the number of orders).
    * @param {PrepareBulkListingsParams} prepareBulkListingsParams - Details about the listings
    * to be created.
    * @return {PrepareBulkListingsResponse} PrepareListingResponse includes
@@ -197,7 +204,7 @@ export class Orderbook {
         listingParams[0].sell,
         listingParams[0].buy,
         new Date(),
-        listingParams[0].orderExpiry || new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2),
+        listingParams[0].orderExpiry || Orderbook.defaultOrderExpiry(),
       );
 
       return {
@@ -221,39 +228,42 @@ export class Orderbook {
       };
     }
 
+    // not fool-proof but scenarios where smart contract wallet is not deployed will be an edge case
     const isSmartContractWallet: boolean = await this.orderbookConfig.provider.getCode(makerAddress) !== '0x';
     if (isSmartContractWallet) {
       track('orderbookmr', 'bulkListings', { walletType: 'Passport', makerAddress, listingsCount: listingParams.length });
+
       // eslint-disable-next-line max-len
-      const prepareListingResponses = await Promise.all(listingParams.map((l) => this.seaport.prepareSeaportOrder(
+      const prepareListingResponses = await Promise.all(listingParams.map((listing) => this.seaport.prepareSeaportOrder(
         makerAddress,
-        l.sell,
-        l.buy,
+        listing.sell,
+        listing.buy,
         new Date(),
-        l.orderExpiry || new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2),
+        listing.orderExpiry || Orderbook.defaultOrderExpiry(),
       )));
 
       const pendingApproval: string[] = [];
-      const dedupedActions: Action[] = [];
-
-      return {
-        actions: prepareListingResponses.flatMap((r) => {
-          // de-dupe approval transactions to ensure every contract has
-          // a maximum of 1 approval transaction
-          r.actions.forEach((action) => {
-            if (action.type === ActionType.TRANSACTION) {
-              // Assuming only a single item is on offer per listing
-              const contractAddress = r.orderComponents.offer[0].token;
-              if (!pendingApproval.includes(contractAddress)) {
-                pendingApproval.push(contractAddress);
-                dedupedActions.push(action);
-              }
-            } else {
+      const actions = prepareListingResponses.flatMap((response) => {
+        // de-dupe approval transactions to ensure every contract has
+        // a maximum of 1 approval transaction
+        const dedupedActions: Action[] = [];
+        response.actions.forEach((action) => {
+          if (action.type === ActionType.TRANSACTION) {
+            // Assuming only a single item is on offer per listing
+            const contractAddress = response.orderComponents.offer[0].token;
+            if (!pendingApproval.includes(contractAddress)) {
+              pendingApproval.push(contractAddress);
               dedupedActions.push(action);
             }
-          });
-          return dedupedActions;
-        }),
+          } else {
+            dedupedActions.push(action);
+          }
+        });
+        return dedupedActions;
+      });
+
+      return {
+        actions,
         completeListings: async (signatures: string[]) => {
           const createListingsApiResponses = await Promise.all(
             prepareListingResponses.map((prepareListingResponse, i) => {
@@ -263,6 +273,7 @@ export class Orderbook {
                 orderComponents: prepareListingResponse.orderComponents,
                 orderHash: prepareListingResponse.orderHash,
                 orderSignature: signature,
+                // Swallow failed creations,this gets mapped in the response to the caller as failed
               }).catch(() => undefined);
             }),
           );
@@ -286,7 +297,7 @@ export class Orderbook {
         listingItem: orderParam.sell,
         considerationItem: orderParam.buy,
         orderStart: new Date(),
-        orderExpiry: orderParam.orderExpiry || new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2),
+        orderExpiry: orderParam.orderExpiry || Orderbook.defaultOrderExpiry(),
       })),
     );
 
@@ -350,7 +361,7 @@ export class Orderbook {
       // Default order start to now
       new Date(),
       // Default order expiry to 2 years from now
-      orderExpiry || new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2),
+      orderExpiry || Orderbook.defaultOrderExpiry(),
     );
   }
 
