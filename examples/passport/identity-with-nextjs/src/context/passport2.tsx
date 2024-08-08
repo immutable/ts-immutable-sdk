@@ -1,7 +1,6 @@
 import { config, passport } from '@imtbl/sdk';
 import { ReactNode } from 'react';
 
-// #doc passport-provider-react
 export function PassportProvider({ children }: { children: ReactNode }) {
   return (
     <passport.PassportProvider
@@ -21,4 +20,3 @@ export function PassportProvider({ children }: { children: ReactNode }) {
     </passport.PassportProvider>
   );
 }
-// #enddoc passport-provider-react

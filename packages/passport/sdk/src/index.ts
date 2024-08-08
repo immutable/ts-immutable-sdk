@@ -32,4 +32,5 @@ export {
   useLinkedAddresses,
   usePassport,
   useUserInfo,
+  useAccounts,
 } from './react/PassportContext';
