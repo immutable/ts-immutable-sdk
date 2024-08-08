@@ -22,11 +22,7 @@ export {
   ChainId,
   ChainName,
   ChainSlug,
-  CheckoutStatus,
-  EIP1193Provider,
-  EIP6963ProviderInfo,
-  EIP6963ProviderDetail,
-  ExchangeType,
+  CheckoutStatus, ExchangeType,
   FeeType,
   FundingStepType,
   GasEstimateType,
@@ -39,6 +35,11 @@ export {
   WalletFilterTypes,
   WalletProviderName,
   WalletProviderRdns,
+} from './types';
+export type {
+  EIP1193Provider,
+  EIP6963ProviderInfo,
+  EIP6963ProviderDetail,
 } from './types';
 
 export type {
@@ -144,11 +145,9 @@ export type {
 } from './types';
 
 export {
-  PostMessageHandler,
-  PostMessageHandlerConfiguration,
-  PostMessageHandlerEventType,
-  PostMessageData,
+  PostMessageHandler, PostMessageHandlerEventType,
 } from './postMessageHandler';
+export type { PostMessageHandlerConfiguration, PostMessageData } from './postMessageHandler';
 
 export { isAddressSanctioned } from './sanctions';
 
