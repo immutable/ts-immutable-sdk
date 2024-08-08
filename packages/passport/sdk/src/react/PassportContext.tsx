@@ -15,6 +15,7 @@ type PassportContextType = {
   loginWithoutWallet: () => Promise<UserProfile | null>;
   loginWithEthersjs: () => Promise<string[]>;
   isLoading: boolean;
+  error: Error | null;
 };
 
 const PassportContext = createContext<PassportContextType>({
@@ -25,6 +26,7 @@ const PassportContext = createContext<PassportContextType>({
   loginWithoutWallet: () => { throw new Error('loginWithoutWallet must be used within a PassportProvider'); },
   loginWithEthersjs: () => { throw new Error('loginWithEthersjs must be used within a PassportProvider'); },
   isLoading: false,
+  error: null,
 });
 
 type PassportProviderProps = {
@@ -35,40 +37,69 @@ type PassportProviderProps = {
 export function PassportProvider({ children, config }: PassportProviderProps) {
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
   const passportInstance = new Passport(config);
   const v = useMemo(() => ({
     passportInstance,
     isLoggedIn,
     isLoading,
+    error,
     login: async () => {
-      setIsLoading(true);
-      const provider = passportInstance.connectEvm();
-      const accounts = await provider.request({ method: 'eth_requestAccounts' });
-      setLoggedIn(true);
-      setIsLoading(false);
-      return accounts;
+      try {
+        setError(null);
+        setIsLoading(true);
+        const provider = passportInstance.connectEvm();
+        const accounts = await provider.request({ method: 'eth_requestAccounts' });
+        setLoggedIn(true);
+        return accounts;
+      } catch (e: any) {
+        setError(e);
+      } finally {
+        setIsLoading(false);
+      }
+      return [];
     },
     logout: async () => {
-      setIsLoading(true);
-      await passportInstance.logout();
-      setLoggedIn(false);
-      setIsLoading(false);
+      try {
+        setError(null);
+        setIsLoading(true);
+        await passportInstance.logout();
+        setLoggedIn(false);
+      } catch (e: any) {
+        setError(e);
+      } finally {
+        setIsLoading(false);
+      }
     },
     loginWithoutWallet: async () => {
-      setIsLoading(true);
-      const profile = await passportInstance.login();
-      setLoggedIn(true);
-      setIsLoading(false);
-      return profile;
+      try {
+        setError(null);
+        setIsLoading(true);
+        const profile = await passportInstance.login();
+        setLoggedIn(true);
+        return profile;
+      } catch (e: any) {
+        setError(e);
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
     },
     loginWithEthersjs: async () => {
-      setIsLoading(true);
-      // eslint-disable-next-line new-cap
-      const provider = new Web3Provider(passportInstance.connectEvm());
-      const accounts = await provider.send('eth_requestAccounts', []);
-      setLoggedIn(true);
-      setIsLoading(false);
-      return accounts;
+      try {
+        setError(null);
+        setIsLoading(true);
+        // eslint-disable-next-line new-cap
+        const provider = new Web3Provider(passportInstance.connectEvm());
+        const accounts = await provider.send('eth_requestAccounts', []);
+        setLoggedIn(true);
+        return accounts;
+      } catch (e: any) {
+        setError(e);
+        return [];
+      } finally {
+        setIsLoading(false);
+      }
     },
   }), [config, isLoggedIn]);
 
