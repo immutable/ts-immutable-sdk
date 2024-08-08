@@ -2,18 +2,12 @@
 
 import { passport } from '@imtbl/sdk';
 
-export default function Page() {
-  // #doc passport-context
-  const {
-    login, loginWithEthersjs, loginWithoutWallet, logout,
-  } = passport.usePassport();
-  // #enddoc passport-context
-  // #doc passport-hooks
+export default function Page () {
+  const { login, loginWithEthersjs, loginWithoutWallet, logout } = passport.usePassport();
   const { idToken } = passport.useIdToken();
   const { accessToken } = passport.useAccessToken();
   const { linkedAddresses } = passport.useLinkedAddresses();
   const { userInfo } = passport.useUserInfo();
-  // #enddoc passport-hooks
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8">
