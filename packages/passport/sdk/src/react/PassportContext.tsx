@@ -13,7 +13,7 @@ type PassportContextType = {
   login: () => Promise<string[]>;
   logout: () => Promise<void>;
   loginWithoutWallet: () => Promise<UserProfile | null>;
-  loginWithEthersjs: () => Promise<string[]>;
+  loginWithEthersjs: () => Promise<{ accounts: string[], provider: Web3Provider | null }>;
   isLoading: boolean;
   error: Error | null;
 };
@@ -93,10 +93,10 @@ export function PassportProvider({ children, config }: PassportProviderProps) {
         const provider = new Web3Provider(passportInstance.connectEvm());
         const accounts = await provider.send('eth_requestAccounts', []);
         setLoggedIn(true);
-        return accounts;
+        return { accounts, provider };
       } catch (e: any) {
         setError(e);
-        return [];
+        return { accounts: [], provider: null };
       } finally {
         setIsLoading(false);
       }
