@@ -1,19 +1,69 @@
-## Introduction
+<p align="center">
+  <a href="https://www.immutable.com">
+    <img src="https://cdn.dribbble.com/users/1299339/screenshots/7133657/media/837237d447d36581ebd59ec36d30daea.gif" width="280"/>
+  </a>
 
-- TOC
+  <h2 align="center">Immutable Code Examples</h3>
 
-## Contribution Guidelines
+  <p align="center">
+    Immutable's code examples as used for the code snippets in the Immutable Docs
+    <br />
+    <a href="https://docs.immutable.com"><strong>Explore the docs »</strong></a>
+    <br />
+  </p>
+</p>
+<hr />
 
-Important information on how to create examples, pull them through to the docs site and ensure they are covered by tests in the CI CD pipeline.
+**Table of Contents**
 
+- [Introduction](#introduction)
+- [Running examples locally](#running-examples-locally)
+- [Contribution guidelines](#contribution-guidelines)
+- [Adding examples](#adding-examples)
+- [End to end testing](#end-to-end-testing)
+- [Creating code snippets](#creating-code-snippets)
+<hr />
 
-## Example Scope
+# Introduction
+
+The example apps in this examples directory are compiled and tested as part of our CI CD pipeline. The goal of this is to ensure the examples found here are always able to run against the latest version of the Immutable Typescript SDK. 
+
+Selected portions of code from these example apps is then displayed as code snippets in our docs site, which means our code snippets in the docs are inherently always accurate as well. How to include the code from here in the docs site is explained below. 
+
+These example apps can also be used directly as a reference and run locally to test and develop with.
+
+# Running examples locally
+
+First you need to clone the `ts-immutable-sdk` repo. There is no need to install the root node modules or build the SDK since the examples have their own `package.json` files and pull the node modules from npm rather than the local build.
+
+Take a look at the README.md file of the example you want to run e.g. the [Passport Connect Readme](/examples/passport/wallets-connect-with-nextjs/README.md)
+
+This should include the steps required to run the example. Generally you will need to;
+
+1. Copy the `.env.example` file to `.env` and populate it with the environment variables as per the readme.
+1. Then `yarn install` and `yarn dev`
+
+And the app should be served on https://localhost:3000 unless otherwise stated in the example app.
+
+# Contribution guidelines
+
+This section explains some of the core concepts to how we want to structure the examples so they can be more easily digested in the docs and by our partners.
+
+The goal is to have easy to read, well commented examples that focus on showing how to use a singular feature without being overly long complicated. They should not include overly opinionated framework implementations as it can make it unclear to the reader what is required and what is optional. They should compilable and tested with e2e tests as much as is practical.
+
+In the long run we want these apps to run in a code blitz frame inside the docs site much like on the [Checkout Connect Widget](https://docs.immutable.com/products/zkEVM/checkout/widgets/connect#sample-code) docs page. So aim to create an example which can be runnable like this.
+
+We also want to eventually index these examples and serve them in a searchable and filterable page on the docs site, so feel free to add more examples here which are not necessarily used as code snippets in the docs site.
+
+## Examples scope
 
 When creating an example app it should contain only examples about one particular feature to prevent overloading the example. If there are multiple ways to use the feature then it is okay to include those in one sample app.
 
 For example;
 
-the app in `examples/passport/wallets-connect-with-nextjs` show how to connect passport in the nextjs framework. It contains a default route that has links to each of the examples. Inside there are three routes, one for each way to connect (EIP-1193, EtherJS and Wagmi). These are okay to be part of one sample app since they show how to use one feature but using 3 different libraries.
+the app in `examples/passport/wallets-connect-with-nextjs` show how to connect passport in the nextjs framework. 
+
+It contains a default route that has links to each of the examples. Inside there are three routes, one for each way to connect (EIP-1193, EtherJS and Wagmi). These are okay to be part of one sample app since they show how to use one feature but using 3 different libraries.
 
 If you want to show a different feature e.g signing with passport, you should create a new example app. Even though it also requires passport to connect you should not add the signing example to the connect example app.
 
@@ -48,12 +98,46 @@ examples
 │   └── ...
 ```
 
-If you need to create a new example follow the steps below;
+# Adding examples
 
-## Creating a New Example
+Depending on the scope of the example you're trying to add, you may be able to add it to an existing example app, or you might have to create a new example app. If you're not sure, read the [Examples Scope](#examples-scope) section above to help you decide.
 
-create the nextjs project
+If you need to add a new example, please follow the [Folder Structure](#folder-structure) guidelines above.
 
+## Add to an existing example app
+
+The process may differ depending on how the example app is setup, but the recommendations we have made around creating a new example should follow the same structure as we've implemented for the [Passport Connect](/examples/passport/wallets-connect-with-nextjs) and [Passport Signing](/examples/passport/wallets-signing-with-nextjs) examples.
+
+So if you need to add a new example to an existing example app you should follow these steps
+
+1. Create a branch in `ts-immutable-sdk` to add your example to.
+1. Create new route folder inside the example app and add the `page.tsx` file.
+1. Add the new route you created to the app's home page
+1. Add any packages you require
+1. Add any environment variables your example requires to the `.env.example` file
+1. Add instructions in the `README.md` file about how to populate the `.env` file and any other build instructions.
+
+Once you've done this you can go ahead and write your example code in the `page.tsx` file.
+
+You can run the example locally to test your code by following the steps in the [Running examples locally](#running-examples-locally) section.
+
+You will also need to create e2e tests for your example as covered in the [End to end testing](#end-to-end-testing) section.
+
+Creating code snippets in the docs site using your example code is covered in the [Creating code snippets](#creating-code-snippets) section.
+
+If your code example is going to be used as code snippets in the docs site, before merging your branch to main in `ts-immutable-sdk` you should follow the steps in [Creating code snippets](#creating-code-snippets). These steps help you to test the code snippets in the docs site before you merge your PR which avoids double handling and multiple pull requests across both repos.
+
+## Creating a new example
+
+The process may differ if you're using a different Javascript Framework, but this assumes you will be creating a new example app using NextJS. These steps which were implemented to create the [Passport Connect](/examples/passport/wallets-connect-with-nextjs) example. It is a good reference point in terms of route structure and page layouts. If you need to copy code from there to help with your layouts then please go ahead.
+
+### Setup example app
+
+If you want to make a new NextJS app from scratch this is the process;
+
+Create a branch in `ts-immutable-sdk` to add your example to.
+
+In the console navigate to the product directory where your example will live (or create one if it doesn't exist). Then use `yarn dlx` to create the app.
 ```
 cd examples/<product>
 yarn dlx create-next-app@latest
@@ -68,12 +152,6 @@ use the default options
 ✔ Would you like to use `src/` directory? … Yes
 ✔ Would you like to use App Router? (recommended) … Yes
 ✔ Would you like to customize the default import alias (@/*)? No
-```
-
-install dependencies
-
-```
-yarn install
 ```
 
 install `@imtbl/sdk` and any other dependencies your example needs e.g.
@@ -112,6 +190,10 @@ Update the readme with any instructions required to run the app, and include wha
 - NEXT_PUBLIC_CLIENT_ID // replace with your client ID from Hub
 ```
 
+delete the any unused imports in `app/page.tsx`
+
+delete the contents of the return statement in `app/page.tsx` and replace with `<h1>My Example<h1/>` or whatever you like, just render something to the screen so you can tell its working when you run the app.
+
 start the project with hot reloading
 
 ```
@@ -120,43 +202,43 @@ yarn dev
 
 check `http://localhost:3000/` in the browser to confirm it compiled and ran
 
-delete the contents of `src/app/globals.css`    
-
-delete the any unused imports in `src/app/page.tsx`
-
-delete the contents of the return statement in `src/app/page.tsx` and replace with `<></>`
-
-update the title and description in `src/app/layout.tsx` to match the examples in your app e.g.
+update the title and description in `app/layout.tsx` to match the examples in your app e.g.
 
 ```
 export const metadata: Metadata = {
-  title: "Passport Wallets Connect",
+  title: "Passport Connect",
   description: "Examples of how to connect wallets to Passport with NextJS",
 };
 ```
 
 create a home page for your example app with links to all the examples in `src/app/page.tsx`
 
-e.g. `examples/passport/wallets-connect-with-nextjs/src/app/page.tsx`
+e.g. [Passport Connect Home Page](/examples/passport/wallets-connect-with-nextjs/app/page.tsx)
 
 create a route for each example using the naming convention `<feature>-with-<library>` e.g. `wallets-with-etherjs`
 
 start building your examples in the `page.tsx` in each of your example's route folders
 
-e.g. `examples/passport/wallets-connect-with-nextjs/src/app/connect-with-etherjs/page.tsx`
+e.g. [Passport Connect with EIP1193](/examples/passport/wallets-connect-with-nextjs/app/connect-with-eip1193/page.tsx)
 
-## Add to and Existing Example
+### Add your example
 
-create new route folder with page.tsx
+Once you've done this you can go ahead and write your example code in the `page.tsx` file in your examples route.
 
-add route to home page
+You can run the example locally to test your code by following the steps in the [Running examples locally](#running-examples-locally) section.
 
-add any packages you require
+You will also need to create e2e tests for your example as covered in the [End to end testing](#end-to-end-testing) section.
 
-yarn install
+Creating code snippets in the docs site using your example code is covered in the [Creating code snippets](#creating-code-snippets) section.
+
+If your code example is going to be used as code snippets in the docs site, before merging your branch to main in `ts-immutable-sdk` you should follow the steps in [Creating code snippets](#creating-code-snippets). These steps help you to test the code snippets in the docs site before you merge your PR which avoids double handling and multiple pull requests across both repos.
 
 
-## Creating Code Snippets
+# Creating code snippets
+
+Creating and using code snippets is relatively straight forward. You can pull in a whole file or by adding some comments you can pull in just a particular few lines of a file as necessary.
+
+You should create a branch in the `docs` repo to add your code snippets before you merge your example code to main in `ts-immutable-sdk`.
 
 In `ts-immutable-sdk`
 
@@ -224,27 +306,12 @@ Create your PR for your `docs` branch and get it merged into main.
 
 Do **NOT** merge your `docs` branch to main without pointing the code import back to the main branch on `ts-immutable-sdk` or it will break things when the branch is deleted and new code examples merged to main will not show in the docs site.
 
-
-## Comments
-
-All examples should be heavily commented and the comments should make sense in the context the snippet is appearing in the docs site.
-
-## Tests
+# End to end testing
 
 All examples should be covered by basic e2e tests to ensure they at least render the examples. Ideally they would also have e2e tests that prove the functionality that you're trying to show works. Depending on what you're doing in the examples, it may be difficult to e2e test certain things e.g. logging in with Passport. For this reason, testing of functionality with e2e testing is recommended if practical, but not required.
 
 More info on e2e tests coming soon.
 
-notes:
-
-- compile list of whats done and needs doing for the passport section
-- re-order the readme to bring the development process up higher
-- combine the section of how to make snippets into the development process
-- make it clearer when what actions are in the docs vs sdk repos
-- add instructions for adding to an existing example
-- Make hierarchy clearer in the readme
-- add table of contents and introduction
-- add some check on the docs CICD to make sure it's pointing to main not custom branch
 Install `@playwright/test` as a dev dependency for the e2e tests.
 
 ```
