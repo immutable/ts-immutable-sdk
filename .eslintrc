@@ -8,7 +8,8 @@
     "dist/",
     "**sample-app**/",
     "**playground**/",
-    "*.cjs"
+    "*.cjs",
+    "tests/func-tests/"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
