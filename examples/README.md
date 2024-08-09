@@ -296,9 +296,9 @@ const BRANCH = 'DVR-193-passport-signing-example';
 
 Now your `docs` branch will be pulling the code examples from your branch in `ts-immutable-sdk` and you can use them locally in your `docs` branch to make sure they make sense in the page.
 
-<div style="font-weight: bold; border: 1px solid #CC0000; padding: 10px 20px; background-color: #330000; border-radius: 5px;">
-## IMPORTANT: Make sure to change the branch back to `main` before merging your `docs` branch or it will break the docs site.
-</div>
+⚠️⚠️⚠️ **IMPORTANT** ⚠️⚠️⚠️
+
+Make sure to change the branch back to `main` before merging your `docs` branch or it will break the docs site.
 
 ## Creating code snippets
 
