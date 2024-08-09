@@ -30,7 +30,7 @@ type PassportProviderProps = {
   children: React.ReactNode;
 };
 
-export function PassportReactProvider({ children, config }: PassportProviderProps) {
+export function ReactProvider({ children, config }: PassportProviderProps) {
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [accounts, setAccounts] = useState<string[]>([]);
@@ -141,7 +141,7 @@ export function PassportReactProvider({ children, config }: PassportProviderProp
 export function usePassport(): PassportContextType {
   const c = useContext(PassportContext);
   if (!c) {
-    throw new Error('usePassport must be used within a PassportReactProvider');
+    throw new Error('usePassport must be used within a ReactProvider');
   }
   return c;
 }
