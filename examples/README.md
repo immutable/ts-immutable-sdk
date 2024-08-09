@@ -302,7 +302,7 @@ Make sure to change this back to `main` before merging your `docs` branch or it 
 
 ## Creating code snippets
 
-In your code examples in `tsimmutable-sdk` find the parts of the code you want to use as code snippets and wrap them in the `#doc` and `#enddoc` comments while providing a label.
+In your code examples in `ts-immutable-sdk` find the parts of the code you want to use as code snippets and wrap them in the `#doc` and `#enddoc` comments while providing a label.
 
 Labels have to be unique within a file so you should use a simple naming convention to avoid clashes within the file e.g.
 
