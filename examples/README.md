@@ -59,9 +59,7 @@ We also want to eventually index these examples and serve them in a searchable a
 
 When creating an example app it should contain only examples about one particular feature to prevent overloading the example. If there are multiple ways to use the feature then it is okay to include those in one example app.
 
-For example;
-
-the app in `examples/passport/wallets-connect-with-nextjs` show how to connect passport in the nextjs framework. 
+For example, the [Passport Connect with NextJS](/examples/passport/wallets-connect-with-nextjs) app shows how to connect passport in the NextJS framework. 
 
 It contains a default route that has links to each of the examples. Inside there are three routes, one for each way to connect (EIP-1193, EtherJS and Wagmi). These are okay to be part of one example app since they show how to use one feature but using 3 different libraries.
 
@@ -106,7 +104,7 @@ If you need to add a new example or add to an existing example, please follow th
 
 ## Add to an existing example app
 
-The process may differ depending on how the example app is setup, but the recommendations we have made around creating a new example should follow the same structure as we've implemented for the [Passport Connect](/examples/passport/wallets-connect-with-nextjs) and [Passport Signing](/examples/passport/wallets-signing-with-nextjs) examples.
+The process may differ depending on how the example app is setup, but the recommendations we have made around creating a new example should follow the same structure as we've implemented for the [[Passport Connect with NextJS](/examples/passport/wallets-connect-with-nextjs) and [Passport Signing with NextJS](/examples/passport/wallets-signing-with-nextjs) examples.
 
 So if you need to add a new example to an existing example app you should create a branch in `ts-immutable-sdk` to add your example to and follow these steps;
 
@@ -272,7 +270,7 @@ Make sure you update the localhost urls `http://localhost:3000` in the above exa
 
 Create a `tests` directory in the root of the example app and start adding tests.
 
-Example of the base level of testing required can be found in `/examples/passport/wallets-signing-with-nextjs/tests/base.spec.ts`
+Example of the base level of testing required can be found in the [Passport Connect e2e Tests](/examples/passport/wallets-connect-with-nextjs/tests/base.spec.ts) spec file.
 
 Add the test runner to the scripts in your package.json
 
@@ -298,7 +296,7 @@ const BRANCH = 'DVR-193-passport-signing-example';
 
 Now your `docs` branch will be pulling the code examples from your branch in `ts-immutable-sdk` and you can use them locally in your `docs` branch to make sure they make sense in the page.
 
-Make sure to change this back to `main` before merging your `docs` branch or it will break the docs site.
+<div style="font-weight: bold; border: 1px solid #CC0000; padding: 10px 20px; background-color: #330000; border-radius: 5px;">IMPORTANT: Make sure to change the branch back to `main` before merging your `docs` branch or it will break the docs site.</div>
 
 ## Creating code snippets
 
@@ -331,7 +329,21 @@ Or if you want to display the whole file just don't include a `#` label at the e
 ```
 ````
 
-Just like regular code snippets, you can set language for syntax highlighting, in this example we are setting it to `tsx`.
+Just like regular code snippets, you can set language for syntax highlighting by adding it's alias directly after the opening backticks. In the above example we are setting the syntax highlighting to be for `tsx`. For more information on syntax highlighting, visit the [GitHub Documentation](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks).
+
+Some popular syntaxes you are likely to want to use syntax highlighting for are;
+
+| Language   | Alias | 
+|------------|-------------|
+| Javascript | js |
+| Typescript | ts |
+| Typescript with JSX | tsx
+| Solidity | solidity |
+| C# | csharp |
+| C++ | cpp |
+
+For the full list of supported syntaxes and their aliases [Linguist's languages YAML file](https://github.com/github-linguist/linguist/blob/master/lib/linguist/languages.yml).
+
 
 The other available parameters are;
 
