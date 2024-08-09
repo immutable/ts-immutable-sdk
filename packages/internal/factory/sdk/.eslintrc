@@ -1,6 +1,6 @@
 {
   "extends": [
-    "../../../../.eslintrc"
+    "../../.eslintrc"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {

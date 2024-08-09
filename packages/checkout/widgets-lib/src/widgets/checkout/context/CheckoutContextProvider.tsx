@@ -1,7 +1,6 @@
 import { PostMessageHandler } from '@imtbl/checkout-sdk';
 import {
-  Dispatch,
-  ReactNode, useContext, useEffect,
+  Dispatch, ReactNode, useContext, useEffect,
 } from 'react';
 import {
   CheckoutAction,
@@ -10,32 +9,47 @@ import {
   CheckoutState,
 } from './CheckoutContext';
 import { ProviderRelay } from './ProviderRelay';
-import { CHECKOUT_APP_URL } from '../../../lib';
 
 type CheckoutContextProviderProps = {
   values: {
-    checkoutState: CheckoutState,
-    checkoutDispatch: Dispatch<CheckoutAction>,
-  }, children: ReactNode
+    checkoutState: CheckoutState;
+    checkoutDispatch: Dispatch<CheckoutAction>;
+  };
+  children: ReactNode;
 };
-export function CheckoutContextProvider({ values, children }: CheckoutContextProviderProps) {
+export function CheckoutContextProvider({
+  values,
+  children,
+}: CheckoutContextProviderProps) {
   const { checkoutState, checkoutDispatch } = values;
-  const { checkout } = checkoutState;
-  const { provider, checkoutAppIframe, postMessageHandler } = checkoutState;
+  const {
+    checkout,
+    provider,
+    iframeContentWindow,
+    postMessageHandler,
+    iframeURL,
+  } = checkoutState;
 
   useEffect(() => {
-    if (!checkoutAppIframe || !checkout) return;
+    if (!iframeContentWindow || !checkout || !iframeURL) return;
+
+    const postMessageHandlerInstance = new PostMessageHandler({
+      targetOrigin: new URL(iframeURL).origin,
+      eventTarget: iframeContentWindow,
+    });
+
+    // TODO: remove logger after done with development
+    postMessageHandlerInstance.setLogger((...args: any[]) => {
+      console.log("🔔 PARENT – ", ...args); // eslint-disable-line
+    });
 
     checkoutDispatch({
       payload: {
         type: CheckoutActions.SET_POST_MESSAGE_HANDLER,
-        postMessageHandler: new PostMessageHandler({
-          targetOrigin: CHECKOUT_APP_URL[checkout.config.environment],
-          eventTarget: checkoutAppIframe,
-        }),
+        postMessageHandler: postMessageHandlerInstance,
       },
     });
-  }, [checkoutAppIframe, checkout]);
+  }, [iframeContentWindow, checkout, iframeURL]);
 
   useEffect(() => {
     if (!provider || !postMessageHandler) return undefined;
@@ -55,7 +69,6 @@ export function CheckoutContextProvider({ values, children }: CheckoutContextPro
     <CheckoutContext.Provider value={values}>
       {children}
     </CheckoutContext.Provider>
-
   );
 }
 

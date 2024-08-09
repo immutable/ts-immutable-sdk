@@ -214,6 +214,7 @@ window.callFunction = async (jsonData: string) => {
 
     track(moduleName, 'startedCallFunction', {
       function: fxName,
+      requestId,
     });
     switch (fxName) {
       case PASSPORT_FUNCTIONS.init: {
