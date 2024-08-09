@@ -9,6 +9,7 @@
     "**sample-app**/",
     "**playground**/",
     "*.cjs",
+    "*.js",
     "tests/func-tests/"
   ],
   "parser": "@typescript-eslint/parser",
