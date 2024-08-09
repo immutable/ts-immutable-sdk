@@ -212,10 +212,6 @@ e.g. [Passport Connect Home Page](/examples/passport/wallets-connect-with-nextjs
 
 create a route for each example using the naming convention `<feature>-with-<library>` e.g. `wallets-with-etherjs`
 
-start building your examples in the `page.tsx` in each of your example's route folders
-
-e.g. [Passport Connect with EIP1193](/examples/passport/wallets-connect-with-nextjs/app/connect-with-eip1193/page.tsx)
-
 ### Add your example
 
 Once you've done this you can go ahead and write your example code in the `page.tsx` file in your examples route.
