@@ -228,8 +228,6 @@ If your code example is going to be used as code snippets in the docs site, befo
 
 All examples should be covered by basic e2e tests to ensure they at least render the examples. Ideally they would also have e2e tests that prove the functionality that you're trying to show works. Depending on what you're doing in the examples, it may be difficult to e2e test certain things e.g. logging in with Passport. For this reason, testing of functionality with e2e testing is recommended if practical, but not required.
 
-More info on e2e tests coming soon.
-
 Install `@playwright/test` as a dev dependency for the e2e tests.
 
 ```
