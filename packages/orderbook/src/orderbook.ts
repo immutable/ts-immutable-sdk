@@ -210,12 +210,12 @@ export class Orderbook {
 
       return {
         actions: prepareListingResponse.actions,
-        completeListings: async (signatures: string[]) => {
+        completeListings: async (signatures: string | string[]) => {
           const createListingResult = await this.createListing({
             makerFees: listingParams[0].makerFees,
             orderComponents: prepareListingResponse.orderComponents,
             orderHash: prepareListingResponse.orderHash,
-            orderSignature: signatures[0],
+            orderSignature: typeof signatures === 'string' ? signatures : signatures[0],
           });
 
           return {
@@ -265,7 +265,12 @@ export class Orderbook {
 
       return {
         actions,
-        completeListings: async (signatures: string[]) => {
+        completeListings: async (signatures: string | string[]) => {
+          const signatureIsString = typeof signatures === 'string';
+          if (signatureIsString) {
+            throw new Error('A signature per listing must be provided for smart contract wallets');
+          }
+
           const createListingsApiResponses = await Promise.all(
             prepareListingResponses.map((prepareListingResponse, i) => {
               const signature = signatures[i];
@@ -304,14 +309,16 @@ export class Orderbook {
 
     return {
       actions,
-      completeListings: async (signatures: string[]) => {
-        if (signatures.length !== 1) {
+      completeListings: async (signatures: string | string[]) => {
+        const signatureIsArray = typeof signatures === 'object';
+        if (signatureIsArray && signatures.length !== 1) {
           throw new Error('Only a single signature is expected for bulk listing creation');
         }
 
         const orderComponents = preparedListings.map((orderParam) => orderParam.orderComponents);
+        const signature = signatureIsArray ? signatures[0] : signatures;
         const bulkOrderSignatures = getBulkSeaportOrderSignatures(
-          signatures[0],
+          signature,
           orderComponents,
         );
 
