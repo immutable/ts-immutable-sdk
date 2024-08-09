@@ -57,13 +57,13 @@ We also want to eventually index these examples and serve them in a searchable a
 
 ## Examples scope
 
-When creating an example app it should contain only examples about one particular feature to prevent overloading the example. If there are multiple ways to use the feature then it is okay to include those in one sample app.
+When creating an example app it should contain only examples about one particular feature to prevent overloading the example. If there are multiple ways to use the feature then it is okay to include those in one example app.
 
 For example;
 
 the app in `examples/passport/wallets-connect-with-nextjs` show how to connect passport in the nextjs framework. 
 
-It contains a default route that has links to each of the examples. Inside there are three routes, one for each way to connect (EIP-1193, EtherJS and Wagmi). These are okay to be part of one sample app since they show how to use one feature but using 3 different libraries.
+It contains a default route that has links to each of the examples. Inside there are three routes, one for each way to connect (EIP-1193, EtherJS and Wagmi). These are okay to be part of one example app since they show how to use one feature but using 3 different libraries.
 
 If you want to show a different feature e.g signing with passport, you should create a new example app. Even though it also requires passport to connect you should not add the signing example to the connect example app.
 
