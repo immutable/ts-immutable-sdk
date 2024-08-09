@@ -59,7 +59,12 @@ export interface PrepareBulkListingsParams {
 
 export interface PrepareBulkListingsResponse {
   actions: Action[];
-  completeListings: (signature: string) => Promise<BulkListingsResult>;
+  completeListings(signatures: string[]): Promise<BulkListingsResult>;
+  /**
+   * @deprecated Pass a string[] to `completeListings` instead to enable
+   * smart contract wallets
+   */
+  completeListings(signature: string): Promise<BulkListingsResult>;
 }
 
 export interface PrepareBulkSeaportOrders {
