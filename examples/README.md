@@ -127,7 +127,7 @@ Creating code snippets in the docs site using your example code is covered in th
 
 If your code example is going to be used as code snippets in the docs site, before merging your branch to main in `ts-immutable-sdk` you should follow the steps in [Using code examples in the docs site](#using-code-examples-in-the-docs-site). These steps help you to test the code snippets in the docs site before you merge your PR which avoids double handling and multiple pull requests across both repos.
 
-## Creating a new example
+## Creating a new example app
 
 The process may differ if you're using a different Javascript Framework, but this assumes you will be creating a new example app using NextJS. These steps which were implemented to create the [Passport Connect](/examples/passport/wallets-connect-with-nextjs) example. It is a good reference point in terms of route structure and page layouts. If you need to copy code from there to help with your layouts then please go ahead.
 
