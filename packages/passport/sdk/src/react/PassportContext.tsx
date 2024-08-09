@@ -157,7 +157,12 @@ export function useIdToken() {
       setLoading(true);
       passportInstance
         .getIdToken()
-        .then((t) => setIdToken(t || null))
+        .then((t) => {
+          setIdToken(t || null);
+          if (!t) {
+            setError(new Error('No ID Token'));
+          }
+        })
         .catch((e) => setError(e))
         .finally(() => setLoading(false));
     } else {
