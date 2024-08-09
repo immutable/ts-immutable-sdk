@@ -108,14 +108,17 @@ If you need to add a new example, please follow the [Folder Structure](#folder-s
 
 The process may differ depending on how the example app is setup, but the recommendations we have made around creating a new example should follow the same structure as we've implemented for the [Passport Connect](/examples/passport/wallets-connect-with-nextjs) and [Passport Signing](/examples/passport/wallets-signing-with-nextjs) examples.
 
-So if you need to add a new example to an existing example app you should follow these steps
+So if you need to add a new example to an existing example app you should create a branch in `ts-immutable-sdk` to add your example to and follow these steps;
 
-1. Create a branch in `ts-immutable-sdk` to add your example to.
+### Setup example in existing app
+
 1. Create new route folder inside the example app and add the `page.tsx` file.
 1. Add the new route you created to the app's home page
 1. Add any packages you require
 1. Add any environment variables your example requires to the `.env.example` file
 1. Add instructions in the `README.md` file about how to populate the `.env` file and any other build instructions.
+
+### Add your example
 
 Once you've done this you can go ahead and write your example code in the `page.tsx` file.
 
