@@ -346,7 +346,9 @@ Make sure the language and parameters are all set on the first line of the code 
 
 ## Finishing up
 
-Once you're happy with your code examples on `ts-immutable-sdk` and you've tried them locally in the `docs` site from your branch on Github. Create a PR for your branch in `ts-immutable-sdk` and get it merged to main. Now in your `docs` branch change the `BRANCH` constant in the `/src/remark/import-code.mjs` file from your branch name, back to `main`.
+Once you're happy with your code examples on `ts-immutable-sdk` and you've tried them locally in the `docs` site from your branch on Github. Create a PR for your code examples branch in `ts-immutable-sdk` and get it merged to main. 
+
+Now in your `docs` branch change the `BRANCH` constant in the `/src/remark/import-code.mjs` file from your branch name, back to `main`. 
 
 You can now double check the code snippets in your `docs` branch are all pulling through correctly from main on `ts-immutable-sdk` and create the PR for your `docs` branch.
 
