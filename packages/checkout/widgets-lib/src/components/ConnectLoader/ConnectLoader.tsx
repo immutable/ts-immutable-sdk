@@ -1,4 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
+import { useTranslation } from 'react-i18next';
 import {
   ChainId,
   Checkout,
@@ -53,6 +54,8 @@ export function ConnectLoader({
     allowedChains,
     web3Provider,
   } = params;
+
+  const { t } = useTranslation();
 
   const [connectLoaderState, connectLoaderDispatch] = useReducer(
     connectLoaderReducer,
@@ -259,7 +262,7 @@ export function ConnectLoader({
               },
             });
           }}
-          actionText="Try Again"
+          actionText={t('views.ERROR_VIEW.actionText')}
         />
       )}
     </>

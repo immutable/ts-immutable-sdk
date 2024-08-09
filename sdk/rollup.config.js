@@ -45,30 +45,41 @@ const getFilesToBuild = () => {
   return [...files, ...returnModules];
 };
 
-const getFileBuild = (inputFilename) => [
-  {
-    input: `./src/${inputFilename}.ts`,
-    output: {
-      dir: 'dist',
-      format: 'es',
-    },
-    plugins: [
-      nodeResolve({
-        resolveOnly: getPackages(),
-      }),
-      json(),
-      commonJs(),
-      typescript({
-        declaration: true,
-        declarationDir: './dist/types',
-      }),
-      replace({
-        exclude: 'node_modules/**',
-        preventAssignment: true,
-        __SDK_VERSION__: pkg.version,
-      }),
-    ],
-  },
+
+const buildJS = () => {
+  const filesToBuild = getFilesToBuild();
+  // generate a single object that contains all the files under input
+  const [inputs] = filesToBuild.reduce((acc, f) => {
+    return [{...acc[0], [f] : `./src/${f}.ts`}]
+  }, [{}])
+
+  return  {
+      input: inputs,
+      output: {
+        dir: 'dist',
+        format: 'es',
+      },
+      plugins: [
+        nodeResolve({
+          resolveOnly: getPackages(),
+        }),
+        json(),
+        commonJs(),
+        typescript({
+          declaration: true,
+          declarationDir: './dist/types',
+        }),
+        replace({
+          exclude: 'node_modules/**',
+          preventAssignment: true,
+          __SDK_VERSION__: pkg.version,
+        }),
+      ],
+      external: ['pg'] 
+    }
+};
+
+const getTypesBuild = (inputFilename) => [
   {
     input: `./dist/types/${inputFilename}.d.ts`,
     output: {
@@ -84,11 +95,11 @@ const getFileBuild = (inputFilename) => [
   },
 ];
 
-const buildBundles = () => {
+const buildTypes = () => {
   const modules = [];
   const filesToBuild = getFilesToBuild();
   for (const file of filesToBuild) {
-    modules.push(...getFileBuild(file));
+    modules.push(...getTypesBuild(file));
   }
   return modules;
 };
@@ -155,5 +166,6 @@ export default [
   },
 
   // Export ES Modules
-  ...buildBundles(),
+  buildJS(),
+  ...buildTypes(),
 ];

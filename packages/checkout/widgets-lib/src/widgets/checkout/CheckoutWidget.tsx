@@ -1,12 +1,10 @@
-import { useEffect, useMemo, useReducer } from 'react';
+import { useMemo, useReducer } from 'react';
 import {
   Checkout,
   CheckoutWidgetConfiguration,
   CheckoutWidgetParams,
-  WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import {
-  CheckoutActions,
   checkoutReducer,
   initialCheckoutState,
 } from './context/CheckoutContext';
@@ -24,7 +22,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   const { config, checkout, params } = props;
   const { environment, publishableKey } = checkout.config;
 
-  const [, iframeUrl] = useMemo(() => {
+  const [, iframeURL] = useMemo(() => {
     if (!publishableKey) return ['', ''];
     return getIframeURL(params, config, environment, publishableKey);
   }, [params, config, environment, publishableKey]);
@@ -34,48 +32,12 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
     initialCheckoutState,
   );
   const checkoutReducerValues = useMemo(
-    () => ({ checkoutState, checkoutDispatch }),
-    [checkoutState, checkoutDispatch],
+    () => ({
+      checkoutState: { ...checkoutState, iframeURL, checkout },
+      checkoutDispatch,
+    }),
+    [checkoutState, checkoutDispatch, iframeURL, checkout],
   );
-
-  useEffect(() => {
-    if (iframeUrl === undefined) return;
-
-    checkoutDispatch({
-      payload: {
-        type: CheckoutActions.SET_IFRAME_URL,
-        iframeUrl,
-      },
-    });
-  }, [iframeUrl]);
-
-  useEffect(() => {
-    checkoutDispatch({
-      payload: {
-        type: CheckoutActions.SET_CHECKOUT,
-        checkout,
-      },
-    });
-
-    const connectProvider = async () => {
-      const createProviderResult = await checkout.createProvider({
-        walletProviderName: WalletProviderName.METAMASK,
-      });
-
-      const connectResult = await checkout.connect({
-        provider: createProviderResult.provider,
-      });
-
-      checkoutDispatch({
-        payload: {
-          type: CheckoutActions.SET_PROVIDER,
-          provider: connectResult.provider,
-        },
-      });
-    };
-
-    connectProvider();
-  }, [checkout]);
 
   return (
     <CheckoutContextProvider values={checkoutReducerValues}>
