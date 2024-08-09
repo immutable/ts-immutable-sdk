@@ -47,7 +47,7 @@ And the app should be served on https://localhost:3000 unless otherwise stated i
 
 # Contribution guidelines
 
-This section explains some of the core concepts to how we want to structure the examples so they can be more easily digested in the docs and by our partners.
+This section explains some of the core concepts for how we want to structure the examples so they can be more easily digested in the docs and by our partners.
 
 The goal is to have easy to read, well commented examples that focus on showing how to use a singular feature without being overly long or complicated. They should not include overly opinionated framework implementations as it can make it unclear to the reader what is required and what is optional. They should compilable and tested with e2e tests as much as is practical.
 
