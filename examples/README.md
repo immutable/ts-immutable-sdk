@@ -298,7 +298,7 @@ Now your `docs` branch will be pulling the code examples from your branch in `ts
 
 ⚠️ ⚠️ ⚠️ **IMPORTANT** ⚠️ ⚠️ ⚠️
 
-Make sure to change the branch back to `main` before merging your `docs` branch or it will break the docs site.
+Make sure to change the branch back to `main` before merging your `docs` branch or it will **BREAK** the docs site.
 
 ## Creating code snippets
 
