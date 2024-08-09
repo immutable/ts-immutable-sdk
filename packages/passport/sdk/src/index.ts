@@ -27,7 +27,7 @@ export type {
 } from './types';
 
 export {
-  PassportProvider,
+  PassportReactProvider,
   useAccessToken,
   useIdToken,
   useLinkedAddresses,
