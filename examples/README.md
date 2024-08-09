@@ -49,7 +49,7 @@ And the app should be served on https://localhost:3000 unless otherwise stated i
 
 This section explains some of the core concepts for how we want to structure the examples so they can be more easily digested in the docs and by our partners.
 
-The goal is to have easy to read, well commented examples that focus on showing how to use a singular feature without being overly long or complicated. They should not include overly opinionated framework implementations as it can make it unclear to the reader what is required and what is optional. They should compilable and tested with e2e tests as much as is practical.
+The goal is to have easy to read, well commented examples that focus on showing how to use a singular feature without being overly long or complicated. They should not include overly opinionated framework implementations as it can make it unclear to the reader what is required and what is optional. They should be compilable and tested with e2e tests as much as is practical.
 
 In the long run we want these apps to run in a code blitz frame inside the docs site much like on the [Checkout Connect Widget](https://docs.immutable.com/products/zkEVM/checkout/widgets/connect#sample-code) docs page. So aim to create an example which can be runnable like this.
 
