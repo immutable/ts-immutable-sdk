@@ -196,6 +196,8 @@ export class Orderbook {
       throw new Error('Bulk listing creation is limited to 20 orders');
     }
 
+    // Bulk listings (with single listing) code path common for both Smart contract
+    // wallets and EOAs.
     // In the event of a single order, delegate to prepareListing as the signature is more
     // gas efficient
     if (listingParams.length === 1) {
@@ -228,7 +230,9 @@ export class Orderbook {
       };
     }
 
-    // not fool-proof but scenarios where smart contract wallet is not deployed will be an edge case
+    // Bulk listings (with multiple listings) code path for Smart contract wallets.
+    // Code check to determine wallet type is not fool-proof but scenarios where smart
+    // contract wallet is not deployed will be an edge case
     const isSmartContractWallet: boolean = await this.orderbookConfig.provider.getCode(makerAddress) !== '0x';
     if (isSmartContractWallet) {
       track('orderbookmr', 'bulkListings', { walletType: 'Passport', makerAddress, listingsCount: listingParams.length });
@@ -290,6 +294,7 @@ export class Orderbook {
       };
     }
 
+    // Bulk listings (with multiple listings) code path for EOA wallets.
     track('orderbookmr', 'bulkListings', { walletType: 'EOA', makerAddress, listingsCount: listingParams.length });
     const { actions, preparedListings } = await this.seaport.prepareBulkSeaportOrders(
       makerAddress,
