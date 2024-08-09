@@ -28,7 +28,7 @@
 
 The example apps in this examples directory are compiled and tested as part of our CI CD pipeline. The goal of this is to ensure the examples found here are always able to run against the latest version of the Immutable Typescript SDK. 
 
-Selected portions of code from these example apps is then displayed as code snippets in our docs site, which means our code snippets in the docs are inherently always accurate as well. How to include the code from here in the docs site is explained below. 
+Selected portions of code from these example apps are then displayed as code snippets in our docs site, which means our code snippets in the docs are inherently always accurate as well. How to include the code from here in the docs site is explained below. 
 
 These example apps can also be used directly as a reference and run locally to test and develop with.
 
@@ -55,9 +55,9 @@ And the app should be served on https://localhost:3000 unless otherwise stated i
 
 # Contribution guidelines
 
-This section explains some of the core concepts to how we want to structure the examples so they can be more easily digested in the docs and by our partners.
+This section explains some of the core concepts for how we want to structure the examples so they can be more easily digested in the docs and by our partners.
 
-The goal is to have easy to read, well commented examples that focus on showing how to use a singular feature without being overly long or complicated. They should not include overly opinionated framework implementations as it can make it unclear to the reader what is required and what is optional. They should compilable and tested with e2e tests as much as is practical.
+The goal is to have easy to read, well commented examples that focus on showing how to use a singular feature without being overly long or complicated. They should not include overly opinionated framework implementations as it can make it unclear to the reader what is required and what is optional. They should be compilable and tested with e2e tests as much as is practical.
 
 In the long run we want these apps to run in a code blitz frame inside the docs site much like on the [Checkout Connect Widget](https://docs.immutable.com/products/zkEVM/checkout/widgets/connect#sample-code) docs page. So aim to create an example which can be runnable like this.
 
