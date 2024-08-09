@@ -154,27 +154,25 @@ use the default options;
 ✔ Would you like to customize the default import alias (@/*)? No
 ```
 
-install `@imtbl/sdk` and any other dependencies your example needs e.g.
+Install `@imtbl/sdk` and any other dependencies your example needs e.g.
 
 ```
 yarn add @imtbl/sdk
 yarn add @ethersproject/providers@^5.7.2
 ```
 
-create a `.env.example` file in the root of the example. This will be committed to git so don't fill in the values
+Create a `.env.example` file in the root of the example. This will be committed to git so don't fill in the values
 
-add a template for any environment variables you need to the `.env.example` file e.g.
+Add a template for any environment variables you need to the `.env.example` file e.g.
 
 ```
 NEXT_PUBLIC_PUBLISHABLE_KEY=
 NEXT_PUBLIC_CLIENT_ID=
 ```
 
-copy the `.env.example` file to `.env` in the root of the example. The `.env` file should be automatically ignored by git.
+Copy the `.env.example` file to `.env` in the root of the example (the `.env` file should be automatically ignored by git). Then populate any API keys and secrets you need to use in your application into the `.env` file.
 
-populate any API keys and secrets you need to use in your application.
-
-note: variables must be prefixed with `NEXT_PUBLIC_` to be piped into the browser env.
+Note: variables must be prefixed with `NEXT_PUBLIC_` to be piped into the browser env.
 
 Update the readme with any instructions required to run the app, and include what required env variables there are with any instructions on what to populate there e.g.
 
@@ -185,19 +183,19 @@ Update the readme with any instructions required to run the app, and include wha
 - NEXT_PUBLIC_CLIENT_ID // replace with your client ID from Hub
 ```
 
-delete the any unused imports in `app/page.tsx`
+Delete the any unused imports in `app/page.tsx`
 
-delete the contents of the return statement in `app/page.tsx` and replace with `<h1>My Example<h1/>` or whatever you like, just render something to the screen so you can tell its working when you run the app.
+Delete the contents of the return statement in `app/page.tsx` and replace with `<h1>My Example<h1/>` or whatever you like, just render something to the screen so you can tell its working when you run the app.
 
-start the project with hot reloading by running;
+Start the project with hot reloading by running;
 
 ```
 yarn dev
 ```
 
-check `http://localhost:3000/` in the browser to confirm it compiled and ran
+Check `http://localhost:3000/` in the browser to confirm it compiled and ran
 
-update the title and description in `app/layout.tsx` to match the examples in your app e.g.
+Update the title and description in `app/layout.tsx` to match the examples in your app e.g.
 
 ```
 export const metadata: Metadata = {
@@ -206,11 +204,9 @@ export const metadata: Metadata = {
 };
 ```
 
-create a home page for your example app with links to all the examples in `src/app/page.tsx`
+Create a home page for your example app with links to all the examples in `src/app/page.tsx` e.g. [Passport Connect Home Page](/examples/passport/wallets-connect-with-nextjs/app/page.tsx)
 
-e.g. [Passport Connect Home Page](/examples/passport/wallets-connect-with-nextjs/app/page.tsx)
-
-create a route for each example using the naming convention `<feature>-with-<library>` e.g. `wallets-with-etherjs`
+Create a route for each example using the naming convention `<feature>-with-<library>` e.g. `wallets-with-etherjs`
 
 ### Add your example
 
