@@ -28,7 +28,7 @@
 
 The example apps in this examples directory are compiled and tested as part of our CI CD pipeline. The goal of this is to ensure the examples found here are always able to run against the latest version of the Immutable Typescript SDK. 
 
-Selected portions of code from these example apps is then displayed as code snippets in our docs site, which means our code snippets in the docs are inherently always accurate as well. How to include the code from here in the docs site is explained below. 
+Selected portions of code from these example apps are then displayed as code snippets in our docs site, which means our code snippets in the docs are inherently always accurate as well. How to include the code from here in the docs site is explained below. 
 
 These example apps can also be used directly as a reference and run locally to test and develop with.
 
