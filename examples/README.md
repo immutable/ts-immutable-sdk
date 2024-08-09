@@ -319,7 +319,7 @@ Make sure to commit and push the labels to your `ts-immutable-sdk` branch on Git
 
 ## Using code snippets
 
-It's very simple to use the code snippet in the docs site, you just add a code block with the reference to the file and label you want to display e.g.
+It's very simple to use the code snippet in the docs site, you just add a code block with the reference to the file and the `#` of the label you want to display e.g.
 
 ````
 ```tsx reference=examples/passport/wallets-connect-with-nextjs/src/app/connect-with-eip1193/page.tsx#eip1193-create title="Create the Passport Provider"
@@ -338,7 +338,7 @@ The other available parameters are;
 
 | parameter  | type    | description |
 |------------|---------|-------------|
-| reference  | string  | the location of the code example file in the `ts-immutable-sdk` |
+| reference  | string  | the location of the code example file in the `ts-immutable-sdk` with optional `#` label of the snippet |
 | title      | string  | the title that will appear above the code snippet block in the docs website |
 | githubLink | boolean | true by default, set to false to hide the link to file on GitHub in the header |
 
