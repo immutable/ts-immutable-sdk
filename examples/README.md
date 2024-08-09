@@ -102,7 +102,7 @@ examples
 
 Depending on the scope of the example you're trying to add, you may be able to add it to an existing example app, or you might have to create a new example app. If you're not sure, read the [Examples Scope](#examples-scope) section above to help you decide.
 
-If you need to add a new example, please follow the [Folder Structure](#folder-structure) guidelines above.
+If you need to add a new example or add to an existing example, please follow the [Folder Structure](#folder-structure) guidelines above.
 
 ## Add to an existing example app
 
