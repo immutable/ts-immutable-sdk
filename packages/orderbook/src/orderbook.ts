@@ -1,4 +1,5 @@
 import { ModuleConfiguration } from '@imtbl/config';
+import { track } from '@imtbl/metrics';
 import { ImmutableApiClient, ImmutableApiClientFactory } from './api-client';
 import {
   getConfiguredProvider,
@@ -234,6 +235,8 @@ export class Orderbook {
     // contract wallet is not deployed will be an edge case
     const isSmartContractWallet: boolean = await this.orderbookConfig.provider.getCode(makerAddress) !== '0x';
     if (isSmartContractWallet) {
+      track('orderbookmr', 'bulkListings', { walletType: 'Passport', makerAddress, listingsCount: listingParams.length });
+
       // eslint-disable-next-line max-len
       const prepareListingResponses = await Promise.all(listingParams.map((listing) => this.seaport.prepareSeaportOrder(
         makerAddress,
@@ -297,6 +300,7 @@ export class Orderbook {
     }
 
     // Bulk listings (with multiple listings) code path for EOA wallets.
+    track('orderbookmr', 'bulkListings', { walletType: 'EOA', makerAddress, listingsCount: listingParams.length });
     const { actions, preparedListings } = await this.seaport.prepareBulkSeaportOrders(
       makerAddress,
       listingParams.map((orderParam) => ({
