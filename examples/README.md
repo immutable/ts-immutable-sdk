@@ -34,7 +34,15 @@ These example apps can also be used directly as a reference and run locally to t
 
 # Running examples locally
 
-First you need to clone the `ts-immutable-sdk` repo. There is no need to install the root node modules or build the SDK since the examples have their own `package.json` files and pull the node modules from npm rather than the local build.
+First you need to clone or fork the `ts-immutable-sdk` repo. The examples are a part of the root workspace and running yarn install from anywhere in the workspace will install the node modules required by the examples to the root `node_modules` directory. By default, the examples pull the latest sdk version from NPM instead of building the SDK locally. 
+
+If you want to run the examples against your local build of the SDK instead, from the project root run;
+
+```bash
+yarn prepare:examples
+```
+
+and it will build the SDK first then use that build instead of what is on NPM. This is what our CI CD pipeline does to ensure it's compiling and testing the examples against the latest changes rather than what's already on NPM.
 
 Take a look at the README.md file of the example you want to run e.g. the [Passport Connect Readme](/examples/passport/wallets-connect-with-nextjs/README.md)
 
@@ -139,14 +147,14 @@ If you want to make a new NextJS app from scratch this is the process;
 Create a branch in `ts-immutable-sdk` to add your example to.
 
 In the console navigate to the product directory where your example will live (or create one if it doesn't exist). Then use `yarn dlx` to create the app.
-```
+```bash
 cd examples/<product>
 yarn dlx create-next-app@latest
 ```
 
 use the default options;
-```
-✔ What is your project named? <feature>-with-<framework> e.g. wallets-with-nextjs
+```bash
+✔ What is your project named? @examples/<product>/<feature>-with-<framework> e.g. @examples/passport/connect-with-nextjs
 ✔ Would you like to use TypeScript? … Yes
 ✔ Would you like to use ESLint? … Yes
 ✔ Would you like to use Tailwind CSS? … Yes
@@ -157,7 +165,7 @@ use the default options;
 
 Install `@imtbl/sdk` and any other dependencies your example needs e.g.
 
-```
+```bash
 yarn add @imtbl/sdk
 yarn add @ethersproject/providers@^5.7.2
 ```
@@ -166,7 +174,7 @@ Create a `.env.example` file in the root of the example. This will be committed 
 
 Add a template for any environment variables you need to the `.env.example` file e.g.
 
-```
+```js
 NEXT_PUBLIC_PUBLISHABLE_KEY=
 NEXT_PUBLIC_CLIENT_ID=
 ```
@@ -177,7 +185,7 @@ Note: variables must be prefixed with `NEXT_PUBLIC_` to be piped into the browse
 
 Update the readme with any instructions required to run the app, and include what required env variables there are with any instructions on what to populate there e.g.
 
-```
+```md
 ## Required Environment Variables
 
 - NEXT_PUBLIC_PUBLISHABLE_KEY // replace with your publishable API key from Hub
@@ -190,7 +198,7 @@ Delete the contents of the return statement in `app/page.tsx` and replace with `
 
 Start the project with hot reloading by running;
 
-```
+```bash
 yarn dev
 ```
 
@@ -198,7 +206,7 @@ Check `http://localhost:3000/` in the browser to confirm it compiled and ran
 
 Update the title and description in `app/layout.tsx` to match the examples in your app e.g.
 
-```
+```ts
 export const metadata: Metadata = {
   title: "Passport Connect",
   description: "Examples of how to connect wallets to Passport with NextJS",
@@ -227,13 +235,13 @@ All examples should be covered by basic e2e tests to ensure they at least render
 
 Install `@playwright/test` as a dev dependency for the e2e tests.
 
-```
+```bash
 yarn add -D @playwright/test
 ```
 
 Create a `playwright.config.ts` file in the root of the example app and add this configuration;
 
-```
+```ts
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
@@ -274,7 +282,7 @@ Example of the base level of testing required can be found in the [Passport Conn
 
 Add the test runner to the scripts in your package.json
 
-```
+```json
 "test": "playwright test"
 ```
 
@@ -290,7 +298,7 @@ To streamline the PR process, you should create a branch in the `docs` repo to a
 
 In your `docs` branch modify the file `/src/remark/import-code.mjs` and update the `BRANCH` constant from `main` to the name of your branch on `ts-immutable-sdk` e.g.
 
-```
+```ts
 const BRANCH = 'DVR-193-passport-signing-example';
 ```
 
@@ -308,7 +316,7 @@ Labels have to be unique within a file so you should use a simple naming convent
 
 e.g. `<library>-<tag>`
 
-```
+```ts
 // #doc eip1193-create
 const passportProvider = passportInstance.connectEvm()
 // #enddoc eip1193-create
@@ -320,13 +328,13 @@ Make sure to commit and push the labels to your `ts-immutable-sdk` branch on Git
 
 It's very simple to use the code snippet in the docs site, you just add a code block with the reference to the file and the `#` of the label you want to display e.g.
 
-````
+````md
 ```tsx reference=examples/passport/wallets-connect-with-nextjs/src/app/connect-with-eip1193/page.tsx#eip1193-create title="Create the Passport Provider"
 ```
 ````
 Or if you want to display the whole file just don't include a `#` label at the end of the file reference e.g.
 
-````
+````md
 ```tsx reference=examples/passport/wallets-connect-with-nextjs/src/app/connect-with-eip1193/page.tsx title="Create the Passport Provider"
 ```
 ````
