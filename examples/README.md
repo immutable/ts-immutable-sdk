@@ -21,7 +21,7 @@
 - [Contribution guidelines](#contribution-guidelines)
 - [Adding examples](#adding-examples)
 - [End to end testing](#end-to-end-testing)
-- [Creating code snippets](#creating-code-snippets)
+- [Using code examples in the docs site](#using-code-examples-in-the-docs-site)
 <hr />
 
 # Introduction
@@ -123,9 +123,9 @@ You can run the example locally to test your code by following the steps in the 
 
 You will also need to create e2e tests for your example as covered in the [End to end testing](#end-to-end-testing) section.
 
-Creating code snippets in the docs site using your example code is covered in the [Creating code snippets](#creating-code-snippets) section.
+Creating code snippets in the docs site using your example code is covered in the [Using code examples in the docs site](#using-code-examples-in-the-docs-site) section.
 
-If your code example is going to be used as code snippets in the docs site, before merging your branch to main in `ts-immutable-sdk` you should follow the steps in [Creating code snippets](#creating-code-snippets). These steps help you to test the code snippets in the docs site before you merge your PR which avoids double handling and multiple pull requests across both repos.
+If your code example is going to be used as code snippets in the docs site, before merging your branch to main in `ts-immutable-sdk` you should follow the steps in [Using code examples in the docs site](#using-code-examples-in-the-docs-site). These steps help you to test the code snippets in the docs site before you merge your PR which avoids double handling and multiple pull requests across both repos.
 
 ## Creating a new example
 
@@ -143,7 +143,7 @@ cd examples/<product>
 yarn dlx create-next-app@latest
 ```
 
-use the default options
+use the default options;
 ```
 ✔ What is your project named? <feature>-with-<framework> e.g. wallets-with-nextjs
 ✔ Would you like to use TypeScript? … Yes
@@ -172,16 +172,11 @@ NEXT_PUBLIC_CLIENT_ID=
 
 copy the `.env.example` file to `.env` in the root of the example. The `.env` file should be automatically ignored by git.
 
-populate any API keys and secrets e.g.
-
-```
-NEXT_PUBLIC_PUBLISHABLE_KEY="ABC"
-NEXT_PUBLIC_CLIENT_ID="XYZ"
-```
+populate any API keys and secrets you need to use in your application.
 
 note: variables must be prefixed with `NEXT_PUBLIC_` to be piped into the browser env.
 
-Update the readme with any instructions required to run the app, and include what required env variables there are with any instructions on what to populate there.
+Update the readme with any instructions required to run the app, and include what required env variables there are with any instructions on what to populate there e.g.
 
 ```
 ## Required Environment Variables
@@ -194,7 +189,7 @@ delete the any unused imports in `app/page.tsx`
 
 delete the contents of the return statement in `app/page.tsx` and replace with `<h1>My Example<h1/>` or whatever you like, just render something to the screen so you can tell its working when you run the app.
 
-start the project with hot reloading
+start the project with hot reloading by running;
 
 ```
 yarn dev
@@ -229,82 +224,9 @@ You can run the example locally to test your code by following the steps in the 
 
 You will also need to create e2e tests for your example as covered in the [End to end testing](#end-to-end-testing) section.
 
-Creating code snippets in the docs site using your example code is covered in the [Creating code snippets](#creating-code-snippets) section.
+Creating code snippets in the docs site using your example code is covered in the [Using code examples in the docs site](#using-code-examples-in-the-docs-site) section.
 
-If your code example is going to be used as code snippets in the docs site, before merging your branch to main in `ts-immutable-sdk` you should follow the steps in [Creating code snippets](#creating-code-snippets). These steps help you to test the code snippets in the docs site before you merge your PR which avoids double handling and multiple pull requests across both repos.
-
-
-# Creating code snippets
-
-Creating and using code snippets is relatively straight forward. You can pull in a whole file or by adding some comments you can pull in just a particular few lines of a file as necessary.
-
-You should create a branch in the `docs` repo to add your code snippets before you merge your example code to main in `ts-immutable-sdk`.
-
-In `ts-immutable-sdk`
-
-In your examples find the parts of the code you want to use as code snippets and wrap them in the `#doc` and `#enddoc` comments while providing a unique label.
-
-Labels only have to be unique in the file, but they should be verbose so it makes it easy to know what they are e.g. 
-
-e.g. `<product>-<feature>-<framework>-<example>-<library>-<tag>`
-
-```
-// #doc passport-wallets-nextjs-connect-eip1193-create
-const passportProvider = passportInstance.connectEvm()
-// #enddoc passport-wallets-nextjs-connect-eip1193-create
-```
-
-make sure to commit and push the labels so they can be used locally
-
-## Using Code Snippets in the Docs site
-
-It's very simple, you just add a code block with the reference to the file and label you want to display e.g.
-
-````
-```tsx reference=examples/passport/wallets-connect-with-nextjs/src/app/connect-with-etherjs/page.tsx#passport-wallets-nextjs-connect-etherjs-create title="Connect Passport to Immutable zkEVM and create the Provider"
-```
-````
-Or if you want to display the whole file dont include a `#` label reference
-
-````
-```tsx reference=examples/passport/wallets-connect-with-nextjs/src/app/connect-with-etherjs/page.tsx title="Connect Passport to Immutable zkEVM and create the Provider"
-```
-````
-
-
-All snippets should have a title, usually this can just be the file name the snippet comes from. Don't be shy adding extra context before or after the snippet explaining any key points which are necessary.
-
-
-## Development process
-
-Since the docs site by default is pulling the code examples from the main branch of `ts-immutable-sdk` they will not be available until they are merged. To get around this and view the snippets in the docs site before you merge the example to main you can point the docs site to use the branch you are working on in the sdk repo while you work on them.
-
-Create a branch for your example in `ts-immutable-sdk` repo and a branch for your code snippets in `docs` repo.
-
-Create your example in your `ts-immutable-sdk` branch and push it up to GitHub.
-
-In your `docs` branch modify the file `/src/remark/import-code.mjs`
-
-Update the `BRANCH` constant from `main` to your branch name e.g.
-
-```
-const BRANCH = 'DVR-193-passport-signing-example';
-```
-
-Now your docs branch will be pulling the code examples from your branch in `ts-immutable-sdk` and you can use them locally in your `docs` branch to make sure they make sense in the page.
-
-
-Once you're happy with your examples, make the PR for your `ts-immutable-sdk` and get it merged into main. 
-
-Then change the `BRANCH` constant back to `main` in the `/src/remark/import-code.mjs` file.
-
-Now your examples are merged they will appear locally in your `docs` branch from main on `ts-immutable-sdk` and you can make any other updates you need to give the code examples context in the docs site.
-
-Create your PR for your `docs` branch and get it merged into main. 
-
-### WARNING
-
-Do **NOT** merge your `docs` branch to main without pointing the code import back to the main branch on `ts-immutable-sdk` or it will break things when the branch is deleted and new code examples merged to main will not show in the docs site.
+If your code example is going to be used as code snippets in the docs site, before merging your branch to main in `ts-immutable-sdk` you should follow the steps in [Using code examples in the docs site](#using-code-examples-in-the-docs-site). These steps help you to test the code snippets in the docs site before you merge your PR which avoids double handling and multiple pull requests across both repos.
 
 # End to end testing
 
@@ -366,3 +288,71 @@ Add the test runner to the scripts in your package.json
 ```
 
 Run your tests with `yarn test`
+
+# Using code examples in the docs site
+
+Creating and using code snippets is relatively straight forward. You can pull in a whole file or by adding some comments you can pull in just a particular few lines of a file as necessary.
+
+To streamline the PR process, you should create a branch in the `docs` repo to add your code snippets before your branch for the code example in `ts-immutable-sdk` is merged to main. This way we can point the docs site to your branch for the code snippets and you can see your code example in situ and make any changes required to your code example before going through the PR process.
+
+## Update import code branch
+
+In your `docs` branch modify the file `/src/remark/import-code.mjs` and update the `BRANCH` constant from `main` to the name of your branch on `ts-immutable-sdk` e.g.
+
+```
+const BRANCH = 'DVR-193-passport-signing-example';
+```
+
+Now your `docs` branch will be pulling the code examples from your branch in `ts-immutable-sdk` and you can use them locally in your `docs` branch to make sure they make sense in the page.
+
+Make sure to change this back to `main` before merging your `docs` branch or it will break the docs site.
+
+## Creating code snippets
+
+In your code examples in `tsimmutable-sdk` find the parts of the code you want to use as code snippets and wrap them in the `#doc` and `#enddoc` comments while providing a unique label.
+
+Labels have to be unique in the file so just make sure you use a simple naming convention to avoid clashes e.g.
+
+e.g. `<library>-<tag>`
+
+```
+// #doc eip1193-create
+const passportProvider = passportInstance.connectEvm()
+// #enddoc eip1193-create
+```
+
+Make sure to commit and push the labels to your `ts-immutable-sdk` branch on GitHub so they can be pulled down into your `docs` local build from there.
+
+## Using code snippets
+
+It's very simple to use the code snippet in the docs site, you just add a code block with the reference to the file and label you want to display e.g.
+
+````
+```tsx reference=examples/passport/wallets-connect-with-nextjs/src/app/connect-with-eip1193/page.tsx#eip1193-create title="Create the Passport Provider"
+```
+````
+Or if you want to display the whole file don't include a `#` label reference at the end of the file name e.g.
+
+````
+```tsx reference=examples/passport/wallets-connect-with-nextjs/src/app/connect-with-eip1193/page.tsx title="Create the Passport Provider"
+```
+````
+
+Just like regular code snippets, you can set language for syntax highlighting, in this example we are setting it to `tsx`.
+
+The other available parameters are;
+
+| parameter  | type    | description |
+|------------|---------|-------------|
+| reference  | string  | the location of the code example file in the `ts-immutable-sdk` |
+| title      | string  | the title that will appear above the code snippet block in the docs website |
+| githubLink | boolean | true by default, set to false to hide the link to file on GitHub in the header |
+
+Make sure the language and parameters are all set on the first line of the code snippet otherwise it will display the text as a regular inline code snippet.
+
+## Finishing up
+
+Once you're happy with your code examples on `ts-immutable-sdk` and you've tried them locally in the `docs` site from your branch on Github. Create a PR for your branch in `ts-immutable-sdk` and get it merged to main. Now in your `docs` branch change the `BRANCH` constant in the `/src/remark/import-code.mjs` file from your branch name, back to `main`.
+
+You can now double check the code snippets in your `docs` branch are all pulling through correctly from main on `ts-immutable-sdk` and create the PR for your `docs` branch.
+
