@@ -325,7 +325,7 @@ It's very simple to use the code snippet in the docs site, you just add a code b
 ```tsx reference=examples/passport/wallets-connect-with-nextjs/src/app/connect-with-eip1193/page.tsx#eip1193-create title="Create the Passport Provider"
 ```
 ````
-Or if you want to display the whole file don't include a `#` label reference at the end of the file name e.g.
+Or if you want to display the whole file just don't include a `#` label at the end of the file reference e.g.
 
 ````
 ```tsx reference=examples/passport/wallets-connect-with-nextjs/src/app/connect-with-eip1193/page.tsx title="Create the Passport Provider"
