@@ -373,3 +373,6 @@ Now in your `docs` branch change the `BRANCH` constant in the `/src/remark/impor
 
 You can now double check the code snippets in your `docs` branch are all pulling through correctly from main on `ts-immutable-sdk` and create the PR for your `docs` branch.
 
+Once your `docs` PR is merged, Netlify should automatically build and deploy the docs site. If your updates are not reflected on the docs site within 10 minutes of the PR being merged, it's likely the build has failed in Netlify. Because we are now pulling in content dynamically for the code snippets, the GET requests to fetch the code examples can sometimes randomly timeout which fails the build. 
+
+If this happens you will need to log into the Netlify site, check the error and retry the build. Usually this will fix the deployment issue, otherwise follow up on the error message shown by Netlify.
