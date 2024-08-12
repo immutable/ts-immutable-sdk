@@ -11,8 +11,6 @@
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.6",
-    "@swc/cli": "^0.4.0",
-    "@swc/core": "^1.7.6",
     "@swc/jest": "^0.2.24",
     "@types/jest": "^29.4.3",
     "eslint": "^8.40.0",
