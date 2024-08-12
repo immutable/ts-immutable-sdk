@@ -2,7 +2,7 @@
 import { passport } from '@imtbl/sdk';
 
 export default function MyComponent() {
-  const { login, loginWithEthersjs } = passport.usePassport();
+  const { login } = passport.usePassport();
   const { accounts } = passport.useAccounts();
 
   return (
@@ -10,7 +10,7 @@ export default function MyComponent() {
       accounts:
       {' '}
       {accounts}
-      <button onClick={login}>Login</button>
+      <button onClick={() => login()}>Login</button>
     </>
   );
 }
