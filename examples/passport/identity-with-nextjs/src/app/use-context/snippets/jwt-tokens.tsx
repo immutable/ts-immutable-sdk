@@ -14,7 +14,7 @@ export default function Page() {
       ID Token:
       {' '}
       {idToken}
-      <button onClick={login}>Login</button>
+      <button onClick={() => login()}>Login</button>
     </>
   );
 }
