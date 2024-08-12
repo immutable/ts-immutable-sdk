@@ -3,6 +3,7 @@ import React, {
   createContext, useContext, useEffect, useMemo,
   useState,
 } from 'react';
+import { setPassportClientId, track } from '@imtbl/metrics';
 import { Passport } from '../Passport';
 import { PassportModuleConfiguration, UserProfile } from '../types';
 import { Provider } from '../zkEvm/types';
@@ -29,6 +30,8 @@ type PassportProviderProps = {
 };
 
 export function ReactProvider({ children, config }: PassportProviderProps) {
+  setPassportClientId(config.clientId);
+  track('passport', 'reactProviderInitialised');
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [accounts, setAccounts] = useState<string[]>([]);
