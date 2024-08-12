@@ -2,7 +2,7 @@
 
 import axios, { AxiosResponse } from 'axios';
 import { BridgeError, BridgeErrorType } from '../errors';
-import { TenderlySimulation } from '../types/tenderly';
+import { TenderlySimulation, TenderlyResult } from '../types/tenderly';
 import { getTenderlyEndpoint } from './utils';
 
 // In the Tenderly API, state objects are mapping of contract address -> "stateDiff" -> slot -> value
@@ -60,7 +60,7 @@ export async function submitTenderlySimulations(
   chainId: string,
   simulations: Array<TenderlySimulation>,
   stateObjects?: StateObject[],
-): Promise<Array<number>> {
+): Promise<TenderlyResult> {
   let axiosResponse: AxiosResponse;
   const tenderlyAPI = getTenderlyEndpoint(chainId);
   const state_objects = stateObjects ? unwrapStateObjects(stateObjects) : undefined;
@@ -70,7 +70,7 @@ export async function submitTenderlySimulations(
       {
         jsonrpc: '2.0',
         id: 0,
-        method: 'tenderly_estimateGasBundle',
+        method: 'tenderly_simulateBundle',
         params: [
           simulations,
           'latest',
@@ -103,6 +103,10 @@ export async function submitTenderlySimulations(
   }
 
   const gas: Array<number> = [];
+  let delayWithdrawalLargeAmount: boolean = false;
+  let delayWithdrawalUnknownToken: boolean = false;
+  let withdrawalQueueActivated: boolean = false;
+  let largeTransferThresholds: number = 0;
 
   for (let i = 0; i < simResults.length; i++) {
     if (simResults[i].error) {
@@ -117,8 +121,48 @@ export async function submitTenderlySimulations(
         BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
       );
     }
-    gas.push(simResults[i].gasUsed);
+    // Attempt to extract event.
+    if (simResults[i].logs !== undefined) {
+      for (let j = 0; j < simResults[i].logs.length; j++) {
+        const event = simResults[i].logs[j];
+        if (event.name === 'QueuedWithdrawal') {
+          for (let k = 0; k < event.inputs.length; k++) {
+            const input = event.inputs[k];
+            if (input.name === 'delayWithdrawalLargeAmount') {
+              delayWithdrawalLargeAmount = input.value;
+            }
+            if (input.name === 'delayWithdrawalUnknownToken') {
+              delayWithdrawalUnknownToken = input.value;
+            }
+            if (input.name === 'withdrawalQueueActivated') {
+              withdrawalQueueActivated = input.value;
+            }
+          }
+        }
+      }
+    }
+    // Check read operation.
+    let skipReadOperation = false;
+    if (simResults[i].trace !== undefined) {
+      for (let j = 0; j < simResults[i].trace.length; j++) {
+        const trace = simResults[i].trace[j];
+        if (trace.method === 'largeTransferThresholds') {
+          largeTransferThresholds = simResults[i].trace[j].output;
+          skipReadOperation = true;
+          break;
+        }
+      }
+    }
+    if (!skipReadOperation) {
+      gas.push(simResults[i].gasUsed);
+    }
   }
 
-  return gas;
+  return {
+    gas,
+    delayWithdrawalLargeAmount,
+    delayWithdrawalUnknownToken,
+    withdrawalQueueActivated,
+    largeTransferThresholds,
+  };
 }
