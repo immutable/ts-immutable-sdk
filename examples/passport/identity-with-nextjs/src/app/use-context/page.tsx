@@ -4,7 +4,7 @@ import { passport } from '@imtbl/sdk';
 
 export default function Page() {
   const {
-    login, loginWithEthersjs, loginWithoutWallet, logout, isLoading, isLoggedIn,
+    login, logout, isLoading, isLoggedIn,
   } = passport.usePassport();
   const { idToken } = passport.useIdToken();
   const { accessToken } = passport.useAccessToken();
@@ -12,11 +12,10 @@ export default function Page() {
   const { userInfo } = passport.useUserInfo();
   const { accounts } = passport.useAccounts();
   const { passportProvider } = passport.usePassportProvider();
-  const { web3Provider } = passport.useWeb3Provider();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8">
-      <h1 className="text-3xl font-bold mb-8">Passport Identity Examples</h1>
+      <h1 className="text-3xl font-bold mb-8">Passport react context example</h1>
       <div className="grid grid-cols-1 gap-4 text-center">
         <div>
           <p className="mb-2">
@@ -59,32 +58,13 @@ export default function Page() {
             {' '}
             { passportProvider ? 'true' : 'false' }
           </p>
-          <p className="mb-2">
-            <b>Web3 Provider:</b>
-            {' '}
-            { web3Provider ? 'true' : 'false' }
-          </p>
         </div>
         <button
           className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
-          onClick={login}
+          onClick={() => login()}
           type="button"
         >
           Login
-        </button>
-        <button
-          className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
-          onClick={loginWithoutWallet}
-          type="button"
-        >
-          Login Without Wallet
-        </button>
-        <button
-          className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
-          onClick={loginWithEthersjs}
-          type="button"
-        >
-          Login With EtherJS
         </button>
         <button
           className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
