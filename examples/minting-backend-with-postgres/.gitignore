@@ -61,7 +61,7 @@ profile*
 *flamegraph*
 
 # lock files
-yarn.lock
+pnpm-lock.yaml
 package-lock.json
 
 # generated code

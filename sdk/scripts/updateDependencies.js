@@ -4,19 +4,15 @@ import { Configuration, Project } from '@yarnpkg/core';
 import semver from 'semver';
 import fs from 'fs';
 import path from 'path';
+import { execSync } from 'child_process';
 
 const __dirname = path.resolve();
 const SDK_PACKAGE = '@imtbl/sdk';
 
-const getWorkspacePackages = () => {
-  const workspacePackages = JSON.parse(
-    fs.readFileSync(path.resolve(__dirname, 'workspace-packages.json'), {
-      encoding: 'utf8',
-    })
-  ).map((pkg) => pkg.name);
-  return workspacePackages;
-};
-const workspacePackages = getWorkspacePackages();
+const workspacePackages = JSON.parse(
+  execSync('pnpm list --recursive --json --depth=-1').toString()
+).map((pkg) => pkg.name)
+
 
 // Update the map with the dependency if it doesn't exist, or if the
 // version is greater than the existing version

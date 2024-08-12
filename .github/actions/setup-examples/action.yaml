@@ -7,4 +7,4 @@ runs:
   steps:
     - name: Prepare examples
       shell: bash
-      run: yarn prepare:examples
+      run: pnpm prepare:examples

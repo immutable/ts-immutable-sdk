@@ -105,7 +105,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('pnpm-lock.yaml') }}
 
       - name: Install dependencies
         if: steps.restore-cache-node_modules.outputs.cache-hit != 'true' 

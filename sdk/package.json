@@ -66,7 +66,6 @@
     "@imtbl/blockchain-data": "0.0.0",
     "@imtbl/checkout-sdk": "0.0.0",
     "@imtbl/checkout-widgets": "0.0.0",
-    "@imtbl/config": "0.0.0",
     "@imtbl/cryptofiat": "0.0.0",
     "@imtbl/generated-clients": "0.0.0",
     "@imtbl/guardian": "0.0.0",
@@ -151,20 +150,15 @@
     "@openzeppelin/contracts": "3.4.2-solc-0.7"
   },
   "repository": "immutable/ts-immutable-sdk.git",
-  "resolutions": {
-    "@biom3/design-tokens": "^0.4.2",
-    "@openzeppelin/contracts": "3.4.2-solc-0.7"
-  },
   "scripts": {
-    "build": "yarn updateDependencies && yarn regenModules && rm -rf dist && NODE_ENV=production node --max-old-space-size=14366 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rm -rf dist/types && yarn copyBrowserBundles",
+    "build": "pnpm updateDependencies && pnpm regenModules && rm -rf dist && NODE_ENV=production node --max-old-space-size=14366 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rm -rf dist/types && pnpm copyBrowserBundles",
     "build:only": "rm -rf dist && NODE_ENV=production node --max-old-space-size=8192 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rm -rf dist/types",
     "copyBrowserBundles": "node scripts/copyBrowserBundles.js",
     "generateIndex": "node scripts/generateIndex.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
-    "packageList": "./scripts/generate-package-list.sh",
-    "regenModules": "yarn generateIndex && yarn updateExports",
+    "regenModules": "pnpm generateIndex && pnpm updateExports",
     "typecheck": "tsc --noEmit --jsx preserve",
-    "updateDependencies": "yarn packageList && node ./scripts/updateDependencies.js && yarn syncpack:format",
+    "updateDependencies": "node ./scripts/updateDependencies.js && pnpm syncpack format",
     "updateExports": "node scripts/updateExports.js"
   },
   "type": "module",

@@ -6,4 +6,4 @@ runs:
   steps:
     - name: Prepare tests
       shell: bash
-      run: yarn prepare:tests
+      run: pnpm prepare:tests

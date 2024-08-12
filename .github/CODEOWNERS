@@ -6,19 +6,27 @@
 /packages/config @immutable/sdk
 /packages/internal/metrics @immutable/sdk
 /packages/internal/generated-clients @immutable/sdk
+/packages/game-bridge @immutable/sdk
+/examples @immutable/sdk
+**/package.json @immutable/sdk
+
 /packages/internal/generated-clients/src/blockchain-data @immutable/assets
+/packages/blockchain-data @immutable/assets
+
 /packages/internal/toolkit @immutable/commerce
 /packages/internal/cryptofiat @immutable/commerce
-/packages/internal/dex @immutable/tokens
-/packages/internal/bridge @immutable/rollups
-/packages/internal/guardian @immutable/passport
-/packages/orderbook @immutable/traders
-/packages/passport @immutable/passport
 /packages/x-provider @immutable/commerce
 /packages/checkout @immutable/commerce
 /packages/checkout/widgets-lib @immutable/commerce
-/packages/blockchain-data @immutable/assets
+
+/packages/internal/dex @immutable/tokens
+
+/packages/internal/bridge @immutable/rollups
+
+/packages/internal/guardian @immutable/passport
+/packages/passport @immutable/passport
+
+/packages/orderbook @immutable/traders
+
 /packages/minting-backend @shineli1984
 /packages/webhook @shineli1984
-/packages/game-bridge @immutable/sdk
-/examples @immutable/sdk

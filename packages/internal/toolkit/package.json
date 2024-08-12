@@ -52,7 +52,6 @@
     "build": "NODE_ENV=production rollup --config rollup.config.js",
     "d": "swc src -d dist --strip-leading-paths --ignore '**/*.test.*'",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
-    "prepare": "wsrun -r build",
     "test": "jest",
     "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit --jsx preserve"
