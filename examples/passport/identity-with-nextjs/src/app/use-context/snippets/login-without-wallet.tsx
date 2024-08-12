@@ -2,7 +2,7 @@
 import { passport } from '@imtbl/sdk';
 
 export default function Page() {
-  const { loginWithoutWallet } = passport.usePassport();
+  const { login } = passport.usePassport();
   const { userInfo } = passport.useUserInfo();
 
   return (
@@ -10,7 +10,7 @@ export default function Page() {
       userInfo:
       {' '}
       {userInfo}
-      <button onClick={loginWithoutWallet}>Login Without Wallet</button>
+      <button onClick={() => login(true)}>Login Without Wallet</button>
     </>
   );
 }
