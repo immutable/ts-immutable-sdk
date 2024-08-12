@@ -19,6 +19,6 @@ export type {
 } from './event-types';
 
 export {
-  handle,
-  WebhookHandlers
+  handle
 };
+export type { WebhookHandlers };

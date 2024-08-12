@@ -7,11 +7,13 @@
     "node_modules/",
     "dist/",
     "**sample-app**/",
-    "**playground**/"
+    "**playground**/",
+    "*.cjs",
+    "tests/func-tests/"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": "./tsconfig.json",
+    "project": "./tsconfig.base.json",
     "tsconfigRootDir": "."
   },
   "rules": {

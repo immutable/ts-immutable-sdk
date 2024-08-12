@@ -1,9 +1,8 @@
-{
+module.exports = {
+  "extends": ["../../.eslintrc"],
   "parser": "@typescript-eslint/parser",
-  "ignorePatterns": ".",
   "parserOptions": {
     "project": "./tsconfig.json",
-    "tsconfigRootDir": ".",
-    "sourceType": "module"
+    "tsconfigRootDir": __dirname
   }
 }
