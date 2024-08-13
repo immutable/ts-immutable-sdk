@@ -101,7 +101,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Test
-        run: pnpm test --configuration=ci
+        run: pnpm run test --configuration=ci
 
       - name: Upload SDK test coverage artifacts
         uses: actions/upload-artifact@v4
