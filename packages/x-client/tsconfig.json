@@ -3,7 +3,6 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDirs": ["src"],
-    "skipLibCheck": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "node_modules/elliptic"]
