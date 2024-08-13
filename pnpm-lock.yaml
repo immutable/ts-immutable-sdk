@@ -1877,6 +1877,9 @@ importers:
       '@imtbl/config':
         specifier: 0.0.0
         version: link:../config
+      '@imtbl/metrics':
+        specifier: 0.0.0
+        version: link:../internal/metrics
       '@opensea/seaport-js':
         specifier: 4.0.3
         version: 4.0.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
