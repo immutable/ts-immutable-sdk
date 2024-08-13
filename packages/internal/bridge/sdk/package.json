@@ -27,7 +27,8 @@
     "rollup": "^4.19.1",
     "ts-node": "^10.9.1",
     "typechain": "^8.1.1",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "unplugin-swc": "^1.5.1"
   },
   "engines": {
     "node": ">=20.11.0"
@@ -43,7 +44,7 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
-    "d": "swc src -d dist --strip-leading-paths --ignore '**/*.test.*'",
+    "d": "rollup --config rollup.config.js",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "lint:fix": "cd ../../../../ && pnpm wsrun -p @imtbl/bridge-sdk -c lint --fix",
     "test": "jest test -- --silent=false",
@@ -52,5 +53,5 @@
   },
   "source": "src/index.ts",
   "type": "module",
-  "types": "dist/index.d.ts"
+  "types": "src/index.ts"
 }

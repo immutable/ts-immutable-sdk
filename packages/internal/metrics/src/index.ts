@@ -17,5 +17,3 @@ export {
 export const utils = {
   localStorage,
 };
-
-export const brla = 'qewrewqr';

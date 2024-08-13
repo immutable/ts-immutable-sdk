@@ -30,6 +30,7 @@
     "@rollup/plugin-replace": "^5.0.7",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
+    "@swc/core": "^1.3.36",
     "@types/uuid": "^8.3.4",
     "babel-jest": "^29.5.0",
     "eslint": "^8.40.0",
@@ -41,7 +42,8 @@
     "text-encoding": "^0.7.0",
     "typedoc": "^0.26.5",
     "typedoc-plugin-markdown": "^4.2.3",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "unplugin-swc": "^1.5.1"
   },
   "homepage": "https://github.com/immutable/ts-immutable-sdk",
   "keywords": [
@@ -54,7 +56,7 @@
   "scripts": {
     "build": "rollup --config rollup.config.js",
     "build:dev": "CHECKOUT_DEV_MODE=true pnpm build",
-    "d": "swc src -d dist --strip-leading-paths --ignore '**/*.test.*'",
+    "d": "rollup --config rollup.config.js",
     "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/index.ts",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
@@ -67,5 +69,5 @@
   },
   "source": "src/index.ts",
   "type": "module",
-  "types": "dist/index.d.ts"
+  "types": "src/index.ts"
 }
