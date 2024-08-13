@@ -1,4 +1,5 @@
 import { ModuleConfiguration } from '@imtbl/config';
+import { track } from '@imtbl/metrics';
 import { ImmutableApiClient, ImmutableApiClientFactory } from './api-client';
 import {
   getConfiguredProvider,
@@ -36,7 +37,7 @@ import {
   PrepareBulkListingsResponse,
   PrepareListingResponse,
   SignablePurpose,
-  TradeResult,
+  TradeResult, Action,
 } from './types';
 
 /**
@@ -97,6 +98,11 @@ export class Orderbook {
       this.orderbookConfig.zoneContractAddress,
       config.baseConfig.rateLimitingKey,
     );
+  }
+
+  // Default order expiry to 2 years from now
+  static defaultOrderExpiry(): Date {
+    return new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2);
   }
 
   /**
@@ -168,11 +174,16 @@ export class Orderbook {
    * Once the transactions are submitted and the message signed, call the completeListings method
    * provided in the return type with the signature. This method supports up to 20 listing creations
    * at a time. It can also be used for individual listings to simplify integration code paths.
+   *
+   * Bulk listings created using an EOA (Metamask) will require a single listing confirmation
+   * signature.
+   * Bulk listings creating using a smart contract wallet will require multiple listing confirmation
+   * signatures(as many as the number of orders).
    * @param {PrepareBulkListingsParams} prepareBulkListingsParams - Details about the listings
    * to be created.
    * @return {PrepareBulkListingsResponse} PrepareListingResponse includes
    * any unsigned approval transactions, the typed bulk order message for signing and
-   * the createListings method that can be called with the signature to create the listings.
+   * the createListings method that can be called with the signature(s) to create the listings.
    */
   async prepareBulkListings(
     {
@@ -185,6 +196,8 @@ export class Orderbook {
       throw new Error('Bulk listing creation is limited to 20 orders');
     }
 
+    // Bulk listings (with single listing) code path common for both Smart contract
+    // wallets and EOAs.
     // In the event of a single order, delegate to prepareListing as the signature is more
     // gas efficient
     if (listingParams.length === 1) {
@@ -193,17 +206,17 @@ export class Orderbook {
         listingParams[0].sell,
         listingParams[0].buy,
         new Date(),
-        listingParams[0].orderExpiry || new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2),
+        listingParams[0].orderExpiry || Orderbook.defaultOrderExpiry(),
       );
 
       return {
         actions: prepareListingResponse.actions,
-        completeListings: async (signature: string) => {
+        completeListings: async (signatures: string | string[]) => {
           const createListingResult = await this.createListing({
             makerFees: listingParams[0].makerFees,
             orderComponents: prepareListingResponse.orderComponents,
             orderHash: prepareListingResponse.orderHash,
-            orderSignature: signature,
+            orderSignature: typeof signatures === 'string' ? signatures : signatures[0],
           });
 
           return {
@@ -217,28 +230,105 @@ export class Orderbook {
       };
     }
 
+    // Bulk listings (with multiple listings) code path for Smart contract wallets.
+    // Code check to determine wallet type is not fool-proof but scenarios where smart
+    // contract wallet is not deployed will be an edge case
+    const isSmartContractWallet: boolean = await this.orderbookConfig.provider.getCode(makerAddress) !== '0x';
+    if (isSmartContractWallet) {
+      track('orderbookmr', 'bulkListings', { walletType: 'Passport', makerAddress, listingsCount: listingParams.length });
+
+      // eslint-disable-next-line max-len
+      const prepareListingResponses = await Promise.all(listingParams.map((listing) => this.seaport.prepareSeaportOrder(
+        makerAddress,
+        listing.sell,
+        listing.buy,
+        new Date(),
+        listing.orderExpiry || Orderbook.defaultOrderExpiry(),
+      )));
+
+      const pendingApproval: string[] = [];
+      const actions = prepareListingResponses.flatMap((response) => {
+        // de-dupe approval transactions to ensure every contract has
+        // a maximum of 1 approval transaction
+        const dedupedActions: Action[] = [];
+        response.actions.forEach((action) => {
+          if (action.type === ActionType.TRANSACTION) {
+            // Assuming only a single item is on offer per listing
+            const contractAddress = response.orderComponents.offer[0].token;
+            if (!pendingApproval.includes(contractAddress)) {
+              pendingApproval.push(contractAddress);
+              dedupedActions.push(action);
+            }
+          } else {
+            dedupedActions.push(action);
+          }
+        });
+        return dedupedActions;
+      });
+
+      return {
+        actions,
+        completeListings: async (signatures: string | string[]) => {
+          const signatureIsString = typeof signatures === 'string';
+          if (signatureIsString) {
+            throw new Error('A signature per listing must be provided for smart contract wallets');
+          }
+
+          const createListingsApiResponses = await Promise.all(
+            prepareListingResponses.map((prepareListingResponse, i) => {
+              const signature = signatures[i];
+              return this.apiClient.createListing({
+                makerFees: listingParams[i].makerFees,
+                orderComponents: prepareListingResponse.orderComponents,
+                orderHash: prepareListingResponse.orderHash,
+                orderSignature: signature,
+                // Swallow failed creations,this gets mapped in the response to the caller as failed
+              }).catch(() => undefined);
+            }),
+          );
+
+          return {
+            result: createListingsApiResponses.map((apiListingResponse, i) => ({
+              success: !!apiListingResponse,
+              orderHash: prepareListingResponses[i].orderHash,
+              // eslint-disable-next-line max-len
+              order: apiListingResponse ? mapFromOpenApiOrder(apiListingResponse.result) : undefined,
+            })),
+          };
+        },
+      };
+    }
+
+    // Bulk listings (with multiple listings) code path for EOA wallets.
+    track('orderbookmr', 'bulkListings', { walletType: 'EOA', makerAddress, listingsCount: listingParams.length });
     const { actions, preparedListings } = await this.seaport.prepareBulkSeaportOrders(
       makerAddress,
       listingParams.map((orderParam) => ({
         listingItem: orderParam.sell,
         considerationItem: orderParam.buy,
         orderStart: new Date(),
-        orderExpiry: orderParam.orderExpiry || new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2),
+        orderExpiry: orderParam.orderExpiry || Orderbook.defaultOrderExpiry(),
       })),
     );
 
     return {
       actions,
-      completeListings: async (bulkOrderSignature: string) => {
+      completeListings: async (signatures: string | string[]) => {
+        const signatureIsArray = typeof signatures === 'object';
+        if (signatureIsArray && signatures.length !== 1) {
+          throw new Error('Only a single signature is expected for bulk listing creation');
+        }
+
         const orderComponents = preparedListings.map((orderParam) => orderParam.orderComponents);
-        const signatures = getBulkSeaportOrderSignatures(
-          bulkOrderSignature,
+        const signature = signatureIsArray ? signatures[0] : signatures;
+        const bulkOrderSignatures = getBulkSeaportOrderSignatures(
+          signature,
           orderComponents,
         );
 
         const createOrdersApiListingResponse = await Promise.all(
           orderComponents.map((orderComponent, i) => {
-            const sig = signatures[i];
+            const sig = bulkOrderSignatures[i];
             const listing = preparedListings[i];
             const listingParam = listingParams[i];
             return this.apiClient.createListing({
@@ -283,7 +373,7 @@ export class Orderbook {
       // Default order start to now
       new Date(),
       // Default order expiry to 2 years from now
-      orderExpiry || new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2),
+      orderExpiry || Orderbook.defaultOrderExpiry(),
     );
   }
 

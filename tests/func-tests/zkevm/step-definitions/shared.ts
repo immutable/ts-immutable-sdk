@@ -198,7 +198,7 @@ export const whenICreateABulkListing = (
     });
 
     const signatures = await actionAll(actions, offerer);
-    const { result } = await completeListings(signatures[0]);
+    const { result } = await completeListings(signatures);
 
     for (const res of result) {
       if (!res.success) {
