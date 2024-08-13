@@ -7,6 +7,7 @@
   "dependencies": {
     "@imtbl/blockchain-data": "0.0.0",
     "@imtbl/config": "0.0.0",
+    "@imtbl/generated-clients": "0.0.0",
     "@imtbl/metrics": "0.0.0",
     "@imtbl/webhook": "0.0.0"
   },
