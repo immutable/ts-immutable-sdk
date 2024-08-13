@@ -44,5 +44,5 @@
     "d": "rollup --config rollup.config.js"
   },
   "type": "module",
-  "types": "src/index.ts"
+  "types": "./src/index.ts"
 }

@@ -40,5 +40,5 @@
     "typecheck": "tsc --noEmit --jsx preserve"
   },
   "type": "module",
-  "types": "src/index.ts"
+  "types": "./src/index.ts"
 }

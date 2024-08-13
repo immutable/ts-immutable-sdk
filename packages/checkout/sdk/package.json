@@ -69,5 +69,5 @@
   },
   "source": "src/index.ts",
   "type": "module",
-  "types": "src/index.ts"
+  "types": "./src/index.ts"
 }
