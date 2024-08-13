@@ -17,6 +17,21 @@ export type StateDiff = {
   value: string;
 };
 
+type Input = {
+  name: string;
+  value: string | boolean;
+};
+
+type Event = {
+  name: string;
+  inputs: Array<Input>;
+};
+
+type Trace = {
+  method: string;
+  output: string | number;
+};
+
 /**
  * We want to convert a StateObject type to the following format (Record<string, Record<string, Record<string, string>>>):
  * @example An example of a state object that changes the state at slot 0xe1b959...2585e to 1 at address 0xe43215...8E31:
@@ -115,47 +130,28 @@ export async function submitTenderlySimulations(
         BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
       );
     }
-    if (simResults[i].gasUsed === undefined) {
+    if (simResults[i].gasUsed === undefined
+      || simResults[i].logs === undefined
+      || simResults[i].trace === undefined) {
       throw new BridgeError(
         'Estimating gas did not return simulation results',
         BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
       );
     }
-    if (simResults[i].logs === undefined) {
-      throw new BridgeError(
-        'Estimating gas did not return logs',
-        BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
-      );
-    }
     // Attempt to extract event.
-    for (let j = 0; j < simResults[i].logs.length; j++) {
-      const event = simResults[i].logs[j];
-      if (event.name === 'QueuedWithdrawal') {
-        for (let k = 0; k < event.inputs.length; k++) {
-          const input = event.inputs[k];
-          if (input.name === 'delayWithdrawalLargeAmount') {
-            delayWithdrawalLargeAmount = input.value;
-          }
-          if (input.name === 'delayWithdrawalUnknownToken') {
-            delayWithdrawalUnknownToken = input.value;
-          }
-          if (input.name === 'withdrawalQueueActivated') {
-            withdrawalQueueActivated = input.value;
-          }
-        }
-      }
+    const event = simResults[i].logs.find((e: Event) => e.name === 'QueuedWithdrawal');
+    if (event !== undefined) {
+      const inputs: Map<string, string | boolean> = new Map(event.inputs.map((c: Input) => [c.name, c.value]));
+      delayWithdrawalLargeAmount = inputs.get('delayWithdrawalLargeAmount') as boolean || false;
+      delayWithdrawalUnknownToken = inputs.get('delayWithdrawalUnknownToken') as boolean || false;
+      withdrawalQueueActivated = inputs.get('withdrawalQueueActivated') as boolean || false;
     }
     // Check read operation.
     let skipReadOperation = false;
-    if (simResults[i].trace !== undefined) {
-      for (let j = 0; j < simResults[i].trace.length; j++) {
-        const trace = simResults[i].trace[j];
-        if (trace.method === 'largeTransferThresholds') {
-          largeTransferThresholds = simResults[i].trace[j].output;
-          skipReadOperation = true;
-          break;
-        }
-      }
+    const trace: Trace = simResults[i].trace.find((e: Trace) => e.method === 'largeTransferThresholds');
+    if (trace !== undefined) {
+      largeTransferThresholds = trace.output as number;
+      skipReadOperation = true;
     }
     if (!skipReadOperation) {
       gas.push(simResults[i].gasUsed);
