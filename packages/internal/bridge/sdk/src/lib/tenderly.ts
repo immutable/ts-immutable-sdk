@@ -121,22 +121,26 @@ export async function submitTenderlySimulations(
         BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
       );
     }
+    if (simResults[i].logs === undefined) {
+      throw new BridgeError(
+        'Estimating gas did not return logs',
+        BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
+      );
+    }
     // Attempt to extract event.
-    if (simResults[i].logs !== undefined) {
-      for (let j = 0; j < simResults[i].logs.length; j++) {
-        const event = simResults[i].logs[j];
-        if (event.name === 'QueuedWithdrawal') {
-          for (let k = 0; k < event.inputs.length; k++) {
-            const input = event.inputs[k];
-            if (input.name === 'delayWithdrawalLargeAmount') {
-              delayWithdrawalLargeAmount = input.value;
-            }
-            if (input.name === 'delayWithdrawalUnknownToken') {
-              delayWithdrawalUnknownToken = input.value;
-            }
-            if (input.name === 'withdrawalQueueActivated') {
-              withdrawalQueueActivated = input.value;
-            }
+    for (let j = 0; j < simResults[i].logs.length; j++) {
+      const event = simResults[i].logs[j];
+      if (event.name === 'QueuedWithdrawal') {
+        for (let k = 0; k < event.inputs.length; k++) {
+          const input = event.inputs[k];
+          if (input.name === 'delayWithdrawalLargeAmount') {
+            delayWithdrawalLargeAmount = input.value;
+          }
+          if (input.name === 'delayWithdrawalUnknownToken') {
+            delayWithdrawalUnknownToken = input.value;
+          }
+          if (input.name === 'withdrawalQueueActivated') {
+            withdrawalQueueActivated = input.value;
           }
         }
       }
