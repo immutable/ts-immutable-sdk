@@ -19,7 +19,7 @@ export default function Logout() {
         >
           Return to examples using
           {' '}
-          <pre>passport.ReactProvider</pre>
+          <pre>passport.ZkEvmReactProvider</pre>
         </a>
       </div>
     </div>

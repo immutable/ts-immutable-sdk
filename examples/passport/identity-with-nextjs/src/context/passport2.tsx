@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 
 export function PassportProvider({ children }: { children: ReactNode }) {
   return (
-    <passport.ReactProvider
+    <passport.ZkEvmReactProvider
       config={{
         baseConfig: {
           environment: config.Environment.SANDBOX, // or config.Environment.SANDBOX
@@ -18,7 +18,7 @@ export function PassportProvider({ children }: { children: ReactNode }) {
       }}
     >
       {children}
-    </passport.ReactProvider>
+    </passport.ZkEvmReactProvider>
   );
 }
 // #enddoc passport-setup-react

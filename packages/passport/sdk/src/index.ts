@@ -27,7 +27,7 @@ export type {
 } from './types';
 
 export {
-  ReactProvider,
+  ZkEvmReactProvider,
   useAccessToken,
   useIdToken,
   useLinkedAddresses,

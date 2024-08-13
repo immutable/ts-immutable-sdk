@@ -8,7 +8,7 @@ import { Passport } from '../Passport';
 import { PassportModuleConfiguration, UserProfile } from '../types';
 import { Provider } from '../zkEvm/types';
 
-type PassportContextType = {
+type ZkEvmReactContext = {
   passportInstance: Passport;
   isLoggedIn: boolean;
   isLoading: boolean;
@@ -16,22 +16,26 @@ type PassportContextType = {
   accounts: string[];
   profile: UserProfile | null;
   passportProvider: Provider | null;
-  login: (withoutWallet?: boolean) => Promise<void>;
+  login: (options?: {
+    useCachedSession?: boolean;
+    anonymousId?: string;
+    withoutWallet?: boolean;
+  }) => Promise<void>;
   logout: () => Promise<void>;
   loginCallback: () => Promise<void>;
   linkExternalWallet: Passport['linkExternalWallet'];
 };
 
-const PassportContext = createContext<PassportContextType | null>(null);
+const PassportContext = createContext<ZkEvmReactContext | null>(null);
 
-type PassportProviderProps = {
+type ZkEvmReactProviderProps = {
   config: PassportModuleConfiguration;
   children: React.ReactNode;
 };
 
-export function ReactProvider({ children, config }: PassportProviderProps) {
+export function ZkEvmReactProvider({ children, config }: ZkEvmReactProviderProps) {
   setPassportClientId(config.clientId);
-  track('passport', 'reactProviderInitialised');
+  track('passport', 'ZkEvmProviderInitialised');
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [accounts, setAccounts] = useState<string[]>([]);
@@ -55,15 +59,22 @@ export function ReactProvider({ children, config }: PassportProviderProps) {
     accounts,
     profile,
     error,
-    login: async (withoutWallet: boolean = false) => {
+    login: async (options?: {
+      useCachedSession?: boolean;
+      anonymousId?: string;
+      withoutWallet?: boolean;
+    }) => {
       try {
         setError(null);
         setIsLoading(true);
-        if (withoutWallet) {
-          const p = await passportInstance.login();
-          setProfile(p);
-          setLoggedIn(true);
-        } else {
+        const p = await passportInstance.login({
+          useCachedSession: !!options?.useCachedSession,
+          anonymousId: options?.anonymousId,
+        });
+        setProfile(p);
+        setLoggedIn(true);
+
+        if (!options?.withoutWallet) {
           const provider = getPassportProvider();
           const acc = await provider.request({ method: 'eth_requestAccounts' });
           setLoggedIn(true);
@@ -103,10 +114,10 @@ export function ReactProvider({ children, config }: PassportProviderProps) {
   );
 }
 
-export function usePassport(): PassportContextType {
+export function usePassport(): ZkEvmReactContext {
   const c = useContext(PassportContext);
   if (!c) {
-    throw new Error('usePassport must be used within a ReactProvider');
+    throw new Error('usePassport must be used within a ZkEvmProvider');
   }
   return c;
 }

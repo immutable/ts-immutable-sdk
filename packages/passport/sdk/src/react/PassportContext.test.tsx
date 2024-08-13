@@ -2,7 +2,7 @@ import { act, renderHook } from '@testing-library/react-hooks/native';
 import { Environment } from '@imtbl/config';
 import React, { ReactNode } from 'react';
 import { Passport } from '../Passport';
-import { ReactProvider, usePassport } from './PassportContext';
+import { ZkEvmReactProvider, usePassport } from './PassportContext';
 import { PassportModuleConfiguration } from '../types';
 
 jest.mock('../Passport');
@@ -28,9 +28,9 @@ describe('PassportContext and hooks', () => {
   it('should return a passport instance from context', () => {
     const { result } = renderHook(() => usePassport(), {
       wrapper: ({ children }: { children: ReactNode }) => (
-        <ReactProvider config={config}>
+        <ZkEvmReactProvider config={config}>
           {children}
-        </ReactProvider>
+        </ZkEvmReactProvider>
       ),
     });
 
@@ -40,9 +40,9 @@ describe('PassportContext and hooks', () => {
   it('should initialize context values', () => {
     const { result } = renderHook(() => usePassport(), {
       wrapper: ({ children }: { children: ReactNode }) => (
-        <ReactProvider config={config}>
+        <ZkEvmReactProvider config={config}>
           {children}
-        </ReactProvider>
+        </ZkEvmReactProvider>
       ),
     });
 
@@ -57,9 +57,9 @@ describe('PassportContext and hooks', () => {
   it('should login', async () => {
     const { result, waitFor } = renderHook(() => usePassport(), {
       wrapper: ({ children }: { children: ReactNode }) => (
-        <ReactProvider config={config}>
+        <ZkEvmReactProvider config={config}>
           {children}
-        </ReactProvider>
+        </ZkEvmReactProvider>
       ),
     });
 
@@ -81,9 +81,9 @@ describe('PassportContext and hooks', () => {
   it('should login without wallet', async () => {
     const { result, waitFor } = renderHook(() => usePassport(), {
       wrapper: ({ children }: { children: ReactNode }) => (
-        <ReactProvider config={config}>
+        <ZkEvmReactProvider config={config}>
           {children}
-        </ReactProvider>
+        </ZkEvmReactProvider>
       ),
     });
 
@@ -94,7 +94,9 @@ describe('PassportContext and hooks', () => {
 
     (result.current.passportInstance.login as jest.Mock).mockReturnValue(Promise.resolve(profile));
 
-    await act(() => result.current.login(true));
+    await act(() => result.current.login({
+      withoutWallet: true,
+    }));
 
     expect(result.current.error).toBe(null);
     expect(result.current.isLoggedIn).toBe(true);
@@ -106,9 +108,9 @@ describe('PassportContext and hooks', () => {
   it('should logout', async () => {
     const { result, waitFor } = renderHook(() => usePassport(), {
       wrapper: ({ children }: { children: ReactNode }) => (
-        <ReactProvider config={config}>
+        <ZkEvmReactProvider config={config}>
           {children}
-        </ReactProvider>
+        </ZkEvmReactProvider>
       ),
     });
 
@@ -126,9 +128,9 @@ describe('PassportContext and hooks', () => {
     it('should return the passport instance', () => {
       const { result } = renderHook(() => usePassport(), {
         wrapper: ({ children }: { children: ReactNode }) => (
-          <ReactProvider config={config}>
+          <ZkEvmReactProvider config={config}>
             {children}
-          </ReactProvider>
+          </ZkEvmReactProvider>
         ),
       });
 
