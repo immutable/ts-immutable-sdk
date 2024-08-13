@@ -32,6 +32,8 @@ type Trace = {
   output: string | number;
 };
 
+const THRESHOLD_SELECTOR = '0x84a3291a0';
+
 /**
  * We want to convert a StateObject type to the following format (Record<string, Record<string, Record<string, string>>>):
  * @example An example of a state object that changes the state at slot 0xe1b959...2585e to 1 at address 0xe43215...8E31:
@@ -122,7 +124,10 @@ export async function submitTenderlySimulations(
   let delayWithdrawalUnknownToken: boolean = false;
   let withdrawalQueueActivated: boolean = false;
   let largeTransferThresholds: number = 0;
+  let skipReadOperation = false;
 
+  // Check if simulations are for token withdrawal
+  const withdrawal = simulations.find((e: TenderlySimulation) => e.data?.startsWith(THRESHOLD_SELECTOR)) !== undefined;
   for (let i = 0; i < simResults.length; i++) {
     if (simResults[i].error) {
       throw new BridgeError(
@@ -137,7 +142,7 @@ export async function submitTenderlySimulations(
       );
     }
     // Attempt to extract event.
-    if (simResults[i].logs !== undefined) {
+    if (withdrawal && simResults[i].logs !== undefined) {
       const event = simResults[i].logs.find((e: Event) => e.name === 'QueuedWithdrawal');
       if (event !== undefined) {
         const inputs: Map<string, string | boolean> = new Map(event.inputs.map((c: Input) => [c.name, c.value]));
@@ -147,8 +152,7 @@ export async function submitTenderlySimulations(
       }
     }
     // Check read operation.
-    let skipReadOperation = false;
-    if (simResults[i].trace !== undefined) {
+    if (withdrawal && simResults[i].trace !== undefined) {
       const trace: Trace = simResults[i].trace.find((e: Trace) => e.method === 'largeTransferThresholds');
       if (trace !== undefined) {
         largeTransferThresholds = trace.output as number;
