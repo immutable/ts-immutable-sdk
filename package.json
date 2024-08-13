@@ -43,7 +43,6 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
     "@biom3/design-tokens": "^0.4.2",
-    "@openzeppelin/contracts": "3.4.2-solc-0.7",
     "responselike": "^2.0.0"
   },
   "scripts": {
