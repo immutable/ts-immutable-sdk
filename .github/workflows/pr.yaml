@@ -67,7 +67,7 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
       - name: Build
-        run: pnpm --reporter=append-only --if-present nx affected --target=build --parallel=5 --exclude=@imtbl/checkout-widgets-sample-app
+        run: pnpm --if-present nx affected --target=build --parallel=5 --exclude=@imtbl/checkout-widgets-sample-app
 
   typecheck-sdk:
     name: Typecheck SDK
