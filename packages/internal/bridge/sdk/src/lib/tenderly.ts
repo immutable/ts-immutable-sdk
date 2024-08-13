@@ -130,28 +130,30 @@ export async function submitTenderlySimulations(
         BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
       );
     }
-    if (simResults[i].gasUsed === undefined
-      || simResults[i].logs === undefined
-      || simResults[i].trace === undefined) {
+    if (simResults[i].gasUsed === undefined) {
       throw new BridgeError(
         'Estimating gas did not return simulation results',
         BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
       );
     }
     // Attempt to extract event.
-    const event = simResults[i].logs.find((e: Event) => e.name === 'QueuedWithdrawal');
-    if (event !== undefined) {
-      const inputs: Map<string, string | boolean> = new Map(event.inputs.map((c: Input) => [c.name, c.value]));
-      delayWithdrawalLargeAmount = inputs.get('delayWithdrawalLargeAmount') as boolean || false;
-      delayWithdrawalUnknownToken = inputs.get('delayWithdrawalUnknownToken') as boolean || false;
-      withdrawalQueueActivated = inputs.get('withdrawalQueueActivated') as boolean || false;
+    if (simResults[i].logs !== undefined) {
+      const event = simResults[i].logs.find((e: Event) => e.name === 'QueuedWithdrawal');
+      if (event !== undefined) {
+        const inputs: Map<string, string | boolean> = new Map(event.inputs.map((c: Input) => [c.name, c.value]));
+        delayWithdrawalLargeAmount = inputs.get('delayWithdrawalLargeAmount') as boolean || false;
+        delayWithdrawalUnknownToken = inputs.get('delayWithdrawalUnknownToken') as boolean || false;
+        withdrawalQueueActivated = inputs.get('withdrawalQueueActivated') as boolean || false;
+      }
     }
     // Check read operation.
     let skipReadOperation = false;
-    const trace: Trace = simResults[i].trace.find((e: Trace) => e.method === 'largeTransferThresholds');
-    if (trace !== undefined) {
-      largeTransferThresholds = trace.output as number;
-      skipReadOperation = true;
+    if (simResults[i].trace !== undefined) {
+      const trace: Trace = simResults[i].trace.find((e: Trace) => e.method === 'largeTransferThresholds');
+      if (trace !== undefined) {
+        largeTransferThresholds = trace.output as number;
+        skipReadOperation = true;
+      }
     }
     if (!skipReadOperation) {
       gas.push(simResults[i].gasUsed);
