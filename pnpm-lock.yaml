@@ -841,6 +841,9 @@ importers:
       '@imtbl/config':
         specifier: 0.0.0
         version: link:../../config
+      '@imtbl/passport':
+        specifier: 0.0.0
+        version: link:../../passport/sdk
       embla-carousel-react:
         specifier: ^8.1.5
         version: 8.1.5(react@18.2.0)
@@ -1679,12 +1682,6 @@ importers:
       '@rollup/plugin-typescript':
         specifier: ^11.1.6
         version: 11.1.6(rollup@4.19.1)(tslib@2.6.3)(typescript@5.5.4)
-      '@swc/cli':
-        specifier: ^0.4.0
-        version: 0.4.0(@swc/core@1.7.6(@swc/helpers@0.5.5))(chokidar@3.6.0)
-      '@swc/core':
-        specifier: ^1.7.6
-        version: 1.7.6(@swc/helpers@0.5.5)
       '@swc/jest':
         specifier: ^0.2.24
         version: 0.2.36(@swc/core@1.7.6(@swc/helpers@0.5.5))
@@ -2068,6 +2065,9 @@ importers:
       '@imtbl/config':
         specifier: 0.0.0
         version: link:../../config
+      '@imtbl/generated-clients':
+        specifier: 0.0.0
+        version: link:../../internal/generated-clients
       '@imtbl/orderbook':
         specifier: 0.0.0
         version: link:../../orderbook
@@ -20222,7 +20222,7 @@ snapshots:
       '@types/istanbul-lib-coverage': 2.0.4
       collect-v8-coverage: 1.0.2
 
-  '@jest/test-sequencer@26.6.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.7.6(@swc/helpers@0.5.5))(@types/node@20.14.13)(typescript@5.5.4))(utf-8-validate@5.0.10)':
+  '@jest/test-sequencer@26.6.3':
     dependencies:
       '@jest/test-result': 26.6.2
       graceful-fs: 4.2.11
@@ -20230,11 +20230,7 @@ snapshots:
       jest-runner: 26.6.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.7.6(@swc/helpers@0.5.5))(@types/node@20.14.13)(typescript@5.5.4))(utf-8-validate@5.0.10)
       jest-runtime: 26.6.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.7.6(@swc/helpers@0.5.5))(@types/node@20.14.13)(typescript@5.5.4))(utf-8-validate@5.0.10)
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
 
   '@jest/test-sequencer@27.5.1':
     dependencies:
@@ -31030,7 +31026,7 @@ snapshots:
   jest-config@26.6.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.7.6(@swc/helpers@0.5.5))(@types/node@20.14.13)(typescript@5.5.4))(utf-8-validate@5.0.10):
     dependencies:
       '@babel/core': 7.24.9
-      '@jest/test-sequencer': 26.6.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.7.6(@swc/helpers@0.5.5))(@types/node@20.14.13)(typescript@5.5.4))(utf-8-validate@5.0.10)
+      '@jest/test-sequencer': 26.6.3
       '@jest/types': 26.6.2
       babel-jest: 26.6.3(@babel/core@7.24.9)
       chalk: 4.1.2

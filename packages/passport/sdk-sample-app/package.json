@@ -6,6 +6,7 @@
     "@biom3/react": "^0.25.0",
     "@imtbl/blockchain-data": "0.0.0",
     "@imtbl/config": "0.0.0",
+    "@imtbl/generated-clients": "0.0.0",
     "@imtbl/orderbook": "0.0.0",
     "@imtbl/passport": "0.0.0",
     "@imtbl/x-client": "0.0.0",
