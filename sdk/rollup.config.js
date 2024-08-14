@@ -55,7 +55,6 @@ const buildJS = () => {
         json(),
         commonJs(),
         typescript({
-          compilerOptions: { customConditions: ["default"] },
           declaration: true,
           declarationDir: './dist/types',
         }),
@@ -108,7 +107,7 @@ export default [
       }),
       json(),
       commonJs(),
-      typescript({customConditions: ["default"]}),
+      typescript(),
       replace({
         exclude: 'node_modules/**',
         preventAssignment: true,
@@ -140,7 +139,7 @@ export default [
         include: ['../node_modules/ethers-v6/**', '../node_modules/@opensea/seaport-js/**'],
         plugins: ['@babel/plugin-transform-class-properties', '@babel/plugin-transform-private-methods'],
       }),
-      typescript({customConditions: ["default"]}),
+      typescript(),
       replace({
         // Can't exclude node_modules here because some dependencies use process.env.NODE_ENV
         // this breaks in browsers
