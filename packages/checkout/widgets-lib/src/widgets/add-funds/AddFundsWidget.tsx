@@ -2,7 +2,7 @@ import { AddFundsWidgetParams } from '@imtbl/checkout-sdk/dist/widgets/definitio
 import { Checkout, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import {
-  useContext, useEffect, useMemo, useReducer,
+  useContext, useMemo, useReducer,
 } from 'react';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
@@ -42,12 +42,6 @@ export default function AddFundsWidget({
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
-
-  useEffect(() => {
-    eventTarget.addEventListener('imtbl-add-funds-widget', (data) => {
-      console.log('request-onramp', data);
-    });
-  }, []);
 
   return (
     <ViewContext.Provider value={viewReducerValues}>

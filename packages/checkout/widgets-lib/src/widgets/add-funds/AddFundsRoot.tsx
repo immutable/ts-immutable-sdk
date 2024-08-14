@@ -65,7 +65,6 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
         getL2ChainId(this.checkout.config),
       ],
     };
-    console.log('=== ADDFUNDS', this.web3Provider, this.checkout);
 
     this.reactRoot.render(
       <React.StrictMode>
