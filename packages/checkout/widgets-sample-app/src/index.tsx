@@ -12,6 +12,7 @@ import { PassportLoginCallback } from './components/ui/marketplace-orchestrator/
 import { Marketplace } from './components/ui/marketplace-orchestrator';
 import { SaleUI } from './components/ui/sale/sale';
 import CheckoutUI from './components/ui/checkout/checkout';
+import AddFundsUI from './components/ui/add-funds/addFunds';
 
 const router = createBrowserRouter([
   {
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
   {
     path: '/checkout',
     element: <CheckoutUI />,
+  },
+  {
+    path: '/add-funds',
+    element: <AddFundsUI />,
   },
   {
     path: '/marketplace-orchestrator',
