@@ -1,17 +1,17 @@
 'use client';
 
-import { passport } from '@imtbl/sdk';
+import { reactPassport } from '@imtbl/sdk';
 
 export default function Page() {
   const {
     login, logout, isLoading, isLoggedIn,
-  } = passport.usePassport();
-  const { idToken } = passport.useIdToken();
-  const { accessToken } = passport.useAccessToken();
-  const { linkedAddresses } = passport.useLinkedAddresses();
-  const { userInfo } = passport.useUserInfo();
-  const { accounts } = passport.useAccounts();
-  const { passportProvider } = passport.usePassportProvider();
+  } = reactPassport.usePassport();
+  const { idToken } = reactPassport.useIdToken();
+  const { accessToken } = reactPassport.useAccessToken();
+  const { linkedAddresses } = reactPassport.useLinkedAddresses();
+  const { userInfo } = reactPassport.useUserInfo();
+  const { accounts } = reactPassport.useAccounts();
+  const { passportProvider } = reactPassport.usePassportProvider();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8">

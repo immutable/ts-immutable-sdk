@@ -14,9 +14,10 @@
     "checkout": "prod",
     "x": "prod",
     "webhook": "prod",
-    "minting_backend": "prod"
+    "minting_backend": "prod",
+    "react_passport": "alpha"
   },
-  "excludeForBrowser": ["webhook", "minting_backend"],
+  "excludeForBrowser": ["webhook", "minting_backend", "react_passport"],
   "fileCopy": [
     {
       "src": "../packages/checkout/widgets-lib/dist/index.js",

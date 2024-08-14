@@ -1,9 +1,8 @@
 import { act, renderHook } from '@testing-library/react-hooks/native';
 import { Environment } from '@imtbl/config';
 import React, { ReactNode } from 'react';
-import { Passport } from '../Passport';
+import { Passport, PassportModuleConfiguration } from '@imtbl/passport';
 import { ZkEvmReactProvider, usePassport } from './PassportContext';
-import { PassportModuleConfiguration } from '../types';
 
 jest.mock('../Passport');
 jest.mock('../zkEvm');

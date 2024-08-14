@@ -1,10 +1,10 @@
 // #doc passport-setup-react
-import { config, passport } from '@imtbl/sdk';
+import { config, reactPassport } from '@imtbl/sdk';
 import { ReactNode } from 'react';
 
 export function PassportProvider({ children }: { children: ReactNode }) {
   return (
-    <passport.ZkEvmReactProvider
+    <reactPassport.ZkEvmReactProvider
       config={{
         baseConfig: {
           environment: config.Environment.SANDBOX, // or config.Environment.SANDBOX
@@ -18,7 +18,7 @@ export function PassportProvider({ children }: { children: ReactNode }) {
       }}
     >
       {children}
-    </passport.ZkEvmReactProvider>
+    </reactPassport.ZkEvmReactProvider>
   );
 }
 // #enddoc passport-setup-react

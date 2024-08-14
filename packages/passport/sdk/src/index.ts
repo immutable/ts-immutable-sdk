@@ -25,15 +25,3 @@ export type {
   DeviceConnectResponse,
   DeviceTokenResponse,
 } from './types';
-
-export {
-  ZkEvmReactProvider,
-  useAccessToken,
-  useIdToken,
-  useLinkedAddresses,
-  usePassport,
-  useUserInfo,
-  useAccounts,
-  usePassportProvider,
-  useProfile,
-} from './react/PassportContext';

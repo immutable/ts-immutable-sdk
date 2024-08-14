@@ -96,6 +96,7 @@
       "packages/checkout/widgets-lib",
       "packages/blockchain-data/sdk",
       "packages/game-bridge",
+      "packages/react/passport",
       "packages/webhook/sdk",
       "packages/minting-backend/sdk",
       "tests/**",

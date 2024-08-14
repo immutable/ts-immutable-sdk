@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import React, {
-  createContext, useContext, useEffect, useMemo,
+  createContext, useCallback, useContext, useEffect, useMemo,
   useState,
 } from 'react';
 import { setPassportClientId, track } from '@imtbl/metrics';
-import { Passport } from '../Passport';
-import { PassportModuleConfiguration, UserProfile } from '../types';
-import { Provider } from '../zkEvm/types';
+import {
+  Passport, PassportModuleConfiguration, UserProfile, Provider,
+} from '@imtbl/passport';
 
 type ZkEvmReactContext = {
   passportInstance: Passport;
@@ -51,6 +51,17 @@ export function ZkEvmReactProvider({ children, config }: ZkEvmReactProviderProps
     return p;
   };
 
+  const checkLogggedIn = useCallback(async () => {
+    const p = await passportInstance.login({
+      useCachedSession: true,
+    });
+    setLoggedIn(!!p);
+  }, [passportInstance]);
+
+  useEffect(() => {
+    checkLogggedIn();
+  }, [config, passportInstance, accounts, profile]);
+
   const v = useMemo(() => ({
     passportInstance,
     passportProvider,
@@ -72,12 +83,10 @@ export function ZkEvmReactProvider({ children, config }: ZkEvmReactProviderProps
           anonymousId: options?.anonymousId,
         });
         setProfile(p);
-        setLoggedIn(true);
 
         if (!options?.withoutWallet) {
           const provider = getPassportProvider();
           const acc = await provider.request({ method: 'eth_requestAccounts' });
-          setLoggedIn(true);
           setAccounts(acc);
         }
       } catch (e) {
@@ -92,7 +101,6 @@ export function ZkEvmReactProvider({ children, config }: ZkEvmReactProviderProps
         setIsLoading(true);
         await passportInstance.logout();
         setPassportProvider(null);
-        setLoggedIn(false);
         setAccounts([]);
         setProfile(null);
       } catch (e) {
@@ -123,119 +131,87 @@ export function usePassport(): ZkEvmReactContext {
 }
 
 export function useIdToken() {
-  const { passportInstance, isLoading, isLoggedIn } = usePassport();
+  const { passportInstance, isLoading } = usePassport();
   const [idToken, setIdToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   const getIdToken = () => {
-    if (isLoggedIn) {
-      setLoading(true);
-      passportInstance
-        .getIdToken()
-        .then((t) => {
-          setIdToken(t || null);
-          if (!t) {
-            setError(new Error('No ID Token'));
-          }
-        })
-        .catch((e) => setError(e))
-        .finally(() => setLoading(false));
-    } else {
-      setIdToken(null);
-    }
-
-    return () => {
-      setIdToken(null);
-    };
+    setLoading(true);
+    passportInstance
+      .getIdToken()
+      .then((t) => {
+        setIdToken(t || null);
+        if (!t) {
+          setError(new Error('No ID Token'));
+        }
+      })
+      .catch((e) => setError(e))
+      .finally(() => setLoading(false));
   };
-  useEffect(getIdToken, [passportInstance, isLoggedIn]);
+  useEffect(getIdToken, [passportInstance]);
   return {
-    idToken, isLoading: isLoading || loading, error, refetch: getIdToken,
+    idToken, isLoading: isLoading || loading, error,
   };
 }
 
 export function useAccessToken() {
-  const { passportInstance, isLoading, isLoggedIn } = usePassport();
+  const { passportInstance, isLoading } = usePassport();
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   const getAccessToken = () => {
-    if (isLoggedIn) {
-      setLoading(true);
-      passportInstance
-        .getAccessToken()
-        .then((t) => setAccessToken(t || null))
-        .catch((e) => setError(e))
-        .finally(() => setLoading(false));
-    } else {
-      setAccessToken(null);
-    }
-
-    return () => {
-      setAccessToken(null);
-    };
+    setLoading(true);
+    passportInstance
+      .getAccessToken()
+      .then((t) => setAccessToken(t || null))
+      .catch((e) => setError(e))
+      .finally(() => setLoading(false));
   };
-  useEffect(getAccessToken, [passportInstance, isLoggedIn]);
+  useEffect(getAccessToken, [passportInstance]);
   return {
-    accessToken, isLoading: isLoading || loading, error, refetch: getAccessToken,
+    accessToken, isLoading: isLoading || loading, error,
   };
 }
 
 export function useLinkedAddresses() {
-  const { passportInstance, isLoading, isLoggedIn } = usePassport();
+  const { passportInstance, isLoading } = usePassport();
   const [linkedAddresses, setLinkedAddresses] = useState<string[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   const getLinkedAddresses = () => {
-    if (isLoggedIn) {
-      setLoading(true);
-      passportInstance
-        .getLinkedAddresses()
-        .then((t) => setLinkedAddresses(t || null))
-        .catch((e) => setError(e))
-        .finally(() => setLoading(false));
-    } else {
-      setLinkedAddresses(null);
-    }
-
-    return () => {
-      setLinkedAddresses(null);
-    };
+    setLoading(true);
+    passportInstance
+      .getLinkedAddresses()
+      .then((t) => setLinkedAddresses(t || null))
+      .catch((e) => setError(e))
+      .finally(() => setLoading(false));
   };
-  useEffect(getLinkedAddresses, [passportInstance, isLoggedIn]);
+  useEffect(getLinkedAddresses, [passportInstance]);
   return {
-    linkedAddresses, isLoading: isLoading || loading, error, refetch: getLinkedAddresses,
+    linkedAddresses, isLoading: isLoading || loading, error,
   };
 }
 
 export function useUserInfo() {
-  const { passportInstance, isLoading, isLoggedIn } = usePassport();
+  const { passportInstance, isLoading } = usePassport();
   const [userInfo, setUserInfo] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   const getUserInfo = () => {
-    if (isLoggedIn) {
-      setLoading(true);
-      passportInstance
-        .getUserInfo()
-        .then((t) => setUserInfo(t || null))
-        .catch((e) => setError(e))
-        .finally(() => setLoading(false));
-    } else {
-      setUserInfo(null);
-    }
-
-    return () => {
-      setUserInfo(null);
-    };
+    setLoading(true);
+    passportInstance
+      .getUserInfo()
+      .then((t) => setUserInfo(t || null))
+      .catch((e) => setError(e))
+      .finally(() => setLoading(false));
   };
-  useEffect(getUserInfo, [passportInstance, isLoggedIn]);
+  useEffect(getUserInfo, [passportInstance]);
   return {
-    userInfo, isLoading: isLoading || loading, error, refetch: getUserInfo,
+    userInfo, isLoading: isLoading || loading, error,
   };
 }
 

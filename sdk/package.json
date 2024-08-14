@@ -73,6 +73,7 @@
     "@imtbl/minting-backend": "0.0.0",
     "@imtbl/orderbook": "0.0.0",
     "@imtbl/passport": "0.0.0",
+    "@imtbl/react-passport": "0.0.0",
     "@imtbl/webhook": "0.0.0",
     "@imtbl/x-client": "0.0.0",
     "@imtbl/x-provider": "0.0.0",
@@ -134,6 +135,10 @@
     "./minting_backend": {
       "types": "./dist/minting_backend.d.ts",
       "import": "./dist/minting_backend.js"
+    },
+    "./react_passport": {
+      "types": "./dist/react_passport.d.ts",
+      "import": "./dist/react_passport.js"
     }
   },
   "files": [
