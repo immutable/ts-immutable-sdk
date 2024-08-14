@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "es2022",
-    "module": "esnext",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "noEmit": true,
     "allowJs": false,
     "removeComments": false,
@@ -14,10 +14,8 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "isolatedModules": true,
-    "incremental": true,
+    "incremental": false
     // "isolatedDeclarations": true,
-    // "module": "Preserve",
-    // "moduleResolution": "Bundler",
     // "noUncheckedIndexedAccess": true,
     // "verbatimModuleSyntax": true,
     // "composite": true,

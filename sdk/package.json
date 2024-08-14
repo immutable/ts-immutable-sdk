@@ -154,8 +154,6 @@
     "copyBrowserBundles": "node scripts/copyBrowserBundles.js",
     "generateIndex": "node scripts/generateIndex.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
-    "postbuild": "pnpm --filter @imtbl/sdk^... exec pnpm pkg set types='./src/index.ts' -ws > /dev/null",
-    "prebuild": "pnpm --filter @imtbl/sdk^... exec pnpm pkg set types='./dist/index.d.ts' -ws > /dev/null",
     "regenModules": "pnpm generateIndex && pnpm updateExports",
     "typecheck": "tsc --noEmit --jsx preserve",
     "updateDependencies": "node ./scripts/updateDependencies.js && pnpm syncpack format",

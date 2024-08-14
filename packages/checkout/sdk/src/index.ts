@@ -29,13 +29,13 @@ export {
   GasTokenType,
   ItemType,
   NetworkFilterTypes,
-  RoutingOutcomeType,
-  TokenFilterTypes,
+  RoutingOutcomeType, TokenFilterTypes,
   TransactionOrGasType,
   WalletFilterTypes,
   WalletProviderName,
   WalletProviderRdns,
 } from './types';
+export type { TelemetryConfig, SwapFees } from './types';
 export type {
   EIP1193Provider,
   EIP6963ProviderInfo,

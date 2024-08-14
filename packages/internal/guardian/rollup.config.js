@@ -15,6 +15,7 @@ export default {
     resolve({ browser: true }),
     isProduction ?
     typescript({
+      customConditions: ["default"],
       exclude: ['**/ABIs/*', '**/*.test.*', '**/utils/testUtils.ts'],
     }) :
     swc.rollup({exclude: ['**/ABIs/*', '**/*.test.*', '**/utils/testUtils.ts']}),

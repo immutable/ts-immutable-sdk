@@ -9,5 +9,5 @@ export default {
     dir: 'dist',
     format: 'es',
   },
-  plugins: [isProduction ? typescript() : swc.rollup()],
+  plugins: [isProduction ? typescript({customConditions: ["default"]}) : swc.rollup()],
 };

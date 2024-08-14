@@ -5,9 +5,12 @@ import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
 import replace from '@rollup/plugin-replace';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
+import swc from 'unplugin-swc'
 
 const DEVELOPMENT = 'development';
 const PRODUCTION = 'production';
+
+const isProduction = process.env.NODE_ENV === PRODUCTION
 
 const defaultPlugins = [
   json(),
@@ -15,13 +18,14 @@ const defaultPlugins = [
     preventAssignment: true,
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || PRODUCTION),
   }),
-  typescript(),
+  isProduction ? typescript({customConditions: ["default"]}) : swc.rollup(),
 ]
 
 const productionPlugins = [
   resolve({
     browser: true,
     dedupe: ['react', 'react-dom'],
+    exportConditions: ['browser']
   }),
   nodePolyfills(),
   commonjs(),

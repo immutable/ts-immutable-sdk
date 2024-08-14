@@ -28,6 +28,16 @@
   "engines": {
     "node": ">=20.11.0"
   },
+  "exports": {
+    "development": {
+      "types": "./src/index.ts",
+      "import": "./dist/index.js"
+    },
+    "default": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "files": [
     "dist"
   ],
@@ -36,13 +46,11 @@
     "immutablex"
   ],
   "license": "Apache-2.0",
-  "main": "dist/index.js",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
     "d": "rollup --config rollup.config.js"
   },
-  "type": "module",
-  "types": "./src/index.ts"
+  "type": "module"
 }

@@ -27,12 +27,21 @@
   "engines": {
     "node": ">=20.11.0"
   },
+  "exports": {
+    "development": {
+      "types": "./src/index.ts",
+      "import": "./dist/index.js"
+    },
+    "default": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "files": [
     "dist"
   ],
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "license": "Apache-2.0",
-  "main": "dist/index.js",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
@@ -43,6 +52,5 @@
     "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit --jsx preserve"
   },
-  "type": "module",
-  "types": "./src/index.ts"
+  "type": "module"
 }

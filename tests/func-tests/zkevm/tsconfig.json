@@ -2,6 +2,7 @@
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     "rootDirs": ["src"],
+    "customConditions": ["development"]
   },
   "include": ["src"],
   "exclude": [

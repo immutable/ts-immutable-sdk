@@ -8,7 +8,6 @@ packages:
   - "packages/passport/sdk-sample-app"
   - "packages/orderbook"
   - "packages/internal/metrics"
-  - "packages/internal/contracts"
   - "packages/internal/toolkit"
   - "packages/internal/cryptofiat"
   - "packages/internal/dex/sdk"
