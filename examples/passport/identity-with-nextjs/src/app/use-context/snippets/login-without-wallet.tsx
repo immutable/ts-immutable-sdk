@@ -10,7 +10,7 @@ export default function Page() {
       userInfo:
       {' '}
       {userInfo}
-      <button onClick={() => login(true)}>Login Without Wallet</button>
+      <button onClick={() => login({ withoutWallet: true })}>Login Without Wallet</button>
     </>
   );
 }
