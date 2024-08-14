@@ -14,7 +14,8 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "isolatedModules": true,
-    "incremental": false
+    "incremental": false,
+    "noEmitOnError": true,
     // "isolatedDeclarations": true,
     // "noUncheckedIndexedAccess": true,
     // "verbatimModuleSyntax": true,
