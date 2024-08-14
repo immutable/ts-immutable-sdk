@@ -39,6 +39,7 @@ import {
   CheckoutSuccessEvent,
   CheckoutFailureEvent,
   CheckoutUserActionEvent,
+  RequestAddFundsEvent,
 } from './events';
 import {
   BridgeWidgetParams,
@@ -129,7 +130,7 @@ type OrchestrationMapping = {
   [OrchestrationEventType.REQUEST_SWAP]: RequestSwapEvent;
   [OrchestrationEventType.REQUEST_BRIDGE]: RequestBridgeEvent;
   [OrchestrationEventType.REQUEST_ONRAMP]: RequestOnrampEvent;
-  // TODO : [ADD_FUNDS] CHECK if we need for ADD_FUNDS
+  [OrchestrationEventType.REQUEST_ADD_FUNDS]: RequestAddFundsEvent;
 };
 
 type ProviderEventMapping = {
@@ -207,6 +208,9 @@ export type WidgetEventData = {
 
   [WidgetType.ADD_FUNDS]: {
     [AddFundsEventType.CLOSE_WIDGET]: {};
+    [AddFundsEventType.REQUEST_BRIDGE]: {};
+    [AddFundsEventType.REQUEST_SWAP]: {};
+    [AddFundsEventType.REQUEST_ONRAMP]: {};
   } & OrchestrationMapping &
   ProviderEventMapping;
 };
