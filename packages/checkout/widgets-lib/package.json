@@ -102,5 +102,6 @@
     "test:watch": "jest test --passWithNoTests --watch",
     "typecheck": "tsc --noEmit"
   },
-  "type": "module"
+  "type": "module",
+  "main": "./dist/index.js"
 }

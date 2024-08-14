@@ -45,7 +45,7 @@
   },
   "private": true,
   "scripts": {
-    "build": "tsc && vite build",
+    "build": "tsc --customConditions \"default\" && vite build",
     "preview": "vite preview",
     "start": "vite"
   }

@@ -10,7 +10,9 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
+    // React-app-rewired needs to be replaced to enable the development custom condition
+    "customConditions": ["default"],
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,

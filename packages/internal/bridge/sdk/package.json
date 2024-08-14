@@ -61,5 +61,6 @@
     "typecheck": "tsc --noEmit"
   },
   "source": "src/index.ts",
-  "type": "module"
+  "type": "module",
+  "main": "./dist/index.js"
 }

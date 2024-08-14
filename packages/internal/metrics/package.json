@@ -48,5 +48,6 @@
     "test": "jest",
     "typecheck": "tsc --noEmit --jsx preserve"
   },
-  "type": "module"
+  "type": "module",
+  "main": "./dist/index.js"
 }

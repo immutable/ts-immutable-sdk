@@ -40,5 +40,6 @@
     "typecheck": "tsc --noEmit --jsx preserve",
     "view-generators": "openapi-generator-cli author template -g typescript-axios -o src/templates"
   },
-  "type": "module"
+  "type": "module",
+  "main": "./dist/index.js"
 }

@@ -66,5 +66,6 @@
     "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit --jsx preserve"
   },
-  "type": "module"
+  "type": "module",
+  "main": "./dist/index.js"
 }
