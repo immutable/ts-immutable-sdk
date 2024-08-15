@@ -1,4 +1,4 @@
-// #doc passport-react-user-info
+// #doc passport-react-profile
 import { passport } from '@imtbl/sdk';
 
 export default function Page() {
@@ -11,4 +11,4 @@ export default function Page() {
     </>
   );
 }
-// #enddoc passport-react-user-info
+// #enddoc passport-react-profile
