@@ -208,6 +208,7 @@ export type WidgetEventData = {
 
   [WidgetType.ADD_FUNDS]: {
     [AddFundsEventType.CLOSE_WIDGET]: {};
+    [AddFundsEventType.GO_BACK]: {};
     [AddFundsEventType.REQUEST_BRIDGE]: {};
     [AddFundsEventType.REQUEST_SWAP]: {};
     [AddFundsEventType.REQUEST_ONRAMP]: {};

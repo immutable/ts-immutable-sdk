@@ -7,5 +7,5 @@ export enum AddFundsEventType {
   REQUEST_BRIDGE = 'request-bridge',
   REQUEST_ONRAMP = 'request-onramp',
   REQUEST_SWAP = 'request-swap',
+  GO_BACK = 'go-back',
 }
-// TODO: [ADD_FUNDS] Add Events

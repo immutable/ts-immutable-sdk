@@ -29,6 +29,9 @@ function AddFundsUI() {
 
   useEffect(() => {
     addFunds.mount(ADD_FUNDS_TARGET_ID);
+    addFunds.addListener(AddFundsEventType.GO_BACK, (data: any) => {
+      console.log("GO_BACK", data);
+    });
     addFunds.addListener(AddFundsEventType.CLOSE_WIDGET, (data: any) => {
       console.log("CLOSE_WIDGET", data);
       addFunds.unmount();

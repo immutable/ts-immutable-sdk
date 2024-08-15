@@ -1,13 +1,14 @@
 import { AddFundsWidgetParams } from '@imtbl/checkout-sdk/dist/widgets/definitions/parameters/addFunds';
 import { Checkout, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
-import {
-  useContext, useMemo, useReducer,
-} from 'react';
+import { useContext, useMemo, useReducer } from 'react';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { TopUpView } from '../../views/top-up/TopUpView';
-import { sendAddFundsCloseEvent } from './AddFundsWidgetEvents';
+import {
+  sendAddFundsCloseEvent,
+  sendAddFundsGoBackEvent,
+} from './AddFundsWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import {
   ViewContext,
@@ -54,6 +55,7 @@ export default function AddFundsWidget({
         showSwapOption={isSwapEnabled}
         showBridgeOption={isBridgeEnabled}
         onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
+        onBackButtonClick={() => sendAddFundsGoBackEvent(eventTarget)}
       />
     </ViewContext.Provider>
   );
