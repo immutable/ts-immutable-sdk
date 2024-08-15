@@ -4198,6 +4198,7 @@ __metadata:
     ts-mockito: ^2.6.1
     typechain: ^8.1.1
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
   languageName: unknown
   linkType: soft
 
@@ -4226,6 +4227,7 @@ __metadata:
     ts-node: ^10.9.1
     typechain: ^8.1.1
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
   languageName: unknown
   linkType: soft
 
@@ -4237,7 +4239,10 @@ __metadata:
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
+    "@imtbl/orderbook": 0.0.0
+    "@imtbl/passport": 0.0.0
     "@svgr/webpack": ^8.0.1
+    "@swc/core": ^1.3.36
     "@testing-library/jest-dom": ^5.16.5
     "@testing-library/react": ^13.4.0
     "@testing-library/user-event": ^13.5.0
@@ -4261,6 +4266,7 @@ __metadata:
     react-scripts: 5.0.1
     stream-browserify: ^3.0.0
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
     web-vitals: ^2.1.4
   languageName: unknown
   linkType: soft
@@ -4276,6 +4282,7 @@ __metadata:
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/config": 0.0.0
     "@imtbl/dex-sdk": 0.0.0
+    "@imtbl/generated-clients": 0.0.0
     "@imtbl/metrics": 0.0.0
     "@imtbl/orderbook": 0.0.0
     "@imtbl/passport": 0.0.0
@@ -4288,6 +4295,7 @@ __metadata:
     "@rollup/plugin-replace": ^5.0.7
     "@rollup/plugin-terser": ^0.4.4
     "@rollup/plugin-typescript": ^11.1.6
+    "@swc/core": ^1.3.36
     "@types/uuid": ^8.3.4
     axios: ^1.6.5
     babel-jest: ^29.5.0
@@ -4302,6 +4310,7 @@ __metadata:
     typedoc: ^0.26.5
     typedoc-plugin-markdown: ^4.2.3
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
     uuid: ^8.3.2
   languageName: unknown
   linkType: soft
@@ -4316,6 +4325,7 @@ __metadata:
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
     "@imtbl/passport": 0.0.0
+    "@swc/core": ^1.3.36
     "@testing-library/jest-dom": ^5.16.5
     "@testing-library/react": ^13.4.0
     "@testing-library/user-event": ^13.5.0
@@ -4331,6 +4341,7 @@ __metadata:
     react-dom: ^18.2.0
     react-router-dom: ^6.11.0
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
     vite: ^5.0.12
     vite-plugin-node-polyfills: ^0.16.0
     web-vitals: ^2.1.4
@@ -4359,6 +4370,7 @@ __metadata:
     "@rollup/plugin-terser": ^0.4.4
     "@rollup/plugin-typescript": ^11.1.6
     "@svgr/webpack": ^8.0.1
+    "@swc/core": ^1.3.36
     "@testing-library/jest-dom": ^5.16.5
     "@testing-library/react": ^13.4.0
     "@testing-library/user-event": ^13.5.0
@@ -4386,12 +4398,14 @@ __metadata:
     react-i18next: ^13.5.0
     react-scripts: 5.0.1
     rollup: ^4.19.1
+    rollup-plugin-polyfill-node: ^0.13.0
     rollup-plugin-svg: ^2.0.0
     rollup-plugin-visualizer: ^5.12.0
     stream-browserify: ^3.0.0
     stream-http: ^3.2.0
     ts-jest: ^29.1.0
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
     url: ^0.11.0
     web-vitals: ^2.1.4
   languageName: unknown
@@ -4416,6 +4430,7 @@ __metadata:
     rollup: ^4.19.1
     ts-node: ^10.9.1
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
   languageName: unknown
   linkType: soft
 
@@ -4460,6 +4475,7 @@ __metadata:
     rollup: ^4.19.1
     ts-node: ^10.9.1
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
   languageName: unknown
   linkType: soft
 
@@ -4469,6 +4485,7 @@ __metadata:
   dependencies:
     "@imtbl/config": 0.0.0
     "@rollup/plugin-json": ^6.1.0
+    "@rollup/plugin-typescript": ^11.1.6
     "@swc/core": ^1.3.36
     "@swc/jest": ^0.2.24
     "@typechain/ethers-v5": ^10.2.0
@@ -4485,6 +4502,7 @@ __metadata:
     ts-node: ^10.9.1
     typechain: ^8.1.1
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
   languageName: unknown
   linkType: soft
 
@@ -4510,6 +4528,7 @@ __metadata:
     ts-node: ^10.9.1
     typechain: ^8.1.1
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
   languageName: unknown
   linkType: soft
 
@@ -4522,6 +4541,7 @@ __metadata:
     "@imtbl/passport": 0.0.0
     "@imtbl/x-client": 0.0.0
     "@imtbl/x-provider": 0.0.0
+    "@swc/core": ^1.3.36
     eslint: ^8.40.0
     ethers: ^5.7.2
     parcel: ^2.8.3
@@ -4533,9 +4553,12 @@ __metadata:
   resolution: "@imtbl/generated-clients@workspace:packages/internal/generated-clients"
   dependencies:
     "@openapitools/openapi-generator-cli": ^2.13.4
+    "@rollup/plugin-typescript": ^11.1.6
+    "@swc/core": ^1.3.36
     jest: ^29.4.3
     rollup: ^4.19.1
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
   languageName: unknown
   linkType: soft
 
@@ -4544,6 +4567,8 @@ __metadata:
   resolution: "@imtbl/guardian@workspace:packages/internal/guardian"
   dependencies:
     "@rollup/plugin-json": ^6.1.0
+    "@rollup/plugin-node-resolve": ^15.2.3
+    "@rollup/plugin-typescript": ^11.1.6
     "@swc/core": ^1.3.36
     "@swc/jest": ^0.2.24
     "@typechain/ethers-v5": ^10.2.0
@@ -4557,6 +4582,7 @@ __metadata:
     ts-node: ^10.9.1
     typechain: ^8.1.1
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
   languageName: unknown
   linkType: soft
 
@@ -4565,6 +4591,7 @@ __metadata:
   resolution: "@imtbl/metrics@workspace:packages/internal/metrics"
   dependencies:
     "@rollup/plugin-typescript": ^11.1.6
+    "@swc/core": ^1.3.36
     "@swc/jest": ^0.2.24
     "@types/jest": ^29.4.3
     axios: ^1.6.5
@@ -4576,6 +4603,7 @@ __metadata:
     rollup: ^4.19.1
     ts-jest: ^29.1.0
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
   languageName: unknown
   linkType: soft
 
@@ -4585,6 +4613,7 @@ __metadata:
   dependencies:
     "@imtbl/blockchain-data": 0.0.0
     "@imtbl/config": 0.0.0
+    "@imtbl/generated-clients": 0.0.0
     "@imtbl/metrics": 0.0.0
     "@imtbl/webhook": 0.0.0
     "@rollup/plugin-typescript": ^11.1.6
@@ -4603,6 +4632,7 @@ __metadata:
     testcontainers: ^10.9.0
     ts-mockito: ^2.6.1
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
   dependenciesMeta:
     pg:
       optional: true
@@ -4619,6 +4649,7 @@ __metadata:
     "@imtbl/metrics": 0.0.0
     "@opensea/seaport-js": 4.0.3
     "@rollup/plugin-typescript": ^11.1.6
+    "@swc/core": ^1.3.36
     "@swc/jest": ^0.2.24
     "@typechain/ethers-v5": ^10.2.0
     "@types/jest": ^29.4.3
@@ -4635,6 +4666,7 @@ __metadata:
     ts-mockito: ^2.6.1
     typechain: ^8.1.1
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
   languageName: unknown
   linkType: soft
 
@@ -4646,12 +4678,14 @@ __metadata:
     "@biom3/react": ^0.25.0
     "@imtbl/blockchain-data": 0.0.0
     "@imtbl/config": 0.0.0
+    "@imtbl/generated-clients": 0.0.0
     "@imtbl/orderbook": 0.0.0
     "@imtbl/passport": 0.0.0
     "@imtbl/x-client": 0.0.0
     "@imtbl/x-provider": 0.0.0
     "@metamask/detect-provider": ^2.0.0
     "@next/eslint-plugin-next": ^13.4.7
+    "@swc/core": ^1.3.36
     "@types/node": ^18.14.2
     "@types/react": ^18.0.28
     "@types/react-dom": ^18.0.11
@@ -4665,11 +4699,12 @@ __metadata:
     eslint-config-next: 13.3.1
     ethers: ^5.7.2
     framer-motion: ^11.0.6
-    next: 13.3.1
+    next: 13.4.11
     react: ^18.2.0
     react-bootstrap: ^2.7.2
     react-dom: ^18.2.0
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
   languageName: unknown
   linkType: soft
 
@@ -4717,6 +4752,7 @@ __metadata:
     rollup: ^4.19.1
     ts-node: ^10.9.1
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
     uuid: ^8.3.2
   languageName: unknown
   linkType: soft
@@ -4928,6 +4964,7 @@ __metadata:
     rollup: ^4.19.1
     ts-node: ^10.9.1
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
   languageName: unknown
   linkType: soft
 
@@ -4952,6 +4989,7 @@ __metadata:
     ts-mockito: ^2.6.1
     typechain: ^8.1.1
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
   languageName: unknown
   linkType: soft
 
@@ -4968,6 +5006,7 @@ __metadata:
     "@imtbl/config": 0.0.0
     "@imtbl/generated-clients": 0.0.0
     "@rollup/plugin-typescript": ^11.1.6
+    "@swc/core": ^1.3.36
     "@swc/jest": ^0.2.24
     "@types/jest": ^29.4.3
     axios: ^1.6.5
@@ -4981,6 +5020,7 @@ __metadata:
     jest-environment-jsdom: ^29.4.3
     rollup: ^4.19.1
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
   languageName: unknown
   linkType: soft
 
@@ -5015,6 +5055,7 @@ __metadata:
     rollup: ^4.19.1
     ts-node: ^10.9.1
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
   languageName: unknown
   linkType: soft
 
@@ -6835,10 +6876,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@next/env@npm:13.3.1":
-  version: 13.3.1
-  resolution: "@next/env@npm:13.3.1"
-  checksum: 3bf01e62b7de1de9de0cf7a5904364a2e807ad4f0a6cabfbb288225696a0750163bee23669bd45bfbec17dcf1fe66512212bdfa5be0a341ad187270a3cc27943
+"@next/env@npm:13.4.11":
+  version: 13.4.11
+  resolution: "@next/env@npm:13.4.11"
+  checksum: f0181ae16ba3f7bbf6e7ce9b431218740b800ab3c2a61a50a75828794eecb7e6fe324f0547bfc6d80221ab3f4b812184a040c7c72b0f37c2f0c3742047f352c6
   languageName: node
   linkType: hard
 
@@ -6892,9 +6933,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@next/swc-darwin-arm64@npm:13.3.1":
-  version: 13.3.1
-  resolution: "@next/swc-darwin-arm64@npm:13.3.1"
+"@next/swc-darwin-arm64@npm:13.4.11":
+  version: 13.4.11
+  resolution: "@next/swc-darwin-arm64@npm:13.4.11"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
@@ -6913,9 +6954,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@next/swc-darwin-x64@npm:13.3.1":
-  version: 13.3.1
-  resolution: "@next/swc-darwin-x64@npm:13.3.1"
+"@next/swc-darwin-x64@npm:13.4.11":
+  version: 13.4.11
+  resolution: "@next/swc-darwin-x64@npm:13.4.11"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
@@ -6934,9 +6975,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@next/swc-linux-arm64-gnu@npm:13.3.1":
-  version: 13.3.1
-  resolution: "@next/swc-linux-arm64-gnu@npm:13.3.1"
+"@next/swc-linux-arm64-gnu@npm:13.4.11":
+  version: 13.4.11
+  resolution: "@next/swc-linux-arm64-gnu@npm:13.4.11"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
@@ -6955,9 +6996,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@next/swc-linux-arm64-musl@npm:13.3.1":
-  version: 13.3.1
-  resolution: "@next/swc-linux-arm64-musl@npm:13.3.1"
+"@next/swc-linux-arm64-musl@npm:13.4.11":
+  version: 13.4.11
+  resolution: "@next/swc-linux-arm64-musl@npm:13.4.11"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
@@ -6976,9 +7017,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@next/swc-linux-x64-gnu@npm:13.3.1":
-  version: 13.3.1
-  resolution: "@next/swc-linux-x64-gnu@npm:13.3.1"
+"@next/swc-linux-x64-gnu@npm:13.4.11":
+  version: 13.4.11
+  resolution: "@next/swc-linux-x64-gnu@npm:13.4.11"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
@@ -6997,9 +7038,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@next/swc-linux-x64-musl@npm:13.3.1":
-  version: 13.3.1
-  resolution: "@next/swc-linux-x64-musl@npm:13.3.1"
+"@next/swc-linux-x64-musl@npm:13.4.11":
+  version: 13.4.11
+  resolution: "@next/swc-linux-x64-musl@npm:13.4.11"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
@@ -7018,9 +7059,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@next/swc-win32-arm64-msvc@npm:13.3.1":
-  version: 13.3.1
-  resolution: "@next/swc-win32-arm64-msvc@npm:13.3.1"
+"@next/swc-win32-arm64-msvc@npm:13.4.11":
+  version: 13.4.11
+  resolution: "@next/swc-win32-arm64-msvc@npm:13.4.11"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
@@ -7039,9 +7080,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@next/swc-win32-ia32-msvc@npm:13.3.1":
-  version: 13.3.1
-  resolution: "@next/swc-win32-ia32-msvc@npm:13.3.1"
+"@next/swc-win32-ia32-msvc@npm:13.4.11":
+  version: 13.4.11
+  resolution: "@next/swc-win32-ia32-msvc@npm:13.4.11"
   conditions: os=win32 & cpu=ia32
   languageName: node
   linkType: hard
@@ -7060,9 +7101,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@next/swc-win32-x64-msvc@npm:13.3.1":
-  version: 13.3.1
-  resolution: "@next/swc-win32-x64-msvc@npm:13.3.1"
+"@next/swc-win32-x64-msvc@npm:13.4.11":
+  version: 13.4.11
+  resolution: "@next/swc-win32-x64-msvc@npm:13.4.11"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -11781,12 +11822,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@swc/helpers@npm:0.5.0":
-  version: 0.5.0
-  resolution: "@swc/helpers@npm:0.5.0"
+"@swc/helpers@npm:0.5.1, @swc/helpers@npm:^0.5.0":
+  version: 0.5.1
+  resolution: "@swc/helpers@npm:0.5.1"
   dependencies:
     tslib: ^2.4.0
-  checksum: 61c9c7dddb707deb58b85328cfe9d211887145f1311ae6a6e6c0fa9f781fb29916a8669a7d479e46e26a32a89d6ef4f293a22dee4925e009c84051e9dd10e8b7
+  checksum: 71e0e27234590435e4c62b97ef5e796f88e786841a38c7116a5e27a3eafa7b9ead7cdec5249b32165902076de78446945311c973e59bddf77c1e24f33a8f272a
   languageName: node
   linkType: hard
 
@@ -11797,15 +11838,6 @@ __metadata:
     "@swc/counter": ^0.1.3
     tslib: ^2.4.0
   checksum: d4f207b191e54b29460804ddf2984ba6ece1d679a0b2f6a9c765dcf27bba92c5769e7965668a4546fb9f1021eaf0ff9be4bf5c235ce12adcd65acdfe77187d11
-  languageName: node
-  linkType: hard
-
-"@swc/helpers@npm:^0.5.0":
-  version: 0.5.1
-  resolution: "@swc/helpers@npm:0.5.1"
-  dependencies:
-    tslib: ^2.4.0
-  checksum: 71e0e27234590435e4c62b97ef5e796f88e786841a38c7116a5e27a3eafa7b9ead7cdec5249b32165902076de78446945311c973e59bddf77c1e24f33a8f272a
   languageName: node
   linkType: hard
 
@@ -11948,7 +11980,6 @@ __metadata:
     "@swc/jest": ^0.2.29
     "@types/node": ^20.10.1
     dotenv: ^16.3.1
-    husky: ^8.0.0
     jest: ^29.7.0
     jest-cucumber: ^3.0.1
     pinst: ^3.0.0
@@ -11980,7 +12011,6 @@ __metadata:
     ethers: ^5.7.0
     hardhat: ^2.19.4
     hardhat-gas-reporter: ^1.0.8
-    husky: ^8.0.0
     jest: ^29.7.0
     jest-cucumber: ^3.0.1
     pinst: ^3.0.0
@@ -15086,6 +15116,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"acorn@npm:^8.12.1":
+  version: 8.12.1
+  resolution: "acorn@npm:8.12.1"
+  bin:
+    acorn: bin/acorn
+  checksum: 677880034aee5bdf7434cc2d25b641d7bedb0b5ef47868a78dadabedccf58e1c5457526d9d8249cd253f2df087e081c3fe7d903b448d8e19e5131a3065b83c07
+  languageName: node
+  linkType: hard
+
 "address@npm:^1.0.1, address@npm:^1.1.2":
   version: 1.2.2
   resolution: "address@npm:1.2.2"
@@ -16883,6 +16922,7 @@ __metadata:
   dependencies:
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/config": 0.0.0
+    "@swc/core": ^1.3.36
     "@types/node": ^18.14.2
     autoprefixer: 10.4.14
     dotenv: ^16.0.3
@@ -16891,6 +16931,7 @@ __metadata:
     ethers: ^5.7.2
     ts-node: ^10.9.1
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
   languageName: unknown
   linkType: soft
 
@@ -17631,7 +17672,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chokidar@npm:^3.4.0":
+"chokidar@npm:^3.4.0, chokidar@npm:^3.6.0":
   version: 3.6.0
   resolution: "chokidar@npm:3.6.0"
   dependencies:
@@ -19815,6 +19856,7 @@ __metadata:
   resolution: "dex-sample-app@workspace:packages/internal/dex/sdk-sample-app"
   dependencies:
     "@imtbl/dex-sdk": 0.0.0
+    "@swc/core": ^1.3.36
     "@types/node": ^18.14.2
     "@types/react": ^18.0.28
     "@types/react-dom": ^18.0.11
@@ -19822,12 +19864,13 @@ __metadata:
     concurrently: ^8.2.2
     eslint: ^8.40.0
     ethers: ^5.7.2
-    next: 13.3.1
+    next: 13.4.11
     postcss: 8.4.31
     react: ^18.2.0
     react-dom: ^18.2.0
     tailwindcss: 3.3.2
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
   languageName: unknown
   linkType: soft
 
@@ -22628,6 +22671,7 @@ __metadata:
   dependencies:
     "@imtbl/config": 0.0.0
     "@imtbl/factory-sdk": 0.0.0
+    "@swc/core": ^1.3.36
     "@types/node": ^18.14.2
     autoprefixer: 10.4.14
     eslint: ^8.40.0
@@ -22635,6 +22679,7 @@ __metadata:
     ethers: ^5.7.2
     ts-node: ^10.9.1
     typescript: ^5.5.4
+    unplugin-swc: ^1.5.1
   languageName: unknown
   linkType: soft
 
@@ -24943,7 +24988,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:^8.0.0, husky@npm:^8.0.3":
+"husky@npm:^8.0.3":
   version: 8.0.3
   resolution: "husky@npm:8.0.3"
   bin:
@@ -29098,6 +29143,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"load-tsconfig@npm:^0.2.5":
+  version: 0.2.5
+  resolution: "load-tsconfig@npm:0.2.5"
+  checksum: 631740833c4a7157bb7b6eeae6e1afb6a6fac7416b7ba91bd0944d5c5198270af2d68bf8347af3cc2ba821adc4d83ef98f66278bd263bc284c863a09ec441503
+  languageName: node
+  linkType: hard
+
 "loader-runner@npm:^4.2.0":
   version: 4.3.0
   resolution: "loader-runner@npm:4.3.0"
@@ -30494,29 +30546,30 @@ __metadata:
   languageName: node
   linkType: hard
 
-"next@npm:13.3.1":
-  version: 13.3.1
-  resolution: "next@npm:13.3.1"
+"next@npm:13.4.11":
+  version: 13.4.11
+  resolution: "next@npm:13.4.11"
   dependencies:
-    "@next/env": 13.3.1
-    "@next/swc-darwin-arm64": 13.3.1
-    "@next/swc-darwin-x64": 13.3.1
-    "@next/swc-linux-arm64-gnu": 13.3.1
-    "@next/swc-linux-arm64-musl": 13.3.1
-    "@next/swc-linux-x64-gnu": 13.3.1
-    "@next/swc-linux-x64-musl": 13.3.1
-    "@next/swc-win32-arm64-msvc": 13.3.1
-    "@next/swc-win32-ia32-msvc": 13.3.1
-    "@next/swc-win32-x64-msvc": 13.3.1
-    "@swc/helpers": 0.5.0
+    "@next/env": 13.4.11
+    "@next/swc-darwin-arm64": 13.4.11
+    "@next/swc-darwin-x64": 13.4.11
+    "@next/swc-linux-arm64-gnu": 13.4.11
+    "@next/swc-linux-arm64-musl": 13.4.11
+    "@next/swc-linux-x64-gnu": 13.4.11
+    "@next/swc-linux-x64-musl": 13.4.11
+    "@next/swc-win32-arm64-msvc": 13.4.11
+    "@next/swc-win32-ia32-msvc": 13.4.11
+    "@next/swc-win32-x64-msvc": 13.4.11
+    "@swc/helpers": 0.5.1
     busboy: 1.6.0
     caniuse-lite: ^1.0.30001406
     postcss: 8.4.14
     styled-jsx: 5.1.1
+    watchpack: 2.4.0
+    zod: 3.21.4
   peerDependencies:
     "@opentelemetry/api": ^1.1.0
     fibers: ">= 3.1.0"
-    node-sass: ^6.0.0 || ^7.0.0
     react: ^18.2.0
     react-dom: ^18.2.0
     sass: ^1.3.0
@@ -30544,13 +30597,11 @@ __metadata:
       optional: true
     fibers:
       optional: true
-    node-sass:
-      optional: true
     sass:
       optional: true
   bin:
     next: dist/bin/next
-  checksum: a685abbcfe028940f8e3c86f6712fadcba1ca92c68b4dddfd1192d93a4ebac2d0947cd62d8cecf530afbd8163b2ef6dfe338b1fe7b699d78bc7123624a7622db
+  checksum: 3d6a7443bc1f22bc98db1cb87096df1e97c511a7cb8b0ee24469ea20bcfe50ba0b2baeb7e7ad9dba4c92cc126fc6809ba7f1690510ee2f54226bfd3173b921bd
   languageName: node
   linkType: hard
 
@@ -35991,7 +36042,7 @@ __metadata:
   resolution: "seaport-core@https://github.com/immutable/seaport-core.git#commit=0633350ec34f21fcede657ff812f11cf7d19144e"
   dependencies:
     seaport-types: ^0.0.1
-  checksum: d8adba0d54106c6fe9370f0775fadef2198e5eab440b36919d1f917705ce2f0a7028e4da021b6df049aa3ca35d7e673a28b78a731130f0ff9fdf7a8bd32e3b94
+  checksum: 392bce86bbfc4f7c00b65575b238825f4c696bddf5af08be7aa496862e63879375387fd4400f6e900ffee08d65c1f75cf3adad9c6c41ddcf7a3b0389cd73c3c7
   languageName: node
   linkType: hard
 
@@ -36035,7 +36086,7 @@ __metadata:
     seaport-sol: ^1.5.0
     seaport-types: ^0.0.1
     solady: ^0.0.84
-  checksum: a77e141e4ab5d2c4bb190a38fbb6cda3011fdf5f350b250fbeb4d82ae81cf917a966a2dcb8d9e4fd1bed29e5510ede9b15941b0ac77aeb4272dab94c9f51e7ff
+  checksum: f31a7443a50fa1c35ec03ea031743d1d10896653ae443fa15ab8e6f5b4a2ca43f6743d523ae4e1f14df867451e5b2b2130b0bfa58a1085b0bcae3fceb8dfdc9b
   languageName: node
   linkType: hard
 
@@ -39651,6 +39702,31 @@ __metadata:
   languageName: node
   linkType: hard
 
+"unplugin-swc@npm:^1.5.1":
+  version: 1.5.1
+  resolution: "unplugin-swc@npm:1.5.1"
+  dependencies:
+    "@rollup/pluginutils": ^5.1.0
+    load-tsconfig: ^0.2.5
+    unplugin: ^1.11.0
+  peerDependencies:
+    "@swc/core": ^1.2.108
+  checksum: f278ccb085510f4cec3943a0f896465c67caee012bcea31beb630a8455adf190682745ee44cd791a922999d43c9f36fe5cbbe2e6e8f81dfbbae4d0ee07fc0642
+  languageName: node
+  linkType: hard
+
+"unplugin@npm:^1.11.0":
+  version: 1.12.1
+  resolution: "unplugin@npm:1.12.1"
+  dependencies:
+    acorn: ^8.12.1
+    chokidar: ^3.6.0
+    webpack-sources: ^3.2.3
+    webpack-virtual-modules: ^0.6.2
+  checksum: 39fe19b592b03de4762e61ed16b7d411a5cb34ee7ad58bf3249663674062a59dfada4ce49ed0f7351e67633358477d680d564db1e973d9bfbcb572973ae11b88
+  languageName: node
+  linkType: hard
+
 "unquote@npm:~1.1.1":
   version: 1.1.1
   resolution: "unquote@npm:1.1.1"
@@ -40329,7 +40405,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"watchpack@npm:^2.4.0":
+"watchpack@npm:2.4.0, watchpack@npm:^2.4.0":
   version: 2.4.0
   resolution: "watchpack@npm:2.4.0"
   dependencies:
@@ -40707,6 +40783,13 @@ __metadata:
   version: 3.2.3
   resolution: "webpack-sources@npm:3.2.3"
   checksum: 989e401b9fe3536529e2a99dac8c1bdc50e3a0a2c8669cbafad31271eadd994bc9405f88a3039cd2e29db5e6d9d0926ceb7a1a4e7409ece021fe79c37d9c4607
+  languageName: node
+  linkType: hard
+
+"webpack-virtual-modules@npm:^0.6.2":
+  version: 0.6.2
+  resolution: "webpack-virtual-modules@npm:0.6.2"
+  checksum: 7e8e1d63f35864c815420cc2f27da8561a1e028255040698a352717de0ba46d3b3faf16f06c1a1965217054c4c2894eb9af53a85451870e919b5707ce9c5822d
   languageName: node
   linkType: hard
 
@@ -41426,6 +41509,7 @@ __metadata:
     "@biom3/react": ^0.25.0
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
+    "@swc/core": ^1.3.36
     "@testing-library/jest-dom": ^5.16.5
     "@testing-library/react": ^13.4.0
     "@testing-library/user-event": ^13.5.0
