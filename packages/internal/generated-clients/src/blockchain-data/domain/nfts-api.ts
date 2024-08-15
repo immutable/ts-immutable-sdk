@@ -42,33 +42,33 @@ import { ListNFTsResult } from '../models';
 // @ts-ignore
 import { MintRequestStatus } from '../models';
 // @ts-ignore
-export type { APIError400 } from '../models';
+export { APIError400 } from '../models';
 // @ts-ignore
-export type { APIError401 } from '../models';
+export { APIError401 } from '../models';
 // @ts-ignore
-export type { APIError403 } from '../models';
+export { APIError403 } from '../models';
 // @ts-ignore
-export type { APIError404 } from '../models';
+export { APIError404 } from '../models';
 // @ts-ignore
-export type { APIError409 } from '../models';
+export { APIError409 } from '../models';
 // @ts-ignore
-export type { APIError429 } from '../models';
+export { APIError429 } from '../models';
 // @ts-ignore
-export type { APIError500 } from '../models';
+export { APIError500 } from '../models';
 // @ts-ignore
-export type { CreateMintRequestRequest } from '../models';
+export { CreateMintRequestRequest } from '../models';
 // @ts-ignore
-export type { CreateMintRequestResult } from '../models';
+export { CreateMintRequestResult } from '../models';
 // @ts-ignore
-export type { GetNFTResult } from '../models';
+export { GetNFTResult } from '../models';
 // @ts-ignore
-export type { ListMintRequestsResult } from '../models';
+export { ListMintRequestsResult } from '../models';
 // @ts-ignore
-export type { ListNFTsByOwnerResult } from '../models';
+export { ListNFTsByOwnerResult } from '../models';
 // @ts-ignore
-export type { ListNFTsResult } from '../models';
+export { ListNFTsResult } from '../models';
 // @ts-ignore
-export type { MintRequestStatus } from '../models';
+export { MintRequestStatus } from '../models';
 
 /**
  * Request parameters for createMintRequest operation in NftsApi.

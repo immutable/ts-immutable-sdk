@@ -24,15 +24,15 @@ import { ListCollectionOwnersResult } from '../models';
 // @ts-ignore
 import { ListNFTOwnersResult } from '../models';
 // @ts-ignore
-export type { APIError400 } from '../models';
+export { APIError400 } from '../models';
 // @ts-ignore
-export type { APIError404 } from '../models';
+export { APIError404 } from '../models';
 // @ts-ignore
-export type { APIError500 } from '../models';
+export { APIError500 } from '../models';
 // @ts-ignore
-export type { ListCollectionOwnersResult } from '../models';
+export { ListCollectionOwnersResult } from '../models';
 // @ts-ignore
-export type { ListNFTOwnersResult } from '../models';
+export { ListNFTOwnersResult } from '../models';
 
 /**
  * Request parameters for listAllNFTOwners operation in NftOwnersApi.
