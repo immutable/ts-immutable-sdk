@@ -16,11 +16,13 @@ const ADD_FUNDS_TARGET_ID = "add-funds-widget-target";
 function AddFundsUI() {
   const checkout = useMemo(() => new Checkout(), []);
   const factory = useMemo(
-    () => new WidgetsFactory(checkout, { theme: WidgetTheme.DARK }),
+    () => new WidgetsFactory(checkout,{}),
     [checkout]
   );
   const addFunds = useMemo(
-    () => factory.create(WidgetType.ADD_FUNDS),
+    () => factory.create(WidgetType.ADD_FUNDS, {
+      config: { theme: WidgetTheme.LIGHT },
+    }),
     [factory]
   );
   const onRamp = useMemo(() => factory.create(WidgetType.ONRAMP), [factory]);
@@ -28,7 +30,11 @@ function AddFundsUI() {
   const bridge = useMemo(() => factory.create(WidgetType.BRIDGE), [factory]);
 
   useEffect(() => {
-    addFunds.mount(ADD_FUNDS_TARGET_ID);
+    addFunds.mount(ADD_FUNDS_TARGET_ID, {
+      showSwapOption:false,
+      amount: "10",
+      tokenAddress: "0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439"
+    });
     addFunds.addListener(AddFundsEventType.GO_BACK, (data: any) => {
       console.log("GO_BACK", data);
     });

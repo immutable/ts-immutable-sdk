@@ -46,7 +46,6 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
     params: AddFundsWidgetParams,
   ): AddFundsWidgetParams {
     const validatedParams = params;
-    // TODO : ADD params
     return validatedParams;
   }
 
@@ -83,8 +82,12 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
                 >
                   <AddFundsWidget
                     checkout={this.checkout}
-                    config={this.strongConfig()}
                     web3Provider={this.web3Provider}
+                    showBridgeOption={this.parameters.showBridgeOption}
+                    showSwapOption={this.parameters.showSwapOption}
+                    showOnrampOption={this.parameters.showOnrampOption}
+                    tokenAddress={this.parameters.tokenAddress}
+                    amount={this.parameters.amount}
                   />
                 </Suspense>
               </ConnectLoader>

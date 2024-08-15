@@ -2,7 +2,6 @@ import { AddFundsWidgetParams } from '@imtbl/checkout-sdk/dist/widgets/definitio
 import { Checkout, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { useContext, useMemo, useReducer } from 'react';
-import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import {
@@ -17,22 +16,19 @@ import {
 } from '../../context/view-context/ViewContext';
 
 export type AddFundsWidgetInputs = AddFundsWidgetParams & {
-  config: StrongCheckoutWidgetsConfig;
   checkout: Checkout;
   web3Provider?: Web3Provider;
 };
-const isOnRampEnabled = true;
-const isSwapEnabled = true;
-const isBridgeEnabled = true;
 
 export default function AddFundsWidget({
-  config,
   checkout,
   web3Provider,
+  showOnrampOption = true,
+  showSwapOption = true,
+  showBridgeOption = true,
+  tokenAddress,
+  amount,
 }: AddFundsWidgetInputs) {
-  // eslint-disable-next-line no-console
-  console.log(config, checkout, web3Provider);
-
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
 
   const viewReducerValues = useMemo(
@@ -51,9 +47,11 @@ export default function AddFundsWidget({
         widgetEvent={IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT}
         checkout={checkout}
         provider={web3Provider}
-        showOnrampOption={isOnRampEnabled}
-        showSwapOption={isSwapEnabled}
-        showBridgeOption={isBridgeEnabled}
+        tokenAddress={tokenAddress}
+        amount={amount}
+        showOnrampOption={showOnrampOption}
+        showSwapOption={showSwapOption}
+        showBridgeOption={showBridgeOption}
         onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
         onBackButtonClick={() => sendAddFundsGoBackEvent(eventTarget)}
       />
