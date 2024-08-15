@@ -1,10 +1,10 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "moduleResolution": "Bundler",
-    "customConditions": ["default"],
+    "moduleResolution": "node",
+    "customConditions": null,
     "outDir": "./dist",
-    "rootDirs": ["src"]  
+    "rootDirs": ["src"],
   },
   "include": ["src"],
   "exclude": [

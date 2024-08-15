@@ -11,8 +11,6 @@
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
     "moduleResolution": "node",
-    // React-app-rewired needs to be replaced to enable the development custom condition
-    // "customConditions": ["development"],
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
