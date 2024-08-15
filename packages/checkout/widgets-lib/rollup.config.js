@@ -28,7 +28,8 @@ const productionPlugins = [
     exportConditions: ['browser']
   }),
   nodePolyfills(),
-  commonjs()
+  commonjs(),
+  terser()
 ]
 
 const getPlugins = () => {

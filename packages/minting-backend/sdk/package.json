@@ -40,7 +40,7 @@
   },
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "license": "Apache-2.0",
-  "main": "./dist/index.js",
+  "main": "dist/index.js",
   "optionalDependencies": {
     "pg": "^8.11.5",
     "prisma": "^5.13.0"

@@ -9,7 +9,7 @@ module.exports = function override(config, env) {
         assert: require.resolve("assert-browserify"),
         stream: require.resolve("stream-browserify"),
         buffer: require.resolve("buffer/"),
-        https: false,
+        https: false
       });
     
     config.resolve.fallback = fallback;

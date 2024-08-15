@@ -17,7 +17,6 @@ const commonPlugins = [
     'process.env.CHECKOUT_LOCAL_MODE': JSON.stringify(process.env.CHECKOUT_LOCAL_MODE || 'false'),
     'process.versions': JSON.stringify(process.versions || {}),
   }),
-  // typescript()
   isProduction ? typescript({customConditions: ["default"]}) : swc.rollup()
 ]
 

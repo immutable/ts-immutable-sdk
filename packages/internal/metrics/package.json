@@ -39,7 +39,7 @@
     "dist"
   ],
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
-  "main": "./dist/index.js",
+  "main": "dist/index.js",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
