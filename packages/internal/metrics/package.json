@@ -39,6 +39,7 @@
     "dist"
   ],
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
+  "main": "./dist/index.js",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
@@ -48,6 +49,5 @@
     "test": "jest",
     "typecheck": "tsc --noEmit --jsx preserve"
   },
-  "type": "module",
-  "main": "./dist/index.js"
+  "type": "module"
 }

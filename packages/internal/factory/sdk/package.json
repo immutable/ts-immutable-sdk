@@ -45,6 +45,7 @@
     "immutablex"
   ],
   "license": "Apache-2.0",
+  "main": "./dist/index.js",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
@@ -56,6 +57,5 @@
     "test:watch": "jest --watch"
   },
   "source": "src/index.ts",
-  "type": "module",
-  "main": "./dist/index.js"
+  "type": "module"
 }

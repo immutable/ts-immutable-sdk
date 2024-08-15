@@ -60,6 +60,7 @@
     "immutablex"
   ],
   "license": "Apache-2.0",
+  "main": "./dist/index.js",
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
@@ -76,6 +77,5 @@
     "typecheck": "tsc --noEmit"
   },
   "source": "src/index.ts",
-  "type": "module",
-  "main": "./dist/index.js"
+  "type": "module"
 }

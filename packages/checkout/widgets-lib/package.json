@@ -88,6 +88,7 @@
     "immutable"
   ],
   "license": "ISC",
+  "main": "./dist/index.js",
   "private": true,
   "scripts": {
     "build": "yarn clean && NODE_ENV=production rollup --config rollup.config.js",
@@ -102,6 +103,5 @@
     "test:watch": "jest test --passWithNoTests --watch",
     "typecheck": "tsc --noEmit"
   },
-  "type": "module",
-  "main": "./dist/index.js"
+  "type": "module"
 }

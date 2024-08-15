@@ -9,10 +9,12 @@ import { execSync } from 'child_process';
 const __dirname = path.resolve();
 const SDK_PACKAGE = '@imtbl/sdk';
 
-const workspacePackages = JSON.parse(
-  execSync('yarn workspaces list --json').toString()
-).map((pkg) => pkg.name)
-
+const workspacePackages = execSync('yarn workspaces list --json')
+  .toString()
+  .trim()
+  .split('\n')
+  .map((line) => JSON.parse(line))
+  .map((pkg) => pkg.name);
 
 // Update the map with the dependency if it doesn't exist, or if the
 // version is greater than the existing version

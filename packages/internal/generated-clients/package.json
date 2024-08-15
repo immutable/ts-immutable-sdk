@@ -31,6 +31,7 @@
   ],
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "license": "Apache-2.0",
+  "main": "./dist/index.js",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
@@ -40,6 +41,5 @@
     "typecheck": "tsc --noEmit --jsx preserve",
     "view-generators": "openapi-generator-cli author template -g typescript-axios -o src/templates"
   },
-  "type": "module",
-  "main": "./dist/index.js"
+  "type": "module"
 }

@@ -9,6 +9,7 @@ import {
   ERC20ItemRequirement,
   FundingRoute,
   RoutingOutcomeType,
+  FundingStep,
   FundingStepType,
   Fee,
   SwapFees,
@@ -101,7 +102,7 @@ export const getSufficientFundingStep = (
 export const getAlternativeFundingSteps = (
   fundingRoutes: FundingRoute[],
   environment: Environment,
-) => {
+): FundingStep[] => {
   if (fundingRoutes.length === 0) {
     return [];
   }
