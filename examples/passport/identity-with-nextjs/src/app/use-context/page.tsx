@@ -9,9 +9,8 @@ export default function Page() {
   const { idToken } = reactPassport.useIdToken();
   const { accessToken } = reactPassport.useAccessToken();
   const { linkedAddresses } = reactPassport.useLinkedAddresses();
-  const { userInfo } = reactPassport.useUserInfo();
+  const { profile } = reactPassport.useProfile();
   const { accounts } = reactPassport.useAccounts();
-  const { passportProvider } = reactPassport.usePassportProvider();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8">
@@ -44,19 +43,14 @@ export default function Page() {
             {linkedAddresses}
           </p>
           <p className="mb-2">
-            <b>User Info:</b>
+            <b>Profile:</b>
             {' '}
-            {JSON.stringify(userInfo, null, 2)}
+            {JSON.stringify(profile, null, 2)}
           </p>
           <p className="mb-2">
             <b>Accounts:</b>
             {' '}
             {JSON.stringify(accounts, null, 2)}
-          </p>
-          <p className="mb-2">
-            <b>Passport Provider:</b>
-            {' '}
-            { passportProvider ? 'true' : 'false' }
           </p>
         </div>
         <button
@@ -65,6 +59,15 @@ export default function Page() {
           type="button"
         >
           Login
+        </button>
+        <button
+          className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
+          onClick={() => login({
+            withoutWallet: true,
+          })}
+          type="button"
+        >
+          Login without wallet
         </button>
         <button
           className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"

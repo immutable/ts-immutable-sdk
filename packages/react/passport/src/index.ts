@@ -4,7 +4,6 @@ export {
   useIdToken,
   useLinkedAddresses,
   usePassport,
-  useUserInfo,
   useAccounts,
   usePassportProvider,
   useProfile,
