@@ -18,6 +18,19 @@ import { LoadingView } from '../../../views/loading/LoadingView';
 import { ErrorView } from '../../../views/error/ErrorView';
 import { IFRAME_INIT_TIMEOUT_MS } from '../utils/config';
 
+const permissions = `
+  accelerometer;
+  camera;
+  microphone;
+  geolocation;
+  gyroscope;
+  fullscreen;
+  autoplay;
+  encrypted-media;
+  picture-in-picture;
+  clipboard-write;
+  clipboard-read;
+`;
 export interface LoadingHandoverProps {
   text: string;
   duration?: number;
@@ -125,6 +138,8 @@ export function CheckoutAppIframe() {
               ref={iframeRef}
               src={iframeURL}
               onLoad={onIframeLoad}
+              allow={permissions.trim().replace(/\n/g, '')}
+              loading="lazy"
             />
           )}
           sx={{
