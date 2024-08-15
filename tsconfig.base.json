@@ -14,35 +14,13 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "isolatedModules": true,
-    "incremental": false,
-    "noEmitOnError": true,
-    // "isolatedDeclarations": true,
-    // "noUncheckedIndexedAccess": true,
-    // "verbatimModuleSyntax": true,
-    // "composite": true,
-    // "declarationMap": true,
-    // "alwaysStrict": true,
-    // "forceConsistentCasingInFileNames": true,
-    // "strictFunctionTypes": true,
-		// "noImplicitAny": true,
-		// "strictNullChecks": true,
-		// "strictBindCallApply": true,
-		// "strictPropertyInitialization": true,
-		// "noImplicitThis": true,
-		// "useUnknownInCatchVariables": true,
-		// "noUnusedLocals": true,
-		// "noUnusedParameters": true,
-		// "exactOptionalPropertyTypes": true,
-		// "noImplicitReturns": true,
-		// "noFallthroughCasesInSwitch": true,
-		// "noImplicitOverride": true,
-		// "noPropertyAccessFromIndexSignature": true,
-		// "allowUnusedLabels": false,
-		// "allowUnreachableCode": false,
+    "noEmitOnError": true
   },
   "ts-node": {
     "compilerOptions": {
-      "module": "commonjs"
+      "module": "commonjs",
+      // "moduleResolution": "node",
+      // "customConditions": null
     }
   }
 }

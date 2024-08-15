@@ -90,14 +90,14 @@
   "license": "ISC",
   "private": true,
   "scripts": {
-    "build": "pnpm clean && NODE_ENV=production rollup --config rollup.config.js",
-    "build:analyse": "pnpm build --plugin visualizer",
-    "build:local": "pnpm clean && pnpm build && mkdir -p ../widgets-sample-app/public/lib/js && cp dist/*.js ../widgets-sample-app/public/lib/js/",
+    "build": "yarn clean && NODE_ENV=production rollup --config rollup.config.js",
+    "build:analyse": "yarn build --plugin visualizer",
+    "build:local": "yarn clean && yarn build && mkdir -p ../widgets-sample-app/public/lib/js && cp dist/*.js ../widgets-sample-app/public/lib/js/",
     "clean": "rm -rf ./dist",
     "d": "rollup --config rollup.config.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
-    "start": "pnpm clean && NODE_ENV=development rollup --config rollup.config.js --watch",
+    "start": "yarn clean && NODE_ENV=development rollup --config rollup.config.js --watch",
     "test": "jest test --passWithNoTests",
     "test:watch": "jest test --passWithNoTests --watch",
     "typecheck": "tsc --noEmit"

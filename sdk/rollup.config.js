@@ -14,7 +14,7 @@ import babel from '@rollup/plugin-babel';
 // RELEASE_TYPE environment variable is set by the CI/CD pipeline
 const releaseType = process.env.RELEASE_TYPE || 'alpha';
 
-const packages = JSON.parse(execSync('pnpm list --recursive --json --depth=-1').toString());
+const packages = JSON.parse(execSync('yarn workspaces list --json').toString());
 
 const getPackages = () => packages.map((pkg) => pkg.name);
 

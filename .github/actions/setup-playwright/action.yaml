@@ -4,19 +4,18 @@ description: "Install the browsers and dependencies for Playwright to run"
 runs:
   using: "composite"
   steps:
-    #  TODO
-    # - name: Playwright versions in sync check
-    #   shell: bash
-    #   run: |
-    #     versions=$(yarn why --json @playwright/test | grep -h 'workspace:.' | jq --raw-output '.children[].locator' | sed -e 's/@playwright\/test@.*://')
-    #     unique_versions=$(echo "$versions" | sort | uniq)
-    #     if [ $(echo "$unique_versions" | wc -l) -ne 1 ]; then
-    #       echo "Playwright versions are not in sync:"
-    #       echo "$unique_versions"
-    #       exit 1
-    #     else
-    #       echo "All Playwright versions are in sync."
-    #     fi
+    - name: Playwright versions in sync check
+      shell: bash
+      run: |
+        versions=$(yarn why --json @playwright/test | grep -h 'workspace:.' | jq --raw-output '.children[].locator' | sed -e 's/@playwright\/test@.*://')
+        unique_versions=$(echo "$versions" | sort | uniq)
+        if [ $(echo "$unique_versions" | wc -l) -ne 1 ]; then
+          echo "Playwright versions are not in sync:"
+          echo "$unique_versions"
+          exit 1
+        else
+          echo "All Playwright versions are in sync."
+        fi
 
     - name: Get Playwright version
       shell: bash
@@ -32,9 +31,9 @@ runs:
     - name: Install Playwright with dependencies
       shell: bash
       if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
-      run: pnpm dlx playwright@${{ env.PLAYWRIGHT_VERSION }} install --with-deps
+      run: yarn dlx playwright@${{ env.PLAYWRIGHT_VERSION }} install --with-deps
 
     - name: Install Playwright dependencies
       shell: bash
       if: steps.cache-playwright-browsers.outputs.cache-hit == 'true'
-      run: pnpm dlx playwright@${{ env.PLAYWRIGHT_VERSION }} install-deps
+      run: yarn dlx playwright@${{ env.PLAYWRIGHT_VERSION }} install-deps

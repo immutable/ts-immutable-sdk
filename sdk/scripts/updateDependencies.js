@@ -10,7 +10,7 @@ const __dirname = path.resolve();
 const SDK_PACKAGE = '@imtbl/sdk';
 
 const workspacePackages = JSON.parse(
-  execSync('pnpm list --recursive --json --depth=-1').toString()
+  execSync('yarn workspaces list --json').toString()
 ).map((pkg) => pkg.name)
 
 

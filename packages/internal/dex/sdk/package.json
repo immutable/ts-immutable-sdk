@@ -56,7 +56,7 @@
     "d": "rollup --config rollup.config.js",
     "generate-types": "typechain --target ethers-v5 --out-dir ./src/contracts/types ./src/contracts/ABIs/*.json",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
-    "lint:fix": "cd ../../../.. && pnpm wsrun -p @imtbl/dex-sdk -c lint --fix",
+    "lint:fix": "cd ../../../.. && yarn wsrun -p @imtbl/dex-sdk -c lint --fix",
     "test": "jest test",
     "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit"

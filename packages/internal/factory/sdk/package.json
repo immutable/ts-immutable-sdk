@@ -51,11 +51,11 @@
     "build": "NODE_ENV=production rollup --config rollup.config.js",
     "d": "rollup --config rollup.config.js",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
-    "lint:fix": "cd ../../../ && pnpm wsrun -p @imtbl/factory-sdk -c lint --fix",
+    "lint:fix": "cd ../../../ && yarn wsrun -p @imtbl/factory-sdk -c lint --fix",
     "test": "jest test",
     "test:watch": "jest --watch"
   },
   "source": "src/index.ts",
   "type": "module",
-  "types": "src/index.ts"
+  "main": "./dist/index.js"
 }

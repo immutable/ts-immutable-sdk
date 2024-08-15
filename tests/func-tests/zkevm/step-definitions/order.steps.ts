@@ -1,6 +1,7 @@
 import { Wallet } from 'ethers';
 import { defineFeature, loadFeature } from 'jest-cucumber';
-import { orderbook, config } from '@imtbl/sdk';
+import { orderbook } from '@imtbl/sdk';
+import { Environment } from '@imtbl/sdk/config'
 import {
   getConfigFromEnv,
   getRandomTokenId,
@@ -34,7 +35,7 @@ defineFeature(feature, (test) => {
   const orderbookConfig = getConfigFromEnv();
   const sdk = new orderbook.Orderbook({
     baseConfig: {
-      environment: config.Environment.SANDBOX,
+      environment: Environment.SANDBOX,
     },
     overrides: {
       ...orderbookConfig,

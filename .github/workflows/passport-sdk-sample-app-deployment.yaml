@@ -34,10 +34,10 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Export Passport sample app
-        run: pnpm nx run @imtbl/passport-sdk-sample-app:export --skip-nx-cache
+        run: yarn nx run @imtbl/passport-sdk-sample-app:export --skip-nx-cache
 
       - name: Update SDK version
-        run: pnpm workspace @imtbl/passport-sdk-sample-app update-sdk-version
+        run: yarn workspace @imtbl/passport-sdk-sample-app update-sdk-version
 
       - name: Upload to S3
         run: |

@@ -12,7 +12,6 @@ import {
   FundingStepType,
   Fee,
   SwapFees,
-  FundingStep,
 } from '@imtbl/checkout-sdk';
 
 import { BigNumber } from 'ethers';
@@ -102,7 +101,7 @@ export const getSufficientFundingStep = (
 export const getAlternativeFundingSteps = (
   fundingRoutes: FundingRoute[],
   environment: Environment,
-): FundingStep[] => {
+) => {
   if (fundingRoutes.length === 0) {
     return [];
   }

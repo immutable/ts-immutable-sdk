@@ -4,4 +4,4 @@
 # prevent heap limit allocation errors
 export NODE_OPTIONS="--max-old-space-size=4096"
 
-pnpm lint-staged
+yarn lint-staged

@@ -9,6 +9,9 @@ const config: Config = {
     '^.+\\.(t|j)sx?$': '@swc/jest',
   },
   transformIgnorePatterns: [],
+  moduleNameMapper: {
+    '^@imtbl/(.*)$': '<rootDir>/../../../node_modules/@imtbl/$1',
+  },
 };
 
 export default config;

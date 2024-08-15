@@ -30,9 +30,9 @@
     "typescript": "^5.5.4"
   },
   "scripts": {
-    "compile": "pnpm hardhat compile",
-    "func-test": "pnpm compile && jest",
-    "func-test:ci": "pnpm compile && TAGS=\"not @skip and not @slow\" jest",
+    "compile": "npx hardhat compile",
+    "func-test": "yarn compile && jest",
+    "func-test:ci": "yarn compile && TAGS=\"not @skip and not @slow\" jest",
     "postpack": "pinst --enable",
     "prepack": "pinst --disable"
   }

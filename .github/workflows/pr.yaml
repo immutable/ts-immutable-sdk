@@ -25,7 +25,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Syncpack
-        run: pnpm syncpack:check
+        run: yarn syncpack:check
 
   detect:
     name: Detect Node engine version change
@@ -67,7 +67,7 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
       - name: Build
-        run: pnpm --if-present nx affected --target=build --parallel=5 --exclude=@imtbl/checkout-widgets-sample-app
+        run: yarn nx affected --target=build --parallel=5 --exclude=@imtbl/checkout-widgets-sample-app
 
   typecheck-sdk:
     name: Typecheck SDK
@@ -83,7 +83,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Typecheck
-        run: pnpm typecheck
+        run: yarn typecheck
 
   test-sdk:
     name: Test SDK
@@ -101,7 +101,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Test
-        run: pnpm run test --configuration=ci
+        run: yarn test --configuration=ci
 
       - name: Upload SDK test coverage artifacts
         uses: actions/upload-artifact@v4
@@ -122,7 +122,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Lint
-        run: pnpm lint
+        run: yarn lint
 
   build-examples:
     name: Build Examples
@@ -141,7 +141,7 @@ jobs:
         uses: ./.github/actions/setup-examples
 
       - name: Build examples
-        run: pnpm build:examples
+        run: yarn build:examples
 
   lint-examples:
     name: Lint Examples
@@ -160,7 +160,7 @@ jobs:
         uses: ./.github/actions/setup-examples
 
       - name: Lint examples
-        run: pnpm lint:examples
+        run: yarn lint:examples
 
   test-examples:
     name: Test Examples
@@ -182,7 +182,7 @@ jobs:
         uses: ./.github/actions/setup-playwright
 
       - name: Test examples
-        run: pnpm test:examples
+        run: yarn test:examples
       
 
   func-test-imx:
@@ -216,7 +216,7 @@ jobs:
         uses: ./.github/actions/setup-tests
 
       - name: test
-        run: pnpm --filter @tests/func-tests-imx func-test:ci
+        run: yarn workspace @tests/func-tests-imx func-test:ci
 
   func-test-zkevm:
     name: zkevm func tests
@@ -245,4 +245,4 @@ jobs:
         uses: ./.github/actions/setup-tests
 
       - name: test
-        run: pnpm --filter @tests/func-tests-zkevm func-test:ci
+        run: yarn workspace @tests/func-tests-zkevm func-test:ci
