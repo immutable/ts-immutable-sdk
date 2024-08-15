@@ -716,7 +716,7 @@ window.callFunction = async (jsonData: string) => {
           method: 'eth_getTransactionReceipt',
           params: [request.txHash],
         });
-        const success = response !== null && response !== undefined;
+        const success = response !== undefined;
 
         if (!success) {
           throw new Error('Failed to get transaction receipt');
