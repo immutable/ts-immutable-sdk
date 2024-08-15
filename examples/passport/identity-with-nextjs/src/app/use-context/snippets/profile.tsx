@@ -2,12 +2,12 @@
 import { passport } from '@imtbl/sdk';
 
 export default function Page() {
-  const { userInfo } = passport.useUserInfo();
+  const { profile } = passport.useProfile();
 
   return (
     <>
       userInfo:
-      {userInfo}
+      {profile}
     </>
   );
 }
