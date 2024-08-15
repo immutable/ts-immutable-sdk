@@ -14,7 +14,7 @@ import {
   whenICreateAListing, whenIFulfillTheListingToBuy, andERC1155TokensShouldBeTransferredToTheFulfiller,
   thenTheListingsShouldBeOfStatus,
   whenIFulfillBulkListings, whenIFulfillTheListingToBuyWithoutExplicitFulfillmentAmt,
-  whenICreateABulkListing,
+  whenICreateABulkListing, andAnyRemainingFundsAreReturnedToBanker,
 } from './shared';
 
 const feature = loadFeature('features/order.feature', { tagFilter: process.env.TAGS });
@@ -78,6 +78,8 @@ defineFeature(feature, (test) => {
     andERC721TokenShouldBeTransferredToTheFulfiller(and, bankerWallet, erc721ContractAddress, testTokenId, fulfiller);
 
     andTradeShouldBeAvailable(and, sdk, fulfiller, getListingId);
+
+    andAnyRemainingFundsAreReturnedToBanker(and, bankerWallet, offerer, fulfiller);
   }, 120_000);
 
   test('bulk creating and fulfilling ERC721 listings', async ({
@@ -117,6 +119,8 @@ defineFeature(feature, (test) => {
     andERC721TokenShouldBeTransferredToTheFulfiller(and, bankerWallet, erc721ContractAddress, testTokenId2, fulfiller);
 
     andTradeShouldBeAvailable(and, sdk, fulfiller, getListingId);
+
+    andAnyRemainingFundsAreReturnedToBanker(and, bankerWallet, offerer, fulfiller);
   }, 120_000);
 
   test('create and completely fill a ERC1155 listing', ({
@@ -156,6 +160,8 @@ defineFeature(feature, (test) => {
     andERC1155TokensShouldBeTransferredToTheFulfiller(and, bankerWallet, erc1155ContractAddress, testTokenId, fulfiller);
 
     andTradeShouldBeAvailable(and, sdk, fulfiller, getListingId);
+
+    andAnyRemainingFundsAreReturnedToBanker(and, bankerWallet, offerer, fulfiller);
   }, 120_000);
 
   test('create and partially fill a ERC1155 listing', ({
@@ -203,6 +209,8 @@ defineFeature(feature, (test) => {
     andERC1155TokensShouldBeTransferredToTheFulfiller(and, bankerWallet, erc1155ContractAddress, testTokenId, fulfiller);
 
     andTradeShouldBeAvailable(and, sdk, fulfiller, getListingId);
+
+    andAnyRemainingFundsAreReturnedToBanker(and, bankerWallet, offerer, fulfiller);
   }, 120_000);
 
   test('create and bulk fill multiple listings', ({
@@ -256,6 +264,8 @@ defineFeature(feature, (test) => {
     thenTheListingShouldBeOfStatus(then, sdk, getERC1155ListingId);
 
     andTradeShouldBeAvailable(and, sdk, fulfiller, getERC1155ListingId);
+
+    andAnyRemainingFundsAreReturnedToBanker(and, bankerWallet, offerer, fulfiller);
   }, 120_000);
 
   test('create and fully fill a ERC1155 listing without an explicit fulfill amount', ({
@@ -294,6 +304,8 @@ defineFeature(feature, (test) => {
     andERC1155TokensShouldBeTransferredToTheFulfiller(and, bankerWallet, erc1155ContractAddress, testTokenId, fulfiller);
 
     andTradeShouldBeAvailable(and, sdk, fulfiller, getListingId);
+
+    andAnyRemainingFundsAreReturnedToBanker(and, bankerWallet, offerer, fulfiller);
   }, 120_000);
 
   test('create and partially fill a ERC1155 listing, second fill without explicit amount', ({
@@ -341,5 +353,7 @@ defineFeature(feature, (test) => {
     andERC1155TokensShouldBeTransferredToTheFulfiller(and, bankerWallet, erc1155ContractAddress, testTokenId, fulfiller);
 
     andTradeShouldBeAvailable(and, sdk, fulfiller, getListingId);
+
+    andAnyRemainingFundsAreReturnedToBanker(and, bankerWallet, offerer, fulfiller);
   }, 120_000);
 });
