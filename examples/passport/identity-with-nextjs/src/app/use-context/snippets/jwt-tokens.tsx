@@ -1,10 +1,10 @@
 // #doc passport-react-jwt-tokens
-import { passport } from '@imtbl/sdk';
+import { reactPassport } from '@imtbl/sdk';
 
 export default function Page() {
-  const { login } = passport.usePassport();
-  const { idToken } = passport.useIdToken();
-  const { accessToken } = passport.useAccessToken();
+  const { login } = reactPassport.usePassport();
+  const { idToken } = reactPassport.useIdToken();
+  const { accessToken } = reactPassport.useAccessToken();
 
   return (
     <>

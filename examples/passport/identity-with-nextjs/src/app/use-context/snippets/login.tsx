@@ -1,9 +1,9 @@
 // #doc passport-react-login
-import { passport } from '@imtbl/sdk';
+import { reactPassport } from '@imtbl/sdk';
 
 export default function MyComponent() {
-  const { login } = passport.usePassport();
-  const { accounts } = passport.useAccounts();
+  const { login } = reactPassport.usePassport();
+  const { accounts } = reactPassport.useAccounts();
 
   return (
     <>

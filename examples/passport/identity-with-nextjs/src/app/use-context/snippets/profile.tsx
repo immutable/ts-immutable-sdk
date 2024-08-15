@@ -1,8 +1,8 @@
 // #doc passport-react-profile
-import { passport } from '@imtbl/sdk';
+import { reactPassport } from '@imtbl/sdk';
 
 export default function Page() {
-  const { profile } = passport.useProfile();
+  const { profile } = reactPassport.useProfile();
 
   return (
     <>

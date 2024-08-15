@@ -1,9 +1,9 @@
 // #doc passport-react-login-without-wallet
-import { passport } from '@imtbl/sdk';
+import { reactPassport } from '@imtbl/sdk';
 
 export default function Page() {
-  const { login } = passport.usePassport();
-  const { profile } = passport.useProfile();
+  const { login } = reactPassport.usePassport();
+  const { profile } = reactPassport.useProfile();
 
   return (
     <>
