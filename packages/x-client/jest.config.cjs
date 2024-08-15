@@ -2,9 +2,6 @@ module.exports = {
   testEnvironment: 'node',
   moduleDirectories: ['node_modules', '<rootDir>/src'],
   modulePathIgnorePatterns: ['<rootDir>/dist/', '<rootDir>/backup/'],
-  moduleNameMapper: {
-    '^@imtbl/(.*)$': '<rootDir>/../../node_modules/@imtbl/$1',
-  },
   testRegex: '^.+\\.test\\.(js|ts|jsx|tsx)$',
   testPathIgnorePatterns: [
     '/node_modules/'

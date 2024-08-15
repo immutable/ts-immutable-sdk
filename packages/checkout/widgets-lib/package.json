@@ -101,7 +101,7 @@
     "start": "yarn clean && NODE_ENV=development rollup --config rollup.config.js --watch",
     "test": "jest test --passWithNoTests",
     "test:watch": "jest test --passWithNoTests --watch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --customConditions \"default\" --noEmit"
   },
   "type": "module"
 }

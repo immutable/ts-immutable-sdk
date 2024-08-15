@@ -21,8 +21,6 @@ const packages = execSync('yarn workspaces list --json')
   .map((line) => JSON.parse(line))
   .map((pkg) => pkg.name);
 
-const getPackages = () => packages.map((pkg) => pkg.name);
-
 // Get relevant files to bundle
 const getFilesToBuild = () => {
   // Always build the index file
@@ -55,7 +53,7 @@ const buildJS = () => {
       },
       plugins: [
         nodeResolve({
-          resolveOnly: getPackages(),
+          resolveOnly: packages,
         }),
         json(),
         commonJs(),
@@ -108,7 +106,7 @@ export default [
     },
     plugins: [
       nodeResolve({
-        resolveOnly: getPackages(),
+        resolveOnly: packages,
       }),
       json(),
       commonJs(),

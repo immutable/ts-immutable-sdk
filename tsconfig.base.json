@@ -19,8 +19,8 @@
   "ts-node": {
     "compilerOptions": {
       "module": "commonjs",
-      // "moduleResolution": "node",
-      // "customConditions": null
+      "moduleResolution": "node",
+      "customConditions": null
     }
   }
 }
