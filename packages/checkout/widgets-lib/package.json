@@ -104,5 +104,6 @@
     "test:watch": "jest test --passWithNoTests --watch",
     "typecheck": "tsc --customConditions \"default\" --noEmit"
   },
-  "type": "module"
+  "type": "module",
+  "types": "./dist/index.d.ts"
 }
