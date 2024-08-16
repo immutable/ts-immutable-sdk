@@ -1,16 +1,17 @@
 'use client';
 
 import { reactPassport } from '@imtbl/sdk';
+import { useState } from 'react';
 
 export default function Page() {
   const {
-    login, logout, isLoading, isLoggedIn,
+    login, logout, isLoading, isLoggedIn, getAccessToken, getIdToken,
   } = reactPassport.usePassport();
-  const { idToken } = reactPassport.useIdToken();
-  const { accessToken } = reactPassport.useAccessToken();
   const { linkedAddresses } = reactPassport.useLinkedAddresses();
   const { profile } = reactPassport.useProfile();
   const { accounts } = reactPassport.useAccounts();
+  const [accessToken, setAccessToken] = useState<string | undefined>();
+  const [idToken, setIdToken] = useState<string | undefined>();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8">
@@ -28,16 +29,6 @@ export default function Page() {
             {isLoggedIn ? 'true' : 'false'}
           </p>
           <p className="mb-2">
-            <b>Access Token:</b>
-            {' '}
-            {accessToken}
-          </p>
-          <p className="mb-2">
-            <b>ID Token:</b>
-            {' '}
-            {idToken}
-          </p>
-          <p className="mb-2">
             <b>Linked Addresses:</b>
             {' '}
             {linkedAddresses}
@@ -51,6 +42,16 @@ export default function Page() {
             <b>Accounts:</b>
             {' '}
             {JSON.stringify(accounts, null, 2)}
+          </p>
+          <p className="mb-2">
+            <b>Access Token:</b>
+            {' '}
+            {accessToken}
+          </p>
+          <p className="mb-2">
+            <b>ID Token:</b>
+            {' '}
+            {idToken}
           </p>
         </div>
         <button
@@ -69,6 +70,13 @@ export default function Page() {
         >
           Login without wallet
         </button>
+        <button className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
+          onClick={() => {
+            getAccessToken().then(setAccessToken);
+            getIdToken().then(setIdToken);
+          }}
+          type='button'
+        >Get Tokens</button>
         <button
           className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
           onClick={logout}

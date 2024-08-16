@@ -47,6 +47,22 @@ describe('PassportContext and hooks', () => {
     expect(result.current.error).toBe(null);
   });
 
+  it('should login', async () => {
+    const { result, waitFor } = renderHook(() => usePassport(), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <ZkEvmReactProvider config={config}>
+          {children}
+        </ZkEvmReactProvider>
+      ),
+    });
+
+    await act(() => result.current.login());
+
+    expect(result.current.error).toBe(null);
+    waitFor(() => expect(result.current.isLoggedIn).toBe(true));
+    waitFor(() => expect(result.current.isLoading).toBe(false));
+  });
+
   it('should logout', async () => {
     const { result, waitFor } = renderHook(() => usePassport(), {
       wrapper: ({ children }: { children: ReactNode }) => (

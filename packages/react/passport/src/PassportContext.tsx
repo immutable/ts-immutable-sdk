@@ -5,15 +5,18 @@ import React, {
 } from 'react';
 import { setPassportClientId, track } from '@imtbl/metrics';
 import {
-  Passport, PassportModuleConfiguration, UserProfile,
+  Passport, PassportModuleConfiguration,
+  UserProfile,
 } from '@imtbl/passport';
 
 type ZkEvmReactContext = {
   passportInstance: Passport;
   isLoggedIn: boolean;
   isLoading: boolean;
-  error: Error | null;
   withWallet: boolean;
+  error: Error | null;
+  getIdToken: Passport['getIdToken'];
+  getAccessToken: Passport['getAccessToken'];
   login: (options?: {
     useCachedSession?: boolean;
     anonymousId?: string;
@@ -87,9 +90,7 @@ export function ZkEvmReactProvider({ children, config }: ZkEvmReactProviderProps
         setError(null);
         setIsLoading(true);
         await passportInstance.logout();
-        // setAccounts([]);
         setWithWallet(false);
-        // setProfile(null);
         setLoggedIn(false);
       } catch (e) {
         setError(e as Error);
@@ -101,6 +102,8 @@ export function ZkEvmReactProvider({ children, config }: ZkEvmReactProviderProps
       await passportInstance.loginCallback();
     },
     linkExternalWallet: passportInstance.linkExternalWallet.bind(passportInstance),
+    getIdToken: passportInstance.getIdToken.bind(passportInstance),
+    getAccessToken: passportInstance.getAccessToken.bind(passportInstance),
   }), [config, isLoggedIn]);
 
   return (
@@ -116,51 +119,6 @@ export function usePassport(): ZkEvmReactContext {
     throw new Error('usePassport must be used within a ZkEvmProvider');
   }
   return c;
-}
-
-export function useIdToken() {
-  const { passportInstance, isLoading, isLoggedIn } = usePassport();
-  const [idToken, setIdToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  const getIdToken = () => {
-    setLoading(true);
-    passportInstance
-      .getIdToken()
-      .then((t) => {
-        setIdToken(t || null);
-        if (!t) {
-          setError(new Error('No ID Token'));
-        }
-      })
-      .catch((e) => setError(e))
-      .finally(() => setLoading(false));
-  };
-  useEffect(getIdToken, [passportInstance, isLoggedIn]);
-  return {
-    idToken, isLoading: isLoading || loading, error,
-  };
-}
-
-export function useAccessToken() {
-  const { passportInstance, isLoading, isLoggedIn } = usePassport();
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  const getAccessToken = () => {
-    setLoading(true);
-    passportInstance
-      .getAccessToken()
-      .then((t) => setAccessToken(t || null))
-      .catch((e) => setError(e))
-      .finally(() => setLoading(false));
-  };
-  useEffect(getAccessToken, [passportInstance, isLoggedIn]);
-  return {
-    accessToken, isLoading: isLoading || loading, error,
-  };
 }
 
 export function useLinkedAddresses() {

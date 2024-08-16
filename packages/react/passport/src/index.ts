@@ -1,7 +1,5 @@
 export {
   ZkEvmReactProvider,
-  useAccessToken,
-  useIdToken,
   useLinkedAddresses,
   usePassport,
   useAccounts,
