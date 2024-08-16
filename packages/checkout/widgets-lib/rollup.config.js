@@ -29,7 +29,7 @@ const productionPlugins = [
   }),
   nodePolyfills(),
   commonjs(),
-  terser()
+  //terser()
 ]
 
 const getPlugins = () => {

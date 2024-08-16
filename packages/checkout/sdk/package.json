@@ -49,12 +49,14 @@
     "development": {
       "types": "./src/index.ts",
       "main": "./dist/index.js",
-      "module": "./dist/index.js"
+      "module": "./dist/index.js",
+      "import": "./dist/index.js"
     },
     "default": {
       "types": "./dist/index.d.ts",
       "main": "./dist/index.js",
-      "module": "./dist/index.js"
+      "module": "./dist/index.js",
+      "import": "./dist/index.js"
     }
   },
   "homepage": "https://github.com/immutable/ts-immutable-sdk",
