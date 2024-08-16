@@ -39,6 +39,7 @@ import {
   CheckoutSuccessEvent,
   CheckoutFailureEvent,
   CheckoutUserActionEvent,
+  RequestAddFundsEvent,
 } from './events';
 import {
   BridgeWidgetParams,
@@ -59,6 +60,9 @@ import {
   CheckoutWidgetConfiguration,
 } from './configurations';
 import { WidgetTheme } from './configurations/theme';
+import { AddFundsWidgetConfiguration } from './configurations/addFunds';
+import { AddFundsWidgetParams } from './parameters/addFunds';
+import { AddFundsEventType } from './events/addFunds';
 
 /**
  * Enum representing the list of widget types.
@@ -71,6 +75,7 @@ export enum WidgetType {
   ONRAMP = 'onramp',
   SALE = 'sale',
   CHECKOUT = 'checkout',
+  ADD_FUNDS = 'addFunds',
 }
 
 /**
@@ -89,6 +94,7 @@ export type WidgetConfigurations = {
   [WidgetType.ONRAMP]: OnrampWidgetConfiguration;
   [WidgetType.SALE]: SaleWidgetConfiguration;
   [WidgetType.CHECKOUT]: CheckoutWidgetConfiguration;
+  [WidgetType.ADD_FUNDS]: AddFundsWidgetConfiguration;
 };
 
 // Mapping each widget type to their parameters
@@ -100,6 +106,7 @@ export type WidgetParameters = {
   [WidgetType.ONRAMP]: OnRampWidgetParams;
   [WidgetType.SALE]: SaleWidgetParams;
   [WidgetType.CHECKOUT]: CheckoutWidgetParams;
+  [WidgetType.ADD_FUNDS]: AddFundsWidgetParams;
 };
 
 /**
@@ -113,6 +120,7 @@ export type WidgetEventTypes = {
   [WidgetType.ONRAMP]: OnRampEventType | OrchestrationEventType;
   [WidgetType.SALE]: SaleEventType | OrchestrationEventType;
   [WidgetType.CHECKOUT]: CheckoutEventType | OrchestrationEventType;
+  [WidgetType.ADD_FUNDS]: AddFundsEventType | OrchestrationEventType;
 };
 
 // Mapping of Orchestration events to their payloads
@@ -122,6 +130,7 @@ type OrchestrationMapping = {
   [OrchestrationEventType.REQUEST_SWAP]: RequestSwapEvent;
   [OrchestrationEventType.REQUEST_BRIDGE]: RequestBridgeEvent;
   [OrchestrationEventType.REQUEST_ONRAMP]: RequestOnrampEvent;
+  [OrchestrationEventType.REQUEST_ADD_FUNDS]: RequestAddFundsEvent;
 };
 
 type ProviderEventMapping = {
@@ -196,6 +205,15 @@ export type WidgetEventData = {
     [CheckoutEventType.DISCONNECTED]: {};
     [CheckoutEventType.USER_ACTION]: CheckoutUserActionEvent;
   };
+
+  [WidgetType.ADD_FUNDS]: {
+    [AddFundsEventType.CLOSE_WIDGET]: {};
+    [AddFundsEventType.GO_BACK]: {};
+    [AddFundsEventType.REQUEST_BRIDGE]: {};
+    [AddFundsEventType.REQUEST_SWAP]: {};
+    [AddFundsEventType.REQUEST_ONRAMP]: {};
+  } & OrchestrationMapping &
+  ProviderEventMapping;
 };
 
 /**
