@@ -16,52 +16,60 @@ export function sendConnectSuccessEvent(
   provider: Web3Provider,
   walletProviderName?: WalletProviderName,
   walletProviderInfo?: EIP6963ProviderInfo,
+  id = 'some-id',
 ) {
-  const successEvent = new CustomEvent<WidgetEvent<WidgetType.CONNECT, ConnectEventType.SUCCESS>>(
-    IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
-    {
-      detail: {
-        type: ConnectEventType.SUCCESS,
-        data: {
-          provider,
-          walletProviderName,
-          walletProviderInfo,
-        },
+  const successEvent = new CustomEvent<
+  WidgetEvent<WidgetType.CONNECT, ConnectEventType.SUCCESS>
+  >(IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT, {
+    detail: {
+      type: ConnectEventType.SUCCESS,
+      data: {
+        provider,
+        walletProviderName,
+        walletProviderInfo,
       },
     },
-  );
+  });
+
+  if (provider === undefined) {
+    throw new Error(`-----> Provider is undefined ${id}`);
+  }
+
   // eslint-disable-next-line no-console
-  console.log('success event:', eventTarget, successEvent);
+  console.log('-----> success event:', id, eventTarget, successEvent, {
+    provider,
+  });
   if (eventTarget !== undefined) eventTarget.dispatchEvent(successEvent);
 }
 
 export function sendCloseWidgetEvent(eventTarget: Window | EventTarget) {
-  const closeWidgetEvent = new CustomEvent<WidgetEvent<WidgetType.CONNECT, ConnectEventType.CLOSE_WIDGET>>(
-    IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
-    {
-      detail: {
-        type: ConnectEventType.CLOSE_WIDGET,
-        data: {},
-      },
+  const closeWidgetEvent = new CustomEvent<
+  WidgetEvent<WidgetType.CONNECT, ConnectEventType.CLOSE_WIDGET>
+  >(IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT, {
+    detail: {
+      type: ConnectEventType.CLOSE_WIDGET,
+      data: {},
     },
-  );
+  });
   // eslint-disable-next-line no-console
   console.log('close event:', eventTarget, closeWidgetEvent);
   if (eventTarget !== undefined) eventTarget.dispatchEvent(closeWidgetEvent);
 }
 
-export function sendConnectFailedEvent(eventTarget: Window | EventTarget, reason: string) {
-  const failedEvent = new CustomEvent<WidgetEvent<WidgetType.CONNECT, ConnectEventType.FAILURE>>(
-    IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
-    {
-      detail: {
-        type: ConnectEventType.FAILURE,
-        data: {
-          reason,
-        },
+export function sendConnectFailedEvent(
+  eventTarget: Window | EventTarget,
+  reason: string,
+) {
+  const failedEvent = new CustomEvent<
+  WidgetEvent<WidgetType.CONNECT, ConnectEventType.FAILURE>
+  >(IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT, {
+    detail: {
+      type: ConnectEventType.FAILURE,
+      data: {
+        reason,
       },
     },
-  );
+  });
   // eslint-disable-next-line no-console
   console.log('failed event:', eventTarget, failedEvent);
   if (eventTarget !== undefined) eventTarget.dispatchEvent(failedEvent);
@@ -73,18 +81,18 @@ export function sendWalletConnectProviderUpdatedEvent(
   walletConnectManager: WalletConnectManager,
 ) {
   const successEvent = new CustomEvent<
-  WidgetEvent<WidgetType.CONNECT, ConnectEventType.WALLETCONNECT_PROVIDER_UPDATED>
-  >(
-    IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
-    {
-      detail: {
-        type: ConnectEventType.WALLETCONNECT_PROVIDER_UPDATED,
-        data: {
-          ethereumProvider,
-          walletConnectManager,
-        },
+  WidgetEvent<
+  WidgetType.CONNECT,
+  ConnectEventType.WALLETCONNECT_PROVIDER_UPDATED
+  >
+  >(IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT, {
+    detail: {
+      type: ConnectEventType.WALLETCONNECT_PROVIDER_UPDATED,
+      data: {
+        ethereumProvider,
+        walletConnectManager,
       },
     },
-  );
+  });
   if (eventTarget !== undefined) eventTarget.dispatchEvent(successEvent);
 }

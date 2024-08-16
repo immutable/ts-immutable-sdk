@@ -205,7 +205,13 @@ export default function ConnectWidget({
       }
     }
 
-    sendConnectSuccessEvent(eventTarget, provider, walletProviderName ?? undefined, walletProviderInfo);
+    sendConnectSuccessEvent(
+      eventTarget,
+      provider,
+      walletProviderName ?? undefined,
+      walletProviderInfo,
+      'connect-widget-handleConnectSuccess',
+    );
   }, [provider, identify]);
 
   return (
