@@ -5,13 +5,8 @@ import { useState } from 'react';
 
 export default function Page() {
   const {
-    login, logout, isLoading, isLoggedIn, getAccessToken, getIdToken,
+    login, logout, isLoading, isLoggedIn, accessToken, accounts, idToken, profile, linkedAddresses,
   } = reactPassport.usePassport();
-  const { linkedAddresses } = reactPassport.useLinkedAddresses();
-  const { profile } = reactPassport.useProfile();
-  const { accounts } = reactPassport.useAccounts();
-  const [accessToken, setAccessToken] = useState<string | undefined>();
-  const [idToken, setIdToken] = useState<string | undefined>();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8">
@@ -70,13 +65,6 @@ export default function Page() {
         >
           Login without wallet
         </button>
-        <button className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
-          onClick={() => {
-            getAccessToken().then(setAccessToken);
-            getIdToken().then(setIdToken);
-          }}
-          type='button'
-        >Get Tokens</button>
         <button
           className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
           onClick={logout}

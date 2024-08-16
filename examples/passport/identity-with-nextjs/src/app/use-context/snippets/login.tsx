@@ -2,8 +2,7 @@
 import { reactPassport } from '@imtbl/sdk';
 
 export default function MyComponent() {
-  const { login } = reactPassport.usePassport();
-  const { accounts } = reactPassport.useAccounts();
+  const { login, accounts } = reactPassport.usePassport();
 
   return (
     <>

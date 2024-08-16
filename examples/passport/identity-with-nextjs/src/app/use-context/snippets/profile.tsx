@@ -2,12 +2,13 @@
 import { reactPassport } from '@imtbl/sdk';
 
 export default function Page() {
-  const { profile } = reactPassport.useProfile();
+  const { login, profile } = reactPassport.usePassport();
 
   return (
     <>
-      userInfo:
+      profile:
       {profile}
+      <button onClick={() => login()}>Login</button>
     </>
   );
 }

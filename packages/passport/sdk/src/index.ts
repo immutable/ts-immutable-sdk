@@ -25,3 +25,4 @@ export type {
   DeviceConnectResponse,
   DeviceTokenResponse,
 } from './types';
+export { PassportExternalEvent } from './types';

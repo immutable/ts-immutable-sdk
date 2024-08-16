@@ -3,9 +3,7 @@ import { reactPassport } from '@imtbl/sdk';
 import { useState } from 'react';
 
 export default function Page() {
-  const { login, getAccessToken, getIdToken } = reactPassport.usePassport();
-  const [accessToken, setAccessToken] = useState<string | undefined>();
-  const [idToken, setIdToken] = useState<string | undefined>();
+  const { login, accessToken, idToken } = reactPassport.usePassport();
 
   return (
     <>
@@ -16,10 +14,6 @@ export default function Page() {
       {' '}
       {idToken}
       <button onClick={() => login()}>Login</button>
-      <button onClick={() => {
-        getAccessToken().then(setAccessToken);
-        getIdToken().then(setIdToken);
-      }}>Get Tokens</button>
     </>
   );
 }
