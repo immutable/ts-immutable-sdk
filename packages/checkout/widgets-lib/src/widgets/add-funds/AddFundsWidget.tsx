@@ -1,5 +1,4 @@
-import { AddFundsWidgetParams } from '@imtbl/checkout-sdk/dist/widgets/definitions/parameters/addFunds';
-import { Checkout, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
+import { AddFundsWidgetParams, Checkout, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { useContext, useMemo, useReducer } from 'react';
 import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';

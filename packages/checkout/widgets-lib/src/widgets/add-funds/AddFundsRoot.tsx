@@ -5,9 +5,9 @@ import {
   WidgetProperties,
   WidgetTheme,
   WidgetType,
+  AddFundsWidgetParams,
 } from '@imtbl/checkout-sdk';
 import React, { Suspense } from 'react';
-import { AddFundsWidgetParams } from '@imtbl/checkout-sdk/dist/widgets/definitions/parameters/addFunds';
 import { Base } from '../BaseWidgetRoot';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { HandoverProvider } from '../../context/handover-context/HandoverProvider';
