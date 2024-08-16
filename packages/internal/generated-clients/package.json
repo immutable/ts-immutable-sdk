@@ -19,11 +19,11 @@
   "exports": {
     "development": {
       "types": "./src/index.ts",
-      "import": "./dist/index.js"
+      "main": "./dist/index.js"
     },
     "default": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "main": "./dist/index.js"
     }
   },
   "files": [

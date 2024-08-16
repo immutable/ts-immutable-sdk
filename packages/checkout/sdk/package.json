@@ -48,11 +48,13 @@
   "exports": {
     "development": {
       "types": "./src/index.ts",
-      "import": "./dist/index.js"
+      "main": "./dist/index.js",
+      "module": "./dist/index.js"
     },
     "default": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "main": "./dist/index.js",
+      "module": "./dist/index.js"
     }
   },
   "homepage": "https://github.com/immutable/ts-immutable-sdk",
@@ -61,6 +63,7 @@
   ],
   "license": "Apache-2.0",
   "main": "dist/index.js",
+  "module": "dist/index.js",
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
