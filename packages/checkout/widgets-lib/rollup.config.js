@@ -2,7 +2,6 @@ import typescript from '@rollup/plugin-typescript';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
 import json from '@rollup/plugin-json';
-import terser from '@rollup/plugin-terser';
 import replace from '@rollup/plugin-replace';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
 import swc from 'unplugin-swc'
@@ -29,7 +28,6 @@ const productionPlugins = [
   }),
   nodePolyfills(),
   commonjs(),
-  terser({ keep_fnames: /./ }),
 ]
 
 const getPlugins = () => {
