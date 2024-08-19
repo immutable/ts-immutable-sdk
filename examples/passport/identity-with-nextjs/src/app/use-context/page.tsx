@@ -1,17 +1,19 @@
 'use client';
 
-import { reactPassport } from '@imtbl/sdk';
+import { passport, reactPassport } from '@imtbl/sdk';
 import { useState } from 'react';
 
 export default function Page() {
   const {
-    login, logout, isLoading, isLoggedIn, getAccessToken, getIdToken,
+    login, logout, isLoading, isLoggedIn, getAccessToken, getIdToken, getAccounts, getLinkedAddresses, getProfile,
   } = reactPassport.usePassport();
-  const { linkedAddresses } = reactPassport.useLinkedAddresses();
-  const { profile } = reactPassport.useProfile();
-  const { accounts } = reactPassport.useAccounts();
+
   const [accessToken, setAccessToken] = useState<string | undefined>();
   const [idToken, setIdToken] = useState<string | undefined>();
+  const [linkedAddresses, setLinkedAddresses] = useState<string[]>();
+  const [profile, setProfile] = useState<passport.UserProfile | undefined>();
+  const [accounts, setAccounts] = useState<string[]>();
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8">
@@ -77,6 +79,27 @@ export default function Page() {
           }}
           type='button'
         >Get Tokens</button>
+        <button
+          className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
+          onClick={() => getLinkedAddresses().then(setLinkedAddresses)}
+          type="button"
+        >
+          Get Linked Addresses
+        </button>
+        <button
+          className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
+          onClick={() => getProfile().then(setProfile)}
+          type="button"
+        >
+          Get Profile
+        </button>
+        <button
+          className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
+          onClick={() => getAccounts().then(setAccounts)}
+          type="button"
+        >
+          Get Accounts
+        </button>
         <button
           className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
           onClick={logout}

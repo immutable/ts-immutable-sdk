@@ -17,6 +17,9 @@ type ZkEvmReactContext = {
   error: Error | null;
   getIdToken: Passport['getIdToken'];
   getAccessToken: Passport['getAccessToken'];
+  getAccounts: () => Promise<string[]>;
+  getLinkedAddresses: Passport['getLinkedAddresses'];
+  getProfile: () => Promise<UserProfile | undefined>;
   login: (options?: {
     useCachedSession?: boolean;
     anonymousId?: string;
@@ -102,8 +105,70 @@ export function ZkEvmReactProvider({ children, config }: ZkEvmReactProviderProps
       await passportInstance.loginCallback();
     },
     linkExternalWallet: passportInstance.linkExternalWallet.bind(passportInstance),
-    getIdToken: passportInstance.getIdToken.bind(passportInstance),
-    getAccessToken: passportInstance.getAccessToken.bind(passportInstance),
+    getIdToken: async () => {
+      setIsLoading(true);
+      try {
+        const idToken = await passportInstance.getIdToken();
+        return idToken;
+      } catch (e: any) {
+        setError(e as Error);
+        setLoggedIn(false);
+      } finally {
+        setIsLoading(false);
+      }
+      return undefined;
+    },
+    getAccessToken: async () => {
+      setIsLoading(true);
+      try {
+        const accessToken = await passportInstance.getAccessToken();
+        return accessToken;
+      } catch (e: any) {
+        setError(e as Error);
+        setLoggedIn(false);
+      } finally {
+        setIsLoading(false);
+      }
+      return undefined;
+    },
+    getAccounts: async () => {
+      setIsLoading(true);
+      try {
+        const provider = passportInstance.connectEvm();
+        const accounts = await provider.request({ method: 'eth_requestAccounts' });
+        return accounts;
+      } catch (e: any) {
+        setError(e as Error);
+      } finally {
+        setIsLoading(false);
+      }
+      return [];
+    },
+    getLinkedAddresses: async () => {
+      setIsLoading(true);
+      try {
+        const linkedAddresses = await passportInstance.getLinkedAddresses();
+        return linkedAddresses;
+      } catch (e: any) {
+        setError(e as Error);
+      } finally {
+        setIsLoading(false);
+      }
+      return [];
+    },
+    getProfile: async () => {
+      setIsLoading(true);
+      try {
+        const profile = await passportInstance.getUserInfo();
+        return profile;
+      } catch (e: any) {
+        setError(e as Error);
+        setLoggedIn(false);
+      } finally {
+        setIsLoading(false);
+      }
+      return undefined;
+    },
   }), [config, isLoggedIn]);
 
   return (
@@ -119,72 +184,4 @@ export function usePassport(): ZkEvmReactContext {
     throw new Error('usePassport must be used within a ZkEvmProvider');
   }
   return c;
-}
-
-export function useLinkedAddresses() {
-  const { passportInstance, isLoading, isLoggedIn } = usePassport();
-  const [linkedAddresses, setLinkedAddresses] = useState<string[] | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  const getLinkedAddresses = () => {
-    setLoading(true);
-    passportInstance
-      .getLinkedAddresses()
-      .then((t) => setLinkedAddresses(t || null))
-      .catch((e) => setError(e))
-      .finally(() => setLoading(false));
-  };
-  useEffect(getLinkedAddresses, [passportInstance, isLoggedIn]);
-  return {
-    linkedAddresses, isLoading: isLoading || loading, error,
-  };
-}
-
-export function useProfile() {
-  const { passportInstance, isLoading, isLoggedIn } = usePassport();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  const getProfile = () => {
-    setLoading(true);
-    passportInstance
-      .getUserInfo()
-      .then((t) => setProfile(t || null))
-      .catch((e) => setError(e))
-      .finally(() => setLoading(false));
-  };
-  useEffect(getProfile, [passportInstance, isLoggedIn]);
-  return {
-    profile, isLoading: isLoading || loading, error,
-  };
-}
-
-export function useAccounts() {
-  const {
-    passportInstance, isLoading, isLoggedIn, withWallet,
-  } = usePassport();
-  const [accounts, setAccounts] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  const getAccounts = () => {
-    if (!passportInstance || !withWallet || !isLoggedIn) return;
-    setLoading(true);
-    passportInstance.connectEvm()
-      .request({ method: 'eth_requestAccounts' })
-      .then((t) => setAccounts(t || []))
-      .catch((e) => setError(e))
-      .finally(() => setLoading(false));
-  };
-  useEffect(getAccounts, [passportInstance, isLoggedIn]);
-  return {
-    accounts, isLoading: isLoading || loading, error,
-  };
-}
-
-export function usePassportProvider() {
-  const { passportInstance } = usePassport();
-  return passportInstance.connectEvm();
 }

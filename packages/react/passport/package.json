@@ -35,9 +35,6 @@
     "ts-node": "^10.9.1",
     "typescript": "^5.5.4"
   },
-  "optionalDependencies": {
-    "react": ">=17.0.0"
-  },
   "engines": {
     "node": ">=20.11.0"
   },
@@ -47,6 +44,9 @@
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "license": "Apache-2.0",
   "main": "dist/index.js",
+  "optionalDependencies": {
+    "react": ">=17.0.0"
+  },
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {

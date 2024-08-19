@@ -1,16 +1,14 @@
 // #doc passport-react-login
 import { reactPassport } from '@imtbl/sdk';
+import { useState } from 'react';
 
 export default function MyComponent() {
-  const { login } = reactPassport.usePassport();
-  const { accounts } = reactPassport.useAccounts();
+  const { login, getAccounts } = reactPassport.usePassport();
 
   return (
     <>
-      accounts:
-      {' '}
-      {accounts}
       <button onClick={() => login()}>Login</button>
+      <button onClick={() => getAccounts().then((accounts) => console.log(accounts))}>Get Accounts</button>
     </>
   );
 }
