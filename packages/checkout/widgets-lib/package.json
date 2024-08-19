@@ -24,6 +24,7 @@
     "@imtbl/dex-sdk": "0.0.0",
     "@imtbl/passport": "0.0.0",
     "@imtbl/react-analytics": "0.2.1-alpha",
+    "@lifi/sdk": "^3.1.5",
     "@rive-app/react-canvas-lite": "^4.9.0",
     "@walletconnect/ethereum-provider": "^2.11.1",
     "@walletconnect/modal": "^2.6.2",
@@ -40,7 +41,8 @@
     "react-i18next": "^13.5.0",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
-    "url": "^0.11.0"
+    "url": "^0.11.0",
+    "viem": "^2.19.7"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^26.0.1",
