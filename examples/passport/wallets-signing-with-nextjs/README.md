@@ -1,6 +1,6 @@
 # Passport Wallets with Next JS
 
-To run this example you can 
+To run this example you can run:
 
 ```
 cd examples/passport/wallets-connect-with-nextjs
