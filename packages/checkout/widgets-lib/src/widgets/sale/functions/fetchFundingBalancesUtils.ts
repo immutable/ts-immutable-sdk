@@ -9,14 +9,15 @@ import {
   ERC20ItemRequirement,
   FundingRoute,
   RoutingOutcomeType,
+  FundingStep,
   FundingStepType,
   Fee,
+  SwapFees,
 } from '@imtbl/checkout-sdk';
 
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
-import { SwapFees } from '@imtbl/checkout-sdk/dist/types';
 import { getTokenImageByAddress, isNativeToken } from '../../../lib/utils';
 import { isGasFree } from '../../../lib/provider';
 import {
@@ -101,7 +102,7 @@ export const getSufficientFundingStep = (
 export const getAlternativeFundingSteps = (
   fundingRoutes: FundingRoute[],
   environment: Environment,
-) => {
+): FundingStep[] => {
   if (fundingRoutes.length === 0) {
     return [];
   }

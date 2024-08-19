@@ -3,6 +3,7 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDirs": ["src"],
+    "customConditions": ["development"]
   },
   "include": ["src", "test/__mocks__/window.ts"],
   "exclude": ["node_modules", "dist", "test"]

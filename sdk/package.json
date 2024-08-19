@@ -161,10 +161,9 @@
     "copyBrowserBundles": "node scripts/copyBrowserBundles.js",
     "generateIndex": "node scripts/generateIndex.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
-    "packageList": "./scripts/generate-package-list.sh",
     "regenModules": "yarn generateIndex && yarn updateExports",
     "typecheck": "tsc --noEmit --jsx preserve",
-    "updateDependencies": "yarn packageList && node ./scripts/updateDependencies.js && yarn syncpack:format",
+    "updateDependencies": "node ./scripts/updateDependencies.js && yarn run --top-level syncpack:format",
     "updateExports": "node scripts/updateExports.js"
   },
   "type": "module",
