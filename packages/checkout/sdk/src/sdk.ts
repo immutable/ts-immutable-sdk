@@ -17,6 +17,7 @@ import * as buy from './smartCheckout/buy';
 import * as cancel from './smartCheckout/cancel';
 import * as sell from './smartCheckout/sell';
 import * as smartCheckout from './smartCheckout';
+import * as swap from './swap';
 import {
   AddNetworkParams,
   BuyParams,
@@ -76,6 +77,7 @@ import { WidgetConfiguration } from './widgets/definitions/configurations';
 import { SemanticVersion } from './widgets/definitions/types';
 import { validateAndBuildVersion } from './widgets/version';
 import { InjectedProvidersManager } from './provider/injectedProvidersManager';
+import { SwapParams, SwapResult } from './types/swap';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -721,5 +723,21 @@ export class Checkout {
    */
   public async isSwapAvailable(): Promise<boolean> {
     return this.availability.checkDexAvailability();
+  }
+
+  /**
+   * Fetches the approval and swap transaction details including the quote for the swap.
+   * @param {SwapParams} params - The parameters for the swap.
+   * @returns {Promise<SwapResult>} - A promise that resolves to the swap result (approvla tx, swap tx, quote).
+   */
+  public async swap(params: SwapParams): Promise<SwapResult> {
+    return swap.swap(
+      this.config,
+      params.provider,
+      params.fromToken,
+      params.toToken,
+      params.fromAmount,
+      params.toAmount,
+    );
   }
 }
