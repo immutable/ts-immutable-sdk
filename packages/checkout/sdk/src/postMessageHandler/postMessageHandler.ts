@@ -31,9 +31,6 @@ export class PostMessageHandler {
 
   private logger: (...args: any[]) => void;
 
-  static isSynOrAck = (type: PostMessageHandlerEventType): boolean => type === PostMessageHandlerEventType.SYN
-    || type === PostMessageHandlerEventType.ACK;
-
   constructor({
     targetOrigin,
     eventTarget,
@@ -66,11 +63,14 @@ export class PostMessageHandler {
     this.logger = logger;
   }
 
-  private handshake = (): void => {
+  static isSynOrAck = (type: PostMessageHandlerEventType): boolean => type === PostMessageHandlerEventType.SYN
+    || type === PostMessageHandlerEventType.ACK;
+
+  protected handshake = (): void => {
     this.postMessage(PostMessageHandlerEventType.SYN, null);
   };
 
-  private onMessage = (event: MessageEvent): void => {
+  protected onMessage = (event: MessageEvent): void => {
     if (event.origin !== this.targetOrigin) return;
 
     if (this.init) {

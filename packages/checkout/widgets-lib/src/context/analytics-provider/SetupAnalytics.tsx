@@ -1,6 +1,5 @@
 import { useCallback, useEffect } from 'react';
-import { Checkout } from '@imtbl/checkout-sdk';
-import { TelemetryConfig } from '@imtbl/checkout-sdk/dist/types';
+import { Checkout, TelemetryConfig } from '@imtbl/checkout-sdk';
 import { useAnalytics } from './SegmentAnalyticsProvider';
 
 type SetupAnalyticsProps = {

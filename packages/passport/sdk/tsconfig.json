@@ -4,7 +4,7 @@
     "jsx": "react-jsx",
     "outDir": "./dist",
     "rootDirs": ["src"],
-    "jsxImportSource": "@emotion/react"
+    "customConditions": ["development"]
   },
   "include": ["src", "src/types.ts"],
   "exclude": [

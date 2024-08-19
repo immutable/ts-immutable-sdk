@@ -1,3 +1,5 @@
+export type { AddFundsWidgetParams } from './addFunds';
+
 export * from './connect';
 export * from './bridge';
 export * from './wallet';
