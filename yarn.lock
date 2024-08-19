@@ -3862,7 +3862,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/identity-with-nextjs@workspace:examples/passport/identity-with-nextjs"
   dependencies:
-    "@imtbl/sdk": latest
+    "@imtbl/sdk": "file:.yalc/@imtbl/sdk"
     "@playwright/test": ^1.45.3
     "@types/node": ^20
     "@types/react": ^18.0.28
@@ -4101,7 +4101,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/wallets-transactions-with-nextjs@workspace:examples/passport/wallets-transactions-with-nextjs"
   dependencies:
-    "@imtbl/sdk": latest
+    "@imtbl/sdk": "file:.yalc/@imtbl/sdk"
     "@playwright/test": ^1.45.3
     "@types/node": ^20
     "@types/react": ^18.0.28
@@ -4846,7 +4846,6 @@ __metadata:
     pg: ^8.11.5
     pino-pretty: ^11.2.2
     prisma: ^5.13.0
-    react: ">=17.0.0"
     react-i18next: ^13.5.0
     rollup: ^4.19.1
     rollup-plugin-dts: ^6.1.1
@@ -4863,10 +4862,142 @@ __metadata:
       optional: true
     prisma:
       optional: true
-    react:
-      optional: true
   languageName: unknown
   linkType: soft
+
+"@imtbl/sdk@file:.yalc/@imtbl/sdk::locator=%40examples%2Fidentity-with-nextjs%40workspace%3Aexamples%2Fpassport%2Fidentity-with-nextjs":
+  version: 0.0.0
+  resolution: "@imtbl/sdk@file:.yalc/@imtbl/sdk#.yalc/@imtbl/sdk::hash=094137&locator=%40examples%2Fidentity-with-nextjs%40workspace%3Aexamples%2Fpassport%2Fidentity-with-nextjs"
+  dependencies:
+    "@0xsequence/abi": ^1.4.3
+    "@0xsequence/core": ^1.4.3
+    "@biom3/design-tokens": ^0.4.2
+    "@biom3/react": ^0.25.0
+    "@ethersproject/abi": ^5.7.0
+    "@ethersproject/abstract-signer": ^5.7.0
+    "@ethersproject/keccak256": ^5.7.0
+    "@ethersproject/providers": ^5.7.2
+    "@ethersproject/strings": ^5.7.0
+    "@ethersproject/wallet": ^5.7.0
+    "@imtbl/react-analytics": 0.2.1-alpha
+    "@jest/globals": ^29.5.0
+    "@magic-ext/oidc": 4.3.1
+    "@metamask/detect-provider": ^2.0.0
+    "@opensea/seaport-js": 4.0.3
+    "@rive-app/react-canvas-lite": ^4.9.0
+    "@stdlib/number-float64-base-normalize": 0.0.8
+    "@uniswap/router-sdk": ^1.4.0
+    "@uniswap/sdk-core": ^3.0.1
+    "@uniswap/v3-sdk": ^3.9.0
+    "@walletconnect/ethereum-provider": ^2.11.1
+    "@walletconnect/modal": ^2.6.2
+    assert: ^2.0.0
+    axios: ^1.6.5
+    bn.js: ^5.2.1
+    buffer: ^6.0.3
+    crypto-browserify: ^3.12.0
+    elliptic: ^6.5.4
+    enc-utils: ^3.0.0
+    ethereumjs-wallet: ^1.0.2
+    ethers: ^5.7.2
+    ethers-v6: "npm:ethers@6.11.1"
+    events: ^3.3.0
+    global-const: ^0.1.2
+    https-browserify: ^1.0.0
+    i18next: ^23.7.6
+    i18next-browser-languagedetector: ^7.2.0
+    jwt-decode: ^3.1.2
+    localforage: ^1.10.0
+    lru-memorise: 0.3.0
+    magic-sdk: ^21.2.0
+    merkletreejs: ^0.3.11
+    oidc-client-ts: 2.4.0
+    os-browserify: ^0.3.0
+    pako: ^2.1.0
+    pg: ^8.11.5
+    pino-pretty: ^11.2.2
+    prisma: ^5.13.0
+    react-i18next: ^13.5.0
+    sns-validator: ^0.3.5
+    stream-browserify: ^3.0.0
+    stream-http: ^3.2.0
+    url: ^0.11.0
+    uuid: ^8.3.2
+  dependenciesMeta:
+    pg:
+      optional: true
+    prisma:
+      optional: true
+  checksum: 3d5af3ea21549452f16025d47d69340416ae7cb3f18fdef44fc9b3d6bf0515d6d2308a8aac3b90c7be42d690a4903393cb8fa10feb12a6a8971c9e0f1662c464
+  languageName: node
+  linkType: hard
+
+"@imtbl/sdk@file:.yalc/@imtbl/sdk::locator=%40examples%2Fwallets-transactions-with-nextjs%40workspace%3Aexamples%2Fpassport%2Fwallets-transactions-with-nextjs":
+  version: 0.0.0
+  resolution: "@imtbl/sdk@file:.yalc/@imtbl/sdk#.yalc/@imtbl/sdk::hash=15f58d&locator=%40examples%2Fwallets-transactions-with-nextjs%40workspace%3Aexamples%2Fpassport%2Fwallets-transactions-with-nextjs"
+  dependencies:
+    "@0xsequence/abi": ^1.4.3
+    "@0xsequence/core": ^1.4.3
+    "@biom3/design-tokens": ^0.4.2
+    "@biom3/react": ^0.25.0
+    "@ethersproject/abi": ^5.7.0
+    "@ethersproject/abstract-signer": ^5.7.0
+    "@ethersproject/keccak256": ^5.7.0
+    "@ethersproject/providers": ^5.7.2
+    "@ethersproject/strings": ^5.7.0
+    "@ethersproject/wallet": ^5.7.0
+    "@imtbl/react-analytics": 0.2.1-alpha
+    "@jest/globals": ^29.5.0
+    "@magic-ext/oidc": 4.3.1
+    "@metamask/detect-provider": ^2.0.0
+    "@opensea/seaport-js": 4.0.3
+    "@rive-app/react-canvas-lite": ^4.9.0
+    "@stdlib/number-float64-base-normalize": 0.0.8
+    "@uniswap/router-sdk": ^1.4.0
+    "@uniswap/sdk-core": ^3.0.1
+    "@uniswap/v3-sdk": ^3.9.0
+    "@walletconnect/ethereum-provider": ^2.11.1
+    "@walletconnect/modal": ^2.6.2
+    assert: ^2.0.0
+    axios: ^1.6.5
+    bn.js: ^5.2.1
+    buffer: ^6.0.3
+    crypto-browserify: ^3.12.0
+    elliptic: ^6.5.4
+    enc-utils: ^3.0.0
+    ethereumjs-wallet: ^1.0.2
+    ethers: ^5.7.2
+    ethers-v6: "npm:ethers@6.11.1"
+    events: ^3.3.0
+    global-const: ^0.1.2
+    https-browserify: ^1.0.0
+    i18next: ^23.7.6
+    i18next-browser-languagedetector: ^7.2.0
+    jwt-decode: ^3.1.2
+    localforage: ^1.10.0
+    lru-memorise: 0.3.0
+    magic-sdk: ^21.2.0
+    merkletreejs: ^0.3.11
+    oidc-client-ts: 2.4.0
+    os-browserify: ^0.3.0
+    pako: ^2.1.0
+    pg: ^8.11.5
+    pino-pretty: ^11.2.2
+    prisma: ^5.13.0
+    react-i18next: ^13.5.0
+    sns-validator: ^0.3.5
+    stream-browserify: ^3.0.0
+    stream-http: ^3.2.0
+    url: ^0.11.0
+    uuid: ^8.3.2
+  dependenciesMeta:
+    pg:
+      optional: true
+    prisma:
+      optional: true
+  checksum: c5bc1e671caa3660c3afb0de6f8441169b426675f496cb088ed2afe6699ee03cfd0d8bc69dc971c20bcb09113c1f6f80c95f824289a0fbf3175c0c3451257749
+  languageName: node
+  linkType: hard
 
 "@imtbl/sdk@npm:latest":
   version: 1.46.5

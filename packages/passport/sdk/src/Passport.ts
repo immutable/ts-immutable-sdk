@@ -21,8 +21,6 @@ import {
   LinkWalletParams,
   PassportEventMap,
   PassportEvents,
-  PassportExternalEvent,
-  PassportExternalEventMap,
   PassportModuleConfiguration,
   User,
   UserProfile,
@@ -60,7 +58,6 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
   const confirmationScreen = new ConfirmationScreen(config);
   const multiRollupApiClients = new MultiRollupApiClients(config.multiRollupConfig);
   const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
-  const passportExternalEventEmitter = new TypedEventEmitter<PassportEventMap>();
 
   const immutableXClient = passportModuleConfiguration.overrides
     ? passportModuleConfiguration.overrides.immutableXClient
@@ -91,7 +88,6 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
     immutableXClient,
     multiRollupApiClients,
     passportEventEmitter,
-    passportExternalEventEmitter,
     passportImxProviderFactory,
     guardianClient,
   };
@@ -116,8 +112,6 @@ export class Passport {
 
   private readonly guardianClient: GuardianClient;
 
-  private readonly passportExternalEventEmitter : TypedEventEmitter<PassportExternalEventMap>;
-
   constructor(passportModuleConfiguration: PassportModuleConfiguration) {
     const privateVars = buildPrivateVars(passportModuleConfiguration);
 
@@ -130,28 +124,9 @@ export class Passport {
     this.passportEventEmitter = privateVars.passportEventEmitter;
     this.passportImxProviderFactory = privateVars.passportImxProviderFactory;
     this.guardianClient = privateVars.guardianClient;
-    this.passportExternalEventEmitter = privateVars.passportExternalEventEmitter;
 
     setPassportClientId(passportModuleConfiguration.clientId);
     track('passport', 'initialise');
-
-    this.passportEventEmitter.on(PassportEvents.LOGGED_IN, () => {
-      this.passportExternalEventEmitter.emit(PassportExternalEvent.LOGGED_IN);
-    });
-    this.passportEventEmitter.on(PassportEvents.LOGGED_OUT, () => {
-      this.passportExternalEventEmitter.emit(PassportExternalEvent.LOGGED_OUT);
-    });
-  }
-
-  public on(event: PassportExternalEvent, listener: (...args: PassportExternalEventMap[typeof event]) => void): void {
-    this.passportExternalEventEmitter.on(event, listener);
-  }
-
-  public removeListener(
-    event: PassportExternalEvent,
-    listener: (...args: PassportExternalEventMap[typeof event]) => void,
-  ): void {
-    this.passportExternalEventEmitter.removeListener(event, listener);
   }
 
   /**
