@@ -25,11 +25,11 @@ const productionPlugins = [
   resolve({
     browser: true,
     dedupe: ['react', 'react-dom'],
-    exportConditions: ['browser']
+    exportConditions: ['default']
   }),
   nodePolyfills(),
   commonjs(),
-  //terser()
+  terser({ keep_fnames: /./ }),
 ]
 
 const getPlugins = () => {

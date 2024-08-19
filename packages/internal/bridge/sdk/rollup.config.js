@@ -14,7 +14,7 @@ export default [{
     plugins: [
       json(),
       commonjs(),
-      nodeResolve(),
+      nodeResolve({ exportConditions: ["default"] }),
       isProduction ? typescript({customConditions: ["default"]}) : swc.rollup()
     ],
   },
@@ -26,7 +26,7 @@ export default [{
     plugins: [
       json(),
       commonjs(),
-      nodeResolve({ browser: true }), 
+      nodeResolve({ browser: true, exportConditions: ["default"] }), 
       isProduction ? typescript({customConditions: ["default"]}) : swc.rollup()
     ],
   }

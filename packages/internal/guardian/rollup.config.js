@@ -12,7 +12,7 @@ export default {
   },
   plugins: [
     json(),
-    resolve({ browser: true }),
+    resolve({ browser: true, exportConditions: ["default"] }),
     isProduction ?
     typescript({
       customConditions: ["default"],

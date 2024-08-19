@@ -54,6 +54,7 @@ const buildJS = () => {
       plugins: [
         nodeResolve({
           resolveOnly: packages,
+          exportConditions: ["default"],
         }),
         json(),
         commonJs(),
@@ -107,6 +108,7 @@ export default [
     plugins: [
       nodeResolve({
         resolveOnly: packages,
+        exportConditions: ["default"]
       }),
       json(),
       commonJs(),
@@ -133,6 +135,7 @@ export default [
         main: true,
         browser: true,
         preferBuiltins: false,
+        exportConditions: ["default"],
       }),
       nodePolyfills(),
       json(),
@@ -153,7 +156,7 @@ export default [
         'process.env.NODE_ENV': '"production"',
         'process': 'undefined'
       }),
-      terser(),
+      terser({ keep_fnames: /./ }),
     ],
   },
 

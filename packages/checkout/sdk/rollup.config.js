@@ -44,7 +44,7 @@ export default [
       nodeResolve({ browser: true, exportConditions: ['browser'] }),
       commonjs(),
       nodePolyfills(),
-      terser(),
+      terser({ keep_fnames: /./ }),
       ...commonPlugins,
     ],
   }
