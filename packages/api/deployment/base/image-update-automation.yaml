@@ -1,0 +1,27 @@
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta1
+kind: ImageUpdateAutomation
+metadata:
+  name: ts-sdk-api
+spec:
+  interval: 1m
+  sourceRef:
+    kind: GitRepository
+    name: ts-immutable-sdk
+    namespace: flux-system
+  git:
+    commit:
+      author:
+        email: fluxcdbot@users.noreply.github.com
+        name: fluxcdbot
+      messageTemplate: |
+        Automated image update
+
+        Images:
+        {{ range .Updated.Images -}}
+        - {{.}}
+        {{ end -}}
+        [skip ci]
+  update:
+    # Overlays need to set update.path to ./deploy/$env
+    strategy: Setters

@@ -1,0 +1,68 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ts-sdk-api
+  annotations:
+    secret.reloader.stakater.com/reload: "newrelic"
+spec:
+  selector:
+    matchLabels:
+      app: ts-sdk-api
+  template:
+    metadata:
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+        sidecar.istio.io/inject: "false"
+        repository: "https://github.com/immutable/ts-immutable-sdk/tree/main/packages/api"
+    spec:
+      serviceAccountName: ts-sdk-api
+      imagePullSecrets:
+        - name: docker-registry
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - ts-sdk-api
+                topologyKey: failure-domain.beta.kubernetes.io/zone
+            - weight: 90
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - ts-sdk-api
+                topologyKey: kubernetes.io/hostname
+      containers:
+        - name: ts-sdk-api
+          image: ghcr.io/immutable/ts-immutable-sdk/ts-sdk-api
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 2
+              memory: 1Gi
+            requests:
+              cpu: 2
+              memory: 512Mi
+          ports:
+            - containerPort: 8080
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: FallbackToLogsOnError
+          serviceAccount: ts-sdk-api
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+            httpGet:
+              path: /v1/heartbeat
+              port: 8080
+              scheme: HTTP

@@ -1,0 +1,8 @@
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta1
+kind: ImageUpdateAutomation
+metadata:
+  name: ts-sdk-api
+spec:
+  update:
+    path: ./packages/api/deployment/prod

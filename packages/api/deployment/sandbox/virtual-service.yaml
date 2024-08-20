@@ -1,0 +1,12 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: ts-sdk-api
+spec:
+  gateways:
+    - sandbox/gateway-nlb-private # ingress on private subnets
+    - sandbox/gateway-alb-api # ingress from Cloudfront, protected by secret
+  hosts:
+    - api.sandbox.immutable.com
+    - ts-sdk-api.sandbox.imtbl.com

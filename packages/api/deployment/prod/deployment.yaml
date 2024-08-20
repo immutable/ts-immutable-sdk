@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ts-sdk-api
+  annotations:
+    newrelic.com/app.id: ""
+    newrelic.com/app.name: "ts-sdk-api-prod"
+    github.com/repo.name: "ts-immutable-sdk"
+    github.com/environment.name: "ts-sdk-api-prod"
+    github.com/deployment.name: "ts-sdk-api-prod"
+spec:
+  template:
+    spec:
+      containers:
+        - name: ts-sdk-api
+          image: ghcr.io/immutable/ts-immutable-sdk/ts-sdk-api # {"$imagepolicy": "prod:ts-sdk-api"}
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: IMMUTABLE_ENV
+              value: prod

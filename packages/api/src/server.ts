@@ -11,20 +11,25 @@ const orderbook = new Orderbook({
   },
 });
 
-const packages = {
+const packages: { [key: string]: any } = {
   orderbook,
 };
 
 // TODO: add validation
-server.post('/:pkg/:method', async (request) => {
-  console.log(request.body);
+// TODO: correct typing
+// TODO: json schema
+// TODO: openapi schema
+// TODO: newrelic
+// TODO: no deployment of alpha package on flux commit
+// TODO: env for production vs sandbox
+server.post('/v1/ts-sdk/v1/:pkg/:method', async (request: any) => {
   const { pkg, method } = request.params;
-  // const listing = await orderbook.prepareListing(request.body);
-  // return listing;
   return await packages[pkg][method](request.body);
 });
 
-server.listen({ port: 8080 }, (err, address) => {
+server.get('v1/heartbeat', async () => ({ status: 'ok' }));
+
+server.listen({ port: 8080 }, (err: any, address: any) => {
   if (err) {
     console.error(err);
     process.exit(1);
