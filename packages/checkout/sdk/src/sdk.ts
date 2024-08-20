@@ -728,7 +728,7 @@ export class Checkout {
   /**
    * Fetches the approval and swap transaction details including the quote for the swap.
    * @param {SwapParams} params - The parameters for the swap.
-   * @returns {Promise<SwapResult>} - A promise that resolves to the swap result (approval tx, swap tx, quote).
+   * @returns {Promise<SwapResult>} - A promise that resolves to the swap result (swap tx, swap tx receipt, quote used in the swap).
    */
   public async swap(params: SwapParams): Promise<SwapResult> {
     const web3Provider = await provider.validateProvider(
