@@ -17,7 +17,9 @@ const defaultPlugins = [
     preventAssignment: true,
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || PRODUCTION),
   }),
-  isProduction ? typescript({customConditions: ["default"]}) : swc.rollup(),
+  isProduction ? typescript({customConditions: ["default"]}) : swc.rollup({ jsc: { 
+    transform: { react: { development: true, runtime: 'automatic' }},
+  } }),
 ]
 
 const productionPlugins = [
