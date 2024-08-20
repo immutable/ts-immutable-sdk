@@ -55,6 +55,8 @@ import { FiatRampParams, ExchangeType } from './types/fiatRamp';
 import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequirements';
 import { CheckoutErrorType } from './errors';
 import { availabilityService } from './availability';
+import * as swap from './swap';
+import { SwapParams, SwapResult } from './types/swap';
 
 jest.mock('./connect');
 jest.mock('./network');
@@ -72,6 +74,7 @@ jest.mock('./smartCheckout');
 jest.mock('./fiatRamp');
 jest.mock('./smartCheckout/itemRequirements');
 jest.mock('./availability');
+jest.mock('./swap');
 
 describe('Connect', () => {
   let providerMock: ExternalProvider;
@@ -987,6 +990,135 @@ describe('Connect', () => {
       await checkout.isSwapAvailable();
 
       expect(checkout.availability.checkDexAvailability).toBeCalledTimes(1);
+    });
+  });
+
+  describe('Swap', () => {
+    let checkout: Checkout;
+    let web3Provider: Web3Provider;
+
+    beforeEach(() => {
+      jest.resetAllMocks();
+
+      providerMock.request = jest.fn().mockResolvedValue('0x1');
+
+      web3Provider = new Web3Provider(providerMock, ChainId.ETHEREUM);
+
+      (validateProvider as jest.Mock).mockResolvedValue(web3Provider);
+
+      checkout = new Checkout({
+        baseConfig: { environment: Environment.PRODUCTION },
+      });
+    });
+
+    it('should call swap function with correct parameters', async () => {
+      const swapParams: SwapParams = {
+        provider: web3Provider,
+        fromToken: { address: '0xFromTokenAddress', decimals: 18 } as TokenInfo,
+        toToken: { address: '0xToTokenAddress', decimals: 18 } as TokenInfo,
+        fromAmount: '1000000000000000000', // 1 ETH in wei
+        toAmount: '1000000', // Example USDC amount
+        slippagePercent: 0.5,
+        maxHops: 3,
+        deadline: 1234567890,
+      };
+
+      const mockSwapResult: SwapResult = {
+        swap: {
+          transaction: {
+            to: '0xSwapContractAddress',
+            data: '0xEncodedSwapData',
+            value: '0',
+          },
+          gasFeeEstimate: {
+            token: {
+              chainId: 0,
+              address: '',
+              decimals: 0,
+              symbol: undefined,
+              name: undefined,
+            },
+            value: BigNumber.from('1000000000000000000'),
+          },
+        },
+        quote: {
+          slippage: 0.1,
+          fees: [],
+          amount: {
+            token: {
+              chainId: 0,
+              address: '',
+              decimals: 0,
+              symbol: undefined,
+              name: undefined,
+            },
+            value: BigNumber.from('1000000000000000000'),
+          },
+          amountWithMaxSlippage: {
+            token: {
+              chainId: 0,
+              address: '',
+              decimals: 0,
+              symbol: undefined,
+              name: undefined,
+            },
+            value: BigNumber.from('1050000000000000000'), // Example value with 5% max slippage
+          },
+        },
+        swapReceipt: {
+          to: '0xRecipientAddress',
+          from: '0xSenderAddress',
+          contractAddress: '0xContractAddress',
+          transactionIndex: 1,
+          gasUsed: BigNumber.from('21000'),
+          logsBloom: '0x',
+          blockHash: '0xBlockHash',
+          transactionHash: '0xTransactionHash',
+          logs: [],
+          blockNumber: 12345,
+          confirmations: 2,
+          cumulativeGasUsed: BigNumber.from('100000'),
+          effectiveGasPrice: BigNumber.from('20000000000'),
+          status: 1,
+          type: 2,
+          byzantium: true,
+        },
+      };
+
+      (swap.swap as jest.Mock).mockResolvedValue(mockSwapResult);
+
+      const result = await checkout.swap(swapParams);
+
+      expect(validateProvider).toHaveBeenCalledWith(checkout.config, web3Provider);
+      expect(swap.swap).toHaveBeenCalledWith(
+        checkout.config,
+        web3Provider,
+        swapParams.fromToken,
+        swapParams.toToken,
+        swapParams.fromAmount,
+        swapParams.toAmount,
+        swapParams.slippagePercent,
+        swapParams.maxHops,
+        swapParams.deadline,
+      );
+      expect(result).toEqual(mockSwapResult);
+    });
+
+    it('should throw an error if provider validation fails', async () => {
+      const error = new Error('Invalid provider');
+      (validateProvider as jest.Mock).mockRejectedValue(error);
+
+      const swapParams: SwapParams = {
+        provider: web3Provider,
+        fromToken: { address: '0xFromTokenAddress', decimals: 18 } as TokenInfo,
+        toToken: { address: '0xToTokenAddress', decimals: 18 } as TokenInfo,
+        fromAmount: '1000000000000000000',
+        toAmount: '1000000',
+        slippagePercent: 0.5,
+      };
+
+      await expect(checkout.swap(swapParams)).rejects.toThrow('Invalid provider');
+      expect(swap.swap).not.toHaveBeenCalled();
     });
   });
 });
