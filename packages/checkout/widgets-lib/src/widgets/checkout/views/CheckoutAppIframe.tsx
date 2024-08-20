@@ -1,8 +1,8 @@
-import { Box } from '@biom3/react';
-import { useTranslation } from 'react-i18next';
 import {
   useContext, useEffect, useRef, useState,
 } from 'react';
+import { Box } from '@biom3/react';
+import { useTranslation } from 'react-i18next';
 import {
   CheckoutEventType,
   IMTBLWidgetEvents,
@@ -17,6 +17,8 @@ import { EventTargetContext } from '../../../context/event-target-context/EventT
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { ErrorView } from '../../../views/error/ErrorView';
 import { IFRAME_INIT_TIMEOUT_MS } from '../utils/config';
+import { useEip6963Relayer } from '../hooks/useEip6963Relayer';
+import { useProviderRelay } from '../hooks/useProviderRelay';
 
 const permissions = `
   accelerometer;
@@ -47,6 +49,9 @@ export function CheckoutAppIframe() {
     { iframeURL, postMessageHandler, iframeContentWindow },
     checkoutDispatch,
   ] = useCheckoutContext();
+
+  useEip6963Relayer();
+  useProviderRelay();
 
   const loading = !iframeURL || !iframeContentWindow || !initialised;
 
