@@ -23,9 +23,17 @@ Copy the `.env.example` file and rename it to `.env`.
 
 ## Webhook endpoints
 
-To see the list of endpoints this example serves, go to [the Swagger UI](http://localhost:3010/docs).
+To see the list of endpoints this example serves, go to [the Swagger UI](http://localhost:3000/docs).
 
 Apart from the `/api/v1/products` endpoint which is used to list the products available in the DB, the rest of the endpoints correspond to the [Primary Sales backend config documentation](https://docs.immutable.com/products/zkEVM/checkout/widgets/primary-sales/backend/byo).
+
+
+## Example requests
+
+For your convenience, we have also added a postman collection under the `postman` folder. These contain sample requests for each endpoint, using the seeded products data.
+
+To run the requests, download [Postman](https://www.postman.com/) and import the collection.
+
 
 ## TO-DO list
 
