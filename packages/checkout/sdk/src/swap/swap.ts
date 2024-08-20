@@ -5,7 +5,7 @@ import { TokenInfo } from '../types';
 import { createExchangeInstance } from '../instance';
 import { CheckoutConfiguration, getL2ChainId } from '../config';
 import { SwapQuoteResult, SwapResult } from '../types/swap';
-import { sendTransaction, setTransactionGasLimits } from '../transaction/transaction';
+import { sendTransaction } from '../transaction/transaction';
 
 const swapQuote = async (
   config: CheckoutConfiguration,
@@ -92,8 +92,7 @@ const swap = async (
     deadline,
   );
   if (quoteResult.approval) {
-    const approvalTxGasLimit = await setTransactionGasLimits(provider, quoteResult.approval.transaction);
-    const approvalTx = await sendTransaction(provider, approvalTxGasLimit);
+    const approvalTx = await sendTransaction(provider, quoteResult.approval.transaction);
     const receipt = await approvalTx.transactionResponse.wait();
     if (receipt.status === 0) {
       throw new CheckoutError(
@@ -102,8 +101,7 @@ const swap = async (
       );
     }
   }
-  const swapTxGasLimit = await setTransactionGasLimits(provider, quoteResult.swap.transaction);
-  const swapTx = await sendTransaction(provider, swapTxGasLimit);
+  const swapTx = await sendTransaction(provider, quoteResult.swap.transaction);
   const receipt = await swapTx.transactionResponse.wait();
   if (receipt.status === 0) {
     throw new CheckoutError(
