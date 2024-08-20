@@ -1,7 +1,14 @@
 import { AddFundsWidgetParams } from '@imtbl/checkout-sdk/dist/widgets/definitions/parameters/addFunds';
 import { Checkout, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
-import { useContext, useMemo, useReducer } from 'react';
+import {
+  useContext, useEffect, useMemo, useReducer,
+} from 'react';
+import { createWalletClient, custom } from 'viem';
+import { mainnet } from 'viem/chains';
+import {
+  createConfig, EVM, getToken, getTokenBalance,
+} from '@lifi/sdk';
 import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import {
@@ -32,13 +39,54 @@ export default function AddFundsWidget({
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
 
   const viewReducerValues = useMemo(
-    () => ({ viewState, viewDispatch }),
+    () => ({
+      viewState,
+      viewDispatch,
+    }),
     [viewState, viewReducer],
   );
 
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
+
+  useEffect(() => {
+    (async () => {
+      const client = createWalletClient({
+        chain: mainnet,
+        transport: custom({
+          async request({
+            method,
+            params,
+          }) {
+            const response = await web3Provider?.jsonRpcFetchFunc(method, params);
+            return response;
+          },
+        }),
+      });
+
+      const evmProvider = EVM({
+        getWalletClient: async () => client,
+      });
+
+      createConfig({
+        integrator: 'immutable',
+        providers: [evmProvider],
+      });
+
+      const chainId = 1;
+      const tokenContractAddress = '0x0000000000000000000000000000000000000000';
+      const walletAddress = await web3Provider?.getSigner().getAddress();
+
+      try {
+        const token = await getToken(chainId, tokenContractAddress);
+        const tokenBalance = await getTokenBalance(walletAddress!, token);
+        console.log(tokenBalance);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  }, [web3Provider]);
 
   return (
     <ViewContext.Provider value={viewReducerValues}>
