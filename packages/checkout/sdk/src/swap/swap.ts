@@ -4,16 +4,32 @@ import { CheckoutError, CheckoutErrorType } from '../errors';
 import { TokenInfo } from '../types';
 import { createExchangeInstance } from '../instance';
 import { CheckoutConfiguration, getL2ChainId } from '../config';
-import { SwapResult } from '../types/swap';
+import { SwapQuoteResult, SwapResult } from '../types/swap';
+import { sendTransaction, setTransactionGasLimits } from '../transaction/transaction';
 
-const swap = async (
+const swapQuote = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   fromToken: TokenInfo,
   toToken: TokenInfo,
   fromAmount?: string,
   toAmount?: string,
-): Promise<SwapResult> => {
+  slippagePercent?: number,
+  maxHops?: number,
+  deadline?: number,
+): Promise<SwapQuoteResult> => {
+  if (!fromToken.address || fromToken.decimals === 0) {
+    throw new CheckoutError(
+      'fromToken address or decimals is missing.',
+      CheckoutErrorType.MISSING_PARAMS,
+    );
+  }
+  if (!toToken.address || toToken.decimals === 0) {
+    throw new CheckoutError(
+      'toToken address or decimals is missing.',
+      CheckoutErrorType.MISSING_PARAMS,
+    );
+  }
   if (fromAmount && toAmount) {
     throw new CheckoutError(
       'Only one of fromAmount or toAmount can be provided.',
@@ -37,6 +53,9 @@ const swap = async (
       fromToken.address as string,
       toToken.address as string,
       BigNumber.from(utils.parseUnits(fromAmount, fromToken.decimals)),
+      slippagePercent,
+      maxHops,
+      deadline,
     );
   }
   return exchange.getUnsignedSwapTxFromAmountOut(
@@ -44,7 +63,59 @@ const swap = async (
     fromToken.address as string,
     toToken.address as string,
     BigNumber.from(utils.parseUnits(toAmount!, toToken.decimals)),
+    slippagePercent,
+    maxHops,
+    deadline,
   );
 };
 
-export { swap };
+const swap = async (
+  config: CheckoutConfiguration,
+  provider: Web3Provider,
+  fromToken: TokenInfo,
+  toToken: TokenInfo,
+  fromAmount?: string,
+  toAmount?: string,
+  slippagePercent?: number,
+  maxHops?: number,
+  deadline?: number,
+): Promise<SwapResult> => {
+  const quoteResult = await swapQuote(
+    config,
+    provider,
+    fromToken,
+    toToken,
+    fromAmount,
+    toAmount,
+    slippagePercent,
+    maxHops,
+    deadline,
+  );
+  if (quoteResult.approval) {
+    const approvalTxGasLimit = await setTransactionGasLimits(provider, quoteResult.approval.transaction);
+    const approvalTx = await sendTransaction(provider, approvalTxGasLimit);
+    const receipt = await approvalTx.transactionResponse.wait();
+    if (receipt.status === 0) {
+      throw new CheckoutError(
+        'Approval transaction failed and was reverted',
+        CheckoutErrorType.APPROVAL_TRANSACTION_FAILED,
+      );
+    }
+  }
+  const swapTxGasLimit = await setTransactionGasLimits(provider, quoteResult.swap.transaction);
+  const swapTx = await sendTransaction(provider, swapTxGasLimit);
+  const receipt = await swapTx.transactionResponse.wait();
+  if (receipt.status === 0) {
+    throw new CheckoutError(
+      'Swap transaction failed and was reverted',
+      CheckoutErrorType.TRANSACTION_FAILED,
+    );
+  }
+  return {
+    swapReceipt: receipt,
+    quote: quoteResult.quote,
+    swap: quoteResult.swap,
+  };
+};
+
+export { swapQuote, swap };

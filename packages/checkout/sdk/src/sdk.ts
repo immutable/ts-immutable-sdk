@@ -728,16 +728,23 @@ export class Checkout {
   /**
    * Fetches the approval and swap transaction details including the quote for the swap.
    * @param {SwapParams} params - The parameters for the swap.
-   * @returns {Promise<SwapResult>} - A promise that resolves to the swap result (approvla tx, swap tx, quote).
+   * @returns {Promise<SwapResult>} - A promise that resolves to the swap result (approval tx, swap tx, quote).
    */
   public async swap(params: SwapParams): Promise<SwapResult> {
-    return swap.swap(
+    const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
+    );
+    return swap.swap(
+      this.config,
+      web3Provider,
       params.fromToken,
       params.toToken,
       params.fromAmount,
       params.toAmount,
+      params.slippagePercent,
+      params.maxHops,
+      params.deadline,
     );
   }
 }
