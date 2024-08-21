@@ -4,8 +4,7 @@ import {
   useContext, useEffect, useRef, useState,
 } from 'react';
 import {
-  CheckoutEventType,
-  IMTBLWidgetEvents,
+  CheckoutEventType, IMTBLWidgetEvents,
   PostMessageHandlerEventType,
   WidgetEventData,
   WidgetType,
@@ -16,7 +15,10 @@ import { sendCheckoutEvent } from '../CheckoutWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { ErrorView } from '../../../views/error/ErrorView';
-import { IFRAME_INIT_TIMEOUT_MS, IFRAME_ALLOW_PERMISSIONS } from '../utils/config';
+import {
+  IFRAME_INIT_TIMEOUT_MS,
+  IFRAME_ALLOW_PERMISSIONS,
+} from '../utils/config';
 import { useEip6963Relayer } from '../hooks/useEip6963Relayer';
 import { useProviderRelay } from '../hooks/useProviderRelay';
 
@@ -64,6 +66,7 @@ export function CheckoutAppIframe() {
     if (!postMessageHandler) return undefined;
 
     // subscribe to widget events
+    // TODO: Move to its own hook
     postMessageHandler.subscribe(({ type, payload }) => {
       if (type !== PostMessageHandlerEventType.WIDGET_EVENT) return;
 
@@ -75,6 +78,14 @@ export function CheckoutAppIframe() {
           data: WidgetEventData[WidgetType.CHECKOUT][keyof WidgetEventData[WidgetType.CHECKOUT]];
         };
       } = payload as any;
+
+      // TODO: intercept connect success and inject the state provider
+      // FIXME: events type narrowing is not working properly
+      // if (customEvent.detail.type === CheckoutEventType.SUCCESS) {
+      //   if (payload.flow === CheckoutFlowType.CONNECT) {
+      //     console.log('------>', customEvent.detail.data)
+      //   }
+      // }
 
       // Forward widget events
       sendCheckoutEvent(eventTarget, customEvent.detail);

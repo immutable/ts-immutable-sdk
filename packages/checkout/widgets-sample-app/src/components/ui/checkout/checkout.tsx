@@ -16,18 +16,12 @@ import { Environment } from "@imtbl/config";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import { passport } from "../marketplace-orchestrator/passport";
 import { Box } from "@biom3/react";
-import { Web3Provider } from '@ethersproject/providers';
+import { Web3Provider } from "@ethersproject/providers";
 
 function CheckoutUI() {
-
-
-  const [web3Provider, setWeb3Provider] = useState<Web3Provider | undefined>(undefined);
-
-  useEffect(() => {
-    const provider = passport.connectEvm()
-    setWeb3Provider(new Web3Provider(provider));
-  }, []);
-
+  const [web3Provider, setWeb3Provider] = useState<Web3Provider | undefined>(
+    undefined
+  );
 
   const checkout = useMemo(
     () =>
@@ -40,27 +34,73 @@ function CheckoutUI() {
     []
   );
   const factory = useMemo(
-    () => web3Provider ?
-      new WidgetsFactory(checkout, { theme: WidgetTheme.DARK, language: "en" })
-      : undefined,
+    () =>
+      web3Provider
+        ? new WidgetsFactory(checkout, {
+            theme: WidgetTheme.DARK,
+            language: "en",
+          })
+        : undefined,
     [checkout, web3Provider]
   );
   const checkoutWidget = useMemo(
-    () => factory ?
-      factory.create(WidgetType.CHECKOUT, {
-        config: {
-          theme: WidgetTheme.LIGHT,
-          wallet: { showNetworkMenu: false },
-          sale: {
-            hideExcludedPaymentTypes: true,
-          },
-        },
-        provider: web3Provider,
-      })
-      : undefined
-    ,
+    () =>
+      factory
+        ? factory.create(WidgetType.CHECKOUT, {
+            config: {
+              theme: WidgetTheme.LIGHT,
+              wallet: { showNetworkMenu: false },
+              sale: {
+                hideExcludedPaymentTypes: true,
+              },
+            },
+            provider: web3Provider,
+          })
+        : undefined,
     [factory]
   );
+
+  // Case 1: with MM
+  useEffect(() => {
+    (async () => {
+      const { provider: newProvider } = await checkout.createProvider({
+        walletProviderName: WalletProviderName.METAMASK,
+      });
+
+      await checkout.connect({
+        provider: newProvider,
+      });
+
+      const { isConnected } = await checkout.checkIsWalletConnected({
+        provider: newProvider,
+      });
+
+      if (isConnected) {
+        setWeb3Provider(newProvider);
+      }
+    })();
+  }, []);
+
+  // Case 1: with Passport
+  // useEffect(() => {
+  //   const passportProvider = passport.connectEvm();
+  //   setWeb3Provider(new Web3Provider(passportProvider));
+  // }, []);
+
+  // Case 2: with MM
+  // useEffect(() => {
+  //   (async () => {
+  //     const { provider: newProvider } = await checkout.createProvider({
+  //       walletProviderName: WalletProviderName.METAMASK,
+  //     });
+
+  //     setWeb3Provider(newProvider);
+
+  //     await checkout.connect({
+  //       provider: newProvider,
+  //     });
+  //   })();
+  // }, []);
 
   const unmount = () => {
     checkoutWidget?.unmount();
@@ -92,39 +132,43 @@ function CheckoutUI() {
       console.log("----------> CLOSE", data);
     });
 
-    checkoutWidget.addListener(CheckoutEventType.SUCCESS, (data) => {
+    checkoutWidget.addListener(CheckoutEventType.SUCCESS, (payload) => {
+      if (payload.flow === CheckoutFlowType.CONNECT) {
+        setWeb3Provider(payload.data.provider);
+      }
+
       if (
-        data.flow === CheckoutFlowType.SALE &&
-        data.type === CheckoutSuccessEventType.SALE_SUCCESS
+        payload.flow === CheckoutFlowType.SALE &&
+        payload.type === CheckoutSuccessEventType.SALE_SUCCESS
       ) {
-        console.log("----------> SUCCESS SALE_SUCESS", data);
+        console.log("----------> SUCCESS SALE_SUCESS", payload);
       }
       if (
-        data.flow === CheckoutFlowType.SALE &&
-        data.type === CheckoutSuccessEventType.SALE_TRANSACTION_SUCCESS
+        payload.flow === CheckoutFlowType.SALE &&
+        payload.type === CheckoutSuccessEventType.SALE_TRANSACTION_SUCCESS
       ) {
-        console.log("----------> SUCCESS SALE_TRANSACTION_SUCCESS", data);
+        console.log("----------> SUCCESS SALE_TRANSACTION_SUCCESS", payload);
       }
-      if (data.flow === CheckoutFlowType.ONRAMP) {
-        console.log("----------> SUCCESS ONRAMP", data);
+      if (payload.flow === CheckoutFlowType.ONRAMP) {
+        console.log("----------> SUCCESS ONRAMP", payload);
       }
       if (
-        data.flow === CheckoutFlowType.BRIDGE &&
-        data.type === CheckoutSuccessEventType.BRIDGE_SUCCESS
+        payload.flow === CheckoutFlowType.BRIDGE &&
+        payload.type === CheckoutSuccessEventType.BRIDGE_SUCCESS
       ) {
-        console.log("----------> SUCCESS BRIDGE_SUCCESS", data);
+        console.log("----------> SUCCESS BRIDGE_SUCCESS", payload);
       }
       if (
-        data.flow === CheckoutFlowType.BRIDGE &&
-        data.type === CheckoutSuccessEventType.BRIDGE_CLAIM_WITHDRAWAL_SUCCESS
+        payload.flow === CheckoutFlowType.BRIDGE &&
+        payload.type === CheckoutSuccessEventType.BRIDGE_CLAIM_WITHDRAWAL_SUCCESS
       ) {
         console.log(
           "----------> SUCCESS BRIDGE_CLAIM_WITHDRAWAL_SUCCESS",
-          data.data
+          payload.data
         );
       }
 
-      console.log("----------> SUCCESS", data);
+      console.log("----------> SUCCESS", payload);
     });
 
     checkoutWidget.addListener(CheckoutEventType.FAILURE, (data) => {
