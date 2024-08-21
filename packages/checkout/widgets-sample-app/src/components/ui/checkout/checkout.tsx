@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Checkout,
   CheckoutFlowType,
@@ -16,8 +16,19 @@ import { Environment } from "@imtbl/config";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import { passport } from "../marketplace-orchestrator/passport";
 import { Box } from "@biom3/react";
+import { Web3Provider } from '@ethersproject/providers';
 
 function CheckoutUI() {
+
+
+  const [web3Provider, setWeb3Provider] = useState<Web3Provider | undefined>(undefined);
+
+  useEffect(() => {
+    const provider = passport.connectEvm()
+    setWeb3Provider(new Web3Provider(provider));
+  }, []);
+
+
   const checkout = useMemo(
     () =>
       new Checkout({
@@ -29,12 +40,13 @@ function CheckoutUI() {
     []
   );
   const factory = useMemo(
-    () =>
-      new WidgetsFactory(checkout, { theme: WidgetTheme.DARK, language: "en" }),
-    [checkout]
+    () => web3Provider ?
+      new WidgetsFactory(checkout, { theme: WidgetTheme.DARK, language: "en" })
+      : undefined,
+    [checkout, web3Provider]
   );
   const checkoutWidget = useMemo(
-    () =>
+    () => factory ?
       factory.create(WidgetType.CHECKOUT, {
         config: {
           theme: WidgetTheme.LIGHT,
@@ -43,24 +55,27 @@ function CheckoutUI() {
             hideExcludedPaymentTypes: true,
           },
         },
-      }),
-    [checkout]
+        provider: web3Provider,
+      })
+      : undefined
+    ,
+    [factory]
   );
 
   const unmount = () => {
-    checkoutWidget.unmount();
+    checkoutWidget?.unmount();
   };
 
   const update = (theme: WidgetTheme) => {
-    checkoutWidget.update({ config: { theme } });
+    checkoutWidget?.update({ config: { theme } });
   };
 
   useEffect(() => {
-    passport.connectEvm();
-    checkoutWidget.mount("checkout", {
+    if (!checkoutWidget) return;
+    checkoutWidget?.mount("checkout", {
       flow: CheckoutFlowType.WALLET,
     });
-  }, []);
+  }, [checkoutWidget]);
 
   useEffect(() => {
     if (!checkoutWidget) return;
@@ -179,7 +194,7 @@ function CheckoutUI() {
       >
         <button
           onClick={() => {
-            checkoutWidget.mount("checkout", {
+            checkoutWidget?.mount("checkout", {
               flow: CheckoutFlowType.CONNECT,
               // blocklistWalletRdns: ["io.metamask"],
             });
@@ -189,7 +204,7 @@ function CheckoutUI() {
         </button>
         <button
           onClick={() => {
-            checkoutWidget.mount("checkout", {
+            checkoutWidget?.mount("checkout", {
               flow: CheckoutFlowType.WALLET,
               walletProviderName: WalletProviderName.METAMASK,
             });
@@ -199,7 +214,7 @@ function CheckoutUI() {
         </button>
         <button
           onClick={() => {
-            checkoutWidget.mount("checkout", {
+            checkoutWidget?.mount("checkout", {
               flow: CheckoutFlowType.SWAP,
               amount: "0.1",
               fromTokenAddress: "0x3B2d8A1931736Fc321C24864BceEe981B11c3c57", // usdc
@@ -211,7 +226,7 @@ function CheckoutUI() {
         </button>
         <button
           onClick={() => {
-            checkoutWidget.mount("checkout", {
+            checkoutWidget?.mount("checkout", {
               flow: CheckoutFlowType.BRIDGE,
               amount: "0.2",
               tokenAddress: "native",
@@ -222,7 +237,7 @@ function CheckoutUI() {
         </button>
         <button
           onClick={() => {
-            checkoutWidget.mount("checkout", {
+            checkoutWidget?.mount("checkout", {
               flow: CheckoutFlowType.ONRAMP,
               amount: "10",
               tokenAddress: "native",
@@ -233,7 +248,7 @@ function CheckoutUI() {
         </button>
         <button
           onClick={() => {
-            checkoutWidget.mount("checkout", {
+            checkoutWidget?.mount("checkout", {
               flow: CheckoutFlowType.SALE,
               items: [
                 {
@@ -261,7 +276,7 @@ function CheckoutUI() {
       <select
         onChange={(e) => {
           console.log("change language");
-          checkoutWidget.update({
+          checkoutWidget?.update({
             config: { language: e.target.value as WidgetLanguage },
           });
         }}

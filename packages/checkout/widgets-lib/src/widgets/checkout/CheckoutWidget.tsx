@@ -4,6 +4,7 @@ import {
   CheckoutWidgetConfiguration,
   CheckoutWidgetParams,
 } from '@imtbl/checkout-sdk';
+import { Web3Provider } from '@ethersproject/providers';
 import {
   checkoutReducer,
   initialCheckoutState,
@@ -16,10 +17,13 @@ export type CheckoutWidgetInputs = {
   checkout: Checkout;
   params: CheckoutWidgetParams;
   config: CheckoutWidgetConfiguration;
+  provider?: Web3Provider
 };
 
 export default function CheckoutWidget(props: CheckoutWidgetInputs) {
-  const { config, checkout, params } = props;
+  const {
+    config, checkout, params, provider,
+  } = props;
   const { environment, publishableKey } = checkout.config;
 
   const [, iframeURL] = useMemo(() => {
@@ -33,10 +37,12 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   );
   const checkoutReducerValues = useMemo(
     () => ({
-      checkoutState: { ...checkoutState, iframeURL, checkout },
+      checkoutState: {
+        ...checkoutState, iframeURL, checkout, provider,
+      },
       checkoutDispatch,
     }),
-    [checkoutState, checkoutDispatch, iframeURL, checkout],
+    [checkoutState, checkoutDispatch, iframeURL, checkout, provider],
   );
 
   return (

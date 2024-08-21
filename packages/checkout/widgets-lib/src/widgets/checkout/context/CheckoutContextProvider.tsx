@@ -1,4 +1,4 @@
-import { PostMessageHandler } from '@imtbl/checkout-sdk';
+import { PostMessageHandler, PostMessageHandlerEventType } from '@imtbl/checkout-sdk';
 import {
   Dispatch, ReactNode, useContext, useEffect,
 } from 'react';
@@ -8,7 +8,6 @@ import {
   CheckoutContext,
   CheckoutState,
 } from './CheckoutContext';
-import { ProviderRelay } from './ProviderRelay';
 
 type CheckoutContextProviderProps = {
   values: {
@@ -54,11 +53,9 @@ export function CheckoutContextProvider({
   useEffect(() => {
     if (!provider || !postMessageHandler) return;
 
-    checkoutDispatch({
-      payload: {
-        type: CheckoutActions.SET_PROVIDER_RELAY,
-        providerRelay: new ProviderRelay(postMessageHandler, provider),
-      },
+    postMessageHandler.send(PostMessageHandlerEventType.PROVIDER_UPDATED, {
+      isMetamask: provider.provider.isMetaMask,
+      isPassport: (provider.provider as any)?.isPassport,
     });
   }, [provider, postMessageHandler]);
 

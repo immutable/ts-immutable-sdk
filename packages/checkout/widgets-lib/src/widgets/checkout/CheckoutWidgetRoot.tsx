@@ -59,6 +59,7 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
               }
             >
               <CheckoutWidget
+                provider={this.web3Provider}
                 checkout={this.checkout}
                 config={config}
                 params={this.parameters}

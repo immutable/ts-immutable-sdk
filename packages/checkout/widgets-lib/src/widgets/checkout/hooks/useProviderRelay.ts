@@ -71,14 +71,14 @@ export function useProviderRelay() {
 
       const injectedProviders = checkout.getInjectedProviders();
       const targetProvider = injectedProviders.find(
-        (p) => p.info.uuid === providerRelayPayload.eip6963Info.uuid,
+        (p) => p.info.uuid === providerRelayPayload?.eip6963Info?.uuid,
       );
 
-      if (!targetProvider) {
+      if (!targetProvider && providerRelayPayload.eip6963Info !== undefined) {
         // eslint-disable-next-line no-console
         console.error(
           'PARENT - requested provider not found',
-          providerRelayPayload.eip6963Info,
+          providerRelayPayload?.eip6963Info,
           injectedProviders,
         );
         return;
@@ -86,11 +86,16 @@ export function useProviderRelay() {
 
       // If provider is not defined, connect the target provider
       let currentProvider = provider;
-      if (!currentProvider) {
+      if (!currentProvider && targetProvider) {
         const connectResponse = await checkout.connect({
           provider: new Web3Provider(targetProvider.provider),
         });
         currentProvider = connectResponse.provider;
+      }
+
+      if (!currentProvider) {
+        // eslint-disable-next-line no-console
+        throw new Error('Provider is not defined');
       }
 
       // Set provider and execute the request
@@ -99,10 +104,6 @@ export function useProviderRelay() {
           type: CheckoutActions.SET_PROVIDER,
           provider: currentProvider,
         },
-      });
-
-      postMessageHandler.send(PostMessageHandlerEventType.PROVIDER_UPDATED, {
-        eip6963Info: payload.eip6963Info,
       });
 
       await execute(providerRelayPayload, currentProvider);
