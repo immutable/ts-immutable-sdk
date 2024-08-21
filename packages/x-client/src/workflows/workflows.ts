@@ -14,6 +14,13 @@ import {
   CreateMetadataRefreshRequest,
   MetadataSchemaRequest,
   PrimarySalesApiSignableCreatePrimarySaleRequest,
+  Project,
+  Collection,
+  SuccessResponse,
+  GetMetadataRefreshes,
+  GetMetadataRefreshErrorsResponse,
+  GetMetadataRefreshResponse,
+  CreateMetadataRefreshResponse,
 } from '../types/api';
 import {
   UnsignedMintRequest,
@@ -113,7 +120,7 @@ export class Workflows {
     });
   }
 
-  public async getProject(ethSigner: EthSigner, id: string) {
+  public async getProject(ethSigner: EthSigner, id: string): Promise<AxiosResponse<Project, any>> {
     const imxAuthHeaders = await generateIMXAuthorisationHeaders(ethSigner);
 
     return this.projectsApi.getProject({
@@ -126,7 +133,7 @@ export class Workflows {
   public async createCollection(
     ethSigner: EthSigner,
     createCollectionRequest: CreateCollectionRequest,
-  ) {
+  ): Promise<AxiosResponse<Collection, any>> {
     const imxAuthHeaders = await generateIMXAuthorisationHeaders(ethSigner);
 
     return this.collectionsApi.createCollection({
@@ -140,7 +147,7 @@ export class Workflows {
     ethSigner: EthSigner,
     address: string,
     updateCollectionRequest: UpdateCollectionRequest,
-  ) {
+  ): Promise<AxiosResponse<Collection, any>> {
     const imxAuthHeaders = await generateIMXAuthorisationHeaders(ethSigner);
 
     return this.collectionsApi.updateCollection({
@@ -155,7 +162,7 @@ export class Workflows {
     ethSigner: EthSigner,
     address: string,
     addMetadataSchemaToCollectionRequest: AddMetadataSchemaToCollectionRequest,
-  ) {
+  ): Promise<AxiosResponse<SuccessResponse, any>> {
     const imxAuthHeaders = await generateIMXAuthorisationHeaders(ethSigner);
 
     return this.metadataApi.addMetadataSchemaToCollection({
@@ -171,7 +178,7 @@ export class Workflows {
     address: string,
     name: string,
     metadataSchemaRequest: MetadataSchemaRequest,
-  ) {
+  ): Promise<AxiosResponse<SuccessResponse, any>> {
     const imxAuthHeaders = await generateIMXAuthorisationHeaders(ethSigner);
 
     return this.metadataApi.updateMetadataSchemaByName({
@@ -188,7 +195,7 @@ export class Workflows {
     collectionAddress?: string,
     pageSize?: number,
     cursor?: string,
-  ) {
+  ): Promise<AxiosResponse<GetMetadataRefreshes, any>> {
     const imxAuthHeaders = await generateIMXAuthorisationHeaders(ethSigner);
     const ethAddress = await ethSigner.getAddress();
 
@@ -207,7 +214,7 @@ export class Workflows {
     refreshId: string,
     pageSize?: number,
     cursor?: string,
-  ) {
+  ): Promise<AxiosResponse<GetMetadataRefreshErrorsResponse, any>> {
     const imxAuthHeaders = await generateIMXAuthorisationHeaders(ethSigner);
     const ethAddress = await ethSigner.getAddress();
 
@@ -224,7 +231,7 @@ export class Workflows {
   public async getMetadataRefreshResults(
     ethSigner: EthSigner,
     refreshId: string,
-  ) {
+  ): Promise<AxiosResponse<GetMetadataRefreshResponse, any>> {
     const imxAuthHeaders = await generateIMXAuthorisationHeaders(ethSigner);
     const ethAddress = await ethSigner.getAddress();
 
@@ -239,7 +246,7 @@ export class Workflows {
   public async createMetadataRefresh(
     ethSigner: EthSigner,
     request: CreateMetadataRefreshRequest,
-  ) {
+  ): Promise<AxiosResponse<CreateMetadataRefreshResponse, any>> {
     const imxAuthHeaders = await generateIMXAuthorisationHeaders(ethSigner);
     const ethAddress = await ethSigner.getAddress();
 

@@ -1,15 +1,15 @@
 import { MenuItem } from '@biom3/react';
 import { cloneElement, ReactElement, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { EIP6963ProviderDetail } from '@imtbl/checkout-sdk';
+import { EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
 import { RawImage } from '../RawImage/RawImage';
 
 export interface WalletItemProps<RC extends ReactElement | undefined = undefined> {
   loading?: boolean;
   recommended?: boolean;
   testId: string;
-  providerDetail: EIP6963ProviderDetail;
-  onWalletItemClick: (providerDetail: EIP6963ProviderDetail) => Promise<void>;
+  providerInfo: EIP6963ProviderInfo;
+  onWalletItemClick: () => void;
   rc?: RC;
 }
 
@@ -20,7 +20,7 @@ export function WalletItem<
   testId,
   loading = false,
   recommended = false,
-  providerDetail,
+  providerInfo,
   onWalletItemClick,
 }: WalletItemProps<RC>) {
   const { t } = useTranslation();
@@ -34,27 +34,27 @@ export function WalletItem<
           setBusy(true);
           // let the parent handle errors
           try {
-            await onWalletItemClick(providerDetail);
+            await onWalletItemClick();
           } finally {
             setBusy(false);
           }
         },
       })}
-      testId={`${testId}-wallet-list-${providerDetail.info.rdns}`}
+      testId={`${testId}-wallet-list-${providerInfo.rdns}`}
       size="medium"
       emphasized
       sx={{ position: 'relative' }}
     >
       <RawImage
-        src={providerDetail.info.icon}
-        alt={providerDetail.info.name}
+        src={providerInfo.icon}
+        alt={providerInfo.name}
         sx={{
           position: 'absolute',
           left: 'base.spacing.x3',
         }}
       />
       <MenuItem.Label size="medium" sx={{ marginLeft: '65px' }}>
-        {providerDetail.info.name}
+        {providerInfo.name}
       </MenuItem.Label>
       {((recommended || busy) && (
         <MenuItem.Badge

@@ -1,10 +1,9 @@
 module.exports = {
-  "ignorePatterns": ["jest.config.*"],
   "extends": ["../../.eslintrc"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": "./tsconfig.json",
-    "tsconfigRootDir": __dirname,
+    "tsconfigRootDir": __dirname
   },
   "rules": {
     "max-len": [

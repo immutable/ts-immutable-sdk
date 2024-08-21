@@ -16,7 +16,9 @@ import { sendCheckoutEvent } from '../CheckoutWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { ErrorView } from '../../../views/error/ErrorView';
-import { IFRAME_INIT_TIMEOUT_MS } from '../utils/config';
+import { IFRAME_INIT_TIMEOUT_MS, IFRAME_ALLOW_PERMISSIONS } from '../utils/config';
+import { useEip6963Relayer } from '../hooks/useEip6963Relayer';
+import { useProviderRelay } from '../hooks/useProviderRelay';
 
 export interface LoadingHandoverProps {
   text: string;
@@ -34,6 +36,9 @@ export function CheckoutAppIframe() {
     { iframeURL, postMessageHandler, iframeContentWindow },
     checkoutDispatch,
   ] = useCheckoutContext();
+
+  useEip6963Relayer();
+  useProviderRelay();
 
   const loading = !iframeURL || !iframeContentWindow || !initialised;
 
@@ -60,8 +65,10 @@ export function CheckoutAppIframe() {
 
     // subscribe to widget events
     postMessageHandler.subscribe(({ type, payload }) => {
+      if (type !== PostMessageHandlerEventType.WIDGET_EVENT) return;
+
       // FIXME: improve typing
-      const event: {
+      const customEvent: {
         type: IMTBLWidgetEvents.IMTBL_CHECKOUT_WIDGET_EVENT;
         detail: {
           type: CheckoutEventType;
@@ -69,19 +76,18 @@ export function CheckoutAppIframe() {
         };
       } = payload as any;
 
-      if (type !== PostMessageHandlerEventType.WIDGET_EVENT) return;
+      // Forward widget events
+      sendCheckoutEvent(eventTarget, customEvent.detail);
 
-      // forward events
-      sendCheckoutEvent(eventTarget, event.detail);
-
-      // check if the widget has been initialised
-      if (event.detail.type === CheckoutEventType.INITIALISED) {
+      // If iframe has been initialised, set widget as initialised
+      if (customEvent.detail.type === CheckoutEventType.INITIALISED) {
         setInitialised(true);
         clearTimeout(timeoutRef.current!);
       }
     });
 
-    // check if loaded correctly
+    // Expire iframe initialisation after timeout
+    // and set a loading error
     timeoutRef.current = setTimeout(() => {
       if (!initialised) {
         setLoadingError(true);
@@ -90,7 +96,6 @@ export function CheckoutAppIframe() {
     }, IFRAME_INIT_TIMEOUT_MS);
 
     return () => {
-      postMessageHandler.destroy();
       clearTimeout(timeoutRef.current!);
     };
   }, [postMessageHandler]);
@@ -122,9 +127,11 @@ export function CheckoutAppIframe() {
             <iframe
               id="checkout-app"
               title="checkout"
+              loading="lazy"
               ref={iframeRef}
               src={iframeURL}
               onLoad={onIframeLoad}
+              allow={IFRAME_ALLOW_PERMISSIONS}
             />
           )}
           sx={{

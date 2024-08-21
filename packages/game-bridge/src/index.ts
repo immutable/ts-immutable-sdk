@@ -716,7 +716,7 @@ window.callFunction = async (jsonData: string) => {
           method: 'eth_getTransactionReceipt',
           params: [request.txHash],
         });
-        const success = response !== null && response !== undefined;
+        const success = response !== undefined;
 
         if (!success) {
           throw new Error('Failed to get transaction receipt');
@@ -736,7 +736,7 @@ window.callFunction = async (jsonData: string) => {
       }
       case trackFunction: {
         const request = JSON.parse(data);
-        const properties = JSON.parse(request.properties);
+        const properties = request.properties ? JSON.parse(request.properties) : {};
         track(request.moduleName, request.eventName, properties);
         callbackToGame({
           responseFor: fxName,

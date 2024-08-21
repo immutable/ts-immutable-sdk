@@ -11,7 +11,7 @@ import {
 import { EnvironmentNames, RequestExampleProps } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
-import { NFT } from '@imtbl/generated-clients/dist/blockchain-data';
+import { BlockchainData } from '@imtbl/generated-clients';
 import WorkflowButton from '@/components/WorkflowButton';
 import { utils } from 'ethers';
 
@@ -20,7 +20,7 @@ type GroupedAsset = {
   assets: NFTCandidate[];
 };
 
-type NFTCandidate = NFT & { selected: boolean, to_address?: string, to_address_required?: string };
+type NFTCandidate = BlockchainData.NFT & { selected: boolean, to_address?: string, to_address_required?: string };
 
 const chainNameMapping = (environment: EnvironmentNames) => {
   switch (environment) {
@@ -36,7 +36,7 @@ const chainNameMapping = (environment: EnvironmentNames) => {
 };
 
 function NFTTransfer({ disabled, handleExampleSubmitted }: RequestExampleProps) {
-  const [assets, setAssets] = useState<NFT[]>([]);
+  const [assets, setAssets] = useState<BlockchainData.NFT[]>([]);
   const [transfers, setTransfers] = useState<Partial<NFTCandidate>[]>([]);
   const [fromAddress, setFromAddress] = useState<string>('');
   const { zkEvmProvider } = usePassportProvider();
@@ -111,14 +111,14 @@ function NFTTransfer({ disabled, handleExampleSubmitted }: RequestExampleProps) 
       };
       const assetsRes = await blockchainData.listNFTsByAccountAddress(payload);
 
-      setAssets(assetsRes.result as NFT[]);
+      setAssets(assetsRes.result as BlockchainData.NFT[]);
     };
     getAssets().catch(console.log);
   }, [blockchainData, chainName, fromAddress]);
 
   const groupedAssets = useMemo(
     () => assets
-      .reduce((group: GroupedAsset[], rawAsset: NFT) => {
+      .reduce((group: GroupedAsset[], rawAsset: BlockchainData.NFT) => {
         const sameContractAddressAssets = group.find(
           (g) => g.contract_address.toLowerCase() === rawAsset.contract_address.toLowerCase(),
         );

@@ -32,6 +32,10 @@ function App() {
         </div>
         <br />
         <div>
+          <a href={"/add-funds"}>Add Funds Widget</a>
+        </div>
+        <br />
+        <div>
           <a
             href={
               "/sale?environmentId=249d9b0b-ee16-4dd5-91ee-96bece3b0473&collectionName=Iguanas&excludePaymentTypes=credit"
