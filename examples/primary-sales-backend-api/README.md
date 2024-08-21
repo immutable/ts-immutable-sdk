@@ -37,4 +37,4 @@ To run the requests, download [Postman](https://www.postman.com/) and import the
 
 ## TO-DO list
 
-* Add authentication for each endponit, as per the [webhook authentication section](https://docs.immutable.com/products/zkEVM/checkout/widgets/primary-sales/backend/byo#webhook-authentication)
+* Add authentication for each endpoint, as per the [webhook authentication section](https://docs.immutable.com/products/zkEVM/checkout/widgets/primary-sales/backend/byo#webhook-authentication)
