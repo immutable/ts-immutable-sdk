@@ -6,3 +6,4 @@ export * as checkout from './checkout';
 export * as x from './x';
 export * as webhook from './webhook';
 export * as mintingBackend from './minting_backend';
+export * as reactPassport from './react_passport';
