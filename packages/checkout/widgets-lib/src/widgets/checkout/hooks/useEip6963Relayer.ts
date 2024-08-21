@@ -26,6 +26,7 @@ export function useEip6963Relayer() {
 
   const onRequest = useCallback((payload: any) => {
     if (payload.message !== 'eip6963:requestProvider') return;
+
     window.dispatchEvent(new CustomEvent('eip6963:requestProvider'));
   }, [postMessageHandler]);
 

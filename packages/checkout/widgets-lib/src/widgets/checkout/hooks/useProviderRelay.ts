@@ -1,5 +1,9 @@
 import { useCallback, useEffect } from 'react';
-import { EIP6963ProviderInfo, PostMessageData, PostMessageHandlerEventType } from '@imtbl/checkout-sdk';
+import {
+  EIP6963ProviderInfo,
+  PostMessageData,
+  PostMessageHandlerEventType,
+} from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { useCheckoutContext } from '../context/CheckoutContextProvider';
 import { CheckoutActions } from '../context/CheckoutContext';
@@ -17,86 +21,100 @@ interface JsonRpcRequestMessage<TParams = any> {
 }
 
 type ProviderRelayPayload = {
-  jsonRpcRequestMessage: JsonRpcRequestMessage,
-  eip6963Info: EIP6963ProviderInfo
+  jsonRpcRequestMessage: JsonRpcRequestMessage;
+  eip6963Info: EIP6963ProviderInfo;
 };
 
 export function useProviderRelay() {
-  const [checkoutState, checkoutDispatch] = useCheckoutContext();
+  const [{ checkout, postMessageHandler, provider }, checkoutDispatch] = useCheckoutContext();
 
-  const { checkout, postMessageHandler, provider } = checkoutState;
+  /**
+   * Execute a request using the provider
+   * and relay the response back using the postMessageHandler
+   */
+  const execute = useCallback(
+    async (payload: ProviderRelayPayload, executeProvider: Web3Provider) => {
+      if (!executeProvider?.provider.request) {
+        throw new Error("Provider only supports 'request' method");
+      }
 
-  const execute = useCallback(async (payload: ProviderRelayPayload, executeProvider: Web3Provider) => {
-    if (!executeProvider?.provider.request) {
-      throw new Error('Provider does not support request method');
-    }
-
-    executeProvider.provider
-      .request({
-        method: payload.jsonRpcRequestMessage.method,
-        params: payload.jsonRpcRequestMessage.params,
-      })
-      .then((resp) => {
-        const formattedResponse = {
-          id: payload.jsonRpcRequestMessage.id,
-          jsonrpc: '2.0',
-          result: resp,
-        };
-        // console.log('PARENT - execute done', formattedResponse, payload.jsonRpcRequestMessage, executeProvider);
-
-        postMessageHandler!.send(
-          PostMessageHandlerEventType.PROVIDER_RELAY,
-          {
-            response: formattedResponse,
-            eip6963Info: payload.eip6963Info,
-          },
+      if (!postMessageHandler) {
+        throw new Error(
+          'Provider can execute request because PostMessageHandler is not initialized',
         );
+      }
+
+      const { id, params, method } = payload.jsonRpcRequestMessage;
+
+      // Execute the request
+      const result = await executeProvider.provider.request({ method, params });
+      const formattedResponse = { id, result, jsonrpc: '2.0' };
+
+      // Send the response using the postMessageHandler
+      postMessageHandler.send(PostMessageHandlerEventType.PROVIDER_RELAY, {
+        response: formattedResponse,
+        eip6963Info: payload.eip6963Info,
       });
-  }, [postMessageHandler]);
+    },
+    [postMessageHandler],
+  );
 
-  const onMessage = useCallback(async ({ type, payload }: PostMessageData) => {
-    if (!postMessageHandler || !checkout) return;
-    if (type !== PostMessageHandlerEventType.PROVIDER_RELAY) return;
+  /**
+   * Handle incoming provider relay messages
+   */
+  const onJsonRpcRequestMessage = useCallback(
+    async ({ type, payload }: PostMessageData) => {
+      if (!postMessageHandler || !checkout) return;
+      if (type !== PostMessageHandlerEventType.PROVIDER_RELAY) return;
 
-    const providerRelayPayload = payload as ProviderRelayPayload;
+      const providerRelayPayload = payload as ProviderRelayPayload;
 
-    //
-    const injectedProviders = checkout.getInjectedProviders();
-    const targetProvider = injectedProviders.find((p) => p.info.uuid === providerRelayPayload.eip6963Info.uuid);
+      const injectedProviders = checkout.getInjectedProviders();
+      const targetProvider = injectedProviders.find(
+        (p) => p.info.uuid === providerRelayPayload.eip6963Info.uuid,
+      );
 
-    if (!targetProvider) {
-      console.error('PARENT - requested provider not found', providerRelayPayload.eip6963Info, injectedProviders);
-      return;
-    }
+      if (!targetProvider) {
+        console.error(
+          'PARENT - requested provider not found',
+          providerRelayPayload.eip6963Info,
+          injectedProviders,
+        );
+        return;
+      }
 
-    if (!provider) {
-      // console.log('PARENT - provider not found');
+      // If provider is not defined, connect the target provider
+      let currentProvider = provider;
+      if (!currentProvider) {
+        const connectResponse = await checkout.connect({
+          provider: new Web3Provider(targetProvider.provider),
+        });
+        currentProvider = connectResponse.provider;
+      }
 
-      const connectRes = await checkout.connect({
-        provider: new Web3Provider(targetProvider.provider),
+      // Set provider and execute the request
+      checkoutDispatch({
+        payload: {
+          type: CheckoutActions.SET_PROVIDER,
+          provider: currentProvider,
+        },
       });
 
       postMessageHandler.send(PostMessageHandlerEventType.PROVIDER_UPDATED, {
         eip6963Info: payload.eip6963Info,
       });
 
-      checkoutDispatch({
-        payload: {
-          type: CheckoutActions.SET_PROVIDER,
-          provider: connectRes.provider,
-        },
-      });
-      // console.log('PARENT - provider connected', connectRes);
-      await execute(providerRelayPayload, connectRes.provider);
-    } else {
-      // console.log('PARENT - provider found', provider);
-      await execute(providerRelayPayload, provider);
-    }
-  }, [provider, postMessageHandler, checkout]);
+      await execute(providerRelayPayload, currentProvider);
+    },
 
+    [provider, postMessageHandler, checkout, execute],
+  );
+
+  /**
+   * Subscribe to provider relay messages
+   */
   useEffect(() => {
-    if (!postMessageHandler || !checkout) return;
-
-    postMessageHandler.subscribe(onMessage);
-  }, [provider, postMessageHandler, checkout, execute, onMessage]);
+    if (!postMessageHandler) return;
+    postMessageHandler.subscribe(onJsonRpcRequestMessage);
+  }, [provider, postMessageHandler, execute, onJsonRpcRequestMessage]);
 }
