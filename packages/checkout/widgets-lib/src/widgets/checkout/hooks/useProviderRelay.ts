@@ -75,6 +75,7 @@ export function useProviderRelay() {
       );
 
       if (!targetProvider) {
+        // eslint-disable-next-line no-console
         console.error(
           'PARENT - requested provider not found',
           providerRelayPayload.eip6963Info,
