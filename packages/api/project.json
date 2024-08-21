@@ -1,0 +1,61 @@
+{
+    "name": "api",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "packages/api",
+    "targets": {
+        "deploy": {
+        "executor": "@nx-tools/nx-container:build",
+        "options": {
+            "context": ".",
+            "file": "packages/api/Dockerfile",
+            "push": true,
+            "metadata": {},
+            "cache-from": ["type=registry,ref=ghcr.io/immutable/ts-immutable-sdl/ts-sdk-api:buildcache"],
+            "cache-to": ["type=registry,ref=ghcr.io/immutable/ts-immutable-sdl/ts-sdk-api:buildcache,mode=max"]
+        },
+        "configurations": {
+            "local": {
+                "push": false,
+                "cache-from": [],
+                "cache-to": []
+            },
+            "pr": {
+                "push": false
+            },
+            "dev": {
+                "metadata": {
+                    "images": [
+                        "ghcr.io/immutable/ts-immutable-sdk/ts-sdk-api",
+                        "783421985614.dkr.ecr.us-east-2.amazonaws.com/ts-sdk-api"
+                    ],
+                    "tags": [
+                        "type=sha,prefix=develop-{{date 'YYYY-MM-DDTHH-mm-ss[Z]'}}-git."
+                    ]
+                }
+            },
+            "sandbox": {
+                "metadata": {
+                    "images": [
+                        "ghcr.io/immutable/ts-immutable-sdk/ts-sdk-api",
+                        "783421985614.dkr.ecr.us-east-2.amazonaws.com/ts-sdk-api"
+                    ],
+                    "tags": [
+                        "type=sha,prefix=sandbox-{{date 'YYYY-MM-DDTHH-mm-ss[Z]'}}-git."
+                    ]
+                }
+            },
+            "prod": {
+                "metadata": {
+                    "images": [
+                        "ghcr.io/immutable/ts-immutable-sdk/ts-sdk-api",
+                        "362750628221.dkr.ecr.us-east-2.amazonaws.com/ts-sdk-api"
+                    ],
+                    "tags": [
+                        "type=sha,prefix=prod-{{date 'YYYY-MM-DDTHH-mm-ss[Z]'}}-git."
+                    ]
+                }
+            }
+        }
+        }
+    }
+}
