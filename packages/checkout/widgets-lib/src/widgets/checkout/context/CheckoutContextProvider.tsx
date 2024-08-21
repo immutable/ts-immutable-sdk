@@ -52,17 +52,14 @@ export function CheckoutContextProvider({
   }, [iframeContentWindow, checkout, iframeURL]);
 
   useEffect(() => {
-    if (!provider || !postMessageHandler) return undefined;
+    if (!provider || !postMessageHandler) return;
+
     checkoutDispatch({
       payload: {
         type: CheckoutActions.SET_PROVIDER_RELAY,
         providerRelay: new ProviderRelay(postMessageHandler, provider),
       },
     });
-
-    return () => {
-      postMessageHandler?.destroy();
-    };
   }, [provider, postMessageHandler]);
 
   return (
