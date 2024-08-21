@@ -121,6 +121,6 @@ export const WITHDRAWAL_CLAIM_GAS_LIMIT = 91000;
  */
 export const CHECKOUT_APP_URL = {
   [ENV_DEVELOPMENT]: 'https://checkout.dev.immutable.com',
-  [Environment.SANDBOX]: 'https://checkout.sandbox.immutable.com',
+  [Environment.SANDBOX]: 'http://localhost:3001',
   [Environment.PRODUCTION]: 'https://checkout.immutable.com',
 };
