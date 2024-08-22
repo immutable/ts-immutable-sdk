@@ -16,9 +16,11 @@ import i18n from '../../i18n';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
 import {
+  ConnectLoader,
   ConnectLoaderParams,
 } from '../../components/ConnectLoader/ConnectLoader';
 import { getL1ChainId, getL2ChainId } from '../../lib';
+import { sendAddFundsCloseEvent } from './AddFundsWidgetEvents';
 
 const AddFundsWidget = React.lazy(() => import('./AddFundsWidget'));
 
@@ -70,26 +72,26 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="add-funds-container" config={this.strongConfig()}>
             <HandoverProvider>
-              {/* <ConnectLoader
+              <ConnectLoader
                 widgetConfig={this.strongConfig()}
                 params={connectLoaderParams}
                 closeEvent={() => sendAddFundsCloseEvent(window)}
-              > */}
-              <Suspense
-                fallback={
-                  <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
-                }
               >
-                <AddFundsWidget
-                  web3Provider={this.web3Provider}
-                  showBridgeOption={this.parameters.showBridgeOption}
-                  showSwapOption={this.parameters.showSwapOption}
-                  showOnrampOption={this.parameters.showOnrampOption}
-                  tokenAddress={this.parameters.tokenAddress}
-                  amount={this.parameters.amount}
-                />
-              </Suspense>
-              {/* </ConnectLoader> */}
+                <Suspense
+                  fallback={
+                    <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
+                  }
+                >
+                  <AddFundsWidget
+                    web3Provider={this.web3Provider}
+                    showBridgeOption={this.parameters.showBridgeOption}
+                    showSwapOption={this.parameters.showSwapOption}
+                    showOnrampOption={this.parameters.showOnrampOption}
+                    tokenAddress={this.parameters.tokenAddress}
+                    amount={this.parameters.amount}
+                  />
+                </Suspense>
+              </ConnectLoader>
             </HandoverProvider>
           </ThemeProvider>
         </CustomAnalyticsProvider>

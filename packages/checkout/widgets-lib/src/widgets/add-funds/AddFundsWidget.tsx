@@ -240,6 +240,8 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
     }
   };
 
+  const executeQuote = () => {};
+
   return (
     <ViewContext.Provider value={viewReducerValues}>
       <Box
@@ -323,6 +325,15 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
         </Box>
 
         {quotes && <Quotes quotes={quotes} />}
+
+        <Box>
+          <Box sx={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
+            <Heading sx={{ marginBottom: '20px' }}>3. Execute Quote</Heading>
+            <Button onClick={executeQuote}>
+              {isLoadingQuotes ? 'Loading Quotes...' : 'Get Quotes'}
+            </Button>
+          </Box>
+        </Box>
       </Box>
     </ViewContext.Provider>
   );
