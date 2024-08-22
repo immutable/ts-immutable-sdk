@@ -8,12 +8,6 @@ import { HttpClient } from '../api/http';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { RemoteConfigFetcher } from './remoteConfigFetcher';
 
-const chainSlugMap = new Map<ChainId, ChainSlug>([
-  [ChainId.IMTBL_ZKEVM_MAINNET, ChainSlug.IMTBL_ZKEVM_MAINNET],
-  [ChainId.IMTBL_ZKEVM_TESTNET, ChainSlug.IMTBL_ZKEVM_TESTNET],
-  [ChainId.IMTBL_ZKEVM_DEVNET, ChainSlug.IMTBL_ZKEVM_DEVNET],
-]);
-
 type TokensEndpointResult = {
   chain: {
     id: string;
@@ -62,7 +56,13 @@ export class TokensFetcher {
     return IMMUTABLE_API_BASE_URL[Environment.SANDBOX];
   };
 
-  private async loadTokens(chainSlug: ChainSlug): Promise<ChainTokensConfig | undefined> {
+  private getChainSlug = () => {
+    if (this.isDevelopment) return ChainSlug.IMTBL_ZKEVM_DEVNET;
+    if (this.isProduction) return ChainSlug.IMTBL_ZKEVM_MAINNET;
+    return ChainSlug.IMTBL_ZKEVM_TESTNET;
+  };
+
+  private async loadTokens(): Promise<ChainTokensConfig | undefined> {
     if (this.tokensCache) {
       return this.tokensCache;
     }
@@ -70,7 +70,7 @@ export class TokensFetcher {
     let response: AxiosResponse;
     try {
       response = await this.httpClient.get(
-        `${this.getBaseUrl()}/v1/chains/${chainSlug}/tokens?verification_status=verified&is_canonical=true`,
+        `${this.getBaseUrl()}/v1/chains/${this.getChainSlug()}/tokens?verification_status=verified&is_canonical=true`,
       );
     } catch (err: any) {
       throw new CheckoutError(
@@ -88,10 +88,7 @@ export class TokensFetcher {
   }
 
   public async getTokensConfig(chainId: ChainId): Promise<TokenInfo[]> {
-    const chainSlug = chainSlugMap.get(chainId);
-    if (!chainSlug) return [];
-
-    const config = await this.loadTokens(chainSlug);
+    const config = await this.loadTokens();
     if (!config || !config[chainId]) return [];
 
     return config[chainId] ?? [];
