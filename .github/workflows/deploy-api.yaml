@@ -17,10 +17,11 @@ jobs:
     steps:
       - name: configure aws credentials
         id: aws-credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: ${{ secrets.AWS_IMMUTABLE_PROD_ADMIN_ROLE }}
           aws-region: ${{ env.AWS_REGION }}
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
