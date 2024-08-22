@@ -2,7 +2,7 @@ export const responsiveStyles = {
   // width: 'clamp(320px, 100vw, 430px)',
   width: '1000px',
   minHeight: '500px',
-  height: '100vh',
+  // height: '100vh',
   // maxHeight: '650px',
   position: 'relative',
   overflow: 'hidden',

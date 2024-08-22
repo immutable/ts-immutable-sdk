@@ -20,11 +20,15 @@ import {
 } from '@lifi/sdk';
 import { findDefaultToken } from '@lifi/data-types';
 import {
+  Body, Box, Button, Heading,
+} from '@biom3/react';
+import {
   ViewContext,
   initialViewState,
   viewReducer,
 } from '../../context/view-context/ViewContext';
-import { Poc } from './views/poc';
+import { Balances } from './components/Balances';
+import { Quotes } from './components/Quotes';
 
 export type AddFundsWidgetInputs = AddFundsWidgetParams & {
   web3Provider?: Web3Provider;
@@ -35,15 +39,25 @@ export type PocInputs = {
   quotes: any;
 };
 
-export default function AddFundsWidget({
-  web3Provider,
-}: AddFundsWidgetInputs) {
+export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const [balances, setBalances] = useState<
   { [chainId: number]: TokenAmount[] } | undefined
   >();
-
   const [quotes, setQuotes] = useState<LiFiStep[] | undefined>();
+  const [isLoadingBalances, setIsLoadingBalances] = useState(false);
+  const [isLoadingQuotes, setIsLoadingQuotes] = useState(false);
+  const [balanceFetchTime, setBalanceFetchTime] = useState<number | null>(null);
+  const [quoteFetchTime, setQuoteFetchTime] = useState<number | null>(null);
+  const [balanceError, setBalanceError] = useState<{
+    code: string;
+    message: string;
+  } | null>(null);
+  const [quoteError, setQuoteError] = useState<{
+    code: string;
+    message: string;
+  } | null>(null);
+
   const viewReducerValues = useMemo(
     () => ({
       viewState,
@@ -52,8 +66,10 @@ export default function AddFundsWidget({
     [viewState, viewReducer],
   );
 
+  const richWallet = '0xe93685f3bBA03016F02bD1828BaDD6195988D950';
+
   useEffect(() => {
-    (async () => {
+    const initializeLifiConfig = async () => {
       const client = createWalletClient({
         chain: mainnet,
         transport: custom({
@@ -77,128 +93,191 @@ export default function AddFundsWidget({
           '0809bf15-d159-42dd-b079-756d1c3b0458.d17e73a9-93fa-4d60-ac1e-a1a027425c3b',
         providers: [evmProvider],
       });
+    };
 
-      // const chainId = 1;
-      // const tokenContractAddress = '0x0000000000000000000000000000000000000000';
-      // const walletAddress = await web3Provider?.getSigner().getAddress();
-      // console.log('connected wallet address', walletAddress);
+    initializeLifiConfig();
+  }, [web3Provider]);
 
-      const richWallet = '0xe93685f3bBA03016F02bD1828BaDD6195988D950';
+  const fetchBalances = async () => {
+    setIsLoadingBalances(true);
+    const start = Date.now();
 
-      // DO WE QUERY TOKEN FROM SOMEWHERE?
-      const tokensByChain = {
-        1: [
-          {
-            chainId: 1,
-            address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-            symbol: 'USDC',
-            name: 'USDC',
-            decimals: 18,
-            priceUSD: '0.9999',
-          },
-        ],
-        59144: [
-          {
-            chainId: 59144,
-            address: '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f',
-            symbol: 'WETH',
-            name: 'Wrapped Ether ',
-            decimals: 18,
-            priceUSD: '0.9999',
-          },
-        ],
-      };
-      try {
-        const balancesResponse = await getTokenBalancesByChain(
-          richWallet,
-          tokensByChain,
-        );
-        setBalances(balancesResponse);
-        console.log('===== balanceResponse', balancesResponse);
-      } catch (error) {
-        console.error('===== balanceResponse ERROR', error);
-      }
-
-      const configs = [
+    const tokensByChain = {
+      1: [
         {
-          fromChain: ChainId.ETH,
-          fromToken: findDefaultToken(CoinKey.USDC, ChainId.ETH).address,
-          toChain: ChainId.LNA,
-          toToken: findDefaultToken(CoinKey.USDC, ChainId.LNA).address,
-          toAmount: '1000000',
+          chainId: 1,
+          address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+          symbol: 'USDC',
+          name: 'USDC',
+          decimals: 18,
+          priceUSD: '0.9999',
         },
-        // {
-        //   fromChain: ChainId.ETH,
-        //   fromToken: findDefaultToken(CoinKey.ETH, ChainId.ETH).address,
-        //   toChain: ChainId.LNA,
-        //   toToken: findDefaultToken(CoinKey.USDC, ChainId.LNA).address,
-        //   toAmount: '1000000',
-        // },
-        // {
-        //   fromChain: ChainId.MNT,
-        //   fromToken: findDefaultToken(CoinKey.USDT, ChainId.MNT).address,
-        //   toChain: ChainId.LNA,
-        //   toToken: findDefaultToken(CoinKey.USDC, ChainId.LNA).address,
-        //   toAmount: '1000000',
-        // },
-        // {
-        //   fromChain: ChainId.MNT,
-        //   fromToken: findDefaultToken(CoinKey.WETH, ChainId.MNT).address,
-        //   toChain: ChainId.LNA,
-        //   toToken: findDefaultToken(CoinKey.USDC, ChainId.LNA).address,
-        //   toAmount: '1000000',
-        // },
-        // {
-        //   fromChain: ChainId.MNT,
-        //   fromToken: findDefaultToken(CoinKey.WBTC, ChainId.MNT).address,
-        //   toChain: ChainId.LNA,
-        //   toToken: findDefaultToken(CoinKey.USDC, ChainId.LNA).address,
-        //   toAmount: '1000000',
-        // },
-        // {
-        //   fromChain: ChainId.CEL,
-        //   fromToken: findDefaultToken(CoinKey.CELO, ChainId.CEL).address,
-        //   toChain: ChainId.LNA,
-        //   toToken: findDefaultToken(CoinKey.USDC, ChainId.LNA).address,
-        //   toAmount: '1000000',
-        // },
-        // {
-        //   fromChain: ChainId.CEL,
-        //   fromToken: findDefaultToken(CoinKey.WETH, ChainId.CEL).address,
-        //   toChain: ChainId.LNA,
-        //   toToken: findDefaultToken(CoinKey.USDC, ChainId.LNA).address,
-        //   toAmount: '1000000',
-        // },
-      ];
+      ],
+      59144: [
+        {
+          chainId: 59144,
+          address: '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f',
+          symbol: 'WETH',
+          name: 'Wrapped Ether ',
+          decimals: 18,
+          priceUSD: '0.9999',
+        },
+      ],
+    };
 
-      const start = Date.now();
-      const quoteRequests = configs.map((config) => {
-        const quoteRequest: ContractCallsQuoteRequest = {
-          fromChain: config.fromChain,
-          fromToken: config.fromToken,
-          fromAddress: richWallet!,
-          toChain: config.toChain,
-          toToken: config.toToken,
-          toAmount: config.toAmount,
-          contractCalls: [],
-        };
-        return getContractCallsQuote(quoteRequest);
+    try {
+      const balancesResponse = await getTokenBalancesByChain(
+        richWallet,
+        tokensByChain,
+      );
+      setBalances(balancesResponse);
+      console.log('===== balanceResponse', balancesResponse);
+    } catch (error: any) {
+      console.error('===== balanceResponse ERROR', error);
+      setBalanceError({
+        code: error.code || 'UNKNOWN_ERROR',
+        message:
+          error.message || 'An unknown error occurred while fetching balances.',
       });
-
-      const contractCallQuoteResponses = await Promise.all(quoteRequests);
-
-      setQuotes(contractCallQuoteResponses);
-
+    } finally {
       const end = Date.now();
+      setBalanceFetchTime((end - start) / 1000);
+      setIsLoadingBalances(false);
+    }
+  };
 
-      console.log('Time', end - start / 1000);
+  const fetchQuotes = async () => {
+    setIsLoadingQuotes(true);
+    const start = Date.now();
+
+    const configs = [
+      {
+        fromChain: ChainId.ETH,
+        fromToken: findDefaultToken(CoinKey.USDC, ChainId.ETH).address,
+        toChain: ChainId.LNA,
+        toToken: findDefaultToken(CoinKey.USDC, ChainId.LNA).address,
+        toAmount: '1000000',
+      },
+    ];
+
+    const quoteRequests = configs.map((config) => {
+      const quoteRequest: ContractCallsQuoteRequest = {
+        fromChain: config.fromChain,
+        fromToken: config.fromToken,
+        fromAddress: richWallet!,
+        toChain: config.toChain,
+        toToken: config.toToken,
+        toAmount: config.toAmount,
+        contractCalls: [],
+      };
+      return getContractCallsQuote(quoteRequest);
+    });
+
+    try {
+      const contractCallQuoteResponses = await Promise.all(quoteRequests);
+      setQuotes(contractCallQuoteResponses);
       console.log(contractCallQuoteResponses);
-    })();
-  }, []);
+    } catch (error: any) {
+      // Catch error and extract code/message
+      console.error('===== quoteResponse ERROR', error);
+      setQuoteError({
+        code: error.code || 'UNKNOWN_ERROR',
+        message:
+          error.message || 'An unknown error occurred while fetching quotes.',
+      });
+    } finally {
+      const end = Date.now();
+      setQuoteFetchTime((end - start) / 1000);
+      setIsLoadingQuotes(false);
+    }
+  };
 
   return (
     <ViewContext.Provider value={viewReducerValues}>
-      {balances && quotes && <Poc balances={balances} quotes={quotes} />}
+      <Box
+        sx={{
+          border: '3px solid gray',
+          minHeight: '800px',
+          padding: '20px',
+          borderRadius: '20px',
+        }}
+      >
+        <Box>
+          <Box sx={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
+            <Heading sx={{ marginBottom: '20px' }}>1. Get Balances</Heading>
+            <Button
+              sx={{ marginBottom: '20px' }}
+              onClick={fetchBalances}
+              disabled={isLoadingBalances}
+            >
+              {isLoadingBalances ? 'Loading Balances...' : 'Get Balances'}
+            </Button>
+          </Box>
+
+          {balanceFetchTime !== null && (
+            <Heading
+              size="xSmall"
+              sx={{ margin: '10px', color: 'base.color.accent.1' }}
+            >
+              Time to fetch balances:
+              {' '}
+              {balanceFetchTime}
+              {' '}
+              seconds
+            </Heading>
+          )}
+
+          {balanceError && (
+            <Box sx={{ backgroundColor: '#ffadad', marginTop: '10px' }}>
+              <Heading size="xSmall" sx={{ margin: '10px' }}>
+                {' '}
+                Error Code:
+                {balanceError.code}
+              </Heading>
+              <Body>
+                Error Message:
+                {balanceError.message}
+              </Body>
+            </Box>
+          )}
+        </Box>
+
+        {balances && <Balances balances={balances} />}
+
+        {balances && (
+          <Box>
+            <Box sx={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
+              <Heading sx={{ marginBottom: '20px' }}>2. Get Quotes</Heading>
+              <Button onClick={fetchQuotes} disabled={isLoadingQuotes}>
+                {isLoadingQuotes ? 'Loading Quotes...' : 'Get Quotes'}
+              </Button>
+            </Box>
+            {quoteFetchTime !== null && (
+              <Heading
+                size="xSmall"
+                sx={{ margin: '10px', color: 'base.color.accent.1' }}
+              >
+                Time to fetch quotes:
+                {' '}
+                {quoteFetchTime}
+                {' '}
+                seconds
+              </Heading>
+            )}
+
+            {quoteError && (
+              <Box sx={{ backgroundColor: '#ffadad', marginTop: '10px' }}>
+                <Heading size="xSmall" sx={{ margin: '10px' }}>
+                  Error Message:
+                  {quoteError.message}
+                </Heading>
+              </Box>
+            )}
+          </Box>
+        )}
+
+        {quotes && <Quotes quotes={quotes} />}
+      </Box>
     </ViewContext.Provider>
   );
 }
