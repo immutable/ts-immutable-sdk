@@ -99,6 +99,7 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
   }, [web3Provider]);
 
   const fetchBalances = async () => {
+    setBalances(undefined);
     setIsLoadingBalances(true);
     const start = Date.now();
 
@@ -147,6 +148,7 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
   };
 
   const fetchQuotes = async () => {
+    setQuotes(undefined);
     setIsLoadingQuotes(true);
     const start = Date.now();
 
@@ -227,7 +229,7 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
             </Heading>
           )}
 
-          {balanceError && (
+          {balanceError && !balances && (
             <Box sx={{ backgroundColor: '#ffadad', marginTop: '10px' }}>
               <Heading size="xSmall" sx={{ margin: '10px' }}>
                 {' '}
@@ -265,7 +267,7 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
               </Heading>
             )}
 
-            {quoteError && (
+            {quoteError && !quotes && (
               <Box sx={{ backgroundColor: '#ffadad', marginTop: '10px' }}>
                 <Heading size="xSmall" sx={{ margin: '10px' }}>
                   Error Message:
