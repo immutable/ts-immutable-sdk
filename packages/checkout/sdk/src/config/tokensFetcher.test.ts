@@ -123,8 +123,13 @@ describe('TokensFetcher', () => {
         });
 
         it(`should return empty array if config missing [${env}]`, async () => {
+          mockedConfigClient.getConfig.mockResolvedValue({} as unknown as RemoteConfiguration);
+
           const mockResponse = {
             status: 200,
+            data: {
+              result: [],
+            },
           } as AxiosResponse;
           mockedHttpClient.get.mockResolvedValueOnce(mockResponse);
 

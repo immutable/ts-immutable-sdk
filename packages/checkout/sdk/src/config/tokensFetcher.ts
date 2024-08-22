@@ -82,7 +82,7 @@ export class TokensFetcher {
 
     const responseData = this.parseResponse(response);
 
-    this.tokensCache = await this.getMappingsForTokensResponse(responseData.result || []);
+    this.tokensCache = await this.getMappingsForTokensResponse(responseData?.result || []);
 
     return this.tokensCache;
   }
@@ -149,7 +149,7 @@ export class TokensFetcher {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  private parseResponse(response: AxiosResponse<any, any>) {
+  private parseResponse(response: AxiosResponse<any, any>): TokensEndpointResponse | undefined {
     let responseData: TokensEndpointResponse = response.data;
     if (response.data && typeof response.data !== 'object') {
       try {
