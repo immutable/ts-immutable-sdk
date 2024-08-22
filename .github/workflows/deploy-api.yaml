@@ -6,6 +6,11 @@ on:
       - main
       - ts-backend
 
+# this is used by github OIDC to assume the admin role later on
+permissions: # see this: https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs
+  id-token: write # This is required for requesting the JWT
+  contents: write # This is required for actions/checkout
+
 env:
   AWS_REGION: us-east-2
   GITHUB_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
@@ -17,7 +22,7 @@ jobs:
     steps:
       - name: configure aws credentials
         id: aws-credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_IMMUTABLE_PROD_ADMIN_ROLE }}
           aws-region: ${{ env.AWS_REGION }}
