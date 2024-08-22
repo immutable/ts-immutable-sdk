@@ -35,9 +35,12 @@ export function CheckoutAppIframe() {
   const [loadingError, setLoadingError] = useState<boolean>(false);
   const [initialised, setInitialised] = useState<boolean>(false);
   const [
-    { iframeURL, postMessageHandler, iframeContentWindow },
+    {
+      iframeURL, postMessageHandler, iframeContentWindow,
+    },
     checkoutDispatch,
   ] = useCheckoutContext();
+  const unsubscribePostMessageHandler = useRef<() => void>();
 
   useEip6963Relayer();
   useProviderRelay();
@@ -64,10 +67,11 @@ export function CheckoutAppIframe() {
 
   useEffect(() => {
     if (!postMessageHandler) return undefined;
+    unsubscribePostMessageHandler.current?.();
 
     // subscribe to widget events
     // TODO: Move to its own hook
-    postMessageHandler.subscribe(({ type, payload }) => {
+    unsubscribePostMessageHandler.current = postMessageHandler.subscribe(({ type, payload }) => {
       if (type !== PostMessageHandlerEventType.WIDGET_EVENT) return;
 
       // FIXME: improve typing
@@ -112,7 +116,7 @@ export function CheckoutAppIframe() {
     return () => {
       clearTimeout(timeoutRef.current!);
     };
-  }, [postMessageHandler]);
+  }, [postMessageHandler, checkoutDispatch]);
 
   if (loadingError) {
     return (

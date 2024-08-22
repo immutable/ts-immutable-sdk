@@ -28,7 +28,7 @@ type ProviderRelayPayload = {
 export function useProviderRelay() {
   const [{ checkout, postMessageHandler, provider }, checkoutDispatch] = useCheckoutContext();
 
-  const unsub = useRef<() => void>();
+  const unsubscribePostMessageHandler = useRef<() => void>();
 
   /**
    * Execute a request using the provider
@@ -118,9 +118,10 @@ export function useProviderRelay() {
    */
   useEffect(() => {
     // TODO we need to unsubscribe everywhere
-    unsub.current?.();
-    unsub.current = postMessageHandler?.subscribe(onJsonRpcRequestMessage);
-  }, [onJsonRpcRequestMessage]);
+    if (!postMessageHandler) return;
+    unsubscribePostMessageHandler.current?.();
+    unsubscribePostMessageHandler.current = postMessageHandler?.subscribe(onJsonRpcRequestMessage);
+  }, [postMessageHandler, onJsonRpcRequestMessage]);
 }
 
 // TODO -
