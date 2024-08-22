@@ -10,6 +10,7 @@ on:
 permissions: # see this: https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs
   id-token: write # This is required for requesting the JWT
   contents: write # This is required for actions/checkout
+  packages: write # This is required for pushing to the container registry
 
 env:
   AWS_REGION: us-east-2
@@ -24,6 +25,7 @@ jobs:
         id: aws-credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
+          role-session-name: github-workflow-immutable-prod-admin
           role-to-assume: ${{ secrets.AWS_IMMUTABLE_PROD_ADMIN_ROLE }}
           aws-region: ${{ env.AWS_REGION }}
 
