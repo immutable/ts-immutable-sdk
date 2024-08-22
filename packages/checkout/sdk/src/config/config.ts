@@ -14,7 +14,7 @@ import {
   SANDBOX_CHAIN_ID_NETWORK_MAP,
 } from '../env';
 import { HttpClient } from '../api/http/httpClient';
-import { RemoteTokensFetcher } from './remoteTokensFetcher';
+import { TokensFetcher } from './tokensFetcher';
 
 export class CheckoutConfigurationError extends Error {
   public message: string;
@@ -68,7 +68,7 @@ export class CheckoutConfiguration {
 
   readonly remote: RemoteConfigFetcher;
 
-  readonly tokens: RemoteTokensFetcher;
+  readonly tokens: TokensFetcher;
 
   readonly environment: Environment;
 
@@ -102,7 +102,7 @@ export class CheckoutConfiguration {
       isProduction: this.isProduction,
     });
 
-    this.tokens = new RemoteTokensFetcher(httpClient, this.remote, {
+    this.tokens = new TokensFetcher(httpClient, this.remote, {
       isDevelopment: this.isDevelopment,
       isProduction: this.isProduction,
     });

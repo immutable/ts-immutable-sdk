@@ -38,7 +38,7 @@ export type RemoteConfigParams = {
   isProduction: boolean;
 };
 
-export class RemoteTokensFetcher {
+export class TokensFetcher {
   private httpClient: HttpClient;
 
   private remoteConfig: RemoteConfigFetcher;
@@ -56,7 +56,7 @@ export class RemoteTokensFetcher {
     this.remoteConfig = remoteConfig;
   }
 
-  private getEndpoint = () => {
+  private getBaseUrl = () => {
     if (this.isDevelopment) return IMMUTABLE_API_BASE_URL[ENV_DEVELOPMENT];
     if (this.isProduction) return IMMUTABLE_API_BASE_URL[Environment.PRODUCTION];
     return IMMUTABLE_API_BASE_URL[Environment.SANDBOX];
@@ -70,7 +70,7 @@ export class RemoteTokensFetcher {
     let response: AxiosResponse;
     try {
       response = await this.httpClient.get(
-        `${this.getEndpoint()}/v1/chains/${chainSlug}/tokens?verification_status=verified&is_canonical=true`,
+        `${this.getBaseUrl()}/v1/chains/${chainSlug}/tokens?verification_status=verified&is_canonical=true`,
       );
     } catch (err: any) {
       throw new CheckoutError(

@@ -8,10 +8,10 @@ import { CheckoutConfiguration } from '../config';
 import { ERC20ABI, NATIVE } from '../env';
 import { CheckoutErrorType } from '../errors';
 import { HttpClient } from '../api/http';
-import { RemoteTokensFetcher } from '../config/remoteTokensFetcher';
+import { TokensFetcher } from '../config/tokensFetcher';
 
 jest.mock('../config/remoteConfigFetcher');
-jest.mock('../config/remoteTokensFetcher');
+jest.mock('../config/tokensFetcher');
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -25,7 +25,7 @@ describe('token related functions', () => {
 
   describe('when tokens are not configured', () => {
     it('should return the empty list of tokens', async () => {
-      (RemoteTokensFetcher as unknown as jest.Mock).mockReturnValue({
+      (TokensFetcher as unknown as jest.Mock).mockReturnValue({
         getTokensConfig: jest.fn().mockResolvedValue([]),
       });
       config = new CheckoutConfiguration({
@@ -229,7 +229,7 @@ describe('token related functions', () => {
     testcases.forEach((testcase) => {
       it(`should return the filtered list of allowed tokens for a given ${testcase.text}`, async () => {
         (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue(testcase.remoteConfigMockReturn);
-        (RemoteTokensFetcher as unknown as jest.Mock).mockReturnValue(testcase.remoteTokensMockReturn);
+        (TokensFetcher as unknown as jest.Mock).mockReturnValue(testcase.remoteTokensMockReturn);
         config = new CheckoutConfiguration({
           baseConfig: { environment: Environment.SANDBOX },
         }, mockedHttpClient);

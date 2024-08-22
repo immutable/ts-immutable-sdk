@@ -6,11 +6,11 @@ import {
   ENV_DEVELOPMENT,
 } from '../env';
 import { HttpClient } from '../api/http';
-import { RemoteTokensFetcher } from './remoteTokensFetcher';
+import { TokensFetcher } from './tokensFetcher';
 
 jest.mock('../api/http');
 
-describe('RemoteTokens', () => {
+describe('TokensFetcher', () => {
   let mockedHttpClient: jest.Mocked<HttpClient>;
   let mockedConfigClient: jest.Mocked<RemoteConfigFetcher>;
 
@@ -34,7 +34,7 @@ describe('RemoteTokens', () => {
         } as AxiosResponse;
         mockedHttpClient.get.mockResolvedValueOnce(mockResponse);
 
-        const fetcher = new RemoteTokensFetcher(mockedHttpClient, mockedConfigClient, {
+        const fetcher = new TokensFetcher(mockedHttpClient, mockedConfigClient, {
           isDevelopment: env === ENV_DEVELOPMENT,
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });

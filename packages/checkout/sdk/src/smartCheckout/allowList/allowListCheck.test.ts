@@ -16,10 +16,10 @@ import {
 import { TokenBalanceResult } from '../routing/types';
 import { RemoteConfigFetcher } from '../../config/remoteConfigFetcher';
 import { HttpClient } from '../../api/http';
-import { RemoteTokensFetcher } from '../../config/remoteTokensFetcher';
+import { TokensFetcher } from '../../config/tokensFetcher';
 
 jest.mock('../../config/remoteConfigFetcher');
-jest.mock('../../config/remoteTokensFetcher');
+jest.mock('../../config/tokensFetcher');
 
 describe('allowListCheck', () => {
   let config: CheckoutConfiguration;
@@ -44,7 +44,7 @@ describe('allowListCheck', () => {
       }),
     });
 
-    (RemoteTokensFetcher as unknown as jest.Mock).mockReturnValue({
+    (TokensFetcher as unknown as jest.Mock).mockReturnValue({
       getTokensConfig: jest.fn().mockImplementation((chainId: ChainId) => {
         if (chainId === ChainId.IMTBL_ZKEVM_TESTNET) {
           return tokensL2;
