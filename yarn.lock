@@ -4351,6 +4351,7 @@ __metadata:
     "@imtbl/dex-sdk": 0.0.0
     "@imtbl/passport": 0.0.0
     "@imtbl/react-analytics": 0.2.1-alpha
+    "@lifi/data-types": ^5.5.0
     "@lifi/sdk": ^3.1.5
     "@rive-app/react-canvas-lite": ^4.9.0
     "@rollup/plugin-commonjs": ^26.0.1
@@ -6136,6 +6137,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lifi/data-types@npm:^5.5.0":
+  version: 5.5.0
+  resolution: "@lifi/data-types@npm:5.5.0"
+  dependencies:
+    "@lifi/types": ^15.3.0
+  checksum: 08116e61c45ac37b5a6c750f0f0e666ae14a78db5ace6bd7dc8610ef7658c5e4d9720874cd97dd2fd6fc5c18ebdbceee3773dc9fc915a5477d16bb6579d4994f
+  languageName: node
+  linkType: hard
+
 "@lifi/sdk@npm:^3.1.5":
   version: 3.1.5
   resolution: "@lifi/sdk@npm:3.1.5"
@@ -6153,7 +6163,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lifi/types@npm:^15.2.0":
+"@lifi/types@npm:^15.2.0, @lifi/types@npm:^15.3.0":
   version: 15.3.0
   resolution: "@lifi/types@npm:15.3.0"
   checksum: 975a8829672ca8c0046c047df4b499b674eec90492d40c02b960398b81cb9b9fbeccc6e1061f1bdc3900d606ebbe515bacf07c0a1e79424a9777921839aba558

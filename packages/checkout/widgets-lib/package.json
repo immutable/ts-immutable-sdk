@@ -24,6 +24,7 @@
     "@imtbl/dex-sdk": "0.0.0",
     "@imtbl/passport": "0.0.0",
     "@imtbl/react-analytics": "0.2.1-alpha",
+    "@lifi/data-types": "^5.5.0",
     "@lifi/sdk": "^3.1.5",
     "@rive-app/react-canvas-lite": "^4.9.0",
     "@walletconnect/ethereum-provider": "^2.11.1",
