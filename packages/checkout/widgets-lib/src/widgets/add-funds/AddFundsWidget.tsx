@@ -66,7 +66,7 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
     [viewState, viewReducer],
   );
 
-  const richWallet = '0xe93685f3bBA03016F02bD1828BaDD6195988D950';
+  const richWallet = '0x61Ed281e487502458f84752eB367697d6BB5778a';
 
   useEffect(() => {
     const initializeLifiConfig = async () => {
@@ -89,6 +89,11 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
 
       createConfig({
         integrator: 'immutable',
+        routeOptions: {
+          bridges: {
+            allow: ['squid'],
+          },
+        },
         apiKey:
           '0809bf15-d159-42dd-b079-756d1c3b0458.d17e73a9-93fa-4d60-ac1e-a1a027425c3b',
         providers: [evmProvider],
@@ -107,21 +112,32 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
       1: [
         {
           chainId: 1,
-          address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-          symbol: 'USDC',
-          name: 'USDC',
+          address: '0x0000000000000000000000000000000000000000',
+          symbol: 'ETH',
+          name: 'ETH',
           decimals: 18,
-          priceUSD: '0.9999',
+          priceUSD: '2617.08',
+          CoinKey: 'ETH',
         },
       ],
-      59144: [
+      10: [
         {
-          chainId: 59144,
-          address: '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f',
-          symbol: 'WETH',
-          name: 'Wrapped Ether ',
-          decimals: 18,
-          priceUSD: '0.9999',
+          chainId: 10,
+          address: '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58',
+          symbol: 'USDT',
+          name: 'USDT',
+          decimals: 6,
+          priceUSD: '1.00015',
+          ConinKey: 'USDT',
+        },
+        {
+          chainId: 10,
+          address: '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85',
+          symbol: 'USDC',
+          name: 'USD Coin',
+          decimals: 6,
+          priceUSD: '0.9998000399920016',
+          ConinKey: 'USDC',
         },
       ],
     };
@@ -154,10 +170,17 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
 
     const configs = [
       {
-        fromChain: ChainId.ETH,
-        fromToken: findDefaultToken(CoinKey.USDC, ChainId.ETH).address,
-        toChain: ChainId.LNA,
-        toToken: findDefaultToken(CoinKey.USDC, ChainId.LNA).address,
+        fromChain: ChainId.OPT,
+        fromToken: findDefaultToken(CoinKey.USDT, ChainId.OPT).address,
+        toChain: ChainId.MNT,
+        toToken: findDefaultToken(CoinKey.USDC, ChainId.MNT).address,
+        toAmount: '1000000',
+      },
+      {
+        fromChain: ChainId.OPT,
+        fromToken: findDefaultToken(CoinKey.USDC, ChainId.OPT).address,
+        toChain: ChainId.MNT,
+        toToken: findDefaultToken(CoinKey.USDC, ChainId.MNT).address,
         toAmount: '1000000',
       },
     ];
