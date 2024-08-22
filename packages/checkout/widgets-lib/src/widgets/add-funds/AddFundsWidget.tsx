@@ -34,11 +34,6 @@ export type AddFundsWidgetInputs = AddFundsWidgetParams & {
   web3Provider?: Web3Provider;
 };
 
-export type PocInputs = {
-  balances: { [chainId: number]: TokenAmount[] } | undefined;
-  quotes: any;
-};
-
 export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const [balances, setBalances] = useState<
@@ -183,6 +178,13 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
         toToken: findDefaultToken(CoinKey.USDC, ChainId.MNT).address,
         toAmount: '1000000',
       },
+      {
+        fromChain: ChainId.ETH,
+        fromToken: findDefaultToken(CoinKey.ETH, ChainId.ETH).address,
+        toChain: ChainId.OPT,
+        toToken: findDefaultToken(CoinKey.ETH, ChainId.OPT).address,
+        toAmount: '1000000000000000',
+      },
     ];
 
     const quoteRequests = configs.map((config) => {
@@ -199,9 +201,30 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
     });
 
     try {
-      const contractCallQuoteResponses = await Promise.all(quoteRequests);
-      setQuotes(contractCallQuoteResponses);
-      console.log(contractCallQuoteResponses);
+      const contractCallQuoteResponses = await Promise.allSettled(
+        quoteRequests,
+      );
+
+      const successfulQuotes = contractCallQuoteResponses
+        .filter((result) => result.status === 'fulfilled')
+        .map((result) => (result as PromiseFulfilledResult<LiFiStep>).value);
+
+      if (successfulQuotes.length > 0) {
+        setQuotes(successfulQuotes);
+        console.log('===== Successful Quotes:', successfulQuotes);
+      }
+
+      const failedQuotes = contractCallQuoteResponses
+        .filter((result) => result.status === 'rejected')
+        .map((result) => (result as PromiseRejectedResult).reason);
+
+      if (failedQuotes.length > 0) {
+        setQuoteError({
+          code: 'PARTIAL_ERROR',
+          message: 'Some quotes failed to fetch.',
+        });
+        console.error('===== Failed Quotes:', failedQuotes);
+      }
     } catch (error: any) {
       // Catch error and extract code/message
       console.error('===== quoteResponse ERROR', error);
@@ -269,37 +292,35 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
 
         {balances && <Balances balances={balances} />}
 
-        {balances && (
-          <Box>
-            <Box sx={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
-              <Heading sx={{ marginBottom: '20px' }}>2. Get Quotes</Heading>
-              <Button onClick={fetchQuotes} disabled={isLoadingQuotes}>
-                {isLoadingQuotes ? 'Loading Quotes...' : 'Get Quotes'}
-              </Button>
-            </Box>
-            {quoteFetchTime !== null && (
-              <Heading
-                size="xSmall"
-                sx={{ margin: '10px', color: 'base.color.accent.1' }}
-              >
-                Time to fetch quotes:
-                {' '}
-                {quoteFetchTime}
-                {' '}
-                seconds
-              </Heading>
-            )}
-
-            {quoteError && !quotes && (
-              <Box sx={{ backgroundColor: '#ffadad', marginTop: '10px' }}>
-                <Heading size="xSmall" sx={{ margin: '10px' }}>
-                  Error Message:
-                  {quoteError.message}
-                </Heading>
-              </Box>
-            )}
+        <Box>
+          <Box sx={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
+            <Heading sx={{ marginBottom: '20px' }}>2. Get Quotes</Heading>
+            <Button onClick={fetchQuotes} disabled={isLoadingQuotes}>
+              {isLoadingQuotes ? 'Loading Quotes...' : 'Get Quotes'}
+            </Button>
           </Box>
-        )}
+          {quoteFetchTime !== null && (
+            <Heading
+              size="xSmall"
+              sx={{ margin: '10px', color: 'base.color.accent.1' }}
+            >
+              Time to fetch quotes:
+              {' '}
+              {quoteFetchTime}
+              {' '}
+              seconds
+            </Heading>
+          )}
+
+          {quoteError && (
+            <Box sx={{ backgroundColor: '#ffadad', marginTop: '10px' }}>
+              <Heading size="xSmall" sx={{ margin: '10px' }}>
+                Error Message:
+                {quoteError.message}
+              </Heading>
+            </Box>
+          )}
+        </Box>
 
         {quotes && <Quotes quotes={quotes} />}
       </Box>
