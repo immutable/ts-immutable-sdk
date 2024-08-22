@@ -29,7 +29,7 @@ server.post('/v1/ts-sdk/v1/:pkg/:method', async (request: any) => {
 
 server.get('v1/heartbeat', async () => ({ status: 'ok' }));
 
-server.listen({ port: 8080 }, (err: any, address: any) => {
+server.listen({ port: 8080, host: '0.0.0.0' }, (err: any, address: any) => {
   if (err) {
     console.error(err);
     process.exit(1);

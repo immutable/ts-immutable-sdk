@@ -39749,6 +39749,7 @@ __metadata:
     syncpack: ^9.8.4
     tslib: ^2.6.2
     typedoc: ^0.26.5
+    typescript: ^5.5.4
     wsrun: ^5.2.4
   languageName: unknown
   linkType: soft

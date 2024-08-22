@@ -6,23 +6,17 @@ RUN corepack enable
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if available)
-COPY package.json yarn.lock .yarnrc.yml .yarn ./
+COPY . .
 
 RUN apk add --no-cache --virtual .gyp python3 py-setuptools make g++
 
 # Install dependencies
 RUN yarn install
 
-RUN ls -la
-
-# Copy the rest of the application code
-COPY . .
-
-RUN ls -la
-
 # Build the TypeScript code
-RUN yarn nx run api:build
+RUN yarn nx run api:build --skip-nx-cache
+
+RUN ls -ls /app/packages/api
 
 # Stage 2: Run the application
 FROM node:18-alpine
@@ -31,10 +25,10 @@ FROM node:18-alpine
 WORKDIR /app
 
 # Copy the built files from the builder stage
-COPY --from=builder /app/api/dist ./dist
+COPY --from=builder /app/packages/api .
 
 # Expose the port the app runs on
-EXPOSE 3000
+EXPOSE 8080:8080
 
 # Define the command to run the app
-CMD ["node", "api/dist/server.js"]
+CMD ["node", "dist/server.js"]

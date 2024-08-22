@@ -22,5 +22,8 @@
     "build": "tsc",
     "start": "tsx watch src/server.ts"
   },
-  "type": "module"
+  "type": "module",
+  "installConfig":{
+    "hoistingLimits": "workspaces"
+  }
 }
