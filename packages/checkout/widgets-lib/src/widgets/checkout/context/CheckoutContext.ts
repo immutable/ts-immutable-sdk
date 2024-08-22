@@ -66,7 +66,7 @@ export interface SetCheckoutPayload {
 
 export interface SetProviderPayload {
   type: CheckoutActions.SET_PROVIDER;
-  provider: Web3Provider;
+  provider: Web3Provider | undefined;
 }
 
 export interface SetIframeURLPayload {

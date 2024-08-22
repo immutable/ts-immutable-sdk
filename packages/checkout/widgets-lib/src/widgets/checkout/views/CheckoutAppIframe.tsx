@@ -81,11 +81,14 @@ export function CheckoutAppIframe() {
 
       // TODO: intercept connect success and inject the state provider
       // FIXME: events type narrowing is not working properly
-      // if (customEvent.detail.type === CheckoutEventType.SUCCESS) {
-      //   if (payload.flow === CheckoutFlowType.CONNECT) {
-      //     console.log('------>', customEvent.detail.data)
-      //   }
-      // }
+      if (customEvent.detail.type === CheckoutEventType.DISCONNECTED) {
+        checkoutDispatch({
+          payload: {
+            type: CheckoutActions.SET_PROVIDER,
+            provider: undefined,
+          },
+        });
+      }
 
       // Forward widget events
       sendCheckoutEvent(eventTarget, customEvent.detail);

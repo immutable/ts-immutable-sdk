@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import {
   EIP6963ProviderInfo,
   PostMessageData,
@@ -27,6 +27,8 @@ type ProviderRelayPayload = {
 
 export function useProviderRelay() {
   const [{ checkout, postMessageHandler, provider }, checkoutDispatch] = useCheckoutContext();
+
+  const unsub = useRef<() => void>();
 
   /**
    * Execute a request using the provider
@@ -91,20 +93,19 @@ export function useProviderRelay() {
           provider: new Web3Provider(targetProvider.provider),
         });
         currentProvider = connectResponse.provider;
+
+        // Set provider and execute the request
+        checkoutDispatch({
+          payload: {
+            type: CheckoutActions.SET_PROVIDER,
+            provider: currentProvider,
+          },
+        });
       }
 
       if (!currentProvider) {
-        // eslint-disable-next-line no-console
         throw new Error('Provider is not defined');
       }
-
-      // Set provider and execute the request
-      checkoutDispatch({
-        payload: {
-          type: CheckoutActions.SET_PROVIDER,
-          provider: currentProvider,
-        },
-      });
 
       await execute(providerRelayPayload, currentProvider);
     },
@@ -116,7 +117,12 @@ export function useProviderRelay() {
    * Subscribe to provider relay messages
    */
   useEffect(() => {
-    if (!postMessageHandler) return;
-    postMessageHandler.subscribe(onJsonRpcRequestMessage);
-  }, [provider, postMessageHandler, execute, onJsonRpcRequestMessage]);
+    // TODO we need to unsubscribe everywhere
+    unsub.current?.();
+    unsub.current = postMessageHandler?.subscribe(onJsonRpcRequestMessage);
+  }, [onJsonRpcRequestMessage]);
 }
+
+// TODO -
+// 1 - commit the unsub part
+// 2 - add unsubs to all postMessageHandlers subscriptions

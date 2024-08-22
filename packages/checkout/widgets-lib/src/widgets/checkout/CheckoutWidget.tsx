@@ -1,4 +1,4 @@
-import { useMemo, useReducer } from 'react';
+import { useEffect, useMemo, useReducer } from 'react';
 import {
   Checkout,
   CheckoutWidgetConfiguration,
@@ -6,6 +6,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import {
+  CheckoutActions,
   checkoutReducer,
   initialCheckoutState,
 } from './context/CheckoutContext';
@@ -38,12 +39,21 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   const checkoutReducerValues = useMemo(
     () => ({
       checkoutState: {
-        ...checkoutState, iframeURL, checkout, provider,
+        ...checkoutState, iframeURL, checkout,
       },
       checkoutDispatch,
     }),
-    [checkoutState, checkoutDispatch, iframeURL, checkout, provider],
+    [checkoutState, checkoutDispatch, iframeURL, checkout],
   );
+
+  useEffect(() => {
+    checkoutDispatch({
+      payload: {
+        type: CheckoutActions.SET_PROVIDER,
+        provider,
+      },
+    });
+  }, [provider]);
 
   return (
     <CheckoutContextProvider values={checkoutReducerValues}>
