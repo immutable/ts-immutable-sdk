@@ -23,7 +23,7 @@
     "start": "tsx watch src/server.ts"
   },
   "type": "module",
-  "installConfig":{
+  "installConfig": {
     "hoistingLimits": "workspaces"
   }
 }

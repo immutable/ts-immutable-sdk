@@ -7802,6 +7802,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nrwl/devkit@npm:19.6.2":
+  version: 19.6.2
+  resolution: "@nrwl/devkit@npm:19.6.2"
+  dependencies:
+    "@nx/devkit": 19.6.2
+  checksum: 21e699979faf68de4c491c10c44657b0c551e3ee4329756aa1e0b83050948a7541bd987248a6fe611520e32a15435bb57df58e3b681e03194ccd9d1ea7c7936a
+  languageName: node
+  linkType: hard
+
 "@nrwl/tao@npm:19.3.2":
   version: 19.3.2
   resolution: "@nrwl/tao@npm:19.3.2"
@@ -7910,6 +7919,25 @@ __metadata:
   peerDependencies:
     nx: ">= 17 <= 20"
   checksum: a3d113cd6d2d58aa74fb2dfde9420e1544829e3ac2e39a819b114766a915ad05f51b05ee8615c4a5b1d1fe9d7014ceb5c2dd9d2085756af474dc5564bc970c46
+  languageName: node
+  linkType: hard
+
+"@nx/devkit@npm:19.6.2, @nx/devkit@npm:^19.6.2":
+  version: 19.6.2
+  resolution: "@nx/devkit@npm:19.6.2"
+  dependencies:
+    "@nrwl/devkit": 19.6.2
+    ejs: ^3.1.7
+    enquirer: ~2.3.6
+    ignore: ^5.0.4
+    minimatch: 9.0.3
+    semver: ^7.5.3
+    tmp: ~0.2.1
+    tslib: ^2.3.0
+    yargs-parser: 21.1.1
+  peerDependencies:
+    nx: ">= 17 <= 20"
+  checksum: 8eec09ba3710aa757e7bc62c4be757ef2d34fff6f38995ec74012c8edf79c024fcd66f0138412ccc3e40e2a9e6bdcadf4b2b2e329c8094effa271635b6a0f28e
   languageName: node
   linkType: hard
 
@@ -39729,6 +39757,7 @@ __metadata:
     "@emotion/react": ^11.11.3
     "@nx-tools/container-metadata": ^6.0.2
     "@nx-tools/nx-container": ^6.0.2
+    "@nx/devkit": ^19.6.2
     "@release-it-plugins/workspaces": ^4.0.0
     "@swc/cli": ^0.4.0
     "@swc/core": ^1.3.36

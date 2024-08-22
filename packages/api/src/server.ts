@@ -7,7 +7,7 @@ const server = fastify();
 
 const orderbook = new Orderbook({
   baseConfig: {
-    environment: process.env.IMMUTABLE_ENV as Environment,
+    environment: process.env.IMMUTABLE_ENV as Environment || Environment.SANDBOX,
   },
 });
 
@@ -27,7 +27,7 @@ server.post('/v1/ts-sdk/v1/:pkg/:method', async (request: any) => {
   return await packages[pkg][method](request.body);
 });
 
-server.get('v1/heartbeat', async () => ({ status: 'ok' }));
+server.get('/v1/heartbeat', async () => ({ status: 'ok' }));
 
 server.listen({ port: 8080, host: '0.0.0.0' }, (err: any, address: any) => {
   if (err) {

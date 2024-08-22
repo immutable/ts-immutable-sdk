@@ -16,8 +16,6 @@ RUN yarn install
 # Build the TypeScript code
 RUN yarn nx run api:build
 
-RUN ls -ls /app/packages/api
-
 # Stage 2: Run the application
 FROM node:18-alpine
 
@@ -25,10 +23,10 @@ FROM node:18-alpine
 WORKDIR /app
 
 # Copy the built files from the builder stage
-COPY --from=builder /app/packages/api .
+COPY --from=builder /app .
 
 # Expose the port the app runs on
 EXPOSE 8080:8080
 
 # Define the command to run the app
-CMD ["node", "dist/server.js"]
+CMD ["node", "packages/api/dist/server.js"]
