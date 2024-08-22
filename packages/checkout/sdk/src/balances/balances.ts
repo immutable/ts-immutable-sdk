@@ -16,6 +16,7 @@ import { CheckoutConfiguration } from '../config';
 import {
   Blockscout,
   BlockscoutToken,
+  BlockscoutTokenData,
   BlockscoutTokens,
   BlockscoutTokenType,
 } from '../api/blockscout';
@@ -186,7 +187,8 @@ export const getBlockscoutBalance = async (
 
   const balances: GetBalanceResult[] = [];
   items.forEach((item) => {
-    if (shouldFilter && !mapFilterTokens[item.token.address.toLowerCase()]) return;
+    const allowlistedToken = mapFilterTokens[item.token.address.toLowerCase()];
+    if (shouldFilter && !allowlistedToken) return;
 
     const tokenData = item.token || {};
 
@@ -196,9 +198,12 @@ export const getBlockscoutBalance = async (
     let decimals = parseInt(tokenData.decimals, 10);
     if (Number.isNaN(decimals)) decimals = DEFAULT_TOKEN_DECIMALS;
 
+    const icon = (tokenData as BlockscoutTokenData).icon_url ?? allowlistedToken.icon;
+
     const token = {
       ...tokenData,
       decimals,
+      icon,
     };
 
     const formattedBalance = utils.formatUnits(item.value, token.decimals);
