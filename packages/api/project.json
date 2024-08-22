@@ -23,35 +23,16 @@
                 "pr": {
                     "push": false
                 },
-                "dev": {
+                "ci": {
                     "metadata": {
                         "images": [
                             "ghcr.io/immutable/ts-immutable-sdk/ts-sdk-api",
-                            "783421985614.dkr.ecr.us-east-2.amazonaws.com/ts-sdk-api"
-                        ],
-                        "tags": [
-                            "type=sha,prefix=develop-{{date 'YYYY-MM-DDTHH-mm-ss[Z]'}}-git."
-                        ]
-                    }
-                },
-                "sandbox": {
-                    "metadata": {
-                        "images": [
-                            "ghcr.io/immutable/ts-immutable-sdk/ts-sdk-api",
-                            "783421985614.dkr.ecr.us-east-2.amazonaws.com/ts-sdk-api"
-                        ],
-                        "tags": [
-                            "type=sha,prefix=sandbox-{{date 'YYYY-MM-DDTHH-mm-ss[Z]'}}-git."
-                        ]
-                    }
-                },
-                "prod": {
-                    "metadata": {
-                        "images": [
-                            "ghcr.io/immutable/ts-immutable-sdk/ts-sdk-api",
+                            "783421985614.dkr.ecr.us-east-2.amazonaws.com/ts-sdk-api",
                             "362750628221.dkr.ecr.us-east-2.amazonaws.com/ts-sdk-api"
                         ],
                         "tags": [
+                            "type=sha,prefix=develop-{{date 'YYYY-MM-DDTHH-mm-ss[Z]'}}-git.",
+                            "type=sha,prefix=sandbox-{{date 'YYYY-MM-DDTHH-mm-ss[Z]'}}-git.",
                             "type=sha,prefix=prod-{{date 'YYYY-MM-DDTHH-mm-ss[Z]'}}-git."
                         ]
                     }
