@@ -14,7 +14,7 @@ RUN apk add --no-cache --virtual .gyp python3 py-setuptools make g++
 RUN yarn install
 
 # Build the TypeScript code
-RUN yarn nx run api:build --skip-nx-cache
+RUN yarn nx run api:build
 
 RUN ls -ls /app/packages/api
 
