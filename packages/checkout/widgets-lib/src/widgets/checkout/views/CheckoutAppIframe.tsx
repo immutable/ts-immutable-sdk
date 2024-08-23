@@ -4,6 +4,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import {
   useContext,
+  useEffect,
   useRef, useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +19,7 @@ import { useEip6963Relayer } from '../hooks/useEip6963Relayer';
 import { useProviderRelay } from '../hooks/useProviderRelay';
 import {
   IFRAME_ALLOW_PERMISSIONS,
+  IFRAME_INIT_TIMEOUT_MS,
 } from '../utils/config';
 
 export interface LoadingHandoverProps {
@@ -36,6 +38,7 @@ export function CheckoutAppIframe() {
     },
     checkoutDispatch,
   ] = useCheckoutContext();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useCheckoutEventsRelayer();
   useEip6963Relayer();
@@ -46,6 +49,19 @@ export function CheckoutAppIframe() {
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
+
+  useEffect(() => {
+    timeoutRef.current = setTimeout(() => {
+      if (!initialised) {
+        setLoadingError(true);
+        clearTimeout(timeoutRef.current!);
+      }
+    }, IFRAME_INIT_TIMEOUT_MS);
+
+    return () => {
+      clearTimeout(timeoutRef.current!);
+    };
+  }, [initialised]);
 
   const onIframeLoad = () => {
     const iframe = iframeRef.current;

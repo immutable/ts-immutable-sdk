@@ -12,7 +12,6 @@ import {
 import { useCheckoutContext } from '../context/CheckoutContextProvider';
 import { sendCheckoutEvent } from '../CheckoutWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { IFRAME_INIT_TIMEOUT_MS } from '../utils/config';
 import { CheckoutActions } from '../context/CheckoutContext';
 
 function isWidgetEvent(payload: any): payload is {
@@ -29,7 +28,6 @@ export function useCheckoutEventsRelayer() {
   const [{ postMessageHandler, provider }, checkoutDispatch] = useCheckoutContext();
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const unsubscribePostMessageHandler = useRef<(() => void) | undefined>();
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!postMessageHandler) return undefined;
@@ -59,7 +57,6 @@ export function useCheckoutEventsRelayer() {
       sendCheckoutEvent(eventTarget, payload.detail);
 
       if (payload.detail.type === CheckoutEventType.INITIALISED) {
-        clearTimeout(timeoutRef.current!);
         checkoutDispatch({
           payload: {
             type: CheckoutActions.SET_INITIALISED,
@@ -69,12 +66,7 @@ export function useCheckoutEventsRelayer() {
       }
     });
 
-    timeoutRef.current = setTimeout(() => {
-      clearTimeout(timeoutRef.current!);
-    }, IFRAME_INIT_TIMEOUT_MS);
-
     return () => {
-      clearTimeout(timeoutRef.current!);
       unsubscribePostMessageHandler.current?.();
     };
   }, [postMessageHandler, checkoutDispatch, eventTarget, provider]);
