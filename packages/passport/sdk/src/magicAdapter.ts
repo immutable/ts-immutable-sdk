@@ -5,7 +5,6 @@ import { ethers } from 'ethers';
 import { trackDuration } from '@imtbl/metrics';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import { PassportConfiguration } from './config';
-import { lazyDocumentReady } from './utils/lazyLoad';
 
 type MagicClient = InstanceWithExtensions<SDKBase, [OpenIdExtension]>;
 
@@ -14,28 +13,14 @@ const MAINNET = 'mainnet';
 export default class MagicAdapter {
   private readonly config: PassportConfiguration;
 
-  private readonly lazyMagicClient?: Promise<MagicClient>;
+  private readonly magicClient: MagicClient;
 
   constructor(config: PassportConfiguration) {
     this.config = config;
-    if (typeof window !== 'undefined') {
-      this.lazyMagicClient = lazyDocumentReady<MagicClient>(() => {
-        const client = new Magic(this.config.magicPublishableApiKey, {
-          extensions: [new OpenIdExtension()],
-          network: MAINNET, // We always connect to mainnet to ensure addresses are the same across envs
-          deferPreload: true,
-        });
-        return client;
-      });
-    }
-  }
-
-  private get magicClient(): Promise<MagicClient> {
-    if (!this.lazyMagicClient) {
-      throw new Error('Cannot perform this action outside of the browser');
-    }
-
-    return this.lazyMagicClient;
+    this.magicClient = new Magic(this.config.magicPublishableApiKey, {
+      extensions: [new OpenIdExtension()],
+      network: MAINNET, // We always connect to mainnet to ensure addresses are the same across envs
+    });
   }
 
   async login(
@@ -44,8 +29,7 @@ export default class MagicAdapter {
     return withPassportError<ethers.providers.ExternalProvider>(async () => {
       const startTime = performance.now();
 
-      const magicClient = await this.magicClient;
-      await magicClient.openid.loginWithOIDC({
+      await this.magicClient.openid.loginWithOIDC({
         jwt: idToken,
         providerId: this.config.magicProviderId,
       });
@@ -56,14 +40,13 @@ export default class MagicAdapter {
         Math.round(performance.now() - startTime),
       );
 
-      return magicClient.rpcProvider as unknown as ethers.providers.ExternalProvider;
+      return this.magicClient.rpcProvider as unknown as ethers.providers.ExternalProvider;
     }, PassportErrorType.WALLET_CONNECTION_ERROR);
   }
 
   async logout() {
-    const magicClient = await this.magicClient;
-    if (magicClient.user) {
-      await magicClient.user.logout();
+    if (this.magicClient.user) {
+      await this.magicClient.user.logout();
     }
   }
 }
