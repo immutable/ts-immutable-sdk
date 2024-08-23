@@ -39,7 +39,7 @@ export function CheckoutAppIframe() {
     checkoutDispatch,
   ] = useCheckoutContext();
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
+  const initialisedRef = useRef(initialised);
   useCheckoutEventsRelayer();
   useEip6963Relayer();
   useProviderRelay();
@@ -51,17 +51,21 @@ export function CheckoutAppIframe() {
   } = useContext(EventTargetContext);
 
   useEffect(() => {
+    initialisedRef.current = initialised;
+  }, [initialised]);
+
+  useEffect(() => {
     timeoutRef.current = setTimeout(() => {
-      if (!initialised) {
-        setLoadingError(true);
-        clearTimeout(timeoutRef.current!);
-      }
+      if (initialisedRef.current) return;
+
+      setLoadingError(true);
+      clearTimeout(timeoutRef.current!);
     }, IFRAME_INIT_TIMEOUT_MS);
 
     return () => {
       clearTimeout(timeoutRef.current!);
     };
-  }, [initialised]);
+  }, []);
 
   const onIframeLoad = () => {
     const iframe = iframeRef.current;
