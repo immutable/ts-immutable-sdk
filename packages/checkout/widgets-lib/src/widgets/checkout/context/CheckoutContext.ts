@@ -15,6 +15,7 @@ export interface CheckoutState {
   walletProviderName: WalletProviderName | null;
   walletProviderInfo: EIP6963ProviderInfo | null;
   sendCloseEvent: () => void;
+  initialised: boolean;
 }
 
 export const initialCheckoutState: CheckoutState = {
@@ -27,6 +28,7 @@ export const initialCheckoutState: CheckoutState = {
   walletProviderInfo: null,
   walletProviderName: null,
   sendCloseEvent: () => { },
+  initialised: false,
 };
 
 export interface CheckoutContextState {
@@ -46,7 +48,8 @@ type ActionPayload =
   | SetIframeContentWindowPayload
   | SetPassportPayload
   | SetProviderNamePayload
-  | SetSendCloseEventPayload;
+  | SetSendCloseEventPayload
+  | SetInitialisedPayload;
 
 export enum CheckoutActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
@@ -57,6 +60,7 @@ export enum CheckoutActions {
   SET_PASSPORT = 'SET_PASSPORT',
   SET_WALLET_PROVIDER_NAME = 'SET_WALLET_PROVIDER_NAME',
   SET_SEND_CLOSE_EVENT = 'SET_SEND_CLOSE_EVENT',
+  SET_INITIALISED = 'SET_INITIALISED',
 }
 
 export interface SetCheckoutPayload {
@@ -97,6 +101,11 @@ export interface SetProviderNamePayload {
 export interface SetSendCloseEventPayload {
   type: CheckoutActions.SET_SEND_CLOSE_EVENT;
   sendCloseEvent: () => void;
+}
+
+export interface SetInitialisedPayload {
+  type: CheckoutActions.SET_INITIALISED;
+  initialised: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -153,6 +162,11 @@ export const checkoutReducer: Reducer<CheckoutState, CheckoutAction> = (
       return {
         ...state,
         sendCloseEvent: action.payload.sendCloseEvent,
+      };
+    case CheckoutActions.SET_INITIALISED:
+      return {
+        ...state,
+        initialised: action.payload.initialised,
       };
     default:
       return state;
