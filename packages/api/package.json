@@ -2,8 +2,7 @@
   "name": "api",
   "packageManager": "yarn@3.6.1",
   "dependencies": {
-    "@imtbl/config": "0.0.0",
-    "@imtbl/orderbook": "0.0.0",
+    "@imtbl/sdk": "1.47.8",
     "fastify": "^4.28.1"
   },
   "devDependencies": {

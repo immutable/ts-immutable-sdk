@@ -5113,6 +5113,73 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@imtbl/sdk@npm:1.47.8":
+  version: 1.47.8
+  resolution: "@imtbl/sdk@npm:1.47.8"
+  dependencies:
+    "@0xsequence/abi": ^1.4.3
+    "@0xsequence/core": ^1.4.3
+    "@biom3/design-tokens": ^0.4.2
+    "@biom3/react": ^0.25.0
+    "@ethersproject/abi": ^5.7.0
+    "@ethersproject/abstract-signer": ^5.7.0
+    "@ethersproject/keccak256": ^5.7.0
+    "@ethersproject/providers": ^5.7.2
+    "@ethersproject/strings": ^5.7.0
+    "@ethersproject/wallet": ^5.7.0
+    "@imtbl/react-analytics": 0.2.1-alpha
+    "@jest/globals": ^29.5.0
+    "@magic-ext/oidc": 4.3.1
+    "@metamask/detect-provider": ^2.0.0
+    "@opensea/seaport-js": 4.0.3
+    "@rive-app/react-canvas-lite": ^4.9.0
+    "@stdlib/number-float64-base-normalize": 0.0.8
+    "@uniswap/router-sdk": ^1.4.0
+    "@uniswap/sdk-core": ^3.0.1
+    "@uniswap/v3-sdk": ^3.9.0
+    "@walletconnect/ethereum-provider": ^2.11.1
+    "@walletconnect/modal": ^2.6.2
+    assert: ^2.0.0
+    axios: ^1.6.5
+    bn.js: ^5.2.1
+    buffer: ^6.0.3
+    crypto-browserify: ^3.12.0
+    elliptic: ^6.5.4
+    enc-utils: ^3.0.0
+    ethereumjs-wallet: ^1.0.2
+    ethers: ^5.7.2
+    ethers-v6: "npm:ethers@6.11.1"
+    events: ^3.3.0
+    global-const: ^0.1.2
+    https-browserify: ^1.0.0
+    i18next: ^23.7.6
+    i18next-browser-languagedetector: ^7.2.0
+    jwt-decode: ^3.1.2
+    localforage: ^1.10.0
+    lru-memorise: 0.3.0
+    magic-sdk: ^21.2.0
+    merkletreejs: ^0.3.11
+    oidc-client-ts: 2.4.0
+    os-browserify: ^0.3.0
+    pako: ^2.1.0
+    pg: ^8.11.5
+    pino-pretty: ^11.2.2
+    prisma: ^5.13.0
+    react-i18next: ^13.5.0
+    sns-validator: ^0.3.5
+    stream-browserify: ^3.0.0
+    stream-http: ^3.2.0
+    url: ^0.11.0
+    uuid: ^8.3.2
+  dependenciesMeta:
+    pg:
+      optional: true
+    prisma:
+      optional: true
+  checksum: bc967dc2667df092249ee396b8263d6dde915dad764efb35238ac1b24217ceb47c8719fb4a331668818ee3c6c8683b4ae0bde2cd84fa23e1409a6dd4d8dd4dab
+  languageName: node
+  linkType: hard
+
 "@imtbl/sdk@npm:latest":
   version: 1.46.5
   resolution: "@imtbl/sdk@npm:1.46.5"
@@ -15934,8 +16001,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "api@workspace:packages/api"
   dependencies:
-    "@imtbl/config": 0.0.0
-    "@imtbl/orderbook": 0.0.0
+    "@imtbl/sdk": 1.47.8
     "@nx-tools/container-metadata": ^6.0.2
     "@nx-tools/nx-container": ^6.0.2
     "@nx/devkit": ^19.6.1

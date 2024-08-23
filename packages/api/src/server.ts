@@ -1,18 +1,17 @@
 import fastify from 'fastify';
 import 'dotenv/config';
-import { Orderbook } from '@imtbl/orderbook';
-import { Environment } from '@imtbl/config';
+import { orderbook, config } from '@imtbl/sdk';
 
 const server = fastify();
 
-const orderbook = new Orderbook({
+const ob = new orderbook.Orderbook({
   baseConfig: {
-    environment: process.env.IMMUTABLE_ENV as Environment || Environment.SANDBOX,
+    environment: process.env.IMMUTABLE_ENV as config.Environment || config.Environment.SANDBOX,
   },
 });
 
 const packages: { [key: string]: any } = {
-  orderbook,
+  orderbook: ob,
 };
 
 // TODO: add validation
@@ -22,8 +21,11 @@ const packages: { [key: string]: any } = {
 // TODO: newrelic
 // TODO: no deployment of alpha package on flux commit
 // TODO: env for production vs sandbox
-server.post('/v1/ts-sdk/v1/:pkg/:method', async (request: any) => {
+server.post('/v1/ts-sdk/v1/:pkg/:method', async (request: any, reply) => {
   const { pkg, method } = request.params;
+  if (Object.keys(packages).indexOf(pkg) === -1) {
+    return reply.code(400).send({ error: 'Invalid package' });
+  }
   return await packages[pkg][method](request.body);
 });
 
