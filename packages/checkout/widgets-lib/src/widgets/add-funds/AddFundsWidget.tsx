@@ -3,6 +3,7 @@
 import { AddFundsWidgetParams } from '@imtbl/checkout-sdk/dist/widgets/definitions/parameters/addFunds';
 import { Web3Provider } from '@ethersproject/providers';
 import {
+  useCallback,
   useEffect, useMemo, useReducer, useState,
 } from 'react';
 import { createWalletClient, custom } from 'viem';
@@ -17,12 +18,13 @@ import {
   getTokenBalancesByChain,
   LiFiStep,
   TokenAmount,
-  TransactionRequest,
 } from '@lifi/sdk';
 import { findDefaultToken } from '@lifi/data-types';
 import {
   Body, Box, Button, Heading,
 } from '@biom3/react';
+import { BigNumber, Contract } from 'ethers';
+import { ERC20ABI } from '@imtbl/checkout-sdk';
 import {
   ViewContext,
   initialViewState,
@@ -54,7 +56,9 @@ export default function AddFundsWidget({ provider }: AddFundsWidgetInputs) {
     code: string;
     message: string;
   } | null>(null);
-  const [selectedTxnRequest, setSelectedTxnRequest] = useState<TransactionRequest | undefined>(undefined);
+  const [selectedQuote, setSelectedQuote] = useState<LiFiStep | undefined>(undefined);
+  const [isApproving, setIsApproving] = useState(false);
+  const [approvalError, setApprovalError] = useState<string | null>(null);
 
   const viewReducerValues = useMemo(
     () => ({
@@ -66,7 +70,7 @@ export default function AddFundsWidget({ provider }: AddFundsWidgetInputs) {
 
   const { sendTransaction } = useExecuteQuote({
     provider,
-    txnRequest: selectedTxnRequest,
+    txnRequest: selectedQuote?.transactionRequest,
   });
 
   useEffect(() => {
@@ -244,8 +248,8 @@ export default function AddFundsWidget({ provider }: AddFundsWidgetInputs) {
         console.log('===== Successful Quotes:', successfulQuotes);
 
         // use the first successful quote to execute
-        const firstTxnRequest = successfulQuotes[0].transactionRequest;
-        setSelectedTxnRequest(firstTxnRequest);
+        const firstQuote = successfulQuotes[0];
+        setSelectedQuote(firstQuote);
       }
 
       const failedQuotes = contractCallQuoteResponses
@@ -274,12 +278,52 @@ export default function AddFundsWidget({ provider }: AddFundsWidgetInputs) {
     }
   };
 
-  const executeQuote = async () => {
-    if (selectedTxnRequest) {
-      await sendTransaction(selectedTxnRequest);
-    } else {
-      console.log('==== No quotes were selected, no transaction request available to execute');
+  const checkAllowanceAndApprove = useCallback(async (tokenAddress: string, spender: string, amount: BigNumber) => {
+    if (!provider) return;
+
+    const signer = provider?.getSigner();
+    const tokenContract = new Contract(tokenAddress, JSON.stringify(ERC20ABI), signer);
+
+    try {
+      const address = (await signer?.getAddress()) || '';
+      const currentAllowance: BigNumber = await tokenContract.allowance(address, spender);
+      console.log('==== current allowance:', currentAllowance.toString());
+
+      if (currentAllowance.lt(amount)) {
+        setIsApproving(true);
+
+        const approveTx = await tokenContract.approve(spender, amount);
+
+        await approveTx.wait();
+
+        console.log(`Approval successful: ${approveTx.hash}`);
+      } else {
+        console.log('!!! Sufficient allowance already granted');
+      }
+    } catch (error: any) {
+      console.log('Approval error:', error);
+      setApprovalError('Failed to approve tokens for transfer.');
+    } finally {
+      setIsApproving(false);
     }
+  }, [provider]);
+
+  const executeQuote = async () => {
+    if (!selectedQuote?.transactionRequest) return;
+
+    const tokenAddress = selectedQuote.action.fromToken.address || '';
+    const spender = selectedQuote.transactionRequest?.to || '';
+    const amount = BigNumber.from(selectedQuote.transactionRequest?.value);
+
+    console.log('=== tokenAddress', tokenAddress);
+    console.log('=== spender', spender);
+    console.log('=== amount', amount);
+
+    // Step 1: Check allowance and approve if necessary
+    await checkAllowanceAndApprove(tokenAddress, spender, amount);
+
+    // Step 2: Execute the main transaction
+    await sendTransaction(selectedQuote.transactionRequest);
   };
 
   return (
@@ -369,10 +413,19 @@ export default function AddFundsWidget({ provider }: AddFundsWidgetInputs) {
         <Box>
           <Box sx={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
             <Heading sx={{ marginBottom: '20px' }}>3. Execute Quote</Heading>
-            <Button onClick={executeQuote}>
-              Get Quotes
+            <Button onClick={executeQuote} disabled={isApproving || !selectedQuote}>
+              {isApproving ? 'Approving...' : 'Execute Quote'}
             </Button>
           </Box>
+
+          {approvalError && (
+          <Box sx={{ backgroundColor: '#ffadad', marginTop: '10px' }}>
+            <Heading size="xSmall" sx={{ margin: '10px' }}>
+              Approval Error:
+              {approvalError}
+            </Heading>
+          </Box>
+          )}
         </Box>
       </Box>
     </ViewContext.Provider>

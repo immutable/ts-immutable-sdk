@@ -10,7 +10,7 @@ export * from './widgets/definitions/configurations';
 
 export { Checkout } from './sdk';
 
-export { IMMUTABLE_API_BASE_URL } from './env';
+export { IMMUTABLE_API_BASE_URL, ERC20ABI } from './env';
 
 export {
   getPassportProviderDetail,

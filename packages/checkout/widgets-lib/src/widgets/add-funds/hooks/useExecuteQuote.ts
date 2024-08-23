@@ -1,5 +1,5 @@
-import { Web3Provider } from '@ethersproject/providers';
-import { TransactionRequest } from '@lifi/sdk';
+/* eslint-disable no-console */
+import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { useCallback, useState } from 'react';
 
 export type ExecuteQuoteInput = {
@@ -20,6 +20,7 @@ export const useExecuteQuote = (input: ExecuteQuoteInput) => {
       const signer = provider?.getSigner();
       const txnResponse = await signer?.sendTransaction(txn);
       console.log('=== txnResponse', txnResponse);
+
       await txnResponse?.wait();
       const transactionHash = txnResponse?.hash;
       console.log('=== transactionHash', transactionHash);
