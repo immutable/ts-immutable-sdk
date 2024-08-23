@@ -56,4 +56,4 @@ jobs:
 
       - name: build-image
         run: |
-          yarn nx run api:deploy --configuration=ci
+          INPUT_GITHUB_TOKEN=${{ env.GITHUB_TOKEN }} yarn nx run api:deploy --configuration=ci
