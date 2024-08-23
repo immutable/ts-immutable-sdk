@@ -101,7 +101,6 @@
       "packages/game-bridge",
       "packages/webhook/sdk",
       "packages/minting-backend/sdk",
-      "packages/api",
       "tests/**",
       "examples/passport/**"
     ],

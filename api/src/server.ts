@@ -21,12 +21,13 @@ const packages: { [key: string]: any } = {
 // TODO: newrelic
 // TODO: no deployment of alpha package on flux commit
 // TODO: env for production vs sandbox
+// TODO: write wrapper for methods. because date/time type are just strings from JSON body
 server.post('/v1/ts-sdk/v1/:pkg/:method', async (request: any, reply) => {
   const { pkg, method } = request.params;
   if (Object.keys(packages).indexOf(pkg) === -1) {
     return reply.code(400).send({ error: 'Invalid package' });
   }
-  return await packages[pkg][method](request.body);
+  return await packages[pkg][method](...request.body);
 });
 
 server.get('/v1/heartbeat', async () => ({ status: 'ok' }));
