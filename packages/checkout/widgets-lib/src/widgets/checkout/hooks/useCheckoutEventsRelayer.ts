@@ -39,7 +39,9 @@ export function useCheckoutEventsRelayer() {
       if (payload.detail.type === CheckoutEventType.SUCCESS
         && (payload.detail.data as CheckoutSuccessEvent).flow === CheckoutFlowType.CONNECT) {
         const checkoutConnectSuccessEvent = payload.detail as unknown as CheckoutConnectSuccessEvent;
-        if (!provider) return;
+        if (!provider) {
+          throw new Error('Provider not found, unable to send checkout connect success event');
+        }
         checkoutConnectSuccessEvent.data.provider = provider;
         sendCheckoutEvent(eventTarget, { type: payload.detail.type, data: checkoutConnectSuccessEvent });
         return;
