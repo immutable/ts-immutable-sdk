@@ -14,6 +14,8 @@ console.log('DEBUGGING')
 console.log('CWD:', cwd)
 console.log('ABSOLUTE ROOT:', absoluteRoot)
 
+console.log(execSync('ls').toString())
+
 const workspacePackages = execSync('yarn workspaces list --json')
   .toString()
   .trim()
@@ -47,7 +49,7 @@ const collectDependenciesRecusively = async (sdkWorkspace) => {
 
   // Recursively go through a workspace and update the dependencies
   const processWorkspace = (workspace) => {
-    const workspacePackageJSON = path.join(
+    const workspacePackageJSON = path.resolve(
       absoluteRoot, workspace, 'package.json'
     );
     const manifest = JSON.parse(fs.readFileSync(workspacePackageJSON, {encoding: 'utf8'}))
