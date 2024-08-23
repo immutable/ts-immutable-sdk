@@ -1,0 +1,30 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: ts-sdk-api
+spec:
+  http:
+    - match:
+        - uri:
+            regex: \/v[0-9]+\/ts-sdk\/v[0-9]+\/.*
+          method:
+            exact: OPTIONS
+      route:
+        - destination:
+            host: ts-sdk-api # interpreted as ts-sdk-api.<namespace-of-virtual-service-rule>.svc.cluster.local
+          headers:
+            response:
+              set:
+                Cache-Control: "public, max-age=86400"
+    - match:
+        - uri:
+            regex: \/v[0-9]+\/ts-sdk\/v[0-9]+\/.*
+      route:
+        - destination:
+            host: ts-sdk-api # interpreted as ts-sdk-api.<namespace-of-virtual-service-rule>.svc.cluster.local
+          headers:
+            request:
+              remove:
+                - x-envoy-peer-metadata
+                - x-envoy-peer-metadata-id

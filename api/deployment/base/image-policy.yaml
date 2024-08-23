@@ -1,0 +1,11 @@
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta1
+kind: ImagePolicy
+metadata:
+  name: ts-sdk-api
+spec:
+  imageRepositoryRef:
+    name: ts-sdk-api
+    namespace: flux-system
+  filterTags:
+    extract: "$ts"

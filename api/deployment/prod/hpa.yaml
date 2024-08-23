@@ -1,0 +1,17 @@
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ts-sdk-api
+spec:
+  maxReplicas: 10
+  minReplicas: 2
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ts-sdk-api
+  targetCPUUtilizationPercentage: 80
+  # https://github.com/kubernetes/website/blob/main/content/en/docs/tasks/run-application/horizontal-pod-autoscale.md#algorithm-details
+
+  # CPU utilization is the average CPU usage of a all pods in a deployment across the last minute divided by the requested CPU of this deployment.
+  # If the mean of the pods' CPU utilization is higher than the target you defined, the your replicas will be adjusted.
