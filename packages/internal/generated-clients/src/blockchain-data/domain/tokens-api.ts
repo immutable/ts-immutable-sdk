@@ -26,17 +26,17 @@ import { GetTokenResult } from '../models';
 // @ts-ignore
 import { ListTokensResult } from '../models';
 // @ts-ignore
-export type { APIError400 } from '../models';
+export { APIError400 } from '../models';
 // @ts-ignore
-export type { APIError404 } from '../models';
+export { APIError404 } from '../models';
 // @ts-ignore
-export type { APIError500 } from '../models';
+export { APIError500 } from '../models';
 // @ts-ignore
-export type { AssetVerificationStatus } from '../models';
+export { AssetVerificationStatus } from '../models';
 // @ts-ignore
-export type { GetTokenResult } from '../models';
+export { GetTokenResult } from '../models';
 // @ts-ignore
-export type { ListTokensResult } from '../models';
+export { ListTokensResult } from '../models';
 
 /**
  * Request parameters for getERC20Token operation in TokensApi.
@@ -85,6 +85,13 @@ export interface ListERC20TokensRequestParams {
      * @memberof ListERC20Tokens
      */
     readonly verificationStatus?: Array<AssetVerificationStatus>
+
+    /**
+     * [Experimental - Canonical token data may be updated] Filter by canonical or non-canonical tokens.
+     * @type {boolean}
+     * @memberof ListERC20Tokens
+     */
+    readonly isCanonical?: boolean
 
     /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.

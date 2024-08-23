@@ -24,6 +24,12 @@ import { NFTMetadataAttributeValue } from './nftmetadata-attribute-value';
  */
 export interface NFTMetadataAttribute {
     /**
+     * Display type for this attribute
+     * @type {string}
+     * @memberof NFTMetadataAttribute
+     */
+    'display_type'?: NFTMetadataAttributeDisplayTypeEnum;
+    /**
      * The metadata trait type
      * @type {string}
      * @memberof NFTMetadataAttribute
@@ -36,4 +42,14 @@ export interface NFTMetadataAttribute {
      */
     'value': NFTMetadataAttributeValue;
 }
+
+export const NFTMetadataAttributeDisplayTypeEnum = {
+    Number: 'number',
+    BoostPercentage: 'boost_percentage',
+    BoostNumber: 'boost_number',
+    Date: 'date'
+} as const;
+
+export type NFTMetadataAttributeDisplayTypeEnum = typeof NFTMetadataAttributeDisplayTypeEnum[keyof typeof NFTMetadataAttributeDisplayTypeEnum];
+
 

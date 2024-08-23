@@ -60,6 +60,12 @@ export interface GetMintRequestResult {
      */
     'token_id': string | null;
     /**
+     * An `uint256` amount as string. Only relevant for mint requests on ERC1155 contracts
+     * @type {string}
+     * @memberof GetMintRequestResult
+     */
+    'amount'?: string | null;
+    /**
      * The id of the mint activity associated with this mint request
      * @type {string}
      * @memberof GetMintRequestResult

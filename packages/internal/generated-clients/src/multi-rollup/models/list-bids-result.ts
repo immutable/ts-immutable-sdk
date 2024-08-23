@@ -15,19 +15,28 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { RefreshMetadataByTokenID } from './refresh-metadata-by-token-id';
+import { Order } from './order';
+// May contain unused imports in some cases
+// @ts-ignore
+import { Page } from './page';
 
 /**
  * 
  * @export
- * @interface RefreshNFTMetadataByTokenIDRequest
+ * @interface ListBidsResult
  */
-export interface RefreshNFTMetadataByTokenIDRequest {
+export interface ListBidsResult {
     /**
-     * List of nft metadata to be refreshed. Total size of the list should not exceed 228 KiB
-     * @type {Array<RefreshMetadataByTokenID>}
-     * @memberof RefreshNFTMetadataByTokenIDRequest
+     * 
+     * @type {Page}
+     * @memberof ListBidsResult
      */
-    'nft_metadata': Array<RefreshMetadataByTokenID>;
+    'page': Page;
+    /**
+     * 
+     * @type {Array<Order>}
+     * @memberof ListBidsResult
+     */
+    'result': Array<Order>;
 }
 

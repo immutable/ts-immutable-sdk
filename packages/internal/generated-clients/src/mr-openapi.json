@@ -1663,6 +1663,15 @@
             }
           },
           {
+            "name": "is_canonical",
+            "in": "query",
+            "required": false,
+            "description": "[Experimental - Canonical token data may be updated] Filter by canonical or non-canonical tokens.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
             "name": "page_cursor",
             "in": "query",
             "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
@@ -2450,6 +2459,237 @@
         }
       }
     },
+    "/v1/chains/{chain_name}/orders/bids": {
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "x-internal": true,
+        "summary": "List a paginated array of bids with optional filter parameters",
+        "description": "List a paginated array of bids with optional filter parameters",
+        "operationId": "ListBids",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Order status to filter by",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/OrderStatusName"
+            }
+          },
+          {
+            "name": "buy_item_contract_address",
+            "in": "query",
+            "description": "Buy item contract address to filter by",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "name": "sell_item_type",
+            "in": "query",
+            "description": "Sell item type to filter by",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "NATIVE",
+                "ERC20"
+              ],
+              "example": "NATIVE"
+            }
+          },
+          {
+            "name": "sell_item_contract_address",
+            "in": "query",
+            "description": "Sell item contract address to filter by",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "name": "account_address",
+            "in": "query",
+            "description": "The account address of the user who created the bid",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "0xc49Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "name": "buy_item_metadata_id",
+            "in": "query",
+            "description": "The metadata_id of the buy item",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "020792C9-4AD7-8EC4-4038-9E05C598535B"
+            }
+          },
+          {
+            "name": "buy_item_token_id",
+            "in": "query",
+            "description": "buy item token identifier to filter by",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "1",
+              "pattern": "\\d+"
+            }
+          },
+          {
+            "name": "from_updated_at",
+            "in": "query",
+            "description": "From updated at including given date",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2022-03-09T05:00:50.52Z"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "Maximum number of orders to return per page",
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "description": "Order field to sort by. `sell_item_amount` sorts by per token price, for example if 10eth is offered for 5 ERC1155 items, it’s sorted as 2eth for `sell_item_amount`.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "created_at",
+                "updated_at",
+                "sell_item_amount"
+              ],
+              "description": "Order field to sort by",
+              "example": "created_at"
+            },
+            "example": "created_at"
+          },
+          {
+            "name": "sort_direction",
+            "in": "query",
+            "description": "Ascending or descending direction for sort",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "description": "Ascending or descending direction for sort",
+              "example": "asc"
+            },
+            "example": "asc"
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListBidsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "orders"
+        ],
+        "x-internal": true,
+        "summary": "Create a bid",
+        "description": "Create a bid",
+        "operationId": "CreateBid",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBidRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BidResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/v1/chains/{chain_name}/orders/listings/{listing_id}": {
       "get": {
         "tags": [
@@ -2487,6 +2727,60 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ListingResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/orders/bids/{bid_id}": {
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "x-internal": true,
+        "summary": "Get a single bid by ID",
+        "description": "Get a single bid by ID",
+        "operationId": "GetBid",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          },
+          {
+            "name": "bid_id",
+            "in": "path",
+            "description": "Global Bid identifier",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Global Bid identifier",
+              "example": "018792C9-4AD7-8EC4-4038-9E05C598534A"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BidResult"
                 }
               }
             }
@@ -3727,15 +4021,6 @@
           "withdrawal"
         ]
       },
-      "OperatorAllowlistAdminAction": {
-        "description": "The action an admin can take on an operator allowlist request",
-        "example": "approve",
-        "type": "string",
-        "enum": [
-          "approve",
-          "reject"
-        ]
-      },
       "ActivityNFT": {
         "type": "object",
         "properties": {
@@ -4442,7 +4727,10 @@
               "$ref": "#/components/schemas/RefreshMetadataByID"
             }
           }
-        }
+        },
+        "required": [
+          "metadata"
+        ]
       },
       "NFT": {
         "type": "object",
@@ -4673,6 +4961,18 @@
       "NFTMetadataAttribute": {
         "type": "object",
         "properties": {
+          "display_type": {
+            "description": "Display type for this attribute",
+            "nullable": true,
+            "type": "string",
+            "enum": [
+              "number",
+              "boost_percentage",
+              "boost_number",
+              "date"
+            ],
+            "example": "number"
+          },
           "trait_type": {
             "description": "The metadata trait type",
             "type": "string",
@@ -5214,6 +5514,11 @@
             "format": "date-time",
             "example": "2022-08-16T17:43:26.991388Z",
             "description": "When the collection was last updated"
+          },
+          "is_canonical": {
+            "type": "boolean",
+            "example": true,
+            "description": "Indicates whether the token is canonical or not"
           }
         },
         "required": [
@@ -5225,7 +5530,8 @@
           "image_url",
           "name",
           "updated_at",
-          "verification_status"
+          "verification_status",
+          "is_canonical"
         ]
       },
       "CollectionMetadata": {
@@ -6226,7 +6532,7 @@
             },
             "uniqueItems": true,
             "minItems": 1,
-            "maxItems": 10
+            "maxItems": 20
           },
           "signature": {
             "type": "string",
@@ -6356,6 +6662,135 @@
           },
           "salt": "12686911856931635052326433555881236148",
           "sell": [
+            {
+              "type": "ERC721",
+              "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+              "token_id": "1"
+            }
+          ],
+          "signature": "0x",
+          "start_at": "2022-03-09T05:00:50.52Z"
+        },
+        "required": [
+          "account_address",
+          "order_hash",
+          "buy",
+          "sell",
+          "fees",
+          "end_at",
+          "start_at",
+          "protocol_data",
+          "salt",
+          "signature"
+        ]
+      },
+      "CreateBidRequestBody": {
+        "type": "object",
+        "properties": {
+          "account_address": {
+            "type": "string",
+            "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "order_hash": {
+            "type": "string",
+            "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+          },
+          "buy": {
+            "type": "array",
+            "description": "Buy item for listing should either be ERC721 or ERC1155 item",
+            "items": {
+              "$ref": "#/components/schemas/Item"
+            },
+            "example": [
+              {
+                "type": "ERC721",
+                "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                "token_id": "1"
+              }
+            ],
+            "minItems": 1,
+            "maxItems": 1
+          },
+          "fees": {
+            "type": "array",
+            "description": "Buy fees should only include maker marketplace fees and should be no more than two entries as more entires will incur more gas. It is best practice to have this as few as possible.",
+            "items": {
+              "$ref": "#/components/schemas/Fee"
+            },
+            "example": [],
+            "minItems": 0,
+            "maxItems": 2
+          },
+          "end_at": {
+            "type": "string",
+            "description": "Time after which the Order is considered expired",
+            "format": "date-time",
+            "example": "2022-03-09T05:00:50.52Z"
+          },
+          "protocol_data": {
+            "$ref": "#/components/schemas/ProtocolData"
+          },
+          "salt": {
+            "type": "string",
+            "description": "A random value added to the create Order request",
+            "example": "12686911856931635052326433555881236148"
+          },
+          "sell": {
+            "type": "array",
+            "description": "Sell item for listing should be an ERC20 item",
+            "items": {
+              "$ref": "#/components/schemas/Item"
+            },
+            "example": [
+              {
+                "type": "ERC20",
+                "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                "amount": "9750000000000000000"
+              }
+            ],
+            "minItems": 1,
+            "maxItems": 1
+          },
+          "signature": {
+            "type": "string",
+            "description": "Digital signature generated by the user for the specific Order",
+            "example": "0x"
+          },
+          "start_at": {
+            "type": "string",
+            "description": "Time after which Order is considered active",
+            "format": "date-time",
+            "example": "2022-03-09T05:00:50.52Z"
+          }
+        },
+        "example": {
+          "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+          "order_hash": "0x0821933d9391bc9bf11a6010fe84776c84b203abff0c1ad781fb4881409c8770",
+          "sell": [
+            {
+              "type": "ERC20",
+              "amount": "9750000000000000000",
+              "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+            }
+          ],
+          "fees": [
+            {
+              "type": "MAKER_ECOSYSTEM",
+              "amount": "2250000000000000000",
+              "recipient_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233"
+            }
+          ],
+          "end_at": "2022-03-10T05:00:50.52Z",
+          "protocol_data": {
+            "order_type": "FULL_RESTRICTED",
+            "counter": "1",
+            "zone_address": "0x12",
+            "seaport_address": "0x12",
+            "seaport_version": "1.5"
+          },
+          "salt": "12686911856931635052326433555881236148",
+          "buy": [
             {
               "type": "ERC721",
               "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
@@ -6513,7 +6948,8 @@
             "description": "Order type",
             "example": "LISTING",
             "enum": [
-              "LISTING"
+              "LISTING",
+              "BID"
             ]
           },
           "updated_at": {
@@ -6860,6 +7296,60 @@
           }
         }
       },
+      "BidResult": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/Order"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "example": {
+          "result": {
+            "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+            "sell": [
+              {
+                "type": "ERC20",
+                "amount": "9750000000000000000",
+                "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+              }
+            ],
+            "fees": [],
+            "chain": {
+              "id": "eip155:11155111",
+              "name": "sepolia"
+            },
+            "created_at": "2022-03-07T07:20:50.52Z",
+            "end_at": "2022-03-10T05:00:50.52Z",
+            "id": "018792C9-4AD7-8EC4-4038-9E05C598534B",
+            "order_hash": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+            "protocol_data": {
+              "order_type": "FULL_RESTRICTED",
+              "counter": "1",
+              "zone_address": "0x12",
+              "seaport_address": "0x12",
+              "seaport_version": "1.5"
+            },
+            "salt": "12686911856931635052326433555881236148",
+            "buy": [
+              {
+                "type": "ERC721",
+                "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                "token_id": "1"
+              }
+            ],
+            "signature": "0x",
+            "start_at": "2022-03-09T05:00:50.52Z",
+            "status": {
+              "name": "EXPIRED"
+            },
+            "type": "BID",
+            "updated_at": "2022-03-07T07:20:50.52Z"
+          }
+        }
+      },
       "ListListingsResult": {
         "type": "object",
         "properties": {
@@ -6952,6 +7442,114 @@
               },
               "salt": "12686911856931635052326433555881236148",
               "sell": [
+                {
+                  "type": "ERC721",
+                  "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                  "token_id": "1"
+                }
+              ],
+              "signature": "0x",
+              "start_at": "2022-03-09T05:00:50.52Z",
+              "status": {
+                "name": "EXPIRED"
+              },
+              "updated_at": "2022-03-07T07:20:50.52Z"
+            }
+          ]
+        }
+      },
+      "ListBidsResult": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "$ref": "#/components/schemas/Page"
+          },
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Order"
+            },
+            "minItems": 0,
+            "maxItems": 200
+          }
+        },
+        "required": [
+          "page",
+          "result"
+        ],
+        "example": {
+          "page": {
+            "previous_cursor": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzA",
+            "next_cursor": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzA"
+          },
+          "result": [
+            {
+              "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "sell": [
+                {
+                  "type": "ERC20",
+                  "amount": "9750000000000000000",
+                  "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+                }
+              ],
+              "fees": [],
+              "chain": {
+                "id": "eip155:11155111",
+                "name": "sepolia"
+              },
+              "created_at": "2022-03-07T07:20:50.52Z",
+              "end_at": "2022-03-10T05:00:50.52Z",
+              "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
+              "order_hash": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "protocol_data": {
+                "order_type": "FULL_RESTRICTED",
+                "counter": "1",
+                "zone_address": "0x12",
+                "seaport_address": "0x12",
+                "seaport_version": "1.5"
+              },
+              "salt": "12686911856931635052326433555881236148",
+              "buy": [
+                {
+                  "type": "ERC721",
+                  "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                  "token_id": "1"
+                }
+              ],
+              "signature": "0x",
+              "start_at": "2022-03-09T05:00:50.52Z",
+              "status": {
+                "name": "EXPIRED"
+              },
+              "updated_at": "2022-03-07T07:20:50.52Z"
+            },
+            {
+              "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "sell": [
+                {
+                  "type": "ERC20",
+                  "amount": "9750000000000000000",
+                  "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+                }
+              ],
+              "fees": [],
+              "chain": {
+                "id": "eip155:11155111",
+                "name": "sepolia"
+              },
+              "created_at": "2022-03-07T07:20:50.52Z",
+              "end_at": "2022-03-10T05:00:50.52Z",
+              "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
+              "order_hash": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "protocol_data": {
+                "order_type": "FULL_RESTRICTED",
+                "counter": "1",
+                "zone_address": "0x12",
+                "seaport_address": "0x12",
+                "seaport_version": "1.5"
+              },
+              "salt": "12686911856931635052326433555881236148",
+              "buy": [
                 {
                   "type": "ERC721",
                   "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
@@ -8497,147 +9095,10 @@
         "format": "date-time",
         "example": "2021-08-31T00:00:00Z"
       },
-      "UpdatedAt": {
-        "description": "Updated at",
-        "type": "string",
-        "format": "date-time",
-        "example": "2021-08-31T00:00:00Z"
-      },
-      "Image": {
-        "description": "Image",
-        "type": "string",
-        "example": "https://test.com/image.png"
-      },
-      "TokenId": {
-        "description": "Token ID",
-        "type": "string",
-        "example": 0
-      },
-      "TokenType": {
-        "description": "Contract type for token (ERC721/ERC1155)",
-        "type": "string",
-        "example": "ERC721",
-        "enum": [
-          "ERC721",
-          "ERC1155"
-        ]
-      },
-      "Network": {
-        "description": "Network",
-        "type": "string",
-        "example": "zkEvm",
-        "enum": [
-          "starkEx",
-          "zkEvm"
-        ]
-      },
       "Name": {
         "description": "Name",
         "type": "string",
         "example": "Test"
-      },
-      "Symbol": {
-        "description": "Symbol",
-        "type": "string",
-        "example": "TST"
-      },
-      "Description": {
-        "description": "Description",
-        "type": "string",
-        "example": "Test"
-      },
-      "Balance": {
-        "description": "Balance",
-        "type": "string",
-        "example": 0
-      },
-      "NftCollection": {
-        "description": "Collection",
-        "type": "object",
-        "required": [
-          "network",
-          "name",
-          "contract_address",
-          "balance",
-          "token_type"
-        ],
-        "properties": {
-          "network": {
-            "$ref": "#/components/schemas/Network"
-          },
-          "name": {
-            "$ref": "#/components/schemas/Name"
-          },
-          "contract_address": {
-            "$ref": "#/components/schemas/EthAddress"
-          },
-          "image": {
-            "$ref": "#/components/schemas/Image"
-          },
-          "icon": {
-            "$ref": "#/components/schemas/Image"
-          },
-          "balance": {
-            "$ref": "#/components/schemas/Balance"
-          },
-          "owners": {
-            "description": "Owners of the collection",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EthAddress"
-            }
-          },
-          "token_type": {
-            "$ref": "#/components/schemas/TokenType"
-          }
-        }
-      },
-      "CollectionList": {
-        "description": "Collection list",
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/NftCollection"
-        }
-      },
-      "CollectionItem": {
-        "description": "Item in a collection",
-        "type": "object",
-        "required": [
-          "network",
-          "token_id",
-          "owner",
-          "balance",
-          "token_type"
-        ],
-        "properties": {
-          "network": {
-            "$ref": "#/components/schemas/Network"
-          },
-          "name": {
-            "$ref": "#/components/schemas/Name"
-          },
-          "description": {
-            "$ref": "#/components/schemas/Description"
-          },
-          "image": {
-            "$ref": "#/components/schemas/Image"
-          },
-          "animation_url": {
-            "$ref": "#/components/schemas/Image"
-          },
-          "token_id": {
-            "$ref": "#/components/schemas/TokenId"
-          },
-          "owner": {
-            "$ref": "#/components/schemas/EthAddress"
-          },
-          "balance": {
-            "$ref": "#/components/schemas/Balance"
-          },
-          "token_type": {
-            "$ref": "#/components/schemas/TokenType"
-          }
-        }
       },
       "WalletType": {
         "description": "Wallet type",
@@ -8677,11 +9138,6 @@
           }
         }
       },
-      "Signature": {
-        "description": "Signature",
-        "type": "string",
-        "example": "0x..."
-      },
       "LinkWalletV2Request": {
         "description": "Link wallet V2 request",
         "type": "object",
@@ -8717,15 +9173,6 @@
           "nonce": {
             "description": "A unique identifier for the signature",
             "type": "string"
-          }
-        }
-      },
-      "PageResponse": {
-        "description": "Response page",
-        "type": "object",
-        "properties": {
-          "next_cursor": {
-            "$ref": "#/components/schemas/PageCursor"
           }
         }
       },
@@ -8767,7 +9214,7 @@
   },
   "x-tagGroups": [
     {
-      "name": "oas",
+      "name": "Multi Rollup API",
       "tags": [
         "activities",
         "chains",
@@ -8780,11 +9227,20 @@
         "verification",
         "operatorallowlist",
         "listings",
-        "orders",
-        "passport",
+        "orders"
+      ]
+    },
+    {
+      "name": "Passport MR",
+      "tags": [
+        "passport"
+      ]
+    },
+    {
+      "name": "Passport Profile Service API",
+      "tags": [
         "passport profile"
-      ],
-      "description": "Passport Profile Service API"
+      ]
     }
   ]
 }
