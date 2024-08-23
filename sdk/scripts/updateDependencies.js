@@ -10,6 +10,10 @@ const SDK_PACKAGE = '@imtbl/sdk';
 const cwd = process.cwd()
 const absoluteRoot = `${cwd.split('ts-immutable-sdk')[0]}ts-immutable-sdk`;
 
+console.log('DEBUGGING')
+console.log('CWD:', cwd)
+console.log('ABSOLUTE ROOT:', absoluteRoot)
+
 const workspacePackages = execSync('yarn workspaces list --json')
   .toString()
   .trim()
