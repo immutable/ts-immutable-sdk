@@ -19,7 +19,7 @@ env:
 jobs:
   build-deploy-api:
     name: Build and Deploy API
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-4-cores
     steps:
       - name: configure aws credentials
         id: aws-credentials
