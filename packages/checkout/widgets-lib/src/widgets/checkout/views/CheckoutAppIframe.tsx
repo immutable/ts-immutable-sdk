@@ -1,26 +1,24 @@
 import { Box } from '@biom3/react';
-import { useTranslation } from 'react-i18next';
 import {
-  useContext, useEffect, useRef, useState,
-} from 'react';
-import {
-  CheckoutEventType, IMTBLWidgetEvents,
-  PostMessageHandlerEventType,
-  WidgetEventData,
-  WidgetType,
+  CheckoutEventType,
 } from '@imtbl/checkout-sdk';
+import {
+  useContext,
+  useRef, useState,
+} from 'react';
+import { useTranslation } from 'react-i18next';
+import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { ErrorView } from '../../../views/error/ErrorView';
+import { LoadingView } from '../../../views/loading/LoadingView';
+import { sendCheckoutEvent } from '../CheckoutWidgetEvents';
 import { CheckoutActions } from '../context/CheckoutContext';
 import { useCheckoutContext } from '../context/CheckoutContextProvider';
-import { sendCheckoutEvent } from '../CheckoutWidgetEvents';
-import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { LoadingView } from '../../../views/loading/LoadingView';
-import { ErrorView } from '../../../views/error/ErrorView';
-import {
-  IFRAME_INIT_TIMEOUT_MS,
-  IFRAME_ALLOW_PERMISSIONS,
-} from '../utils/config';
+import { useCheckoutEventsRelayer } from '../hooks/useCheckoutEventsRelayer';
 import { useEip6963Relayer } from '../hooks/useEip6963Relayer';
 import { useProviderRelay } from '../hooks/useProviderRelay';
+import {
+  IFRAME_ALLOW_PERMISSIONS,
+} from '../utils/config';
 
 export interface LoadingHandoverProps {
   text: string;
@@ -31,17 +29,15 @@ export interface LoadingHandoverProps {
 export function CheckoutAppIframe() {
   const { t } = useTranslation();
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [loadingError, setLoadingError] = useState<boolean>(false);
-  const [initialised, setInitialised] = useState<boolean>(false);
   const [
     {
-      iframeURL, postMessageHandler, iframeContentWindow,
+      iframeURL, iframeContentWindow, initialised,
     },
     checkoutDispatch,
   ] = useCheckoutContext();
-  const unsubscribePostMessageHandler = useRef<() => void>();
 
+  useCheckoutEventsRelayer();
   useEip6963Relayer();
   useProviderRelay();
 
@@ -64,59 +60,6 @@ export function CheckoutAppIframe() {
       },
     });
   };
-
-  useEffect(() => {
-    if (!postMessageHandler) return undefined;
-    unsubscribePostMessageHandler.current?.();
-
-    // subscribe to widget events
-    // TODO: Move to its own hook
-    unsubscribePostMessageHandler.current = postMessageHandler.subscribe(({ type, payload }) => {
-      if (type !== PostMessageHandlerEventType.WIDGET_EVENT) return;
-
-      // FIXME: improve typing
-      const customEvent: {
-        type: IMTBLWidgetEvents.IMTBL_CHECKOUT_WIDGET_EVENT;
-        detail: {
-          type: CheckoutEventType;
-          data: WidgetEventData[WidgetType.CHECKOUT][keyof WidgetEventData[WidgetType.CHECKOUT]];
-        };
-      } = payload as any;
-
-      // TODO: intercept connect success and inject the state provider
-      // FIXME: events type narrowing is not working properly
-      if (customEvent.detail.type === CheckoutEventType.DISCONNECTED) {
-        checkoutDispatch({
-          payload: {
-            type: CheckoutActions.SET_PROVIDER,
-            provider: undefined,
-          },
-        });
-      }
-
-      // Forward widget events
-      sendCheckoutEvent(eventTarget, customEvent.detail);
-
-      // If iframe has been initialised, set widget as initialised
-      if (customEvent.detail.type === CheckoutEventType.INITIALISED) {
-        setInitialised(true);
-        clearTimeout(timeoutRef.current!);
-      }
-    });
-
-    // Expire iframe initialisation after timeout
-    // and set a loading error
-    timeoutRef.current = setTimeout(() => {
-      if (!initialised) {
-        setLoadingError(true);
-        clearTimeout(timeoutRef.current!);
-      }
-    }, IFRAME_INIT_TIMEOUT_MS);
-
-    return () => {
-      clearTimeout(timeoutRef.current!);
-    };
-  }, [postMessageHandler, checkoutDispatch]);
 
   if (loadingError) {
     return (
