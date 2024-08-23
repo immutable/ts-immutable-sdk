@@ -7,14 +7,7 @@ import { execSync } from 'child_process';
 const __dirname = path.resolve();
 const SDK_PACKAGE = '@imtbl/sdk';
 
-const cwd = process.cwd()
-const absoluteRoot = `${cwd.split('ts-immutable-sdk')[0]}ts-immutable-sdk`;
-
-console.log('DEBUGGING')
-console.log('CWD:', __dirname)
-console.log('ABSOLUTE ROOT:', absoluteRoot)
-
-console.log(execSync('ls').toString())
+const rootDir = path.resolve(__dirname, '..')
 
 const workspacePackages = execSync('yarn workspaces list --json')
   .toString()
@@ -50,10 +43,9 @@ const collectDependenciesRecusively = async (sdkWorkspace) => {
   // Recursively go through a workspace and update the dependencies
   const processWorkspace = (workspace) => {
     const workspacePackageJSON = path.resolve(
-      absoluteRoot, workspace, 'package.json'
+      rootDir, workspace, 'package.json'
     );
 
-    console.log('Processing workspace:', workspacePackageJSON)
     const manifest = JSON.parse(fs.readFileSync(workspacePackageJSON, {encoding: 'utf8'}))
     const { dependencies, peerDependencies, devDependencies, optionalDependencies } = manifest;
 
