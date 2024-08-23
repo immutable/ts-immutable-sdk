@@ -11,7 +11,7 @@ const cwd = process.cwd()
 const absoluteRoot = `${cwd.split('ts-immutable-sdk')[0]}ts-immutable-sdk`;
 
 console.log('DEBUGGING')
-console.log('CWD:', cwd)
+console.log('CWD:', __dirname)
 console.log('ABSOLUTE ROOT:', absoluteRoot)
 
 console.log(execSync('ls').toString())
@@ -52,6 +52,8 @@ const collectDependenciesRecusively = async (sdkWorkspace) => {
     const workspacePackageJSON = path.resolve(
       absoluteRoot, workspace, 'package.json'
     );
+
+    console.log('Processing workspace:', workspacePackageJSON)
     const manifest = JSON.parse(fs.readFileSync(workspacePackageJSON, {encoding: 'utf8'}))
     const { dependencies, peerDependencies, devDependencies, optionalDependencies } = manifest;
 
