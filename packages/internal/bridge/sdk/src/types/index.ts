@@ -308,12 +308,20 @@ export interface BridgeBundledTxRequest {
  * @property {ethers.providers.TransactionRequest | null} unsignedApprovalTx - The unsigned transaction for the token approval, or null
  * if no approval is required.
  * @property {ethers.providers.TransactionRequest} unsignedBridgeTx - The unsigned transaction for the deposit / withdrawal.
+ * @property {boolean | null} delayWithdrawalLargeAmount - If withdrawal gets queued due to large amount.
+ * @property {boolean | null} delayWithdrawalUnknownToken - If withdrawal gets queued due to unknown token.
+ * @property {boolean | null} withdrawalQueueActivated - If withdrawal gets queued due to activated queue.
+ * @property {number | null} largeTransferThresholds - The configured large transfer threshold for given withdrawal token.
  */
 export interface BridgeBundledTxResponse {
   feeData: BridgeFeeResponse,
   contractToApprove: string | null,
   unsignedApprovalTx: ethers.providers.TransactionRequest | null;
   unsignedBridgeTx: ethers.providers.TransactionRequest;
+  delayWithdrawalLargeAmount: boolean | null;
+  delayWithdrawalUnknownToken: boolean | null;
+  withdrawalQueueActivated: boolean | null;
+  largeTransferThresholds: number | null;
 }
 
 /**
