@@ -8,6 +8,7 @@ import {
 } from 'react';
 import {
   DexConfig, TokenFilterTypes, IMTBLWidgetEvents, SwapWidgetParams,
+  SwapDirection,
 } from '@imtbl/checkout-sdk';
 import { ImmutableConfiguration } from '@imtbl/config';
 import { Exchange } from '@imtbl/dex-sdk';
@@ -61,6 +62,8 @@ export default function SwapWidget({
   fromTokenAddress,
   toTokenAddress,
   config,
+  autoProceed,
+  direction,
 }: SwapWidgetInputs) {
   const { t } = useTranslation();
   const {
@@ -208,6 +211,16 @@ export default function SwapWidget({
     })();
   }, [checkout, provider]);
 
+  useEffect(() => {
+    swapDispatch({
+      payload: {
+        type: SwapActions.SET_AUTO_PROCEED,
+        autoProceed: autoProceed ?? false,
+        direction: direction ?? SwapDirection.FROM,
+      },
+    });
+  }, [autoProceed, direction]);
+
   return (
     <ViewContext.Provider value={viewReducerValues}>
       <SwapContext.Provider value={swapReducerValues}>
@@ -219,13 +232,8 @@ export default function SwapWidget({
           <SwapCoins
             theme={theme}
             fromAmount={viewState.view.data?.fromAmount ?? amount}
-            fromTokenAddress={
-                  viewState.view.data?.fromTokenAddress
-                  ?? fromTokenAddress
-                }
-            toTokenAddress={
-                  viewState.view.data?.toTokenAddress ?? toTokenAddress
-                }
+            fromTokenAddress={viewState.view.data?.fromTokenAddress ?? fromTokenAddress}
+            toTokenAddress={viewState.view.data?.toTokenAddress ?? toTokenAddress}
           />
           )}
           {viewState.view.type === SwapWidgetViews.IN_PROGRESS && (

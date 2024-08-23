@@ -21,6 +21,7 @@ import { IMX_TOKEN_SYMBOL } from '../../../lib';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { isPassportProvider } from '../../../lib/provider';
+import { LoadingView } from '../../../views/loading/LoadingView';
 
 export interface SwapCoinsProps {
   theme: WidgetTheme;
@@ -44,6 +45,7 @@ export function SwapCoins({
   const {
     swapState: {
       tokenBalances,
+      autoProceed,
     },
   } = useContext(SwapContext);
 
@@ -124,6 +126,7 @@ export function SwapCoins({
           }}
         />
       </Box>
+      {autoProceed && <LoadingView loadingText={t('views.SWAP.PREPARE_SWAP.loading.text')} />}
     </SimpleLayout>
   );
 }
