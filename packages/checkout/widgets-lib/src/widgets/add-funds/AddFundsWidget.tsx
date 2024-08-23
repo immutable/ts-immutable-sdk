@@ -17,6 +17,7 @@ import {
   getTokenBalancesByChain,
   LiFiStep,
   TokenAmount,
+  TransactionRequest,
 } from '@lifi/sdk';
 import { findDefaultToken } from '@lifi/data-types';
 import {
@@ -29,12 +30,13 @@ import {
 } from '../../context/view-context/ViewContext';
 import { Balances } from './components/Balances';
 import { Quotes } from './components/Quotes';
+import { useExecuteQuote } from './hooks/useExecuteQuote';
 
 export type AddFundsWidgetInputs = AddFundsWidgetParams & {
-  web3Provider?: Web3Provider;
+  provider?: Web3Provider;
 };
 
-export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
+export default function AddFundsWidget({ provider }: AddFundsWidgetInputs) {
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const [balances, setBalances] = useState<
   { [chainId: number]: TokenAmount[] } | undefined
@@ -52,6 +54,7 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
     code: string;
     message: string;
   } | null>(null);
+  const [selectedTxnRequest, setSelectedTxnRequest] = useState<TransactionRequest | undefined>(undefined);
 
   const viewReducerValues = useMemo(
     () => ({
@@ -61,7 +64,10 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
     [viewState, viewReducer],
   );
 
-  const richWallet = '0x61Ed281e487502458f84752eB367697d6BB5778a';
+  const { sendTransaction } = useExecuteQuote({
+    provider,
+    txnRequest: selectedTxnRequest,
+  });
 
   useEffect(() => {
     const initializeLifiConfig = async () => {
@@ -69,7 +75,7 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
         chain: mainnet,
         transport: custom({
           async request({ method, params }) {
-            const response = await web3Provider?.jsonRpcFetchFunc(
+            const response = await provider?.jsonRpcFetchFunc(
               method,
               params,
             );
@@ -96,7 +102,7 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
     };
 
     initializeLifiConfig();
-  }, [web3Provider]);
+  }, [provider]);
 
   const fetchBalances = async () => {
     setBalances(undefined);
@@ -135,11 +141,33 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
           ConinKey: 'USDC',
         },
       ],
+      5000: [
+        {
+          chainId: 5000,
+          address: '0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE',
+          symbol: 'USDT',
+          name: 'USDT',
+          decimals: 6,
+          priceUSD: '1.00009',
+          CoinKey: 'USDT',
+        },
+        {
+          chainId: 5000,
+          address: '0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9',
+          symbol: 'USDC',
+          name: 'USD Coin',
+          decimals: 6,
+          priceUSD: '0.9998000399920016',
+          CoinKey: 'USDC',
+        },
+      ],
     };
 
     try {
+      const signer = provider?.getSigner();
+      const address = (await signer?.getAddress()) || '';
       const balancesResponse = await getTokenBalancesByChain(
-        richWallet,
+        address,
         tokensByChain,
       );
       setBalances(balancesResponse);
@@ -187,11 +215,13 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
       },
     ];
 
+    const signer = provider?.getSigner();
+    const address = (await signer?.getAddress()) || '';
     const quoteRequests = configs.map((config) => {
       const quoteRequest: ContractCallsQuoteRequest = {
         fromChain: config.fromChain,
         fromToken: config.fromToken,
-        fromAddress: richWallet!,
+        fromAddress: address,
         toChain: config.toChain,
         toToken: config.toToken,
         toAmount: config.toAmount,
@@ -212,6 +242,10 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
       if (successfulQuotes.length > 0) {
         setQuotes(successfulQuotes);
         console.log('===== Successful Quotes:', successfulQuotes);
+
+        // use the first successful quote to execute
+        const firstTxnRequest = successfulQuotes[0].transactionRequest;
+        setSelectedTxnRequest(firstTxnRequest);
       }
 
       const failedQuotes = contractCallQuoteResponses
@@ -240,7 +274,13 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
     }
   };
 
-  const executeQuote = () => {};
+  const executeQuote = async () => {
+    if (selectedTxnRequest) {
+      await sendTransaction(selectedTxnRequest);
+    } else {
+      console.log('==== No quotes were selected, no transaction request available to execute');
+    }
+  };
 
   return (
     <ViewContext.Provider value={viewReducerValues}>
@@ -330,7 +370,7 @@ export default function AddFundsWidget({ web3Provider }: AddFundsWidgetInputs) {
           <Box sx={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
             <Heading sx={{ marginBottom: '20px' }}>3. Execute Quote</Heading>
             <Button onClick={executeQuote}>
-              {isLoadingQuotes ? 'Loading Quotes...' : 'Get Quotes'}
+              Get Quotes
             </Button>
           </Box>
         </Box>

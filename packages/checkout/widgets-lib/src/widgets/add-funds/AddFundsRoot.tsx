@@ -83,7 +83,7 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
                   }
                 >
                   <AddFundsWidget
-                    web3Provider={this.web3Provider}
+                    provider={this.web3Provider}
                     showBridgeOption={this.parameters.showBridgeOption}
                     showSwapOption={this.parameters.showSwapOption}
                     showOnrampOption={this.parameters.showOnrampOption}
