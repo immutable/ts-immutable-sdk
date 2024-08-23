@@ -1,10 +1,11 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { EIP6963ProviderDetail, PostMessageHandlerEventType } from '@imtbl/checkout-sdk';
 import { useCheckoutContext } from '../context/CheckoutContextProvider';
 
 export function useEip6963Relayer() {
   const [checkoutState] = useCheckoutContext();
   const { postMessageHandler } = checkoutState;
+  const unsubscribePostMessageHandler = useRef<() => void>();
 
   const onAnnounce = useCallback((event: CustomEvent<EIP6963ProviderDetail>) => {
     postMessageHandler?.send(PostMessageHandlerEventType.EIP_6963_EVENT, {
@@ -32,8 +33,8 @@ export function useEip6963Relayer() {
 
   useEffect(() => {
     if (!postMessageHandler) return;
-
-    postMessageHandler.subscribe((message) => {
+    unsubscribePostMessageHandler.current?.();
+    unsubscribePostMessageHandler.current = postMessageHandler.subscribe((message) => {
       if (message.type === PostMessageHandlerEventType.EIP_6963_EVENT) {
         onRequest(message.payload);
       }

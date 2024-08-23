@@ -4,7 +4,6 @@ import {
   Checkout, EIP6963ProviderInfo, PostMessageHandler, WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
-import { ProviderRelay } from './ProviderRelay';
 
 export interface CheckoutState {
   checkout: Checkout | null;
@@ -13,7 +12,6 @@ export interface CheckoutState {
   iframeURL: string | undefined;
   iframeContentWindow: Window | undefined;
   postMessageHandler: PostMessageHandler | undefined;
-  providerRelay: ProviderRelay | undefined;
   walletProviderName: WalletProviderName | null;
   walletProviderInfo: EIP6963ProviderInfo | null;
   sendCloseEvent: () => void;
@@ -26,7 +24,6 @@ export const initialCheckoutState: CheckoutState = {
   iframeURL: undefined,
   iframeContentWindow: undefined,
   postMessageHandler: undefined,
-  providerRelay: undefined,
   walletProviderInfo: null,
   walletProviderName: null,
   sendCloseEvent: () => { },
@@ -47,7 +44,6 @@ type ActionPayload =
   | SetIframeURLPayload
   | SetPostMessageHandlerPayload
   | SetIframeContentWindowPayload
-  | SetProviderRelayPayload
   | SetPassportPayload
   | SetProviderNamePayload
   | SetSendCloseEventPayload;
@@ -58,7 +54,6 @@ export enum CheckoutActions {
   SET_IFRAME_URL = 'SET_IFRAME_URL',
   SET_POST_MESSAGE_HANDLER = 'SET_POST_MESSAGE_HANDLER',
   SET_CHECKOUT_APP_IFRAME = 'SET_CHECKOUT_APP_IFRAME',
-  SET_PROVIDER_RELAY = 'SET_PROVIDER_RELAY',
   SET_PASSPORT = 'SET_PASSPORT',
   SET_WALLET_PROVIDER_NAME = 'SET_WALLET_PROVIDER_NAME',
   SET_SEND_CLOSE_EVENT = 'SET_SEND_CLOSE_EVENT',
@@ -71,7 +66,7 @@ export interface SetCheckoutPayload {
 
 export interface SetProviderPayload {
   type: CheckoutActions.SET_PROVIDER;
-  provider: Web3Provider;
+  provider: Web3Provider | undefined;
 }
 
 export interface SetIframeURLPayload {
@@ -87,11 +82,6 @@ export interface SetIframeContentWindowPayload {
 export interface SetPostMessageHandlerPayload {
   type: CheckoutActions.SET_POST_MESSAGE_HANDLER;
   postMessageHandler: PostMessageHandler;
-}
-
-export interface SetProviderRelayPayload {
-  type: CheckoutActions.SET_PROVIDER_RELAY;
-  providerRelay: ProviderRelay;
 }
 
 export interface SetPassportPayload {
@@ -153,11 +143,6 @@ export const checkoutReducer: Reducer<CheckoutState, CheckoutAction> = (
       return {
         ...state,
         postMessageHandler: action.payload.postMessageHandler,
-      };
-    case CheckoutActions.SET_PROVIDER_RELAY:
-      return {
-        ...state,
-        providerRelay: action.payload.providerRelay,
       };
     case CheckoutActions.SET_WALLET_PROVIDER_NAME:
       return {

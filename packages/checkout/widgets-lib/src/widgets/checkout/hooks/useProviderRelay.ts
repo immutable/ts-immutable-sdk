@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import {
   EIP6963ProviderInfo,
   PostMessageData,
@@ -27,6 +27,8 @@ type ProviderRelayPayload = {
 
 export function useProviderRelay() {
   const [{ checkout, postMessageHandler, provider }, checkoutDispatch] = useCheckoutContext();
+
+  const unsubscribePostMessageHandler = useRef<() => void>();
 
   /**
    * Execute a request using the provider
@@ -71,14 +73,14 @@ export function useProviderRelay() {
 
       const injectedProviders = checkout.getInjectedProviders();
       const targetProvider = injectedProviders.find(
-        (p) => p.info.uuid === providerRelayPayload.eip6963Info.uuid,
+        (p) => p.info.uuid === providerRelayPayload?.eip6963Info?.uuid,
       );
 
-      if (!targetProvider) {
+      if (!targetProvider && providerRelayPayload.eip6963Info !== undefined) {
         // eslint-disable-next-line no-console
         console.error(
           'PARENT - requested provider not found',
-          providerRelayPayload.eip6963Info,
+          providerRelayPayload?.eip6963Info,
           injectedProviders,
         );
         return;
@@ -86,24 +88,24 @@ export function useProviderRelay() {
 
       // If provider is not defined, connect the target provider
       let currentProvider = provider;
-      if (!currentProvider) {
+      if (!currentProvider && targetProvider) {
         const connectResponse = await checkout.connect({
           provider: new Web3Provider(targetProvider.provider),
         });
         currentProvider = connectResponse.provider;
+
+        // Set provider and execute the request
+        checkoutDispatch({
+          payload: {
+            type: CheckoutActions.SET_PROVIDER,
+            provider: currentProvider,
+          },
+        });
       }
 
-      // Set provider and execute the request
-      checkoutDispatch({
-        payload: {
-          type: CheckoutActions.SET_PROVIDER,
-          provider: currentProvider,
-        },
-      });
-
-      postMessageHandler.send(PostMessageHandlerEventType.PROVIDER_UPDATED, {
-        eip6963Info: payload.eip6963Info,
-      });
+      if (!currentProvider) {
+        throw new Error('Provider is not defined');
+      }
 
       await execute(providerRelayPayload, currentProvider);
     },
@@ -115,7 +117,13 @@ export function useProviderRelay() {
    * Subscribe to provider relay messages
    */
   useEffect(() => {
+    // TODO we need to unsubscribe everywhere
     if (!postMessageHandler) return;
-    postMessageHandler.subscribe(onJsonRpcRequestMessage);
-  }, [provider, postMessageHandler, execute, onJsonRpcRequestMessage]);
+    unsubscribePostMessageHandler.current?.();
+    unsubscribePostMessageHandler.current = postMessageHandler?.subscribe(onJsonRpcRequestMessage);
+  }, [postMessageHandler, onJsonRpcRequestMessage]);
 }
+
+// TODO -
+// 1 - commit the unsub part
+// 2 - add unsubs to all postMessageHandlers subscriptions

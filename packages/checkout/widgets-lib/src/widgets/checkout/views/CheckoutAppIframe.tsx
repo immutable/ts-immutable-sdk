@@ -4,8 +4,7 @@ import {
   useContext, useEffect, useRef, useState,
 } from 'react';
 import {
-  CheckoutEventType,
-  IMTBLWidgetEvents,
+  CheckoutEventType, IMTBLWidgetEvents,
   PostMessageHandlerEventType,
   WidgetEventData,
   WidgetType,
@@ -16,7 +15,10 @@ import { sendCheckoutEvent } from '../CheckoutWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { ErrorView } from '../../../views/error/ErrorView';
-import { IFRAME_INIT_TIMEOUT_MS, IFRAME_ALLOW_PERMISSIONS } from '../utils/config';
+import {
+  IFRAME_INIT_TIMEOUT_MS,
+  IFRAME_ALLOW_PERMISSIONS,
+} from '../utils/config';
 import { useEip6963Relayer } from '../hooks/useEip6963Relayer';
 import { useProviderRelay } from '../hooks/useProviderRelay';
 
@@ -33,9 +35,12 @@ export function CheckoutAppIframe() {
   const [loadingError, setLoadingError] = useState<boolean>(false);
   const [initialised, setInitialised] = useState<boolean>(false);
   const [
-    { iframeURL, postMessageHandler, iframeContentWindow },
+    {
+      iframeURL, postMessageHandler, iframeContentWindow,
+    },
     checkoutDispatch,
   ] = useCheckoutContext();
+  const unsubscribePostMessageHandler = useRef<() => void>();
 
   useEip6963Relayer();
   useProviderRelay();
@@ -62,9 +67,11 @@ export function CheckoutAppIframe() {
 
   useEffect(() => {
     if (!postMessageHandler) return undefined;
+    unsubscribePostMessageHandler.current?.();
 
     // subscribe to widget events
-    postMessageHandler.subscribe(({ type, payload }) => {
+    // TODO: Move to its own hook
+    unsubscribePostMessageHandler.current = postMessageHandler.subscribe(({ type, payload }) => {
       if (type !== PostMessageHandlerEventType.WIDGET_EVENT) return;
 
       // FIXME: improve typing
@@ -75,6 +82,17 @@ export function CheckoutAppIframe() {
           data: WidgetEventData[WidgetType.CHECKOUT][keyof WidgetEventData[WidgetType.CHECKOUT]];
         };
       } = payload as any;
+
+      // TODO: intercept connect success and inject the state provider
+      // FIXME: events type narrowing is not working properly
+      if (customEvent.detail.type === CheckoutEventType.DISCONNECTED) {
+        checkoutDispatch({
+          payload: {
+            type: CheckoutActions.SET_PROVIDER,
+            provider: undefined,
+          },
+        });
+      }
 
       // Forward widget events
       sendCheckoutEvent(eventTarget, customEvent.detail);
@@ -98,7 +116,7 @@ export function CheckoutAppIframe() {
     return () => {
       clearTimeout(timeoutRef.current!);
     };
-  }, [postMessageHandler]);
+  }, [postMessageHandler, checkoutDispatch]);
 
   if (loadingError) {
     return (
