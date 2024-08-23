@@ -23,8 +23,8 @@ export default class MagicAdapter {
         const client = new Magic(this.config.magicPublishableApiKey, {
           extensions: [new OpenIdExtension()],
           network: MAINNET, // We always connect to mainnet to ensure addresses are the same across envs
+          deferPreload: true,
         });
-        client.preload();
         return client;
       });
     }
