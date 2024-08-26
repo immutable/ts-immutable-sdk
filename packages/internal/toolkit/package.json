@@ -11,7 +11,7 @@
     "@imtbl/x-client": "0.0.0",
     "@magic-ext/oidc": "4.3.1",
     "@metamask/detect-provider": "^2.0.0",
-    "axios": "^1.6.5",
+    "axios": "^1.7.4",
     "bn.js": "^5.2.1",
     "enc-utils": "^3.0.0",
     "ethers": "^5.7.2",

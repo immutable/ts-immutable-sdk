@@ -15,7 +15,7 @@
     "@imtbl/orderbook": "0.0.0",
     "@imtbl/passport": "0.0.0",
     "@metamask/detect-provider": "^2.0.0",
-    "axios": "^1.6.5",
+    "axios": "^1.7.4",
     "ethers": "^5.7.2",
     "uuid": "^8.3.2"
   },

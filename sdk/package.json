@@ -29,7 +29,7 @@
     "@walletconnect/ethereum-provider": "^2.11.1",
     "@walletconnect/modal": "^2.6.2",
     "assert": "^2.0.0",
-    "axios": "^1.6.5",
+    "axios": "^1.7.4",
     "bn.js": "^5.2.1",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.0",
