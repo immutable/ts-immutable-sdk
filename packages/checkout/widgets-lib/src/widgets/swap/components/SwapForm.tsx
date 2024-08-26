@@ -7,6 +7,7 @@ import {
 } from '@biom3/react';
 import { BigNumber, utils } from 'ethers';
 import { CheckoutErrorType, TokenInfo, WidgetTheme } from '@imtbl/checkout-sdk';
+
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { useTranslation } from 'react-i18next';
 import { Environment } from '@imtbl/config';
@@ -26,7 +27,6 @@ import {
   ESTIMATE_DEBOUNCE,
   getL2ChainId,
 } from '../../../lib';
-import { quotesProcessor } from '../functions/FetchQuote';
 import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
 import {
   validateFromAmount,
@@ -80,7 +80,6 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
   const {
     swapState: {
       allowedTokens,
-      exchange,
       tokenBalances,
       network,
       autoProceed,
@@ -256,19 +255,17 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
 
   const processFetchQuoteFrom = async (silently: boolean = false) => {
     if (!provider) return;
-    if (!exchange) return;
+    if (!checkout) return;
     if (!fromToken) return;
     if (!toToken) return;
 
     try {
-      console.log(`processFetchQuoteFrom ${new Date().toISOString()}`);
-      const quoteResultPromise = quotesProcessor.fromAmountIn(
-        exchange,
+      const quoteResultPromise = checkout.swapQuote({
         provider,
         fromToken,
-        fromAmount,
         toToken,
-      );
+        fromAmount,
+      });
 
       const currentQuoteRequest = CancellablePromise.all<TransactionResponse>([
         quoteResultPromise,
@@ -343,18 +340,18 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
 
   const processFetchQuoteTo = async (silently: boolean = false) => {
     if (!provider) return;
-    if (!exchange) return;
+    if (!checkout) return;
     if (!fromToken) return;
     if (!toToken) return;
 
     try {
-      const quoteResultPromise = quotesProcessor.fromAmountOut(
-        exchange,
+      const quoteResultPromise = checkout.swapQuote({
         provider,
-        toToken,
-        toAmount,
         fromToken,
-      );
+        toToken,
+        fromAmount: undefined,
+        toAmount,
+      });
 
       const currentQuoteRequest = CancellablePromise.all<TransactionResponse>([
         quoteResultPromise,
@@ -472,7 +469,9 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
   };
 
   // Silently refresh the quote
-  useInterval(() => fetchQuote(true), DEFAULT_QUOTE_REFRESH_INTERVAL);
+  useInterval(() => {
+    fetchQuote(true);
+  }, DEFAULT_QUOTE_REFRESH_INTERVAL);
 
   // Fetch quote triggers
   useEffect(() => {
@@ -673,34 +672,17 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
   };
 
   const isFormValidForAutoProceed = useMemo(() => {
-    console.log('isFormValidForAutoProceed debug:', {
-      autoProceed,
-      loadedToAndFromTokens,
-      fromAmount,
-      toAmount,
-      fromToken,
-      toToken,
-      quote,
-      loading,
-      insufficientFundsForGas,
-    });
     if (!autoProceed) return false;
     if (!loadedToAndFromTokens) return false;
 
     return !loading;
-  }, [loading, loadedToAndFromTokens]);
+  }, [autoProceed, loading, loadedToAndFromTokens]);
 
   const canAutoSwap = useMemo(() => {
     if (!autoProceed) return false;
     if (!isFormValidForAutoProceed) return false;
 
     const isFormValid = SwapFormValidator();
-
-    console.log('canAutoSwap debug:', {
-      autoProceed,
-      isFormValid,
-      isFormValidForAutoProceed,
-    });
 
     if (!isFormValid) {
       cancelAutoProceed();
@@ -782,6 +764,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         });
         return;
       }
+      cancelAutoProceed();
       const txn = await checkout.sendTransaction({
         provider,
         transaction: {
