@@ -25,6 +25,7 @@ import { LoadingView } from '../../../views/loading/LoadingView';
 
 export interface SwapCoinsProps {
   theme: WidgetTheme;
+  cancelAutoSwap: () => void;
   fromAmount?: string;
   toAmount?: string;
   fromTokenAddress?: string;
@@ -33,6 +34,7 @@ export interface SwapCoinsProps {
 
 export function SwapCoins({
   theme,
+  cancelAutoSwap,
   fromAmount,
   toAmount,
   fromTokenAddress,
@@ -98,6 +100,7 @@ export function SwapCoins({
         }}
       >
         <SwapForm
+          cancelAutoSwap={cancelAutoSwap}
           data={{
             fromAmount,
             toAmount,

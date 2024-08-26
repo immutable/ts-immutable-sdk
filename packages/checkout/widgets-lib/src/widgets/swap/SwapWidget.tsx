@@ -221,6 +221,18 @@ export default function SwapWidget({
     });
   }, [autoProceed, direction]);
 
+  const cancelAutoProceed = useCallback(() => {
+    if (autoProceed) {
+      swapDispatch({
+        payload: {
+          type: SwapActions.SET_AUTO_PROCEED,
+          autoProceed: false,
+          direction: SwapDirection.FROM,
+        },
+      });
+    }
+  }, [autoProceed, swapDispatch]);
+
   return (
     <ViewContext.Provider value={viewReducerValues}>
       <SwapContext.Provider value={swapReducerValues}>
@@ -231,6 +243,7 @@ export default function SwapWidget({
           {viewState.view.type === SwapWidgetViews.SWAP && (
           <SwapCoins
             theme={theme}
+            cancelAutoProceed={cancelAutoProceed}
             fromAmount={viewState.view.data?.fromAmount ?? amount}
             fromTokenAddress={viewState.view.data?.fromTokenAddress ?? fromTokenAddress}
             toTokenAddress={viewState.view.data?.toTokenAddress ?? toTokenAddress}

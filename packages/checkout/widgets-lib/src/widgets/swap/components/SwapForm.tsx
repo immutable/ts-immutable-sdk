@@ -72,9 +72,10 @@ let quoteRequest: CancellablePromise<any>;
 export interface SwapFromProps {
   data?: SwapFormData;
   theme: WidgetTheme;
+  cancelAutoProceed: () => void;
 }
 
-export function SwapForm({ data, theme }: SwapFromProps) {
+export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
   const { t } = useTranslation();
   const {
     swapState: {
@@ -668,22 +669,9 @@ export function SwapForm({ data, theme }: SwapFromProps) {
     return isSwapFormValid;
   };
 
-  const canAutoSwap = useMemo(() => {
-    if (!autoProceed) return false;
-    const isValid = SwapFormValidator();
-    const result = (
-      !!fromAmount
-      && !!toAmount
-      && !!fromToken
-      && !!toToken
-      && !!quote
-      && !loading
-      && !insufficientFundsForGas
-      && isValid
-    );
-    console.log('canAutoSwap debug:', {
+  const formLoaded = useMemo(() => {
+    console.log('formLoaded debug:', {
       autoProceed,
-      isValid,
       fromAmount,
       toAmount,
       fromToken,
@@ -691,10 +679,30 @@ export function SwapForm({ data, theme }: SwapFromProps) {
       quote,
       loading,
       insufficientFundsForGas,
-      result,
     });
+    if (!autoProceed) return false;
+    const result = (
+      !loading
+      && !insufficientFundsForGas
+    );
     return result;
-  }, [fromAmount, toAmount, fromToken?.address, toToken?.address, quote, loading, insufficientFundsForGas]);
+  }, [loading, insufficientFundsForGas]);
+
+  const canAutoSwap = useMemo(() => {
+    if (!autoProceed) return false;
+    if (!formLoaded) return false;
+    const isValid = SwapFormValidator();
+    console.log('canAutoSwap debug:', {
+      autoProceed,
+      isValid,
+      formLoaded,
+    });
+    if (!isValid) {
+      cancelAutoProceed();
+      return false;
+    }
+    return true;
+  }, [formLoaded, quote]);
 
   const sendTransaction = async () => {
     if (!quote) return;
@@ -988,12 +996,13 @@ export function SwapForm({ data, theme }: SwapFromProps) {
         />
         )}
       </Box>
-      <SwapButton
-        visible={!autoProceed}
-        validator={SwapFormValidator}
-        loading={loading}
-        sendTransaction={sendTransaction}
-      />
+      {!autoProceed && (
+        <SwapButton
+          validator={SwapFormValidator}
+          loading={loading}
+          sendTransaction={sendTransaction}
+        />
+      )}
       <TransactionRejected
         visible={showTxnRejectedState}
         showHeaderBar={false}

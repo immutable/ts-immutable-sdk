@@ -6,31 +6,28 @@ import {
 } from './SwapButtonStyles';
 
 export interface SwapButtonProps {
-  visibility: boolean;
   loading: boolean
   validator: () => boolean
-  sendTransaction: () => Promise<void>; // Added this line
+  sendTransaction: () => Promise<void>;
 }
 
 export function SwapButton({
-  visibility,
   loading,
   validator,
-  sendTransaction, // Added this line
+  sendTransaction,
 }: SwapButtonProps) {
   const { t } = useTranslation();
 
   const handleClick = async () => {
     const canSwap = validator();
     if (canSwap) {
-      await sendTransaction(); // Call sendTransaction here
+      await sendTransaction();
     }
   };
 
   return (
     <Box sx={swapButtonBoxStyle}>
       <Button
-        sx={{ visibility: visibility ? 'visible' : 'hidden' }}
         testId="swap-button"
         disabled={loading}
         variant="primary"
