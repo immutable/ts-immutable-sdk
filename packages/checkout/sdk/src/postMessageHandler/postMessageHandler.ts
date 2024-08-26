@@ -1,17 +1,12 @@
 import {
   PostMessageHandlerEventType,
-  PostMessagePayload,
+  PostMessageData,
 } from './postMessageEventTypes';
 
 export type PostMessageHandlerConfiguration = {
   targetOrigin: string;
   eventTarget: WindowProxy;
   eventSource?: WindowProxy;
-};
-
-export type PostMessageData = {
-  type: PostMessageHandlerEventType;
-  payload: PostMessagePayload;
 };
 
 export class PostMessageHandler {
