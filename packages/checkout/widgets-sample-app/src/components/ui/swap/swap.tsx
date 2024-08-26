@@ -4,13 +4,15 @@ import { useEffect, useMemo, useState } from 'react';
 
 const SWAP_TARGET_ID = 'swap-target'
 function SwapUI() {
+  const urlParams = new URLSearchParams(window.location.search);
+
   const checkout = useMemo(() => new Checkout(), []);
   const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout]);
   const swap = useMemo(() => factory.create(WidgetType.SWAP),[factory]);
-  const [isAutoProceed, setIsAutoProceed] = useState(false);
+  const [isAutoProceed, setIsAutoProceed] = useState(urlParams.get('isAutoProceed') == 'true');
 
   const updateTheme = (theme: WidgetTheme) => swap.update({config: {theme}});
-  
+
   useEffect(() => {
     swap.mount(SWAP_TARGET_ID,{
       amount: '5',

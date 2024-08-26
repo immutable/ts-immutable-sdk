@@ -116,6 +116,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
   const [toToken, setToToken] = useState<TokenInfo | undefined>();
   const [toTokenError, setToTokenError] = useState<string>('');
   const [fromFiatValue, setFromFiatValue] = useState('');
+  const [loadedToAndFromTokens, setLoadedToAndFromTokens] = useState(false);
 
   // Quote
   const [quote, setQuote] = useState<TransactionResponse | null>(null);
@@ -197,6 +198,8 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         isNativeToken(token.address) && data?.toTokenAddress?.toLowerCase() === NATIVE
       ) || (token.address?.toLowerCase() === data?.toTokenAddress?.toLowerCase())));
     }
+
+    setLoadedToAndFromTokens(true);
   }, [
     tokenBalances,
     allowedTokens,
@@ -669,9 +672,10 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     return isSwapFormValid;
   };
 
-  const formLoaded = useMemo(() => {
-    console.log('formLoaded debug:', {
+  const isFormValidForAutoProceed = useMemo(() => {
+    console.log('isFormValidForAutoProceed debug:', {
       autoProceed,
+      loadedToAndFromTokens,
       fromAmount,
       toAmount,
       fromToken,
@@ -681,28 +685,30 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       insufficientFundsForGas,
     });
     if (!autoProceed) return false;
-    const result = (
-      !loading
-      && !insufficientFundsForGas
-    );
-    return result;
-  }, [loading, insufficientFundsForGas]);
+    if (!loadedToAndFromTokens) return false;
+
+    return !loading;
+  }, [loading, loadedToAndFromTokens]);
 
   const canAutoSwap = useMemo(() => {
     if (!autoProceed) return false;
-    if (!formLoaded) return false;
-    const isValid = SwapFormValidator();
+    if (!isFormValidForAutoProceed) return false;
+
+    const isFormValid = SwapFormValidator();
+
     console.log('canAutoSwap debug:', {
       autoProceed,
-      isValid,
-      formLoaded,
+      isFormValid,
+      isFormValidForAutoProceed,
     });
-    if (!isValid) {
+
+    if (!isFormValid) {
       cancelAutoProceed();
       return false;
     }
+
     return true;
-  }, [formLoaded, quote]);
+  }, [isFormValidForAutoProceed]);
 
   const sendTransaction = async () => {
     if (!quote) return;
@@ -728,6 +734,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     if (!isValid) return;
     if (!checkout || !provider || !transaction) return;
     if (insufficientFundsForGas) {
+      cancelAutoProceed();
       openNotEnoughImxDrawer();
       return;
     }
