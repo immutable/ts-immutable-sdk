@@ -8,6 +8,8 @@ import { HttpClient } from '../api/http';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { RemoteConfigFetcher } from './remoteConfigFetcher';
 
+const INDEXER_ETH_ROOT_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000eee';
+
 type TokensEndpointResult = {
   chain: {
     id: string;
@@ -133,14 +135,20 @@ export class TokensFetcher {
       tokens[chainId]?.push(tokenInfo);
 
       const rootChainId = parseInt(token.root_chain_id?.split('eip155:').pop() || '', 10) as ChainId;
-      if (rootChainId && token.root_contract_address) {
+      let address = token.root_contract_address?.toLowerCase();
+
+      if (rootChainId && address) {
         if (!tokens[rootChainId]) {
           tokens[rootChainId] = [];
         }
 
+        if (address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS) {
+          address = 'native';
+        }
+
         tokens[rootChainId]?.push({
           ...tokenInfo,
-          address: token.root_contract_address,
+          address,
         });
       }
     });
