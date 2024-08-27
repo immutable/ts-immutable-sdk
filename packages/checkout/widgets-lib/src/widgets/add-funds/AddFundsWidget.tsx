@@ -3,7 +3,6 @@
 import { AddFundsWidgetParams } from '@imtbl/checkout-sdk/dist/widgets/definitions/parameters/addFunds';
 import { Web3Provider } from '@ethersproject/providers';
 import {
-  useCallback,
   useEffect, useMemo, useReducer, useState,
 } from 'react';
 import { createWalletClient, custom } from 'viem';
@@ -23,8 +22,6 @@ import { findDefaultToken } from '@lifi/data-types';
 import {
   Body, Box, Button, Heading,
 } from '@biom3/react';
-import { BigNumber, Contract } from 'ethers';
-import { ERC20ABI } from '@imtbl/checkout-sdk';
 import {
   ViewContext,
   initialViewState,
@@ -57,8 +54,6 @@ export default function AddFundsWidget({ provider }: AddFundsWidgetInputs) {
     message: string;
   } | null>(null);
   const [selectedQuote, setSelectedQuote] = useState<LiFiStep | undefined>(undefined);
-  const [isApproving, setIsApproving] = useState(false);
-  const [approvalError, setApprovalError] = useState<string | null>(null);
 
   const viewReducerValues = useMemo(
     () => ({
@@ -68,9 +63,9 @@ export default function AddFundsWidget({ provider }: AddFundsWidgetInputs) {
     [viewState, viewReducer],
   );
 
-  const { sendTransaction } = useExecuteQuote({
+  const { executeFlow } = useExecuteQuote({
     provider,
-    txnRequest: selectedQuote?.transactionRequest,
+    quote: selectedQuote,
   });
 
   useEffect(() => {
@@ -96,7 +91,7 @@ export default function AddFundsWidget({ provider }: AddFundsWidgetInputs) {
         integrator: 'immutable',
         routeOptions: {
           bridges: {
-            allow: ['squid'],
+            // allow: ['squid', 'newone'],
           },
         },
         apiKey:
@@ -196,13 +191,13 @@ export default function AddFundsWidget({ provider }: AddFundsWidgetInputs) {
     const start = Date.now();
 
     const configs = [
-      {
-        fromChain: ChainId.OPT,
-        fromToken: findDefaultToken(CoinKey.USDT, ChainId.OPT).address,
-        toChain: ChainId.MNT,
-        toToken: findDefaultToken(CoinKey.USDC, ChainId.MNT).address,
-        toAmount: '1000000',
-      },
+      // {
+      //   fromChain: ChainId.OPT,
+      //   fromToken: findDefaultToken(CoinKey.USDT, ChainId.OPT).address,
+      //   toChain: ChainId.MNT,
+      //   toToken: findDefaultToken(CoinKey.USDC, ChainId.MNT).address,
+      //   toAmount: '1000000',
+      // },
       {
         fromChain: ChainId.OPT,
         fromToken: findDefaultToken(CoinKey.USDC, ChainId.OPT).address,
@@ -210,13 +205,13 @@ export default function AddFundsWidget({ provider }: AddFundsWidgetInputs) {
         toToken: findDefaultToken(CoinKey.USDC, ChainId.MNT).address,
         toAmount: '1000000',
       },
-      {
-        fromChain: ChainId.ETH,
-        fromToken: findDefaultToken(CoinKey.ETH, ChainId.ETH).address,
-        toChain: ChainId.OPT,
-        toToken: findDefaultToken(CoinKey.ETH, ChainId.OPT).address,
-        toAmount: '1000000000000000',
-      },
+      // {
+      //   fromChain: ChainId.ETH,
+      //   fromToken: findDefaultToken(CoinKey.ETH, ChainId.ETH).address,
+      //   toChain: ChainId.OPT,
+      //   toToken: findDefaultToken(CoinKey.ETH, ChainId.OPT).address,
+      //   toAmount: '1000000000000000',
+      // },
     ];
 
     const signer = provider?.getSigner();
@@ -278,52 +273,10 @@ export default function AddFundsWidget({ provider }: AddFundsWidgetInputs) {
     }
   };
 
-  const checkAllowanceAndApprove = useCallback(async (tokenAddress: string, spender: string, amount: BigNumber) => {
-    if (!provider) return;
-
-    const signer = provider?.getSigner();
-    const tokenContract = new Contract(tokenAddress, JSON.stringify(ERC20ABI), signer);
-
-    try {
-      const address = (await signer?.getAddress()) || '';
-      const currentAllowance: BigNumber = await tokenContract.allowance(address, spender);
-      console.log('==== current allowance:', currentAllowance.toString());
-
-      if (currentAllowance.lt(amount)) {
-        setIsApproving(true);
-
-        const approveTx = await tokenContract.approve(spender, amount);
-
-        await approveTx.wait();
-
-        console.log(`Approval successful: ${approveTx.hash}`);
-      } else {
-        console.log('!!! Sufficient allowance already granted');
-      }
-    } catch (error: any) {
-      console.log('Approval error:', error);
-      setApprovalError('Failed to approve tokens for transfer.');
-    } finally {
-      setIsApproving(false);
-    }
-  }, [provider]);
-
   const executeQuote = async () => {
-    if (!selectedQuote?.transactionRequest) return;
+    if (!selectedQuote) return;
 
-    const tokenAddress = selectedQuote.action.fromToken.address || '';
-    const spender = selectedQuote.transactionRequest?.to || '';
-    const amount = BigNumber.from(selectedQuote.transactionRequest?.value);
-
-    console.log('=== tokenAddress', tokenAddress);
-    console.log('=== spender', spender);
-    console.log('=== amount', amount);
-
-    // Step 1: Check allowance and approve if necessary
-    await checkAllowanceAndApprove(tokenAddress, spender, amount);
-
-    // Step 2: Execute the main transaction
-    await sendTransaction(selectedQuote.transactionRequest);
+    await executeFlow();
   };
 
   return (
@@ -413,19 +366,10 @@ export default function AddFundsWidget({ provider }: AddFundsWidgetInputs) {
         <Box>
           <Box sx={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
             <Heading sx={{ marginBottom: '20px' }}>3. Execute Quote</Heading>
-            <Button onClick={executeQuote} disabled={isApproving || !selectedQuote}>
-              {isApproving ? 'Approving...' : 'Execute Quote'}
+            <Button onClick={executeQuote}>
+              Execute Quote
             </Button>
           </Box>
-
-          {approvalError && (
-          <Box sx={{ backgroundColor: '#ffadad', marginTop: '10px' }}>
-            <Heading size="xSmall" sx={{ margin: '10px' }}>
-              Approval Error:
-              {approvalError}
-            </Heading>
-          </Box>
-          )}
         </Box>
       </Box>
     </ViewContext.Provider>

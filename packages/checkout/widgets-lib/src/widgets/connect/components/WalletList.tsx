@@ -138,12 +138,19 @@ export function WalletList(props: WalletListProps) {
         });
         return;
       }
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: ConnectWidgetViews.SWITCH_NETWORK },
+          view: { type: ConnectWidgetViews.SUCCESS },
         },
       });
+      // viewDispatch({
+      //   payload: {
+      //     type: ViewActions.UPDATE_VIEW,
+      //     view: { type: ConnectWidgetViews.SWITCH_NETWORK },
+      //   },
+      // });
       return;
     }
 
@@ -225,21 +232,21 @@ export function WalletList(props: WalletListProps) {
       const web3Provider = new Web3Provider(ethereumProvider);
       selectWeb3Provider(web3Provider, 'walletconnect');
 
-      const chainId = await web3Provider.getSigner().getChainId();
+      // const chainId = await web3Provider.getSigner().getChainId();
 
       if (ethereumProvider.chainId !== targetChainId) {
         // @ts-ignore allow protected method `switchEthereumChain` to be called
         await ethereumProvider.switchEthereumChain(targetChainId);
       }
 
-      if (chainId !== targetChainId) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: { type: ConnectWidgetViews.SWITCH_NETWORK },
-          },
-        });
-      }
+      // if (chainId !== targetChainId) {
+      //   viewDispatch({
+      //     payload: {
+      //       type: ViewActions.UPDATE_VIEW,
+      //       view: { type: ConnectWidgetViews.SWITCH_NETWORK },
+      //     },
+      //   });
+      // }
 
       viewDispatch({
         payload: {

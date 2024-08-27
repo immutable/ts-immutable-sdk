@@ -35,7 +35,7 @@ import { addProviderListenersForWidgetRoot, sendProviderUpdatedEvent } from '../
 import { identifyUser } from '../../lib/analytics/identifyUser';
 import { useWalletConnect } from '../../lib/hooks/useWalletConnect';
 import { isMetaMaskProvider, isPassportProvider, isWalletConnectProvider } from '../../lib/provider';
-import { isL1EthChainId, isZkEvmChainId } from '../../lib/utils';
+import { isL1EthChainId } from '../../lib/utils';
 import { WalletConnectManager, walletConnectProviderInfo } from '../../lib/walletConnect';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { ErrorView } from '../../views/error/ErrorView';
@@ -56,7 +56,7 @@ import {
 } from './context/ConnectContext';
 import { ConnectWallet } from './views/ConnectWallet';
 import { SwitchNetworkEth } from './views/SwitchNetworkEth';
-import { SwitchNetworkZkEVM } from './views/SwitchNetworkZkEVM';
+// import { SwitchNetworkZkEVM } from './views/SwitchNetworkZkEVM';
 
 export type ConnectWidgetInputs = ConnectWidgetParams & {
   config: StrongCheckoutWidgetsConfig
@@ -223,9 +223,9 @@ export default function ConnectWidget({
               blocklistWalletRdns={blocklistWalletRdns}
             />
           )}
-          {view.type === ConnectWidgetViews.SWITCH_NETWORK && isZkEvmChainId(targetChain) && (
+          {/* {view.type === ConnectWidgetViews.SWITCH_NETWORK && isZkEvmChainId(targetChain) && (
             <SwitchNetworkZkEVM />
-          )}
+          )} */}
           {view.type === ConnectWidgetViews.SWITCH_NETWORK && isL1EthChainId(targetChain) && (
             <SwitchNetworkEth />
           )}
