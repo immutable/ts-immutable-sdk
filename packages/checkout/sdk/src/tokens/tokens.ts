@@ -44,7 +44,7 @@ export const getTokenAllowList = async (
       // legal reasons.
       blockedTokens = (
         ((await config.remote.getConfig('dex')) as DexConfig)?.blocklist || []
-      ).map((token) => token.address);
+      ).map((token) => token.address.toLowerCase());
 
       tokens = tokens.filter((token) => token.address && !blockedTokens.includes(token.address));
 
