@@ -79,14 +79,18 @@ describe('MagicWallet', () => {
       it('should throw a browser error for loginWithOIDC', async () => {
         const magicAdapter = new MagicAdapter(config);
 
-        await expect(async () => {
+        let type = '';
+        let message = '';
+
+        try {
           await magicAdapter.login(idToken);
-        }).rejects.toThrow(
-          new PassportError(
-            'Cannot perform this action outside of the browser',
-            PassportErrorType.WALLET_CONNECTION_ERROR,
-          ),
-        );
+        } catch (e: any) {
+          type = e.type;
+          message = e.message;
+        }
+
+        expect(type).toEqual(PassportErrorType.WALLET_CONNECTION_ERROR);
+        expect(message).toEqual('Cannot perform this action outside of the browser');
       });
     });
   });
