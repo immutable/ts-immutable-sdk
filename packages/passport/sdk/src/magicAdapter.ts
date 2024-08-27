@@ -13,14 +13,24 @@ const MAINNET = 'mainnet';
 export default class MagicAdapter {
   private readonly config: PassportConfiguration;
 
-  private readonly magicClient: MagicClient;
+  private readonly client?: MagicClient;
 
   constructor(config: PassportConfiguration) {
     this.config = config;
-    this.magicClient = new Magic(this.config.magicPublishableApiKey, {
-      extensions: [new OpenIdExtension()],
-      network: MAINNET, // We always connect to mainnet to ensure addresses are the same across envs
-    });
+    if (typeof window !== 'undefined') {
+      this.client = new Magic(this.config.magicPublishableApiKey, {
+        extensions: [new OpenIdExtension()],
+        network: MAINNET, // We always connect to mainnet to ensure addresses are the same across envs
+      });
+    }
+  }
+
+  private get magicClient(): MagicClient {
+    if (!this.client) {
+      throw new Error('Cannot perform this action outside of the browser');
+    }
+
+    return this.client;
   }
 
   async login(
