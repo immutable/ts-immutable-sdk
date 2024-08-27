@@ -16,6 +16,7 @@ export interface CheckoutState {
   walletProviderInfo: EIP6963ProviderInfo | null;
   sendCloseEvent: () => void;
   initialised: boolean;
+  checkoutAppRoute: string | undefined;
 }
 
 export const initialCheckoutState: CheckoutState = {
@@ -29,6 +30,7 @@ export const initialCheckoutState: CheckoutState = {
   walletProviderName: null,
   sendCloseEvent: () => { },
   initialised: false,
+  checkoutAppRoute: undefined,
 };
 
 export interface CheckoutContextState {
@@ -49,7 +51,8 @@ type ActionPayload =
   | SetPassportPayload
   | SetProviderNamePayload
   | SetSendCloseEventPayload
-  | SetInitialisedPayload;
+  | SetInitialisedPayload
+  | SetCheckoutAppRoutePayload;
 
 export enum CheckoutActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
@@ -61,6 +64,7 @@ export enum CheckoutActions {
   SET_WALLET_PROVIDER_NAME = 'SET_WALLET_PROVIDER_NAME',
   SET_SEND_CLOSE_EVENT = 'SET_SEND_CLOSE_EVENT',
   SET_INITIALISED = 'SET_INITIALISED',
+  SET_CHECKOUT_APP_ROUTE = 'SET_CHECKOUT_APP_ROUTE',
 }
 
 export interface SetCheckoutPayload {
@@ -106,6 +110,11 @@ export interface SetSendCloseEventPayload {
 export interface SetInitialisedPayload {
   type: CheckoutActions.SET_INITIALISED;
   initialised: boolean;
+}
+
+export interface SetCheckoutAppRoutePayload {
+  type: CheckoutActions.SET_CHECKOUT_APP_ROUTE;
+  checkoutAppRoute: string | undefined;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -167,6 +176,11 @@ export const checkoutReducer: Reducer<CheckoutState, CheckoutAction> = (
       return {
         ...state,
         initialised: action.payload.initialised,
+      };
+    case CheckoutActions.SET_CHECKOUT_APP_ROUTE:
+      return {
+        ...state,
+        checkoutAppRoute: action.payload.checkoutAppRoute,
       };
     default:
       return state;

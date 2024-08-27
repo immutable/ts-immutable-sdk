@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useRef } from 'react';
+import {
+  useCallback, useEffect, useMemo, useRef,
+} from 'react';
 import {
   EIP6963ProviderInfo,
   PostMessageData,
@@ -25,10 +27,19 @@ type ProviderRelayPayload = {
   eip6963Info: EIP6963ProviderInfo;
 };
 
+const ROUTES_TO_BYPASS_SAVED_PROVIDER = ['bridge'];
+
 export function useProviderRelay() {
-  const [{ checkout, postMessageHandler, provider }, checkoutDispatch] = useCheckoutContext();
+  const [{
+    checkout, postMessageHandler, provider, checkoutAppRoute,
+  }, checkoutDispatch] = useCheckoutContext();
 
   const unsubscribePostMessageHandler = useRef<() => void>();
+
+  const bypassSavedProvider = useMemo(
+    () => ROUTES_TO_BYPASS_SAVED_PROVIDER.includes(checkoutAppRoute ?? ''),
+    [checkoutAppRoute],
+  );
 
   /**
    * Execute a request using the provider
@@ -87,7 +98,7 @@ export function useProviderRelay() {
       }
 
       // If provider is not defined, connect the target provider
-      let currentProvider = provider;
+      let currentProvider = bypassSavedProvider ? undefined : provider;
       if (!currentProvider && targetProvider) {
         const connectResponse = await checkout.connect({
           provider: new Web3Provider(targetProvider.provider),
@@ -110,20 +121,15 @@ export function useProviderRelay() {
       await execute(providerRelayPayload, currentProvider);
     },
 
-    [provider, postMessageHandler, checkout, execute],
+    [provider, postMessageHandler, checkout, execute, bypassSavedProvider],
   );
 
   /**
    * Subscribe to provider relay messages
    */
   useEffect(() => {
-    // TODO we need to unsubscribe everywhere
     if (!postMessageHandler) return;
     unsubscribePostMessageHandler.current?.();
     unsubscribePostMessageHandler.current = postMessageHandler?.subscribe(onJsonRpcRequestMessage);
   }, [postMessageHandler, onJsonRpcRequestMessage]);
 }
-
-// TODO -
-// 1 - commit the unsub part
-// 2 - add unsubs to all postMessageHandlers subscriptions
