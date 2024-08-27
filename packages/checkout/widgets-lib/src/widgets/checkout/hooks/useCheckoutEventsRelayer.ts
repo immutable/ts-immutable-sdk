@@ -1,72 +1,68 @@
+/* eslint-disable no-case-declarations */
 import { useContext, useEffect, useRef } from 'react';
 import {
-  CheckoutConnectSuccessEvent,
   CheckoutEventType,
-  CheckoutFlowType,
-  CheckoutSuccessEvent,
-  IMTBLWidgetEvents,
   PostMessageHandlerEventType,
-  WidgetEventData,
-  WidgetType,
+  CheckoutSuccessEventType,
 } from '@imtbl/checkout-sdk';
 import { useCheckoutContext } from '../context/CheckoutContextProvider';
-import { sendCheckoutEvent } from '../CheckoutWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { CheckoutActions } from '../context/CheckoutContext';
-
-function isWidgetEvent(payload: any): payload is {
-  type: IMTBLWidgetEvents.IMTBL_CHECKOUT_WIDGET_EVENT;
-  detail: {
-    type: CheckoutEventType;
-    data: WidgetEventData[WidgetType.CHECKOUT][keyof WidgetEventData[WidgetType.CHECKOUT]];
-  };
-} {
-  return payload.type === IMTBLWidgetEvents.IMTBL_CHECKOUT_WIDGET_EVENT;
-}
+import { sendCheckoutEvent } from '../CheckoutWidgetEvents';
 
 export function useCheckoutEventsRelayer() {
   const [{ postMessageHandler, provider }, checkoutDispatch] = useCheckoutContext();
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
   const unsubscribePostMessageHandler = useRef<(() => void) | undefined>();
 
   useEffect(() => {
     if (!postMessageHandler) return undefined;
     unsubscribePostMessageHandler.current?.();
 
-    unsubscribePostMessageHandler.current = postMessageHandler.subscribe(({ type, payload }) => {
-      if (type !== PostMessageHandlerEventType.WIDGET_EVENT || !isWidgetEvent(payload)) return;
-
-      if (payload.detail.type === CheckoutEventType.SUCCESS
-        && (payload.detail.data as CheckoutSuccessEvent).flow === CheckoutFlowType.CONNECT) {
-        const checkoutConnectSuccessEvent = payload.detail as unknown as CheckoutConnectSuccessEvent;
-        if (!provider) {
-          throw new Error('Provider not found, unable to send checkout connect success event');
+    unsubscribePostMessageHandler.current = postMessageHandler.subscribe(
+      ({ type, payload }) => {
+        if (type !== PostMessageHandlerEventType.WIDGET_EVENT) {
+          return;
         }
-        checkoutConnectSuccessEvent.data.provider = provider;
-        sendCheckoutEvent(eventTarget, { type: payload.detail.type, data: checkoutConnectSuccessEvent });
-        return;
-      }
 
-      if (payload.detail.type === CheckoutEventType.DISCONNECTED) {
-        checkoutDispatch({
-          payload: {
-            type: CheckoutActions.SET_PROVIDER,
-            provider: undefined,
-          },
-        });
-      }
+        const event = { ...payload };
 
-      sendCheckoutEvent(eventTarget, payload.detail);
+        if (event.detail.type === CheckoutEventType.INITIALISED) {
+          checkoutDispatch({
+            payload: {
+              type: CheckoutActions.SET_INITIALISED,
+              initialised: true,
+            },
+          });
+        }
 
-      if (payload.detail.type === CheckoutEventType.INITIALISED) {
-        checkoutDispatch({
-          payload: {
-            type: CheckoutActions.SET_INITIALISED,
-            initialised: true,
-          },
-        });
-      }
-    });
+        if (event.detail.type === CheckoutEventType.DISCONNECTED) {
+          checkoutDispatch({
+            payload: {
+              type: CheckoutActions.SET_PROVIDER,
+              provider: undefined,
+            },
+          });
+        }
+
+        if (
+          event.detail.type === CheckoutEventType.SUCCESS
+          && event.detail.data.type === CheckoutSuccessEventType.CONNECT_SUCCESS
+        ) {
+          if (!provider) {
+            throw new Error(
+              'Provider not found, unable to send checkout connect success event',
+            );
+          }
+
+          event.detail.data.data.provider = provider;
+        }
+
+        sendCheckoutEvent(eventTarget, event.detail);
+      },
+    );
 
     return () => {
       unsubscribePostMessageHandler.current?.();

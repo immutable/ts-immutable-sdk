@@ -113,7 +113,7 @@ function CheckoutUI() {
   useEffect(() => {
     if (!checkoutWidget) return;
     checkoutWidget?.mount("checkout", {
-      flow: CheckoutFlowType.WALLET,
+      flow: CheckoutFlowType.CONNECT,
     });
   }, [checkoutWidget]);
 
@@ -132,97 +132,81 @@ function CheckoutUI() {
       console.log("----------> CLOSE", data);
     });
 
-    checkoutWidget.addListener(CheckoutEventType.SUCCESS, (payload) => {
-      if (payload.flow === CheckoutFlowType.CONNECT) {
-        setWeb3Provider(payload.data.provider);
-      }
+    checkoutWidget.addListener(CheckoutEventType.SUCCESS, (event) => {
+      console.log("🐛 ~ event: ----->", event);
 
-      if (
-        payload.flow === CheckoutFlowType.SALE &&
-        payload.type === CheckoutSuccessEventType.SALE_SUCCESS
-      ) {
-        console.log("----------> SUCCESS SALE_SUCESS", payload);
+      if (event.type === CheckoutSuccessEventType.CONNECT_SUCCESS) {
+        console.log("----------> SUCCESS CONNECT_SUCCESS", event);
+        setWeb3Provider(event.data.provider);
+      }
+      if (event.type === CheckoutSuccessEventType.SALE_SUCCESS) {
+        console.log("----------> SUCCESS SALE_SUCESS", event);
+      }
+      if (event.type === CheckoutSuccessEventType.SALE_TRANSACTION_SUCCESS) {
+        console.log("----------> SUCCESS SALE_TRANSACTION_SUCCESS", event);
+      }
+      if (event.type === CheckoutSuccessEventType.ONRAMP_SUCCESS) {
+        console.log("----------> SUCCESS ONRAMP", event);
+      }
+      if (event.type === CheckoutSuccessEventType.BRIDGE_SUCCESS) {
+        console.log("----------> SUCCESS BRIDGE_SUCCESS", event);
       }
       if (
-        payload.flow === CheckoutFlowType.SALE &&
-        payload.type === CheckoutSuccessEventType.SALE_TRANSACTION_SUCCESS
-      ) {
-        console.log("----------> SUCCESS SALE_TRANSACTION_SUCCESS", payload);
-      }
-      if (payload.flow === CheckoutFlowType.ONRAMP) {
-        console.log("----------> SUCCESS ONRAMP", payload);
-      }
-      if (
-        payload.flow === CheckoutFlowType.BRIDGE &&
-        payload.type === CheckoutSuccessEventType.BRIDGE_SUCCESS
-      ) {
-        console.log("----------> SUCCESS BRIDGE_SUCCESS", payload);
-      }
-      if (
-        payload.flow === CheckoutFlowType.BRIDGE &&
-        payload.type === CheckoutSuccessEventType.BRIDGE_CLAIM_WITHDRAWAL_SUCCESS
+        event.type === CheckoutSuccessEventType.BRIDGE_CLAIM_WITHDRAWAL_SUCCESS
       ) {
         console.log(
           "----------> SUCCESS BRIDGE_CLAIM_WITHDRAWAL_SUCCESS",
-          payload.data
+          event.data
         );
       }
-
-      console.log("----------> SUCCESS", payload);
     });
 
-    checkoutWidget.addListener(CheckoutEventType.FAILURE, (data) => {
-      if (
-        data.flow === CheckoutFlowType.BRIDGE &&
-        data.type === CheckoutFailureEventType.BRIDGE_FAILED
-      ) {
-        console.log("----------> FAILURE BRIDGE_FAILED", data);
+    checkoutWidget.addListener(CheckoutEventType.FAILURE, (event) => {
+      if (event.type === CheckoutFailureEventType.BRIDGE_FAILED) {
+        console.log("----------> FAILURE BRIDGE_FAILED", event);
       }
       if (
-        data.flow === CheckoutFlowType.BRIDGE &&
-        data.type === CheckoutFailureEventType.BRIDGE_CLAIM_WITHDRAWAL_FAILED
+        event.type === CheckoutFailureEventType.BRIDGE_CLAIM_WITHDRAWAL_FAILED
       ) {
         console.log(
           "----------> FAILURE BRIDGE_CLAIM_WITHDRAWAL_FAILED",
-          data.data
+          event.data
         );
       }
-      if (data.flow === CheckoutFlowType.CONNECT) {
-        console.log("----------> FAILURE CONNECT", data);
+      if (event.type === CheckoutFailureEventType.CONNECT_FAILED) {
+        console.log("----------> FAILURE CONNECT", event);
       }
-      if (data.flow === CheckoutFlowType.ONRAMP) {
-        console.log("----------> FAILURE ONRAMP", data);
+      if (event.type === CheckoutFailureEventType.ONRAMP_FAILED) {
+        console.log("----------> FAILURE ONRAMP", event);
       }
-      if (data.flow === CheckoutFlowType.SWAP) {
-        console.log("----------> FAILURE SWAP", data);
+      if (event.type === CheckoutFailureEventType.SWAP_FAILED) {
+        console.log("----------> FAILURE SWAP", event);
       }
-      if (data.flow === CheckoutFlowType.SALE) {
-        console.log("----------> FAILURE SALE", data);
+      if (event.type === CheckoutFailureEventType.SALE_FAILED) {
+        console.log("----------> FAILURE SALE", event);
       }
-      console.log("----------> FAILURE", data);
+      console.log("----------> FAILURE", event);
     });
 
-    checkoutWidget.addListener(CheckoutEventType.DISCONNECTED, (data) => {
-      console.log("----------> DISCONNECTED", data);
+    checkoutWidget.addListener(CheckoutEventType.DISCONNECTED, (event) => {
+      console.log("----------> DISCONNECTED", event);
     });
 
-    checkoutWidget.addListener(CheckoutEventType.USER_ACTION, (data) => {
-      if (
-        data.flow === CheckoutFlowType.SALE &&
-        data.type === CheckoutUserActionEventType.PAYMENT_METHOD_SELECTED
-      ) {
-        console.log("----------> USER_ACTION PAYMENT_METHOD_SELECTED", data);
+    checkoutWidget.addListener(CheckoutEventType.USER_ACTION, (event) => {
+      if (event.type === CheckoutUserActionEventType.PAYMENT_METHOD_SELECTED) {
+        console.log(
+          "----------> USER_ACTION PAYMENT_METHOD_SELECTED",
+          event.data.paymentMethod
+        );
       }
-      if (
-        data.flow === CheckoutFlowType.SALE &&
-        data.type === CheckoutUserActionEventType.PAYMENT_TOKEN_SELECTED
-      ) {
-        console.log("----------> USER_ACTION PAYMENT_TOKEN_SELECTED", data);
+      if (event.type === CheckoutUserActionEventType.PAYMENT_TOKEN_SELECTED) {
+        console.log("----------> USER_ACTION PAYMENT_TOKEN_SELECTED", event);
       }
-      if (data.flow === CheckoutFlowType.WALLET) {
-        console.log("----------> USER_ACTION WALLET", data);
+      if (event.type === CheckoutUserActionEventType.NETWORK_SWITCH) {
+        console.log("----------> USER_ACTION WALLET", event);
       }
-      console.log("----------> USER_ACTION", data);
+
+      console.log("----------> USER_ACTION", event);
     });
   }, [checkoutWidget]);
 
