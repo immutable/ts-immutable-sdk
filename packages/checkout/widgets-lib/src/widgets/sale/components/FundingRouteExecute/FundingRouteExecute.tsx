@@ -17,6 +17,7 @@ import {
   OnRampSuccess,
   OnRampFailed,
   ChainId,
+  SwapDirection,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback,
@@ -156,13 +157,14 @@ export function FundingRouteExecute({
           amount: step.fundingItem.fundsRequired.formattedAmount,
           fromTokenAddress: step.fundingItem.token.address,
           toTokenAddress: requiredTokenAddress,
+          autoProceed: true,
+          direction: SwapDirection.FROM,
         });
         if (network.chainId === getL2ChainId(checkout!.config)) {
           setView(FundingRouteExecuteViews.EXECUTE_SWAP);
           return;
         }
         nextView.current = FundingRouteExecuteViews.EXECUTE_SWAP;
-
         setView(FundingRouteExecuteViews.SWITCH_NETWORK_ZKEVM);
       }
 

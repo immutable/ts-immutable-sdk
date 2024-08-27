@@ -761,11 +761,12 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     });
   };
 
+  const shouldSendTransaction = useMemo(() => canAutoSwap === true && autoProceed === true, [canAutoSwap, autoProceed]);
+
   useEffect(() => {
-    if (!autoProceed) return;
-    if (!canAutoSwap) return;
+    if (shouldSendTransaction === undefined) return;
     sendTransaction();
-  }, [canAutoSwap, autoProceed, sendTransaction]);
+  }, [shouldSendTransaction]);
 
   return (
     <>
