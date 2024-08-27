@@ -38,12 +38,55 @@ describe('MagicWallet', () => {
   });
 
   describe('constructor', () => {
-    it('initialises the magicClient', async () => {
-      // eslint-disable-next-line no-new
-      new MagicAdapter(config);
-      expect(Magic).toHaveBeenCalledWith(apiKey, {
-        network: 'mainnet',
-        extensions: [new OpenIdExtension()],
+    describe('when window defined', () => {
+      let originalDocument: Document | undefined;
+
+      beforeAll(() => {
+        originalDocument = window.document;
+        const mockDocument = {
+          ...window.document,
+          readyState: 'complete',
+        };
+        (window as any).document = mockDocument;
+      });
+      afterAll(() => {
+        (window as any).document = originalDocument;
+      });
+      it('starts initialising the magicClient', () => {
+        jest.spyOn(window.document, 'readyState', 'get').mockReturnValue('complete');
+        const magicAdapter = new MagicAdapter(config);
+        // @ts-expect-error: client is private
+        expect(magicAdapter.client).toBeDefined();
+      });
+    });
+
+    describe('when window is undefined', () => {
+      const { window } = global;
+      beforeAll(() => {
+        // @ts-expect-error
+        delete global.window;
+      });
+      afterAll(() => {
+        global.window = window;
+      });
+
+      it('does nothing', () => {
+        const magicAdapter = new MagicAdapter(config);
+        // @ts-expect-error: client is private
+        expect(magicAdapter.client).toBeUndefined();
+      });
+
+      it('should throw a browser error for loginWithOIDC', async () => {
+        const magicAdapter = new MagicAdapter(config);
+
+        await expect(async () => {
+          await magicAdapter.login(idToken);
+        }).rejects.toThrow(
+          new PassportError(
+            'Cannot perform this action outside of the browser',
+            PassportErrorType.WALLET_CONNECTION_ERROR,
+          ),
+        );
       });
     });
   });
