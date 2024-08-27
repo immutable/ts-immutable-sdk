@@ -221,8 +221,8 @@ export default function SwapWidget({
           <SwapCoins
             theme={theme}
             cancelAutoProceed={cancelAutoProceed}
-            fromAmount={fromAmount}
-            toAmount={toAmount}
+            fromAmount={viewState.view.data?.fromAmount ?? fromAmount}
+            toAmount={viewState.view.data?.toAmount ?? toAmount}
             fromTokenAddress={viewState.view.data?.fromTokenAddress ?? fromTokenAddress}
             toTokenAddress={viewState.view.data?.toTokenAddress ?? toTokenAddress}
           />
