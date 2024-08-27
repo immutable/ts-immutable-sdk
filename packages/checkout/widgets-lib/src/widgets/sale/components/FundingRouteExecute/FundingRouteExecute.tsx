@@ -156,7 +156,6 @@ export function FundingRouteExecute({
           amount: step.fundingItem.fundsRequired.formattedAmount,
           fromTokenAddress: step.fundingItem.token.address,
           toTokenAddress: requiredTokenAddress,
-          autoProceed: true,
         });
         if (network.chainId === getL2ChainId(checkout!.config)) {
           setView(FundingRouteExecuteViews.EXECUTE_SWAP);

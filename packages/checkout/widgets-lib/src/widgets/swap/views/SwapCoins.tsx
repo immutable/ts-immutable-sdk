@@ -83,12 +83,12 @@ export function SwapCoins({
 
   return (
     <SimpleLayout
-      header={(
+      header={!autoProceed ? (
         <HeaderNavigation
           title={t('views.SWAP.header.title')}
           onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
         />
-      )}
+      ) : ''}
       footer={<QuickswapFooter environment={checkout?.config.environment} theme={theme} />}
     >
       <Box

@@ -6,7 +6,7 @@ import {
   Box, Heading, Icon, OptionKey, Tooltip,
 } from '@biom3/react';
 import { BigNumber, utils } from 'ethers';
-import { CheckoutErrorType, TokenInfo, WidgetTheme } from '@imtbl/checkout-sdk';
+import { TokenInfo, WidgetTheme } from '@imtbl/checkout-sdk';
 
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { useTranslation } from 'react-i18next';
@@ -736,102 +736,29 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     }
 
     if (!transaction) return;
-    try {
-      setLoading(true);
-      const prefilledSwapData:PrefilledSwapForm = {
-        fromAmount: data?.fromAmount || '',
-        fromTokenAddress: data?.fromTokenAddress || '',
-        toTokenAddress: data?.toTokenAddress || '',
-        toAmount: data?.toAmount || '',
-      };
 
-      if (transaction.approval) {
-        // If we need to approve a spending limit first
-        // send user to Approve ERC20 Onbaording flow
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: SwapWidgetViews.APPROVE_ERC20,
-              data: {
-                approveTransaction: transaction.approval.transaction,
-                transaction: transaction.swap.transaction,
-                info: transaction.quote,
-                swapFormInfo: prefilledSwapData,
-              },
-            },
-          },
-        });
-        return;
-      }
-      cancelAutoProceed();
-      const txn = await checkout.sendTransaction({
-        provider,
-        transaction: {
-          ...transaction.swap.transaction,
-          gasPrice: (isPassportProvider(provider) ? BigNumber.from(0) : undefined),
-        },
-      });
+    setLoading(true);
+    const prefilledSwapData:PrefilledSwapForm = {
+      fromAmount: data?.fromAmount || '',
+      fromTokenAddress: data?.fromTokenAddress || '',
+      toTokenAddress: data?.toTokenAddress || '',
+      toAmount: data?.toAmount || '',
+    };
 
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SwapWidgetViews.IN_PROGRESS,
-            data: {
-              transactionResponse: txn.transactionResponse,
-              swapForm: prefilledSwapData as PrefilledSwapForm,
-            },
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SwapWidgetViews.APPROVE_ERC20,
+          data: {
+            approveTransaction: transaction.approval?.transaction,
+            transaction: transaction.swap.transaction,
+            info: transaction.quote,
+            swapFormInfo: prefilledSwapData,
           },
         },
-      });
-    } catch (err: any) {
-      // eslint-disable-next-line no-console
-      console.error(err);
-
-      setLoading(false);
-      if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
-        setShowTxnRejectedState(true);
-        return;
-      }
-      if (err.type === CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: SwapWidgetViews.PRICE_SURGE,
-              data: data as PrefilledSwapForm,
-            },
-          },
-        });
-        return;
-      }
-      if (err.type === CheckoutErrorType.TRANSACTION_FAILED
-        || err.type === CheckoutErrorType.INSUFFICIENT_FUNDS
-      || (err.receipt && err.receipt.status === 0)) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: SwapWidgetViews.FAIL,
-              reason: 'Transaction failed',
-              data: data as PrefilledSwapForm,
-            },
-          },
-        });
-        return;
-      }
-
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SharedViews.ERROR_VIEW,
-            error: err,
-          },
-        },
-      });
-    }
+      },
+    });
   };
 
   useEffect(() => {

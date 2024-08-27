@@ -207,7 +207,7 @@ export default function SwapWidget({
     }
   }, [autoProceed, swapDispatch]);
 
-  const fromAmount = direction === SwapDirection.FROM ? amount : undefined;
+  const fromAmount = direction === SwapDirection.FROM || direction == null ? amount : undefined;
   const toAmount = direction === SwapDirection.TO ? amount : undefined;
 
   return (

@@ -16,11 +16,9 @@ function SwapUI() {
   useEffect(() => {
     swap.mount(SWAP_TARGET_ID,{
       amount: '5',
-      // fromTokenAddress: '0x95222290DD7278Aa3Ddd389Cc1E1d165CC4BAfe5',
       fromTokenAddress: '0x3B2d8A1931736Fc321C24864BceEe981B11c3c57',
       toTokenAddress: "0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439",
       autoProceed: isAutoProceed,
-      // direction: SwapDirection.TO
     });
     swap.addListener(SwapEventType.SUCCESS, (data: SwapSuccess) => {
     })
