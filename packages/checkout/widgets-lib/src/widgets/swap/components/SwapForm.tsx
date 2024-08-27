@@ -761,7 +761,8 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     });
   };
 
-  const shouldSendTransaction = useMemo(() => canAutoSwap === true && autoProceed === true, [canAutoSwap, autoProceed]);
+  // eslint-disable-next-line max-len
+  const shouldSendTransaction = useMemo(() => ((canAutoSwap === true && autoProceed === true) ? true : undefined), [canAutoSwap, autoProceed]);
 
   useEffect(() => {
     if (shouldSendTransaction === undefined) return;
