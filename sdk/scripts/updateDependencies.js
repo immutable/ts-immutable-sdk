@@ -1,6 +1,4 @@
 //@ts-check
-import { getPluginConfiguration } from '@yarnpkg/cli';
-import { Configuration, Project } from '@yarnpkg/core';
 import semver from 'semver';
 import fs from 'fs';
 import path from 'path';
@@ -9,18 +7,21 @@ import { execSync } from 'child_process';
 const __dirname = path.resolve();
 const SDK_PACKAGE = '@imtbl/sdk';
 
+const rootDir = path.resolve(__dirname, '..')
+
 const workspacePackages = execSync('yarn workspaces list --json')
   .toString()
   .trim()
   .split('\n')
   .map((line) => JSON.parse(line))
-  .map((pkg) => pkg.name);
+
+const workspaceNames = workspacePackages.map((pkg) => pkg.name);
 
 // Update the map with the dependency if it doesn't exist, or if the
 // version is greater than the existing version
 const updateVersion = (map, dependency, version) => {
   // Don't add any workspace packages as a dependency
-  if (workspacePackages.includes(dependency)) return;
+  if (workspaceNames.includes(dependency)) return;
 
   const existingVersion = map.get(dependency);
 
@@ -41,50 +42,56 @@ const collectDependenciesRecusively = async (sdkWorkspace) => {
 
   // Recursively go through a workspace and update the dependencies
   const processWorkspace = (workspace) => {
-    const manifest = workspace.manifest;
-    const { dependencies, peerDependencies, devDependencies } = manifest;
+    const workspacePackageJSON = path.resolve(
+      rootDir, workspace, 'package.json'
+    );
+
+    const manifest = JSON.parse(fs.readFileSync(workspacePackageJSON, {encoding: 'utf8'}))
+    const { dependencies, peerDependencies, devDependencies, optionalDependencies } = manifest;
 
     // Dev dependencies, only check if they're workspace packages
     // And then process them
-    devDependencies.forEach((dep) => {
-      const depWorkspace = workspace.project.tryWorkspaceByIdent(dep);
+    Object.keys(devDependencies).forEach((dep) => {
+      const depWorkspace = workspacePackages.find((pkg) => pkg.name === dep);
       if (depWorkspace) {
-        processWorkspace(depWorkspace);
+        processWorkspace(depWorkspace.location);
       }
     });
 
     // If sdkpackage, exit early
-    if (manifest.raw.name === SDK_PACKAGE) return;
+    if (manifest.name === SDK_PACKAGE) return;
 
     // UpdateVersion for dependencies
-    dependencies.forEach((dep) => {
-      // check for optional dependencies metadata
-      if (manifest.dependenciesMeta?.get(dep.name)?.get(null)?.optional) {
-        updateVersion(
-          optionalDependenciesMap,
-          packageName(dep.scope, dep.name),
-          dep.range
-        );
-      } else {
+    if (dependencies) Object.keys(dependencies).forEach((dep) => {
         updateVersion(
           dependenciesMap,
-          packageName(dep.scope, dep.name),
-          dep.range
+          dep,
+          dependencies[dep]
         );
-      }
 
-      const depWorkspace = workspace.project.tryWorkspaceByIdent(dep);
-      if (depWorkspace) {
-        processWorkspace(depWorkspace);
-      }
+        const depWorkspace = workspacePackages.find((pkg) => pkg.name === dep);
+        if (depWorkspace) {
+          processWorkspace(depWorkspace.location);
+        }
     });
 
+
+
+      // refactor the above optionalDependencies part
+      if (optionalDependencies) Object.keys(optionalDependencies).forEach((dep) =>
+        updateVersion(
+          optionalDependenciesMap,
+          dep,
+          optionalDependencies[dep]
+        )
+      );
+
     // Same for peerDependencies, but don't recurse
-    peerDependencies.forEach((dep) =>
+    if (peerDependencies) Object.keys(peerDependencies).forEach((dep) =>
       updateVersion(
         peerDependenciesMap,
-        packageName(dep.scope, dep.name),
-        dep.range
+        dep,
+        peerDependencies[dep]
       )
     );
   };
@@ -99,11 +106,6 @@ const collectDependenciesRecusively = async (sdkWorkspace) => {
   };
 };
 
-// Takes a scope and a package name and returns a scoped package name
-const packageName = (scope, name) => {
-  return scope ? `@${scope}/${name}` : name;
-};
-
 // Remove ranges to parse just version
 const parseVersion = (version) => {
   return version.replace(/^[^\d]*/, '');
@@ -111,14 +113,9 @@ const parseVersion = (version) => {
 
 // Update package.json with the dependencies and peerDependencies
 const main = async () => {
-  const cwd = process.cwd();
-  const pluginConfiguration = getPluginConfiguration();
-  const configuration = await Configuration.find(cwd, pluginConfiguration);
-  const { project } = await Project.find(configuration, cwd);
-
-  const targetWorkspace = project.workspaces.find(
-    (workspace) => workspace.manifest.raw.name === SDK_PACKAGE
-  );
+  const targetWorkspace = workspacePackages.find(
+    (pkg) => pkg.name === SDK_PACKAGE
+  ).location;
 
   if (!targetWorkspace) {
     throw Error(`${SDK_PACKAGE} package not found`);
