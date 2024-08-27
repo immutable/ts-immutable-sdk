@@ -172,6 +172,11 @@
         "loading": {
           "text": "Swap in progress"
         }
+      },
+      "PREPARE_SWAP": {
+        "loading": {
+          "text": "Calculating swap"
+        }
       }
     },
     "APPROVE_ERC20": {

@@ -7,10 +7,9 @@ import {
   useState,
 } from 'react';
 import {
-  DexConfig, TokenFilterTypes, IMTBLWidgetEvents, SwapWidgetParams,
+  TokenFilterTypes, IMTBLWidgetEvents, SwapWidgetParams,
+  SwapDirection,
 } from '@imtbl/checkout-sdk';
-import { ImmutableConfiguration } from '@imtbl/config';
-import { Exchange } from '@imtbl/dex-sdk';
 import { useTranslation } from 'react-i18next';
 import { SwapCoins } from './views/SwapCoins';
 import { LoadingView } from '../../views/loading/LoadingView';
@@ -61,6 +60,8 @@ export default function SwapWidget({
   fromTokenAddress,
   toTokenAddress,
   config,
+  autoProceed,
+  direction,
 }: SwapWidgetInputs) {
   const { t } = useTranslation();
   const {
@@ -169,30 +170,6 @@ export default function SwapWidget({
       // connect loader handle the switch network functionality
       if (network.chainId !== getL2ChainId(checkout.config)) return;
 
-      let dexConfig: DexConfig | undefined;
-      try {
-        dexConfig = (
-          (await checkout.config.remote.getConfig('dex')) as DexConfig
-        );
-      } catch (err: any) {
-        showErrorView(err);
-        return;
-      }
-
-      const exchange = new Exchange({
-        chainId: network.chainId,
-        baseConfig: new ImmutableConfiguration({ environment }),
-        secondaryFees: dexConfig.secondaryFees,
-        overrides: dexConfig.overrides,
-      });
-
-      swapDispatch({
-        payload: {
-          type: SwapActions.SET_EXCHANGE,
-          exchange,
-        },
-      });
-
       swapDispatch({
         payload: {
           type: SwapActions.SET_NETWORK,
@@ -208,6 +185,31 @@ export default function SwapWidget({
     })();
   }, [checkout, provider]);
 
+  useEffect(() => {
+    swapDispatch({
+      payload: {
+        type: SwapActions.SET_AUTO_PROCEED,
+        autoProceed: autoProceed ?? false,
+        direction: direction ?? SwapDirection.FROM,
+      },
+    });
+  }, [autoProceed, direction]);
+
+  const cancelAutoProceed = useCallback(() => {
+    if (autoProceed) {
+      swapDispatch({
+        payload: {
+          type: SwapActions.SET_AUTO_PROCEED,
+          autoProceed: false,
+          direction: SwapDirection.FROM,
+        },
+      });
+    }
+  }, [autoProceed, swapDispatch]);
+
+  const fromAmount = direction === SwapDirection.FROM || direction == null ? amount : undefined;
+  const toAmount = direction === SwapDirection.TO ? amount : undefined;
+
   return (
     <ViewContext.Provider value={viewReducerValues}>
       <SwapContext.Provider value={swapReducerValues}>
@@ -218,14 +220,11 @@ export default function SwapWidget({
           {viewState.view.type === SwapWidgetViews.SWAP && (
           <SwapCoins
             theme={theme}
-            fromAmount={viewState.view.data?.fromAmount ?? amount}
-            fromTokenAddress={
-                  viewState.view.data?.fromTokenAddress
-                  ?? fromTokenAddress
-                }
-            toTokenAddress={
-                  viewState.view.data?.toTokenAddress ?? toTokenAddress
-                }
+            cancelAutoProceed={cancelAutoProceed}
+            fromAmount={fromAmount}
+            toAmount={toAmount}
+            fromTokenAddress={viewState.view.data?.fromTokenAddress ?? fromTokenAddress}
+            toTokenAddress={viewState.view.data?.toTokenAddress ?? toTokenAddress}
           />
           )}
           {viewState.view.type === SwapWidgetViews.IN_PROGRESS && (

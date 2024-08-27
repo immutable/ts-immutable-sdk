@@ -1,6 +1,11 @@
 import { WalletProviderName } from '../../../types';
 import { WidgetLanguage } from '../configurations';
 
+export enum SwapDirection {
+  FROM = 'FROM',
+  TO = 'TO',
+}
+
 /**
  * Swap Widget parameters
  * @property {string | undefined} amount
@@ -19,4 +24,8 @@ export type SwapWidgetParams = {
   walletProviderName?: WalletProviderName;
   /** The language to use for the swap widget */
   language?: WidgetLanguage;
+  /** Whether the swap widget should display the form or automatically proceed with the swap */
+  autoProceed?: boolean;
+  /** The direction of the swap */
+  direction?: SwapDirection;
 };
