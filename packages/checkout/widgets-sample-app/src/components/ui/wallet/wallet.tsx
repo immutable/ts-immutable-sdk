@@ -1,10 +1,17 @@
-import { useEffect, useMemo } from 'react';
-import { Checkout, WalletEventType, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { useEffect, useMemo, useState } from 'react';
+import { Checkout, WalletEventType, WalletProviderName, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
+import { Web3Provider } from "@ethersproject/providers";
 
 function WalletUI() {
   const checkout = useMemo(() => new Checkout(), [])
-  const wallet = useMemo(() => new WidgetsFactory(checkout, {}).create(WidgetType.WALLET), [checkout])
+  const [wallet, setWallet] = useState<any>();
+  const [web3Provider, setWeb3Provider] = useState<Web3Provider | undefined>(undefined);
+
+  useEffect(() => {
+    const walletProviderName = WalletProviderName.PASSPORT;
+    checkout.createProvider({ walletProviderName }).then((resp) => setWeb3Provider(resp.provider));
+  }, []);
 
   const unmount = () => {wallet.unmount()}
   const mount = () => {wallet.mount('wallet')}
@@ -12,10 +19,21 @@ function WalletUI() {
   const updateLanguage = (language: any) => {wallet.update({config: {language}})}
 
   useEffect(() => {
-    mount()
-    wallet.addListener(WalletEventType.NETWORK_SWITCH, (data) => {console.log('NETWORK_SWITCH', data)})
-    wallet.addListener(WalletEventType.CLOSE_WIDGET, () => {unmount()})
-  }, []);
+    if (!wallet && checkout && web3Provider) {
+      const walletWidget = new WidgetsFactory(checkout, {}).create(WidgetType.WALLET, {
+          provider: web3Provider,
+          config: { theme: WidgetTheme.DARK  },
+      })
+      setWallet(walletWidget);
+      walletWidget.addListener(WalletEventType.NETWORK_SWITCH, (data) => {console.log('NETWORK_SWITCH', data)})
+      walletWidget.addListener(WalletEventType.CLOSE_WIDGET, () => {{
+        window.location.href = "imxsample://addfunds?status=hell_from_widget";
+        walletWidget.unmount()
+      }})
+      walletWidget.mount('wallet');
+    }
+
+  }, [checkout, web3Provider]);
 
   return (
     <div>
