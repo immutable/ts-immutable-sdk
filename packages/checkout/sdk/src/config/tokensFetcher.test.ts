@@ -43,13 +43,15 @@ describe('TokensFetcher', () => {
                     id: 'eip155:13473',
                     name: 'imtbl-zkevm-testnet',
                   },
-                  contract_address: '0xb8ee289c64c1a0dc0311364721ada8c3180d838c',
+                  contract_address:
+                    '0xb8ee289c64c1a0dc0311364721ada8c3180d838c',
                   decimals: 18,
                   image_url: 'https://example.com/gog.svg',
                   is_canonical: true,
                   name: 'Guild of Guardians',
                   root_chain_id: 'eip155:11155111',
-                  root_contract_address: '0xfe9df9ebe5fbd94b00247613b6cf7629891954e2',
+                  root_contract_address:
+                    '0xfe9df9ebe5fbd94b00247613b6cf7629891954e2',
                   symbol: 'GOG',
                   verification_status: 'verified',
                 },
@@ -58,13 +60,15 @@ describe('TokensFetcher', () => {
                     id: 'eip155:13473',
                     name: 'imtbl-zkevm-testnet',
                   },
-                  contract_address: '0xe9E96d1aad82562b7588F03f49aD34186f996478',
+                  contract_address:
+                    '0xe9E96d1aad82562b7588F03f49aD34186f996478',
                   decimals: 18,
                   image_url: 'https://example.com/eth.svg',
                   is_canonical: true,
                   name: 'Ethereum',
                   root_chain_id: 'eip155:11155111',
-                  root_contract_address: '0x0000000000000000000000000000000000000eee',
+                  root_contract_address:
+                    '0x0000000000000000000000000000000000000eee',
                   symbol: 'ETH',
                   verification_status: 'verified',
                 },
@@ -73,7 +77,8 @@ describe('TokensFetcher', () => {
                     id: 'eip155:13473',
                     name: 'imtbl-zkevm-testnet',
                   },
-                  contract_address: '0x3b2d8a1931736fc321c24864bceee981b11c3c50',
+                  contract_address:
+                    '0x3b2d8a1931736fc321c24864bceee981b11c3c50',
                   decimals: 6,
                   image_url: null,
                   is_canonical: true,
@@ -106,6 +111,15 @@ describe('TokensFetcher', () => {
                 env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
             },
           );
+
+          const chainsTokenConfig = await fetcher.getChainTokensConfig();
+          // ChainsTokenConfig has the correct keys
+          expect(chainsTokenConfig).toHaveProperty(
+            ChainId.IMTBL_ZKEVM_TESTNET.toString(),
+          );
+          expect(chainsTokenConfig).toHaveProperty(ChainId.SEPOLIA.toString());
+          expect(Object.keys(chainsTokenConfig)).toHaveLength(2);
+
           const tokensZkEVM = await fetcher.getTokensConfig(
             ChainId.IMTBL_ZKEVM_TESTNET,
           );
@@ -125,8 +139,12 @@ describe('TokensFetcher', () => {
           });
 
           // Tokens with invalid info are ignored
-          expect(tokensZkEVM.find((token) => token.address === '0xinvalid')).toBeUndefined();
-          expect(tokensSepolia.find((token) => token.address === '0xinvalid')).toBeUndefined();
+          expect(
+            tokensZkEVM.find((token) => token.address === '0xinvalid'),
+          ).toBeUndefined();
+          expect(
+            tokensSepolia.find((token) => token.address === '0xinvalid'),
+          ).toBeUndefined();
 
           // IMX token is populated
           expect(
@@ -134,7 +152,10 @@ describe('TokensFetcher', () => {
           ).toHaveProperty('address', 'native');
           expect(
             tokensSepolia.find((token) => token.symbol === 'IMX'),
-          ).toHaveProperty('address', '0xe2629e08f4125d14e446660028bD98ee60EE69F2');
+          ).toHaveProperty(
+            'address',
+            '0xe2629e08f4125d14e446660028bD98ee60EE69F2',
+          );
 
           // ETH root contract is mapped to native in L1
           expect(
@@ -142,14 +163,19 @@ describe('TokensFetcher', () => {
           ).toHaveProperty('address', 'native');
           expect(
             tokensZkEVM.find((token) => token.symbol === 'ETH'),
-          ).toHaveProperty('address', '0xe9e96d1aad82562b7588f03f49ad34186f996478');
+          ).toHaveProperty(
+            'address',
+            '0xe9e96d1aad82562b7588f03f49ad34186f996478',
+          );
 
           // HTTP request is cached after first occurrence
           expect(mockedHttpClient.get).toHaveBeenCalledTimes(1);
         });
 
         it(`should return empty array if config missing [${env}]`, async () => {
-          mockedConfigClient.getConfig.mockResolvedValue({} as unknown as RemoteConfiguration);
+          mockedConfigClient.getConfig.mockResolvedValue(
+            {} as unknown as RemoteConfiguration,
+          );
 
           const mockResponse = {
             status: 200,
@@ -169,6 +195,7 @@ describe('TokensFetcher', () => {
             },
           );
 
+          expect(await fetcher.getChainTokensConfig()).toEqual({});
           expect(await fetcher.getTokensConfig(ChainId.SEPOLIA)).toEqual([]);
         });
       });
