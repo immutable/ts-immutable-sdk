@@ -169,6 +169,7 @@ Install `@imtbl/sdk` and any other dependencies your example needs e.g.
 
 ```bash
 yarn add @imtbl/sdk
+yarn add @biom3/react
 yarn add @ethersproject/providers@^5.7.2
 ```
 
@@ -288,8 +289,17 @@ Add the test runner to the scripts in your package.json
 "test": "playwright test"
 ```
 
-Run your tests with `yarn test`
+Install the playwright browsers
 
+```bash
+ yarn playwright install   
+```
+
+Run your tests
+
+```bash
+yarn test
+```
 # Using code examples in the docs site
 
 Creating and using code snippets is relatively straight forward. You can pull in a whole file or by adding some comments you can pull in just a particular few lines of a file as necessary.
