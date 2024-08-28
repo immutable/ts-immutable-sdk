@@ -1,9 +1,30 @@
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { SendTransactionResult } from '../types';
 import { IMMUTABLE_ZKVEM_GAS_OVERRIDES } from '../env';
 import { isZkEvmChainId } from '../utils/utils';
+
+export function isPassportProvider(provider?: Web3Provider | null) {
+  return (provider?.provider as any)?.isPassport === true;
+}
+
+/**
+ * Checks conditions to operate a gas-free flow.
+ *
+ * TODO:
+ * - Phase 1 (2024): Allow all passport wallets to be gas-free.
+ * - Phase 2 & 3 (2025): Not all passport wallets will be gas-free.
+ *   Therefore, the gas-free condition must be checked against the relayer's
+ *   `im_getFeeOptions` endpoint, which should return zero for
+ *   passport accounts with gas sponsorship enabled.
+ *
+ * Refer to the docs for more details:
+ * https://docs.immutable.com/docs/zkevm/architecture/gas-sponsorship-for-gamers/
+ */
+export function isGasFree(provider?: Web3Provider | null) {
+  return isPassportProvider(provider);
+}
 
 export const setTransactionGasLimits = async (
   web3Provider: Web3Provider,
@@ -14,10 +35,12 @@ export const setTransactionGasLimits = async (
   const { chainId } = await web3Provider.getNetwork();
   if (!isZkEvmChainId(chainId)) return rawTx;
   if (typeof rawTx.gasPrice !== 'undefined') return rawTx;
-
-  rawTx.maxFeePerGas = IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxFeePerGas;
-  rawTx.maxPriorityFeePerGas = IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxPriorityFeePerGas;
-
+  if (isGasFree(web3Provider)) {
+    rawTx.gasPrice = BigNumber.from(0);
+  } else {
+    rawTx.maxFeePerGas = IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxFeePerGas;
+    rawTx.maxPriorityFeePerGas = IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxPriorityFeePerGas;
+  }
   return rawTx;
 };
 

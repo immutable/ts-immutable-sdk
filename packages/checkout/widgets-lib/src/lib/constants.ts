@@ -20,7 +20,7 @@ export const ETH_TOKEN_SYMBOL = 'ETH';
 
 export const ZERO_BALANCE_STRING = '0.0';
 
-export const FAQS_LINK = 'https://support.immutable.com/en/';
+export const FAQS_LINK = 'https://support.immutable.com/hc/en-us/categories/9383180060815-FAQs';
 
 /**
  * Delay between retries (milliseconds)

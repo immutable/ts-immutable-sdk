@@ -23,7 +23,7 @@ get-mr-openapi:
 
 .PHONY: generate-imx-api-client
 generate-imx-api-client:
-	rm -rf src/imx && \
+	rimraf src/imx && \
     mkdir src/imx && \
 	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v6.2.1 generate \
     -i ./app/src/imx-openapi.json \
@@ -33,7 +33,7 @@ generate-imx-api-client:
 
 .PHONY: generate-mr-api-client
 generate-mr-api-client:
-	rm -rf src/multi-rollup && \
+	rimraf src/multi-rollup && \
     mkdir src/multi-rollup && \
 	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v7.0.1 generate \
     --inline-schema-options REFACTOR_ALLOF_INLINE_SCHEMAS=true \
@@ -45,7 +45,7 @@ generate-mr-api-client:
 # When running this command, ensure files not relevant to blockchain data are manually removed
 .PHONY: generate-blockchain-data-types
 generate-blockchain-data-types:
-	rm -rf src/blockchain-data && \
+	rimraf src/blockchain-data && \
     mkdir src/blockchain-data && \
 	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v7.0.1 generate \
     --inline-schema-options REFACTOR_ALLOF_INLINE_SCHEMAS=true \

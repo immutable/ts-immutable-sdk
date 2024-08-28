@@ -12,6 +12,7 @@ Feature: orderbook
         Then the listing should be of status filled
         And 1 ERC721 token should be transferred to the fulfiller
         And 1 trade should be available
+        And any remaining funds are returned to the banker
 
     Scenario: bulk creating and fulfilling ERC721 listings
         Given I have a funded offerer account
@@ -23,6 +24,7 @@ Feature: orderbook
         Then the listing should be of status filled
         And 1 ERC721 token should be transferred to the fulfiller
         And 1 trade should be available
+        And any remaining funds are returned to the banker
 
     Scenario: create and completely fill a ERC1155 listing
         Given I have a funded offerer account
@@ -34,6 +36,7 @@ Feature: orderbook
         Then the listing should be of status filled
         And 100 ERC1155 tokens should be transferred to the fulfiller
         And 1 trade should be available
+        And any remaining funds are returned to the banker
 
     Scenario: create and partially fill a ERC1155 listing
         Given I have a funded offerer account
@@ -50,6 +53,7 @@ Feature: orderbook
         # Checks for the total amount of tokens transferred - 100 = 90 from first fulfilment + 10 from second fulfilment
         And 100 ERC1155 tokens should be transferred to the fulfiller
         And 2 trades should be available
+        And any remaining funds are returned to the banker
 
     Scenario: create and bulk fill multiple listings
         Given I have a funded offerer account
@@ -67,6 +71,7 @@ Feature: orderbook
         Then the listing should be of status active
         # Assert only the ERC1155 trade in this scenario
         And 1 trade should be available
+        And any remaining funds are returned to the banker
 
     Scenario: create and fully fill a ERC1155 listing without an explicit fulfill amount
         Given I have a funded offerer account
@@ -78,6 +83,7 @@ Feature: orderbook
         Then the listing should be of status filled
         And 100 ERC1155 tokens should be transferred to the fulfiller
         And 1 trade should be available
+        And any remaining funds are returned to the banker
 
     Scenario: create and partially fill a ERC1155 listing, second fill without explicit amount
         Given I have a funded offerer account
@@ -94,3 +100,4 @@ Feature: orderbook
         # Checks for the total amount of tokens transferred - 100 = 90 from first fulfilment + 10 from second fulfilment
         And 100 ERC1155 tokens should be transferred to the fulfiller
         And 2 trades should be available
+        And any remaining funds are returned to the banker

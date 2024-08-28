@@ -171,6 +171,11 @@
         "loading": {
           "text": "교환 진행 중"
         }
+      },
+      "PREPARE_SWAP": {
+        "loading": {
+          "text": "스왑 계산"
+        }
       }
     },
     "APPROVE_ERC20": {

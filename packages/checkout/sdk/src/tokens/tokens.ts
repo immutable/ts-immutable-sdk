@@ -1,7 +1,6 @@
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { Contract } from 'ethers';
 import {
-  BridgeConfig,
   ChainId,
   DexConfig,
   GetTokenAllowListResult,
@@ -10,7 +9,7 @@ import {
   TokenFilterTypes,
   TokenInfo,
 } from '../types';
-import { CheckoutConfiguration, getL1ChainId } from '../config';
+import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../config';
 import { ERC20ABI, NATIVE } from '../env';
 import { CheckoutErrorType, withCheckoutError } from '../errors';
 import { isMatchingAddress } from '../utils/utils';
@@ -31,17 +30,24 @@ export const getTokenAllowList = async (
 ): Promise<GetTokenAllowListResult> => {
   let tokens: TokenInfo[] = [];
   let onRampConfig: OnRampConfig;
-  let onBridgeConfig: BridgeConfig;
+  let blockedTokens: string[];
 
   const targetChainId = chainId ?? getL1ChainId(config);
+  const dexChainId = getL2ChainId(config);
 
   switch (type) {
     case TokenFilterTypes.SWAP:
+      tokens = (await config.tokens.getTokensConfig(dexChainId));
+
       // Fetch tokens from dex-tokens config because
       // Dex needs to have a whitelisted list of tokens due to
       // legal reasons.
-      tokens = ((await config.remote.getConfig('dex')) as DexConfig)
-        .tokens || [];
+      blockedTokens = (
+        ((await config.remote.getConfig('dex')) as DexConfig)?.blocklist || []
+      ).map((token) => token.address.toLowerCase());
+
+      tokens = tokens.filter((token) => token.address && !blockedTokens.includes(token.address));
+
       break;
     case TokenFilterTypes.ONRAMP:
       onRampConfig = (await config.remote.getConfig('onramp')) as OnRampConfig;
@@ -50,14 +56,9 @@ export const getTokenAllowList = async (
       tokens = onRampConfig[OnRampProvider.TRANSAK]?.tokens || [];
       break;
     case TokenFilterTypes.BRIDGE:
-      onBridgeConfig = ((await config.remote.getConfig('bridge')) as BridgeConfig);
-      if (!onBridgeConfig) tokens = [];
-
-      tokens = onBridgeConfig[targetChainId]?.tokens || [];
-      break;
     case TokenFilterTypes.ALL:
     default:
-      tokens = (await config.remote.getTokensConfig(targetChainId)).allowed as TokenInfo[];
+      tokens = (await config.tokens.getTokensConfig(targetChainId));
   }
 
   if (!exclude || exclude?.length === 0) return { tokens };

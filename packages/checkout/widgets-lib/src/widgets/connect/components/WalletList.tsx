@@ -372,8 +372,8 @@ export function WalletList(props: WalletListProps) {
         <WalletItem
           recommended
           key={passportProviderDetail.info.rdns}
-          onWalletItemClick={handleWalletItemClick}
-          providerDetail={passportProviderDetail}
+          onWalletItemClick={() => handleWalletItemClick(passportProviderDetail)}
+          providerInfo={passportProviderDetail.info}
           rc={(
             <motion.div
               variants={listItemVariants}
@@ -386,8 +386,8 @@ export function WalletList(props: WalletListProps) {
       {filteredProviders.length === 1 && (
         <WalletItem
           key={filteredProviders[0].info.rdns}
-          onWalletItemClick={handleWalletItemClick}
-          providerDetail={filteredProviders[0]}
+          onWalletItemClick={() => handleWalletItemClick(filteredProviders[0])}
+          providerInfo={filteredProviders[0].info}
           rc={(
             <motion.div
               variants={listItemVariants}

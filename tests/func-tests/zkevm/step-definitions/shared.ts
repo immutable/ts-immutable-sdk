@@ -1,6 +1,6 @@
 import { orderbook } from '@imtbl/sdk';
 import { DefineStepFunction } from 'jest-cucumber';
-import { Wallet } from 'ethers';
+import { BigNumber, Wallet } from 'ethers';
 import {
   bulkFulfillListings,
   connectToTestERC1155Token,
@@ -14,6 +14,7 @@ import { actionAll } from '../utils/orderbook/actions';
 const imxForApproval = 0.03 * 1e18;
 const imxForFulfillment = 0.08 * 1e18;
 const listingPrice = 0.0001 * 1e18;
+const transferTxnFee = 0.0035 * 1e18;
 
 // Workaround to retry banker on-chain actions which can race with test runs on other PRs
 // eslint-disable-next-line consistent-return
@@ -198,7 +199,7 @@ export const whenICreateABulkListing = (
     });
 
     const signatures = await actionAll(actions, offerer);
-    const { result } = await completeListings(signatures[0]);
+    const { result } = await completeListings(signatures);
 
     for (const res of result) {
       if (!res.success) {
@@ -330,5 +331,41 @@ export const andTradeShouldBeAvailable = (
     }
 
     expect(targetTrades?.length === count);
+  });
+};
+
+export const andAnyRemainingFundsAreReturnedToBanker = (
+    and: DefineStepFunction,
+    banker: Wallet,
+    offerer: Wallet,
+    fulfiller: Wallet,
+) => {
+  and(/^any remaining funds are returned to the banker$/, async () => {
+    await withBankerRetry(async () => {
+      const fulfillerBalance = await fulfiller.getBalance();
+      const offererBalance = await offerer.getBalance();
+
+      if (fulfillerBalance.gt(BigNumber.from(transferTxnFee))) {
+        // fulfiller returns funds
+        const fulfillerReturnTxn = await fulfiller.sendTransaction({
+          to: banker.address,
+          value: `${fulfillerBalance.sub(BigNumber.from(transferTxnFee)).toString()}`,
+          ...GAS_OVERRIDES,
+        });
+
+        await fulfillerReturnTxn.wait(1);
+      }
+
+      if (offererBalance.gt(BigNumber.from(transferTxnFee))) {
+        // offerer returns funds
+        const offererReturnTxn = await offerer.sendTransaction({
+          to: banker.address,
+          value: `${offererBalance.sub(BigNumber.from(transferTxnFee)).toString()}`,
+          ...GAS_OVERRIDES,
+        });
+
+        await offererReturnTxn.wait(1);
+      }
+    });
   });
 };

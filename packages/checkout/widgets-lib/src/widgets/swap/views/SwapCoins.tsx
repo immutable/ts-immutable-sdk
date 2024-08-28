@@ -21,9 +21,11 @@ import { IMX_TOKEN_SYMBOL } from '../../../lib';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { isPassportProvider } from '../../../lib/provider';
+import { LoadingView } from '../../../views/loading/LoadingView';
 
 export interface SwapCoinsProps {
   theme: WidgetTheme;
+  cancelAutoProceed: () => void;
   fromAmount?: string;
   toAmount?: string;
   fromTokenAddress?: string;
@@ -32,6 +34,7 @@ export interface SwapCoinsProps {
 
 export function SwapCoins({
   theme,
+  cancelAutoProceed,
   fromAmount,
   toAmount,
   fromTokenAddress,
@@ -44,6 +47,7 @@ export function SwapCoins({
   const {
     swapState: {
       tokenBalances,
+      autoProceed,
     },
   } = useContext(SwapContext);
 
@@ -79,12 +83,12 @@ export function SwapCoins({
 
   return (
     <SimpleLayout
-      header={(
+      header={!autoProceed ? (
         <HeaderNavigation
           title={t('views.SWAP.header.title')}
           onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
         />
-      )}
+      ) : ''}
       footer={<QuickswapFooter environment={checkout?.config.environment} theme={theme} />}
     >
       <Box
@@ -96,6 +100,7 @@ export function SwapCoins({
         }}
       >
         <SwapForm
+          cancelAutoProceed={cancelAutoProceed}
           data={{
             fromAmount,
             toAmount,
@@ -124,6 +129,7 @@ export function SwapCoins({
           }}
         />
       </Box>
+      {autoProceed && <LoadingView loadingText={t('views.SWAP.PREPARE_SWAP.loading.text')} />}
     </SimpleLayout>
   );
 }

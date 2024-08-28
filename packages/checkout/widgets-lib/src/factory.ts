@@ -23,6 +23,7 @@ import {
 } from './lib';
 import './i18n';
 import { CheckoutWidgetRoot } from './widgets/checkout/CheckoutWidgetRoot';
+import { AddFunds } from './widgets/add-funds/AddFundsRoot';
 
 export class WidgetsFactory implements IWidgetsFactory {
   private sdk: Checkout;
@@ -102,6 +103,12 @@ export class WidgetsFactory implements IWidgetsFactory {
           config: { ...this.widgetConfig, ...(config) },
           provider,
         }) as Widget<WidgetType.CHECKOUT> as Widget<T>;
+      }
+      case WidgetType.ADD_FUNDS: {
+        return new AddFunds(this.sdk, {
+          config: { ...this.widgetConfig, ...(config) },
+          provider,
+        }) as Widget<WidgetType.ADD_FUNDS> as Widget<T>;
       }
       default:
         throw new Error('widget type not supported');

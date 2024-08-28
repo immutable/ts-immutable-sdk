@@ -171,6 +171,11 @@
         "loading": {
           "text": "交换进行中"
         }
+      },
+      "PREPARE_SWAP": {
+        "loading": {
+          "text": "计算交换"
+        }
       }
     },
     "APPROVE_ERC20": {

@@ -11,6 +11,7 @@ export enum UserJourney {
   SWAP = 'Swap',
   BRIDGE = 'Bridge',
   SALE = 'PrimarySale',
+  ADD_FUNDS = 'AddFunds',
 }
 
 export type AnalyticsControlTypes =

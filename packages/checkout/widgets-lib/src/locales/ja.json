@@ -175,6 +175,11 @@
         "loading": {
           "text": "スワップ進行中"
         }
+      },
+      "PREPARE_SWAP": {
+        "loading": {
+          "text": "スワップ計算"
+        }
       }
     },
     "APPROVE_ERC20": {
