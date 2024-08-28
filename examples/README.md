@@ -157,11 +157,13 @@ use the default options;
 ✔ What is your project named? @examples/<product>/<feature>-with-<framework> e.g. @examples/passport/connect-with-nextjs
 ✔ Would you like to use TypeScript? … Yes
 ✔ Would you like to use ESLint? … Yes
-✔ Would you like to use Tailwind CSS? … Yes
+✔ Would you like to use Tailwind CSS? … No
 ✔ Would you like to use `src/` directory? … Yes
 ✔ Would you like to use App Router? (recommended) … Yes
 ✔ Would you like to customize the default import alias (@/*)? No
 ```
+
+The setup script will throw an error about the app not being part of the yarn project. This is normal, the example apps shouldn't be part of the top level yarn project. Create an empty `yarn.lock` file in the app root and continue and run `yarn install` manually to install your dependencies.
 
 Install `@imtbl/sdk` and any other dependencies your example needs e.g.
 
