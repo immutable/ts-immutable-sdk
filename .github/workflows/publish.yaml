@@ -30,6 +30,9 @@ on:
     branches:
       - main
 
+permissions:
+  attestations: write # Required for GitHub Attestation
+
 env:
   RELEASE_TYPE: ${{ github.event.inputs.release_type || 'alpha' }}
   UPGRADE_TYPE: ${{ github.event.inputs.upgrade_type || 'none' }}
@@ -126,6 +129,11 @@ jobs:
           package: ./sdk/package.json
           tag: ${{ contains(env.RELEASE_TYPE, 'alpha') && 'alpha' }}
           dry-run: ${{ env.DRY_RUN }}
+
+      - name: Generate SDK attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: './sdk'
 
       - name: Authenticate NPM
         if: contains(env.RELEASE_TYPE, 'release')
