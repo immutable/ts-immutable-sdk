@@ -17,7 +17,7 @@ import {
   ImxApiClients,
 } from '@imtbl/generated-clients';
 import TypedEventEmitter from '../utils/typedEventEmitter';
-import AuthManager from '../authManager';
+import AuthManager from '../auth/authManager';
 import GuardianClient from '../guardian';
 import {
   PassportEventMap, PassportEvents, UserImx, User, IMXSigners, isUserImx,

@@ -21,7 +21,7 @@ import {
 } from './workflows';
 import { PassportEventMap, PassportEvents } from '../types';
 import TypedEventEmitter from '../utils/typedEventEmitter';
-import AuthManager from '../authManager';
+import AuthManager from '../auth/authManager';
 import MagicAdapter from '../magicAdapter';
 import { getStarkSigner } from './getStarkSigner';
 import GuardianClient from '../guardian';

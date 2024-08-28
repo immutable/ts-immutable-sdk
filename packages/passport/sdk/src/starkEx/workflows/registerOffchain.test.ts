@@ -3,7 +3,7 @@ import { Signer } from 'ethers';
 import { AxiosError } from 'axios';
 import { ImxApiClients } from '@imtbl/generated-clients';
 import { StarkSigner } from '@imtbl/x-client';
-import AuthManager from '../../authManager';
+import AuthManager from '../../auth/authManager';
 import { mockUserImx } from '../../test/mocks';
 import registerPassportStarkEx from './registration';
 import { PassportError, PassportErrorType } from '../../errors/passportError';

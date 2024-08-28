@@ -2,7 +2,7 @@ import { IMXClient } from '@imtbl/x-client';
 import { ImxApiClients } from '@imtbl/generated-clients';
 import { PassportImxProviderFactory } from './passportImxProviderFactory';
 import MagicAdapter from '../magicAdapter';
-import AuthManager from '../authManager';
+import AuthManager from '../auth/authManager';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { PassportEventMap } from '../types';
 import TypedEventEmitter from '../utils/typedEventEmitter';

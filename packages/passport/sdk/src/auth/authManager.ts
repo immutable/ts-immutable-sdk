@@ -5,6 +5,7 @@ import {
   User as OidcUser,
   UserManager,
   UserManagerSettings,
+  UserManagerSettingsStore,
   WebStorageStateStore,
 } from 'oidc-client-ts';
 import axios from 'axios';
@@ -12,10 +13,10 @@ import * as crypto from 'crypto';
 import jwt_decode from 'jwt-decode';
 import { getDetail, Detail } from '@imtbl/metrics';
 import localForage from 'localforage';
-import DeviceCredentialsManager from './storage/device_credentials_manager';
-import logger from './utils/logger';
-import { isTokenExpired } from './utils/token';
-import { PassportError, PassportErrorType, withPassportError } from './errors/passportError';
+import DeviceCredentialsManager from '../storage/device_credentials_manager';
+import logger from '../utils/logger';
+import { isTokenExpired } from '../utils/token';
+import { PassportError, PassportErrorType, withPassportError } from '../errors/passportError';
 import {
   PassportMetadata,
   User,
@@ -29,10 +30,11 @@ import {
   isUserZkEvm,
   UserImx,
   isUserImx,
-} from './types';
-import { PassportConfiguration } from './config';
-import Overlay from './overlay';
-import { LocalForageAsyncStorage } from './storage/LocalForageAsyncStorage';
+} from '../types';
+import { PassportConfiguration } from '../config';
+import Overlay from '../overlay';
+import { LocalForageAsyncStorage } from '../storage/LocalForageAsyncStorage';
+import { PopupNavigator } from './PopupNavigator';
 
 const formUrlEncodedHeader = {
   headers: {
@@ -120,7 +122,11 @@ export default class AuthManager {
 
   constructor(config: PassportConfiguration) {
     this.config = config;
-    this.userManager = new UserManager(getAuthConfiguration(config));
+    let redirectNavigator;
+    const userManagerConfig = getAuthConfiguration(config);
+    const userManagerSettingsStore = new UserManagerSettingsStore(userManagerConfig);
+    const popupNavigator = new PopupNavigator(userManagerSettingsStore);
+    this.userManager = new UserManager(getAuthConfiguration(config), redirectNavigator, popupNavigator);
     this.deviceCredentialsManager = new DeviceCredentialsManager();
     this.logoutMode = config.oidcConfiguration.logoutMode || 'redirect';
   }

@@ -4,7 +4,7 @@ import { signRaw } from '@imtbl/toolkit';
 import { Signer } from '@ethersproject/abstract-signer';
 import { Flow } from '@imtbl/metrics';
 import { getEip155ChainId } from '../walletHelpers';
-import AuthManager from '../../authManager';
+import AuthManager from '../../auth/authManager';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
 
 export type RegisterZkEvmUserInput = {

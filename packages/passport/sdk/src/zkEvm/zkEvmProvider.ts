@@ -14,7 +14,7 @@ import {
   ProviderEventMap,
   RequestArguments,
 } from './types';
-import AuthManager from '../authManager';
+import AuthManager from '../auth/authManager';
 import MagicAdapter from '../magicAdapter';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportConfiguration } from '../config';

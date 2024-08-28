@@ -1,7 +1,7 @@
 import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { identify, trackFlow } from '@imtbl/metrics';
 import { utils } from 'ethers';
-import AuthManager from '../authManager';
+import AuthManager from '../auth/authManager';
 import { ZkEvmProvider, ZkEvmProviderInput } from './zkEvmProvider';
 import { sendTransaction } from './sendTransaction';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';

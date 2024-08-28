@@ -5,7 +5,7 @@ import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { Flow } from '@imtbl/metrics';
 import { ChainId, ChainName } from '../../network/chains';
 import { registerZkEvmUser } from './registerZkEvmUser';
-import AuthManager from '../../authManager';
+import AuthManager from '../../auth/authManager';
 import { mockListChains, mockUserZkEvm } from '../../test/mocks';
 
 jest.mock('@ethersproject/providers');

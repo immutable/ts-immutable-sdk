@@ -2,7 +2,7 @@ import * as guardian from '@imtbl/guardian';
 import { TransactionRequest } from '@ethersproject/providers';
 import { ImmutableConfiguration } from '@imtbl/config';
 import { ConfirmationScreen } from '../confirmation';
-import AuthManager from '../authManager';
+import AuthManager from '../auth/authManager';
 import GuardianClient from './index';
 import { mockUser, mockUserImx, mockUserZkEvm } from '../test/mocks';
 import { JsonRpcError, RpcErrorCode } from '../zkEvm/JsonRpcError';

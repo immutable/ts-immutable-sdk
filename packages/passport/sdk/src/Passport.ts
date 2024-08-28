@@ -9,7 +9,7 @@ import {
   identify, setPassportClientId, track, trackError,
 } from '@imtbl/metrics';
 import { isAxiosError } from 'axios';
-import AuthManager from './authManager';
+import AuthManager from './auth/authManager';
 import MagicAdapter from './magicAdapter';
 import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';

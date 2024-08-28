@@ -1,5 +1,5 @@
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
-import AuthManager from '../authManager';
+import AuthManager from '../auth/authManager';
 import { RelayerClient } from './relayerClient';
 import { PassportConfiguration } from '../config';
 import { UserZkEvm } from '../types';
