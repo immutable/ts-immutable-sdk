@@ -126,7 +126,7 @@ export function AddFunds({
           variant="primary"
           onClick={handleReviewClick}
           size="large"
-          sx={{ marginBottom: 'base.spacing.x10' }}
+          sx={{ marginBottom: 'base.spacing.x10', mx: 'base.spacing.x3' }}
         >
           Review
         </Button>
