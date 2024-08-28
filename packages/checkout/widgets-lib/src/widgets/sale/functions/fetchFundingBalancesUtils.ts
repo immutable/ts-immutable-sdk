@@ -76,7 +76,7 @@ const getTokenInfo = (
 
   return {
     ...tokenInfo,
-    icon: getTokenImageByAddress(environment, address),
+    icon: tokenInfo.icon ?? getTokenImageByAddress(environment, address),
   };
 };
 

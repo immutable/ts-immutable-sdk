@@ -23,6 +23,7 @@ export interface BlockscoutTokenData {
   decimals: string
   name: string
   symbol: string
+  icon_url: string;
   type: BlockscoutTokenType
 }
 
