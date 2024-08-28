@@ -77,7 +77,7 @@ import { WidgetConfiguration } from './widgets/definitions/configurations';
 import { SemanticVersion } from './widgets/definitions/types';
 import { validateAndBuildVersion } from './widgets/version';
 import { InjectedProvidersManager } from './provider/injectedProvidersManager';
-import { SwapParams, SwapResult } from './types/swap';
+import { SwapParams, SwapQuoteResult, SwapResult } from './types/swap';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -726,7 +726,7 @@ export class Checkout {
   }
 
   /**
-   * Fetches the approval and swap transaction details including the quote for the swap.
+   * Fetches a quote and then performs the approval and swap transaction.
    * @param {SwapParams} params - The parameters for the swap.
    * @returns {Promise<SwapResult>} - A promise that resolves to the swap result (swap tx, swap tx receipt, quote used in the swap).
    */
@@ -736,6 +736,29 @@ export class Checkout {
       params.provider,
     );
     return swap.swap(
+      this.config,
+      web3Provider,
+      params.fromToken,
+      params.toToken,
+      params.fromAmount,
+      params.toAmount,
+      params.slippagePercent,
+      params.maxHops,
+      params.deadline,
+    );
+  }
+
+  /**
+   * Fetches a quote for the swap.
+   * @param {SwapParams} params - The parameters for the swap.
+   * @returns {Promise<SwapQuoteResult>} - A promise that resolves to the swap quote result.
+   */
+  public async swapQuote(params: SwapParams): Promise<SwapQuoteResult> {
+    const web3Provider = await provider.validateProvider(
+      this.config,
+      params.provider,
+    );
+    return swap.swapQuote(
       this.config,
       web3Provider,
       params.fromToken,

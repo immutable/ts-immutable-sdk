@@ -37,11 +37,12 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const isPassport = isPassportProvider(provider);
+  const noApprovalTransaction = data.approveTransaction === undefined;
 
   // Local state
   const [actionDisabled, setActionDisabled] = useState(false);
   const [approvalTxnLoading, setApprovalTxnLoading] = useState(false);
-  const [showSwapTxnStep, setShowSwapTxnStep] = useState(false);
+  const [showSwapTxnStep, setShowSwapTxnStep] = useState(noApprovalTransaction);
   const [loading, setLoading] = useState(false);
   // reject transaction flags
   const [rejectedSpending, setRejectedSpending] = useState(false);
