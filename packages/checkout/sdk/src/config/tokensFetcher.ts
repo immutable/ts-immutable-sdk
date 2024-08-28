@@ -1,7 +1,11 @@
 import { Environment } from '@imtbl/config';
 import { AxiosResponse } from 'axios';
 import {
-  ChainId, ChainSlug, ChainTokensConfig, ImxAddressConfig, TokenInfo,
+  ChainId,
+  ChainSlug,
+  ChainTokensConfig,
+  ImxAddressConfig,
+  TokenInfo,
 } from '../types';
 import { ENV_DEVELOPMENT, IMMUTABLE_API_BASE_URL } from '../env';
 import { HttpClient } from '../api/http';
@@ -45,7 +49,11 @@ export class TokensFetcher {
 
   private tokensCache: ChainTokensConfig | undefined;
 
-  constructor(httpClient: HttpClient, remoteConfig: RemoteConfigFetcher, params: RemoteConfigParams) {
+  constructor(
+    httpClient: HttpClient,
+    remoteConfig: RemoteConfigFetcher,
+    params: RemoteConfigParams,
+  ) {
     this.isDevelopment = params.isDevelopment;
     this.isProduction = params.isProduction;
     this.httpClient = httpClient;
@@ -84,9 +92,16 @@ export class TokensFetcher {
 
     const responseData = this.parseResponse(response);
 
-    this.tokensCache = await this.getMappingsForTokensResponse(responseData?.result || []);
+    this.tokensCache = await this.getMappingsForTokensResponse(
+      responseData?.result || [],
+    );
 
     return this.tokensCache;
+  }
+
+  public async getChainTokensConfig(): Promise<ChainTokensConfig> {
+    const config = await this.loadTokens();
+    return config ?? {};
   }
 
   public async getTokensConfig(chainId: ChainId): Promise<TokenInfo[]> {
@@ -96,7 +111,9 @@ export class TokensFetcher {
     return config[chainId] ?? [];
   }
 
-  private async getMappingsForTokensResponse(tokenList: TokensEndpointResult[]): Promise<ChainTokensConfig> {
+  private async getMappingsForTokensResponse(
+    tokenList: TokensEndpointResult[],
+  ): Promise<ChainTokensConfig> {
     const tokens: ChainTokensConfig = {};
 
     const imxMappings = await this.fetchIMXTokenMappings();
@@ -114,7 +131,10 @@ export class TokensFetcher {
     });
 
     tokenList.forEach((token) => {
-      const chainId = parseInt(token.chain.id.split('eip155:').pop() || '', 10) as ChainId;
+      const chainId = parseInt(
+        token.chain.id.split('eip155:').pop() || '',
+        10,
+      ) as ChainId;
 
       if (!token.symbol || !token.decimals) {
         return;
@@ -134,7 +154,10 @@ export class TokensFetcher {
 
       tokens[chainId]?.push(tokenInfo);
 
-      const rootChainId = parseInt(token.root_chain_id?.split('eip155:').pop() || '', 10) as ChainId;
+      const rootChainId = parseInt(
+        token.root_chain_id?.split('eip155:').pop() || '',
+        10,
+      ) as ChainId;
       let address = token.root_contract_address?.toLowerCase();
 
       if (rootChainId && address) {
@@ -157,7 +180,9 @@ export class TokensFetcher {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  private parseResponse(response: AxiosResponse<any, any>): TokensEndpointResponse | undefined {
+  private parseResponse(
+    response: AxiosResponse<any, any>,
+  ): TokensEndpointResponse | undefined {
     let responseData: TokensEndpointResponse = response.data;
     if (response.data && typeof response.data !== 'object') {
       try {

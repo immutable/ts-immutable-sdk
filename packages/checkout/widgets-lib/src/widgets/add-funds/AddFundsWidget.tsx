@@ -1,10 +1,8 @@
-import { AddFundsWidgetParams, Checkout, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
+import { AddFundsWidgetParams, Checkout } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import {
   useContext, useEffect, useMemo, useReducer,
 } from 'react';
-import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
-import { TopUpView } from '../../views/top-up/TopUpView';
 import {
   sendAddFundsCloseEvent,
   sendAddFundsGoBackEvent,
@@ -15,6 +13,7 @@ import {
   initialViewState,
   viewReducer,
 } from '../../context/view-context/ViewContext';
+import { AddFunds } from './views/AddFunds';
 import {
   AddFundsActions, AddFundsContext, addFundsReducer, initialAddFundsState,
 } from './context/AddFundsContext';
@@ -79,9 +78,7 @@ export default function AddFundsWidget({
   return (
     <ViewContext.Provider value={viewReducerValues}>
       <AddFundsContext.Provider value={addFundsReducerValues}>
-        <TopUpView
-          analytics={{ userJourney: UserJourney.ADD_FUNDS }}
-          widgetEvent={IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT}
+        <AddFunds
           checkout={checkout}
           provider={web3Provider}
           tokenAddress={tokenAddress}
