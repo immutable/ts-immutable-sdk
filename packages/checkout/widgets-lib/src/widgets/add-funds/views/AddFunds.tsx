@@ -1,15 +1,18 @@
 /* eslint-disable no-console */
 import { Web3Provider } from '@ethersproject/providers';
-import { Checkout } from '@imtbl/checkout-sdk';
+import { Checkout, IMTBLWidgetEvents, SalePaymentTypes } from '@imtbl/checkout-sdk';
 import {
   Body,
   Box, Button, MenuItem, OverflowPopoverMenu,
 } from '@biom3/react';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
 import { TextInputForm } from '../../../components/FormComponents/TextInputForm/TextInputForm';
+import { OptionsDrawer } from '../components/OptionsDrawer';
+import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -24,9 +27,15 @@ interface AddFundsProps {
 }
 
 export function AddFunds({
-  checkout, provider, amount, tokenAddress,
-  showOnrampOption = true, showSwapOption = true, showBridgeOption = true,
-  onBackButtonClick, onCloseButtonClick,
+  checkout,
+  provider,
+  amount,
+  tokenAddress,
+  showOnrampOption = true,
+  showSwapOption = true,
+  showBridgeOption = true,
+  onBackButtonClick,
+  onCloseButtonClick,
 
 }: AddFundsProps) {
   console.log('checkout', checkout);
@@ -35,6 +44,10 @@ export function AddFunds({
   console.log('showSwapOption', showSwapOption);
   console.log('showBridgeOption', showBridgeOption);
   console.log('onCloseButtonClick', onCloseButtonClick);
+
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+
+  const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
 
   const [toAmount, setToAmount] = useState<string>(amount || '');
   // eslint-disable-next-line max-len
@@ -56,6 +69,10 @@ export function AddFunds({
     },
   ];
 
+  const openDrawer = () => {
+    setShowOptionsDrawer(true);
+  };
+
   const updateAmount = (value: string) => {
     setToAmount(value);
   };
@@ -75,6 +92,15 @@ export function AddFunds({
     console.log('handle review click');
   };
 
+  const onPayWithCard = (paymentType: SalePaymentTypes) => {
+    console.log('onPayWithCard', paymentType);
+    const data = {
+      tokenAddress: tokenAddress ?? '',
+      amount: amount ?? '',
+    };
+    orchestrationEvents.sendRequestOnrampEvent(eventTarget, IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT, data);
+  };
+
   return (
     <SimpleLayout
       header={(
@@ -84,13 +110,21 @@ export function AddFunds({
           onCloseButtonClick={onCloseButtonClick}
           showBack={!!onBackButtonClick}
         />
-      )}
+            )}
     >
       <Box sx={{
-        display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        height: '100%',
       }}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 'base.spacing.x10' }}>
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          marginTop: 'base.spacing.x10',
+        }}
+        >
           <Box sx={{ width: 'base.spacing.x40' }}>
             <Box sx={{ marginBottom: 'base.spacing.x3' }}>
               <TextInputForm
@@ -105,7 +139,10 @@ export function AddFunds({
             </Box>
 
             <Box sx={{
-              display: 'flex', alignItems: 'center', gap: 'base.spacing.x5', justifyContent: 'center',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'base.spacing.x5',
+              justifyContent: 'center',
             }}
             >
               <Body size="large" weight="bold">{fromAddressToTokenName(toTokenAddress)}</Body>
@@ -121,17 +158,36 @@ export function AddFunds({
           </Box>
         </Box>
 
+        <MenuItem
+          size="small"
+          emphasized
+        >
+          <MenuItem.IntentIcon
+            icon="ChevronExpand"
+            onClick={() => {
+              console.log('menu arrow down clicked');
+              openDrawer();
+            }}
+          />
+        </MenuItem>
+        <OptionsDrawer
+          visible={showOptionsDrawer}
+          onClose={() => setShowOptionsDrawer(false)}
+          onPayWithCard={onPayWithCard}
+        />
         <Button
           testId="add-funds-button"
           variant="primary"
           onClick={handleReviewClick}
           size="large"
-          sx={{ marginBottom: 'base.spacing.x10', mx: 'base.spacing.x3' }}
+          sx={{
+            marginBottom: 'base.spacing.x10',
+            mx: 'base.spacing.x3',
+          }}
         >
           Review
         </Button>
       </Box>
     </SimpleLayout>
-
   );
 }
