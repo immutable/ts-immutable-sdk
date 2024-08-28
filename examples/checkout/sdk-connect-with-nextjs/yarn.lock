@@ -442,7 +442,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.25.0":
+"@biom3/react@npm:^0.25.0, @biom3/react@npm:^0.25.21":
   version: 0.25.21
   resolution: "@biom3/react@npm:0.25.21"
   dependencies:
@@ -9655,6 +9655,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "sdk-connect-with-nextjs@workspace:."
   dependencies:
+    "@biom3/react": ^0.25.21
     "@ethersproject/providers": ^5.7.2
     "@imtbl/sdk": ^1.48.1
     "@playwright/test": ^1.46.1

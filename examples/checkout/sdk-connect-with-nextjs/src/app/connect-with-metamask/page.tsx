@@ -4,6 +4,8 @@ import { checkoutSDK } from '../utils/setupDefault';
 import { useState } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { WalletProviderName } from '@imtbl/sdk/checkout';
+import { Button, Heading, Body, Link } from '@biom3/react';
+import NextLink from 'next/link';
 
 export default function ConnectWithMetamask() {
 
@@ -24,24 +26,24 @@ const connectWithMetamask = async () => {
   setLoadingState(false);
 }
   return (<>
-    <h1>Connect with MetaMask</h1>
-    {!provider && 
-        <button
-        onClick={connectWithMetamask}
-        disabled={loading}
-      >
-        Connect with Metamask
-      </button>
-    }
+    <Heading size="medium" className="mb-1">Connect with Metamask</Heading>
+    <Button 
+    className="mb-1"
+    size="medium" 
+    onClick={connectWithMetamask}
+    disabled={loading}>
+      Connect with MetaMask
+    </Button>
+        
     {loading
-        ? <p>Loading...</p>
+        ? <Body>Loading...</Body>
         : (
-          <p>
+          <Body>
             Connected Provider:
             {(provider && walletProviderName) ? ` ${walletProviderName}` : ' (not connected)'}
-          </p>
+          </Body>
         )}
-      <a href="/" className="underline">Return to Examples</a>
+      <Link rc={<NextLink href="/" />}>Return to Examples</Link>
   </>);
 }
   
