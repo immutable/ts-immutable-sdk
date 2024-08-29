@@ -1,8 +1,8 @@
-import { AddFundsWidgetParams, Checkout, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
+import { AddFundsWidgetParams, Checkout } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
-import { useContext, useMemo, useReducer } from 'react';
-import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
-import { TopUpView } from '../../views/top-up/TopUpView';
+import {
+  useContext, useEffect, useMemo, useReducer,
+} from 'react';
 import {
   sendAddFundsCloseEvent,
   sendAddFundsGoBackEvent,
@@ -13,6 +13,10 @@ import {
   initialViewState,
   viewReducer,
 } from '../../context/view-context/ViewContext';
+import { AddFunds } from './views/AddFunds';
+import {
+  AddFundsActions, AddFundsContext, addFundsReducer, initialAddFundsState,
+} from './context/AddFundsContext';
 
 export type AddFundsWidgetInputs = AddFundsWidgetParams & {
   checkout: Checkout;
@@ -31,9 +35,41 @@ export default function AddFundsWidget({
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
 
   const viewReducerValues = useMemo(
-    () => ({ viewState, viewDispatch }),
+    () => ({
+      viewState,
+      viewDispatch,
+    }),
     [viewState, viewReducer],
   );
+  const [addFundsState, addFundsDispatch] = useReducer(addFundsReducer, initialAddFundsState);
+
+  const addFundsReducerValues = useMemo(
+    () => ({
+      addFundsState,
+      addFundsDispatch,
+    }),
+    [addFundsState, addFundsDispatch],
+  );
+
+  useEffect(() => {
+    if (!web3Provider) return;
+    addFundsDispatch({
+      payload: {
+        type: AddFundsActions.SET_PROVIDER,
+        provider: web3Provider,
+      },
+    });
+  }, [web3Provider]);
+
+  useEffect(() => {
+    if (!checkout) return;
+    addFundsDispatch({
+      payload: {
+        type: AddFundsActions.SET_CHECKOUT,
+        checkout,
+      },
+    });
+  }, [checkout]);
 
   const {
     eventTargetState: { eventTarget },
@@ -41,19 +77,19 @@ export default function AddFundsWidget({
 
   return (
     <ViewContext.Provider value={viewReducerValues}>
-      <TopUpView
-        analytics={{ userJourney: UserJourney.ADD_FUNDS }}
-        widgetEvent={IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT}
-        checkout={checkout}
-        provider={web3Provider}
-        tokenAddress={tokenAddress}
-        amount={amount}
-        showOnrampOption={showOnrampOption}
-        showSwapOption={showSwapOption}
-        showBridgeOption={showBridgeOption}
-        onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
-        onBackButtonClick={() => sendAddFundsGoBackEvent(eventTarget)}
-      />
+      <AddFundsContext.Provider value={addFundsReducerValues}>
+        <AddFunds
+          checkout={checkout}
+          provider={web3Provider}
+          tokenAddress={tokenAddress}
+          amount={amount}
+          showOnrampOption={showOnrampOption}
+          showSwapOption={showSwapOption}
+          showBridgeOption={showBridgeOption}
+          onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
+          onBackButtonClick={() => sendAddFundsGoBackEvent(eventTarget)}
+        />
+      </AddFundsContext.Provider>
     </ViewContext.Provider>
   );
 }
