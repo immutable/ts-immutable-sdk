@@ -18,9 +18,10 @@ const [loading, setLoadingState] = useState<boolean>(false);
 const connectWithMetamask = async () => {
   // disable button while loading
   setLoadingState(true);
+  // #doc create-metamask-provider
   const walletProviderName = checkout.WalletProviderName.METAMASK;
   const response = await checkoutSDK.createProvider({ walletProviderName });
-  console.log('response', response)
+  // #enddoc create-metamask-provider
   setProvider(response.provider)
   setWalletProviderName(response.walletProviderName)
   setLoadingState(false);
