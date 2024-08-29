@@ -13,7 +13,7 @@
         "body1": "資金をImmutable zkEVMにブリッジするには、<layerswapLink>Layerswap</layerswapLink>の使用をお勧めします。リファエルをオンにしてIMXを受け取ります。",
         "body2": "または、ガス無料のImmutable Passportで簡単に支払いとプレイができます。",
         "buttonText": "それでも進む"
-      }    
+      }
     },
     "CONNECT_SUCCESS": {
       "status": "接続が安全です",
@@ -313,8 +313,9 @@
         "fee": "交換手数料 ~ {{symbol}} {{amount}}"
       },
       "orderReview": {
-        "heading": "支払いの概要",
+        "heading": "注文の概要",
         "continue": "続行",
+        "continueFreeMint": "無料で続行",
         "payWith": {
           "SWAP": "{{symbol}}でスワップ＆支払い",
           "SUFFICIENT": "{{symbol}}で支払う"

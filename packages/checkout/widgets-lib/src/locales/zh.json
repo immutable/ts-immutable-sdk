@@ -306,8 +306,9 @@
         "fee": "交换费用 ~ {{symbol}} {{amount}}"
       },
       "orderReview": {
-        "heading": "付款摘要",
+        "heading": "订单摘要",
         "continue": "继续",
+        "continueFreeMint": "免费继续",
         "payWith": {
           "SWAP": "使用{{symbol}}进行交换和支付",
           "SUFFICIENT": "使用{{symbol}}支付"

@@ -306,8 +306,9 @@
         "fee": "교환 수수료 ~ {{symbol}} {{amount}}"
       },
       "orderReview": {
-        "heading": "결제 요약",
+        "heading": "주문 요약",
         "continue": "계속",
+        "continueFreeMint": "무료로 진행하세요",
         "payWith": {
           "SWAP": "{{symbol}}로 스왑 및 결제하기",
           "SUFFICIENT": "{{symbol}}로 결제"

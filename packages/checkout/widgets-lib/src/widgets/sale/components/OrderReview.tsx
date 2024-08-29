@@ -61,6 +61,7 @@ export function OrderReview({
     items,
     orderQuote,
     disabledPaymentTypes,
+    selectedCurrency,
     config: { theme, environment },
   } = useSaleContext();
   const { sendSelectedPaymentToken, sendViewFeesEvent, sendPageView } = useSaleEvent();
@@ -73,6 +74,8 @@ export function OrderReview({
     fiatAmount: '',
     formattedFees: [],
   });
+
+  const isFreeMint = selectedCurrency?.name ? orderQuote.totalAmount[selectedCurrency.name].amount === 0 : false;
 
   const openDrawer = () => {
     setShowCoinsDrawer(true);
@@ -237,6 +240,7 @@ export function OrderReview({
         onProceed={onProceedToBuy}
         balance={fundingBalance}
         conversions={conversions}
+        isFreeMint={isFreeMint}
         canOpen={fundingBalances.length > 1}
         loading={loadingBalances}
         priceDisplay={items.length > 1}
