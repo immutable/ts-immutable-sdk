@@ -309,6 +309,7 @@
       "orderReview": {
         "heading": "Payment summary",
         "continue": "Proceed",
+        "continueFreeMint": "Proceed for free",
         "payWith": {
           "SWAP": "Swap & Pay with {{symbol}}",
           "SUFFICIENT": "Pay with {{symbol}}"

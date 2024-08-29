@@ -315,6 +315,7 @@
       "orderReview": {
         "heading": "支払いの概要",
         "continue": "続行",
+        "continueFreeMint": "無料で続行",
         "payWith": {
           "SWAP": "{{symbol}}でスワップ＆支払い",
           "SUFFICIENT": "{{symbol}}で支払う"
