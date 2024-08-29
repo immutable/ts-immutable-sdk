@@ -1,15 +1,24 @@
 /* eslint-disable no-console */
 import { Web3Provider } from '@ethersproject/providers';
-import { Checkout } from '@imtbl/checkout-sdk';
 import {
-  Body,
-  Box, Button, MenuItem, OverflowPopoverMenu,
+  Checkout,
+  IMTBLWidgetEvents,
+  TokenFilterTypes,
+  TokenInfo,
+} from '@imtbl/checkout-sdk';
+import {
+  Body, Box, MenuItem, OverflowPopoverMenu,
 } from '@biom3/react';
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
 import { TextInputForm } from '../../../components/FormComponents/TextInputForm/TextInputForm';
+import { OptionsDrawer } from '../components/OptionsDrawer';
+import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { orchestrationEvents } from '../../../lib/orchestrationEvents';
+import { OptionTypes } from '../components/Option';
+import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -24,10 +33,15 @@ interface AddFundsProps {
 }
 
 export function AddFunds({
-  checkout, provider, amount, tokenAddress,
-  showOnrampOption = true, showSwapOption = true, showBridgeOption = true,
-  onBackButtonClick, onCloseButtonClick,
-
+  checkout,
+  provider,
+  amount,
+  tokenAddress,
+  showOnrampOption = true,
+  showSwapOption = true,
+  showBridgeOption = true,
+  onBackButtonClick,
+  onCloseButtonClick,
 }: AddFundsProps) {
   console.log('checkout', checkout);
   console.log('provider', provider);
@@ -36,43 +50,83 @@ export function AddFunds({
   console.log('showBridgeOption', showBridgeOption);
   console.log('onCloseButtonClick', onCloseButtonClick);
 
-  const [toAmount, setToAmount] = useState<string>(amount || '');
-  // eslint-disable-next-line max-len
-  const [toTokenAddress, setToTokenAddress] = useState<string>(tokenAddress || '0x6B175474E89094C44Da98b954EedeAC495271');
+  const { addFundsDispatch } = useContext(AddFundsContext);
 
-  // TODO: get the tokens from the new method
-  const tokens = [
-    {
-      name: 'USDC',
-      address: '0x6B175474E89094C44Da98b954EedeAC495271',
-    },
-    {
-      name: 'DAI',
-      address: '0x6B175474E89094C44Da98b954EedeAC495272',
-    },
-    {
-      name: 'USDT',
-      address: '0x6B175474E89094C44Da98b954EedeedeACasd',
-    },
-  ];
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
+
+  const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
+  const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
+  const [toAmount, setToAmount] = useState<string>(amount || '');
+  const [toTokenAddress, setToTokenAddress] = useState<TokenInfo | undefined>();
+
+  useEffect(() => {
+    if (!checkout) return;
+    const fetchTokens = async () => {
+      const tokenResponse = await checkout.getTokenAllowList({ type: TokenFilterTypes.SWAP, chainId: 1 });
+
+      if (tokenResponse?.tokens.length > 0) {
+        setAllowedTokens(tokenResponse.tokens);
+
+        if (tokenAddress) {
+          const token = allowedTokens.find((t) => t.address === tokenAddress);
+          setToTokenAddress(token);
+        } else {
+          setToTokenAddress(tokenResponse.tokens[0]);
+        }
+
+        addFundsDispatch({
+          payload: {
+            type: AddFundsActions.SET_ALLOWED_TOKENS,
+            allowedTokens: tokenResponse.tokens,
+          },
+        });
+      }
+    };
+    fetchTokens();
+  }, [checkout]);
+
+  const openDrawer = () => {
+    setShowOptionsDrawer(true);
+  };
 
   const updateAmount = (value: string) => {
     setToAmount(value);
   };
 
-  const isSelected = (token: any) => token.address === toTokenAddress;
+  const isSelected = (token: TokenInfo) => token.address === toTokenAddress;
 
-  const handleTokenChange = (token) => {
-    setToTokenAddress(token.address);
+  const handleTokenChange = (token: TokenInfo) => {
+    setToTokenAddress(token);
   };
 
-  const fromAddressToTokenName = (address: string) => {
-    const token = tokens.find((t) => t.address === address);
-    return token?.name || '';
-  };
+  // const handleReviewClick = () => {
+  //   console.log('handle review click');
+  // };
 
-  const handleReviewClick = () => {
-    console.log('handle review click');
+  const onPayWithCard = (paymentType: OptionTypes) => {
+    console.log('paymentType', paymentType);
+    console.log('=== toTokenAddress', toTokenAddress);
+    console.log('=== toAmount', toAmount);
+
+    if (paymentType === OptionTypes.SWAP) {
+      orchestrationEvents.sendRequestSwapEvent(
+        eventTarget,
+        IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+        { toTokenAddress: toTokenAddress?.address ?? '', amount: toAmount ?? '', fromTokenAddress: '' },
+      );
+    } else {
+      const data = {
+        tokenAddress: tokenAddress ?? '',
+        amount: amount ?? '',
+      };
+      orchestrationEvents.sendRequestOnrampEvent(
+        eventTarget,
+        IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+        data,
+      );
+    }
   };
 
   return (
@@ -86,11 +140,21 @@ export function AddFunds({
         />
       )}
     >
-      <Box sx={{
-        display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%',
-      }}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          height: '100%',
+        }}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 'base.spacing.x10' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginTop: 'base.spacing.x10',
+          }}
+        >
           <Box sx={{ width: 'base.spacing.x40' }}>
             <Box sx={{ marginBottom: 'base.spacing.x3' }}>
               <TextInputForm
@@ -104,34 +168,67 @@ export function AddFunds({
               />
             </Box>
 
-            <Box sx={{
-              display: 'flex', alignItems: 'center', gap: 'base.spacing.x5', justifyContent: 'center',
-            }}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'base.spacing.x5',
+                justifyContent: 'center',
+              }}
             >
-              <Body size="large" weight="bold">{fromAddressToTokenName(toTokenAddress)}</Body>
+              <Body size="large" weight="bold">
+                {toTokenAddress ? toTokenAddress.name : ''}
+              </Body>
               <OverflowPopoverMenu testId="add-funds-tokens-menu">
-                {tokens.map((token: any) => (
-                  <MenuItem key={token.address} onClick={() => handleTokenChange(token)} selected={isSelected(token)}>
+                {allowedTokens.map((token: any) => (
+                  <MenuItem
+                    key={token.address}
+                    onClick={() => handleTokenChange(token)}
+                    selected={isSelected(token)}
+                  >
                     <MenuItem.Label>{token.name}</MenuItem.Label>
                   </MenuItem>
                 ))}
-
               </OverflowPopoverMenu>
             </Box>
           </Box>
         </Box>
 
-        <Button
+        <MenuItem
+          size="small"
+          emphasized
+          onClick={() => {
+            openDrawer();
+          }}
+        >
+          <MenuItem.IntentIcon
+            icon="ChevronExpand"
+          />
+          <MenuItem.Label size="medium">Choose payment option</MenuItem.Label>
+        </MenuItem>
+        <Box sx={{
+          marginBottom: 'base.spacing.x10',
+        }}
+        >
+          <OptionsDrawer
+            visible={showOptionsDrawer}
+            onClose={() => setShowOptionsDrawer(false)}
+            onPayWithCard={onPayWithCard}
+          />
+        </Box>
+        {/* <Button
           testId="add-funds-button"
           variant="primary"
           onClick={handleReviewClick}
           size="large"
-          sx={{ marginBottom: 'base.spacing.x10', mx: 'base.spacing.x3' }}
+          sx={{
+            marginBottom: 'base.spacing.x10',
+            mx: 'base.spacing.x3',
+          }}
         >
           Review
-        </Button>
+        </Button> */}
       </Box>
     </SimpleLayout>
-
   );
 }

@@ -1,15 +1,17 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { createContext } from 'react';
-import { Checkout } from '@imtbl/checkout-sdk';
+import { Checkout, TokenInfo } from '@imtbl/checkout-sdk';
 
 export interface AddFundsState {
   checkout: Checkout | null;
   provider: Web3Provider | null;
+  allowedTokens: TokenInfo[] | null;
 }
 
 export const initialAddFundsState: AddFundsState = {
   checkout: null,
   provider: null,
+  allowedTokens: null,
 };
 
 export interface AddFundsContextState {
@@ -22,12 +24,14 @@ export interface AddFundsAction {
 }
 
 type ActionPayload =
-    | SetCheckoutPayload
-    | SetProviderPayload;
+  | SetCheckoutPayload
+  | SetProviderPayload
+  | SetAllowedTokensPayload;
 
 export enum AddFundsActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
+  SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
 }
 
 export interface SetCheckoutPayload {
@@ -40,11 +44,15 @@ export interface SetProviderPayload {
   provider: Web3Provider;
 }
 
+export interface SetAllowedTokensPayload {
+  type: AddFundsActions.SET_ALLOWED_TOKENS;
+  allowedTokens: TokenInfo[];
+}
+
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const AddFundsContext = createContext<AddFundsContextState>({
   addFundsState: initialAddFundsState,
-  addFundsDispatch: () => {
-  },
+  addFundsDispatch: () => {},
 });
 
 AddFundsContext.displayName = 'AddFundsContext';
@@ -65,6 +73,11 @@ export const addFundsReducer: Reducer<AddFundsState, AddFundsAction> = (
       return {
         ...state,
         provider: action.payload.provider,
+      };
+    case AddFundsActions.SET_ALLOWED_TOKENS:
+      return {
+        ...state,
+        allowedTokens: action.payload.allowedTokens,
       };
     default:
       return state;

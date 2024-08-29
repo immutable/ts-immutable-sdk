@@ -21,7 +21,7 @@ function AddFundsUI() {
   );
   const addFunds = useMemo(
     () => factory.create(WidgetType.ADD_FUNDS, {
-      config: { theme: WidgetTheme.LIGHT },
+      config: { theme: WidgetTheme.DARK },
     }),
     [factory]
   );
@@ -47,7 +47,10 @@ function AddFundsUI() {
         console.log("CLOSE_WIDGET", data);
         onRamp.unmount();
       });
-      onRamp.mount(ADD_FUNDS_TARGET_ID, {});
+      onRamp.mount(ADD_FUNDS_TARGET_ID, {
+        amount: data.amount,
+        tokenAddress: data.tokenAddress,
+      });
     });
     addFunds.addListener(AddFundsEventType.REQUEST_SWAP, (data: any) => {
       console.log("REQUEST_SWAP", data);
@@ -56,7 +59,10 @@ function AddFundsUI() {
         console.log("CLOSE_WIDGET", data);
         swap.unmount();
       });
-      swap.mount(ADD_FUNDS_TARGET_ID, {});
+      swap.mount(ADD_FUNDS_TARGET_ID, {
+        amount: data.amount,
+        toTokenAddress: data.toTokenAddress,
+      });
     });
     addFunds.addListener(AddFundsEventType.REQUEST_BRIDGE, (data: any) => {
       console.log("REQUEST_BRIDGE", data);

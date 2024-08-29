@@ -638,6 +638,27 @@
           "actionText": "Try again"
         }
       }
+    },
+    "ADD_FUNDS": {
+      "drawer": {
+        "options": {
+          "swap": {
+            "heading": "Swap",
+            "caption": "Swap tokens on this network.",
+            "disabledCaption": "Currently not available."
+          },
+          "debit": {
+            "heading": "Debit Card",
+            "caption": "The recommended way to pay with card.",
+            "disabledCaption": "Unavailable for your selection. We recommend adding tokens."
+          },
+          "credit": {
+            "heading": "Credit Card",
+            "caption": "Not recommended since transactions may be blocked by your bank.",
+            "disabledCaption": "Unavailable for your selection. We recommend adding tokens."
+          }
+        }
+      }
     }
   },
   "footers": {
