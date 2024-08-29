@@ -63,7 +63,7 @@ export class PopupWindow extends AbstractChildWindow {
     const centeredPopup = PopupUtils.center({ ...DefaultPopupWindowFeatures, ...this.popupWindowFeatures });
     this._window = window.open(params.url, this.popupWindowTarget, PopupUtils.serialize(centeredPopup));
 
-    this._window?.focus();
+    // this._window?.focus();
 
     const popupClosedInterval = setInterval(() => {
       if (!this._window || this._window.closed) {
