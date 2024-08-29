@@ -1,7 +1,6 @@
 import {
   Body,
   Box,
-  ButtCon,
   Button,
   CloudImage,
   Drawer,
@@ -22,7 +21,6 @@ export interface WithdrawalQueueDrawerProps {
   checkout: Checkout;
   onCloseDrawer: () => void;
   warningType?: WithdrawalQueueWarningType;
-  onProceed?: () => void;
   onAdjustAmount?: () => void;
   threshold?: number;
 }
@@ -31,7 +29,6 @@ export function WithdrawalQueueDrawer({
   checkout,
   warningType,
   onCloseDrawer,
-  onProceed,
   onAdjustAmount,
   threshold,
 }: WithdrawalQueueDrawerProps) {
@@ -75,17 +72,6 @@ export function WithdrawalQueueDrawer({
                   alt={t(`drawers.withdrawalQueue.${warningType}.heading`, { threshold })}
                 />
               )}
-            />
-            <ButtCon
-              icon="Close"
-              variant="tertiary"
-              sx={{
-                pos: 'absolute',
-                top: 'base.spacing.x5',
-                left: 'base.spacing.x5',
-                backdropFilter: 'blur(30px)',
-              }}
-              onClick={onCloseDrawer}
             />
             <Box
               sx={{
@@ -141,7 +127,7 @@ export function WithdrawalQueueDrawer({
               size="large"
               variant="primary"
               sx={{ width: '100%', marginBottom: 'base.spacing.x10' }}
-              onClick={onProceed}
+              onClick={onCloseDrawer}
             >
               {t(`drawers.withdrawalQueue.${warningType}.buttons.proceed`)}
             </Button>

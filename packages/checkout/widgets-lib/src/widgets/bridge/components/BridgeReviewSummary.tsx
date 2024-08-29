@@ -70,12 +70,6 @@ import {
 
 const testId = 'bridge-review-summary';
 
-type BridgeWithdrawalQueueData = {
-  delayed: boolean;
-  activated: boolean;
-  threshold: number;
-};
-
 export function BridgeReviewSummary() {
   const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
@@ -116,8 +110,6 @@ export function BridgeReviewSummary() {
   // Not enough ETH to cover gas
   const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
 
-  const [withdrawalQueueData, setWithdrawalQueueData] = useState<BridgeWithdrawalQueueData | undefined>(undefined);
-  const [isWarningAcknowledged, setIsWarningAcknowledged] = useState(false);
   const [withdrawalQueueWarning, setWithdrawalQueueWarning] = useState<{
     visible: boolean;
     warningType?: WithdrawalQueueWarningType;
@@ -222,11 +214,20 @@ export function BridgeReviewSummary() {
       gasMultiplier: 'auto',
     });
 
-    setWithdrawalQueueData({
-      delayed: bundledTxn.delayWithdrawalLargeAmount ?? false,
-      activated: bundledTxn.withdrawalQueueActivated ?? false,
-      threshold: bundledTxn.largeTransferThresholds ?? 0,
-    });
+    if (bundledTxn.withdrawalQueueActivated) {
+      setWithdrawalQueueWarning({
+        visible: true,
+        warningType: WithdrawalQueueWarningType.TYPE_ACTIVE_QUEUE,
+      });
+    } else if (bundledTxn.delayWithdrawalLargeAmount && bundledTxn.largeTransferThresholds) {
+      const threshold = utils.formatUnits(bundledTxn.largeTransferThresholds, token.decimals);
+
+      setWithdrawalQueueWarning({
+        visible: true,
+        warningType: WithdrawalQueueWarningType.TYPE_THRESHOLD,
+        threshold: parseInt(threshold, 10),
+      });
+    }
 
     const unsignedApproveTransaction = {
       contractToApprove: bundledTxn.contractToApprove,
@@ -368,27 +369,6 @@ export function BridgeReviewSummary() {
       return;
     }
 
-    if (withdrawalQueueData?.delayed && !isWarningAcknowledged) {
-      const threshold = utils.formatUnits(withdrawalQueueData.threshold, token?.decimals || DEFAULT_TOKEN_DECIMALS);
-
-      setWithdrawalQueueWarning({
-        visible: true,
-        warningType: WithdrawalQueueWarningType.TYPE_THRESHOLD,
-        threshold: parseInt(threshold, 10),
-      });
-
-      return;
-    }
-
-    if (withdrawalQueueData?.activated && !isWarningAcknowledged) {
-      setWithdrawalQueueWarning({
-        visible: true,
-        warningType: WithdrawalQueueWarningType.TYPE_ACTIVE_QUEUE,
-      });
-
-      return;
-    }
-
     try {
       const currentChainId = await (from?.web3Provider.provider as any).request({ method: 'eth_chainId', params: [] });
       // eslint-disable-next-line radix
@@ -453,15 +433,7 @@ export function BridgeReviewSummary() {
     to?.web3Provider,
     to?.network,
     to?.walletProviderInfo,
-    withdrawalQueueData,
-    isWarningAcknowledged,
   ]);
-
-  useEffect(() => {
-    if (isWarningAcknowledged) {
-      submitBridge();
-    }
-  }, [isWarningAcknowledged, submitBridge]);
 
   return (
     <Box testId={testId} sx={bridgeReviewWrapperStyles}>
@@ -669,10 +641,6 @@ export function BridgeReviewSummary() {
         visible={withdrawalQueueWarning.visible}
         warningType={withdrawalQueueWarning.warningType}
         checkout={checkout}
-        onProceed={() => {
-          setWithdrawalQueueWarning({ visible: false });
-          setIsWarningAcknowledged(true);
-        }}
         onAdjustAmount={() => {
           setWithdrawalQueueWarning({ visible: false });
           viewDispatch({
