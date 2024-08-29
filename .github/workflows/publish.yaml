@@ -31,6 +31,7 @@ on:
       - main
 
 permissions:
+  id-token: write
   attestations: write # Required for GitHub Attestation
 
 env:
