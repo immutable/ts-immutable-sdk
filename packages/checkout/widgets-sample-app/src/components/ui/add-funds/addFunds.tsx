@@ -7,6 +7,7 @@ import {
   OnRampEventType,
   SwapEventType,
   BridgeEventType,
+  SwapDirection,
 } from "@imtbl/checkout-sdk";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import { useMemo, useEffect } from "react";
@@ -15,14 +16,12 @@ const ADD_FUNDS_TARGET_ID = "add-funds-widget-target";
 
 function AddFundsUI() {
   const checkout = useMemo(() => new Checkout(), []);
-  const factory = useMemo(
-    () => new WidgetsFactory(checkout,{}),
-    [checkout]
-  );
+  const factory = useMemo(() => new WidgetsFactory(checkout, {}), [checkout]);
   const addFunds = useMemo(
-    () => factory.create(WidgetType.ADD_FUNDS, {
-      config: { theme: WidgetTheme.DARK },
-    }),
+    () =>
+      factory.create(WidgetType.ADD_FUNDS, {
+        config: { theme: WidgetTheme.DARK },
+      }),
     [factory]
   );
   const onRamp = useMemo(() => factory.create(WidgetType.ONRAMP), [factory]);
@@ -31,7 +30,7 @@ function AddFundsUI() {
 
   useEffect(() => {
     addFunds.mount(ADD_FUNDS_TARGET_ID, {
-      showSwapOption:false,
+      showSwapOption: false,
     });
     addFunds.addListener(AddFundsEventType.GO_BACK, (data: any) => {
       console.log("GO_BACK", data);
@@ -62,6 +61,7 @@ function AddFundsUI() {
       swap.mount(ADD_FUNDS_TARGET_ID, {
         amount: data.amount,
         toTokenAddress: data.toTokenAddress,
+        direction: SwapDirection.TO,
       });
     });
     addFunds.addListener(AddFundsEventType.REQUEST_BRIDGE, (data: any) => {
