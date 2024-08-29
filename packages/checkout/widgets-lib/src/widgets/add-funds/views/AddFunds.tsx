@@ -64,7 +64,10 @@ export function AddFunds({
   useEffect(() => {
     if (!checkout) return;
     const fetchTokens = async () => {
-      const tokenResponse = await checkout.getTokenAllowList({ type: TokenFilterTypes.SWAP, chainId: 1 });
+      const tokenResponse = await checkout.getTokenAllowList({
+        type: TokenFilterTypes.SWAP,
+        chainId: 1,
+      });
 
       if (tokenResponse?.tokens.length > 0) {
         setAllowedTokens(tokenResponse.tokens);
@@ -114,12 +117,16 @@ export function AddFunds({
       orchestrationEvents.sendRequestSwapEvent(
         eventTarget,
         IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
-        { toTokenAddress: toTokenAddress?.address ?? '', amount: toAmount ?? '', fromTokenAddress: '' },
+        {
+          toTokenAddress: toTokenAddress?.address ?? '',
+          amount: toAmount ?? '',
+          fromTokenAddress: '',
+        },
       );
     } else {
       const data = {
-        tokenAddress: tokenAddress ?? '',
-        amount: amount ?? '',
+        tokenAddress: toTokenAddress?.address ?? '',
+        amount: toAmount ?? '',
       };
       orchestrationEvents.sendRequestOnrampEvent(
         eventTarget,
@@ -201,14 +208,13 @@ export function AddFunds({
             openDrawer();
           }}
         >
-          <MenuItem.IntentIcon
-            icon="ChevronExpand"
-          />
+          <MenuItem.IntentIcon icon="ChevronExpand" />
           <MenuItem.Label size="medium">Choose payment option</MenuItem.Label>
         </MenuItem>
-        <Box sx={{
-          marginBottom: 'base.spacing.x10',
-        }}
+        <Box
+          sx={{
+            marginBottom: 'base.spacing.x10',
+          }}
         >
           <OptionsDrawer
             visible={showOptionsDrawer}
