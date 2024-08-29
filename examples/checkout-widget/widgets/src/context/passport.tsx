@@ -20,6 +20,7 @@ type PassportContextType = {
   logout?: () => void;
   loginWithoutWallet?: () => void;
   walletWidget: checkout.Widget<checkout.WidgetType> | undefined;
+  backToGame: () => void;
 };
 
 const PassportContext = createContext<PassportContextType>({} as any);
@@ -97,11 +98,16 @@ export function PassportProvider({ children }: { children: ReactNode }) {
     }
     initializeWallet();
   }, [passportInstance]);
+
+  const backToGame = useCallback(async () => {
+    window.location.href = `${environment.redirectUri}?status=hell_from_widget`;
+  }, [environment]);
+
   const login = useCallback(async () => {
     if (!passportInstance) return;
     const provider = passportInstance.connectEvm();
     const accounts = await provider.request({ method: "eth_requestAccounts" });
-    window.alert(`accounts: ${accounts}`);
+    // window.alert(`accounts: ${accounts}`);
   }, [passportInstance]);
 
   const logout = useCallback(async () => {
@@ -112,7 +118,7 @@ export function PassportProvider({ children }: { children: ReactNode }) {
   const loginWithoutWallet = useCallback(async () => {
     if (!passportInstance) return;
     const profile: passport.UserProfile | null = await passportInstance.login();
-    window.alert(`profile: ${JSON.stringify(profile)}`);
+    // window.alert(`profile: ${JSON.stringify(profile)}`);
   }, [passportInstance]);
 
   const providerValue = useMemo(
@@ -122,8 +128,9 @@ export function PassportProvider({ children }: { children: ReactNode }) {
       logout,
       loginWithoutWallet,
       walletWidget,
+      backToGame,
     }),
-    [passportInstance, login, logout, loginWithoutWallet, walletWidget]
+    [passportInstance, login, logout, loginWithoutWallet, walletWidget, backToGame]
   );
 
   return (
