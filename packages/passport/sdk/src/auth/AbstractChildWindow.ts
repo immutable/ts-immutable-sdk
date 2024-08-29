@@ -42,7 +42,7 @@ export abstract class AbstractChildWindow implements IWindow {
     }
 
     logger.debug('setting URL in window');
-    this._window.location.replace(params.url);
+    // this._window.location.replace(params.url);
 
     const { url, keepOpen } = await new Promise<MessageData>((resolve, reject) => {
       const listener = (e: MessageEvent) => {
