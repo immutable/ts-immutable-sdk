@@ -19,6 +19,7 @@ import { EventTargetContext } from '../../../context/event-target-context/EventT
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { OptionTypes } from '../components/Option';
 import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
+import { getL2ChainId } from '../../../lib';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -66,7 +67,7 @@ export function AddFunds({
     const fetchTokens = async () => {
       const tokenResponse = await checkout.getTokenAllowList({
         type: TokenFilterTypes.SWAP,
-        chainId: 1,
+        chainId: getL2ChainId(checkout.config),
       });
 
       if (tokenResponse?.tokens.length > 0) {
