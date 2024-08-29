@@ -25,8 +25,10 @@ export class PopupWindow extends AbstractChildWindow {
 
   protected _window: WindowProxy | null = null;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected popupWindowTarget: string;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected popupWindowFeatures: PopupWindowFeatures;
 
   public constructor({
