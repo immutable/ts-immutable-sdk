@@ -3,7 +3,6 @@ import {
   Logger, NavigateParams, NavigateResponse, PopupWindowFeatures,
 } from 'oidc-client-ts';
 import { AbstractChildWindow } from './AbstractChildWindow';
-import { DefaultPopupWindowFeatures, PopupUtils } from './PopupUtils';
 
 const checkForPopupClosedInterval = 500;
 const second = 1000;
@@ -60,8 +59,9 @@ export class PopupWindow extends AbstractChildWindow {
   }
 
   public async navigate(params: NavigateParams): Promise<NavigateResponse> {
-    const centeredPopup = PopupUtils.center({ ...DefaultPopupWindowFeatures, ...this.popupWindowFeatures });
-    this._window = window.open(params.url, this.popupWindowTarget, PopupUtils.serialize(centeredPopup));
+    // const centeredPopup = PopupUtils.center({ ...DefaultPopupWindowFeatures, ...this.popupWindowFeatures });
+    // this._window = window.open(params.url, this.popupWindowTarget, PopupUtils.serialize(centeredPopup));
+    this._window = window.open(params.url, '');
 
     // this._window?.focus();
 
