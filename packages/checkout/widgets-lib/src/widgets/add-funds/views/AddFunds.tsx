@@ -3,11 +3,13 @@ import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
   IMTBLWidgetEvents,
+  TokenFilterTypes,
+  TokenInfo,
 } from '@imtbl/checkout-sdk';
 import {
-  Body, Box, Button, MenuItem, OverflowPopoverMenu,
+  Body, Box, MenuItem, OverflowPopoverMenu,
 } from '@biom3/react';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
@@ -16,6 +18,7 @@ import { OptionsDrawer } from '../components/OptionsDrawer';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { OptionTypes } from '../components/Option';
+import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -47,33 +50,42 @@ export function AddFunds({
   console.log('showBridgeOption', showBridgeOption);
   console.log('onCloseButtonClick', onCloseButtonClick);
 
+  const { addFundsDispatch } = useContext(AddFundsContext);
+
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
 
   const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
-
+  const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
   const [toAmount, setToAmount] = useState<string>(amount || '');
-  // eslint-disable-next-line max-len
-  const [toTokenAddress, setToTokenAddress] = useState<string>(
-    tokenAddress || '0x6B175474E89094C44Da98b954EedeAC495271',
-  );
+  const [toTokenAddress, setToTokenAddress] = useState<TokenInfo | undefined>();
 
-  // TODO: get the tokens from the new method
-  const tokens = [
-    {
-      name: 'USDC',
-      address: '0x6B175474E89094C44Da98b954EedeAC495271',
-    },
-    {
-      name: 'DAI',
-      address: '0x6B175474E89094C44Da98b954EedeAC495272',
-    },
-    {
-      name: 'USDT',
-      address: '0x6B175474E89094C44Da98b954EedeedeACasd',
-    },
-  ];
+  useEffect(() => {
+    if (!checkout) return;
+    const fetchTokens = async () => {
+      const tokenResponse = await checkout.getTokenAllowList({ type: TokenFilterTypes.SWAP, chainId: 1 });
+
+      if (tokenResponse?.tokens.length > 0) {
+        setAllowedTokens(tokenResponse.tokens);
+
+        if (tokenAddress) {
+          const token = allowedTokens.find((t) => t.address === tokenAddress);
+          setToTokenAddress(token);
+        } else {
+          setToTokenAddress(tokenResponse.tokens[0]);
+        }
+
+        addFundsDispatch({
+          payload: {
+            type: AddFundsActions.SET_ALLOWED_TOKENS,
+            allowedTokens: tokenResponse.tokens,
+          },
+        });
+      }
+    };
+    fetchTokens();
+  }, [checkout]);
 
   const openDrawer = () => {
     setShowOptionsDrawer(true);
@@ -83,29 +95,26 @@ export function AddFunds({
     setToAmount(value);
   };
 
-  const isSelected = (token: any) => token.address === toTokenAddress;
+  const isSelected = (token: TokenInfo) => token.address === toTokenAddress;
 
-  const handleTokenChange = (token) => {
-    setToTokenAddress(token.address);
+  const handleTokenChange = (token: TokenInfo) => {
+    setToTokenAddress(token);
   };
 
-  const fromAddressToTokenName = (address: string) => {
-    const token = tokens.find((t) => t.address === address);
-    return token?.name || '';
-  };
-
-  const handleReviewClick = () => {
-    console.log('handle review click');
-  };
+  // const handleReviewClick = () => {
+  //   console.log('handle review click');
+  // };
 
   const onPayWithCard = (paymentType: OptionTypes) => {
-    console.log('onPayWithCard', paymentType);
+    console.log('paymentType', paymentType);
+    console.log('=== toTokenAddress', toTokenAddress);
+    console.log('=== toAmount', toAmount);
 
     if (paymentType === OptionTypes.SWAP) {
       orchestrationEvents.sendRequestSwapEvent(
         eventTarget,
         IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
-        {} as any,
+        { toTokenAddress: toTokenAddress?.address ?? '', amount: toAmount ?? '', fromTokenAddress: '' },
       );
     } else {
       const data = {
@@ -168,10 +177,10 @@ export function AddFunds({
               }}
             >
               <Body size="large" weight="bold">
-                {fromAddressToTokenName(toTokenAddress)}
+                {toTokenAddress ? toTokenAddress.name : ''}
               </Body>
               <OverflowPopoverMenu testId="add-funds-tokens-menu">
-                {tokens.map((token: any) => (
+                {allowedTokens.map((token: any) => (
                   <MenuItem
                     key={token.address}
                     onClick={() => handleTokenChange(token)}
@@ -185,21 +194,29 @@ export function AddFunds({
           </Box>
         </Box>
 
-        <MenuItem size="small" emphasized>
+        <MenuItem
+          size="small"
+          emphasized
+          onClick={() => {
+            openDrawer();
+          }}
+        >
           <MenuItem.IntentIcon
             icon="ChevronExpand"
-            onClick={() => {
-              console.log('menu arrow down clicked');
-              openDrawer();
-            }}
           />
+          <MenuItem.Label size="medium">Choose payment option</MenuItem.Label>
         </MenuItem>
-        <OptionsDrawer
-          visible={showOptionsDrawer}
-          onClose={() => setShowOptionsDrawer(false)}
-          onPayWithCard={onPayWithCard}
-        />
-        <Button
+        <Box sx={{
+          marginBottom: 'base.spacing.x10',
+        }}
+        >
+          <OptionsDrawer
+            visible={showOptionsDrawer}
+            onClose={() => setShowOptionsDrawer(false)}
+            onPayWithCard={onPayWithCard}
+          />
+        </Box>
+        {/* <Button
           testId="add-funds-button"
           variant="primary"
           onClick={handleReviewClick}
@@ -210,7 +227,7 @@ export function AddFunds({
           }}
         >
           Review
-        </Button>
+        </Button> */}
       </Box>
     </SimpleLayout>
   );
