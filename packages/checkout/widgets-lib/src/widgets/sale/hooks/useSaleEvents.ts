@@ -208,6 +208,25 @@ export const useSaleEvent = () => {
     });
   };
 
+  const sendInsufficientFunds = (
+    screen: string,
+    txRequirements: any,
+    controlType: AnalyticsControlTypes = 'Event',
+    action: StandardAnalyticsActions = 'Viewed',
+  ) => {
+    track({
+      ...commonProps,
+      screen: toPascalCase(screen),
+      control: 'InsufficientFunds',
+      controlType,
+      action,
+      extras: {
+        ...userProps,
+        ...txRequirements,
+      },
+    });
+  };
+
   const sendViewFeesEvent = (
     screen: string,
     controlType: AnalyticsControlTypes = 'Button',
@@ -238,5 +257,6 @@ export const useSaleEvent = () => {
     sendSelectedPaymentToken,
     sendProceedToPay,
     sendViewFeesEvent,
+    sendInsufficientFunds,
   };
 };

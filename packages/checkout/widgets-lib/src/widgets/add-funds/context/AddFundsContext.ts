@@ -24,9 +24,9 @@ export interface AddFundsAction {
 }
 
 type ActionPayload =
-    | SetCheckoutPayload
-    | SetProviderPayload
-    | SetAllowedTokensPayload;
+  | SetCheckoutPayload
+  | SetProviderPayload
+  | SetAllowedTokensPayload;
 
 export enum AddFundsActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
@@ -52,8 +52,7 @@ export interface SetAllowedTokensPayload {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const AddFundsContext = createContext<AddFundsContextState>({
   addFundsState: initialAddFundsState,
-  addFundsDispatch: () => {
-  },
+  addFundsDispatch: () => {},
 });
 
 AddFundsContext.displayName = 'AddFundsContext';

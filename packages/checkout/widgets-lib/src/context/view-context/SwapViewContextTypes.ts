@@ -62,6 +62,7 @@ export interface ApproveERC20SwapData {
   transaction: TransactionRequest;
   info: Quote;
   swapFormInfo: PrefilledSwapForm;
+  autoProceed: boolean;
 }
 export interface PrefilledSwapForm {
   fromAmount: string;
