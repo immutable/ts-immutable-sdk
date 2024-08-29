@@ -151,6 +151,9 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
       screen: 'ApproveERC20',
       control: 'ApproveSpending',
       controlType: 'Button',
+      extras: {
+        autoProceed: data.autoProceed,
+      },
     });
     setLoading(true);
 
@@ -252,6 +255,9 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
       screen: 'ApproveERC20',
       control: 'ApproveSwap',
       controlType: 'Button',
+      extras: {
+        autoProceed: data.autoProceed,
+      },
     });
     setLoading(true);
 
