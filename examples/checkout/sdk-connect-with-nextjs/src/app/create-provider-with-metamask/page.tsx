@@ -7,7 +7,7 @@ import { WalletProviderName } from '@imtbl/sdk/checkout';
 import { Button, Heading, Body, Link } from '@biom3/react';
 import NextLink from 'next/link';
 
-export default function ConnectWithMetamask() {
+export default function CreateProviderWithMetamask() {
 
 const [provider, setProvider] = useState<Web3Provider>();
 const [walletProviderName, setWalletProviderName] = useState<WalletProviderName>();
@@ -18,10 +18,10 @@ const [loading, setLoadingState] = useState<boolean>(false);
 const connectWithMetamask = async () => {
   // disable button while loading
   setLoadingState(true);
-  // #doc connect-metamask-provider
+  // #doc create-metamask-provider
   const walletProviderName = checkout.WalletProviderName.METAMASK;
   const response = await checkoutSDK.createProvider({ walletProviderName });
-  // #enddoc connect-metamask-provider
+  // #enddoc create-metamask-provider
   setProvider(response.provider)
   setWalletProviderName(response.walletProviderName)
   setLoadingState(false);
