@@ -306,7 +306,7 @@
         "fee": "交换费用 ~ {{symbol}} {{amount}}"
       },
       "orderReview": {
-        "heading": "付款摘要",
+        "heading": "订单摘要",
         "continue": "继续",
         "continueFreeMint": "免费继续",
         "payWith": {

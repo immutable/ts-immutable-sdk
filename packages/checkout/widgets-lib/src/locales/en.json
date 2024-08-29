@@ -307,7 +307,7 @@
         "fee": "Swap fee ~ {{symbol}} {{amount}}"
       },
       "orderReview": {
-        "heading": "Payment summary",
+        "heading": "Order summary",
         "continue": "Proceed",
         "continueFreeMint": "Proceed for free",
         "payWith": {
