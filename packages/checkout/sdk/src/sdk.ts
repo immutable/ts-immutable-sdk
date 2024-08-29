@@ -293,6 +293,10 @@ export class Checkout {
     return InjectedProvidersManager.getInstance().subscribe(listener);
   }
 
+  public clearInjectedProviders() {
+    return InjectedProvidersManager.getInstance().clear();
+  }
+
   /**
    * Checks if a wallet is connected to the specified provider.
    * @param {CheckConnectionParams} params - The parameters for checking the wallet connection.
