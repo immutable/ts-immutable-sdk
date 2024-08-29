@@ -1,13 +1,13 @@
 import { Box, Drawer } from '@biom3/react';
 import { motion } from 'framer-motion';
-import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { listVariants } from '../../../lib/animation/listAnimation';
-import { PaymentOptions } from '../../sale/components/PaymentOptions';
+import { Options } from './Options';
+import { OptionTypes } from './Option';
 
 type OptionsDrawerProps = {
   visible: boolean;
   onClose: () => void;
-  onPayWithCard?: (paymentType: SalePaymentTypes) => void;
+  onPayWithCard?: (paymentType: OptionTypes) => void;
 };
 
 export function OptionsDrawer({
@@ -26,7 +26,7 @@ export function OptionsDrawer({
       <Drawer.Content
         rc={
           <motion.div variants={listVariants} initial="hidden" animate="show" />
-                }
+        }
       >
         <Box
           sx={{
@@ -37,15 +37,20 @@ export function OptionsDrawer({
             px: 'base.spacing.x4',
           }}
         >
-          <PaymentOptions
+          <Options
             onClick={onPayWithCard ?? (() => {})}
             size="medium"
             hideDisabledOptions
-            paymentOptions={[SalePaymentTypes.DEBIT, SalePaymentTypes.CREDIT]}
+            options={[
+              OptionTypes.SWAP,
+              OptionTypes.DEBIT,
+              OptionTypes.CREDIT,
+            ]}
             disabledOptions={[]}
             captions={{
-              [SalePaymentTypes.DEBIT]: 'Debit',
-              [SalePaymentTypes.CREDIT]: 'Credit',
+              [OptionTypes.SWAP]: 'Swap',
+              [OptionTypes.DEBIT]: 'Debit',
+              [OptionTypes.CREDIT]: 'Credit',
             }}
           />
         </Box>

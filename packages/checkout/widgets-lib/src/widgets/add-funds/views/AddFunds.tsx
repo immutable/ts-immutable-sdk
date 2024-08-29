@@ -1,9 +1,11 @@
 /* eslint-disable no-console */
 import { Web3Provider } from '@ethersproject/providers';
-import { Checkout, IMTBLWidgetEvents, SalePaymentTypes } from '@imtbl/checkout-sdk';
 import {
-  Body,
-  Box, Button, MenuItem, OverflowPopoverMenu,
+  Checkout,
+  IMTBLWidgetEvents,
+} from '@imtbl/checkout-sdk';
+import {
+  Body, Box, Button, MenuItem, OverflowPopoverMenu,
 } from '@biom3/react';
 import { useContext, useState } from 'react';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -13,6 +15,7 @@ import { TextInputForm } from '../../../components/FormComponents/TextInputForm/
 import { OptionsDrawer } from '../components/OptionsDrawer';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
+import { OptionTypes } from '../components/Option';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -36,7 +39,6 @@ export function AddFunds({
   showBridgeOption = true,
   onBackButtonClick,
   onCloseButtonClick,
-
 }: AddFundsProps) {
   console.log('checkout', checkout);
   console.log('provider', provider);
@@ -45,13 +47,17 @@ export function AddFunds({
   console.log('showBridgeOption', showBridgeOption);
   console.log('onCloseButtonClick', onCloseButtonClick);
 
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
 
   const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
 
   const [toAmount, setToAmount] = useState<string>(amount || '');
   // eslint-disable-next-line max-len
-  const [toTokenAddress, setToTokenAddress] = useState<string>(tokenAddress || '0x6B175474E89094C44Da98b954EedeAC495271');
+  const [toTokenAddress, setToTokenAddress] = useState<string>(
+    tokenAddress || '0x6B175474E89094C44Da98b954EedeAC495271',
+  );
 
   // TODO: get the tokens from the new method
   const tokens = [
@@ -92,13 +98,26 @@ export function AddFunds({
     console.log('handle review click');
   };
 
-  const onPayWithCard = (paymentType: SalePaymentTypes) => {
+  const onPayWithCard = (paymentType: OptionTypes) => {
     console.log('onPayWithCard', paymentType);
-    const data = {
-      tokenAddress: tokenAddress ?? '',
-      amount: amount ?? '',
-    };
-    orchestrationEvents.sendRequestOnrampEvent(eventTarget, IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT, data);
+
+    if (paymentType === OptionTypes.SWAP) {
+      orchestrationEvents.sendRequestSwapEvent(
+        eventTarget,
+        IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+        {} as any,
+      );
+    } else {
+      const data = {
+        tokenAddress: tokenAddress ?? '',
+        amount: amount ?? '',
+      };
+      orchestrationEvents.sendRequestOnrampEvent(
+        eventTarget,
+        IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+        data,
+      );
+    }
   };
 
   return (
@@ -110,20 +129,22 @@ export function AddFunds({
           onCloseButtonClick={onCloseButtonClick}
           showBack={!!onBackButtonClick}
         />
-            )}
+      )}
     >
-      <Box sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        height: '100%',
-      }}
-      >
-        <Box sx={{
+      <Box
+        sx={{
           display: 'flex',
-          justifyContent: 'center',
-          marginTop: 'base.spacing.x10',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          height: '100%',
         }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginTop: 'base.spacing.x10',
+          }}
         >
           <Box sx={{ width: 'base.spacing.x40' }}>
             <Box sx={{ marginBottom: 'base.spacing.x3' }}>
@@ -138,30 +159,33 @@ export function AddFunds({
               />
             </Box>
 
-            <Box sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 'base.spacing.x5',
-              justifyContent: 'center',
-            }}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'base.spacing.x5',
+                justifyContent: 'center',
+              }}
             >
-              <Body size="large" weight="bold">{fromAddressToTokenName(toTokenAddress)}</Body>
+              <Body size="large" weight="bold">
+                {fromAddressToTokenName(toTokenAddress)}
+              </Body>
               <OverflowPopoverMenu testId="add-funds-tokens-menu">
                 {tokens.map((token: any) => (
-                  <MenuItem key={token.address} onClick={() => handleTokenChange(token)} selected={isSelected(token)}>
+                  <MenuItem
+                    key={token.address}
+                    onClick={() => handleTokenChange(token)}
+                    selected={isSelected(token)}
+                  >
                     <MenuItem.Label>{token.name}</MenuItem.Label>
                   </MenuItem>
                 ))}
-
               </OverflowPopoverMenu>
             </Box>
           </Box>
         </Box>
 
-        <MenuItem
-          size="small"
-          emphasized
-        >
+        <MenuItem size="small" emphasized>
           <MenuItem.IntentIcon
             icon="ChevronExpand"
             onClick={() => {
