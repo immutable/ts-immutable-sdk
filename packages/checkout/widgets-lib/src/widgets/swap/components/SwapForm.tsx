@@ -665,6 +665,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         swapToAddress: toToken?.address,
         swapToAmount: toAmount,
         swapToTokenSymbol: toToken?.symbol,
+        autoProceed,
       },
     });
 
@@ -711,6 +712,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         swapToTokenSymbol: data?.toTokenSymbol,
         isSwapFormValid: isValid,
         hasFundsForGas: !insufficientFundsForGas,
+        autoProceed,
       },
     });
     if (!isValid) return;
@@ -755,6 +757,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
             transaction: transaction.swap.transaction,
             info: transaction.quote,
             swapFormInfo: prefilledSwapData,
+            autoProceed,
           },
         },
       },
