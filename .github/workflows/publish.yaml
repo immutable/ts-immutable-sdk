@@ -30,9 +30,6 @@ on:
     branches:
       - main
 
-permissions:
-  attestations: write # Required for GitHub Attestation
-
 env:
   RELEASE_TYPE: ${{ github.event.inputs.release_type || 'alpha' }}
   UPGRADE_TYPE: ${{ github.event.inputs.upgrade_type || 'none' }}
@@ -50,6 +47,9 @@ jobs:
       GH_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
       NODE_OPTIONS: --max-old-space-size=14366
       SDK_PUBLISH_SLACK_WEBHOOK: ${{ secrets.SDK_PUBLISH_SLACK_WEBHOOK }}
+    permissions:
+      id-token: write # Required for GitHub Attestation
+      attestations: write # Required for GitHub Attestation
     steps:
       - name: Check Public Release Branch
         if: contains(env.RELEASE_TYPE , 'release') && (github.ref != 'refs/heads/main')
