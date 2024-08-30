@@ -10,6 +10,13 @@ export enum PostMessageHandlerEventType {
   WIDGET_EVENT = 'IMTBL_CHECKOUT_WIDGET_EVENT',
 }
 
+export type WidgetEventDetail<T extends WidgetType> = {
+  [K in keyof WidgetEventData[T]]: {
+    type: K;
+    data: WidgetEventData[T][K];
+  };
+}[keyof WidgetEventData[T]];
+
 export type PostMessageProviderRelayData = any;
 
 export type PostMessageEIP6963Data = any;
@@ -18,12 +25,7 @@ export type PostMessageWidgetEventData<
   T extends WidgetType = WidgetType.CHECKOUT,
 > = {
   type: IMTBLWidgetEvents.IMTBL_CHECKOUT_WIDGET_EVENT;
-  detail: {
-    [K in keyof WidgetEventData[T]]: {
-      type: K;
-      data: WidgetEventData[T][K];
-    };
-  }[keyof WidgetEventData[T]];
+  detail: WidgetEventDetail<T>;
 };
 
 export type PostMessageData =
