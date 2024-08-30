@@ -44,7 +44,7 @@ yarn prepare:examples
 
 and it will build the SDK first then use that build instead of what is on NPM. This is what our CI CD pipeline does to ensure it's compiling and testing the examples against the latest changes rather than what's already on NPM.
 
-Take a look at the README.md file of the example you want to run e.g. the [Passport Connect Readme](/examples/passport/wallets-connect-with-nextjs/README.md)
+Take a look at the README.md file of the example you want to run e.g. the [Checkout SDK Connect Readme](examples/checkout/sdk-connect-with-nextjs/README.md)
 
 This should include the steps required to run the example. Generally you will need to;
 
@@ -67,11 +67,11 @@ We also want to eventually index these examples and serve them in a searchable a
 
 When creating an example app it should contain only examples about one particular feature to prevent overloading the example. If there are multiple ways to use the feature then it is okay to include those in one example app.
 
-For example, the [Passport Connect with NextJS](/examples/passport/wallets-connect-with-nextjs) app shows how to connect passport in the NextJS framework. 
+For example, the  [Checkout SDK Connect](/examples/checkout/sdk-connect-with-nextjs) app shows how to connect checkout in the NextJS framework. 
 
-It contains a default route that has links to each of the examples. Inside there are three routes, one for each way to connect (EIP-1193, EtherJS and Wagmi). These are okay to be part of one example app since they show how to use one feature but using 3 different libraries.
+It contains a default route that has links to each of the examples. Inside there is just one route, showing how to connect with Metamask. If we wanted to show how to connect with Passport or Wallet Connect we would make new routes in this example app for each. These are okay to be part of one example app since they show how to use one feature but using 3 different libraries.
 
-If you want to show a different feature e.g signing with passport, you should create a new example app. Even though it also requires passport to connect you should not add the signing example to the connect example app.
+If you want to show a different feature e.g switching networks, you should create a new example app. Even though it also requires checkout to connect you should not add the switching example to the connect example app to prevent overloading.
 
 ## Folder structure
 
@@ -101,7 +101,13 @@ examples
 │   │           └── sign-with-erc191
 │   └── ...
 ├── checkout
+│   ├── sdk-connect-with-nextjs
+│   │   └── src
+│   │       └── app
+│   │           ├── page.tsx
+│   │           └── connect-with-metamask
 │   └── ...
+└── ...
 ```
 
 # Adding examples
@@ -112,7 +118,7 @@ If you need to add a new example or add to an existing example, please follow th
 
 ## Add to an existing example app
 
-The process may differ depending on how the example app is setup, but the recommendations we have made around creating a new example should follow the same structure as we've implemented for the [[Passport Connect with NextJS](/examples/passport/wallets-connect-with-nextjs) and [Passport Signing with NextJS](/examples/passport/wallets-signing-with-nextjs) examples.
+The process may differ depending on how the example app is setup, but the recommendations we have made around creating a new example should follow the same structure as we've implemented for the [Checkout SDK Connect](/examples/checkout/sdk-connect-with-nextjs) example.
 
 So if you need to add a new example to an existing example app you should create a branch in `ts-immutable-sdk` to add your example to and follow these steps;
 
@@ -138,7 +144,7 @@ If your code example is going to be used as code snippets in the docs site, befo
 
 ## Creating a new example app
 
-The process may differ if you're using a different Javascript Framework, but this assumes you will be creating a new example app using NextJS. These steps which were implemented to create the [Passport Connect](/examples/passport/wallets-connect-with-nextjs) example. It is a good reference point in terms of route structure and page layouts. If you need to copy code from there to help with your layouts then please go ahead.
+The process may differ if you're using a different Javascript Framework, but this assumes you will be creating a new example app using NextJS. These steps which were implemented to create the [Checkout SDK Connect](/examples/checkout/sdk-connect-with-nextjs) example. It is a good reference point in terms of route structure and page layouts. If you need to copy code from there to help with your layouts then please go ahead.
 
 ### Setup example app
 
@@ -152,23 +158,30 @@ cd examples/<product>
 yarn dlx create-next-app@latest
 ```
 
-use the default options;
+use the default options, except don't use Tailwind CSS;
 ```bash
-✔ What is your project named? @examples/<product>/<feature>-with-<framework> e.g. @examples/passport/connect-with-nextjs
+✔ What is your project named? @examples/<product>/<feature>-with-<framework> e.g. @examples/checkout/sdk-connect-with-nextjs
 ✔ Would you like to use TypeScript? … Yes
 ✔ Would you like to use ESLint? … Yes
-✔ Would you like to use Tailwind CSS? … Yes
+✔ Would you like to use Tailwind CSS? … No
 ✔ Would you like to use `src/` directory? … Yes
 ✔ Would you like to use App Router? (recommended) … Yes
 ✔ Would you like to customize the default import alias (@/*)? No
 ```
 
+The setup script will throw an error about the app not being part of the yarn project. This is normal, the example apps shouldn't be part of the top level yarn project. Create an empty `yarn.lock` file in the app root and continue and run `yarn install` manually to install your dependencies.
+
 Install `@imtbl/sdk` and any other dependencies your example needs e.g.
 
 ```bash
 yarn add @imtbl/sdk
+yarn add @biom3/react
 yarn add @ethersproject/providers@^5.7.2
 ```
+
+You should use `@biom3/react` to style your app so it matches the immutable branding. A good example of how to use Biome can be found in the [Checkout SDK Connect](/examples/checkout/sdk-connect-with-nextjs) example.
+
+The main things to remember is to create an [App Wrapper component](examples/checkout/sdk-connect-with-nextjs/src/app/utils/wrapper.tsx) which adds the Biome Providers. Then make sure you wrap your app in the wrapper component in the [Layout component](examples/checkout/sdk-connect-with-nextjs/src/app/layout.tsx). You can simply copy the same setup linked above then you should be able to access and display all the Biome components you want in your pages.
 
 Create a `.env.example` file in the root of the example. This will be committed to git so don't fill in the values
 
@@ -208,12 +221,12 @@ Update the title and description in `app/layout.tsx` to match the examples in yo
 
 ```ts
 export const metadata: Metadata = {
-  title: "Passport Connect",
-  description: "Examples of how to connect wallets to Passport with NextJS",
+  title: "Checkout SDK - Connect",
+  description: "Examples of how to connect using the Checkout SDK with NextJS",
 };
 ```
 
-Create a home page for your example app with links to all the examples in `src/app/page.tsx` e.g. [Passport Connect Home Page](/examples/passport/wallets-connect-with-nextjs/app/page.tsx)
+Create a home page for your example app with links to all the examples in `src/app/page.tsx` e.g. [Checkout SDK Connect Home](/examples/checkout/sdk-connect-with-nextjs/src/app/page.tsx)
 
 Create a route for each example using the naming convention `<feature>-with-<library>` e.g. `wallets-with-etherjs`
 
@@ -231,7 +244,7 @@ If your code example is going to be used as code snippets in the docs site, befo
 
 # End to end testing
 
-All examples should be covered by basic e2e tests to ensure they at least render the examples. Ideally they would also have e2e tests that prove the functionality that you're trying to show works. Depending on what you're doing in the examples, it may be difficult to e2e test certain things e.g. logging in with Passport. For this reason, testing of functionality with e2e testing is recommended if practical, but not required.
+All examples should be covered by basic e2e tests to ensure they at least render the examples. Ideally they would also have e2e tests that prove the functionality that you're trying to show works. Depending on what you're doing in the examples, it may be difficult to e2e test certain things e.g. logging in with Passport or connecting with Metamask. For this reason, testing of functionality with e2e testing is recommended if practical, but not required.
 
 Install `@playwright/test` as a dev dependency for the e2e tests.
 
@@ -278,7 +291,7 @@ Make sure you update the localhost urls `http://localhost:3000` in the above exa
 
 Create a `tests` directory in the root of the example app and start adding tests.
 
-Example of the base level of testing required can be found in the [Passport Connect e2e Tests](/examples/passport/wallets-connect-with-nextjs/tests/base.spec.ts) spec file.
+Example of the base level of testing required can be found in the [Checkout SDK Connect e2e Tests](/examples/checkout/sdk-connect-with-nextjs/tests/base.spec.ts) spec file.
 
 Add the test runner to the scripts in your package.json
 
@@ -286,8 +299,17 @@ Add the test runner to the scripts in your package.json
 "test": "playwright test"
 ```
 
-Run your tests with `yarn test`
+Install the playwright browsers
 
+```bash
+ yarn playwright install   
+```
+
+Run your tests
+
+```bash
+yarn test
+```
 # Using code examples in the docs site
 
 Creating and using code snippets is relatively straight forward. You can pull in a whole file or by adding some comments you can pull in just a particular few lines of a file as necessary.
@@ -299,7 +321,7 @@ To streamline the PR process, you should create a branch in the `docs` repo to a
 In your `docs` branch modify the file `/src/remark/import-code.mjs` and update the `BRANCH` constant from `main` to the name of your branch on `ts-immutable-sdk` e.g.
 
 ```ts
-const BRANCH = 'DVR-193-passport-signing-example';
+const BRANCH = 'DVR-173-checkout-sdk-example';
 ```
 
 Now your `docs` branch will be pulling the code examples from your branch in `ts-immutable-sdk` and you can use them locally in your `docs` branch to make sure they make sense in the page.
@@ -314,12 +336,13 @@ In your code examples in `ts-immutable-sdk` find the parts of the code you want 
 
 Labels have to be unique within a file so you should use a simple naming convention to avoid clashes within the file e.g.
 
-e.g. `<library>-<tag>`
-
 ```ts
-// #doc eip1193-create
-const passportProvider = passportInstance.connectEvm()
-// #enddoc eip1193-create
+// #doc connect-metamask-provider
+// Get the current network information
+const connectRes = await checkoutSDK.connect({
+  provider: providerRes.provider
+});
+// #enddoc connect-metamask-provider
 ```
 
 Make sure to commit and push the labels to your `ts-immutable-sdk` branch on GitHub so they can be pulled down into your `docs` local build from there.
@@ -329,13 +352,14 @@ Make sure to commit and push the labels to your `ts-immutable-sdk` branch on Git
 It's very simple to use the code snippet in the docs site, you just add a code block with the reference to the file and the `#` of the label you want to display e.g.
 
 ````md
-```tsx reference=examples/passport/wallets-connect-with-nextjs/src/app/connect-with-eip1193/page.tsx#eip1193-create title="Create the Passport Provider"
+```tsx reference=examples/checkout/sdk-connect-with-nextjs/src/app/connect-with-metamask/page.tsx#get-wallet-allow-list title="Get the wallet allow list"
+```
 ```
 ````
 Or if you want to display the whole file just don't include a `#` label at the end of the file reference e.g.
 
 ````md
-```tsx reference=examples/passport/wallets-connect-with-nextjs/src/app/connect-with-eip1193/page.tsx title="Create the Passport Provider"
+```tsx reference=examples/checkout/sdk-connect-with-nextjs/src/app/utils/setupDefault.ts title="Default setup"
 ```
 ````
 
