@@ -64,6 +64,7 @@ export function AddFunds({
 
   useEffect(() => {
     if (!checkout) return;
+
     const fetchTokens = async () => {
       const tokenResponse = await checkout.getTokenAllowList({
         type: TokenFilterTypes.SWAP,
@@ -74,7 +75,7 @@ export function AddFunds({
         setAllowedTokens(tokenResponse.tokens);
 
         if (tokenAddress) {
-          const token = allowedTokens.find((t) => t.address === tokenAddress);
+          const token = tokenResponse.tokens.find((t) => t.address === tokenAddress);
           setToTokenAddress(token);
         } else {
           setToTokenAddress(tokenResponse.tokens[0]);
