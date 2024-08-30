@@ -40,7 +40,7 @@ type OrderSummaryProps = {
 
 export function OrderSummary({ subView }: OrderSummaryProps) {
   const { t } = useTranslation();
-  const { sendProceedToPay } = useSaleEvent();
+  const { sendProceedToPay, sendInsufficientFunds } = useSaleEvent();
   const {
     fromTokenAddress,
     collectionName,
@@ -165,6 +165,12 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
         smartCheckoutResult.transactionRequirements,
       );
       setPaymentMethod(undefined);
+
+      // Send analytics event to track insufficient funds
+      sendInsufficientFunds(
+        SaleWidgetViews.ORDER_SUMMARY,
+        data,
+      );
 
       closeHandover();
       viewDispatch({

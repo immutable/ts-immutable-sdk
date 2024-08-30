@@ -63,6 +63,10 @@ import { Fees } from '../../../components/Fees/Fees';
 import { formatBridgeFees } from '../functions/BridgeFees';
 import { RawImage } from '../../../components/RawImage/RawImage';
 import { getErc20Contract } from '../functions/TransferErc20';
+import {
+  WithdrawalQueueDrawer,
+  WithdrawalQueueWarningType,
+} from '../../../components/WithdrawalQueueDrawer/WithdrawalQueueDrawer';
 
 const testId = 'bridge-review-summary';
 
@@ -105,6 +109,12 @@ export function BridgeReviewSummary() {
 
   // Not enough ETH to cover gas
   const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
+
+  const [withdrawalQueueWarning, setWithdrawalQueueWarning] = useState<{
+    visible: boolean;
+    warningType?: WithdrawalQueueWarningType;
+    threshold?: number;
+  }>({ visible: false });
 
   const isTransfer = useMemo(() => from?.network === to?.network, [from, to]);
   const isDeposit = useMemo(
@@ -203,6 +213,21 @@ export function BridgeReviewSummary() {
       destinationChainId: to?.network.toString(),
       gasMultiplier: 'auto',
     });
+
+    if (bundledTxn.withdrawalQueueActivated) {
+      setWithdrawalQueueWarning({
+        visible: true,
+        warningType: WithdrawalQueueWarningType.TYPE_ACTIVE_QUEUE,
+      });
+    } else if (bundledTxn.delayWithdrawalLargeAmount && bundledTxn.largeTransferThresholds) {
+      const threshold = utils.formatUnits(bundledTxn.largeTransferThresholds, token.decimals);
+
+      setWithdrawalQueueWarning({
+        visible: true,
+        warningType: WithdrawalQueueWarningType.TYPE_THRESHOLD,
+        threshold: parseInt(threshold, 10),
+      });
+    }
 
     const unsignedApproveTransaction = {
       contractToApprove: bundledTxn.contractToApprove,
@@ -610,6 +635,27 @@ export function BridgeReviewSummary() {
             },
           });
         }}
+      />
+
+      <WithdrawalQueueDrawer
+        visible={withdrawalQueueWarning.visible}
+        warningType={withdrawalQueueWarning.warningType}
+        checkout={checkout}
+        onAdjustAmount={() => {
+          setWithdrawalQueueWarning({ visible: false });
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: {
+                type: BridgeWidgetViews.BRIDGE_FORM,
+              },
+            },
+          });
+        }}
+        onCloseDrawer={() => {
+          setWithdrawalQueueWarning({ visible: false });
+        }}
+        threshold={withdrawalQueueWarning.threshold}
       />
     </Box>
   );

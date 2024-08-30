@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  primary-sales-db:
+    image: postgres:14
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=primarysales
+    restart: always
+    volumes:
+      - primary-sales-db-data:/data/postgres
+  
+volumes:
+  primary-sales-db-data:
+

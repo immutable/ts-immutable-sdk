@@ -1,5 +1,4 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { CheckoutFlowType } from '../parameters/checkout';
 import { ConnectionFailed, ConnectionSuccess } from './connect';
 import {
   SaleFailed,
@@ -30,6 +29,9 @@ export enum CheckoutEventType {
 }
 
 export enum CheckoutSuccessEventType {
+  SWAP_SUCCESS = 'SWAP_SUCCESS',
+  ONRAMP_SUCCESS = 'ONRAMP_SUCCESS',
+  CONNECT_SUCCESS = 'CONNECT_SUCCESS',
   SALE_SUCCESS = 'SALE_SUCCESS',
   SALE_TRANSACTION_SUCCESS = 'SALE_TRANSACTION_SUCCESS',
   BRIDGE_SUCCESS = 'BRIDGE_SUCCESS',
@@ -41,11 +43,15 @@ export enum CheckoutFailureEventType {
   BRIDGE_CLAIM_WITHDRAWAL_FAILED = 'BRIDGE_CLAIM_WITHDRAWAL_FAILED',
   SWAP_FAILED = 'SWAP_FAILED',
   SWAP_REJECTED = 'SWAP_REJECTED',
+  CONNECT_FAILED = 'CONNECT_FAILED',
+  SALE_FAILED = 'SALE_FAILED',
+  ONRAMP_FAILED = 'ONRAMP_FAILED',
 }
 
 export enum CheckoutUserActionEventType {
   PAYMENT_METHOD_SELECTED = 'PAYMENT_METHOD_SELECTED',
   PAYMENT_TOKEN_SELECTED = 'PAYMENT_TOKEN_SELECTED',
+  NETWORK_SWITCH = 'NETWORK_SWITCH',
 }
 
 export type CheckoutProviderUpdatedEvent = {
@@ -58,41 +64,37 @@ export type CheckoutProviderUpdatedEvent = {
 };
 
 export type CheckoutSaleSuccessEvent = {
-  flow: CheckoutFlowType.SALE;
   type: CheckoutSuccessEventType.SALE_SUCCESS;
   data: SaleSuccess;
 };
 
 export type CheckoutSaleSuccessfulTransactionEvent = {
-  flow: CheckoutFlowType.SALE;
   type: CheckoutSuccessEventType.SALE_TRANSACTION_SUCCESS;
   data: SaleTransactionSuccess;
 };
 
 export type CheckoutOnRampSuccessEvent = {
-  flow: CheckoutFlowType.ONRAMP;
+  type: CheckoutSuccessEventType.ONRAMP_SUCCESS;
   data: OnRampSuccess;
 }; // FIMXE: TransactionSent
 
 export type CheckoutBridgeSuccessEvent = {
-  flow: CheckoutFlowType.BRIDGE;
   type: CheckoutSuccessEventType.BRIDGE_SUCCESS;
   data: BridgeTransactionSent;
 }; // FIMXE: TransactionSent
 
 export type CheckoutBridgeClaimWithdrawalSuccessEvent = {
-  flow: CheckoutFlowType.BRIDGE;
   type: CheckoutSuccessEventType.BRIDGE_CLAIM_WITHDRAWAL_SUCCESS;
   data: BridgeClaimWithdrawalSuccess;
 }; // FIMXE: TransactionSent
 
 export type CheckoutSwapSuccessEvent = {
-  flow: CheckoutFlowType.SWAP;
+  type: CheckoutSuccessEventType.SWAP_SUCCESS;
   data: SwapSuccess;
 }; // FIMXE: TransactionSent
 
 export type CheckoutConnectSuccessEvent = {
-  flow: CheckoutFlowType.CONNECT;
+  type: CheckoutSuccessEventType.CONNECT_SUCCESS;
   data: ConnectionSuccess;
 };
 
@@ -106,41 +108,37 @@ export type CheckoutSuccessEvent =
   | CheckoutSaleSuccessfulTransactionEvent;
 
 export type CheckoutBridgeFailureEvent = {
-  flow: CheckoutFlowType.BRIDGE;
   type: CheckoutFailureEventType.BRIDGE_FAILED;
   data: BridgeFailed;
 }; // FIMXE: Error
 
 export type CheckoutBridgeClaimWithdrawalFailedEvent = {
-  flow: CheckoutFlowType.BRIDGE;
   type: CheckoutFailureEventType.BRIDGE_CLAIM_WITHDRAWAL_FAILED;
   data: BridgeClaimWithdrawalFailed;
 }; // FIMXE: Error
 
 export type CheckoutConnectFailureEvent = {
-  flow: CheckoutFlowType.CONNECT;
+  type: CheckoutFailureEventType.CONNECT_FAILED;
   data: ConnectionFailed;
 }; // FIMXE: Error
 
 export type CheckoutOnRampFailureEvent = {
-  flow: CheckoutFlowType.ONRAMP;
+  type: CheckoutFailureEventType.ONRAMP_FAILED;
   data: OnRampFailed;
 }; // FIMXE: Error
 
 export type CheckoutSwapFailureEvent = {
-  flow: CheckoutFlowType.SWAP;
   type: CheckoutFailureEventType.SWAP_FAILED;
   data: SwapFailed;
 }; // FIMXE: Error
 
 export type CheckoutSwapRejectedEvent = {
-  flow: CheckoutFlowType.SWAP;
   type: CheckoutFailureEventType.SWAP_REJECTED;
   data: SwapRejected;
 }; // FIMXE: Error
 
 export type CheckoutSaleFailureEvent = {
-  flow: CheckoutFlowType.SALE;
+  type: CheckoutFailureEventType.SALE_FAILED;
   data: SaleFailed;
 };
 
@@ -154,19 +152,17 @@ export type CheckoutFailureEvent =
   | CheckoutSaleFailureEvent;
 
 export type CheckoutPaymentMethodSelectedEvent = {
-  flow: CheckoutFlowType.SALE;
   type: CheckoutUserActionEventType.PAYMENT_METHOD_SELECTED;
   data: SalePaymentMethod;
 };
 
 export type CheckoutPaymentTokenSelectedEvent = {
-  flow: CheckoutFlowType.SALE;
   type: CheckoutUserActionEventType.PAYMENT_TOKEN_SELECTED;
   data: SalePaymentToken;
 };
 
 export type CheckoutNetworkSwitchEvent = {
-  flow: CheckoutFlowType.WALLET;
+  type: CheckoutUserActionEventType.NETWORK_SWITCH;
   data: WalletNetworkSwitch;
 };
 

@@ -4,7 +4,6 @@ import {
   Checkout, EIP6963ProviderInfo, PostMessageHandler, WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
-import { ProviderRelay } from './ProviderRelay';
 
 export interface CheckoutState {
   checkout: Checkout | null;
@@ -13,10 +12,10 @@ export interface CheckoutState {
   iframeURL: string | undefined;
   iframeContentWindow: Window | undefined;
   postMessageHandler: PostMessageHandler | undefined;
-  providerRelay: ProviderRelay | undefined;
   walletProviderName: WalletProviderName | null;
   walletProviderInfo: EIP6963ProviderInfo | null;
   sendCloseEvent: () => void;
+  initialised: boolean;
 }
 
 export const initialCheckoutState: CheckoutState = {
@@ -26,10 +25,10 @@ export const initialCheckoutState: CheckoutState = {
   iframeURL: undefined,
   iframeContentWindow: undefined,
   postMessageHandler: undefined,
-  providerRelay: undefined,
   walletProviderInfo: null,
   walletProviderName: null,
   sendCloseEvent: () => { },
+  initialised: false,
 };
 
 export interface CheckoutContextState {
@@ -47,10 +46,10 @@ type ActionPayload =
   | SetIframeURLPayload
   | SetPostMessageHandlerPayload
   | SetIframeContentWindowPayload
-  | SetProviderRelayPayload
   | SetPassportPayload
   | SetProviderNamePayload
-  | SetSendCloseEventPayload;
+  | SetSendCloseEventPayload
+  | SetInitialisedPayload;
 
 export enum CheckoutActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
@@ -58,10 +57,10 @@ export enum CheckoutActions {
   SET_IFRAME_URL = 'SET_IFRAME_URL',
   SET_POST_MESSAGE_HANDLER = 'SET_POST_MESSAGE_HANDLER',
   SET_CHECKOUT_APP_IFRAME = 'SET_CHECKOUT_APP_IFRAME',
-  SET_PROVIDER_RELAY = 'SET_PROVIDER_RELAY',
   SET_PASSPORT = 'SET_PASSPORT',
   SET_WALLET_PROVIDER_NAME = 'SET_WALLET_PROVIDER_NAME',
   SET_SEND_CLOSE_EVENT = 'SET_SEND_CLOSE_EVENT',
+  SET_INITIALISED = 'SET_INITIALISED',
 }
 
 export interface SetCheckoutPayload {
@@ -71,7 +70,7 @@ export interface SetCheckoutPayload {
 
 export interface SetProviderPayload {
   type: CheckoutActions.SET_PROVIDER;
-  provider: Web3Provider;
+  provider: Web3Provider | undefined;
 }
 
 export interface SetIframeURLPayload {
@@ -89,11 +88,6 @@ export interface SetPostMessageHandlerPayload {
   postMessageHandler: PostMessageHandler;
 }
 
-export interface SetProviderRelayPayload {
-  type: CheckoutActions.SET_PROVIDER_RELAY;
-  providerRelay: ProviderRelay;
-}
-
 export interface SetPassportPayload {
   type: CheckoutActions.SET_PASSPORT;
   passport: Passport;
@@ -107,6 +101,11 @@ export interface SetProviderNamePayload {
 export interface SetSendCloseEventPayload {
   type: CheckoutActions.SET_SEND_CLOSE_EVENT;
   sendCloseEvent: () => void;
+}
+
+export interface SetInitialisedPayload {
+  type: CheckoutActions.SET_INITIALISED;
+  initialised: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -154,11 +153,6 @@ export const checkoutReducer: Reducer<CheckoutState, CheckoutAction> = (
         ...state,
         postMessageHandler: action.payload.postMessageHandler,
       };
-    case CheckoutActions.SET_PROVIDER_RELAY:
-      return {
-        ...state,
-        providerRelay: action.payload.providerRelay,
-      };
     case CheckoutActions.SET_WALLET_PROVIDER_NAME:
       return {
         ...state,
@@ -168,6 +162,11 @@ export const checkoutReducer: Reducer<CheckoutState, CheckoutAction> = (
       return {
         ...state,
         sendCloseEvent: action.payload.sendCloseEvent,
+      };
+    case CheckoutActions.SET_INITIALISED:
+      return {
+        ...state,
+        initialised: action.payload.initialised,
       };
     default:
       return state;

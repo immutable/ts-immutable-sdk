@@ -7,6 +7,7 @@
   "dependencies": {
     "@imtbl/blockchain-data": "0.0.0",
     "@imtbl/config": "0.0.0",
+    "@imtbl/generated-clients": "0.0.0",
     "@imtbl/metrics": "0.0.0",
     "@imtbl/webhook": "0.0.0"
   },
@@ -24,7 +25,20 @@
     "rollup": "^4.19.1",
     "testcontainers": "^10.9.0",
     "ts-mockito": "^2.6.1",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "unplugin-swc": "^1.5.1"
+  },
+  "exports": {
+    "development": {
+      "types": "./src/index.ts",
+      "main": "./dist/index.js",
+      "import": "./dist/index.js"
+    },
+    "default": {
+      "types": "./dist/index.d.ts",
+      "main": "./dist/index.js",
+      "import": "./dist/index.js"
+    }
   },
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "license": "Apache-2.0",
@@ -37,12 +51,11 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
-    "d": "swc src -d dist --strip-leading-paths --ignore '**/*.test.*'",
+    "d": "rollup --config rollup.config.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit --jsx preserve"
   },
-  "type": "module",
-  "types": "dist/index.d.ts"
+  "type": "module"
 }

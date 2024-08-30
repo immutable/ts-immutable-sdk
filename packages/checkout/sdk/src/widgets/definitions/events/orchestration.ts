@@ -7,6 +7,7 @@ export enum OrchestrationEventType {
   REQUEST_SWAP = 'request-swap',
   REQUEST_BRIDGE = 'request-bridge',
   REQUEST_ONRAMP = 'request-onramp',
+  REQUEST_ADD_FUNDS = 'request-add-funds',
 }
 
 /**
@@ -64,6 +65,12 @@ export type RequestOnrampEvent = {
   tokenAddress: string;
   /** The amount of tokens to onramp. */
   amount: string;
+};
+
+/**
+ * Represents the add funds event object when the add funds widget is requested.
+ */
+export type RequestAddFundsEvent = {
 };
 
 /*

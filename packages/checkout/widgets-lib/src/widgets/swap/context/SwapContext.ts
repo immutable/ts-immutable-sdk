@@ -3,6 +3,7 @@ import {
   GetBalanceResult,
   NetworkInfo,
   TokenInfo,
+  SwapDirection,
 } from '@imtbl/checkout-sdk';
 import { Exchange } from '@imtbl/dex-sdk';
 import { createContext } from 'react';
@@ -14,6 +15,7 @@ export interface SwapState {
   tokenBalances: GetBalanceResult[];
   supportedTopUps: TopUpFeature | null;
   allowedTokens: TokenInfo[];
+  autoProceed: boolean;
 }
 
 export interface TopUpFeature {
@@ -29,6 +31,7 @@ export const initialSwapState: SwapState = {
   tokenBalances: [],
   supportedTopUps: null,
   allowedTokens: [],
+  autoProceed: false,
 };
 
 export interface SwapContextState {
@@ -46,7 +49,8 @@ type ActionPayload =
   | SetNetworkPayload
   | SetSupportedTopUpPayload
   | SetTokenBalancesPayload
-  | SetAllowedTokensPayload;
+  | SetAllowedTokensPayload
+  | SetAutoProceedPayload;
 
 export enum SwapActions {
   SET_EXCHANGE = 'SET_EXCHANGE',
@@ -55,6 +59,7 @@ export enum SwapActions {
   SET_SUPPORTED_TOP_UPS = 'SET_SUPPORTED_TOP_UPS',
   SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES',
   SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
+  SET_AUTO_PROCEED = 'SET_AUTO_PROCEED',
 }
 
 export interface SetExchangePayload {
@@ -85,6 +90,12 @@ export interface SetSupportedTopUpPayload {
 export interface SetAllowedTokensPayload {
   type: SwapActions.SET_ALLOWED_TOKENS;
   allowedTokens: TokenInfo[];
+}
+
+export interface SetAutoProceedPayload {
+  type: SwapActions.SET_AUTO_PROCEED;
+  autoProceed: boolean;
+  direction: SwapDirection;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -137,6 +148,12 @@ export const swapReducer: Reducer<SwapState, SwapAction> = (
       return {
         ...state,
         allowedTokens: action.payload.allowedTokens,
+      };
+    case SwapActions.SET_AUTO_PROCEED:
+      return {
+        ...state,
+        autoProceed: action.payload.autoProceed,
+        direction: action.payload.direction,
       };
     default:
       return state;
