@@ -15,11 +15,5 @@ export default function Home() {
       rc={<NextLink href="/connect-with-metamask" />}>
         Connect with MetaMask
       </Button> 
-      <Button       
-      className="mb-1"
-      size="medium" 
-      rc={<NextLink href="/supported-wallet-providers" />}>
-        Supported Wallet Providers
-      </Button> 
   </>);
 }
