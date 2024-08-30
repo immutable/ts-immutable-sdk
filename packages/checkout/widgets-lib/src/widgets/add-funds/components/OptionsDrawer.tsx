@@ -21,7 +21,7 @@ export function OptionsDrawer({
       visible={visible}
       showHeaderBar
       onCloseDrawer={onClose}
-      headerBarTitle="Pay with ..."
+      headerBarTitle="Pay with..."
     >
       <Drawer.Content
         rc={
