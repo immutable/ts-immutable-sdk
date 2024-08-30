@@ -4,16 +4,18 @@ import { checkoutSDK } from '../utils/setupDefault';
 import { useState } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { WalletInfo, WalletProviderName } from '@imtbl/sdk/checkout';
-import { Button, Heading, Body, Link } from '@biom3/react';
+import { Button, Heading, Body, Link, Table } from '@biom3/react';
 import NextLink from 'next/link';
 
 export default function ConnectWithMetamask() {
 
 const [provider, setProvider] = useState<Web3Provider>();
 const [walletProviderName, setWalletProviderName] = useState<WalletProviderName>();
-const [supportedWallets, setWsupportedWallets] = useState<WalletInfo[]>();
+const [supportedWallets, setSupportedWallets] = useState<WalletInfo[]>();
 const [connectedProvider, setConnectedProvider] = useState<Web3Provider>();
 const [isValidProvider, setIsValidProvider] = useState<boolean>();
+const [isConnected, setIsConnected] = useState<boolean>();
+const [walletAddress, setWalletAddress] = useState<string>();
 
 // setup the loading state to enable/disable buttons when loading
 const [loading, setLoadingState] = useState<boolean>(false);
@@ -28,7 +30,7 @@ const connectWithMetamask = async (connectWithPerms:boolean) => {
   const allowListRes = await checkoutSDK.getWalletAllowList({ type });
   // #enddoc get-wallet-allow-list
 
-  setWsupportedWallets(allowListRes.wallets);
+  setSupportedWallets(allowListRes.wallets);
 
   // #doc create-metamask-provider
   // Create a provider given one of the default wallet provider names
@@ -38,6 +40,13 @@ const connectWithMetamask = async (connectWithPerms:boolean) => {
   
   setProvider(providerRes.provider);
   setWalletProviderName(providerRes.walletProviderName);
+
+  // #doc check-is-valid-provider
+  // Check if the provider if a Web3Provider
+  const isProviderRes = await checkout.Checkout.isWeb3Provider(providerRes.provider);
+  // #enddoc check-is-valid-provider
+
+  setIsValidProvider(isProviderRes);
 
   if (connectWithPerms) {
     // #doc connect-metamask-provider-perms
@@ -53,18 +62,23 @@ const connectWithMetamask = async (connectWithPerms:boolean) => {
   } else {
     // #doc connect-metamask-provider
     // Get the current network information
-    const connectRes = await checkoutSDK.connect({provider: providerRes.provider,});
+    const connectRes = await checkoutSDK.connect({
+      provider: providerRes.provider
+    });
     // #enddoc connect-metamask-provider
 
     setConnectedProvider(connectRes.provider);
   }
   
-  // #doc check-is-valid-provider
+  // #doc check-is-connected
   // Check if the provider if a Web3Provider
-  const isProviderRes = await checkout.Checkout.isWeb3Provider(providerRes.provider);
-  // #enddoc check-is-valid-provider
+  const isConnectedRes = await checkoutSDK.checkIsWalletConnected({
+    provider: providerRes.provider
+  });
+  // #enddoc check-is-connected
 
-  setIsValidProvider(isProviderRes);
+  setIsConnected(isConnectedRes.isConnected);
+  setWalletAddress(isConnectedRes.walletAddress);
 
   setLoadingState(false);
 }
@@ -86,32 +100,59 @@ const connectWithMetamask = async (connectWithPerms:boolean) => {
       Connect MetaMask without Permissions
     </Button>
         
-    {loading
-        ? <Body>Loading...</Body>
-        : (<>
-          <Body>
-            <b>Supported Wallets: </b>
+    <Table>
+      <Table.Head>
+        <Table.Row>
+          <Table.Cell>Item</Table.Cell>
+          <Table.Cell>Value</Table.Cell>
+        </Table.Row>
+      </Table.Head>
+      <Table.Body>
+        <Table.Row>
+          <Table.Cell><b>Supported Wallets</b></Table.Cell>
+          <Table.Cell>
             {!supportedWallets && ' (not fetched)'}
             {supportedWallets && (
               supportedWallets.map((wallet, index) => (
                 <span key={index}>{wallet.walletProviderName}, </span>
               ))
             )}
-          </Body>
-          <Body>
-            <b>Created Provider: </b>
+          </Table.Cell>
+        </Table.Row>
+        <Table.Row>
+          <Table.Cell><b>Created Provider</b></Table.Cell>
+          <Table.Cell>
             {(provider && walletProviderName) ? ` ${walletProviderName}` : ' (not created)'}
-          </Body>
-          <Body>
-            <b>Connected to Network: </b>
-            {(connectedProvider) ? `chainId ${connectedProvider._network.chainId}` : ' (not connected)'}
-          </Body>
-          <Body>
-            <b>Is Valid Provider: </b>
+          </Table.Cell>
+        </Table.Row>
+        <Table.Row>
+          <Table.Cell><b>Is Valid Provider</b></Table.Cell>
+          <Table.Cell>
             {(isValidProvider) ? `${isValidProvider}` : ' (not validated)'}
-          </Body>
-        </>)}
-      <Link rc={<NextLink href="/" />}>Return to Examples</Link>
+          </Table.Cell>
+        </Table.Row>
+        <Table.Row>
+          <Table.Cell><b>Connected to Network</b></Table.Cell>
+          <Table.Cell>
+            {(connectedProvider) ? `chainId ${connectedProvider._network.chainId}` : ' (not connected)'}
+          </Table.Cell>
+        </Table.Row>
+        <Table.Row>
+          <Table.Cell><b>Is Connected</b></Table.Cell>
+          <Table.Cell>
+            {(isConnected) ? `${isConnected}` : ' (not connected)'}
+          </Table.Cell>
+        </Table.Row>
+        <Table.Row>
+          <Table.Cell><b>Wallet Address</b></Table.Cell>
+          <Table.Cell>
+          {(walletAddress) ? `${walletAddress}` : ' (not connected)'}
+          </Table.Cell>
+        </Table.Row>
+      </Table.Body>
+    </Table>
+    <br />
+    <Link rc={<NextLink href="/" />}>Return to Examples</Link>
   </>);
 }
   
