@@ -5,3 +5,11 @@ export type TenderlySimulation = {
   data?: string;
   value?: string;
 };
+
+export type TenderlyResult = {
+  gas: Array<number>;
+  delayWithdrawalLargeAmount: boolean;
+  delayWithdrawalUnknownToken: boolean;
+  withdrawalQueueActivated: boolean;
+  largeTransferThresholds: number;
+};

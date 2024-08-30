@@ -20,7 +20,7 @@ function generateAxiosData(
   return {
     jsonrpc: '2.0',
     id: 0,
-    method: 'tenderly_estimateGasBundle',
+    method: 'tenderly_simulateBundle',
     params: [
       simulations,
       'latest',
@@ -89,7 +89,7 @@ describe('Tenderly Utils', () => {
 
       mockedAxios.post.mockResolvedValueOnce({ data: expectedResponse });
 
-      const result = await submitTenderlySimulations(chainId, simulations);
+      const result = (await submitTenderlySimulations(chainId, simulations)).gas;
 
       expect(result.length).toEqual(1);
       expect(result[0]).toEqual(expectedResponse.result[0].gasUsed);
@@ -128,7 +128,7 @@ describe('Tenderly Utils', () => {
 
       mockedAxios.post.mockResolvedValueOnce({ data: expectedResponse });
 
-      const result = await submitTenderlySimulations(chainId, simulations);
+      const result = (await submitTenderlySimulations(chainId, simulations)).gas;
 
       expect(result.length).toEqual(2);
       expect(result[0]).toEqual(expectedResponse.result[0].gasUsed);
@@ -176,7 +176,7 @@ describe('Tenderly Utils', () => {
 
       mockedAxios.post.mockResolvedValueOnce({ data: expectedResponse });
 
-      const result = await submitTenderlySimulations(chainId, simulations, stateObjects);
+      const result = (await submitTenderlySimulations(chainId, simulations, stateObjects)).gas;
 
       expect(result.length).toEqual(2);
       expect(result[0]).toEqual(expectedResponse.result[0].gasUsed);

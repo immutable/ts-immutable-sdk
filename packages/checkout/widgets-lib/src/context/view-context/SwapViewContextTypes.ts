@@ -58,10 +58,11 @@ interface SwapInProgressView extends ViewType {
   }
 }
 export interface ApproveERC20SwapData {
-  approveTransaction: TransactionRequest;
+  approveTransaction?: TransactionRequest;
   transaction: TransactionRequest;
   info: Quote;
   swapFormInfo: PrefilledSwapForm;
+  autoProceed: boolean;
 }
 export interface PrefilledSwapForm {
   fromAmount: string;

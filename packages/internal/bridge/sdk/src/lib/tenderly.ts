@@ -2,7 +2,7 @@
 
 import axios, { AxiosResponse } from 'axios';
 import { BridgeError, BridgeErrorType } from '../errors';
-import { TenderlySimulation } from '../types/tenderly';
+import { TenderlySimulation, TenderlyResult } from '../types/tenderly';
 import { getTenderlyEndpoint } from './utils';
 
 // In the Tenderly API, state objects are mapping of contract address -> "stateDiff" -> slot -> value
@@ -16,6 +16,23 @@ export type StateDiff = {
   storageSlot: string;
   value: string;
 };
+
+type Input = {
+  name: string;
+  value: string | boolean;
+};
+
+type Event = {
+  name: string;
+  inputs: Array<Input>;
+};
+
+type Trace = {
+  method: string;
+  output: string | number;
+};
+
+const THRESHOLD_SELECTOR = '0x84a3291a0';
 
 /**
  * We want to convert a StateObject type to the following format (Record<string, Record<string, Record<string, string>>>):
@@ -60,7 +77,7 @@ export async function submitTenderlySimulations(
   chainId: string,
   simulations: Array<TenderlySimulation>,
   stateObjects?: StateObject[],
-): Promise<Array<number>> {
+): Promise<TenderlyResult> {
   let axiosResponse: AxiosResponse;
   const tenderlyAPI = getTenderlyEndpoint(chainId);
   const state_objects = stateObjects ? unwrapStateObjects(stateObjects) : undefined;
@@ -70,7 +87,7 @@ export async function submitTenderlySimulations(
       {
         jsonrpc: '2.0',
         id: 0,
-        method: 'tenderly_estimateGasBundle',
+        method: 'tenderly_simulateBundle',
         params: [
           simulations,
           'latest',
@@ -103,7 +120,14 @@ export async function submitTenderlySimulations(
   }
 
   const gas: Array<number> = [];
+  let delayWithdrawalLargeAmount: boolean = false;
+  let delayWithdrawalUnknownToken: boolean = false;
+  let withdrawalQueueActivated: boolean = false;
+  let largeTransferThresholds: number = 0;
+  let skipReadOperation = false;
 
+  // Check if simulations are for token withdrawal
+  const withdrawal = simulations.find((e: TenderlySimulation) => e.data?.startsWith(THRESHOLD_SELECTOR)) !== undefined;
   for (let i = 0; i < simResults.length; i++) {
     if (simResults[i].error) {
       throw new BridgeError(
@@ -117,8 +141,34 @@ export async function submitTenderlySimulations(
         BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
       );
     }
-    gas.push(simResults[i].gasUsed);
+    // Attempt to extract event.
+    if (withdrawal && simResults[i].logs !== undefined) {
+      const event = simResults[i].logs.find((e: Event) => e.name === 'QueuedWithdrawal');
+      if (event !== undefined) {
+        const inputs: Map<string, string | boolean> = new Map(event.inputs.map((c: Input) => [c.name, c.value]));
+        delayWithdrawalLargeAmount = inputs.get('delayWithdrawalLargeAmount') as boolean || false;
+        delayWithdrawalUnknownToken = inputs.get('delayWithdrawalUnknownToken') as boolean || false;
+        withdrawalQueueActivated = inputs.get('withdrawalQueueActivated') as boolean || false;
+      }
+    }
+    // Check read operation.
+    if (withdrawal && simResults[i].trace !== undefined) {
+      const trace: Trace = simResults[i].trace.find((e: Trace) => e.method === 'largeTransferThresholds');
+      if (trace !== undefined) {
+        largeTransferThresholds = trace.output as number;
+        skipReadOperation = true;
+      }
+    }
+    if (!skipReadOperation) {
+      gas.push(simResults[i].gasUsed);
+    }
   }
 
-  return gas;
+  return {
+    gas,
+    delayWithdrawalLargeAmount,
+    delayWithdrawalUnknownToken,
+    withdrawalQueueActivated,
+    largeTransferThresholds,
+  };
 }

@@ -2,6 +2,9 @@ import typescript from '@rollup/plugin-typescript';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
+import swc from 'unplugin-swc'
+
+const isProduction = process.env.NODE_ENV === 'production';
 
 export default [{
     input: './src/index.ts',
@@ -11,8 +14,8 @@ export default [{
     plugins: [
       json(),
       commonjs(),
-      nodeResolve(),
-      typescript(),
+      nodeResolve({ exportConditions: ["default"] }),
+      isProduction ? typescript({customConditions: ["default"]}) : swc.rollup()
     ],
   },
   {
@@ -23,8 +26,8 @@ export default [{
     plugins: [
       json(),
       commonjs(),
-      nodeResolve({ browser: true }), 
-      typescript(),
+      nodeResolve({ browser: true, exportConditions: ["default"] }), 
+      isProduction ? typescript({customConditions: ["default"]}) : swc.rollup()
     ],
   }
 ];

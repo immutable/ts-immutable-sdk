@@ -1,17 +1,12 @@
 import {
   PostMessageHandlerEventType,
-  PostMessagePayload,
+  PostMessageData,
 } from './postMessageEventTypes';
 
 export type PostMessageHandlerConfiguration = {
   targetOrigin: string;
   eventTarget: WindowProxy;
   eventSource?: WindowProxy;
-};
-
-export type PostMessageData = {
-  type: PostMessageHandlerEventType;
-  payload: PostMessagePayload;
 };
 
 export class PostMessageHandler {
@@ -30,9 +25,6 @@ export class PostMessageHandler {
   private eventSource!: WindowProxy;
 
   private logger: (...args: any[]) => void;
-
-  static isSynOrAck = (type: PostMessageHandlerEventType): boolean => type === PostMessageHandlerEventType.SYN
-    || type === PostMessageHandlerEventType.ACK;
 
   constructor({
     targetOrigin,
@@ -66,11 +58,14 @@ export class PostMessageHandler {
     this.logger = logger;
   }
 
-  private handshake = (): void => {
+  static isSynOrAck = (type: PostMessageHandlerEventType): boolean => type === PostMessageHandlerEventType.SYN
+    || type === PostMessageHandlerEventType.ACK;
+
+  protected handshake = (): void => {
     this.postMessage(PostMessageHandlerEventType.SYN, null);
   };
 
-  private onMessage = (event: MessageEvent): void => {
+  protected onMessage = (event: MessageEvent): void => {
     if (event.origin !== this.targetOrigin) return;
 
     if (this.init) {

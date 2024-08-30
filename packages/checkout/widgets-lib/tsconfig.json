@@ -3,13 +3,13 @@
   "compilerOptions": {
     "outDir": "./dist",
     "lib": ["dom", "dom.iterable", "esnext"],
+    "customConditions": ["development"],
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "jsx": "react-jsx",
     "noImplicitAny": false,
     "jsxImportSource": "@emotion/react",
     "experimentalDecorators": true,
-    "skipLibCheck": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]

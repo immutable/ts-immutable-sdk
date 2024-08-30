@@ -172,6 +172,11 @@
         "loading": {
           "text": "Swap in progress"
         }
+      },
+      "PREPARE_SWAP": {
+        "loading": {
+          "text": "Calculating swap"
+        }
       }
     },
     "APPROVE_ERC20": {
@@ -302,8 +307,9 @@
         "fee": "Swap fee ~ {{symbol}} {{amount}}"
       },
       "orderReview": {
-        "heading": "Payment summary",
+        "heading": "Order summary",
         "continue": "Proceed",
+        "continueFreeMint": "Proceed for free",
         "payWith": {
           "SWAP": "Swap & Pay with {{symbol}}",
           "SUFFICIENT": "Pay with {{symbol}}"
@@ -633,6 +639,27 @@
           "actionText": "Try again"
         }
       }
+    },
+    "ADD_FUNDS": {
+      "drawer": {
+        "options": {
+          "swap": {
+            "heading": "Swap",
+            "caption": "Swap tokens on this network.",
+            "disabledCaption": "Currently not available."
+          },
+          "debit": {
+            "heading": "Debit Card",
+            "caption": "The recommended way to pay with card.",
+            "disabledCaption": "Unavailable for your selection. We recommend adding tokens."
+          },
+          "credit": {
+            "heading": "Credit Card",
+            "caption": "Not recommended since transactions may be blocked by your bank.",
+            "disabledCaption": "Unavailable for your selection. We recommend adding tokens."
+          }
+        }
+      }
     }
   },
   "footers": {
@@ -769,6 +796,23 @@
         "heading": "Changed your mind?",
         "body": "Make sure pop ups are enabled and follow the prompts in your wallet to connect",
         "actionButtonText": "Try again"
+      }
+    },
+    "withdrawalQueue": {
+      "exceedsThreshold": {
+        "heading": "This withdraw will trigger a 24h delay. Withdraw less than {{threshold}} to avoid this.",
+        "body": "This withdrawal is over a security threshold that will trigger a 24hr delay. Withdraw an amount lower than {{threshold}} to have it actioned in ~20 minutes. Alternatively you can proceed and receive funds in 24hrs. ",
+        "buttons": {
+          "cancel": "Lower amount",
+          "proceed": "I understand"
+        }
+      },
+      "queueActivated": {
+        "heading": "This withdrawal will take 24hrs.",
+        "body": "We’re experiencing higher than normal congestion and wanted to let you know before you proceed.",
+        "buttons": {
+          "proceed": "I understand"
+        }
       }
     }
   }

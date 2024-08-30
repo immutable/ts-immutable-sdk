@@ -146,6 +146,16 @@ export type DexConfig = {
   tokens?: TokenInfo[];
   /** An array of secondary fees to be applied to swaps */
   secondaryFees?: SecondaryFee[];
+  /** An array of tokens to be blocked from the DEX */
+  blocklist?: BlockedToken[];
+};
+
+/**
+ * A type representing a token that is blocked from the DEX.
+ */
+export type BlockedToken = {
+  address: string;
+  symbol: string;
 };
 
 /**
@@ -233,18 +243,6 @@ export type GasEstimateSwapTokenConfig = {
 /**
  * A type that represents the tokens configuration for chain.
  */
-export type ChainsTokensConfig = {
-  [key in ChainId]: ChainTokensConfig;
-};
-
-/**
- * A type representing all the feature flags available.
- * @property {TokenInfo[] | undefined} allowed -
- * @property {boolean | undefined} blockscout -
- */
 export type ChainTokensConfig = {
-  /** List of allowed tokens for a given chain. */
-  allowed?: TokenInfo[];
-  /** Feature flag to enable/disable blockscout integration. */
-  blockscout?: boolean;
+  [key in ChainId]?: TokenInfo[];
 };

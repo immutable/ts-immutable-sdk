@@ -12,10 +12,11 @@ import {
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { getNetworkInfo } from '../network';
 import { getERC20TokenInfo, getTokenAllowList } from '../tokens';
-import { CheckoutConfiguration, getL1ChainId } from '../config';
+import { CheckoutConfiguration } from '../config';
 import {
   Blockscout,
   BlockscoutToken,
+  BlockscoutTokenData,
   BlockscoutTokens,
   BlockscoutTokenType,
 } from '../api/blockscout';
@@ -96,7 +97,7 @@ const blockscoutClientMap: Map<ChainId, Blockscout> = new Map();
 // blockscout map and therefore clear all the cache.
 export const resetBlockscoutClientMap = () => blockscoutClientMap.clear();
 
-export const getIndexerBalance = async (
+export const getBlockscoutBalance = async (
   config: CheckoutConfiguration,
   walletAddress: string,
   chainId: ChainId,
@@ -107,7 +108,7 @@ export const getIndexerBalance = async (
   const shouldFilter = filterTokens !== undefined;
   const mapFilterTokens = Object.assign(
     {},
-    ...((filterTokens ?? []).map((t) => ({ [t.address || NATIVE]: t }))),
+    ...((filterTokens ?? []).map((t) => ({ [t.address?.toLowerCase() || NATIVE]: t }))),
   );
 
   // Get blockscout client for the given chain
@@ -186,7 +187,8 @@ export const getIndexerBalance = async (
 
   const balances: GetBalanceResult[] = [];
   items.forEach((item) => {
-    if (shouldFilter && !mapFilterTokens[item.token.address]) return;
+    const allowlistedToken = mapFilterTokens[item.token.address.toLowerCase()];
+    if (shouldFilter && !allowlistedToken) return;
 
     const tokenData = item.token || {};
 
@@ -196,9 +198,12 @@ export const getIndexerBalance = async (
     let decimals = parseInt(tokenData.decimals, 10);
     if (Number.isNaN(decimals)) decimals = DEFAULT_TOKEN_DECIMALS;
 
+    const icon = (tokenData as BlockscoutTokenData).icon_url ?? allowlistedToken.icon;
+
     const token = {
       ...tokenData,
       decimals,
+      icon,
     };
 
     const formattedBalance = utils.formatUnits(item.value, token.decimals);
@@ -304,35 +309,18 @@ export const getAllBalances = async (
     },
   );
 
-  // In order to prevent unnecessary RPC calls
-  // let's use the Indexer if available for the
-  // given chain.
-  let flag = false;
-  try {
-    flag = (await config.remote.getTokensConfig(chainId)).blockscout || flag;
-  } catch (err: any) {
-    // eslint-disable-next-line no-console
-    console.error(err);
-  }
-
   if (forceFetch) {
     resetBlockscoutClientMap();
   }
 
-  let address = walletAddress;
-  if (flag && Blockscout.isChainSupported(chainId)) {
-    // This is a hack because the widgets are still using the tokens symbol
-    // to drive the conversions. If we remove all the token symbols from e.g. zkevm
-    // then we would not have fiat conversions.
-    // Please remove this hack once https://immutable.atlassian.net/browse/WT-1710
-    // is done.
-    const isL1Chain = getL1ChainId(config) === chainId;
-    if (!address) address = await web3Provider?.getSigner().getAddress();
+  if (Blockscout.isChainSupported(chainId)) {
+    const address = walletAddress ?? await web3Provider?.getSigner().getAddress();
+
     try {
       return await measureAsyncExecution<GetAllBalancesResult>(
         config,
         `Time to fetch balances using blockscout for ${chainId}`,
-        getIndexerBalance(config, address!, chainId, isL1Chain ? tokens : undefined),
+        getBlockscoutBalance(config, address!, chainId, tokens),
       );
     } catch (error) {
       // Blockscout rate limiting, fallback to RPC node

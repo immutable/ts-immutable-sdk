@@ -1,10 +1,10 @@
-{
+module.exports = {
   "extends": ["../../.eslintrc"],
   "ignorePatterns": ["jest.config.*", "rollup.config.*"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": "./tsconfig.json",
-    "tsconfigRootDir": "."
+    "tsconfigRootDir": __dirname
   },
   "rules": {
     "implicit-arrow-linebreak": "off",

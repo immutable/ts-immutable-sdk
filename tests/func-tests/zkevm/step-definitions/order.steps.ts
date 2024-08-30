@@ -1,7 +1,7 @@
 import { Wallet } from 'ethers';
 import { defineFeature, loadFeature } from 'jest-cucumber';
 import { orderbook } from '@imtbl/sdk';
-import { Environment } from '@imtbl/config';
+import { Environment } from '@imtbl/sdk/config'
 import {
   getConfigFromEnv,
   getRandomTokenId,

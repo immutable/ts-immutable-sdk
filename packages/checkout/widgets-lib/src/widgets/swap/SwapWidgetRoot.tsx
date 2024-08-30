@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import {
   ChainId,
   IMTBLWidgetEvents,
+  SwapDirection,
   SwapWidgetParams,
   WalletProviderName,
   WidgetConfiguration,
@@ -71,6 +72,10 @@ export class Swap extends Base<WidgetType.SWAP> {
       validatedParams.toTokenAddress = '';
     }
 
+    if (params.autoProceed) {
+      validatedParams.autoProceed = true;
+    }
+
     return validatedParams;
   }
 
@@ -131,6 +136,8 @@ export class Swap extends Base<WidgetType.SWAP> {
                         toTokenAddress={this.parameters.toTokenAddress}
                         amount={this.parameters.amount}
                         config={this.strongConfig()}
+                        autoProceed={this.parameters.autoProceed}
+                        direction={this.parameters.direction ?? SwapDirection.FROM}
                       />
                     </Suspense>
                   </ConnectLoader>

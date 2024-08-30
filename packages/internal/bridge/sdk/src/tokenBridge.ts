@@ -17,7 +17,7 @@ import {
   isWrappedIMX,
   shouldBeDepositOrFinaliseWithdraw,
 } from './lib/utils';
-import { TenderlySimulation } from './types/tenderly';
+import { TenderlyResult, TenderlySimulation } from './types/tenderly';
 import { calculateGasFee } from './lib/gas';
 import { createContract } from './contracts/createContract';
 import { getWithdrawRootToken, genAxelarWithdrawPayload, genUniqueAxelarCommandId } from './lib/axelarUtils';
@@ -679,6 +679,10 @@ export class TokenBridge {
       contractToApprove,
       unsignedApprovalTx,
       unsignedBridgeTx,
+      delayWithdrawalLargeAmount: null,
+      delayWithdrawalUnknownToken: null,
+      withdrawalQueueActivated: null,
+      largeTransferThresholds: null,
     };
   }
 
@@ -690,7 +694,7 @@ export class TokenBridge {
     amount: ethers.BigNumber,
     gasMultiplier: number | string,
   ): Promise<BridgeBundledTxResponse> {
-    const [allowance, feeData, rootGas] = await Promise.all([
+    const [allowance, feeData, tenderlyRes] = await Promise.all([
       this.getAllowance(direction, token, sender),
       this.config.childProvider.getFeeData(),
       await this.getDynamicWithdrawGasRootChain(
@@ -701,6 +705,7 @@ export class TokenBridge {
         amount,
       ),
     ]);
+    const rootGas = tenderlyRes.gas[0];
     // Get axelar fee
     const axelarFee = await this.getAxelarFee(
       this.config.bridgeInstance.childChainID,
@@ -770,6 +775,10 @@ export class TokenBridge {
       contractToApprove,
       unsignedApprovalTx,
       unsignedBridgeTx,
+      delayWithdrawalLargeAmount: tenderlyRes.delayWithdrawalLargeAmount,
+      delayWithdrawalUnknownToken: tenderlyRes.delayWithdrawalUnknownToken,
+      withdrawalQueueActivated: tenderlyRes.withdrawalQueueActivated,
+      largeTransferThresholds: tenderlyRes.largeTransferThresholds,
     };
   }
 
@@ -828,7 +837,7 @@ export class TokenBridge {
     });
 
     // TODO this specific branch does not have tests written
-    const gas = await submitTenderlySimulations(sourceChainId, simulations);
+    const { gas } = await submitTenderlySimulations(sourceChainId, simulations);
     const tenderlyGasEstimatesRes = {} as DynamicGasEstimatesResponse;
     if (gas.length === 1) {
       tenderlyGasEstimatesRes.approvalGas = 0;
@@ -848,7 +857,7 @@ export class TokenBridge {
     recipient: string,
     token: FungibleToken,
     amount: ethers.BigNumber,
-  ): Promise<number> {
+  ): Promise<TenderlyResult> {
     const rootToken = await getWithdrawRootToken(token, destinationChainId, this.config.childProvider);
     const payload = genAxelarWithdrawPayload(
       rootToken,
@@ -893,6 +902,23 @@ export class TokenBridge {
       data: executeData,
     }];
 
+    // Read large transfer threshold for given token
+    const bridgeAddress = this.config.bridgeContracts.rootERC20BridgeFlowRate;
+    const bridgeContract = await createContract(
+      bridgeAddress,
+      ROOT_ERC20_BRIDGE_FLOW_RATE,
+      this.config.rootProvider,
+    );
+    // Get current bucket state
+    const readData = await withBridgeError<string>(async () => bridgeContract.interface.encodeFunctionData(
+      'largeTransferThresholds',
+      [rootToken],
+    ), BridgeErrorType.INTERNAL_ERROR);
+    simulations.push({
+      from: sender,
+      to: bridgeAddress,
+      data: readData,
+    });
     const stateObject: StateObject = {
       contractAddress: axelarGateway,
       stateDiff: {
@@ -901,8 +927,7 @@ export class TokenBridge {
       },
     };
 
-    const gas = await submitTenderlySimulations(destinationChainId, simulations, [stateObject]);
-    return gas[0];
+    return await submitTenderlySimulations(destinationChainId, simulations, [stateObject]);
   }
 
   private async getAllowance(direction: BridgeDirection, token: string, sender: string): Promise<ethers.BigNumber> {

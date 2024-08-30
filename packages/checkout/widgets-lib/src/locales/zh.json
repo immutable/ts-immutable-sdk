@@ -171,6 +171,11 @@
         "loading": {
           "text": "交换进行中"
         }
+      },
+      "PREPARE_SWAP": {
+        "loading": {
+          "text": "计算交换"
+        }
       }
     },
     "APPROVE_ERC20": {
@@ -301,8 +306,9 @@
         "fee": "交换费用 ~ {{symbol}} {{amount}}"
       },
       "orderReview": {
-        "heading": "付款摘要",
+        "heading": "订单摘要",
         "continue": "继续",
+        "continueFreeMint": "免费继续",
         "payWith": {
           "SWAP": "使用{{symbol}}进行交换和支付",
           "SUFFICIENT": "使用{{symbol}}支付"
@@ -749,6 +755,23 @@
         "heading": "改变主意了吗？",
         "body": "确保弹出窗口已启用，并按照钱包中的提示进行连接。",
         "actionButtonText": "重试"
+      }
+    },
+    "withdrawalQueue": {
+      "exceedsThreshold": {
+        "heading": "此次提款将触发 24 小时延迟。提款金额不得超过 {{threshold}}，以避免出现此情况。",
+        "body": "此次提款超过安全阈值，将导致 24 小时延迟。提款金额低于 {{threshold}} 可在约 20 分钟内完成。或者，您也可以继续操作并在 24 小时内收到资金。",
+        "buttons": {
+          "cancel": "较低金额",
+          "proceed": "我明白"
+        }
+      },
+      "queueActivated": {
+        "heading": "此次提款将耗时 24 小时。",
+        "body": "我们正面临比平常更严重的拥堵，因此我们想在您继续前通知您。",
+        "buttons": {
+          "proceed": "我明白"
+        }
       }
     }
   }

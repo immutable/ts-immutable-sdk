@@ -119,8 +119,8 @@ export function WalletDrawer({
             key={providerDetail.info.rdns}
             testId={testId}
             loading={walletItemLoading}
-            providerDetail={providerDetail}
-            onWalletItemClick={handleWalletItemClick}
+            providerInfo={providerDetail.info}
+            onWalletItemClick={() => handleWalletItemClick(providerDetail)}
             rc={(
               <motion.div variants={listItemVariants} custom={index} />
             )}
