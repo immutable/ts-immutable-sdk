@@ -3,7 +3,7 @@ import { checkout } from '@imtbl/sdk';
 import { checkoutSDK } from '../utils/setupDefault';
 import { useState } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
-import { ConnectResult, WalletInfo, WalletProviderName } from '@imtbl/sdk/checkout';
+import { WalletInfo, WalletProviderName } from '@imtbl/sdk/checkout';
 import { Button, Heading, Body, Link } from '@biom3/react';
 import NextLink from 'next/link';
 
@@ -18,11 +18,12 @@ const [isValidProvider, setIsValidProvider] = useState<boolean>();
 // setup the loading state to enable/disable buttons when loading
 const [loading, setLoadingState] = useState<boolean>(false);
 
-const connectWithMetamask = async () => {
+const connectWithMetamask = async (connectWithPerms:boolean) => {
   // disable button while loading
   setLoadingState(true);
 
   // #doc get-wallet-allow-list
+  // Get the list of default supported providers
   const type = checkout.WalletFilterTypes.ALL;
   const allowListRes = await checkoutSDK.getWalletAllowList({ type });
   // #enddoc get-wallet-allow-list
@@ -30,6 +31,7 @@ const connectWithMetamask = async () => {
   setWsupportedWallets(allowListRes.wallets);
 
   // #doc create-metamask-provider
+  // Create a provider given one of the default wallet provider names
   const walletProviderName = checkout.WalletProviderName.METAMASK;
   const providerRes = await checkoutSDK.createProvider({ walletProviderName });
   // #enddoc create-metamask-provider
@@ -37,16 +39,28 @@ const connectWithMetamask = async () => {
   setProvider(providerRes.provider);
   setWalletProviderName(providerRes.walletProviderName);
 
-  // #doc connect-metamask-provider-perms
-  const connectRes = await checkoutSDK.connect({ 
-    provider: providerRes.provider,
-    requestWalletPermissions: true,
-   });
-  // #enddoc connect-metamask-provider-perms
+  if (connectWithPerms) {
+    // #doc connect-metamask-provider-perms
+    // Get the current network information
+    // Pass through requestWalletPermissions to request the user's wallet permissions
+    const connectRes = await checkoutSDK.connect({ 
+      provider: providerRes.provider,
+      requestWalletPermissions: true,
+    });
+    // #enddoc connect-metamask-provider-perms
 
-  setConnectedProvider(connectRes.provider);
+    setConnectedProvider(connectRes.provider);
+  } else {
+    // #doc connect-metamask-provider
+    // Get the current network information
+    const connectRes = await checkoutSDK.connect({provider: providerRes.provider,});
+    // #enddoc connect-metamask-provider
+
+    setConnectedProvider(connectRes.provider);
+  }
   
   // #doc check-is-valid-provider
+  // Check if the provider if a Web3Provider
   const isProviderRes = await checkout.Checkout.isWeb3Provider(providerRes.provider);
   // #enddoc check-is-valid-provider
 
@@ -59,9 +73,17 @@ const connectWithMetamask = async () => {
     <Button 
     className="mb-1"
     size="medium" 
-    onClick={connectWithMetamask}
+    onClick={async () => await connectWithMetamask(true)}
     disabled={loading}>
-      Connect with MetaMask
+      Connect MetaMask with Permissions
+    </Button>
+
+    <Button 
+    className="mb-1"
+    size="medium" 
+    onClick={async () => await connectWithMetamask(false)}
+    disabled={loading}>
+      Connect MetaMask without Permissions
     </Button>
         
     {loading
