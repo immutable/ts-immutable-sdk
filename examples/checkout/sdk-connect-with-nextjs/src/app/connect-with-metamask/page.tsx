@@ -83,7 +83,11 @@ const connectWithMetamask = async (connectWithPerms:boolean) => {
   setLoadingState(false);
 }
   return (<>
-    <Heading size="medium" className="mb-1">Connect with Metamask</Heading>
+    <Heading 
+    size="medium" 
+    className="mb-1">
+      Connect with Metamask
+      </Heading>
     <Button 
     className="mb-1"
     size="medium" 
