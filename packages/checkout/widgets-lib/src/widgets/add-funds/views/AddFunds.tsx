@@ -59,11 +59,12 @@ export function AddFunds({
 
   const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
   const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
-  const [toAmount, setToAmount] = useState<string>(amount || '');
+  const [toAmount, setToAmount] = useState<string>(amount || '0');
   const [toTokenAddress, setToTokenAddress] = useState<TokenInfo | undefined>();
 
   useEffect(() => {
     if (!checkout) return;
+
     const fetchTokens = async () => {
       const tokenResponse = await checkout.getTokenAllowList({
         type: TokenFilterTypes.SWAP,
@@ -74,7 +75,7 @@ export function AddFunds({
         setAllowedTokens(tokenResponse.tokens);
 
         if (tokenAddress) {
-          const token = allowedTokens.find((t) => t.address === tokenAddress);
+          const token = tokenResponse.tokens.find((t) => t.address === tokenAddress);
           setToTokenAddress(token);
         } else {
           setToTokenAddress(tokenResponse.tokens[0]);
@@ -179,9 +180,12 @@ export function AddFunds({
             <Box
               sx={{
                 display: 'flex',
+                borderRadius: 'base.borderRadius.x20',
                 alignItems: 'center',
                 gap: 'base.spacing.x5',
                 justifyContent: 'center',
+                border: '1px solid grey',
+
               }}
             >
               <Body size="large" weight="bold">
