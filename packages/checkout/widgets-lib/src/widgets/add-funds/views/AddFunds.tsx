@@ -124,6 +124,8 @@ export function AddFunds({
 
   const isSelected = (token: TokenInfo) => token.address === toTokenAddress;
 
+  const isDisabled = !toTokenAddress || !toAmount || parseFloat(toAmount) <= 0;
+
   const handleTokenChange = (token: TokenInfo) => {
     setToTokenAddress(token);
   };
@@ -227,6 +229,11 @@ export function AddFunds({
         <MenuItem
           size="small"
           emphasized
+          disabled={isDisabled}
+          sx={{
+            opacity: isDisabled ? 0.5 : 1,
+            cursor: isDisabled ? 'not-allowed' : 'pointer',
+          }}
           onClick={() => {
             openDrawer();
           }}
