@@ -1,7 +1,7 @@
 import { Box, MenuItemSize } from '@biom3/react';
 
 import { motion } from 'framer-motion';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import {
   listItemVariants,
   listVariants,
@@ -38,12 +38,6 @@ export function Options(props: OptionsProps) {
     ),
     [options, disabledOptions, hideDisabledOptions],
   );
-
-  useEffect(() => {
-    if (filteredOptions.length === 1) {
-      onClick(filteredOptions[0]);
-    }
-  }, [options, onClick]);
 
   return (
     <Box
