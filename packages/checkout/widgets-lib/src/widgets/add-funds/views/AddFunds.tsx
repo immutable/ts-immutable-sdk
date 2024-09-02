@@ -9,7 +9,9 @@ import {
 import {
   Body, Box, MenuItem, OverflowPopoverMenu,
 } from '@biom3/react';
-import { useContext, useEffect, useState } from 'react';
+import {
+  useCallback, useContext, useEffect, useState,
+} from 'react';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
@@ -20,6 +22,7 @@ import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { OptionTypes } from '../components/Option';
 import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
 import { getL2ChainId } from '../../../lib';
+import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -53,6 +56,8 @@ export function AddFunds({
 
   const { addFundsDispatch } = useContext(AddFundsContext);
 
+  const { viewDispatch } = useContext(ViewContext);
+
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
@@ -62,35 +67,58 @@ export function AddFunds({
   const [toAmount, setToAmount] = useState<string>(amount || '0');
   const [toTokenAddress, setToTokenAddress] = useState<TokenInfo | undefined>();
 
+  const showErrorView = useCallback(
+    (error: Error) => {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.ERROR_VIEW,
+            error,
+          },
+        },
+      });
+    },
+    [viewDispatch],
+  );
+
   useEffect(() => {
-    if (!checkout) return;
+    if (!checkout) {
+      showErrorView(new Error('Checkout object is missing'));
+      return;
+    }
 
     const fetchTokens = async () => {
-      const tokenResponse = await checkout.getTokenAllowList({
-        type: TokenFilterTypes.SWAP,
-        chainId: getL2ChainId(checkout.config),
-      });
-
-      if (tokenResponse?.tokens.length > 0) {
-        setAllowedTokens(tokenResponse.tokens);
-
-        if (tokenAddress) {
-          const token = tokenResponse.tokens.find((t) => t.address === tokenAddress);
-          setToTokenAddress(token);
-        } else {
-          setToTokenAddress(tokenResponse.tokens[0]);
-        }
-
-        addFundsDispatch({
-          payload: {
-            type: AddFundsActions.SET_ALLOWED_TOKENS,
-            allowedTokens: tokenResponse.tokens,
-          },
+      try {
+        const tokenResponse = await checkout.getTokenAllowList({
+          type: TokenFilterTypes.SWAP,
+          chainId: getL2ChainId(checkout.config),
         });
+
+        if (tokenResponse?.tokens.length > 0) {
+          setAllowedTokens(tokenResponse.tokens);
+
+          if (tokenAddress) {
+            const token = tokenResponse.tokens.find((t) => t.address === tokenAddress);
+            setToTokenAddress(token);
+          } else {
+            setToTokenAddress(tokenResponse.tokens[0]);
+          }
+
+          addFundsDispatch({
+            payload: {
+              type: AddFundsActions.SET_ALLOWED_TOKENS,
+              allowedTokens: tokenResponse.tokens,
+            },
+          });
+        }
+      } catch (error) {
+        showErrorView(new Error('Failed to fetch tokens'));
       }
     };
+
     fetchTokens();
-  }, [checkout]);
+  }, [checkout, tokenAddress]);
 
   const openDrawer = () => {
     setShowOptionsDrawer(true);
