@@ -7,6 +7,7 @@ import { Environment } from '@imtbl/config';
 
 import {
   identify, setPassportClientId, track, trackError,
+  trackFlow,
 } from '@imtbl/metrics';
 import { isAxiosError } from 'axios';
 import AuthManager from './authManager';
@@ -134,11 +135,19 @@ export class Passport {
    * `connectImx` instead.
    */
   public async connectImxSilent(): Promise<IMXProvider | null> {
-    return this.passportImxProviderFactory.getProviderSilent();
+    const flow = trackFlow('passport', 'connectImxSilent');
+    flow.addEvent('startConnectImxSilent');
+    const provider = this.passportImxProviderFactory.getProviderSilent();
+    flow.addEvent('endConnectImxSilent');
+    return provider;
   }
 
   public async connectImx(): Promise<IMXProvider> {
-    return this.passportImxProviderFactory.getProvider();
+    const flow = trackFlow('passport', 'connectImx');
+    flow.addEvent('startConnectImx');
+    const provider = this.passportImxProviderFactory.getProvider();
+    flow.addEvent('endConnectImx');
+    return provider;
   }
 
   public connectEvm(options: {
@@ -146,6 +155,9 @@ export class Passport {
   } = {
     announceProvider: true,
   }): Provider {
+    const flow = trackFlow('passport', 'connectEvm');
+
+    flow.addEvent('startConnectEvm');
     const provider = new ZkEvmProvider({
       passportEventEmitter: this.passportEventEmitter,
       authManager: this.authManager,
@@ -162,6 +174,7 @@ export class Passport {
       });
     }
 
+    flow.addEvent('endConnectEvm');
     return provider;
   }
 
@@ -178,11 +191,15 @@ export class Passport {
     useCachedSession: boolean;
     anonymousId?: string;
   }): Promise<UserProfile | null> {
+    const flow = trackFlow('passport', 'login');
+
+    flow.addEvent('startLogin');
     const { useCachedSession = false } = options || {};
     let user: User | null = null;
     try {
       user = await this.authManager.getUser();
     } catch (error) {
+      trackError('passport', 'login', error as Error);
       if (useCachedSession) {
         throw error;
       }
@@ -199,17 +216,26 @@ export class Passport {
       this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
     }
 
+    flow.addEvent('endLogin');
     return user ? user.profile : null;
   }
 
   public async loginCallback(): Promise<void> {
-    return this.authManager.loginCallback();
+    const flow = trackFlow('passport', 'loginWithDeviceFlow');
+    flow.addEvent('startLoginCallback');
+    const login = this.authManager.loginCallback();
+    flow.addEvent('endLoginCallback');
+    return login;
   }
 
   public async loginWithDeviceFlow(options?: {
     anonymousId?: string;
   }): Promise<DeviceConnectResponse> {
-    return this.authManager.loginWithDeviceFlow(options?.anonymousId);
+    const flow = trackFlow('passport', 'loginWithDeviceFlow');
+    flow.addEvent('startLoginWithDeviceFlow');
+    const response = this.authManager.loginWithDeviceFlow(options?.anonymousId);
+    flow.addEvent('endLoginWithDeviceFlow');
+    return response;
   }
 
   public async loginWithDeviceFlowCallback(
@@ -217,32 +243,44 @@ export class Passport {
     interval: number,
     timeoutMs?: number,
   ): Promise<UserProfile> {
+    const flow = trackFlow('passport', 'loginWithDeviceFlowCallback');
+    flow.addEvent('startLoginWithDeviceFlowCallback');
     const user = await this.authManager.loginWithDeviceFlowCallback(
       deviceCode,
       interval,
       timeoutMs,
     );
     this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
+    flow.addEvent('endLoginWithDeviceFlowCallback');
     return user.profile;
   }
 
   public loginWithPKCEFlow(): string {
-    return this.authManager.getPKCEAuthorizationUrl();
+    const flow = trackFlow('passport', 'loginWithPKCEFlow');
+    flow.addEvent('startLoginWithPKCEFlow');
+    const url = this.authManager.getPKCEAuthorizationUrl();
+    flow.addEvent('endLoginWithPKCEFlow');
+    return url;
   }
 
   public async loginWithPKCEFlowCallback(
     authorizationCode: string,
     state: string,
   ): Promise<UserProfile> {
+    const flow = trackFlow('passport', 'loginWithPKCEFlowCallback');
+    flow.addEvent('startLoginWithPKCEFlowCallback');
     const user = await this.authManager.loginWithPKCEFlowCallback(
       authorizationCode,
       state,
     );
     this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
+    flow.addEvent('endLoginWithPKCEFlowCallback');
     return user.profile;
   }
 
   public async logout(): Promise<void> {
+    const flow = trackFlow('passport', 'logout');
+    flow.addEvent('startLogout');
     if (this.config.oidcConfiguration.logoutMode === 'silent') {
       await Promise.allSettled([
         this.authManager.logout(),
@@ -253,7 +291,7 @@ export class Passport {
       await this.magicAdapter.logout();
       await this.authManager.logout();
     }
-
+    flow.addEvent('endLogout');
     this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
   }
 
@@ -264,11 +302,20 @@ export class Passport {
    * opening this URL in the same browser that was used to log the user in.
    */
   public async logoutDeviceFlow(): Promise<string> {
+    const flow = trackFlow('passport', 'logoutDeviceFlow');
+    flow.addEvent('startLogoutDeviceFlow');
+    flow.addEvent('startLogout');
     await this.authManager.removeUser();
     await this.magicAdapter.logout();
     this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
+    flow.addEvent('endLogout');
 
-    return this.authManager.getDeviceFlowEndSessionEndpoint();
+    flow.addEvent('startGetSessionEndpoint');
+    const endpoint = this.authManager.getDeviceFlowEndSessionEndpoint();
+    flow.addEvent('endGetSessionEndpoint');
+
+    flow.addEvent('endLogoutDeviceFlow');
+    return endpoint;
   }
 
   /**
@@ -276,36 +323,54 @@ export class Passport {
    * when logout mode is 'silent'.
    */
   public async logoutSilentCallback(url: string): Promise<void> {
-    return this.authManager.logoutSilentCallback(url);
+    const flow = trackFlow('passport', 'logoutSilentCallback');
+    flow.addEvent('startLogoutSilentCallback');
+    const logout = this.authManager.logoutSilentCallback(url);
+    flow.addEvent('endLogoutSilentCallback');
+    return logout;
   }
 
   public async getUserInfo(): Promise<UserProfile | undefined> {
+    const flow = trackFlow('passport', 'getUserInfo');
+    flow.addEvent('startGetUserInfo');
     const user = await this.authManager.getUser();
+    flow.addEvent('endGetUserInfo');
     return user?.profile;
   }
 
   public async getIdToken(): Promise<string | undefined> {
+    const flow = trackFlow('passport', 'getIdToken');
+    flow.addEvent('startGetIdToken');
     const user = await this.authManager.getUser();
+    flow.addEvent('endGetIdToken');
     return user?.idToken;
   }
 
   public async getAccessToken(): Promise<string | undefined> {
+    const flow = trackFlow('passport', 'getAccessToken');
+    flow.addEvent('startGetAccessToken');
     const user = await this.authManager.getUser();
+    flow.addEvent('endGetAccessToken');
     return user?.accessToken;
   }
 
   public async getLinkedAddresses(): Promise<string[]> {
+    const flow = trackFlow('passport', 'getLinkedAddresses');
+    flow.addEvent('startGetLinkedAddresses');
     const user = await this.authManager.getUser();
     if (!user?.profile.sub) {
+      flow.addEvent('endGetLinkedAddressesNoUser');
       return [];
     }
     const headers = { Authorization: `Bearer ${user.accessToken}` };
     const getUserInfoResult = await this.multiRollupApiClients.passportProfileApi.getUserInfo({ headers });
+    flow.addEvent('endGetLinkedAddresses');
     return getUserInfoResult.data.linked_addresses;
   }
 
   public async linkExternalWallet(params: LinkWalletParams): Promise<LinkedWallet> {
-    track('passport', 'linkWallet', { type: params.type });
+    const flow = trackFlow('passport', 'linkExternalWallet');
+    flow.addEvent('startLinkExternalWallet', { type: params.type });
 
     const user = await this.authManager.getUser();
     if (!user) {
@@ -329,9 +394,10 @@ export class Passport {
     try {
       const linkWalletV2Result = await this.multiRollupApiClients
         .passportProfileApi.linkWalletV2({ linkWalletV2Request }, { headers });
+      flow.addEvent('endLinkExternalWallet', { type: params.type });
       return { ...linkWalletV2Result.data };
     } catch (error) {
-      trackError('passport', 'linkWallet', error as Error);
+      trackError('passport', 'linkExternalWallet', error as Error);
 
       if (isAxiosError(error) && error.response) {
         if (error.response.data && isAPIError(error.response.data)) {
