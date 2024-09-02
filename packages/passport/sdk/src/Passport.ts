@@ -137,6 +137,7 @@ export class Passport {
   public async connectImxSilent(): Promise<IMXProvider | null> {
     const flow = trackFlow('passport', 'connectImxSilent');
     flow.addEvent('startConnectImxSilent');
+
     try {
       const provider = await this.passportImxProviderFactory.getProviderSilent();
       flow.addEvent('endConnectImxSilent');
@@ -150,6 +151,7 @@ export class Passport {
   public async connectImx(): Promise<IMXProvider> {
     const flow = trackFlow('passport', 'connectImx');
     flow.addEvent('startConnectImx');
+
     try {
       const provider = await this.passportImxProviderFactory.getProvider();
       flow.addEvent('endConnectImx');
@@ -211,6 +213,7 @@ export class Passport {
     flow.addEvent('startLogin');
     const { useCachedSession = false } = options || {};
     let user: User | null = null;
+
     try {
       user = await this.authManager.getUser();
     } catch (error) {
@@ -254,6 +257,7 @@ export class Passport {
   }): Promise<DeviceConnectResponse> {
     const flow = trackFlow('passport', 'loginWithDeviceFlow');
     flow.addEvent('startLoginWithDeviceFlow');
+
     try {
       const response = await this.authManager.loginWithDeviceFlow(options?.anonymousId);
       flow.addEvent('endLoginWithDeviceFlow');
