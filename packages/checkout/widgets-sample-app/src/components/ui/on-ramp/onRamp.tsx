@@ -1,4 +1,4 @@
-import { Checkout, OnRampEventType, WidgetTheme, WidgetType } from "@imtbl/checkout-sdk";
+import { Checkout, OnRampEventType, WalletProviderName, WidgetTheme, WidgetType } from "@imtbl/checkout-sdk";
 import { useEffect, useMemo } from "react";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
 
@@ -8,7 +8,12 @@ function OnRampUI() {
 
   const unmount = () => {onRamp.unmount()}
   const mount = () => {
-    onRamp.mount('onramp', {amount: '55', tokenAddress: '0x0000000000000000000000000000000000001010'})}
+    onRamp.mount('onramp', {
+      amount: '55',
+      tokenAddress: '0x0000000000000000000000000000000000001010',
+      walletProviderName: WalletProviderName.PASSPORT
+    })
+  }
   const update = (theme: WidgetTheme) => {onRamp.update({config: {theme}})}
 
   useEffect(() => {

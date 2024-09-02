@@ -45,13 +45,16 @@ const authorizeEndpoint = '/authorize';
 
 const getAuthConfiguration = (config: PassportConfiguration): UserManagerSettings => {
   const { authenticationDomain, oidcConfiguration } = config;
-
+  console.log(config);
   let store;
   if (config.crossSdkBridgeEnabled) {
+    console.log(1);
     store = new LocalForageAsyncStorage('ImmutableSDKPassport', localForage.INDEXEDDB);
   } else if (typeof window !== 'undefined') {
+    console.log(2);
     store = window.localStorage;
   } else {
+    console.log(3);
     store = new InMemoryWebStorage();
   }
   const userStore = new WebStorageStateStore({ store });
@@ -66,6 +69,7 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
     authority: authenticationDomain,
     redirect_uri: oidcConfiguration.redirectUri,
     popup_redirect_uri: oidcConfiguration.redirectUri,
+    silent_redirect_uri: oidcConfiguration.redirectUri,
     client_id: oidcConfiguration.clientId,
     metadata: {
       authorization_endpoint: `${authenticationDomain}/authorize`,
@@ -74,7 +78,7 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
       end_session_endpoint: endSessionEndpoint.toString(),
     },
     mergeClaims: true,
-    automaticSilentRenew: false, // Disabled until https://github.com/authts/oidc-client-ts/issues/430 has been resolved
+    automaticSilentRenew: true, // Disabled until https://github.com/authts/oidc-client-ts/issues/430 has been resolved
     scope: oidcConfiguration.scope,
     userStore,
   };
@@ -105,7 +109,7 @@ function sha256(buffer: string) {
 }
 
 export default class AuthManager {
-  private userManager;
+  public userManager;
 
   private deviceCredentialsManager: DeviceCredentialsManager;
 

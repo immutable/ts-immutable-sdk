@@ -3,19 +3,15 @@ import { useTranslation } from 'react-i18next';
 import {
   ChainId,
   Checkout,
-  WalletProviderName,
   CheckoutErrorType,
+  WalletProviderName,
 } from '@imtbl/checkout-sdk';
-import React, {
-  useEffect,
-  useMemo,
-  useReducer,
-} from 'react';
+import React, { useEffect, useMemo, useReducer } from 'react';
 import { ErrorView } from '../../views/error/ErrorView';
 import {
+  ConnectionStatus,
   ConnectLoaderActions,
   ConnectLoaderContext,
-  ConnectionStatus,
   connectLoaderReducer,
   initialConnectLoaderState,
 } from '../../context/connect-loader-context/ConnectLoaderContext';
@@ -24,7 +20,6 @@ import ConnectWidget from '../../widgets/connect/ConnectWidget';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
-import { identifyUser } from '../../lib/analytics/identifyUser';
 
 export interface ConnectLoaderProps {
   children?: React.ReactNode;
@@ -138,6 +133,7 @@ export function ConnectLoader({
     const { isConnected } = await checkout.checkIsWalletConnected({
       provider: localProvider!,
     });
+    console.log('isConnected', isConnected);
     if (!isConnected) {
       connectLoaderDispatch({
         payload: {
@@ -160,25 +156,38 @@ export function ConnectLoader({
 
     (async () => {
       if (!checkout) return;
+      // if (hasNoWalletProviderNameAndNoWeb3Provider(web3Provider)) return;
+      // if (await hasWalletProviderNameAndNoWeb3Provider(web3Provider)) return;
+      let createdProvider = web3Provider;
 
-      if (hasNoWalletProviderNameAndNoWeb3Provider(web3Provider)) return;
-      if (await hasWalletProviderNameAndNoWeb3Provider(web3Provider)) return;
+      const createProviderResult = await checkout.createProvider({
+        walletProviderName: WalletProviderName.PASSPORT,
+      });
+      createdProvider = createProviderResult.provider;
+      console.log('createdProvider', createdProvider);
+      connectLoaderDispatch({
+        payload: {
+          type: ConnectLoaderActions.SET_PROVIDER,
+          provider: createProviderResult.provider,
+        },
+      });
 
       try {
-        connectLoaderDispatch({
-          payload: {
-            type: ConnectLoaderActions.SET_PROVIDER,
-            provider: web3Provider!,
-          },
-        });
+        // connectLoaderDispatch({
+        //   payload: {
+        //     type: ConnectLoaderActions.SET_PROVIDER,
+        //     provider: web3Provider!,
+        //   },
+        // });
         // TODO: handle all of the inner try catches with error handling
         // At this point the Web3Provider exists
         // This will bypass the wallet list screen
-        const isConnected = (await isWalletConnected(web3Provider!));
-        if (!isConnected) return;
+        // const isConnected = (await isWalletConnected(createdProvider!));
+        // console.log(isConnected);
+        // if (!isConnected) return;
 
         try {
-          const currentNetworkInfo = await checkout.getNetworkInfo({ provider: web3Provider! });
+          const currentNetworkInfo = await checkout.getNetworkInfo({ provider: createdProvider! });
 
           // TODO: do this instead, replace chainId check with below code instead of checkout.getNetworkInfo
           // Also, skip the entire section if it is Passport.
@@ -200,13 +209,13 @@ export function ConnectLoader({
           return;
         }
 
-        try {
-          // WT-1698 Analytics - Identify user here then progress to widget
-          // TODO: Identify user should be separated out into a use Effect with only the provider (from connect loader state) as dependency
-          await identifyUser(identify, web3Provider!);
-        } catch (err) {
-          return;
-        }
+        // try {
+        //   // WT-1698 Analytics - Identify user here then progress to widget
+        //   // TODO: Identify user should be separated out into a use Effect with only the provider (from connect loader state) as dependency
+        //   await identifyUser(identify, web3Provider!);
+        // } catch (err) {
+        //   return;
+        // }
 
         // The user is connected and the widget will be shown
         connectLoaderDispatch({
@@ -228,7 +237,7 @@ export function ConnectLoader({
       }
     })();
   }, [checkout, walletProviderName, web3Provider]);
-
+  console.log(connectionStatus);
   return (
     <>
       {(connectionStatus === ConnectionStatus.LOADING) && (

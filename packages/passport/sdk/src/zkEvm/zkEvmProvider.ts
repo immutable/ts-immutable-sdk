@@ -209,6 +209,11 @@ export class ZkEvmProvider implements Provider {
       if (user && isZkEvmUser(user)) {
         return user.zkEvm.ethAddress;
       }
+      const newUser = await this.#authManager.forceUserRefresh();
+      if (newUser && isZkEvmUser(newUser)) {
+        return newUser.zkEvm.ethAddress;
+      }
+
       return undefined;
     } catch {
       return undefined;

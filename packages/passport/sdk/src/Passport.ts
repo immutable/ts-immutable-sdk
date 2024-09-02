@@ -94,7 +94,7 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
 };
 
 export class Passport {
-  private readonly authManager: AuthManager;
+  public authManager: AuthManager;
 
   private readonly config: PassportConfiguration;
 

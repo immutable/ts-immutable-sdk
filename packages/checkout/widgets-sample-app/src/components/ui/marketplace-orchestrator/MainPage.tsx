@@ -3,19 +3,23 @@ import { Box, Button, Heading } from "@biom3/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
 import {
+  BridgeEventType,
+  ChainId,
   Checkout,
   ConnectEventType,
   ConnectionSuccess,
+  OnRampEventType,
   OrchestrationEventType,
   RequestBridgeEvent,
-  BridgeEventType,
   RequestOnrampEvent,
-  OnRampEventType,
   RequestSwapEvent,
   SwapEventType,
   WalletEventType,
   WalletNetworkSwitch,
-  WidgetTheme, WidgetType, ProviderEventType, ProviderUpdated, WidgetProperties, ChainId
+  WalletProviderName,
+  WidgetProperties,
+  WidgetTheme,
+  WidgetType
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { passport } from './passport';
@@ -130,7 +134,9 @@ export const MainPage = () => {
   }, [swapWidget])
 
   const openOnRampWidget = useCallback(() => {
-    onRampWidget.mount('onramp-target')
+    onRampWidget.mount('onramp-target', {
+      walletProviderName: WalletProviderName.PASSPORT
+    })
   }, [onRampWidget, web3Provider])
 
   const logout = useCallback(async () => {

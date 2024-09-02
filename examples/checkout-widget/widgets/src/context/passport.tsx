@@ -13,6 +13,7 @@ import { config, passport, checkout } from "@imtbl/sdk";
 import { useSearchParams } from "next/navigation";
 import { WalletEventType } from "@imtbl/checkout-sdk";
 import useLocalStorage from "@imtbl/passport-sdk-sample-app/src/hooks/useLocalStorage";
+import { Web3Provider } from "@ethersproject/providers";
 
 type PassportContextType = {
   passportInstance?: passport.Passport;
@@ -86,9 +87,11 @@ export function PassportProvider({ children }: { children: ReactNode }) {
 
       const walletProviderName = checkout.WalletProviderName.PASSPORT;
       const {provider} = await checkoutSDK.createProvider({walletProviderName});
+      // const provider = passportInstance.connectEvm();
       const wallet = widgets.create(checkout.WidgetType.WALLET, {
         provider
       });
+
       wallet.addListener(WalletEventType.CLOSE_WIDGET, () => {
         {
           window.location.href = `${environment.redirectUri}?status=hell_from_widget`;

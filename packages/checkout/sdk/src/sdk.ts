@@ -678,7 +678,8 @@ export class Checkout {
     let tokenSymbol = 'IMX';
     let email;
 
-    const walletAddress = await params.web3Provider.getSigner().getAddress();
+    // const walletAddress = await params.web3Provider.getSigner().getAddress();
+    const walletAddress = '0x87fca93aca7ee43a9bada74ae475fdd73f7f3d5b';
     const isPassport = (params.web3Provider.provider as any)?.isPassport || false;
 
     if (isPassport && params.passport) {

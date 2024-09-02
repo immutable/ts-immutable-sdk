@@ -6,22 +6,27 @@ import {
   AddFundsEventType,
   OnRampEventType,
   SwapEventType,
-  BridgeEventType,
+  BridgeEventType, WalletProviderName,
 } from "@imtbl/checkout-sdk";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useState } from "react";
+import { useSearchParams } from 'react-router-dom';
+import { Web3Provider } from "@ethersproject/providers";
 
 const ADD_FUNDS_TARGET_ID = "add-funds-widget-target";
 
 function AddFundsUI() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const checkout = useMemo(() => new Checkout(), []);
   const factory = useMemo(
     () => new WidgetsFactory(checkout,{}),
     [checkout]
   );
+
   const addFunds = useMemo(
     () => factory.create(WidgetType.ADD_FUNDS, {
-      config: { theme: WidgetTheme.LIGHT },
+      config: { theme: WidgetTheme.DARK },
     }),
     [factory]
   );
@@ -33,7 +38,7 @@ function AddFundsUI() {
     addFunds.mount(ADD_FUNDS_TARGET_ID, {
       showSwapOption:false,
       amount: "10",
-      tokenAddress: "0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439"
+      tokenAddress: "0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439",
     });
     addFunds.addListener(AddFundsEventType.GO_BACK, (data: any) => {
       console.log("GO_BACK", data);
@@ -50,6 +55,7 @@ function AddFundsUI() {
         onRamp.unmount();
       });
       onRamp.mount(ADD_FUNDS_TARGET_ID, {});
+      setSearchParams({'view': 'onramp'})
     });
     addFunds.addListener(AddFundsEventType.REQUEST_SWAP, (data: any) => {
       console.log("REQUEST_SWAP", data);
@@ -73,34 +79,34 @@ function AddFundsUI() {
 
   return (
     <div>
-      <h1 className="sample-heading">Checkout Add Funds</h1>
+      {/* <h1 className="sample-heading">Checkout Add Funds</h1> */}
       <div id={ADD_FUNDS_TARGET_ID}></div>
-      <button onClick={() => addFunds.mount(ADD_FUNDS_TARGET_ID)}>Mount</button>
-      <button onClick={() => addFunds.unmount()}>Unmount</button>
-      <button
-        onClick={() =>
-          addFunds.update({ config: { theme: WidgetTheme.LIGHT } })
-        }
-      >
-        Update Config Light
-      </button>
-      <button
-        onClick={() => addFunds.update({ config: { theme: WidgetTheme.DARK } })}
-      >
-        Update Config Dark
-      </button>
-      <select
-        onChange={(e) =>
-          addFunds.update({
-            config: { language: e.target.value as WidgetLanguage },
-          })
-        }
-      >
-        <option value="en">EN</option>
-        <option value="ja">JA</option>
-        <option value="ko">KO</option>
-        <option value="zh">ZH</option>
-      </select>
+      {/* <button onClick={() => addFunds.mount(ADD_FUNDS_TARGET_ID)}>Mount</button> */}
+      {/* <button onClick={() => addFunds.unmount()}>Unmount</button> */}
+      {/* <button */}
+      {/*   onClick={() => */}
+      {/*     addFunds.update({ config: { theme: WidgetTheme.LIGHT } }) */}
+      {/*   } */}
+      {/* > */}
+      {/*   Update Config Light */}
+      {/* </button> */}
+      {/* <button */}
+      {/*   onClick={() => addFunds.update({ config: { theme: WidgetTheme.DARK } })} */}
+      {/* > */}
+      {/*   Update Config Dark */}
+      {/* </button> */}
+      {/* <select */}
+      {/*   onChange={(e) => */}
+      {/*     addFunds.update({ */}
+      {/*       config: { language: e.target.value as WidgetLanguage }, */}
+      {/*     }) */}
+      {/*   } */}
+      {/* > */}
+      {/*   <option value="en">EN</option> */}
+      {/*   <option value="ja">JA</option> */}
+      {/*   <option value="ko">KO</option> */}
+      {/*   <option value="zh">ZH</option> */}
+      {/* </select> */}
     </div>
   );
 }

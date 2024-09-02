@@ -191,7 +191,7 @@ export function OnRampMain({
   useEffect(() => {
     if (!checkout || !provider) return;
 
-    let userWalletAddress = '';
+    const userWalletAddress = '0x87fca93aca7ee43a9bada74ae475fdd73f7f3d5b';
 
     (async () => {
       const params = {
@@ -203,7 +203,7 @@ export function OnRampMain({
       };
 
       setWidgetUrl(await checkout.createFiatRampUrl(params));
-      userWalletAddress = await provider!.getSigner().getAddress();
+      // userWalletAddress = await provider!.getSigner().getAddress();
     })();
 
     const domIframe:HTMLIFrameElement = document.getElementById(transakIframeId) as HTMLIFrameElement;

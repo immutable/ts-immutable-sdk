@@ -1,7 +1,7 @@
 'use client';
 import { usePassport } from "@/src/context/passport";
 export default function Page() {
-  const { walletWidget, backToGame, login, logout } = usePassport();
+  const { walletWidget, backToGame, login, logout, loginWithoutWallet } = usePassport();
 
   walletWidget?.mount('wallet');
   return (
@@ -20,6 +20,13 @@ export default function Page() {
         type="button"
       >
         Login
+      </button>
+      <button
+        className="bg-black text-white py-2 px-4 my-2 rounded hover:bg-gray-800"
+        onClick={loginWithoutWallet}
+        type="button"
+      >
+        Login without wallet
       </button>
       <button
         className="bg-black text-white py-2 px-4 my-2 rounded hover:bg-gray-800"

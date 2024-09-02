@@ -3,7 +3,8 @@ import { passport } from "./passport";
 
 export function PassportLoginCallback() {
   useEffect(() => {
-      passport?.loginCallback();
+      // passport?.loginCallback();
+      passport.authManager.userManager.signinSilentCallback();
   }, [passport])
   return(<></>);
 }

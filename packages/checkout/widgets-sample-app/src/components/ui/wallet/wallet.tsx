@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Checkout, WalletEventType, WalletProviderName, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
 import { Web3Provider } from "@ethersproject/providers";
+import { passport } from "../marketplace-orchestrator/passport";
 
 function WalletUI() {
   const checkout = useMemo(() => new Checkout(), [])
@@ -9,10 +10,17 @@ function WalletUI() {
   const [web3Provider, setWeb3Provider] = useState<Web3Provider | undefined>(undefined);
 
   useEffect(() => {
+    // provider.request({ method: 'eth_requestAccounts' }).then(accounts => {
+    //   console.log(accounts);
+    // })
+    // if (provider) {
+    //   setWeb3Provider(new Web3Provider(provider));
+    // }
     const walletProviderName = WalletProviderName.PASSPORT;
-    checkout.createProvider({ walletProviderName }).then((resp) => setWeb3Provider(resp.provider));
+    checkout.createProvider({ walletProviderName }).then((resp) => {
+      setWeb3Provider(resp.provider);
+    });
   }, []);
-
   const unmount = () => {wallet.unmount()}
   const mount = () => {wallet.mount('wallet')}
   const update = (theme: WidgetTheme) => {wallet.update({config: {theme}})}
@@ -35,6 +43,18 @@ function WalletUI() {
 
   }, [checkout, web3Provider]);
 
+  const login = async () => {
+    const provider = passport.connectEvm();
+    const accounts = await provider.request({ method: "eth_requestAccounts" });
+    console.log(accounts);
+  }
+  const loginWithoutWallet = async () => {
+    const profile = await passport.login();
+    console.log(profile);
+  }
+  const logout = async () => {
+    await passport.logout();
+  }
   return (
     <div>
       <h1 className="sample-heading">Checkout Wallet</h1>
@@ -47,6 +67,9 @@ function WalletUI() {
       <button onClick={() => updateLanguage('ja')}>JA</button>
       <button onClick={() => updateLanguage('ko')}>KO</button>
       <button onClick={() => updateLanguage('zh')}>ZH</button>
+      <button onClick={() => login()}>Login</button>
+      <button onClick={() => loginWithoutWallet()}>loginWithoutWallet</button>
+      <button onClick={() => logout()}>logout</button>
     </div>
   );
 }
