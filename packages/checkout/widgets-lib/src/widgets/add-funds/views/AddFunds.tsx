@@ -222,6 +222,9 @@ export function AddFunds({
           }}
         >
           <OptionsDrawer
+            showOnrampOption={showOnrampOption}
+            showSwapOption={showSwapOption}
+            showBridgeOption={showBridgeOption}
             visible={showOptionsDrawer}
             onClose={() => setShowOptionsDrawer(false)}
             onPayWithCard={onPayWithCard}

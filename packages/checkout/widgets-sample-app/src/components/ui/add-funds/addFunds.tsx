@@ -30,6 +30,8 @@ function AddFundsUI() {
 
   useEffect(() => {
     addFunds.mount(ADD_FUNDS_TARGET_ID, {
+      showOnrampOption:false,
+      showBridgeOption: false,
       showSwapOption: false,
       tokenAddress: "0x3b2d8a1931736fc321c24864bceee981b11c3c57",
     });
