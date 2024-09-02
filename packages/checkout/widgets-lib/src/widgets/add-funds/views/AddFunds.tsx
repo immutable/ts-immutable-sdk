@@ -9,7 +9,9 @@ import {
 import {
   Body, Box, MenuItem, OverflowPopoverMenu,
 } from '@biom3/react';
-import { useContext, useEffect, useState } from 'react';
+import {
+  useCallback, useContext, useEffect, useState,
+} from 'react';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
@@ -20,6 +22,7 @@ import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { OptionTypes } from '../components/Option';
 import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
 import { getL2ChainId } from '../../../lib';
+import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -44,52 +47,95 @@ export function AddFunds({
   onBackButtonClick,
   onCloseButtonClick,
 }: AddFundsProps) {
-  console.log('checkout', checkout);
   console.log('provider', provider);
   console.log('showOnrampOption', showOnrampOption);
   console.log('showSwapOption', showSwapOption);
   console.log('showBridgeOption', showBridgeOption);
-  console.log('onCloseButtonClick', onCloseButtonClick);
 
   const { addFundsDispatch } = useContext(AddFundsContext);
+
+  const { viewDispatch } = useContext(ViewContext);
 
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
 
   const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
+  const [onRampAllowedTokens, setOnRampAllowedTokens] = useState<TokenInfo[]>([]);
   const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
   const [toAmount, setToAmount] = useState<string>(amount || '0');
   const [toTokenAddress, setToTokenAddress] = useState<TokenInfo | undefined>();
 
+  const showErrorView = useCallback(
+    (error: Error) => {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.ERROR_VIEW,
+            error,
+          },
+        },
+      });
+    },
+    [viewDispatch],
+  );
+
   useEffect(() => {
-    if (!checkout) return;
+    if (!checkout) {
+      showErrorView(new Error('Checkout object is missing'));
+      return;
+    }
 
     const fetchTokens = async () => {
-      const tokenResponse = await checkout.getTokenAllowList({
-        type: TokenFilterTypes.SWAP,
-        chainId: getL2ChainId(checkout.config),
-      });
-
-      if (tokenResponse?.tokens.length > 0) {
-        setAllowedTokens(tokenResponse.tokens);
-
-        if (tokenAddress) {
-          const token = tokenResponse.tokens.find((t) => t.address === tokenAddress);
-          setToTokenAddress(token);
-        } else {
-          setToTokenAddress(tokenResponse.tokens[0]);
-        }
-
-        addFundsDispatch({
-          payload: {
-            type: AddFundsActions.SET_ALLOWED_TOKENS,
-            allowedTokens: tokenResponse.tokens,
-          },
+      try {
+        const tokenResponse = await checkout.getTokenAllowList({
+          type: TokenFilterTypes.SWAP,
+          chainId: getL2ChainId(checkout.config),
         });
+
+        if (tokenResponse?.tokens.length > 0) {
+          setAllowedTokens(tokenResponse.tokens);
+
+          const token = tokenResponse.tokens.find((t) => t.address === tokenAddress) || tokenResponse.tokens[0];
+          setToTokenAddress(token);
+
+          addFundsDispatch({
+            payload: {
+              type: AddFundsActions.SET_ALLOWED_TOKENS,
+              allowedTokens: tokenResponse.tokens,
+            },
+          });
+        }
+      } catch (error) {
+        showErrorView(new Error('Failed to fetch tokens'));
       }
     };
+
     fetchTokens();
+  }, [checkout, tokenAddress]);
+
+  useEffect(() => {
+    if (!checkout) {
+      showErrorView(new Error('Checkout object is missing'));
+      return;
+    }
+
+    const fetchOnRampTokens = async () => {
+      try {
+        const tokenResponse = await checkout.getTokenAllowList({
+          type: TokenFilterTypes.ONRAMP,
+          chainId: getL2ChainId(checkout.config),
+        });
+
+        if (tokenResponse?.tokens.length > 0) {
+          setOnRampAllowedTokens(tokenResponse.tokens);
+        }
+      } catch (error) {
+        showErrorView(new Error('Failed to fetch onramp tokens'));
+      }
+    };
+    fetchOnRampTokens();
   }, [checkout]);
 
   const openDrawer = () => {
@@ -101,6 +147,8 @@ export function AddFunds({
   };
 
   const isSelected = (token: TokenInfo) => token.address === toTokenAddress;
+
+  const isDisabled = !toTokenAddress || !toAmount || parseFloat(toAmount) <= 0;
 
   const handleTokenChange = (token: TokenInfo) => {
     setToTokenAddress(token);
@@ -138,6 +186,14 @@ export function AddFunds({
     }
   };
 
+  const checkShowOnRampOption = () => {
+    if (showOnrampOption && toTokenAddress) {
+      const token = onRampAllowedTokens.find((t) => t.address?.toLowerCase() === toTokenAddress.address?.toLowerCase());
+      return !!token;
+    }
+    return false;
+  };
+
   return (
     <SimpleLayout
       header={(
@@ -147,7 +203,7 @@ export function AddFunds({
           onCloseButtonClick={onCloseButtonClick}
           showBack={!!onBackButtonClick}
         />
-      )}
+            )}
     >
       <Box
         sx={{
@@ -189,7 +245,7 @@ export function AddFunds({
               }}
             >
               <Body size="large" weight="bold">
-                {toTokenAddress ? toTokenAddress.name : ''}
+                {toTokenAddress?.name ?? ''}
               </Body>
               <OverflowPopoverMenu testId="add-funds-tokens-menu">
                 {allowedTokens.map((token: any) => (
@@ -209,6 +265,11 @@ export function AddFunds({
         <MenuItem
           size="small"
           emphasized
+          disabled={isDisabled}
+          sx={{
+            opacity: isDisabled ? 0.5 : 1,
+            cursor: isDisabled ? 'not-allowed' : 'pointer',
+          }}
           onClick={() => {
             openDrawer();
           }}
@@ -222,6 +283,9 @@ export function AddFunds({
           }}
         >
           <OptionsDrawer
+            showOnrampOption={checkShowOnRampOption()}
+            showSwapOption={showSwapOption}
+            showBridgeOption={showBridgeOption}
             visible={showOptionsDrawer}
             onClose={() => setShowOptionsDrawer(false)}
             onPayWithCard={onPayWithCard}

@@ -3,20 +3,23 @@ import { Web3Provider } from '@ethersproject/providers';
 import {
   useContext, useEffect, useMemo, useReducer,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   sendAddFundsCloseEvent,
   sendAddFundsGoBackEvent,
 } from './AddFundsWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
-import {
-  ViewContext,
-  initialViewState,
-  viewReducer,
-} from '../../context/view-context/ViewContext';
-import { AddFunds } from './views/AddFunds';
+
 import {
   AddFundsActions, AddFundsContext, addFundsReducer, initialAddFundsState,
 } from './context/AddFundsContext';
+import { useAnalytics, UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { AddFundsWidgetViews } from '../../context/view-context/AddFundsViewContextTypes';
+import {
+  initialViewState, SharedViews, ViewContext, viewReducer,
+} from '../../context/view-context/ViewContext';
+import { AddFunds } from './views/AddFunds';
+import { ErrorView } from '../../views/error/ErrorView';
 
 export type AddFundsWidgetInputs = AddFundsWidgetParams & {
   checkout: Checkout;
@@ -32,7 +35,16 @@ export default function AddFundsWidget({
   tokenAddress,
   amount,
 }: AddFundsWidgetInputs) {
-  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+  const [viewState, viewDispatch] = useReducer(
+    viewReducer,
+    {
+      ...initialViewState,
+      view: { type: AddFundsWidgetViews.ADD_FUNDS },
+      history: [{ type: AddFundsWidgetViews.ADD_FUNDS }],
+    },
+  );
+  const { t } = useTranslation();
+  const { page } = useAnalytics();
 
   const viewReducerValues = useMemo(
     () => ({
@@ -78,6 +90,7 @@ export default function AddFundsWidget({
   return (
     <ViewContext.Provider value={viewReducerValues}>
       <AddFundsContext.Provider value={addFundsReducerValues}>
+        {viewState.view.type === AddFundsWidgetViews.ADD_FUNDS && (
         <AddFunds
           checkout={checkout}
           provider={web3Provider}
@@ -89,6 +102,20 @@ export default function AddFundsWidget({
           onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
           onBackButtonClick={() => sendAddFundsGoBackEvent(eventTarget)}
         />
+        )}
+        {viewState.view.type === SharedViews.ERROR_VIEW && (
+        <ErrorView
+          actionText={t('views.ERROR_VIEW.actionText')}
+          onActionClick={() => undefined}
+          onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
+          errorEventAction={() => {
+            page({
+              userJourney: UserJourney.ADD_FUNDS,
+              screen: 'Error',
+            });
+          }}
+        />
+        )}
       </AddFundsContext.Provider>
     </ViewContext.Provider>
   );
