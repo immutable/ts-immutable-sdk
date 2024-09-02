@@ -1,5 +1,6 @@
 import { ImxApiClients } from '@imtbl/generated-clients';
 import registerPassport, { RegisterPassportParams } from './registration';
+import { PassportError, PassportErrorType } from '../../errors/passportError';
 
 jest.mock('@imtbl/generated-clients');
 
@@ -84,7 +85,10 @@ describe('registration', () => {
     };
 
     await expect(registerPassport(request, mockToken)).rejects.toThrow(
-      new Error('error'),
+      new PassportError(
+        'error',
+        PassportErrorType.USER_REGISTRATION_ERROR,
+      ),
     );
 
     expect(mockStarkSigner.signMessage).toHaveBeenCalled();
