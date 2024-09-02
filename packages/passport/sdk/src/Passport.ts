@@ -136,29 +136,37 @@ export class Passport {
    */
   public async connectImxSilent(): Promise<IMXProvider | null> {
     const flow = trackFlow('passport', 'connectImxSilent');
-    flow.addEvent('startConnectImxSilent');
 
     try {
+      flow.addEvent('startConnectImxSilent');
       const provider = await this.passportImxProviderFactory.getProviderSilent();
-      flow.addEvent('endConnectImxSilent');
       return provider;
     } catch (error) {
-      trackError('passport', 'connectImxSilent', error as Error);
+      if (error instanceof Error) {
+        trackError('passport', 'connectImxSilent', error);
+      }
+      flow.addEvent('Error');
       throw error;
+    } finally {
+      flow.addEvent('endConnectImxSilent');
     }
   }
 
   public async connectImx(): Promise<IMXProvider> {
     const flow = trackFlow('passport', 'connectImx');
-    flow.addEvent('startConnectImx');
 
     try {
+      flow.addEvent('startConnectImx');
       const provider = await this.passportImxProviderFactory.getProvider();
-      flow.addEvent('endConnectImx');
       return provider;
     } catch (error) {
-      trackError('passport', 'connectImx', error as Error);
+      if (error instanceof Error) {
+        trackError('passport', 'connectImx', error);
+      }
+      flow.addEvent('Error');
       throw error;
+    } finally {
+      flow.addEvent('endConnectImx');
     }
   }
 
@@ -168,9 +176,9 @@ export class Passport {
     announceProvider: true,
   }): Provider {
     const flow = trackFlow('passport', 'connectEvm');
-    flow.addEvent('startConnectEvm');
 
     try {
+      flow.addEvent('startConnectEvm');
       const provider = new ZkEvmProvider({
         passportEventEmitter: this.passportEventEmitter,
         authManager: this.authManager,
@@ -187,11 +195,15 @@ export class Passport {
         });
       }
 
-      flow.addEvent('endConnectEvm');
       return provider;
     } catch (error) {
-      trackError('passport', 'connectEvm', error as Error);
+      if (error instanceof Error) {
+        trackError('passport', 'connectEvm', error);
+      }
+      flow.addEvent('Error');
       throw error;
+    } finally {
+      flow.addEvent('endConnectEvm');
     }
   }
 
@@ -210,45 +222,59 @@ export class Passport {
   }): Promise<UserProfile | null> {
     const flow = trackFlow('passport', 'login');
 
-    flow.addEvent('startLogin');
-    const { useCachedSession = false } = options || {};
-    let user: User | null = null;
-
     try {
-      user = await this.authManager.getUser();
-    } catch (error) {
-      trackError('passport', 'login', error as Error);
-      if (useCachedSession) {
-        throw error;
+      flow.addEvent('startLogin');
+      const { useCachedSession = false } = options || {};
+      let user: User | null = null;
+
+      try {
+        user = await this.authManager.getUser();
+      } catch (error) {
+        if (error instanceof Error) {
+          trackError('passport', 'login', error);
+        }
+        if (useCachedSession) {
+          throw error;
+        }
+        logger.warn('Failed to retrieve a cached user session', error);
       }
-      logger.warn('Failed to retrieve a cached user session', error);
-    }
-    if (!user && !useCachedSession) {
-      user = await this.authManager.login(options?.anonymousId);
-    }
+      if (!user && !useCachedSession) {
+        user = await this.authManager.login(options?.anonymousId);
+      }
 
-    if (user) {
-      identify({
-        passportId: user.profile.sub,
-      });
-      this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
-    }
+      if (user) {
+        identify({
+          passportId: user.profile.sub,
+        });
+        this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
+      }
 
-    flow.addEvent('endLogin');
-    return user ? user.profile : null;
+      return user ? user.profile : null;
+    } catch (error) {
+      if (error instanceof Error) {
+        trackError('passport', 'login', error);
+      }
+      throw error;
+    } finally {
+      flow.addEvent('endLogin');
+    }
   }
 
   public async loginCallback(): Promise<void> {
-    const flow = trackFlow('passport', 'loginWithDeviceFlow');
-    flow.addEvent('startLoginCallback');
+    const flow = trackFlow('passport', 'loginCallback');
 
     try {
+      flow.addEvent('startLoginCallback');
       const login = await this.authManager.loginCallback();
-      flow.addEvent('endLoginCallback');
       return login;
     } catch (error) {
-      trackError('passport', 'loginCallback', error as Error);
+      if (error instanceof Error) {
+        trackError('passport', 'loginCallback', error);
+      }
+      flow.addEvent('Error');
       throw error;
+    } finally {
+      flow.addEvent('endLoginCallback');
     }
   }
 
@@ -256,15 +282,19 @@ export class Passport {
     anonymousId?: string;
   }): Promise<DeviceConnectResponse> {
     const flow = trackFlow('passport', 'loginWithDeviceFlow');
-    flow.addEvent('startLoginWithDeviceFlow');
 
     try {
+      flow.addEvent('startLoginWithDeviceFlow');
       const response = await this.authManager.loginWithDeviceFlow(options?.anonymousId);
-      flow.addEvent('endLoginWithDeviceFlow');
       return response;
     } catch (error) {
-      trackError('passport', 'loginWithDeviceFlow', error as Error);
+      if (error instanceof Error) {
+        trackError('passport', 'loginWithDeviceFlow', error);
+      }
+      flow.addEvent('Error');
       throw error;
+    } finally {
+      flow.addEvent('endLoginWithDeviceFlow');
     }
   }
 
@@ -274,34 +304,42 @@ export class Passport {
     timeoutMs?: number,
   ): Promise<UserProfile> {
     const flow = trackFlow('passport', 'loginWithDeviceFlowCallback');
-    flow.addEvent('startLoginWithDeviceFlowCallback');
 
     try {
+      flow.addEvent('startLoginWithDeviceFlowCallback');
       const user = await this.authManager.loginWithDeviceFlowCallback(
         deviceCode,
         interval,
         timeoutMs,
       );
       this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
-      flow.addEvent('endLoginWithDeviceFlowCallback');
       return user.profile;
     } catch (error) {
-      trackError('passport', 'loginWithDeviceFlowCallback', error as Error);
+      if (error instanceof Error) {
+        trackError('passport', 'loginWithDeviceFlowCallback', error);
+      }
+      flow.addEvent('Error');
       throw error;
+    } finally {
+      flow.addEvent('endLoginWithDeviceFlowCallback');
     }
   }
 
   public loginWithPKCEFlow(): string {
     const flow = trackFlow('passport', 'loginWithPKCEFlow');
-    flow.addEvent('startLoginWithPKCEFlow');
 
     try {
+      flow.addEvent('startLoginWithPKCEFlow');
       const url = this.authManager.getPKCEAuthorizationUrl();
-      flow.addEvent('endLoginWithPKCEFlow');
       return url;
     } catch (error) {
-      trackError('passport', 'loginWithPKCEFlow', error as Error);
+      if (error instanceof Error) {
+        trackError('passport', 'loginWithPKCEFlow', error);
+      }
+      flow.addEvent('Error');
       throw error;
+    } finally {
+      flow.addEvent('endLoginWithPKCEFlow');
     }
   }
 
@@ -310,27 +348,31 @@ export class Passport {
     state: string,
   ): Promise<UserProfile> {
     const flow = trackFlow('passport', 'loginWithPKCEFlowCallback');
-    flow.addEvent('startLoginWithPKCEFlowCallback');
 
     try {
+      flow.addEvent('startLoginWithPKCEFlowCallback');
       const user = await this.authManager.loginWithPKCEFlowCallback(
         authorizationCode,
         state,
       );
       this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
-      flow.addEvent('endLoginWithPKCEFlowCallback');
       return user.profile;
     } catch (error) {
-      trackError('passport', 'loginWithPKCEFlowCallback', error as Error);
+      if (error instanceof Error) {
+        trackError('passport', 'loginWithPKCEFlowCallback', error);
+      }
+      flow.addEvent('Error');
       throw error;
+    } finally {
+      flow.addEvent('endLoginWithPKCEFlowCallback');
     }
   }
 
   public async logout(): Promise<void> {
     const flow = trackFlow('passport', 'logout');
-    flow.addEvent('startLogout');
 
     try {
+      flow.addEvent('startLogout');
       if (this.config.oidcConfiguration.logoutMode === 'silent') {
         await Promise.allSettled([
           this.authManager.logout(),
@@ -341,11 +383,15 @@ export class Passport {
         await this.magicAdapter.logout();
         await this.authManager.logout();
       }
-      flow.addEvent('endLogout');
       this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
     } catch (error) {
-      trackError('passport', 'logout', error as Error);
+      if (error instanceof Error) {
+        trackError('passport', 'logout', error);
+      }
+      flow.addEvent('Error');
       throw error;
+    } finally {
+      flow.addEvent('endLogout');
     }
   }
 
@@ -357,9 +403,9 @@ export class Passport {
    */
   public async logoutDeviceFlow(): Promise<string> {
     const flow = trackFlow('passport', 'logoutDeviceFlow');
-    flow.addEvent('startLogoutDeviceFlow');
 
     try {
+      flow.addEvent('startLogoutDeviceFlow');
       flow.addEvent('startLogout');
       await this.authManager.removeUser();
       await this.magicAdapter.logout();
@@ -370,11 +416,15 @@ export class Passport {
       const endpoint = await this.authManager.getDeviceFlowEndSessionEndpoint();
       flow.addEvent('endGetSessionEndpoint');
 
-      flow.addEvent('endLogoutDeviceFlow');
       return endpoint;
     } catch (error) {
-      trackError('passport', 'logoutDeviceFlow', error as Error);
+      if (error instanceof Error) {
+        trackError('passport', 'logoutDeviceFlow', error);
+      }
+      flow.addEvent('Error');
       throw error;
+    } finally {
+      flow.addEvent('endLogoutDeviceFlow');
     }
   }
 
@@ -384,77 +434,96 @@ export class Passport {
    */
   public async logoutSilentCallback(url: string): Promise<void> {
     const flow = trackFlow('passport', 'logoutSilentCallback');
-    flow.addEvent('startLogoutSilentCallback');
 
     try {
+      flow.addEvent('startLogoutSilentCallback');
       const logout = await this.authManager.logoutSilentCallback(url);
-      flow.addEvent('endLogoutSilentCallback');
       return logout;
     } catch (error) {
-      trackError('passport', 'logoutSilentCallback', error as Error);
+      if (error instanceof Error) {
+        trackError('passport', 'logoutSilentCallback', error);
+      }
+      flow.addEvent('Error');
       throw error;
+    } finally {
+      flow.addEvent('endLogoutSilentCallback');
     }
   }
 
   public async getUserInfo(): Promise<UserProfile | undefined> {
     const flow = trackFlow('passport', 'getUserInfo');
-    flow.addEvent('startGetUserInfo');
 
     try {
+      flow.addEvent('startGetUserInfo');
       const user = await this.authManager.getUser();
-      flow.addEvent('endGetUserInfo');
       return user?.profile;
     } catch (error) {
-      trackError('passport', 'getUserInfo', error as Error);
+      if (error instanceof Error) {
+        trackError('passport', 'getUserInfo', error);
+      }
+      flow.addEvent('Error');
       throw error;
+    } finally {
+      flow.addEvent('endGetUserInfo');
     }
   }
 
   public async getIdToken(): Promise<string | undefined> {
     const flow = trackFlow('passport', 'getIdToken');
-    flow.addEvent('startGetIdToken');
 
     try {
+      flow.addEvent('startGetIdToken');
       const user = await this.authManager.getUser();
-      flow.addEvent('endGetIdToken');
       return user?.idToken;
     } catch (error) {
-      trackError('passport', 'getIdToken', error as Error);
+      if (error instanceof Error) {
+        trackError('passport', 'getIdToken', error);
+      }
+      flow.addEvent('Error');
       throw error;
+    } finally {
+      flow.addEvent('endGetIdToken');
     }
   }
 
   public async getAccessToken(): Promise<string | undefined> {
     const flow = trackFlow('passport', 'getAccessToken');
-    flow.addEvent('startGetAccessToken');
 
     try {
+      flow.addEvent('startGetAccessToken');
       const user = await this.authManager.getUser();
-      flow.addEvent('endGetAccessToken');
       return user?.accessToken;
     } catch (error) {
-      trackError('passport', 'getAccessToken', error as Error);
+      if (error instanceof Error) {
+        trackError('passport', 'getAccessToken', error);
+      }
+      flow.addEvent('Error');
       throw error;
+    } finally {
+      flow.addEvent('endGetAccessToken');
     }
   }
 
   public async getLinkedAddresses(): Promise<string[]> {
     const flow = trackFlow('passport', 'getLinkedAddresses');
-    flow.addEvent('startGetLinkedAddresses');
 
     try {
+      flow.addEvent('startGetLinkedAddresses');
       const user = await this.authManager.getUser();
       if (!user?.profile.sub) {
-        flow.addEvent('endGetLinkedAddressesNoUser');
         return [];
       }
       const headers = { Authorization: `Bearer ${user.accessToken}` };
       const getUserInfoResult = await this.multiRollupApiClients.passportProfileApi.getUserInfo({ headers });
-      flow.addEvent('endGetLinkedAddresses');
       return getUserInfoResult.data.linked_addresses;
     } catch (error) {
-      trackError('passport', 'getLinkedAddresses', error as Error);
+      if (error instanceof Error) {
+        trackError('passport', 'getLinkedAddresses', error);
+      }
+      flow.addEvent('Error');
       throw error;
+    } finally {
+      flow.addEvent('endGetLinkedAddresses');
     }
   }
 
@@ -484,10 +553,12 @@ export class Passport {
     try {
       const linkWalletV2Result = await this.multiRollupApiClients
         .passportProfileApi.linkWalletV2({ linkWalletV2Request }, { headers });
-      flow.addEvent('endLinkExternalWallet', { type: params.type });
       return { ...linkWalletV2Result.data };
     } catch (error) {
-      trackError('passport', 'linkExternalWallet', error as Error);
+      if (error instanceof Error) {
+        trackError('passport', 'linkExternalWallet', error);
+      }
+      flow.addEvent('Error');
 
       if (isAxiosError(error) && error.response) {
         if (error.response.data && isAPIError(error.response.data)) {
@@ -523,6 +594,8 @@ export class Passport {
         message,
         PassportErrorType.LINK_WALLET_GENERIC_ERROR,
       );
+    } finally {
+      flow.addEvent('endLinkExternalWallet');
     }
   }
 }
