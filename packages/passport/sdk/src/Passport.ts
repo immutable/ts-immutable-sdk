@@ -166,26 +166,31 @@ export class Passport {
     announceProvider: true,
   }): Provider {
     const flow = trackFlow('passport', 'connectEvm');
-
     flow.addEvent('startConnectEvm');
-    const provider = new ZkEvmProvider({
-      passportEventEmitter: this.passportEventEmitter,
-      authManager: this.authManager,
-      magicAdapter: this.magicAdapter,
-      config: this.config,
-      multiRollupApiClients: this.multiRollupApiClients,
-      guardianClient: this.guardianClient,
-    });
 
-    if (options?.announceProvider) {
-      announceProvider({
-        info: passportProviderInfo,
-        provider,
+    try {
+      const provider = new ZkEvmProvider({
+        passportEventEmitter: this.passportEventEmitter,
+        authManager: this.authManager,
+        magicAdapter: this.magicAdapter,
+        config: this.config,
+        multiRollupApiClients: this.multiRollupApiClients,
+        guardianClient: this.guardianClient,
       });
-    }
 
-    flow.addEvent('endConnectEvm');
-    return provider;
+      if (options?.announceProvider) {
+        announceProvider({
+          info: passportProviderInfo,
+          provider,
+        });
+      }
+
+      flow.addEvent('endConnectEvm');
+      return provider;
+    } catch (error) {
+      trackError('passport', 'connectEvm', error as Error);
+      throw error;
+    }
   }
 
   /**
@@ -285,9 +290,15 @@ export class Passport {
   public loginWithPKCEFlow(): string {
     const flow = trackFlow('passport', 'loginWithPKCEFlow');
     flow.addEvent('startLoginWithPKCEFlow');
-    const url = this.authManager.getPKCEAuthorizationUrl();
-    flow.addEvent('endLoginWithPKCEFlow');
-    return url;
+
+    try {
+      const url = this.authManager.getPKCEAuthorizationUrl();
+      flow.addEvent('endLoginWithPKCEFlow');
+      return url;
+    } catch (error) {
+      trackError('passport', 'loginWithPKCEFlow', error as Error);
+      throw error;
+    }
   }
 
   public async loginWithPKCEFlowCallback(
