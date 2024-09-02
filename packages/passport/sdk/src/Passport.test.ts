@@ -146,6 +146,21 @@ describe('Passport', () => {
       expect(result).toBe(passportImxProvider);
       expect(getProviderMock).toHaveBeenCalled();
     });
+
+    it('should call track error function if an error occurs', async () => {
+      const error = new Error('Error');
+      getProviderMock.mockRejectedValue(error);
+
+      try {
+        await passport.connectImx();
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'connectImx',
+          e,
+        );
+      }
+    });
   });
 
   describe('connectImxSilent', () => {
@@ -170,6 +185,21 @@ describe('Passport', () => {
         expect(getProviderSilentMock).toHaveBeenCalled();
       });
     });
+
+    it('should call track error function if an error occurs', async () => {
+      const error = new Error('Unknown or invalid refresh token.');
+      getProviderSilentMock.mockRejectedValue(error);
+
+      try {
+        await passport.connectImxSilent();
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'connectImxSilent',
+          e,
+        );
+      }
+    });
   });
 
   describe('connectEvm', () => {
@@ -184,7 +214,7 @@ describe('Passport', () => {
 
     it('should announce the provider by default', async () => {
       passportProviderInfo.uuid = 'mock123';
-      const provider = await passport.connectEvm();
+      const provider = passport.connectEvm();
 
       expect(announceProvider).toHaveBeenCalledWith({
         info: passportProviderInfo,
@@ -200,9 +230,25 @@ describe('Passport', () => {
         ...oidcConfiguration,
       });
 
-      await passportInstance.connectEvm({ announceProvider: false });
+      passportInstance.connectEvm({ announceProvider: false });
 
       expect(announceProvider).not.toHaveBeenCalled();
+    });
+
+    it('should call track error function if an error occurs', () => {
+      (ZkEvmProvider as jest.Mock).mockImplementation(() => {
+        throw new Error('Error');
+      });
+
+      try {
+        passport.connectEvm();
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'connectEvm',
+          e,
+        );
+      }
     });
   });
 
@@ -211,6 +257,21 @@ describe('Passport', () => {
       await passport.loginCallback();
 
       expect(loginCallbackMock).toBeCalledTimes(1);
+    });
+
+    it('should call track error function if an error occurs', async () => {
+      const error = new Error('error');
+      loginCallbackMock.mockRejectedValue(error);
+
+      try {
+        await passport.loginCallback();
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'loginCallback',
+          e,
+        );
+      }
     });
   });
 
@@ -236,6 +297,21 @@ describe('Passport', () => {
         expect(magicLogoutMockOrder).toBeLessThan(logoutMockOrder);
       });
     });
+
+    it('should call track error function if an error occurs', async () => {
+      const error = new Error('error');
+      magicLogoutMock.mockRejectedValue(error);
+
+      try {
+        await passport.logout();
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'logout',
+          e,
+        );
+      }
+    });
   });
 
   describe('logoutDeviceFlow', () => {
@@ -249,6 +325,21 @@ describe('Passport', () => {
       expect(removeUserMock).toHaveBeenCalledTimes(1);
       expect(magicLogoutMock).toHaveBeenCalledTimes(1);
       expect(getDeviceFlowEndSessionEndpointMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('should call track error function if an error occurs', async () => {
+      const error = new Error('error');
+      removeUserMock.mockRejectedValue(error);
+
+      try {
+        await passport.logoutDeviceFlow();
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'logoutDeviceFlow',
+          e,
+        );
+      }
     });
   });
 
@@ -268,6 +359,21 @@ describe('Passport', () => {
 
       expect(result).toEqual(undefined);
     });
+
+    it('should call track error function if an error occurs', async () => {
+      const error = new Error('Unknown or invalid refresh token.');
+      getUserMock.mockRejectedValue(error);
+
+      try {
+        await passport.getUserInfo();
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'getUserInfo',
+          e,
+        );
+      }
+    });
   });
 
   describe('getIdToken', () => {
@@ -286,6 +392,21 @@ describe('Passport', () => {
 
       expect(result).toEqual(undefined);
     });
+
+    it('should call track error function if an error occurs', async () => {
+      const error = new Error('Unknown or invalid refresh token.');
+      getUserMock.mockRejectedValue(error);
+
+      try {
+        await passport.getIdToken();
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'getIdToken',
+          e,
+        );
+      }
+    });
   });
 
   describe('getAccessToken', () => {
@@ -303,6 +424,21 @@ describe('Passport', () => {
       const result = await passport.getAccessToken();
 
       expect(result).toEqual(undefined);
+    });
+
+    it('should call track error function if an error occurs', async () => {
+      const error = new Error('Unknown or invalid refresh token.');
+      getUserMock.mockRejectedValue(error);
+
+      try {
+        await passport.getAccessToken();
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'getAccessToken',
+          e,
+        );
+      }
     });
   });
 
@@ -328,6 +464,21 @@ describe('Passport', () => {
       const result = await passport.getLinkedAddresses();
 
       expect(result).toHaveLength(0);
+    });
+
+    it('should call track error function if an error occurs', async () => {
+      const error = new Error('Unknown or invalid refresh token.');
+      getUserMock.mockRejectedValue(error);
+
+      try {
+        await passport.getLinkedAddresses();
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'getLinkedAddresses',
+          e,
+        );
+      }
     });
   });
 
@@ -380,6 +531,22 @@ describe('Passport', () => {
       await expect(passport.login({ useCachedSession: true })).rejects.toThrow(error);
       expect(getUserMock).toBeCalledTimes(1);
       expect(authLoginMock).toBeCalledTimes(0);
+    });
+
+    it('should call track error function if an error occurs', async () => {
+      const error = new Error('Unknown or invalid refresh token.');
+      getUserMock.mockRejectedValue(error);
+      authLoginMock.mockReturnValue(mockUserImx);
+
+      try {
+        await passport.login({ useCachedSession: true });
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'login',
+          e,
+        );
+      }
     });
   });
 

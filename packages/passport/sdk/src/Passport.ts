@@ -139,8 +139,7 @@ export class Passport {
 
     try {
       flow.addEvent('startConnectImxSilent');
-      const provider = await this.passportImxProviderFactory.getProviderSilent();
-      return provider;
+      return await this.passportImxProviderFactory.getProviderSilent();
     } catch (error) {
       if (error instanceof Error) {
         trackError('passport', 'connectImxSilent', error);
@@ -157,8 +156,7 @@ export class Passport {
 
     try {
       flow.addEvent('startConnectImx');
-      const provider = await this.passportImxProviderFactory.getProvider();
-      return provider;
+      return await this.passportImxProviderFactory.getProvider();
     } catch (error) {
       if (error instanceof Error) {
         trackError('passport', 'connectImx', error);
@@ -265,8 +263,7 @@ export class Passport {
 
     try {
       flow.addEvent('startLoginCallback');
-      const login = await this.authManager.loginCallback();
-      return login;
+      return await this.authManager.loginCallback();
     } catch (error) {
       if (error instanceof Error) {
         trackError('passport', 'loginCallback', error);
@@ -285,8 +282,7 @@ export class Passport {
 
     try {
       flow.addEvent('startLoginWithDeviceFlow');
-      const response = await this.authManager.loginWithDeviceFlow(options?.anonymousId);
-      return response;
+      return await this.authManager.loginWithDeviceFlow(options?.anonymousId);
     } catch (error) {
       if (error instanceof Error) {
         trackError('passport', 'loginWithDeviceFlow', error);
@@ -330,8 +326,7 @@ export class Passport {
 
     try {
       flow.addEvent('startLoginWithPKCEFlow');
-      const url = this.authManager.getPKCEAuthorizationUrl();
-      return url;
+      return this.authManager.getPKCEAuthorizationUrl();
     } catch (error) {
       if (error instanceof Error) {
         trackError('passport', 'loginWithPKCEFlow', error);
@@ -406,17 +401,10 @@ export class Passport {
 
     try {
       flow.addEvent('startLogoutDeviceFlow');
-      flow.addEvent('startLogout');
       await this.authManager.removeUser();
       await this.magicAdapter.logout();
       this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
-      flow.addEvent('endLogout');
-
-      flow.addEvent('startGetSessionEndpoint');
-      const endpoint = await this.authManager.getDeviceFlowEndSessionEndpoint();
-      flow.addEvent('endGetSessionEndpoint');
-
-      return endpoint;
+      return await this.authManager.getDeviceFlowEndSessionEndpoint();
     } catch (error) {
       if (error instanceof Error) {
         trackError('passport', 'logoutDeviceFlow', error);
@@ -437,8 +425,7 @@ export class Passport {
 
     try {
       flow.addEvent('startLogoutSilentCallback');
-      const logout = await this.authManager.logoutSilentCallback(url);
-      return logout;
+      return await this.authManager.logoutSilentCallback(url);
     } catch (error) {
       if (error instanceof Error) {
         trackError('passport', 'logoutSilentCallback', error);
