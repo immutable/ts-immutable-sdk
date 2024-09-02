@@ -1,7 +1,7 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { IMXClient } from '@imtbl/x-client';
 import { ImxApiClients, imxApiConfig, MultiRollupApiClients } from '@imtbl/generated-clients';
-import { trackError } from '@imtbl/metrics';
+import { trackError, trackFlow } from '@imtbl/metrics';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { Passport } from './Passport';
@@ -90,6 +90,10 @@ describe('Passport', () => {
         linkWalletV2: linkExternalWalletMock,
       },
     });
+    (trackFlow as unknown as jest.Mock).mockImplementation(() => ({
+      addEvent: jest.fn(),
+      end: jest.fn(),
+    }));
     passport = new Passport({
       baseConfig: new ImmutableConfiguration({
         environment: Environment.SANDBOX,
@@ -439,7 +443,7 @@ describe('Passport', () => {
       } catch (error) {
         expect(trackError).toHaveBeenCalledWith(
           'passport',
-          'linkWallet',
+          'linkExternalWallet',
           error,
         );
       }
