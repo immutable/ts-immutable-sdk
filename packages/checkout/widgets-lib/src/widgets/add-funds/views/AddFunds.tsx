@@ -47,12 +47,10 @@ export function AddFunds({
   onBackButtonClick,
   onCloseButtonClick,
 }: AddFundsProps) {
-  console.log('checkout', checkout);
   console.log('provider', provider);
   console.log('showOnrampOption', showOnrampOption);
   console.log('showSwapOption', showSwapOption);
   console.log('showBridgeOption', showBridgeOption);
-  console.log('onCloseButtonClick', onCloseButtonClick);
 
   const { addFundsDispatch } = useContext(AddFundsContext);
 
@@ -98,12 +96,8 @@ export function AddFunds({
         if (tokenResponse?.tokens.length > 0) {
           setAllowedTokens(tokenResponse.tokens);
 
-          if (tokenAddress) {
-            const token = tokenResponse.tokens.find((t) => t.address === tokenAddress);
-            setToTokenAddress(token);
-          } else {
-            setToTokenAddress(tokenResponse.tokens[0]);
-          }
+          const token = tokenResponse.tokens.find((t) => t.address === tokenAddress) || tokenResponse.tokens[0];
+          setToTokenAddress(token);
 
           addFundsDispatch({
             payload: {
@@ -139,10 +133,6 @@ export function AddFunds({
   // };
 
   const onPayWithCard = (paymentType: OptionTypes) => {
-    console.log('paymentType', paymentType);
-    console.log('=== toTokenAddress', toTokenAddress);
-    console.log('=== toAmount', toAmount);
-
     if (paymentType === OptionTypes.SWAP) {
       orchestrationEvents.sendRequestSwapEvent(
         eventTarget,
@@ -217,7 +207,7 @@ export function AddFunds({
               }}
             >
               <Body size="large" weight="bold">
-                {toTokenAddress ? toTokenAddress.name : ''}
+                {toTokenAddress?.name ?? ''}
               </Body>
               <OverflowPopoverMenu testId="add-funds-tokens-menu">
                 {allowedTokens.map((token: any) => (
