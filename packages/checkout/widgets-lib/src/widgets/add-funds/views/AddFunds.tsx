@@ -58,6 +58,7 @@ export function AddFunds({
   } = useContext(EventTargetContext);
 
   const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
+  const [onRampAllowedTokens, setOnRampAllowedTokens] = useState<TokenInfo[]>([]);
   const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
   const [toAmount, setToAmount] = useState<string>(amount || '0');
   const [toTokenAddress, setToTokenAddress] = useState<TokenInfo | undefined>();
@@ -90,6 +91,18 @@ export function AddFunds({
       }
     };
     fetchTokens();
+
+    const fetchOnRampTokens = async () => {
+      const tokenResponse = await checkout.getTokenAllowList({
+        type: TokenFilterTypes.ONRAMP,
+        chainId: getL2ChainId(checkout.config),
+      });
+
+      if (tokenResponse?.tokens.length > 0) {
+        setOnRampAllowedTokens(tokenResponse.tokens);
+      }
+    };
+    fetchOnRampTokens();
   }, [checkout]);
 
   const openDrawer = () => {
@@ -138,6 +151,14 @@ export function AddFunds({
     }
   };
 
+  const checkShowOnRampOption = () => {
+    if (showOnrampOption && toTokenAddress) {
+      const token = onRampAllowedTokens.find((t) => t.address?.toLowerCase() === toTokenAddress.address?.toLowerCase());
+      return !!token;
+    }
+    return false;
+  };
+
   return (
     <SimpleLayout
       header={(
@@ -147,7 +168,7 @@ export function AddFunds({
           onCloseButtonClick={onCloseButtonClick}
           showBack={!!onBackButtonClick}
         />
-      )}
+            )}
     >
       <Box
         sx={{
@@ -222,7 +243,7 @@ export function AddFunds({
           }}
         >
           <OptionsDrawer
-            showOnrampOption={showOnrampOption}
+            showOnrampOption={checkShowOnRampOption()}
             showSwapOption={showSwapOption}
             showBridgeOption={showBridgeOption}
             visible={showOptionsDrawer}
