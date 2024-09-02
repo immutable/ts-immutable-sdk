@@ -92,7 +92,7 @@ export async function createOrder({
     return {
       ...createOrderResponse.data,
     };
-  }, PassportErrorType.CREATE_ORDER_ERROR);
+  }, PassportErrorType.CREATE_ORDER_ERROR, 'imxCreateOrder');
 }
 
 export async function cancelOrder({
@@ -138,5 +138,5 @@ export async function cancelOrder({
       order_id: cancelOrderResponse.data.order_id,
       status: cancelOrderResponse.data.status,
     };
-  }, PassportErrorType.CANCEL_ORDER_ERROR);
+  }, PassportErrorType.CANCEL_ORDER_ERROR, 'imxCancelOrder');
 }
