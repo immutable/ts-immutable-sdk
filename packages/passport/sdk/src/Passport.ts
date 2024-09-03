@@ -34,6 +34,7 @@ import GuardianClient from './guardian';
 import logger from './utils/logger';
 import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
 import { isAPIError, PassportError, PassportErrorType } from './errors/passportError';
+import { withMetrics, withMetricsAsync } from './utils/metrics';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
   if (passportModuleConfiguration.overrides) {
@@ -135,35 +136,11 @@ export class Passport {
    * `connectImx` instead.
    */
   public async connectImxSilent(): Promise<IMXProvider | null> {
-    const flow = trackFlow('passport', 'connectImxSilent');
-
-    try {
-      return await this.passportImxProviderFactory.getProviderSilent();
-    } catch (error) {
-      if (error instanceof Error) {
-        trackError('passport', 'connectImxSilent', error);
-      }
-      flow.addEvent('errored');
-      throw error;
-    } finally {
-      flow.addEvent('End');
-    }
+    return withMetricsAsync(() => this.passportImxProviderFactory.getProviderSilent(), 'connectImxSilent');
   }
 
   public async connectImx(): Promise<IMXProvider> {
-    const flow = trackFlow('passport', 'connectImx');
-
-    try {
-      return await this.passportImxProviderFactory.getProvider();
-    } catch (error) {
-      if (error instanceof Error) {
-        trackError('passport', 'connectImx', error);
-      }
-      flow.addEvent('errored');
-      throw error;
-    } finally {
-      flow.addEvent('End');
-    }
+    return withMetricsAsync(() => this.passportImxProviderFactory.getProvider(), 'connectImx');
   }
 
   public connectEvm(options: {
@@ -171,9 +148,7 @@ export class Passport {
   } = {
     announceProvider: true,
   }): Provider {
-    const flow = trackFlow('passport', 'connectEvm');
-
-    try {
+    return withMetrics(() => {
       const provider = new ZkEvmProvider({
         passportEventEmitter: this.passportEventEmitter,
         authManager: this.authManager,
@@ -191,15 +166,7 @@ export class Passport {
       }
 
       return provider;
-    } catch (error) {
-      if (error instanceof Error) {
-        trackError('passport', 'connectEvm', error);
-      }
-      flow.addEvent('errored');
-      throw error;
-    } finally {
-      flow.addEvent('End');
-    }
+    }, 'connectEvm');
   }
 
   /**
@@ -215,9 +182,7 @@ export class Passport {
     useCachedSession: boolean;
     anonymousId?: string;
   }): Promise<UserProfile | null> {
-    const flow = trackFlow('passport', 'login');
-
-    try {
+    return withMetricsAsync(async () => {
       const { useCachedSession = false } = options || {};
       let user: User | null = null;
 
@@ -244,49 +209,17 @@ export class Passport {
       }
 
       return user ? user.profile : null;
-    } catch (error) {
-      if (error instanceof Error) {
-        trackError('passport', 'login', error);
-      }
-      flow.addEvent('errored');
-      throw error;
-    } finally {
-      flow.addEvent('End');
-    }
+    }, 'login');
   }
 
   public async loginCallback(): Promise<void> {
-    const flow = trackFlow('passport', 'loginCallback');
-
-    try {
-      return await this.authManager.loginCallback();
-    } catch (error) {
-      if (error instanceof Error) {
-        trackError('passport', 'loginCallback', error);
-      }
-      flow.addEvent('errored');
-      throw error;
-    } finally {
-      flow.addEvent('End');
-    }
+    return withMetricsAsync(() => this.authManager.loginCallback(), 'loginCallback');
   }
 
   public async loginWithDeviceFlow(options?: {
     anonymousId?: string;
   }): Promise<DeviceConnectResponse> {
-    const flow = trackFlow('passport', 'loginWithDeviceFlow');
-
-    try {
-      return await this.authManager.loginWithDeviceFlow(options?.anonymousId);
-    } catch (error) {
-      if (error instanceof Error) {
-        trackError('passport', 'loginWithDeviceFlow', error);
-      }
-      flow.addEvent('errored');
-      throw error;
-    } finally {
-      flow.addEvent('End');
-    }
+    return withMetricsAsync(() => this.authManager.loginWithDeviceFlow(options?.anonymousId), 'loginWithDeviceFlow');
   }
 
   public async loginWithDeviceFlowCallback(
@@ -294,9 +227,7 @@ export class Passport {
     interval: number,
     timeoutMs?: number,
   ): Promise<UserProfile> {
-    const flow = trackFlow('passport', 'loginWithDeviceFlowCallback');
-
-    try {
+    return withMetricsAsync(async () => {
       const user = await this.authManager.loginWithDeviceFlowCallback(
         deviceCode,
         interval,
@@ -304,61 +235,29 @@ export class Passport {
       );
       this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
       return user.profile;
-    } catch (error) {
-      if (error instanceof Error) {
-        trackError('passport', 'loginWithDeviceFlowCallback', error);
-      }
-      flow.addEvent('errored');
-      throw error;
-    } finally {
-      flow.addEvent('End');
-    }
+    }, 'loginWithDeviceFlowCallback');
   }
 
   public loginWithPKCEFlow(): string {
-    const flow = trackFlow('passport', 'loginWithPKCEFlow');
-
-    try {
-      return this.authManager.getPKCEAuthorizationUrl();
-    } catch (error) {
-      if (error instanceof Error) {
-        trackError('passport', 'loginWithPKCEFlow', error);
-      }
-      flow.addEvent('errored');
-      throw error;
-    } finally {
-      flow.addEvent('End');
-    }
+    return withMetrics(() => this.authManager.getPKCEAuthorizationUrl(), 'loginWithPKCEFlow');
   }
 
   public async loginWithPKCEFlowCallback(
     authorizationCode: string,
     state: string,
   ): Promise<UserProfile> {
-    const flow = trackFlow('passport', 'loginWithPKCEFlowCallback');
-
-    try {
+    return withMetricsAsync(async () => {
       const user = await this.authManager.loginWithPKCEFlowCallback(
         authorizationCode,
         state,
       );
       this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
       return user.profile;
-    } catch (error) {
-      if (error instanceof Error) {
-        trackError('passport', 'loginWithPKCEFlowCallback', error);
-      }
-      flow.addEvent('errored');
-      throw error;
-    } finally {
-      flow.addEvent('End');
-    }
+    }, 'loginWithPKCEFlowCallback');
   }
 
   public async logout(): Promise<void> {
-    const flow = trackFlow('passport', 'logout');
-
-    try {
+    return withMetricsAsync(async () => {
       if (this.config.oidcConfiguration.logoutMode === 'silent') {
         await Promise.allSettled([
           this.authManager.logout(),
@@ -370,15 +269,7 @@ export class Passport {
         await this.authManager.logout();
       }
       this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
-    } catch (error) {
-      if (error instanceof Error) {
-        trackError('passport', 'logout', error);
-      }
-      flow.addEvent('errored');
-      throw error;
-    } finally {
-      flow.addEvent('End');
-    }
+    }, 'logout');
   }
 
   /**
@@ -388,22 +279,12 @@ export class Passport {
    * opening this URL in the same browser that was used to log the user in.
    */
   public async logoutDeviceFlow(): Promise<string> {
-    const flow = trackFlow('passport', 'logoutDeviceFlow');
-
-    try {
+    return withMetricsAsync(async () => {
       await this.authManager.removeUser();
       await this.magicAdapter.logout();
       this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
       return await this.authManager.getDeviceFlowEndSessionEndpoint();
-    } catch (error) {
-      if (error instanceof Error) {
-        trackError('passport', 'logoutDeviceFlow', error);
-      }
-      flow.addEvent('errored');
-      throw error;
-    } finally {
-      flow.addEvent('End');
-    }
+    }, 'logoutDeviceFlow');
   }
 
   /**
@@ -411,76 +292,32 @@ export class Passport {
    * when logout mode is 'silent'.
    */
   public async logoutSilentCallback(url: string): Promise<void> {
-    const flow = trackFlow('passport', 'logoutSilentCallback');
-
-    try {
-      return await this.authManager.logoutSilentCallback(url);
-    } catch (error) {
-      if (error instanceof Error) {
-        trackError('passport', 'logoutSilentCallback', error);
-      }
-      flow.addEvent('errored');
-      throw error;
-    } finally {
-      flow.addEvent('End');
-    }
+    return withMetricsAsync(() => this.authManager.logoutSilentCallback(url), 'logoutSilentCallback');
   }
 
   public async getUserInfo(): Promise<UserProfile | undefined> {
-    const flow = trackFlow('passport', 'getUserInfo');
-
-    try {
+    return withMetricsAsync(async () => {
       const user = await this.authManager.getUser();
       return user?.profile;
-    } catch (error) {
-      if (error instanceof Error) {
-        trackError('passport', 'getUserInfo', error);
-      }
-      flow.addEvent('errored');
-      throw error;
-    } finally {
-      flow.addEvent('End');
-    }
+    }, 'getUserInfo');
   }
 
   public async getIdToken(): Promise<string | undefined> {
-    const flow = trackFlow('passport', 'getIdToken');
-
-    try {
+    return withMetricsAsync(async () => {
       const user = await this.authManager.getUser();
       return user?.idToken;
-    } catch (error) {
-      if (error instanceof Error) {
-        trackError('passport', 'getIdToken', error);
-      }
-      flow.addEvent('errored');
-      throw error;
-    } finally {
-      flow.addEvent('End');
-    }
+    }, 'getIdToken');
   }
 
   public async getAccessToken(): Promise<string | undefined> {
-    const flow = trackFlow('passport', 'getAccessToken');
-
-    try {
+    return withMetricsAsync(async () => {
       const user = await this.authManager.getUser();
       return user?.accessToken;
-    } catch (error) {
-      if (error instanceof Error) {
-        trackError('passport', 'getAccessToken', error);
-      }
-      flow.addEvent('errored');
-      throw error;
-    } finally {
-      flow.addEvent('End');
-    }
+    }, 'getAccessToken');
   }
 
   public async getLinkedAddresses(): Promise<string[]> {
-    const flow = trackFlow('passport', 'getLinkedAddresses');
-
-    try {
+    return withMetricsAsync(async () => {
       const user = await this.authManager.getUser();
       if (!user?.profile.sub) {
         return [];
@@ -488,15 +325,7 @@ export class Passport {
       const headers = { Authorization: `Bearer ${user.accessToken}` };
       const getUserInfoResult = await this.multiRollupApiClients.passportProfileApi.getUserInfo({ headers });
       return getUserInfoResult.data.linked_addresses;
-    } catch (error) {
-      if (error instanceof Error) {
-        trackError('passport', 'getLinkedAddresses', error);
-      }
-      flow.addEvent('errored');
-      throw error;
-    } finally {
-      flow.addEvent('End');
-    }
+    }, 'getLinkedAddresses');
   }
 
   public async linkExternalWallet(params: LinkWalletParams): Promise<LinkedWallet> {

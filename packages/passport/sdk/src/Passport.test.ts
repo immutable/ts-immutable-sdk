@@ -92,7 +92,6 @@ describe('Passport', () => {
     });
     (trackFlow as unknown as jest.Mock).mockImplementation(() => ({
       addEvent: jest.fn(),
-      end: jest.fn(),
     }));
     passport = new Passport({
       baseConfig: new ImmutableConfiguration({
