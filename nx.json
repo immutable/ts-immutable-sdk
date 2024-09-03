@@ -36,6 +36,37 @@
       "cache": true
     }
   },
+  "release": {
+    "projectsRelationship": "fixed",
+    "projects": ["sdk/**", "packages/**", "!packages/internal/**", "!packages/**/*sample-app/**"],
+    "releaseTagPattern": "{version}",
+    "changelog": {
+        "workspaceChangelog": {
+          "createRelease": "github",
+          "renderOptions": {
+            "authors": false
+          }
+        }
+    },
+    "version": {
+      "generatorOptions": {
+        "currentVersionResolver": "registry",
+        "preid": "alpha"
+      }
+    },
+    "git": {
+      "commit": false,
+      "tag": false,
+      "stageChanges": false
+    },
+    "conventionalCommits": {
+      "types": {
+        "internal": {
+          "changelog": false
+        }
+      }
+    }
+  },
   "defaultBase": "main",
   "parallel": 8,
   "nxCloudAccessToken": "Mzg3ZGY1MWUtYmYyNy00ZmE4LTkyNDAtYjYxZmJmYmE4NWQ3fHJlYWQ="
