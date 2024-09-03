@@ -13,23 +13,25 @@ describe('passport metrics', () => {
   describe('withMetrics', () => {
     it('should execute the function successfully', () => {
       const returnValue = 'success';
-      const anyFn = jest.fn();
-      anyFn.mockReturnValue(returnValue);
+      const mockFn = jest.fn();
+      mockFn.mockReturnValue(returnValue);
 
-      expect(withMetrics(anyFn, 'event')).toEqual(returnValue);
+      expect(withMetrics(mockFn, 'event')).toEqual(returnValue);
     });
 
     it('should track and re-throw error', () => {
-      const errorFunction = jest.fn();
-      errorFunction.mockReturnValue(new Error('error'));
+      const mockFn = jest.fn().mockImplementation(() => {
+        throw new Error('error');
+      });
 
       try {
-        withMetrics(errorFunction, 'event');
+        withMetrics(mockFn, 'event');
       } catch (error) {
         expect(error).toBeInstanceOf(Error);
         expect(error).toMatchObject({
           message: 'error',
         });
+        expect(trackFlow).toBeCalledTimes(1);
         expect(trackError).toHaveBeenCalledWith(
           'passport',
           'event',
@@ -42,10 +44,10 @@ describe('passport metrics', () => {
   describe('withMetricsAsync', () => {
     it('should execute the async function successfully', async () => {
       const returnValue = 'success';
-      const anyFn = jest.fn();
-      anyFn.mockResolvedValue(returnValue);
+      const mockFn = jest.fn();
+      mockFn.mockResolvedValue(returnValue);
 
-      expect(await withMetricsAsync(anyFn, 'event')).toEqual(returnValue);
+      expect(await withMetricsAsync(mockFn, 'event')).toEqual(returnValue);
     });
 
     it('should track and re-throw error', async () => {
@@ -59,6 +61,7 @@ describe('passport metrics', () => {
         expect(error).toMatchObject({
           message: 'error',
         });
+        expect(trackFlow).toBeCalledTimes(1);
         expect(trackError).toHaveBeenCalledWith(
           'passport',
           'event',
