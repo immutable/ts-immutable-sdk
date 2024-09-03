@@ -7,15 +7,41 @@ import { ChainName } from "@imtbl/sdk/checkout";
 import { WalletInfo, WalletProviderName } from "@imtbl/sdk/checkout";
 import { Button, Heading, Body, Link, Table } from "@biom3/react";
 import NextLink from "next/link";
+import { NetworkInfo } from "@imtbl/sdk/checkout";
 
 export default function ConnectWithMetamask() {
   const [isConnected, setIsConnected] = useState<boolean>();
   const [chainName, setChainName] = useState<string>();
+  const [chainId, setChainId] = useState<string>();
+  const [nativeCurrency, setNativeCurrency] = useState<string>();
   // setup the loading state to enable/disable buttons when loading
   const [loading, setLoadingState] = useState<boolean>(false);
   const [connectedProvider, setConnectedProvider] = useState<Web3Provider>();
   const [supportedNetworks, setSupportedNetworks] = useState<string[]>();
   const [switchNetworkLoading, setSwitchNetworkLoading] = useState<boolean>(false);
+  const [networkInfo, setNetworkInfo] = useState<NetworkInfo | null>(null);
+
+  const updateNetworkInfo = async (provider: Web3Provider) => {
+    try {
+
+      // #doc get-network-details
+      // Get the network details
+      const info = await checkoutSDK.getNetworkInfo({ provider });
+      // #enddoc get-network-details
+      setNetworkInfo(info);
+      setChainName(info.name);
+      setChainId(info.chainId.toString());
+      setNativeCurrency(info.nativeCurrency?.symbol || 'N/A');
+      setIsConnected(true);
+    } catch (error) {
+      console.error("Failed to update network info:", error);
+      setNetworkInfo(null);
+      setChainName(undefined);
+      setChainId(undefined);
+      setNativeCurrency(undefined);
+      setIsConnected(false);
+    }
+  };
 
   const connectWithMetamask = async () => {
     // disable button while loading
@@ -29,10 +55,7 @@ export default function ConnectWithMetamask() {
     });
     // #enddoc create-metamask-provider
 
-    const chainName = await checkoutSDK.getNetworkInfo({
-      provider: providerRes.provider,
-    });
-    setChainName(chainName.name);
+    await updateNetworkInfo(providerRes.provider);
 
     // #doc connect-metamask-provider-perms
     // Get the current network information
@@ -75,12 +98,8 @@ export default function ConnectWithMetamask() {
       const chainId = checkout.ChainId.IMTBL_ZKEVM_TESTNET;
       await checkoutSDK.switchNetwork({ provider: connectedProvider, chainId });
       // #enddoc switch-network
-      
-      // Update the chain name after switching
-      const networkInfo = await checkoutSDK.getNetworkInfo({ provider: connectedProvider });
-      const chainName = networkInfo.name;
-      setChainName(chainName);
-      setIsConnected(true);
+
+      await updateNetworkInfo(connectedProvider);
     } catch (error) {
       console.error("Failed to switch network:", error);
     } finally {
@@ -94,17 +113,14 @@ export default function ConnectWithMetamask() {
       if (!connectedProvider) {
         throw new Error("No connected provider found");
       }
+
       // #doc switch-network
       // Switch to Sepolia Testnet
       const chainId = checkout.ChainId.SEPOLIA;
       await checkoutSDK.switchNetwork({ provider: connectedProvider, chainId });
       // #enddoc switch-network
 
-      // Update the chain name after switching
-      const networkInfo = await checkoutSDK.getNetworkInfo({ provider: connectedProvider });
-      const chainName = networkInfo.name;
-      setChainName(chainName);
-      setIsConnected(true);
+      await updateNetworkInfo(connectedProvider);
     } catch (error) {
       console.error("Failed to switch network:", error);
     } finally {
@@ -181,6 +197,22 @@ export default function ConnectWithMetamask() {
               )}
             </Table.Cell>
            </Table.Row>
+          <Table.Row>
+            <Table.Cell>
+              <b>Chain ID</b>
+            </Table.Cell>
+            <Table.Cell>
+              {chainId ? chainId : " (not connected)"}
+            </Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell>
+              <b>Native Currency</b>
+            </Table.Cell>
+            <Table.Cell>
+              {nativeCurrency ? nativeCurrency : " (not connected)"}
+            </Table.Cell>
+          </Table.Row>
         </Table.Body>
       </Table>
       <br />

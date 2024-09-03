@@ -5,8 +5,8 @@ import AppWrapper from "./utils/wrapper";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Checkout SDK - Connect with NextJS",
-  description: "Examples of how to connect using the Checkout SDK with NextJS",
+  title: "Checkout SDK - Switching Networks with NextJS",
+  description: "Examples of how to switch networks using the Checkout SDK with NextJS",
 };
 
 export default function RootLayout({
