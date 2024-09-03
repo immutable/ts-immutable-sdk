@@ -70,5 +70,5 @@ export async function createTrade({
       },
     );
     return createTradeResponse;
-  }, PassportErrorType.CREATE_TRADE_ERROR, 'imxCreateTrade');
+  }, PassportErrorType.CREATE_TRADE_ERROR);
 }

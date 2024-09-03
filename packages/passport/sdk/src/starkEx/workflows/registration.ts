@@ -40,5 +40,5 @@ export default async function registerPassport(
       },
     });
     return response.data as imx.RegisterUserResponse;
-  }, PassportErrorType.USER_REGISTRATION_ERROR, 'imxRegisterUser');
+  }, PassportErrorType.USER_REGISTRATION_ERROR);
 }
