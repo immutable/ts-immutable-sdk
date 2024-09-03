@@ -143,7 +143,7 @@ export class Passport {
       if (error instanceof Error) {
         trackError('passport', 'connectImxSilent', error);
       }
-      flow.addEvent('Error');
+      flow.addEvent('errored');
       throw error;
     } finally {
       flow.addEvent('End');
@@ -159,7 +159,7 @@ export class Passport {
       if (error instanceof Error) {
         trackError('passport', 'connectImx', error);
       }
-      flow.addEvent('Error');
+      flow.addEvent('errored');
       throw error;
     } finally {
       flow.addEvent('End');
@@ -195,7 +195,7 @@ export class Passport {
       if (error instanceof Error) {
         trackError('passport', 'connectEvm', error);
       }
-      flow.addEvent('Error');
+      flow.addEvent('errored');
       throw error;
     } finally {
       flow.addEvent('End');
@@ -248,7 +248,7 @@ export class Passport {
       if (error instanceof Error) {
         trackError('passport', 'login', error);
       }
-      flow.addEvent('Error');
+      flow.addEvent('errored');
       throw error;
     } finally {
       flow.addEvent('End');
@@ -264,7 +264,7 @@ export class Passport {
       if (error instanceof Error) {
         trackError('passport', 'loginCallback', error);
       }
-      flow.addEvent('Error');
+      flow.addEvent('errored');
       throw error;
     } finally {
       flow.addEvent('End');
@@ -282,7 +282,7 @@ export class Passport {
       if (error instanceof Error) {
         trackError('passport', 'loginWithDeviceFlow', error);
       }
-      flow.addEvent('Error');
+      flow.addEvent('errored');
       throw error;
     } finally {
       flow.addEvent('End');
@@ -308,7 +308,7 @@ export class Passport {
       if (error instanceof Error) {
         trackError('passport', 'loginWithDeviceFlowCallback', error);
       }
-      flow.addEvent('Error');
+      flow.addEvent('errored');
       throw error;
     } finally {
       flow.addEvent('End');
@@ -324,7 +324,7 @@ export class Passport {
       if (error instanceof Error) {
         trackError('passport', 'loginWithPKCEFlow', error);
       }
-      flow.addEvent('Error');
+      flow.addEvent('errored');
       throw error;
     } finally {
       flow.addEvent('End');
@@ -348,7 +348,7 @@ export class Passport {
       if (error instanceof Error) {
         trackError('passport', 'loginWithPKCEFlowCallback', error);
       }
-      flow.addEvent('Error');
+      flow.addEvent('errored');
       throw error;
     } finally {
       flow.addEvent('End');
@@ -374,7 +374,7 @@ export class Passport {
       if (error instanceof Error) {
         trackError('passport', 'logout', error);
       }
-      flow.addEvent('Error');
+      flow.addEvent('errored');
       throw error;
     } finally {
       flow.addEvent('End');
@@ -399,7 +399,7 @@ export class Passport {
       if (error instanceof Error) {
         trackError('passport', 'logoutDeviceFlow', error);
       }
-      flow.addEvent('Error');
+      flow.addEvent('errored');
       throw error;
     } finally {
       flow.addEvent('End');
@@ -419,7 +419,7 @@ export class Passport {
       if (error instanceof Error) {
         trackError('passport', 'logoutSilentCallback', error);
       }
-      flow.addEvent('Error');
+      flow.addEvent('errored');
       throw error;
     } finally {
       flow.addEvent('End');
@@ -436,7 +436,7 @@ export class Passport {
       if (error instanceof Error) {
         trackError('passport', 'getUserInfo', error);
       }
-      flow.addEvent('Error');
+      flow.addEvent('errored');
       throw error;
     } finally {
       flow.addEvent('End');
@@ -453,7 +453,7 @@ export class Passport {
       if (error instanceof Error) {
         trackError('passport', 'getIdToken', error);
       }
-      flow.addEvent('Error');
+      flow.addEvent('errored');
       throw error;
     } finally {
       flow.addEvent('End');
@@ -470,7 +470,7 @@ export class Passport {
       if (error instanceof Error) {
         trackError('passport', 'getAccessToken', error);
       }
-      flow.addEvent('Error');
+      flow.addEvent('errored');
       throw error;
     } finally {
       flow.addEvent('End');
@@ -492,7 +492,7 @@ export class Passport {
       if (error instanceof Error) {
         trackError('passport', 'getLinkedAddresses', error);
       }
-      flow.addEvent('Error');
+      flow.addEvent('errored');
       throw error;
     } finally {
       flow.addEvent('End');
@@ -529,7 +529,7 @@ export class Passport {
       if (error instanceof Error) {
         trackError('passport', 'linkExternalWallet', error);
       }
-      flow.addEvent('Error');
+      flow.addEvent('errored');
 
       if (isAxiosError(error) && error.response) {
         if (error.response.data && isAPIError(error.response.data)) {
