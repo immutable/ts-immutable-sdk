@@ -42,6 +42,7 @@
     "releaseTagPattern": "{version}",
     "changelog": {
         "workspaceChangelog": {
+          "file": false,
           "createRelease": "github",
           "renderOptions": {
             "authors": false
@@ -50,6 +51,7 @@
     },
     "version": {
       "generatorOptions": {
+        "skipLockFileUpdate": true,
         "currentVersionResolver": "registry",
         "preid": "alpha"
       }
