@@ -126,6 +126,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     loadingBalances,
     fundingBalancesResult,
     transactionRequirement,
+    gasFees,
     queryFundingBalances,
   } = useFundingBalances();
 
@@ -228,6 +229,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
           onProceedToBuy={onProceedToBuy}
           transactionRequirement={transactionRequirement}
           onPayWithCard={onPayWithCard}
+          gasFees={gasFees}
         />
       )}
       {subView === OrderSummarySubViews.EXECUTE_FUNDING_ROUTE && (

@@ -6,13 +6,14 @@ import { useTranslation } from 'react-i18next';
 import {
   FundingStepType,
   SalePaymentTypes,
+  TokenBalance,
   TransactionRequirement,
 } from '@imtbl/checkout-sdk';
 import {
   OrderSummarySubViews,
   SaleWidgetViews,
 } from '../../../context/view-context/SaleViewContextTypes';
-import { calculateCryptoToFiat } from '../../../lib/utils';
+import { calculateCryptoToFiat, tokenValueFormat } from '../../../lib/utils';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
@@ -40,6 +41,7 @@ type OrderReviewProps = {
   onBackButtonClick: () => void;
   onProceedToBuy: (fundingBalance: FundingBalance) => void;
   onPayWithCard?: (paymentType: SalePaymentTypes) => void;
+  gasFees?: TokenBalance;
 };
 
 export function OrderReview({
@@ -51,6 +53,7 @@ export function OrderReview({
   onBackButtonClick,
   onPayWithCard,
   onProceedToBuy,
+  gasFees,
 }: OrderReviewProps) {
   const {
     eventTargetState: { eventTarget },
@@ -68,7 +71,7 @@ export function OrderReview({
 
   const [showCoinsDrawer, setShowCoinsDrawer] = useState(false);
   const [selectedCurrencyIndex, setSelectedCurrencyIndex] = useState(0);
-  const [swapFees, setSwapFees] = useState<FeesDisplay>({
+  const [transactionFees, setTransactionFees] = useState<FeesDisplay>({
     token: undefined,
     amount: '',
     fiatAmount: '',
@@ -117,7 +120,7 @@ export function OrderReview({
       return;
     }
 
-    setSwapFees({
+    setTransactionFees({
       token: fee.token,
       amount: fee.formattedAmount,
       fiatAmount: calculateCryptoToFiat(
@@ -132,6 +135,37 @@ export function OrderReview({
       ),
     });
   }, [fundingBalance, conversions, provider]);
+
+  useEffect(() => {
+    if (fundingBalance.type === FundingStepType.SWAP) {
+      return;
+    }
+
+    if (!gasFees || gasFees.balance.lte(0)) {
+      return;
+    }
+
+    const fiatAmount = calculateCryptoToFiat(
+      gasFees.formattedBalance,
+      gasFees.token.symbol,
+      conversions,
+    );
+
+    setTransactionFees({
+      token: gasFees.token,
+      amount: gasFees.formattedBalance,
+      fiatAmount,
+      formattedFees: [
+        {
+          label: t('drawers.feesBreakdown.fees.gasFeeMove.label'),
+          fiatAmount: `≈ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${fiatAmount}`,
+          amount: `${tokenValueFormat(gasFees.formattedBalance)}`,
+          prefix: '~ ',
+          token: gasFees.token,
+        },
+      ],
+    });
+  }, [gasFees, fundingBalance, conversions]);
 
   // Trigger page loaded event
   useMount(
@@ -155,7 +189,7 @@ export function OrderReview({
   );
 
   const multiple = items.length > 1;
-  const withFees = !loadingBalances && fundingBalance.type === FundingStepType.SWAP;
+  const withFees = transactionFees.formattedFees.length > 0;
 
   return (
     <SimpleLayout
@@ -206,7 +240,7 @@ export function OrderReview({
           >
             {!multiple && withFees && (
               <OrderFees
-                swapFees={swapFees}
+                fees={transactionFees}
                 sx={{
                   bradtl: '0',
                   bradtr: '0',
@@ -223,7 +257,7 @@ export function OrderReview({
       </Box>
       {multiple && withFees && (
         <OrderFees
-          swapFees={swapFees}
+          fees={transactionFees}
           sx={{
             mb: '-12px',
             bradtl: 'base.borderRadius.x6',
