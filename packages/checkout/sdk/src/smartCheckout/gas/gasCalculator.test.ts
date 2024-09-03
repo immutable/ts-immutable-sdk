@@ -27,6 +27,7 @@ describe('gasCalculator', () => {
       expect(item).toEqual({
         type: ItemType.NATIVE,
         amount: BigNumber.from(100000),
+        isFee: true,
       });
     });
 
@@ -74,6 +75,7 @@ describe('gasCalculator', () => {
       expect(item).toEqual({
         type: ItemType.NATIVE,
         amount: BigNumber.from(300000),
+        isFee: true,
       });
     });
 
@@ -128,6 +130,7 @@ describe('gasCalculator', () => {
       expect(item).toEqual({
         type: ItemType.NATIVE,
         amount: BigNumber.from(400000),
+        isFee: true,
       });
     });
 
@@ -185,6 +188,7 @@ describe('gasCalculator', () => {
         tokenAddress: '0xERC20',
         amount: BigNumber.from(400000),
         spenderAddress: '',
+        isFee: true,
       });
     });
 
@@ -264,6 +268,7 @@ describe('gasCalculator', () => {
       expect(item).toEqual({
         type: ItemType.NATIVE,
         amount: BigNumber.from(100000),
+        isFee: true,
       });
     });
 
@@ -282,6 +287,7 @@ describe('gasCalculator', () => {
       expect(item).toEqual({
         type: ItemType.NATIVE,
         amount: BigNumber.from(100000),
+        isFee: true,
       });
     });
 
@@ -303,6 +309,7 @@ describe('gasCalculator', () => {
         amount: BigNumber.from(100000),
         tokenAddress: '0xERC20',
         spenderAddress: '',
+        isFee: true,
       });
     });
   });

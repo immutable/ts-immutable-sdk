@@ -246,7 +246,7 @@ describe('balanceCheck', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
-          isFee: true,
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
@@ -399,7 +399,7 @@ describe('balanceCheck', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from('1'),
-          isFee: true,
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
