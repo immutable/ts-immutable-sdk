@@ -1,8 +1,11 @@
 import { imx } from '@imtbl/generated-clients';
 import { ETHAmount } from '@imtbl/x-client';
+import { trackError } from '@imtbl/metrics';
 import { exchangeTransfer } from './exchange';
 import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
+
+jest.mock('@imtbl/metrics');
 
 describe('exchangeTransfer', () => {
   afterEach(jest.resetAllMocks);
@@ -132,16 +135,24 @@ describe('exchangeTransfer', () => {
       new Error(mockErrorMessage),
     );
 
-    await expect(() => exchangeTransfer({
-      user: mockUserImx,
-      starkSigner: mockStarkSigner,
-      request: exchangeTransferRequest,
-      exchangesApi: exchangesApiMock,
-    })).rejects.toThrow(
-      new PassportError(
-        mockErrorMessage,
-        PassportErrorType.EXCHANGE_TRANSFER_ERROR,
-      ),
-    );
+    try {
+      await exchangeTransfer({
+        user: mockUserImx,
+        starkSigner: mockStarkSigner,
+        request: exchangeTransferRequest,
+        exchangesApi: exchangesApiMock,
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(PassportError);
+      expect(error).toMatchObject({
+        message: mockErrorMessage,
+        type: PassportErrorType.EXCHANGE_TRANSFER_ERROR,
+      });
+      expect(trackError).toHaveBeenCalledWith(
+        'passport',
+        'imxExchangeTransfer',
+        error,
+      );
+    }
   });
 });

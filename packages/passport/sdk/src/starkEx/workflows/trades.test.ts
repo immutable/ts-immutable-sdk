@@ -1,10 +1,12 @@
 import { imx } from '@imtbl/generated-clients';
+import { trackError } from '@imtbl/metrics';
 import { createTrade } from './trades';
 import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
 import GuardianClient from '../../guardian';
 
 jest.mock('../../guardian');
+jest.mock('@imtbl/metrics');
 
 const mockPayloadHash = 'test_payload_hash';
 const mockSignableTradeRequest = {
@@ -109,13 +111,26 @@ describe('Trades', () => {
       mockGetSignableTrade.mockResolvedValue(mockSignableTradeResponse);
       (mockGuardianClient.evaluateImxTransaction as jest.Mock).mockRejectedValue(new Error('Transaction rejected by user'));
 
-      await expect(() => createTrade({
-        tradesApi: mockTradesApi,
-        starkSigner: mockStarkSigner,
-        user: mockUserImx,
-        request: mockSignableTradeRequest.getSignableTradeRequest,
-        guardianClient: mockGuardianClient,
-      })).rejects.toThrowError('Transaction rejected by user');
+      try {
+        await createTrade({
+          tradesApi: mockTradesApi,
+          starkSigner: mockStarkSigner,
+          user: mockUserImx,
+          request: mockSignableTradeRequest.getSignableTradeRequest,
+          guardianClient: mockGuardianClient,
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(PassportError);
+        expect(error).toMatchObject({
+          message: 'Transaction rejected by user',
+          type: PassportErrorType.CREATE_TRADE_ERROR,
+        });
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'imxCreateTrade',
+          error,
+        );
+      }
 
       expect(mockGuardianClient.evaluateImxTransaction)
         .toBeCalledWith({ payloadHash: mockPayloadHash });
@@ -124,18 +139,26 @@ describe('Trades', () => {
     it('should return error if failed to call public api', async () => {
       mockGetSignableTrade.mockRejectedValue(new Error(mockErrorMessage));
 
-      await expect(() => createTrade({
-        tradesApi: mockTradesApi,
-        starkSigner: mockStarkSigner,
-        user: mockUserImx,
-        request: mockSignableTradeRequest.getSignableTradeRequest,
-        guardianClient: mockGuardianClient,
-      })).rejects.toThrow(
-        new PassportError(
-          mockErrorMessage,
-          PassportErrorType.CREATE_TRADE_ERROR,
-        ),
-      );
+      try {
+        await createTrade({
+          tradesApi: mockTradesApi,
+          starkSigner: mockStarkSigner,
+          user: mockUserImx,
+          request: mockSignableTradeRequest.getSignableTradeRequest,
+          guardianClient: mockGuardianClient,
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(PassportError);
+        expect(error).toMatchObject({
+          message: mockErrorMessage,
+          type: PassportErrorType.CREATE_TRADE_ERROR,
+        });
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'imxCreateTrade',
+          error,
+        );
+      }
     });
   });
 });

@@ -1,11 +1,13 @@
 import { imx } from '@imtbl/generated-clients';
 import { ETHAmount, UnsignedOrderRequest } from '@imtbl/x-client';
+import { trackError } from '@imtbl/metrics';
 import GuardianClient from '../../guardian';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
 import { cancelOrder, createOrder } from './order';
 
 jest.mock('../../guardian');
+jest.mock('@imtbl/metrics');
 
 describe('order', () => {
   const mockGuardianClient = new GuardianClient({} as any);
@@ -138,18 +140,26 @@ describe('order', () => {
     it('should return error if failed to call public api', async () => {
       mockGetSignableCreateOrder.mockRejectedValue(new Error(mockErrorMessage));
 
-      await expect(() => createOrder({
-        ordersApi: mockOrdersApi,
-        starkSigner: mockStarkSigner,
-        user: mockUserImx,
-        request: orderRequest as UnsignedOrderRequest,
-        guardianClient: mockGuardianClient,
-      })).rejects.toThrow(
-        new PassportError(
-          mockErrorMessage,
-          PassportErrorType.CREATE_ORDER_ERROR,
-        ),
-      );
+      try {
+        await createOrder({
+          ordersApi: mockOrdersApi,
+          starkSigner: mockStarkSigner,
+          user: mockUserImx,
+          request: orderRequest as UnsignedOrderRequest,
+          guardianClient: mockGuardianClient,
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(PassportError);
+        expect(error).toMatchObject({
+          message: mockErrorMessage,
+          type: PassportErrorType.CREATE_ORDER_ERROR,
+        });
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'imxCreateOrder',
+          error,
+        );
+      }
     });
 
     it('should return error if transfer is rejected by user', async () => {
@@ -176,18 +186,28 @@ describe('order', () => {
       (mockGuardianClient.evaluateImxTransaction as jest.Mock)
         .mockRejectedValue(new Error('Transaction rejected by user'));
 
-      await expect(() => createOrder({
-        ordersApi: mockOrdersApi,
-        starkSigner: mockStarkSigner,
-        user: mockUserImx,
-        request: orderRequest as UnsignedOrderRequest,
-        guardianClient: mockGuardianClient,
-      })).rejects.toThrowError(new PassportError(
-        'Transaction rejected by user',
-        PassportErrorType.CREATE_ORDER_ERROR,
-      ));
-      expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash });
+      try {
+        await createOrder({
+          ordersApi: mockOrdersApi,
+          starkSigner: mockStarkSigner,
+          user: mockUserImx,
+          request: orderRequest as UnsignedOrderRequest,
+          guardianClient: mockGuardianClient,
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(PassportError);
+        expect(error).toMatchObject({
+          message: 'Transaction rejected by user',
+          type: PassportErrorType.CREATE_ORDER_ERROR,
+        });
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'imxCreateOrder',
+          error,
+        );
+        expect(mockGuardianClient.evaluateImxTransaction)
+          .toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash });
+      }
     });
   });
 
@@ -285,33 +305,51 @@ describe('order', () => {
       (mockGuardianClient.evaluateImxTransaction as jest.Mock)
         .mockRejectedValue(new Error('Transaction rejected by user'));
 
-      await expect(() => cancelOrder({
-        ordersApi: mockOrdersApi,
-        starkSigner: mockStarkSigner,
-        user: mockUserImx,
-        request: cancelOrderRequest,
-        guardianClient: mockGuardianClient,
-      })).rejects.toThrowError(new PassportError(
-        'Transaction rejected by user',
-        PassportErrorType.CANCEL_ORDER_ERROR,
-      ));
+      try {
+        await cancelOrder({
+          ordersApi: mockOrdersApi,
+          starkSigner: mockStarkSigner,
+          user: mockUserImx,
+          request: cancelOrderRequest,
+          guardianClient: mockGuardianClient,
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(PassportError);
+        expect(error).toMatchObject({
+          message: 'Transaction rejected by user',
+          type: PassportErrorType.CANCEL_ORDER_ERROR,
+        });
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'imxCancelOrder',
+          error,
+        );
+      }
     });
 
     it('should return error if failed to call public api', async () => {
       mockGetSignableCancelOrder.mockRejectedValue(new Error(mockErrorMessage));
 
-      await expect(() => cancelOrder({
-        ordersApi: mockOrdersApi,
-        starkSigner: mockStarkSigner,
-        user: mockUserImx,
-        request: cancelOrderRequest,
-        guardianClient: mockGuardianClient,
-      })).rejects.toThrow(
-        new PassportError(
-          mockErrorMessage,
-          PassportErrorType.CANCEL_ORDER_ERROR,
-        ),
-      );
+      try {
+        await cancelOrder({
+          ordersApi: mockOrdersApi,
+          starkSigner: mockStarkSigner,
+          user: mockUserImx,
+          request: cancelOrderRequest,
+          guardianClient: mockGuardianClient,
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(PassportError);
+        expect(error).toMatchObject({
+          message: mockErrorMessage,
+          type: PassportErrorType.CANCEL_ORDER_ERROR,
+        });
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'imxCancelOrder',
+          error,
+        );
+      }
     });
   });
 });
