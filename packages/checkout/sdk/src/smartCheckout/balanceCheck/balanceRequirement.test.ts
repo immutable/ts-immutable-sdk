@@ -23,12 +23,14 @@ describe('balanceRequirement', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from('1000000000000000000'),
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
           tokenAddress: '0xERC20',
           amount: BigNumber.from('1000000000000000000'),
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.ERC721,
@@ -91,6 +93,7 @@ describe('balanceRequirement', () => {
           contractAddress: '0xERC721',
           id: '0',
         },
+        isFee: false,
       });
     });
 
@@ -136,6 +139,7 @@ describe('balanceRequirement', () => {
           contractAddress: '0xERC721',
           id: '0',
         },
+        isFee: false,
       });
     });
   });
@@ -158,6 +162,7 @@ describe('balanceRequirement', () => {
       const itemRequirement: NativeItem = {
         type: ItemType.NATIVE,
         amount: BigNumber.from('1000000000000000000'),
+        isFee: true,
       };
       const balances: ItemBalance[] = [
         {
@@ -204,6 +209,7 @@ describe('balanceRequirement', () => {
             decimals: 18,
           },
         },
+        isFee: true,
       });
     });
 
@@ -213,6 +219,7 @@ describe('balanceRequirement', () => {
         tokenAddress: '0xERC20',
         amount: BigNumber.from('1000000000000000000'),
         spenderAddress: '0xSEAPORT',
+        isFee: true,
       };
       const balances: ItemBalance[] = [
         {
@@ -262,6 +269,7 @@ describe('balanceRequirement', () => {
             address: '0xERC20',
           },
         },
+        isFee: true,
       });
     });
 
@@ -269,6 +277,7 @@ describe('balanceRequirement', () => {
       const itemRequirement: NativeItem = {
         type: ItemType.NATIVE,
         amount: BigNumber.from('1000000000000000000'),
+        isFee: false,
       };
       const balances: ItemBalance[] = [
         {
@@ -326,6 +335,7 @@ describe('balanceRequirement', () => {
             decimals: 18,
           },
         },
+        isFee: false,
       });
     });
 
@@ -335,6 +345,7 @@ describe('balanceRequirement', () => {
         tokenAddress: '0xERC20',
         amount: BigNumber.from('1000000000000000000'),
         spenderAddress: '0xSEAPORT',
+        isFee: false,
       };
       const balances: ItemBalance[] = [
         {
@@ -394,6 +405,7 @@ describe('balanceRequirement', () => {
             address: '0xERC20',
           },
         },
+        isFee: false,
       });
     });
   });

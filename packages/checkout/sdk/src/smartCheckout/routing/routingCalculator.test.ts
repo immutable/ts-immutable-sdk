@@ -290,6 +290,7 @@ describe('routingCalculator', () => {
     const balanceERC20Requirement: BalanceERC20Requirement = {
       type: ItemType.ERC20,
       sufficient: false,
+      isFee: false,
       delta: {
         balance: BigNumber.from(10),
         formattedBalance: '10',
@@ -1147,6 +1148,7 @@ describe('routingCalculator', () => {
     const balanceERC20Requirement: BalanceERC20Requirement = {
       type: ItemType.ERC20,
       sufficient: false,
+      isFee: false,
       delta: {
         balance: BigNumber.from(10),
         formattedBalance: '10',
@@ -1272,6 +1274,7 @@ describe('routingCalculator', () => {
     const balanceERC20Requirement: BalanceERC20Requirement = {
       type: ItemType.ERC20,
       sufficient: false,
+      isFee: false,
       delta: {
         balance: BigNumber.from(10),
         formattedBalance: '10',

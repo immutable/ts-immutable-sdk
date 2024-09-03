@@ -46,6 +46,7 @@ describe('balanceCheck', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
       ];
       const getBalancesResult = {
@@ -73,6 +74,7 @@ describe('balanceCheck', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(3),
+          isFee: false,
         },
       ];
       const getBalancesResult = {
@@ -116,6 +118,7 @@ describe('balanceCheck', () => {
                   decimals: 18,
                 },
               },
+              isFee: false,
             },
           ],
           sufficient: false,
@@ -131,6 +134,7 @@ describe('balanceCheck', () => {
           amount: BigNumber.from(10),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
       ];
       const getBalancesResult = {
@@ -161,6 +165,7 @@ describe('balanceCheck', () => {
           amount: BigNumber.from(10),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
       ];
       const getBalancesResult = {
@@ -202,6 +207,7 @@ describe('balanceCheck', () => {
                   address: '0xERC20',
                 },
               },
+              isFee: false,
             },
           ],
           sufficient: false,
@@ -235,22 +241,26 @@ describe('balanceCheck', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: true,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(10),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(10),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
       ];
       const getBalancesResult = { balances: [] };
@@ -287,6 +297,7 @@ describe('balanceCheck', () => {
             },
             sufficient: false,
             type: ItemType.NATIVE,
+            isFee: false,
           },
           {
             delta: {
@@ -315,6 +326,7 @@ describe('balanceCheck', () => {
                 decimals: DEFAULT_TOKEN_DECIMALS,
               },
             },
+            isFee: false,
             sufficient: false,
             type: ItemType.ERC20,
           },
@@ -328,12 +340,14 @@ describe('balanceCheck', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from('1'),
+          isFee: true,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from('10'),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.ERC721,
@@ -380,22 +394,26 @@ describe('balanceCheck', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from('1'),
+          isFee: false,
         },
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from('1'),
+          isFee: true,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from('10'),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from('10'),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.ERC721,
@@ -465,6 +483,7 @@ describe('balanceCheck', () => {
             },
             sufficient: false,
             type: ItemType.NATIVE,
+            isFee: false,
           },
           {
             delta: {
@@ -495,6 +514,7 @@ describe('balanceCheck', () => {
             },
             sufficient: false,
             type: ItemType.ERC20,
+            isFee: false,
           },
           {
             delta: {
@@ -517,6 +537,7 @@ describe('balanceCheck', () => {
             },
             sufficient: true,
             type: ItemType.ERC721,
+            isFee: false,
           },
         ]));
     });
@@ -580,6 +601,7 @@ describe('balanceCheck', () => {
             },
             sufficient: false,
             type: ItemType.ERC721,
+            isFee: false,
           },
           {
             current: {
@@ -602,6 +624,7 @@ describe('balanceCheck', () => {
             },
             sufficient: false,
             type: ItemType.ERC721,
+            isFee: false,
           },
         ]));
     });
@@ -612,6 +635,7 @@ describe('balanceCheck', () => {
       {
         type: ItemType.NATIVE,
         amount: BigNumber.from(1),
+        isFee: false,
       },
     ];
     const getBalancesResult = {

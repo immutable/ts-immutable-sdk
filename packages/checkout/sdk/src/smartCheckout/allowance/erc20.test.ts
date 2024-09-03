@@ -129,12 +129,14 @@ describe('allowance', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: true,
         },
         {
           type: ItemType.ERC20,
           tokenAddress: '0xERC20',
           amount: BigNumber.from(2),
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
       ];
 
@@ -165,12 +167,14 @@ describe('allowance', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: true,
         },
         {
           type: ItemType.ERC20,
           tokenAddress: '0xERC20',
           amount: BigNumber.from(1),
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
       ];
 
@@ -198,24 +202,28 @@ describe('allowance', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: true,
         },
         {
           type: ItemType.ERC20,
           tokenAddress: '0xERC20a',
           amount: BigNumber.from(2),
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
           tokenAddress: '0xERC20b',
           amount: BigNumber.from(1),
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
           tokenAddress: '0xERC20c',
           amount: BigNumber.from(2),
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
       ];
 
