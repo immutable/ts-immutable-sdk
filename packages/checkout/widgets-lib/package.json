@@ -99,7 +99,6 @@
   "license": "ISC",
   "main": "dist/main.js",
   "module": "dist/index.js",
-  "private": true,
   "scripts": {
     "build": "yarn clean && NODE_ENV=production rollup --config rollup.config.js",
     "build:analyse": "yarn build --plugin visualizer",
