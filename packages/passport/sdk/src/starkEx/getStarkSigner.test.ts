@@ -5,7 +5,7 @@ import {
 import { ethers } from 'ethers';
 import { trackError } from '@imtbl/metrics';
 import { getStarkSigner } from './getStarkSigner';
-import { PassportError } from '../errors/passportError';
+import { PassportError, PassportErrorType } from '../errors/passportError';
 
 jest.mock('@imtbl/x-client');
 jest.mock('@imtbl/metrics');
@@ -37,6 +37,10 @@ describe('getStarkSigner', () => {
       await getStarkSigner(wallet);
     } catch (error) {
       expect(error).toBeInstanceOf(PassportError);
+      expect(error).toMatchObject({
+        message: errorMessage,
+        type: PassportErrorType.WALLET_CONNECTION_ERROR,
+      });
       expect(trackError).toHaveBeenCalledWith(
         'passport',
         'imxGetStarkSigner',
