@@ -10,7 +10,7 @@ export const nativeAggregator = (
   itemRequirements.forEach((itemRequirement) => {
     const { type } = itemRequirement;
 
-    if (type !== ItemType.NATIVE) {
+    if (type !== ItemType.NATIVE || itemRequirement.isFee) {
       aggregatedItemRequirements.push(itemRequirement);
       return;
     }
@@ -37,7 +37,7 @@ export const erc20ItemAggregator = (
   itemRequirements.forEach((itemRequirement) => {
     const { type } = itemRequirement;
 
-    if (type !== ItemType.ERC20) {
+    if (type !== ItemType.ERC20 || itemRequirement.isFee) {
       aggregatedItemRequirements.push(itemRequirement);
       return;
     }
