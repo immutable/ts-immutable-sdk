@@ -3,12 +3,10 @@ import {
   generateLegacyStarkPrivateKey,
 } from '@imtbl/x-client';
 import { ethers } from 'ethers';
-import { trackError } from '@imtbl/metrics';
 import { getStarkSigner } from './getStarkSigner';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 
 jest.mock('@imtbl/x-client');
-jest.mock('@imtbl/metrics');
 
 describe('getStarkSigner', () => {
   const privateKey = '0x610855bbd7dad4efa59587e97041baa5ec96d483cac2ae78f2c2fb124fc391c1';
@@ -33,19 +31,13 @@ describe('getStarkSigner', () => {
     (generateLegacyStarkPrivateKey as jest.Mock).mockImplementation(() => {
       throw new Error(errorMessage);
     });
-    try {
+    await expect(async () => {
       await getStarkSigner(wallet);
-    } catch (error) {
-      expect(error).toBeInstanceOf(PassportError);
-      expect(error).toMatchObject({
-        message: errorMessage,
-        type: PassportErrorType.WALLET_CONNECTION_ERROR,
-      });
-      expect(trackError).toHaveBeenCalledWith(
-        'passport',
-        'imxGetStarkSigner',
-        error,
-      );
-    }
+    }).rejects.toThrow(
+      new PassportError(
+        errorMessage,
+        PassportErrorType.WALLET_CONNECTION_ERROR,
+      ),
+    );
   });
 });

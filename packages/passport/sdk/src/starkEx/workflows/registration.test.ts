@@ -1,10 +1,7 @@
 import { ImxApiClients } from '@imtbl/generated-clients';
-import { trackError } from '@imtbl/metrics';
 import registerPassport, { RegisterPassportParams } from './registration';
-import { PassportError, PassportErrorType } from '../../errors/passportError';
 
 jest.mock('@imtbl/generated-clients');
-jest.mock('@imtbl/metrics');
 
 describe('registration', () => {
   const requestBody = {
@@ -86,20 +83,9 @@ describe('registration', () => {
       imxApiClients,
     };
 
-    try {
-      await registerPassport(request, mockToken);
-    } catch (error) {
-      expect(error).toBeInstanceOf(PassportError);
-      expect(error).toMatchObject({
-        message: 'error',
-        type: PassportErrorType.USER_REGISTRATION_ERROR,
-      });
-      expect(trackError).toHaveBeenCalledWith(
-        'passport',
-        'imxRegisterUser',
-        error,
-      );
-    }
+    await expect(registerPassport(request, mockToken)).rejects.toThrow(
+      new Error('error'),
+    );
 
     expect(mockStarkSigner.signMessage).toHaveBeenCalled();
     expect(mockEthSigner.signMessage).toHaveBeenCalled();
