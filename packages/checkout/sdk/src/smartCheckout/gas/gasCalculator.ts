@@ -31,6 +31,7 @@ export const getGasItemRequirement = (
     return {
       type: ItemType.NATIVE,
       amount: gas,
+      isFee: true,
     };
   }
 
@@ -39,6 +40,7 @@ export const getGasItemRequirement = (
     amount: gas,
     tokenAddress: transactionOrGas.gasToken.tokenAddress,
     spenderAddress: '',
+    isFee: true,
   };
 };
 

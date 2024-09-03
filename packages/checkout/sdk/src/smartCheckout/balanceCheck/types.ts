@@ -8,6 +8,7 @@ export type BalanceNativeRequirement = {
   delta: BalanceDelta,
   current: TokenBalance,
   required: TokenBalance,
+  isFee: boolean,
 };
 
 export type BalanceERC20Requirement = {
@@ -16,6 +17,7 @@ export type BalanceERC20Requirement = {
   delta: BalanceDelta,
   current: TokenBalance,
   required: TokenBalance,
+  isFee: boolean,
 };
 
 export type BalanceERC721Requirement = {
@@ -24,6 +26,7 @@ export type BalanceERC721Requirement = {
   delta: BalanceDelta,
   current: ERC721Balance,
   required: ERC721Balance,
+  isFee: boolean,
 };
 
 export type BalanceRequirement = BalanceNativeRequirement | BalanceERC721Requirement | BalanceERC20Requirement;

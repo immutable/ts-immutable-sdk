@@ -96,6 +96,7 @@ export const getERC721BalanceRequirement = (
       balance: BigNumber.from(1),
       formattedBalance: '1',
     },
+    isFee: false,
   };
 };
 
@@ -194,6 +195,7 @@ export const getTokenBalanceRequirement = async (
         balance: BigNumber.from(itemRequirement.amount),
         formattedBalance: utils.formatUnits(itemRequirement.amount, decimals),
       },
+      isFee: itemRequirement.isFee,
     };
   }
 
@@ -239,5 +241,6 @@ export const getTokenBalanceRequirement = async (
       balance: BigNumber.from(itemRequirement.amount),
       formattedBalance: utils.formatUnits(itemRequirement.amount, decimals),
     },
+    isFee: itemRequirement.isFee,
   };
 };
