@@ -36,27 +36,35 @@ export function useProviderRelay() {
    */
   const execute = useCallback(
     async (payload: ProviderRelayPayload, executeProvider: Web3Provider) => {
-      if (!executeProvider?.provider.request) {
-        throw new Error("Provider only supports 'request' method");
-      }
-
       if (!postMessageHandler) {
         throw new Error(
           'Provider can execute request because PostMessageHandler is not initialized',
         );
       }
 
-      const { id, params, method } = payload.jsonRpcRequestMessage;
+      if (!executeProvider?.provider.request) {
+        throw new Error("Provider only supports 'request' method");
+      }
 
-      // Execute the request
-      const result = await executeProvider.provider.request({ method, params });
-      const formattedResponse = { id, result, jsonrpc: '2.0' };
+      try {
+        const { id, params, method } = payload.jsonRpcRequestMessage;
 
-      // Send the response using the postMessageHandler
-      postMessageHandler.send(PostMessageHandlerEventType.PROVIDER_RELAY, {
-        response: formattedResponse,
-        eip6963Info: payload.eip6963Info,
-      });
+        // Execute the request
+        const result = await executeProvider.provider.request({ method, params });
+        const formattedResponse = { id, result, jsonrpc: '2.0' };
+
+        // Send the response using the postMessageHandler
+        postMessageHandler.send(PostMessageHandlerEventType.PROVIDER_RELAY, {
+          response: formattedResponse,
+          eip6963Info: payload.eip6963Info,
+        });
+      } catch (error: any) {
+        // Send the error using the postMessageHandler
+        postMessageHandler.send(PostMessageHandlerEventType.PROVIDER_RELAY, {
+          response: { id: payload.jsonRpcRequestMessage.id, error: error.message, jsonrpc: '2.0' },
+          eip6963Info: payload.eip6963Info,
+        });
+      }
     },
     [postMessageHandler],
   );
@@ -107,9 +115,16 @@ export function useProviderRelay() {
         throw new Error('Provider is not defined');
       }
 
-      await execute(providerRelayPayload, currentProvider);
+      try {
+        await execute(providerRelayPayload, currentProvider);
+      } catch (error: any) {
+        // Send the error using the postMessageHandler
+        postMessageHandler.send(PostMessageHandlerEventType.PROVIDER_RELAY, {
+          response: { id: providerRelayPayload.jsonRpcRequestMessage.id, error: error.message, jsonrpc: '2.0' },
+          eip6963Info: providerRelayPayload.eip6963Info,
+        });
+      }
     },
-
     [provider, postMessageHandler, checkout, execute],
   );
 

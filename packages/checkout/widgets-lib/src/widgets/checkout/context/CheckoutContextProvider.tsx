@@ -1,4 +1,4 @@
-import { PostMessageHandler, PostMessageHandlerEventType } from '@imtbl/checkout-sdk';
+import { PostMessageHandler } from '@imtbl/checkout-sdk';
 import {
   Dispatch, ReactNode, useContext, useEffect,
 } from 'react';
@@ -21,13 +21,7 @@ export function CheckoutContextProvider({
   children,
 }: CheckoutContextProviderProps) {
   const { checkoutState, checkoutDispatch } = values;
-  const {
-    checkout,
-    provider,
-    iframeContentWindow,
-    postMessageHandler,
-    iframeURL,
-  } = checkoutState;
+  const { checkout, iframeContentWindow, iframeURL } = checkoutState;
 
   useEffect(() => {
     if (!iframeContentWindow || !checkout || !iframeURL) return;
@@ -49,15 +43,6 @@ export function CheckoutContextProvider({
       },
     });
   }, [iframeContentWindow, checkout, iframeURL]);
-
-  useEffect(() => {
-    if (!provider || !postMessageHandler) return;
-
-    postMessageHandler.send(PostMessageHandlerEventType.PROVIDER_UPDATED, {
-      isMetamask: provider.provider.isMetaMask,
-      isPassport: (provider.provider as any)?.isPassport,
-    });
-  }, [provider, postMessageHandler]);
 
   return (
     <CheckoutContext.Provider value={values}>
