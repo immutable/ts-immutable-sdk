@@ -52,7 +52,7 @@ export function ErrorView({
         <Link
           size="small"
           rc={
-            <a href="https://support.immutable.com/hc/en-us" />
+            <a href="https://support.immutable.com/hc" />
           }
         >
           {t('views.ERROR_VIEW.body', { returnObjects: true })[1]}
