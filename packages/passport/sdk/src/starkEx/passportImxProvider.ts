@@ -29,6 +29,7 @@ import {
 import registerOffchain from './workflows/registerOffchain';
 import MagicAdapter from '../magicAdapter';
 import { getStarkSigner } from './getStarkSigner';
+import { withMetricsAsync } from '../utils/metrics';
 
 export interface PassportImxProviderOptions {
   authManager: AuthManager;
@@ -173,8 +174,8 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   async transfer(request: UnsignedTransferRequest): Promise<imx.CreateTransferResponseV1> {
-    return (
-      this.guardianClient.withDefaultConfirmationScreenTask(async () => {
+    return withMetricsAsync(() => this.guardianClient.withDefaultConfirmationScreenTask(
+      async () => {
         const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
 
         return transfer({
@@ -184,29 +185,38 @@ export class PassportImxProvider implements IMXProvider {
           transfersApi: this.immutableXClient.transfersApi,
           guardianClient: this.guardianClient,
         });
-      })()
-    );
+      },
+    )(), 'imxTransfer');
   }
 
   async registerOffchain(): Promise<imx.RegisterUserResponse> {
-    const [user, signers] = await Promise.all([
-      this.#getAuthenticatedUser(),
-      this.#getSigners(),
-    ]);
+    return withMetricsAsync(
+      async () => {
+        const [user, signers] = await Promise.all([
+          this.#getAuthenticatedUser(),
+          this.#getSigners(),
+        ]);
 
-    return await registerOffchain(
-      signers.ethSigner,
-      signers.starkSigner,
-      user,
-      this.authManager,
-      this.imxApiClients,
+        return await registerOffchain(
+          signers.ethSigner,
+          signers.starkSigner,
+          user,
+          this.authManager,
+          this.imxApiClients,
+        );
+      },
+      'imxRegisterOffchain',
     );
   }
 
   async isRegisteredOffchain(): Promise<boolean> {
-    const user = await this.#getAuthenticatedUser();
-
-    return !!user.imx;
+    return withMetricsAsync(
+      async () => {
+        const user = await this.#getAuthenticatedUser();
+        return !!user.imx;
+      },
+      'imxIsRegisteredOffchain',
+    );
   }
 
   // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
@@ -218,7 +228,7 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   async createOrder(request: UnsignedOrderRequest): Promise<imx.CreateOrderResponse> {
-    return this.guardianClient.withDefaultConfirmationScreenTask(
+    return withMetricsAsync(() => this.guardianClient.withDefaultConfirmationScreenTask(
       async () => {
         const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
         return createOrder({
@@ -229,13 +239,13 @@ export class PassportImxProvider implements IMXProvider {
           guardianClient: this.guardianClient,
         });
       },
-    )();
+    )(), 'imxCreateOrder');
   }
 
   async cancelOrder(
     request: imx.GetSignableCancelOrderRequest,
   ): Promise<imx.CancelOrderResponse> {
-    return this.guardianClient.withDefaultConfirmationScreenTask(
+    return withMetricsAsync(() => this.guardianClient.withDefaultConfirmationScreenTask(
       async () => {
         const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
 
@@ -247,11 +257,11 @@ export class PassportImxProvider implements IMXProvider {
           guardianClient: this.guardianClient,
         });
       },
-    )();
+    )(), 'imxCancelOrder');
   }
 
   async createTrade(request: imx.GetSignableTradeRequest): Promise<imx.CreateTradeResponse> {
-    return this.guardianClient.withDefaultConfirmationScreenTask(
+    return withMetricsAsync(() => this.guardianClient.withDefaultConfirmationScreenTask(
       async () => {
         const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
 
@@ -263,13 +273,13 @@ export class PassportImxProvider implements IMXProvider {
           guardianClient: this.guardianClient,
         });
       },
-    )();
+    )(), 'imxCreateTrade');
   }
 
   async batchNftTransfer(
     request: NftTransferDetails[],
   ): Promise<imx.CreateTransferResponse> {
-    return this.guardianClient.withConfirmationScreenTask(
+    return withMetricsAsync(() => this.guardianClient.withConfirmationScreenTask(
       { width: 480, height: 784 },
     )(async () => {
       const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
@@ -281,20 +291,22 @@ export class PassportImxProvider implements IMXProvider {
         transfersApi: this.immutableXClient.transfersApi,
         guardianClient: this.guardianClient,
       });
-    })();
+    })(), 'imxBatchNftTransfer');
   }
 
   async exchangeTransfer(
     request: UnsignedExchangeTransferRequest,
   ): Promise<imx.CreateTransferResponseV1> {
-    const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
+    return withMetricsAsync(async () => {
+      const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
 
-    return exchangeTransfer({
-      request,
-      user,
-      starkSigner,
-      exchangesApi: this.immutableXClient.exchangeApi,
-    });
+      return exchangeTransfer({
+        request,
+        user,
+        starkSigner,
+        exchangesApi: this.immutableXClient.exchangeApi,
+      });
+    }, 'imxExchangeTransfer');
   }
 
   // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
@@ -327,14 +339,16 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   async getAddress(): Promise<string> {
-    const user = await this.#getAuthenticatedUser();
-    if (!isUserImx(user)) {
-      throw new PassportError(
-        'User has not been registered with StarkEx',
-        PassportErrorType.USER_NOT_REGISTERED_ERROR,
-      );
-    }
+    return withMetricsAsync(async () => {
+      const user = await this.#getAuthenticatedUser();
+      if (!isUserImx(user)) {
+        throw new PassportError(
+          'User has not been registered with StarkEx',
+          PassportErrorType.USER_NOT_REGISTERED_ERROR,
+        );
+      }
 
-    return Promise.resolve(user.imx.ethAddress);
+      return Promise.resolve(user.imx.ethAddress);
+    }, 'imxGetAddress');
   }
 }
