@@ -12,6 +12,7 @@ import {
 import {
   useCallback, useContext, useEffect, useState,
 } from 'react';
+import { RouteResponse } from '@0xsquid/squid-types';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
@@ -47,12 +48,7 @@ export function AddFunds({
   onBackButtonClick,
   onCloseButtonClick,
 }: AddFundsProps) {
-  console.log('provider', provider);
-  console.log('showOnrampOption', showOnrampOption);
-  console.log('showSwapOption', showSwapOption);
-  console.log('showBridgeOption', showBridgeOption);
-
-  const { addFundsDispatch } = useContext(AddFundsContext);
+  const { addFundsDispatch, addFundsState } = useContext(AddFundsContext);
 
   const { viewDispatch } = useContext(ViewContext);
 
@@ -80,6 +76,165 @@ export function AddFunds({
     },
     [viewDispatch],
   );
+
+  useEffect(() => {
+    const { squid } = addFundsState;
+
+    if (!squid || !provider) return;
+
+    const startTime = Date.now();
+    const getBalances = async () => {
+      const address = await provider.getSigner().getAddress();
+      const balances = await squid.getAllBalances({
+        chainIds: [1, 10],
+        evmAddress: address,
+      });
+      const positiveBalances = balances?.evmBalances?.filter((balance) => balance.balance !== '0');
+      console.log('positiveBalances:', positiveBalances);
+      console.log('@@@ balance time', (Date.now() - startTime) / 1000);
+
+      const startTokenDataTime = Date.now();
+      const tokenData = await squid.getTokenData('0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', '1');
+      console.log('tokenData:', tokenData);
+      console.log('@@@ tokenData time', (Date.now() - startTokenDataTime) / 1000);
+
+      const startTokenPricesDataTime = Date.now();
+      const tokenPrices = await squid.getMultipleTokensPrice({ chainId: '1' });
+      console.log('tokenPrices:', tokenPrices);
+      console.log('@@@ tokenPrices time', (Date.now() - startTokenPricesDataTime) / 1000);
+
+      // const params = {
+      //   fromAddress: address,
+      //   fromChain: '1',
+      //   fromToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      //   fromAmount: '1000000000000000',
+      //   toChain: '10',
+      //   toToken: '0x0b2c639c533813f4aa9d7837caf62653d097ff85',
+      //   toAddress: address,
+      //   enableBoost: true,
+      // };
+
+      // const paramsList = [
+      //   {
+      //     fromAddress: address,
+      //     fromChain: '1',
+      //     fromToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      //     fromAmount: '1000000000000000000',
+      //     toChain: '10',
+      //     toToken: '0x0b2c639c533813f4aa9d7837caf62653d097ff85', // USDC
+      //     toAddress: address,
+      //     enableBoost: true,
+      //   },
+      //   {
+      //     fromAddress: address,
+      //     fromChain: '1',
+      //     fromToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      //     fromAmount: '1000000000000000000',
+      //     toChain: '10',
+      //     toToken: '0x94b008aa00579c1307b0ef2c499ad98a8ce58e58', // USDT
+      //     toAddress: address,
+      //     enableBoost: true,
+      //   },
+      //   {
+      //     fromAddress: address,
+      //     fromChain: '1',
+      //     fromToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      //     fromAmount: '1000000000000000000',
+      //     toChain: '13371',
+      //     toToken: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', // IMX
+      //     toAddress: address,
+      //     enableBoost: true,
+      //   },
+      //   {
+      //     fromAddress: address,
+      //     fromChain: '1',
+      //     fromToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      //     fromAmount: '1000000000000000000',
+      //     toChain: '13371',
+      //     toToken: '0x6de8aCC0D406837030CE4dd28e7c08C5a96a30d2', // USDC
+      //     toAddress: address,
+      //     enableBoost: true,
+      //   },
+      //   {
+      //     fromAddress: address,
+      //     fromChain: '1',
+      //     fromToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      //     fromAmount: '1000000000000000000',
+      //     toChain: '13371',
+      //     toToken: '0xb00ed913aAFf8280C17BfF33CcE82fE6D79e85e8', // GOG
+      //     toAddress: address,
+      //     enableBoost: true,
+      //   },
+      // ];
+
+      const paramsList = [
+        {
+          fromAddress: address,
+          fromChain: '10',
+          fromToken: '0x0b2c639c533813f4aa9d7837caf62653d097ff85', // USDC
+          fromAmount: '1000000000000000',
+          toChain: '1',
+          toToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', // USDC
+          toAddress: address,
+          enableBoost: true,
+        },
+        {
+          fromAddress: address,
+          fromChain: '10',
+          fromToken: '0x94b008aa00579c1307b0ef2c499ad98a8ce58e58', // USDT
+          toChain: '1',
+          toToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+          fromAmount: '1000000000000000',
+          toAddress: address,
+          enableBoost: true,
+        },
+        {
+          fromAddress: address,
+          fromChain: '13371',
+          fromToken: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', // IMX
+          toChain: '1',
+          toToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+          fromAmount: '1000000000000000',
+          toAddress: address,
+          enableBoost: true,
+        },
+        {
+          fromAddress: address,
+          fromChain: '13371',
+          fromToken: '0x6de8aCC0D406837030CE4dd28e7c08C5a96a30d2', // USDC
+          toChain: '1',
+          toToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+          fromAmount: '1000000000000000',
+          toAddress: address,
+          enableBoost: true,
+        },
+        {
+          fromAddress: address,
+          fromChain: '13371',
+          fromToken: '0xb00ed913aAFf8280C17BfF33CcE82fE6D79e85e8', // GOG
+          toChain: '1',
+          toToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+          fromAmount: '1000000000000000',
+          toAddress: address,
+          enableBoost: true,
+        },
+      ];
+
+      const startRouteDataTime = Date.now();
+      const quoteRequests: Promise<RouteResponse>[] = [];
+      paramsList.map((param) => quoteRequests.push(squid.getRoute(param)));
+
+      const responses = await Promise.allSettled(
+        quoteRequests,
+      );
+
+      // const { route, requestId } = await squid.getRoute(params);
+      console.log('Calculated route:', responses);
+      console.log('@@@ Route time', (Date.now() - startRouteDataTime) / 1000);
+    };
+
+    getBalances();
+  }, [provider, addFundsState.squid]);
 
   useEffect(() => {
     if (!checkout) {
