@@ -32,12 +32,17 @@ export function TokenImage({
     [src, error],
   );
 
+  const { ...cleanedProps } = forwardedProps as Record<string, unknown>;
+  if (Object.prototype.hasOwnProperty.call(cleanedProps, 'responsiveSizes')) {
+    delete cleanedProps.responsiveSizes;
+  }
+
   return (
     <img
       src={url}
       alt={name}
       onError={() => setError(true)}
-      {...forwardedProps}
+      {...cleanedProps}
     />
   );
 }
