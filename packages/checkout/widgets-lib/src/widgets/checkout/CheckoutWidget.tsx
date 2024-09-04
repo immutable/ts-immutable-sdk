@@ -25,12 +25,11 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   const {
     config, checkout, params, provider,
   } = props;
-  const { environment, publishableKey } = checkout.config;
 
   const [, iframeURL] = useMemo(() => {
-    if (!publishableKey) return ['', ''];
-    return getIframeURL(params, config, environment, publishableKey);
-  }, [params, config, environment, publishableKey]);
+    if (!checkout.config.publishableKey) return ['', ''];
+    return getIframeURL(params, config, checkout.config);
+  }, [params, config, checkout.config]);
 
   const [checkoutState, checkoutDispatch] = useReducer(
     checkoutReducer,
