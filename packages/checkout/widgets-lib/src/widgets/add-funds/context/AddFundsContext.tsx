@@ -1,17 +1,23 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { createContext } from 'react';
+import {
+  createContext, ReactNode, useEffect, useMemo, useReducer,
+} from 'react';
 import { Checkout, TokenInfo } from '@imtbl/checkout-sdk';
+import { Squid } from '@0xsquid/sdk';
+import { useSquid } from '../../../hooks/useSquid';
 
 export interface AddFundsState {
   checkout: Checkout | null;
   provider: Web3Provider | null;
   allowedTokens: TokenInfo[] | null;
+  squid: Squid | null;
 }
 
 export const initialAddFundsState: AddFundsState = {
   checkout: null,
   provider: null,
   allowedTokens: null,
+  squid: null,
 };
 
 export interface AddFundsContextState {
@@ -26,12 +32,14 @@ export interface AddFundsAction {
 type ActionPayload =
   | SetCheckoutPayload
   | SetProviderPayload
-  | SetAllowedTokensPayload;
+  | SetAllowedTokensPayload
+  | SetSquid;
 
 export enum AddFundsActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
   SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
+  SET_SQUID = 'SET_SQUID',
 }
 
 export interface SetCheckoutPayload {
@@ -47,6 +55,11 @@ export interface SetProviderPayload {
 export interface SetAllowedTokensPayload {
   type: AddFundsActions.SET_ALLOWED_TOKENS;
   allowedTokens: TokenInfo[];
+}
+
+export interface SetSquid {
+  type: AddFundsActions.SET_SQUID;
+  squid: Squid;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -79,7 +92,41 @@ export const addFundsReducer: Reducer<AddFundsState, AddFundsAction> = (
         ...state,
         allowedTokens: action.payload.allowedTokens,
       };
+    case AddFundsActions.SET_SQUID:
+      return {
+        ...state,
+        squid: action.payload.squid,
+      };
     default:
       return state;
   }
 };
+
+export const useAddFundsValues = (overrides: Partial<AddFundsState> = {}) => {
+  const [addFundsState, addFundsDispatch] = useReducer(addFundsReducer, { ...initialAddFundsState, ...overrides });
+  const values = useMemo(() => ({ addFundsState, addFundsDispatch }), [addFundsState, addFundsDispatch]);
+  return values;
+};
+
+export function AddFundsProvider({ children }: { children: ReactNode }) {
+  const addFundsValue = useAddFundsValues();
+  const { addFundsState, addFundsDispatch } = addFundsValue;
+  const squid = useSquid();
+
+  useEffect(() => {
+    if (!addFundsDispatch || !squid) return;
+
+    addFundsDispatch({
+      payload: {
+        type: AddFundsActions.SET_SQUID,
+        squid,
+      },
+    });
+  }, [addFundsDispatch, squid, addFundsState.squid]);
+
+  return (
+    <AddFundsContext.Provider value={addFundsValue}>
+      {children}
+    </AddFundsContext.Provider>
+  );
+}
