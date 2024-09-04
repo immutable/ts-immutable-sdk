@@ -12,6 +12,7 @@ import {
   UnsignedOrderRequest,
   UnsignedTransferRequest,
 } from '@imtbl/x-client';
+import { trackError, trackFlow } from '@imtbl/metrics';
 import registerPassportStarkEx from './workflows/registration';
 import { mockUser, mockUserImx } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
@@ -32,6 +33,7 @@ jest.mock('./workflows/registration');
 jest.mock('./getStarkSigner');
 jest.mock('@imtbl/generated-clients');
 jest.mock('@imtbl/x-client');
+jest.mock('@imtbl/metrics');
 
 describe('PassportImxProvider', () => {
   afterEach(jest.resetAllMocks);
@@ -83,6 +85,11 @@ describe('PassportImxProvider', () => {
     passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
     mockAuthManager.getUser.mockResolvedValue(mockUserImx);
 
+    // Metrics
+    (trackFlow as unknown as jest.Mock).mockImplementation(() => ({
+      addEvent: jest.fn(),
+    }));
+
     // Signers
     magicAdapterMock.login.mockResolvedValue({ getSigner: getSignerMock });
     (Web3Provider as unknown as jest.Mock).mockReturnValue({ getSigner: getSignerMock });
@@ -124,6 +131,11 @@ describe('PassportImxProvider', () => {
       // Signers
       magicAdapterMock.login.mockResolvedValue({});
       (getStarkSigner as jest.Mock).mockRejectedValue(new Error('error'));
+
+      // Metrics
+      (trackFlow as unknown as jest.Mock).mockImplementation(() => ({
+        addEvent: jest.fn(),
+      }));
 
       const pp = new PassportImxProvider({
         authManager: mockAuthManager as unknown as AuthManager,
@@ -359,15 +371,15 @@ describe('PassportImxProvider', () => {
   });
 
   describe.each([
-    ['transfer' as const, {} as UnsignedTransferRequest],
-    ['createOrder' as const, {} as UnsignedOrderRequest],
-    ['cancelOrder' as const, {} as imx.GetSignableCancelOrderRequest],
-    ['createTrade' as const, {} as imx.GetSignableTradeRequest],
-    ['batchNftTransfer' as const, [] as NftTransferDetails[]],
-    ['exchangeTransfer' as const, {} as UnsignedExchangeTransferRequest],
-    ['getAddress' as const, {} as any],
-    ['isRegisteredOffchain' as const, {} as any],
-  ])('when the user has been logged out - %s', (methodName, args) => {
+    ['transfer' as const, 'imxTransfer', {} as UnsignedTransferRequest],
+    ['createOrder' as const, 'imxCreateOrder', {} as UnsignedOrderRequest],
+    ['cancelOrder' as const, 'imxCancelOrder', {} as imx.GetSignableCancelOrderRequest],
+    ['createTrade' as const, 'imxCreateTrade', {} as imx.GetSignableTradeRequest],
+    ['batchNftTransfer' as const, 'imxBatchNftTransfer', [] as NftTransferDetails[]],
+    ['exchangeTransfer' as const, 'imxExchangeTransfer', {} as UnsignedExchangeTransferRequest],
+    ['getAddress' as const, 'imxGetAddress', {} as any],
+    ['isRegisteredOffchain' as const, 'imxIsRegisteredOffchain', {} as any],
+  ])('when the user has been logged out - %s', (methodName, eventName, args) => {
     beforeEach(() => {
       passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
     });
@@ -382,18 +394,34 @@ describe('PassportImxProvider', () => {
           ),
         );
     });
+
+    it(`should track metrics when error thrown for ${methodName}`, async () => {
+      try {
+        await passportImxProvider[methodName!](args);
+      } catch (error) {
+        expect(trackFlow).toHaveBeenCalledWith(
+          'passport',
+          eventName,
+        );
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          eventName,
+          error,
+        );
+      }
+    });
   });
 
   describe.each([
-    ['transfer' as const, {} as UnsignedTransferRequest],
-    ['createOrder' as const, {} as UnsignedOrderRequest],
-    ['cancelOrder' as const, {} as imx.GetSignableCancelOrderRequest],
-    ['createTrade' as const, {} as imx.GetSignableTradeRequest],
-    ['batchNftTransfer' as const, [] as NftTransferDetails[]],
-    ['exchangeTransfer' as const, {} as UnsignedExchangeTransferRequest],
-    ['getAddress' as const, {} as any],
-    ['isRegisteredOffchain' as const, {} as any],
-  ])('when the user\'s access token is expired and cannot be retrieved', (methodName, args) => {
+    ['transfer' as const, 'imxTransfer', {} as UnsignedTransferRequest],
+    ['createOrder' as const, 'imxCreateOrder', {} as UnsignedOrderRequest],
+    ['cancelOrder' as const, 'imxCancelOrder', {} as imx.GetSignableCancelOrderRequest],
+    ['createTrade' as const, 'imxCreateTrade', {} as imx.GetSignableTradeRequest],
+    ['batchNftTransfer' as const, 'imxBatchNftTransfer', [] as NftTransferDetails[]],
+    ['exchangeTransfer' as const, 'imxExchangeTransfer', {} as UnsignedExchangeTransferRequest],
+    ['getAddress' as const, 'imxGetAddress', {} as any],
+    ['isRegisteredOffchain' as const, 'imxIsRegisteredOffchain', {} as any],
+  ])('when the user\'s access token is expired and cannot be retrieved', (methodName, eventName, args) => {
     beforeEach(() => {
       mockAuthManager.getUser.mockResolvedValue(null);
     });
@@ -407,6 +435,22 @@ describe('PassportImxProvider', () => {
             PassportErrorType.NOT_LOGGED_IN_ERROR,
           ),
         );
+    });
+
+    it(`should track metrics when error thrown for ${methodName}`, async () => {
+      try {
+        await passportImxProvider[methodName!](args);
+      } catch (error) {
+        expect(trackFlow).toHaveBeenCalledWith(
+          'passport',
+          eventName,
+        );
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          eventName,
+          error,
+        );
+      }
     });
   });
 });
