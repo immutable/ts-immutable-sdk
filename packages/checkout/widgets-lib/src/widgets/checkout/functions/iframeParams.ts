@@ -154,10 +154,10 @@ export const getIframeURL = (
     environment = checkoutConfig.overrides.environment;
   }
 
-  const baseURL = checkoutConfig.overrides?.checkoutAppUrl ?? CHECKOUT_APP_URL[environment];
+  const baseURL = checkoutConfig.overrides?.checkoutAppUrl as string ?? CHECKOUT_APP_URL[environment];
   const queryParams = getIframeParams(params, widgetConfig, checkoutConfig);
 
   const iframeURL = `${baseURL}/${publishableKey}/${language}/${flow}?${queryParams}`;
 
-  return [baseURL, iframeURL];
+  return [baseURL, iframeURL] as const;
 };
