@@ -1,12 +1,16 @@
 import {
+  CheckoutConfiguration,
   CheckoutFlowType,
   CheckoutWidgetConfiguration,
   CheckoutWidgetParams,
 } from '@imtbl/checkout-sdk';
+
 import { Environment } from '@imtbl/config';
+import { CHECKOUT_APP_URL, ENV_DEVELOPMENT } from '../../../lib/constants';
 
-import { CHECKOUT_APP_URL } from '../../../lib/constants';
-
+/**
+ * Converts a record of parameters to a query string.
+ */
 const toQueryString = (params: Record<string, unknown>): string => {
   const sanitizedParams = Object.entries(params)
     .filter(([, value]) => value !== undefined)
@@ -22,21 +26,27 @@ const toQueryString = (params: Record<string, unknown>): string => {
   return new URLSearchParams(sanitizedParams).toString();
 };
 
-// TODO: Can be removed after updating params across widgets
+/**
+ * Maps the flow configuration and params to the corresponding query parameters.
+ */
 const getIframeParams = (
   params: CheckoutWidgetParams,
-  config: CheckoutWidgetConfiguration,
+  widgetConfig: CheckoutWidgetConfiguration,
+  checkoutConfig: CheckoutConfiguration,
 ): string => {
   const { flow } = params;
   const commonConfig = {
-    theme: config.theme,
+    theme: widgetConfig.theme,
+    language: widgetConfig.language,
+    publishableKey: checkoutConfig.publishableKey,
+    sdkVersion: checkoutConfig.sdkVersion,
   };
 
   switch (flow) {
     case CheckoutFlowType.CONNECT:
       return toQueryString({
         ...commonConfig,
-        ...(config.connect || {}),
+        ...(widgetConfig.connect || {}),
         chainId: params.targetChainId,
         walletRdns: params.targetWalletRdns,
         blocklistWalletRdns: params.blocklistWalletRdns,
@@ -44,7 +54,7 @@ const getIframeParams = (
     case CheckoutFlowType.WALLET:
       return toQueryString({
         ...commonConfig,
-        ...(config.wallet || {}),
+        ...(widgetConfig.wallet || {}),
         // FIMXE: Add connection params
         // chainId:
         // walletRdns:
@@ -56,7 +66,7 @@ const getIframeParams = (
     case CheckoutFlowType.SWAP:
       return toQueryString({
         ...commonConfig,
-        ...(config.swap || {}),
+        ...(widgetConfig.swap || {}),
         // FIMXE: Add connection params
         // chainId:
         // walletRdns:
@@ -71,7 +81,7 @@ const getIframeParams = (
     case CheckoutFlowType.BRIDGE:
       return toQueryString({
         ...commonConfig,
-        ...(config.bridge || {}),
+        ...(widgetConfig.bridge || {}),
         // FIMXE: Add bridge params
         // fromChainId:
         // toChainId:
@@ -86,7 +96,7 @@ const getIframeParams = (
     case CheckoutFlowType.ONRAMP:
       return toQueryString({
         ...commonConfig,
-        ...(config.onRamp || {}),
+        ...(widgetConfig.onRamp || {}),
         // FIMXE: Add connection params
         // chainId:
         // walletRdns:
@@ -100,7 +110,7 @@ const getIframeParams = (
     case CheckoutFlowType.SALE:
       return toQueryString({
         ...commonConfig,
-        ...(config.sale || {}),
+        ...(widgetConfig.sale || {}),
         // FIMXE: Add connection params
         // chainId:
         // walletRdns:
@@ -123,17 +133,29 @@ const getIframeParams = (
   }
 };
 
+/**
+ * Returns the iframe URL for the Checkout App based on the environment.
+ */
 export const getIframeURL = (
   params: CheckoutWidgetParams,
-  config: CheckoutWidgetConfiguration,
-  environment: Environment,
-  publishableKey: string,
+  widgetConfig: CheckoutWidgetConfiguration,
+  checkoutConfig: CheckoutConfiguration,
 ) => {
   const { flow } = params;
-  const language = params.language || config.language;
+  const { publishableKey } = checkoutConfig;
 
-  const baseURL = CHECKOUT_APP_URL[environment];
-  const queryParams = getIframeParams(params, config);
+  const language = params.language || widgetConfig.language;
+
+  let environment: Environment = checkoutConfig.environment || Environment.SANDBOX;
+  if (checkoutConfig.isDevelopment) {
+    environment = ENV_DEVELOPMENT;
+  }
+  if (checkoutConfig.overrides?.environment) {
+    environment = checkoutConfig.overrides.environment;
+  }
+
+  const baseURL = checkoutConfig.overrides?.checkoutAppUrl ?? CHECKOUT_APP_URL[environment];
+  const queryParams = getIframeParams(params, widgetConfig, checkoutConfig);
 
   const iframeURL = `${baseURL}/${publishableKey}/${language}/${flow}?${queryParams}`;
 
