@@ -93,6 +93,7 @@ describe('Passport', () => {
     (Magic as jest.Mock).mockImplementation(() => ({
       openid: { loginWithOIDC: mockLoginWithOidc },
       rpcProvider: { request: mockMagicRequest },
+      preload: jest.fn(),
     }));
   });
 
