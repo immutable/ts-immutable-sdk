@@ -41,16 +41,15 @@ const getBaseConfig = () =>
   });
 
 // create a passport client
-const getPassportClient = () => {
+const getPassportClient = () =>
   new Passport({
     baseConfig: getBaseConfig(),
     audience: "platform_api",
     scope: "openid offline_access email transact",
     clientId: "ViaYO6JWck4TZOiiojEak8mz6WvQh3wK",
-    redirectUri: "http://localhost:3001/checkout?login=true",
-    logoutRedirectUri: "http://localhost:3001/checkout?logout=true",
+    redirectUri: "http://localhost:3000/checkout?login=true",
+    logoutRedirectUri: "http://localhost:3000/checkout?logout=true",
   });
-};
 
 // create Checkout SDK
 const getCheckoutSdk = (passportClient: Passport) =>
