@@ -178,7 +178,7 @@ export function ConnectLoader({
         if (!isConnected) return;
 
         try {
-          const currentNetworkInfo = await checkout.getNetworkInfo({ provider: web3Provider! });
+          // const currentNetworkInfo = await checkout.getNetworkInfo({ provider: web3Provider! });
 
           // TODO: do this instead, replace chainId check with below code instead of checkout.getNetworkInfo
           // Also, skip the entire section if it is Passport.
@@ -186,16 +186,16 @@ export function ConnectLoader({
 
           // If unsupported network or current network is not in the allowed chains
           // then show the switch network screen
-          if (!currentNetworkInfo.isSupported || !allowedChains.includes(currentNetworkInfo.chainId)) {
-            connectLoaderDispatch({
-              payload: {
-                type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
-                connectionStatus: ConnectionStatus.CONNECTED_WRONG_NETWORK,
-                deepLink: ConnectWidgetViews.SWITCH_NETWORK,
-              },
-            });
-            return;
-          }
+          // if (!currentNetworkInfo.isSupported || !allowedChains.includes(currentNetworkInfo.chainId)) {
+          //   connectLoaderDispatch({
+          //     payload: {
+          //       type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+          //       connectionStatus: ConnectionStatus.CONNECTED_WRONG_NETWORK,
+          //       deepLink: ConnectWidgetViews.SWITCH_NETWORK,
+          //     },
+          //   });
+          //   return;
+          // }
         } catch (err) {
           return;
         }
