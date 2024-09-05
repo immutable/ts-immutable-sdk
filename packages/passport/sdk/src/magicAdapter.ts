@@ -24,7 +24,6 @@ export default class MagicAdapter {
           extensions: [new OpenIdExtension()],
           network: MAINNET, // We always connect to mainnet to ensure addresses are the same across envs
         });
-        client.preload();
         return client;
       });
     }
