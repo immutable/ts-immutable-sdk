@@ -83,11 +83,7 @@ describe('balanceCheck', () => {
             {
               balance: BigNumber.from(1),
               formattedBalance: '0.000000000000000001',
-              token: {
-                name: 'IMX',
-                symbol: 'IMX',
-                decimals: 18,
-              },
+              token: ZKEVM_NATIVE_TOKEN,
             },
           ],
       };
@@ -107,16 +103,13 @@ describe('balanceCheck', () => {
               current: {
                 ...getBalancesResult.balances[0],
                 type: ItemType.NATIVE,
+                token: ZKEVM_NATIVE_TOKEN,
               },
               required: {
                 type: ItemType.NATIVE,
                 balance: BigNumber.from(3),
                 formattedBalance: '0.000000000000000003',
-                token: {
-                  name: 'IMX',
-                  symbol: 'IMX',
-                  decimals: 18,
-                },
+                token: ZKEVM_NATIVE_TOKEN,
               },
               isFee: false,
             },
@@ -513,11 +506,7 @@ describe('balanceCheck', () => {
               type: ItemType.NATIVE,
               balance: BigNumber.from(1),
               formattedBalance: '0.000000000000000001',
-              token: {
-                decimals: 18,
-                name: '',
-                symbol: '',
-              },
+              token: ZKEVM_NATIVE_TOKEN,
             },
             delta: {
               balance: BigNumber.from(0),
@@ -527,11 +516,7 @@ describe('balanceCheck', () => {
               type: ItemType.NATIVE,
               balance: BigNumber.from(1),
               formattedBalance: '0.000000000000000001',
-              token: {
-                name: '',
-                symbol: '',
-                decimals: 18,
-              },
+              token: ZKEVM_NATIVE_TOKEN,
             },
             sufficient: true,
             type: ItemType.NATIVE,
@@ -542,11 +527,7 @@ describe('balanceCheck', () => {
               type: ItemType.NATIVE,
               balance: BigNumber.from(0),
               formattedBalance: '0.0',
-              token: {
-                decimals: 18,
-                name: '',
-                symbol: '',
-              },
+              token: ZKEVM_NATIVE_TOKEN,
             },
             delta: {
               balance: BigNumber.from(1),
@@ -556,11 +537,7 @@ describe('balanceCheck', () => {
               type: ItemType.NATIVE,
               balance: BigNumber.from(1),
               formattedBalance: '0.000000000000000001',
-              token: {
-                name: '',
-                symbol: '',
-                decimals: 18,
-              },
+              token: ZKEVM_NATIVE_TOKEN,
             },
             sufficient: false,
             type: ItemType.NATIVE,
