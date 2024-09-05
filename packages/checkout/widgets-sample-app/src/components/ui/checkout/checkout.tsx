@@ -29,10 +29,7 @@ import { Environment, ImmutableConfiguration } from "@imtbl/config";
 
 import { useAsyncMemo, usePrevState } from "../../../hooks";
 
-const checkoutAppUrl = "https://imtbl-checkout.vercel.app/";
-
 const publishableKey = "pk_imapik-test-Xdera@";
-// const publishableKey = "pk_imapik-test-gaDU8iOIIn-mLBc@Vvpm"
 
 // create a base config
 const getBaseConfig = () =>
@@ -44,15 +41,16 @@ const getBaseConfig = () =>
   });
 
 // create a passport client
-const getPassportClient = () =>
+const getPassportClient = () => {
   new Passport({
     baseConfig: getBaseConfig(),
     audience: "platform_api",
     scope: "openid offline_access email transact",
     clientId: "ViaYO6JWck4TZOiiojEak8mz6WvQh3wK",
-    redirectUri: `${checkoutAppUrl}?login=true`,
-    logoutRedirectUri: `${checkoutAppUrl}?logout=true`,
+    redirectUri: "http://localhost:3001/checkout?login=true",
+    logoutRedirectUri: "http://localhost:3001/checkout?logout=true",
   });
+};
 
 // create Checkout SDK
 const getCheckoutSdk = (passportClient: Passport) =>
@@ -61,7 +59,7 @@ const getCheckoutSdk = (passportClient: Passport) =>
     passport: passportClient,
     baseConfig: getBaseConfig(),
     overrides: {
-      checkoutAppUrl,
+      // checkoutAppUrl: "http://localhost:3001",
       // environment: "development" as Environment,
     },
     // swap: { enable: true }
@@ -71,14 +69,14 @@ const getCheckoutSdk = (passportClient: Passport) =>
 
 // handle passport login
 const usePassportLoginCallback = (passportClient: Passport) => {
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const loginParam = params.get("login");
+  const params = new URLSearchParams(window.location.search);
+  const loginParam = params.get("login");
 
+  useEffect(() => {
     if (loginParam === "true") {
       passportClient?.loginCallback();
     }
-  }, [passportClient]);
+  }, [loginParam, passportClient]);
 };
 
 // handle creating and connecting a provider
