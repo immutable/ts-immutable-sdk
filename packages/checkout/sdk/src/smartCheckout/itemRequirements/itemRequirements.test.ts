@@ -16,7 +16,6 @@ describe('itemRequirements', () => {
         {
           type: ItemType.NATIVE,
           amount: '2.0',
-          isFee: true,
         },
         {
           type: ItemType.ERC20,
@@ -44,7 +43,6 @@ describe('itemRequirements', () => {
         {
           type: ItemType.NATIVE,
           amount: utils.parseUnits('2.0', 18),
-          isFee: true,
         },
         {
           type: ItemType.ERC20,
