@@ -246,7 +246,7 @@ describe('balanceCheck', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
-          isFee: false,
+          isFee: true,
         },
         {
           type: ItemType.ERC20,
@@ -286,18 +286,39 @@ describe('balanceCheck', () => {
               token: ZKEVM_NATIVE_TOKEN,
             },
             delta: {
-              balance: BigNumber.from(2),
-              formattedBalance: '0.000000000000000002',
+              balance: BigNumber.from(1),
+              formattedBalance: '0.000000000000000001',
             },
             required: {
               type: ItemType.NATIVE,
-              balance: BigNumber.from(2),
-              formattedBalance: '0.000000000000000002',
+              balance: BigNumber.from(1),
+              formattedBalance: '0.000000000000000001',
               token: ZKEVM_NATIVE_TOKEN,
             },
             sufficient: false,
             type: ItemType.NATIVE,
             isFee: false,
+          },
+          {
+            current: {
+              type: ItemType.NATIVE,
+              balance: BigNumber.from(0),
+              formattedBalance: '0',
+              token: ZKEVM_NATIVE_TOKEN,
+            },
+            delta: {
+              balance: BigNumber.from(1),
+              formattedBalance: '0.000000000000000001',
+            },
+            required: {
+              type: ItemType.NATIVE,
+              balance: BigNumber.from(1),
+              formattedBalance: '0.000000000000000001',
+              token: ZKEVM_NATIVE_TOKEN,
+            },
+            sufficient: false,
+            type: ItemType.NATIVE,
+            isFee: true,
           },
           {
             delta: {
@@ -399,7 +420,7 @@ describe('balanceCheck', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from('1'),
-          isFee: false,
+          isFee: true,
         },
         {
           type: ItemType.ERC20,
@@ -457,35 +478,6 @@ describe('balanceCheck', () => {
       expect(result.balanceRequirements)
         .toEqual(expect.arrayContaining([
           {
-            current: {
-              type: ItemType.NATIVE,
-              balance: BigNumber.from(1),
-              formattedBalance: '0.000000000000000001',
-              token: {
-                decimals: 18,
-                name: '',
-                symbol: '',
-              },
-            },
-            delta: {
-              balance: BigNumber.from(1),
-              formattedBalance: '0.000000000000000001',
-            },
-            required: {
-              type: ItemType.NATIVE,
-              balance: BigNumber.from(2),
-              formattedBalance: '0.000000000000000002',
-              token: {
-                name: '',
-                symbol: '',
-                decimals: 18,
-              },
-            },
-            sufficient: false,
-            type: ItemType.NATIVE,
-            isFee: false,
-          },
-          {
             delta: {
               balance: BigNumber.from(20),
               formattedBalance: '0.00000000000000002',
@@ -515,6 +507,64 @@ describe('balanceCheck', () => {
             sufficient: false,
             type: ItemType.ERC20,
             isFee: false,
+          },
+          {
+            current: {
+              type: ItemType.NATIVE,
+              balance: BigNumber.from(1),
+              formattedBalance: '0.000000000000000001',
+              token: {
+                decimals: 18,
+                name: '',
+                symbol: '',
+              },
+            },
+            delta: {
+              balance: BigNumber.from(0),
+              formattedBalance: '0.0',
+            },
+            required: {
+              type: ItemType.NATIVE,
+              balance: BigNumber.from(1),
+              formattedBalance: '0.000000000000000001',
+              token: {
+                name: '',
+                symbol: '',
+                decimals: 18,
+              },
+            },
+            sufficient: true,
+            type: ItemType.NATIVE,
+            isFee: false,
+          },
+          {
+            current: {
+              type: ItemType.NATIVE,
+              balance: BigNumber.from(0),
+              formattedBalance: '0.0',
+              token: {
+                decimals: 18,
+                name: '',
+                symbol: '',
+              },
+            },
+            delta: {
+              balance: BigNumber.from(1),
+              formattedBalance: '0.000000000000000001',
+            },
+            required: {
+              type: ItemType.NATIVE,
+              balance: BigNumber.from(1),
+              formattedBalance: '0.000000000000000001',
+              token: {
+                name: '',
+                symbol: '',
+                decimals: 18,
+              },
+            },
+            sufficient: false,
+            type: ItemType.NATIVE,
+            isFee: true,
           },
           {
             delta: {

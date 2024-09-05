@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
 import {
   ChainId,
@@ -8,13 +8,20 @@ import {
   ItemRequirement,
   ItemType,
   NativeItem,
+  TokenInfo,
 } from '../../types';
 import {
   getERC721BalanceRequirement,
   getTokenBalanceRequirement,
   getTokensFromRequirements,
+  getTokensInfo,
 } from './balanceRequirement';
-import { NATIVE } from '../../env';
+import { NATIVE, ZKEVM_NATIVE_TOKEN } from '../../env';
+
+jest.mock('ethers', () => ({
+  ...jest.requireActual('ethers'),
+  Contract: jest.fn(),
+}));
 
 describe('balanceRequirement', () => {
   describe('getTokensFromRequirements', () => {
@@ -144,10 +151,12 @@ describe('balanceRequirement', () => {
     });
   });
 
-  describe('getTokenBalanceRequirement', () => {
+  describe('getTokensInfo', () => {
     let mockProvider: Web3Provider;
 
     beforeEach(() => {
+      jest.resetAllMocks();
+
       mockProvider = {
         getSigner: jest.fn().mockReturnValue({
           getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
@@ -158,7 +167,97 @@ describe('balanceRequirement', () => {
       } as unknown as Web3Provider;
     });
 
-    it('should return sufficient true if meets requirements for NATIVE', async () => {
+    it('should return native token data if type is native', async () => {
+      const itemRequirements: NativeItem[] = [
+        {
+          type: ItemType.NATIVE,
+          amount: BigNumber.from('1000000000000000000'),
+          isFee: true,
+        },
+      ];
+      const balances: ItemBalance[] = [
+        {
+          type: ItemType.NATIVE,
+          balance: BigNumber.from('1000000000000000000'),
+          formattedBalance: '1.0',
+          token: {
+            name: 'IMX',
+            symbol: 'IMX',
+            decimals: 18,
+          },
+        },
+      ];
+
+      const tokensInfo = await getTokensInfo(itemRequirements, balances, mockProvider);
+
+      expect(tokensInfo).toHaveProperty(NATIVE, ZKEVM_NATIVE_TOKEN);
+    });
+
+    it('should fetch ERC20 details from balance when available', async () => {
+      const itemRequirements: ERC20Item[] = [
+        {
+          type: ItemType.ERC20,
+          tokenAddress: '0xERC20',
+          amount: BigNumber.from('1000000000000000000'),
+          spenderAddress: '0xSEAPORT',
+          isFee: true,
+        },
+      ];
+      const balances: ItemBalance[] = [
+        {
+          type: ItemType.ERC20,
+          balance: BigNumber.from('1000000000000000000'),
+          formattedBalance: '1.0',
+          token: {
+            name: 'ERC20',
+            symbol: 'ERC20',
+            decimals: 18,
+            address: '0xERC20',
+          },
+        },
+      ];
+
+      const tokensInfo = await getTokensInfo(itemRequirements, balances, mockProvider);
+
+      expect(tokensInfo).toHaveProperty('0xerc20', {
+        name: 'ERC20',
+        symbol: 'ERC20',
+        decimals: 18,
+        address: '0xERC20',
+      });
+    });
+
+    it('should fetch ERC20 details from contract when not available in balance', async () => {
+      const itemRequirements: ERC20Item[] = [
+        {
+          type: ItemType.ERC20,
+          tokenAddress: '0xERC20',
+          amount: BigNumber.from('1000000000000000000'),
+          spenderAddress: '0xSEAPORT',
+          isFee: true,
+        },
+      ];
+      const balances: ItemBalance[] = [];
+
+      (Contract as unknown as jest.Mock).mockImplementation(() => ({
+        symbol: jest.fn().mockResolvedValue('ERC20'),
+        name: jest.fn().mockResolvedValue('ERC20'),
+        decimals: jest.fn().mockResolvedValue(18),
+      }));
+
+      const tokensInfo = await getTokensInfo(itemRequirements, balances, mockProvider);
+
+      expect(tokensInfo).toHaveProperty('0xerc20', {
+        name: 'ERC20',
+        symbol: 'ERC20',
+        decimals: 18,
+        address: '0xERC20',
+      });
+    });
+  });
+
+  describe('getTokenBalanceRequirement', () => {
+    it('should return sufficient true if meets requirements for NATIVE', () => {
       const itemRequirement: NativeItem = {
         type: ItemType.NATIVE,
         amount: BigNumber.from('1000000000000000000'),
@@ -176,11 +275,12 @@ describe('balanceRequirement', () => {
           },
         },
       ];
+      const tokenInfo: TokenInfo = ZKEVM_NATIVE_TOKEN;
 
-      const result = await getTokenBalanceRequirement(
+      const result = getTokenBalanceRequirement(
         itemRequirement,
         balances,
-        mockProvider,
+        tokenInfo,
       );
       expect(result).toEqual({
         sufficient: true,
@@ -193,27 +293,19 @@ describe('balanceRequirement', () => {
           type: ItemType.NATIVE,
           balance: BigNumber.from('1000000000000000000'),
           formattedBalance: '1.0',
-          token: {
-            name: 'IMX',
-            symbol: 'IMX',
-            decimals: 18,
-          },
+          token: tokenInfo,
         },
         current: {
           type: ItemType.NATIVE,
           balance: BigNumber.from('1000000000000000000'),
           formattedBalance: '1.0',
-          token: {
-            name: 'IMX',
-            symbol: 'IMX',
-            decimals: 18,
-          },
+          token: tokenInfo,
         },
         isFee: true,
       });
     });
 
-    it('should return sufficient true if meets requirements for ERC20', async () => {
+    it('should return sufficient true if meets requirements for ERC20', () => {
       const itemRequirement: ERC20Item = {
         type: ItemType.ERC20,
         tokenAddress: '0xERC20',
@@ -234,11 +326,17 @@ describe('balanceRequirement', () => {
           },
         },
       ];
+      const tokenInfo: TokenInfo = {
+        name: 'ERC20',
+        symbol: 'ERC20',
+        decimals: 18,
+        address: '0xERC20',
+      };
 
-      const result = await getTokenBalanceRequirement(
+      const result = getTokenBalanceRequirement(
         itemRequirement,
         balances,
-        mockProvider,
+        tokenInfo,
       );
       expect(result).toEqual({
         sufficient: true,
@@ -251,29 +349,19 @@ describe('balanceRequirement', () => {
           type: ItemType.ERC20,
           balance: BigNumber.from('1000000000000000000'),
           formattedBalance: '1.0',
-          token: {
-            name: 'ERC20',
-            symbol: 'ERC20',
-            decimals: 18,
-            address: '0xERC20',
-          },
+          token: tokenInfo,
         },
         current: {
           type: ItemType.ERC20,
           balance: BigNumber.from('1000000000000000000'),
           formattedBalance: '1.0',
-          token: {
-            name: 'ERC20',
-            symbol: 'ERC20',
-            decimals: 18,
-            address: '0xERC20',
-          },
+          token: tokenInfo,
         },
         isFee: true,
       });
     });
 
-    it('should return sufficient false if requirements not met for NATIVE', async () => {
+    it('should return sufficient false if requirements not met for NATIVE', () => {
       const itemRequirement: NativeItem = {
         type: ItemType.NATIVE,
         amount: BigNumber.from('1000000000000000000'),
@@ -303,10 +391,12 @@ describe('balanceRequirement', () => {
         },
       ];
 
-      const result = await getTokenBalanceRequirement(
+      const tokenInfo: TokenInfo = ZKEVM_NATIVE_TOKEN;
+
+      const result = getTokenBalanceRequirement(
         itemRequirement,
         balances,
-        mockProvider,
+        tokenInfo,
       );
       expect(result).toEqual({
         sufficient: false,
@@ -319,27 +409,19 @@ describe('balanceRequirement', () => {
           type: ItemType.NATIVE,
           balance: BigNumber.from('1000000000000000000'),
           formattedBalance: '1.0',
-          token: {
-            name: 'IMX',
-            symbol: 'IMX',
-            decimals: 18,
-          },
+          token: tokenInfo,
         },
         current: {
           type: ItemType.NATIVE,
           balance: BigNumber.from('10000000000'),
           formattedBalance: '0.000001',
-          token: {
-            name: 'IMX',
-            symbol: 'IMX',
-            decimals: 18,
-          },
+          token: tokenInfo,
         },
         isFee: false,
       });
     });
 
-    it('should return sufficient false if requirements not met for ERC20', async () => {
+    it('should return sufficient false if requirements not met for ERC20', () => {
       const itemRequirement: ERC20Item = {
         type: ItemType.ERC20,
         tokenAddress: '0xERC20',
@@ -370,11 +452,17 @@ describe('balanceRequirement', () => {
           },
         },
       ];
+      const tokenInfo: TokenInfo = {
+        name: 'ERC20',
+        symbol: 'ERC20',
+        decimals: 18,
+        address: '0xERC20',
+      };
 
-      const result = await getTokenBalanceRequirement(
+      const result = getTokenBalanceRequirement(
         itemRequirement,
         balances,
-        mockProvider,
+        tokenInfo,
       );
       expect(result).toEqual({
         sufficient: false,
@@ -387,23 +475,13 @@ describe('balanceRequirement', () => {
           type: ItemType.ERC20,
           balance: BigNumber.from('1000000000000000000'),
           formattedBalance: '1.0',
-          token: {
-            name: 'ERC20',
-            symbol: 'ERC20',
-            decimals: 18,
-            address: '0xERC20',
-          },
+          token: tokenInfo,
         },
         current: {
           type: ItemType.ERC20,
           balance: BigNumber.from('10000000000'),
           formattedBalance: '0.000001',
-          token: {
-            name: 'ERC20',
-            symbol: 'ERC20',
-            decimals: 18,
-            address: '0xERC20',
-          },
+          token: tokenInfo,
         },
         isFee: false,
       });
