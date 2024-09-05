@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-console */
 import { Web3Provider } from '@ethersproject/providers';
 import {
@@ -5,6 +6,7 @@ import {
   IMTBLWidgetEvents,
   TokenFilterTypes,
   TokenInfo,
+  WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import {
   Body, Box, MenuItem, OverflowPopoverMenu,
@@ -12,7 +14,7 @@ import {
 import {
   useCallback, useContext, useEffect, useState,
 } from 'react';
-import { RouteResponse } from '@0xsquid/squid-types';
+import { ethers } from 'ethers';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
@@ -82,37 +84,28 @@ export function AddFunds({
 
     if (!squid || !provider) return;
 
-    const startTime = Date.now();
+    console.log('@@@ squid:', squid);
+
+    // const startTime = Date.now();
     const getBalances = async () => {
-      const address = await provider.getSigner().getAddress();
-      const balances = await squid.getAllBalances({
-        chainIds: [1, 10],
-        evmAddress: address,
-      });
-      const positiveBalances = balances?.evmBalances?.filter((balance) => balance.balance !== '0');
-      console.log('positiveBalances:', positiveBalances);
-      console.log('@@@ balance time', (Date.now() - startTime) / 1000);
+      // const address = await provider.getSigner().getAddress();
+      // const balances = await squid.getAllBalances({
+      //   chainIds: [1, 10],
+      //   evmAddress: address,
+      // });
+      // const positiveBalances = balances?.evmBalances?.filter((balance) => balance.balance !== '0');
+      // console.log('positiveBalances:', positiveBalances);
+      // console.log('@@@ balance time', (Date.now() - startTime) / 1000);
 
-      const startTokenDataTime = Date.now();
-      const tokenData = await squid.getTokenData('0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', '1');
-      console.log('tokenData:', tokenData);
-      console.log('@@@ tokenData time', (Date.now() - startTokenDataTime) / 1000);
+      // const startTokenDataTime = Date.now();
+      // const tokenData = await squid.getTokenData('0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', '1');
+      // console.log('tokenData:', tokenData);
+      // console.log('@@@ tokenData time', (Date.now() - startTokenDataTime) / 1000);
 
-      const startTokenPricesDataTime = Date.now();
-      const tokenPrices = await squid.getMultipleTokensPrice({ chainId: '1' });
-      console.log('tokenPrices:', tokenPrices);
-      console.log('@@@ tokenPrices time', (Date.now() - startTokenPricesDataTime) / 1000);
-
-      // const params = {
-      //   fromAddress: address,
-      //   fromChain: '1',
-      //   fromToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
-      //   fromAmount: '1000000000000000',
-      //   toChain: '10',
-      //   toToken: '0x0b2c639c533813f4aa9d7837caf62653d097ff85',
-      //   toAddress: address,
-      //   enableBoost: true,
-      // };
+      // const startTokenPricesDataTime = Date.now();
+      // const tokenPrices = await squid.getMultipleTokensPrice({ chainId: '1' });
+      // console.log('tokenPrices:', tokenPrices);
+      // console.log('@@@ tokenPrices time', (Date.now() - startTokenPricesDataTime) / 1000);
 
       // const paramsList = [
       //   {
@@ -167,70 +160,71 @@ export function AddFunds({
       //   },
       // ];
 
-      const paramsList = [
-        {
-          fromAddress: address,
-          fromChain: '10',
-          fromToken: '0x0b2c639c533813f4aa9d7837caf62653d097ff85', // USDC
-          fromAmount: '1000000000000000',
-          toChain: '1',
-          toToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', // USDC
-          toAddress: address,
-          enableBoost: true,
-        },
-        {
-          fromAddress: address,
-          fromChain: '10',
-          fromToken: '0x94b008aa00579c1307b0ef2c499ad98a8ce58e58', // USDT
-          toChain: '1',
-          toToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
-          fromAmount: '1000000000000000',
-          toAddress: address,
-          enableBoost: true,
-        },
-        {
-          fromAddress: address,
-          fromChain: '13371',
-          fromToken: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', // IMX
-          toChain: '1',
-          toToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
-          fromAmount: '1000000000000000',
-          toAddress: address,
-          enableBoost: true,
-        },
-        {
-          fromAddress: address,
-          fromChain: '13371',
-          fromToken: '0x6de8aCC0D406837030CE4dd28e7c08C5a96a30d2', // USDC
-          toChain: '1',
-          toToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
-          fromAmount: '1000000000000000',
-          toAddress: address,
-          enableBoost: true,
-        },
-        {
-          fromAddress: address,
-          fromChain: '13371',
-          fromToken: '0xb00ed913aAFf8280C17BfF33CcE82fE6D79e85e8', // GOG
-          toChain: '1',
-          toToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
-          fromAmount: '1000000000000000',
-          toAddress: address,
-          enableBoost: true,
-        },
-      ];
+      // const paramsList = [
+      //   {
+      //     fromAddress: address,
+      //     fromChain: '10',
+      //     fromToken: '0x0b2c639c533813f4aa9d7837caf62653d097ff85', // USDC
+      //     fromAmount: '1000000000000000',
+      //     toChain: '1',
+      //     toToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', // USDC
+      //     toAddress: address,
+      //     enableBoost: true,
+      //   },
+      //   {
+      //     fromAddress: address,
+      //     fromChain: '10',
+      //     fromToken: '0x94b008aa00579c1307b0ef2c499ad98a8ce58e58', // USDT
+      //     toChain: '1',
+      //     toToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      //     fromAmount: '1000000000000000',
+      //     toAddress: address,
+      //     enableBoost: true,
+      //   },
+      //   {
+      //     fromAddress: address,
+      //     fromChain: '13371',
+      //     fromToken: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', // IMX
+      //     toChain: '1',
+      //     toToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      //     fromAmount: '1000000000000000',
+      //     toAddress: address,
+      //     enableBoost: true,
+      //   },
+      //   {
+      //     fromAddress: address,
+      //     fromChain: '13371',
+      //     fromToken: '0x6de8aCC0D406837030CE4dd28e7c08C5a96a30d2', // USDC
+      //     toChain: '1',
+      //     toToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      //     fromAmount: '1000000000000000',
+      //     toAddress: address,
+      //     enableBoost: true,
+      //   },
+      //   {
+      //     fromAddress: address,
+      //     fromChain: '13371',
+      //     fromToken: '0xb00ed913aAFf8280C17BfF33CcE82fE6D79e85e8', // GOG
+      //     toChain: '1',
+      //     toToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      //     fromAmount: '1000000000000000',
+      //     toAddress: address,
+      //     enableBoost: true,
+      //   },
+      // ];
 
-      const startRouteDataTime = Date.now();
-      const quoteRequests: Promise<RouteResponse>[] = [];
-      paramsList.map((param) => quoteRequests.push(squid.getRoute(param)));
+      // const startRouteDataTime = Date.now();
+      // const quoteRequests: Promise<RouteResponse>[] = [];
+      // paramsList.map((param) => quoteRequests.push(squid.getRoute(param)));
 
-      const responses = await Promise.allSettled(
-        quoteRequests,
-      );
+      // const responses = await Promise.allSettled(
+      //   quoteRequests,
+      // );
 
-      // const { route, requestId } = await squid.getRoute(params);
-      console.log('Calculated route:', responses);
-      console.log('@@@ Route time', (Date.now() - startRouteDataTime) / 1000);
+      // // const { route, requestId } = await squid.getRoute(params);
+      // console.log('Calculated route:', responses);
+      // console.log('!!!!!!!!!!! squid', squid);
+      // console.log('@@@ Route time', (Date.now() - startRouteDataTime) / 1000);
     };
 
     getBalances();
@@ -313,21 +307,152 @@ export function AddFunds({
   //   console.log('handle review click');
   // };
 
-  const onPayWithCard = (paymentType: OptionTypes) => {
+  const onPayWithCard = async (paymentType: OptionTypes) => {
     console.log('paymentType', paymentType);
     console.log('=== toTokenAddress', toTokenAddress);
     console.log('=== toAmount', toAmount);
 
     if (paymentType === OptionTypes.SWAP) {
-      orchestrationEvents.sendRequestSwapEvent(
-        eventTarget,
-        IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
-        {
-          toTokenAddress: toTokenAddress?.address ?? '',
-          amount: toAmount ?? '',
-          fromTokenAddress: '',
-        },
-      );
+      if (!addFundsState.squid || !checkout) return;
+
+      // {
+      //   fromAddress: address,
+      //   fromChain: '13371',
+      //   fromToken: '0xb00ed913aAFf8280C17BfF33CcE82fE6D79e85e8', // GOG
+      //   toChain: '1',
+      //   toToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      //   fromAmount: '1000000000000000',
+      //   toAddress: address,
+      //   enableBoost: true,
+      // },
+      try {
+        const createProviderResult = await checkout.createProvider({
+          walletProviderName: WalletProviderName.METAMASK,
+        });
+
+        const createProvider = createProviderResult.provider;
+        const signer = createProvider.getSigner();
+        const address = await createProvider?.getSigner().getAddress();
+        await createProvider?.provider.request!({
+          method: 'eth_requestAccounts',
+        });
+
+        const fromToken = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+        const fromAmount = '1000000000000000';
+
+        const params = {
+          fromAddress: address,
+          fromChain: '1',
+          fromToken,
+          fromAmount,
+          toChain: '13371',
+          toToken: '0x6de8aCC0D406837030CE4dd28e7c08C5a96a30d2',
+          toAddress: address,
+          enableBoost: false,
+        };
+
+        const { route, requestId } = await addFundsState.squid.getRoute(params);
+        console.log('!!!!!!!!!!! route', route);
+        console.log('!!!!!!!!!!! requestId', requestId);
+
+        // const chainId = 1;
+        // const chainHex = `0x${chainId?.toString(16)}`;
+
+        // await createProvider?.provider.request!({
+        //   method: 'wallet_switchEthereumChain',
+        //   params: [
+        //     {
+        //       chainId: chainHex,
+        //     },
+        //   ],
+        // });
+
+        const erc20Abi = [
+          'function approve(address spender, uint256 amount) public returns (bool)',
+        ];
+        const tokenContract = new ethers.Contract(fromToken, erc20Abi, signer);
+        try {
+          const tx = await tokenContract.approve(route?.transactionRequest?.target, fromAmount);
+          await tx.wait();
+          console.log(`Approved ${fromAmount} tokens for ${route?.transactionRequest?.target}`);
+        } catch (error) {
+          console.error('Approval failed:', error);
+          throw error;
+        }
+
+        const tx = (await addFundsState.squid.executeRoute({
+          signer: createProvider.getSigner(),
+          route,
+        })) as unknown as ethers.providers.TransactionResponse;
+        const txReceipt = await tx.wait();
+
+        // Show the transaction receipt with Axelarscan link
+        const axelarScanLink = `https://axelarscan.io/gmp/${txReceipt.transactionHash}`;
+        console.log(`Finished! Check Axelarscan for details: ${axelarScanLink}`);
+
+        // Wait a few seconds before checking the status
+        await new Promise((resolve) => { setTimeout(resolve, 5000); });
+
+        // Parameters for checking the status of the transaction
+        const getStatusParams = {
+          transactionId: txReceipt.transactionHash,
+          requestId,
+          integratorId: 'immutable-bridge-f126614b-1683-471c-9e16-5df422c515cf',
+          fromChainId: '1',
+          toChainId: '10',
+        };
+        const completedStatuses = ['success', 'partial_success', 'needs_gas', 'not_found'];
+        const maxRetries = 10; // Maximum number of retries for status check
+        let retryCount = 0;
+        let status = await addFundsState.squid.getStatus(getStatusParams);
+
+        // Loop to check the transaction status until it is completed or max retries are reached
+        console.log(`Initial route status: ${status.squidTransactionStatus}`);
+
+        do {
+          try {
+            // Wait a few seconds before checking the status
+            await new Promise((resolve) => { setTimeout(resolve, 5000); });
+
+            // Retrieve the transaction's route status
+            status = await addFundsState.squid.getStatus(getStatusParams);
+
+            // Display the route status
+            console.log(`Route status: ${status.squidTransactionStatus}`);
+          } catch (error: unknown) {
+            // Handle error if the transaction status is not found
+            if (error instanceof Error && (error as any).response && (error as any).response.status === 404) {
+              retryCount++;
+              if (retryCount >= maxRetries) {
+                console.error('Max retries reached. Transaction not found.');
+                break;
+              }
+              console.log('Transaction not found. Retrying...');
+              // eslint-disable-next-line no-continue
+              continue;
+            } else {
+              throw error;
+            }
+          }
+        } while (status && !completedStatuses.includes(status.squidTransactionStatus ?? ''));
+
+        // Wait for the transaction to be mined
+        console.log('Swap transaction executed:', txReceipt.transactionHash);
+
+        console.log('!!!!!!!', status);
+      } catch (e) {
+        console.log('EEEEEEEEEE', e);
+      }
+
+      // orchestrationEvents.sendRequestSwapEvent(
+      //   eventTarget,
+      //   IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+      //   {
+      //     toTokenAddress: toTokenAddress?.address ?? '',
+      //     amount: toAmount ?? '',
+      //     fromTokenAddress: '',
+      //   },
+      // );
     } else {
       const data = {
         tokenAddress: toTokenAddress?.address ?? '',
