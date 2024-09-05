@@ -54,6 +54,11 @@ const getFeeOption = async (
   return imxFeeOption;
 };
 
+/**
+ * Prepares the meta transactions array to be signed by estimating the fee and
+ * getting the nonce from the smart wallet.
+ *
+ */
 const buildMetaTransactions = async (
   transactionRequest: TransactionRequest,
   rpcProvider: StaticJsonRpcProvider,
@@ -70,16 +75,18 @@ const buildMetaTransactions = async (
   const metaTransaction: MetaTransaction = {
     to: transactionRequest.to,
     data: transactionRequest.data,
-    nonce: BigNumber.from(0),
+    nonce: BigNumber.from(0), // NOTE: We don't need a valid nonce to estimate the fee
     value: transactionRequest.value,
     revertOnError: true,
   };
 
+  // Estimate the fee and get the nonce from the smart wallet
   const [nonce, feeOption] = await Promise.all([
     getNonce(rpcProvider, zkevmAddress),
     getFeeOption(metaTransaction, zkevmAddress, relayerClient),
   ]);
 
+  // Build the meta transactions array with a valid nonce and fee transaction
   const metaTransactions: [MetaTransaction, ...MetaTransaction[]] = [
     {
       ...metaTransaction,
@@ -87,6 +94,7 @@ const buildMetaTransactions = async (
     },
   ];
 
+  // Add a fee transaction if the fee is non-zero
   const feeValue = BigNumber.from(feeOption.tokenPrice);
   if (!feeValue.isZero()) {
     metaTransactions.push({
@@ -107,6 +115,10 @@ export const pollRelayerTransaction = async (
 ) => {
   const retrieveRelayerTransaction = async () => {
     const tx = await relayerClient.imGetTransactionByHash(relayerId);
+    // NOTE: The transaction hash is only available from the Relayer once the
+    // transaction is actually submitted onchain. Hence we need to poll the
+    // Relayer get transaction endpoint until the status transitions to one that
+    // has the hash available.
     if (tx.status === RelayerTransactionStatus.PENDING) {
       throw new Error();
     }
@@ -165,12 +177,16 @@ export const prepareAndSignTransaction = async ({
     throw new Error('Failed to retrieve nonce from the smart wallet');
   }
 
+  // Parallelize the validation and signing of the transaction
+  // without waiting for the validation to complete
   const validateEVMTransactionPromise = guardianClient.validateEVMTransaction({
     chainId: getEip155ChainId(chainId),
     nonce: convertBigNumberishToString(nonce),
     metaTransactions,
   });
 
+  // NOTE: We sign again because we now are adding the fee transaction, so the
+  // whole payload is different and needs a new signature.
   const getSignedMetaTransactionsPromise = signMetaTransactions(
     metaTransactions,
     nonce,
