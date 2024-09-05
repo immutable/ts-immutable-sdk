@@ -220,7 +220,7 @@ window.callFunction = async (jsonData: string) => {
       case PASSPORT_FUNCTIONS.init: {
         const request = JSON.parse(data);
         const redirect: string | null = request?.redirectUri;
-        const logoutMode: 'silent' | 'redirect' = request?.logoutMode === 'silent' ? 'silent' : 'redirect';
+        const logoutMode: 'silent' | 'redirect' = request?.isSilentLogout === true ? 'silent' : 'redirect';
         if (!passportClient) {
           const passportConfig = {
             baseConfig: new config.ImmutableConfiguration({
