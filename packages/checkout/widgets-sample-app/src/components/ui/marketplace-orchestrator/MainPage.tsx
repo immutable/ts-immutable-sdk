@@ -22,7 +22,6 @@ import { passport } from './passport';
 import { LanguageSelector } from './LanguageSelector';
 
 // Create one instance of Checkout and inject Passport
-passport.connectEvm();
 const checkout = new Checkout({
   baseConfig: {
     environment: Environment.SANDBOX,
@@ -64,6 +63,10 @@ export const MainPage = () => {
   swapWidget.addListener(SwapEventType.CLOSE_WIDGET, () => swapWidget.unmount());
   onRampWidget.addListener(OnRampEventType.CLOSE_WIDGET, () => { onRampWidget.unmount() });
 
+  useEffect(() => {
+    passport.connectEvm();
+  }, []);
+  
   useEffect(() => {
     connectWidget.addListener(ConnectEventType.CLOSE_WIDGET, () => connectWidget.unmount());
     connectWidget.addListener(ConnectEventType.SUCCESS, (eventData: ConnectionSuccess) => {
