@@ -1,4 +1,4 @@
-import { StaticJsonRpcProvider, TransactionRequest } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
 import { Flow } from '@imtbl/metrics';
 import { BigNumber } from 'ethers';
@@ -66,7 +66,7 @@ describe('transactionHelpers', () => {
     const chainId = 123;
     const nonce = BigNumber.from(5);
     const zkEvmAddress = '0x1234567890123456789012345678901234567890';
-    const transactionRequest: TransactionRequest = {
+    const transactionRequest = {
       to: '0x1234567890123456789012345678901234567890',
       data: '0x456',
       value: '0x00',
@@ -115,10 +115,10 @@ describe('transactionHelpers', () => {
       (walletHelpers.getNonce as jest.Mock).mockResolvedValue(nonce);
       (walletHelpers.getNormalisedTransactions as jest.Mock).mockReturnValue(metaTransactions);
       (walletHelpers.encodedTransactions as jest.Mock).mockReturnValue('encodedTransactions123');
-      rpcProvider.detectNetwork.mockResolvedValue({ chainId });
-      relayerClient.imGetFeeOptions.mockResolvedValue([imxFeeOption]);
-      relayerClient.ethSendTransaction.mockResolvedValue(relayerId);
-      guardianClient.validateEVMTransaction.mockResolvedValue(undefined);
+      (rpcProvider.detectNetwork as jest.Mock).mockResolvedValue({ chainId });
+      (relayerClient.imGetFeeOptions as jest.Mock).mockResolvedValue([imxFeeOption]);
+      (relayerClient.ethSendTransaction as jest.Mock).mockResolvedValue(relayerId);
+      (guardianClient.validateEVMTransaction as jest.Mock).mockResolvedValue(undefined);
     });
 
     it('prepares and signs transaction correctly', async () => {
@@ -151,7 +151,7 @@ describe('transactionHelpers', () => {
 
     it('handles sponsored transactions correctly', async () => {
       const sponsoredFeeOption = { ...imxFeeOption, tokenPrice: '0' };
-      relayerClient.imGetFeeOptions.mockResolvedValue([sponsoredFeeOption]);
+      (relayerClient.imGetFeeOptions as jest.Mock).mockResolvedValue([sponsoredFeeOption]);
 
       await prepareAndSignTransaction({
         transactionRequest,
@@ -186,7 +186,7 @@ describe('transactionHelpers', () => {
         tokenAddress: '0x1337',
         recipientAddress: '0x7331',
       };
-      relayerClient.imGetFeeOptions.mockResolvedValue([nonSponsoredFeeOption]);
+      (relayerClient.imGetFeeOptions as jest.Mock).mockResolvedValue([nonSponsoredFeeOption]);
 
       await prepareAndSignTransaction({
         transactionRequest,
@@ -242,7 +242,7 @@ describe('transactionHelpers', () => {
     });
 
     it('throws an error when validateEVMTransaction fails', async () => {
-      guardianClient.validateEVMTransaction.mockRejectedValue(new Error('Validation failed'));
+      (guardianClient.validateEVMTransaction as jest.Mock).mockRejectedValue(new Error('Validation failed'));
 
       await expect(prepareAndSignTransaction({
         transactionRequest,
@@ -274,7 +274,7 @@ describe('transactionHelpers', () => {
     });
 
     it('throws an error when ethSendTransaction fails', async () => {
-      relayerClient.ethSendTransaction.mockRejectedValue(new Error('Transaction send failed'));
+      (relayerClient.ethSendTransaction as jest.Mock).mockRejectedValue(new Error('Transaction send failed'));
 
       await expect(prepareAndSignTransaction({
         transactionRequest,
