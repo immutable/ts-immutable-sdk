@@ -47,6 +47,7 @@ describe('getTopUpViewData', () => {
       balance: BigNumber.from(50),
       formattedBalance: '50',
     },
+    isFee: false,
   };
 
   const insufficientERC20: TransactionRequirement = {
@@ -63,6 +64,7 @@ describe('getTopUpViewData', () => {
       balance: BigNumber.from(100),
       formattedBalance: '100',
     },
+    isFee: false,
   };
 
   const sufficientNative: TransactionRequirement = {
@@ -79,6 +81,7 @@ describe('getTopUpViewData', () => {
       balance: BigNumber.from(30),
       formattedBalance: '30',
     },
+    isFee: false,
   };
 
   const insufficientNative: TransactionRequirement = {
@@ -95,6 +98,7 @@ describe('getTopUpViewData', () => {
       balance: BigNumber.from(20),
       formattedBalance: '20',
     },
+    isFee: false,
   };
 
   it('should return correct data when both NATIVE and ERC20 are insufficient', () => {
@@ -185,6 +189,7 @@ describe('getTopUpViewData', () => {
           balance: BigNumber.from(30),
           formattedBalance: '30',
         },
+        isFee: true,
       },
       {
         type: ItemType.ERC20,
@@ -204,6 +209,7 @@ describe('getTopUpViewData', () => {
           balance: BigNumber.from(50),
           formattedBalance: '50',
         },
+        isFee: false,
       },
     ];
 

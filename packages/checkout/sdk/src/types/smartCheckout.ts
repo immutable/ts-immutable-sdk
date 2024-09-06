@@ -488,6 +488,8 @@ export type NativeItem = {
   type: ItemType.NATIVE;
   /** The amount of the item. */
   amount: BigNumber;
+  /** Flag to indicate if the item is a transaction fee */
+  isFee: boolean;
 };
 
 /**
@@ -506,6 +508,8 @@ export type ERC20Item = {
   amount: BigNumber;
   /** The contract address of the approver. */
   spenderAddress: string;
+  /** Flag to indicate if the item is a transaction fee */
+  isFee: boolean;
 };
 
 /**
@@ -934,13 +938,15 @@ export type TransactionRequirement = {
   current: ItemBalance;
   /** The delta between the required and current balances. */
   delta: BalanceDelta;
+  /** Flags if the requirement is needed for transaction fees */
+  isFee: boolean;
 };
 
 /**
  * Represents the balance for either a native or ERC20 token.
  * @property {ItemType.NATIVE | ItemType.ERC20} type
  * @property {BigNumber} balance
- * @property {string} formattedBalanc
+ * @property {string} formattedBalance
  * @property {TokenInfo} token
  */
 export type TokenBalance = {

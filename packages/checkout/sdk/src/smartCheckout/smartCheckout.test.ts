@@ -157,6 +157,7 @@ describe('smartCheckout', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
       ];
 
@@ -361,6 +362,7 @@ describe('smartCheckout', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
       ];
 
@@ -565,6 +567,7 @@ describe('smartCheckout', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
       ];
 
@@ -776,6 +779,7 @@ describe('smartCheckout', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
       ];
 
@@ -995,6 +999,7 @@ describe('smartCheckout', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
       ];
 
@@ -1169,6 +1174,7 @@ describe('smartCheckout', () => {
           tokenAddress: '0xERC20',
           amount: BigNumber.from(1),
           spenderAddress: '0x1',
+          isFee: false,
         },
       ];
 
@@ -1289,6 +1295,7 @@ describe('smartCheckout', () => {
           tokenAddress: '0xERC20',
           amount: BigNumber.from(1),
           spenderAddress: '0x1',
+          isFee: false,
         },
       ];
 
@@ -1384,6 +1391,7 @@ describe('smartCheckout', () => {
               },
               type: ItemType.NATIVE,
             },
+            isFee: false,
           },
           {
             sufficient: true,
@@ -1414,6 +1422,7 @@ describe('smartCheckout', () => {
                 decimals: 6,
               },
             },
+            isFee: false,
           },
         ],
       };
@@ -1477,6 +1486,7 @@ describe('smartCheckout', () => {
           tokenAddress: '0xERC20',
           amount: BigNumber.from(10),
           spenderAddress: '0x1',
+          isFee: false,
         },
       ];
 

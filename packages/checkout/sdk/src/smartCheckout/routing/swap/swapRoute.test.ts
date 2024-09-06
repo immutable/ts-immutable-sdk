@@ -1283,6 +1283,7 @@ describe('swapRoute', () => {
           balance: BigNumber.from(1),
           formattedBalance: '1',
         },
+        isFee: false,
       };
 
       const requiredToken = getRequiredToken(balanceRequirement);
@@ -1324,6 +1325,7 @@ describe('swapRoute', () => {
           balance: BigNumber.from(1),
           formattedBalance: '1',
         },
+        isFee: false,
       };
 
       const requiredToken = getRequiredToken(balanceRequirement);
