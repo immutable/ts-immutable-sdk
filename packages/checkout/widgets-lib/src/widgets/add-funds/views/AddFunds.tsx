@@ -15,6 +15,7 @@ import {
   useCallback, useContext, useEffect, useState,
 } from 'react';
 import { ethers } from 'ethers';
+
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
@@ -325,13 +326,13 @@ export function AddFunds({
       //   toAddress: address,
       //   enableBoost: true,
       // },
+
       try {
         const createProviderResult = await checkout.createProvider({
           walletProviderName: WalletProviderName.METAMASK,
         });
 
         const createProvider = createProviderResult.provider;
-        const signer = createProvider.getSigner();
         const address = await createProvider?.getSigner().getAddress();
         await createProvider?.provider.request!({
           method: 'eth_requestAccounts',
@@ -355,21 +356,42 @@ export function AddFunds({
         console.log('!!!!!!!!!!! route', route);
         console.log('!!!!!!!!!!! requestId', requestId);
 
-        // const chainId = 1;
-        // const chainHex = `0x${chainId?.toString(16)}`;
+        if (createProvider.provider?.request) {
+          const chainId = params.toChain;
+          console.log('!!!!!!!!!!! chainId', chainId);
 
-        // await createProvider?.provider.request!({
-        //   method: 'wallet_switchEthereumChain',
-        //   params: [
-        //     {
-        //       chainId: chainHex,
-        //     },
-        //   ],
-        // });
+          // convert chainId to hexadecimal
+          const chainHex = `0x${parseInt(chainId, 10).toString(16)}`;
+
+          // get the current network chain ID
+          const currentChainId = await createProvider.provider.request({
+            method: 'eth_chainId',
+          });
+
+          // only switch if the current network is different
+          if (currentChainId !== chainHex) {
+            try {
+              await createProvider.provider.request({
+                method: 'wallet_switchEthereumChain',
+                params: [
+                  {
+                    chainId: chainHex,
+                  },
+                ],
+              });
+              console.log(`Switched to chain ${chainHex}`);
+            } catch (error) {
+              console.error('Failed to switch networks:', error);
+            }
+          } else {
+            console.log(`Already on chain ${chainHex}, no need to switch`);
+          }
+        }
 
         const erc20Abi = [
           'function approve(address spender, uint256 amount) public returns (bool)',
         ];
+        const signer = createProvider.getSigner();
         const tokenContract = new ethers.Contract(fromToken, erc20Abi, signer);
         try {
           const tx = await tokenContract.approve(route?.transactionRequest?.target, fromAmount);
