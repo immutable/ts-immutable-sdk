@@ -316,17 +316,6 @@ export function AddFunds({
     if (paymentType === OptionTypes.SWAP) {
       if (!addFundsState.squid || !checkout) return;
 
-      // {
-      //   fromAddress: address,
-      //   fromChain: '13371',
-      //   fromToken: '0xb00ed913aAFf8280C17BfF33CcE82fE6D79e85e8', // GOG
-      //   toChain: '1',
-      //   toToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
-      //   fromAmount: '1000000000000000',
-      //   toAddress: address,
-      //   enableBoost: true,
-      // },
-
       try {
         const createProviderResult = await checkout.createProvider({
           walletProviderName: WalletProviderName.METAMASK,
@@ -360,6 +349,7 @@ export function AddFunds({
           const chainId = params.toChain;
           console.log('!!!!!!!!!!! chainId', chainId);
 
+          // ====== GET THE RIGHT CHAIN ======
           // convert chainId to hexadecimal
           const chainHex = `0x${parseInt(chainId, 10).toString(16)}`;
 
@@ -388,6 +378,7 @@ export function AddFunds({
           }
         }
 
+        // ====== APPROVE ======
         const erc20Abi = [
           'function approve(address spender, uint256 amount) public returns (bool)',
         ];
@@ -402,6 +393,7 @@ export function AddFunds({
           throw error;
         }
 
+        // ====== EXECUTE ROUTE ======
         const tx = (await addFundsState.squid.executeRoute({
           signer: createProvider.getSigner(),
           route,
