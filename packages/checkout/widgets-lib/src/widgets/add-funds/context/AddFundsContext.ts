@@ -66,7 +66,7 @@ export const AddFundsContext = createContext<AddFundsContextState>({
 
 AddFundsContext.displayName = 'AddFundsContext';
 
-export type Reducer<S, A> = (prevState: S, action: A) => S;
+type Reducer<S, A> = (prevState: S, action: A) => S;
 
 const addFundsReducer: Reducer<AddFundsState, AddFundsAction> = (
   state: AddFundsState,
