@@ -13,7 +13,7 @@ export const useSquid = () => {
     const initialiseSquid = async () => {
       const squidSDK = new Squid({
         baseUrl: SQUID_SDK_BASE_URL,
-        integratorId: 'immutable-bridge-f126614b-1683-471c-9e16-5df422c515cf',
+        integratorId: '',
       });
 
       await squidSDK.init();
