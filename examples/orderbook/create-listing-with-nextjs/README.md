@@ -19,3 +19,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## Required Environment Variables
 
 - NEXT_PUBLIC_PUBLISHABLE_KEY // replace with your publishable API key from Hub
+- NEXT_PUBLIC_CLIENT_ID // replace with your client ID from Hub
