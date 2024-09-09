@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { passportInstance } from '../utils/setupPassport';
-import {Box, Heading} from "@biom3/react";
+import { useEffect } from "react";
+import { passportInstance } from "../utils/setupPassport";
+import { Box, Heading } from "@biom3/react";
 
 export default function Redirect() {
   useEffect(() => {
