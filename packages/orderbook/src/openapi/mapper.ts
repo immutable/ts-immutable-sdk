@@ -3,6 +3,7 @@ import {
   ERC20Item,
   ERC721Item,
   FeeType,
+  ListingLike,
   NativeItem,
   Order,
   Page,
@@ -12,11 +13,7 @@ import { Order as OpenApiOrder } from './sdk/models/Order';
 import { Page as OpenApiPage } from './sdk/models/Page';
 import { Trade as OpenApiTrade } from './sdk/models/Trade';
 
-export function mapListingFromOpenApiOrder(order: OpenApiOrder): Order & {
-  type: 'LISTING';
-  sell: (ERC721Item | ERC1155Item)[];
-  buy: (NativeItem | ERC20Item)[];
-} {
+export function mapListingFromOpenApiOrder(order: OpenApiOrder): Order & ListingLike {
   if (order.type !== OpenApiOrder.type.LISTING) {
     throw new Error('Order type must be LISTING');
   }

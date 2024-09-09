@@ -232,33 +232,27 @@ export interface Order {
   updatedAt: string;
 }
 
+export interface ListingLike {
+  type: 'LISTING';
+  sell: (ERC721Item | ERC1155Item)[];
+  buy: (NativeItem | ERC20Item)[];
+}
+
 export interface ListingResult {
-  result: Order & {
-    type: 'LISTING';
-    sell: (ERC721Item | ERC1155Item)[];
-    buy: (NativeItem | ERC20Item)[];
-  };
+  result: Order & ListingLike;
 }
 
 export interface BulkListingsResult {
   result: {
     success: boolean;
     orderHash: string;
-    order?: Order & {
-      type: 'LISTING';
-      sell: (ERC721Item | ERC1155Item)[];
-      buy: (NativeItem | ERC20Item)[];
-    };
+    order?: Order & ListingLike;
   }[];
 }
 
 export interface ListListingsResult {
   page: Page;
-  result: (Order & {
-    type: 'LISTING';
-    sell: (ERC721Item | ERC1155Item)[];
-    buy: (NativeItem | ERC20Item)[];
-  })[];
+  result: (Order & ListingLike)[];
 }
 
 export interface Page {
