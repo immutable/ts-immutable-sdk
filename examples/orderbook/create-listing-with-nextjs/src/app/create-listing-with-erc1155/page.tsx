@@ -16,7 +16,7 @@ import {orderbook} from "@imtbl/sdk";
 import {ERC1155Item, NativeItem, ERC20Item, PrepareListingParams} from "@imtbl/sdk/orderbook";
 import NextLink from "next/link";
 
-export default function ConnectWithEtherJS() {
+export default function CreateERC1155ListingWithPassport() {
     // setup the accounts state
     const [accountsState, setAccountsState] = useState<any>([]);
 
