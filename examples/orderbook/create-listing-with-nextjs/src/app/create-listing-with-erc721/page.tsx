@@ -10,10 +10,11 @@ import {
     Box,
     Select,
     TextInput,
-    FormControl, Heading, Grid, Button, LoadingOverlay
+    FormControl, Heading, Grid, Button, LoadingOverlay, Link
 } from "@biom3/react";
 import {orderbook} from "@imtbl/sdk";
 import {ERC721Item, NativeItem, ERC20Item, PrepareListingParams} from "@imtbl/sdk/orderbook";
+import NextLink from "next/link";
 
 export default function ConnectWithEtherJS() {
     // setup the accounts state
@@ -121,7 +122,6 @@ export default function ConnectWithEtherJS() {
         const sell: ERC721Item = {
             contractAddress: sellItemContractAddress,
             tokenId: sellItemTokenID,
-            amount: sellItemQty,
             type: 'ERC721'
         }
 
@@ -276,6 +276,7 @@ export default function ConnectWithEtherJS() {
                     </Button>
                 </Box>
             </Box>
+            <Link rc={<NextLink href="/" />}>Return to Examples</Link>
         </Box>
     );
 }
