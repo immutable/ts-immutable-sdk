@@ -10,7 +10,7 @@ export interface AddFundsState {
   squid: Squid | null;
 }
 
-export const initialAddFundsState: AddFundsState = {
+const initialAddFundsState: AddFundsState = {
   checkout: null,
   provider: null,
   allowedTokens: null,
@@ -68,7 +68,7 @@ AddFundsContext.displayName = 'AddFundsContext';
 
 export type Reducer<S, A> = (prevState: S, action: A) => S;
 
-export const addFundsReducer: Reducer<AddFundsState, AddFundsAction> = (
+const addFundsReducer: Reducer<AddFundsState, AddFundsAction> = (
   state: AddFundsState,
   action: AddFundsAction,
 ) => {

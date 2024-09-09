@@ -2,7 +2,7 @@ import { ReactNode, useEffect } from 'react';
 import { AddFundsActions, useAddFundsValues, AddFundsContext } from './AddFundsContext';
 import { useSquid } from '../hooks/useSquid';
 
-export function AddFundsProvider({ children }: { children: ReactNode }) {
+export function AddFundsContextProvider({ children }: { children: ReactNode }) {
   const addFundsValue = useAddFundsValues();
   const { addFundsState, addFundsDispatch } = addFundsValue;
 
