@@ -9,7 +9,7 @@ import {
 } from './config/config';
 import { CancelOrdersResult, Fee as OpenApiFee } from './openapi/sdk';
 import {
-  mapFromOpenApiOrder,
+  mapListingFromOpenApiOrder,
   mapFromOpenApiPage,
   mapFromOpenApiTrade,
 } from './openapi/mapper';
@@ -121,7 +121,7 @@ export class Orderbook {
   async getListing(listingId: string): Promise<ListingResult> {
     const apiListing = await this.apiClient.getListing(listingId);
     return {
-      result: mapFromOpenApiOrder(apiListing.result),
+      result: mapListingFromOpenApiOrder(apiListing.result),
     };
   }
 
@@ -149,7 +149,7 @@ export class Orderbook {
     const apiListings = await this.apiClient.listListings(listOrderParams);
     return {
       page: mapFromOpenApiPage(apiListings.page),
-      result: apiListings.result.map(mapFromOpenApiOrder),
+      result: apiListings.result.map(mapListingFromOpenApiOrder),
     };
   }
 
@@ -292,7 +292,7 @@ export class Orderbook {
               success: !!apiListingResponse,
               orderHash: prepareListingResponses[i].orderHash,
               // eslint-disable-next-line max-len
-              order: apiListingResponse ? mapFromOpenApiOrder(apiListingResponse.result) : undefined,
+              order: apiListingResponse ? mapListingFromOpenApiOrder(apiListingResponse.result) : undefined,
             })),
           };
         },
@@ -345,7 +345,9 @@ export class Orderbook {
           result: createOrdersApiListingResponse.map((apiListingResponse, i) => ({
             success: !!apiListingResponse,
             orderHash: preparedListings[i].orderHash,
-            order: apiListingResponse ? mapFromOpenApiOrder(apiListingResponse.result) : undefined,
+            order: apiListingResponse
+              ? mapListingFromOpenApiOrder(apiListingResponse.result)
+              : undefined,
           })),
         };
       },
@@ -390,7 +392,7 @@ export class Orderbook {
     });
 
     return {
-      result: mapFromOpenApiOrder(apiListingResponse.result),
+      result: mapListingFromOpenApiOrder(apiListingResponse.result),
     };
   }
 
@@ -492,7 +494,7 @@ export class Orderbook {
           takerAddress,
         )),
         fulfillableOrders: fulfillmentDataRes.result.fulfillable_orders.map(
-          (o) => mapFromOpenApiOrder(o.order),
+          (o) => mapListingFromOpenApiOrder(o.order),
         ),
         unfulfillableOrders: fulfillmentDataRes.result.unfulfillable_orders.map(
           (o) => ({
@@ -507,7 +509,7 @@ export class Orderbook {
       if (String(e).includes('The fulfiller does not have the balances needed to fulfill.')) {
         return {
           fulfillableOrders: fulfillmentDataRes.result.fulfillable_orders.map(
-            (o) => mapFromOpenApiOrder(o.order),
+            (o) => mapListingFromOpenApiOrder(o.order),
           ),
           unfulfillableOrders: fulfillmentDataRes.result.unfulfillable_orders.map(
             (o) => ({

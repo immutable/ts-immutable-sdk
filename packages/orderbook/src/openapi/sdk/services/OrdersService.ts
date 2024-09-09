@@ -1,12 +1,15 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { BidResult } from '../models/BidResult';
 import type { CancelOrdersRequestBody } from '../models/CancelOrdersRequestBody';
 import type { CancelOrdersResult } from '../models/CancelOrdersResult';
 import type { ChainName } from '../models/ChainName';
+import type { CreateBidRequestBody } from '../models/CreateBidRequestBody';
 import type { CreateListingRequestBody } from '../models/CreateListingRequestBody';
 import type { FulfillableOrder } from '../models/FulfillableOrder';
 import type { FulfillmentDataRequest } from '../models/FulfillmentDataRequest';
+import type { ListBidsResult } from '../models/ListBidsResult';
 import type { ListingResult } from '../models/ListingResult';
 import type { ListListingsResult } from '../models/ListListingsResult';
 import type { ListTradeResult } from '../models/ListTradeResult';
@@ -184,6 +187,129 @@ export class OrdersService {
   }
 
   /**
+   * List a paginated array of bids with optional filter parameters
+   * List a paginated array of bids with optional filter parameters
+   * @returns ListBidsResult OK response.
+   * @throws ApiError
+   */
+  public listBids({
+    chainName,
+    status,
+    buyItemContractAddress,
+    sellItemContractAddress,
+    accountAddress,
+    buyItemMetadataId,
+    buyItemTokenId,
+    fromUpdatedAt,
+    pageSize,
+    sortBy,
+    sortDirection,
+    pageCursor,
+  }: {
+    chainName: ChainName,
+    /**
+     * Order status to filter by
+     */
+    status?: OrderStatusName,
+    /**
+     * Buy item contract address to filter by
+     */
+    buyItemContractAddress?: string,
+    /**
+     * Sell item contract address to filter by
+     */
+    sellItemContractAddress?: string,
+    /**
+     * The account address of the user who created the bid
+     */
+    accountAddress?: string,
+    /**
+     * The metadata_id of the buy item
+     */
+    buyItemMetadataId?: string,
+    /**
+     * buy item token identifier to filter by
+     */
+    buyItemTokenId?: string,
+    /**
+     * From updated at including given date
+     */
+    fromUpdatedAt?: string,
+    /**
+     * Maximum number of orders to return per page
+     */
+    pageSize?: PageSize,
+    /**
+     * Order field to sort by. `sell_item_amount` sorts by per token price, for example if 10eth is offered for 5 ERC1155 items, it’s sorted as 2eth for `sell_item_amount`.
+     */
+    sortBy?: 'created_at' | 'updated_at' | 'sell_item_amount',
+    /**
+     * Ascending or descending direction for sort
+     */
+    sortDirection?: 'asc' | 'desc',
+    /**
+     * Page cursor to retrieve previous or next page. Use the value returned in the response.
+     */
+    pageCursor?: PageCursor,
+  }): CancelablePromise<ListBidsResult> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/v1/chains/{chain_name}/orders/bids',
+      path: {
+        'chain_name': chainName,
+      },
+      query: {
+        'status': status,
+        'buy_item_contract_address': buyItemContractAddress,
+        'sell_item_contract_address': sellItemContractAddress,
+        'account_address': accountAddress,
+        'buy_item_metadata_id': buyItemMetadataId,
+        'buy_item_token_id': buyItemTokenId,
+        'from_updated_at': fromUpdatedAt,
+        'page_size': pageSize,
+        'sort_by': sortBy,
+        'sort_direction': sortDirection,
+        'page_cursor': pageCursor,
+      },
+      errors: {
+        400: `Bad Request (400)`,
+        404: `The specified resource was not found (404)`,
+        500: `Internal Server Error (500)`,
+      },
+    });
+  }
+
+  /**
+   * Create a bid
+   * Create a bid
+   * @returns BidResult Created response.
+   * @throws ApiError
+   */
+  public createBid({
+    chainName,
+    requestBody,
+  }: {
+    chainName: ChainName,
+    requestBody: CreateBidRequestBody,
+  }): CancelablePromise<BidResult> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/v1/chains/{chain_name}/orders/bids',
+      path: {
+        'chain_name': chainName,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `Bad Request (400)`,
+        404: `The specified resource was not found (404)`,
+        500: `Internal Server Error (500)`,
+        501: `Not Implemented Error (501)`,
+      },
+    });
+  }
+
+  /**
    * Get a single listing by ID
    * Get a single listing by ID
    * @returns ListingResult OK response.
@@ -205,6 +331,37 @@ export class OrdersService {
       path: {
         'chain_name': chainName,
         'listing_id': listingId,
+      },
+      errors: {
+        400: `Bad Request (400)`,
+        404: `The specified resource was not found (404)`,
+        500: `Internal Server Error (500)`,
+      },
+    });
+  }
+
+  /**
+   * Get a single bid by ID
+   * Get a single bid by ID
+   * @returns BidResult OK response.
+   * @throws ApiError
+   */
+  public getBid({
+    chainName,
+    bidId,
+  }: {
+    chainName: ChainName,
+    /**
+     * Global Bid identifier
+     */
+    bidId: string,
+  }): CancelablePromise<BidResult> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/v1/chains/{chain_name}/orders/bids/{bid_id}',
+      path: {
+        'chain_name': chainName,
+        'bid_id': bidId,
       },
       errors: {
         400: `Bad Request (400)`,

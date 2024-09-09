@@ -9,7 +9,7 @@ import type {
   OrderUseCase,
 } from '@opensea/seaport-js/lib/types';
 import { providers } from 'ethers';
-import { mapFromOpenApiOrder } from '../openapi/mapper';
+import { mapListingFromOpenApiOrder } from '../openapi/mapper';
 import {
   Action,
   ActionType,
@@ -221,7 +221,7 @@ export class Seaport {
     return {
       actions: fulfillmentActions,
       expiration: Seaport.getExpirationISOTimeFromExtraData(extraData),
-      order: mapFromOpenApiOrder(order),
+      order: mapListingFromOpenApiOrder(order),
     };
   }
 

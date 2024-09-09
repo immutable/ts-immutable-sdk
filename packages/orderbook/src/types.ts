@@ -54,7 +54,7 @@ export interface PrepareBulkListingsParams {
     buy: ERC20Item | NativeItem;
     makerFees: FeeValue[];
     orderExpiry?: Date;
-  }[]
+  }[];
 }
 
 export interface PrepareBulkListingsResponse {
@@ -72,7 +72,7 @@ export interface PrepareBulkSeaportOrders {
   preparedListings: {
     orderComponents: OrderComponents;
     orderHash: string;
-  }[]
+  }[];
 }
 
 export interface PrepareCancelOrdersResponse {
@@ -151,13 +151,14 @@ export interface SignableAction {
 export type Action = TransactionAction | SignableAction;
 
 export interface FulfillmentListing {
-  listingId: string,
-  takerFees: Array<FeeValue>,
-  amountToFill?: string,
+  listingId: string;
+  takerFees: Array<FeeValue>;
+  amountToFill?: string;
 }
 
-export type FulfillBulkOrdersResponse
-  = FulfillBulkOrdersInsufficientBalanceResponse | FulfillBulkOrdersSufficientBalanceResponse;
+export type FulfillBulkOrdersResponse =
+  | FulfillBulkOrdersInsufficientBalanceResponse
+  | FulfillBulkOrdersSufficientBalanceResponse;
 
 export interface FulfillBulkOrdersSufficientBalanceResponse {
   sufficientBalance: true;
@@ -174,8 +175,8 @@ export interface FulfillBulkOrdersInsufficientBalanceResponse {
 }
 
 export interface UnfulfillableOrder {
-  orderId: string,
-  reason: string,
+  orderId: string;
+  reason: string;
 }
 
 export interface FulfillOrderResponse {
@@ -190,25 +191,24 @@ export interface FulfillOrderResponse {
 }
 
 export interface CancelOrdersOnChainResponse {
-  cancellationAction: TransactionAction
+  cancellationAction: TransactionAction;
 }
 
 export interface Order {
   id: string;
-  type: 'LISTING';
-  accountAddress: string;
-  buy: (ERC20Item | NativeItem)[];
-  sell: (ERC721Item | ERC1155Item)[];
-  fees: Fee[];
+  type: 'LISTING' | 'BID';
   chain: {
     id: string;
     name: string;
   };
-  createdAt: string;
-  updatedAt: string;
+  accountAddress: string;
+  sell: (ERC20Item | ERC721Item | ERC1155Item)[];
+  buy: (NativeItem | ERC20Item | ERC721Item | ERC1155Item)[];
+  fees: Fee[];
+  status: OrderStatus;
   fillStatus: {
-    numerator: string,
-    denominator: string,
+    numerator: string;
+    denominator: string;
   };
   /**
    * Time after which the Order is considered active
@@ -218,6 +218,8 @@ export interface Order {
    * Time after which the Order is expired
    */
   endAt: string;
+  salt: string;
+  signature: string;
   orderHash: string;
   protocolData: {
     orderType: 'FULL_RESTRICTED' | 'PARTIAL_RESTRICTED';
@@ -226,26 +228,37 @@ export interface Order {
     seaportAddress: string;
     seaportVersion: string;
   };
-  salt: string;
-  signature: string;
-  status: OrderStatus;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ListingResult {
-  result: Order;
+  result: Order & {
+    type: 'LISTING';
+    sell: (ERC721Item | ERC1155Item)[];
+    buy: (NativeItem | ERC20Item)[];
+  };
 }
 
 export interface BulkListingsResult {
   result: {
     success: boolean;
     orderHash: string;
-    order?: Order;
+    order?: Order & {
+      type: 'LISTING';
+      sell: (ERC721Item | ERC1155Item)[];
+      buy: (NativeItem | ERC20Item)[];
+    };
   }[];
 }
 
 export interface ListListingsResult {
   page: Page;
-  result: Order[];
+  result: (Order & {
+    type: 'LISTING';
+    sell: (ERC721Item | ERC1155Item)[];
+    buy: (NativeItem | ERC20Item)[];
+  })[];
 }
 
 export interface Page {
@@ -266,8 +279,8 @@ export interface Trade {
     id: string;
     name: string;
   };
-  buy: (ERC20Item | NativeItem)[];
-  sell: (ERC721Item | ERC1155Item)[];
+  buy: (NativeItem | ERC20Item | ERC721Item | ERC1155Item)[];
+  sell: (ERC20Item | ERC721Item | ERC1155Item)[];
   buyerFees: Fee[];
   sellerAddress: string;
   buyerAddress: string;
