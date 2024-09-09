@@ -65,7 +65,7 @@ export type ConnectWidgetInputs = ConnectWidgetParams & {
   allowedChains?: ChainId[];
   checkout: Checkout;
   web3Provider?: Web3Provider;
-  isCheckNetworkEnabled: boolean;
+  isCheckNetworkEnabled?: boolean;
 };
 
 export default function ConnectWidget({
