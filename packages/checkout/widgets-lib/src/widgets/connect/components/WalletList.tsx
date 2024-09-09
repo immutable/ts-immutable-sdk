@@ -57,11 +57,17 @@ export interface WalletListProps {
   targetChainId: ChainId;
   allowedChains: ChainId[];
   blocklistWalletRdns?: string[];
+  isCheckNetworkEnabled: boolean;
 }
 
 export function WalletList(props: WalletListProps) {
   const { t } = useTranslation();
-  const { targetWalletRdns, targetChainId, allowedChains } = props;
+  const {
+    targetWalletRdns,
+    targetChainId,
+    allowedChains,
+    isCheckNetworkEnabled,
+  } = props;
   const blocklistWalletRdns = props?.blocklistWalletRdns || [];
   const {
     connectDispatch,
@@ -138,13 +144,15 @@ export function WalletList(props: WalletListProps) {
         });
         return;
       }
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: { type: ConnectWidgetViews.SWITCH_NETWORK },
-        },
-      });
-      return;
+      if (isCheckNetworkEnabled) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: { type: ConnectWidgetViews.SWITCH_NETWORK },
+          },
+        });
+        return;
+      }
     }
 
     viewDispatch({

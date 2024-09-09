@@ -65,6 +65,7 @@ export type ConnectWidgetInputs = ConnectWidgetParams & {
   allowedChains?: ChainId[];
   checkout: Checkout;
   web3Provider?: Web3Provider;
+  isCheckNetworkEnabled: boolean;
 };
 
 export default function ConnectWidget({
@@ -77,6 +78,7 @@ export default function ConnectWidget({
   allowedChains,
   blocklistWalletRdns,
   deepLink = ConnectWidgetViews.CONNECT_WALLET,
+  isCheckNetworkEnabled,
 }: ConnectWidgetInputs) {
   const { t } = useTranslation();
   const { environment } = config;
@@ -221,6 +223,7 @@ export default function ConnectWidget({
               targetChainId={targetChain}
               allowedChains={allowedChains ?? [targetChain]}
               blocklistWalletRdns={blocklistWalletRdns}
+              checkNetwork={isCheckNetworkEnabled ?? true}
             />
           )}
           {view.type === ConnectWidgetViews.SWITCH_NETWORK && isZkEvmChainId(targetChain) && (
