@@ -1,4 +1,5 @@
 import {orderbook} from '@imtbl/sdk';
+import {Web3Provider} from "@ethersproject/providers";
 
 export const signAndSubmitApproval = async (
     provider: Web3Provider,
