@@ -116,6 +116,7 @@ export default function CreateERC721ListingWithPassport() {
         setSuccessMessageState(`Listing created successfully - ${listingID}`);
     };
 
+    // #doc prepare-erc721-listing
     // prepare ERC721 listing
     const prepareERC721Listing = async (): Promise<orderbook.PrepareListingResponse> => {
         // build the sell item
@@ -147,6 +148,7 @@ export default function CreateERC721ListingWithPassport() {
         // invoke the orderbook SDK to prepare the listing
         return await orderbookSDK.prepareListing(prepareListingParams);
     };
+    // #enddoc prepare-erc721-listing
 
     // create ERC721 listing
     const createER721Listing = async () => {

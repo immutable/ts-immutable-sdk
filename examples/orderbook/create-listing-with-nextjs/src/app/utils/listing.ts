@@ -1,6 +1,7 @@
 import {orderbook} from '@imtbl/sdk';
 import {Web3Provider} from "@ethersproject/providers";
 
+// #doc sign-and-submit-approval
 export const signAndSubmitApproval = async (
     provider: Web3Provider,
     listing: orderbook.PrepareListingResponse
@@ -23,7 +24,9 @@ export const signAndSubmitApproval = async (
 
     return;
 }
+// #enddoc sign-and-submit-approval
 
+// #doc sign-listing
 export const signListing = async (
     provider: Web3Provider,
     listing: orderbook.PrepareListingResponse
@@ -47,7 +50,9 @@ export const signListing = async (
 
     return signature;
 }
+// #enddoc sign-listing
 
+// #doc create-listing
 export const createListing = async (
     client: orderbook.Orderbook,
     preparedListing: orderbook.PrepareListingResponse,
@@ -65,3 +70,4 @@ export const createListing = async (
     });
     return order.result.id
 };
+// #enddoc create-listing
