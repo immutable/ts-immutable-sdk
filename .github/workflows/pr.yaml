@@ -88,7 +88,6 @@ jobs:
   test-sdk:
     name: Test SDK
     runs-on: ubuntu-latest-8-cores
-    needs: build-sdk
     env:
       NODE_OPTIONS: --max-old-space-size=14366
     steps:
@@ -101,7 +100,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Test
-        run: yarn test --configuration=ci
+        run: yarn nx run-many --all -t test --parallel=5 --configuration=ci --skip-nx-cache
 
       - name: Upload SDK test coverage artifacts
         uses: actions/upload-artifact@v4
