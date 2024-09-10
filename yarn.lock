@@ -3644,6 +3644,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@examples/create-listing-with-nextjs@workspace:examples/orderbook/create-listing-with-nextjs":
+  version: 0.0.0-use.local
+  resolution: "@examples/create-listing-with-nextjs@workspace:examples/orderbook/create-listing-with-nextjs"
+  dependencies:
+    "@biom3/react": ^0.26.1
+    "@ethersproject/providers": ^5.7.2
+    "@imtbl/sdk": latest
+    "@playwright/test": ^1.47.0
+    "@types/node": ^20
+    "@types/react": ^18
+    "@types/react-dom": ^18
+    eslint: ^8
+    eslint-config-next: 14.2.7
+    next: 14.2.7
+    react: ^18
+    react-dom: ^18
+    typescript: ^5
+  languageName: unknown
+  linkType: soft
+
 "@examples/identity-with-nextjs@workspace:examples/passport/identity-with-nextjs":
   version: 0.0.0-use.local
   resolution: "@examples/identity-with-nextjs@workspace:examples/passport/identity-with-nextjs"
@@ -4486,73 +4506,6 @@ __metadata:
       optional: true
   languageName: unknown
   linkType: soft
-
-"@imtbl/sdk@npm:^1.51.2":
-  version: 1.51.4
-  resolution: "@imtbl/sdk@npm:1.51.4"
-  dependencies:
-    "@0xsequence/abi": ^1.4.3
-    "@0xsequence/core": ^1.4.3
-    "@biom3/design-tokens": ^0.4.2
-    "@biom3/react": ^0.25.0
-    "@ethersproject/abi": ^5.7.0
-    "@ethersproject/abstract-signer": ^5.7.0
-    "@ethersproject/keccak256": ^5.7.0
-    "@ethersproject/providers": ^5.7.2
-    "@ethersproject/strings": ^5.7.0
-    "@ethersproject/wallet": ^5.7.0
-    "@imtbl/react-analytics": 0.2.1-alpha
-    "@jest/globals": ^29.5.0
-    "@magic-ext/oidc": 4.3.1
-    "@metamask/detect-provider": ^2.0.0
-    "@opensea/seaport-js": 4.0.3
-    "@rive-app/react-canvas-lite": ^4.9.0
-    "@stdlib/number-float64-base-normalize": 0.0.8
-    "@uniswap/router-sdk": ^1.4.0
-    "@uniswap/sdk-core": ^3.0.1
-    "@uniswap/v3-sdk": ^3.9.0
-    "@walletconnect/ethereum-provider": ^2.11.1
-    "@walletconnect/modal": ^2.6.2
-    assert: ^2.0.0
-    axios: ^1.6.5
-    bn.js: ^5.2.1
-    buffer: ^6.0.3
-    crypto-browserify: ^3.12.0
-    elliptic: ^6.5.7
-    enc-utils: ^3.0.0
-    ethereumjs-wallet: ^1.0.2
-    ethers: ^5.7.2
-    ethers-v6: "npm:ethers@6.11.1"
-    events: ^3.3.0
-    global-const: ^0.1.2
-    https-browserify: ^1.0.0
-    i18next: ^23.7.6
-    i18next-browser-languagedetector: ^7.2.0
-    jwt-decode: ^3.1.2
-    localforage: ^1.10.0
-    lru-memorise: 0.3.0
-    magic-sdk: ^21.2.0
-    merkletreejs: ^0.3.11
-    oidc-client-ts: 2.4.0
-    os-browserify: ^0.3.0
-    pako: ^2.1.0
-    pg: ^8.11.5
-    pino-pretty: ^11.2.2
-    prisma: ^5.13.0
-    react-i18next: ^13.5.0
-    sns-validator: ^0.3.5
-    stream-browserify: ^3.0.0
-    stream-http: ^3.2.0
-    url: ^0.11.0
-    uuid: ^8.3.2
-  dependenciesMeta:
-    pg:
-      optional: true
-    prisma:
-      optional: true
-  checksum: 1afa578e875bf76429abd8880d548de578f24c5c5b2c07fa88a3fee24c52e5739988ee0ba560fb49984e9b0e1677cdce5098158b4e0ff72715f0be483675e8da
-  languageName: node
-  linkType: hard
 
 "@imtbl/sdk@npm:latest":
   version: 1.46.5
@@ -8465,13 +8418,6 @@ __metadata:
   version: 0.11.0
   resolution: "@pkgjs/parseargs@npm:0.11.0"
   checksum: 6ad6a00fc4f2f2cfc6bff76fb1d88b8ee20bc0601e18ebb01b6d4be583733a860239a521a7fbca73b612e66705078809483549d2b18f370eb346c5155c8e4a0f
-  languageName: node
-  linkType: hard
-
-"@pkgr/core@npm:^0.1.0":
-  version: 0.1.1
-  resolution: "@pkgr/core@npm:0.1.1"
-  checksum: 6f25fd2e3008f259c77207ac9915b02f1628420403b2630c92a07ff963129238c9262afc9e84344c7a23b5cc1f3965e2cd17e3798219f5fd78a63d144d3cceba
   languageName: node
   linkType: hard
 
@@ -17512,29 +17458,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"create-listing-with-nextjs@workspace:examples/orderbook/create-listing-with-nextjs":
-  version: 0.0.0-use.local
-  resolution: "create-listing-with-nextjs@workspace:examples/orderbook/create-listing-with-nextjs"
-  dependencies:
-    "@biom3/react": ^0.26.1
-    "@ethersproject/providers": ^5.7.2
-    "@imtbl/sdk": ^1.51.2
-    "@playwright/test": ^1.47.0
-    "@types/node": ^20
-    "@types/react": ^18
-    "@types/react-dom": ^18
-    eslint: ^8
-    eslint-config-next: 14.2.7
-    eslint-config-prettier: 9.1.0
-    eslint-plugin-prettier: 5.2.1
-    next: 14.2.7
-    prettier: 3.3.3
-    react: ^18
-    react-dom: ^18
-    typescript: ^5
-  languageName: unknown
-  linkType: soft
-
 "create-require@npm:^1.1.0, create-require@npm:^1.1.1":
   version: 1.1.1
   resolution: "create-require@npm:1.1.1"
@@ -20022,17 +19945,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-prettier@npm:9.1.0":
-  version: 9.1.0
-  resolution: "eslint-config-prettier@npm:9.1.0"
-  peerDependencies:
-    eslint: ">=7.0.0"
-  bin:
-    eslint-config-prettier: bin/cli.js
-  checksum: 9229b768c879f500ee54ca05925f31b0c0bafff3d9f5521f98ff05127356de78c81deb9365c86a5ec4efa990cb72b74df8612ae15965b14136044c73e1f6a907
-  languageName: node
-  linkType: hard
-
 "eslint-config-react-app@npm:^7.0.1":
   version: 7.0.1
   resolution: "eslint-config-react-app@npm:7.0.1"
@@ -20267,26 +20179,6 @@ __metadata:
   peerDependencies:
     eslint: ">=7.0.0"
   checksum: 07fc975c7768b19de4d2883307177f10e94b6318a4971dbc3c52edcea01977a59a54b85fe564974e43b29b12b821b06afd48d95b631e84d203c44676778aa019
-  languageName: node
-  linkType: hard
-
-"eslint-plugin-prettier@npm:5.2.1":
-  version: 5.2.1
-  resolution: "eslint-plugin-prettier@npm:5.2.1"
-  dependencies:
-    prettier-linter-helpers: ^1.0.0
-    synckit: ^0.9.1
-  peerDependencies:
-    "@types/eslint": ">=8.0.0"
-    eslint: ">=8.0.0"
-    eslint-config-prettier: "*"
-    prettier: ">=3.0.0"
-  peerDependenciesMeta:
-    "@types/eslint":
-      optional: true
-    eslint-config-prettier:
-      optional: true
-  checksum: 812f4d1596dcd3a55963212dfbd818a4b38f880741aac75f6869aa740dc5d934060674d3b85d10ff9fec424defa61967dbdef26b8a893a92c9b51880264ed0d9
   languageName: node
   linkType: hard
 
@@ -21394,13 +21286,6 @@ __metadata:
   version: 3.1.3
   resolution: "fast-deep-equal@npm:3.1.3"
   checksum: e21a9d8d84f53493b6aa15efc9cfd53dd5b714a1f23f67fb5dc8f574af80df889b3bce25dc081887c6d25457cce704e636395333abad896ccdec03abaf1f3f9d
-  languageName: node
-  linkType: hard
-
-"fast-diff@npm:^1.1.2":
-  version: 1.3.0
-  resolution: "fast-diff@npm:1.3.0"
-  checksum: d22d371b994fdc8cce9ff510d7b8dc4da70ac327bcba20df607dd5b9cae9f908f4d1028f5fe467650f058d1e7270235ae0b8230809a262b4df587a3b3aa216c3
   languageName: node
   linkType: hard
 
@@ -32283,24 +32168,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier-linter-helpers@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "prettier-linter-helpers@npm:1.0.0"
-  dependencies:
-    fast-diff: ^1.1.2
-  checksum: 00ce8011cf6430158d27f9c92cfea0a7699405633f7f1d4a45f07e21bf78e99895911cbcdc3853db3a824201a7c745bd49bfea8abd5fb9883e765a90f74f8392
-  languageName: node
-  linkType: hard
-
-"prettier@npm:3.3.3":
-  version: 3.3.3
-  resolution: "prettier@npm:3.3.3"
-  bin:
-    prettier: bin/prettier.cjs
-  checksum: bc8604354805acfdde6106852d14b045bb20827ad76a5ffc2455b71a8257f94de93f17f14e463fe844808d2ccc87248364a5691488a3304f1031326e62d9276e
-  languageName: node
-  linkType: hard
-
 "prettier@npm:^2.3.1, prettier@npm:^2.8.7":
   version: 2.8.8
   resolution: "prettier@npm:2.8.8"
@@ -36463,16 +36330,6 @@ __metadata:
     "@pkgr/utils": ^2.3.1
     tslib: ^2.5.0
   checksum: 8a9560e5d8f3d94dc3cf5f7b9c83490ffa30d320093560a37b88f59483040771fd1750e76b9939abfbb1b5a23fd6dfbae77f6b338abffe7cae7329cd9b9bb86b
-  languageName: node
-  linkType: hard
-
-"synckit@npm:^0.9.1":
-  version: 0.9.1
-  resolution: "synckit@npm:0.9.1"
-  dependencies:
-    "@pkgr/core": ^0.1.0
-    tslib: ^2.6.2
-  checksum: 4042941a4d939675f1d7b01124b8405b6ac616f3e3f396d00e46c67f38d0d5b7f9a1de05bc7ceea4ce80d967b450cfa2460e5f6aca81f7cea8f1a28be9392985
   languageName: node
   linkType: hard
 
