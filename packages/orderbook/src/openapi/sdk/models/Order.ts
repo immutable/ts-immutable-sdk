@@ -61,6 +61,7 @@ export namespace Order {
   export enum type {
     LISTING = 'LISTING',
     BID = 'BID',
+    COLLECTION_BID = 'COLLECTION_BID',
   }
 
 

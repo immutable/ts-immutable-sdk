@@ -5,10 +5,14 @@ import { Fee as OpenapiFee, OrdersService, OrderStatus } from './openapi/sdk';
 // Strictly re-export only the OrderStatusName enum from the openapi types
 export { OrderStatusName } from './openapi/sdk';
 
-export interface ERC1155Item {
-  type: 'ERC1155';
+export interface NativeItem {
+  type: 'NATIVE';
+  amount: string;
+}
+
+export interface ERC20Item {
+  type: 'ERC20';
   contractAddress: string;
-  tokenId: string;
   amount: string;
 }
 
@@ -18,14 +22,22 @@ export interface ERC721Item {
   tokenId: string;
 }
 
-export interface ERC20Item {
-  type: 'ERC20';
+export interface ERC1155Item {
+  type: 'ERC1155';
+  contractAddress: string;
+  tokenId: string;
+  amount: string;
+}
+
+export interface ERC721CollectionItem {
+  type: 'ERC721_COLLECTION';
   contractAddress: string;
   amount: string;
 }
 
-export interface NativeItem {
-  type: 'NATIVE';
+export interface ERC1155CollectionItem {
+  type: 'ERC1155_COLLECTION';
+  contractAddress: string;
   amount: string;
 }
 
@@ -194,7 +206,7 @@ export interface CancelOrdersOnChainResponse {
   cancellationAction: TransactionAction;
 }
 
-export type Order = Listing | Bid;
+export type Order = Listing | Bid | CollectionBid;
 
 export interface Listing extends OrderFields {
   type: 'LISTING';
@@ -206,6 +218,12 @@ export interface Bid extends OrderFields {
   type: 'BID';
   sell: ERC20Item[];
   buy: (ERC721Item | ERC1155Item)[];
+}
+
+export interface CollectionBid extends OrderFields {
+  type: 'COLLECTION_BID';
+  sell: ERC20Item[];
+  buy: (ERC721CollectionItem | ERC1155CollectionItem)[];
 }
 
 interface OrderFields {
