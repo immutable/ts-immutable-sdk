@@ -13,7 +13,7 @@ export default function Home() {
       className="mb-1"
       size="medium" 
       rc={<NextLink href="/switch-with-metamask" />}>
-        Switch Network with MetaMask Connection
+        Switch Network with MetaMask
       </Button> 
   </>);
 }

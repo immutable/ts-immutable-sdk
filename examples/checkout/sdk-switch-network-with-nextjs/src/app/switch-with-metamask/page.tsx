@@ -23,11 +23,12 @@ export default function ConnectWithMetamask() {
 
   const updateNetworkInfo = async (provider: Web3Provider) => {
     try {
-
       // #doc get-network-details
       // Get the network details
       const info = await checkoutSDK.getNetworkInfo({ provider });
       // #enddoc get-network-details
+      // console.log for debugging
+      console.log("info", info);
       setNetworkInfo(info);
       setChainName(info.name);
       setChainId(info.chainId.toString());
