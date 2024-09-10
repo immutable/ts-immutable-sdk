@@ -87,7 +87,7 @@ jobs:
 
   test-sdk:
     name: Test SDK
-    runs-on: ubuntu-latest-8-cores
+    runs-on: ubuntu-latest-4-cores
     env:
       NODE_OPTIONS: --max-old-space-size=14366
     steps:
