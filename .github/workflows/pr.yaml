@@ -98,8 +98,12 @@ jobs:
           fetch-depth: 0
       - name: setup
         uses: ./.github/actions/setup
+
+      - name: Build sdk
+        run: yarn build --skip-nx-cache
+
       - name: Test
-        run: yarn nx run @imtbl/dex-sdk:test --skip-nx-cache
+        run: yarn workspace @imtbl/dex-sdk test
 
       - name: Upload SDK test coverage artifacts
         uses: actions/upload-artifact@v4
