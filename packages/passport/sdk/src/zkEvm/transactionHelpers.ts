@@ -184,6 +184,7 @@ export const prepareAndSignTransaction = async ({
     nonce: convertBigNumberishToString(nonce),
     metaTransactions,
   });
+  validateEVMTransactionPromise.then(() => flow.addEvent('endValidateEVMTransaction'));
 
   // NOTE: We sign again because we now are adding the fee transaction, so the
   // whole payload is different and needs a new signature.
@@ -194,14 +195,12 @@ export const prepareAndSignTransaction = async ({
     zkEvmAddress,
     ethSigner,
   );
+  getSignedMetaTransactionsPromise.then(() => flow.addEvent('endGetSignedMetaTransactions'));
 
   const [, signedTransactions] = await Promise.all([
     validateEVMTransactionPromise,
     getSignedMetaTransactionsPromise,
   ]);
-
-  flow.addEvent('endValidateEVMTransaction');
-  flow.addEvent('endGetSignedMetaTransactions');
 
   const relayerId = await relayerClient.ethSendTransaction(zkEvmAddress, signedTransactions);
   flow.addEvent('endRelayerSendTransaction');
