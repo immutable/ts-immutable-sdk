@@ -5,16 +5,18 @@ export const lazyLoad = <T, Y = void>(
 
 export const lazyDocumentReady = <T>(initialiseFunction: () => Promise<T> | T): Promise<T> => {
   const documentReadyPromise = () => new Promise<void>((resolve) => {
+    const onReadyStateChange = () => {
+      if (window.document.readyState === 'complete') {
+        resolve();
+        window.document.removeEventListener('readystatechange', onReadyStateChange);
+      }
+    };
+
+    // Add a handler before checking `readyState` to ensure that we don't miss the event
+    window.document.addEventListener('readystatechange', onReadyStateChange);
     if (window.document.readyState === 'complete') {
       resolve();
-    } else {
-      const onReadyStateChange = () => {
-        if (window.document.readyState === 'complete') {
-          resolve();
-          window.document.removeEventListener('readystatechange', onReadyStateChange);
-        }
-      };
-      window.document.addEventListener('readystatechange', onReadyStateChange);
+      window.document.removeEventListener('readystatechange', onReadyStateChange);
     }
   });
 
