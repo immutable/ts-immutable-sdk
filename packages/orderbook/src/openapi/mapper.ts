@@ -3,9 +3,8 @@ import {
   ERC20Item,
   ERC721Item,
   FeeType,
-  ListingLike,
+  Listing,
   NativeItem,
-  Order,
   Page,
   Trade,
 } from '../types';
@@ -13,7 +12,7 @@ import { Order as OpenApiOrder } from './sdk/models/Order';
 import { Page as OpenApiPage } from './sdk/models/Page';
 import { Trade as OpenApiTrade } from './sdk/models/Trade';
 
-export function mapListingFromOpenApiOrder(order: OpenApiOrder): Order & ListingLike {
+export function mapListingFromOpenApiOrder(order: OpenApiOrder): Listing {
   if (order.type !== OpenApiOrder.type.LISTING) {
     throw new Error('Order type must be LISTING');
   }

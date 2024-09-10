@@ -37,7 +37,7 @@ export interface RoyaltyInfo {
 export interface PrepareListingParams {
   makerAddress: string;
   sell: ERC721Item | ERC1155Item;
-  buy: ERC20Item | NativeItem;
+  buy: NativeItem | ERC20Item;
   orderExpiry?: Date;
 }
 
@@ -51,7 +51,7 @@ export interface PrepareBulkListingsParams {
   makerAddress: string;
   listingParams: {
     sell: ERC721Item | ERC1155Item;
-    buy: ERC20Item | NativeItem;
+    buy: NativeItem | ERC20Item;
     makerFees: FeeValue[];
     orderExpiry?: Date;
   }[];
@@ -194,16 +194,27 @@ export interface CancelOrdersOnChainResponse {
   cancellationAction: TransactionAction;
 }
 
-export interface Order {
+export type Order = Listing | Bid;
+
+export interface Listing extends OrderFields {
+  type: 'LISTING';
+  sell: (ERC721Item | ERC1155Item)[];
+  buy: (NativeItem | ERC20Item)[];
+}
+
+export interface Bid extends OrderFields {
+  type: 'BID';
+  sell: ERC20Item[];
+  buy: (ERC721Item | ERC1155Item)[];
+}
+
+interface OrderFields {
   id: string;
-  type: 'LISTING' | 'BID';
   chain: {
     id: string;
     name: string;
   };
   accountAddress: string;
-  sell: (ERC20Item | ERC721Item | ERC1155Item)[];
-  buy: (NativeItem | ERC20Item | ERC721Item | ERC1155Item)[];
   fees: Fee[];
   status: OrderStatus;
   fillStatus: {
@@ -232,27 +243,21 @@ export interface Order {
   updatedAt: string;
 }
 
-export interface ListingLike {
-  type: 'LISTING';
-  sell: (ERC721Item | ERC1155Item)[];
-  buy: (NativeItem | ERC20Item)[];
-}
-
 export interface ListingResult {
-  result: Order & ListingLike;
+  result: Listing;
 }
 
 export interface BulkListingsResult {
   result: {
     success: boolean;
     orderHash: string;
-    order?: Order & ListingLike;
+    order?: Listing;
   }[];
 }
 
 export interface ListListingsResult {
   page: Page;
-  result: (Order & ListingLike)[];
+  result: Listing[];
 }
 
 export interface Page {
