@@ -25,8 +25,6 @@ export default function ConnectWithMetamask() {
       // Get the network details
       const info = await checkoutSDK.getNetworkInfo({ provider });
       // #enddoc get-network-details
-      // console.log for debugging
-      console.log("info", info);
       setNetworkInfo(info);
       setChainName(info.name);
       setChainId(info.chainId.toString());
@@ -95,10 +93,10 @@ export default function ConnectWithMetamask() {
       // #doc switch-network
       // Switch to Immutable zkEVM Testnet
       const chainId = checkout.ChainId.IMTBL_ZKEVM_TESTNET;
-      await checkoutSDK.switchNetwork({ provider: connectedProvider, chainId });
+      const switchResponse = await checkoutSDK.switchNetwork({ provider: connectedProvider, chainId });
       // #enddoc switch-network
-
-      await updateNetworkInfo(connectedProvider);
+      setConnectedProvider(switchResponse.provider);
+      await updateNetworkInfo(switchResponse.provider);
     } catch (error) {
       console.error("Failed to switch network:", error);
     } finally {
@@ -116,10 +114,10 @@ export default function ConnectWithMetamask() {
       // #doc switch-network
       // Switch to Sepolia Testnet
       const chainId = checkout.ChainId.SEPOLIA;
-      await checkoutSDK.switchNetwork({ provider: connectedProvider, chainId });
+      const switchResponse = await checkoutSDK.switchNetwork({ provider: connectedProvider, chainId });
       // #enddoc switch-network
-
-      await updateNetworkInfo(connectedProvider);
+      setConnectedProvider(switchResponse.provider);
+      await updateNetworkInfo(switchResponse.provider);
     } catch (error) {
       console.error("Failed to switch network:", error);
     } finally {
