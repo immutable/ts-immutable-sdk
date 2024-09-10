@@ -100,7 +100,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Test
-        run: yarn nx run-many --all -t test --parallel=5 --configuration=ci --skip-nx-cache
+        run: yarn workspace @imtbl/dex-sdk test
 
       - name: Upload SDK test coverage artifacts
         uses: actions/upload-artifact@v4
