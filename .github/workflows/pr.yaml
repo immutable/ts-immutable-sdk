@@ -101,7 +101,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Test
-        run: yarn test --configuration=ci --skip-nx-cache
+        run: yarn nx run-many --target=test --parallel=5 --skip-nx-cache
 
       - name: Upload SDK test coverage artifacts
         uses: actions/upload-artifact@v4
