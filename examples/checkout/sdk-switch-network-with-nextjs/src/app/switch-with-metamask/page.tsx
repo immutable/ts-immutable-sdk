@@ -3,8 +3,6 @@ import { checkout } from "@imtbl/sdk";
 import { checkoutSDK } from "../utils/setupDefault";
 import { useState } from "react";
 import { Web3Provider } from "@ethersproject/providers";
-import { ChainName } from "@imtbl/sdk/checkout";
-import { WalletInfo, WalletProviderName } from "@imtbl/sdk/checkout";
 import { Button, Heading, Body, Link, Table } from "@biom3/react";
 import NextLink from "next/link";
 import { NetworkInfo } from "@imtbl/sdk/checkout";
