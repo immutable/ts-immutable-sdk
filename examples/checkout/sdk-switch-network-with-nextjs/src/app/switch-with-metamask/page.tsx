@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { checkout } from "@imtbl/sdk";
 import { checkoutSDK } from "../utils/setupDefault";
 import { useState } from "react";
