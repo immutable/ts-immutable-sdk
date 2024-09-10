@@ -3651,7 +3651,7 @@ __metadata:
     "@biom3/react": ^0.26.1
     "@ethersproject/providers": ^5.7.2
     "@imtbl/sdk": latest
-    "@playwright/test": ^1.47.0
+    "@playwright/test": ^1.45.3
     "@types/node": ^20
     "@types/react": ^18
     "@types/react-dom": ^18
@@ -8443,17 +8443,6 @@ __metadata:
   bin:
     playwright: cli.js
   checksum: 3e2c88d40f98cf94ab7947263804d1ee78c4bb21a35c8dbb64855eed5565ffc688509c5f07bda5438cba6c354374981448dcba3dbe326d1699b4fef75c9ce43d
-  languageName: node
-  linkType: hard
-
-"@playwright/test@npm:^1.47.0":
-  version: 1.47.0
-  resolution: "@playwright/test@npm:1.47.0"
-  dependencies:
-    playwright: 1.47.0
-  bin:
-    playwright: cli.js
-  checksum: 4f5a921c57d2577c64b0bc03d4b97937a6f853eee6afb58f2fc8fb140147b7f33800afe490c9ba3af515d5feb104f65319663931ec1ee75e10f001c1d69b138c
   languageName: node
   linkType: hard
 
@@ -31080,15 +31069,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.47.0":
-  version: 1.47.0
-  resolution: "playwright-core@npm:1.47.0"
-  bin:
-    playwright-core: cli.js
-  checksum: 64c6adae3ba76cd9f05e6569b1350a6e6990fd8236bb17d1f241b49bea68592a4f4390adb38863d2ee8ef5124e9cb77ff50b9076f8ef3a0890b2a37f87fb842a
-  languageName: node
-  linkType: hard
-
 "playwright@npm:1.45.3":
   version: 1.45.3
   resolution: "playwright@npm:1.45.3"
@@ -31101,21 +31081,6 @@ __metadata:
   bin:
     playwright: cli.js
   checksum: d9d23b155ccd001553214f710561b01e48eb409676102f8ab94c0b4aa5ac5f398becc1a96528b0554944e07e34189503d891913e0e0a4aa58ad36b9c08747983
-  languageName: node
-  linkType: hard
-
-"playwright@npm:1.47.0":
-  version: 1.47.0
-  resolution: "playwright@npm:1.47.0"
-  dependencies:
-    fsevents: 2.3.2
-    playwright-core: 1.47.0
-  dependenciesMeta:
-    fsevents:
-      optional: true
-  bin:
-    playwright: cli.js
-  checksum: e055fee751035f306a636267d0e080f08d4a523a6c1e3ebb01c91c18838c29bb9165ec3e63eb706798886fa2715f272dec908a7e2e1abcd7a55984688dbac2db
   languageName: node
   linkType: hard
 
