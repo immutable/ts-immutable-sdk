@@ -15,19 +15,28 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { RefreshMetadataByID } from './refresh-metadata-by-id';
+import { Order } from './order';
+// May contain unused imports in some cases
+// @ts-ignore
+import { Page } from './page';
 
 /**
- * Request body for refreshing metadata by id. Total size of this list should not exceed 228 KiB
+ * 
  * @export
- * @interface RefreshMetadataByIDRequest
+ * @interface ListBidsResult
  */
-export interface RefreshMetadataByIDRequest {
+export interface ListBidsResult {
     /**
      * 
-     * @type {Array<RefreshMetadataByID>}
-     * @memberof RefreshMetadataByIDRequest
+     * @type {Page}
+     * @memberof ListBidsResult
      */
-    'metadata': Array<RefreshMetadataByID>;
+    'page': Page;
+    /**
+     * 
+     * @type {Array<Order>}
+     * @memberof ListBidsResult
+     */
+    'result': Array<Order>;
 }
 
