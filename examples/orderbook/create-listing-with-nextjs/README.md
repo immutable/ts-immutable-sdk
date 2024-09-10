@@ -1,17 +1,25 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This example application demonstrates how to create a listing using the Immutable SDK. The application connects to the Immutable Sandbox environment and requires a valid client ID and publishable API key (which can be retrieved from the Immutable Hub).
+
+In order to create a listing, a valid ERC721 or ERC1155 token must be provided. The application will prompt the user to connect their Passport wallet and approve the token. Once the token is approved, a listing with the desired price and quantity is created.
+
+## Features
+- Create a listing using ERC721 token
+- Create a listing using ERC1155 token
+
+## Prerequisites
+- Node.js
 
 ## Getting Started
-
-First, run the development server:
+First, install the dependencies:
 
 ```bash
-npm run dev
-# or
+yarn
+```    
+
+Then, run the development server:
+
+```bash
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
