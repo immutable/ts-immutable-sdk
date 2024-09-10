@@ -10,19 +10,57 @@ In order to create a listing, a valid ERC721 or ERC1155 token must be provided. 
 - Node.js
 
 ## Getting Started
-First, install the dependencies:
+1. Install the dependencies:
 
 ```bash
 yarn
 ```    
 
-Then, run the development server:
+2. Copy the `.env.example` file to `.env`:
+
+```bash
+cp .env.example .env
+```
+
+3. Replace the `NEXT_PUBLIC_PUBLISHABLE_KEY` and `NEXT_PUBLIC_CLIENT_ID` with your own values from the Immutable Hub.
+
+
+4. Run the development server:
 
 ```bash
 yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser and you'll be navigated to the home screen.
+
+## Create listing for ERC721 token
+1. Click on the "Create ERC721 Listing" button
+2. Connect your Passport wallet
+3. Enter the following details
+   - NFT Contract Address: The contract address of the ERC721 token
+   - NFT Token ID: The Token ID of the ERC721 token
+   - Currency Type: The type of currency (Native or ERC20) you'd like to receive for the item
+   - Currency Amount: The amount of currency you'd like to receive for the item
+4. Click on the "Create Listing" button
+5. Approve the token for trading
+6. Sign the listing
+7. If successful, the listing will be created and the order ID will be displayed
+8. If unsuccessful, an error message will be displayed
+
+## Create listing for ERC1155 token
+1. Click on the "Create ERC1155 Listing" button
+2. Connect your Passport wallet
+3. Enter the following details
+    - NFT Contract Address: The contract address of the ERC1155 token
+    - NFT Token ID: The Token ID of the ERC1155 token
+    - NFT Token Quantity: The amount of ERC1155 tokens you'd like to list
+    - Currency Type: The type of currency (Native or ERC20) you'd like to receive for the item
+    - Currency Amount: The amount of currency you'd like to receive for the item
+4. Click on the "Create Listing" button
+5. Approve the token for trading
+6. Sign the listing
+7. If successful, the listing will be created and the order ID will be displayed
+8. If unsuccessful, an error message will be displayed
 
 ## Required Environment Variables
 
