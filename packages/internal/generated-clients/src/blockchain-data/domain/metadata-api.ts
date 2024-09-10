@@ -36,27 +36,27 @@ import { RefreshMetadataByIDRequest } from '../models';
 // @ts-ignore
 import { RefreshNFTMetadataByTokenIDRequest } from '../models';
 // @ts-ignore
-export type { APIError400 } from '../models';
+export { APIError400 } from '../models';
 // @ts-ignore
-export type { APIError401 } from '../models';
+export { APIError401 } from '../models';
 // @ts-ignore
-export type { APIError403 } from '../models';
+export { APIError403 } from '../models';
 // @ts-ignore
-export type { APIError404 } from '../models';
+export { APIError404 } from '../models';
 // @ts-ignore
-export type { APIError429 } from '../models';
+export { APIError429 } from '../models';
 // @ts-ignore
-export type { APIError500 } from '../models';
+export { APIError500 } from '../models';
 // @ts-ignore
-export type { GetMetadataResult } from '../models';
+export { GetMetadataResult } from '../models';
 // @ts-ignore
-export type { ListMetadataResult } from '../models';
+export { ListMetadataResult } from '../models';
 // @ts-ignore
-export type { MetadataRefreshRateLimitResult } from '../models';
+export { MetadataRefreshRateLimitResult } from '../models';
 // @ts-ignore
-export type { RefreshMetadataByIDRequest } from '../models';
+export { RefreshMetadataByIDRequest } from '../models';
 // @ts-ignore
-export type { RefreshNFTMetadataByTokenIDRequest } from '../models';
+export { RefreshNFTMetadataByTokenIDRequest } from '../models';
 
 /**
  * Request parameters for getMetadata operation in MetadataApi.

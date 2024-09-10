@@ -34,25 +34,25 @@ import { RefreshCollectionMetadataRequest } from '../models';
 // @ts-ignore
 import { RefreshCollectionMetadataResult } from '../models';
 // @ts-ignore
-export type { APIError400 } from '../models';
+export { APIError400 } from '../models';
 // @ts-ignore
-export type { APIError401 } from '../models';
+export { APIError401 } from '../models';
 // @ts-ignore
-export type { APIError403 } from '../models';
+export { APIError403 } from '../models';
 // @ts-ignore
-export type { APIError404 } from '../models';
+export { APIError404 } from '../models';
 // @ts-ignore
-export type { APIError500 } from '../models';
+export { APIError500 } from '../models';
 // @ts-ignore
-export type { AssetVerificationStatus } from '../models';
+export { AssetVerificationStatus } from '../models';
 // @ts-ignore
-export type { GetCollectionResult } from '../models';
+export { GetCollectionResult } from '../models';
 // @ts-ignore
-export type { ListCollectionsResult } from '../models';
+export { ListCollectionsResult } from '../models';
 // @ts-ignore
-export type { RefreshCollectionMetadataRequest } from '../models';
+export { RefreshCollectionMetadataRequest } from '../models';
 // @ts-ignore
-export type { RefreshCollectionMetadataResult } from '../models';
+export { RefreshCollectionMetadataResult } from '../models';
 
 /**
  * Request parameters for getCollection operation in CollectionsApi.
