@@ -1,5 +1,5 @@
 {
-  "name": "create-listing-with-nextjs",
+  "name": "@examples/create-listing-with-nextjs",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -12,7 +12,7 @@
   "dependencies": {
     "@biom3/react": "^0.26.1",
     "@ethersproject/providers": "^5.7.2",
-    "@imtbl/sdk": "^1.51.2",
+    "@imtbl/sdk": "latest",
     "next": "14.2.7",
     "react": "^18",
     "react-dom": "^18"
@@ -24,9 +24,6 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.7",
-    "eslint-config-prettier": "9.1.0",
-    "eslint-plugin-prettier": "5.2.1",
-    "prettier": "3.3.3",
     "typescript": "^5"
   }
 }
