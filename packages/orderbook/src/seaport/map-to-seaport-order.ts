@@ -5,9 +5,9 @@ import {
   TipInputItem,
 } from '@opensea/seaport-js/lib/types';
 import { constants } from 'ethers';
-import { ItemType, OrderType } from './constants';
 import { Item, Order, ProtocolData } from '../openapi/sdk';
 import { exhaustiveSwitch } from '../utils';
+import { ItemType, OrderType } from './constants';
 
 function mapImmutableItemToSeaportOfferItem(item: Item): OfferItem {
   switch (item.type) {

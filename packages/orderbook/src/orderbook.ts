@@ -7,16 +7,17 @@ import {
   OrderbookModuleConfiguration,
   OrderbookOverrides,
 } from './config/config';
-import { CancelOrdersResult, Fee as OpenApiFee } from './openapi/sdk';
 import {
-  mapListingFromOpenApiOrder,
   mapFromOpenApiPage,
   mapFromOpenApiTrade,
+  mapListingFromOpenApiOrder,
 } from './openapi/mapper';
+import { CancelOrdersResult, Fee as OpenApiFee } from './openapi/sdk';
 import { Seaport } from './seaport';
 import { getBulkSeaportOrderSignatures } from './seaport/components';
 import { SeaportLibFactory } from './seaport/seaport-lib-factory';
 import {
+  Action,
   ActionType,
   CancelOrdersOnChainResponse,
   CreateListingParams,
@@ -24,6 +25,7 @@ import {
   FeeValue,
   FulfillBulkOrdersResponse,
   FulfillmentListing,
+  FulfillmentOrder,
   FulfillOrderResponse,
   ListingResult,
   ListListingsParams,
@@ -31,13 +33,13 @@ import {
   ListTradesParams,
   ListTradesResult,
   OrderStatusName,
-  PrepareCancelOrdersResponse,
-  PrepareListingParams,
   PrepareBulkListingsParams,
   PrepareBulkListingsResponse,
+  PrepareCancelOrdersResponse,
+  PrepareListingParams,
   PrepareListingResponse,
   SignablePurpose,
-  TradeResult, Action,
+  TradeResult,
 } from './types';
 
 /**
@@ -114,9 +116,9 @@ export class Orderbook {
   }
 
   /**
-   * Get an order by ID
+   * Get an listing by ID
    * @param {string} listingId - The listingId to find.
-   * @return {ListingResult} The returned order result.
+   * @return {ListingResult} The returned listing result.
    */
   async getListing(listingId: string): Promise<ListingResult> {
     const apiListing = await this.apiClient.getListing(listingId);
@@ -128,7 +130,7 @@ export class Orderbook {
   /**
    * Get a trade by ID
    * @param {string} tradeId - The tradeId to find.
-   * @return {TradeResult} The returned order result.
+   * @return {TradeResult} The returned trade result.
    */
   async getTrade(tradeId: string): Promise<TradeResult> {
     const apiListing = await this.apiClient.getTrade(tradeId);
@@ -138,10 +140,10 @@ export class Orderbook {
   }
 
   /**
-   * List orders. This method is used to get a list of orders filtered by conditions specified
+   * List listings. This method is used to get a list of listings filtered by conditions specified
    * in the params object.
    * @param {ListListingsParams} listOrderParams - Filtering, ordering and page parameters.
-   * @return {ListListingsResult} The paged orders.
+   * @return {ListListingsResult} The paged listings.
    */
   async listListings(
     listOrderParams: ListListingsParams,
@@ -205,6 +207,7 @@ export class Orderbook {
         makerAddress,
         listingParams[0].sell,
         listingParams[0].buy,
+        listingParams[0].sell.type === 'ERC1155',
         new Date(),
         listingParams[0].orderExpiry || Orderbook.defaultOrderExpiry(),
       );
@@ -242,6 +245,7 @@ export class Orderbook {
         makerAddress,
         listing.sell,
         listing.buy,
+        listing.sell.type === 'ERC1155',
         new Date(),
         listing.orderExpiry || Orderbook.defaultOrderExpiry(),
       )));
@@ -301,11 +305,13 @@ export class Orderbook {
 
     // Bulk listings (with multiple listings) code path for EOA wallets.
     track('orderbookmr', 'bulkListings', { walletType: 'EOA', makerAddress, listingsCount: listingParams.length });
-    const { actions, preparedListings } = await this.seaport.prepareBulkSeaportOrders(
+    const { actions, preparedOrders } = await this.seaport.prepareBulkSeaportOrders(
       makerAddress,
       listingParams.map((orderParam) => ({
-        listingItem: orderParam.sell,
+        orderType: 'LISTING',
+        offerItem: orderParam.sell,
         considerationItem: orderParam.buy,
+        allowPartialFills: orderParam.sell.type === 'ERC1155',
         orderStart: new Date(),
         orderExpiry: orderParam.orderExpiry || Orderbook.defaultOrderExpiry(),
       })),
@@ -319,7 +325,7 @@ export class Orderbook {
           throw new Error('Only a single signature is expected for bulk listing creation');
         }
 
-        const orderComponents = preparedListings.map((orderParam) => orderParam.orderComponents);
+        const orderComponents = preparedOrders.map((orderParam) => orderParam.orderComponents);
         const signature = signatureIsArray ? signatures[0] : signatures;
         const bulkOrderSignatures = getBulkSeaportOrderSignatures(
           signature,
@@ -329,7 +335,7 @@ export class Orderbook {
         const createOrdersApiListingResponse = await Promise.all(
           orderComponents.map((orderComponent, i) => {
             const sig = bulkOrderSignatures[i];
-            const listing = preparedListings[i];
+            const listing = preparedOrders[i];
             const listingParam = listingParams[i];
             return this.apiClient.createListing({
               orderComponents: orderComponent,
@@ -344,7 +350,7 @@ export class Orderbook {
         return {
           result: createOrdersApiListingResponse.map((apiListingResponse, i) => ({
             success: !!apiListingResponse,
-            orderHash: preparedListings[i].orderHash,
+            orderHash: preparedOrders[i].orderHash,
             order: apiListingResponse
               ? mapListingFromOpenApiOrder(apiListingResponse.result)
               : undefined,
@@ -372,6 +378,7 @@ export class Orderbook {
       makerAddress,
       sell,
       buy,
+      sell.type === 'ERC1155',
       // Default order start to now
       new Date(),
       // Default order expiry to 2 years from now
@@ -400,7 +407,7 @@ export class Orderbook {
    * Get unsigned transactions that can be submitted to fulfil an open order. If the approval
    * transaction exists it must be signed and submitted to the chain before the fulfilment
    * transaction can be submitted or it will be reverted.
-   * @param {string} listingId - The listingId to fulfil.
+   * @param {string} orderId - The orderId to fulfil.
    * @param {string} takerAddress - The address of the account fulfilling the order.
    * @param {FeeValue[]} takerFees - Taker ecosystem fees to be paid.
    * @param {string} amountToFill - Amount of the order to fill, defaults to sell item amount.
@@ -408,14 +415,14 @@ export class Orderbook {
    * @return {FulfillOrderResponse} Approval and fulfilment transactions.
    */
   async fulfillOrder(
-    listingId: string,
+    orderId: string,
     takerAddress: string,
     takerFees: FeeValue[],
     amountToFill?: string,
   ): Promise<FulfillOrderResponse> {
     const fulfillmentDataRes = await this.apiClient.fulfillmentData([
       {
-        order_id: listingId,
+        order_id: orderId,
         taker_address: takerAddress,
         fees: takerFees.map((fee) => ({
           amount: fee.amount,
@@ -450,18 +457,24 @@ export class Orderbook {
    * Get unsigned transactions that can be submitted to fulfil multiple open orders. If approval
    * transactions exist, they must be signed and submitted to the chain before the fulfilment
    * transaction can be submitted or it will be reverted.
-   * @param {Array<FulfillmentListing>} listings - The details of the listings to fulfil, amounts
+   * @param {FulfillmentOrder[]} orders - The details of the orders to fulfil, amounts
    *                                               to fill and taker ecosystem fees to be paid.
    * @param {string} takerAddress - The address of the account fulfilling the order.
    * @return {FulfillBulkOrdersResponse} Approval and fulfilment transactions.
    */
   async fulfillBulkOrders(
-    listings: Array<FulfillmentListing>,
+    orders: FulfillmentOrder[] | FulfillmentListing[],
     takerAddress: string,
   ): Promise<FulfillBulkOrdersResponse> {
+    const mappedOrders = orders.map((order): FulfillmentOrder => ({
+      orderId: 'listingId' in order ? order.listingId : order.orderId,
+      takerFees: order.takerFees,
+      amountToFill: order.amountToFill,
+    }));
+
     const fulfillmentDataRes = await this.apiClient.fulfillmentData(
-      listings.map((listingRequest) => ({
-        order_id: listingRequest.listingId,
+      mappedOrders.map((listingRequest) => ({
+        order_id: listingRequest.orderId,
         taker_address: takerAddress,
         fees: listingRequest.takerFees.map((fee) => ({
           amount: fee.amount,
@@ -475,16 +488,16 @@ export class Orderbook {
     try {
       const fulfillableOrdersWithUnits = fulfillmentDataRes.result.fulfillable_orders
         .map((fulfillmentData) => {
-        // Find the listing that corresponds to the order for the units
-          const listing = listings.find((l) => l.listingId === fulfillmentData.order.id);
-          if (!listing) {
-            throw new Error(`Could not find listing for order ${fulfillmentData.order.id}`);
+        // Find the order that corresponds to the order for the units
+          const order = mappedOrders.find((l) => l.orderId === fulfillmentData.order.id);
+          if (!order) {
+            throw new Error(`Could not find order for order ${fulfillmentData.order.id}`);
           }
 
           return {
             extraData: fulfillmentData.extra_data,
             order: fulfillmentData.order,
-            unitsToFill: listing.amountToFill,
+            unitsToFill: order.amountToFill,
           };
         });
 

@@ -4583,6 +4583,7 @@ __metadata:
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
+    "@0xsquid/sdk": ^2.8.24
     "@babel/core": ^7.21.0
     "@babel/plugin-transform-class-properties": ^7.24.1
     "@babel/plugin-transform-private-methods": ^7.24.1

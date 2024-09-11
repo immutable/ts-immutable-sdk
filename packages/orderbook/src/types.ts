@@ -53,11 +53,13 @@ export interface PrepareListingParams {
   orderExpiry?: Date;
 }
 
-export interface PrepareListingResponse {
+export interface PrepareOrderResponse {
   actions: Action[];
   orderComponents: OrderComponents;
   orderHash: string;
 }
+
+export type PrepareListingResponse = PrepareOrderResponse;
 
 export interface PrepareBulkListingsParams {
   makerAddress: string;
@@ -81,7 +83,7 @@ export interface PrepareBulkListingsResponse {
 
 export interface PrepareBulkSeaportOrders {
   actions: Action[];
-  preparedListings: {
+  preparedOrders: {
     orderComponents: OrderComponents;
     orderHash: string;
   }[];
@@ -133,7 +135,11 @@ export enum TransactionPurpose {
 }
 
 export enum SignablePurpose {
-  CREATE_LISTING = 'CREATE_LISTING',
+  /**
+   * @deprecated Use `CREATE_ORDER` instead
+   */
+  CREATE_LISTING = 'CREATE_ORDER',
+  CREATE_ORDER = 'CREATE_ORDER',
   OFF_CHAIN_CANCELLATION = 'OFF_CHAIN_CANCELLATION',
 }
 
@@ -162,9 +168,18 @@ export interface SignableAction {
 
 export type Action = TransactionAction | SignableAction;
 
+export interface FulfillmentOrder {
+  orderId: string;
+  takerFees: FeeValue[];
+  amountToFill?: string;
+}
+
+/**
+ * @deprecated Use `FulfillmentOrder` instead
+ */
 export interface FulfillmentListing {
   listingId: string;
-  takerFees: Array<FeeValue>;
+  takerFees: FeeValue[];
   amountToFill?: string;
 }
 

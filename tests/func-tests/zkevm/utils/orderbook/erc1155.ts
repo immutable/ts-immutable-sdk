@@ -1,13 +1,10 @@
 /* eslint-disable */
 import { Wallet } from 'ethers';
-import { GAS_OVERRIDES } from './gas';
-import { randomBytes } from 'crypto';
-import hre from 'hardhat'
+import hre from 'hardhat';
 import {
-  OperatorAllowlistUpgradeable__factory, TestERC1155Token, TestERC1155Token__factory,
-  TestToken,
-  TestToken__factory
+  OperatorAllowlistUpgradeable__factory, TestERC1155Token, TestERC1155Token__factory
 } from '../../typechain-types';
+import { GAS_OVERRIDES } from './gas';
 
 export async function connectToTestERC1155Token(deployer: Wallet, tokenAddress: string): Promise<TestERC1155Token> {
   const hreEthers = (hre as any).ethers;
