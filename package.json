@@ -98,7 +98,8 @@
       "packages/webhook/sdk",
       "packages/minting-backend/sdk",
       "tests/**",
-      "examples/passport/**"
+      "examples/passport/**",
+      "examples/orderbook/**"
     ],
     "nohoist": [
       "examples/**",
