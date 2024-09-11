@@ -1,5 +1,5 @@
 {
-  "name": "@examples/sdk-connect-with-nextjs",
+  "name": "@examples/switch-network-with-nextjs",
   "version": "0.1.0",
   "private": true,
   "scripts": {

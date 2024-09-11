@@ -99,7 +99,8 @@
       "packages/minting-backend/sdk",
       "tests/**",
       "examples/passport/**",
-      "examples/orderbook/**"
+      "examples/orderbook/**",
+      "examples/checkout/**"
     ],
     "nohoist": [
       "examples/**",
