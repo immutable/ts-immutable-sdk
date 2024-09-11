@@ -15,21 +15,28 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ERC1155Item } from './erc1155-item';
+import { Order } from './order';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ERC20Item } from './erc20-item';
-// May contain unused imports in some cases
-// @ts-ignore
-import { ERC721Item } from './erc721-item';
-// May contain unused imports in some cases
-// @ts-ignore
-import { NativeItem } from './native-item';
+import { Page } from './page';
 
 /**
- * @type Item
+ * 
  * @export
+ * @interface ListBidsResult
  */
-export type Item = { type: 'ERC1155' } & ERC1155Item | { type: 'ERC20' } & ERC20Item | { type: 'ERC721' } & ERC721Item | { type: 'NATIVE' } & NativeItem;
-
+export interface ListBidsResult {
+    /**
+     * 
+     * @type {Page}
+     * @memberof ListBidsResult
+     */
+    'page': Page;
+    /**
+     * 
+     * @type {Array<Order>}
+     * @memberof ListBidsResult
+     */
+    'result': Array<Order>;
+}
 
