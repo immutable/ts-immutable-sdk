@@ -10,6 +10,7 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { ActiveOrderStatus } from './models/ActiveOrderStatus';
+export type { AssetCollectionItem } from './models/AssetCollectionItem';
 export type { BidResult } from './models/BidResult';
 export { CancelledOrderStatus } from './models/CancelledOrderStatus';
 export type { CancelOrdersRequestBody } from './models/CancelOrdersRequestBody';
@@ -18,7 +19,6 @@ export type { CancelOrdersResultData } from './models/CancelOrdersResultData';
 export type { Chain } from './models/Chain';
 export type { ChainName } from './models/ChainName';
 export type { CollectionBidResult } from './models/CollectionBidResult';
-export type { CollectionItem } from './models/CollectionItem';
 export type { CreateBidRequestBody } from './models/CreateBidRequestBody';
 export type { CreateCollectionBidRequestBody } from './models/CreateCollectionBidRequestBody';
 export type { CreateListingRequestBody } from './models/CreateListingRequestBody';

@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { CollectionItem } from './CollectionItem';
+import type { AssetCollectionItem } from './AssetCollectionItem';
 import type { ERC20Item } from './ERC20Item';
 import type { Fee } from './Fee';
 import type { ProtocolData } from './ProtocolData';
@@ -13,7 +13,7 @@ export type CreateCollectionBidRequestBody = {
   /**
    * Buy item for listing should either be ERC721 or ERC1155 collection item
    */
-  buy: Array<CollectionItem>;
+  buy: Array<AssetCollectionItem>;
   /**
    * Buy fees should only include maker marketplace fees and should be no more than two entries as more entires will incur more gas. It is best practice to have this as few as possible.
    */
