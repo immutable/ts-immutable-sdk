@@ -293,17 +293,6 @@ export interface ListListingsResult {
   result: Listing[];
 }
 
-export interface Page {
-  /**
-   * First item as an encoded string
-   */
-  previousCursor: string | null;
-  /**
-   * Last item as an encoded string
-   */
-  nextCursor: string | null;
-}
-
 export interface Trade {
   id: string;
   orderId: string;
@@ -349,4 +338,15 @@ export interface TradeResult {
 export interface ListTradesResult {
   page: Page;
   result: Trade[];
+}
+
+export interface Page {
+  /**
+   * First item as an encoded string
+   */
+  previousCursor: string | null;
+  /**
+   * Last item as an encoded string
+   */
+  nextCursor: string | null;
 }
