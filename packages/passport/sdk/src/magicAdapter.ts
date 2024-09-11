@@ -2,10 +2,11 @@ import { SDKBase, InstanceWithExtensions } from '@magic-sdk/provider';
 import { Magic } from 'magic-sdk';
 import { OpenIdExtension } from '@magic-ext/oidc';
 import { ethers } from 'ethers';
-import { trackDuration } from '@imtbl/metrics';
+import { Flow, trackDuration } from '@imtbl/metrics';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import { PassportConfiguration } from './config';
 import { lazyDocumentReady } from './utils/lazyLoad';
+import { withMetricsAsync } from './utils/metrics';
 
 type MagicClient = InstanceWithExtensions<SDKBase, [OpenIdExtension]>;
 
@@ -40,23 +41,28 @@ export default class MagicAdapter {
   async login(
     idToken: string,
   ): Promise<ethers.providers.ExternalProvider> {
-    return withPassportError<ethers.providers.ExternalProvider>(async () => {
-      const startTime = performance.now();
+    return withPassportError<ethers.providers.ExternalProvider>(async () => (
+      withMetricsAsync(async (flow: Flow) => {
+        const startTime = performance.now();
 
-      const magicClient = await this.magicClient;
-      await magicClient.openid.loginWithOIDC({
-        jwt: idToken,
-        providerId: this.config.magicProviderId,
-      });
+        const magicClient = await this.magicClient;
+        flow.addEvent('endMagicClientInit');
 
-      trackDuration(
-        'passport',
-        'magicLogin',
-        Math.round(performance.now() - startTime),
-      );
+        await magicClient.openid.loginWithOIDC({
+          jwt: idToken,
+          providerId: this.config.magicProviderId,
+        });
+        flow.addEvent('endLoginWithOIDC');
 
-      return magicClient.rpcProvider as unknown as ethers.providers.ExternalProvider;
-    }, PassportErrorType.WALLET_CONNECTION_ERROR);
+        trackDuration(
+          'passport',
+          flow.details.flowName,
+          Math.round(performance.now() - startTime),
+        );
+
+        return magicClient.rpcProvider as unknown as ethers.providers.ExternalProvider;
+      }, 'magicLogin')
+    ), PassportErrorType.WALLET_CONNECTION_ERROR);
   }
 
   async logout() {

@@ -308,6 +308,20 @@ export interface ListNFTsByAccountAddressRequestParams {
     readonly contractAddress?: string
 
     /**
+     * List of token IDs to filter by
+     * @type {Array<string>}
+     * @memberof ListNFTsByAccountAddress
+     */
+    readonly tokenId?: Array<string>
+
+    /**
+     * Datetime to use as the oldest updated timestamp
+     * @type {string}
+     * @memberof ListNFTsByAccountAddress
+     */
+    readonly fromUpdatedAt?: string
+
+    /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
      * @memberof ListNFTsByAccountAddress
