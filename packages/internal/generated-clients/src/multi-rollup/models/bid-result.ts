@@ -13,18 +13,21 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { Order } from './order';
 
 /**
- * Response page
+ * 
  * @export
- * @interface PageResponse
+ * @interface BidResult
  */
-export interface PageResponse {
+export interface BidResult {
     /**
-     * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-     * @type {string}
-     * @memberof PageResponse
+     * 
+     * @type {Order}
+     * @memberof BidResult
      */
-    'next_cursor'?: string;
+    'result': Order;
 }
 

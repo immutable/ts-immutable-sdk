@@ -28,6 +28,6 @@ export interface RefreshMetadataByIDRequest {
      * @type {Array<RefreshMetadataByID>}
      * @memberof RefreshMetadataByIDRequest
      */
-    'metadata'?: Array<RefreshMetadataByID>;
+    'metadata': Array<RefreshMetadataByID>;
 }
 

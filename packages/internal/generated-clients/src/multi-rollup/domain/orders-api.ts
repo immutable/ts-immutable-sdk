@@ -34,15 +34,21 @@ import { APIError500 } from '../models';
 // @ts-ignore
 import { APIError501 } from '../models';
 // @ts-ignore
+import { BidResult } from '../models';
+// @ts-ignore
 import { CancelOrdersRequestBody } from '../models';
 // @ts-ignore
 import { CancelOrdersResult } from '../models';
+// @ts-ignore
+import { CreateBidRequestBody } from '../models';
 // @ts-ignore
 import { CreateListingRequestBody } from '../models';
 // @ts-ignore
 import { FulfillmentData200Response } from '../models';
 // @ts-ignore
 import { FulfillmentDataRequest } from '../models';
+// @ts-ignore
+import { ListBidsResult } from '../models';
 // @ts-ignore
 import { ListListingsResult } from '../models';
 // @ts-ignore
@@ -93,6 +99,46 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(cancelOrdersRequestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Create a bid
+         * @summary Create a bid
+         * @param {string} chainName 
+         * @param {CreateBidRequestBody} createBidRequestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createBid: async (chainName: string, createBidRequestBody: CreateBidRequestBody, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'chainName' is not null or undefined
+            assertParamExists('createBid', 'chainName', chainName)
+            // verify required parameter 'createBidRequestBody' is not null or undefined
+            assertParamExists('createBid', 'createBidRequestBody', createBidRequestBody)
+            const localVarPath = `/v1/chains/{chain_name}/orders/bids`
+                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createBidRequestBody, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -180,6 +226,44 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
+         * Get a single bid by ID
+         * @summary Get a single bid by ID
+         * @param {string} chainName 
+         * @param {string} bidId Global Bid identifier
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getBid: async (chainName: string, bidId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'chainName' is not null or undefined
+            assertParamExists('getBid', 'chainName', chainName)
+            // verify required parameter 'bidId' is not null or undefined
+            assertParamExists('getBid', 'bidId', bidId)
+            const localVarPath = `/v1/chains/{chain_name}/orders/bids/{bid_id}`
+                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)))
+                .replace(`{${"bid_id"}}`, encodeURIComponent(String(bidId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Get a single listing by ID
          * @summary Get a single listing by ID
          * @param {string} chainName 
@@ -243,6 +327,97 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * List a paginated array of bids with optional filter parameters
+         * @summary List a paginated array of bids with optional filter parameters
+         * @param {string} chainName 
+         * @param {OrderStatusName} [status] Order status to filter by
+         * @param {string} [buyItemContractAddress] Buy item contract address to filter by
+         * @param {string} [sellItemContractAddress] Sell item contract address to filter by
+         * @param {string} [accountAddress] The account address of the user who created the bid
+         * @param {string} [buyItemMetadataId] The metadata_id of the buy item
+         * @param {string} [buyItemTokenId] buy item token identifier to filter by
+         * @param {string} [fromUpdatedAt] From updated at including given date
+         * @param {number} [pageSize] Maximum number of orders to return per page
+         * @param {ListBidsSortByEnum} [sortBy] Order field to sort by. &#x60;sell_item_amount&#x60; sorts by per token price, for example if 10eth is offered for 5 ERC1155 items, it’s sorted as 2eth for &#x60;sell_item_amount&#x60;.
+         * @param {ListBidsSortDirectionEnum} [sortDirection] Ascending or descending direction for sort
+         * @param {string} [pageCursor] Page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listBids: async (chainName: string, status?: OrderStatusName, buyItemContractAddress?: string, sellItemContractAddress?: string, accountAddress?: string, buyItemMetadataId?: string, buyItemTokenId?: string, fromUpdatedAt?: string, pageSize?: number, sortBy?: ListBidsSortByEnum, sortDirection?: ListBidsSortDirectionEnum, pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'chainName' is not null or undefined
+            assertParamExists('listBids', 'chainName', chainName)
+            const localVarPath = `/v1/chains/{chain_name}/orders/bids`
+                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
+            }
+
+            if (buyItemContractAddress !== undefined) {
+                localVarQueryParameter['buy_item_contract_address'] = buyItemContractAddress;
+            }
+
+            if (sellItemContractAddress !== undefined) {
+                localVarQueryParameter['sell_item_contract_address'] = sellItemContractAddress;
+            }
+
+            if (accountAddress !== undefined) {
+                localVarQueryParameter['account_address'] = accountAddress;
+            }
+
+            if (buyItemMetadataId !== undefined) {
+                localVarQueryParameter['buy_item_metadata_id'] = buyItemMetadataId;
+            }
+
+            if (buyItemTokenId !== undefined) {
+                localVarQueryParameter['buy_item_token_id'] = buyItemTokenId;
+            }
+
+            if (fromUpdatedAt !== undefined) {
+                localVarQueryParameter['from_updated_at'] = (fromUpdatedAt as any instanceof Date) ?
+                    (fromUpdatedAt as any).toISOString() :
+                    fromUpdatedAt;
+            }
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['page_size'] = pageSize;
+            }
+
+            if (sortBy !== undefined) {
+                localVarQueryParameter['sort_by'] = sortBy;
+            }
+
+            if (sortDirection !== undefined) {
+                localVarQueryParameter['sort_direction'] = sortDirection;
+            }
+
+            if (pageCursor !== undefined) {
+                localVarQueryParameter['page_cursor'] = pageCursor;
+            }
 
 
     
@@ -445,6 +620,18 @@ export const OrdersApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Create a bid
+         * @summary Create a bid
+         * @param {string} chainName 
+         * @param {CreateBidRequestBody} createBidRequestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createBid(chainName: string, createBidRequestBody: CreateBidRequestBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BidResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createBid(chainName, createBidRequestBody, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Create a listing
          * @summary Create a listing
          * @param {string} chainName 
@@ -469,6 +656,18 @@ export const OrdersApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Get a single bid by ID
+         * @summary Get a single bid by ID
+         * @param {string} chainName 
+         * @param {string} bidId Global Bid identifier
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getBid(chainName: string, bidId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BidResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getBid(chainName, bidId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Get a single listing by ID
          * @summary Get a single listing by ID
          * @param {string} chainName 
@@ -490,6 +689,28 @@ export const OrdersApiFp = function(configuration?: Configuration) {
          */
         async getTrade(chainName: string, tradeId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TradeResult>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getTrade(chainName, tradeId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * List a paginated array of bids with optional filter parameters
+         * @summary List a paginated array of bids with optional filter parameters
+         * @param {string} chainName 
+         * @param {OrderStatusName} [status] Order status to filter by
+         * @param {string} [buyItemContractAddress] Buy item contract address to filter by
+         * @param {string} [sellItemContractAddress] Sell item contract address to filter by
+         * @param {string} [accountAddress] The account address of the user who created the bid
+         * @param {string} [buyItemMetadataId] The metadata_id of the buy item
+         * @param {string} [buyItemTokenId] buy item token identifier to filter by
+         * @param {string} [fromUpdatedAt] From updated at including given date
+         * @param {number} [pageSize] Maximum number of orders to return per page
+         * @param {ListBidsSortByEnum} [sortBy] Order field to sort by. &#x60;sell_item_amount&#x60; sorts by per token price, for example if 10eth is offered for 5 ERC1155 items, it’s sorted as 2eth for &#x60;sell_item_amount&#x60;.
+         * @param {ListBidsSortDirectionEnum} [sortDirection] Ascending or descending direction for sort
+         * @param {string} [pageCursor] Page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listBids(chainName: string, status?: OrderStatusName, buyItemContractAddress?: string, sellItemContractAddress?: string, accountAddress?: string, buyItemMetadataId?: string, buyItemTokenId?: string, fromUpdatedAt?: string, pageSize?: number, sortBy?: ListBidsSortByEnum, sortDirection?: ListBidsSortDirectionEnum, pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListBidsResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listBids(chainName, status, buyItemContractAddress, sellItemContractAddress, accountAddress, buyItemMetadataId, buyItemTokenId, fromUpdatedAt, pageSize, sortBy, sortDirection, pageCursor, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -554,6 +775,16 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.cancelOrders(requestParameters.chainName, requestParameters.cancelOrdersRequestBody, options).then((request) => request(axios, basePath));
         },
         /**
+         * Create a bid
+         * @summary Create a bid
+         * @param {OrdersApiCreateBidRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createBid(requestParameters: OrdersApiCreateBidRequest, options?: AxiosRequestConfig): AxiosPromise<BidResult> {
+            return localVarFp.createBid(requestParameters.chainName, requestParameters.createBidRequestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Create a listing
          * @summary Create a listing
          * @param {OrdersApiCreateListingRequest} requestParameters Request parameters.
@@ -574,6 +805,16 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.fulfillmentData(requestParameters.chainName, requestParameters.fulfillmentDataRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * Get a single bid by ID
+         * @summary Get a single bid by ID
+         * @param {OrdersApiGetBidRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getBid(requestParameters: OrdersApiGetBidRequest, options?: AxiosRequestConfig): AxiosPromise<BidResult> {
+            return localVarFp.getBid(requestParameters.chainName, requestParameters.bidId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Get a single listing by ID
          * @summary Get a single listing by ID
          * @param {OrdersApiGetListingRequest} requestParameters Request parameters.
@@ -592,6 +833,16 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
          */
         getTrade(requestParameters: OrdersApiGetTradeRequest, options?: AxiosRequestConfig): AxiosPromise<TradeResult> {
             return localVarFp.getTrade(requestParameters.chainName, requestParameters.tradeId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * List a paginated array of bids with optional filter parameters
+         * @summary List a paginated array of bids with optional filter parameters
+         * @param {OrdersApiListBidsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listBids(requestParameters: OrdersApiListBidsRequest, options?: AxiosRequestConfig): AxiosPromise<ListBidsResult> {
+            return localVarFp.listBids(requestParameters.chainName, requestParameters.status, requestParameters.buyItemContractAddress, requestParameters.sellItemContractAddress, requestParameters.accountAddress, requestParameters.buyItemMetadataId, requestParameters.buyItemTokenId, requestParameters.fromUpdatedAt, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(axios, basePath));
         },
         /**
          * List all listings
@@ -638,6 +889,27 @@ export interface OrdersApiCancelOrdersRequest {
 }
 
 /**
+ * Request parameters for createBid operation in OrdersApi.
+ * @export
+ * @interface OrdersApiCreateBidRequest
+ */
+export interface OrdersApiCreateBidRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof OrdersApiCreateBid
+     */
+    readonly chainName: string
+
+    /**
+     * 
+     * @type {CreateBidRequestBody}
+     * @memberof OrdersApiCreateBid
+     */
+    readonly createBidRequestBody: CreateBidRequestBody
+}
+
+/**
  * Request parameters for createListing operation in OrdersApi.
  * @export
  * @interface OrdersApiCreateListingRequest
@@ -680,6 +952,27 @@ export interface OrdersApiFulfillmentDataRequest {
 }
 
 /**
+ * Request parameters for getBid operation in OrdersApi.
+ * @export
+ * @interface OrdersApiGetBidRequest
+ */
+export interface OrdersApiGetBidRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof OrdersApiGetBid
+     */
+    readonly chainName: string
+
+    /**
+     * Global Bid identifier
+     * @type {string}
+     * @memberof OrdersApiGetBid
+     */
+    readonly bidId: string
+}
+
+/**
  * Request parameters for getListing operation in OrdersApi.
  * @export
  * @interface OrdersApiGetListingRequest
@@ -719,6 +1012,97 @@ export interface OrdersApiGetTradeRequest {
      * @memberof OrdersApiGetTrade
      */
     readonly tradeId: string
+}
+
+/**
+ * Request parameters for listBids operation in OrdersApi.
+ * @export
+ * @interface OrdersApiListBidsRequest
+ */
+export interface OrdersApiListBidsRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof OrdersApiListBids
+     */
+    readonly chainName: string
+
+    /**
+     * Order status to filter by
+     * @type {OrderStatusName}
+     * @memberof OrdersApiListBids
+     */
+    readonly status?: OrderStatusName
+
+    /**
+     * Buy item contract address to filter by
+     * @type {string}
+     * @memberof OrdersApiListBids
+     */
+    readonly buyItemContractAddress?: string
+
+    /**
+     * Sell item contract address to filter by
+     * @type {string}
+     * @memberof OrdersApiListBids
+     */
+    readonly sellItemContractAddress?: string
+
+    /**
+     * The account address of the user who created the bid
+     * @type {string}
+     * @memberof OrdersApiListBids
+     */
+    readonly accountAddress?: string
+
+    /**
+     * The metadata_id of the buy item
+     * @type {string}
+     * @memberof OrdersApiListBids
+     */
+    readonly buyItemMetadataId?: string
+
+    /**
+     * buy item token identifier to filter by
+     * @type {string}
+     * @memberof OrdersApiListBids
+     */
+    readonly buyItemTokenId?: string
+
+    /**
+     * From updated at including given date
+     * @type {string}
+     * @memberof OrdersApiListBids
+     */
+    readonly fromUpdatedAt?: string
+
+    /**
+     * Maximum number of orders to return per page
+     * @type {number}
+     * @memberof OrdersApiListBids
+     */
+    readonly pageSize?: number
+
+    /**
+     * Order field to sort by. &#x60;sell_item_amount&#x60; sorts by per token price, for example if 10eth is offered for 5 ERC1155 items, it’s sorted as 2eth for &#x60;sell_item_amount&#x60;.
+     * @type {'created_at' | 'updated_at' | 'sell_item_amount'}
+     * @memberof OrdersApiListBids
+     */
+    readonly sortBy?: ListBidsSortByEnum
+
+    /**
+     * Ascending or descending direction for sort
+     * @type {'asc' | 'desc'}
+     * @memberof OrdersApiListBids
+     */
+    readonly sortDirection?: ListBidsSortDirectionEnum
+
+    /**
+     * Page cursor to retrieve previous or next page. Use the value returned in the response.
+     * @type {string}
+     * @memberof OrdersApiListBids
+     */
+    readonly pageCursor?: string
 }
 
 /**
@@ -902,6 +1286,18 @@ export class OrdersApi extends BaseAPI {
     }
 
     /**
+     * Create a bid
+     * @summary Create a bid
+     * @param {OrdersApiCreateBidRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrdersApi
+     */
+    public createBid(requestParameters: OrdersApiCreateBidRequest, options?: AxiosRequestConfig) {
+        return OrdersApiFp(this.configuration).createBid(requestParameters.chainName, requestParameters.createBidRequestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Create a listing
      * @summary Create a listing
      * @param {OrdersApiCreateListingRequest} requestParameters Request parameters.
@@ -923,6 +1319,18 @@ export class OrdersApi extends BaseAPI {
      */
     public fulfillmentData(requestParameters: OrdersApiFulfillmentDataRequest, options?: AxiosRequestConfig) {
         return OrdersApiFp(this.configuration).fulfillmentData(requestParameters.chainName, requestParameters.fulfillmentDataRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get a single bid by ID
+     * @summary Get a single bid by ID
+     * @param {OrdersApiGetBidRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrdersApi
+     */
+    public getBid(requestParameters: OrdersApiGetBidRequest, options?: AxiosRequestConfig) {
+        return OrdersApiFp(this.configuration).getBid(requestParameters.chainName, requestParameters.bidId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -950,6 +1358,18 @@ export class OrdersApi extends BaseAPI {
     }
 
     /**
+     * List a paginated array of bids with optional filter parameters
+     * @summary List a paginated array of bids with optional filter parameters
+     * @param {OrdersApiListBidsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrdersApi
+     */
+    public listBids(requestParameters: OrdersApiListBidsRequest, options?: AxiosRequestConfig) {
+        return OrdersApiFp(this.configuration).listBids(requestParameters.chainName, requestParameters.status, requestParameters.buyItemContractAddress, requestParameters.sellItemContractAddress, requestParameters.accountAddress, requestParameters.buyItemMetadataId, requestParameters.buyItemTokenId, requestParameters.fromUpdatedAt, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * List all listings
      * @summary List all listings
      * @param {OrdersApiListListingsRequest} requestParameters Request parameters.
@@ -974,6 +1394,23 @@ export class OrdersApi extends BaseAPI {
     }
 }
 
+/**
+ * @export
+ */
+export const ListBidsSortByEnum = {
+    CreatedAt: 'created_at',
+    UpdatedAt: 'updated_at',
+    SellItemAmount: 'sell_item_amount'
+} as const;
+export type ListBidsSortByEnum = typeof ListBidsSortByEnum[keyof typeof ListBidsSortByEnum];
+/**
+ * @export
+ */
+export const ListBidsSortDirectionEnum = {
+    Asc: 'asc',
+    Desc: 'desc'
+} as const;
+export type ListBidsSortDirectionEnum = typeof ListBidsSortDirectionEnum[keyof typeof ListBidsSortDirectionEnum];
 /**
  * @export
  */
