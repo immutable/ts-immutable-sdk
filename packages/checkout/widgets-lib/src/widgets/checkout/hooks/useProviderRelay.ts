@@ -64,11 +64,7 @@ export function useProviderRelay() {
           eip6963Info: payload.eip6963Info,
         });
       } catch (error: any) {
-        // Send the error using the postMessageHandler
-        postMessageHandler.send(PostMessageHandlerEventType.PROVIDER_RELAY, {
-          response: { id: payload.jsonRpcRequestMessage.id, error: error.message, jsonrpc: '2.0' },
-          eip6963Info: payload.eip6963Info,
-        });
+        throw new Error(error);
       }
     },
     [postMessageHandler],
