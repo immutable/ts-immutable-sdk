@@ -87,6 +87,13 @@ export interface ListERC20TokensRequestParams {
     readonly verificationStatus?: Array<AssetVerificationStatus>
 
     /**
+     * [Experimental - Canonical token data may be updated] Filter by canonical or non-canonical tokens.
+     * @type {boolean}
+     * @memberof ListERC20Tokens
+     */
+    readonly isCanonical?: boolean
+
+    /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
      * @memberof ListERC20Tokens

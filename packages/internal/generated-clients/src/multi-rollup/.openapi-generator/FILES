@@ -43,6 +43,7 @@ models/apierror501-all-of.ts
 models/apierror501.ts
 models/asset-verification-status.ts
 models/basic-apierror.ts
+models/bid-result.ts
 models/blockchain-metadata.ts
 models/burn.ts
 models/cancel-orders-request-body.ts
@@ -53,9 +54,9 @@ models/chain-with-details-all-of.ts
 models/chain-with-details.ts
 models/chain.ts
 models/collection-contract-type.ts
-models/collection-item.ts
 models/collection-metadata.ts
 models/collection.ts
+models/create-bid-request-body.ts
 models/create-counterfactual-address-request.ts
 models/create-counterfactual-address-res.ts
 models/create-listing-request-body.ts
@@ -103,6 +104,7 @@ models/index.ts
 models/item.ts
 models/link-wallet-v2-request.ts
 models/list-activities-result.ts
+models/list-bids-result.ts
 models/list-chains-result.ts
 models/list-collection-owners-result.ts
 models/list-collections-result.ts
@@ -122,8 +124,6 @@ models/mint-request-error-message.ts
 models/mint-request-status.ts
 models/mint.ts
 models/native-item.ts
-models/network.ts
-models/nft-collection.ts
 models/nft.ts
 models/nftcontract-type.ts
 models/nftmetadata-attribute-value.ts
@@ -134,7 +134,6 @@ models/nftsale.ts
 models/nftset-approval-for-all-metadata.ts
 models/nftwith-balance.ts
 models/nftwith-owner.ts
-models/operator-allowlist-admin-action.ts
 models/operator-allowlist-contract-status-internal-all-of.ts
 models/operator-allowlist-contract-status-internal.ts
 models/operator-allowlist-contract-status.ts
@@ -146,7 +145,6 @@ models/order-status-name.ts
 models/order-status.ts
 models/order.ts
 models/organisation-tier.ts
-models/page-response.ts
 models/page.ts
 models/pending-order-status.ts
 models/protocol-data.ts
@@ -175,7 +173,6 @@ models/seaport-fee.ts
 models/seaport-fulfill-available-advanced-orders-metadata.ts
 models/seaport-native-item.ts
 models/token-contract-type.ts
-models/token-type.ts
 models/token.ts
 models/trade-blockchain-metadata.ts
 models/trade-result.ts
