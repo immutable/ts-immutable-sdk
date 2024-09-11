@@ -17,6 +17,7 @@ import { SaleUI } from "./components/ui/sale/sale";
 import AddFundsUI from "./components/ui/add-funds/addFunds";
 import { PassportProvider } from "./context/passport";
 import { WidgetsProvider } from "./context/widgets";
+import AddFundsIntegration from "./components/ui/add-funds-integration/addFunds";
 
 const router = createBrowserRouter([
   {
@@ -53,10 +54,14 @@ const router = createBrowserRouter([
   },
   {
     path: "/add-funds",
+    element: <AddFundsUI />,
+  },
+  {
+    path: "/add-funds-integration",
     element: (
       <PassportProvider>
         <WidgetsProvider>
-          <AddFundsUI />
+          <AddFundsIntegration />
         </WidgetsProvider>
       </PassportProvider>
     ),

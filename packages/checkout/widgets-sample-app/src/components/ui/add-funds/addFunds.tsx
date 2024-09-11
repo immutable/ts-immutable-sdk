@@ -1,60 +1,80 @@
 import {
+  Checkout,
+  WidgetTheme,
+  WidgetType,
+  WidgetLanguage,
   AddFundsEventType,
   OnRampEventType,
   SwapEventType,
-  BridgeEventType, WidgetTheme, WidgetLanguage,
+  BridgeEventType,
+  SwapDirection,
 } from "@imtbl/checkout-sdk";
-import { useEffect } from "react";
-import { useWidgets } from "../../../context/widgets";
-import { usePassport } from "../../../context/passport";
+import { WidgetsFactory } from "@imtbl/checkout-widgets";
+import { useMemo, useEffect } from "react";
 
 const ADD_FUNDS_TARGET_ID = "add-funds-widget-target";
 
 function AddFundsUI() {
-  const { addFunds, onRamp, swap, bridge } = useWidgets();
-  const { backToGame } = usePassport();
+  const checkout = useMemo(() => new Checkout(), []);
+  const factory = useMemo(() => new WidgetsFactory(checkout, {}), [checkout]);
+  const addFunds = useMemo(
+    () =>
+      factory.create(WidgetType.ADD_FUNDS, {
+        config: { theme: WidgetTheme.DARK },
+      }),
+    [factory]
+  );
+  const onRamp = useMemo(() => factory.create(WidgetType.ONRAMP), [factory]);
+  const swap = useMemo(() => factory.create(WidgetType.SWAP), [factory]);
+  const bridge = useMemo(() => factory.create(WidgetType.BRIDGE), [factory]);
 
   useEffect(() => {
-    if (!addFunds) return;
     addFunds.mount(ADD_FUNDS_TARGET_ID, {
-      showSwapOption:false,
-      amount: "10",
-      tokenAddress: "0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439",
+      showOnrampOption: true,
+      showBridgeOption: false,
+      showSwapOption: true,
+      tokenAddress: "0x3b2d8a1931736fc321c24864bceee981b11c3c57",
     });
     addFunds.addListener(AddFundsEventType.GO_BACK, (data: any) => {
       console.log("GO_BACK", data);
     });
     addFunds.addListener(AddFundsEventType.CLOSE_WIDGET, (data: any) => {
       console.log("CLOSE_WIDGET", data);
-      backToGame();
       addFunds.unmount();
     });
     addFunds.addListener(AddFundsEventType.REQUEST_ONRAMP, (data: any) => {
       console.log("REQUEST_ONRAMP", data);
       addFunds.unmount();
-      onRamp?.addListener(OnRampEventType.CLOSE_WIDGET, (data: any) => {
+      onRamp.addListener(OnRampEventType.CLOSE_WIDGET, (data: any) => {
         console.log("CLOSE_WIDGET", data);
-        onRamp?.unmount();
+        onRamp.unmount();
       });
-      onRamp?.mount(ADD_FUNDS_TARGET_ID, {});
+      onRamp.mount(ADD_FUNDS_TARGET_ID, {
+        amount: data.amount,
+        tokenAddress: data.tokenAddress,
+      });
     });
     addFunds.addListener(AddFundsEventType.REQUEST_SWAP, (data: any) => {
       console.log("REQUEST_SWAP", data);
       addFunds.unmount();
-      swap?.addListener(SwapEventType.CLOSE_WIDGET, (data: any) => {
+      swap.addListener(SwapEventType.CLOSE_WIDGET, (data: any) => {
         console.log("CLOSE_WIDGET", data);
         swap.unmount();
       });
-      swap?.mount(ADD_FUNDS_TARGET_ID, {});
+      swap.mount(ADD_FUNDS_TARGET_ID, {
+        amount: data.amount,
+        toTokenAddress: data.toTokenAddress,
+        direction: SwapDirection.TO,
+      });
     });
     addFunds.addListener(AddFundsEventType.REQUEST_BRIDGE, (data: any) => {
       console.log("REQUEST_BRIDGE", data);
       addFunds.unmount();
-      bridge?.addListener(BridgeEventType.CLOSE_WIDGET, (data: any) => {
+      bridge.addListener(BridgeEventType.CLOSE_WIDGET, (data: any) => {
         console.log("CLOSE_WIDGET", data);
         bridge.unmount();
       });
-      bridge?.mount(ADD_FUNDS_TARGET_ID, {});
+      bridge.mount(ADD_FUNDS_TARGET_ID, {});
     });
   }, [addFunds]);
 
@@ -62,23 +82,23 @@ function AddFundsUI() {
     <div>
       <h1 className="sample-heading">Checkout Add Funds</h1>
       <div id={ADD_FUNDS_TARGET_ID}></div>
-      <button onClick={() => addFunds?.mount(ADD_FUNDS_TARGET_ID)}>Mount</button>
-      <button onClick={() => addFunds?.unmount()}>Unmount</button>
+      <button onClick={() => addFunds.mount(ADD_FUNDS_TARGET_ID)}>Mount</button>
+      <button onClick={() => addFunds.unmount()}>Unmount</button>
       <button
         onClick={() =>
-          addFunds?.update({ config: { theme: WidgetTheme.LIGHT } })
+          addFunds.update({ config: { theme: WidgetTheme.LIGHT } })
         }
       >
         Update Config Light
       </button>
       <button
-        onClick={() => addFunds?.update({ config: { theme: WidgetTheme.DARK } })}
+        onClick={() => addFunds.update({ config: { theme: WidgetTheme.DARK } })}
       >
         Update Config Dark
       </button>
       <select
         onChange={(e) =>
-          addFunds?.update({
+          addFunds.update({
             config: { language: e.target.value as WidgetLanguage },
           })
         }
