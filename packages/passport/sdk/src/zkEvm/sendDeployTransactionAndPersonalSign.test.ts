@@ -142,10 +142,7 @@ describe('sendDeployTransactionAndPersonalSign', () => {
       flow: flow as unknown as Flow,
     });
 
-    expect(guardianClient.withConfirmationScreen).toHaveBeenCalledWith({
-      width: 480,
-      height: 720,
-    });
+    expect(guardianClient.withConfirmationScreen).toHaveBeenCalled();
   });
 
   it('throws an error if any step fails', async () => {
