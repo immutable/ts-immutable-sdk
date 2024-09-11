@@ -26,17 +26,17 @@ import { GetTokenResult } from '../models';
 // @ts-ignore
 import { ListTokensResult } from '../models';
 // @ts-ignore
-export { APIError400 } from '../models';
+export type { APIError400 } from '../models';
 // @ts-ignore
-export { APIError404 } from '../models';
+export type { APIError404 } from '../models';
 // @ts-ignore
-export { APIError500 } from '../models';
+export type { APIError500 } from '../models';
 // @ts-ignore
-export { AssetVerificationStatus } from '../models';
+export type { AssetVerificationStatus } from '../models';
 // @ts-ignore
-export { GetTokenResult } from '../models';
+export type { GetTokenResult } from '../models';
 // @ts-ignore
-export { ListTokensResult } from '../models';
+export type { ListTokensResult } from '../models';
 
 /**
  * Request parameters for getERC20Token operation in TokensApi.
