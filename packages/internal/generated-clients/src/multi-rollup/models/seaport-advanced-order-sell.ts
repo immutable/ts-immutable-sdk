@@ -21,12 +21,18 @@ import { ImmutableVerificationStatusEnum } from './immutable-verification-status
 import { SeaportERC1155Item } from './seaport-erc1155-item';
 // May contain unused imports in some cases
 // @ts-ignore
+import { SeaportERC20Item } from './seaport-erc20-item';
+// May contain unused imports in some cases
+// @ts-ignore
 import { SeaportERC721Item } from './seaport-erc721-item';
+// May contain unused imports in some cases
+// @ts-ignore
+import { SeaportNativeItem } from './seaport-native-item';
 
 /**
  * @type SeaportAdvancedOrderSell
  * @export
  */
-export type SeaportAdvancedOrderSell = SeaportERC1155Item | SeaportERC721Item;
+export type SeaportAdvancedOrderSell = SeaportERC1155Item | SeaportERC20Item | SeaportERC721Item | SeaportNativeItem;
 
 

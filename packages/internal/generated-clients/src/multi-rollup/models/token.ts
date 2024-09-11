@@ -92,6 +92,12 @@ export interface Token {
      * @memberof Token
      */
     'updated_at': string;
+    /**
+     * Indicates whether the token is canonical or not
+     * @type {boolean}
+     * @memberof Token
+     */
+    'is_canonical': boolean;
 }
 
 
