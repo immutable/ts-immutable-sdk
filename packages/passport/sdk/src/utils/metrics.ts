@@ -1,16 +1,16 @@
-import { trackError, trackFlow } from '@imtbl/metrics';
+import { Flow, trackError, trackFlow } from '@imtbl/metrics';
 
 export const withMetrics = <T>(
-  fn: () => T,
-  event: string,
+  fn: (flow: Flow) => T,
+  flowName: string,
 ): T => {
-  const flow = trackFlow('passport', event);
+  const flow: Flow = trackFlow('passport', flowName);
 
   try {
-    return fn();
+    return fn(flow);
   } catch (error) {
     if (error instanceof Error) {
-      trackError('passport', event, error);
+      trackError('passport', flowName, error);
     }
     flow.addEvent('errored');
     throw error;
@@ -20,16 +20,16 @@ export const withMetrics = <T>(
 };
 
 export const withMetricsAsync = async <T>(
-  fn: () => Promise<T>,
-  event: string,
+  fn: (flow: Flow) => Promise<T>,
+  flowName: string,
 ): Promise<T> => {
-  const flow = trackFlow('passport', event);
+  const flow: Flow = trackFlow('passport', flowName);
 
   try {
-    return await fn();
+    return await fn(flow);
   } catch (error) {
     if (error instanceof Error) {
-      trackError('passport', event, error);
+      trackError('passport', flowName, error);
     }
     flow.addEvent('errored');
     throw error;

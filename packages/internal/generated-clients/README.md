@@ -120,6 +120,14 @@ make generate-blockchain-data-types
 Note - You will need to manually remove the models and domain files not relevant to the Blockchain Data package from the `blockchain-data` folder, in order
 for other teams types not to bleed into our Blockchain Data Types namespace.
 
+Note - You will also need to replace exports with typed exports:
+```ts
+// Replace
+export { APIError400 } from '../models';
+// With
+export type { APIError400 } from '../models';
+```
+
 #### View generators
 
 To run the `view-generators` yarn command, you will need to have the java runtime installed. The yarn command will need to be run in the `generated-clients` package folder where this README is located.

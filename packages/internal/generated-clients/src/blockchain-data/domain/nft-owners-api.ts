@@ -132,6 +132,13 @@ export interface ListOwnersByContractAddressRequestParams {
     readonly chainName: string
 
     /**
+     * List of account addresses to filter by
+     * @type {Array<string>}
+     * @memberof ListOwnersByContractAddress
+     */
+    readonly accountAddress?: Array<string>
+
+    /**
      * Datetime to use as the oldest updated timestamp
      * @type {string}
      * @memberof ListOwnersByContractAddress
