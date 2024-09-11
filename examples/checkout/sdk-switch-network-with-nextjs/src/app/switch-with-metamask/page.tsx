@@ -74,7 +74,7 @@ export default function ConnectWithMetamask() {
     setIsConnected(isConnectedRes.isConnected);
 
     // #doc supported-networks
-    // Get the list of supported networks
+    // Get the list of default supported networks
     const type = checkout.NetworkFilterTypes.ALL;
     const supportedNetworks = await checkoutSDK.getNetworkAllowList({ type });
     setSupportedNetworks(supportedNetworks.networks.map(network => network.name));
@@ -91,11 +91,13 @@ export default function ConnectWithMetamask() {
       }
 
       // #doc switch-network
-      // Switch to Immutable zkEVM Testnet
+      // Switch to Immutable zkEVM Testnet and update the provider
       const chainId = checkout.ChainId.IMTBL_ZKEVM_TESTNET;
       const switchResponse = await checkoutSDK.switchNetwork({ provider: connectedProvider, chainId });
+      
+      // Update the provider
+      setConnectedProvider(switchResponse.provider);      
       // #enddoc switch-network
-      setConnectedProvider(switchResponse.provider);
       await updateNetworkInfo(switchResponse.provider);
     } catch (error) {
       console.error("Failed to switch network:", error);
@@ -110,12 +112,8 @@ export default function ConnectWithMetamask() {
       if (!connectedProvider) {
         throw new Error("No connected provider found");
       }
-
-      // #doc switch-network
-      // Switch to Sepolia Testnet
       const chainId = checkout.ChainId.SEPOLIA;
       const switchResponse = await checkoutSDK.switchNetwork({ provider: connectedProvider, chainId });
-      // #enddoc switch-network
       setConnectedProvider(switchResponse.provider);
       await updateNetworkInfo(switchResponse.provider);
     } catch (error) {
