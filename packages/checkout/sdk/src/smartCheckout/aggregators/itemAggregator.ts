@@ -7,13 +7,18 @@ export const nativeAggregator = (
   const aggregatedMap = new Map<string, ItemRequirement>();
   const aggregatedItemRequirements: ItemRequirement[] = [];
 
-  itemRequirements.forEach((itemRequirement) => {
-    const { type } = itemRequirement;
+  itemRequirements.forEach((item) => {
+    const { type } = item;
 
-    if (type !== ItemType.NATIVE) {
-      aggregatedItemRequirements.push(itemRequirement);
+    if (type !== ItemType.NATIVE || item.isFee) {
+      aggregatedItemRequirements.push(item);
       return;
     }
+
+    const itemRequirement = {
+      ...item,
+      isFee: 'isFee' in item ? item.isFee : false,
+    };
 
     const { amount } = itemRequirement;
 
@@ -34,13 +39,18 @@ export const erc20ItemAggregator = (
   const aggregatedMap = new Map<string, ItemRequirement>();
   const aggregatedItemRequirements: ItemRequirement[] = [];
 
-  itemRequirements.forEach((itemRequirement) => {
-    const { type } = itemRequirement;
+  itemRequirements.forEach((item) => {
+    const { type } = item;
 
-    if (type !== ItemType.ERC20) {
-      aggregatedItemRequirements.push(itemRequirement);
+    if (type !== ItemType.ERC20 || item.isFee) {
+      aggregatedItemRequirements.push(item);
       return;
     }
+
+    const itemRequirement = {
+      ...item,
+      isFee: 'isFee' in item ? item.isFee : false,
+    };
 
     const { tokenAddress, spenderAddress, amount } = itemRequirement;
     const key = `${tokenAddress}${spenderAddress}`;

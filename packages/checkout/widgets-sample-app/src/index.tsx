@@ -9,9 +9,8 @@ import SwapUI from './components/ui/swap/swap';
 import BridgeUI from './components/ui/bridge/bridge';
 import OnRampUI from "./components/ui/on-ramp/onRamp";
 import { PassportLoginCallback } from './components/ui/marketplace-orchestrator/PassportLoginCallback';
-import { Marketplace } from './components/ui/marketplace-orchestrator';
+import { Marketplace, Checkout } from './components/ui/marketplace-orchestrator';
 import { SaleUI } from './components/ui/sale/sale';
-import CheckoutUI from './components/ui/checkout/checkout';
 import AddFundsUI from './components/ui/add-funds/addFunds';
 
 const router = createBrowserRouter([
@@ -45,7 +44,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/checkout',
-    element: <CheckoutUI />,
+    element: <Checkout />,
   },
   {
     path: '/add-funds',

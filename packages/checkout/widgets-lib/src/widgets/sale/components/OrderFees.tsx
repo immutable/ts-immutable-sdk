@@ -11,17 +11,17 @@ export type FeesDisplay = {
 };
 
 export type OrderFeesProps = {
-  swapFees: FeesDisplay;
+  fees: FeesDisplay;
   onFeesClick?: () => void;
   sx?: SxProps;
 };
-export function OrderFees({ sx, swapFees, onFeesClick }: OrderFeesProps) {
+export function OrderFees({ sx, fees, onFeesClick }: OrderFeesProps) {
   return (
     <Fees
-      gasFeeFiatValue={swapFees.fiatAmount}
-      gasFeeToken={swapFees.token}
-      gasFeeValue={swapFees.amount}
-      fees={swapFees.formattedFees}
+      gasFeeFiatValue={fees.fiatAmount}
+      gasFeeToken={fees.token}
+      gasFeeValue={fees.amount}
+      fees={fees.formattedFees}
       onFeesClick={onFeesClick}
       sx={sx}
       loading={false}

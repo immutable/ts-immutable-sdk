@@ -1,5 +1,5 @@
 import { useContext, useRef, useState } from 'react';
-import { TransactionRequirement } from '@imtbl/checkout-sdk';
+import { TokenBalance, TransactionRequirement } from '@imtbl/checkout-sdk';
 import { CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { fetchFundingBalances } from '../functions/fetchFundingBalances';
 import { FundingBalance, FundingBalanceResult } from '../types';
@@ -24,6 +24,7 @@ export const useFundingBalances = () => {
   FundingBalanceResult[]
   >([]);
   const [loadingBalances, setLoadingBalances] = useState(false);
+  const [gasFees, setGasFees] = useState<TokenBalance | undefined>();
 
   const queryFundingBalances = () => {
     if (
@@ -60,6 +61,9 @@ export const useFundingBalances = () => {
           onFundingRequirement: (requirement) => {
             setTransactionRequirement(requirement);
           },
+          onUpdateGasFees: (fees) => {
+            setGasFees(fees);
+          },
         });
 
         setFundingBalancesResult(results);
@@ -76,6 +80,7 @@ export const useFundingBalances = () => {
     loadingBalances,
     fundingBalancesResult,
     transactionRequirement,
+    gasFees,
     queryFundingBalances,
   };
 };

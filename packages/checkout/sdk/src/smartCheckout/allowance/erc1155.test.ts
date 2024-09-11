@@ -126,6 +126,7 @@ describe('erc1155', () => {
           {
             type: ItemType.NATIVE,
             amount: BigNumber.from(1),
+            isFee: false,
           },
           {
             type: ItemType.ERC721,
@@ -165,6 +166,7 @@ describe('erc1155', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
         {
           type: ItemType.ERC721,
@@ -205,6 +207,7 @@ describe('erc1155', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
         {
           type: ItemType.ERC1155,
