@@ -179,27 +179,32 @@ export const prepareAndSignTransaction = async ({
 
   // Parallelize the validation and signing of the transaction
   // without waiting for the validation to complete
-  const validateEVMTransactionPromise = guardianClient.validateEVMTransaction({
-    chainId: getEip155ChainId(chainId),
-    nonce: convertBigNumberishToString(nonce),
-    metaTransactions,
-  });
-  validateEVMTransactionPromise.then(() => flow.addEvent('endValidateEVMTransaction'));
+  const validateTransaction = async () => {
+    await guardianClient.validateEVMTransaction({
+      chainId: getEip155ChainId(chainId),
+      nonce: convertBigNumberishToString(nonce),
+      metaTransactions,
+    });
+    flow.addEvent('endValidateEVMTransaction');
+  };
 
   // NOTE: We sign again because we now are adding the fee transaction, so the
   // whole payload is different and needs a new signature.
-  const getSignedMetaTransactionsPromise = signMetaTransactions(
-    metaTransactions,
-    nonce,
-    chainIdBigNumber,
-    zkEvmAddress,
-    ethSigner,
-  );
-  getSignedMetaTransactionsPromise.then(() => flow.addEvent('endGetSignedMetaTransactions'));
+  const signTransaction = async () => {
+    const signed = await signMetaTransactions(
+      metaTransactions,
+      nonce,
+      chainIdBigNumber,
+      zkEvmAddress,
+      ethSigner,
+    );
+    flow.addEvent('endGetSignedMetaTransactions');
+    return signed;
+  };
 
   const [, signedTransactions] = await Promise.all([
-    validateEVMTransactionPromise,
-    getSignedMetaTransactionsPromise,
+    validateTransaction(),
+    signTransaction(),
   ]);
 
   const relayerId = await relayerClient.ethSendTransaction(zkEvmAddress, signedTransactions);
