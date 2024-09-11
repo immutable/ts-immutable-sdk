@@ -1,5 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { Checkout, TransactionRequirement } from '@imtbl/checkout-sdk';
+import {
+  Checkout, ItemBalance, TokenBalance, TransactionRequirement,
+} from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { compareStr } from '../../../lib/utils';
 import {
@@ -17,6 +19,8 @@ import {
   wrapPromisesWithOnResolve,
 } from './fetchFundingBalancesUtils';
 
+const isTokenFee = (balance: ItemBalance): balance is TokenBalance => 'token' in balance && balance.token !== undefined;
+
 export type FundingBalanceParams = {
   provider: Web3Provider;
   checkout: Checkout;
@@ -30,6 +34,7 @@ export type FundingBalanceParams = {
     fundingItemRequirement: TransactionRequirement
   ) => void;
   onComplete?: (balances: FundingBalance[]) => void;
+  onUpdateGasFees?: (fees: TokenBalance) => void;
 };
 
 export const fetchFundingBalances = async (
@@ -45,6 +50,7 @@ export const fetchFundingBalances = async (
     getIsGasless,
     onComplete,
     onFundingRequirement,
+    onUpdateGasFees,
   } = params;
 
   const signer = provider?.getSigner();
@@ -106,7 +112,7 @@ export const fetchFundingBalances = async (
     })
     .filter(Boolean) as Promise<FundingBalanceResult>[];
 
-  const results = await wrapPromisesWithOnResolve(
+  return await wrapPromisesWithOnResolve(
     balancePromises,
     ({ currency, smartCheckoutResult }) => {
       if (isBaseCurrency(currency.name)) {
@@ -118,9 +124,13 @@ export const fetchFundingBalances = async (
         updateFundingBalances(
           getFundingBalances(smartCheckoutResult, environment),
         );
+
+        const feeRequirement = smartCheckoutResult.transactionRequirements.find((requirement) => requirement.isFee);
+
+        if (feeRequirement && isTokenFee(feeRequirement.required) && onUpdateGasFees) {
+          onUpdateGasFees(feeRequirement.required);
+        }
       }
     },
   );
-
-  return results;
 };

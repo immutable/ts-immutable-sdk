@@ -47,6 +47,7 @@ export const getItemRequirement = (
   tokenAddress: string,
   amount: BigNumber,
   spenderAddress: string,
+  isFee: boolean = false,
 ): ItemRequirement => {
   switch (type) {
     case ItemType.ERC20:
@@ -55,12 +56,14 @@ export const getItemRequirement = (
         amount,
         tokenAddress,
         spenderAddress,
+        isFee,
       };
     case ItemType.NATIVE:
     default:
       return {
         type: ItemType.NATIVE,
         amount,
+        isFee,
       };
   }
 };

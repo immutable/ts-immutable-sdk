@@ -89,6 +89,7 @@ describe('buy', () => {
             balance: BigNumber.from(0),
             formattedBalance: '0',
           },
+          isFee: false,
         }],
       };
       const fulfillOrderMock = jest.fn().mockReturnValue({
@@ -151,6 +152,7 @@ describe('buy', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from('2000000000000000000'),
+          isFee: false,
         },
       ];
 
@@ -219,6 +221,7 @@ describe('buy', () => {
             balance: BigNumber.from(0),
             formattedBalance: '0',
           },
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
@@ -247,6 +250,7 @@ describe('buy', () => {
             balance: BigNumber.from(0),
             formattedBalance: '0',
           },
+          isFee: false,
         }],
       };
       const fulfillOrderMock = jest.fn().mockReturnValue({
@@ -325,6 +329,7 @@ describe('buy', () => {
           amount: BigNumber.from('2000000000000000000'),
           tokenAddress: '0xCONTRACTADDRESS',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
       ];
 
@@ -395,6 +400,7 @@ describe('buy', () => {
             balance: BigNumber.from(0),
             formattedBalance: '0',
           },
+          isFee: false,
         }],
       };
       const fulfillOrderMock = jest.fn().mockReturnValue({
@@ -457,6 +463,7 @@ describe('buy', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from('10010000000000000000'), // 101e16
+          isFee: false,
         },
       ];
 
@@ -525,6 +532,7 @@ describe('buy', () => {
             balance: BigNumber.from(0),
             formattedBalance: '0',
           },
+          isFee: false,
         }],
       };
       const fulfillOrderMock = jest.fn().mockReturnValue({
@@ -588,6 +596,7 @@ describe('buy', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from('5005000000000000000'), // 5005e15
+          isFee: false,
         },
       ];
 
@@ -655,6 +664,7 @@ describe('buy', () => {
             balance: BigNumber.from(0),
             formattedBalance: '0',
           },
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
@@ -683,6 +693,7 @@ describe('buy', () => {
             balance: BigNumber.from(0),
             formattedBalance: '0',
           },
+          isFee: false,
         }],
       };
       const fulfillOrderMock = jest.fn().mockReturnValue({
@@ -761,6 +772,7 @@ describe('buy', () => {
           amount: BigNumber.from('2000000000000000000'),
           tokenAddress: '0xCONTRACTADDRESS',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
       ];
 
@@ -838,6 +850,7 @@ describe('buy', () => {
               balance: BigNumber.from(0),
               formattedBalance: '0',
             },
+            isFee: false,
           },
           {
             type: ItemType.ERC20,
@@ -866,6 +879,7 @@ describe('buy', () => {
               balance: BigNumber.from(0),
               formattedBalance: '0',
             },
+            isFee: false,
           }],
         };
         const fulfillOrderMock = jest.fn().mockReturnValue({
@@ -943,6 +957,7 @@ describe('buy', () => {
             amount: BigNumber.from('2000000000000000000'),
             tokenAddress: '0xCONTRACTADDRESS',
             spenderAddress: '0xSEAPORT',
+            isFee: false,
           },
         ];
 
@@ -1022,6 +1037,7 @@ describe('buy', () => {
           {
             type: ItemType.NATIVE,
             amount: BigNumber.from('2000000000000000000'),
+            isFee: false,
           },
         ];
         const gasAmount: GasAmount = {
@@ -1130,6 +1146,7 @@ describe('buy', () => {
           amount: BigNumber.from('2000000000000000000'),
           tokenAddress: '0x123',
           spenderAddress: seaportContractAddress,
+          isFee: false,
         },
       ];
       const gasAmount: GasAmount = {
@@ -1238,6 +1255,7 @@ describe('buy', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from('2'),
+          isFee: false,
         },
       ];
       const fulfillmentTransaction: FulfillmentTransaction = {
@@ -1356,6 +1374,7 @@ describe('buy', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from('2'),
+          isFee: false,
         },
       ];
       const fulfillmentTransaction: FulfillmentTransaction = {
@@ -1414,6 +1433,7 @@ describe('buy', () => {
             balance: BigNumber.from(0),
             formattedBalance: '0',
           },
+          isFee: false,
         }],
       };
       (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
@@ -1478,6 +1498,7 @@ describe('buy', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from('2'),
+          isFee: false,
         },
       ];
       const fulfillmentTransaction: FulfillmentTransaction = {
@@ -1847,6 +1868,7 @@ describe('buy', () => {
               balance: BigNumber.from(0),
               formattedBalance: '0',
             },
+            isFee: false,
           }],
         };
         const fulfillOrderMock = jest.fn().mockReturnValue({
@@ -1903,6 +1925,7 @@ describe('buy', () => {
           {
             type: ItemType.NATIVE,
             amount: BigNumber.from('2000000000000000000'),
+            isFee: false,
           },
         ];
         const fulfillmentTransaction: FulfillmentTransaction = {
@@ -2055,6 +2078,7 @@ describe('buy', () => {
               formattedBalance: '0',
             },
           }],
+          isFee: false,
         };
         const fulfillOrderMock = jest.fn().mockReturnValue({
           actions: [
@@ -2120,6 +2144,7 @@ describe('buy', () => {
             amount: BigNumber.from('2000000'),
             tokenAddress: '0xCONTRACTADDRESS',
             spenderAddress: '0xSEAPORT',
+            isFee: false,
           },
         ];
         const fulfillmentTransaction: FulfillmentTransaction = {
@@ -2161,6 +2186,7 @@ describe('buy', () => {
       expect(result).toEqual({
         type,
         amount,
+        isFee: false,
       });
     });
 
@@ -2174,6 +2200,7 @@ describe('buy', () => {
         amount,
         tokenAddress,
         spenderAddress: seaportContractAddress,
+        isFee: false,
       });
     });
 
@@ -2185,6 +2212,7 @@ describe('buy', () => {
       expect(result).toEqual({
         type: ItemType.NATIVE,
         amount,
+        isFee: false,
       });
     });
 
@@ -2195,6 +2223,7 @@ describe('buy', () => {
       expect(result).toEqual({
         type: ItemType.NATIVE,
         amount,
+        isFee: false,
       });
     });
   });

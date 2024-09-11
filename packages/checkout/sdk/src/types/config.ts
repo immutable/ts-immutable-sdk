@@ -1,10 +1,12 @@
-import { ModuleConfiguration } from '@imtbl/config';
+import { Environment, ModuleConfiguration } from '@imtbl/config';
 import { ExchangeOverrides, SecondaryFee } from '@imtbl/dex-sdk';
 import { Passport } from '@imtbl/passport';
 import { TokenInfo } from './tokenInfo';
 import { ChainId } from './chains';
 
 export interface CheckoutOverrides {
+  environment?: Environment;
+  [key: string]: unknown;
 }
 
 interface CheckoutFeatureConfiguration {
@@ -43,6 +45,8 @@ export interface CheckoutModuleConfiguration extends ModuleConfiguration<Checkou
   bridge?: CheckoutBridgeConfiguration;
   passport?: Passport;
   publishableKey?: string;
+  environment?: Environment;
+  overrides?: CheckoutOverrides;
 }
 
 /**

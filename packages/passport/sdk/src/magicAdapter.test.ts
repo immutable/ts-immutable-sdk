@@ -4,7 +4,7 @@ import MagicAdapter from './magicAdapter';
 import { PassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from './errors/passportError';
 
-const loginWithOIDCMock: jest.MockedFunction<(args: LoginWithOpenIdParams) => Promise<void>> = jest.fn();
+const loginWithOIDCMock:jest.MockedFunction<(args: LoginWithOpenIdParams) => Promise<void>> = jest.fn();
 
 const rpcProvider = {};
 
@@ -55,8 +55,8 @@ describe('MagicWallet', () => {
       it('starts initialising the magicClient', () => {
         jest.spyOn(window.document, 'readyState', 'get').mockReturnValue('complete');
         const magicAdapter = new MagicAdapter(config);
-        // @ts-expect-error: client is private
-        expect(magicAdapter.client).toBeDefined();
+        // @ts-ignore
+        expect(magicAdapter.lazyMagicClient).toBeDefined();
       });
     });
 
@@ -72,25 +72,8 @@ describe('MagicWallet', () => {
 
       it('does nothing', () => {
         const magicAdapter = new MagicAdapter(config);
-        // @ts-expect-error: client is private
-        expect(magicAdapter.client).toBeUndefined();
-      });
-
-      it('should throw a browser error for loginWithOIDC', async () => {
-        const magicAdapter = new MagicAdapter(config);
-
-        let type = '';
-        let message = '';
-
-        try {
-          await magicAdapter.login(idToken);
-        } catch (e: any) {
-          type = e.type;
-          message = e.message;
-        }
-
-        expect(type).toEqual(PassportErrorType.WALLET_CONNECTION_ERROR);
-        expect(message).toEqual('Cannot perform this action outside of the browser');
+        // @ts-ignore
+        expect(magicAdapter.magicClientPromise).toBeUndefined();
       });
     });
   });

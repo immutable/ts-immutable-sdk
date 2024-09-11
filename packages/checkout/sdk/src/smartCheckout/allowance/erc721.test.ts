@@ -197,6 +197,7 @@ describe('erc721', () => {
           {
             type: ItemType.NATIVE,
             amount: BigNumber.from(1),
+            isFee: false,
           },
           {
             type: ItemType.ERC721,
@@ -231,6 +232,7 @@ describe('erc721', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
         {
           type: ItemType.ERC721,
@@ -266,6 +268,7 @@ describe('erc721', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
         {
           type: ItemType.ERC721,

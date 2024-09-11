@@ -14,6 +14,7 @@ export interface ConnectWalletProps {
   targetChainId: ChainId;
   allowedChains: ChainId[];
   blocklistWalletRdns?: string[];
+  checkNetwork: boolean;
 }
 
 export function ConnectWallet({
@@ -21,6 +22,7 @@ export function ConnectWallet({
   targetChainId,
   allowedChains,
   blocklistWalletRdns,
+  checkNetwork,
 }: ConnectWalletProps) {
   const { t } = useTranslation();
   const {
@@ -79,6 +81,7 @@ export function ConnectWallet({
           targetChainId={targetChainId}
           allowedChains={allowedChains}
           blocklistWalletRdns={blocklistWalletRdns}
+          isCheckNetworkEnabled={checkNetwork}
         />
       </Box>
     </SimpleLayout>

@@ -39,6 +39,7 @@ export interface ConnectLoaderParams {
   web3Provider?: Web3Provider;
   checkout: Checkout;
   allowedChains: ChainId[];
+  isCheckNetworkEnabled?: boolean;
 }
 
 export function ConnectLoader({
@@ -53,6 +54,7 @@ export function ConnectLoader({
     walletProviderName,
     allowedChains,
     web3Provider,
+    isCheckNetworkEnabled,
   } = params;
 
   const { t } = useTranslation();
@@ -186,7 +188,8 @@ export function ConnectLoader({
 
           // If unsupported network or current network is not in the allowed chains
           // then show the switch network screen
-          if (!currentNetworkInfo.isSupported || !allowedChains.includes(currentNetworkInfo.chainId)) {
+          if ((isCheckNetworkEnabled === undefined || isCheckNetworkEnabled)
+              && (!allowedChains.includes(currentNetworkInfo.chainId) || !currentNetworkInfo.isSupported)) {
             connectLoaderDispatch({
               payload: {
                 type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
@@ -236,17 +239,18 @@ export function ConnectLoader({
       )}
       <ConnectLoaderContext.Provider value={connectLoaderReducerValues}>
         {(connectionStatus === ConnectionStatus.NOT_CONNECTED_NO_PROVIDER
-          || connectionStatus === ConnectionStatus.NOT_CONNECTED
-          || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
-            <ConnectWidget
-              config={widgetConfig}
-              targetChainId={targetChainId}
-              web3Provider={provider}
-              checkout={checkout}
-              deepLink={deepLink}
-              sendCloseEventOverride={closeEvent}
-              allowedChains={allowedChains}
-            />
+                    || connectionStatus === ConnectionStatus.NOT_CONNECTED
+                    || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
+                    <ConnectWidget
+                      config={widgetConfig}
+                      targetChainId={targetChainId}
+                      web3Provider={provider}
+                      checkout={checkout}
+                      deepLink={deepLink}
+                      sendCloseEventOverride={closeEvent}
+                      allowedChains={allowedChains}
+                      isCheckNetworkEnabled={isCheckNetworkEnabled ?? true}
+                    />
         )}
         {/* If the user has connected then render the widget */}
         {connectionStatus === ConnectionStatus.CONNECTED_WITH_NETWORK && (children)}

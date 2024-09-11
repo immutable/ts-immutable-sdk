@@ -25,6 +25,15 @@ fi
       sed -i -E "s/SDK_VERSION = '.*'/SDK_VERSION = '$VERSION'/g;" $FILE
   fi
 
+  FILE2=sidebars/sidebars-docs.js
+  if [ "$(uname)" == "Darwin" ]; then
+      # On Mac OS, sed requires an empty string as an argument to -i to avoid creating a backup file
+      sed -i '' -E "s/SDK_VERSION = '.*'/SDK_VERSION = '$VERSION'/g;" $FILE2
+  else
+      sed -i -E "s/SDK_VERSION = '.*'/SDK_VERSION = '$VERSION'/g;" $FILE2
+  fi
+
+
   major=$(echo $VERSION | awk '{ 
     split($0, a, ".");
     print a[1];
