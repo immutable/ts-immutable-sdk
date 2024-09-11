@@ -26,10 +26,7 @@ export const sendDeployTransactionAndPersonalSign = async ({
     flow,
   });
 
-  return guardianClient.withConfirmationScreen({
-    width: 480,
-    height: 720,
-  })(async () => {
+  return guardianClient.withConfirmationScreen()(async () => {
     const signedMessage = await personalSign({
       params,
       ethSigner,
