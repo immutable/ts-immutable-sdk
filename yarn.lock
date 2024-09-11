@@ -2526,6 +2526,33 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@biom3/react@npm:^0.25.21":
+  version: 0.25.21
+  resolution: "@biom3/react@npm:0.25.21"
+  dependencies:
+    "@biom3/design-tokens": ~0.4.4
+    "@imtbl/image-resizer-utils": ~0.0.1
+    csstype: ^3.1.2
+    hls.js: ^1.5.11
+    localforage: ^1.10.0
+    lodash.debounce: ^4.0.8
+    lodash.get: ^4.4.2
+    lodash.isequal: ^4.5.0
+    lodash.throttle: ^4.1.1
+    react-is: ^18.2.0
+    react-keyed-flatten-children: ^3.0.0
+    ts-deepmerge: ^6.2.0
+  peerDependencies:
+    "@emotion/react": ^11.11.4
+    "@rive-app/react-canvas-lite": ^4.9.0
+    embla-carousel-react: ^8.0.4
+    framer-motion: ^10.12.12
+    react: ^18.2.0
+    react-dom: ^18.2.0
+  checksum: f8ae35e917d9b655467f281df4fe9af307acf7ed16a6a80bc81cfae91d6c173c2f92ef502f58d4d16088930eae32d711de55cc7c434583278ffd8d4e3e6d59a8
+  languageName: node
+  linkType: hard
+
 "@biom3/react@npm:^0.26.1":
   version: 0.26.2
   resolution: "@biom3/react@npm:0.26.2"
@@ -3848,6 +3875,46 @@ __metadata:
     react-dom: ^18.2.0
     tailwindcss: ^3.4.6
     typescript: ^5.5.4
+  languageName: unknown
+  linkType: soft
+
+"@examples/sdk-connect-with-nextjs@workspace:examples/checkout/sdk-connect-with-nextjs":
+  version: 0.0.0-use.local
+  resolution: "@examples/sdk-connect-with-nextjs@workspace:examples/checkout/sdk-connect-with-nextjs"
+  dependencies:
+    "@biom3/react": ^0.25.21
+    "@ethersproject/providers": ^5.7.2
+    "@imtbl/sdk": latest
+    "@playwright/test": ^1.46.1
+    "@types/node": ^20
+    "@types/react": ^18.3.4
+    "@types/react-dom": ^18.3.0
+    eslint: ^8
+    eslint-config-next: 14.2.7
+    next: 14.2.7
+    react: ^18
+    react-dom: ^18
+    typescript: ^5
+  languageName: unknown
+  linkType: soft
+
+"@examples/switch-network-with-nextjs@workspace:examples/checkout/sdk-switch-network-with-nextjs":
+  version: 0.0.0-use.local
+  resolution: "@examples/switch-network-with-nextjs@workspace:examples/checkout/sdk-switch-network-with-nextjs"
+  dependencies:
+    "@biom3/react": ^0.25.21
+    "@ethersproject/providers": ^5.7.2
+    "@imtbl/sdk": latest
+    "@playwright/test": ^1.47.0
+    "@types/node": ^20
+    "@types/react": ^18.3.4
+    "@types/react-dom": ^18.3.0
+    eslint: ^8
+    eslint-config-next: 14.2.7
+    next: 14.2.7
+    react: ^18
+    react-dom: ^18
+    typescript: ^5
   languageName: unknown
   linkType: soft
 
@@ -8620,6 +8687,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@playwright/test@npm:^1.46.1, @playwright/test@npm:^1.47.0":
+  version: 1.47.0
+  resolution: "@playwright/test@npm:1.47.0"
+  dependencies:
+    playwright: 1.47.0
+  bin:
+    playwright: cli.js
+  checksum: 4f5a921c57d2577c64b0bc03d4b97937a6f853eee6afb58f2fc8fb140147b7f33800afe490c9ba3af515d5feb104f65319663931ec1ee75e10f001c1d69b138c
+  languageName: node
+  linkType: hard
+
 "@pmmmwh/react-refresh-webpack-plugin@npm:^0.5.3":
   version: 0.5.10
   resolution: "@pmmmwh/react-refresh-webpack-plugin@npm:0.5.10"
@@ -12499,7 +12577,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^18":
+"@types/react-dom@npm:^18, @types/react-dom@npm:^18.3.0":
   version: 18.3.0
   resolution: "@types/react-dom@npm:18.3.0"
   dependencies:
@@ -12537,7 +12615,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^18":
+"@types/react@npm:^18, @types/react@npm:^18.3.4":
   version: 18.3.5
   resolution: "@types/react@npm:18.3.5"
   dependencies:
@@ -31367,6 +31445,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"playwright-core@npm:1.47.0":
+  version: 1.47.0
+  resolution: "playwright-core@npm:1.47.0"
+  bin:
+    playwright-core: cli.js
+  checksum: 64c6adae3ba76cd9f05e6569b1350a6e6990fd8236bb17d1f241b49bea68592a4f4390adb38863d2ee8ef5124e9cb77ff50b9076f8ef3a0890b2a37f87fb842a
+  languageName: node
+  linkType: hard
+
 "playwright@npm:1.45.3":
   version: 1.45.3
   resolution: "playwright@npm:1.45.3"
@@ -31379,6 +31466,21 @@ __metadata:
   bin:
     playwright: cli.js
   checksum: d9d23b155ccd001553214f710561b01e48eb409676102f8ab94c0b4aa5ac5f398becc1a96528b0554944e07e34189503d891913e0e0a4aa58ad36b9c08747983
+  languageName: node
+  linkType: hard
+
+"playwright@npm:1.47.0":
+  version: 1.47.0
+  resolution: "playwright@npm:1.47.0"
+  dependencies:
+    fsevents: 2.3.2
+    playwright-core: 1.47.0
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  bin:
+    playwright: cli.js
+  checksum: e055fee751035f306a636267d0e080f08d4a523a6c1e3ebb01c91c18838c29bb9165ec3e63eb706798886fa2715f272dec908a7e2e1abcd7a55984688dbac2db
   languageName: node
   linkType: hard
 
