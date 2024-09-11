@@ -11,6 +11,11 @@ import { CheckoutActions } from '../context/CheckoutContext';
 // TODO these types should be in sync with Checkout App
 type MessageId = number | string | null;
 
+enum ConnectMethods {
+  REQUEST_ACCOUNTS = 'eth_requestAccounts',
+  REQUEST_PERMISSIONS = 'wallet_requestPermissions',
+}
+
 interface JsonRpcRequestMessage<TParams = any> {
   type: 'dapp';
   jsonrpc: '2.0';
@@ -106,8 +111,8 @@ export function useProviderRelay() {
 
       try {
         await execute(providerRelayPayload, currentProvider);
-        if (providerRelayPayload.jsonRpcRequestMessage.method === 'eth_requestAccounts'
-          || providerRelayPayload.jsonRpcRequestMessage.method === 'wallet_requestPermissions') {
+        if (providerRelayPayload.jsonRpcRequestMessage.method === ConnectMethods.REQUEST_ACCOUNTS
+          || providerRelayPayload.jsonRpcRequestMessage.method === ConnectMethods.REQUEST_PERMISSIONS) {
           checkoutDispatch({
             payload: {
               type: CheckoutActions.SET_PROVIDER,
