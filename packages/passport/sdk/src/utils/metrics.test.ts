@@ -16,7 +16,7 @@ describe('passport metrics', () => {
       const mockFn = jest.fn();
       mockFn.mockReturnValue(returnValue);
 
-      expect(withMetrics(mockFn, 'event')).toEqual(returnValue);
+      expect(withMetrics(mockFn, 'myFlow')).toEqual(returnValue);
     });
 
     it('should track and re-throw error', () => {
@@ -25,7 +25,7 @@ describe('passport metrics', () => {
       });
 
       try {
-        withMetrics(mockFn, 'event');
+        withMetrics(mockFn, 'myFlow');
       } catch (error) {
         expect(error).toBeInstanceOf(Error);
         expect(error).toMatchObject({
@@ -34,7 +34,7 @@ describe('passport metrics', () => {
         expect(trackFlow).toBeCalledTimes(1);
         expect(trackError).toHaveBeenCalledWith(
           'passport',
-          'event',
+          'myFlow',
           error,
         );
       }
@@ -47,7 +47,7 @@ describe('passport metrics', () => {
       const mockFn = jest.fn();
       mockFn.mockResolvedValue(returnValue);
 
-      expect(await withMetricsAsync(mockFn, 'event')).toEqual(returnValue);
+      expect(await withMetricsAsync(mockFn, 'myFlow')).toEqual(returnValue);
     });
 
     it('should track and re-throw error', async () => {
@@ -55,7 +55,7 @@ describe('passport metrics', () => {
       errorFunction.mockRejectedValue(new Error('error'));
 
       try {
-        await withMetricsAsync(errorFunction, 'event');
+        await withMetricsAsync(errorFunction, 'myFlow');
       } catch (error) {
         expect(error).toBeInstanceOf(Error);
         expect(error).toMatchObject({
@@ -64,7 +64,7 @@ describe('passport metrics', () => {
         expect(trackFlow).toBeCalledTimes(1);
         expect(trackError).toHaveBeenCalledWith(
           'passport',
-          'event',
+          'myFlow',
           error,
         );
       }

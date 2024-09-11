@@ -21,7 +21,6 @@
  */
 
 export enum AssetVerificationStatus {
-    Pending = 'pending',
     Verified = 'verified',
     Unverified = 'unverified',
     Spam = 'spam',

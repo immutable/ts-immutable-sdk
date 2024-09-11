@@ -11,7 +11,7 @@ import {
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 
 import {
-  AddFundsActions, AddFundsContext, addFundsReducer, initialAddFundsState,
+  AddFundsActions, AddFundsContext,
 } from './context/AddFundsContext';
 import { useAnalytics, UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { AddFundsWidgetViews } from '../../context/view-context/AddFundsViewContextTypes';
@@ -20,6 +20,7 @@ import {
 } from '../../context/view-context/ViewContext';
 import { AddFunds } from './views/AddFunds';
 import { ErrorView } from '../../views/error/ErrorView';
+import { AddFundsContextProvider } from './context/AddFundsContextProvider';
 
 export type AddFundsWidgetInputs = AddFundsWidgetParams & {
   checkout: Checkout;
@@ -53,15 +54,7 @@ export default function AddFundsWidget({
     }),
     [viewState, viewReducer],
   );
-  const [addFundsState, addFundsDispatch] = useReducer(addFundsReducer, initialAddFundsState);
-
-  const addFundsReducerValues = useMemo(
-    () => ({
-      addFundsState,
-      addFundsDispatch,
-    }),
-    [addFundsState, addFundsDispatch],
-  );
+  const { addFundsDispatch } = useContext(AddFundsContext);
 
   useEffect(() => {
     if (!web3Provider) return;
@@ -89,7 +82,7 @@ export default function AddFundsWidget({
 
   return (
     <ViewContext.Provider value={viewReducerValues}>
-      <AddFundsContext.Provider value={addFundsReducerValues}>
+      <AddFundsContextProvider>
         {viewState.view.type === AddFundsWidgetViews.ADD_FUNDS && (
         <AddFunds
           checkout={checkout}
@@ -116,7 +109,7 @@ export default function AddFundsWidget({
           }}
         />
         )}
-      </AddFundsContext.Provider>
+      </AddFundsContextProvider>
     </ViewContext.Provider>
   );
 }
