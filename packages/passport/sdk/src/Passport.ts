@@ -176,14 +176,16 @@ export class Passport {
    * @param options.useCachedSession = false - If true, and no active session exists, then the user will not be
    * prompted to log in and the Promise will resolve with a null value.
    * @param options.anonymousId - If provided, Passport internal metrics will be enriched with this value.
+   * @param options.silent - If true, will trigger a silent login request.
    * @returns {Promise<UserProfile | null>} the user profile if the user is logged in, otherwise null
    */
   public async login(options?: {
     useCachedSession: boolean;
     anonymousId?: string;
+    silent?: boolean;
   }): Promise<UserProfile | null> {
     return withMetricsAsync(async () => {
-      const { useCachedSession = false } = options || {};
+      const { useCachedSession = false, silent } = options || {};
       let user: User | null = null;
 
       try {
@@ -198,7 +200,11 @@ export class Passport {
         logger.warn('Failed to retrieve a cached user session', error);
       }
       if (!user && !useCachedSession) {
-        user = await this.authManager.login(options?.anonymousId);
+        if (silent) {
+          user = await this.authManager.forceUserRefresh();
+        } else {
+          user = await this.authManager.login(options?.anonymousId);
+        }
       }
 
       if (user) {
