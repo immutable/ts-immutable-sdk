@@ -23,6 +23,7 @@ import { OptionTypes } from '../components/Option';
 import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
 import { getL2ChainId } from '../../../lib';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { useRoutes } from '../hooks/useRoutes';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -52,9 +53,11 @@ export function AddFunds({
   console.log('showSwapOption', showSwapOption);
   console.log('showBridgeOption', showBridgeOption);
 
-  const { addFundsDispatch } = useContext(AddFundsContext);
+  const { addFundsState, addFundsDispatch } = useContext(AddFundsContext);
 
   const { viewDispatch } = useContext(ViewContext);
+
+  const { getRoutes } = useRoutes();
 
   const {
     eventTargetState: { eventTarget },
@@ -80,6 +83,17 @@ export function AddFunds({
     },
     [viewDispatch],
   );
+
+  useEffect(() => {
+    console.log('=== addFundsState', addFundsState);
+    if (!addFundsState.provider || !addFundsState.squid) return;
+
+    const routes = async () => {
+      await getRoutes();
+    };
+
+    routes();
+  }, [addFundsState.provider, addFundsState.squid]);
 
   useEffect(() => {
     if (!checkout) {
