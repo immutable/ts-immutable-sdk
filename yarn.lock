@@ -4817,7 +4817,6 @@ __metadata:
     jwt-decode: ^3.1.2
     localforage: ^1.10.0
     lru-memorise: 0.3.0
-    lzma-web: ^3.0.1
     magic-sdk: ^21.2.0
     merkletreejs: ^0.3.11
     oidc-client-ts: 2.4.0
@@ -28571,13 +28570,6 @@ __metadata:
   bin:
     lz-string: bin/bin.js
   checksum: 1ee98b4580246fd90dd54da6e346fb1caefcf05f677c686d9af237a157fdea3fd7c83a4bc58f858cd5b10a34d27afe0fdcbd0505a47e0590726a873dc8b8f65d
-  languageName: node
-  linkType: hard
-
-"lzma-web@npm:^3.0.1":
-  version: 3.0.1
-  resolution: "lzma-web@npm:3.0.1"
-  checksum: a03b4dc0977c6265eb113f5f58007245bc930747cfe0842f46655ba4368d6b74f98c35b03d73577df08f0416216ec21cc47012c52a2d98f679643c1efc9ffb00
   languageName: node
   linkType: hard
 
