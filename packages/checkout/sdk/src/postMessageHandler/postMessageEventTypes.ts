@@ -8,6 +8,7 @@ export enum PostMessageHandlerEventType {
   PROVIDER_UPDATED = 'IMTBL_PROVIDER_UPDATED',
   EIP_6963_EVENT = 'IMTBL_EIP_6963_EVENT',
   WIDGET_EVENT = 'IMTBL_CHECKOUT_WIDGET_EVENT',
+  WIDGET_PROVIDER_EVENT = 'IMTBL_WIDGET_PROVIDER_EVENT',
 }
 
 export type WidgetEventDetail<T extends WidgetType> = {
@@ -52,4 +53,7 @@ export type PostMessageData =
   | {
     type: PostMessageHandlerEventType.WIDGET_EVENT;
     payload: PostMessageWidgetEventData;
+  } | {
+    type: PostMessageHandlerEventType.WIDGET_PROVIDER_EVENT;
+    payload: any;
   };
