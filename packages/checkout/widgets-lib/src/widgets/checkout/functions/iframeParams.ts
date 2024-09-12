@@ -8,7 +8,7 @@ import {
 
 import { Environment } from '@imtbl/config';
 
-import { compressAndEncode } from '../utils/encode';
+import { encodeObject } from '../utils/encode';
 import { CHECKOUT_APP_URL, ENV_DEVELOPMENT } from '../../../lib/constants';
 
 /**
@@ -111,7 +111,7 @@ const getIframeParams = async (
         toAmount: params.tokenAddress,
       });
     case CheckoutFlowType.SALE:
-      const items = await compressAndEncode(params.items || []);
+      const items = await encodeObject(params.items || []);
 
       return toQueryString({
         ...commonConfig,
