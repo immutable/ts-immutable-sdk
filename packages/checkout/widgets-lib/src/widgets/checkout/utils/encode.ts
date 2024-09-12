@@ -18,7 +18,7 @@ export const decodeObject = async (
   encodedValue: string,
 ): Promise<Object> => {
   try {
-    const decodedString = atob(decodeURIComponent(encodedValue)); // Removed LZMA decompression
+    const decodedString = atob(decodeURIComponent(encodedValue));
     return JSON.parse(decodedString);
   } catch (error) {
     throw new Error(`Decompression failed: ${(error as Error).message}`);
