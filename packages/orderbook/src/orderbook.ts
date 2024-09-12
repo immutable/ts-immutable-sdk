@@ -116,7 +116,7 @@ export class Orderbook {
   }
 
   /**
-   * Get an listing by ID
+   * Get a listing by ID
    * @param {string} listingId - The listingId to find.
    * @return {ListingResult} The returned listing result.
    */
