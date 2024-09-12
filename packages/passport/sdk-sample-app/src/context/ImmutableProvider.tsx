@@ -94,6 +94,7 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
     logoutRedirectUri: LOGOUT_MODE === 'silent'
       ? SILENT_LOGOUT_REDIRECT_URI
       : LOGOUT_REDIRECT_URI,
+    forceScwDeployBeforeMessageSignature: true,
   };
 
   switch (environment) {
