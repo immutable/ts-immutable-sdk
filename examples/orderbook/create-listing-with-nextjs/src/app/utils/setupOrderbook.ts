@@ -1,5 +1,5 @@
 import { orderbook } from "@imtbl/sdk";
-import { Environment } from "@imtbl/config";
+import { Environment } from "@imtbl/sdk/config";
 
 export const orderbookSDK = new orderbook.Orderbook({
   baseConfig: {

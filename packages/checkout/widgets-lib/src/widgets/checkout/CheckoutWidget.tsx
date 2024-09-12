@@ -15,6 +15,7 @@ import { CheckoutContextProvider } from './context/CheckoutContextProvider';
 import { CheckoutAppIframe } from './views/CheckoutAppIframe';
 import { getIframeURL } from './functions/iframeParams';
 import { useMount } from './hooks/useMount';
+import { useAsyncMemo } from './hooks/useAsyncMemo';
 
 export type CheckoutWidgetInputs = {
   checkout: Checkout;
@@ -28,10 +29,10 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
     config, checkout, params, provider,
   } = props;
 
-  const [, iframeURL] = useMemo(() => {
-    if (!checkout.config.publishableKey) return ['', ''];
-    return getIframeURL(params, config, checkout.config);
-  }, [params, config, checkout.config]);
+  const iframeURL = useAsyncMemo(
+    async () => getIframeURL(params, config, checkout.config),
+    [params, config, checkout.config],
+  );
 
   const [checkoutState, checkoutDispatch] = useReducer(
     checkoutReducer,

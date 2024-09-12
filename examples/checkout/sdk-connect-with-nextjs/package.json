@@ -1,5 +1,5 @@
 {
-  "name": "sdk-connect-with-nextjs",
+  "name": "@examples/sdk-connect-with-nextjs",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -12,13 +12,13 @@
   "dependencies": {
     "@biom3/react": "^0.25.21",
     "@ethersproject/providers": "^5.7.2",
-    "@imtbl/sdk": "^1.48.1",
+    "@imtbl/sdk": "latest",
     "next": "14.2.7",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
-    "@playwright/test": "^1.46.1",
+    "@playwright/test": "^1.45.3",
     "@types/node": "^20",
     "@types/react": "^18.3.4",
     "@types/react-dom": "^18.3.0",

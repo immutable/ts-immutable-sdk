@@ -50,12 +50,15 @@ export class PassportConfiguration {
 
   readonly crossSdkBridgeEnabled: boolean;
 
+  readonly forceScwDeployBeforeMessageSignature: boolean;
+
   readonly popupOverlayOptions: PopupOverlayOptions;
 
   constructor({
     baseConfig,
     overrides,
     crossSdkBridgeEnabled,
+    forceScwDeployBeforeMessageSignature,
     popupOverlayOptions,
     ...oidcConfiguration
   }: PassportModuleConfiguration) {
@@ -66,6 +69,7 @@ export class PassportConfiguration {
     this.oidcConfiguration = oidcConfiguration;
     this.baseConfig = baseConfig;
     this.crossSdkBridgeEnabled = crossSdkBridgeEnabled || false;
+    this.forceScwDeployBeforeMessageSignature = forceScwDeployBeforeMessageSignature || false;
     this.popupOverlayOptions = popupOverlayOptions || {
       disableGenericPopupOverlay: false,
       disableBlockedPopupOverlay: false,

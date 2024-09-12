@@ -2,21 +2,13 @@ import { StaticJsonRpcProvider, TransactionRequest } from '@ethersproject/provid
 import { Signer } from '@ethersproject/abstract-signer';
 import { Flow } from '@imtbl/metrics';
 import { BigNumber } from 'ethers';
-import {
-  getEip155ChainId,
-  getNonce,
-  signMetaTransactions,
-} from './walletHelpers';
 import { sendTransaction } from './sendTransaction';
-import { chainId, chainIdEip155, mockUserZkEvm } from '../test/mocks';
+import { mockUserZkEvm } from '../test/mocks';
 import { RelayerClient } from './relayerClient';
-import { retryWithDelay } from '../network/retry';
-import { FeeOption, RelayerTransaction, RelayerTransactionStatus } from './types';
-import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import GuardianClient from '../guardian';
-import * as walletHelpers from './walletHelpers';
+import * as transactionHelpers from './transactionHelpers';
 
-jest.mock('./walletHelpers');
+jest.mock('./transactionHelpers');
 jest.mock('../network/retry');
 
 describe('sendTransaction', () => {
@@ -24,7 +16,7 @@ describe('sendTransaction', () => {
   const relayerTransactionId = 'relayerTransactionId123';
   const transactionHash = 'transactionHash123';
 
-  const nonce = '5';
+  const nonce = BigNumber.from(5);
 
   const transactionRequest: TransactionRequest = {
     to: mockUserZkEvm.zkEvm.ethAddress,
@@ -49,212 +41,86 @@ describe('sendTransaction', () => {
     addEvent: jest.fn(),
   };
 
-  const imxFeeOption: FeeOption = {
-    tokenPrice: '0x1',
-    tokenSymbol: 'IMX',
-    tokenDecimals: 18,
-    tokenAddress: '0x1337',
-    recipientAddress: '0x7331',
-  };
-
   beforeEach(() => {
     jest.resetAllMocks();
-    relayerClient.imGetFeeOptions.mockResolvedValue([imxFeeOption]);
-    (getNonce as jest.Mock).mockResolvedValueOnce(nonce);
-    (getEip155ChainId as jest.Mock).mockReturnValue(chainIdEip155);
-    (signMetaTransactions as jest.Mock).mockResolvedValueOnce(
+    (transactionHelpers.prepareAndSignTransaction as jest.Mock).mockResolvedValue({
       signedTransactions,
+      relayerId: relayerTransactionId,
+      nonce,
+    });
+    (transactionHelpers.pollRelayerTransaction as jest.Mock).mockResolvedValue({
+      hash: transactionHash,
+    });
+  });
+
+  it('calls prepareAndSignTransaction with the correct arguments', async () => {
+    await sendTransaction({
+      params: [transactionRequest],
+      ethSigner,
+      rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+      relayerClient: relayerClient as unknown as RelayerClient,
+      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      guardianClient: guardianClient as unknown as GuardianClient,
+      flow: flow as unknown as Flow,
+    });
+
+    expect(transactionHelpers.prepareAndSignTransaction).toHaveBeenCalledWith({
+      transactionRequest,
+      ethSigner,
+      rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+      relayerClient: relayerClient as unknown as RelayerClient,
+      guardianClient: guardianClient as unknown as GuardianClient,
+      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      flow: flow as unknown as Flow,
+    });
+  });
+
+  it('calls pollRelayerTransaction with the correct arguments', async () => {
+    await sendTransaction({
+      params: [transactionRequest],
+      ethSigner,
+      rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+      relayerClient: relayerClient as unknown as RelayerClient,
+      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      guardianClient: guardianClient as unknown as GuardianClient,
+      flow: flow as unknown as Flow,
+    });
+
+    expect(transactionHelpers.pollRelayerTransaction).toHaveBeenCalledWith(
+      relayerClient as unknown as RelayerClient,
+      relayerTransactionId,
+      flow as unknown as Flow,
     );
-    relayerClient.ethSendTransaction.mockResolvedValue(relayerTransactionId);
-    rpcProvider.detectNetwork.mockResolvedValue({ chainId });
-    guardianClient.validateEVMTransaction.mockResolvedValue(undefined);
   });
 
-  describe('when the relayer returns a transaction with a "SUCCESSFUL" status', () => {
-    beforeEach(() => {
-      (retryWithDelay as jest.Mock).mockResolvedValue({
-        status: RelayerTransactionStatus.SUCCESSFUL,
-        hash: transactionHash,
-      } as RelayerTransaction);
+  it('returns the transaction hash', async () => {
+    const result = await sendTransaction({
+      params: [transactionRequest],
+      ethSigner,
+      rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+      relayerClient: relayerClient as unknown as RelayerClient,
+      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      guardianClient: guardianClient as unknown as GuardianClient,
+      flow: flow as unknown as Flow,
     });
 
-    it('calls relayerClient.imGetFeeOptions with the correct arguments', async () => {
-      (walletHelpers.encodedTransactions as jest.Mock).mockReturnValue('encodedTransactions123');
-
-      await sendTransaction({
-        params: [transactionRequest],
-        ethSigner,
-        rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
-        relayerClient: relayerClient as unknown as RelayerClient,
-        zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
-        guardianClient: guardianClient as unknown as GuardianClient,
-        flow: flow as unknown as Flow,
-      });
-
-      expect(relayerClient.imGetFeeOptions).toHaveBeenCalledWith(
-        mockUserZkEvm.zkEvm.ethAddress,
-        'encodedTransactions123',
-      );
-    });
-
-    it('calls relayerClient.ethSendTransaction with the correct arguments', async () => {
-      const result = await sendTransaction({
-        params: [transactionRequest],
-        ethSigner,
-        rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
-        relayerClient: relayerClient as unknown as RelayerClient,
-        zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
-        guardianClient: guardianClient as unknown as GuardianClient,
-        flow: flow as unknown as Flow,
-      });
-
-      expect(result).toEqual(transactionHash);
-      expect(relayerClient.ethSendTransaction).toHaveBeenCalledWith(
-        mockUserZkEvm.zkEvm.ethAddress,
-        signedTransactions,
-      );
-    });
-
-    it('calls relayerClient.ethSendTransaction with sponsored meta transaction', async () => {
-      const mockImxFeeOption = {
-        tokenPrice: '0',
-        tokenSymbol: 'IMX',
-        tokenDecimals: 18,
-        tokenAddress: '0x1337',
-        recipientAddress: '0x7331',
-      };
-
-      relayerClient.imGetFeeOptions.mockResolvedValue([mockImxFeeOption]);
-
-      const result = await sendTransaction({
-        params: [transactionRequest],
-        ethSigner,
-        rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
-        relayerClient: relayerClient as unknown as RelayerClient,
-        zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
-        guardianClient: guardianClient as unknown as GuardianClient,
-        flow: flow as unknown as Flow,
-      });
-
-      expect(result).toEqual(transactionHash);
-      expect(guardianClient.validateEVMTransaction).toHaveBeenCalledWith(
-        {
-          chainId: chainIdEip155,
-          nonce,
-          metaTransactions: [
-            {
-              data: transactionRequest.data,
-              revertOnError: true,
-              to: mockUserZkEvm.zkEvm.ethAddress,
-              value: '0x00',
-              nonce,
-            },
-          ],
-        },
-      );
-
-      expect(relayerClient.ethSendTransaction).toHaveBeenCalledWith(
-        mockUserZkEvm.zkEvm.ethAddress,
-        signedTransactions,
-      );
-    });
-
-    it('calls guardian.evaluateTransaction with the correct arguments', async () => {
-      (getEip155ChainId as jest.Mock).mockReturnValue(`eip155:${chainId}`);
-
-      const result = await sendTransaction({
-        params: [transactionRequest],
-        ethSigner,
-        rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
-        relayerClient: relayerClient as unknown as RelayerClient,
-        zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
-        guardianClient: guardianClient as unknown as GuardianClient,
-        flow: flow as unknown as Flow,
-      });
-
-      expect(result).toEqual(transactionHash);
-      expect(getEip155ChainId).toHaveBeenCalledWith(chainId);
-      expect(guardianClient.validateEVMTransaction).toHaveBeenCalledWith(
-        {
-          chainId: chainIdEip155,
-          nonce,
-          metaTransactions: [
-            {
-              data: transactionRequest.data,
-              revertOnError: true,
-              to: mockUserZkEvm.zkEvm.ethAddress,
-              value: '0x00',
-              nonce,
-            },
-            {
-              revertOnError: true,
-              to: imxFeeOption.recipientAddress,
-              value: BigNumber.from(imxFeeOption.tokenPrice),
-              nonce,
-            },
-          ],
-        },
-      );
-      expect(relayerClient.ethSendTransaction).toHaveBeenCalledWith(
-        mockUserZkEvm.zkEvm.ethAddress,
-        signedTransactions,
-      );
-    });
+    expect(result).toEqual(transactionHash);
   });
 
-  describe('when the relayer returns a transaction with a "FAILED" status', () => {
-    beforeEach(() => {
-      (retryWithDelay as jest.Mock).mockResolvedValue({
-        status: RelayerTransactionStatus.FAILED,
-        statusMessage: 'Unable to complete transaction',
-      } as RelayerTransaction);
-    });
+  it('throws an error if pollRelayerTransaction fails', async () => {
+    const error = new Error('Transaction failed');
+    (transactionHelpers.pollRelayerTransaction as jest.Mock).mockRejectedValue(error);
 
-    it('returns and surfaces an error', async () => {
-      await expect(
-        sendTransaction({
-          params: [transactionRequest],
-          ethSigner,
-          rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
-          relayerClient: relayerClient as unknown as RelayerClient,
-          zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
-          guardianClient: guardianClient as unknown as GuardianClient,
-          flow: flow as unknown as Flow,
-        }),
-      ).rejects.toThrow(
-        new JsonRpcError(
-          RpcErrorCode.INTERNAL_ERROR,
-          'Transaction failed to submit with status FAILED. Error message: Unable to complete transaction',
-        ),
-      );
-    });
-  });
-
-  describe('when the relayer returns a transaction with a "CANCELLED" status', () => {
-    beforeEach(() => {
-      (retryWithDelay as jest.Mock).mockResolvedValue({
-        status: RelayerTransactionStatus.CANCELLED,
-        statusMessage: 'Transaction cancelled',
-      } as RelayerTransaction);
-    });
-
-    it('returns and surfaces an error', async () => {
-      await expect(
-        sendTransaction({
-          params: [transactionRequest],
-          ethSigner,
-          rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
-          relayerClient: relayerClient as unknown as RelayerClient,
-          zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
-          guardianClient: guardianClient as unknown as GuardianClient,
-          flow: flow as unknown as Flow,
-        }),
-      ).rejects.toThrow(
-        new JsonRpcError(
-          RpcErrorCode.INTERNAL_ERROR,
-          'Transaction failed to submit with status CANCELLED. Error message: Transaction cancelled',
-        ),
-      );
-    });
+    await expect(
+      sendTransaction({
+        params: [transactionRequest],
+        ethSigner,
+        rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+        relayerClient: relayerClient as unknown as RelayerClient,
+        zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+        guardianClient: guardianClient as unknown as GuardianClient,
+        flow: flow as unknown as Flow,
+      }),
+    ).rejects.toThrow(error);
   });
 });
