@@ -12,6 +12,8 @@ import { EventTargetContext } from '../../context/event-target-context/EventTarg
 
 import {
   AddFundsActions, AddFundsContext,
+  addFundsReducer,
+  initialAddFundsState,
 } from './context/AddFundsContext';
 import { useAnalytics, UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { AddFundsWidgetViews } from '../../context/view-context/AddFundsViewContextTypes';
@@ -20,7 +22,7 @@ import {
 } from '../../context/view-context/ViewContext';
 import { AddFunds } from './views/AddFunds';
 import { ErrorView } from '../../views/error/ErrorView';
-import { AddFundsContextProvider } from './context/AddFundsContextProvider';
+import { useSquid } from './hooks/useSquid';
 
 export type AddFundsWidgetInputs = AddFundsWidgetParams & {
   checkout: Checkout;
@@ -54,10 +56,33 @@ export default function AddFundsWidget({
     }),
     [viewState, viewReducer],
   );
-  const { addFundsDispatch } = useContext(AddFundsContext);
+
+  const [addFundsState, addFundsDispatch] = useReducer(addFundsReducer, initialAddFundsState);
+
+  const addFundsReducerValues = useMemo(
+    () => ({
+      addFundsState,
+      addFundsDispatch,
+    }),
+    [addFundsState, addFundsDispatch],
+  );
+
+  const squid = useSquid();
+
+  useEffect(() => {
+    if (!squid || addFundsState.squid) return;
+
+    addFundsDispatch({
+      payload: {
+        type: AddFundsActions.SET_SQUID,
+        squid,
+      },
+    });
+  }, [squid]);
 
   useEffect(() => {
     if (!web3Provider) return;
+
     addFundsDispatch({
       payload: {
         type: AddFundsActions.SET_PROVIDER,
@@ -68,6 +93,7 @@ export default function AddFundsWidget({
 
   useEffect(() => {
     if (!checkout) return;
+
     addFundsDispatch({
       payload: {
         type: AddFundsActions.SET_CHECKOUT,
@@ -82,7 +108,7 @@ export default function AddFundsWidget({
 
   return (
     <ViewContext.Provider value={viewReducerValues}>
-      <AddFundsContextProvider>
+      <AddFundsContext.Provider value={addFundsReducerValues}>
         {viewState.view.type === AddFundsWidgetViews.ADD_FUNDS && (
         <AddFunds
           checkout={checkout}
@@ -109,7 +135,7 @@ export default function AddFundsWidget({
           }}
         />
         )}
-      </AddFundsContextProvider>
+      </AddFundsContext.Provider>
     </ViewContext.Provider>
   );
 }
