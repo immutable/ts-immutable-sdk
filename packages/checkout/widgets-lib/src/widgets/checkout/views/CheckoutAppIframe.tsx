@@ -21,6 +21,7 @@ import {
   IFRAME_ALLOW_PERMISSIONS,
   IFRAME_INIT_TIMEOUT_MS,
 } from '../utils/config';
+import { useWidgetProviderEventRelayer } from '../hooks/useWidgetProviderEventRelayer';
 
 export interface LoadingHandoverProps {
   text: string;
@@ -43,6 +44,7 @@ export function CheckoutAppIframe() {
   useCheckoutEventsRelayer();
   useEip6963Relayer();
   useProviderRelay();
+  useWidgetProviderEventRelayer();
 
   const loading = !iframeURL || !iframeContentWindow || !initialised;
 
