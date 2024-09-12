@@ -11,6 +11,8 @@ export function useEip6963Relayer() {
     postMessageHandler?.send(PostMessageHandlerEventType.EIP_6963_EVENT, {
       message: 'eip6963:announceProvider',
       info: event.detail.info,
+      isPassport: (event.detail.provider as unknown as any)?.isPassport,
+      isMetamask: (event.detail.provider as unknown as any)?.isMetamask,
     });
   }, [postMessageHandler]);
 
