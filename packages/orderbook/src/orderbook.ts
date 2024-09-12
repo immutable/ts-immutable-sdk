@@ -21,7 +21,6 @@ import {
   ActionType,
   CancelOrdersOnChainResponse,
   CreateListingParams,
-  FeeType,
   FeeValue,
   FulfillBulkOrdersResponse,
   FulfillmentListing,
@@ -387,9 +386,9 @@ export class Orderbook {
   }
 
   /**
-   * Create an order
-   * @param {CreateListingParams} createListingParams - create an order with the given params.
-   * @return {ListingResult} The result of the order created in the Immutable services.
+   * Create a listing
+   * @param {CreateListingParams} createListingParams - create a listing with the given params.
+   * @return {ListingResult} The result of the listing created in the Immutable services.
    */
   async createListing(
     createListingParams: CreateListingParams,
@@ -425,9 +424,8 @@ export class Orderbook {
         order_id: orderId,
         taker_address: takerAddress,
         fees: takerFees.map((fee) => ({
+          type: OpenApiFee.type.TAKER_ECOSYSTEM,
           amount: fee.amount,
-          type:
-            FeeType.TAKER_ECOSYSTEM as unknown as OpenApiFee.type.TAKER_ECOSYSTEM,
           recipient_address: fee.recipientAddress,
         })),
       },
@@ -477,9 +475,8 @@ export class Orderbook {
         order_id: listingRequest.orderId,
         taker_address: takerAddress,
         fees: listingRequest.takerFees.map((fee) => ({
+          type: OpenApiFee.type.TAKER_ECOSYSTEM,
           amount: fee.amount,
-          type:
-            FeeType.TAKER_ECOSYSTEM as unknown as OpenApiFee.type.TAKER_ECOSYSTEM,
           recipient_address: fee.recipientAddress,
         })),
       })),
