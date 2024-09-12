@@ -11,6 +11,7 @@ import {
   mapFromOpenApiPage,
   mapFromOpenApiTrade,
   mapListingFromOpenApiOrder,
+  mapOrderFromOpenApiOrder,
 } from './openapi/mapper';
 import { CancelOrdersResult, Fee as OpenApiFee } from './openapi/sdk';
 import { Seaport } from './seaport';
