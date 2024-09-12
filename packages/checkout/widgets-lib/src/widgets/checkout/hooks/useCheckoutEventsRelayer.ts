@@ -4,6 +4,7 @@ import {
   CheckoutEventType,
   PostMessageHandlerEventType,
   CheckoutSuccessEventType,
+  CheckoutUserActionEventType,
 } from '@imtbl/checkout-sdk';
 import { useCheckoutContext } from '../context/CheckoutContextProvider';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
@@ -58,6 +59,25 @@ export function useCheckoutEventsRelayer() {
           }
 
           event.detail.data.data.provider = provider;
+        }
+
+        if (
+          event.detail.type === CheckoutEventType.USER_ACTION
+          && event.detail.data.type === CheckoutUserActionEventType.NETWORK_SWITCH
+        ) {
+          if (!provider) {
+            throw new Error(
+              'Provider not found, unable to send checkout network switch',
+            );
+          }
+
+          postMessageHandler?.send(PostMessageHandlerEventType.PROVIDER_UPDATED, {
+            isMetamask: provider.provider.isMetaMask,
+            isPassport: (provider.provider as any)?.isPassport,
+          });
+
+          // TODO - causes SON.stringify in checkout.tsx to break
+          // event.detail.data.data.provider = provider;
         }
 
         sendCheckoutEvent(eventTarget, event.detail);
