@@ -504,7 +504,7 @@ export class Orderbook {
           takerAddress,
         )),
         fulfillableOrders: fulfillmentDataRes.result.fulfillable_orders.map(
-          (o) => mapListingFromOpenApiOrder(o.order),
+          (o) => mapOrderFromOpenApiOrder(o.order),
         ),
         unfulfillableOrders: fulfillmentDataRes.result.unfulfillable_orders.map(
           (o) => ({
@@ -519,7 +519,7 @@ export class Orderbook {
       if (String(e).includes('The fulfiller does not have the balances needed to fulfill.')) {
         return {
           fulfillableOrders: fulfillmentDataRes.result.fulfillable_orders.map(
-            (o) => mapListingFromOpenApiOrder(o.order),
+            (o) => mapOrderFromOpenApiOrder(o.order),
           ),
           unfulfillableOrders: fulfillmentDataRes.result.unfulfillable_orders.map(
             (o) => ({
