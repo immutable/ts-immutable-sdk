@@ -180,7 +180,7 @@ export class Passport {
    * @returns {Promise<UserProfile | null>} the user profile if the user is logged in, otherwise null
    */
   public async login(options?: {
-    useCachedSession: boolean;
+    useCachedSession?: boolean;
     anonymousId?: string;
     silent?: boolean;
   }): Promise<UserProfile | null> {
