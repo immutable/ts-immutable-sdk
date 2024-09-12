@@ -133,9 +133,9 @@ export class Orderbook {
    * @return {TradeResult} The returned trade result.
    */
   async getTrade(tradeId: string): Promise<TradeResult> {
-    const apiListing = await this.apiClient.getTrade(tradeId);
+    const apiTrade = await this.apiClient.getTrade(tradeId);
     return {
-      result: mapFromOpenApiTrade(apiListing.result),
+      result: mapFromOpenApiTrade(apiTrade.result),
     };
   }
 
@@ -164,10 +164,10 @@ export class Orderbook {
   async listTrades(
     listTradesParams: ListTradesParams,
   ): Promise<ListTradesResult> {
-    const apiListings = await this.apiClient.listTrades(listTradesParams);
+    const apiTrades = await this.apiClient.listTrades(listTradesParams);
     return {
-      page: mapFromOpenApiPage(apiListings.page),
-      result: apiListings.result.map(mapFromOpenApiTrade),
+      page: mapFromOpenApiPage(apiTrades.page),
+      result: apiTrades.result.map(mapFromOpenApiTrade),
     };
   }
 
@@ -181,10 +181,10 @@ export class Orderbook {
    * Bulk listings created using an EOA (Metamask) will require a single listing confirmation
    * signature.
    * Bulk listings creating using a smart contract wallet will require multiple listing confirmation
-   * signatures(as many as the number of orders).
+   * signatures (as many as the number of orders).
    * @param {PrepareBulkListingsParams} prepareBulkListingsParams - Details about the listings
    * to be created.
-   * @return {PrepareBulkListingsResponse} PrepareListingResponse includes
+   * @return {PrepareBulkListingsResponse} PrepareBulkListingsResponse includes
    * any unsigned approval transactions, the typed bulk order message for signing and
    * the {@linkcode PrepareBulkListingsResponse.completeListings} method that can be called with
    * the signature(s) to create the listings.
@@ -310,7 +310,6 @@ export class Orderbook {
     const { actions, preparedOrders } = await this.seaport.prepareBulkSeaportOrders(
       makerAddress,
       listingParams.map((orderParam) => ({
-        orderType: 'LISTING',
         offerItem: orderParam.sell,
         considerationItem: orderParam.buy,
         allowPartialFills: orderParam.sell.type === 'ERC1155',
@@ -474,10 +473,10 @@ export class Orderbook {
     }));
 
     const fulfillmentDataRes = await this.apiClient.fulfillmentData(
-      mappedOrders.map((listingRequest) => ({
-        order_id: listingRequest.orderId,
+      mappedOrders.map((fulfillmentRequest) => ({
+        order_id: fulfillmentRequest.orderId,
         taker_address: takerAddress,
-        fees: listingRequest.takerFees.map((fee) => ({
+        fees: fulfillmentRequest.takerFees.map((fee) => ({
           type: OpenApiFee.type.TAKER_ECOSYSTEM,
           amount: fee.amount,
           recipient_address: fee.recipientAddress,
