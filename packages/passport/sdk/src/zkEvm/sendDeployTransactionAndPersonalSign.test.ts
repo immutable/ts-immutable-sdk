@@ -1,28 +1,26 @@
-import { StaticJsonRpcProvider, TransactionRequest } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
 import { Flow } from '@imtbl/metrics';
 import { BigNumber } from 'ethers';
-import { sendTransaction } from './sendTransaction';
+import { sendDeployTransactionAndPersonalSign } from './sendDeployTransactionAndPersonalSign';
 import { mockUserZkEvm } from '../test/mocks';
 import { RelayerClient } from './relayerClient';
 import GuardianClient from '../guardian';
 import * as transactionHelpers from './transactionHelpers';
+import * as personalSign from './personalSign';
 
 jest.mock('./transactionHelpers');
-jest.mock('../network/retry');
+jest.mock('./personalSign');
 
-describe('sendTransaction', () => {
+describe('sendDeployTransactionAndPersonalSign', () => {
   const signedTransactions = 'signedTransactions123';
   const relayerTransactionId = 'relayerTransactionId123';
   const transactionHash = 'transactionHash123';
+  const signedMessage = 'signedMessage123';
 
   const nonce = BigNumber.from(5);
 
-  const transactionRequest: TransactionRequest = {
-    to: mockUserZkEvm.zkEvm.ethAddress,
-    data: '0x456',
-    value: '0x00',
-  };
+  const params = ['message to sign'];
   const rpcProvider = {
     detectNetwork: jest.fn(),
   };
@@ -33,6 +31,7 @@ describe('sendTransaction', () => {
   };
   const guardianClient = {
     validateEVMTransaction: jest.fn(),
+    withConfirmationScreen: jest.fn(),
   };
   const ethSigner = {
     getAddress: jest.fn(),
@@ -51,11 +50,14 @@ describe('sendTransaction', () => {
     (transactionHelpers.pollRelayerTransaction as jest.Mock).mockResolvedValue({
       hash: transactionHash,
     });
+    (personalSign.personalSign as jest.Mock).mockResolvedValue(signedMessage);
+    (guardianClient.withConfirmationScreen as jest.Mock)
+      .mockImplementation(() => (task: () => void) => task());
   });
 
   it('calls prepareAndSignTransaction with the correct arguments', async () => {
-    await sendTransaction({
-      params: [transactionRequest],
+    await sendDeployTransactionAndPersonalSign({
+      params,
       ethSigner,
       rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
@@ -65,7 +67,7 @@ describe('sendTransaction', () => {
     });
 
     expect(transactionHelpers.prepareAndSignTransaction).toHaveBeenCalledWith({
-      transactionRequest,
+      transactionRequest: { to: mockUserZkEvm.zkEvm.ethAddress, value: 0 },
       ethSigner,
       rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
@@ -75,9 +77,31 @@ describe('sendTransaction', () => {
     });
   });
 
+  it('calls personalSign with the correct arguments', async () => {
+    await sendDeployTransactionAndPersonalSign({
+      params,
+      ethSigner,
+      rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+      relayerClient: relayerClient as unknown as RelayerClient,
+      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      guardianClient: guardianClient as unknown as GuardianClient,
+      flow: flow as unknown as Flow,
+    });
+
+    expect(personalSign.personalSign).toHaveBeenCalledWith({
+      params,
+      ethSigner,
+      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+      guardianClient: guardianClient as unknown as GuardianClient,
+      relayerClient: relayerClient as unknown as RelayerClient,
+      flow: flow as unknown as Flow,
+    });
+  });
+
   it('calls pollRelayerTransaction with the correct arguments', async () => {
-    await sendTransaction({
-      params: [transactionRequest],
+    await sendDeployTransactionAndPersonalSign({
+      params,
       ethSigner,
       rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
@@ -93,9 +117,9 @@ describe('sendTransaction', () => {
     );
   });
 
-  it('returns the transaction hash', async () => {
-    const result = await sendTransaction({
-      params: [transactionRequest],
+  it('returns the signed message', async () => {
+    const result = await sendDeployTransactionAndPersonalSign({
+      params,
       ethSigner,
       rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
@@ -104,16 +128,30 @@ describe('sendTransaction', () => {
       flow: flow as unknown as Flow,
     });
 
-    expect(result).toEqual(transactionHash);
+    expect(result).toEqual(signedMessage);
   });
 
-  it('throws an error if pollRelayerTransaction fails', async () => {
-    const error = new Error('Transaction failed');
-    (transactionHelpers.pollRelayerTransaction as jest.Mock).mockRejectedValue(error);
+  it('calls guardianClient.withConfirmationScreen with the correct arguments', async () => {
+    await sendDeployTransactionAndPersonalSign({
+      params,
+      ethSigner,
+      rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+      relayerClient: relayerClient as unknown as RelayerClient,
+      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      guardianClient: guardianClient as unknown as GuardianClient,
+      flow: flow as unknown as Flow,
+    });
+
+    expect(guardianClient.withConfirmationScreen).toHaveBeenCalled();
+  });
+
+  it('throws an error if any step fails', async () => {
+    const error = new Error('Something went wrong');
+    (transactionHelpers.prepareAndSignTransaction as jest.Mock).mockRejectedValue(error);
 
     await expect(
-      sendTransaction({
-        params: [transactionRequest],
+      sendDeployTransactionAndPersonalSign({
+        params,
         ethSigner,
         rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,

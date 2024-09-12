@@ -91,10 +91,19 @@ export interface PassportModuleConfiguration
    * and not directly on the web.
    */
   crossSdkBridgeEnabled?: boolean;
+
   /**
    * Options for disabling the Passport popup overlays.
    */
   popupOverlayOptions?: PopupOverlayOptions;
+
+  /**
+   * This flag controls whether a deploy transaction is sent before signing an ERC191 message.
+   *
+   * @default false - By default, this behavior is disabled and the user will not be asked
+   * to approve a deploy transaction before signing.
+   */
+  forceScwDeployBeforeMessageSignature?: boolean;
 }
 
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
