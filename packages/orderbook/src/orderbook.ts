@@ -362,11 +362,11 @@ export class Orderbook {
 
   /**
    * Get required transactions and messages for signing prior to creating a listing
-   * through the createListing method
+   * through the {@linkcode createListing} method
    * @param {PrepareListingParams} prepareListingParams - Details about the listing to be created.
    * @return {PrepareListingResponse} PrepareListingResponse includes
    * the unsigned approval transaction, the typed order message for signing and
-   * the order components that can be submitted to `createListing` with a signature.
+   * the order components that can be submitted to {@linkcode createListing} with a signature.
    */
   async prepareListing({
     makerAddress,
@@ -543,8 +543,8 @@ export class Orderbook {
 
   /**
    * Cancelling orders is a gasless alternative to on-chain cancellation exposed with
-   * `cancelOrdersOnChain`. For the orderbook to authenticate the cancellation, the creator
-   * of the orders must sign an EIP712 message containing the orderIds
+   * {@linkcode cancelOrdersOnChain}. For the orderbook to authenticate the cancellation,
+   * the creator of the orders must sign an EIP712 message containing the orderIds.
    * @param {string} orderIds - The orderIds to attempt to cancel.
    * @return {PrepareCancelOrdersResponse} The signable action to cancel the orders.
    */
@@ -588,10 +588,10 @@ export class Orderbook {
 
   /**
    * Cancelling orders is a gasless alternative to on-chain cancellation exposed with
-   * `cancelOrdersOnChain`. Orders cancelled this way cannot be fulfilled and will be removed
-   * from the orderbook. If there is pending fulfillment data outstanding for the order, its
-   * cancellation will be pending until the fulfillment window has passed.
-   * `prepareOffchainOrderCancellations` can be used to get the signable action that is signed
+   * {@linkcode cancelOrdersOnChain}. Orders cancelled this way cannot be fulfilled and
+   * will be removed from the orderbook. If there is pending fulfillment data outstanding
+   * for the order, its cancellation will be pending until the fulfillment window has passed.
+   * {@linkcode prepareOrderCancellations} can be used to get the signable action that is signed
    * to get the signature required for this call.
    * @param {string[]} orderIds - The orderIds to attempt to cancel.
    * @param {string} accountAddress - The address of the account cancelling the orders.

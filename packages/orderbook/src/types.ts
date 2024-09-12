@@ -207,7 +207,7 @@ export interface PrepareBulkListingsResponse {
   actions: Action[];
   completeListings(signatures: string[]): Promise<BulkListingsResult>;
   /**
-   * @deprecated Pass a string[] to `completeListings` instead to enable
+   * @deprecated Pass a `string[]` to {@linkcode completeListings} instead to enable
    * smart contract wallets
    */
   completeListings(signature: string): Promise<BulkListingsResult>;
@@ -237,7 +237,7 @@ export interface FulfillmentOrder {
 }
 
 /**
- * @deprecated Use `FulfillmentOrder` instead
+ * @deprecated Use {@linkcode FulfillmentOrder} instead
  */
 export interface FulfillmentListing {
   listingId: string;
@@ -340,7 +340,7 @@ export interface SignableAction {
 
 export enum SignablePurpose {
   /**
-   * @deprecated Use `CREATE_ORDER` instead
+   * @deprecated Use {@linkcode CREATE_ORDER} instead
    */
   CREATE_LISTING = 'CREATE_ORDER',
   CREATE_ORDER = 'CREATE_ORDER',
