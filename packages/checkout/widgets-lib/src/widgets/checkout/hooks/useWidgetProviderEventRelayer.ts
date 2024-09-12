@@ -15,9 +15,9 @@ export function useWidgetProviderEventRelayer() {
     () => {
       if (!postMessageHandler) return () => { };
 
-      window.addEventListener(baseWidgetProviderEvent, onWidgetProviderEvent as any);
+      window.addEventListener(baseWidgetProviderEvent, onWidgetProviderEvent);
 
-      return () => window.removeEventListener(baseWidgetProviderEvent, onWidgetProviderEvent as any);
+      return () => window.removeEventListener(baseWidgetProviderEvent, onWidgetProviderEvent);
     },
     [postMessageHandler, onWidgetProviderEvent],
   );
