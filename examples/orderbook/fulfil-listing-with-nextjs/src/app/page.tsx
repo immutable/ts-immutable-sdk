@@ -22,7 +22,7 @@ export default function Home() {
         size="medium"
         rc={<NextLink href="/fulfill-listing-with-erc1155" />}
       >
-          Fulfill listing - Partial fulfillment with ERC1155
+        Fulfill listing - Partial fulfillment with ERC1155
       </Button>
     </>
   );

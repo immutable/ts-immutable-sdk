@@ -18,8 +18,8 @@ import {
   Table,
 } from "@biom3/react";
 import NextLink from "next/link";
-import {orderbook} from "@imtbl/sdk";
-import {OrderStatusName} from "@imtbl/sdk/orderbook";
+import { orderbook } from "@imtbl/sdk";
+import { OrderStatusName } from "@imtbl/sdk/orderbook";
 
 export default function FulfillERC721WithPassport() {
   // setup the accounts state
@@ -41,10 +41,13 @@ export default function FulfillERC721WithPassport() {
   const signer = web3Provider.getSigner();
 
   // setup the sell item contract address state
-  const [sellItemContractAddress, setSellItemContractAddressState] = useState<any>(null);
+  const [sellItemContractAddress, setSellItemContractAddressState] =
+    useState<any>(null);
 
   // setup the buy item type state
-  const [buyItemType, setBuyItemTypeState] = useState<'NATIVE' | 'ERC20'>("NATIVE");
+  const [buyItemType, setBuyItemTypeState] = useState<"NATIVE" | "ERC20">(
+    "NATIVE",
+  );
 
   // save the listings state
   const [listings, setListingsState] = useState<any>(null);
@@ -95,13 +98,14 @@ export default function FulfillERC721WithPassport() {
   const resetMsgState = () => {
     setSuccessMessageState(null);
     setErrorMessageState(null);
-  }
+  };
 
   // state change handlers
   const handleSellItemContractAddressChange = (event: any) => {
     resetMsgState();
 
-    const sellContractAddrsVal = event.target.value === "" ? null : event.target.value;
+    const sellContractAddrsVal =
+      event.target.value === "" ? null : event.target.value;
     setSellItemContractAddressState(sellContractAddrsVal);
   };
 
@@ -111,35 +115,41 @@ export default function FulfillERC721WithPassport() {
     setBuyItemTypeState(val);
   };
 
-  const getListings = async(
-      client: orderbook.Orderbook,
-      sellItemContractAddrs?: string,
-      buyItemType?: 'NATIVE' | 'ERC20'
+  const getListings = async (
+    client: orderbook.Orderbook,
+    sellItemContractAddrs?: string,
+    buyItemType?: "NATIVE" | "ERC20",
   ): Promise<orderbook.Order[]> => {
     let params: orderbook.ListListingsParams = {
       pageSize: 50,
       sortBy: "created_at",
       status: OrderStatusName.ACTIVE,
-      sellItemContractAddress: sellItemContractAddrs?? sellItemContractAddrs,
-      buyItemType: buyItemType?? buyItemType,
+      sellItemContractAddress: sellItemContractAddrs ?? sellItemContractAddrs,
+      buyItemType: buyItemType ?? buyItemType,
     };
     const listings = await client.listListings(params);
     return listings.result;
-  }
+  };
 
   // memoize the listings fetch
   useMemo(async () => {
-    const listings = await getListings(orderbookSDK, sellItemContractAddress, buyItemType);
+    const listings = await getListings(
+      orderbookSDK,
+      sellItemContractAddress,
+      buyItemType,
+    );
     const filtered = listings.filter(
-        listing => listing.accountAddress !== accountsState[0] && listing.sell[0].type === "ERC721"
+      (listing) =>
+        listing.accountAddress !== accountsState[0] &&
+        listing.sell[0].type === "ERC721",
     );
     setListingsState(filtered.slice(0, 10));
   }, [accountsState, sellItemContractAddress, buyItemType]);
 
   const executeTrade = async (listingID: string) => {
     if (accountsState.length === 0) {
-        setErrorMessageState("Please connect your wallet first");
-        return;
+      setErrorMessageState("Please connect your wallet first");
+      return;
     }
 
     resetMsgState();
@@ -150,30 +160,32 @@ export default function FulfillERC721WithPassport() {
       await fulfillERC721Listing(listingID);
       setSuccessMessageState(`Listing filled successfully`);
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error)
+      const message = error instanceof Error ? error.message : String(error);
       setErrorMessageState(message);
     }
 
     setLoadingState(false);
-  }
+  };
 
   const fulfillERC721Listing = async (listingID: string) => {
-      const { actions } = await orderbookSDK.fulfillOrder(
-          listingID,
-          accountsState[0],
-          [{
-            amount: '1000000',  // Insert taker ecosystem/marketplace fee here
-            recipientAddress: '0xFooBar', // Replace address with your own marketplace address
-          }]
-      );
+    const { actions } = await orderbookSDK.fulfillOrder(
+      listingID,
+      accountsState[0],
+      [
+        {
+          amount: "1000000", // Insert taker ecosystem/marketplace fee here
+          recipientAddress: "0xFooBar", // Replace address with your own marketplace address
+        },
+      ],
+    );
 
-      for (const action of actions) {
-        if (action.type === orderbook.ActionType.TRANSACTION) {
-          const builtTx = await action.buildTransaction();
-          await signer.sendTransaction(builtTx);
-        }
+    for (const action of actions) {
+      if (action.type === orderbook.ActionType.TRANSACTION) {
+        const builtTx = await action.buildTransaction();
+        await signer.sendTransaction(builtTx);
       }
-  }
+    }
+  };
 
   return (
     <Box sx={{ marginBottom: "base.spacing.x5" }}>
@@ -230,88 +242,92 @@ export default function FulfillERC721WithPassport() {
           Fulfill Listing - ERC721 Fulfillment
         </Heading>
         {successMessage && (
-            <Box
-                sx={{
-                  color: "green",
-                  fontSize: "15",
-                  marginBottom: "base.spacing.x5",
-                }}
-            >
-              {successMessage}
-            </Box>
+          <Box
+            sx={{
+              color: "green",
+              fontSize: "15",
+              marginBottom: "base.spacing.x5",
+            }}
+          >
+            {successMessage}
+          </Box>
         )}
         {errorMessage && (
-            <Box sx={{ color: "red", fontSize: "15", marginBottom: "base.spacing.x5" }}>
-              {errorMessage}
-            </Box>
+          <Box
+            sx={{
+              color: "red",
+              fontSize: "15",
+              marginBottom: "base.spacing.x5",
+            }}
+          >
+            {errorMessage}
+          </Box>
         )}
       </Box>
       <Box>
         <Grid>
-        <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
-          <FormControl.Label>NFT Contract Address</FormControl.Label>
-          <TextInput onChange={handleSellItemContractAddressChange} />
-        </FormControl>
-        <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
-          <FormControl.Label>Currency Type</FormControl.Label>
-          <Select
+          <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
+            <FormControl.Label>NFT Contract Address</FormControl.Label>
+            <TextInput onChange={handleSellItemContractAddressChange} />
+          </FormControl>
+          <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
+            <FormControl.Label>Currency Type</FormControl.Label>
+            <Select
               size="medium"
               defaultOption="Native"
               onSelectChange={handleBuyItemTypeChange}
-          >
-            <Select.Option optionKey={"NATIVE"}>
-              <Select.Option.Icon icon="ImxToken" />
-              <Select.Option.Label>Native</Select.Option.Label>
-              <Select.Option.Caption>Native Currency</Select.Option.Caption>
-            </Select.Option>
-            <Select.Option optionKey={"ERC20"}>
-              <Select.Option.Icon icon="Tokens" />
-              <Select.Option.Label>ERC20</Select.Option.Label>
-              <Select.Option.Caption>ERC20 Tokens</Select.Option.Caption>
-            </Select.Option>
-          </Select>
-        </FormControl>
-      </Grid>
+            >
+              <Select.Option optionKey={"NATIVE"}>
+                <Select.Option.Icon icon="ImxToken" />
+                <Select.Option.Label>Native</Select.Option.Label>
+                <Select.Option.Caption>Native Currency</Select.Option.Caption>
+              </Select.Option>
+              <Select.Option optionKey={"ERC20"}>
+                <Select.Option.Icon icon="Tokens" />
+                <Select.Option.Label>ERC20</Select.Option.Label>
+                <Select.Option.Caption>ERC20 Tokens</Select.Option.Caption>
+              </Select.Option>
+            </Select>
+          </FormControl>
+        </Grid>
       </Box>
-      {listings && listings.length > 0 &&
+      {listings && listings.length > 0 && (
         <Box sx={{ marginBottom: "base.spacing.x5" }}>
           <Table>
-        <Table.Head>
-          <Table.Row>
-            <Table.Cell>SNO</Table.Cell>
-            <Table.Cell>Listing ID</Table.Cell>
-            <Table.Cell>Contract Address</Table.Cell>
-            <Table.Cell>Token ID</Table.Cell>
-            <Table.Cell></Table.Cell>
-          </Table.Row>
-        </Table.Head>
-          <Table.Body>
-            {
-                listings.map((listing: any, index: number) => {
-                    return (
-                    <Table.Row key={index}>
-                        <Table.Cell>{index+1}</Table.Cell>
-                        <Table.Cell>{listing.id}</Table.Cell>
-                        <Table.Cell>{listing.sell[0].contractAddress}</Table.Cell>
-                        <Table.Cell>{listing.sell[0].tokenId}</Table.Cell>
-                        <Table.Cell>
-                        <Button
-                            size="medium"
-                            variant="primary"
-                            disabled={loading}
-                            onClick={() => executeTrade(listing.id)}
-                        >
-                            Buy
-                        </Button>
-                        </Table.Cell>
-                    </Table.Row>
-                    );
-                })
-            }
-          </Table.Body>
-      </Table>
-      </Box>
-      }
+            <Table.Head>
+              <Table.Row>
+                <Table.Cell>SNO</Table.Cell>
+                <Table.Cell>Listing ID</Table.Cell>
+                <Table.Cell>Contract Address</Table.Cell>
+                <Table.Cell>Token ID</Table.Cell>
+                <Table.Cell></Table.Cell>
+              </Table.Row>
+            </Table.Head>
+            <Table.Body>
+              {listings.map((listing: any, index: number) => {
+                return (
+                  <Table.Row key={index}>
+                    <Table.Cell>{index + 1}</Table.Cell>
+                    <Table.Cell>{listing.id}</Table.Cell>
+                    <Table.Cell>{listing.sell[0].contractAddress}</Table.Cell>
+                    <Table.Cell>{listing.sell[0].tokenId}</Table.Cell>
+                    <Table.Cell>
+                      <Button
+                        size="medium"
+                        variant="primary"
+                        disabled={loading}
+                        onClick={() => executeTrade(listing.id)}
+                      >
+                        Buy
+                      </Button>
+                    </Table.Cell>
+                  </Table.Row>
+                );
+              })}
+            </Table.Body>
+          </Table>
+        </Box>
+      )}
       <Link rc={<NextLink href="/" />}>Return to Examples</Link>
     </Box>
   );
