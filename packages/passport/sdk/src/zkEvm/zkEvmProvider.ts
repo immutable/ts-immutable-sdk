@@ -29,6 +29,8 @@ import GuardianClient from '../guardian';
 import { signTypedDataV4 } from './signTypedDataV4';
 import { personalSign } from './personalSign';
 import { trackSessionActivity } from './sessionActivity/sessionActivity';
+import { getNonce } from './walletHelpers';
+import { sendDeployTransactionAndPersonalSign } from './sendDeployTransactionAndPersonalSign';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
@@ -331,6 +333,24 @@ export class ZkEvmProvider implements Provider {
           })(async () => {
             const ethSigner = await this.#getSigner();
             flow.addEvent('endGetSigner');
+
+            if (this.#config.forceScwDeployBeforeMessageSignature) {
+              // Check if the smart contract wallet has been deployed
+              const nonce = await getNonce(this.#rpcProvider, zkEvmAddress);
+              if (!nonce.gt(0)) {
+                // If the smart contract wallet has not been deployed,
+                // submit a transaction before signing the message
+                return await sendDeployTransactionAndPersonalSign({
+                  params: request.params || [],
+                  ethSigner,
+                  zkEvmAddress,
+                  rpcProvider: this.#rpcProvider,
+                  guardianClient: this.#guardianClient,
+                  relayerClient: this.#relayerClient,
+                  flow,
+                });
+              }
+            }
 
             return await personalSign({
               params: request.params || [],

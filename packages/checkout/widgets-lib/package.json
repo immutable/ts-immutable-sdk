@@ -44,6 +44,7 @@
     "url": "^0.11.0"
   },
   "devDependencies": {
+    "@0xsquid/squid-types": "^0.1.104",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
