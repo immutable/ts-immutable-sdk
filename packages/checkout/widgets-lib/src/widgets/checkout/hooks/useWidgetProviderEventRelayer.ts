@@ -1,6 +1,5 @@
 import { PostMessageHandlerEventType } from '@imtbl/checkout-sdk';
 import { useCallback, useEffect } from 'react';
-import { baseWidgetProviderEvent } from '../../../lib';
 import { useCheckoutContext } from '../context/CheckoutContextProvider';
 
 export function useWidgetProviderEventRelayer() {
@@ -15,9 +14,9 @@ export function useWidgetProviderEventRelayer() {
     () => {
       if (!postMessageHandler) return () => { };
 
-      window.addEventListener(baseWidgetProviderEvent, onWidgetProviderEvent);
+      window.addEventListener(PostMessageHandlerEventType.WIDGET_PROVIDER_EVENT, onWidgetProviderEvent);
 
-      return () => window.removeEventListener(baseWidgetProviderEvent, onWidgetProviderEvent);
+      return () => window.removeEventListener(PostMessageHandlerEventType.WIDGET_PROVIDER_EVENT, onWidgetProviderEvent);
     },
     [postMessageHandler, onWidgetProviderEvent],
   );
