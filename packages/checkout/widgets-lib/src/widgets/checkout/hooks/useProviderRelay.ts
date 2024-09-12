@@ -11,6 +11,11 @@ import { CheckoutActions } from '../context/CheckoutContext';
 // TODO these types should be in sync with Checkout App
 type MessageId = number | string | null;
 
+enum ConnectMethods {
+  REQUEST_ACCOUNTS = 'eth_requestAccounts',
+  REQUEST_PERMISSIONS = 'wallet_requestPermissions',
+}
+
 interface JsonRpcRequestMessage<TParams = any> {
   type: 'dapp';
   jsonrpc: '2.0';
@@ -94,21 +99,10 @@ export function useProviderRelay() {
         return;
       }
 
-      // If provider is not defined, connect the target provider
       let currentProvider = provider;
+      // If provider is not defined, create a provider
       if (!currentProvider && targetProvider) {
-        const connectResponse = await checkout.connect({
-          provider: new Web3Provider(targetProvider.provider),
-        });
-        currentProvider = connectResponse.provider;
-
-        // Set provider and execute the request
-        checkoutDispatch({
-          payload: {
-            type: CheckoutActions.SET_PROVIDER,
-            provider: currentProvider,
-          },
-        });
+        currentProvider = new Web3Provider(targetProvider.provider);
       }
 
       if (!currentProvider) {
@@ -117,6 +111,15 @@ export function useProviderRelay() {
 
       try {
         await execute(providerRelayPayload, currentProvider);
+        if (providerRelayPayload.jsonRpcRequestMessage.method === ConnectMethods.REQUEST_ACCOUNTS
+          || providerRelayPayload.jsonRpcRequestMessage.method === ConnectMethods.REQUEST_PERMISSIONS) {
+          checkoutDispatch({
+            payload: {
+              type: CheckoutActions.SET_PROVIDER,
+              provider: currentProvider,
+            },
+          });
+        }
       } catch (error: any) {
         // Send the error using the postMessageHandler
         postMessageHandler.send(PostMessageHandlerEventType.PROVIDER_RELAY, {
@@ -132,13 +135,8 @@ export function useProviderRelay() {
    * Subscribe to provider relay messages
    */
   useEffect(() => {
-    // TODO we need to unsubscribe everywhere
     if (!postMessageHandler) return;
     unsubscribePostMessageHandler.current?.();
     unsubscribePostMessageHandler.current = postMessageHandler?.subscribe(onJsonRpcRequestMessage);
   }, [postMessageHandler, onJsonRpcRequestMessage]);
 }
-
-// TODO -
-// 1 - commit the unsub part
-// 2 - add unsubs to all postMessageHandlers subscriptions
