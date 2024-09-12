@@ -184,9 +184,11 @@ export default function FulfillERC1155WithPassport() {
     setLoadingState(false);
   };
 
+  // #doc fulfill-erc1155-listing
+  // Fulfill ERC1155 listing
   const fulfillERC1155Listing = async (
     listingID: string,
-    unitsToFill?: string,
+    unitsToFill?: string, // Number of units to fill
   ) => {
     const { actions } = await orderbookSDK.fulfillOrder(
       listingID,
@@ -207,6 +209,7 @@ export default function FulfillERC1155WithPassport() {
       }
     }
   };
+  // #enddoc fulfill-erc721-listing
 
   return (
     <Box sx={{ marginBottom: "base.spacing.x5" }}>

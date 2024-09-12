@@ -167,6 +167,8 @@ export default function FulfillERC721WithPassport() {
     setLoadingState(false);
   };
 
+  // #doc fulfill-erc721-listing
+  // Fulfill ERC721 listing
   const fulfillERC721Listing = async (listingID: string) => {
     const { actions } = await orderbookSDK.fulfillOrder(
       listingID,
@@ -186,6 +188,7 @@ export default function FulfillERC721WithPassport() {
       }
     }
   };
+  // #enddoc fulfill-erc1155-listing
 
   return (
     <Box sx={{ marginBottom: "base.spacing.x5" }}>
