@@ -30,12 +30,31 @@ export class Sale extends Base<WidgetType.SALE> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT;
 
   // TODO: add specific validation logic for the sale items
-  private isValidProucts(products: SaleItem[]): boolean {
+  private isValidArray(items: SaleItem[] | undefined): boolean {
     try {
-      return Array.isArray(products);
+      return Array.isArray(items);
     } catch {
       return false;
     }
+  }
+
+  private deduplicateItems(items: SaleItem[] | undefined): SaleItem[] {
+    if (!items || !this.isValidArray(items)) return [];
+
+    const uniqueItems = items.reduce((acc, item) => {
+      const itemIndex = acc.findIndex(
+        ({ productId }) => productId === item.productId,
+      );
+
+      if (itemIndex !== -1) {
+        acc[itemIndex] = { ...item, qty: acc[itemIndex].qty + item.qty };
+        return acc;
+      }
+
+      return [...acc, { ...item }];
+    }, [] as SaleItem[]);
+
+    return uniqueItems;
   }
 
   protected getValidatedProperties({
@@ -62,8 +81,7 @@ export class Sale extends Base<WidgetType.SALE> {
       validatedParams.walletProviderName = undefined;
     }
 
-    // TODO: fix the logic here when proper , currently saying if valid then reset to empty array.
-    if (!this.isValidProucts(params.items ?? [])) {
+    if (!this.isValidArray(params.items)) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "items" widget input.');
       validatedParams.items = [];
@@ -90,7 +108,10 @@ export class Sale extends Base<WidgetType.SALE> {
       validatedParams.excludePaymentTypes = [];
     }
 
-    return validatedParams;
+    return {
+      ...validatedParams,
+      items: this.deduplicateItems(params.items),
+    };
   }
 
   protected render() {
@@ -131,7 +152,9 @@ export class Sale extends Base<WidgetType.SALE> {
                     environmentId={this.parameters.environmentId!}
                     collectionName={this.parameters.collectionName!}
                     excludePaymentTypes={this.parameters.excludePaymentTypes!}
-                    excludeFiatCurrencies={this.parameters.excludeFiatCurrencies!}
+                    excludeFiatCurrencies={
+                      this.parameters.excludeFiatCurrencies!
+                    }
                     preferredCurrency={this.parameters.preferredCurrency!}
                     hideExcludedPaymentTypes={
                       this.properties?.config?.hideExcludedPaymentTypes ?? false
