@@ -175,6 +175,10 @@ Parameters<typeof OrdersService.prototype.listListings>[0],
 'chainName'
 >;
 
+export interface ListingResult {
+  result: Listing;
+}
+
 export interface ListListingsResult {
   page: Page;
   result: Listing[];
@@ -214,10 +218,6 @@ export interface CreateListingParams {
   orderHash: string;
   orderSignature: string;
   makerFees: FeeValue[];
-}
-
-export interface ListingResult {
-  result: Listing;
 }
 
 export interface BulkListingsResult {
