@@ -172,8 +172,9 @@ export class Orderbook {
 
   /**
    * Get required transactions and messages for signing to facilitate creating bulk listings.
-   * Once the transactions are submitted and the message signed, call the completeListings method
-   * provided in the return type with the signature. This method supports up to 20 listing creations
+   * Once the transactions are submitted and the message signed, call the
+   * {@linkcode PrepareBulkListingsResponse.completeListings} method provided in the return
+   * type with the signature. This method supports up to 20 listing creations
    * at a time. It can also be used for individual listings to simplify integration code paths.
    *
    * Bulk listings created using an EOA (Metamask) will require a single listing confirmation
@@ -184,7 +185,8 @@ export class Orderbook {
    * to be created.
    * @return {PrepareBulkListingsResponse} PrepareListingResponse includes
    * any unsigned approval transactions, the typed bulk order message for signing and
-   * the createListings method that can be called with the signature(s) to create the listings.
+   * the {@linkcode PrepareBulkListingsResponse.completeListings} method that can be called with
+   * the signature(s) to create the listings.
    */
   async prepareBulkListings(
     {
