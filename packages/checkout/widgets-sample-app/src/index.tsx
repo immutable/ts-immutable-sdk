@@ -1,68 +1,85 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import ConnectUI from './components/ui/connect/connect';
-import WalletUI from './components/ui/wallet/wallet';
-import SwapUI from './components/ui/swap/swap';
-import BridgeUI from './components/ui/bridge/bridge';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import ConnectUI from "./components/ui/connect/connect";
+import WalletUI from "./components/ui/wallet/wallet";
+import SwapUI from "./components/ui/swap/swap";
+import BridgeUI from "./components/ui/bridge/bridge";
 import OnRampUI from "./components/ui/on-ramp/onRamp";
-import { PassportLoginCallback } from './components/ui/marketplace-orchestrator/PassportLoginCallback';
-import { Marketplace, Checkout } from './components/ui/marketplace-orchestrator';
-import { SaleUI } from './components/ui/sale/sale';
-import AddFundsUI from './components/ui/add-funds/addFunds';
+import { PassportLoginCallback } from "./components/ui/marketplace-orchestrator/PassportLoginCallback";
+import {
+  Marketplace,
+  Checkout,
+} from "./components/ui/marketplace-orchestrator";
+import { SaleUI } from "./components/ui/sale/sale";
+import AddFundsUI from "./components/ui/add-funds/addFunds";
+import { PassportProvider } from "./context/passport";
+import { WidgetsProvider } from "./context/widgets";
+import AddFundsIntegration from "./components/ui/add-funds-integration/addFunds";
 
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <App />,
   },
   {
-    path: '/connect',
+    path: "/connect",
     element: <ConnectUI />,
   },
   {
-    path: '/wallet',
+    path: "/wallet",
     element: <WalletUI />,
   },
   {
-    path: '/swap',
+    path: "/swap",
     element: <SwapUI />,
   },
   {
-    path: '/bridge',
+    path: "/bridge",
     element: <BridgeUI />,
   },
   {
-    path: '/on-ramp',
+    path: "/on-ramp",
     element: <OnRampUI />,
   },
   {
-    path: '/sale',
+    path: "/sale",
     element: <SaleUI />,
   },
   {
-    path: '/checkout',
+    path: "/checkout",
     element: <Checkout />,
   },
   {
-    path: '/add-funds',
+    path: "/add-funds",
     element: <AddFundsUI />,
   },
   {
-    path: '/marketplace-orchestrator',
-    element: <Marketplace />
+    path: "/add-funds-integration",
+    element: (
+      <PassportProvider>
+        <WidgetsProvider>
+          <AddFundsIntegration />
+        </WidgetsProvider>
+      </PassportProvider>
+    ),
   },
   {
-    path: '/marketplace-orchestrator/login/callback',
-    element: <PassportLoginCallback />
+    path: "/marketplace-orchestrator",
+    element: <Marketplace />,
+  },
+  {
+    path: "/marketplace-orchestrator/login/callback",
+    element: <PassportLoginCallback />,
   },
 ]);
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+  document.getElementById("root") as HTMLElement
 );
+
 root.render(
   <React.StrictMode>
     <RouterProvider router={router} />
