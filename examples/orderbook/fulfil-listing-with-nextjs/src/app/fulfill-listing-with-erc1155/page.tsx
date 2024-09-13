@@ -316,8 +316,8 @@ export default function FulfillERC1155WithPassport() {
         </Grid>
       </Box>
       {listings && listings.length > 0 && (
-        <Box sx={{ marginBottom: "base.spacing.x5" }}>
-          <Table>
+        <Box sx={{ maxHeight: "800px", marginBottom: "base.spacing.x5" }}>
+          <Table sx={{ marginLeft: "base.spacing.x5", maxWidth: "1300px", maxHeight: "400px", overflowY: "auto", marginBottom: "base.spacing.x5"}}>
             <Table.Head>
               <Table.Row>
                 <Table.Cell>SNO</Table.Cell>
@@ -347,7 +347,7 @@ export default function FulfillERC1155WithPassport() {
                         />
                       </FormControl>
                     </Table.Cell>
-                    <Table.Cell>
+                    <Table.Cell size="small">
                       <Button
                         size="medium"
                         variant="primary"
