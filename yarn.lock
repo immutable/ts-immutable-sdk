@@ -3960,10 +3960,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@examples/fulfil-listing-with-nextjs@workspace:examples/orderbook/fulfil-listing-with-nextjs":
+"@examples/fulfill-listing-with-nextjs@workspace:examples/orderbook/fulfill-listing-with-nextjs":
   version: 0.0.0-use.local
-  resolution: "@examples/fulfil-listing-with-nextjs@workspace:examples/orderbook/fulfil-listing-with-nextjs"
+  resolution: "@examples/fulfill-listing-with-nextjs@workspace:examples/orderbook/fulfill-listing-with-nextjs"
   dependencies:
+    "@playwright/test": ^1.45.3
     "@types/node": ^20
     "@types/react": ^18
     "@types/react-dom": ^18

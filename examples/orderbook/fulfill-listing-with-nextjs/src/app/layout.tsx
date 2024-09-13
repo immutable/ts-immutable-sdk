@@ -5,9 +5,9 @@ import AppWrapper from "./utils/wrapper";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Orderbook SDK - Create listing with NextJS",
+  title: "Orderbook SDK - Fulfill listing with NextJS",
   description:
-    "Examples of how to create a listing using the Orderbook SDK with NextJS",
+    "Examples of how to fill a listing using the Orderbook SDK with NextJS",
 };
 
 export default function RootLayout({
