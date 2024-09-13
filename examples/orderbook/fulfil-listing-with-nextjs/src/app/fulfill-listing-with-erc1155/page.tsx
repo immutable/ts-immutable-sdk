@@ -196,7 +196,7 @@ export default function FulfillERC1155WithPassport() {
       [
         {
           amount: "1000000", // Insert taker ecosystem/marketplace fee here
-          recipientAddress: "0xFooBar", // Replace address with your own marketplace address
+          recipientAddress: "0x0000000000000000000000000000000000000000", // Replace address with your own marketplace address
         },
       ],
       unitsToFill,
