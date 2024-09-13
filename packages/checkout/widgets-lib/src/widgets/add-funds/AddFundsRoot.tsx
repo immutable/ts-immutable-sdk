@@ -96,6 +96,7 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
                     showOnrampOption={this.parameters.showOnrampOption}
                     tokenAddress={this.parameters.tokenAddress}
                     amount={this.parameters.amount}
+                    showBackButton={this.parameters.showBackButton}
                   />
                 </Suspense>
               </ConnectLoader>

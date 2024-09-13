@@ -22,11 +22,16 @@ import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { OptionTypes } from '../components/Option';
 import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
 import { getL2ChainId } from '../../../lib';
-import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import {
+  SharedViews,
+  ViewActions,
+  ViewContext,
+} from '../../../context/view-context/ViewContext';
 
 interface AddFundsProps {
   checkout?: Checkout;
   provider?: Web3Provider;
+  showBackButton?: boolean;
   showOnrampOption?: boolean;
   showSwapOption?: boolean;
   showBridgeOption?: boolean;
@@ -41,6 +46,7 @@ export function AddFunds({
   provider,
   amount,
   tokenAddress,
+  showBackButton = false,
   showOnrampOption = true,
   showSwapOption = true,
   showBridgeOption = true,
@@ -52,6 +58,8 @@ export function AddFunds({
   console.log('showSwapOption', showSwapOption);
   console.log('showBridgeOption', showBridgeOption);
 
+  const showBack = showBackButton || !!onBackButtonClick;
+
   const { addFundsDispatch } = useContext(AddFundsContext);
 
   const { viewDispatch } = useContext(ViewContext);
@@ -61,7 +69,9 @@ export function AddFunds({
   } = useContext(EventTargetContext);
 
   const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
-  const [onRampAllowedTokens, setOnRampAllowedTokens] = useState<TokenInfo[]>([]);
+  const [onRampAllowedTokens, setOnRampAllowedTokens] = useState<TokenInfo[]>(
+    [],
+  );
   const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
   const [toAmount, setToAmount] = useState<string>(amount || '0');
   const [toTokenAddress, setToTokenAddress] = useState<TokenInfo | undefined>();
@@ -97,7 +107,8 @@ export function AddFunds({
         if (tokenResponse?.tokens.length > 0) {
           setAllowedTokens(tokenResponse.tokens);
 
-          const token = tokenResponse.tokens.find((t) => t.address === tokenAddress) || tokenResponse.tokens[0];
+          const token = tokenResponse.tokens.find((t) => t.address === tokenAddress)
+            || tokenResponse.tokens[0];
           setToTokenAddress(token);
 
           addFundsDispatch({
@@ -188,7 +199,9 @@ export function AddFunds({
 
   const checkShowOnRampOption = () => {
     if (showOnrampOption && toTokenAddress) {
-      const token = onRampAllowedTokens.find((t) => t.address?.toLowerCase() === toTokenAddress.address?.toLowerCase());
+      const token = onRampAllowedTokens.find(
+        (t) => t.address?.toLowerCase() === toTokenAddress.address?.toLowerCase(),
+      );
       return !!token;
     }
     return false;
@@ -199,11 +212,18 @@ export function AddFunds({
       header={(
         <HeaderNavigation
           title="Add"
-          onBackButtonClick={onBackButtonClick}
           onCloseButtonClick={onCloseButtonClick}
-          showBack={!!onBackButtonClick}
+          showBack={showBack}
+          onBackButtonClick={() => {
+            orchestrationEvents.sendRequestGoBackEvent(
+              eventTarget,
+              IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+              {},
+            );
+            onBackButtonClick?.();
+          }}
         />
-            )}
+      )}
     >
       <Box
         sx={{
@@ -241,7 +261,6 @@ export function AddFunds({
                 gap: 'base.spacing.x5',
                 justifyContent: 'center',
                 border: '1px solid grey',
-
               }}
             >
               <Body size="large" weight="bold">

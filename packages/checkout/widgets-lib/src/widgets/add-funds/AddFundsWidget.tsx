@@ -1,22 +1,23 @@
-import { AddFundsWidgetParams, Checkout } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import {
   useContext, useEffect, useMemo, useReducer,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  sendAddFundsCloseEvent,
-  sendAddFundsGoBackEvent,
-} from './AddFundsWidgetEvents';
-import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
+import { AddFundsWidgetParams, Checkout } from '@imtbl/checkout-sdk';
 
+import { sendAddFundsCloseEvent } from './AddFundsWidgetEvents';
+import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
+import { AddFundsActions, AddFundsContext } from './context/AddFundsContext';
 import {
-  AddFundsActions, AddFundsContext,
-} from './context/AddFundsContext';
-import { useAnalytics, UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+  useAnalytics,
+  UserJourney,
+} from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { AddFundsWidgetViews } from '../../context/view-context/AddFundsViewContextTypes';
 import {
-  initialViewState, SharedViews, ViewContext, viewReducer,
+  initialViewState,
+  SharedViews,
+  ViewContext,
+  viewReducer,
 } from '../../context/view-context/ViewContext';
 import { AddFunds } from './views/AddFunds';
 import { ErrorView } from '../../views/error/ErrorView';
@@ -35,15 +36,13 @@ export default function AddFundsWidget({
   showBridgeOption = true,
   tokenAddress,
   amount,
+  showBackButton,
 }: AddFundsWidgetInputs) {
-  const [viewState, viewDispatch] = useReducer(
-    viewReducer,
-    {
-      ...initialViewState,
-      view: { type: AddFundsWidgetViews.ADD_FUNDS },
-      history: [{ type: AddFundsWidgetViews.ADD_FUNDS }],
-    },
-  );
+  const [viewState, viewDispatch] = useReducer(viewReducer, {
+    ...initialViewState,
+    view: { type: AddFundsWidgetViews.ADD_FUNDS },
+    history: [{ type: AddFundsWidgetViews.ADD_FUNDS }],
+  });
   const { t } = useTranslation();
   const { page } = useAnalytics();
 
@@ -84,30 +83,30 @@ export default function AddFundsWidget({
     <ViewContext.Provider value={viewReducerValues}>
       <AddFundsContextProvider>
         {viewState.view.type === AddFundsWidgetViews.ADD_FUNDS && (
-        <AddFunds
-          checkout={checkout}
-          provider={web3Provider}
-          tokenAddress={tokenAddress}
-          amount={amount}
-          showOnrampOption={showOnrampOption}
-          showSwapOption={showSwapOption}
-          showBridgeOption={showBridgeOption}
-          onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
-          onBackButtonClick={() => sendAddFundsGoBackEvent(eventTarget)}
-        />
+          <AddFunds
+            checkout={checkout}
+            provider={web3Provider}
+            tokenAddress={tokenAddress}
+            amount={amount}
+            showBackButton={showBackButton}
+            showOnrampOption={showOnrampOption}
+            showSwapOption={showSwapOption}
+            showBridgeOption={showBridgeOption}
+            onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
+          />
         )}
         {viewState.view.type === SharedViews.ERROR_VIEW && (
-        <ErrorView
-          actionText={t('views.ERROR_VIEW.actionText')}
-          onActionClick={() => undefined}
-          onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
-          errorEventAction={() => {
-            page({
-              userJourney: UserJourney.ADD_FUNDS,
-              screen: 'Error',
-            });
-          }}
-        />
+          <ErrorView
+            actionText={t('views.ERROR_VIEW.actionText')}
+            onActionClick={() => undefined}
+            onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
+            errorEventAction={() => {
+              page({
+                userJourney: UserJourney.ADD_FUNDS,
+                screen: 'Error',
+              });
+            }}
+          />
         )}
       </AddFundsContextProvider>
     </ViewContext.Provider>
