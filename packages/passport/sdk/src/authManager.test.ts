@@ -83,7 +83,7 @@ describe('AuthManager', () => {
 
   let authManager: AuthManager;
   let mockSigninPopup: jest.Mock;
-  let mockSigninPopupCallback: jest.Mock;
+  let mockSigninCallback: jest.Mock;
   let mockSignoutRedirect: jest.Mock;
   let mockGetUser: jest.Mock;
   let mockSigninSilent: jest.Mock;
@@ -94,7 +94,7 @@ describe('AuthManager', () => {
 
   beforeEach(() => {
     mockSigninPopup = jest.fn();
-    mockSigninPopupCallback = jest.fn();
+    mockSigninCallback = jest.fn();
     mockSignoutRedirect = jest.fn();
     mockGetUser = jest.fn();
     mockSigninSilent = jest.fn();
@@ -104,7 +104,7 @@ describe('AuthManager', () => {
     mockOverlayRemove = jest.fn();
     (UserManager as jest.Mock).mockReturnValue({
       signinPopup: mockSigninPopup,
-      signinPopupCallback: mockSigninPopupCallback,
+      signinCallback: mockSigninCallback,
       signoutRedirect: mockSignoutRedirect,
       signoutSilent: mockSignoutSilent,
       getUser: mockGetUser,
@@ -365,7 +365,7 @@ describe('AuthManager', () => {
     it('should call login callback', async () => {
       await authManager.loginCallback();
 
-      expect(mockSigninPopupCallback).toBeCalled();
+      expect(mockSigninCallback).toBeCalled();
     });
   });
 
