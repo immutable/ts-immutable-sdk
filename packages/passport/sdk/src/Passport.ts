@@ -176,16 +176,16 @@ export class Passport {
    * @param options.useCachedSession = false - If true, and no active session exists, then the user will not be
    * prompted to log in and the Promise will resolve with a null value.
    * @param options.anonymousId - If provided, Passport internal metrics will be enriched with this value.
-   * @param options.attemptSilentLogin - If true, and no active session exists, then we will attempt to log in the user silently. If no active session exists with the authentication server, or if user input is required (for example, consent is required), then the silent login request this will fail.
+   * @param options.useSilentLogin - If true, and no active session exists, then the user will not be prompted to log in. Instead, we will attempt to authenticate the user silently. This approach will fail if the user does not have an active session with the authentication server, or if user input is required (for example, consent is required).
    * @returns {Promise<UserProfile | null>} the user profile if the user is logged in, otherwise null
    */
   public async login(options?: {
     useCachedSession?: boolean;
     anonymousId?: string;
-    attemptSilentLogin?: boolean;
+    useSilentLogin?: boolean;
   }): Promise<UserProfile | null> {
     return withMetricsAsync(async () => {
-      const { useCachedSession = false, attemptSilentLogin } = options || {};
+      const { useCachedSession = false, useSilentLogin } = options || {};
       let user: User | null = null;
 
       try {
@@ -200,11 +200,9 @@ export class Passport {
         logger.warn('Failed to retrieve a cached user session', error);
       }
 
-      if (!user && attemptSilentLogin) {
+      if (!user && useSilentLogin) {
         user = await this.authManager.forceUserRefresh();
-      }
-
-      if (!user && !useCachedSession) {
+      } else if (!user && !useCachedSession) {
         user = await this.authManager.login(options?.anonymousId);
       }
 

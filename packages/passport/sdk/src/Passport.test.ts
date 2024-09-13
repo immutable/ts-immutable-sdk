@@ -554,9 +554,10 @@ describe('Passport', () => {
     it('should try to login silently if silent is true', async () => {
       getUserMock.mockReturnValue(null);
 
-      await passport.login({ attemptSilentLogin: true });
+      await passport.login({ useSilentLogin: true });
 
       expect(forceUserRefreshMock).toBeCalledTimes(1);
+      expect(authLoginMock).toBeCalledTimes(0);
     });
   });
 
