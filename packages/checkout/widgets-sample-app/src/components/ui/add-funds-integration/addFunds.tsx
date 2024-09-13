@@ -18,8 +18,8 @@ function AddFundsIntegration() {
     if (!addFunds) return;
     addFunds.mount(ADD_FUNDS_TARGET_ID, {
       showSwapOption:false,
-      amount: "10",
-      tokenAddress: "0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439",
+      toAmount: "10",
+      toTokenAddress: "0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439",
     });
     addFunds.addListener(AddFundsEventType.GO_BACK, (data: any) => {
       console.log("GO_BACK", data);
