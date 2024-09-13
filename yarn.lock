@@ -3964,6 +3964,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/fulfill-listing-with-nextjs@workspace:examples/orderbook/fulfill-listing-with-nextjs"
   dependencies:
+    "@biom3/react": ^0.26.1
+    "@imtbl/sdk": latest
     "@playwright/test": ^1.45.3
     "@types/node": ^20
     "@types/react": ^18

@@ -10,6 +10,8 @@
     "test": "playwright test"
   },
   "dependencies": {
+    "@biom3/react": "^0.26.1",
+    "@imtbl/sdk": "latest",
     "next": "14.2.9",
     "react": "^18",
     "react-dom": "^18"
