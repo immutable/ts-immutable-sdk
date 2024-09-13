@@ -264,7 +264,7 @@ export default class AuthManager {
 
   public async loginCallback(): Promise<void> {
     return withPassportError<void>(
-      async () => this.userManager.signinPopupCallback(),
+      async () => { await this.userManager.signinCallback(); },
       PassportErrorType.AUTHENTICATION_ERROR,
     );
   }
