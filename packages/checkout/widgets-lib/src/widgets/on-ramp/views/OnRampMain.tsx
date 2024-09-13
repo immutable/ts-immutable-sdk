@@ -3,22 +3,32 @@ import { Box } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
-import { ExchangeType } from '@imtbl/checkout-sdk';
+import { ExchangeType, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 import url from 'url';
 import { useTranslation } from 'react-i18next';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { sendOnRampWidgetCloseEvent } from '../OnRampWidgetEvents';
-import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import {
+  SharedViews,
+  ViewActions,
+  ViewContext,
+} from '../../../context/view-context/ViewContext';
 import { OnRampWidgetViews } from '../../../context/view-context/OnRampViewContextTypes';
 import { boxMainStyle, containerStyle } from './onRampStyles';
 import {
-  useAnalytics, UserJourney,
+  useAnalytics,
+  UserJourney,
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
-import { TransakEventData, TransakEvents, TransakStatuses } from '../TransakEvents';
+import {
+  TransakEventData,
+  TransakEvents,
+  TransakStatuses,
+} from '../TransakEvents';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { TRANSAK_ORIGIN } from '../../../components/Transak/useTransakEvents';
+import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 
 const transakIframeId = 'transak-iframe';
 const IN_PROGRESS_VIEW_DELAY_MS = 6000; // 6 second
@@ -27,13 +37,20 @@ interface OnRampProps {
   tokenAmount?: string;
   tokenAddress?: string;
   passport?: Passport;
+  showBackButton: boolean;
 }
 export function OnRampMain({
-  passport, showIframe, tokenAmount, tokenAddress,
+  passport,
+  showIframe,
+  tokenAmount,
+  tokenAddress,
+  showBackButton,
 }: OnRampProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
 
   const { t } = useTranslation();
   const { viewState, viewDispatch } = useContext(ViewContext);
@@ -43,12 +60,21 @@ export function OnRampMain({
 
   const isPassport = !!passport && (provider?.provider as any)?.isPassport;
 
-  const showBackButton = useMemo(() => viewState.history.length > 2
-    && viewState.history[viewState.history.length - 2].type === SharedViews.TOP_UP_VIEW, [viewState.history]);
+  const openedFromTopUpView = useMemo(
+    () => viewState.history.length > 2
+      && viewState.history[viewState.history.length - 2].type
+        === SharedViews.TOP_UP_VIEW,
+    [viewState.history],
+  );
+
+  const showBack = showBackButton || openedFromTopUpView;
 
   const { track } = useAnalytics();
 
-  const trackSegmentEvents = async (event: TransakEventData, walletAddress: string) => {
+  const trackSegmentEvents = async (
+    event: TransakEventData,
+    walletAddress: string,
+  ) => {
     const miscProps = {
       userId: walletAddress.toLowerCase(),
       isPassportWallet: isPassport,
@@ -70,7 +96,6 @@ export function OnRampMain({
           control: 'OrderCreated',
           controlType: 'IframeEvent',
           extras: { ...miscProps },
-
         }); // checkoutOnRampInputScreen_OrderCreatedIframeEvent
         break;
       case TransakEvents.TRANSAK_ORDER_SUCCESSFUL:
@@ -82,7 +107,6 @@ export function OnRampMain({
             control: 'PaymentProcessing',
             controlType: 'IframeEvent',
             extras: { ...miscProps },
-
           }); // checkoutOnRampOrderInProgress_PaymentProcessingIframeEvent
         }
         if (event.data.status === TransakStatuses.COMPLETED) {
@@ -92,7 +116,6 @@ export function OnRampMain({
             control: 'PaymentCompleted',
             controlType: 'IframeEvent',
             extras: { ...miscProps },
-
           }); // checkoutOnRampSuccess_PaymentCompletedIframeEvent
         }
         break;
@@ -103,7 +126,6 @@ export function OnRampMain({
           control: 'PaymentFailed',
           controlType: 'IframeEvent',
           extras: { ...miscProps },
-
         }); // checkoutOnRampFailure_PaymentFailedIframeEvent
         break;
       default:
@@ -128,8 +150,10 @@ export function OnRampMain({
       return;
     }
 
-    if (event.event_id === TransakEvents.TRANSAK_ORDER_SUCCESSFUL
-      && event.data.status === TransakStatuses.PROCESSING) {
+    if (
+      event.event_id === TransakEvents.TRANSAK_ORDER_SUCCESSFUL
+      && event.data.status === TransakStatuses.PROCESSING
+    ) {
       // this handles 3DS -- once the user has completed the verification,
       // kick off teh loading screen and then fake a IN_PROGRESS_VIEW_DELAY_MS
       // delay before showing the IN_PROGRESS screen
@@ -154,7 +178,8 @@ export function OnRampMain({
       return;
     }
 
-    if (event.event_id === TransakEvents.TRANSAK_ORDER_SUCCESSFUL
+    if (
+      event.event_id === TransakEvents.TRANSAK_ORDER_SUCCESSFUL
       && event.data.status === TransakStatuses.COMPLETED
     ) {
       viewDispatch({
@@ -206,7 +231,9 @@ export function OnRampMain({
       userWalletAddress = await provider!.getSigner().getAddress();
     })();
 
-    const domIframe:HTMLIFrameElement = document.getElementById(transakIframeId) as HTMLIFrameElement;
+    const domIframe: HTMLIFrameElement = document.getElementById(
+      transakIframeId,
+    ) as HTMLIFrameElement;
 
     if (!domIframe) return;
 
@@ -214,8 +241,11 @@ export function OnRampMain({
       if (!domIframe) return;
 
       const host = url.parse(event.origin)?.host?.toLowerCase();
-      if (event.source === domIframe.contentWindow
-        && host && TRANSAK_ORIGIN.includes(host)) {
+      if (
+        event.source === domIframe.contentWindow
+        && host
+        && TRANSAK_ORIGIN.includes(host)
+      ) {
         trackSegmentEvents(event.data, userWalletAddress);
         transakEventHandler(event.data);
       }
@@ -228,9 +258,16 @@ export function OnRampMain({
       <SimpleLayout
         header={(
           <HeaderNavigation
-            showBack={showBackButton}
             title={t('views.ONRAMP.header.title')}
             onCloseButtonClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
+            showBack={showBack}
+            onBackButtonClick={() => {
+              orchestrationEvents.sendRequestGoBackEvent(
+                eventTarget,
+                IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT,
+                {},
+              );
+            }}
           />
         )}
         footerBackgroundColor="base.color.translucent.emphasis.200"
@@ -242,7 +279,10 @@ export function OnRampMain({
             src={widgetUrl}
             allow="camera;microphone;fullscreen;payment"
             style={{
-              height: '100%', width: '100%', border: 'none', position: 'absolute',
+              height: '100%',
+              width: '100%',
+              border: 'none',
+              position: 'absolute',
             }}
           />
         </Box>

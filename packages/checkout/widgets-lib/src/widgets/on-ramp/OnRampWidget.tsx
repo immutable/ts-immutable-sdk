@@ -30,7 +30,7 @@ export type OnRampWidgetInputs = OnRampWidgetParams & {
 };
 
 export default function OnRampWidget({
-  amount, tokenAddress, config,
+  amount, tokenAddress, config, showBackButton,
 }: OnRampWidgetInputs) {
   const {
     isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
@@ -137,6 +137,7 @@ export default function OnRampWidget({
           tokenAddress={
               tknAddr ?? viewState.view.data?.tokenAddress
           }
+          showBackButton={!!showBackButton}
         />
       )}
 

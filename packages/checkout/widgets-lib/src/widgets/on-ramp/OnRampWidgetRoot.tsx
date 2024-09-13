@@ -87,6 +87,7 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
                     tokenAddress={this.parameters.tokenAddress}
                     amount={this.parameters.amount}
                     config={this.strongConfig()}
+                    showBackButton={this.parameters.showBackButton}
                   />
                 </Suspense>
               </ConnectLoader>
