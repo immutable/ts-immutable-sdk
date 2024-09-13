@@ -188,7 +188,7 @@ export default function FulfillERC721WithPassport() {
       }
     }
   };
-  // #enddoc fulfill-erc1155-listing
+  // #enddoc fulfill-erc721-listing
 
   return (
     <Box sx={{ marginBottom: "base.spacing.x5" }}>
