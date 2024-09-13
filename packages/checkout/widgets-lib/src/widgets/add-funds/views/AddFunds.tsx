@@ -22,7 +22,11 @@ import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { OptionTypes } from '../components/Option';
 import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
 import { getL2ChainId } from '../../../lib';
-import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import {
+  SharedViews,
+  ViewActions,
+  ViewContext,
+} from '../../../context/view-context/ViewContext';
 import { useRoutes } from '../hooks/useRoutes';
 
 interface AddFundsProps {
@@ -31,8 +35,8 @@ interface AddFundsProps {
   showOnrampOption?: boolean;
   showSwapOption?: boolean;
   showBridgeOption?: boolean;
-  tokenAddress?: string;
-  amount?: string;
+  toTokenAddress?: string;
+  toAmount?: string;
   onCloseButtonClick?: () => void;
   onBackButtonClick?: () => void;
 }
@@ -40,8 +44,8 @@ interface AddFundsProps {
 export function AddFunds({
   checkout,
   provider,
-  amount,
-  tokenAddress,
+  toTokenAddress,
+  toAmount,
   showOnrampOption = true,
   showSwapOption = true,
   showBridgeOption = true,
@@ -53,7 +57,7 @@ export function AddFunds({
   console.log('showSwapOption', showSwapOption);
   console.log('showBridgeOption', showBridgeOption);
 
-  const { addFundsState, addFundsDispatch } = useContext(AddFundsContext);
+  const { addFundsDispatch } = useContext(AddFundsContext);
 
   const { viewDispatch } = useContext(ViewContext);
 
@@ -64,10 +68,14 @@ export function AddFunds({
   } = useContext(EventTargetContext);
 
   const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
-  const [onRampAllowedTokens, setOnRampAllowedTokens] = useState<TokenInfo[]>([]);
+  const [onRampAllowedTokens, setOnRampAllowedTokens] = useState<TokenInfo[]>(
+    [],
+  );
   const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
-  const [toAmount, setToAmount] = useState<string>(amount || '0');
-  const [toTokenAddress, setToTokenAddress] = useState<TokenInfo | undefined>();
+  const [currentToAmount, setToAmount] = useState<string>(toAmount || '0');
+  const [currentToTokenAddress, setToTokenAddress] = useState<
+  TokenInfo | undefined
+  >();
 
   const showErrorView = useCallback(
     (error: Error) => {
@@ -85,17 +93,6 @@ export function AddFunds({
   );
 
   useEffect(() => {
-    console.log('=== addFundsState', addFundsState);
-    if (!addFundsState.provider || !addFundsState.squid) return;
-
-    const routes = async () => {
-      await getRoutes();
-    };
-
-    routes();
-  }, [addFundsState.provider, addFundsState.squid]);
-
-  useEffect(() => {
     if (!checkout) {
       showErrorView(new Error('Checkout object is missing'));
       return;
@@ -111,7 +108,8 @@ export function AddFunds({
         if (tokenResponse?.tokens.length > 0) {
           setAllowedTokens(tokenResponse.tokens);
 
-          const token = tokenResponse.tokens.find((t) => t.address === tokenAddress) || tokenResponse.tokens[0];
+          const token = tokenResponse.tokens.find((t) => t.address === toTokenAddress)
+            || tokenResponse.tokens[0];
           setToTokenAddress(token);
 
           addFundsDispatch({
@@ -127,7 +125,7 @@ export function AddFunds({
     };
 
     fetchTokens();
-  }, [checkout, tokenAddress]);
+  }, [checkout, toTokenAddress]);
 
   useEffect(() => {
     if (!checkout) {
@@ -152,7 +150,8 @@ export function AddFunds({
     fetchOnRampTokens();
   }, [checkout]);
 
-  const openDrawer = () => {
+  const openDrawer = async () => {
+    await getRoutes(currentToTokenAddress?.address ?? '', currentToAmount, '13371');
     setShowOptionsDrawer(true);
   };
 
@@ -162,7 +161,9 @@ export function AddFunds({
 
   const isSelected = (token: TokenInfo) => token.address === toTokenAddress;
 
-  const isDisabled = !toTokenAddress || !toAmount || parseFloat(toAmount) <= 0;
+  const isDisabled = !currentToTokenAddress
+    || !currentToAmount
+    || parseFloat(currentToAmount) <= 0;
 
   const handleTokenChange = (token: TokenInfo) => {
     setToTokenAddress(token);
@@ -182,14 +183,14 @@ export function AddFunds({
         eventTarget,
         IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
         {
-          toTokenAddress: toTokenAddress?.address ?? '',
+          toTokenAddress: currentToTokenAddress?.address ?? '',
           amount: toAmount ?? '',
           fromTokenAddress: '',
         },
       );
     } else {
       const data = {
-        tokenAddress: toTokenAddress?.address ?? '',
+        tokenAddress: currentToTokenAddress?.address ?? '',
         amount: toAmount ?? '',
       };
       orchestrationEvents.sendRequestOnrampEvent(
@@ -201,8 +202,11 @@ export function AddFunds({
   };
 
   const checkShowOnRampOption = () => {
-    if (showOnrampOption && toTokenAddress) {
-      const token = onRampAllowedTokens.find((t) => t.address?.toLowerCase() === toTokenAddress.address?.toLowerCase());
+    if (showOnrampOption && currentToTokenAddress) {
+      const token = onRampAllowedTokens.find(
+        (t) => t.address?.toLowerCase()
+          === currentToTokenAddress.address?.toLowerCase(),
+      );
       return !!token;
     }
     return false;
@@ -217,7 +221,7 @@ export function AddFunds({
           onCloseButtonClick={onCloseButtonClick}
           showBack={!!onBackButtonClick}
         />
-            )}
+      )}
     >
       <Box
         sx={{
@@ -239,7 +243,7 @@ export function AddFunds({
               <TextInputForm
                 testId="add-funds-amount"
                 type="number"
-                value={toAmount}
+                value={currentToAmount}
                 validator={amountInputValidation}
                 onTextInputChange={(value) => updateAmount(value)}
                 textAlign="right"
@@ -255,11 +259,10 @@ export function AddFunds({
                 gap: 'base.spacing.x5',
                 justifyContent: 'center',
                 border: '1px solid grey',
-
               }}
             >
               <Body size="large" weight="bold">
-                {toTokenAddress?.name ?? ''}
+                {currentToTokenAddress?.name ?? ''}
               </Body>
               <OverflowPopoverMenu testId="add-funds-tokens-menu">
                 {allowedTokens.map((token: any) => (

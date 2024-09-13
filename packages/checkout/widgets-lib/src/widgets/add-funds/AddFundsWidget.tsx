@@ -35,8 +35,8 @@ export default function AddFundsWidget({
   showOnrampOption = true,
   showSwapOption = true,
   showBridgeOption = true,
-  tokenAddress,
-  amount,
+  toTokenAddress,
+  toAmount,
 }: AddFundsWidgetInputs) {
   const [viewState, viewDispatch] = useReducer(
     viewReducer,
@@ -113,8 +113,8 @@ export default function AddFundsWidget({
         <AddFunds
           checkout={checkout}
           provider={web3Provider}
-          tokenAddress={tokenAddress}
-          amount={amount}
+          toTokenAddress={toTokenAddress}
+          toAmount={toAmount}
           showOnrampOption={showOnrampOption}
           showSwapOption={showSwapOption}
           showBridgeOption={showBridgeOption}

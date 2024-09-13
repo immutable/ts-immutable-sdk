@@ -1,11 +1,10 @@
 /* eslint-disable no-console */
 import { useContext, useState } from 'react';
-import { TokenBalance } from '@0xsquid/sdk/dist/types';
+import { Token, TokenBalance } from '@0xsquid/sdk/dist/types';
 import { AddFundsContext } from '../context/AddFundsContext';
 import { SQUID_BASE_URL } from '../utils/config';
 
-export type RoutesProps = {
-};
+export type RoutesProps = {};
 
 export type Chain = {
   id: string;
@@ -14,13 +13,13 @@ export type Chain = {
 };
 
 export type SquidChain = {
-  chainId: string
-  chainName:string;
-  chainIconURI:string;
+  chainId: string;
+  chainName: string;
+  chainIconURI: string;
 };
 
 type SquidChains = {
-  chains:SquidChain[];
+  chains: SquidChain[];
 };
 
 export const useRoutes = () => {
@@ -40,7 +39,7 @@ export const useRoutes = () => {
       },
     });
 
-    const data :SquidChains = await response.json();
+    const data: SquidChains = await response.json();
 
     const chains = data.chains.map((chain: SquidChain) => ({
       id: chain.chainId,
@@ -53,17 +52,14 @@ export const useRoutes = () => {
   };
 
   // FUNCTION: Get token balances for each token on each chain function
-  const getTokenBalances = async (chainIds:string[], address:string):Promise<TokenBalance[]> => {
+  const getTokenBalances = async (
+    chainIds: string[],
+    address: string,
+  ): Promise<TokenBalance[]> => {
     if (!addFundsState.squid) {
       console.log('squid not found');
       return [];
     }
-
-    const balanceTest = await addFundsState.squid?.getAllBalances({
-      chainIds: [1, 10],
-      evmAddress: '0x61Ed281e487502458f84752eB367697d6BB5778a',
-    });
-    console.log('=== balances', balanceTest);
 
     const balances = await addFundsState.squid?.getAllBalances({
       chainIds,
@@ -73,7 +69,7 @@ export const useRoutes = () => {
     return balances?.evmBalances ?? [];
   };
 
-  //   // FUNCTION: Get toAmount for each token that has a balance function
+  //   // FUNCTION: Get fromAmoun for each token that has a balance function
   //   const getToAmounts = async () => {
   //   };
 
@@ -86,25 +82,100 @@ export const useRoutes = () => {
   //   };
 
   // FUNCTION: main function - getRoutes
-  const getRoutes = async () => {
+  const getRoutes = async (
+    toTokenAddress: string,
+    toAmount: string,
+    toChanId: string,
+  ) => {
     // 1. Get chains and tokens from squid function
     // 2. Get token balances for each token on each chain function
-    // 3. Get toAmount for each token that has a balance function
+    // 3. Get fromAmount for each token that has a balance function
     // 4. Compare toAmounts with targetAmount and filter the tokens that is < targetAmount function
     // 5. Call squid's getRoutes function for filtered tokens
     // 6. Order the routes by the best price and estimated time function
+    console.log('======== toTokenAddress', toTokenAddress); // native
+    console.log('======== toAmount', toAmount);
+    console.log('======== toChanId', toChanId);
+
+    if (!addFundsState.squid) {
+      return;
+    }
+    const squidSdk = addFundsState.squid;
 
     const address = await addFundsState.provider?.getSigner().getAddress();
     if (!address) {
       return;
     }
-
-    const chainIds = (await getChainsAndTokens()).map((chain: Chain) => chain.id);
-    console.log('======== CHAIN IDS', chainIds);
-    const balances = await getTokenBalances(chainIds, address);
     console.log('======== address', address);
-    console.log('======== BALANCES', balances);
-  };
 
+    const chainIds = (await getChainsAndTokens()).map(
+      (chain: Chain) => chain.id,
+    );
+    console.log('======== CHAIN IDS', chainIds);
+
+    const balances = await getTokenBalances(chainIds, address);
+    console.log('======== BALANCES', balances);
+
+    const filteredBalance = balances.reduce(
+      (acc: TokenBalance[], balance: TokenBalance) => {
+        if (balance.balance === '0') {
+          return acc;
+        }
+        return [...acc, balance];
+      },
+      [],
+    );
+    console.log('======== FILTERED BALANCES', filteredBalance);
+
+    const calculatedFromAmounts = filteredBalance.map(
+      (balance: TokenBalance): Promise<AmountData | undefined> => {
+        const fromTokenData = addFundsState.squid?.getTokenData(
+          balance.address,
+          balance.chainId.toString(),
+        );
+        const toTokenData = addFundsState.squid?.getTokenData(
+          '0x6de8aCC0D406837030CE4dd28e7c08C5a96a30d2',
+          toChanId,
+        );
+
+        if (!fromTokenData || !toTokenData) {
+          console.log('tokenData not found');
+          return Promise.resolve(undefined);
+        }
+
+        return squidSdk
+          .getFromAmount({
+            fromToken: fromTokenData,
+            toToken: toTokenData,
+            toAmount,
+          })
+          .then((fromAmount: string) => ({
+            fromAmount,
+            fromToken: fromTokenData,
+            toToken: toTokenData,
+            toAmount,
+          }))
+          .catch((error) => {
+            console.log('error', error);
+            return Promise.resolve(undefined);
+          });
+      },
+    );
+
+    Promise.all(calculatedFromAmounts)
+      .then((result) => {
+        console.log('======== FROM AMOUNTS', result);
+      })
+      .catch((error) => {
+        console.log('error', error);
+      });
+  };
   return { routes, getRoutes };
+};
+
+export type AmountData = {
+  fromAmount: string;
+  fromToken: Token;
+  toToken: Token;
+  toAmount: string;
 };
