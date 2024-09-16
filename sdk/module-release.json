@@ -3,8 +3,7 @@
     "This file is responsible for which modules",
     "get bundled and released as part of alpha and prod",
     "releases of the SDK.",
-    "Under `modules`, each key is a file in `src`, and each value is either alpha or prod",
-    "Under `fileCopy`, each object has `src` and `dest` keys, as well, which are paths relative to this file"
+    "Under `modules`, each key is a file in `src`, and each value is either alpha or prod"
   ],
   "modules": {
     "config": "prod",
@@ -15,19 +14,5 @@
     "x": "prod",
     "webhook": "prod",
     "minting_backend": "prod"
-  },
-  "excludeForBrowser": ["webhook", "minting_backend"],
-  "fileCopy": [
-    {
-      "src": "../packages/checkout/widgets-lib/dist/index.js",
-      "dest": "./dist/browser/checkout/widgets-esm.js",
-      "stage": "prod",
-      "copyAllJsFiles": true
-    },
-    {
-      "src": "../packages/checkout/sdk/dist/browser.js",
-      "dest": "./dist/browser/checkout/sdk.js",
-      "stage": "prod"
-    }
-  ]
+  }
 }

@@ -11,7 +11,7 @@ const config: Config = {
     '^.+\\.mjs?$': '@swc/jest',
   },
   transformIgnorePatterns: [
-    "node_modules/(?!axios|@biom3/design-tokens)",
+    "../../../node_modules/.pnpm/(?!axios|@biom3/design-tokens)",
   ],
   modulePathIgnorePatterns: ['<rootDir>/.yalc'],
 };

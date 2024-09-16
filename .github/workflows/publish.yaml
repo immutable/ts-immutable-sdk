@@ -88,7 +88,7 @@ jobs:
         shell: bash
 
       - name: Lint
-        run: yarn lint
+        run: pnpm lint
 
       - name: Get next version string
         id: version
@@ -96,10 +96,10 @@ jobs:
           echo "NEXT_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
 
       - name: Typecheck
-        run: yarn typecheck
+        run: pnpm typecheck
 
       - name: Test
-        run: yarn test
+        run: pnpm test
 
       - name: Update package.json version for build
         run: |
@@ -109,7 +109,7 @@ jobs:
       # WARNING: build step should be after typecheck and test steps. This is to make sure build artifacts are overwritten by the lint and tests steps.
       - name: Build
         run: |
-          export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ env.RELEASE_TYPE }} yarn build
+          export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ env.RELEASE_TYPE }} pnpm build
           ls -l ./sdk/dist/browser/checkout || echo 1
           [ -d "./sdk/dist/browser/checkout" ] || { echo "Error: Directory does not exist." && exit 1; }
 
@@ -142,7 +142,7 @@ jobs:
       - name: Release
         id: npm_release
         if: contains(env.RELEASE_TYPE, 'release')
-        run: yarn release --ci --no-increment -c .release-it.json $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
+        run: pnpm release --ci --no-increment -c .release-it.json $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
 
       - name: Warm up CDN
         id: warm_up_cdn

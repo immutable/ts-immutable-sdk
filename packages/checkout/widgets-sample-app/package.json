@@ -39,7 +39,6 @@
     "@types/react-dom": "^18.0.11",
     "@vitejs/plugin-react": "^4.2.0",
     "typescript": "^5.6.2",
-    "unplugin-swc": "^1.5.1",
     "vite": "^5.2.14",
     "vite-plugin-node-polyfills": "^0.16.0",
     "web-vitals": "^2.1.4"
