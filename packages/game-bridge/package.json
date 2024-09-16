@@ -15,7 +15,7 @@
   },
   "scripts": {
     "build": "parcel build --no-cache --no-scope-hoist",
-    "build:local": "parcel build --no-cache --no-scope-hoist && yarn updateSdkVersion",
+    "build:local": "parcel build --no-cache --no-scope-hoist && pnpm updateSdkVersion",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "start": "parcel",
     "updateSdkVersion": "./scripts/updateSdkVersion.sh"

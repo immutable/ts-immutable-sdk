@@ -7,7 +7,7 @@ runs:
     - name: Playwright versions in sync check
       shell: bash
       run: |
-        versions=$(yarn why --json @playwright/test | grep -h 'workspace:.' | jq --raw-output '.children[].locator' | sed -e 's/@playwright\/test@.*://')
+        versions=$(pnpm ls -r --json --depth 0 @playwright/test | jq --raw-output '.[] | select(.devDependencies["@playwright/test"]) | .devDependencies["@playwright/test"].version')
         unique_versions=$(echo "$versions" | sort | uniq)
         if [ $(echo "$unique_versions" | wc -l) -ne 1 ]; then
           echo "Playwright versions are not in sync:"
@@ -31,9 +31,9 @@ runs:
     - name: Install Playwright with dependencies
       shell: bash
       if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
-      run: yarn dlx playwright@${{ env.PLAYWRIGHT_VERSION }} install --with-deps
+      run: pnpm dlx playwright@${{ env.PLAYWRIGHT_VERSION }} install --with-deps
 
     - name: Install Playwright dependencies
       shell: bash
       if: steps.cache-playwright-browsers.outputs.cache-hit == 'true'
-      run: yarn dlx playwright@${{ env.PLAYWRIGHT_VERSION }} install-deps
+      run: pnpm dlx playwright@${{ env.PLAYWRIGHT_VERSION }} install-deps

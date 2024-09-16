@@ -38,12 +38,12 @@
   },
   "release": {
     "projectsRelationship": "fixed",
-    "projects": ["sdk/**", "packages/**", "!packages/internal/**", "!packages/**/*sample-app/**"],
+    "projects": ["sdk/**", "packages/**", "!packages/**/*sample-app/**"],
     "releaseTagPattern": "{version}",
     "changelog": {
         "workspaceChangelog": {
           "file": false,
-          "createRelease": "github",
+          "createRelease": false,
           "renderOptions": {
             "authors": false
           }
