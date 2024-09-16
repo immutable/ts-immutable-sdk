@@ -282,11 +282,14 @@ export default function FulfillERC1155WithPassport() {
               color: "red",
               fontSize: "15",
               marginBottom: "base.spacing.x5",
+              maxWidth: "1300px",
+              maxHeight: "400px",
+              overflowY: "auto",
             }}
           >
             {errorMessage}
           </Box>
-        ): null}
+        ) : null}
       </Box>
       <Box>
         <Grid>
