@@ -9,7 +9,8 @@
     "**sample-app**/",
     "**playground**/",
     "*.cjs",
-    "tests/func-tests/"
+    "tests/func-tests/",
+    "tsup.*.ts"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {

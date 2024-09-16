@@ -85,21 +85,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          cache: "yarn"
+          cache: "pnpm"
 
       - name: Restore cached node_modules
         id: restore-cache-node_modules
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('pnpm-lock.yaml') }}
 
       - name: Install dependencies
         if: steps.restore-cache-node_modules.outputs.cache-hit != 'true' 
-        run: yarn install --immutable
+        run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
+        run: export NODE_OPTIONS=--max-old-space-size=6144 && pnpm build
 
       - name: Update SDK package.json version
         run: |
@@ -108,7 +108,7 @@ jobs:
         shell: bash
 
       - name: Build SDK Docs
-        run: yarn docs:build
+        run: pnpm docs:build
 
       - name: Update version link
         run: ./.github/scripts/update-docs-link.sh

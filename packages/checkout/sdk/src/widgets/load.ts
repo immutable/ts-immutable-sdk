@@ -14,7 +14,7 @@ export function loadUnresolvedBundle(
     throw new Error('missing document object: please run Checkout client side');
   }
 
-  let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout/widgets.js`;
+  let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets@${validVersion}/dist/widgets.js`;
   if (useLocalBundle()) cdnUrl = `http://${window.location.host}/lib/js/widgets.js`;
 
   tag.setAttribute('id', scriptId);
@@ -28,7 +28,7 @@ export function loadUnresolvedBundle(
 export function getWidgetsEsmUrl(
   validVersion: string,
 ): string {
-  let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout/widgets-esm.js`;
+  let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets@${validVersion}/dist/index.js`;
   if (useLocalBundle()) cdnUrl = `http://${window.location.host}/lib/js/index.js`;
   return cdnUrl;
 }

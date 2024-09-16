@@ -3,105 +3,22 @@
   "description": "Immutable Typescript SDK",
   "version": "0.0.0",
   "author": "Immutable",
-  "browser": "./dist/index.browser.js",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "@0xsequence/abi": "^1.4.3",
-    "@0xsequence/core": "^1.4.3",
-    "@0xsquid/sdk": "^2.8.25",
-    "@biom3/design-tokens": "^0.4.4",
-    "@biom3/react": "^0.27.12",
-    "@ethersproject/abi": "^5.7.0",
-    "@ethersproject/abstract-provider": "^5.7.0",
-    "@ethersproject/abstract-signer": "^5.7.0",
-    "@ethersproject/address": "^5.7.0",
-    "@ethersproject/bignumber": "^5.7.0",
-    "@ethersproject/bytes": "^5.7.0",
-    "@ethersproject/contracts": "^5.7.0",
-    "@ethersproject/keccak256": "^5.7.0",
-    "@ethersproject/providers": "^5.7.2",
-    "@ethersproject/solidity": "^5.7.0",
-    "@ethersproject/strings": "^5.7.0",
-    "@ethersproject/units": "^5.7.0",
-    "@ethersproject/wallet": "^5.7.0",
-    "@imtbl/react-analytics": "0.2.1-alpha",
-    "@jest/globals": "^29.5.0",
-    "@magic-ext/oidc": "4.3.1",
-    "@magic-sdk/provider": "^21.2.0",
-    "@metamask/detect-provider": "^2.0.0",
-    "@opensea/seaport-js": "4.0.3",
-    "@rive-app/react-canvas-lite": "^4.9.0",
-    "@stdlib/number-float64-base-normalize": "0.0.8",
-    "@uniswap/router-sdk": "^1.4.0",
-    "@uniswap/sdk-core": "^3.0.1",
-    "@uniswap/v3-sdk": "^3.9.0",
-    "@walletconnect/ethereum-provider": "^2.11.1",
-    "@walletconnect/modal": "^2.6.2",
-    "assert": "^2.0.0",
-    "axios": "^1.6.5",
-    "bn.js": "^5.2.1",
-    "buffer": "^6.0.3",
-    "crypto-browserify": "^3.12.0",
-    "elliptic": "^6.5.7",
-    "enc-utils": "^3.0.0",
-    "ethereumjs-wallet": "^1.0.2",
-    "ethers": "^5.7.2",
-    "ethers-v6": "npm:ethers@6.11.1",
-    "events": "^3.3.0",
-    "form-data": "^4.0.0",
-    "framer-motion": "^11.0.6",
-    "global-const": "^0.1.2",
-    "hash.js": "^1.1.7",
-    "https-browserify": "^1.0.0",
-    "i18next": "^23.7.6",
-    "i18next-browser-languagedetector": "^7.2.0",
-    "jwt-decode": "^3.1.2",
-    "localforage": "^1.10.0",
-    "lru-memorise": "0.3.0",
-    "magic-sdk": "^21.2.0",
-    "merkletreejs": "^0.3.11",
-    "oidc-client-ts": "2.4.0",
-    "os-browserify": "^0.3.0",
-    "pako": "^2.1.0",
-    "pino-pretty": "^11.2.2",
-    "react-i18next": "^13.5.0",
-    "sns-validator": "^0.3.5",
-    "stream-browserify": "^3.0.0",
-    "stream-http": "^3.2.0",
-    "url": "^0.11.0",
-    "uuid": "^8.3.2"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.21.0",
-    "@babel/plugin-transform-class-properties": "^7.24.1",
-    "@babel/plugin-transform-private-methods": "^7.24.1",
     "@imtbl/blockchain-data": "0.0.0",
     "@imtbl/checkout-sdk": "0.0.0",
-    "@imtbl/checkout-widgets": "0.0.0",
     "@imtbl/config": "0.0.0",
-    "@imtbl/cryptofiat": "0.0.0",
-    "@imtbl/generated-clients": "0.0.0",
     "@imtbl/minting-backend": "0.0.0",
     "@imtbl/orderbook": "0.0.0",
     "@imtbl/passport": "0.0.0",
     "@imtbl/webhook": "0.0.0",
     "@imtbl/x-client": "0.0.0",
-    "@imtbl/x-provider": "0.0.0",
-    "@rollup/plugin-babel": "^6.0.4",
-    "@rollup/plugin-commonjs": "^26.0.1",
-    "@rollup/plugin-json": "^6.1.0",
-    "@rollup/plugin-node-resolve": "^15.2.3",
-    "@rollup/plugin-replace": "^5.0.7",
-    "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^11.1.6",
+    "@imtbl/x-provider": "0.0.0"
+  },
+  "devDependencies": {
     "eslint": "^8.40.0",
-    "glob": "^10.2.3",
-    "rimraf": "^6.0.1",
-    "rollup": "^4.22.4",
-    "rollup-plugin-dts": "^6.1.1",
-    "rollup-plugin-polyfill-node": "^0.13.0",
-    "semver": "^7.4.0",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.2",
+    "tsup": "^8.2.4"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -109,41 +26,112 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "development": {
+        "types": "./src/index.ts",
+        "import": "./dist/index.js",
+        "require": "./dist/index.cjs"
+      },
+      "default": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js",
+        "require": "./dist/index.cjs"
+      }
     },
     "./config": {
-      "types": "./dist/config.d.ts",
-      "import": "./dist/config.js"
+      "development": {
+        "types": "./src/config.ts",
+        "import": "./dist/config.js",
+        "require": "./dist/config.cjs"
+      },
+      "default": {
+        "types": "./dist/config.d.ts",
+        "import": "./dist/config.js",
+        "require": "./dist/config.cjs"
+      }
     },
     "./blockchain_data": {
-      "types": "./dist/blockchain_data.d.ts",
-      "import": "./dist/blockchain_data.js"
+      "development": {
+        "types": "./src/blockchain_data.ts",
+        "import": "./dist/blockchain_data.js",
+        "require": "./dist/blockchain_data.cjs"
+      },
+      "default": {
+        "types": "./dist/blockchain_data.d.ts",
+        "import": "./dist/blockchain_data.js",
+        "require": "./dist/blockchain_data.cjs"
+      }
     },
     "./passport": {
-      "types": "./dist/passport.d.ts",
-      "import": "./dist/passport.js"
+      "development": {
+        "types": "./src/passport.ts",
+        "import": "./dist/passport.js",
+        "require": "./dist/passport.cjs"
+      },
+      "default": {
+        "types": "./dist/passport.d.ts",
+        "import": "./dist/passport.js",
+        "require": "./dist/passport.cjs"
+      }
     },
     "./orderbook": {
-      "types": "./dist/orderbook.d.ts",
-      "import": "./dist/orderbook.js"
+      "development": {
+        "types": "./src/orderbook.ts",
+        "import": "./dist/orderbook.js",
+        "require": "./dist/orderbook.cjs"
+      },
+      "default": {
+        "types": "./dist/orderbook.d.ts",
+        "import": "./dist/orderbook.js",
+        "require": "./dist/orderbook.cjs"
+      }
     },
     "./checkout": {
-      "types": "./dist/checkout.d.ts",
-      "import": "./dist/checkout.js"
+      "development": {
+        "types": "./src/checkout.ts",
+        "import": "./dist/checkout.js",
+        "require": "./dist/checkout.cjs"
+      },
+      "default": {
+        "types": "./dist/checkout.d.ts",
+        "import": "./dist/checkout.js",
+        "require": "./dist/checkout.cjs"
+      }
     },
     "./x": {
-      "types": "./dist/x.d.ts",
-      "import": "./dist/x.js"
+      "development": {
+        "types": "./src/x.ts",
+        "import": "./dist/x.js",
+        "require": "./dist/x.cjs"
+      },
+      "default": {
+        "types": "./dist/x.d.ts",
+        "import": "./dist/x.js",
+        "require": "./dist/x.cjs"
+      }
     },
     "./webhook": {
-      "types": "./dist/webhook.d.ts",
-      "import": "./dist/webhook.js"
+      "development": {
+        "types": "./src/webhook.ts",
+        "import": "./dist/webhook.js",
+        "require": "./dist/webhook.cjs"
+      },
+      "default": {
+        "types": "./dist/webhook.d.ts",
+        "import": "./dist/webhook.js",
+        "require": "./dist/webhook.cjs"
+      }
     },
     "./minting_backend": {
-      "types": "./dist/minting_backend.d.ts",
-      "import": "./dist/minting_backend.js"
+      "development": {
+        "types": "./src/minting_backend.ts",
+        "import": "./dist/minting_backend.js",
+        "require": "./dist/minting_backend.cjs"
+      },
+      "default": {
+        "types": "./dist/minting_backend.d.ts",
+        "import": "./dist/minting_backend.js",
+        "require": "./dist/minting_backend.cjs"
+      }
     }
   },
   "files": [
@@ -153,28 +141,15 @@
   "license": "Apache-2.0",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
-  "optionalDependencies": {
-    "pg": "^8.11.5",
-    "prisma": "^5.13.0"
-  },
   "overrides": {
     "@openzeppelin/contracts": "3.4.2-solc-0.7"
   },
   "repository": "immutable/ts-immutable-sdk.git",
-  "resolutions": {
-    "@biom3/design-tokens": "^0.4.4",
-    "@openzeppelin/contracts": "3.4.2-solc-0.7"
-  },
   "scripts": {
-    "build": "yarn updateDependencies && yarn regenModules && rimraf dist && NODE_ENV=production node --max-old-space-size=14366 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rimraf dist/types && yarn copyBrowserBundles",
-    "build:only": "rimraf dist && NODE_ENV=production node --max-old-space-size=8192 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rimraf dist/types",
-    "copyBrowserBundles": "node scripts/copyBrowserBundles.js",
-    "generateIndex": "node scripts/generateIndex.js",
+    "build": "tsup src --config ../tsup.base.ts && tsc --customConditions default --emitDeclarationOnly",
+    "d": "tsup src --config ../tsup.base.ts",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
-    "regenModules": "yarn generateIndex && yarn updateExports",
-    "typecheck": "tsc --noEmit --jsx preserve",
-    "updateDependencies": "node ./scripts/updateDependencies.js && yarn run --top-level syncpack:format",
-    "updateExports": "node scripts/updateExports.js"
+    "typecheck": "tsc --customConditions default --noEmit --jsx preserve"
   },
   "type": "module",
   "types": "./dist/index.d.ts"
