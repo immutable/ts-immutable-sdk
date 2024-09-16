@@ -71,14 +71,14 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
-    "build:dev": "CHECKOUT_DEV_MODE=true yarn build",
+    "build:dev": "CHECKOUT_DEV_MODE=true pnpm build",
     "d": "rollup --config rollup.config.js",
     "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/index.ts",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
     "start": "rollup --config rollup.config.js --watch",
-    "start:dev": "CHECKOUT_DEV_MODE=true yarn start",
-    "start:local": "CHECKOUT_LOCAL_MODE=true yarn start",
+    "start:dev": "CHECKOUT_DEV_MODE=true pnpm start",
+    "start:local": "CHECKOUT_LOCAL_MODE=true pnpm start",
     "test": "jest test",
     "test:watch": "jest test --watch",
     "typecheck": "tsc --customConditions default --noEmit"

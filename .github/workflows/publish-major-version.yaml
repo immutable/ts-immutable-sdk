@@ -86,7 +86,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          cache: "yarn"
+          cache: "pnpm"
 
       - name: Workout next version string
         run: |
@@ -105,14 +105,14 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('pnpm-lock.yaml') }}
 
       - name: Install dependencies
         if: steps.restore-cache-node_modules.outputs.cache-hit != 'true' 
-        run: yarn install --immutable
+        run: pnpm install --frozen-lockfile
 
       - name: Lint
-        run: yarn lint
+        run: pnpm lint
 
       - name: Get next version string
         id: version
@@ -125,13 +125,13 @@ jobs:
           jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
 
       - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ github.event.inputs.release_type }} yarn build
+        run: export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ github.event.inputs.release_type }} pnpm build
 
       - name: Typecheck
-        run: yarn typecheck
+        run: pnpm typecheck
 
       - name: Test
-        run: yarn test
+        run: pnpm test
 
       - name: Push tags
         # Boolean inputs are not actually booleans, see https://github.com/actions/runner/issues/1483
@@ -157,7 +157,7 @@ jobs:
       - name: Release
         id: npm_release
         if: contains(github.event.inputs.release_type, 'release')
-        run: yarn release --ci --no-increment -c .release-it.json $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
+        run: pnpm release --ci --no-increment -c .release-it.json $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
 
       - name: Warm up CDN
         id: warm_up_cdn

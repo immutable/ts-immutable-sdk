@@ -26,7 +26,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Syncpack
-        run: yarn syncpack:check
+        run: pnpm syncpack:check
 
   build-lint-test-typecheck-sdk:
     name: Build, Lint, Test & Typecheck SDK
@@ -42,7 +42,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Build, Lint, Test & Typecheck
-        run: yarn nx affected -t build,lint,test,typecheck 
+        run: pnpm --if-present nx affected -t build,lint,test,typecheck 
 
   build-lint-test-examples:
     name: Build, Lint & Test Examples
@@ -60,13 +60,13 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Prepare examples
-        run: yarn prepare:examples
+        run: pnpm prepare:examples
 
       - name: Build examples
-        run: yarn build:examples
+        run: pnpm build:examples
 
       - name: Lint examples
-        run: yarn lint:examples
+        run: pnpm lint:examples
 
       - name: Setup playwright
         uses: ./.github/actions/setup-playwright
@@ -75,7 +75,8 @@ jobs:
         run: yarn workspace @imtbl/checkout-widgets prepare:examplewidgets
 
       - name: Test examples
-        run: yarn test:examples
+        run: pnpm test:examples
+      
 
   func-tests:
     name: Functional tests
@@ -117,7 +118,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Prepare tests
-        run: yarn prepare:tests
+        run: pnpm prepare:tests
 
       - name: Install SDK at current version for @tests/checkout-widgets-nextjs
         run: yarn workspace @tests/checkout-widgets-nextjs add @imtbl/sdk@$(npm view @imtbl/sdk version)
@@ -132,4 +133,4 @@ jobs:
         uses: ./.github/actions/setup-playwright
 
       - name: Run functional tests
-        run: FORCE_COLOR=1 yarn workspaces foreach -Apt --include='@tests/**' run func-test:ci
+        run: pnpm --filter "@tests/*" --parallel func-test:ci

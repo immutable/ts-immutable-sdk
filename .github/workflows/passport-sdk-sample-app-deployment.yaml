@@ -34,10 +34,10 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Build Static Passport sample app
-        run: yarn nx run @imtbl/passport-sdk-sample-app:build --skip-nx-cache
+        run: pnpm nx run @imtbl/passport-sdk-sample-app:build --skip-nx-cache
 
       - name: Update SDK version
-        run: yarn workspace @imtbl/passport-sdk-sample-app update-sdk-version
+        run: pnpm --filter @imtbl/passport-sdk-sample-app update-sdk-version
 
       - name: Upload to S3
         run: |

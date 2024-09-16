@@ -9,7 +9,7 @@
   "devDependencies": {
     "@actions/core": "^1.10.1",
     "@emotion/react": "^11.11.3",
-    "@nx/js": "^19.3.2",
+    "@nx/js": "^19.7.2",
     "@release-it-plugins/workspaces": "^4.0.0",
     "@swc-node/register": "^1.10.9",
     "@swc/cli": "^0.4.0",
@@ -26,9 +26,10 @@
     "husky": "^8.0.3",
     "lint-staged": "^13.2.0",
     "node-gyp": "^9.3.1",
-    "nx": "19.3.2",
+    "nx": "19.7.2",
     "release-it": "^16.1.3",
     "syncpack": "^9.8.4",
+    "tsup": "^8.2.4",
     "typedoc": "^0.26.5",
     "wsrun": "^5.2.4"
   },
@@ -40,7 +41,6 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint"
   },
-  "packageManager": "yarn@3.6.1",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
@@ -48,64 +48,26 @@
   },
   "scripts": {
     "build": "nx run @imtbl/sdk:build",
-    "build:examples": "yarn workspaces foreach -Apt --include='@examples/**' run build",
-    "build:onlysdk": "NODE_OPTIONS=--max-old-space-size=14366 nx run-many --target=build --projects=@imtbl/sdk && yarn syncpack:format",
+    "build:examples": "pnpm workspaces foreach -Apt --include='@examples/**' run build",
+    "build:onlysdk": "NODE_OPTIONS=--max-old-space-size=14366 nx run-many --target=build --projects=@imtbl/sdk && pnpm syncpack:format",
     "dev": "./dev.sh",
     "docs:build": "typedoc",
     "docs:serve": "http-server ./docs --cors -p 8080 -c-1",
     "lint": "nx affected -t lint",
-    "lint:examples": "yarn workspaces foreach -Apt --include='@examples/**' run lint",
+    "lint:examples": "pnpm workspaces foreach -Apt --include='@examples/**' run lint",
     "nx": "nx",
     "postinstall": "husky install",
-    "prepare:examples": "yarn build:onlysdk && yarn yalc:sdk:publish && yarn workspaces foreach -Apt --include='@examples/**' exec yarn dlx yalc add @imtbl/sdk && yarn install --no-immutable",
-    "prepare:tests": "yarn build:onlysdk && yarn yalc:sdk:publish && yarn workspaces foreach -Apt --include='@tests/**' exec yarn dlx yalc add @imtbl/sdk && yarn install --no-immutable",
+    "prepare:examples": "pnpm build:onlysdk && pnpm yalc:sdk:publish && pnpm workspaces foreach -Apt --include='@examples/**' exec pnpm dlx yalc add @imtbl/sdk && pnpm install --no-immutable",
+    "prepare:tests": "pnpm build:onlysdk && pnpm yalc:sdk:publish && pnpm workspaces foreach -Apt --include='@tests/**' exec pnpm dlx yalc add @imtbl/sdk && pnpm install --no-immutable",
     "release": "release-it",
-    "syncpack:check": "yarn syncpack list-mismatches",
-    "syncpack:fix": "yarn syncpack fix-mismatches",
-    "syncpack:format": "yarn syncpack format",
+    "syncpack:check": "pnpm syncpack list-mismatches",
+    "syncpack:fix": "pnpm syncpack fix-mismatches",
+    "syncpack:format": "pnpm syncpack format",
     "test": "nx affected -t test",
-    "test:examples": "yarn workspaces foreach -At --include='@examples/**' run test",
+    "test:examples": "pnpm workspaces foreach -At --include='@examples/**' run test",
     "test:vpn": "RUN_VPN_TESTS=1 wsrun --exclude-missing -e test",
     "typecheck": "nx affected -t typecheck",
-    "yalc:sdk:publish": "yarn workspace @imtbl/sdk exec yarn dlx yalc publish"
+    "yalc:sdk:publish": "pnpm workspace @imtbl/sdk exec pnpm dlx yalc publish"
   },
-  "workspaces": {
-    "packages": [
-      "sdk",
-      "packages/config",
-      "packages/x-client",
-      "packages/x-provider",
-      "packages/x-provider/src/sample-app",
-      "packages/passport/sdk",
-      "packages/passport/sdk-sample-app",
-      "packages/orderbook",
-      "packages/internal/metrics",
-      "packages/internal/toolkit",
-      "packages/internal/cryptofiat",
-      "packages/internal/dex/sdk",
-      "packages/internal/dex/sdk-sample-app",
-      "packages/internal/bridge/sdk",
-      "packages/internal/generated-clients",
-      "packages/internal/bridge/bridge-sample-app",
-      "packages/checkout/sdk",
-      "packages/checkout/sdk-sample-app",
-      "packages/checkout/widgets-sample-app",
-      "packages/checkout/widgets-lib",
-      "packages/blockchain-data/sdk",
-      "packages/game-bridge",
-      "packages/webhook/sdk",
-      "packages/minting-backend/sdk",
-      "tests/**",
-      "examples/passport/**",
-      "examples/orderbook/**",
-      "examples/checkout/**",
-      "examples/blockchain-data",
-      "examples/contracts/**",
-      "examples/x-to-zkevm-migration-app/**"
-    ],
-    "nohoist": [
-      "examples/**",
-      "tests/**"
-    ]
-  }
+  "packageManager": "pnpm@9.12.0"
 }

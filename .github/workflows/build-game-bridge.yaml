@@ -65,7 +65,7 @@ jobs:
         run: echo "TS_SDK_HASH=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
       - name: Build Game Bridge
-        run: yarn nx run @imtbl/game-bridge:build --skip-nx-cache
+        run: pnpm nx run @imtbl/game-bridge:build --skip-nx-cache
 
       - name: Update Version Strings
         run: cd packages/game-bridge && ./scripts/updateSdkVersion.sh
