@@ -1,6 +1,7 @@
 import { useContext, useEffect } from 'react';
 import { ButtCon } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
+import { IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
@@ -11,8 +12,14 @@ import { ViewActions, ViewContext } from '../../../context/view-context/ViewCont
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { WalletAndNetworkSelector } from '../components/WalletAndNetworkSelector';
+import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 
-export function WalletNetworkSelectionView() {
+type WalletNetworkSelectionViewProps = {
+  showBackButton?: boolean;
+};
+export function WalletNetworkSelectionView({
+  showBackButton,
+}: WalletNetworkSelectionViewProps) {
   const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
 
@@ -49,6 +56,14 @@ export function WalletNetworkSelectionView() {
               testId="move-transactions-button"
             />
           )}
+          showBack={showBackButton}
+          onBackButtonClick={() => {
+            orchestrationEvents.sendRequestGoBackEvent(
+              eventTarget,
+              IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
+              {},
+            );
+          }}
         />
       )}
       footer={<FooterLogo />}

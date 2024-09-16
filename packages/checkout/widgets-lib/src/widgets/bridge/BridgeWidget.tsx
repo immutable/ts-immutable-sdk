@@ -69,6 +69,7 @@ export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
   checkout: Checkout;
   web3Provider?: Web3Provider;
+  showBackButton: boolean;
 };
 
 export default function BridgeWidget({
@@ -77,6 +78,7 @@ export default function BridgeWidget({
   config,
   amount,
   tokenAddress,
+  showBackButton,
 }: BridgeWidgetInputs) {
   const { t } = useTranslation();
   const {
@@ -203,7 +205,7 @@ export default function BridgeWidget({
       <BridgeContext.Provider value={bridgeReducerValues}>
         <CryptoFiatProvider environment={environment}>
           {viewState.view.type === BridgeWidgetViews.WALLET_NETWORK_SELECTION && (
-            <WalletNetworkSelectionView />
+            <WalletNetworkSelectionView showBackButton={showBackButton} />
           )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_FORM && (
             <Bridge
