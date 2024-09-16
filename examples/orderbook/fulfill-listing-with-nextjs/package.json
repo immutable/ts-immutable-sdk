@@ -1,5 +1,5 @@
 {
-  "name": "@examples/create-listing-with-nextjs",
+  "name": "@examples/fulfill-listing-with-nextjs",
   "version": "0.1.0",
   "private": true,
   "scripts": {
