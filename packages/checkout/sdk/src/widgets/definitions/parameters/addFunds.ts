@@ -18,4 +18,7 @@ export type AddFundsWidgetParams = {
 
   /** Amount of the fund to be added */
   toAmount?: string;
+
+  /** Whether to show a back button on the first screen, on click triggers REQUEST_GO_BACK event */
+  showBackButton?: boolean;
 };

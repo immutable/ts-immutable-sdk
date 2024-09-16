@@ -31,6 +31,7 @@ import {
 interface AddFundsProps {
   checkout?: Checkout;
   provider?: Web3Provider;
+  showBackButton?: boolean;
   showOnrampOption?: boolean;
   showSwapOption?: boolean;
   showBridgeOption?: boolean;
@@ -45,6 +46,7 @@ export function AddFunds({
   provider,
   toAmount,
   toTokenAddress,
+  showBackButton = false,
   showOnrampOption = true,
   showSwapOption = true,
   showBridgeOption = true,
@@ -55,6 +57,8 @@ export function AddFunds({
   console.log('showOnrampOption', showOnrampOption);
   console.log('showSwapOption', showSwapOption);
   console.log('showBridgeOption', showBridgeOption);
+
+  const showBack = showBackButton || !!onBackButtonClick;
 
   const { addFundsDispatch } = useContext(AddFundsContext);
 
@@ -213,9 +217,16 @@ export function AddFunds({
       header={(
         <HeaderNavigation
           title="Add"
-          onBackButtonClick={onBackButtonClick}
           onCloseButtonClick={onCloseButtonClick}
-          showBack={!!onBackButtonClick}
+          showBack={showBack}
+          onBackButtonClick={() => {
+            orchestrationEvents.sendRequestGoBackEvent(
+              eventTarget,
+              IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+              {},
+            );
+            onBackButtonClick?.();
+          }}
         />
       )}
     >

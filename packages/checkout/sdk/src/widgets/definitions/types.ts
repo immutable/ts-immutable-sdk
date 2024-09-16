@@ -40,6 +40,7 @@ import {
   CheckoutFailureEvent,
   CheckoutUserActionEvent,
   RequestAddFundsEvent,
+  RequestGoBackEvent,
 } from './events';
 import {
   BridgeWidgetParams,
@@ -131,6 +132,7 @@ type OrchestrationMapping = {
   [OrchestrationEventType.REQUEST_BRIDGE]: RequestBridgeEvent;
   [OrchestrationEventType.REQUEST_ONRAMP]: RequestOnrampEvent;
   [OrchestrationEventType.REQUEST_ADD_FUNDS]: RequestAddFundsEvent;
+  [OrchestrationEventType.REQUEST_GO_BACK]: RequestGoBackEvent;
 };
 
 type ProviderEventMapping = {
@@ -208,7 +210,6 @@ export type WidgetEventData = {
 
   [WidgetType.ADD_FUNDS]: {
     [AddFundsEventType.CLOSE_WIDGET]: {};
-    [AddFundsEventType.GO_BACK]: {};
     [AddFundsEventType.REQUEST_BRIDGE]: {};
     [AddFundsEventType.REQUEST_SWAP]: {};
     [AddFundsEventType.REQUEST_ONRAMP]: {};

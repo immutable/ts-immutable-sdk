@@ -8,6 +8,7 @@ export enum OrchestrationEventType {
   REQUEST_BRIDGE = 'request-bridge',
   REQUEST_ONRAMP = 'request-onramp',
   REQUEST_ADD_FUNDS = 'request-add-funds',
+  REQUEST_GO_BACK = 'request-go-back',
 }
 
 /**
@@ -73,6 +74,12 @@ export type RequestOnrampEvent = {
 export type RequestAddFundsEvent = {
 };
 
+/**
+ * Represents the object provide after go back event is requested
+ */
+export type RequestGoBackEvent = {
+};
+
 /*
 * Type representing the orchestration events.
 */
@@ -81,4 +88,5 @@ export type OrchestrationEventData =
   | RequestWalletEvent
   | RequestSwapEvent
   | RequestBridgeEvent
-  | RequestOnrampEvent;
+  | RequestOnrampEvent
+  | RequestGoBackEvent;

@@ -1,15 +1,12 @@
-import { AddFundsWidgetParams, Checkout } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import {
   useContext, useEffect, useMemo, useReducer,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  sendAddFundsCloseEvent,
-  sendAddFundsGoBackEvent,
-} from './AddFundsWidgetEvents';
-import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
+import { AddFundsWidgetParams, Checkout } from '@imtbl/checkout-sdk';
 
+import { sendAddFundsCloseEvent } from './AddFundsWidgetEvents';
+import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import {
   AddFundsActions, AddFundsContext, addFundsReducer, initialAddFundsState,
 } from './context/AddFundsContext';
@@ -39,6 +36,7 @@ export default function AddFundsWidget({
   showBridgeOption = true,
   toTokenAddress,
   toAmount,
+  showBackButton,
 }: AddFundsWidgetInputs) {
   const [viewState, viewDispatch] = useReducer(viewReducer, {
     ...initialViewState,
@@ -145,11 +143,11 @@ export default function AddFundsWidget({
             provider={web3Provider}
             toTokenAddress={toTokenAddress}
             toAmount={toAmount}
+            showBackButton={showBackButton}
             showOnrampOption={showOnrampOption}
             showSwapOption={showSwapOption}
             showBridgeOption={showBridgeOption}
             onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
-            onBackButtonClick={() => sendAddFundsGoBackEvent(eventTarget)}
           />
         )}
         {viewState.view.type === SharedViews.ERROR_VIEW && (
