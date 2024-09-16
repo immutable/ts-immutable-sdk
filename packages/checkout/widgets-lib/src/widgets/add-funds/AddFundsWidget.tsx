@@ -11,16 +11,20 @@ import {
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 
 import {
-  AddFundsActions, AddFundsContext,
+  AddFundsActions, AddFundsContext, addFundsReducer, initialAddFundsState,
 } from './context/AddFundsContext';
-import { useAnalytics, UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { AddFundsWidgetViews } from '../../context/view-context/AddFundsViewContextTypes';
 import {
-  initialViewState, SharedViews, ViewContext, viewReducer,
+  initialViewState,
+  SharedViews,
+  ViewContext,
+  viewReducer,
 } from '../../context/view-context/ViewContext';
 import { AddFunds } from './views/AddFunds';
 import { ErrorView } from '../../views/error/ErrorView';
-import { AddFundsContextProvider } from './context/AddFundsContextProvider';
+import { useSquid } from './hooks/useSquid';
+import { useAnalytics, UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { fetchChains } from './functions/fetchChains';
 
 export type AddFundsWidgetInputs = AddFundsWidgetParams & {
   checkout: Checkout;
@@ -33,17 +37,14 @@ export default function AddFundsWidget({
   showOnrampOption = true,
   showSwapOption = true,
   showBridgeOption = true,
-  tokenAddress,
-  amount,
+  toTokenAddress,
+  toAmount,
 }: AddFundsWidgetInputs) {
-  const [viewState, viewDispatch] = useReducer(
-    viewReducer,
-    {
-      ...initialViewState,
-      view: { type: AddFundsWidgetViews.ADD_FUNDS },
-      history: [{ type: AddFundsWidgetViews.ADD_FUNDS }],
-    },
-  );
+  const [viewState, viewDispatch] = useReducer(viewReducer, {
+    ...initialViewState,
+    view: { type: AddFundsWidgetViews.ADD_FUNDS },
+    history: [{ type: AddFundsWidgetViews.ADD_FUNDS }],
+  });
   const { t } = useTranslation();
   const { page } = useAnalytics();
 
@@ -54,7 +55,62 @@ export default function AddFundsWidget({
     }),
     [viewState, viewReducer],
   );
-  const { addFundsDispatch } = useContext(AddFundsContext);
+
+  const [addFundsState, addFundsDispatch] = useReducer(addFundsReducer, initialAddFundsState);
+
+  const addFundsReducerValues = useMemo(
+    () => ({
+      addFundsState,
+      addFundsDispatch,
+    }),
+    [addFundsState, addFundsDispatch],
+  );
+
+  const squid = useSquid(checkout);
+
+  useEffect(() => {
+    (async () => {
+      const chains = await fetchChains();
+
+      addFundsDispatch({
+        payload: {
+          type: AddFundsActions.SET_CHAINS,
+          chains,
+        },
+      });
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (!addFundsState.squid || !addFundsState.chains || !addFundsState.provider) return;
+
+    (async () => {
+      const chainIds = addFundsState.chains.map((chain) => chain.id);
+      const fromAddress = await addFundsState.provider?.getSigner().getAddress();
+
+      const balances = await addFundsState.squid?.getAllBalances({
+        chainIds,
+        evmAddress: fromAddress,
+      });
+      addFundsDispatch({
+        payload: {
+          type: AddFundsActions.SET_BALANCES,
+          balances: balances?.evmBalances ?? [],
+        },
+      });
+    })();
+  }, [addFundsState.squid, addFundsState.chains, addFundsState.provider]);
+
+  useEffect(() => {
+    if (!squid || addFundsState.squid) return;
+
+    addFundsDispatch({
+      payload: {
+        type: AddFundsActions.SET_SQUID,
+        squid,
+      },
+    });
+  }, [squid]);
 
   useEffect(() => {
     if (!web3Provider) return;
@@ -82,34 +138,34 @@ export default function AddFundsWidget({
 
   return (
     <ViewContext.Provider value={viewReducerValues}>
-      <AddFundsContextProvider>
+      <AddFundsContext.Provider value={addFundsReducerValues}>
         {viewState.view.type === AddFundsWidgetViews.ADD_FUNDS && (
-        <AddFunds
-          checkout={checkout}
-          provider={web3Provider}
-          tokenAddress={tokenAddress}
-          amount={amount}
-          showOnrampOption={showOnrampOption}
-          showSwapOption={showSwapOption}
-          showBridgeOption={showBridgeOption}
-          onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
-          onBackButtonClick={() => sendAddFundsGoBackEvent(eventTarget)}
-        />
+          <AddFunds
+            checkout={checkout}
+            provider={web3Provider}
+            toTokenAddress={toTokenAddress}
+            toAmount={toAmount}
+            showOnrampOption={showOnrampOption}
+            showSwapOption={showSwapOption}
+            showBridgeOption={showBridgeOption}
+            onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
+            onBackButtonClick={() => sendAddFundsGoBackEvent(eventTarget)}
+          />
         )}
         {viewState.view.type === SharedViews.ERROR_VIEW && (
-        <ErrorView
-          actionText={t('views.ERROR_VIEW.actionText')}
-          onActionClick={() => undefined}
-          onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
-          errorEventAction={() => {
-            page({
-              userJourney: UserJourney.ADD_FUNDS,
-              screen: 'Error',
-            });
-          }}
-        />
+          <ErrorView
+            actionText={t('views.ERROR_VIEW.actionText')}
+            onActionClick={() => undefined}
+            onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
+            errorEventAction={() => {
+              page({
+                userJourney: UserJourney.ADD_FUNDS,
+                screen: 'Error',
+              });
+            }}
+          />
         )}
-      </AddFundsContextProvider>
+      </AddFundsContext.Provider>
     </ViewContext.Provider>
   );
 }

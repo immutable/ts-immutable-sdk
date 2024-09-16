@@ -52,6 +52,7 @@ describe('Passport', () => {
   let getProviderSilentMock: jest.Mock;
   let getLinkedAddressesMock: jest.Mock;
   let linkExternalWalletMock: jest.Mock;
+  let forceUserRefreshMock: jest.Mock;
 
   beforeEach(() => {
     authLoginMock = jest.fn().mockReturnValue(mockUser);
@@ -67,6 +68,7 @@ describe('Passport', () => {
     getProviderSilentMock = jest.fn();
     getLinkedAddressesMock = jest.fn();
     linkExternalWalletMock = jest.fn();
+    forceUserRefreshMock = jest.fn();
     (AuthManager as unknown as jest.Mock).mockReturnValue({
       login: authLoginMock,
       loginCallback: loginCallbackMock,
@@ -75,6 +77,7 @@ describe('Passport', () => {
       getDeviceFlowEndSessionEndpoint: getDeviceFlowEndSessionEndpointMock,
       getUser: getUserMock,
       requestRefreshTokenAfterRegistration: requestRefreshTokenMock,
+      forceUserRefresh: forceUserRefreshMock,
     });
     (MagicAdapter as jest.Mock).mockReturnValue({
       login: magicLoginMock,
@@ -493,7 +496,7 @@ describe('Passport', () => {
       expect(user).toEqual(mockUser.profile);
     });
 
-    it('should login if login sliently returns error', async () => {
+    it('should login if login silently returns error', async () => {
       getUserMock.mockRejectedValue(new Error('Unknown or invalid refresh token.'));
       authLoginMock.mockReturnValue(mockUserImx);
       const user = await passport.login();
@@ -546,6 +549,15 @@ describe('Passport', () => {
           e,
         );
       }
+    });
+
+    it('should try to login silently if silent is true', async () => {
+      getUserMock.mockReturnValue(null);
+
+      await passport.login({ useSilentLogin: true });
+
+      expect(forceUserRefreshMock).toBeCalledTimes(1);
+      expect(authLoginMock).toBeCalledTimes(0);
     });
   });
 
