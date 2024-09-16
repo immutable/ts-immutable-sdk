@@ -144,6 +144,7 @@ export type {
   TransactionRequirement,
   WalletFilter,
   WalletInfo,
+  SquidConfig,
 } from './types';
 
 export {
