@@ -48,6 +48,7 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint"
   },
+  "packageManager": "pnpm@9.12.0",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
@@ -55,26 +56,25 @@
   },
   "scripts": {
     "build": "nx run @imtbl/sdk:build",
-    "build:examples": "pnpm workspaces foreach -Apt --include='@examples/**' run build",
+    "build:examples": "pnpm --recursive --filter '@examples/**' build",
     "build:onlysdk": "NODE_OPTIONS=--max-old-space-size=14366 nx run-many --target=build --projects=@imtbl/sdk && pnpm syncpack:format",
     "dev": "./dev.sh",
     "docs:build": "typedoc",
     "docs:serve": "http-server ./docs --cors -p 8080 -c-1",
     "lint": "nx affected -t lint",
-    "lint:examples": "pnpm workspaces foreach -Apt --include='@examples/**' run lint",
+    "lint:examples": "pnpm --recursive --filter '@examples/**' lint",
     "nx": "nx",
     "postinstall": "husky install",
-    "prepare:examples": "pnpm build:onlysdk && pnpm yalc:sdk:publish && pnpm workspaces foreach -Apt --include='@examples/**' exec pnpm dlx yalc add @imtbl/sdk && pnpm install --no-immutable",
-    "prepare:tests": "pnpm build:onlysdk && pnpm yalc:sdk:publish && pnpm workspaces foreach -Apt --include='@tests/**' exec pnpm dlx yalc add @imtbl/sdk && pnpm install --no-immutable",
+    "prepare:examples": "pnpm build:onlysdk && pnpm yalc:sdk:publish && pnpm --recursive --filter '@examples/**' exec pnpm dlx yalc add @imtbl/sdk && pnpm install --frozen-lockfile=false",
+    "prepare:tests": "pnpm build:onlysdk && pnpm yalc:sdk:publish && pnpm --recursive --filter '@examples/**' exec pnpm dlx yalc add @imtbl/sdk && pnpm install --frozen-lockfile=false",
     "release": "release-it",
     "syncpack:check": "pnpm syncpack list-mismatches",
     "syncpack:fix": "pnpm syncpack fix-mismatches",
     "syncpack:format": "pnpm syncpack format",
     "test": "nx affected -t test",
-    "test:examples": "pnpm workspaces foreach -At --include='@examples/**' run test",
+    "test:examples": "pnpm --recursive --sequential --filter '@examples/**' test",
     "test:vpn": "RUN_VPN_TESTS=1 wsrun --exclude-missing -e test",
     "typecheck": "nx affected -t typecheck",
-    "yalc:sdk:publish": "pnpm workspace @imtbl/sdk exec pnpm dlx yalc publish"
-  },
-  "packageManager": "pnpm@9.12.0"
+    "yalc:sdk:publish": "pnpm --filter @imtbl/sdk exec pnpm dlx yalc publish"
+  }
 }
