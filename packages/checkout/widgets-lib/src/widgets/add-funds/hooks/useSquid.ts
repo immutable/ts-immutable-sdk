@@ -1,6 +1,5 @@
 import { Squid } from '@0xsquid/sdk';
 import { useEffect, useState } from 'react';
-import { SQUID_SDK_BASE_URL } from '../utils/config';
 
 export const useSquid = () => {
   const [squid, setSquid] = useState<Squid | null>(null);
@@ -11,10 +10,7 @@ export const useSquid = () => {
     }
 
     const initialiseSquid = async () => {
-      const squidSDK = new Squid({
-        baseUrl: SQUID_SDK_BASE_URL,
-        integratorId: '',
-      });
+      const squidSDK = null;
 
       setSquid(squidSDK);
     };
