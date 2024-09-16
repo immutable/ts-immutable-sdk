@@ -16,7 +16,6 @@ export const useSquid = () => {
         integratorId: '',
       });
 
-      await squidSDK.init();
       setSquid(squidSDK);
     };
 
