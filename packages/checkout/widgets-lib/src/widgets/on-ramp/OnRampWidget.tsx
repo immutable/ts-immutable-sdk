@@ -137,7 +137,7 @@ export default function OnRampWidget({
           tokenAddress={
               tknAddr ?? viewState.view.data?.tokenAddress
           }
-          showBackButton={!!showBackButton}
+          showBackButton={showBackButton}
         />
       )}
 

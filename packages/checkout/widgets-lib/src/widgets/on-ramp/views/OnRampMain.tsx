@@ -37,7 +37,7 @@ interface OnRampProps {
   tokenAmount?: string;
   tokenAddress?: string;
   passport?: Passport;
-  showBackButton: boolean;
+  showBackButton?: boolean;
 }
 export function OnRampMain({
   passport,

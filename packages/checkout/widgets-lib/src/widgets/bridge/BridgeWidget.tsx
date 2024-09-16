@@ -69,7 +69,6 @@ export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
   checkout: Checkout;
   web3Provider?: Web3Provider;
-  showBackButton: boolean;
 };
 
 export default function BridgeWidget({
