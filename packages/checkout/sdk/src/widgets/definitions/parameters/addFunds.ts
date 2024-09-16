@@ -14,10 +14,10 @@ export type AddFundsWidgetParams = {
   showBridgeOption?: boolean;
 
   /** Token address of the fund to be added */
-  tokenAddress?: string;
+  toTokenAddress?: string;
 
   /** Amount of the fund to be added */
-  amount?: string;
+  toAmount?: string;
 
   /** Whether to show a back button on the first screen, on click triggers REQUEST_GO_BACK event */
   showBackButton?: boolean;

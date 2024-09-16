@@ -1,20 +1,26 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { createContext, useMemo, useReducer } from 'react';
+import { createContext } from 'react';
 import { Checkout, TokenInfo } from '@imtbl/checkout-sdk';
 import { Squid } from '@0xsquid/sdk';
+import { TokenBalance } from '@0xsquid/sdk/dist/types';
+import { Chain } from '../types';
 
 export interface AddFundsState {
   checkout: Checkout | null;
   provider: Web3Provider | null;
-  allowedTokens: TokenInfo[] | null;
+  allowedTokens: TokenInfo[];
   squid: Squid | null;
+  chains: Chain[];
+  balances: TokenBalance[];
 }
 
-const initialAddFundsState: AddFundsState = {
+export const initialAddFundsState: AddFundsState = {
   checkout: null,
   provider: null,
-  allowedTokens: null,
+  allowedTokens: [],
   squid: null,
+  chains: [],
+  balances: [],
 };
 
 export interface AddFundsContextState {
@@ -30,13 +36,17 @@ type ActionPayload =
   | SetCheckoutPayload
   | SetProviderPayload
   | SetAllowedTokensPayload
-  | SetSquid;
+  | SetSquid
+  | SetChains
+  | SetBalances;
 
 export enum AddFundsActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
   SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
   SET_SQUID = 'SET_SQUID',
+  SET_CHAINS = 'SET_CHAINS',
+  SET_BALANCES = 'SET_BALANCES',
 }
 
 export interface SetCheckoutPayload {
@@ -58,6 +68,15 @@ export interface SetSquid {
   squid: Squid;
 }
 
+export interface SetChains {
+  type: AddFundsActions.SET_CHAINS;
+  chains: Chain[];
+}
+export interface SetBalances {
+  type: AddFundsActions.SET_BALANCES;
+  balances: TokenBalance[];
+}
+
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const AddFundsContext = createContext<AddFundsContextState>({
   addFundsState: initialAddFundsState,
@@ -66,9 +85,9 @@ export const AddFundsContext = createContext<AddFundsContextState>({
 
 AddFundsContext.displayName = 'AddFundsContext';
 
-type Reducer<S, A> = (prevState: S, action: A) => S;
+export type Reducer<S, A> = (prevState: S, action: A) => S;
 
-const addFundsReducer: Reducer<AddFundsState, AddFundsAction> = (
+export const addFundsReducer: Reducer<AddFundsState, AddFundsAction> = (
   state: AddFundsState,
   action: AddFundsAction,
 ) => {
@@ -93,13 +112,17 @@ const addFundsReducer: Reducer<AddFundsState, AddFundsAction> = (
         ...state,
         squid: action.payload.squid,
       };
+    case AddFundsActions.SET_CHAINS:
+      return {
+        ...state,
+        chains: action.payload.chains,
+      };
+    case AddFundsActions.SET_BALANCES:
+      return {
+        ...state,
+        balances: action.payload.balances,
+      };
     default:
       return state;
   }
-};
-
-export const useAddFundsValues = (overrides: Partial<AddFundsState> = {}) => {
-  const [addFundsState, addFundsDispatch] = useReducer(addFundsReducer, { ...initialAddFundsState, ...overrides });
-  const values = useMemo(() => ({ addFundsState, addFundsDispatch }), [addFundsState, addFundsDispatch]);
-  return values;
 };

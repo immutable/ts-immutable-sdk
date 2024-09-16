@@ -48,10 +48,10 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
   ): AddFundsWidgetParams {
     const validatedParams = params;
 
-    if (!isValidAmount(params.amount)) {
+    if (!isValidAmount(params.toAmount)) {
       // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "amount" widget input');
-      validatedParams.amount = '';
+      console.warn('[IMTBL]: invalid "toAmount" widget input');
+      validatedParams.toAmount = '';
     }
 
     return validatedParams;
@@ -94,8 +94,8 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
                     showBridgeOption={this.parameters.showBridgeOption}
                     showSwapOption={this.parameters.showSwapOption}
                     showOnrampOption={this.parameters.showOnrampOption}
-                    tokenAddress={this.parameters.tokenAddress}
-                    amount={this.parameters.amount}
+                    toTokenAddress={this.parameters.toTokenAddress}
+                    toAmount={this.parameters.toAmount}
                     showBackButton={this.parameters.showBackButton}
                   />
                 </Suspense>

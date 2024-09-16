@@ -7,11 +7,9 @@ import { AddFundsWidgetParams, Checkout } from '@imtbl/checkout-sdk';
 
 import { sendAddFundsCloseEvent } from './AddFundsWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
-import { AddFundsActions, AddFundsContext } from './context/AddFundsContext';
 import {
-  useAnalytics,
-  UserJourney,
-} from '../../context/analytics-provider/SegmentAnalyticsProvider';
+  AddFundsActions, AddFundsContext, addFundsReducer, initialAddFundsState,
+} from './context/AddFundsContext';
 import { AddFundsWidgetViews } from '../../context/view-context/AddFundsViewContextTypes';
 import {
   initialViewState,
@@ -21,7 +19,9 @@ import {
 } from '../../context/view-context/ViewContext';
 import { AddFunds } from './views/AddFunds';
 import { ErrorView } from '../../views/error/ErrorView';
-import { AddFundsContextProvider } from './context/AddFundsContextProvider';
+import { useSquid } from './hooks/useSquid';
+import { useAnalytics, UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { fetchChains } from './functions/fetchChains';
 
 export type AddFundsWidgetInputs = AddFundsWidgetParams & {
   checkout: Checkout;
@@ -34,8 +34,8 @@ export default function AddFundsWidget({
   showOnrampOption = true,
   showSwapOption = true,
   showBridgeOption = true,
-  tokenAddress,
-  amount,
+  toTokenAddress,
+  toAmount,
   showBackButton,
 }: AddFundsWidgetInputs) {
   const [viewState, viewDispatch] = useReducer(viewReducer, {
@@ -53,7 +53,62 @@ export default function AddFundsWidget({
     }),
     [viewState, viewReducer],
   );
-  const { addFundsDispatch } = useContext(AddFundsContext);
+
+  const [addFundsState, addFundsDispatch] = useReducer(addFundsReducer, initialAddFundsState);
+
+  const addFundsReducerValues = useMemo(
+    () => ({
+      addFundsState,
+      addFundsDispatch,
+    }),
+    [addFundsState, addFundsDispatch],
+  );
+
+  const squid = useSquid(checkout);
+
+  useEffect(() => {
+    (async () => {
+      const chains = await fetchChains();
+
+      addFundsDispatch({
+        payload: {
+          type: AddFundsActions.SET_CHAINS,
+          chains,
+        },
+      });
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (!addFundsState.squid || !addFundsState.chains || !addFundsState.provider) return;
+
+    (async () => {
+      const chainIds = addFundsState.chains.map((chain) => chain.id);
+      const fromAddress = await addFundsState.provider?.getSigner().getAddress();
+
+      const balances = await addFundsState.squid?.getAllBalances({
+        chainIds,
+        evmAddress: fromAddress,
+      });
+      addFundsDispatch({
+        payload: {
+          type: AddFundsActions.SET_BALANCES,
+          balances: balances?.evmBalances ?? [],
+        },
+      });
+    })();
+  }, [addFundsState.squid, addFundsState.chains, addFundsState.provider]);
+
+  useEffect(() => {
+    if (!squid || addFundsState.squid) return;
+
+    addFundsDispatch({
+      payload: {
+        type: AddFundsActions.SET_SQUID,
+        squid,
+      },
+    });
+  }, [squid]);
 
   useEffect(() => {
     if (!web3Provider) return;
@@ -81,13 +136,13 @@ export default function AddFundsWidget({
 
   return (
     <ViewContext.Provider value={viewReducerValues}>
-      <AddFundsContextProvider>
+      <AddFundsContext.Provider value={addFundsReducerValues}>
         {viewState.view.type === AddFundsWidgetViews.ADD_FUNDS && (
           <AddFunds
             checkout={checkout}
             provider={web3Provider}
-            tokenAddress={tokenAddress}
-            amount={amount}
+            toTokenAddress={toTokenAddress}
+            toAmount={toAmount}
             showBackButton={showBackButton}
             showOnrampOption={showOnrampOption}
             showSwapOption={showSwapOption}
@@ -108,7 +163,7 @@ export default function AddFundsWidget({
             }}
           />
         )}
-      </AddFundsContextProvider>
+      </AddFundsContext.Provider>
     </ViewContext.Provider>
   );
 }

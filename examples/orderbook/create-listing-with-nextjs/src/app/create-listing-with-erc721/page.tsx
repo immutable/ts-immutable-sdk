@@ -208,7 +208,7 @@ export default function CreateERC721ListingWithPassport() {
           Passport
         </Heading>
         <Grid>
-          {accountsState.length === 0 && (
+          {accountsState.length === 0 ? (
             <Box sx={{ marginBottom: "base.spacing.x5" }}>
               <Button
                 size="medium"
@@ -220,8 +220,8 @@ export default function CreateERC721ListingWithPassport() {
                 Login
               </Button>
             </Box>
-          )}
-          {accountsState.length >= 1 && (
+          ) : null}
+          {accountsState.length >= 1 ? (
             <Box sx={{ marginBottom: "base.spacing.x5" }}>
               <Button
                 size="medium"
@@ -233,7 +233,7 @@ export default function CreateERC721ListingWithPassport() {
                 Logout
               </Button>
             </Box>
-          )}
+          ) : null}
           {loading ? (
             <LoadingOverlay visible>
               <LoadingOverlay.Content>
@@ -255,7 +255,7 @@ export default function CreateERC721ListingWithPassport() {
         <Heading size="medium" sx={{ marginBottom: "base.spacing.x5" }}>
           Create ERC721 listing
         </Heading>
-        {successMessage && (
+        {successMessage ? (
           <Box
             sx={{
               color: "green",
@@ -265,12 +265,18 @@ export default function CreateERC721ListingWithPassport() {
           >
             {successMessage}
           </Box>
-        )}
-        {listingError && (
-          <Box sx={{ color: "red", marginBottom: "base.spacing.x5" }}>
+        ) : null}
+        {listingError ? (
+          <Box sx={{
+            color: "red",
+            marginBottom: "base.spacing.x5",
+            maxWidth: "1300px",
+            maxHeight: "400px",
+            overflowY: "auto",
+          }}>
             {listingError}
           </Box>
-        )}
+        ) : null}
         <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
           <FormControl.Label>NFT Contract Address</FormControl.Label>
           <TextInput onChange={handleSellItemContractAddressChange} />
@@ -298,12 +304,12 @@ export default function CreateERC721ListingWithPassport() {
             </Select.Option>
           </Select>
         </FormControl>
-        {showBuyItemContractAddress && (
+        {showBuyItemContractAddress ? (
           <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
             <FormControl.Label>Currency Contract Address</FormControl.Label>
             <TextInput onChange={handleBuyItemContractAddressChange} />
           </FormControl>
-        )}
+        ) : null}
         <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
           <FormControl.Label>Currency Amount</FormControl.Label>
           <TextInput onChange={handleBuyItemAmountChange} />

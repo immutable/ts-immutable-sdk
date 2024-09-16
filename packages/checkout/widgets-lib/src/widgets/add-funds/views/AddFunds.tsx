@@ -35,8 +35,8 @@ interface AddFundsProps {
   showOnrampOption?: boolean;
   showSwapOption?: boolean;
   showBridgeOption?: boolean;
-  tokenAddress?: string;
-  amount?: string;
+  toTokenAddress?: string;
+  toAmount?: string;
   onCloseButtonClick?: () => void;
   onBackButtonClick?: () => void;
 }
@@ -44,8 +44,8 @@ interface AddFundsProps {
 export function AddFunds({
   checkout,
   provider,
-  amount,
-  tokenAddress,
+  toAmount,
+  toTokenAddress,
   showBackButton = false,
   showOnrampOption = true,
   showSwapOption = true,
@@ -73,8 +73,12 @@ export function AddFunds({
     [],
   );
   const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
-  const [toAmount, setToAmount] = useState<string>(amount || '0');
-  const [toTokenAddress, setToTokenAddress] = useState<TokenInfo | undefined>();
+  const [currentToAmount, setCurrentToAmount] = useState<string>(
+    toAmount || '0',
+  );
+  const [currentToTokenAddress, setCurrentToTokenAddress] = useState<
+  TokenInfo | undefined
+  >();
 
   const showErrorView = useCallback(
     (error: Error) => {
@@ -107,9 +111,9 @@ export function AddFunds({
         if (tokenResponse?.tokens.length > 0) {
           setAllowedTokens(tokenResponse.tokens);
 
-          const token = tokenResponse.tokens.find((t) => t.address === tokenAddress)
+          const token = tokenResponse.tokens.find((t) => t.address === toTokenAddress)
             || tokenResponse.tokens[0];
-          setToTokenAddress(token);
+          setCurrentToTokenAddress(token);
 
           addFundsDispatch({
             payload: {
@@ -124,7 +128,7 @@ export function AddFunds({
     };
 
     fetchTokens();
-  }, [checkout, tokenAddress]);
+  }, [checkout, toTokenAddress]);
 
   useEffect(() => {
     if (!checkout) {
@@ -154,15 +158,15 @@ export function AddFunds({
   };
 
   const updateAmount = (value: string) => {
-    setToAmount(value);
+    setCurrentToAmount(value);
   };
 
-  const isSelected = (token: TokenInfo) => token.address === toTokenAddress;
+  const isSelected = (token: TokenInfo) => token.address === currentToTokenAddress;
 
-  const isDisabled = !toTokenAddress || !toAmount || parseFloat(toAmount) <= 0;
+  const isDisabled = !currentToTokenAddress || !toAmount || parseFloat(toAmount) <= 0;
 
   const handleTokenChange = (token: TokenInfo) => {
-    setToTokenAddress(token);
+    setCurrentToTokenAddress(token);
   };
 
   // const handleReviewClick = () => {
@@ -171,7 +175,7 @@ export function AddFunds({
 
   const onPayWithCard = (paymentType: OptionTypes) => {
     console.log('paymentType', paymentType);
-    console.log('=== toTokenAddress', toTokenAddress);
+    console.log('=== toTokenAddress', currentToTokenAddress);
     console.log('=== toAmount', toAmount);
 
     if (paymentType === OptionTypes.SWAP) {
@@ -179,14 +183,14 @@ export function AddFunds({
         eventTarget,
         IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
         {
-          toTokenAddress: toTokenAddress?.address ?? '',
+          toTokenAddress: currentToTokenAddress?.address ?? '',
           amount: toAmount ?? '',
           fromTokenAddress: '',
         },
       );
     } else {
       const data = {
-        tokenAddress: toTokenAddress?.address ?? '',
+        tokenAddress: currentToTokenAddress?.address ?? '',
         amount: toAmount ?? '',
       };
       orchestrationEvents.sendRequestOnrampEvent(
@@ -198,9 +202,10 @@ export function AddFunds({
   };
 
   const checkShowOnRampOption = () => {
-    if (showOnrampOption && toTokenAddress) {
+    if (showOnrampOption && currentToTokenAddress) {
       const token = onRampAllowedTokens.find(
-        (t) => t.address?.toLowerCase() === toTokenAddress.address?.toLowerCase(),
+        (t) => t.address?.toLowerCase()
+          === currentToTokenAddress.address?.toLowerCase(),
       );
       return !!token;
     }
@@ -245,7 +250,7 @@ export function AddFunds({
               <TextInputForm
                 testId="add-funds-amount"
                 type="number"
-                value={toAmount}
+                value={currentToAmount}
                 validator={amountInputValidation}
                 onTextInputChange={(value) => updateAmount(value)}
                 textAlign="right"
@@ -264,7 +269,7 @@ export function AddFunds({
               }}
             >
               <Body size="large" weight="bold">
-                {toTokenAddress?.name ?? ''}
+                {currentToTokenAddress?.name ?? ''}
               </Body>
               <OverflowPopoverMenu testId="add-funds-tokens-menu">
                 {allowedTokens.map((token: any) => (
