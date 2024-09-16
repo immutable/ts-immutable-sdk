@@ -62,6 +62,7 @@ export default function SwapWidget({
   config,
   autoProceed,
   direction,
+  showBackButton,
 }: SwapWidgetInputs) {
   const { t } = useTranslation();
   const {
@@ -225,6 +226,7 @@ export default function SwapWidget({
             toAmount={viewState.view.data?.toAmount ?? toAmount}
             fromTokenAddress={viewState.view.data?.fromTokenAddress ?? fromTokenAddress}
             toTokenAddress={viewState.view.data?.toTokenAddress ?? toTokenAddress}
+            showBackButton={showBackButton}
           />
           )}
           {viewState.view.type === SwapWidgetViews.IN_PROGRESS && (
