@@ -89,7 +89,7 @@ jobs:
 
       - name: Test examples
         run: pnpm test:examples
-
+        
   func-tests:
     name: Functional tests
     runs-on: ubuntu-latest-8-cores
