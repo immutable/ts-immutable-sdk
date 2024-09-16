@@ -82,7 +82,7 @@ function sendRequestGoBackEvent(
   });
   // TODO: please remove or if necessary keep the eslint ignore
   // eslint-disable-next-line no-console
-  console.log('go back event:', eventTarget, requestGoBackEvent);
+  console.log(`go back event from ${imtblWidgetEvent}:`, eventTarget, requestGoBackEvent);
   if (eventTarget !== undefined) eventTarget.dispatchEvent(requestGoBackEvent);
 }
 
