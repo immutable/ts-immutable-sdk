@@ -1,5 +1,5 @@
 name: "Setup"
-description: "Do necessary setup for NX, node, yarn cache and deps install"
+description: "Do necessary setup for NX, node, pnpm cache and deps install"
 
 runs:
   using: "composite"
@@ -7,12 +7,15 @@ runs:
     - name: Derive appropriate SHAs for base and head for `nx affected` commands
       uses: nrwl/nx-set-shas@v3
 
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+
     - name: Use Node.js
       uses: actions/setup-node@v4
       with:
         node-version-file: ".nvmrc"
         registry-url: https://registry.npmjs.org/
-        cache: "yarn"
+        cache: "pnpm"
 
     - name: Restore cached node_modules
       id: restore-cache-node_modules
@@ -20,10 +23,9 @@ runs:
       with:
         path: |
           **/node_modules
-          .yarn/install-state.gz
-        key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
+        key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('pnpm-lock.yaml') }}
 
     - name: install dependencies
       if: steps.restore-cache-node_modules.outputs.cache-hit != 'true'
       shell: bash
-      run: yarn install --immutable
+      run: pnpm install --frozen-lockfile
