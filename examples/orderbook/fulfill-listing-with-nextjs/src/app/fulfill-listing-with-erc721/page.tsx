@@ -117,15 +117,15 @@ export default function FulfillERC721WithPassport() {
 
   const getListings = async (
     client: orderbook.Orderbook,
-    sellItemContractAddrs?: string,
+    sellItemContractAddress?: string,
     buyItemType?: "NATIVE" | "ERC20",
   ): Promise<orderbook.Order[]> => {
     let params: orderbook.ListListingsParams = {
       pageSize: 50,
       sortBy: "created_at",
       status: OrderStatusName.ACTIVE,
-      sellItemContractAddress: sellItemContractAddrs ?? sellItemContractAddrs,
-      buyItemType: buyItemType ?? buyItemType,
+      sellItemContractAddress,
+      buyItemType,
     };
     const listings = await client.listListings(params);
     return listings.result;
@@ -197,7 +197,7 @@ export default function FulfillERC721WithPassport() {
           Passport
         </Heading>
         <Grid>
-          {accountsState.length === 0 && (
+          {accountsState.length === 0 ? (
             <Box sx={{ marginBottom: "base.spacing.x5" }}>
               <Button
                 size="medium"
@@ -209,8 +209,8 @@ export default function FulfillERC721WithPassport() {
                 Login
               </Button>
             </Box>
-          )}
-          {accountsState.length >= 1 && (
+          ) : null}
+          {accountsState.length >= 1 ? (
             <Box sx={{ marginBottom: "base.spacing.x5" }}>
               <Button
                 size="medium"
@@ -222,7 +222,7 @@ export default function FulfillERC721WithPassport() {
                 Logout
               </Button>
             </Box>
-          )}
+          ) : null}
           {loading ? (
             <LoadingOverlay visible>
               <LoadingOverlay.Content>
@@ -244,7 +244,7 @@ export default function FulfillERC721WithPassport() {
         <Heading size="medium" sx={{ marginBottom: "base.spacing.x5" }}>
           Fulfill Listing - ERC721 Fulfillment
         </Heading>
-        {successMessage && (
+        {successMessage ? (
           <Box
             sx={{
               color: "green",
@@ -254,8 +254,8 @@ export default function FulfillERC721WithPassport() {
           >
             {successMessage}
           </Box>
-        )}
-        {errorMessage && (
+        ) : null}
+        {errorMessage ? (
           <Box
             sx={{
               color: "red",
@@ -265,7 +265,7 @@ export default function FulfillERC721WithPassport() {
           >
             {errorMessage}
           </Box>
-        )}
+        ) : null}
       </Box>
       <Box>
         <Grid>
@@ -294,7 +294,7 @@ export default function FulfillERC721WithPassport() {
           </FormControl>
         </Grid>
       </Box>
-      {listings && listings.length > 0 && (
+      {listings && listings.length > 0 ? (
           <Box sx={{ maxHeight: "800px", marginBottom: "base.spacing.x5" }}>
             <Table sx={{ marginLeft: "base.spacing.x5", maxWidth: "1300px", maxHeight: "400px", overflowY: "auto", marginBottom: "base.spacing.x5"}}>
             <Table.Head>
@@ -330,7 +330,7 @@ export default function FulfillERC721WithPassport() {
             </Table.Body>
           </Table>
         </Box>
-      )}
+      ) : null}
       <Link rc={<NextLink href="/" />}>Return to Examples</Link>
     </Box>
   );
