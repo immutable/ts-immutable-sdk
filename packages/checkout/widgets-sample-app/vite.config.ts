@@ -25,7 +25,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      'jsbi': path.resolve(__dirname, '../../../node_modules/jsbi'),
+      'jsbi': path.resolve(__dirname, './node_modules/jsbi'),
     },
     conditions: ["default"]
   }
