@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { createContext, useMemo, useReducer } from 'react';
+import { createContext } from 'react';
 import { Checkout, TokenInfo } from '@imtbl/checkout-sdk';
 import { Squid } from '@0xsquid/sdk';
 
@@ -10,7 +10,7 @@ export interface AddFundsState {
   squid: Squid | null;
 }
 
-const initialAddFundsState: AddFundsState = {
+export const initialAddFundsState: AddFundsState = {
   checkout: null,
   provider: null,
   allowedTokens: null,
@@ -66,9 +66,9 @@ export const AddFundsContext = createContext<AddFundsContextState>({
 
 AddFundsContext.displayName = 'AddFundsContext';
 
-type Reducer<S, A> = (prevState: S, action: A) => S;
+export type Reducer<S, A> = (prevState: S, action: A) => S;
 
-const addFundsReducer: Reducer<AddFundsState, AddFundsAction> = (
+export const addFundsReducer: Reducer<AddFundsState, AddFundsAction> = (
   state: AddFundsState,
   action: AddFundsAction,
 ) => {
@@ -96,10 +96,4 @@ const addFundsReducer: Reducer<AddFundsState, AddFundsAction> = (
     default:
       return state;
   }
-};
-
-export const useAddFundsValues = (overrides: Partial<AddFundsState> = {}) => {
-  const [addFundsState, addFundsDispatch] = useReducer(addFundsReducer, { ...initialAddFundsState, ...overrides });
-  const values = useMemo(() => ({ addFundsState, addFundsDispatch }), [addFundsState, addFundsDispatch]);
-  return values;
 };
