@@ -60,6 +60,7 @@ export interface CheckoutModuleConfiguration extends ModuleConfiguration<Checkou
  * @property {GasEstimateTokenConfig | undefined} gasEstimateTokens
  * @property {ImxAddressConfig | undefined} imxAddressMapping
  * @property {TelemetryConfig | undefined} telemetry
+ * @property {SquidConfig | undefined} squid
  */
 export type RemoteConfiguration = {
   /** The config used for the Connect. */
@@ -78,6 +79,8 @@ export type RemoteConfiguration = {
   imxAddressMapping?: ImxAddressConfig;
   /** Telemetry config. */
   telemetry?: TelemetryConfig;
+  /** Squid config. */
+  squid?: SquidConfig;
 };
 
 /**
@@ -202,6 +205,14 @@ export type ImxAddressConfig = {
  */
 export type TelemetryConfig = {
   segmentPublishableKey: string
+};
+
+/**
+ * A type representing the squid integrator id.
+ * @property {string} integratorId
+ */
+export type SquidConfig = {
+  integratorId: string
 };
 
 /**
