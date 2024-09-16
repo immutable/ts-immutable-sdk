@@ -18,7 +18,7 @@ const transferTxnFee = 0.0035 * 1e18;
 
 // Workaround to retry banker on-chain actions which can race with test runs on other PRs
 // eslint-disable-next-line consistent-return
-async function withBankerRetry(func: () => Promise<void>, attempt = 1): Promise<void> {
+export async function withBankerRetry(func: () => Promise<void>, attempt = 1): Promise<void> {
   try {
     await func();
   } catch (e) {

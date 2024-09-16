@@ -8,31 +8,38 @@ import {
   OrderbookOverrides,
 } from './config/config';
 import {
+  mapBidFromOpenApiOrder,
   mapFromOpenApiPage,
   mapFromOpenApiTrade,
   mapListingFromOpenApiOrder,
   mapOrderFromOpenApiOrder,
 } from './openapi/mapper';
-import { CancelOrdersResult, Fee as OpenApiFee } from './openapi/sdk';
+import { ApiError, CancelOrdersResult, Fee as OpenApiFee } from './openapi/sdk';
 import { Seaport } from './seaport';
 import { getBulkSeaportOrderSignatures } from './seaport/components';
 import { SeaportLibFactory } from './seaport/seaport-lib-factory';
 import {
   Action,
   ActionType,
+  BidResult,
   CancelOrdersOnChainResponse,
+  CreateBidParams,
   CreateListingParams,
   FeeValue,
   FulfillBulkOrdersResponse,
   FulfillmentListing,
   FulfillmentOrder,
   FulfillOrderResponse,
+  ListBidsParams,
+  ListBidsResult,
   ListingResult,
   ListListingsParams,
   ListListingsResult,
   ListTradesParams,
   ListTradesResult,
   OrderStatusName,
+  PrepareBidParams,
+  PrepareBidResponse,
   PrepareBulkListingsParams,
   PrepareBulkListingsResponse,
   PrepareCancelOrdersResponse,
@@ -128,6 +135,18 @@ export class Orderbook {
   }
 
   /**
+   * Get a bid by ID
+   * @param {string} bidId - The bidId to find.
+   * @return {BidResult} The returned bid result.
+   */
+  async getBid(bidId: string): Promise<BidResult> {
+    const apiBid = await this.apiClient.getBid(bidId);
+    return {
+      result: mapBidFromOpenApiOrder(apiBid.result),
+    };
+  }
+
+  /**
    * Get a trade by ID
    * @param {string} tradeId - The tradeId to find.
    * @return {TradeResult} The returned trade result.
@@ -152,6 +171,22 @@ export class Orderbook {
     return {
       page: mapFromOpenApiPage(apiListings.page),
       result: apiListings.result.map(mapListingFromOpenApiOrder),
+    };
+  }
+
+  /**
+   * List bids. This method is used to get a list of bids filtered by conditions specified
+   * in the params object.
+   * @param {ListBidsParams} listOrderParams - Filtering, ordering and page parameters.
+   * @return {ListBidsResult} The paged bids.
+   */
+  async listBids(
+    listOrderParams: ListBidsParams,
+  ): Promise<ListBidsResult> {
+    const apiBids = await this.apiClient.listBids(listOrderParams);
+    return {
+      page: mapFromOpenApiPage(apiBids.page),
+      result: apiBids.result.map(mapBidFromOpenApiOrder),
     };
   }
 
@@ -405,6 +440,49 @@ export class Orderbook {
   }
 
   /**
+   * Get required transactions and messages for signing prior to creating a bid
+   * through the {@linkcode createBid} method
+   * @param {PrepareBidParams} prepareBidParams - Details about the bid to be created.
+   * @return {PrepareBidResponse} PrepareBidResponse includes
+   * the unsigned approval transaction, the typed order message for signing and
+   * the order components that can be submitted to {@linkcode createBid} with a signature.
+   */
+  async prepareBid({
+    makerAddress,
+    sell,
+    buy,
+    orderExpiry,
+  }: PrepareBidParams): Promise<PrepareBidResponse> {
+    return this.seaport.prepareSeaportOrder(
+      makerAddress,
+      sell,
+      buy,
+      buy.type === 'ERC1155',
+      // Default order start to now
+      new Date(),
+      // Default order expiry to 2 years from now
+      orderExpiry || Orderbook.defaultOrderExpiry(),
+    );
+  }
+
+  /**
+   * Create a bid
+   * @param {CreateBidParams} createBidParams - create a bid with the given params.
+   * @return {BidResult} The result of the bid created in the Immutable services.
+   */
+  async createBid(
+    createBidParams: CreateBidParams,
+  ): Promise<BidResult> {
+    const apiBidResponse = await this.apiClient.createBid({
+      ...createBidParams,
+    });
+
+    return {
+      result: mapBidFromOpenApiOrder(apiBidResponse.result),
+    };
+  }
+
+  /**
    * Get unsigned transactions that can be submitted to fulfil an open order. If the approval
    * transaction exists it must be signed and submitted to the chain before the fulfilment
    * transaction can be submitted or it will be reverted.
@@ -594,7 +672,8 @@ export class Orderbook {
    * to get the signature required for this call.
    * @param {string[]} orderIds - The orderIds to attempt to cancel.
    * @param {string} accountAddress - The address of the account cancelling the orders.
-   * @param {string} accountAddress - The address of the account cancelling the orders.
+   * @param {string} signature - The signature obtained by signing the
+   * message obtained from {@linkcode prepareOrderCancellations}.
    * @return {CancelOrdersResult} The result of the off-chain cancellation request
    */
   async cancelOrders(
@@ -622,28 +701,42 @@ export class Orderbook {
     orderIds: string[],
     accountAddress: string,
   ): Promise<CancelOrdersOnChainResponse> {
-    const orderResults = await Promise.all(orderIds.map((id) => this.apiClient.getListing(id)));
+    const listingResultsPromises = Promise.all(
+      orderIds.map((id) => this.apiClient.getListing(id).catch((e: ApiError) => {
+        if (e.status === 404) {
+          return undefined;
+        }
+        throw e;
+      })),
+    );
+
+    const bidResultsPromises = Promise.all(
+      orderIds.map((id) => this.apiClient.getBid(id).catch((e: ApiError) => {
+        if (e.status === 404) {
+          return undefined;
+        }
+        throw e;
+      })),
+    );
+
+    const orders = [
+      await Promise.all([listingResultsPromises, bidResultsPromises]),
+    ].flat(2).filter((r) => r !== undefined).map((r) => r.result);
+
+    if (orders.length !== orderIds.length) {
+      const notFoundOrderIds = orderIds.filter((oi) => !orders.some((o) => o.id === oi));
+      throw new Error(`Orders ${notFoundOrderIds} not found`);
+    }
 
     // eslint-disable-next-line no-restricted-syntax
-    for (const orderResult of orderResults) {
-      if (
-        orderResult.result.status.name !== OrderStatusName.ACTIVE
-        && orderResult.result.status.name !== OrderStatusName.INACTIVE
-        && orderResult.result.status.name !== OrderStatusName.PENDING
-      ) {
+    for (const order of orders) {
+      if (order.account_address !== accountAddress.toLowerCase()) {
         throw new Error(
-          `Cannot cancel order with status ${orderResult.result.status}`,
-        );
-      }
-
-      if (orderResult.result.account_address !== accountAddress.toLowerCase()) {
-        throw new Error(
-          `Only account ${orderResult.result.account_address} can cancel order ${orderResult.result.id}`,
+          `Only account ${order.account_address} can cancel order ${order.id}`,
         );
       }
     }
 
-    const orders = orderResults.map((orderResult) => orderResult.result);
     const seaportAddresses = orders.map((o) => o.protocol_data.seaport_address);
     const distinctSeaportAddresses = new Set(...[seaportAddresses]);
     if (distinctSeaportAddresses.size !== 1) {
