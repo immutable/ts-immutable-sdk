@@ -1,0 +1,16 @@
+{
+  "name": "blockchain-data-api-examples",
+  "version": "1.0.0",
+  "description": "Code examples for interacting with the Blockchain Data API package of @imtbl/sdk",
+  "main": "index.js",
+  "scripts": {
+    "test": "ts-node --esm api-examples-with-node/get-activities.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@imtbl/sdk": "latest",
+    "ts-node": "^10.9.2",
+    "typescript": "^5"
+  }
+}
