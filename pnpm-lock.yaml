@@ -20,7 +20,7 @@ importers:
         version: 1.10.1
       '@emotion/react':
         specifier: ^11.11.3
-        version: 11.11.3(@types/react@18.3.5)(react@18.2.0)
+        version: 11.11.3(@types/react@18.2.15)(react@18.2.0)
       '@nx/js':
         specifier: ^19.7.2
         version: 19.7.2(@babel/traverse@7.25.6)(@swc-node/register@1.10.9(@swc/core@1.3.70(@swc/helpers@0.5.5))(@swc/types@0.1.12)(typescript@5.5.4))(@swc/core@1.3.70(@swc/helpers@0.5.5))(@types/node@22.0.0)(nx@19.7.2(@swc-node/register@1.10.9(@swc/core@1.3.70(@swc/helpers@0.5.5))(@swc/types@0.1.12)(typescript@5.5.4))(@swc/core@1.3.70(@swc/helpers@0.5.5)))(typescript@5.5.4)
@@ -144,7 +144,7 @@ importers:
         version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@imtbl/sdk':
         specifier: latest
-        version: link:../../../sdk
+        version: 1.52.1(@emotion/react@11.11.3(@types/react@18.3.5)(react@18.2.0))(@types/react@18.3.5)(bufferutil@4.0.8)(embla-carousel-react@8.1.5(react@18.2.0))(encoding@0.1.13)(framer-motion@11.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.7
         version: 14.2.7(@babel/core@7.25.2)(@playwright/test@1.45.3)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -187,7 +187,7 @@ importers:
         version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@imtbl/sdk':
         specifier: latest
-        version: link:../../../sdk
+        version: 1.52.1(@emotion/react@11.11.3(@types/react@18.3.5)(react@18.2.0))(@types/react@18.3.5)(bufferutil@4.0.8)(embla-carousel-react@8.1.5(react@18.2.0))(encoding@0.1.13)(framer-motion@11.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.7
         version: 14.2.7(@babel/core@7.25.2)(@playwright/test@1.45.3)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -227,7 +227,7 @@ importers:
         version: 0.26.2(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.2.0))(@rive-app/react-canvas-lite@4.9.0(react@18.2.0))(embla-carousel-react@8.1.5(react@18.2.0))(framer-motion@11.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@imtbl/sdk':
         specifier: latest
-        version: link:../../../sdk
+        version: 1.52.1(@emotion/react@11.11.3(@types/react@18.3.5)(react@18.2.0))(@types/react@18.3.5)(bufferutil@4.0.8)(embla-carousel-react@8.1.5(react@18.2.0))(encoding@0.1.13)(framer-motion@11.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(utf-8-validate@5.0.10)
       ethers:
         specifier: ^5.7.2
         version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -270,7 +270,7 @@ importers:
         version: 0.26.2(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.2.0))(@rive-app/react-canvas-lite@4.9.0(react@18.2.0))(embla-carousel-react@8.1.5(react@18.2.0))(framer-motion@11.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@imtbl/sdk':
         specifier: latest
-        version: link:../../../sdk
+        version: 1.52.1(@emotion/react@11.11.3(@types/react@18.3.5)(react@18.2.0))(@types/react@18.3.5)(bufferutil@4.0.8)(embla-carousel-react@8.1.5(react@18.2.0))(encoding@0.1.13)(framer-motion@11.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(utf-8-validate@5.0.10)
       ethers:
         specifier: ^5.7.2
         version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -308,6 +308,12 @@ importers:
 
   examples/passport/identity-with-nextjs:
     dependencies:
+      '@imtbl/sdk':
+        specifier: latest
+        version: 1.52.1(@emotion/react@11.11.3(@types/react@18.3.5)(react@18.2.0))(@types/react@18.3.5)(bufferutil@4.0.8)(embla-carousel-react@8.1.5(react@18.2.0))(encoding@0.1.13)(framer-motion@11.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(utf-8-validate@5.0.10)
+      ethers:
+        specifier: ^5.7.2
+        version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.5
         version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.45.3)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -318,9 +324,6 @@ importers:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
     devDependencies:
-      '@imtbl/sdk':
-        specifier: latest
-        version: link:../../../sdk
       '@playwright/test':
         specifier: ^1.45.3
         version: 1.45.3
@@ -328,11 +331,11 @@ importers:
         specifier: ^20
         version: 20.14.13
       '@types/react':
-        specifier: ^18.0.28
-        version: 18.2.15
+        specifier: ^18.2.15
+        version: 18.3.5
       '@types/react-dom':
-        specifier: ^18.0.11
-        version: 18.2.7
+        specifier: ^18.2.15
+        version: 18.3.0
       autoprefixer:
         specifier: ^10.4.19
         version: 10.4.19(postcss@8.4.40)
@@ -359,7 +362,7 @@ importers:
         version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@imtbl/sdk':
         specifier: latest
-        version: link:../../../sdk
+        version: 1.52.1(@emotion/react@11.11.3(@types/react@18.2.15)(react@18.2.0))(@types/react@18.2.15)(bufferutil@4.0.8)(embla-carousel-react@8.1.5(react@18.2.0))(encoding@0.1.13)(framer-motion@11.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.15)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.2.0)(typescript@5.5.4)(utf-8-validate@5.0.10))(react@18.2.0)(utf-8-validate@5.0.10)
       '@tanstack/react-query':
         specifier: ^5.51.11
         version: 5.51.15(react@18.2.0)
@@ -414,7 +417,7 @@ importers:
         version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@imtbl/sdk':
         specifier: latest
-        version: link:../../../sdk
+        version: 1.52.1(@emotion/react@11.11.3(@types/react@18.2.15)(react@18.2.0))(@types/react@18.2.15)(bufferutil@4.0.8)(embla-carousel-react@8.1.5(react@18.2.0))(encoding@0.1.13)(framer-motion@11.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.15)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.2.0)(typescript@5.5.4)(utf-8-validate@5.0.10))(react@18.2.0)(utf-8-validate@5.0.10)
       '@tanstack/react-query':
         specifier: ^5.51.11
         version: 5.51.15(react@18.2.0)
@@ -464,6 +467,12 @@ importers:
 
   examples/passport/wallets-transactions-with-nextjs:
     dependencies:
+      '@imtbl/sdk':
+        specifier: latest
+        version: 1.52.1(@emotion/react@11.11.3(@types/react@18.3.5)(react@18.2.0))(@types/react@18.3.5)(bufferutil@4.0.8)(embla-carousel-react@8.1.5(react@18.2.0))(encoding@0.1.13)(framer-motion@11.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(utf-8-validate@5.0.10)
+      ethers:
+        specifier: ^5.7.2
+        version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.10
         version: 14.2.10(@babel/core@7.25.2)(@playwright/test@1.45.3)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -474,9 +483,6 @@ importers:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
     devDependencies:
-      '@imtbl/sdk':
-        specifier: latest
-        version: link:../../../sdk
       '@playwright/test':
         specifier: ^1.45.3
         version: 1.45.3
@@ -484,11 +490,11 @@ importers:
         specifier: ^20
         version: 20.14.13
       '@types/react':
-        specifier: ^18.0.28
-        version: 18.2.15
+        specifier: ^18.2.15
+        version: 18.3.5
       '@types/react-dom':
-        specifier: ^18.0.11
-        version: 18.2.7
+        specifier: ^18.2.15
+        version: 18.3.0
       autoprefixer:
         specifier: ^10.4.19
         version: 10.4.19(postcss@8.4.40)
@@ -517,10 +523,10 @@ importers:
         specifier: ^5.7.2
         version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@imtbl/config':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../config
       '@imtbl/generated-clients':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../internal/generated-clients
       axios:
         specifier: ^1.6.5
@@ -572,28 +578,28 @@ importers:
         specifier: ^5.7.2
         version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@imtbl/blockchain-data':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../blockchain-data/sdk
       '@imtbl/bridge-sdk':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../internal/bridge/sdk
       '@imtbl/config':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../config
       '@imtbl/dex-sdk':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../internal/dex/sdk
       '@imtbl/generated-clients':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../internal/generated-clients
       '@imtbl/metrics':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../internal/metrics
       '@imtbl/orderbook':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../orderbook
       '@imtbl/passport':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../passport/sdk
       '@metamask/detect-provider':
         specifier: ^2.0.0
@@ -699,19 +705,19 @@ importers:
         specifier: ^5.7.2
         version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@imtbl/checkout-sdk':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../sdk
       '@imtbl/checkout-widgets':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../widgets-lib
       '@imtbl/config':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../config
       '@imtbl/orderbook':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../orderbook
       '@imtbl/passport':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../passport/sdk
       embla-carousel-react:
         specifier: ^8.1.5
@@ -811,22 +817,22 @@ importers:
         specifier: ^5.7.2
         version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@imtbl/bridge-sdk':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../internal/bridge/sdk
       '@imtbl/checkout-sdk':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../sdk
       '@imtbl/config':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../config
       '@imtbl/cryptofiat':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../internal/cryptofiat
       '@imtbl/dex-sdk':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../internal/dex/sdk
       '@imtbl/passport':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../passport/sdk
       '@imtbl/react-analytics':
         specifier: 0.2.1-alpha
@@ -878,7 +884,7 @@ importers:
         version: 11.2.2
       react-i18next:
         specifier: ^13.5.0
-        version: 13.5.0(i18next@23.11.5)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        version: 13.5.0(i18next@23.11.5)(react-dom@18.2.0(react@18.2.0))(react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.15)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.2.0)(typescript@5.5.4)(utf-8-validate@5.0.10))(react@18.2.0)
       stream-browserify:
         specifier: ^3.0.0
         version: 3.0.0
@@ -995,16 +1001,16 @@ importers:
         specifier: ^5.7.2
         version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@imtbl/checkout-sdk':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../sdk
       '@imtbl/checkout-widgets':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../widgets-lib
       '@imtbl/config':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../config
       '@imtbl/passport':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../passport/sdk
       embla-carousel-react:
         specifier: ^8.1.5
@@ -1068,7 +1074,7 @@ importers:
   packages/config:
     dependencies:
       '@imtbl/metrics':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../internal/metrics
     devDependencies:
       '@swc/core':
@@ -1114,19 +1120,19 @@ importers:
   packages/game-bridge:
     dependencies:
       '@imtbl/config':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../config
       '@imtbl/metrics':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../internal/metrics
       '@imtbl/passport':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../passport/sdk
       '@imtbl/x-client':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../x-client
       '@imtbl/x-provider':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../x-provider
       ethers:
         specifier: ^5.7.2
@@ -1142,10 +1148,10 @@ importers:
   packages/internal/bridge/bridge-sample-app:
     dependencies:
       '@imtbl/bridge-sdk':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../sdk
       '@imtbl/config':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../../config
       dotenv:
         specifier: ^16.0.3
@@ -1176,7 +1182,7 @@ importers:
   packages/internal/bridge/sdk:
     dependencies:
       '@imtbl/config':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../../config
       '@jest/globals':
         specifier: ^29.5.0
@@ -1228,7 +1234,7 @@ importers:
   packages/internal/cryptofiat:
     dependencies:
       '@imtbl/config':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../config
       axios:
         specifier: ^1.6.5
@@ -1304,7 +1310,7 @@ importers:
         specifier: ^5.7.0
         version: 5.7.0
       '@imtbl/config':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../../config
       '@uniswap/router-sdk':
         specifier: ^1.4.0
@@ -1359,7 +1365,7 @@ importers:
   packages/internal/dex/sdk-sample-app:
     devDependencies:
       '@imtbl/dex-sdk':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../sdk
       '@types/node':
         specifier: ^18.14.2
@@ -1404,10 +1410,10 @@ importers:
   packages/internal/factory/factory-sample-app:
     dependencies:
       '@imtbl/config':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../../config
       '@imtbl/factory-sdk':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../sdk
       ethers:
         specifier: ^5.7.2
@@ -1435,7 +1441,7 @@ importers:
   packages/internal/factory/sdk:
     dependencies:
       '@imtbl/config':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../../config
       '@jest/globals':
         specifier: ^29.5.0
@@ -1523,7 +1529,7 @@ importers:
         version: 0.2.36(@swc/core@1.3.70(@swc/helpers@0.5.5))
       '@typechain/ethers-v5':
         specifier: ^10.2.0
-        version: 10.2.1(@ethersproject/abi@5.7.0)(@ethersproject/providers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(ethers@6.11.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.5.4))(typescript@5.5.4)
+        version: 10.2.1(@ethersproject/abi@5.7.0)(@ethersproject/providers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(ethers@6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.5.4))(typescript@5.5.4)
       '@types/jest':
         specifier: ^29.4.3
         version: 29.5.3
@@ -1607,7 +1613,7 @@ importers:
         specifier: ^5.7.0
         version: 5.7.0
       '@imtbl/x-client':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../x-client
       '@magic-ext/oidc':
         specifier: 4.3.1
@@ -1689,19 +1695,19 @@ importers:
   packages/minting-backend/sdk:
     dependencies:
       '@imtbl/blockchain-data':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../blockchain-data/sdk
       '@imtbl/config':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../config
       '@imtbl/generated-clients':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../internal/generated-clients
       '@imtbl/metrics':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../internal/metrics
       '@imtbl/webhook':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../webhook/sdk
       uuid:
         specifier: ^8.3.2
@@ -1766,10 +1772,10 @@ importers:
         specifier: ^5.7.2
         version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@imtbl/config':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../config
       '@imtbl/metrics':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../internal/metrics
       '@opensea/seaport-js':
         specifier: 4.0.3
@@ -1837,7 +1843,7 @@ importers:
         version: 1.4.3
       '@0xsequence/core':
         specifier: ^1.4.3
-        version: 1.4.3(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+        version: 1.4.3(ethers@5.7.2)
       '@ethersproject/abstract-provider':
         specifier: ^5.7.0
         version: 5.7.0
@@ -1848,25 +1854,25 @@ importers:
         specifier: ^5.7.2
         version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@imtbl/config':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../config
       '@imtbl/generated-clients':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../internal/generated-clients
       '@imtbl/guardian':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../internal/guardian
       '@imtbl/metrics':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../internal/metrics
       '@imtbl/toolkit':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../internal/toolkit
       '@imtbl/x-client':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../x-client
       '@imtbl/x-provider':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../x-provider
       '@magic-ext/oidc':
         specifier: 4.3.1
@@ -1972,25 +1978,25 @@ importers:
         specifier: ^0.25.0
         version: 0.25.0(@emotion/react@11.11.3(@types/react@18.3.5)(react@18.2.0))(@rive-app/react-canvas-lite@4.9.0(react@18.2.0))(embla-carousel-react@8.1.5(react@18.2.0))(framer-motion@11.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@imtbl/blockchain-data':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../blockchain-data/sdk
       '@imtbl/config':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../config
       '@imtbl/generated-clients':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../internal/generated-clients
       '@imtbl/orderbook':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../orderbook
       '@imtbl/passport':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../sdk
       '@imtbl/x-client':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../x-client
       '@imtbl/x-provider':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../x-provider
       '@metamask/detect-provider':
         specifier: ^2.0.0
@@ -2063,10 +2069,10 @@ importers:
   packages/webhook/sdk:
     dependencies:
       '@imtbl/config':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../config
       '@imtbl/generated-clients':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../internal/generated-clients
       sns-validator:
         specifier: ^0.3.5
@@ -2080,7 +2086,7 @@ importers:
         version: 0.2.36(@swc/core@1.3.70(@swc/helpers@0.5.5))
       '@typechain/ethers-v5':
         specifier: ^10.2.0
-        version: 10.2.1(@ethersproject/abi@5.7.0)(@ethersproject/providers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(ethers@6.11.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.5.4))(typescript@5.5.4)
+        version: 10.2.1(@ethersproject/abi@5.7.0)(@ethersproject/providers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(ethers@6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.5.4))(typescript@5.5.4)
       '@types/jest':
         specifier: ^29.4.3
         version: 29.5.3
@@ -2136,10 +2142,10 @@ importers:
         specifier: ^5.7.0
         version: 5.7.0
       '@imtbl/config':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../config
       '@imtbl/generated-clients':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../internal/generated-clients
       axios:
         specifier: ^1.6.5
@@ -2206,16 +2212,16 @@ importers:
         specifier: ^5.7.0
         version: 5.7.0
       '@imtbl/config':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../config
       '@imtbl/generated-clients':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../internal/generated-clients
       '@imtbl/toolkit':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../internal/toolkit
       '@imtbl/x-client':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../x-client
       '@magic-ext/oidc':
         specifier: 4.3.1
@@ -2294,7 +2300,7 @@ importers:
         specifier: ^0.25.0
         version: 0.25.0(@emotion/react@11.11.3(@types/react@18.3.5)(react@18.2.0))(@rive-app/react-canvas-lite@4.9.0(react@18.2.0))(embla-carousel-react@8.1.5(react@18.2.0))(framer-motion@11.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@imtbl/sdk':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../../../sdk
       '@testing-library/jest-dom':
         specifier: ^5.16.5
@@ -2358,31 +2364,31 @@ importers:
   sdk:
     dependencies:
       '@imtbl/blockchain-data':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../packages/blockchain-data/sdk
       '@imtbl/checkout-sdk':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../packages/checkout/sdk
       '@imtbl/config':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../packages/config
       '@imtbl/minting-backend':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../packages/minting-backend/sdk
       '@imtbl/orderbook':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../packages/orderbook
       '@imtbl/passport':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../packages/passport/sdk
       '@imtbl/webhook':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../packages/webhook/sdk
       '@imtbl/x-client':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../packages/x-client
       '@imtbl/x-provider':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../packages/x-provider
     devDependencies:
       eslint:
@@ -2407,7 +2413,7 @@ importers:
         specifier: ^5.7.0
         version: 5.7.0
       '@imtbl/sdk':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../../sdk
       dotenv:
         specifier: ^16.3.1
@@ -2444,7 +2450,7 @@ importers:
         specifier: 2.2.6
         version: 2.2.6(bufferutil@4.0.8)(eslint@8.57.0)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.5))(@types/node@20.14.13)(typescript@5.5.4))(typescript@5.5.4)(utf-8-validate@5.0.10)
       '@imtbl/sdk':
-        specifier: 0.0.0
+        specifier: workspace:*
         version: link:../../../sdk
       '@nomicfoundation/hardhat-chai-matchers':
         specifier: ^1.0.0
@@ -4051,6 +4057,10 @@ packages:
 
   '@imtbl/react-analytics@0.2.1-alpha':
     resolution: {integrity: sha512-oDqDmCn+qJPsLnXV+DnP7VxNWLs6wES1020AprgqZh1k5lq0hoZ1ATtEPsq/u1zg9V94glC6lLCVtl28eHbj9w==}
+
+  '@imtbl/sdk@1.52.1':
+    resolution: {integrity: sha512-91gSu+uAK93P6PqJ74wT0KRZHHv9qEUP2EpoBuGn3L0cJnxt570dbd/44YLrXEcOEulmb6HSwQLfHSe1bvSCyg==}
+    engines: {node: '>=20.0.0'}
 
   '@ioredis/commands@1.2.0':
     resolution: {integrity: sha512-Sx1pU8EM64o2BrqNpEO1CNLtKQwyhuXuqyfH7oGKCk+1a33d2r5saW8zNwm3j6BTExtjrv2BxTgzzkMwts6vGg==}
@@ -6500,6 +6510,11 @@ packages:
 
   '@stdlib/number-float64-base-get-high-word@0.0.6':
     resolution: {integrity: sha512-jSFSYkgiG/IzDurbwrDKtWiaZeSEJK8iJIsNtbPG1vOIdQMRyw+t0bf3Kf3vuJu/+bnSTvYZLqpCO6wzT/ve9g==}
+    engines: {node: '>=0.10.0', npm: '>2.7.0'}
+    os: [aix, darwin, freebsd, linux, macos, openbsd, sunos, win32, windows]
+
+  '@stdlib/number-float64-base-normalize@0.0.8':
+    resolution: {integrity: sha512-4P3c7YD0hahCgflxxTWrjR8457o2ViYu32MH/M166Aj6nkPj0ZovYj/X1DdyiYAAMHhVePGGMl0JAL3X141FVQ==}
     engines: {node: '>=0.10.0', npm: '>2.7.0'}
     os: [aix, darwin, freebsd, linux, macos, openbsd, sunos, win32, windows]
 
@@ -10224,6 +10239,10 @@ packages:
 
   ethers@6.11.1:
     resolution: {integrity: sha512-mxTAE6wqJQAbp5QAe/+o+rXOID7Nw91OZXvgpjDa1r4fAbq2Nu314oEZSbjoRLacuCzs7kUC3clEvkCQowffGg==}
+    engines: {node: '>=14.0.0'}
+
+  ethers@6.13.2:
+    resolution: {integrity: sha512-9VkriTTed+/27BGuY1s0hf441kqwHJ1wtN2edksEtiRvXx+soxRX3iSXTfFqq2+YwrOqbDoTHjIhQnjJRlzKmg==}
     engines: {node: '>=14.0.0'}
 
   ethers@6.8.1:
@@ -17407,7 +17426,7 @@ snapshots:
 
   '@0xsequence/abi@1.4.3': {}
 
-  '@0xsequence/core@1.4.3(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))':
+  '@0xsequence/core@1.4.3(ethers@5.7.2)':
     dependencies:
       '@0xsequence/abi': 1.4.3
       ethers: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -18653,7 +18672,7 @@ snapshots:
   '@cosmjs/socket@0.31.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@cosmjs/stream': 0.31.3
-      isomorphic-ws: 4.0.1(ws@7.5.10(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+      isomorphic-ws: 4.0.1(ws@7.5.10)
       ws: 7.5.10(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       xstream: 11.14.0
     transitivePeerDependencies:
@@ -19420,6 +19439,178 @@ snapshots:
     transitivePeerDependencies:
       - encoding
       - supports-color
+
+  '@imtbl/sdk@1.52.1(@emotion/react@11.11.3(@types/react@18.2.15)(react@18.2.0))(@types/react@18.2.15)(bufferutil@4.0.8)(embla-carousel-react@8.1.5(react@18.2.0))(encoding@0.1.13)(framer-motion@11.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.15)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.2.0)(typescript@5.5.4)(utf-8-validate@5.0.10))(react@18.2.0)(utf-8-validate@5.0.10)':
+    dependencies:
+      '@0xsequence/abi': 1.4.3
+      '@0xsequence/core': 1.4.3(ethers@5.7.2)
+      '@0xsquid/sdk': 2.8.24(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@biom3/design-tokens': 0.4.4
+      '@biom3/react': 0.25.21(@emotion/react@11.11.3(@types/react@18.2.15)(react@18.2.0))(@rive-app/react-canvas-lite@4.9.0(react@18.2.0))(embla-carousel-react@8.1.5(react@18.2.0))(framer-motion@11.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      '@ethersproject/abi': 5.7.0
+      '@ethersproject/abstract-signer': 5.7.0
+      '@ethersproject/keccak256': 5.7.0
+      '@ethersproject/providers': 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@ethersproject/strings': 5.7.0
+      '@ethersproject/wallet': 5.7.0
+      '@imtbl/react-analytics': 0.2.1-alpha(encoding@0.1.13)
+      '@jest/globals': 29.7.0
+      '@magic-ext/oidc': 4.3.1
+      '@metamask/detect-provider': 2.0.0
+      '@opensea/seaport-js': 4.0.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@rive-app/react-canvas-lite': 4.9.0(react@18.2.0)
+      '@stdlib/number-float64-base-normalize': 0.0.8
+      '@uniswap/router-sdk': 1.6.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.5))(@types/node@18.19.34)(typescript@5.5.4))(typescript@5.5.4)(utf-8-validate@5.0.10))
+      '@uniswap/sdk-core': 3.2.3
+      '@uniswap/v3-sdk': 3.10.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.5))(@types/node@18.19.34)(typescript@5.5.4))(typescript@5.5.4)(utf-8-validate@5.0.10))
+      '@walletconnect/ethereum-provider': 2.13.0(@types/react@18.2.15)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.2.0)(utf-8-validate@5.0.10)
+      '@walletconnect/modal': 2.6.2(@types/react@18.2.15)(react@18.2.0)
+      assert: 2.0.0
+      axios: 1.7.7
+      bn.js: 5.2.1
+      buffer: 6.0.3
+      crypto-browserify: 3.12.0
+      elliptic: 6.5.7
+      enc-utils: 3.0.0
+      ethereumjs-wallet: 1.0.2
+      ethers: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ethers-v6: ethers@6.11.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      events: 3.3.0
+      global-const: 0.1.2
+      https-browserify: 1.0.0
+      i18next: 23.11.5
+      i18next-browser-languagedetector: 7.2.0
+      jwt-decode: 3.1.2
+      localforage: 1.10.0
+      lru-memorise: 0.3.0
+      magic-sdk: 21.2.0
+      merkletreejs: 0.3.11
+      oidc-client-ts: 2.4.0
+      os-browserify: 0.3.0
+      pako: 2.1.0
+      pino-pretty: 11.2.2
+      react-i18next: 13.5.0(i18next@23.11.5)(react-dom@18.2.0(react@18.2.0))(react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.15)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.2.0)(typescript@5.5.4)(utf-8-validate@5.0.10))(react@18.2.0)
+      sns-validator: 0.3.5
+      stream-browserify: 3.0.0
+      stream-http: 3.2.0
+      url: 0.11.1
+      uuid: 8.3.2
+    optionalDependencies:
+      pg: 8.11.5
+      prisma: 5.13.0
+    transitivePeerDependencies:
+      - '@azure/app-configuration'
+      - '@azure/cosmos'
+      - '@azure/data-tables'
+      - '@azure/identity'
+      - '@azure/keyvault-secrets'
+      - '@azure/storage-blob'
+      - '@capacitor/preferences'
+      - '@emotion/react'
+      - '@netlify/blobs'
+      - '@planetscale/database'
+      - '@react-native-async-storage/async-storage'
+      - '@types/react'
+      - '@upstash/redis'
+      - '@vercel/kv'
+      - bufferutil
+      - debug
+      - embla-carousel-react
+      - encoding
+      - framer-motion
+      - hardhat
+      - pg-native
+      - react
+      - react-dom
+      - react-native
+      - supports-color
+      - utf-8-validate
+
+  '@imtbl/sdk@1.52.1(@emotion/react@11.11.3(@types/react@18.3.5)(react@18.2.0))(@types/react@18.3.5)(bufferutil@4.0.8)(embla-carousel-react@8.1.5(react@18.2.0))(encoding@0.1.13)(framer-motion@11.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(utf-8-validate@5.0.10)':
+    dependencies:
+      '@0xsequence/abi': 1.4.3
+      '@0xsequence/core': 1.4.3(ethers@5.7.2)
+      '@0xsquid/sdk': 2.8.24(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@biom3/design-tokens': 0.4.4
+      '@biom3/react': 0.25.21(@emotion/react@11.11.3(@types/react@18.3.5)(react@18.2.0))(@rive-app/react-canvas-lite@4.9.0(react@18.2.0))(embla-carousel-react@8.1.5(react@18.2.0))(framer-motion@11.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      '@ethersproject/abi': 5.7.0
+      '@ethersproject/abstract-signer': 5.7.0
+      '@ethersproject/keccak256': 5.7.0
+      '@ethersproject/providers': 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@ethersproject/strings': 5.7.0
+      '@ethersproject/wallet': 5.7.0
+      '@imtbl/react-analytics': 0.2.1-alpha(encoding@0.1.13)
+      '@jest/globals': 29.7.0
+      '@magic-ext/oidc': 4.3.1
+      '@metamask/detect-provider': 2.0.0
+      '@opensea/seaport-js': 4.0.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@rive-app/react-canvas-lite': 4.9.0(react@18.2.0)
+      '@stdlib/number-float64-base-normalize': 0.0.8
+      '@uniswap/router-sdk': 1.6.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.5))(@types/node@18.19.34)(typescript@5.5.4))(typescript@5.5.4)(utf-8-validate@5.0.10))
+      '@uniswap/sdk-core': 3.2.3
+      '@uniswap/v3-sdk': 3.10.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.5))(@types/node@18.19.34)(typescript@5.5.4))(typescript@5.5.4)(utf-8-validate@5.0.10))
+      '@walletconnect/ethereum-provider': 2.13.0(@types/react@18.3.5)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.2.0)(utf-8-validate@5.0.10)
+      '@walletconnect/modal': 2.6.2(@types/react@18.3.5)(react@18.2.0)
+      assert: 2.0.0
+      axios: 1.7.7
+      bn.js: 5.2.1
+      buffer: 6.0.3
+      crypto-browserify: 3.12.0
+      elliptic: 6.5.7
+      enc-utils: 3.0.0
+      ethereumjs-wallet: 1.0.2
+      ethers: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ethers-v6: ethers@6.11.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      events: 3.3.0
+      global-const: 0.1.2
+      https-browserify: 1.0.0
+      i18next: 23.11.5
+      i18next-browser-languagedetector: 7.2.0
+      jwt-decode: 3.1.2
+      localforage: 1.10.0
+      lru-memorise: 0.3.0
+      magic-sdk: 21.2.0
+      merkletreejs: 0.3.11
+      oidc-client-ts: 2.4.0
+      os-browserify: 0.3.0
+      pako: 2.1.0
+      pino-pretty: 11.2.2
+      react-i18next: 13.5.0(i18next@23.11.5)(react-dom@18.2.0(react@18.2.0))(react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.15)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.2.0)(typescript@5.5.4)(utf-8-validate@5.0.10))(react@18.2.0)
+      sns-validator: 0.3.5
+      stream-browserify: 3.0.0
+      stream-http: 3.2.0
+      url: 0.11.1
+      uuid: 8.3.2
+    optionalDependencies:
+      pg: 8.11.5
+      prisma: 5.13.0
+    transitivePeerDependencies:
+      - '@azure/app-configuration'
+      - '@azure/cosmos'
+      - '@azure/data-tables'
+      - '@azure/identity'
+      - '@azure/keyvault-secrets'
+      - '@azure/storage-blob'
+      - '@capacitor/preferences'
+      - '@emotion/react'
+      - '@netlify/blobs'
+      - '@planetscale/database'
+      - '@react-native-async-storage/async-storage'
+      - '@types/react'
+      - '@upstash/redis'
+      - '@vercel/kv'
+      - bufferutil
+      - debug
+      - embla-carousel-react
+      - encoding
+      - framer-motion
+      - hardhat
+      - pg-native
+      - react
+      - react-dom
+      - react-native
+      - supports-color
+      - utf-8-validate
 
   '@ioredis/commands@1.2.0': {}
 
@@ -21016,7 +21207,7 @@ snapshots:
 
   '@opensea/seaport-js@4.0.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      ethers: 6.11.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ethers: 6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       merkletreejs: 0.3.11
     transitivePeerDependencies:
       - bufferutil
@@ -22928,6 +23119,17 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@stdlib/number-float64-base-normalize@0.0.8':
+    dependencies:
+      '@stdlib/constants-float64-smallest-normal': 0.0.8
+      '@stdlib/math-base-assert-is-infinite': 0.0.9
+      '@stdlib/math-base-assert-is-nan': 0.0.8
+      '@stdlib/math-base-special-abs': 0.0.6
+      '@stdlib/types': 0.0.14
+      '@stdlib/utils-define-nonenumerable-read-only-property': 0.0.7
+    transitivePeerDependencies:
+      - supports-color
+
   '@stdlib/number-float64-base-normalize@0.0.9':
     dependencies:
       '@stdlib/constants-float64-smallest-normal': 0.0.8
@@ -23483,11 +23685,11 @@ snapshots:
       typechain: 8.3.0(typescript@5.5.4)
       typescript: 5.5.4
 
-  '@typechain/ethers-v5@10.2.1(@ethersproject/abi@5.7.0)(@ethersproject/providers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(ethers@6.11.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.5.4))(typescript@5.5.4)':
+  '@typechain/ethers-v5@10.2.1(@ethersproject/abi@5.7.0)(@ethersproject/providers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(ethers@6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.5.4))(typescript@5.5.4)':
     dependencies:
       '@ethersproject/abi': 5.7.0
       '@ethersproject/providers': 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      ethers: 6.11.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ethers: 6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       lodash: 4.17.21
       ts-essentials: 7.0.3(typescript@5.5.4)
       typechain: 8.3.0(typescript@5.5.4)
@@ -27842,7 +28044,7 @@ snapshots:
 
   ethers-multicall-provider@5.0.0(bufferutil@4.0.8)(lodash@4.17.21)(utf-8-validate@5.0.10):
     dependencies:
-      ethers: 6.11.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ethers: 6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       lodash: 4.17.21
     transitivePeerDependencies:
       - bufferutil
@@ -27893,6 +28095,19 @@ snapshots:
       aes-js: 4.0.0-beta.5
       tslib: 2.4.0
       ws: 8.5.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
+  ethers@6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10):
+    dependencies:
+      '@adraffy/ens-normalize': 1.10.1
+      '@noble/curves': 1.2.0
+      '@noble/hashes': 1.3.2
+      '@types/node': 18.15.13
+      aes-js: 4.0.0-beta.5
+      tslib: 2.4.0
+      ws: 8.17.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -29645,7 +29860,7 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  isomorphic-ws@4.0.1(ws@7.5.10(bufferutil@4.0.8)(utf-8-validate@5.0.10)):
+  isomorphic-ws@4.0.1(ws@7.5.10):
     dependencies:
       ws: 7.5.10(bufferutil@4.0.8)(utf-8-validate@5.0.10)
 
@@ -34038,7 +34253,7 @@ snapshots:
 
   react-error-overlay@6.0.9: {}
 
-  react-i18next@13.5.0(i18next@23.11.5)(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
+  react-i18next@13.5.0(i18next@23.11.5)(react-dom@18.2.0(react@18.2.0))(react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.15)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.2.0)(typescript@5.5.4)(utf-8-validate@5.0.10))(react@18.2.0):
     dependencies:
       '@babel/runtime': 7.25.6
       html-parse-stringify: 3.0.1
@@ -34046,6 +34261,7 @@ snapshots:
       react: 18.2.0
     optionalDependencies:
       react-dom: 18.2.0(react@18.2.0)
+      react-native: 0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.15)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.2.0)(typescript@5.5.4)(utf-8-validate@5.0.10)
 
   react-is@16.13.1: {}
 
