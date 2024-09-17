@@ -4,12 +4,17 @@
   "description": "Code examples for interacting with the Blockchain Data API package of @imtbl/sdk",
   "main": "index.js",
   "scripts": {
-    "test": "ts-node --esm api-examples-with-node/get-activities.ts"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@imtbl/sdk": "latest",
+    "@imtbl/sdk": "^1.52.1"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5"
   }
