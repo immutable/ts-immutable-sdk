@@ -5,11 +5,11 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "@imtbl/blockchain-data": "0.0.0",
-    "@imtbl/config": "0.0.0",
-    "@imtbl/generated-clients": "0.0.0",
-    "@imtbl/metrics": "0.0.0",
-    "@imtbl/webhook": "0.0.0",
+    "@imtbl/blockchain-data": "workspace:*",
+    "@imtbl/config": "workspace:*",
+    "@imtbl/generated-clients": "workspace:*",
+    "@imtbl/metrics": "workspace:*",
+    "@imtbl/webhook": "workspace:*",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

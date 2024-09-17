@@ -5,7 +5,7 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "@imtbl/config": "0.0.0",
+    "@imtbl/config": "workspace:*",
     "axios": "^1.6.5"
   },
   "devDependencies": {

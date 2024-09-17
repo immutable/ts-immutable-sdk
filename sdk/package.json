@@ -5,15 +5,15 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "@imtbl/blockchain-data": "0.0.0",
-    "@imtbl/checkout-sdk": "0.0.0",
-    "@imtbl/config": "0.0.0",
-    "@imtbl/minting-backend": "0.0.0",
-    "@imtbl/orderbook": "0.0.0",
-    "@imtbl/passport": "0.0.0",
-    "@imtbl/webhook": "0.0.0",
-    "@imtbl/x-client": "0.0.0",
-    "@imtbl/x-provider": "0.0.0"
+    "@imtbl/blockchain-data": "workspace:*",
+    "@imtbl/checkout-sdk": "workspace:*",
+    "@imtbl/config": "workspace:*",
+    "@imtbl/minting-backend": "workspace:*",
+    "@imtbl/orderbook": "workspace:*",
+    "@imtbl/passport": "workspace:*",
+    "@imtbl/webhook": "workspace:*",
+    "@imtbl/x-client": "workspace:*",
+    "@imtbl/x-provider": "workspace:*"
   },
   "devDependencies": {
     "eslint": "^8.40.0",

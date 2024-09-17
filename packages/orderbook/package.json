@@ -6,8 +6,8 @@
   "dependencies": {
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
-    "@imtbl/config": "0.0.0",
-    "@imtbl/metrics": "0.0.0",
+    "@imtbl/config": "workspace:*",
+    "@imtbl/metrics": "workspace:*",
     "@opensea/seaport-js": "4.0.3",
     "axios": "^1.6.5",
     "ethers": "^5.7.2",
