@@ -2,7 +2,7 @@
   "name": "@tests/func-tests-zkevm",
   "dependencies": {
     "@imtbl/contracts": "2.2.6",
-    "@imtbl/sdk": "0.0.0",
+    "@imtbl/sdk": "workspace:*",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.0",
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
     "@nomicfoundation/hardhat-verify": "^2.0.0",

@@ -8,7 +8,7 @@
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
     "@ethersproject/wallet": "^5.7.0",
-    "@imtbl/x-client": "0.0.0",
+    "@imtbl/x-client": "workspace:*",
     "@magic-ext/oidc": "4.3.1",
     "@metamask/detect-provider": "^2.0.0",
     "axios": "^1.6.5",

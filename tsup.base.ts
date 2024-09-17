@@ -7,5 +7,6 @@ export default defineConfig({
   target: 'es2022',
   bundle: true,
   clean: true,
+  splitting: false,
   skipNodeModulesBundle: true,
 });
