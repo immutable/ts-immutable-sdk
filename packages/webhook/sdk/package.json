@@ -5,8 +5,8 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "@imtbl/config": "0.0.0",
-    "@imtbl/generated-clients": "0.0.0",
+    "@imtbl/config": "workspace:*",
+    "@imtbl/generated-clients": "workspace:*",
     "sns-validator": "^0.3.5"
   },
   "devDependencies": {

@@ -2,11 +2,11 @@
   "name": "@imtbl/game-bridge",
   "version": "0.0.0",
   "dependencies": {
-    "@imtbl/config": "0.0.0",
-    "@imtbl/metrics": "0.0.0",
-    "@imtbl/passport": "0.0.0",
-    "@imtbl/x-client": "0.0.0",
-    "@imtbl/x-provider": "0.0.0",
+    "@imtbl/config": "workspace:*",
+    "@imtbl/metrics": "workspace:*",
+    "@imtbl/passport": "workspace:*",
+    "@imtbl/x-client": "workspace:*",
+    "@imtbl/x-provider": "workspace:*",
     "ethers": "^5.7.2"
   },
   "devDependencies": {

@@ -4,7 +4,7 @@
     "@ethersproject/providers": "^5.7.2",
     "@ethersproject/units": "^5.7.0",
     "@ethersproject/wallet": "^5.7.0",
-    "@imtbl/sdk": "0.0.0",
+    "@imtbl/sdk": "workspace:*",
     "dotenv": "^16.3.1"
   },
   "devDependencies": {

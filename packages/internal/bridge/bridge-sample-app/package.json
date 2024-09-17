@@ -2,8 +2,8 @@
   "name": "bridge-sample-app",
   "version": "0.1.0",
   "dependencies": {
-    "@imtbl/bridge-sdk": "0.0.0",
-    "@imtbl/config": "0.0.0",
+    "@imtbl/bridge-sdk": "workspace:*",
+    "@imtbl/config": "workspace:*",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2"
   },
