@@ -1,4 +1,3 @@
-// #doc blockchain-data-api-exported-types
 import { blockchainData, config } from '@imtbl/sdk';
 
 const configuration: blockchainData.BlockchainDataModuleConfiguration = {
@@ -18,4 +17,3 @@ export async function getChains(
 
   return chains.result[0]; // type inference, autocomplete works here for `Chain` object
 }
-// #enddoc blockchain-data-api-exported-types
