@@ -1,4 +1,5 @@
 import { verifySuccessfulMints } from "./verify-successful-mints";
+import { getChains } from "./exported-types";
 import { getCollection } from "./get-collection";
 import { getMetadata } from "./get-metadata";
 import { getNFT } from "./get-nft";
@@ -12,6 +13,7 @@ import { refreshStackedMetadata } from "./refresh-stacked-metadata";
 
 export {
   verifySuccessfulMints,
+  getChains,
   getCollection,
   getMetadata,
   getNFT,
