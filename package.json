@@ -65,7 +65,7 @@
     "lint:examples": "pnpm --recursive --filter '@examples/**' lint",
     "nx": "nx",
     "postinstall": "husky install",
-    "prepare:sdk": "pnpm --filter @imtbl/sdk... exec bash -c 'pnpm list --json | jq -r \".[0].dependencies | keys[] | select(startswith(\\\"@imtbl/\\\"))\" | while read -r dep; do pnpm exec pnpm dlx yalc add \"$dep\"; done && jq \".files = [\\\"dist\\\", \\\".yalc\\\"]\" package.json > package.tmp.json && mv package.tmp.json package.json && pnpm dlx yalc publish'",    
+    "prepare:sdk": "pnpm build && pnpm --filter @imtbl/sdk... exec bash -c 'pnpm list --json | jq -r \".[0].dependencies | keys[] | select(startswith(\\\"@imtbl/\\\"))\" | while read -r dep; do pnpm exec pnpm dlx yalc add \"$dep\"; done && jq \".files = [\\\"dist\\\", \\\".yalc\\\"]\" package.json > package.tmp.json && mv package.tmp.json package.json && pnpm dlx yalc publish'",    
     "prepare:examples": "pnpm prepare:sdk && pnpm --recursive --filter '@examples/**' exec pnpm dlx yalc add @imtbl/sdk && pnpm install --frozen-lockfile=false",
     "prepare:tests": "pnpm prepare:sdk && pnpm --recursive --filter '@tests/**' exec pnpm dlx yalc add @imtbl/sdk && pnpm install --frozen-lockfile=false",
     "release": "release-it",
