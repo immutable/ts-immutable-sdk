@@ -6,6 +6,7 @@ import { listMetadata } from "./list-metadata";
 import { listCollections } from "./list-collections";
 import { listCollectionsByNFTOwner } from "./list-collections-by-owner";
 import { listActivities } from "./list-activities";
+import { listNFTsByAccountAddress } from "./list-nfts-by-account-address";
 
 export {
   verifySuccessfulMints,
@@ -16,4 +17,5 @@ export {
   listCollections,
   listCollectionsByNFTOwner,
   listActivities,
+  listNFTsByAccountAddress,
 };
