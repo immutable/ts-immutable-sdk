@@ -141,9 +141,6 @@
   "license": "Apache-2.0",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
-  "overrides": {
-    "@openzeppelin/contracts": "3.4.2-solc-0.7"
-  },
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "tsup src --config ../tsup.base.ts && tsc --customConditions default --emitDeclarationOnly",
