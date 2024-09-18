@@ -6,11 +6,9 @@ export async function listNFTsByAccountAddress(
   contractAddress: string,
   accountAddress: string,
 ): Promise<blockchainData.Types.ListNFTsResult> {
-  // #doc blockchain-data-api-list-nfts-by-account-address
   return await client.listNFTsByAccountAddress({
     chainName,
     contractAddress,
     accountAddress,
   });
-  // #enddoc blockchain-data-api-list-nfts-by-account-address
 };

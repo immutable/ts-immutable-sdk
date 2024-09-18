@@ -6,11 +6,9 @@ export async function getMetadata(
   contractAddress: string,
   metadataId: string
 ): Promise<blockchainData.Types.GetMetadataResult> {
-  // #doc blockchain-data-api-get-metadata
   return await client.getMetadata({
     chainName,
     contractAddress,
     metadataId,
   });
-  // #enddoc blockchain-data-api-get-metadata
 }
