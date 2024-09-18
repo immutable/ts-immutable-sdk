@@ -32,13 +32,12 @@ defineFeature(feature, (test) => {
   const provider = new RetryProvider(rpcUrl);
   const bankerWallet = new Wallet(bankerKey, provider);
 
-  const orderbookConfig = getConfigFromEnv();
   const sdk = new orderbook.Orderbook({
     baseConfig: {
       environment: Environment.SANDBOX,
     },
     overrides: {
-      ...orderbookConfig,
+      ...getConfigFromEnv(),
     },
   });
 

@@ -135,6 +135,7 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
+          false,
           orderStart,
           orderExpiry,
         );
@@ -149,6 +150,7 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
+          false,
           orderStart,
           orderExpiry,
         );
@@ -174,6 +176,7 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
+          false,
           orderStart,
           orderExpiry,
         );
@@ -185,6 +188,7 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
+          false,
           orderStart,
           orderExpiry,
         );
@@ -271,7 +275,6 @@ describe('Seaport', () => {
               ],
               consideration: [
                 {
-                  token: undefined,
                   amount: considerationItem.amount,
                   recipient: offerer,
                 },
@@ -303,6 +306,7 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
+          false,
           orderStart,
           orderExpiry,
         );
@@ -324,6 +328,7 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
+          false,
           orderStart,
           orderExpiry,
         );
@@ -350,6 +355,7 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
+          false,
           orderStart,
           orderExpiry,
         );
@@ -361,6 +367,7 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
+          false,
           orderStart,
           orderExpiry,
         );
