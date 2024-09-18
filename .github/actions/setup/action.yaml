@@ -15,7 +15,6 @@ runs:
       with:
         node-version-file: ".nvmrc"
         registry-url: https://registry.npmjs.org/
-        cache: "pnpm"
 
     - name: Restore cached node_modules
       id: restore-cache-node_modules
@@ -26,6 +25,5 @@ runs:
         key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('pnpm-lock.yaml') }}
 
     - name: install dependencies
-      if: steps.restore-cache-node_modules.outputs.cache-hit != 'true'
       shell: bash
       run: pnpm install --frozen-lockfile
