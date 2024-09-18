@@ -163,7 +163,7 @@ export function AddFunds({
 
   const isSelected = (token: TokenInfo) => token.address === currentToTokenAddress;
 
-  const isDisabled = !currentToTokenAddress || !toAmount || parseFloat(toAmount) <= 0;
+  const isDisabled = !currentToTokenAddress || !currentToAmount || parseFloat(currentToAmount) <= 0;
 
   const handleTokenChange = (token: TokenInfo) => {
     setCurrentToTokenAddress(token);
