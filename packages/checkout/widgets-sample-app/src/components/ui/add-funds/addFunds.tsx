@@ -35,9 +35,6 @@ function AddFundsUI() {
       showSwapOption: true,
       toTokenAddress: "0x3b2d8a1931736fc321c24864bceee981b11c3c57",
     });
-    addFunds.addListener(AddFundsEventType.GO_BACK, (data: any) => {
-      console.log("GO_BACK", data);
-    });
     addFunds.addListener(AddFundsEventType.CLOSE_WIDGET, (data: any) => {
       console.log("CLOSE_WIDGET", data);
       addFunds.unmount();

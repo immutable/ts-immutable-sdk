@@ -1,4 +1,4 @@
-import { mr } from '@imtbl/generated-clients';
+import { mr, BlockchainData as Types } from '@imtbl/generated-clients';
 import {
   BlockchainDataConfiguration,
   BlockchainDataModuleConfiguration,
@@ -41,14 +41,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listActivities(
-    request: mr.ActivitiesApiListActivitiesRequest,
-  ): Promise<mr.ListActivitiesResult> {
-    return await this.activities
+    request: Types.ListActivitiesRequestParams,
+  ): Promise<Types.ListActivitiesResult> {
+    return (await this.activities
       .listActivities(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.ListActivitiesResult;
   }
 
   /**
@@ -58,14 +58,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listActivityHistory(
-    request: mr.ActivitiesApiListActivityHistoryRequest,
-  ): Promise<mr.ListActivitiesResult> {
-    return await this.activities
+    request: Types.ListActivityHistoryRequestParams,
+  ): Promise<Types.ListActivitiesResult> {
+    return (await this.activities
       .listActivityHistory(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.ListActivitiesResult;
   }
 
   /**
@@ -75,14 +75,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async getActivity(
-    request: mr.ActivitiesApiGetActivityRequest,
-  ): Promise<mr.GetActivityResult> {
-    return await this.activities
+    request: Types.GetActivityRequestParams,
+  ): Promise<Types.GetActivityResult> {
+    return (await this.activities
       .getActivity(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.GetActivityResult;
   }
 
   /**
@@ -92,14 +92,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listChains(
-    request: mr.ChainsApiListChainsRequest,
-  ): Promise<mr.ListChainsResult> {
-    return await this.chains
+    request: Types.ListChainsRequestParams,
+  ): Promise<Types.ListChainsResult> {
+    return (await this.chains
       .listChains(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.ListChainsResult;
   }
 
   /**
@@ -109,14 +109,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listCollections(
-    request: mr.CollectionsApiListCollectionsRequest,
-  ): Promise<mr.ListCollectionsResult> {
-    return await this.collections
+    request: Types.ListCollectionsRequestParams,
+  ): Promise<Types.ListCollectionsResult> {
+    return (await this.collections
       .listCollections(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.ListCollectionsResult;
   }
 
   /**
@@ -126,14 +126,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listCollectionsByNFTOwner(
-    request: mr.CollectionsApiListCollectionsByNFTOwnerRequest,
-  ): Promise<mr.ListCollectionsResult> {
-    return await this.collections
+    request: Types.ListCollectionsByNFTOwnerRequestParams,
+  ): Promise<Types.ListCollectionsResult> {
+    return (await this.collections
       .listCollectionsByNFTOwner(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.ListCollectionsResult;
   }
 
   /**
@@ -143,14 +143,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async getCollection(
-    request: mr.CollectionsApiGetCollectionRequest,
-  ): Promise<mr.GetCollectionResult> {
-    return await this.collections
+    request: Types.GetCollectionRequestParams,
+  ): Promise<Types.GetCollectionResult> {
+    return (await this.collections
       .getCollection(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.GetCollectionResult;
   }
 
   /**
@@ -160,14 +160,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async getNFT(
-    request: mr.NftsApiGetNFTRequest,
-  ): Promise<mr.GetNFTResult> {
-    return await this.nfts
+    request: Types.GetNFTRequestParams,
+  ): Promise<Types.GetNFTResult> {
+    return (await this.nfts
       .getNFT(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.GetNFTResult;
   }
 
   /**
@@ -177,14 +177,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listNFTs(
-    request: mr.NftsApiListNFTsRequest,
-  ): Promise<mr.ListNFTsResult> {
-    return await this.nfts
+    request: Types.ListNFTsRequestParams,
+  ): Promise<Types.ListNFTsResult> {
+    return (await this.nfts
       .listNFTs(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.ListNFTsResult;
   }
 
   /**
@@ -194,14 +194,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listNFTsByAccountAddress(
-    request: mr.NftsApiListNFTsByAccountAddressRequest,
-  ): Promise<mr.ListNFTsResult> {
-    return await this.nfts
+    request: Types.ListNFTsByAccountAddressRequestParams,
+  ): Promise<Types.ListNFTsResult> {
+    return (await this.nfts
       .listNFTsByAccountAddress(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.ListNFTsResult;
   }
 
   /**
@@ -211,14 +211,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listAllNFTs(
-    request: mr.NftsApiListAllNFTsRequest,
-  ): Promise<mr.ListNFTsResult> {
-    return await this.nfts
+    request: Types.ListAllNFTsRequestParams,
+  ): Promise<Types.ListNFTsResult> {
+    return (await this.nfts
       .listAllNFTs(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.ListNFTsResult;
   }
 
   /**
@@ -228,14 +228,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async createMintRequest(
-    request: mr.NftsApiCreateMintRequestRequest,
-  ): Promise<mr.CreateMintRequestResult> {
-    return await this.nfts
+    request: Types.CreateMintRequestRequestParams,
+  ): Promise<Types.CreateMintRequestResult> {
+    return (await this.nfts
       .createMintRequest(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.CreateMintRequestResult;
   }
 
   /**
@@ -245,14 +245,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listMintRequests(
-    request: mr.NftsApiListMintRequestsRequest,
-  ): Promise<mr.ListMintRequestsResult> {
-    return await this.nfts
+    request: Types.ListMintRequestsRequestParams,
+  ): Promise<Types.ListMintRequestsResult> {
+    return (await this.nfts
       .listMintRequests(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.ListMintRequestsResult;
   }
 
   /**
@@ -262,14 +262,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async getMintRequest(
-    request: mr.NftsApiGetMintRequestRequest,
-  ): Promise<mr.ListMintRequestsResult> {
-    return await this.nfts
+    request: Types.GetMintRequestRequestParams,
+  ): Promise<Types.ListMintRequestsResult> {
+    return (await this.nfts
       .getMintRequest(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.ListMintRequestsResult;
   }
 
   /**
@@ -279,14 +279,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listNFTOwners(
-    request: mr.NftOwnersApiListNFTOwnersRequest,
-  ): Promise<mr.ListNFTOwnersResult> {
-    return await this.nftOwners
+    request: Types.ListNFTOwnersRequestParams,
+  ): Promise<Types.ListNFTOwnersResult> {
+    return (await this.nftOwners
       .listNFTOwners(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.ListNFTOwnersResult;
   }
 
   /**
@@ -296,14 +296,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listNFTOwnersByContractAddress(
-    request: mr.NftOwnersApiListOwnersByContractAddressRequest,
-  ): Promise<mr.ListNFTOwnersResult> {
-    return await this.nftOwners
+    request: Types.ListOwnersByContractAddressRequestParams,
+  ): Promise<Types.ListNFTOwnersResult> {
+    return (await this.nftOwners
       .listOwnersByContractAddress(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.ListNFTOwnersResult;
   }
 
   /**
@@ -313,14 +313,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listAllNFTOwners(
-    request: mr.NftOwnersApiListAllNFTOwnersRequest,
-  ): Promise<mr.ListNFTOwnersResult> {
-    return await this.nftOwners
+    request: Types.ListAllNFTOwnersRequestParams,
+  ): Promise<Types.ListNFTOwnersResult> {
+    return (await this.nftOwners
       .listAllNFTOwners(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.ListNFTOwnersResult;
   }
 
   /**
@@ -330,14 +330,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listTokens(
-    request: mr.TokensApiListERC20TokensRequest,
-  ): Promise<mr.ListTokensResult> {
-    return await this.tokens
+    request: Types.ListERC20TokensRequestParams,
+  ): Promise<Types.ListTokensResult> {
+    return (await this.tokens
       .listERC20Tokens(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.ListTokensResult;
   }
 
   /**
@@ -347,14 +347,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async getToken(
-    request: mr.TokensApiGetERC20TokenRequest,
-  ): Promise<mr.GetTokenResult> {
-    return await this.tokens
+    request: Types.GetERC20TokenRequestParams,
+  ): Promise<Types.GetTokenResult> {
+    return (await this.tokens
       .getERC20Token(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.GetTokenResult;
   }
 
   /**
@@ -364,14 +364,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async getMetadata(
-    request: mr.MetadataApiGetMetadataRequest,
-  ): Promise<mr.GetMetadataResult> {
-    return await this.metadata
+    request: Types.GetMetadataRequestParams,
+  ): Promise<Types.GetMetadataResult> {
+    return (await this.metadata
       .getMetadata(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.GetMetadataResult;
   }
 
   /**
@@ -381,14 +381,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listNFTMetadataByContractAddress(
-    request: mr.MetadataApiListMetadataRequest,
-  ): Promise<mr.ListMetadataResult> {
-    return await this.metadata
+    request: Types.ListMetadataRequestParams,
+  ): Promise<Types.ListMetadataResult> {
+    return (await this.metadata
       .listMetadata(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.ListMetadataResult;
   }
 
   /**
@@ -398,14 +398,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listNFTMetadataByChain(
-    request: mr.MetadataApiListMetadataForChainRequest,
-  ): Promise<mr.ListMetadataResult> {
-    return await this.metadata
+    request: Types.ListMetadataForChainRequestParams,
+  ): Promise<Types.ListMetadataResult> {
+    return (await this.metadata
       .listMetadataForChain(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.ListMetadataResult;
   }
 
   /**
@@ -415,14 +415,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async refreshCollectionMetadata(
-    request: mr.CollectionsApiRefreshCollectionMetadataRequest,
-  ): Promise<mr.RefreshCollectionMetadataResult> {
-    return await this.collections
+    request: Types.RefreshCollectionMetadataRequestParams,
+  ): Promise<Types.RefreshCollectionMetadataResult> {
+    return (await this.collections
       .refreshCollectionMetadata(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.RefreshCollectionMetadataResult;
   }
 
   /**
@@ -432,14 +432,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async refreshNFTMetadata(
-    request: mr.MetadataApiRefreshNFTMetadataByTokenIDRequest,
-  ): Promise<mr.MetadataRefreshRateLimitResult> {
-    return await this.metadata
+    request: Types.RefreshNFTMetadataByTokenIDRequestParams,
+  ): Promise<Types.MetadataRefreshRateLimitResult> {
+    return (await this.metadata
       .refreshNFTMetadataByTokenID(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.MetadataRefreshRateLimitResult;
   }
 
   /**
@@ -449,13 +449,13 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async refreshStackedMetadata(
-    request: mr.MetadataApiRefreshMetadataByIDRequest,
-  ): Promise<mr.MetadataRefreshRateLimitResult> {
-    return await this.metadata
+    request: Types.RefreshMetadataByIDRequestParams,
+  ): Promise<Types.MetadataRefreshRateLimitResult> {
+    return (await this.metadata
       .refreshMetadataByID(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      });
+      })) as Types.MetadataRefreshRateLimitResult;
   }
 }

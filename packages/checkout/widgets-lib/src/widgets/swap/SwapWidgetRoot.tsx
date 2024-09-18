@@ -138,6 +138,7 @@ export class Swap extends Base<WidgetType.SWAP> {
                         config={this.strongConfig()}
                         autoProceed={this.parameters.autoProceed}
                         direction={this.parameters.direction ?? SwapDirection.FROM}
+                        showBackButton={this.parameters.showBackButton}
                       />
                     </Suspense>
                   </ConnectLoader>

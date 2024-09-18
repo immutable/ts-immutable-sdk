@@ -76,6 +76,7 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
                   tokenAddress={this.parameters.tokenAddress}
                   amount={this.parameters.amount}
                   walletProviderName={this.parameters.walletProviderName}
+                  showBackButton={!!this.parameters.showBackButton}
                 />
               </Suspense>
             </HandoverProvider>

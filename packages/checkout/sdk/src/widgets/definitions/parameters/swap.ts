@@ -28,4 +28,6 @@ export type SwapWidgetParams = {
   autoProceed?: boolean;
   /** The direction of the swap */
   direction?: SwapDirection;
+  /** Whether to show a back button on the first screen, on click triggers REQUEST_GO_BACK event */
+  showBackButton?: boolean;
 };
