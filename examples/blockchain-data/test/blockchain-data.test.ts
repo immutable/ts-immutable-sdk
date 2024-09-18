@@ -8,16 +8,26 @@ import {
   listMetadata,
   listCollections,
   listCollectionsByNFTOwner,
+  listActivities,
 } from "../api-examples-with-node";
 
 const CHAIN_NAME = "imtbl-zkevm-testnet";
 const CONTRACT_ADDRESS = "0x21F0D60cfE554B6d5b7f9E799BDeBD97C5d64274";
 const NFT_OWNER = "0x9C1634bebC88653D2Aebf4c14a3031f62092b1D9";
 
-describe("verifySuccessfulMints", () => {
-  test("listing activities from a contract address returns mint activities", async () => {
-    const result = await verifySuccessfulMints(CONTRACT_ADDRESS);
-    expect(result.result.length).toBeGreaterThan(0);
+describe("Activities", () => {
+  describe("listActivities", () => {
+    test("listing activities from a contract address returns activities", async () => {
+      const result = await listActivities(CHAIN_NAME, CONTRACT_ADDRESS, 10);
+      expect(result.result.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe("verifySuccessfulMints", () => {
+    test("listing activities from a contract address returns mint activities", async () => {
+      const result = await verifySuccessfulMints(CONTRACT_ADDRESS);
+      expect(result.result.length).toBeGreaterThan(0);
+    });
   });
 });
 

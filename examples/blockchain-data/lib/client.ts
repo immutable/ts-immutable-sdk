@@ -1,3 +1,4 @@
+// #doc blockchain-data-api-setup
 import { config as immutableConfig, blockchainData } from '@imtbl/sdk';
 
 export const config: blockchainData.BlockchainDataModuleConfiguration = {
@@ -8,3 +9,4 @@ export const config: blockchainData.BlockchainDataModuleConfiguration = {
 };
 
 export const client = new blockchainData.BlockchainData(config);
+// #enddoc blockchain-data-api-setup

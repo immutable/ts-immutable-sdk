@@ -1,9 +1,19 @@
-import { verifySuccessfulMints } from './verify-successful-mints';
-import { getCollection } from './get-collection';
-import { getMetadata } from './get-metadata';
-import { getNFT } from './get-nft';
-import { listMetadata } from './list-metadata';
-import { listCollections } from './list-collections';
-import { listCollectionsByNFTOwner } from './list-collections-by-owner';
+import { verifySuccessfulMints } from "./verify-successful-mints";
+import { getCollection } from "./get-collection";
+import { getMetadata } from "./get-metadata";
+import { getNFT } from "./get-nft";
+import { listMetadata } from "./list-metadata";
+import { listCollections } from "./list-collections";
+import { listCollectionsByNFTOwner } from "./list-collections-by-owner";
+import { listActivities } from "./list-activities";
 
-export { verifySuccessfulMints, getCollection, getMetadata, getNFT, listMetadata, listCollections, listCollectionsByNFTOwner };
+export {
+  verifySuccessfulMints,
+  getCollection,
+  getMetadata,
+  getNFT,
+  listMetadata,
+  listCollections,
+  listCollectionsByNFTOwner,
+  listActivities,
+};
