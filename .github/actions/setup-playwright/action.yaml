@@ -15,12 +15,9 @@ runs:
           exit 1
         else
           echo "All Playwright versions are in sync."
+          echo "PLAYWRIGHT_VERSION=$unique_versions" >> $GITHUB_ENV
         fi
-
-    - name: Get Playwright version
-      shell: bash
-      run: echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('playwright/package.json').version)")" >> $GITHUB_ENV
-
+        
     - name: Cache Playwright Browsers
       id: cache-playwright-browsers
       uses: actions/cache@v4
@@ -30,10 +27,10 @@ runs:
 
     - name: Install Playwright with dependencies
       shell: bash
-      # if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
+      if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
       run: pnpm dlx playwright@${{ env.PLAYWRIGHT_VERSION }} install --with-deps
 
-    # - name: Install Playwright dependencies
-    #   shell: bash
-    #   if: steps.cache-playwright-browsers.outputs.cache-hit == 'true'
-    #   run: pnpm dlx playwright@${{ env.PLAYWRIGHT_VERSION }} install-deps
+    - name: Install Playwright dependencies
+      shell: bash
+      if: steps.cache-playwright-browsers.outputs.cache-hit == 'true'
+      run: pnpm dlx playwright@${{ env.PLAYWRIGHT_VERSION }} install-deps
