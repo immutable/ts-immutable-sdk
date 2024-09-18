@@ -2,6 +2,7 @@ import { describe, expect, test } from '@jest/globals';
 
 import {
   verifySuccessfulMints,
+  getChains,
   getCollection,
   getMetadata,
   getNFT,
@@ -16,16 +17,16 @@ const CHAIN_NAME = 'imtbl-zkevm-testnet';
 const CONTRACT_ADDRESS = '0x21F0D60cfE554B6d5b7f9E799BDeBD97C5d64274';
 const NFT_OWNER = '0x9C1634bebC88653D2Aebf4c14a3031f62092b1D9';
 
-describe("Activities", () => {
-  describe("listActivities", () => {
-    test("listing activities from a contract address returns activities", async () => {
+describe('Activities', () => {
+  describe('listActivities', () => {
+    test('listing activities from a contract address returns activities', async () => {
       const result = await listActivities(CHAIN_NAME, CONTRACT_ADDRESS, 10);
       expect(result.result.length).toBeGreaterThan(0);
     });
   });
 
-  describe("verifySuccessfulMints", () => {
-    test("listing activities from a contract address returns mint activities", async () => {
+  describe('verifySuccessfulMints', () => {
+    test('listing activities from a contract address returns mint activities', async () => {
       const result = await verifySuccessfulMints(CONTRACT_ADDRESS);
       expect(result.result.length).toBeGreaterThan(0);
     });
@@ -89,5 +90,14 @@ describe('NFTs', () => {
   test('returns nft', async () => {
     const result = await getNFT(CHAIN_NAME, CONTRACT_ADDRESS, '199144');
     expect(result.result).not.toBe(null);
+  });
+});
+
+describe('Setup', () => {
+  describe('getChains', () => {
+    test('returns a chain', async () => {
+      const result = await getChains({});
+      expect(result).not.toBe(null);
+    });
   });
 });
