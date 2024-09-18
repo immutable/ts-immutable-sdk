@@ -29,11 +29,13 @@
       "development": {
         "types": "./src/index.ts",
         "import": "./dist/index.js",
+        "main": "./dist/index.js",
         "require": "./dist/index.cjs"
       },
       "default": {
         "types": "./dist/index.d.ts",
         "import": "./dist/index.js",
+        "main": "./dist/index.js",
         "require": "./dist/index.cjs"
       }
     },
@@ -41,11 +43,13 @@
       "development": {
         "types": "./src/config.ts",
         "import": "./dist/config.js",
+        "main": "./dist/config.js",
         "require": "./dist/config.cjs"
       },
       "default": {
         "types": "./dist/config.d.ts",
         "import": "./dist/config.js",
+        "main": "./dist/config.js",
         "require": "./dist/config.cjs"
       }
     },
@@ -53,11 +57,13 @@
       "development": {
         "types": "./src/blockchain_data.ts",
         "import": "./dist/blockchain_data.js",
+        "main": "./dist/blockchain_data.js",
         "require": "./dist/blockchain_data.cjs"
       },
       "default": {
         "types": "./dist/blockchain_data.d.ts",
         "import": "./dist/blockchain_data.js",
+        "main": "./dist/blockchain_data.js",
         "require": "./dist/blockchain_data.cjs"
       }
     },
@@ -65,11 +71,13 @@
       "development": {
         "types": "./src/passport.ts",
         "import": "./dist/passport.js",
+        "main": "./dist/passport.js",
         "require": "./dist/passport.cjs"
       },
       "default": {
         "types": "./dist/passport.d.ts",
         "import": "./dist/passport.js",
+        "main": "./dist/passport.js",
         "require": "./dist/passport.cjs"
       }
     },
@@ -77,11 +85,13 @@
       "development": {
         "types": "./src/orderbook.ts",
         "import": "./dist/orderbook.js",
+        "main": "./dist/orderbook.js",
         "require": "./dist/orderbook.cjs"
       },
       "default": {
         "types": "./dist/orderbook.d.ts",
         "import": "./dist/orderbook.js",
+        "main": "./dist/orderbook.js",
         "require": "./dist/orderbook.cjs"
       }
     },
@@ -89,11 +99,13 @@
       "development": {
         "types": "./src/checkout.ts",
         "import": "./dist/checkout.js",
+        "main": "./dist/checkout.js",
         "require": "./dist/checkout.cjs"
       },
       "default": {
         "types": "./dist/checkout.d.ts",
         "import": "./dist/checkout.js",
+        "main": "./dist/checkout.js",
         "require": "./dist/checkout.cjs"
       }
     },
@@ -101,11 +113,13 @@
       "development": {
         "types": "./src/x.ts",
         "import": "./dist/x.js",
+        "main": "./dist/x.js",
         "require": "./dist/x.cjs"
       },
       "default": {
         "types": "./dist/x.d.ts",
         "import": "./dist/x.js",
+        "main": "./dist/x.js",
         "require": "./dist/x.cjs"
       }
     },
@@ -113,11 +127,13 @@
       "development": {
         "types": "./src/webhook.ts",
         "import": "./dist/webhook.js",
+        "main": "./dist/webhook.js",
         "require": "./dist/webhook.cjs"
       },
       "default": {
         "types": "./dist/webhook.d.ts",
         "import": "./dist/webhook.js",
+        "main": "./dist/webhook.js",
         "require": "./dist/webhook.cjs"
       }
     },
@@ -125,11 +141,13 @@
       "development": {
         "types": "./src/minting_backend.ts",
         "import": "./dist/minting_backend.js",
+        "main": "./dist/minting_backend.js",
         "require": "./dist/minting_backend.cjs"
       },
       "default": {
         "types": "./dist/minting_backend.d.ts",
         "import": "./dist/minting_backend.js",
+        "main": "./dist/minting_backend.js",
         "require": "./dist/minting_backend.cjs"
       }
     }
