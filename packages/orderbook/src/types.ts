@@ -5,10 +5,16 @@ import { Fee as OpenapiFee, OrdersService, OrderStatus } from './openapi/sdk';
 // Strictly re-export only the OrderStatusName enum from the openapi types
 export { OrderStatusName } from './openapi/sdk';
 
-export interface ERC1155Item {
-  type: 'ERC1155';
+/* Items */
+
+export interface NativeItem {
+  type: 'NATIVE';
+  amount: string;
+}
+
+export interface ERC20Item {
+  type: 'ERC20';
   contractAddress: string;
-  tokenId: string;
   amount: string;
 }
 
@@ -18,197 +24,59 @@ export interface ERC721Item {
   tokenId: string;
 }
 
-export interface ERC20Item {
-  type: 'ERC20';
+export interface ERC1155Item {
+  type: 'ERC1155';
+  contractAddress: string;
+  tokenId: string;
+  amount: string;
+}
+
+export interface ERC721CollectionItem {
+  type: 'ERC721_COLLECTION';
   contractAddress: string;
   amount: string;
 }
 
-export interface NativeItem {
-  type: 'NATIVE';
+export interface ERC1155CollectionItem {
+  type: 'ERC1155_COLLECTION';
+  contractAddress: string;
   amount: string;
 }
 
-export interface RoyaltyInfo {
-  recipient: string;
-  amountRequired: string;
-}
+/* Orders */
 
-export interface PrepareListingParams {
-  makerAddress: string;
-  sell: ERC721Item | ERC1155Item;
-  buy: ERC20Item | NativeItem;
-  orderExpiry?: Date;
-}
+export type Order = Listing | Bid | CollectionBid;
 
-export interface PrepareListingResponse {
-  actions: Action[];
-  orderComponents: OrderComponents;
-  orderHash: string;
-}
-
-export interface PrepareBulkListingsParams {
-  makerAddress: string;
-  listingParams: {
-    sell: ERC721Item | ERC1155Item;
-    buy: ERC20Item | NativeItem;
-    makerFees: FeeValue[];
-    orderExpiry?: Date;
-  }[]
-}
-
-export interface PrepareBulkListingsResponse {
-  actions: Action[];
-  completeListings(signatures: string[]): Promise<BulkListingsResult>;
-  /**
-   * @deprecated Pass a string[] to `completeListings` instead to enable
-   * smart contract wallets
-   */
-  completeListings(signature: string): Promise<BulkListingsResult>;
-}
-
-export interface PrepareBulkSeaportOrders {
-  actions: Action[];
-  preparedListings: {
-    orderComponents: OrderComponents;
-    orderHash: string;
-  }[]
-}
-
-export interface PrepareCancelOrdersResponse {
-  signableAction: SignableAction;
-}
-
-export interface CreateListingParams {
-  orderComponents: OrderComponents;
-  orderHash: string;
-  orderSignature: string;
-  makerFees: FeeValue[];
-}
-
-// Expose the list order filtering and ordering directly from the openAPI SDK, except
-// chainName is omitted as its configured as a part of the client
-export type ListListingsParams = Omit<
-Parameters<typeof OrdersService.prototype.listListings>[0],
-'chainName'
->;
-
-export type ListTradesParams = Omit<
-Parameters<typeof OrdersService.prototype.listTrades>[0],
-'chainName'
->;
-
-export enum FeeType {
-  MAKER_ECOSYSTEM = OpenapiFee.type.MAKER_ECOSYSTEM,
-  TAKER_ECOSYSTEM = OpenapiFee.type.TAKER_ECOSYSTEM,
-  PROTOCOL = OpenapiFee.type.PROTOCOL,
-  ROYALTY = OpenapiFee.type.ROYALTY,
-}
-
-export interface FeeValue {
-  recipientAddress: string;
-  amount: string;
-}
-
-export interface Fee extends FeeValue {
-  type: FeeType;
-}
-
-export enum TransactionPurpose {
-  APPROVAL = 'APPROVAL',
-  FULFILL_ORDER = 'FULFILL_ORDER',
-  CANCEL = 'CANCEL',
-}
-
-export enum SignablePurpose {
-  CREATE_LISTING = 'CREATE_LISTING',
-  OFF_CHAIN_CANCELLATION = 'OFF_CHAIN_CANCELLATION',
-}
-
-export enum ActionType {
-  TRANSACTION = 'TRANSACTION',
-  SIGNABLE = 'SIGNABLE',
-}
-
-export type TransactionBuilder = () => Promise<PopulatedTransaction>;
-
-export interface TransactionAction {
-  type: ActionType.TRANSACTION;
-  purpose: TransactionPurpose;
-  buildTransaction: TransactionBuilder;
-}
-
-export interface SignableAction {
-  type: ActionType.SIGNABLE;
-  purpose: SignablePurpose;
-  message: {
-    domain: TypedDataDomain;
-    types: Record<string, TypedDataField[]>;
-    value: Record<string, any>;
-  };
-}
-
-export type Action = TransactionAction | SignableAction;
-
-export interface FulfillmentListing {
-  listingId: string,
-  takerFees: Array<FeeValue>,
-  amountToFill?: string,
-}
-
-export type FulfillBulkOrdersResponse
-  = FulfillBulkOrdersInsufficientBalanceResponse | FulfillBulkOrdersSufficientBalanceResponse;
-
-export interface FulfillBulkOrdersSufficientBalanceResponse {
-  sufficientBalance: true;
-  actions: Action[];
-  expiration: string;
-  fulfillableOrders: Order[];
-  unfulfillableOrders: UnfulfillableOrder[];
-}
-
-export interface FulfillBulkOrdersInsufficientBalanceResponse {
-  sufficientBalance: false;
-  fulfillableOrders: Order[];
-  unfulfillableOrders: UnfulfillableOrder[];
-}
-
-export interface UnfulfillableOrder {
-  orderId: string,
-  reason: string,
-}
-
-export interface FulfillOrderResponse {
-  actions: Action[];
-  /**
-   * User MUST submit the fulfillment transaction before the expiration
-   * Submitting after the expiration will result in a on chain revert
-   */
-  expiration: string;
-  // order might contain updated fee information
-  order: Order;
-}
-
-export interface CancelOrdersOnChainResponse {
-  cancellationAction: TransactionAction
-}
-
-export interface Order {
-  id: string;
+export interface Listing extends OrderFields {
   type: 'LISTING';
-  accountAddress: string;
-  buy: (ERC20Item | NativeItem)[];
   sell: (ERC721Item | ERC1155Item)[];
-  fees: Fee[];
+  buy: (NativeItem | ERC20Item)[];
+}
+
+export interface Bid extends OrderFields {
+  type: 'BID';
+  sell: ERC20Item[];
+  buy: (ERC721Item | ERC1155Item)[];
+}
+
+export interface CollectionBid extends OrderFields {
+  type: 'COLLECTION_BID';
+  sell: ERC20Item[];
+  buy: (ERC721CollectionItem | ERC1155CollectionItem)[];
+}
+
+interface OrderFields {
+  id: string;
   chain: {
     id: string;
     name: string;
   };
-  createdAt: string;
-  updatedAt: string;
+  accountAddress: string;
+  fees: Fee[];
+  status: OrderStatus;
   fillStatus: {
-    numerator: string,
-    denominator: string,
+    numerator: string;
+    denominator: string;
   };
   /**
    * Time after which the Order is considered active
@@ -218,6 +86,8 @@ export interface Order {
    * Time after which the Order is expired
    */
   endAt: string;
+  salt: string;
+  signature: string;
   orderHash: string;
   protocolData: {
     orderType: 'FULL_RESTRICTED' | 'PARTIAL_RESTRICTED';
@@ -226,38 +96,11 @@ export interface Order {
     seaportAddress: string;
     seaportVersion: string;
   };
-  salt: string;
-  signature: string;
-  status: OrderStatus;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface ListingResult {
-  result: Order;
-}
-
-export interface BulkListingsResult {
-  result: {
-    success: boolean;
-    orderHash: string;
-    order?: Order;
-  }[];
-}
-
-export interface ListListingsResult {
-  page: Page;
-  result: Order[];
-}
-
-export interface Page {
-  /**
-   * First item as an encoded string
-   */
-  previousCursor: string | null;
-  /**
-   * Last item as an encoded string
-   */
-  nextCursor: string | null;
-}
+/* Trades */
 
 export interface Trade {
   id: string;
@@ -266,8 +109,8 @@ export interface Trade {
     id: string;
     name: string;
   };
-  buy: (ERC20Item | NativeItem)[];
-  sell: (ERC721Item | ERC1155Item)[];
+  buy: (NativeItem | ERC20Item | ERC721Item | ERC1155Item)[];
+  sell: (ERC20Item | ERC721Item | ERC1155Item)[];
   buyerFees: Fee[];
   sellerAddress: string;
   buyerAddress: string;
@@ -297,6 +140,162 @@ export interface Trade {
   };
 }
 
+/* Fees */
+
+export interface Fee extends FeeValue {
+  type: FeeType;
+}
+
+export interface FeeValue {
+  recipientAddress: string;
+  amount: string;
+}
+
+export enum FeeType {
+  MAKER_ECOSYSTEM = OpenapiFee.type.MAKER_ECOSYSTEM,
+  TAKER_ECOSYSTEM = OpenapiFee.type.TAKER_ECOSYSTEM,
+  PROTOCOL = OpenapiFee.type.PROTOCOL,
+  ROYALTY = OpenapiFee.type.ROYALTY,
+}
+
+/* Generic Order Ops */
+
+export interface PrepareOrderResponse {
+  actions: Action[];
+  orderComponents: OrderComponents;
+  orderHash: string;
+}
+
+/* Listings Ops */
+
+// Expose the list order filtering and ordering directly from the openAPI SDK, except
+// chainName is omitted as its configured as a part of the client
+export type ListListingsParams = Omit<
+Parameters<typeof OrdersService.prototype.listListings>[0],
+'chainName'
+>;
+
+export interface ListingResult {
+  result: Listing;
+}
+
+export interface ListListingsResult {
+  page: Page;
+  result: Listing[];
+}
+
+export interface PrepareListingParams {
+  makerAddress: string;
+  sell: ERC721Item | ERC1155Item;
+  buy: NativeItem | ERC20Item;
+  orderExpiry?: Date;
+}
+
+export type PrepareListingResponse = PrepareOrderResponse;
+
+export interface PrepareBulkListingsParams {
+  makerAddress: string;
+  listingParams: {
+    sell: ERC721Item | ERC1155Item;
+    buy: NativeItem | ERC20Item;
+    makerFees: FeeValue[];
+    orderExpiry?: Date;
+  }[];
+}
+
+export interface PrepareBulkListingsResponse {
+  actions: Action[];
+  completeListings(signatures: string[]): Promise<BulkListingsResult>;
+  /**
+   * @deprecated Pass a `string[]` to {@linkcode completeListings} instead to enable
+   * smart contract wallets
+   */
+  completeListings(signature: string): Promise<BulkListingsResult>;
+}
+
+export interface CreateListingParams {
+  orderComponents: OrderComponents;
+  orderHash: string;
+  orderSignature: string;
+  makerFees: FeeValue[];
+}
+
+export interface BulkListingsResult {
+  result: {
+    success: boolean;
+    orderHash: string;
+    order?: Listing;
+  }[];
+}
+
+/* Fulfilment Ops */
+
+export interface FulfillmentOrder {
+  orderId: string;
+  takerFees: FeeValue[];
+  amountToFill?: string;
+}
+
+/**
+ * @deprecated Use {@linkcode FulfillmentOrder} instead
+ */
+export interface FulfillmentListing {
+  listingId: string;
+  takerFees: FeeValue[];
+  amountToFill?: string;
+}
+
+export type FulfillBulkOrdersResponse =
+  | FulfillBulkOrdersInsufficientBalanceResponse
+  | FulfillBulkOrdersSufficientBalanceResponse;
+
+export interface FulfillBulkOrdersSufficientBalanceResponse {
+  sufficientBalance: true;
+  actions: Action[];
+  expiration: string;
+  fulfillableOrders: Order[];
+  unfulfillableOrders: UnfulfillableOrder[];
+}
+
+export interface FulfillBulkOrdersInsufficientBalanceResponse {
+  sufficientBalance: false;
+  fulfillableOrders: Order[];
+  unfulfillableOrders: UnfulfillableOrder[];
+}
+
+export interface FulfillOrderResponse {
+  actions: Action[];
+  /**
+   * User MUST submit the fulfillment transaction before the expiration
+   * Submitting after the expiration will result in a on chain revert
+   */
+  expiration: string;
+  // order might contain updated fee information
+  order: Order;
+}
+
+export interface UnfulfillableOrder {
+  orderId: string;
+  reason: string;
+}
+
+/* Order Cancel Ops */
+
+export interface PrepareCancelOrdersResponse {
+  signableAction: SignableAction;
+}
+
+export interface CancelOrdersOnChainResponse {
+  cancellationAction: TransactionAction;
+}
+
+/* Trade Ops */
+
+export type ListTradesParams = Omit<
+Parameters<typeof OrdersService.prototype.listTrades>[0],
+'chainName'
+>;
+
 export interface TradeResult {
   result: Trade;
 }
@@ -304,4 +303,72 @@ export interface TradeResult {
 export interface ListTradesResult {
   page: Page;
   result: Trade[];
+}
+
+/* Action Ops */
+
+export type Action = TransactionAction | SignableAction;
+
+export enum ActionType {
+  TRANSACTION = 'TRANSACTION',
+  SIGNABLE = 'SIGNABLE',
+}
+
+export interface TransactionAction {
+  type: ActionType.TRANSACTION;
+  purpose: TransactionPurpose;
+  buildTransaction: TransactionBuilder;
+}
+
+export enum TransactionPurpose {
+  APPROVAL = 'APPROVAL',
+  FULFILL_ORDER = 'FULFILL_ORDER',
+  CANCEL = 'CANCEL',
+}
+
+export type TransactionBuilder = () => Promise<PopulatedTransaction>;
+
+export interface SignableAction {
+  type: ActionType.SIGNABLE;
+  purpose: SignablePurpose;
+  message: {
+    domain: TypedDataDomain;
+    types: Record<string, TypedDataField[]>;
+    value: Record<string, any>;
+  };
+}
+
+export enum SignablePurpose {
+  /**
+   * @deprecated Use {@linkcode CREATE_ORDER} instead
+   */
+  CREATE_LISTING = 'CREATE_ORDER',
+  CREATE_ORDER = 'CREATE_ORDER',
+  OFF_CHAIN_CANCELLATION = 'OFF_CHAIN_CANCELLATION',
+}
+
+/* Misc */
+
+export interface RoyaltyInfo {
+  recipient: string;
+  amountRequired: string;
+}
+
+export interface Page {
+  /**
+   * First item as an encoded string
+   */
+  previousCursor: string | null;
+  /**
+   * Last item as an encoded string
+   */
+  nextCursor: string | null;
+}
+
+export interface PrepareBulkSeaportOrders {
+  actions: Action[];
+  preparedOrders: {
+    orderComponents: OrderComponents;
+    orderHash: string;
+  }[];
 }

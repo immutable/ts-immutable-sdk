@@ -1,18 +1,18 @@
 /* eslint-disable */
-import { Wallet } from 'ethers';
-import { GAS_OVERRIDES } from './gas';
 import { randomBytes } from 'crypto';
-import hre from 'hardhat'
-import { OperatorAllowlistUpgradeable__factory, TestToken, TestToken__factory } from '../../typechain-types';
+import { Wallet } from 'ethers';
+import hre from 'hardhat';
+import { OperatorAllowlistUpgradeable__factory, TestERC721Token, TestERC721Token__factory } from '../../typechain-types';
+import { GAS_OVERRIDES } from './gas';
 
 export function getRandomTokenId(): string {
   return BigInt('0x' + randomBytes(4).toString('hex')).toString(10);
 }
 
-export async function connectToTestERC721Token(deployer: Wallet, tokenAddress: string): Promise<TestToken> {
+export async function connectToTestERC721Token(deployer: Wallet, tokenAddress: string): Promise<TestERC721Token> {
   const hreEthers = (hre as any).ethers;
-  const testTokenContractFactory = await hreEthers.getContractFactory("TestToken") as TestToken__factory;
-  return testTokenContractFactory.connect(deployer).attach(tokenAddress) as unknown as TestToken
+  const testTokenContractFactory = await hreEthers.getContractFactory("TestERC721Token") as TestERC721Token__factory;
+  return testTokenContractFactory.connect(deployer).attach(tokenAddress) as unknown as TestERC721Token
 }
 
 /**
@@ -35,10 +35,10 @@ export async function deployERC721Token(deployer: Wallet, seaportAddress: string
   const tx = await allowlist.addAddressesToAllowlist([seaportAddress], GAS_OVERRIDES);
   await tx.wait(1);
 
-  const testTokenContractFactory = await hreEthers.getContractFactory("TestToken") as TestToken__factory;
+  const testTokenContractFactory = await hreEthers.getContractFactory("TestERC721Token") as TestERC721Token__factory;
   const testTokenContract = await testTokenContractFactory.connect(deployer).deploy(
     deployerAddress,
-    "Test",
+    "TestERC721",
     "TEST",
     "",
     "",

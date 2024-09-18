@@ -7,23 +7,25 @@ import {
   OrderbookModuleConfiguration,
   OrderbookOverrides,
 } from './config/config';
-import { CancelOrdersResult, Fee as OpenApiFee } from './openapi/sdk';
 import {
-  mapFromOpenApiOrder,
   mapFromOpenApiPage,
   mapFromOpenApiTrade,
+  mapListingFromOpenApiOrder,
+  mapOrderFromOpenApiOrder,
 } from './openapi/mapper';
+import { CancelOrdersResult, Fee as OpenApiFee } from './openapi/sdk';
 import { Seaport } from './seaport';
 import { getBulkSeaportOrderSignatures } from './seaport/components';
 import { SeaportLibFactory } from './seaport/seaport-lib-factory';
 import {
+  Action,
   ActionType,
   CancelOrdersOnChainResponse,
   CreateListingParams,
-  FeeType,
   FeeValue,
   FulfillBulkOrdersResponse,
   FulfillmentListing,
+  FulfillmentOrder,
   FulfillOrderResponse,
   ListingResult,
   ListListingsParams,
@@ -31,13 +33,13 @@ import {
   ListTradesParams,
   ListTradesResult,
   OrderStatusName,
-  PrepareCancelOrdersResponse,
-  PrepareListingParams,
   PrepareBulkListingsParams,
   PrepareBulkListingsResponse,
+  PrepareCancelOrdersResponse,
+  PrepareListingParams,
   PrepareListingResponse,
   SignablePurpose,
-  TradeResult, Action,
+  TradeResult,
 } from './types';
 
 /**
@@ -114,34 +116,34 @@ export class Orderbook {
   }
 
   /**
-   * Get an order by ID
+   * Get a listing by ID
    * @param {string} listingId - The listingId to find.
-   * @return {ListingResult} The returned order result.
+   * @return {ListingResult} The returned listing result.
    */
   async getListing(listingId: string): Promise<ListingResult> {
     const apiListing = await this.apiClient.getListing(listingId);
     return {
-      result: mapFromOpenApiOrder(apiListing.result),
+      result: mapListingFromOpenApiOrder(apiListing.result),
     };
   }
 
   /**
    * Get a trade by ID
    * @param {string} tradeId - The tradeId to find.
-   * @return {TradeResult} The returned order result.
+   * @return {TradeResult} The returned trade result.
    */
   async getTrade(tradeId: string): Promise<TradeResult> {
-    const apiListing = await this.apiClient.getTrade(tradeId);
+    const apiTrade = await this.apiClient.getTrade(tradeId);
     return {
-      result: mapFromOpenApiTrade(apiListing.result),
+      result: mapFromOpenApiTrade(apiTrade.result),
     };
   }
 
   /**
-   * List orders. This method is used to get a list of orders filtered by conditions specified
+   * List listings. This method is used to get a list of listings filtered by conditions specified
    * in the params object.
    * @param {ListListingsParams} listOrderParams - Filtering, ordering and page parameters.
-   * @return {ListListingsResult} The paged orders.
+   * @return {ListListingsResult} The paged listings.
    */
   async listListings(
     listOrderParams: ListListingsParams,
@@ -149,7 +151,7 @@ export class Orderbook {
     const apiListings = await this.apiClient.listListings(listOrderParams);
     return {
       page: mapFromOpenApiPage(apiListings.page),
-      result: apiListings.result.map(mapFromOpenApiOrder),
+      result: apiListings.result.map(mapListingFromOpenApiOrder),
     };
   }
 
@@ -162,28 +164,30 @@ export class Orderbook {
   async listTrades(
     listTradesParams: ListTradesParams,
   ): Promise<ListTradesResult> {
-    const apiListings = await this.apiClient.listTrades(listTradesParams);
+    const apiTrades = await this.apiClient.listTrades(listTradesParams);
     return {
-      page: mapFromOpenApiPage(apiListings.page),
-      result: apiListings.result.map(mapFromOpenApiTrade),
+      page: mapFromOpenApiPage(apiTrades.page),
+      result: apiTrades.result.map(mapFromOpenApiTrade),
     };
   }
 
   /**
    * Get required transactions and messages for signing to facilitate creating bulk listings.
-   * Once the transactions are submitted and the message signed, call the completeListings method
-   * provided in the return type with the signature. This method supports up to 20 listing creations
+   * Once the transactions are submitted and the message signed, call the
+   * {@linkcode PrepareBulkListingsResponse.completeListings} method provided in the return
+   * type with the signature. This method supports up to 20 listing creations
    * at a time. It can also be used for individual listings to simplify integration code paths.
    *
    * Bulk listings created using an EOA (Metamask) will require a single listing confirmation
    * signature.
    * Bulk listings creating using a smart contract wallet will require multiple listing confirmation
-   * signatures(as many as the number of orders).
+   * signatures (as many as the number of orders).
    * @param {PrepareBulkListingsParams} prepareBulkListingsParams - Details about the listings
    * to be created.
-   * @return {PrepareBulkListingsResponse} PrepareListingResponse includes
+   * @return {PrepareBulkListingsResponse} PrepareBulkListingsResponse includes
    * any unsigned approval transactions, the typed bulk order message for signing and
-   * the createListings method that can be called with the signature(s) to create the listings.
+   * the {@linkcode PrepareBulkListingsResponse.completeListings} method that can be called with
+   * the signature(s) to create the listings.
    */
   async prepareBulkListings(
     {
@@ -205,6 +209,7 @@ export class Orderbook {
         makerAddress,
         listingParams[0].sell,
         listingParams[0].buy,
+        listingParams[0].sell.type === 'ERC1155',
         new Date(),
         listingParams[0].orderExpiry || Orderbook.defaultOrderExpiry(),
       );
@@ -242,6 +247,7 @@ export class Orderbook {
         makerAddress,
         listing.sell,
         listing.buy,
+        listing.sell.type === 'ERC1155',
         new Date(),
         listing.orderExpiry || Orderbook.defaultOrderExpiry(),
       )));
@@ -292,7 +298,7 @@ export class Orderbook {
               success: !!apiListingResponse,
               orderHash: prepareListingResponses[i].orderHash,
               // eslint-disable-next-line max-len
-              order: apiListingResponse ? mapFromOpenApiOrder(apiListingResponse.result) : undefined,
+              order: apiListingResponse ? mapListingFromOpenApiOrder(apiListingResponse.result) : undefined,
             })),
           };
         },
@@ -301,11 +307,12 @@ export class Orderbook {
 
     // Bulk listings (with multiple listings) code path for EOA wallets.
     track('orderbookmr', 'bulkListings', { walletType: 'EOA', makerAddress, listingsCount: listingParams.length });
-    const { actions, preparedListings } = await this.seaport.prepareBulkSeaportOrders(
+    const { actions, preparedOrders } = await this.seaport.prepareBulkSeaportOrders(
       makerAddress,
       listingParams.map((orderParam) => ({
-        listingItem: orderParam.sell,
+        offerItem: orderParam.sell,
         considerationItem: orderParam.buy,
+        allowPartialFills: orderParam.sell.type === 'ERC1155',
         orderStart: new Date(),
         orderExpiry: orderParam.orderExpiry || Orderbook.defaultOrderExpiry(),
       })),
@@ -319,7 +326,7 @@ export class Orderbook {
           throw new Error('Only a single signature is expected for bulk listing creation');
         }
 
-        const orderComponents = preparedListings.map((orderParam) => orderParam.orderComponents);
+        const orderComponents = preparedOrders.map((orderParam) => orderParam.orderComponents);
         const signature = signatureIsArray ? signatures[0] : signatures;
         const bulkOrderSignatures = getBulkSeaportOrderSignatures(
           signature,
@@ -329,7 +336,7 @@ export class Orderbook {
         const createOrdersApiListingResponse = await Promise.all(
           orderComponents.map((orderComponent, i) => {
             const sig = bulkOrderSignatures[i];
-            const listing = preparedListings[i];
+            const listing = preparedOrders[i];
             const listingParam = listingParams[i];
             return this.apiClient.createListing({
               orderComponents: orderComponent,
@@ -344,8 +351,10 @@ export class Orderbook {
         return {
           result: createOrdersApiListingResponse.map((apiListingResponse, i) => ({
             success: !!apiListingResponse,
-            orderHash: preparedListings[i].orderHash,
-            order: apiListingResponse ? mapFromOpenApiOrder(apiListingResponse.result) : undefined,
+            orderHash: preparedOrders[i].orderHash,
+            order: apiListingResponse
+              ? mapListingFromOpenApiOrder(apiListingResponse.result)
+              : undefined,
           })),
         };
       },
@@ -354,11 +363,11 @@ export class Orderbook {
 
   /**
    * Get required transactions and messages for signing prior to creating a listing
-   * through the createListing method
+   * through the {@linkcode createListing} method
    * @param {PrepareListingParams} prepareListingParams - Details about the listing to be created.
    * @return {PrepareListingResponse} PrepareListingResponse includes
    * the unsigned approval transaction, the typed order message for signing and
-   * the order components that can be submitted to `createListing` with a signature.
+   * the order components that can be submitted to {@linkcode createListing} with a signature.
    */
   async prepareListing({
     makerAddress,
@@ -370,6 +379,7 @@ export class Orderbook {
       makerAddress,
       sell,
       buy,
+      sell.type === 'ERC1155',
       // Default order start to now
       new Date(),
       // Default order expiry to 2 years from now
@@ -378,9 +388,9 @@ export class Orderbook {
   }
 
   /**
-   * Create an order
-   * @param {CreateListingParams} createListingParams - create an order with the given params.
-   * @return {ListingResult} The result of the order created in the Immutable services.
+   * Create a listing
+   * @param {CreateListingParams} createListingParams - create a listing with the given params.
+   * @return {ListingResult} The result of the listing created in the Immutable services.
    */
   async createListing(
     createListingParams: CreateListingParams,
@@ -390,7 +400,7 @@ export class Orderbook {
     });
 
     return {
-      result: mapFromOpenApiOrder(apiListingResponse.result),
+      result: mapListingFromOpenApiOrder(apiListingResponse.result),
     };
   }
 
@@ -398,7 +408,7 @@ export class Orderbook {
    * Get unsigned transactions that can be submitted to fulfil an open order. If the approval
    * transaction exists it must be signed and submitted to the chain before the fulfilment
    * transaction can be submitted or it will be reverted.
-   * @param {string} listingId - The listingId to fulfil.
+   * @param {string} orderId - The orderId to fulfil.
    * @param {string} takerAddress - The address of the account fulfilling the order.
    * @param {FeeValue[]} takerFees - Taker ecosystem fees to be paid.
    * @param {string} amountToFill - Amount of the order to fill, defaults to sell item amount.
@@ -406,19 +416,18 @@ export class Orderbook {
    * @return {FulfillOrderResponse} Approval and fulfilment transactions.
    */
   async fulfillOrder(
-    listingId: string,
+    orderId: string,
     takerAddress: string,
     takerFees: FeeValue[],
     amountToFill?: string,
   ): Promise<FulfillOrderResponse> {
     const fulfillmentDataRes = await this.apiClient.fulfillmentData([
       {
-        order_id: listingId,
+        order_id: orderId,
         taker_address: takerAddress,
         fees: takerFees.map((fee) => ({
+          type: OpenApiFee.type.TAKER_ECOSYSTEM,
           amount: fee.amount,
-          type:
-            FeeType.TAKER_ECOSYSTEM as unknown as OpenApiFee.type.TAKER_ECOSYSTEM,
           recipient_address: fee.recipientAddress,
         })),
       },
@@ -448,23 +457,28 @@ export class Orderbook {
    * Get unsigned transactions that can be submitted to fulfil multiple open orders. If approval
    * transactions exist, they must be signed and submitted to the chain before the fulfilment
    * transaction can be submitted or it will be reverted.
-   * @param {Array<FulfillmentListing>} listings - The details of the listings to fulfil, amounts
+   * @param {FulfillmentOrder[]} orders - The details of the orders to fulfil, amounts
    *                                               to fill and taker ecosystem fees to be paid.
    * @param {string} takerAddress - The address of the account fulfilling the order.
    * @return {FulfillBulkOrdersResponse} Approval and fulfilment transactions.
    */
   async fulfillBulkOrders(
-    listings: Array<FulfillmentListing>,
+    orders: FulfillmentOrder[] | FulfillmentListing[],
     takerAddress: string,
   ): Promise<FulfillBulkOrdersResponse> {
+    const mappedOrders = orders.map((order): FulfillmentOrder => ({
+      orderId: 'listingId' in order ? order.listingId : order.orderId,
+      takerFees: order.takerFees,
+      amountToFill: order.amountToFill,
+    }));
+
     const fulfillmentDataRes = await this.apiClient.fulfillmentData(
-      listings.map((listingRequest) => ({
-        order_id: listingRequest.listingId,
+      mappedOrders.map((fulfillmentRequest) => ({
+        order_id: fulfillmentRequest.orderId,
         taker_address: takerAddress,
-        fees: listingRequest.takerFees.map((fee) => ({
+        fees: fulfillmentRequest.takerFees.map((fee) => ({
+          type: OpenApiFee.type.TAKER_ECOSYSTEM,
           amount: fee.amount,
-          type:
-            FeeType.TAKER_ECOSYSTEM as unknown as OpenApiFee.type.TAKER_ECOSYSTEM,
           recipient_address: fee.recipientAddress,
         })),
       })),
@@ -473,16 +487,16 @@ export class Orderbook {
     try {
       const fulfillableOrdersWithUnits = fulfillmentDataRes.result.fulfillable_orders
         .map((fulfillmentData) => {
-        // Find the listing that corresponds to the order for the units
-          const listing = listings.find((l) => l.listingId === fulfillmentData.order.id);
-          if (!listing) {
-            throw new Error(`Could not find listing for order ${fulfillmentData.order.id}`);
+        // Find the order that corresponds to the order for the units
+          const order = mappedOrders.find((l) => l.orderId === fulfillmentData.order.id);
+          if (!order) {
+            throw new Error(`Could not find order for order ${fulfillmentData.order.id}`);
           }
 
           return {
             extraData: fulfillmentData.extra_data,
             order: fulfillmentData.order,
-            unitsToFill: listing.amountToFill,
+            unitsToFill: order.amountToFill,
           };
         });
 
@@ -492,7 +506,7 @@ export class Orderbook {
           takerAddress,
         )),
         fulfillableOrders: fulfillmentDataRes.result.fulfillable_orders.map(
-          (o) => mapFromOpenApiOrder(o.order),
+          (o) => mapOrderFromOpenApiOrder(o.order),
         ),
         unfulfillableOrders: fulfillmentDataRes.result.unfulfillable_orders.map(
           (o) => ({
@@ -507,7 +521,7 @@ export class Orderbook {
       if (String(e).includes('The fulfiller does not have the balances needed to fulfill.')) {
         return {
           fulfillableOrders: fulfillmentDataRes.result.fulfillable_orders.map(
-            (o) => mapFromOpenApiOrder(o.order),
+            (o) => mapOrderFromOpenApiOrder(o.order),
           ),
           unfulfillableOrders: fulfillmentDataRes.result.unfulfillable_orders.map(
             (o) => ({
@@ -528,8 +542,8 @@ export class Orderbook {
 
   /**
    * Cancelling orders is a gasless alternative to on-chain cancellation exposed with
-   * `cancelOrdersOnChain`. For the orderbook to authenticate the cancellation, the creator
-   * of the orders must sign an EIP712 message containing the orderIds
+   * {@linkcode cancelOrdersOnChain}. For the orderbook to authenticate the cancellation,
+   * the creator of the orders must sign an EIP712 message containing the orderIds.
    * @param {string} orderIds - The orderIds to attempt to cancel.
    * @return {PrepareCancelOrdersResponse} The signable action to cancel the orders.
    */
@@ -573,10 +587,10 @@ export class Orderbook {
 
   /**
    * Cancelling orders is a gasless alternative to on-chain cancellation exposed with
-   * `cancelOrdersOnChain`. Orders cancelled this way cannot be fulfilled and will be removed
-   * from the orderbook. If there is pending fulfillment data outstanding for the order, its
-   * cancellation will be pending until the fulfillment window has passed.
-   * `prepareOffchainOrderCancellations` can be used to get the signable action that is signed
+   * {@linkcode cancelOrdersOnChain}. Orders cancelled this way cannot be fulfilled and
+   * will be removed from the orderbook. If there is pending fulfillment data outstanding
+   * for the order, its cancellation will be pending until the fulfillment window has passed.
+   * {@linkcode prepareOrderCancellations} can be used to get the signable action that is signed
    * to get the signature required for this call.
    * @param {string[]} orderIds - The orderIds to attempt to cancel.
    * @param {string} accountAddress - The address of the account cancelling the orders.
