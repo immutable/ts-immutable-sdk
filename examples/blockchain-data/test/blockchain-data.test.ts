@@ -8,6 +8,7 @@ import {
   getMetadata,
   getNFT,
   listAllNFTs,
+  listAllNFTOwners,
   listChains,
   listMetadata,
   listCollections,
@@ -133,6 +134,15 @@ describe('NFTs', () => {
   test('returns nft', async () => {
     const result = await getNFT(CHAIN_NAME, CONTRACT_ADDRESS, '199144');
     expect(result.result).not.toBe(null);
+  });
+});
+
+describe('NFT Owners', () => {
+  describe('listAllNFTOwners', () => {
+    test('returns a list of NFT Owners', async () => {
+      const result = await listAllNFTOwners();
+      expect(result.result.length).toBeGreaterThan(0);
+    });
   });
 });
 
