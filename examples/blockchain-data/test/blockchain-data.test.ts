@@ -1,4 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
+import { blockchainData } from '@imtbl/sdk';
 
 import {
   verifySuccessfulMints,
@@ -10,6 +11,7 @@ import {
   listCollections,
   listCollectionsByNFTOwner,
   listActivities,
+  listActivitiesByActivityType,
   listNFTsByAccountAddress,
 } from '../api-examples-with-node';
 
@@ -22,6 +24,18 @@ describe('Activities', () => {
     test('listing activities from a contract address returns activities', async () => {
       const result = await listActivities(CHAIN_NAME, CONTRACT_ADDRESS, 10);
       expect(result.result.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('listActivities', () => {
+    test('listing activities by activity type returns activities of that type', async () => {
+      const result = await listActivitiesByActivityType(
+        CONTRACT_ADDRESS,
+        blockchainData.Types.ActivityType.Mint,
+      );
+      expect(result.result[0].type).toBe(
+        blockchainData.Types.ActivityType.Mint,
+      );
     });
   });
 
