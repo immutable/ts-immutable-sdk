@@ -17,6 +17,7 @@ import {
   listActivitiesByActivityType,
   listNFTsByAccountAddress,
   listNFTsByCollection,
+  listNFTOwnersByTokenId,
 } from '../api-examples-with-node';
 
 const CHAIN_NAME = 'imtbl-zkevm-testnet';
@@ -141,6 +142,16 @@ describe('NFT Owners', () => {
   describe('listAllNFTOwners', () => {
     test('returns a list of NFT Owners', async () => {
       const result = await listAllNFTOwners();
+      expect(result.result.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('listNFTOwnersByTokenId', () => {
+    test('returns a list of NFT Owners', async () => {
+      const result = await listNFTOwnersByTokenId(
+        '0xd9cfd0a6d1496a4da6e8ad570344e1482ce3c257',
+        '1',
+      );
       expect(result.result.length).toBeGreaterThan(0);
     });
   });

@@ -13,6 +13,7 @@ import { listActivities } from './list-activities';
 import { listActivitiesByActivityType } from './list-activties-by-activity-type';
 import { listNFTsByAccountAddress } from './list-nfts-by-account-address';
 import { listNFTsByCollection } from './list-nfts-by-collection';
+import { listNFTOwnersByTokenId } from './list-nft-owners-by-token-id';
 import { refreshNFTMetadata } from './refresh-nft-metadata';
 import { refreshStackedMetadata } from './refresh-stacked-metadata';
 
@@ -32,6 +33,7 @@ export {
   listActivitiesByActivityType,
   listNFTsByAccountAddress,
   listNFTsByCollection,
+  listNFTOwnersByTokenId,
   refreshNFTMetadata,
   refreshStackedMetadata,
 };
