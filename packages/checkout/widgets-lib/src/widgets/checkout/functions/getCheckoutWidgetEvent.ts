@@ -12,14 +12,9 @@ import {
   SaleEventType,
   SwapEventType,
   WalletEventType,
-  WidgetEventData,
-  WidgetType,
 } from '@imtbl/checkout-sdk';
 
-type CheckoutEventDetail = {
-  type: CheckoutEventType;
-  data: WidgetEventData[WidgetType.CHECKOUT][keyof WidgetEventData[WidgetType.CHECKOUT]];
-};
+import { CheckoutEventDetail } from '../CheckoutWidgetEvents';
 
 /**
  * Map Connect Widget Events
