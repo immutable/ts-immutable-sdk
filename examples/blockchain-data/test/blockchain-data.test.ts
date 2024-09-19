@@ -7,6 +7,7 @@ import {
   getCollection,
   getMetadata,
   getNFT,
+  listChains,
   listMetadata,
   listCollections,
   listCollectionsByNFTOwner,
@@ -18,6 +19,15 @@ import {
 const CHAIN_NAME = 'imtbl-zkevm-testnet';
 const CONTRACT_ADDRESS = '0x21F0D60cfE554B6d5b7f9E799BDeBD97C5d64274';
 const NFT_OWNER = '0x9C1634bebC88653D2Aebf4c14a3031f62092b1D9';
+
+describe('Chains', () => {
+  describe('listChains', () => {
+    test('returns a list of chains', async () => {
+      const result = await listChains({});
+      expect(result.result.length).toBeGreaterThan(0);
+    });
+  });
+});
 
 describe('Activities', () => {
   describe('listActivities', () => {
