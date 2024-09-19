@@ -1,38 +1,44 @@
 import { useEffect, useMemo, useReducer } from 'react';
 import {
-  Checkout,
   CheckoutWidgetConfiguration,
   CheckoutWidgetParams,
-  PostMessageHandlerEventType,
 } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
+import { useTranslation } from 'react-i18next';
 import {
-  CheckoutActions,
   checkoutReducer,
   initialCheckoutState,
 } from './context/CheckoutContext';
 import { CheckoutContextProvider } from './context/CheckoutContextProvider';
-import { CheckoutAppIframe } from './views/CheckoutAppIframe';
-import { getIframeURL } from './functions/iframeParams';
-import { useMount } from './hooks/useMount';
-import { useAsyncMemo } from './hooks/useAsyncMemo';
+import { useConnectLoaderState } from '../../context/connect-loader-context/ConnectLoaderContext';
+import {
+  SharedViews,
+  useViewState,
+  ViewContextProvider,
+} from '../../context/view-context/ViewContext';
+import { LoadingView } from '../../views/loading/LoadingView';
 
 export type CheckoutWidgetInputs = {
-  checkout: Checkout;
   params: CheckoutWidgetParams;
   config: CheckoutWidgetConfiguration;
-  provider?: Web3Provider;
 };
 
 export default function CheckoutWidget(props: CheckoutWidgetInputs) {
-  const {
-    config, checkout, params, provider,
-  } = props;
+  const { config, params } = props;
 
-  const iframeURL = useAsyncMemo(
-    async () => getIframeURL(params, config, checkout.config),
-    [params, config, checkout.config],
-  );
+  const { t } = useTranslation();
+  const [viewState] = useViewState();
+  const [{ checkout, provider }] = useConnectLoaderState();
+
+  useEffect(() => {
+    // eslint-disable-next-line
+    console.log(
+      '🐛 ~ config, checkout, params, provider,:',
+      config,
+      checkout,
+      params,
+      provider,
+    );
+  }, []);
 
   const [checkoutState, checkoutDispatch] = useReducer(
     checkoutReducer,
@@ -40,38 +46,19 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   );
   const checkoutReducerValues = useMemo(
     () => ({
-      checkoutState: { ...checkoutState, iframeURL, checkout },
+      checkoutState: { ...checkoutState, checkout, provider },
       checkoutDispatch,
     }),
-    [checkoutState, checkoutDispatch, iframeURL, checkout],
+    [checkoutState, checkoutDispatch, checkout, provider],
   );
-
-  // If the widget was initialized with a provider,
-  // notify iframe via postMessage
-  const { postMessageHandler } = checkoutState;
-  useMount(
-    () => {
-      if (!provider) return;
-
-      postMessageHandler?.send(PostMessageHandlerEventType.PROVIDER_UPDATED, {
-        isMetamask: provider.provider.isMetaMask,
-        isPassport: (provider.provider as any)?.isPassport,
-      });
-    },
-    [postMessageHandler, provider] as const,
-    ([_postMessageHandler]) => _postMessageHandler !== undefined,
-  );
-
-  // keep the provider updated in the state
-  useEffect(() => {
-    checkoutDispatch({
-      payload: { type: CheckoutActions.SET_PROVIDER, provider },
-    });
-  }, [provider]);
 
   return (
-    <CheckoutContextProvider values={checkoutReducerValues}>
-      <CheckoutAppIframe />
-    </CheckoutContextProvider>
+    <ViewContextProvider>
+      <CheckoutContextProvider values={checkoutReducerValues}>
+        {viewState.view.type === SharedViews.LOADING_VIEW && (
+          <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
+        )}
+      </CheckoutContextProvider>
+    </ViewContextProvider>
   );
 }

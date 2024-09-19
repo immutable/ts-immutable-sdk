@@ -1,10 +1,8 @@
-import { PostMessageHandler } from '@imtbl/checkout-sdk';
 import {
-  Dispatch, ReactNode, useContext, useEffect,
+  Dispatch, ReactNode, useContext,
 } from 'react';
 import {
   CheckoutAction,
-  CheckoutActions,
   CheckoutContext,
   CheckoutState,
 } from './CheckoutContext';
@@ -20,30 +18,6 @@ export function CheckoutContextProvider({
   values,
   children,
 }: CheckoutContextProviderProps) {
-  const { checkoutState, checkoutDispatch } = values;
-  const { checkout, iframeContentWindow, iframeURL } = checkoutState;
-
-  useEffect(() => {
-    if (!iframeContentWindow || !checkout || !iframeURL) return;
-
-    const postMessageHandlerInstance = new PostMessageHandler({
-      targetOrigin: new URL(iframeURL).origin,
-      eventTarget: iframeContentWindow,
-    });
-
-    // TODO: remove logger after done with development
-    postMessageHandlerInstance.setLogger((...args: any[]) => {
-      console.log("🔔 PARENT – ", ...args); // eslint-disable-line
-    });
-
-    checkoutDispatch({
-      payload: {
-        type: CheckoutActions.SET_POST_MESSAGE_HANDLER,
-        postMessageHandler: postMessageHandlerInstance,
-      },
-    });
-  }, [iframeContentWindow, checkout, iframeURL]);
-
   return (
     <CheckoutContext.Provider value={values}>
       {children}
@@ -55,7 +29,7 @@ export const useCheckoutContext = () => {
   const context = useContext(CheckoutContext);
   if (context === undefined) {
     const error = new Error(
-      'useCheckoutContext must be used within a <ImtblProvider />',
+      'useCheckoutContext must be used within a <CheckoutContextProvider />',
     );
     throw error;
   }
