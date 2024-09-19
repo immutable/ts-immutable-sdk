@@ -1,6 +1,6 @@
 import { client } from "../lib";
 
-export async function createMintRequest(
+export async function createMintRequestWithMetadata(
   chainName: string,
   contractAddress: string,
   owner_address: string,
