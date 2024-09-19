@@ -7,6 +7,7 @@ import {
   getCollection,
   getMetadata,
   getNFT,
+  getToken,
   listAllNFTs,
   listAllNFTOwners,
   listChains,
@@ -19,11 +20,13 @@ import {
   listNFTsByCollection,
   listNFTOwnersByTokenId,
   listNFTOwnersByContractAddress,
+  listTokens,
 } from '../api-examples-with-node';
 
 const CHAIN_NAME = 'imtbl-zkevm-testnet';
 const CONTRACT_ADDRESS = '0x21F0D60cfE554B6d5b7f9E799BDeBD97C5d64274';
 const NFT_OWNER = '0x9C1634bebC88653D2Aebf4c14a3031f62092b1D9';
+const TOKEN_ADDRESS = '0x007a4bdf308ca0074d7b95628e72a62f12b2c58f';
 
 describe('Chains', () => {
   describe('listChains', () => {
@@ -163,6 +166,22 @@ describe('NFT Owners', () => {
         '1',
       );
       expect(result.result.length).toBeGreaterThan(0);
+    });
+  });
+});
+
+describe('Tokens', () => {
+  describe('listTokens', () => {
+    test('returns a list of tokens', async () => {
+      const result = await listTokens();
+      expect(result.result.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('getToken', () => {
+    test('returns a token', async () => {
+      const result = await getToken(TOKEN_ADDRESS);
+      expect(result).not.toBe(null);
     });
   });
 });
