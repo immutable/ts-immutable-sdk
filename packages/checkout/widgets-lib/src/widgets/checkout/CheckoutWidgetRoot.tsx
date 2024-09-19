@@ -46,6 +46,7 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
 
   protected render() {
     if (!this.reactRoot) return;
+
     const { t } = i18n;
     const config = this.properties.config || {};
 
@@ -58,12 +59,7 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
                 <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
               }
             >
-              <CheckoutWidget
-                provider={this.web3Provider}
-                checkout={this.checkout}
-                config={config}
-                params={this.parameters}
-              />
+              <CheckoutWidget config={config} params={this.parameters} />
             </Suspense>
           </HandoverProvider>
         </ThemeProvider>
