@@ -1,4 +1,5 @@
 import {
+  ChainId,
   Checkout,
   IMTBLWidgetEvents,
   TokenFilterTypes,
@@ -24,6 +25,7 @@ import {
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
+import { useRoutes } from '../hooks/useRoutes';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -50,9 +52,11 @@ export function AddFunds({
 }: AddFundsProps) {
   const showBack = showBackButton || !!onBackButtonClick;
 
-  const { addFundsDispatch } = useContext(AddFundsContext);
+  const { addFundsState, addFundsDispatch } = useContext(AddFundsContext);
 
   const { viewDispatch } = useContext(ViewContext);
+
+  const { routes, fetchRoutesWithRateLimit } = useRoutes();
 
   const {
     eventTargetState: { eventTarget },
@@ -143,7 +147,20 @@ export function AddFunds({
     fetchOnRampTokens();
   }, [checkout]);
 
-  const openDrawer = () => {
+  const openDrawer = async () => {
+    if (!addFundsState.squid || !currentToTokenAddress) {
+      return;
+    }
+    await fetchRoutesWithRateLimit(
+      addFundsState.squid,
+      addFundsState.balances,
+      ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+      currentToTokenAddress?.address ?? '',
+      currentToAmount,
+      5,
+      1000,
+    );
+
     setShowOptionsDrawer(true);
   };
 
@@ -281,6 +298,7 @@ export function AddFunds({
           }}
         >
           <OptionsDrawer
+            routes={routes}
             showOnrampOption={checkShowOnRampOption()}
             showSwapOption={showSwapOption}
             showBridgeOption={showBridgeOption}
