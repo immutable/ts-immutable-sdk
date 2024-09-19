@@ -1,34 +1,20 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { createContext } from 'react';
 import {
-  Checkout, EIP6963ProviderInfo, PostMessageHandler, WalletProviderName,
+  Checkout,
 } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 
 export interface CheckoutState {
-  checkout: Checkout | null;
+  checkout: Checkout | undefined;
   provider: Web3Provider | undefined;
   passport: Passport | undefined;
-  iframeURL: string | undefined;
-  iframeContentWindow: Window | undefined;
-  postMessageHandler: PostMessageHandler | undefined;
-  walletProviderName: WalletProviderName | null;
-  walletProviderInfo: EIP6963ProviderInfo | null;
-  sendCloseEvent: () => void;
-  initialised: boolean;
 }
 
 export const initialCheckoutState: CheckoutState = {
-  checkout: null,
+  checkout: undefined,
   provider: undefined,
   passport: undefined,
-  iframeURL: undefined,
-  iframeContentWindow: undefined,
-  postMessageHandler: undefined,
-  walletProviderInfo: null,
-  walletProviderName: null,
-  sendCloseEvent: () => { },
-  initialised: false,
 };
 
 export interface CheckoutContextState {
@@ -43,24 +29,12 @@ export interface CheckoutAction {
 type ActionPayload =
   | SetCheckoutPayload
   | SetProviderPayload
-  | SetIframeURLPayload
-  | SetPostMessageHandlerPayload
-  | SetIframeContentWindowPayload
-  | SetPassportPayload
-  | SetProviderNamePayload
-  | SetSendCloseEventPayload
-  | SetInitialisedPayload;
+  | SetPassportPayload;
 
 export enum CheckoutActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
-  SET_IFRAME_URL = 'SET_IFRAME_URL',
-  SET_POST_MESSAGE_HANDLER = 'SET_POST_MESSAGE_HANDLER',
-  SET_CHECKOUT_APP_IFRAME = 'SET_CHECKOUT_APP_IFRAME',
   SET_PASSPORT = 'SET_PASSPORT',
-  SET_WALLET_PROVIDER_NAME = 'SET_WALLET_PROVIDER_NAME',
-  SET_SEND_CLOSE_EVENT = 'SET_SEND_CLOSE_EVENT',
-  SET_INITIALISED = 'SET_INITIALISED',
 }
 
 export interface SetCheckoutPayload {
@@ -73,39 +47,9 @@ export interface SetProviderPayload {
   provider: Web3Provider | undefined;
 }
 
-export interface SetIframeURLPayload {
-  type: CheckoutActions.SET_IFRAME_URL;
-  iframeURL: string;
-}
-
-export interface SetIframeContentWindowPayload {
-  type: CheckoutActions.SET_CHECKOUT_APP_IFRAME;
-  iframeContentWindow: Window;
-}
-
-export interface SetPostMessageHandlerPayload {
-  type: CheckoutActions.SET_POST_MESSAGE_HANDLER;
-  postMessageHandler: PostMessageHandler;
-}
-
 export interface SetPassportPayload {
   type: CheckoutActions.SET_PASSPORT;
-  passport: Passport;
-}
-
-export interface SetProviderNamePayload {
-  type: CheckoutActions.SET_WALLET_PROVIDER_NAME;
-  walletProviderName: WalletProviderName;
-}
-
-export interface SetSendCloseEventPayload {
-  type: CheckoutActions.SET_SEND_CLOSE_EVENT;
-  sendCloseEvent: () => void;
-}
-
-export interface SetInitialisedPayload {
-  type: CheckoutActions.SET_INITIALISED;
-  initialised: boolean;
+  passport: Passport | undefined;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -137,36 +81,6 @@ export const checkoutReducer: Reducer<CheckoutState, CheckoutAction> = (
       return {
         ...state,
         passport: action.payload.passport,
-      };
-    case CheckoutActions.SET_IFRAME_URL:
-      return {
-        ...state,
-        iframeURL: action.payload.iframeURL,
-      };
-    case CheckoutActions.SET_CHECKOUT_APP_IFRAME:
-      return {
-        ...state,
-        iframeContentWindow: action.payload.iframeContentWindow,
-      };
-    case CheckoutActions.SET_POST_MESSAGE_HANDLER:
-      return {
-        ...state,
-        postMessageHandler: action.payload.postMessageHandler,
-      };
-    case CheckoutActions.SET_WALLET_PROVIDER_NAME:
-      return {
-        ...state,
-        walletProviderName: action.payload.walletProviderName,
-      };
-    case CheckoutActions.SET_SEND_CLOSE_EVENT:
-      return {
-        ...state,
-        sendCloseEvent: action.payload.sendCloseEvent,
-      };
-    case CheckoutActions.SET_INITIALISED:
-      return {
-        ...state,
-        initialised: action.payload.initialised,
       };
     default:
       return state;
