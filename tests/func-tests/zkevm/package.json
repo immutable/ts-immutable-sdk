@@ -32,6 +32,7 @@
   "scripts": {
     "compile": "npx hardhat compile",
     "func-test": "yarn compile && jest",
+    "func-test:only": "yarn compile && TAGS=\"@only\" jest",
     "func-test:ci": "yarn compile && TAGS=\"not @skip and not @slow\" jest",
     "postpack": "pinst --enable",
     "prepack": "pinst --disable"
