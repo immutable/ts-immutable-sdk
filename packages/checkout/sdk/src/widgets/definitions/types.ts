@@ -41,6 +41,7 @@ import {
   CheckoutUserActionEvent,
   RequestAddFundsEvent,
   RequestGoBackEvent,
+  AddFundsEventType,
 } from './events';
 import {
   BridgeWidgetParams,
@@ -49,6 +50,7 @@ import {
   WalletWidgetParams,
   OnRampWidgetParams,
   CheckoutWidgetParams,
+  AddFundsWidgetParams,
 } from './parameters';
 import { SaleWidgetParams } from './parameters/sale';
 import {
@@ -59,11 +61,9 @@ import {
   SwapWidgetConfiguration,
   WalletWidgetConfiguration,
   CheckoutWidgetConfiguration,
+  AddFundsWidgetConfiguration,
 } from './configurations';
 import { WidgetTheme } from './configurations/theme';
-import { AddFundsWidgetConfiguration } from './configurations/addFunds';
-import { AddFundsWidgetParams } from './parameters/addFunds';
-import { AddFundsEventType } from './events/addFunds';
 
 /**
  * Enum representing the list of widget types.
