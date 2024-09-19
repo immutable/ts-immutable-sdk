@@ -17,7 +17,6 @@ import { TextInputForm } from '../../../components/FormComponents/TextInputForm/
 import { OptionsDrawer } from '../components/OptionsDrawer';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
-import { OptionTypes } from '../components/Option';
 import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
 import { getL2ChainId } from '../../../lib';
 import {
@@ -164,28 +163,16 @@ export function AddFunds({
   //   console.log('handle review click');
   // };
 
-  const onPayWithCard = (paymentType: OptionTypes) => {
-    if (paymentType === OptionTypes.SWAP) {
-      orchestrationEvents.sendRequestSwapEvent(
-        eventTarget,
-        IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
-        {
-          toTokenAddress: currentToTokenAddress?.address ?? '',
-          amount: toAmount ?? '',
-          fromTokenAddress: '',
-        },
-      );
-    } else {
-      const data = {
-        tokenAddress: currentToTokenAddress?.address ?? '',
-        amount: toAmount ?? '',
-      };
-      orchestrationEvents.sendRequestOnrampEvent(
-        eventTarget,
-        IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
-        data,
-      );
-    }
+  const onPayWithCard = () => {
+    const data = {
+      tokenAddress: currentToTokenAddress?.address ?? '',
+      amount: toAmount ?? '',
+    };
+    orchestrationEvents.sendRequestOnrampEvent(
+      eventTarget,
+      IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+      data,
+    );
   };
 
   const checkShowOnRampOption = () => {

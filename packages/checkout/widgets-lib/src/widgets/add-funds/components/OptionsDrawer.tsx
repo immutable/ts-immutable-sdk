@@ -2,7 +2,7 @@ import { Box, Drawer } from '@biom3/react';
 import { motion } from 'framer-motion';
 import { listVariants } from '../../../lib/animation/listAnimation';
 import { Options } from './Options';
-import { OptionTypes } from './Option';
+import { CardOptionTypes } from './CardOption';
 
 type OptionsDrawerProps = {
   showOnrampOption?: boolean;
@@ -10,11 +10,12 @@ type OptionsDrawerProps = {
   showBridgeOption?: boolean;
   visible: boolean;
   onClose: () => void;
-  onPayWithCard?: (paymentType: OptionTypes) => void;
+  onPayWithCard?: (paymentType: CardOptionTypes) => void;
 };
 
 export function OptionsDrawer({
   showOnrampOption,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   showSwapOption,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   showBridgeOption,
@@ -22,13 +23,10 @@ export function OptionsDrawer({
   onClose,
   onPayWithCard,
 }: OptionsDrawerProps) {
-  const disabledOptions: OptionTypes[] = [];
+  const disabledOptions: CardOptionTypes[] = [];
   if (!showOnrampOption) {
-    disabledOptions.push(OptionTypes.CREDIT);
-    disabledOptions.push(OptionTypes.DEBIT);
-  }
-  if (!showSwapOption) {
-    disabledOptions.push(OptionTypes.SWAP);
+    disabledOptions.push(CardOptionTypes.CREDIT);
+    disabledOptions.push(CardOptionTypes.DEBIT);
   }
 
   return (
@@ -59,15 +57,13 @@ export function OptionsDrawer({
             size="medium"
             hideDisabledOptions
             options={[
-              OptionTypes.SWAP,
-              OptionTypes.DEBIT,
-              OptionTypes.CREDIT,
+              CardOptionTypes.DEBIT,
+              CardOptionTypes.CREDIT,
             ]}
             disabledOptions={disabledOptions}
             captions={{
-              [OptionTypes.SWAP]: 'Swap',
-              [OptionTypes.DEBIT]: 'Debit',
-              [OptionTypes.CREDIT]: 'Credit',
+              [CardOptionTypes.DEBIT]: 'Debit',
+              [CardOptionTypes.CREDIT]: 'Credit',
             }}
           />
         </Box>

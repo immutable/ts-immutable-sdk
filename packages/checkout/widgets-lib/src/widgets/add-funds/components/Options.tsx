@@ -6,19 +6,18 @@ import {
   listItemVariants,
   listVariants,
 } from '../../../lib/animation/listAnimation';
-import { Option, OptionTypes } from './Option';
+import { CardOption, CardOptionTypes } from './CardOption';
 
-const defaultOptions: OptionTypes[] = [
-  OptionTypes.SWAP,
-  OptionTypes.DEBIT,
-  OptionTypes.CREDIT,
+const defaultOptions: CardOptionTypes[] = [
+  CardOptionTypes.DEBIT,
+  CardOptionTypes.CREDIT,
 ];
 
 export interface OptionsProps {
-  onClick: (type: OptionTypes) => void;
-  disabledOptions?: OptionTypes[];
-  options?: OptionTypes[];
-  captions?: Partial<Record<OptionTypes, string>>;
+  onClick: (type: CardOptionTypes) => void;
+  disabledOptions?: CardOptionTypes[];
+  options?: CardOptionTypes[];
+  captions?: Partial<Record<CardOptionTypes, string>>;
   size?: MenuItemSize;
   hideDisabledOptions?: boolean;
 }
@@ -54,7 +53,7 @@ export function Options(props: OptionsProps) {
       }
     >
       {filteredOptions.map((type, idx: number) => (
-        <Option
+        <CardOption
           key={`option-type-${type}`}
           type={type}
           size={size}
