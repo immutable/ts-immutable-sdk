@@ -1,4 +1,5 @@
 * @immutable/passport
+package.json @immutable/passport
 .github @immutable/security @immutable/passport
 /.husky @immutable/passport
 /.nvmrc @immutable/passport
