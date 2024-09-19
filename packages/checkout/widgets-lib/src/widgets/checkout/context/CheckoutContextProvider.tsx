@@ -1,38 +1,41 @@
+import { ReactNode, useMemo, useReducer } from 'react';
 import {
-  Dispatch, ReactNode, useContext,
-} from 'react';
-import {
-  CheckoutAction,
   CheckoutContext,
-  CheckoutState,
+  checkoutReducer,
+  initialCheckoutState,
 } from './CheckoutContext';
+import { useConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
+
+export const useCheckoutWidgetState = () => {
+  const [viewState, viewDispatch] = useReducer(
+    checkoutReducer,
+    initialCheckoutState,
+  );
+
+  return [viewState, viewDispatch] as const;
+};
 
 type CheckoutContextProviderProps = {
-  values: {
-    checkoutState: CheckoutState;
-    checkoutDispatch: Dispatch<CheckoutAction>;
-  };
   children: ReactNode;
 };
-export function CheckoutContextProvider({
-  values,
+
+export function CheckoutWidgetContextProvicer({
   children,
 }: CheckoutContextProviderProps) {
+  const [{ checkout, provider }] = useConnectLoaderState();
+  const [checkoutState, checkoutDispatch] = useCheckoutWidgetState();
+
+  const values = useMemo(
+    () => ({
+      checkoutState: { ...checkoutState, checkout, provider },
+      checkoutDispatch,
+    }),
+    [checkoutState, checkoutDispatch, checkout, provider],
+  );
+
   return (
     <CheckoutContext.Provider value={values}>
       {children}
     </CheckoutContext.Provider>
   );
 }
-
-export const useCheckoutContext = () => {
-  const context = useContext(CheckoutContext);
-  if (context === undefined) {
-    const error = new Error(
-      'useCheckoutContext must be used within a <CheckoutContextProvider />',
-    );
-    throw error;
-  }
-
-  return [context.checkoutState, context.checkoutDispatch] as const;
-};

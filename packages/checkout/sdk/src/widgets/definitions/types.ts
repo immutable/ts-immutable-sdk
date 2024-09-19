@@ -41,6 +41,7 @@ import {
   CheckoutUserActionEvent,
   RequestAddFundsEvent,
   RequestGoBackEvent,
+  AddFundsEventType,
 } from './events';
 import {
   BridgeWidgetParams,
@@ -49,6 +50,7 @@ import {
   WalletWidgetParams,
   OnRampWidgetParams,
   CheckoutWidgetParams,
+  AddFundsWidgetParams,
 } from './parameters';
 import { SaleWidgetParams } from './parameters/sale';
 import {
@@ -59,11 +61,9 @@ import {
   SwapWidgetConfiguration,
   WalletWidgetConfiguration,
   CheckoutWidgetConfiguration,
+  AddFundsWidgetConfiguration,
 } from './configurations';
 import { WidgetTheme } from './configurations/theme';
-import { AddFundsWidgetConfiguration } from './configurations/addFunds';
-import { AddFundsWidgetParams } from './parameters/addFunds';
-import { AddFundsEventType } from './events/addFunds';
 
 /**
  * Enum representing the list of widget types.
@@ -94,8 +94,9 @@ export type WidgetConfigurations = {
   [WidgetType.BRIDGE]: BridgeWidgetConfiguration;
   [WidgetType.ONRAMP]: OnrampWidgetConfiguration;
   [WidgetType.SALE]: SaleWidgetConfiguration;
-  [WidgetType.CHECKOUT]: CheckoutWidgetConfiguration;
   [WidgetType.ADD_FUNDS]: AddFundsWidgetConfiguration;
+
+  [WidgetType.CHECKOUT]: CheckoutWidgetConfiguration;
 };
 
 // Mapping each widget type to their parameters
@@ -106,8 +107,9 @@ export type WidgetParameters = {
   [WidgetType.BRIDGE]: BridgeWidgetParams;
   [WidgetType.ONRAMP]: OnRampWidgetParams;
   [WidgetType.SALE]: SaleWidgetParams;
-  [WidgetType.CHECKOUT]: CheckoutWidgetParams;
   [WidgetType.ADD_FUNDS]: AddFundsWidgetParams;
+
+  [WidgetType.CHECKOUT]: CheckoutWidgetParams;
 };
 
 /**

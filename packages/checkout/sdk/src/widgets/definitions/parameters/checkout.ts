@@ -6,14 +6,16 @@ import { WalletWidgetParams } from './wallet';
 import { SwapWidgetParams } from './swap';
 import { OnRampWidgetParams } from './onramp';
 import { SaleWidgetParams } from './sale';
+import { AddFundsWidgetParams } from './addFunds';
 
 export enum CheckoutFlowType {
-  CONNECT = 'connect',
-  WALLET = 'wallet',
-  SWAP = 'swap',
-  BRIDGE = 'bridge',
-  ONRAMP = 'onramp',
-  SALE = 'sale',
+  CONNECT = 'CONNECT',
+  WALLET = 'WALLET',
+  SALE = 'SALE',
+  SWAP = 'SWAP',
+  BRIDGE = 'BRIDGE',
+  ONRAMP = 'ONRAMP',
+  ADD_FUNDS = 'ADD_FUNDS',
 }
 
 export type CheckoutWidgetConnectFlowParams = {
@@ -40,13 +42,18 @@ export type CheckouWidgetSaleFlowParams = {
   flow: CheckoutFlowType.SALE;
 } & SaleWidgetParams;
 
+export type CheckouWidgetAddFundsFlowParams = {
+  flow: CheckoutFlowType.ADD_FUNDS;
+} & AddFundsWidgetParams;
+
 export type CheckoutWidgetFlowParams =
   | CheckoutWidgetConnectFlowParams
   | CheckoutWidgetWalletFlowParams
   | CheckouWidgetSwapFlowParams
   | CheckouWidgetBridgeFlowParams
   | CheckouWidgetOnRampFlowParams
-  | CheckouWidgetSaleFlowParams;
+  | CheckouWidgetSaleFlowParams
+  | CheckouWidgetAddFundsFlowParams;
 
 export type CheckoutWidgetParams = {
   /** The language to use for the checkout widget */

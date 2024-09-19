@@ -28,6 +28,7 @@ import {
   CheckoutFlowType,
   WalletProviderName,
   Widget,
+  SalePaymentTypes,
 } from "@imtbl/checkout-sdk";
 import { Passport } from "@imtbl/passport";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
@@ -37,6 +38,7 @@ import { useAsyncMemo, usePrevState } from "../../../hooks";
 import { Message } from "./components/messages";
 import { Legend } from "./components/legend";
 import { itemsMock } from "./items.mock";
+import { ChainId } from "@imtbl/checkout-sdk";
 
 //
 const ENVIRONMENT_DEV = "development" as Environment;
@@ -130,6 +132,7 @@ const flows: Array<CheckoutFlowType> = [
   CheckoutFlowType.SWAP,
   CheckoutFlowType.BRIDGE,
   CheckoutFlowType.SALE,
+  CheckoutFlowType.ADD_FUNDS,
 ];
 
 function CheckoutUI() {
@@ -165,13 +168,34 @@ function CheckoutUI() {
   const [flowParams, setFlowParams] = useState<
     Partial<Record<CheckoutFlowType, CheckoutWidgetParams>>
   >({
-    sale: {
+    CONNECT: {
+      flow: CheckoutFlowType.CONNECT,
+      // blocklistWalletRdns: ["io.metamask"],
+      // targetChainId: ChainId.SEPOLIA,
+      // targetWalletRdns: "io.metamask",
+      theme: WidgetTheme.LIGHT,
+    },
+    SALE: {
       flow: CheckoutFlowType.SALE,
       items: itemsMock,
-      environmentId: "249d9b0b-ee16-4dd5-91ee-96bece3b0473",
+      environmentId: "4dfc4bec-1867-49aa-ad35-d8a13b206c94",
       collectionName: "Pixel Aussie Farm",
-      // excludePaymentTypes: [checkout.SalePaymentTypes.CREDIT],
+      excludePaymentTypes: [SalePaymentTypes.CREDIT],
       // preferredCurrency: 'USDC',
+    },
+    SWAP: {
+      flow: CheckoutFlowType.SWAP,
+      amount: "10",
+      fromTokenAddress: "native",
+      toTokenAddress: "0x3B2d8A1931736Fc321C24864BceEe981B11c3c57",
+    },
+    WALLET: {
+      flow: CheckoutFlowType.WALLET,
+    },
+    ADD_FUNDS: {
+      flow: CheckoutFlowType.ADD_FUNDS,
+      toAmount: "100",
+      toTokenAddress: "native",
     },
   });
 
@@ -240,18 +264,18 @@ function CheckoutUI() {
       config: {
         theme,
         language,
-        // swap: {},
-        // bridge: {},
-        // connect: {},
-        // onRamp: {},
-        // sale: {
-        //   hideExcludedPaymentTypes: false,
-        //   waitFulfillmentSettlements: false,
-        // },
-        // wallet: {
-        //   showDisconnectButton: true,
-        //   showNetworkMenu: true,
-        // }
+        // SWAP: {},
+        // BRIDGE: {},
+        // CONNECT: {},
+        // ONRAMP: {},
+        SALE: {
+          hideExcludedPaymentTypes: true,
+          waitFulfillmentSettlements: false,
+        },
+        WALLET: {
+          showDisconnectButton: false,
+          showNetworkMenu: false,
+        },
       },
     });
   }, [widgetsFactory, web3Provider, renderAfterConnect]);
@@ -430,7 +454,7 @@ function CheckoutUI() {
                       name: "Kangaroo",
                       image:
                         "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-10-1.png",
-                      description: "Pixel Art Kangaroo"
+                      description: "Pixel Art Kangaroo",
                     },
                   ],
                   environmentId: "249d9b0b-ee16-4dd5-91ee-96bece3b0473",
