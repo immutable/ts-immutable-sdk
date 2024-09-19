@@ -1,5 +1,5 @@
+import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import { RouteResponse, Token } from '@0xsquid/squid-types';
-import { TokenBalance } from '@imtbl/checkout-sdk';
 
 export type Chain = {
   id: string;
