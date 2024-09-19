@@ -1,11 +1,12 @@
 import { blockchainData } from "@imtbl/sdk";
 import { client } from "../lib";
 
-export async function createMintRequestWithMetadata(
+export async function createMintRequestWithTokenIdAndMetadata(
   chainName: string,
   contractAddress: string,
   owner_address: string,
-  reference_id: string
+  reference_id: string,
+  token_id: string
 ): Promise<blockchainData.Types.CreateMintRequestResult> {
   return await client.createMintRequest({
     chainName,
@@ -15,6 +16,7 @@ export async function createMintRequestWithMetadata(
         {
           owner_address,
           reference_id,
+          token_id,
           metadata: {
             name: "Brown Dog Green Car",
             description: "This NFT is a Brown Dog in a Green Car",
@@ -45,6 +47,7 @@ export async function createMintRequestWithMetadata(
         {
           owner_address,
           reference_id,
+          token_id,
           metadata: {
             name: "Brown Dog Red Car",
             description: "This NFT is a Brown Dog in a Red Car",
