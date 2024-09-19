@@ -9,12 +9,14 @@ import { SaleWidgetView } from './SaleViewContextTypes';
 import { ViewType } from './ViewType';
 import { OnRampWidgetView } from './OnRampViewContextTypes';
 import { AddFundsWidgetView } from './AddFundsViewContextTypes';
+import { CheckoutWidgetView } from './CheckoutWidgetViewContextTypes';
 
 export enum SharedViews {
   LOADING_VIEW = 'LOADING_VIEW',
   ERROR_VIEW = 'ERROR_VIEW',
-  SERVICE_UNAVAILABLE_ERROR_VIEW = 'SERVICE_UNAVAILABLE_ERROR_VIEW',
+  SUCCESS_VIEW = 'SUCCESS_VIEW',
   TOP_UP_VIEW = 'TOP_UP_VIEW',
+  SERVICE_UNAVAILABLE_ERROR_VIEW = 'SERVICE_UNAVAILABLE_ERROR_VIEW',
 }
 
 export type SharedView =
@@ -51,7 +53,8 @@ export type View =
   | OnRampWidgetView
   | SaleWidgetView
   | BridgeWidgetView
-  | AddFundsWidgetView;
+  | AddFundsWidgetView
+  | CheckoutWidgetView;
 
 export interface ViewState {
   view: View;
