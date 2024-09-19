@@ -100,7 +100,8 @@
       "tests/**",
       "examples/passport/**",
       "examples/orderbook/**",
-      "examples/checkout/**"
+      "examples/checkout/**",
+      "examples/blockchain-data/**"
     ],
     "nohoist": [
       "examples/**",
