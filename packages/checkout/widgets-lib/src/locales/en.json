@@ -643,19 +643,14 @@
     "ADD_FUNDS": {
       "drawer": {
         "options": {
-          "swap": {
-            "heading": "Swap",
-            "caption": "Swap tokens on this network.",
-            "disabledCaption": "Currently not available."
-          },
           "debit": {
             "heading": "Debit Card",
-            "caption": "The recommended way to pay with card.",
+            "caption": "The recommended way to add funds with card",
             "disabledCaption": "Unavailable for your selection. We recommend adding tokens."
           },
           "credit": {
             "heading": "Credit Card",
-            "caption": "Not recommended since transactions may be blocked by your bank.",
+            "caption": "Not recommended due to failure rates & charges",
             "disabledCaption": "Unavailable for your selection. We recommend adding tokens."
           }
         }

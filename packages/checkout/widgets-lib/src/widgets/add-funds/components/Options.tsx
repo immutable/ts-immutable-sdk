@@ -17,7 +17,6 @@ export interface OptionsProps {
   onClick: (type: CardOptionTypes) => void;
   disabledOptions?: CardOptionTypes[];
   options?: CardOptionTypes[];
-  captions?: Partial<Record<CardOptionTypes, string>>;
   size?: MenuItemSize;
   hideDisabledOptions?: boolean;
 }
@@ -27,7 +26,6 @@ export function Options(props: OptionsProps) {
     disabledOptions = [],
     options,
     onClick,
-    captions,
     size,
     hideDisabledOptions,
   } = props;
@@ -59,7 +57,6 @@ export function Options(props: OptionsProps) {
           size={size}
           onClick={onClick}
           disabled={disabledOptions.includes(type)}
-          caption={captions?.[type]}
           rc={<motion.div custom={idx} variants={listItemVariants} />}
         />
       ))}

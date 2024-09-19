@@ -12,7 +12,6 @@ export interface CardOptionProps<RC extends ReactElement | undefined = undefined
   type: CardOptionTypes;
   onClick: (type: CardOptionTypes) => void;
   disabled?: boolean;
-  caption?: string;
   size?: MenuItemSize;
 }
 
@@ -20,7 +19,6 @@ export function CardOption<RC extends ReactElement | undefined = undefined>({
   type,
   onClick,
   disabled = false,
-  caption,
   size,
   rc = <span />,
 }: CardOptionProps<RC>) {
@@ -59,12 +57,11 @@ export function CardOption<RC extends ReactElement | undefined = undefined>({
       </MenuItem.Label>
       {!disabled && <MenuItem.IntentIcon />}
       <MenuItem.Caption>
-        {caption
-          || t(
-            `views.ADD_FUNDS.drawer.options.${type}.${
-              disabled ? 'disabledCaption' : 'caption'
-            }`,
-          )}
+        { t(
+          `views.ADD_FUNDS.drawer.options.${type}.${
+            disabled ? 'disabledCaption' : 'caption'
+          }`,
+        )}
       </MenuItem.Caption>
     </MenuItem>
   );

@@ -61,10 +61,6 @@ export function OptionsDrawer({
               CardOptionTypes.CREDIT,
             ]}
             disabledOptions={disabledOptions}
-            captions={{
-              [CardOptionTypes.DEBIT]: 'Debit',
-              [CardOptionTypes.CREDIT]: 'Credit',
-            }}
           />
         </Box>
       </Drawer.Content>
