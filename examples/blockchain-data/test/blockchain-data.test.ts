@@ -7,6 +7,7 @@ import {
   getCollection,
   getMetadata,
   getNFT,
+  listAllNFTs,
   listChains,
   listMetadata,
   listCollections,
@@ -100,6 +101,13 @@ describe('Metadata', () => {
 });
 
 describe('NFTs', () => {
+  describe('listAllNFTs', () => {
+    test('returns a list of NFTs', async () => {
+      const result = await listAllNFTs();
+      expect(result.result.length).toBeGreaterThan(0);
+    });
+  });
+
   describe('listNFTsByAccountAddress', () => {
     test('returns a list of NFTs', async () => {
       const result = await listNFTsByAccountAddress(

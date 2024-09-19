@@ -3,6 +3,7 @@ import { getChains } from './exported-types';
 import { getCollection } from './get-collection';
 import { getMetadata } from './get-metadata';
 import { getNFT } from './get-nft';
+import { listAllNFTs } from './list-nfts';
 import { listChains } from './list-chains';
 import { listMetadata } from './list-metadata';
 import { listCollections } from './list-collections';
@@ -19,6 +20,7 @@ export {
   getCollection,
   getMetadata,
   getNFT,
+  listAllNFTs,
   listChains,
   listMetadata,
   listCollections,
