@@ -9,26 +9,41 @@ import {
   SwapWidgetParams,
   AddFundsWidgetParams,
   AddFundsWidgetConfiguration,
+  CheckoutFlowType,
+  ConnectWidgetParams,
+  ConnectWidgetConfiguration,
+  WalletWidgetParams,
+  WalletWidgetConfiguration,
 } from '@imtbl/checkout-sdk';
 import { ViewType } from './ViewType';
 
-export enum CheckoutWidgetViews {
-  SALE = 'SALE',
-  ADD_FUNDS = 'ADD_FUNDS',
-  SWAP = 'SWAP',
-  ONRAMP = 'ONRAMP',
-  BRIDGE = 'BRIDGE',
-}
-
 export type CheckoutWidgetView =
+  | ConnectView
+  | WalletView
   | AddFundsView
   | SaleView
   | SwapView
   | OnRampView
   | BrdigeView;
 
+interface ConnectView extends ViewType {
+  type: CheckoutFlowType.CONNECT;
+  data: {
+    params: ConnectWidgetParams;
+    config: ConnectWidgetConfiguration;
+  };
+}
+
+interface WalletView extends ViewType {
+  type: CheckoutFlowType.WALLET;
+  data: {
+    params: WalletWidgetParams;
+    config: WalletWidgetConfiguration;
+  };
+}
+
 interface AddFundsView extends ViewType {
-  type: CheckoutWidgetViews.SALE;
+  type: CheckoutFlowType.ADD_FUNDS;
   data: {
     params: AddFundsWidgetParams;
     config: AddFundsWidgetConfiguration;
@@ -36,15 +51,15 @@ interface AddFundsView extends ViewType {
 }
 
 interface SaleView extends ViewType {
-  type: CheckoutWidgetViews.ADD_FUNDS;
+  type: CheckoutFlowType.SALE;
   data: {
-    params: SaleWidgetParams;
+    params: Required<SaleWidgetParams>;
     config: SaleWidgetConfiguration;
   };
 }
 
 interface SwapView extends ViewType {
-  type: CheckoutWidgetViews.SWAP;
+  type: CheckoutFlowType.SWAP;
   data: {
     params: SwapWidgetParams;
     config: SwapWidgetConfiguration;
@@ -52,7 +67,7 @@ interface SwapView extends ViewType {
 }
 
 interface OnRampView extends ViewType {
-  type: CheckoutWidgetViews.ONRAMP;
+  type: CheckoutFlowType.ONRAMP;
   data: {
     params: OnRampWidgetParams;
     config: OnrampWidgetConfiguration;
@@ -60,7 +75,7 @@ interface OnRampView extends ViewType {
 }
 
 interface BrdigeView extends ViewType {
-  type: CheckoutWidgetViews.BRIDGE;
+  type: CheckoutFlowType.BRIDGE;
   data: {
     params: BridgeWidgetParams;
     config: BridgeWidgetConfiguration;

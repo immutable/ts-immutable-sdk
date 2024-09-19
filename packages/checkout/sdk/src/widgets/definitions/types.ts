@@ -94,8 +94,9 @@ export type WidgetConfigurations = {
   [WidgetType.BRIDGE]: BridgeWidgetConfiguration;
   [WidgetType.ONRAMP]: OnrampWidgetConfiguration;
   [WidgetType.SALE]: SaleWidgetConfiguration;
-  [WidgetType.CHECKOUT]: CheckoutWidgetConfiguration;
   [WidgetType.ADD_FUNDS]: AddFundsWidgetConfiguration;
+
+  [WidgetType.CHECKOUT]: CheckoutWidgetConfiguration;
 };
 
 // Mapping each widget type to their parameters
@@ -106,8 +107,9 @@ export type WidgetParameters = {
   [WidgetType.BRIDGE]: BridgeWidgetParams;
   [WidgetType.ONRAMP]: OnRampWidgetParams;
   [WidgetType.SALE]: SaleWidgetParams;
-  [WidgetType.CHECKOUT]: CheckoutWidgetParams;
   [WidgetType.ADD_FUNDS]: AddFundsWidgetParams;
+
+  [WidgetType.CHECKOUT]: CheckoutWidgetParams;
 };
 
 /**
