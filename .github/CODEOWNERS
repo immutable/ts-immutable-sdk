@@ -1,4 +1,5 @@
 * @immutable/sdk
+package.json @immutable/sdk
 /.husky @immutable/sdk
 /.nvmrc @immutable/sdk
 /sdk @immutable/sdk
