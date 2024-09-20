@@ -273,8 +273,8 @@ function CheckoutUI() {
           waitFulfillmentSettlements: false,
         },
         WALLET: {
-          showDisconnectButton: false,
-          showNetworkMenu: false,
+          showDisconnectButton: true,
+          showNetworkMenu: true,
         },
       },
     });
@@ -692,12 +692,6 @@ function CheckoutUI() {
             </Link>
           </Message>
         )}
-      </Box>
-      <Box>
-        <Heading>Events</Heading>
-        {eventResults.map((result) => (
-          <Box children={JSON.stringify(result, null, 2)} />
-        ))}
       </Box>
     </Box>
   );
