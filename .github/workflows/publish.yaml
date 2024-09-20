@@ -48,7 +48,9 @@ jobs:
     steps:
       - name: Check Public Release Branch
         if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }} && (github.ref != 'refs/heads/main')
-        run: failure("Public releases should be only done from main branch, current branch ${{ github.ref }}")
+        run: |
+          echo "Public releases should be only done from main branch, current branch ${{ github.ref }}"
+          exit 1
 
       - name: Check User Permission
         id: check_user_permission
