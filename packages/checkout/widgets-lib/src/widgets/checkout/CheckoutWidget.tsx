@@ -57,7 +57,6 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   const viewState = useViewState();
   const [{ view }, viewDispatch] = viewState;
   const [{ eventTarget }] = useEventTargetState();
-  useWidgetEvents(eventTarget);
 
   /**
    * Subscribe and Handle widget events
