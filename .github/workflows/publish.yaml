@@ -97,7 +97,9 @@ jobs:
       - name: Generate SDK attestations
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: './sdk/!(node_modules)/**'
+          subject-path: |
+            './sdk/dist'
+            './sdk/package.json'
 
       - name: Authenticate NPM
         run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
