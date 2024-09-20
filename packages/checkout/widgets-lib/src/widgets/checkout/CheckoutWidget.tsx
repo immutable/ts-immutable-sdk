@@ -32,6 +32,7 @@ import WalletWidget from '../wallet/WalletWidget';
 import SaleWidget from '../sale/SaleWidget';
 import AddFundsWidget from '../add-funds/AddFundsWidget';
 import { getViewShouldConnect } from './functions/getViewShouldConnect';
+import { useWidgetEvents } from './hooks/useWidgetEvents';
 
 export type CheckoutWidgetInputs = {
   checkout: Checkout;
@@ -55,7 +56,11 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   const { t } = useTranslation();
   const [{ view }, viewDispatch] = useViewState();
   const [{ eventTarget }] = useEventTargetState();
+  useWidgetEvents(eventTarget);
 
+  /**
+   * Mount the view according to set flow in params
+   */
   useEffect(() => {
     if (!flowParams.flow) return;
 
@@ -108,6 +113,12 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
           <ConnectWidget
             config={widgetsConfig}
             checkout={checkout}
+            sendCloseEventOverride={() => {
+              sendCheckoutEvent(eventTarget, {
+                type: CheckoutEventType.CLOSE,
+                data: {},
+              });
+            }}
             {...(view.data.params || {})}
           />
         )}
