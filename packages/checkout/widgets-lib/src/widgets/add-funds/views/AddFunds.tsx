@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
   IMTBLWidgetEvents,
@@ -30,7 +28,6 @@ import {
 
 interface AddFundsProps {
   checkout?: Checkout;
-  provider?: Web3Provider;
   showBackButton?: boolean;
   showOnrampOption?: boolean;
   showSwapOption?: boolean;
@@ -43,7 +40,6 @@ interface AddFundsProps {
 
 export function AddFunds({
   checkout,
-  provider,
   toAmount,
   toTokenAddress,
   showBackButton = false,
@@ -53,11 +49,6 @@ export function AddFunds({
   onBackButtonClick,
   onCloseButtonClick,
 }: AddFundsProps) {
-  console.log('provider', provider);
-  console.log('showOnrampOption', showOnrampOption);
-  console.log('showSwapOption', showSwapOption);
-  console.log('showBridgeOption', showBridgeOption);
-
   const showBack = showBackButton || !!onBackButtonClick;
 
   const { addFundsDispatch } = useContext(AddFundsContext);
@@ -174,10 +165,6 @@ export function AddFunds({
   // };
 
   const onPayWithCard = (paymentType: OptionTypes) => {
-    console.log('paymentType', paymentType);
-    console.log('=== toTokenAddress', currentToTokenAddress);
-    console.log('=== toAmount', toAmount);
-
     if (paymentType === OptionTypes.SWAP) {
       orchestrationEvents.sendRequestSwapEvent(
         eventTarget,
