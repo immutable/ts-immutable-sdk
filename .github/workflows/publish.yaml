@@ -23,6 +23,12 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+  merge_group:
+    branches:
+      - main
 
 env:
   RELEASE_TYPE: ${{ github.event.inputs.release_type }}
@@ -75,6 +81,32 @@ jobs:
             echo "User does not have permission to perform a major release."
             exit 1
           fi
+
+      - name: Check User Permission
+        id: check_user_permission
+        uses: actions-cool/check-user-permission@v2
+        with:
+          token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
+          require: admin
+          username: ${{ github.triggering_actor }}
+          check-bot: true
+
+      - name: Log User Permission
+        run: |
+          echo "Check user permissions for triggering actor - ${{ github.triggering_actor }}"
+          echo "user-permission = ${{ steps.check_user_permission.outputs.user-permission }}"
+          echo "require-result = ${{ steps.check_user_permission.outputs.require-result }}"
+  
+      - name: Major release Permission Check
+        if: |
+          contains(env.RELEASE_TYPE, 'major') &&
+          (
+            (steps.check_user_permission.outputs.require-result != 'true') ||
+            ${{ !contains(fromJson(env.SDK_PUBLISH_MAJOR_VERSION_ACTORS), github.triggering_actor) }}
+          )        
+        run: |
+          echo "User does not have permission to perform a major release."
+          exit 1
 
       - name: Checkout
         uses: actions/checkout@v4

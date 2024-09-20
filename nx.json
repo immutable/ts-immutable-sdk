@@ -43,7 +43,7 @@
     "changelog": {
         "workspaceChangelog": {
           "file": false,
-          "createRelease": false,
+          "createRelease": "github",
           "renderOptions": {
             "authors": false
           }
