@@ -68,15 +68,12 @@ jobs:
           echo "require-result = ${{ steps.check_user_permission.outputs.require-result }}"
   
       - name: Major release Permission Check
-        if: |
-          contains(env.RELEASE_TYPE, 'major') &&
-          (
-            (steps.check_user_permission.outputs.require-result != 'true') ||
-            ${{ !contains(fromJson(env.SDK_PUBLISH_MAJOR_VERSION_ACTORS), github.triggering_actor) }}
-          )        
+        if: contains(env.RELEASE_TYPE, 'major')
         run: |
-          echo "User does not have permission to perform a major release."
-          exit 1
+          if [[ ${{ steps.check_user_permission.outputs.require-result }} != 'true' || ! ${{ fromJson(env.SDK_PUBLISH_MAJOR_VERSION_ACTORS) }}.includes(${{ github.triggering_actor }}) ]]; then
+            echo "User does not have permission to perform a major release."
+            exit 1
+          fi
 
       - name: Checkout
         uses: actions/checkout@v4
