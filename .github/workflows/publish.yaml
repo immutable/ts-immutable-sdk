@@ -112,10 +112,6 @@ jobs:
             exit 1
           fi
           pnpm nx release $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") --yes --specifier ${{ env.RELEASE_TYPE }}
-          if [[ ${{ env.DRY_RUN }} == 'true' ]]; then
-            echo "Dry run completed successfully."
-            exit 0
-          fi
 
       - name: Warm up CDN
         id: warm_up_cdn
