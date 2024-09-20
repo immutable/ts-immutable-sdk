@@ -41,6 +41,9 @@
       "require": "./dist/index.cjs"
     }
   },
+  "files": [
+    "dist"
+  ],
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "keywords": [
     "immutablex"

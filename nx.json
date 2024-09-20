@@ -38,12 +38,12 @@
   },
   "release": {
     "projectsRelationship": "fixed",
-    "projects": ["sdk/**", "packages/**", "!packages/**/*sample-app/**"],
+    "projects": ["sdk/**", "packages/**", "!packages/**/*sample-app/**", "!packages/game-bridge", "!packages/internal/factory/sdk"],
     "releaseTagPattern": "{version}",
     "changelog": {
         "workspaceChangelog": {
           "file": false,
-          "createRelease": false,
+          "createRelease": "github",
           "renderOptions": {
             "authors": false
           }
