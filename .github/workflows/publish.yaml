@@ -97,8 +97,8 @@ jobs:
       - name: Get SDK directories
         id: get-sdk-dirs
         run: |
-          SDK_DIRS=$(pnpm --filter @imtbl/sdk --filter @imtbl/checkout-widgets ls --parseable --only-projects --depth Infinity)
-          echo "SDK_DIRS=$SDK_DIRS" >> $GITHUB_ENV
+          SDK_DIRS=$(pnpm --filter @imtbl/sdk --filter @imtbl/checkout-widgets ls --parseable --only-projects --depth Infinity | tr '\n' ' ')
+          echo "SDK_DIRS=${SDK_DIRS%,}" >> $GITHUB_ENV
 
       - name: Generate SDK attestations
         uses: actions/attest-build-provenance@v1
