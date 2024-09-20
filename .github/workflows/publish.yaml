@@ -92,7 +92,7 @@ jobs:
           git config user.email "platform-sa@users.noreply.github.com"
 
       - name: Build SDK
-        run: pnpm build --filter @imtbl/sdk --filter @imtbl/checkout-widgets
+        run: pnpm --filter @imtbl/sdk --filter @imtbl/checkout-widgets build
     
       - name: Get SDK directories
         id: get-sdk-dirs
