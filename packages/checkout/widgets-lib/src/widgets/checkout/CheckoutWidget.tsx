@@ -54,9 +54,14 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   } = props;
 
   const { t } = useTranslation();
-  const [{ view }, viewDispatch] = useViewState();
+  const viewState = useViewState();
+  const [{ view }, viewDispatch] = viewState;
   const [{ eventTarget }] = useEventTargetState();
-  useWidgetEvents(eventTarget);
+
+  /**
+   * Subscribe and Handle widget events
+   */
+  useWidgetEvents(eventTarget, viewState);
 
   /**
    * Mount the view according to set flow in params
@@ -80,7 +85,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
     });
   }, [flowParams]);
 
-  const showBackButton = true;
+  const showBackButton = !!view.data?.showBackButton;
 
   const shouldConnectView = useMemo(
     () => getViewShouldConnect(view.type),
