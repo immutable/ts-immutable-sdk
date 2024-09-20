@@ -23,6 +23,12 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+  merge_group:
+    branches:
+      - main
 
 env:
   RELEASE_TYPE: ${{ github.event.inputs.release_type }}
@@ -44,15 +50,13 @@ jobs:
     permissions:
       id-token: write # ! Required for GitHub Attestations, removing will create a Sev 0 incident !
       attestations: write # ! Required for GitHub Attestations, removing will create a Sev 0 incident !
+
     steps:
       - name: Check Public Release Branch
-        if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') && github.ref != 'refs/heads/main' }}
-        run: |
-          echo "Public releases can only be executed from the main branch, current branch ${{ github.ref }}"
-          exit 1
+        if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }} && (github.ref != 'refs/heads/main')
+        run: failure("Public releases should be only done from main branch, current branch ${{ github.ref }}")
 
       - name: Check User Permission
-        if: contains(env.RELEASE_TYPE, 'major')
         id: check_user_permission
         uses: actions-cool/check-user-permission@v2
         with:
@@ -62,19 +66,21 @@ jobs:
           check-bot: true
 
       - name: Log User Permission
-        if: contains(env.RELEASE_TYPE, 'major')
         run: |
           echo "Check user permissions for triggering actor - ${{ github.triggering_actor }}"
           echo "user-permission = ${{ steps.check_user_permission.outputs.user-permission }}"
           echo "require-result = ${{ steps.check_user_permission.outputs.require-result }}"
   
       - name: Major release Permission Check
-        if: contains(env.RELEASE_TYPE, 'major')
+        if: |
+          contains(env.RELEASE_TYPE, 'major') &&
+          (
+            (steps.check_user_permission.outputs.require-result != 'true') ||
+            ${{ !contains(fromJson(env.SDK_PUBLISH_MAJOR_VERSION_ACTORS), github.triggering_actor) }}
+          )        
         run: |
-          if [[ ${{ steps.check_user_permission.outputs.require-result }} != 'true' || ! ${{ fromJson(env.SDK_PUBLISH_MAJOR_VERSION_ACTORS) }}.includes(${{ github.triggering_actor }}) ]]; then
-            echo "User does not have permission to perform a major release."
-            exit 1
-          fi
+          echo "User does not have permission to perform a major release."
+          exit 1
 
       - name: Checkout
         uses: actions/checkout@v4
