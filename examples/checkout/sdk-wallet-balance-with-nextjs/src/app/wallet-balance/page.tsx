@@ -3,7 +3,7 @@ import { checkout } from '@imtbl/sdk';
 import { checkoutSDK } from '../utils/setupDefault';
 import { useState, useEffect } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
-import { WalletInfo, WalletProviderName, GetTokenAllowListResult, TokenInfo, GetAllBalancesResult } from '@imtbl/sdk/checkout';
+import { WalletInfo, WalletProviderName, GetTokenAllowListResult, TokenInfo, GetAllBalancesResult, GetBalanceResult } from '@imtbl/sdk/checkout';
 import { Button, Heading, Body, Link, Table } from '@biom3/react';
 import NextLink from 'next/link';
 
@@ -20,6 +20,8 @@ export default function ConnectWithMetamask() {
   const [allBalances, setAllBalances] = useState<GetAllBalancesResult>();
   const [loading, setLoadingState] = useState<boolean>(false);
   const [tokenInfo, setTokenInfo] = useState<TokenInfo>();
+  const [tokenBalance, setTokenBalance] = useState<GetBalanceResult>();
+  const [nativeBalance, setNativeBalance] = useState<GetBalanceResult>();
 
   const handleTokenChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedAddress = event.target.value;
@@ -30,57 +32,47 @@ export default function ConnectWithMetamask() {
   const connectWithMetamask = async () => {
     setLoadingState(true);
 
-    // #doc get-wallet-allow-list
     // Get the list of default supported providers
     const type = checkout.WalletFilterTypes.ALL;
     const allowListRes = await checkoutSDK.getWalletAllowList({ type });
-    // #enddoc get-wallet-allow-list
 
     setSupportedWallets(allowListRes.wallets);
 
-    // #doc create-metamask-provider
     // Create a provider given one of the default wallet provider names
     const walletProviderName = checkout.WalletProviderName.METAMASK;
     const providerRes = await checkoutSDK.createProvider({ walletProviderName });
-    // #enddoc create-metamask-provider
     
     setProvider(providerRes.provider);
     setWalletProviderName(providerRes.walletProviderName);
 
-    // #doc check-is-valid-provider
     // Check if the provider if a Web3Provider
     const isProviderRes = await checkout.Checkout.isWeb3Provider(providerRes.provider);
-    // #enddoc check-is-valid-provider
 
     setIsValidProvider(isProviderRes);
 
-    // #doc connect-metamask-provider-perms
     // Get the current network information
     // Pass through requestWalletPermissions to request the user's wallet permissions
     const connectRes = await checkoutSDK.connect({ 
       provider: providerRes.provider,
       requestWalletPermissions: true,
     });
-    // #enddoc connect-metamask-provider-perms
 
     setConnectedProvider(connectRes.provider);
 
-    // #doc check-is-connected
     // Check if the provider if a Web3Provider
     const isConnectedRes = await checkoutSDK.checkIsWalletConnected({
       provider: providerRes.provider
     });
     setIsConnected(isConnectedRes.isConnected);
     setWalletAddress(isConnectedRes.walletAddress);
-    // #enddoc check-is-connected
 
     // #doc get-token-allow-list
     // Get the list of supported tokens
     const tokenType = await checkout.TokenFilterTypes.ALL;
     const chainId = connectRes.provider._network.chainId ?? checkout.ChainId.IMTBL_ZKEVM_TESTNET;
     const tokenAllowList = await checkoutSDK.getTokenAllowList({ type: tokenType, chainId });
-    setTokenAllowList(tokenAllowList);
     // #enddoc get-token-allow-list
+    setTokenAllowList(tokenAllowList);
 
     setLoadingState(false);
   };
@@ -89,11 +81,11 @@ export default function ConnectWithMetamask() {
     const fetchBalances = async () => {
       if (connectedProvider && walletAddress) {
         // #doc get-all-balances
-        // Get the balances of the wallet
+        // Get all token balances of the wallet
         const chainId = connectedProvider._network.chainId ?? checkout.ChainId.IMTBL_ZKEVM_TESTNET;
         const allBalancesResponse = await checkoutSDK.getAllBalances({ provider: connectedProvider, walletAddress, chainId });
-        setAllBalances(allBalancesResponse);
         // #enddoc get-all-balances
+        setAllBalances(allBalancesResponse);
       }
     };
 
@@ -104,14 +96,41 @@ export default function ConnectWithMetamask() {
   useEffect(() => {
     const fetchTokenInfo = async () => {
       if (connectedProvider) {
+        // #doc get-token-info
+        // Get the information of a particular token
         const tokenAddress = "0xD61ffaece032CA6E0C469820707d677Feb4BEDD5";
         const tokenInfo = await checkoutSDK.getTokenInfo({ provider: connectedProvider, tokenAddress });
+        // #enddoc get-token-info
         setTokenInfo(tokenInfo);
       }
     };
     fetchTokenInfo();
   }, [connectedProvider]);
-
+  useEffect(() => {
+    const fetchTokenBalance = async () => {
+      if (connectedProvider && walletAddress) {
+        // #doc get-token-bal
+        // Get the balance of a particular token
+        const tokenAddress = '0xD61ffaece032CA6E0C469820707d677Feb4BEDD5'
+        const balanceResponse = await checkoutSDK.getBalance({ provider: connectedProvider, walletAddress, tokenAddress });
+        // #enddoc get-token-bal
+        setTokenBalance(balanceResponse)
+      }
+    };
+    fetchTokenBalance();
+  }, [connectedProvider, walletAddress]);
+  useEffect(() => {
+    const fetchTokenBalance = async () => {
+      if (connectedProvider && walletAddress) {
+        // #doc get-native-bal
+        // Get the balance of the native token
+        const balanceResponse = await checkoutSDK.getBalance({ provider: connectedProvider, walletAddress });
+        // #enddoc get-native-bal
+        setNativeBalance(balanceResponse)
+      }
+    };
+    fetchTokenBalance();
+  }, [connectedProvider, walletAddress]);
   return (
     <>
       <Heading size="medium" className="mb-1">
@@ -199,38 +218,92 @@ export default function ConnectWithMetamask() {
         </Table.Body>
       </Table>
       
+      <h4>All Balances</h4>
       {allBalances && allBalances.balances.length > 0 ? (
-        <>
-          <h3>All Balances</h3> {/* Added header here */}
-          <Table>
-            <Table.Head>
-              <Table.Row>
-                <Table.Cell>Token</Table.Cell>
-                <Table.Cell>Balance (Hex)</Table.Cell>
-                <Table.Cell>Formatted Balance</Table.Cell>
+        <Table>
+          <Table.Head>
+            <Table.Row>
+              <Table.Cell>Token</Table.Cell>
+              <Table.Cell>Balance (Hex)</Table.Cell>
+              <Table.Cell>Formatted Balance</Table.Cell>
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>
+            {allBalances.balances.map((balanceResult, index) => (
+              <Table.Row key={index}>
+                <Table.Cell>
+                  {balanceResult.token.name} ({balanceResult.token.symbol})
+                </Table.Cell>
+                <Table.Cell>
+                  {balanceResult.balance._hex || 'N/A'}
+                </Table.Cell>
+                <Table.Cell>
+                  {balanceResult.formattedBalance || 'N/A'}
+                </Table.Cell>
               </Table.Row>
-            </Table.Head>
-            <Table.Body>
-              {allBalances.balances.map((balanceResult, index) => (
-                <Table.Row key={index}>
-                  <Table.Cell>
-                    {balanceResult.token.name} ({balanceResult.token.symbol})
-                  </Table.Cell>
-                  <Table.Cell>
-                    {balanceResult.balance._hex || 'N/A'}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {balanceResult.formattedBalance || 'N/A'}
-                  </Table.Cell>
-                </Table.Row>
-              ))}
-            </Table.Body>
-          </Table>
-        </>
+            ))}
+          </Table.Body>
+        </Table>
       ) : (
-        <p>No balances available.</p>
+        <p>No balances available - please connect your wallet.</p>
       )}
 
+      <h4>Specific Token Balance</h4>
+      {tokenBalance ? (
+        <Table>
+          <Table.Head>
+            <Table.Row>
+              <Table.Cell>Token</Table.Cell>
+              <Table.Cell>Balance (Hex)</Table.Cell>
+              <Table.Cell>Formatted Balance</Table.Cell>
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>
+            <Table.Row>
+              <Table.Cell>
+                {tokenBalance.token.name || 'N/A'}
+              </Table.Cell>
+              <Table.Cell>
+                {tokenBalance.balance._hex || 'N/A'}
+              </Table.Cell>
+              <Table.Cell>
+                {tokenBalance.formattedBalance || 'N/A'}
+              </Table.Cell>
+            </Table.Row>
+          </Table.Body>
+        </Table>
+      ) : (
+        <p>No balances available - please connect your wallet.</p>
+      )}
+
+      <h4>Native Token Balance</h4>
+      {nativeBalance ? (
+        <Table>
+          <Table.Head>
+            <Table.Row>
+              <Table.Cell>Token</Table.Cell>
+              <Table.Cell>Balance (Hex)</Table.Cell>
+              <Table.Cell>Formatted Balance</Table.Cell>
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>
+            <Table.Row>
+              <Table.Cell>
+                {nativeBalance.token.name || 'N/A'}
+              </Table.Cell>
+              <Table.Cell>
+                {nativeBalance.balance._hex || 'N/A'}
+              </Table.Cell>
+              <Table.Cell>
+                {nativeBalance.formattedBalance || 'N/A'}
+              </Table.Cell>
+            </Table.Row>
+          </Table.Body>
+        </Table>
+      ) : (
+        <p>No balances available - please connect your wallet.</p>
+      )}
+      
       <Link rc={<NextLink href="/" />}>Return to Examples</Link>
     </>
   );
