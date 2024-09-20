@@ -93,17 +93,11 @@ jobs:
 
       - name: Build SDK & Checkout Widgets
         run: pnpm nx run-many -t build -p @imtbl/sdk,@imtbl/checkout-widgets
-    
-      - name: Get SDK directories
-        id: get-sdk-dirs
-        run: |
-          SDK_DIRS=$(pnpm --filter @imtbl/sdk --filter @imtbl/checkout-widgets ls --parseable --only-projects --depth Infinity)
-          echo "::set-output name=SDK_DIRS::${SDK_DIRS%,}"
 
       - name: Generate SDK attestations
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: ${{ steps.get-sdk-dirs.outputs.SDK_DIRS }}
+          subject-path: './sdk'
 
       - name: Authenticate NPM
         run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
