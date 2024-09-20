@@ -7,7 +7,7 @@
   "dependencies": {
     "@imtbl/config": "0.0.0",
     "@jest/globals": "^29.5.0",
-    "axios": "^1.6.5",
+    "axios": "^1.7.4",
     "ethers": "^5.7.2"
   },
   "devDependencies": {

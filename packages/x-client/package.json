@@ -13,7 +13,7 @@
     "@ethersproject/wallet": "^5.7.0",
     "@imtbl/config": "0.0.0",
     "@imtbl/generated-clients": "0.0.0",
-    "axios": "^1.6.5",
+    "axios": "^1.7.4",
     "bn.js": "^5.2.1",
     "elliptic": "^6.5.7",
     "enc-utils": "^3.0.0",

@@ -9,7 +9,7 @@
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/config": "0.0.0",
     "@imtbl/generated-clients": "0.0.0",
-    "axios": "^1.6.5",
+    "axios": "^1.7.4",
     "ethers": "^5.7.2"
   },
   "devDependencies": {

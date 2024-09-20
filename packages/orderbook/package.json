@@ -7,7 +7,7 @@
     "@imtbl/config": "0.0.0",
     "@imtbl/metrics": "0.0.0",
     "@opensea/seaport-js": "4.0.3",
-    "axios": "^1.6.5",
+    "axios": "^1.7.4",
     "ethers": "^5.7.2",
     "ethers-v6": "npm:ethers@6.11.1",
     "merkletreejs": "^0.3.11"
