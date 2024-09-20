@@ -7,20 +7,14 @@ on:
         type: choice
         description: Release Type
         options:
-          - alpha
-          - release
-        required: true
-        default: alpha
-      upgrade_type:
-        type: choice
-        description: Upgrade Type
-        options:
-          - none
+          - prepatch
+          - preminor
+          - premajor
           - patch
           - minor
-          # - major
-        required: false
-        default: none
+          - major
+        required: true
+        default: prepatch
       dry_run:
         type: boolean
         description: "(Optional) Dry run"
@@ -29,14 +23,19 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+  merge_group:
+    branches:
+      - main
 
 env:
-  RELEASE_TYPE: ${{ github.event.inputs.release_type || 'alpha' }}
-  UPGRADE_TYPE: ${{ github.event.inputs.upgrade_type || 'none' }}
+  RELEASE_TYPE: ${{ github.event.inputs.release_type || 'prepatch' }}
   DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.inputs.release_type || 'alpha' }}-${{ github.event.inputs.upgrade_type || 'none' }}
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.inputs.release_type || 'prepatch' }}
   cancel-in-progress: false
 
 jobs:
@@ -47,13 +46,41 @@ jobs:
       GH_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
       NODE_OPTIONS: --max-old-space-size=14366
       SDK_PUBLISH_SLACK_WEBHOOK: ${{ secrets.SDK_PUBLISH_SLACK_WEBHOOK }}
+      SDK_PUBLISH_MAJOR_VERSION_ACTORS: ${{ secrets.SDK_PUBLISH_MAJOR_VERSION_ACTORS }}
     permissions:
       id-token: write # Required for GitHub Attestation
       attestations: write # Required for GitHub Attestation
+
     steps:
       - name: Check Public Release Branch
-        if: contains(env.RELEASE_TYPE , 'release') && (github.ref != 'refs/heads/main')
+        if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }} && (github.ref != 'refs/heads/main')
         run: failure("Public releases should be only done from main branch, current branch ${{ github.ref }}")
+
+      - name: Check User Permission
+        id: check_user_permission
+        uses: actions-cool/check-user-permission@v2
+        with:
+          token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
+          require: admin
+          username: ${{ github.triggering_actor }}
+          check-bot: true
+
+      - name: Log User Permission
+        run: |
+          echo "Check user permissions for triggering actor - ${{ github.triggering_actor }}"
+          echo "user-permission = ${{ steps.check_user_permission.outputs.user-permission }}"
+          echo "require-result = ${{ steps.check_user_permission.outputs.require-result }}"
+  
+      - name: Major release Permission Check
+        if: |
+          contains(env.RELEASE_TYPE, 'major') &&
+          (
+            (steps.check_user_permission.outputs.require-result != 'true') ||
+            ${{ !contains(fromJson(env.SDK_PUBLISH_MAJOR_VERSION_ACTORS), github.triggering_actor) }}
+          )        
+        run: |
+          echo "User does not have permission to perform a major release."
+          exit 1
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -69,97 +96,45 @@ jobs:
           git config user.name "platform-sa"
           git config user.email "platform-sa@users.noreply.github.com"
 
-      - name: Get tags
-        run: git fetch --tags
-
-      - name: Workout next version string
+      - name: Build SDK
+        run: pnpm build --filter @imtbl/sdk --filter @imtbl/checkout-widgets
+    
+      - name: Get SDK directories
+        id: get-sdk-dirs
         run: |
-          upgrade_type=${{ env.UPGRADE_TYPE }}
-          if [ ${{ contains(env.UPGRADE_TYPE, 'none') }} == true ]
-          then
-            upgrade_type=""
-            revision_upgrade=$( ${{ contains(env.RELEASE_TYPE, 'alpha') }} && echo '--revision' || echo '')
-          else
-            upgrade_type="--$upgrade_type"
-          fi
-          echo upgrade_type=$upgrade_type
-          echo revision_upgrade=$revision_upgrade
-          ./.github/scripts/version-up.sh --${{ env.RELEASE_TYPE }} $upgrade_type --apply $revision_upgrade
-        shell: bash
+          SDK_DIRS=$(pnpm --filter @imtbl/sdk --filter @imtbl/checkout-widgets ls --parseable --only-projects --depth Infinity)
+          echo "SDK_DIRS=$SDK_DIRS" >> $GITHUB_ENV
 
-      - name: Lint
-        run: pnpm lint
-
-      - name: Get next version string
-        id: version
-        run: |
-          echo "NEXT_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
-
-      - name: Typecheck
-        run: pnpm typecheck
-
-      - name: Test
-        run: pnpm test
-
-      - name: Update package.json version for build
-        run: |
-          tmp=$(mktemp)
-          jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
-
-      # WARNING: build step should be after typecheck and test steps. This is to make sure build artifacts are overwritten by the lint and tests steps.
-      - name: Build
-        run: |
-          export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ env.RELEASE_TYPE }} pnpm build
-          ls -l ./sdk/dist/browser/checkout || echo 1
-          [ -d "./sdk/dist/browser/checkout" ] || { echo "Error: Directory does not exist." && exit 1; }
-
-      - name: Push tags
-        # Boolean inputs are not actually booleans, see https://github.com/actions/runner/issues/1483
-        if: (env.DRY_RUN) == 'false'
-        run: |
-          echo "$(git push --tags)"
-
-      - name: Pre Release Step
-        if: contains(env.RELEASE_TYPE, 'alpha')
-        id: pre_release
-        uses: JS-DevTools/npm-publish@v3
-        with:
-          token: ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
-          access: public
-          package: ./sdk/package.json
-          tag: ${{ contains(env.RELEASE_TYPE, 'alpha') && 'alpha' }}
-          dry-run: ${{ env.DRY_RUN }}
-
-      - name: Generate SDK attestation
+      - name: Generate SDK attestations
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: './sdk'
+          subject-path: ${{ steps.get-sdk-dirs.outputs.SDK_DIRS }}
 
       - name: Authenticate NPM
-        if: contains(env.RELEASE_TYPE, 'release')
         run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
 
       - name: Release
         id: npm_release
-        if: contains(env.RELEASE_TYPE, 'release')
-        run: pnpm release --ci --no-increment -c .release-it.json $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [[ "${{ github.ref }}" != "refs/heads/main" && ! "${{ env.RELEASE_TYPE }}" =~ ^pre ]]; then
+            echo "Non-pre specifiers can only be used on the main branch."
+            exit 1
+          fi
+          pnpm nx release $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") --yes --specifier ${{ env.RELEASE_TYPE }}
 
       - name: Warm up CDN
         id: warm_up_cdn
-        if: contains(env.RELEASE_TYPE, 'release')
+        if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }}
         run: |
-          wget https://cdn.jsdelivr.net/npm/@imtbl/sdk/dist/browser/checkout/widgets.js
-          wget https://cdn.jsdelivr.net/npm/@imtbl/sdk/dist/browser/checkout/sdk.js
+          wget https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets/dist/widgets.js
+          wget https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets/dist/index.js
 
       # Wait for 30 seconds to make sure the tag is available on GitHub
       - uses: GuillaumeFalourd/wait-sleep-action@v1
         with:
           time: "30"
-
-      - name: Create GitHub Release
-        id: gh_release
-        if: contains(env.RELEASE_TYPE, 'release') && env.DRY_RUN == 'false'
-        run: gh release create ${{ steps.version.outputs.NEXT_VERSION }} --title ${{ steps.version.outputs.NEXT_VERSION }} --draft=false --prerelease=false --generate-notes --repo immutable/ts-immutable-sdk --target main
 
       - name: Get GitHub Release Name and URL
         if: contains(env.RELEASE_TYPE, 'release') && env.DRY_RUN == 'false'
@@ -169,13 +144,13 @@ jobs:
           echo "RELEASE_URL=$(gh release view --json url | jq -r .url)" >> $GITHUB_OUTPUT
 
       - name: Notify SDK Slack Publish Success
-        if: ${{ success() && (steps.npm_release.conclusion == 'success' || steps.pre_release.conclusion == 'success') && env.DRY_RUN == 'false' }}
+        if: ${{ success() && (steps.npm_release.conclusion == 'success') && env.DRY_RUN == 'false' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
-          message: "✅ ${{ github.triggering_actor }} successfully published SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM.\n\nhttps://www.npmjs.com/package/@imtbl/sdk/v/${{steps.version.outputs.NEXT_VERSION}}"
+          message: "✅ ${{ github.triggering_actor }} successfully published SDK version ${{steps.release.outputs.RELEASE_NAME}} to NPM.\n\nhttps://www.npmjs.com/package/@imtbl/sdk/v/${{steps.release.outputs.RELEASE_NAME}}"
 
       - name: Notify SDK Slack Publish Failure
-        if: ${{ failure() && (steps.npm_release.conclusion == 'failure' || steps.pre_release.conclusion == 'failure' || steps.gh_release.conclusion == 'failure') && env.DRY_RUN == 'false' }}
+        if: ${{ failure() && (steps.npm_release.conclusion == 'failure') && env.DRY_RUN == 'false' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
-          message: "❌ Failed to publish SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM. ${{ github.triggering_actor }} please check the logs for more details."
+          message: "❌ Failed to publish SDK version ${{steps.release.outputs.RELEASE_NAME}} to NPM. ${{ github.triggering_actor }} please check the logs for more details."

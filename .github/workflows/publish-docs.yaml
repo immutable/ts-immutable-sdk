@@ -87,15 +87,7 @@ jobs:
           node-version-file: .nvmrc
           cache: "pnpm"
 
-      - name: Restore cached node_modules
-        id: restore-cache-node_modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('pnpm-lock.yaml') }}
-
       - name: Install dependencies
-        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true' 
         run: pnpm install --frozen-lockfile
 
       - name: Build
