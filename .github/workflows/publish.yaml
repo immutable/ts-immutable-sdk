@@ -53,6 +53,7 @@ jobs:
           exit 1
 
       - name: Check User Permission
+        if: contains(env.RELEASE_TYPE, 'major')
         id: check_user_permission
         uses: actions-cool/check-user-permission@v2
         with:
@@ -62,6 +63,7 @@ jobs:
           check-bot: true
 
       - name: Log User Permission
+        if: contains(env.RELEASE_TYPE, 'major')
         run: |
           echo "Check user permissions for triggering actor - ${{ github.triggering_actor }}"
           echo "user-permission = ${{ steps.check_user_permission.outputs.user-permission }}"
