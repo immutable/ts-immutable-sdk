@@ -21,10 +21,7 @@ import { useEventTargetState } from '../../context/event-target-context/EventTar
 import { ErrorView } from '../../views/error/ErrorView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import SwapWidget from '../swap/SwapWidget';
-import {
-  ConnectLoader,
-  ConnectLoaderParams,
-} from '../../components/ConnectLoader/ConnectLoader';
+import { ConnectLoader } from '../../components/ConnectLoader/ConnectLoader';
 import ConnectWidget from '../connect/ConnectWidget';
 import BridgeWidget from '../bridge/BridgeWidget';
 import OnRampWidget from '../on-ramp/OnRampWidget';
@@ -33,6 +30,7 @@ import SaleWidget from '../sale/SaleWidget';
 import AddFundsWidget from '../add-funds/AddFundsWidget';
 import { getViewShouldConnect } from './functions/getViewShouldConnect';
 import { useWidgetEvents } from './hooks/useWidgetEvents';
+import { getConnectLoaderParams } from './functions/getConnectLoaderParams';
 
 export type CheckoutWidgetInputs = {
   checkout: Checkout;
@@ -40,23 +38,22 @@ export type CheckoutWidgetInputs = {
   flowParams: CheckoutWidgetParams;
   flowConfig: CheckoutWidgetConfiguration;
   widgetsConfig: StrongCheckoutWidgetsConfig;
-  connectLoaderParams: ConnectLoaderParams;
 };
 
 export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   const {
-    flowParams,
-    flowConfig,
-    widgetsConfig,
-    connectLoaderParams,
-    checkout,
-    web3Provider,
+    flowParams, flowConfig, widgetsConfig, checkout, web3Provider,
   } = props;
 
   const { t } = useTranslation();
   const viewState = useViewState();
   const [{ view }, viewDispatch] = viewState;
   const [{ eventTarget }] = useEventTargetState();
+
+  const connectLoaderParams = useMemo(
+    () => getConnectLoaderParams(view, checkout, web3Provider),
+    [view, checkout, web3Provider],
+  );
 
   /**
    * Subscribe and Handle widget events

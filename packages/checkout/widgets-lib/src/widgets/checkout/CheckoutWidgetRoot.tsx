@@ -5,7 +5,6 @@ import {
   WidgetProperties,
   WidgetTheme,
   WidgetType,
-  ChainId,
 } from '@imtbl/checkout-sdk';
 import React, { Suspense } from 'react';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
@@ -14,8 +13,6 @@ import { HandoverProvider } from '../../context/handover-context/HandoverProvide
 import { LoadingView } from '../../views/loading/LoadingView';
 import { Base } from '../BaseWidgetRoot';
 import i18n from '../../i18n';
-import { getL2ChainId } from '../../lib';
-import { ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 
 const CheckoutWidget = React.lazy(() => import('./CheckoutWidget'));
 
@@ -52,15 +49,6 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
 
     const { t } = i18n;
 
-    const connectLoaderParams: ConnectLoaderParams = {
-      targetChainId: this.checkout.config.isProduction
-        ? ChainId.IMTBL_ZKEVM_MAINNET
-        : ChainId.IMTBL_ZKEVM_TESTNET,
-      web3Provider: this.web3Provider,
-      checkout: this.checkout,
-      allowedChains: [getL2ChainId(this.checkout!.config)],
-    };
-
     this.reactRoot.render(
       <CustomAnalyticsProvider checkout={this.checkout}>
         <ThemeProvider id="checkout-container" config={this.strongConfig()}>
@@ -76,7 +64,6 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
                 flowParams={this.parameters}
                 flowConfig={this.properties.config || {}}
                 widgetsConfig={this.strongConfig()}
-                connectLoaderParams={connectLoaderParams}
               />
             </Suspense>
           </HandoverProvider>
