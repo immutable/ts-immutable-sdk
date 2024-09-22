@@ -99,7 +99,7 @@ export function mapBidFromOpenApiOrder(order: OpenApiOrder): Bid {
     throw new Error('Order type must be BID');
   }
 
-  const sellItems: ERC20Item[] = order.buy.map((item) => {
+  const sellItems: ERC20Item[] = order.sell.map((item) => {
     if (item.type === 'ERC20') {
       return {
         type: 'ERC20',
@@ -111,7 +111,7 @@ export function mapBidFromOpenApiOrder(order: OpenApiOrder): Bid {
     throw new Error('Bid sell items must be ERC20');
   });
 
-  const buyItems: (ERC721Item | ERC1155Item)[] = order.sell.map((item) => {
+  const buyItems: (ERC721Item | ERC1155Item)[] = order.buy.map((item) => {
     if (item.type === 'ERC721') {
       return {
         type: 'ERC721',
@@ -168,7 +168,7 @@ export function mapCollectionBidFromOpenApiOrder(order: OpenApiOrder): Collectio
     throw new Error('Order type must be COLLECTION_BID');
   }
 
-  const sellItems: ERC20Item[] = order.buy.map((item) => {
+  const sellItems: ERC20Item[] = order.sell.map((item) => {
     if (item.type === 'ERC20') {
       return {
         type: 'ERC20',
@@ -180,7 +180,7 @@ export function mapCollectionBidFromOpenApiOrder(order: OpenApiOrder): Collectio
     throw new Error('Collection bid sell items must be ERC20');
   });
 
-  const buyItems: (ERC721CollectionItem | ERC1155CollectionItem)[] = order.sell.map((item) => {
+  const buyItems: (ERC721CollectionItem | ERC1155CollectionItem)[] = order.buy.map((item) => {
     if (item.type === 'ERC721_COLLECTION') {
       return {
         type: 'ERC721_COLLECTION',
