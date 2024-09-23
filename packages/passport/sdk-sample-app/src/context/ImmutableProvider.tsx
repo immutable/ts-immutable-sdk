@@ -218,9 +218,14 @@ export function ImmutableProvider({
   );
 
   useEffect(() => {
+    const passportInstance = new Passport(getPassportConfig(environment));
+    Object.defineProperty(window, 'passport', {
+      configurable: true,
+      value: passportInstance,
+    });
     setSdkClient(new ImmutableX(getSdkConfig(environment)));
     setOrderbookClient(new Orderbook(getOrderbookConfig(environment)));
-    setPassportClient(new Passport(getPassportConfig(environment)));
+    setPassportClient(passportInstance);
     setBlockchainData(new BlockchainData(getBlockchainDataConfig(environment)));
   }, [environment]);
 
