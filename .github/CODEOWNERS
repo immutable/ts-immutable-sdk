@@ -22,3 +22,4 @@
 /packages/webhook @shineli1984
 /packages/game-bridge @immutable/sdk
 /examples @immutable/sdk
+**/package.json @immutable/sdk
