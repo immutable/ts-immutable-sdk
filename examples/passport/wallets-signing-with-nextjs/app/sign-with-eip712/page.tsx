@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import { ethers } from 'ethers';
-import { passportInstance } from '../utils';
+import { passportInstance } from '../utils/passport';
+import { Button, Heading, Link, Table } from '@biom3/react';
+import NextLink from 'next/link';
 
 export default function ConnectWithEtherJS() {
   // setup the accounts state
@@ -117,28 +119,30 @@ export default function ConnectWithEtherJS() {
 
   // render the view to login/logout and show the connected accounts and sign message
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-8">
-      <h1 className="text-3xl font-bold mb-8">Passport Sign EIP-712 Message</h1>
+      <>
+      <Heading className="mb-1">Passport Sign EIP-712 Message</Heading>
       {accountsState.length === 0
       && (
-      <button
-        className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
+      <Button
+        className="mb-1"
+        size="medium"
         onClick={passportLogin}
         disabled={loading}
       >
         Passport Login
-      </button>
+      </Button>
       )}
       {accountsState.length >= 1 && (
       <>
         <p>
-          <button
-            className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
+          <Button
+            className="mb-1"
+            size="medium"
             onClick={signMessage}
             disabled={loading}
           >
             Sign Message
-          </button>
+          </Button>
         </p>
         <br />
         <p>
@@ -147,27 +151,39 @@ export default function ConnectWithEtherJS() {
         </p>
         <br />
         <p>
-          <button
-            className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
+          <Button
+            className="mb-1"
             onClick={passportLogout}
             disabled={loading}
           >
             Passport Logout
-          </button>
+          </Button>
         </p>
       </>
       )}
       <br />
-      {loading
-        ? <p>Loading...</p>
-        : (
-          <p>
-            Connected Account:
-            {accountsState.length >= 1 ? accountsState : '(not connected)'}
-          </p>
-        )}
+      <Table>
+        <Table.Head>
+          <Table.Row>
+            <Table.Cell>Item</Table.Cell>
+            <Table.Cell>Value</Table.Cell>
+          </Table.Row>
+        </Table.Head>
+        <Table.Body>
+          <Table.Row>
+            <Table.Cell><b>Connected Account</b></Table.Cell>
+            <Table.Cell>
+              {accountsState.length === 0 && (
+                <span>(not&nbsp;connected)</span>
+              )
+              }
+              {accountsState.length > 0 && accountsState[0]}
+            </Table.Cell>
+          </Table.Row>
+        </Table.Body>
+      </Table>
       <br />
-      <a href="/" className="underline">Return to Examples</a>
-    </div>
+      <Link rc={<NextLink href="/" />}>Return to Examples</Link>
+    </>
   );
 }
