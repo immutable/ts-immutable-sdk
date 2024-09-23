@@ -340,7 +340,7 @@ function CheckoutUI() {
 
   // mount & re-render widget everytime params change
   useEffect(() => {
-    if (params == undefined) return;
+    if (params?.flow === undefined) return;
     if (renderAfterConnect && !web3Provider) return;
 
     mount();
