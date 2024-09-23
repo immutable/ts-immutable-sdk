@@ -1,28 +1,28 @@
 import { IconProps, MenuItem, MenuItemSize } from '@biom3/react';
 import { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CardOptionType, OptionTypes } from '../types';
+import { FiatOptionType } from '../types';
 
-export interface CardOptionProps<RC extends ReactElement | undefined = undefined> {
+export interface FiatOptionProps<RC extends ReactElement | undefined = undefined> {
   rc?: RC;
-  type: OptionTypes;
-  onClick: (type: OptionTypes) => void;
+  type: FiatOptionType;
+  onClick: (type: FiatOptionType) => void;
   disabled?: boolean;
   size?: MenuItemSize;
 }
 
-export function CardOption<RC extends ReactElement | undefined = undefined>({
+export function FiatOption<RC extends ReactElement | undefined = undefined>({
   type,
   onClick,
   disabled = false,
   size,
   rc = <span />,
-}: CardOptionProps<RC>) {
+}: FiatOptionProps<RC>) {
   const { t } = useTranslation();
 
-  const icon: Record<CardOptionType, IconProps['icon']> = {
-    [OptionTypes.DEBIT]: 'BankCard',
-    [OptionTypes.CREDIT]: 'BankCard',
+  const icon: Record<FiatOptionType, IconProps['icon']> = {
+    [FiatOptionType.DEBIT]: 'BankCard',
+    [FiatOptionType.CREDIT]: 'BankCard',
   };
 
   const handleClick = () => onClick(type);
