@@ -3,7 +3,7 @@ import { CheckoutConfiguration } from '../../config';
 import { isOnRampAvailable, isSwapAvailable } from './geoBlocking';
 import { AvailableRoutingOptions } from '../../types';
 
-const isPassportProvider = (provider: Web3Provider) => (provider.provider as any)?.isPassport === true ?? false;
+const isPassportProvider = (provider: Web3Provider) => (provider.provider as any)?.isPassport === true;
 
 type GeoBlockingCheck = {
   id: 'onRamp' | 'swap';
