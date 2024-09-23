@@ -2,7 +2,8 @@ import {
   useAccount, useDisconnect, useEnsName,
 } from 'wagmi';
 import { useState } from 'react';
-import { passportInstance } from '../utils';
+import { passportInstance } from '../utils/passport';
+import { Button, Table } from '@biom3/react';
 
 export function Account() {
   const { address } = useAccount();
@@ -24,23 +25,36 @@ export function Account() {
   // render the view to show the connected accounts and logout
   return (
     <>
-      <button
-        className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
+      <Button
+        className="mb-1"
         onClick={() => passportLogout()}
         disabled={loading}
         type="button"
       >
         Passport Logout
-      </button>
-      <br />
-      {loading
-        ? <p>Loading...</p>
-        : (
-          <p>
-            Connected Account:
-            {address && <span>{ensName ? `${ensName} (${address})` : address}</span>}
-          </p>
-        )}
+      </Button>
+      <Table>
+      <Table.Head>
+        <Table.Row>
+          <Table.Cell>Item</Table.Cell>
+          <Table.Cell>Value</Table.Cell>
+        </Table.Row>
+      </Table.Head>
+      <Table.Body>
+        <Table.Row>
+          <Table.Cell><b>Connected Account</b></Table.Cell>
+          <Table.Cell>
+            {!address && (
+              <span>(not&nbsp;connected)</span>
+            )
+            }
+            {address && (
+              <span>{ensName ? `${ensName} (${address})` : address}</span>
+            )}
+          </Table.Cell>
+        </Table.Row>
+      </Table.Body>
+    </Table>
     </>
   );
 }

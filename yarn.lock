@@ -2617,7 +2617,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.26.1":
+"@biom3/react@npm:^0.26.1, @biom3/react@npm:^0.26.2":
   version: 0.26.2
   resolution: "@biom3/react@npm:0.26.2"
   dependencies:
@@ -4045,6 +4045,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/wallets-connect-with-nextjs@workspace:examples/passport/wallets-connect-with-nextjs"
   dependencies:
+    "@biom3/react": ^0.26.2
     "@ethersproject/providers": ^5.7.2
     "@imtbl/sdk": latest
     "@playwright/test": ^1.45.2
@@ -35089,7 +35090,7 @@ __metadata:
   resolution: "seaport-core@https://github.com/immutable/seaport-core.git#commit=0633350ec34f21fcede657ff812f11cf7d19144e"
   dependencies:
     seaport-types: ^0.0.1
-  checksum: 392bce86bbfc4f7c00b65575b238825f4c696bddf5af08be7aa496862e63879375387fd4400f6e900ffee08d65c1f75cf3adad9c6c41ddcf7a3b0389cd73c3c7
+  checksum: d8adba0d54106c6fe9370f0775fadef2198e5eab440b36919d1f917705ce2f0a7028e4da021b6df049aa3ca35d7e673a28b78a731130f0ff9fdf7a8bd32e3b94
   languageName: node
   linkType: hard
 
@@ -35133,7 +35134,7 @@ __metadata:
     seaport-sol: ^1.5.0
     seaport-types: ^0.0.1
     solady: ^0.0.84
-  checksum: f31a7443a50fa1c35ec03ea031743d1d10896653ae443fa15ab8e6f5b4a2ca43f6743d523ae4e1f14df867451e5b2b2130b0bfa58a1085b0bcae3fceb8dfdc9b
+  checksum: a77e141e4ab5d2c4bb190a38fbb6cda3011fdf5f350b250fbeb4d82ae81cf917a966a2dcb8d9e4fd1bed29e5510ede9b15941b0ac77aeb4272dab94c9f51e7ff
   languageName: node
   linkType: hard
 

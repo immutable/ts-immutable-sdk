@@ -2,6 +2,7 @@
   "name": "@examples/wallets-connect-with-nextjs",
   "version": "0.1.0",
   "dependencies": {
+    "@biom3/react": "^0.26.2",
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/sdk": "latest",
     "@tanstack/react-query": "^5.51.11",
