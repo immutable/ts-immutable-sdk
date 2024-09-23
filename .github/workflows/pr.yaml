@@ -124,8 +124,8 @@ jobs:
       - name: Lint
         run: yarn lint
 
-  build-examples:
-    name: Build Examples
+  build-lint-test-examples:
+    name: Build, Lint & Test Examples
     needs: build-sdk
     runs-on: ubuntu-latest-8-cores
     env:
@@ -137,46 +137,14 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
-      - name: Setup examples
-        uses: ./.github/actions/setup-examples
+      - name: Prepare examples
+        run: yarn prepare:examples
 
       - name: Build examples
         run: yarn build:examples
 
-  lint-examples:
-    name: Lint Examples
-    needs: build-sdk
-    runs-on: ubuntu-latest-4-cores
-    env:
-      NODE_OPTIONS: --max-old-space-size=14366
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: setup
-        uses: ./.github/actions/setup
-
-      - name: Setup examples
-        uses: ./.github/actions/setup-examples
-
       - name: Lint examples
         run: yarn lint:examples
-
-  test-examples:
-    name: Test Examples
-    needs: build-sdk
-    runs-on: ubuntu-latest-8-cores
-    env:
-      NODE_OPTIONS: --max-old-space-size=14366
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: setup
-        uses: ./.github/actions/setup
-
-      - name: Setup examples
-        uses: ./.github/actions/setup-examples
 
       - name: Setup playwright
         uses: ./.github/actions/setup-playwright
