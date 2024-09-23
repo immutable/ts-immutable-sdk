@@ -46,8 +46,8 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
 
   protected render() {
     if (!this.reactRoot) return;
+
     const { t } = i18n;
-    const config = this.properties.config || {};
 
     this.reactRoot.render(
       <CustomAnalyticsProvider checkout={this.checkout}>
@@ -59,10 +59,11 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
               }
             >
               <CheckoutWidget
-                provider={this.web3Provider}
                 checkout={this.checkout}
-                config={config}
-                params={this.parameters}
+                web3Provider={this.web3Provider}
+                flowParams={this.parameters}
+                flowConfig={this.properties.config || {}}
+                widgetsConfig={this.strongConfig()}
               />
             </Suspense>
           </HandoverProvider>

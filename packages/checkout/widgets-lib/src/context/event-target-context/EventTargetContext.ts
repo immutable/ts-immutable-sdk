@@ -1,4 +1,4 @@
-import { createContext } from 'react';
+import { createContext, useReducer } from 'react';
 
 export interface EventTargetState {
   eventTarget: Window | EventTarget
@@ -49,4 +49,10 @@ EventTargetAction
     default:
       return state;
   }
+};
+
+export const useEventTargetState = () => {
+  const [eventTargetState, eventTargetDispatch] = useReducer(eventTargetReducer, initialEventTargetState);
+
+  return [eventTargetState, eventTargetDispatch] as const;
 };

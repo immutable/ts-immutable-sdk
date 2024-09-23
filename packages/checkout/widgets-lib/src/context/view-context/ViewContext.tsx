@@ -1,4 +1,6 @@
-import { createContext } from 'react';
+import {
+  createContext, ReactNode, useMemo, useReducer,
+} from 'react';
 import { ConnectWidgetView } from './ConnectViewContextTypes';
 import { WalletWidgetView } from './WalletViewContextTypes';
 import { PrefilledSwapForm, SwapWidgetView } from './SwapViewContextTypes';
@@ -7,28 +9,30 @@ import { SaleWidgetView } from './SaleViewContextTypes';
 import { ViewType } from './ViewType';
 import { OnRampWidgetView } from './OnRampViewContextTypes';
 import { AddFundsWidgetView } from './AddFundsViewContextTypes';
+import { CheckoutWidgetView } from './CheckoutWidgetViewContextTypes';
 
 export enum SharedViews {
   LOADING_VIEW = 'LOADING_VIEW',
   ERROR_VIEW = 'ERROR_VIEW',
-  SERVICE_UNAVAILABLE_ERROR_VIEW = 'SERVICE_UNAVAILABLE_ERROR_VIEW',
+  SUCCESS_VIEW = 'SUCCESS_VIEW',
   TOP_UP_VIEW = 'TOP_UP_VIEW',
+  SERVICE_UNAVAILABLE_ERROR_VIEW = 'SERVICE_UNAVAILABLE_ERROR_VIEW',
 }
 
 export type SharedView =
-  LoadingView
+  | LoadingView
   | ErrorView
   | ServiceUnavailableErrorView
   | TopUpView;
 
 interface LoadingView extends ViewType {
-  type: SharedViews.LOADING_VIEW
+  type: SharedViews.LOADING_VIEW;
 }
 
 export interface ErrorView extends ViewType {
   type: SharedViews.ERROR_VIEW;
   error: Error;
-  tryAgain?: () => Promise<any>
+  tryAgain?: () => Promise<any>;
 }
 
 interface ServiceUnavailableErrorView extends ViewType {
@@ -37,19 +41,20 @@ interface ServiceUnavailableErrorView extends ViewType {
 }
 
 interface TopUpView extends ViewType {
-  type: SharedViews.TOP_UP_VIEW,
-  swapData?: PrefilledSwapForm,
+  type: SharedViews.TOP_UP_VIEW;
+  swapData?: PrefilledSwapForm;
 }
 
 export type View =
-  SharedView
+  | SharedView
   | ConnectWidgetView
   | WalletWidgetView
   | SwapWidgetView
   | OnRampWidgetView
   | SaleWidgetView
   | BridgeWidgetView
-  | AddFundsWidgetView;
+  | AddFundsWidgetView
+  | CheckoutWidgetView;
 
 export interface ViewState {
   view: View;
@@ -98,7 +103,7 @@ export interface GoBackToPayload {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const ViewContext = createContext<ViewContextState>({
   viewState: initialViewState,
-  viewDispatch: () => { },
+  viewDispatch: () => {},
 });
 
 ViewContext.displayName = 'ViewContext'; // help with debugging Context in browser
@@ -124,7 +129,10 @@ export const viewReducer: Reducer<ViewState, ViewAction> = (
       ) {
         // currentViewData should only be set on the current view before updating
         if (currentViewData) {
-          history[history.length - 1] = { ...history[history.length - 1], data: currentViewData };
+          history[history.length - 1] = {
+            ...history[history.length - 1],
+            data: currentViewData,
+          };
         }
 
         history.push(view);
@@ -177,3 +185,28 @@ export const viewReducer: Reducer<ViewState, ViewAction> = (
       return state;
   }
 };
+
+export const useViewState = () => {
+  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+
+  return [viewState, viewDispatch] as const;
+};
+
+type ViewContextProviderProps = {
+  children: ReactNode;
+};
+
+export function ViewContextProvider({ children }: ViewContextProviderProps) {
+  const [viewState, viewDispatch] = useViewState();
+
+  const viewReducerValues = useMemo(
+    () => ({ viewState, viewDispatch }),
+    [viewState, viewDispatch],
+  );
+
+  return (
+    <ViewContext.Provider value={viewReducerValues}>
+      {children}
+    </ViewContext.Provider>
+  );
+}
