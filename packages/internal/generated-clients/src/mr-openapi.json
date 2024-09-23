@@ -5078,15 +5078,6 @@
           "withdrawal"
         ]
       },
-      "OperatorAllowlistAdminAction": {
-        "description": "The action an admin can take on an operator allowlist request",
-        "example": "approve",
-        "type": "string",
-        "enum": [
-          "approve",
-          "reject"
-        ]
-      },
       "ActivityNFT": {
         "type": "object",
         "properties": {
@@ -7145,35 +7136,6 @@
           "created_by"
         ]
       },
-      "Call": {
-        "type": "object",
-        "properties": {
-          "target_address": {
-            "$ref": "#/components/schemas/Address"
-          },
-          "function_signature": {
-            "type": "string",
-            "description": "The function signature",
-            "example": "mint(address,uint256)"
-          },
-          "function_args": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "The function arguments",
-            "example": [
-              "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e",
-              "1"
-            ]
-          }
-        },
-        "required": [
-          "target_address",
-          "function_signature",
-          "function_args"
-        ]
-      },
       "BasicAPIError": {
         "type": "object",
         "properties": {
@@ -7892,7 +7854,7 @@
           },
           "buy": {
             "type": "array",
-            "description": "Buy item for listing should either be ERC721 or ERC1155 item",
+            "description": "Buy item for bid should either be ERC721 or ERC1155 item",
             "items": {
               "$ref": "#/components/schemas/Item"
             },
@@ -7932,9 +7894,9 @@
           },
           "sell": {
             "type": "array",
-            "description": "Sell item for listing should be an ERC20 item",
+            "description": "Sell item for bid should be an ERC20 item",
             "items": {
-              "$ref": "#/components/schemas/Item"
+              "$ref": "#/components/schemas/ERC20Item"
             },
             "example": [
               {
@@ -8021,7 +7983,7 @@
           },
           "buy": {
             "type": "array",
-            "description": "Buy item for listing should either be ERC721 or ERC1155 collection item",
+            "description": "Buy item for collection bid should either be ERC721 or ERC1155 collection item",
             "items": {
               "$ref": "#/components/schemas/AssetCollectionItem"
             },
@@ -8061,7 +8023,7 @@
           },
           "sell": {
             "type": "array",
-            "description": "Sell item for listing should be an ERC20 item",
+            "description": "Sell item for collection bid should be an ERC20 item",
             "items": {
               "$ref": "#/components/schemas/ERC20Item"
             },
@@ -10620,305 +10582,10 @@
         "format": "date-time",
         "example": "2021-08-31T00:00:00Z"
       },
-      "UpdatedAt": {
-        "description": "Updated at",
-        "type": "string",
-        "format": "date-time",
-        "example": "2021-08-31T00:00:00Z"
-      },
-      "AcquiredAt": {
-        "description": "Acquired at",
-        "type": "string",
-        "format": "date-time",
-        "example": "2021-08-31T00:00:00Z"
-      },
-      "Image": {
-        "description": "Image",
-        "type": "string",
-        "example": "https://test.com/image.png"
-      },
-      "TokenId": {
-        "description": "Token ID",
-        "type": "string",
-        "example": 0
-      },
-      "TokenType": {
-        "description": "Contract type for token (ERC721/ERC1155)",
-        "type": "string",
-        "example": "ERC721",
-        "enum": [
-          "ERC721",
-          "ERC1155"
-        ]
-      },
-      "Network": {
-        "description": "Network",
-        "type": "string",
-        "example": "zkEvm",
-        "enum": [
-          "starkEx",
-          "zkEvm"
-        ]
-      },
       "Name": {
         "description": "Name",
         "type": "string",
         "example": "Test"
-      },
-      "Symbol": {
-        "description": "Symbol",
-        "type": "string",
-        "example": "TST"
-      },
-      "Description": {
-        "description": "Description",
-        "type": "string",
-        "example": "Test"
-      },
-      "Balance": {
-        "description": "Balance",
-        "type": "string",
-        "example": 0
-      },
-      "Amount": {
-        "description": "Amount",
-        "type": "string",
-        "example": 0
-      },
-      "NftCollection": {
-        "description": "Collection",
-        "type": "object",
-        "required": [
-          "network",
-          "name",
-          "contract_address",
-          "balance",
-          "token_type"
-        ],
-        "properties": {
-          "network": {
-            "$ref": "#/components/schemas/Network"
-          },
-          "name": {
-            "$ref": "#/components/schemas/Name"
-          },
-          "contract_address": {
-            "$ref": "#/components/schemas/EthAddress"
-          },
-          "image": {
-            "$ref": "#/components/schemas/Image"
-          },
-          "icon": {
-            "$ref": "#/components/schemas/Image"
-          },
-          "balance": {
-            "$ref": "#/components/schemas/Balance"
-          },
-          "owners": {
-            "description": "Owners of the collection",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EthAddress"
-            }
-          },
-          "token_type": {
-            "$ref": "#/components/schemas/TokenType"
-          }
-        }
-      },
-      "CollectionList": {
-        "description": "Collection list",
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/NftCollection"
-        }
-      },
-      "CollectionItem": {
-        "description": "Item in a collection",
-        "type": "object",
-        "required": [
-          "network",
-          "token_id",
-          "owner",
-          "balance",
-          "token_type"
-        ],
-        "properties": {
-          "network": {
-            "$ref": "#/components/schemas/Network"
-          },
-          "name": {
-            "$ref": "#/components/schemas/Name"
-          },
-          "description": {
-            "$ref": "#/components/schemas/Description"
-          },
-          "image": {
-            "$ref": "#/components/schemas/Image"
-          },
-          "animation_url": {
-            "$ref": "#/components/schemas/Image"
-          },
-          "token_id": {
-            "$ref": "#/components/schemas/TokenId"
-          },
-          "owner": {
-            "$ref": "#/components/schemas/EthAddress"
-          },
-          "balance": {
-            "$ref": "#/components/schemas/Balance"
-          },
-          "token_type": {
-            "$ref": "#/components/schemas/TokenType"
-          }
-        }
-      },
-      "NativeToken": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "description": "Token type user is offering, which in this case is the native IMX token",
-            "example": "NATIVE",
-            "enum": [
-              "NATIVE"
-            ]
-          },
-          "symbol": {
-            "nullable": true,
-            "type": "string",
-            "description": "The symbol of token",
-            "example": "IMX"
-          }
-        },
-        "required": [
-          "type",
-          "symbol"
-        ]
-      },
-      "ERC20Token": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "description": "Token type user is offering, which in this case is ERC20",
-            "example": "ERC20",
-            "enum": [
-              "ERC20"
-            ]
-          },
-          "contract_address": {
-            "type": "string",
-            "description": "Address of ERC20 token",
-            "example": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
-          },
-          "symbol": {
-            "nullable": true,
-            "type": "string",
-            "description": "The symbol of token",
-            "example": "ETH"
-          },
-          "decimals": {
-            "nullable": true,
-            "type": "integer",
-            "description": "The decimals of token",
-            "example": 18
-          }
-        },
-        "required": [
-          "type",
-          "contract_address",
-          "symbol",
-          "decimals"
-        ]
-      },
-      "PricingData": {
-        "description": "The price of a listing or trade",
-        "type": "object",
-        "properties": {
-          "token": {
-            "description": "Token details",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/NativeToken"
-              },
-              {
-                "$ref": "#/components/schemas/ERC20Token"
-              }
-            ],
-            "discriminator": {
-              "propertyName": "type",
-              "mapping": {
-                "NATIVE": "#/components/schemas/NativeToken",
-                "ERC20": "#/components/schemas/ERC20Token"
-              }
-            }
-          },
-          "amount": {
-            "$ref": "#/components/schemas/Amount"
-          }
-        }
-      },
-      "ItemMarketData": {
-        "description": "The market data for an NFTs price",
-        "type": "object",
-        "properties": {
-          "floor_listing": {
-            "$ref": "#/components/schemas/PricingData"
-          },
-          "current_listing": {
-            "$ref": "#/components/schemas/PricingData"
-          },
-          "last_sold": {
-            "$ref": "#/components/schemas/PricingData"
-          }
-        }
-      },
-      "CollectionItemV2": {
-        "description": "Item in a collection V2",
-        "type": "object",
-        "required": [
-          "network",
-          "token_id",
-          "owner",
-          "balance",
-          "token_type"
-        ],
-        "properties": {
-          "network": {
-            "$ref": "#/components/schemas/Network"
-          },
-          "name": {
-            "$ref": "#/components/schemas/Name"
-          },
-          "description": {
-            "$ref": "#/components/schemas/Description"
-          },
-          "image": {
-            "$ref": "#/components/schemas/Image"
-          },
-          "animation_url": {
-            "$ref": "#/components/schemas/Image"
-          },
-          "token_id": {
-            "$ref": "#/components/schemas/TokenId"
-          },
-          "owner": {
-            "$ref": "#/components/schemas/EthAddress"
-          },
-          "balance": {
-            "$ref": "#/components/schemas/Balance"
-          },
-          "token_type": {
-            "$ref": "#/components/schemas/TokenType"
-          },
-          "market_data": {
-            "$ref": "#/components/schemas/ItemMarketData"
-          },
-          "acquired_at": {
-            "$ref": "#/components/schemas/AcquiredAt"
-          }
-        }
       },
       "WalletType": {
         "description": "Wallet type",
@@ -10958,11 +10625,6 @@
           }
         }
       },
-      "Signature": {
-        "description": "Signature",
-        "type": "string",
-        "example": "0x..."
-      },
       "LinkWalletV2Request": {
         "description": "Link wallet V2 request",
         "type": "object",
@@ -11001,15 +10663,6 @@
           }
         }
       },
-      "PageResponse": {
-        "description": "Response page",
-        "type": "object",
-        "properties": {
-          "next_cursor": {
-            "$ref": "#/components/schemas/PageCursor"
-          }
-        }
-      },
       "UserInfo": {
         "type": "object",
         "required": [
@@ -11041,28 +10694,6 @@
               "pattern": "^0x[0-9a-fA-F]*$",
               "maxLength": 42
             }
-          }
-        }
-      },
-      "HideActivationBadges": {
-        "type": "object",
-        "required": [
-          "balances",
-          "inventory",
-          "external_wallets"
-        ],
-        "properties": {
-          "balances": {
-            "type": "boolean",
-            "example": true
-          },
-          "inventory": {
-            "type": "boolean",
-            "example": true
-          },
-          "external_wallets": {
-            "type": "boolean",
-            "example": true
           }
         }
       },
@@ -11511,470 +11142,12 @@
         "description": "the raw message data to sign",
         "maxLength": 500,
         "minLength": 1
-      },
-      "Stack": {
-        "type": "object",
-        "description": "Stack",
-        "properties": {
-          "stack_id": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Stack ID"
-          },
-          "chain": {
-            "$ref": "#/components/schemas/Chain"
-          },
-          "contract_address": {
-            "type": "string",
-            "description": "Contract address"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2022-08-16T17:43:26.991388Z",
-            "description": "When the metadata was created"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "When the metadata was last updated",
-            "example": "2022-08-16T17:43:26.991388Z"
-          },
-          "name": {
-            "type": "string",
-            "nullable": true,
-            "example": "Sword",
-            "description": "The name of the NFT"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true,
-            "example": "2022-08-16T17:43:26.991388Z",
-            "description": "The description of the NFT"
-          },
-          "image": {
-            "type": "string",
-            "nullable": true,
-            "description": "The image url of the NFT",
-            "example": "https://some-url"
-          },
-          "external_url": {
-            "type": "string",
-            "nullable": true,
-            "description": "The external website link of NFT",
-            "example": "https://some-url"
-          },
-          "animation_url": {
-            "type": "string",
-            "nullable": true,
-            "description": "The animation url of the NFT",
-            "example": "https://some-url"
-          },
-          "youtube_url": {
-            "type": "string",
-            "nullable": true,
-            "description": "The youtube URL of NFT",
-            "example": "https://some-url"
-          },
-          "attributes": {
-            "type": "array",
-            "description": "List of Metadata attributes",
-            "nullable": true,
-            "items": {
-              "$ref": "#/components/schemas/NFTMetadataAttribute"
-            }
-          }
-        },
-        "required": [
-          "stack_id",
-          "chain",
-          "contract_address",
-          "updated_at",
-          "created_at",
-          "name",
-          "description",
-          "image",
-          "external_url",
-          "animation_url",
-          "youtube_url",
-          "attributes"
-        ]
-      },
-      "MarketPriceNativeToken": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "description": "Token type user is offering, which in this case is the native IMX token",
-            "example": "NATIVE",
-            "enum": [
-              "NATIVE"
-            ]
-          },
-          "symbol": {
-            "nullable": true,
-            "type": "string",
-            "description": "The symbol of token",
-            "example": "IMX"
-          }
-        },
-        "required": [
-          "type",
-          "symbol"
-        ]
-      },
-      "MarketPriceERC20Token": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "description": "Token type user is offering, which in this case is ERC20",
-            "example": "ERC20",
-            "enum": [
-              "ERC20"
-            ]
-          },
-          "contract_address": {
-            "type": "string",
-            "description": "Address of ERC20 token",
-            "example": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
-            "pattern": "^0x[a-fA-F0-9]{40}$"
-          },
-          "symbol": {
-            "nullable": true,
-            "type": "string",
-            "description": "The symbol of token",
-            "example": "ETH"
-          },
-          "decimals": {
-            "nullable": true,
-            "type": "integer",
-            "description": "The decimals of token",
-            "example": 18
-          }
-        },
-        "required": [
-          "type",
-          "contract_address",
-          "symbol",
-          "decimals"
-        ]
-      },
-      "PaymentAmount": {
-        "type": "object",
-        "description": "Amount details",
-        "properties": {
-          "value": {
-            "type": "string",
-            "description": "The token amount value. This value is provided in the smallest unit of the token (e.g. wei for ETH)",
-            "example": "9750000000000000000",
-            "pattern": "\\d+"
-          },
-          "value_in_eth": {
-            "type": "string",
-            "description": "The token amount value in ETH",
-            "example": "9750000000000000000",
-            "pattern": "\\d+"
-          }
-        },
-        "required": [
-          "value",
-          "value_in_eth"
-        ]
-      },
-      "MarketPriceFees": {
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "string",
-            "description": "Fee in the payment currency",
-            "example": "1000000000000000000"
-          },
-          "type": {
-            "type": "string",
-            "description": "Fee type",
-            "example": "ROYALTY",
-            "enum": [
-              "ROYALTY",
-              "MAKER_ECOSYSTEM",
-              "TAKER_ECOSYSTEM",
-              "PROTOCOL"
-            ]
-          },
-          "recipient_address": {
-            "type": "string",
-            "description": "Wallet address of fee recipient",
-            "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233",
-            "pattern": "^0x[a-fA-F0-9]{40}$"
-          }
-        },
-        "example": {
-          "amount": "1000000000000000000",
-          "type": "ROYALTY",
-          "recipient_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233"
-        },
-        "required": [
-          "type",
-          "amount",
-          "recipient_address"
-        ]
-      },
-      "MarketPriceDetails": {
-        "type": "object",
-        "description": "Market Price details",
-        "properties": {
-          "token": {
-            "description": "Token details",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/MarketPriceNativeToken"
-              },
-              {
-                "$ref": "#/components/schemas/MarketPriceERC20Token"
-              }
-            ],
-            "discriminator": {
-              "propertyName": "type",
-              "mapping": {
-                "NATIVE": "#/components/schemas/MarketPriceNativeToken",
-                "ERC20": "#/components/schemas/MarketPriceERC20Token"
-              }
-            }
-          },
-          "amount": {
-            "$ref": "#/components/schemas/PaymentAmount"
-          },
-          "fee_inclusive_amount": {
-            "$ref": "#/components/schemas/PaymentAmount"
-          },
-          "fees": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MarketPriceFees"
-            },
-            "example": [
-              {
-                "type": "TAKER_ECOSYSTEM",
-                "recipient_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233",
-                "amount": "1000000000000000000"
-              }
-            ]
-          }
-        },
-        "required": [
-          "token",
-          "amount",
-          "fee_inclusive_amount",
-          "fees"
-        ]
-      },
-      "Listing": {
-        "type": "object",
-        "description": "Listing",
-        "properties": {
-          "listing_id": {
-            "type": "string",
-            "description": "Global Order identifier",
-            "example": "018792C9-4AD7-8EC4-4038-9E05C598534A"
-          },
-          "price_details": {
-            "$ref": "#/components/schemas/MarketPriceDetails"
-          },
-          "token_id": {
-            "type": "string",
-            "description": "Token ID",
-            "example": "1"
-          },
-          "creator": {
-            "type": "string",
-            "description": "ETH Address of listing creator",
-            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
-          },
-          "amount": {
-            "type": "string",
-            "description": "Amount of token included in the listing",
-            "example": "1"
-          }
-        },
-        "required": [
-          "listing_id",
-          "price_details",
-          "creator",
-          "token_id",
-          "amount"
-        ]
-      },
-      "LastTrade": {
-        "type": "object",
-        "nullable": true,
-        "description": "Last trade",
-        "properties": {
-          "trade_id": {
-            "type": "string",
-            "description": "Trade ID",
-            "format": "uuid",
-            "example": "4e28df8d-f65c-4c11-ba04-6a9dd47b179b"
-          },
-          "token_id": {
-            "type": "string",
-            "description": "Token id of the traded asset (uint256 as string)",
-            "example": "1"
-          },
-          "price_details": {
-            "type": "array",
-            "description": "Price details, list of payments involved in this trade",
-            "items": {
-              "$ref": "#/components/schemas/MarketPriceDetails"
-            }
-          },
-          "amount": {
-            "type": "string",
-            "description": "Amount of the trade (uint256 as string)",
-            "example": "1"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "When the trade was created",
-            "example": "2022-08-16T17:43:26.991388Z"
-          }
-        },
-        "required": [
-          "trade_id",
-          "token_id",
-          "price_details",
-          "amount",
-          "created_at"
-        ]
-      },
-      "Market": {
-        "type": "object",
-        "description": "Market data",
-        "properties": {
-          "floor_listing": {
-            "nullable": true,
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Listing"
-              }
-            ]
-          },
-          "last_trade": {
-            "$ref": "#/components/schemas/LastTrade"
-          }
-        },
-        "required": [
-          "floor_listing",
-          "last_trade"
-        ]
-      },
-      "StackBundle": {
-        "type": "object",
-        "description": "Stack bundle includes stacks, markets and listings",
-        "properties": {
-          "stack": {
-            "$ref": "#/components/schemas/Stack"
-          },
-          "stack_count": {
-            "type": "integer",
-            "description": "Total count of NFTs in the stack matching the filter params",
-            "example": 1
-          },
-          "market": {
-            "nullable": true,
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Market"
-              }
-            ]
-          },
-          "listings": {
-            "type": "array",
-            "description": "List of open listings for the stack.",
-            "maxItems": 10,
-            "items": {
-              "$ref": "#/components/schemas/Listing"
-            }
-          }
-        },
-        "required": [
-          "stack",
-          "stack_count",
-          "market",
-          "listings"
-        ]
-      },
-      "StackQuoteResult": {
-        "type": "object",
-        "description": "Stack quote result",
-        "properties": {
-          "chain": {
-            "$ref": "#/components/schemas/Chain"
-          },
-          "stack_id": {
-            "format": "uuid",
-            "type": "string"
-          },
-          "market_stack": {
-            "$ref": "#/components/schemas/Market"
-          },
-          "market_collection": {
-            "$ref": "#/components/schemas/Market"
-          }
-        },
-        "required": [
-          "stack_id",
-          "market_stack",
-          "market_collection",
-          "chain"
-        ]
-      },
-      "MarketNft": {
-        "type": "object",
-        "description": "NFT market data",
-        "properties": {
-          "last_trade": {
-            "$ref": "#/components/schemas/LastTrade"
-          }
-        },
-        "required": [
-          "last_trade"
-        ]
-      },
-      "NFTQuoteResult": {
-        "type": "object",
-        "description": "NFT quote result",
-        "properties": {
-          "chain": {
-            "$ref": "#/components/schemas/Chain"
-          },
-          "token_id": {
-            "description": "Token id of NFT (uint256 as string)",
-            "type": "string"
-          },
-          "market_stack": {
-            "$ref": "#/components/schemas/Market"
-          },
-          "market_nft": {
-            "$ref": "#/components/schemas/MarketNft"
-          },
-          "market_collection": {
-            "$ref": "#/components/schemas/Market"
-          }
-        },
-        "required": [
-          "token_id",
-          "market_stack",
-          "market_nft",
-          "market_collection",
-          "chain"
-        ]
       }
     }
   },
   "x-tagGroups": [
     {
-      "name": "oas",
+      "name": "Multi Rollup API",
       "tags": [
         "activities",
         "chains",
@@ -11988,14 +11161,33 @@
         "operatorallowlist",
         "crafting",
         "listings",
-        "orders",
-        "passport",
-        "passport profile",
-        "guardian",
+        "orders"
+      ]
+    },
+    {
+      "name": "Passport MR",
+      "tags": [
+        "passport"
+      ]
+    },
+    {
+      "name": "Passport Profile Service API",
+      "tags": [
+        "passport profile"
+      ]
+    },
+    {
+      "name": "Guardian",
+      "tags": [
+        "guardian"
+      ]
+    },
+    {
+      "name": "Indexer Marketplace APIs",
+      "tags": [
         "pricing",
         "stacks"
-      ],
-      "description": "This API implements endpoints to power data driven marketplace and game experiences"
+      ]
     }
   ]
 }
