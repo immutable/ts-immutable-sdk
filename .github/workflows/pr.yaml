@@ -126,7 +126,6 @@ jobs:
 
   build-lint-test-examples:
     name: Build, Lint & Test Examples
-    needs: build-sdk
     runs-on: ubuntu-latest-8-cores
     env:
       NODE_OPTIONS: --max-old-space-size=14366
