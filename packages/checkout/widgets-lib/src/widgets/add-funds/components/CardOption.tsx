@@ -1,16 +1,12 @@
 import { IconProps, MenuItem, MenuItemSize } from '@biom3/react';
 import { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-
-export enum CardOptionTypes {
-  DEBIT = 'debit',
-  CREDIT = 'credit',
-}
+import { CardOptionType, OptionTypes } from '../types';
 
 export interface CardOptionProps<RC extends ReactElement | undefined = undefined> {
   rc?: RC;
-  type: CardOptionTypes;
-  onClick: (type: CardOptionTypes) => void;
+  type: OptionTypes;
+  onClick: (type: OptionTypes) => void;
   disabled?: boolean;
   size?: MenuItemSize;
 }
@@ -24,9 +20,9 @@ export function CardOption<RC extends ReactElement | undefined = undefined>({
 }: CardOptionProps<RC>) {
   const { t } = useTranslation();
 
-  const icon: Record<CardOptionTypes, IconProps['icon']> = {
-    [CardOptionTypes.DEBIT]: 'BankCard',
-    [CardOptionTypes.CREDIT]: 'BankCard',
+  const icon: Record<CardOptionType, IconProps['icon']> = {
+    [OptionTypes.DEBIT]: 'BankCard',
+    [OptionTypes.CREDIT]: 'BankCard',
   };
 
   const handleClick = () => onClick(type);

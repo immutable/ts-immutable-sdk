@@ -20,3 +20,14 @@ export type RouteData = {
   amountData: AmountData;
   route: RouteResponse;
 };
+
+export enum CardOptionType {
+  CREDIT = 'credit',
+  DEBIT = 'debit',
+}
+
+export enum OptionTypes {
+  CREDIT = CardOptionType.CREDIT,
+  DEBIT = CardOptionType.DEBIT,
+  ROUTE = 'route',
+}

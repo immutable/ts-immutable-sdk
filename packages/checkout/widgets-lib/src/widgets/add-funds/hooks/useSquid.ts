@@ -19,9 +19,10 @@ export const useSquid = (checkout: Checkout) => {
   }, [checkout]);
 
   useEffect(() => {
-    if (squid || !squidConfig) {
+    if (squid) {
       return;
     }
+
     const initialiseSquid = async () => {
       const config = await squidConfig();
 
@@ -33,6 +34,7 @@ export const useSquid = (checkout: Checkout) => {
       });
 
       await squidSDK.init();
+
       setSquid(squidSDK);
     };
 
