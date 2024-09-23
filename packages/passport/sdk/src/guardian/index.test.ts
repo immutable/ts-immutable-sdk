@@ -1,4 +1,4 @@
-import * as guardian from '@imtbl/guardian';
+import * as GeneratedClients from '@imtbl/generated-clients';
 import { TransactionRequest } from '@ethersproject/providers';
 import { ImmutableConfiguration } from '@imtbl/config';
 import { ConfirmationScreen } from '../confirmation';
@@ -9,7 +9,6 @@ import { JsonRpcError, RpcErrorCode } from '../zkEvm/JsonRpcError';
 import { PassportConfiguration } from '../config';
 import { ChainId } from '../network/chains';
 
-jest.mock('@imtbl/guardian');
 jest.mock('../confirmation/confirmation');
 
 describe('Guardian', () => {
@@ -24,8 +23,14 @@ describe('Guardian', () => {
 
   const mockConfirmationScreen = new ConfirmationScreen({} as any);
 
-  const getGuardianClient = (crossSdkBridgeEnabled: boolean = false) => (
-    new GuardianClient({
+  const getGuardianClient = (crossSdkBridgeEnabled: boolean = false) => {
+    const guardianApi = {
+      getTransactionByID: mockGetTransactionByID,
+      evaluateTransaction: mockEvaluateTransaction,
+      evaluateMessage: mockEvaluateMessage,
+      evaluateErc191Message: mockEvaluateErc191Message,
+    } as Partial<GeneratedClients.mr.GuardianApi>;
+    return new GuardianClient({
       confirmationScreen: mockConfirmationScreen,
       config: new PassportConfiguration({
         baseConfig: {} as ImmutableConfiguration,
@@ -38,8 +43,9 @@ describe('Guardian', () => {
         getUserImx: getUserImxMock,
         getUserZkEvm: getUserZkEvmMock,
       } as unknown as AuthManager,
-    })
-  );
+      guardianApi: guardianApi as GeneratedClients.mr.GuardianApi,
+    });
+  };
 
   beforeEach(() => {
     mockGetTransactionByID = jest.fn();
@@ -49,14 +55,6 @@ describe('Guardian', () => {
 
     getUserImxMock = jest.fn().mockReturnValue(mockUserImx);
     getUserZkEvmMock = jest.fn().mockReturnValue(mockUserZkEvm);
-    (guardian.TransactionsApi as jest.Mock).mockImplementation(() => ({
-      getTransactionByID: mockGetTransactionByID,
-      evaluateTransaction: mockEvaluateTransaction,
-    }));
-    (guardian.MessagesApi as jest.Mock).mockImplementation(() => ({
-      evaluateMessage: mockEvaluateMessage,
-      evaluateErc191Message: mockEvaluateErc191Message,
-    }));
   });
 
   describe('evaluateImxTransaction', () => {
@@ -299,7 +297,7 @@ describe('Guardian', () => {
   });
 
   describe('evaluateEIP712Message', () => {
-    const mockPayload = { chainID: '0x1234', payload: {} as guardian.EIP712Message, user: mockUserZkEvm };
+    const mockPayload = { chainID: '0x1234', payload: {} as GeneratedClients.mr.EIP712Message, user: mockUserZkEvm };
 
     it('surfaces error message if message evaluation fails', async () => {
       mockEvaluateMessage.mockRejectedValueOnce(new Error('401: Unauthorized'));

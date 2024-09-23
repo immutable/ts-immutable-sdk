@@ -87,7 +87,6 @@
       "packages/internal/factory/sdk",
       "packages/internal/factory/factory-sample-app",
       "packages/internal/generated-clients",
-      "packages/internal/guardian",
       "packages/internal/bridge/bridge-sample-app",
       "packages/checkout/sdk",
       "packages/checkout/sdk-sample-app",

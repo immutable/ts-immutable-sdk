@@ -1,5 +1,4 @@
-import * as guardian from '@imtbl/guardian';
-import { TransactionApprovalRequestChainTypeEnum, TransactionEvaluationResponse } from '@imtbl/guardian';
+import * as GeneratedClients from '@imtbl/generated-clients';
 import { BigNumber, ethers } from 'ethers';
 import AuthManager from '../authManager';
 import { ConfirmationScreen } from '../confirmation';
@@ -13,6 +12,7 @@ export type GuardianClientParams = {
   confirmationScreen: ConfirmationScreen;
   config: PassportConfiguration;
   authManager: AuthManager;
+  guardianApi: GeneratedClients.mr.GuardianApi;
 };
 
 export type GuardianEvaluateImxTransactionParams = {
@@ -44,7 +44,7 @@ export const convertBigNumberishToString = (
 
 const transformGuardianTransactions = (
   txs: MetaTransaction[],
-): guardian.MetaTransaction[] => {
+): GeneratedClients.mr.MetaTransaction[] => {
   try {
     return txs.map((t) => ({
       delegateCall: t.delegateCall === true,
@@ -64,9 +64,7 @@ const transformGuardianTransactions = (
 };
 
 export default class GuardianClient {
-  private readonly transactionAPI: guardian.TransactionsApi;
-
-  private readonly messageAPI: guardian.MessagesApi;
+  private readonly guardianApi: GeneratedClients.mr.GuardianApi;
 
   private readonly confirmationScreen: ConfirmationScreen;
 
@@ -74,12 +72,12 @@ export default class GuardianClient {
 
   private readonly authManager: AuthManager;
 
-  constructor({ confirmationScreen, config, authManager }: GuardianClientParams) {
-    const guardianConfiguration = new guardian.Configuration({ basePath: config.imxPublicApiDomain });
+  constructor({
+    confirmationScreen, config, authManager, guardianApi,
+  }: GuardianClientParams) {
     this.confirmationScreen = confirmationScreen;
     this.crossSdkBridgeEnabled = config.crossSdkBridgeEnabled;
-    this.messageAPI = new guardian.MessagesApi(guardianConfiguration);
-    this.transactionAPI = new guardian.TransactionsApi(guardianConfiguration);
+    this.guardianApi = guardianApi;
     this.authManager = authManager;
   }
 
@@ -122,7 +120,7 @@ export default class GuardianClient {
 
     const headers = { Authorization: `Bearer ${user.accessToken}` };
     const transactionRes = await retryWithDelay(
-      async () => this.transactionAPI.getTransactionByID({
+      async () => this.guardianApi.getTransactionByID({
         transactionID: payloadHash,
         chainType: 'starkex',
       }, { headers }),
@@ -133,7 +131,7 @@ export default class GuardianClient {
       throw new Error("Transaction doesn't exists");
     }
 
-    const evaluateImxRes = await this.transactionAPI.evaluateTransaction({
+    const evaluateImxRes = await this.guardianApi.evaluateTransaction({
       id: payloadHash,
       transactionEvaluationRequest: {
         chainType: 'starkex',
@@ -149,7 +147,7 @@ export default class GuardianClient {
       const confirmationResult = await this.confirmationScreen.requestConfirmation(
         payloadHash,
         user.imx.ethAddress,
-        TransactionApprovalRequestChainTypeEnum.Starkex,
+        GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Starkex,
       );
 
       if (!confirmationResult.confirmed) {
@@ -164,12 +162,12 @@ export default class GuardianClient {
     chainId,
     nonce,
     metaTransactions,
-  }: GuardianEVMTxnEvaluationParams): Promise<TransactionEvaluationResponse> {
+  }: GuardianEVMTxnEvaluationParams): Promise<GeneratedClients.mr.TransactionEvaluationResponse> {
     const user = await this.authManager.getUserZkEvm();
     const headers = { Authorization: `Bearer ${user.accessToken}` };
     const guardianTransactions = transformGuardianTransactions(metaTransactions);
     try {
-      const response = await this.transactionAPI.evaluateTransaction(
+      const response = await this.guardianApi.evaluateTransaction(
         {
           id: 'evm',
           transactionEvaluationRequest: {
@@ -219,7 +217,7 @@ export default class GuardianClient {
       const confirmationResult = await this.confirmationScreen.requestConfirmation(
         transactionId,
         user.zkEvm.ethAddress,
-        TransactionApprovalRequestChainTypeEnum.Evm,
+        GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Evm,
         chainId,
       );
 
@@ -236,7 +234,7 @@ export default class GuardianClient {
 
   private async handleEIP712MessageEvaluation(
     { chainID, payload }: GuardianEIP712MessageEvaluationParams,
-  ): Promise<guardian.MessageEvaluationResponse> {
+  ): Promise<GeneratedClients.mr.MessageEvaluationResponse> {
     try {
       const user = await this.authManager.getUserZkEvm();
       if (user === null) {
@@ -245,7 +243,7 @@ export default class GuardianClient {
           'User not logged in. Please log in first.',
         );
       }
-      const messageEvalResponse = await this.messageAPI.evaluateMessage(
+      const messageEvalResponse = await this.guardianApi.evaluateMessage(
         { messageEvaluationRequest: { chainID, payload } },
         { headers: { Authorization: `Bearer ${user.accessToken}` } },
       );
@@ -285,7 +283,7 @@ export default class GuardianClient {
 
   private async handleERC191MessageEvaluation(
     { chainID, payload }: GuardianERC191MessageEvaluationParams,
-  ): Promise<guardian.MessageEvaluationResponse> {
+  ): Promise<GeneratedClients.mr.MessageEvaluationResponse> {
     try {
       const user = await this.authManager.getUserZkEvm();
       if (user === null) {
@@ -294,7 +292,7 @@ export default class GuardianClient {
           'User not logged in. Please log in first.',
         );
       }
-      const messageEvalResponse = await this.messageAPI.evaluateErc191Message(
+      const messageEvalResponse = await this.guardianApi.evaluateErc191Message(
         {
           eRC191MessageEvaluationRequest: {
             chainID: getEip155ChainId(chainID),

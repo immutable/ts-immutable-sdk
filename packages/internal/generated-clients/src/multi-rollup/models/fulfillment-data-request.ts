@@ -41,5 +41,11 @@ export interface FulfillmentDataRequest {
      * @memberof FulfillmentDataRequest
      */
     'fees': Array<Fee>;
+    /**
+     * Token ID for the ERC721 or ERC1155 token
+     * @type {string}
+     * @memberof FulfillmentDataRequest
+     */
+    'token_id'?: string;
 }
 

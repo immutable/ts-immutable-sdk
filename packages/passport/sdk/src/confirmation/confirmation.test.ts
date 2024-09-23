@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { TransactionApprovalRequestChainTypeEnum } from '@imtbl/guardian';
+import * as GeneratedClients from '@imtbl/generated-clients';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import ConfirmationScreen from './confirmation';
 import SpyInstance = jest.SpyInstance;
@@ -79,7 +79,7 @@ describe('confirmation', () => {
       const res = await confirmationScreen.requestConfirmation(
         transactionId,
         mockEtherAddress,
-        TransactionApprovalRequestChainTypeEnum.Starkex,
+        GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Starkex,
       );
 
       expect(res.confirmed).toEqual(false);
@@ -104,7 +104,7 @@ describe('confirmation', () => {
       await confirmationScreen.requestConfirmation(
         transactionId,
         mockEtherAddress,
-        TransactionApprovalRequestChainTypeEnum.Starkex,
+        GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Starkex,
       );
 
       expect(postMessageMock).toHaveBeenCalledTimes(1);
@@ -134,7 +134,7 @@ describe('confirmation', () => {
         const res = await confirmationScreen.requestConfirmation(
           transactionId,
           mockEtherAddress,
-          TransactionApprovalRequestChainTypeEnum.Starkex,
+          GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Starkex,
         );
 
         expect(res.confirmed).toEqual(false);

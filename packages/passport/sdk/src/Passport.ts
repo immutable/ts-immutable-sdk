@@ -69,6 +69,7 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
     confirmationScreen,
     config,
     authManager,
+    guardianApi: multiRollupApiClients.guardianApi,
   });
 
   const imxApiClients = buildImxApiClients(passportModuleConfiguration);
