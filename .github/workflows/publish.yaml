@@ -25,11 +25,11 @@ on:
       - main
 
 env:
-  RELEASE_TYPE: ${{ github.event.inputs.release_type || 'prepatch' }}
+  RELEASE_TYPE: ${{ github.event.inputs.release_type }}
   DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.inputs.release_type || 'prepatch' }}
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.inputs.release_type }}
   cancel-in-progress: false
 
 jobs:
