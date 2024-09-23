@@ -21,13 +21,7 @@ export type RouteData = {
   route: RouteResponse;
 };
 
-export enum CardOptionType {
+export enum FiatOptionType {
   CREDIT = 'credit',
   DEBIT = 'debit',
-}
-
-export enum OptionTypes {
-  CREDIT = CardOptionType.CREDIT,
-  DEBIT = CardOptionType.DEBIT,
-  ROUTE = 'route',
 }
