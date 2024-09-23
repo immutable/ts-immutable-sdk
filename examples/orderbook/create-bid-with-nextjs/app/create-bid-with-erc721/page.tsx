@@ -7,12 +7,11 @@ import { passportInstance } from "../utils/setupPassport";
 import { orderbookSDK } from "../utils/setupOrderbook";
 import {
   signAndSubmitApproval,
-  signListing,
-  createListing,
-} from "../utils/listing";
+  signBid,
+  createBid,
+} from "../utils/bid";
 import {
   Box,
-  Select,
   TextInput,
   FormControl,
   Heading,
@@ -24,13 +23,12 @@ import {
 import { orderbook } from "@imtbl/sdk";
 import {
   ERC721Item,
-  NativeItem,
   ERC20Item,
-  PrepareListingParams,
+  PrepareBidParams,
 } from "@imtbl/sdk/orderbook";
 import NextLink from "next/link";
 
-export default function CreateERC721ListingWithPassport() {
+export default function CreateERC721BidWithPassport() {
   // setup the accounts state
   const [accountsState, setAccountsState] = useState<any>([]);
 
@@ -46,34 +44,27 @@ export default function CreateERC721ListingWithPassport() {
   // create the Web3Provider using the Passport provider
   const web3Provider = new ethers.providers.Web3Provider(passportProvider);
 
-  // setup the state for the ERC721 listing creation form elements
+  // setup the state for the ERC721 bid creation form elements
 
   // setup the sell item contract address state
   const [sellItemContractAddress, setSellItemContractAddressState] =
     useState<string>("");
 
-  // setup the sell item token ID state
-  const [sellItemTokenID, setSellItemTokenIDState] = useState<string>("");
-
-  // setup the buy item type state
-  const [buyItemType, setBuyItemTypeState] = useState<string>("Native");
-
-  // setup the show buy item contract address state
-  const [showBuyItemContractAddress, setShowBuyItemContractAddressState] =
-    useState<boolean>(false);
+  // setup the buy item amount state
+  const [sellItemAmount, setSellItemAmountState] = useState<string>("");
 
   // setup the buy item contract address state
   const [buyItemContractAddress, setBuyItemContractAddressState] =
     useState<string>("");
 
-  // setup the buy item amount state
-  const [buyItemAmount, setBuyItemAmountState] = useState<string>("");
+  // setup the buy item token ID state
+  const [buyItemTokenID, setBuyItemTokenIDState] = useState<string>("");
 
-  // setup the listing creation success message state
+  // setup the bid creation success message state
   const [successMessage, setSuccessMessageState] = useState<any>(null);
 
-  // setup the listing creation error message state
-  const [listingError, setListingErrorState] = useState<any>(null);
+  // setup the bid creation error message state
+  const [bidError, setBidErrorState] = useState<any>(null);
 
   const passportLogin = async () => {
     if (web3Provider.provider.request) {
@@ -113,91 +104,78 @@ export default function CreateERC721ListingWithPassport() {
     setSellItemContractAddressState(event.target.value);
   };
 
-  const handleSellItemTokenIDChange = (event: any) => {
-    setSellItemTokenIDState(event.target.value);
-  };
-
-  const handleBuyItemTypeChange = (val: any) => {
-    setBuyItemTypeState(val);
-    val === "ERC20"
-      ? setShowBuyItemContractAddressState(true)
-      : setShowBuyItemContractAddressState(false);
+  const handleSellItemAmountChange = (event: any) => {
+    setSellItemAmountState(event.target.value);
   };
 
   const handleBuyItemContractAddressChange = (event: any) => {
     setBuyItemContractAddressState(event.target.value);
   };
 
-  const handleBuyItemAmountChange = (event: any) => {
-    setBuyItemAmountState(event.target.value);
+  const handleBuyItemTokenIDChange = (event: any) => {
+    setBuyItemTokenIDState(event.target.value);
   };
 
-  const handleSuccessfulListingCreation = (listingID: string) => {
-    setSuccessMessageState(`Listing created successfully - ${listingID}`);
+  const handleSuccessfulBidCreation = (bidID: string) => {
+    setSuccessMessageState(`Bid created successfully - ${bidID}`);
   };
 
-  // #doc prepare-erc721-listing
-  // prepare ERC721 listing
-  const prepareERC721Listing =
-    async (): Promise<orderbook.PrepareListingResponse> => {
+  // #doc prepare-erc721-bid
+  // prepare ERC721 bid
+  const prepareERC721Bid =
+    async (): Promise<orderbook.PrepareBidResponse> => {
       // build the sell item
-      const sell: ERC721Item = {
+      const sell: ERC20Item = {
+        type: "ERC20",
         contractAddress: sellItemContractAddress,
-        tokenId: sellItemTokenID,
-        type: "ERC721",
+        amount: sellItemAmount,
       };
 
       // build the buy item
-      const buy =
-        buyItemType === "Native"
-          ? ({
-              amount: buyItemAmount,
-              type: "NATIVE",
-            } as NativeItem)
-          : ({
-              amount: buyItemAmount,
-              type: "ERC20",
-              contractAddress: buyItemContractAddress,
-            } as ERC20Item);
+      const buy: ERC721Item = {
+        type: "ERC721",
+        contractAddress: buyItemContractAddress,
+        tokenId: buyItemTokenID,
+      };
 
-      // build the prepare listing parameters
-      const prepareListingParams: PrepareListingParams = {
+      // build the prepare bid parameters
+      const prepareBidParams: PrepareBidParams = {
         makerAddress: accountsState[0],
         buy,
         sell,
       };
 
-      // invoke the orderbook SDK to prepare the listing
-      return await orderbookSDK.prepareListing(prepareListingParams);
+      // invoke the orderbook SDK to prepare the bid
+      return await orderbookSDK.prepareBid(prepareBidParams);
     };
-  // #enddoc prepare-erc721-listing
+  // #enddoc prepare-erc721-bid
 
-  // create ERC721 listing
-  const createER721Listing = async () => {
-    setListingErrorState(null);
+  // create ERC721 bid
+  const createER721Bid = async () => {
+    setBidErrorState(null);
 
     try {
-      // prepare the listing
-      const preparedListing = await prepareERC721Listing();
+      // prepare the bid
+      const preparedBid = await prepareERC721Bid();
 
       // sign and submit approval transaction
-      await signAndSubmitApproval(web3Provider, preparedListing);
+      await signAndSubmitApproval(web3Provider, preparedBid);
 
-      // sign the listing
-      const orderSignature = await signListing(web3Provider, preparedListing);
+      // sign the bid
+      const orderSignature = await signBid(web3Provider, preparedBid);
 
-      // create the listing
-      const listingID = await createListing(
+      // create the bid
+      const bidID = await createBid(
         orderbookSDK,
-        preparedListing,
+        preparedBid,
         orderSignature,
       );
 
-      handleSuccessfulListingCreation(listingID);
+      handleSuccessfulBidCreation(bidID);
     } catch (error: any) {
       console.error(error);
       setSuccessMessageState(null);
-      setListingErrorState(`Something went wrong - ${error.message}`);
+      setBidErrorState(`Something went wrong - ${error.message}`);
     }
   };
 
@@ -253,7 +231,7 @@ export default function CreateERC721ListingWithPassport() {
       </Box>
       <Box>
         <Heading size="medium" sx={{ marginBottom: "base.spacing.x5" }}>
-          Create ERC721 listing
+          Create ERC721 bid
         </Heading>
         {successMessage ? (
           <Box
@@ -266,7 +244,7 @@ export default function CreateERC721ListingWithPassport() {
             {successMessage}
           </Box>
         ) : null}
-        {listingError ? (
+        {bidError ? (
           <Box sx={{
             color: "red",
             marginBottom: "base.spacing.x5",
@@ -274,45 +252,24 @@ export default function CreateERC721ListingWithPassport() {
             maxHeight: "400px",
             overflowY: "auto",
           }}>
-            {listingError}
+            {bidError}
           </Box>
         ) : null}
         <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
           <FormControl.Label>NFT Contract Address</FormControl.Label>
-          <TextInput onChange={handleSellItemContractAddressChange} />
+          <TextInput onChange={handleBuyItemContractAddressChange} />
         </FormControl>
         <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
           <FormControl.Label>NFT Token ID</FormControl.Label>
-          <TextInput onChange={handleSellItemTokenIDChange} />
+          <TextInput onChange={handleBuyItemTokenIDChange} />
         </FormControl>
         <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
-          <FormControl.Label>Currency Type</FormControl.Label>
-          <Select
-            size="medium"
-            defaultOption="Native"
-            onSelectChange={handleBuyItemTypeChange}
-          >
-            <Select.Option optionKey={"Native"}>
-              <Select.Option.Icon icon="ImxToken" />
-              <Select.Option.Label>Native</Select.Option.Label>
-              <Select.Option.Caption>Native Currency</Select.Option.Caption>
-            </Select.Option>
-            <Select.Option optionKey={"ERC20"}>
-              <Select.Option.Icon icon="Tokens" />
-              <Select.Option.Label>ERC20</Select.Option.Label>
-              <Select.Option.Caption>ERC20 Tokens</Select.Option.Caption>
-            </Select.Option>
-          </Select>
+          <FormControl.Label>ERC20 Currency Contract Address</FormControl.Label>
+          <TextInput onChange={handleSellItemContractAddressChange} />
         </FormControl>
-        {showBuyItemContractAddress ? (
-          <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
-            <FormControl.Label>Currency Contract Address</FormControl.Label>
-            <TextInput onChange={handleBuyItemContractAddressChange} />
-          </FormControl>
-        ) : null}
         <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
           <FormControl.Label>Currency Amount</FormControl.Label>
-          <TextInput onChange={handleBuyItemAmountChange} />
+          <TextInput onChange={handleSellItemAmountChange} />
         </FormControl>
         <Box
           sx={{
@@ -327,7 +284,7 @@ export default function CreateERC721ListingWithPassport() {
             size="medium"
             variant="primary"
             sx={{ width: "100%", marginBottom: "base.spacing.x10" }}
-            onClick={createER721Listing}
+            onClick={createER721Bid}
           >
             Submit
           </Button>
