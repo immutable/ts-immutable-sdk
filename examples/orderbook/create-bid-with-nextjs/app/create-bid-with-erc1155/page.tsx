@@ -64,10 +64,10 @@ export default function CreateERC1155BidWithPassport() {
   const [buyItemQty, setBuyItemQtyState] = useState<string>("");
 
   // setup the bid creation success message state
-  const [successMessage, setSuccessMessageState] = useState<any>(null);
+  const [successMessage, setSuccessMessageState] = useState<string | null>(null);
 
   // setup the bid creation error message state
-  const [bidError, setBidErrorState] = useState<any>(null);
+  const [bidError, setBidErrorState] = useState<string | null>(null);
 
   const passportLogin = async () => {
     if (web3Provider.provider.request) {

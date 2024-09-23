@@ -1,6 +1,6 @@
 This example application demonstrates how to fill a listing using the Immutable SDK. The application connects to the Immutable Sandbox environment and requires a valid client ID and publishable API key (which can be retrieved from the Immutable Hub).
 
-In order to fill a listing, valid ERC721 or ERC1155 orders should exist in the system. The application will prompt the user to connect their Passport wallet and approve the settlement contract to transfer the currency tokens on their behalf. Once the currency is approved, a listing  is filled on a best effort basis.
+In order to fill a listing, valid ERC721 or ERC1155 listings should exist in the system. The application will prompt the user to connect their Passport wallet and approve the settlement contract to transfer the currency tokens on their behalf. Once the currency is approved, a listing is filled on a best effort basis.
 
 ## Features
 - Fill a ERC721 listing
@@ -14,7 +14,7 @@ In order to fill a listing, valid ERC721 or ERC1155 orders should exist in the s
 
 ```bash
 yarn
-```    
+```
 
 2. Copy the `.env.example` file to `.env`:
 
