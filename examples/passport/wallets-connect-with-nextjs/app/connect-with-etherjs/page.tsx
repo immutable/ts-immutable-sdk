@@ -65,7 +65,7 @@ export default function ConnectWithEtherJS() {
         onClick={passportLogin}
         disabled={loading}>
         Passport Login
-      </Button> 
+      </Button>
       )}
       {accountsState.length >= 1
       && (
