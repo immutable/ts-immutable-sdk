@@ -1,5 +1,5 @@
 import {
-  type AllDualVariantIconKeys, type AllIconKeys, AllSingleVariantIconKeys, ButtCon,
+  type AllDualVariantIconKeys, type AllIconKeys, ButtCon,
   isDualVariantIcon,
   MenuItem, type SxProps,
 } from '@biom3/react';
