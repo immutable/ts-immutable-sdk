@@ -1,6 +1,4 @@
 import { useLocalBundle } from '../env';
-import { SemanticVersion } from './definitions/types';
-import { validateAndBuildVersion } from './version';
 
 // Loads the checkout widgets bundle from the CDN and appends the script to the document head
 export function loadUnresolvedBundle(
@@ -28,9 +26,8 @@ export function loadUnresolvedBundle(
 
 // Gets the CDN url for the split checkout widgets bundle
 export function getWidgetsEsmUrl(
-  version?: SemanticVersion,
+  validVersion: string,
 ): string {
-  const validVersion = validateAndBuildVersion(version);
   let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout/widgets-esm.js`;
   if (useLocalBundle()) cdnUrl = `http://${window.location.host}/lib/js/index.js`;
   return cdnUrl;

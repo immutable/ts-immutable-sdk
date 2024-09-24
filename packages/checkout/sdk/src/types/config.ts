@@ -17,19 +17,19 @@ interface CheckoutFeatureConfiguration {
  * A type representing the on-ramp configurations for the checkout SDK.
  * @property {boolean} enable - To enable on-ramp feature in Checkout sdk.
 */
-export interface CheckoutOnRampConfiguration extends CheckoutFeatureConfiguration {}
+export interface CheckoutOnRampConfiguration extends CheckoutFeatureConfiguration { }
 
 /**
  * A type representing the swap configurations for the checkout SDK.
  * @property {boolean} enable - To enable swap feature in Checkout sdk.
 */
-export interface CheckoutSwapConfiguration extends CheckoutFeatureConfiguration {}
+export interface CheckoutSwapConfiguration extends CheckoutFeatureConfiguration { }
 
 /**
  * A type representing the bridge configurations for the checkout SDK.
  * @property {boolean} enable - To enable bridge feature in Checkout sdk.
 */
-export interface CheckoutBridgeConfiguration extends CheckoutFeatureConfiguration {}
+export interface CheckoutBridgeConfiguration extends CheckoutFeatureConfiguration { }
 
 /**
  * A type representing checkout SDK configurations.
@@ -81,6 +81,8 @@ export type RemoteConfiguration = {
   telemetry?: TelemetryConfig;
   /** Squid config. */
   squid?: SquidConfig;
+  /** The checkout version info. */
+  version: CheckoutVersionConfig;
 };
 
 /**
@@ -260,4 +262,8 @@ export type GasEstimateSwapTokenConfig = {
  */
 export type ChainTokensConfig = {
   [key in ChainId]?: TokenInfo[];
+};
+
+export type CheckoutVersionConfig = {
+  compatibleVersionMarkers: string[];
 };

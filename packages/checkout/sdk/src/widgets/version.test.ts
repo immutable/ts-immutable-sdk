@@ -1,17 +1,17 @@
 import { SDK_VERSION_MARKER } from '../env';
+import { CheckoutVersionConfig } from '../types';
 import { SemanticVersion } from './definitions/types';
-import { validateAndBuildVersion } from './version';
+import { determineWidgetsVersion, validateAndBuildVersion } from './version';
 
 describe('CheckoutWidgets', () => {
   const SDK_VERSION = SDK_VERSION_MARKER;
 
   beforeEach(() => {
-    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    jest.spyOn(console, 'warn').mockImplementation(() => { });
   });
 
-  describe('Versioning', () => {
-    const versionTestCases:
-    {
+  describe('Version Validation', () => {
+    const versionTestCases: {
       title: string,
       version: SemanticVersion | undefined,
       expectedVersion: string,
@@ -199,6 +199,140 @@ describe('CheckoutWidgets', () => {
       it(`should validate the correct versioning for ${testCase.title}`, () => {
         const validVersion = validateAndBuildVersion(testCase.version);
         expect(validVersion).toEqual(testCase.expectedVersion);
+      });
+    });
+  });
+
+  describe('Determine Widget Version', () => {
+    const determineWidgetVersionTestCases: {
+      title: string,
+      expectedVersion: string,
+      validatedBuildVersion: string,
+      initVersionProvided: boolean,
+      checkoutVersionConfig?: CheckoutVersionConfig,
+    }[] = [
+      {
+        title: 'version is provided in widget init params',
+        expectedVersion: '1.0.0',
+        validatedBuildVersion: '1.0.0',
+        checkoutVersionConfig: undefined,
+        initVersionProvided: true,
+      },
+      {
+        title: 'version is provided in widget init params and compatibleVersionMarkers are available',
+        expectedVersion: '1.0.0',
+        validatedBuildVersion: '1.0.0',
+        initVersionProvided: true,
+        checkoutVersionConfig: { compatibleVersionMarkers: ['2.0.0', '1.0.0'] },
+      },
+      {
+        title: 'there is a matching compatible version marker',
+        expectedVersion: '1.1.1',
+        validatedBuildVersion: '1.0.0',
+        initVersionProvided: false,
+        checkoutVersionConfig: { compatibleVersionMarkers: ['1.1.1'] },
+      },
+      {
+        title: 'there is a matching compatible version marker',
+        expectedVersion: '1.1.1',
+        validatedBuildVersion: '1.0.0',
+        initVersionProvided: false,
+        checkoutVersionConfig: { compatibleVersionMarkers: ['1.1.1', '2.0.0'] },
+      },
+      {
+        title: 'there is a matching compatible version marker',
+        expectedVersion: '1.1.1',
+        validatedBuildVersion: '1.1.1',
+        initVersionProvided: false,
+        checkoutVersionConfig: { compatibleVersionMarkers: ['1.1.1', '2.0.0'] },
+      },
+      {
+        title: 'there is a matching compatible version marker',
+        expectedVersion: '2.0.0',
+        validatedBuildVersion: '1.2.0',
+        initVersionProvided: false,
+        checkoutVersionConfig: { compatibleVersionMarkers: ['1.1.1', '2.0.0'] },
+      },
+      {
+        title: 'there is no matching compatible version marker, returning latest',
+        expectedVersion: 'latest',
+        validatedBuildVersion: '1.0.0',
+        initVersionProvided: false,
+        checkoutVersionConfig: { compatibleVersionMarkers: [] },
+      },
+      {
+        title: 'there is no matching compatible version marker, returning latest',
+        expectedVersion: 'latest',
+        validatedBuildVersion: '1.2.0',
+        initVersionProvided: false,
+        checkoutVersionConfig: { compatibleVersionMarkers: ['1.1.0'] },
+      },
+      {
+        title: 'all compatible version markers are invalid',
+        expectedVersion: 'latest',
+        validatedBuildVersion: '1.2.0',
+        initVersionProvided: false,
+        checkoutVersionConfig: { compatibleVersionMarkers: ['invalid', 'invalid'] },
+      },
+      {
+        title: 'there are invalid compatible version markers',
+        expectedVersion: 'latest',
+        validatedBuildVersion: '1.2.0',
+        initVersionProvided: false,
+        checkoutVersionConfig: { compatibleVersionMarkers: ['1.1.0', 'invalid'] },
+      },
+      {
+        title: 'there are invalid compatible version markers',
+        expectedVersion: '1.1.0',
+        validatedBuildVersion: '1.0.0',
+        initVersionProvided: false,
+        checkoutVersionConfig: { compatibleVersionMarkers: ['1.1.0', 'invalid'] },
+      },
+      {
+        title: 'there are invalid compatible version markers',
+        expectedVersion: '2.0.0',
+        validatedBuildVersion: '1.51.0',
+        initVersionProvided: false,
+        checkoutVersionConfig: { compatibleVersionMarkers: ['1.1.0', 'invalid', '2.0.0'] },
+      },
+      {
+        title: 'there are invalid compatible version markers',
+        expectedVersion: 'latest',
+        validatedBuildVersion: '2.1.0',
+        initVersionProvided: false,
+        checkoutVersionConfig: { compatibleVersionMarkers: ['1.1.0', 'invalid', '2.0.0'] },
+      },
+      {
+        title: 'the build version is an alpha',
+        expectedVersion: '1.2.0-alpha',
+        validatedBuildVersion: '1.2.0-alpha',
+        initVersionProvided: false,
+        checkoutVersionConfig: { compatibleVersionMarkers: ['2.0.0'] },
+      },
+      {
+        title: 'the build version is an alpha',
+        expectedVersion: '1.2.0-alpha',
+        validatedBuildVersion: '1.2.0-alpha',
+        initVersionProvided: false,
+        checkoutVersionConfig: { compatibleVersionMarkers: [] },
+      },
+      {
+        title: 'no version config provided',
+        expectedVersion: 'latest',
+        validatedBuildVersion: '1.2.0',
+        initVersionProvided: false,
+        checkoutVersionConfig: undefined,
+      },
+    ];
+
+    determineWidgetVersionTestCases.forEach((testCase) => {
+      it(`should determine correct widget version when ${testCase.title}`, () => {
+        const widgetVersion = determineWidgetsVersion(
+          testCase.validatedBuildVersion,
+          testCase.initVersionProvided,
+          testCase?.checkoutVersionConfig,
+        );
+        expect(widgetVersion).toEqual(testCase.expectedVersion);
       });
     });
   });

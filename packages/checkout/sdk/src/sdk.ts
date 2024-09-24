@@ -1,23 +1,30 @@
 /* eslint-disable class-methods-use-this */
 import { Web3Provider } from '@ethersproject/providers';
-import { ethers } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { Passport } from '@imtbl/passport';
 import { track } from '@imtbl/metrics';
+import { Passport } from '@imtbl/passport';
+import { ethers } from 'ethers';
+import { HttpClient } from './api/http';
+import { AvailabilityService, availabilityService } from './availability';
 import * as balances from './balances';
-import * as tokens from './tokens';
+import { CheckoutConfiguration } from './config';
 import * as connect from './connect';
-import * as provider from './provider';
-import * as wallet from './wallet';
-import * as network from './network';
-import * as transaction from './transaction';
-import { handleProviderError } from './transaction';
+import { CheckoutError, CheckoutErrorType } from './errors';
+import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
 import * as gasEstimatorService from './gasEstimate';
+import * as network from './network';
+import * as provider from './provider';
+import { InjectedProvidersManager } from './provider/injectedProvidersManager';
+import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
+import * as smartCheckout from './smartCheckout';
 import * as buy from './smartCheckout/buy';
 import * as cancel from './smartCheckout/cancel';
+import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequirements';
 import * as sell from './smartCheckout/sell';
-import * as smartCheckout from './smartCheckout';
 import * as swap from './swap';
+import * as tokens from './tokens';
+import * as transaction from './transaction';
+import { handleProviderError } from './transaction';
 import {
   AddNetworkParams,
   BuyParams,
@@ -27,6 +34,7 @@ import {
   CheckConnectionParams,
   CheckConnectionResult,
   CheckoutModuleConfiguration,
+  CheckoutVersionConfig,
   ConnectParams,
   ConnectResult,
   CreateProviderParams,
@@ -61,23 +69,15 @@ import {
   TokenInfo,
   ValidateProviderOptions,
 } from './types';
-import { CheckoutConfiguration } from './config';
-import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
-import { SellParams } from './types/sell';
 import { CancelParams } from './types/cancel';
-import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
-import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequirements';
-import { CheckoutError, CheckoutErrorType } from './errors';
-import { AvailabilityService, availabilityService } from './availability';
-import { getWidgetsEsmUrl, loadUnresolvedBundle } from './widgets/load';
-import { WidgetsInit } from './types/widgets';
-import { HttpClient } from './api/http';
-import { isMatchingAddress } from './utils/utils';
-import { WidgetConfiguration } from './widgets/definitions/configurations';
-import { SemanticVersion } from './widgets/definitions/types';
-import { validateAndBuildVersion } from './widgets/version';
-import { InjectedProvidersManager } from './provider/injectedProvidersManager';
+import { SellParams } from './types/sell';
 import { SwapParams, SwapQuoteResult, SwapResult } from './types/swap';
+import { WidgetsInit } from './types/widgets';
+import { isMatchingAddress } from './utils/utils';
+import * as wallet from './wallet';
+import { WidgetConfiguration } from './widgets/definitions/configurations';
+import { getWidgetsEsmUrl, loadUnresolvedBundle } from './widgets/load';
+import { determineWidgetsVersion, validateAndBuildVersion } from './widgets/version';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -134,10 +134,19 @@ export class Checkout {
     const checkout = this;
 
     // Preload the configurations
-    await checkout.config.remote.getConfig();
+    const versionConfig = await checkout.config.remote.getConfig('version') as CheckoutVersionConfig | undefined;
+
+    // Determine the version of the widgets to load
+    const validatedBuildVersion = validateAndBuildVersion(init.version);
+    const initVersionProvided = init.version !== undefined;
+    const widgetsVersion = determineWidgetsVersion(
+      validatedBuildVersion,
+      initVersionProvided,
+      versionConfig,
+    );
 
     try {
-      const factory = await this.loadEsModules(init.config, init.version);
+      const factory = await this.loadEsModules(init.config, widgetsVersion);
       return factory;
     } catch (err: any) {
       throw new CheckoutError(
@@ -150,7 +159,7 @@ export class Checkout {
 
   private async loadUmdBundle(
     config: WidgetConfiguration,
-    version?: SemanticVersion,
+    validVersion: string,
   ) {
     const checkout = this;
 
@@ -158,7 +167,6 @@ export class Checkout {
       (resolve, reject) => {
         try {
           const scriptId = 'immutable-checkout-widgets-bundle';
-          const validVersion = validateAndBuildVersion(version);
 
           // Prevent the script to be loaded more than once
           // by checking the presence of the script and its version.
@@ -225,11 +233,11 @@ export class Checkout {
 
   private async loadEsModules(
     config: WidgetConfiguration,
-    version?: SemanticVersion,
+    validVersion: string,
   ) {
     const checkout = this;
     try {
-      const cdnUrl = getWidgetsEsmUrl(version);
+      const cdnUrl = getWidgetsEsmUrl(validVersion);
 
       // WebpackIgnore comment required to prevent webpack modifying the import statement and
       // breaking the dynamic import in certain applications integrating checkout
@@ -248,7 +256,7 @@ export class Checkout {
     }
 
     // Fallback to UMD bundle if esm bundle fails to load
-    return await checkout.loadUmdBundle(config, version);
+    return await checkout.loadUmdBundle(config, validVersion);
   }
 
   /**
