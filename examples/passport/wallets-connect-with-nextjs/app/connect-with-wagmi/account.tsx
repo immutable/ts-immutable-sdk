@@ -26,7 +26,6 @@ export function Account() {
   return (
     <>
       <Button
-        className="mb-1"
         onClick={() => passportLogout()}
         disabled={loading}
         type="button"
@@ -55,6 +54,7 @@ export function Account() {
         </Table.Row>
       </Table.Body>
     </Table>
+    <br />
     </>
   );
 }

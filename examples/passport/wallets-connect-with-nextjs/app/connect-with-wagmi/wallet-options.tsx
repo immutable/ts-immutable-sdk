@@ -47,7 +47,6 @@ export function WalletOptions() {
 
       {loading && (
         <>
-          <br />
           <p>Loading...</p>
         </>
         )}
