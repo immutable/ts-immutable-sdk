@@ -32,6 +32,7 @@ export function OptionsDrawer({
   const {
     addFundsState: { chains },
   } = useContext(AddFundsContext);
+
   return (
     <Drawer
       size="full"

@@ -53,7 +53,7 @@ export function AddFunds({
 }: AddFundsProps) {
   const showBack = showBackButton || !!onBackButtonClick;
 
-  const { addFundsState, addFundsDispatch } = useContext(AddFundsContext);
+  const { addFundsState: { squid, balances }, addFundsDispatch } = useContext(AddFundsContext);
   const { viewDispatch } = useContext(ViewContext);
   const {
     eventTargetState: { eventTarget },
@@ -148,12 +148,9 @@ export function AddFunds({
   }, [checkout]);
 
   const openDrawer = async () => {
-    if (!addFundsState.squid || !currentToTokenAddress) {
-      return;
-    }
     await fetchRoutesWithRateLimit(
-      addFundsState.squid,
-      addFundsState.balances,
+      squid!,
+      balances,
       ChainId.IMTBL_ZKEVM_MAINNET.toString(),
       currentToTokenAddress?.address ?? '',
       currentToAmount,
@@ -171,16 +168,14 @@ export function AddFunds({
 
   useEffect(
     () => {
-      // eslint-disable-next-line max-len
-      console.log('=== SETISDISABLED currentToTokenAddress, currentToAmount, addFundsState.balances', currentToTokenAddress, currentToAmount, addFundsState.balances);
-
       setIsDisabled(
         !currentToTokenAddress
         || parseFloat(currentToAmount) <= 0
-        || addFundsState.balances.length === 0,
+        || balances.length === 0
+        || !squid,
       );
     },
-    [currentToTokenAddress, currentToAmount, addFundsState.balances],
+    [currentToTokenAddress, currentToAmount, balances, squid],
   );
 
   const handleTokenChange = (token: TokenInfo) => {
