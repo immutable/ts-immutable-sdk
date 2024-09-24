@@ -10,7 +10,7 @@ import { RelayerClient } from './relayerClient';
 import { Provider, RequestArguments } from './types';
 import { PassportEventMap, PassportEvents } from '../types';
 import TypedEventEmitter from '../utils/typedEventEmitter';
-import {mockUser, mockUserZkEvm, testConfig} from '../test/mocks';
+import { mockUser, mockUserZkEvm, testConfig } from '../test/mocks';
 import { signTypedDataV4 } from './signTypedDataV4';
 import MagicAdapter from '../magicAdapter';
 
@@ -147,12 +147,6 @@ describe('ZkEvmProvider', () => {
   });
 
   describe('eth_requestAccounts', () => {
-    it('constructor tries to automatically connect existing user session when provider is instantiated', async () => {
-      authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
-      getProvider();
-      expect(authManager.getUser).toHaveBeenCalledTimes(1);
-    });
-
     it('should return the ethAddress if already logged in', async () => {
       authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
       const provider = getProvider();
@@ -187,7 +181,7 @@ describe('ZkEvmProvider', () => {
 
     it('should throw an error if the signer initialisation fails', async () => {
       authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
-      authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+      authManager.getUser.mockResolvedValue(mockUserZkEvm);
 
       (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
         getSigner: () => {
@@ -202,8 +196,22 @@ describe('ZkEvmProvider', () => {
       );
     });
 
-    it('should not reinitialise the ethSigner if it has already been initialised', async () => {
+    it('should not reinitialise the ethSigner when it has been set during the constructor', async () => {
+      authManager.getUser.mockResolvedValue(mockUserZkEvm);
+      const provider = getProvider();
 
+      await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
+
+      expect(magicAdapter.login).toBeCalledTimes(1);
+      expect(Web3Provider).toBeCalledTimes(1);
+
+      await provider.request({ method: 'eth_requestAccounts' });
+
+      // Add a delay so that we can check if the ethSigner is initialised again
+      await new Promise(process.nextTick);
+
+      expect(magicAdapter.login).toBeCalledTimes(1);
+      expect(Web3Provider).toBeCalledTimes(1);
     });
   });
 
