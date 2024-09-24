@@ -340,7 +340,7 @@ function CheckoutUI() {
 
   // mount & re-render widget everytime params change
   useEffect(() => {
-    if (params == undefined) return;
+    if (params?.flow === undefined) return;
     if (renderAfterConnect && !web3Provider) return;
 
     mount();
@@ -659,6 +659,11 @@ function CheckoutUI() {
                       <Select.Option.Label>{flow}</Select.Option.Label>
                     </Select.Option>
                   ))}
+                  <Select.Option key={"INVALID"} optionKey={"INVALID"}>
+                    <Select.Option.Label>
+                      {"INVALID FLOW TYPE"}
+                    </Select.Option.Label>
+                  </Select.Option>
                 </Select>
               </>
             )}
