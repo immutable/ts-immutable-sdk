@@ -2518,7 +2518,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:^0.4.0, @biom3/design-tokens@npm:^0.4.2, @biom3/design-tokens@npm:~0.4.2":
+"@biom3/design-tokens@npm:^0.4.0, @biom3/design-tokens@npm:~0.4.2":
   version: 0.4.2
   resolution: "@biom3/design-tokens@npm:0.4.2"
   dependencies:
@@ -2560,33 +2560,6 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
   checksum: a2cf59149d4e15c97772bcc3de4f38b10b903dba6fda948f1faba1bbb53fe86c2f9e73adb43ba4a3f2eefeb0770d652d76f47fc11f00df7587cb846f779c601d
-  languageName: node
-  linkType: hard
-
-"@biom3/react@npm:^0.25.0":
-  version: 0.25.0
-  resolution: "@biom3/react@npm:0.25.0"
-  dependencies:
-    "@biom3/design-tokens": ~0.4.2
-    buffer: ^6.0.3
-    csstype: ^3.1.2
-    hls.js: ^1.5.11
-    localforage: ^1.10.0
-    lodash.debounce: ^4.0.8
-    lodash.get: ^4.4.2
-    lodash.isequal: ^4.5.0
-    lodash.throttle: ^4.1.1
-    react-is: ^18.2.0
-    react-keyed-flatten-children: ^3.0.0
-    ts-deepmerge: ^6.2.0
-  peerDependencies:
-    "@emotion/react": ^11.11.4
-    "@rive-app/react-canvas-lite": ^4.9.0
-    embla-carousel-react: ^8.0.4
-    framer-motion: ^10.12.12
-    react: ^18.2.0
-    react-dom: ^18.2.0
-  checksum: 7758e5c903a3bad821aeb360083e2880753b5b1ad5359e182a29ee3cd05d6fb843964fb11f8f4c7f684d4f52e4b8427a13e13dc937461be056b7eb904f9f70d5
   languageName: node
   linkType: hard
 
@@ -4254,7 +4227,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.25.0
+    "@biom3/react": ^0.27.0
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -4336,8 +4309,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
-    "@biom3/design-tokens": ^0.4.2
-    "@biom3/react": ^0.25.0
+    "@biom3/design-tokens": ^0.4.4
+    "@biom3/react": ^0.27.0
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -4662,8 +4635,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
-    "@biom3/design-tokens": ^0.4.2
-    "@biom3/react": ^0.25.0
+    "@biom3/design-tokens": ^0.4.4
+    "@biom3/react": ^0.27.0
     "@imtbl/blockchain-data": 0.0.0
     "@imtbl/config": 0.0.0
     "@imtbl/generated-clients": 0.0.0
@@ -4763,8 +4736,8 @@ __metadata:
     "@babel/core": ^7.21.0
     "@babel/plugin-transform-class-properties": ^7.24.1
     "@babel/plugin-transform-private-methods": ^7.24.1
-    "@biom3/design-tokens": ^0.4.2
-    "@biom3/react": ^0.25.0
+    "@biom3/design-tokens": ^0.4.4
+    "@biom3/react": ^0.27.0
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/keccak256": ^5.7.0
@@ -40257,7 +40230,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "x-provider-sample-app@workspace:packages/x-provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.25.0
+    "@biom3/react": ^0.27.0
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
     "@testing-library/jest-dom": ^5.16.5
