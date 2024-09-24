@@ -31,6 +31,7 @@ import AddFundsWidget from '../add-funds/AddFundsWidget';
 import { getViewShouldConnect } from './functions/getViewShouldConnect';
 import { useWidgetEvents } from './hooks/useWidgetEvents';
 import { getConnectLoaderParams } from './functions/getConnectLoaderParams';
+import { checkoutFlows } from './functions/isValidCheckoutFlow';
 
 export type CheckoutWidgetInputs = {
   checkout: Checkout;
@@ -82,12 +83,39 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
     });
   }, [flowParams]);
 
-  const showBackButton = !!view.data?.showBackButton;
+  /**
+   * If invalid flow set error view
+   */
+  useEffect(() => {
+    console.log('🐛 ~ useEffect:', flowParams.flow);
+    if (checkoutFlows.includes(flowParams.flow)) return;
 
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SharedViews.ERROR_VIEW,
+          error: {
+            name: 'InvalidViewType',
+            message: `Invalid view type "${flowParams}"`,
+          },
+        },
+      },
+    });
+  }, [flowParams.flow]);
+
+  /**
+   * Validate if the view requires connect loader
+   */
   const shouldConnectView = useMemo(
     () => getViewShouldConnect(view.type),
     [view.type],
   );
+
+  /*
+   * Show back button
+   */
+  const showBackButton = !!view.data?.showBackButton;
 
   return (
     <ViewContextProvider>
@@ -96,7 +124,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
         {view.type === SharedViews.LOADING_VIEW && (
           <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
         )}
-        {view.type === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
+        {view.type === SharedViews.ERROR_VIEW && (
           <ErrorView
             onCloseClick={() => {
               sendCheckoutEvent(eventTarget, {

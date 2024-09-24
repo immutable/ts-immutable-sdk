@@ -233,9 +233,11 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
       case CheckoutFlowType.ADD_FUNDS:
         return this.getValidAddFundsFlowParams(params);
       default:
-        throw new Error(
+        // eslint-disable-next-line no-console
+        console.warn(
           `[IMTBL]: invalid "flow: ${flowType}" widget input, must be one of the following: ${supportedFlows}`,
         );
+        return params;
     }
   }
 

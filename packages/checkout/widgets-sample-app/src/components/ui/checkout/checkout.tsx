@@ -659,6 +659,11 @@ function CheckoutUI() {
                       <Select.Option.Label>{flow}</Select.Option.Label>
                     </Select.Option>
                   ))}
+                  <Select.Option key={"INVALID"} optionKey={"INVALID"}>
+                    <Select.Option.Label>
+                      {"INVALID FLOW TYPE"}
+                    </Select.Option.Label>
+                  </Select.Option>
                 </Select>
               </>
             )}
