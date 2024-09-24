@@ -57,7 +57,7 @@
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
     "test": "jest",
     "test:watch": "jest --watch",
-    "typecheck": "tsc --noEmit --jsx preserve"
+    "typecheck": "tsc --customConditions default --noEmit --jsx preserve"
   },
   "type": "module"
 }

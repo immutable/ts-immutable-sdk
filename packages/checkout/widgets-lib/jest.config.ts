@@ -13,6 +13,7 @@ const config: Config = {
   transformIgnorePatterns: [
     "node_modules/(?!axios|@biom3/design-tokens)",
   ],
+  modulePathIgnorePatterns: ['<rootDir>/.yalc'],
 };
 
 export default config;

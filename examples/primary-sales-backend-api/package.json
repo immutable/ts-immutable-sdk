@@ -5,7 +5,7 @@
     "nodemon": "^3.1.4",
     "prisma": "^5.18.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.4"
+    "typescript": "^5.6.2"
   },
   "dependencies": {
     "@fastify/autoload": "^5.10.0",
