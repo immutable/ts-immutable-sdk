@@ -1,21 +1,26 @@
 import {
+  AddFundsEventType,
+  BridgeEventType,
   Checkout,
+  OnRampEventType,
+  SwapDirection,
+  SwapEventType,
+  WidgetLanguage,
   WidgetTheme,
   WidgetType,
-  WidgetLanguage,
-  AddFundsEventType,
-  OnRampEventType,
-  SwapEventType,
-  BridgeEventType,
-  SwapDirection,
 } from "@imtbl/checkout-sdk";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
-import { useMemo, useEffect } from "react";
+import { useEffect, useMemo } from "react";
+import { Environment } from '@imtbl/config';
 
 const ADD_FUNDS_TARGET_ID = "add-funds-widget-target";
 
 function AddFundsUI() {
-  const checkout = useMemo(() => new Checkout(), []);
+  const checkout = useMemo(() => new Checkout({
+    baseConfig:{
+      environment: Environment.PRODUCTION,
+    }
+  }), []);
   const factory = useMemo(() => new WidgetsFactory(checkout, {}), [checkout]);
   const addFunds = useMemo(
     () =>
@@ -33,7 +38,8 @@ function AddFundsUI() {
       showOnrampOption: true,
       showBridgeOption: false,
       showSwapOption: true,
-      toTokenAddress: "0x3b2d8a1931736fc321c24864bceee981b11c3c57",
+      toTokenAddress: "0x6de8acc0d406837030ce4dd28e7c08c5a96a30d2",
+      toAmount: "10",
     });
     addFunds.addListener(AddFundsEventType.CLOSE_WIDGET, (data: any) => {
       console.log("CLOSE_WIDGET", data);

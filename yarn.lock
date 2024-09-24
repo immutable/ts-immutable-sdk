@@ -2527,7 +2527,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:~0.4.4":
+"@biom3/design-tokens@npm:^0.4.4, @biom3/design-tokens@npm:~0.4.4":
   version: 0.4.4
   resolution: "@biom3/design-tokens@npm:0.4.4"
   dependencies:
@@ -2617,7 +2617,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.26.1":
+"@biom3/react@npm:^0.26.1, @biom3/react@npm:^0.26.2":
   version: 0.26.2
   resolution: "@biom3/react@npm:0.26.2"
   dependencies:
@@ -4344,8 +4344,8 @@ __metadata:
   dependencies:
     "@0xsquid/sdk": ^2.8.24
     "@0xsquid/squid-types": ^0.1.104
-    "@biom3/design-tokens": ^0.4.2
-    "@biom3/react": ^0.25.0
+    "@biom3/design-tokens": ^0.4.4
+    "@biom3/react": ^0.26.2
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/checkout-sdk": 0.0.0
