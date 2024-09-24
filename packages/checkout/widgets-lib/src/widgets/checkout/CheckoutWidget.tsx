@@ -87,7 +87,6 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
    * If invalid flow set error view
    */
   useEffect(() => {
-    console.log('🐛 ~ useEffect:', flowParams.flow);
     if (checkoutFlows.includes(flowParams.flow)) return;
 
     viewDispatch({
