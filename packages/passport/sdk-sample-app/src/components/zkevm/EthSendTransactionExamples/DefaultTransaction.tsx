@@ -34,7 +34,7 @@ function ShowGenericConfirmationScreen({ disabled, handleExampleSubmitted }: Req
       setParams([{
         from: fromAddress,
         to: toAddress,
-        data: encUtils.utf8ToHex(data, true),
+        data: data.startsWith('0x') ? data : encUtils.utf8ToHex(data, true),
       }]);
     } catch (err) {
       setDataError(emptyDataError);

@@ -96,11 +96,18 @@ export interface NFT {
      */
     'image': string | null;
     /**
+     * (deprecated - use external_url instead) The external website link of NFT
+     * @type {string}
+     * @memberof NFT
+     * @deprecated
+     */
+    'external_link': string | null;
+    /**
      * The external website link of NFT
      * @type {string}
      * @memberof NFT
      */
-    'external_link': string | null;
+    'external_url': string | null;
     /**
      * The animation url of the NFT
      * @type {string}
