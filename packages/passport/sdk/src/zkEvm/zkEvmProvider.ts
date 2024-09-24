@@ -116,14 +116,20 @@ export class ZkEvmProvider implements Provider {
 
     // Automatically connect an existing user session to Passport
     this.#authManager.getUser().then((user) => {
-      if (user && isZkEvmUser(user)) {
+      if (user) {
         this.#initialiseEthSigner(user);
+        if (isZkEvmUser(user)) {
+          this.#callSessionActivity(user.zkEvm.ethAddress);
+        }
       }
-    }).catch(() => {
-      // User does not exist, don't initialise an eth signer
-    });
+    }).catch(); // User does not exist, don't initialise an eth signer
 
-    passportEventEmitter.on(PassportEvents.LOGGED_IN, (user: User) => this.#initialiseEthSigner(user));
+    passportEventEmitter.on(PassportEvents.LOGGED_IN, (user: User) => {
+      this.#initialiseEthSigner(user);
+      if (isZkEvmUser(user)) {
+        this.#callSessionActivity(user.zkEvm.ethAddress);
+      }
+    });
     passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.#handleLogout);
     passportEventEmitter.on(
       PassportEvents.ACCOUNTS_REQUESTED,
@@ -231,7 +237,9 @@ export class ZkEvmProvider implements Provider {
           const user = await this.#authManager.getUserOrLogin();
           flow.addEvent('endGetUserOrLogin');
 
-          this.#initialiseEthSigner(user);
+          if (!this.#ethSigner) {
+            this.#initialiseEthSigner(user);
+          }
 
           let userZkEvmEthAddress;
 
