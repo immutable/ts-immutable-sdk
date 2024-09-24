@@ -1,40 +1,43 @@
 import { Box, MenuItemSize } from '@biom3/react';
 
 import { motion } from 'framer-motion';
-import { useMemo } from 'react';
 import {
   listItemVariants,
   listVariants,
 } from '../../../lib/animation/listAnimation';
-import { CardOption, CardOptionTypes } from './CardOption';
+import { FiatOption } from './FiatOption';
+import { Chain, FiatOptionType, RouteData } from '../types';
+import { RouteOption } from './RouteOption';
 
-const defaultOptions: CardOptionTypes[] = [
-  CardOptionTypes.DEBIT,
-  CardOptionTypes.CREDIT,
+const defaultOptions: FiatOptionType[] = [
+  FiatOptionType.DEBIT,
+  FiatOptionType.CREDIT,
 ];
 
 export interface OptionsProps {
-  onClick: (type: CardOptionTypes) => void;
-  disabledOptions?: CardOptionTypes[];
-  options?: CardOptionTypes[];
+  routes: RouteData[];
+  chains: Chain[];
+  onCardClick: (type: FiatOptionType) => void;
+  onRouteClick: (route: RouteData) => void;
   size?: MenuItemSize;
-  hideDisabledOptions?: boolean;
+  showOnrampOption?: boolean;
 }
 
 export function Options(props: OptionsProps) {
   const {
-    disabledOptions = [],
-    options,
-    onClick,
+    routes,
+    chains,
+    onCardClick,
+    onRouteClick,
     size,
-    hideDisabledOptions,
+    showOnrampOption,
   } = props;
-  const filteredOptions = useMemo(
-    () => (options || defaultOptions).filter(
-      (option) => !hideDisabledOptions || !disabledOptions.includes(option),
-    ),
-    [options, disabledOptions, hideDisabledOptions],
-  );
+  const disabledOptions: FiatOptionType[] = [];
+
+  if (!showOnrampOption) {
+    disabledOptions.push(FiatOptionType.CREDIT);
+    disabledOptions.push(FiatOptionType.DEBIT);
+  }
 
   return (
     <Box
@@ -50,13 +53,27 @@ export function Options(props: OptionsProps) {
         <motion.div variants={listVariants} initial="hidden" animate="show" />
       }
     >
-      {filteredOptions.map((type, idx: number) => (
-        <CardOption
-          key={`option-type-${type}`}
+      {routes.length > 0 && routes.map((route: RouteData) => {
+        const chain = chains.find((c: Chain) => c.id === route.amountData.fromToken.chainId);
+        return (
+          <RouteOption
+            key={`route-option-${route.amountData.fromToken.chainId}-${route.amountData.fromToken.address}`}
+            chain={chain}
+            route={route}
+            onClick={() => onRouteClick(route)}
+            size={size}
+            disabled={false}
+            rc={<motion.div variants={listItemVariants} />}
+          />
+        );
+      })}
+
+      {showOnrampOption && defaultOptions.map((type, idx: number) => (
+        <FiatOption
+          key={`fiat-option-type-${type}`}
           type={type}
           size={size}
-          onClick={onClick}
-          disabled={disabledOptions.includes(type)}
+          onClick={() => onCardClick(type)}
           rc={<motion.div custom={idx} variants={listItemVariants} />}
         />
       ))}
