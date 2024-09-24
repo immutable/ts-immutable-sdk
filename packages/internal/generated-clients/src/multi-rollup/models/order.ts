@@ -144,7 +144,8 @@ export interface Order {
 
 export const OrderTypeEnum = {
     Listing: 'LISTING',
-    Bid: 'BID'
+    Bid: 'BID',
+    CollectionBid: 'COLLECTION_BID'
 } as const;
 
 export type OrderTypeEnum = typeof OrderTypeEnum[keyof typeof OrderTypeEnum];

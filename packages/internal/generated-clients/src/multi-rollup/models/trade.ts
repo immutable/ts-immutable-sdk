@@ -33,23 +33,29 @@ import { TradeBlockchainMetadata } from './trade-blockchain-metadata';
  */
 export interface Trade {
     /**
-     * 
+     * Buy items are transferred from the taker to the maker.
      * @type {Array<Item>}
      * @memberof Trade
      */
     'buy': Array<Item>;
     /**
-     * 
+     * Deprecated. Use maker and taker addresses instead of buyer and seller addresses.
      * @type {string}
      * @memberof Trade
      */
     'buyer_address': string;
     /**
-     * 
+     * Deprecated. Use fees instead. The taker always pays the fees.
      * @type {Array<Fee>}
      * @memberof Trade
      */
     'buyer_fees': Array<Fee>;
+    /**
+     * 
+     * @type {Array<Fee>}
+     * @memberof Trade
+     */
+    'fees': Array<Fee>;
     /**
      * 
      * @type {Chain}
@@ -81,13 +87,13 @@ export interface Trade {
      */
     'id': string;
     /**
-     * 
+     * Sell items are transferred from the maker to the taker.
      * @type {Array<Item>}
      * @memberof Trade
      */
     'sell': Array<Item>;
     /**
-     * 
+     * Deprecated. Use maker and taker addresses instead of buyer and seller addresses.
      * @type {string}
      * @memberof Trade
      */

@@ -1,4 +1,4 @@
-import { TransactionApprovalRequestChainTypeEnum } from '@imtbl/guardian';
+import * as GeneratedClients from '@imtbl/generated-clients';
 import { trackError } from '@imtbl/metrics';
 
 import {
@@ -60,7 +60,7 @@ export default class ConfirmationScreen {
   requestConfirmation(
     transactionId: string,
     etherAddress: string,
-    chainType: TransactionApprovalRequestChainTypeEnum,
+    chainType: GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum,
     chainId?: string,
   ): Promise<ConfirmationResult> {
     return new Promise((resolve, reject) => {
@@ -102,7 +102,7 @@ export default class ConfirmationScreen {
       };
 
       let href = '';
-      if (chainType === TransactionApprovalRequestChainTypeEnum.Starkex) {
+      if (chainType === GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Starkex) {
         href = this.getHref('transaction', { transactionId, etherAddress, chainType });
       } else {
         href = this.getHref('zkevm/transaction', {

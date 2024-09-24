@@ -70,7 +70,6 @@
     "@imtbl/config": "0.0.0",
     "@imtbl/cryptofiat": "0.0.0",
     "@imtbl/generated-clients": "0.0.0",
-    "@imtbl/guardian": "0.0.0",
     "@imtbl/minting-backend": "0.0.0",
     "@imtbl/orderbook": "0.0.0",
     "@imtbl/passport": "0.0.0",
