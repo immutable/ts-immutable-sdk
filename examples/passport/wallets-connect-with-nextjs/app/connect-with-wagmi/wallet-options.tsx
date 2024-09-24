@@ -31,6 +31,8 @@ export function WalletOptions() {
   return (
     <>
       {filteredConnectors.map((connector) => (
+        <>
+        <p>Connect with:</p>
         <Button
           className="mb-1"
           key={connector.uid}
@@ -40,9 +42,15 @@ export function WalletOptions() {
         >
           {connector.name}
         </Button>
+        </>
       ))}
-      <br />
-      {loading && <p>Loading...</p>}
+
+      {loading && (
+        <>
+          <br />
+          <p>Loading...</p>
+        </>
+        )}
     </>
   );
 }

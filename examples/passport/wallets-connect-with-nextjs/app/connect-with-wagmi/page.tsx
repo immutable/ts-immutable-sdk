@@ -25,7 +25,6 @@ export default function ConnectWithWagmi() {
           <ConnectWallet />
         </QueryClientProvider>
       </WagmiProvider>
-      <br />
       <Link rc={<NextLink href="/" />}>Return to Examples</Link>
     </>
   );
