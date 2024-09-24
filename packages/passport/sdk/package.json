@@ -7,6 +7,8 @@
   "dependencies": {
     "@0xsequence/abi": "^1.4.3",
     "@0xsequence/core": "^1.4.3",
+    "@ethersproject/abstract-provider": "^5.7.0",
+    "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/config": "0.0.0",
     "@imtbl/generated-clients": "0.0.0",
@@ -16,6 +18,7 @@
     "@imtbl/x-client": "0.0.0",
     "@imtbl/x-provider": "0.0.0",
     "@magic-ext/oidc": "4.3.1",
+    "@magic-sdk/provider": "^21.2.0",
     "@metamask/detect-provider": "^2.0.0",
     "axios": "^1.6.5",
     "ethers": "^5.7.2",
@@ -79,7 +82,7 @@
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest",
     "test:watch": "jest --watch",
-    "typecheck": "tsc --noEmit --jsx preserve"
+    "typecheck": "tsc --customConditions default --noEmit --jsx preserve"
   },
   "type": "module"
 }

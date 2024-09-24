@@ -1,9 +1,9 @@
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDirs": ["src"],
+    "rootDirs": ["utils", "step-definitions"],
   },
-  "include": ["src"],
+  "include": ["utils", "step-definitions"],
   "exclude": [
     "node_modules",
     "dist"
