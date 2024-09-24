@@ -2527,7 +2527,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:~0.4.4":
+"@biom3/design-tokens@npm:^0.4.4, @biom3/design-tokens@npm:~0.4.4":
   version: 0.4.4
   resolution: "@biom3/design-tokens@npm:0.4.4"
   dependencies:
@@ -2641,6 +2641,33 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
   checksum: f70fdcb649e617cc3e9ab5bc093a74f9908a198cd5446370b14dcf3748b1dfacc6c08b517766f41231886bf4ec0dccfe47edb91ba7c7f67a96599cef5e1135bf
+  languageName: node
+  linkType: hard
+
+"@biom3/react@npm:^0.27.0":
+  version: 0.27.0
+  resolution: "@biom3/react@npm:0.27.0"
+  dependencies:
+    "@biom3/design-tokens": ~0.4.4
+    "@imtbl/image-resizer-utils": ~0.0.2
+    csstype: ^3.1.2
+    hls.js: ^1.5.11
+    localforage: ^1.10.0
+    lodash.debounce: ^4.0.8
+    lodash.get: ^4.4.2
+    lodash.isequal: ^4.5.0
+    lodash.throttle: ^4.1.1
+    react-is: ^18.2.0
+    react-keyed-flatten-children: ^3.0.0
+    ts-deepmerge: ^6.2.0
+  peerDependencies:
+    "@emotion/react": ^11.11.4
+    "@rive-app/react-canvas-lite": ^4.9.0
+    embla-carousel-react: ^8.0.4
+    framer-motion: ^10.12.12
+    react: ^18.2.0
+    react-dom: ^18.2.0
+  checksum: 2ba88ed68ddfcc3d48b8c0963ecf88cebc61c38428d2a2e01725527109fda0f3381f4d3244e47e487cf88a1aeec5ef932b0c6beeb13614e9d2fd60cbdad76d83
   languageName: node
   linkType: hard
 
@@ -4344,8 +4371,8 @@ __metadata:
   dependencies:
     "@0xsquid/sdk": ^2.8.24
     "@0xsquid/squid-types": ^0.1.104
-    "@biom3/design-tokens": ^0.4.2
-    "@biom3/react": ^0.25.0
+    "@biom3/design-tokens": ^0.4.4
+    "@biom3/react": ^0.27.0
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/checkout-sdk": 0.0.0
@@ -4535,6 +4562,15 @@ __metadata:
   dependencies:
     buffer: ^6.0.3
   checksum: 5094e23136eee70ceb790dbeb71834d25941477bc768fe4d83c5cf4f6b062a68bc3cac110c6585908f44fe13ef0b1a9cb0c1a07042672da90c9713b0b7e9cf98
+  languageName: node
+  linkType: hard
+
+"@imtbl/image-resizer-utils@npm:~0.0.2":
+  version: 0.0.2
+  resolution: "@imtbl/image-resizer-utils@npm:0.0.2"
+  dependencies:
+    buffer: ^6.0.3
+  checksum: aba219f47ab57418f7fef8cc2382218e00582ec4e1bd931821cf2a6160e9ce56737fb1973aaff0d3e0d5d774eaa793d91d456ed43611430d8fe77597ab92fd3d
   languageName: node
   linkType: hard
 
