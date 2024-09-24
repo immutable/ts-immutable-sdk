@@ -105,7 +105,7 @@ describe('ZkEvmProvider', () => {
 
     describe('when a login occurs outside of the zkEvm provider', () => {
       beforeEach(() => {
-        authManager.getUser.mockResolvedValue();
+        authManager.getUser.mockResolvedValue(null);
       });
 
       it('initialises the signer', async () => {
