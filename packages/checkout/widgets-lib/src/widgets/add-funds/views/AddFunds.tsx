@@ -26,6 +26,7 @@ import {
   ViewContext,
 } from '../../../context/view-context/ViewContext';
 import { useRoutes } from '../hooks/useRoutes';
+import { RouteData } from '../types';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -53,14 +54,12 @@ export function AddFunds({
   const showBack = showBackButton || !!onBackButtonClick;
 
   const { addFundsState, addFundsDispatch } = useContext(AddFundsContext);
-
   const { viewDispatch } = useContext(ViewContext);
-
-  const { routes, fetchRoutesWithRateLimit } = useRoutes();
-
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
+
+  const { routes, fetchRoutesWithRateLimit } = useRoutes();
 
   const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
   const [onRampAllowedTokens, setOnRampAllowedTokens] = useState<TokenInfo[]>(
@@ -73,6 +72,7 @@ export function AddFunds({
   const [currentToTokenAddress, setCurrentToTokenAddress] = useState<
   TokenInfo | undefined
   >();
+  const [isDisabled, setIsDisabled] = useState(true);
 
   const showErrorView = useCallback(
     (error: Error) => {
@@ -160,7 +160,6 @@ export function AddFunds({
       5,
       1000,
     );
-
     setShowOptionsDrawer(true);
   };
 
@@ -170,7 +169,19 @@ export function AddFunds({
 
   const isSelected = (token: TokenInfo) => token.address === currentToTokenAddress;
 
-  const isDisabled = !currentToTokenAddress || !currentToAmount || parseFloat(currentToAmount) <= 0;
+  useEffect(
+    () => {
+      // eslint-disable-next-line max-len
+      console.log('=== SETISDISABLED currentToTokenAddress, currentToAmount, addFundsState.balances', currentToTokenAddress, currentToAmount, addFundsState.balances);
+
+      setIsDisabled(
+        !currentToTokenAddress
+        || parseFloat(currentToAmount) <= 0
+        || addFundsState.balances.length === 0,
+      );
+    },
+    [currentToTokenAddress, currentToAmount, addFundsState.balances],
+  );
 
   const handleTokenChange = (token: TokenInfo) => {
     setCurrentToTokenAddress(token);
@@ -180,7 +191,7 @@ export function AddFunds({
   //   console.log('handle review click');
   // };
 
-  const onPayWithCard = () => {
+  const onCardClick = () => {
     const data = {
       tokenAddress: currentToTokenAddress?.address ?? '',
       amount: toAmount ?? '',
@@ -201,6 +212,12 @@ export function AddFunds({
       return !!token;
     }
     return false;
+  };
+
+  const onRouteClick = (route: RouteData | undefined) => () => {
+    // TODO: go to the review screen
+    // eslint-disable-next-line no-console
+    console.log('onRouteClick', route);
   };
 
   return (
@@ -304,7 +321,8 @@ export function AddFunds({
             showBridgeOption={showBridgeOption}
             visible={showOptionsDrawer}
             onClose={() => setShowOptionsDrawer(false)}
-            onPayWithCard={onPayWithCard}
+            onCardClick={onCardClick}
+            onRouteClick={onRouteClick}
           />
         </Box>
         {/* <Button
