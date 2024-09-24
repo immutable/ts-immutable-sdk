@@ -1,5 +1,6 @@
 import {
-  type AllDualVariantIconKeys, type AllIconKeys, ButtCon,
+  type AllDualVariantIconKeys, type AllIconKeys, AllSingleVariantIconKeys, ButtCon,
+  isDualVariantIcon,
   MenuItem, type SxProps,
 } from '@biom3/react';
 import type { Web3Provider } from '@ethersproject/providers';
@@ -76,21 +77,37 @@ export function WalletAddress({
         logo={getWalletLogoByName(getWalletProviderNameByProvider(provider))}
         sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
       />
-
-      <ButtCon
-        variant="tertiary"
-        iconVariant="bold"
-        size="small"
-        icon={ctaIcon as AllDualVariantIconKeys}
-        iconSx={{
-          ...(isCopied ? isCopiedIconStyle : {}),
-        }}
-        onClick={handleIconClick}
-        sx={{
-          cursor: 'pointer',
-          ...(isCopied ? isCopiedStyle : {}),
-        }}
-      />
+      {isDualVariantIcon(ctaIcon) ? (
+        <ButtCon
+          variant="tertiary"
+          iconVariant="bold"
+          size="small"
+          icon={ctaIcon}
+          iconSx={{
+            ...(isCopied ? isCopiedIconStyle : {}),
+          }}
+          onClick={handleIconClick}
+          sx={{
+            cursor: 'pointer',
+            ...(isCopied ? isCopiedStyle : {}),
+          }}
+        />
+      ) : (
+        <ButtCon
+          variant="tertiary"
+          size="small"
+          icon={ctaIcon as AllDualVariantIconKeys}
+          iconSx={{
+            ...(isCopied ? isCopiedIconStyle : {}),
+          }}
+          onClick={handleIconClick}
+          sx={{
+            cursor: 'pointer',
+            ...(isCopied ? isCopiedStyle : {}),
+          }}
+        />
+      )}
+      
       <MenuItem.Label>{t('views.SETTINGS.walletAddress.label')}</MenuItem.Label>
       <MenuItem.Caption testId="wallet-address">
         {abbreviateWalletAddress(walletAddress)}
