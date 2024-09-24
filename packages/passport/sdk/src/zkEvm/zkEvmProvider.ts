@@ -223,7 +223,10 @@ export class ZkEvmProvider implements Provider {
     switch (request.method) {
       case 'eth_requestAccounts': {
         const zkEvmAddress = await this.#getZkEvmAddress();
-        if (zkEvmAddress) return [zkEvmAddress];
+        if (zkEvmAddress) {
+          this.#callSessionActivity(zkEvmAddress);
+          return [zkEvmAddress];
+        }
 
         const flow = trackFlow('passport', 'ethRequestAccounts');
 

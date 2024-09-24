@@ -101,6 +101,45 @@ describe('ZkEvmProvider', () => {
       });
     });
 
+    it('should emit accountsRequested event when the user is not authenticated', async () => {
+      authManager.getUser.mockResolvedValue(Promise.resolve(null));
+
+      authManager.getUserOrLogin.mockResolvedValue(mockUserZkEvm);
+      const provider = getProvider();
+      const onAccountsRequested = jest.fn();
+
+      passportEventEmitter.on(PassportEvents.ACCOUNTS_REQUESTED, onAccountsRequested);
+
+      const accounts = await provider.request({ method: 'eth_requestAccounts' });
+
+      expect(accounts).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
+      expect(onAccountsRequested).toHaveBeenCalledWith({
+        environment: 'sandbox',
+        passportClient: 'client123',
+        sendTransaction: expect.any(Function),
+        walletAddress: '0x0000000000000000000000000000000000000001',
+      });
+    });
+
+    it('should emit accountsRequested event when the user is already authenticated', async () => {
+      authManager.getUser.mockResolvedValue(mockUserZkEvm);
+
+      const provider = getProvider();
+      const onAccountsRequested = jest.fn();
+
+      passportEventEmitter.on(PassportEvents.ACCOUNTS_REQUESTED, onAccountsRequested);
+
+      const accounts = await provider.request({ method: 'eth_requestAccounts' });
+
+      expect(accounts).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
+      expect(onAccountsRequested).toHaveBeenCalledWith({
+        environment: 'sandbox',
+        passportClient: 'client123',
+        sendTransaction: expect.any(Function),
+        walletAddress: '0x0000000000000000000000000000000000000001',
+      });
+    });
+
     it('should throw an error if the signer initialisation fails', async () => {
       authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
       authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
