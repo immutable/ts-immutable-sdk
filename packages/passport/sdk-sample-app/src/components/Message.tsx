@@ -17,7 +17,7 @@ function Message() {
   return (
     <CardStack title="Message">
       <Sticker
-        style={{ width: '100%' }}
+        sx={{ width: '100%' }}
         position={{ x: 'right', y: 'top' }}
       >
         <Form>
