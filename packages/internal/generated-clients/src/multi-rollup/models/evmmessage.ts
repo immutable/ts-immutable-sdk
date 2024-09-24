@@ -15,37 +15,43 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Fee } from './fee';
+import { EIP712Message } from './eip712-message';
 
 /**
  * 
  * @export
- * @interface FulfillmentDataRequest
+ * @interface EVMMessage
  */
-export interface FulfillmentDataRequest {
+export interface EVMMessage {
+    /**
+     * Confirmation Candidate ID
+     * @type {string}
+     * @memberof EVMMessage
+     */
+    'id': string;
+    /**
+     * request user\'s ether address
+     * @type {string}
+     * @memberof EVMMessage
+     */
+    'eth_address': string;
+    /**
+     * Status of the evm message
+     * @type {string}
+     * @memberof EVMMessage
+     */
+    'status': string;
+    /**
+     * Which version is at
+     * @type {string}
+     * @memberof EVMMessage
+     */
+    'version': string;
     /**
      * 
-     * @type {string}
-     * @memberof FulfillmentDataRequest
+     * @type {EIP712Message}
+     * @memberof EVMMessage
      */
-    'order_id': string;
-    /**
-     * Address of the intended account fulfilling the order
-     * @type {string}
-     * @memberof FulfillmentDataRequest
-     */
-    'taker_address': string;
-    /**
-     * 
-     * @type {Array<Fee>}
-     * @memberof FulfillmentDataRequest
-     */
-    'fees': Array<Fee>;
-    /**
-     * Token ID for the ERC721 or ERC1155 token
-     * @type {string}
-     * @memberof FulfillmentDataRequest
-     */
-    'token_id'?: string;
+    'data': EIP712Message;
 }
 
