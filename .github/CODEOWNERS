@@ -11,7 +11,6 @@
 /packages/internal/cryptofiat @immutable/commerce
 /packages/internal/dex @immutable/tokens
 /packages/internal/bridge @immutable/rollups
-/packages/internal/guardian @immutable/passport
 /packages/orderbook @immutable/traders
 /packages/passport @immutable/passport
 /packages/x-provider @immutable/commerce

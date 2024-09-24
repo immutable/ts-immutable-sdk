@@ -17,32 +17,33 @@
 /**
  * 
  * @export
- * @interface NativeItem
+ * @interface ERC1155CollectionItem
  */
-export interface NativeItem {
+export interface ERC1155CollectionItem {
     /**
-     * Token type user is offering, which in this case is the native IMX token
+     * Token type user is offering, which in this case is ERC1155
      * @type {string}
-     * @memberof NativeItem
+     * @memberof ERC1155CollectionItem
      */
-    'type': NativeItemTypeEnum;
+    'type': ERC1155CollectionItemTypeEnum;
+    /**
+     * Address of ERC1155 collection
+     * @type {string}
+     * @memberof ERC1155CollectionItem
+     */
+    'contract_address': string;
     /**
      * A string representing the price at which the user is willing to sell the token. This value is provided in the smallest unit of the token (e.g., wei for Ethereum).
      * @type {string}
-     * @memberof NativeItem
+     * @memberof ERC1155CollectionItem
      */
     'amount': string;
 }
 
-export const NativeItemTypeEnum = {
-    Native: 'NATIVE',
-    Erc20: 'ERC20',
-    Erc721: 'ERC721',
-    Erc1155: 'ERC1155',
-    Erc721Collection: 'ERC721_COLLECTION',
+export const ERC1155CollectionItemTypeEnum = {
     Erc1155Collection: 'ERC1155_COLLECTION'
 } as const;
 
-export type NativeItemTypeEnum = typeof NativeItemTypeEnum[keyof typeof NativeItemTypeEnum];
+export type ERC1155CollectionItemTypeEnum = typeof ERC1155CollectionItemTypeEnum[keyof typeof ERC1155CollectionItemTypeEnum];
 
 

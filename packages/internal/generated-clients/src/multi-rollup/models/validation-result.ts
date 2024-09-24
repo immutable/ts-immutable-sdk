@@ -15,27 +15,24 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ERC1155CollectionItem } from './erc1155-collection-item';
+import { Analysis } from './analysis';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ERC1155Item } from './erc1155-item';
+import { Severity } from './severity';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ERC20Item } from './erc20-item';
+import { ValidationErrorResults } from './validation-error-results';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ERC721CollectionItem } from './erc721-collection-item';
+import { ValidationStatus } from './validation-status';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ERC721Item } from './erc721-item';
-// May contain unused imports in some cases
-// @ts-ignore
-import { NativeItem } from './native-item';
+import { ValidationSuccessResults } from './validation-success-results';
 
 /**
- * @type Item
+ * @type ValidationResult
  * @export
  */
-export type Item = { type: 'ERC1155' } & ERC1155Item | { type: 'ERC1155_COLLECTION' } & ERC1155CollectionItem | { type: 'ERC20' } & ERC20Item | { type: 'ERC721' } & ERC721Item | { type: 'ERC721_COLLECTION' } & ERC721CollectionItem | { type: 'NATIVE' } & NativeItem;
+export type ValidationResult = { status: 'error' } & ValidationErrorResults | { status: 'success' } & ValidationSuccessResults;
 
 
