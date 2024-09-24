@@ -28,5 +28,5 @@ fi
 
 # Run nx commands with the selected or provided package name
 echo "Running commands for package: $PACKAGE_NAME"
-nx run $PACKAGE_NAME:d --parallel=5 --no-cloud
+nx run $PACKAGE_NAME:d --no-cloud
 nx watch --all -- node ./build-dependents.js \$NX_PROJECT_NAME $(echo $PACKAGE_NAME)
