@@ -60,7 +60,7 @@ export function Options(props: OptionsProps) {
             key={`route-option-${route.amountData.fromToken.chainId}-${route.amountData.fromToken.address}`}
             chain={chain}
             route={route}
-            onClick={() => onRouteClick(route)}
+            onClick={onRouteClick}
             size={size}
             disabled={false}
             rc={<motion.div variants={listItemVariants} />}
