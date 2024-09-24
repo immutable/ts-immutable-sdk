@@ -3,9 +3,10 @@ import { Box } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
-import { ExchangeType, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
+import { Checkout, ExchangeType, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 import url from 'url';
 import { useTranslation } from 'react-i18next';
+import { Web3Provider } from '@ethersproject/providers';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { sendOnRampWidgetCloseEvent } from '../OnRampWidgetEvents';
@@ -25,7 +26,6 @@ import {
   TransakEvents,
   TransakStatuses,
 } from '../TransakEvents';
-import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { TRANSAK_ORIGIN } from '../../../components/Transak/useTransakEvents';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
@@ -36,18 +36,22 @@ interface OnRampProps {
   showIframe: boolean;
   tokenAmount?: string;
   tokenAddress?: string;
+  toWalletAddress?: string;
   passport?: Passport;
   showBackButton?: boolean;
+  checkout: Checkout;
+  provider?: Web3Provider;
 }
 export function OnRampMain({
+  toWalletAddress,
   passport,
   showIframe,
   tokenAmount,
   tokenAddress,
   showBackButton,
+  checkout,
+  provider,
 }: OnRampProps) {
-  const { connectLoaderState } = useContext(ConnectLoaderContext);
-  const { checkout, provider } = connectLoaderState;
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
@@ -214,21 +218,24 @@ export function OnRampMain({
   };
 
   useEffect(() => {
-    if (!checkout || !provider) return;
+    if (!checkout) return;
 
-    let userWalletAddress = '';
+    let walletAddress = toWalletAddress ?? '';
 
     (async () => {
       const params = {
         exchangeType: ExchangeType.ONRAMP,
         web3Provider: provider,
         tokenAddress,
+        walletAddress,
         tokenAmount,
         passport,
       };
 
       setWidgetUrl(await checkout.createFiatRampUrl(params));
-      userWalletAddress = await provider!.getSigner().getAddress();
+      if (provider) {
+        walletAddress = await provider.getSigner().getAddress();
+      }
     })();
 
     const domIframe: HTMLIFrameElement = document.getElementById(
@@ -246,12 +253,19 @@ export function OnRampMain({
         && host
         && TRANSAK_ORIGIN.includes(host)
       ) {
-        trackSegmentEvents(event.data, userWalletAddress);
+        trackSegmentEvents(event.data, walletAddress);
         transakEventHandler(event.data);
       }
     };
     window.addEventListener('message', handleTransakEvents);
-  }, [checkout, provider, tokenAmount, tokenAddress, passport]);
+  }, [
+    checkout,
+    provider,
+    tokenAmount,
+    tokenAddress,
+    toWalletAddress,
+    passport,
+  ]);
 
   return (
     <Box sx={boxMainStyle(showIframe)}>

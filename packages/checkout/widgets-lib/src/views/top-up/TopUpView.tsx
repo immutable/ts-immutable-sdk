@@ -10,7 +10,6 @@ import {
   IMTBLWidgetEvents,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
-import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
 import {
   UserJourney,
@@ -44,7 +43,6 @@ type $Dictionary<T = unknown> = { [key: string]: T };
 interface TopUpViewProps {
   widgetEvent: IMTBLWidgetEvents;
   checkout?: Checkout;
-  provider?: Web3Provider;
   showOnrampOption: boolean;
   showSwapOption: boolean;
   showBridgeOption: boolean;
@@ -77,7 +75,7 @@ export function TopUpView({
   widgetEvent,
   checkout,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  provider, // Keep this for future use
+  // provider, // Keep this for future use
   showOnrampOption,
   showSwapOption,
   showBridgeOption,

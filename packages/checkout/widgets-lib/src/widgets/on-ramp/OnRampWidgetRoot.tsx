@@ -9,9 +9,15 @@ import {
   WidgetType,
 } from '@imtbl/checkout-sdk';
 import { Base } from '../BaseWidgetRoot';
-import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
+import {
+  ConnectLoader,
+  ConnectLoaderParams,
+} from '../../components/ConnectLoader/ConnectLoader';
 import { getL1ChainId, getL2ChainId } from '../../lib';
-import { isValidAddress, isValidAmount } from '../../lib/validations/widgetValidators';
+import {
+  isValidAddress,
+  isValidAmount,
+} from '../../lib/validations/widgetValidators';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { LoadingView } from '../../views/loading/LoadingView';
@@ -24,9 +30,9 @@ const OnRampWidget = React.lazy(() => import('./OnRampWidget'));
 export class OnRamp extends Base<WidgetType.ONRAMP> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT;
 
-  protected getValidatedProperties(
-    { config }: WidgetProperties<WidgetType.ONRAMP>,
-  ): WidgetProperties<WidgetType.ONRAMP> {
+  protected getValidatedProperties({
+    config,
+  }: WidgetProperties<WidgetType.ONRAMP>): WidgetProperties<WidgetType.ONRAMP> {
     let validatedConfig: WidgetConfiguration | undefined;
 
     if (config) {
@@ -40,7 +46,9 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
     };
   }
 
-  protected getValidatedParameters(params: OnRampWidgetParams): OnRampWidgetParams {
+  protected getValidatedParameters(
+    params: OnRampWidgetParams,
+  ): OnRampWidgetParams {
     const validatedParams = params;
 
     if (!isValidAmount(params.amount)) {
@@ -54,6 +62,24 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
       console.warn('[IMTBL]: invalid "tokenAddress" widget input');
       validatedParams.tokenAddress = '';
     }
+
+    if (!isValidAddress(params.toWalletAddress)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "toWalletAddress" widget input');
+      validatedParams.toWalletAddress = '';
+    }
+
+    if (params.skipConnect && !params.toWalletAddress) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        '[IMTBL]: Cannot skip connect without providing a wallet address',
+      );
+    }
+
+    // skip connect only if wallet address is provided
+    validatedParams.skipConnect = Boolean(
+      params.skipConnect && params.toWalletAddress,
+    );
 
     return validatedParams;
   }
@@ -69,28 +95,46 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
       walletProviderName: this.parameters.walletProviderName,
       web3Provider: this.web3Provider,
       checkout: this.checkout,
-      allowedChains: [getL1ChainId(this.checkout.config), getL2ChainId(this.checkout.config)],
+      allowedChains: [
+        getL1ChainId(this.checkout.config),
+        getL2ChainId(this.checkout.config),
+      ],
     };
+
+    const onRamp = (
+      <Suspense
+        fallback={
+          <LoadingView loadingText={t('views.ONRAMP.initialLoadingText')} />
+        }
+      >
+        <OnRampWidget
+          tokenAddress={this.parameters.tokenAddress}
+          amount={this.parameters.amount}
+          config={this.strongConfig()}
+          showBackButton={this.parameters.showBackButton}
+          skipConnect={this.parameters.skipConnect}
+          toWalletAddress={this.parameters.toWalletAddress}
+          checkout={this.checkout}
+          web3Provider={this.web3Provider}
+        />
+      </Suspense>
+    );
 
     this.reactRoot.render(
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="onramp-container" config={this.strongConfig()}>
             <HandoverProvider>
-              <ConnectLoader
-                widgetConfig={this.strongConfig()}
-                params={connectLoaderParams}
-                closeEvent={() => sendOnRampWidgetCloseEvent(window)}
-              >
-                <Suspense fallback={<LoadingView loadingText={t('views.ONRAMP.initialLoadingText')} />}>
-                  <OnRampWidget
-                    tokenAddress={this.parameters.tokenAddress}
-                    amount={this.parameters.amount}
-                    config={this.strongConfig()}
-                    showBackButton={this.parameters.showBackButton}
-                  />
-                </Suspense>
-              </ConnectLoader>
+              {this.parameters.skipConnect && onRamp}
+              {!this.parameters.skipConnect && (
+                <ConnectLoader
+                  widgetConfig={this.strongConfig()}
+                  params={connectLoaderParams}
+                  closeEvent={() => sendOnRampWidgetCloseEvent(window)}
+                >
+                  {onRamp}
+                </ConnectLoader>
+              )}
             </HandoverProvider>
           </ThemeProvider>
         </CustomAnalyticsProvider>

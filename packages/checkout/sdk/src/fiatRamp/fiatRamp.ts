@@ -59,7 +59,6 @@ export class FiatRampService {
         ...widgetParams,
         email: encodeURIComponent(params.email),
         isAutoFillUserData: true,
-        disableWalletAddressForm: true,
       };
     }
 
@@ -84,6 +83,12 @@ export class FiatRampService {
       widgetParams = {
         ...widgetParams,
         walletAddress: params.walletAddress,
+        disableWalletAddressForm: true,
+      };
+    } else {
+      widgetParams = {
+        ...widgetParams,
+        disableWalletAddressForm: false,
       };
     }
 
