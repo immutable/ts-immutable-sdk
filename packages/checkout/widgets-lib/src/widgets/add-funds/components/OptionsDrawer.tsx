@@ -10,7 +10,7 @@ type OptionsDrawerProps = {
   routes: RouteData[];
   visible: boolean;
   onClose: () => void;
-  onRouteClick: (route: RouteData | undefined) => void;
+  onRouteClick: (route: RouteData) => void;
   onCardClick: (type: FiatOptionType) => void;
   showOnrampOption?: boolean;
   showSwapOption?: boolean;
@@ -60,7 +60,7 @@ export function OptionsDrawer({
             routes={routes}
             chains={chains}
             onCardClick={onCardClick}
-            onRouteClick={onRouteClick}
+            onRouteClick={(route:RouteData) => { console.log('OptionsDrawer onClick'); onRouteClick(route); }}
             showOnrampOption={showOnrampOption}
           />
         </Box>

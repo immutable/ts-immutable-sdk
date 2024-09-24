@@ -21,7 +21,10 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
   size,
   rc = <span />,
 }: RouteOptionProps<RC>) {
-  const handleClick = () => onClick(route);
+  const handleClick = () => {
+    console.log('+++++++ route', route, onClick);
+    onClick(route);
+  };
 
   const menuItemProps = {
     disabled,

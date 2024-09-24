@@ -27,6 +27,7 @@ import {
 } from '../../../context/view-context/ViewContext';
 import { useRoutes } from '../hooks/useRoutes';
 import { RouteData } from '../types';
+import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -209,10 +210,29 @@ export function AddFunds({
     return false;
   };
 
-  const onRouteClick = (route: RouteData | undefined) => () => {
+  const onRouteClick = (route: RouteData) => {
+    console.log('onRoute', route);
     // TODO: go to the review screen
     // eslint-disable-next-line no-console
     console.log('onRouteClick', route);
+    if (!route) return;
+    if (!toAmount || !toTokenAddress) return;
+
+    console.log('viewDispatch');
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: AddFundsWidgetViews.REVIEW,
+          data: {
+            balance: route.amountData.balance,
+            toChainId: '13371',
+            toTokenAddress,
+            toAmount,
+          },
+        },
+      },
+    });
   };
 
   return (

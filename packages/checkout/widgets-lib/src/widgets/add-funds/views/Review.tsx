@@ -37,11 +37,17 @@ export function Review({
   const { addFundsState } = useContext(AddFundsContext);
   const { getFromAmount, getRoute } = useRoutes();
   const [route, setRoute] = useState<RouteResponse | undefined>();
+  const [fromAddress, setFromAddress] = useState<string | undefined>();
 
   async function getFromAmountAndRoute() {
-    if (!addFundsState.squid) {
+    if (!addFundsState.squid || !addFundsState.provider) {
       return;
     }
+
+    const address = await addFundsState.provider.getSigner().getAddress();
+    setFromAddress(address);
+
+    if (!address) { return; }
     const amountData = await getFromAmount(
       addFundsState.squid,
       data.balance,
@@ -58,7 +64,7 @@ export function Review({
       amountData?.toToken,
       data.toAmount,
       data.toTokenAddress,
-      data.fromAddress,
+      fromAddress,
       false,
     );
     setRoute(routeResponse);
@@ -186,7 +192,7 @@ export function Review({
               <Body size="small" sx={{ c: 'inherit' }}>
                 <EllipsizedText
                   size="small"
-                  text={data.fromAddress}
+                  text={fromAddress ?? ''}
                   sx={{ c: 'inherit' }}
                 />
               </Body>
@@ -276,7 +282,7 @@ export function Review({
               <Body size="small" sx={{ c: 'inherit' }}>
                 <EllipsizedText
                   size="small"
-                  text={data.fromAddress}
+                  text={fromAddress ?? ''}
                   sx={{ c: 'inherit' }}
                 />
               </Body>

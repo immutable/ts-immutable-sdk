@@ -22,5 +22,4 @@ export interface AddFundsReviewData {
   toAmount: string;
   toChainId: string;
   toTokenAddress: string;
-  fromAddress: string;
 }
