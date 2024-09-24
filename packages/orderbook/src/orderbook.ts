@@ -245,7 +245,7 @@ export class Orderbook {
         listingParams[0].sell,
         listingParams[0].buy,
         listingParams[0].sell.type === 'ERC1155',
-        new Date(),
+        listingParams[0].orderStart || new Date(),
         listingParams[0].orderExpiry || Orderbook.defaultOrderExpiry(),
       );
 
@@ -283,7 +283,7 @@ export class Orderbook {
         listing.sell,
         listing.buy,
         listing.sell.type === 'ERC1155',
-        new Date(),
+        listing.orderStart || new Date(),
         listing.orderExpiry || Orderbook.defaultOrderExpiry(),
       )));
 
@@ -344,12 +344,12 @@ export class Orderbook {
     track('orderbookmr', 'bulkListings', { walletType: 'EOA', makerAddress, listingsCount: listingParams.length });
     const { actions, preparedOrders } = await this.seaport.prepareBulkSeaportOrders(
       makerAddress,
-      listingParams.map((orderParam) => ({
-        offerItem: orderParam.sell,
-        considerationItem: orderParam.buy,
-        allowPartialFills: orderParam.sell.type === 'ERC1155',
-        orderStart: new Date(),
-        orderExpiry: orderParam.orderExpiry || Orderbook.defaultOrderExpiry(),
+      listingParams.map((listing) => ({
+        offerItem: listing.sell,
+        considerationItem: listing.buy,
+        allowPartialFills: listing.sell.type === 'ERC1155',
+        orderStart: listing.orderStart || new Date(),
+        orderExpiry: listing.orderExpiry || Orderbook.defaultOrderExpiry(),
       })),
     );
 
@@ -408,6 +408,7 @@ export class Orderbook {
     makerAddress,
     sell,
     buy,
+    orderStart,
     orderExpiry,
   }: PrepareListingParams): Promise<PrepareListingResponse> {
     return this.seaport.prepareSeaportOrder(
@@ -416,7 +417,7 @@ export class Orderbook {
       buy,
       sell.type === 'ERC1155',
       // Default order start to now
-      new Date(),
+      orderStart || new Date(),
       // Default order expiry to 2 years from now
       orderExpiry || Orderbook.defaultOrderExpiry(),
     );
@@ -451,6 +452,7 @@ export class Orderbook {
     makerAddress,
     sell,
     buy,
+    orderStart,
     orderExpiry,
   }: PrepareBidParams): Promise<PrepareBidResponse> {
     return this.seaport.prepareSeaportOrder(
@@ -459,7 +461,7 @@ export class Orderbook {
       buy,
       buy.type === 'ERC1155',
       // Default order start to now
-      new Date(),
+      orderStart || new Date(),
       // Default order expiry to 2 years from now
       orderExpiry || Orderbook.defaultOrderExpiry(),
     );

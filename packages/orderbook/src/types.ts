@@ -188,6 +188,7 @@ export interface PrepareListingParams {
   makerAddress: string;
   sell: ERC721Item | ERC1155Item;
   buy: NativeItem | ERC20Item;
+  orderStart?: Date;
   orderExpiry?: Date;
 }
 
@@ -199,6 +200,7 @@ export interface PrepareBulkListingsParams {
     sell: ERC721Item | ERC1155Item;
     buy: NativeItem | ERC20Item;
     makerFees: FeeValue[];
+    orderStart?: Date;
     orderExpiry?: Date;
   }[];
 }
@@ -250,6 +252,7 @@ export interface PrepareBidParams {
   makerAddress: string;
   sell: ERC20Item;
   buy: ERC721Item | ERC1155Item;
+  orderStart?: Date;
   orderExpiry?: Date;
 }
 
