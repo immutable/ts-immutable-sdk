@@ -81,10 +81,10 @@ export type RequestGoBackEvent = {
 };
 
 /*
-* Type representing the orchestration events.
-*/
+ * Type representing the orchestration events.
+ */
 export type OrchestrationEventData =
-  RequestConnectEvent
+  | RequestConnectEvent
   | RequestWalletEvent
   | RequestSwapEvent
   | RequestBridgeEvent

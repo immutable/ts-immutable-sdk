@@ -1,48 +1,37 @@
-import { PostMessageHandler } from '@imtbl/checkout-sdk';
+import { ReactNode, useMemo, useReducer } from 'react';
 import {
-  Dispatch, ReactNode, useContext, useEffect,
-} from 'react';
-import {
-  CheckoutAction,
-  CheckoutActions,
   CheckoutContext,
-  CheckoutState,
+  checkoutReducer,
+  initialCheckoutState,
 } from './CheckoutContext';
+import { useConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
+
+export const useCheckoutWidgetState = () => {
+  const [viewState, viewDispatch] = useReducer(
+    checkoutReducer,
+    initialCheckoutState,
+  );
+
+  return [viewState, viewDispatch] as const;
+};
 
 type CheckoutContextProviderProps = {
-  values: {
-    checkoutState: CheckoutState;
-    checkoutDispatch: Dispatch<CheckoutAction>;
-  };
   children: ReactNode;
 };
-export function CheckoutContextProvider({
-  values,
+
+export function CheckoutWidgetContextProvicer({
   children,
 }: CheckoutContextProviderProps) {
-  const { checkoutState, checkoutDispatch } = values;
-  const { checkout, iframeContentWindow, iframeURL } = checkoutState;
+  const [{ checkout, provider }] = useConnectLoaderState();
+  const [checkoutState, checkoutDispatch] = useCheckoutWidgetState();
 
-  useEffect(() => {
-    if (!iframeContentWindow || !checkout || !iframeURL) return;
-
-    const postMessageHandlerInstance = new PostMessageHandler({
-      targetOrigin: new URL(iframeURL).origin,
-      eventTarget: iframeContentWindow,
-    });
-
-    // TODO: remove logger after done with development
-    postMessageHandlerInstance.setLogger((...args: any[]) => {
-      console.log("🔔 PARENT – ", ...args); // eslint-disable-line
-    });
-
-    checkoutDispatch({
-      payload: {
-        type: CheckoutActions.SET_POST_MESSAGE_HANDLER,
-        postMessageHandler: postMessageHandlerInstance,
-      },
-    });
-  }, [iframeContentWindow, checkout, iframeURL]);
+  const values = useMemo(
+    () => ({
+      checkoutState: { ...checkoutState, checkout, provider },
+      checkoutDispatch,
+    }),
+    [checkoutState, checkoutDispatch, checkout, provider],
+  );
 
   return (
     <CheckoutContext.Provider value={values}>
@@ -50,15 +39,3 @@ export function CheckoutContextProvider({
     </CheckoutContext.Provider>
   );
 }
-
-export const useCheckoutContext = () => {
-  const context = useContext(CheckoutContext);
-  if (context === undefined) {
-    const error = new Error(
-      'useCheckoutContext must be used within a <ImtblProvider />',
-    );
-    throw error;
-  }
-
-  return [context.checkoutState, context.checkoutDispatch] as const;
-};

@@ -9,10 +9,10 @@ import { SaleWidgetConfiguration } from './sale';
 import { WidgetConfiguration } from './widget';
 
 export type CheckoutWidgetConfiguration = {
-  connect?: Omit<ConnectWidgetConfiguration, keyof WidgetConfiguration>;
-  wallet?: Omit<WalletWidgetConfiguration, keyof WidgetConfiguration>;
-  swap?: Omit<SwapWidgetConfiguration, keyof WidgetConfiguration>;
-  bridge?: Omit<BridgeWidgetConfiguration, keyof WidgetConfiguration>;
-  onRamp?: Omit<OnrampWidgetConfiguration, keyof WidgetConfiguration>;
-  sale?: Omit<SaleWidgetConfiguration, keyof WidgetConfiguration>;
+  CONNECT?: Omit<ConnectWidgetConfiguration, keyof WidgetConfiguration>;
+  WALLET?: Omit<WalletWidgetConfiguration, keyof WidgetConfiguration>;
+  SWAP?: Omit<SwapWidgetConfiguration, keyof WidgetConfiguration>;
+  BRIDGE?: Omit<BridgeWidgetConfiguration, keyof WidgetConfiguration>;
+  ONRAMP?: Omit<OnrampWidgetConfiguration, keyof WidgetConfiguration>;
+  SALE?: Omit<SaleWidgetConfiguration, keyof WidgetConfiguration>;
 } & Omit<WidgetConfiguration, 'walletConnect'>;
