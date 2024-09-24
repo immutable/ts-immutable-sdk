@@ -42,7 +42,7 @@ export type CheckouWidgetSaleFlowParams = {
   flow: CheckoutFlowType.SALE;
 } & SaleWidgetParams;
 
-export type CheckouWidgetAddFundsFlowParams = {
+export type CheckoutWidgetAddFundsFlowParams = {
   flow: CheckoutFlowType.ADD_FUNDS;
 } & AddFundsWidgetParams;
 
@@ -53,7 +53,7 @@ export type CheckoutWidgetFlowParams =
   | CheckouWidgetBridgeFlowParams
   | CheckouWidgetOnRampFlowParams
   | CheckouWidgetSaleFlowParams
-  | CheckouWidgetAddFundsFlowParams;
+  | CheckoutWidgetAddFundsFlowParams;
 
 export type CheckoutWidgetParams = {
   /** The language to use for the checkout widget */
