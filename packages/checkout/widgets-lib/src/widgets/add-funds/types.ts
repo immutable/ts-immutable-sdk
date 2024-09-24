@@ -6,6 +6,14 @@ export type Chain = {
   type: string;
   name: string;
   iconUrl: string;
+  nativeCurrency: NativeCurrency;
+};
+
+export type NativeCurrency = {
+  name: string;
+  symbol: string;
+  decimals: number;
+  iconUrl:string;
 };
 
 export type AmountData = {
