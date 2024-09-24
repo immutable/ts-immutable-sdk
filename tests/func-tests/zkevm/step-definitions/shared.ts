@@ -142,6 +142,7 @@ export const whenICreateAListing = (
         type: 'NATIVE',
       },
       sell: sellItem,
+      orderStart: new Date(2000, 1, 15),
     });
 
     const signatures = await actionAll(listing.actions, offerer);
@@ -190,6 +191,7 @@ export const whenICreateABulkListing = (
         },
         sell: sellItem,
         makerFees: [],
+        orderStart: new Date(2000, 1, 15),
       });
     }
 

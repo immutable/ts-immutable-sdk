@@ -128,7 +128,7 @@ describe.skip("Orderbook", () => {
       await (
         await banker.sendTransaction({
           to: maker.address,
-          value: imxForApproval,
+          value: `${imxForApproval}`,
           ...GAS_OVERRIDES,
         })
       ).wait(1);
@@ -144,7 +144,7 @@ describe.skip("Orderbook", () => {
       await (
         await banker.sendTransaction({
           to: taker.address,
-          value: imxForApproval + imxForFulfillment,
+          value: `${imxForApproval + imxForFulfillment}`,
           ...GAS_OVERRIDES,
         })
       ).wait(1);
@@ -166,9 +166,11 @@ describe.skip("Orderbook", () => {
         contractAddress: erc721Contract.address,
         tokenId: erc721TokenId,
       },
+      orderStart: new Date(2000, 1, 15),
     });
 
     const signatures = await actionAll(bidCreateActions, maker);
+
     const { result } = await orderBookSdk.createBid({
       orderComponents,
       orderHash,
@@ -209,7 +211,7 @@ describe.skip("Orderbook", () => {
         await (
           await banker.sendTransaction({
             to: maker.address,
-            value: imxForApproval,
+            value: `${imxForApproval}`,
             ...GAS_OVERRIDES,
           })
         ).wait(1);
@@ -231,7 +233,7 @@ describe.skip("Orderbook", () => {
         await (
           await banker.sendTransaction({
             to: taker.address,
-            value: imxForApproval + imxForFulfillment,
+            value: `${imxForApproval + imxForFulfillment}`,
             ...GAS_OVERRIDES,
           })
         ).wait(1);
@@ -367,7 +369,7 @@ describe.skip("Orderbook", () => {
       await (
         await banker.sendTransaction({
           to: maker.address,
-          value: imxForApproval * 2,
+          value: `${imxForApproval * 2}`,
           ...GAS_OVERRIDES,
         })
       ).wait(1);
