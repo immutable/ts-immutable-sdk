@@ -38,7 +38,9 @@ export const NativeItemTypeEnum = {
     Native: 'NATIVE',
     Erc20: 'ERC20',
     Erc721: 'ERC721',
-    Erc1155: 'ERC1155'
+    Erc1155: 'ERC1155',
+    Erc721Collection: 'ERC721_COLLECTION',
+    Erc1155Collection: 'ERC1155_COLLECTION'
 } as const;
 
 export type NativeItemTypeEnum = typeof NativeItemTypeEnum[keyof typeof NativeItemTypeEnum];
