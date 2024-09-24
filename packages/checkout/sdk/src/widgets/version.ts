@@ -60,9 +60,9 @@ export function validateAndBuildVersion(
  */
 function latestCompatibleVersion(
   validVersion: string,
-  checkoutVersionConfig: CheckoutVersionConfig,
+  compatibleVersionMarkers: string[],
 ) {
-  for (const comptabileVersionMarker of checkoutVersionConfig.compatibleVersionMarkers) {
+  for (const comptabileVersionMarker of compatibleVersionMarkers) {
     if (semver.valid(comptabileVersionMarker) && semver.lte(validVersion, comptabileVersionMarker)) {
       return comptabileVersionMarker;
     }
@@ -92,9 +92,9 @@ export function determineWidgetsVersion(
   }
 
   // If there's no version config, default to 'latest'
-  if (!versionConfig) {
+  if (!versionConfig || !Array.isArray(versionConfig.compatibleVersionMarkers)) {
     return 'latest';
   }
 
-  return latestCompatibleVersion(validatedBuildVersion, versionConfig);
+  return latestCompatibleVersion(validatedBuildVersion, versionConfig.compatibleVersionMarkers);
 }
