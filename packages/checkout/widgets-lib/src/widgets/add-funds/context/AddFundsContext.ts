@@ -11,7 +11,7 @@ export interface AddFundsState {
   allowedTokens: TokenInfo[];
   squid: Squid | null;
   chains: Chain[];
-  balances: TokenBalance[];
+  balances: TokenBalance[] | null;
 }
 
 export const initialAddFundsState: AddFundsState = {
@@ -20,7 +20,7 @@ export const initialAddFundsState: AddFundsState = {
   allowedTokens: [],
   squid: null,
   chains: [],
-  balances: [],
+  balances: null,
 };
 
 export interface AddFundsContextState {

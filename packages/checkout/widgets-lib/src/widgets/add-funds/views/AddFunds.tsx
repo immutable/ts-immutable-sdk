@@ -148,6 +148,8 @@ export function AddFunds({
   }, [checkout]);
 
   const openDrawer = async () => {
+    if (!balances) return;
+
     await fetchRoutesWithRateLimit(
       squid!,
       balances,
@@ -171,7 +173,6 @@ export function AddFunds({
       setIsDisabled(
         !currentToTokenAddress
         || parseFloat(currentToAmount) <= 0
-        || balances.length === 0
         || !squid,
       );
     },
