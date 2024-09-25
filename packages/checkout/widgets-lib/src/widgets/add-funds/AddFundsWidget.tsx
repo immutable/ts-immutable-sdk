@@ -90,10 +90,14 @@ export default function AddFundsWidget({
         chainIds,
         evmAddress: fromAddress,
       });
+      const filteredBalances = balances?.evmBalances?.filter(
+        (balance) => balance.balance !== '0',
+      );
+
       addFundsDispatch({
         payload: {
           type: AddFundsActions.SET_BALANCES,
-          balances: balances?.evmBalances ?? [],
+          balances: filteredBalances ?? [],
         },
       });
     })();
@@ -140,7 +144,6 @@ export default function AddFundsWidget({
         {viewState.view.type === AddFundsWidgetViews.ADD_FUNDS && (
           <AddFunds
             checkout={checkout}
-            provider={web3Provider}
             toTokenAddress={toTokenAddress}
             toAmount={toAmount}
             showBackButton={showBackButton}

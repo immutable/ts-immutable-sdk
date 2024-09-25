@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Connector, useConnect } from 'wagmi';
+import { Button } from '@biom3/react';
 
 export function WalletOptions() {
   // get the available connectors and the connect function from Wagmi
@@ -30,18 +31,25 @@ export function WalletOptions() {
   return (
     <>
       {filteredConnectors.map((connector) => (
-        <button
-          className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
+        <>
+        <p>Connect with:</p>
+        <Button
+          className="mb-1"
           key={connector.uid}
           type="button"
           onClick={() => passportLogin(connector)}
           disabled={loading}
         >
           {connector.name}
-        </button>
+        </Button>
+        </>
       ))}
-      <br />
-      {loading && <p>Loading...</p>}
+
+      {loading && (
+        <>
+          <p>Loading...</p>
+        </>
+        )}
     </>
   );
 }

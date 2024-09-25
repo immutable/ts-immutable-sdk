@@ -6,12 +6,14 @@ import {
   WidgetEventData,
 } from '@imtbl/checkout-sdk';
 
+export type CheckoutEventDetail = {
+  type: CheckoutEventType;
+  data: WidgetEventData[WidgetType.CHECKOUT][keyof WidgetEventData[WidgetType.CHECKOUT]];
+};
+
 export const sendCheckoutEvent = (
   eventTarget: Window | EventTarget,
-  detail: {
-    type: CheckoutEventType;
-    data: WidgetEventData[WidgetType.CHECKOUT][keyof WidgetEventData[WidgetType.CHECKOUT]];
-  },
+  detail: CheckoutEventDetail,
 ) => {
   const event = new CustomEvent<
   WidgetEvent<WidgetType.CHECKOUT, CheckoutEventType>

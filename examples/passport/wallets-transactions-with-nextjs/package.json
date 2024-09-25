@@ -2,12 +2,13 @@
   "name": "@examples/wallets-transactions-with-nextjs",
   "version": "0.1.0",
   "dependencies": {
-    "next": "14.2.5",
+    "@imtbl/sdk": "latest",
+    "ethers": "^5.7.2",
+    "next": "14.2.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@imtbl/sdk": "latest",
     "@playwright/test": "^1.45.3",
     "@types/node": "^20",
     "@types/react": "^18.0.28",
@@ -17,7 +18,7 @@
     "eslint-config-next": "14.2.5",
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.6",
-    "typescript": "^5.5.4"
+    "typescript": "^5.6.2"
   },
   "private": true,
   "scripts": {

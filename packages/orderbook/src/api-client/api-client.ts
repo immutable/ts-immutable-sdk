@@ -1,23 +1,26 @@
 import {
+  BidResult,
+  CancelOrdersResult,
   Fee,
+  ListBidsResult,
   ListingResult,
   ListListingsResult,
   ListTradeResult,
   OrdersService,
-  ProtocolData,
   TradeResult,
-  CancelOrdersResult,
 } from '../openapi/sdk';
+import { FulfillableOrder } from '../openapi/sdk/models/FulfillableOrder';
+import { FulfillmentDataRequest } from '../openapi/sdk/models/FulfillmentDataRequest';
+import { UnfulfillableOrder } from '../openapi/sdk/models/UnfulfillableOrder';
+import { ItemType, SEAPORT_CONTRACT_VERSION_V1_5 } from '../seaport';
+import { mapSeaportItemToImmutableItem, mapSeaportOrderTypeToImmutableProtocolDataOrderType } from '../seaport/map-to-immutable-order';
 import {
+  CreateBidParams,
   CreateListingParams,
-  FeeType,
+  ListBidsParams,
   ListListingsParams,
   ListTradesParams,
 } from '../types';
-import { FulfillableOrder } from '../openapi/sdk/models/FulfillableOrder';
-import { UnfulfillableOrder } from '../openapi/sdk/models/UnfulfillableOrder';
-import { FulfillmentDataRequest } from '../openapi/sdk/models/FulfillmentDataRequest';
-import { ItemType, SEAPORT_CONTRACT_VERSION_V1_5 } from '../seaport';
 
 export class ImmutableApiClient {
   constructor(
@@ -47,6 +50,13 @@ export class ImmutableApiClient {
     });
   }
 
+  async getBid(bidId: string): Promise<BidResult> {
+    return this.orderbookService.getBid({
+      chainName: this.chainName,
+      bidId,
+    });
+  }
+
   async getTrade(tradeId: string): Promise<TradeResult> {
     return this.orderbookService.getTrade({
       chainName: this.chainName,
@@ -58,6 +68,15 @@ export class ImmutableApiClient {
     listOrderParams: ListListingsParams,
   ): Promise<ListListingsResult> {
     return this.orderbookService.listListings({
+      chainName: this.chainName,
+      ...listOrderParams,
+    });
+  }
+
+  async listBids(
+    listOrderParams: ListBidsParams,
+  ): Promise<ListBidsResult> {
+    return this.orderbookService.listBids({
       chainName: this.chainName,
       ...listOrderParams,
     });
@@ -94,66 +113,99 @@ export class ImmutableApiClient {
     makerFees,
   }: CreateListingParams): Promise<ListingResult> {
     if (orderComponents.offer.length !== 1) {
-      throw new Error('Only one item can be listed at a time');
+      throw new Error('Only one item can be listed for a listing');
     }
 
-    if (Number(orderComponents.offer[0].itemType) !== ItemType.ERC721
-      && Number(orderComponents.offer[0].itemType) !== ItemType.ERC1155) {
+    if (orderComponents.consideration.length !== 1) {
+      throw new Error('Only one item can be used as currency for a listing');
+    }
+
+    if (![ItemType.ERC721, ItemType.ERC1155].includes(orderComponents.offer[0].itemType)) {
       throw new Error('Only ERC721 / ERC1155 tokens can be listed');
     }
 
-    const orderTypes = [
-      ...orderComponents.consideration.map((c) => c.itemType),
-    ];
-    const isSameConsiderationType = new Set(orderTypes).size === 1;
-    if (!isSameConsiderationType) {
-      throw new Error('All consideration items must be of the same type');
+    if (![ItemType.NATIVE, ItemType.ERC20].includes(orderComponents.consideration[0].itemType)) {
+      throw new Error('Only Native / ERC20 tokens can be used as currency items in a listing');
     }
 
     return this.orderbookService.createListing({
       chainName: this.chainName,
       requestBody: {
         account_address: orderComponents.offerer,
-        buy: [
-          {
-            type:
-              Number(orderComponents.consideration[0].itemType)
-                === ItemType.NATIVE
-                ? 'NATIVE'
-                : 'ERC20',
-            amount: orderComponents.consideration[0].startAmount,
-            contract_address: orderComponents.consideration[0].token,
-          },
-        ],
-        fees: makerFees.map((x) => ({
-          amount: x.amount,
-          type: FeeType.MAKER_ECOSYSTEM as unknown as Fee.type,
-          recipient_address: x.recipientAddress,
+        buy: orderComponents.consideration.map(mapSeaportItemToImmutableItem),
+        fees: makerFees.map((f) => ({
+          type: Fee.type.MAKER_ECOSYSTEM,
+          amount: f.amount,
+          recipient_address: f.recipientAddress,
         })),
         end_at: new Date(
           parseInt(`${orderComponents.endTime.toString()}000`, 10),
         ).toISOString(),
         order_hash: orderHash,
         protocol_data: {
-          order_type: Number(orderComponents.offer[0].itemType) === ItemType.ERC1155
-            ? ProtocolData.order_type.PARTIAL_RESTRICTED : ProtocolData.order_type.FULL_RESTRICTED,
+          order_type:
+            mapSeaportOrderTypeToImmutableProtocolDataOrderType(orderComponents.orderType),
           zone_address: orderComponents.zone,
           seaport_address: this.seaportAddress,
           seaport_version: SEAPORT_CONTRACT_VERSION_V1_5,
           counter: orderComponents.counter.toString(),
         },
         salt: orderComponents.salt,
-        sell: Number(orderComponents.offer[0].itemType) === ItemType.ERC1155
-          ? [{
-            contract_address: orderComponents.offer[0].token,
-            token_id: orderComponents.offer[0].identifierOrCriteria,
-            type: 'ERC1155',
-            amount: orderComponents.offer[0].startAmount,
-          }] : [{
-            contract_address: orderComponents.offer[0].token,
-            token_id: orderComponents.offer[0].identifierOrCriteria,
-            type: 'ERC721',
-          }],
+        sell: orderComponents.offer.map(mapSeaportItemToImmutableItem),
+        signature: orderSignature,
+        start_at: new Date(
+          parseInt(`${orderComponents.startTime.toString()}000`, 10),
+        ).toISOString(),
+      },
+    });
+  }
+
+  async createBid({
+    orderHash,
+    orderComponents,
+    orderSignature,
+    makerFees,
+  }: CreateBidParams): Promise<BidResult> {
+    if (orderComponents.offer.length !== 1) {
+      throw new Error('Only one item can be listed for a bid');
+    }
+
+    if (orderComponents.consideration.length !== 1) {
+      throw new Error('Only one item can be used as currency for a bid');
+    }
+
+    if (ItemType.ERC20 !== orderComponents.offer[0].itemType) {
+      throw new Error('Only ERC20 tokens can be used as the currency item in a bid');
+    }
+
+    if (![ItemType.ERC721, ItemType.ERC1155].includes(orderComponents.consideration[0].itemType)) {
+      throw new Error('Only ERC721 / ERC1155 tokens can be bid against');
+    }
+
+    return this.orderbookService.createBid({
+      chainName: this.chainName,
+      requestBody: {
+        account_address: orderComponents.offerer,
+        buy: orderComponents.consideration.map(mapSeaportItemToImmutableItem),
+        fees: makerFees.map((f) => ({
+          type: Fee.type.MAKER_ECOSYSTEM,
+          amount: f.amount,
+          recipient_address: f.recipientAddress,
+        })),
+        end_at: new Date(
+          parseInt(`${orderComponents.endTime.toString()}000`, 10),
+        ).toISOString(),
+        order_hash: orderHash,
+        protocol_data: {
+          order_type:
+            mapSeaportOrderTypeToImmutableProtocolDataOrderType(orderComponents.orderType),
+          zone_address: orderComponents.zone,
+          seaport_address: this.seaportAddress,
+          seaport_version: SEAPORT_CONTRACT_VERSION_V1_5,
+          counter: orderComponents.counter.toString(),
+        },
+        salt: orderComponents.salt,
+        sell: orderComponents.offer.map(mapSeaportItemToImmutableItem),
         signature: orderSignature,
         start_at: new Date(
           parseInt(`${orderComponents.startTime.toString()}000`, 10),
