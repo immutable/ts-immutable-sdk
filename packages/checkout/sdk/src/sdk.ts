@@ -34,7 +34,7 @@ import {
   CheckConnectionParams,
   CheckConnectionResult,
   CheckoutModuleConfiguration,
-  CheckoutVersionConfig,
+  CheckoutWidgetsVersionConfig,
   ConnectParams,
   ConnectResult,
   CreateProviderParams,
@@ -78,6 +78,7 @@ import * as wallet from './wallet';
 import { WidgetConfiguration } from './widgets/definitions/configurations';
 import { getWidgetsEsmUrl, loadUnresolvedBundle } from './widgets/load';
 import { determineWidgetsVersion, validateAndBuildVersion } from './widgets/version';
+import { globalPackageVersion } from './env';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -134,7 +135,9 @@ export class Checkout {
     const checkout = this;
 
     // Preload the configurations
-    const versionConfig = await checkout.config.remote.getConfig('version') as CheckoutVersionConfig | undefined;
+    const versionConfig = (
+      await checkout.config.remote.getConfig('checkoutWidgetsVersion')
+    ) as CheckoutWidgetsVersionConfig | undefined;
 
     // Determine the version of the widgets to load
     const validatedBuildVersion = validateAndBuildVersion(init.version);
@@ -144,6 +147,12 @@ export class Checkout {
       initVersionProvided,
       versionConfig,
     );
+
+    track('checkout_sdk', 'widgets', {
+      sdkVersion: globalPackageVersion(),
+      validatedSdkVersion: validatedBuildVersion,
+      widgetsVersion,
+    });
 
     try {
       const factory = await this.loadEsModules(init.config, widgetsVersion);

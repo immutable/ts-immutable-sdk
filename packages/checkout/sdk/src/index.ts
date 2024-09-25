@@ -145,7 +145,7 @@ export type {
   WalletFilter,
   WalletInfo,
   SquidConfig,
-  CheckoutVersionConfig,
+  CheckoutWidgetsVersionConfig,
 } from './types';
 
 export {

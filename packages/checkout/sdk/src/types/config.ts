@@ -82,7 +82,7 @@ export type RemoteConfiguration = {
   /** Squid config. */
   squid?: SquidConfig;
   /** The checkout version info. */
-  version: CheckoutVersionConfig;
+  checkoutWidgetsVersion: CheckoutWidgetsVersionConfig;
 };
 
 /**
@@ -264,6 +264,6 @@ export type ChainTokensConfig = {
   [key in ChainId]?: TokenInfo[];
 };
 
-export type CheckoutVersionConfig = {
+export type CheckoutWidgetsVersionConfig = {
   compatibleVersionMarkers: string[];
 };

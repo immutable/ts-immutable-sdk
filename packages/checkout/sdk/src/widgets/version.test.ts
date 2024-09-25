@@ -1,5 +1,5 @@
 import { SDK_VERSION_MARKER } from '../env';
-import { CheckoutVersionConfig } from '../types';
+import { CheckoutWidgetsVersionConfig } from '../types';
 import { SemanticVersion } from './definitions/types';
 import { determineWidgetsVersion, validateAndBuildVersion } from './version';
 
@@ -209,7 +209,7 @@ describe('CheckoutWidgets', () => {
       expectedVersion: string,
       validatedBuildVersion: string,
       initVersionProvided: boolean,
-      checkoutVersionConfig?: CheckoutVersionConfig,
+      checkoutVersionConfig?: CheckoutWidgetsVersionConfig,
     }[] = [
       {
         title: 'version is provided in widget init params',

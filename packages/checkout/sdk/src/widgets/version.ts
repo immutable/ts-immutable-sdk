@@ -1,7 +1,7 @@
 import semver from 'semver';
 import { globalPackageVersion } from '../env';
 import { SemanticVersion } from './definitions/types';
-import { CheckoutVersionConfig } from '../types';
+import { CheckoutWidgetsVersionConfig } from '../types';
 
 /**
  * Validates and builds a version string based on the given SemanticVersion object.
@@ -79,7 +79,7 @@ function latestCompatibleVersion(
 export function determineWidgetsVersion(
   validatedBuildVersion: string,
   initVersionProvided: boolean,
-  versionConfig?: CheckoutVersionConfig,
+  versionConfig?: CheckoutWidgetsVersionConfig,
 ) {
   // If version is provided in widget init parms, use that
   if (initVersionProvided) {
