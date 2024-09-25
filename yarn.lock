@@ -2518,7 +2518,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:^0.4.0, @biom3/design-tokens@npm:^0.4.2, @biom3/design-tokens@npm:~0.4.2":
+"@biom3/design-tokens@npm:^0.4.2, @biom3/design-tokens@npm:~0.4.2":
   version: 0.4.2
   resolution: "@biom3/design-tokens@npm:0.4.2"
   dependencies:
@@ -2533,33 +2533,6 @@ __metadata:
   dependencies:
     lodash.get: ^4.4.2
   checksum: b62db8bf266d41097bc231795eed3208d18e526deff29bfb4d286645ebda34bdb3edf3f4aef7e849b08b4f1af051c801de48e3f250ab1c721b4e5c508113194d
-  languageName: node
-  linkType: hard
-
-"@biom3/react@npm:^0.24.1":
-  version: 0.24.20
-  resolution: "@biom3/react@npm:0.24.20"
-  dependencies:
-    "@biom3/design-tokens": ~0.4.2
-    buffer: ^6.0.3
-    csstype: ^3.1.2
-    hls.js: ^1.5.11
-    localforage: ^1.10.0
-    lodash.debounce: ^4.0.8
-    lodash.get: ^4.4.2
-    lodash.isequal: ^4.5.0
-    lodash.throttle: ^4.1.1
-    react-is: ^18.2.0
-    react-keyed-flatten-children: ^3.0.0
-    ts-deepmerge: ^6.2.0
-  peerDependencies:
-    "@emotion/react": ^11.11.4
-    "@rive-app/react-canvas-lite": ^4.9.0
-    embla-carousel-react: ^8.0.4
-    framer-motion: ^10.12.12
-    react: ^18.2.0
-    react-dom: ^18.2.0
-  checksum: a2cf59149d4e15c97772bcc3de4f38b10b903dba6fda948f1faba1bbb53fe86c2f9e73adb43ba4a3f2eefeb0770d652d76f47fc11f00df7587cb846f779c601d
   languageName: node
   linkType: hard
 
@@ -4899,22 +4872,30 @@ __metadata:
   linkType: soft
 
 "@imtbl/sdk@npm:latest":
-  version: 1.46.5
-  resolution: "@imtbl/sdk@npm:1.46.5"
+  version: 1.54.0
+  resolution: "@imtbl/sdk@npm:1.54.0"
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
-    "@biom3/design-tokens": ^0.4.0
-    "@biom3/react": ^0.24.1
+    "@0xsquid/sdk": ^2.8.24
+    "@biom3/design-tokens": ^0.4.2
+    "@biom3/react": ^0.25.0
     "@ethersproject/abi": ^5.7.0
+    "@ethersproject/abstract-provider": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
+    "@ethersproject/address": ^5.7.0
+    "@ethersproject/bignumber": ^5.7.0
+    "@ethersproject/bytes": ^5.7.0
     "@ethersproject/keccak256": ^5.7.0
     "@ethersproject/providers": ^5.7.2
+    "@ethersproject/solidity": ^5.7.0
     "@ethersproject/strings": ^5.7.0
+    "@ethersproject/units": ^5.7.0
     "@ethersproject/wallet": ^5.7.0
     "@imtbl/react-analytics": 0.2.1-alpha
     "@jest/globals": ^29.5.0
-    "@magic-ext/oidc": 4.2.0
+    "@magic-ext/oidc": 4.3.1
+    "@magic-sdk/provider": ^21.2.0
     "@metamask/detect-provider": ^2.0.0
     "@opensea/seaport-js": 4.0.3
     "@rive-app/react-canvas-lite": ^4.9.0
@@ -4929,13 +4910,16 @@ __metadata:
     bn.js: ^5.2.1
     buffer: ^6.0.3
     crypto-browserify: ^3.12.0
-    elliptic: ^6.5.4
+    elliptic: ^6.5.7
     enc-utils: ^3.0.0
     ethereumjs-wallet: ^1.0.2
     ethers: ^5.7.2
     ethers-v6: "npm:ethers@6.11.1"
     events: ^3.3.0
+    form-data: ^4.0.0
+    framer-motion: ^11.0.6
     global-const: ^0.1.2
+    hash.js: ^1.1.7
     https-browserify: ^1.0.0
     i18next: ^23.7.6
     i18next-browser-languagedetector: ^7.2.0
@@ -4948,6 +4932,7 @@ __metadata:
     os-browserify: ^0.3.0
     pako: ^2.1.0
     pg: ^8.11.5
+    pino-pretty: ^11.2.2
     prisma: ^5.13.0
     react-i18next: ^13.5.0
     sns-validator: ^0.3.5
@@ -4960,7 +4945,7 @@ __metadata:
       optional: true
     prisma:
       optional: true
-  checksum: 741ca6f12858ce033881a0aebd8d0f3880b38cca1db936c7ba2763283a504bce2bc57e4a93547b3811c0b67169dadf8fc449d8ade8783f5f5b834d1d5f7c74d6
+  checksum: 349362964e32bac6bc8ad22fe06ab3e3f6f07db598bc87e9f822d5e18698307e96437af7a05226260380b5578cec8e5533ad81fddee23e9206f06cd4a748d310
   languageName: node
   linkType: hard
 
@@ -6297,13 +6282,6 @@ __metadata:
   dependencies:
     "@lukeed/csprng": ^1.1.0
   checksum: f5e71e4da852dbff49b93cad27d5a2f61c2241e307bbe89b3b54b889ecb7927f2487246467f90ebb6cbdb7e0ac2a213e2e58b1182cb7990cef6e049aa7c39e7b
-  languageName: node
-  linkType: hard
-
-"@magic-ext/oidc@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@magic-ext/oidc@npm:4.2.0"
-  checksum: 7bd51bf45168b7456a963f87c9118617f73c9a7e2c427b4bd786775f5fb80c90e90cbb10069e8a670587a8b20871bf4aa706f9fdef7f5981f007550b2adfc947
   languageName: node
   linkType: hard
 
