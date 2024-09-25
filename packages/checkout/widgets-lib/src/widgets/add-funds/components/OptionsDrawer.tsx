@@ -7,7 +7,7 @@ import { FiatOptionType, RouteData } from '../types';
 import { AddFundsContext } from '../context/AddFundsContext';
 
 type OptionsDrawerProps = {
-  routes: RouteData[];
+  routes: RouteData[] | undefined;
   visible: boolean;
   onClose: () => void;
   onRouteClick: (route: RouteData | undefined) => void;

@@ -7,7 +7,7 @@ import { delay } from '../functions/delay';
 import { AmountData, RouteData } from '../types';
 
 export const useRoutes = () => {
-  const [routes, setRoutes] = useState<RouteData[]>([]);
+  const [routes, setRoutes] = useState<RouteData[] | undefined>(undefined);
 
   const getFromAmount = async (
     squid: Squid,

@@ -1,4 +1,4 @@
-import { Box, MenuItemSize } from '@biom3/react';
+import { Body, Box, MenuItemSize } from '@biom3/react';
 
 import { motion } from 'framer-motion';
 import {
@@ -15,7 +15,7 @@ const defaultOptions: FiatOptionType[] = [
 ];
 
 export interface OptionsProps {
-  routes: RouteData[];
+  routes: RouteData[] | undefined;
   chains: Chain[];
   onCardClick: (type: FiatOptionType) => void;
   onRouteClick: (route: RouteData) => void;
@@ -53,7 +53,14 @@ export function Options(props: OptionsProps) {
         <motion.div variants={listVariants} initial="hidden" animate="show" />
       }
     >
-      {routes.length > 0 && routes.map((route: RouteData) => {
+      {!routes
+          && (
+          <Body>
+            Loading!!!
+          </Body>
+          )}
+
+      { routes && routes.map((route: RouteData) => {
         const chain = chains.find((c: Chain) => c.id === route.amountData.fromToken.chainId);
         return (
           <RouteOption
