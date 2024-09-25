@@ -175,8 +175,7 @@ export function AddFunds({
     () => {
       setIsDisabled(
         !currentToTokenAddress
-        || parseFloat(currentToAmount) <= 0
-        || !squid,
+        || parseFloat(currentToAmount) <= 0,
       );
     },
     [currentToTokenAddress, currentToAmount, balances, squid],
