@@ -134,6 +134,7 @@ describe('FiatRampService', () => {
         exchangeType: ExchangeType.ONRAMP,
         isPassport: true,
         email: 'passport.user@immutable.com',
+        walletAddress: '0x1234567890',
       };
       const result = await fiatRampService.createWidgetUrl(params);
       expect(result).toContain(defaultWidgetUrl);
