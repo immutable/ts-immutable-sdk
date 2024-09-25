@@ -2,6 +2,7 @@ import {
   anything, deepEqual, instance, mock, when,
 } from 'ts-mockito';
 import type { OrderComponents } from '@opensea/seaport-js/lib/types';
+import { OrderType } from '@opensea/seaport-js/lib/constants';
 import { ListingResult, OrdersService } from '../openapi/sdk';
 import { ItemType } from '../seaport';
 import { ImmutableApiClient } from './api-client';
@@ -172,19 +173,12 @@ describe('ImmutableApiClient', () => {
             itemType: ItemType.NATIVE,
             endAmount: '1',
             startAmount: '1',
-            identifierOrCriteria: '456',
-            token: '0x123',
-            recipient: '0x123',
-          },
-          {
-            itemType: ItemType.NATIVE,
-            endAmount: '1',
-            startAmount: '1',
-            identifierOrCriteria: '456',
-            token: '0x123',
+            identifierOrCriteria: '0',
+            token: '0x',
             recipient: '0x123',
           },
         ];
+        orderComponents.orderType = OrderType.FULL_RESTRICTED;
         orderComponents.endTime = new Date().getTime() / 1000;
         orderComponents.startTime = new Date().getTime() / 1000;
 
