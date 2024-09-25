@@ -9,7 +9,7 @@ import { FiatOption } from './FiatOption';
 import { Chain, FiatOptionType, RouteData } from '../types';
 import { RouteOption } from './RouteOption';
 
-const defaultOptions: FiatOptionType[] = [
+const defaultFiatOptions: FiatOptionType[] = [
   FiatOptionType.DEBIT,
   FiatOptionType.CREDIT,
 ];
@@ -32,12 +32,6 @@ export function Options(props: OptionsProps) {
     size,
     showOnrampOption,
   } = props;
-  const disabledOptions: FiatOptionType[] = [];
-
-  if (!showOnrampOption) {
-    disabledOptions.push(FiatOptionType.CREDIT);
-    disabledOptions.push(FiatOptionType.DEBIT);
-  }
 
   return (
     <Box
@@ -53,14 +47,9 @@ export function Options(props: OptionsProps) {
         <motion.div variants={listVariants} initial="hidden" animate="show" />
       }
     >
-      {!routes
-          && (
-          <Body>
-            Loading!!!
-          </Body>
-          )}
+      {!routes && <Body>Loading...</Body>}
 
-      { routes && routes.map((route: RouteData) => {
+      {routes?.map((route: RouteData) => {
         const chain = chains.find((c: Chain) => c.id === route.amountData.fromToken.chainId);
         return (
           <RouteOption
@@ -75,9 +64,9 @@ export function Options(props: OptionsProps) {
         );
       })}
 
-      {showOnrampOption && defaultOptions.map((type, idx: number) => (
+      {showOnrampOption && defaultFiatOptions.map((type, idx: number) => (
         <FiatOption
-          key={`fiat-option-type-${type}`}
+          key={`fiat-option-${type}`}
           type={type}
           size={size}
           onClick={() => onCardClick(type)}
