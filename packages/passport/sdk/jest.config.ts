@@ -10,6 +10,7 @@ const config: Config = {
     '^.+\\.(t|j)sx?$': '@swc/jest',
   },
   transformIgnorePatterns: [],
+  restoreMocks: true,
   modulePathIgnorePatterns: ['<rootDir>/.yalc'],
 };
 
