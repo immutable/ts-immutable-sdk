@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@biom3/react": "^0.26.1",
+    "@ethersproject/providers": "^5.7.2",
     "@imtbl/sdk": "latest",
     "ethers": "^5.7.2",
     "next": "14.2.7",
