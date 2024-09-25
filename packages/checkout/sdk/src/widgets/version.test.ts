@@ -318,10 +318,17 @@ describe('CheckoutWidgets', () => {
       },
       {
         title: 'no version config provided',
-        expectedVersion: 'latest',
+        expectedVersion: '1.2.0',
         validatedBuildVersion: '1.2.0',
         initVersionProvided: false,
         checkoutVersionConfig: undefined,
+      },
+      {
+        title: 'invalid version config provided',
+        expectedVersion: '1.2.0',
+        validatedBuildVersion: '1.2.0',
+        initVersionProvided: false,
+        checkoutVersionConfig: { compatibleVersionMarkers: undefined as unknown as string[] },
       },
     ];
 

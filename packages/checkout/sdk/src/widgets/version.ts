@@ -91,9 +91,9 @@ export function determineWidgetsVersion(
     return validatedBuildVersion;
   }
 
-  // If there's no version config, default to 'latest'
+  // If there's version config is invalid, default to use current build version
   if (!versionConfig || !Array.isArray(versionConfig.compatibleVersionMarkers)) {
-    return 'latest';
+    return validatedBuildVersion;
   }
 
   return latestCompatibleVersion(validatedBuildVersion, versionConfig.compatibleVersionMarkers);
