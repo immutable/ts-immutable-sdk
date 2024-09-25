@@ -1,3 +1,7 @@
+# -------------------------------------------------
+# Combined clients
+# -------------------------------------------------
+
 .PHONY: generate-imx-openapi
 generate-imx-openapi: get-imx-openapi generate-imx-api-client
 
@@ -42,15 +46,34 @@ generate-mr-api-client:
     -o /app/src/multi-rollup \
     -c /app/config/mr.config.json
 
-# When running this command, ensure files not relevant to blockchain data are manually removed
+# -------------------------------------------------
+# Seperate clients
+# -------------------------------------------------
+
+.PHONY: generate-blockchain-data
+generate-blockchain-data: get-blockchain-data-openapi generate-blockchain-data-client
+
+.PHONY: get-blockchain-data-openapi
+get-blockchain-data-openapi:
+	rm -f src/blockchain-data-openapi.json && touch src/blockchain-data-openapi.json && \
+	curl -H "Accept: application/json+v3" \
+    https://imtbl-sdk.s3.us-east-2.amazonaws.com/openapi/indexer-mr-oas.json \
+    -o src/blockchain-data-openapi.json
+
+# TODO
+.PHONY: generate-blockchain-data-client
+generate-blockchain-data-client:
+
+# TODO remove once combined with API functions in above command
 .PHONY: generate-blockchain-data-types
 generate-blockchain-data-types:
 	rimraf src/blockchain-data && \
     mkdir src/blockchain-data && \
 	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v7.0.1 generate \
     --inline-schema-options REFACTOR_ALLOF_INLINE_SCHEMAS=true \
-    -i ./app/src/mr-openapi.json \
+    -i ./app/src/blockchain-data-openapi.json \
     -g typescript-axios \
     -o /app/src/blockchain-data \
     -c /app/config/blockchain-data.config.json \
     --additional-properties=stringEnums=true
+

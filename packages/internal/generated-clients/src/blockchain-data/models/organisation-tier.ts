@@ -13,17 +13,20 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import { APIError501AllOf } from './apierror501-all-of';
-// May contain unused imports in some cases
-// @ts-ignore
-import { BasicAPIError } from './basic-apierror';
 
 /**
- * @type APIError501
+ * The tier of the organisation
  * @export
+ * @enum {string}
  */
-export type APIError501 = APIError501AllOf & BasicAPIError;
+
+export enum OrganisationTier {
+    Common = 'common',
+    Uncommon = 'uncommon',
+    Rare = 'rare',
+    Epic = 'epic',
+    Legendary = 'legendary'
+}
+
 
 

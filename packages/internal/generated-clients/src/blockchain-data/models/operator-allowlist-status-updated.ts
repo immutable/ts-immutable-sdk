@@ -14,11 +14,17 @@
 
 
 
-export * from './domain/activities-api';
-export * from './domain/chains-api';
-export * from './domain/collections-api';
-export * from './domain/metadata-api';
-export * from './domain/nft-owners-api';
-export * from './domain/nfts-api';
-export * from './domain/tokens-api';
+/**
+ * The update details
+ * @export
+ * @interface OperatorAllowlistStatusUpdated
+ */
+export interface OperatorAllowlistStatusUpdated {
+    /**
+     * Why this action was performed
+     * @type {string}
+     * @memberof OperatorAllowlistStatusUpdated
+     */
+    'reason': string;
+}
 

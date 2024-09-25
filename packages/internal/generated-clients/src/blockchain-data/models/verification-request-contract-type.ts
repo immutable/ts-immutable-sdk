@@ -15,25 +15,16 @@
 
 
 /**
- * 
+ * The contract type associated with the given request
  * @export
- * @interface ActiveOrderStatus
+ * @enum {string}
  */
-export interface ActiveOrderStatus {
-    /**
-     * The order status that indicates an order can be fulfilled.
-     * @type {string}
-     * @memberof ActiveOrderStatus
-     */
-    'name': ActiveOrderStatusNameEnum;
+
+export enum VerificationRequestContractType {
+    Erc20 = 'ERC20',
+    Erc721 = 'ERC721',
+    Erc1155 = 'ERC1155'
 }
 
-/**
-    * @export
-    * @enum {string}
-    */
-export enum ActiveOrderStatusNameEnum {
-    Active = 'ACTIVE'
-}
 
 

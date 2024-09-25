@@ -14,11 +14,16 @@
 
 
 
-export * from './domain/activities-api';
-export * from './domain/chains-api';
-export * from './domain/collections-api';
-export * from './domain/metadata-api';
-export * from './domain/nft-owners-api';
-export * from './domain/nfts-api';
-export * from './domain/tokens-api';
+/**
+ * The status of the verification request
+ * @export
+ * @enum {string}
+ */
+
+export enum VerificationRequestStatus {
+    Completed = 'completed',
+    Pending = 'pending'
+}
+
+
 
