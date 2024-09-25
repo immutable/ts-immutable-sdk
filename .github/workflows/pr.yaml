@@ -70,9 +70,10 @@ jobs:
       
 
   func-tests:
-    name: zkevm & imx func tests
+    name: Functional tests
     runs-on: ubuntu-latest-8-cores
     env:
+      # imx envs
       NETWORK: sepolia
       TEST_ALCHEMY_API_KEY: ${{ secrets.TEST_ALCHEMY_API_KEY }}
       PUBLIC_API_URL: "https://api.sandbox.x.immutable.com/v1"
@@ -87,6 +88,7 @@ jobs:
       TEST_WALLET_BANKER_STARK_PRIVATE_KEY: ${{ secrets.TEST_WALLET_BANKER_STARK_PRIVATE_KEY }}
       TEST_STARKEX_BATCH_SIZE: 500
 
+      # zkevm envs
       ZKEVM_ORDERBOOK_BANKER: ${{ secrets.ZKEVM_ORDERBOOK_BANKER }}
       ZKEVM_ORDERBOOK_ERC721: "0xBE8B131f39825282Ace9eFf99C0Bb14972417b49"
       ZKEVM_ORDERBOOK_ERC1155: "0x2efB9B7810B1d1520c0822aa20F1889ABd2c2146"
@@ -107,8 +109,5 @@ jobs:
       - name: Prepare tests
         run: yarn prepare:tests
 
-      - name: test imx
-        run: yarn workspace @tests/func-tests-imx func-test:ci
-
-      - name: test zkevm
-        run: yarn workspace @tests/func-tests-zkevm func-test:ci
+      - name: Run functional tests
+        run: FORCE_COLOR=1 yarn workspaces foreach -Apt --include='@tests/**' run func-test:ci
