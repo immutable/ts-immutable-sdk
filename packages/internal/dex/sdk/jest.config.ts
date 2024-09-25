@@ -12,6 +12,7 @@ const config: Config = {
   },
   coveragePathIgnorePatterns:['node_modules', 'src/contracts/', 'src/test/'],
   transformIgnorePatterns: [],
+  modulePathIgnorePatterns: ['<rootDir>/.yalc'],
 };
 
 export default config;

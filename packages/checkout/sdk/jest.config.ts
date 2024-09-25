@@ -11,6 +11,7 @@ const config: Config = {
   },
   transformIgnorePatterns: [],
   setupFiles: [],
+  modulePathIgnorePatterns: ['<rootDir>/.yalc'],
 };
 
 export default config;

@@ -13,6 +13,7 @@ const config: Config = {
   //     url: "http://localhost",
   //   },
   //   verbose: true,
+  modulePathIgnorePatterns: ['<rootDir>/.yalc'],
 };
 
 export default config;

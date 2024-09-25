@@ -268,6 +268,7 @@ export class Seaport {
   ): Promise<FulfillOrderResponse> {
     const { orderComponents, tips } = mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
+    const chainID = (await this.provider.getNetwork()).chainId;
 
     const { actions: seaportActions } = await seaportLib.fulfillOrders({
       accountAddress: account,
@@ -286,19 +287,21 @@ export class Seaport {
 
     const fulfillmentActions: TransactionAction[] = [];
 
-    const approvalAction = seaportActions.find(
+    const approvalActions = seaportActions.filter(
       (action) => action.type === 'approval',
     );
 
-    if (approvalAction) {
-      fulfillmentActions.push({
-        type: ActionType.TRANSACTION,
-        buildTransaction: prepareTransaction(
-          approvalAction.transactionMethods,
-          (await this.provider.getNetwork()).chainId,
-          account,
-        ),
-        purpose: TransactionPurpose.APPROVAL,
+    if (approvalActions.length > 0) {
+      approvalActions.forEach((approvalAction) => {
+        fulfillmentActions.push({
+          type: ActionType.TRANSACTION,
+          buildTransaction: prepareTransaction(
+            approvalAction.transactionMethods,
+            chainID,
+            account,
+          ),
+          purpose: TransactionPurpose.APPROVAL,
+        });
       });
     }
 
@@ -314,7 +317,7 @@ export class Seaport {
       type: ActionType.TRANSACTION,
       buildTransaction: prepareTransaction(
         fulfilOrderAction.transactionMethods,
-        (await this.provider.getNetwork()).chainId,
+        chainID,
         account,
       ),
       purpose: TransactionPurpose.FULFILL_ORDER,

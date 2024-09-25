@@ -54,6 +54,7 @@ describe('completeEthWithdrawal action', () => {
     beforeEach(() => {
       jest.restoreAllMocks();
       (getEncodeAssetInfo as jest.Mock).mockResolvedValue(encodeAssetResponse);
+      (isRegisteredOnChain as jest.Mock).mockResolvedValue(false);
       (getSignableRegistrationOnchain as jest.Mock).mockResolvedValue({
         operator_signature: 'operator-signature',
         payload_hash: 'payload hash',
