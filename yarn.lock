@@ -3887,7 +3887,7 @@ __metadata:
     next: 14.2.7
     react: ^18
     react-dom: ^18
-    typescript: ^5
+    typescript: ^5.6.2
   languageName: unknown
   linkType: soft
 
@@ -3928,7 +3928,7 @@ __metadata:
     next: 14.2.7
     react: ^18
     react-dom: ^18
-    typescript: ^5
+    typescript: ^5.6.2
   languageName: unknown
   linkType: soft
 
@@ -37789,7 +37789,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:*, typescript@npm:^5, typescript@npm:^5.6.2":
+"typescript@npm:*, typescript@npm:^5.6.2":
   version: 5.6.2
   resolution: "typescript@npm:5.6.2"
   bin:
@@ -37799,7 +37799,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@*#~builtin<compat/typescript>, typescript@patch:typescript@^5#~builtin<compat/typescript>, typescript@patch:typescript@^5.6.2#~builtin<compat/typescript>":
+"typescript@patch:typescript@*#~builtin<compat/typescript>, typescript@patch:typescript@^5.6.2#~builtin<compat/typescript>":
   version: 5.6.2
   resolution: "typescript@patch:typescript@npm%3A5.6.2#~builtin<compat/typescript>::version=5.6.2&hash=14eedb"
   bin:
