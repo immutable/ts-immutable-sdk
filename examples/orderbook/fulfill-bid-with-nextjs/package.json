@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@biom3/react": "^0.26.1",
-    "@imtbl/sdk": "1.53.0-alpha.11",
+    "@imtbl/sdk": "latest",
     "ethers": "^5.7.2",
     "next": "14.2.7",
     "react": "^18",
