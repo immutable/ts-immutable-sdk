@@ -25,7 +25,7 @@
     "prettier": "^2.8.7",
     "rollup": "^4.19.1",
     "ts-node": "^10.9.1",
-    "typescript": "^5.5.4",
+    "typescript": "^5.6.2",
     "unplugin-swc": "^1.5.1"
   },
   "engines": {
