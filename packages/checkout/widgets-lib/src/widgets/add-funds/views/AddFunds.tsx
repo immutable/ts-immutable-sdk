@@ -147,20 +147,23 @@ export function AddFunds({
     fetchOnRampTokens();
   }, [checkout]);
 
-  const openDrawer = async () => {
-    if (!balances) return;
-
-    await fetchRoutesWithRateLimit(
-      squid!,
-      balances,
-      ChainId.IMTBL_ZKEVM_MAINNET.toString(),
-      currentToTokenAddress?.address ?? '',
-      currentToAmount,
-      5,
-      1000,
-    );
+  const openDrawer = () => {
     setShowOptionsDrawer(true);
   };
+
+  useEffect(() => {
+    if (balances && squid && currentToTokenAddress && currentToAmount) {
+      fetchRoutesWithRateLimit(
+        squid,
+        balances,
+        ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+        currentToTokenAddress?.address ?? '',
+        currentToAmount,
+        5,
+        1000,
+      );
+    }
+  }, [balances, squid, currentToTokenAddress, currentToAmount]);
 
   const updateAmount = (value: string) => {
     setCurrentToAmount(value);
