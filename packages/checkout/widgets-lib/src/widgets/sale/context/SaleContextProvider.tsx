@@ -48,6 +48,7 @@ type SaleContextProps = {
   excludePaymentTypes: SalePaymentTypes[];
   excludeFiatCurrencies?: string[];
   preferredCurrency?: string;
+  customOrderData?: Record<string, any>;
   waitFulfillmentSettlements: boolean;
   hideExcludedPaymentTypes: boolean;
 };
@@ -132,6 +133,7 @@ const SaleContext = createContext<SaleContextValues>({
   signTokenIds: [],
   excludePaymentTypes: [],
   preferredCurrency: undefined,
+  customOrderData: undefined,
   selectedCurrency: undefined,
   waitFulfillmentSettlements: true,
   hideExcludedPaymentTypes: false,
@@ -160,6 +162,7 @@ export function SaleContextProvider(props: {
       excludePaymentTypes,
       excludeFiatCurrencies,
       preferredCurrency,
+      customOrderData,
       waitFulfillmentSettlements,
       hideExcludedPaymentTypes,
     },
@@ -254,6 +257,7 @@ export function SaleContextProvider(props: {
     environmentId,
     environment,
     waitFulfillmentSettlements,
+    customOrderData,
   });
 
   const sign = useCallback(

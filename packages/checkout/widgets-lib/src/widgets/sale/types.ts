@@ -54,6 +54,7 @@ export type SignOrderInput = {
   environment: string;
   environmentId: string;
   waitFulfillmentSettlements: boolean;
+  customOrderData?: Record<string, any>;
 };
 
 export type SignOrderError = {

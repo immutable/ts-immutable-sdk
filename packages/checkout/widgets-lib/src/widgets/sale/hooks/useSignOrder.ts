@@ -73,6 +73,7 @@ type SignApiRequest = {
     product_id: string;
     quantity: number;
   }[];
+  custom_data?: Record<string, any>;
 };
 
 type SignApiError = {
@@ -159,6 +160,7 @@ export const useSignOrder = (input: SignOrderInput) => {
     environment,
     environmentId,
     waitFulfillmentSettlements,
+    customOrderData,
   } = input;
   const [signError, setSignError] = useState<SignOrderError | undefined>(
     undefined,
@@ -274,6 +276,7 @@ export const useSignOrder = (input: SignOrderInput) => {
             product_id: item.productId,
             quantity: item.qty,
           })),
+          custom_data: customOrderData,
         };
 
         const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/order/sign`;
