@@ -252,7 +252,7 @@ describe.skip("Orderbook", () => {
         },
         buy: {
           type: "ERC1155",
-          contractAddress: erc721Contract.address,
+          contractAddress: erc1155Contract.address,
           tokenId: erc1155TokenId,
           amount: "50",
         },

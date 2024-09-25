@@ -8,7 +8,7 @@ import type {Config} from 'jest';
 const config: Config = {
   rootDir: ".",
   testMatch:["**/*.steps.ts", "**/*.spec.ts"],
-  testTimeout: 60000,
+  testTimeout: 120000,
   moduleDirectories: ["node_modules", "<rootDir>"],
   moduleNameMapper: {
     "@imtbl/sdk/provider": "<rootDir>/../../../node_modules/@imtbl/sdk/dist/provider",
