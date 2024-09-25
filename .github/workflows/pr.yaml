@@ -21,6 +21,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
+
       - name: setup
         uses: ./.github/actions/setup
 
@@ -36,9 +37,11 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
+
       - name: setup
         uses: ./.github/actions/setup
-      - name: Build
+
+      - name: Build, Lint, Test & Typecheck
         run: yarn nx affected -t build,lint,test,typecheck 
 
   build-lint-test-examples:
@@ -103,6 +106,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
+          
       - name: setup
         uses: ./.github/actions/setup
 
