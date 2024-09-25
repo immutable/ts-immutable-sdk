@@ -2617,7 +2617,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.26.1, @biom3/react@npm:^0.26.2":
+"@biom3/react@npm:^0.26.1":
   version: 0.26.2
   resolution: "@biom3/react@npm:0.26.2"
   dependencies:
@@ -35214,9 +35214,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "sdk-wallet-balance-with-nextjs@workspace:examples/checkout/sdk-wallet-balance-with-nextjs"
   dependencies:
-    "@biom3/react": ^0.26.2
+    "@biom3/react": ^0.26.1
     "@ethersproject/providers": ^5.7.2
     "@imtbl/sdk": latest
+    "@playwright/test": ^1.45.3
     "@types/node": ^20
     "@types/react": ^18
     "@types/react-dom": ^18

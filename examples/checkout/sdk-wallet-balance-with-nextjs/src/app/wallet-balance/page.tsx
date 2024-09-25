@@ -97,7 +97,7 @@ export default function ConnectWithMetamask() {
     const fetchTokenInfo = async () => {
       if (connectedProvider) {
         // #doc get-token-info
-        // Get the information of a particular token
+        // Get the details of a particular token
         const tokenAddress = "0xD61ffaece032CA6E0C469820707d677Feb4BEDD5";
         const tokenInfo = await checkoutSDK.getTokenInfo({ provider: connectedProvider, tokenAddress });
         // #enddoc get-token-info
