@@ -166,6 +166,7 @@ function CheckoutUI() {
   );
 
   const [flowParams, setFlowParams] = useState<
+    
     Partial<Record<CheckoutFlowType, CheckoutWidgetParams>>
   >({
     CONNECT: {
@@ -197,6 +198,11 @@ function CheckoutUI() {
       toAmount: "100",
       toTokenAddress: "native",
     },
+    ONRAMP: {
+      flow: CheckoutFlowType.ONRAMP,
+      skipConnect: true,
+      toWalletAddress: '0x420c020E80c7694727aBC12a0d4F52FA839f8d38',
+    }
   });
 
   // set a state to keep widget event results

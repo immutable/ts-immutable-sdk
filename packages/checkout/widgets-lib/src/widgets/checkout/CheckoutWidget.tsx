@@ -28,7 +28,7 @@ import OnRampWidget from '../on-ramp/OnRampWidget';
 import WalletWidget from '../wallet/WalletWidget';
 import SaleWidget from '../sale/SaleWidget';
 import AddFundsWidget from '../add-funds/AddFundsWidget';
-import { getViewShouldConnect } from './functions/getViewShouldConnect';
+import { getIsConnectFirstView } from './functions/getIsConnectFirstView';
 import { useWidgetEvents } from './hooks/useWidgetEvents';
 import { getConnectLoaderParams } from './functions/getConnectLoaderParams';
 import { checkoutFlows } from './functions/isValidCheckoutFlow';
@@ -106,8 +106,8 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   /**
    * Validate if the view requires connect loader
    */
-  const shouldConnectView = useMemo(
-    () => getViewShouldConnect(view.type),
+  const isConnectFirstView = useMemo(
+    () => getIsConnectFirstView(view.type, view.data?.params),
     [view.type],
   );
 
@@ -115,6 +115,31 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
    * Show back button
    */
   const showBackButton = !!view.data?.showBackButton;
+
+  /**
+   * OnRamp component renders conditionally
+   * either inside connect loader or directly if skipConnect is true
+   */
+  const onRampComponent = useMemo(
+    () => (
+      <OnRampWidget
+        config={widgetsConfig}
+        {...(view.data?.params || {})}
+        {...(view.data?.config || {})}
+        checkout={checkout}
+        web3Provider={web3Provider}
+        showBackButton={showBackButton}
+      />
+    ),
+    [
+      view.data?.params,
+      view.data?.config,
+      showBackButton,
+      widgetsConfig,
+      web3Provider,
+      checkout,
+    ],
+  );
 
   return (
     <ViewContextProvider>
@@ -160,8 +185,11 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
             {...(view.data.params || {})}
           />
         )}
+        {view.type === CheckoutFlowType.ONRAMP
+          && !isConnectFirstView
+          && onRampComponent}
         {/* --- Widgets that require connect --- */}
-        {shouldConnectView && (
+        {isConnectFirstView && (
           <ConnectLoader
             widgetConfig={widgetsConfig}
             params={connectLoaderParams}
@@ -215,15 +243,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
                   showBackButton={showBackButton}
                 />
               )}
-              {view.type === CheckoutFlowType.ONRAMP && (
-                <OnRampWidget
-                  config={widgetsConfig}
-                  {...(view.data.params || {})}
-                  {...(view.data.config || {})}
-                  checkout={checkout}
-                  showBackButton={showBackButton}
-                />
-              )}
+              {view.type === CheckoutFlowType.ONRAMP && onRampComponent}
             </Suspense>
           </ConnectLoader>
         )}
