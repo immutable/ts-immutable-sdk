@@ -227,7 +227,6 @@ export default function WalletWidget(props: WalletWidgetInputs) {
               analytics={{ userJourney: UserJourney.WALLET }}
               widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
               checkout={checkout}
-              provider={provider}
               showOnrampOption={isOnRampEnabled}
               showSwapOption={isSwapEnabled}
               showBridgeOption={isBridgeEnabled}

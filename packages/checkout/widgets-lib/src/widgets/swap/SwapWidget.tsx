@@ -345,7 +345,6 @@ export default function SwapWidget({
             <TopUpView
               analytics={{ userJourney: UserJourney.SWAP }}
               checkout={checkout}
-              provider={provider}
               widgetEvent={IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT}
               showOnrampOption={isOnRampEnabled}
               showSwapOption={isSwapEnabled}

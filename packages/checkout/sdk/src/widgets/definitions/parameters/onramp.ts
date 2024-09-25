@@ -17,4 +17,8 @@ export type OnRampWidgetParams = {
   language?: WidgetLanguage;
   /** Whether to show a back button on the first screen, on click triggers REQUEST_GO_BACK event */
   showBackButton?: boolean;
+  /** Whether to skip the connect screen */
+  skipConnect?: boolean;
+  /** The destination wallet address to receive the funds */
+  toWalletAddress?: string;
 };

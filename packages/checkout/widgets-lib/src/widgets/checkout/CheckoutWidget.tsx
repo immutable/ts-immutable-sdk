@@ -220,6 +220,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
                   config={widgetsConfig}
                   {...(view.data.params || {})}
                   {...(view.data.config || {})}
+                  checkout={checkout}
                   showBackButton={showBackButton}
                 />
               )}

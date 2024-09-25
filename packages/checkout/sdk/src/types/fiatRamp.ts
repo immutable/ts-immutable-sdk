@@ -20,8 +20,9 @@ export enum ExchangeType {
  */
 export interface FiatRampParams {
   exchangeType: ExchangeType;
-  web3Provider: Web3Provider;
+  web3Provider?: Web3Provider;
   tokenAmount?: string;
   tokenAddress?: string;
+  walletAddress?: string;
   passport?: any;
 }

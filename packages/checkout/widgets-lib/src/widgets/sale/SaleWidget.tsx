@@ -167,7 +167,6 @@ export default function SaleWidget(props: SaleWidgetProps) {
               analytics={{ userJourney: UserJourney.SALE }}
               widgetEvent={IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT}
               checkout={checkout}
-              provider={provider}
               showOnrampOption={config.isOnRampEnabled}
               showSwapOption={false}
               showBridgeOption={config.isBridgeEnabled}

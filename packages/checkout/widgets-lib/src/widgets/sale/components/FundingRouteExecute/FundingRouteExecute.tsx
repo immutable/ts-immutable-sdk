@@ -310,11 +310,7 @@ export function FundingRouteExecute({
   return (
     <EventTargetContext.Provider value={eventTargetReducerValues}>
       {view === FundingRouteExecuteViews.LOADING && (
-        <LoadingView
-          loadingText={t(
-            'views.ORDER_SUMMARY.loading.balances',
-          )}
-        />
+        <LoadingView loadingText={t('views.ORDER_SUMMARY.loading.balances')} />
       )}
       {view === FundingRouteExecuteViews.EXECUTE_BRIDGE && (
         <BridgeWidget {...bridgeParams!} config={config} checkout={checkout!} />
@@ -323,7 +319,7 @@ export function FundingRouteExecute({
         <SwapWidget {...swapParams!} config={config} />
       )}
       {view === FundingRouteExecuteViews.EXECUTE_ON_RAMP && (
-        <OnRampWidget config={config} {...onRampParams} />
+        <OnRampWidget config={config} checkout={checkout!} {...onRampParams} />
       )}
       {view === FundingRouteExecuteViews.SWITCH_NETWORK_ETH && (
         <ConnectWidget
