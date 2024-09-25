@@ -156,7 +156,7 @@ export default function ConnectWithMetamask() {
           <Table.Row>
             <Table.Cell><b>Supported Wallets</b></Table.Cell>
             <Table.Cell>
-              {!supportedWallets && ' (not fetched)'}
+              {!supportedWallets && ' (not connected)'}
               {supportedWallets && (
                 supportedWallets.map((wallet, index) => (
                   <span key={index}>{wallet.walletProviderName}, </span>
@@ -167,7 +167,7 @@ export default function ConnectWithMetamask() {
           <Table.Row>
             <Table.Cell><b>Is Valid Provider</b></Table.Cell>
             <Table.Cell>
-              {(isValidProvider) ? `${isValidProvider}` : ' (not  validated)'}
+              {(isValidProvider) ? `${isValidProvider}` : ' (not  connected)'}
             </Table.Cell>
           </Table.Row>
           <Table.Row>
