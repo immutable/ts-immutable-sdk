@@ -47,7 +47,7 @@ export default function FulfillERC1155WithPassport() {
 
   // setup the sell item contract address state
   const [sellItemContractAddress, setSellItemContractAddressState] =
-    useState<any>(null);
+    useState<string | null>(null);
 
   // setup the buy item type state
   const [buyItemType, setBuyItemTypeState] = useState<"NATIVE" | "ERC20">(
@@ -55,15 +55,15 @@ export default function FulfillERC1155WithPassport() {
   );
 
   // save the listings state
-  const [listings, setListingsState] = useState<any>(null);
+  const [listings, setListingsState] = useState<orderbook.Listing[]>([]);
 
-  const [unitsToFill, setUnitsToFill] = useState<any>(null);
+  const [unitsToFill, setUnitsToFill] = useState<UnitsToFill | null>(null);
 
   // setup the listing creation success message state
-  const [successMessage, setSuccessMessageState] = useState<any>(null);
+  const [successMessage, setSuccessMessageState] = useState<string | null>(null);
 
   // setup the listing creation error message state
-  const [errorMessage, setErrorMessageState] = useState<any>(null);
+  const [errorMessage, setErrorMessageState] = useState<string | null>(null);
 
   const passportLogin = async () => {
     if (web3Provider.provider.request) {
@@ -133,7 +133,7 @@ export default function FulfillERC1155WithPassport() {
     client: orderbook.Orderbook,
     sellItemContractAddress?: string,
     buyItemType?: "NATIVE" | "ERC20",
-  ): Promise<orderbook.Order[]> => {
+  ): Promise<orderbook.Listing[]> => {
     let params: orderbook.ListListingsParams = {
       pageSize: 50,
       sortBy: "created_at",
@@ -149,7 +149,7 @@ export default function FulfillERC1155WithPassport() {
   useMemo(async () => {
     const listings = await getListings(
       orderbookSDK,
-      sellItemContractAddress,
+      sellItemContractAddress == null ? undefined : sellItemContractAddress,
       buyItemType,
     );
     const filtered = listings.filter(
@@ -162,7 +162,7 @@ export default function FulfillERC1155WithPassport() {
 
   const executeTrade = async (listingID: string, rowIndex: number) => {
     const units =
-      unitsToFill.rowIndex === rowIndex ? unitsToFill.units : undefined;
+      unitsToFill?.rowIndex === rowIndex ? unitsToFill.units : undefined;
 
     if (accountsState.length === 0) {
       setErrorMessageState("Please connect your wallet first");
@@ -333,14 +333,14 @@ export default function FulfillERC1155WithPassport() {
               </Table.Row>
             </Table.Head>
             <Table.Body>
-              {listings.map((listing: any, index: number) => {
+              {listings.map((listing: orderbook.Listing, index: number) => {
                 return (
                   <Table.Row key={index}>
                     <Table.Cell>{index + 1}</Table.Cell>
                     <Table.Cell>{listing.id}</Table.Cell>
                     <Table.Cell>{listing.sell[0].contractAddress}</Table.Cell>
                     <Table.Cell>{listing.sell[0].tokenId}</Table.Cell>
-                    <Table.Cell>{listing.sell[0].amount}</Table.Cell>
+                    <Table.Cell>{listing.sell[0].type === 'ERC1155' ? listing.sell[0].amount : '1'}</Table.Cell>
                     <Table.Cell>
                       <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
                         <TextInput

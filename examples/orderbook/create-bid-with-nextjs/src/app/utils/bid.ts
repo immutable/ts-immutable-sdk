@@ -4,14 +4,14 @@ import { Web3Provider } from "@ethersproject/providers";
 // #doc sign-and-submit-approval
 export const signAndSubmitApproval = async (
   provider: Web3Provider,
-  listing: orderbook.PrepareListingResponse,
+  bid: orderbook.PrepareBidResponse,
 ): Promise<void> => {
   // get your user's Web3 wallet, e.g. MetaMask, Passport, etc
   const signer = provider.getSigner();
 
   // If the user hasn't yet approved the Immutable Seaport contract to transfer assets from this
   // collection on their behalf they'll need to do so before they create an order
-  const approvalAction = listing.actions.find(
+  const approvalAction = bid.actions.find(
     (action): action is orderbook.TransactionAction =>
       action.type === orderbook.ActionType.TRANSACTION,
   );
@@ -26,18 +26,18 @@ export const signAndSubmitApproval = async (
 };
 // #enddoc sign-and-submit-approval
 
-// #doc sign-listing
-export const signListing = async (
+// #doc sign-bid
+export const signBid = async (
   provider: Web3Provider,
-  listing: orderbook.PrepareListingResponse,
+  bid: orderbook.PrepareBidResponse,
 ): Promise<string> => {
   // get your user's Web3 wallet, e.g. MetaMask, Passport, etc
   const signer = provider.getSigner();
 
   // For an order to be created (and subsequently filled), Immutable needs a valid signature for the order data.
   // This signature is stored off-chain and is later provided to any user wishing to fulfil the open order.
-  // The signature only allows the order to be fulfilled if it meets the conditions specified by the user that created the listing.
-  const signableAction = listing.actions.find(
+  // The signature only allows the order to be fulfilled if it meets the conditions specified by the user that created the bid.
+  const signableAction = bid.actions.find(
     (action): action is orderbook.SignableAction =>
       action.type === orderbook.ActionType.SIGNABLE,
   )!;
@@ -50,17 +50,17 @@ export const signListing = async (
 
   return signature;
 };
-// #enddoc sign-listing
+// #enddoc sign-bid
 
-// #doc create-listing
-export const createListing = async (
+// #doc create-bid
+export const createBid = async (
   client: orderbook.Orderbook,
-  preparedListing: orderbook.PrepareListingResponse,
+  preparedBid: orderbook.PrepareBidResponse,
   orderSignature: string,
 ): Promise<string> => {
-  const order = await client.createListing({
-    orderComponents: preparedListing.orderComponents,
-    orderHash: preparedListing.orderHash,
+  const order = await client.createBid({
+    orderComponents: preparedBid.orderComponents,
+    orderHash: preparedBid.orderHash,
     orderSignature,
     // Optional maker marketplace fee
     makerFees: [
@@ -72,4 +72,4 @@ export const createListing = async (
   });
   return order.result.id;
 };
-// #enddoc create-listing
+// #enddoc create-bid

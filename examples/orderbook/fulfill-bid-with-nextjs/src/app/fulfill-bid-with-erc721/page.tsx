@@ -10,7 +10,6 @@ import {
   FormControl,
   Heading,
   TextInput,
-  Select,
   Grid,
   Button,
   LoadingOverlay,
@@ -40,22 +39,17 @@ export default function FulfillERC721WithPassport() {
   // create the signer using the Web3Provider
   const signer = web3Provider.getSigner();
 
-  // setup the sell item contract address state
-  const [sellItemContractAddress, setSellItemContractAddressState] =
+  // setup the buy item contract address state
+  const [buyItemContractAddress, setBuyItemContractAddressState] =
     useState<string | null>(null);
 
-  // setup the buy item type state
-  const [buyItemType, setBuyItemTypeState] = useState<"NATIVE" | "ERC20">(
-    "NATIVE",
-  );
+  // save the bids state
+  const [bids, setBidsState] = useState<orderbook.Bid[]>([]);
 
-  // save the listings state
-  const [listings, setListingsState] = useState<orderbook.Listing[]>([]);
-
-  // setup the listing creation success message state
+  // setup the bid creation success message state
   const [successMessage, setSuccessMessageState] = useState<string | null>(null);
 
-  // setup the listing creation error message state
+  // setup the bid creation error message state
   const [errorMessage, setErrorMessageState] = useState<string | null>(null);
 
   const passportLogin = async () => {
@@ -101,52 +95,43 @@ export default function FulfillERC721WithPassport() {
   };
 
   // state change handlers
-  const handleSellItemContractAddressChange = (event: any) => {
+  const handleBuyItemContractAddressChange = (event: any) => {
     resetMsgState();
 
-    const sellContractAddrsVal =
+    const buyContractAddrsVal =
       event.target.value === "" ? null : event.target.value;
-    setSellItemContractAddressState(sellContractAddrsVal);
+    setBuyItemContractAddressState(buyContractAddrsVal);
   };
 
-  const handleBuyItemTypeChange = (val: any) => {
-    resetMsgState();
-
-    setBuyItemTypeState(val);
-  };
-
-  const getListings = async (
+  const getBids = async (
     client: orderbook.Orderbook,
-    sellItemContractAddress?: string,
-    buyItemType?: "NATIVE" | "ERC20",
-  ): Promise<orderbook.Listing[]> => {
-    let params: orderbook.ListListingsParams = {
+    buyItemContractAddress?: string,
+  ): Promise<orderbook.Bid[]> => {
+    let params: orderbook.ListBidsParams = {
       pageSize: 50,
       sortBy: "created_at",
       status: OrderStatusName.ACTIVE,
-      sellItemContractAddress,
-      buyItemType,
+      buyItemContractAddress,
     };
-    const listings = await client.listListings(params);
-    return listings.result;
+    const bids = await client.listBids(params);
+    return bids.result;
   };
 
-  // memoize the listings fetch
+  // memoize the bids fetch
   useMemo(async () => {
-    const listings = await getListings(
+    const bids = await getBids(
       orderbookSDK,
-      sellItemContractAddress == null ? undefined : sellItemContractAddress,
-      buyItemType,
+      buyItemContractAddress == null ? undefined : buyItemContractAddress,
     );
-    const filtered = listings.filter(
-      (listing) =>
-        listing.accountAddress !== accountsState[0] &&
-        listing.sell[0].type === "ERC721",
+    const filtered = bids.filter(
+      (bid) =>
+        bid.accountAddress !== accountsState[0] &&
+        bid.buy[0].type === "ERC721",
     );
-    setListingsState(filtered.slice(0, 10));
-  }, [accountsState, sellItemContractAddress, buyItemType]);
+    setBidsState(filtered.slice(0, 10));
+  }, [accountsState, buyItemContractAddress]);
 
-  const executeTrade = async (listingID: string) => {
+  const executeTrade = async (bidID: string) => {
     if (accountsState.length === 0) {
       setErrorMessageState("Please connect your wallet first");
       return;
@@ -154,11 +139,11 @@ export default function FulfillERC721WithPassport() {
 
     resetMsgState();
     setLoadingState(true);
-    setLoadingText("Fulfilling listing");
+    setLoadingText("Fulfilling bid");
 
     try {
-      await fulfillERC721Listing(listingID);
-      setSuccessMessageState(`Listing filled successfully`);
+      await fulfillERC721Bid(bidID);
+      setSuccessMessageState(`Bid filled successfully`);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       setErrorMessageState(message);
@@ -167,11 +152,11 @@ export default function FulfillERC721WithPassport() {
     setLoadingState(false);
   };
 
-  // #doc fulfill-erc721-listing
-  // Fulfill ERC721 listing
-  const fulfillERC721Listing = async (listingID: string) => {
+  // #doc fulfill-erc721-bid
+  // Fulfill ERC721 bid
+  const fulfillERC721Bid = async (bidID: string) => {
     const { actions } = await orderbookSDK.fulfillOrder(
-      listingID,
+      bidID,
       accountsState[0],
       [
         {
@@ -188,7 +173,7 @@ export default function FulfillERC721WithPassport() {
       }
     }
   };
-  // #enddoc fulfill-erc721-listing
+  // #enddoc fulfill-erc721-bid
 
   return (
     <Box sx={{ marginBottom: "base.spacing.x5" }}>
@@ -242,7 +227,7 @@ export default function FulfillERC721WithPassport() {
       </Box>
       <Box>
         <Heading size="medium" sx={{ marginBottom: "base.spacing.x5" }}>
-          Fulfill Listing - ERC721 Fulfillment
+          Fulfill Bid - ERC721 Fulfillment
         </Heading>
         {successMessage ? (
           <Box
@@ -274,55 +259,36 @@ export default function FulfillERC721WithPassport() {
         <Grid>
           <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
             <FormControl.Label>NFT Contract Address</FormControl.Label>
-            <TextInput onChange={handleSellItemContractAddressChange} />
-          </FormControl>
-          <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
-            <FormControl.Label>Currency Type</FormControl.Label>
-            <Select
-              size="medium"
-              defaultOption="Native"
-              onSelectChange={handleBuyItemTypeChange}
-            >
-              <Select.Option optionKey={"NATIVE"}>
-                <Select.Option.Icon icon="ImxToken" />
-                <Select.Option.Label>Native</Select.Option.Label>
-                <Select.Option.Caption>Native Currency</Select.Option.Caption>
-              </Select.Option>
-              <Select.Option optionKey={"ERC20"}>
-                <Select.Option.Icon icon="Tokens" />
-                <Select.Option.Label>ERC20</Select.Option.Label>
-                <Select.Option.Caption>ERC20 Tokens</Select.Option.Caption>
-              </Select.Option>
-            </Select>
+            <TextInput onChange={handleBuyItemContractAddressChange} />
           </FormControl>
         </Grid>
       </Box>
-        {listings && listings.length > 0 ? (
+        {bids && bids.length > 0 ? (
           <Box sx={{ maxHeight: "800px", marginBottom: "base.spacing.x5" }}>
             <Table sx={{ marginLeft: "base.spacing.x5", maxWidth: "1300px", maxHeight: "400px", overflowY: "auto", marginBottom: "base.spacing.x5"}}>
             <Table.Head>
               <Table.Row>
                 <Table.Cell>SNO</Table.Cell>
-                <Table.Cell>Listing ID</Table.Cell>
+                <Table.Cell>Bid ID</Table.Cell>
                 <Table.Cell>Contract Address</Table.Cell>
                 <Table.Cell>Token ID</Table.Cell>
                 <Table.Cell></Table.Cell>
               </Table.Row>
             </Table.Head>
             <Table.Body>
-              {listings.map((listing: orderbook.Listing, index: number) => {
+              {bids.map((bid: orderbook.Bid, index: number) => {
                 return (
                   <Table.Row key={index}>
                     <Table.Cell>{index + 1}</Table.Cell>
-                    <Table.Cell>{listing.id}</Table.Cell>
-                    <Table.Cell>{listing.sell[0].contractAddress}</Table.Cell>
-                    <Table.Cell>{listing.sell[0].tokenId}</Table.Cell>
+                    <Table.Cell>{bid.id}</Table.Cell>
+                    <Table.Cell>{bid.buy[0].contractAddress}</Table.Cell>
+                    <Table.Cell>{bid.buy[0].tokenId}</Table.Cell>
                     <Table.Cell>
                       <Button
                         size="medium"
                         variant="primary"
                         disabled={loading}
-                        onClick={() => executeTrade(listing.id)}
+                        onClick={() => executeTrade(bid.id)}
                       >
                         Buy
                       </Button>
