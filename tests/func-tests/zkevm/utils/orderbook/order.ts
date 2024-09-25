@@ -1,6 +1,7 @@
 import { orderbook } from '@imtbl/sdk';
 import { Wallet } from 'ethers';
 import { actionAll } from './actions';
+import { exhaustiveSwitch } from './switch';
 
 const orderStatusMap = new Map<string, orderbook.OrderStatusName>([
   ['pending', orderbook.OrderStatusName.PENDING],
@@ -141,4 +142,36 @@ export async function getTrades(
 
   // eslint-disable-next-line @typescript-eslint/no-loop-func
   return trades.result.filter((t) => t.orderId === listingId);
+}
+
+export function statusIsEqual(a: orderbook.Order['status'], b: orderbook.Order['status']): boolean {
+  if (a.name != b.name) {
+    return false
+  }
+
+  switch (a.name) {
+    case 'PENDING':
+      return (
+        (b as orderbook.Order['status'] & { name: 'PENDING' }).evaluated == a.evaluated &&
+        (b as orderbook.Order['status'] & { name: 'PENDING' }).started == a.started
+      )
+    case 'ACTIVE':
+      return true
+    case 'INACTIVE':
+      return (
+        (b as orderbook.Order['status'] & { name: 'INACTIVE' }).sufficient_approvals == a.sufficient_approvals &&
+        (b as orderbook.Order['status'] & { name: 'INACTIVE' }).sufficient_balances == a.sufficient_balances
+      )
+    case 'FILLED':
+      return true
+    case 'CANCELLED':
+      return (
+        (b as orderbook.Order['status'] & { name: 'CANCELLED' }).cancellation_type == a.cancellation_type &&
+        (b as orderbook.Order['status'] & { name: 'CANCELLED' }).pending == a.pending
+      )
+    case 'EXPIRED':
+      return true
+    default:
+      exhaustiveSwitch(a)
+  }
 }
