@@ -112,6 +112,7 @@ function NFTTransfer({ disabled, handleExampleSubmitted }: RequestExampleProps) 
       const assetsRes = await blockchainData.listNFTsByAccountAddress(payload);
 
       setAssets(assetsRes.result as BlockchainData.NFT[]);
+      console.log('temp - please remove before merging')
     };
     getAssets().catch(console.log);
   }, [blockchainData, chainName, fromAddress]);
