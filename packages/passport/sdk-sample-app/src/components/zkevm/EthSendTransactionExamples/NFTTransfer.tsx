@@ -20,7 +20,11 @@ type GroupedAsset = {
   assets: NFTCandidate[];
 };
 
-type NFTCandidate = BlockchainData.NFTWithBalance & { selected: boolean, to_address?: string, to_address_required?: string };
+type NFTCandidate = BlockchainData.NFTWithBalance & {
+  selected: boolean;
+  to_address?: string;
+  to_address_required?: string;
+};
 
 const chainNameMapping = (environment: EnvironmentNames) => {
   switch (environment) {
