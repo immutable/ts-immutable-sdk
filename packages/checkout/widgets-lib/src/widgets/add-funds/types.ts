@@ -20,3 +20,8 @@ export type RouteData = {
   amountData: AmountData;
   route: RouteResponse;
 };
+
+export enum FiatOptionType {
+  CREDIT = 'credit',
+  DEBIT = 'debit',
+}
