@@ -36,6 +36,7 @@ function Message() {
         <Sticker.FramedIcon
           icon="Close"
           circularFrame
+          emphasized
           sx={{
             cursor: 'pointer',
           }}
