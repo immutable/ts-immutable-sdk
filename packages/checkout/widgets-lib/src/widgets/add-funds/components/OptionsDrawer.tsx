@@ -30,7 +30,7 @@ export function OptionsDrawer({
   showBridgeOption,
 }: OptionsDrawerProps) {
   const {
-    addFundsState: { chains },
+    addFundsState: { chains, balances },
   } = useContext(AddFundsContext);
 
   return (
@@ -59,6 +59,7 @@ export function OptionsDrawer({
             size="medium"
             routes={routes}
             chains={chains}
+            balances={balances}
             onCardClick={onCardClick}
             onRouteClick={onRouteClick}
             showOnrampOption={showOnrampOption}

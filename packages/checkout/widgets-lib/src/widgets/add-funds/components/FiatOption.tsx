@@ -6,7 +6,7 @@ import { FiatOptionType } from '../types';
 export interface FiatOptionProps<RC extends ReactElement | undefined = undefined> {
   rc?: RC;
   type: FiatOptionType;
-  onClick: (type: FiatOptionType) => void;
+  onClick?: (type: FiatOptionType) => void;
   disabled?: boolean;
   size?: MenuItemSize;
 }
@@ -25,7 +25,11 @@ export function FiatOption<RC extends ReactElement | undefined = undefined>({
     [FiatOptionType.CREDIT]: 'BankCard',
   };
 
-  const handleClick = () => onClick(type);
+  const handleClick = () => {
+    if (onClick) {
+      onClick(type);
+    }
+  };
 
   const menuItemProps = {
     disabled,
