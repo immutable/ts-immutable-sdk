@@ -2617,9 +2617,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.27.0":
-  version: 0.27.0
-  resolution: "@biom3/react@npm:0.27.0"
+"@biom3/react@npm:^0.27.2":
+  version: 0.27.2
+  resolution: "@biom3/react@npm:0.27.2"
   dependencies:
     "@biom3/design-tokens": ~0.4.4
     "@imtbl/image-resizer-utils": ~0.0.2
@@ -2640,7 +2640,7 @@ __metadata:
     framer-motion: ^10.12.12
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 2ba88ed68ddfcc3d48b8c0963ecf88cebc61c38428d2a2e01725527109fda0f3381f4d3244e47e487cf88a1aeec5ef932b0c6beeb13614e9d2fd60cbdad76d83
+  checksum: 9ddd3e6703e4cf7eb255f94d5f54a5cc3bf80915437788c9c07c451b0af126d5247814f294838cf490bc06a70730fd078bcb72fe6265cb0a75f1f6616b033df3
   languageName: node
   linkType: hard
 
@@ -4045,7 +4045,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/wallets-connect-with-nextjs@workspace:examples/passport/wallets-connect-with-nextjs"
   dependencies:
-    "@biom3/react": ^0.27.0
+    "@biom3/react": ^0.27.2
     "@ethersproject/providers": ^5.7.2
     "@imtbl/sdk": latest
     "@playwright/test": ^1.45.2
@@ -4230,7 +4230,7 @@ __metadata:
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.0
+    "@biom3/react": ^0.27.2
     "@ethersproject/providers": ^5.7.2
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
@@ -4317,7 +4317,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.0
+    "@biom3/react": ^0.27.2
     "@ethersproject/providers": ^5.7.2
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
@@ -4353,7 +4353,7 @@ __metadata:
     "@0xsquid/sdk": ^2.8.24
     "@0xsquid/squid-types": ^0.1.104
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.0
+    "@biom3/react": ^0.27.2
     "@ethersproject/bignumber": ^5.7.0
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
@@ -4661,7 +4661,7 @@ __metadata:
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.0
+    "@biom3/react": ^0.27.2
     "@imtbl/blockchain-data": 0.0.0
     "@imtbl/config": 0.0.0
     "@imtbl/generated-clients": 0.0.0
@@ -4766,7 +4766,7 @@ __metadata:
     "@babel/plugin-transform-class-properties": ^7.24.1
     "@babel/plugin-transform-private-methods": ^7.24.1
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.0
+    "@biom3/react": ^0.27.2
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-provider": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
@@ -39852,7 +39852,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "x-provider-sample-app@workspace:packages/x-provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.27.0
+    "@biom3/react": ^0.27.2
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
     "@testing-library/jest-dom": ^5.16.5
