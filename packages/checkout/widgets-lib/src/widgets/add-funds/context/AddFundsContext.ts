@@ -10,7 +10,7 @@ export interface AddFundsState {
   provider: Web3Provider | null;
   allowedTokens: TokenInfo[];
   squid: Squid | null;
-  chains: Chain[];
+  chains: Chain[] | null;
   balances: TokenBalance[] | null;
 }
 
@@ -19,7 +19,7 @@ export const initialAddFundsState: AddFundsState = {
   provider: null,
   allowedTokens: [],
   squid: null,
-  chains: [],
+  chains: null,
   balances: null,
 };
 
