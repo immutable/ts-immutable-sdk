@@ -48,6 +48,13 @@ export interface NFTOwner {
      */
     'account_address': string;
     /**
+     * (deprecated - use balance instead) The quantity of owned tokens (uint256 as string)
+     * @type {string}
+     * @memberof NFTOwner
+     * @deprecated
+     */
+    'quantity': string;
+    /**
      * The amount of owned tokens (uint256 as string)
      * @type {string}
      * @memberof NFTOwner

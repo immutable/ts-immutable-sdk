@@ -80,14 +80,6 @@ models/nftowner.ts
 models/nftsale.ts
 models/nftwith-balance.ts
 models/nftwith-owner.ts
-models/operator-allowlist-contract-status-internal-all-of.ts
-models/operator-allowlist-contract-status-internal.ts
-models/operator-allowlist-contract-status.ts
-models/operator-allowlist-status-details.ts
-models/operator-allowlist-status-requested.ts
-models/operator-allowlist-status-updated.ts
-models/operator-allowlist-status.ts
-models/organisation-tier.ts
 models/page.ts
 models/refresh-collection-metadata-request.ts
 models/refresh-collection-metadata-result.ts
@@ -104,9 +96,4 @@ models/sale-payment.ts
 models/token-contract-type.ts
 models/token.ts
 models/transfer.ts
-models/verification-request-contract-type.ts
-models/verification-request-internal-all-of.ts
-models/verification-request-internal.ts
-models/verification-request-status.ts
-models/verification-request.ts
 models/withdrawal.ts
