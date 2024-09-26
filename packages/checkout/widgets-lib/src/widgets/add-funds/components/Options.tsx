@@ -1,5 +1,6 @@
-import { Body, Box, MenuItemSize } from '@biom3/react';
-
+import {
+  Box, LoadingOverlay, MenuItemSize,
+} from '@biom3/react';
 import { motion } from 'framer-motion';
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import {
@@ -27,17 +28,15 @@ export interface OptionsProps {
   showOnrampOption?: boolean;
 }
 
-export function Options(props: OptionsProps) {
-  const {
-    routes,
-    chains,
-    balances,
-    onCardClick,
-    onRouteClick,
-    size,
-    showOnrampOption,
-  } = props;
-
+export function Options({
+  routes,
+  chains,
+  balances,
+  onCardClick,
+  onRouteClick,
+  size,
+  showOnrampOption,
+}: OptionsProps) {
   const getUsdBalance = (balance: TokenBalance | undefined, route: RouteData) => {
     if (!balance) return undefined;
 
@@ -52,33 +51,41 @@ export function Options(props: OptionsProps) {
 
   const sortedRoutes = sortRoutesByFastestTime(routes);
 
-  const fastestRoute = sortedRoutes?.[0];
+  if (!sortedRoutes) {
+    return (
+      <LoadingOverlay visible>
+        <LoadingOverlay.Content>
+          <LoadingOverlay.Content.LoopingText
+            text={['Fetching balances', 'Fetching routes']}
+            textDuration={5000}
+          />
+        </LoadingOverlay.Content>
+      </LoadingOverlay>
+    );
+  }
 
-  const routeOptions = sortedRoutes
-    ? sortedRoutes.map((route: RouteData) => {
-      const { fromToken } = route.amountData;
+  const routeOptions = sortedRoutes.map((route: RouteData) => {
+    const { fromToken } = route.amountData;
 
-      const chain = chains?.find((c) => c.id === fromToken.chainId);
-      const balance = balances?.find(
-        (bal) => bal.address === fromToken.address && bal.chainId === fromToken.chainId,
-      );
+    const chain = chains?.find((c) => c.id === fromToken.chainId);
+    const balance = balances?.find(
+      (bal) => bal.address === fromToken.address && bal.chainId === fromToken.chainId,
+    );
 
-      const usdBalance = getUsdBalance(balance, route);
+    const usdBalance = getUsdBalance(balance, route);
 
-      return (
-        <RouteOption
-          key={`route-option-${fromToken.chainId}-${fromToken.address}`}
-          chain={chain}
-          route={route}
-          usdBalance={usdBalance}
-          onClick={onRouteClick}
-          isFastest={route === fastestRoute}
-          size={size}
-          rc={<motion.div variants={listItemVariants} />}
-        />
-      );
-    })
-    : <Body>Loading routes...</Body>;
+    return (
+      <RouteOption
+        key={`route-option-${fromToken.chainId}-${fromToken.address}`}
+        chain={chain}
+        route={route}
+        usdBalance={usdBalance}
+        onClick={onRouteClick}
+        size={size}
+        rc={<motion.div variants={listItemVariants} />}
+      />
+    );
+  });
 
   const fiatOptions = showOnrampOption
     ? defaultFiatOptions.map((type, idx) => (
