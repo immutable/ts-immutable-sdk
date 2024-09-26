@@ -17,6 +17,7 @@
     "@metamask/detect-provider": "^2.0.0",
     "axios": "^1.6.5",
     "ethers": "^5.7.2",
+    "semver": "^7.4.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
