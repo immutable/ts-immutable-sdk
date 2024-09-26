@@ -188,6 +188,7 @@ export interface PrepareListingParams {
   makerAddress: string;
   sell: ERC721Item | ERC1155Item;
   buy: NativeItem | ERC20Item;
+  orderStart?: Date;
   orderExpiry?: Date;
 }
 
@@ -199,6 +200,7 @@ export interface PrepareBulkListingsParams {
     sell: ERC721Item | ERC1155Item;
     buy: NativeItem | ERC20Item;
     makerFees: FeeValue[];
+    orderStart?: Date;
     orderExpiry?: Date;
   }[];
 }
@@ -225,6 +227,49 @@ export interface BulkListingsResult {
     success: boolean;
     orderHash: string;
     order?: Listing;
+  }[];
+}
+
+/* Bid Ops */
+
+// Expose the list order filtering and ordering directly from the openAPI SDK, except
+// chainName is omitted as its configured as a part of the client
+export type ListBidsParams = Omit<
+Parameters<typeof OrdersService.prototype.listBids>[0],
+'chainName'
+>;
+
+export interface BidResult {
+  result: Bid;
+}
+
+export interface ListBidsResult {
+  page: Page;
+  result: Bid[];
+}
+
+export interface PrepareBidParams {
+  makerAddress: string;
+  sell: ERC20Item;
+  buy: ERC721Item | ERC1155Item;
+  orderStart?: Date;
+  orderExpiry?: Date;
+}
+
+export type PrepareBidResponse = PrepareOrderResponse;
+
+export interface CreateBidParams {
+  orderComponents: OrderComponents;
+  orderHash: string;
+  orderSignature: string;
+  makerFees: FeeValue[];
+}
+
+export interface BulkBidsResult {
+  result: {
+    success: boolean;
+    orderHash: string;
+    order?: Bid;
   }[];
 }
 
