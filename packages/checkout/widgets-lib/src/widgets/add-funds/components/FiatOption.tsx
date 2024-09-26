@@ -26,9 +26,7 @@ export function FiatOption<RC extends ReactElement | undefined = undefined>({
   };
 
   const handleClick = () => {
-    if (onClick) {
-      onClick(type);
-    }
+    onClick?.(type);
   };
 
   const menuItemProps = {
