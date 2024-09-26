@@ -8,6 +8,7 @@ configuration.ts
 domain/activities-api.ts
 domain/chains-api.ts
 domain/collections-api.ts
+domain/crafting-api.ts
 domain/metadata-api.ts
 domain/nft-owners-api.ts
 domain/nfts-api.ts
@@ -39,6 +40,7 @@ models/asset-verification-status.ts
 models/basic-apierror.ts
 models/blockchain-metadata.ts
 models/burn.ts
+models/call.ts
 models/chain-with-details-all-of.ts
 models/chain-with-details.ts
 models/chain.ts
@@ -93,6 +95,9 @@ models/refreshable-nftattributes.ts
 models/sale-fee.ts
 models/sale-payment-token.ts
 models/sale-payment.ts
+models/sign-crafting-request-multi-caller.ts
+models/sign-crafting-request.ts
+models/sign-crafting-result.ts
 models/token-contract-type.ts
 models/token.ts
 models/transfer.ts
