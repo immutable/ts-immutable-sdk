@@ -2617,9 +2617,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.27.2":
-  version: 0.27.2
-  resolution: "@biom3/react@npm:0.27.2"
+"@biom3/react@npm:^0.27.3":
+  version: 0.27.3
+  resolution: "@biom3/react@npm:0.27.3"
   dependencies:
     "@biom3/design-tokens": ~0.4.4
     "@imtbl/image-resizer-utils": ~0.0.2
@@ -2640,7 +2640,7 @@ __metadata:
     framer-motion: ^10.12.12
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 9ddd3e6703e4cf7eb255f94d5f54a5cc3bf80915437788c9c07c451b0af126d5247814f294838cf490bc06a70730fd078bcb72fe6265cb0a75f1f6616b033df3
+  checksum: 4462a567804bf29c817e7260c4e98a062ea5e5ee9f0ae872738d412ebd51e94a63237d5a83e52f0a46b83c3377f272cf46b775c3ab1ef37cfff5ac2fc3e5b938
   languageName: node
   linkType: hard
 
@@ -4045,7 +4045,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/wallets-connect-with-nextjs@workspace:examples/passport/wallets-connect-with-nextjs"
   dependencies:
-    "@biom3/react": ^0.27.2
+    "@biom3/react": ^0.27.3
     "@ethersproject/providers": ^5.7.2
     "@imtbl/sdk": latest
     "@playwright/test": ^1.45.2
@@ -4223,7 +4223,7 @@ __metadata:
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.2
+    "@biom3/react": ^0.27.3
     "@ethersproject/providers": ^5.7.2
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
@@ -4310,7 +4310,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.2
+    "@biom3/react": ^0.27.3
     "@ethersproject/providers": ^5.7.2
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
@@ -4346,7 +4346,7 @@ __metadata:
     "@0xsquid/sdk": ^2.8.24
     "@0xsquid/squid-types": ^0.1.104
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.2
+    "@biom3/react": ^0.27.3
     "@ethersproject/bignumber": ^5.7.0
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
@@ -4651,7 +4651,7 @@ __metadata:
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.2
+    "@biom3/react": ^0.27.3
     "@imtbl/blockchain-data": 0.0.0
     "@imtbl/config": 0.0.0
     "@imtbl/generated-clients": 0.0.0
@@ -4756,7 +4756,7 @@ __metadata:
     "@babel/plugin-transform-class-properties": ^7.24.1
     "@babel/plugin-transform-private-methods": ^7.24.1
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.2
+    "@biom3/react": ^0.27.3
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-provider": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
@@ -34546,7 +34546,7 @@ __metadata:
   resolution: "seaport-core@https://github.com/immutable/seaport-core.git#commit=0633350ec34f21fcede657ff812f11cf7d19144e"
   dependencies:
     seaport-types: ^0.0.1
-  checksum: 392bce86bbfc4f7c00b65575b238825f4c696bddf5af08be7aa496862e63879375387fd4400f6e900ffee08d65c1f75cf3adad9c6c41ddcf7a3b0389cd73c3c7
+  checksum: d8adba0d54106c6fe9370f0775fadef2198e5eab440b36919d1f917705ce2f0a7028e4da021b6df049aa3ca35d7e673a28b78a731130f0ff9fdf7a8bd32e3b94
   languageName: node
   linkType: hard
 
@@ -34590,7 +34590,7 @@ __metadata:
     seaport-sol: ^1.5.0
     seaport-types: ^0.0.1
     solady: ^0.0.84
-  checksum: f31a7443a50fa1c35ec03ea031743d1d10896653ae443fa15ab8e6f5b4a2ca43f6743d523ae4e1f14df867451e5b2b2130b0bfa58a1085b0bcae3fceb8dfdc9b
+  checksum: a77e141e4ab5d2c4bb190a38fbb6cda3011fdf5f350b250fbeb4d82ae81cf917a966a2dcb8d9e4fd1bed29e5510ede9b15941b0ac77aeb4272dab94c9f51e7ff
   languageName: node
   linkType: hard
 
@@ -39838,7 +39838,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "x-provider-sample-app@workspace:packages/x-provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.27.2
+    "@biom3/react": ^0.27.3
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
     "@testing-library/jest-dom": ^5.16.5
