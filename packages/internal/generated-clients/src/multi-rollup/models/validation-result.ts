@@ -18,7 +18,7 @@
 import { Analysis } from './analysis';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Severity } from './severity';
+import { HighestSeverity } from './highest-severity';
 // May contain unused imports in some cases
 // @ts-ignore
 import { ValidationErrorResults } from './validation-error-results';

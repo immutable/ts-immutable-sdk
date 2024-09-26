@@ -18,7 +18,7 @@
 import { Analysis } from './analysis';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Severity } from './severity';
+import { HighestSeverity } from './highest-severity';
 // May contain unused imports in some cases
 // @ts-ignore
 import { ValidationStatus } from './validation-status';
@@ -37,10 +37,10 @@ export interface ValidationSuccessResults {
     'status': ValidationStatus;
     /**
      * 
-     * @type {Severity}
+     * @type {HighestSeverity}
      * @memberof ValidationSuccessResults
      */
-    'highestSeverity'?: Severity;
+    'highestSeverity': HighestSeverity;
     /**
      * Contains a recommended action and warnings pertaining to the simulated transaction, such as interactions with known malicious addresses
      * @type {Array<Analysis>}
