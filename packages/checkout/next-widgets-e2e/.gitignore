@@ -8,6 +8,9 @@
 
 # testing
 /coverage
+/tests/utils/local-widgets-js
+/playwright-report
+/test-results
 
 # next.js
 /.next/
