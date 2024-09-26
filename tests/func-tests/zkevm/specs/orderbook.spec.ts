@@ -20,7 +20,7 @@ import { GAS_OVERRIDES } from "../utils/orderbook/gas";
 import { waitForListingToBeOfStatus } from "../utils/orderbook/listing";
 import { RetryProvider } from "../utils/orderbook/retry-provider";
 
-describe.skip("Orderbook", () => {
+describe("Orderbook", () => {
   const imxForApproval = 0.03 * 1e18;
   const imxForFulfillment = 0.08 * 1e18;
   const transferTxnFee = 0.0035 * 1e18;
