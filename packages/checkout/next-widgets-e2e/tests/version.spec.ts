@@ -1,45 +1,14 @@
 import { test, expect } from "@playwright/test";
 import fs from 'fs';
 import path from 'path';
+import { interceptWidgets } from "./utils/intercept-widgets";
 
 const useLocalBundle = true;
 
 test.beforeEach(async ({ page }) => {
   if (useLocalBundle) {
-  await page.route('**/@imtbl/sdk@*/dist/browser/checkout/**', async route => {
-    const url = new URL(route.request().url());
-    const fileName = path.basename(url.pathname);
-    let filePath = path.join(__dirname, 'public/lib/js', fileName);
-
-    // Special case for widgets-esm.js
-    if (fileName === 'widgets-esm.js') {
-      filePath = path.join(__dirname, 'public/lib/js', 'index.js');
-    }
-
-    console.log('Attempting to read file:', filePath);
-
-    try {
-      if (fs.existsSync(filePath)) {
-        const fileContent = fs.readFileSync(filePath, 'utf8');
-        console.log('File content length:', fileContent.length);
-
-        // Fulfill the request with your local file content
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/javascript',
-          body: fileContent
-        });
-        console.log('Request fulfilled with local file:', fileName);
-      } else {
-        console.error('File does not exist:', filePath);
-        await route.continue(); // Continue with the original request if file doesn't exist
-      }
-    } catch (error) {
-      console.error('Error reading file:', error);
-      await route.continue(); // Continue with the original request if there's an error
-    }
-  });
-}
+    await interceptWidgets(page);
+  }
 
   await page.goto("/version");
 });
