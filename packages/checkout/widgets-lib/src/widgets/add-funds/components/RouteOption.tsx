@@ -1,13 +1,15 @@
 import {
   MenuItem, MenuItemSize, Sticker,
 } from '@biom3/react';
-import { ReactElement } from 'react';
+import { ReactElement, useMemo } from 'react';
+import { ethers } from 'ethers';
 import { Chain, RouteData } from '../types';
 
 export interface RouteOptionProps<RC extends ReactElement | undefined = undefined> {
   route: RouteData;
-  chain: Chain | undefined;
-  onClick: (route: RouteData) => void;
+  onClick?: (route: RouteData) => void;
+  chain?: Chain;
+  usdBalance?: string;
   disabled?: boolean;
   size?: MenuItemSize;
   rc?: RC;
@@ -15,21 +17,35 @@ export interface RouteOptionProps<RC extends ReactElement | undefined = undefine
 
 export function RouteOption<RC extends ReactElement | undefined = undefined>({
   route,
-  chain,
   onClick,
+  chain,
+  usdBalance,
   disabled = false,
   size,
   rc = <span />,
 }: RouteOptionProps<RC>) {
-  const handleClick = () => onClick(route);
+  const { fromToken } = route.amountData;
+
+  const { estimate } = route.route.route;
+
+  const formattedFromAmount = useMemo(() => Number(ethers.utils.formatUnits(
+    estimate.fromAmount,
+    estimate.fromToken.decimals,
+  )).toFixed(4), [estimate.fromAmount, estimate.fromToken.decimals]);
+
+  const formattedUsdBalance = useMemo(() => (usdBalance ? Number(usdBalance).toFixed(2) : undefined), [usdBalance]);
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick(route);
+    }
+  };
 
   const menuItemProps = {
     disabled,
     emphasized: true,
     onClick: disabled ? undefined : handleClick,
   };
-
-  const { fromToken, balance } = route.amountData;
 
   return (
     <MenuItem
@@ -46,13 +62,12 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
       {...menuItemProps}
     >
       <MenuItem.Label weight="bold">{fromToken.name}</MenuItem.Label>
-      <MenuItem.Caption>
-        Balance:
-        {' '}
-        {balance.balance}
 
-        {fromToken.symbol}
+      {formattedUsdBalance && (
+      <MenuItem.Caption>
+        {`Balance: $${formattedUsdBalance}`}
       </MenuItem.Caption>
+      )}
 
       {chain && (
       <Sticker position={{ x: 'right', y: 'bottom' }}>
@@ -61,11 +76,19 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
           sx={{ w: 'base.icon.size.200' }}
         />
 
-        <MenuItem.FramedImage use={<img src={fromToken.logoURI} alt={fromToken.name} />} />
+        <MenuItem.FramedImage
+          use={<img src={fromToken.logoURI} alt={fromToken.name} />}
+        />
       </Sticker>
       )}
 
-      {!disabled && <MenuItem.IntentIcon />}
+      {formattedFromAmount && estimate.fromAmountUSD && (
+      <MenuItem.PriceDisplay price={formattedFromAmount}>
+        <MenuItem.PriceDisplay.Caption>
+          {`USD $${estimate.fromAmountUSD}`}
+        </MenuItem.PriceDisplay.Caption>
+      </MenuItem.PriceDisplay>
+      )}
 
     </MenuItem>
   );
