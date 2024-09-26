@@ -1,5 +1,7 @@
-import { IconProps, MenuItem, MenuItemSize } from '@biom3/react';
-import { ReactElement } from 'react';
+import {
+  type AllDualVariantIconKeys, MenuItem, type MenuItemSize,
+} from '@biom3/react';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export enum OptionTypes {
@@ -27,7 +29,7 @@ export function Option<RC extends ReactElement | undefined = undefined>({
 }: OptionProps<RC>) {
   const { t } = useTranslation();
 
-  const icon: Record<OptionTypes, IconProps['icon']> = {
+  const icon: Record<OptionTypes, AllDualVariantIconKeys> = {
     [OptionTypes.SWAP]: 'Coins',
     [OptionTypes.DEBIT]: 'BankCard',
     [OptionTypes.CREDIT]: 'BankCard',

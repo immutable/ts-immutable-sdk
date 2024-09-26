@@ -1,4 +1,4 @@
-import { IconProps, MenuItem, MenuItemSize } from '@biom3/react';
+import { AllDualVariantIconKeys, MenuItem, MenuItemSize } from '@biom3/react';
 import { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiatOptionType } from '../types';
@@ -20,7 +20,7 @@ export function FiatOption<RC extends ReactElement | undefined = undefined>({
 }: FiatOptionProps<RC>) {
   const { t } = useTranslation();
 
-  const icon: Record<FiatOptionType, IconProps['icon']> = {
+  const icon: Record<FiatOptionType, AllDualVariantIconKeys> = {
     [FiatOptionType.DEBIT]: 'BankCard',
     [FiatOptionType.CREDIT]: 'BankCard',
   };
