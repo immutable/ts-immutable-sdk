@@ -11,6 +11,7 @@ export interface RouteOptionProps<RC extends ReactElement | undefined = undefine
   chain?: Chain;
   usdBalance?: string;
   disabled?: boolean;
+  isFastest?: boolean;
   size?: MenuItemSize;
   rc?: RC;
 }
@@ -21,6 +22,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
   chain,
   usdBalance,
   disabled = false,
+  isFastest = false,
   size,
   rc = <span />,
 }: RouteOptionProps<RC>) {
@@ -88,6 +90,10 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
           {`USD $${estimate.fromAmountUSD}`}
         </MenuItem.PriceDisplay.Caption>
       </MenuItem.PriceDisplay>
+      )}
+
+      {isFastest && (
+      <MenuItem.Badge badgeContent="Fastest" variant="emphasis" />
       )}
 
     </MenuItem>

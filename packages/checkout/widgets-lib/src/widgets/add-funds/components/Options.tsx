@@ -10,6 +10,7 @@ import { FiatOption } from './FiatOption';
 import { Chain, FiatOptionType, RouteData } from '../types';
 import { RouteOption } from './RouteOption';
 import { convertTokenBalanceToUsd } from '../functions/convertTokenBalanceToUsd';
+import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
 
 const defaultFiatOptions: FiatOptionType[] = [
   FiatOptionType.DEBIT,
@@ -49,6 +50,48 @@ export function Options(props: OptionsProps) {
     }
   };
 
+  const sortedRoutes = sortRoutesByFastestTime(routes);
+
+  const fastestRoute = sortedRoutes?.[0];
+
+  const routeOptions = sortedRoutes
+    ? sortedRoutes.map((route: RouteData) => {
+      const { fromToken } = route.amountData;
+
+      const chain = chains?.find((c) => c.id === fromToken.chainId);
+      const balance = balances?.find(
+        (bal) => bal.address === fromToken.address && bal.chainId === fromToken.chainId,
+      );
+
+      const usdBalance = getUsdBalance(balance, route);
+
+      return (
+        <RouteOption
+          key={`route-option-${fromToken.chainId}-${fromToken.address}`}
+          chain={chain}
+          route={route}
+          usdBalance={usdBalance}
+          onClick={onRouteClick}
+          isFastest={route === fastestRoute}
+          size={size}
+          rc={<motion.div variants={listItemVariants} />}
+        />
+      );
+    })
+    : <Body>Loading routes...</Body>;
+
+  const fiatOptions = showOnrampOption
+    ? defaultFiatOptions.map((type, idx) => (
+      <FiatOption
+        key={`fiat-option-${type}`}
+        type={type}
+        size={size}
+        onClick={onCardClick}
+        rc={<motion.div custom={idx} variants={listItemVariants} />}
+      />
+    ))
+    : null;
+
   return (
     <Box
       testId="options-list"
@@ -59,44 +102,10 @@ export function Options(props: OptionsProps) {
         justifyContent: 'center',
         alignItems: 'flex-start',
       }}
-      rc={
-        <motion.div variants={listVariants} initial="hidden" animate="show" />
-      }
+      rc={<motion.div variants={listVariants} initial="hidden" animate="show" />}
     >
-      {!routes && <Body>Loading...</Body>}
-
-      {routes?.map((route: RouteData) => {
-        const { fromToken } = route.amountData;
-
-        const chain = chains?.find((c) => c.id === fromToken.chainId);
-
-        const balance = balances?.find(
-          (bal) => bal.address === fromToken.address && bal.chainId === fromToken.chainId,
-        );
-
-        const usdBalance = getUsdBalance(balance, route);
-        return (
-          <RouteOption
-            key={`route-option-${route.amountData.fromToken.chainId}-${route.amountData.fromToken.address}`}
-            chain={chain}
-            route={route}
-            usdBalance={usdBalance}
-            onClick={onRouteClick}
-            size={size}
-            rc={<motion.div variants={listItemVariants} />}
-          />
-        );
-      })}
-
-      {showOnrampOption && defaultFiatOptions.map((type, idx: number) => (
-        <FiatOption
-          key={`fiat-option-${type}`}
-          type={type}
-          size={size}
-          onClick={onCardClick}
-          rc={<motion.div custom={idx} variants={listItemVariants} />}
-        />
-      ))}
+      {routeOptions}
+      {fiatOptions}
     </Box>
   );
 }
