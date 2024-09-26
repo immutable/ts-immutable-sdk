@@ -7,8 +7,8 @@ import type {Config} from 'jest';
 
 const config: Config = {
   rootDir: ".",
-  testMatch:["**/*.steps.ts"],
-  testTimeout: 60000,
+  testMatch:["**/*.steps.ts", "**/*.spec.ts"],
+  testTimeout: 120000,
   roots: ["step-definitions"],
   moduleDirectories: ["node_modules", "<rootDir>"],
   moduleNameMapper: {

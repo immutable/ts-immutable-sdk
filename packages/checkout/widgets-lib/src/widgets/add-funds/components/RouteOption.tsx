@@ -38,9 +38,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
   const formattedUsdBalance = useMemo(() => (usdBalance ? Number(usdBalance).toFixed(2) : undefined), [usdBalance]);
 
   const handleClick = () => {
-    if (onClick) {
-      onClick(route);
-    }
+    onClick?.(route);
   };
 
   const menuItemProps = {

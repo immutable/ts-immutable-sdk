@@ -2,15 +2,18 @@ import {
   anything, deepEqual, instance, mock, when,
 } from 'ts-mockito';
 import type { TransactionMethods } from '@opensea/seaport-js/lib/utils/usecase';
-import { ContractTransaction } from 'ethers-v6';
+import { ContractTransaction, ZeroHash, ZeroAddress } from 'ethers-v6';
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
 import type {
   ApprovalAction,
+  ConsiderationItem,
   CreateOrderAction,
   ExchangeAction,
+  OfferItem,
   OrderComponents,
 } from '@opensea/seaport-js/lib/types';
 import { BigNumber, providers } from 'ethers';
+import { OrderType } from '@opensea/seaport-js/lib/constants';
 import {
   ActionType,
   TransactionAction,
@@ -43,12 +46,6 @@ describe('Seaport', () => {
       let sut: Seaport;
 
       const network = 1;
-      const orderComponents = { salt: '123' } as OrderComponents;
-      // Salt is encoded as hex from original order components, so use this
-      // to compare against the expected order components
-      const orderComponentsWithHexSalt = {
-        salt: BigNumber.from(orderComponents.salt).toHexString(),
-      };
 
       const zoneAddress = randomAddress();
       const seaportContractAddress = randomAddress();
@@ -69,6 +66,66 @@ describe('Seaport', () => {
       const orderExpiry = new Date();
       const orderHash = randomAddress();
 
+      const orderComponents: OrderComponents = {
+        orderType: OrderType.FULL_RESTRICTED,
+        offerer,
+        offer: [
+          {
+            itemType: ItemType.ERC721,
+            token: listingItem.contractAddress,
+            identifierOrCriteria: listingItem.tokenId,
+            startAmount: '1',
+            endAmount: '1',
+          },
+        ],
+        consideration: [
+          {
+            itemType: ItemType.ERC20,
+            token: considerationItem.contractAddress,
+            identifierOrCriteria: '0',
+            startAmount: considerationItem.amount,
+            endAmount: considerationItem.amount,
+            recipient: offerer,
+          },
+        ],
+        startTime: (orderStart.getTime() / 1000).toFixed(0),
+        endTime: (orderExpiry.getTime() / 1000).toFixed(0),
+        salt: BigNumber.from('123').toHexString(),
+        counter: 0,
+        zone: zoneAddress,
+        zoneHash: ZeroHash,
+        conduitKey: ZeroHash,
+        totalOriginalConsiderationItems: 1,
+      };
+
+      const orderComponentsMessage: Omit<OrderComponents, 'orderType' | 'offer' | 'consideration'> & {
+        orderType: string;
+        offer: (Omit<OfferItem, 'itemType'> & { itemType: string })[];
+        consideration: (Omit<ConsiderationItem, 'itemType'> & { itemType: string })[];
+      } = {
+        ...orderComponents,
+        orderType: OrderType.FULL_RESTRICTED.toString(),
+        offer: [
+          {
+            itemType: ItemType.ERC721.toString(),
+            token: listingItem.contractAddress,
+            identifierOrCriteria: listingItem.tokenId,
+            startAmount: '1',
+            endAmount: '1',
+          },
+        ],
+        consideration: [
+          {
+            itemType: ItemType.ERC20.toString(),
+            token: considerationItem.contractAddress,
+            identifierOrCriteria: '0',
+            startAmount: considerationItem.amount,
+            endAmount: considerationItem.amount,
+            recipient: offerer,
+          },
+        ],
+      };
+
       beforeEach(() => {
         const mockedSeaportJs = mock(SeaportLib);
         const mockedSeaportLibFactory = mock(SeaportLibFactory);
@@ -85,10 +142,10 @@ describe('Seaport', () => {
           instance(mockedSeaportJs),
         );
         when(
-          mockedSeaportJs.getOrderHash(deepEqual(orderComponentsWithHexSalt as OrderComponents)),
+          mockedSeaportJs.getOrderHash(deepEqual(orderComponents)),
         ).thenReturn(orderHash);
         when(createAction.getMessageToSign()).thenReturn(
-          Promise.resolve(JSON.stringify({ message: orderComponents })),
+          Promise.resolve(JSON.stringify({ message: orderComponentsMessage })),
         );
         when(
           mockedSeaportJs.createOrder(
@@ -167,7 +224,7 @@ describe('Seaport', () => {
         expect(signableAction.message).toEqual({
           domain: domainData,
           types: EIP_712_ORDER_TYPE,
-          value: orderComponentsWithHexSalt,
+          value: orderComponents,
         });
       });
 
@@ -180,7 +237,7 @@ describe('Seaport', () => {
           orderStart,
           orderExpiry,
         );
-        expect(orderComponentsRes).toEqual(orderComponentsWithHexSalt);
+        expect(orderComponentsRes).toEqual(orderComponents);
       });
 
       it('returns the expected order hash', async () => {
@@ -200,12 +257,6 @@ describe('Seaport', () => {
       let sut: Seaport;
 
       const network = 1;
-      const orderComponents = { salt: '123' } as OrderComponents;
-      // Salt is encoded as hex from original order components, so use this
-      // to compare against the expected order components
-      const orderComponentsWithHexSalt = {
-        salt: BigNumber.from(orderComponents.salt).toHexString(),
-      };
 
       const zoneAddress = randomAddress();
       const seaportContractAddress = randomAddress();
@@ -224,6 +275,67 @@ describe('Seaport', () => {
       const orderStart = new Date();
       const orderExpiry = new Date();
       const orderHash = randomAddress();
+
+      const orderComponents: OrderComponents = {
+        orderType: OrderType.FULL_RESTRICTED,
+        offerer,
+        offer: [
+          {
+            itemType: ItemType.ERC721,
+            token: listingItem.contractAddress,
+            identifierOrCriteria: listingItem.tokenId,
+            startAmount: '1',
+            endAmount: '1',
+          },
+        ],
+        consideration: [
+          {
+            itemType: ItemType.NATIVE,
+            token: ZeroAddress,
+            identifierOrCriteria: '0',
+            startAmount: considerationItem.amount,
+            endAmount: considerationItem.amount,
+            recipient: offerer,
+          },
+        ],
+        startTime: (orderStart.getTime() / 1000).toFixed(0),
+        endTime: (orderExpiry.getTime() / 1000).toFixed(0),
+        salt: BigNumber.from('123').toHexString(),
+        counter: 0,
+        zone: zoneAddress,
+        zoneHash: ZeroHash,
+        conduitKey: ZeroHash,
+        totalOriginalConsiderationItems: 1,
+      };
+
+      const orderComponentsMessage: Omit<OrderComponents, 'orderType' | 'offer' | 'consideration'> & {
+        orderType: string;
+        offer: (Omit<OfferItem, 'itemType'> & { itemType: string })[];
+        consideration: (Omit<ConsiderationItem, 'itemType'> & { itemType: string })[];
+      } = {
+        ...orderComponents,
+        orderType: OrderType.FULL_RESTRICTED.toString(),
+        offer: [
+          {
+            itemType: ItemType.ERC721.toString(),
+            token: listingItem.contractAddress,
+            identifierOrCriteria: listingItem.tokenId,
+            startAmount: '1',
+            endAmount: '1',
+          },
+        ],
+        consideration: [
+          {
+            itemType: ItemType.NATIVE.toString(),
+            token: ZeroAddress,
+            identifierOrCriteria: '0',
+            startAmount: considerationItem.amount,
+            endAmount: considerationItem.amount,
+            recipient: offerer,
+          },
+        ],
+      };
+
       const approvalGas = BigInt(1000000);
       const approvalTransaction: ContractTransaction = {
         from: offerer,
@@ -240,7 +352,7 @@ describe('Seaport', () => {
         const createActionInstance = instance(createAction);
         createActionInstance.type = 'create';
         when(createAction.getMessageToSign()).thenReturn(
-          Promise.resolve(JSON.stringify({ message: orderComponents })),
+          Promise.resolve(JSON.stringify({ message: orderComponentsMessage })),
         );
 
         const transactionMethods = mock<TransactionMethods<any>>();
@@ -260,7 +372,7 @@ describe('Seaport', () => {
           instance(mockedSeaportJs),
         );
         when(
-          mockedSeaportJs.getOrderHash(deepEqual(orderComponentsWithHexSalt as OrderComponents)),
+          mockedSeaportJs.getOrderHash(deepEqual(orderComponents)),
         ).thenReturn(orderHash);
         when(
           mockedSeaportJs.createOrder(
@@ -346,7 +458,7 @@ describe('Seaport', () => {
         expect(signableAction.message).toEqual({
           domain: domainData,
           types: EIP_712_ORDER_TYPE,
-          value: orderComponentsWithHexSalt,
+          value: orderComponents,
         });
       });
 
@@ -359,7 +471,7 @@ describe('Seaport', () => {
           orderStart,
           orderExpiry,
         );
-        expect(orderComponentsRes).toEqual(orderComponentsWithHexSalt);
+        expect(orderComponentsRes).toEqual(orderComponents);
       });
 
       it('returns the expected order hash', async () => {
