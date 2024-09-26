@@ -3336,12 +3336,6 @@
             "description": "The account address of the owner of the NFT",
             "example": "0x5a019874f4fae314b0eaa4606be746366e661306"
           },
-          "quantity": {
-            "type": "string",
-            "description": "(deprecated - use balance instead) The quantity of owned tokens (uint256 as string)",
-            "example": "1",
-            "deprecated": true
-          },
           "balance": {
             "type": "string",
             "description": "The amount of owned tokens (uint256 as string)",
@@ -3359,7 +3353,6 @@
           "contract_address",
           "token_id",
           "account_address",
-          "quantity",
           "balance"
         ]
       },
@@ -3384,12 +3377,6 @@
             "description": "The account address of the owner of the NFT",
             "example": "0x5a019874f4fae314b0eaa4606be746366e661306"
           },
-          "quantity": {
-            "type": "string",
-            "description": "(deprecated - use balance instead) The quantity of owned tokens (uint256 as string)",
-            "example": "1",
-            "deprecated": true
-          },
           "balance": {
             "type": "string",
             "description": "The amount of owned tokens (uint256 as string)",
@@ -3407,7 +3394,6 @@
           "contract_address",
           "token_id",
           "account_address",
-          "quantity",
           "balance",
           "updated_at"
         ]
