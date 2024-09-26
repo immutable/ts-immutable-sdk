@@ -42,26 +42,20 @@ export const useExecute = () => {
   const approve = async (
     provider: Web3Provider,
     routeResponse: RouteResponse,
-  ): Promise<boolean> => {
+  ): Promise<void> => {
     try {
-      if (isSquidNativeToken(routeResponse?.route?.params.fromToken)) {
-        return true;
-      }
+      if (!isSquidNativeToken(routeResponse?.route?.params.fromToken)) {
+        const fromToken = routeResponse?.route.params.fromToken;
+        const erc20Abi = [
+          'function approve(address spender, uint256 amount) public returns (bool)',
+        ];
+        const signer = provider.getSigner();
+        const tokenContract = new ethers.Contract(fromToken, erc20Abi, signer);
 
-      const transactionRequestTarget = routeResponse?.route?.transactionRequest?.target;
-      const fromToken = routeResponse?.route.params.fromToken;
-      const fromAmount = routeResponse?.route.params.fromAmount;
-      const signer = provider.getSigner();
-      const erc20Abi = [
-        'function approve(address spender, uint256 amount) public returns (bool)',
-      ];
-      const tokenContract = new ethers.Contract(fromToken, erc20Abi, signer);
-      try {
+        const transactionRequestTarget = routeResponse?.route?.transactionRequest?.target;
+        const fromAmount = routeResponse?.route.params.fromAmount;
         const tx = await tokenContract.approve(transactionRequestTarget, fromAmount);
         await tx.wait();
-        return true;
-      } catch (error) {
-        return false;
       }
     } catch (e) {
       throw Error('Error approving tokens');
