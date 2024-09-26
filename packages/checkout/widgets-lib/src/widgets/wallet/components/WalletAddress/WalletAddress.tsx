@@ -107,7 +107,7 @@ export function WalletAddress({
           }}
         />
       )}
-      
+
       <MenuItem.Label>{t('views.SETTINGS.walletAddress.label')}</MenuItem.Label>
       <MenuItem.Caption testId="wallet-address">
         {abbreviateWalletAddress(walletAddress)}

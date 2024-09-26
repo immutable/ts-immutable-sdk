@@ -9,7 +9,7 @@ import {
   signAndSubmitApproval,
   signListing,
   createListing,
-} from "@/app/utils/listing";
+} from "../utils/listing";
 import {
   Box,
   Select,
@@ -70,10 +70,10 @@ export default function CreateERC721ListingWithPassport() {
   const [buyItemAmount, setBuyItemAmountState] = useState<string>("");
 
   // setup the listing creation success message state
-  const [successMessage, setSuccessMessageState] = useState<any>(null);
+  const [successMessage, setSuccessMessageState] = useState<string | null>(null);
 
   // setup the listing creation error message state
-  const [listingError, setListingErrorState] = useState<any>(null);
+  const [listingError, setListingErrorState] = useState<string | null>(null);
 
   const passportLogin = async () => {
     if (web3Provider.provider.request) {

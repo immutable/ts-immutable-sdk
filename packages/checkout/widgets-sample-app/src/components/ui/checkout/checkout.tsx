@@ -218,8 +218,17 @@ function CheckoutUI() {
   // ignore language or theme changes
   const widgetsFactory = useAsyncMemo(
     async () => new WidgetsFactory(checkoutSdk, { theme, language }),
-    []
+    [checkoutSdk]
   );
+
+  // setup widgets factory using a local widgets bundle, after building with build:local
+  // see packages/checkout/widgets-lib/README.md
+  // const widgetsFactory = useAsyncMemo(
+  //   () => checkoutSdk?.widgets({ config: { theme, language } }),
+  //   [checkoutSdk]
+  // );
+
+
 
   // know connected wallet type
   const isMetamask = web3Provider?.provider?.isMetaMask;

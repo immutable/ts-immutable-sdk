@@ -18,7 +18,7 @@ const transferTxnFee = 0.0035 * 1e18;
 
 // Workaround to retry banker on-chain actions which can race with test runs on other PRs
 // eslint-disable-next-line consistent-return
-async function withBankerRetry(func: () => Promise<void>, attempt = 1): Promise<void> {
+export async function withBankerRetry(func: () => Promise<void>, attempt = 1): Promise<void> {
   try {
     await func();
   } catch (e) {
@@ -142,6 +142,7 @@ export const whenICreateAListing = (
         type: 'NATIVE',
       },
       sell: sellItem,
+      orderStart: new Date(2000, 1, 15),
     });
 
     const signatures = await actionAll(listing.actions, offerer);
@@ -190,6 +191,7 @@ export const whenICreateABulkListing = (
         },
         sell: sellItem,
         makerFees: [],
+        orderStart: new Date(2000, 1, 15),
       });
     }
 
