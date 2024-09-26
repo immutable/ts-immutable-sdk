@@ -88,6 +88,7 @@
       "packages/internal/bridge/bridge-sample-app",
       "packages/checkout/sdk",
       "packages/checkout/sdk-sample-app",
+      "packages/checkout/next-widgets-e2e",
       "packages/checkout/widgets-sample-app",
       "packages/checkout/widgets-lib",
       "packages/blockchain-data/sdk",
