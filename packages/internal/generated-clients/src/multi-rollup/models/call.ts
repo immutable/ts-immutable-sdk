@@ -17,23 +17,26 @@
 /**
  * 
  * @export
- * @interface ActiveOrderStatus
+ * @interface Call
  */
-export interface ActiveOrderStatus {
+export interface Call {
     /**
-     * The order status that indicates an order can be fulfilled.
+     * An Ethereum address
      * @type {string}
-     * @memberof ActiveOrderStatus
+     * @memberof Call
      */
-    'name': ActiveOrderStatusNameEnum;
+    'target_address': string;
+    /**
+     * The function signature
+     * @type {string}
+     * @memberof Call
+     */
+    'function_signature': string;
+    /**
+     * The function arguments
+     * @type {Array<string>}
+     * @memberof Call
+     */
+    'function_args': Array<string>;
 }
-
-/**
-    * @export
-    * @enum {string}
-    */
-export enum ActiveOrderStatusNameEnum {
-    Active = 'ACTIVE'
-}
-
 
