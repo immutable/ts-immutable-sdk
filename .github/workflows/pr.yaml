@@ -56,11 +56,20 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
 
-      - name: setup
+      - name: Setup
         uses: ./.github/actions/setup
+
+      - name: Build SDK
+        run: pnpm build
+
+      - name: Prepare SDK
+        run: pnpm prepare:sdk
         
       - name: Prepare examples
         run: pnpm prepare:examples
+
+      - name: Update modules
+        run: pnpm install --frozen-lockfile=false
 
       - name: Build examples
         run: pnpm build:examples
