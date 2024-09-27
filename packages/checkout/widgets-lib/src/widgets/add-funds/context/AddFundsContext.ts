@@ -8,19 +8,19 @@ import { Chain } from '../types';
 export interface AddFundsState {
   checkout: Checkout | null;
   provider: Web3Provider | null;
-  allowedTokens: TokenInfo[];
+  allowedTokens: TokenInfo[] | null;
   squid: Squid | null;
-  chains: Chain[];
-  balances: TokenBalance[];
+  chains: Chain[] | null;
+  balances: TokenBalance[] | null;
 }
 
 export const initialAddFundsState: AddFundsState = {
   checkout: null,
   provider: null,
-  allowedTokens: [],
+  allowedTokens: null,
   squid: null,
-  chains: [],
-  balances: [],
+  chains: null,
+  balances: null,
 };
 
 export interface AddFundsContextState {

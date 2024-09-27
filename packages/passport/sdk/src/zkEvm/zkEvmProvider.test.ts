@@ -10,7 +10,7 @@ import { RelayerClient } from './relayerClient';
 import { Provider, RequestArguments } from './types';
 import { PassportEventMap, PassportEvents } from '../types';
 import TypedEventEmitter from '../utils/typedEventEmitter';
-import { mockUserZkEvm, testConfig } from '../test/mocks';
+import { mockUser, mockUserZkEvm, testConfig } from '../test/mocks';
 import { signTypedDataV4 } from './signTypedDataV4';
 import MagicAdapter from '../magicAdapter';
 
@@ -62,13 +62,91 @@ describe('ZkEvmProvider', () => {
     return new ZkEvmProvider(constructorParameters as ZkEvmProviderInput);
   };
 
-  describe('eth_requestAccounts', () => {
-    it('constructor tries to automatically connect existing user session when provider is instantiated', async () => {
-      authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
-      getProvider();
-      expect(authManager.getUser).toHaveBeenCalledTimes(1);
+  describe('constructor', () => {
+    describe('when an application session exists', () => {
+      it('initialises the signer', async () => {
+        authManager.getUser.mockResolvedValue(mockUserZkEvm);
+        getProvider();
+
+        await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
+
+        expect(authManager.getUser).toBeCalledTimes(1);
+        expect(magicAdapter.login).toBeCalledTimes(1);
+        expect(Web3Provider).toBeCalledTimes(1);
+      });
+
+      describe('and the user has not registered before', () => {
+        it('does not call session activity', async () => {
+          const onAccountsRequested = jest.fn();
+          passportEventEmitter.on(PassportEvents.ACCOUNTS_REQUESTED, onAccountsRequested);
+          authManager.getUser.mockResolvedValue(mockUser);
+          getProvider();
+
+          await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
+
+          expect(authManager.getUser).toBeCalledTimes(1);
+          expect(onAccountsRequested).not.toHaveBeenCalled();
+        });
+      });
+      describe('and the user has registered before', () => {
+        it('calls session activity', async () => {
+          const onAccountsRequested = jest.fn();
+          passportEventEmitter.on(PassportEvents.ACCOUNTS_REQUESTED, onAccountsRequested);
+          authManager.getUser.mockResolvedValue(mockUserZkEvm);
+          getProvider();
+
+          await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
+
+          expect(authManager.getUser).toBeCalledTimes(1);
+          expect(onAccountsRequested).toHaveBeenCalledTimes(1);
+        });
+      });
     });
 
+    describe('when a login occurs outside of the zkEvm provider', () => {
+      beforeEach(() => {
+        authManager.getUser.mockResolvedValue(null);
+      });
+
+      it('initialises the signer', async () => {
+        getProvider();
+        passportEventEmitter.emit(PassportEvents.LOGGED_IN, mockUserZkEvm);
+
+        await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
+
+        expect(magicAdapter.login).toBeCalledTimes(1);
+        expect(Web3Provider).toBeCalledTimes(1);
+      });
+
+      describe('and the user has not registered before', () => {
+        it('does not call session activity', async () => {
+          const onAccountsRequested = jest.fn();
+          passportEventEmitter.on(PassportEvents.ACCOUNTS_REQUESTED, onAccountsRequested);
+          getProvider();
+          passportEventEmitter.emit(PassportEvents.LOGGED_IN, mockUser);
+
+          await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
+
+          expect(onAccountsRequested).not.toHaveBeenCalled();
+        });
+
+        describe('and the user has registered before', () => {
+          it('calls session activity', async () => {
+            const onAccountsRequested = jest.fn();
+            passportEventEmitter.on(PassportEvents.ACCOUNTS_REQUESTED, onAccountsRequested);
+            getProvider();
+            passportEventEmitter.emit(PassportEvents.LOGGED_IN, mockUserZkEvm);
+
+            await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
+
+            expect(onAccountsRequested).toHaveBeenCalledTimes(1);
+          });
+        });
+      });
+    });
+  });
+
+  describe('eth_requestAccounts', () => {
     it('should return the ethAddress if already logged in', async () => {
       authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
       const provider = getProvider();
@@ -103,7 +181,7 @@ describe('ZkEvmProvider', () => {
 
     it('should throw an error if the signer initialisation fails', async () => {
       authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
-      authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+      authManager.getUser.mockResolvedValue(mockUserZkEvm);
 
       (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
         getSigner: () => {
@@ -116,6 +194,24 @@ describe('ZkEvmProvider', () => {
       await expect(provider.request({ method: 'eth_sendTransaction' })).rejects.toThrow(
         new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Something went wrong'),
       );
+    });
+
+    it('should not reinitialise the ethSigner when it has been set during the constructor', async () => {
+      authManager.getUser.mockResolvedValue(mockUserZkEvm);
+      const provider = getProvider();
+
+      await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
+
+      expect(magicAdapter.login).toBeCalledTimes(1);
+      expect(Web3Provider).toBeCalledTimes(1);
+
+      await provider.request({ method: 'eth_requestAccounts' });
+
+      // Add a delay so that we can check if the ethSigner is initialised again
+      await new Promise(process.nextTick);
+
+      expect(magicAdapter.login).toBeCalledTimes(1);
+      expect(Web3Provider).toBeCalledTimes(1);
     });
   });
 

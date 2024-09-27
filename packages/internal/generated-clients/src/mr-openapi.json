@@ -86,6 +86,21 @@
       "name": "passport profile",
       "description": "Passport Profile endpoints",
       "x-displayName": "passport profile"
+    },
+    {
+      "name": "guardian",
+      "description": "Guardian endpoints",
+      "x-displayName": "guardian"
+    },
+    {
+      "name": "pricing",
+      "description": "Pricing Endpoints",
+      "x-displayName": "pricing"
+    },
+    {
+      "name": "stacks",
+      "description": "Stacks Endpoints",
+      "x-displayName": "stacks"
     }
   ],
   "paths": {
@@ -2174,6 +2189,78 @@
         }
       }
     },
+    "/v1/chains/{chain_name}/crafting/sign": {
+      "post": {
+        "description": "Sign a crafting payload",
+        "tags": [
+          "crafting"
+        ],
+        "operationId": "SignCraftingPayload",
+        "summary": "Sign a crafting payload",
+        "security": [
+          {
+            "ImmutableApiKey": [
+              "create:collections"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The request body",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignCraftingRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignCraftingResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/v1/chains/{chain_name}/orders/cancel": {
       "post": {
         "tags": [
@@ -2468,8 +2555,8 @@
         "tags": [
           "orders"
         ],
-        "summary": "List a paginated array of bids with optional filter parameters",
-        "description": "List a paginated array of bids with optional filter parameters",
+        "summary": "List all bids",
+        "description": "List all bids",
         "operationId": "ListBids",
         "parameters": [
           {
@@ -2681,6 +2768,202 @@
         }
       }
     },
+    "/v1/chains/{chain_name}/orders/collection-bids": {
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "List all collection bids",
+        "description": "List all collection bids",
+        "operationId": "ListCollectionBids",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Order status to filter by",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/OrderStatusName"
+            }
+          },
+          {
+            "name": "buy_item_contract_address",
+            "in": "query",
+            "description": "Buy item contract address to filter by",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "name": "sell_item_contract_address",
+            "in": "query",
+            "description": "Sell item contract address to filter by",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "name": "account_address",
+            "in": "query",
+            "description": "The account address of the user who created the bid",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "0xc49Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "name": "from_updated_at",
+            "in": "query",
+            "description": "From updated at including given date",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2022-03-09T05:00:50.52Z"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "Maximum number of orders to return per page",
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "description": "Order field to sort by. `sell_item_amount` sorts by per token price, for example if 10eth is offered for 5 ERC1155 items, it’s sorted as 2eth for `sell_item_amount`.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "created_at",
+                "updated_at",
+                "sell_item_amount"
+              ],
+              "description": "Order field to sort by",
+              "example": "created_at"
+            },
+            "example": "created_at"
+          },
+          {
+            "name": "sort_direction",
+            "in": "query",
+            "description": "Ascending or descending direction for sort",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "description": "Ascending or descending direction for sort",
+              "example": "asc"
+            },
+            "example": "asc"
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListCollectionBidsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Create a collection bid",
+        "description": "Create a collection bid",
+        "operationId": "CreateCollectionBid",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCollectionBidRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionBidResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "501": {
+            "$ref": "#/components/responses/NotImplementedError"
+          }
+        }
+      }
+    },
     "/v1/chains/{chain_name}/orders/listings/{listing_id}": {
       "get": {
         "tags": [
@@ -2771,6 +3054,59 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BidResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/orders/collection-bids/{collection_bid_id}": {
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Get a single collection bid by ID",
+        "description": "Get a single collection bid by ID",
+        "operationId": "GetCollectionBid",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          },
+          {
+            "name": "collection_bid_id",
+            "in": "path",
+            "description": "Global Collection Bid identifier",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Global Collection Bid identifier",
+              "example": "018792C9-4AD7-8EC4-4038-9E05C598534A"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionBidResult"
                 }
               }
             }
@@ -3739,6 +4075,785 @@
           }
         }
       }
+    },
+    "/guardian/v1/transactions/{id}/evaluate": {
+      "post": {
+        "x-internal": true,
+        "security": [
+          {
+            "BearerAuth": [
+              "transact"
+            ]
+          }
+        ],
+        "tags": [
+          "guardian"
+        ],
+        "summary": "Evaluate a transaction",
+        "description": "Check if the transaction is valid by transaction ID for both StarkEx and EVM",
+        "operationId": "evaluateTransaction",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TransactionId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Specifies the kind of transaction",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransactionEvaluationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Expected response to a valid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionEvaluationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ConflictError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError409"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guardian/v1/messages/evaluate": {
+      "post": {
+        "x-internal": true,
+        "security": [
+          {
+            "BearerAuth": [
+              "transact"
+            ]
+          }
+        ],
+        "tags": [
+          "guardian"
+        ],
+        "summary": "Evaluate an evm message to sign",
+        "description": "Check if a given message is valid  for EVM",
+        "operationId": "evaluateMessage",
+        "requestBody": {
+          "required": true,
+          "description": "Specifies the kind of transaction",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageEvaluationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Expected response to a valid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageEvaluationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guardian/v1/erc191-messages/evaluate": {
+      "post": {
+        "x-internal": true,
+        "security": [
+          {
+            "BearerAuth": [
+              "transact"
+            ]
+          }
+        ],
+        "tags": [
+          "guardian"
+        ],
+        "summary": "Evaluate an erc191 message to sign",
+        "description": "Check if a given erc191 message is valid",
+        "operationId": "evaluateErc191Message",
+        "requestBody": {
+          "required": true,
+          "description": "Specifies the kind of transaction",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ERC191MessageEvaluationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Expected response to a valid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageEvaluationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guardian/v1/transactions/{payloadHash}/approve": {
+      "post": {
+        "x-internal": true,
+        "security": [
+          {
+            "BearerAuth": [
+              "approve:transactions",
+              "transact"
+            ]
+          }
+        ],
+        "tags": [
+          "guardian"
+        ],
+        "summary": "Approve a pending transaction given chain",
+        "description": "Approve a pending transaction",
+        "operationId": "approvePendingTransaction",
+        "parameters": [
+          {
+            "name": "payloadHash",
+            "in": "path",
+            "description": "Hash for the payload",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Hash for the payload"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "request body for approving a pending transaction",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransactionApprovalRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "successfully approved a pending transaction"
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guardian/v1/messages/{messageID}/approve": {
+      "post": {
+        "x-internal": true,
+        "security": [
+          {
+            "BearerAuth": [
+              "approve:transactions",
+              "transact"
+            ]
+          }
+        ],
+        "tags": [
+          "guardian"
+        ],
+        "summary": "Approve a pending evm message",
+        "description": "Approve a pending evm message",
+        "operationId": "approvePendingMessage",
+        "parameters": [
+          {
+            "name": "messageID",
+            "in": "path",
+            "description": "id for the message",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Hash for the payload"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successfully approved a pending evm message"
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guardian/v1/erc191-messages/{messageID}/approve": {
+      "post": {
+        "x-internal": true,
+        "security": [
+          {
+            "BearerAuth": [
+              "approve:transactions",
+              "transact"
+            ]
+          }
+        ],
+        "tags": [
+          "guardian"
+        ],
+        "summary": "Approve a pending erc191 message",
+        "description": "Approve a pending erc191 message",
+        "operationId": "approvePendingERC191Message",
+        "parameters": [
+          {
+            "name": "messageID",
+            "in": "path",
+            "description": "id for the message",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Hash for the payload"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successfully approved a pending erc191 message"
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guardian/v1/transactions/{transactionID}": {
+      "get": {
+        "x-internal": true,
+        "summary": "Info for a specific transaction",
+        "description": "Get a transaction by payload hash",
+        "operationId": "getTransactionByID",
+        "security": [
+          {
+            "BearerAuth": [
+              "transact"
+            ]
+          }
+        ],
+        "tags": [
+          "guardian"
+        ],
+        "parameters": [
+          {
+            "name": "transactionID",
+            "in": "path",
+            "required": true,
+            "description": "The id of the starkex transaction to retrieve",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "chainType",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "starkex",
+                "evm"
+              ]
+            },
+            "required": true,
+            "description": "roll up type"
+          },
+          {
+            "in": "query",
+            "name": "chainID",
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of evm chain"
+          },
+          {
+            "in": "query",
+            "name": "includeSimulation",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Include simulation results"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Expected response to a valid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transaction"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guardian/v1/messages/{messageID}": {
+      "get": {
+        "x-internal": true,
+        "summary": "Info for a specific evm message",
+        "description": "Get an evm message by id",
+        "operationId": "getMessageByID",
+        "security": [
+          {
+            "BearerAuth": [
+              "transact"
+            ]
+          }
+        ],
+        "tags": [
+          "guardian"
+        ],
+        "parameters": [
+          {
+            "name": "messageID",
+            "in": "path",
+            "required": true,
+            "description": "The id of the evm message",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Expected response to a valid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EVMMessage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guardian/v1/erc191-messages/{messageID}": {
+      "get": {
+        "x-internal": true,
+        "summary": "Info for a specific erc191 message",
+        "description": "Get an erc191 message by id",
+        "operationId": "getErc191MessageByID",
+        "security": [
+          {
+            "BearerAuth": [
+              "transact"
+            ]
+          }
+        ],
+        "tags": [
+          "guardian"
+        ],
+        "parameters": [
+          {
+            "name": "messageID",
+            "in": "path",
+            "required": true,
+            "description": "The id of the erc191 message",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Expected response to a valid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erc191MessageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3778,6 +4893,16 @@
         "description": "Contract address",
         "schema": {
           "$ref": "#/components/schemas/Address"
+        }
+      },
+      "TransactionId": {
+        "name": "id",
+        "in": "path",
+        "description": "Transaction identifier: payloadHash on StarkEx or EVM ID",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Hash of the transaction"
         }
       }
     },
@@ -3840,6 +4965,11 @@
               "$ref": "#/components/schemas/APIError429"
             }
           }
+        },
+        "headers": {
+          "Retry-After": {
+            "$ref": "#/components/headers/RetryAfter"
+          }
         }
       },
       "TooManyMetadataRefreshes": {
@@ -3861,7 +4991,7 @@
           "imx-remaining-refreshes": {
             "$ref": "#/components/headers/MetadataRefreshLimitRemaining"
           },
-          "retry-after": {
+          "Retry-After": {
             "$ref": "#/components/headers/MetadataRefreshRetryAfter"
           }
         }
@@ -3886,6 +5016,9 @@
             "$ref": "#/components/headers/MintRequestsLimitRemaining"
           },
           "imx-mint-requests-retry-after": {
+            "$ref": "#/components/headers/MintRequestsRetryAfter"
+          },
+          "Retry-After": {
             "$ref": "#/components/headers/MintRequestsRetryAfter"
           }
         }
@@ -3932,6 +5065,12 @@
       },
       "MetadataRefreshRetryAfter": {
         "description": "The number of seconds until the next refresh request can be made.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "RetryAfter": {
+        "description": "The number of seconds until the next request can be made.",
         "schema": {
           "type": "string"
         }
@@ -4786,6 +5925,13 @@
             "example": "https://some-url"
           },
           "external_link": {
+            "deprecated": true,
+            "type": "string",
+            "nullable": true,
+            "description": "(deprecated - use external_url instead) The external website link of NFT",
+            "example": "https://some-url"
+          },
+          "external_url": {
             "type": "string",
             "nullable": true,
             "description": "The external website link of NFT",
@@ -4828,6 +5974,7 @@
           "description",
           "image",
           "external_link",
+          "external_url",
           "animation_url",
           "youtube_url",
           "attributes",
@@ -4953,8 +6100,8 @@
         "properties": {
           "display_type": {
             "description": "Display type for this attribute",
-            "nullable": true,
             "type": "string",
+            "nullable": true,
             "enum": [
               "number",
               "boost_percentage",
@@ -5118,12 +6265,6 @@
             "description": "The account address of the owner of the NFT",
             "example": "0x5a019874f4fae314b0eaa4606be746366e661306"
           },
-          "quantity": {
-            "type": "string",
-            "description": "(deprecated - use balance instead) The quantity of owned tokens (uint256 as string)",
-            "example": "1",
-            "deprecated": true
-          },
           "balance": {
             "type": "string",
             "description": "The amount of owned tokens (uint256 as string)",
@@ -5141,7 +6282,6 @@
           "contract_address",
           "token_id",
           "account_address",
-          "quantity",
           "balance"
         ]
       },
@@ -5166,12 +6306,6 @@
             "description": "The account address of the owner of the NFT",
             "example": "0x5a019874f4fae314b0eaa4606be746366e661306"
           },
-          "quantity": {
-            "type": "string",
-            "description": "(deprecated - use balance instead) The quantity of owned tokens (uint256 as string)",
-            "example": "1",
-            "deprecated": true
-          },
           "balance": {
             "type": "string",
             "description": "The amount of owned tokens (uint256 as string)",
@@ -5189,7 +6323,6 @@
           "contract_address",
           "token_id",
           "account_address",
-          "quantity",
           "balance",
           "updated_at"
         ]
@@ -6061,6 +7194,106 @@
           "created_by"
         ]
       },
+      "Call": {
+        "type": "object",
+        "properties": {
+          "target_address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "function_signature": {
+            "type": "string",
+            "description": "The function signature",
+            "example": "mint(address,uint256)"
+          },
+          "function_args": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The function arguments",
+            "example": [
+              "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e",
+              "1"
+            ]
+          }
+        },
+        "required": [
+          "target_address",
+          "function_signature",
+          "function_args"
+        ]
+      },
+      "SignCraftingRequest": {
+        "type": "object",
+        "properties": {
+          "multi_caller": {
+            "type": "object",
+            "properties": {
+              "address": {
+                "$ref": "#/components/schemas/Address"
+              },
+              "name": {
+                "type": "string",
+                "description": "The name of the multicaller contract",
+                "example": "Multicaller"
+              },
+              "version": {
+                "type": "string",
+                "description": "The version of the multicaller contract",
+                "example": "1"
+              }
+            },
+            "required": [
+              "address",
+              "name",
+              "version"
+            ]
+          },
+          "reference_id": {
+            "type": "string",
+            "description": "The id of this request in the system that originates the crafting request, specified as a 32 byte hex string",
+            "example": "67f7d464b8f04f6a9a3b8d3cb4a21af0"
+          },
+          "calls": {
+            "type": "array",
+            "description": "The calls to be signed",
+            "items": {
+              "$ref": "#/components/schemas/Call"
+            },
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The expiration time of the request",
+            "example": "2022-08-16T17:43:26.991388Z"
+          }
+        },
+        "required": [
+          "multi_caller",
+          "reference_id",
+          "calls",
+          "expires_at"
+        ]
+      },
+      "SignCraftingResult": {
+        "type": "object",
+        "properties": {
+          "signer_address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "signature": {
+            "type": "string",
+            "description": "The signature of the request",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          }
+        },
+        "required": [
+          "signer_address",
+          "signature"
+        ]
+      },
       "BasicAPIError": {
         "type": "object",
         "properties": {
@@ -6303,6 +7536,12 @@
           },
           {
             "$ref": "#/components/schemas/ERC1155Item"
+          },
+          {
+            "$ref": "#/components/schemas/ERC721CollectionItem"
+          },
+          {
+            "$ref": "#/components/schemas/ERC1155CollectionItem"
           }
         ],
         "discriminator": {
@@ -6311,7 +7550,26 @@
             "NATIVE": "#/components/schemas/NativeItem",
             "ERC20": "#/components/schemas/ERC20Item",
             "ERC721": "#/components/schemas/ERC721Item",
-            "ERC1155": "#/components/schemas/ERC1155Item"
+            "ERC1155": "#/components/schemas/ERC1155Item",
+            "ERC721_COLLECTION": "#/components/schemas/ERC721CollectionItem",
+            "ERC1155_COLLECTION": "#/components/schemas/ERC1155CollectionItem"
+          }
+        }
+      },
+      "AssetCollectionItem": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ERC721CollectionItem"
+          },
+          {
+            "$ref": "#/components/schemas/ERC1155CollectionItem"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "ERC721_COLLECTION": "#/components/schemas/ERC721CollectionItem",
+            "ERC1155_COLLECTION": "#/components/schemas/ERC1155CollectionItem"
           }
         }
       },
@@ -6342,6 +7600,12 @@
             ],
             "minItems": 0,
             "maxItems": 2
+          },
+          "token_id": {
+            "type": "string",
+            "description": "Token ID for the ERC721 or ERC1155 token",
+            "example": "123",
+            "pattern": "\\d+"
           }
         },
         "required": [
@@ -6501,6 +7765,66 @@
           "type",
           "contract_address",
           "token_id",
+          "amount"
+        ]
+      },
+      "ERC721CollectionItem": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Token type user is offering, which in this case is ERC721",
+            "example": "ERC721_COLLECTION",
+            "enum": [
+              "ERC721_COLLECTION"
+            ]
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "Address of ERC721 collection",
+            "example": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "amount": {
+            "type": "string",
+            "description": "A string representing the price at which the user is willing to sell the token. This value is provided in the smallest unit of the token (e.g., wei for Ethereum).",
+            "example": "9750000000000000000",
+            "pattern": "\\d+"
+          }
+        },
+        "required": [
+          "type",
+          "contract_address",
+          "amount"
+        ]
+      },
+      "ERC1155CollectionItem": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Token type user is offering, which in this case is ERC1155",
+            "example": "ERC1155_COLLECTION",
+            "enum": [
+              "ERC1155_COLLECTION"
+            ]
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "Address of ERC1155 collection",
+            "example": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "amount": {
+            "type": "string",
+            "description": "A string representing the price at which the user is willing to sell the token. This value is provided in the smallest unit of the token (e.g., wei for Ethereum).",
+            "example": "9750000000000000000",
+            "pattern": "\\d+"
+          }
+        },
+        "required": [
+          "type",
+          "contract_address",
           "amount"
         ]
       },
@@ -6688,7 +8012,7 @@
           },
           "buy": {
             "type": "array",
-            "description": "Buy item for listing should either be ERC721 or ERC1155 item",
+            "description": "Buy item for bid should either be ERC721 or ERC1155 item",
             "items": {
               "$ref": "#/components/schemas/Item"
             },
@@ -6728,9 +8052,9 @@
           },
           "sell": {
             "type": "array",
-            "description": "Sell item for listing should be an ERC20 item",
+            "description": "Sell item for bid should be an ERC20 item",
             "items": {
-              "$ref": "#/components/schemas/Item"
+              "$ref": "#/components/schemas/ERC20Item"
             },
             "example": [
               {
@@ -6785,6 +8109,135 @@
               "type": "ERC721",
               "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
               "token_id": "1"
+            }
+          ],
+          "signature": "0x",
+          "start_at": "2022-03-09T05:00:50.52Z"
+        },
+        "required": [
+          "account_address",
+          "order_hash",
+          "buy",
+          "sell",
+          "fees",
+          "end_at",
+          "start_at",
+          "protocol_data",
+          "salt",
+          "signature"
+        ]
+      },
+      "CreateCollectionBidRequestBody": {
+        "type": "object",
+        "properties": {
+          "account_address": {
+            "type": "string",
+            "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "order_hash": {
+            "type": "string",
+            "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+          },
+          "buy": {
+            "type": "array",
+            "description": "Buy item for collection bid should either be ERC721 or ERC1155 collection item",
+            "items": {
+              "$ref": "#/components/schemas/AssetCollectionItem"
+            },
+            "example": [
+              {
+                "type": "ERC721_COLLECTION",
+                "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                "amount": "1"
+              }
+            ],
+            "minItems": 1,
+            "maxItems": 1
+          },
+          "fees": {
+            "type": "array",
+            "description": "Buy fees should only include maker marketplace fees and should be no more than two entries as more entires will incur more gas. It is best practice to have this as few as possible.",
+            "items": {
+              "$ref": "#/components/schemas/Fee"
+            },
+            "example": [],
+            "minItems": 0,
+            "maxItems": 2
+          },
+          "end_at": {
+            "type": "string",
+            "description": "Time after which the Order is considered expired",
+            "format": "date-time",
+            "example": "2022-03-09T05:00:50.52Z"
+          },
+          "protocol_data": {
+            "$ref": "#/components/schemas/ProtocolData"
+          },
+          "salt": {
+            "type": "string",
+            "description": "A random value added to the create Order request",
+            "example": "12686911856931635052326433555881236148"
+          },
+          "sell": {
+            "type": "array",
+            "description": "Sell item for collection bid should be an ERC20 item",
+            "items": {
+              "$ref": "#/components/schemas/ERC20Item"
+            },
+            "example": [
+              {
+                "type": "ERC20",
+                "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                "amount": "9750000000000000000"
+              }
+            ],
+            "minItems": 1,
+            "maxItems": 1
+          },
+          "signature": {
+            "type": "string",
+            "description": "Digital signature generated by the user for the specific Order",
+            "example": "0x"
+          },
+          "start_at": {
+            "type": "string",
+            "description": "Time after which Order is considered active",
+            "format": "date-time",
+            "example": "2022-03-09T05:00:50.52Z"
+          }
+        },
+        "example": {
+          "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+          "order_hash": "0x0821933d9391bc9bf11a6010fe84776c84b203abff0c1ad781fb4881409c8770",
+          "sell": [
+            {
+              "type": "ERC20",
+              "amount": "9750000000000000000",
+              "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+            }
+          ],
+          "fees": [
+            {
+              "type": "MAKER_ECOSYSTEM",
+              "amount": "2250000000000000000",
+              "recipient_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233"
+            }
+          ],
+          "end_at": "2022-03-10T05:00:50.52Z",
+          "protocol_data": {
+            "order_type": "FULL_RESTRICTED",
+            "counter": "1",
+            "zone_address": "0x12",
+            "seaport_address": "0x12",
+            "seaport_version": "1.5"
+          },
+          "salt": "12686911856931635052326433555881236148",
+          "buy": [
+            {
+              "type": "ERC721_COLLECTION",
+              "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+              "amount": "1"
             }
           ],
           "signature": "0x",
@@ -6938,7 +8391,8 @@
             "example": "LISTING",
             "enum": [
               "LISTING",
-              "BID"
+              "BID",
+              "COLLECTION_BID"
             ]
           },
           "updated_at": {
@@ -7019,6 +8473,7 @@
         "type": "object",
         "properties": {
           "buy": {
+            "description": "Buy items are transferred from the taker to the maker.",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Item"
@@ -7034,10 +8489,21 @@
             "maxItems": 1
           },
           "buyer_address": {
+            "description": "Deprecated. Use maker and taker addresses instead of buyer and seller addresses.",
             "type": "string",
             "example": "0xFC99a706C0D05B8C71E1fAAC91b3E1343aC34D40"
           },
           "buyer_fees": {
+            "description": "Deprecated. Use fees instead. The taker always pays the fees.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Fee"
+            },
+            "example": [],
+            "minItems": 0,
+            "maxItems": 1
+          },
+          "fees": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Fee"
@@ -7068,6 +8534,7 @@
             "example": "018792C9-4AD7-8EC4-4038-9E05C598534A"
           },
           "sell": {
+            "description": "Sell items are transferred from the maker to the taker.",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Item"
@@ -7083,6 +8550,7 @@
             "maxItems": 1
           },
           "seller_address": {
+            "description": "Deprecated. Use maker and taker addresses instead of buyer and seller addresses.",
             "type": "string",
             "example": "0x002b9B1cbf464782Df5d48870358FA6c09f1b19D"
           },
@@ -7105,6 +8573,7 @@
           ],
           "buyer_address": "0xFC99a706C0D05B8C71E1fAAC91b3E1343aC34D40",
           "buyer_fees": [],
+          "fees": [],
           "chain": {
             "id": "eip155:11155111",
             "name": "sepolia"
@@ -7130,6 +8599,7 @@
           "sell",
           "seller_address",
           "buyer_fees",
+          "fees",
           "chain",
           "maker_address",
           "taker_address",
@@ -7339,6 +8809,60 @@
           }
         }
       },
+      "CollectionBidResult": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/Order"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "example": {
+          "result": {
+            "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+            "sell": [
+              {
+                "type": "ERC20",
+                "amount": "9750000000000000000",
+                "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+              }
+            ],
+            "fees": [],
+            "chain": {
+              "id": "eip155:11155111",
+              "name": "sepolia"
+            },
+            "created_at": "2022-03-07T07:20:50.52Z",
+            "end_at": "2022-03-10T05:00:50.52Z",
+            "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
+            "order_hash": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+            "protocol_data": {
+              "order_type": "PARTIAL_RESTRICTED",
+              "counter": "1",
+              "zone_address": "0x12",
+              "seaport_address": "0x12",
+              "seaport_version": "1.5"
+            },
+            "salt": "12686911856931635052326433555881236148",
+            "buy": [
+              {
+                "type": "ERC721_COLLECTION",
+                "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                "amount": "1"
+              }
+            ],
+            "signature": "0x",
+            "start_at": "2022-03-09T05:00:50.52Z",
+            "status": {
+              "name": "EXPIRED"
+            },
+            "type": "COLLECTION_BID",
+            "updated_at": "2022-03-07T07:20:50.52Z"
+          }
+        }
+      },
       "ListListingsResult": {
         "type": "object",
         "properties": {
@@ -7543,6 +9067,114 @@
                   "type": "ERC721",
                   "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
                   "token_id": "1"
+                }
+              ],
+              "signature": "0x",
+              "start_at": "2022-03-09T05:00:50.52Z",
+              "status": {
+                "name": "EXPIRED"
+              },
+              "updated_at": "2022-03-07T07:20:50.52Z"
+            }
+          ]
+        }
+      },
+      "ListCollectionBidsResult": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "$ref": "#/components/schemas/Page"
+          },
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Order"
+            },
+            "minItems": 0,
+            "maxItems": 200
+          }
+        },
+        "required": [
+          "page",
+          "result"
+        ],
+        "example": {
+          "page": {
+            "previous_cursor": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzA",
+            "next_cursor": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzA"
+          },
+          "result": [
+            {
+              "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "sell": [
+                {
+                  "type": "ERC20",
+                  "amount": "9750000000000000000",
+                  "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+                }
+              ],
+              "fees": [],
+              "chain": {
+                "id": "eip155:11155111",
+                "name": "sepolia"
+              },
+              "created_at": "2022-03-07T07:20:50.52Z",
+              "end_at": "2022-03-10T05:00:50.52Z",
+              "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
+              "order_hash": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "protocol_data": {
+                "order_type": "PARTIAL_RESTRICTED",
+                "counter": "1",
+                "zone_address": "0x12",
+                "seaport_address": "0x12",
+                "seaport_version": "1.5"
+              },
+              "salt": "12686911856931635052326433555881236148",
+              "buy": [
+                {
+                  "type": "ERC721_COLLECTION",
+                  "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                  "amount": "1"
+                }
+              ],
+              "signature": "0x",
+              "start_at": "2022-03-09T05:00:50.52Z",
+              "status": {
+                "name": "EXPIRED"
+              },
+              "updated_at": "2022-03-07T07:20:50.52Z"
+            },
+            {
+              "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "sell": [
+                {
+                  "type": "ERC20",
+                  "amount": "9750000000000000000",
+                  "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+                }
+              ],
+              "fees": [],
+              "chain": {
+                "id": "eip155:11155111",
+                "name": "sepolia"
+              },
+              "created_at": "2022-03-07T07:20:50.52Z",
+              "end_at": "2022-03-10T05:00:50.52Z",
+              "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
+              "order_hash": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "protocol_data": {
+                "order_type": "PARTIAL_RESTRICTED",
+                "counter": "1",
+                "zone_address": "0x12",
+                "seaport_address": "0x12",
+                "seaport_version": "1.5"
+              },
+              "salt": "12686911856931635052326433555881236148",
+              "buy": [
+                {
+                  "type": "ERC721_COLLECTION",
+                  "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                  "amount": "1"
                 }
               ],
               "signature": "0x",
@@ -8585,7 +10217,13 @@
                 "$ref": "#/components/schemas/SeaportERC1155Item"
               },
               {
+                "$ref": "#/components/schemas/SeaportERC1155CollectionItem"
+              },
+              {
                 "$ref": "#/components/schemas/SeaportERC721Item"
+              },
+              {
+                "$ref": "#/components/schemas/SeaportERC721CollectionItem"
               }
             ],
             "example": [
@@ -8814,7 +10452,7 @@
           },
           "amount": {
             "type": "string",
-            "description": "A string representing the total units of an ERC1155 token which the user is selling",
+            "description": "A string representing the total units of an ERC1155 token which the user is buying/selling",
             "example": "100"
           },
           "immutable_verification_status": {
@@ -8838,6 +10476,105 @@
           "type",
           "contract_address",
           "token_id",
+          "amount",
+          "immutable_verification_status"
+        ]
+      },
+      "SeaportERC721CollectionItem": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Token type user is offering, which in this case is ERC721Collection",
+            "example": "ERC721Collection",
+            "enum": [
+              "ERC721Collection"
+            ]
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "Address of ERC721 token",
+            "example": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "contract_name": {
+            "type": "string",
+            "nullable": true,
+            "description": "The name of the collection",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          "amount": {
+            "type": "string",
+            "description": "A string representing the total units of an ERC721 token which the user is buying",
+            "example": "10"
+          },
+          "immutable_verification_status": {
+            "type": "string",
+            "description": "The Immutable verification status of this collection",
+            "$ref": "#/components/schemas/ImmutableVerificationStatusEnum"
+          }
+        },
+        "example": [
+          {
+            "type": "ERC721Collection",
+            "contract_address": "0x87c07c927eba711cbc55ec628a670acd48d0b525",
+            "amount": "10",
+            "immutable_verification_status": "verified"
+          }
+        ],
+        "required": [
+          "type",
+          "contract_address",
+          "amount",
+          "immutable_verification_status"
+        ]
+      },
+      "SeaportERC1155CollectionItem": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Token type user is offering, which in this case is ERC1155Collection",
+            "example": "ERC1155Collection",
+            "enum": [
+              "ERC1155Collection"
+            ]
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "Address of ERC1155 token",
+            "example": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "contract_name": {
+            "type": "string",
+            "nullable": true,
+            "description": "The name of the collection",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          "amount": {
+            "type": "string",
+            "description": "A string representing the total units of an ERC1155 token which the user is buying",
+            "example": "100"
+          },
+          "immutable_verification_status": {
+            "type": "string",
+            "description": "The Immutable verification status of this collection",
+            "$ref": "#/components/schemas/ImmutableVerificationStatusEnum"
+          }
+        },
+        "example": [
+          {
+            "type": "ERC1155",
+            "contract_address": "0x87c07c927eba711cbc55ec628a670acd48d0b525",
+            "contract_name": "Guild of Guardians Heroes",
+            "amount": "100",
+            "immutable_verification_status": "verified"
+          }
+        ],
+        "required": [
+          "type",
+          "contract_address",
           "amount",
           "immutable_verification_status"
         ]
@@ -8924,7 +10661,13 @@
                 "$ref": "#/components/schemas/SeaportERC721Item"
               },
               {
+                "$ref": "#/components/schemas/SeaportERC721CollectionItem"
+              },
+              {
                 "$ref": "#/components/schemas/SeaportERC1155Item"
+              },
+              {
+                "$ref": "#/components/schemas/SeaportERC1155CollectionItem"
               }
             ],
             "example": [
@@ -9222,6 +10965,469 @@
             }
           }
         }
+      },
+      "Transaction": {
+        "type": "object",
+        "required": [
+          "id",
+          "eth_address",
+          "transaction_metadata",
+          "version",
+          "transaction_type",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "description": "Confirmation Candidate ID",
+            "type": "string"
+          },
+          "eth_address": {
+            "description": "candidate's ether address",
+            "type": "string"
+          },
+          "status": {
+            "description": "Status of the starkex transactions",
+            "type": "string"
+          },
+          "transaction_type": {
+            "description": "Confirmation candidate type",
+            "type": "string"
+          },
+          "version": {
+            "description": "Which version is at",
+            "type": "string"
+          },
+          "transaction_metadata": {
+            "description": "Transaction metadata as a string",
+            "type": "object",
+            "additionalProperties": true
+          },
+          "client_name": {
+            "description": "Name of request client",
+            "type": "string"
+          },
+          "validation": {
+            "description": "Validation results",
+            "type": "object",
+            "$ref": "#/components/schemas/ValidationResult",
+            "nullable": true
+          }
+        }
+      },
+      "TransactionApprovalRequest": {
+        "type": "object",
+        "required": [
+          "chainType"
+        ],
+        "properties": {
+          "chainID": {
+            "description": "rollup chain ID",
+            "type": "string"
+          },
+          "chainType": {
+            "description": "chain type",
+            "type": "string",
+            "enum": [
+              "starkex",
+              "evm"
+            ]
+          },
+          "otp": {
+            "description": "otp string",
+            "type": "string"
+          }
+        }
+      },
+      "TransactionEvaluationRequest": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/StarkExTransactionEvaluationRequest"
+          },
+          {
+            "$ref": "#/components/schemas/ZkEvmTransactionEvaluationRequest"
+          }
+        ]
+      },
+      "StarkExTransactionEvaluationRequest": {
+        "required": [
+          "chainType"
+        ],
+        "type": "object",
+        "properties": {
+          "chainId": {
+            "type": "string",
+            "description": "The ID of the chain"
+          },
+          "chainType": {
+            "type": "string",
+            "enum": [
+              "starkex"
+            ],
+            "description": "The type of the chain"
+          }
+        }
+      },
+      "ZkEvmTransactionEvaluationRequest": {
+        "required": [
+          "transactionData",
+          "chainId",
+          "chainType"
+        ],
+        "type": "object",
+        "properties": {
+          "chainId": {
+            "type": "string",
+            "description": "The ID of the chain"
+          },
+          "chainType": {
+            "type": "string",
+            "enum": [
+              "evm"
+            ],
+            "description": "The type of the chain"
+          },
+          "transactionData": {
+            "$ref": "#/components/schemas/ZkEvmTransactionData"
+          }
+        }
+      },
+      "TransactionEvaluationResponse": {
+        "type": "object",
+        "required": [
+          "confirmationRequired"
+        ],
+        "properties": {
+          "confirmationRequired": {
+            "type": "boolean"
+          },
+          "confirmationMethod": {
+            "type": "string",
+            "enum": [
+              "otp",
+              "web"
+            ]
+          },
+          "transactionId": {
+            "type": "string"
+          }
+        }
+      },
+      "MessageEvaluationResponse": {
+        "type": "object",
+        "required": [
+          "confirmationRequired",
+          "confirmationMethod",
+          "messageId"
+        ],
+        "properties": {
+          "confirmationRequired": {
+            "type": "boolean"
+          },
+          "confirmationMethod": {
+            "type": "string",
+            "enum": [
+              "otp",
+              "web"
+            ]
+          },
+          "messageId": {
+            "type": "string"
+          }
+        }
+      },
+      "ZkEvmTransactionData": {
+        "type": "object",
+        "required": [
+          "userAddress",
+          "metaTransactions",
+          "nonce"
+        ],
+        "properties": {
+          "userAddress": {
+            "type": "string",
+            "description": "The user address",
+            "pattern": "^0x[0-9a-fA-F]*$"
+          },
+          "metaTransactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetaTransaction"
+            },
+            "minItems": 1,
+            "maxItems": 2,
+            "description": "An array of exactly two meta-transactions"
+          },
+          "nonce": {
+            "type": "string",
+            "description": "The nonce value"
+          }
+        }
+      },
+      "MetaTransaction": {
+        "type": "object",
+        "required": [
+          "delegateCall",
+          "revertOnError",
+          "gasLimit",
+          "target",
+          "value",
+          "data"
+        ],
+        "properties": {
+          "delegateCall": {
+            "type": "boolean",
+            "description": "Whether the transaction is a delegate call"
+          },
+          "revertOnError": {
+            "type": "boolean",
+            "description": "Whether to revert on error"
+          },
+          "gasLimit": {
+            "type": "string",
+            "description": "The gas limit for the transaction"
+          },
+          "target": {
+            "type": "string",
+            "description": "The SM target address of the transaction",
+            "pattern": "^0x[0-9a-fA-F]*$"
+          },
+          "value": {
+            "type": "string",
+            "description": "The value of the transaction"
+          },
+          "data": {
+            "oneOf": [
+              {
+                "type": "string",
+                "description": "Encoded data for calling the `execute()` function on the SCW",
+                "pattern": "^0x[0-9a-fA-F]*$"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "MessageEvaluationRequest": {
+        "type": "object",
+        "required": [
+          "payload",
+          "chainID"
+        ],
+        "properties": {
+          "payload": {
+            "$ref": "#/components/schemas/EIP712Message"
+          },
+          "chainID": {
+            "description": "rollup chain ID",
+            "type": "string"
+          }
+        }
+      },
+      "ERC191MessageEvaluationRequest": {
+        "type": "object",
+        "required": [
+          "payload",
+          "chainID"
+        ],
+        "properties": {
+          "payload": {
+            "$ref": "#/components/schemas/ERC191Message"
+          },
+          "chainID": {
+            "description": "rollup chain ID",
+            "type": "string"
+          }
+        }
+      },
+      "EVMMessage": {
+        "type": "object",
+        "required": [
+          "id",
+          "eth_address",
+          "data",
+          "version",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "description": "Confirmation Candidate ID",
+            "type": "string"
+          },
+          "eth_address": {
+            "description": "request user's ether address",
+            "type": "string"
+          },
+          "status": {
+            "description": "Status of the evm message",
+            "type": "string"
+          },
+          "version": {
+            "description": "Which version is at",
+            "type": "string"
+          },
+          "data": {
+            "description": "evm message data",
+            "$ref": "#/components/schemas/EIP712Message"
+          }
+        }
+      },
+      "Erc191MessageResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "eth_address",
+          "data",
+          "version",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "description": "Confirmation Candidate ID",
+            "type": "string"
+          },
+          "eth_address": {
+            "description": "request user's ether address",
+            "type": "string"
+          },
+          "status": {
+            "description": "Status of the evm message",
+            "type": "string"
+          },
+          "version": {
+            "description": "Which version is at",
+            "type": "string"
+          },
+          "data": {
+            "description": "evm message data",
+            "$ref": "#/components/schemas/ERC191Message"
+          }
+        }
+      },
+      "ValidationResult": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ValidationSuccessResults"
+          },
+          {
+            "$ref": "#/components/schemas/ValidationErrorResults"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "status",
+          "mapping": {
+            "error": "#/components/schemas/ValidationErrorResults",
+            "success": "#/components/schemas/ValidationSuccessResults"
+          }
+        }
+      },
+      "ValidationSuccessResults": {
+        "type": "object",
+        "required": [
+          "status",
+          "analysis",
+          "highestSeverity"
+        ],
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/ValidationStatus"
+          },
+          "highestSeverity": {
+            "$ref": "#/components/schemas/HighestSeverity"
+          },
+          "analysis": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Analysis"
+            },
+            "minItems": 0,
+            "description": "Contains a recommended action and warnings pertaining to the simulated transaction, such as interactions with known malicious addresses"
+          }
+        }
+      },
+      "ValidationErrorResults": {
+        "type": "object",
+        "required": [
+          "status",
+          "error"
+        ],
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/ValidationStatus"
+          },
+          "error": {
+            "description": "human-readable error message",
+            "type": "string"
+          }
+        }
+      },
+      "Analysis": {
+        "description": "Contains a recommended action and warnings pertaining to the simulated transaction, such as interactions with known malicious addresses",
+        "type": "object",
+        "required": [
+          "severity",
+          "description"
+        ],
+        "properties": {
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "description": {
+            "description": "description of the analysis",
+            "type": "string"
+          },
+          "address": {
+            "description": "address of related analysis",
+            "type": "string"
+          }
+        }
+      },
+      "Severity": {
+        "type": "string",
+        "description": "Analysis severity level",
+        "enum": [
+          "malicious",
+          "benign",
+          "warning",
+          "unknown",
+          "info"
+        ]
+      },
+      "HighestSeverity": {
+        "type": "object",
+        "required": [
+          "severity",
+          "description"
+        ],
+        "description": "Top level severity analysis",
+        "properties": {
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "ValidationStatus": {
+        "type": "string",
+        "description": "Status of the validation",
+        "enum": [
+          "success",
+          "error"
+        ]
+      },
+      "ERC191Message": {
+        "type": "string",
+        "description": "the raw message data to sign",
+        "maxLength": 500,
+        "minLength": 1
       }
     }
   },
@@ -9254,6 +11460,19 @@
       "name": "Passport Profile Service API",
       "tags": [
         "passport profile"
+      ]
+    },
+    {
+      "name": "Guardian",
+      "tags": [
+        "guardian"
+      ]
+    },
+    {
+      "name": "Indexer Marketplace APIs",
+      "tags": [
+        "pricing",
+        "stacks"
       ]
     }
   ]

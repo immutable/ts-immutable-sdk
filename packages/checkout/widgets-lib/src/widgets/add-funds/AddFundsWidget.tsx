@@ -83,7 +83,7 @@ export default function AddFundsWidget({
     if (!addFundsState.squid || !addFundsState.chains || !addFundsState.provider) return;
 
     (async () => {
-      const chainIds = addFundsState.chains.map((chain) => chain.id);
+      const chainIds = addFundsState.chains?.map((chain) => chain.id);
       const fromAddress = await addFundsState.provider?.getSigner().getAddress();
 
       const balances = await addFundsState.squid?.getAllBalances({

@@ -42,7 +42,7 @@ export default function FulfillERC721WithPassport() {
 
   // setup the sell item contract address state
   const [sellItemContractAddress, setSellItemContractAddressState] =
-    useState<any>(null);
+    useState<string | null>(null);
 
   // setup the buy item type state
   const [buyItemType, setBuyItemTypeState] = useState<"NATIVE" | "ERC20">(
@@ -50,13 +50,13 @@ export default function FulfillERC721WithPassport() {
   );
 
   // save the listings state
-  const [listings, setListingsState] = useState<any>(null);
+  const [listings, setListingsState] = useState<orderbook.Listing[]>([]);
 
   // setup the listing creation success message state
-  const [successMessage, setSuccessMessageState] = useState<any>(null);
+  const [successMessage, setSuccessMessageState] = useState<string | null>(null);
 
   // setup the listing creation error message state
-  const [errorMessage, setErrorMessageState] = useState<any>(null);
+  const [errorMessage, setErrorMessageState] = useState<string | null>(null);
 
   const passportLogin = async () => {
     if (web3Provider.provider.request) {
@@ -119,7 +119,7 @@ export default function FulfillERC721WithPassport() {
     client: orderbook.Orderbook,
     sellItemContractAddress?: string,
     buyItemType?: "NATIVE" | "ERC20",
-  ): Promise<orderbook.Order[]> => {
+  ): Promise<orderbook.Listing[]> => {
     let params: orderbook.ListListingsParams = {
       pageSize: 50,
       sortBy: "created_at",
@@ -135,7 +135,7 @@ export default function FulfillERC721WithPassport() {
   useMemo(async () => {
     const listings = await getListings(
       orderbookSDK,
-      sellItemContractAddress,
+      sellItemContractAddress == null ? undefined : sellItemContractAddress,
       buyItemType,
     );
     const filtered = listings.filter(
@@ -297,7 +297,7 @@ export default function FulfillERC721WithPassport() {
           </FormControl>
         </Grid>
       </Box>
-      {listings && listings.length > 0 ? (
+        {listings && listings.length > 0 ? (
           <Box sx={{ maxHeight: "800px", marginBottom: "base.spacing.x5" }}>
             <Table sx={{ marginLeft: "base.spacing.x5", maxWidth: "1300px", maxHeight: "400px", overflowY: "auto", marginBottom: "base.spacing.x5"}}>
             <Table.Head>
@@ -310,7 +310,7 @@ export default function FulfillERC721WithPassport() {
               </Table.Row>
             </Table.Head>
             <Table.Body>
-              {listings.map((listing: any, index: number) => {
+              {listings.map((listing: orderbook.Listing, index: number) => {
                 return (
                   <Table.Row key={index}>
                     <Table.Cell>{index + 1}</Table.Cell>

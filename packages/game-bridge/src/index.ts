@@ -2,6 +2,7 @@
 import * as passport from '@imtbl/passport';
 import * as config from '@imtbl/config';
 import * as provider from '@imtbl/x-provider';
+import * as xClient from '@imtbl/x-client';
 import {
   track,
   trackError,
@@ -55,6 +56,7 @@ const PASSPORT_FUNCTIONS = {
     connectEvm: 'connectEvm',
     sendTransaction: 'zkEvmSendTransaction',
     sendTransactionWithConfirmation: 'zkEvmSendTransactionWithConfirmation',
+    signTypedDataV4: 'zkEvmSignTypedDataV4',
     requestAccounts: 'zkEvmRequestAccounts',
     getBalance: 'zkEvmGetBalance',
     getTransactionReceipt: 'zkEvmGetTransactionReceipt',
@@ -212,28 +214,68 @@ window.callFunction = async (jsonData: string) => {
     requestId = json[keyRequestId];
     const data = json[keyData];
 
-    track(moduleName, 'startedCallFunction', {
-      function: fxName,
-      requestId,
-    });
     switch (fxName) {
       case PASSPORT_FUNCTIONS.init: {
         const request = JSON.parse(data);
         const redirect: string | null = request?.redirectUri;
         const logoutMode: 'silent' | 'redirect' = request?.isSilentLogout === true ? 'silent' : 'redirect';
         if (!passportClient) {
-          const passportConfig = {
-            baseConfig: new config.ImmutableConfiguration({
-              environment: request.environment,
-            }),
-            clientId: request.clientId,
-            audience,
-            scope,
-            redirectUri: redirect ?? redirectUri,
-            logoutRedirectUri: request?.logoutRedirectUri,
-            crossSdkBridgeEnabled: true,
-            logoutMode,
-          };
+          console.log(`Connecting to ${request.environment} environment`);
+
+          let passportConfig: passport.PassportModuleConfiguration;
+
+          const environment = request.environment === 'production'
+            ? config.Environment.PRODUCTION
+            : config.Environment.SANDBOX;
+          const baseConfig = new config.ImmutableConfiguration({ environment });
+
+          if (request.environment === 'dev' || request.environment === 'development') {
+            passportConfig = {
+              baseConfig,
+              clientId: request.clientId,
+              redirectUri: redirect ?? redirectUri,
+              logoutRedirectUri: request?.logoutRedirectUri,
+              audience,
+              scope,
+              crossSdkBridgeEnabled: true,
+              logoutMode,
+              overrides: {
+                authenticationDomain: 'https://auth.dev.immutable.com',
+                magicPublishableApiKey: 'pk_live_4058236363130CA9', // Public key
+                magicProviderId: 'C9odf7hU4EQ5EufcfgYfcBaT5V6LhocXyiPRhIjw2EY=', // Public key
+                passportDomain: 'https://passport.dev.immutable.com',
+                imxPublicApiDomain: 'https://api.dev.immutable.com',
+                immutableXClient: new xClient.IMXClient({
+                  baseConfig,
+                  overrides: {
+                    immutableXConfig: xClient.createConfig({
+                      basePath: 'https://api.dev.x.immutable.com',
+                      chainID: 5,
+                      coreContractAddress: '0xd05323731807A35599BF9798a1DE15e89d6D6eF1',
+                      registrationContractAddress: '0x7EB840223a3b1E0e8D54bF8A6cd83df5AFfC88B2',
+                    }),
+                  },
+                }),
+                zkEvmRpcUrl: 'https://rpc.dev.immutable.com',
+                relayerUrl: 'https://api.dev.immutable.com/relayer-mr',
+                indexerMrBasePath: 'https://api.dev.immutable.com',
+                orderBookMrBasePath: 'https://api.dev.immutable.com',
+                passportMrBasePath: 'https://api.dev.immutable.com',
+              },
+            };
+          } else {
+            passportConfig = {
+              baseConfig,
+              clientId: request.clientId,
+              audience,
+              scope,
+              redirectUri: redirect ?? redirectUri,
+              logoutRedirectUri: request?.logoutRedirectUri,
+              crossSdkBridgeEnabled: true,
+              logoutMode,
+            };
+          }
+
           passportClient = new passport.Passport(passportConfig);
           trackDuration(moduleName, 'initialisedPassport', mt(markStart));
         }
@@ -667,6 +709,34 @@ window.callFunction = async (jsonData: string) => {
             error: null,
           },
           ...response,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.zkEvm.signTypedDataV4: {
+        const payload = JSON.parse(data);
+        const [address] = await getZkEvmProvider().request({
+          method: 'eth_requestAccounts',
+        });
+        const signature = await getZkEvmProvider().request({
+          method: 'eth_signTypedData_v4',
+          params: [address, payload],
+        });
+
+        const success = signature !== null && signature !== undefined;
+
+        if (!success) {
+          throw new Error('Failed to sign payload');
+        }
+
+        trackDuration(moduleName, 'performedZkevmSignTypedDataV4', mt(markStart), {
+          requestId,
+        });
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success,
+          error: null,
+          result: signature,
         });
         break;
       }

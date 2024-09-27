@@ -7,7 +7,7 @@ describe('load', () => {
   const scriptId = 'immutable-checkout-widgets-bundle';
 
   beforeEach(() => {
-    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    jest.spyOn(console, 'warn').mockImplementation(() => { });
   });
 
   describe('load unresolved bundle', () => {
@@ -24,17 +24,13 @@ describe('load', () => {
 
   describe('get widgets esm url', () => {
     it('should validate the versioning', () => {
-      expect(getWidgetsEsmUrl()).toEqual(
+      expect(getWidgetsEsmUrl(SDK_VERSION)).toEqual(
         `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/checkout/widgets-esm.js`,
       );
     });
 
     it('should change version', () => {
-      expect(getWidgetsEsmUrl({
-        major: 1,
-        minor: 2,
-        patch: 3,
-      })).toEqual(
+      expect(getWidgetsEsmUrl('1.2.3')).toEqual(
         'https://cdn.jsdelivr.net/npm/@imtbl/sdk@1.2.3/dist/browser/checkout/widgets-esm.js',
       );
     });

@@ -7,6 +7,7 @@ import {
   OrdersApi,
   PassportApi,
   PassportProfileApi,
+  GuardianApi,
 } from './multi-rollup';
 import { MultiRollupAPIConfiguration } from './config';
 
@@ -29,6 +30,8 @@ export class MultiRollupApiClients {
 
   public passportProfileApi: PassportProfileApi;
 
+  public guardianApi: GuardianApi;
+
   constructor(config: MultiRollupAPIConfiguration) {
     this.config = config;
     this.activitiesApi = new ActivitiesApi(config.indexer);
@@ -39,5 +42,6 @@ export class MultiRollupApiClients {
     this.ordersApi = new OrdersApi(config.orderBook);
     this.passportApi = new PassportApi(config.passport);
     this.passportProfileApi = new PassportProfileApi(config.passport);
+    this.guardianApi = new GuardianApi(config.passport);
   }
 }
