@@ -125,6 +125,12 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
+      - name: Build SDK
+        run: pnpm build
+
+      - name: Prepare SDK
+        run: pnpm prepare:sdk
+
       - name: Prepare tests
         run: pnpm prepare:tests
 
