@@ -24,7 +24,7 @@ export type AddFundsSuccess = {
  * @property {number} timestamp
  */
 export type AddFundsFailed = {
-  /** The reason why the on-ramp failed. */
+  /** The reason why it failed. */
   reason: string;
   /** The timestamp of the failed transaction. */
   timestamp: number;
