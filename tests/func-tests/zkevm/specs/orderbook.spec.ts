@@ -485,7 +485,7 @@ describe("Orderbook", () => {
         name: orderbook.OrderStatusName.ACTIVE,
       });
 
-      // fulfill partially with 1 ERC721 token
+      // fulfill partially with 1 ERC721 token (1/2)
       const { actions: fulfillActions } = await orderBookSdk.fulfillOrder(
         result.id,
         taker.address,
@@ -664,7 +664,7 @@ describe("Orderbook", () => {
         name: orderbook.OrderStatusName.ACTIVE,
       });
 
-      // fulfill partially with 1 ERC1155
+      // fulfill partially with 10 ERC1155 (10/50)
       const { actions: fulfillActions } = await orderBookSdk.fulfillOrder(
         result.id,
         taker.address,

@@ -814,7 +814,7 @@ export class Orderbook {
 
     const orders = [
       await Promise.all([listingResultsPromises, bidResultsPromises, collectionBidResultsPromises]),
-    ].flat(2).filter((r) => r !== undefined).map((r) => r!.result);
+    ].flat(2).filter((r) => r && r !== undefined).map((f) => f!.result);
 
     if (orders.length !== orderIds.length) {
       const notFoundOrderIds = orderIds.filter((oi) => !orders.some((o) => o.id === oi));
