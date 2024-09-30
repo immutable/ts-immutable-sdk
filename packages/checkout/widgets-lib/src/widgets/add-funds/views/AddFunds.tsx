@@ -5,15 +5,13 @@ import {
   TokenInfo,
 } from '@imtbl/checkout-sdk';
 import {
-  Body, Box, MenuItem, OverflowPopoverMenu,
+  Body, Box, MenuItem, OverflowPopoverMenu, HeroTextInput,
 } from '@biom3/react';
 import {
-  useCallback, useContext, useEffect, useState,
+  useCallback, useContext, useEffect, useRef, useState,
 } from 'react';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
-import { TextInputForm } from '../../../components/FormComponents/TextInputForm/TextInputForm';
 import { OptionsDrawer } from '../components/OptionsDrawer';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
@@ -64,12 +62,31 @@ export function AddFunds({
     [],
   );
   const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
+  const [inputValue, setInputValue] = useState<string>(toAmount || '0'); // UI input state
   const [currentToAmount, setCurrentToAmount] = useState<string>(
     toAmount || '0',
   );
   const [currentToTokenAddress, setCurrentToTokenAddress] = useState<
   TokenInfo | undefined
   >();
+
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleAmountChange = (value: string) => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
+    debounceTimeoutRef.current = setTimeout(() => {
+      setCurrentToAmount(value);
+    }, 1500);
+  };
+
+  const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    setInputValue(value);
+    handleAmountChange(value);
+  };
 
   const showErrorView = useCallback(
     (error: Error) => {
@@ -146,10 +163,6 @@ export function AddFunds({
 
   const openDrawer = () => {
     setShowOptionsDrawer(true);
-  };
-
-  const updateAmount = (value: string) => {
-    setCurrentToAmount(value);
   };
 
   const isSelected = (token: TokenInfo) => token.address === currentToTokenAddress;
@@ -234,14 +247,13 @@ export function AddFunds({
         >
           <Box sx={{ width: 'base.spacing.x40' }}>
             <Box sx={{ marginBottom: 'base.spacing.x3' }}>
-              <TextInputForm
-                testId="add-funds-amount"
+              <HeroTextInput
+                testId="add-funds-amount-input"
                 type="number"
-                value={currentToAmount}
-                validator={amountInputValidation}
-                onTextInputChange={(value) => updateAmount(value)}
-                textAlign="right"
-                inputMode="decimal"
+                value={inputValue}
+                onChange={(value) => updateAmount(value)}
+                placeholder="0"
+                weight="bold"
               />
             </Box>
 
