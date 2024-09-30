@@ -28,6 +28,8 @@ export type SaleWidgetParams = {
   excludeFiatCurrencies?: string[];
   /** Preferred currency, replacing the backend's base currency */
   preferredCurrency?: string;
+  /** Custom key-value pairs to be passed to the order */
+  customOrderData?: Record<string, unknown>;
 };
 
 /**
