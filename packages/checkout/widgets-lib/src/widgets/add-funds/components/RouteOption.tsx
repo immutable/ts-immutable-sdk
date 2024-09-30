@@ -37,11 +37,15 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
   )).toFixed(4), [estimate.fromAmount, estimate.fromToken.decimals]);
 
   const formattedUsdBalance = useMemo(() => (usdBalance ? Number(usdBalance).toFixed(2) : undefined), [usdBalance]);
-  const estimatedDurationInSeconds = useMemo(
-    () => (
-      estimate.estimatedRouteDuration / 1000).toFixed(1),
-    [estimate.estimatedRouteDuration],
-  );
+
+  const estimatedDurationFormatted = useMemo(() => {
+    const seconds = estimate.estimatedRouteDuration / 1000;
+    if (seconds >= 60) {
+      const minutes = Math.round(seconds / 60);
+      return minutes === 1 ? '1min' : `${minutes}mins`;
+    }
+    return `${seconds.toFixed(0)}s`;
+  }, [estimate.estimatedRouteDuration]);
 
   const handleClick = () => {
     onClick?.(route);
@@ -101,9 +105,9 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
       )}
 
       <MenuItem.Caption>
-        <Icon icon="Countdown" sx={{ w: 'base.icon.size.300' }} />
-        { estimatedDurationInSeconds }
-        s
+        <Icon icon="Countdown" sx={{ w: 'base.icon.size.250' }} />
+        {' '}
+        { estimatedDurationFormatted }
       </MenuItem.Caption>
 
     </MenuItem>
