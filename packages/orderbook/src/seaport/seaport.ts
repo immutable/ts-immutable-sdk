@@ -281,11 +281,11 @@ export class Seaport {
         parameters: orderComponents,
         signature: order.signature,
       },
+      unitsToFill,
       extraData,
       tips,
     };
 
-    if (unitsToFill) Object.assign(fulfilmentOrderDetails, { unitsToFill });
     if (considerationCriteria) Object.assign(fulfilmentOrderDetails, { considerationCriteria });
 
     const { actions: seaportActions } = await seaportLib.fulfillOrders({
