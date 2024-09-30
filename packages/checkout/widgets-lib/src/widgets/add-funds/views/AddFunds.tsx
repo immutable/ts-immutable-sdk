@@ -62,7 +62,7 @@ export function AddFunds({
     [],
   );
   const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
-  const [inputValue, setInputValue] = useState<string>(toAmount || '0'); // UI input state
+  const [inputValue, setInputValue] = useState<string>(toAmount || '0');
   const [currentToAmount, setCurrentToAmount] = useState<string>(
     toAmount || '0',
   );
