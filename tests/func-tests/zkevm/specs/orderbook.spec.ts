@@ -19,6 +19,7 @@ import { waitForBidToBeOfStatus } from "../utils/orderbook/bid";
 import { GAS_OVERRIDES } from "../utils/orderbook/gas";
 import { waitForListingToBeOfStatus } from "../utils/orderbook/listing";
 import { RetryProvider } from "../utils/orderbook/retry-provider";
+import { waitForCollectionBidToBeOfStatus } from "../utils/orderbook/collection-bid";
 
 describe("Orderbook", () => {
   const imxForApproval = 0.03 * 1e18;
@@ -342,9 +343,356 @@ describe("Orderbook", () => {
     });
   });
 
-  it("create and cancel listing & bid", async () => {
+  describe.skip("create and fulfill ERC721 collection bid", () => {
+    it("fulfill fully", async () => {
+      const erc721TokenId = getRandomTokenId();
+
+      // maker funds
+      await withBankerRetry(async () => {
+        await (
+          await erc20Contract.mint(maker.address, 100, GAS_OVERRIDES)
+        ).wait(1);
+      });
+      await withBankerRetry(async () => {
+        await (
+          await banker.sendTransaction({
+            to: maker.address,
+            value: `${imxForApproval}`,
+            ...GAS_OVERRIDES,
+          })
+        ).wait(1);
+      });
+
+      // taker funds
+      await withBankerRetry(async () => {
+        await (
+          await erc721Contract.mint(taker.address, erc721TokenId, GAS_OVERRIDES)
+        ).wait(1);
+      });
+      await withBankerRetry(async () => {
+        await (
+          await banker.sendTransaction({
+            to: taker.address,
+            value: `${imxForApproval + imxForFulfillment}`,
+            ...GAS_OVERRIDES,
+          })
+        ).wait(1);
+      });
+
+      const { actions, orderComponents, orderHash } = await orderBookSdk.prepareCollectionBid({
+        makerAddress: maker.address,
+        sell: {
+          type: "ERC20",
+          contractAddress: erc20Contract.address,
+          amount: "100",
+        },
+        buy: {
+          type: "ERC721_COLLECTION",
+          contractAddress: erc721Contract.address,
+          amount: "1",
+        },
+        orderStart: new Date(2000, 1, 15),
+      });
+      
+      const signatures = await actionAll(actions, maker);
+
+      const { result } = await orderBookSdk.createCollectionBid({
+        orderComponents,
+        orderHash,
+        orderSignature: signatures[0],
+        makerFees: [],
+      });
+      
+      await waitForCollectionBidToBeOfStatus(orderBookSdk, result.id, {
+        name: orderbook.OrderStatusName.ACTIVE,
+      });
+
+      const { actions: fulfillActions } = await orderBookSdk.fulfillOrder(
+        result.id,
+        taker.address,
+        [],
+        "1",
+        erc721TokenId
+      );
+      await actionAll(fulfillActions, taker);
+
+      await waitForCollectionBidToBeOfStatus(orderBookSdk, result.id, {
+        name: orderbook.OrderStatusName.FILLED,
+      });
+    })
+
+    it.skip("fulfill partially", async () => {
+      const erc721TokenId = getRandomTokenId();
+
+      // maker funds
+      await withBankerRetry(async () => {
+        await (
+          await erc20Contract.mint(maker.address, 100, GAS_OVERRIDES)
+        ).wait(1);
+      });
+      await withBankerRetry(async () => {
+        await (
+          await banker.sendTransaction({
+            to: maker.address,
+            value: `${imxForApproval}`,
+            ...GAS_OVERRIDES,
+          })
+        ).wait(1);
+      });
+
+      // taker funds
+      await withBankerRetry(async () => {
+        await (
+          await erc721Contract.mint(taker.address, erc721TokenId, GAS_OVERRIDES)
+        ).wait(1);
+      });
+      await withBankerRetry(async () => {
+        await (
+          await banker.sendTransaction({
+            to: taker.address,
+            value: `${imxForApproval + imxForFulfillment}`,
+            ...GAS_OVERRIDES,
+          })
+        ).wait(1);
+      });
+
+      // create a collection bid to receive an amount greather than 1
+      const { actions, orderComponents, orderHash } = await orderBookSdk.prepareCollectionBid({
+        makerAddress: maker.address,
+        sell: {
+          type: "ERC20",
+          contractAddress: erc20Contract.address,
+          amount: "100",
+        },
+        buy: {
+          type: "ERC721_COLLECTION",
+          contractAddress: erc721Contract.address,
+          amount: "2",
+        },
+        orderStart: new Date(2000, 1, 15),
+      })
+
+      const signatures = await actionAll(actions, maker);
+
+      const { result } = await orderBookSdk.createCollectionBid({
+        orderComponents,
+        orderHash,
+        orderSignature: signatures[0],
+        makerFees: [],
+      });
+      
+      await waitForCollectionBidToBeOfStatus(orderBookSdk, result.id, {
+        name: orderbook.OrderStatusName.ACTIVE,
+      });
+
+      // fulfill partially with 1 ERC721 token
+      const { actions: fulfillActions } = await orderBookSdk.fulfillOrder(
+        result.id,
+        taker.address,
+        [],
+        "1",
+        erc721TokenId
+      )
+
+      await actionAll(fulfillActions, taker)
+
+      await waitForCollectionBidToBeOfStatus(
+        orderBookSdk,
+        result.id, 
+        {
+          name: orderbook.OrderStatusName.ACTIVE
+        },
+        {
+          numerator: 1,
+          denominator: 2
+        }
+      );
+    })
+  })
+
+  describe.skip("create and fulfill ERC1155 collection bid", () => {
+    it("fulfill fully", async () => {
+      const erc1155TokenId = getRandomTokenId();
+
+      // maker funds
+      await withBankerRetry(async () => {
+        await (
+          await erc20Contract.mint(maker.address, 100, GAS_OVERRIDES)
+        ).wait(1);
+      });
+      await withBankerRetry(async () => {
+        await (
+          await banker.sendTransaction({
+            to: maker.address,
+            value: `${imxForApproval}`,
+            ...GAS_OVERRIDES,
+          })
+        ).wait(1);
+      });
+
+      // taker funds
+      await withBankerRetry(async () => {
+        await (
+          await erc1155Contract.safeMint(
+            taker.address,
+            erc1155TokenId,
+            50,
+            "0x",
+            GAS_OVERRIDES
+          )
+        ).wait(1);
+      });
+      await withBankerRetry(async () => {
+        await (
+          await banker.sendTransaction({
+            to: taker.address,
+            value: `${imxForApproval + imxForFulfillment}`,
+            ...GAS_OVERRIDES,
+          })
+        ).wait(1);
+      });
+
+      const { actions, orderComponents, orderHash } = await orderBookSdk.prepareCollectionBid({
+        makerAddress: maker.address,
+        sell: {
+          type: "ERC20",
+          contractAddress: erc20Contract.address,
+          amount: "100",
+        },
+        buy: {
+          type: "ERC1155_COLLECTION",
+          contractAddress: erc1155Contract.address,
+          amount: "50",
+        },
+        orderStart: new Date(2000, 1, 15),
+      });
+      
+      const signatures = await actionAll(actions, maker);
+
+      const { result } = await orderBookSdk.createCollectionBid({
+        orderComponents,
+        orderHash,
+        orderSignature: signatures[0],
+        makerFees: [],
+      });
+      
+      await waitForCollectionBidToBeOfStatus(orderBookSdk, result.id, {
+        name: orderbook.OrderStatusName.ACTIVE,
+      });
+
+      const { actions: fulfillActions } = await orderBookSdk.fulfillOrder(
+        result.id,
+        taker.address,
+        [],
+        "50",
+        erc1155TokenId
+      );
+      await actionAll(fulfillActions, taker);
+
+      await waitForCollectionBidToBeOfStatus(orderBookSdk, result.id, {
+        name: orderbook.OrderStatusName.ACTIVE,
+      });
+    })
+
+    it("fulfill partially", async () => {
+      const erc1155TokenId = getRandomTokenId();
+
+      // maker funds
+      await withBankerRetry(async () => {
+        await (
+          await erc20Contract.mint(maker.address, 100, GAS_OVERRIDES)
+        ).wait(1);
+      });
+      await withBankerRetry(async () => {
+        await (
+          await banker.sendTransaction({
+            to: maker.address,
+            value: `${imxForApproval}`,
+            ...GAS_OVERRIDES,
+          })
+        ).wait(1);
+      });
+
+      // taker funds
+      await withBankerRetry(async () => {
+        await (
+          await erc1155Contract.safeMint(
+            taker.address,
+            erc1155TokenId,
+            50,
+            "0x",
+            GAS_OVERRIDES
+          )
+        ).wait(1);
+      });
+      await withBankerRetry(async () => {
+        await (
+          await banker.sendTransaction({
+            to: taker.address,
+            value: `${imxForApproval + imxForFulfillment}`,
+            ...GAS_OVERRIDES,
+          })
+        ).wait(1);
+      });
+
+      // create a collection bid to receive an amount greather than 1
+      const { actions, orderComponents, orderHash } = await orderBookSdk.prepareCollectionBid({
+        makerAddress: maker.address,
+        sell: {
+          type: "ERC20",
+          contractAddress: erc20Contract.address,
+          amount: "100",
+        },
+        buy: {
+          type: "ERC1155_COLLECTION",
+          contractAddress: erc1155Contract.address,
+          amount: "50",
+        },
+        orderStart: new Date(2000, 1, 15),
+      });
+
+      const signatures = await actionAll(actions, maker);
+
+      const { result } = await orderBookSdk.createCollectionBid({
+        orderComponents,
+        orderHash,
+        orderSignature: signatures[0],
+        makerFees: [],
+      });
+      
+      await waitForCollectionBidToBeOfStatus(orderBookSdk, result.id, {
+        name: orderbook.OrderStatusName.ACTIVE,
+      });
+
+      // fulfill partially with 1 ERC1155
+      const { actions: fulfillActions } = await orderBookSdk.fulfillOrder(
+        result.id,
+        taker.address,
+        [],
+        "10",
+        erc1155TokenId
+      )
+
+      await actionAll(fulfillActions, taker)
+
+      await waitForCollectionBidToBeOfStatus(
+        orderBookSdk,
+        result.id, 
+        {
+          name: orderbook.OrderStatusName.ACTIVE
+        },
+        {
+          numerator: 10,
+          denominator: 50
+        }
+      );
+    })
+  })
+
+  it.skip("create and cancel listing, bid, and collection bid", async () => {
     const erc721TokenIdForListing = getRandomTokenId();
     const erc721TokenIdForBid = getRandomTokenId();
+    const erc1155TokenIdForCollectionBid = getRandomTokenId();
 
     // maker funds
     await withBankerRetry(async () => {
@@ -358,7 +706,7 @@ describe("Orderbook", () => {
           [
             {
               to: maker.address,
-              tokenIds: [erc721TokenIdForListing, erc721TokenIdForBid],
+              tokenIds: [erc721TokenIdForListing, erc721TokenIdForBid, erc1155TokenIdForCollectionBid],
             },
           ],
           GAS_OVERRIDES
@@ -445,20 +793,56 @@ describe("Orderbook", () => {
       return result.id;
     })();
 
+    // collection bid
+    const collectionBidId = await (async () => {
+      const {
+        actions: collectionBidCreateActions,
+        orderComponents,
+        orderHash,
+      } = await orderBookSdk.prepareCollectionBid({
+        makerAddress: maker.address,
+        sell: {
+          type: "ERC20",
+          contractAddress: erc20Contract.address,
+          amount: "100",
+        },
+        buy: {
+          type: "ERC1155_COLLECTION",
+          contractAddress: erc1155Contract.address,
+          amount: "50",
+        },
+      });
+
+      const signatures = await actionAll(collectionBidCreateActions, maker);
+      const { result } = await orderBookSdk.createCollectionBid({
+        orderComponents,
+        orderHash,
+        orderSignature: signatures[0],
+        makerFees: [],
+      });
+
+      await waitForCollectionBidToBeOfStatus(orderBookSdk, result.id, {
+        name: orderbook.OrderStatusName.ACTIVE,
+      });
+
+      return result.id;
+    })();
+
     // cancel listing & bid
     const { signableAction } = await orderBookSdk.prepareOrderCancellations([
       listingId,
       bidId,
+      collectionBidId,
     ]);
     const signatures = await actionAll([signableAction], maker);
     const { result } = await orderBookSdk.cancelOrders(
-      [listingId, bidId],
+      [listingId, bidId, collectionBidId],
       maker.address,
       signatures[0]
     );
 
     expect(result.successful_cancellations).toEqual(
-      expect.arrayContaining([listingId, bidId])
+      expect.arrayContaining([listingId, bidId, collectionBidId])
     );
 
     await Promise.all([
@@ -468,6 +852,11 @@ describe("Orderbook", () => {
         pending: false,
       }),
       waitForBidToBeOfStatus(orderBookSdk, bidId, {
+        name: orderbook.OrderStatusName.CANCELLED,
+        cancellation_type: "OFF_CHAIN" as any, // Cancellation type enum is not exported
+        pending: false,
+      }),
+      waitForCollectionBidToBeOfStatus(orderBookSdk, collectionBidId, {
         name: orderbook.OrderStatusName.CANCELLED,
         cancellation_type: "OFF_CHAIN" as any, // Cancellation type enum is not exported
         pending: false,

@@ -9,6 +9,7 @@ import {
 } from './config/config';
 import {
   mapBidFromOpenApiOrder,
+  mapCollectionBidFromOpenApiOrder,
   mapFromOpenApiPage,
   mapFromOpenApiTrade,
   mapListingFromOpenApiOrder,
@@ -23,7 +24,9 @@ import {
   ActionType,
   BidResult,
   CancelOrdersOnChainResponse,
+  CollectionBidResult,
   CreateBidParams,
+  CreateCollectionBidParams,
   CreateListingParams,
   FeeValue,
   FulfillBulkOrdersResponse,
@@ -43,6 +46,8 @@ import {
   PrepareBulkListingsParams,
   PrepareBulkListingsResponse,
   PrepareCancelOrdersResponse,
+  PrepareCollectionBidParams,
+  PrepareCollectionBidResponse,
   PrepareListingParams,
   PrepareListingResponse,
   SignablePurpose,
@@ -143,6 +148,18 @@ export class Orderbook {
     const apiBid = await this.apiClient.getBid(bidId);
     return {
       result: mapBidFromOpenApiOrder(apiBid.result),
+    };
+  }
+
+  /**
+   * Get a collection bid by ID
+   * @param {string} collectionBidId - The collectionBidId to find.
+   * @return {CollectionBidResult} The returned collection bid result.
+   */
+  async getCollectionBid(collectionBidId: string): Promise<CollectionBidResult> {
+    const apiCollectionBid = await this.apiClient.getCollectionBid(collectionBidId);
+    return {
+      result: mapCollectionBidFromOpenApiOrder(apiCollectionBid.result),
     };
   }
 
@@ -485,6 +502,52 @@ export class Orderbook {
   }
 
   /**
+   * Get required transactions and messages for signing prior to creating a collection bid
+   * through the {@linkcode createCollectionBid} method
+   * @param {PrepareCollectionBidParams} - Details about the collection bid to be created.
+   * @return {PrepareCollectionBidResponse} PrepareCollectionBidResponse includes
+   * the unsigned approval transaction, the typed order message for signing and
+   * the order components that can be submitted to {@linkcode createCollectionBid} with a signature.
+   */
+  async prepareCollectionBid({
+    makerAddress,
+    sell,
+    buy,
+    orderStart,
+    orderExpiry,
+  }: PrepareCollectionBidParams): Promise<PrepareCollectionBidResponse> {
+    return this.seaport.prepareSeaportOrder(
+      makerAddress,
+      sell,
+      buy,
+      true,
+      // Default order start to now
+      orderStart || new Date(),
+      // Default order expiry to 2 years from now
+      orderExpiry || Orderbook.defaultOrderExpiry(),
+    );
+  }
+
+  /**
+   * Create a collection bid
+   * @param {CreateCollectionBidParams} createCollectionBidParams create a collection bid
+   *                                                              with the given params.
+   * @return {CollectionBidResult} The result of the collection bid created
+   *                               in the Immutable services.
+   */
+  async createCollectionBid(
+    createCollectionBidParams: CreateCollectionBidParams,
+  ): Promise<CollectionBidResult> {
+    const apiCollectionBidResponse = await this.apiClient.createCollectionBid({
+      ...createCollectionBidParams,
+    });
+
+    return {
+      result: mapCollectionBidFromOpenApiOrder(apiCollectionBidResponse.result),
+    };
+  }
+
+  /**
    * Get unsigned transactions that can be submitted to fulfil an open order. If the approval
    * transaction exists it must be signed and submitted to the chain before the fulfilment
    * transaction can be submitted or it will be reverted.
@@ -500,18 +563,31 @@ export class Orderbook {
     takerAddress: string,
     takerFees: FeeValue[],
     amountToFill?: string,
+    tokenId?: string,
   ): Promise<FulfillOrderResponse> {
-    const fulfillmentDataRes = await this.apiClient.fulfillmentData([
-      {
-        order_id: orderId,
-        taker_address: takerAddress,
-        fees: takerFees.map((fee) => ({
-          type: OpenApiFee.type.TAKER_ECOSYSTEM,
-          amount: fee.amount,
-          recipient_address: fee.recipientAddress,
-        })),
-      },
-    ]);
+    const fulfillmentDataParams = {
+      order_id: orderId,
+      taker_address: takerAddress,
+      fees: takerFees.map((fee) => ({
+        type: OpenApiFee.type.TAKER_ECOSYSTEM,
+        amount: fee.amount,
+        recipient_address: fee.recipientAddress,
+      })),
+    };
+
+    let considerationCriteria;
+
+    // if token ID is present we can assume it is a criteria based order
+    if (tokenId) {
+      Object.assign(fulfillmentDataParams, { token_id: tokenId });
+
+      considerationCriteria = [{
+        identifier: tokenId,
+        proof: [],
+      }];
+    }
+
+    const fulfillmentDataRes = await this.apiClient.fulfillmentData([fulfillmentDataParams]);
 
     if (fulfillmentDataRes.result.unfulfillable_orders?.length > 0) {
       throw new Error(
@@ -530,7 +606,13 @@ export class Orderbook {
       );
     }
 
-    return this.seaport.fulfillOrder(orderResult, takerAddress, extraData, amountToFill);
+    return this.seaport.fulfillOrder(
+      orderResult,
+      takerAddress,
+      extraData,
+      amountToFill,
+      considerationCriteria,
+    );
   }
 
   /**
@@ -721,9 +803,18 @@ export class Orderbook {
       })),
     );
 
+    const collectionBidResultsPromises = Promise.all(
+      orderIds.map((id) => this.apiClient.getCollectionBid(id).catch((e: ApiError) => {
+        if (e.status === 404) {
+          return undefined;
+        }
+        throw e;
+      })),
+    );
+
     const orders = [
-      await Promise.all([listingResultsPromises, bidResultsPromises]),
-    ].flat(2).filter((r) => r !== undefined).map((r) => r.result);
+      await Promise.all([listingResultsPromises, bidResultsPromises, collectionBidResultsPromises]),
+    ].flat(2).filter((r) => r !== undefined).map((r) => r!.result);
 
     if (orders.length !== orderIds.length) {
       const notFoundOrderIds = orderIds.filter((oi) => !orders.some((o) => o.id === oi));

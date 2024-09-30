@@ -5,6 +5,7 @@ import type {
   CreateInputItem,
   CreateOrderAction,
   ExchangeAction,
+  InputCriteria,
   OrderComponents,
   OrderUseCase,
 } from '@opensea/seaport-js/lib/types';
@@ -109,16 +110,20 @@ function mapImmutableSdkItemToSeaportSdkConsiderationInputItem(
       };
     case 'ERC721_COLLECTION':
       return {
+        // seaport will handle mapping an ERC721 item with no identifier to a criteria based item
         itemType: ItemType.ERC721,
         token: item.contractAddress,
         amount: item.amount,
+        identifiers: [],
         recipient,
       };
     case 'ERC1155_COLLECTION':
       return {
+        // seaport will handle mapping an ERC1155 item with no identifier to a criteria based item
         itemType: ItemType.ERC1155,
         token: item.contractAddress,
         amount: item.amount,
+        identifiers: [],
         recipient,
       };
     default:
@@ -265,24 +270,27 @@ export class Seaport {
     account: string,
     extraData: string,
     unitsToFill?: string,
+    considerationCriteria?: InputCriteria[],
   ): Promise<FulfillOrderResponse> {
     const { orderComponents, tips } = mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
     const chainID = (await this.provider.getNetwork()).chainId;
 
+    const fulfilmentOrderDetails = {
+      order: {
+        parameters: orderComponents,
+        signature: order.signature,
+      },
+      extraData,
+      tips,
+    };
+
+    if (unitsToFill) Object.assign(fulfilmentOrderDetails, { unitsToFill });
+    if (considerationCriteria) Object.assign(fulfilmentOrderDetails, { considerationCriteria });
+
     const { actions: seaportActions } = await seaportLib.fulfillOrders({
       accountAddress: account,
-      fulfillOrderDetails: [
-        {
-          order: {
-            parameters: orderComponents,
-            signature: order.signature,
-          },
-          unitsToFill,
-          extraData,
-          tips,
-        },
-      ],
+      fulfillOrderDetails: [fulfilmentOrderDetails],
     });
 
     const fulfillmentActions: TransactionAction[] = [];
