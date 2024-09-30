@@ -258,7 +258,7 @@ export class ImmutableApiClient {
     if (![ItemType.ERC721_WITH_CRITERIA, ItemType.ERC1155_WITH_CRITERIA]
       .includes(orderComponents.consideration[0].itemType)
     ) {
-      throw new Error('Only ERC721 / ERC1155 tokens can be bid against');
+      throw new Error('Only ERC721 / ERC1155 collection based tokens can be bid against');
     }
 
     return this.orderbookService.createCollectionBid({

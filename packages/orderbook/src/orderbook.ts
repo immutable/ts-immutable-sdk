@@ -577,7 +577,7 @@ export class Orderbook {
 
     let considerationCriteria;
 
-    // if token ID is present we can assume it is a criteria based order
+    // if token ID is present we can assume it is a criteria based order for now
     if (tokenId) {
       Object.assign(fulfillmentDataParams, { token_id: tokenId });
 
