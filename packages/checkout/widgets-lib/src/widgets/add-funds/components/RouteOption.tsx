@@ -1,4 +1,5 @@
 import {
+  Icon,
   MenuItem, MenuItemSize, Sticker,
 } from '@biom3/react';
 import { ReactElement, useMemo } from 'react';
@@ -36,6 +37,11 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
   )).toFixed(4), [estimate.fromAmount, estimate.fromToken.decimals]);
 
   const formattedUsdBalance = useMemo(() => (usdBalance ? Number(usdBalance).toFixed(2) : undefined), [usdBalance]);
+  const estimatedDurationInSeconds = useMemo(
+    () => (
+      estimate.estimatedRouteDuration / 1000).toFixed(1),
+    [estimate.estimatedRouteDuration],
+  );
 
   const handleClick = () => {
     onClick?.(route);
@@ -93,6 +99,12 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
       {isFastest && (
       <MenuItem.Badge badgeContent="Fastest" variant="emphasis" />
       )}
+
+      <MenuItem.Caption>
+        <Icon icon="Countdown" sx={{ w: 'base.icon.size.300' }} />
+        { estimatedDurationInSeconds }
+        s
+      </MenuItem.Caption>
 
     </MenuItem>
   );
