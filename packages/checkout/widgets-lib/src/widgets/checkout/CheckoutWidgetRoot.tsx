@@ -8,10 +8,10 @@ import {
   CheckoutWidgetConnectFlowParams,
   CheckoutWidgetWalletFlowParams,
   CheckoutWidgetAddFundsFlowParams,
-  CheckouWidgetSwapFlowParams,
-  CheckouWidgetBridgeFlowParams,
-  CheckouWidgetOnRampFlowParams,
-  CheckouWidgetSaleFlowParams,
+  CheckoutWidgetSwapFlowParams,
+  CheckoutWidgetBridgeFlowParams,
+  CheckoutWidgetOnRampFlowParams,
+  CheckoutWidgetSaleFlowParams,
   CheckoutFlowType,
 } from '@imtbl/checkout-sdk';
 import React, { Suspense } from 'react';
@@ -68,7 +68,7 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
     return params;
   }
 
-  protected getValidSaleFlowParams(params: CheckouWidgetSaleFlowParams) {
+  protected getValidSaleFlowParams(params: CheckoutWidgetSaleFlowParams) {
     const validatedParams = { ...params };
 
     if (!isValidWalletProvider(params.walletProviderName)) {
@@ -142,7 +142,7 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
     return validatedParams;
   }
 
-  protected getValidSwapFlowParams(params: CheckouWidgetSwapFlowParams) {
+  protected getValidSwapFlowParams(params: CheckoutWidgetSwapFlowParams) {
     const validatedParams = { ...params };
 
     if (!isValidAmount(params.amount)) {
@@ -170,7 +170,7 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
     return validatedParams;
   }
 
-  protected getValidBridgeFlowParams(params: CheckouWidgetBridgeFlowParams) {
+  protected getValidBridgeFlowParams(params: CheckoutWidgetBridgeFlowParams) {
     const validatedParams = { ...params };
 
     if (!isValidAmount(params.amount)) {
@@ -188,7 +188,7 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
     return validatedParams;
   }
 
-  protected getValidOnRampFlowParams(params: CheckouWidgetOnRampFlowParams) {
+  protected getValidOnRampFlowParams(params: CheckoutWidgetOnRampFlowParams) {
     const validatedParams = { ...params };
 
     if (!isValidAmount(params.amount)) {

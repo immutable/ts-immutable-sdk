@@ -26,7 +26,7 @@ export type CheckoutWidgetWalletFlowParams = {
   flow: CheckoutFlowType.WALLET;
 } & WalletWidgetParams;
 
-export type CheckouWidgetSwapFlowParams = {
+export type CheckoutWidgetSwapFlowParams = {
   flow: CheckoutFlowType.SWAP;
 } & SwapWidgetParams;
 
@@ -49,7 +49,7 @@ export type CheckoutWidgetAddFundsFlowParams = {
 export type CheckoutWidgetFlowParams =
   | CheckoutWidgetConnectFlowParams
   | CheckoutWidgetWalletFlowParams
-  | CheckouWidgetSwapFlowParams
+  | CheckoutWidgetSwapFlowParams
   | CheckouWidgetBridgeFlowParams
   | CheckouWidgetOnRampFlowParams
   | CheckouWidgetSaleFlowParams
