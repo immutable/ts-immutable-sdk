@@ -42,7 +42,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
     const seconds = estimate.estimatedRouteDuration / 1000;
     if (seconds >= 60) {
       const minutes = Math.round(seconds / 60);
-      return minutes === 1 ? '1min' : `${minutes}mins`;
+      return minutes === 1 ? '1 min' : `${minutes} mins`;
     }
     return `${seconds.toFixed(0)}s`;
   }, [estimate.estimatedRouteDuration]);
