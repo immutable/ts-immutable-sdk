@@ -4071,7 +4071,7 @@ __metadata:
   resolution: "@examples/wallets-signing-with-nextjs@workspace:examples/passport/wallets-signing-with-nextjs"
   dependencies:
     "@ethersproject/providers": ^5.7.2
-    "@imtbl/sdk": latest
+    "@imtbl/sdk": "workspace:^"
     "@playwright/test": ^1.45.3
     "@tanstack/react-query": ^5.51.11
     "@types/node": ^20
@@ -4745,7 +4745,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@imtbl/sdk@0.0.0, @imtbl/sdk@workspace:sdk":
+"@imtbl/sdk@0.0.0, @imtbl/sdk@workspace:^, @imtbl/sdk@workspace:sdk":
   version: 0.0.0-use.local
   resolution: "@imtbl/sdk@workspace:sdk"
   dependencies:
