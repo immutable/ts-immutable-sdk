@@ -181,8 +181,8 @@ export default function FulfillERC1155WithPassport() {
       accountsState[0],
       [
         {
-          amount: "1000000", // Insert taker ecosystem/marketplace fee here
           recipientAddress: "0x0000000000000000000000000000000000000000", // Replace address with your own marketplace address
+          amount: "100", // Insert taker ecosystem/marketplace fee here
         },
       ],
       unitsToFill,
@@ -191,7 +191,7 @@ export default function FulfillERC1155WithPassport() {
     for (const action of actions) {
       if (action.type === orderbook.ActionType.TRANSACTION) {
         const builtTx = await action.buildTransaction();
-        await signer.sendTransaction(builtTx);
+        await (await signer.sendTransaction(builtTx)).wait(1);
       }
     }
   };

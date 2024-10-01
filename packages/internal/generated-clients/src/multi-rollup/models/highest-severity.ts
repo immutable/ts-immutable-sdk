@@ -15,15 +15,27 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { APIError501AllOf } from './apierror501-all-of';
-// May contain unused imports in some cases
-// @ts-ignore
-import { BasicAPIError } from './basic-apierror';
+import { Severity } from './severity';
 
 /**
- * @type APIError501
+ * Top level severity analysis
  * @export
+ * @interface HighestSeverity
  */
-export type APIError501 = APIError501AllOf & BasicAPIError;
+export interface HighestSeverity {
+    /**
+     * 
+     * @type {Severity}
+     * @memberof HighestSeverity
+     */
+    'severity': Severity;
+    /**
+     * 
+     * @type {string}
+     * @memberof HighestSeverity
+     */
+    'description': string;
+}
+
 
 

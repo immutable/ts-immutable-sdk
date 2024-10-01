@@ -9,8 +9,8 @@
     "@0xsequence/abi": "^1.4.3",
     "@0xsequence/core": "^1.4.3",
     "@0xsquid/sdk": "^2.8.24",
-    "@biom3/design-tokens": "^0.4.2",
-    "@biom3/react": "^0.25.0",
+    "@biom3/design-tokens": "^0.4.4",
+    "@biom3/react": "^0.27.3",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/abstract-provider": "^5.7.0",
     "@ethersproject/abstract-signer": "^5.7.0",
@@ -97,7 +97,7 @@
     "eslint": "^8.40.0",
     "glob": "^10.2.3",
     "rimraf": "^6.0.1",
-    "rollup": "^4.19.1",
+    "rollup": "^4.22.4",
     "rollup-plugin-dts": "^6.1.1",
     "rollup-plugin-polyfill-node": "^0.13.0",
     "semver": "^7.4.0",
@@ -162,7 +162,7 @@
   },
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
-    "@biom3/design-tokens": "^0.4.2",
+    "@biom3/design-tokens": "^0.4.4",
     "@openzeppelin/contracts": "3.4.2-solc-0.7"
   },
   "scripts": {

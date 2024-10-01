@@ -101,6 +101,7 @@ export const useRoutes = () => {
     toToken: Token,
     toAmount: string,
     toAddress: string,
+    fromAddress:string | undefined = undefined,
     quoteOnly = true,
   ): Promise<RouteResponse | undefined> => {
     try {
@@ -122,6 +123,7 @@ export const useRoutes = () => {
         fromAmount: formattedFromAmount.toString(),
         toChain: toToken.chainId,
         toToken: toToken.address,
+        fromAddress,
         toAddress,
         quoteOnly,
         enableBoost: true,
@@ -190,5 +192,7 @@ export const useRoutes = () => {
     return allRoutes;
   };
 
-  return { routes, fetchRoutesWithRateLimit };
+  return {
+    routes, fetchRoutesWithRateLimit, getFromAmount, getRoute,
+  };
 };
