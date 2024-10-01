@@ -16,7 +16,6 @@ import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { OptionsDrawer } from '../components/OptionsDrawer';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
-import { OptionTypes } from '../components/Option';
 import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
 import { getL2ChainId } from '../../../lib';
 import {
@@ -25,6 +24,7 @@ import {
   ViewContext,
 } from '../../../context/view-context/ViewContext';
 import { useRoutes } from '../hooks/useRoutes';
+import { RouteData } from '../types';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -74,7 +74,7 @@ export function AddFunds({
 
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
+  const { routes, fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
 
   const handleAmountChange = (value: string) => {
     if (debounceTimeoutRef.current) {
@@ -197,28 +197,22 @@ export function AddFunds({
   //   console.log('handle review click');
   // };
 
-  const onPayWithCard = (paymentType: OptionTypes) => {
-    if (paymentType === OptionTypes.SWAP) {
-      orchestrationEvents.sendRequestSwapEvent(
-        eventTarget,
-        IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
-        {
-          toTokenAddress: currentToTokenAddress?.address ?? '',
-          amount: toAmount ?? '',
-          fromTokenAddress: '',
-        },
-      );
-    } else {
-      const data = {
-        tokenAddress: currentToTokenAddress?.address ?? '',
-        amount: toAmount ?? '',
-      };
-      orchestrationEvents.sendRequestOnrampEvent(
-        eventTarget,
-        IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
-        data,
-      );
-    }
+  const onCardClick = () => {
+    const data = {
+      tokenAddress: currentToTokenAddress?.address ?? '',
+      amount: toAmount ?? '',
+    };
+    orchestrationEvents.sendRequestOnrampEvent(
+      eventTarget,
+      IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+      data,
+    );
+  };
+
+  const onRouteClick = (route: RouteData) => () => {
+    // TODO: go to the review screen
+    // eslint-disable-next-line no-console
+    console.log('onRouteClick', route);
   };
 
   const checkShowOnRampOption = () => {
@@ -326,12 +320,14 @@ export function AddFunds({
           }}
         >
           <OptionsDrawer
+            routes={routes}
             showOnrampOption={checkShowOnRampOption()}
             showSwapOption={showSwapOption}
             showBridgeOption={showBridgeOption}
             visible={showOptionsDrawer}
             onClose={() => setShowOptionsDrawer(false)}
-            onPayWithCard={onPayWithCard}
+            onCardClick={onCardClick}
+            onRouteClick={onRouteClick}
           />
         </Box>
         {/* <Button
