@@ -1,10 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { ethers } from 'ethers';
+import { ethers, utils } from 'ethers';
 import { passportInstance } from '../utils/passport';
+import { Provider } from '@imtbl/passport';
+import { isValidSignature } from '../utils/isValidSignature';
 import { Button, Heading, Link, Table } from '@biom3/react';
 import NextLink from 'next/link';
+import React from 'react';
 
 export default function ConnectWithEtherJS() {
   // setup the accounts state
@@ -13,10 +16,19 @@ export default function ConnectWithEtherJS() {
   // setup the loading state to enable/disable buttons when loading
   const [loading, setLoadingState] = useState<boolean>(false);
 
-  // setup the signed state to show messages on success or failure of signing
+  // setup the signed/verified state to show messages on success or failure of signing
   const [signedStateMessage, setSignedMessageState] = useState<string>('(not signed)');
 
+  const [verifiedStateMessage, setVerifiedStateMessage] = useState<string>('(not verified)');
+
+  //setup necessary states for signature verification
+  const [address, setAddress] = useState<string>('')
+
+  const [personalMessage, setPersonalMessage] = useState<string>('');
+
+  const [msgSignature, setSignature] = useState<string>('')
   // #doc passport-wallets-nextjs-sign-erc191-create
+
   // fetch the Passport provider from the Passport instance
   const passportProvider = passportInstance.connectEvm();
 
@@ -58,16 +70,22 @@ export default function ConnectWithEtherJS() {
     // fetch the signer from the Web3provider
     const signer = web3Provider.getSigner();
 
+    const address = await signer.getAddress();
+    setAddress(address);
+
     // Create the message to be signed
     // Please note there is a 500 character limit for the message
     const message = 'this is a personal sign message';
 
+    setPersonalMessage(message);
+
     try {
       // attempt to sign the message, this brings up the passport popup
-      await signer.signMessage(message);
-
+      const signature = await signer.signMessage(message);
+      setSignature(signature);
       // if successful update the signed message to successful in the view
       setSignedMessageState('user successfully signed message');
+
     } catch (error: any) {
       // Handle user denying signature
       if (error.code === -32003) {
@@ -76,10 +94,39 @@ export default function ConnectWithEtherJS() {
       } else {
         // if something else went wrong, update the generic error with message in the view
         setSignedMessageState(`something went wrong - ${error.message}`);
+        console.log(error)
       }
     }
   };
   // #enddoc passport-wallets-nextjs-sign-erc191-signmessage
+
+  // #doc passport-wallets-nextjs-sign-erc191-verifysignature
+  const isValidERC191Signature = async (
+    address: string,
+    payload: string,
+    signature: string,
+    zkEvmProvider: Provider,
+  ) => {
+    const digest = utils.hashMessage(payload);
+  
+    return isValidSignature(address, digest, signature, zkEvmProvider);
+  };
+
+  const verifySignature = async () => {
+    setVerifiedStateMessage("Pending Verification");
+
+    try {
+      // validate the signature
+      const isValid = await isValidERC191Signature(address, personalMessage, msgSignature, passportProvider);
+      isValid ? setVerifiedStateMessage("Signature verified") : setVerifiedStateMessage("Signature couldn't be verified");
+
+    } catch (error: any) {
+      // if something else went wrong, update the generic error with message in the view
+      setVerifiedStateMessage(`something went wrong - ${error.message}`);
+      console.log(error);
+    }
+  }
+  // #enddoc passport-wallets-nextjs-sign-erc191-verifysignature
 
   // render the view to login/logout and show the connected accounts and sign message
   return (
@@ -108,10 +155,22 @@ export default function ConnectWithEtherJS() {
             Sign Message
           </Button>
         </p>
+        <p>
+          Message Signed: {signedStateMessage}
+        </p>
         <br />
         <p>
-          Message Signed:
-          {signedStateMessage}
+          <Button
+            className="mb-1"
+            size="medium"
+            onClick={verifySignature}
+            disabled={loading || !personalMessage || !msgSignature}
+          >
+            Verify Message
+          </Button>
+        </p>
+        <p>
+          Message Verified: {verifiedStateMessage}
         </p>
         <br />
         <p>
