@@ -75,8 +75,13 @@ export function mapSeaportItemToImmutableAssetCollectionItem(
         contract_address: item.token,
         amount: item.startAmount,
       };
-    default:
+    case ItemType.ERC20:
+    case ItemType.NATIVE:
+    case ItemType.ERC721:
+    case ItemType.ERC1155:
       throw new Error(`Unsupported item type ${item.itemType}`);
+    default:
+      return exhaustiveSwitch(item.itemType);
   }
 }
 

@@ -15,7 +15,9 @@ import {
   mapListingFromOpenApiOrder,
   mapOrderFromOpenApiOrder,
 } from './openapi/mapper';
-import { ApiError, CancelOrdersResult, Fee as OpenApiFee } from './openapi/sdk';
+import {
+  ApiError, CancelOrdersResult, FulfillmentDataRequest, Fee as OpenApiFee,
+} from './openapi/sdk';
 import { Seaport } from './seaport';
 import { getBulkSeaportOrderSignatures } from './seaport/components';
 import { SeaportLibFactory } from './seaport/seaport-lib-factory';
@@ -448,9 +450,7 @@ export class Orderbook {
   async createListing(
     createListingParams: CreateListingParams,
   ): Promise<ListingResult> {
-    const apiListingResponse = await this.apiClient.createListing({
-      ...createListingParams,
-    });
+    const apiListingResponse = await this.apiClient.createListing(createListingParams);
 
     return {
       result: mapListingFromOpenApiOrder(apiListingResponse.result),
@@ -492,9 +492,7 @@ export class Orderbook {
   async createBid(
     createBidParams: CreateBidParams,
   ): Promise<BidResult> {
-    const apiBidResponse = await this.apiClient.createBid({
-      ...createBidParams,
-    });
+    const apiBidResponse = await this.apiClient.createBid(createBidParams);
 
     return {
       result: mapBidFromOpenApiOrder(apiBidResponse.result),
@@ -538,9 +536,9 @@ export class Orderbook {
   async createCollectionBid(
     createCollectionBidParams: CreateCollectionBidParams,
   ): Promise<CollectionBidResult> {
-    const apiCollectionBidResponse = await this.apiClient.createCollectionBid({
-      ...createCollectionBidParams,
-    });
+    const apiCollectionBidResponse = await this.apiClient.createCollectionBid(
+      createCollectionBidParams,
+    );
 
     return {
       result: mapCollectionBidFromOpenApiOrder(apiCollectionBidResponse.result),
@@ -565,7 +563,7 @@ export class Orderbook {
     amountToFill?: string,
     tokenId?: string,
   ): Promise<FulfillOrderResponse> {
-    const fulfillmentDataParams = {
+    const fulfillmentDataParams: FulfillmentDataRequest = {
       order_id: orderId,
       taker_address: takerAddress,
       fees: takerFees.map((fee) => ({
@@ -575,17 +573,12 @@ export class Orderbook {
       })),
     };
 
-    let considerationCriteria;
+    const considerationCriteria = tokenId
+      ? [{ identifier: tokenId, proof: [] }]
+      : undefined;
 
     // if token ID is present we can assume it is a criteria based order for now
-    if (tokenId) {
-      Object.assign(fulfillmentDataParams, { token_id: tokenId });
-
-      considerationCriteria = [{
-        identifier: tokenId,
-        proof: [],
-      }];
-    }
+    if (tokenId) fulfillmentDataParams.token_id = tokenId;
 
     const fulfillmentDataRes = await this.apiClient.fulfillmentData([fulfillmentDataParams]);
 
@@ -814,7 +807,7 @@ export class Orderbook {
 
     const orders = [
       await Promise.all([listingResultsPromises, bidResultsPromises, collectionBidResultsPromises]),
-    ].flat(2).filter((r) => r && r !== undefined).map((f) => f!.result);
+    ].flat(2).filter((r) => r !== undefined).map((f) => f.result);
 
     if (orders.length !== orderIds.length) {
       const notFoundOrderIds = orderIds.filter((oi) => !orders.some((o) => o.id === oi));

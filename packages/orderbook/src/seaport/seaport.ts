@@ -276,7 +276,7 @@ export class Seaport {
     const seaportLib = this.getSeaportLib(order);
     const chainID = (await this.provider.getNetwork()).chainId;
 
-    const fulfilmentOrderDetails = {
+    const fulfilmentOrderDetails: Parameters<typeof seaportLib.fulfillOrders>[0]['fulfillOrderDetails'][0] = {
       order: {
         parameters: orderComponents,
         signature: order.signature,
@@ -286,7 +286,7 @@ export class Seaport {
       tips,
     };
 
-    if (considerationCriteria) Object.assign(fulfilmentOrderDetails, { considerationCriteria });
+    if (considerationCriteria) fulfilmentOrderDetails.considerationCriteria = considerationCriteria;
 
     const { actions: seaportActions } = await seaportLib.fulfillOrders({
       accountAddress: account,
