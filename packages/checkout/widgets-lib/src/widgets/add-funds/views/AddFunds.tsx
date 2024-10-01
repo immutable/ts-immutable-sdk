@@ -25,6 +25,7 @@ import {
 } from '../../../context/view-context/ViewContext';
 import { useRoutes } from '../hooks/useRoutes';
 import { RouteData } from '../types';
+import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -209,10 +210,25 @@ export function AddFunds({
     );
   };
 
-  const onRouteClick = (route: RouteData) => () => {
-    // TODO: go to the review screen
-    // eslint-disable-next-line no-console
-    console.log('onRouteClick', route);
+  const onRouteClick = (routeData: RouteData) => () => {
+    if (!toAmount || !toTokenAddress) {
+      return;
+    }
+
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: AddFundsWidgetViews.REVIEW,
+          data: {
+            balance: routeData.amountData.balance,
+            toChainId: ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+            toTokenAddress,
+            toAmount,
+          },
+        },
+      },
+    });
   };
 
   const checkShowOnRampOption = () => {
