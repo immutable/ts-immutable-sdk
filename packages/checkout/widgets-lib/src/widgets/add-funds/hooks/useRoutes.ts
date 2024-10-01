@@ -106,7 +106,7 @@ export const useRoutes = () => {
     toToken: Token,
     toAmount: string,
     toAddress: string,
-    fromAddress:string | undefined = undefined,
+    fromAddress?:string,
     quoteOnly = true,
   ): Promise<RouteResponse | undefined> => {
     try {
