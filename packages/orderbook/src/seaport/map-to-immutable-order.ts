@@ -1,6 +1,8 @@
 import { ConsiderationItem, OfferItem } from '@opensea/seaport-js/lib/types';
 import { ItemType, OrderType } from '@opensea/seaport-js/lib/constants';
-import { Item, ProtocolData } from '../openapi/sdk';
+import {
+  AssetCollectionItem, ERC20Item, Item, ProtocolData,
+} from '../openapi/sdk';
 import { exhaustiveSwitch } from '../utils';
 
 export function mapSeaportItemToImmutableItem(item: OfferItem | ConsiderationItem): Item {
@@ -41,6 +43,43 @@ export function mapSeaportItemToImmutableItem(item: OfferItem | ConsiderationIte
         contract_address: item.token,
         amount: item.startAmount,
       };
+    default:
+      return exhaustiveSwitch(item.itemType);
+  }
+}
+
+export function mapSeaportItemToImmutableERC20Item(item: OfferItem | ConsiderationItem): ERC20Item {
+  if (item.itemType !== ItemType.ERC20) {
+    throw new Error(`Expected ERC20 item, got ${item.itemType}`);
+  }
+  return {
+    type: 'ERC20',
+    contract_address: item.token,
+    amount: item.startAmount,
+  };
+}
+
+export function mapSeaportItemToImmutableAssetCollectionItem(
+  item: OfferItem | ConsiderationItem,
+): AssetCollectionItem {
+  switch (item.itemType) {
+    case ItemType.ERC721_WITH_CRITERIA:
+      return {
+        type: 'ERC721_COLLECTION',
+        contract_address: item.token,
+        amount: item.startAmount,
+      };
+    case ItemType.ERC1155_WITH_CRITERIA:
+      return {
+        type: 'ERC1155_COLLECTION',
+        contract_address: item.token,
+        amount: item.startAmount,
+      };
+    case ItemType.ERC20:
+    case ItemType.NATIVE:
+    case ItemType.ERC721:
+    case ItemType.ERC1155:
+      throw new Error(`Unsupported item type ${item.itemType}`);
     default:
       return exhaustiveSwitch(item.itemType);
   }
