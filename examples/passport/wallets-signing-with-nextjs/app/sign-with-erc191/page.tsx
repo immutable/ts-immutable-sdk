@@ -16,6 +16,8 @@ export default function ConnectWithEtherJS() {
   // setup the loading state to enable/disable buttons when loading
   const [loading, setLoadingState] = useState<boolean>(false);
 
+  const [loggingOut, setLoggingOut] = useState<boolean>(false);
+
   // setup the signed/verified state to show messages on success or failure of signing
   const [signedStateMessage, setSignedMessageState] = useState<string>('(not signed)');
 
@@ -56,6 +58,8 @@ export default function ConnectWithEtherJS() {
   const passportLogout = async () => {
     // disable button while loading
     setLoadingState(true);
+    // hide table while logging out
+    setLoggingOut(true);
     // reset the account state
     setAccountsState([]);
     // logout from passport
@@ -132,7 +136,7 @@ export default function ConnectWithEtherJS() {
   return (
     <>
       <Heading className="mb-1">Passport Sign ERC-191 Message</Heading>
-      {accountsState.length === 0
+      {(accountsState.length === 0 && !loggingOut)
       && (
         <Button
         className="mb-1"
@@ -185,28 +189,34 @@ export default function ConnectWithEtherJS() {
       </>
       )}
       <br />
-      <Table>
-        <Table.Head>
-          <Table.Row>
-            <Table.Cell>Item</Table.Cell>
-            <Table.Cell>Value</Table.Cell>
-          </Table.Row>
-        </Table.Head>
-        <Table.Body>
-          <Table.Row>
-            <Table.Cell><b>Connected Account</b></Table.Cell>
-            <Table.Cell>
-              {accountsState.length === 0 && (
-                <span>(not&nbsp;connected)</span>
-              )
-              }
-              {accountsState.length > 0 && accountsState[0]}
-            </Table.Cell>
-          </Table.Row>
-        </Table.Body>
-      </Table>
-      <br />
-      <Link rc={<NextLink href="/" />}>Return to Examples</Link>
+      {loggingOut ? (
+        <h1 className="text-3xl font-bold mb-8">Logging Out...</h1>
+      ) : (
+        <>
+          <Table>
+            <Table.Head>
+              <Table.Row>
+                <Table.Cell>Item</Table.Cell>
+                <Table.Cell>Value</Table.Cell>
+              </Table.Row>
+            </Table.Head>
+            <Table.Body>
+              <Table.Row>
+                <Table.Cell><b>Connected Account</b></Table.Cell>
+                <Table.Cell>
+                  {accountsState.length === 0 && (
+                    <span>(not&nbsp;connected)</span>
+                  )
+                  }
+                  {accountsState.length > 0 && accountsState[0]}
+                </Table.Cell>
+              </Table.Row>
+            </Table.Body>
+          </Table>
+          <br />
+          <Link rc={<NextLink href="/" />}>Return to Examples</Link>
+        </>
+      )}
   </>
   );
 }
