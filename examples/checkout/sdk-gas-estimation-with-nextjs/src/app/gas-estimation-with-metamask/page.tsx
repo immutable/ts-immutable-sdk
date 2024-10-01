@@ -13,7 +13,6 @@ const hexToDecimal = (hex: string) => {
 };
 
 export default function ConnectWithMetamask() {
-  const [isConnected, setIsConnected] = useState<boolean>();
   // setup the loading state to enable/disable buttons when loading
   const [loading, setLoadingState] = useState<boolean>(false);
   const [swapGasEstimate, setSwapGasEstimate] = useState<GasEstimateSwapResult>();
@@ -29,9 +28,8 @@ export default function ConnectWithMetamask() {
       walletProviderName,
     });
 
-    // Get the current network information
     // Pass through requestWalletPermissions to request the user's wallet permissions
-    const connectRes = await checkoutSDK.connect({
+   await checkoutSDK.connect({
       provider: providerRes.provider,
       requestWalletPermissions: true,
     });
