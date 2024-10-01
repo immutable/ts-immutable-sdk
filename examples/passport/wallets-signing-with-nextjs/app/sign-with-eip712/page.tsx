@@ -2,9 +2,13 @@
 
 import { useState } from 'react';
 import { ethers } from 'ethers';
+import { Provider, TypedDataPayload } from '@imtbl/passport';
 import { passportInstance } from '../utils/passport';
+import { getEtherMailTypedPayload } from '../utils/etherMailTypedPayload'
+import { isValidSignature } from '../utils/isValidSignature'
 import { Button, Heading, Link, Table } from '@biom3/react';
 import NextLink from 'next/link';
+import React from 'react';
 
 export default function ConnectWithEtherJS() {
   // setup the accounts state
@@ -13,15 +17,25 @@ export default function ConnectWithEtherJS() {
   // setup the loading state to enable/disable buttons when loading
   const [loading, setLoadingState] = useState<boolean>(false);
 
-  // setup the signed state to show messages on success or failure
+  // setup the signed/verified states to show messages on success or failure
   const [signedStateMessage, setSignedMessageState] = useState<string>('(not signed)');
 
+  const [verifiedStateMessage, setVerifiedStateMessage] = useState<string>('(not verified)');
+
+  // setup necessary states for verifying messages (params - address, payload; signature)
+  const [params, setParams] = useState<any[]>([]);
+
+  const [signature, setSignature] = useState<any>('');
   // #doc passport-wallets-nextjs-sign-eip712-create
+  
   // fetch the Passport provider from the Passport instance
   const passportProvider = passportInstance.connectEvm();
 
   // create the Web3Provider using the Passport provider
   const web3Provider = new ethers.providers.Web3Provider(passportProvider);
+
+  // const address = await signer.getAddress();
+
   // #enddoc passport-wallets-nextjs-sign-eip712-create
 
   const passportLogin = async () => {
@@ -36,6 +50,7 @@ export default function ConnectWithEtherJS() {
 
       // once logged in Passport is connected to the wallet and ready to transact
       setAccountsState(accounts);
+
       // enable button when loading has finished
       setLoadingState(false);
     }
@@ -44,11 +59,16 @@ export default function ConnectWithEtherJS() {
   const passportLogout = async () => {
     // disable button while loading
     setLoadingState(true);
-    // reset the account state
+
+    // reset states
     setAccountsState([]);
+    setParams([]);
+    setSignature('');
+
     // logout from passport
     await passportInstance.logout();
   };
+
 
   // #doc passport-wallets-nextjs-sign-eip712-signmessage
   const signMessage = async () => {
@@ -64,46 +84,25 @@ export default function ConnectWithEtherJS() {
     // set the sender address
     const address = await signer.getAddress();
 
-    // Define our "domain separator" to ensure user signatures are unique across apps/chains
-    const domain = {
-      name: 'Ether Mail',
-      version: '1',
-      chainId,
-      verifyingContract: address,
-    };
+    // get our message payload - including domain, message and types (see utils/etherMailTypedPayload)
+    const etherMailTypedPayload = getEtherMailTypedPayload(chainId, address)
 
-    // setup the types for displaying the message in the signing window
-    const types = {
-      Person: [
-        { name: 'name', type: 'string' },
-        { name: 'wallet', type: 'address' },
-      ],
-      Mail: [
-        { name: 'from', type: 'Person' },
-        { name: 'to', type: 'Person' },
-        { name: 'contents', type: 'string' },
-      ],
-    };
-
-    // setup the message to be signed
-    const message = {
-      from: {
-        name: 'Cow',
-        wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-      },
-      to: {
-        name: 'Bob',
-        wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-      },
-      contents: 'Hello, Bob!',
-    };
+    setParams([
+      address,
+      etherMailTypedPayload
+    ])
 
     try {
       // attempt to sign the message, this brings up the passport popup
-      await signer._signTypedData(domain, types, message);
-
       // if successful update the signed message to successful in the view
+      const signature = await passportProvider.request({
+        method: 'eth_signTypedData_v4',
+        params: [address, etherMailTypedPayload],
+      })
+
+      setSignature(signature)
       setSignedMessageState('user successfully signed message');
+
     } catch (error: any) {
       // Handle user denying signature
       if (error.code === 4001) {
@@ -112,10 +111,58 @@ export default function ConnectWithEtherJS() {
       } else {
         // if something else went wrong, update the generic error with message in the view
         setSignedMessageState(`something went wrong - ${error.message}`);
+        console.log(error);
       }
     }
   };
   // #enddoc passport-wallets-nextjs-sign-eip712-signmessage
+
+  // #doc passport-wallets-nextjs-sign-eip712-verifysignature
+  
+  const isValidTypedDataSignature = async (
+    address: string,
+    payload: string,
+    signature: string,
+    zkEvmProvider: Provider,
+  ) => {
+    const typedPayload: TypedDataPayload = JSON.parse(payload);
+    const types = { ...typedPayload.types };
+    // @ts-ignore
+    delete types.EIP712Domain;
+  
+    // eslint-disable-next-line no-underscore-dangle
+    const digest = ethers.utils._TypedDataEncoder.hash(
+      typedPayload.domain,
+      types,
+      typedPayload.message,
+    );
+    return isValidSignature(address, digest, signature, zkEvmProvider);
+  };
+
+  const verifySignature = async () => {
+    setVerifiedStateMessage("Pending Verification");
+
+    try {
+      // validate the signature
+      const isValid = await isValidTypedDataSignature(
+        params[0], // the signer address
+        JSON.stringify(params[1]), // the etherMail payload
+        signature,
+        passportProvider,
+      );
+
+      // set verified message state based on validation value
+      isValid ? setVerifiedStateMessage("Signature verified") : setVerifiedStateMessage("Signature couldn't be verified");
+
+    } catch (error: any) {
+      // if something else went wrong, update the generic error with message in the view
+      setSignedMessageState(`something went wrong - ${error.message}`);
+      console.log(error);
+    }
+  }
+  
+  // #enddoc passport-wallets-nextjs-sign-eip712-verifysignature
+
 
   // render the view to login/logout and show the connected accounts and sign message
   return (
@@ -144,10 +191,22 @@ export default function ConnectWithEtherJS() {
             Sign Message
           </Button>
         </p>
+        <p>
+          Message Signed: {signedStateMessage}
+        </p>
         <br />
         <p>
-          Message Signed:
-          {signedStateMessage}
+          <Button
+            className="mb-1"
+            size="medium"
+            onClick={verifySignature}
+            disabled={loading || !signature}
+          >
+            Verify Signature
+          </Button>
+        </p>
+        <p>
+          Message Verified: {verifiedStateMessage}
         </p>
         <br />
         <p>
