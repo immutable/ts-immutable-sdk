@@ -2,12 +2,17 @@ import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import { RouteResponse, Token } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
 import { utils } from 'ethers';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { delay } from '../functions/delay';
 import { AmountData, RouteData } from '../types';
 
 export const useRoutes = () => {
-  const [routes, setRoutes] = useState<RouteData[]>([]);
+  const [routes, setRoutes] = useState<RouteData[] | undefined>(undefined);
+  const latestRequestIdRef = useRef<number>(0); // Track the latest request ID
+
+  const resetRoutes = () => {
+    setRoutes(undefined);
+  };
 
   const getFromAmount = async (
     squid: Squid,
@@ -166,6 +171,8 @@ export const useRoutes = () => {
     bulkNumber = 5,
     delayMs = 1000,
   ):Promise<RouteData[]> => {
+    const currentRequestId = ++latestRequestIdRef.current;
+
     const amountDataArray = await getSufficientFromAmounts(
       squid,
       balances,
@@ -188,11 +195,14 @@ export const useRoutes = () => {
       await delay(delayMs);
     }
 
-    setRoutes(allRoutes);
+    // Only update routes if the request is the latest one
+    if (currentRequestId === latestRequestIdRef.current) {
+      setRoutes(allRoutes);
+    }
     return allRoutes;
   };
 
   return {
-    routes, fetchRoutesWithRateLimit, getFromAmount, getRoute,
+    routes, fetchRoutesWithRateLimit, getFromAmount, getRoute, resetRoutes,
   };
 };
