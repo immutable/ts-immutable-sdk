@@ -1,4 +1,5 @@
 import {
+  ChainId,
   Checkout,
   IMTBLWidgetEvents,
   TokenFilterTypes,
@@ -23,6 +24,7 @@ import {
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
+import { useRoutes } from '../hooks/useRoutes';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -49,7 +51,7 @@ export function AddFunds({
 }: AddFundsProps) {
   const showBack = showBackButton || !!onBackButtonClick;
 
-  const { addFundsDispatch } = useContext(AddFundsContext);
+  const { addFundsState: { squid, balances }, addFundsDispatch } = useContext(AddFundsContext);
 
   const { viewDispatch } = useContext(ViewContext);
 
@@ -71,6 +73,8 @@ export function AddFunds({
   >();
 
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const { fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
 
   const handleAmountChange = (value: string) => {
     if (debounceTimeoutRef.current) {
@@ -102,6 +106,22 @@ export function AddFunds({
     },
     [viewDispatch],
   );
+
+  useEffect(() => {
+    resetRoutes();
+
+    if (balances && squid && currentToTokenAddress && currentToAmount) {
+      fetchRoutesWithRateLimit(
+        squid,
+        balances,
+        ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+        currentToTokenAddress?.address ?? '',
+        currentToAmount,
+        5,
+        1000,
+      );
+    }
+  }, [balances, squid, currentToTokenAddress, currentToAmount]);
 
   useEffect(() => {
     if (!checkout) {
