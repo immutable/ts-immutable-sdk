@@ -138,7 +138,7 @@ export default function AddFundsWidget({
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
 
-  const errorAction = async () => {
+  const errorAction = () => {
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
@@ -165,7 +165,7 @@ export default function AddFundsWidget({
         {viewState.view.type === SharedViews.ERROR_VIEW && (
           <ErrorView
             actionText={t('views.ERROR_VIEW.actionText')}
-            onActionClick={() => errorAction()}
+            onActionClick={errorAction}
             onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
             errorEventAction={() => {
               page({
