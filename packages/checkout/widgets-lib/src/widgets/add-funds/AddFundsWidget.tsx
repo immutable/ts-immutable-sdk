@@ -13,7 +13,7 @@ import {
 import { AddFundsWidgetViews } from '../../context/view-context/AddFundsViewContextTypes';
 import {
   initialViewState,
-  SharedViews,
+  SharedViews, ViewActions,
   ViewContext,
   viewReducer,
 } from '../../context/view-context/ViewContext';
@@ -138,6 +138,15 @@ export default function AddFundsWidget({
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
 
+  const errorAction = () => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: { type: AddFundsWidgetViews.ADD_FUNDS },
+      },
+    });
+  };
+
   return (
     <ViewContext.Provider value={viewReducerValues}>
       <AddFundsContext.Provider value={addFundsReducerValues}>
@@ -156,7 +165,7 @@ export default function AddFundsWidget({
         {viewState.view.type === SharedViews.ERROR_VIEW && (
           <ErrorView
             actionText={t('views.ERROR_VIEW.actionText')}
-            onActionClick={() => undefined}
+            onActionClick={errorAction}
             onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
             errorEventAction={() => {
               page({
