@@ -22,6 +22,8 @@ import { ErrorView } from '../../views/error/ErrorView';
 import { useSquid } from './hooks/useSquid';
 import { useAnalytics, UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { fetchChains } from './functions/fetchChains';
+import { Review } from './views/Review';
+import { Confirmation } from './views/Confirmation';
 
 export type AddFundsWidgetInputs = AddFundsWidgetParams & {
   checkout: Checkout;
@@ -160,6 +162,26 @@ export default function AddFundsWidget({
             showSwapOption={showSwapOption}
             showBridgeOption={showBridgeOption}
             onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
+          />
+        )}
+        {viewState.view.type === AddFundsWidgetViews.REVIEW && (
+          <Review
+            data={viewState.view.data}
+            onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
+            onBackButtonClick={() => {
+              viewDispatch({
+                payload: {
+                  type: ViewActions.GO_BACK,
+                },
+              });
+            }}
+            showBackButton
+          />
+        )}
+        {viewState.view.type === AddFundsWidgetViews.CONFIRMATION && (
+          <Confirmation
+            data={viewState.view.data}
+            onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
           />
         )}
         {viewState.view.type === SharedViews.ERROR_VIEW && (
