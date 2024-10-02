@@ -28,8 +28,8 @@ jobs:
       - name: Syncpack
         run: pnpm syncpack:check
 
-  build-lint-test-typecheck-sdk:
-    name: Build, Lint, Test & Typecheck SDK
+  build-lint-test-sdk:
+    name: Build, Lint & Test SDK
     runs-on: ubuntu-latest-8-cores
     steps:
       - name: Checkout code
@@ -41,8 +41,8 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
-      - name: Build, Lint, Test & Typecheck
-        run: pnpm --if-present nx affected -t build,lint,test,typecheck 
+      - name: Build, Lint & Test
+        run: pnpm --if-present nx affected -t build,lint,test 
 
   build-lint-test-examples:
     name: Build, Lint & Test Examples

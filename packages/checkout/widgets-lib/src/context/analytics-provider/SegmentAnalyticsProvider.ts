@@ -4,9 +4,6 @@ import {
   StandardAnalyticsControlTypes,
 } from '@imtbl/react-analytics';
 
-// Needed to fix ts(2742) error with @imtbl/react-analytics and inferring types for AnalyticsProvider, useAnalytics
-import '@segment/analytics-next';
-
 export enum UserJourney {
   CONNECT = 'Connect',
   WALLET = 'Wallet',

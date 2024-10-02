@@ -53,8 +53,8 @@
   "module": "dist/index.browser.js",
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "tsup --config ../../../../tsup.base.ts && tsc --customConditions default --emitDeclarationOnly",
-    "d": "tsup --config ../../../../tsup.base.ts",
+    "build": "tsup --config ../../../../tsup.base.js && tsc --customConditions default --emitDeclarationOnly",
+    "d": "tsup --config ../../../../tsup.base.js",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "lint:fix": "cd ../../../../ && pnpm wsrun -p @imtbl/bridge-sdk -c lint --fix",
     "test": "jest test -- --silent=false",

@@ -47,6 +47,11 @@
           "renderOptions": {
             "authors": false
           }
+        },
+        "git": {
+          "commit": false,
+          "tag": false,
+          "stageChanges": false
         }
     },
     "version": {
@@ -54,12 +59,12 @@
         "skipLockFileUpdate": true,
         "currentVersionResolver": "registry",
         "preid": "alpha"
+      },
+      "git": {
+        "commit": false,
+        "tag": false,
+        "stageChanges": false
       }
-    },
-    "git": {
-      "commit": false,
-      "tag": false,
-      "stageChanges": false
     },
     "conventionalCommits": {
       "types": {
