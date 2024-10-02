@@ -75,8 +75,8 @@
   "main": "dist/index.js",
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "tsup --config ../../../tsup.base.ts && tsc --customConditions default --emitDeclarationOnly",
-    "d": "tsup --config ../../../tsup.base.ts",
+    "build": "tsup --config ../../../tsup.base.js && tsc --customConditions default --emitDeclarationOnly",
+    "d": "tsup --config ../../../tsup.base.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest",
     "test:watch": "jest --watch",
