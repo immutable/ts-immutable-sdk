@@ -7,9 +7,9 @@ import { passportInstance } from "../utils/setupPassport";
 import { orderbookSDK } from "../utils/setupOrderbook";
 import {
   signAndSubmitApproval,
-  signBid,
-  createBid,
-} from "../utils/bid";
+  signCollectionBid,
+  createCollectionBid,
+} from "../utils/collectionBid";
 import {
   Box,
   TextInput,
@@ -163,10 +163,10 @@ export default function CreateERC1155CollectionBidWithPassport() {
       await signAndSubmitApproval(web3Provider, preparedCollectionBid);
 
       // sign the collection bid
-      const orderSignature = await signBid(web3Provider, preparedCollectionBid);
+      const orderSignature = await signCollectionBid(web3Provider, preparedCollectionBid);
 
       // create the collection bid
-      const bidID = await createBid(
+      const bidID = await createCollectionBid(
         orderbookSDK,
         preparedCollectionBid,
         orderSignature,

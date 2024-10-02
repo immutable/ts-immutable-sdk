@@ -1,32 +1,30 @@
 "use client";
 
-import { useState } from "react";
-import { ethers } from "ethers";
-import { ProviderEvent } from "@imtbl/sdk/passport";
-import { passportInstance } from "../utils/setupPassport";
-import { orderbookSDK } from "../utils/setupOrderbook";
-import {
-  signAndSubmitApproval,
-  signBid,
-} from "../utils/bid";
 import {
   Box,
-  TextInput,
-  FormControl,
-  Heading,
-  Grid,
   Button,
-  LoadingOverlay,
+  FormControl,
+  Grid,
+  Heading,
   Link,
+  LoadingOverlay,
+  TextInput,
 } from "@biom3/react";
 import type { orderbook } from "@imtbl/sdk";
 import type {
-  ERC721Item,
   ERC20Item,
-  PrepareBidParams,
-  ERC721CollectionItem,
+  ERC721CollectionItem
 } from "@imtbl/sdk/orderbook";
+import { ProviderEvent } from "@imtbl/sdk/passport";
+import { ethers } from "ethers";
 import NextLink from "next/link";
+import { useState } from "react";
+import {
+  signAndSubmitApproval,
+  signCollectionBid,
+} from "../utils/collectionBid";
+import { orderbookSDK } from "../utils/setupOrderbook";
+import { passportInstance } from "../utils/setupPassport";
 
 export default function CreateERC721CollectionBidWithPassport() {
   // setup the accounts state
@@ -162,7 +160,7 @@ export default function CreateERC721CollectionBidWithPassport() {
       await signAndSubmitApproval(web3Provider, preparedCollectionBid);
 
       // sign the collection bid
-      const orderSignature = await signBid(web3Provider, preparedCollectionBid);
+      const orderSignature = await signCollectionBid(web3Provider, preparedCollectionBid);
 
       // create the collection bid
       const bidID = await createCollectionBid(

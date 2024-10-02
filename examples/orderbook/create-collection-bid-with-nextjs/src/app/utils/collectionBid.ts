@@ -4,19 +4,19 @@ import { Web3Provider } from "@ethersproject/providers";
 // #doc sign-and-submit-approval
 export const signAndSubmitApproval = async (
   provider: Web3Provider,
-  bid: orderbook.PrepareBidResponse,
+  collectionBid: orderbook.PrepareBidResponse,
 ): Promise<void> => {
   // get your user's Web3 wallet, e.g. MetaMask, Passport, etc
   const signer = provider.getSigner();
 
   // If the user hasn't yet approved the Immutable Seaport contract to transfer assets from this
   // collection on their behalf they'll need to do so before they create an order
-  const approvalAction = bid.actions.find(
+  const approvalActions = collectionBid.actions.filter(
     (action): action is orderbook.TransactionAction =>
       action.type === orderbook.ActionType.TRANSACTION,
   );
 
-  if (approvalAction) {
+  for (const approvalAction of approvalActions) {
     const unsignedTx = await approvalAction.buildTransaction();
     const receipt = await signer.sendTransaction(unsignedTx);
     await receipt.wait();
@@ -26,8 +26,8 @@ export const signAndSubmitApproval = async (
 };
 // #enddoc sign-and-submit-approval
 
-// #doc sign-bid
-export const signBid = async (
+// #doc sign-collection-bid
+export const signCollectionBid = async (
   provider: Web3Provider,
   bid: orderbook.PrepareBidResponse,
 ): Promise<string> => {
@@ -50,10 +50,10 @@ export const signBid = async (
 
   return signature;
 };
-// #enddoc sign-bid
+// #enddoc sign-collection-bid
 
-// #doc create-bid
-export const createBid = async (
+// #doc create-collection-bid
+export const createCollectionBid = async (
   client: orderbook.Orderbook,
   preparedBid: orderbook.PrepareBidResponse,
   orderSignature: string,
@@ -72,4 +72,4 @@ export const createBid = async (
   });
   return order.result.id;
 };
-// #enddoc create-bid
+// #enddoc create-collection-bid
