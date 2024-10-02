@@ -20,7 +20,7 @@ import {
 } from '../../components/ConnectLoader/ConnectLoader';
 import { getL1ChainId, getL2ChainId } from '../../lib';
 import { sendAddFundsCloseEvent } from './AddFundsWidgetEvents';
-import { isValidAmount } from '../../lib/validations/widgetValidators';
+import { isValidAddress, isValidAmount } from '../../lib/validations/widgetValidators';
 
 const AddFundsWidget = React.lazy(() => import('./AddFundsWidget'));
 
@@ -52,6 +52,12 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "toAmount" widget input');
       validatedParams.toAmount = '';
+    }
+
+    if (!isValidAddress(params.toTokenAddress)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "toTokenAddress" widget input');
+      validatedParams.toTokenAddress = '';
     }
 
     return validatedParams;
