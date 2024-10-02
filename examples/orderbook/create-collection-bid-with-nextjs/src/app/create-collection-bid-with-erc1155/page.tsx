@@ -1,14 +1,15 @@
 "use client";
 
 import {
+  Body,
   Box,
   Button,
   FormControl,
-  Grid,
   Heading,
   Link,
   LoadingOverlay,
-  TextInput,
+  Stack,
+  TextInput
 } from "@biom3/react";
 import type { orderbook } from "@imtbl/sdk";
 import type {
@@ -185,13 +186,13 @@ export default function CreateERC1155CollectionBidWithPassport() {
         <Heading size="medium" sx={{ marginBottom: "base.spacing.x5" }}>
           Passport
         </Heading>
-        <Grid>
+        <Stack direction="row" justifyContent={"space-between"}>
           {accountsState.length === 0 ? (
             <Box sx={{ marginBottom: "base.spacing.x5" }}>
               <Button
                 size="medium"
                 variant="primary"
-                sx={{ width: "50%", marginBottom: "base.spacing.x10" }}
+                sx={{ width: "80%", marginBottom: "base.spacing.x10" }}
                 disabled={loading}
                 onClick={passportLogin}
               >
@@ -204,7 +205,7 @@ export default function CreateERC1155CollectionBidWithPassport() {
               <Button
                 size="medium"
                 variant="primary"
-                sx={{ width: "50%", marginBottom: "base.spacing.x10" }}
+                sx={{ width: "80%", marginBottom: "base.spacing.x10" }}
                 disabled={loading}
                 onClick={passportLogout}
               >
@@ -222,12 +223,16 @@ export default function CreateERC1155CollectionBidWithPassport() {
               </LoadingOverlay.Content>
             </LoadingOverlay>
           ) : (
-            <Box sx={{ marginBottom: "base.spacing.x5" }}>
-              Connected Account:
-              {accountsState.length >= 1 ? accountsState : "(not connected)"}
+            <Box sx={{ marginBottom: "base.spacing.x5", marginTop: "base.spacing.x1", textAlign: "right" }}>
+              <div>
+                <Body size="small" weight="bold">Connected Account:</Body>
+              </div>
+              <div>
+                <Body size="xSmall" mono={true}>{accountsState.length >= 1 ? accountsState : "(not connected)"}</Body>
+              </div>
             </Box>
           )}
-        </Grid>
+        </Stack>
       </Box>
       <Box>
         <Heading size="medium" sx={{ marginBottom: "base.spacing.x5" }}>

@@ -2609,34 +2609,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.26.1":
-  version: 0.26.2
-  resolution: "@biom3/react@npm:0.26.2"
-  dependencies:
-    "@biom3/design-tokens": ~0.4.4
-    "@imtbl/image-resizer-utils": ~0.0.1
-    csstype: ^3.1.2
-    hls.js: ^1.5.11
-    localforage: ^1.10.0
-    lodash.debounce: ^4.0.8
-    lodash.get: ^4.4.2
-    lodash.isequal: ^4.5.0
-    lodash.throttle: ^4.1.1
-    react-is: ^18.2.0
-    react-keyed-flatten-children: ^3.0.0
-    ts-deepmerge: ^6.2.0
-  peerDependencies:
-    "@emotion/react": ^11.11.4
-    "@rive-app/react-canvas-lite": ^4.9.0
-    embla-carousel-react: ^8.0.4
-    framer-motion: ^10.12.12
-    react: ^18.2.0
-    react-dom: ^18.2.0
-  checksum: f70fdcb649e617cc3e9ab5bc093a74f9908a198cd5446370b14dcf3748b1dfacc6c08b517766f41231886bf4ec0dccfe47edb91ba7c7f67a96599cef5e1135bf
-  languageName: node
-  linkType: hard
-
-"@biom3/react@npm:^0.27.8":
+"@biom3/react@npm:^0.27.6, @biom3/react@npm:^0.27.8":
   version: 0.27.8
   resolution: "@biom3/react@npm:0.27.8"
   dependencies:
@@ -4080,7 +4053,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/create-bid-with-nextjs@workspace:examples/orderbook/create-bid-with-nextjs"
   dependencies:
-    "@biom3/react": ^0.26.1
+    "@biom3/react": ^0.27.8
     "@ethersproject/providers": ^5.7.2
     "@imtbl/sdk": latest
     "@playwright/test": ^1.45.3
@@ -4101,9 +4074,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/create-collection-bid-with-nextjs@workspace:examples/orderbook/create-collection-bid-with-nextjs"
   dependencies:
-    "@biom3/react": ^0.26.1
+    "@biom3/react": ^0.27.8
     "@ethersproject/providers": ^5.7.2
-    "@imtbl/sdk": latest
+    "@imtbl/sdk": 1.55.0-alpha.17
     "@playwright/test": ^1.45.3
     "@types/node": ^20
     "@types/react": ^18
@@ -4122,7 +4095,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/create-listing-with-nextjs@workspace:examples/orderbook/create-listing-with-nextjs"
   dependencies:
-    "@biom3/react": ^0.26.1
+    "@biom3/react": ^0.27.8
     "@ethersproject/providers": ^5.7.2
     "@imtbl/sdk": latest
     "@playwright/test": ^1.45.3
@@ -4143,7 +4116,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/fulfill-bid-with-nextjs@workspace:examples/orderbook/fulfill-bid-with-nextjs"
   dependencies:
-    "@biom3/react": ^0.26.1
+    "@biom3/react": ^0.27.8
     "@imtbl/sdk": latest
     "@playwright/test": ^1.45.3
     "@types/node": ^20
@@ -4163,7 +4136,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/fulfill-listing-with-nextjs@workspace:examples/orderbook/fulfill-listing-with-nextjs"
   dependencies:
-    "@biom3/react": ^0.26.1
+    "@biom3/react": ^0.27.8
     "@imtbl/sdk": latest
     "@playwright/test": ^1.45.3
     "@types/node": ^20
@@ -5052,6 +5025,85 @@ __metadata:
       optional: true
   languageName: unknown
   linkType: soft
+
+"@imtbl/sdk@npm:1.55.0-alpha.17":
+  version: 1.55.0-alpha.17
+  resolution: "@imtbl/sdk@npm:1.55.0-alpha.17"
+  dependencies:
+    "@0xsequence/abi": ^1.4.3
+    "@0xsequence/core": ^1.4.3
+    "@0xsquid/sdk": ^2.8.25
+    "@biom3/design-tokens": ^0.4.4
+    "@biom3/react": ^0.27.6
+    "@ethersproject/abi": ^5.7.0
+    "@ethersproject/abstract-provider": ^5.7.0
+    "@ethersproject/abstract-signer": ^5.7.0
+    "@ethersproject/address": ^5.7.0
+    "@ethersproject/bignumber": ^5.7.0
+    "@ethersproject/bytes": ^5.7.0
+    "@ethersproject/contracts": ^5.7.0
+    "@ethersproject/keccak256": ^5.7.0
+    "@ethersproject/providers": ^5.7.2
+    "@ethersproject/solidity": ^5.7.0
+    "@ethersproject/strings": ^5.7.0
+    "@ethersproject/units": ^5.7.0
+    "@ethersproject/wallet": ^5.7.0
+    "@imtbl/react-analytics": 0.2.1-alpha
+    "@jest/globals": ^29.5.0
+    "@magic-ext/oidc": 4.3.1
+    "@magic-sdk/provider": ^21.2.0
+    "@metamask/detect-provider": ^2.0.0
+    "@opensea/seaport-js": 4.0.3
+    "@rive-app/react-canvas-lite": ^4.9.0
+    "@stdlib/number-float64-base-normalize": 0.0.8
+    "@uniswap/router-sdk": ^1.4.0
+    "@uniswap/sdk-core": ^3.0.1
+    "@uniswap/v3-sdk": ^3.9.0
+    "@walletconnect/ethereum-provider": ^2.11.1
+    "@walletconnect/modal": ^2.6.2
+    assert: ^2.0.0
+    axios: ^1.6.5
+    bn.js: ^5.2.1
+    buffer: ^6.0.3
+    crypto-browserify: ^3.12.0
+    elliptic: ^6.5.7
+    enc-utils: ^3.0.0
+    ethereumjs-wallet: ^1.0.2
+    ethers: ^5.7.2
+    ethers-v6: "npm:ethers@6.11.1"
+    events: ^3.3.0
+    form-data: ^4.0.0
+    framer-motion: ^11.0.6
+    global-const: ^0.1.2
+    hash.js: ^1.1.7
+    https-browserify: ^1.0.0
+    i18next: ^23.7.6
+    i18next-browser-languagedetector: ^7.2.0
+    jwt-decode: ^3.1.2
+    localforage: ^1.10.0
+    lru-memorise: 0.3.0
+    magic-sdk: ^21.2.0
+    merkletreejs: ^0.3.11
+    oidc-client-ts: 2.4.0
+    os-browserify: ^0.3.0
+    pako: ^2.1.0
+    pg: ^8.11.5
+    pino-pretty: ^11.2.2
+    prisma: ^5.13.0
+    react-i18next: ^13.5.0
+    sns-validator: ^0.3.5
+    stream-browserify: ^3.0.0
+    stream-http: ^3.2.0
+    url: ^0.11.0
+    uuid: ^8.3.2
+  dependenciesMeta:
+    pg:
+      optional: true
+    prisma:
+      optional: true
+  checksum: 3cebd455d3e2d33dbde3d0d791b5662b3602cb9a6fa9f9e8d3f3950f50a921249bf20a34913dcb1602e8dbbd5ff83fd7e57417e681387771d6e0b2bbfe667945
+  languageName: node
+  linkType: hard
 
 "@imtbl/sdk@npm:alpha":
   version: 1.55.0-alpha.19
@@ -22681,7 +22733,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "fulfill-collection-bid-with-nextjs@workspace:examples/orderbook/fulfill-collection-bid-with-nextjs"
   dependencies:
-    "@biom3/react": ^0.26.1
+    "@biom3/react": ^0.27.8
     "@imtbl/sdk": alpha
     "@types/node": ^20
     "@types/react": ^18

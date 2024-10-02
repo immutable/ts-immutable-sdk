@@ -1,24 +1,26 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { ethers } from "ethers";
-import { ProviderEvent } from "@imtbl/sdk/passport";
-import { passportInstance } from "../utils/setupPassport";
-import { orderbookSDK } from "../utils/setupOrderbook";
 import {
+  Body,
   Box,
-  FormControl,
-  Heading,
-  TextInput,
-  Grid,
   Button,
-  LoadingOverlay,
+  FormControl,
+  Grid,
+  Heading,
   Link,
+  LoadingOverlay,
+  Stack,
   Table,
+  TextInput,
 } from "@biom3/react";
-import NextLink from "next/link";
 import { orderbook } from "@imtbl/sdk";
 import { OrderStatusName } from "@imtbl/sdk/orderbook";
+import { ProviderEvent } from "@imtbl/sdk/passport";
+import { ethers } from "ethers";
+import NextLink from "next/link";
+import { useMemo, useState } from "react";
+import { orderbookSDK } from "../utils/setupOrderbook";
+import { passportInstance } from "../utils/setupPassport";
 
 export default function FulfillERC721WithPassport() {
     // setup the accounts state
@@ -29,7 +31,7 @@ export default function FulfillERC721WithPassport() {
 
   // setup the loading text to display while loading
   const [loadingText, setLoadingText] = useState<string>("");
- 
+
   // fetch the Passport provider from the Passport instance
   const passportProvider = passportInstance.connectEvm();
 
@@ -124,8 +126,8 @@ export default function FulfillERC721WithPassport() {
       orderbookSDK,
       buyItemContractAddress === null ? undefined : buyItemContractAddress,
     );
-    
-    const filtered = collectionBids.filter(collectionBid => 
+
+    const filtered = collectionBids.filter(collectionBid =>
       collectionBid.accountAddress !== accountsState[0] &&
       collectionBid.buy[0].type === 'ERC721_COLLECTION',
     );
@@ -172,20 +174,20 @@ export default function FulfillERC721WithPassport() {
       }
     }
   }
-  
+
   return (
     <Box sx={{ marginBottom: "base.spacing.x5" }}>
       <Box sx={{ marginTop: "base.spacing.x10" }}>
         <Heading size="medium" sx={{ marginBottom: "base.spacing.x5" }}>
           Passport
         </Heading>
-        <Grid>
+        <Stack direction="row" justifyContent={"space-between"}>
           {accountsState.length === 0 ? (
             <Box sx={{ marginBottom: "base.spacing.x5" }}>
               <Button
                 size="medium"
                 variant="primary"
-                sx={{ width: "50%", marginBottom: "base.spacing.x10" }}
+                sx={{ width: "80%", marginBottom: "base.spacing.x10" }}
                 disabled={loading}
                 onClick={passportLogin}
               >
@@ -198,7 +200,7 @@ export default function FulfillERC721WithPassport() {
               <Button
                 size="medium"
                 variant="primary"
-                sx={{ width: "50%", marginBottom: "base.spacing.x10" }}
+                sx={{ width: "80%", marginBottom: "base.spacing.x10" }}
                 disabled={loading}
                 onClick={passportLogout}
               >
@@ -216,12 +218,16 @@ export default function FulfillERC721WithPassport() {
               </LoadingOverlay.Content>
             </LoadingOverlay>
           ) : (
-            <Box sx={{ marginBottom: "base.spacing.x5" }}>
-              Connected Account:
-              {accountsState.length >= 1 ? accountsState : "(not connected)"}
+            <Box sx={{ marginBottom: "base.spacing.x5", marginTop: "base.spacing.x1", textAlign: "right" }}>
+              <div>
+                <Body size="small" weight="bold">Connected Account:</Body>
+              </div>
+              <div>
+                <Body size="xSmall" mono={true}>{accountsState.length >= 1 ? accountsState : "(not connected)"}</Body>
+              </div>
             </Box>
           )}
-        </Grid>
+        </Stack>
       </Box>
       <Box>
         <Heading size="medium" sx={{ marginBottom: "base.spacing.x5" }}>

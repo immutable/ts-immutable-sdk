@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@biom3/react": "^0.26.1",
+    "@biom3/react": "^0.27.8",
     "@imtbl/sdk": "alpha",
     "ethers": "^5.7.2",
     "next": "14.2.10",

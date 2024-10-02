@@ -1,34 +1,35 @@
 "use client";
 
-import { useState } from "react";
-import { ethers } from "ethers";
-import { ProviderEvent } from "@imtbl/sdk/passport";
-import { passportInstance } from "../utils/setupPassport";
-import { orderbookSDK } from "../utils/setupOrderbook";
 import {
-  signAndSubmitApproval,
-  signListing,
-  createListing,
-} from "../utils/listing";
-import {
+  Body,
   Box,
-  Select,
-  TextInput,
+  Button,
   FormControl,
   Heading,
-  Grid,
-  Button,
-  LoadingOverlay,
   Link,
+  LoadingOverlay,
+  Select,
+  Stack,
+  TextInput
 } from "@biom3/react";
 import { orderbook } from "@imtbl/sdk";
 import {
   ERC1155Item,
-  NativeItem,
   ERC20Item,
+  NativeItem,
   PrepareListingParams,
 } from "@imtbl/sdk/orderbook";
+import { ProviderEvent } from "@imtbl/sdk/passport";
+import { ethers } from "ethers";
 import NextLink from "next/link";
+import { useState } from "react";
+import {
+  createListing,
+  signAndSubmitApproval,
+  signListing,
+} from "../utils/listing";
+import { orderbookSDK } from "../utils/setupOrderbook";
+import { passportInstance } from "../utils/setupPassport";
 
 export default function CreateERC1155ListingWithPassport() {
   // setup the accounts state
@@ -215,13 +216,13 @@ export default function CreateERC1155ListingWithPassport() {
         <Heading size="medium" sx={{ marginBottom: "base.spacing.x5" }}>
           Passport
         </Heading>
-        <Grid>
+        <Stack direction="row" justifyContent={"space-between"}>
           {accountsState.length === 0 ? (
             <Box sx={{ marginBottom: "base.spacing.x5" }}>
               <Button
                 size="medium"
                 variant="primary"
-                sx={{ width: "50%", marginBottom: "base.spacing.x10" }}
+                sx={{ width: "80%", marginBottom: "base.spacing.x10" }}
                 disabled={loading}
                 onClick={passportLogin}
               >
@@ -234,7 +235,7 @@ export default function CreateERC1155ListingWithPassport() {
               <Button
                 size="medium"
                 variant="primary"
-                sx={{ width: "50%", marginBottom: "base.spacing.x10" }}
+                sx={{ width: "80%", marginBottom: "base.spacing.x10" }}
                 disabled={loading}
                 onClick={passportLogout}
               >
@@ -252,12 +253,16 @@ export default function CreateERC1155ListingWithPassport() {
               </LoadingOverlay.Content>
             </LoadingOverlay>
           ) : (
-            <Box sx={{ marginBottom: "base.spacing.x5" }}>
-              Connected Account:
-              {accountsState.length >= 1 ? accountsState : "(not connected)"}
+            <Box sx={{ marginBottom: "base.spacing.x5", marginTop: "base.spacing.x1", textAlign: "right" }}>
+              <div>
+                <Body size="small" weight="bold">Connected Account:</Body>
+              </div>
+              <div>
+                <Body size="xSmall" mono={true}>{accountsState.length >= 1 ? accountsState : "(not connected)"}</Body>
+              </div>
             </Box>
           )}
-        </Grid>
+        </Stack>
       </Box>
       <Box>
         <Heading size="medium" sx={{ marginBottom: "base.spacing.x5" }}>
