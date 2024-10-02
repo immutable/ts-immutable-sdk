@@ -40,12 +40,6 @@ export const useExecute = () => {
     }
   };
 
-  const getAllowance = async (
-    tokenContract: ethers.Contract,
-    owner: string,
-    spender: string,
-  ): Promise<ethers.BigNumber> => tokenContract.allowance(owner, spender);
-
   const approve = async (
     provider: Web3Provider,
     routeResponse: RouteResponse,
@@ -71,7 +65,8 @@ export const useExecute = () => {
         }
 
         const ownerAddress = await signer.getAddress();
-        const allowance = await getAllowance(tokenContract, ownerAddress, transactionRequestTarget);
+        const allowance = await tokenContract.allowance(ownerAddress, transactionRequestTarget);
+
         if (allowance.lt(fromAmount)) {
           const tx = await tokenContract.approve(transactionRequestTarget, fromAmount);
           await tx.wait();
