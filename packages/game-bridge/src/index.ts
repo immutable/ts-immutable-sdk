@@ -56,6 +56,7 @@ const PASSPORT_FUNCTIONS = {
     connectEvm: 'connectEvm',
     sendTransaction: 'zkEvmSendTransaction',
     sendTransactionWithConfirmation: 'zkEvmSendTransactionWithConfirmation',
+    signTypedDataV4: 'zkEvmSignTypedDataV4',
     requestAccounts: 'zkEvmRequestAccounts',
     getBalance: 'zkEvmGetBalance',
     getTransactionReceipt: 'zkEvmGetTransactionReceipt',
@@ -708,6 +709,34 @@ window.callFunction = async (jsonData: string) => {
             error: null,
           },
           ...response,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.zkEvm.signTypedDataV4: {
+        const payload = JSON.parse(data);
+        const [address] = await getZkEvmProvider().request({
+          method: 'eth_requestAccounts',
+        });
+        const signature = await getZkEvmProvider().request({
+          method: 'eth_signTypedData_v4',
+          params: [address, payload],
+        });
+
+        const success = signature !== null && signature !== undefined;
+
+        if (!success) {
+          throw new Error('Failed to sign payload');
+        }
+
+        trackDuration(moduleName, 'performedZkevmSignTypedDataV4', mt(markStart), {
+          requestId,
+        });
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success,
+          error: null,
+          result: signature,
         });
         break;
       }

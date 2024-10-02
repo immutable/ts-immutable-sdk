@@ -17,29 +17,26 @@
 /**
  * 
  * @export
- * @interface APIError501AllOf
+ * @interface Call
  */
-export interface APIError501AllOf {
+export interface Call {
     /**
-     * Error Code
+     * An Ethereum address
      * @type {string}
-     * @memberof APIError501AllOf
+     * @memberof Call
      */
-    'code': APIError501AllOfCodeEnum;
+    'target_address': string;
     /**
-     * Additional details to help resolve the error
-     * @type {object}
-     * @memberof APIError501AllOf
+     * The function signature
+     * @type {string}
+     * @memberof Call
      */
-    'details': object | null;
+    'function_signature': string;
+    /**
+     * The function arguments
+     * @type {Array<string>}
+     * @memberof Call
+     */
+    'function_args': Array<string>;
 }
-
-/**
-    * @export
-    * @enum {string}
-    */
-export enum APIError501AllOfCodeEnum {
-    NotImplementedError = 'NOT_IMPLEMENTED_ERROR'
-}
-
 

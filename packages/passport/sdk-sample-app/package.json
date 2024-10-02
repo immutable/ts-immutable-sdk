@@ -2,8 +2,8 @@
   "name": "@imtbl/passport-sdk-sample-app",
   "version": "0.1.0",
   "dependencies": {
-    "@biom3/design-tokens": "^0.4.2",
-    "@biom3/react": "^0.25.0",
+    "@biom3/design-tokens": "^0.4.4",
+    "@biom3/react": "^0.27.8",
     "@imtbl/blockchain-data": "0.0.0",
     "@imtbl/config": "0.0.0",
     "@imtbl/generated-clients": "0.0.0",
