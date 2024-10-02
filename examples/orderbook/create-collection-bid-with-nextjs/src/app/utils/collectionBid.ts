@@ -58,7 +58,7 @@ export const createCollectionBid = async (
   preparedBid: orderbook.PrepareBidResponse,
   orderSignature: string,
 ): Promise<string> => {
-  const order = await client.createBid({
+  const order = await client.createCollectionBid({
     orderComponents: preparedBid.orderComponents,
     orderHash: preparedBid.orderHash,
     orderSignature,
