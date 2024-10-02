@@ -245,6 +245,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     switch (event.detail.type) {
       case ProviderEventType.PROVIDER_UPDATED: {
         const eventData = event.detail.data as ProviderUpdated;
+        console.log('🐛 ~ handleProviderUpdatedEvent:', eventData.provider);
         widgetRoot.web3Provider = eventData.provider;
         this.render();
         break;

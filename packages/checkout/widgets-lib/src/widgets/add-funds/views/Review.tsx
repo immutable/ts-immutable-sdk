@@ -17,12 +17,20 @@ import { BigNumber, utils } from 'ethers';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { AddFundsContext } from '../context/AddFundsContext';
 import { useRoutes } from '../hooks/useRoutes';
-import { AddFundsReviewData, AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
+import {
+  AddFundsReviewData,
+  AddFundsWidgetViews,
+} from '../../../context/view-context/AddFundsViewContextTypes';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { Chain } from '../types';
 import { useExecute } from '../hooks/useExecute';
-import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import {
+  SharedViews,
+  ViewActions,
+  ViewContext,
+} from '../../../context/view-context/ViewContext';
 import { SquidIcon } from '../components/SquidIcon';
+import { useProvidersState } from '../../../context/providers-context/ProvidersContext';
 
 interface ReviewProps {
   data: AddFundsReviewData;
@@ -34,31 +42,43 @@ interface ReviewProps {
 export function Review({
   data,
   showBackButton = false,
-  onBackButtonClick, onCloseButtonClick,
+  onBackButtonClick,
+  onCloseButtonClick,
 }: ReviewProps) {
   const { viewDispatch } = useContext(ViewContext);
-  const { addFundsState: { squid, provider, chains } } = useContext(AddFundsContext);
+  const {
+    providersState: { fromProvider },
+  } = useProvidersState();
+  const {
+    addFundsState: { squid, chains },
+  } = useContext(AddFundsContext);
 
   const [route, setRoute] = useState<RouteResponse | undefined>();
   const [fromAddress, setFromAddress] = useState<string | undefined>();
-  const [getRouteIntervalId, setGetRouteIntervalId] = useState<NodeJS.Timer | undefined>();
+  const [getRouteIntervalId, setGetRouteIntervalId] = useState<
+  NodeJS.Timer | undefined
+  >();
   const [proceedDisabled, setProceedDisabled] = useState(true);
 
   const { getFromAmount, getRoute } = useRoutes();
 
   const {
-    convertToNetworkChangeableProvider, checkProviderChain, approve, execute,
+    convertToNetworkChangeableProvider,
+    checkProviderChain,
+    approve,
+    execute,
   } = useExecute();
 
   const getFromAmountAndRoute = async () => {
-    if (!squid) {
-      return;
+    if (!squid || !fromProvider) {
+      throw new Error('No squid or fromProvider found');
     }
 
-    const address = await provider?.getSigner().getAddress();
+    const address = await fromProvider?.getSigner().getAddress();
     if (!address) {
-      return;
+      throw new Error('No address found');
     }
+
     setFromAddress(address);
 
     const amountData = await getFromAmount(
@@ -88,9 +108,13 @@ export function Review({
 
   useEffect(() => {
     (async () => {
-      await getFromAmountAndRoute();
-      const setIntervalId = setInterval(getFromAmountAndRoute, 20000);
-      setGetRouteIntervalId(setIntervalId);
+      try {
+        await getFromAmountAndRoute();
+        const setIntervalId = setInterval(getFromAmountAndRoute, 20000);
+        setGetRouteIntervalId(setIntervalId);
+      } catch (error) {
+        console.log(error); // eslint-disable-line no-console
+      }
     })();
     return () => {
       if (getRouteIntervalId) {
@@ -99,15 +123,19 @@ export function Review({
     };
   }, []);
 
-  const getChain = (chainId: string | undefined)
-  : Chain | undefined => chains?.find((chain) => chain.id === chainId);
+  const getChain = (chainId: string | undefined): Chain | undefined => chains?.find((chain) => chain.id === chainId);
 
-  const getFeeCosts = (): number => route?.route.estimate.feeCosts.reduce((acc, fee) => acc + Number(fee.amountUsd), 0)
-    ?? 0;
+  const getFeeCosts = (): number => route?.route.estimate.feeCosts.reduce(
+    (acc, fee) => acc + Number(fee.amountUsd),
+    0,
+  ) ?? 0;
 
   const getAmountInUSDText = (amount: string | undefined): string => (amount ? `USD $${amount}` : '');
 
-  const getAmountFormatted = (amount: string | undefined, decimals: number): string => {
+  const getAmountFormatted = (
+    amount: string | undefined,
+    decimals: number,
+  ): string => {
     if (!amount) {
       return '0';
     }
@@ -116,7 +144,10 @@ export function Review({
   };
 
   const getGasCostText = (): string => {
-    if (!route?.route.estimate.gasCosts || route?.route.estimate.gasCosts.length === 0) {
+    if (
+      !route?.route.estimate.gasCosts
+      || route?.route.estimate.gasCosts.length === 0
+    ) {
       return '';
     }
     const totalGasFee = route?.route.estimate.gasCosts.reduce(
@@ -124,13 +155,16 @@ export function Review({
       BigNumber.from(0),
     );
 
-    const formattedTotalGasFee = utils.formatUnits(totalGasFee, route?.route.estimate.gasCosts[0].token.decimals);
+    const formattedTotalGasFee = utils.formatUnits(
+      totalGasFee,
+      route?.route.estimate.gasCosts[0].token.decimals,
+    );
 
     return `Gas Refuel +${route.route.estimate.gasCosts[0].token.name} ${formattedTotalGasFee}`;
   };
 
   const onProceedClick = async () => {
-    if (!squid || !provider || !route) {
+    if (!squid || !fromProvider || !route) {
       return;
     }
 
@@ -138,9 +172,14 @@ export function Review({
       clearInterval(getRouteIntervalId);
       setProceedDisabled(true);
 
-      const changeableProvider = await convertToNetworkChangeableProvider(provider);
+      const changeableProvider = await convertToNetworkChangeableProvider(
+        fromProvider,
+      );
 
-      await checkProviderChain(changeableProvider, route.route.params.fromChain);
+      await checkProviderChain(
+        changeableProvider,
+        route.route.params.fromChain,
+      );
 
       await approve(changeableProvider, route);
 
@@ -182,7 +221,10 @@ export function Review({
     >
       {!route && <Body>Loading...</Body>}
       {route && (
-        <Stack sx={{ w: '100%', flex: 1, p: 'base.spacing.x4' }} alignItems="stretch">
+        <Stack
+          sx={{ w: '100%', flex: 1, p: 'base.spacing.x4' }}
+          alignItems="stretch"
+        >
           <Stack sx={{ minh: '60px' }} rc={<header />} justifyContent="center">
             <Heading weight="bold" sx={{ textAlign: 'center' }}>
               Review
@@ -195,13 +237,17 @@ export function Review({
               <FramedImage
                 circularFrame
                 sx={{ w: 'base.icon.size.400' }}
-                use={<img src={route?.route.estimate.fromToken.logoURI} alt={route?.route.estimate.fromToken.name} />}
+                use={(
+                  <img
+                    src={route?.route.estimate.fromToken.logoURI}
+                    alt={route?.route.estimate.fromToken.name}
+                  />
+                )}
               />
             </Stack>
             <Stack sx={{ flex: 1 }} gap="base.spacing.x1">
               <Body>
                 Pay with
-                {' '}
                 {route?.route.estimate.fromToken.name}
               </Body>
               <Stack
@@ -215,8 +261,13 @@ export function Review({
                   sx={{ w: 'base.icon.size.200' }}
                   use={(
                     <img
-                      src={getChain(route?.route.estimate.fromToken.chainId)?.iconUrl}
-                      alt={getChain(route?.route.estimate.fromToken.chainId)?.name}
+                      src={
+                        getChain(route?.route.estimate.fromToken.chainId)
+                          ?.iconUrl
+                      }
+                      alt={
+                        getChain(route?.route.estimate.fromToken.chainId)?.name
+                      }
                     />
                   )}
                 />
@@ -252,8 +303,14 @@ export function Review({
                   sx={{ w: 'base.icon.size.200' }}
                   use={(
                     <img
-                      src={getChain(route?.route.estimate.fromToken.chainId)?.nativeCurrency.iconUrl}
-                      alt={getChain(route?.route.estimate.fromToken.chainId)?.nativeCurrency.name}
+                      src={
+                        getChain(route?.route.estimate.fromToken.chainId)
+                          ?.nativeCurrency.iconUrl
+                      }
+                      alt={
+                        getChain(route?.route.estimate.fromToken.chainId)
+                          ?.nativeCurrency.name
+                      }
                     />
                   )}
                 />
@@ -265,7 +322,10 @@ export function Review({
             </Stack>
             <Stack>
               <PriceDisplay
-                price={getAmountFormatted(route?.route.estimate.fromAmount, route?.route.estimate.fromToken.decimals)}
+                price={getAmountFormatted(
+                  route?.route.estimate.fromAmount,
+                  route?.route.estimate.fromToken.decimals,
+                )}
                 weight="bold"
               >
                 <PriceDisplay.Caption sx={{ mt: 'base.spacing.x1' }}>
@@ -287,13 +347,17 @@ export function Review({
               <FramedImage
                 circularFrame
                 sx={{ w: 'base.icon.size.400' }}
-                use={<img src={route?.route.estimate.toToken.logoURI} alt={route?.route.estimate.toToken.name} />}
+                use={(
+                  <img
+                    src={route?.route.estimate.toToken.logoURI}
+                    alt={route?.route.estimate.toToken.name}
+                  />
+                )}
               />
             </Stack>
             <Stack sx={{ flex: 1 }} gap="base.spacing.x1">
               <Body>
                 Deliver
-                {' '}
                 {route?.route.estimate.toToken.name}
               </Body>
               <Stack
@@ -306,8 +370,12 @@ export function Review({
                   sx={{ w: 'base.icon.size.200' }}
                   use={(
                     <img
-                      src={getChain(route?.route.estimate.toToken.chainId)?.iconUrl}
-                      alt={getChain(route?.route.estimate.toToken.chainId)?.name}
+                      src={
+                        getChain(route?.route.estimate.toToken.chainId)?.iconUrl
+                      }
+                      alt={
+                        getChain(route?.route.estimate.toToken.chainId)?.name
+                      }
                     />
                   )}
                 />
@@ -345,7 +413,10 @@ export function Review({
             </Stack>
             <Stack>
               <PriceDisplay
-                price={getAmountFormatted(route?.route.estimate.toAmount, route?.route.estimate.toToken.decimals)}
+                price={getAmountFormatted(
+                  route?.route.estimate.toAmount,
+                  route?.route.estimate.toToken.decimals,
+                )}
                 weight="bold"
               >
                 <PriceDisplay.Caption sx={{ mt: 'base.spacing.x1' }}>
@@ -375,9 +446,12 @@ export function Review({
             Powered by Squid
           </Body>
 
-          <Button size="large" onClick={onProceedClick} disabled={proceedDisabled}>
-            {proceedDisabled ? 'Processing'
-              : 'Proceed'}
+          <Button
+            size="large"
+            onClick={onProceedClick}
+            disabled={proceedDisabled}
+          >
+            {proceedDisabled ? 'Processing' : 'Proceed'}
           </Button>
         </Stack>
       )}

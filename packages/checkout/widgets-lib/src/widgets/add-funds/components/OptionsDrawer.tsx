@@ -29,9 +29,7 @@ export function OptionsDrawer({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   showBridgeOption,
 }: OptionsDrawerProps) {
-  const {
-    addFundsState: { chains, balances },
-  } = useContext(AddFundsContext);
+  const { addFundsState: { chains, balances } } = useContext(AddFundsContext);
 
   return (
     <Drawer

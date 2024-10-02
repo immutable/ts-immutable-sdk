@@ -1,39 +1,41 @@
-import { Web3Provider } from '@ethersproject/providers';
 import {
   useContext, useEffect, useMemo, useReducer,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AddFundsWidgetParams, Checkout } from '@imtbl/checkout-sdk';
+import { AddFundsWidgetParams } from '@imtbl/checkout-sdk';
 
 import { sendAddFundsCloseEvent } from './AddFundsWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import {
-  AddFundsActions, AddFundsContext, addFundsReducer, initialAddFundsState,
+  AddFundsActions,
+  AddFundsContext,
+  addFundsReducer,
+  initialAddFundsState,
 } from './context/AddFundsContext';
 import { AddFundsWidgetViews } from '../../context/view-context/AddFundsViewContextTypes';
 import {
   initialViewState,
-  SharedViews, ViewActions,
+  SharedViews,
+  ViewActions,
   ViewContext,
   viewReducer,
 } from '../../context/view-context/ViewContext';
 import { AddFunds } from './views/AddFunds';
 import { ErrorView } from '../../views/error/ErrorView';
 import { useSquid } from './hooks/useSquid';
-import { useAnalytics, UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import {
+  useAnalytics,
+  UserJourney,
+} from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { fetchChains } from './functions/fetchChains';
 import { Review } from './views/Review';
 import { Confirmation } from './views/Confirmation';
 import { fetchBalances } from './functions/fetchBalances';
+import { useProvidersState } from '../../context/providers-context/ProvidersContext';
 
-export type AddFundsWidgetInputs = AddFundsWidgetParams & {
-  checkout: Checkout;
-  web3Provider?: Web3Provider;
-};
+export type AddFundsWidgetInputs = AddFundsWidgetParams & {};
 
 export default function AddFundsWidget({
-  checkout,
-  web3Provider,
   showOnrampOption = true,
   showSwapOption = true,
   showBridgeOption = true,
@@ -41,13 +43,13 @@ export default function AddFundsWidget({
   toAmount,
   showBackButton,
 }: AddFundsWidgetInputs) {
+  const { t } = useTranslation();
+  const { page } = useAnalytics();
   const [viewState, viewDispatch] = useReducer(viewReducer, {
     ...initialViewState,
     view: { type: AddFundsWidgetViews.ADD_FUNDS },
     history: [{ type: AddFundsWidgetViews.ADD_FUNDS }],
   });
-  const { t } = useTranslation();
-  const { page } = useAnalytics();
 
   const viewReducerValues = useMemo(
     () => ({
@@ -57,12 +59,10 @@ export default function AddFundsWidget({
     [viewState, viewReducer],
   );
 
-  const [addFundsState, addFundsDispatch] = useReducer(addFundsReducer, initialAddFundsState);
-
-  const {
-    squid, provider, chains,
-  } = addFundsState;
-
+  const [addFundsState, addFundsDispatch] = useReducer(
+    addFundsReducer,
+    initialAddFundsState,
+  );
   const addFundsReducerValues = useMemo(
     () => ({
       addFundsState,
@@ -70,6 +70,10 @@ export default function AddFundsWidget({
     }),
     [addFundsState, addFundsDispatch],
   );
+  
+  const { squid, chains } = addFundsState;
+
+  const { providersState: { checkout, fromProvider } } = useProvidersState();
 
   const squidSdk = useSquid(checkout);
 
@@ -87,11 +91,11 @@ export default function AddFundsWidget({
   }, []);
 
   useEffect(() => {
-    if (!squid || !chains || !provider) return;
+    if (!squid || !chains || !fromProvider) return;
 
     (async () => {
       const evmChains = chains.filter((chain) => chain.type === 'evm');
-      const balances = await fetchBalances(squid, evmChains, provider);
+      const balances = await fetchBalances(squid, evmChains, fromProvider);
 
       addFundsDispatch({
         payload: {
@@ -100,7 +104,7 @@ export default function AddFundsWidget({
         },
       });
     })();
-  }, [squid, chains, provider]);
+  }, [squid, chains, fromProvider]);
 
   useEffect(() => {
     if (!squidSdk) return;
@@ -112,26 +116,6 @@ export default function AddFundsWidget({
       },
     });
   }, [squidSdk]);
-
-  useEffect(() => {
-    if (!web3Provider) return;
-    addFundsDispatch({
-      payload: {
-        type: AddFundsActions.SET_PROVIDER,
-        provider: web3Provider,
-      },
-    });
-  }, [web3Provider]);
-
-  useEffect(() => {
-    if (!checkout) return;
-    addFundsDispatch({
-      payload: {
-        type: AddFundsActions.SET_CHECKOUT,
-        checkout,
-      },
-    });
-  }, [checkout]);
 
   const {
     eventTargetState: { eventTarget },
@@ -151,7 +135,6 @@ export default function AddFundsWidget({
       <AddFundsContext.Provider value={addFundsReducerValues}>
         {viewState.view.type === AddFundsWidgetViews.ADD_FUNDS && (
           <AddFunds
-            checkout={checkout}
             toTokenAddress={toTokenAddress}
             toAmount={toAmount}
             showBackButton={showBackButton}

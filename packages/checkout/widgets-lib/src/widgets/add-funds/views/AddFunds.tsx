@@ -19,9 +19,9 @@ import { useRoutes } from '../hooks/useRoutes';
 import { RouteData } from '../types';
 import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
 import { SQUID_NATIVE_TOKEN } from '../utils/config';
+import { useProvidersState } from '../../../context/providers-context/ProvidersContext';
 
 interface AddFundsProps {
-  checkout?: Checkout;
   showBackButton?: boolean;
   showOnrampOption?: boolean;
   showSwapOption?: boolean;
@@ -33,7 +33,6 @@ interface AddFundsProps {
 }
 
 export function AddFunds({
-  checkout,
   toAmount,
   toTokenAddress,
   showBackButton = false,
@@ -45,6 +44,8 @@ export function AddFunds({
 }: AddFundsProps) {
   const showBack = showBackButton || !!onBackButtonClick;
 
+  const { providersState: { checkout, fromProvider } } = useProvidersState();
+  console.log('🐛 ~ fromProvider:', fromProvider);
   const { addFundsState: { squid, balances }, addFundsDispatch } = useContext(AddFundsContext);
 
   const { viewDispatch } = useContext(ViewContext);
@@ -239,7 +240,7 @@ export function AddFunds({
     <SimpleLayout
       header={(
         <HeaderNavigation
-          title="Add"
+          title="Add Tokens" // FIXME: i18n
           onCloseButtonClick={onCloseButtonClick}
           showBack={showBack}
           onBackButtonClick={() => {

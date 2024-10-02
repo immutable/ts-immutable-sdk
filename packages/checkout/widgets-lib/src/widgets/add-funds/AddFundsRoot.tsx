@@ -13,7 +13,11 @@ import { HandoverProvider } from '../../context/handover-context/HandoverProvide
 import i18n from '../../i18n';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
-import { isValidAddress, isValidAmount } from '../../lib/validations/widgetValidators';
+import {
+  isValidAddress,
+  isValidAmount,
+} from '../../lib/validations/widgetValidators';
+import { ProvidersContextProvider } from '../../context/providers-context/ProvidersContext';
 
 const AddFundsWidget = React.lazy(() => import('./AddFundsWidget'));
 
@@ -41,6 +45,9 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
   ): AddFundsWidgetParams {
     const validatedParams = params;
 
+    validatedParams.toAmount = '2';
+    validatedParams.toTokenAddress = 'native';
+
     if (!isValidAmount(params.toAmount)) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "toAmount" widget input');
@@ -57,6 +64,7 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
   }
 
   protected render() {
+    console.log('🐛 ~ render:', this.web3Provider);
     if (!this.reactRoot) return;
 
     const { t } = i18n;
@@ -66,22 +74,27 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="add-funds-container" config={this.strongConfig()}>
             <HandoverProvider>
-              <Suspense
-                fallback={
-                  <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
-                }
+              <ProvidersContextProvider
+                initialState={{
+                  checkout: this.checkout,
+                  fromProvider: this.web3Provider,
+                }}
               >
-                <AddFundsWidget
-                  checkout={this.checkout}
-                  web3Provider={this.web3Provider}
-                  showBridgeOption={this.parameters.showBridgeOption}
-                  showSwapOption={this.parameters.showSwapOption}
-                  showOnrampOption={this.parameters.showOnrampOption}
-                  toTokenAddress={this.parameters.toTokenAddress}
-                  toAmount={this.parameters.toAmount}
-                  showBackButton={this.parameters.showBackButton}
-                />
-              </Suspense>
+                <Suspense
+                  fallback={
+                    <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
+                }
+                >
+                  <AddFundsWidget
+                    showBridgeOption={this.parameters.showBridgeOption}
+                    showSwapOption={this.parameters.showSwapOption}
+                    showOnrampOption={this.parameters.showOnrampOption}
+                    toTokenAddress={this.parameters.toTokenAddress}
+                    toAmount={this.parameters.toAmount}
+                    showBackButton={this.parameters.showBackButton}
+                  />
+                </Suspense>
+              </ProvidersContextProvider>
             </HandoverProvider>
           </ThemeProvider>
         </CustomAnalyticsProvider>
