@@ -11,7 +11,7 @@ export type CreateCollectionBidRequestBody = {
   account_address: string;
   order_hash: string;
   /**
-   * Buy item for listing should either be ERC721 or ERC1155 collection item
+   * Buy item for collection bid should either be ERC721 or ERC1155 collection item
    */
   buy: Array<AssetCollectionItem>;
   /**
@@ -28,7 +28,7 @@ export type CreateCollectionBidRequestBody = {
    */
   salt: string;
   /**
-   * Sell item for listing should be an ERC20 item
+   * Sell item for collection bid should be an ERC20 item
    */
   sell: Array<ERC20Item>;
   /**
