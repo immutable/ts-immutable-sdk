@@ -189,7 +189,7 @@ export default function FulfillERC721WithPassport() {
               <Button
                 size="medium"
                 variant="primary"
-                sx={{ width: "80%", marginBottom: "base.spacing.x10" }}
+                sx={{ width: "100%", marginBottom: "base.spacing.x10" }}
                 disabled={loading}
                 onClick={passportLogin}
               >
@@ -202,7 +202,7 @@ export default function FulfillERC721WithPassport() {
               <Button
                 size="medium"
                 variant="primary"
-                sx={{ width: "80%", marginBottom: "base.spacing.x10" }}
+                sx={{ width: "90%", marginBottom: "base.spacing.x10" }}
                 disabled={loading}
                 onClick={passportLogout}
               >
