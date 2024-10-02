@@ -8,7 +8,7 @@
   "dependencies": {
     "@0xsequence/abi": "^1.4.3",
     "@0xsequence/core": "^1.4.3",
-    "@0xsquid/sdk": "^2.8.24",
+    "@0xsquid/sdk": "2.8.25",
     "@biom3/design-tokens": "^0.4.4",
     "@biom3/react": "^0.27.3",
     "@ethersproject/abi": "^5.7.0",
