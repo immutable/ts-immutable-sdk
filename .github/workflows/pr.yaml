@@ -110,6 +110,9 @@ jobs:
       - name: Build next app
         run: yarn workspace @examples/sdk-load-widgets-with-nextjs build
 
+      - name: Build Checkout SDK
+        run: yarn workspace @imtbl/checkout-sdk build
+
       - name: Build local widgets bundle
         run: yarn workspace @imtbl/checkout-widgets build:examplewidgets
 
