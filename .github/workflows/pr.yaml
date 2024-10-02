@@ -111,7 +111,7 @@ jobs:
         run: yarn workspace @examples/sdk-load-widgets-with-nextjs build
 
       - name: Build local widgets bundle
-        run: yarn workspace @checkout/widgets-lib build:examplewidgets
+        run: yarn workspace @imtbl/checkout-widgets build:examplewidgets
 
       - name: Lint examples
         run: yarn workspace @examples/sdk-load-widgets-with-nextjs lint
