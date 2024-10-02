@@ -1,33 +1,31 @@
 "use client";
 
-import { useState } from "react";
-import { ethers } from "ethers";
-import { ProviderEvent } from "@imtbl/sdk/passport";
-import { passportInstance } from "../utils/setupPassport";
-import { orderbookSDK } from "../utils/setupOrderbook";
-import {
-  signAndSubmitApproval,
-  signCollectionBid,
-  createCollectionBid,
-} from "../utils/collectionBid";
 import {
   Box,
-  TextInput,
-  FormControl,
-  Heading,
-  Grid,
   Button,
-  LoadingOverlay,
+  FormControl,
+  Grid,
+  Heading,
   Link,
+  LoadingOverlay,
+  TextInput,
 } from "@biom3/react";
 import type { orderbook } from "@imtbl/sdk";
 import type {
   ERC1155CollectionItem,
-  ERC1155Item,
-  ERC20Item,
-  PrepareBidParams,
+  ERC20Item
 } from "@imtbl/sdk/orderbook";
+import { ProviderEvent } from "@imtbl/sdk/passport";
+import { ethers } from "ethers";
 import NextLink from "next/link";
+import { useState } from "react";
+import {
+  createCollectionBid,
+  signAndSubmitApproval,
+  signCollectionBid,
+} from "../utils/collectionBid";
+import { orderbookSDK } from "../utils/setupOrderbook";
+import { passportInstance } from "../utils/setupPassport";
 
 export default function CreateERC1155CollectionBidWithPassport() {
   // setup the accounts state
