@@ -57,7 +57,8 @@ export function AddFunds({
   showSwapOption = true,
   showBridgeOption = true,
   onCloseButtonClick,
-  // @TODO: dont think these are needed anymore (according to the new designs)
+  // @TODO: dont think these are needed anymore 
+  // (according to the new designs)
   // showBackButton,
   // onBackButtonClick,
 }: AddFundsProps) {
