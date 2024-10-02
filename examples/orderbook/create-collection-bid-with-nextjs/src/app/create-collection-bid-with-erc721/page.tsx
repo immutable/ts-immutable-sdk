@@ -20,6 +20,7 @@ import { ethers } from "ethers";
 import NextLink from "next/link";
 import { useState } from "react";
 import {
+  createCollectionBid,
   signAndSubmitApproval,
   signCollectionBid,
 } from "../utils/collectionBid";
@@ -42,7 +43,7 @@ export default function CreateERC721CollectionBidWithPassport() {
   // create the Web3Provider using the Passport provider
   const web3Provider = new ethers.providers.Web3Provider(passportProvider);
 
-  // setup the state for the ERC721 bid creation form elements
+  // setup the state for the ERC721 collection bid creation form elements
 
   // setup the sell item contract address state
   const [sellItemContractAddress, setSellItemContractAddressState] =
@@ -58,11 +59,11 @@ export default function CreateERC721CollectionBidWithPassport() {
   // setup the buy item token amount state
   const [buyItemTokenAmount, setBuyItemTokenAmountState] = useState<string>("");
 
-  // setup the bid creation success message state
+  // setup the collection bid creation success message state
   const [successMessage, setSuccessMessageState] = useState<string | null>(null);
 
-  // setup the bid creation error message state
-  const [bidError, setBidErrorState] = useState<string | null>(null);
+  // setup the collection bid creation error message state
+  const [collectionBidError, setCollectionBidErrorState] = useState<string | null>(null);
 
   const passportLogin = async () => {
     if (web3Provider.provider.request) {
@@ -114,8 +115,8 @@ export default function CreateERC721CollectionBidWithPassport() {
     setBuyItemTokenAmountState(event.target.value);
   };
 
-  const handleSuccessfulBidCreation = (bidID: string) => {
-    setSuccessMessageState(`Collection bid created successfully - ${bidID}`);
+  const handleSuccessfulCollectionBidCreation = (collectionBidID: string) => {
+    setSuccessMessageState(`Collection bid created successfully - ${collectionBidID}`);
   };
 
   // #doc prepare-erc721-collection-bid
@@ -143,14 +144,14 @@ export default function CreateERC721CollectionBidWithPassport() {
         sell,
       };
 
-      // invoke the orderbook SDK to prepare the bid
+      // invoke the orderbook SDK to prepare the collection bid
       return await orderbookSDK.prepareCollectionBid(prepareCollectionBidParams);
     };
   // #enddoc prepare-erc721-collection-bid
 
   // create ERC721 collection bid
   const createER721CollectionBid = async () => {
-    setBidErrorState(null);
+    setCollectionBidErrorState(null);
 
     try {
       // prepare the collection bid
@@ -163,17 +164,17 @@ export default function CreateERC721CollectionBidWithPassport() {
       const orderSignature = await signCollectionBid(web3Provider, preparedCollectionBid);
 
       // create the collection bid
-      const bidID = await createCollectionBid(
+      const collectionBidID = await createCollectionBid(
         orderbookSDK,
         preparedCollectionBid,
         orderSignature,
       );
 
-      handleSuccessfulBidCreation(bidID);
+      handleSuccessfulCollectionBidCreation(collectionBidID);
     } catch (error: any) {
       console.error(error);
       setSuccessMessageState(null);
-      setBidErrorState(`Something went wrong - ${error.message}`);
+      setCollectionBidErrorState(`Something went wrong - ${error.message}`);
     }
   };
 
@@ -242,7 +243,7 @@ export default function CreateERC721CollectionBidWithPassport() {
             {successMessage}
           </Box>
         ) : null}
-        {bidError ? (
+        {collectionBidError ? (
           <Box sx={{
             color: "red",
             marginBottom: "base.spacing.x5",
@@ -250,7 +251,7 @@ export default function CreateERC721CollectionBidWithPassport() {
             maxHeight: "400px",
             overflowY: "auto",
           }}>
-            {bidError}
+            {collectionBidError}
           </Box>
         ) : null}
         <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
