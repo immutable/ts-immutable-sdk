@@ -11,3 +11,13 @@ test.describe("home page", () => {
     await expect(page.getByRole("link", { name: "Wallet Balance with MetaMask" })).toBeVisible();
   });
 });
+
+test.describe("Wallet Balance with MetaMask", () => {
+  test("has heading, login button and initial account status set correctly", async ({ page }) => {
+    await page.click("text=Wallet Balance with MetaMask");
+    await expect(page.getByRole("heading", { name: "Wallet Balance with MetaMask" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Connect MetaMask" })).toBeVisible();
+    await expect(page.getByText("(not connected)")).toHaveCount(3);
+    await expect(page.getByRole("link", { name: "Return to Examples" })).toBeVisible();
+  });
+});

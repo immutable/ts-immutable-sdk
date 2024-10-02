@@ -12,7 +12,7 @@ export default function Home() {
       <Button       
       className="mb-1"
       size="medium" 
-      rc={<NextLink href="/wallet-balance" />}>
+      rc={<NextLink href="/wallet-balance-with-metamask" />}>
         Wallet Balance with MetaMask
       </Button> 
   </>);
