@@ -273,6 +273,49 @@ export interface BulkBidsResult {
   }[];
 }
 
+/* Collection Bid Ops */
+
+// Expose the list order filtering and ordering directly from the openAPI SDK, except
+// chainName is omitted as its configured as a part of the client
+export type ListCollectionBidsParams = Omit<
+Parameters<typeof OrdersService.prototype.listCollectionBids>[0],
+'chainName'
+>;
+
+export interface CollectionBidResult {
+  result: CollectionBid;
+}
+
+export interface ListCollectionBidsResult {
+  page: Page;
+  result: CollectionBid[];
+}
+
+export interface PrepareCollectionBidParams {
+  makerAddress: string;
+  sell: ERC20Item;
+  buy: ERC721CollectionItem | ERC1155CollectionItem;
+  orderStart?: Date;
+  orderExpiry?: Date;
+}
+
+export type PrepareCollectionBidResponse = PrepareOrderResponse;
+
+export interface CreateCollectionBidParams {
+  orderComponents: OrderComponents;
+  orderHash: string;
+  orderSignature: string;
+  makerFees: FeeValue[];
+}
+
+export interface BulkCollectionBidsResult {
+  result: {
+    success: boolean;
+    orderHash: string;
+    order?: CollectionBid;
+  }[];
+}
+
 /* Fulfilment Ops */
 
 export interface FulfillmentOrder {

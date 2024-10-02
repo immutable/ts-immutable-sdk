@@ -1,16 +1,18 @@
 import {
-  MenuItem, ButtCon, AllIconKeys, SxProps,
+  type AllDualVariantIconKeys, type AllIconKeys, ButtCon,
+  isDualVariantIcon,
+  MenuItem, type SxProps,
 } from '@biom3/react';
-import { Web3Provider } from '@ethersproject/providers';
+import type { Web3Provider } from '@ethersproject/providers';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getWalletLogoByName } from '../../../../lib/logoUtils';
-import { abbreviateWalletAddress } from '../../../../lib/utils';
-import { getWalletProviderNameByProvider, isPassportProvider } from '../../../../lib/provider';
 import {
   UserJourney,
   useAnalytics,
 } from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { getWalletLogoByName } from '../../../../lib/logoUtils';
+import { getWalletProviderNameByProvider, isPassportProvider } from '../../../../lib/provider';
+import { abbreviateWalletAddress } from '../../../../lib/utils';
 
 const isCopiedStyle: SxProps = {
   background: 'base.color.status.success.bright',
@@ -75,21 +77,37 @@ export function WalletAddress({
         logo={getWalletLogoByName(getWalletProviderNameByProvider(provider))}
         sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
       />
+      {isDualVariantIcon(ctaIcon) ? (
+        <ButtCon
+          variant="tertiary"
+          iconVariant="bold"
+          size="small"
+          icon={ctaIcon}
+          iconSx={{
+            ...(isCopied ? isCopiedIconStyle : {}),
+          }}
+          onClick={handleIconClick}
+          sx={{
+            cursor: 'pointer',
+            ...(isCopied ? isCopiedStyle : {}),
+          }}
+        />
+      ) : (
+        <ButtCon
+          variant="tertiary"
+          size="small"
+          icon={ctaIcon as AllDualVariantIconKeys}
+          iconSx={{
+            ...(isCopied ? isCopiedIconStyle : {}),
+          }}
+          onClick={handleIconClick}
+          sx={{
+            cursor: 'pointer',
+            ...(isCopied ? isCopiedStyle : {}),
+          }}
+        />
+      )}
 
-      <ButtCon
-        variant="tertiary"
-        iconVariant="bold"
-        size="small"
-        icon={ctaIcon}
-        iconSx={{
-          ...(isCopied ? isCopiedIconStyle : {}),
-        }}
-        onClick={handleIconClick}
-        sx={{
-          cursor: 'pointer',
-          ...(isCopied ? isCopiedStyle : {}),
-        }}
-      />
       <MenuItem.Label>{t('views.SETTINGS.walletAddress.label')}</MenuItem.Label>
       <MenuItem.Caption testId="wallet-address">
         {abbreviateWalletAddress(walletAddress)}

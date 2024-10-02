@@ -20,7 +20,11 @@ type GroupedAsset = {
   assets: NFTCandidate[];
 };
 
-type NFTCandidate = BlockchainData.NFT & { selected: boolean, to_address?: string, to_address_required?: string };
+type NFTCandidate = BlockchainData.NFTWithBalance & {
+  selected: boolean;
+  to_address?: string;
+  to_address_required?: string;
+};
 
 const chainNameMapping = (environment: EnvironmentNames) => {
   switch (environment) {
@@ -36,7 +40,7 @@ const chainNameMapping = (environment: EnvironmentNames) => {
 };
 
 function NFTTransfer({ disabled, handleExampleSubmitted }: RequestExampleProps) {
-  const [assets, setAssets] = useState<BlockchainData.NFT[]>([]);
+  const [assets, setAssets] = useState<BlockchainData.NFTWithBalance[]>([]);
   const [transfers, setTransfers] = useState<Partial<NFTCandidate>[]>([]);
   const [fromAddress, setFromAddress] = useState<string>('');
   const { zkEvmProvider } = usePassportProvider();
@@ -111,14 +115,14 @@ function NFTTransfer({ disabled, handleExampleSubmitted }: RequestExampleProps) 
       };
       const assetsRes = await blockchainData.listNFTsByAccountAddress(payload);
 
-      setAssets(assetsRes.result as BlockchainData.NFT[]);
+      setAssets(assetsRes.result as BlockchainData.NFTWithBalance[]);
     };
     getAssets().catch(console.log);
   }, [blockchainData, chainName, fromAddress]);
 
   const groupedAssets = useMemo(
     () => assets
-      .reduce((group: GroupedAsset[], rawAsset: BlockchainData.NFT) => {
+      .reduce((group: GroupedAsset[], rawAsset: BlockchainData.NFTWithBalance) => {
         const sameContractAddressAssets = group.find(
           (g) => g.contract_address.toLowerCase() === rawAsset.contract_address.toLowerCase(),
         );

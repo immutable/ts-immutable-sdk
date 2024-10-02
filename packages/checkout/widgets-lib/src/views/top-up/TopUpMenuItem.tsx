@@ -1,5 +1,7 @@
-import { Box, MenuItem, IconProps } from '@biom3/react';
-import { ReactNode } from 'react';
+import {
+  AllSingleVariantIconKeys, Box, type IconProps, isDualVariantIcon, MenuItem,
+} from '@biom3/react';
+import type { ReactNode } from 'react';
 
 export interface TopUpMenuItemProps {
   testId: string;
@@ -25,15 +27,19 @@ export function TopUpMenuItem({
         onClick={!isDisabled ? onClick : undefined}
         sx={isDisabled ? { opacity: '0.5', cursor: 'not-allowed' } : {}}
       >
-        <MenuItem.Icon
-          icon={icon}
-          variant={iconVariant}
-        />
+        {isDualVariantIcon(icon) ? (
+          <MenuItem.Icon
+            icon={icon}
+            variant={iconVariant}
+          />
+        ) : (
+          <MenuItem.Icon icon={icon} />
+        )}
         <MenuItem.Label size="medium">
           {heading}
         </MenuItem.Label>
         <MenuItem.IntentIcon
-          icon={intentIcon}
+          icon={intentIcon as AllSingleVariantIconKeys}
         />
         <MenuItem.Caption testId={`menu-item-caption-${testId}`}>
           {caption}

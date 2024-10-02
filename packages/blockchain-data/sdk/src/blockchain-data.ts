@@ -22,6 +22,8 @@ export class BlockchainData {
 
   private readonly metadata: mr.MetadataApi;
 
+  private readonly crafting: mr.CraftingApi;
+
   constructor(moduleConfig: BlockchainDataModuleConfiguration) {
     this.config = new BlockchainDataConfiguration(moduleConfig);
 
@@ -32,6 +34,7 @@ export class BlockchainData {
     this.nftOwners = new mr.NftOwnersApi(this.config.apiConfig);
     this.tokens = new mr.TokensApi(this.config.apiConfig);
     this.metadata = new mr.MetadataApi(this.config.apiConfig);
+    this.crafting = new mr.CraftingApi(this.config.apiConfig);
   }
 
   /**
@@ -195,13 +198,13 @@ export class BlockchainData {
    */
   public async listNFTsByAccountAddress(
     request: Types.ListNFTsByAccountAddressRequestParams,
-  ): Promise<Types.ListNFTsResult> {
+  ): Promise<Types.ListNFTsByOwnerResult> {
     return (await this.nfts
       .listNFTsByAccountAddress(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
-      })) as Types.ListNFTsResult;
+      })) as Types.ListNFTsByOwnerResult;
   }
 
   /**
@@ -457,5 +460,22 @@ export class BlockchainData {
       .catch((err) => {
         throw formatError(err);
       })) as Types.MetadataRefreshRateLimitResult;
+  }
+
+  /**
+   * Sign a crafting payload
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with the signature result
+   * @throws {@link index.APIError}
+   */
+  public async signCraftingPayload(
+    request: Types.SignCraftingPayloadRequestParams,
+  ): Promise<Types.SignCraftingResult> {
+    return (await this.crafting
+      .signCraftingPayload(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      })) as Types.SignCraftingResult;
   }
 }

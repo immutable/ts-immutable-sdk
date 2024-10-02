@@ -96,7 +96,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
           type: SharedViews.ERROR_VIEW,
           error: {
             name: 'InvalidViewType',
-            message: `Invalid view type "${flowParams}"`,
+            message: `Invalid view type "${flowParams.flow}"`,
           },
         },
       },

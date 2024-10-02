@@ -39,7 +39,7 @@ import { EventTargetContext } from '../../context/event-target-context/EventTarg
 import { OrderSummary } from './views/OrderSummary';
 import { CreditCardWarningDrawer } from './components/CreditCardWarningDrawer';
 
-type OptionalWidgetParams = Pick<SaleWidgetParams, 'excludePaymentTypes' | 'excludeFiatCurrencies'>;
+type OptionalWidgetParams = Pick<SaleWidgetParams, 'excludePaymentTypes' | 'excludeFiatCurrencies' | 'customOrderData'>;
 type RequiredWidgetParams = Required<
 Omit<SaleWidgetParams, 'walletProviderName'>
 >;
@@ -63,6 +63,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
     excludePaymentTypes,
     excludeFiatCurrencies,
     preferredCurrency,
+    customOrderData,
     hideExcludedPaymentTypes,
     waitFulfillmentSettlements = true,
   } = props;
@@ -131,6 +132,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
           excludePaymentTypes,
           excludeFiatCurrencies,
           preferredCurrency,
+          customOrderData,
           waitFulfillmentSettlements,
           hideExcludedPaymentTypes,
         }}

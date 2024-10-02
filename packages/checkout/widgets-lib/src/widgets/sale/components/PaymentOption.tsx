@@ -1,4 +1,4 @@
-import { IconProps, MenuItem, MenuItemSize } from '@biom3/react';
+import { AllDualVariantIconKeys, MenuItem, MenuItemSize } from '@biom3/react';
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,7 +24,7 @@ export function PaymentOption<RC extends ReactElement | undefined = undefined>({
 }: PaymentOptionProps<RC>) {
   const { t } = useTranslation();
 
-  const icon: Record<SalePaymentTypes, IconProps['icon']> = {
+  const icon: Record<SalePaymentTypes, AllDualVariantIconKeys> = {
     [SalePaymentTypes.CRYPTO]: 'Coins',
     [SalePaymentTypes.DEBIT]: 'BankCard',
     [SalePaymentTypes.CREDIT]: 'BankCard',
