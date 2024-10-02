@@ -1,12 +1,8 @@
 import {
-  ChainId,
-  Checkout,
-  IMTBLWidgetEvents,
-  TokenFilterTypes,
-  TokenInfo,
+  ChainId, Checkout, IMTBLWidgetEvents, TokenFilterTypes, TokenInfo,
 } from '@imtbl/checkout-sdk';
 import {
-  Body, Box, MenuItem, OverflowPopoverMenu, HeroTextInput,
+  Body, Box, HeroTextInput, MenuItem, OverflowPopoverMenu,
 } from '@biom3/react';
 import {
   useCallback, useContext, useEffect, useRef, useState,
@@ -18,14 +14,11 @@ import { EventTargetContext } from '../../../context/event-target-context/EventT
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
 import { getL2ChainId } from '../../../lib';
-import {
-  SharedViews,
-  ViewActions,
-  ViewContext,
-} from '../../../context/view-context/ViewContext';
+import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { useRoutes } from '../hooks/useRoutes';
 import { RouteData } from '../types';
 import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
+import { SQUID_NATIVE_TOKEN } from '../utils/config';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -111,12 +104,12 @@ export function AddFunds({
   useEffect(() => {
     resetRoutes();
 
-    if (balances && squid && currentToTokenAddress && currentToAmount) {
+    if (balances && squid && currentToTokenAddress?.address && currentToAmount) {
       fetchRoutesWithRateLimit(
         squid,
         balances,
         ChainId.IMTBL_ZKEVM_MAINNET.toString(),
-        currentToTokenAddress?.address ?? '',
+        currentToTokenAddress.address === 'native' ? SQUID_NATIVE_TOKEN : currentToTokenAddress.address,
         currentToAmount,
         5,
         1000,
