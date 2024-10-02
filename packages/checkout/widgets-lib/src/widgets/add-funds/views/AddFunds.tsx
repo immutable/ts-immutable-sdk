@@ -140,8 +140,8 @@ export function AddFunds({
         if (tokenResponse?.tokens.length > 0) {
           setAllowedTokens(tokenResponse.tokens);
 
-          const token = tokenResponse.tokens.find((t) => t.address === toTokenAddress)
-            || tokenResponse.tokens[0];
+          const token = tokenResponse.tokens.find((t) => t.address?.toLowerCase() === toTokenAddress?.toLowerCase())
+            ?? tokenResponse.tokens[0];
           setCurrentToTokenAddress(token);
 
           addFundsDispatch({
@@ -182,6 +182,13 @@ export function AddFunds({
     fetchOnRampTokens();
   }, [checkout]);
 
+  useEffect(
+    () => {
+      console.log('Routes', routes);
+    },
+    [routes],
+  );
+
   const openDrawer = () => {
     setShowOptionsDrawer(true);
   };
@@ -201,7 +208,7 @@ export function AddFunds({
   const onCardClick = () => {
     const data = {
       tokenAddress: currentToTokenAddress?.address ?? '',
-      amount: toAmount ?? '',
+      amount: currentToAmount ?? '',
     };
     orchestrationEvents.sendRequestOnrampEvent(
       eventTarget,
@@ -210,8 +217,11 @@ export function AddFunds({
     );
   };
 
-  const onRouteClick = (routeData: RouteData) => () => {
-    if (!toAmount || !toTokenAddress) {
+  const onRouteClick = (routeData: RouteData) => {
+    console.log('currentToAmount', currentToAmount);
+    console.log('currentToTokenAddress', currentToTokenAddress);
+
+    if (!currentToAmount || !currentToTokenAddress?.address) {
       return;
     }
 
@@ -223,8 +233,8 @@ export function AddFunds({
           data: {
             balance: routeData.amountData.balance,
             toChainId: ChainId.IMTBL_ZKEVM_MAINNET.toString(),
-            toTokenAddress,
-            toAmount,
+            toTokenAddress: currentToTokenAddress.address,
+            toAmount: currentToAmount,
           },
         },
       },
