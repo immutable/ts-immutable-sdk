@@ -3,9 +3,17 @@ import { checkout } from '@imtbl/sdk';
 import { checkoutSDK } from '../utils/setupDefault';
 import { useState, useEffect } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
-import { WalletInfo, WalletProviderName, GetTokenAllowListResult, TokenInfo, GetAllBalancesResult, GetBalanceResult } from '@imtbl/sdk/checkout';
-import { Button, Heading, Body, Link, Table } from '@biom3/react';
+import { 
+  WalletInfo, 
+  WalletProviderName, 
+  GetTokenAllowListResult, 
+  TokenInfo, 
+  GetAllBalancesResult, 
+  GetBalanceResult 
+} from '@imtbl/sdk/checkout';
+import { Button, Heading, Link, Table } from '@biom3/react';
 import NextLink from 'next/link';
+import Image from 'next/image';
 
 export default function ConnectWithMetamask() {
   const [provider, setProvider] = useState<Web3Provider>();
@@ -197,8 +205,7 @@ export default function ConnectWithMetamask() {
                   <p><strong>Name:</strong> {selectedToken.name}</p>
                   <p><strong>Symbol:</strong> {selectedToken.symbol}</p>
                   <p><strong>Decimals:</strong> {selectedToken.decimals}</p>
-                  <p><strong>Address:</strong> {selectedToken.address}</p>
-                  {selectedToken.icon && <img src={selectedToken.icon} alt={`${selectedToken.name} icon`} />}
+                  {selectedToken.icon && <Image src={selectedToken.icon} alt={`${selectedToken.name} icon`} />}
                 </div>
               </Table.Cell>
             </Table.Row>
@@ -211,7 +218,7 @@ export default function ConnectWithMetamask() {
                 <p><strong>Symbol:</strong> {tokenInfo?.symbol || 'N/A'}</p>
                 <p><strong>Decimals:</strong> {tokenInfo?.decimals || 'N/A'}</p>
                 <p><strong>Address:</strong> {tokenInfo?.address || 'N/A'}</p>
-                {tokenInfo?.icon && <img src={tokenInfo.icon} alt={`${tokenInfo.name} icon`} />}
+                {tokenInfo?.icon && <Image src={tokenInfo.icon} alt={`${tokenInfo.name} icon`} />}
               </div>
             </Table.Cell>
           </Table.Row>
