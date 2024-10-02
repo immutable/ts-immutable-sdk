@@ -11,12 +11,12 @@ export const signAndSubmitApproval = async (
 
   // If the user hasn't yet approved the Immutable Seaport contract to transfer assets from this
   // collection on their behalf they'll need to do so before they create an order
-  const approvalAction = listing.actions.find(
+  const approvalActions = listing.actions.filter(
     (action): action is orderbook.TransactionAction =>
       action.type === orderbook.ActionType.TRANSACTION,
   );
 
-  if (approvalAction) {
+  for (const approvalAction of approvalActions) {
     const unsignedTx = await approvalAction.buildTransaction();
     const receipt = await signer.sendTransaction(unsignedTx);
     await receipt.wait();
