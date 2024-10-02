@@ -21,8 +21,8 @@ const defaultFiatOptions: FiatOptionType[] = [
 export interface OptionsProps {
   chains: Chain[] | null;
   balances: TokenBalance[] | null;
-  onCardClick?: (type: FiatOptionType) => void;
-  onRouteClick?: (route: RouteData) => void;
+  onCardClick: (type: FiatOptionType) => void;
+  onRouteClick: (route: RouteData) => void;
   routes?: RouteData[];
   size?: MenuItemSize;
   showOnrampOption?: boolean;
