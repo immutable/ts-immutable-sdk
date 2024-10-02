@@ -175,13 +175,6 @@ export function AddFunds({
     fetchOnRampTokens();
   }, [checkout]);
 
-  useEffect(
-    () => {
-      console.log('Routes', routes);
-    },
-    [routes],
-  );
-
   const openDrawer = () => {
     setShowOptionsDrawer(true);
   };
@@ -211,9 +204,6 @@ export function AddFunds({
   };
 
   const onRouteClick = (routeData: RouteData) => {
-    console.log('currentToAmount', currentToAmount);
-    console.log('currentToTokenAddress', currentToTokenAddress);
-
     if (!currentToAmount || !currentToTokenAddress?.address) {
       return;
     }
