@@ -10,7 +10,7 @@
     "**playground**/",
     "*.cjs",
     "tests/func-tests/",
-    "tsup.*.ts"
+    "tsup.*"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
