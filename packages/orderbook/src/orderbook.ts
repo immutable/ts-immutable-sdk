@@ -38,6 +38,8 @@ import {
   ListBidsParams,
   ListBidsResult,
   ListingResult,
+  ListCollectionBidsParams,
+  ListCollectionBidsResult,
   ListListingsParams,
   ListListingsResult,
   ListTradesParams,
@@ -206,6 +208,22 @@ export class Orderbook {
     return {
       page: mapFromOpenApiPage(apiBids.page),
       result: apiBids.result.map(mapBidFromOpenApiOrder),
+    };
+  }
+
+  /**
+   * List collection bids. This method is used to get a list of collection bids filtered
+   * by conditions specified in the params object.
+   * @param {ListCollectionBidsParams} listOrderParams - Filtering, ordering and page parameters.
+   * @return {ListCollectionBidsResult} The paged collection bids.
+   */
+  async listCollectionBids(
+    listOrderParams: ListCollectionBidsParams,
+  ): Promise<ListCollectionBidsResult> {
+    const apiCollectionBids = await this.apiClient.listCollectionBids(listOrderParams);
+    return {
+      page: mapFromOpenApiPage(apiCollectionBids.page),
+      result: apiCollectionBids.result.map(mapCollectionBidFromOpenApiOrder),
     };
   }
 
