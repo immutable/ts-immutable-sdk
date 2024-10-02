@@ -44,6 +44,8 @@ import { mapImmutableOrderToSeaportOrderComponents } from './map-to-seaport-orde
 import { SeaportLibFactory } from './seaport-lib-factory';
 import { prepareTransaction } from './transaction';
 
+type FulfillmentOrderDetails = Parameters<SeaportLib['fulfillOrders']>[0]['fulfillOrderDetails'][0] & { extraData: string };
+
 function mapImmutableSdkItemToSeaportSdkCreateInputItem(
   item: ERC20Item | ERC721Item | ERC1155Item,
 ): CreateInputItem {
@@ -276,7 +278,7 @@ export class Seaport {
     const seaportLib = this.getSeaportLib(order);
     const chainID = (await this.provider.getNetwork()).chainId;
 
-    const fulfilmentOrderDetails: Parameters<SeaportLib['fulfillOrders']>[0]['fulfillOrderDetails'][0] = {
+    const fulfilmentOrderDetails: FulfillmentOrderDetails = {
       order: {
         parameters: orderComponents,
         signature: order.signature,
@@ -353,7 +355,7 @@ export class Seaport {
     const fulfillOrderDetails = fulfillingOrders.map((o) => {
       const { orderComponents, tips } = mapImmutableOrderToSeaportOrderComponents(o.order);
 
-      const fulfilmentOrderDetails: Parameters<SeaportLib['fulfillOrders']>[0]['fulfillOrderDetails'][0] = {
+      const fulfilmentOrderDetails: FulfillmentOrderDetails = {
         order: {
           parameters: orderComponents,
           signature: o.order.signature,
