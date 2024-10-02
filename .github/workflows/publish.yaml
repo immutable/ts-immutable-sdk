@@ -48,7 +48,7 @@ jobs:
       - name: Check Public Release Branch
         if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') && github.ref != 'refs/heads/main' }}
         run: |
-          echo "Public releases should be only done from main branch, current branch ${{ github.ref }}"
+          echo "Public releases can only be executed from the main branch, current branch ${{ github.ref }}"
           exit 1
 
       - name: Check User Permission
@@ -90,6 +90,9 @@ jobs:
           git config user.name "platform-sa"
           git config user.email "platform-sa@users.noreply.github.com"
 
+      - name: Setup new package versions
+        run: pnpm nx release version --specifier ${{ env.RELEASE_TYPE }} $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "")
+
       - name: Build SDK & Checkout Widgets
         run: pnpm nx run-many -t build -p @imtbl/sdk,@imtbl/checkout-widgets
 
@@ -102,16 +105,14 @@ jobs:
       - name: Authenticate NPM
         run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
 
-      - name: Release
+      - name: Publish Github Release
+        run: pnpm nx release changelog $(jq -r '.version' ./sdk/package.json) $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") 
+
+      - name: Release to NPM
         id: npm_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if [[ "${{ github.ref }}" != "refs/heads/main" && ! "${{ env.RELEASE_TYPE }}" =~ ^pre ]]; then
-            echo "Non-pre specifiers can only be used on the main branch."
-            exit 1
-          fi
-          pnpm nx release $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") --yes --specifier ${{ env.RELEASE_TYPE }}
+        run: pnpm nx release publish $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "")
 
       - name: Warm up CDN
         id: warm_up_cdn
