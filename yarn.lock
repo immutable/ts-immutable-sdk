@@ -2636,7 +2636,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.27.8":
+"@biom3/react@npm:^0.27.3, @biom3/react@npm:^0.27.8":
   version: 0.27.8
   resolution: "@biom3/react@npm:0.27.8"
   dependencies:
