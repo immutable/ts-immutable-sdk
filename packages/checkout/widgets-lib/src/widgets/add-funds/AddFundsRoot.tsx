@@ -1,5 +1,4 @@
 import {
-  ChainId,
   IMTBLWidgetEvents,
   WidgetConfiguration,
   WidgetProperties,
@@ -14,12 +13,6 @@ import { HandoverProvider } from '../../context/handover-context/HandoverProvide
 import i18n from '../../i18n';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
-import {
-  ConnectLoader,
-  ConnectLoaderParams,
-} from '../../components/ConnectLoader/ConnectLoader';
-import { getL1ChainId, getL2ChainId } from '../../lib';
-import { sendAddFundsCloseEvent } from './AddFundsWidgetEvents';
 import { isValidAddress, isValidAmount } from '../../lib/validations/widgetValidators';
 
 const AddFundsWidget = React.lazy(() => import('./AddFundsWidget'));
@@ -67,46 +60,28 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
     if (!this.reactRoot) return;
 
     const { t } = i18n;
-    const connectLoaderParams: ConnectLoaderParams = {
-      targetChainId: this.checkout.config.isProduction
-        ? ChainId.IMTBL_ZKEVM_MAINNET
-        : ChainId.IMTBL_ZKEVM_TESTNET,
-      web3Provider: this.web3Provider,
-      checkout: this.checkout,
-      allowedChains: [
-        getL1ChainId(this.checkout.config),
-        getL2ChainId(this.checkout.config),
-      ],
-      isCheckNetworkEnabled: false,
-    };
 
     this.reactRoot.render(
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="add-funds-container" config={this.strongConfig()}>
             <HandoverProvider>
-              <ConnectLoader
-                widgetConfig={this.strongConfig()}
-                params={connectLoaderParams}
-                closeEvent={() => sendAddFundsCloseEvent(window)}
+              <Suspense
+                fallback={
+                  <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
+                }
               >
-                <Suspense
-                  fallback={
-                    <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
-                  }
-                >
-                  <AddFundsWidget
-                    checkout={this.checkout}
-                    web3Provider={this.web3Provider}
-                    showBridgeOption={this.parameters.showBridgeOption}
-                    showSwapOption={this.parameters.showSwapOption}
-                    showOnrampOption={this.parameters.showOnrampOption}
-                    toTokenAddress={this.parameters.toTokenAddress}
-                    toAmount={this.parameters.toAmount}
-                    showBackButton={this.parameters.showBackButton}
-                  />
-                </Suspense>
-              </ConnectLoader>
+                <AddFundsWidget
+                  checkout={this.checkout}
+                  web3Provider={this.web3Provider}
+                  showBridgeOption={this.parameters.showBridgeOption}
+                  showSwapOption={this.parameters.showSwapOption}
+                  showOnrampOption={this.parameters.showOnrampOption}
+                  toTokenAddress={this.parameters.toTokenAddress}
+                  toAmount={this.parameters.toAmount}
+                  showBackButton={this.parameters.showBackButton}
+                />
+              </Suspense>
             </HandoverProvider>
           </ThemeProvider>
         </CustomAnalyticsProvider>
