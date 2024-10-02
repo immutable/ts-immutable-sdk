@@ -590,7 +590,7 @@ describe("Orderbook", () => {
       await actionAll(fulfillActions, taker);
 
       await waitForCollectionBidToBeOfStatus(orderBookSdk, result.id, {
-        name: orderbook.OrderStatusName.ACTIVE,
+        name: orderbook.OrderStatusName.FILLED,
       });
     })
 
@@ -686,6 +686,207 @@ describe("Orderbook", () => {
           denominator: 50
         }
       );
+    })
+  })
+
+  describe("create and bulk fulfill ERC721 bid", () => {
+    it("fulfill fully", async () => {
+      const erc721TokenIds = Array.from({ length: 2 }, () => getRandomTokenId());
+
+      // maker funds
+      await withBankerRetry(async () => {
+        await (
+          await erc20Contract.mint(maker.address, 10000, GAS_OVERRIDES)
+        ).wait(1);
+      });
+      await withBankerRetry(async () => {
+        await (
+          await banker.sendTransaction({
+            to: maker.address,
+            value: `${imxForApproval}`,
+            ...GAS_OVERRIDES,
+          })
+        ).wait(1);
+      });
+
+      for (const tokenId of erc721TokenIds) {
+        await withBankerRetry(async () => {
+          await (
+            await erc721Contract.mint(taker.address, tokenId, GAS_OVERRIDES)
+          ).wait(1);
+        });
+      }
+
+      await withBankerRetry(async () => {
+        await (
+          await banker.sendTransaction({
+            to: taker.address,
+            value: `${(imxForApproval * 2) + imxForFulfillment}`,
+            ...GAS_OVERRIDES,
+          })
+        ).wait(1);
+      });
+
+      const orderIds: string[] = [];
+
+      for (const tokenId of erc721TokenIds) {
+        const {
+          actions: bidCreateActions,
+          orderComponents,
+          orderHash,
+        } = await orderBookSdk.prepareBid({
+          makerAddress: maker.address,
+          sell: {
+            type: 'ERC20',
+            contractAddress: erc20Contract.address,
+            amount: '100',
+          },
+          buy: {
+            type: 'ERC721',
+            contractAddress: erc721Contract.address,
+            tokenId,
+          },
+          orderStart: new Date(2000, 1, 15),
+        });
+
+        const signatures = await actionAll(bidCreateActions, maker);
+
+        const { result } = await orderBookSdk.createBid({
+          orderComponents,
+          orderHash,
+          orderSignature: signatures[0],
+          makerFees: [],
+        });
+
+        orderIds.push(result.id);
+
+        await waitForBidToBeOfStatus(orderBookSdk, result.id, {
+          name: orderbook.OrderStatusName.ACTIVE,
+        });
+      }
+
+      const fulfilmentParams = orderIds.map(orderId => ({
+        orderId,
+        takerFees: [],
+        amountToFill: '1',
+      }));
+
+      const fulfillResponse = await orderBookSdk.fulfillBulkOrders(
+        fulfilmentParams,
+        taker.address
+      );
+
+      if (!fulfillResponse.sufficientBalance) {
+        throw new Error('Expected balance to be sufficient for order fulfillment');
+      }
+
+      const { actions } = fulfillResponse;
+
+      await actionAll(actions, taker);
+
+      const allowance = await erc20Contract.allowance(taker.address, '0x3870289A34bba912a05B2c0503F7484dD18d2f6F');
+
+      await Promise.all(
+        orderIds.map(orderId => waitForBidToBeOfStatus(orderBookSdk, orderId, {
+          name: orderbook.OrderStatusName.FILLED,
+        }))
+      );
+    })
+  })
+
+  describe.skip("create and bulk fulfill ERC721 collection bid", () => {
+    it("fulfill fully", async () => {
+      const erc721TokenIds = Array.from({ length: 10 }, () => getRandomTokenId());
+
+      // maker funds
+      await withBankerRetry(async () => {
+        await (
+          await erc20Contract.mint(maker.address, 10000, GAS_OVERRIDES)
+        ).wait(1);
+      });
+      await withBankerRetry(async () => {
+        await (
+          await banker.sendTransaction({
+            to: maker.address,
+            value: `${imxForApproval}`,
+            ...GAS_OVERRIDES,
+          })
+        ).wait(1);
+      });
+
+      for (const tokenId of erc721TokenIds) {
+        await withBankerRetry(async () => {
+          await (
+            await erc721Contract.mint(taker.address, tokenId, GAS_OVERRIDES)
+          ).wait(1);
+        });
+      }
+
+      await withBankerRetry(async () => {
+        await (
+          await banker.sendTransaction({
+            to: taker.address,
+            value: `${(imxForApproval * 2) + (imxForFulfillment * 2)}`,
+            ...GAS_OVERRIDES,
+          })
+        ).wait(1);
+      });
+
+      const {
+        actions: bidCreateActions,
+        orderComponents,
+        orderHash,
+      } = await orderBookSdk.prepareCollectionBid({
+        makerAddress: maker.address,
+        sell: {
+          type: 'ERC20',
+          contractAddress: erc20Contract.address,
+          amount: '100',
+        },
+        buy: {
+          type: 'ERC721_COLLECTION',
+          contractAddress: erc721Contract.address,
+          amount: '10',
+        },
+        orderStart: new Date(2000, 1, 15),
+      });
+
+      const signatures = await actionAll(bidCreateActions, maker);
+
+      const { result } = await orderBookSdk.createCollectionBid({
+        orderComponents,
+        orderHash,
+        orderSignature: signatures[0],
+        makerFees: [],
+      });
+
+      await waitForCollectionBidToBeOfStatus(orderBookSdk, result.id, {
+        name: orderbook.OrderStatusName.ACTIVE,
+      });
+
+      const fulfilmentParams = erc721TokenIds.map(tokenId => ({
+        orderId: result.id,
+        takerFees: [],
+        amountToFill: '1',
+        tokenId,
+      }));
+
+      const fulfillResponse = await orderBookSdk.fulfillBulkOrders(
+        fulfilmentParams,
+        taker.address
+      );
+
+      if (!fulfillResponse.sufficientBalance) {
+        throw new Error('Expected balance to be sufficient for order fulfillment');
+      }
+
+      const { actions } = fulfillResponse;
+
+      await actionAll(actions, taker);
+
+      await waitForCollectionBidToBeOfStatus(orderBookSdk, result.id, {
+        name: orderbook.OrderStatusName.FILLED,
+      });
     })
   })
 
