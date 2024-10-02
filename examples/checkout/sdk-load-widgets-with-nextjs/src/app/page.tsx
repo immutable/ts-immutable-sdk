@@ -7,14 +7,8 @@ export default function Home() {
     <Heading
       size="medium"
       className="mb-1">
-      Checkout SDK Connect
+      Checkout SDK Widgets
     </Heading>
-    <Button
-      className="mb-1"
-      size="medium"
-      rc={<NextLink href="/connect-with-metamask" />}>
-      Connect with MetaMask
-    </Button>
 
     <Button
       className="mb-1"

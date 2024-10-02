@@ -65,6 +65,9 @@ jobs:
       - name: Build examples
         run: yarn build:examples
 
+      - name: Build local widgets bundle
+        run: yarn workspace @imtbl/checkout-widgets build:examplewidgets
+
       - name: Lint examples
         run: yarn lint:examples
 
@@ -75,7 +78,6 @@ jobs:
         run: yarn test:examples
       
 
-  # todo - this should only run on checkout PRs
   build-lint-test-example-widgets-with-sdk:
     name: Build, Lint & Test Example Widgets with latest SDK
     runs-on: ubuntu-latest-8-cores
@@ -110,6 +112,9 @@ jobs:
       - name: Build next app
         run: yarn workspace @examples/sdk-load-widgets-with-nextjs build
 
+      - name: Build everything
+        run: yarn build
+
       - name: Build local widgets bundle
         run: yarn workspace @imtbl/checkout-widgets build:examplewidgets
 
@@ -120,7 +125,7 @@ jobs:
         uses: ./.github/actions/setup-playwright
 
       - name: Test Widget example
-        run: yarn workspace @examples/sdk-load-widgets-with-nextjs test:localwidgets
+        run: yarn workspace @examples/sdk-load-widgets-with-nextjs test
 
   func-tests:
     name: Functional tests
