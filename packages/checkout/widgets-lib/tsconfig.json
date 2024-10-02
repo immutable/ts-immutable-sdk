@@ -10,7 +10,7 @@
     "noImplicitAny": false,
     "jsxImportSource": "@emotion/react",
     "experimentalDecorators": true,
-    "types": ["@segment/analytics-next", "jest"]
+    "types": ["@segment/analytics-next", "jest", "node"]
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]
