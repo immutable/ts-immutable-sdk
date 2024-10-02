@@ -343,7 +343,7 @@ describe("Orderbook", () => {
     });
   });
 
-  describe.skip("create and fulfill ERC721 collection bid", () => {
+  describe("create and fulfill ERC721 collection bid", () => {
     it("fulfill fully", async () => {
       const erc721TokenId = getRandomTokenId();
 
@@ -421,7 +421,7 @@ describe("Orderbook", () => {
       });
     })
 
-    it.skip("fulfill partially", async () => {
+    it("fulfill partially", async () => {
       const erc721TokenId = getRandomTokenId();
 
       // maker funds
@@ -510,7 +510,7 @@ describe("Orderbook", () => {
     })
   })
 
-  describe.skip("create and fulfill ERC1155 collection bid", () => {
+  describe("create and fulfill ERC1155 collection bid", () => {
     it("fulfill fully", async () => {
       const erc1155TokenId = getRandomTokenId();
 
@@ -794,7 +794,7 @@ describe("Orderbook", () => {
     })
   })
 
-  describe.skip("create and bulk fulfill ERC721 collection bid", () => {
+  describe("create and bulk fulfill ERC721 collection bid", () => {
     it("fulfill fully", async () => {
       const erc721TokenIds = Array.from({ length: 10 }, () => getRandomTokenId());
 
@@ -890,7 +890,7 @@ describe("Orderbook", () => {
     })
   })
 
-  it.skip("create and cancel listing, bid, and collection bid", async () => {
+  it("create and cancel listing, bid, and collection bid", async () => {
     const erc721TokenIdForListing = getRandomTokenId();
     const erc721TokenIdForBid = getRandomTokenId();
     const erc1155TokenIdForCollectionBid = getRandomTokenId();
