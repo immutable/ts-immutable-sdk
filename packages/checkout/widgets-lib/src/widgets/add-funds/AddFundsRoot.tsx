@@ -13,7 +13,10 @@ import { HandoverProvider } from '../../context/handover-context/HandoverProvide
 import i18n from '../../i18n';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
-import { isValidAmount } from '../../lib/validations/widgetValidators';
+import {
+  isValidAddress,
+  isValidAmount,
+} from '../../lib/validations/widgetValidators';
 
 const AddFundsWidget = React.lazy(() => import('./AddFundsWidget'));
 
@@ -45,6 +48,12 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "toAmount" widget input');
       validatedParams.toAmount = '';
+    }
+
+    if (!isValidAddress(params.toTokenAddress)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "toTokenAddress" widget input');
+      validatedParams.toTokenAddress = '';
     }
 
     return validatedParams;
