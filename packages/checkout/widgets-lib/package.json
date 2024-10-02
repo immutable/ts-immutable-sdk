@@ -14,9 +14,9 @@
     ]
   },
   "dependencies": {
-    "@0xsquid/sdk": "^2.8.24",
+    "@0xsquid/sdk": "^2.8.25",
     "@biom3/design-tokens": "^0.4.4",
-    "@biom3/react": "^0.27.3",
+    "@biom3/react": "^0.27.6",
     "@ethersproject/bignumber": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/bridge-sdk": "0.0.0",
@@ -47,7 +47,7 @@
     "url": "^0.11.0"
   },
   "devDependencies": {
-    "@0xsquid/squid-types": "^0.1.104",
+    "@0xsquid/squid-types": "^0.1.108",
     "@jest/globals": "^29.5.0",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-json": "^6.1.0",
