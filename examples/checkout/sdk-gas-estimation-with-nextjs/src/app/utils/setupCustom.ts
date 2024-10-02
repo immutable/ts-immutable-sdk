@@ -8,7 +8,7 @@ const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_PUBLISHABLE_KEY ?? ''
 
 // Set the environment to SANDBOX for testnet or PRODUCTION for mainnet
 const baseConfig = {
-  environment: config.Environment.SANDBOX,
+  environment: config.Environment.PRODUCTION,
   publishableKey: PUBLISHABLE_KEY,
 };
 

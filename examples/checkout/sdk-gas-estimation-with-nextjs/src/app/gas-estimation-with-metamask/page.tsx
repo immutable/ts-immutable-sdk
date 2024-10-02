@@ -1,7 +1,7 @@
 'use client';
 import { checkout } from "@imtbl/sdk";
 import { GasEstimateSwapResult, GasEstimateBridgeToL2Result } from "@imtbl/sdk/checkout";
-import { checkoutSDK } from "../utils/setupDefault";
+import { checkoutSDK } from "../utils/setupCustom";
 import { useState } from "react";
 import { Web3Provider } from "@ethersproject/providers";
 import { Button, Heading, Body, Link, Table } from "@biom3/react";
@@ -78,7 +78,12 @@ export default function ConnectWithMetamask() {
           <Table.Row>
             <Table.Cell><b>Swap Gas Estimate</b></Table.Cell>
             <Table.Cell>
-              {swapGasEstimate ? `${swapGasEstimate.fees}` : ' (not estimated)'}
+              {swapGasEstimate ? (
+                <>
+                  <div><b>Total Fees:</b> {swapGasEstimate.fees.totalFees ? hexToDecimal(swapGasEstimate.fees.totalFees._hex) : 'N/A'}</div>
+                  <div><b>Token:</b> {swapGasEstimate.fees.token?.name} ({swapGasEstimate.fees.token?.symbol})</div>
+                </>
+              ) : ' (not estimated)'}
             </Table.Cell>
           </Table.Row>
           <Table.Row>
@@ -86,11 +91,12 @@ export default function ConnectWithMetamask() {
             <Table.Cell>
               {bridgeGasEstimate ? (
                 <>
-                  <div>Source Chain Gas: {hexToDecimal(bridgeGasEstimate.fees.sourceChainGas._hex)}</div>
-                  <div>Approval Fee: {hexToDecimal(bridgeGasEstimate.fees.approvalFee._hex)}</div>
-                  <div>Bridge Fee: {hexToDecimal(bridgeGasEstimate.fees.bridgeFee._hex)}</div>
-                  <div>IMTBL Fee: {hexToDecimal(bridgeGasEstimate.fees.imtblFee._hex)}</div>
-                  <div>Total Fees: {hexToDecimal(bridgeGasEstimate.fees.totalFees._hex)}</div>
+                  <div><b>Source Chain Gas:</b> {hexToDecimal(bridgeGasEstimate.fees.sourceChainGas._hex)}</div>
+                  <div><b>Approval Fee:</b> {hexToDecimal(bridgeGasEstimate.fees.approvalFee._hex)}</div>
+                  <div><b>Bridge Fee:</b> {hexToDecimal(bridgeGasEstimate.fees.bridgeFee._hex)}</div>
+                  <div><b>IMTBL Fee:</b> {hexToDecimal(bridgeGasEstimate.fees.imtblFee._hex)}</div>
+                  <div><b>Total Fees:</b> {hexToDecimal(bridgeGasEstimate.fees.totalFees._hex)}</div>
+                  <div><b>Token:</b> {bridgeGasEstimate.token?.name} ({bridgeGasEstimate.token?.symbol})</div>
                 </>
               ) : ' (not estimated)'}
             </Table.Cell>
