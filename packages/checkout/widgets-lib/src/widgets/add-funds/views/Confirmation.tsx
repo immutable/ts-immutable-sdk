@@ -22,7 +22,7 @@ export function Confirmation({ data, onCloseClick }: ConfirmationProps) {
         <Link
           size="small"
           rc={
-            <a href={`https://axelarscan.io/gmp/${data.transactionHash}`} />
+            <a target="_blank" href={`https://axelarscan.io/gmp/${data.transactionHash}`} rel="noreferrer" />
           }
         >
           <Link.Icon icon="ArrowForward" />
