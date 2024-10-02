@@ -26,5 +26,7 @@ module.exports = function override(config, env) {
       },
     });
     
+    config.module.exprContextCritical = false
+    
     return config
 }
