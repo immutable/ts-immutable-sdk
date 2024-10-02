@@ -19,6 +19,7 @@ export const useExecute = () => {
     if (!provider.provider.request) {
       throw Error('provider does not have request method');
     }
+
     try {
       const fromChainHex = `0x${parseInt(chainId, 10).toString(16)}`;
       const providerChainId = await provider.provider.request({
@@ -39,23 +40,42 @@ export const useExecute = () => {
     }
   };
 
+  const getAllowance = async (
+    tokenContract: ethers.Contract,
+    owner: string,
+    spender: string,
+  ): Promise<ethers.BigNumber> => tokenContract.allowance(owner, spender);
+
   const approve = async (
     provider: Web3Provider,
     routeResponse: RouteResponse,
   ): Promise<void> => {
     try {
       if (!isSquidNativeToken(routeResponse?.route?.params.fromToken)) {
-        const fromToken = routeResponse?.route.params.fromToken;
         const erc20Abi = [
           'function approve(address spender, uint256 amount) public returns (bool)',
+          'function allowance(address owner, address spender) public view returns (uint256)',
         ];
+        const fromToken = routeResponse?.route.params.fromToken;
         const signer = provider.getSigner();
         const tokenContract = new ethers.Contract(fromToken, erc20Abi, signer);
 
-        const transactionRequestTarget = routeResponse?.route?.transactionRequest?.target;
         const fromAmount = routeResponse?.route.params.fromAmount;
-        const tx = await tokenContract.approve(transactionRequestTarget, fromAmount);
-        await tx.wait();
+        if (!fromAmount) {
+          throw new Error('fromAmount is undefined');
+        }
+
+        const transactionRequestTarget = routeResponse?.route?.transactionRequest?.target;
+        if (!transactionRequestTarget) {
+          throw new Error('transactionRequest target is undefined');
+        }
+
+        const ownerAddress = await signer.getAddress();
+        const allowance = await getAllowance(tokenContract, ownerAddress, transactionRequestTarget);
+        if (allowance.lt(fromAmount)) {
+          const tx = await tokenContract.approve(transactionRequestTarget, fromAmount);
+          await tx.wait();
+        }
       }
     } catch (e) {
       throw Error('Error approving tokens');
@@ -70,6 +90,7 @@ export const useExecute = () => {
     if (!provider.provider.request) {
       throw Error('provider does not have request method');
     }
+
     try {
       const tx = (await squid.executeRoute({
         signer: provider.getSigner(),
