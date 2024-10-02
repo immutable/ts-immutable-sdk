@@ -5,6 +5,6 @@
     "rootDirs": ["src"],
     "customConditions": ["development"]
   },
-  "include": ["src", "test/__mocks__/window.ts"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist", "test"]
 }
