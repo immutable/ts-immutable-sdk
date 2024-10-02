@@ -9,7 +9,7 @@ export default function Home() {
         Orderbook - Create Collection Bid
       </Heading>
       <Button
-        testId={"create-bid-with-erc721"}
+        testId={"create-collection-bid-with-erc721"}
         className="mb-1"
         size="medium"
         rc={<NextLink href="/create-collection-bid-with-erc721" />}
@@ -17,7 +17,7 @@ export default function Home() {
         Create ERC721 Collection Bid
       </Button>
       <Button
-        testId={"create-bid-with-erc1155"}
+        testId={"create-collection-bid-with-erc1155"}
         className="mb-1"
         size="medium"
         rc={<NextLink href="/create-collection-bid-with-erc1155" />}
