@@ -4,6 +4,7 @@ import {
 	ButtCon,
 	Button,
 	FramedIcon,
+	FramedImage,
 	HeroFormControl,
 	HeroTextInput,
 	MenuItem,
@@ -77,10 +78,8 @@ export function AddFunds({
 		[],
 	);
 	const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
-	const [inputValue, setInputValue] = useState<string>(toAmount || "0");
-	const [currentToAmount, setCurrentToAmount] = useState<string>(
-		toAmount || "0",
-	);
+	const [inputValue, setInputValue] = useState<string>(toAmount || "");
+	const [currentToAmount, setCurrentToAmount] = useState<string>(inputValue);
 	const [currentToTokenAddress, setCurrentToTokenAddress] = useState<
 		TokenInfo | undefined
 	>();
@@ -236,16 +235,15 @@ export function AddFunds({
 	return (
 		<SimpleLayout
 			header={
-				<HeaderNavigation
-					onCloseButtonClick={onCloseButtonClick}
-					showBack={showBack}
-					onBackButtonClick={() => {
-						orchestrationEvents.sendRequestGoBackEvent(
-							eventTarget,
-							IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
-							{},
-						);
-						onBackButtonClick?.();
+				<ButtCon
+					variant="tertiary"
+					size="small"
+					icon="Close"
+					onClick={onCloseButtonClick}
+					sx={{
+						pos: "absolute",
+						top: "base.spacing.x4",
+						right: "base.spacing.x5",
 					}}
 				/>
 			}
@@ -277,21 +275,28 @@ export function AddFunds({
         */}
 
 			<Stack alignItems="center" sx={{ flex: 1 }}>
-				<Stack testId="top-section" sx={{ flex: 1 }} justifyContent="center">
+				<Stack
+					testId="top-section"
+					sx={{ flex: 1, px: "base.spacing.x2" }}
+					justifyContent="center"
+					alignItems="center"
+				>
 					{showInitialEmptyState ? (
-						<Stack alignItems="center">
+						<>
 							<OverflowDrawerMenu
 								icon="Add"
 								size="large"
+								variant="tertiary"
 								drawerSize="full"
 								headerBarTitle="Add Token"
+								drawerCloseIcon="ChevronExpand"
 							>
 								{allowedTokens.map((token) => (
 									<MenuItem
 										size="medium"
 										key={token.name}
-										// onClick={() => handleTokenChange(token)}
-										// selected={isSelected(token)}
+										onClick={() => handleTokenChange(token)}
+										selected={isSelected(token)}
 										emphasized
 									>
 										<MenuItem.FramedImage
@@ -304,21 +309,30 @@ export function AddFunds({
 								))}
 							</OverflowDrawerMenu>
 							<Body>Add Token</Body>
-						</Stack>
+						</>
 					) : (
-						<HeroFormControl>
-							<HeroFormControl.Label>
-								Add {currentToTokenAddress.symbol}
-							</HeroFormControl.Label>
-							<HeroTextInput
-								testId="add-funds-amount-input"
-								type="number"
-								value={inputValue}
-								onChange={(value) => updateAmount(value)}
-								placeholder="0"
+						<>
+							<FramedImage
+								size="xLarge"
+								use={<img src={currentToTokenAddress?.icon} />}
+								padded
+								emphasized
+								circularFrame
 							/>
-							<HeroFormControl.Caption>USD $0.00</HeroFormControl.Caption>
-						</HeroFormControl>
+							<HeroFormControl>
+								<HeroFormControl.Label>
+									Add {currentToTokenAddress.symbol}
+								</HeroFormControl.Label>
+								<HeroTextInput
+									testId="add-funds-amount-input"
+									type="number"
+									value={inputValue}
+									onChange={(value) => updateAmount(value)}
+									placeholder="0"
+								/>
+								<HeroFormControl.Caption>USD $0.00</HeroFormControl.Caption>
+							</HeroFormControl>
+						</>
 					)}
 				</Stack>
 				<Stack
