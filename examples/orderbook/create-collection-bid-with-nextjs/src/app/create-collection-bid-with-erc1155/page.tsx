@@ -13,7 +13,8 @@ import {
 import type { orderbook } from "@imtbl/sdk";
 import type {
   ERC1155CollectionItem,
-  ERC20Item
+  ERC20Item,
+  PrepareCollectionBidParams
 } from "@imtbl/sdk/orderbook";
 import { ProviderEvent } from "@imtbl/sdk/passport";
 import { ethers } from "ethers";
@@ -145,7 +146,7 @@ export default function CreateERC1155CollectionBidWithPassport() {
       };
 
       // invoke the orderbook SDK to prepare the collection bid
-      return await orderbookSDK.prepareBid(prepareCollectionBidParams);
+      return await orderbookSDK.prepareCollectionBid(prepareCollectionBidParams);
     };
   // #enddoc prepare-erc1155-collection-bid
 

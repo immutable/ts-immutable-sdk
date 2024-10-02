@@ -13,7 +13,8 @@ import {
 import type { orderbook } from "@imtbl/sdk";
 import type {
   ERC20Item,
-  ERC721CollectionItem
+  ERC721CollectionItem,
+  PrepareCollectionBidParams
 } from "@imtbl/sdk/orderbook";
 import { ProviderEvent } from "@imtbl/sdk/passport";
 import { ethers } from "ethers";
