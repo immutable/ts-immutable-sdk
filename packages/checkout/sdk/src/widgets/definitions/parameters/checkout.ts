@@ -26,19 +26,19 @@ export type CheckoutWidgetWalletFlowParams = {
   flow: CheckoutFlowType.WALLET;
 } & WalletWidgetParams;
 
-export type CheckouWidgetSwapFlowParams = {
+export type CheckoutWidgetSwapFlowParams = {
   flow: CheckoutFlowType.SWAP;
 } & SwapWidgetParams;
 
-export type CheckouWidgetBridgeFlowParams = {
+export type CheckoutWidgetBridgeFlowParams = {
   flow: CheckoutFlowType.BRIDGE;
 } & BridgeWidgetParams;
 
-export type CheckouWidgetOnRampFlowParams = {
+export type CheckoutWidgetOnRampFlowParams = {
   flow: CheckoutFlowType.ONRAMP;
 } & OnRampWidgetParams;
 
-export type CheckouWidgetSaleFlowParams = {
+export type CheckoutWidgetSaleFlowParams = {
   flow: CheckoutFlowType.SALE;
 } & SaleWidgetParams;
 
@@ -49,10 +49,10 @@ export type CheckoutWidgetAddFundsFlowParams = {
 export type CheckoutWidgetFlowParams =
   | CheckoutWidgetConnectFlowParams
   | CheckoutWidgetWalletFlowParams
-  | CheckouWidgetSwapFlowParams
-  | CheckouWidgetBridgeFlowParams
-  | CheckouWidgetOnRampFlowParams
-  | CheckouWidgetSaleFlowParams
+  | CheckoutWidgetSwapFlowParams
+  | CheckoutWidgetBridgeFlowParams
+  | CheckoutWidgetOnRampFlowParams
+  | CheckoutWidgetSaleFlowParams
   | CheckoutWidgetAddFundsFlowParams;
 
 export type CheckoutWidgetParams = {

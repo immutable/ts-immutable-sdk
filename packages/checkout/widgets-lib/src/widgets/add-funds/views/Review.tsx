@@ -37,7 +37,7 @@ export function Review({
   onBackButtonClick, onCloseButtonClick,
 }: ReviewProps) {
   const { viewDispatch } = useContext(ViewContext);
-  const { addFundsState } = useContext(AddFundsContext);
+  const { addFundsState: { squid, provider, chains } } = useContext(AddFundsContext);
 
   const [route, setRoute] = useState<RouteResponse | undefined>();
   const [fromAddress, setFromAddress] = useState<string | undefined>();
@@ -51,18 +51,18 @@ export function Review({
   } = useExecute();
 
   const getFromAmountAndRoute = async () => {
-    if (!addFundsState.squid) {
+    if (!squid) {
       return;
     }
 
-    const address = await addFundsState.provider?.getSigner().getAddress();
+    const address = await provider?.getSigner().getAddress();
     if (!address) {
       return;
     }
     setFromAddress(address);
 
     const amountData = await getFromAmount(
-      addFundsState.squid,
+      squid,
       data.balance,
       data.toAmount,
       data.toChainId,
@@ -74,7 +74,7 @@ export function Review({
     }
 
     const routeResponse = await getRoute(
-      addFundsState.squid,
+      squid,
       amountData?.fromToken,
       amountData?.toToken,
       data.toAmount,
@@ -100,7 +100,7 @@ export function Review({
   }, []);
 
   const getChain = (chainId: string | undefined)
-  : Chain | undefined => addFundsState.chains?.find((chain) => chain.id === chainId);
+  : Chain | undefined => chains?.find((chain) => chain.id === chainId);
 
   const getFeeCosts = (): number => route?.route.estimate.feeCosts.reduce((acc, fee) => acc + Number(fee.amountUsd), 0)
     ?? 0;
@@ -130,17 +130,22 @@ export function Review({
   };
 
   const onProceedClick = async () => {
-    if (!addFundsState.squid || !addFundsState.provider || !route) {
+    if (!squid || !provider || !route) {
       return;
     }
+
     try {
       clearInterval(getRouteIntervalId);
       setProceedDisabled(true);
 
-      const provider = await convertToNetworkChangeableProvider(addFundsState.provider);
-      await checkProviderChain(provider, route.route.params.fromChain);
-      await approve(provider, route);
-      const txReceipt = await execute(addFundsState.squid, provider, route);
+      const changeableProvider = await convertToNetworkChangeableProvider(provider);
+
+      await checkProviderChain(changeableProvider, route.route.params.fromChain);
+
+      await approve(changeableProvider, route);
+
+      const txReceipt = await execute(squid, changeableProvider, route);
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -152,7 +157,7 @@ export function Review({
           },
         },
       });
-    } catch (e: unknown) {
+    } catch (e) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
