@@ -184,6 +184,8 @@ export default function CreateERC1155ListingWithPassport() {
   // create ERC1155 listing
   const createER1155Listing = async () => {
     setListingErrorState(null);
+    setLoadingState(true);
+    setLoadingText('Creating listing');
 
     try {
       // prepare the listing
@@ -208,17 +210,27 @@ export default function CreateERC1155ListingWithPassport() {
       setSuccessMessageState(null);
       setListingErrorState(`Something went wrong - ${error.message}`);
     }
+
+    setLoadingState(false);
   };
 
   return (
-    <Box>
+    <Box sx={{ width: "450px" }}>
+      <LoadingOverlay visible={loading}>
+        <LoadingOverlay.Content>
+          <LoadingOverlay.Content.LoopingText
+            text={[loadingText]}
+            textDuration={1000}
+          />
+        </LoadingOverlay.Content>
+      </LoadingOverlay>
       <Box sx={{ marginBottom: "base.spacing.x5" }}>
         <Heading size="medium" sx={{ marginBottom: "base.spacing.x5" }}>
           Passport
         </Heading>
         <Stack direction="row" justifyContent={"space-between"}>
-          {accountsState.length === 0 ? (
-            <Box sx={{ marginBottom: "base.spacing.x5" }}>
+          <Box sx={{ marginBottom: "base.spacing.x5" }}>
+            {accountsState.length === 0 ? (
               <Button
                 size="medium"
                 variant="primary"
@@ -228,10 +240,7 @@ export default function CreateERC1155ListingWithPassport() {
               >
                 Login
               </Button>
-            </Box>
-          ) : null}
-          {accountsState.length >= 1 ? (
-            <Box sx={{ marginBottom: "base.spacing.x5" }}>
+            ) : (
               <Button
                 size="medium"
                 variant="primary"
@@ -241,27 +250,16 @@ export default function CreateERC1155ListingWithPassport() {
               >
                 Logout
               </Button>
-            </Box>
-          ) : null}
-          {loading ? (
-            <LoadingOverlay visible>
-              <LoadingOverlay.Content>
-                <LoadingOverlay.Content.LoopingText
-                  text={[loadingText]}
-                  textDuration={1000}
-                />
-              </LoadingOverlay.Content>
-            </LoadingOverlay>
-          ) : (
-            <Box sx={{ marginBottom: "base.spacing.x5", marginTop: "base.spacing.x1", textAlign: "right" }}>
-              <div>
-                <Body size="small" weight="bold">Connected Account:</Body>
-              </div>
-              <div>
-                <Body size="xSmall" mono={true}>{accountsState.length >= 1 ? accountsState : "(not connected)"}</Body>
-              </div>
-            </Box>
-          )}
+            )}
+          </Box>
+          <Box sx={{ marginBottom: "base.spacing.x5", marginTop: "base.spacing.x1", textAlign: "right" }}>
+            <div>
+              <Body size="small" weight="bold">Connected Account:</Body>
+            </div>
+            <div>
+              <Body size="xSmall" mono={true}>{accountsState.length >= 1 ? accountsState : "(not connected)"}</Body>
+            </div>
+          </Box>
         </Stack>
       </Box>
       <Box>

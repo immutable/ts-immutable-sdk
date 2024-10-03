@@ -194,13 +194,21 @@ export default function FulfillERC721WithPassport() {
 
   return (
     <Box sx={{ marginBottom: "base.spacing.x5" }}>
-      <Box sx={{ marginTop: "base.spacing.x10" }}>
+      <LoadingOverlay visible={loading}>
+        <LoadingOverlay.Content>
+          <LoadingOverlay.Content.LoopingText
+            text={[loadingText]}
+            textDuration={1000}
+          />
+        </LoadingOverlay.Content>
+      </LoadingOverlay>
+      <Box sx={{ marginBottom: "base.spacing.x10" }}>
         <Heading size="medium" sx={{ marginBottom: "base.spacing.x5" }}>
           Passport
         </Heading>
         <Stack direction="row" justifyContent={"space-between"}>
-          {accountsState.length === 0 ? (
-            <Box sx={{ marginBottom: "base.spacing.x5" }}>
+          <Box sx={{ marginBottom: "base.spacing.x5" }}>
+            {accountsState.length === 0 ? (
               <Button
                 size="medium"
                 variant="primary"
@@ -210,10 +218,7 @@ export default function FulfillERC721WithPassport() {
               >
                 Login
               </Button>
-            </Box>
-          ) : null}
-          {accountsState.length >= 1 ? (
-            <Box sx={{ marginBottom: "base.spacing.x5" }}>
+            ) : (
               <Button
                 size="medium"
                 variant="primary"
@@ -223,27 +228,16 @@ export default function FulfillERC721WithPassport() {
               >
                 Logout
               </Button>
-            </Box>
-          ) : null}
-          {loading ? (
-            <LoadingOverlay visible>
-              <LoadingOverlay.Content>
-                <LoadingOverlay.Content.LoopingText
-                  text={[loadingText]}
-                  textDuration={1000}
-                />
-              </LoadingOverlay.Content>
-            </LoadingOverlay>
-          ) : (
-            <Box sx={{ marginBottom: "base.spacing.x5", marginTop: "base.spacing.x1", textAlign: "right" }}>
-              <div>
-                <Body size="small" weight="bold">Connected Account:</Body>
-              </div>
-              <div>
-                <Body size="xSmall" mono={true}>{accountsState.length >= 1 ? accountsState : "(not connected)"}</Body>
-              </div>
-            </Box>
-          )}
+            )}
+          </Box>
+          <Box sx={{ marginBottom: "base.spacing.x5", marginTop: "base.spacing.x1", textAlign: "right" }}>
+            <div>
+              <Body size="small" weight="bold">Connected Account:</Body>
+            </div>
+            <div>
+              <Body size="xSmall" mono={true}>{accountsState.length >= 1 ? accountsState : "(not connected)"}</Body>
+            </div>
+          </Box>
         </Stack>
       </Box>
       <Box>
@@ -277,8 +271,8 @@ export default function FulfillERC721WithPassport() {
         ) : null}
       </Box>
       <Box>
-        <Grid>
-          <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
+        <Stack direction="row">
+          <FormControl sx={{ marginBottom: "base.spacing.x5", width: "415px" }}>
             <FormControl.Label>NFT Contract Address</FormControl.Label>
             <TextInput onChange={handleSellItemContractAddressChange} />
           </FormControl>
@@ -301,42 +295,42 @@ export default function FulfillERC721WithPassport() {
               </Select.Option>
             </Select>
           </FormControl>
-        </Grid>
+        </Stack>
       </Box>
-        {listings && listings.length > 0 ? (
-          <Box sx={{ maxHeight: "800px", marginBottom: "base.spacing.x5" }}>
-            <Table sx={{ marginLeft: "base.spacing.x5", maxWidth: "1300px", maxHeight: "400px", overflowY: "auto", marginBottom: "base.spacing.x5"}}>
-            <Table.Head>
-              <Table.Row>
-                <Table.Cell>SNO</Table.Cell>
-                <Table.Cell>Listing ID</Table.Cell>
-                <Table.Cell>Contract Address</Table.Cell>
-                <Table.Cell>Token ID</Table.Cell>
-                <Table.Cell></Table.Cell>
-              </Table.Row>
-            </Table.Head>
-            <Table.Body>
-              {listings.map((listing: orderbook.Listing, index: number) => {
-                return (
-                  <Table.Row key={index}>
-                    <Table.Cell>{index + 1}</Table.Cell>
-                    <Table.Cell>{listing.id}</Table.Cell>
-                    <Table.Cell>{listing.sell[0].contractAddress}</Table.Cell>
-                    <Table.Cell>{listing.sell[0].tokenId}</Table.Cell>
-                    <Table.Cell>
-                      <Button
-                        size="medium"
-                        variant="primary"
-                        disabled={loading}
-                        onClick={() => executeTrade(listing.id)}
-                      >
-                        Buy
-                      </Button>
-                    </Table.Cell>
-                  </Table.Row>
-                );
-              })}
-            </Table.Body>
+      {listings && listings.length > 0 ? (
+        <Box sx={{ maxHeight: "800px", marginBottom: "base.spacing.x5" }}>
+          <Table sx={{ maxWidth: "1500px", width: "100%", maxHeight: "400px", overflowY: "auto", marginBottom: "base.spacing.x5"}}>
+          <Table.Head>
+            <Table.Row>
+              <Table.Cell sx={{ padding: "base.spacing.x2" }}>SNO</Table.Cell>
+              <Table.Cell sx={{ padding: "base.spacing.x2" }}>Listing ID</Table.Cell>
+              <Table.Cell sx={{ padding: "base.spacing.x2" }}>Contract Address</Table.Cell>
+              <Table.Cell sx={{ padding: "base.spacing.x2" }}>Token ID</Table.Cell>
+              <Table.Cell sx={{ padding: "base.spacing.x2" }}></Table.Cell>
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>
+            {listings.map((listing: orderbook.Listing, index: number) => {
+              return (
+                <Table.Row key={index}>
+                  <Table.Cell sx={{ paddingLeft: "base.spacing.x5", paddingRight: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{index + 1}</Body></Table.Cell>
+                  <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{listing.id}</Body></Table.Cell>
+                  <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{listing.sell[0].contractAddress}</Body></Table.Cell>
+                  <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{listing.sell[0].tokenId}</Body></Table.Cell>
+                  <Table.Cell sx={{ paddingLeft: "base.spacing.x2", paddingRight: "base.spacing.x5", paddingY: "base.spacing.x2" }}>
+                    <Button
+                      size="small"
+                      variant="primary"
+                      disabled={loading}
+                      onClick={() => executeTrade(listing.id)}
+                    >
+                      Buy
+                    </Button>
+                  </Table.Cell>
+                </Table.Row>
+              );
+            })}
+          </Table.Body>
           </Table>
         </Box>
       ) : null}
