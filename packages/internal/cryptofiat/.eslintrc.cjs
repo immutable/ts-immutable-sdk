@@ -1,11 +1,10 @@
-{
+module.exports = {
   "extends": ["../.eslintrc"],
   "ignorePatterns": [],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": "./tsconfig.json",
-    "tsconfigRootDir": ".",
-    "sourceType": "module"
+    "tsconfigRootDir": __dirname
   },
   "rules": {
     "no-restricted-syntax": "off",
