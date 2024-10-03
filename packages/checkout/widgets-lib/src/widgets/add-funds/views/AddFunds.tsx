@@ -72,7 +72,10 @@ export function AddFunds({
   onBackButtonClick,
 }: AddFundsProps) {
   const { routes, fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
-  const { addFundsState: { squid, balances, tokens }, addFundsDispatch } = useContext(AddFundsContext);
+  const {
+    addFundsState: { squid, balances, tokens },
+    addFundsDispatch,
+  } = useContext(AddFundsContext);
 
   const { viewDispatch } = useContext(ViewContext);
 
@@ -122,7 +125,13 @@ export function AddFunds({
   useEffect(() => {
     resetRoutes();
 
-    if (balances && squid && tokens && currentToTokenAddress?.address && debouncedToAmount) {
+    if (
+      balances
+      && squid
+      && tokens
+      && currentToTokenAddress?.address
+      && debouncedToAmount
+    ) {
       fetchRoutesWithRateLimit(
         squid,
         tokens,
@@ -290,7 +299,10 @@ export function AddFunds({
             )}
           emphasized={false}
         />
-        <MenuItem.Label>{token.name}</MenuItem.Label>
+        <MenuItem.Label>{token.symbol}</MenuItem.Label>
+        {token.symbol !== token.name && (
+        <MenuItem.Caption>{token.name}</MenuItem.Caption>
+        )}
       </MenuItem>
     )),
     [allowedTokens, handleTokenChange, isSelected, defaultTokenImage],
