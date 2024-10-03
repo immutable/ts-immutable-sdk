@@ -175,16 +175,18 @@ export function AddFunds({
     (token: TokenInfo) => token.address === currentToTokenAddress,
     [currentToTokenAddress],
   );
+  // @TODO: this is not uses atm, can maybe be removed
   // const isDisabled = !currentToTokenAddress || !currentToAmount || Number.parseFloat(currentToAmount) <= 0;
 
   const handleTokenChange = useCallback((token: TokenInfo) => {
     setCurrentToTokenAddress(token);
   }, []);
 
-  const handleReviewClick = useCallback(() => {
-    // eslint-disable-next-line no-console
-    console.log('handle review click');
-  }, []);
+  // @TODO: restore this when we bring back all the templating below
+  // const handleReviewClick = useCallback(() => {
+  //   // eslint-disable-next-line no-console
+  //   console.log('handle review click');
+  // }, []);
 
   const onPayWithCard = (paymentType: OptionTypes) => {
     if (paymentType === OptionTypes.SWAP) {

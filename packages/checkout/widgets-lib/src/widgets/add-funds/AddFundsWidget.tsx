@@ -39,7 +39,7 @@ export default function AddFundsWidget({
   toTokenAddress,
   toAmount,
   showBackButton,
-  config
+  config,
 }: AddFundsWidgetInputs) {
   const [viewState, viewDispatch] = useReducer(viewReducer, {
     ...initialViewState,
@@ -155,7 +155,7 @@ export default function AddFundsWidget({
       <AddFundsContext.Provider value={addFundsReducerValues}>
         {viewState.view.type === AddFundsWidgetViews.ADD_FUNDS && (
           <AddFunds
-          config={config}
+            config={config}
             checkout={checkout}
             toTokenAddress={toTokenAddress}
             toAmount={toAmount}
