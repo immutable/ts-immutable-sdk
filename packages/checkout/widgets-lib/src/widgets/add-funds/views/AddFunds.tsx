@@ -18,11 +18,7 @@ import {
   type TokenInfo,
 } from '@imtbl/checkout-sdk';
 import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
+  useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
@@ -57,11 +53,11 @@ export function AddFunds({
   showSwapOption = true,
   showBridgeOption = true,
   onCloseButtonClick,
-  // @TODO: dont think these are needed anymore
-  // (according to the new designs)
-  // showBackButton,
-  // onBackButtonClick,
-}: AddFundsProps) {
+}: // @TODO: dont think these are needed anymore
+// (according to the new designs)
+// showBackButton,
+// onBackButtonClick,
+AddFundsProps) {
   const { addFundsDispatch } = useContext(AddFundsContext);
   const { viewDispatch } = useContext(ViewContext);
 
@@ -78,7 +74,9 @@ export function AddFunds({
   // @TODO: the debouncedToAmount is likely what we need to use for USD
   // pricing and route calculations, etc
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [debouncedToAmount, setDebouncedToAmount] = useState<string | undefined>(inputValue);
+  const [debouncedToAmount, setDebouncedToAmount] = useState<
+  string | undefined
+  >(inputValue);
   const [currentToTokenAddress, setCurrentToTokenAddress] = useState<
   TokenInfo | undefined
   >();
@@ -278,7 +276,12 @@ export function AddFunds({
                 customTarget: (
                   <FramedImage
                     size="xLarge"
-                    use={<img src={currentToTokenAddress?.icon} alt={`${currentToTokenAddress.name} token`} />}
+                    use={(
+                      <img
+                        src={currentToTokenAddress?.icon}
+                        alt={`${currentToTokenAddress.name} token`}
+                      />
+                      )}
                     padded
                     emphasized
                     circularFrame
@@ -352,9 +355,10 @@ export function AddFunds({
             <MenuItem
               size="small"
               emphasized
-              onClick={() => 
+              onClick={() => {
                 // eslint-disable-next-line no-console
-                console.log('@TODO - need to hook this up!')}
+                console.log('@TODO - need to hook this up!');
+              }}
             >
               <MenuItem.FramedIcon
                 icon="Wallet"
