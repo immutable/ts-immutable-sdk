@@ -23,7 +23,6 @@ import { useSquid } from './hooks/useSquid';
 import { useAnalytics, UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { fetchChains } from './functions/fetchChains';
 import { Review } from './views/Review';
-import { Confirmation } from './views/Confirmation';
 import { fetchBalances } from './functions/fetchBalances';
 
 export type AddFundsWidgetInputs = AddFundsWidgetParams & {
@@ -173,12 +172,6 @@ export default function AddFundsWidget({
               });
             }}
             showBackButton
-          />
-        )}
-        {viewState.view.type === AddFundsWidgetViews.CONFIRMATION && (
-          <Confirmation
-            data={viewState.view.data}
-            onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
           />
         )}
         {viewState.view.type === SharedViews.ERROR_VIEW && (
