@@ -184,6 +184,7 @@ export function AddFunds({
   }, []);
 
   const handleReviewClick = useCallback(() => {
+    // eslint-disable-next-line no-console
     console.log('handle review click');
   }, []);
 
@@ -351,7 +352,9 @@ export function AddFunds({
             <MenuItem
               size="small"
               emphasized
-              onClick={() => console.log('@TODO - need to hook this up!')}
+              onClick={() => 
+                // eslint-disable-next-line no-console
+                console.log('@TODO - need to hook this up!')}
             >
               <MenuItem.FramedIcon
                 icon="Wallet"
