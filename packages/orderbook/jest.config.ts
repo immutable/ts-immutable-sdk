@@ -1,7 +1,16 @@
 import type { Config } from 'jest';
+import { execSync } from 'child_process';
+import { name } from './package.json';
+
+const rootDirs = execSync(`pnpm --filter ${name}... exec pwd`)
+  .toString()
+  .split('\n')
+  .filter(Boolean)
+  .map((dir) => `${dir}/dist`);
 
 const config: Config = {
   clearMocks: true,
+  roots: ['<rootDir>/src', ...rootDirs],
   coverageProvider: 'v8',
   moduleDirectories: ['node_modules', 'src'],
   testEnvironment: 'node',
@@ -9,7 +18,6 @@ const config: Config = {
     '^.+\\.(t|j)sx?$': '@swc/jest',
   },
   transformIgnorePatterns: [],
-  modulePathIgnorePatterns: ['<rootDir>/.yalc'],
 };
 
 export default config;
