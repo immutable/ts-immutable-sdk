@@ -30,6 +30,7 @@ import { useHandover } from '../../../lib/hooks/useHandover';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
 import { getRemoteRive } from '../../../lib/utils';
+import { SQUID_NATIVE_TOKEN } from '../utils/config';
 
 interface ReviewProps {
   data: AddFundsReviewData;
@@ -83,7 +84,7 @@ export function Review({
       data.balance,
       data.toAmount,
       data.toChainId,
-      data.toTokenAddress,
+      data.toTokenAddress === 'native' ? SQUID_NATIVE_TOKEN : data.toTokenAddress,
     );
 
     if (!amountData) return;
@@ -93,7 +94,7 @@ export function Review({
       amountData?.fromToken,
       amountData?.toToken,
       data.toAmount,
-      data.toTokenAddress,
+      address,
       address,
       false,
     );
