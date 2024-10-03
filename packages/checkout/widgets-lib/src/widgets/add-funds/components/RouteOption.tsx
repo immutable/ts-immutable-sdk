@@ -87,7 +87,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
         />
 
         <MenuItem.FramedImage
-          use={<img src={fromToken.logoURI} alt={fromToken.name} />}
+          use={<img src={fromToken.iconUrl} alt={fromToken.name} />}
         />
       </Sticker>
       )}
