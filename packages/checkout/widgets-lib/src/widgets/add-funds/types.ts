@@ -1,5 +1,15 @@
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
-import { RouteResponse, Token } from '@0xsquid/squid-types';
+import { RouteResponse } from '@0xsquid/squid-types';
+
+export type Token = {
+  chainId: string;
+  address: string;
+  decimals: number;
+  symbol?: string;
+  name?: string;
+  usdPrice: number;
+  iconUrl: string;
+};
 
 export type Chain = {
   id: string;

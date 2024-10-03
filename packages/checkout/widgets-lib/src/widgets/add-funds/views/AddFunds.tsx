@@ -71,11 +71,9 @@ export function AddFunds({
   showBackButton,
   onBackButtonClick,
 }: AddFundsProps) {
-  const {
-    addFundsState: { squid, balances },
-    addFundsDispatch,
-  } = useContext(AddFundsContext);
   const { routes, fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
+  const { addFundsState: { squid, balances, tokens }, addFundsDispatch } = useContext(AddFundsContext);
+
   const { viewDispatch } = useContext(ViewContext);
 
   const {
@@ -124,9 +122,10 @@ export function AddFunds({
   useEffect(() => {
     resetRoutes();
 
-    if (balances && squid && currentToTokenAddress?.address && inputValue) {
+    if (balances && squid && tokens && currentToTokenAddress?.address && currentToAmount) {
       fetchRoutesWithRateLimit(
         squid,
+        tokens,
         balances,
         ChainId.IMTBL_ZKEVM_MAINNET.toString(),
         currentToTokenAddress.address === 'native'

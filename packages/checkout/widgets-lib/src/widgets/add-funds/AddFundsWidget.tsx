@@ -25,6 +25,7 @@ import { fetchChains } from './functions/fetchChains';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { Review } from './views/Review';
 import { fetchBalances } from './functions/fetchBalances';
+import { useTokens } from './hooks/useTokens';
 
 export type AddFundsWidgetInputs = AddFundsWidgetParams & {
   checkout: Checkout;
@@ -74,6 +75,7 @@ export default function AddFundsWidget({
   );
 
   const squidSdk = useSquid(checkout);
+  const tokensResponse = useTokens(checkout);
 
   useEffect(() => {
     (async () => {
@@ -114,6 +116,17 @@ export default function AddFundsWidget({
       },
     });
   }, [squidSdk]);
+
+  useEffect(() => {
+    if (!tokensResponse) return;
+
+    addFundsDispatch({
+      payload: {
+        type: AddFundsActions.SET_TOKENS,
+        tokens: tokensResponse,
+      },
+    });
+  }, [tokensResponse]);
 
   useEffect(() => {
     if (!web3Provider) return;

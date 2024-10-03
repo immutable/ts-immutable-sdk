@@ -52,7 +52,7 @@ export function Review({
   const { viewDispatch } = useContext(ViewContext);
   const {
     addFundsState: {
-      squid, provider, chains, checkout,
+      squid, provider, chains, checkout, tokens,
     },
   } = useContext(AddFundsContext);
 
@@ -61,7 +61,7 @@ export function Review({
   const [getRouteIntervalId, setGetRouteIntervalId] = useState<NodeJS.Timer | undefined>();
   const [proceedDisabled, setProceedDisabled] = useState(true);
 
-  const { getFromAmount, getRoute } = useRoutes();
+  const { getAmountData, getRoute } = useRoutes();
   const { addHandover, closeHandover } = useHandover({
     id: HandoverTarget.GLOBAL,
   });
@@ -71,16 +71,15 @@ export function Review({
   } = useExecute();
 
   const getFromAmountAndRoute = async () => {
-    if (!squid) return;
+    if (!squid || !tokens) return;
 
     const address = await provider?.getSigner().getAddress();
 
     if (!address) return;
-
     setFromAddress(address);
 
-    const amountData = await getFromAmount(
-      squid,
+    const amountData = getAmountData(
+      tokens,
       data.balance,
       data.toAmount,
       data.toChainId,
@@ -93,8 +92,8 @@ export function Review({
       squid,
       amountData?.fromToken,
       amountData?.toToken,
-      data.toAmount,
       address,
+      amountData.fromAmount,
       address,
       false,
     );
