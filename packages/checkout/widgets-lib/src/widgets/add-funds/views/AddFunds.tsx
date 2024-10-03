@@ -1,24 +1,50 @@
 import {
-  ChainId, Checkout, IMTBLWidgetEvents, TokenFilterTypes, TokenInfo,
+  ButtCon,
+  // Button,
+  // FramedIcon,
+  FramedImage,
+  HeroFormControl,
+  HeroTextInput,
+  OverflowDrawerMenu,
+  Stack,
+  Body,
+  // Box,
+  MenuItem,
+} from '@biom3/react';
+import debounce from 'lodash.debounce';
+import {
+  ChainId,
+  type Checkout,
+  IMTBLWidgetEvents,
+  TokenFilterTypes,
+  type TokenInfo,
 } from '@imtbl/checkout-sdk';
 import {
-  Body, Box, HeroTextInput, MenuItem, OverflowPopoverMenu,
-} from '@biom3/react';
-import {
-  useCallback, useContext, useEffect, useRef, useState,
+  type ChangeEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
 } from 'react';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { OptionsDrawer } from '../components/OptionsDrawer';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { orchestrationEvents } from '../../../lib/orchestrationEvents';
-import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
+import {
+  SharedViews,
+  ViewActions,
+  ViewContext,
+} from '../../../context/view-context/ViewContext';
 import { getL2ChainId } from '../../../lib';
-import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { orchestrationEvents } from '../../../lib/orchestrationEvents';
+import { OptionsDrawer } from '../components/OptionsDrawer';
+import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
+import { TokenImage } from '../../../components/TokenImage/TokenImage';
+import { getDefaultTokenImage } from '../../../lib/utils';
+import type { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { useRoutes } from '../hooks/useRoutes';
-import { RouteData } from '../types';
-import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
 import { SQUID_NATIVE_TOKEN } from '../utils/config';
+import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
+import type { RouteData } from '../types';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -30,21 +56,22 @@ interface AddFundsProps {
   toAmount?: string;
   onCloseButtonClick?: () => void;
   onBackButtonClick?: () => void;
+  config: StrongCheckoutWidgetsConfig;
 }
 
 export function AddFunds({
   checkout,
   toAmount,
+  config,
   toTokenAddress,
-  showBackButton = false,
   showOnrampOption = true,
   showSwapOption = true,
   showBridgeOption = true,
-  onBackButtonClick,
   onCloseButtonClick,
+  showBackButton,
+  onBackButtonClick,
 }: AddFundsProps) {
-  const showBack = showBackButton || !!onBackButtonClick;
-
+  const { routes, fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
   const { addFundsState: { squid, balances, tokens }, addFundsDispatch } = useContext(AddFundsContext);
 
   const { viewDispatch } = useContext(ViewContext);
@@ -58,32 +85,23 @@ export function AddFunds({
     [],
   );
   const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
-  const [inputValue, setInputValue] = useState<string>(toAmount || '0');
-  const [currentToAmount, setCurrentToAmount] = useState<string>(
-    toAmount || '0',
-  );
+  const [inputValue, setInputValue] = useState<string>(toAmount || '');
+  // @TODO: the debouncedToAmount is likely what we need to use for USD
+  // pricing and route calculations, etc
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [debouncedToAmount, setDebouncedToAmount] = useState<string>(inputValue);
   const [currentToTokenAddress, setCurrentToTokenAddress] = useState<
   TokenInfo | undefined
   >();
 
-  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const debouncedUpdateAmount = debounce((value: string) => {
+    setDebouncedToAmount(value);
+  }, 1500);
 
-  const { routes, fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
-
-  const handleAmountChange = (value: string) => {
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
-    }
-
-    debounceTimeoutRef.current = setTimeout(() => {
-      setCurrentToAmount(value);
-    }, 1500);
-  };
-
-  const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const updateAmount = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setInputValue(value);
-    handleAmountChange(value);
+    debouncedUpdateAmount(value);
   };
 
   const showErrorView = useCallback(
@@ -104,19 +122,21 @@ export function AddFunds({
   useEffect(() => {
     resetRoutes();
 
-    if (balances && squid && tokens && currentToTokenAddress?.address && currentToAmount) {
+    if (balances && squid && tokens && currentToTokenAddress?.address && debouncedToAmount) {
       fetchRoutesWithRateLimit(
         squid,
         tokens,
         balances,
         ChainId.IMTBL_ZKEVM_MAINNET.toString(),
-        currentToTokenAddress.address === 'native' ? SQUID_NATIVE_TOKEN : currentToTokenAddress.address,
-        currentToAmount,
+        currentToTokenAddress.address === 'native'
+          ? SQUID_NATIVE_TOKEN
+          : currentToTokenAddress.address,
+        debouncedToAmount,
         5,
         1000,
       );
     }
-  }, [balances, squid, currentToTokenAddress, currentToAmount]);
+  }, [balances, squid, currentToTokenAddress, debouncedToAmount]);
 
   useEffect(() => {
     if (!checkout) {
@@ -134,9 +154,15 @@ export function AddFunds({
         if (tokenResponse?.tokens.length > 0) {
           setAllowedTokens(tokenResponse.tokens);
 
-          const token = tokenResponse.tokens.find((t) => t.address?.toLowerCase() === toTokenAddress?.toLowerCase())
-            ?? tokenResponse.tokens[0];
-          setCurrentToTokenAddress(token);
+          if (toTokenAddress) {
+            const token = tokenResponse.tokens.find(
+              (t) => t.address?.toLowerCase() === toTokenAddress.toLowerCase(),
+            );
+
+            if (token) {
+              setCurrentToTokenAddress(token);
+            }
+          }
 
           addFundsDispatch({
             payload: {
@@ -180,22 +206,25 @@ export function AddFunds({
     setShowOptionsDrawer(true);
   };
 
-  const isSelected = (token: TokenInfo) => token.address === currentToTokenAddress;
+  const isSelected = useCallback(
+    (token: TokenInfo) => token.address === currentToTokenAddress,
+    [currentToTokenAddress],
+  );
 
-  const isDisabled = !currentToTokenAddress || !currentToAmount || parseFloat(currentToAmount) <= 0;
-
-  const handleTokenChange = (token: TokenInfo) => {
+  const handleTokenChange = useCallback((token: TokenInfo) => {
     setCurrentToTokenAddress(token);
-  };
+  }, []);
 
-  // const handleReviewClick = () => {
+  // @TODO: restore this when we bring back all the templating below
+  // const handleReviewClick = useCallback(() => {
+  //   // eslint-disable-next-line no-console
   //   console.log('handle review click');
-  // };
+  // }, []);
 
   const onCardClick = () => {
     const data = {
       tokenAddress: currentToTokenAddress?.address ?? '',
-      amount: currentToAmount ?? '',
+      amount: debouncedToAmount ?? '',
     };
     orchestrationEvents.sendRequestOnrampEvent(
       eventTarget,
@@ -205,7 +234,7 @@ export function AddFunds({
   };
 
   const onRouteClick = (routeData: RouteData) => {
-    if (!currentToAmount || !currentToTokenAddress?.address) {
+    if (!debouncedToAmount || !currentToTokenAddress?.address) {
       return;
     }
 
@@ -218,14 +247,14 @@ export function AddFunds({
             balance: routeData.amountData.balance,
             toChainId: ChainId.IMTBL_ZKEVM_MAINNET.toString(),
             toTokenAddress: currentToTokenAddress.address,
-            toAmount: currentToAmount,
+            toAmount: debouncedToAmount,
           },
         },
       },
     });
   };
 
-  const checkShowOnRampOption = () => {
+  const shouldShowOnRampOption = useMemo(() => {
     if (showOnrampOption && currentToTokenAddress) {
       const token = onRampAllowedTokens.find(
         (t) => t.address?.toLowerCase()
@@ -234,104 +263,203 @@ export function AddFunds({
       return !!token;
     }
     return false;
-  };
+  }, [currentToTokenAddress, onRampAllowedTokens, showOnrampOption]);
+
+  const showInitialEmptyState = !currentToTokenAddress;
+  const defaultTokenImage = getDefaultTokenImage(
+    checkout?.config.environment,
+    config.theme,
+  );
+  const tokenChoiceOptions = useMemo(
+    () => allowedTokens.map((token) => (
+      <MenuItem
+        size="medium"
+        key={token.name}
+        onClick={() => handleTokenChange(token)}
+        selected={isSelected(token)}
+        emphasized
+      >
+        <MenuItem.FramedImage
+          circularFrame
+          use={(
+            <TokenImage
+              src={token.icon}
+              name={token.name}
+              defaultImage={defaultTokenImage}
+            />
+            )}
+          emphasized={false}
+        />
+        <MenuItem.Label>{token.name}</MenuItem.Label>
+      </MenuItem>
+    )),
+    [allowedTokens, handleTokenChange, isSelected, defaultTokenImage],
+  );
+  const shouldShowBackButton = showBackButton ?? !!onBackButtonClick;
 
   return (
     <SimpleLayout
       header={(
-        <HeaderNavigation
-          title="Add"
-          onCloseButtonClick={onCloseButtonClick}
-          showBack={showBack}
-          onBackButtonClick={() => {
-            orchestrationEvents.sendRequestGoBackEvent(
-              eventTarget,
-              IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
-              {},
-            );
-            onBackButtonClick?.();
+        <Stack
+          direction="row"
+          sx={{
+            pos: 'absolute',
+            w: '100%',
+            top: '0px',
+            pt: 'base.spacing.x4',
+            px: 'base.spacing.x5',
           }}
-        />
+          justifyContent="flex-start"
+        >
+          {shouldShowBackButton && (
+            <ButtCon
+              testId="backButton"
+              icon="ArrowBackward"
+              variant="tertiary"
+              size="small"
+              onClick={onBackButtonClick}
+            />
+          )}
+          <ButtCon
+            variant="tertiary"
+            size="small"
+            icon="Close"
+            onClick={onCloseButtonClick}
+            sx={{ ml: 'auto' }}
+          />
+        </Stack>
       )}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          height: '100%',
-        }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            marginTop: 'base.spacing.x10',
-          }}
+      <Stack alignItems="center" sx={{ flex: 1 }}>
+        <Stack
+          testId="topSection"
+          sx={{ flex: 1, px: 'base.spacing.x2', w: '100%' }}
+          justifyContent="center"
+          alignItems="center"
         >
-          <Box sx={{ width: 'base.spacing.x40' }}>
-            <Box sx={{ marginBottom: 'base.spacing.x3' }}>
+          <OverflowDrawerMenu
+            drawerSize="full"
+            headerBarTitle="Add Token"
+            drawerCloseIcon="ChevronExpand"
+            {...(showInitialEmptyState
+              ? { icon: 'Add', size: 'large', variant: 'tertiary' }
+              : {
+                customTarget: (
+                  <FramedImage
+                    size="xLarge"
+                    use={(
+                      <TokenImage
+                        src={currentToTokenAddress?.icon}
+                        name={currentToTokenAddress?.name}
+                        defaultImage={defaultTokenImage}
+                      />
+                      )}
+                    padded
+                    emphasized
+                    circularFrame
+                    sx={{
+                      cursor: 'pointer',
+                      // eslint-disable-next-line @typescript-eslint/naming-convention
+                      '&:hover': {
+                        boxShadow: ({ base }) => `0 0 0 ${base.border.size[200]} ${base.color.text.body.primary}`,
+                      },
+                    }}
+                  />
+                ),
+              })}
+          >
+            {tokenChoiceOptions}
+          </OverflowDrawerMenu>
+
+          {showInitialEmptyState ? (
+            <Body>Add Token</Body>
+          ) : (
+            <HeroFormControl>
+              <HeroFormControl.Label>
+                Add
+                {' '}
+                {currentToTokenAddress.symbol}
+              </HeroFormControl.Label>
               <HeroTextInput
                 testId="add-funds-amount-input"
                 type="number"
                 value={inputValue}
                 onChange={(value) => updateAmount(value)}
                 placeholder="0"
-                weight="bold"
+                maxTextSize="xLarge"
               />
-            </Box>
-
-            <Box
-              sx={{
-                display: 'flex',
-                borderRadius: 'base.borderRadius.x20',
-                alignItems: 'center',
-                gap: 'base.spacing.x5',
-                justifyContent: 'center',
-                border: '1px solid grey',
-              }}
+              <HeroFormControl.Caption>USD $0.00</HeroFormControl.Caption>
+            </HeroFormControl>
+          )}
+        </Stack>
+        <Stack
+          testId="bottomSection"
+          sx={{
+            alignSelf: 'stretch',
+            p: 'base.spacing.x3',
+            pb: 'base.spacing.x10',
+            bg: 'base.color.neutral.800',
+          }}
+          gap="base.spacing.x6"
+        >
+          <Stack gap="0px">
+            <MenuItem size="small" emphasized onClick={openDrawer}>
+              <MenuItem.FramedIcon
+                icon="Dollar"
+                variant="bold"
+                emphasized={false}
+              />
+              <MenuItem.Label>
+                {/* Pay with */}
+                Choose payment option
+              </MenuItem.Label>
+            </MenuItem>
+            {/*  @TODO: commented out for now, till these features are ready to go
+            <Stack
+              sx={{ pos: 'relative', h: 'base.spacing.x3' }}
+              alignItems="center"
             >
-              <Body size="large" weight="bold">
-                {currentToTokenAddress?.name ?? ''}
-              </Body>
-              <OverflowPopoverMenu testId="add-funds-tokens-menu">
-                {allowedTokens.map((token: any) => (
-                  <MenuItem
-                    key={token.address}
-                    onClick={() => handleTokenChange(token)}
-                    selected={isSelected(token)}
-                  >
-                    <MenuItem.Label>{token.name}</MenuItem.Label>
-                  </MenuItem>
-                ))}
-              </OverflowPopoverMenu>
-            </Box>
-          </Box>
-        </Box>
+              <FramedIcon
+                icon="ArrowDown"
+                sx={{
+                  top: '0',
+                  pos: 'absolute',
+                  translate: ({ base }) => `0 -${base.spacing.x3}`,
+                }}
+              />
+            </Stack> */}
+            {/* @TODO: commented out for now, till these features are ready to go
+            <MenuItem
+              size="small"
+              emphasized
+              // onClick={() => {
+              //   // eslint-disable-next-line no-console
+              //   console.log('@TODO - need to hook this up!');
+              // }}
+            >
+              <MenuItem.FramedIcon
+                icon="Wallet"
+                variant="bold"
+                emphasized={false}
+              />
+              <MenuItem.Label>Deliver to</MenuItem.Label>
+            </MenuItem> */}
+          </Stack>
 
-        <MenuItem
-          size="small"
-          emphasized
-          disabled={isDisabled}
-          sx={{
-            opacity: isDisabled ? 0.5 : 1,
-            cursor: isDisabled ? 'not-allowed' : 'pointer',
-          }}
-          onClick={() => {
-            openDrawer();
-          }}
-        >
-          <MenuItem.IntentIcon icon="ChevronExpand" />
-          <MenuItem.Label size="medium">Choose payment option</MenuItem.Label>
-        </MenuItem>
-        <Box
-          sx={{
-            marginBottom: 'base.spacing.x10',
-          }}
-        >
+          {/*
+            @TODO: commented out for now, till these features are ready to go
+          <Button
+            testId="add-funds-button"
+            variant="secondary"
+            onClick={handleReviewClick}
+            size="large"
+          >
+            Review
+          </Button> */}
+
           <OptionsDrawer
+            showOnrampOption={shouldShowOnRampOption}
             routes={routes}
-            showOnrampOption={checkShowOnRampOption()}
             showSwapOption={showSwapOption}
             showBridgeOption={showBridgeOption}
             visible={showOptionsDrawer}
@@ -339,20 +467,8 @@ export function AddFunds({
             onCardClick={onCardClick}
             onRouteClick={onRouteClick}
           />
-        </Box>
-        {/* <Button
-          testId="add-funds-button"
-          variant="primary"
-          onClick={handleReviewClick}
-          size="large"
-          sx={{
-            marginBottom: 'base.spacing.x10',
-            mx: 'base.spacing.x3',
-          }}
-        >
-          Review
-        </Button> */}
-      </Box>
+        </Stack>
+      </Stack>
     </SimpleLayout>
   );
 }

@@ -22,6 +22,7 @@ import { ErrorView } from '../../views/error/ErrorView';
 import { useSquid } from './hooks/useSquid';
 import { useAnalytics, UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { fetchChains } from './functions/fetchChains';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { Review } from './views/Review';
 import { fetchBalances } from './functions/fetchBalances';
 import { useTokens } from './hooks/useTokens';
@@ -29,6 +30,7 @@ import { useTokens } from './hooks/useTokens';
 export type AddFundsWidgetInputs = AddFundsWidgetParams & {
   checkout: Checkout;
   web3Provider?: Web3Provider;
+  config: StrongCheckoutWidgetsConfig;
 };
 
 export default function AddFundsWidget({
@@ -40,6 +42,7 @@ export default function AddFundsWidget({
   toTokenAddress,
   toAmount,
   showBackButton,
+  config,
 }: AddFundsWidgetInputs) {
   const [viewState, viewDispatch] = useReducer(viewReducer, {
     ...initialViewState,
@@ -163,6 +166,7 @@ export default function AddFundsWidget({
       <AddFundsContext.Provider value={addFundsReducerValues}>
         {viewState.view.type === AddFundsWidgetViews.ADD_FUNDS && (
           <AddFunds
+            config={config}
             checkout={checkout}
             toTokenAddress={toTokenAddress}
             toAmount={toAmount}
