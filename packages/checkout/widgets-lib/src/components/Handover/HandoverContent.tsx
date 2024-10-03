@@ -1,6 +1,7 @@
 import {
   Body, Box, Button, Heading,
 } from '@biom3/react';
+import { ReactNode } from 'react';
 
 export function HandoverContent({
   headingText,
@@ -11,7 +12,7 @@ export function HandoverContent({
   onSecondaryButtonClick,
 }: {
   headingText: string;
-  subheadingText?: string;
+  subheadingText?: ReactNode;
   primaryButtonText?: string;
   onPrimaryButtonClick?: () => void;
   secondaryButtonText?: string;

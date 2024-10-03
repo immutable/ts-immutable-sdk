@@ -1,17 +1,19 @@
 import {
-  Body,
   ButtCon,
   // Button,
   // FramedIcon,
   FramedImage,
   HeroFormControl,
   HeroTextInput,
-  MenuItem,
   OverflowDrawerMenu,
   Stack,
+  Body,
+  // Box,
+  MenuItem,
 } from '@biom3/react';
 import debounce from 'lodash.debounce';
 import {
+  ChainId,
   type Checkout,
   IMTBLWidgetEvents,
   TokenFilterTypes,
@@ -21,7 +23,6 @@ import {
   type ChangeEvent,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
 } from 'react';
@@ -34,12 +35,15 @@ import {
 } from '../../../context/view-context/ViewContext';
 import { getL2ChainId } from '../../../lib';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
-import { OptionTypes } from '../components/Option';
 import { OptionsDrawer } from '../components/OptionsDrawer';
 import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
 import { TokenImage } from '../../../components/TokenImage/TokenImage';
 import { getDefaultTokenImage } from '../../../lib/utils';
-import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
+import type { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
+import { useRoutes } from '../hooks/useRoutes';
+import { SQUID_NATIVE_TOKEN } from '../utils/config';
+import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
+import type { RouteData } from '../types';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -57,6 +61,7 @@ interface AddFundsProps {
 export function AddFunds({
   checkout,
   toAmount,
+  config,
   toTokenAddress,
   showOnrampOption = true,
   showSwapOption = true,
@@ -65,7 +70,11 @@ export function AddFunds({
   showBackButton,
   onBackButtonClick,
 }: AddFundsProps) {
-  const { addFundsDispatch } = useContext(AddFundsContext);
+  const {
+    addFundsState: { squid, balances },
+    addFundsDispatch,
+  } = useContext(AddFundsContext);
+  const { routes, fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
   const { viewDispatch } = useContext(ViewContext);
 
   const {
@@ -81,9 +90,7 @@ export function AddFunds({
   // @TODO: the debouncedToAmount is likely what we need to use for USD
   // pricing and route calculations, etc
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [debouncedToAmount, setDebouncedToAmount] = useState<
-  string | undefined
-  >(inputValue);
+  const [debouncedToAmount, setDebouncedToAmount] = useState<string>(inputValue);
   const [currentToTokenAddress, setCurrentToTokenAddress] = useState<
   TokenInfo | undefined
   >();
@@ -112,6 +119,24 @@ export function AddFunds({
     },
     [viewDispatch],
   );
+
+  useEffect(() => {
+    resetRoutes();
+
+    if (balances && squid && currentToTokenAddress?.address && inputValue) {
+      fetchRoutesWithRateLimit(
+        squid,
+        balances,
+        ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+        currentToTokenAddress.address === 'native'
+          ? SQUID_NATIVE_TOKEN
+          : currentToTokenAddress.address,
+        debouncedToAmount,
+        5,
+        1000,
+      );
+    }
+  }, [balances, squid, currentToTokenAddress, debouncedToAmount]);
 
   useEffect(() => {
     if (!checkout) {
@@ -188,28 +213,37 @@ export function AddFunds({
   //   console.log('handle review click');
   // }, []);
 
-  const onPayWithCard = (paymentType: OptionTypes) => {
-    if (paymentType === OptionTypes.SWAP) {
-      orchestrationEvents.sendRequestSwapEvent(
-        eventTarget,
-        IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
-        {
-          toTokenAddress: currentToTokenAddress?.address ?? '',
-          amount: toAmount ?? '',
-          fromTokenAddress: '',
-        },
-      );
-    } else {
-      const data = {
-        tokenAddress: currentToTokenAddress?.address ?? '',
-        amount: toAmount ?? '',
-      };
-      orchestrationEvents.sendRequestOnrampEvent(
-        eventTarget,
-        IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
-        data,
-      );
+  const onCardClick = () => {
+    const data = {
+      tokenAddress: currentToTokenAddress?.address ?? '',
+      amount: debouncedToAmount ?? '',
+    };
+    orchestrationEvents.sendRequestOnrampEvent(
+      eventTarget,
+      IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+      data,
+    );
+  };
+
+  const onRouteClick = (routeData: RouteData) => {
+    if (!debouncedToAmount || !currentToTokenAddress?.address) {
+      return;
     }
+
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: AddFundsWidgetViews.REVIEW,
+          data: {
+            balance: routeData.amountData.balance,
+            toChainId: ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+            toTokenAddress: currentToTokenAddress.address,
+            toAmount: debouncedToAmount,
+          },
+        },
+      },
+    });
   };
 
   const shouldShowOnRampOption = useMemo(() => {
@@ -226,7 +260,7 @@ export function AddFunds({
   const showInitialEmptyState = !currentToTokenAddress;
   const defaultTokenImage = getDefaultTokenImage(
     checkout?.config.environment,
-    checkout?.config.theme,
+    config.theme,
   );
   const tokenChoiceOptions = useMemo(
     () => allowedTokens.map((token) => (
@@ -305,9 +339,10 @@ export function AddFunds({
                   <FramedImage
                     size="xLarge"
                     use={(
-                      <img
+                      <TokenImage
                         src={currentToTokenAddress?.icon}
-                        alt={`${currentToTokenAddress.name} token`}
+                        name={currentToTokenAddress?.name}
+                        defaultImage={defaultTokenImage}
                       />
                       )}
                     padded
@@ -415,11 +450,13 @@ export function AddFunds({
 
           <OptionsDrawer
             showOnrampOption={shouldShowOnRampOption}
+            routes={routes}
             showSwapOption={showSwapOption}
             showBridgeOption={showBridgeOption}
             visible={showOptionsDrawer}
             onClose={() => setShowOptionsDrawer(false)}
-            onPayWithCard={onPayWithCard}
+            onCardClick={onCardClick}
+            onRouteClick={onRouteClick}
           />
         </Stack>
       </Stack>
