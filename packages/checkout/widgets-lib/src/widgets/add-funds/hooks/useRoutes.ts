@@ -55,7 +55,7 @@ export const useRoutes = () => {
     toAmount: string,
   ): AmountData[] => {
     const filteredBalances = balances.filter(
-      (balance) => !(balance.address === toTokenAddress && balance.chainId === toChainId),
+      (balance) => !(balance.address.toLowerCase() === toTokenAddress.toLowerCase() && balance.chainId === toChainId),
     );
     const amountDataArray: AmountData[] = filteredBalances.map((balance) => getAmountData(
       tokens,
