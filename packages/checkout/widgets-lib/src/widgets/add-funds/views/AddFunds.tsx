@@ -1,11 +1,8 @@
 import {
-  Checkout,
-  IMTBLWidgetEvents,
-  TokenFilterTypes,
-  TokenInfo,
+  ChainId, Checkout, IMTBLWidgetEvents, TokenFilterTypes, TokenInfo,
 } from '@imtbl/checkout-sdk';
 import {
-  Body, Box, MenuItem, OverflowPopoverMenu, HeroTextInput,
+  Body, Box, HeroTextInput, MenuItem, OverflowPopoverMenu,
 } from '@biom3/react';
 import {
   useCallback, useContext, useEffect, useRef, useState,
@@ -15,14 +12,13 @@ import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { OptionsDrawer } from '../components/OptionsDrawer';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
-import { OptionTypes } from '../components/Option';
 import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
 import { getL2ChainId } from '../../../lib';
-import {
-  SharedViews,
-  ViewActions,
-  ViewContext,
-} from '../../../context/view-context/ViewContext';
+import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { useRoutes } from '../hooks/useRoutes';
+import { RouteData } from '../types';
+import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
+import { SQUID_NATIVE_TOKEN } from '../utils/config';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -49,7 +45,7 @@ export function AddFunds({
 }: AddFundsProps) {
   const showBack = showBackButton || !!onBackButtonClick;
 
-  const { addFundsDispatch } = useContext(AddFundsContext);
+  const { addFundsState: { squid, balances }, addFundsDispatch } = useContext(AddFundsContext);
 
   const { viewDispatch } = useContext(ViewContext);
 
@@ -71,6 +67,8 @@ export function AddFunds({
   >();
 
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const { routes, fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
 
   const handleAmountChange = (value: string) => {
     if (debounceTimeoutRef.current) {
@@ -104,6 +102,22 @@ export function AddFunds({
   );
 
   useEffect(() => {
+    resetRoutes();
+
+    if (balances && squid && currentToTokenAddress?.address && currentToAmount) {
+      fetchRoutesWithRateLimit(
+        squid,
+        balances,
+        ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+        currentToTokenAddress.address === 'native' ? SQUID_NATIVE_TOKEN : currentToTokenAddress.address,
+        currentToAmount,
+        5,
+        1000,
+      );
+    }
+  }, [balances, squid, currentToTokenAddress, currentToAmount]);
+
+  useEffect(() => {
     if (!checkout) {
       showErrorView(new Error('Checkout object is missing'));
       return;
@@ -119,8 +133,8 @@ export function AddFunds({
         if (tokenResponse?.tokens.length > 0) {
           setAllowedTokens(tokenResponse.tokens);
 
-          const token = tokenResponse.tokens.find((t) => t.address === toTokenAddress)
-            || tokenResponse.tokens[0];
+          const token = tokenResponse.tokens.find((t) => t.address?.toLowerCase() === toTokenAddress?.toLowerCase())
+            ?? tokenResponse.tokens[0];
           setCurrentToTokenAddress(token);
 
           addFundsDispatch({
@@ -177,28 +191,37 @@ export function AddFunds({
   //   console.log('handle review click');
   // };
 
-  const onPayWithCard = (paymentType: OptionTypes) => {
-    if (paymentType === OptionTypes.SWAP) {
-      orchestrationEvents.sendRequestSwapEvent(
-        eventTarget,
-        IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
-        {
-          toTokenAddress: currentToTokenAddress?.address ?? '',
-          amount: toAmount ?? '',
-          fromTokenAddress: '',
-        },
-      );
-    } else {
-      const data = {
-        tokenAddress: currentToTokenAddress?.address ?? '',
-        amount: toAmount ?? '',
-      };
-      orchestrationEvents.sendRequestOnrampEvent(
-        eventTarget,
-        IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
-        data,
-      );
+  const onCardClick = () => {
+    const data = {
+      tokenAddress: currentToTokenAddress?.address ?? '',
+      amount: currentToAmount ?? '',
+    };
+    orchestrationEvents.sendRequestOnrampEvent(
+      eventTarget,
+      IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+      data,
+    );
+  };
+
+  const onRouteClick = (routeData: RouteData) => {
+    if (!currentToAmount || !currentToTokenAddress?.address) {
+      return;
     }
+
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: AddFundsWidgetViews.REVIEW,
+          data: {
+            balance: routeData.amountData.balance,
+            toChainId: ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+            toTokenAddress: currentToTokenAddress.address,
+            toAmount: currentToAmount,
+          },
+        },
+      },
+    });
   };
 
   const checkShowOnRampOption = () => {
@@ -306,12 +329,14 @@ export function AddFunds({
           }}
         >
           <OptionsDrawer
+            routes={routes}
             showOnrampOption={checkShowOnRampOption()}
             showSwapOption={showSwapOption}
             showBridgeOption={showBridgeOption}
             visible={showOptionsDrawer}
             onClose={() => setShowOptionsDrawer(false)}
-            onPayWithCard={onPayWithCard}
+            onCardClick={onCardClick}
+            onRouteClick={onRouteClick}
           />
         </Box>
         {/* <Button
