@@ -1,4 +1,6 @@
-import { useContext, useEffect, useState } from 'react';
+import {
+  ReactNode, useContext, useEffect, useState,
+} from 'react';
 import {
   Body,
   Button,
@@ -9,6 +11,7 @@ import {
   Heading,
   hFlex,
   Icon,
+  Link,
   PriceDisplay,
   Stack,
 } from '@biom3/react';
@@ -17,12 +20,16 @@ import { BigNumber, utils } from 'ethers';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { AddFundsContext } from '../context/AddFundsContext';
 import { useRoutes } from '../hooks/useRoutes';
-import { AddFundsReviewData, AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
+import { AddFundsReviewData } from '../../../context/view-context/AddFundsViewContextTypes';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { Chain } from '../types';
+import { Chain, RiveStateMachineInput } from '../types';
 import { useExecute } from '../hooks/useExecute';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { SquidIcon } from '../components/SquidIcon';
+import { useHandover } from '../../../lib/hooks/useHandover';
+import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
+import { HandoverContent } from '../../../components/Handover/HandoverContent';
+import { getRemoteRive } from '../../../lib/utils';
 
 interface ReviewProps {
   data: AddFundsReviewData;
@@ -30,6 +37,10 @@ interface ReviewProps {
   onBackButtonClick?: () => void;
   onCloseButtonClick?: () => void;
 }
+const FIXED_HANDOVER_DURATION = 2000;
+
+const APPROVE_TXN_ANIMATION = '/access_coins.riv';
+const EXECUTE_TXN_ANIMATION = '/purchasing_items.riv';
 
 export function Review({
   data,
@@ -37,7 +48,11 @@ export function Review({
   onBackButtonClick, onCloseButtonClick,
 }: ReviewProps) {
   const { viewDispatch } = useContext(ViewContext);
-  const { addFundsState: { squid, provider, chains } } = useContext(AddFundsContext);
+  const {
+    addFundsState: {
+      squid, provider, chains, checkout,
+    },
+  } = useContext(AddFundsContext);
 
   const [route, setRoute] = useState<RouteResponse | undefined>();
   const [fromAddress, setFromAddress] = useState<string | undefined>();
@@ -45,20 +60,21 @@ export function Review({
   const [proceedDisabled, setProceedDisabled] = useState(true);
 
   const { getFromAmount, getRoute } = useRoutes();
+  const { addHandover, closeHandover } = useHandover({
+    id: HandoverTarget.GLOBAL,
+  });
 
   const {
-    convertToNetworkChangeableProvider, checkProviderChain, approve, execute,
+    convertToNetworkChangeableProvider, checkProviderChain, getAllowance, approve, execute,
   } = useExecute();
 
   const getFromAmountAndRoute = async () => {
-    if (!squid) {
-      return;
-    }
+    if (!squid) return;
 
     const address = await provider?.getSigner().getAddress();
-    if (!address) {
-      return;
-    }
+
+    if (!address) return;
+
     setFromAddress(address);
 
     const amountData = await getFromAmount(
@@ -69,9 +85,7 @@ export function Review({
       data.toTokenAddress,
     );
 
-    if (!amountData) {
-      return;
-    }
+    if (!amountData) return;
 
     const routeResponse = await getRoute(
       squid,
@@ -129,7 +143,22 @@ export function Review({
     return `Gas Refuel +${route.route.estimate.gasCosts[0].token.name} ${formattedTotalGasFee}`;
   };
 
-  const onProceedClick = async () => {
+  const showHandover = (
+    animationPath: string,
+    state: RiveStateMachineInput,
+    headingText: string,
+    subheadingText?: ReactNode,
+    duration?: number,
+  ) => {
+    addHandover({
+      animationUrl: getRemoteRive(checkout?.config.environment, animationPath),
+      inputValue: state,
+      duration,
+      children: <HandoverContent headingText={headingText} subheadingText={subheadingText} />,
+    });
+  };
+
+  const handleTransaction = async () => {
     if (!squid || !provider || !route) {
       return;
     }
@@ -138,26 +167,71 @@ export function Review({
       clearInterval(getRouteIntervalId);
       setProceedDisabled(true);
 
-      const changeableProvider = await convertToNetworkChangeableProvider(provider);
+      showHandover(APPROVE_TXN_ANIMATION, RiveStateMachineInput.START, 'Preparing', '');
 
+      const changeableProvider = await convertToNetworkChangeableProvider(provider);
       await checkProviderChain(changeableProvider, route.route.params.fromChain);
 
-      await approve(changeableProvider, route);
+      const allowance = await getAllowance(changeableProvider, route);
+      const { fromAmount } = route.route.params;
+
+      if (allowance?.lt(fromAmount)) {
+        showHandover(
+          APPROVE_TXN_ANIMATION,
+          RiveStateMachineInput.WAITING,
+          'Waiting for access approval in your wallet',
+          'Approve the transaction request to complete this transaction',
+        );
+
+        await approve(changeableProvider, route);
+
+        showHandover(
+          APPROVE_TXN_ANIMATION,
+          RiveStateMachineInput.COMPLETED,
+          'Granted access to your tokens',
+          '',
+          FIXED_HANDOVER_DURATION,
+        );
+      }
+
+      showHandover(
+        EXECUTE_TXN_ANIMATION,
+        RiveStateMachineInput.WAITING,
+        'Waiting for transaction approval in wallet',
+        'Approve the transaction request to complete this transaction',
+      );
 
       const txReceipt = await execute(squid, changeableProvider, route);
 
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: AddFundsWidgetViews.CONFIRMATION,
-            data: {
-              transactionHash: txReceipt.transactionHash,
-            },
-          },
-        },
-      });
+      showHandover(APPROVE_TXN_ANIMATION, RiveStateMachineInput.PROCESSING, 'Processing', '', FIXED_HANDOVER_DURATION);
+
+      showHandover(
+        EXECUTE_TXN_ANIMATION,
+        RiveStateMachineInput.COMPLETED,
+        'Funds added successfully', (
+          <>
+            Go to
+            {' '}
+            <Link
+              size="small"
+              rc={(
+                <a
+                  target="_blank"
+                  href={`https://axelarscan.io/gmp/${txReceipt.transactionHash}`}
+                  rel="noreferrer"
+                />
+            )}
+            >
+              Axelarscan
+            </Link>
+            {' '}
+            for transaction details
+          </>
+        ),
+      );
     } catch (e) {
+      closeHandover();
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -169,6 +243,8 @@ export function Review({
       });
     }
   };
+
+  const onProceedClick = () => handleTransaction();
 
   return (
     <SimpleLayout
