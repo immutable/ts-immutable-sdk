@@ -40,8 +40,6 @@ import {
   ListCollectionBidsParams,
   ListCollectionBidsResult,
   ListingResult,
-  ListCollectionBidsParams,
-  ListCollectionBidsResult,
   ListListingsParams,
   ListListingsResult,
   ListTradesParams,
