@@ -3,9 +3,7 @@ import { checkout } from '@imtbl/sdk';
 import { checkoutSDK } from '../utils/setupDefault';
 import { useState, useEffect } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
-import { 
-  WalletInfo, 
-  WalletProviderName, 
+import {
   GetTokenAllowListResult, 
   TokenInfo, 
   GetAllBalancesResult, 
@@ -16,12 +14,7 @@ import NextLink from 'next/link';
 import Image from 'next/image';
 
 export default function ConnectWithMetamask() {
-  const [provider, setProvider] = useState<Web3Provider>();
-  const [walletProviderName, setWalletProviderName] = useState<WalletProviderName>();
-  const [supportedWallets, setSupportedWallets] = useState<WalletInfo[]>();
   const [connectedProvider, setConnectedProvider] = useState<Web3Provider>();
-  const [isValidProvider, setIsValidProvider] = useState<boolean>();
-  const [isConnected, setIsConnected] = useState<boolean>();
   const [walletAddress, setWalletAddress] = useState<string>();
   const [tokenAllowList, setTokenAllowList] = useState<GetTokenAllowListResult>();
   const [selectedToken, setSelectedToken] = useState<TokenInfo>();
@@ -40,23 +33,16 @@ export default function ConnectWithMetamask() {
   const connectWithMetamask = async () => {
     setLoadingState(true);
 
-    // Get the list of default supported providers
-    const type = checkout.WalletFilterTypes.ALL;
-    const allowListRes = await checkoutSDK.getWalletAllowList({ type });
-
-    setSupportedWallets(allowListRes.wallets);
-
     // Create a provider given one of the default wallet provider names
     const walletProviderName = checkout.WalletProviderName.METAMASK;
     const providerRes = await checkoutSDK.createProvider({ walletProviderName });
     
-    setProvider(providerRes.provider);
-    setWalletProviderName(providerRes.walletProviderName);
-
     // Check if the provider if a Web3Provider
     const isProviderRes = await checkout.Checkout.isWeb3Provider(providerRes.provider);
 
-    setIsValidProvider(isProviderRes);
+    if(!isProviderRes) {
+      console.error('Provider is not a valid Web3Provider');
+    }
 
     // Get the current network information
     // Pass through requestWalletPermissions to request the user's wallet permissions
@@ -71,7 +57,6 @@ export default function ConnectWithMetamask() {
     const isConnectedRes = await checkoutSDK.checkIsWalletConnected({
       provider: providerRes.provider
     });
-    setIsConnected(isConnectedRes.isConnected);
     setWalletAddress(isConnectedRes.walletAddress);
 
     // #doc get-token-allow-list
@@ -161,22 +146,6 @@ export default function ConnectWithMetamask() {
           </Table.Row>
         </Table.Head>
         <Table.Body>
-          <Table.Row>
-            <Table.Cell><b>Supported Wallets</b></Table.Cell>
-            <Table.Cell>
-              {supportedWallets ? (
-                supportedWallets.map((wallet, index) => (
-                  <span key={index}>{wallet.walletProviderName}, </span>
-                ))
-              ): ' (not connected)'}
-            </Table.Cell>
-          </Table.Row>
-          <Table.Row>
-            <Table.Cell><b>Is Valid Provider</b></Table.Cell>
-            <Table.Cell>
-              {(isValidProvider) ? `${isValidProvider}` : ' (not  connected)'}
-            </Table.Cell>
-          </Table.Row>
           <Table.Row>
             <Table.Cell><b>Connected to Network</b></Table.Cell>
             <Table.Cell>
