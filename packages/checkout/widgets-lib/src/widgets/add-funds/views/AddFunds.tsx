@@ -1,8 +1,8 @@
 import {
   Body,
   ButtCon,
-  Button,
-  FramedIcon,
+  // Button,
+  // FramedIcon,
   FramedImage,
   HeroFormControl,
   HeroTextInput,
@@ -18,7 +18,12 @@ import {
   type TokenInfo,
 } from '@imtbl/checkout-sdk';
 import {
-  useCallback, useContext, useEffect, useMemo, useState,
+  type ChangeEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
 } from 'react';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
@@ -32,6 +37,9 @@ import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { OptionTypes } from '../components/Option';
 import { OptionsDrawer } from '../components/OptionsDrawer';
 import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
+import { TokenImage } from '../../../components/TokenImage/TokenImage';
+import { getDefaultTokenImage } from '../../../lib/utils';
+import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -43,6 +51,7 @@ interface AddFundsProps {
   toAmount?: string;
   onCloseButtonClick?: () => void;
   onBackButtonClick?: () => void;
+  config: StrongCheckoutWidgetsConfig;
 }
 
 export function AddFunds({
@@ -53,11 +62,9 @@ export function AddFunds({
   showSwapOption = true,
   showBridgeOption = true,
   onCloseButtonClick,
-}: // @TODO: dont think these are needed anymore
-// (according to the new designs)
-// showBackButton,
-// onBackButtonClick,
-AddFundsProps) {
+  showBackButton,
+  onBackButtonClick,
+}: AddFundsProps) {
   const { addFundsDispatch } = useContext(AddFundsContext);
   const { viewDispatch } = useContext(ViewContext);
 
@@ -83,9 +90,9 @@ AddFundsProps) {
 
   const debouncedUpdateAmount = debounce((value: string) => {
     setDebouncedToAmount(value);
-  }, 100);
+  }, 1500);
 
-  const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const updateAmount = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setInputValue(value);
     debouncedUpdateAmount(value);
@@ -121,13 +128,6 @@ AddFundsProps) {
 
         if (tokenResponse?.tokens.length > 0) {
           setAllowedTokens(tokenResponse.tokens);
-
-          // @TODO: i think this can be removed...as we are starting off in the
-          // default state, where no pay with and deliver to addresses are set ... ?
-          // --------------------------------------------------------------------------------
-          // const token = tokenResponse.tokens.find((t) => t.address === toTokenAddress)
-          //   || tokenResponse.tokens[0];
-          // setCurrentToTokenAddress(token);
 
           addFundsDispatch({
             payload: {
@@ -222,7 +222,10 @@ AddFundsProps) {
   }, [currentToTokenAddress, onRampAllowedTokens, showOnrampOption]);
 
   const showInitialEmptyState = !currentToTokenAddress;
-
+  const defaultTokenImage = getDefaultTokenImage(
+    checkout?.config.environment,
+    checkout?.config.theme,
+  );
   const tokenChoiceOptions = useMemo(
     () => allowedTokens.map((token) => (
       <MenuItem
@@ -234,29 +237,52 @@ AddFundsProps) {
       >
         <MenuItem.FramedImage
           circularFrame
-          use={<img src={token.icon} alt="" />}
+          use={(
+            <TokenImage
+              src={token.icon}
+              name={token.name}
+              defaultImage={defaultTokenImage}
+            />
+            )}
           emphasized={false}
         />
         <MenuItem.Label>{token.name}</MenuItem.Label>
       </MenuItem>
     )),
-    [allowedTokens, handleTokenChange, isSelected],
+    [allowedTokens, handleTokenChange, isSelected, defaultTokenImage],
   );
+  const shouldShowBackButton = showBackButton ?? !!onBackButtonClick;
 
   return (
     <SimpleLayout
       header={(
-        <ButtCon
-          variant="tertiary"
-          size="small"
-          icon="Close"
-          onClick={onCloseButtonClick}
+        <Stack
+          direction="row"
           sx={{
             pos: 'absolute',
-            top: 'base.spacing.x4',
-            right: 'base.spacing.x5',
+            w: '100%',
+            top: '0px',
+            pt: 'base.spacing.x4',
+            px: 'base.spacing.x5',
           }}
-        />
+          justifyContent="flex-start"
+        >
+          {shouldShowBackButton && (
+            <ButtCon
+              testId="backButton"
+              icon="ArrowBackward"
+              variant="tertiary"
+              size="small"
+            />
+          )}
+          <ButtCon
+            variant="tertiary"
+            size="small"
+            icon="Close"
+            onClick={onCloseButtonClick}
+            sx={{ ml: 'auto' }}
+          />
+        </Stack>
       )}
     >
       <Stack alignItems="center" sx={{ flex: 1 }}>
@@ -337,8 +363,12 @@ AddFundsProps) {
                 variant="bold"
                 emphasized={false}
               />
-              <MenuItem.Label>Pay with</MenuItem.Label>
+              <MenuItem.Label>
+                {/* Pay with */}
+                Choose payment option
+              </MenuItem.Label>
             </MenuItem>
+            {/*  @TODO: commented out for now, till these features are ready to go
             <Stack
               sx={{ pos: 'relative', h: 'base.spacing.x3' }}
               alignItems="center"
@@ -351,14 +381,15 @@ AddFundsProps) {
                   translate: ({ base }) => `0 -${base.spacing.x3}`,
                 }}
               />
-            </Stack>
+            </Stack> */}
+            {/* @TODO: commented out for now, till these features are ready to go
             <MenuItem
               size="small"
               emphasized
-              onClick={() => {
-                // eslint-disable-next-line no-console
-                console.log('@TODO - need to hook this up!');
-              }}
+              // onClick={() => {
+              //   // eslint-disable-next-line no-console
+              //   console.log('@TODO - need to hook this up!');
+              // }}
             >
               <MenuItem.FramedIcon
                 icon="Wallet"
@@ -366,9 +397,11 @@ AddFundsProps) {
                 emphasized={false}
               />
               <MenuItem.Label>Deliver to</MenuItem.Label>
-            </MenuItem>
+            </MenuItem> */}
           </Stack>
 
+          {/*
+            @TODO: commented out for now, till these features are ready to go
           <Button
             testId="add-funds-button"
             variant="secondary"
@@ -376,7 +409,7 @@ AddFundsProps) {
             size="large"
           >
             Review
-          </Button>
+          </Button> */}
 
           <OptionsDrawer
             showOnrampOption={shouldShowOnRampOption}

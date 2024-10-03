@@ -201,6 +201,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
               )}
               {view.type === CheckoutFlowType.ADD_FUNDS && (
                 <AddFundsWidget
+                  config={widgetsConfig}
                   checkout={checkout}
                   {...(view.data.params || {})}
                   {...(view.data.config || {})}
