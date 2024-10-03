@@ -10,6 +10,7 @@ import {
   OverflowDrawerMenu,
   Stack,
 } from '@biom3/react';
+import debounce from 'lodash.debounce';
 import {
   type Checkout,
   IMTBLWidgetEvents,
@@ -21,7 +22,6 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -57,7 +57,7 @@ export function AddFunds({
   showSwapOption = true,
   showBridgeOption = true,
   onCloseButtonClick,
-  // @TODO: dont think these are needed anymore 
+  // @TODO: dont think these are needed anymore
   // (according to the new designs)
   // showBackButton,
   // onBackButtonClick,
@@ -75,26 +75,22 @@ export function AddFunds({
   );
   const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
   const [inputValue, setInputValue] = useState<string>(toAmount || '');
+  // @TODO: the debouncedToAmount is likely what we need to use for USD 
+  // pricing and route calculations, etc
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [debouncedToAmount, setDebouncedToAmount] = useState<string | undefined>(inputValue);
   const [currentToTokenAddress, setCurrentToTokenAddress] = useState<
   TokenInfo | undefined
   >();
 
-  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const handleAmountChange = (value: string) => {
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
-    }
-
-    debounceTimeoutRef.current = setTimeout(() => {
-      setCurrentToAmount(value);
-    }, 1500);
-  };
+  const debouncedUpdateAmount = debounce((value: string) => {
+    setDebouncedToAmount(value);
+  }, 100);
 
   const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setInputValue(value);
-    handleAmountChange(value);
+    debouncedUpdateAmount(value);
   };
 
   const showErrorView = useCallback(
