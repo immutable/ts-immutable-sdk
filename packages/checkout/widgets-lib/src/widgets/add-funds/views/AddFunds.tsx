@@ -122,7 +122,7 @@ export function AddFunds({
   useEffect(() => {
     resetRoutes();
 
-    if (balances && squid && tokens && currentToTokenAddress?.address && currentToAmount) {
+    if (balances && squid && tokens && currentToTokenAddress?.address && debouncedToAmount) {
       fetchRoutesWithRateLimit(
         squid,
         tokens,
@@ -210,8 +210,6 @@ export function AddFunds({
     (token: TokenInfo) => token.address === currentToTokenAddress,
     [currentToTokenAddress],
   );
-  // @TODO: this is not uses atm, can maybe be removed
-  // const isDisabled = !currentToTokenAddress || !currentToAmount || Number.parseFloat(currentToAmount) <= 0;
 
   const handleTokenChange = useCallback((token: TokenInfo) => {
     setCurrentToTokenAddress(token);
