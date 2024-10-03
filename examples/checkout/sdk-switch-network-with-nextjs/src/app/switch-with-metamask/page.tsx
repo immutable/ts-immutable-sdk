@@ -5,7 +5,6 @@ import { useState } from "react";
 import { Web3Provider } from "@ethersproject/providers";
 import { Button, Heading, Body, Link, Table } from "@biom3/react";
 import NextLink from "next/link";
-import { NetworkInfo } from "@imtbl/sdk/checkout";
 
 export default function ConnectWithMetamask() {
   const [isConnected, setIsConnected] = useState<boolean>();
@@ -17,7 +16,6 @@ export default function ConnectWithMetamask() {
   const [connectedProvider, setConnectedProvider] = useState<Web3Provider>();
   const [supportedNetworks, setSupportedNetworks] = useState<string[]>();
   const [switchNetworkLoading, setSwitchNetworkLoading] = useState<boolean>(false);
-  const [networkInfo, setNetworkInfo] = useState<NetworkInfo | null>(null);
 
   const updateNetworkInfo = async (provider: Web3Provider) => {
     try {
@@ -25,14 +23,12 @@ export default function ConnectWithMetamask() {
       // Get the network details
       const info = await checkoutSDK.getNetworkInfo({ provider });
       // #enddoc get-network-details
-      setNetworkInfo(info);
       setChainName(info.name);
       setChainId(info.chainId.toString());
       setNativeCurrency(info.nativeCurrency?.symbol || 'N/A');
       setIsConnected(true);
     } catch (error) {
       console.error("Failed to update network info:", error);
-      setNetworkInfo(null);
       setChainName(undefined);
       setChainId(undefined);
       setNativeCurrency(undefined);

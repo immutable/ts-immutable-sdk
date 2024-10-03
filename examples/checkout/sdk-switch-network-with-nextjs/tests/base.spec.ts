@@ -11,3 +11,15 @@ test.describe("home page", () => {
     await expect(page.getByRole("link", { name: "Switch Network with MetaMask" })).toBeVisible();
   });
 });
+
+test.describe("switch network with metamask", () => {
+  test("has heading, login button and initial account status set correctly", async ({ page }) => {
+    await page.click("text=Switch Network with MetaMask");
+    await expect(page.getByRole("heading", { name: "Switch Network" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Connect MetaMask" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Switch to Sepolia Testnet" })).toBeVisible();
+    await expect(page.getByRole("button", { name: " Switch to Immutable zkEVM Testnet" })).toBeVisible();
+    await expect(page.getByText("(not connected)")).toHaveCount(5);
+    await expect(page.getByRole("link", { name: "Return to Examples" })).toBeVisible();
+  });
+});
