@@ -96,6 +96,7 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
                   }
                 >
                   <AddFundsWidget
+                    config={this.strongConfig()}
                     checkout={this.checkout}
                     web3Provider={this.web3Provider}
                     showBridgeOption={this.parameters.showBridgeOption}
