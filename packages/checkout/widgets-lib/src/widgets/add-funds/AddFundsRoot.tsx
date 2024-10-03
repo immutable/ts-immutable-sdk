@@ -77,6 +77,7 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
         getL1ChainId(this.checkout.config),
         getL2ChainId(this.checkout.config),
       ],
+      isCheckNetworkEnabled: false,
     };
 
     this.reactRoot.render(
@@ -95,6 +96,7 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
                   }
                 >
                   <AddFundsWidget
+                    config={this.strongConfig()}
                     checkout={this.checkout}
                     web3Provider={this.web3Provider}
                     showBridgeOption={this.parameters.showBridgeOption}

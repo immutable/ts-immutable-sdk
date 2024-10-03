@@ -8,7 +8,7 @@ import { Chain, RouteData } from '../types';
 
 export interface RouteOptionProps<RC extends ReactElement | undefined = undefined> {
   route: RouteData;
-  onClick?: (route: RouteData) => void;
+  onClick: (route: RouteData) => void;
   chain?: Chain;
   usdBalance?: string;
   disabled?: boolean;
@@ -39,7 +39,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
   const formattedUsdBalance = useMemo(() => (usdBalance ? Number(usdBalance).toFixed(2) : undefined), [usdBalance]);
 
   const estimatedDurationFormatted = useMemo(() => {
-    const seconds = estimate.estimatedRouteDuration / 1000;
+    const seconds = estimate.estimatedRouteDuration;
     if (seconds >= 60) {
       const minutes = Math.round(seconds / 60);
       return minutes === 1 ? '1 min' : `${minutes} mins`;
@@ -48,7 +48,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
   }, [estimate.estimatedRouteDuration]);
 
   const handleClick = () => {
-    onClick?.(route);
+    onClick(route);
   };
 
   const menuItemProps = {
@@ -87,7 +87,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
         />
 
         <MenuItem.FramedImage
-          use={<img src={fromToken.logoURI} alt={fromToken.name} />}
+          use={<img src={fromToken.iconUrl} alt={fromToken.name} />}
         />
       </Sticker>
       )}

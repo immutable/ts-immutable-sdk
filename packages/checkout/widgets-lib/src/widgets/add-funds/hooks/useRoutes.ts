@@ -1,10 +1,10 @@
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
-import { RouteResponse, Token } from '@0xsquid/squid-types';
+import { RouteResponse } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
 import { utils } from 'ethers';
 import { useRef, useState } from 'react';
 import { delay } from '../functions/delay';
-import { AmountData, RouteData } from '../types';
+import { AmountData, RouteData, Token } from '../types';
 
 export const useRoutes = () => {
   const [routes, setRoutes] = useState<RouteData[] | undefined>(undefined);
@@ -14,115 +14,80 @@ export const useRoutes = () => {
     setRoutes(undefined);
   };
 
-  const getFromAmount = async (
-    squid: Squid,
+  const findToken = (tokens: Token[], address: string, chainId: string)
+  : Token | undefined => tokens.find((value) => value.address.toLowerCase() === address.toLowerCase()
+    && value.chainId === chainId);
+
+  const calculateFromAmount = (fromToken: Token, toToken: Token, toAmount: string) => {
+    const toAmountNumber = Number(toAmount);
+    const toAmountInUsd = toAmountNumber * toToken.usdPrice;
+    const baseFromAmount = toAmountInUsd / fromToken.usdPrice;
+    const fromAmountWithBuffer = baseFromAmount * 1.015;
+    return fromAmountWithBuffer.toString();
+  };
+
+  const getAmountData = (
+    tokens: Token[],
     balance: TokenBalance,
     toAmount: string,
     toChainId: string,
     toTokenAddress: string,
-  ): Promise<AmountData | undefined> => {
-    const fromTokenData = squid?.getTokenData(
-      balance.address,
-      balance.chainId.toString(),
-    );
-    const toTokenData = squid?.getTokenData(toTokenAddress, toChainId);
-
-    if (!fromTokenData || !toTokenData) {
+  ): AmountData | undefined => {
+    const fromToken = findToken(tokens, balance.address, balance.chainId.toString());
+    const toToken = findToken(tokens, toTokenAddress, toChainId);
+    if (!fromToken || !toToken) {
       return undefined;
     }
-
-    try {
-      const fromAmount = await squid.getFromAmount({
-        fromToken: fromTokenData,
-        toToken: toTokenData,
-        toAmount,
-      });
-
-      return {
-        fromAmount,
-        fromToken: fromTokenData,
-        toToken: toTokenData,
-        toAmount,
-        balance,
-      };
-    } catch (error) {
-      return undefined;
-    }
+    return {
+      fromToken,
+      fromAmount: calculateFromAmount(fromToken, toToken, toAmount),
+      toToken,
+      toAmount,
+      balance,
+    };
   };
 
-  const getSufficientFromAmounts = async (
-    squid: Squid,
+  const getSufficientFromAmounts = (
+    tokens: Token[],
     balances: TokenBalance[],
     toChainId: string,
     toTokenAddress: string,
     toAmount: string,
-    bulkNumber: number,
-    delayMs: number,
-  ): Promise<AmountData[]> => {
+  ): AmountData[] => {
     const filteredBalances = balances.filter(
-      (balance) => !(balance.address === toTokenAddress && balance.chainId === toChainId),
+      (balance) => !(balance.address.toLowerCase() === toTokenAddress.toLowerCase() && balance.chainId === toChainId),
     );
+    const amountDataArray: AmountData[] = filteredBalances.map((balance) => getAmountData(
+      tokens,
+      balance,
+      toAmount,
+      toChainId,
+      toTokenAddress,
+    )).filter((value) => value !== undefined);
 
-    const result :AmountData[] = [];
-
-    for (let i = 0; i < filteredBalances.length; i += bulkNumber) {
-      const promises = filteredBalances.slice(i, i + bulkNumber).map(
-        (balance) => getFromAmount(
-          squid,
-          balance,
-          toAmount,
-          toChainId,
-          toTokenAddress,
-        ),
-      );
-
-      // eslint-disable-next-line no-await-in-loop
-      const amountsData = await Promise.all(promises);
-
-      const filteredAmountsData = amountsData.filter(
-        (amountData): amountData is AmountData => amountData !== undefined,
-      );
-
-      if (filteredAmountsData.length > 0) {
-        result.push(...filteredAmountsData);
-      }
-
-      // eslint-disable-next-line no-await-in-loop
-      await delay(delayMs);
-    }
-
-    const filteredAmountData = result.filter(
-      (data: AmountData) => {
-        const formattedBalance = utils.formatUnits(data.balance.balance, data.balance.decimals);
-        return parseFloat(formattedBalance.toString()) > parseFloat(data.fromAmount);
-      },
-    );
-    return filteredAmountData;
+    return amountDataArray.filter((data: AmountData) => {
+      const formattedBalance = utils.formatUnits(data.balance.balance, data.balance.decimals);
+      return parseFloat(formattedBalance.toString()) > parseFloat(data.fromAmount);
+    });
   };
 
   const getRoute = async (
     squid: Squid,
     fromToken: Token,
     toToken: Token,
-    toAmount: string,
     toAddress: string,
-    fromAddress?:string,
+    fromAmount: string,
+    fromAddress?: string,
     quoteOnly = true,
   ): Promise<RouteResponse | undefined> => {
     try {
-      const fromAmount = await squid.getFromAmount({
-        fromToken,
-        toToken,
-        toAmount,
-      });
-
       const parsedFromAmount = parseFloat(fromAmount).toFixed(fromToken.decimals);
       const formattedFromAmount = utils.parseUnits(
         parsedFromAmount,
         fromToken.decimals,
       );
 
-      const route = await squid.getRoute({
+      return await squid.getRoute({
         fromChain: fromToken.chainId,
         fromToken: fromToken.address,
         fromAmount: formattedFromAmount.toString(),
@@ -133,8 +98,6 @@ export const useRoutes = () => {
         quoteOnly,
         enableBoost: true,
       });
-
-      return route;
     } catch (error) {
       return undefined;
     }
@@ -150,8 +113,8 @@ export const useRoutes = () => {
         squid,
         data.fromToken,
         data.toToken,
-        data.toAmount,
         toTokenAddress,
+        data.fromAmount,
       ).then((route) => ({
         amountData: data,
         route,
@@ -164,23 +127,22 @@ export const useRoutes = () => {
 
   const fetchRoutesWithRateLimit = async (
     squid: Squid,
+    tokens: Token[],
     balances: TokenBalance[],
     toChanId: string,
     toTokenAddress: string,
     toAmount: string,
     bulkNumber = 5,
     delayMs = 1000,
-  ):Promise<RouteData[]> => {
+  ): Promise<RouteData[]> => {
     const currentRequestId = ++latestRequestIdRef.current;
 
-    const amountDataArray = await getSufficientFromAmounts(
-      squid,
+    const amountDataArray = getSufficientFromAmounts(
+      tokens,
       balances,
       toChanId,
       toTokenAddress,
       toAmount,
-      10,
-      1000,
     );
 
     const allRoutes: RouteData[] = [];
@@ -203,6 +165,6 @@ export const useRoutes = () => {
   };
 
   return {
-    routes, fetchRoutesWithRateLimit, getFromAmount, getRoute, resetRoutes,
+    routes, fetchRoutesWithRateLimit, getAmountData, getRoute, resetRoutes,
   };
 };
