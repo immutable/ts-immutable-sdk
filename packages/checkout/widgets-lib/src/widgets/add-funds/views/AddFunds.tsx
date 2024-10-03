@@ -75,7 +75,7 @@ export function AddFunds({
   );
   const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
   const [inputValue, setInputValue] = useState<string>(toAmount || '');
-  // @TODO: the debouncedToAmount is likely what we need to use for USD 
+  // @TODO: the debouncedToAmount is likely what we need to use for USD
   // pricing and route calculations, etc
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [debouncedToAmount, setDebouncedToAmount] = useState<string | undefined>(inputValue);
