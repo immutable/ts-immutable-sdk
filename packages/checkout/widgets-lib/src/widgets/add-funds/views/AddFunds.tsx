@@ -317,6 +317,7 @@ export function AddFunds({
               icon="ArrowBackward"
               variant="tertiary"
               size="small"
+              onClick={onBackButtonClick}
             />
           )}
           <ButtCon
