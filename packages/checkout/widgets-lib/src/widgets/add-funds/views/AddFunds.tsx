@@ -155,6 +155,16 @@ export function AddFunds({
         if (tokenResponse?.tokens.length > 0) {
           setAllowedTokens(tokenResponse.tokens);
 
+          if (toTokenAddress) {
+            const token = tokenResponse.tokens.find(
+              (t) => t.address?.toLowerCase() === toTokenAddress.toLowerCase(),
+            );
+
+            if (token) {
+              setCurrentToTokenAddress(token);
+            }
+          }
+
           addFundsDispatch({
             payload: {
               type: AddFundsActions.SET_ALLOWED_TOKENS,
