@@ -256,7 +256,7 @@ export function Review({
         />
       )}
     >
-      {!route && <Body>Loading...</Body>}
+      {!route && <Heading>Loading...</Heading>}
       {route && (
         <Stack sx={{ w: '100%', flex: 1, p: 'base.spacing.x4' }} alignItems="stretch">
           <Stack sx={{ minh: '60px' }} rc={<header />} justifyContent="center">
