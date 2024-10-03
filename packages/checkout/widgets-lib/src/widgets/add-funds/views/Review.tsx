@@ -37,6 +37,7 @@ interface ReviewProps {
   onBackButtonClick?: () => void;
   onCloseButtonClick?: () => void;
 }
+
 const FIXED_HANDOVER_DURATION = 2000;
 
 const APPROVE_TXN_ANIMATION = '/access_coins.riv';
@@ -167,7 +168,7 @@ export function Review({
       clearInterval(getRouteIntervalId);
       setProceedDisabled(true);
 
-      showHandover(APPROVE_TXN_ANIMATION, RiveStateMachineInput.START, 'Preparing', '');
+      showHandover(APPROVE_TXN_ANIMATION, RiveStateMachineInput.START, 'Preparing');
 
       const changeableProvider = await convertToNetworkChangeableProvider(provider);
       await checkProviderChain(changeableProvider, route.route.params.fromChain);
