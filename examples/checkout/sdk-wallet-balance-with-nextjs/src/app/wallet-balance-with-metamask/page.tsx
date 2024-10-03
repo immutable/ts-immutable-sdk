@@ -164,12 +164,11 @@ export default function ConnectWithMetamask() {
           <Table.Row>
             <Table.Cell><b>Supported Wallets</b></Table.Cell>
             <Table.Cell>
-              {!supportedWallets && ' (not connected)'}
-              {supportedWallets && (
+              {supportedWallets ? (
                 supportedWallets.map((wallet, index) => (
                   <span key={index}>{wallet.walletProviderName}, </span>
                 ))
-              )}
+              ): ' (not connected)'}
             </Table.Cell>
           </Table.Row>
           <Table.Row>
@@ -197,7 +196,7 @@ export default function ConnectWithMetamask() {
               </select>
             </Table.Cell>
           </Table.Row>
-          {selectedToken && (
+          {selectedToken ? (
             <Table.Row>
               <Table.Cell colSpan={2}>
                 <div>
@@ -205,11 +204,11 @@ export default function ConnectWithMetamask() {
                   <p><strong>Name:</strong> {selectedToken.name}</p>
                   <p><strong>Symbol:</strong> {selectedToken.symbol}</p>
                   <p><strong>Decimals:</strong> {selectedToken.decimals}</p>
-                  {selectedToken.icon && <Image src={selectedToken.icon} alt={`${selectedToken.name} icon`} />}
+                  {selectedToken.icon ? <Image src={selectedToken.icon} alt={`${selectedToken.name} icon`} /> : null}
                 </div>
               </Table.Cell>
             </Table.Row>
-          )}
+          ): null}
           <Table.Row>
             <Table.Cell colSpan={2}>
               <div>
@@ -218,7 +217,7 @@ export default function ConnectWithMetamask() {
                 <p><strong>Symbol:</strong> {tokenInfo?.symbol || 'N/A'}</p>
                 <p><strong>Decimals:</strong> {tokenInfo?.decimals || 'N/A'}</p>
                 <p><strong>Address:</strong> {tokenInfo?.address || 'N/A'}</p>
-                {tokenInfo?.icon && <Image src={tokenInfo.icon} alt={`${tokenInfo.name} icon`} />}
+                {tokenInfo?.icon ? <Image src={tokenInfo.icon} alt={`${tokenInfo.name} icon`} /> : null}
               </div>
             </Table.Cell>
           </Table.Row>
