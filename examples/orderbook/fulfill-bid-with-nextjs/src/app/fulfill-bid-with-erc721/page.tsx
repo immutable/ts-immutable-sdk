@@ -292,39 +292,39 @@ export default function FulfillERC721WithPassport() {
       {bids && bids.length > 0 ? (
         <Box sx={{ maxHeight: "800px", marginBottom: "base.spacing.x5" }}>
           <Table sx={{ maxWidth: "1500px", width: "100%", maxHeight: "400px", overflowY: "auto", marginBottom: "base.spacing.x5"}}>
-          <Table.Head>
-            <Table.Row>
-              <Table.Cell sx={{ padding: "base.spacing.x2" }}>SNO</Table.Cell>
-              <Table.Cell sx={{ padding: "base.spacing.x2" }}>Bid ID</Table.Cell>
-              <Table.Cell sx={{ padding: "base.spacing.x2" }}>Contract Address</Table.Cell>
-              <Table.Cell sx={{ padding: "base.spacing.x2" }}>Token ID</Table.Cell>
-              <Table.Cell sx={{ padding: "base.spacing.x2" }}></Table.Cell>
-            </Table.Row>
-          </Table.Head>
-          <Table.Body>
-            {bids.map((bid: orderbook.Bid, index: number) => {
-              return (
-                <Table.Row key={index}>
-                  <Table.Cell sx={{ paddingLeft: "base.spacing.x5", paddingRight: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{index + 1}</Body></Table.Cell>
-                  <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{bid.id}</Body></Table.Cell>
-                  <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{bid.buy[0].contractAddress}</Body></Table.Cell>
-                  <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{bid.buy[0].tokenId}</Body></Table.Cell>
-                  <Table.Cell sx={{ paddingLeft: "base.spacing.x2", paddingRight: "base.spacing.x5", paddingY: "base.spacing.x2" }}>
-                    <Button
-                      size="small"
-                      variant="primary"
-                      disabled={loading}
-                      onClick={() => executeTrade(bid.id)}
-                    >
-                      Buy
-                    </Button>
-                  </Table.Cell>
-                </Table.Row>
-              );
-            })}
-          </Table.Body>
-        </Table>
-      </Box>
+            <Table.Head>
+              <Table.Row>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>SNO</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Bid ID</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Contract Address</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Token ID</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}></Table.Cell>
+              </Table.Row>
+            </Table.Head>
+            <Table.Body>
+              {bids.map((bid: orderbook.Bid, index: number) => {
+                return (
+                  <Table.Row key={index}>
+                    <Table.Cell sx={{ paddingLeft: "base.spacing.x5", paddingRight: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{index + 1}</Body></Table.Cell>
+                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{bid.id}</Body></Table.Cell>
+                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{bid.buy[0].contractAddress}</Body></Table.Cell>
+                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{bid.buy[0].tokenId}</Body></Table.Cell>
+                    <Table.Cell sx={{ paddingLeft: "base.spacing.x2", paddingRight: "base.spacing.x5", paddingY: "base.spacing.x2" }}>
+                      <Button
+                        size="small"
+                        variant="primary"
+                        disabled={loading}
+                        onClick={() => executeTrade(bid.id)}
+                      >
+                        Buy
+                      </Button>
+                    </Table.Cell>
+                  </Table.Row>
+                );
+              })}
+            </Table.Body>
+          </Table>
+        </Box>
       ) : null}
       <Link rc={<NextLink href="/" />}>Return to Examples</Link>
     </Box>

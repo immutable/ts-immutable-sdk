@@ -343,61 +343,61 @@ export default function FulfillERC1155WithPassport() {
       {collectionBids && collectionBids.length > 0 ? (
         <Box sx={{ maxHeight: "800px", marginBottom: "base.spacing.x5" }}>
           <Table sx={{ maxWidth: "1500px", width: "100%", maxHeight: "400px", overflowY: "auto", marginBottom: "base.spacing.x5"}}>
-          <Table.Head>
-            <Table.Row>
-              <Table.Cell sx={{ padding: "base.spacing.x2" }}>SNO</Table.Cell>
-              <Table.Cell sx={{ padding: "base.spacing.x2" }}>Bid ID</Table.Cell>
-              <Table.Cell sx={{ padding: "base.spacing.x2" }}>Contract Address</Table.Cell>
-              <Table.Cell sx={{ padding: "base.spacing.x2" }}>Offer Amount</Table.Cell>
-              <Table.Cell sx={{ padding: "base.spacing.x2" }}>Fillable Units</Table.Cell>
-              <Table.Cell sx={{ padding: "base.spacing.x2" }}>Units to Fill</Table.Cell>
-              <Table.Cell sx={{ padding: "base.spacing.x2" }}>Token ID</Table.Cell>
-              <Table.Cell sx={{ padding: "base.spacing.x2" }}></Table.Cell>
-            </Table.Row>
-          </Table.Head>
-          <Table.Body>
-            {collectionBids.map((collectionBid: orderbook.CollectionBid, index: number) => {
-              return (
-                <Table.Row key={index}>
-                  <Table.Cell sx={{ paddingLeft: "base.spacing.x5", paddingRight: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{index + 1}</Body></Table.Cell>
-                  <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{collectionBid.id}</Body></Table.Cell>
-                  <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{collectionBid.buy[0].contractAddress}</Body></Table.Cell>
-                  <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{collectionBid.sell[0].amount}</Body></Table.Cell>
-                  <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}>
-                    <Body mono={true} size="small">{`${unitsRemaining(collectionBid)}/${unitsTotal(collectionBid)}`}</Body>
-                  </Table.Cell>
-                  <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "0" }}>
-                    <FormControl>
-                      <TextInput sx={{ minWidth: "50px", height: "40px" }}
-                        onChange={(event: any) =>
-                          handleUnitsToFillChange(index, event.target.value)
-                        }
-                      />
-                    </FormControl>
-                  </Table.Cell>
-                  <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "0" }}>
-                    <FormControl>
-                      <TextInput sx={{ minWidth: "100px", height: "40px" }}
-                        onChange={(event: any) =>
-                          handleTokenIdToFillChange(index, event.target.value)
-                        }
-                      />
-                    </FormControl>
-                  </Table.Cell>
-                  <Table.Cell sx={{ paddingLeft: "base.spacing.x2", paddingRight: "base.spacing.x5", paddingY: "base.spacing.x2" }}>
-                    <Button
-                      size="small"
-                      variant="primary"
-                      disabled={loading}
-                      onClick={() => executeTrade(collectionBid.id, index)}
-                    >
-                      Buy
-                    </Button>
-                  </Table.Cell>
-                </Table.Row>
-              );
-            })}
-          </Table.Body>
+            <Table.Head>
+              <Table.Row>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>SNO</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Bid ID</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Contract Address</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Offer Amount</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Fillable Units</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Units to Fill</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Token ID</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}></Table.Cell>
+              </Table.Row>
+            </Table.Head>
+            <Table.Body>
+              {collectionBids.map((collectionBid: orderbook.CollectionBid, index: number) => {
+                return (
+                  <Table.Row key={index}>
+                    <Table.Cell sx={{ paddingLeft: "base.spacing.x5", paddingRight: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{index + 1}</Body></Table.Cell>
+                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{collectionBid.id}</Body></Table.Cell>
+                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{collectionBid.buy[0].contractAddress}</Body></Table.Cell>
+                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{collectionBid.sell[0].amount}</Body></Table.Cell>
+                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}>
+                      <Body mono={true} size="small">{`${unitsRemaining(collectionBid)}/${unitsTotal(collectionBid)}`}</Body>
+                    </Table.Cell>
+                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "0" }}>
+                      <FormControl>
+                        <TextInput sx={{ minWidth: "50px", height: "40px" }}
+                          onChange={(event: any) =>
+                            handleUnitsToFillChange(index, event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    </Table.Cell>
+                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "0" }}>
+                      <FormControl>
+                        <TextInput sx={{ minWidth: "100px", height: "40px" }}
+                          onChange={(event: any) =>
+                            handleTokenIdToFillChange(index, event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    </Table.Cell>
+                    <Table.Cell sx={{ paddingLeft: "base.spacing.x2", paddingRight: "base.spacing.x5", paddingY: "base.spacing.x2" }}>
+                      <Button
+                        size="small"
+                        variant="primary"
+                        disabled={loading}
+                        onClick={() => executeTrade(collectionBid.id, index)}
+                      >
+                        Buy
+                      </Button>
+                    </Table.Cell>
+                  </Table.Row>
+                );
+              })}
+            </Table.Body>
           </Table>
         </Box>
       ) : null}
