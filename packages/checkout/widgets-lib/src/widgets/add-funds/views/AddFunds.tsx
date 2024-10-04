@@ -366,6 +366,7 @@ export function AddFunds({
           sx={{ flex: 1, px: 'base.spacing.x2', w: '100%', pt: 'base.spacing.x1' }}
           justifyContent="center"
           alignItems="center"
+          gap="base.spacing.x3"
         >
           <OverflowDrawerMenu
             drawerSize="full"
@@ -389,6 +390,7 @@ export function AddFunds({
                     circularFrame
                     sx={{
                       cursor: 'pointer',
+                      mb: 'base.spacing.x1',
                       // eslint-disable-next-line @typescript-eslint/naming-convention
                       '&:hover': {
                         boxShadow: ({ base }) => `0 0 0 ${base.border.size[200]} ${base.color.text.body.primary}`,

@@ -62,19 +62,19 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
 
   return (
     <MenuItem {...menuItemProps}>
-      <MenuItem.Label weight="bold">{fromToken.name}</MenuItem.Label>
+      <MenuItem.Label>{fromToken.name}</MenuItem.Label>
 
       {chain && (
-      <Sticker position={{ x: 'right', y: 'bottom' }}>
-        <Sticker.FramedImage
-          use={<img src={chain.iconUrl} alt={chain.name} />}
-          sx={{ w: 'base.icon.size.200' }}
-        />
+        <Sticker position={{ x: 'right', y: 'bottom' }}>
+          <Sticker.FramedImage
+            use={<img src={chain.iconUrl} alt={chain.name} />}
+            sx={{ w: 'base.icon.size.200' }}
+          />
 
-        <MenuItem.FramedImage
-          use={<img src={fromToken.iconUrl} alt={fromToken.name} />}
-        />
-      </Sticker>
+          <MenuItem.FramedImage
+            use={<img src={fromToken.iconUrl} alt={fromToken.name} />}
+          />
+        </Sticker>
       )}
 
       {formattedFromAmount && estimate.fromAmountUSD && (
