@@ -1,3 +1,4 @@
+import type { Config } from 'jest';
 import { execSync } from 'child_process';
 import { name } from './package.json';
 
@@ -7,7 +8,7 @@ const rootDirs = execSync(`pnpm --filter ${name}... exec pwd`)
   .filter(Boolean)
   .map((dir) => `${dir}/dist`);
   
-module.exports = {
+const config: Config = {
   roots: ['<rootDir>/src', ...rootDirs],
   testEnvironment: 'node',
   moduleDirectories: ['node_modules', '<rootDir>/src'],
@@ -24,3 +25,5 @@ module.exports = {
     'node_modules\//(?!node-fetch)/',
   ],
 };
+
+export default config
