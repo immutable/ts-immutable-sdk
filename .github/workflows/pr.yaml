@@ -135,13 +135,16 @@ jobs:
         run: pnpm prepare:tests
 
       - name: Install SDK at current version for @tests/checkout-widgets-nextjs
-        run: yarn workspace @tests/checkout-widgets-nextjs add @imtbl/sdk@$(npm view @imtbl/sdk version)
+        run: pnpm --filter @tests/checkout-widgets-nextjs add @imtbl/sdk@$(npm view @imtbl/sdk version)
 
       - name: Build @tests/checkout-widgets-nextjs
-        run: yarn workspace @tests/checkout-widgets-nextjs build
+        run: pnpm --filter @tests/checkout-widgets-nextjs build
 
       - name: Prepare widgets bundle for @tests/checkout-widgets-nextjs
-        run: yarn workspace @imtbl/checkout-widgets prepare:testwidgets
+        run: pnpm --filter @imtbl/checkout-widgets prepare:testwidgets
+        
+      - name: Update modules
+        run: pnpm install --frozen-lockfile=false
 
       - name: Setup playwright
         uses: ./.github/actions/setup-playwright
