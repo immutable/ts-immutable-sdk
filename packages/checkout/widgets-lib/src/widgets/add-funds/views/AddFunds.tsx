@@ -436,7 +436,10 @@ export function AddFunds({
             <MenuItem
               size="small"
               emphasized
-              onClick={() => setShowPayWithDrawer(true)}
+              onClick={(event) => {
+                event.stopPropagation();
+                setShowPayWithDrawer(true);
+              }}
             >
               <MenuItem.FramedIcon
                 icon="Wallet"
