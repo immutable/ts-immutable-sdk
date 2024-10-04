@@ -1,6 +1,4 @@
-import {
-  Box, LoadingOverlay, MenuItemSize,
-} from '@biom3/react';
+import { Box, LoadingOverlay, MenuItemSize } from '@biom3/react';
 import { motion } from 'framer-motion';
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import {
@@ -10,8 +8,7 @@ import {
 import { FiatOption } from './FiatOption';
 import { Chain, FiatOptionType, RouteData } from '../types';
 import { RouteOption } from './RouteOption';
-import { convertTokenBalanceToUsd } from '../functions/convertTokenBalanceToUsd';
-import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
+import { getUsdBalance } from '../functions/convertTokenBalanceToUsd';
 
 const defaultFiatOptions: FiatOptionType[] = [
   FiatOptionType.DEBIT,
@@ -37,21 +34,7 @@ export function Options({
   size,
   showOnrampOption,
 }: OptionsProps) {
-  const getUsdBalance = (balance: TokenBalance | undefined, route: RouteData) => {
-    if (!balance) return undefined;
-
-    try {
-      return convertTokenBalanceToUsd(balance, route.route)?.toString();
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error calculating USD balance:', error);
-      return undefined;
-    }
-  };
-
-  const sortedRoutes = sortRoutesByFastestTime(routes);
-
-  if (!sortedRoutes) {
+  if (!routes) {
     return (
       <LoadingOverlay visible>
         <LoadingOverlay.Content>
@@ -64,7 +47,7 @@ export function Options({
     );
   }
 
-  const routeOptions = sortedRoutes.map((route: RouteData) => {
+  const routeOptions = routes.map((route: RouteData) => {
     const { fromToken } = route.amountData;
 
     const chain = chains?.find((c) => c.id === fromToken.chainId);
@@ -109,7 +92,9 @@ export function Options({
         justifyContent: 'center',
         alignItems: 'flex-start',
       }}
-      rc={<motion.div variants={listVariants} initial="hidden" animate="show" />}
+      rc={
+        <motion.div variants={listVariants} initial="hidden" animate="show" />
+      }
     >
       {routeOptions}
       {fiatOptions}

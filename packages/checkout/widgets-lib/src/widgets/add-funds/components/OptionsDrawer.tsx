@@ -39,12 +39,12 @@ export function OptionsDrawer({
       visible={visible}
       showHeaderBar
       onCloseDrawer={onClose}
-      headerBarTitle="Pay with..."
+      headerBarTitle="Pay using..."
     >
       <Drawer.Content
         rc={
           <motion.div variants={listVariants} initial="hidden" animate="show" />
-  }
+        }
       >
         <Box
           sx={{

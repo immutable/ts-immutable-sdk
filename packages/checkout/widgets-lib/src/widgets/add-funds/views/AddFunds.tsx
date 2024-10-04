@@ -1,14 +1,13 @@
 import {
   ButtCon,
-  // Button,
-  // FramedIcon,
+  Button,
+  FramedIcon,
   FramedImage,
   HeroFormControl,
   HeroTextInput,
   OverflowDrawerMenu,
   Stack,
   Body,
-  // Box,
   MenuItem,
 } from '@biom3/react';
 import debounce from 'lodash.debounce';
@@ -37,6 +36,8 @@ import {
 import { getL2ChainId } from '../../../lib';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { OptionsDrawer } from '../components/OptionsDrawer';
+import { PayWithDrawer } from '../components/PayWithDrawer';
+import { DeliverToDrawer } from '../components/DeliverToDrawer';
 import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
 import { TokenImage } from '../../../components/TokenImage/TokenImage';
 import { getDefaultTokenImage } from '../../../lib/utils';
@@ -45,6 +46,7 @@ import { useRoutes } from '../hooks/useRoutes';
 import { SQUID_NATIVE_TOKEN } from '../utils/config';
 import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
 import type { RouteData } from '../types';
+import { SelectedRouteOption } from '../components/SelectedRouteOption';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -71,9 +73,13 @@ export function AddFunds({
   showBackButton,
   onBackButtonClick,
 }: AddFundsProps) {
-  const { routes, fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
   const {
-    addFundsState: { squid, balances, tokens },
+    routes, fetchRoutesWithRateLimit, resetRoutes, fetchingRoutes,
+  } = useRoutes();
+  const {
+    addFundsState: {
+      squid, chains, balances, tokens,
+    },
     addFundsDispatch,
   } = useContext(AddFundsContext);
 
@@ -83,19 +89,19 @@ export function AddFunds({
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
 
+  const [selectedRouteData, setSelectedRouteData] = useState<
+  RouteData | undefined
+  >(undefined);
   const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
+  const [showPayWithDrawer, setShowPayWithDrawer] = useState(false);
+  const [showDeliverToDrawer, setShowDeliverToDrawer] = useState(false);
   const [onRampAllowedTokens, setOnRampAllowedTokens] = useState<TokenInfo[]>(
     [],
   );
   const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
   const [inputValue, setInputValue] = useState<string>(toAmount || '');
-  // @TODO: the debouncedToAmount is likely what we need to use for USD
-  // pricing and route calculations, etc
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [debouncedToAmount, setDebouncedToAmount] = useState<string>(inputValue);
-  const [currentToTokenAddress, setCurrentToTokenAddress] = useState<
-  TokenInfo | undefined
-  >();
+  const [selectedToken, setSelectedToken] = useState<TokenInfo | undefined>();
 
   const debouncedUpdateAmount = debounce((value: string) => {
     setDebouncedToAmount(value);
@@ -129,7 +135,7 @@ export function AddFunds({
       balances
       && squid
       && tokens
-      && currentToTokenAddress?.address
+      && selectedToken?.address
       && debouncedToAmount
     ) {
       fetchRoutesWithRateLimit(
@@ -137,15 +143,21 @@ export function AddFunds({
         tokens,
         balances,
         ChainId.IMTBL_ZKEVM_MAINNET.toString(),
-        currentToTokenAddress.address === 'native'
+        selectedToken.address === 'native'
           ? SQUID_NATIVE_TOKEN
-          : currentToTokenAddress.address,
+          : selectedToken.address,
         debouncedToAmount,
         5,
         1000,
       );
     }
-  }, [balances, squid, currentToTokenAddress, debouncedToAmount]);
+  }, [balances, squid, selectedToken, debouncedToAmount]);
+
+  useEffect(() => {
+    if (!selectedRouteData && routes.length > 0) {
+      setSelectedRouteData(routes[0]);
+    }
+  }, [routes]);
 
   useEffect(() => {
     if (!checkout) {
@@ -169,7 +181,7 @@ export function AddFunds({
             );
 
             if (token) {
-              setCurrentToTokenAddress(token);
+              setSelectedToken(token);
             }
           }
 
@@ -211,28 +223,18 @@ export function AddFunds({
     fetchOnRampTokens();
   }, [checkout]);
 
-  const openDrawer = () => {
-    setShowOptionsDrawer(true);
-  };
-
   const isSelected = useCallback(
-    (token: TokenInfo) => token.address === currentToTokenAddress,
-    [currentToTokenAddress],
+    (token: TokenInfo) => token.address === selectedToken,
+    [selectedToken],
   );
 
   const handleTokenChange = useCallback((token: TokenInfo) => {
-    setCurrentToTokenAddress(token);
+    setSelectedToken(token);
   }, []);
 
-  // @TODO: restore this when we bring back all the templating below
-  // const handleReviewClick = useCallback(() => {
-  //   // eslint-disable-next-line no-console
-  //   console.log('handle review click');
-  // }, []);
-
-  const onCardClick = () => {
+  const handleCardClick = () => {
     const data = {
-      tokenAddress: currentToTokenAddress?.address ?? '',
+      tokenAddress: selectedToken?.address ?? '',
       amount: debouncedToAmount ?? '',
     };
     orchestrationEvents.sendRequestOnrampEvent(
@@ -242,8 +244,15 @@ export function AddFunds({
     );
   };
 
-  const onRouteClick = (routeData: RouteData) => {
-    if (!debouncedToAmount || !currentToTokenAddress?.address) {
+  const handleRouteClick = (route: RouteData) => {
+    setShowOptionsDrawer(false);
+    setShowPayWithDrawer(false);
+    setShowDeliverToDrawer(false);
+    setSelectedRouteData(route);
+  };
+
+  const handleReviewClick = () => {
+    if (!debouncedToAmount || !selectedToken?.address || !selectedRouteData) {
       return;
     }
 
@@ -253,9 +262,9 @@ export function AddFunds({
         view: {
           type: AddFundsWidgetViews.REVIEW,
           data: {
-            balance: routeData.amountData.balance,
+            balance: selectedRouteData.amountData.balance,
             toChainId: ChainId.IMTBL_ZKEVM_MAINNET.toString(),
-            toTokenAddress: currentToTokenAddress.address,
+            toTokenAddress: selectedToken.address,
             toAmount: debouncedToAmount,
           },
         },
@@ -264,17 +273,16 @@ export function AddFunds({
   };
 
   const shouldShowOnRampOption = useMemo(() => {
-    if (showOnrampOption && currentToTokenAddress) {
+    if (showOnrampOption && selectedToken) {
       const token = onRampAllowedTokens.find(
-        (t) => t.address?.toLowerCase()
-          === currentToTokenAddress.address?.toLowerCase(),
+        (t) => t.address?.toLowerCase() === selectedToken.address?.toLowerCase(),
       );
       return !!token;
     }
     return false;
-  }, [currentToTokenAddress, onRampAllowedTokens, showOnrampOption]);
+  }, [selectedToken, onRampAllowedTokens, showOnrampOption]);
 
-  const showInitialEmptyState = !currentToTokenAddress;
+  const showInitialEmptyState = !selectedToken;
   const defaultTokenImage = getDefaultTokenImage(
     checkout?.config.environment,
     config.theme,
@@ -308,6 +316,16 @@ export function AddFunds({
     [allowedTokens, handleTokenChange, isSelected, defaultTokenImage],
   );
   const shouldShowBackButton = showBackButton ?? !!onBackButtonClick;
+
+  const readyToReview = useMemo(
+    () => !!debouncedToAmount && !!selectedRouteData && !!selectedToken?.address,
+    [debouncedToAmount, selectedToken, selectedRouteData],
+  );
+
+  const loading = Boolean(
+    (selectedToken?.address && debouncedToAmount && !selectedRouteData)
+      || fetchingRoutes,
+  );
 
   return (
     <SimpleLayout
@@ -361,8 +379,8 @@ export function AddFunds({
                     size="xLarge"
                     use={(
                       <TokenImage
-                        src={currentToTokenAddress?.icon}
-                        name={currentToTokenAddress?.name}
+                        src={selectedToken?.icon}
+                        name={selectedToken?.name}
                         defaultImage={defaultTokenImage}
                       />
                       )}
@@ -390,7 +408,7 @@ export function AddFunds({
               <HeroFormControl.Label>
                 Add
                 {' '}
-                {currentToTokenAddress.symbol}
+                {selectedToken.symbol}
               </HeroFormControl.Label>
               <HeroTextInput
                 testId="add-funds-amount-input"
@@ -415,18 +433,33 @@ export function AddFunds({
           gap="base.spacing.x6"
         >
           <Stack gap="0px">
-            <MenuItem size="small" emphasized onClick={openDrawer}>
+            <MenuItem
+              size="small"
+              emphasized
+              onClick={(event) => {
+                event.stopPropagation();
+                setShowPayWithDrawer(true);
+              }}
+            >
               <MenuItem.FramedIcon
-                icon="Dollar"
+                icon="Wallet"
                 variant="bold"
                 emphasized={false}
               />
-              <MenuItem.Label>
-                {/* Pay with */}
-                Choose payment option
-              </MenuItem.Label>
+              <MenuItem.Label>Pay with</MenuItem.Label>
+              <MenuItem.BottomSlot>
+                <MenuItem.BottomSlot.Divider />
+                <SelectedRouteOption
+                  selected
+                  loading={loading}
+                  chains={chains}
+                  balances={balances}
+                  routeData={selectedRouteData}
+                  onClick={() => setShowOptionsDrawer(true)}
+                />
+              </MenuItem.BottomSlot>
             </MenuItem>
-            {/*  @TODO: commented out for now, till these features are ready to go
+
             <Stack
               sx={{ pos: 'relative', h: 'base.spacing.x3' }}
               alignItems="center"
@@ -439,15 +472,11 @@ export function AddFunds({
                   translate: ({ base }) => `0 -${base.spacing.x3}`,
                 }}
               />
-            </Stack> */}
-            {/* @TODO: commented out for now, till these features are ready to go
+            </Stack>
             <MenuItem
               size="small"
               emphasized
-              // onClick={() => {
-              //   // eslint-disable-next-line no-console
-              //   console.log('@TODO - need to hook this up!');
-              // }}
+              onClick={() => setShowDeliverToDrawer(true)}
             >
               <MenuItem.FramedIcon
                 icon="Wallet"
@@ -455,29 +484,35 @@ export function AddFunds({
                 emphasized={false}
               />
               <MenuItem.Label>Deliver to</MenuItem.Label>
-            </MenuItem> */}
+            </MenuItem>
           </Stack>
 
-          {/*
-            @TODO: commented out for now, till these features are ready to go
           <Button
             testId="add-funds-button"
             variant="secondary"
             onClick={handleReviewClick}
             size="large"
+            disabled={!readyToReview}
           >
             Review
-          </Button> */}
-
+          </Button>
+          <PayWithDrawer
+            visible={showPayWithDrawer}
+            onClose={() => setShowPayWithDrawer(false)}
+          />
           <OptionsDrawer
-            showOnrampOption={shouldShowOnRampOption}
             routes={routes}
+            showOnrampOption={shouldShowOnRampOption}
             showSwapOption={showSwapOption}
             showBridgeOption={showBridgeOption}
             visible={showOptionsDrawer}
             onClose={() => setShowOptionsDrawer(false)}
-            onCardClick={onCardClick}
-            onRouteClick={onRouteClick}
+            onCardClick={handleCardClick}
+            onRouteClick={handleRouteClick}
+          />
+          <DeliverToDrawer
+            visible={showDeliverToDrawer}
+            onClose={() => setShowDeliverToDrawer(false)}
           />
         </Stack>
       </Stack>

@@ -8,14 +8,24 @@ import {
   SwapEventType,
   BridgeEventType,
   SwapDirection,
+  WalletProviderName,
 } from "@imtbl/checkout-sdk";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
+import { Environment } from "@imtbl/config";
 import { useMemo, useEffect } from "react";
 
 const ADD_FUNDS_TARGET_ID = "add-funds-widget-target";
 
 function AddFundsUI() {
-  const checkout = useMemo(() => new Checkout(), []);
+  const checkout = useMemo(
+    () =>
+      new Checkout({
+        baseConfig: {
+          environment: Environment.PRODUCTION,
+        },
+      }),
+    []
+  );
   const factory = useMemo(() => new WidgetsFactory(checkout, {}), [checkout]);
   const addFunds = useMemo(
     () =>
@@ -29,11 +39,32 @@ function AddFundsUI() {
   const bridge = useMemo(() => factory.create(WidgetType.BRIDGE), [factory]);
 
   useEffect(() => {
+    if (!checkout || !factory) return;
+
+    (async () => {
+      const { provider } = await checkout.createProvider({
+        walletProviderName: WalletProviderName.METAMASK,
+      });
+
+      await checkout.connect({ provider, requestWalletPermissions: false });
+
+      const { isConnected } = await checkout.checkIsWalletConnected({
+        provider,
+      });
+
+      if (isConnected) {
+        factory.updateProvider(provider);
+      }
+    })();
+  }, [checkout, factory]);
+
+  useEffect(() => {
     addFunds.mount(ADD_FUNDS_TARGET_ID, {
       showOnrampOption: true,
       showBridgeOption: false,
       showSwapOption: true,
-      toTokenAddress: "0x3b2d8a1931736fc321c24864bceee981b11c3c57",
+      // toAmount: "1",
+      // toTokenAddress: "native",
     });
     addFunds.addListener(AddFundsEventType.CLOSE_WIDGET, (data: any) => {
       console.log("CLOSE_WIDGET", data);
