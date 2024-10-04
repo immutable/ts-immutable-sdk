@@ -69,15 +69,10 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
           cursor: 'not-allowed !important',
         }),
       }}
+      selected={isFastest}
       {...menuItemProps}
     >
       <MenuItem.Label weight="bold">{fromToken.name}</MenuItem.Label>
-
-      {formattedUsdBalance && (
-      <MenuItem.Caption>
-        {`Balance: $${formattedUsdBalance}`}
-      </MenuItem.Caption>
-      )}
 
       {chain && (
       <Sticker position={{ x: 'right', y: 'bottom' }}>
@@ -106,8 +101,9 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
 
       <MenuItem.Caption>
         <Icon icon="Countdown" sx={{ w: 'base.icon.size.250' }} />
-        {' '}
-        { estimatedDurationFormatted }
+        {estimatedDurationFormatted}
+        <br />
+        Balance: $${formattedUsdBalance}
       </MenuItem.Caption>
 
     </MenuItem>

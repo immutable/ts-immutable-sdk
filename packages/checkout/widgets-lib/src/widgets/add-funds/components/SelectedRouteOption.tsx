@@ -1,18 +1,17 @@
 import {
-  MenuItem, MenuItemSize, Sticker, SxProps,
+  Box,
+  hFlex,
+  MenuItem, MenuItemSize, Stack, Sticker, SxProps,
 } from '@biom3/react';
-import { ReactElement, useMemo } from 'react';
+import { MouseEvent, MouseEventHandler, ReactNode, useCallback, useMemo } from 'react';
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
 
 import { Chain, RouteData } from '../types';
 import { getUsdBalance } from '../functions/convertTokenBalanceToUsd';
 
-export interface RouteOptionProps<
-  RC extends ReactElement | undefined = undefined,
-> {
+export interface RouteOptionProps {
   size?: MenuItemSize;
-  rc?: RC;
-  onClick: (event: any) => void;
+  onClick: MouseEventHandler<HTMLSpanElement>;
   routeData?: RouteData;
   chains: Chain[] | null;
   balances: TokenBalance[] | null;
@@ -24,45 +23,51 @@ export interface RouteOptionProps<
   sx?: SxProps;
 }
 
-export function SelectedRouteOption<
-  RC extends ReactElement | undefined = undefined,
->({
+function SelectedRouteOptionContainer({ children, onClick }: { children: ReactNode; onClick?: MouseEventHandler<HTMLSpanElement> }) {
+  return (
+    <Stack
+      direction="row"
+      alignItems="center"
+      gap="base.spacing.x4"
+      sx={{ 
+        ml: '-77px', 
+        px: 'base.spacing.x3' 
+      }} 
+      rc={<span {...(onClick ? { onClick } : {})} />}
+    >
+      {children}
+    </Stack>
+  );
+}
+
+export function SelectedRouteOption({
   routeData,
   chains,
   balances,
   loading = false,
   onClick,
   size,
-  rc = <span />,
   sx,
-}: RouteOptionProps<RC>) {
-  if (!routeData && !loading) {
-    return (
-      <MenuItem
-        size="small"
-        sx={{
-          ml: '-76px',
-          w: 'calc(100% + 88px)',
-          userSelect: 'none',
-        }}
-      >
-        <MenuItem.FramedIcon icon="Dollar" circularFrame padded />
-        <MenuItem.Caption>
-          Add your token, we&apos;ll find the best payment
-        </MenuItem.Caption>
-      </MenuItem>
-    );
-  }
+}: RouteOptionProps) {
+  const mergedOnClick = useCallback((event: MouseEvent<HTMLSpanElement>) => {
+    event.stopPropagation();
+    if (!loading && !routeData) return false;
+    onClick?.(event);
+  }, [onClick, loading, routeData]);
+  const { fromToken } = routeData?.amountData ?? {};
+  const chain = chains?.find((c) => c.id === fromToken?.chainId);
+  const balance = balances?.find(
+    ({ address, chainId }) => address === fromToken?.address && chainId === fromToken.chainId,
+  );
+  const usdBalance = routeData ? getUsdBalance(balance, routeData) : '';
+  const formattedUsdBalance = useMemo(
+    () => (usdBalance ? Number(usdBalance).toFixed(2) : undefined),
+    [usdBalance],
+  );
 
-  if (!routeData || loading) {
-    return (
-      <MenuItem
-        size="small"
-        sx={{
-          ml: '-76px',
-          w: 'calc(100% + 88px)',
-        }}
-      >
+  if (!routeData) {
+    return loading ? (
+      <SelectedRouteOptionContainer onClick={mergedOnClick}>
         <MenuItem.FramedVideo
           videoUrl="https://i.imgur.com/dVQoobw.mp4"
           mimeType="video/mp4"
@@ -70,47 +75,20 @@ export function SelectedRouteOption<
           padded
         />
         <MenuItem.Caption>Finding the best payment route...</MenuItem.Caption>
-      </MenuItem>
-    );
+      </SelectedRouteOptionContainer>
+    ) : (
+      <SelectedRouteOptionContainer onClick={mergedOnClick}>
+        <MenuItem.FramedIcon icon="Sparkle" variant="bold" circularFrame emphasized={false} />
+         <MenuItem.Caption>
+           Add your token, we&apos;ll find the best payment
+         </MenuItem.Caption>
+      </SelectedRouteOptionContainer>
+    )
   }
 
-  const { fromToken } = routeData.amountData;
-
-  const chain = chains?.find((c) => c.id === fromToken.chainId);
-  const balance = balances?.find(
-    ({ address, chainId }) => address === fromToken.address && chainId === fromToken.chainId,
-  );
-
-  const usdBalance = getUsdBalance(balance, routeData);
-  const formattedUsdBalance = useMemo(
-    () => (usdBalance ? Number(usdBalance).toFixed(2) : undefined),
-    [usdBalance],
-  );
-
-  const menuItemProps = {
-    onClick: (event: MouseEvent) => {
-      event.stopPropagation();
-      onClick();
-    },
-  };
-
   return (
-    <MenuItem
-      rc={rc}
-      size={size || 'medium'}
-      sx={{
-        ...sx,
-        py: '0 !important',
-        ml: '-77px',
-        my: '1px',
-        w: 'calc(100% + 90px)',
-        userSelect: 'none',
-        brad: '0',
-      }}
-      {...menuItemProps}
-    >
-      <MenuItem.Label weight="bold">{fromToken.name}</MenuItem.Label>
-
+    <SelectedRouteOptionContainer onClick={mergedOnClick}>
+      <MenuItem.Label weight="bold">{fromToken?.name}</MenuItem.Label>
       {chain && (
         <Sticker position={{ x: 'right', y: 'bottom' }}>
           <Sticker.FramedImage
@@ -121,17 +99,12 @@ export function SelectedRouteOption<
           <MenuItem.FramedImage
             circularFrame
             use={(
-              <img
-                data-id="token-icon"
-                src={fromToken.iconUrl}
-                alt={fromToken.name}
-              />
+              <img src={fromToken?.iconUrl} alt={fromToken?.name} />
             )}
           />
         </Sticker>
       )}
-
       <MenuItem.Caption>{`Balance $${formattedUsdBalance}`}</MenuItem.Caption>
-    </MenuItem>
+    </SelectedRouteOptionContainer>
   );
 }
