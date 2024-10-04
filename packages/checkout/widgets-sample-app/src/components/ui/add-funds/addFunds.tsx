@@ -63,8 +63,8 @@ function AddFundsUI() {
       showOnrampOption: true,
       showBridgeOption: false,
       showSwapOption: true,
-      toAmount: "1",
-      toTokenAddress: "native",
+      // toAmount: "1",
+      // toTokenAddress: "native",
     });
     addFunds.addListener(AddFundsEventType.CLOSE_WIDGET, (data: any) => {
       console.log("CLOSE_WIDGET", data);
