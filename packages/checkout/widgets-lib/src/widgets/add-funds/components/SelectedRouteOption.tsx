@@ -43,6 +43,7 @@ export function SelectedRouteOption<
         sx={{
           ml: '-76px',
           w: 'calc(100% + 88px)',
+          userSelect: 'none',
         }}
       >
         <MenuItem.FramedIcon icon="Dollar" circularFrame padded />
@@ -86,7 +87,12 @@ export function SelectedRouteOption<
     [usdBalance],
   );
 
-  const menuItemProps = { onClick };
+  const menuItemProps = {
+    onClick: (event: MouseEvent) => {
+      event.stopPropagation();
+      onClick();
+    },
+  };
 
   return (
     <MenuItem
