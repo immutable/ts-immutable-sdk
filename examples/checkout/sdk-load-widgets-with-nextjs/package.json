@@ -7,15 +7,15 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "playwright test",
+    "test": "USE_LOCAL_BUNDLE=true playwright test playwright test",
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
-    "test:localwidgets": "USE_LOCAL_BUNDLE=true playwright test"
+    "test:remotewidgets": "playwright test"
   },
   "dependencies": {
     "@biom3/react": "^0.25.21",
     "@ethersproject/providers": "^5.7.2",
-    "@imtbl/sdk": "latest",
+    "@imtbl/sdk": "file:.yalc/@imtbl/sdk",
     "next": "14.2.7",
     "react": "^18",
     "react-dom": "^18"
