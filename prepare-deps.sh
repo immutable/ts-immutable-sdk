@@ -66,3 +66,7 @@ prepare_deps() {
 
 #  Run the below recursively for each workspace in the workspace filter set above
 pnpm --parallel --filter $workspaceFilter exec bash -c "$(declare -f prepare_deps); prepare_deps $envToPrepare"
+
+if [ "$envToPrepare" != "sdk" ]; then
+  pnpm install
+fi
