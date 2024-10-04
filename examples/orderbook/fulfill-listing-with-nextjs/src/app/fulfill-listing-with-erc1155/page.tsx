@@ -5,14 +5,13 @@ import {
   Box,
   Button,
   FormControl,
-  Grid,
   Heading,
   Link,
   LoadingOverlay,
   Select,
   Stack,
   Table,
-  TextInput,
+  TextInput
 } from "@biom3/react";
 import { orderbook } from "@imtbl/sdk";
 import { OrderStatusName } from "@imtbl/sdk/orderbook";
@@ -20,6 +19,7 @@ import { ProviderEvent } from "@imtbl/sdk/passport";
 import { ethers } from "ethers";
 import NextLink from "next/link";
 import { useMemo, useState } from "react";
+import { unitsRemaining, unitsTotal } from "../utils/listing";
 import { orderbookSDK } from "../utils/setupOrderbook";
 import { passportInstance } from "../utils/setupPassport";
 
@@ -327,7 +327,7 @@ export default function FulfillERC1155WithPassport() {
                 <Table.Cell sx={{ padding: "base.spacing.x2" }}>Listing ID</Table.Cell>
                 <Table.Cell sx={{ padding: "base.spacing.x2" }}>Contract Address</Table.Cell>
                 <Table.Cell sx={{ padding: "base.spacing.x2" }}>Token ID</Table.Cell>
-                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Fillable Units</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Remaining Units</Table.Cell>
                 <Table.Cell sx={{ padding: "base.spacing.x2" }}>Units to Fill</Table.Cell>
                 <Table.Cell sx={{ padding: "base.spacing.x2" }}></Table.Cell>
               </Table.Row>
@@ -340,7 +340,9 @@ export default function FulfillERC1155WithPassport() {
                     <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{listing.id}</Body></Table.Cell>
                     <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{listing.sell[0].contractAddress}</Body></Table.Cell>
                     <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{listing.sell[0].tokenId}</Body></Table.Cell>
-                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{listing.sell[0].type === 'ERC1155' ? listing.sell[0].amount : '1'}</Body></Table.Cell>
+                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}>
+                      <Body mono={true} size="small">{`${unitsRemaining(listing)}/${unitsTotal(listing)}`}</Body>
+                    </Table.Cell>
                     <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "0" }}>
                       <FormControl>
                         <TextInput sx={{ minWidth: "50px", height: "40px" }}
