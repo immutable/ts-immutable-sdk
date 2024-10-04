@@ -10,17 +10,11 @@ import { Chain, RouteData } from '../types';
 import { getUsdBalance } from '../functions/convertTokenBalanceToUsd';
 
 export interface RouteOptionProps {
-  size?: MenuItemSize;
-  onClick: MouseEventHandler<HTMLSpanElement>;
   routeData?: RouteData;
   chains: Chain[] | null;
+  onClick: MouseEventHandler<HTMLSpanElement>;
   balances: TokenBalance[] | null;
-  disabled?: boolean;
-  isFastest?: boolean;
-  emphasized?: boolean;
-  selected?: boolean;
   loading?: boolean;
-  sx?: SxProps;
 }
 
 function SelectedRouteOptionContainer({ children, onClick }: { children: ReactNode; onClick?: MouseEventHandler<HTMLSpanElement> }) {
@@ -30,8 +24,8 @@ function SelectedRouteOptionContainer({ children, onClick }: { children: ReactNo
       alignItems="center"
       gap="base.spacing.x4"
       sx={{ 
-        ml: '-77px', 
-        px: 'base.spacing.x3' 
+        ml: ({ base }) => `calc(${base.spacing.x16} * -1)`, 
+        w: ({ base }) => `calc(100% + (${base.spacing.x16}))`,
       }} 
       rc={<span {...(onClick ? { onClick } : {})} />}
     >
@@ -46,8 +40,6 @@ export function SelectedRouteOption({
   balances,
   loading = false,
   onClick,
-  size,
-  sx,
 }: RouteOptionProps) {
   const mergedOnClick = useCallback((event: MouseEvent<HTMLSpanElement>) => {
     event.stopPropagation();
@@ -88,7 +80,6 @@ export function SelectedRouteOption({
 
   return (
     <SelectedRouteOptionContainer onClick={mergedOnClick}>
-      <MenuItem.Label weight="bold">{fromToken?.name}</MenuItem.Label>
       {chain && (
         <Sticker position={{ x: 'right', y: 'bottom' }}>
           <Sticker.FramedImage
@@ -98,13 +89,24 @@ export function SelectedRouteOption({
 
           <MenuItem.FramedImage
             circularFrame
+            padded
             use={(
               <img src={fromToken?.iconUrl} alt={fromToken?.name} />
             )}
           />
         </Sticker>
       )}
-      <MenuItem.Caption>{`Balance $${formattedUsdBalance}`}</MenuItem.Caption>
+
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ w: '100%' }}>
+        <Stack gap="0px">
+          <MenuItem.Label>{fromToken?.name}</MenuItem.Label>
+          <MenuItem.Caption>{`Balance $${formattedUsdBalance}`}</MenuItem.Caption>
+        </Stack>
+        
+        <MenuItem.PriceDisplay price="0.14">
+          <MenuItem.PriceDisplay.Caption>USD $300.30</MenuItem.PriceDisplay.Caption>
+        </MenuItem.PriceDisplay>
+      </Stack>
     </SelectedRouteOptionContainer>
   );
 }

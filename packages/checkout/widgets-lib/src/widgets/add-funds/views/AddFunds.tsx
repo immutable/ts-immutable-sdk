@@ -363,7 +363,7 @@ export function AddFunds({
       <Stack alignItems="center" sx={{ flex: 1 }}>
         <Stack
           testId="topSection"
-          sx={{ flex: 1, px: 'base.spacing.x2', w: '100%' }}
+          sx={{ flex: 1, px: 'base.spacing.x2', w: '100%', pt: 'base.spacing.x1' }}
           justifyContent="center"
           alignItems="center"
         >
@@ -450,7 +450,6 @@ export function AddFunds({
               <MenuItem.BottomSlot>
                 <MenuItem.BottomSlot.Divider />
                 <SelectedRouteOption
-                  selected
                   loading={loading}
                   chains={chains}
                   balances={balances}
