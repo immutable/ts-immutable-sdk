@@ -689,6 +689,110 @@ describe("Orderbook", () => {
     })
   })
 
+  describe('create and bulk fulfill ERC721 listing', () => {
+    it('fulfill fully', async () => {
+      const erc721TokenIds = Array.from({ length: 2 }, () => getRandomTokenId());
+
+      // maker funds
+      for (const tokenId of erc721TokenIds) {
+        await withBankerRetry(async () => {
+          await (
+            await erc721Contract.mint(maker.address, tokenId, GAS_OVERRIDES)
+          ).wait(1);
+        });
+      }
+
+      await withBankerRetry(async () => {
+        await (
+          await banker.sendTransaction({
+            to: maker.address,
+            value: `${(imxForApproval * 2) + imxForFulfillment}`,
+            ...GAS_OVERRIDES,
+          })
+        ).wait(1);
+      });
+
+      // taker funds
+      await withBankerRetry(async () => {
+        await (
+          await erc20Contract.mint(taker.address, 10000, GAS_OVERRIDES)
+        ).wait(1);
+      });
+      await withBankerRetry(async () => {
+        await (
+          await banker.sendTransaction({
+            to: taker.address,
+            value: `${(imxForApproval * 2) + imxForFulfillment}`,
+            ...GAS_OVERRIDES,
+          })
+        ).wait(1);
+      });
+
+      const orderIds: string[] = [];
+
+      for (const tokenId of erc721TokenIds) {
+        const {
+          actions: listingCreateActions,
+          orderComponents,
+          orderHash,
+        } = await orderBookSdk.prepareListing({
+          makerAddress: maker.address,
+          sell: {
+            type: 'ERC721',
+            contractAddress: erc721Contract.address,
+            tokenId,
+          },
+          buy: {
+            type: 'ERC20',
+            contractAddress: erc20Contract.address,
+            amount: '100',
+          },
+          orderStart: new Date(2000, 1, 15),
+        });
+
+        const signatures = await actionAll(listingCreateActions, maker);
+
+        const { result } = await orderBookSdk.createListing({
+          orderComponents,
+          orderHash,
+          orderSignature: signatures[0],
+          makerFees: [],
+        });
+
+        orderIds.push(result.id);
+
+        await waitForListingToBeOfStatus(orderBookSdk, result.id, {
+          name: orderbook.OrderStatusName.ACTIVE,
+        });
+      }
+
+      const fulfilmentParams = orderIds.map(orderId => ({
+        orderId,
+        takerFees: [],
+        amountToFill: '1',
+      }));
+
+      const fulfillResponse = await orderBookSdk.fulfillBulkOrders(
+        fulfilmentParams,
+        taker.address
+      );
+
+      if (!fulfillResponse.sufficientBalance) {
+        throw new Error('Expected balance to be sufficient for order fulfillment');
+      }
+
+      const { actions } = fulfillResponse;
+
+      await actionAll(actions, taker);
+
+      await Promise.all(
+        orderIds.map(orderId => waitForListingToBeOfStatus(orderBookSdk, orderId, {
+          name: orderbook.OrderStatusName.FILLED,
+        }))
+      );
+    })
+  })
+
   describe("create and bulk fulfill ERC721 bid", () => {
     it("fulfill fully", async () => {
       const erc721TokenIds = Array.from({ length: 2 }, () => getRandomTokenId());
@@ -783,8 +887,6 @@ describe("Orderbook", () => {
       const { actions } = fulfillResponse;
 
       await actionAll(actions, taker);
-
-      const allowance = await erc20Contract.allowance(taker.address, '0x3870289A34bba912a05B2c0503F7484dD18d2f6F');
 
       await Promise.all(
         orderIds.map(orderId => waitForBidToBeOfStatus(orderBookSdk, orderId, {
