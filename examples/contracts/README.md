@@ -10,10 +10,6 @@ The [contracts library](https://github.com/immutable/contracts) contains smart c
 
 ## Getting Started
 
-<!-- Pre-requisites:
-
-- Node.js 20.0.0 or higher -->
-
 Install dependencies:
 
 ```bash
