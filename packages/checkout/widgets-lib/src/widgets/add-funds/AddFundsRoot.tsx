@@ -20,7 +20,7 @@ import {
 } from '../../components/ConnectLoader/ConnectLoader';
 import { getL1ChainId, getL2ChainId } from '../../lib';
 import { sendAddFundsCloseEvent } from './AddFundsWidgetEvents';
-import { isValidAmount } from '../../lib/validations/widgetValidators';
+import { isValidAddress, isValidAmount } from '../../lib/validations/widgetValidators';
 
 const AddFundsWidget = React.lazy(() => import('./AddFundsWidget'));
 
@@ -54,6 +54,12 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
       validatedParams.toAmount = '';
     }
 
+    if (!isValidAddress(params.toTokenAddress)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "toTokenAddress" widget input');
+      validatedParams.toTokenAddress = '';
+    }
+
     return validatedParams;
   }
 
@@ -71,6 +77,7 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
         getL1ChainId(this.checkout.config),
         getL2ChainId(this.checkout.config),
       ],
+      isCheckNetworkEnabled: false,
     };
 
     this.reactRoot.render(
@@ -89,6 +96,7 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
                   }
                 >
                   <AddFundsWidget
+                    config={this.strongConfig()}
                     checkout={this.checkout}
                     web3Provider={this.web3Provider}
                     showBridgeOption={this.parameters.showBridgeOption}

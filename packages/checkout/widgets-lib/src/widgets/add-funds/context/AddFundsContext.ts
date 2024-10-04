@@ -3,7 +3,7 @@ import { createContext } from 'react';
 import { Checkout, TokenInfo } from '@imtbl/checkout-sdk';
 import { Squid } from '@0xsquid/sdk';
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
-import { Chain } from '../types';
+import { Chain, Token } from '../types';
 
 export interface AddFundsState {
   checkout: Checkout | null;
@@ -12,6 +12,7 @@ export interface AddFundsState {
   squid: Squid | null;
   chains: Chain[] | null;
   balances: TokenBalance[] | null;
+  tokens: Token[] | null;
 }
 
 export const initialAddFundsState: AddFundsState = {
@@ -21,6 +22,7 @@ export const initialAddFundsState: AddFundsState = {
   squid: null,
   chains: null,
   balances: null,
+  tokens: null,
 };
 
 export interface AddFundsContextState {
@@ -38,7 +40,8 @@ type ActionPayload =
   | SetAllowedTokensPayload
   | SetSquid
   | SetChains
-  | SetBalances;
+  | SetBalances
+  | SetTokens;
 
 export enum AddFundsActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
@@ -47,6 +50,7 @@ export enum AddFundsActions {
   SET_SQUID = 'SET_SQUID',
   SET_CHAINS = 'SET_CHAINS',
   SET_BALANCES = 'SET_BALANCES',
+  SET_TOKENS = 'SET_TOKENS',
 }
 
 export interface SetCheckoutPayload {
@@ -72,9 +76,15 @@ export interface SetChains {
   type: AddFundsActions.SET_CHAINS;
   chains: Chain[];
 }
+
 export interface SetBalances {
   type: AddFundsActions.SET_BALANCES;
   balances: TokenBalance[];
+}
+
+export interface SetTokens {
+  type: AddFundsActions.SET_TOKENS;
+  tokens: Token[];
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -121,6 +131,11 @@ export const addFundsReducer: Reducer<AddFundsState, AddFundsAction> = (
       return {
         ...state,
         balances: action.payload.balances,
+      };
+    case AddFundsActions.SET_TOKENS:
+      return {
+        ...state,
+        tokens: action.payload.tokens,
       };
     default:
       return state;

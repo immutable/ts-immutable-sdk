@@ -1,35 +1,37 @@
 import { Box, Drawer } from '@biom3/react';
 import { motion } from 'framer-motion';
+import { useContext } from 'react';
 import { listVariants } from '../../../lib/animation/listAnimation';
 import { Options } from './Options';
-import { OptionTypes } from './Option';
+import { FiatOptionType, RouteData } from '../types';
+import { AddFundsContext } from '../context/AddFundsContext';
 
 type OptionsDrawerProps = {
+  routes: RouteData[] | undefined;
+  visible: boolean;
+  onClose: () => void;
+  onRouteClick: (route: RouteData) => void;
+  onCardClick: (type: FiatOptionType) => void;
   showOnrampOption?: boolean;
   showSwapOption?: boolean;
   showBridgeOption?: boolean;
-  visible: boolean;
-  onClose: () => void;
-  onPayWithCard?: (paymentType: OptionTypes) => void;
 };
 
 export function OptionsDrawer({
+  routes,
+  visible,
+  onClose,
+  onRouteClick,
+  onCardClick,
   showOnrampOption,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   showSwapOption,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   showBridgeOption,
-  visible,
-  onClose,
-  onPayWithCard,
 }: OptionsDrawerProps) {
-  const disabledOptions: OptionTypes[] = [];
-  if (!showOnrampOption) {
-    disabledOptions.push(OptionTypes.CREDIT);
-    disabledOptions.push(OptionTypes.DEBIT);
-  }
-  if (!showSwapOption) {
-    disabledOptions.push(OptionTypes.SWAP);
-  }
+  const {
+    addFundsState: { chains, balances },
+  } = useContext(AddFundsContext);
 
   return (
     <Drawer
@@ -42,7 +44,7 @@ export function OptionsDrawer({
       <Drawer.Content
         rc={
           <motion.div variants={listVariants} initial="hidden" animate="show" />
-                }
+  }
       >
         <Box
           sx={{
@@ -54,21 +56,13 @@ export function OptionsDrawer({
           }}
         >
           <Options
-            onClick={onPayWithCard ?? (() => {
-            })}
             size="medium"
-            hideDisabledOptions
-            options={[
-              OptionTypes.SWAP,
-              OptionTypes.DEBIT,
-              OptionTypes.CREDIT,
-            ]}
-            disabledOptions={disabledOptions}
-            captions={{
-              [OptionTypes.SWAP]: 'Swap',
-              [OptionTypes.DEBIT]: 'Debit',
-              [OptionTypes.CREDIT]: 'Credit',
-            }}
+            routes={routes}
+            chains={chains}
+            balances={balances}
+            onCardClick={onCardClick}
+            onRouteClick={onRouteClick}
+            showOnrampOption={showOnrampOption}
           />
         </Box>
       </Drawer.Content>

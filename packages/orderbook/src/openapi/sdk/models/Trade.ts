@@ -8,9 +8,19 @@ import type { Item } from './Item';
 import type { TradeBlockchainMetadata } from './TradeBlockchainMetadata';
 
 export type Trade = {
+  /**
+   * Buy items are transferred from the taker to the maker.
+   */
   buy: Array<Item>;
+  /**
+   * Deprecated. Use maker and taker addresses instead of buyer and seller addresses.
+   */
   buyer_address: string;
+  /**
+   * Deprecated. Use fees instead. The taker always pays the fees.
+   */
   buyer_fees: Array<Fee>;
+  fees: Array<Fee>;
   chain: Chain;
   order_id: string;
   blockchain_metadata: TradeBlockchainMetadata;
@@ -22,7 +32,13 @@ export type Trade = {
    * Global Trade identifier
    */
   id: string;
+  /**
+   * Sell items are transferred from the maker to the taker.
+   */
   sell: Array<Item>;
+  /**
+   * Deprecated. Use maker and taker addresses instead of buyer and seller addresses.
+   */
   seller_address: string;
   maker_address: string;
   taker_address: string;

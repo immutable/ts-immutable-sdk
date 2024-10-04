@@ -1,3 +1,3 @@
-const SQUID_NATIVE_TOKEN = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+import { SQUID_NATIVE_TOKEN } from '../utils/config';
 
-export const isSquidNativeToken = (token: string) => token === SQUID_NATIVE_TOKEN;
+export const isSquidNativeToken = (token: string) => token.toLowerCase() === SQUID_NATIVE_TOKEN.toLowerCase();

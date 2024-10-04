@@ -1,0 +1,23 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 1rem;
+}
+
+body {
+  margin: 0;
+}
+
+.flex-container {
+  min-height: 100%;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.mb-1 {
+  margin-bottom: 1rem;
+}

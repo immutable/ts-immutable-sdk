@@ -17,8 +17,9 @@ export const useExecute = () => {
     chainId: string,
   ): Promise<void> => {
     if (!provider.provider.request) {
-      throw Error('provider does not have request method');
+      throw new Error('provider does not have request method');
     }
+
     try {
       const fromChainHex = `0x${parseInt(chainId, 10).toString(16)}`;
       const providerChainId = await provider.provider.request({
@@ -35,8 +36,34 @@ export const useExecute = () => {
         });
       }
     } catch (e) {
-      throw Error('Error checking provider');
+      throw new Error('Error checking provider');
     }
+  };
+
+  const getAllowance = async (
+    provider: Web3Provider,
+    routeResponse: RouteResponse,
+  ): Promise<ethers.BigNumber | undefined> => {
+    if (!isSquidNativeToken(routeResponse?.route?.params.fromToken)) {
+      const erc20Abi = [
+        'function allowance(address owner, address spender) public view returns (uint256)',
+      ];
+      const fromToken = routeResponse?.route.params.fromToken;
+      const signer = provider.getSigner();
+      const tokenContract = new ethers.Contract(fromToken, erc20Abi, signer);
+
+      const ownerAddress = await signer.getAddress();
+      const transactionRequestTarget = routeResponse?.route?.transactionRequest?.target;
+
+      if (!transactionRequestTarget) {
+        throw new Error('transactionRequest target is undefined');
+      }
+
+      const allowance = await tokenContract.allowance(ownerAddress, transactionRequestTarget);
+      return allowance;
+    }
+
+    return ethers.constants.MaxUint256; // no approval is needed for native tokens
   };
 
   const approve = async (
@@ -45,20 +72,28 @@ export const useExecute = () => {
   ): Promise<void> => {
     try {
       if (!isSquidNativeToken(routeResponse?.route?.params.fromToken)) {
-        const fromToken = routeResponse?.route.params.fromToken;
         const erc20Abi = [
           'function approve(address spender, uint256 amount) public returns (bool)',
         ];
+        const fromToken = routeResponse?.route.params.fromToken;
         const signer = provider.getSigner();
         const tokenContract = new ethers.Contract(fromToken, erc20Abi, signer);
 
-        const transactionRequestTarget = routeResponse?.route?.transactionRequest?.target;
         const fromAmount = routeResponse?.route.params.fromAmount;
+        if (!fromAmount) {
+          throw new Error('fromAmount is undefined');
+        }
+
+        const transactionRequestTarget = routeResponse?.route?.transactionRequest?.target;
+        if (!transactionRequestTarget) {
+          throw new Error('transactionRequest target is undefined');
+        }
+
         const tx = await tokenContract.approve(transactionRequestTarget, fromAmount);
         await tx.wait();
       }
     } catch (e) {
-      throw Error('Error approving tokens');
+      throw new Error('Error approving tokens');
     }
   };
 
@@ -68,8 +103,9 @@ export const useExecute = () => {
     routeResponse: RouteResponse,
   ): Promise<ethers.providers.TransactionReceipt> => {
     if (!provider.provider.request) {
-      throw Error('provider does not have request method');
+      throw new Error('provider does not have request method');
     }
+
     try {
       const tx = (await squid.executeRoute({
         signer: provider.getSigner(),
@@ -77,11 +113,11 @@ export const useExecute = () => {
       })) as unknown as ethers.providers.TransactionResponse;
       return tx.wait();
     } catch (e) {
-      throw Error('Error executing route');
+      throw new Error('Error executing route');
     }
   };
 
   return {
-    convertToNetworkChangeableProvider, checkProviderChain, approve, execute,
+    convertToNetworkChangeableProvider, checkProviderChain, getAllowance, approve, execute,
   };
 };
