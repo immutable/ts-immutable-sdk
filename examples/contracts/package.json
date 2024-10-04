@@ -1,5 +1,5 @@
 {
-  "name": "contract-examples",
+  "name": "@examples/contract-examples",
   "version": "1.0.0",
   "description": "Code examples for interacting with the Immutable preset contracts",
   "main": "index.js",
