@@ -5053,15 +5053,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/sdk@npm:alpha":
-  version: 1.55.0-alpha.19
-  resolution: "@imtbl/sdk@npm:1.55.0-alpha.19"
+"@imtbl/sdk@npm:1.55.0-alpha.23":
+  version: 1.55.0-alpha.23
+  resolution: "@imtbl/sdk@npm:1.55.0-alpha.23"
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
     "@0xsquid/sdk": ^2.8.25
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.8
+    "@biom3/react": ^0.27.9
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-provider": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
@@ -5128,7 +5128,7 @@ __metadata:
       optional: true
     prisma:
       optional: true
-  checksum: b52673485a87145c2e8f05c863c76f81628cd6eb5099fd0b85867fea664ba5b67628d60f3eabab40657041f4072e2ec65841dd02b96e6e521811020810782cca
+  checksum: 29af97177427183159efb01c0849217f96aa5041fbca53a6b734cd3551e2a029a7f044b7bd2ec6b115c1a9ba0b71f9190401ec648a6ad007e70adfba4b367dcf
   languageName: node
   linkType: hard
 
@@ -22682,7 +22682,7 @@ __metadata:
   resolution: "fulfill-collection-bid-with-nextjs@workspace:examples/orderbook/fulfill-collection-bid-with-nextjs"
   dependencies:
     "@biom3/react": ^0.27.8
-    "@imtbl/sdk": alpha
+    "@imtbl/sdk": 1.55.0-alpha.23
     "@types/node": ^20
     "@types/react": ^18
     "@types/react-dom": ^18

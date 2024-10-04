@@ -23,7 +23,12 @@ import { orderbookSDK } from "../utils/setupOrderbook";
 import { passportInstance } from "../utils/setupPassport";
 
 export default function FulfillERC721WithPassport() {
-    // setup the accounts state
+  interface TokenIdToFill {
+    rowIndex: number;
+    tokenId: string;
+  }
+
+  // setup the accounts state
   const [accountsState, setAccountsState] = useState<any>([]);
 
   // setup the loading state to enable/disable buttons when loading
@@ -44,6 +49,8 @@ export default function FulfillERC721WithPassport() {
   // setup the buy item contract addres s state
   const [buyItemContractAddress, setBuyItemContractAddressState] =
     useState<string | null>(null);
+
+  const [tokenIdToFill, setTokenIdToFill] = useState<TokenIdToFill | null>(null);
 
   // save the collection bids state
   const [collectionBids, setCollectionBidsState] = useState<orderbook.CollectionBid[]>([]);
@@ -105,6 +112,14 @@ export default function FulfillERC721WithPassport() {
     setBuyItemContractAddressState(buyContractAddrsVal);
   };
 
+  const handleTokenIdChange = (index: number, val: string) => {
+    resetMsgState();
+    setTokenIdToFill({
+      rowIndex: index,
+      tokenId: val,
+    });
+  };
+
   const getCollectionBids = async (
     client: orderbook.Orderbook,
     buyItemContractAddress?: string
@@ -116,8 +131,8 @@ export default function FulfillERC721WithPassport() {
       buyItemContractAddress,
     }
 
-    const { results } = await client.listCollectionBids(params);
-    return results;
+    const { result } = await client.listCollectionBids(params);
+    return result;
   }
 
   // memoize the collection bids fetch
@@ -135,7 +150,15 @@ export default function FulfillERC721WithPassport() {
     setCollectionBidsState(filtered.slice(0, 10));
   }, [accountsState, buyItemContractAddress]);
 
-  const executeTrade = async (collectionBidID: string) => {
+  const executeTrade = async (collectionBidID: string, rowIndex: number) => {
+    const tokenId =
+      tokenIdToFill?.rowIndex === rowIndex ? tokenIdToFill.tokenId : undefined;
+
+    if (!tokenId) {
+      setErrorMessageState('Please enter the token ID to fill');
+      return;
+    }
+
     if (accountsState.length === 0) {
       setErrorMessageState('Please connect your wallet first');
       return;
@@ -146,7 +169,8 @@ export default function FulfillERC721WithPassport() {
     setLoadingText('Fulfilling collection bid');
 
     try {
-
+      await fulfillERC721CollectionBid(collectionBidID, tokenId);
+      setSuccessMessageState('Collection bid filled successfully');
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       setErrorMessageState(message);
@@ -155,16 +179,16 @@ export default function FulfillERC721WithPassport() {
     setLoadingState(false);
   }
 
-  const fulfillERC721CollectionBid = async (collectionBidID: string) => {
+  const fulfillERC721CollectionBid = async (
+    collectionBidID: string,
+    tokenID: string
+  ) => {
     const { actions } = await orderbookSDK.fulfillOrder(
       collectionBidID,
       accountsState[0],
-      [
-        {
-          amount: "1000000", // Insert taker ecosystem/marketplace fee here
-          recipientAddress: "0x0000000000000000000000000000000000000000", // Replace address with your own marketplace address
-        },
-      ],
+      [],
+      '1',
+      tokenID,
     );
 
     for (const action of actions) {
@@ -173,6 +197,22 @@ export default function FulfillERC721WithPassport() {
         await signer.sendTransaction(builtTx);
       }
     }
+  }
+
+  const unitsLeftToFill = (
+    total: string,
+    numerator: string,
+    denominator: string
+  ): number => {
+    const totalAmount = parseInt(total);
+    const numeratorAsInt = parseInt(numerator);
+    const denominatorAsInt = parseInt(denominator);
+
+    if (denominatorAsInt === 0 && numeratorAsInt === 0) {
+      return totalAmount;
+    }
+  
+    return totalAmount - Math.floor((numeratorAsInt / denominatorAsInt) * totalAmount)
   }
 
   return (
@@ -269,7 +309,9 @@ export default function FulfillERC721WithPassport() {
                 <Table.Cell>SNO</Table.Cell>
                 <Table.Cell>Bid ID</Table.Cell>
                 <Table.Cell>Contract Address</Table.Cell>
-                <Table.Cell>Amount</Table.Cell>
+                <Table.Cell>Offer Amount</Table.Cell>
+                <Table.Cell>Fillable Units</Table.Cell>
+                <Table.Cell>Token ID</Table.Cell>
                 <Table.Cell></Table.Cell>
               </Table.Row>
             </Table.Head>
@@ -280,13 +322,28 @@ export default function FulfillERC721WithPassport() {
                     <Table.Cell>{index + 1}</Table.Cell>
                     <Table.Cell>{collectionBid.id}</Table.Cell>
                     <Table.Cell>{collectionBid.buy[0].contractAddress}</Table.Cell>
-                    <Table.Cell>{collectionBid.buy[0].amount}</Table.Cell>
+                    <Table.Cell>{collectionBid.sell[0].amount}</Table.Cell>
+                    <Table.Cell>{unitsLeftToFill(
+                        collectionBid.buy[0].amount,
+                        collectionBid.fillStatus.numerator,
+                        collectionBid.fillStatus.denominator,
+                      )}
+                    </Table.Cell>
+                    <Table.Cell>
+                    <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
+                        <TextInput
+                          onChange={(event: any) =>
+                            handleTokenIdChange(index, event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    </Table.Cell>
                     <Table.Cell>
                       <Button
                         size="medium"
                         variant="primary"
                         disabled={loading}
-                        onClick={() => executeTrade(collectionBid.id)}
+                        onClick={() => executeTrade(collectionBid.id, index)}
                       >
                         Buy
                       </Button>

@@ -22,7 +22,17 @@ import { useMemo, useState } from "react";
 import { orderbookSDK } from "../utils/setupOrderbook";
 import { passportInstance } from "../utils/setupPassport";
 
-export default function FulfillERC721WithPassport() {
+export default function FulfillERC1155WithPassport() {
+  interface UnitsToFill {
+    rowIndex: number;
+    units: string;
+  }
+
+  interface TokenIdToFill {
+    rowIndex: number;
+    tokenId: string;
+  }
+
   // setup the accounts state
   const [accountsState, setAccountsState] = useState<any>([]);
 
@@ -41,17 +51,21 @@ export default function FulfillERC721WithPassport() {
   // create the signer using the Web3Provider
   const signer = web3Provider.getSigner();
 
-  // setup the buy item contract address state
+  // setup the buy item contract addres s state
   const [buyItemContractAddress, setBuyItemContractAddressState] =
     useState<string | null>(null);
 
-  // save the bids state
-  const [bids, setBidsState] = useState<orderbook.Bid[]>([]);
+  // save the collection bids state
+  const [collectionBids, setCollectionBidsState] = useState<orderbook.CollectionBid[]>([]);
 
-  // setup the bid creation success message state
+  const [unitsToFill, setUnitsToFill] = useState<UnitsToFill | null>(null);
+
+  const [tokenIdToFill, setTokenIdToFill] = useState<TokenIdToFill | null>(null);
+
+  // setup the collection bid creation success message state
   const [successMessage, setSuccessMessageState] = useState<string | null>(null);
 
-  // setup the bid creation error message state
+  // setup the collection bid creation error message state
   const [errorMessage, setErrorMessageState] = useState<string | null>(null);
 
   const passportLogin = async () => {
@@ -62,7 +76,7 @@ export default function FulfillERC721WithPassport() {
 
       // calling eth_requestAccounts triggers the Passport login flow
       const accounts = await web3Provider.provider.request({
-        method: "eth_requestAccounts",
+      method: "eth_requestAccounts",
       });
 
       // once logged in Passport is connected to the wallet and ready to transact
@@ -105,90 +119,134 @@ export default function FulfillERC721WithPassport() {
     setBuyItemContractAddressState(buyContractAddrsVal);
   };
 
-  const getBids = async (
+  const handleUnitsToFillChange = (index: number, val: string) => {
+    resetMsgState();
+    setUnitsToFill({
+      rowIndex: index,
+      units: val,
+    });
+  };
+
+  const handleTokenIdToFillChange = (index: number, val: string) => {
+    resetMsgState();
+    setTokenIdToFill({
+      rowIndex: index,
+      tokenId: val,
+    });
+  }
+
+  const getCollectionBids = async (
     client: orderbook.Orderbook,
-    buyItemContractAddress?: string,
-  ): Promise<orderbook.Bid[]> => {
-    let params: orderbook.ListBidsParams = {
+    buyItemContractAddress?: string
+  ): Promise<orderbook.CollectionBid[]> => {
+    const params: orderbook.ListCollectionBidsParams = {
       pageSize: 50,
       sortBy: "created_at",
       status: OrderStatusName.ACTIVE,
       buyItemContractAddress,
-    };
-    const bids = await client.listBids(params);
-    return bids.result;
-  };
+    }
 
-  // memoize the bids fetch
+    const { result } = await client.listCollectionBids(params);
+    return result;
+  }
+
+  // memoize the collection bids fetch
   useMemo(async () => {
-    const bids = await getBids(
+    const collectionBids = await getCollectionBids(
       orderbookSDK,
-      buyItemContractAddress == null ? undefined : buyItemContractAddress,
+      buyItemContractAddress === null ? undefined : buyItemContractAddress,
     );
-    const filtered = bids.filter(
-      (bid) =>
-        bid.accountAddress !== accountsState[0] &&
-        bid.buy[0].type === "ERC721",
+
+    const filtered = collectionBids.filter(collectionBid =>
+      collectionBid.accountAddress !== accountsState[0] &&
+      collectionBid.buy[0].type === 'ERC1155_COLLECTION',
     );
-    setBidsState(filtered.slice(0, 10));
+
+    setCollectionBidsState(filtered.slice(0, 10));
   }, [accountsState, buyItemContractAddress]);
 
-  const executeTrade = async (bidID: string) => {
+  const executeTrade = async (collectionBidID: string, rowIndex: number) => {
+    const units =
+      unitsToFill?.rowIndex === rowIndex ? unitsToFill.units : undefined;
+
+    if (!units) {
+      setErrorMessageState('Please enter the units to fill');
+      return;
+    }
+
+    const tokenId =
+      tokenIdToFill?.rowIndex === rowIndex ? tokenIdToFill.tokenId : undefined;
+
+    if (!tokenId) {
+      setErrorMessageState('Please enter the token ID to fill');
+      return;
+    }
+
     if (accountsState.length === 0) {
-      setErrorMessageState("Please connect your wallet first");
+      setErrorMessageState('Please connect your wallet first');
       return;
     }
 
     resetMsgState();
     setLoadingState(true);
-    setLoadingText("Fulfilling bid");
+    setLoadingText('Fulfilling collection bid');
 
     try {
-      await fulfillERC721Bid(bidID);
-      setSuccessMessageState(`Bid filled successfully`);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
+      await fulfillERC1155CollectionBid(collectionBidID, units.toString(), tokenId);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
       setErrorMessageState(message);
     }
 
     setLoadingState(false);
-  };
+  }
 
-  // #doc fulfill-erc721-bid
-  // Fulfill ERC721 bid
-  const fulfillERC721Bid = async (bidID: string) => {
+  const fulfillERC1155CollectionBid = async (
+    collectionBidID: string,
+    amount: string,
+    tokenId: string,
+  ) => {
     const { actions } = await orderbookSDK.fulfillOrder(
-      bidID,
+      collectionBidID,
       accountsState[0],
       [],
+      amount,
+      tokenId,
     );
 
     for (const action of actions) {
       if (action.type === orderbook.ActionType.TRANSACTION) {
         const builtTx = await action.buildTransaction();
-        await (await signer.sendTransaction(builtTx)).wait(1);
+        await signer.sendTransaction(builtTx);
       }
     }
-  };
-  // #enddoc fulfill-erc721-bid
+  }
+
+  const unitsLeftToFill = (
+    total: string,
+    numerator: string,
+    denominator: string
+  ): number => {
+    const totalAmount = parseInt(total);
+    const numeratorAsInt = parseInt(numerator);
+    const denominatorAsInt = parseInt(denominator);
+
+    if (denominatorAsInt === 0 && numeratorAsInt === 0) {
+      return totalAmount;
+    }
+  
+    return totalAmount - Math.floor((numeratorAsInt / denominatorAsInt) * totalAmount)
+  }
 
   return (
     <Box sx={{ marginBottom: "base.spacing.x5" }}>
-      <LoadingOverlay visible={loading}>
-        <LoadingOverlay.Content>
-          <LoadingOverlay.Content.LoopingText
-            text={[loadingText]}
-            textDuration={1000}
-          />
-        </LoadingOverlay.Content>
-      </LoadingOverlay>
-      <Box sx={{ marginBottom: "base.spacing.x10" }}>
+      <Box sx={{ marginTop: "base.spacing.x10" }}>
         <Heading size="medium" sx={{ marginBottom: "base.spacing.x5" }}>
           Passport
         </Heading>
         <Stack direction="row" justifyContent={"space-between"}>
-          <Box sx={{ marginBottom: "base.spacing.x5" }}>
-            {accountsState.length === 0 ? (
+          {accountsState.length === 0 ? (
+            <Box sx={{ marginBottom: "base.spacing.x5" }}>
               <Button
                 size="medium"
                 variant="primary"
@@ -198,7 +256,10 @@ export default function FulfillERC721WithPassport() {
               >
                 Login
               </Button>
-            ) : (
+            </Box>
+          ) : null}
+          {accountsState.length >= 1 ? (
+            <Box sx={{ marginBottom: "base.spacing.x5" }}>
               <Button
                 size="medium"
                 variant="primary"
@@ -208,21 +269,32 @@ export default function FulfillERC721WithPassport() {
               >
                 Logout
               </Button>
-            )}
-          </Box>
-          <Box sx={{ marginBottom: "base.spacing.x5", marginTop: "base.spacing.x1", textAlign: "right" }}>
-            <div>
-              <Body size="small" weight="bold">Connected Account:</Body>
-            </div>
-            <div>
-              <Body size="xSmall" mono={true}>{accountsState.length >= 1 ? accountsState : "(not connected)"}</Body>
-            </div>
-          </Box>
+            </Box>
+          ) : null}
+          {loading ? (
+            <LoadingOverlay visible>
+              <LoadingOverlay.Content>
+                <LoadingOverlay.Content.LoopingText
+                  text={[loadingText]}
+                  textDuration={1000}
+                />
+              </LoadingOverlay.Content>
+            </LoadingOverlay>
+          ) : (
+            <Box sx={{ marginBottom: "base.spacing.x5", marginTop: "base.spacing.x1", textAlign: "right" }}>
+              <div>
+                <Body size="small" weight="bold">Connected Account:</Body>
+              </div>
+              <div>
+                <Body size="xSmall" mono={true}>{accountsState.length >= 1 ? accountsState : "(not connected)"}</Body>
+              </div>
+            </Box>
+          )}
         </Stack>
       </Box>
       <Box>
         <Heading size="medium" sx={{ marginBottom: "base.spacing.x5" }}>
-          Fulfill Bid - ERC721 Fulfillment
+          Fulfill Collection Bid - ERC1155 Fulfillment
         </Heading>
         {successMessage ? (
           <Box
@@ -258,7 +330,7 @@ export default function FulfillERC721WithPassport() {
           </FormControl>
         </Grid>
       </Box>
-        {bids && bids.length > 0 ? (
+        {collectionBids && collectionBids.length > 0 ? (
           <Box sx={{ maxHeight: "800px", marginBottom: "base.spacing.x5" }}>
             <Table sx={{ marginLeft: "base.spacing.x5", maxWidth: "1300px", maxHeight: "400px", overflowY: "auto", marginBottom: "base.spacing.x5"}}>
             <Table.Head>
@@ -266,24 +338,51 @@ export default function FulfillERC721WithPassport() {
                 <Table.Cell>SNO</Table.Cell>
                 <Table.Cell>Bid ID</Table.Cell>
                 <Table.Cell>Contract Address</Table.Cell>
+                <Table.Cell>Offer Amount</Table.Cell>
+                <Table.Cell>Fillable Units</Table.Cell>
+                <Table.Cell>Units to Fill</Table.Cell>
                 <Table.Cell>Token ID</Table.Cell>
                 <Table.Cell></Table.Cell>
               </Table.Row>
             </Table.Head>
             <Table.Body>
-              {bids.map((bid: orderbook.Bid, index: number) => {
+              {collectionBids.map((collectionBid: orderbook.CollectionBid, index: number) => {
                 return (
                   <Table.Row key={index}>
                     <Table.Cell>{index + 1}</Table.Cell>
-                    <Table.Cell>{bid.id}</Table.Cell>
-                    <Table.Cell>{bid.buy[0].contractAddress}</Table.Cell>
-                    <Table.Cell>{bid.buy[0].tokenId}</Table.Cell>
+                    <Table.Cell>{collectionBid.id}</Table.Cell>
+                    <Table.Cell>{collectionBid.buy[0].contractAddress}</Table.Cell>
+                    <Table.Cell>{collectionBid.sell[0].amount}</Table.Cell>
+                    <Table.Cell>{unitsLeftToFill(
+                        collectionBid.buy[0].amount,
+                        collectionBid.fillStatus.numerator,
+                        collectionBid.fillStatus.denominator,
+                      )}
+                    </Table.Cell>
+                    <Table.Cell>
+                      <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
+                        <TextInput
+                          onChange={(event: any) =>
+                            handleUnitsToFillChange(index, event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
+                        <TextInput
+                          onChange={(event: any) =>
+                            handleTokenIdToFillChange(index, event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    </Table.Cell>
                     <Table.Cell>
                       <Button
                         size="medium"
                         variant="primary"
                         disabled={loading}
-                        onClick={() => executeTrade(bid.id)}
+                        onClick={() => executeTrade(collectionBid.id, index)}
                       >
                         Buy
                       </Button>
@@ -297,5 +396,5 @@ export default function FulfillERC721WithPassport() {
       ) : null}
       <Link rc={<NextLink href="/" />}>Return to Examples</Link>
     </Box>
-  );
+  )
 }
