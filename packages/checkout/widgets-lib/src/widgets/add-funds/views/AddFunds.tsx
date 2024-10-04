@@ -366,7 +366,6 @@ export function AddFunds({
           sx={{ flex: 1, px: 'base.spacing.x2', w: '100%', pt: 'base.spacing.x1' }}
           justifyContent="center"
           alignItems="center"
-          gap="base.spacing.x3"
         >
           <OverflowDrawerMenu
             drawerSize="full"
