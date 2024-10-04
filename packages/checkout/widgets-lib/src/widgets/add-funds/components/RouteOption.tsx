@@ -54,23 +54,14 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
   const menuItemProps = {
     disabled,
     emphasized: true,
+    rc,
+    size: size || 'medium',
     onClick: disabled ? undefined : handleClick,
+    selected: isFastest,
   };
 
   return (
-    <MenuItem
-      rc={rc}
-      size={size || 'medium'}
-      sx={{
-        userSelect: 'none',
-        ...(disabled && {
-          filter: 'opacity(0.5)',
-          cursor: 'not-allowed !important',
-        }),
-      }}
-      selected={isFastest}
-      {...menuItemProps}
-    >
+    <MenuItem {...menuItemProps}>
       <MenuItem.Label weight="bold">{fromToken.name}</MenuItem.Label>
 
       {chain && (

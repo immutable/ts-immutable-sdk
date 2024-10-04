@@ -33,19 +33,12 @@ export function FiatOption<RC extends ReactElement | undefined = undefined>({
     disabled,
     emphasized: true,
     onClick: disabled ? undefined : handleClick,
+    size: size || 'medium',
+    rc,
   };
 
   return (
     <MenuItem
-      rc={rc}
-      size={size || 'medium'}
-      sx={{
-        userSelect: 'none',
-        ...(disabled && {
-          filter: 'opacity(0.5)',
-          cursor: 'not-allowed !important',
-        }),
-      }}
       {...menuItemProps}
     >
       <MenuItem.FramedIcon icon={icon[type]} />
