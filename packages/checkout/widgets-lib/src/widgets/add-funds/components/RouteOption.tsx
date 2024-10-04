@@ -62,7 +62,6 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
       rc={rc}
       size={size || 'medium'}
       sx={{
-        marginBottom: 'base.spacing.x1',
         userSelect: 'none',
         ...(disabled && {
           filter: 'opacity(0.5)',

@@ -63,7 +63,7 @@ export function Options({
     );
   }
 
-  const routeOptions = routes.map((route: RouteData) => {
+  const routeOptions = routes.map((route: RouteData, index) => {
     const { fromToken } = route.amountData;
 
     const chain = chains?.find((c) => c.id === fromToken.chainId);
@@ -82,6 +82,8 @@ export function Options({
         onClick={onRouteClick}
         size={size}
         rc={<motion.div variants={listItemVariants} />}
+        // @TODO: need to actually implement this feature
+        isFastest={index === 0}
       />
     );
   });
