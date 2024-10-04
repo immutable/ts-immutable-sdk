@@ -12,7 +12,7 @@ export type FulfillmentDataRequest = {
   taker_address: string;
   fees: Array<Fee>;
   /**
-   * Token ID for the ERC721 or ERC1155 token
+   * Token ID for the ERC721 or ERC1155 token when fulfilling a collection order
    */
   token_id?: string;
 };

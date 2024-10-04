@@ -4,6 +4,7 @@ import {
   CollectionBidResult,
   Fee,
   ListBidsResult,
+  ListCollectionBidsResult,
   ListingResult,
   ListListingsResult,
   ListTradeResult,
@@ -98,7 +99,7 @@ export class ImmutableApiClient {
 
   async listCollectionBids(
     listOrderParams: ListCollectionBidsParams,
-  ): Promise<ListBidsResult> {
+  ): Promise<ListCollectionBidsResult> {
     return this.orderbookService.listCollectionBids({
       chainName: this.chainName,
       ...listOrderParams,
