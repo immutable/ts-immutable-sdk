@@ -312,7 +312,7 @@ export default function FulfillERC721WithPassport() {
                     </Table.Cell>
                     <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "0" }}>
                       <FormControl>
-                      <TextInput sx={{ minWidth: "50px", height: "40px" }}
+                      <TextInput sx={{ minWidth: "100px", height: "40px" }}
                           onChange={(event: any) =>
                             handleTokenIdChange(index, event.target.value)
                           }
