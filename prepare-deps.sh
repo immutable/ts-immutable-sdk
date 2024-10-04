@@ -46,6 +46,11 @@ prepare_deps() {
     if [ -z "$dep" ]; then
       continue
     fi
+
+    # Skip if the dependency is not in the workspace
+    if ! pnpm recursive list --depth -1 | grep -q $dep; then
+      continue
+    fi
     
     # Get the packed dependency filename. For example, @imtbl/sdk -> imtbl-sdk-0.0.0.tgz
     packedDepFilename=$(echo "$dep" | sed "s/@imtbl\///" | sed "s/\//-/" | sed "s/^/imtbl-/" | sed "s/$/-0.0.0.tgz/")
