@@ -57,18 +57,22 @@ export const createListing = async (
   client: orderbook.Orderbook,
   preparedListing: orderbook.PrepareListingResponse,
   orderSignature: string,
+  makerEcosystemFee?: {
+    recipientAddress: string;
+    amount: string;
+  },
 ): Promise<string> => {
   const order = await client.createListing({
     orderComponents: preparedListing.orderComponents,
     orderHash: preparedListing.orderHash,
     orderSignature,
     // Optional maker marketplace fee
-    makerFees: [
+    makerFees: makerEcosystemFee ? [
       {
-        amount: "100",
-        recipientAddress: "0x0000000000000000000000000000000000000000", // Replace address with your own marketplace address
+        recipientAddress: makerEcosystemFee.recipientAddress, // Replace address with your own marketplace address
+        amount: makerEcosystemFee.amount,
       },
-    ],
+    ] : [],
   });
   return order.result.id;
 };

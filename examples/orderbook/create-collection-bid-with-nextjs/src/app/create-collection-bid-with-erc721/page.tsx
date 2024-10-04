@@ -61,6 +61,12 @@ export default function CreateERC721CollectionBidWithPassport() {
   // setup the buy item token amount state
   const [buyItemTokenAmount, setBuyItemTokenAmountState] = useState<string>("");
 
+  // setup the maker ecosystem fee recipient state
+  const [makerEcosystemFeeRecipient, setMakerEcosystemFeeRecipientState] = useState<string>("");
+
+  // setup the maker ecosystem fee amount state
+  const [makerEcosystemFeeAmount, setMakerEcosystemFeeAmountState] = useState<string>("");
+
   // setup the collection bid creation success message state
   const [successMessage, setSuccessMessageState] = useState<string | null>(null);
 
@@ -115,6 +121,14 @@ export default function CreateERC721CollectionBidWithPassport() {
 
   const handleBuyItemTokenAmountChange = (event: any) => {
     setBuyItemTokenAmountState(event.target.value);
+  };
+
+  const handleMakerEcosystemFeeRecipientChange = (event: any) => {
+    setMakerEcosystemFeeRecipientState(event.target.value);
+  };
+
+  const handleMakerEcosystemFeeAmountChange = (event: any) => {
+    setMakerEcosystemFeeAmountState(event.target.value);
   };
 
   const handleSuccessfulCollectionBidCreation = (collectionBidID: string) => {
@@ -172,6 +186,10 @@ export default function CreateERC721CollectionBidWithPassport() {
         orderbookSDK,
         preparedCollectionBid,
         orderSignature,
+        makerEcosystemFeeRecipient == "" ? {
+          recipientAddress: makerEcosystemFeeRecipient,
+          amount: makerEcosystemFeeAmount,
+        } : undefined
       );
 
       handleSuccessfulCollectionBidCreation(collectionBidID);
@@ -273,6 +291,17 @@ export default function CreateERC721CollectionBidWithPassport() {
         <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
           <FormControl.Label>Currency Amount</FormControl.Label>
           <TextInput onChange={handleSellItemAmountChange} />
+        </FormControl>
+        <Heading size="xSmall" sx={{ marginBottom: "base.spacing.x5" }}>
+          Maker Ecosystem Fee
+        </Heading>
+        <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
+          <FormControl.Label>Recipient Address</FormControl.Label>
+          <TextInput onChange={handleMakerEcosystemFeeRecipientChange} />
+        </FormControl>
+        <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
+          <FormControl.Label>Fee Amount</FormControl.Label>
+          <TextInput onChange={handleMakerEcosystemFeeAmountChange} />
         </FormControl>
         <Box
           sx={{
