@@ -131,5 +131,8 @@ jobs:
       - name: Prepare tests
         run: pnpm prepare:tests
 
+      - name: Update modules
+        run: pnpm install --frozen-lockfile=false
+
       - name: Run functional tests
         run: pnpm --filter "@tests/*" --parallel func-test:ci
