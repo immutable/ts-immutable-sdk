@@ -5,13 +5,12 @@ import {
   Box,
   Button,
   FormControl,
-  Grid,
   Heading,
   Link,
   LoadingOverlay,
   Stack,
   Table,
-  TextInput,
+  TextInput
 } from "@biom3/react";
 import { orderbook } from "@imtbl/sdk";
 import { OrderStatusName } from "@imtbl/sdk/orderbook";
@@ -19,6 +18,7 @@ import { ProviderEvent } from "@imtbl/sdk/passport";
 import { ethers } from "ethers";
 import NextLink from "next/link";
 import { useMemo, useState } from "react";
+import { unitsRemaining, unitsTotal } from "../utils/collectionBid";
 import { orderbookSDK } from "../utils/setupOrderbook";
 import { passportInstance } from "../utils/setupPassport";
 
@@ -199,22 +199,6 @@ export default function FulfillERC721WithPassport() {
     }
   }
 
-  const unitsLeftToFill = (
-    total: string,
-    numerator: string,
-    denominator: string
-  ): number => {
-    const totalAmount = parseInt(total);
-    const numeratorAsInt = parseInt(numerator);
-    const denominatorAsInt = parseInt(denominator);
-
-    if (denominatorAsInt === 0 && numeratorAsInt === 0) {
-      return totalAmount;
-    }
-  
-    return totalAmount - Math.floor((numeratorAsInt / denominatorAsInt) * totalAmount)
-  }
-
   return (
     <Box sx={{ marginBottom: "base.spacing.x5" }}>
       <LoadingOverlay visible={loading}>
@@ -294,53 +278,50 @@ export default function FulfillERC721WithPassport() {
         ) : null}
       </Box>
       <Box>
-        <Grid>
-          <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
+        <Stack direction="row">
+          <FormControl sx={{ marginBottom: "base.spacing.x5", width: "415px" }}>
             <FormControl.Label>NFT Contract Address</FormControl.Label>
             <TextInput onChange={handleBuyItemContractAddressChange} />
           </FormControl>
-        </Grid>
+        </Stack>
       </Box>
         {collectionBids && collectionBids.length > 0 ? (
           <Box sx={{ maxHeight: "800px", marginBottom: "base.spacing.x5" }}>
-            <Table sx={{ marginLeft: "base.spacing.x5", maxWidth: "1300px", maxHeight: "400px", overflowY: "auto", marginBottom: "base.spacing.x5"}}>
+            <Table sx={{ maxWidth: "1500px", width: "100%", maxHeight: "400px", overflowY: "auto", marginBottom: "base.spacing.x5"}}>
             <Table.Head>
               <Table.Row>
-                <Table.Cell>SNO</Table.Cell>
-                <Table.Cell>Bid ID</Table.Cell>
-                <Table.Cell>Contract Address</Table.Cell>
-                <Table.Cell>Offer Amount</Table.Cell>
-                <Table.Cell>Fillable Units</Table.Cell>
-                <Table.Cell>Token ID</Table.Cell>
-                <Table.Cell></Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>SNO</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Bid ID</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Contract Address</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Offer Amount</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Remaining Units</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Token ID</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}></Table.Cell>
               </Table.Row>
             </Table.Head>
             <Table.Body>
               {collectionBids.map((collectionBid: orderbook.CollectionBid, index: number) => {
                 return (
                   <Table.Row key={index}>
-                    <Table.Cell>{index + 1}</Table.Cell>
-                    <Table.Cell>{collectionBid.id}</Table.Cell>
-                    <Table.Cell>{collectionBid.buy[0].contractAddress}</Table.Cell>
-                    <Table.Cell>{collectionBid.sell[0].amount}</Table.Cell>
-                    <Table.Cell>{unitsLeftToFill(
-                        collectionBid.buy[0].amount,
-                        collectionBid.fillStatus.numerator,
-                        collectionBid.fillStatus.denominator,
-                      )}
+                    <Table.Cell sx={{ paddingLeft: "base.spacing.x5", paddingRight: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{index + 1}</Body></Table.Cell>
+                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{collectionBid.id}</Body></Table.Cell>
+                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{collectionBid.buy[0].contractAddress}</Body></Table.Cell>
+                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{collectionBid.sell[0].amount}</Body></Table.Cell>
+                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}>
+                      <Body mono={true} size="small">{`${unitsRemaining(collectionBid)}/${unitsTotal(collectionBid)}`}</Body>
                     </Table.Cell>
-                    <Table.Cell>
-                    <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
-                        <TextInput
+                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "0" }}>
+                      <FormControl>
+                      <TextInput sx={{ minWidth: "50px", height: "40px" }}
                           onChange={(event: any) =>
                             handleTokenIdChange(index, event.target.value)
                           }
                         />
                       </FormControl>
                     </Table.Cell>
-                    <Table.Cell>
+                    <Table.Cell sx={{ paddingLeft: "base.spacing.x2", paddingRight: "base.spacing.x5", paddingY: "base.spacing.x2" }}>
                       <Button
-                        size="medium"
+                        size="small"
                         variant="primary"
                         disabled={loading}
                         onClick={() => executeTrade(collectionBid.id, index)}
