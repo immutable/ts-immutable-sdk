@@ -65,6 +65,9 @@ jobs:
       - name: Build examples
         run: yarn build:examples
 
+      - name: Build local widgets bundle
+        run: yarn workspace @imtbl/checkout-widgets build:examplewidgets
+
       - name: Lint examples
         run: yarn lint:examples
 
@@ -123,7 +126,7 @@ jobs:
         uses: ./.github/actions/setup-playwright
 
       - name: Test Widget example
-        run: yarn workspace @examples/sdk-load-widgets-with-nextjs test:localwidgets
+        run: yarn workspace @examples/sdk-load-widgets-with-nextjs test
 
   func-tests:
     name: Functional tests
