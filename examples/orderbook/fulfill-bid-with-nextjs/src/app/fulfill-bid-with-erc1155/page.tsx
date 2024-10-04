@@ -50,6 +50,12 @@ export default function FulfillERC1155WithPassport() {
   const [buyItemContractAddress, setBuyItemContractAddressState] =
     useState<string | null>(null);
 
+  // setup the taker ecosystem fee recipient state
+  const [takerEcosystemFeeRecipient, setTakerEcosystemFeeRecipientState] = useState<string>("");
+
+  // setup the taker ecosystem fee amount state
+  const [takerEcosystemFeeAmount, setTakerEcosystemFeeAmountState] = useState<string>("");
+
   // save the bids state
   const [bids, setBidsState] = useState<orderbook.Bid[]>([]);
 
@@ -120,6 +126,14 @@ export default function FulfillERC1155WithPassport() {
     });
   };
 
+  const handleTakerEcosystemFeeRecipientChange = (event: any) => {
+    setTakerEcosystemFeeRecipientState(event.target.value);
+  };
+
+  const handleTakerEcosystemFeeAmountChange = (event: any) => {
+    setTakerEcosystemFeeAmountState(event.target.value);
+  };
+
   const getBids = async (
     client: orderbook.Orderbook,
     buyItemContractAddress?: string,
@@ -181,12 +195,10 @@ export default function FulfillERC1155WithPassport() {
     const { actions } = await orderbookSDK.fulfillOrder(
       bidID,
       accountsState[0],
-      [
-        {
-          recipientAddress: "0x0000000000000000000000000000000000000000", // Replace address with your own marketplace address
-          amount: "100", // Insert taker ecosystem/marketplace fee here
-        },
-      ],
+      takerEcosystemFeeRecipient == "" ? [{
+        recipientAddress: takerEcosystemFeeRecipient, // Replace address with your own marketplace address
+        amount: takerEcosystemFeeAmount, // Insert taker ecosystem/marketplace fee here
+      }] : [],
       unitsToFill,
     );
 
@@ -282,6 +294,21 @@ export default function FulfillERC1155WithPassport() {
           <FormControl sx={{ marginBottom: "base.spacing.x5", width: "415px" }}>
             <FormControl.Label>NFT Contract Address</FormControl.Label>
             <TextInput onChange={handleBuyItemContractAddressChange} />
+          </FormControl>
+        </Stack>
+      </Box>
+      <Box>
+        <Heading size="xSmall" sx={{ marginBottom: "base.spacing.x5" }}>
+          Taker Ecosystem Fee
+        </Heading>
+        <Stack direction="row">
+          <FormControl sx={{ marginBottom: "base.spacing.x5", width: "415px" }}>
+            <FormControl.Label>Recipient Address</FormControl.Label>
+            <TextInput onChange={handleTakerEcosystemFeeRecipientChange} />
+          </FormControl>
+          <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
+            <FormControl.Label>Fee Amount</FormControl.Label>
+            <TextInput onChange={handleTakerEcosystemFeeAmountChange} />
           </FormControl>
         </Stack>
       </Box>

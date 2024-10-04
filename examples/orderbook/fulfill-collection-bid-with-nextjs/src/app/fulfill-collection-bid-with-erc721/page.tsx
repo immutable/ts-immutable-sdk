@@ -52,6 +52,12 @@ export default function FulfillERC721WithPassport() {
 
   const [tokenIdToFill, setTokenIdToFill] = useState<TokenIdToFill | null>(null);
 
+  // setup the taker ecosystem fee recipient state
+  const [takerEcosystemFeeRecipient, setTakerEcosystemFeeRecipientState] = useState<string>("");
+
+  // setup the taker ecosystem fee amount state
+  const [takerEcosystemFeeAmount, setTakerEcosystemFeeAmountState] = useState<string>("");
+
   // save the collection bids state
   const [collectionBids, setCollectionBidsState] = useState<orderbook.CollectionBid[]>([]);
 
@@ -120,6 +126,14 @@ export default function FulfillERC721WithPassport() {
     });
   };
 
+  const handleTakerEcosystemFeeRecipientChange = (event: any) => {
+    setTakerEcosystemFeeRecipientState(event.target.value);
+  };
+
+  const handleTakerEcosystemFeeAmountChange = (event: any) => {
+    setTakerEcosystemFeeAmountState(event.target.value);
+  };
+
   const getCollectionBids = async (
     client: orderbook.Orderbook,
     buyItemContractAddress?: string
@@ -186,7 +200,10 @@ export default function FulfillERC721WithPassport() {
     const { actions } = await orderbookSDK.fulfillOrder(
       collectionBidID,
       accountsState[0],
-      [],
+      takerEcosystemFeeRecipient == "" ? [{
+        recipientAddress: takerEcosystemFeeRecipient, // Replace address with your own marketplace address
+        amount: takerEcosystemFeeAmount, // Insert taker ecosystem/marketplace fee here
+      }] : [],
       '1',
       tokenID,
     );
@@ -285,54 +302,69 @@ export default function FulfillERC721WithPassport() {
           </FormControl>
         </Stack>
       </Box>
-        {collectionBids && collectionBids.length > 0 ? (
-          <Box sx={{ maxHeight: "800px", marginBottom: "base.spacing.x5" }}>
-            <Table sx={{ maxWidth: "1500px", width: "100%", maxHeight: "400px", overflowY: "auto", marginBottom: "base.spacing.x5"}}>
-            <Table.Head>
-              <Table.Row>
-                <Table.Cell sx={{ padding: "base.spacing.x2" }}>SNO</Table.Cell>
-                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Bid ID</Table.Cell>
-                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Contract Address</Table.Cell>
-                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Offer Amount</Table.Cell>
-                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Remaining Units</Table.Cell>
-                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Token ID</Table.Cell>
-                <Table.Cell sx={{ padding: "base.spacing.x2" }}></Table.Cell>
-              </Table.Row>
-            </Table.Head>
-            <Table.Body>
-              {collectionBids.map((collectionBid: orderbook.CollectionBid, index: number) => {
-                return (
-                  <Table.Row key={index}>
-                    <Table.Cell sx={{ paddingLeft: "base.spacing.x5", paddingRight: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{index + 1}</Body></Table.Cell>
-                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{collectionBid.id}</Body></Table.Cell>
-                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{collectionBid.buy[0].contractAddress}</Body></Table.Cell>
-                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{collectionBid.sell[0].amount}</Body></Table.Cell>
-                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}>
-                      <Body mono={true} size="small">{`${unitsRemaining(collectionBid)}/${unitsTotal(collectionBid)}`}</Body>
-                    </Table.Cell>
-                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "0" }}>
-                      <FormControl>
-                      <TextInput sx={{ minWidth: "100px", height: "40px" }}
-                          onChange={(event: any) =>
-                            handleTokenIdChange(index, event.target.value)
-                          }
-                        />
-                      </FormControl>
-                    </Table.Cell>
-                    <Table.Cell sx={{ paddingLeft: "base.spacing.x2", paddingRight: "base.spacing.x5", paddingY: "base.spacing.x2" }}>
-                      <Button
-                        size="small"
-                        variant="primary"
-                        disabled={loading}
-                        onClick={() => executeTrade(collectionBid.id, index)}
-                      >
-                        Buy
-                      </Button>
-                    </Table.Cell>
-                  </Table.Row>
-                );
-              })}
-            </Table.Body>
+      <Box>
+        <Heading size="xSmall" sx={{ marginBottom: "base.spacing.x5" }}>
+          Taker Ecosystem Fee
+        </Heading>
+        <Stack direction="row">
+          <FormControl sx={{ marginBottom: "base.spacing.x5", width: "415px" }}>
+            <FormControl.Label>Recipient Address</FormControl.Label>
+            <TextInput onChange={handleTakerEcosystemFeeRecipientChange} />
+          </FormControl>
+          <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
+            <FormControl.Label>Fee Amount</FormControl.Label>
+            <TextInput onChange={handleTakerEcosystemFeeAmountChange} />
+          </FormControl>
+        </Stack>
+      </Box>
+      {collectionBids && collectionBids.length > 0 ? (
+        <Box sx={{ maxHeight: "800px", marginBottom: "base.spacing.x5" }}>
+          <Table sx={{ maxWidth: "1500px", width: "100%", maxHeight: "400px", overflowY: "auto", marginBottom: "base.spacing.x5"}}>
+          <Table.Head>
+            <Table.Row>
+              <Table.Cell sx={{ padding: "base.spacing.x2" }}>SNO</Table.Cell>
+              <Table.Cell sx={{ padding: "base.spacing.x2" }}>Bid ID</Table.Cell>
+              <Table.Cell sx={{ padding: "base.spacing.x2" }}>Contract Address</Table.Cell>
+              <Table.Cell sx={{ padding: "base.spacing.x2" }}>Offer Amount</Table.Cell>
+              <Table.Cell sx={{ padding: "base.spacing.x2" }}>Remaining Units</Table.Cell>
+              <Table.Cell sx={{ padding: "base.spacing.x2" }}>Token ID</Table.Cell>
+              <Table.Cell sx={{ padding: "base.spacing.x2" }}></Table.Cell>
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>
+            {collectionBids.map((collectionBid: orderbook.CollectionBid, index: number) => {
+              return (
+                <Table.Row key={index}>
+                  <Table.Cell sx={{ paddingLeft: "base.spacing.x5", paddingRight: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{index + 1}</Body></Table.Cell>
+                  <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{collectionBid.id}</Body></Table.Cell>
+                  <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{collectionBid.buy[0].contractAddress}</Body></Table.Cell>
+                  <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{collectionBid.sell[0].amount}</Body></Table.Cell>
+                  <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}>
+                    <Body mono={true} size="small">{`${unitsRemaining(collectionBid)}/${unitsTotal(collectionBid)}`}</Body>
+                  </Table.Cell>
+                  <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "0" }}>
+                    <FormControl>
+                    <TextInput sx={{ minWidth: "100px", height: "40px" }}
+                        onChange={(event: any) =>
+                          handleTokenIdChange(index, event.target.value)
+                        }
+                      />
+                    </FormControl>
+                  </Table.Cell>
+                  <Table.Cell sx={{ paddingLeft: "base.spacing.x2", paddingRight: "base.spacing.x5", paddingY: "base.spacing.x2" }}>
+                    <Button
+                      size="small"
+                      variant="primary"
+                      disabled={loading}
+                      onClick={() => executeTrade(collectionBid.id, index)}
+                    >
+                      Buy
+                    </Button>
+                  </Table.Cell>
+                </Table.Row>
+              );
+            })}
+          </Table.Body>
           </Table>
         </Box>
       ) : null}
