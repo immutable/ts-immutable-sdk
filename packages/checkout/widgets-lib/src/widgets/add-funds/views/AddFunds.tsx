@@ -436,7 +436,10 @@ export function AddFunds({
             <MenuItem
               size="small"
               emphasized
-              onClick={() => setShowPayWithDrawer(true)}
+              // onClick={() => {
+              //   setShowPayWithDrawer(true);
+              //   console.log('@@@@@@ OPENING THE PAY WITH DRAW')
+              // }}
             >
               <MenuItem.FramedIcon
                 icon="Wallet"
@@ -452,7 +455,12 @@ export function AddFunds({
                   chains={chains}
                   balances={balances}
                   routeData={selectedRouteData}
-                  onClick={() => setShowOptionsDrawer(true)}
+                  onClick={(event) => {
+                    console.log('@@@@@@@@@@@');
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setShowOptionsDrawer(true)
+                  }}
                 />
               </MenuItem.BottomSlot>
             </MenuItem>
@@ -498,11 +506,11 @@ export function AddFunds({
             onClose={() => setShowPayWithDrawer(false)}
           />
           <OptionsDrawer
-            routes={routes}
-            showOnrampOption={shouldShowOnRampOption}
-            showSwapOption={showSwapOption}
-            showBridgeOption={showBridgeOption}
             visible={showOptionsDrawer}
+            routes={routes}
+            showSwapOption={showSwapOption}
+            showOnrampOption={shouldShowOnRampOption}
+            showBridgeOption={showBridgeOption}
             onClose={() => setShowOptionsDrawer(false)}
             onCardClick={handleCardClick}
             onRouteClick={handleRouteClick}

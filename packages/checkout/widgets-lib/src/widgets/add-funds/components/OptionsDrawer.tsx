@@ -46,25 +46,16 @@ export function OptionsDrawer({
           <motion.div variants={listVariants} initial="hidden" animate="show" />
         }
       >
-        <Box
-          sx={{
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            px: 'base.spacing.x4',
-          }}
-        >
-          <Options
-            size="medium"
-            routes={routes}
-            chains={chains}
-            balances={balances}
-            onCardClick={onCardClick}
-            onRouteClick={onRouteClick}
-            showOnrampOption={showOnrampOption}
-          />
-        </Box>
+        
+        <Options
+          size="medium"
+          routes={routes}
+          chains={chains}
+          balances={balances}
+          onCardClick={onCardClick}
+          onRouteClick={onRouteClick}
+          showOnrampOption={showOnrampOption}
+        />
       </Drawer.Content>
     </Drawer>
   );

@@ -1,4 +1,4 @@
-import { Box, LoadingOverlay, MenuItemSize } from '@biom3/react';
+import { Box, LoadingOverlay, MenuItemSize, Stack } from '@biom3/react';
 import { motion } from 'framer-motion';
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import {
@@ -83,21 +83,15 @@ export function Options({
     : null;
 
   return (
-    <Box
+    <Stack
       testId="options-list"
-      sx={{
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-      }}
+      justifyContent='center'
       rc={
         <motion.div variants={listVariants} initial="hidden" animate="show" />
       }
     >
       {routeOptions}
       {fiatOptions}
-    </Box>
+    </Stack>
   );
 }

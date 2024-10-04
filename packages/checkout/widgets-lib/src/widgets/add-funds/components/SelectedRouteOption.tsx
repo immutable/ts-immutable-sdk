@@ -12,7 +12,7 @@ export interface RouteOptionProps<
 > {
   size?: MenuItemSize;
   rc?: RC;
-  onClick: () => void;
+  onClick: (event: any) => void;
   routeData?: RouteData;
   chains: Chain[] | null;
   balances: TokenBalance[] | null;
