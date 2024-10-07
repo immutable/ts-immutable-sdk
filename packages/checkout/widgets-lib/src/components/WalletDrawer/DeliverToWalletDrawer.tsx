@@ -39,8 +39,6 @@ export function DeliverToWalletDrawer({
     // setChosenProviderDetail(providerDetail);
   };
 
-  if (!visible) return null;
-
   return (
     <WalletDrawer
       testId="select-to-wallet-drawer"
