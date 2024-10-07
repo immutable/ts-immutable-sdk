@@ -322,6 +322,7 @@ export interface FulfillmentOrder {
   orderId: string;
   takerFees: FeeValue[];
   amountToFill?: string;
+  tokenId?: string;
 }
 
 /**
@@ -364,6 +365,7 @@ export interface FulfillOrderResponse {
 
 export interface UnfulfillableOrder {
   orderId: string;
+  tokenId?: string;
   reason: string;
 }
 
