@@ -36,8 +36,6 @@ import {
 import { getL2ChainId } from '../../../lib';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { OptionsDrawer } from '../components/OptionsDrawer';
-import { PayWithDrawer } from '../components/PayWithDrawer';
-import { DeliverToDrawer } from '../components/DeliverToDrawer';
 import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
 import { TokenImage } from '../../../components/TokenImage/TokenImage';
 import { getDefaultTokenImage } from '../../../lib/utils';
@@ -47,9 +45,11 @@ import { SQUID_NATIVE_TOKEN } from '../utils/config';
 import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
 import type { RouteData } from '../types';
 import { SelectedRouteOption } from '../components/SelectedRouteOption';
+import { DeliverToWalletDrawer } from '../../../components/WalletDrawer/DeliverToWalletDrawer';
+import { PayWithWalletDrawer } from '../../../components/WalletDrawer/PayWithWalletDrawer';
 
 interface AddFundsProps {
-  checkout?: Checkout;
+  checkout: Checkout | null;
   showBackButton?: boolean;
   showOnrampOption?: boolean;
   showSwapOption?: boolean;
@@ -496,7 +496,8 @@ export function AddFunds({
           >
             Review
           </Button>
-          <PayWithDrawer
+          <PayWithWalletDrawer
+            checkout={checkout}
             visible={showPayWithDrawer}
             onClose={() => setShowPayWithDrawer(false)}
           />
@@ -510,7 +511,8 @@ export function AddFunds({
             onCardClick={handleCardClick}
             onRouteClick={handleRouteClick}
           />
-          <DeliverToDrawer
+          <DeliverToWalletDrawer
+            checkout={checkout}
             visible={showDeliverToDrawer}
             onClose={() => setShowDeliverToDrawer(false)}
           />

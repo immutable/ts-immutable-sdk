@@ -1,4 +1,4 @@
-import { MenuItem } from '@biom3/react';
+import { MenuItem, MenuItemProps } from '@biom3/react';
 import { cloneElement, ReactElement, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
@@ -11,6 +11,7 @@ export interface WalletItemProps<RC extends ReactElement | undefined = undefined
   providerInfo: EIP6963ProviderInfo;
   onWalletItemClick: () => void;
   rc?: RC;
+  size?: MenuItemProps['size'];
 }
 
 export function WalletItem<
@@ -22,6 +23,7 @@ export function WalletItem<
   recommended = false,
   providerInfo,
   onWalletItemClick,
+  size = 'medium',
 }: WalletItemProps<RC>) {
   const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
@@ -41,7 +43,7 @@ export function WalletItem<
         },
       })}
       testId={`${testId}-wallet-list-${providerInfo.rdns}`}
-      size="medium"
+      size={size}
       emphasized
       sx={{ position: 'relative' }}
     >
