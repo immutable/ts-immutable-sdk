@@ -470,6 +470,7 @@ export function AddFunds({
                   top: '0',
                   pos: 'absolute',
                   translate: ({ base }) => `0 -${base.spacing.x3}`,
+                  bg: 'base.color.neutral.800'
                 }}
               />
             </Stack>
