@@ -96,6 +96,7 @@ export function AddFunds({
   const [currentToTokenAddress, setCurrentToTokenAddress] = useState<
   TokenInfo | undefined
   >();
+  const [amountInUSD, setAmountInUSD] = useState<string>('');
 
   const debouncedUpdateAmount = debounce((value: string) => {
     setDebouncedToAmount(value);
@@ -229,6 +230,31 @@ export function AddFunds({
   //   // eslint-disable-next-line no-console
   //   console.log('handle review click');
   // }, []);
+
+  useEffect(() => {
+    setAmountInUSD('');
+
+    if (!inputValue || !currentToTokenAddress?.address || !tokens) {
+      return;
+    }
+    const toSquidTokenAddress = currentToTokenAddress?.address === 'native'
+      ? SQUID_NATIVE_TOKEN
+      : currentToTokenAddress?.address;
+
+    const toToken = tokens?.find(
+      (value) => value.address.toLowerCase() === toSquidTokenAddress.toLowerCase()
+        && value.chainId === ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+    );
+
+    if (!toToken) {
+      return;
+    }
+
+    const tokenBalance = Number(inputValue) * toToken.usdPrice;
+    if (!Number.isNaN(tokenBalance) && tokenBalance > 0) {
+      setAmountInUSD(`USD $${tokenBalance.toFixed(2)}`);
+    }
+  }, [inputValue, currentToTokenAddress, tokens]);
 
   const onCardClick = () => {
     const data = {
@@ -400,7 +426,7 @@ export function AddFunds({
                 placeholder="0"
                 maxTextSize="xLarge"
               />
-              <HeroFormControl.Caption>USD $0.00</HeroFormControl.Caption>
+              <HeroFormControl.Caption>{amountInUSD}</HeroFormControl.Caption>
             </HeroFormControl>
           )}
         </Stack>
