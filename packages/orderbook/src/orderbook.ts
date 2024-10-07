@@ -37,9 +37,9 @@ import {
   FulfillOrderResponse,
   ListBidsParams,
   ListBidsResult,
-  ListingResult,
   ListCollectionBidsParams,
   ListCollectionBidsResult,
+  ListingResult,
   ListListingsParams,
   ListListingsResult,
   ListTradesParams,
@@ -639,14 +639,19 @@ export class Orderbook {
     orders: FulfillmentOrder[] | FulfillmentListing[],
     takerAddress: string,
   ): Promise<FulfillBulkOrdersResponse> {
-    const mappedOrders = orders.map((order): FulfillmentOrder => ({
-      orderId: 'listingId' in order ? order.listingId : order.orderId,
-      takerFees: order.takerFees,
-      amountToFill: order.amountToFill,
-    }));
+    const mo = orders.map((order): FulfillmentOrder => {
+      const isListing = 'listingId' in order;
+
+      return {
+        orderId: isListing ? order.listingId : order.orderId,
+        takerFees: order.takerFees,
+        amountToFill: order.amountToFill,
+        tokenId: isListing ? undefined : order.tokenId,
+      };
+    });
 
     const fulfillmentDataRes = await this.apiClient.fulfillmentData(
-      mappedOrders.map((fulfillmentRequest) => ({
+      mo.map((fulfillmentRequest) => ({
         order_id: fulfillmentRequest.orderId,
         taker_address: takerAddress,
         fees: fulfillmentRequest.takerFees.map((fee) => ({
@@ -654,22 +659,33 @@ export class Orderbook {
           amount: fee.amount,
           recipient_address: fee.recipientAddress,
         })),
+        token_id: fulfillmentRequest?.tokenId,
       })),
     );
 
     try {
       const fulfillableOrdersWithUnits = fulfillmentDataRes.result.fulfillable_orders
-        .map((fulfillmentData) => {
-        // Find the order that corresponds to the order for the units
-          const order = mappedOrders.find((l) => l.orderId === fulfillmentData.order.id);
+        .map((fd) => {
+          // Find the order that corresponds to the order for the units
+          const order = mo.find((l) => l.orderId === fd.order.id && l.tokenId === fd.token_id);
+
           if (!order) {
-            throw new Error(`Could not find order for order ${fulfillmentData.order.id}`);
+            let errMessage = `Could not find order for order ${fd.order.id}`;
+            if (fd.token_id) errMessage += ` and token ID ${fd.token_id}`;
+            throw new Error(errMessage);
+          }
+
+          const considerationCriteria = [];
+
+          if (order.tokenId) {
+            considerationCriteria.push({ identifier: order.tokenId, proof: [] });
           }
 
           return {
-            extraData: fulfillmentData.extra_data,
-            order: fulfillmentData.order,
+            extraData: fd.extra_data,
+            order: fd.order,
             unitsToFill: order.amountToFill,
+            considerationCriteria,
           };
         });
 
@@ -684,6 +700,7 @@ export class Orderbook {
         unfulfillableOrders: fulfillmentDataRes.result.unfulfillable_orders.map(
           (o) => ({
             orderId: o.order_id,
+            tokenId: o.token_id,
             reason: o.reason,
           }),
         ),
