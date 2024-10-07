@@ -1,4 +1,4 @@
-import { Box, Drawer, DUMMY_RASTER_IMAGE_3_URL, EllipsizedText, MenuItem, Stack } from '@biom3/react';
+import { Drawer, DUMMY_RASTER_IMAGE_3_URL, EllipsizedText, MenuItem } from '@biom3/react';
 import { motion } from 'framer-motion';
 import { useContext } from 'react';
 import { listVariants } from '../../../lib/animation/listAnimation';

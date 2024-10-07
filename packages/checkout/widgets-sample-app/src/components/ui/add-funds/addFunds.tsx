@@ -14,6 +14,8 @@ import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import { Environment } from "@imtbl/config";
 import { useMemo, useEffect } from "react";
 
+import { passport } from "../marketplace-orchestrator/passport";
+
 const ADD_FUNDS_TARGET_ID = "add-funds-widget-target";
 
 function AddFundsUI() {
@@ -26,17 +28,38 @@ function AddFundsUI() {
       }),
     []
   );
-  const factory = useMemo(() => new WidgetsFactory(checkout, {}), [checkout]);
+  const factory = useMemo(
+    () =>
+      new WidgetsFactory(checkout, {
+        walletConnect: {
+          projectId: "938b553484e344b1e0b4bb80edf8c362",
+          metadata: {
+            name: "Checkout Marketplace",
+            description: "Checkout Marketplace",
+            url: "http://localhost:3000/marketplace-orchestrator",
+            icons: [],
+          },
+        },
+      }),
+    [checkout]
+  );
+
   const addFunds = useMemo(
     () =>
       factory.create(WidgetType.ADD_FUNDS, {
-        config: { theme: WidgetTheme.DARK },
+        config: {
+          theme: WidgetTheme.DARK,
+        },
       }),
     [factory]
   );
   const onRamp = useMemo(() => factory.create(WidgetType.ONRAMP), [factory]);
   const swap = useMemo(() => factory.create(WidgetType.SWAP), [factory]);
   const bridge = useMemo(() => factory.create(WidgetType.BRIDGE), [factory]);
+
+  useEffect(() => {
+    passport.connectEvm();
+  }, []);
 
   useEffect(() => {
     if (!checkout || !factory) return;
@@ -63,8 +86,8 @@ function AddFundsUI() {
       showOnrampOption: true,
       showBridgeOption: false,
       showSwapOption: true,
-      // toAmount: "1",
-      // toTokenAddress: "native",
+      toAmount: "1",
+      toTokenAddress: "native",
     });
     addFunds.addListener(AddFundsEventType.CLOSE_WIDGET, (data: any) => {
       console.log("CLOSE_WIDGET", data);

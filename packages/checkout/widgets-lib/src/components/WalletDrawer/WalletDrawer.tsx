@@ -1,4 +1,4 @@
-import { Drawer, Select } from '@biom3/react';
+import { Drawer, MenuItemProps, Select } from '@biom3/react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { EIP1193Provider, EIP6963ProviderDetail } from '@imtbl/checkout-sdk';
@@ -18,21 +18,23 @@ interface WalletDrawerProps {
     defaultText?: string;
   },
   showWalletConnect?: boolean;
-  showWalletSelectorTarget: boolean;
+  showWalletSelectorTarget?: boolean;
   walletOptions: EIP6963ProviderDetail[];
   showDrawer: boolean;
   setShowDrawer: (show: boolean) => void;
   onWalletChange: (event: WalletChangeEvent) => Promise<void>;
+  menuItemSize?: MenuItemProps['size'];
 }
 export function WalletDrawer({
   testId,
   drawerText,
   walletOptions,
   showWalletConnect = true,
-  showWalletSelectorTarget,
+  showWalletSelectorTarget = false,
   showDrawer,
   setShowDrawer,
   onWalletChange,
+  menuItemSize,
 }: WalletDrawerProps) {
   const { isWalletConnectEnabled, openWalletConnectModal } = useWalletConnect();
   const [walletItemLoading, setWalletItemLoading] = useState(false);
@@ -70,7 +72,7 @@ export function WalletDrawer({
           };
           onWalletChange(walletChangeEvent);
         },
-        restoreSession: true,
+        restoreSession: false,
       });
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -124,6 +126,7 @@ export function WalletDrawer({
             rc={(
               <motion.div variants={listItemVariants} custom={index} />
             )}
+            size={menuItemSize}
           />
         ))}
         {isWalletConnectEnabled && showWalletConnect && (
@@ -133,7 +136,7 @@ export function WalletDrawer({
             key="walletconnect"
           >
             <WalletConnectItem
-              testId={`${testId}-wallet-list-walletconnect`}
+              size={menuItemSize}
               loading={walletItemLoading}
               onWalletItemClick={handleWalletConnectClick}
             />

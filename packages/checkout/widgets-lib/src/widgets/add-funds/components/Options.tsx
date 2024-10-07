@@ -1,4 +1,4 @@
-import { Body, Box, FramedVideo, LoadingOverlay, MenuItem, MenuItemSize, Stack } from '@biom3/react';
+import { Body, Box, FramedVideo, LoadingOverlay, MenuItem, Stack, Box, LoadingOverlay, MenuItemSize } from '@biom3/react';
 import { motion } from 'framer-motion';
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import {
@@ -82,7 +82,6 @@ export function Options({
         onClick={onRouteClick}
         size={size}
         rc={<motion.div variants={listItemVariants} />}
-        // @TODO: need to actually implement this feature
         isFastest={index === 0}
       />
     );
