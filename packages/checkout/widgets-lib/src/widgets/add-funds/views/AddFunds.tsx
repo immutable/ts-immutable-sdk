@@ -17,6 +17,7 @@ import {
   IMTBLWidgetEvents,
   TokenFilterTypes,
   type TokenInfo,
+  WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 import {
   type ChangeEvent,
@@ -47,6 +48,9 @@ import type { RouteData } from '../types';
 import { SelectedRouteOption } from '../components/SelectedRouteOption';
 import { DeliverToWalletDrawer } from '../../../components/WalletDrawer/DeliverToWalletDrawer';
 import { PayWithWalletDrawer } from '../../../components/WalletDrawer/PayWithWalletDrawer';
+import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
+import { getProviderSlugFromRdns } from '../../../lib/provider';
+import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 
 interface AddFundsProps {
   checkout: Checkout | null;
@@ -112,6 +116,27 @@ export function AddFunds({
     setInputValue(value);
     debouncedUpdateAmount(value);
   };
+
+  const { providersState: { fromProvider } } = useProvidersContext();
+
+  const { providers } = useInjectedProviders({ checkout });
+  const walletOptions = useMemo(
+    () => providers
+      // TODO: Check if must filter passport on L1
+      .map((detail) => {
+        if (detail.info.rdns === WalletProviderRdns.PASSPORT) {
+          return {
+            ...detail,
+            info: {
+              ...detail.info,
+              name: getProviderSlugFromRdns(detail.info.rdns).replace(/^\w/, (c) => c.toUpperCase()),
+            },
+          };
+        }
+        return detail;
+      }),
+    [providers],
+  );
 
   const showErrorView = useCallback(
     (error: Error) => {
@@ -304,12 +329,12 @@ export function AddFunds({
               name={token.name}
               defaultImage={defaultTokenImage}
             />
-            )}
+          )}
           emphasized={false}
         />
         <MenuItem.Label>{token.symbol}</MenuItem.Label>
         {token.symbol !== token.name && (
-        <MenuItem.Caption>{token.name}</MenuItem.Caption>
+          <MenuItem.Caption>{token.name}</MenuItem.Caption>
         )}
       </MenuItem>
     )),
@@ -322,10 +347,14 @@ export function AddFunds({
     [debouncedToAmount, selectedToken, selectedRouteData],
   );
 
+  // @FIXME: Must improve how we detect the loading condition is met based on inputs and routes fetching state
   const loading = Boolean(
-    (selectedToken?.address && debouncedToAmount && !selectedRouteData)
-      || fetchingRoutes,
+    fromProvider && ((selectedToken?.address && debouncedToAmount && !selectedRouteData)
+      || fetchingRoutes),
   );
+
+  // @TODO: Also, Open pay with drawer if insufficient balance
+  const insufficientBalance = useMemo(() => !loading && routes.length === 0, [loading, routes]);
 
   return (
     <SimpleLayout
@@ -383,7 +412,7 @@ export function AddFunds({
                         name={selectedToken?.name}
                         defaultImage={defaultTokenImage}
                       />
-                      )}
+                    )}
                     padded
                     emphasized
                     circularFrame
@@ -497,9 +526,13 @@ export function AddFunds({
             Review
           </Button>
           <PayWithWalletDrawer
-            checkout={checkout}
             visible={showPayWithDrawer}
+            walletOptions={walletOptions}
             onClose={() => setShowPayWithDrawer(false)}
+            onPayWithCard={() => {
+              console.log('@TODO: Implement pay with card'); // eslint-disable-line no-console
+            }}
+            insufficientBalance={insufficientBalance}
           />
           <OptionsDrawer
             routes={routes}
@@ -512,8 +545,8 @@ export function AddFunds({
             onRouteClick={handleRouteClick}
           />
           <DeliverToWalletDrawer
-            checkout={checkout}
             visible={showDeliverToDrawer}
+            walletOptions={walletOptions}
             onClose={() => setShowDeliverToDrawer(false)}
           />
         </Stack>

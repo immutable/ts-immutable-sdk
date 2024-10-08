@@ -6,17 +6,21 @@ import {
   useReducer,
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
-import { Checkout } from '@imtbl/checkout-sdk';
+import { Checkout, EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
 
 export interface ProvidersState {
   fromProvider?: Web3Provider;
+  fromProviderInfo?: EIP6963ProviderInfo;
   toProvider?: Web3Provider;
+  toProviderInfo?: EIP6963ProviderInfo;
   checkout: Checkout;
 }
 
 export const initialProvidersState: ProvidersState = {
   fromProvider: undefined,
+  fromProviderInfo: undefined,
   toProvider: undefined,
+  toProviderInfo: undefined,
   checkout: {} as Checkout,
 };
 
@@ -42,8 +46,10 @@ export enum ProvidersContextActions {
 
 export interface SetProviderPayload {
   type: ProvidersContextActions.SET_PROVIDER;
-  toProvider: Web3Provider;
-  fromProvider: Web3Provider;
+  fromProvider?: Web3Provider;
+  fromProviderInfo?: EIP6963ProviderInfo;
+  toProvider?: Web3Provider;
+  toProviderInfo?: EIP6963ProviderInfo;
 }
 
 export interface SetCheckoutPayload {
@@ -64,13 +70,17 @@ export const ProvidersContext = createContext<ProvidersContextState>({
   providersDispatch: () => {},
 });
 
+ProvidersContext.displayName = 'ProvidersContext';
+
 export type Reducer<S, A> = (prevState: S, action: A) => S;
 
 export const providersContextReducer: Reducer<
 ProvidersState,
 ProvidersContextAction
 > = (state: ProvidersState, action: ProvidersContextAction) => {
-  switch (action.payload.type) {
+  const { type, ...payload } = action.payload;
+
+  switch (type) {
     case ProvidersContextActions.SET_PROVIDER:
       return {
         ...state,
@@ -79,6 +89,12 @@ ProvidersContextAction
         }),
         ...(action.payload.toProvider && {
           toProvider: action.payload.toProvider,
+        }),
+        ...(action.payload.fromProviderInfo && {
+          fromProviderInfo: action.payload.fromProviderInfo,
+        }),
+        ...(action.payload.toProviderInfo && {
+          toProviderInfo: action.payload.toProviderInfo,
         }),
       };
     case ProvidersContextActions.SET_CHECKOUT:
@@ -89,7 +105,7 @@ ProvidersContextAction
     case 'RESET_STATE':
       return {
         ...initialProvidersState,
-        ...action.payload,
+        ...payload,
       };
     default:
       return state;
