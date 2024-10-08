@@ -79,7 +79,7 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
               <Suspense
                 fallback={
                   <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
-                  }
+                }
               >
                 <AddFundsWidget
                   config={this.strongConfig()}

@@ -1,6 +1,12 @@
-import { Box, Drawer } from '@biom3/react';
+import {
+  Drawer,
+  DUMMY_RASTER_IMAGE_3_URL,
+  EllipsizedText,
+  MenuItem,
+} from '@biom3/react';
 import { motion } from 'framer-motion';
 import { useContext } from 'react';
+
 import { listVariants } from '../../../lib/animation/listAnimation';
 import { Options } from './Options';
 import { FiatOptionType, RouteData } from '../types';
@@ -37,34 +43,47 @@ export function OptionsDrawer({
     <Drawer
       size="full"
       visible={visible}
-      showHeaderBar
+      showHeaderBar={false}
       onCloseDrawer={onClose}
-      headerBarTitle="Pay using..."
     >
       <Drawer.Content
         rc={
           <motion.div variants={listVariants} initial="hidden" animate="show" />
         }
+        sx={{
+          pt: 'base.spacing.x3',
+          px: 'base.spacing.x3',
+        }}
       >
-        <Box
-          sx={{
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            px: 'base.spacing.x4',
-          }}
-        >
-          <Options
-            size="medium"
-            routes={routes}
-            chains={chains}
-            balances={balances}
-            onCardClick={onCardClick}
-            onRouteClick={onRouteClick}
-            showOnrampOption={showOnrampOption}
+        <MenuItem size="xSmall">
+          <MenuItem.FramedImage
+            // @TODO: we need this to be the actual wallet icon
+            use={<img src={DUMMY_RASTER_IMAGE_3_URL} alt="mooo" />}
+            padded
+            emphasized
           />
-        </Box>
+          <MenuItem.Label>Pay from</MenuItem.Label>
+          <MenuItem.Caption>
+            {/* @TODO: we need this to be the actual wallet name */}
+            MetaMask •
+            {' '}
+            <EllipsizedText
+              // @TODO: we need this to be the actual wallet address
+              text="0x83124528b40F21882eb7D6bcDa07592f364d3856"
+              sx={{ c: 'inherit', fontSize: 'inherit' }}
+            />
+          </MenuItem.Caption>
+          <MenuItem.StatefulButtCon icon="ChevronExpand" onClick={onClose} />
+        </MenuItem>
+        <Options
+          size="small"
+          routes={routes}
+          chains={chains}
+          balances={balances}
+          onCardClick={onCardClick}
+          onRouteClick={onRouteClick}
+          showOnrampOption={showOnrampOption}
+        />
       </Drawer.Content>
     </Drawer>
   );
