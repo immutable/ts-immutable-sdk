@@ -10,7 +10,7 @@
     "test": "playwright test"
   },
   "dependencies": {
-    "@biom3/react": "^0.27.8",
+    "@biom3/react": "^0.27.10",
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/sdk": "latest",
     "ethers": "^5.7.2",

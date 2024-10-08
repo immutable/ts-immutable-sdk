@@ -23,24 +23,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@0xsquid/sdk@npm:^2.8.24":
-  version: 2.8.24
-  resolution: "@0xsquid/sdk@npm:2.8.24"
-  dependencies:
-    "@cosmjs/encoding": ^0.31.0
-    "@cosmjs/stargate": ^0.31.3
-    "@ethersproject/abstract-signer": ^5.7.0
-    "@ethersproject/wallet": ^5.7.0
-    axios: ^1.5.0
-    cosmjs-types: ^0.8.0
-    ethers: 6.8.1
-    ethers-multicall-provider: ^5.0.0
-    lodash: ^4.17.21
-    long: ^5.2.3
-  checksum: 780b7837e13c6876764d0cc615d9712c9b35a523857823dba9cc2ba96df672c0a57292d39c34a358cef2e66b834c333db6860829542907065c01bc613d6b233d
-  languageName: node
-  linkType: hard
-
 "@0xsquid/sdk@npm:^2.8.25":
   version: 2.8.25
   resolution: "@0xsquid/sdk@npm:2.8.25"
@@ -2537,48 +2519,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:^0.4.2, @biom3/design-tokens@npm:~0.4.2":
-  version: 0.4.2
-  resolution: "@biom3/design-tokens@npm:0.4.2"
-  dependencies:
-    lodash.get: ^4.4.2
-  checksum: feae1a9193ca25bb1e27041d6684155e5e3935d5b4876318c207cd73dc0c9ec31b126e54fc97bd02f9f663213a2accc1a7361a95b4d61a135e02f06ceb7659b7
-  languageName: node
-  linkType: hard
-
 "@biom3/design-tokens@npm:^0.4.4, @biom3/design-tokens@npm:~0.4.4":
   version: 0.4.4
   resolution: "@biom3/design-tokens@npm:0.4.4"
   dependencies:
     lodash.get: ^4.4.2
   checksum: b62db8bf266d41097bc231795eed3208d18e526deff29bfb4d286645ebda34bdb3edf3f4aef7e849b08b4f1af051c801de48e3f250ab1c721b4e5c508113194d
-  languageName: node
-  linkType: hard
-
-"@biom3/react@npm:^0.25.0":
-  version: 0.25.0
-  resolution: "@biom3/react@npm:0.25.0"
-  dependencies:
-    "@biom3/design-tokens": ~0.4.2
-    buffer: ^6.0.3
-    csstype: ^3.1.2
-    hls.js: ^1.5.11
-    localforage: ^1.10.0
-    lodash.debounce: ^4.0.8
-    lodash.get: ^4.4.2
-    lodash.isequal: ^4.5.0
-    lodash.throttle: ^4.1.1
-    react-is: ^18.2.0
-    react-keyed-flatten-children: ^3.0.0
-    ts-deepmerge: ^6.2.0
-  peerDependencies:
-    "@emotion/react": ^11.11.4
-    "@rive-app/react-canvas-lite": ^4.9.0
-    embla-carousel-react: ^8.0.4
-    framer-motion: ^10.12.12
-    react: ^18.2.0
-    react-dom: ^18.2.0
-  checksum: 7758e5c903a3bad821aeb360083e2880753b5b1ad5359e182a29ee3cd05d6fb843964fb11f8f4c7f684d4f52e4b8427a13e13dc937461be056b7eb904f9f70d5
   languageName: node
   linkType: hard
 
@@ -2609,7 +2555,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.27.8":
+"@biom3/react@npm:^0.27.10":
   version: 0.27.10
   resolution: "@biom3/react@npm:0.27.10"
   dependencies:
@@ -2782,7 +2728,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cosmjs/encoding@npm:^0.31.0, @cosmjs/encoding@npm:^0.31.0-alpha.1, @cosmjs/encoding@npm:^0.31.3":
+"@cosmjs/encoding@npm:^0.31.0-alpha.1, @cosmjs/encoding@npm:^0.31.3":
   version: 0.31.3
   resolution: "@cosmjs/encoding@npm:0.31.3"
   dependencies:
@@ -2841,7 +2787,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cosmjs/proto-signing@npm:^0.31.0-alpha.1, @cosmjs/proto-signing@npm:^0.31.3":
+"@cosmjs/proto-signing@npm:^0.31.0-alpha.1":
   version: 0.31.3
   resolution: "@cosmjs/proto-signing@npm:0.31.3"
   dependencies:
@@ -2932,26 +2878,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cosmjs/stargate@npm:^0.31.3":
-  version: 0.31.3
-  resolution: "@cosmjs/stargate@npm:0.31.3"
-  dependencies:
-    "@confio/ics23": ^0.6.8
-    "@cosmjs/amino": ^0.31.3
-    "@cosmjs/encoding": ^0.31.3
-    "@cosmjs/math": ^0.31.3
-    "@cosmjs/proto-signing": ^0.31.3
-    "@cosmjs/stream": ^0.31.3
-    "@cosmjs/tendermint-rpc": ^0.31.3
-    "@cosmjs/utils": ^0.31.3
-    cosmjs-types: ^0.8.0
-    long: ^4.0.0
-    protobufjs: ~6.11.3
-    xstream: ^11.14.0
-  checksum: 9b680d50f0818e3cfaffccd022d6034c283c1e350a1b8d8f74ffa22352e342ce1cb00533007ba7b5a6a1c1bc30fe327bd09c23ac8b7486691ad127a34c47690c
-  languageName: node
-  linkType: hard
-
 "@cosmjs/stream@npm:^0.30.1":
   version: 0.30.1
   resolution: "@cosmjs/stream@npm:0.30.1"
@@ -2979,7 +2905,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cosmjs/tendermint-rpc@npm:^0.31.0-alpha.1, @cosmjs/tendermint-rpc@npm:^0.31.3":
+"@cosmjs/tendermint-rpc@npm:^0.31.0-alpha.1":
   version: 0.31.3
   resolution: "@cosmjs/tendermint-rpc@npm:0.31.3"
   dependencies:
@@ -4080,7 +4006,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/create-bid-with-nextjs@workspace:examples/orderbook/create-bid-with-nextjs"
   dependencies:
-    "@biom3/react": ^0.27.8
+    "@biom3/react": ^0.27.10
     "@ethersproject/providers": ^5.7.2
     "@imtbl/sdk": latest
     "@playwright/test": ^1.45.3
@@ -4101,7 +4027,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/create-collection-bid-with-nextjs@workspace:examples/orderbook/create-collection-bid-with-nextjs"
   dependencies:
-    "@biom3/react": ^0.27.8
+    "@biom3/react": ^0.27.10
     "@ethersproject/providers": ^5.7.2
     "@imtbl/sdk": latest
     "@playwright/test": ^1.45.3
@@ -4122,7 +4048,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/create-listing-with-nextjs@workspace:examples/orderbook/create-listing-with-nextjs"
   dependencies:
-    "@biom3/react": ^0.27.8
+    "@biom3/react": ^0.27.10
     "@ethersproject/providers": ^5.7.2
     "@imtbl/sdk": latest
     "@playwright/test": ^1.45.3
@@ -4143,7 +4069,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/fulfill-bid-with-nextjs@workspace:examples/orderbook/fulfill-bid-with-nextjs"
   dependencies:
-    "@biom3/react": ^0.27.8
+    "@biom3/react": ^0.27.10
     "@imtbl/sdk": latest
     "@playwright/test": ^1.45.3
     "@types/node": ^20
@@ -4163,7 +4089,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/fulfill-listing-with-nextjs@workspace:examples/orderbook/fulfill-listing-with-nextjs"
   dependencies:
-    "@biom3/react": ^0.27.8
+    "@biom3/react": ^0.27.10
     "@imtbl/sdk": latest
     "@playwright/test": ^1.45.3
     "@types/node": ^20
@@ -5054,14 +4980,14 @@ __metadata:
   linkType: soft
 
 "@imtbl/sdk@npm:latest":
-  version: 1.54.0
-  resolution: "@imtbl/sdk@npm:1.54.0"
+  version: 1.56.0
+  resolution: "@imtbl/sdk@npm:1.56.0"
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
-    "@0xsquid/sdk": ^2.8.24
-    "@biom3/design-tokens": ^0.4.2
-    "@biom3/react": ^0.25.0
+    "@0xsquid/sdk": ^2.8.25
+    "@biom3/design-tokens": ^0.4.4
+    "@biom3/react": ^0.27.10
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-provider": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
@@ -5128,7 +5054,7 @@ __metadata:
       optional: true
     prisma:
       optional: true
-  checksum: 349362964e32bac6bc8ad22fe06ab3e3f6f07db598bc87e9f822d5e18698307e96437af7a05226260380b5578cec8e5533ad81fddee23e9206f06cd4a748d310
+  checksum: 47ecff0575a0597d6a889f4896842a4d55a1eaed321062734798d6cc90181de48ba71a4095798524076d442d2472bf1f408caecaac83af0a988bd4280ed13062
   languageName: node
   linkType: hard
 
@@ -22602,7 +22528,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "fulfill-collection-bid-with-nextjs@workspace:examples/orderbook/fulfill-collection-bid-with-nextjs"
   dependencies:
-    "@biom3/react": ^0.27.8
+    "@biom3/react": ^0.27.10
     "@imtbl/sdk": latest
     "@types/node": ^20
     "@types/react": ^18
