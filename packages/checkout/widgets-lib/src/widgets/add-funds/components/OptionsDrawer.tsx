@@ -1,6 +1,7 @@
 import { Drawer, DUMMY_RASTER_IMAGE_3_URL, EllipsizedText, MenuItem } from '@biom3/react';
 import { motion } from 'framer-motion';
 import { useContext } from 'react';
+
 import { listVariants } from '../../../lib/animation/listAnimation';
 import { Options } from './Options';
 import { FiatOptionType, RouteData } from '../types';
@@ -70,7 +71,7 @@ export function OptionsDrawer({
         </MenuItem>
 
         <Options
-          size="medium"
+          size="small"
           routes={routes}
           chains={chains}
           balances={balances}

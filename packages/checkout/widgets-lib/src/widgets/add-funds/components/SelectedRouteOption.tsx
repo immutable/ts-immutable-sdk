@@ -104,7 +104,7 @@ export function SelectedRouteOption({
         </Stack>
         
         <MenuItem.PriceDisplay price="0.14">
-          <MenuItem.PriceDisplay.Caption>USD ${formattedUsdBalance ?? ''}</MenuItem.PriceDisplay.Caption>
+          <MenuItem.PriceDisplay.Caption>{`USD $${formattedUsdBalance}`}</MenuItem.PriceDisplay.Caption>
         </MenuItem.PriceDisplay>
       </Stack>
     </SelectedRouteOptionContainer>

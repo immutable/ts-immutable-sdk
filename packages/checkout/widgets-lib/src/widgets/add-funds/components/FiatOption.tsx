@@ -15,14 +15,14 @@ export function FiatOption<RC extends ReactElement | undefined = undefined>({
   type,
   onClick,
   disabled = false,
-  size,
+  size = 'small',
   rc = <span />,
 }: FiatOptionProps<RC>) {
   const { t } = useTranslation();
 
   const icon: Record<FiatOptionType, AllDualVariantIconKeys> = {
     [FiatOptionType.DEBIT]: 'BankCard',
-    [FiatOptionType.CREDIT]: 'BankCard',
+    [FiatOptionType.CREDIT]: 'Craft',
   };
 
   const handleClick = () => {
@@ -33,7 +33,7 @@ export function FiatOption<RC extends ReactElement | undefined = undefined>({
     disabled,
     emphasized: true,
     onClick: disabled ? undefined : handleClick,
-    size: size || 'medium',
+    size,
     rc,
   };
 
@@ -41,11 +41,10 @@ export function FiatOption<RC extends ReactElement | undefined = undefined>({
     <MenuItem
       {...menuItemProps}
     >
-      <MenuItem.FramedIcon icon={icon[type]} />
-      <MenuItem.Label size="medium">
+      <MenuItem.FramedIcon icon={icon[type]} variant="bold" emphasized={false} />
+      <MenuItem.Label>
         {t(`views.ADD_FUNDS.drawer.options.${type}.heading`)}
       </MenuItem.Label>
-      {!disabled && <MenuItem.IntentIcon />}
       <MenuItem.Caption>
         { t(
           `views.ADD_FUNDS.drawer.options.${type}.${
@@ -53,6 +52,7 @@ export function FiatOption<RC extends ReactElement | undefined = undefined>({
           }`,
         )}
       </MenuItem.Caption>
+      {!disabled && <MenuItem.IntentIcon />}
     </MenuItem>
   );
 }
