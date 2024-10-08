@@ -11,17 +11,11 @@ test.beforeEach(async ({ page }) => {
     await interceptWidgets(page, interceptWidgetsVersion);
   }
 
-  await page.goto("/version");
+  await page.goto("/widgets");
 });
 
 test.describe("widget loading", () => {
-  test("basic check", async ({ page }) => {
-    const versionText = page.getByText('Version');
-    await expect(versionText).toBeVisible();
-  });
-
   test("loads widgets into root", async ({ page }) => {
-
     // Wait for the widget-root element to be visible
     await page.waitForSelector('#widget-root');
 
@@ -33,6 +27,3 @@ test.describe("widget loading", () => {
     await expect(connectWidget).toBeVisible();
   });
 });
-
-
-

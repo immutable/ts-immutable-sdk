@@ -15,13 +15,9 @@ export const interceptWidgets = async (page: Page, widgetsVersion: string = '*')
       filePath = path.join(__dirname, 'local-widgets-js', 'index.js');
     }
 
-    // console.log('Attempting to read file:', filePath);
-
     try {
       if (fs.existsSync(filePath)) {
         const fileContent = fs.readFileSync(filePath, 'utf8');
-        // console.log('File content length:', fileContent.length);
-
         // Fulfill the request with your local file content
         await route.fulfill({
           status: 200,

@@ -5,8 +5,8 @@ import AppWrapper from "./utils/wrapper";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Checkout SDK - Connect with NextJS",
-  description: "Examples of how to connect using the Checkout SDK with NextJS",
+  title: "Checkout SDK - Load and Mount Widgets",
+  description: "Examples of how mount Checkout SDK Widgets",
 };
 
 export default function RootLayout({
@@ -20,7 +20,7 @@ export default function RootLayout({
         <AppWrapper>
           {children}
         </AppWrapper>
-        </body>
+      </body>
     </html>
   );
 }

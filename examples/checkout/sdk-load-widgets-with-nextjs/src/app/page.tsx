@@ -13,8 +13,8 @@ export default function Home() {
     <Button
       className="mb-1"
       size="medium"
-      rc={<NextLink href="/version" />}>
-      Check SDK and Widgets Version
+      rc={<NextLink href="/widgets" />}>
+      Mount Checkout Widgets
     </Button>
   </>);
 }

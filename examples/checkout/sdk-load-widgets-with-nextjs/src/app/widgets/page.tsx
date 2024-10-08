@@ -1,34 +1,25 @@
 "use client";
-
-
 import { Box } from '@biom3/react';
 import { checkout } from '@imtbl/sdk';
 import { CheckoutFlowType, Widget, WidgetType } from '@imtbl/sdk/checkout';
 import { useEffect, useState } from 'react';
-import { version } from 'react';
-
-console.log(version);
 
 const checkoutSDK = new checkout.Checkout();
 
-function Version() {
+function Widgets() {
 
   const [widget, setWidget] = useState<Widget<WidgetType.CHECKOUT>>();
-
 
   useEffect(() => {
 
     const loadWidgets = async () => {
       const widgetsFactory = await checkoutSDK.widgets({ config: {} });
 
-
       const widget = widgetsFactory.create(WidgetType.CHECKOUT, {})
       setWidget(widget);
     }
 
     loadWidgets();
-
-
   }, []);
 
 
@@ -43,7 +34,6 @@ function Version() {
 
   return (
     <div>
-      <p>Version</p>
       <Box
         id="widget-root"
         sx={{
@@ -57,4 +47,4 @@ function Version() {
   )
 }
 
-export default Version;
+export default Widgets;
