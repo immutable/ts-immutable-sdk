@@ -125,7 +125,7 @@ jobs:
         uses: ./.github/actions/setup-playwright
 
       - name: Test Widget example
-        run: yarn workspace @examples/sdk-load-widgets-with-nextjs test
+        run: yarn workspace @examples/sdk-load-widgets-with-nextjs test:latest
 
   func-tests:
     name: Functional tests

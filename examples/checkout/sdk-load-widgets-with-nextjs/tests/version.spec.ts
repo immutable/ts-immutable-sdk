@@ -3,9 +3,12 @@ import { interceptWidgets } from "./utils/intercept-widgets";
 
 const useLocalBundle = process.env.USE_LOCAL_BUNDLE === 'true';
 
+// Only intercept a specific version of the widgets jsdelivr bundle (i.e 1.55.0, or latest)
+const interceptWidgetsVersion = process.env.INTERCEPT_WIDGETS_VERSION;
+
 test.beforeEach(async ({ page }) => {
   if (useLocalBundle) {
-    await interceptWidgets(page);
+    await interceptWidgets(page, interceptWidgetsVersion);
   }
 
   await page.goto("/version");
