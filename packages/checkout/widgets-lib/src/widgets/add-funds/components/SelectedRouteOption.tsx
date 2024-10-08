@@ -100,11 +100,11 @@ export function SelectedRouteOption({
       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ w: '100%' }}>
         <Stack gap="0px">
           <MenuItem.Label>{fromToken?.name}</MenuItem.Label>
-          <MenuItem.Caption>{`Balance $${formattedUsdBalance}`}</MenuItem.Caption>
+          <MenuItem.Caption>{`Balance $${balance?.balance}`}</MenuItem.Caption>
         </Stack>
         
         <MenuItem.PriceDisplay price="0.14">
-          <MenuItem.PriceDisplay.Caption>USD $300.30</MenuItem.PriceDisplay.Caption>
+          <MenuItem.PriceDisplay.Caption>USD ${formattedUsdBalance ?? ''}</MenuItem.PriceDisplay.Caption>
         </MenuItem.PriceDisplay>
       </Stack>
     </SelectedRouteOptionContainer>
