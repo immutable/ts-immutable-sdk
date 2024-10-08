@@ -1,55 +1,28 @@
-import { useMemo } from 'react';
-import { Checkout, WalletProviderRdns } from '@imtbl/checkout-sdk';
-
-import { useInjectedProviders } from '../../lib/hooks/useInjectedProviders';
-import { WalletDrawer } from './WalletDrawer';
-import { WalletChangeEvent } from './WalletDrawerEvents';
+import { EIP6963ProviderDetail } from '@imtbl/checkout-sdk';
+import { ConnectWalletDrawer } from './ConnectWalletDrawer';
 
 type DeliverToWalletDrawerProps = {
   visible: boolean;
   onClose: () => void;
-  checkout: Checkout | null;
+  walletOptions: EIP6963ProviderDetail[];
 };
 
 export function DeliverToWalletDrawer({
   visible,
   onClose,
-  checkout,
+  walletOptions,
+  // insufficientBalance,
 }: DeliverToWalletDrawerProps) {
-  const blocklistWalletRdns: string[] = [];
-  const { providers: eip6963Providers } = useInjectedProviders({ checkout });
-  const injectedProviders = useMemo(
-    () => eip6963Providers
-      .filter(
-        (provider) => !(provider.info.rdns === WalletProviderRdns.PASSPORT),
-      )
-      .filter(
-        (provider) => !blocklistWalletRdns.includes(provider.info.rdns),
-      ),
-    [eip6963Providers],
-  );
-
-  const handleOnWalletChangeEvent = async (event: WalletChangeEvent) => {
-    const { providerDetail } = event;
-    console.log('🐛 ~ providerDetail:', providerDetail);
-    onClose();
-
-    // handle provider detail
-    // await selectProviderDetail(providerDetail);
-    // setChosenProviderDetail(providerDetail);
-  };
+  // TODO: Implement pay with card option
+  // TODO: Implement not available option with custom label when insufficient balance
 
   return (
-    <WalletDrawer
-      testId="select-to-wallet-drawer"
-      showWalletConnect
-      showDrawer={visible}
-      drawerText={{ heading: 'Deliver to' }}
-      walletOptions={injectedProviders}
-      setShowDrawer={(show: boolean) => {
-        if (show === false) onClose();
-      }}
-      onWalletChange={handleOnWalletChangeEvent}
+    <ConnectWalletDrawer
+      heading="Deliver To"
+      visible={visible}
+      onClose={onClose}
+      providerType="to"
+      walletOptions={walletOptions}
     />
   );
 }

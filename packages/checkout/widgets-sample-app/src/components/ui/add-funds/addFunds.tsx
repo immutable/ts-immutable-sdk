@@ -61,25 +61,25 @@ function AddFundsUI() {
     passport.connectEvm();
   }, []);
 
-  useEffect(() => {
-    if (!checkout || !factory) return;
+  // useEffect(() => {
+  //   if (!checkout || !factory) return;
 
-    (async () => {
-      const { provider } = await checkout.createProvider({
-        walletProviderName: WalletProviderName.METAMASK,
-      });
+  //   (async () => {
+  //     const { provider } = await checkout.createProvider({
+  //       walletProviderName: WalletProviderName.METAMASK,
+  //     });
 
-      await checkout.connect({ provider, requestWalletPermissions: false });
+  //     await checkout.connect({ provider, requestWalletPermissions: false });
 
-      const { isConnected } = await checkout.checkIsWalletConnected({
-        provider,
-      });
+  //     const { isConnected } = await checkout.checkIsWalletConnected({
+  //       provider,
+  //     });
 
-      if (isConnected) {
-        factory.updateProvider(provider);
-      }
-    })();
-  }, [checkout, factory]);
+  //     if (isConnected) {
+  //       factory.updateProvider(provider);
+  //     }
+  //   })();
+  // }, [checkout, factory]);
 
   useEffect(() => {
     addFunds.mount(ADD_FUNDS_TARGET_ID, {

@@ -1,9 +1,4 @@
-import {
-  Drawer,
-  DUMMY_RASTER_IMAGE_3_URL,
-  EllipsizedText,
-  MenuItem,
-} from '@biom3/react';
+import { Drawer, EllipsizedText, MenuItem } from '@biom3/react';
 import { motion } from 'framer-motion';
 import { useContext } from 'react';
 
@@ -11,6 +6,7 @@ import { listVariants } from '../../../lib/animation/listAnimation';
 import { Options } from './Options';
 import { FiatOptionType, RouteData } from '../types';
 import { AddFundsContext } from '../context/AddFundsContext';
+import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 
 type OptionsDrawerProps = {
   routes: RouteData[] | undefined;
@@ -39,6 +35,10 @@ export function OptionsDrawer({
     addFundsState: { chains, balances },
   } = useContext(AddFundsContext);
 
+  const {
+    providersState: { fromProviderInfo, fromAddress },
+  } = useProvidersContext();
+
   return (
     <Drawer
       size="full"
@@ -57,19 +57,18 @@ export function OptionsDrawer({
       >
         <MenuItem size="xSmall">
           <MenuItem.FramedImage
-            // @TODO: we need this to be the actual wallet icon
-            use={<img src={DUMMY_RASTER_IMAGE_3_URL} alt="mooo" />}
             padded
             emphasized
+            use={
+              <img src={fromProviderInfo?.icon} alt={fromProviderInfo?.name} />
+            }
           />
           <MenuItem.Label>Pay from</MenuItem.Label>
           <MenuItem.Caption>
-            {/* @TODO: we need this to be the actual wallet name */}
-            MetaMask •
-            {' '}
+            {fromProviderInfo?.name}
+            {' • '}
             <EllipsizedText
-              // @TODO: we need this to be the actual wallet address
-              text="0x83124528b40F21882eb7D6bcDa07592f364d3856"
+              text={fromAddress ?? ''}
               sx={{ c: 'inherit', fontSize: 'inherit' }}
             />
           </MenuItem.Caption>

@@ -1,53 +1,70 @@
+import { EIP6963ProviderDetail } from '@imtbl/checkout-sdk';
 import { useMemo } from 'react';
-import { Checkout } from '@imtbl/checkout-sdk';
-
-import { useInjectedProviders } from '../../lib/hooks/useInjectedProviders';
-import { WalletDrawer } from './WalletDrawer';
-import { WalletChangeEvent } from './WalletDrawerEvents';
+import { MenuItem } from '@biom3/react';
+import { ConnectWalletDrawer } from './ConnectWalletDrawer';
+import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
 
 type PayWithWalletDrawerProps = {
   visible: boolean;
   onClose: () => void;
-  checkout: Checkout | null;
+  onPayWithCard: () => void;
+  walletOptions: EIP6963ProviderDetail[];
+  insufficientBalance?: boolean;
 };
 
 export function PayWithWalletDrawer({
   visible,
   onClose,
-  checkout,
+  walletOptions,
+  onPayWithCard,
+  insufficientBalance,
 }: PayWithWalletDrawerProps) {
-  const blocklistWalletRdns: string[] = [];
-  const { providers: eip6963Providers } = useInjectedProviders({ checkout });
-  const injectedProviders = useMemo(
-    () => eip6963Providers
-    // TODO: Check if must filter passport on L1
-      .filter(
-        (provider) => !blocklistWalletRdns.includes(provider.info.rdns),
-      ),
-    [eip6963Providers],
-  );
-  const handleOnWalletChangeEvent = async (event: WalletChangeEvent) => {
-    const { providerDetail } = event;
-    console.log('🐛 ~ providerDetail:', providerDetail);
-    onClose();
+  // TODO: Implement pay with card option
+  // TODO: Implement not available option with custom label when insufficient balance
 
-    // handle provider detail
-    // await selectProviderDetail(providerDetail);
-    // setChosenProviderDetail(providerDetail);
-  };
+  const { providersState: { fromProviderInfo } } = useProvidersContext();
+
+  const disabledOptions = useMemo(() => {
+    if (insufficientBalance && fromProviderInfo) {
+      return [{
+        label: 'insufficient funds',
+        rdns: fromProviderInfo.rdns,
+      }];
+    }
+
+    return [];
+  }, [insufficientBalance, fromProviderInfo]);
+
+  const payWithCardItem = useMemo(
+    () => (
+      <MenuItem
+        size="small"
+        emphasized
+        onClick={() => {
+          onClose();
+          onPayWithCard();
+        }}
+      >
+        <MenuItem.FramedIcon
+          icon="BankCard"
+          variant="bold"
+          emphasized={false}
+        />
+        <MenuItem.Label>Pay with Card</MenuItem.Label>
+      </MenuItem>
+    ),
+    [onClose, onPayWithCard],
+  );
 
   return (
-    <WalletDrawer
-      testId="select-from-wallet-drawer"
-      showWalletConnect
-      showDrawer={visible}
-      drawerText={{ heading: 'Pay with' }}
-      walletOptions={injectedProviders}
-      menuItemSize="small"
-      setShowDrawer={(show: boolean) => {
-        if (show === false) onClose();
-      }}
-      onWalletChange={handleOnWalletChangeEvent}
+    <ConnectWalletDrawer
+      heading={insufficientBalance ? 'Choose another option' : 'Pay With'}
+      visible={visible}
+      onClose={onClose}
+      providerType="from"
+      walletOptions={walletOptions}
+      disabledOptions={disabledOptions}
+      bottomSlot={payWithCardItem}
     />
   );
 }
