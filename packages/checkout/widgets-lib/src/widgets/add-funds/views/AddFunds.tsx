@@ -388,7 +388,7 @@ export function AddFunds({
           {showInitialEmptyState ? (
             <Body>Add Token</Body>
           ) : (
-            <HeroFormControl validationStatus={validateToAmount(inputValue) ? 'success' : 'error'}>
+            <HeroFormControl validationStatus={validateToAmount(inputValue) || inputValue === '' ? 'success' : 'error'}>
               <HeroFormControl.Label>
                 Add
                 {' '}
