@@ -251,7 +251,7 @@ export function AddFunds({
     }
 
     const tokenBalance = Number(inputValue) * toToken.usdPrice;
-    if (!Number.isNaN(tokenBalance) && tokenBalance > 0) {
+    if (tokenBalance > 0) {
       setAmountInUSD(`USD $${tokenBalance.toFixed(2)}`);
     }
   }, [inputValue, currentToTokenAddress, tokens]);
