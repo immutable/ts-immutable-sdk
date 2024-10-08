@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "USE_LOCAL_BUNDLE=true playwright test playwright test",
-    "test:headed": "playwright test --headed",
+    "test:latest": "USE_LOCAL_BUNDLE=true INTERCEPT_WIDGETS_VERSION=latest playwright test",
     "test:ui": "playwright test --ui",
     "test:remotewidgets": "playwright test"
   },
