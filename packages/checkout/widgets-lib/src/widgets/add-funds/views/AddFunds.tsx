@@ -10,7 +10,6 @@ import {
   Body,
   // Box,
   MenuItem,
-  InputValidationStatus,
 } from '@biom3/react';
 import debounce from 'lodash.debounce';
 import {
@@ -46,6 +45,7 @@ import { useRoutes } from '../hooks/useRoutes';
 import { SQUID_NATIVE_TOKEN } from '../utils/config';
 import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
 import type { RouteData } from '../types';
+import { validateToAmount } from '../functions/amountValidation';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -94,11 +94,10 @@ export function AddFunds({
   const [currentToTokenAddress, setCurrentToTokenAddress] = useState<
   TokenInfo | undefined
   >();
-  const [toAmountValidationStatus, setToAmountValidationStatus] = useState<InputValidationStatus>('success');
 
   const debouncedUpdateAmount = debounce((value: string) => {
     setDebouncedToAmount(value);
-  }, 1500);
+  }, 2500);
 
   const updateAmount = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
@@ -121,22 +120,6 @@ export function AddFunds({
     [viewDispatch],
   );
 
-  const validateToAmount = (amount: string): InputValidationStatus => {
-    if (
-      !amount
-    || parseFloat(amount) <= 0
-    ) {
-      return 'error';
-    }
-
-    return 'success';
-  };
-
-  useEffect(() => {
-    const validationStatus = validateToAmount(inputValue);
-    setToAmountValidationStatus(validationStatus);
-  }, [inputValue]);
-
   useEffect(() => {
     resetRoutes();
 
@@ -146,7 +129,7 @@ export function AddFunds({
       && tokens
       && currentToTokenAddress?.address
       && debouncedToAmount
-      && toAmountValidationStatus === 'success'
+      && validateToAmount(debouncedToAmount)
     ) {
       fetchRoutesWithRateLimit(
         squid,
@@ -161,7 +144,7 @@ export function AddFunds({
         1000,
       );
     }
-  }, [balances, squid, currentToTokenAddress, debouncedToAmount, toAmountValidationStatus]);
+  }, [balances, squid, currentToTokenAddress, debouncedToAmount]);
 
   useEffect(() => {
     if (!checkout) {
@@ -405,7 +388,7 @@ export function AddFunds({
           {showInitialEmptyState ? (
             <Body>Add Token</Body>
           ) : (
-            <HeroFormControl validationStatus={toAmountValidationStatus}>
+            <HeroFormControl validationStatus={validateToAmount(inputValue) ? 'success' : 'error'}>
               <HeroFormControl.Label>
                 Add
                 {' '}
