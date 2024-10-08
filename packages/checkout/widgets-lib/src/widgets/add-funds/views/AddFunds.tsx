@@ -10,6 +10,7 @@ import {
   Body,
   // Box,
   MenuItem,
+  InputValidationStatus,
 } from '@biom3/react';
 import debounce from 'lodash.debounce';
 import {
@@ -89,13 +90,11 @@ export function AddFunds({
   );
   const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
   const [inputValue, setInputValue] = useState<string>(toAmount || '');
-  // @TODO: the debouncedToAmount is likely what we need to use for USD
-  // pricing and route calculations, etc
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [debouncedToAmount, setDebouncedToAmount] = useState<string>(inputValue);
   const [currentToTokenAddress, setCurrentToTokenAddress] = useState<
   TokenInfo | undefined
   >();
+  const [toAmountValidationStatus, setToAmountValidationStatus] = useState<InputValidationStatus>('success');
 
   const debouncedUpdateAmount = debounce((value: string) => {
     setDebouncedToAmount(value);
@@ -122,6 +121,22 @@ export function AddFunds({
     [viewDispatch],
   );
 
+  const validateToAmount = (amount: string): InputValidationStatus => {
+    if (
+      !amount
+    || parseFloat(amount) <= 0
+    ) {
+      return 'error';
+    }
+
+    return 'success';
+  };
+
+  useEffect(() => {
+    const validationStatus = validateToAmount(inputValue);
+    setToAmountValidationStatus(validationStatus);
+  }, [inputValue]);
+
   useEffect(() => {
     resetRoutes();
 
@@ -131,6 +146,7 @@ export function AddFunds({
       && tokens
       && currentToTokenAddress?.address
       && debouncedToAmount
+      && toAmountValidationStatus === 'success'
     ) {
       fetchRoutesWithRateLimit(
         squid,
@@ -145,7 +161,7 @@ export function AddFunds({
         1000,
       );
     }
-  }, [balances, squid, currentToTokenAddress, debouncedToAmount]);
+  }, [balances, squid, currentToTokenAddress, debouncedToAmount, toAmountValidationStatus]);
 
   useEffect(() => {
     if (!checkout) {
@@ -275,10 +291,12 @@ export function AddFunds({
   }, [currentToTokenAddress, onRampAllowedTokens, showOnrampOption]);
 
   const showInitialEmptyState = !currentToTokenAddress;
+
   const defaultTokenImage = getDefaultTokenImage(
     checkout?.config.environment,
     config.theme,
   );
+
   const tokenChoiceOptions = useMemo(
     () => allowedTokens.map((token) => (
       <MenuItem
@@ -307,6 +325,7 @@ export function AddFunds({
     )),
     [allowedTokens, handleTokenChange, isSelected, defaultTokenImage],
   );
+
   const shouldShowBackButton = showBackButton ?? !!onBackButtonClick;
 
   return (
@@ -386,7 +405,7 @@ export function AddFunds({
           {showInitialEmptyState ? (
             <Body>Add Token</Body>
           ) : (
-            <HeroFormControl>
+            <HeroFormControl validationStatus={toAmountValidationStatus}>
               <HeroFormControl.Label>
                 Add
                 {' '}
