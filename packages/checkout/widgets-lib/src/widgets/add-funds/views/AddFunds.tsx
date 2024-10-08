@@ -529,9 +529,7 @@ export function AddFunds({
             visible={showPayWithDrawer}
             walletOptions={walletOptions}
             onClose={() => setShowPayWithDrawer(false)}
-            onPayWithCard={() => {
-              console.log('@TODO: Implement pay with card'); // eslint-disable-line no-console
-            }}
+            onPayWithCard={handleCardClick}
             insufficientBalance={insufficientBalance}
           />
           <OptionsDrawer

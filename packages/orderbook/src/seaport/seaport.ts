@@ -44,6 +44,8 @@ import { mapImmutableOrderToSeaportOrderComponents } from './map-to-seaport-orde
 import { SeaportLibFactory } from './seaport-lib-factory';
 import { prepareTransaction } from './transaction';
 
+type FulfillmentOrderDetails = Parameters<SeaportLib['fulfillOrders']>[0]['fulfillOrderDetails'][0] & { extraData: string };
+
 function mapImmutableSdkItemToSeaportSdkCreateInputItem(
   item: ERC20Item | ERC721Item | ERC1155Item,
 ): CreateInputItem {
@@ -276,7 +278,7 @@ export class Seaport {
     const seaportLib = this.getSeaportLib(order);
     const chainID = (await this.provider.getNetwork()).chainId;
 
-    const fulfilmentOrderDetails: Parameters<typeof seaportLib.fulfillOrders>[0]['fulfillOrderDetails'][0] = {
+    const fulfilmentOrderDetails: FulfillmentOrderDetails = {
       order: {
         parameters: orderComponents,
         signature: order.signature,
@@ -343,6 +345,7 @@ export class Seaport {
       extraData: string;
       order: OpenApiOrder;
       unitsToFill?: string;
+      considerationCriteria?: InputCriteria[];
     }[],
     account: string,
   ): Promise<{
@@ -352,7 +355,7 @@ export class Seaport {
     const fulfillOrderDetails = fulfillingOrders.map((o) => {
       const { orderComponents, tips } = mapImmutableOrderToSeaportOrderComponents(o.order);
 
-      return {
+      const fulfilmentOrderDetails: FulfillmentOrderDetails = {
         order: {
           parameters: orderComponents,
           signature: o.order.signature,
@@ -361,6 +364,12 @@ export class Seaport {
         extraData: o.extraData,
         tips,
       };
+
+      if (o.considerationCriteria && o.considerationCriteria.length > 0) {
+        fulfilmentOrderDetails.considerationCriteria = o.considerationCriteria;
+      }
+
+      return fulfilmentOrderDetails;
     });
 
     const { actions: seaportActions } = await this.getSeaportLib().fulfillOrders({
@@ -370,19 +379,23 @@ export class Seaport {
 
     const fulfillmentActions: TransactionAction[] = [];
 
-    const approvalAction = seaportActions.find(
+    const approvalActions = seaportActions.filter(
       (action) => action.type === 'approval',
     );
 
-    if (approvalAction) {
-      fulfillmentActions.push({
-        type: ActionType.TRANSACTION,
-        buildTransaction: prepareTransaction(
-          approvalAction.transactionMethods,
-          (await this.provider.getNetwork()).chainId,
-          account,
-        ),
-        purpose: TransactionPurpose.APPROVAL,
+    const chainID = (await this.provider.getNetwork()).chainId;
+
+    if (approvalActions.length > 0) {
+      approvalActions.forEach((approvalAction) => {
+        fulfillmentActions.push({
+          type: ActionType.TRANSACTION,
+          buildTransaction: prepareTransaction(
+            approvalAction.transactionMethods,
+            chainID,
+            account,
+          ),
+          purpose: TransactionPurpose.APPROVAL,
+        });
       });
     }
 

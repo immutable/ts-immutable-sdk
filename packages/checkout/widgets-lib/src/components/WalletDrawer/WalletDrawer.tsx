@@ -10,7 +10,10 @@ import { walletItemListStyles } from './WalletDrawerStyles';
 import { WalletConnectItem } from './WalletConnectItem';
 import { useWalletConnect } from '../../lib/hooks/useWalletConnect';
 import { WalletChangeEvent } from './WalletDrawerEvents';
-import { listItemVariants, listVariants } from '../../lib/animation/listAnimation';
+import {
+  listItemVariants,
+  listVariants,
+} from '../../lib/animation/listAnimation';
 import { walletConnectProviderInfo } from '../../lib/walletConnect';
 
 interface WalletDrawerProps {
@@ -18,7 +21,7 @@ interface WalletDrawerProps {
   drawerText: {
     heading: string;
     defaultText?: string;
-  },
+  };
   showWalletConnect?: boolean;
   showWalletSelectorTarget?: boolean;
   walletOptions: EIP6963ProviderDetail[];
@@ -49,7 +52,9 @@ export function WalletDrawer({
   const [walletItemLoading, setWalletItemLoading] = useState(false);
   const { heading, defaultText } = drawerText;
 
-  const handleWalletItemClick = async (providerDetail: EIP6963ProviderDetail) => {
+  const handleWalletItemClick = async (
+    providerDetail: EIP6963ProviderDetail,
+  ) => {
     setWalletItemLoading(true);
     try {
       await onWalletChange({
@@ -99,31 +104,26 @@ export function WalletDrawer({
       }}
       visible={showDrawer}
     >
-      {showWalletSelectorTarget
-        && (
-          <Drawer.Target>
-            <FormControlWrapper
-              testId={`${testId}-wallet-form-control`}
-              textAlign="left"
-            >
-              <Select
-                testId={`${testId}-wallet-select`}
-                defaultLabel={defaultText ?? ''}
-                size="large"
-                targetClickOveride={() => setShowDrawer(true)}
-              />
-            </FormControlWrapper>
-          </Drawer.Target>
-        )}
+      {showWalletSelectorTarget && (
+        <Drawer.Target>
+          <FormControlWrapper
+            testId={`${testId}-wallet-form-control`}
+            textAlign="left"
+          >
+            <Select
+              testId={`${testId}-wallet-select`}
+              defaultLabel={defaultText ?? ''}
+              size="large"
+              targetClickOveride={() => setShowDrawer(true)}
+            />
+          </FormControlWrapper>
+        </Drawer.Target>
+      )}
       <Drawer.Content
         sx={walletItemListStyles}
-        rc={(
-          <motion.div
-            variants={listVariants}
-            initial="hidden"
-            animate="show"
-          />
-        )}
+        rc={
+          <motion.div variants={listVariants} initial="hidden" animate="show" />
+        }
       >
         {walletOptions.map((providerDetail, index) => {
           const unavailableIndex = disabledOptions?.findIndex(
@@ -132,14 +132,14 @@ export function WalletDrawer({
 
           const unavalable = unavailableIndex > -1;
 
-          const badge = unavalable
-            ? (
-              <MenuItem.Badge
-                variant="dark"
-                badgeContent={disabledOptions?.[unavailableIndex]?.label ?? 'no funds'}
-              />
-            )
-            : undefined;
+          const badge = unavalable ? (
+            <MenuItem.Badge
+              variant="dark"
+              badgeContent={
+                disabledOptions?.[unavailableIndex]?.label ?? 'no funds'
+              }
+            />
+          ) : undefined;
 
           return (
             <WalletItem
@@ -148,9 +148,7 @@ export function WalletDrawer({
               loading={walletItemLoading}
               providerInfo={providerDetail.info}
               onWalletItemClick={() => handleWalletItemClick(providerDetail)}
-              rc={(
-                <motion.div variants={listItemVariants} custom={index} />
-              )}
+              rc={<motion.div variants={listItemVariants} custom={index} />}
               size={menuItemSize}
               badge={badge}
               disabled={unavalable}
