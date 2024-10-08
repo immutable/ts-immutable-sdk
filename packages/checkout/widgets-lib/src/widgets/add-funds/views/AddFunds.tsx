@@ -45,6 +45,7 @@ import { useRoutes } from '../hooks/useRoutes';
 import { SQUID_NATIVE_TOKEN } from '../utils/config';
 import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
 import type { RouteData } from '../types';
+import { convertToUsd } from '../functions/convertToUsd';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -96,7 +97,10 @@ export function AddFunds({
   const [currentToTokenAddress, setCurrentToTokenAddress] = useState<
   TokenInfo | undefined
   >();
-  const [amountInUSD, setAmountInUSD] = useState<string>('');
+  const amountInUsd = useMemo(
+    () => convertToUsd(tokens, inputValue, currentToTokenAddress),
+    [tokens, inputValue, currentToTokenAddress],
+  );
 
   const debouncedUpdateAmount = debounce((value: string) => {
     setDebouncedToAmount(value);
@@ -230,31 +234,6 @@ export function AddFunds({
   //   // eslint-disable-next-line no-console
   //   console.log('handle review click');
   // }, []);
-
-  useEffect(() => {
-    setAmountInUSD('');
-
-    if (!inputValue || !currentToTokenAddress?.address || !tokens) {
-      return;
-    }
-    const toSquidTokenAddress = currentToTokenAddress?.address === 'native'
-      ? SQUID_NATIVE_TOKEN
-      : currentToTokenAddress?.address;
-
-    const toToken = tokens?.find(
-      (value) => value.address.toLowerCase() === toSquidTokenAddress.toLowerCase()
-        && value.chainId === ChainId.IMTBL_ZKEVM_MAINNET.toString(),
-    );
-
-    if (!toToken) {
-      return;
-    }
-
-    const tokenBalance = Number(inputValue) * toToken.usdPrice;
-    if (tokenBalance > 0) {
-      setAmountInUSD(`USD $${tokenBalance.toFixed(2)}`);
-    }
-  }, [inputValue, currentToTokenAddress, tokens]);
 
   const onCardClick = () => {
     const data = {
@@ -426,7 +405,12 @@ export function AddFunds({
                 placeholder="0"
                 maxTextSize="xLarge"
               />
-              <HeroFormControl.Caption>{amountInUSD}</HeroFormControl.Caption>
+              {amountInUsd > 0 && (
+                <HeroFormControl.Caption>
+                  USD $
+                  {amountInUsd.toFixed(2)}
+                </HeroFormControl.Caption>
+              )}
             </HeroFormControl>
           )}
         </Stack>
