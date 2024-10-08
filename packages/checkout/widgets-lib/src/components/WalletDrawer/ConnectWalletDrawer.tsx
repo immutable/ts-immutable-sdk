@@ -1,7 +1,5 @@
 import { ReactNode, useRef, useState } from 'react';
 import {
-  Checkout,
-  CheckoutErrorType,
   EIP6963ProviderDetail,
   EIP6963ProviderInfo,
   WalletProviderRdns,
@@ -12,16 +10,23 @@ import { MenuItemProps } from '@biom3/react';
 import { WalletDrawer } from './WalletDrawer';
 import { WalletChangeEvent } from './WalletDrawerEvents';
 import { NonPassportWarningDrawer } from './NonPassportWarningDrawer';
-import { addProviderListenersForWidgetRoot } from '../../lib';
 import { identifyUser } from '../../lib/analytics/identifyUser';
 import { getProviderSlugFromRdns } from '../../lib/provider';
-import { useAnalytics, UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import {
+  useAnalytics,
+  UserJourney,
+} from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import {
   ProvidersContextActions,
   useProvidersContext,
 } from '../../context/providers-context/ProvidersContext';
 import { UnableToConnectDrawer } from '../UnableToConnectDrawer/UnableToConnectDrawer';
 import { ChangedYourMindDrawer } from '../ChangedYourMindDrawer/ChangedYourMindDrawer';
+import { HAS_SEEN_NON_PASSPORT_WARNING_KEY } from '../../lib/constants';
+import {
+  connectEIP6963Provider,
+  ConnectEIP6963ProviderError,
+} from '../../lib/connectEIP6963Provider';
 
 type ConnectWalletDrawerProps = {
   heading: string;
@@ -37,57 +42,6 @@ type ConnectWalletDrawerProps = {
   }[];
 };
 
-const HAS_SEEN_NON_PASSPORT_WARNING_KEY = '@imtbl/checkout/has-seen-non-passport-warning';
-
-enum ConnectEIP6963ProviderError {
-  CONNECT_ERROR = 'CONNECT_ERROR',
-  SANCTIONED_ADDRESS = 'SANCTIONED_ADDRESS',
-  USER_REJECTED_REQUEST_ERROR = 'USER_REJECTED_REQUEST_ERROR',
-}
-
-type ConnectEIP6963ProviderResult = {
-  provider: Web3Provider;
-  providerName: string;
-};
-const connectEIP6963Provider = async (
-  providerDetail: EIP6963ProviderDetail,
-  checkout: Checkout,
-): Promise<ConnectEIP6963ProviderResult> => {
-  const web3Provider = new Web3Provider(providerDetail.provider as any);
-
-  try {
-    const requestWalletPermissions = providerDetail.info.rdns === WalletProviderRdns.METAMASK;
-    const connectResult = await checkout.connect({
-      provider: web3Provider,
-      requestWalletPermissions,
-    });
-
-    const address = await connectResult.provider.getSigner().getAddress();
-    const isSanctioned = await checkout.checkIsAddressSanctioned(
-      address,
-      checkout.config.environment,
-    );
-
-    if (isSanctioned) {
-      throw new Error(ConnectEIP6963ProviderError.SANCTIONED_ADDRESS);
-    }
-
-    addProviderListenersForWidgetRoot(connectResult.provider);
-    return {
-      provider: connectResult.provider,
-      providerName: getProviderSlugFromRdns(providerDetail.info.rdns),
-    };
-  } catch (error: CheckoutErrorType | any) {
-    if (error.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
-      throw new Error(
-        ConnectEIP6963ProviderError.USER_REJECTED_REQUEST_ERROR,
-      );
-    }
-
-    throw new Error(ConnectEIP6963ProviderError.CONNECT_ERROR);
-  }
-};
-
 export function ConnectWalletDrawer({
   heading,
   visible,
@@ -98,7 +52,10 @@ export function ConnectWalletDrawer({
   menuItemSize = 'small',
   disabledOptions = [],
 }: ConnectWalletDrawerProps) {
-  const { providersState: { checkout }, providersDispatch } = useProvidersContext();
+  const {
+    providersState: { checkout },
+    providersDispatch,
+  } = useProvidersContext();
 
   const { identify, track } = useAnalytics();
 
@@ -119,11 +76,17 @@ export function ConnectWalletDrawer({
     return false;
   };
 
-  const setProviderInContext = (provider: Web3Provider, providerInfo: EIP6963ProviderInfo) => {
+  const setProviderInContext = async (
+    provider: Web3Provider,
+    providerInfo: EIP6963ProviderInfo,
+  ) => {
+    const address = await provider.getSigner().getAddress();
+
     if (providerType === 'from') {
       providersDispatch({
         payload: {
           type: ProvidersContextActions.SET_PROVIDER,
+          fromAddress: address,
           fromProvider: provider,
           fromProviderInfo: providerInfo,
         },
@@ -134,6 +97,7 @@ export function ConnectWalletDrawer({
       providersDispatch({
         payload: {
           type: ProvidersContextActions.SET_PROVIDER,
+          toAddress: address,
           toProvider: provider,
           toProviderInfo: providerInfo,
         },
@@ -187,8 +151,15 @@ export function ConnectWalletDrawer({
         setShowUnableToConnectDrawer(true);
       }
 
-      if (error.message === ConnectEIP6963ProviderError.USER_REJECTED_REQUEST_ERROR) {
+      if (
+        error.message
+        === ConnectEIP6963ProviderError.USER_REJECTED_REQUEST_ERROR
+      ) {
         setShowChangedMindDrawer(true);
+      }
+
+      if (error.message === ConnectEIP6963ProviderError.CONNECT_ERROR) {
+        console.log('@TODO: handle connect error'); // eslint-disable-line no-console
       }
 
       return;

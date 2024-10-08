@@ -46,6 +46,7 @@ import { SQUID_NATIVE_TOKEN } from '../utils/config';
 import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
 import type { RouteData } from '../types';
 import { SelectedRouteOption } from '../components/SelectedRouteOption';
+import { SelectedWallet } from '../components/SelectedWallet';
 import { DeliverToWalletDrawer } from '../../../components/WalletDrawer/DeliverToWalletDrawer';
 import { PayWithWalletDrawer } from '../../../components/WalletDrawer/PayWithWalletDrawer';
 import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
@@ -117,19 +118,26 @@ export function AddFunds({
     debouncedUpdateAmount(value);
   };
 
-  const { providersState: { fromProvider } } = useProvidersContext();
+  const {
+    providersState: {
+      fromProvider, fromProviderInfo, fromAddress, toProviderInfo, toAddress,
+    },
+  } = useProvidersContext();
 
   const { providers } = useInjectedProviders({ checkout });
   const walletOptions = useMemo(
     () => providers
-      // TODO: Check if must filter passport on L1
+    // TODO: Check if must filter passport on L1
       .map((detail) => {
         if (detail.info.rdns === WalletProviderRdns.PASSPORT) {
           return {
             ...detail,
             info: {
               ...detail.info,
-              name: getProviderSlugFromRdns(detail.info.rdns).replace(/^\w/, (c) => c.toUpperCase()),
+              name: getProviderSlugFromRdns(detail.info.rdns).replace(
+                /^\w/,
+                (c) => c.toUpperCase(),
+              ),
             },
           };
         }
@@ -329,12 +337,12 @@ export function AddFunds({
               name={token.name}
               defaultImage={defaultTokenImage}
             />
-          )}
+            )}
           emphasized={false}
         />
         <MenuItem.Label>{token.symbol}</MenuItem.Label>
         {token.symbol !== token.name && (
-          <MenuItem.Caption>{token.name}</MenuItem.Caption>
+        <MenuItem.Caption>{token.name}</MenuItem.Caption>
         )}
       </MenuItem>
     )),
@@ -349,12 +357,16 @@ export function AddFunds({
 
   // @FIXME: Must improve how we detect the loading condition is met based on inputs and routes fetching state
   const loading = Boolean(
-    fromProvider && ((selectedToken?.address && debouncedToAmount && !selectedRouteData)
-      || fetchingRoutes),
+    fromProvider
+      && ((selectedToken?.address && debouncedToAmount && !selectedRouteData)
+        || fetchingRoutes),
   );
 
   // @TODO: Also, Open pay with drawer if insufficient balance
-  const insufficientBalance = useMemo(() => !loading && routes.length === 0, [loading, routes]);
+  const insufficientBalance = useMemo(
+    () => !loading && routes.length === 0,
+    [loading, routes],
+  );
 
   return (
     <SimpleLayout
@@ -417,7 +429,7 @@ export function AddFunds({
                         name={selectedToken?.name}
                         defaultImage={defaultTokenImage}
                       />
-                    )}
+                      )}
                     padded
                     emphasized
                     circularFrame
@@ -468,32 +480,30 @@ export function AddFunds({
           gap="base.spacing.x6"
         >
           <Stack gap="0px">
-            <MenuItem
-              size="small"
-              emphasized
+            <SelectedWallet
+              label="Pay with"
+              providerInfo={{
+                ...fromProviderInfo,
+                address: fromAddress,
+              }}
               onClick={(event) => {
                 event.stopPropagation();
                 setShowPayWithDrawer(true);
               }}
             >
-              <MenuItem.FramedIcon
-                icon="Wallet"
-                variant="bold"
-                emphasized={false}
+              <MenuItem.BottomSlot.Divider sx={{
+                ml: fromAddress ? 'base.spacing.x2' : undefined,
+              }}
               />
-              <MenuItem.Label>Pay with</MenuItem.Label>
-              <MenuItem.BottomSlot>
-                <MenuItem.BottomSlot.Divider />
-                <SelectedRouteOption
-                  loading={loading}
-                  chains={chains}
-                  balances={balances}
-                  routeData={selectedRouteData}
-                  onClick={() => setShowOptionsDrawer(true)}
-                />
-              </MenuItem.BottomSlot>
-            </MenuItem>
-
+              <SelectedRouteOption
+                loading={loading}
+                chains={chains}
+                balances={balances}
+                routeData={selectedRouteData}
+                onClick={() => setShowOptionsDrawer(true)}
+                selected={!!fromAddress}
+              />
+            </SelectedWallet>
             <Stack
               sx={{ pos: 'relative', h: 'base.spacing.x3' }}
               alignItems="center"
@@ -508,18 +518,14 @@ export function AddFunds({
                 }}
               />
             </Stack>
-            <MenuItem
-              size="small"
-              emphasized
+            <SelectedWallet
+              label="Deliver to"
+              providerInfo={{
+                ...toProviderInfo,
+                address: toAddress,
+              }}
               onClick={() => setShowDeliverToDrawer(true)}
-            >
-              <MenuItem.FramedIcon
-                icon="Wallet"
-                variant="bold"
-                emphasized={false}
-              />
-              <MenuItem.Label>Deliver to</MenuItem.Label>
-            </MenuItem>
+            />
           </Stack>
 
           <Button

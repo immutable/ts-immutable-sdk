@@ -61,11 +61,12 @@ export function Review({
   } = useContext(AddFundsContext);
 
   const {
-    providersState: { checkout, fromProvider },
+    providersState: {
+      checkout, fromProvider, fromAddress, toAddress,
+    },
   } = useProvidersContext();
 
   const [route, setRoute] = useState<RouteResponse | undefined>();
-  const [fromAddress, setFromAddress] = useState<string | undefined>();
   const [getRouteIntervalId, setGetRouteIntervalId] = useState<
   NodeJS.Timer | undefined
   >();
@@ -87,10 +88,7 @@ export function Review({
   const getFromAmountAndRoute = async () => {
     if (!squid || !tokens) return;
 
-    const address = await fromProvider?.getSigner().getAddress();
-
-    if (!address) return;
-    setFromAddress(address);
+    if (!fromAddress || !toAddress) return;
 
     const amountData = getAmountData(
       tokens,
@@ -108,9 +106,9 @@ export function Review({
       squid,
       amountData?.fromToken,
       amountData?.toToken,
-      address,
+      toAddress,
       amountData.fromAmount,
-      address,
+      fromAddress,
       false,
     );
     setRoute(routeResponse);

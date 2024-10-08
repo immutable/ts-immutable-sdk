@@ -11,16 +11,20 @@ import { Checkout, EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
 export interface ProvidersState {
   fromProvider?: Web3Provider;
   fromProviderInfo?: EIP6963ProviderInfo;
+  fromAddress?: string;
   toProvider?: Web3Provider;
   toProviderInfo?: EIP6963ProviderInfo;
+  toAddress?: string;
   checkout: Checkout;
 }
 
 export const initialProvidersState: ProvidersState = {
   fromProvider: undefined,
   fromProviderInfo: undefined,
+  fromAddress: undefined,
   toProvider: undefined,
   toProviderInfo: undefined,
+  toAddress: undefined,
   checkout: {} as Checkout,
 };
 
@@ -48,8 +52,10 @@ export interface SetProviderPayload {
   type: ProvidersContextActions.SET_PROVIDER;
   fromProvider?: Web3Provider;
   fromProviderInfo?: EIP6963ProviderInfo;
+  fromAddress?: string;
   toProvider?: Web3Provider;
   toProviderInfo?: EIP6963ProviderInfo;
+  toAddress?: string;
 }
 
 export interface SetCheckoutPayload {
@@ -95,6 +101,12 @@ ProvidersContextAction
         }),
         ...(action.payload.toProviderInfo && {
           toProviderInfo: action.payload.toProviderInfo,
+        }),
+        ...(action.payload.fromAddress && {
+          fromAddress: action.payload.fromAddress,
+        }),
+        ...(action.payload.toAddress && {
+          toAddress: action.payload.toAddress,
         }),
       };
     case ProvidersContextActions.SET_CHECKOUT:

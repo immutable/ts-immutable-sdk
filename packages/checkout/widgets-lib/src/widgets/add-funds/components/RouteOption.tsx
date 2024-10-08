@@ -85,7 +85,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
       )}
 
       <MenuItem.Caption>
-        Balance: $$
+        Balance: $
         {formattedUsdBalance}
       </MenuItem.Caption>
 

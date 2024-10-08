@@ -1,4 +1,5 @@
 import { MenuItem, Stack, Sticker } from '@biom3/react';
+import { BigNumber, utils } from 'ethers';
 import {
   MouseEvent,
   MouseEventHandler,
@@ -10,6 +11,7 @@ import { TokenBalance } from '@0xsquid/sdk/dist/types';
 
 import { Chain, RouteData } from '../types';
 import { getUsdBalance } from '../functions/convertTokenBalanceToUsd';
+import { tokenValueFormat } from '../../../lib/utils';
 
 export interface RouteOptionProps {
   routeData?: RouteData;
@@ -17,13 +19,16 @@ export interface RouteOptionProps {
   onClick: MouseEventHandler<HTMLSpanElement>;
   balances: TokenBalance[] | null;
   loading?: boolean;
+  selected?: boolean;
 }
 
 function SelectedRouteOptionContainer({
   children,
   onClick,
+  selected,
 }: {
   children: ReactNode;
+  selected?: boolean;
   onClick?: MouseEventHandler<HTMLSpanElement>;
 }) {
   return (
@@ -32,8 +37,12 @@ function SelectedRouteOptionContainer({
       alignItems="center"
       gap="base.spacing.x4"
       sx={{
-        ml: ({ base }) => `calc(${base.spacing.x16} * -1)`,
-        w: ({ base }) => `calc(100% + (${base.spacing.x16}))`,
+        ml: ({ base }) => (selected
+          ? `calc(${base.spacing.x12} * -1)`
+          : `calc(${base.spacing.x16} * -1)`),
+        w: ({ base }) => (selected
+          ? `calc(100% + (${base.spacing.x12}))`
+          : `calc(100% + (${base.spacing.x16}))`),
       }}
       rc={<span {...(onClick ? { onClick } : {})} />}
     >
@@ -47,6 +56,7 @@ export function SelectedRouteOption({
   chains,
   balances,
   loading = false,
+  selected = false,
   onClick,
 }: RouteOptionProps) {
   const mergedOnClick = useCallback(
@@ -63,15 +73,22 @@ export function SelectedRouteOption({
   const balance = balances?.find(
     ({ address, chainId }) => address === fromToken?.address && chainId === fromToken.chainId,
   );
-  const usdBalance = routeData ? getUsdBalance(balance, routeData) : '';
-  const formattedUsdBalance = useMemo(
-    () => (usdBalance ? Number(usdBalance).toFixed(2) : undefined),
-    [usdBalance],
-  );
+
+  const usdBalance = routeData ? getUsdBalance(balance, routeData) : '0.00';
+
+  const routeUSDBalance = routeData?.route.route.estimate.fromAmountUSD ?? '0.00';
+  const routeBalance = useMemo(() => {
+    if (!routeData) return '0.00';
+
+    const amount = routeData?.route.route.estimate.fromAmount;
+    const decimals = routeData?.route.route.estimate.fromToken.decimals;
+
+    return utils.formatUnits(BigNumber.from(amount), decimals).toString();
+  }, [routeData]);
 
   if (!routeData) {
     return loading ? (
-      <SelectedRouteOptionContainer onClick={mergedOnClick}>
+      <SelectedRouteOptionContainer onClick={mergedOnClick} selected={selected}>
         <MenuItem.FramedVideo
           videoUrl="https://i.imgur.com/dVQoobw.mp4"
           mimeType="video/mp4"
@@ -81,7 +98,7 @@ export function SelectedRouteOption({
         <MenuItem.Caption>Finding the best payment route...</MenuItem.Caption>
       </SelectedRouteOptionContainer>
     ) : (
-      <SelectedRouteOptionContainer onClick={mergedOnClick}>
+      <SelectedRouteOptionContainer onClick={mergedOnClick} selected={selected}>
         <MenuItem.FramedIcon
           icon="Sparkle"
           variant="bold"
@@ -96,7 +113,7 @@ export function SelectedRouteOption({
   }
 
   return (
-    <SelectedRouteOptionContainer onClick={mergedOnClick}>
+    <SelectedRouteOptionContainer onClick={mergedOnClick} selected={selected}>
       {chain && (
         <Sticker position={{ x: 'right', y: 'bottom' }}>
           <Sticker.FramedImage
@@ -120,11 +137,14 @@ export function SelectedRouteOption({
       >
         <Stack gap="0px">
           <MenuItem.Label>{fromToken?.name}</MenuItem.Label>
-          <MenuItem.Caption>{`Balance $${balance?.balance}`}</MenuItem.Caption>
+          <MenuItem.Caption>
+            {`Balance USD $${tokenValueFormat(usdBalance)}`}
+          </MenuItem.Caption>
         </Stack>
-
-        <MenuItem.PriceDisplay price="0.14">
-          <MenuItem.PriceDisplay.Caption>{`USD $${formattedUsdBalance}`}</MenuItem.PriceDisplay.Caption>
+        <MenuItem.PriceDisplay price={tokenValueFormat(routeBalance)}>
+          <MenuItem.PriceDisplay.Caption>
+            {`USD $${tokenValueFormat(routeUSDBalance)}`}
+          </MenuItem.PriceDisplay.Caption>
         </MenuItem.PriceDisplay>
       </Stack>
     </SelectedRouteOptionContainer>
