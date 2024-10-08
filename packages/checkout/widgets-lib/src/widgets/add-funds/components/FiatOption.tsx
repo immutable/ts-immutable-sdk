@@ -3,7 +3,9 @@ import { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiatOptionType } from '../types';
 
-export interface FiatOptionProps<RC extends ReactElement | undefined = undefined> {
+export interface FiatOptionProps<
+  RC extends ReactElement | undefined = undefined,
+> {
   rc?: RC;
   type: FiatOptionType;
   onClick?: (type: FiatOptionType) => void;
@@ -38,15 +40,17 @@ export function FiatOption<RC extends ReactElement | undefined = undefined>({
   };
 
   return (
-    <MenuItem
-      {...menuItemProps}
-    >
-      <MenuItem.FramedIcon icon={icon[type]} variant="bold" emphasized={false} />
+    <MenuItem {...menuItemProps}>
+      <MenuItem.FramedIcon
+        icon={icon[type]}
+        variant="bold"
+        emphasized={false}
+      />
       <MenuItem.Label>
         {t(`views.ADD_FUNDS.drawer.options.${type}.heading`)}
       </MenuItem.Label>
       <MenuItem.Caption>
-        { t(
+        {t(
           `views.ADD_FUNDS.drawer.options.${type}.${
             disabled ? 'disabledCaption' : 'caption'
           }`,

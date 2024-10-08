@@ -1,4 +1,9 @@
-import { Drawer, DUMMY_RASTER_IMAGE_3_URL, EllipsizedText, MenuItem } from '@biom3/react';
+import {
+  Drawer,
+  DUMMY_RASTER_IMAGE_3_URL,
+  EllipsizedText,
+  MenuItem,
+} from '@biom3/react';
 import { motion } from 'framer-motion';
 import { useContext } from 'react';
 
@@ -53,14 +58,15 @@ export function OptionsDrawer({
         <MenuItem size="xSmall">
           <MenuItem.FramedImage
             // @TODO: we need this to be the actual wallet icon
-            use={<img src={DUMMY_RASTER_IMAGE_3_URL} />}
+            use={<img src={DUMMY_RASTER_IMAGE_3_URL} alt="mooo" />}
             padded
             emphasized
           />
           <MenuItem.Label>Pay from</MenuItem.Label>
           <MenuItem.Caption>
             {/* @TODO: we need this to be the actual wallet name */}
-            MetaMask •{' '}
+            MetaMask •
+            {' '}
             <EllipsizedText
               // @TODO: we need this to be the actual wallet address
               text="0x83124528b40F21882eb7D6bcDa07592f364d3856"
@@ -69,7 +75,6 @@ export function OptionsDrawer({
           </MenuItem.Caption>
           <MenuItem.StatefulButtCon icon="ChevronExpand" onClick={onClose} />
         </MenuItem>
-
         <Options
           size="small"
           routes={routes}

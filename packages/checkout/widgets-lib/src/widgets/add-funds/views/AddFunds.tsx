@@ -363,7 +363,12 @@ export function AddFunds({
       <Stack alignItems="center" sx={{ flex: 1 }}>
         <Stack
           testId="topSection"
-          sx={{ flex: 1, px: 'base.spacing.x2', w: '100%', pt: 'base.spacing.x1' }}
+          sx={{
+            flex: 1,
+            px: 'base.spacing.x2',
+            w: '100%',
+            pt: 'base.spacing.x1',
+          }}
           justifyContent="center"
           alignItems="center"
         >
@@ -470,7 +475,7 @@ export function AddFunds({
                   top: '0',
                   pos: 'absolute',
                   translate: ({ base }) => `0 -${base.spacing.x3}`,
-                  bg: 'base.color.neutral.800'
+                  bg: 'base.color.neutral.800',
                 }}
               />
             </Stack>

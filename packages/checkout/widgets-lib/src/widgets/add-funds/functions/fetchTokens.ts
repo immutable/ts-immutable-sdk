@@ -15,7 +15,7 @@ type SquidTokensResponse = {
   tokens: SquidTokenResponse[];
 };
 
-export const fetchTokens = async (integratorId:string): Promise<Token[]> => {
+export const fetchTokens = async (integratorId: string): Promise<Token[]> => {
   const url = `${SQUID_SDK_BASE_URL}/v2/sdk-info`;
 
   const response = await fetch(url, {
