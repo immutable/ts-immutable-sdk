@@ -4,8 +4,9 @@ on:
   pull_request:
     branches:
       - main
-    paths: 
-      - 'packages/checkout/**'
+  merge_group:
+    branches:
+      - main
 
 env:
   NX_CLOUD_ACCESS_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NX_TOKEN }}

@@ -13,7 +13,6 @@ const checkoutSDK = new checkout.Checkout();
 
 function Version() {
 
-  // const [widgets, setWidgets] = useState<ImmutableCheckoutWidgets.WidgetsFactory>();
   const [widget, setWidget] = useState<Widget<WidgetType.CHECKOUT>>();
 
 
