@@ -216,7 +216,7 @@ export default function CreateERC1155ListingWithPassport() {
         orderbookSDK,
         preparedListing,
         orderSignature,
-        makerEcosystemFeeRecipient == "" ? {
+        makerEcosystemFeeRecipient != "" ? {
           recipientAddress: makerEcosystemFeeRecipient,
           amount: makerEcosystemFeeAmount,
         } : undefined

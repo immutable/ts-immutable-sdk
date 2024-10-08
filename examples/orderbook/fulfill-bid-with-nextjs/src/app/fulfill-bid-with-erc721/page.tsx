@@ -173,7 +173,7 @@ export default function FulfillERC721WithPassport() {
     const { actions } = await orderbookSDK.fulfillOrder(
       bidID,
       accountsState[0],
-      takerEcosystemFeeRecipient == "" ? [{
+      takerEcosystemFeeRecipient != "" ? [{
         recipientAddress: takerEcosystemFeeRecipient, // Replace address with your own marketplace address
         amount: takerEcosystemFeeAmount, // Insert taker ecosystem/marketplace fee here
       }] : [],

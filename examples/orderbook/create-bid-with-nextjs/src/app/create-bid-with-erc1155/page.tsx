@@ -194,7 +194,7 @@ export default function CreateERC1155BidWithPassport() {
         orderbookSDK,
         preparedBid,
         orderSignature,
-        makerEcosystemFeeRecipient == "" ? {
+        makerEcosystemFeeRecipient != "" ? {
           recipientAddress: makerEcosystemFeeRecipient,
           amount: makerEcosystemFeeAmount,
         } : undefined

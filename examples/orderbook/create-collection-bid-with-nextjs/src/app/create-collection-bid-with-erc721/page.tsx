@@ -186,7 +186,7 @@ export default function CreateERC721CollectionBidWithPassport() {
         orderbookSDK,
         preparedCollectionBid,
         orderSignature,
-        makerEcosystemFeeRecipient == "" ? {
+        makerEcosystemFeeRecipient != "" ? {
           recipientAddress: makerEcosystemFeeRecipient,
           amount: makerEcosystemFeeAmount,
         } : undefined
