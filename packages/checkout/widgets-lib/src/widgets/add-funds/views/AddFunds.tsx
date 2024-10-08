@@ -45,6 +45,7 @@ import { useRoutes } from '../hooks/useRoutes';
 import { SQUID_NATIVE_TOKEN } from '../utils/config';
 import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
 import type { RouteData } from '../types';
+import { convertToUsd } from '../functions/convertToUsd';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -96,6 +97,10 @@ export function AddFunds({
   const [currentToTokenAddress, setCurrentToTokenAddress] = useState<
   TokenInfo | undefined
   >();
+  const amountInUsd = useMemo(
+    () => convertToUsd(tokens, inputValue, currentToTokenAddress),
+    [tokens, inputValue, currentToTokenAddress],
+  );
 
   const debouncedUpdateAmount = debounce((value: string) => {
     setDebouncedToAmount(value);
@@ -400,7 +405,12 @@ export function AddFunds({
                 placeholder="0"
                 maxTextSize="xLarge"
               />
-              <HeroFormControl.Caption>USD $0.00</HeroFormControl.Caption>
+              {amountInUsd > 0 && (
+                <HeroFormControl.Caption>
+                  USD $
+                  {amountInUsd.toFixed(2)}
+                </HeroFormControl.Caption>
+              )}
             </HeroFormControl>
           )}
         </Stack>
