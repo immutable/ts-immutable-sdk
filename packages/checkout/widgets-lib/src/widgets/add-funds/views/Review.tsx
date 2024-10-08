@@ -475,7 +475,7 @@ export function Review({
                 <Body size="small" sx={{ c: 'inherit' }}>
                   <EllipsizedText
                     size="small"
-                    text={fromAddress ?? ''}
+                    text={toAddress ?? ''}
                     sx={{ c: 'inherit' }}
                   />
                 </Body>
