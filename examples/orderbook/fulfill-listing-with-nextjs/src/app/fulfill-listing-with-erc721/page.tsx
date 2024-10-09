@@ -198,7 +198,7 @@ export default function FulfillERC721WithPassport() {
     for (const action of actions) {
       if (action.type === orderbook.ActionType.TRANSACTION) {
         const builtTx = await action.buildTransaction();
-        await signer.sendTransaction(builtTx);
+        await (await signer.sendTransaction(builtTx)).wait(1);
       }
     }
   };
