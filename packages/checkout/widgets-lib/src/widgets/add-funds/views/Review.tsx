@@ -1,9 +1,5 @@
 import {
-  ReactNode,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
+  ReactNode, useCallback, useContext, useMemo, useState,
 } from 'react';
 import {
   Body,
@@ -43,9 +39,7 @@ import { SQUID_NATIVE_TOKEN } from '../utils/config';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import i18n from '../../../i18n';
-import {
-  getDurationFormatted,
-} from '../functions/getDurationFormatted';
+import { getDurationFormatted } from '../functions/getDurationFormatted';
 
 interface ReviewProps {
   data: AddFundsReviewData;
@@ -69,6 +63,14 @@ const getAmountFormatted = (amount?: string, decimals?: number) => {
   }
 
   return utils.formatUnits(BigNumber.from(amount), decimals);
+};
+
+const dividerSx = {
+  content: "''",
+  pos: 'absolute',
+  left: 'base.spacing.x6',
+  w: '1px',
+  bg: 'base.color.translucent.standard.500',
 };
 
 export function Review({
@@ -328,6 +330,7 @@ export function Review({
             pt: 'base.spacing.x4',
             px: 'base.spacing.x5',
             h: 'base.spacing.x18',
+            w: '100%',
           }}
           justifyContent="flex-start"
         >
@@ -354,10 +357,10 @@ export function Review({
         sx={{
           w: '100%',
           flex: 1,
-          px: 'base.spacing.x2',
           overflowY: 'auto',
         }}
         alignItems="stretch"
+        gap="base.spacing.x4"
         testId="reviewContainer"
       >
         {isContentLoaded(route) ? (
@@ -366,313 +369,307 @@ export function Review({
               Review
             </Heading>
 
-            <Stack
-              direction="row"
-              sx={{ py: 'base.spacing.x5', px: 'base.spacing.x3' }}
-              gap="base.spacing.x6"
-              alignItems="flex-start"
-            >
-              <Sticker position={{ x: 'right', y: 'bottom' }}>
-                <FramedImage
-                  use={(
-                    <img
-                      src={route.route.estimate.fromToken.logoURI}
-                      alt={route.route.estimate.fromToken.name}
-                    />
-                  )}
-                  circularFrame
-                  size="xLarge"
-                />
-                <Sticker.FramedImage
-                  use={(
-                    <img
-                      src={
-                        getChain(route.route.estimate.fromToken.chainId)
-                          ?.iconUrl
-                      }
-                      alt={
-                        getChain(route.route.estimate.fromToken.chainId)?.name
-                      }
-                    />
-                  )}
-                  emphasized
-                  sx={{
-                    bottom: 'base.spacing.x2',
-                    right: 'base.spacing.x2',
-                  }}
-                />
-              </Sticker>
-              <Stack sx={{ flex: 1 }} gap="0px">
-                <Body weight="bold">
-                  Send
-                  {' '}
-                  {route.route.estimate.fromToken.name}
-                </Body>
-                <Body size="small" sx={{ c: 'base.color.text.body.secondary' }}>
-                  {getChain(route.route.estimate.fromToken.chainId)?.name}
-                  <EllipsizedText
-                    text={fromAddress ?? ''}
-                    sx={{
-                      d: 'block',
-                      fontSize: 'inherit',
-                      lineHeight: 'inherit',
-                      c: 'inherit',
-                    }}
-                  />
-                </Body>
-              </Stack>
-              <PriceDisplay
-                price={getAmountFormatted(
-                  route.route.estimate.fromAmount,
-                  route.route.estimate.fromToken.decimals,
-                )}
-                sx={{ flexShrink: 0 }}
-              >
-                <PriceDisplay.Caption size="small">
-                  {getAmountInUSDText(route.route.estimate.fromAmountUSD)}
-                </PriceDisplay.Caption>
-              </PriceDisplay>
-            </Stack>
-            {/*
-
-          */}
-            <Stack
-              sx={{
-                pos: 'relative',
-                w: 'base.spacing.x16',
-                ml: 'base.spacing.x3',
-
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                '&::before': {
-                  content: "''",
-                  pos: 'absolute',
-                  top: '0%',
-                  left: '50%',
-                  translate: '-50% -25%',
-                  h: 'base.spacing.x9',
-                  w: '1px',
-                  bg: 'base.color.translucent.standard.500',
-                },
-              }}
-            />
-            {/*
-
-          */}
-            <Stack
-              direction="row"
-              sx={{ py: 'base.spacing.x5', px: 'base.spacing.x3' }}
-              gap="base.spacing.x6"
-              alignItems="center"
-            >
+            <Stack gap="0px">
               <Stack
                 direction="row"
-                sx={{ w: 'base.spacing.x16' }}
-                justifyContent="center"
+                sx={{ py: 'base.spacing.x5', px: 'base.spacing.x7' }}
+                gap="base.spacing.x6"
+                alignItems="center"
               >
-                <FramedImage use={<SquidIcon />} size="medium" />
+                <Sticker position={{ x: 'right', y: 'bottom' }}>
+                  <FramedImage
+                    use={(
+                      <img
+                        src={route.route.estimate.fromToken.logoURI}
+                        alt={route.route.estimate.fromToken.name}
+                      />
+                    )}
+                    circularFrame
+                    size="large"
+                  />
+                  <Sticker.FramedImage
+                    use={(
+                      <img
+                        src={
+                          getChain(route.route.estimate.fromToken.chainId)
+                            ?.iconUrl
+                        }
+                        alt={
+                          getChain(route.route.estimate.fromToken.chainId)?.name
+                        }
+                      />
+                    )}
+                    emphasized
+                    sx={{
+                      bottom: 'base.spacing.x2',
+                      right: 'base.spacing.x2',
+                    }}
+                  />
+                </Sticker>
+                <Stack sx={{ flex: 1 }} gap="0px">
+                  <Body weight="bold">
+                    Send
+                    {' '}
+                    {route.route.estimate.fromToken.name}
+                  </Body>
+                  <Body
+                    size="small"
+                    sx={{ c: 'base.color.text.body.secondary' }}
+                  >
+                    {getChain(route.route.estimate.fromToken.chainId)?.name}
+                    <EllipsizedText
+                      text={fromAddress ?? ''}
+                      sx={{
+                        d: 'block',
+                        fontSize: 'inherit',
+                        lineHeight: 'inherit',
+                        c: 'inherit',
+                      }}
+                    />
+                  </Body>
+                </Stack>
+                <PriceDisplay
+                  price={getAmountFormatted(
+                    route.route.estimate.fromAmount,
+                    route.route.estimate.fromToken.decimals,
+                  )}
+                  sx={{ flexShrink: 0, alignSelf: 'flex-start' }}
+                >
+                  <PriceDisplay.Caption size="small">
+                    {getAmountInUSDText(route.route.estimate.fromAmountUSD)}
+                  </PriceDisplay.Caption>
+                </PriceDisplay>
               </Stack>
-              <Stack sx={{ flex: 1 }} gap="0px">
-                <Body weight="bold">
-                  Swap
-                  {' '}
-                  {route.route.estimate.fromToken.name}
-                  {' '}
-                  to
-                  {' '}
-                  {route.route.estimate.toToken.name}
+              {/*
+
+          */}
+              <Stack
+                sx={{
+                  pos: 'relative',
+                  w: 'base.spacing.x16',
+                  ml: 'base.spacing.x7',
+
+                  // eslint-disable-next-line @typescript-eslint/naming-convention
+                  '&::before': {
+                    ...dividerSx,
+                    top: '-14px',
+                    h: 'base.spacing.x10',
+                  },
+                }}
+              />
+              {/*
+
+          */}
+              <Stack
+                direction="row"
+                sx={{ py: 'base.spacing.x5', px: 'base.spacing.x7' }}
+                gap="base.spacing.x6"
+                alignItems="center"
+              >
+                <Stack
+                  direction="row"
+                  sx={{ w: 'base.spacing.x12' }}
+                  justifyContent="center"
+                >
+                  <FramedImage use={<SquidIcon />} size="medium" padded />
+                </Stack>
+                <Stack sx={{ flex: 1 }} gap="0px">
+                  <Body weight="bold">
+                    Swap
+                    {' '}
+                    {route.route.estimate.fromToken.name}
+                    {' '}
+                    to
+                    {' '}
+                    {route.route.estimate.toToken.name}
+                  </Body>
+                  <Body
+                    size="small"
+                    sx={{ c: 'base.color.text.body.secondary' }}
+                  >
+                    Powered by Squid
+                    <br />
+                    1
+                    {route.route.estimate.fromToken.name}
+                    {' '}
+                    =
+                    {' '}
+                    {route.route.estimate.exchangeRate}
+                    {' '}
+                    {route.route.estimate.toToken.name}
+                  </Body>
+                </Stack>
+              </Stack>
+              {/*
+
+            */}
+              <Stack
+                sx={{
+                  pos: 'relative',
+                  w: 'base.spacing.x16',
+                  ml: 'base.spacing.x7',
+
+                  // eslint-disable-next-line @typescript-eslint/naming-convention
+                  '&::before': {
+                    ...dividerSx,
+                    top: '-26px',
+                    h: 'base.spacing.x10',
+                  },
+                }}
+              />
+              {/*
+
+          */}
+              <Stack
+                direction="row"
+                sx={{ py: 'base.spacing.x5', px: 'base.spacing.x7' }}
+                gap="base.spacing.x6"
+                alignItems="center"
+              >
+                <Sticker position={{ x: 'right', y: 'bottom' }}>
+                  <FramedImage
+                    use={(
+                      <img
+                        src={
+                          getChain(route.route.estimate.toToken.chainId)
+                            ?.nativeCurrency.iconUrl
+                        }
+                        alt={
+                          getChain(route.route.estimate.toToken.chainId)
+                            ?.nativeCurrency.name
+                        }
+                      />
+                    )}
+                    circularFrame
+                    size="large"
+                  />
+                  <Sticker.FramedImage
+                    use={(
+                      <img
+                        src={
+                          getChain(route.route.estimate.toToken.chainId)
+                            ?.iconUrl
+                        }
+                        alt={
+                          getChain(route.route.estimate.toToken.chainId)?.name
+                        }
+                      />
+                    )}
+                    emphasized
+                    sx={{
+                      bottom: 'base.spacing.x2',
+                      right: 'base.spacing.x2',
+                    }}
+                  />
+                </Sticker>
+                <Stack sx={{ flex: 1 }} gap="0px">
+                  <Body weight="bold">
+                    Receive
+                    {' '}
+                    {route?.route.estimate.toToken.name}
+                  </Body>
+                  <Body
+                    size="small"
+                    sx={{ c: 'base.color.text.body.secondary' }}
+                  >
+                    {getChain(route?.route.estimate.toToken.chainId)?.name}
+                    <EllipsizedText
+                      text={toAddress ?? ''}
+                      sx={{
+                        d: 'block',
+                        fontSize: 'inherit',
+                        lineHeight: 'inherit',
+                        c: 'inherit',
+                      }}
+                    />
+                  </Body>
+                </Stack>
+                <PriceDisplay
+                  price={getAmountFormatted(
+                    route?.route.estimate.toAmount,
+                    route?.route.estimate.toToken.decimals,
+                  )}
+                  sx={{ flexShrink: 0, alignSelf: 'flex-start' }}
+                >
+                  <PriceDisplay.Caption size="small">
+                    {getAmountInUSDText(route?.route.estimate.toAmountUSD)}
+                  </PriceDisplay.Caption>
+                </PriceDisplay>
+              </Stack>
+              {/*
+
+            */}
+              <Stack
+                sx={{
+                  pos: 'relative',
+                  w: 'base.spacing.x16',
+                  ml: 'base.spacing.x7',
+
+                  // eslint-disable-next-line @typescript-eslint/naming-convention
+                  '&::before': {
+                    ...dividerSx,
+                    top: '-8px',
+                    h: 'base.spacing.x5',
+                  },
+                }}
+              />
+              {/*
+
+            */}
+              <Stack
+                direction="row"
+                gap="base.spacing.x6"
+                sx={{ py: 'base.spacing.x5', px: 'base.spacing.x7' }}
+                alignItems="center"
+              >
+                <Stack
+                  direction="row"
+                  sx={{ w: 'base.spacing.x12' }}
+                  justifyContent="center"
+                >
+                  <FramedIcon
+                    icon="Countdown"
+                    variant="bold"
+                    size="medium"
+                    circularFrame
+                  />
+                </Stack>
+                <Body
+                  size="small"
+                  sx={{ flex: 1, c: 'base.color.text.body.secondary' }}
+                >
+                  {formattedDuration}
                 </Body>
-                <Body size="small" sx={{ c: 'base.color.text.body.secondary' }}>
-                  Fee,
+
+                <Body
+                  onClick={() => {
+                    // eslint-disable-next-line no-console
+                    console.log('@TODO');
+                  }}
+                  size="small"
+                  sx={{
+                    ...hFlex,
+                    alignItems: 'center',
+                    c: 'base.color.text.body.secondary',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Included fees
                   {' '}
                   {formattedFeeCosts}
-                  {' '}
-                  from Squid
-                  <br />
-                  1
-                  {route.route.estimate.fromToken.name}
-                  {' '}
-                  =
-                  {' '}
-                  {route.route.estimate.exchangeRate}
-                  {' '}
-                  {route.route.estimate.toToken.name}
-                  <br />
-                </Body>
-              </Stack>
-            </Stack>
-            {/*
-
-            */}
-            <Stack
-              sx={{
-                pos: 'relative',
-                w: 'base.spacing.x16',
-                ml: 'base.spacing.x3',
-
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                '&::before': {
-                  content: "''",
-                  pos: 'absolute',
-                  top: '0%',
-                  left: '50%',
-                  translate: '-50% -75%',
-                  h: 'base.spacing.x9',
-                  w: '1px',
-                  bg: 'base.color.translucent.standard.500',
-                },
-              }}
-            />
-            {/*
-
-          */}
-            <Stack
-              direction="row"
-              sx={{ py: 'base.spacing.x5', px: 'base.spacing.x3' }}
-              gap="base.spacing.x6"
-              alignItems="flex-start"
-            >
-              <Sticker position={{ x: 'right', y: 'bottom' }}>
-                <FramedImage
-                  use={(
-                    <img
-                      src={
-                        getChain(route.route.estimate.toToken.chainId)
-                          ?.nativeCurrency.iconUrl
-                      }
-                      alt={
-                        getChain(route.route.estimate.toToken.chainId)
-                          ?.nativeCurrency.name
-                      }
-                    />
-                  )}
-                  circularFrame
-                  size="xLarge"
-                />
-                <Sticker.FramedImage
-                  use={(
-                    <img
-                      src={
-                        getChain(route.route.estimate.toToken.chainId)?.iconUrl
-                      }
-                      alt={getChain(route.route.estimate.toToken.chainId)?.name}
-                    />
-                  )}
-                  emphasized
-                  sx={{
-                    bottom: 'base.spacing.x2',
-                    right: 'base.spacing.x2',
-                  }}
-                />
-              </Sticker>
-              <Stack sx={{ flex: 1 }} gap="0px">
-                <Body weight="bold">
-                  Receive
-                  {' '}
-                  {route?.route.estimate.toToken.name}
-                </Body>
-                <Body size="small" sx={{ c: 'base.color.text.body.secondary' }}>
-                  {getChain(route?.route.estimate.toToken.chainId)?.name}
-                  <EllipsizedText
-                    text={toAddress ?? ''}
-                    sx={{
-                      d: 'block',
-                      fontSize: 'inherit',
-                      lineHeight: 'inherit',
-                      c: 'inherit',
-                    }}
+                  <Icon
+                    icon="ChevronExpand"
+                    sx={{ ml: 'base.spacing.x2', w: 'base.icon.size.200' }}
                   />
                 </Body>
               </Stack>
-              <PriceDisplay
-                price={getAmountFormatted(
-                  route?.route.estimate.toAmount,
-                  route?.route.estimate.toToken.decimals,
-                )}
-                sx={{ flexShrink: 0 }}
-              >
-                <PriceDisplay.Caption size="small">
-                  {getAmountInUSDText(route?.route.estimate.toAmountUSD)}
-                </PriceDisplay.Caption>
-              </PriceDisplay>
-            </Stack>
-            {/*
-
-            */}
-            <Stack
-              sx={{
-                pos: 'relative',
-                w: 'base.spacing.x16',
-                ml: 'base.spacing.x3',
-
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                '&::before': {
-                  content: "''",
-                  pos: 'absolute',
-                  top: '0%',
-                  left: '50%',
-                  translate: '-50% -25%',
-                  h: 'base.spacing.x4',
-                  w: '1px',
-                  bg: 'base.color.translucent.standard.500',
-                },
-              }}
-            />
-            {/*
-
-            */}
-            <Stack
-              direction="row"
-              gap="base.spacing.x6"
-              sx={{ py: 'base.spacing.x5', px: 'base.spacing.x3' }}
-              alignItems="center"
-            >
-              <Stack
-                direction="row"
-                sx={{ w: 'base.spacing.x16' }}
-                justifyContent="center"
-              >
-                <FramedIcon
-                  icon="Countdown"
-                  variant="bold"
-                  size="medium"
-                  circularFrame
-                />
-              </Stack>
-              <Body
-                size="small"
-                sx={{ flex: 1, c: 'base.color.text.body.secondary' }}
-              >
-                {formattedDuration}
-              </Body>
-
-              <Body
-                onClick={() => {
-                  // eslint-disable-next-line no-console
-                  console.log('@TODO');
-                }}
-                size="small"
-                sx={{
-                  ...hFlex,
-                  alignItems: 'center',
-                  c: 'base.color.text.body.secondary',
-                  cursor: 'pointer',
-                }}
-              >
-                Include Fee
-                {' '}
-                {formattedFeeCosts}
-                <Icon
-                  icon="ChevronExpand"
-                  sx={{ ml: 'base.spacing.x2', w: 'base.icon.size.200' }}
-                />
-              </Body>
             </Stack>
 
             <Button
               size="large"
               onClick={handleTransaction}
               disabled={proceedDisabled}
-              sx={{ mt: 'auto', mb: 'base.spacing.x4' }}
+              sx={{ mt: 'auto', mb: 'base.spacing.x4', mx: 'base.spacing.x3' }}
             >
               {proceedDisabled ? 'Processing' : 'Proceed'}
             </Button>

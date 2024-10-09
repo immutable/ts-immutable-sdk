@@ -514,7 +514,7 @@ export function AddFunds({
               alignItems="center"
             >
               <FramedIcon
-                icon="Add"
+                icon="ArrowDown"
                 sx={{
                   top: '0',
                   pos: 'absolute',
