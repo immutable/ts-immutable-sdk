@@ -1,0 +1,23 @@
+{
+  "name": "@examples/contract-examples",
+  "version": "1.0.0",
+  "description": "Code examples for interacting with the Immutable preset contracts",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@imtbl/contracts": "latest",
+    "@imtbl/sdk": "latest",
+    "viem": "^2.7.13"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5"
+  }
+}
