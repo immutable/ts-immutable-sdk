@@ -13,7 +13,6 @@ import { ReactElement, useMemo } from 'react';
 import { Chain, RouteData } from '../types';
 import { getDurationFormatted } from '../functions/getDurationFormatted';
 
-
 export interface RouteOptionProps<
   RC extends ReactElement | undefined = undefined,
 > {
@@ -45,7 +44,9 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
     [usdBalance],
   );
 
-  const estimatedDurationFormatted = getDurationFormatted(estimate.estimatedRouteDuration);
+  const estimatedDurationFormatted = getDurationFormatted(
+    estimate.estimatedRouteDuration,
+  );
 
   const handleClick = () => {
     onClick(route);

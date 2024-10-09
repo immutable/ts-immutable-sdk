@@ -120,7 +120,11 @@ export function AddFunds({
 
   const {
     providersState: {
-      fromProvider, fromProviderInfo, fromAddress, toProviderInfo, toAddress,
+      fromProvider,
+      fromProviderInfo,
+      fromAddress,
+      toProviderInfo,
+      toAddress,
     },
   } = useProvidersContext();
 
@@ -491,9 +495,10 @@ export function AddFunds({
                 setShowPayWithDrawer(true);
               }}
             >
-              <MenuItem.BottomSlot.Divider sx={{
-                ml: fromAddress ? 'base.spacing.x2' : undefined,
-              }}
+              <MenuItem.BottomSlot.Divider
+                sx={{
+                  ml: fromAddress ? 'base.spacing.x2' : undefined,
+                }}
               />
               <SelectedRouteOption
                 loading={loading}
@@ -509,7 +514,7 @@ export function AddFunds({
               alignItems="center"
             >
               <FramedIcon
-                icon="ArrowDown"
+                icon="Add"
                 sx={{
                   top: '0',
                   pos: 'absolute',
