@@ -1,32 +1,33 @@
 "use client";
 
-import { useState } from "react";
-import { ethers } from "ethers";
-import { ProviderEvent } from "@imtbl/sdk/passport";
-import { passportInstance } from "../utils/setupPassport";
-import { orderbookSDK } from "../utils/setupOrderbook";
 import {
-  signAndSubmitApproval,
-  signBid,
-  createBid,
-} from "../utils/bid";
-import {
+  Body,
   Box,
-  TextInput,
+  Button,
   FormControl,
   Heading,
-  Grid,
-  Button,
-  LoadingOverlay,
   Link,
+  LoadingOverlay,
+  Stack,
+  TextInput
 } from "@biom3/react";
 import { orderbook } from "@imtbl/sdk";
 import {
-  ERC721Item,
   ERC20Item,
+  ERC721Item,
   PrepareBidParams,
 } from "@imtbl/sdk/orderbook";
+import { ProviderEvent } from "@imtbl/sdk/passport";
+import { ethers } from "ethers";
 import NextLink from "next/link";
+import { useState } from "react";
+import {
+  createBid,
+  signAndSubmitApproval,
+  signBid,
+} from "../utils/bid";
+import { orderbookSDK } from "../utils/setupOrderbook";
+import { passportInstance } from "../utils/setupPassport";
 
 export default function CreateERC721BidWithPassport() {
   // setup the accounts state
@@ -59,6 +60,12 @@ export default function CreateERC721BidWithPassport() {
 
   // setup the buy item token ID state
   const [buyItemTokenID, setBuyItemTokenIDState] = useState<string>("");
+
+  // setup the maker ecosystem fee recipient state
+  const [makerEcosystemFeeRecipient, setMakerEcosystemFeeRecipientState] = useState<string>("");
+
+  // setup the maker ecosystem fee amount state
+  const [makerEcosystemFeeAmount, setMakerEcosystemFeeAmountState] = useState<string>("");
 
   // setup the bid creation success message state
   const [successMessage, setSuccessMessageState] = useState<string | null>(null);
@@ -116,6 +123,14 @@ export default function CreateERC721BidWithPassport() {
     setBuyItemTokenIDState(event.target.value);
   };
 
+  const handleMakerEcosystemFeeRecipientChange = (event: any) => {
+    setMakerEcosystemFeeRecipientState(event.target.value);
+  };
+
+  const handleMakerEcosystemFeeAmountChange = (event: any) => {
+    setMakerEcosystemFeeAmountState(event.target.value);
+  };
+
   const handleSuccessfulBidCreation = (bidID: string) => {
     setSuccessMessageState(`Bid created successfully - ${bidID}`);
   };
@@ -153,6 +168,8 @@ export default function CreateERC721BidWithPassport() {
   // create ERC721 bid
   const createER721Bid = async () => {
     setBidErrorState(null);
+    setLoadingState(true);
+    setLoadingText('Creating bid');
 
     try {
       // prepare the bid
@@ -169,6 +186,10 @@ export default function CreateERC721BidWithPassport() {
         orderbookSDK,
         preparedBid,
         orderSignature,
+        makerEcosystemFeeRecipient != "" ? {
+          recipientAddress: makerEcosystemFeeRecipient,
+          amount: makerEcosystemFeeAmount,
+        } : undefined
       );
 
       handleSuccessfulBidCreation(bidID);
@@ -177,57 +198,57 @@ export default function CreateERC721BidWithPassport() {
       setSuccessMessageState(null);
       setBidErrorState(`Something went wrong - ${error.message}`);
     }
+
+    setLoadingState(false);
   };
 
   return (
-    <Box>
+    <Box sx={{ width: "450px" }}>
+      <LoadingOverlay visible={loading}>
+        <LoadingOverlay.Content>
+          <LoadingOverlay.Content.LoopingText
+            text={[loadingText]}
+            textDuration={1000}
+          />
+        </LoadingOverlay.Content>
+      </LoadingOverlay>
       <Box sx={{ marginBottom: "base.spacing.x5" }}>
         <Heading size="medium" sx={{ marginBottom: "base.spacing.x5" }}>
           Passport
         </Heading>
-        <Grid>
-          {accountsState.length === 0 ? (
-            <Box sx={{ marginBottom: "base.spacing.x5" }}>
+        <Stack direction="row" justifyContent={"space-between"}>
+          <Box sx={{ marginBottom: "base.spacing.x5" }}>
+            {accountsState.length === 0 ? (
               <Button
                 size="medium"
                 variant="primary"
-                sx={{ width: "50%", marginBottom: "base.spacing.x10" }}
+                sx={{ width: "100%", marginBottom: "base.spacing.x10" }}
                 disabled={loading}
                 onClick={passportLogin}
               >
                 Login
               </Button>
-            </Box>
-          ) : null}
-          {accountsState.length >= 1 ? (
-            <Box sx={{ marginBottom: "base.spacing.x5" }}>
+            ) : (
               <Button
                 size="medium"
                 variant="primary"
-                sx={{ width: "50%", marginBottom: "base.spacing.x10" }}
+                sx={{ width: "90%", marginBottom: "base.spacing.x10" }}
                 disabled={loading}
                 onClick={passportLogout}
               >
                 Logout
               </Button>
-            </Box>
-          ) : null}
-          {loading ? (
-            <LoadingOverlay visible>
-              <LoadingOverlay.Content>
-                <LoadingOverlay.Content.LoopingText
-                  text={[loadingText]}
-                  textDuration={1000}
-                />
-              </LoadingOverlay.Content>
-            </LoadingOverlay>
-          ) : (
-            <Box sx={{ marginBottom: "base.spacing.x5" }}>
-              Connected Account:
-              {accountsState.length >= 1 ? accountsState : "(not connected)"}
-            </Box>
-          )}
-        </Grid>
+            )}
+          </Box>
+          <Box sx={{ marginBottom: "base.spacing.x5", marginTop: "base.spacing.x1", textAlign: "right" }}>
+            <div>
+              <Body size="small" weight="bold">Connected Account:</Body>
+            </div>
+            <div>
+              <Body size="xSmall" mono={true}>{accountsState.length >= 1 ? accountsState : "(not connected)"}</Body>
+            </div>
+          </Box>
+        </Stack>
       </Box>
       <Box>
         <Heading size="medium" sx={{ marginBottom: "base.spacing.x5" }}>
@@ -270,6 +291,17 @@ export default function CreateERC721BidWithPassport() {
         <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
           <FormControl.Label>Currency Amount</FormControl.Label>
           <TextInput onChange={handleSellItemAmountChange} />
+        </FormControl>
+        <Heading size="xSmall" sx={{ marginBottom: "base.spacing.x5" }}>
+          Maker Ecosystem Fee
+        </Heading>
+        <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
+          <FormControl.Label>Recipient Address</FormControl.Label>
+          <TextInput onChange={handleMakerEcosystemFeeRecipientChange} />
+        </FormControl>
+        <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
+          <FormControl.Label>Fee Amount</FormControl.Label>
+          <TextInput onChange={handleMakerEcosystemFeeAmountChange} />
         </FormControl>
         <Box
           sx={{
