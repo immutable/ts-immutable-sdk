@@ -4014,7 +4014,7 @@ __metadata:
     "@types/react": ^18
     "@types/react-dom": ^18
     eslint: ^8
-    eslint-config-next: 14.2.7
+    eslint-config-next: 14.2.14
     ethers: ^5.7.2
     next: 14.2.10
     react: ^18
@@ -4035,7 +4035,7 @@ __metadata:
     "@types/react": ^18
     "@types/react-dom": ^18
     eslint: ^8
-    eslint-config-next: 14.2.7
+    eslint-config-next: 14.2.14
     ethers: ^5.7.2
     next: 14.2.7
     react: ^18
@@ -4056,7 +4056,7 @@ __metadata:
     "@types/react": ^18
     "@types/react-dom": ^18
     eslint: ^8
-    eslint-config-next: 14.2.7
+    eslint-config-next: 14.2.14
     ethers: ^5.7.2
     next: 14.2.7
     react: ^18
@@ -4076,7 +4076,7 @@ __metadata:
     "@types/react": ^18
     "@types/react-dom": ^18
     eslint: ^8
-    eslint-config-next: 14.2.7
+    eslint-config-next: 14.2.14
     ethers: ^5.7.2
     next: 14.2.10
     react: ^18
@@ -4091,6 +4091,7 @@ __metadata:
   dependencies:
     "@biom3/react": ^0.27.10
     "@imtbl/sdk": latest
+    "@playwright/test": ^1.45.3
     "@types/node": ^20
     "@types/react": ^18
     "@types/react-dom": ^18
@@ -4098,11 +4099,9 @@ __metadata:
     eslint-config-next: 14.2.14
     ethers: ^5.7.2
     next: 14.2.10
-    postcss: ^8
     react: ^18
     react-dom: ^18
-    tailwindcss: ^3.4.1
-    typescript: ^5
+    typescript: ^5.6.2
   languageName: unknown
   linkType: soft
 
@@ -4117,7 +4116,7 @@ __metadata:
     "@types/react": ^18
     "@types/react-dom": ^18
     eslint: ^8
-    eslint-config-next: 14.2.7
+    eslint-config-next: 14.2.14
     ethers: ^5.7.2
     next: 14.2.7
     react: ^18
@@ -38121,7 +38120,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:*, typescript@npm:^5, typescript@npm:^5.6.2":
+"typescript@npm:*, typescript@npm:^5.6.2":
   version: 5.6.2
   resolution: "typescript@npm:5.6.2"
   bin:
@@ -38131,7 +38130,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@*#~builtin<compat/typescript>, typescript@patch:typescript@^5#~builtin<compat/typescript>, typescript@patch:typescript@^5.6.2#~builtin<compat/typescript>":
+"typescript@patch:typescript@*#~builtin<compat/typescript>, typescript@patch:typescript@^5.6.2#~builtin<compat/typescript>":
   version: 5.6.2
   resolution: "typescript@patch:typescript@npm%3A5.6.2#~builtin<compat/typescript>::version=5.6.2&hash=14eedb"
   bin:
