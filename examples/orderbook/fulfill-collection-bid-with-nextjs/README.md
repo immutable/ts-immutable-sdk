@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This example application demonstrates how to fill a collection bid using the Immutable SDK. The application connects to the Immutable Sandbox environment and requires a valid client ID and publishable API key (which can be retrieved from the Immutable Hub).
+
+In order to fill a collection bid, valid ERC721 or ERC1155 bids should exist in the system. The application will prompt the user to connect their Passport wallet and approve the settlement contract to transfer any ERC20, ERC721 or ERC1155 tokens on their behalf. Once the token/s are approved, a collection bid is filled on a best effort basis.
+
+## Features
+- Fill a ERC721 collection bid
+- Fill a ERC1155 collection bid
+
+## Prerequisites
+- Node.js
 
 ## Getting Started
-
-First, run the development server:
+1. Install the dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+yarn
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Copy the `.env.example` file to `.env`:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cp .env.example .env
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Replace the `NEXT_PUBLIC_PUBLISHABLE_KEY` and `NEXT_PUBLIC_CLIENT_ID` with your own values from the Immutable Hub.
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+4. Run the development server:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+yarn dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Open [http://localhost:3000](http://localhost:3000) with your browser and you'll be navigated to the home screen.
 
-## Deploy on Vercel
+## Fill a ERC721 collection bid
+1. Click on the "Fulfill collection bid - Complete fulfillment with ERC721" button
+2. Connect your Passport wallet
+3. Filter collection bids based on criteria:
+   - NFT Contract Address: The contract address of the ERC721 token
+4. Provide a token ID
+5. Click on the "Submit" button
+6. Approve the settlement contract to transfer tokens on your behalf
+7. If successful, the bid will be fulfilled or partially fulfilled
+8. If unsuccessful, an error message will be displayed
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Fill a ERC1155 collection bid
+1. Click on the "Fulfill collection bid - Complete fulfillment with ERC1155" button
+2. Connect your Passport wallet
+3. Filter collection bids based on criteria:
+   - NFT Contract Address: The contract address of the ERC1155 token
+4. Provide a token ID and the number of units to fill
+5. Click on the "Submit" button
+6. Approve the settlement contract to transfer tokens on your behalf
+7. If successful, the bid will be fulfilled or partially fulfilled
+8. If unsuccessful, an error message will be displayed
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Required Environment Variables
+
+- NEXT_PUBLIC_PUBLISHABLE_KEY // replace with your publishable API key from Hub
+- NEXT_PUBLIC_CLIENT_ID // replace with your client ID from Hub

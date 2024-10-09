@@ -316,7 +316,7 @@ export default function FulfillERC721WithPassport() {
                         disabled={loading}
                         onClick={() => executeTrade(bid.id)}
                       >
-                        Buy
+                        Submit
                       </Button>
                     </Table.Cell>
                   </Table.Row>

@@ -353,7 +353,7 @@ export default function FulfillERC1155WithPassport() {
                         disabled={loading}
                         onClick={() => executeTrade(bid.id, index)}
                       >
-                        Buy
+                        Submit
                       </Button>
                     </Table.Cell>
                   </Table.Row>

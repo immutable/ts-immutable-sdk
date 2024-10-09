@@ -1,5 +1,5 @@
 {
-  "name": "fulfill-collection-bid-with-nextjs",
+  "name": "@examples/fulfill-collection-bid-with-nextjs",
   "version": "0.1.0",
   "private": true,
   "scripts": {
