@@ -32,6 +32,7 @@ type ConnectWalletDrawerProps = {
   heading: string;
   visible: boolean;
   onClose: () => void;
+  onConnect?: (provider: Web3Provider, providerInfo: EIP6963ProviderInfo) => void;
   providerType: 'from' | 'to';
   walletOptions: EIP6963ProviderDetail[];
   bottomSlot?: ReactNode;
@@ -46,6 +47,7 @@ export function ConnectWalletDrawer({
   heading,
   visible,
   onClose,
+  onConnect,
   providerType,
   walletOptions,
   bottomSlot,
@@ -121,13 +123,13 @@ export function ConnectWalletDrawer({
     // Trigger analytics connect wallet, menu item, with wallet details
     track({
       userJourney: UserJourney.CONNECT,
-      screen: 'ConnectWallet',
+      screen: 'AddFunds',
       control: info.name,
       controlType: 'MenuItem',
       extras: {
+        providerType,
         wallet: getProviderSlugFromRdns(info.rdns),
         walletRdns: info.rdns,
-        walletUuid: info.uuid,
       },
     });
 
@@ -146,6 +148,9 @@ export function ConnectWalletDrawer({
 
       // Store selected provider as fromProvider in context
       setProviderInContext(provider, providerDetail.info);
+
+      // Call onConnect callback
+      onConnect?.(provider, providerDetail.info);
     } catch (error: ConnectEIP6963ProviderError | any) {
       if (error.message === ConnectEIP6963ProviderError.SANCTIONED_ADDRESS) {
         setShowUnableToConnectDrawer(true);

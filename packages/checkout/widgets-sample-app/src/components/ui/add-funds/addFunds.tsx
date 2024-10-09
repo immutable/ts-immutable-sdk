@@ -9,12 +9,14 @@ import {
   BridgeEventType,
   SwapDirection,
   WalletProviderName,
+  OrchestrationEventType,
 } from "@imtbl/checkout-sdk";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import { Environment } from "@imtbl/config";
 import { useMemo, useEffect } from "react";
 
 import { passport } from "../marketplace-orchestrator/passport";
+import { da } from "@biom3/react/_internals/components/index";
 
 const ADD_FUNDS_TARGET_ID = "add-funds-widget-target";
 
@@ -93,7 +95,7 @@ function AddFundsUI() {
       console.log("CLOSE_WIDGET", data);
       addFunds.unmount();
     });
-    addFunds.addListener(AddFundsEventType.REQUEST_ONRAMP, (data: any) => {
+    addFunds.addListener(OrchestrationEventType.REQUEST_ONRAMP, (data: any) => {
       console.log("REQUEST_ONRAMP", data);
       addFunds.unmount();
       onRamp.addListener(OnRampEventType.CLOSE_WIDGET, (data: any) => {
@@ -105,28 +107,37 @@ function AddFundsUI() {
         tokenAddress: data.tokenAddress,
       });
     });
-    addFunds.addListener(AddFundsEventType.REQUEST_SWAP, (data: any) => {
-      console.log("REQUEST_SWAP", data);
-      addFunds.unmount();
-      swap.addListener(SwapEventType.CLOSE_WIDGET, (data: any) => {
-        console.log("CLOSE_WIDGET", data);
-        swap.unmount();
-      });
-      swap.mount(ADD_FUNDS_TARGET_ID, {
-        amount: data.amount,
-        toTokenAddress: data.toTokenAddress,
-        direction: SwapDirection.TO,
-      });
+    addFunds.addListener(AddFundsEventType.CONNECT_SUCCESS, (data: any) => {
+      console.log("CONNECT_SUCCESS", data);
+      if (data.providerType === "from") {
+        onRamp.update({
+          provider: data.provider,
+        });
+        console.log("CONNECT_SUCCESS FROM", data.provider);
+      }
     });
-    addFunds.addListener(AddFundsEventType.REQUEST_BRIDGE, (data: any) => {
-      console.log("REQUEST_BRIDGE", data);
-      addFunds.unmount();
-      bridge.addListener(BridgeEventType.CLOSE_WIDGET, (data: any) => {
-        console.log("CLOSE_WIDGET", data);
-        bridge.unmount();
-      });
-      bridge.mount(ADD_FUNDS_TARGET_ID, {});
-    });
+    // addFunds.addListener(AddFundsEventType.REQUEST_SWAP, (data: any) => {
+    //   console.log("REQUEST_SWAP", data);
+    //   addFunds.unmount();
+    //   swap.addListener(SwapEventType.CLOSE_WIDGET, (data: any) => {
+    //     console.log("CLOSE_WIDGET", data);
+    //     swap.unmount();
+    //   });
+    //   swap.mount(ADD_FUNDS_TARGET_ID, {
+    //     amount: data.amount,
+    //     toTokenAddress: data.toTokenAddress,
+    //     direction: SwapDirection.TO,
+    //   });
+    // });
+    // addFunds.addListener(AddFundsEventType.REQUEST_BRIDGE, (data: any) => {
+    //   console.log("REQUEST_BRIDGE", data);
+    //   addFunds.unmount();
+    //   bridge.addListener(BridgeEventType.CLOSE_WIDGET, (data: any) => {
+    //     console.log("CLOSE_WIDGET", data);
+    //     bridge.unmount();
+    //   });
+    //   bridge.mount(ADD_FUNDS_TARGET_ID, {});
+    // });
   }, [addFunds]);
 
   return (

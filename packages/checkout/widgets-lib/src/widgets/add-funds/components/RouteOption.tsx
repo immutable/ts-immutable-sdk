@@ -23,6 +23,7 @@ export interface RouteOptionProps<
   isFastest?: boolean;
   size?: MenuItemSize;
   rc?: RC;
+  selected?: boolean;
 }
 
 export function RouteOption<RC extends ReactElement | undefined = undefined>({
@@ -34,6 +35,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
   isFastest = false,
   size = 'small',
   rc = <span />,
+  selected = false,
 }: RouteOptionProps<RC>) {
   const { fromToken } = route.amountData;
   const { estimate } = route.route.route;
@@ -57,12 +59,12 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
   };
 
   const menuItemProps = {
+    selected,
     disabled,
     emphasized: true,
     rc,
     size,
     onClick: disabled ? undefined : handleClick,
-    selected: isFastest,
   };
 
   return (

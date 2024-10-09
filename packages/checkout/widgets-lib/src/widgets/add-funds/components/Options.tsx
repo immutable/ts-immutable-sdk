@@ -5,9 +5,11 @@ import {
   Stack,
   MenuItemSize,
   Divider,
+  Banner,
 } from '@biom3/react';
 import { motion } from 'framer-motion';
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
+import { useMemo } from 'react';
 import {
   listItemVariants,
   listVariants,
@@ -26,10 +28,12 @@ export interface OptionsProps {
   chains: Chain[] | null;
   balances: TokenBalance[] | null;
   onCardClick: (type: FiatOptionType) => void;
-  onRouteClick: (route: RouteData) => void;
+  onRouteClick: (route: RouteData, index: number) => void;
   routes?: RouteData[];
   size?: MenuItemSize;
   showOnrampOption?: boolean;
+  insufficientBalance?: boolean;
+  selectedIndex: number;
 }
 
 export function Options({
@@ -40,10 +44,12 @@ export function Options({
   onRouteClick,
   size,
   showOnrampOption,
+  insufficientBalance,
+  selectedIndex,
 }: OptionsProps) {
   // @NOTE: early exit with loading related UI, when the
   // routes are not yet available
-  if (!routes?.length) {
+  if (!routes?.length && !insufficientBalance) {
     return (
       <Stack
         sx={{ pt: 'base.spacing.x3' }}
@@ -70,7 +76,7 @@ export function Options({
     );
   }
 
-  const routeOptions = routes.map((route: RouteData, index) => {
+  const routeOptions = routes?.map((route: RouteData, index) => {
     const { fromToken } = route.amountData;
 
     const chain = chains?.find((c) => c.id === fromToken.chainId);
@@ -86,25 +92,49 @@ export function Options({
         chain={chain}
         route={route}
         usdBalance={usdBalance}
-        onClick={onRouteClick}
+        onClick={() => onRouteClick(route, index)}
         size={size}
         rc={<motion.div variants={listItemVariants} />}
         isFastest={index === 0}
+        selected={index === selectedIndex}
       />
     );
   });
 
-  const fiatOptions = showOnrampOption
-    ? defaultFiatOptions.map((type, idx) => (
-      <FiatOption
-        key={`fiat-option-${type}`}
-        type={type}
-        size={size}
-        onClick={onCardClick}
-        rc={<motion.div custom={idx} variants={listItemVariants} />}
-      />
-    ))
-    : null;
+  const fiatOptions = useMemo(() => {
+    if (!showOnrampOption) return null;
+
+    return (
+      <>
+        <Divider size="xSmall" sx={{ my: 'base.spacing.x2' }}>
+          More ways to Pay
+        </Divider>
+        {defaultFiatOptions.map((type, idx) => (
+          <FiatOption
+            key={`fiat-option-${type}`}
+            type={type}
+            size={size}
+            onClick={onCardClick}
+            rc={<motion.div custom={idx} variants={listItemVariants} />}
+          />
+        ))}
+      </>
+    );
+  }, [showOnrampOption, size, onCardClick]);
+
+  const noFundsBanner = useMemo(() => {
+    if (!insufficientBalance || routes?.length) return null;
+
+    return (
+      <Banner>
+        <Banner.Icon icon="InformationCircle" />
+        <Banner.Title>No routes found</Banner.Title>
+        <Banner.Caption>
+          Choose a different wallet, token or amount and try again.
+        </Banner.Caption>
+      </Banner>
+    );
+  }, [insufficientBalance, routes]);
 
   return (
     <Stack
@@ -118,9 +148,7 @@ export function Options({
       }
     >
       {routeOptions}
-      <Divider size="xSmall" sx={{ my: 'base.spacing.x2' }}>
-        More ways to Pay
-      </Divider>
+      {noFundsBanner}
       {fiatOptions}
     </Stack>
   );
