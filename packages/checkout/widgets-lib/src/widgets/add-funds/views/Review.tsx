@@ -140,7 +140,7 @@ export function Review({
     [chains],
   );
 
-  useInterval(getFromAmountAndRoute, 20000);
+  const getRouteIntervalIdRef = useInterval(getFromAmountAndRoute, 20000);
 
   const feeCosts = useMemo(
     () => route?.route.estimate.feeCosts.reduce(
@@ -207,7 +207,7 @@ export function Review({
     }
 
     try {
-      clearInterval(getRouteIntervalId);
+      clearInterval(getRouteIntervalIdRef.current);
       setProceedDisabled(true);
 
       showHandover(
@@ -303,7 +303,7 @@ export function Review({
     route,
     squid,
     fromProvider,
-    getRouteIntervalId,
+    getRouteIntervalIdRef,
     approve,
     showHandover,
     checkProviderChain,
