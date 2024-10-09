@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "playwright test"
   },
   "dependencies": {
     "@biom3/react": "^0.27.10",
