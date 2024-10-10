@@ -1,6 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
+  CheckoutError,
   CheckoutErrorType,
   EIP6963ProviderDetail,
   WalletProviderRdns,
@@ -39,7 +40,7 @@ export const connectEIP6963Provider = async (
     );
 
     if (isSanctioned) {
-      throw new Error(ConnectEIP6963ProviderError.SANCTIONED_ADDRESS);
+      throw new CheckoutError('Sanctioned address', ConnectEIP6963ProviderError.SANCTIONED_ADDRESS);
     }
 
     addProviderListenersForWidgetRoot(connectResult.provider);
@@ -47,11 +48,14 @@ export const connectEIP6963Provider = async (
       provider: connectResult.provider,
       providerName: getProviderSlugFromRdns(providerDetail.info.rdns),
     };
-  } catch (error: CheckoutErrorType | any) {
-    if (error.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
-      throw new Error(ConnectEIP6963ProviderError.USER_REJECTED_REQUEST_ERROR);
+  } catch (error: CheckoutErrorType | ConnectEIP6963ProviderError | any) {
+    switch (error.type) {
+      case CheckoutErrorType.USER_REJECTED_REQUEST_ERROR:
+        throw new Error(ConnectEIP6963ProviderError.USER_REJECTED_REQUEST_ERROR);
+      case ConnectEIP6963ProviderError.SANCTIONED_ADDRESS:
+        throw new Error(ConnectEIP6963ProviderError.SANCTIONED_ADDRESS);
+      default:
+        throw new Error(ConnectEIP6963ProviderError.CONNECT_ERROR);
     }
-
-    throw new Error(ConnectEIP6963ProviderError.CONNECT_ERROR);
   }
 };

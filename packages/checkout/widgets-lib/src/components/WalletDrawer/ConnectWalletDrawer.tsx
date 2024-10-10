@@ -32,7 +32,11 @@ type ConnectWalletDrawerProps = {
   heading: string;
   visible: boolean;
   onClose: () => void;
-  onConnect?: (provider: Web3Provider, providerInfo: EIP6963ProviderInfo) => void;
+  onConnect?: (
+    provider: Web3Provider,
+    providerInfo: EIP6963ProviderInfo
+  ) => void;
+  onError?: (errorType: ConnectEIP6963ProviderError) => void;
   providerType: 'from' | 'to';
   walletOptions: EIP6963ProviderDetail[];
   bottomSlot?: ReactNode;
@@ -48,6 +52,7 @@ export function ConnectWalletDrawer({
   visible,
   onClose,
   onConnect,
+  onError,
   providerType,
   walletOptions,
   bottomSlot,
@@ -108,6 +113,12 @@ export function ConnectWalletDrawer({
   };
 
   const handleOnWalletChangeEvent = async (event: WalletChangeEvent) => {
+    if (!checkout) {
+      setShowUnableToConnectDrawer(true);
+      onError?.(ConnectEIP6963ProviderError.CONNECT_ERROR);
+      throw new Error('Checkout is not initialized');
+    }
+
     // Keep prev wallet change event
     prevWalletChangeEvent.current = event;
 
@@ -133,10 +144,6 @@ export function ConnectWalletDrawer({
       },
     });
 
-    if (!checkout) {
-      throw new Error('Checkout is not initialized');
-    }
-
     // Proceed to disconnect current provider if Passport
     if (info.rdns === WalletProviderRdns.PASSPORT) {
       const { isConnected } = await checkout.checkIsWalletConnected({
@@ -160,24 +167,24 @@ export function ConnectWalletDrawer({
       // Store selected provider as fromProvider in context
       setProviderInContext(provider, providerDetail.info);
 
-      // Call onConnect callback
+      // Notify successful connection
       onConnect?.(provider, providerDetail.info);
     } catch (error: ConnectEIP6963ProviderError | any) {
-      if (error.message === ConnectEIP6963ProviderError.SANCTIONED_ADDRESS) {
-        setShowUnableToConnectDrawer(true);
+      let errorType = error.message;
+      switch (error.message) {
+        case ConnectEIP6963ProviderError.USER_REJECTED_REQUEST_ERROR:
+          setShowChangedMindDrawer(true);
+          break;
+        case ConnectEIP6963ProviderError.SANCTIONED_ADDRESS:
+        case ConnectEIP6963ProviderError.CONNECT_ERROR:
+          setShowUnableToConnectDrawer(true);
+          break;
+        default:
+          errorType = ConnectEIP6963ProviderError.CONNECT_ERROR;
       }
 
-      if (
-        error.message
-        === ConnectEIP6963ProviderError.USER_REJECTED_REQUEST_ERROR
-      ) {
-        setShowChangedMindDrawer(true);
-      }
-
-      if (error.message === ConnectEIP6963ProviderError.CONNECT_ERROR) {
-        console.log('@TODO: handle connect error'); // eslint-disable-line no-console
-      }
-
+      // Notify failure to connect
+      onError?.(errorType as ConnectEIP6963ProviderError);
       return;
     }
 
