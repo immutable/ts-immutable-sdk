@@ -98,7 +98,8 @@
       "examples/passport/**",
       "examples/orderbook/**",
       "examples/checkout/**",
-      "examples/blockchain-data/**"
+      "examples/blockchain-data/**",
+      "examples/contracts/**"
     ],
     "nohoist": [
       "examples/**",
