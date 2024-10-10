@@ -119,7 +119,7 @@ export function NetworkMenu() {
                 size="small"
                 onClick={() => switchNetwork(networkItem.chainId)}
               >
-                <FramedImage
+                <HorizontalMenu.Button.FramedImage
                   sx={logoStyle(networkItem.chainId === network?.chainId)}
                   use={(
                     <img
