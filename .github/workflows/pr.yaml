@@ -65,8 +65,8 @@ jobs:
       - name: Build examples
         run: yarn build:examples
 
-      - name: Build local widgets bundle
-        run: yarn workspace @imtbl/checkout-widgets build:examplewidgets
+      - name: Prepare widgets bundle for Checkout Widget example app
+        run: yarn workspace @examples/sdk-load-widgets-with-nextjs prepare:widgets
 
       - name: Lint examples
         run: yarn lint:examples
