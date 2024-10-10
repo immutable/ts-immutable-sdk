@@ -4,7 +4,8 @@ import {
   WidgetType,
   WidgetLanguage,
   AddFundsEventType,
-  OnRampEventType, OrchestrationEventType
+  OnRampEventType,
+  OrchestrationEventType,
 } from "@imtbl/checkout-sdk";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import { Environment } from "@imtbl/config";
@@ -84,8 +85,8 @@ function AddFundsUI() {
       showOnrampOption: true,
       showSwapOption: false,
       showBridgeOption: false,
-      toAmount: "1",
-      toTokenAddress: "native",
+      // toAmount: "1",
+      // toTokenAddress: "native",
     });
   };
 
@@ -94,8 +95,8 @@ function AddFundsUI() {
       showOnrampOption: true,
       showSwapOption: false,
       showBridgeOption: false,
-      toAmount: "1",
-      toTokenAddress: "native",
+      // toAmount: "1",
+      // toTokenAddress: "native",
     });
     addFunds.addListener(AddFundsEventType.CLOSE_WIDGET, (data: any) => {
       console.log("CLOSE_WIDGET", data);
@@ -115,12 +116,6 @@ function AddFundsUI() {
     });
     addFunds.addListener(AddFundsEventType.CONNECT_SUCCESS, (data: any) => {
       console.log("CONNECT_SUCCESS", data);
-      if (data.providerType === "from") {
-        onRamp.update({
-          provider: data.provider,
-        });
-        console.log("CONNECT_SUCCESS FROM", data.provider);
-      }
     });
     onRamp.addListener(OrchestrationEventType.REQUEST_GO_BACK, () => {
       goBack();

@@ -1,8 +1,6 @@
 import {
   createContext,
-  useContext,
-  useEffect,
-  useMemo,
+  useContext, useMemo,
   useReducer,
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
@@ -84,9 +82,7 @@ export const providersContextReducer: Reducer<
 ProvidersState,
 ProvidersContextAction
 > = (state: ProvidersState, action: ProvidersContextAction) => {
-  const { type, ...payload } = action.payload;
-
-  switch (type) {
+  switch (action.payload.type) {
     case ProvidersContextActions.SET_PROVIDER:
       return {
         ...state,
@@ -117,7 +113,6 @@ ProvidersContextAction
     case 'RESET_STATE':
       return {
         ...initialProvidersState,
-        ...payload,
       };
     default:
       return state;
@@ -146,16 +141,6 @@ export function ProvidersContextProvider({
     () => ({ providersState, providersDispatch }),
     [providersState, providersDispatch],
   );
-
-  // Update the reducer when initialState changes
-  useEffect(() => {
-    providersDispatch({
-      payload: {
-        type: ProvidersContextActions.RESET_STATE,
-        ...initialState,
-      },
-    });
-  }, [initialState]);
 
   return (
     <ProvidersContext.Provider value={value}>

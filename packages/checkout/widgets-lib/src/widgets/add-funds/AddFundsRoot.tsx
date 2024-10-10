@@ -66,36 +66,33 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
     const { t } = i18n;
 
     this.reactRoot.render(
-      // <React.StrictMode>
-      <CustomAnalyticsProvider checkout={this.checkout}>
-        <ThemeProvider id="add-funds-container" config={this.strongConfig()}>
-          <HandoverProvider>
-            <ProvidersContextProvider
-              initialState={{
-                checkout: this.checkout,
-                fromProvider: this.web3Provider,
-              }}
-            >
-              <Suspense
-                fallback={
-                  <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
-                }
+      <React.StrictMode>
+        <CustomAnalyticsProvider checkout={this.checkout}>
+          <ThemeProvider id="add-funds-container" config={this.strongConfig()}>
+            <HandoverProvider>
+              <ProvidersContextProvider
+                initialState={{ checkout: this.checkout }}
               >
-                <AddFundsWidget
-                  config={this.strongConfig()}
-                  toTokenAddress={this.parameters.toTokenAddress}
-                  toAmount={this.parameters.toAmount}
-                  showBridgeOption={this.parameters.showBridgeOption}
-                  showSwapOption={this.parameters.showSwapOption}
-                  showOnrampOption={this.parameters.showOnrampOption}
-                  showBackButton={this.parameters.showBackButton}
-                />
-              </Suspense>
-            </ProvidersContextProvider>
-          </HandoverProvider>
-        </ThemeProvider>
-      </CustomAnalyticsProvider>,
-      // </React.StrictMode>,
+                <Suspense
+                  fallback={
+                    <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
+                }
+                >
+                  <AddFundsWidget
+                    config={this.strongConfig()}
+                    toTokenAddress={this.parameters.toTokenAddress}
+                    toAmount={this.parameters.toAmount}
+                    showBridgeOption={this.parameters.showBridgeOption}
+                    showSwapOption={this.parameters.showSwapOption}
+                    showOnrampOption={this.parameters.showOnrampOption}
+                    showBackButton={this.parameters.showBackButton}
+                  />
+                </Suspense>
+              </ProvidersContextProvider>
+            </HandoverProvider>
+          </ThemeProvider>
+        </CustomAnalyticsProvider>
+      </React.StrictMode>,
     );
   }
 }
