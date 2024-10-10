@@ -169,7 +169,7 @@ export class IMXClient {
       this.immutableX.metadataApi,
       this.immutableX.metadataRefreshesApi,
       this.immutableX.mintsApi,
-      this.immutableX.primarySalesApi,
+      this.immutableX.projectsApi,
     );
   }
 
