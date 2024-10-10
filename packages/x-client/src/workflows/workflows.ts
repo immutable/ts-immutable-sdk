@@ -4,7 +4,6 @@ import {
   CollectionsApi,
   ExchangesApi,
   ProjectsApi,
-  PrimarySalesApi,
   MetadataApi,
   MetadataRefreshesApi,
   MintsApi,
@@ -13,7 +12,6 @@ import {
   AddMetadataSchemaToCollectionRequest,
   CreateMetadataRefreshRequest,
   MetadataSchemaRequest,
-  PrimarySalesApiSignableCreatePrimarySaleRequest,
   Project,
   Collection,
   SuccessResponse,
@@ -33,17 +31,6 @@ import { mintingWorkflow } from './minting';
 import { generateIMXAuthorisationHeaders } from '../utils';
 import { ImmutableXConfiguration } from '../config';
 import { exchangeTransfersWorkflow } from './exchangeTransfers';
-import {
-  CreatePrimarySaleWorkflow,
-  AcceptPrimarySalesWorkflow,
-  RejectPrimarySalesWorkflow,
-} from './primarySales';
-
-export type {
-  AcceptPrimarySaleResponse,
-  CreatePrimarySaleResponse,
-  RejectPrimarySaleResponse,
-} from './primarySales';
 
 export class Workflows {
   private readonly mintsApi: MintsApi;
@@ -58,8 +45,6 @@ export class Workflows {
 
   private readonly exchangesApi: ExchangesApi;
 
-  private readonly primarySalesApi: PrimarySalesApi;
-
   private isChainValid(chainID: number) {
     return chainID === this.config.ethConfiguration.chainID;
   }
@@ -71,7 +56,6 @@ export class Workflows {
     metadataApi: MetadataApi,
     metadataRefreshesApi: MetadataRefreshesApi,
     mintsApi: MintsApi,
-    primarySalesApi: PrimarySalesApi,
     projectsApi: ProjectsApi,
   ) {
     this.config = config;
@@ -80,7 +64,6 @@ export class Workflows {
     this.metadataApi = metadataApi;
     this.metadataRefreshesApi = metadataRefreshesApi;
     this.mintsApi = mintsApi;
-    this.primarySalesApi = primarySalesApi;
     this.projectsApi = projectsApi;
   }
 
@@ -255,35 +238,6 @@ export class Workflows {
       xImxEthTimestamp: imxAuthHeaders.timestamp,
       xImxEthAddress: ethAddress,
       createMetadataRefreshRequest: request,
-    });
-  }
-
-  public async createPrimarySale(
-    walletConnection: WalletConnection,
-    request: PrimarySalesApiSignableCreatePrimarySaleRequest,
-  ) {
-    await this.validateChain(walletConnection.ethSigner);
-
-    return CreatePrimarySaleWorkflow({
-      ...walletConnection,
-      request,
-      primarySalesApi: this.primarySalesApi,
-    });
-  }
-
-  public async acceptPrimarySale(ethSigner: EthSigner, primarySaleId: number) {
-    return AcceptPrimarySalesWorkflow({
-      ethSigner,
-      primarySaleId,
-      primarySalesApi: this.primarySalesApi,
-    });
-  }
-
-  public async rejectPrimarySale(ethSigner: EthSigner, primarySaleId: number) {
-    return RejectPrimarySalesWorkflow({
-      ethSigner,
-      primarySaleId,
-      primarySalesApi: this.primarySalesApi,
     });
   }
 }
