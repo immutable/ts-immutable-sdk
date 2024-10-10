@@ -68,6 +68,7 @@ const getPassportClient = (environment: Environment) =>
     clientId: "ViaYO6JWck4TZOiiojEak8mz6WvQh3wK",
     redirectUri: "http://localhost:3000/checkout?login=true",
     logoutRedirectUri: "http://localhost:3000/checkout?logout=true",
+    logoutMode: "silent",
   });
 
 // create Checkout SDK
@@ -89,6 +90,14 @@ const getCheckoutSdk = (passportClient: Passport, environment: Environment) =>
 const usePassportLoginCallback = (passportClient: Passport) => {
   const params = new URLSearchParams(window.location.search);
   const loginParam = params.get("login");
+  const logoutParam = params.get("logout");
+
+  useEffect(() => {
+    if (logoutParam === "true") {
+      passportClient?.logoutSilentCallback('http://localhost:3000/checkout');
+    }
+  }, [logoutParam, passportClient]);
+
 
   useEffect(() => {
     if (loginParam === "true") {
@@ -194,7 +203,7 @@ function CheckoutUI() {
     },
     ADD_FUNDS: {
       flow: CheckoutFlowType.ADD_FUNDS,
-      toAmount: "100",
+      toAmount: "1",
       toTokenAddress: "native",
     },
   });
@@ -523,7 +532,7 @@ function CheckoutUI() {
             </Box>
           </AppHeaderBar.RightSlot>
           <AppHeaderBar.LeftSlot gap="base.spacing.x4">
-            <AppHeaderBar.Title>{params?.flow || ""}</AppHeaderBar.Title>
+            <Heading>{params?.flow || ""}</Heading>
           </AppHeaderBar.LeftSlot>
         </AppHeaderBar>
       </Box>

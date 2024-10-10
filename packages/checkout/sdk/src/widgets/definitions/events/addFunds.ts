@@ -1,9 +1,13 @@
+import { Web3Provider } from '@ethersproject/providers';
+import { EIP6963ProviderInfo } from '../../../types';
+
 /**
  * Enum of possible Add Funds Widget event types.
  */
 export enum AddFundsEventType {
   CLOSE_WIDGET = 'close-widget',
   LANGUAGE_CHANGED = 'language-changed',
+  CONNECT_SUCCESS = 'connect-success',
   REQUEST_BRIDGE = 'request-bridge',
   REQUEST_ONRAMP = 'request-onramp',
   REQUEST_SWAP = 'request-swap',
@@ -28,4 +32,16 @@ export type AddFundsFailed = {
   reason: string;
   /** The timestamp of the failed transaction. */
   timestamp: number;
+};
+
+/**
+ * Type representing a successfull provider connection
+ * @property {Web3Provider} provider
+ * @property {EIP6963ProviderInfo} providerInfo
+ * @property {'from' | 'to'} providerType
+ */
+export type AddFundsConnectSuccess = {
+  provider: Web3Provider;
+  providerInfo: EIP6963ProviderInfo;
+  providerType: 'from' | 'to';
 };

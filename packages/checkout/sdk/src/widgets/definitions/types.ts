@@ -42,6 +42,7 @@ import {
   RequestAddFundsEvent,
   RequestGoBackEvent,
   AddFundsEventType,
+  AddFundsConnectSuccess,
 } from './events';
 import {
   BridgeWidgetParams,
@@ -212,9 +213,7 @@ export type WidgetEventData = {
 
   [WidgetType.ADD_FUNDS]: {
     [AddFundsEventType.CLOSE_WIDGET]: {};
-    [AddFundsEventType.REQUEST_BRIDGE]: {};
-    [AddFundsEventType.REQUEST_SWAP]: {};
-    [AddFundsEventType.REQUEST_ONRAMP]: {};
+    [AddFundsEventType.CONNECT_SUCCESS]: AddFundsConnectSuccess;
   } & OrchestrationMapping &
   ProviderEventMapping;
 };

@@ -7,10 +7,7 @@ import { isSquidNativeToken } from '../functions/isSquidNativeToken';
 export const useExecute = () => {
   const convertToNetworkChangeableProvider = async (
     provider: Web3Provider,
-  ): Promise<Web3Provider> => new ethers.providers.Web3Provider(
-    provider.provider,
-    'any',
-  );
+  ): Promise<Web3Provider> => new ethers.providers.Web3Provider(provider.provider, 'any');
 
   const checkProviderChain = async (
     provider: Web3Provider,
@@ -59,7 +56,10 @@ export const useExecute = () => {
         throw new Error('transactionRequest target is undefined');
       }
 
-      const allowance = await tokenContract.allowance(ownerAddress, transactionRequestTarget);
+      const allowance = await tokenContract.allowance(
+        ownerAddress,
+        transactionRequestTarget,
+      );
       return allowance;
     }
 
@@ -89,7 +89,10 @@ export const useExecute = () => {
           throw new Error('transactionRequest target is undefined');
         }
 
-        const tx = await tokenContract.approve(transactionRequestTarget, fromAmount);
+        const tx = await tokenContract.approve(
+          transactionRequestTarget,
+          fromAmount,
+        );
         await tx.wait();
       }
     } catch (e) {
@@ -118,6 +121,10 @@ export const useExecute = () => {
   };
 
   return {
-    convertToNetworkChangeableProvider, checkProviderChain, getAllowance, approve, execute,
+    convertToNetworkChangeableProvider,
+    checkProviderChain,
+    getAllowance,
+    approve,
+    execute,
   };
 };

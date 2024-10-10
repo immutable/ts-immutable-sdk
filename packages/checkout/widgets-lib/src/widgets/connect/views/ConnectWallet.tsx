@@ -15,6 +15,8 @@ export interface ConnectWalletProps {
   allowedChains: ChainId[];
   blocklistWalletRdns?: string[];
   checkNetwork: boolean;
+  showBackButton?: boolean;
+  onBackButtonClick?: () => void;
 }
 
 export function ConnectWallet({
@@ -23,6 +25,8 @@ export function ConnectWallet({
   allowedChains,
   blocklistWalletRdns,
   checkNetwork,
+  showBackButton,
+  onBackButtonClick,
 }: ConnectWalletProps) {
   const { t } = useTranslation();
   const {
@@ -44,6 +48,8 @@ export function ConnectWallet({
       header={(
         <HeaderNavigation
           onCloseButtonClick={sendCloseEvent}
+          showBack={showBackButton}
+          onBackButtonClick={onBackButtonClick}
         />
       )}
       footer={<FooterLogo />}

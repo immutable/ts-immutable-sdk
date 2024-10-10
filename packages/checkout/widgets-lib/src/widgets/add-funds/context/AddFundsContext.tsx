@@ -1,13 +1,10 @@
-import { Web3Provider } from '@ethersproject/providers';
 import { createContext } from 'react';
-import { Checkout, TokenInfo } from '@imtbl/checkout-sdk';
+import { TokenInfo } from '@imtbl/checkout-sdk';
 import { Squid } from '@0xsquid/sdk';
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import { Chain, Token } from '../types';
 
 export interface AddFundsState {
-  checkout: Checkout | null;
-  provider: Web3Provider | null;
   allowedTokens: TokenInfo[] | null;
   squid: Squid | null;
   chains: Chain[] | null;
@@ -16,8 +13,6 @@ export interface AddFundsState {
 }
 
 export const initialAddFundsState: AddFundsState = {
-  checkout: null,
-  provider: null,
   allowedTokens: null,
   squid: null,
   chains: null,
@@ -35,8 +30,6 @@ export interface AddFundsAction {
 }
 
 type ActionPayload =
-  | SetCheckoutPayload
-  | SetProviderPayload
   | SetAllowedTokensPayload
   | SetSquid
   | SetChains
@@ -44,23 +37,11 @@ type ActionPayload =
   | SetTokens;
 
 export enum AddFundsActions {
-  SET_CHECKOUT = 'SET_CHECKOUT',
-  SET_PROVIDER = 'SET_PROVIDER',
   SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
   SET_SQUID = 'SET_SQUID',
   SET_CHAINS = 'SET_CHAINS',
   SET_BALANCES = 'SET_BALANCES',
   SET_TOKENS = 'SET_TOKENS',
-}
-
-export interface SetCheckoutPayload {
-  type: AddFundsActions.SET_CHECKOUT;
-  checkout: Checkout;
-}
-
-export interface SetProviderPayload {
-  type: AddFundsActions.SET_PROVIDER;
-  provider: Web3Provider;
 }
 
 export interface SetAllowedTokensPayload {
@@ -102,16 +83,6 @@ export const addFundsReducer: Reducer<AddFundsState, AddFundsAction> = (
   action: AddFundsAction,
 ) => {
   switch (action.payload.type) {
-    case AddFundsActions.SET_CHECKOUT:
-      return {
-        ...state,
-        checkout: action.payload.checkout,
-      };
-    case AddFundsActions.SET_PROVIDER:
-      return {
-        ...state,
-        provider: action.payload.provider,
-      };
     case AddFundsActions.SET_ALLOWED_TOKENS:
       return {
         ...state,

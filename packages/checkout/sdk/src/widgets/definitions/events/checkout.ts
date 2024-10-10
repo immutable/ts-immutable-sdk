@@ -17,7 +17,7 @@ import {
 } from './bridge';
 import { SwapFailed, SwapRejected, SwapSuccess } from './swap';
 import { WalletNetworkSwitch } from './wallet';
-import { AddFundsFailed, AddFundsSuccess } from './addFunds';
+import { AddFundsFailed, AddFundsSuccess, AddFundsConnectSuccess } from './addFunds';
 
 export enum CheckoutEventType {
   INITIALISED = 'INITIALISED',
@@ -106,8 +106,14 @@ export type CheckoutAddFundsSuccessEvent = {
   data: AddFundsSuccess;
 };
 
+export type CheckoutAddFundsConnectSuccessEvent = {
+  type: CheckoutSuccessEventType.CONNECT_SUCCESS;
+  data: AddFundsConnectSuccess;
+};
+
 export type CheckoutSuccessEvent =
   | CheckoutAddFundsSuccessEvent
+  | CheckoutAddFundsConnectSuccessEvent
   | CheckoutConnectSuccessEvent
   | CheckoutBridgeSuccessEvent
   | CheckoutBridgeClaimWithdrawalSuccessEvent

@@ -115,3 +115,8 @@ export const IMAGE_RESIZER_URL = {
 };
 
 export const WITHDRAWAL_CLAIM_GAS_LIMIT = 91000;
+
+/**
+ * Key for storing if user has seen non-passport warning UI in local storage
+ */
+export const HAS_SEEN_NON_PASSPORT_WARNING_KEY = '@imtbl/checkout/has-seen-non-passport-warning';

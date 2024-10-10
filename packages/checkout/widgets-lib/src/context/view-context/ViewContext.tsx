@@ -186,8 +186,11 @@ export const viewReducer: Reducer<ViewState, ViewAction> = (
   }
 };
 
-export const useViewState = () => {
-  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+export const useViewState = (initialState?: ViewState) => {
+  const [viewState, viewDispatch] = useReducer(viewReducer, {
+    ...initialViewState,
+    ...(initialState ?? {}),
+  });
 
   return [viewState, viewDispatch] as const;
 };
