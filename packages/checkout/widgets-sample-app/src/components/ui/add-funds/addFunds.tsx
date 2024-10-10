@@ -16,7 +16,6 @@ import { Environment } from "@imtbl/config";
 import { useMemo, useEffect } from "react";
 
 import { passport } from "../marketplace-orchestrator/passport";
-import { da } from "@biom3/react/_internals/components/index";
 
 const ADD_FUNDS_TARGET_ID = "add-funds-widget-target";
 
@@ -27,6 +26,7 @@ function AddFundsUI() {
         baseConfig: {
           environment: Environment.PRODUCTION,
         },
+        passport,
       }),
     []
   );

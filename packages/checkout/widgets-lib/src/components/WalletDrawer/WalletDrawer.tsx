@@ -3,7 +3,7 @@ import {
 } from '@biom3/react';
 import { ReactNode, useState } from 'react';
 import { motion } from 'framer-motion';
-import { EIP1193Provider, EIP6963ProviderDetail } from '@imtbl/checkout-sdk';
+import { EIP1193Provider, EIP6963ProviderDetail, WalletProviderRdns } from '@imtbl/checkout-sdk';
 import { FormControlWrapper } from '../FormComponents/FormControlWrapper/FormControlWrapper';
 import { WalletItem } from './WalletItem';
 import { walletItemListStyles } from './WalletDrawerStyles';
@@ -152,6 +152,7 @@ export function WalletDrawer({
               size={menuItemSize}
               badge={badge}
               disabled={unavalable}
+              recommended={providerDetail.info.rdns === WalletProviderRdns.PASSPORT}
             />
           );
         })}

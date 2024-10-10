@@ -137,6 +137,17 @@ export function ConnectWalletDrawer({
       throw new Error('Checkout is not initialized');
     }
 
+    // Proceed to disconnect current provider if Passport
+    if (info.rdns === WalletProviderRdns.PASSPORT) {
+      const { isConnected } = await checkout.checkIsWalletConnected({
+        provider: new Web3Provider(providerDetail.provider!),
+      });
+
+      if (isConnected) {
+        await checkout.passport?.logout();
+      }
+    }
+
     // Proceed to connect selected provider
     try {
       const { provider } = await connectEIP6963Provider(

@@ -129,9 +129,13 @@ export function SelectedRouteOption({
       copy = "Add your amount, we'll find the best payment";
     }
 
+    if (!withSelectedWallet && withSelectedToken && withSelectedAmount) {
+      copy = "Select a wallet, we'll find the best payment";
+    }
+
     if (insufficientBalance) {
       icon = 'InformationCircle';
-      copy = 'No routes found, choose a different token or amount.';
+      copy = 'No routes found, choose a different wallet, token or amount.';
     }
 
     if (insufficientBalancePayWithCard) {

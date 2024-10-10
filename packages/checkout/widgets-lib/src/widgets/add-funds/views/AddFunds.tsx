@@ -81,9 +81,7 @@ export function AddFunds({
   showBackButton,
   onBackButtonClick,
 }: AddFundsProps) {
-  const {
-    routes, fetchRoutesWithRateLimit, resetRoutes,
-  } = useRoutes();
+  const { routes, fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
   const {
     addFundsState: {
       squid, chains, balances, tokens,
@@ -172,6 +170,8 @@ export function AddFunds({
 
   useEffect(() => {
     resetRoutes();
+    setInsufficientBalance(false);
+    setSelectedRouteData(undefined);
 
     (async () => {
       if (
@@ -368,7 +368,8 @@ export function AddFunds({
   );
   const shouldShowBackButton = showBackButton ?? !!onBackButtonClick;
   const inputsReady = !!selectedToken && !!debouncedToAmount && !!fromProvider;
-  const loading = (inputsReady || fetchingRoutes) && !(selectedRouteData || insufficientBalance);
+  const loading = (inputsReady || fetchingRoutes)
+    && !(selectedRouteData || insufficientBalance);
 
   const handleWalletConnected = (
     providerType: 'from' | 'to',
@@ -391,7 +392,7 @@ export function AddFunds({
           sx={{
             pos: 'absolute',
             w: '100%',
-            top: '0px',
+            top: '0',
             pt: 'base.spacing.x4',
             px: 'base.spacing.x5',
           }}
@@ -518,10 +519,10 @@ export function AddFunds({
                 routeData={selectedRouteData}
                 onClick={() => setShowOptionsDrawer(true)}
                 withSelectedToken={!!selectedToken}
-                withSelectedAmount={!!debouncedToAmount}
+                withSelectedAmount={Number(debouncedToAmount) > 0}
                 withSelectedWallet={!!fromProvider}
                 insufficientBalance={insufficientBalance}
-                showOnrampOption={shouldShowOnRampOption}
+                showOnrampOption={false}
               />
             </SelectedWallet>
             <Stack
@@ -550,10 +551,11 @@ export function AddFunds({
 
           <Button
             testId="add-funds-button"
-            variant="secondary"
-            onClick={handleReviewClick}
             size="large"
+            variant="secondary"
             disabled={!inputsReady}
+            onClick={handleReviewClick}
+            sx={{ opacity: inputsReady ? 1 : 0.5 }}
           >
             Review
           </Button>
