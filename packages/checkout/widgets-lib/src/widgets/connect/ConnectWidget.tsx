@@ -66,6 +66,7 @@ export type ConnectWidgetInputs = ConnectWidgetParams & {
   web3Provider?: Web3Provider;
   isCheckNetworkEnabled?: boolean;
   sendGoBackEventOverride?: () => void;
+  showBackButton?: boolean;
 };
 
 export default function ConnectWidget({
@@ -80,6 +81,7 @@ export default function ConnectWidget({
   deepLink = ConnectWidgetViews.CONNECT_WALLET,
   isCheckNetworkEnabled,
   sendGoBackEventOverride,
+  showBackButton,
 }: ConnectWidgetInputs) {
   const { t } = useTranslation();
   const { environment } = config;
@@ -225,7 +227,7 @@ export default function ConnectWidget({
               allowedChains={allowedChains ?? [targetChain]}
               blocklistWalletRdns={blocklistWalletRdns}
               checkNetwork={isCheckNetworkEnabled ?? true}
-              showBackButton={!!sendCloseEventOverride}
+              showBackButton={showBackButton}
               onBackButtonClick={sendGoBackEventOverride}
             />
           )}

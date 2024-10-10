@@ -95,6 +95,7 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
                 params={connectLoaderParams}
                 closeEvent={() => sendOnRampWidgetCloseEvent(window)}
                 goBackEvent={() => this.goBackEvent(window)}
+                showBackButton={this.parameters.showBackButton}
               >
                 <Suspense fallback={<LoadingView loadingText={t('views.ONRAMP.initialLoadingText')} />}>
                   <OnRampWidget
