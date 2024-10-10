@@ -534,7 +534,7 @@ export function AddFunds({
                 sx={{
                   top: '0',
                   pos: 'absolute',
-                  translate: ({ base }) => `0 -${base.spacing.x3}`,
+                  translate: '0 -30%',
                   bg: 'base.color.neutral.800',
                 }}
               />

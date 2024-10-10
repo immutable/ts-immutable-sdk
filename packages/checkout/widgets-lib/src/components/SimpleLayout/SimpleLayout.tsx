@@ -31,27 +31,27 @@ export function SimpleLayout({
   bodyStyleOverrides,
 }: SimpleLayoutProps) {
   return (
-    <Box sx={responsiveStyles}>
+    <Box sx={responsiveStyles} testId="simpleLayout">
       <Box testId={testId} sx={simpleLayoutStyle}>
         {header && (
-          <Box sx={headerStyle(floatHeader)}>
+          <Box sx={headerStyle(floatHeader)} testId="header">
             {header}
           </Box>
         )}
         <Box sx={contentStyle}>
           {heroContent && (
-            <Box sx={heroContentStyle}>
+            <Box sx={heroContentStyle} testId="heroContent">
               {heroContent}
             </Box>
           )}
           {children && (
-            <Box sx={{ ...bodyStyle, ...bodyStyleOverrides }}>
+            <Box sx={{ ...bodyStyle, ...bodyStyleOverrides, overflowY: 'auto' }} testId="children">
               {children}
             </Box>
           )}
         </Box>
         {footer && (
-          <Box sx={footerStyle(footerBackgroundColor)}>
+          <Box sx={footerStyle(footerBackgroundColor)} testId="footer">
             {footer}
           </Box>
         )}
