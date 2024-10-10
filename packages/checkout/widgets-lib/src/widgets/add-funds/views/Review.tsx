@@ -38,8 +38,8 @@ import { getRemoteRive } from '../../../lib/utils';
 import { SQUID_NATIVE_TOKEN } from '../utils/config';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
-import i18n from '../../../i18n';
 import { getDurationFormatted } from '../functions/getDurationFormatted';
+import { useTranslation } from 'react-i18next';
 
 interface ReviewProps {
   data: AddFundsReviewData;
@@ -79,7 +79,7 @@ export function Review({
   onBackButtonClick,
   onCloseButtonClick,
 }: ReviewProps) {
-  const { t } = i18n;
+  const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
   const {
     addFundsState: { squid, chains, tokens },
