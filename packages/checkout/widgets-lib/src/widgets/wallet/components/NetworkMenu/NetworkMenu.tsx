@@ -1,7 +1,6 @@
 import {
   Body,
   Box,
-  FramedImage,
   HorizontalMenu,
 } from '@biom3/react';
 import {
