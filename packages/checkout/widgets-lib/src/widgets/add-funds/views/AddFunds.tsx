@@ -522,7 +522,7 @@ export function AddFunds({
                 withSelectedAmount={Number(debouncedToAmount) > 0}
                 withSelectedWallet={!!fromProvider}
                 insufficientBalance={insufficientBalance}
-                showOnrampOption={false}
+                showOnrampOption={shouldShowOnRampOption}
               />
             </SelectedWallet>
             <Stack
