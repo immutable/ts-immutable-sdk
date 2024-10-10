@@ -1,6 +1,6 @@
 import { Drawer, EllipsizedText, MenuItem } from '@biom3/react';
 import { motion } from 'framer-motion';
-import { useContext } from 'react';
+import { useContext, useRef } from 'react';
 
 import { listVariants } from '../../../lib/animation/listAnimation';
 import { Options } from './Options';
@@ -17,6 +17,7 @@ type OptionsDrawerProps = {
   showOnrampOption?: boolean;
   showSwapOption?: boolean;
   showBridgeOption?: boolean;
+  insufficientBalance?: boolean;
 };
 
 export function OptionsDrawer({
@@ -30,6 +31,7 @@ export function OptionsDrawer({
   showSwapOption,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   showBridgeOption,
+  insufficientBalance,
 }: OptionsDrawerProps) {
   const {
     addFundsState: { chains, balances },
@@ -38,6 +40,13 @@ export function OptionsDrawer({
   const {
     providersState: { fromProviderInfo, fromAddress },
   } = useProvidersContext();
+
+  const selectedRouteIndex = useRef<number>(0);
+
+  const handleOnRouteClick = (route: RouteData, index: number) => {
+    selectedRouteIndex.current = index;
+    onRouteClick(route);
+  };
 
   return (
     <Drawer
@@ -80,8 +89,10 @@ export function OptionsDrawer({
           chains={chains}
           balances={balances}
           onCardClick={onCardClick}
-          onRouteClick={onRouteClick}
+          onRouteClick={handleOnRouteClick}
           showOnrampOption={showOnrampOption}
+          insufficientBalance={insufficientBalance}
+          selectedIndex={selectedRouteIndex.current}
         />
       </Drawer.Content>
     </Drawer>

@@ -14,6 +14,7 @@ import debounce from 'lodash.debounce';
 import {
   ChainId,
   type Checkout,
+  EIP6963ProviderInfo,
   IMTBLWidgetEvents,
   TokenFilterTypes,
   type TokenInfo,
@@ -27,6 +28,7 @@ import {
   useMemo,
   useState,
 } from 'react';
+import { Web3Provider } from '@ethersproject/providers';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
@@ -52,6 +54,7 @@ import { PayWithWalletDrawer } from '../../../components/WalletDrawer/PayWithWal
 import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
 import { getProviderSlugFromRdns } from '../../../lib/provider';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
+import { sendConnectProviderSuccessEvent } from '../AddFundsWidgetEvents';
 
 interface AddFundsProps {
   checkout: Checkout | null;
@@ -78,9 +81,7 @@ export function AddFunds({
   showBackButton,
   onBackButtonClick,
 }: AddFundsProps) {
-  const {
-    routes, fetchRoutesWithRateLimit, resetRoutes, fetchingRoutes,
-  } = useRoutes();
+  const { routes, fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
   const {
     addFundsState: {
       squid, chains, balances, tokens,
@@ -107,6 +108,8 @@ export function AddFunds({
   const [inputValue, setInputValue] = useState<string>(toAmount || '');
   const [debouncedToAmount, setDebouncedToAmount] = useState<string>(inputValue);
   const [selectedToken, setSelectedToken] = useState<TokenInfo | undefined>();
+  const [fetchingRoutes, setFetchingRoutes] = useState(false);
+  const [insufficientBalance, setInsufficientBalance] = useState(false);
 
   const debouncedUpdateAmount = debounce((value: string) => {
     setDebouncedToAmount(value);
@@ -167,27 +170,37 @@ export function AddFunds({
 
   useEffect(() => {
     resetRoutes();
+    setInsufficientBalance(false);
+    setSelectedRouteData(undefined);
 
-    if (
-      balances
-      && squid
-      && tokens
-      && selectedToken?.address
-      && debouncedToAmount
-    ) {
-      fetchRoutesWithRateLimit(
-        squid,
-        tokens,
-        balances,
-        ChainId.IMTBL_ZKEVM_MAINNET.toString(),
-        selectedToken.address === 'native'
-          ? SQUID_NATIVE_TOKEN
-          : selectedToken.address,
-        debouncedToAmount,
-        5,
-        1000,
-      );
-    }
+    (async () => {
+      if (
+        balances
+        && squid
+        && tokens
+        && selectedToken?.address
+        && debouncedToAmount
+      ) {
+        setFetchingRoutes(true);
+        const availableRoutes = await fetchRoutesWithRateLimit(
+          squid,
+          tokens,
+          balances,
+          ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+          selectedToken.address === 'native'
+            ? SQUID_NATIVE_TOKEN
+            : selectedToken.address,
+          debouncedToAmount,
+          5,
+          1000,
+        );
+        setFetchingRoutes(false);
+
+        if (availableRoutes.length === 0) {
+          setInsufficientBalance(true);
+        }
+      }
+    })();
   }, [balances, squid, selectedToken, debouncedToAmount]);
 
   useEffect(() => {
@@ -273,6 +286,7 @@ export function AddFunds({
     const data = {
       tokenAddress: selectedToken?.address ?? '',
       amount: debouncedToAmount ?? '',
+      showBackButton: true,
     };
     orchestrationEvents.sendRequestOnrampEvent(
       eventTarget,
@@ -353,24 +367,22 @@ export function AddFunds({
     [allowedTokens, handleTokenChange, isSelected, defaultTokenImage],
   );
   const shouldShowBackButton = showBackButton ?? !!onBackButtonClick;
+  const inputsReady = !!selectedToken && !!debouncedToAmount && !!fromProvider;
+  const loading = (inputsReady || fetchingRoutes)
+    && !(selectedRouteData || insufficientBalance);
 
-  const readyToReview = useMemo(
-    () => !!debouncedToAmount && !!selectedRouteData && !!selectedToken?.address,
-    [debouncedToAmount, selectedToken, selectedRouteData],
-  );
-
-  // @FIXME: Must improve how we detect the loading condition is met based on inputs and routes fetching state
-  const loading = Boolean(
-    fromProvider
-      && ((selectedToken?.address && debouncedToAmount && !selectedRouteData)
-        || fetchingRoutes),
-  );
-
-  // @TODO: Also, Open pay with drawer if insufficient balance
-  const insufficientBalance = useMemo(
-    () => !loading && routes.length === 0,
-    [loading, routes],
-  );
+  const handleWalletConnected = (
+    providerType: 'from' | 'to',
+    provider: Web3Provider,
+    providerInfo: EIP6963ProviderInfo,
+  ) => {
+    sendConnectProviderSuccessEvent(
+      eventTarget,
+      providerType,
+      provider,
+      providerInfo,
+    );
+  };
 
   return (
     <SimpleLayout
@@ -380,7 +392,7 @@ export function AddFunds({
           sx={{
             pos: 'absolute',
             w: '100%',
-            top: '0px',
+            top: '0',
             pt: 'base.spacing.x4',
             px: 'base.spacing.x5',
           }}
@@ -497,7 +509,7 @@ export function AddFunds({
             >
               <MenuItem.BottomSlot.Divider
                 sx={{
-                  ml: fromAddress ? 'base.spacing.x2' : undefined,
+                  ml: fromProvider ? 'base.spacing.x2' : undefined,
                 }}
               />
               <SelectedRouteOption
@@ -506,7 +518,11 @@ export function AddFunds({
                 balances={balances}
                 routeData={selectedRouteData}
                 onClick={() => setShowOptionsDrawer(true)}
-                selected={!!fromAddress}
+                withSelectedToken={!!selectedToken}
+                withSelectedAmount={Number(debouncedToAmount) > 0}
+                withSelectedWallet={!!fromProvider}
+                insufficientBalance={insufficientBalance}
+                showOnrampOption={shouldShowOnRampOption}
               />
             </SelectedWallet>
             <Stack
@@ -535,10 +551,11 @@ export function AddFunds({
 
           <Button
             testId="add-funds-button"
-            variant="secondary"
-            onClick={handleReviewClick}
             size="large"
-            disabled={!readyToReview}
+            variant="secondary"
+            disabled={!inputsReady}
+            onClick={handleReviewClick}
+            sx={{ opacity: inputsReady ? 1 : 0.5 }}
           >
             Review
           </Button>
@@ -547,6 +564,7 @@ export function AddFunds({
             walletOptions={walletOptions}
             onClose={() => setShowPayWithDrawer(false)}
             onPayWithCard={handleCardClick}
+            onConnect={handleWalletConnected}
             insufficientBalance={insufficientBalance}
           />
           <OptionsDrawer
@@ -558,11 +576,13 @@ export function AddFunds({
             onClose={() => setShowOptionsDrawer(false)}
             onCardClick={handleCardClick}
             onRouteClick={handleRouteClick}
+            insufficientBalance={insufficientBalance}
           />
           <DeliverToWalletDrawer
             visible={showDeliverToDrawer}
             walletOptions={walletOptions}
             onClose={() => setShowDeliverToDrawer(false)}
+            onConnect={handleWalletConnected}
           />
         </Stack>
       </Stack>

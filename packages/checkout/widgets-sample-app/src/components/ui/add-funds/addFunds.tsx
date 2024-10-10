@@ -5,16 +5,13 @@ import {
   WidgetLanguage,
   AddFundsEventType,
   OnRampEventType,
-  SwapEventType,
-  BridgeEventType,
-  SwapDirection,
-  WalletProviderName,
+  OrchestrationEventType,
 } from "@imtbl/checkout-sdk";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import { Environment } from "@imtbl/config";
 import { useMemo, useEffect } from "react";
 
-import { passport } from "../marketplace-orchestrator/passport";
+import { passport } from "./passport";
 
 const ADD_FUNDS_TARGET_ID = "add-funds-widget-target";
 
@@ -25,6 +22,7 @@ function AddFundsUI() {
         baseConfig: {
           environment: Environment.PRODUCTION,
         },
+        passport,
       }),
     []
   );
@@ -81,19 +79,30 @@ function AddFundsUI() {
   //   })();
   // }, [checkout, factory]);
 
+  const goBack = () => {
+    addFunds.unmount();
+    addFunds.mount(ADD_FUNDS_TARGET_ID, {
+      showOnrampOption: true,
+      showSwapOption: false,
+      showBridgeOption: false,
+      // toAmount: "1",
+      // toTokenAddress: "native",
+    });
+  };
+
   useEffect(() => {
     addFunds.mount(ADD_FUNDS_TARGET_ID, {
       showOnrampOption: true,
+      showSwapOption: false,
       showBridgeOption: false,
-      showSwapOption: true,
-      toAmount: "1",
-      toTokenAddress: "native",
+      // toAmount: "1",
+      // toTokenAddress: "native",
     });
     addFunds.addListener(AddFundsEventType.CLOSE_WIDGET, (data: any) => {
       console.log("CLOSE_WIDGET", data);
       addFunds.unmount();
     });
-    addFunds.addListener(AddFundsEventType.REQUEST_ONRAMP, (data: any) => {
+    addFunds.addListener(OrchestrationEventType.REQUEST_ONRAMP, (data: any) => {
       console.log("REQUEST_ONRAMP", data);
       addFunds.unmount();
       onRamp.addListener(OnRampEventType.CLOSE_WIDGET, (data: any) => {
@@ -101,31 +110,15 @@ function AddFundsUI() {
         onRamp.unmount();
       });
       onRamp.mount(ADD_FUNDS_TARGET_ID, {
-        amount: data.amount,
-        tokenAddress: data.tokenAddress,
+        ...data,
+        showBackButton: true,
       });
     });
-    addFunds.addListener(AddFundsEventType.REQUEST_SWAP, (data: any) => {
-      console.log("REQUEST_SWAP", data);
-      addFunds.unmount();
-      swap.addListener(SwapEventType.CLOSE_WIDGET, (data: any) => {
-        console.log("CLOSE_WIDGET", data);
-        swap.unmount();
-      });
-      swap.mount(ADD_FUNDS_TARGET_ID, {
-        amount: data.amount,
-        toTokenAddress: data.toTokenAddress,
-        direction: SwapDirection.TO,
-      });
+    addFunds.addListener(AddFundsEventType.CONNECT_SUCCESS, (data: any) => {
+      console.log("CONNECT_SUCCESS", data);
     });
-    addFunds.addListener(AddFundsEventType.REQUEST_BRIDGE, (data: any) => {
-      console.log("REQUEST_BRIDGE", data);
-      addFunds.unmount();
-      bridge.addListener(BridgeEventType.CLOSE_WIDGET, (data: any) => {
-        console.log("CLOSE_WIDGET", data);
-        bridge.unmount();
-      });
-      bridge.mount(ADD_FUNDS_TARGET_ID, {});
+    onRamp.addListener(OrchestrationEventType.REQUEST_GO_BACK, () => {
+      goBack();
     });
   }, [addFunds]);
 

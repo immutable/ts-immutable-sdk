@@ -19,6 +19,7 @@ import {
 } from '@biom3/react';
 import { RouteResponse } from '@0xsquid/squid-types';
 import { BigNumber, utils } from 'ethers';
+import { useTranslation } from 'react-i18next';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { AddFundsContext } from '../context/AddFundsContext';
 import { useRoutes } from '../hooks/useRoutes';
@@ -39,7 +40,6 @@ import { SQUID_NATIVE_TOKEN } from '../utils/config';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { getDurationFormatted } from '../functions/getDurationFormatted';
-import { useTranslation } from 'react-i18next';
 
 interface ReviewProps {
   data: AddFundsReviewData;

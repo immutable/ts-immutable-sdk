@@ -1,4 +1,6 @@
-import { MenuItem, Stack, Sticker } from '@biom3/react';
+import {
+  AllDualVariantIconKeys, MenuItem, Stack, Sticker,
+} from '@biom3/react';
 import { BigNumber, utils } from 'ethers';
 import {
   MouseEvent,
@@ -19,7 +21,11 @@ export interface RouteOptionProps {
   onClick: MouseEventHandler<HTMLSpanElement>;
   balances: TokenBalance[] | null;
   loading?: boolean;
-  selected?: boolean;
+  withSelectedToken?: boolean;
+  withSelectedAmount?: boolean;
+  withSelectedWallet?: boolean;
+  insufficientBalance?: boolean;
+  showOnrampOption?: boolean;
 }
 
 function SelectedRouteOptionContainer({
@@ -56,18 +62,13 @@ export function SelectedRouteOption({
   chains,
   balances,
   loading = false,
-  selected = false,
+  withSelectedWallet = false,
+  withSelectedToken = false,
+  withSelectedAmount = false,
+  insufficientBalance = false,
+  showOnrampOption = false,
   onClick,
 }: RouteOptionProps) {
-  const mergedOnClick = useCallback(
-    (event: MouseEvent<HTMLSpanElement>) => {
-      event.stopPropagation();
-      if (!loading && !routeData) return false;
-      onClick?.(event);
-      return true;
-    },
-    [onClick, loading, routeData],
-  );
   const { fromToken } = routeData?.amountData ?? {};
   const chain = chains?.find((c) => c.id === fromToken?.chainId);
   const balance = balances?.find(
@@ -86,34 +87,83 @@ export function SelectedRouteOption({
     return utils.formatUnits(BigNumber.from(amount), decimals).toString();
   }, [routeData]);
 
-  if (!routeData) {
-    return loading ? (
-      <SelectedRouteOptionContainer onClick={mergedOnClick} selected={selected}>
+  const insufficientBalancePayWithCard = insufficientBalance && showOnrampOption;
+
+  const mergedOnClick = useCallback(
+    (event: MouseEvent<HTMLSpanElement>) => {
+      event.stopPropagation();
+
+      if (!loading && !routeData && !insufficientBalancePayWithCard) return false;
+
+      onClick?.(event);
+      return true;
+    },
+    [onClick, loading, routeData],
+  );
+
+  if (!routeData && loading) {
+    return (
+      <SelectedRouteOptionContainer
+        onClick={mergedOnClick}
+        selected={withSelectedWallet}
+      >
         <MenuItem.FramedVideo
           videoUrl="https://i.imgur.com/dVQoobw.mp4"
           mimeType="video/mp4"
           circularFrame
-          padded
         />
         <MenuItem.Caption>Finding the best payment route...</MenuItem.Caption>
       </SelectedRouteOptionContainer>
-    ) : (
-      <SelectedRouteOptionContainer onClick={mergedOnClick} selected={selected}>
+    );
+  }
+
+  if ((!routeData && !loading) || insufficientBalance) {
+    let icon: AllDualVariantIconKeys = 'Sparkle';
+    let copy = "Add your token, we'll find the best payment";
+
+    if (!withSelectedToken && withSelectedAmount) {
+      copy = "Add your token, we'll find the best payment";
+    }
+
+    if (withSelectedToken && !withSelectedAmount) {
+      copy = "Add your amount, we'll find the best payment";
+    }
+
+    if (!withSelectedWallet && withSelectedToken && withSelectedAmount) {
+      copy = "Select a wallet, we'll find the best payment";
+    }
+
+    if (insufficientBalance) {
+      icon = 'InformationCircle';
+      copy = 'No routes found, choose a different wallet, token or amount.';
+    }
+
+    if (insufficientBalancePayWithCard) {
+      icon = 'BankCard';
+      copy = 'No routes found, pay with card available';
+    }
+
+    return (
+      <SelectedRouteOptionContainer
+        onClick={mergedOnClick}
+        selected={withSelectedWallet}
+      >
         <MenuItem.FramedIcon
-          icon="Sparkle"
+          icon={icon}
           variant="bold"
           circularFrame
           emphasized={false}
         />
-        <MenuItem.Caption>
-          Add your token, we&apos;ll find the best payment
-        </MenuItem.Caption>
+        <MenuItem.Caption>{copy}</MenuItem.Caption>
       </SelectedRouteOptionContainer>
     );
   }
 
   return (
-    <SelectedRouteOptionContainer onClick={mergedOnClick} selected={selected}>
+    <SelectedRouteOptionContainer
+      onClick={mergedOnClick}
+      selected={withSelectedWallet}
+    >
       {chain && (
         <Sticker position={{ x: 'right', y: 'bottom' }}>
           <Sticker.FramedImage

@@ -37,7 +37,7 @@ export function WalletItem<
   return (
     <MenuItem
       rc={cloneElement(rc, {
-        onClick: disabled ? undefined : async () => {
+        onClick: async () => {
           if (loading) return;
           setBusy(true);
           // let the parent handle errors
@@ -50,7 +50,7 @@ export function WalletItem<
       })}
       testId={`${testId}-wallet-list-${providerInfo.rdns}`}
       size={size}
-      emphasized={!disabled}
+      emphasized
       sx={{ position: 'relative' }}
     >
       <RawImage
@@ -65,14 +65,14 @@ export function WalletItem<
       <MenuItem.Label size="medium" sx={{ marginLeft: '65px' }}>
         {providerInfo.name}
       </MenuItem.Label>
-      {(((recommended || busy) && !badge) && (
+      {((recommended || busy) && (
         <MenuItem.Badge
-          variant="guidance"
           isAnimated={busy}
+          variant={recommended && !busy ? 'emphasis' : 'guidance'}
           badgeContent={busy ? '' : t('wallets.recommended')}
         />
       ))}
-      {badge}
+      {!busy && badge}
     </MenuItem>
   );
 }

@@ -8,7 +8,6 @@ import { AmountData, RouteData, Token } from '../types';
 import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
 
 export const useRoutes = () => {
-  const [fetchingRoutes, setFetchingRoutes] = useState(false);
   const [routes, setRoutes] = useState<RouteData[]>([]);
   const latestRequestIdRef = useRef<number>(0);
 
@@ -166,8 +165,6 @@ export const useRoutes = () => {
       toAmount,
     );
 
-    setFetchingRoutes(true);
-
     const allRoutes: RouteData[] = [];
     await Promise.all(
       amountDataArray
@@ -191,7 +188,6 @@ export const useRoutes = () => {
       setRoutes(sortedRoutes);
     }
 
-    setFetchingRoutes(false);
     return allRoutes;
   };
 
@@ -201,6 +197,5 @@ export const useRoutes = () => {
     getAmountData,
     getRoute,
     resetRoutes,
-    fetchingRoutes,
   };
 };
