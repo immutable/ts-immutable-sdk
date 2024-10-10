@@ -32,7 +32,11 @@ type ConnectWalletDrawerProps = {
   heading: string;
   visible: boolean;
   onClose: () => void;
-  onConnect?: (provider: Web3Provider, providerInfo: EIP6963ProviderInfo) => void;
+  onConnect?: (
+    provider: Web3Provider,
+    providerInfo: EIP6963ProviderInfo
+  ) => void;
+  onError?: (errorType: ConnectEIP6963ProviderError) => void;
   providerType: 'from' | 'to';
   walletOptions: EIP6963ProviderDetail[];
   bottomSlot?: ReactNode;
@@ -48,6 +52,7 @@ export function ConnectWalletDrawer({
   visible,
   onClose,
   onConnect,
+  onError,
   providerType,
   walletOptions,
   bottomSlot,
@@ -163,21 +168,19 @@ export function ConnectWalletDrawer({
       // Call onConnect callback
       onConnect?.(provider, providerDetail.info);
     } catch (error: ConnectEIP6963ProviderError | any) {
-      if (error.message === ConnectEIP6963ProviderError.SANCTIONED_ADDRESS) {
-        setShowUnableToConnectDrawer(true);
+      switch (error.message) {
+        case ConnectEIP6963ProviderError.USER_REJECTED_REQUEST_ERROR:
+          setShowChangedMindDrawer(true);
+          break;
+        case ConnectEIP6963ProviderError.SANCTIONED_ADDRESS:
+        case ConnectEIP6963ProviderError.CONNECT_ERROR:
+          setShowUnableToConnectDrawer(true);
+          break;
+        default:
+          console.error('Unknown connect error', error); // eslint-disable-line no-console
       }
 
-      if (
-        error.message
-        === ConnectEIP6963ProviderError.USER_REJECTED_REQUEST_ERROR
-      ) {
-        setShowChangedMindDrawer(true);
-      }
-
-      if (error.message === ConnectEIP6963ProviderError.CONNECT_ERROR) {
-        console.log('@TODO: handle connect error'); // eslint-disable-line no-console
-      }
-
+      onError?.(error.message as ConnectEIP6963ProviderError);
       return;
     }
 
