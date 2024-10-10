@@ -92,6 +92,9 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
+      - name: Setup playwright
+        uses: ./.github/actions/setup-playwright
+
       - name: Get current SDK version string
         uses: actions/github-script@v7.0.1
         with: 
@@ -117,11 +120,8 @@ jobs:
       - name: Lint examples
         run: yarn workspace @examples/sdk-load-widgets-with-nextjs lint
 
-      - name: Setup playwright
-        uses: ./.github/actions/setup-playwright
-
-      - name: Build local widgets bundle
-        run: yarn workspace @imtbl/checkout-widgets build:examplewidgets
+      - name: Prepare widgets bundle for example app
+        run: yarn workspace @examples/sdk-load-widgets-with-nextjs prepare:widgets
 
       - name: Test Widget example
         run: yarn workspace @examples/sdk-load-widgets-with-nextjs test:latest
