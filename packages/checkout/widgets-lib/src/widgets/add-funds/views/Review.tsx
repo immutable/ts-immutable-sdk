@@ -42,7 +42,7 @@ interface ReviewProps {
 const FIXED_HANDOVER_DURATION = 2000;
 
 const APPROVE_TXN_ANIMATION = '/access_coins.riv';
-const EXECUTE_TXN_ANIMATION = '/purchasing_items.riv';
+const EXECUTE_TXN_ANIMATION = '/swapping_coins.riv';
 
 export function Review({
   data,
@@ -204,7 +204,7 @@ export function Review({
 
       const txReceipt = await execute(squid, changeableProvider, route);
 
-      showHandover(APPROVE_TXN_ANIMATION, RiveStateMachineInput.PROCESSING, 'Processing', '', FIXED_HANDOVER_DURATION);
+      showHandover(EXECUTE_TXN_ANIMATION, RiveStateMachineInput.PROCESSING, 'Processing', '', FIXED_HANDOVER_DURATION);
 
       showHandover(
         EXECUTE_TXN_ANIMATION,
