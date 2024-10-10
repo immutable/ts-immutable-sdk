@@ -39,9 +39,9 @@ Open [http://localhost:3000](http://localhost:3000) with your browser and you'll
 3. Filter listings based on criteria:
    - NFT Contract Address: The contract address of the ERC721 token
    - Currency Type: The type of currency (Native or ERC20) you'd like to receive for the item
-4. Click on the "Buy" button
+4. Click on the "Submit" button
 5. Approve the settlement contract to transfer tokens on your behalf
-6. If successful, the listing will be created and the order ID will be displayed
+6. If successful, the listing will be fulfilled
 7. If unsuccessful, an error message will be displayed
 
 ## Fill a ERC1155 listing
@@ -50,10 +50,11 @@ Open [http://localhost:3000](http://localhost:3000) with your browser and you'll
 3. Filter listings based on criteria:
    - NFT Contract Address: The contract address of the ERC1155 token
    - Currency Type: The type of currency (Native or ERC20) you'd like to receive for the item
-4. Click on the "Buy" button
-5. Approve the settlement contract to transfer tokens on your behalf
-6. If successful, the listing will be created and the order ID will be displayed
-7. If unsuccessful, an error message will be displayed
+4. Provide the number of units to fill
+5. Click on the "Submit" button
+6. Approve the settlement contract to transfer tokens on your behalf
+7. If successful, the listing will be fulfilled
+8. If unsuccessful, an error message will be displayed
 
 ## Required Environment Variables
 

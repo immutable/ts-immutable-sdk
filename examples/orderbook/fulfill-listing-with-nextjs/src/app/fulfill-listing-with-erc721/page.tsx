@@ -1,25 +1,27 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { ethers } from "ethers";
-import { ProviderEvent } from "@imtbl/sdk/passport";
-import { passportInstance } from "../utils/setupPassport";
-import { orderbookSDK } from "../utils/setupOrderbook";
 import {
+  Body,
   Box,
-  FormControl,
-  Heading,
-  TextInput,
-  Select,
-  Grid,
   Button,
-  LoadingOverlay,
+  FormControl,
+  Grid,
+  Heading,
   Link,
+  LoadingOverlay,
+  Select,
+  Stack,
   Table,
+  TextInput,
 } from "@biom3/react";
-import NextLink from "next/link";
 import { orderbook } from "@imtbl/sdk";
 import { OrderStatusName } from "@imtbl/sdk/orderbook";
+import { ProviderEvent } from "@imtbl/sdk/passport";
+import { ethers } from "ethers";
+import NextLink from "next/link";
+import { useMemo, useState } from "react";
+import { orderbookSDK } from "../utils/setupOrderbook";
+import { passportInstance } from "../utils/setupPassport";
 
 export default function FulfillERC721WithPassport() {
   // setup the accounts state
@@ -48,6 +50,12 @@ export default function FulfillERC721WithPassport() {
   const [buyItemType, setBuyItemTypeState] = useState<"NATIVE" | "ERC20">(
     "NATIVE",
   );
+
+  // setup the taker ecosystem fee recipient state
+  const [takerEcosystemFeeRecipient, setTakerEcosystemFeeRecipientState] = useState<string>("");
+
+  // setup the taker ecosystem fee amount state
+  const [takerEcosystemFeeAmount, setTakerEcosystemFeeAmountState] = useState<string>("");
 
   // save the listings state
   const [listings, setListingsState] = useState<orderbook.Listing[]>([]);
@@ -115,6 +123,14 @@ export default function FulfillERC721WithPassport() {
     setBuyItemTypeState(val);
   };
 
+  const handleTakerEcosystemFeeRecipientChange = (event: any) => {
+    setTakerEcosystemFeeRecipientState(event.target.value);
+  };
+
+  const handleTakerEcosystemFeeAmountChange = (event: any) => {
+    setTakerEcosystemFeeAmountState(event.target.value);
+  };
+
   const getListings = async (
     client: orderbook.Orderbook,
     sellItemContractAddress?: string,
@@ -173,18 +189,16 @@ export default function FulfillERC721WithPassport() {
     const { actions } = await orderbookSDK.fulfillOrder(
       listingID,
       accountsState[0],
-      [
-        {
-          amount: "1000000", // Insert taker ecosystem/marketplace fee here
-          recipientAddress: "0x0000000000000000000000000000000000000000", // Replace address with your own marketplace address
-        },
-      ],
+      takerEcosystemFeeRecipient != "" ? [{
+        recipientAddress: takerEcosystemFeeRecipient, // Replace address with your own marketplace address
+        amount: takerEcosystemFeeAmount, // Insert taker ecosystem/marketplace fee here
+      }] : [],
     );
 
     for (const action of actions) {
       if (action.type === orderbook.ActionType.TRANSACTION) {
         const builtTx = await action.buildTransaction();
-        await signer.sendTransaction(builtTx);
+        await (await signer.sendTransaction(builtTx)).wait(1);
       }
     }
   };
@@ -192,53 +206,51 @@ export default function FulfillERC721WithPassport() {
 
   return (
     <Box sx={{ marginBottom: "base.spacing.x5" }}>
-      <Box sx={{ marginTop: "base.spacing.x10" }}>
+      <LoadingOverlay visible={loading}>
+        <LoadingOverlay.Content>
+          <LoadingOverlay.Content.LoopingText
+            text={[loadingText]}
+            textDuration={1000}
+          />
+        </LoadingOverlay.Content>
+      </LoadingOverlay>
+      <Box sx={{ marginBottom: "base.spacing.x10" }}>
         <Heading size="medium" sx={{ marginBottom: "base.spacing.x5" }}>
           Passport
         </Heading>
-        <Grid>
-          {accountsState.length === 0 ? (
-            <Box sx={{ marginBottom: "base.spacing.x5" }}>
+        <Stack direction="row" justifyContent={"space-between"}>
+          <Box sx={{ marginBottom: "base.spacing.x5" }}>
+            {accountsState.length === 0 ? (
               <Button
                 size="medium"
                 variant="primary"
-                sx={{ width: "50%", marginBottom: "base.spacing.x10" }}
+                sx={{ width: "100%", marginBottom: "base.spacing.x10" }}
                 disabled={loading}
                 onClick={passportLogin}
               >
                 Login
               </Button>
-            </Box>
-          ) : null}
-          {accountsState.length >= 1 ? (
-            <Box sx={{ marginBottom: "base.spacing.x5" }}>
+            ) : (
               <Button
                 size="medium"
                 variant="primary"
-                sx={{ width: "50%", marginBottom: "base.spacing.x10" }}
+                sx={{ width: "90%", marginBottom: "base.spacing.x10" }}
                 disabled={loading}
                 onClick={passportLogout}
               >
                 Logout
               </Button>
-            </Box>
-          ) : null}
-          {loading ? (
-            <LoadingOverlay visible>
-              <LoadingOverlay.Content>
-                <LoadingOverlay.Content.LoopingText
-                  text={[loadingText]}
-                  textDuration={1000}
-                />
-              </LoadingOverlay.Content>
-            </LoadingOverlay>
-          ) : (
-            <Box sx={{ marginBottom: "base.spacing.x5" }}>
-              Connected Account:
-              {accountsState.length >= 1 ? accountsState : "(not connected)"}
-            </Box>
-          )}
-        </Grid>
+            )}
+          </Box>
+          <Box sx={{ marginBottom: "base.spacing.x5", marginTop: "base.spacing.x1", textAlign: "right" }}>
+            <div>
+              <Body size="small" weight="bold">Connected Account:</Body>
+            </div>
+            <div>
+              <Body size="xSmall" mono={true}>{accountsState.length >= 1 ? accountsState : "(not connected)"}</Body>
+            </div>
+          </Box>
+        </Stack>
       </Box>
       <Box>
         <Heading size="medium" sx={{ marginBottom: "base.spacing.x5" }}>
@@ -271,8 +283,8 @@ export default function FulfillERC721WithPassport() {
         ) : null}
       </Box>
       <Box>
-        <Grid>
-          <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
+        <Stack direction="row">
+          <FormControl sx={{ marginBottom: "base.spacing.x5", width: "415px" }}>
             <FormControl.Label>NFT Contract Address</FormControl.Label>
             <TextInput onChange={handleSellItemContractAddressChange} />
           </FormControl>
@@ -295,36 +307,51 @@ export default function FulfillERC721WithPassport() {
               </Select.Option>
             </Select>
           </FormControl>
-        </Grid>
+        </Stack>
       </Box>
-        {listings && listings.length > 0 ? (
-          <Box sx={{ maxHeight: "800px", marginBottom: "base.spacing.x5" }}>
-            <Table sx={{ marginLeft: "base.spacing.x5", maxWidth: "1300px", maxHeight: "400px", overflowY: "auto", marginBottom: "base.spacing.x5"}}>
+      <Box>
+        <Heading size="xSmall" sx={{ marginBottom: "base.spacing.x5" }}>
+          Taker Ecosystem Fee
+        </Heading>
+        <Stack direction="row">
+          <FormControl sx={{ marginBottom: "base.spacing.x5", width: "415px" }}>
+            <FormControl.Label>Recipient Address</FormControl.Label>
+            <TextInput onChange={handleTakerEcosystemFeeRecipientChange} />
+          </FormControl>
+          <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
+            <FormControl.Label>Fee Amount</FormControl.Label>
+            <TextInput onChange={handleTakerEcosystemFeeAmountChange} />
+          </FormControl>
+        </Stack>
+      </Box>
+      {listings && listings.length > 0 ? (
+        <Box sx={{ maxHeight: "800px", marginBottom: "base.spacing.x5" }}>
+          <Table sx={{ maxWidth: "1500px", width: "100%", maxHeight: "400px", overflowY: "auto", marginBottom: "base.spacing.x5"}}>
             <Table.Head>
               <Table.Row>
-                <Table.Cell>SNO</Table.Cell>
-                <Table.Cell>Listing ID</Table.Cell>
-                <Table.Cell>Contract Address</Table.Cell>
-                <Table.Cell>Token ID</Table.Cell>
-                <Table.Cell></Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>SNO</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Listing ID</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Contract Address</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}>Token ID</Table.Cell>
+                <Table.Cell sx={{ padding: "base.spacing.x2" }}></Table.Cell>
               </Table.Row>
             </Table.Head>
             <Table.Body>
               {listings.map((listing: orderbook.Listing, index: number) => {
                 return (
                   <Table.Row key={index}>
-                    <Table.Cell>{index + 1}</Table.Cell>
-                    <Table.Cell>{listing.id}</Table.Cell>
-                    <Table.Cell>{listing.sell[0].contractAddress}</Table.Cell>
-                    <Table.Cell>{listing.sell[0].tokenId}</Table.Cell>
-                    <Table.Cell>
+                    <Table.Cell sx={{ paddingLeft: "base.spacing.x5", paddingRight: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{index + 1}</Body></Table.Cell>
+                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{listing.id}</Body></Table.Cell>
+                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{listing.sell[0].contractAddress}</Body></Table.Cell>
+                    <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}><Body mono={true} size="small">{listing.sell[0].tokenId}</Body></Table.Cell>
+                    <Table.Cell sx={{ paddingLeft: "base.spacing.x2", paddingRight: "base.spacing.x5", paddingY: "base.spacing.x2" }}>
                       <Button
-                        size="medium"
+                        size="small"
                         variant="primary"
                         disabled={loading}
                         onClick={() => executeTrade(listing.id)}
                       >
-                        Buy
+                        Submit
                       </Button>
                     </Table.Cell>
                   </Table.Row>
