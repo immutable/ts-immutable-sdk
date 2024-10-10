@@ -69,7 +69,6 @@ export function Options({
           videoUrl="https://i.imgur.com/dVQoobw.mp4"
           sx={{ alignSelf: 'center', mt: 'base.spacing.x2' }}
           size="large"
-          padded
           circularFrame
         />
       </Stack>

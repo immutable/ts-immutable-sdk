@@ -81,10 +81,17 @@ export function AddFunds({
   showBackButton,
   onBackButtonClick,
 }: AddFundsProps) {
-  const { routes, fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
+  const { fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
   const {
     addFundsState: {
-      squid, chains, balances, tokens,
+      squid,
+      chains,
+      balances,
+      tokens,
+      selectedAmount,
+      routes,
+      selectedRouteData,
+      selectedToken,
     },
     addFundsDispatch,
   } = useContext(AddFundsContext);
@@ -95,9 +102,6 @@ export function AddFunds({
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
 
-  const [selectedRouteData, setSelectedRouteData] = useState<
-  RouteData | undefined
-  >(undefined);
   const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
   const [showPayWithDrawer, setShowPayWithDrawer] = useState(false);
   const [showDeliverToDrawer, setShowDeliverToDrawer] = useState(false);
@@ -105,28 +109,48 @@ export function AddFunds({
     [],
   );
   const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
-  const [inputValue, setInputValue] = useState<string>(toAmount || '');
-  const [debouncedToAmount, setDebouncedToAmount] = useState<string>(inputValue);
-  const [selectedToken, setSelectedToken] = useState<TokenInfo | undefined>();
+  const [inputValue, setInputValue] = useState<string>(selectedAmount || toAmount || '');
   const [fetchingRoutes, setFetchingRoutes] = useState(false);
   const [insufficientBalance, setInsufficientBalance] = useState(false);
 
-  const debouncedUpdateAmount = debounce((value: string) => {
-    setDebouncedToAmount(value);
+  const setSelectedAmount = debounce((value: string) => {
+    addFundsDispatch({
+      payload: {
+        type: AddFundsActions.SET_SELECTED_AMOUNT,
+        selectedAmount: value,
+      },
+    });
   }, 1500);
 
-  const updateAmount = (event: ChangeEvent<HTMLInputElement>) => {
+  const setSelectedToken = (token: TokenInfo | undefined) => {
+    addFundsDispatch({
+      payload: {
+        type: AddFundsActions.SET_SELECTED_TOKEN,
+        selectedToken: token,
+      },
+    });
+  };
+
+  const setSelectedRouteData = (route: RouteData | undefined) => {
+    addFundsDispatch({
+      payload: {
+        type: AddFundsActions.SET_SELECTED_ROUTE_DATA,
+        selectedRouteData: route,
+      },
+    });
+  };
+
+  const handleOnAmountInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setInputValue(value);
-    debouncedUpdateAmount(value);
+    setSelectedAmount(value);
   };
 
   const {
     providersState: {
-      fromProvider,
       fromProviderInfo,
-      fromAddress,
       toProviderInfo,
+      fromAddress,
       toAddress,
     },
   } = useProvidersContext();
@@ -169,6 +193,10 @@ export function AddFunds({
   );
 
   useEffect(() => {
+    setSelectedAmount(toAmount || '');
+  }, [toAmount]);
+
+  useEffect(() => {
     resetRoutes();
     setInsufficientBalance(false);
     setSelectedRouteData(undefined);
@@ -179,7 +207,7 @@ export function AddFunds({
         && squid
         && tokens
         && selectedToken?.address
-        && debouncedToAmount
+        && selectedAmount
       ) {
         setFetchingRoutes(true);
         const availableRoutes = await fetchRoutesWithRateLimit(
@@ -190,7 +218,7 @@ export function AddFunds({
           selectedToken.address === 'native'
             ? SQUID_NATIVE_TOKEN
             : selectedToken.address,
-          debouncedToAmount,
+          selectedAmount,
           5,
           1000,
         );
@@ -201,7 +229,7 @@ export function AddFunds({
         }
       }
     })();
-  }, [balances, squid, selectedToken, debouncedToAmount]);
+  }, [balances, squid, selectedToken, selectedAmount]);
 
   useEffect(() => {
     if (!selectedRouteData && routes.length > 0) {
@@ -285,7 +313,7 @@ export function AddFunds({
   const handleCardClick = () => {
     const data = {
       tokenAddress: selectedToken?.address ?? '',
-      amount: debouncedToAmount ?? '',
+      amount: selectedAmount ?? '',
       showBackButton: true,
     };
     orchestrationEvents.sendRequestOnrampEvent(
@@ -303,7 +331,7 @@ export function AddFunds({
   };
 
   const handleReviewClick = () => {
-    if (!debouncedToAmount || !selectedToken?.address || !selectedRouteData) {
+    if (!selectedAmount || !selectedToken?.address || !selectedRouteData) {
       return;
     }
 
@@ -316,7 +344,7 @@ export function AddFunds({
             balance: selectedRouteData.amountData.balance,
             toChainId: ChainId.IMTBL_ZKEVM_MAINNET.toString(),
             toTokenAddress: selectedToken.address,
-            toAmount: debouncedToAmount,
+            toAmount: selectedAmount,
           },
         },
       },
@@ -367,9 +395,10 @@ export function AddFunds({
     [allowedTokens, handleTokenChange, isSelected, defaultTokenImage],
   );
   const shouldShowBackButton = showBackButton ?? !!onBackButtonClick;
-  const inputsReady = !!selectedToken && !!debouncedToAmount && !!fromProvider;
-  const loading = (inputsReady || fetchingRoutes)
+  const routeInputsReady = !!selectedToken && parseFloat(inputValue) > 0 && !!fromAddress;
+  const loading = (routeInputsReady || fetchingRoutes)
     && !(selectedRouteData || insufficientBalance);
+  const readyToReview = routeInputsReady && !!toAddress && !!selectedRouteData && !loading;
 
   const handleWalletConnected = (
     providerType: 'from' | 'to',
@@ -477,7 +506,7 @@ export function AddFunds({
                 testId="add-funds-amount-input"
                 type="number"
                 value={inputValue}
-                onChange={(value) => updateAmount(value)}
+                onChange={(value) => handleOnAmountInputChange(value)}
                 placeholder="0"
                 maxTextSize="xLarge"
               />
@@ -509,7 +538,7 @@ export function AddFunds({
             >
               <MenuItem.BottomSlot.Divider
                 sx={{
-                  ml: fromProvider ? 'base.spacing.x2' : undefined,
+                  ml: fromAddress ? 'base.spacing.x2' : undefined,
                 }}
               />
               <SelectedRouteOption
@@ -519,8 +548,8 @@ export function AddFunds({
                 routeData={selectedRouteData}
                 onClick={() => setShowOptionsDrawer(true)}
                 withSelectedToken={!!selectedToken}
-                withSelectedAmount={Number(debouncedToAmount) > 0}
-                withSelectedWallet={!!fromProvider}
+                withSelectedAmount={parseFloat(inputValue) > 0}
+                withSelectedWallet={!!fromAddress}
                 insufficientBalance={insufficientBalance}
                 showOnrampOption={shouldShowOnRampOption}
               />
@@ -553,9 +582,9 @@ export function AddFunds({
             testId="add-funds-button"
             size="large"
             variant="secondary"
-            disabled={!inputsReady}
+            disabled={!readyToReview}
             onClick={handleReviewClick}
-            sx={{ opacity: inputsReady ? 1 : 0.5 }}
+            sx={{ opacity: readyToReview ? 1 : 0.5 }}
           >
             Review
           </Button>
