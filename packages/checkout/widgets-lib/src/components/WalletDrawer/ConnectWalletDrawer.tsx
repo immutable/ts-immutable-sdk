@@ -123,7 +123,7 @@ export function ConnectWalletDrawer({
     // Trigger analytics connect wallet, menu item, with wallet details
     track({
       userJourney: UserJourney.CONNECT,
-      screen: 'AddFunds',
+      screen: 'ConnectWallet',
       control: info.name,
       controlType: 'MenuItem',
       extras: {
