@@ -103,7 +103,6 @@
   "scripts": {
     "build": "yarn clean && NODE_ENV=production rollup --config rollup.config.js",
     "build:analyse": "yarn build --plugin visualizer",
-    "build:examplewidgets": "yarn build && yarn workspace @examples/sdk-load-widgets-with-nextjs exec mkdir -p tests/utils/local-widgets-js/ && cp dist/*.js $(yarn workspace @examples/sdk-load-widgets-with-nextjs exec pwd)/tests/utils/local-widgets-js/",
     "build:local": "yarn clean && yarn build && mkdir -p ../widgets-sample-app/public/lib/js && cp dist/*.js ../widgets-sample-app/public/lib/js/",
     "clean": "rimraf ./dist",
     "d": "rollup --config rollup.config.js",
