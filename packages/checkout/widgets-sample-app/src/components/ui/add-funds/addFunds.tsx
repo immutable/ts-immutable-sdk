@@ -11,7 +11,7 @@ import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import { Environment } from "@imtbl/config";
 import { useMemo, useEffect } from "react";
 
-import { passport } from "../marketplace-orchestrator/passport";
+import { passport } from "./passport";
 
 const ADD_FUNDS_TARGET_ID = "add-funds-widget-target";
 
