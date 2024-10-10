@@ -113,6 +113,12 @@ export function ConnectWalletDrawer({
   };
 
   const handleOnWalletChangeEvent = async (event: WalletChangeEvent) => {
+    if (!checkout) {
+      setShowUnableToConnectDrawer(true);
+      onError?.(ConnectEIP6963ProviderError.CONNECT_ERROR);
+      throw new Error('Checkout is not initialized');
+    }
+
     // Keep prev wallet change event
     prevWalletChangeEvent.current = event;
 
@@ -138,10 +144,6 @@ export function ConnectWalletDrawer({
       },
     });
 
-    if (!checkout) {
-      throw new Error('Checkout is not initialized');
-    }
-
     // Proceed to disconnect current provider if Passport
     if (info.rdns === WalletProviderRdns.PASSPORT) {
       const { isConnected } = await checkout.checkIsWalletConnected({
@@ -165,9 +167,10 @@ export function ConnectWalletDrawer({
       // Store selected provider as fromProvider in context
       setProviderInContext(provider, providerDetail.info);
 
-      // Call onConnect callback
+      // Notify successful connection
       onConnect?.(provider, providerDetail.info);
     } catch (error: ConnectEIP6963ProviderError | any) {
+      let errorType = error.message;
       switch (error.message) {
         case ConnectEIP6963ProviderError.USER_REJECTED_REQUEST_ERROR:
           setShowChangedMindDrawer(true);
@@ -177,10 +180,11 @@ export function ConnectWalletDrawer({
           setShowUnableToConnectDrawer(true);
           break;
         default:
-          console.error('Unknown connect error', error); // eslint-disable-line no-console
+          errorType = ConnectEIP6963ProviderError.CONNECT_ERROR;
       }
 
-      onError?.(error.message as ConnectEIP6963ProviderError);
+      // Notify failure to connect
+      onError?.(errorType as ConnectEIP6963ProviderError);
       return;
     }
 
