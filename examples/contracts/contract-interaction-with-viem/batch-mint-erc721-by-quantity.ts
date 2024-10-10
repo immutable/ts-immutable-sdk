@@ -4,29 +4,25 @@ import { ImmutableERC721Abi } from '@imtbl/contracts';
 
 const PRIVATE_KEY = '0xYOUR_PRIVATE_KEY'; // should be read from environment variable, should be of type `0x${string}`
 const CONTRACT_ADDRESS = '0xYOUR_CONTRACT_ADDRESS'; // should be of type `0x${string}`
-const TOKEN_ID_1 = BigInt(1);
-const TOKEN_ID_2 = BigInt(2);
-const TOKEN_ID_3 = BigInt(3);
-const TOKEN_ID_4 = BigInt(4);
 const ACCOUNT_ADDRESS_1: `0x${string}` = '0xACCOUNT_ADDRESS_1'; // should be of type `0x${string}`
 const ACCOUNT_ADDRESS_2: `0x${string}` = '0xACCOUNT_ADDRESS_2'; // should be of type `0x${string}`
-const REQUESTS = [
+const MINTS = [
   {
     to: ACCOUNT_ADDRESS_1,
-    tokenIds: [TOKEN_ID_1, TOKEN_ID_2],
+    quantity: BigInt(3),
   },
   {
     to: ACCOUNT_ADDRESS_2,
-    tokenIds: [TOKEN_ID_3, TOKEN_ID_4],
+    quantity: BigInt(3),
   },
 ];
 
-export const batchMintERC721ByID = async (
+export const batchMintERC721ByQuantity = async (
   privateKey: `0x${string}`,
   contractAddress: `0x${string}`,
-  requests: {
+  mints: {
     to: `0x${string}`;
-    tokenIds: bigint[];
+    quantity: bigint;
   }[],
 ): Promise<string> => {
   const immutableTestnet = defineChain({
@@ -70,10 +66,10 @@ export const batchMintERC721ByID = async (
     );
   }
 
-  const txHash = await contract.write.mintBatch([requests]);
+  const txHash = await contract.write.mintBatchByQuantity([mints]);
 
   console.log(`txHash: ${txHash}`);
   return txHash;
 };
 
-batchMintERC721ByID(PRIVATE_KEY, CONTRACT_ADDRESS, REQUESTS);
+batchMintERC721ByQuantity(PRIVATE_KEY, CONTRACT_ADDRESS, MINTS);
