@@ -1,21 +1,62 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Checkout SDK Widgets Example App
+
+This example app shows how to use the Checkout Widget, loaded from the Checkout SDK. It will cover scenarios including mounting, executing flows, and handling events.
+
+**Example App implementation progress:**
+- [x] Mounting Checkout Widget
+- [ ] Executing different flows
+- [ ] Events
 
 ## Getting Started
 
-First, run the development server:
+Install your dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+yarn install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Copy over the `.env.example` file to `.env` and fill in the required environment variables.
 
 ## Required Environment Variables
 
 - NEXT_PUBLIC_PUBLISHABLE_KEY // replace with your publishable API key from Hub
+
+## Running locally
+
+```bash
+yarn dev
+```
+
+## E2E Testing
+
+There are tests covering the auto updating of the Checkout Widget.
+
+Build the app:
+
+```bash
+yarn build
+```
+
+Run tests with latest compatible remote bundle of the widgets:
+
+```bash
+yarn test:remotewidgets
+```
+
+To run these tests using a local bundle of the widgets, first build the entire Checkout SDK from the root of `ts-immutable-sdk`:
+
+```bash
+yarn build
+```
+
+Copy over the created widgets bundle to use for testing:
+
+```bash
+yarn workspace @examples/sdk-load-widgets-with-nextjs prepare:widgets
+```
+
+Run tests against the local bundle:
+
+```bash
+yarn test
+```
