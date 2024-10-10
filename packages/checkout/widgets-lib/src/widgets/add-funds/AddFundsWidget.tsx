@@ -33,6 +33,8 @@ import { Review } from './views/Review';
 import { fetchBalances } from './functions/fetchBalances';
 import { useTokens } from './hooks/useTokens';
 import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
+import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
+import { ServiceType } from '../../views/error/serviceTypes';
 
 export type AddFundsWidgetInputs = AddFundsWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
@@ -198,6 +200,12 @@ export default function AddFundsWidget({
               });
             }}
           />
+        )}
+        {viewState.view.type === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
+        <ServiceUnavailableErrorView
+          service={ServiceType.GENERIC}
+          onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
+        />
         )}
       </AddFundsContext.Provider>
     </ViewContext.Provider>

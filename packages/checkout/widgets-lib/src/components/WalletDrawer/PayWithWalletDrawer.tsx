@@ -1,9 +1,11 @@
 import { EIP6963ProviderDetail, EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import { MenuItem } from '@biom3/react';
 import { Web3Provider } from '@ethersproject/providers';
 import { ConnectWalletDrawer } from './ConnectWalletDrawer';
 import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
+import { ConnectEIP6963ProviderError } from '../../lib/connectEIP6963Provider';
+import { SharedViews, ViewActions, ViewContext } from '../../context/view-context/ViewContext';
 
 type PayWithWalletDrawerProps = {
   visible: boolean;
@@ -22,10 +24,8 @@ export function PayWithWalletDrawer({
   walletOptions,
   insufficientBalance,
 }: PayWithWalletDrawerProps) {
-  // TODO: Implement pay with card option
-  // TODO: Implement not available option with custom label when insufficient balance
-
   const { providersState: { fromProviderInfo } } = useProvidersContext();
+  const { viewDispatch } = useContext(ViewContext);
 
   const disabledOptions = useMemo(() => {
     if (insufficientBalance && fromProviderInfo) {
@@ -37,6 +37,25 @@ export function PayWithWalletDrawer({
 
     return [];
   }, [insufficientBalance, fromProviderInfo]);
+
+  const handleOnConnect = (provider: Web3Provider, providerInfo: EIP6963ProviderInfo) => {
+    onConnect('from', provider, providerInfo);
+  };
+
+  const handleOnError = (errorType: ConnectEIP6963ProviderError) => {
+    if (errorType === ConnectEIP6963ProviderError.SANCTIONED_ADDRESS) {
+      onClose();
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
+            error: new Error(errorType),
+          },
+        },
+      });
+    }
+  };
 
   const payWithCardItem = useMemo(
     () => (
@@ -68,7 +87,8 @@ export function PayWithWalletDrawer({
       walletOptions={walletOptions}
       disabledOptions={disabledOptions}
       bottomSlot={payWithCardItem}
-      onConnect={(provider, providerInfo) => onConnect('from', provider, providerInfo)}
+      onConnect={handleOnConnect}
+      onError={handleOnError}
     />
   );
 }

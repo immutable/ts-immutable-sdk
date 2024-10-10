@@ -67,6 +67,7 @@ export function UnableToConnectDrawer({
           <ButtCon
             icon="Close"
             variant="tertiary"
+            size="small"
             sx={{
               pos: 'absolute',
               top: 'base.spacing.x5',

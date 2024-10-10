@@ -62,16 +62,16 @@ export type ErrorType = {
 
 /* The CheckoutError class is a custom error class in TypeScript that includes a message, type, and
 optional data object. */
-export class CheckoutError extends Error {
+export class CheckoutError<T = CheckoutErrorType> extends Error {
   public message: string;
 
-  public type: CheckoutErrorType;
+  public type: T;
 
   public data?: { [key: string]: any };
 
   constructor(
     message: string,
-    type: CheckoutErrorType,
+    type: T,
     data?: {
       [key: string]: any
     },

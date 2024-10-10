@@ -66,6 +66,7 @@ export function ChangedYourMindDrawer({
           />
           <ButtCon
             icon="Close"
+            size="small"
             variant="tertiary"
             sx={{
               pos: 'absolute',
