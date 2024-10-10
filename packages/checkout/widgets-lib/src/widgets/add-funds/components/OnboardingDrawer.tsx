@@ -37,7 +37,6 @@ export function OnboardingDrawer({ ...props }: OnboardingDrawerProps) {
         return setVisible(false);
       }
 
-      setCacheItem(SEEN_ONBOARDING_KEY, true);
       return setVisible(true);
     }
 
@@ -50,8 +49,10 @@ export function OnboardingDrawer({ ...props }: OnboardingDrawerProps) {
         return setScreenIndex(1);
       case 1:
         return setScreenIndex(2);
-      case 2:
+      case 2: {
+        setCacheItem(SEEN_ONBOARDING_KEY, true);
         return setVisible(false);
+      }
     }
   }, [screenIndex]);
 
