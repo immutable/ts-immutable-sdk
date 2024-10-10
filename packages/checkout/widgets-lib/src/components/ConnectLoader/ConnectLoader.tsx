@@ -31,6 +31,7 @@ export interface ConnectLoaderProps {
   params: ConnectLoaderParams;
   closeEvent: () => void;
   widgetConfig: StrongCheckoutWidgetsConfig;
+  goBackEvent?: () => void;
 }
 
 export interface ConnectLoaderParams {
@@ -47,6 +48,7 @@ export function ConnectLoader({
   params,
   widgetConfig,
   closeEvent,
+  goBackEvent,
 }: ConnectLoaderProps) {
   const {
     checkout,
@@ -250,6 +252,7 @@ export function ConnectLoader({
                       sendCloseEventOverride={closeEvent}
                       allowedChains={allowedChains}
                       isCheckNetworkEnabled={isCheckNetworkEnabled ?? true}
+                      sendGoBackEventOverride={goBackEvent}
                     />
         )}
         {/* If the user has connected then render the widget */}

@@ -4,12 +4,7 @@ import {
   WidgetType,
   WidgetLanguage,
   AddFundsEventType,
-  OnRampEventType,
-  SwapEventType,
-  BridgeEventType,
-  SwapDirection,
-  WalletProviderName,
-  OrchestrationEventType,
+  OnRampEventType, OrchestrationEventType
 } from "@imtbl/checkout-sdk";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import { Environment } from "@imtbl/config";
@@ -83,11 +78,22 @@ function AddFundsUI() {
   //   })();
   // }, [checkout, factory]);
 
+  const goBack = () => {
+    addFunds.unmount();
+    addFunds.mount(ADD_FUNDS_TARGET_ID, {
+      showOnrampOption: true,
+      showSwapOption: false,
+      showBridgeOption: false,
+      toAmount: "1",
+      toTokenAddress: "native",
+    });
+  };
+
   useEffect(() => {
     addFunds.mount(ADD_FUNDS_TARGET_ID, {
       showOnrampOption: true,
+      showSwapOption: false,
       showBridgeOption: false,
-      showSwapOption: true,
       toAmount: "1",
       toTokenAddress: "native",
     });
@@ -103,8 +109,8 @@ function AddFundsUI() {
         onRamp.unmount();
       });
       onRamp.mount(ADD_FUNDS_TARGET_ID, {
-        amount: data.amount,
-        tokenAddress: data.tokenAddress,
+        ...data,
+        showBackButton: true,
       });
     });
     addFunds.addListener(AddFundsEventType.CONNECT_SUCCESS, (data: any) => {
@@ -116,28 +122,9 @@ function AddFundsUI() {
         console.log("CONNECT_SUCCESS FROM", data.provider);
       }
     });
-    // addFunds.addListener(AddFundsEventType.REQUEST_SWAP, (data: any) => {
-    //   console.log("REQUEST_SWAP", data);
-    //   addFunds.unmount();
-    //   swap.addListener(SwapEventType.CLOSE_WIDGET, (data: any) => {
-    //     console.log("CLOSE_WIDGET", data);
-    //     swap.unmount();
-    //   });
-    //   swap.mount(ADD_FUNDS_TARGET_ID, {
-    //     amount: data.amount,
-    //     toTokenAddress: data.toTokenAddress,
-    //     direction: SwapDirection.TO,
-    //   });
-    // });
-    // addFunds.addListener(AddFundsEventType.REQUEST_BRIDGE, (data: any) => {
-    //   console.log("REQUEST_BRIDGE", data);
-    //   addFunds.unmount();
-    //   bridge.addListener(BridgeEventType.CLOSE_WIDGET, (data: any) => {
-    //     console.log("CLOSE_WIDGET", data);
-    //     bridge.unmount();
-    //   });
-    //   bridge.mount(ADD_FUNDS_TARGET_ID, {});
-    // });
+    onRamp.addListener(OrchestrationEventType.REQUEST_GO_BACK, () => {
+      goBack();
+    });
   }, [addFunds]);
 
   return (

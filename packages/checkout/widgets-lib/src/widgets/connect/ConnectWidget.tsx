@@ -7,8 +7,7 @@ import {
   EIP1193Provider,
   EIP6963ProviderInfo,
   getMetaMaskProviderDetail,
-  getPassportProviderDetail,
-  WalletConnectManager as IWalletConnectManager,
+  getPassportProviderDetail, WalletConnectManager as IWalletConnectManager,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback,
@@ -66,6 +65,7 @@ export type ConnectWidgetInputs = ConnectWidgetParams & {
   checkout: Checkout;
   web3Provider?: Web3Provider;
   isCheckNetworkEnabled?: boolean;
+  sendGoBackEventOverride?: () => void;
 };
 
 export default function ConnectWidget({
@@ -79,6 +79,7 @@ export default function ConnectWidget({
   blocklistWalletRdns,
   deepLink = ConnectWidgetViews.CONNECT_WALLET,
   isCheckNetworkEnabled,
+  sendGoBackEventOverride,
 }: ConnectWidgetInputs) {
   const { t } = useTranslation();
   const { environment } = config;
@@ -224,6 +225,8 @@ export default function ConnectWidget({
               allowedChains={allowedChains ?? [targetChain]}
               blocklistWalletRdns={blocklistWalletRdns}
               checkNetwork={isCheckNetworkEnabled ?? true}
+              showBackButton={!!sendCloseEventOverride}
+              onBackButtonClick={sendGoBackEventOverride}
             />
           )}
           {view.type === ConnectWidgetViews.SWITCH_NETWORK && isZkEvmChainId(targetChain) && (
