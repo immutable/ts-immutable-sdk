@@ -1,7 +1,6 @@
 import {
   AllDualVariantIconKeys, MenuItem, Stack, Sticker,
 } from '@biom3/react';
-import { BigNumber, utils } from 'ethers';
 import {
   MouseEvent,
   MouseEventHandler,
@@ -13,7 +12,10 @@ import { TokenBalance } from '@0xsquid/sdk/dist/types';
 
 import { Chain, RouteData } from '../types';
 import { getUsdBalance } from '../functions/convertTokenBalanceToUsd';
-import { tokenValueFormat } from '../../../lib/utils';
+import {
+  getFormattedNumber,
+  getFormattedAmounts,
+} from '../functions/getFormattedNumber';
 
 export interface RouteOptionProps {
   routeData?: RouteData;
@@ -78,14 +80,13 @@ export function SelectedRouteOption({
   const usdBalance = routeData ? getUsdBalance(balance, routeData) : '0.00';
 
   const routeUSDBalance = routeData?.route.route.estimate.fromAmountUSD ?? '0.00';
-  const routeBalance = useMemo(() => {
-    if (!routeData) return '0.00';
-
-    const amount = routeData?.route.route.estimate.fromAmount;
-    const decimals = routeData?.route.route.estimate.fromToken.decimals;
-
-    return utils.formatUnits(BigNumber.from(amount), decimals).toString();
-  }, [routeData]);
+  const routeBalance = useMemo(
+    () => getFormattedNumber(
+      routeData?.route.route.estimate.fromAmount,
+      routeData?.route.route.estimate.fromToken.decimals,
+    ),
+    [routeData],
+  );
 
   const insufficientBalancePayWithCard = insufficientBalance && showOnrampOption;
 
@@ -188,12 +189,12 @@ export function SelectedRouteOption({
         <Stack gap="0px">
           <MenuItem.Label>{fromToken?.name}</MenuItem.Label>
           <MenuItem.Caption>
-            {`Balance USD $${tokenValueFormat(usdBalance)}`}
+            {`Balance USD $${getFormattedAmounts(usdBalance)}`}
           </MenuItem.Caption>
         </Stack>
-        <MenuItem.PriceDisplay price={tokenValueFormat(routeBalance)}>
+        <MenuItem.PriceDisplay price={getFormattedAmounts(routeBalance)}>
           <MenuItem.PriceDisplay.Caption>
-            {`USD $${tokenValueFormat(routeUSDBalance)}`}
+            {`USD $${getFormattedAmounts(routeUSDBalance)}`}
           </MenuItem.PriceDisplay.Caption>
         </MenuItem.PriceDisplay>
       </Stack>

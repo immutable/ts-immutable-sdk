@@ -1,5 +1,10 @@
 import {
-  ReactNode, useCallback, useContext, useMemo, useState,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
 } from 'react';
 import {
   Body,
@@ -18,8 +23,7 @@ import {
   useInterval,
 } from '@biom3/react';
 import { RouteResponse } from '@0xsquid/squid-types';
-import { BigNumber, utils } from 'ethers';
-import { useTranslation } from 'react-i18next';
+import { t } from 'i18next';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { AddFundsContext } from '../context/AddFundsContext';
 import { useRoutes } from '../hooks/useRoutes';
@@ -40,6 +44,10 @@ import { SQUID_NATIVE_TOKEN } from '../utils/config';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { getDurationFormatted } from '../functions/getDurationFormatted';
+import { RouteFees } from '../components/RouteFees';
+import { getTotalRouteFees } from '../functions/getTotalRouteFees';
+import { getRouteChains } from '../functions/getRouteChains';
+import { getFormattedNumber, getFormattedAmounts } from '../functions/getFormattedNumber';
 
 interface ReviewProps {
   data: AddFundsReviewData;
@@ -49,21 +57,8 @@ interface ReviewProps {
 }
 
 const FIXED_HANDOVER_DURATION = 2000;
-
 const APPROVE_TXN_ANIMATION = '/access_coins.riv';
 const EXECUTE_TXN_ANIMATION = '/purchasing_items.riv';
-
-const isContentLoaded = (route: RouteResponse | undefined) => !!route;
-
-const getAmountInUSDText = (amount: string | undefined) => (amount ? `USD $${amount}` : '');
-
-const getAmountFormatted = (amount?: string, decimals?: number) => {
-  if (!amount || typeof decimals !== 'number') {
-    return '0';
-  }
-
-  return utils.formatUnits(BigNumber.from(amount), decimals);
-};
 
 const dividerSx = {
   content: "''",
@@ -79,7 +74,6 @@ export function Review({
   onBackButtonClick,
   onCloseButtonClick,
 }: ReviewProps) {
-  const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
   const {
     addFundsState: { squid, chains, tokens },
@@ -93,6 +87,7 @@ export function Review({
 
   const [route, setRoute] = useState<RouteResponse | undefined>();
   const [proceedDisabled, setProceedDisabled] = useState(true);
+  const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
 
   const { getAmountData, getRoute } = useRoutes();
   const { addHandover, closeHandover } = useHandover({
@@ -137,45 +132,56 @@ export function Review({
     setProceedDisabled(false);
   };
 
-  const getChain = useCallback(
-    (chainId: string | undefined) => chains?.find((chain) => chain.id === chainId),
-    [chains],
+  const { fromChain, toChain } = useMemo(
+    () => getRouteChains(chains, route),
+    [chains, route],
   );
 
   const getRouteIntervalIdRef = useInterval(getFromAmountAndRoute, 20000);
+  useEffect(() => {
+    getFromAmountAndRoute();
+  }, []);
 
-  const feeCosts = useMemo(
-    () => route?.route.estimate.feeCosts.reduce(
-      (acc, fee) => acc + Number(fee.amountUsd),
-      0,
-    ) ?? 0,
+  const { totalFees, totalFeesUsd } = useMemo(
+    () => getTotalRouteFees(route),
     [route],
   );
-
-  const formattedFeeCosts = useMemo(() => `USD $${feeCosts}`, [feeCosts]);
-
-  /*
-  @TODO: is this still needed?
-  const gasCostText = useMemo((): string => {
-    if (
-      !route?.route.estimate.gasCosts
-      || route?.route.estimate.gasCosts.length === 0
-    ) {
-      return '';
+  const routeFees = useMemo(() => {
+    if (totalFeesUsd) {
+      return (
+        <Body
+          onClick={() => setShowFeeBreakdown(true)}
+          size="small"
+          sx={{
+            ...hFlex,
+            alignItems: 'center',
+            c: 'base.color.text.body.secondary',
+            cursor: 'pointer',
+          }}
+        >
+          Included fees
+          {` USD $${getFormattedAmounts(totalFeesUsd)}`}
+          <Icon
+            icon="ChevronExpand"
+            sx={{ ml: 'base.spacing.x2', w: 'base.icon.size.200' }}
+          />
+        </Body>
+      );
     }
-    const totalGasFee = route?.route.estimate.gasCosts.reduce(
-      (acc, gas) => acc.add(BigNumber.from(gas.amount)),
-      BigNumber.from(0),
-    );
 
-    const formattedTotalGasFee = utils.formatUnits(
-      totalGasFee,
-      route?.route.estimate.gasCosts[0].token.decimals,
+    return (
+      <Body
+        size="small"
+        sx={{
+          ...hFlex,
+          alignItems: 'center',
+          c: 'base.color.text.body.secondary',
+        }}
+      >
+        {t('Zero fees')}
+      </Body>
     );
-
-    return `Gas Refuel +${route.route.estimate.gasCosts[0].token.name} ${formattedTotalGasFee}`;
-  }, [route]);
-  */
+  }, [totalFeesUsd]);
 
   const showHandover = useCallback(
     (
@@ -363,7 +369,7 @@ export function Review({
         gap="base.spacing.x4"
         testId="reviewContainer"
       >
-        {isContentLoaded(route) ? (
+        {!!route && (
           <>
             <Heading weight="bold" sx={{ textAlign: 'center' }}>
               Review
@@ -388,17 +394,7 @@ export function Review({
                     size="large"
                   />
                   <Sticker.FramedImage
-                    use={(
-                      <img
-                        src={
-                          getChain(route.route.estimate.fromToken.chainId)
-                            ?.iconUrl
-                        }
-                        alt={
-                          getChain(route.route.estimate.fromToken.chainId)?.name
-                        }
-                      />
-                    )}
+                    use={<img src={fromChain?.iconUrl} alt={fromChain?.name} />}
                     emphasized
                     sx={{
                       bottom: 'base.spacing.x2',
@@ -416,7 +412,7 @@ export function Review({
                     size="small"
                     sx={{ c: 'base.color.text.body.secondary' }}
                   >
-                    {getChain(route.route.estimate.fromToken.chainId)?.name}
+                    {fromChain?.name}
                     <EllipsizedText
                       text={fromAddress ?? ''}
                       sx={{
@@ -429,14 +425,14 @@ export function Review({
                   </Body>
                 </Stack>
                 <PriceDisplay
-                  price={getAmountFormatted(
+                  price={getFormattedNumber(
                     route.route.estimate.fromAmount,
                     route.route.estimate.fromToken.decimals,
                   )}
                   sx={{ flexShrink: 0, alignSelf: 'flex-start' }}
                 >
                   <PriceDisplay.Caption size="small">
-                    {getAmountInUSDText(route.route.estimate.fromAmountUSD)}
+                    {`USD $${route?.route.estimate.fromAmountUSD ?? ''}`}
                   </PriceDisplay.Caption>
                 </PriceDisplay>
               </Stack>
@@ -530,31 +526,15 @@ export function Review({
                   <FramedImage
                     use={(
                       <img
-                        src={
-                          getChain(route.route.estimate.toToken.chainId)
-                            ?.nativeCurrency.iconUrl
-                        }
-                        alt={
-                          getChain(route.route.estimate.toToken.chainId)
-                            ?.nativeCurrency.name
-                        }
+                        src={toChain?.nativeCurrency.iconUrl}
+                        alt={toChain?.nativeCurrency.name}
                       />
                     )}
                     circularFrame
                     size="large"
                   />
                   <Sticker.FramedImage
-                    use={(
-                      <img
-                        src={
-                          getChain(route.route.estimate.toToken.chainId)
-                            ?.iconUrl
-                        }
-                        alt={
-                          getChain(route.route.estimate.toToken.chainId)?.name
-                        }
-                      />
-                    )}
+                    use={<img src={toChain?.iconUrl} alt={toChain?.name} />}
                     emphasized
                     sx={{
                       bottom: 'base.spacing.x2',
@@ -572,7 +552,7 @@ export function Review({
                     size="small"
                     sx={{ c: 'base.color.text.body.secondary' }}
                   >
-                    {getChain(route?.route.estimate.toToken.chainId)?.name}
+                    {toChain?.name}
                     <EllipsizedText
                       text={toAddress ?? ''}
                       sx={{
@@ -585,14 +565,14 @@ export function Review({
                   </Body>
                 </Stack>
                 <PriceDisplay
-                  price={getAmountFormatted(
+                  price={getFormattedNumber(
                     route?.route.estimate.toAmount,
                     route?.route.estimate.toToken.decimals,
                   )}
                   sx={{ flexShrink: 0, alignSelf: 'flex-start' }}
                 >
                   <PriceDisplay.Caption size="small">
-                    {getAmountInUSDText(route?.route.estimate.toAmountUSD)}
+                    {`USD $${route?.route.estimate.toAmountUSD ?? ''}`}
                   </PriceDisplay.Caption>
                 </PriceDisplay>
               </Stack>
@@ -640,28 +620,7 @@ export function Review({
                 >
                   {formattedDuration}
                 </Body>
-
-                <Body
-                  onClick={() => {
-                    // eslint-disable-next-line no-console
-                    console.log('@TODO');
-                  }}
-                  size="small"
-                  sx={{
-                    ...hFlex,
-                    alignItems: 'center',
-                    c: 'base.color.text.body.secondary',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Included fees
-                  {' '}
-                  {formattedFeeCosts}
-                  <Icon
-                    icon="ChevronExpand"
-                    sx={{ ml: 'base.spacing.x2', w: 'base.icon.size.200' }}
-                  />
-                </Body>
+                {routeFees}
               </Stack>
             </Stack>
 
@@ -674,10 +633,17 @@ export function Review({
               {proceedDisabled ? 'Processing' : 'Proceed'}
             </Button>
           </>
-        ) : (
-          <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
         )}
+
+        {!route && <LoadingView loadingText="Securing quote" />}
       </Stack>
+      <RouteFees
+        routeData={route}
+        visible={showFeeBreakdown}
+        onClose={() => setShowFeeBreakdown(false)}
+        totalAmount={totalFees}
+        totalFiatAmount={totalFeesUsd}
+      />
     </SimpleLayout>
   );
 }

@@ -2,7 +2,7 @@ import { createContext } from 'react';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { Squid } from '@0xsquid/sdk';
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
-import { Chain, Token } from '../types';
+import { Chain, Token, RouteData } from '../types';
 
 export interface AddFundsState {
   allowedTokens: TokenInfo[] | null;
@@ -10,6 +10,10 @@ export interface AddFundsState {
   chains: Chain[] | null;
   balances: TokenBalance[] | null;
   tokens: Token[] | null;
+  routes: RouteData[];
+  selectedRouteData: RouteData | undefined;
+  selectedToken: TokenInfo | undefined;
+  selectedAmount: string;
 }
 
 export const initialAddFundsState: AddFundsState = {
@@ -18,6 +22,10 @@ export const initialAddFundsState: AddFundsState = {
   chains: null,
   balances: null,
   tokens: null,
+  routes: [],
+  selectedRouteData: undefined,
+  selectedToken: undefined,
+  selectedAmount: '',
 };
 
 export interface AddFundsContextState {
@@ -34,7 +42,11 @@ type ActionPayload =
   | SetSquid
   | SetChains
   | SetBalances
-  | SetTokens;
+  | SetTokens
+  | SetRoutes
+  | SetSelectedRouteData
+  | SetSelectedToken
+  | SetSelectedAmount;
 
 export enum AddFundsActions {
   SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
@@ -42,6 +54,10 @@ export enum AddFundsActions {
   SET_CHAINS = 'SET_CHAINS',
   SET_BALANCES = 'SET_BALANCES',
   SET_TOKENS = 'SET_TOKENS',
+  SET_ROUTES = 'SET_ROUTES',
+  SET_SELECTED_ROUTE_DATA = 'SET_SELECTED_ROUTE_DATA',
+  SET_SELECTED_TOKEN = 'SET_SELECTED_TOKEN',
+  SET_SELECTED_AMOUNT = 'SET_SELECTED_AMOUNT',
 }
 
 export interface SetAllowedTokensPayload {
@@ -66,6 +82,26 @@ export interface SetBalances {
 export interface SetTokens {
   type: AddFundsActions.SET_TOKENS;
   tokens: Token[];
+}
+
+export interface SetRoutes {
+  type: AddFundsActions.SET_ROUTES;
+  routes: RouteData[];
+}
+
+export interface SetSelectedRouteData {
+  type: AddFundsActions.SET_SELECTED_ROUTE_DATA;
+  selectedRouteData: RouteData | undefined;
+}
+
+export interface SetSelectedToken {
+  type: AddFundsActions.SET_SELECTED_TOKEN;
+  selectedToken: TokenInfo | undefined;
+}
+
+export interface SetSelectedAmount {
+  type: AddFundsActions.SET_SELECTED_AMOUNT;
+  selectedAmount: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -107,6 +143,26 @@ export const addFundsReducer: Reducer<AddFundsState, AddFundsAction> = (
       return {
         ...state,
         tokens: action.payload.tokens,
+      };
+    case AddFundsActions.SET_ROUTES:
+      return {
+        ...state,
+        routes: action.payload.routes,
+      };
+    case AddFundsActions.SET_SELECTED_ROUTE_DATA:
+      return {
+        ...state,
+        selectedRouteData: action.payload.selectedRouteData,
+      };
+    case AddFundsActions.SET_SELECTED_TOKEN:
+      return {
+        ...state,
+        selectedToken: action.payload.selectedToken,
+      };
+    case AddFundsActions.SET_SELECTED_AMOUNT:
+      return {
+        ...state,
+        selectedAmount: action.payload.selectedAmount,
       };
     default:
       return state;
