@@ -74,8 +74,6 @@ import type {
   OrdersApiGetOrderV3Request,
   OrdersApiListOrdersV3Request,
   OrderV3,
-  PrimarySalesApi,
-  PrimarySalesApiSignableCreatePrimarySaleRequest,
   Project,
   ProjectsApi,
   SuccessResponse,
@@ -101,11 +99,6 @@ import type {
   WithdrawalsApiGetWithdrawalRequest,
   WithdrawalsApiListWithdrawalsRequest,
 } from './types';
-import type {
-  AcceptPrimarySaleResponse,
-  CreatePrimarySaleResponse,
-  RejectPrimarySaleResponse,
-} from './workflows';
 import { Workflows } from './workflows';
 
 export class IMXClient {
@@ -135,8 +128,6 @@ export class IMXClient {
 
   public ordersApi: OrdersApi;
 
-  public primarySalesApi: PrimarySalesApi;
-
   public projectsApi: ProjectsApi;
 
   public tokensApi: TokensApi;
@@ -165,7 +156,6 @@ export class IMXClient {
     this.mintsApi = this.immutableX.mintsApi;
     this.nftCheckoutPrimaryApi = this.immutableX.nftCheckoutPrimaryApi;
     this.ordersApi = this.immutableX.ordersApi;
-    this.primarySalesApi = this.immutableX.primarySalesApi;
     this.projectsApi = this.immutableX.projectsApi;
     this.tokensApi = this.immutableX.tokensApi;
     this.tradesApi = this.immutableX.tradesApi;
@@ -180,7 +170,6 @@ export class IMXClient {
       this.immutableX.metadataRefreshesApi,
       this.immutableX.mintsApi,
       this.immutableX.primarySalesApi,
-      this.immutableX.projectsApi,
     );
   }
 
@@ -859,60 +848,6 @@ export class IMXClient {
     return this.nftCheckoutPrimaryApi
       .getNftPrimaryTransactions(request)
       .then((res) => res.data)
-      .catch((err) => {
-        throw formatError(err);
-      });
-  }
-
-  /**
-   * Create a PrimarySale
-   * @param walletConnection - the pair of L1/L2 signers
-   * @param request - the request object to be provided in the API request
-   * @returns a promise that resolves with the created Trade
-   * @throws {@link IMXError}
-   */
-  public createPrimarySale(
-    walletConnection: WalletConnection,
-    request: PrimarySalesApiSignableCreatePrimarySaleRequest,
-  ): Promise<CreatePrimarySaleResponse> {
-    return this.workflows
-      .createPrimarySale(walletConnection, request)
-      .catch((err) => {
-        throw formatError(err);
-      });
-  }
-
-  /**
-   * Accept a PrimarySale
-   * @param ethSigner - eth signer matching the 'studio_ether_key' of the primary sale
-   * @param primarySaleId - id of the primary sale accepting
-   * @returns a promise that resolves with the created Trade
-   * @throws {@link IMXError}
-   */
-  public acceptPrimarySale(
-    ethSigner: EthSigner,
-    primarySaleId: number,
-  ): Promise<AcceptPrimarySaleResponse> {
-    return this.workflows
-      .acceptPrimarySale(ethSigner, primarySaleId)
-      .catch((err) => {
-        throw formatError(err);
-      });
-  }
-
-  /**
-   * Reject a PrimarySale
-   * @param ethSigner - eth signer matching the 'studio_ether_key' of the primary sale
-   * @param primarySaleId - id of the primary sale to be rejected
-   * @returns a promise that resolves with the rejected PrimarySale
-   * @throws {@link IMXError}
-   */
-  public rejectPrimarySale(
-    ethSigner: EthSigner,
-    primarySaleId: number,
-  ): Promise<RejectPrimarySaleResponse> {
-    return this.workflows
-      .rejectPrimarySale(ethSigner, primarySaleId)
       .catch((err) => {
         throw formatError(err);
       });
