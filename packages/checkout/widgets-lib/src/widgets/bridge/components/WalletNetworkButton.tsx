@@ -122,11 +122,7 @@ export function WalletNetworkButton({
         variant="tertiary"
         sx={networkButtonStyles}
       >
-        <FramedImage
-          sx={{
-            w: 'base.icon.size.400',
-            h: 'base.icon.size.400',
-          }}
+        <Button.FramedImage
           use={(
             <img
               src={getChainImage(environment, chainId)}
