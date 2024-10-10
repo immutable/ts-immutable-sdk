@@ -2,8 +2,6 @@ import { Body, Button, Caption, Drawer, DUMMY_RASTER_IMAGE_2_URL, DUMMY_RASTER_I
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { getCacheItem, SEEN_ONBOARDING_KEY, setCacheItem } from '../functions/onboardingState';
 
-
-type OnboardingDrawerProps = {};
 const MAPPED_SCREEN_CONTENT = [
   {
     title: <>Payments on Immutable<br />have evolved</>,
@@ -25,7 +23,7 @@ const MAPPED_SCREEN_CONTENT = [
   },
 ];
 
-export function OnboardingDrawer({ ...props }: OnboardingDrawerProps) {
+export function OnboardingDrawer() {
   const [visible, setVisible] = useState(false);
   const [screenIndex, setScreenIndex] = useState<0 | 1 | 2>(0);
   const currentScreenContent = useMemo(() => MAPPED_SCREEN_CONTENT[screenIndex], [screenIndex]);
@@ -33,11 +31,7 @@ export function OnboardingDrawer({ ...props }: OnboardingDrawerProps) {
   useEffect(() => {
     async function checkToInitialiseDrawer() {
       const cachedValue = await getCacheItem(SEEN_ONBOARDING_KEY);
-      if (cachedValue) {
-        return setVisible(false);
-      }
-
-      return setVisible(true);
+      return cachedValue ? setVisible(false) : setVisible(true);
     }
 
     checkToInitialiseDrawer();
