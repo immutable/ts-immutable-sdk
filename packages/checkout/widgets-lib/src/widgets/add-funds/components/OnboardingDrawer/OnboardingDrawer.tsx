@@ -26,7 +26,7 @@ const HERO_IMAGES = [
 export function OnboardingDrawer() {
 	const { t } = useTranslation();
 	const [visible, setVisible] = useState(false);
-	const [screenIndex, setScreenIndex] = useState<0 | 1 | 2>(0);
+	const [screenIndex, setScreenIndex] = useState<1 | 2 | 3>(1);
 
 	useEffect(() => {
 		async function checkToInitialiseDrawer() {
@@ -39,21 +39,21 @@ export function OnboardingDrawer() {
 
 	const handleCtaOnClick = useCallback(() => {
 		switch (screenIndex) {
-			case 0:
-				return setScreenIndex(1);
-			case 1: {
+			case 1:
+				return setScreenIndex(2);
+			case 2: {
 				// @NOTE: once they have "seen" the final slide, mark it as such
 				// in the cache so that we don't show this to users again
 				setCacheItem(SEEN_ONBOARDING_KEY, true);
-				return setScreenIndex(2);
+				return setScreenIndex(3);
 			}
-			case 2:
+			case 3:
 				// @NOTE: they have "seen" all slides - so this drawer can be closed
 				return setVisible(false);
 		}
 	}, [screenIndex]);
 
-	const ScreenHeroImage = useMemo(() => HERO_IMAGES[screenIndex], [screenIndex]);
+	const ScreenHeroImage = useMemo(() => HERO_IMAGES[screenIndex - 1], [screenIndex]);
 
 	return (
 		<Drawer size="threeQuarter" visible={visible} showHeaderBar={false}>
@@ -86,12 +86,12 @@ export function OnboardingDrawer() {
 				<OnboardingPagination
 					disabled
 					size="small"
-					currentPage={screenIndex + 1}
+					currentPage={screenIndex}
 					totalPages={3}
 					sx={{ mt: "base.spacing.x11", mb: "base.spacing.x8" }}
 				/>
 				<Button
-					variant={screenIndex === 2 ? "primary" : "tertiary"}
+					variant={screenIndex === 3 ? "primary" : "tertiary"}
 					onClick={handleCtaOnClick}
 					size="large"
 					sx={{ alignSelf: "stretch" }}
