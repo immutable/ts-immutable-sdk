@@ -150,7 +150,12 @@ export function AddFunds({
   };
 
   const handleOnAmountInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
+    const { value, amount, isValid } = validateToAmount(event.target.value);
+
+    if (!isValid && amount < 0) {
+      return;
+    }
+
     setInputValue(value);
     setSelectedAmount(value);
   };
@@ -508,11 +513,7 @@ export function AddFunds({
             <Body>Add Token</Body>
           ) : (
             <HeroFormControl
-              validationStatus={
-                validateToAmount(inputValue) || inputValue === ''
-                  ? 'success'
-                  : 'error'
-              }
+              validationStatus={inputValue === '0' ? 'error' : 'success'}
             >
               <HeroFormControl.Label>
                 Add
