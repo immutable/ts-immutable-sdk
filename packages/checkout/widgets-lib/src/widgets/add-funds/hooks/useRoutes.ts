@@ -176,8 +176,8 @@ export const useRoutes = () => {
     for (let i = 0; i < amountDataArray.length; i += bulkNumber) {
       const slicedAmountDataArray = amountDataArray.slice(i, i + bulkNumber);
 
-      // eslint-disable-next-line no-await-in-loop
       allRoutes.push(
+        // eslint-disable-next-line no-await-in-loop
         ...(await getRoutes(squid, slicedAmountDataArray, toTokenAddress)),
       );
 
