@@ -72,6 +72,14 @@ export type RequestOnrampEvent = {
  * Represents the add funds event object when the add funds widget is requested.
  */
 export type RequestAddFundsEvent = {
+  /** Token address of the fund to be added */
+  toTokenAddress?: string;
+
+  /** Amount of the fund to be added */
+  toAmount?: string;
+
+  /** Whether to show a back button on the first screen, on click triggers REQUEST_GO_BACK event */
+  showBackButton?: boolean;
 };
 
 /**
@@ -79,7 +87,6 @@ export type RequestAddFundsEvent = {
  */
 export type RequestGoBackEvent = {
 };
-
 /*
  * Type representing the orchestration events.
  */
@@ -89,4 +96,5 @@ export type OrchestrationEventData =
   | RequestSwapEvent
   | RequestBridgeEvent
   | RequestOnrampEvent
-  | RequestGoBackEvent;
+  | RequestGoBackEvent
+  | RequestAddFundsEvent;

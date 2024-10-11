@@ -176,7 +176,7 @@ export function WalletList(props: WalletListProps) {
           const changeAccount = isMetaMask;
           const connectResult = await checkout.connect({
             provider: web3Provider,
-            requestWalletPermissions: changeAccount,
+            requestWalletPermissions: false,
           });
 
           // CM-793 Check for sanctioned address

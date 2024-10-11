@@ -4,6 +4,7 @@ import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import {
   BridgeEventType,
   OnRampEventType,
+  OrchestrationEventType,
   SaleEventType,
   SaleItem,
   SalePaymentTypes,
@@ -234,6 +235,12 @@ export function SaleUI() {
       });
       return;
     });
+
+
+    saleWidget.addListener(OrchestrationEventType.REQUEST_ADD_FUNDS, (event) => {
+      console.log('REQUEST_ADD_FUNDS', event);
+    });
+    
   }, [saleWidget, swapWidget, bridgeWidget, onrampWidget]);
 
   const handlePassportConfigChange = (e: any) => {

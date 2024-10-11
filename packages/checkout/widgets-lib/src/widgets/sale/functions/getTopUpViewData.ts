@@ -7,9 +7,16 @@ const tokenInfo = (req?: TransactionRequirement) => {
   return undefined;
 };
 
+export type TopUpViewData = {
+  heading: string[];
+  subheading: string[];
+  amount: string;
+  tokenAddress: string;
+};
+
 export const getTopUpViewData = (
   transactionRequirements: TransactionRequirement[],
-) => {
+): TopUpViewData => {
   const native = transactionRequirements.find(
     ({ type }) => type === ItemType.NATIVE,
   );

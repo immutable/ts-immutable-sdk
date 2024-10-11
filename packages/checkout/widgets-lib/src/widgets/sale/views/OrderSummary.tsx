@@ -1,7 +1,7 @@
 import { Box, Heading } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SalePaymentTypes } from '@imtbl/checkout-sdk';
+import { IMTBLWidgetEvents, SalePaymentTypes } from '@imtbl/checkout-sdk';
 
 import {
   OrderSummarySubViews,
@@ -14,7 +14,7 @@ import {
 } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { OrderReview } from '../components/OrderReview';
 import { useFundingBalances } from '../hooks/useFundingBalances';
-import { getTopUpViewData } from '../functions/getTopUpViewData';
+import { getTopUpViewData, TopUpViewData } from '../functions/getTopUpViewData';
 import {
   FundingBalance,
   FundingBalanceType,
@@ -30,9 +30,17 @@ import {
   transactionRiveAnimations,
 } from '../hooks/useHandoverSteps';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
-import { ViewContext, ViewActions, SharedViews } from '../../../context/view-context/ViewContext';
+import {
+  ViewContext,
+  ViewActions,
+  SharedViews,
+} from '../../../context/view-context/ViewContext';
 import { useHandover } from '../../../lib/hooks/useHandover';
 import { getRemoteRive } from '../../../lib/utils';
+import { orchestrationEvents } from '../../../lib/orchestrationEvents';
+import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+
+const ADD_FUNDS_ENABLED = true;
 
 type OrderSummaryProps = {
   subView: OrderSummarySubViews;
@@ -57,6 +65,10 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
   const { addHandover, closeHandover } = useHandover({
     id: HandoverTarget.GLOBAL,
   });
+
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
 
   const onPayWithCard = (paymentType: SalePaymentTypes) => goBackToPaymentMethods(paymentType);
 
@@ -121,6 +133,32 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     });
   };
 
+  const onInsufficientFunds = (data: TopUpViewData) => {
+    if (ADD_FUNDS_ENABLED) {
+      orchestrationEvents.sendRequestAddFundsEvent(
+        eventTarget,
+        IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT,
+        {
+          showBackButton: true,
+          toAmount: data.amount,
+          toTokenAddress: data.tokenAddress,
+        },
+      );
+
+      return;
+    }
+
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SharedViews.TOP_UP_VIEW,
+          data,
+        },
+      },
+    });
+  };
+
   const {
     fundingBalances,
     loadingBalances,
@@ -168,21 +206,10 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       setPaymentMethod(undefined);
 
       // Send analytics event to track insufficient funds
-      sendInsufficientFunds(
-        SaleWidgetViews.ORDER_SUMMARY,
-        data,
-      );
+      sendInsufficientFunds(SaleWidgetViews.ORDER_SUMMARY, data);
 
       closeHandover();
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SharedViews.TOP_UP_VIEW,
-            data,
-          },
-        },
-      });
+      onInsufficientFunds(data);
     } catch (error: any) {
       goToErrorView(SaleErrorTypes.SERVICE_BREAKDOWN, error);
     }
