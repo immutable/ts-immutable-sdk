@@ -23,7 +23,7 @@ import { AddFundsContext } from '../context/AddFundsContext';
 import { useRoutes } from '../hooks/useRoutes';
 import { AddFundsReviewData } from '../../../context/view-context/AddFundsViewContextTypes';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { AddFundsErrorTypes, Chain, RiveStateMachineInput } from '../types';
+import { Chain, RiveStateMachineInput } from '../types';
 import { useExecute } from '../hooks/useExecute';
 import { SquidIcon } from '../components/SquidIcon';
 import { useHandover } from '../../../lib/hooks/useHandover';
@@ -33,7 +33,6 @@ import { getRemoteRive } from '../../../lib/utils';
 import {
   APPROVE_TXN_ANIMATION, EXECUTE_TXN_ANIMATION, FIXED_HANDOVER_DURATION, SQUID_NATIVE_TOKEN,
 } from '../utils/config';
-import { useError } from '../hooks/useError';
 
 interface ReviewProps {
   data: AddFundsReviewData;
@@ -58,7 +57,6 @@ export function Review({
   const [getRouteIntervalId, setGetRouteIntervalId] = useState<NodeJS.Timer | undefined>();
   const [proceedDisabled, setProceedDisabled] = useState(true);
 
-  const { showErrorHandover } = useError(checkout?.config.environment || Environment.SANDBOX);
   const { getAmountData, getRoute } = useRoutes();
   const { addHandover } = useHandover({
     id: HandoverTarget.GLOBAL,
@@ -66,7 +64,7 @@ export function Review({
 
   const {
     convertToNetworkChangeableProvider, checkProviderChain, getAllowance, approve, execute,
-  } = useExecute();
+  } = useExecute(checkout?.config.environment || Environment.SANDBOX);
 
   const getFromAmountAndRoute = async () => {
     if (!squid || !tokens) return;
@@ -162,82 +160,74 @@ export function Review({
       return;
     }
 
-    try {
-      clearInterval(getRouteIntervalId);
-      setProceedDisabled(true);
+    clearInterval(getRouteIntervalId);
+    setProceedDisabled(true);
 
-      showHandover(APPROVE_TXN_ANIMATION, RiveStateMachineInput.START, 'Preparing');
+    showHandover(APPROVE_TXN_ANIMATION, RiveStateMachineInput.START, 'Preparing');
 
-      const changeableProvider = await convertToNetworkChangeableProvider(provider);
-      await checkProviderChain(changeableProvider, route.route.params.fromChain);
+    const changeableProvider = await convertToNetworkChangeableProvider(provider);
+    await checkProviderChain(changeableProvider, route.route.params.fromChain);
 
-      const allowance = await getAllowance(changeableProvider, route);
+    const allowance = await getAllowance(changeableProvider, route);
 
-      const { fromAmount } = route.route.params;
-      if (allowance?.lt(fromAmount)) {
-        showHandover(
-          APPROVE_TXN_ANIMATION,
-          RiveStateMachineInput.WAITING,
-          'Waiting for access approval in your wallet',
-          'Approve the transaction request to complete this transaction',
-        );
-
-        await approve(changeableProvider, route);
-
-        showHandover(
-          APPROVE_TXN_ANIMATION,
-          RiveStateMachineInput.COMPLETED,
-          'Granted access to your tokens',
-          '',
-          FIXED_HANDOVER_DURATION,
-        );
-      }
-
+    const { fromAmount } = route.route.params;
+    if (allowance?.lt(fromAmount)) {
       showHandover(
-        EXECUTE_TXN_ANIMATION,
+        APPROVE_TXN_ANIMATION,
         RiveStateMachineInput.WAITING,
-        'Waiting for transaction approval in wallet',
+        'Waiting for access approval in your wallet',
         'Approve the transaction request to complete this transaction',
       );
 
-      const txReceipt = await execute(squid, changeableProvider, route);
+      const approveTxnHash = await approve(changeableProvider, route);
 
-      if (txReceipt) {
-        showHandover(
-          EXECUTE_TXN_ANIMATION,
-          RiveStateMachineInput.PROCESSING,
-          'Processing',
-          '',
-          FIXED_HANDOVER_DURATION,
-        );
-
-        showHandover(
-          EXECUTE_TXN_ANIMATION,
-          RiveStateMachineInput.COMPLETED,
-          'Funds added successfully', (
-            <>
-              Go to
-              {' '}
-              <Link
-                size="small"
-                rc={(
-                  <a
-                    target="_blank"
-                    href={`https://axelarscan.io/gmp/${txReceipt?.transactionHash}`}
-                    rel="noreferrer"
-                  />
-            )}
-              >
-                Axelarscan
-              </Link>
-              {' '}
-              for transaction details
-            </>
-          ),
-        );
+      if (!approveTxnHash) {
+        return;
       }
-    } catch (error) {
-      showErrorHandover(AddFundsErrorTypes.SERVICE_BREAKDOWN, { error });
+    }
+
+    showHandover(
+      EXECUTE_TXN_ANIMATION,
+      RiveStateMachineInput.WAITING,
+      'Waiting for transaction approval in wallet',
+      'Approve the transaction request to complete this transaction',
+    );
+
+    const txReceipt = await execute(squid, changeableProvider, route);
+
+    if (txReceipt) {
+      showHandover(
+        EXECUTE_TXN_ANIMATION,
+        RiveStateMachineInput.PROCESSING,
+        'Processing',
+        '',
+        FIXED_HANDOVER_DURATION,
+      );
+
+      showHandover(
+        EXECUTE_TXN_ANIMATION,
+        RiveStateMachineInput.COMPLETED,
+        'Funds added successfully', (
+          <>
+            Go to
+            {' '}
+            <Link
+              size="small"
+              rc={(
+                <a
+                  target="_blank"
+                  href={`https://axelarscan.io/gmp/${txReceipt?.transactionHash}`}
+                  rel="noreferrer"
+                />
+            )}
+            >
+              Axelarscan
+            </Link>
+            {' '}
+            for transaction details
+          </>
+        ),
+      );
     }
   };
 
