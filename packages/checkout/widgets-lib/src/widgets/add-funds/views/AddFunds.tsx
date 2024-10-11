@@ -618,6 +618,7 @@ export function AddFunds({
             onPayWithCard={handleCardClick}
             onConnect={handleWalletConnected}
             insufficientBalance={insufficientBalance}
+            showOnRampOption={shouldShowOnRampOption}
           />
           <OptionsDrawer
             routes={routes}
