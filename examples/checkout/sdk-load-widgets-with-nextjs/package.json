@@ -7,11 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prepare:widgets": "mkdir -p tests/utils/local-widgets-js/ && cp $(yarn workspace @imtbl/checkout-widgets exec pwd)/dist/*.js tests/utils/local-widgets-js/",
-    "test": "USE_LOCAL_BUNDLE=true playwright test playwright test",
-    "test:latest": "USE_LOCAL_BUNDLE=true INTERCEPT_WIDGETS_VERSION=latest playwright test",
+    "test": "playwright test",
     "test:ui": "playwright test --ui",
-    "test:remotewidgets": "playwright test"
+    "test:remotewidgets": "USE_LOCAL_BUNDLE=false playwright test"
   },
   "dependencies": {
     "@biom3/react": "^0.25.21",

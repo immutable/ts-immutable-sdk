@@ -65,14 +65,14 @@ jobs:
       - name: Build examples
         run: yarn build:examples
 
-      - name: Prepare widgets bundle for Checkout Widget example app
-        run: yarn workspace @examples/sdk-load-widgets-with-nextjs prepare:widgets
-
       - name: Lint examples
         run: yarn lint:examples
 
       - name: Setup playwright
         uses: ./.github/actions/setup-playwright
+
+      - name: Prepare widgets bundle for Checkout Widgets example app
+        run: yarn workspace @imtbl/checkout-widgets prepare:examplewidgets
 
       - name: Test examples
         run: yarn test:examples
@@ -120,11 +120,11 @@ jobs:
       - name: Lint examples
         run: yarn workspace @examples/sdk-load-widgets-with-nextjs lint
 
-      - name: Prepare widgets bundle for example app
-        run: yarn workspace @examples/sdk-load-widgets-with-nextjs prepare:widgets
+      - name: Prepare widgets bundle for Checkout Widgets example app
+        run: yarn workspace @imtbl/checkout-widgets prepare:examplewidgets
 
       - name: Test Widget example
-        run: yarn workspace @examples/sdk-load-widgets-with-nextjs test:latest
+        run: yarn workspace @examples/sdk-load-widgets-with-nextjs test
 
   func-tests:
     name: Functional tests
