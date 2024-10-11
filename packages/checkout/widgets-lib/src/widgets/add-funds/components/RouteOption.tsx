@@ -12,14 +12,16 @@ import {
 import { ReactElement, useMemo } from 'react';
 import { Chain, RouteData } from '../types';
 import { getDurationFormatted } from '../functions/getDurationFormatted';
+import { getTotalRouteFees } from '../functions/getTotalRouteFees';
+import { getFormattedAmounts } from '../functions/getFormattedNumber';
+import { getRouteAndTokenBalances } from '../functions/getRouteAndTokenBalances';
 
 export interface RouteOptionProps<
   RC extends ReactElement | undefined = undefined,
 > {
-  route: RouteData;
+  routeData: RouteData;
+  chains: Chain[] | null;
   onClick: (route: RouteData) => void;
-  chain?: Chain;
-  usdBalance?: string;
   disabled?: boolean;
   isFastest?: boolean;
   size?: MenuItemSize;
@@ -28,30 +30,36 @@ export interface RouteOptionProps<
 }
 
 export function RouteOption<RC extends ReactElement | undefined = undefined>({
-  route,
+  routeData,
   onClick,
-  chain,
-  usdBalance,
+  chains,
   disabled = false,
   isFastest = false,
   size = 'small',
   rc = <span />,
   selected = false,
 }: RouteOptionProps<RC>) {
-  const { fromToken } = route.amountData;
-  const { estimate } = route.route.route;
+  const { fromToken } = routeData.amountData;
+  const { estimate } = routeData.route.route;
 
-  const formattedUsdBalance = useMemo(
-    () => (usdBalance ? Number(usdBalance).toFixed(2) : undefined),
-    [usdBalance],
-  );
+  const chain = chains?.find((c) => c.id === fromToken.chainId);
 
   const estimatedDurationFormatted = getDurationFormatted(
     estimate.estimatedRouteDuration,
   );
 
+  const { totalFeesUsd } = useMemo(
+    () => getTotalRouteFees(routeData.route),
+    [routeData],
+  );
+
+  const { routeBalanceUsd, fromAmount, fromAmountUsd } = useMemo(
+    () => getRouteAndTokenBalances(routeData),
+    [routeData],
+  );
+
   const handleClick = () => {
-    onClick(route);
+    onClick(routeData);
   };
 
   const menuItemProps = {
@@ -82,10 +90,13 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
         </Sticker>
       )}
 
-      <MenuItem.Caption>
-        Balance: $
-        {formattedUsdBalance}
-      </MenuItem.Caption>
+      <MenuItem.Caption>{`Balance: USD ${routeBalanceUsd}`}</MenuItem.Caption>
+
+      <MenuItem.PriceDisplay price={fromAmount}>
+        <MenuItem.PriceDisplay.Caption>
+          {`USD $${fromAmountUsd}`}
+        </MenuItem.PriceDisplay.Caption>
+      </MenuItem.PriceDisplay>
 
       <MenuItem.BottomSlot>
         <MenuItem.BottomSlot.Divider />
@@ -117,7 +128,16 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
             {estimatedDurationFormatted}
           </Body>
 
-          {isFastest && <Badge badgeContent="Fastest" variant="emphasis" />}
+          <Body size="xSmall" sx={{ ...hFlex, ...centerFlexChildren }}>
+            {isFastest && (
+              <Badge
+                badgeContent="Fastest"
+                variant="emphasis"
+                sx={{ mr: 'base.spacing.x2' }}
+              />
+            )}
+            {`Fee ~ USD $${getFormattedAmounts(totalFeesUsd)}`}
+          </Body>
         </Stack>
       </MenuItem.BottomSlot>
     </MenuItem>

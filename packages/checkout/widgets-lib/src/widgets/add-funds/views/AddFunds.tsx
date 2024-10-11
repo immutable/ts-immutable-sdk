@@ -544,7 +544,6 @@ export function AddFunds({
               <SelectedRouteOption
                 loading={loading}
                 chains={chains}
-                balances={balances}
                 routeData={selectedRouteData}
                 onClick={() => setShowOptionsDrawer(true)}
                 withSelectedToken={!!selectedToken}
