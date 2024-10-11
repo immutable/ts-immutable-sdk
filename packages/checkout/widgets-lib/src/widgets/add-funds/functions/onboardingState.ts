@@ -1,13 +1,12 @@
-import localForage from "localforage";
+import localForage from 'localforage';
 
 export const addFundsOnboardingCache = localForage.createInstance({
-  name: "AddFunds Onboarding State",
+  name: 'AddFunds Onboarding State',
   version: 1.0,
-  storeName: "Internal state",
+  storeName: 'Internal state',
   description:
-    "A small IndexDB for storage of state relating to the AddFunds Onboarding Drawer",
+    'A small IndexDB for storage of state relating to the AddFunds Onboarding Drawer',
 });
-
 
 export const SEEN_ONBOARDING_KEY = 'seen-onboarding';
 

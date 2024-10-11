@@ -1,6 +1,8 @@
 import { RouteData } from '../types';
 
-export const sortRoutesByFastestTime = (routes: RouteData[] | undefined): RouteData[] | undefined => {
+export const sortRoutesByFastestTime = (
+  routes: RouteData[] | undefined,
+): RouteData[] | undefined => {
   if (!routes) return undefined;
 
   return routes.slice().sort((a, b) => {

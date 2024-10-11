@@ -1,12 +1,13 @@
 import {
-  Icon,
-  MenuItem, MenuItemSize, Sticker,
+  Icon, MenuItem, MenuItemSize, Sticker,
 } from '@biom3/react';
 import { ReactElement, useMemo } from 'react';
 import { ethers } from 'ethers';
 import { Chain, RouteData } from '../types';
 
-export interface RouteOptionProps<RC extends ReactElement | undefined = undefined> {
+export interface RouteOptionProps<
+  RC extends ReactElement | undefined = undefined,
+> {
   route: RouteData;
   onClick: (route: RouteData) => void;
   chain?: Chain;
@@ -31,12 +32,20 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
 
   const { estimate } = route.route.route;
 
-  const formattedFromAmount = useMemo(() => Number(ethers.utils.formatUnits(
-    estimate.fromAmount,
-    estimate.fromToken.decimals,
-  )).toFixed(4), [estimate.fromAmount, estimate.fromToken.decimals]);
+  const formattedFromAmount = useMemo(
+    () => Number(
+      ethers.utils.formatUnits(
+        estimate.fromAmount,
+        estimate.fromToken.decimals,
+      ),
+    ).toFixed(4),
+    [estimate.fromAmount, estimate.fromToken.decimals],
+  );
 
-  const formattedUsdBalance = useMemo(() => (usdBalance ? Number(usdBalance).toFixed(2) : undefined), [usdBalance]);
+  const formattedUsdBalance = useMemo(
+    () => (usdBalance ? Number(usdBalance).toFixed(2) : undefined),
+    [usdBalance],
+  );
 
   const estimatedDurationFormatted = useMemo(() => {
     const seconds = estimate.estimatedRouteDuration;
@@ -74,42 +83,41 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
       <MenuItem.Label weight="bold">{fromToken.name}</MenuItem.Label>
 
       {formattedUsdBalance && (
-      <MenuItem.Caption>
-        {`Balance: $${formattedUsdBalance}`}
-      </MenuItem.Caption>
+        <MenuItem.Caption>
+          {`Balance: $${formattedUsdBalance}`}
+        </MenuItem.Caption>
       )}
 
       {chain && (
-      <Sticker position={{ x: 'right', y: 'bottom' }}>
-        <Sticker.FramedImage
-          use={<img src={chain.iconUrl} alt={chain.name} />}
-          sx={{ w: 'base.icon.size.200' }}
-        />
+        <Sticker position={{ x: 'right', y: 'bottom' }}>
+          <Sticker.FramedImage
+            use={<img src={chain.iconUrl} alt={chain.name} />}
+            sx={{ w: 'base.icon.size.200' }}
+          />
 
-        <MenuItem.FramedImage
-          use={<img src={fromToken.iconUrl} alt={fromToken.name} />}
-        />
-      </Sticker>
+          <MenuItem.FramedImage
+            use={<img src={fromToken.iconUrl} alt={fromToken.name} />}
+          />
+        </Sticker>
       )}
 
       {formattedFromAmount && estimate.fromAmountUSD && (
-      <MenuItem.PriceDisplay price={formattedFromAmount}>
-        <MenuItem.PriceDisplay.Caption>
-          {`USD $${estimate.fromAmountUSD}`}
-        </MenuItem.PriceDisplay.Caption>
-      </MenuItem.PriceDisplay>
+        <MenuItem.PriceDisplay price={formattedFromAmount}>
+          <MenuItem.PriceDisplay.Caption>
+            {`USD $${estimate.fromAmountUSD}`}
+          </MenuItem.PriceDisplay.Caption>
+        </MenuItem.PriceDisplay>
       )}
 
       {isFastest && (
-      <MenuItem.Badge badgeContent="Fastest" variant="emphasis" />
+        <MenuItem.Badge badgeContent="Fastest" variant="emphasis" />
       )}
 
       <MenuItem.Caption>
         <Icon icon="Countdown" sx={{ w: 'base.icon.size.250' }} />
         {' '}
-        { estimatedDurationFormatted }
+        {estimatedDurationFormatted}
       </MenuItem.Caption>
-
     </MenuItem>
   );
 }
