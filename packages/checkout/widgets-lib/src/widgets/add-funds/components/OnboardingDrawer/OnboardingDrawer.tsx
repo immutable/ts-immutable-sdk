@@ -7,6 +7,7 @@ import {
 	vFlex,
 } from "@biom3/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
 	getCacheItem,
 	SEEN_ONBOARDING_KEY,
@@ -15,7 +16,6 @@ import {
 import { OnboardingIllustration1 } from "./OnboardingIllustration1";
 import { OnboardingIllustration2 } from "./OnboardingIllustration2";
 import { OnboardingIllustration3 } from "./OnboardingIllustration3";
-import { useTranslation } from "react-i18next";
 
 const HERO_IMAGES = [
 	OnboardingIllustration1,
@@ -44,8 +44,7 @@ export function OnboardingDrawer() {
 			case 1: {
 				// @NOTE: once they have "seen" the final slide, mark it as such
 				// in the cache so that we don't show this to users again
-				// @TODO: restore this line before merge
-				// setCacheItem(SEEN_ONBOARDING_KEY, true);
+				setCacheItem(SEEN_ONBOARDING_KEY, true);
 				return setScreenIndex(2);
 			}
 			case 2:
@@ -54,7 +53,7 @@ export function OnboardingDrawer() {
 		}
 	}, [screenIndex]);
 
-	const ImageComponent = useMemo(() => HERO_IMAGES[screenIndex], [screenIndex]);
+	const ScreenHeroImage = useMemo(() => HERO_IMAGES[screenIndex], [screenIndex]);
 
 	return (
 		<Drawer size="threeQuarter" visible={visible} showHeaderBar={false}>
@@ -66,7 +65,7 @@ export function OnboardingDrawer() {
 					px: "base.spacing.x6",
 				}}
 			>
-				<ImageComponent />
+				<ScreenHeroImage />
 				<Divider
 					size="xSmall"
 					textAlign="center"
