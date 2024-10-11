@@ -150,7 +150,12 @@ export function AddFunds({
   };
 
   const handleOnAmountInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
+    const { value, amount, isValid } = validateToAmount(event.target.value);
+
+    if (!isValid && amount < 0) {
+      return;
+    }
+
     setInputValue(value);
     setSelectedAmount(value);
   };
@@ -209,15 +214,16 @@ export function AddFunds({
     resetRoutes();
     setInsufficientBalance(false);
     setSelectedRouteData(undefined);
+  }, [fromAddress]);
+
+  useEffect(() => {
+    resetRoutes();
+    setInsufficientBalance(false);
+    setSelectedRouteData(undefined);
 
     (async () => {
-      if (
-        balances
-        && squid
-        && tokens
-        && selectedToken?.address
-        && selectedAmount
-      ) {
+      const isValidAmount = validateToAmount(selectedAmount).isValid;
+      if (balances && squid && tokens && selectedToken?.address && isValidAmount) {
         setFetchingRoutes(true);
         const availableRoutes = await fetchRoutesWithRateLimit(
           squid,
@@ -508,11 +514,7 @@ export function AddFunds({
             <Body>Add Token</Body>
           ) : (
             <HeroFormControl
-              validationStatus={
-                validateToAmount(inputValue) || inputValue === ''
-                  ? 'success'
-                  : 'error'
-              }
+              validationStatus={inputValue === '0' ? 'error' : 'success'}
             >
               <HeroFormControl.Label>
                 Add
@@ -616,6 +618,7 @@ export function AddFunds({
             onPayWithCard={handleCardClick}
             onConnect={handleWalletConnected}
             insufficientBalance={insufficientBalance}
+            showOnRampOption={shouldShowOnRampOption}
           />
           <OptionsDrawer
             routes={routes}
