@@ -8,6 +8,7 @@ import {
   AddFundsWidgetParams,
 } from '@imtbl/checkout-sdk';
 import React, { Suspense } from 'react';
+import { CloudImage, Stack } from '@biom3/react';
 import { Base } from '../BaseWidgetRoot';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { HandoverProvider } from '../../context/handover-context/HandoverProvider';
@@ -20,7 +21,11 @@ import {
 } from '../../components/ConnectLoader/ConnectLoader';
 import { getL1ChainId, getL2ChainId } from '../../lib';
 import { sendAddFundsCloseEvent } from './AddFundsWidgetEvents';
-import { isValidAddress, isValidAmount } from '../../lib/validations/widgetValidators';
+import {
+  isValidAddress,
+  isValidAmount,
+} from '../../lib/validations/widgetValidators';
+import { getRemoteImage } from '../../lib/utils';
 
 const AddFundsWidget = React.lazy(() => import('./AddFundsWidget'));
 
@@ -79,14 +84,15 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
       ],
       isCheckNetworkEnabled: false,
     };
+    const config = this.strongConfig();
 
     this.reactRoot.render(
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
-          <ThemeProvider id="add-funds-container" config={this.strongConfig()}>
+          <ThemeProvider id="add-funds-container" config={config}>
             <HandoverProvider>
               <ConnectLoader
-                widgetConfig={this.strongConfig()}
+                widgetConfig={config}
                 params={connectLoaderParams}
                 closeEvent={() => sendAddFundsCloseEvent(window)}
               >
@@ -95,17 +101,37 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
                     <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
                   }
                 >
-                  <AddFundsWidget
-                    config={this.strongConfig()}
-                    checkout={this.checkout}
-                    web3Provider={this.web3Provider}
-                    showBridgeOption={this.parameters.showBridgeOption}
-                    showSwapOption={this.parameters.showSwapOption}
-                    showOnrampOption={this.parameters.showOnrampOption}
-                    toTokenAddress={this.parameters.toTokenAddress}
-                    toAmount={this.parameters.toAmount}
-                    showBackButton={this.parameters.showBackButton}
-                  />
+                  <Stack sx={{ pos: 'relative' }}>
+                    <CloudImage
+                      use={(
+                        <img
+                          src={getRemoteImage(
+                            config.environment,
+                            '/add-funds-bg-texture.webp',
+                          )}
+                          alt="blurry bg texture"
+                        />
+                      )}
+                      sx={{
+                        pos: 'absolute',
+                        h: '100%',
+                        w: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center',
+                      }}
+                    />
+                    <AddFundsWidget
+                      config={config}
+                      checkout={this.checkout}
+                      web3Provider={this.web3Provider}
+                      showBridgeOption={this.parameters.showBridgeOption}
+                      showSwapOption={this.parameters.showSwapOption}
+                      showOnrampOption={this.parameters.showOnrampOption}
+                      toTokenAddress={this.parameters.toTokenAddress}
+                      toAmount={this.parameters.toAmount}
+                      showBackButton={this.parameters.showBackButton}
+                    />
+                  </Stack>
                 </Suspense>
               </ConnectLoader>
             </HandoverProvider>

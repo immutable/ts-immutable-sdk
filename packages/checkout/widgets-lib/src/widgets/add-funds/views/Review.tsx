@@ -24,7 +24,11 @@ import { AddFundsReviewData } from '../../../context/view-context/AddFundsViewCo
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { Chain, RiveStateMachineInput } from '../types';
 import { useExecute } from '../hooks/useExecute';
-import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import {
+  SharedViews,
+  ViewActions,
+  ViewContext,
+} from '../../../context/view-context/ViewContext';
 import { SquidIcon } from '../components/SquidIcon';
 import { useHandover } from '../../../lib/hooks/useHandover';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
@@ -47,7 +51,8 @@ const EXECUTE_TXN_ANIMATION = '/swapping_coins.riv';
 export function Review({
   data,
   showBackButton = false,
-  onBackButtonClick, onCloseButtonClick,
+  onBackButtonClick,
+  onCloseButtonClick,
 }: ReviewProps) {
   const { viewDispatch } = useContext(ViewContext);
   const {
@@ -58,7 +63,9 @@ export function Review({
 
   const [route, setRoute] = useState<RouteResponse | undefined>();
   const [fromAddress, setFromAddress] = useState<string | undefined>();
-  const [getRouteIntervalId, setGetRouteIntervalId] = useState<NodeJS.Timer | undefined>();
+  const [getRouteIntervalId, setGetRouteIntervalId] = useState<
+  NodeJS.Timer | undefined
+  >();
   const [proceedDisabled, setProceedDisabled] = useState(true);
 
   const { getAmountData, getRoute } = useRoutes();
@@ -67,7 +74,11 @@ export function Review({
   });
 
   const {
-    convertToNetworkChangeableProvider, checkProviderChain, getAllowance, approve, execute,
+    convertToNetworkChangeableProvider,
+    checkProviderChain,
+    getAllowance,
+    approve,
+    execute,
   } = useExecute();
 
   const getFromAmountAndRoute = async () => {
@@ -83,7 +94,9 @@ export function Review({
       data.balance,
       data.toAmount,
       data.toChainId,
-      data.toTokenAddress === 'native' ? SQUID_NATIVE_TOKEN : data.toTokenAddress,
+      data.toTokenAddress === 'native'
+        ? SQUID_NATIVE_TOKEN
+        : data.toTokenAddress,
     );
 
     if (!amountData) return;
@@ -114,15 +127,19 @@ export function Review({
     };
   }, []);
 
-  const getChain = (chainId: string | undefined)
-  : Chain | undefined => chains?.find((chain) => chain.id === chainId);
+  const getChain = (chainId: string | undefined): Chain | undefined => chains?.find((chain) => chain.id === chainId);
 
-  const getFeeCosts = (): number => route?.route.estimate.feeCosts.reduce((acc, fee) => acc + Number(fee.amountUsd), 0)
-    ?? 0;
+  const getFeeCosts = (): number => route?.route.estimate.feeCosts.reduce(
+    (acc, fee) => acc + Number(fee.amountUsd),
+    0,
+  ) ?? 0;
 
   const getAmountInUSDText = (amount: string | undefined): string => (amount ? `USD $${amount}` : '');
 
-  const getAmountFormatted = (amount: string | undefined, decimals: number): string => {
+  const getAmountFormatted = (
+    amount: string | undefined,
+    decimals: number,
+  ): string => {
     if (!amount) {
       return '0';
     }
@@ -131,7 +148,10 @@ export function Review({
   };
 
   const getGasCostText = (): string => {
-    if (!route?.route.estimate.gasCosts || route?.route.estimate.gasCosts.length === 0) {
+    if (
+      !route?.route.estimate.gasCosts
+      || route?.route.estimate.gasCosts.length === 0
+    ) {
       return '';
     }
     const totalGasFee = route?.route.estimate.gasCosts.reduce(
@@ -139,7 +159,10 @@ export function Review({
       BigNumber.from(0),
     );
 
-    const formattedTotalGasFee = utils.formatUnits(totalGasFee, route?.route.estimate.gasCosts[0].token.decimals);
+    const formattedTotalGasFee = utils.formatUnits(
+      totalGasFee,
+      route?.route.estimate.gasCosts[0].token.decimals,
+    );
 
     return `Gas Refuel +${route.route.estimate.gasCosts[0].token.name} ${formattedTotalGasFee}`;
   };
@@ -155,7 +178,12 @@ export function Review({
       animationUrl: getRemoteRive(checkout?.config.environment, animationPath),
       inputValue: state,
       duration,
-      children: <HandoverContent headingText={headingText} subheadingText={subheadingText} />,
+      children: (
+        <HandoverContent
+          headingText={headingText}
+          subheadingText={subheadingText}
+        />
+      ),
     });
   };
 
@@ -168,10 +196,19 @@ export function Review({
       clearInterval(getRouteIntervalId);
       setProceedDisabled(true);
 
-      showHandover(APPROVE_TXN_ANIMATION, RiveStateMachineInput.START, 'Preparing');
+      showHandover(
+        APPROVE_TXN_ANIMATION,
+        RiveStateMachineInput.START,
+        'Preparing',
+      );
 
-      const changeableProvider = await convertToNetworkChangeableProvider(provider);
-      await checkProviderChain(changeableProvider, route.route.params.fromChain);
+      const changeableProvider = await convertToNetworkChangeableProvider(
+        provider,
+      );
+      await checkProviderChain(
+        changeableProvider,
+        route.route.params.fromChain,
+      );
 
       const allowance = await getAllowance(changeableProvider, route);
       const { fromAmount } = route.route.params;
@@ -204,31 +241,36 @@ export function Review({
 
       const txReceipt = await execute(squid, changeableProvider, route);
 
-      showHandover(EXECUTE_TXN_ANIMATION, RiveStateMachineInput.PROCESSING, 'Processing', '', FIXED_HANDOVER_DURATION);
+      showHandover(
+        EXECUTE_TXN_ANIMATION,
+        RiveStateMachineInput.PROCESSING,
+        'Processing',
+        '',
+        FIXED_HANDOVER_DURATION,
+      );
 
       showHandover(
         EXECUTE_TXN_ANIMATION,
         RiveStateMachineInput.COMPLETED,
-        'Funds added successfully', (
-          <>
-            Go to
-            {' '}
-            <Link
-              size="small"
-              rc={(
-                <a
-                  target="_blank"
-                  href={`https://axelarscan.io/gmp/${txReceipt.transactionHash}`}
-                  rel="noreferrer"
-                />
+        'Funds added successfully',
+        <>
+          Go to
+          {' '}
+          <Link
+            size="small"
+            rc={(
+              <a
+                target="_blank"
+                href={`https://axelarscan.io/gmp/${txReceipt.transactionHash}`}
+                rel="noreferrer"
+              />
             )}
-            >
-              Axelarscan
-            </Link>
-            {' '}
-            for transaction details
-          </>
-        ),
+          >
+            Axelarscan
+          </Link>
+          {' '}
+          for transaction details
+        </>,
       );
     } catch (e) {
       closeHandover();
@@ -249,6 +291,7 @@ export function Review({
 
   return (
     <SimpleLayout
+      containerSx={{ bg: 'transparent' }}
       header={(
         <HeaderNavigation
           onCloseButtonClick={onCloseButtonClick}
@@ -259,7 +302,10 @@ export function Review({
     >
       {!route && <Heading>Loading...</Heading>}
       {route && (
-        <Stack sx={{ w: '100%', flex: 1, p: 'base.spacing.x4' }} alignItems="stretch">
+        <Stack
+          sx={{ w: '100%', flex: 1, p: 'base.spacing.x4' }}
+          alignItems="stretch"
+        >
           <Stack sx={{ minh: '60px' }} rc={<header />} justifyContent="center">
             <Heading weight="bold" sx={{ textAlign: 'center' }}>
               Review
@@ -272,13 +318,17 @@ export function Review({
               <FramedImage
                 circularFrame
                 sx={{ w: 'base.icon.size.400' }}
-                use={<img src={route?.route.estimate.fromToken.logoURI} alt={route?.route.estimate.fromToken.name} />}
+                use={(
+                  <img
+                    src={route?.route.estimate.fromToken.logoURI}
+                    alt={route?.route.estimate.fromToken.name}
+                  />
+                )}
               />
             </Stack>
             <Stack sx={{ flex: 1 }} gap="base.spacing.x1">
               <Body>
                 Pay with
-                {' '}
                 {route?.route.estimate.fromToken.name}
               </Body>
               <Stack
@@ -292,8 +342,13 @@ export function Review({
                   sx={{ w: 'base.icon.size.200' }}
                   use={(
                     <img
-                      src={getChain(route?.route.estimate.fromToken.chainId)?.iconUrl}
-                      alt={getChain(route?.route.estimate.fromToken.chainId)?.name}
+                      src={
+                        getChain(route?.route.estimate.fromToken.chainId)
+                          ?.iconUrl
+                      }
+                      alt={
+                        getChain(route?.route.estimate.fromToken.chainId)?.name
+                      }
                     />
                   )}
                 />
@@ -329,8 +384,14 @@ export function Review({
                   sx={{ w: 'base.icon.size.200' }}
                   use={(
                     <img
-                      src={getChain(route?.route.estimate.fromToken.chainId)?.nativeCurrency.iconUrl}
-                      alt={getChain(route?.route.estimate.fromToken.chainId)?.nativeCurrency.name}
+                      src={
+                        getChain(route?.route.estimate.fromToken.chainId)
+                          ?.nativeCurrency.iconUrl
+                      }
+                      alt={
+                        getChain(route?.route.estimate.fromToken.chainId)
+                          ?.nativeCurrency.name
+                      }
                     />
                   )}
                 />
@@ -342,7 +403,10 @@ export function Review({
             </Stack>
             <Stack>
               <PriceDisplay
-                price={getAmountFormatted(route?.route.estimate.fromAmount, route?.route.estimate.fromToken.decimals)}
+                price={getAmountFormatted(
+                  route?.route.estimate.fromAmount,
+                  route?.route.estimate.fromToken.decimals,
+                )}
                 weight="bold"
               >
                 <PriceDisplay.Caption sx={{ mt: 'base.spacing.x1' }}>
@@ -364,13 +428,17 @@ export function Review({
               <FramedImage
                 circularFrame
                 sx={{ w: 'base.icon.size.400' }}
-                use={<img src={route?.route.estimate.toToken.logoURI} alt={route?.route.estimate.toToken.name} />}
+                use={(
+                  <img
+                    src={route?.route.estimate.toToken.logoURI}
+                    alt={route?.route.estimate.toToken.name}
+                  />
+                )}
               />
             </Stack>
             <Stack sx={{ flex: 1 }} gap="base.spacing.x1">
               <Body>
                 Deliver
-                {' '}
                 {route?.route.estimate.toToken.name}
               </Body>
               <Stack
@@ -383,8 +451,12 @@ export function Review({
                   sx={{ w: 'base.icon.size.200' }}
                   use={(
                     <img
-                      src={getChain(route?.route.estimate.toToken.chainId)?.iconUrl}
-                      alt={getChain(route?.route.estimate.toToken.chainId)?.name}
+                      src={
+                        getChain(route?.route.estimate.toToken.chainId)?.iconUrl
+                      }
+                      alt={
+                        getChain(route?.route.estimate.toToken.chainId)?.name
+                      }
                     />
                   )}
                 />
@@ -422,7 +494,10 @@ export function Review({
             </Stack>
             <Stack>
               <PriceDisplay
-                price={getAmountFormatted(route?.route.estimate.toAmount, route?.route.estimate.toToken.decimals)}
+                price={getAmountFormatted(
+                  route?.route.estimate.toAmount,
+                  route?.route.estimate.toToken.decimals,
+                )}
                 weight="bold"
               >
                 <PriceDisplay.Caption sx={{ mt: 'base.spacing.x1' }}>
@@ -452,9 +527,12 @@ export function Review({
             Powered by Squid
           </Body>
 
-          <Button size="large" onClick={onProceedClick} disabled={proceedDisabled}>
-            {proceedDisabled ? 'Processing'
-              : 'Proceed'}
+          <Button
+            size="large"
+            onClick={onProceedClick}
+            disabled={proceedDisabled}
+          >
+            {proceedDisabled ? 'Processing' : 'Proceed'}
           </Button>
         </Stack>
       )}

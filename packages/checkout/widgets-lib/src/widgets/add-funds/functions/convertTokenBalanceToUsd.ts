@@ -12,7 +12,10 @@ export function convertTokenBalanceToUsd(
     throw new Error('USD conversion rate not available');
   }
 
-  const tokenBalance = ethers.utils.formatUnits(balance.balance, balance.decimals);
+  const tokenBalance = ethers.utils.formatUnits(
+    balance.balance,
+    balance.decimals,
+  );
 
   const usdBalance = parseFloat(tokenBalance) * usdPrice;
 
