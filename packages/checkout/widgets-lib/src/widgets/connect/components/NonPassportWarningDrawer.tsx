@@ -26,6 +26,7 @@ export function NonPassportWarningDrawer({
       <Drawer.Content>
         <ButtCon
           icon="Close"
+          size="small"
           variant="tertiary"
           sx={{
             pos: 'absolute',
