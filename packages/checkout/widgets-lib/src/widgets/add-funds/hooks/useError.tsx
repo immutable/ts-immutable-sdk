@@ -14,7 +14,9 @@ import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewC
 interface ErrorConfig {
   headingText: string;
   subHeadingText?: string;
+  primaryButtonText?: string;
   onPrimaryButtonClick?: () => void;
+  secondaryButtonText?: string;
   onSecondaryButtonClick?: () => void;
 }
 
@@ -51,48 +53,64 @@ export const useError = (environment: Environment) => {
   };
 
   const errorConfig: Record<AddFundsErrorTypes, ErrorConfig> = {
-    [AddFundsErrorTypes.SQUID_ROUTE_EXECUTION_FAILED]: {
-      headingText: 'Failed executing the route',
-      subHeadingText: 'The transaction failed. Please try again.',
-      onPrimaryButtonClick: () => {},
-      onSecondaryButtonClick: goBackToAddFundsView,
-    },
     [AddFundsErrorTypes.WALLET_REJECTED]: {
       headingText: 'Transaction rejected',
       subHeadingText: 'The transaction was rejected. Please try again.',
-      onSecondaryButtonClick: goBackToAddFundsView,
-
-    },
-    [AddFundsErrorTypes.SERVICE_BREAKDOWN]: {
-      headingText: 'Transaction timeout',
-      subHeadingText: 'The transaction timed out. Please try again.',
+      primaryButtonText: 'Retry',
+      onPrimaryButtonClick: goBackToAddFundsView,
+      secondaryButtonText: 'Close',
       onSecondaryButtonClick: closeWidget,
 
     },
+    [AddFundsErrorTypes.SERVICE_BREAKDOWN]: {
+      headingText: 'Our system is currently down',
+      subHeadingText: 'We are currently experiencing technical difficulties. Please try again later.',
+      secondaryButtonText: 'Close',
+      onSecondaryButtonClick: closeWidget,
+    },
+    [AddFundsErrorTypes.TRANSACTION_FAILED]: {
+      headingText: 'Transaction failed',
+      subHeadingText: 'The transaction failed. Please try again.',
+      primaryButtonText: 'Retry',
+      onPrimaryButtonClick: goBackToAddFundsView,
+      secondaryButtonText: 'Close',
+      onSecondaryButtonClick: closeWidget,
+    },
     [AddFundsErrorTypes.WALLET_POPUP_BLOCKED]: {
-      headingText: 'Unknown error',
-      subHeadingText: 'An unknown error occurred. Please try again.',
+      headingText: "Browser's popup blocked",
+      subHeadingText: 'Please enable popups in your browser to proceed.',
+      primaryButtonText: 'Retry',
+      onPrimaryButtonClick: goBackToAddFundsView,
+      secondaryButtonText: 'Close',
       onSecondaryButtonClick: goBackToAddFundsView,
     },
     [AddFundsErrorTypes.WALLET_REJECTED_NO_FUNDS]: {
       headingText: 'Insufficient funds',
-      subHeadingText: 'You have insufficient funds. Please try again.',
-      onSecondaryButtonClick: goBackToAddFundsView,
+      subHeadingText: 'You do not have enough funds to complete the transaction.',
+      primaryButtonText: 'Retry',
+      onPrimaryButtonClick: goBackToAddFundsView,
+      secondaryButtonText: 'Close',
+      onSecondaryButtonClick: closeWidget,
     },
     [AddFundsErrorTypes.WALLET_FAILED]: {
       headingText: 'Transaction failed',
       subHeadingText: 'The transaction failed. Please try again.',
+      primaryButtonText: 'Retry',
+      onPrimaryButtonClick: goBackToAddFundsView,
+      secondaryButtonText: 'Close',
       onSecondaryButtonClick: goBackToAddFundsView,
     },
     [AddFundsErrorTypes.DEFAULT]: {
       headingText: 'Unknown error',
-      subHeadingText: 'An unknown error occurred. Please try again.',
-      onSecondaryButtonClick: goBackToAddFundsView,
+      subHeadingText: 'An unknown error occurred. Please try again later.',
+      secondaryButtonText: 'Close',
+      onSecondaryButtonClick: closeWidget,
     },
     [AddFundsErrorTypes.INVALID_PARAMETERS]: {
       headingText: 'Invalid parameters',
-      subHeadingText: 'The parameters provided are invalid. Please try again.',
-      onSecondaryButtonClick: goBackToAddFundsView,
+      subHeadingText: 'The parameters provided are invalid. Please check again.',
+      secondaryButtonText: 'Close',
+      onSecondaryButtonClick: closeWidget,
     },
   };
 
@@ -100,6 +118,8 @@ export const useError = (environment: Environment) => {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const showErrorHandover = (errorType: AddFundsErrorTypes, data?: Record<string, unknown>) => {
+    // TODO: Track errors in analytics
+
     addHandover({
       animationUrl: getRemoteRive(
         environment,
@@ -109,7 +129,9 @@ export const useError = (environment: Environment) => {
       children: <HandoverContent
         headingText={getErrorConfig(errorType).headingText}
         subheadingText={getErrorConfig(errorType).subHeadingText}
+        primaryButtonText={getErrorConfig(errorType).primaryButtonText}
         onPrimaryButtonClick={getErrorConfig(errorType).onPrimaryButtonClick}
+        secondaryButtonText={getErrorConfig(errorType).secondaryButtonText}
         onSecondaryButtonClick={getErrorConfig(errorType).onSecondaryButtonClick}
       />,
     });
