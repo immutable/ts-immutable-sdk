@@ -76,27 +76,50 @@ export function OnboardingDrawer() {
 		switch (screenIndex) {
 			case 0:
 				return setScreenIndex(1);
-			case 1:
-				return setScreenIndex(2);
-			case 2: {
+			case 1: {
+				// @NOTE: once they have "seen" the final slide, mark it as such
+				// in the cache so that we don't show this to users again
 				setCacheItem(SEEN_ONBOARDING_KEY, true);
+				return setScreenIndex(2);
+			};
+			case 2: 
+				// @NOTE: they have "seen" all slides - so this drawer can be closed
 				return setVisible(false);
-			}
 		}
 	}, [screenIndex]);
 
 	return (
 		<Drawer size="threeQuarter" visible={visible} showHeaderBar={false}>
-			<Drawer.Content sx={{ ...vFlex, alignItems: 'center', textAlign: "center" }}>
+			<Drawer.Content
+				sx={{
+					...vFlex,
+					alignItems: "center",
+					textAlign: "center",
+					px: "base.spacing.x6",
+				}}
+			>
 				<currentScreenContent.image />
-				<Divider size="xSmall" textAlign="center">{currentScreenContent.caption}</Divider>
-				<Heading>{currentScreenContent.title}</Heading>
+				<Divider
+					size="xSmall"
+					textAlign="center"
+					sx={{ mt: "base.spacing.x6", mb: "base.spacing.x4" }}
+				>
+					{currentScreenContent.caption}
+				</Divider>
+				<Heading size="small">{currentScreenContent.title}</Heading>
 				<OnboardingPagination
 					disabled
+					size="small"
 					currentPage={screenIndex + 1}
 					totalPages={3}
+					sx={{ mt: "base.spacing.x11", mb: "base.spacing.x8" }}
 				/>
-				<Button onClick={handleCtaOnClick}>
+				<Button
+					variant={screenIndex === 2 ? "primary" : "tertiary"}
+					onClick={handleCtaOnClick}
+					size="large"
+					sx={{ alignSelf: "stretch" }}
+				>
 					{currentScreenContent.buttonText}
 				</Button>
 			</Drawer.Content>
