@@ -45,7 +45,7 @@ import { useRoutes } from '../hooks/useRoutes';
 import { SQUID_NATIVE_TOKEN } from '../utils/config';
 import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
 import type { RouteData } from '../types';
-import { OnboardingDrawer } from '../components/OnboardingDrawer';
+import { OnboardingDrawer } from '../components/OnboardingDrawer/OnboardingDrawer';
 import { validateToAmount } from '../functions/amountValidation';
 
 interface AddFundsProps {

@@ -1,19 +1,20 @@
 import {
 	Button,
-	Caption,
+	Divider,
 	Drawer,
-	DUMMY_RASTER_IMAGE_2_URL,
-	DUMMY_RASTER_IMAGE_3_URL,
-	DUMMY_RASTER_IMAGE_URL,
 	Heading,
 	OnboardingPagination,
+	vFlex,
 } from "@biom3/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
 	getCacheItem,
 	SEEN_ONBOARDING_KEY,
 	setCacheItem,
-} from "../functions/onboardingState";
+} from "../../functions/onboardingState";
+import { OnboardingIllustration1 } from "./OnboardingIllustration1";
+import { OnboardingIllustration2 } from "./OnboardingIllustration2";
+import { OnboardingIllustration3 } from "./OnboardingIllustration3";
 
 const MAPPED_SCREEN_CONTENT = [
 	{
@@ -26,7 +27,7 @@ const MAPPED_SCREEN_CONTENT = [
 		),
 		caption: "listen up",
 		buttonText: "Next",
-		imageUrl: DUMMY_RASTER_IMAGE_2_URL,
+		image: OnboardingIllustration1,
 	},
 	{
 		title: (
@@ -38,7 +39,7 @@ const MAPPED_SCREEN_CONTENT = [
 		),
 		caption: "whats evolved",
 		buttonText: "Next",
-		imageUrl: DUMMY_RASTER_IMAGE_3_URL,
+		image: OnboardingIllustration2,
 	},
 	{
 		title: (
@@ -50,7 +51,7 @@ const MAPPED_SCREEN_CONTENT = [
 		),
 		caption: "listen up",
 		buttonText: "Choose the Wallet to Pay with",
-		imageUrl: DUMMY_RASTER_IMAGE_URL,
+		image: OnboardingIllustration3,
 	},
 ];
 
@@ -86,8 +87,9 @@ export function OnboardingDrawer() {
 
 	return (
 		<Drawer size="threeQuarter" visible={visible} showHeaderBar={false}>
-			<Drawer.Content>
-				<Caption>{currentScreenContent.caption}</Caption>
+			<Drawer.Content sx={{ ...vFlex, alignItems: 'center', textAlign: "center" }}>
+				<currentScreenContent.image />
+				<Divider size="xSmall" textAlign="center">{currentScreenContent.caption}</Divider>
 				<Heading>{currentScreenContent.title}</Heading>
 				<OnboardingPagination
 					disabled
