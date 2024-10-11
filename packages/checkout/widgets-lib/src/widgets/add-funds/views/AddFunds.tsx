@@ -214,6 +214,12 @@ export function AddFunds({
     resetRoutes();
     setInsufficientBalance(false);
     setSelectedRouteData(undefined);
+  }, [fromAddress]);
+
+  useEffect(() => {
+    resetRoutes();
+    setInsufficientBalance(false);
+    setSelectedRouteData(undefined);
 
     (async () => {
       const isValidAmount = validateToAmount(selectedAmount).isValid;
