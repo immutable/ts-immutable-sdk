@@ -316,6 +316,7 @@ export function AddFunds({
 
   return (
     <SimpleLayout
+      containerSx={{ bg: 'transparent' }}
       header={(
         <Stack
           direction="row"

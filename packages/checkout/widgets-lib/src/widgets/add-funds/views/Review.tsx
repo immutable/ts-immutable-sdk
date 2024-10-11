@@ -249,6 +249,7 @@ export function Review({
 
   return (
     <SimpleLayout
+      containerSx={{ bg: 'transparent' }}
       header={(
         <HeaderNavigation
           onCloseButtonClick={onCloseButtonClick}
