@@ -17,7 +17,6 @@ export const networkButtonStyle = {
 };
 
 export const logoStyle = (isActive: boolean) => ({
-  width: '22px',
   filter: isActive ? undefined : 'grayscale(1)',
 });
 
