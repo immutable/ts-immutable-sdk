@@ -46,6 +46,7 @@ import { SQUID_NATIVE_TOKEN } from '../utils/config';
 import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
 import type { RouteData } from '../types';
 import { OnboardingDrawer } from '../components/OnboardingDrawer';
+import { validateToAmount } from '../functions/amountValidation';
 
 interface AddFundsProps {
   checkout?: Checkout;
@@ -90,9 +91,6 @@ export function AddFunds({
   );
   const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
   const [inputValue, setInputValue] = useState<string>(toAmount || '');
-  // @TODO: the debouncedToAmount is likely what we need to use for USD
-  // pricing and route calculations, etc
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [debouncedToAmount, setDebouncedToAmount] = useState<string>(inputValue);
   const [currentToTokenAddress, setCurrentToTokenAddress] = useState<
   TokenInfo | undefined
@@ -100,7 +98,7 @@ export function AddFunds({
 
   const debouncedUpdateAmount = debounce((value: string) => {
     setDebouncedToAmount(value);
-  }, 1500);
+  }, 2500);
 
   const updateAmount = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
@@ -132,6 +130,7 @@ export function AddFunds({
       && tokens
       && currentToTokenAddress?.address
       && debouncedToAmount
+      && validateToAmount(debouncedToAmount)
     ) {
       fetchRoutesWithRateLimit(
         squid,
@@ -276,10 +275,12 @@ export function AddFunds({
   }, [currentToTokenAddress, onRampAllowedTokens, showOnrampOption]);
 
   const showInitialEmptyState = !currentToTokenAddress;
+
   const defaultTokenImage = getDefaultTokenImage(
     checkout?.config.environment,
     config.theme,
   );
+
   const tokenChoiceOptions = useMemo(
     () => allowedTokens.map((token) => (
       <MenuItem
@@ -308,6 +309,7 @@ export function AddFunds({
     )),
     [allowedTokens, handleTokenChange, isSelected, defaultTokenImage],
   );
+
   const shouldShowBackButton = showBackButton ?? !!onBackButtonClick;
 
   return (
@@ -387,7 +389,7 @@ export function AddFunds({
           {showInitialEmptyState ? (
             <Body>Add Token</Body>
           ) : (
-            <HeroFormControl>
+            <HeroFormControl validationStatus={validateToAmount(inputValue) || inputValue === '' ? 'success' : 'error'}>
               <HeroFormControl.Label>
                 Add
                 {' '}
