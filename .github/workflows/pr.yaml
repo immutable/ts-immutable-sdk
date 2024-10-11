@@ -95,21 +95,8 @@ jobs:
       - name: Setup playwright
         uses: ./.github/actions/setup-playwright
 
-      - name: Get current SDK version string
-        uses: actions/github-script@v7.0.1
-        with: 
-          script: |
-            const { data: latestRelease } = await github.rest.repos.getLatestRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo
-            });
-            console.log("Current SDK version: ", latestRelease.tag_name);
-            return latestRelease.tag_name;
-          result-encoding: string
-        id: version
-
       - name: Install SDK at current version
-        run: yarn workspace @examples/sdk-load-widgets-with-nextjs add @imtbl/sdk@${{ steps.version.outputs.result }}
+        run: yarn workspace @examples/sdk-load-widgets-with-nextjs add @imtbl/sdk@$(npm view @imtbl/sdk version)
 
       - name: Build next app
         run: yarn workspace @examples/sdk-load-widgets-with-nextjs build
