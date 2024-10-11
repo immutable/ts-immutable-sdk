@@ -2,16 +2,49 @@ import { Web3Provider } from '@ethersproject/providers';
 import { RouteResponse } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
 import { ethers } from 'ethers';
-import { useContext } from 'react';
 import { Environment } from '@imtbl/config';
 import { isSquidNativeToken } from '../functions/isSquidNativeToken';
 import { useError } from './useError';
-import { AddFundsContext } from '../context/AddFundsContext';
-import { AddFundsErrorTypes } from '../types';
+import { AddFundsError, AddFundsErrorTypes } from '../types';
 
-export const useExecute = () => {
-  const { addFundsState: { checkout } } = useContext(AddFundsContext);
-  const { showErrorHandover } = useError(checkout?.config.environment || Environment.SANDBOX);
+export const useExecute = (environment: Environment) => {
+  const { showErrorHandover } = useError(environment);
+
+  const handleTransactionError = (err: unknown) => {
+    const reason = `${
+      (err as any)?.reason || (err as any)?.message || ''
+    }`.toLowerCase();
+
+    let errorType = AddFundsErrorTypes.WALLET_FAILED;
+
+    if (reason.includes('failed') && reason.includes('open confirmation')) {
+      errorType = AddFundsErrorTypes.WALLET_POPUP_BLOCKED;
+    }
+
+    if (reason.includes('rejected') && reason.includes('user')) {
+      errorType = AddFundsErrorTypes.WALLET_REJECTED;
+    }
+
+    if (
+      reason.includes('failed to submit')
+          && reason.includes('highest gas limit')
+    ) {
+      errorType = AddFundsErrorTypes.WALLET_REJECTED_NO_FUNDS;
+    }
+
+    if (
+      reason.includes('status failed')
+          || reason.includes('transaction failed')
+    ) {
+      errorType = AddFundsErrorTypes.TRANSACTION_FAILED;
+    }
+    const error: AddFundsError = {
+      type: errorType,
+      data: { error: err },
+    };
+
+    showErrorHandover(errorType, { error });
+  };
 
   const convertToNetworkChangeableProvider = async (
     provider: Web3Provider,
@@ -106,10 +139,9 @@ export const useExecute = () => {
         const tx = await tokenContract.approve(transactionRequestTarget, fromAmount);
         return tx.wait();
       }
-
       return undefined;
     } catch (error) {
-      showErrorHandover(AddFundsErrorTypes.DEFAULT, { error });
+      handleTransactionError(error);
       return undefined;
     }
   };
@@ -130,7 +162,7 @@ export const useExecute = () => {
       })) as unknown as ethers.providers.TransactionResponse;
       return tx.wait();
     } catch (error) {
-      showErrorHandover(AddFundsErrorTypes.SQUID_ROUTE_EXECUTION_FAILED, { error });
+      handleTransactionError(error);
       return undefined;
     }
   };
