@@ -1,31 +1,28 @@
 import { Web3Provider } from '@ethersproject/providers';
+import { AddFundsWidgetParams, Checkout } from '@imtbl/checkout-sdk';
 import {
   useContext, useEffect, useMemo, useReducer,
 } from 'react';
-import { useTranslation } from 'react-i18next';
-import { AddFundsWidgetParams, Checkout } from '@imtbl/checkout-sdk';
 
-import { sendAddFundsCloseEvent } from './AddFundsWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
-import {
-  AddFundsActions, AddFundsContext, addFundsReducer, initialAddFundsState,
-} from './context/AddFundsContext';
 import { AddFundsWidgetViews } from '../../context/view-context/AddFundsViewContextTypes';
 import {
   initialViewState,
-  SharedViews, ViewActions,
+  ViewActions,
   ViewContext,
   viewReducer,
 } from '../../context/view-context/ViewContext';
-import { AddFunds } from './views/AddFunds';
-import { ErrorView } from '../../views/error/ErrorView';
-import { useSquid } from './hooks/useSquid';
-import { useAnalytics, UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
-import { fetchChains } from './functions/fetchChains';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { Review } from './views/Review';
+import { sendAddFundsCloseEvent } from './AddFundsWidgetEvents';
+import {
+  AddFundsActions, AddFundsContext, addFundsReducer, initialAddFundsState,
+} from './context/AddFundsContext';
 import { fetchBalances } from './functions/fetchBalances';
+import { fetchChains } from './functions/fetchChains';
+import { useSquid } from './hooks/useSquid';
 import { useTokens } from './hooks/useTokens';
+import { AddFunds } from './views/AddFunds';
+import { Review } from './views/Review';
 
 export type AddFundsWidgetInputs = AddFundsWidgetParams & {
   checkout: Checkout;
@@ -49,8 +46,6 @@ export default function AddFundsWidget({
     view: { type: AddFundsWidgetViews.ADD_FUNDS },
     history: [{ type: AddFundsWidgetViews.ADD_FUNDS }],
   });
-  const { t } = useTranslation();
-  const { page } = useAnalytics();
 
   const viewReducerValues = useMemo(
     () => ({
@@ -152,15 +147,6 @@ export default function AddFundsWidget({
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
 
-  const errorAction = () => {
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: { type: AddFundsWidgetViews.ADD_FUNDS },
-      },
-    });
-  };
-
   return (
     <ViewContext.Provider value={viewReducerValues}>
       <AddFundsContext.Provider value={addFundsReducerValues}>
@@ -189,19 +175,6 @@ export default function AddFundsWidget({
               });
             }}
             showBackButton
-          />
-        )}
-        {viewState.view.type === SharedViews.ERROR_VIEW && (
-          <ErrorView
-            actionText={t('views.ERROR_VIEW.actionText')}
-            onActionClick={errorAction}
-            onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
-            errorEventAction={() => {
-              page({
-                userJourney: UserJourney.ADD_FUNDS,
-                screen: 'Error',
-              });
-            }}
           />
         )}
       </AddFundsContext.Provider>
