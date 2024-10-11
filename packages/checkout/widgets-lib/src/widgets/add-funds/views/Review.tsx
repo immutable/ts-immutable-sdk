@@ -31,6 +31,7 @@ import { HandoverTarget } from '../../../context/handover-context/HandoverContex
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
 import { getRemoteRive } from '../../../lib/utils';
 import { SQUID_NATIVE_TOKEN } from '../utils/config';
+import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 interface ReviewProps {
   data: AddFundsReviewData;
@@ -50,6 +51,7 @@ export function Review({
   onBackButtonClick, onCloseButtonClick,
 }: ReviewProps) {
   const { viewDispatch } = useContext(ViewContext);
+  const { track, page } = useAnalytics();
   const {
     addFundsState: {
       squid, provider, chains, checkout, tokens,
@@ -100,6 +102,18 @@ export function Review({
     setRoute(routeResponse);
     setProceedDisabled(false);
   };
+
+  useEffect(() => {
+    page({
+      userJourney: UserJourney.SWAP,
+      screen: 'Review',
+      extras: {
+        toAmount: data.toAmount,
+        toChainId: data.toChainId,
+        toTokenAddress: data.toTokenAddress,
+      },
+    });
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -203,6 +217,14 @@ export function Review({
       );
 
       const txReceipt = await execute(squid, changeableProvider, route);
+      track({
+        userJourney: UserJourney.ADD_FUNDS,
+        screen: 'FundsAdded',
+        action: 'Succeeded',
+        extras: {
+          txHash: txReceipt.transactionHash,
+        },
+      });
 
       showHandover(EXECUTE_TXN_ANIMATION, RiveStateMachineInput.PROCESSING, 'Processing', '', FIXED_HANDOVER_DURATION);
 

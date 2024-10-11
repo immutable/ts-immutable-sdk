@@ -1,15 +1,12 @@
 import {
+  Body,
   ButtCon,
-  // Button,
-  // FramedIcon,
   FramedImage,
   HeroFormControl,
   HeroTextInput,
+  MenuItem,
   OverflowDrawerMenu,
   Stack,
-  Body,
-  // Box,
-  MenuItem,
 } from '@biom3/react';
 import debounce from 'lodash.debounce';
 import {
@@ -45,6 +42,10 @@ import { useRoutes } from '../hooks/useRoutes';
 import { SQUID_NATIVE_TOKEN } from '../utils/config';
 import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
 import type { RouteData } from '../types';
+import {
+  useAnalytics,
+  UserJourney,
+} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { validateToAmount } from '../functions/amountValidation';
 
 interface AddFundsProps {
@@ -79,6 +80,7 @@ export function AddFunds({
   } = useContext(AddFundsContext);
 
   const { viewDispatch } = useContext(ViewContext);
+  const { track, page } = useAnalytics();
 
   const {
     eventTargetState: { eventTarget },
@@ -96,6 +98,15 @@ export function AddFunds({
   >();
 
   const debouncedUpdateAmount = debounce((value: string) => {
+    track({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'InputScreen',
+      control: 'AmountInput',
+      controlType: 'TextInput',
+      extras: {
+        toAmount: value,
+      },
+    });
     setDebouncedToAmount(value);
   }, 2500);
 
@@ -119,6 +130,17 @@ export function AddFunds({
     },
     [viewDispatch],
   );
+
+  useEffect(() => {
+    page({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'InputScreen',
+      extras: {
+        toAmount,
+        toTokenAddress,
+      },
+    });
+  }, []);
 
   useEffect(() => {
     resetRoutes();
@@ -168,6 +190,15 @@ export function AddFunds({
             );
 
             if (token) {
+              track({
+                userJourney: UserJourney.ADD_FUNDS,
+                screen: 'InputScreen',
+                control: 'TokensMenu',
+                controlType: 'MenuItem',
+                extras: {
+                  tokenAddress: token.address,
+                },
+              });
               setCurrentToTokenAddress(token);
             }
           }
@@ -220,6 +251,15 @@ export function AddFunds({
   );
 
   const handleTokenChange = useCallback((token: TokenInfo) => {
+    track({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'InputScreen',
+      control: 'TokensMenu',
+      controlType: 'MenuItem',
+      extras: {
+        tokenAddress: token.address,
+      },
+    });
     setCurrentToTokenAddress(token);
   }, []);
 
@@ -245,6 +285,21 @@ export function AddFunds({
     if (!debouncedToAmount || !currentToTokenAddress?.address) {
       return;
     }
+
+    track({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'InputScreen',
+      control: 'RoutesMenu',
+      controlType: 'MenuItem',
+      extras: {
+        toTokenAddress: routeData.amountData.toToken.address,
+        toTokenChainId: routeData.amountData.toToken.chainId,
+        fromTokenAddress: routeData.amountData.fromToken.address,
+        fromTokenChainId: routeData.amountData.fromToken.chainId,
+        toAmount: routeData.amountData.toAmount,
+        fromAmount: routeData.amountData.fromAmount,
+      },
+    });
 
     viewDispatch({
       payload: {
