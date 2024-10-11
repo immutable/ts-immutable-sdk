@@ -179,9 +179,9 @@ export function Review({
         'Approve the transaction request to complete this transaction',
       );
 
-      const approveTxnHash = await approve(changeableProvider, route);
+      const approveTxnReceipt = await approve(changeableProvider, route);
 
-      if (!approveTxnHash) {
+      if (!approveTxnReceipt) {
         return;
       }
     }
@@ -193,9 +193,9 @@ export function Review({
       'Approve the transaction request to complete this transaction',
     );
 
-    const txReceipt = await execute(squid, changeableProvider, route);
+    const executeTxnReceipt = await execute(squid, changeableProvider, route);
 
-    if (txReceipt) {
+    if (executeTxnReceipt) {
       showHandover(
         EXECUTE_TXN_ANIMATION,
         RiveStateMachineInput.PROCESSING,
@@ -216,7 +216,7 @@ export function Review({
               rc={(
                 <a
                   target="_blank"
-                  href={`https://axelarscan.io/gmp/${txReceipt?.transactionHash}`}
+                  href={`https://axelarscan.io/gmp/${executeTxnReceipt?.transactionHash}`}
                   rel="noreferrer"
                 />
             )}
