@@ -602,7 +602,7 @@ export class Orderbook {
 
     if (fulfillmentDataRes.result.unfulfillable_orders?.length > 0) {
       throw new Error(
-        `Unable to prepare fulfillment date: ${fulfillmentDataRes.result.unfulfillable_orders[0].reason}`,
+        `Unable to prepare fulfillment data: ${fulfillmentDataRes.result.unfulfillable_orders[0].reason}`,
       );
     } else if (fulfillmentDataRes.result.fulfillable_orders?.length !== 1) {
       throw new Error('unexpected fulfillable order result length');
