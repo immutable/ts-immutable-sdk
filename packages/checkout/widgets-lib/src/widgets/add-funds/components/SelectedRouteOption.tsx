@@ -1,7 +1,6 @@
 import {
   AllDualVariantIconKeys, MenuItem, Stack, Sticker,
 } from '@biom3/react';
-import { BigNumber, utils } from 'ethers';
 import {
   MouseEvent,
   MouseEventHandler,
@@ -9,17 +8,14 @@ import {
   useCallback,
   useMemo,
 } from 'react';
-import { TokenBalance } from '@0xsquid/sdk/dist/types';
 
 import { Chain, RouteData } from '../types';
-import { getUsdBalance } from '../functions/convertTokenBalanceToUsd';
-import { tokenValueFormat } from '../../../lib/utils';
+import { getRouteAndTokenBalances } from '../functions/getRouteAndTokenBalances';
 
 export interface RouteOptionProps {
   routeData?: RouteData;
   chains: Chain[] | null;
   onClick: MouseEventHandler<HTMLSpanElement>;
-  balances: TokenBalance[] | null;
   loading?: boolean;
   withSelectedToken?: boolean;
   withSelectedAmount?: boolean;
@@ -60,7 +56,6 @@ function SelectedRouteOptionContainer({
 export function SelectedRouteOption({
   routeData,
   chains,
-  balances,
   loading = false,
   withSelectedWallet = false,
   withSelectedToken = false,
@@ -71,25 +66,15 @@ export function SelectedRouteOption({
 }: RouteOptionProps) {
   const { fromToken } = routeData?.amountData ?? {};
   const chain = chains?.find((c) => c.id === fromToken?.chainId);
-  const balance = balances?.find(
-    ({ address, chainId }) => address === fromToken?.address && chainId === fromToken.chainId,
+
+  const { routeBalanceUsd, fromAmount, fromAmountUsd } = useMemo(
+    () => getRouteAndTokenBalances(routeData),
+    [routeData],
   );
-
-  const usdBalance = routeData ? getUsdBalance(balance, routeData) : '0.00';
-
-  const routeUSDBalance = routeData?.route.route.estimate.fromAmountUSD ?? '0.00';
-  const routeBalance = useMemo(() => {
-    if (!routeData) return '0.00';
-
-    const amount = routeData?.route.route.estimate.fromAmount;
-    const decimals = routeData?.route.route.estimate.fromToken.decimals;
-
-    return utils.formatUnits(BigNumber.from(amount), decimals).toString();
-  }, [routeData]);
 
   const insufficientBalancePayWithCard = insufficientBalance && showOnrampOption;
 
-  const mergedOnClick = useCallback(
+  const handleOnClick = useCallback(
     (event: MouseEvent<HTMLSpanElement>) => {
       event.stopPropagation();
 
@@ -104,7 +89,7 @@ export function SelectedRouteOption({
   if (!routeData && loading) {
     return (
       <SelectedRouteOptionContainer
-        onClick={mergedOnClick}
+        onClick={handleOnClick}
         selected={withSelectedWallet}
       >
         <MenuItem.FramedVideo
@@ -145,7 +130,7 @@ export function SelectedRouteOption({
 
     return (
       <SelectedRouteOptionContainer
-        onClick={mergedOnClick}
+        onClick={handleOnClick}
         selected={withSelectedWallet}
       >
         <MenuItem.FramedIcon
@@ -161,7 +146,7 @@ export function SelectedRouteOption({
 
   return (
     <SelectedRouteOptionContainer
-      onClick={mergedOnClick}
+      onClick={handleOnClick}
       selected={withSelectedWallet}
     >
       {chain && (
@@ -187,13 +172,11 @@ export function SelectedRouteOption({
       >
         <Stack gap="0px">
           <MenuItem.Label>{fromToken?.name}</MenuItem.Label>
-          <MenuItem.Caption>
-            {`Balance USD $${tokenValueFormat(usdBalance)}`}
-          </MenuItem.Caption>
+          <MenuItem.Caption>{`Balance USD $${routeBalanceUsd}`}</MenuItem.Caption>
         </Stack>
-        <MenuItem.PriceDisplay price={tokenValueFormat(routeBalance)}>
+        <MenuItem.PriceDisplay price={fromAmount}>
           <MenuItem.PriceDisplay.Caption>
-            {`USD $${tokenValueFormat(routeUSDBalance)}`}
+            {`USD $${fromAmountUsd}`}
           </MenuItem.PriceDisplay.Caption>
         </MenuItem.PriceDisplay>
       </Stack>

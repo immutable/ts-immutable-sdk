@@ -2,14 +2,25 @@ import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import { RouteResponse } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
 import { utils } from 'ethers';
-import { useRef, useState } from 'react';
+import { useContext, useRef } from 'react';
 import { delay } from '../functions/delay';
 import { AmountData, RouteData, Token } from '../types';
 import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
+import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
 
 export const useRoutes = () => {
-  const [routes, setRoutes] = useState<RouteData[]>([]);
   const latestRequestIdRef = useRef<number>(0);
+
+  const { addFundsDispatch } = useContext(AddFundsContext);
+
+  const setRoutes = (routes: RouteData[]) => {
+    addFundsDispatch({
+      payload: {
+        type: AddFundsActions.SET_ROUTES,
+        routes,
+      },
+    });
+  };
 
   const resetRoutes = () => {
     setRoutes([]);
@@ -192,7 +203,6 @@ export const useRoutes = () => {
   };
 
   return {
-    routes,
     fetchRoutesWithRateLimit,
     getAmountData,
     getRoute,

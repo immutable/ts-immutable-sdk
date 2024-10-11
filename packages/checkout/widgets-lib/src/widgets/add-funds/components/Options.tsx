@@ -8,7 +8,6 @@ import {
   Banner,
 } from '@biom3/react';
 import { motion } from 'framer-motion';
-import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import { useMemo } from 'react';
 import {
   listItemVariants,
@@ -17,7 +16,6 @@ import {
 import { FiatOption } from './FiatOption';
 import { Chain, FiatOptionType, RouteData } from '../types';
 import { RouteOption } from './RouteOption';
-import { getUsdBalance } from '../functions/convertTokenBalanceToUsd';
 
 const defaultFiatOptions: FiatOptionType[] = [
   FiatOptionType.DEBIT,
@@ -26,7 +24,6 @@ const defaultFiatOptions: FiatOptionType[] = [
 
 export interface OptionsProps {
   chains: Chain[] | null;
-  balances: TokenBalance[] | null;
   onCardClick: (type: FiatOptionType) => void;
   onRouteClick: (route: RouteData, index: number) => void;
   routes?: RouteData[];
@@ -39,7 +36,6 @@ export interface OptionsProps {
 export function Options({
   routes,
   chains,
-  balances,
   onCardClick,
   onRouteClick,
   size,
@@ -69,37 +65,24 @@ export function Options({
           videoUrl="https://i.imgur.com/dVQoobw.mp4"
           sx={{ alignSelf: 'center', mt: 'base.spacing.x2' }}
           size="large"
-          padded
           circularFrame
         />
       </Stack>
     );
   }
 
-  const routeOptions = routes?.map((route: RouteData, index) => {
-    const { fromToken } = route.amountData;
-
-    const chain = chains?.find((c) => c.id === fromToken.chainId);
-    const balance = balances?.find(
-      (bal) => bal.address === fromToken.address && bal.chainId === fromToken.chainId,
-    );
-
-    const usdBalance = getUsdBalance(balance, route);
-
-    return (
-      <RouteOption
-        key={`route-option-${fromToken.chainId}-${fromToken.address}`}
-        chain={chain}
-        route={route}
-        usdBalance={usdBalance}
-        onClick={() => onRouteClick(route, index)}
-        size={size}
-        rc={<motion.div variants={listItemVariants} />}
-        isFastest={index === 0}
-        selected={index === selectedIndex}
-      />
-    );
-  });
+  const routeOptions = routes?.map((routeData: RouteData, index) => (
+    <RouteOption
+      key={`route-option-${routeData.amountData.fromToken.chainId}-${routeData.amountData.fromToken.address}`}
+      size={size}
+      routeData={routeData}
+      chains={chains}
+      onClick={() => onRouteClick(routeData, index)}
+      isFastest={index === 0}
+      selected={index === selectedIndex}
+      rc={<motion.div variants={listItemVariants} />}
+    />
+  ));
 
   const fiatOptions = useMemo(() => {
     if (!showOnrampOption) return null;
