@@ -47,7 +47,10 @@ import { getDurationFormatted } from '../functions/getDurationFormatted';
 import { RouteFees } from '../components/RouteFees';
 import { getTotalRouteFees } from '../functions/getTotalRouteFees';
 import { getRouteChains } from '../functions/getRouteChains';
-import { getFormattedNumber, getFormattedAmounts } from '../functions/getFormattedNumber';
+import {
+  getFormattedNumber,
+  getFormattedAmounts,
+} from '../functions/getFormattedNumber';
 
 interface ReviewProps {
   data: AddFundsReviewData;
@@ -58,7 +61,7 @@ interface ReviewProps {
 
 const FIXED_HANDOVER_DURATION = 2000;
 const APPROVE_TXN_ANIMATION = '/access_coins.riv';
-const EXECUTE_TXN_ANIMATION = '/purchasing_items.riv';
+const EXECUTE_TXN_ANIMATION = '/swapping_coins.riv';
 
 const dividerSx = {
   content: "''",
@@ -264,7 +267,7 @@ export function Review({
       const txReceipt = await execute(squid, changeableProvider, route);
 
       showHandover(
-        APPROVE_TXN_ANIMATION,
+        EXECUTE_TXN_ANIMATION,
         RiveStateMachineInput.PROCESSING,
         'Processing',
         '',

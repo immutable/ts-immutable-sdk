@@ -1,14 +1,14 @@
 import {
+  Body,
   ButtCon,
   Button,
   FramedIcon,
   FramedImage,
   HeroFormControl,
   HeroTextInput,
+  MenuItem,
   OverflowDrawerMenu,
   Stack,
-  Body,
-  MenuItem,
 } from '@biom3/react';
 import debounce from 'lodash.debounce';
 import {
@@ -55,6 +55,8 @@ import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
 import { getProviderSlugFromRdns } from '../../../lib/provider';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { sendConnectProviderSuccessEvent } from '../AddFundsWidgetEvents';
+import { convertToUsd } from '../functions/convertToUsd';
+import { validateToAmount } from '../functions/amountValidation';
 
 interface AddFundsProps {
   checkout: Checkout | null;
@@ -109,9 +111,16 @@ export function AddFunds({
     [],
   );
   const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
-  const [inputValue, setInputValue] = useState<string>(selectedAmount || toAmount || '');
+  const [inputValue, setInputValue] = useState<string>(
+    selectedAmount || toAmount || '',
+  );
   const [fetchingRoutes, setFetchingRoutes] = useState(false);
   const [insufficientBalance, setInsufficientBalance] = useState(false);
+
+  const selectedAmountUsd = useMemo(
+    () => convertToUsd(tokens, inputValue, selectedToken),
+    [tokens, inputValue, selectedToken],
+  );
 
   const setSelectedAmount = debounce((value: string) => {
     addFundsDispatch({
@@ -120,7 +129,7 @@ export function AddFunds({
         selectedAmount: value,
       },
     });
-  }, 1500);
+  }, 2500);
 
   const setSelectedToken = (token: TokenInfo | undefined) => {
     addFundsDispatch({
@@ -366,6 +375,7 @@ export function AddFunds({
     checkout?.config.environment,
     config.theme,
   );
+
   const tokenChoiceOptions = useMemo(
     () => allowedTokens.map((token) => (
       <MenuItem
@@ -394,6 +404,7 @@ export function AddFunds({
     )),
     [allowedTokens, handleTokenChange, isSelected, defaultTokenImage],
   );
+
   const shouldShowBackButton = showBackButton ?? !!onBackButtonClick;
   const routeInputsReady = !!selectedToken && parseFloat(inputValue) > 0 && !!fromAddress;
   const loading = (routeInputsReady || fetchingRoutes)
@@ -496,7 +507,13 @@ export function AddFunds({
           {showInitialEmptyState ? (
             <Body>Add Token</Body>
           ) : (
-            <HeroFormControl>
+            <HeroFormControl
+              validationStatus={
+                validateToAmount(inputValue) || inputValue === ''
+                  ? 'success'
+                  : 'error'
+              }
+            >
               <HeroFormControl.Label>
                 Add
                 {' '}
@@ -510,7 +527,12 @@ export function AddFunds({
                 placeholder="0"
                 maxTextSize="xLarge"
               />
-              <HeroFormControl.Caption>USD $0.00</HeroFormControl.Caption>
+              {selectedAmountUsd > 0 && (
+                <HeroFormControl.Caption>
+                  USD $
+                  {selectedAmountUsd.toFixed(2)}
+                </HeroFormControl.Caption>
+              )}
             </HeroFormControl>
           )}
         </Stack>
