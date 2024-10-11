@@ -105,6 +105,7 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
 										<CloudImage
 											use={
 												<img
+                          // @TODO: update this to be the actual BG texture img
 													src={DUMMY_RASTER_IMAGE_3_URL}
 													alt="blurry bg texture"
 												/>
