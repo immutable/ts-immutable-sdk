@@ -1,22 +1,21 @@
 import {
-  AddFundsEventType,
-  BridgeEventType,
   Checkout,
-  OnRampEventType,
-  SwapDirection,
-  SwapEventType,
-  WidgetLanguage,
   WidgetTheme,
   WidgetType,
+  WidgetLanguage,
+  AddFundsEventType,
+  OnRampEventType,
+  SwapEventType,
+  BridgeEventType,
+  SwapDirection,
 } from "@imtbl/checkout-sdk";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
-import { useEffect, useMemo } from "react";
-import { Environment } from "@imtbl/config";
+import { useMemo, useEffect } from "react";
 
 const ADD_FUNDS_TARGET_ID = "add-funds-widget-target";
 
 function AddFundsUI() {
-  const checkout = useMemo(() => new Checkout({ baseConfig:{environment:Environment.PRODUCTION}}), []);
+  const checkout = useMemo(() => new Checkout(), []);
   const factory = useMemo(() => new WidgetsFactory(checkout, {}), [checkout]);
   const addFunds = useMemo(
     () =>
