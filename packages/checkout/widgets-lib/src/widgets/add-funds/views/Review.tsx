@@ -17,20 +17,23 @@ import {
 } from '@biom3/react';
 import { RouteResponse } from '@0xsquid/squid-types';
 import { BigNumber, utils } from 'ethers';
+import { Environment } from '@imtbl/config';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { AddFundsContext } from '../context/AddFundsContext';
 import { useRoutes } from '../hooks/useRoutes';
 import { AddFundsReviewData } from '../../../context/view-context/AddFundsViewContextTypes';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { Chain, RiveStateMachineInput } from '../types';
+import { AddFundsErrorTypes, Chain, RiveStateMachineInput } from '../types';
 import { useExecute } from '../hooks/useExecute';
-import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { SquidIcon } from '../components/SquidIcon';
 import { useHandover } from '../../../lib/hooks/useHandover';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
 import { getRemoteRive } from '../../../lib/utils';
-import { SQUID_NATIVE_TOKEN } from '../utils/config';
+import {
+  APPROVE_TXN_ANIMATION, EXECUTE_TXN_ANIMATION, FIXED_HANDOVER_DURATION, SQUID_NATIVE_TOKEN,
+} from '../utils/config';
+import { useError } from '../hooks/useError';
 
 interface ReviewProps {
   data: AddFundsReviewData;
@@ -39,17 +42,11 @@ interface ReviewProps {
   onCloseButtonClick?: () => void;
 }
 
-const FIXED_HANDOVER_DURATION = 2000;
-
-const APPROVE_TXN_ANIMATION = '/access_coins.riv';
-const EXECUTE_TXN_ANIMATION = '/swapping_coins.riv';
-
 export function Review({
   data,
   showBackButton = false,
   onBackButtonClick, onCloseButtonClick,
 }: ReviewProps) {
-  const { viewDispatch } = useContext(ViewContext);
   const {
     addFundsState: {
       squid, provider, chains, checkout, tokens,
@@ -61,8 +58,9 @@ export function Review({
   const [getRouteIntervalId, setGetRouteIntervalId] = useState<NodeJS.Timer | undefined>();
   const [proceedDisabled, setProceedDisabled] = useState(true);
 
+  const { showErrorHandover } = useError(checkout?.config.environment || Environment.SANDBOX);
   const { getAmountData, getRoute } = useRoutes();
-  const { addHandover, closeHandover } = useHandover({
+  const { addHandover } = useHandover({
     id: HandoverTarget.GLOBAL,
   });
 
@@ -174,8 +172,8 @@ export function Review({
       await checkProviderChain(changeableProvider, route.route.params.fromChain);
 
       const allowance = await getAllowance(changeableProvider, route);
-      const { fromAmount } = route.route.params;
 
+      const { fromAmount } = route.route.params;
       if (allowance?.lt(fromAmount)) {
         showHandover(
           APPROVE_TXN_ANIMATION,
@@ -204,44 +202,42 @@ export function Review({
 
       const txReceipt = await execute(squid, changeableProvider, route);
 
-      showHandover(EXECUTE_TXN_ANIMATION, RiveStateMachineInput.PROCESSING, 'Processing', '', FIXED_HANDOVER_DURATION);
+      if (txReceipt) {
+        showHandover(
+          EXECUTE_TXN_ANIMATION,
+          RiveStateMachineInput.PROCESSING,
+          'Processing',
+          '',
+          FIXED_HANDOVER_DURATION,
+        );
 
-      showHandover(
-        EXECUTE_TXN_ANIMATION,
-        RiveStateMachineInput.COMPLETED,
-        'Funds added successfully', (
-          <>
-            Go to
-            {' '}
-            <Link
-              size="small"
-              rc={(
-                <a
-                  target="_blank"
-                  href={`https://axelarscan.io/gmp/${txReceipt.transactionHash}`}
-                  rel="noreferrer"
-                />
+        showHandover(
+          EXECUTE_TXN_ANIMATION,
+          RiveStateMachineInput.COMPLETED,
+          'Funds added successfully', (
+            <>
+              Go to
+              {' '}
+              <Link
+                size="small"
+                rc={(
+                  <a
+                    target="_blank"
+                    href={`https://axelarscan.io/gmp/${txReceipt?.transactionHash}`}
+                    rel="noreferrer"
+                  />
             )}
-            >
-              Axelarscan
-            </Link>
-            {' '}
-            for transaction details
-          </>
-        ),
-      );
-    } catch (e) {
-      closeHandover();
-
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SharedViews.ERROR_VIEW,
-            error: e as Error,
-          },
-        },
-      });
+              >
+                Axelarscan
+              </Link>
+              {' '}
+              for transaction details
+            </>
+          ),
+        );
+      }
+    } catch (error) {
+      showErrorHandover(AddFundsErrorTypes.SERVICE_BREAKDOWN, { error });
     }
   };
 
