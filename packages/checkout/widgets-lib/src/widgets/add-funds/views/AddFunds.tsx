@@ -216,13 +216,8 @@ export function AddFunds({
     setSelectedRouteData(undefined);
 
     (async () => {
-      if (
-        balances
-        && squid
-        && tokens
-        && selectedToken?.address
-        && selectedAmount
-      ) {
+      const isValidAmount = validateToAmount(selectedAmount).isValid;
+      if (balances && squid && tokens && selectedToken?.address && isValidAmount) {
         setFetchingRoutes(true);
         const availableRoutes = await fetchRoutesWithRateLimit(
           squid,
