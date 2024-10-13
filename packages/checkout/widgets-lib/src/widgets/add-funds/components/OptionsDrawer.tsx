@@ -44,7 +44,7 @@ export function OptionsDrawer({
       <Drawer.Content
         rc={
           <motion.div variants={listVariants} initial="hidden" animate="show" />
-        }
+  }
       >
         <Box
           sx={{

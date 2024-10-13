@@ -8,26 +8,19 @@ import { AddFundsWidgetParams, Checkout } from '@imtbl/checkout-sdk';
 import { sendAddFundsCloseEvent } from './AddFundsWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import {
-  AddFundsActions,
-  AddFundsContext,
-  addFundsReducer,
-  initialAddFundsState,
+  AddFundsActions, AddFundsContext, addFundsReducer, initialAddFundsState,
 } from './context/AddFundsContext';
 import { AddFundsWidgetViews } from '../../context/view-context/AddFundsViewContextTypes';
 import {
   initialViewState,
-  SharedViews,
-  ViewActions,
+  SharedViews, ViewActions,
   ViewContext,
   viewReducer,
 } from '../../context/view-context/ViewContext';
 import { AddFunds } from './views/AddFunds';
 import { ErrorView } from '../../views/error/ErrorView';
 import { useSquid } from './hooks/useSquid';
-import {
-  useAnalytics,
-  UserJourney,
-} from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { useAnalytics, UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { fetchChains } from './functions/fetchChains';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { Review } from './views/Review';
@@ -67,12 +60,11 @@ export default function AddFundsWidget({
     [viewState, viewReducer],
   );
 
-  const [addFundsState, addFundsDispatch] = useReducer(
-    addFundsReducer,
-    initialAddFundsState,
-  );
+  const [addFundsState, addFundsDispatch] = useReducer(addFundsReducer, initialAddFundsState);
 
-  const { squid, provider, chains } = addFundsState;
+  const {
+    squid, provider, chains,
+  } = addFundsState;
 
   const addFundsReducerValues = useMemo(
     () => ({

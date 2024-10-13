@@ -23,7 +23,7 @@ export type NativeCurrency = {
   name: string;
   symbol: string;
   decimals: number;
-  iconUrl: string;
+  iconUrl:string;
 };
 
 export type AmountData = {

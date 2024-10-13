@@ -1,4 +1,6 @@
-import { Box, LoadingOverlay, MenuItemSize } from '@biom3/react';
+import {
+  Box, LoadingOverlay, MenuItemSize,
+} from '@biom3/react';
 import { motion } from 'framer-motion';
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import {
@@ -35,10 +37,7 @@ export function Options({
   size,
   showOnrampOption,
 }: OptionsProps) {
-  const getUsdBalance = (
-    balance: TokenBalance | undefined,
-    route: RouteData,
-  ) => {
+  const getUsdBalance = (balance: TokenBalance | undefined, route: RouteData) => {
     if (!balance) return undefined;
 
     try {
@@ -110,9 +109,7 @@ export function Options({
         justifyContent: 'center',
         alignItems: 'flex-start',
       }}
-      rc={
-        <motion.div variants={listVariants} initial="hidden" animate="show" />
-      }
+      rc={<motion.div variants={listVariants} initial="hidden" animate="show" />}
     >
       {routeOptions}
       {fiatOptions}

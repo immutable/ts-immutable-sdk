@@ -3,11 +3,8 @@ import { Squid } from '@0xsquid/sdk';
 import { CosmosBalance, TokenBalance } from '@0xsquid/sdk/dist/types';
 import { Chain } from '../types';
 
-export const fetchBalances = async (
-  squid: Squid,
-  chains: Chain[],
-  provider: Web3Provider,
-): Promise<TokenBalance[]> => {
+export const fetchBalances = async (squid: Squid, chains: Chain[], provider: Web3Provider)
+: Promise<TokenBalance[]> => {
   const chainIds = chains.map((chain) => chain.id);
   const address = await provider?.getSigner().getAddress();
 
@@ -17,10 +14,7 @@ export const fetchBalances = async (
   }>[] = [];
 
   for (const chainId of chainIds) {
-    const balancePromise = squid.getAllBalances({
-      chainIds: [chainId],
-      evmAddress: address,
-    });
+    const balancePromise = squid.getAllBalances({ chainIds: [chainId], evmAddress: address });
     promises.push(balancePromise);
   }
 
