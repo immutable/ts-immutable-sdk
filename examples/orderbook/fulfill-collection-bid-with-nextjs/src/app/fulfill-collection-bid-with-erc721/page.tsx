@@ -193,6 +193,8 @@ export default function FulfillERC721WithPassport() {
     setLoadingState(false);
   }
 
+  // #doc fulfil-erc721-collection-bid
+  // FulFill ERC721 Collection Bid
   const fulfillERC721CollectionBid = async (
     collectionBidID: string,
     tokenID: string
@@ -215,6 +217,7 @@ export default function FulfillERC721WithPassport() {
       }
     }
   }
+  // #enddoc fulfil-erc721-collection-bid
 
   return (
     <Box sx={{ marginBottom: "base.spacing.x5" }}>
