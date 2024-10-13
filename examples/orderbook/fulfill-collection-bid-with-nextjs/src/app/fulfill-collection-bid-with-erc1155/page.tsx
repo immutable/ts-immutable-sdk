@@ -215,6 +215,8 @@ export default function FulfillERC1155WithPassport() {
     setLoadingState(false);
   }
 
+  // #doc fulfill-erc1155-collection-bid
+  // Fulfill ERC1155 collection bid
   const fulfillERC1155CollectionBid = async (
     collectionBidID: string,
     amount: string,
@@ -238,6 +240,7 @@ export default function FulfillERC1155WithPassport() {
       }
     }
   }
+  // #enddoc fulfill-erc1155-collection-bid
 
   return (
     <Box sx={{ marginBottom: "base.spacing.x5" }}>
