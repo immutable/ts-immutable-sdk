@@ -1,10 +1,14 @@
 import {
   createContext,
-  useContext, useMemo,
+  useContext,
+  useEffect,
+  useMemo,
   useReducer,
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { Checkout, EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
+import { getProviderDetailByProvider } from '../../lib/provider/utils';
+import { connectEIP6963Provider } from '../../lib/connectEIP6963Provider';
 
 export interface ProvidersState {
   fromProvider?: Web3Provider;
@@ -14,6 +18,7 @@ export interface ProvidersState {
   toProviderInfo?: EIP6963ProviderInfo;
   toAddress?: string;
   checkout: Checkout;
+  lockedToProvider?: boolean;
 }
 
 export const initialProvidersState: ProvidersState = {
@@ -24,6 +29,7 @@ export const initialProvidersState: ProvidersState = {
   toProviderInfo: undefined,
   toAddress: undefined,
   checkout: {} as Checkout,
+  lockedToProvider: false,
 };
 
 export interface ProvidersContextState {
@@ -38,12 +44,14 @@ export interface ProvidersContextAction {
 type ProvidersContextActionPayload =
   | SetProviderPayload
   | SetCheckoutPayload
-  | ResetStatePayload;
+  | ResetStatePayload
+  | SetLockedToProviderPayload;
 
 export enum ProvidersContextActions {
   SET_PROVIDER = 'SET_PROVIDER',
   SET_CHECKOUT = 'SET_CHECKOUT',
   RESET_STATE = 'RESET_STATE',
+  SET_LOCKED_TO_PROVIDER = 'SET_LOCKED_TO_PROVIDER',
 }
 
 export interface SetProviderPayload {
@@ -66,6 +74,11 @@ export interface ResetStatePayload {
   fromProvider?: Web3Provider;
   toProvider?: Web3Provider;
   checkout: Checkout;
+}
+
+export interface SetLockedToProviderPayload {
+  type: ProvidersContextActions.SET_LOCKED_TO_PROVIDER;
+  lockedToProvider: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -114,6 +127,11 @@ ProvidersContextAction
       return {
         ...initialProvidersState,
       };
+    case ProvidersContextActions.SET_LOCKED_TO_PROVIDER:
+      return {
+        ...state,
+        lockedToProvider: action.payload.lockedToProvider,
+      };
     default:
       return state;
   }
@@ -141,6 +159,40 @@ export function ProvidersContextProvider({
     () => ({ providersState, providersDispatch }),
     [providersState, providersDispatch],
   );
+
+  const { toProvider, checkout } = initialState;
+
+  // if `toProvider` is passed, try to connect and get EIP6963 provider info
+  useEffect(() => {
+    if (!toProvider) return;
+    (async () => {
+      const injectedProviders = checkout.getInjectedProviders();
+      const providerDetail = getProviderDetailByProvider(toProvider, [
+        ...injectedProviders,
+      ]);
+
+      if (!providerDetail) return;
+
+      try {
+        await connectEIP6963Provider(providerDetail, checkout, false);
+        const toAddress = await toProvider.getSigner().getAddress();
+        providersDispatch({
+          payload: {
+            type: ProvidersContextActions.SET_PROVIDER,
+            toProvider,
+            toAddress,
+            toProviderInfo: providerDetail.info,
+          },
+        });
+        providersDispatch({
+          payload: {
+            type: ProvidersContextActions.SET_LOCKED_TO_PROVIDER,
+            lockedToProvider: true,
+          },
+        });
+      } catch { /** TODO: handle error */ }
+    })();
+  }, [toProvider]);
 
   return (
     <ProvidersContext.Provider value={value}>

@@ -11,6 +11,7 @@ export interface SelectedWalletProps {
   }
   >;
   onClick: MouseEventHandler<HTMLSpanElement>;
+  disabled?: boolean;
 }
 
 export function SelectedWallet({
@@ -18,12 +19,19 @@ export function SelectedWallet({
   children,
   onClick,
   providerInfo,
+  disabled,
 }: SelectedWalletProps) {
   const selected = !!children && providerInfo?.rdns;
   const size: MenuItemProps['size'] = selected ? 'xSmall' : 'small';
 
   return (
-    <MenuItem size={size} emphasized onClick={onClick}>
+    <MenuItem
+      size={size}
+      disabled={disabled}
+      emphasized={!disabled}
+      onClick={disabled ? undefined : onClick}
+      sx={{ bg: 'base.color.translucent.inverse.800', cursor: 'not-allowed' }}
+    >
       {!providerInfo?.icon && (
         <MenuItem.FramedIcon icon="Wallet" variant="bold" emphasized={false} />
       )}

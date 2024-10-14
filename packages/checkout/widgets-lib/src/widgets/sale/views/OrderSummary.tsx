@@ -43,8 +43,6 @@ type OrderSummaryProps = {
   subView: OrderSummarySubViews;
 };
 
-const ADD_FUNDS_ENABLED = true;
-
 export function OrderSummary({ subView }: OrderSummaryProps) {
   const { t } = useTranslation();
   const { sendProceedToPay, sendInsufficientFunds } = useSaleEvent();
@@ -57,6 +55,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     selectedCurrency,
     setPaymentMethod,
     environment,
+    addFundsEnabled,
   } = useSaleContext();
 
   const { viewDispatch, viewState } = useContext(ViewContext);
@@ -138,30 +137,17 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
   };
 
   const onInsufficientFunds = (data: TopUpViewData) => {
-    if (ADD_FUNDS_ENABLED) {
+    if (!addFundsEnabled) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: SaleWidgetViews.ORDER_SUMMARY,
-            subView: OrderSummarySubViews.EXECUTE_FUNDING_ROUTE,
-            data: {
-              fundingBalance: {
-                type: FundingStepType.ADD_FUNDS,
-                fundingItem: {
-                  token: getTokenInfo(transactionRequirement),
-                  fundsRequired: {
-                    amount: transactionRequirement?.required?.balance,
-                    formattedAmount:
-                      transactionRequirement?.required?.formattedBalance,
-                  },
-                },
-              },
-              onFundingRouteExecuted,
-            },
+            type: SharedViews.TOP_UP_VIEW,
+            data,
           },
         },
       });
+
       return;
     }
 
@@ -169,8 +155,21 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: SharedViews.TOP_UP_VIEW,
-          data,
+          type: SaleWidgetViews.ORDER_SUMMARY,
+          subView: OrderSummarySubViews.EXECUTE_FUNDING_ROUTE,
+          data: {
+            fundingBalance: {
+              type: FundingStepType.ADD_FUNDS,
+              fundingItem: {
+                token: getTokenInfo(transactionRequirement),
+                fundsRequired: {
+                  amount: transactionRequirement?.required?.balance,
+                  formattedAmount: transactionRequirement?.required?.formattedBalance,
+                },
+              },
+            },
+            onFundingRouteExecuted,
+          },
         },
       },
     });

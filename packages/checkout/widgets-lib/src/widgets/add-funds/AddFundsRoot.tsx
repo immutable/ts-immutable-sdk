@@ -71,7 +71,7 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
           <ThemeProvider id="add-funds-container" config={this.strongConfig()}>
             <HandoverProvider>
               <ProvidersContextProvider
-                initialState={{ checkout: this.checkout }}
+                initialState={{ checkout: this.checkout, toProvider: this.web3Provider }}
               >
                 <Suspense
                   fallback={

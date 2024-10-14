@@ -1,4 +1,6 @@
-import { FundingRoute, SaleItem, SalePaymentTypes } from '@imtbl/checkout-sdk';
+import {
+  FundingRoute, RemoteConfiguration, SaleItem, SalePaymentTypes,
+} from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 import {
   ReactNode,
@@ -179,9 +181,14 @@ export function SaleContextProvider(props: {
   });
 
   const addFundsEnabled = useAsyncMemo(
-    async () => checkout?.config && checkout.config.remote.getConfig('addfunds'),
+    async () => {
+      if (!checkout) return false;
+      const addFundsConfig = await checkout.config.remote.getConfig('addfunds') as RemoteConfiguration['addfunds'];
+      return addFundsConfig.enabled;
+    },
     [checkout],
   );
+
   const [showCreditCardWarning, setShowCreditCardWarning] = useState(false);
   const [paymentMethod, setPaymentMethodState] = useState<
   SalePaymentTypes | undefined
