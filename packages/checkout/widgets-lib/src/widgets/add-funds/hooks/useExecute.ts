@@ -26,15 +26,13 @@ export const useExecute = (environment: Environment) => {
     }
 
     if (
-      reason.includes('failed to submit')
-          && reason.includes('highest gas limit')
+      reason.includes('failed to submit') && reason.includes('highest gas limit')
     ) {
       errorType = AddFundsErrorTypes.WALLET_REJECTED_NO_FUNDS;
     }
 
     if (
-      reason.includes('status failed')
-          || reason.includes('transaction failed')
+      reason.includes('status failed') || reason.includes('transaction failed')
     ) {
       errorType = AddFundsErrorTypes.TRANSACTION_FAILED;
     }
