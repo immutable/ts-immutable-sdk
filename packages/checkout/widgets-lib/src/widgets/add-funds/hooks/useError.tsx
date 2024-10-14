@@ -10,6 +10,7 @@ import { sendAddFundsCloseEvent } from '../AddFundsWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
+import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 interface ErrorConfig {
   headingText: string;
@@ -23,6 +24,7 @@ interface ErrorConfig {
 export const useError = (environment: Environment) => {
   const { viewDispatch } = useContext(ViewContext);
 
+  const { page } = useAnalytics();
   const { addHandover, closeHandover } = useHandover({
     id: HandoverTarget.GLOBAL,
   });
@@ -111,9 +113,15 @@ export const useError = (environment: Environment) => {
 
   const getErrorConfig = (errorType: AddFundsErrorTypes) => errorConfig[errorType];
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const showErrorHandover = (errorType: AddFundsErrorTypes, data?: Record<string, unknown>) => {
-    // TODO: Track errors in analytics
+    page({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'Error',
+      extras: {
+        errorType,
+        data,
+      },
+    });
 
     addHandover({
       animationUrl: getRemoteRive(
