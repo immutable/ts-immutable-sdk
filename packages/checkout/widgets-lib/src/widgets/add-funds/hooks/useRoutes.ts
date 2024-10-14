@@ -159,7 +159,7 @@ export const useRoutes = () => {
 
     const routesData = await Promise.all(routePromises);
     return routesData.filter(
-      (route): route is RouteData => route !== undefined,
+      (route): route is RouteData => route?.route !== undefined,
     );
   };
 
