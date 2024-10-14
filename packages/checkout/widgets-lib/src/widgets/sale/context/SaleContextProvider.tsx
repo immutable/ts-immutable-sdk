@@ -1,7 +1,4 @@
-import {
-  FundingRoute,
-  SaleItem, SalePaymentTypes,
-} from '@imtbl/checkout-sdk';
+import { FundingRoute, SaleItem, SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 import {
   ReactNode,
@@ -35,6 +32,7 @@ import {
   SignedTransaction,
 } from '../types';
 import { useQuoteOrder, defaultOrderQuote } from '../hooks/useQuoteOrder';
+import { useAsyncMemo } from '../../../lib/hooks/useAsyncMemo';
 
 type SaleContextProps = {
   config: StrongCheckoutWidgetsConfig;
@@ -95,6 +93,7 @@ type SaleContextValues = SaleContextProps & {
   orderQuote: OrderQuote;
   signTokenIds: string[];
   selectedCurrency: OrderQuoteCurrency | undefined;
+  addFundsEnabled: boolean;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -137,6 +136,7 @@ const SaleContext = createContext<SaleContextValues>({
   selectedCurrency: undefined,
   waitFulfillmentSettlements: true,
   hideExcludedPaymentTypes: false,
+  addFundsEnabled: false,
 });
 
 SaleContext.displayName = 'SaleSaleContext';
@@ -178,6 +178,10 @@ export function SaleContextProvider(props: {
     recipientAddress: '',
   });
 
+  const addFundsEnabled = useAsyncMemo(
+    async () => checkout?.config && checkout.config.remote.getConfig('addfunds'),
+    [checkout],
+  );
   const [showCreditCardWarning, setShowCreditCardWarning] = useState(false);
   const [paymentMethod, setPaymentMethodState] = useState<
   SalePaymentTypes | undefined
@@ -390,6 +394,7 @@ export function SaleContextProvider(props: {
       selectedCurrency,
       waitFulfillmentSettlements,
       hideExcludedPaymentTypes,
+      addFundsEnabled,
     }),
     [
       config,
@@ -424,6 +429,7 @@ export function SaleContextProvider(props: {
       selectedCurrency,
       waitFulfillmentSettlements,
       hideExcludedPaymentTypes,
+      addFundsEnabled,
     ],
   );
 

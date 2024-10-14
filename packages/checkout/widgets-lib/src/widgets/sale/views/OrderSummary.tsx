@@ -37,6 +37,7 @@ import {
 } from '../../../context/view-context/ViewContext';
 import { useHandover } from '../../../lib/hooks/useHandover';
 import { getRemoteRive } from '../../../lib/utils';
+import { getTokenInfo } from '../functions/getTokenInfo';
 
 type OrderSummaryProps = {
   subView: OrderSummarySubViews;
@@ -63,6 +64,15 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
   const { addHandover, closeHandover } = useHandover({
     id: HandoverTarget.GLOBAL,
   });
+
+  const {
+    fundingBalances,
+    loadingBalances,
+    fundingBalancesResult,
+    transactionRequirement,
+    gasFees,
+    queryFundingBalances,
+  } = useFundingBalances();
 
   const onPayWithCard = (paymentType: SalePaymentTypes) => goBackToPaymentMethods(paymentType);
 
@@ -139,8 +149,12 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
               fundingBalance: {
                 type: FundingStepType.ADD_FUNDS,
                 fundingItem: {
-                  token: {},
-                  fundsRequired: {},
+                  token: getTokenInfo(transactionRequirement),
+                  fundsRequired: {
+                    amount: transactionRequirement?.required?.balance,
+                    formattedAmount:
+                      transactionRequirement?.required?.formattedBalance,
+                  },
                 },
               },
               onFundingRouteExecuted,
@@ -161,17 +175,6 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       },
     });
   };
-
-  const {
-    fundingBalances,
-    loadingBalances,
-    fundingBalancesResult,
-    transactionRequirement,
-    gasFees,
-    queryFundingBalances,
-  } = useFundingBalances();
-
-  console.log('🐛 ~     ^^^', transactionRequirement, transactionRequirement);
 
   // Initialise funding balances
   useEffect(() => {

@@ -53,8 +53,6 @@ export interface SaleWidgetProps extends WidgetParams {
   config: StrongCheckoutWidgetsConfig;
 }
 
-const ADD_FUNDS_ENABLED = true;
-
 export default function SaleWidget(props: SaleWidgetProps) {
   const { t } = useTranslation();
   const {
@@ -166,7 +164,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
           {viewState.view.type === SaleWidgetViews.ORDER_SUMMARY && (
             <OrderSummary subView={viewState.view.subView} />
           )}
-          {viewState.view.type === SharedViews.TOP_UP_VIEW && !ADD_FUNDS_ENABLED && (
+          {viewState.view.type === SharedViews.TOP_UP_VIEW && (
             <TopUpView
               analytics={{ userJourney: UserJourney.SALE }}
               widgetEvent={IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT}

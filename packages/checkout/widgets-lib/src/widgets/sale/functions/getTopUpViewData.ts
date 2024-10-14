@@ -1,11 +1,5 @@
 import { ItemType, TransactionRequirement } from '@imtbl/checkout-sdk';
-
-const tokenInfo = (req?: TransactionRequirement) => {
-  if (req && req.current.type !== ItemType.ERC721) {
-    return req.current.token;
-  }
-  return undefined;
-};
+import { getTokenInfo } from './getTokenInfo';
 
 export type TopUpViewData = {
   heading: string[];
@@ -27,11 +21,11 @@ export const getTopUpViewData = (
   const balances = {
     erc20: {
       value: erc20?.delta.formattedBalance,
-      symbol: tokenInfo(erc20)?.symbol,
+      symbol: getTokenInfo(erc20)?.symbol,
     },
     native: {
       value: native?.delta.formattedBalance,
-      symbol: tokenInfo(native)?.symbol,
+      symbol: getTokenInfo(native)?.symbol,
     },
   };
   const heading = ['views.PAYMENT_METHODS.topUp.heading'];
@@ -39,7 +33,7 @@ export const getTopUpViewData = (
   // default to insufficient ERC20
   let subheading = ['views.PAYMENT_METHODS.topUp.subheading.erc20', balances];
   let amount = erc20?.delta.formattedBalance || '0';
-  let tokenAddress = tokenInfo(erc20)?.address;
+  let tokenAddress = getTokenInfo(erc20)?.address;
 
   // if both NATIVE & ERC20 are insufficient
   if (native && erc20 && !native.sufficient && !erc20.sufficient) {
@@ -49,7 +43,7 @@ export const getTopUpViewData = (
   // if only NATIVE is insufficient
   if (native && erc20 && !native.sufficient && erc20.sufficient) {
     amount = native?.delta.formattedBalance || '0';
-    tokenAddress = tokenInfo(native)?.address;
+    tokenAddress = getTokenInfo(native)?.address;
     subheading = ['views.PAYMENT_METHODS.topUp.subheading.native', balances];
   }
 
