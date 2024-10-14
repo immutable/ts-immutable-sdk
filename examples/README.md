@@ -34,12 +34,25 @@ These example apps can also be used directly as a reference and run locally to t
 
 # Running examples locally
 
-First you need to clone or fork the `ts-immutable-sdk` repo. The examples are a part of the root workspace and running yarn install from anywhere in the workspace will install the node modules required by the examples to the root `node_modules` directory. By default, the examples pull the latest sdk version from NPM instead of building the SDK locally. 
+First you need to clone or fork the `ts-immutable-sdk` repo. The examples are a part of the root workspace and running `pnpm install` from anywhere in the workspace will install the node modules required by the examples to the root `node_modules` directory. By default, the examples pull the latest sdk version from NPM instead of building the SDK locally. 
 
 If you want to run the examples against your local build of the SDK instead, from the project root run;
 
 ```bash
-yarn prepare:examples
+# Install node modules
+pnpm install
+
+# Build the SDK
+pnpm build
+
+# Prepare the built SDK
+pnpm prepare:sdk
+
+# Prepare the examples
+pnpm prepare:examples
+
+# Update the node modules after preparing the sdk and examples
+pnpm install
 ```
 
 and it will build the SDK first then use that build instead of what is on NPM. This is what our CI CD pipeline does to ensure it's compiling and testing the examples against the latest changes rather than what's already on NPM.
@@ -49,7 +62,7 @@ Take a look at the README.md file of the example you want to run e.g. the [Check
 This should include the steps required to run the example. Generally you will need to;
 
 1. Copy the `.env.example` file to `.env` and populate it with the environment variables as per the readme.
-1. Then `yarn install` and `yarn dev`
+1. Then `pnpm install` and `pnpm dev` in the example app directory to run the example.
 
 And the app should be served on https://localhost:3000 unless otherwise stated in the example app.
 
@@ -152,10 +165,10 @@ If you want to make a new NextJS app from scratch this is the process;
 
 Create a branch in `ts-immutable-sdk` to add your example to.
 
-In the console navigate to the product directory where your example will live (or create one if it doesn't exist). Then use `yarn dlx` to create the app.
+In the console navigate to the product directory where your example will live (or create one if it doesn't exist). Then use `pnpm dlx` to create the app.
 ```bash
 cd examples/<product>
-yarn dlx create-next-app@latest
+pnpm dlx create-next-app@latest
 ```
 
 use the default options, except don't use Tailwind CSS;
@@ -169,14 +182,14 @@ use the default options, except don't use Tailwind CSS;
 ✔ Would you like to customize the default import alias (@/*)? No
 ```
 
-The setup script will throw an error about the app not being part of the yarn project. This is normal, the example apps shouldn't be part of the top level yarn project. Create an empty `yarn.lock` file in the app root and continue and run `yarn install` manually to install your dependencies.
+Note that the newly created example will be a part of the root pnpm workspace. This will ensure that the example will correctly be built, linted and tested as part of the CI CD pipeline to verify it is always working with the latest SDK version.
 
 Install `@imtbl/sdk` and any other dependencies your example needs e.g.
 
 ```bash
-yarn add @imtbl/sdk
-yarn add @biom3/react
-yarn add @ethersproject/providers@^5.7.2
+pnpm add @imtbl/sdk
+pnpm add @biom3/react
+pnpm add @ethersproject/providers@^5.7.2
 ```
 
 You should use `@biom3/react` to style your app so it matches the immutable branding. A good example of how to use Biome can be found in the [Checkout SDK Connect](/examples/checkout/sdk-connect-with-nextjs) example.
@@ -212,7 +225,7 @@ Delete the contents of the return statement in `app/page.tsx` and replace with `
 Start the project with hot reloading by running;
 
 ```bash
-yarn dev
+pnpm dev
 ```
 
 Check `http://localhost:3000/` in the browser to confirm it compiled and ran
@@ -246,10 +259,10 @@ If your code example is going to be used as code snippets in the docs site, befo
 
 All examples should be covered by basic e2e tests to ensure they at least render the examples. Ideally they would also have e2e tests that prove the functionality that you're trying to show works. Depending on what you're doing in the examples, it may be difficult to e2e test certain things e.g. logging in with Passport or connecting with Metamask. For this reason, testing of functionality with e2e testing is recommended if practical, but not required.
 
-Install `@playwright/test` as a dev dependency for the e2e tests.
+Install `@playwright/test@^1.45.3` as a dev dependency for the e2e tests.
 
 ```bash
-yarn add -D @playwright/test
+pnpm add -D @playwright/test@^1.45.3
 ```
 
 Create a `playwright.config.ts` file in the root of the example app and add this configuration;
@@ -302,13 +315,13 @@ Add the test runner to the scripts in your package.json
 Install the playwright browsers
 
 ```bash
- yarn playwright install   
+pnpm playwright install   
 ```
 
 Run your tests
 
 ```bash
-yarn test
+pnpm test
 ```
 # Using code examples in the docs site
 

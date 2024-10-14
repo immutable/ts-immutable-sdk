@@ -5,10 +5,8 @@ Functional tests using Cucumber and Gherkin
 ## Prerequisites
 
 1. Open the repository root folder in VS Code
-2. Install dependencies: `yarn` (husky needs `node_modules` at the repo root to run)
-3. Build the SDK: `yarn build`
-4. cd into `tests/func-tests/zkevm`
-5. Install dependencies: `yarn` (this also configures husky)
+2. Install dependencies: `pnpm` (husky needs `node_modules` at the repo root to run)
+3. Build the SDK: `pnpm build`
 
 ### Required ENV values
 
@@ -18,9 +16,9 @@ Functional tests using Cucumber and Gherkin
 # ORDERBOOK_MR_API_URL=       // Immutable zkEVM API endpoint
 # ZKEVM_CHAIN_NAME=           // Immutable zkEVM chain name
 # ZKEVM_ORDERBOOK_BANKER=     // Banker private key used to fund accounts
-# ZKEVM_ORDERBOOK_ERC20=      // Address of the ERC20 contract that the banker can mint from (can be redeployed with `yarn ts-node utils/orderbook/deploy-erc20.ts`)
-# ZKEVM_ORDERBOOK_ERC721=     // Address of the ERC721 contract that the banker can mint from (can be redeployed with `yarn ts-node utils/orderbook/deploy-erc721.ts`)
-# ZKEVM_ORDERBOOK_ERC1155=    // Address of the ERC1155 contract that the banker can mint from (can be redeployed with `yarn ts-node utils/orderbook/deploy-erc1155.ts`)
+# ZKEVM_ORDERBOOK_ERC20=      // Address of the ERC20 contract that the banker can mint from (can be redeployed with `pnpm ts-node utils/orderbook/deploy-erc20.ts`)
+# ZKEVM_ORDERBOOK_ERC721=     // Address of the ERC721 contract that the banker can mint from (can be redeployed with `pnpm ts-node utils/orderbook/deploy-erc721.ts`)
+# ZKEVM_ORDERBOOK_ERC1155=    // Address of the ERC1155 contract that the banker can mint from (can be redeployed with `pnpm ts-node utils/orderbook/deploy-erc1155.ts`)
 # SEAPORT_CONTRACT_ADDRESS=   // Seaport contract
 # ZONE_CONTRACT_ADDRESS=      // Seaport zone contract
 # OPERATOR_ALLOWLIST_ADDRESS= // Operator allow list contract
@@ -52,15 +50,15 @@ OPERATOR_ALLOWLIST_ADDRESS=0x6b969FD89dE634d8DE3271EbE97734FEFfcd58eE
 
 ## Running the tests
 
-1. Run the tests: `yarn func-test`
+1. Run the tests: `pnpm func-test`
 
-**Note:** Certain tests are skipped on CI because of the time they take to run. To run only these, use `yarn func-test:ci`
+**Note:** Certain tests are skipped on CI because of the time they take to run. To run only these, use `pnpm func-test:ci`
 
 ## Filtering tests
 
 By default, all tests that do not have the `@skip` tag are run. In other words, the tag filter is set to `not @skip`.
 
-You can change the tag filter on the command line: `TAGS="<tag-expression>" yarn test`, or more permanently, by editing your .env file directly.
+You can change the tag filter on the command line: `TAGS="<tag-expression>" pnpm test`, or more permanently, by editing your .env file directly.
 
 Examples of `<tag-expression>`:
 

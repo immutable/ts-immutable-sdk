@@ -7,7 +7,7 @@
   <h1>Welcome to Immutable TypeScript SDK</h1>
 </div>
 
-## Documentation
+# Docs
 
 [Typescript SDK Official Starting guide](https://docs.immutable.com/sdk-docs/ts-immutable-sdk/overview/)
 
@@ -15,17 +15,19 @@ Checkout our API references for more information.
 - [Immutable X API Reference](https://docs.immutable.com/x/reference)
 - [Immutable zkEVM API Reference](https://docs.immutable.com/zkevm/api/reference)
 
-## Installation
+# Installation
 
 ```sh
-npm install @imtbl/sdk
+npm add @imtbl/sdk
 # or
 yarn add @imtbl/sdk
+# or
+pnpm add @imtbl/sdk
 ```
-## Disclaimer for Alpha Releases
+# Disclaimer for Alpha Releases
 
 Please note that alpha releases are still in development and may contain bugs or breaking changes. Please do not use these versions as we do not intend to support them.
 
-## Changelog
+# Changelog
 
 Please visit the [GitHub Releases](https://github.com/immutable/ts-immutable-sdk/releases) page for changelog information.

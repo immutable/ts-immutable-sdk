@@ -2,19 +2,10 @@
 
 ## Table of Contents
 
-- [Pre-requisites](#pre-requisites)
 - [Checkout SDK Quick Start Guide](#checkout-sdk-quick-start-guide)
 - [Widgets Library Quick Start Guide](#widgets-library-quick-start-guide)
   - [Widgets Development Locally](#widgets-development-locally)
 - [Project structure](#project-structure)
-
-### Pre-requisites
-
-Install dependencies for the workspace
-
-```bash
-yarn install
-```
 
 ### Checkout SDK Quick Start Guide
 
@@ -23,13 +14,13 @@ All commands below need to be run in the context of the `checkout-sdk` package i
 Running in `dev` mode using the `immutable-devnet` network:
 
 ```bash
-yarn start:dev
+pnpm start:dev
 ```
 
-Running in `sandbox`/`production` mode using the `immutable-testnet`/`mainnet` network based on the environment value set for the `SANDBOX_CONFIGURATION` config object in the `./sdk/src/sdk.ts` file:
+Running in `sandbox`/`production` mode using the `immutable-testnet`/`mainnet` network based on the environment value set for the `SANDBOX_CONFIGURATION` config object in the `./sdk/src/sdk.ts` file (note the preferred way to run this command is to run `pnpm dev` in the root of the repo to run all packages in watch mode together):
 
 ```bash
-yarn start
+pnpm start
 ```
 
 Running the Checkout SDK Sample App with the Checkout SDK supporting hot reloading:
@@ -37,59 +28,29 @@ Running the Checkout SDK Sample App with the Checkout SDK supporting hot reloadi
 ```bash
 # Run the Checkout SDK first
 # Context: checkout-sdk in ./sdk
-yarn start
+pnpm start
 
 # Run the Checkout SDK Sample App in a new terminal
 # Context: checkout-sdk-sample-app in ./sdk-sample-app
-yarn start
+pnpm start
 ```
 
 Building to the `./sdk/dist` directory for `dev` environment:
 
 ```bash
-yarn build:dev
+pnpm build:dev
 ```
 
 Building to the `./sdk/dist` directory for `sandbox`/`production` environment:
 
 ```bash
-yarn build
-```
-
-Running all jest tests:
-
-```bash
-yarn test
-```
-
-Running changed tests on save in watch mode:
-
-```bash
-yarn test:watch
-```
-
-Linting:
-
-```bash
-yarn lint
-```
-
-Linting and attempting to auto-fix issues:
-
-```bash
-yarn lint:fix
-```
-
-Typechecking:
-
-```bash
-yarn typecheck
+pnpm build
 ```
 
 Generate Typescript API documentation (viewable in the newly generated docs folder at [./sdk/docs/README.md](./sdk/docs/README.md)):
 
 ```bash
-yarn docs
+pnpm docs
 ```
 
 ### Widgets Library Quick Start Guide
@@ -101,11 +62,11 @@ Running in `dev` mode (widgets-lib depends upon checkout-sdk):
 ```bash
 # Run the Checkout SDK first
 # Context: checkout-sdk in ./sdk
-yarn start:dev
+pnpm start:dev
 
 # Run the Widgets Library in a new terminal
 # Context: checkout-widgets in ./widgets-lib
-yarn start
+pnpm start
 ```
 
 Running the Widgets Sample App with the Widgets Library supporting hot reloading:
@@ -116,52 +77,10 @@ Running the Widgets Sample App with the Widgets Library supporting hot reloading
 
 # Run the Widgets Sample App in a new terminal
 # Context: checkout-widgets-sample-app in ./widgets-sample-app
-yarn start
+pnpm start
 ```
 
-**Read more about running locally [here](#widgets-development-locally).**
-
-Building the Widgets Library to the `./widgets-lib/dist` directory:
-
-```bash
-yarn build
-```
-
-Building the Widgets Library and outputting a bundle visualizer:
-
-```bash
-yarn build:analyze
-```
-
-Running all jest tests:
-
-```bash
-yarn test
-```
-
-Running changed jest tests on save in watch mode:
-
-```bash
-yarn test:watch
-```
-
-Linting:
-
-```bash
-yarn lint
-```
-
-Linting and attempting to auto-fix issues:
-
-```bash
-yarn lint:fix
-```
-
-Typechecking:
-
-```bash
-yarn typecheck
-```
+**Read more about running locally below.**
 
 #### Widgets Development Locally
 
@@ -174,19 +93,19 @@ To test this setup locally and force the widgets bundle to be loaded from `local
 ```bash
 # Run the Checkout SDK first in local dev mode
 # Context: checkout-sdk in ./sdk
-yarn start:local
+pnpm start:local
 ```
 
 ```bash
 # Build the Widgets Library in a new terminal in local mode
 # Context: checkout-widgets in ./widgets-lib
-yarn build:local
+pnpm build:local
 ```
 
 ```bash
 # Run the Widgets Sample App in a new terminal
 # Context: checkout-widgets-sample-app in ./widgets-sample-app
-yarn start
+pnpm start
 ```
 
 You will then need to make sure that you replace your creation of a `new WidgetsFactory()` with a call to `await checkout.widgets()` within the sample app. This will pull in the built widgets.js bundle dynamically, but from your local filesystem.

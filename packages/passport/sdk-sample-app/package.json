@@ -40,7 +40,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "dev-with-sdk": "concurrently 'pnpm dev' 'pnpm run -w dev @imtbl/passport'",
+    "dev-with-sdk": "concurrently 'pnpm dev' 'pnpm run -w dev'",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "start": "next start",
     "update-sdk-version": "scripts/updateSdkVersion.sh ./out"
