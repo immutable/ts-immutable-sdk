@@ -4,6 +4,7 @@ import {
   useContext, useEffect, useMemo, useReducer,
 } from 'react';
 
+import { Environment } from '@imtbl/config';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { AddFundsWidgetViews } from '../../context/view-context/AddFundsViewContextTypes';
 import {
@@ -23,6 +24,10 @@ import { useSquid } from './hooks/useSquid';
 import { useTokens } from './hooks/useTokens';
 import { AddFunds } from './views/AddFunds';
 import { Review } from './views/Review';
+import { isValidAddress } from '../../lib/validations/widgetValidators';
+import { amountInputValidation } from '../../lib/validations/amountInputValidations';
+import { useError } from './hooks/useError';
+import { AddFundsErrorTypes } from './types';
 
 export type AddFundsWidgetInputs = AddFundsWidgetParams & {
   checkout: Checkout;
@@ -71,6 +76,7 @@ export default function AddFundsWidget({
 
   const squidSdk = useSquid(checkout);
   const tokensResponse = useTokens(checkout);
+  const { showErrorHandover } = useError(checkout.config.environment ?? Environment.SANDBOX);
 
   useEffect(() => {
     (async () => {
@@ -146,6 +152,15 @@ export default function AddFundsWidget({
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
+
+  useEffect(() => {
+    const isValidToTokenAddress = toTokenAddress && isValidAddress(toTokenAddress);
+    const isValidToAmount = toAmount && amountInputValidation(toAmount);
+
+    if (!isValidToTokenAddress || !isValidToAmount) {
+      showErrorHandover(AddFundsErrorTypes.INVALID_PARAMETERS);
+    }
+  }, [toTokenAddress, toAmount]);
 
   return (
     <ViewContext.Provider value={viewReducerValues}>
