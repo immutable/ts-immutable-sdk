@@ -385,6 +385,16 @@ export function AddFunds({
   }, []);
 
   const handleCardClick = () => {
+    track({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'InputScreen',
+      control: 'PayWithCardMenu',
+      controlType: 'MenuItem',
+      extras: {
+        tokenAddress: selectedToken?.address ?? '',
+        amount: selectedAmount ?? '',
+      },
+    });
     const data = {
       tokenAddress: selectedToken?.address ?? '',
       amount: selectedAmount ?? '',
@@ -496,6 +506,18 @@ export function AddFunds({
     provider: Web3Provider,
     providerInfo: EIP6963ProviderInfo,
   ) => {
+    track({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'InputScreen',
+      control: 'WalletsMenu',
+      controlType: 'MenuItem',
+      extras: {
+        providerType,
+        providerName: providerInfo.name,
+        providerRdns: providerInfo.rdns,
+        providerUuid: providerInfo.uuid,
+      },
+    });
     sendConnectProviderSuccessEvent(
       eventTarget,
       providerType,
