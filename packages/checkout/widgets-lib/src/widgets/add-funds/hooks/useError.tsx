@@ -48,10 +48,6 @@ export const useError = (environment: Environment) => {
     });
   };
 
-  const resetError = () => {
-    closeHandover();
-  };
-
   const errorConfig: Record<AddFundsErrorTypes, ErrorConfig> = {
     [AddFundsErrorTypes.WALLET_REJECTED]: {
       headingText: 'Transaction rejected',
@@ -138,7 +134,6 @@ export const useError = (environment: Environment) => {
   };
 
   return {
-    resetError,
     showErrorHandover,
   };
 };
