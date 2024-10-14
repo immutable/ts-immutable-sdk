@@ -2582,6 +2582,33 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@biom3/react@npm:^0.27.12":
+  version: 0.27.12
+  resolution: "@biom3/react@npm:0.27.12"
+  dependencies:
+    "@biom3/design-tokens": ~0.4.4
+    "@imtbl/image-resizer-utils": ~0.0.2
+    csstype: ^3.1.2
+    hls.js: ^1.5.11
+    localforage: ^1.10.0
+    lodash.debounce: ^4.0.8
+    lodash.get: ^4.4.2
+    lodash.isequal: ^4.5.0
+    lodash.throttle: ^4.1.1
+    react-is: ^18.2.0
+    react-keyed-flatten-children: ^3.0.0
+    ts-deepmerge: ^6.2.0
+  peerDependencies:
+    "@emotion/react": ^11.11.4
+    "@rive-app/react-canvas-lite": ^4.9.0
+    embla-carousel-react: ^8.0.4
+    framer-motion: ^10.12.12
+    react: ^18.2.0
+    react-dom: ^18.2.0
+  checksum: 5d9012ed6d3ba39b3c21b85ce3a4df6f505d81a8fd7da0cbd69c0689f48427205ccd8d8b7b61914e25077ea2c9e219f8626916a64a6f5998f55dbcd5feb02101
+  languageName: node
+  linkType: hard
+
 "@cnakazawa/watch@npm:^1.0.3":
   version: 1.0.4
   resolution: "@cnakazawa/watch@npm:1.0.4"
@@ -4140,6 +4167,26 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@examples/sdk-load-widgets-with-nextjs@workspace:examples/checkout/sdk-load-widgets-with-nextjs":
+  version: 0.0.0-use.local
+  resolution: "@examples/sdk-load-widgets-with-nextjs@workspace:examples/checkout/sdk-load-widgets-with-nextjs"
+  dependencies:
+    "@biom3/react": ^0.25.21
+    "@ethersproject/providers": ^5.7.2
+    "@imtbl/sdk": latest
+    "@playwright/test": ^1.45.3
+    "@types/node": ^20
+    "@types/react": ^18.3.4
+    "@types/react-dom": ^18.3.0
+    eslint: ^8
+    eslint-config-next: 14.2.7
+    next: 14.2.7
+    react: ^18
+    react-dom: ^18
+    typescript: ^5.6.2
+  languageName: unknown
+  linkType: soft
+
 "@examples/switch-network-with-nextjs@workspace:examples/checkout/sdk-switch-network-with-nextjs":
   version: 0.0.0-use.local
   resolution: "@examples/switch-network-with-nextjs@workspace:examples/checkout/sdk-switch-network-with-nextjs"
@@ -4164,7 +4211,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/wallets-connect-with-nextjs@workspace:examples/passport/wallets-connect-with-nextjs"
   dependencies:
-    "@biom3/react": ^0.27.10
+    "@biom3/react": ^0.27.12
     "@ethersproject/providers": ^5.7.2
     "@imtbl/sdk": latest
     "@playwright/test": ^1.45.2
@@ -4342,7 +4389,7 @@ __metadata:
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.10
+    "@biom3/react": ^0.27.12
     "@ethersproject/providers": ^5.7.2
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
@@ -4429,7 +4476,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.10
+    "@biom3/react": ^0.27.12
     "@ethersproject/providers": ^5.7.2
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
@@ -4465,7 +4512,7 @@ __metadata:
     "@0xsquid/sdk": ^2.8.25
     "@0xsquid/squid-types": ^0.1.108
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.10
+    "@biom3/react": ^0.27.12
     "@ethersproject/bignumber": ^5.7.0
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
@@ -4770,7 +4817,7 @@ __metadata:
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.10
+    "@biom3/react": ^0.27.12
     "@imtbl/blockchain-data": 0.0.0
     "@imtbl/config": 0.0.0
     "@imtbl/generated-clients": 0.0.0
@@ -4875,7 +4922,7 @@ __metadata:
     "@babel/plugin-transform-class-properties": ^7.24.1
     "@babel/plugin-transform-private-methods": ^7.24.1
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.10
+    "@biom3/react": ^0.27.12
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-provider": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
@@ -40140,7 +40187,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "x-provider-sample-app@workspace:packages/x-provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.27.10
+    "@biom3/react": ^0.27.12
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
     "@testing-library/jest-dom": ^5.16.5

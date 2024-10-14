@@ -1,7 +1,7 @@
 import { RouteData } from '../types';
 
-export const sortRoutesByFastestTime = (routes: RouteData[] | undefined): RouteData[] | undefined => {
-  if (!routes) return undefined;
+export const sortRoutesByFastestTime = (routes: RouteData[]): RouteData[] => {
+  if (!routes) return [];
 
   return routes.slice().sort((a, b) => {
     const timeA = a.route.route.estimate.estimatedRouteDuration;

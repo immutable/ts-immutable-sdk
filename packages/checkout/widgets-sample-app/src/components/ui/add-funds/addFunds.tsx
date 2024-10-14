@@ -5,22 +5,49 @@ import {
   WidgetLanguage,
   AddFundsEventType,
   OnRampEventType,
-  SwapEventType,
-  BridgeEventType,
-  SwapDirection,
+  OrchestrationEventType,
 } from "@imtbl/checkout-sdk";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
+import { Environment } from "@imtbl/config";
 import { useMemo, useEffect } from "react";
+
+import { passport } from "./passport";
 
 const ADD_FUNDS_TARGET_ID = "add-funds-widget-target";
 
 function AddFundsUI() {
-  const checkout = useMemo(() => new Checkout(), []);
-  const factory = useMemo(() => new WidgetsFactory(checkout, {}), [checkout]);
+  const checkout = useMemo(
+    () =>
+      new Checkout({
+        baseConfig: {
+          environment: Environment.PRODUCTION,
+        },
+        passport,
+      }),
+    []
+  );
+  const factory = useMemo(
+    () =>
+      new WidgetsFactory(checkout, {
+        walletConnect: {
+          projectId: "938b553484e344b1e0b4bb80edf8c362",
+          metadata: {
+            name: "Checkout Marketplace",
+            description: "Checkout Marketplace",
+            url: "http://localhost:3000/marketplace-orchestrator",
+            icons: [],
+          },
+        },
+      }),
+    [checkout]
+  );
+
   const addFunds = useMemo(
     () =>
       factory.create(WidgetType.ADD_FUNDS, {
-        config: { theme: WidgetTheme.DARK },
+        config: {
+          theme: WidgetTheme.DARK,
+        },
       }),
     [factory]
   );
@@ -29,17 +56,53 @@ function AddFundsUI() {
   const bridge = useMemo(() => factory.create(WidgetType.BRIDGE), [factory]);
 
   useEffect(() => {
+    passport.connectEvm();
+  }, []);
+
+  // useEffect(() => {
+  //   if (!checkout || !factory) return;
+
+  //   (async () => {
+  //     const { provider } = await checkout.createProvider({
+  //       walletProviderName: WalletProviderName.METAMASK,
+  //     });
+
+  //     await checkout.connect({ provider, requestWalletPermissions: false });
+
+  //     const { isConnected } = await checkout.checkIsWalletConnected({
+  //       provider,
+  //     });
+
+  //     if (isConnected) {
+  //       factory.updateProvider(provider);
+  //     }
+  //   })();
+  // }, [checkout, factory]);
+
+  const goBack = () => {
+    addFunds.unmount();
     addFunds.mount(ADD_FUNDS_TARGET_ID, {
       showOnrampOption: true,
+      showSwapOption: false,
       showBridgeOption: false,
-      showSwapOption: true,
-      toTokenAddress: "0x3b2d8a1931736fc321c24864bceee981b11c3c57",
+      // toAmount: "1",
+      // toTokenAddress: "native",
+    });
+  };
+
+  useEffect(() => {
+    addFunds.mount(ADD_FUNDS_TARGET_ID, {
+      showOnrampOption: true,
+      showSwapOption: false,
+      showBridgeOption: false,
+      // toAmount: "1",
+      // toTokenAddress: "native",
     });
     addFunds.addListener(AddFundsEventType.CLOSE_WIDGET, (data: any) => {
       console.log("CLOSE_WIDGET", data);
       addFunds.unmount();
     });
-    addFunds.addListener(AddFundsEventType.REQUEST_ONRAMP, (data: any) => {
+    addFunds.addListener(OrchestrationEventType.REQUEST_ONRAMP, (data: any) => {
       console.log("REQUEST_ONRAMP", data);
       addFunds.unmount();
       onRamp.addListener(OnRampEventType.CLOSE_WIDGET, (data: any) => {
@@ -47,31 +110,15 @@ function AddFundsUI() {
         onRamp.unmount();
       });
       onRamp.mount(ADD_FUNDS_TARGET_ID, {
-        amount: data.amount,
-        tokenAddress: data.tokenAddress,
+        ...data,
+        showBackButton: true,
       });
     });
-    addFunds.addListener(AddFundsEventType.REQUEST_SWAP, (data: any) => {
-      console.log("REQUEST_SWAP", data);
-      addFunds.unmount();
-      swap.addListener(SwapEventType.CLOSE_WIDGET, (data: any) => {
-        console.log("CLOSE_WIDGET", data);
-        swap.unmount();
-      });
-      swap.mount(ADD_FUNDS_TARGET_ID, {
-        amount: data.amount,
-        toTokenAddress: data.toTokenAddress,
-        direction: SwapDirection.TO,
-      });
+    addFunds.addListener(AddFundsEventType.CONNECT_SUCCESS, (data: any) => {
+      console.log("CONNECT_SUCCESS", data);
     });
-    addFunds.addListener(AddFundsEventType.REQUEST_BRIDGE, (data: any) => {
-      console.log("REQUEST_BRIDGE", data);
-      addFunds.unmount();
-      bridge.addListener(BridgeEventType.CLOSE_WIDGET, (data: any) => {
-        console.log("CLOSE_WIDGET", data);
-        bridge.unmount();
-      });
-      bridge.mount(ADD_FUNDS_TARGET_ID, {});
+    onRamp.addListener(OrchestrationEventType.REQUEST_GO_BACK, () => {
+      goBack();
     });
   }, [addFunds]);
 
