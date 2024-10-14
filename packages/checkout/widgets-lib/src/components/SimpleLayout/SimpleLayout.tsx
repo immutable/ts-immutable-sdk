@@ -1,4 +1,5 @@
 import { Box, BoxProps } from '@biom3/react';
+import merge from 'ts-deepmerge';
 import {
   simpleLayoutStyle,
   headerStyle,
@@ -18,6 +19,7 @@ export interface SimpleLayoutProps {
   floatHeader?: boolean;
   footerBackgroundColor?: string;
   bodyStyleOverrides?: BoxProps['sx'];
+  containerSx?: BoxProps['sx'];
 }
 
 export function SimpleLayout({
@@ -25,27 +27,28 @@ export function SimpleLayout({
   footer,
   children,
   heroContent,
-  testId,
+  testId = 'container',
   floatHeader = false,
   footerBackgroundColor,
   bodyStyleOverrides,
+  containerSx = {},
 }: SimpleLayoutProps) {
   return (
     <Box sx={responsiveStyles} testId="simpleLayout">
-      <Box testId={testId} sx={simpleLayoutStyle}>
+      <Box testId={testId} sx={merge(simpleLayoutStyle, containerSx)}>
         {header && (
           <Box sx={headerStyle(floatHeader)} testId="header">
             {header}
           </Box>
         )}
-        <Box sx={contentStyle}>
+        <Box sx={contentStyle} testId="main">
           {heroContent && (
-            <Box sx={heroContentStyle} testId="heroContent">
+            <Box sx={heroContentStyle}>
               {heroContent}
             </Box>
           )}
           {children && (
-            <Box sx={{ ...bodyStyle, ...bodyStyleOverrides, overflowY: 'auto' }} testId="children">
+            <Box sx={{ ...bodyStyle, ...bodyStyleOverrides }} testId="children">
               {children}
             </Box>
           )}
