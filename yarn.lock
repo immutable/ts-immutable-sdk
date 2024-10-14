@@ -23,24 +23,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@0xsquid/sdk@npm:^2.8.24":
-  version: 2.8.24
-  resolution: "@0xsquid/sdk@npm:2.8.24"
-  dependencies:
-    "@cosmjs/encoding": ^0.31.0
-    "@cosmjs/stargate": ^0.31.3
-    "@ethersproject/abstract-signer": ^5.7.0
-    "@ethersproject/wallet": ^5.7.0
-    axios: ^1.5.0
-    cosmjs-types: ^0.8.0
-    ethers: 6.8.1
-    ethers-multicall-provider: ^5.0.0
-    lodash: ^4.17.21
-    long: ^5.2.3
-  checksum: 780b7837e13c6876764d0cc615d9712c9b35a523857823dba9cc2ba96df672c0a57292d39c34a358cef2e66b834c333db6860829542907065c01bc613d6b233d
-  languageName: node
-  linkType: hard
-
 "@0xsquid/sdk@npm:^2.8.25":
   version: 2.8.25
   resolution: "@0xsquid/sdk@npm:2.8.25"
@@ -2537,48 +2519,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:^0.4.2, @biom3/design-tokens@npm:~0.4.2":
-  version: 0.4.2
-  resolution: "@biom3/design-tokens@npm:0.4.2"
-  dependencies:
-    lodash.get: ^4.4.2
-  checksum: feae1a9193ca25bb1e27041d6684155e5e3935d5b4876318c207cd73dc0c9ec31b126e54fc97bd02f9f663213a2accc1a7361a95b4d61a135e02f06ceb7659b7
-  languageName: node
-  linkType: hard
-
 "@biom3/design-tokens@npm:^0.4.4, @biom3/design-tokens@npm:~0.4.4":
   version: 0.4.4
   resolution: "@biom3/design-tokens@npm:0.4.4"
   dependencies:
     lodash.get: ^4.4.2
   checksum: b62db8bf266d41097bc231795eed3208d18e526deff29bfb4d286645ebda34bdb3edf3f4aef7e849b08b4f1af051c801de48e3f250ab1c721b4e5c508113194d
-  languageName: node
-  linkType: hard
-
-"@biom3/react@npm:^0.25.0":
-  version: 0.25.0
-  resolution: "@biom3/react@npm:0.25.0"
-  dependencies:
-    "@biom3/design-tokens": ~0.4.2
-    buffer: ^6.0.3
-    csstype: ^3.1.2
-    hls.js: ^1.5.11
-    localforage: ^1.10.0
-    lodash.debounce: ^4.0.8
-    lodash.get: ^4.4.2
-    lodash.isequal: ^4.5.0
-    lodash.throttle: ^4.1.1
-    react-is: ^18.2.0
-    react-keyed-flatten-children: ^3.0.0
-    ts-deepmerge: ^6.2.0
-  peerDependencies:
-    "@emotion/react": ^11.11.4
-    "@rive-app/react-canvas-lite": ^4.9.0
-    embla-carousel-react: ^8.0.4
-    framer-motion: ^10.12.12
-    react: ^18.2.0
-    react-dom: ^18.2.0
-  checksum: 7758e5c903a3bad821aeb360083e2880753b5b1ad5359e182a29ee3cd05d6fb843964fb11f8f4c7f684d4f52e4b8427a13e13dc937461be056b7eb904f9f70d5
   languageName: node
   linkType: hard
 
@@ -2609,33 +2555,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.26.1":
-  version: 0.26.2
-  resolution: "@biom3/react@npm:0.26.2"
-  dependencies:
-    "@biom3/design-tokens": ~0.4.4
-    "@imtbl/image-resizer-utils": ~0.0.1
-    csstype: ^3.1.2
-    hls.js: ^1.5.11
-    localforage: ^1.10.0
-    lodash.debounce: ^4.0.8
-    lodash.get: ^4.4.2
-    lodash.isequal: ^4.5.0
-    lodash.throttle: ^4.1.1
-    react-is: ^18.2.0
-    react-keyed-flatten-children: ^3.0.0
-    ts-deepmerge: ^6.2.0
-  peerDependencies:
-    "@emotion/react": ^11.11.4
-    "@rive-app/react-canvas-lite": ^4.9.0
-    embla-carousel-react: ^8.0.4
-    framer-motion: ^10.12.12
-    react: ^18.2.0
-    react-dom: ^18.2.0
-  checksum: f70fdcb649e617cc3e9ab5bc093a74f9908a198cd5446370b14dcf3748b1dfacc6c08b517766f41231886bf4ec0dccfe47edb91ba7c7f67a96599cef5e1135bf
-  languageName: node
-  linkType: hard
-
 "@biom3/react@npm:^0.27.10":
   version: 0.27.10
   resolution: "@biom3/react@npm:0.27.10"
@@ -2660,6 +2579,33 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
   checksum: 93564ddb70f49b994b8ac484d4e8a4eb5a18c0d9807b70b224973852b5fc964a2514de3bb8b293be0f88cfb9a4c792a7aa0c31662cf373a9aea850f163f2803e
+  languageName: node
+  linkType: hard
+
+"@biom3/react@npm:^0.27.12":
+  version: 0.27.12
+  resolution: "@biom3/react@npm:0.27.12"
+  dependencies:
+    "@biom3/design-tokens": ~0.4.4
+    "@imtbl/image-resizer-utils": ~0.0.2
+    csstype: ^3.1.2
+    hls.js: ^1.5.11
+    localforage: ^1.10.0
+    lodash.debounce: ^4.0.8
+    lodash.get: ^4.4.2
+    lodash.isequal: ^4.5.0
+    lodash.throttle: ^4.1.1
+    react-is: ^18.2.0
+    react-keyed-flatten-children: ^3.0.0
+    ts-deepmerge: ^6.2.0
+  peerDependencies:
+    "@emotion/react": ^11.11.4
+    "@rive-app/react-canvas-lite": ^4.9.0
+    embla-carousel-react: ^8.0.4
+    framer-motion: ^10.12.12
+    react: ^18.2.0
+    react-dom: ^18.2.0
+  checksum: 5d9012ed6d3ba39b3c21b85ce3a4df6f505d81a8fd7da0cbd69c0689f48427205ccd8d8b7b61914e25077ea2c9e219f8626916a64a6f5998f55dbcd5feb02101
   languageName: node
   linkType: hard
 
@@ -2782,7 +2728,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cosmjs/encoding@npm:^0.31.0, @cosmjs/encoding@npm:^0.31.0-alpha.1, @cosmjs/encoding@npm:^0.31.3":
+"@cosmjs/encoding@npm:^0.31.0-alpha.1, @cosmjs/encoding@npm:^0.31.3":
   version: 0.31.3
   resolution: "@cosmjs/encoding@npm:0.31.3"
   dependencies:
@@ -2841,7 +2787,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cosmjs/proto-signing@npm:^0.31.0-alpha.1, @cosmjs/proto-signing@npm:^0.31.3":
+"@cosmjs/proto-signing@npm:^0.31.0-alpha.1":
   version: 0.31.3
   resolution: "@cosmjs/proto-signing@npm:0.31.3"
   dependencies:
@@ -2932,26 +2878,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cosmjs/stargate@npm:^0.31.3":
-  version: 0.31.3
-  resolution: "@cosmjs/stargate@npm:0.31.3"
-  dependencies:
-    "@confio/ics23": ^0.6.8
-    "@cosmjs/amino": ^0.31.3
-    "@cosmjs/encoding": ^0.31.3
-    "@cosmjs/math": ^0.31.3
-    "@cosmjs/proto-signing": ^0.31.3
-    "@cosmjs/stream": ^0.31.3
-    "@cosmjs/tendermint-rpc": ^0.31.3
-    "@cosmjs/utils": ^0.31.3
-    cosmjs-types: ^0.8.0
-    long: ^4.0.0
-    protobufjs: ~6.11.3
-    xstream: ^11.14.0
-  checksum: 9b680d50f0818e3cfaffccd022d6034c283c1e350a1b8d8f74ffa22352e342ce1cb00533007ba7b5a6a1c1bc30fe327bd09c23ac8b7486691ad127a34c47690c
-  languageName: node
-  linkType: hard
-
 "@cosmjs/stream@npm:^0.30.1":
   version: 0.30.1
   resolution: "@cosmjs/stream@npm:0.30.1"
@@ -2979,7 +2905,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cosmjs/tendermint-rpc@npm:^0.31.0-alpha.1, @cosmjs/tendermint-rpc@npm:^0.31.3":
+"@cosmjs/tendermint-rpc@npm:^0.31.0-alpha.1":
   version: 0.31.3
   resolution: "@cosmjs/tendermint-rpc@npm:0.31.3"
   dependencies:
@@ -3542,7 +3468,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint-community/eslint-utils@npm:^4.2.0":
+"@eslint-community/eslint-utils@npm:^4.2.0, @eslint-community/eslint-utils@npm:^4.4.0":
   version: 4.4.0
   resolution: "@eslint-community/eslint-utils@npm:4.4.0"
   dependencies:
@@ -3550,6 +3476,13 @@ __metadata:
   peerDependencies:
     eslint: ^6.0.0 || ^7.0.0 || >=8.0.0
   checksum: cdfe3ae42b4f572cbfb46d20edafe6f36fc5fb52bf2d90875c58aefe226892b9677fef60820e2832caf864a326fe4fc225714c46e8389ccca04d5f9288aabd22
+  languageName: node
+  linkType: hard
+
+"@eslint-community/regexpp@npm:^4.10.0":
+  version: 4.11.1
+  resolution: "@eslint-community/regexpp@npm:4.11.1"
+  checksum: 6986685529d30e33c2640973c3d8e7ddd31bef3cc8cb10ad54ddc1dea12680779a2c23a45562aa1462c488137a3570e672d122fac7da22d82294382d915cec70
   languageName: node
   linkType: hard
 
@@ -4073,7 +4006,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/create-bid-with-nextjs@workspace:examples/orderbook/create-bid-with-nextjs"
   dependencies:
-    "@biom3/react": ^0.26.1
+    "@biom3/react": ^0.27.10
     "@ethersproject/providers": ^5.7.2
     "@imtbl/sdk": latest
     "@playwright/test": ^1.45.3
@@ -4081,9 +4014,30 @@ __metadata:
     "@types/react": ^18
     "@types/react-dom": ^18
     eslint: ^8
-    eslint-config-next: 14.2.7
+    eslint-config-next: 14.2.14
     ethers: ^5.7.2
     next: 14.2.10
+    react: ^18
+    react-dom: ^18
+    typescript: ^5.6.2
+  languageName: unknown
+  linkType: soft
+
+"@examples/create-collection-bid-with-nextjs@workspace:examples/orderbook/create-collection-bid-with-nextjs":
+  version: 0.0.0-use.local
+  resolution: "@examples/create-collection-bid-with-nextjs@workspace:examples/orderbook/create-collection-bid-with-nextjs"
+  dependencies:
+    "@biom3/react": ^0.27.10
+    "@ethersproject/providers": ^5.7.2
+    "@imtbl/sdk": latest
+    "@playwright/test": ^1.45.3
+    "@types/node": ^20
+    "@types/react": ^18
+    "@types/react-dom": ^18
+    eslint: ^8
+    eslint-config-next: 14.2.14
+    ethers: ^5.7.2
+    next: 14.2.7
     react: ^18
     react-dom: ^18
     typescript: ^5.6.2
@@ -4094,7 +4048,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/create-listing-with-nextjs@workspace:examples/orderbook/create-listing-with-nextjs"
   dependencies:
-    "@biom3/react": ^0.26.1
+    "@biom3/react": ^0.27.10
     "@ethersproject/providers": ^5.7.2
     "@imtbl/sdk": latest
     "@playwright/test": ^1.45.3
@@ -4102,7 +4056,7 @@ __metadata:
     "@types/react": ^18
     "@types/react-dom": ^18
     eslint: ^8
-    eslint-config-next: 14.2.7
+    eslint-config-next: 14.2.14
     ethers: ^5.7.2
     next: 14.2.7
     react: ^18
@@ -4115,14 +4069,34 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/fulfill-bid-with-nextjs@workspace:examples/orderbook/fulfill-bid-with-nextjs"
   dependencies:
-    "@biom3/react": ^0.26.1
+    "@biom3/react": ^0.27.10
     "@imtbl/sdk": latest
     "@playwright/test": ^1.45.3
     "@types/node": ^20
     "@types/react": ^18
     "@types/react-dom": ^18
     eslint: ^8
-    eslint-config-next: 14.2.7
+    eslint-config-next: 14.2.14
+    ethers: ^5.7.2
+    next: 14.2.10
+    react: ^18
+    react-dom: ^18
+    typescript: ^5.6.2
+  languageName: unknown
+  linkType: soft
+
+"@examples/fulfill-collection-bid-with-nextjs@workspace:examples/orderbook/fulfill-collection-bid-with-nextjs":
+  version: 0.0.0-use.local
+  resolution: "@examples/fulfill-collection-bid-with-nextjs@workspace:examples/orderbook/fulfill-collection-bid-with-nextjs"
+  dependencies:
+    "@biom3/react": ^0.27.10
+    "@imtbl/sdk": latest
+    "@playwright/test": ^1.45.3
+    "@types/node": ^20
+    "@types/react": ^18
+    "@types/react-dom": ^18
+    eslint: ^8
+    eslint-config-next: 14.2.14
     ethers: ^5.7.2
     next: 14.2.10
     react: ^18
@@ -4135,14 +4109,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/fulfill-listing-with-nextjs@workspace:examples/orderbook/fulfill-listing-with-nextjs"
   dependencies:
-    "@biom3/react": ^0.26.1
+    "@biom3/react": ^0.27.10
     "@imtbl/sdk": latest
     "@playwright/test": ^1.45.3
     "@types/node": ^20
     "@types/react": ^18
     "@types/react-dom": ^18
     eslint: ^8
-    eslint-config-next: 14.2.7
+    eslint-config-next: 14.2.14
     ethers: ^5.7.2
     next: 14.2.7
     react: ^18
@@ -4193,6 +4167,26 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@examples/sdk-load-widgets-with-nextjs@workspace:examples/checkout/sdk-load-widgets-with-nextjs":
+  version: 0.0.0-use.local
+  resolution: "@examples/sdk-load-widgets-with-nextjs@workspace:examples/checkout/sdk-load-widgets-with-nextjs"
+  dependencies:
+    "@biom3/react": ^0.25.21
+    "@ethersproject/providers": ^5.7.2
+    "@imtbl/sdk": latest
+    "@playwright/test": ^1.45.3
+    "@types/node": ^20
+    "@types/react": ^18.3.4
+    "@types/react-dom": ^18.3.0
+    eslint: ^8
+    eslint-config-next: 14.2.7
+    next: 14.2.7
+    react: ^18
+    react-dom: ^18
+    typescript: ^5.6.2
+  languageName: unknown
+  linkType: soft
+
 "@examples/switch-network-with-nextjs@workspace:examples/checkout/sdk-switch-network-with-nextjs":
   version: 0.0.0-use.local
   resolution: "@examples/switch-network-with-nextjs@workspace:examples/checkout/sdk-switch-network-with-nextjs"
@@ -4217,7 +4211,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/wallets-connect-with-nextjs@workspace:examples/passport/wallets-connect-with-nextjs"
   dependencies:
-    "@biom3/react": ^0.27.10
+    "@biom3/react": ^0.27.12
     "@ethersproject/providers": ^5.7.2
     "@imtbl/sdk": latest
     "@playwright/test": ^1.45.2
@@ -4395,7 +4389,7 @@ __metadata:
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.10
+    "@biom3/react": ^0.27.12
     "@ethersproject/providers": ^5.7.2
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
@@ -4482,7 +4476,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.10
+    "@biom3/react": ^0.27.12
     "@ethersproject/providers": ^5.7.2
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
@@ -4518,7 +4512,7 @@ __metadata:
     "@0xsquid/sdk": ^2.8.25
     "@0xsquid/squid-types": ^0.1.108
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.10
+    "@biom3/react": ^0.27.12
     "@ethersproject/bignumber": ^5.7.0
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
@@ -4823,7 +4817,7 @@ __metadata:
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.10
+    "@biom3/react": ^0.27.12
     "@imtbl/blockchain-data": 0.0.0
     "@imtbl/config": 0.0.0
     "@imtbl/generated-clients": 0.0.0
@@ -4928,7 +4922,7 @@ __metadata:
     "@babel/plugin-transform-class-properties": ^7.24.1
     "@babel/plugin-transform-private-methods": ^7.24.1
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.10
+    "@biom3/react": ^0.27.12
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-provider": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
@@ -5026,14 +5020,14 @@ __metadata:
   linkType: soft
 
 "@imtbl/sdk@npm:latest":
-  version: 1.54.0
-  resolution: "@imtbl/sdk@npm:1.54.0"
+  version: 1.56.0
+  resolution: "@imtbl/sdk@npm:1.56.0"
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
-    "@0xsquid/sdk": ^2.8.24
-    "@biom3/design-tokens": ^0.4.2
-    "@biom3/react": ^0.25.0
+    "@0xsquid/sdk": ^2.8.25
+    "@biom3/design-tokens": ^0.4.4
+    "@biom3/react": ^0.27.10
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-provider": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
@@ -5100,7 +5094,7 @@ __metadata:
       optional: true
     prisma:
       optional: true
-  checksum: 349362964e32bac6bc8ad22fe06ab3e3f6f07db598bc87e9f822d5e18698307e96437af7a05226260380b5578cec8e5533ad81fddee23e9206f06cd4a748d310
+  checksum: 47ecff0575a0597d6a889f4896842a4d55a1eaed321062734798d6cc90181de48ba71a4095798524076d442d2472bf1f408caecaac83af0a988bd4280ed13062
   languageName: node
   linkType: hard
 
@@ -7000,6 +6994,15 @@ __metadata:
   dependencies:
     glob: 7.1.7
   checksum: 8e3b16e605bb34e938e0e200c01fb83b0f9061d1a69f6b4319cd153e762a75cc7576d997e508bad54955af3cb76e19650bda64e5e23bc9a18d46edc92596b422
+  languageName: node
+  linkType: hard
+
+"@next/eslint-plugin-next@npm:14.2.14":
+  version: 14.2.14
+  resolution: "@next/eslint-plugin-next@npm:14.2.14"
+  dependencies:
+    glob: 10.3.10
+  checksum: 4ec9c81b22f651afa2ff50910d6055ff169b3a7b8c0134d1ba312f6ceef2c89389b7da6fcd78cde9e6c4ec215a1bce63047781fc6077345393533fb6dcbe3275
   languageName: node
   linkType: hard
 
@@ -13182,6 +13185,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@typescript-eslint/eslint-plugin@npm:^5.4.2 || ^6.0.0 || ^7.0.0 || ^8.0.0":
+  version: 8.8.0
+  resolution: "@typescript-eslint/eslint-plugin@npm:8.8.0"
+  dependencies:
+    "@eslint-community/regexpp": ^4.10.0
+    "@typescript-eslint/scope-manager": 8.8.0
+    "@typescript-eslint/type-utils": 8.8.0
+    "@typescript-eslint/utils": 8.8.0
+    "@typescript-eslint/visitor-keys": 8.8.0
+    graphemer: ^1.4.0
+    ignore: ^5.3.1
+    natural-compare: ^1.4.0
+    ts-api-utils: ^1.3.0
+  peerDependencies:
+    "@typescript-eslint/parser": ^8.0.0 || ^8.0.0-alpha.0
+    eslint: ^8.57.0 || ^9.0.0
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 495bb8cb5136e8e11651fa23569057ac714774a235c9d522de238f7179ab62074021cba633ed611880e3df96c562a6087c9c8a53bd5d7f8a0050e643ff518dd6
+  languageName: node
+  linkType: hard
+
 "@typescript-eslint/eslint-plugin@npm:^5.5.0, @typescript-eslint/eslint-plugin@npm:^5.57.1":
   version: 5.62.0
   resolution: "@typescript-eslint/eslint-plugin@npm:5.62.0"
@@ -13235,6 +13261,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@typescript-eslint/parser@npm:^5.4.2 || ^6.0.0 || ^7.0.0 || ^8.0.0":
+  version: 8.8.0
+  resolution: "@typescript-eslint/parser@npm:8.8.0"
+  dependencies:
+    "@typescript-eslint/scope-manager": 8.8.0
+    "@typescript-eslint/types": 8.8.0
+    "@typescript-eslint/typescript-estree": 8.8.0
+    "@typescript-eslint/visitor-keys": 8.8.0
+    debug: ^4.3.4
+  peerDependencies:
+    eslint: ^8.57.0 || ^9.0.0
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: e80dc53bb3be86bad5ff3e3e0a86fb9d5b11e7ba10d9750d22202b8cbdae5d8d267be00a9e914756dade9116e08682733cf2ab59172cc09a4e6a2d99de1799e0
+  languageName: node
+  linkType: hard
+
 "@typescript-eslint/parser@npm:^5.42.0, @typescript-eslint/parser@npm:^5.5.0, @typescript-eslint/parser@npm:^5.57.1":
   version: 5.62.0
   resolution: "@typescript-eslint/parser@npm:5.62.0"
@@ -13272,6 +13316,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@typescript-eslint/scope-manager@npm:8.8.0":
+  version: 8.8.0
+  resolution: "@typescript-eslint/scope-manager@npm:8.8.0"
+  dependencies:
+    "@typescript-eslint/types": 8.8.0
+    "@typescript-eslint/visitor-keys": 8.8.0
+  checksum: 039eb955251b1ed1a43eb776ffc6af1bfc4c0e533d2bace78d25b17c1a9ff13969806199eedf1623a71787cdfd825b1cd040b1862b8da2d62248e0697436b25b
+  languageName: node
+  linkType: hard
+
 "@typescript-eslint/type-utils@npm:5.62.0":
   version: 5.62.0
   resolution: "@typescript-eslint/type-utils@npm:5.62.0"
@@ -13289,6 +13343,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@typescript-eslint/type-utils@npm:8.8.0":
+  version: 8.8.0
+  resolution: "@typescript-eslint/type-utils@npm:8.8.0"
+  dependencies:
+    "@typescript-eslint/typescript-estree": 8.8.0
+    "@typescript-eslint/utils": 8.8.0
+    debug: ^4.3.4
+    ts-api-utils: ^1.3.0
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: b13ccbf84b8ad644bdbe1c61c4796e80844b1d4b70a235b2226c6a96509074401c50c127e5eaaf92e7b240a54db89b7dbbbd7acd51b02a652547267e5f9e2593
+  languageName: node
+  linkType: hard
+
 "@typescript-eslint/types@npm:5.62.0":
   version: 5.62.0
   resolution: "@typescript-eslint/types@npm:5.62.0"
@@ -13300,6 +13369,13 @@ __metadata:
   version: 7.2.0
   resolution: "@typescript-eslint/types@npm:7.2.0"
   checksum: 237acd24aa55b762ee98904e4f422ba86579325200dcd058b3cbfe70775926e7f00ee0295788d81eb728f3a6326fe4401c648aee9eb1480d9030a441c17520e8
+  languageName: node
+  linkType: hard
+
+"@typescript-eslint/types@npm:8.8.0":
+  version: 8.8.0
+  resolution: "@typescript-eslint/types@npm:8.8.0"
+  checksum: a97f6733c429845938f1ce0f770352b5b7748d3410f9582127bcb50d49df09c88d5210204842ee916caabf1e76649591274c58be7b25be70dbb3589851dfe711
   languageName: node
   linkType: hard
 
@@ -13340,6 +13416,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@typescript-eslint/typescript-estree@npm:8.8.0":
+  version: 8.8.0
+  resolution: "@typescript-eslint/typescript-estree@npm:8.8.0"
+  dependencies:
+    "@typescript-eslint/types": 8.8.0
+    "@typescript-eslint/visitor-keys": 8.8.0
+    debug: ^4.3.4
+    fast-glob: ^3.3.2
+    is-glob: ^4.0.3
+    minimatch: ^9.0.4
+    semver: ^7.6.0
+    ts-api-utils: ^1.3.0
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: ef04d80ab5e25362476c463e3208c58633ea87814604a19d2368f99e5027e2c37612e7c2a6f47203ce86e4d86ed8849f338e1ce6c06bd40e18b9bcc49f9a887c
+  languageName: node
+  linkType: hard
+
 "@typescript-eslint/utils@npm:5.62.0, @typescript-eslint/utils@npm:^5.58.0":
   version: 5.62.0
   resolution: "@typescript-eslint/utils@npm:5.62.0"
@@ -13355,6 +13450,20 @@ __metadata:
   peerDependencies:
     eslint: ^6.0.0 || ^7.0.0 || ^8.0.0
   checksum: ee9398c8c5db6d1da09463ca7bf36ed134361e20131ea354b2da16a5fdb6df9ba70c62a388d19f6eebb421af1786dbbd79ba95ddd6ab287324fc171c3e28d931
+  languageName: node
+  linkType: hard
+
+"@typescript-eslint/utils@npm:8.8.0":
+  version: 8.8.0
+  resolution: "@typescript-eslint/utils@npm:8.8.0"
+  dependencies:
+    "@eslint-community/eslint-utils": ^4.4.0
+    "@typescript-eslint/scope-manager": 8.8.0
+    "@typescript-eslint/types": 8.8.0
+    "@typescript-eslint/typescript-estree": 8.8.0
+  peerDependencies:
+    eslint: ^8.57.0 || ^9.0.0
+  checksum: e7a631005a9855d142b27041cd9556a8b817bbce315a373f8a0d7620f6fb9294149bd384ccd2efa75568d607452d8964060dae70360bbe6cd9ffac3438c48a45
   languageName: node
   linkType: hard
 
@@ -13375,6 +13484,16 @@ __metadata:
     "@typescript-eslint/types": 7.2.0
     eslint-visitor-keys: ^3.4.1
   checksum: d9b11b52737450f213cea5c6e07e4672684da48325905c096ee09302b6b261c0bb226e1e350011bdf127c0cbbdd9e6474c905befdfa0a2118fc89ece16770f2b
+  languageName: node
+  linkType: hard
+
+"@typescript-eslint/visitor-keys@npm:8.8.0":
+  version: 8.8.0
+  resolution: "@typescript-eslint/visitor-keys@npm:8.8.0"
+  dependencies:
+    "@typescript-eslint/types": 8.8.0
+    eslint-visitor-keys: ^3.4.3
+  checksum: 0190f7da372f0af376250317c3e181d54aadae7cfea208714d978afc8f5858a190617f6eb168f117532819f5b768671ef51afa283be37c9319e0e662eedd0188
   languageName: node
   linkType: hard
 
@@ -20332,6 +20451,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"eslint-config-next@npm:14.2.14":
+  version: 14.2.14
+  resolution: "eslint-config-next@npm:14.2.14"
+  dependencies:
+    "@next/eslint-plugin-next": 14.2.14
+    "@rushstack/eslint-patch": ^1.3.3
+    "@typescript-eslint/eslint-plugin": ^5.4.2 || ^6.0.0 || ^7.0.0 || ^8.0.0
+    "@typescript-eslint/parser": ^5.4.2 || ^6.0.0 || ^7.0.0 || ^8.0.0
+    eslint-import-resolver-node: ^0.3.6
+    eslint-import-resolver-typescript: ^3.5.2
+    eslint-plugin-import: ^2.28.1
+    eslint-plugin-jsx-a11y: ^6.7.1
+    eslint-plugin-react: ^7.33.2
+    eslint-plugin-react-hooks: ^4.5.0 || 5.0.0-canary-7118f5dd7-20230705
+  peerDependencies:
+    eslint: ^7.23.0 || ^8.0.0
+    typescript: ">=3.3.1"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 6f2c1fbae53d9ef024dc84f509e37746c243f0224024facf2c51c9386e89e26b1873fef636042f2b49c46e63effc74783a07060960581961ee62e1b5e6fcdee3
+  languageName: node
+  linkType: hard
+
 "eslint-config-next@npm:14.2.5":
   version: 14.2.5
   resolution: "eslint-config-next@npm:14.2.5"
@@ -21710,7 +21853,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-glob@npm:^3.0.3, fast-glob@npm:^3.2.5":
+"fast-glob@npm:^3.0.3, fast-glob@npm:^3.2.5, fast-glob@npm:^3.3.2":
   version: 3.3.2
   resolution: "fast-glob@npm:3.3.2"
   dependencies:
@@ -24036,6 +24179,13 @@ __metadata:
   version: 5.2.4
   resolution: "ignore@npm:5.2.4"
   checksum: 3d4c309c6006e2621659311783eaea7ebcd41fe4ca1d78c91c473157ad6666a57a2df790fe0d07a12300d9aac2888204d7be8d59f9aaf665b1c7fcdb432517ef
+  languageName: node
+  linkType: hard
+
+"ignore@npm:^5.3.1":
+  version: 5.3.2
+  resolution: "ignore@npm:5.3.2"
+  checksum: 2acfd32a573260ea522ea0bfeff880af426d68f6831f973129e2ba7363f422923cf53aab62f8369cbf4667c7b25b6f8a3761b34ecdb284ea18e87a5262a865be
   languageName: node
   linkType: hard
 
@@ -34745,7 +34895,7 @@ __metadata:
   resolution: "seaport-core@https://github.com/immutable/seaport-core.git#commit=0633350ec34f21fcede657ff812f11cf7d19144e"
   dependencies:
     seaport-types: ^0.0.1
-  checksum: 392bce86bbfc4f7c00b65575b238825f4c696bddf5af08be7aa496862e63879375387fd4400f6e900ffee08d65c1f75cf3adad9c6c41ddcf7a3b0389cd73c3c7
+  checksum: d8adba0d54106c6fe9370f0775fadef2198e5eab440b36919d1f917705ce2f0a7028e4da021b6df049aa3ca35d7e673a28b78a731130f0ff9fdf7a8bd32e3b94
   languageName: node
   linkType: hard
 
@@ -34789,7 +34939,7 @@ __metadata:
     seaport-sol: ^1.5.0
     seaport-types: ^0.0.1
     solady: ^0.0.84
-  checksum: f31a7443a50fa1c35ec03ea031743d1d10896653ae443fa15ab8e6f5b4a2ca43f6743d523ae4e1f14df867451e5b2b2130b0bfa58a1085b0bcae3fceb8dfdc9b
+  checksum: a77e141e4ab5d2c4bb190a38fbb6cda3011fdf5f350b250fbeb4d82ae81cf917a966a2dcb8d9e4fd1bed29e5510ede9b15941b0ac77aeb4272dab94c9f51e7ff
   languageName: node
   linkType: hard
 
@@ -34912,7 +35062,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.3.4, semver@npm:^7.5.4":
+"semver@npm:^7.3.4, semver@npm:^7.5.4, semver@npm:^7.6.0":
   version: 7.6.3
   resolution: "semver@npm:7.6.3"
   bin:
@@ -37374,7 +37524,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-api-utils@npm:^1.0.1":
+"ts-api-utils@npm:^1.0.1, ts-api-utils@npm:^1.3.0":
   version: 1.3.0
   resolution: "ts-api-utils@npm:1.3.0"
   peerDependencies:
@@ -40037,7 +40187,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "x-provider-sample-app@workspace:packages/x-provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.27.10
+    "@biom3/react": ^0.27.12
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
     "@testing-library/jest-dom": ^5.16.5

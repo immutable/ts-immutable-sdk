@@ -18,6 +18,8 @@ import AddFundsUI from "./components/ui/add-funds/addFunds";
 import { PassportProvider } from "./context/passport";
 import { WidgetsProvider } from "./context/widgets";
 import AddFundsIntegration from "./components/ui/add-funds-integration/addFunds";
+import { AddFundsPassportLogin } from "./components/ui/add-funds/login";
+import { AddFundsPassportLogout } from "./components/ui/add-funds/logout";
 
 const router = createBrowserRouter([
   {
@@ -55,6 +57,14 @@ const router = createBrowserRouter([
   {
     path: "/add-funds",
     element: <AddFundsUI />,
+  },
+  {
+    path: "/add-funds/login",
+    element: <AddFundsPassportLogin />,
+  },
+  {
+    path: "/add-funds/logout",
+    element: <AddFundsPassportLogout />,
   },
   {
     path: "/add-funds-integration",

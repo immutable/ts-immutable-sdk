@@ -11,12 +11,12 @@ export const signAndSubmitApproval = async (
 
   // If the user hasn't yet approved the Immutable Seaport contract to transfer assets from this
   // collection on their behalf they'll need to do so before they create an order
-  const approvalAction = listing.actions.find(
+  const approvalActions = listing.actions.filter(
     (action): action is orderbook.TransactionAction =>
       action.type === orderbook.ActionType.TRANSACTION,
   );
 
-  if (approvalAction) {
+  for (const approvalAction of approvalActions) {
     const unsignedTx = await approvalAction.buildTransaction();
     const receipt = await signer.sendTransaction(unsignedTx);
     await receipt.wait();
@@ -57,18 +57,22 @@ export const createListing = async (
   client: orderbook.Orderbook,
   preparedListing: orderbook.PrepareListingResponse,
   orderSignature: string,
+  makerEcosystemFee?: {
+    recipientAddress: string;
+    amount: string;
+  },
 ): Promise<string> => {
   const order = await client.createListing({
     orderComponents: preparedListing.orderComponents,
     orderHash: preparedListing.orderHash,
     orderSignature,
     // Optional maker marketplace fee
-    makerFees: [
+    makerFees: makerEcosystemFee ? [
       {
-        amount: "100",
-        recipientAddress: "0x0000000000000000000000000000000000000000", // Replace address with your own marketplace address
+        recipientAddress: makerEcosystemFee.recipientAddress, // Replace address with your own marketplace address
+        amount: makerEcosystemFee.amount,
       },
-    ],
+    ] : [],
   });
   return order.result.id;
 };

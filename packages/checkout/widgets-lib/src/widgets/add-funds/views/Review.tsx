@@ -1,12 +1,17 @@
 import {
-  ReactNode, useContext, useEffect, useState,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
 } from 'react';
 import {
   Body,
+  ButtCon,
   Button,
-  centerFlexChildren,
-  Divider,
   EllipsizedText,
+  FramedIcon,
   FramedImage,
   Heading,
   hFlex,
@@ -14,23 +19,42 @@ import {
   Link,
   PriceDisplay,
   Stack,
+  Sticker,
+  useInterval,
 } from '@biom3/react';
 import { RouteResponse } from '@0xsquid/squid-types';
-import { BigNumber, utils } from 'ethers';
+import { t } from 'i18next';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { AddFundsContext } from '../context/AddFundsContext';
 import { useRoutes } from '../hooks/useRoutes';
 import { AddFundsReviewData } from '../../../context/view-context/AddFundsViewContextTypes';
-import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { Chain, RiveStateMachineInput } from '../types';
+import { RiveStateMachineInput } from '../types';
 import { useExecute } from '../hooks/useExecute';
-import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import {
+  SharedViews,
+  ViewActions,
+  ViewContext,
+} from '../../../context/view-context/ViewContext';
 import { SquidIcon } from '../components/SquidIcon';
 import { useHandover } from '../../../lib/hooks/useHandover';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
 import { getRemoteRive } from '../../../lib/utils';
 import { SQUID_NATIVE_TOKEN } from '../utils/config';
+import {
+  useAnalytics,
+  UserJourney,
+} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
+import { LoadingView } from '../../../views/loading/LoadingView';
+import { getDurationFormatted } from '../functions/getDurationFormatted';
+import { RouteFees } from '../components/RouteFees';
+import { getTotalRouteFees } from '../functions/getTotalRouteFees';
+import { getRouteChains } from '../functions/getRouteChains';
+import {
+  getFormattedAmounts,
+  getFormattedNumber,
+} from '../functions/getFormattedNumber';
 
 interface ReviewProps {
   data: AddFundsReviewData;
@@ -40,26 +64,38 @@ interface ReviewProps {
 }
 
 const FIXED_HANDOVER_DURATION = 2000;
-
 const APPROVE_TXN_ANIMATION = '/access_coins.riv';
-const EXECUTE_TXN_ANIMATION = '/purchasing_items.riv';
+const EXECUTE_TXN_ANIMATION = '/swapping_coins.riv';
+
+const dividerSx = {
+  content: "''",
+  pos: 'absolute',
+  left: 'base.spacing.x6',
+  w: '1px',
+  bg: 'base.color.translucent.standard.500',
+};
 
 export function Review({
   data,
   showBackButton = false,
-  onBackButtonClick, onCloseButtonClick,
+  onBackButtonClick,
+  onCloseButtonClick,
 }: ReviewProps) {
   const { viewDispatch } = useContext(ViewContext);
+  const { track, page } = useAnalytics();
   const {
-    addFundsState: {
-      squid, provider, chains, checkout, tokens,
-    },
+    addFundsState: { squid, chains, tokens },
   } = useContext(AddFundsContext);
 
+  const {
+    providersState: {
+      checkout, fromProvider, fromAddress, toAddress,
+    },
+  } = useProvidersContext();
+
   const [route, setRoute] = useState<RouteResponse | undefined>();
-  const [fromAddress, setFromAddress] = useState<string | undefined>();
-  const [getRouteIntervalId, setGetRouteIntervalId] = useState<NodeJS.Timer | undefined>();
   const [proceedDisabled, setProceedDisabled] = useState(true);
+  const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
 
   const { getAmountData, getRoute } = useRoutes();
   const { addHandover, closeHandover } = useHandover({
@@ -67,23 +103,38 @@ export function Review({
   });
 
   const {
-    convertToNetworkChangeableProvider, checkProviderChain, getAllowance, approve, execute,
+    convertToNetworkChangeableProvider,
+    checkProviderChain,
+    getAllowance,
+    approve,
+    execute,
   } = useExecute();
+
+  useEffect(() => {
+    page({
+      userJourney: UserJourney.SWAP,
+      screen: 'Review',
+      extras: {
+        toAmount: data.toAmount,
+        toChainId: data.toChainId,
+        toTokenAddress: data.toTokenAddress,
+      },
+    });
+  }, []);
 
   const getFromAmountAndRoute = async () => {
     if (!squid || !tokens) return;
 
-    const address = await provider?.getSigner().getAddress();
-
-    if (!address) return;
-    setFromAddress(address);
+    if (!fromAddress || !toAddress) return;
 
     const amountData = getAmountData(
       tokens,
       data.balance,
       data.toAmount,
       data.toChainId,
-      data.toTokenAddress === 'native' ? SQUID_NATIVE_TOKEN : data.toTokenAddress,
+      data.toTokenAddress === 'native'
+        ? SQUID_NATIVE_TOKEN
+        : data.toTokenAddress,
     );
 
     if (!amountData) return;
@@ -92,86 +143,114 @@ export function Review({
       squid,
       amountData?.fromToken,
       amountData?.toToken,
-      address,
+      toAddress,
       amountData.fromAmount,
-      address,
+      fromAddress,
       false,
     );
     setRoute(routeResponse);
     setProceedDisabled(false);
   };
 
+  const { fromChain, toChain } = useMemo(
+    () => getRouteChains(chains, route),
+    [chains, route],
+  );
+
+  const getRouteIntervalIdRef = useInterval(getFromAmountAndRoute, 20000);
   useEffect(() => {
-    (async () => {
-      await getFromAmountAndRoute();
-      const setIntervalId = setInterval(getFromAmountAndRoute, 20000);
-      setGetRouteIntervalId(setIntervalId);
-    })();
-    return () => {
-      if (getRouteIntervalId) {
-        clearInterval(getRouteIntervalId);
-      }
-    };
+    getFromAmountAndRoute();
   }, []);
 
-  const getChain = (chainId: string | undefined)
-  : Chain | undefined => chains?.find((chain) => chain.id === chainId);
-
-  const getFeeCosts = (): number => route?.route.estimate.feeCosts.reduce((acc, fee) => acc + Number(fee.amountUsd), 0)
-    ?? 0;
-
-  const getAmountInUSDText = (amount: string | undefined): string => (amount ? `USD $${amount}` : '');
-
-  const getAmountFormatted = (amount: string | undefined, decimals: number): string => {
-    if (!amount) {
-      return '0';
+  const { totalFees, totalFeesUsd } = useMemo(
+    () => getTotalRouteFees(route),
+    [route],
+  );
+  const routeFees = useMemo(() => {
+    if (totalFeesUsd) {
+      return (
+        <Body
+          onClick={() => setShowFeeBreakdown(true)}
+          size="small"
+          sx={{
+            ...hFlex,
+            alignItems: 'center',
+            c: 'base.color.text.body.secondary',
+            cursor: 'pointer',
+          }}
+        >
+          Included fees
+          {` USD $${getFormattedAmounts(totalFeesUsd)}`}
+          <Icon
+            icon="ChevronExpand"
+            sx={{ ml: 'base.spacing.x2', w: 'base.icon.size.200' }}
+          />
+        </Body>
+      );
     }
 
-    return utils.formatUnits(BigNumber.from(amount), decimals);
-  };
-
-  const getGasCostText = (): string => {
-    if (!route?.route.estimate.gasCosts || route?.route.estimate.gasCosts.length === 0) {
-      return '';
-    }
-    const totalGasFee = route?.route.estimate.gasCosts.reduce(
-      (acc, gas) => acc.add(BigNumber.from(gas.amount)),
-      BigNumber.from(0),
+    return (
+      <Body
+        size="small"
+        sx={{
+          ...hFlex,
+          alignItems: 'center',
+          c: 'base.color.text.body.secondary',
+        }}
+      >
+        {t('Zero fees')}
+      </Body>
     );
+  }, [totalFeesUsd]);
 
-    const formattedTotalGasFee = utils.formatUnits(totalGasFee, route?.route.estimate.gasCosts[0].token.decimals);
+  const showHandover = useCallback(
+    (
+      animationPath: string,
+      state: RiveStateMachineInput,
+      headingText: string,
+      subheadingText?: ReactNode,
+      duration?: number,
+    ) => {
+      addHandover({
+        animationUrl: getRemoteRive(
+          checkout?.config.environment,
+          animationPath,
+        ),
+        inputValue: state,
+        duration,
+        children: (
+          <HandoverContent
+            headingText={headingText}
+            subheadingText={subheadingText}
+          />
+        ),
+      });
+    },
+    [addHandover, checkout],
+  );
 
-    return `Gas Refuel +${route.route.estimate.gasCosts[0].token.name} ${formattedTotalGasFee}`;
-  };
-
-  const showHandover = (
-    animationPath: string,
-    state: RiveStateMachineInput,
-    headingText: string,
-    subheadingText?: ReactNode,
-    duration?: number,
-  ) => {
-    addHandover({
-      animationUrl: getRemoteRive(checkout?.config.environment, animationPath),
-      inputValue: state,
-      duration,
-      children: <HandoverContent headingText={headingText} subheadingText={subheadingText} />,
-    });
-  };
-
-  const handleTransaction = async () => {
-    if (!squid || !provider || !route) {
+  const handleTransaction = useCallback(async () => {
+    if (!squid || !fromProvider || !route) {
       return;
     }
 
     try {
-      clearInterval(getRouteIntervalId);
+      clearInterval(getRouteIntervalIdRef.current);
       setProceedDisabled(true);
 
-      showHandover(APPROVE_TXN_ANIMATION, RiveStateMachineInput.START, 'Preparing');
+      showHandover(
+        APPROVE_TXN_ANIMATION,
+        RiveStateMachineInput.START,
+        'Preparing',
+      );
 
-      const changeableProvider = await convertToNetworkChangeableProvider(provider);
-      await checkProviderChain(changeableProvider, route.route.params.fromChain);
+      const changeableProvider = await convertToNetworkChangeableProvider(
+        fromProvider,
+      );
+      await checkProviderChain(
+        changeableProvider,
+        route.route.params.fromChain,
+      );
 
       const allowance = await getAllowance(changeableProvider, route);
       const { fromAmount } = route.route.params;
@@ -203,32 +282,45 @@ export function Review({
       );
 
       const txReceipt = await execute(squid, changeableProvider, route);
+      track({
+        userJourney: UserJourney.ADD_FUNDS,
+        screen: 'FundsAdded',
+        action: 'Succeeded',
+        extras: {
+          txHash: txReceipt.transactionHash,
+        },
+      });
 
-      showHandover(APPROVE_TXN_ANIMATION, RiveStateMachineInput.PROCESSING, 'Processing', '', FIXED_HANDOVER_DURATION);
+      showHandover(
+        EXECUTE_TXN_ANIMATION,
+        RiveStateMachineInput.PROCESSING,
+        'Processing',
+        '',
+        FIXED_HANDOVER_DURATION,
+      );
 
       showHandover(
         EXECUTE_TXN_ANIMATION,
         RiveStateMachineInput.COMPLETED,
-        'Funds added successfully', (
-          <>
-            Go to
-            {' '}
-            <Link
-              size="small"
-              rc={(
-                <a
-                  target="_blank"
-                  href={`https://axelarscan.io/gmp/${txReceipt.transactionHash}`}
-                  rel="noreferrer"
-                />
+        'Funds added successfully',
+        <>
+          Go to
+          {' '}
+          <Link
+            size="small"
+            rc={(
+              <a
+                target="_blank"
+                href={`https://axelarscan.io/gmp/${txReceipt.transactionHash}`}
+                rel="noreferrer"
+              />
             )}
-            >
-              Axelarscan
-            </Link>
-            {' '}
-            for transaction details
-          </>
-        ),
+          >
+            Axelarscan
+          </Link>
+          {' '}
+          for transaction details
+        </>,
       );
     } catch (e) {
       closeHandover();
@@ -243,221 +335,343 @@ export function Review({
         },
       });
     }
-  };
+  }, [
+    route,
+    squid,
+    fromProvider,
+    getRouteIntervalIdRef,
+    approve,
+    showHandover,
+    checkProviderChain,
+    convertToNetworkChangeableProvider,
+    getAllowance,
+    execute,
+    closeHandover,
+    viewDispatch,
+  ]);
 
-  const onProceedClick = () => handleTransaction();
+  const formattedDuration = route
+    ? getDurationFormatted(route.route.estimate.estimatedRouteDuration)
+    : '';
 
   return (
     <SimpleLayout
       header={(
-        <HeaderNavigation
-          onCloseButtonClick={onCloseButtonClick}
-          showBack={showBackButton}
-          onBackButtonClick={onBackButtonClick}
-        />
+        <Stack
+          rc={<header />}
+          direction="row"
+          sx={{
+            pt: 'base.spacing.x4',
+            px: 'base.spacing.x5',
+            h: 'base.spacing.x18',
+            w: '100%',
+          }}
+          justifyContent="flex-start"
+        >
+          {showBackButton && (
+            <ButtCon
+              testId="backButton"
+              icon="ArrowBackward"
+              variant="tertiary"
+              size="small"
+              onClick={onBackButtonClick}
+            />
+          )}
+          <ButtCon
+            variant="tertiary"
+            size="small"
+            icon="Close"
+            onClick={onCloseButtonClick}
+            sx={{ ml: 'auto' }}
+          />
+        </Stack>
       )}
     >
-      {!route && <Heading>Loading...</Heading>}
-      {route && (
-        <Stack sx={{ w: '100%', flex: 1, p: 'base.spacing.x4' }} alignItems="stretch">
-          <Stack sx={{ minh: '60px' }} rc={<header />} justifyContent="center">
+      <Stack
+        sx={{
+          w: '100%',
+          flex: 1,
+          overflowY: 'auto',
+        }}
+        alignItems="stretch"
+        gap="base.spacing.x4"
+        testId="reviewContainer"
+      >
+        {!!route && (
+          <>
             <Heading weight="bold" sx={{ textAlign: 'center' }}>
               Review
             </Heading>
-          </Stack>
-          <Divider size="xSmall" sx={{ mb: 'base.spacing.x2' }} />
 
-          <Stack rc={<section />} direction="row" gap="base.spacing.x2">
-            <Stack>
-              <FramedImage
-                circularFrame
-                sx={{ w: 'base.icon.size.400' }}
-                use={<img src={route?.route.estimate.fromToken.logoURI} alt={route?.route.estimate.fromToken.name} />}
-              />
-            </Stack>
-            <Stack sx={{ flex: 1 }} gap="base.spacing.x1">
-              <Body>
-                Pay with
-                {' '}
-                {route?.route.estimate.fromToken.name}
-              </Body>
+            <Stack gap="0px">
               <Stack
                 direction="row"
+                sx={{ py: 'base.spacing.x5', px: 'base.spacing.x7' }}
+                gap="base.spacing.x6"
                 alignItems="center"
-                sx={{ c: 'base.color.text.body.secondary' }}
-                gap="base.spacing.x2"
               >
-                <FramedImage
-                  circularFrame
-                  sx={{ w: 'base.icon.size.200' }}
-                  use={(
-                    <img
-                      src={getChain(route?.route.estimate.fromToken.chainId)?.iconUrl}
-                      alt={getChain(route?.route.estimate.fromToken.chainId)?.name}
-                    />
-                  )}
-                />
-                <Body size="small" sx={{ c: 'base.color.text.body.secondary' }}>
-                  {getChain(route?.route.estimate.fromToken.chainId)?.name}
-                </Body>
-              </Stack>
-
-              <Stack
-                direction="row"
-                alignItems="center"
-                sx={{ c: 'base.color.text.body.secondary' }}
-                gap="base.spacing.x2"
-              >
-                <Icon icon="Wallet" sx={{ w: 'base.icon.size.200' }} />
-                <Body size="small" sx={{ c: 'inherit' }}>
-                  <EllipsizedText
-                    size="small"
-                    text={fromAddress ?? ''}
-                    sx={{ c: 'inherit' }}
+                <Sticker position={{ x: 'right', y: 'bottom' }}>
+                  <FramedImage
+                    use={(
+                      <img
+                        src={route.route.estimate.fromToken.logoURI}
+                        alt={route.route.estimate.fromToken.name}
+                      />
+                    )}
+                    circularFrame
+                    size="large"
                   />
-                </Body>
-              </Stack>
-
-              <Stack
-                direction="row"
-                alignItems="center"
-                sx={{ c: 'base.color.text.body.secondary' }}
-                gap="base.spacing.x2"
-              >
-                <FramedImage
-                  circularFrame
-                  sx={{ w: 'base.icon.size.200' }}
-                  use={(
-                    <img
-                      src={getChain(route?.route.estimate.fromToken.chainId)?.nativeCurrency.iconUrl}
-                      alt={getChain(route?.route.estimate.fromToken.chainId)?.nativeCurrency.name}
-                    />
-                  )}
-                />
-                <Body size="small" sx={{ c: 'inherit' }}>
-                  Includes Fees USD $
-                  {getFeeCosts()}
-                </Body>
-              </Stack>
-            </Stack>
-            <Stack>
-              <PriceDisplay
-                price={getAmountFormatted(route?.route.estimate.fromAmount, route?.route.estimate.fromToken.decimals)}
-                weight="bold"
-              >
-                <PriceDisplay.Caption sx={{ mt: 'base.spacing.x1' }}>
-                  {getAmountInUSDText(route?.route.estimate.fromAmountUSD)}
-                </PriceDisplay.Caption>
-              </PriceDisplay>
-            </Stack>
-          </Stack>
-
-          <Divider
-            size="xSmall"
-            sx={{
-              my: 'base.spacing.x2',
-            }}
-          />
-
-          <Stack rc={<section />} direction="row" gap="base.spacing.x2">
-            <Stack>
-              <FramedImage
-                circularFrame
-                sx={{ w: 'base.icon.size.400' }}
-                use={<img src={route?.route.estimate.toToken.logoURI} alt={route?.route.estimate.toToken.name} />}
-              />
-            </Stack>
-            <Stack sx={{ flex: 1 }} gap="base.spacing.x1">
-              <Body>
-                Deliver
-                {' '}
-                {route?.route.estimate.toToken.name}
-              </Body>
-              <Stack
-                direction="row"
-                alignItems="center"
-                sx={{ c: 'base.color.text.body.secondary' }}
-                gap="base.spacing.x2"
-              >
-                <FramedImage
-                  sx={{ w: 'base.icon.size.200' }}
-                  use={(
-                    <img
-                      src={getChain(route?.route.estimate.toToken.chainId)?.iconUrl}
-                      alt={getChain(route?.route.estimate.toToken.chainId)?.name}
-                    />
-                  )}
-                />
-                <Body size="small" sx={{ c: 'base.color.text.body.secondary' }}>
-                  {getChain(route?.route.estimate.toToken.chainId)?.name}
-                </Body>
-              </Stack>
-
-              <Stack
-                direction="row"
-                alignItems="center"
-                sx={{ c: 'base.color.text.body.secondary' }}
-                gap="base.spacing.x2"
-              >
-                <Icon icon="Wallet" />
-                <Body size="small" sx={{ c: 'inherit' }}>
-                  <EllipsizedText
-                    size="small"
-                    text={fromAddress ?? ''}
-                    sx={{ c: 'inherit' }}
+                  <Sticker.FramedImage
+                    use={<img src={fromChain?.iconUrl} alt={fromChain?.name} />}
+                    emphasized
+                    sx={{
+                      bottom: 'base.spacing.x2',
+                      right: 'base.spacing.x2',
+                    }}
                   />
-                </Body>
+                </Sticker>
+                <Stack sx={{ flex: 1 }} gap="0px">
+                  <Body weight="bold">
+                    Send
+                    {' '}
+                    {route.route.estimate.fromToken.name}
+                  </Body>
+                  <Body
+                    size="small"
+                    sx={{ c: 'base.color.text.body.secondary' }}
+                  >
+                    {fromChain?.name}
+                    <EllipsizedText
+                      text={fromAddress ?? ''}
+                      sx={{
+                        d: 'block',
+                        fontSize: 'inherit',
+                        lineHeight: 'inherit',
+                        c: 'inherit',
+                      }}
+                    />
+                  </Body>
+                </Stack>
+                <PriceDisplay
+                  price={getFormattedNumber(
+                    route.route.estimate.fromAmount,
+                    route.route.estimate.fromToken.decimals,
+                  )}
+                  sx={{ flexShrink: 0, alignSelf: 'flex-start' }}
+                >
+                  <PriceDisplay.Caption size="small">
+                    {`USD $${route?.route.estimate.fromAmountUSD ?? ''}`}
+                  </PriceDisplay.Caption>
+                </PriceDisplay>
               </Stack>
+              {/*
+
+          */}
+              <Stack
+                sx={{
+                  pos: 'relative',
+                  w: 'base.spacing.x16',
+                  ml: 'base.spacing.x7',
+
+                  // eslint-disable-next-line @typescript-eslint/naming-convention
+                  '&::before': {
+                    ...dividerSx,
+                    top: '-14px',
+                    h: 'base.spacing.x10',
+                  },
+                }}
+              />
+              {/*
+
+          */}
               <Stack
                 direction="row"
+                sx={{ py: 'base.spacing.x5', px: 'base.spacing.x7' }}
+                gap="base.spacing.x6"
                 alignItems="center"
-                sx={{ c: 'base.color.text.body.secondary' }}
-                gap="base.spacing.x2"
               >
-                <Icon icon="AirDrop" />
-                <Body size="small" sx={{ c: 'inherit' }}>
-                  {getGasCostText()}
+                <Stack
+                  direction="row"
+                  sx={{ w: 'base.spacing.x12' }}
+                  justifyContent="center"
+                >
+                  <FramedImage use={<SquidIcon />} size="medium" padded />
+                </Stack>
+                <Stack sx={{ flex: 1 }} gap="0px">
+                  <Body weight="bold">
+                    Swap
+                    {' '}
+                    {route.route.estimate.fromToken.name}
+                    {' '}
+                    to
+                    {' '}
+                    {route.route.estimate.toToken.name}
+                  </Body>
+                  <Body
+                    size="small"
+                    sx={{ c: 'base.color.text.body.secondary' }}
+                  >
+                    Powered by Squid
+                    <br />
+                    1
+                    {route.route.estimate.fromToken.name}
+                    {' '}
+                    =
+                    {' '}
+                    {route.route.estimate.exchangeRate}
+                    {' '}
+                    {route.route.estimate.toToken.name}
+                  </Body>
+                </Stack>
+              </Stack>
+              {/*
+
+            */}
+              <Stack
+                sx={{
+                  pos: 'relative',
+                  w: 'base.spacing.x16',
+                  ml: 'base.spacing.x7',
+
+                  // eslint-disable-next-line @typescript-eslint/naming-convention
+                  '&::before': {
+                    ...dividerSx,
+                    top: '-26px',
+                    h: 'base.spacing.x10',
+                  },
+                }}
+              />
+              {/*
+
+          */}
+              <Stack
+                direction="row"
+                sx={{ py: 'base.spacing.x5', px: 'base.spacing.x7' }}
+                gap="base.spacing.x6"
+                alignItems="center"
+              >
+                <Sticker position={{ x: 'right', y: 'bottom' }}>
+                  <FramedImage
+                    use={(
+                      <img
+                        src={toChain?.nativeCurrency.iconUrl}
+                        alt={toChain?.nativeCurrency.name}
+                      />
+                    )}
+                    circularFrame
+                    size="large"
+                  />
+                  <Sticker.FramedImage
+                    use={<img src={toChain?.iconUrl} alt={toChain?.name} />}
+                    emphasized
+                    sx={{
+                      bottom: 'base.spacing.x2',
+                      right: 'base.spacing.x2',
+                    }}
+                  />
+                </Sticker>
+                <Stack sx={{ flex: 1 }} gap="0px">
+                  <Body weight="bold">
+                    Receive
+                    {' '}
+                    {route?.route.estimate.toToken.name}
+                  </Body>
+                  <Body
+                    size="small"
+                    sx={{ c: 'base.color.text.body.secondary' }}
+                  >
+                    {toChain?.name}
+                    <EllipsizedText
+                      text={toAddress ?? ''}
+                      sx={{
+                        d: 'block',
+                        fontSize: 'inherit',
+                        lineHeight: 'inherit',
+                        c: 'inherit',
+                      }}
+                    />
+                  </Body>
+                </Stack>
+                <PriceDisplay
+                  price={getFormattedNumber(
+                    route?.route.estimate.toAmount,
+                    route?.route.estimate.toToken.decimals,
+                  )}
+                  sx={{ flexShrink: 0, alignSelf: 'flex-start' }}
+                >
+                  <PriceDisplay.Caption size="small">
+                    {`USD $${route?.route.estimate.toAmountUSD ?? ''}`}
+                  </PriceDisplay.Caption>
+                </PriceDisplay>
+              </Stack>
+              {/*
+
+            */}
+              <Stack
+                sx={{
+                  pos: 'relative',
+                  w: 'base.spacing.x16',
+                  ml: 'base.spacing.x7',
+
+                  // eslint-disable-next-line @typescript-eslint/naming-convention
+                  '&::before': {
+                    ...dividerSx,
+                    top: '-8px',
+                    h: 'base.spacing.x5',
+                  },
+                }}
+              />
+              {/*
+
+            */}
+              <Stack
+                direction="row"
+                gap="base.spacing.x6"
+                sx={{ py: 'base.spacing.x5', px: 'base.spacing.x7' }}
+                alignItems="center"
+              >
+                <Stack
+                  direction="row"
+                  sx={{ w: 'base.spacing.x12' }}
+                  justifyContent="center"
+                >
+                  <FramedIcon
+                    icon="Countdown"
+                    variant="bold"
+                    size="medium"
+                    circularFrame
+                  />
+                </Stack>
+                <Body
+                  size="small"
+                  sx={{ flex: 1, c: 'base.color.text.body.secondary' }}
+                >
+                  {formattedDuration}
                 </Body>
+                {routeFees}
               </Stack>
             </Stack>
-            <Stack>
-              <PriceDisplay
-                price={getAmountFormatted(route?.route.estimate.toAmount, route?.route.estimate.toToken.decimals)}
-                weight="bold"
-              >
-                <PriceDisplay.Caption sx={{ mt: 'base.spacing.x1' }}>
-                  {getAmountInUSDText(route?.route.estimate.toAmountUSD)}
-                </PriceDisplay.Caption>
-              </PriceDisplay>
-            </Stack>
-          </Stack>
-          <Divider
-            size="xSmall"
-            sx={{
-              my: 'base.spacing.x2',
-            }}
-          />
 
-          <Body
-            sx={{
-              ...hFlex,
-              ...centerFlexChildren,
-              gap: 'base.spacing.x2',
-              m: 'base.spacing.x4',
-              c: 'base.color.text.body.secondary',
-            }}
-            size="small"
-          >
-            <SquidIcon />
-            Powered by Squid
-          </Body>
+            <Button
+              size="large"
+              onClick={handleTransaction}
+              disabled={proceedDisabled}
+              sx={{ mt: 'auto', mb: 'base.spacing.x4', mx: 'base.spacing.x3' }}
+            >
+              {proceedDisabled ? 'Processing' : 'Proceed'}
+            </Button>
+          </>
+        )}
 
-          <Button size="large" onClick={onProceedClick} disabled={proceedDisabled}>
-            {proceedDisabled ? 'Processing'
-              : 'Proceed'}
-          </Button>
-        </Stack>
-      )}
+        {!route && <LoadingView loadingText="Securing quote" />}
+      </Stack>
+      <RouteFees
+        routeData={route}
+        visible={showFeeBreakdown}
+        onClose={() => setShowFeeBreakdown(false)}
+        totalAmount={totalFees}
+        totalFiatAmount={totalFeesUsd}
+      />
     </SimpleLayout>
   );
 }

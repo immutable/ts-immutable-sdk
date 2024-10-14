@@ -16,7 +16,7 @@
   "dependencies": {
     "@0xsquid/sdk": "^2.8.25",
     "@biom3/design-tokens": "^0.4.4",
-    "@biom3/react": "^0.27.10",
+    "@biom3/react": "^0.27.12",
     "@ethersproject/bignumber": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/bridge-sdk": "0.0.0",
@@ -104,6 +104,7 @@
     "build": "yarn clean && NODE_ENV=production rollup --config rollup.config.js",
     "build:analyse": "yarn build --plugin visualizer",
     "build:local": "yarn clean && yarn build && mkdir -p ../widgets-sample-app/public/lib/js && cp dist/*.js ../widgets-sample-app/public/lib/js/",
+    "prepare:examplewidgets": "yarn workspace @examples/sdk-load-widgets-with-nextjs exec mkdir -p tests/utils/local-widgets-js/ && cp $(yarn workspace @imtbl/sdk exec pwd)/dist/browser/checkout/*.js $(yarn workspace @examples/sdk-load-widgets-with-nextjs exec pwd)/tests/utils/local-widgets-js/",
     "clean": "rimraf ./dist",
     "d": "rollup --config rollup.config.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
