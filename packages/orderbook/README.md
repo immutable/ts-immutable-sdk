@@ -1,138 +1,71 @@
-# Order Book
-
-## Table of Contents
-
-- [Pre-requisites](#pre-requisites)
-- [Quick Start Guide](#quick-start-guide)
-- [Demo Scripts](#demo-scripts)
-- [About](#about)
-
-### Pre-requisites
-
-Install dependencies for the workspace
-
-```bash
-yarn install
-```
-
-### Quick Start Guide
-
-All commands below need to be run in the context of the `orderbook` package where this README is located. Read more about context [here](../../README.md#context).
-
-Running in `dev` mode:
-
-```bash
-yarn dev
-```
-
-Building to `./dist` directory with javascript output:
-
-```bash
-yarn build
-```
-
-Running all orderbook demos (these rely on the `.env` file explained in the [demo script section](#demo-scripts)):
-
-```bash
-yarn run:demo
-```
-
-Running the orderbook expiry demo (this relies on the `.env` file explained in the [demo script section](#demo-scripts)):
-
-```bash
-yarn run:demo-expiry
-```
-
-Running the orderbook order fulfillment demo (this relies on the `.env` file explained in the [demo script section](#demo-scripts)):
-
-```bash
-yarn run:demo-fulfill
-```
-
-Running the orderbook bulk orders fulfillment demo (this relies on the `.env` file explained in the [demo script section](#demo-scripts)):
-
-```bash
-yarn run:demo-fulfill-bulk
-```
-
-Running all tests:
-
-```bash
-yarn test
-```
-
-Running changed tests in watch mode:
-
-```bash
-yarn test:watch
-```
-
-Running E2E tests (these rely on the `.env` file explained in the [demo script section](#demo-scripts)):
-
-```bash
-yarn test:e2e
-```
-
-Linting:
-
-```bash
-yarn lint
-```
-
-Linting and attempting to auto-fix issues:
-
-```bash
-yarn lint:fix
-```
-
-Typechecking:
-
-```bash
-yarn typecheck
-```
-
-Generating types from the `./abi/*.json` files to `./src/typechain/types`:
-
-```bash
-yarn generate-types
-```
-
-### Demo Scripts
-
-The demo scripts and e2e test scripts mentioned above rely on an `.env` file that specifies the following properties:
-
-```bash
-ACCOUNT_1=
-ACCOUNT_2=
-RPC_ENDPOINT=
-ORDERBOOK_MR_API_URL=
-SEAPORT_CONTRACT_ADDRESS=
-ZONE_CONTRACT_ADDRESS=
-```
-
-* ACCOUNT_1 and ACCOUNT_2 are private keys for funded accounts to be used in the demo scripts
-* RPC_ENDPOINT is the target zkEVM environment's RPC URL
-* ORDERBOOK_MR_API_URL is the exposed URL for the API
-* SEAPORT_CONTRACT_ADDRESS and ZONE_CONTRACT_ADDRESS depend on the address of the deployed contracts
-
-An example `.env.example` file is provided in the root of the `orderbook` package, where this README is located, that can be used as a baseline for creating the `.env` file.
-
-### About
+# About
 
 This package contains the Typescript SDK for the zkEVM Order Book. It is used to interact with the zkEVM Order Book API and provides a number of methods for placing, fulfilling and cancelling listings. The SDK is initialized with a configuration object that specifies the target environment and other necessary parameters.
+
+[Read more about the Orderbook package in our docs here](https://docs.immutable.com/products/zkevm/orderbook/)
+
+# Table of Contents
+
+- [Usage](#usage)
+- [Installation](#installation)
+  - [Individual Package Installation](#individual-package-installation)
+  - [SDK Installation](#sdk-installation)
+    - [Conditional Exports](#conditional-exports)
+    - [Direct Imports](#direct-imports)
+
+# Usage
 
 Initializing the SDK can be achieved by specifying the target environment in the constructor:
 
 ```typescript
-new Orderbook({
+import { Orderbook } from '@imtbl/orderbook';
+import { Environment } from '@imtbl/config';
+
+const orderbook = new Orderbook({
   baseConfig: {
     environment: Environment.SANDBOX,
   },
 })
 ```
 
-The `*.demo.ts` and `*.e2e.ts` files in the `./test` folder have a number of practical examples of how the SDK is used for placing, fulfilling and cancelling listings and can be used as a point of reference. 
+You can find example usages of this package in the examples set up [here](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook)
 
-All content in src/openapi/sdk is auto-generated.
+# Installation
 
-[Read more about the orderbook package here](../../README.md#orderbook)
+## Individual Package Installation
+
+To install this package, run the following command:
+
+```sh
+npm add @imtbl/orderbook
+# or
+yarn add @imtbl/orderbook
+# or
+pnpm add @imtbl/orderbook
+```
+
+## SDK Installation
+
+This package is also included within the [`@imtbl/sdk` NPM package](https://www.npmjs.com/package/@imtbl/sdk) and can be re-exported directly from there.
+
+### Conditional Exports
+
+If your environment supports conditional exports, you can import the contents of this package directly from the `@imtbl/sdk` package using the `@imtbl/sdk/orderbook` import path like so:
+
+```ts
+import { Orderbook } from '@imtbl/sdk/orderbook';
+```
+
+This is the recommended way of consuming this package, as it allows for better tree-shaking and smaller bundle sizes.
+
+### Direct Imports
+
+If your environment does not support conditional exports, you will need to import the contents of this package directly from the `@imtbl/sdk` package like so:
+
+```ts
+import { orderbook } from '@imtbl/sdk';
+
+const { Orderbook } = orderbook;
+```
+
+However this method will result in a larger bundle size as the entire `@imtbl/orderbook` package will be included in your bundle.

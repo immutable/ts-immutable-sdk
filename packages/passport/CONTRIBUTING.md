@@ -2,86 +2,22 @@
 
 ## Table of Contents
 
-- [Pre-requisites](#pre-requisites)
 - [Quick Start Guide](#quick-start-guide)
-- [About](#about)
 - [Sample App Usage](#sample-app-usage)
   - [IMX workflows](#imx-workflows)
   - [ZkEvm workflows](#zkevm-workflows)
   - [Logging out](#logging-out)
 
-### Pre-requisites
-
-Install dependencies for the workspace
-
-```bash
-yarn install
-```
-
 ### Quick Start Guide
 
 All commands below need to be run in the context of the `passport` package in the `./sdk` folder unless specified otherwise. Read more about context [here](../../README.md#context).
 
-Running in `dev` mode:
-
-```bash
-yarn dev
-```
-
 Running the Passport SDK Sample App with the Passport SDK supporting hot reloading:
 
 ```bash
-# Run dev mode at root
-yarn dev @imtbl/passport
-
-# Run the Passport SDK Sample App in a new terminal
 # Context: passport-sdk-sample-app in ./sdk-sample-app
-yarn dev
-
-# Alternatively, you can run both commands in one terminal via the below concurrent yarn script
-# Context: passport-sdk-sample-app in ./sdk-sample-app
-yarn dev-with-sdk
+pnpm dev-with-sdk
 ```
-
-Building to the `./sdk/dist` directory:
-
-```bash
-yarn build
-```
-
-Running all jest tests:
-
-```bash
-yarn test
-```
-
-Running changed tests on save in watch mode:
-
-```bash
-yarn test:watch
-```
-
-Linting:
-
-```bash
-yarn lint
-```
-
-Typechecking:
-
-```bash
-yarn typecheck
-```
-
-### About
-
-Passport is a blockchain-based identity and wallet system that caters to the needs of Web3 games. It offers a persistent identity that accompanies users across Web3 games, ensuring a consistent configuration across all applications.
-
-Passport also comes equipped with a non-custodial wallet as a default option for each user, ensuring a transaction experience comparable to web2 standards.
-
-The Passport sample application is a simple NextJS web app that provides a basic UI for many of the features in the Passport SDK. It can also be used to locally test any changes to the SDK.
-
-[Read more about the Passport SDK here](../../README.md#passport)
 
 ### Sample App Usage
 

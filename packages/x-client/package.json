@@ -62,6 +62,7 @@
     "d": "tsup --config ../../tsup.base.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest",
+    "test:watch": "jest --watch",
     "typecheck": "tsc --customConditions default --noEmit --jsx preserve"
   },
   "type": "module"
