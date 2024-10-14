@@ -49,14 +49,17 @@ export const useError = (environment: Environment) => {
   };
 
   const errorConfig: Record<AddFundsErrorTypes, ErrorConfig> = {
-    [AddFundsErrorTypes.WALLET_REJECTED]: {
-      headingText: 'Transaction rejected',
-      subHeadingText: 'The transaction was rejected. Please try again.',
-      primaryButtonText: 'Retry',
-      onPrimaryButtonClick: goBackToAddFundsView,
+    [AddFundsErrorTypes.DEFAULT]: {
+      headingText: 'Unknown error',
+      subHeadingText: 'An unknown error occurred. Please try again later.',
       secondaryButtonText: 'Close',
       onSecondaryButtonClick: closeWidget,
-
+    },
+    [AddFundsErrorTypes.INVALID_PARAMETERS]: {
+      headingText: 'Invalid parameters',
+      subHeadingText: 'The parameters provided are invalid. Please check again.',
+      secondaryButtonText: 'Close',
+      onSecondaryButtonClick: closeWidget,
     },
     [AddFundsErrorTypes.SERVICE_BREAKDOWN]: {
       headingText: 'Our system is currently down',
@@ -72,13 +75,21 @@ export const useError = (environment: Environment) => {
       secondaryButtonText: 'Close',
       onSecondaryButtonClick: closeWidget,
     },
-    [AddFundsErrorTypes.WALLET_POPUP_BLOCKED]: {
-      headingText: "Browser's popup blocked",
-      subHeadingText: 'Please enable popups in your browser to proceed.',
+    [AddFundsErrorTypes.WALLET_FAILED]: {
+      headingText: 'Transaction failed',
+      subHeadingText: 'The transaction failed. Please try again.',
       primaryButtonText: 'Retry',
       onPrimaryButtonClick: goBackToAddFundsView,
       secondaryButtonText: 'Close',
       onSecondaryButtonClick: goBackToAddFundsView,
+    },
+    [AddFundsErrorTypes.WALLET_REJECTED]: {
+      headingText: 'Transaction rejected',
+      subHeadingText: 'The transaction was rejected. Please try again.',
+      primaryButtonText: 'Retry',
+      onPrimaryButtonClick: goBackToAddFundsView,
+      secondaryButtonText: 'Close',
+      onSecondaryButtonClick: closeWidget,
     },
     [AddFundsErrorTypes.WALLET_REJECTED_NO_FUNDS]: {
       headingText: 'Insufficient funds',
@@ -88,25 +99,13 @@ export const useError = (environment: Environment) => {
       secondaryButtonText: 'Close',
       onSecondaryButtonClick: closeWidget,
     },
-    [AddFundsErrorTypes.WALLET_FAILED]: {
-      headingText: 'Transaction failed',
-      subHeadingText: 'The transaction failed. Please try again.',
+    [AddFundsErrorTypes.WALLET_POPUP_BLOCKED]: {
+      headingText: "Browser's popup blocked",
+      subHeadingText: 'Please enable popups in your browser to proceed.',
       primaryButtonText: 'Retry',
       onPrimaryButtonClick: goBackToAddFundsView,
       secondaryButtonText: 'Close',
       onSecondaryButtonClick: goBackToAddFundsView,
-    },
-    [AddFundsErrorTypes.DEFAULT]: {
-      headingText: 'Unknown error',
-      subHeadingText: 'An unknown error occurred. Please try again later.',
-      secondaryButtonText: 'Close',
-      onSecondaryButtonClick: closeWidget,
-    },
-    [AddFundsErrorTypes.INVALID_PARAMETERS]: {
-      headingText: 'Invalid parameters',
-      subHeadingText: 'The parameters provided are invalid. Please check again.',
-      secondaryButtonText: 'Close',
-      onSecondaryButtonClick: closeWidget,
     },
   };
 
