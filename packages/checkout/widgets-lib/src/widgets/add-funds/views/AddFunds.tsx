@@ -42,7 +42,6 @@ import { useRoutes } from '../hooks/useRoutes';
 import { SQUID_NATIVE_TOKEN } from '../utils/config';
 import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
 import type { RouteData } from '../types';
-import { OnboardingDrawer } from '../components/OnboardingDrawer/OnboardingDrawer';
 import { convertToUsd } from '../functions/convertToUsd';
 import { validateToAmount } from '../functions/amountValidation';
 
@@ -316,7 +315,6 @@ export function AddFunds({
 
   return (
     <SimpleLayout
-      containerSx={{ bg: 'transparent' }}
       header={(
         <Stack
           direction="row"
@@ -392,13 +390,7 @@ export function AddFunds({
           {showInitialEmptyState ? (
             <Body>Add Token</Body>
           ) : (
-            <HeroFormControl
-              validationStatus={
-                validateToAmount(inputValue) || inputValue === ''
-                  ? 'success'
-                  : 'error'
-              }
-            >
+            <HeroFormControl validationStatus={validateToAmount(inputValue) || inputValue === '' ? 'success' : 'error'}>
               <HeroFormControl.Label>
                 Add
                 {' '}
@@ -496,8 +488,6 @@ export function AddFunds({
             onCardClick={onCardClick}
             onRouteClick={onRouteClick}
           />
-
-          <OnboardingDrawer />
         </Stack>
       </Stack>
     </SimpleLayout>
