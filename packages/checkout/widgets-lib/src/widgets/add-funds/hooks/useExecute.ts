@@ -11,9 +11,7 @@ export const useExecute = (environment: Environment) => {
   const { showErrorHandover } = useError(environment);
 
   const handleTransactionError = (err: unknown) => {
-    const reason = `${
-      (err as any)?.reason || (err as any)?.message || ''
-    }`.toLowerCase();
+    const reason = `${(err as any)?.reason || (err as any)?.message || ''}`.toLowerCase();
 
     let errorType = AddFundsErrorTypes.WALLET_FAILED;
 
