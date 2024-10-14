@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { AddFundsWidgetParams } from '@imtbl/checkout-sdk';
 
 import { Stack, CloudImage } from '@biom3/react';
+import { Environment } from '@imtbl/config';
 import { sendAddFundsCloseEvent } from './AddFundsWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import {
@@ -37,6 +38,10 @@ import { useProvidersContext } from '../../context/providers-context/ProvidersCo
 import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 import { ServiceType } from '../../views/error/serviceTypes';
 import { getRemoteImage } from '../../lib/utils';
+import { isValidAddress } from '../../lib/validations/widgetValidators';
+import { amountInputValidation } from '../../lib/validations/amountInputValidations';
+import { useError } from './hooks/useError';
+import { AddFundsErrorTypes } from './types';
 
 export type AddFundsWidgetInputs = AddFundsWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
@@ -90,6 +95,16 @@ export default function AddFundsWidget({
 
   const squidSdk = useSquid(checkout);
   const tokensResponse = useTokens(checkout);
+  const { showErrorHandover } = useError(checkout.config.environment ?? Environment.SANDBOX);
+
+  useEffect(() => {
+    const isInvalidToTokenAddress = toTokenAddress && !isValidAddress(toTokenAddress);
+    const isInvalidToAmount = toAmount && !amountInputValidation(toAmount);
+
+    if (isInvalidToTokenAddress || isInvalidToAmount) {
+      showErrorHandover(AddFundsErrorTypes.INVALID_PARAMETERS);
+    }
+  }, [toTokenAddress, toAmount]);
 
   useEffect(() => {
     (async () => {
