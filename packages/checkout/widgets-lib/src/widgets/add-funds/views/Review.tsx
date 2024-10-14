@@ -247,12 +247,12 @@ export function Review({
       fromProvider,
     );
 
-    const validNetwork = await checkProviderChain(
+    const isValidNetwork = await checkProviderChain(
       changeableProvider,
       route.route.params.fromChain,
     );
 
-    if (!validNetwork) {
+    if (!isValidNetwork) {
       return;
     }
 
