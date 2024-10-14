@@ -259,7 +259,8 @@ export function AddFunds({
   }, []);
 
   useEffect(() => {
-    setSelectedAmount(toAmount || '');
+    if (!toAmount) return;
+    setSelectedAmount(toAmount);
   }, [toAmount]);
 
   useEffect(() => {
@@ -275,7 +276,13 @@ export function AddFunds({
 
     (async () => {
       const isValidAmount = validateToAmount(selectedAmount).isValid;
-      if (balances && squid && tokens && selectedToken?.address && isValidAmount) {
+      if (
+        balances
+        && squid
+        && tokens
+        && selectedToken?.address
+        && isValidAmount
+      ) {
         setFetchingRoutes(true);
         const availableRoutes = await fetchRoutesWithRateLimit(
           squid,
@@ -398,9 +405,7 @@ export function AddFunds({
   };
 
   const handleReviewClick = () => {
-    if (!selectedAmount || !selectedToken?.address || !selectedRouteData) {
-      return;
-    }
+    if (!selectedRouteData || !selectedToken?.address) return;
 
     track({
       userJourney: UserJourney.ADD_FUNDS,
@@ -479,7 +484,9 @@ export function AddFunds({
   );
 
   const shouldShowBackButton = showBackButton ?? !!onBackButtonClick;
-  const routeInputsReady = !!selectedToken && parseFloat(inputValue) > 0 && !!fromAddress;
+  const routeInputsReady = !!selectedToken
+    && !!fromAddress
+    && validateToAmount(selectedAmount).isValid;
   const loading = (routeInputsReady || fetchingRoutes)
     && !(selectedRouteData || insufficientBalance);
   const readyToReview = routeInputsReady && !!toAddress && !!selectedRouteData && !loading;

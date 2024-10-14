@@ -41,7 +41,10 @@ import { HandoverTarget } from '../../../context/handover-context/HandoverContex
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
 import { getRemoteRive } from '../../../lib/utils';
 import { SQUID_NATIVE_TOKEN } from '../utils/config';
-import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import {
+  useAnalytics,
+  UserJourney,
+} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { getDurationFormatted } from '../functions/getDurationFormatted';
@@ -49,8 +52,8 @@ import { RouteFees } from '../components/RouteFees';
 import { getTotalRouteFees } from '../functions/getTotalRouteFees';
 import { getRouteChains } from '../functions/getRouteChains';
 import {
-  getFormattedNumber,
   getFormattedAmounts,
+  getFormattedNumber,
 } from '../functions/getFormattedNumber';
 
 interface ReviewProps {
@@ -107,6 +110,18 @@ export function Review({
     execute,
   } = useExecute();
 
+  useEffect(() => {
+    page({
+      userJourney: UserJourney.SWAP,
+      screen: 'Review',
+      extras: {
+        toAmount: data.toAmount,
+        toChainId: data.toChainId,
+        toTokenAddress: data.toTokenAddress,
+      },
+    });
+  }, []);
+
   const getFromAmountAndRoute = async () => {
     if (!squid || !tokens) return;
 
@@ -143,18 +158,6 @@ export function Review({
   );
 
   const getRouteIntervalIdRef = useInterval(getFromAmountAndRoute, 20000);
-  useEffect(() => {
-    page({
-      userJourney: UserJourney.SWAP,
-      screen: 'Review',
-      extras: {
-        toAmount: data.toAmount,
-        toChainId: data.toChainId,
-        toTokenAddress: data.toTokenAddress,
-      },
-    });
-  }, []);
-
   useEffect(() => {
     getFromAmountAndRoute();
   }, []);
