@@ -1,115 +1,145 @@
 import {
+  Badge,
+  Body,
+  centerFlexChildren,
+  hFlex,
   Icon,
-  MenuItem, MenuItemSize, Sticker,
+  MenuItem,
+  MenuItemSize,
+  Stack,
+  Sticker,
 } from '@biom3/react';
 import { ReactElement, useMemo } from 'react';
-import { ethers } from 'ethers';
 import { Chain, RouteData } from '../types';
+import { getDurationFormatted } from '../functions/getDurationFormatted';
+import { getTotalRouteFees } from '../functions/getTotalRouteFees';
+import { getFormattedAmounts } from '../functions/getFormattedNumber';
+import { getRouteAndTokenBalances } from '../functions/getRouteAndTokenBalances';
 
-export interface RouteOptionProps<RC extends ReactElement | undefined = undefined> {
-  route: RouteData;
+export interface RouteOptionProps<
+  RC extends ReactElement | undefined = undefined,
+> {
+  routeData: RouteData;
+  chains: Chain[] | null;
   onClick: (route: RouteData) => void;
-  chain?: Chain;
-  usdBalance?: string;
   disabled?: boolean;
   isFastest?: boolean;
   size?: MenuItemSize;
   rc?: RC;
+  selected?: boolean;
 }
 
 export function RouteOption<RC extends ReactElement | undefined = undefined>({
-  route,
+  routeData,
   onClick,
-  chain,
-  usdBalance,
+  chains,
   disabled = false,
   isFastest = false,
-  size,
+  size = 'small',
   rc = <span />,
+  selected = false,
 }: RouteOptionProps<RC>) {
-  const { fromToken } = route.amountData;
+  const { fromToken } = routeData.amountData;
+  const { estimate } = routeData.route.route;
 
-  const { estimate } = route.route.route;
+  const chain = chains?.find((c) => c.id === fromToken.chainId);
 
-  const formattedFromAmount = useMemo(() => Number(ethers.utils.formatUnits(
-    estimate.fromAmount,
-    estimate.fromToken.decimals,
-  )).toFixed(4), [estimate.fromAmount, estimate.fromToken.decimals]);
+  const estimatedDurationFormatted = getDurationFormatted(
+    estimate.estimatedRouteDuration,
+  );
 
-  const formattedUsdBalance = useMemo(() => (usdBalance ? Number(usdBalance).toFixed(2) : undefined), [usdBalance]);
+  const { totalFeesUsd } = useMemo(
+    () => getTotalRouteFees(routeData.route),
+    [routeData],
+  );
 
-  const estimatedDurationFormatted = useMemo(() => {
-    const seconds = estimate.estimatedRouteDuration;
-    if (seconds >= 60) {
-      const minutes = Math.round(seconds / 60);
-      return minutes === 1 ? '1 min' : `${minutes} mins`;
-    }
-    return `${seconds.toFixed(0)}s`;
-  }, [estimate.estimatedRouteDuration]);
+  const { routeBalanceUsd, fromAmount, fromAmountUsd } = useMemo(
+    () => getRouteAndTokenBalances(routeData),
+    [routeData],
+  );
 
   const handleClick = () => {
-    onClick(route);
+    onClick(routeData);
   };
 
   const menuItemProps = {
+    selected,
     disabled,
     emphasized: true,
+    rc,
+    size,
     onClick: disabled ? undefined : handleClick,
   };
 
   return (
-    <MenuItem
-      rc={rc}
-      size={size || 'medium'}
-      sx={{
-        marginBottom: 'base.spacing.x1',
-        userSelect: 'none',
-        ...(disabled && {
-          filter: 'opacity(0.5)',
-          cursor: 'not-allowed !important',
-        }),
-      }}
-      {...menuItemProps}
-    >
-      <MenuItem.Label weight="bold">{fromToken.name}</MenuItem.Label>
-
-      {formattedUsdBalance && (
-      <MenuItem.Caption>
-        {`Balance: $${formattedUsdBalance}`}
-      </MenuItem.Caption>
-      )}
+    <MenuItem {...menuItemProps}>
+      <MenuItem.Label>{fromToken.name}</MenuItem.Label>
 
       {chain && (
-      <Sticker position={{ x: 'right', y: 'bottom' }}>
-        <Sticker.FramedImage
-          use={<img src={chain.iconUrl} alt={chain.name} />}
-          sx={{ w: 'base.icon.size.200' }}
-        />
+        <Sticker position={{ x: 'right', y: 'bottom' }}>
+          <Sticker.FramedImage
+            use={<img src={chain.iconUrl} alt={chain.name} />}
+            size="xSmall"
+          />
 
-        <MenuItem.FramedImage
-          use={<img src={fromToken.iconUrl} alt={fromToken.name} />}
-        />
-      </Sticker>
+          <MenuItem.FramedImage
+            circularFrame
+            padded
+            use={<img src={fromToken.iconUrl} alt={fromToken.name} />}
+          />
+        </Sticker>
       )}
 
-      {formattedFromAmount && estimate.fromAmountUSD && (
-      <MenuItem.PriceDisplay price={formattedFromAmount}>
+      <MenuItem.Caption>{`Balance: USD ${routeBalanceUsd}`}</MenuItem.Caption>
+
+      <MenuItem.PriceDisplay price={fromAmount}>
         <MenuItem.PriceDisplay.Caption>
-          {`USD $${estimate.fromAmountUSD}`}
+          {`USD $${fromAmountUsd}`}
         </MenuItem.PriceDisplay.Caption>
       </MenuItem.PriceDisplay>
-      )}
 
-      {isFastest && (
-      <MenuItem.Badge badgeContent="Fastest" variant="emphasis" />
-      )}
+      <MenuItem.BottomSlot>
+        <MenuItem.BottomSlot.Divider />
+        <Stack
+          rc={<span />}
+          direction="row"
+          justifyContent="space-between"
+          sx={{
+            w: '100%',
+          }}
+        >
+          <Body
+            sx={{
+              ...hFlex,
+              ...centerFlexChildren,
+              gap: 'base.spacing.x1',
+              c: 'base.color.text.body.secondary',
+            }}
+            size="xSmall"
+          >
+            <Icon
+              icon="Countdown"
+              sx={{
+                w: 'base.icon.size.200',
+                fill: 'base.color.text.body.secondary',
+              }}
+              variant="bold"
+            />
+            {estimatedDurationFormatted}
+          </Body>
 
-      <MenuItem.Caption>
-        <Icon icon="Countdown" sx={{ w: 'base.icon.size.250' }} />
-        {' '}
-        { estimatedDurationFormatted }
-      </MenuItem.Caption>
-
+          <Body size="xSmall" sx={{ ...hFlex, ...centerFlexChildren }}>
+            {isFastest && (
+              <Badge
+                badgeContent="Fastest"
+                variant="emphasis"
+                sx={{ mr: 'base.spacing.x2' }}
+              />
+            )}
+            {`Fee ~ USD $${getFormattedAmounts(totalFeesUsd)}`}
+          </Body>
+        </Stack>
+      </MenuItem.BottomSlot>
     </MenuItem>
   );
 }

@@ -8,17 +8,19 @@ import {
   Link,
 } from '@biom3/react';
 import { Trans, useTranslation } from 'react-i18next';
-import { WalletWarningHero } from '../../../components/Hero/WalletWarningHero';
+import { WalletWarningHero } from '../Hero/WalletWarningHero';
+
+export interface NonPassportWarningDrawerProps {
+  visible: boolean;
+  onCloseDrawer: () => void;
+  handleCtaButtonClick: () => void;
+}
 
 export function NonPassportWarningDrawer({
   visible,
   onCloseDrawer,
   handleCtaButtonClick,
-}: {
-  visible: boolean;
-  onCloseDrawer: () => void;
-  handleCtaButtonClick: () => void;
-}) {
+}: NonPassportWarningDrawerProps) {
   const { t } = useTranslation();
 
   return (
@@ -26,7 +28,6 @@ export function NonPassportWarningDrawer({
       <Drawer.Content>
         <ButtCon
           icon="Close"
-          size="small"
           variant="tertiary"
           sx={{
             pos: 'absolute',
