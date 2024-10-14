@@ -17,6 +17,8 @@ import {
   OnRampSuccess,
   OnRampFailed,
   ChainId,
+  AddFundsWidgetParams,
+  AddFundsEventType,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback,
@@ -52,6 +54,8 @@ import ConnectWidget from '../../../connect/ConnectWidget';
 import SwapWidget from '../../../swap/SwapWidget';
 import { useSaleContext } from '../../context/SaleContextProvider';
 import { SaleErrorTypes } from '../../types';
+import AddFundsWidget from '../../../add-funds/AddFundsWidget';
+import { ProvidersContextProvider } from '../../../../context/providers-context/ProvidersContext';
 
 type FundingRouteExecuteProps = {
   fundingRouteStep?: FundingStep;
@@ -65,6 +69,7 @@ enum FundingRouteExecuteViews {
   EXECUTE_ON_RAMP = 'EXECUTE_ON_RAMP',
   SWITCH_NETWORK_ETH = 'SWITCH_NETWORK_ETH',
   SWITCH_NETWORK_ZKEVM = 'SWITCH_NETWORK_ZKEVM',
+  EXECUTE_ADD_FUNDS = 'EXECUTE_ADD_FUNDS',
 }
 
 export function FundingRouteExecute({
@@ -90,6 +95,9 @@ export function FundingRouteExecute({
   >(undefined);
   const [onRampParams, setOnRampParams] = useState<
   OnRampWidgetParams | undefined
+  >(undefined);
+  const [addFundsParams, setAddFundsParams] = useState<
+  AddFundsWidgetParams | undefined
   >(undefined);
 
   const [view, setView] = useState<FundingRouteExecuteViews>(
@@ -173,6 +181,14 @@ export function FundingRouteExecute({
         });
         setView(FundingRouteExecuteViews.EXECUTE_ON_RAMP);
       }
+
+      if (step.type === FundingStepType.ADD_FUNDS) {
+        setAddFundsParams({
+          toAmount: step.fundingItem.fundsRequired.formattedAmount,
+          toTokenAddress: step.fundingItem.token.address,
+        });
+        setView(FundingRouteExecuteViews.EXECUTE_ADD_FUNDS);
+      }
     },
     [provider, checkout],
   );
@@ -201,6 +217,14 @@ export function FundingRouteExecute({
 
   const handleCustomEvent = (event) => {
     switch (event.detail.type) {
+      case AddFundsEventType.SUCCESS: {
+        console.log('AddFundsEventType.SUCCESS', event); // eslint-disable-line no-console
+        break;
+      }
+      case AddFundsEventType.FAILURE: {
+        console.log('AddFundsEventType.FAILURE', event); // eslint-disable-line no-console
+        break;
+      }
       case SwapEventType.SUCCESS: {
         const successEvent = event.detail.data as SwapSuccess;
         stepSuccess.current = successEvent;
@@ -324,6 +348,17 @@ export function FundingRouteExecute({
       )}
       {view === FundingRouteExecuteViews.EXECUTE_ON_RAMP && (
         <OnRampWidget config={config} {...onRampParams} />
+      )}
+      {view === FundingRouteExecuteViews.EXECUTE_ADD_FUNDS && (
+        <ProvidersContextProvider
+          initialState={{ checkout: checkout!, toProvider: provider }}
+        >
+          <AddFundsWidget
+            showBackButton
+            config={config}
+            {...addFundsParams}
+          />
+        </ProvidersContextProvider>
       )}
       {view === FundingRouteExecuteViews.SWITCH_NETWORK_ETH && (
         <ConnectWidget

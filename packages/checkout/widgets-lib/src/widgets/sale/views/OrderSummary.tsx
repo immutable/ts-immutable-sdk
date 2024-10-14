@@ -1,7 +1,7 @@
 import { Box, Heading } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IMTBLWidgetEvents, SalePaymentTypes } from '@imtbl/checkout-sdk';
+import { FundingStepType, SalePaymentTypes } from '@imtbl/checkout-sdk';
 
 import {
   OrderSummarySubViews,
@@ -37,14 +37,12 @@ import {
 } from '../../../context/view-context/ViewContext';
 import { useHandover } from '../../../lib/hooks/useHandover';
 import { getRemoteRive } from '../../../lib/utils';
-import { orchestrationEvents } from '../../../lib/orchestrationEvents';
-import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-
-const ADD_FUNDS_ENABLED = true;
 
 type OrderSummaryProps = {
   subView: OrderSummarySubViews;
 };
+
+const ADD_FUNDS_ENABLED = true;
 
 export function OrderSummary({ subView }: OrderSummaryProps) {
   const { t } = useTranslation();
@@ -65,10 +63,6 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
   const { addHandover, closeHandover } = useHandover({
     id: HandoverTarget.GLOBAL,
   });
-
-  const {
-    eventTargetState: { eventTarget },
-  } = useContext(EventTargetContext);
 
   const onPayWithCard = (paymentType: SalePaymentTypes) => goBackToPaymentMethods(paymentType);
 
@@ -135,16 +129,25 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
 
   const onInsufficientFunds = (data: TopUpViewData) => {
     if (ADD_FUNDS_ENABLED) {
-      orchestrationEvents.sendRequestAddFundsEvent(
-        eventTarget,
-        IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT,
-        {
-          showBackButton: true,
-          toAmount: data.amount,
-          toTokenAddress: data.tokenAddress,
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SaleWidgetViews.ORDER_SUMMARY,
+            subView: OrderSummarySubViews.EXECUTE_FUNDING_ROUTE,
+            data: {
+              fundingBalance: {
+                type: FundingStepType.ADD_FUNDS,
+                fundingItem: {
+                  token: {},
+                  fundsRequired: {},
+                },
+              },
+              onFundingRouteExecuted,
+            },
+          },
         },
-      );
-
+      });
       return;
     }
 
@@ -167,6 +170,8 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     gasFees,
     queryFundingBalances,
   } = useFundingBalances();
+
+  console.log('🐛 ~     ^^^', transactionRequirement, transactionRequirement);
 
   // Initialise funding balances
   useEffect(() => {

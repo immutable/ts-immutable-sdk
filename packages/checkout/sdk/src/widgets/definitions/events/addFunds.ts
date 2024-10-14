@@ -8,6 +8,8 @@ export enum AddFundsEventType {
   CLOSE_WIDGET = 'close-widget',
   LANGUAGE_CHANGED = 'language-changed',
   CONNECT_SUCCESS = 'connect-success',
+  SUCCESS = 'success',
+  FAILURE = 'failure',
   REQUEST_BRIDGE = 'request-bridge',
   REQUEST_ONRAMP = 'request-onramp',
   REQUEST_SWAP = 'request-swap',

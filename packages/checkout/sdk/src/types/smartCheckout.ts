@@ -781,7 +781,21 @@ export enum FeeType {
 export type FundingStep =
   | BridgeFundingStep
   | SwapFundingStep
-  | OnRampFundingStep;
+  | OnRampFundingStep
+  | AddFundsFundingStep;
+
+/**
+ * Represents an add funds funding step
+ * @property {FundingStepType.ADD_FUNDS} type
+ * @property {number} chainId
+ * @property {FundingItem} fundingItem
+ */
+export type AddFundsFundingStep = {
+  /** Indicates that this is a add fundsstep */
+  type: FundingStepType.ADD_FUNDS;
+  /** The funding item for the swap */
+  fundingItem: FundingItem;
+};
 
 /**
  * Represents a bridge funding route
@@ -875,6 +889,7 @@ export enum FundingStepType {
   BRIDGE = 'BRIDGE',
   SWAP = 'SWAP',
   ONRAMP = 'ONRAMP',
+  ADD_FUNDS = 'ADD_FUNDS',
 }
 
 /**
