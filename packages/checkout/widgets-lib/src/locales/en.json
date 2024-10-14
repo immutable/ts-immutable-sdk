@@ -659,6 +659,23 @@
             "disabledCaption": "Unavailable for your selection. We recommend adding tokens."
           }
         }
+      },
+      "onboarding": {
+        "screen1": {
+          "title": "Payments on Immutable\nhave evolved",
+          "caption": "listen up",
+          "buttonText": "Next"
+        },
+        "screen2": {
+          "title": "Deliver tokens to Passport\n& pay from any wallet",
+          "caption": "whats evolved",
+          "buttonText": "Next"
+        },
+        "screen3": {
+          "title": "Pay with tokens on other chains,\nwe'll find you the best option",
+          "caption": "evolution",
+          "buttonText": "Choose the Wallet to Pay with"
+        }
       }
     }
   },

@@ -4,6 +4,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { AddFundsWidgetParams } from '@imtbl/checkout-sdk';
 
+import { Stack, CloudImage } from '@biom3/react';
 import { sendAddFundsCloseEvent } from './AddFundsWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import {
@@ -35,6 +36,7 @@ import { useTokens } from './hooks/useTokens';
 import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
 import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 import { ServiceType } from '../../views/error/serviceTypes';
+import { getRemoteImage } from '../../lib/utils';
 
 export type AddFundsWidgetInputs = AddFundsWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
@@ -161,52 +163,73 @@ export default function AddFundsWidget({
   return (
     <ViewContext.Provider value={viewReducerValues}>
       <AddFundsContext.Provider value={addFundsReducerValues}>
-        {viewState.view.type === AddFundsWidgetViews.ADD_FUNDS && (
-          <AddFunds
-            config={config}
-            checkout={checkout}
-            toTokenAddress={toTokenAddress}
-            toAmount={toAmount}
-            showBackButton={showBackButton}
-            showOnrampOption={showOnrampOption}
-            showSwapOption={showSwapOption}
-            showBridgeOption={showBridgeOption}
-            onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
-          />
-        )}
-        {viewState.view.type === AddFundsWidgetViews.REVIEW && (
-          <Review
-            data={viewState.view.data}
-            onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
-            onBackButtonClick={() => {
-              viewDispatch({
-                payload: {
-                  type: ViewActions.GO_BACK,
-                },
-              });
-            }}
-            showBackButton
-          />
-        )}
-        {viewState.view.type === SharedViews.ERROR_VIEW && (
-          <ErrorView
-            actionText={t('views.ERROR_VIEW.actionText')}
-            onActionClick={errorAction}
-            onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
-            errorEventAction={() => {
-              page({
-                userJourney: UserJourney.ADD_FUNDS,
-                screen: 'Error',
-              });
+        <Stack sx={{ pos: 'relative' }}>
+          <CloudImage
+            use={(
+              <img
+                src={getRemoteImage(
+                  config.environment,
+                  '/add-funds-bg-texture.webp',
+                )}
+                alt="blurry bg texture"
+              />
+            )}
+            sx={{
+              pos: 'absolute',
+              h: '100%',
+              w: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center',
             }}
           />
-        )}
-        {viewState.view.type === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
-        <ServiceUnavailableErrorView
-          service={ServiceType.GENERIC}
-          onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
-        />
-        )}
+          {viewState.view.type === AddFundsWidgetViews.ADD_FUNDS && (
+            <AddFunds
+              config={config}
+              checkout={checkout}
+              toTokenAddress={toTokenAddress}
+              toAmount={toAmount}
+              showBackButton={showBackButton}
+              showOnrampOption={showOnrampOption}
+              showSwapOption={showSwapOption}
+              showBridgeOption={showBridgeOption}
+              onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
+            />
+          )}
+          {viewState.view.type === AddFundsWidgetViews.REVIEW && (
+            <Review
+              data={viewState.view.data}
+              onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
+              onBackButtonClick={() => {
+                viewDispatch({
+                  payload: {
+                    type: ViewActions.GO_BACK,
+                  },
+                });
+              }}
+              showBackButton
+            />
+          )}
+          {viewState.view.type === SharedViews.ERROR_VIEW && (
+            <ErrorView
+              actionText={t('views.ERROR_VIEW.actionText')}
+              onActionClick={errorAction}
+              onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
+              errorEventAction={() => {
+                page({
+                  userJourney: UserJourney.ADD_FUNDS,
+                  screen: 'Error',
+                });
+              }}
+            />
+          )}
+          {viewState.view.type
+            === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
+            <ServiceUnavailableErrorView
+              service={ServiceType.GENERIC}
+              onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
+            />
+          )}
+        </Stack>
       </AddFundsContext.Provider>
     </ViewContext.Provider>
   );

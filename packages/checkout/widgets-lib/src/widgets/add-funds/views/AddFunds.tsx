@@ -57,6 +57,7 @@ import { useProvidersContext } from '../../../context/providers-context/Provider
 import { sendConnectProviderSuccessEvent } from '../AddFundsWidgetEvents';
 import { convertToUsd } from '../functions/convertToUsd';
 import { validateToAmount } from '../functions/amountValidation';
+import { OnboardingDrawer } from '../components/OnboardingDrawer';
 
 interface AddFundsProps {
   checkout: Checkout | null;
@@ -432,6 +433,7 @@ export function AddFunds({
 
   return (
     <SimpleLayout
+      containerSx={{ bg: 'transparent' }}
       header={(
         <Stack
           direction="row"
@@ -637,6 +639,7 @@ export function AddFunds({
             onClose={() => setShowDeliverToDrawer(false)}
             onConnect={handleWalletConnected}
           />
+          <OnboardingDrawer environment={checkout?.config.environment!} />
         </Stack>
       </Stack>
     </SimpleLayout>
