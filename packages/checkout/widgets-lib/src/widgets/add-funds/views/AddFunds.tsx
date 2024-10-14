@@ -32,7 +32,6 @@ import { Web3Provider } from '@ethersproject/providers';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
-  SharedViews,
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
@@ -46,7 +45,7 @@ import type { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidget
 import { useRoutes } from '../hooks/useRoutes';
 import { SQUID_NATIVE_TOKEN } from '../utils/config';
 import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
-import type { RouteData } from '../types';
+import { AddFundsErrorTypes, type RouteData } from '../types';
 import { SelectedRouteOption } from '../components/SelectedRouteOption';
 import { SelectedWallet } from '../components/SelectedWallet';
 import { DeliverToWalletDrawer } from '../../../components/WalletDrawer/DeliverToWalletDrawer';
@@ -58,6 +57,7 @@ import { sendConnectProviderSuccessEvent } from '../AddFundsWidgetEvents';
 import { convertToUsd } from '../functions/convertToUsd';
 import { validateToAmount } from '../functions/amountValidation';
 import { OnboardingDrawer } from '../components/OnboardingDrawer';
+import { useError } from '../hooks/useError';
 
 interface AddFundsProps {
   checkout: Checkout | null;
@@ -85,6 +85,8 @@ export function AddFunds({
   onBackButtonClick,
 }: AddFundsProps) {
   const { fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
+  const { showErrorHandover } = useError(config.environment);
+
   const {
     addFundsState: {
       squid,
@@ -192,21 +194,6 @@ export function AddFunds({
     [providers],
   );
 
-  const showErrorView = useCallback(
-    (error: Error) => {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SharedViews.ERROR_VIEW,
-            error,
-          },
-        },
-      });
-    },
-    [viewDispatch],
-  );
-
   useEffect(() => {
     if (!toAmount) return;
     setSelectedAmount(toAmount);
@@ -261,10 +248,7 @@ export function AddFunds({
   }, [routes]);
 
   useEffect(() => {
-    if (!checkout) {
-      showErrorView(new Error('Checkout object is missing'));
-      return;
-    }
+    if (!checkout) return;
 
     const fetchTokens = async () => {
       try {
@@ -294,7 +278,7 @@ export function AddFunds({
           });
         }
       } catch (error) {
-        showErrorView(new Error('Failed to fetch tokens'));
+        showErrorHandover(AddFundsErrorTypes.SERVICE_BREAKDOWN);
       }
     };
 
@@ -302,10 +286,7 @@ export function AddFunds({
   }, [checkout, toTokenAddress]);
 
   useEffect(() => {
-    if (!checkout) {
-      showErrorView(new Error('Checkout object is missing'));
-      return;
-    }
+    if (!checkout) return;
 
     const fetchOnRampTokens = async () => {
       try {
@@ -318,7 +299,7 @@ export function AddFunds({
           setOnRampAllowedTokens(tokenResponse.tokens);
         }
       } catch (error) {
-        showErrorView(new Error('Failed to fetch onramp tokens'));
+        showErrorHandover(AddFundsErrorTypes.SERVICE_BREAKDOWN);
       }
     };
     fetchOnRampTokens();

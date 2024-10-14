@@ -24,6 +24,7 @@ import {
 } from '@biom3/react';
 import { RouteResponse } from '@0xsquid/squid-types';
 import { t } from 'i18next';
+import { Environment } from '@imtbl/config';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { AddFundsContext } from '../context/AddFundsContext';
 import { useRoutes } from '../hooks/useRoutes';
@@ -31,8 +32,6 @@ import { AddFundsReviewData } from '../../../context/view-context/AddFundsViewCo
 import { RiveStateMachineInput } from '../types';
 import { useExecute } from '../hooks/useExecute';
 import {
-  SharedViews,
-  ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
 import { SquidIcon } from '../components/SquidIcon';
@@ -40,7 +39,9 @@ import { useHandover } from '../../../lib/hooks/useHandover';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
 import { getRemoteRive } from '../../../lib/utils';
-import { SQUID_NATIVE_TOKEN } from '../utils/config';
+import {
+  APPROVE_TXN_ANIMATION, EXECUTE_TXN_ANIMATION, FIXED_HANDOVER_DURATION, SQUID_NATIVE_TOKEN,
+} from '../utils/config';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { getDurationFormatted } from '../functions/getDurationFormatted';
@@ -58,10 +59,6 @@ interface ReviewProps {
   onBackButtonClick?: () => void;
   onCloseButtonClick?: () => void;
 }
-
-const FIXED_HANDOVER_DURATION = 2000;
-const APPROVE_TXN_ANIMATION = '/access_coins.riv';
-const EXECUTE_TXN_ANIMATION = '/swapping_coins.riv';
 
 const dividerSx = {
   content: "''",
@@ -103,7 +100,7 @@ export function Review({
     getAllowance,
     approve,
     execute,
-  } = useExecute();
+  } = useExecute(checkout?.config.environment || Environment.SANDBOX);
 
   const getFromAmountAndRoute = async () => {
     if (!squid || !tokens) return;
@@ -217,55 +214,64 @@ export function Review({
       return;
     }
 
-    try {
-      clearInterval(getRouteIntervalIdRef.current);
-      setProceedDisabled(true);
+    clearInterval(getRouteIntervalIdRef.current);
+    setProceedDisabled(true);
 
+    showHandover(
+      APPROVE_TXN_ANIMATION,
+      RiveStateMachineInput.START,
+      'Preparing',
+    );
+
+    const changeableProvider = await convertToNetworkChangeableProvider(
+      fromProvider,
+    );
+
+    const validNetwork = await checkProviderChain(
+      changeableProvider,
+      route.route.params.fromChain,
+    );
+
+    if (!validNetwork) {
+      return;
+    }
+
+    const allowance = await getAllowance(changeableProvider, route);
+
+    const { fromAmount } = route.route.params;
+    if (allowance?.lt(fromAmount)) {
       showHandover(
         APPROVE_TXN_ANIMATION,
-        RiveStateMachineInput.START,
-        'Preparing',
-      );
-
-      const changeableProvider = await convertToNetworkChangeableProvider(
-        fromProvider,
-      );
-      await checkProviderChain(
-        changeableProvider,
-        route.route.params.fromChain,
-      );
-
-      const allowance = await getAllowance(changeableProvider, route);
-      const { fromAmount } = route.route.params;
-
-      if (allowance?.lt(fromAmount)) {
-        showHandover(
-          APPROVE_TXN_ANIMATION,
-          RiveStateMachineInput.WAITING,
-          'Waiting for access approval in your wallet',
-          'Approve the transaction request to complete this transaction',
-        );
-
-        await approve(changeableProvider, route);
-
-        showHandover(
-          APPROVE_TXN_ANIMATION,
-          RiveStateMachineInput.COMPLETED,
-          'Granted access to your tokens',
-          '',
-          FIXED_HANDOVER_DURATION,
-        );
-      }
-
-      showHandover(
-        EXECUTE_TXN_ANIMATION,
         RiveStateMachineInput.WAITING,
-        'Waiting for transaction approval in wallet',
+        'Waiting for access approval in your wallet',
         'Approve the transaction request to complete this transaction',
       );
 
-      const txReceipt = await execute(squid, changeableProvider, route);
+      const approveTxnReceipt = await approve(changeableProvider, route);
 
+      if (!approveTxnReceipt) {
+        return;
+      }
+
+      showHandover(
+        APPROVE_TXN_ANIMATION,
+        RiveStateMachineInput.COMPLETED,
+        'Granted access to your tokens',
+        '',
+        FIXED_HANDOVER_DURATION,
+      );
+    }
+
+    showHandover(
+      EXECUTE_TXN_ANIMATION,
+      RiveStateMachineInput.WAITING,
+      'Waiting for transaction approval in wallet',
+      'Approve the transaction request to complete this transaction',
+    );
+
+    const executeTxnReceipt = await execute(squid, changeableProvider, route);
+
+    if (executeTxnReceipt) {
       showHandover(
         EXECUTE_TXN_ANIMATION,
         RiveStateMachineInput.PROCESSING,
@@ -286,7 +292,7 @@ export function Review({
             rc={(
               <a
                 target="_blank"
-                href={`https://axelarscan.io/gmp/${txReceipt.transactionHash}`}
+                href={`https://axelarscan.io/gmp/${executeTxnReceipt?.transactionHash}`}
                 rel="noreferrer"
               />
             )}
@@ -297,18 +303,6 @@ export function Review({
           for transaction details
         </>,
       );
-    } catch (e) {
-      closeHandover();
-
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SharedViews.ERROR_VIEW,
-            error: e as Error,
-          },
-        },
-      });
     }
   }, [
     route,
