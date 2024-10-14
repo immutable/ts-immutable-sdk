@@ -167,6 +167,21 @@ export function AddFunds({
   };
 
   const setSelectedRouteData = (route: RouteData | undefined) => {
+    track({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'InputScreen',
+      control: 'RoutesMenu',
+      controlType: 'MenuItem',
+      extras: {
+        toTokenAddress: route?.amountData.toToken.address,
+        toTokenChainId: route?.amountData.toToken.chainId,
+        fromTokenAddress: route?.amountData.fromToken.address,
+        fromTokenChainId: route?.amountData.fromToken.chainId,
+        toAmount: route?.amountData.toAmount,
+        fromAmount: route?.amountData.fromAmount,
+      },
+    });
+
     addFundsDispatch({
       payload: {
         type: AddFundsActions.SET_SELECTED_ROUTE_DATA,
