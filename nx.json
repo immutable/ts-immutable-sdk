@@ -38,7 +38,7 @@
   },
   "release": {
     "projectsRelationship": "fixed",
-    "projects": ["sdk/**", "packages/**", "!packages/**/*sample-app/**", "!packages/game-bridge", "!packages/internal/factory/sdk"],
+    "projects": ["sdk/**", "packages/**", "!packages/**/*sample-app/**", "!packages/game-bridge"],
     "releaseTagPattern": "{version}",
     "changelog": {
         "workspaceChangelog": {

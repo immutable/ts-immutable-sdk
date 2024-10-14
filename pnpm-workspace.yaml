@@ -24,10 +24,7 @@ packages:
   - "packages/webhook/sdk"
   - "packages/minting-backend/sdk"
   - "tests/**"
-  - "examples/passport/**"
-  - "examples/orderbook/**"
-  - "examples/checkout/**"
-  - "examples/blockchain-data/**"
-  - "examples/contracts/**"
+  - "examples/**"
+  - "!examples/_deprecated/**"
 
   # Setup catalog file versions for core packages like typescript/eslint TODO

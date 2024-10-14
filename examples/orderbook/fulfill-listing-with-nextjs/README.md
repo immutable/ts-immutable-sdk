@@ -13,7 +13,7 @@ In order to fill a listing, valid ERC721 or ERC1155 listings should exist in the
 1. Install the dependencies:
 
 ```bash
-yarn
+pnpm
 ```
 
 2. Copy the `.env.example` file to `.env`:
@@ -28,7 +28,7 @@ cp .env.example .env
 4. Run the development server:
 
 ```bash
-yarn dev
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser and you'll be navigated to the home screen.
