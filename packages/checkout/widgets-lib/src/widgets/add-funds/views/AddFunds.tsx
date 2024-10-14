@@ -55,6 +55,10 @@ import { getProviderSlugFromRdns } from '../../../lib/provider';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { sendConnectProviderSuccessEvent } from '../AddFundsWidgetEvents';
 import { convertToUsd } from '../functions/convertToUsd';
+import {
+  useAnalytics,
+  UserJourney,
+} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { validateToAmount } from '../functions/amountValidation';
 import { OnboardingDrawer } from '../components/OnboardingDrawer';
 import { useError } from '../hooks/useError';
@@ -102,6 +106,7 @@ export function AddFunds({
   } = useContext(AddFundsContext);
 
   const { viewDispatch } = useContext(ViewContext);
+  const { track, page } = useAnalytics();
 
   const {
     eventTargetState: { eventTarget },
@@ -126,6 +131,16 @@ export function AddFunds({
   );
 
   const setSelectedAmount = debounce((value: string) => {
+    track({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'InputScreen',
+      control: 'AmountInput',
+      controlType: 'TextInput',
+      extras: {
+        toAmount: value,
+      },
+    });
+
     addFundsDispatch({
       payload: {
         type: AddFundsActions.SET_SELECTED_AMOUNT,
@@ -135,6 +150,16 @@ export function AddFunds({
   }, 2500);
 
   const setSelectedToken = (token: TokenInfo | undefined) => {
+    track({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'InputScreen',
+      control: 'TokensMenu',
+      controlType: 'MenuItem',
+      extras: {
+        tokenAddress: token?.address,
+      },
+    });
+
     addFundsDispatch({
       payload: {
         type: AddFundsActions.SET_SELECTED_TOKEN,
@@ -144,6 +169,21 @@ export function AddFunds({
   };
 
   const setSelectedRouteData = (route: RouteData | undefined) => {
+    track({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'InputScreen',
+      control: 'RoutesMenu',
+      controlType: 'MenuItem',
+      extras: {
+        toTokenAddress: route?.amountData.toToken.address,
+        toTokenChainId: route?.amountData.toToken.chainId,
+        fromTokenAddress: route?.amountData.fromToken.address,
+        fromTokenChainId: route?.amountData.fromToken.chainId,
+        toAmount: route?.amountData.toAmount,
+        fromAmount: route?.amountData.fromAmount,
+      },
+    });
+
     addFundsDispatch({
       payload: {
         type: AddFundsActions.SET_SELECTED_ROUTE_DATA,
@@ -193,6 +233,17 @@ export function AddFunds({
       }),
     [providers],
   );
+
+  useEffect(() => {
+    page({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'InputScreen',
+      extras: {
+        toAmount,
+        toTokenAddress,
+      },
+    });
+  }, []);
 
   useEffect(() => {
     if (!toAmount) return;
@@ -336,6 +387,21 @@ export function AddFunds({
 
   const handleReviewClick = () => {
     if (!selectedRouteData || !selectedToken?.address) return;
+
+    track({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'InputScreen',
+      control: 'RoutesMenu',
+      controlType: 'MenuItem',
+      extras: {
+        toTokenAddress: selectedRouteData.amountData.toToken.address,
+        toTokenChainId: selectedRouteData.amountData.toToken.chainId,
+        fromTokenAddress: selectedRouteData.amountData.fromToken.address,
+        fromTokenChainId: selectedRouteData.amountData.fromToken.chainId,
+        toAmount: selectedRouteData.amountData.toAmount,
+        fromAmount: selectedRouteData.amountData.fromAmount,
+      },
+    });
 
     viewDispatch({
       payload: {

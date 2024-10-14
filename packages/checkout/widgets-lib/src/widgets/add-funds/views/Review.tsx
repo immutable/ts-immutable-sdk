@@ -40,8 +40,15 @@ import { HandoverTarget } from '../../../context/handover-context/HandoverContex
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
 import { getRemoteRive } from '../../../lib/utils';
 import {
-  APPROVE_TXN_ANIMATION, EXECUTE_TXN_ANIMATION, FIXED_HANDOVER_DURATION, SQUID_NATIVE_TOKEN,
+  APPROVE_TXN_ANIMATION,
+  EXECUTE_TXN_ANIMATION,
+  FIXED_HANDOVER_DURATION,
+  SQUID_NATIVE_TOKEN,
 } from '../utils/config';
+import {
+  useAnalytics,
+  UserJourney,
+} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { getDurationFormatted } from '../functions/getDurationFormatted';
@@ -49,8 +56,8 @@ import { RouteFees } from '../components/RouteFees';
 import { getTotalRouteFees } from '../functions/getTotalRouteFees';
 import { getRouteChains } from '../functions/getRouteChains';
 import {
-  getFormattedNumber,
   getFormattedAmounts,
+  getFormattedNumber,
 } from '../functions/getFormattedNumber';
 
 interface ReviewProps {
@@ -75,6 +82,7 @@ export function Review({
   onCloseButtonClick,
 }: ReviewProps) {
   const { viewDispatch } = useContext(ViewContext);
+  const { track, page } = useAnalytics();
   const {
     addFundsState: { squid, chains, tokens },
   } = useContext(AddFundsContext);
@@ -101,6 +109,18 @@ export function Review({
     approve,
     execute,
   } = useExecute(checkout?.config.environment || Environment.SANDBOX);
+
+  useEffect(() => {
+    page({
+      userJourney: UserJourney.SWAP,
+      screen: 'Review',
+      extras: {
+        toAmount: data.toAmount,
+        toChainId: data.toChainId,
+        toTokenAddress: data.toTokenAddress,
+      },
+    });
+  }, []);
 
   const getFromAmountAndRoute = async () => {
     if (!squid || !tokens) return;
@@ -272,6 +292,15 @@ export function Review({
     const executeTxnReceipt = await execute(squid, changeableProvider, route);
 
     if (executeTxnReceipt) {
+      track({
+        userJourney: UserJourney.ADD_FUNDS,
+        screen: 'FundsAdded',
+        action: 'Succeeded',
+        extras: {
+          txHash: executeTxnReceipt.transactionHash,
+        },
+      });
+
       showHandover(
         EXECUTE_TXN_ANIMATION,
         RiveStateMachineInput.PROCESSING,
