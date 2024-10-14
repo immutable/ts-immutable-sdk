@@ -54,7 +54,7 @@
     "responselike": "^2.0.0"
   },
   "scripts": {
-    "build": "nx run @imtbl/sdk:build",
+    "build": "nx run-many -p @imtbl/sdk,@imtbl/checkout-widgets -t build",
     "build:examples": "pnpm --recursive --filter '@examples/**' build",
     "build:onlysdk": "NODE_OPTIONS=--max-old-space-size=14366 nx run-many --target=build --projects=@imtbl/sdk && pnpm syncpack:format",
     "dev": "FORCE_COLOR=1 pnpm --filter @imtbl/sdk... --filter @imtbl/checkout-widgets... run d && pnpm --parallel --filter @imtbl/sdk... --filter @imtbl/checkout-widgets... run d --watch",

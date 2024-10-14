@@ -45,6 +45,7 @@
     "build": "tsup --config ../../../tsup.base.js && tsc --customConditions default --emitDeclarationOnly",
     "d": "tsup --config ../../../tsup.base.js",
     "test": "jest",
+    "test:watch": "jest --watch",
     "typecheck": "tsc --customConditions default --noEmit --jsx preserve",
     "view-generators": "openapi-generator-cli author template -g typescript-axios -o src/templates"
   },

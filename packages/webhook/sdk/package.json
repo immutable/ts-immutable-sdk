@@ -46,7 +46,7 @@
     "d": "tsup --config ../../../tsup.base.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest --passWithNoTests",
-    "test:e2e": "jest --runInBand --testMatch \"**/?(*.)+(e2e).[jt]s?(x)\"",
+    "test:watch": "jest --watch",
     "typecheck": "tsc --customConditions default --noEmit --jsx preserve"
   },
   "type": "module"
