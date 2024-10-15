@@ -477,10 +477,16 @@ export function AddFunds({
   const shouldShowBackButton = showBackButton ?? !!onBackButtonClick;
   const routeInputsReady = !!selectedToken
     && !!fromAddress
-    && validateToAmount(selectedAmount).isValid;
+    && validateToAmount(selectedAmount).isValid
+    && validateToAmount(inputValue).isValid;
+
   const loading = (routeInputsReady || fetchingRoutes)
     && !(selectedRouteData || insufficientBalance);
-  const readyToReview = routeInputsReady && !!toAddress && !!selectedRouteData && !loading;
+
+  const readyToReview = routeInputsReady
+    && !!toAddress
+    && !!selectedRouteData
+    && !loading;
 
   const handleWalletConnected = (
     providerType: 'from' | 'to',
