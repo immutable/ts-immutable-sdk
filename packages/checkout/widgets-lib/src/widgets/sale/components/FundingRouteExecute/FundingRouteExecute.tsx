@@ -19,6 +19,9 @@ import {
   ChainId,
   AddFundsWidgetParams,
   AddFundsEventType,
+  OrchestrationEventType,
+  AddFundsSuccess,
+  AddFundsFailed,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback,
@@ -105,7 +108,7 @@ export function FundingRouteExecute({
   );
   const nextView = useRef<FundingRouteExecuteViews | false>(false);
 
-  const stepSuccess = useRef<BridgeTransactionSent | SwapSuccess | undefined>(
+  const stepSuccess = useRef<BridgeTransactionSent | SwapSuccess | AddFundsSuccess | undefined>(
     undefined,
   );
   const stepFailed = useRef<BridgeFailed | SwapFailed | undefined>(undefined);
@@ -204,7 +207,7 @@ export function FundingRouteExecute({
     }
   }, [fundingRouteStep]);
 
-  const onCloseWidget = () => {
+  const onRouteFinished = () => {
     // Need to check SUCCESS first, as it's possible for widget to emit both FAILED and SUCCESS.
     if (stepSuccess.current) {
       stepSuccess.current = undefined;
@@ -215,20 +218,13 @@ export function FundingRouteExecute({
     }
   };
 
-  const handleCustomEvent = (event) => {
+  const handleCustomEvent = (event: CustomEvent) => {
     switch (event.detail.type) {
-      case AddFundsEventType.SUCCESS: {
-        console.log('AddFundsEventType.SUCCESS', event); // eslint-disable-line no-console
-        break;
-      }
-      case AddFundsEventType.FAILURE: {
-        console.log('AddFundsEventType.FAILURE', event); // eslint-disable-line no-console
-        break;
-      }
+      case AddFundsEventType.SUCCESS:
       case SwapEventType.SUCCESS: {
-        const successEvent = event.detail.data as SwapSuccess;
+        const successEvent = event.detail.data;
         stepSuccess.current = successEvent;
-        onCloseWidget();
+        onRouteFinished();
         break;
       }
       case BridgeEventType.TRANSACTION_SENT:
@@ -239,6 +235,7 @@ export function FundingRouteExecute({
         stepSuccess.current = successEvent;
         break;
       }
+      case AddFundsEventType.FAILURE:
       case BridgeEventType.FAILURE:
       case SwapEventType.FAILURE:
       case OnRampEventType.FAILURE: {
@@ -247,14 +244,18 @@ export function FundingRouteExecute({
         const failureEvent = event.detail.data as
           | SwapFailed
           | BridgeFailed
-          | OnRampFailed;
+          | OnRampFailed
+          | AddFundsFailed;
         stepFailed.current = failureEvent;
         break;
       }
       case BridgeEventType.CLOSE_WIDGET:
       case SwapEventType.CLOSE_WIDGET:
       case OnRampEventType.CLOSE_WIDGET: {
-        onCloseWidget();
+        onRouteFinished();
+        break;
+      }
+      case OrchestrationEventType.REQUEST_GO_BACK: {
         break;
       }
       case SwapEventType.REJECTED:
@@ -264,7 +265,7 @@ export function FundingRouteExecute({
     }
   };
 
-  const handleConnectEvent = (event) => {
+  const handleConnectEvent = (event: CustomEvent) => {
     switch (event.detail.type) {
       case ConnectEventType.SUCCESS: {
         const eventData = event.detail.data as ConnectionSuccess;
@@ -283,7 +284,7 @@ export function FundingRouteExecute({
       case ConnectEventType.FAILURE:
       case ConnectEventType.CLOSE_WIDGET:
       default:
-        onCloseWidget();
+        onRouteFinished();
         break;
     }
   };
@@ -292,32 +293,40 @@ export function FundingRouteExecute({
     // Handle the connect event when switching networks
     eventTarget.addEventListener(
       IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
-      handleConnectEvent,
+      handleConnectEvent as EventListener,
     );
 
     // Handle the other widget events
     eventTarget.addEventListener(
       IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
-      handleCustomEvent,
+      handleCustomEvent as EventListener,
     );
     eventTarget.addEventListener(
       IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
-      handleCustomEvent,
+      handleCustomEvent as EventListener,
+    );
+    eventTarget.addEventListener(
+      IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+      handleCustomEvent as EventListener,
     );
 
     // Remove the custom event listener when the component unmounts
     return () => {
       eventTarget.removeEventListener(
         IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
-        handleConnectEvent,
+        handleConnectEvent as EventListener,
       );
       eventTarget.removeEventListener(
         IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
-        handleCustomEvent,
+        handleCustomEvent as EventListener,
       );
       eventTarget.removeEventListener(
         IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
-        handleCustomEvent,
+        handleCustomEvent as EventListener,
+      );
+      eventTarget.removeEventListener(
+        IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+        handleCustomEvent as EventListener,
       );
     };
   }, []);

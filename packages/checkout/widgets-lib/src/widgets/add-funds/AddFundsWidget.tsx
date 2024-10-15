@@ -2,7 +2,7 @@ import {
   useContext, useEffect, useMemo, useReducer, useRef,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AddFundsWidgetParams } from '@imtbl/checkout-sdk';
+import { AddFundsWidgetParams, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 
 import { sendAddFundsCloseEvent } from './AddFundsWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
@@ -35,6 +35,7 @@ import { useTokens } from './hooks/useTokens';
 import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
 import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 import { ServiceType } from '../../views/error/serviceTypes';
+import { orchestrationEvents } from '../../lib/orchestrationEvents';
 
 export type AddFundsWidgetInputs = AddFundsWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
@@ -46,7 +47,6 @@ export default function AddFundsWidget({
   showBridgeOption = true,
   toTokenAddress,
   toAmount,
-  showBackButton,
   config,
 }: AddFundsWidgetInputs) {
   const fetchingBalances = useRef(false);
@@ -167,11 +167,17 @@ export default function AddFundsWidget({
             checkout={checkout}
             toTokenAddress={toTokenAddress}
             toAmount={toAmount}
-            showBackButton={showBackButton}
             showOnrampOption={showOnrampOption}
             showSwapOption={showSwapOption}
             showBridgeOption={showBridgeOption}
             onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
+            onBackButtonClick={() => {
+              orchestrationEvents.sendRequestGoBackEvent(
+                eventTarget,
+                IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+                {},
+              );
+            }}
           />
         )}
         {viewState.view.type === AddFundsWidgetViews.REVIEW && (
@@ -202,10 +208,10 @@ export default function AddFundsWidget({
           />
         )}
         {viewState.view.type === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
-        <ServiceUnavailableErrorView
-          service={ServiceType.GENERIC}
-          onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
-        />
+          <ServiceUnavailableErrorView
+            service={ServiceType.GENERIC}
+            onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
+          />
         )}
       </AddFundsContext.Provider>
     </ViewContext.Provider>
