@@ -1,10 +1,12 @@
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
-import { RouteResponse } from '@0xsquid/squid-types';
+import { Hook, RouteResponse } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
 import { utils } from 'ethers';
 import { useRef, useState } from 'react';
 import { delay } from '../functions/delay';
 import { AmountData, RouteData, Token } from '../types';
+
+export type SquidPostHook = Omit<Hook, 'fundAmount' | 'fundToken'>;
 
 export const useRoutes = () => {
   const [routes, setRoutes] = useState<RouteData[] | undefined>(undefined);
@@ -79,6 +81,7 @@ export const useRoutes = () => {
     fromAmount: string,
     fromAddress?: string,
     quoteOnly = true,
+    postHook?: SquidPostHook,
   ): Promise<RouteResponse | undefined> => {
     try {
       const parsedFromAmount = parseFloat(fromAmount).toFixed(fromToken.decimals);
@@ -97,6 +100,7 @@ export const useRoutes = () => {
         toAddress,
         quoteOnly,
         enableBoost: true,
+        postHook,
       });
     } catch (error) {
       return undefined;
@@ -107,6 +111,7 @@ export const useRoutes = () => {
     squid: Squid,
     amountDataArray: AmountData[],
     toTokenAddress: string,
+    postHook?: SquidPostHook,
   ): Promise<RouteData[]> => {
     const routePromises = amountDataArray.map(
       (data) => getRoute(
@@ -115,6 +120,9 @@ export const useRoutes = () => {
         data.toToken,
         toTokenAddress,
         data.fromAmount,
+        undefined,
+        true,
+        postHook,
       ).then((route) => ({
         amountData: data,
         route,

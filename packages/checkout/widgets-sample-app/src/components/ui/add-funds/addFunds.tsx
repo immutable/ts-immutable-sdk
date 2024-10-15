@@ -1,21 +1,26 @@
 import {
+  AddFundsEventType,
+  BridgeEventType,
   Checkout,
+  OnRampEventType,
+  SwapDirection,
+  SwapEventType,
+  WidgetLanguage,
   WidgetTheme,
   WidgetType,
-  WidgetLanguage,
-  AddFundsEventType,
-  OnRampEventType,
-  SwapEventType,
-  BridgeEventType,
-  SwapDirection,
-} from "@imtbl/checkout-sdk";
-import { WidgetsFactory } from "@imtbl/checkout-widgets";
-import { useMemo, useEffect } from "react";
+} from '@imtbl/checkout-sdk';
+import { WidgetsFactory } from '@imtbl/checkout-widgets';
+import { useEffect, useMemo } from 'react';
+import { Environment } from '@imtbl/config';
 
-const ADD_FUNDS_TARGET_ID = "add-funds-widget-target";
+const ADD_FUNDS_TARGET_ID = 'add-funds-widget-target';
 
 function AddFundsUI() {
-  const checkout = useMemo(() => new Checkout(), []);
+  const checkout = useMemo(() => new Checkout({
+    baseConfig: {
+      environment: Environment.PRODUCTION,
+    }
+  }), []);
   const factory = useMemo(() => new WidgetsFactory(checkout, {}), [checkout]);
   const addFunds = useMemo(
     () =>
@@ -31,19 +36,19 @@ function AddFundsUI() {
   useEffect(() => {
     addFunds.mount(ADD_FUNDS_TARGET_ID, {
       showOnrampOption: true,
-      showBridgeOption: false,
+      showBridgeOption: true,
       showSwapOption: true,
-      toTokenAddress: "0x3b2d8a1931736fc321c24864bceee981b11c3c57",
+      toTokenAddress: '0x6de8aCC0D406837030CE4dd28e7c08C5a96a30d2',
     });
     addFunds.addListener(AddFundsEventType.CLOSE_WIDGET, (data: any) => {
-      console.log("CLOSE_WIDGET", data);
+      console.log('CLOSE_WIDGET', data);
       addFunds.unmount();
     });
     addFunds.addListener(AddFundsEventType.REQUEST_ONRAMP, (data: any) => {
-      console.log("REQUEST_ONRAMP", data);
+      console.log('REQUEST_ONRAMP', data);
       addFunds.unmount();
       onRamp.addListener(OnRampEventType.CLOSE_WIDGET, (data: any) => {
-        console.log("CLOSE_WIDGET", data);
+        console.log('CLOSE_WIDGET', data);
         onRamp.unmount();
       });
       onRamp.mount(ADD_FUNDS_TARGET_ID, {
@@ -52,10 +57,10 @@ function AddFundsUI() {
       });
     });
     addFunds.addListener(AddFundsEventType.REQUEST_SWAP, (data: any) => {
-      console.log("REQUEST_SWAP", data);
+      console.log('REQUEST_SWAP', data);
       addFunds.unmount();
       swap.addListener(SwapEventType.CLOSE_WIDGET, (data: any) => {
-        console.log("CLOSE_WIDGET", data);
+        console.log('CLOSE_WIDGET', data);
         swap.unmount();
       });
       swap.mount(ADD_FUNDS_TARGET_ID, {
@@ -65,10 +70,10 @@ function AddFundsUI() {
       });
     });
     addFunds.addListener(AddFundsEventType.REQUEST_BRIDGE, (data: any) => {
-      console.log("REQUEST_BRIDGE", data);
+      console.log('REQUEST_BRIDGE', data);
       addFunds.unmount();
       bridge.addListener(BridgeEventType.CLOSE_WIDGET, (data: any) => {
-        console.log("CLOSE_WIDGET", data);
+        console.log('CLOSE_WIDGET', data);
         bridge.unmount();
       });
       bridge.mount(ADD_FUNDS_TARGET_ID, {});

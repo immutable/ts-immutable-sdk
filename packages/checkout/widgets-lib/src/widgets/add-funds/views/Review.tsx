@@ -15,8 +15,10 @@ import {
   PriceDisplay,
   Stack,
 } from '@biom3/react';
-import { RouteResponse } from '@0xsquid/squid-types';
-import { BigNumber, utils } from 'ethers';
+import {
+  ChainCall, ChainType, RouteResponse, SquidCallType,
+} from '@0xsquid/squid-types';
+import { BigNumber, Contract, utils } from 'ethers';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { AddFundsContext } from '../context/AddFundsContext';
 import { useRoutes } from '../hooks/useRoutes';
@@ -24,7 +26,11 @@ import { AddFundsReviewData } from '../../../context/view-context/AddFundsViewCo
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { Chain, RiveStateMachineInput } from '../types';
 import { useExecute } from '../hooks/useExecute';
-import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import {
+  SharedViews,
+  ViewActions,
+  ViewContext,
+} from '../../../context/view-context/ViewContext';
 import { SquidIcon } from '../components/SquidIcon';
 import { useHandover } from '../../../lib/hooks/useHandover';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
@@ -88,6 +94,89 @@ export function Review({
 
     if (!amountData) return;
 
+    const squidMulticallerAddress = '0xCB4a628B8FA794B2Dd1FC22C19cC00aaB31DCF35';
+    const primarySalesEnvId = '82a81049-8c41-4ae3-91ca-0bd82a283abc';
+
+    const erc20Abi = ['function transfer(address to, uint amount)'];
+    const erc20Contract = new Contract(amountData.toToken.address, erc20Abi, provider?.getSigner());
+    const transferPendingTokensTx = erc20Contract.interface.encodeFunctionData('transfer', [address, 0]);
+
+    const signResponse = await fetch(`https://api.immutable.com/v1/primary-sales/${primarySalesEnvId}/order/sign`, {
+      method: 'POST',
+      headers: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        spender_address: squidMulticallerAddress, // eslint-disable-line @typescript-eslint/naming-convention
+        recipient_address: address, // eslint-disable-line @typescript-eslint/naming-convention
+        currency_filter: 'symbol', // eslint-disable-line @typescript-eslint/naming-convention
+        currency_value: 'USDC', // eslint-disable-line @typescript-eslint/naming-convention
+        payment_type: 'crypto', // eslint-disable-line @typescript-eslint/naming-convention
+        products: [
+          {
+            product_id: 'P1', // eslint-disable-line @typescript-eslint/naming-convention
+            quantity: 1,
+          },
+        ],
+      }),
+    });
+
+    const signPayload = await signResponse.json();
+    const approvalTxn = signPayload.transactions.find((txn) => txn.method_call.startsWith('approve'));
+    const transferTxn = signPayload.transactions.find((txn) => txn.method_call.startsWith('execute'));
+
+    console.log('sign called successfully', {
+      signPayload,
+      approvalTxn,
+      transferTxn,
+    });
+
+    const postHookCalls: ChainCall[] = [];
+
+    if (approvalTxn) {
+      postHookCalls.push({
+        chainType: ChainType.EVM,
+        callType: SquidCallType.FULL_TOKEN_BALANCE,
+        target: amountData.toToken.address,
+        value: '0',
+        callData: approvalTxn?.raw_data,
+        payload: {
+          tokenAddress: amountData.toToken.address,
+          inputPos: 1,
+        },
+        estimatedGas: '50000',
+      });
+    }
+
+    // Multicaller execute transaction
+    postHookCalls.push({
+      chainType: ChainType.EVM,
+      callType: SquidCallType.DEFAULT,
+      value: '0',
+      payload: {
+        tokenAddress: transferTxn?.contract_address,
+        inputPos: 0,
+      },
+      target: transferTxn?.contract_address,
+      callData: transferTxn?.raw_data,
+      estimatedGas: '200000',
+    });
+
+    // Transfer remaining tokens back to user
+    postHookCalls.push({
+      chainType: ChainType.EVM,
+      callType: SquidCallType.FULL_TOKEN_BALANCE,
+      target: amountData.toToken.address,
+      value: '0',
+      callData: transferPendingTokensTx,
+      payload: {
+        tokenAddress: amountData.toToken.address,
+        inputPos: 1,
+      },
+      estimatedGas: '50000',
+    });
+
     const routeResponse = await getRoute(
       squid,
       amountData?.fromToken,
@@ -96,6 +185,13 @@ export function Review({
       amountData.fromAmount,
       address,
       false,
+      {
+        chainType: ChainType.EVM,
+        calls: postHookCalls,
+        provider: 'Immutable Primary Sales',
+        description: 'Perform Primary Sales NFT checkout',
+        logoURI: 'https://explorer.immutable.com/assets/configs/network_icon.svg', // Add your logo here
+      },
     );
     setRoute(routeResponse);
     setProceedDisabled(false);
@@ -201,6 +297,8 @@ export function Review({
         'Waiting for transaction approval in wallet',
         'Approve the transaction request to complete this transaction',
       );
+
+      console.log({ route });
 
       const txReceipt = await execute(squid, changeableProvider, route);
 
