@@ -7,6 +7,7 @@ import { delay } from '../functions/delay';
 import { AmountData, RouteData, Token } from '../types';
 import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
 import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
+import { retry } from '../../../lib/retry';
 
 export const useRoutes = () => {
   const latestRequestIdRef = useRef<number>(0);
@@ -117,18 +118,24 @@ export const useRoutes = () => {
         parsedFromAmount,
         fromToken.decimals,
       );
-
-      return await squid.getRoute({
-        fromChain: fromToken.chainId,
-        fromToken: fromToken.address,
-        fromAmount: formattedFromAmount.toString(),
-        toChain: toToken.chainId,
-        toToken: toToken.address,
-        fromAddress,
-        toAddress,
-        quoteOnly,
-        enableBoost: true,
-      });
+      return await retry(
+        () => squid.getRoute({
+          fromChain: fromToken.chainId,
+          fromToken: fromToken.address,
+          fromAmount: formattedFromAmount.toString(),
+          toChain: toToken.chainId,
+          toToken: toToken.address,
+          fromAddress,
+          toAddress,
+          quoteOnly,
+          enableBoost: true,
+        }),
+        {
+          retryIntervalMs: 1000,
+          retries: 5,
+          nonRetryable: (err: any) => err.response.status !== 429,
+        },
+      );
     } catch (error) {
       return undefined;
     }
@@ -152,7 +159,7 @@ export const useRoutes = () => {
 
     const routesData = await Promise.all(routePromises);
     return routesData.filter(
-      (route): route is RouteData => route !== undefined,
+      (route): route is RouteData => route?.route !== undefined,
     );
   };
 

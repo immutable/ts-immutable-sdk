@@ -2,9 +2,43 @@ import { Web3Provider } from '@ethersproject/providers';
 import { RouteResponse } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
 import { ethers } from 'ethers';
+import { Environment } from '@imtbl/config';
 import { isSquidNativeToken } from '../functions/isSquidNativeToken';
+import { useError } from './useError';
+import { AddFundsError, AddFundsErrorTypes } from '../types';
 
-export const useExecute = () => {
+export const useExecute = (environment: Environment) => {
+  const { showErrorHandover } = useError(environment);
+
+  const handleTransactionError = (err: unknown) => {
+    const reason = `${(err as any)?.reason || (err as any)?.message || ''}`.toLowerCase();
+
+    let errorType = AddFundsErrorTypes.WALLET_FAILED;
+
+    if (reason.includes('failed') && reason.includes('open confirmation')) {
+      errorType = AddFundsErrorTypes.WALLET_POPUP_BLOCKED;
+    }
+
+    if (reason.includes('rejected') && reason.includes('user')) {
+      errorType = AddFundsErrorTypes.WALLET_REJECTED;
+    }
+
+    if (reason.includes('failed to submit') && reason.includes('highest gas limit')) {
+      errorType = AddFundsErrorTypes.WALLET_REJECTED_NO_FUNDS;
+    }
+
+    if (reason.includes('status failed') || reason.includes('transaction failed')) {
+      errorType = AddFundsErrorTypes.TRANSACTION_FAILED;
+    }
+
+    const error: AddFundsError = {
+      type: errorType,
+      data: { error: err },
+    };
+
+    showErrorHandover(errorType, { error });
+  };
+
   const convertToNetworkChangeableProvider = async (
     provider: Web3Provider,
   ): Promise<Web3Provider> => new ethers.providers.Web3Provider(provider.provider, 'any');
@@ -12,16 +46,16 @@ export const useExecute = () => {
   const checkProviderChain = async (
     provider: Web3Provider,
     chainId: string,
-  ): Promise<void> => {
+  ): Promise<boolean> => {
     if (!provider.provider.request) {
       throw new Error('provider does not have request method');
     }
-
     try {
       const fromChainHex = `0x${parseInt(chainId, 10).toString(16)}`;
       const providerChainId = await provider.provider.request({
         method: 'eth_chainId',
       });
+
       if (fromChainHex !== providerChainId) {
         await provider.provider.request({
           method: 'wallet_switchEthereumChain',
@@ -31,9 +65,12 @@ export const useExecute = () => {
             },
           ],
         });
+        return true;
       }
-    } catch (e) {
-      throw new Error('Error checking provider');
+      return true;
+    } catch (error) {
+      handleTransactionError(error);
+      return false;
     }
   };
 
@@ -41,35 +78,40 @@ export const useExecute = () => {
     provider: Web3Provider,
     routeResponse: RouteResponse,
   ): Promise<ethers.BigNumber | undefined> => {
-    if (!isSquidNativeToken(routeResponse?.route?.params.fromToken)) {
-      const erc20Abi = [
-        'function allowance(address owner, address spender) public view returns (uint256)',
-      ];
-      const fromToken = routeResponse?.route.params.fromToken;
-      const signer = provider.getSigner();
-      const tokenContract = new ethers.Contract(fromToken, erc20Abi, signer);
+    try {
+      if (!isSquidNativeToken(routeResponse?.route?.params.fromToken)) {
+        const erc20Abi = [
+          'function allowance(address owner, address spender) public view returns (uint256)',
+        ];
+        const fromToken = routeResponse?.route.params.fromToken;
+        const signer = provider.getSigner();
+        const tokenContract = new ethers.Contract(fromToken, erc20Abi, signer);
 
-      const ownerAddress = await signer.getAddress();
-      const transactionRequestTarget = routeResponse?.route?.transactionRequest?.target;
+        const ownerAddress = await signer.getAddress();
+        const transactionRequestTarget = routeResponse?.route?.transactionRequest?.target;
 
-      if (!transactionRequestTarget) {
-        throw new Error('transactionRequest target is undefined');
+        if (!transactionRequestTarget) {
+          throw new Error('transactionRequest target is undefined');
+        }
+
+        const allowance = await tokenContract.allowance(
+          ownerAddress,
+          transactionRequestTarget,
+        );
+        return allowance;
       }
 
-      const allowance = await tokenContract.allowance(
-        ownerAddress,
-        transactionRequestTarget,
-      );
-      return allowance;
+      return ethers.constants.MaxUint256; // no approval is needed for native tokens
+    } catch (error) {
+      showErrorHandover(AddFundsErrorTypes.DEFAULT, { error });
+      return undefined;
     }
-
-    return ethers.constants.MaxUint256; // no approval is needed for native tokens
   };
 
   const approve = async (
     provider: Web3Provider,
     routeResponse: RouteResponse,
-  ): Promise<void> => {
+  ): Promise<ethers.providers.TransactionReceipt | undefined> => {
     try {
       if (!isSquidNativeToken(routeResponse?.route?.params.fromToken)) {
         const erc20Abi = [
@@ -93,10 +135,12 @@ export const useExecute = () => {
           transactionRequestTarget,
           fromAmount,
         );
-        await tx.wait();
+        return tx.wait();
       }
-    } catch (e) {
-      throw new Error('Error approving tokens');
+      return undefined;
+    } catch (error) {
+      handleTransactionError(error);
+      return undefined;
     }
   };
 
@@ -104,7 +148,7 @@ export const useExecute = () => {
     squid: Squid,
     provider: Web3Provider,
     routeResponse: RouteResponse,
-  ): Promise<ethers.providers.TransactionReceipt> => {
+  ): Promise<ethers.providers.TransactionReceipt | undefined> => {
     if (!provider.provider.request) {
       throw new Error('provider does not have request method');
     }
@@ -115,8 +159,9 @@ export const useExecute = () => {
         route: routeResponse.route,
       })) as unknown as ethers.providers.TransactionResponse;
       return tx.wait();
-    } catch (e) {
-      throw new Error('Error executing route');
+    } catch (error) {
+      handleTransactionError(error);
+      return undefined;
     }
   };
 

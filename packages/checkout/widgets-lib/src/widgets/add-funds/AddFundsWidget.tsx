@@ -4,6 +4,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { AddFundsWidgetParams, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 
+import { Stack, CloudImage } from '@biom3/react';
+import { Environment } from '@imtbl/config';
 import { sendAddFundsCloseEvent } from './AddFundsWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import {
@@ -36,6 +38,11 @@ import { useProvidersContext } from '../../context/providers-context/ProvidersCo
 import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 import { ServiceType } from '../../views/error/serviceTypes';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
+import { getRemoteImage } from '../../lib/utils';
+import { isValidAddress } from '../../lib/validations/widgetValidators';
+import { amountInputValidation } from '../../lib/validations/amountInputValidations';
+import { useError } from './hooks/useError';
+import { AddFundsErrorTypes } from './types';
 
 export type AddFundsWidgetInputs = AddFundsWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
@@ -88,6 +95,16 @@ export default function AddFundsWidget({
 
   const squidSdk = useSquid(checkout);
   const tokensResponse = useTokens(checkout);
+  const { showErrorHandover } = useError(checkout.config.environment ?? Environment.SANDBOX);
+
+  useEffect(() => {
+    const isInvalidToTokenAddress = toTokenAddress && !isValidAddress(toTokenAddress);
+    const isInvalidToAmount = toAmount && !amountInputValidation(toAmount);
+
+    if (isInvalidToTokenAddress || isInvalidToAmount) {
+      showErrorHandover(AddFundsErrorTypes.INVALID_PARAMETERS);
+    }
+  }, [toTokenAddress, toAmount]);
 
   useEffect(() => {
     (async () => {
@@ -161,58 +178,79 @@ export default function AddFundsWidget({
   return (
     <ViewContext.Provider value={viewReducerValues}>
       <AddFundsContext.Provider value={addFundsReducerValues}>
-        {viewState.view.type === AddFundsWidgetViews.ADD_FUNDS && (
-          <AddFunds
-            config={config}
-            checkout={checkout}
-            toTokenAddress={toTokenAddress}
-            toAmount={toAmount}
-            showOnrampOption={showOnrampOption}
-            showSwapOption={showSwapOption}
-            showBridgeOption={showBridgeOption}
-            onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
-            onBackButtonClick={() => {
-              orchestrationEvents.sendRequestGoBackEvent(
-                eventTarget,
-                IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
-                {},
-              );
+        <Stack sx={{ pos: 'relative' }}>
+          <CloudImage
+            use={(
+              <img
+                src={getRemoteImage(
+                  config.environment,
+                  '/add-funds-bg-texture.webp',
+                )}
+                alt="blurry bg texture"
+              />
+            )}
+            sx={{
+              pos: 'absolute',
+              h: '100%',
+              w: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center',
             }}
           />
-        )}
-        {viewState.view.type === AddFundsWidgetViews.REVIEW && (
-          <Review
-            data={viewState.view.data}
-            onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
-            onBackButtonClick={() => {
-              viewDispatch({
-                payload: {
-                  type: ViewActions.GO_BACK,
-                },
-              });
-            }}
-            showBackButton
-          />
-        )}
-        {viewState.view.type === SharedViews.ERROR_VIEW && (
-          <ErrorView
-            actionText={t('views.ERROR_VIEW.actionText')}
-            onActionClick={errorAction}
-            onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
-            errorEventAction={() => {
-              page({
-                userJourney: UserJourney.ADD_FUNDS,
-                screen: 'Error',
-              });
-            }}
-          />
-        )}
-        {viewState.view.type === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
-          <ServiceUnavailableErrorView
-            service={ServiceType.GENERIC}
-            onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
-          />
-        )}
+          {viewState.view.type === AddFundsWidgetViews.ADD_FUNDS && (
+            <AddFunds
+              config={config}
+              checkout={checkout}
+              toTokenAddress={toTokenAddress}
+              toAmount={toAmount}
+              showOnrampOption={showOnrampOption}
+              showSwapOption={showSwapOption}
+              showBridgeOption={showBridgeOption}
+              onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
+              onBackButtonClick={() => {
+                orchestrationEvents.sendRequestGoBackEvent(
+                  eventTarget,
+                  IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+                  {},
+                );
+              }}
+            />
+          )}
+          {viewState.view.type === AddFundsWidgetViews.REVIEW && (
+            <Review
+              data={viewState.view.data}
+              onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
+              onBackButtonClick={() => {
+                viewDispatch({
+                  payload: {
+                    type: ViewActions.GO_BACK,
+                  },
+                });
+              }}
+              showBackButton
+            />
+          )}
+          {viewState.view.type === SharedViews.ERROR_VIEW && (
+            <ErrorView
+              actionText={t('views.ERROR_VIEW.actionText')}
+              onActionClick={errorAction}
+              onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
+              errorEventAction={() => {
+                page({
+                  userJourney: UserJourney.ADD_FUNDS,
+                  screen: 'Error',
+                });
+              }}
+            />
+          )}
+          {viewState.view.type
+            === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
+            <ServiceUnavailableErrorView
+              service={ServiceType.GENERIC}
+              onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
+            />
+          )}
+        </Stack>
       </AddFundsContext.Provider>
     </ViewContext.Provider>
   );

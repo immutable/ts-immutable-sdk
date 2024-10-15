@@ -1,8 +1,6 @@
 import {
   createContext,
-  useContext,
-  useEffect,
-  useMemo,
+  useContext, useMemo,
   useReducer,
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';

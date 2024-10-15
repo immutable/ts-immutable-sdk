@@ -57,16 +57,21 @@ export function RouteFees({
     [routeData],
   );
 
-  const routeToken = routeData?.route.estimate.feeCosts[0].token;
-  const tokenSymbol = routeToken?.symbol ?? '';
+  const feesToken = routeData?.route.estimate.feeCosts?.[0]?.token
+    || routeData?.route.estimate.gasCosts?.[0]?.token;
 
+  if (!feesToken) {
+    return null;
+  }
+
+  const tokenSymbol = feesToken?.symbol || '';
   return (
     <FeesBreakdown
       visible={visible}
       loading={!routeData}
       fees={[...feeCosts, ...gasCosts]}
       tokenSymbol={tokenSymbol}
-      totalAmount={getFormattedNumber(totalAmount, routeToken?.decimals)}
+      totalAmount={getFormattedNumber(totalAmount, feesToken?.decimals)}
       totalFiatAmount={getFormattedAmounts(totalFiatAmount)}
       onCloseDrawer={onClose}
     />

@@ -14,6 +14,7 @@ type PayWithWalletDrawerProps = {
   onPayWithCard: () => void;
   walletOptions: EIP6963ProviderDetail[];
   insufficientBalance?: boolean;
+  showOnRampOption?: boolean;
 };
 
 export function PayWithWalletDrawer({
@@ -23,6 +24,7 @@ export function PayWithWalletDrawer({
   onPayWithCard,
   walletOptions,
   insufficientBalance,
+  showOnRampOption = true,
 }: PayWithWalletDrawerProps) {
   const { providersState: { fromProviderInfo } } = useProvidersContext();
   const { viewDispatch } = useContext(ViewContext);
@@ -58,23 +60,27 @@ export function PayWithWalletDrawer({
   };
 
   const payWithCardItem = useMemo(
-    () => (
-      <MenuItem
-        size="small"
-        emphasized
-        onClick={() => {
-          onClose();
-          onPayWithCard();
-        }}
-      >
-        <MenuItem.FramedIcon
-          icon="BankCard"
-          variant="bold"
-          emphasized={false}
-        />
-        <MenuItem.Label>Pay with Card</MenuItem.Label>
-      </MenuItem>
-    ),
+    () => {
+      if (!showOnRampOption) return null;
+
+      return (
+        <MenuItem
+          size="small"
+          emphasized
+          onClick={() => {
+            onClose();
+            onPayWithCard();
+          }}
+        >
+          <MenuItem.FramedIcon
+            icon="BankCard"
+            variant="bold"
+            emphasized={false}
+          />
+          <MenuItem.Label>Pay with Card</MenuItem.Label>
+        </MenuItem>
+      );
+    },
     [onClose, onPayWithCard],
   );
 

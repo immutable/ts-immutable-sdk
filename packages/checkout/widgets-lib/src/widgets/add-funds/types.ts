@@ -51,3 +51,19 @@ export enum RiveStateMachineInput {
   COMPLETED = 3,
   ERROR = 4,
 }
+
+export type AddFundsError = {
+  type: AddFundsErrorTypes;
+  data?: Record<string, unknown>;
+};
+
+export enum AddFundsErrorTypes {
+  DEFAULT = 'DEFAULT_ERROR',
+  INVALID_PARAMETERS = 'INVALID_PARAMETERS',
+  SERVICE_BREAKDOWN = 'SERVICE_BREAKDOWN',
+  TRANSACTION_FAILED = 'TRANSACTION_FAILED',
+  WALLET_FAILED = 'WALLET_FAILED',
+  WALLET_REJECTED = 'WALLET_REJECTED',
+  WALLET_REJECTED_NO_FUNDS = 'WALLET_REJECTED_NO_FUNDS',
+  WALLET_POPUP_BLOCKED = 'WALLET_POPUP_BLOCKED',
+}
