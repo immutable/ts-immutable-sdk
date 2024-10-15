@@ -130,7 +130,7 @@ export function AddFunds({
     [tokens, inputValue, selectedToken],
   );
 
-  const setSelectedAmount = debounce((value: string) => {
+  const setSelectedAmount = useMemo(() => debounce((value: string) => {
     track({
       userJourney: UserJourney.ADD_FUNDS,
       screen: 'InputScreen',
@@ -147,7 +147,7 @@ export function AddFunds({
         selectedAmount: value,
       },
     });
-  }, 2500);
+  }, 2500), []);
 
   const setSelectedToken = (token: TokenInfo | undefined) => {
     track({
@@ -478,10 +478,16 @@ export function AddFunds({
   const shouldShowBackButton = showBackButton ?? !!onBackButtonClick;
   const routeInputsReady = !!selectedToken
     && !!fromAddress
-    && validateToAmount(selectedAmount).isValid;
+    && validateToAmount(selectedAmount).isValid
+    && validateToAmount(inputValue).isValid;
+
   const loading = (routeInputsReady || fetchingRoutes)
     && !(selectedRouteData || insufficientBalance);
-  const readyToReview = routeInputsReady && !!toAddress && !!selectedRouteData && !loading;
+
+  const readyToReview = routeInputsReady
+    && !!toAddress
+    && !!selectedRouteData
+    && !loading;
 
   const handleWalletConnected = (
     providerType: 'from' | 'to',
@@ -683,7 +689,7 @@ export function AddFunds({
           <Button
             testId="add-funds-button"
             size="large"
-            variant="secondary"
+            variant={readyToReview ? 'primary' : 'secondary'}
             disabled={!readyToReview}
             onClick={handleReviewClick}
             sx={{ opacity: readyToReview ? 1 : 0.5 }}
