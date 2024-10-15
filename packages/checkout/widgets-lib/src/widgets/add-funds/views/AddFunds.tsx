@@ -130,7 +130,7 @@ export function AddFunds({
     [tokens, inputValue, selectedToken],
   );
 
-  const setSelectedAmount = debounce((value: string) => {
+  const setSelectedAmount = useMemo(() => debounce((value: string) => {
     track({
       userJourney: UserJourney.ADD_FUNDS,
       screen: 'InputScreen',
@@ -147,7 +147,7 @@ export function AddFunds({
         selectedAmount: value,
       },
     });
-  }, 2500);
+  }, 2500), []);
 
   const setSelectedToken = (token: TokenInfo | undefined) => {
     track({
