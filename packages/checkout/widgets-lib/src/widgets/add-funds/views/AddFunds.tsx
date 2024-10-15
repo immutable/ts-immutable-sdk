@@ -635,11 +635,7 @@ export function AddFunds({
                 setShowPayWithDrawer(true);
               }}
             >
-              <MenuItem.BottomSlot.Divider
-                sx={{
-                  ml: fromAddress ? 'base.spacing.x4' : undefined,
-                }}
-              />
+              <MenuItem.BottomSlot.Divider sx={fromAddress ? { ml: 'base.spacing.x4' } : undefined} />
               <SelectedRouteOption
                 loading={loading}
                 chains={chains}
