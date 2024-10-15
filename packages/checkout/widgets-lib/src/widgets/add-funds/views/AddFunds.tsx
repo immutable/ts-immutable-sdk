@@ -423,6 +423,7 @@ export function AddFunds({
             toChainId: ChainId.IMTBL_ZKEVM_MAINNET.toString(),
             toTokenAddress: selectedToken.address,
             toAmount: selectedAmount,
+            additionalBuffer: selectedRouteData.amountData.additionalBuffer,
           },
         },
       },

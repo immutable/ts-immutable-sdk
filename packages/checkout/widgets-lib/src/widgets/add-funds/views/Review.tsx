@@ -135,8 +135,8 @@ export function Review({
       data.toTokenAddress === 'native'
         ? SQUID_NATIVE_TOKEN
         : data.toTokenAddress,
+      data.additionalBuffer,
     );
-
     if (!amountData) return;
 
     const routeResponse = await getRoute(
@@ -145,10 +145,11 @@ export function Review({
       amountData?.toToken,
       toAddress,
       amountData.fromAmount,
+      amountData.toAmount,
       fromAddress,
       false,
     );
-    setRoute(routeResponse);
+    setRoute(routeResponse.route);
     setProceedDisabled(false);
   };
 
