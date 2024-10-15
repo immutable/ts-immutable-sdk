@@ -285,8 +285,8 @@ export function Review({
     showHandover(
       EXECUTE_TXN_ANIMATION,
       RiveStateMachineInput.WAITING,
-      'Waiting for transaction approval in wallet',
-      'Approve the transaction request to complete this transaction',
+      'Waiting for transaction confirmation in your wallet',
+      'Confirm the transaction request to complete this transaction',
     );
 
     const executeTxnReceipt = await execute(squid, changeableProvider, route);
