@@ -32,11 +32,17 @@ export type AmountData = {
   toToken: Token;
   toAmount: string;
   balance: TokenBalance;
+  additionalBuffer: number;
 };
 
 export type RouteData = {
   amountData: AmountData;
   route: RouteResponse;
+};
+
+export type RouteResponseData = {
+  route?: RouteResponse;
+  additionalBuffer?: number;
 };
 
 export enum FiatOptionType {
