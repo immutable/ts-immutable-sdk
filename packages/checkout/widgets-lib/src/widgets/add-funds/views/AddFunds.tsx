@@ -637,7 +637,7 @@ export function AddFunds({
             >
               <MenuItem.BottomSlot.Divider
                 sx={{
-                  ml: fromAddress ? 'base.spacing.x2' : undefined,
+                  ml: fromAddress ? 'base.spacing.x4' : undefined,
                 }}
               />
               <SelectedRouteOption

@@ -153,7 +153,8 @@ export function SelectedRouteOption({
         <Sticker position={{ x: 'right', y: 'bottom' }}>
           <Sticker.FramedImage
             use={<img src={chain.iconUrl} alt={chain.name} />}
-            sx={{ w: 'base.icon.size.200' }}
+            size="xSmall"
+            sx={{ bottom: 'base.spacing.x2', right: 'base.spacing.x2' }}
           />
 
           <MenuItem.FramedImage
