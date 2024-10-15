@@ -682,7 +682,7 @@ export function AddFunds({
           <Button
             testId="add-funds-button"
             size="large"
-            variant="secondary"
+            variant={readyToReview ? 'primary' : 'secondary'}
             disabled={!readyToReview}
             onClick={handleReviewClick}
             sx={{ opacity: readyToReview ? 1 : 0.5 }}
