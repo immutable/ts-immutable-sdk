@@ -48,13 +48,11 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
     if (!isValidAmount(params.toAmount)) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "toAmount" widget input');
-      validatedParams.toAmount = '';
     }
 
     if (!isValidAddress(params.toTokenAddress)) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "toTokenAddress" widget input');
-      validatedParams.toTokenAddress = '';
     }
 
     return validatedParams;
