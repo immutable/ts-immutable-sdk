@@ -24,6 +24,7 @@ import {
 } from '@biom3/react';
 import { RouteResponse } from '@0xsquid/squid-types';
 import { t } from 'i18next';
+import { Environment } from '@imtbl/config';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { AddFundsContext } from '../context/AddFundsContext';
 import { useRoutes } from '../hooks/useRoutes';
@@ -31,8 +32,6 @@ import { AddFundsReviewData } from '../../../context/view-context/AddFundsViewCo
 import { RiveStateMachineInput } from '../types';
 import { useExecute } from '../hooks/useExecute';
 import {
-  SharedViews,
-  ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
 import { SquidIcon } from '../components/SquidIcon';
@@ -40,7 +39,12 @@ import { useHandover } from '../../../lib/hooks/useHandover';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
 import { getRemoteRive } from '../../../lib/utils';
-import { SQUID_NATIVE_TOKEN } from '../utils/config';
+import {
+  APPROVE_TXN_ANIMATION,
+  EXECUTE_TXN_ANIMATION,
+  FIXED_HANDOVER_DURATION,
+  SQUID_NATIVE_TOKEN,
+} from '../utils/config';
 import {
   useAnalytics,
   UserJourney,
@@ -62,10 +66,6 @@ interface ReviewProps {
   onBackButtonClick?: () => void;
   onCloseButtonClick?: () => void;
 }
-
-const FIXED_HANDOVER_DURATION = 2000;
-const APPROVE_TXN_ANIMATION = '/access_coins.riv';
-const EXECUTE_TXN_ANIMATION = '/swapping_coins.riv';
 
 const dividerSx = {
   content: "''",
@@ -108,7 +108,7 @@ export function Review({
     getAllowance,
     approve,
     execute,
-  } = useExecute();
+  } = useExecute(checkout?.config.environment || Environment.SANDBOX);
 
   useEffect(() => {
     page({
@@ -135,8 +135,8 @@ export function Review({
       data.toTokenAddress === 'native'
         ? SQUID_NATIVE_TOKEN
         : data.toTokenAddress,
+      data.additionalBuffer,
     );
-
     if (!amountData) return;
 
     const routeResponse = await getRoute(
@@ -145,10 +145,11 @@ export function Review({
       amountData?.toToken,
       toAddress,
       amountData.fromAmount,
+      amountData.toAmount,
       fromAddress,
       false,
     );
-    setRoute(routeResponse);
+    setRoute(routeResponse.route);
     setProceedDisabled(false);
   };
 
@@ -234,60 +235,70 @@ export function Review({
       return;
     }
 
-    try {
-      clearInterval(getRouteIntervalIdRef.current);
-      setProceedDisabled(true);
+    clearInterval(getRouteIntervalIdRef.current);
+    setProceedDisabled(true);
 
+    showHandover(
+      APPROVE_TXN_ANIMATION,
+      RiveStateMachineInput.START,
+      'Preparing',
+    );
+
+    const changeableProvider = await convertToNetworkChangeableProvider(
+      fromProvider,
+    );
+
+    const isValidNetwork = await checkProviderChain(
+      changeableProvider,
+      route.route.params.fromChain,
+    );
+
+    if (!isValidNetwork) {
+      return;
+    }
+
+    const allowance = await getAllowance(changeableProvider, route);
+
+    const { fromAmount } = route.route.params;
+    if (allowance?.lt(fromAmount)) {
       showHandover(
         APPROVE_TXN_ANIMATION,
-        RiveStateMachineInput.START,
-        'Preparing',
-      );
-
-      const changeableProvider = await convertToNetworkChangeableProvider(
-        fromProvider,
-      );
-      await checkProviderChain(
-        changeableProvider,
-        route.route.params.fromChain,
-      );
-
-      const allowance = await getAllowance(changeableProvider, route);
-      const { fromAmount } = route.route.params;
-
-      if (allowance?.lt(fromAmount)) {
-        showHandover(
-          APPROVE_TXN_ANIMATION,
-          RiveStateMachineInput.WAITING,
-          'Waiting for access approval in your wallet',
-          'Approve the transaction request to complete this transaction',
-        );
-
-        await approve(changeableProvider, route);
-
-        showHandover(
-          APPROVE_TXN_ANIMATION,
-          RiveStateMachineInput.COMPLETED,
-          'Granted access to your tokens',
-          '',
-          FIXED_HANDOVER_DURATION,
-        );
-      }
-
-      showHandover(
-        EXECUTE_TXN_ANIMATION,
         RiveStateMachineInput.WAITING,
-        'Waiting for transaction approval in wallet',
+        'Waiting for access approval in your wallet',
         'Approve the transaction request to complete this transaction',
       );
 
-      const txReceipt = await execute(squid, changeableProvider, route);
+      const approveTxnReceipt = await approve(changeableProvider, route);
+
+      if (!approveTxnReceipt) {
+        return;
+      }
+
+      showHandover(
+        APPROVE_TXN_ANIMATION,
+        RiveStateMachineInput.COMPLETED,
+        'Granted access to your tokens',
+        '',
+        FIXED_HANDOVER_DURATION,
+      );
+    }
+
+    showHandover(
+      EXECUTE_TXN_ANIMATION,
+      RiveStateMachineInput.WAITING,
+      'Waiting for transaction confirmation in your wallet',
+      'Confirm the transaction request to complete this transaction',
+    );
+
+    const executeTxnReceipt = await execute(squid, changeableProvider, route);
+
+    if (executeTxnReceipt) {
       track({
         userJourney: UserJourney.ADD_FUNDS,
         screen: 'FundsAdded',
         action: 'Succeeded',
         extras: {
-          txHash: txReceipt.transactionHash,
+          txHash: executeTxnReceipt.transactionHash,
         },
       });
 
@@ -311,7 +322,7 @@ export function Review({
             rc={(
               <a
                 target="_blank"
-                href={`https://axelarscan.io/gmp/${txReceipt.transactionHash}`}
+                href={`https://axelarscan.io/gmp/${executeTxnReceipt?.transactionHash}`}
                 rel="noreferrer"
               />
             )}
@@ -322,18 +333,6 @@ export function Review({
           for transaction details
         </>,
       );
-    } catch (e) {
-      closeHandover();
-
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SharedViews.ERROR_VIEW,
-            error: e as Error,
-          },
-        },
-      });
     }
   }, [
     route,

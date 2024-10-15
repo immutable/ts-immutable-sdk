@@ -32,7 +32,6 @@ import { Web3Provider } from '@ethersproject/providers';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
-  SharedViews,
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
@@ -46,7 +45,7 @@ import type { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidget
 import { useRoutes } from '../hooks/useRoutes';
 import { SQUID_NATIVE_TOKEN } from '../utils/config';
 import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
-import type { RouteData } from '../types';
+import { AddFundsErrorTypes, type RouteData } from '../types';
 import { SelectedRouteOption } from '../components/SelectedRouteOption';
 import { SelectedWallet } from '../components/SelectedWallet';
 import { DeliverToWalletDrawer } from '../../../components/WalletDrawer/DeliverToWalletDrawer';
@@ -62,6 +61,7 @@ import {
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { validateToAmount } from '../functions/amountValidation';
 import { OnboardingDrawer } from '../components/OnboardingDrawer';
+import { useError } from '../hooks/useError';
 
 interface AddFundsProps {
   checkout: Checkout | null;
@@ -89,6 +89,8 @@ export function AddFunds({
   onBackButtonClick,
 }: AddFundsProps) {
   const { fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
+  const { showErrorHandover } = useError(config.environment);
+
   const {
     addFundsState: {
       squid,
@@ -128,7 +130,7 @@ export function AddFunds({
     [tokens, inputValue, selectedToken],
   );
 
-  const setSelectedAmount = debounce((value: string) => {
+  const setSelectedAmount = useMemo(() => debounce((value: string) => {
     track({
       userJourney: UserJourney.ADD_FUNDS,
       screen: 'InputScreen',
@@ -145,7 +147,7 @@ export function AddFunds({
         selectedAmount: value,
       },
     });
-  }, 2500);
+  }, 2500), []);
 
   const setSelectedToken = (token: TokenInfo | undefined) => {
     track({
@@ -232,21 +234,6 @@ export function AddFunds({
     [providers],
   );
 
-  const showErrorView = useCallback(
-    (error: Error) => {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SharedViews.ERROR_VIEW,
-            error,
-          },
-        },
-      });
-    },
-    [viewDispatch],
-  );
-
   useEffect(() => {
     page({
       userJourney: UserJourney.ADD_FUNDS,
@@ -312,10 +299,7 @@ export function AddFunds({
   }, [routes]);
 
   useEffect(() => {
-    if (!checkout) {
-      showErrorView(new Error('Checkout object is missing'));
-      return;
-    }
+    if (!checkout) return;
 
     const fetchTokens = async () => {
       try {
@@ -345,7 +329,7 @@ export function AddFunds({
           });
         }
       } catch (error) {
-        showErrorView(new Error('Failed to fetch tokens'));
+        showErrorHandover(AddFundsErrorTypes.SERVICE_BREAKDOWN);
       }
     };
 
@@ -353,10 +337,7 @@ export function AddFunds({
   }, [checkout, toTokenAddress]);
 
   useEffect(() => {
-    if (!checkout) {
-      showErrorView(new Error('Checkout object is missing'));
-      return;
-    }
+    if (!checkout) return;
 
     const fetchOnRampTokens = async () => {
       try {
@@ -369,7 +350,7 @@ export function AddFunds({
           setOnRampAllowedTokens(tokenResponse.tokens);
         }
       } catch (error) {
-        showErrorView(new Error('Failed to fetch onramp tokens'));
+        showErrorHandover(AddFundsErrorTypes.SERVICE_BREAKDOWN);
       }
     };
     fetchOnRampTokens();
@@ -385,6 +366,16 @@ export function AddFunds({
   }, []);
 
   const handleCardClick = () => {
+    track({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'InputScreen',
+      control: 'PayWithCardMenu',
+      controlType: 'MenuItem',
+      extras: {
+        tokenAddress: selectedToken?.address ?? '',
+        amount: selectedAmount ?? '',
+      },
+    });
     const data = {
       tokenAddress: selectedToken?.address ?? '',
       amount: selectedAmount ?? '',
@@ -432,6 +423,7 @@ export function AddFunds({
             toChainId: ChainId.IMTBL_ZKEVM_MAINNET.toString(),
             toTokenAddress: selectedToken.address,
             toAmount: selectedAmount,
+            additionalBuffer: selectedRouteData.amountData.additionalBuffer,
           },
         },
       },
@@ -486,16 +478,34 @@ export function AddFunds({
   const shouldShowBackButton = showBackButton ?? !!onBackButtonClick;
   const routeInputsReady = !!selectedToken
     && !!fromAddress
-    && validateToAmount(selectedAmount).isValid;
+    && validateToAmount(selectedAmount).isValid
+    && validateToAmount(inputValue).isValid;
+
   const loading = (routeInputsReady || fetchingRoutes)
     && !(selectedRouteData || insufficientBalance);
-  const readyToReview = routeInputsReady && !!toAddress && !!selectedRouteData && !loading;
+
+  const readyToReview = routeInputsReady
+    && !!toAddress
+    && !!selectedRouteData
+    && !loading;
 
   const handleWalletConnected = (
     providerType: 'from' | 'to',
     provider: Web3Provider,
     providerInfo: EIP6963ProviderInfo,
   ) => {
+    track({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'InputScreen',
+      control: 'WalletsMenu',
+      controlType: 'MenuItem',
+      extras: {
+        providerType,
+        providerName: providerInfo.name,
+        providerRdns: providerInfo.rdns,
+        providerUuid: providerInfo.uuid,
+      },
+    });
     sendConnectProviderSuccessEvent(
       eventTarget,
       providerType,
@@ -679,7 +689,7 @@ export function AddFunds({
           <Button
             testId="add-funds-button"
             size="large"
-            variant="secondary"
+            variant={readyToReview ? 'primary' : 'secondary'}
             disabled={!readyToReview}
             onClick={handleReviewClick}
             sx={{ opacity: readyToReview ? 1 : 0.5 }}
