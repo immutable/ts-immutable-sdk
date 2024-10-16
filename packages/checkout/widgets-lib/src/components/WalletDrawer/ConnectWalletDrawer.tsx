@@ -29,7 +29,7 @@ import {
 type ConnectWalletDrawerProps = {
   heading: string;
   visible: boolean;
-  onClose: () => void;
+  onClose: (address?: string) => void;
   onConnect?: (
     provider: Web3Provider,
     providerInfo: EIP6963ProviderInfo
@@ -43,6 +43,7 @@ type ConnectWalletDrawerProps = {
     label: string;
     rdns: string;
   }[];
+  getShouldRequestWalletPermissions?: (providerInfo: EIP6963ProviderInfo) => boolean | undefined;
 };
 
 export function ConnectWalletDrawer({
@@ -56,6 +57,7 @@ export function ConnectWalletDrawer({
   bottomSlot,
   menuItemSize = 'small',
   disabledOptions = [],
+  getShouldRequestWalletPermissions,
 }: ConnectWalletDrawerProps) {
   const {
     providersState: { checkout },
@@ -95,6 +97,8 @@ export function ConnectWalletDrawer({
         },
       });
     }
+
+    return address;
   };
 
   const handleOnWalletChangeEvent = async (event: WalletChangeEvent) => {
@@ -134,17 +138,21 @@ export function ConnectWalletDrawer({
       }
     }
 
+    let address: string | undefined;
+
     // Proceed to connect selected provider
+    const shouldRequestWalletPermissions = getShouldRequestWalletPermissions?.(info);
     try {
       const { provider } = await connectEIP6963Provider(
         providerDetail,
         checkout,
+        shouldRequestWalletPermissions,
       );
       // Identify connected wallet
       await identifyUser(identify, provider);
 
       // Store selected provider as fromProvider in context
-      setProviderInContext(provider, providerDetail.info);
+      address = await setProviderInContext(provider, providerDetail.info);
 
       // Notify successful connection
       onConnect?.(provider, providerDetail.info);
@@ -167,7 +175,7 @@ export function ConnectWalletDrawer({
       return;
     }
 
-    onClose();
+    onClose(address);
   };
 
   const retrySelectedWallet = () => {

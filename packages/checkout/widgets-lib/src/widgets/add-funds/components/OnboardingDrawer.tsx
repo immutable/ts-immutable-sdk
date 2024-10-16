@@ -76,7 +76,10 @@ export function OnboardingDrawer({ environment }: OnboardingDrawerProps) {
           px: 'base.spacing.x6',
         }}
       >
-        <Box rc={<img src={src} alt={HERO_IMAGES[screenIndex - 1]} />} sx={{ userSelect: 'none' }} />
+        <Box
+          rc={<img src={src} alt={HERO_IMAGES[screenIndex - 1]} />}
+          sx={{ userSelect: 'none' }}
+        />
         <Divider
           size="xSmall"
           textAlign="center"

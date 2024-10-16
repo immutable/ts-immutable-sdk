@@ -11,12 +11,13 @@ import {
   ViewActions,
   ViewContext,
 } from '../../context/view-context/ViewContext';
+import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
 
 type DeliverToWalletDrawerProps = {
   visible: boolean;
-  onClose: () => void;
+  onClose: (toAddress?: string) => void;
   walletOptions: EIP6963ProviderDetail[];
-  onConnect: (
+  onConnect?: (
     providerType: 'from' | 'to',
     provider: Web3Provider,
     providerInfo: EIP6963ProviderInfo
@@ -29,10 +30,17 @@ export function DeliverToWalletDrawer({
   onConnect,
   walletOptions,
 }: DeliverToWalletDrawerProps) {
+  const {
+    providersState: { fromProviderInfo },
+  } = useProvidersContext();
+
   const { viewDispatch } = useContext(ViewContext);
 
-  const handleOnConnect = (provider: Web3Provider, providerInfo: EIP6963ProviderInfo) => {
-    onConnect('to', provider, providerInfo);
+  const handleOnConnect = (
+    provider: Web3Provider,
+    providerInfo: EIP6963ProviderInfo,
+  ) => {
+    onConnect?.('to', provider, providerInfo);
   };
 
   const handleOnError = (errorType: ConnectEIP6963ProviderError) => {
@@ -50,6 +58,13 @@ export function DeliverToWalletDrawer({
     }
   };
 
+  // Becuase wallets extensions don't support multiple wallet connections
+  // UX decides to have the user use the same wallet type they selected to pay with
+  // ie: Metamask to Metamsk, will send to same wallet address
+  const selectedSameFromWalletType = (
+    providerInfo: EIP6963ProviderInfo,
+  ): boolean | undefined => (fromProviderInfo?.rdns !== providerInfo.rdns ? undefined : false);
+
   return (
     <ConnectWalletDrawer
       heading="Deliver To"
@@ -59,6 +74,9 @@ export function DeliverToWalletDrawer({
       walletOptions={walletOptions}
       onConnect={handleOnConnect}
       onError={handleOnError}
+      getShouldRequestWalletPermissions={
+        selectedSameFromWalletType
+      }
     />
   );
 }

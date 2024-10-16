@@ -8,9 +8,15 @@ import { APPROVE_TXN_ANIMATION } from '../utils/config';
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
 import { sendAddFundsCloseEvent } from '../AddFundsWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import {
+  ViewActions,
+  ViewContext,
+} from '../../../context/view-context/ViewContext';
 import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
-import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import {
+  useAnalytics,
+  UserJourney,
+} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 interface ErrorConfig {
   headingText: string;
@@ -58,13 +64,15 @@ export const useError = (environment: Environment) => {
     },
     [AddFundsErrorTypes.INVALID_PARAMETERS]: {
       headingText: 'Invalid parameters',
-      subHeadingText: 'The widget parameters provided are invalid. Please check again.',
+      subHeadingText:
+        'The widget parameters provided are invalid. Please check again.',
       secondaryButtonText: 'Close',
       onSecondaryButtonClick: closeWidget,
     },
     [AddFundsErrorTypes.SERVICE_BREAKDOWN]: {
       headingText: 'Our system is currently down',
-      subHeadingText: 'We are currently experiencing technical difficulties. Please try again later.',
+      subHeadingText:
+        'We are currently experiencing technical difficulties. Please try again later.',
       secondaryButtonText: 'Close',
       onSecondaryButtonClick: closeWidget,
     },
@@ -86,7 +94,8 @@ export const useError = (environment: Environment) => {
     },
     [AddFundsErrorTypes.WALLET_REJECTED]: {
       headingText: 'Transaction rejected',
-      subHeadingText: "You'll need to approve the transaction in your wallet to proceed.",
+      subHeadingText:
+        "You'll need to approve the transaction in your wallet to proceed.",
       primaryButtonText: 'Retry',
       onPrimaryButtonClick: goBackToAddFundsView,
       secondaryButtonText: 'Close',
@@ -94,7 +103,8 @@ export const useError = (environment: Environment) => {
     },
     [AddFundsErrorTypes.WALLET_REJECTED_NO_FUNDS]: {
       headingText: 'Insufficient funds',
-      subHeadingText: 'You do not have enough funds to complete the transaction.',
+      subHeadingText:
+        'You do not have enough funds to complete the transaction.',
       primaryButtonText: 'Retry',
       onPrimaryButtonClick: goBackToAddFundsView,
       secondaryButtonText: 'Close',
@@ -112,7 +122,10 @@ export const useError = (environment: Environment) => {
 
   const getErrorConfig = (errorType: AddFundsErrorTypes) => errorConfig[errorType];
 
-  const showErrorHandover = (errorType: AddFundsErrorTypes, data?: Record<string, unknown>) => {
+  const showErrorHandover = (
+    errorType: AddFundsErrorTypes,
+    data?: Record<string, unknown>,
+  ) => {
     page({
       userJourney: UserJourney.ADD_FUNDS,
       screen: 'Error',
@@ -123,19 +136,20 @@ export const useError = (environment: Environment) => {
     });
 
     addHandover({
-      animationUrl: getRemoteRive(
-        environment,
-        APPROVE_TXN_ANIMATION,
-      ),
+      animationUrl: getRemoteRive(environment, APPROVE_TXN_ANIMATION),
       inputValue: RiveStateMachineInput.ERROR,
-      children: <HandoverContent
-        headingText={getErrorConfig(errorType).headingText}
-        subheadingText={getErrorConfig(errorType).subHeadingText}
-        primaryButtonText={getErrorConfig(errorType).primaryButtonText}
-        onPrimaryButtonClick={getErrorConfig(errorType).onPrimaryButtonClick}
-        secondaryButtonText={getErrorConfig(errorType).secondaryButtonText}
-        onSecondaryButtonClick={getErrorConfig(errorType).onSecondaryButtonClick}
-      />,
+      children: (
+        <HandoverContent
+          headingText={getErrorConfig(errorType).headingText}
+          subheadingText={getErrorConfig(errorType).subHeadingText}
+          primaryButtonText={getErrorConfig(errorType).primaryButtonText}
+          onPrimaryButtonClick={getErrorConfig(errorType).onPrimaryButtonClick}
+          secondaryButtonText={getErrorConfig(errorType).secondaryButtonText}
+          onSecondaryButtonClick={
+            getErrorConfig(errorType).onSecondaryButtonClick
+          }
+        />
+      ),
     });
   };
 

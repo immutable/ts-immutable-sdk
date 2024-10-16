@@ -23,11 +23,13 @@ export type ConnectEIP6963ProviderResult = {
 export const connectEIP6963Provider = async (
   providerDetail: EIP6963ProviderDetail,
   checkout: Checkout,
+  shouldRequestWalletPermissions?: boolean,
 ): Promise<ConnectEIP6963ProviderResult> => {
   const web3Provider = new Web3Provider(providerDetail.provider as any);
 
   try {
-    const requestWalletPermissions = providerDetail.info.rdns === WalletProviderRdns.METAMASK;
+    const requestWalletPermissions = shouldRequestWalletPermissions
+      ?? providerDetail.info.rdns === WalletProviderRdns.METAMASK;
     const connectResult = await checkout.connect({
       provider: web3Provider,
       requestWalletPermissions,
@@ -40,7 +42,10 @@ export const connectEIP6963Provider = async (
     );
 
     if (isSanctioned) {
-      throw new CheckoutError('Sanctioned address', ConnectEIP6963ProviderError.SANCTIONED_ADDRESS);
+      throw new CheckoutError(
+        'Sanctioned address',
+        ConnectEIP6963ProviderError.SANCTIONED_ADDRESS,
+      );
     }
 
     addProviderListenersForWidgetRoot(connectResult.provider);
@@ -51,7 +56,9 @@ export const connectEIP6963Provider = async (
   } catch (error: CheckoutErrorType | ConnectEIP6963ProviderError | any) {
     switch (error.type) {
       case CheckoutErrorType.USER_REJECTED_REQUEST_ERROR:
-        throw new Error(ConnectEIP6963ProviderError.USER_REJECTED_REQUEST_ERROR);
+        throw new Error(
+          ConnectEIP6963ProviderError.USER_REJECTED_REQUEST_ERROR,
+        );
       case ConnectEIP6963ProviderError.SANCTIONED_ADDRESS:
         throw new Error(ConnectEIP6963ProviderError.SANCTIONED_ADDRESS);
       default:

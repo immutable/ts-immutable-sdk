@@ -95,7 +95,9 @@ export default function AddFundsWidget({
 
   const squidSdk = useSquid(checkout);
   const tokensResponse = useTokens(checkout);
-  const { showErrorHandover } = useError(checkout.config.environment ?? Environment.SANDBOX);
+  const { showErrorHandover } = useError(
+    checkout.config.environment ?? Environment.SANDBOX,
+  );
 
   useEffect(() => {
     const isInvalidToTokenAddress = toTokenAddress && !isValidAddress(toTokenAddress);
