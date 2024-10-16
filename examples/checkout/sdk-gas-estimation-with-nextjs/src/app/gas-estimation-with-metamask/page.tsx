@@ -35,11 +35,7 @@ export default function ConnectWithMetamask() {
     });
 
     const swapEstimate = await checkoutSDK.gasEstimate({ gasEstimateType: checkout.GasEstimateType.SWAP });
-    // Debug log
-    console.log(swapEstimate)
     const bridgeEstimate = await checkoutSDK.gasEstimate({ gasEstimateType: checkout.GasEstimateType.BRIDGE_TO_L2 });
-    // Debug log
-    console.log(bridgeEstimate)
     // Set the gas estimates in state
     if (swapEstimate.gasEstimateType === checkout.GasEstimateType.SWAP) {
       setSwapGasEstimate(swapEstimate);
