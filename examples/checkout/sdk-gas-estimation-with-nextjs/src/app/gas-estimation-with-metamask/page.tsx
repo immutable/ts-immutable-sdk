@@ -34,8 +34,12 @@ export default function ConnectWithMetamask() {
       requestWalletPermissions: true,
     });
 
+    // #doc gas-estimates
+    // Fetch gas-estimate for Swap type of transaction
     const swapEstimate = await checkoutSDK.gasEstimate({ gasEstimateType: checkout.GasEstimateType.SWAP });
+    // Fetch gas-estimate for Bridge type of transaction
     const bridgeEstimate = await checkoutSDK.gasEstimate({ gasEstimateType: checkout.GasEstimateType.BRIDGE_TO_L2 });
+    // #enddoc gas-estimates
     // Set the gas estimates in state
     if (swapEstimate.gasEstimateType === checkout.GasEstimateType.SWAP) {
       setSwapGasEstimate(swapEstimate);
