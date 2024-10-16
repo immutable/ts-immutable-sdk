@@ -112,7 +112,8 @@
     "start": "yarn clean && NODE_ENV=development rollup --config rollup.config.js --watch",
     "test": "jest test --passWithNoTests",
     "test:watch": "jest test --passWithNoTests --watch",
-    "typecheck": "tsc --customConditions \"default\" --noEmit"
+    "typecheck": "tsc --customConditions \"default\" --noEmit",
+    "updateHashes": "node ./updateHashes.js"
   },
   "type": "module",
   "types": "./dist/index.d.ts"

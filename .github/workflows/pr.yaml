@@ -44,6 +44,17 @@ jobs:
       - name: Build, Lint, Test & Typecheck
         run: yarn nx affected -t build,lint,test,typecheck 
 
+      - name: Validate Checkout Widgets Hashes
+        run: |
+          cd packages/checkout/widgets-lib
+          mv hashes.json hashes.json.old
+          yarn updateHashes
+          if [ -n "$(git diff --exit-code hashes.json)" ]; then
+            git add hashes.json
+            git commit -m "Update hashes.json"
+            git push
+          fi
+
   build-lint-test-examples:
     name: Build, Lint & Test Examples
     runs-on: ubuntu-latest-8-cores
