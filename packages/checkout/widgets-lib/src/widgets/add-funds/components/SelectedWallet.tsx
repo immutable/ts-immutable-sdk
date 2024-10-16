@@ -23,7 +23,12 @@ export function SelectedWallet({
   const size: MenuItemProps['size'] = selected ? 'xSmall' : 'small';
 
   return (
-    <MenuItem size={size} emphasized onClick={onClick}>
+    <MenuItem
+      size={size}
+      emphasized
+      onClick={onClick}
+      sx={selected ? { py: 'base.spacing.x3' } : undefined}
+    >
       {!providerInfo?.icon && (
         <MenuItem.FramedIcon icon="Wallet" variant="bold" emphasized={false} />
       )}
