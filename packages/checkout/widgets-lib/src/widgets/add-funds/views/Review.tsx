@@ -672,7 +672,7 @@ export function Review({
           </>
         )}
 
-        {!route && <LoadingView loadingText="Securing quote" />}
+        {!route && !showAddressMissmatchDrawer && <LoadingView loadingText="Securing quote" />}
       </Stack>
       <RouteFees
         routeData={route}
