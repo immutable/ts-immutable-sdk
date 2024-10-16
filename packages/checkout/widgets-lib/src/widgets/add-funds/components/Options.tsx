@@ -9,6 +9,7 @@ import {
 } from '@biom3/react';
 import { motion } from 'framer-motion';
 import { useMemo } from 'react';
+import { Checkout } from '@imtbl/checkout-sdk';
 import {
   listItemVariants,
   listVariants,
@@ -16,6 +17,7 @@ import {
 import { FiatOption } from './FiatOption';
 import { Chain, FiatOptionType, RouteData } from '../types';
 import { RouteOption } from './RouteOption';
+import { getRemoteVideo } from '../../../lib/utils';
 
 const defaultFiatOptions: FiatOptionType[] = [
   FiatOptionType.DEBIT,
@@ -23,6 +25,7 @@ const defaultFiatOptions: FiatOptionType[] = [
 ];
 
 export interface OptionsProps {
+  checkout: Checkout;
   chains: Chain[] | null;
   onCardClick: (type: FiatOptionType) => void;
   onRouteClick: (route: RouteData, index: number) => void;
@@ -34,6 +37,7 @@ export interface OptionsProps {
 }
 
 export function Options({
+  checkout,
   routes,
   chains,
   onCardClick,
@@ -62,7 +66,10 @@ export function Options({
         </Body>
         <FramedVideo
           mimeType="video/mp4"
-          videoUrl="https://i.imgur.com/dVQoobw.mp4"
+          videoUrl={getRemoteVideo(
+            checkout.config.environment,
+            '/loading_bubble-small.mp4',
+          )}
           sx={{ alignSelf: 'center', mt: 'base.spacing.x2' }}
           size="large"
           circularFrame
