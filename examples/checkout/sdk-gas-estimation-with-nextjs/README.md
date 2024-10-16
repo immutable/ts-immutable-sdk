@@ -1,5 +1,8 @@
-This is a NextJS app that shows the use of the Immutable Checkout SDK to estimate gas for swap and bridge transactions. 
+# Checkout SDK Gas Estimation Example App
 
+This example app is designed to show you how to estimate gas for swap and bridge transaction on Immutable zkEVM. 
+
+This example app runs on Immutable zkEVM Testnet. To use this code on Immutable zkEVM Mainnet make sure you instantiate the SDK with the Mainnet configuration.
 ## Getting Started
 
 First, run the development server:

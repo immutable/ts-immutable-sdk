@@ -1,7 +1,7 @@
 'use client';
 import { checkout } from "@imtbl/sdk";
 import { GasEstimateSwapResult, GasEstimateBridgeToL2Result } from "@imtbl/sdk/checkout";
-import { checkoutSDK } from "../utils/setupCustom";
+import { checkoutSDK } from "../utils/setupDefault";
 import { useState } from "react";
 import { Web3Provider } from "@ethersproject/providers";
 import { Button, Heading, Body, Link, Table } from "@biom3/react";
