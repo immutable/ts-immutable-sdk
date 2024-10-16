@@ -9,12 +9,15 @@ import {
 } from './config/config';
 import {
   mapBidFromOpenApiOrder,
+  mapCollectionBidFromOpenApiOrder,
   mapFromOpenApiPage,
   mapFromOpenApiTrade,
   mapListingFromOpenApiOrder,
   mapOrderFromOpenApiOrder,
 } from './openapi/mapper';
-import { ApiError, CancelOrdersResult, Fee as OpenApiFee } from './openapi/sdk';
+import {
+  ApiError, CancelOrdersResult, FulfillmentDataRequest, Fee as OpenApiFee,
+} from './openapi/sdk';
 import { Seaport } from './seaport';
 import { getBulkSeaportOrderSignatures } from './seaport/components';
 import { SeaportLibFactory } from './seaport/seaport-lib-factory';
@@ -23,7 +26,9 @@ import {
   ActionType,
   BidResult,
   CancelOrdersOnChainResponse,
+  CollectionBidResult,
   CreateBidParams,
+  CreateCollectionBidParams,
   CreateListingParams,
   FeeValue,
   FulfillBulkOrdersResponse,
@@ -32,6 +37,8 @@ import {
   FulfillOrderResponse,
   ListBidsParams,
   ListBidsResult,
+  ListCollectionBidsParams,
+  ListCollectionBidsResult,
   ListingResult,
   ListListingsParams,
   ListListingsResult,
@@ -43,6 +50,8 @@ import {
   PrepareBulkListingsParams,
   PrepareBulkListingsResponse,
   PrepareCancelOrdersResponse,
+  PrepareCollectionBidParams,
+  PrepareCollectionBidResponse,
   PrepareListingParams,
   PrepareListingResponse,
   SignablePurpose,
@@ -147,6 +156,18 @@ export class Orderbook {
   }
 
   /**
+   * Get a collection bid by ID
+   * @param {string} collectionBidId - The collectionBidId to find.
+   * @return {CollectionBidResult} The returned collection bid result.
+   */
+  async getCollectionBid(collectionBidId: string): Promise<CollectionBidResult> {
+    const apiCollectionBid = await this.apiClient.getCollectionBid(collectionBidId);
+    return {
+      result: mapCollectionBidFromOpenApiOrder(apiCollectionBid.result),
+    };
+  }
+
+  /**
    * Get a trade by ID
    * @param {string} tradeId - The tradeId to find.
    * @return {TradeResult} The returned trade result.
@@ -187,6 +208,22 @@ export class Orderbook {
     return {
       page: mapFromOpenApiPage(apiBids.page),
       result: apiBids.result.map(mapBidFromOpenApiOrder),
+    };
+  }
+
+  /**
+   * List collection bids. This method is used to get a list of collection bids filtered
+   * by conditions specified in the params object.
+   * @param {ListCollectionBidsParams} listOrderParams - Filtering, ordering and page parameters.
+   * @return {ListCollectionBidsResult} The paged collection bids.
+   */
+  async listCollectionBids(
+    listOrderParams: ListCollectionBidsParams,
+  ): Promise<ListCollectionBidsResult> {
+    const apiCollectionBids = await this.apiClient.listCollectionBids(listOrderParams);
+    return {
+      page: mapFromOpenApiPage(apiCollectionBids.page),
+      result: apiCollectionBids.result.map(mapCollectionBidFromOpenApiOrder),
     };
   }
 
@@ -431,9 +468,7 @@ export class Orderbook {
   async createListing(
     createListingParams: CreateListingParams,
   ): Promise<ListingResult> {
-    const apiListingResponse = await this.apiClient.createListing({
-      ...createListingParams,
-    });
+    const apiListingResponse = await this.apiClient.createListing(createListingParams);
 
     return {
       result: mapListingFromOpenApiOrder(apiListingResponse.result),
@@ -475,12 +510,56 @@ export class Orderbook {
   async createBid(
     createBidParams: CreateBidParams,
   ): Promise<BidResult> {
-    const apiBidResponse = await this.apiClient.createBid({
-      ...createBidParams,
-    });
+    const apiBidResponse = await this.apiClient.createBid(createBidParams);
 
     return {
       result: mapBidFromOpenApiOrder(apiBidResponse.result),
+    };
+  }
+
+  /**
+   * Get required transactions and messages for signing prior to creating a collection bid
+   * through the {@linkcode createCollectionBid} method
+   * @param {PrepareCollectionBidParams} - Details about the collection bid to be created.
+   * @return {PrepareCollectionBidResponse} PrepareCollectionBidResponse includes
+   * the unsigned approval transaction, the typed order message for signing and
+   * the order components that can be submitted to {@linkcode createCollectionBid} with a signature.
+   */
+  async prepareCollectionBid({
+    makerAddress,
+    sell,
+    buy,
+    orderStart,
+    orderExpiry,
+  }: PrepareCollectionBidParams): Promise<PrepareCollectionBidResponse> {
+    return this.seaport.prepareSeaportOrder(
+      makerAddress,
+      sell,
+      buy,
+      true,
+      // Default order start to now
+      orderStart || new Date(),
+      // Default order expiry to 2 years from now
+      orderExpiry || Orderbook.defaultOrderExpiry(),
+    );
+  }
+
+  /**
+   * Create a collection bid
+   * @param {CreateCollectionBidParams} createCollectionBidParams create a collection bid
+   *                                                              with the given params.
+   * @return {CollectionBidResult} The result of the collection bid created
+   *                               in the Immutable services.
+   */
+  async createCollectionBid(
+    createCollectionBidParams: CreateCollectionBidParams,
+  ): Promise<CollectionBidResult> {
+    const apiCollectionBidResponse = await this.apiClient.createCollectionBid(
+      createCollectionBidParams,
+    );
+
+    return {
+      result: mapCollectionBidFromOpenApiOrder(apiCollectionBidResponse.result),
     };
   }
 
@@ -500,22 +579,30 @@ export class Orderbook {
     takerAddress: string,
     takerFees: FeeValue[],
     amountToFill?: string,
+    tokenId?: string,
   ): Promise<FulfillOrderResponse> {
-    const fulfillmentDataRes = await this.apiClient.fulfillmentData([
-      {
-        order_id: orderId,
-        taker_address: takerAddress,
-        fees: takerFees.map((fee) => ({
-          type: OpenApiFee.type.TAKER_ECOSYSTEM,
-          amount: fee.amount,
-          recipient_address: fee.recipientAddress,
-        })),
-      },
-    ]);
+    const fulfillmentDataParams: FulfillmentDataRequest = {
+      order_id: orderId,
+      taker_address: takerAddress,
+      fees: takerFees.map((fee) => ({
+        type: OpenApiFee.type.TAKER_ECOSYSTEM,
+        amount: fee.amount,
+        recipient_address: fee.recipientAddress,
+      })),
+    };
+
+    const considerationCriteria = tokenId
+      ? [{ identifier: tokenId, proof: [] }]
+      : undefined;
+
+    // if token ID is present we can assume it is a criteria based order for now
+    if (tokenId) fulfillmentDataParams.token_id = tokenId;
+
+    const fulfillmentDataRes = await this.apiClient.fulfillmentData([fulfillmentDataParams]);
 
     if (fulfillmentDataRes.result.unfulfillable_orders?.length > 0) {
       throw new Error(
-        `Unable to prepare fulfillment date: ${fulfillmentDataRes.result.unfulfillable_orders[0].reason}`,
+        `Unable to prepare fulfillment data: ${fulfillmentDataRes.result.unfulfillable_orders[0].reason}`,
       );
     } else if (fulfillmentDataRes.result.fulfillable_orders?.length !== 1) {
       throw new Error('unexpected fulfillable order result length');
@@ -530,7 +617,13 @@ export class Orderbook {
       );
     }
 
-    return this.seaport.fulfillOrder(orderResult, takerAddress, extraData, amountToFill);
+    return this.seaport.fulfillOrder(
+      orderResult,
+      takerAddress,
+      extraData,
+      amountToFill,
+      considerationCriteria,
+    );
   }
 
   /**
@@ -546,14 +639,19 @@ export class Orderbook {
     orders: FulfillmentOrder[] | FulfillmentListing[],
     takerAddress: string,
   ): Promise<FulfillBulkOrdersResponse> {
-    const mappedOrders = orders.map((order): FulfillmentOrder => ({
-      orderId: 'listingId' in order ? order.listingId : order.orderId,
-      takerFees: order.takerFees,
-      amountToFill: order.amountToFill,
-    }));
+    const mo = orders.map((order): FulfillmentOrder => {
+      const isListing = 'listingId' in order;
+
+      return {
+        orderId: isListing ? order.listingId : order.orderId,
+        takerFees: order.takerFees,
+        amountToFill: order.amountToFill,
+        tokenId: isListing ? undefined : order.tokenId,
+      };
+    });
 
     const fulfillmentDataRes = await this.apiClient.fulfillmentData(
-      mappedOrders.map((fulfillmentRequest) => ({
+      mo.map((fulfillmentRequest) => ({
         order_id: fulfillmentRequest.orderId,
         taker_address: takerAddress,
         fees: fulfillmentRequest.takerFees.map((fee) => ({
@@ -561,22 +659,33 @@ export class Orderbook {
           amount: fee.amount,
           recipient_address: fee.recipientAddress,
         })),
+        token_id: fulfillmentRequest?.tokenId,
       })),
     );
 
     try {
       const fulfillableOrdersWithUnits = fulfillmentDataRes.result.fulfillable_orders
-        .map((fulfillmentData) => {
-        // Find the order that corresponds to the order for the units
-          const order = mappedOrders.find((l) => l.orderId === fulfillmentData.order.id);
+        .map((fd) => {
+          // Find the order that corresponds to the order for the units
+          const order = mo.find((l) => l.orderId === fd.order.id && l.tokenId === fd.token_id);
+
           if (!order) {
-            throw new Error(`Could not find order for order ${fulfillmentData.order.id}`);
+            let errMessage = `Could not find order for order ${fd.order.id}`;
+            if (fd.token_id) errMessage += ` and token ID ${fd.token_id}`;
+            throw new Error(errMessage);
+          }
+
+          const considerationCriteria = [];
+
+          if (order.tokenId) {
+            considerationCriteria.push({ identifier: order.tokenId, proof: [] });
           }
 
           return {
-            extraData: fulfillmentData.extra_data,
-            order: fulfillmentData.order,
+            extraData: fd.extra_data,
+            order: fd.order,
             unitsToFill: order.amountToFill,
+            considerationCriteria,
           };
         });
 
@@ -591,6 +700,7 @@ export class Orderbook {
         unfulfillableOrders: fulfillmentDataRes.result.unfulfillable_orders.map(
           (o) => ({
             orderId: o.order_id,
+            tokenId: o.token_id,
             reason: o.reason,
           }),
         ),
@@ -721,9 +831,18 @@ export class Orderbook {
       })),
     );
 
+    const collectionBidResultsPromises = Promise.all(
+      orderIds.map((id) => this.apiClient.getCollectionBid(id).catch((e: ApiError) => {
+        if (e.status === 404) {
+          return undefined;
+        }
+        throw e;
+      })),
+    );
+
     const orders = [
-      await Promise.all([listingResultsPromises, bidResultsPromises]),
-    ].flat(2).filter((r) => r !== undefined).map((r) => r.result);
+      await Promise.all([listingResultsPromises, bidResultsPromises, collectionBidResultsPromises]),
+    ].flat(2).filter((r) => r !== undefined).map((f) => f.result);
 
     if (orders.length !== orderIds.length) {
       const notFoundOrderIds = orderIds.filter((oi) => !orders.some((o) => o.id === oi));

@@ -21,42 +21,15 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
+
       - name: setup
         uses: ./.github/actions/setup
 
       - name: Syncpack
         run: yarn syncpack:check
 
-  detect:
-    name: Detect Node engine version change
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Get Node engine version from package.json
-        id: get_package_json_node_engine_version
-        run: |
-          node_engine_major_version=$(jq -r '.engines.node' ./sdk/package.json | sed 's/^>=//' | cut -d. -f1)
-          echo "::set-output name=node_engine_major_version::$node_engine_major_version"
-
-      - name: Get Node.js version from .nvmrc
-        id: get_nvmrc_node_version
-        run: echo "::set-output name=nvmrc_node_version::$(head -n 1 .nvmrc | cut -d. -f1)"
-
-      - name: Check Node.js engine version change
-        run: |
-          package_version_major=$(echo "${{ steps.get_package_json_node_engine_version.outputs.node_engine_major_version }}")
-          nvmrc_version_major=$(echo "${{ steps.get_nvmrc_node_version.outputs.nvmrc_node_version }}")
-          if [ "$package_version_major" != "$nvmrc_version_major" ]; then
-            echo "Node.js engine version has changed"
-            exit 1
-          else
-            echo "Node.js engine version has not changed"
-          fi
-
-  build-sdk:
-    name: Build SDK
+  build-lint-test-typecheck-sdk:
+    name: Build, Lint, Test & Typecheck SDK
     runs-on: ubuntu-latest-8-cores
     steps:
       - name: Checkout code
@@ -64,65 +37,12 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
-      - name: setup
-        uses: ./.github/actions/setup
-      - name: Build
-        run: yarn nx affected --target=build
 
-  typecheck-sdk:
-    name: Typecheck SDK
-    runs-on: ubuntu-latest-4-cores
-    needs: build-sdk
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
       - name: setup
         uses: ./.github/actions/setup
 
-      - name: Typecheck
-        run: yarn typecheck
-
-  test-sdk:
-    name: Test SDK
-    runs-on: ubuntu-latest-8-cores
-    needs: build-sdk
-    env:
-      NODE_OPTIONS: --max-old-space-size=14366
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
-      - name: setup
-        uses: ./.github/actions/setup
-
-      - name: Test
-        run: yarn test --configuration=ci
-
-      - name: Upload SDK test coverage artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverages
-          path: ./packages/**/coverage/*
-
-  lint-sdk:
-    name: Lint SDK
-    runs-on: ubuntu-latest-4-cores
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
-      - name: setup
-        uses: ./.github/actions/setup
-
-      - name: Lint
-        run: yarn lint
+      - name: Build, Lint, Test & Typecheck
+        run: yarn nx affected -t build,lint,test,typecheck 
 
   build-lint-test-examples:
     name: Build, Lint & Test Examples
@@ -132,6 +52,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
 
       - name: setup
         uses: ./.github/actions/setup
@@ -148,15 +71,53 @@ jobs:
       - name: Setup playwright
         uses: ./.github/actions/setup-playwright
 
+      - name: Prepare widgets bundle for Checkout Widgets example app
+        run: yarn workspace @imtbl/checkout-widgets prepare:examplewidgets
+
       - name: Test examples
         run: yarn test:examples
-      
 
-  func-test-imx:
-    name: imx func tests
-    runs-on: ubuntu-latest-4-cores
-    needs: build-sdk
+  build-lint-test-example-widgets-with-sdk:
+    name: Build, Lint & Test Example Widgets with latest SDK
+    runs-on: ubuntu-latest-8-cores
     env:
+      NODE_OPTIONS: --max-old-space-size=14366
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: setup
+        uses: ./.github/actions/setup
+
+      - name: Setup playwright
+        uses: ./.github/actions/setup-playwright
+
+      - name: Install SDK at current version
+        run: yarn workspace @examples/sdk-load-widgets-with-nextjs add @imtbl/sdk@$(npm view @imtbl/sdk version)
+
+      - name: Build next app
+        run: yarn workspace @examples/sdk-load-widgets-with-nextjs build
+
+      - name: Build everything
+        run: yarn build
+
+      - name: Lint examples
+        run: yarn workspace @examples/sdk-load-widgets-with-nextjs lint
+
+      - name: Prepare widgets bundle for Checkout Widgets example app
+        run: yarn workspace @imtbl/checkout-widgets prepare:examplewidgets
+
+      - name: Test Widget example
+        run: yarn workspace @examples/sdk-load-widgets-with-nextjs test
+
+  func-tests:
+    name: Functional tests
+    runs-on: ubuntu-latest-8-cores
+    env:
+      # imx envs
       NETWORK: sepolia
       TEST_ALCHEMY_API_KEY: ${{ secrets.TEST_ALCHEMY_API_KEY }}
       PUBLIC_API_URL: "https://api.sandbox.x.immutable.com/v1"
@@ -170,27 +131,10 @@ jobs:
       TEST_WALLET_BANKER_PRIVATE_KEY: ${{ secrets.TEST_WALLET_BANKER_PRIVATE_KEY }}
       TEST_WALLET_BANKER_STARK_PRIVATE_KEY: ${{ secrets.TEST_WALLET_BANKER_STARK_PRIVATE_KEY }}
       TEST_STARKEX_BATCH_SIZE: 500
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
-      - name: setup
-        uses: ./.github/actions/setup
 
-      - name: Setup tests
-        uses: ./.github/actions/setup-tests
-
-      - name: test
-        run: yarn workspace @tests/func-tests-imx func-test:ci
-
-  func-test-zkevm:
-    name: zkevm func tests
-    runs-on: ubuntu-latest-8-cores
-    needs: build-sdk
-    env:
+      # zkevm envs
       ZKEVM_ORDERBOOK_BANKER: ${{ secrets.ZKEVM_ORDERBOOK_BANKER }}
+      ZKEVM_ORDERBOOK_ERC20: "0x70dCEF6C22F50497eafc77D252E8E175af21bF75"
       ZKEVM_ORDERBOOK_ERC721: "0xBE8B131f39825282Ace9eFf99C0Bb14972417b49"
       ZKEVM_ORDERBOOK_ERC1155: "0x2efB9B7810B1d1520c0822aa20F1889ABd2c2146"
       SEAPORT_CONTRACT_ADDRESS: "0x7d117aA8BD6D31c4fa91722f246388f38ab1942c"
@@ -204,12 +148,12 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
-
+          
       - name: setup
         uses: ./.github/actions/setup
 
-      - name: Setup tests
-        uses: ./.github/actions/setup-tests
+      - name: Prepare tests
+        run: yarn prepare:tests
 
-      - name: test
-        run: yarn workspace @tests/func-tests-zkevm func-test:ci
+      - name: Run functional tests
+        run: FORCE_COLOR=1 yarn workspaces foreach -Apt --include='@tests/**' run func-test:ci

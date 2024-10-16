@@ -1,5 +1,7 @@
-import { MenuItem } from '@biom3/react';
-import { cloneElement, ReactElement, useState } from 'react';
+import { MenuItem, MenuItemProps } from '@biom3/react';
+import {
+  cloneElement, ReactElement, ReactNode, useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
 import { RawImage } from '../RawImage/RawImage';
@@ -11,6 +13,9 @@ export interface WalletItemProps<RC extends ReactElement | undefined = undefined
   providerInfo: EIP6963ProviderInfo;
   onWalletItemClick: () => void;
   rc?: RC;
+  size?: MenuItemProps['size'];
+  badge?: ReactNode;
+  disabled?: boolean;
 }
 
 export function WalletItem<
@@ -22,6 +27,9 @@ export function WalletItem<
   recommended = false,
   providerInfo,
   onWalletItemClick,
+  size = 'medium',
+  badge,
+  disabled,
 }: WalletItemProps<RC>) {
   const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
@@ -41,7 +49,7 @@ export function WalletItem<
         },
       })}
       testId={`${testId}-wallet-list-${providerInfo.rdns}`}
-      size="medium"
+      size={size}
       emphasized
       sx={{ position: 'relative' }}
     >
@@ -51,6 +59,7 @@ export function WalletItem<
         sx={{
           position: 'absolute',
           left: 'base.spacing.x3',
+          cursor: disabled ? 'not-allowed' : 'pointer',
         }}
       />
       <MenuItem.Label size="medium" sx={{ marginLeft: '65px' }}>
@@ -58,11 +67,12 @@ export function WalletItem<
       </MenuItem.Label>
       {((recommended || busy) && (
         <MenuItem.Badge
-          variant="guidance"
           isAnimated={busy}
+          variant={recommended && !busy ? 'emphasis' : 'guidance'}
           badgeContent={busy ? '' : t('wallets.recommended')}
         />
       ))}
+      {!busy && badge}
     </MenuItem>
   );
 }

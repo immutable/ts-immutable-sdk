@@ -190,8 +190,8 @@ export class OrdersService {
   }
 
   /**
-   * List a paginated array of bids with optional filter parameters
-   * List a paginated array of bids with optional filter parameters
+   * List all bids
+   * List all bids
    * @returns ListBidsResult OK response.
    * @throws ApiError
    */
@@ -313,8 +313,8 @@ export class OrdersService {
   }
 
   /**
-   * List a paginated array of collection bids with optional filter parameters
-   * List a paginated array of collection bids with optional filter parameters
+   * List all collection bids
+   * List all collection bids
    * @returns ListCollectionBidsResult OK response.
    * @throws ApiError
    */

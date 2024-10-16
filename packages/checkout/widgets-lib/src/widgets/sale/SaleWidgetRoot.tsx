@@ -156,6 +156,7 @@ export class Sale extends Base<WidgetType.SALE> {
                       this.parameters.excludeFiatCurrencies!
                     }
                     preferredCurrency={this.parameters.preferredCurrency!}
+                    customOrderData={this.parameters.customOrderData!}
                     hideExcludedPaymentTypes={
                       this.properties?.config?.hideExcludedPaymentTypes ?? false
                     }

@@ -25,7 +25,6 @@ export * from './domain/metadata-refreshes-api';
 export * from './domain/mints-api';
 export * from './domain/nft-checkout-primary-api';
 export * from './domain/orders-api';
-export * from './domain/primary-sales-api';
 export * from './domain/projects-api';
 export * from './domain/tokens-api';
 export * from './domain/trades-api';

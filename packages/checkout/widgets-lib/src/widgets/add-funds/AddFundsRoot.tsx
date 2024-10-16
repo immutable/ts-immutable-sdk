@@ -1,5 +1,4 @@
 import {
-  ChainId,
   IMTBLWidgetEvents,
   WidgetConfiguration,
   WidgetProperties,
@@ -15,12 +14,10 @@ import i18n from '../../i18n';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
 import {
-  ConnectLoader,
-  ConnectLoaderParams,
-} from '../../components/ConnectLoader/ConnectLoader';
-import { getL1ChainId, getL2ChainId } from '../../lib';
-import { sendAddFundsCloseEvent } from './AddFundsWidgetEvents';
-import { isValidAmount } from '../../lib/validations/widgetValidators';
+  isValidAddress,
+  isValidAmount,
+} from '../../lib/validations/widgetValidators';
+import { ProvidersContextProvider } from '../../context/providers-context/ProvidersContext';
 
 const AddFundsWidget = React.lazy(() => import('./AddFundsWidget'));
 
@@ -51,7 +48,11 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
     if (!isValidAmount(params.toAmount)) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "toAmount" widget input');
-      validatedParams.toAmount = '';
+    }
+
+    if (!isValidAddress(params.toTokenAddress)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "toTokenAddress" widget input');
     }
 
     return validatedParams;
@@ -61,45 +62,31 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
     if (!this.reactRoot) return;
 
     const { t } = i18n;
-    const connectLoaderParams: ConnectLoaderParams = {
-      targetChainId: this.checkout.config.isProduction
-        ? ChainId.IMTBL_ZKEVM_MAINNET
-        : ChainId.IMTBL_ZKEVM_TESTNET,
-      web3Provider: this.web3Provider,
-      checkout: this.checkout,
-      allowedChains: [
-        getL1ChainId(this.checkout.config),
-        getL2ChainId(this.checkout.config),
-      ],
-    };
 
     this.reactRoot.render(
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="add-funds-container" config={this.strongConfig()}>
             <HandoverProvider>
-              <ConnectLoader
-                widgetConfig={this.strongConfig()}
-                params={connectLoaderParams}
-                closeEvent={() => sendAddFundsCloseEvent(window)}
+              <ProvidersContextProvider
+                initialState={{ checkout: this.checkout }}
               >
                 <Suspense
                   fallback={
                     <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
-                  }
+                }
                 >
                   <AddFundsWidget
-                    checkout={this.checkout}
-                    web3Provider={this.web3Provider}
+                    config={this.strongConfig()}
+                    toTokenAddress={this.parameters.toTokenAddress}
+                    toAmount={this.parameters.toAmount}
                     showBridgeOption={this.parameters.showBridgeOption}
                     showSwapOption={this.parameters.showSwapOption}
                     showOnrampOption={this.parameters.showOnrampOption}
-                    toTokenAddress={this.parameters.toTokenAddress}
-                    toAmount={this.parameters.toAmount}
                     showBackButton={this.parameters.showBackButton}
                   />
                 </Suspense>
-              </ConnectLoader>
+              </ProvidersContextProvider>
             </HandoverProvider>
           </ThemeProvider>
         </CustomAnalyticsProvider>

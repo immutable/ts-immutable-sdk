@@ -60,7 +60,7 @@ export interface SeaportERC1155Item {
      */
     'token_id': string;
     /**
-     * A string representing the total units of an ERC1155 token which the user is selling
+     * A string representing the total units of an ERC1155 token which the user is buying/selling
      * @type {string}
      * @memberof SeaportERC1155Item
      */

@@ -1,4 +1,6 @@
-import { Suspense, useEffect, useMemo } from 'react';
+import {
+  Suspense, useCallback, useEffect, useMemo,
+} from 'react';
 import {
   CheckoutEventType,
   CheckoutWidgetParams,
@@ -28,10 +30,14 @@ import OnRampWidget from '../on-ramp/OnRampWidget';
 import WalletWidget from '../wallet/WalletWidget';
 import SaleWidget from '../sale/SaleWidget';
 import AddFundsWidget from '../add-funds/AddFundsWidget';
-import { getViewShouldConnect } from './functions/getViewShouldConnect';
+import {
+  isConnectLoaderFlow,
+  isProvidersContextFlow,
+} from './functions/getFlowRequiresContext';
 import { useWidgetEvents } from './hooks/useWidgetEvents';
 import { getConnectLoaderParams } from './functions/getConnectLoaderParams';
 import { checkoutFlows } from './functions/isValidCheckoutFlow';
+import { ProvidersContextProvider } from '../../context/providers-context/ProvidersContext';
 
 export type CheckoutWidgetInputs = {
   checkout: Checkout;
@@ -48,13 +54,37 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
 
   const { t } = useTranslation();
   const viewState = useViewState();
-  const [{ view }, viewDispatch] = viewState;
+  const [{ view, history }, viewDispatch] = viewState;
   const [{ eventTarget }] = useEventTargetState();
 
   const connectLoaderParams = useMemo(
     () => getConnectLoaderParams(view, checkout, web3Provider),
     [view, checkout, web3Provider],
   );
+
+  const goToPreviousView = useCallback(() => {
+    const sharedViews = [
+      SharedViews.LOADING_VIEW,
+      SharedViews.ERROR_VIEW,
+      SharedViews.SUCCESS_VIEW,
+      SharedViews.TOP_UP_VIEW,
+      SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
+    ] as string[];
+
+    const views = history
+      .slice(0, -1)
+      .filter(({ type }) => !sharedViews.includes(type));
+    const lastView = views[views.length - 1];
+
+    if (lastView) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: lastView,
+        },
+      });
+    }
+  }, [history]);
 
   /**
    * Subscribe and Handle widget events
@@ -96,7 +126,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
           type: SharedViews.ERROR_VIEW,
           error: {
             name: 'InvalidViewType',
-            message: `Invalid view type "${flowParams}"`,
+            message: `Invalid view type "${flowParams.flow}"`,
           },
         },
       },
@@ -106,8 +136,16 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   /**
    * Validate if the view requires connect loader
    */
-  const shouldConnectView = useMemo(
-    () => getViewShouldConnect(view.type),
+  const shouldWrapWithConnectLoader = useMemo(
+    () => isConnectLoaderFlow(view.type),
+    [view.type],
+  );
+
+  /**
+   * Validate if the view requires providers context
+   */
+  const shouldWrapWithProvidersContext = useMemo(
+    () => isProvidersContextFlow(view.type),
     [view.type],
   );
 
@@ -137,7 +175,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
             actionText={t('views.ERROR_VIEW.actionText')}
           />
         )}
-        {/* --- Widgets without connect --- */}
+        {/* --- Widgets without connect loader or providers context --- */}
         {view.type === CheckoutFlowType.CONNECT && (
           <ConnectWidget
             config={widgetsConfig}
@@ -160,8 +198,21 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
             {...(view.data.params || {})}
           />
         )}
-        {/* --- Widgets that require connect --- */}
-        {shouldConnectView && (
+        {/* --- Widgets that require providers context --- */}
+        {shouldWrapWithProvidersContext && (
+          <ProvidersContextProvider initialState={{ checkout }}>
+            {view.type === CheckoutFlowType.ADD_FUNDS && (
+              <AddFundsWidget
+                config={widgetsConfig}
+                {...(view.data.params || {})}
+                {...(view.data.config || {})}
+                showBackButton={showBackButton}
+              />
+            )}
+          </ProvidersContextProvider>
+        )}
+        {/* --- Widgets that require connect loader --- */}
+        {shouldWrapWithConnectLoader && (
           <ConnectLoader
             widgetConfig={widgetsConfig}
             params={connectLoaderParams}
@@ -171,6 +222,8 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
                 data: {},
               });
             }}
+            showBackButton={showBackButton}
+            goBackEvent={goToPreviousView}
           >
             <Suspense
               fallback={
@@ -197,14 +250,6 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
                     waitFulfillmentSettlements: true,
                     ...view.data.config,
                   }}
-                />
-              )}
-              {view.type === CheckoutFlowType.ADD_FUNDS && (
-                <AddFundsWidget
-                  checkout={checkout}
-                  {...(view.data.params || {})}
-                  {...(view.data.config || {})}
-                  showBackButton={showBackButton}
                 />
               )}
               {view.type === CheckoutFlowType.SWAP && (
