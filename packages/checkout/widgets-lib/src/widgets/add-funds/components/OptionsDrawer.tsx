@@ -69,6 +69,7 @@ export function OptionsDrawer({
             use={
               <img src={fromProviderInfo?.icon} alt={fromProviderInfo?.name} />
             }
+            sx={{ mx: 'base.spacing.x2' }}
           />
           <MenuItem.Label>Pay from</MenuItem.Label>
           <MenuItem.Caption>

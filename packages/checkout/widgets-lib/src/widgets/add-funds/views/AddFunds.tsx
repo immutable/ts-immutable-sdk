@@ -614,12 +614,11 @@ export function AddFunds({
                 placeholder="0"
                 maxTextSize="xLarge"
               />
-              {selectedAmountUsd > 0 && (
-                <HeroFormControl.Caption>
-                  USD $
-                  {selectedAmountUsd.toFixed(2)}
-                </HeroFormControl.Caption>
-              )}
+              
+              <HeroFormControl.Caption>
+                USD $
+                {selectedAmountUsd.toFixed(2)}
+              </HeroFormControl.Caption>
             </HeroFormControl>
           )}
         </Stack>
