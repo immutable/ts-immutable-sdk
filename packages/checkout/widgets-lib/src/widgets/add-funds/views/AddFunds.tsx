@@ -64,7 +64,7 @@ import { OnboardingDrawer } from '../components/OnboardingDrawer';
 import { useError } from '../hooks/useError';
 
 interface AddFundsProps {
-  checkout: Checkout | null;
+  checkout: Checkout;
   showBackButton?: boolean;
   showOnrampOption?: boolean;
   showSwapOption?: boolean;
@@ -423,6 +423,7 @@ export function AddFunds({
             toChainId: ChainId.IMTBL_ZKEVM_MAINNET.toString(),
             toTokenAddress: selectedToken.address,
             toAmount: selectedAmount,
+            additionalBuffer: selectedRouteData.amountData.additionalBuffer,
           },
         },
       },
@@ -650,6 +651,7 @@ export function AddFunds({
                 }}
               />
               <SelectedRouteOption
+                checkout={checkout}
                 loading={loading}
                 chains={chains}
                 routeData={selectedRouteData}
@@ -705,6 +707,7 @@ export function AddFunds({
             showOnRampOption={shouldShowOnRampOption}
           />
           <OptionsDrawer
+            checkout={checkout}
             routes={routes}
             showOnrampOption={shouldShowOnRampOption}
             showSwapOption={showSwapOption}
@@ -719,7 +722,6 @@ export function AddFunds({
             visible={showDeliverToDrawer}
             walletOptions={walletOptions}
             onClose={() => setShowDeliverToDrawer(false)}
-            onConnect={handleWalletConnected}
           />
           <OnboardingDrawer environment={checkout?.config.environment!} />
         </Stack>

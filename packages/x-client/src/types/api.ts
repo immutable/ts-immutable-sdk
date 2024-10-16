@@ -20,7 +20,6 @@ export class MetadataApi extends imx.MetadataApi {}
 export class MetadataRefreshesApi extends imx.MetadataRefreshesApi {}
 export class NftCheckoutPrimaryApi extends imx.NftCheckoutPrimaryApi {}
 export class OrdersApi extends imx.OrdersApi {}
-export class PrimarySalesApi extends imx.PrimarySalesApi {}
 export class ProjectsApi extends imx.ProjectsApi {}
 export class TokensApi extends imx.TokensApi {}
 export class TradesApi extends imx.TradesApi {}
@@ -28,11 +27,6 @@ export class TransfersApi extends imx.TransfersApi {}
 export class UsersApi extends imx.UsersApi {}
 export class WithdrawalsApi extends imx.WithdrawalsApi {}
 
-export interface AcceptPrimarySaleBadRequestBody extends imx.AcceptPrimarySaleBadRequestBody {}
-export interface AcceptPrimarySaleForbiddenBody extends imx.AcceptPrimarySaleForbiddenBody {}
-export interface AcceptPrimarySaleNotFoundBody extends imx.AcceptPrimarySaleNotFoundBody {}
-export interface AcceptPrimarySaleOKBody extends imx.AcceptPrimarySaleOKBody {}
-export interface AcceptPrimarySaleUnauthorizedBody extends imx.AcceptPrimarySaleUnauthorizedBody {}
 export interface AddMetadataSchemaToCollectionRequest extends imx.AddMetadataSchemaToCollectionRequest {}
 export interface APIError extends imx.APIError {}
 export interface Asset extends imx.Asset {}
@@ -51,11 +45,6 @@ export interface CreateCollectionRequest extends imx.CreateCollectionRequest {}
 export interface CreateMetadataRefreshRequest extends imx.CreateMetadataRefreshRequest {}
 export interface CreateMetadataRefreshResponse extends imx.CreateMetadataRefreshResponse {}
 export interface CreateOrderResponse extends imx.CreateOrderResponse {}
-export interface CreatePrimarySaleBadRequestBody extends imx.CreatePrimarySaleBadRequestBody {}
-export interface CreatePrimarySaleCreatedBody extends imx.CreatePrimarySaleCreatedBody {}
-export interface CreatePrimarySaleForbiddenBody extends imx.CreatePrimarySaleForbiddenBody {}
-export interface CreatePrimarySaleNotFoundBody extends imx.CreatePrimarySaleNotFoundBody {}
-export interface CreatePrimarySaleUnauthorizedBody extends imx.CreatePrimarySaleUnauthorizedBody {}
 export interface CreateTradeResponse extends imx.CreateTradeResponse {}
 export interface CreateTransferResponseV1 extends imx.CreateTransferResponseV1 {}
 export interface CreateWithdrawalResponse extends imx.CreateWithdrawalResponse {}
@@ -110,14 +99,7 @@ export interface OrdersApiCreateOrderV3Request extends imx.OrdersApiCreateOrderV
 export interface OrdersApiGetOrderV3Request extends imx.OrdersApiGetOrderV3Request {}
 export interface OrdersApiListOrdersV3Request extends imx.OrdersApiListOrdersV3Request {}
 export interface OrderV3 extends imx.OrderV3 {}
-export interface PrimarySalesApiCreatePrimarySaleRequest extends imx.PrimarySalesApiCreatePrimarySaleRequest {}
-export interface PrimarySalesApiSignableCreatePrimarySaleRequest extends imx.PrimarySalesApiSignableCreatePrimarySaleRequest {}
 export interface Project extends imx.Project {}
-export interface RejectPrimarySaleBadRequestBody extends imx.RejectPrimarySaleBadRequestBody {}
-export interface RejectPrimarySaleForbiddenBody extends imx.RejectPrimarySaleForbiddenBody {}
-export interface RejectPrimarySaleNotFoundBody extends imx.RejectPrimarySaleNotFoundBody {}
-export interface RejectPrimarySaleOKBody extends imx.RejectPrimarySaleOKBody {}
-export interface RejectPrimarySaleUnauthorizedBody extends imx.RejectPrimarySaleUnauthorizedBody {}
 export interface SignableToken extends imx.SignableToken {}
 export interface SuccessResponse extends imx.SuccessResponse {}
 export interface TokenDetails extends imx.TokenDetails {}
