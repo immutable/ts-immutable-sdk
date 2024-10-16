@@ -1,4 +1,4 @@
-This is a NextJS app that shows the use of the Immutable Checkout SDK to estimate gas.
+This is a NextJS app that shows the use of the Immutable Checkout SDK to estimate gas for swap and bridge transactions. 
 
 ## Getting Started
 
