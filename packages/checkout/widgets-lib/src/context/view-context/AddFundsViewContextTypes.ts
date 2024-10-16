@@ -4,9 +4,14 @@ import { ViewType } from './ViewType';
 export enum AddFundsWidgetViews {
   ADD_FUNDS = 'ADD_FUNDS',
   REVIEW = 'REVIEW',
+  NON_PROD_ERROR = 'NON_PROD_ERROR',
 }
 
-export type AddFundsWidgetView = AddFundsView | AddFundsReview;
+export type AddFundsWidgetView = AddFundsView | AddFundsReview | AddFundsNonProdErrorView;
+
+interface AddFundsNonProdErrorView extends ViewType {
+  type: AddFundsWidgetViews.NON_PROD_ERROR;
+}
 
 interface AddFundsView extends ViewType {
   type: AddFundsWidgetViews.ADD_FUNDS;

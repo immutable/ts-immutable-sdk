@@ -42,6 +42,7 @@ import { isValidAddress } from '../../lib/validations/widgetValidators';
 import { amountInputValidation } from '../../lib/validations/amountInputValidations';
 import { useError } from './hooks/useError';
 import { AddFundsErrorTypes } from './types';
+import { NonProdErrorView } from './views/NonProdErrorView';
 
 export type AddFundsWidgetInputs = AddFundsWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
@@ -98,6 +99,17 @@ export default function AddFundsWidget({
   const { showErrorHandover } = useError(
     checkout.config.environment ?? Environment.SANDBOX,
   );
+
+  useEffect(() => {
+    if (config.environment !== Environment.PRODUCTION) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: AddFundsWidgetViews.NON_PROD_ERROR },
+        },
+      });
+    }
+  }, [config]);
 
   useEffect(() => {
     const isInvalidToTokenAddress = toTokenAddress && !isValidAddress(toTokenAddress);
@@ -243,6 +255,11 @@ export default function AddFundsWidget({
             === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
             <ServiceUnavailableErrorView
               service={ServiceType.GENERIC}
+              onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
+            />
+          )}
+          {viewState.view.type === AddFundsWidgetViews.NON_PROD_ERROR && (
+            <NonProdErrorView
               onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
             />
           )}
