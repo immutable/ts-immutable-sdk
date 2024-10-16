@@ -719,7 +719,6 @@ export function AddFunds({
             visible={showDeliverToDrawer}
             walletOptions={walletOptions}
             onClose={() => setShowDeliverToDrawer(false)}
-            onConnect={handleWalletConnected}
           />
           <OnboardingDrawer environment={checkout?.config.environment!} />
         </Stack>
