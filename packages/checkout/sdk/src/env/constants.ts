@@ -451,9 +451,54 @@ export const ERC1155ABI = [
   },
 ];
 
+export const WrappedIMXABI = [
+  {
+    inputs: [],
+    name: 'decimals',
+    outputs: [
+      {
+        internalType: 'uint8',
+        name: '',
+        type: 'uint8',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'deposit',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'wad',
+        type: 'uint256',
+      },
+    ],
+    name: 'withdraw',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    stateMutability: 'payable',
+    type: 'receive',
+  },
+];
+
 // Gas overrides -- Anti-spam mechanism for when the baseFee drops low
 // https://docs.immutable.com/docs/zkEVM/architecture/gas-config
 export const IMMUTABLE_ZKVEM_GAS_OVERRIDES = {
   maxFeePerGas: BigNumber.from(15e9),
   maxPriorityFeePerGas: BigNumber.from(10e9),
+};
+
+export const WRAPPED_IMX_ADDRESS = {
+  [Environment.SANDBOX]: '0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439',
+  [Environment.PRODUCTION]: '0x3A0C2Ba54D6CBd3121F01b96dFd20e99D1696C9D',
 };

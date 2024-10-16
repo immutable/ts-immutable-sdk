@@ -13,6 +13,7 @@ import Provider from '../components/Provider';
 import SendTransaction from '../components/SendTransaction';
 import GetInjectedProviders from '../components/GetInjectedProviders';
 import Swap from '../components/Swap';
+import { Wrap } from '../components/Wrap';
 
 export default function ConnectWidget() {
   const [environment, setEnvironment] = useState(Environment.SANDBOX);
@@ -180,6 +181,15 @@ export default function ConnectWidget() {
       </Divider>
       <Swap checkout={checkout} provider={provider} />
 
+      <Divider
+        sx={{
+          marginTop: 'base.spacing.x6',
+          marginBottom: 'base.spacing.x2',
+        }}
+      >
+        Wrap / Unwrap IMX
+      </Divider>
+      <Wrap checkout={checkout} provider={provider} />
     </div>
   );
 }
