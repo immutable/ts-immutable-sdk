@@ -31090,7 +31090,7 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
     react-router-dom: ^6.11.0
-    typescript: ^5
+    typescript: ^5.6.2
   languageName: unknown
   linkType: soft
 
@@ -34934,7 +34934,7 @@ __metadata:
   resolution: "seaport-core@https://github.com/immutable/seaport-core.git#commit=0633350ec34f21fcede657ff812f11cf7d19144e"
   dependencies:
     seaport-types: ^0.0.1
-  checksum: 392bce86bbfc4f7c00b65575b238825f4c696bddf5af08be7aa496862e63879375387fd4400f6e900ffee08d65c1f75cf3adad9c6c41ddcf7a3b0389cd73c3c7
+  checksum: d8adba0d54106c6fe9370f0775fadef2198e5eab440b36919d1f917705ce2f0a7028e4da021b6df049aa3ca35d7e673a28b78a731130f0ff9fdf7a8bd32e3b94
   languageName: node
   linkType: hard
 
@@ -34978,7 +34978,7 @@ __metadata:
     seaport-sol: ^1.5.0
     seaport-types: ^0.0.1
     solady: ^0.0.84
-  checksum: f31a7443a50fa1c35ec03ea031743d1d10896653ae443fa15ab8e6f5b4a2ca43f6743d523ae4e1f14df867451e5b2b2130b0bfa58a1085b0bcae3fceb8dfdc9b
+  checksum: a77e141e4ab5d2c4bb190a38fbb6cda3011fdf5f350b250fbeb4d82ae81cf917a966a2dcb8d9e4fd1bed29e5510ede9b15941b0ac77aeb4272dab94c9f51e7ff
   languageName: node
   linkType: hard
 
@@ -38209,16 +38209,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5":
-  version: 5.6.3
-  resolution: "typescript@npm:5.6.3"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: ba302f8822777ebefb28b554105f3e074466b671e7444ec6b75dadc008a62f46f373d9e57ceced1c433756d06c8b7dc569a7eefdf3a9573122a49205ff99021a
-  languageName: node
-  linkType: hard
-
 "typescript@patch:typescript@*#~builtin<compat/typescript>, typescript@patch:typescript@^5.6.2#~builtin<compat/typescript>":
   version: 5.6.2
   resolution: "typescript@patch:typescript@npm%3A5.6.2#~builtin<compat/typescript>::version=5.6.2&hash=14eedb"
@@ -38226,16 +38216,6 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: c084ee1ab865f108c787e6233a5f63c126c482c0c8e87ec998ac5288a2ad54b603e1ea8b8b272355823b833eb31b9fabb99e8c6152283e1cb47e3a76bd6faf6c
-  languageName: node
-  linkType: hard
-
-"typescript@patch:typescript@^5#~builtin<compat/typescript>":
-  version: 5.6.3
-  resolution: "typescript@patch:typescript@npm%3A5.6.3#~builtin<compat/typescript>::version=5.6.3&hash=14eedb"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: ade87bce2363ee963eed0e4ca8a312ea02c81873ebd53609bc3f6dc0a57f6e61ad7e3fb8cbb7f7ab8b5081cbee801b023f7c4823ee70b1c447eae050e6c7622b
   languageName: node
   linkType: hard
 
