@@ -53,7 +53,7 @@ export function AddressMissmatchDrawer({
             size="large"
             onClick={onClick}
           >
-            Try again
+            Re-select payment wallet
           </Button>
         </Box>
       </Drawer.Content>
