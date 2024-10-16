@@ -33,7 +33,9 @@ export function OptionsDrawer({
   showBridgeOption,
   insufficientBalance,
 }: OptionsDrawerProps) {
-  const { addFundsState: { chains } } = useContext(AddFundsContext);
+  const {
+    addFundsState: { chains },
+  } = useContext(AddFundsContext);
 
   const {
     providersState: { fromProviderInfo, fromAddress },

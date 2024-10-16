@@ -31,9 +31,7 @@ import { useRoutes } from '../hooks/useRoutes';
 import { AddFundsReviewData } from '../../../context/view-context/AddFundsViewContextTypes';
 import { RiveStateMachineInput } from '../types';
 import { useExecute } from '../hooks/useExecute';
-import {
-  ViewContext,
-} from '../../../context/view-context/ViewContext';
+import { ViewContext } from '../../../context/view-context/ViewContext';
 import { SquidIcon } from '../components/SquidIcon';
 import { useHandover } from '../../../lib/hooks/useHandover';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';

@@ -11,7 +11,9 @@ export const useExecute = (environment: Environment) => {
   const { showErrorHandover } = useError(environment);
 
   const handleTransactionError = (err: unknown) => {
-    const reason = `${(err as any)?.reason || (err as any)?.message || ''}`.toLowerCase();
+    const reason = `${
+      (err as any)?.reason || (err as any)?.message || ''
+    }`.toLowerCase();
 
     let errorType = AddFundsErrorTypes.WALLET_FAILED;
 
@@ -23,11 +25,17 @@ export const useExecute = (environment: Environment) => {
       errorType = AddFundsErrorTypes.WALLET_REJECTED;
     }
 
-    if (reason.includes('failed to submit') && reason.includes('highest gas limit')) {
+    if (
+      reason.includes('failed to submit')
+      && reason.includes('highest gas limit')
+    ) {
       errorType = AddFundsErrorTypes.WALLET_REJECTED_NO_FUNDS;
     }
 
-    if (reason.includes('status failed') || reason.includes('transaction failed')) {
+    if (
+      reason.includes('status failed')
+      || reason.includes('transaction failed')
+    ) {
       errorType = AddFundsErrorTypes.TRANSACTION_FAILED;
     }
 
