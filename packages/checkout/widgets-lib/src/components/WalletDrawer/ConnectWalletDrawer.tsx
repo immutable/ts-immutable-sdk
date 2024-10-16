@@ -45,7 +45,7 @@ type ConnectWalletDrawerProps = {
     label: string;
     rdns: string;
   }[];
-  getShouldRequestWalletPermissions: (providerInfo: EIP6963ProviderInfo) => boolean | undefined;
+  getShouldRequestWalletPermissions?: (providerInfo: EIP6963ProviderInfo) => boolean | undefined;
 };
 
 export function ConnectWalletDrawer({
