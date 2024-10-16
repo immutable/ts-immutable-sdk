@@ -110,7 +110,7 @@ export function Review({
 
   useEffect(() => {
     page({
-      userJourney: UserJourney.SWAP,
+      userJourney: UserJourney.ADD_FUNDS,
       screen: 'Review',
       extras: {
         toAmount: data.toAmount,
