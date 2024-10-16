@@ -49,7 +49,7 @@ export default function ConnectWithMetamask() {
   return (
     <>
       <Heading size="medium" className="mb-1">
-        Switch Network
+        Checkout SDK Gas Estimate
       </Heading>
       <Button
         className="mb-1"
