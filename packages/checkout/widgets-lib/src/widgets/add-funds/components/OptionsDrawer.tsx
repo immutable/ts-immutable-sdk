@@ -2,6 +2,7 @@ import { Drawer, EllipsizedText, MenuItem } from '@biom3/react';
 import { motion } from 'framer-motion';
 import { useContext, useRef } from 'react';
 
+import { Checkout } from '@imtbl/checkout-sdk';
 import { listVariants } from '../../../lib/animation/listAnimation';
 import { Options } from './Options';
 import { FiatOptionType, RouteData } from '../types';
@@ -9,6 +10,7 @@ import { AddFundsContext } from '../context/AddFundsContext';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 
 type OptionsDrawerProps = {
+  checkout: Checkout;
   routes: RouteData[] | undefined;
   visible: boolean;
   onClose: () => void;
@@ -21,6 +23,7 @@ type OptionsDrawerProps = {
 };
 
 export function OptionsDrawer({
+  checkout,
   routes,
   visible,
   onClose,
@@ -83,6 +86,7 @@ export function OptionsDrawer({
         </MenuItem>
         <Options
           size="small"
+          checkout={checkout}
           routes={routes}
           chains={chains}
           onCardClick={onCardClick}

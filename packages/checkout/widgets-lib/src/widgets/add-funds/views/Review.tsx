@@ -28,10 +28,14 @@ import { Environment } from '@imtbl/config';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { AddFundsContext } from '../context/AddFundsContext';
 import { useRoutes } from '../hooks/useRoutes';
-import { AddFundsReviewData } from '../../../context/view-context/AddFundsViewContextTypes';
+import {
+  AddFundsReviewData,
+  AddFundsWidgetViews,
+} from '../../../context/view-context/AddFundsViewContextTypes';
 import { RiveStateMachineInput } from '../types';
 import { useExecute } from '../hooks/useExecute';
 import {
+  ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
 import { SquidIcon } from '../components/SquidIcon';
@@ -53,12 +57,14 @@ import { useProvidersContext } from '../../../context/providers-context/Provider
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { getDurationFormatted } from '../functions/getDurationFormatted';
 import { RouteFees } from '../components/RouteFees';
+import { AddressMissmatchDrawer } from '../components/AddressMissmatchDrawer';
 import { getTotalRouteFees } from '../functions/getTotalRouteFees';
 import { getRouteChains } from '../functions/getRouteChains';
 import {
   getFormattedAmounts,
   getFormattedNumber,
 } from '../functions/getFormattedNumber';
+import { convertToNetworkChangeableProvider } from '../functions/convertToNetworkChangeableProvider';
 
 interface ReviewProps {
   data: AddFundsReviewData;
@@ -96,14 +102,13 @@ export function Review({
   const [route, setRoute] = useState<RouteResponse | undefined>();
   const [proceedDisabled, setProceedDisabled] = useState(true);
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
-
+  const [showAddressMissmatchDrawer, setShowAddressMissmatchDrawer] = useState(false);
   const { getAmountData, getRoute } = useRoutes();
   const { addHandover, closeHandover } = useHandover({
     id: HandoverTarget.GLOBAL,
   });
 
   const {
-    convertToNetworkChangeableProvider,
     checkProviderChain,
     getAllowance,
     approve,
@@ -112,7 +117,7 @@ export function Review({
 
   useEffect(() => {
     page({
-      userJourney: UserJourney.SWAP,
+      userJourney: UserJourney.ADD_FUNDS,
       screen: 'Review',
       extras: {
         toAmount: data.toAmount,
@@ -135,8 +140,8 @@ export function Review({
       data.toTokenAddress === 'native'
         ? SQUID_NATIVE_TOKEN
         : data.toTokenAddress,
+      data.additionalBuffer,
     );
-
     if (!amountData) return;
 
     const routeResponse = await getRoute(
@@ -145,10 +150,11 @@ export function Review({
       amountData?.toToken,
       toAddress,
       amountData.fromAmount,
+      amountData.toAmount,
       fromAddress,
       false,
     );
-    setRoute(routeResponse);
+    setRoute(routeResponse.route);
     setProceedDisabled(false);
   };
 
@@ -231,6 +237,13 @@ export function Review({
 
   const handleTransaction = useCallback(async () => {
     if (!squid || !fromProvider || !route) {
+      return;
+    }
+
+    const currentFromAddress = await fromProvider.getSigner().getAddress();
+
+    if (currentFromAddress !== fromAddress) {
+      setShowAddressMissmatchDrawer(true);
       return;
     }
 
@@ -341,7 +354,6 @@ export function Review({
     approve,
     showHandover,
     checkProviderChain,
-    convertToNetworkChangeableProvider,
     getAllowance,
     execute,
     closeHandover,
@@ -661,7 +673,7 @@ export function Review({
           </>
         )}
 
-        {!route && <LoadingView loadingText="Securing quote" />}
+        {!route && !showAddressMissmatchDrawer && <LoadingView loadingText="Securing quote" />}
       </Stack>
       <RouteFees
         routeData={route}
@@ -669,6 +681,21 @@ export function Review({
         onClose={() => setShowFeeBreakdown(false)}
         totalAmount={totalFees}
         totalFiatAmount={totalFeesUsd}
+      />
+      <AddressMissmatchDrawer
+        visible={showAddressMissmatchDrawer}
+        onClick={() => {
+          setShowAddressMissmatchDrawer(false);
+
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: {
+                type: AddFundsWidgetViews.ADD_FUNDS,
+              },
+            },
+          });
+        }}
       />
     </SimpleLayout>
   );
