@@ -9,10 +9,13 @@ import {
   useMemo,
 } from 'react';
 
+import { Checkout } from '@imtbl/checkout-sdk';
 import { Chain, RouteData } from '../types';
 import { getRouteAndTokenBalances } from '../functions/getRouteAndTokenBalances';
+import { getRemoteVideo } from '../../../lib/utils';
 
-export interface RouteOptionProps {
+export interface SelectedRouteOptionProps {
+  checkout: Checkout;
   routeData?: RouteData;
   chains: Chain[] | null;
   onClick: MouseEventHandler<HTMLSpanElement>;
@@ -54,6 +57,7 @@ function SelectedRouteOptionContainer({
 }
 
 export function SelectedRouteOption({
+  checkout,
   routeData,
   chains,
   loading = false,
@@ -63,7 +67,7 @@ export function SelectedRouteOption({
   insufficientBalance = false,
   showOnrampOption = false,
   onClick,
-}: RouteOptionProps) {
+}: SelectedRouteOptionProps) {
   const { fromToken } = routeData?.amountData ?? {};
   const chain = chains?.find((c) => c.id === fromToken?.chainId);
 
@@ -93,7 +97,11 @@ export function SelectedRouteOption({
         selected={withSelectedWallet}
       >
         <MenuItem.FramedVideo
-          videoUrl="https://i.imgur.com/dVQoobw.mp4"
+          videoUrl={getRemoteVideo(
+            checkout.config.environment,
+            '/loading_bubble-small.mp4',
+          )}
+          padded
           mimeType="video/mp4"
           circularFrame
         />
@@ -153,7 +161,8 @@ export function SelectedRouteOption({
         <Sticker position={{ x: 'right', y: 'bottom' }}>
           <Sticker.FramedImage
             use={<img src={chain.iconUrl} alt={chain.name} />}
-            sx={{ w: 'base.icon.size.200' }}
+            size="xSmall"
+            sx={{ bottom: 'base.spacing.x2', right: 'base.spacing.x2' }}
           />
 
           <MenuItem.FramedImage
