@@ -8,9 +8,17 @@ import { DEFAULT_TOKEN_FORMATTING_DECIMALS } from '../../../lib/constants';
  * removing trailing zeros
  */
 export const getFormattedAmounts = (
-  amount: string | number,
+  value: string | number,
   maxDecimals = DEFAULT_TOKEN_FORMATTING_DECIMALS,
-) => tokenValueFormat(amount, maxDecimals).replace(/\.?0+$/, '');
+) => {
+  const amount = typeof value === 'number' ? value : parseFloat(value);
+
+  if (amount > 0 && amount < 1) {
+    return tokenValueFormat(amount, maxDecimals).replace(/\.?0+$/, '');
+  }
+
+  return tokenValueFormat(amount, maxDecimals);
+};
 
 /**
  * Converts a crypto amount to a formatted string
