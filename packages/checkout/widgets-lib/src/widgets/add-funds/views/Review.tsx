@@ -117,7 +117,7 @@ export function Review({
 
   useEffect(() => {
     page({
-      userJourney: UserJourney.SWAP,
+      userJourney: UserJourney.ADD_FUNDS,
       screen: 'Review',
       extras: {
         toAmount: data.toAmount,
@@ -140,8 +140,8 @@ export function Review({
       data.toTokenAddress === 'native'
         ? SQUID_NATIVE_TOKEN
         : data.toTokenAddress,
+      data.additionalBuffer,
     );
-
     if (!amountData) return;
 
     const routeResponse = await getRoute(
@@ -150,10 +150,11 @@ export function Review({
       amountData?.toToken,
       toAddress,
       amountData.fromAmount,
+      amountData.toAmount,
       fromAddress,
       false,
     );
-    setRoute(routeResponse);
+    setRoute(routeResponse.route);
     setProceedDisabled(false);
   };
 

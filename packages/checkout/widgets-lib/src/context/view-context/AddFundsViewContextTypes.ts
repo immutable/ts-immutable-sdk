@@ -22,6 +22,7 @@ export interface AddFundsReviewData {
   toAmount: string;
   toChainId: string;
   toTokenAddress: string;
+  additionalBuffer: number;
 }
 
 export interface AddFundsConfirmationData {
