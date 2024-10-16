@@ -15,9 +15,6 @@ import {
 } from "./components/ui/marketplace-orchestrator";
 import { SaleUI } from "./components/ui/sale/sale";
 import AddFundsUI from "./components/ui/add-funds/addFunds";
-import { PassportProvider } from "./context/passport";
-import { WidgetsProvider } from "./context/widgets";
-import AddFundsIntegration from "./components/ui/add-funds-integration/addFunds";
 import { AddFundsPassportLogin } from "./components/ui/add-funds/login";
 import { AddFundsPassportLogout } from "./components/ui/add-funds/logout";
 
@@ -65,16 +62,6 @@ const router = createBrowserRouter([
   {
     path: "/add-funds/logout",
     element: <AddFundsPassportLogout />,
-  },
-  {
-    path: "/add-funds-integration",
-    element: (
-      <PassportProvider>
-        <WidgetsProvider>
-          <AddFundsIntegration />
-        </WidgetsProvider>
-      </PassportProvider>
-    ),
   },
   {
     path: "/marketplace-orchestrator",
