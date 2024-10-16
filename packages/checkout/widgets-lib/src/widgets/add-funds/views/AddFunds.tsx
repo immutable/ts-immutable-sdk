@@ -64,7 +64,7 @@ import { OnboardingDrawer } from '../components/OnboardingDrawer';
 import { useError } from '../hooks/useError';
 
 interface AddFundsProps {
-  checkout: Checkout | null;
+  checkout: Checkout;
   showBackButton?: boolean;
   showOnrampOption?: boolean;
   showSwapOption?: boolean;
@@ -648,6 +648,7 @@ export function AddFunds({
                 sx={fromAddress ? { ml: 'base.spacing.x4' } : undefined}
               />
               <SelectedRouteOption
+                checkout={checkout}
                 loading={loading}
                 chains={chains}
                 routeData={selectedRouteData}
@@ -703,6 +704,7 @@ export function AddFunds({
             showOnRampOption={shouldShowOnRampOption}
           />
           <OptionsDrawer
+            checkout={checkout}
             routes={routes}
             showOnrampOption={shouldShowOnRampOption}
             showSwapOption={showSwapOption}
