@@ -6,6 +6,7 @@ import {
   RequestOnrampEvent,
   RequestSwapEvent,
   RequestGoBackEvent,
+  RequestAddFundsEvent,
 } from '@imtbl/checkout-sdk';
 
 function sendRequestOnrampEvent(
@@ -86,9 +87,30 @@ function sendRequestGoBackEvent(
   if (eventTarget !== undefined) eventTarget.dispatchEvent(requestGoBackEvent);
 }
 
+function sendRequestAddFundsEvent(
+  eventTarget: Window | EventTarget,
+  imtblWidgetEvent: IMTBLWidgetEvents,
+  eventData: RequestAddFundsEvent,
+) {
+  // eslint-disable-next-line max-len
+  const requestAddFundsEvent = new CustomEvent<
+  OrchestrationEvent<OrchestrationEventType.REQUEST_ADD_FUNDS>
+  >(imtblWidgetEvent, {
+    detail: {
+      type: OrchestrationEventType.REQUEST_ADD_FUNDS,
+      data: eventData,
+    },
+  });
+  // TODO: please remove or if necessary keep the eslint ignore
+  // eslint-disable-next-line no-console
+  console.log('add funds event:', eventTarget, requestAddFundsEvent);
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(requestAddFundsEvent);
+}
+
 export const orchestrationEvents = {
   sendRequestBridgeEvent,
   sendRequestSwapEvent,
   sendRequestOnrampEvent,
   sendRequestGoBackEvent,
+  sendRequestAddFundsEvent,
 };

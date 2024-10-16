@@ -2,7 +2,7 @@ import {
   useContext, useEffect, useMemo, useReducer, useRef,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AddFundsWidgetParams } from '@imtbl/checkout-sdk';
+import { AddFundsWidgetParams, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 
 import { Stack, CloudImage } from '@biom3/react';
 import { Environment } from '@imtbl/config';
@@ -37,6 +37,7 @@ import { useTokens } from './hooks/useTokens';
 import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
 import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 import { ServiceType } from '../../views/error/serviceTypes';
+import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { getRemoteImage } from '../../lib/utils';
 import { isValidAddress } from '../../lib/validations/widgetValidators';
 import { amountInputValidation } from '../../lib/validations/amountInputValidations';
@@ -210,6 +211,13 @@ export default function AddFundsWidget({
               showSwapOption={showSwapOption}
               showBridgeOption={showBridgeOption}
               onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
+              onBackButtonClick={() => {
+                orchestrationEvents.sendRequestGoBackEvent(
+                  eventTarget,
+                  IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+                  {},
+                );
+              }}
             />
           )}
           {viewState.view.type === AddFundsWidgetViews.REVIEW && (
