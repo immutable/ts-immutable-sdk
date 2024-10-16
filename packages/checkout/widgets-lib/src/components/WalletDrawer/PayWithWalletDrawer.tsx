@@ -9,9 +9,9 @@ import { SharedViews, ViewActions, ViewContext } from '../../context/view-contex
 
 type PayWithWalletDrawerProps = {
   visible: boolean;
-  onClose: () => void;
+  onClose: (fromAddress?: string) => void;
   onConnect: (providerType: 'from' | 'to', provider: Web3Provider, providerInfo: EIP6963ProviderInfo) => void;
-  onPayWithCard: () => void;
+  onPayWithCard?: () => void;
   walletOptions: EIP6963ProviderDetail[];
   insufficientBalance?: boolean;
   showOnRampOption?: boolean;
@@ -69,7 +69,7 @@ export function PayWithWalletDrawer({
           emphasized
           onClick={() => {
             onClose();
-            onPayWithCard();
+            onPayWithCard?.();
           }}
         >
           <MenuItem.FramedIcon
