@@ -25,6 +25,7 @@ describe('load', () => {
       expect(document.head.innerHTML).toBe(
         '<script '
         + 'integrity="sha512-abc123" '
+        + 'crossorigin="anonymous" '
         + 'id="immutable-checkout-widgets-bundle" '
         + 'data-version="__SDK_VERSION__" '
         + `src="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/checkout/widgets.js"></script>`,

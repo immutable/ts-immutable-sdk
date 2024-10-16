@@ -21,6 +21,7 @@ export async function loadUnresolvedBundle(
   if (!useLocalBundle()) {
     const integrityHash = await generateSHA512Hash(cdnUrl);
     tag.setAttribute('integrity', integrityHash);
+    tag.setAttribute('crossorigin', 'anonymous');
   }
 
   tag.setAttribute('id', scriptId);
