@@ -2189,6 +2189,78 @@
         }
       }
     },
+    "/v1/chains/{chain_name}/crafting/sign": {
+      "post": {
+        "description": "Sign a crafting payload",
+        "tags": [
+          "crafting"
+        ],
+        "operationId": "SignCraftingPayload",
+        "summary": "Sign a crafting payload",
+        "security": [
+          {
+            "ImmutableApiKey": [
+              "create:collections"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The request body",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignCraftingRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignCraftingResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/v1/chains/{chain_name}/orders/cancel": {
       "post": {
         "tags": [
@@ -6193,12 +6265,6 @@
             "description": "The account address of the owner of the NFT",
             "example": "0x5a019874f4fae314b0eaa4606be746366e661306"
           },
-          "quantity": {
-            "type": "string",
-            "description": "(deprecated - use balance instead) The quantity of owned tokens (uint256 as string)",
-            "example": "1",
-            "deprecated": true
-          },
           "balance": {
             "type": "string",
             "description": "The amount of owned tokens (uint256 as string)",
@@ -6216,7 +6282,6 @@
           "contract_address",
           "token_id",
           "account_address",
-          "quantity",
           "balance"
         ]
       },
@@ -6241,12 +6306,6 @@
             "description": "The account address of the owner of the NFT",
             "example": "0x5a019874f4fae314b0eaa4606be746366e661306"
           },
-          "quantity": {
-            "type": "string",
-            "description": "(deprecated - use balance instead) The quantity of owned tokens (uint256 as string)",
-            "example": "1",
-            "deprecated": true
-          },
           "balance": {
             "type": "string",
             "description": "The amount of owned tokens (uint256 as string)",
@@ -6264,7 +6323,6 @@
           "contract_address",
           "token_id",
           "account_address",
-          "quantity",
           "balance",
           "updated_at"
         ]
@@ -7134,6 +7192,106 @@
           "details",
           "created_at",
           "created_by"
+        ]
+      },
+      "Call": {
+        "type": "object",
+        "properties": {
+          "target_address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "function_signature": {
+            "type": "string",
+            "description": "The function signature",
+            "example": "mint(address,uint256)"
+          },
+          "function_args": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The function arguments",
+            "example": [
+              "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e",
+              "1"
+            ]
+          }
+        },
+        "required": [
+          "target_address",
+          "function_signature",
+          "function_args"
+        ]
+      },
+      "SignCraftingRequest": {
+        "type": "object",
+        "properties": {
+          "multi_caller": {
+            "type": "object",
+            "properties": {
+              "address": {
+                "$ref": "#/components/schemas/Address"
+              },
+              "name": {
+                "type": "string",
+                "description": "The name of the multicaller contract",
+                "example": "Multicaller"
+              },
+              "version": {
+                "type": "string",
+                "description": "The version of the multicaller contract",
+                "example": "1"
+              }
+            },
+            "required": [
+              "address",
+              "name",
+              "version"
+            ]
+          },
+          "reference_id": {
+            "type": "string",
+            "description": "The id of this request in the system that originates the crafting request, specified as a 32 byte hex string",
+            "example": "67f7d464b8f04f6a9a3b8d3cb4a21af0"
+          },
+          "calls": {
+            "type": "array",
+            "description": "The calls to be signed",
+            "items": {
+              "$ref": "#/components/schemas/Call"
+            },
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The expiration time of the request",
+            "example": "2022-08-16T17:43:26.991388Z"
+          }
+        },
+        "required": [
+          "multi_caller",
+          "reference_id",
+          "calls",
+          "expires_at"
+        ]
+      },
+      "SignCraftingResult": {
+        "type": "object",
+        "properties": {
+          "signer_address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "signature": {
+            "type": "string",
+            "description": "The signature of the request",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          }
+        },
+        "required": [
+          "signer_address",
+          "signature"
         ]
       },
       "BasicAPIError": {
@@ -10059,7 +10217,13 @@
                 "$ref": "#/components/schemas/SeaportERC1155Item"
               },
               {
+                "$ref": "#/components/schemas/SeaportERC1155CollectionItem"
+              },
+              {
                 "$ref": "#/components/schemas/SeaportERC721Item"
+              },
+              {
+                "$ref": "#/components/schemas/SeaportERC721CollectionItem"
               }
             ],
             "example": [
@@ -10288,7 +10452,7 @@
           },
           "amount": {
             "type": "string",
-            "description": "A string representing the total units of an ERC1155 token which the user is selling",
+            "description": "A string representing the total units of an ERC1155 token which the user is buying/selling",
             "example": "100"
           },
           "immutable_verification_status": {
@@ -10312,6 +10476,105 @@
           "type",
           "contract_address",
           "token_id",
+          "amount",
+          "immutable_verification_status"
+        ]
+      },
+      "SeaportERC721CollectionItem": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Token type user is offering, which in this case is ERC721Collection",
+            "example": "ERC721Collection",
+            "enum": [
+              "ERC721Collection"
+            ]
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "Address of ERC721 token",
+            "example": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "contract_name": {
+            "type": "string",
+            "nullable": true,
+            "description": "The name of the collection",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          "amount": {
+            "type": "string",
+            "description": "A string representing the total units of an ERC721 token which the user is buying",
+            "example": "10"
+          },
+          "immutable_verification_status": {
+            "type": "string",
+            "description": "The Immutable verification status of this collection",
+            "$ref": "#/components/schemas/ImmutableVerificationStatusEnum"
+          }
+        },
+        "example": [
+          {
+            "type": "ERC721Collection",
+            "contract_address": "0x87c07c927eba711cbc55ec628a670acd48d0b525",
+            "amount": "10",
+            "immutable_verification_status": "verified"
+          }
+        ],
+        "required": [
+          "type",
+          "contract_address",
+          "amount",
+          "immutable_verification_status"
+        ]
+      },
+      "SeaportERC1155CollectionItem": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Token type user is offering, which in this case is ERC1155Collection",
+            "example": "ERC1155Collection",
+            "enum": [
+              "ERC1155Collection"
+            ]
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "Address of ERC1155 token",
+            "example": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "contract_name": {
+            "type": "string",
+            "nullable": true,
+            "description": "The name of the collection",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          "amount": {
+            "type": "string",
+            "description": "A string representing the total units of an ERC1155 token which the user is buying",
+            "example": "100"
+          },
+          "immutable_verification_status": {
+            "type": "string",
+            "description": "The Immutable verification status of this collection",
+            "$ref": "#/components/schemas/ImmutableVerificationStatusEnum"
+          }
+        },
+        "example": [
+          {
+            "type": "ERC1155",
+            "contract_address": "0x87c07c927eba711cbc55ec628a670acd48d0b525",
+            "contract_name": "Guild of Guardians Heroes",
+            "amount": "100",
+            "immutable_verification_status": "verified"
+          }
+        ],
+        "required": [
+          "type",
+          "contract_address",
           "amount",
           "immutable_verification_status"
         ]
@@ -10398,7 +10661,13 @@
                 "$ref": "#/components/schemas/SeaportERC721Item"
               },
               {
+                "$ref": "#/components/schemas/SeaportERC721CollectionItem"
+              },
+              {
                 "$ref": "#/components/schemas/SeaportERC1155Item"
+              },
+              {
+                "$ref": "#/components/schemas/SeaportERC1155CollectionItem"
               }
             ],
             "example": [
@@ -11062,14 +11331,15 @@
         "type": "object",
         "required": [
           "status",
-          "analysis"
+          "analysis",
+          "highestSeverity"
         ],
         "properties": {
           "status": {
             "$ref": "#/components/schemas/ValidationStatus"
           },
           "highestSeverity": {
-            "$ref": "#/components/schemas/Severity"
+            "$ref": "#/components/schemas/HighestSeverity"
           },
           "analysis": {
             "type": "array",
@@ -11128,6 +11398,22 @@
           "unknown",
           "info"
         ]
+      },
+      "HighestSeverity": {
+        "type": "object",
+        "required": [
+          "severity",
+          "description"
+        ],
+        "description": "Top level severity analysis",
+        "properties": {
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
       },
       "ValidationStatus": {
         "type": "string",

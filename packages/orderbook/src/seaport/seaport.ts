@@ -5,6 +5,7 @@ import type {
   CreateInputItem,
   CreateOrderAction,
   ExchangeAction,
+  InputCriteria,
   OrderComponents,
   OrderUseCase,
 } from '@opensea/seaport-js/lib/types';
@@ -42,6 +43,8 @@ import {
 import { mapImmutableOrderToSeaportOrderComponents } from './map-to-seaport-order';
 import { SeaportLibFactory } from './seaport-lib-factory';
 import { prepareTransaction } from './transaction';
+
+type FulfillmentOrderDetails = Parameters<SeaportLib['fulfillOrders']>[0]['fulfillOrderDetails'][0] & { extraData: string };
 
 function mapImmutableSdkItemToSeaportSdkCreateInputItem(
   item: ERC20Item | ERC721Item | ERC1155Item,
@@ -109,16 +112,20 @@ function mapImmutableSdkItemToSeaportSdkConsiderationInputItem(
       };
     case 'ERC721_COLLECTION':
       return {
+        // seaport will handle mapping an ERC721 item with no identifier to a criteria based item
         itemType: ItemType.ERC721,
         token: item.contractAddress,
         amount: item.amount,
+        identifiers: [],
         recipient,
       };
     case 'ERC1155_COLLECTION':
       return {
+        // seaport will handle mapping an ERC1155 item with no identifier to a criteria based item
         itemType: ItemType.ERC1155,
         token: item.contractAddress,
         amount: item.amount,
+        identifiers: [],
         recipient,
       };
     default:
@@ -265,24 +272,27 @@ export class Seaport {
     account: string,
     extraData: string,
     unitsToFill?: string,
+    considerationCriteria?: InputCriteria[],
   ): Promise<FulfillOrderResponse> {
     const { orderComponents, tips } = mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
     const chainID = (await this.provider.getNetwork()).chainId;
 
+    const fulfilmentOrderDetails: FulfillmentOrderDetails = {
+      order: {
+        parameters: orderComponents,
+        signature: order.signature,
+      },
+      unitsToFill,
+      extraData,
+      tips,
+    };
+
+    if (considerationCriteria) fulfilmentOrderDetails.considerationCriteria = considerationCriteria;
+
     const { actions: seaportActions } = await seaportLib.fulfillOrders({
       accountAddress: account,
-      fulfillOrderDetails: [
-        {
-          order: {
-            parameters: orderComponents,
-            signature: order.signature,
-          },
-          unitsToFill,
-          extraData,
-          tips,
-        },
-      ],
+      fulfillOrderDetails: [fulfilmentOrderDetails],
     });
 
     const fulfillmentActions: TransactionAction[] = [];
@@ -335,6 +345,7 @@ export class Seaport {
       extraData: string;
       order: OpenApiOrder;
       unitsToFill?: string;
+      considerationCriteria?: InputCriteria[];
     }[],
     account: string,
   ): Promise<{
@@ -344,7 +355,7 @@ export class Seaport {
     const fulfillOrderDetails = fulfillingOrders.map((o) => {
       const { orderComponents, tips } = mapImmutableOrderToSeaportOrderComponents(o.order);
 
-      return {
+      const fulfilmentOrderDetails: FulfillmentOrderDetails = {
         order: {
           parameters: orderComponents,
           signature: o.order.signature,
@@ -353,6 +364,12 @@ export class Seaport {
         extraData: o.extraData,
         tips,
       };
+
+      if (o.considerationCriteria && o.considerationCriteria.length > 0) {
+        fulfilmentOrderDetails.considerationCriteria = o.considerationCriteria;
+      }
+
+      return fulfilmentOrderDetails;
     });
 
     const { actions: seaportActions } = await this.getSeaportLib().fulfillOrders({
@@ -362,19 +379,23 @@ export class Seaport {
 
     const fulfillmentActions: TransactionAction[] = [];
 
-    const approvalAction = seaportActions.find(
+    const approvalActions = seaportActions.filter(
       (action) => action.type === 'approval',
     );
 
-    if (approvalAction) {
-      fulfillmentActions.push({
-        type: ActionType.TRANSACTION,
-        buildTransaction: prepareTransaction(
-          approvalAction.transactionMethods,
-          (await this.provider.getNetwork()).chainId,
-          account,
-        ),
-        purpose: TransactionPurpose.APPROVAL,
+    const chainID = (await this.provider.getNetwork()).chainId;
+
+    if (approvalActions.length > 0) {
+      approvalActions.forEach((approvalAction) => {
+        fulfillmentActions.push({
+          type: ActionType.TRANSACTION,
+          buildTransaction: prepareTransaction(
+            approvalAction.transactionMethods,
+            chainID,
+            account,
+          ),
+          purpose: TransactionPurpose.APPROVAL,
+        });
       });
     }
 

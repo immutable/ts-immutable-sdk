@@ -1,5 +1,6 @@
 import {
-  AllIconKeys, Body, Box, Icon,
+  AllDualVariantIconKeys,
+  Body, Box, Icon,
 } from '@biom3/react';
 
 import { statusBoxStyles, statusLogoFill } from './StatusViewStyles';
@@ -11,7 +12,7 @@ export interface StatusViewProps {
   iconStyles?: Record<string, string>;
 }
 
-const status: Record<StatusType, AllIconKeys> = {
+const status: Record<StatusType, AllDualVariantIconKeys> = {
   [StatusType.SUCCESS]: 'TickWithCircle',
   [StatusType.WARNING]: 'Shield',
   [StatusType.FAILURE]: 'CloseWithCircle',

@@ -21,38 +21,38 @@ function AddFundsIntegration() {
       toAmount: "10",
       toTokenAddress: "0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439",
     });
-    addFunds.addListener(AddFundsEventType.CLOSE_WIDGET, (data: any) => {
-      console.log("CLOSE_WIDGET", data);
-      backToGame();
-      addFunds.unmount();
-    });
-    addFunds.addListener(AddFundsEventType.REQUEST_ONRAMP, (data: any) => {
-      console.log("REQUEST_ONRAMP", data);
-      addFunds.unmount();
-      onRamp?.addListener(OnRampEventType.CLOSE_WIDGET, (data: any) => {
-        console.log("CLOSE_WIDGET", data);
-        onRamp?.unmount();
-      });
-      onRamp?.mount(ADD_FUNDS_TARGET_ID, {});
-    });
-    addFunds.addListener(AddFundsEventType.REQUEST_SWAP, (data: any) => {
-      console.log("REQUEST_SWAP", data);
-      addFunds.unmount();
-      swap?.addListener(SwapEventType.CLOSE_WIDGET, (data: any) => {
-        console.log("CLOSE_WIDGET", data);
-        swap.unmount();
-      });
-      swap?.mount(ADD_FUNDS_TARGET_ID, {});
-    });
-    addFunds.addListener(AddFundsEventType.REQUEST_BRIDGE, (data: any) => {
-      console.log("REQUEST_BRIDGE", data);
-      addFunds.unmount();
-      bridge?.addListener(BridgeEventType.CLOSE_WIDGET, (data: any) => {
-        console.log("CLOSE_WIDGET", data);
-        bridge.unmount();
-      });
-      bridge?.mount(ADD_FUNDS_TARGET_ID, {});
-    });
+    // addFunds.addListener(AddFundsEventType.CLOSE_WIDGET, (data: any) => {
+    //   console.log("CLOSE_WIDGET", data);
+    //   backToGame();
+    //   addFunds.unmount();
+    // });
+    // addFunds.addListener(AddFundsEventType.REQUEST_ONRAMP, (data: any) => {
+    //   console.log("REQUEST_ONRAMP", data);
+    //   addFunds.unmount();
+    //   onRamp?.addListener(OnRampEventType.CLOSE_WIDGET, (data: any) => {
+    //     console.log("CLOSE_WIDGET", data);
+    //     onRamp?.unmount();
+    //   });
+    //   onRamp?.mount(ADD_FUNDS_TARGET_ID, {});
+    // });
+    // addFunds.addListener(AddFundsEventType.REQUEST_SWAP, (data: any) => {
+    //   console.log("REQUEST_SWAP", data);
+    //   addFunds.unmount();
+    //   swap?.addListener(SwapEventType.CLOSE_WIDGET, (data: any) => {
+    //     console.log("CLOSE_WIDGET", data);
+    //     swap.unmount();
+    //   });
+    //   swap?.mount(ADD_FUNDS_TARGET_ID, {});
+    // });
+    // addFunds.addListener(AddFundsEventType.REQUEST_BRIDGE, (data: any) => {
+    //   console.log("REQUEST_BRIDGE", data);
+    //   addFunds.unmount();
+    //   bridge?.addListener(BridgeEventType.CLOSE_WIDGET, (data: any) => {
+    //     console.log("CLOSE_WIDGET", data);
+    //     bridge.unmount();
+    //   });
+    //   bridge?.mount(ADD_FUNDS_TARGET_ID, {});
+    // });
   }, [addFunds]);
 
   return (

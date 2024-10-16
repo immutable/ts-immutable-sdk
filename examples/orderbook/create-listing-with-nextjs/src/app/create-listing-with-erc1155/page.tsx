@@ -1,34 +1,35 @@
 "use client";
 
-import { useState } from "react";
-import { ethers } from "ethers";
-import { ProviderEvent } from "@imtbl/sdk/passport";
-import { passportInstance } from "../utils/setupPassport";
-import { orderbookSDK } from "../utils/setupOrderbook";
 import {
-  signAndSubmitApproval,
-  signListing,
-  createListing,
-} from "@/app/utils/listing";
-import {
+  Body,
   Box,
-  Select,
-  TextInput,
+  Button,
   FormControl,
   Heading,
-  Grid,
-  Button,
-  LoadingOverlay,
   Link,
+  LoadingOverlay,
+  Select,
+  Stack,
+  TextInput
 } from "@biom3/react";
 import { orderbook } from "@imtbl/sdk";
 import {
   ERC1155Item,
-  NativeItem,
   ERC20Item,
+  NativeItem,
   PrepareListingParams,
 } from "@imtbl/sdk/orderbook";
+import { ProviderEvent } from "@imtbl/sdk/passport";
+import { ethers } from "ethers";
 import NextLink from "next/link";
+import { useState } from "react";
+import {
+  createListing,
+  signAndSubmitApproval,
+  signListing,
+} from "../utils/listing";
+import { orderbookSDK } from "../utils/setupOrderbook";
+import { passportInstance } from "../utils/setupPassport";
 
 export default function CreateERC1155ListingWithPassport() {
   // setup the accounts state
@@ -72,11 +73,17 @@ export default function CreateERC1155ListingWithPassport() {
   // setup the buy item amount state
   const [buyItemAmount, setBuyItemAmountState] = useState<string>("");
 
+  // setup the maker ecosystem fee recipient state
+  const [makerEcosystemFeeRecipient, setMakerEcosystemFeeRecipientState] = useState<string>("");
+
+  // setup the maker ecosystem fee amount state
+  const [makerEcosystemFeeAmount, setMakerEcosystemFeeAmountState] = useState<string>("");
+
   // setup the listing creation success message state
-  const [successMessage, setSuccessMessageState] = useState<any>(null);
+  const [successMessage, setSuccessMessageState] = useState<string | null>(null);
 
   // setup the listing creation error message state
-  const [listingError, setListingErrorState] = useState<any>(null);
+  const [listingError, setListingErrorState] = useState<string | null>(null);
 
   const passportLogin = async () => {
     if (web3Provider.provider.request) {
@@ -139,6 +146,14 @@ export default function CreateERC1155ListingWithPassport() {
     setBuyItemAmountState(event.target.value);
   };
 
+  const handleMakerEcosystemFeeRecipientChange = (event: any) => {
+    setMakerEcosystemFeeRecipientState(event.target.value);
+  };
+
+  const handleMakerEcosystemFeeAmountChange = (event: any) => {
+    setMakerEcosystemFeeAmountState(event.target.value);
+  };
+
   const handleSuccessfulListingCreation = (listingID: string) => {
     setSuccessMessageState(`Listing created successfully - ${listingID}`);
   };
@@ -183,6 +198,8 @@ export default function CreateERC1155ListingWithPassport() {
   // create ERC1155 listing
   const createER1155Listing = async () => {
     setListingErrorState(null);
+    setLoadingState(true);
+    setLoadingText('Creating listing');
 
     try {
       // prepare the listing
@@ -199,6 +216,10 @@ export default function CreateERC1155ListingWithPassport() {
         orderbookSDK,
         preparedListing,
         orderSignature,
+        makerEcosystemFeeRecipient != "" ? {
+          recipientAddress: makerEcosystemFeeRecipient,
+          amount: makerEcosystemFeeAmount,
+        } : undefined
       );
 
       handleSuccessfulListingCreation(listingID);
@@ -207,57 +228,57 @@ export default function CreateERC1155ListingWithPassport() {
       setSuccessMessageState(null);
       setListingErrorState(`Something went wrong - ${error.message}`);
     }
+
+    setLoadingState(false);
   };
 
   return (
-    <Box>
+    <Box sx={{ width: "450px" }}>
+      <LoadingOverlay visible={loading}>
+        <LoadingOverlay.Content>
+          <LoadingOverlay.Content.LoopingText
+            text={[loadingText]}
+            textDuration={1000}
+          />
+        </LoadingOverlay.Content>
+      </LoadingOverlay>
       <Box sx={{ marginBottom: "base.spacing.x5" }}>
         <Heading size="medium" sx={{ marginBottom: "base.spacing.x5" }}>
           Passport
         </Heading>
-        <Grid>
-          {accountsState.length === 0 ? (
-            <Box sx={{ marginBottom: "base.spacing.x5" }}>
+        <Stack direction="row" justifyContent={"space-between"}>
+          <Box sx={{ marginBottom: "base.spacing.x5" }}>
+            {accountsState.length === 0 ? (
               <Button
                 size="medium"
                 variant="primary"
-                sx={{ width: "50%", marginBottom: "base.spacing.x10" }}
+                sx={{ width: "100%", marginBottom: "base.spacing.x10" }}
                 disabled={loading}
                 onClick={passportLogin}
               >
                 Login
               </Button>
-            </Box>
-          ) : null}
-          {accountsState.length >= 1 ? (
-            <Box sx={{ marginBottom: "base.spacing.x5" }}>
+            ) : (
               <Button
                 size="medium"
                 variant="primary"
-                sx={{ width: "50%", marginBottom: "base.spacing.x10" }}
+                sx={{ width: "90%", marginBottom: "base.spacing.x10" }}
                 disabled={loading}
                 onClick={passportLogout}
               >
                 Logout
               </Button>
-            </Box>
-          ) : null}
-          {loading ? (
-            <LoadingOverlay visible>
-              <LoadingOverlay.Content>
-                <LoadingOverlay.Content.LoopingText
-                  text={[loadingText]}
-                  textDuration={1000}
-                />
-              </LoadingOverlay.Content>
-            </LoadingOverlay>
-          ) : (
-            <Box sx={{ marginBottom: "base.spacing.x5" }}>
-              Connected Account:
-              {accountsState.length >= 1 ? accountsState : "(not connected)"}
-            </Box>
-          )}
-        </Grid>
+            )}
+          </Box>
+          <Box sx={{ marginBottom: "base.spacing.x5", marginTop: "base.spacing.x1", textAlign: "right" }}>
+            <div>
+              <Body size="small" weight="bold">Connected Account:</Body>
+            </div>
+            <div>
+              <Body size="xSmall" mono={true}>{accountsState.length >= 1 ? accountsState : "(not connected)"}</Body>
+            </div>
+          </Box>
+        </Stack>
       </Box>
       <Box>
         <Heading size="medium" sx={{ marginBottom: "base.spacing.x5" }}>
@@ -325,6 +346,17 @@ export default function CreateERC1155ListingWithPassport() {
         <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
           <FormControl.Label>Currency Amount</FormControl.Label>
           <TextInput onChange={handleBuyItemAmountChange} />
+        </FormControl>
+        <Heading size="xSmall" sx={{ marginBottom: "base.spacing.x5" }}>
+          Maker Ecosystem Fee
+        </Heading>
+        <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
+          <FormControl.Label>Recipient Address</FormControl.Label>
+          <TextInput onChange={handleMakerEcosystemFeeRecipientChange} />
+        </FormControl>
+        <FormControl sx={{ marginBottom: "base.spacing.x5" }}>
+          <FormControl.Label>Fee Amount</FormControl.Label>
+          <TextInput onChange={handleMakerEcosystemFeeAmountChange} />
         </FormControl>
         <Box
           sx={{

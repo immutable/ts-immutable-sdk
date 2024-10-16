@@ -1,33 +1,70 @@
 import {
-  Checkout,
+  Body,
+  ButtCon,
+  Button,
+  FramedIcon,
+  FramedImage,
+  HeroFormControl,
+  HeroTextInput,
+  MenuItem,
+  OverflowDrawerMenu,
+  Stack,
+} from '@biom3/react';
+import debounce from 'lodash.debounce';
+import {
+  ChainId,
+  type Checkout,
+  EIP6963ProviderInfo,
   IMTBLWidgetEvents,
   TokenFilterTypes,
-  TokenInfo,
+  type TokenInfo,
+  WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 import {
-  Body, Box, MenuItem, OverflowPopoverMenu,
-} from '@biom3/react';
-import {
-  useCallback, useContext, useEffect, useState,
+  type ChangeEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
 } from 'react';
+import { Web3Provider } from '@ethersproject/providers';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
-import { TextInputForm } from '../../../components/FormComponents/TextInputForm/TextInputForm';
-import { OptionsDrawer } from '../components/OptionsDrawer';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { orchestrationEvents } from '../../../lib/orchestrationEvents';
-import { OptionTypes } from '../components/Option';
-import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
-import { getL2ChainId } from '../../../lib';
 import {
-  SharedViews,
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
+import { getL2ChainId } from '../../../lib';
+import { orchestrationEvents } from '../../../lib/orchestrationEvents';
+import { OptionsDrawer } from '../components/OptionsDrawer';
+import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
+import { TokenImage } from '../../../components/TokenImage/TokenImage';
+import { getDefaultTokenImage } from '../../../lib/utils';
+import type { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
+import { useRoutes } from '../hooks/useRoutes';
+import { SQUID_NATIVE_TOKEN } from '../utils/config';
+import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
+import { AddFundsErrorTypes, type RouteData } from '../types';
+import { SelectedRouteOption } from '../components/SelectedRouteOption';
+import { SelectedWallet } from '../components/SelectedWallet';
+import { DeliverToWalletDrawer } from '../../../components/WalletDrawer/DeliverToWalletDrawer';
+import { PayWithWalletDrawer } from '../../../components/WalletDrawer/PayWithWalletDrawer';
+import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
+import { getProviderSlugFromRdns } from '../../../lib/provider';
+import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
+import { sendConnectProviderSuccessEvent } from '../AddFundsWidgetEvents';
+import { convertToUsd } from '../functions/convertToUsd';
+import {
+  useAnalytics,
+  UserJourney,
+} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { validateToAmount } from '../functions/amountValidation';
+import { OnboardingDrawer } from '../components/OnboardingDrawer';
+import { useError } from '../hooks/useError';
 
 interface AddFundsProps {
-  checkout?: Checkout;
+  checkout: Checkout | null;
   showBackButton?: boolean;
   showOnrampOption?: boolean;
   showSwapOption?: boolean;
@@ -36,61 +73,233 @@ interface AddFundsProps {
   toAmount?: string;
   onCloseButtonClick?: () => void;
   onBackButtonClick?: () => void;
+  config: StrongCheckoutWidgetsConfig;
 }
 
 export function AddFunds({
   checkout,
   toAmount,
+  config,
   toTokenAddress,
-  showBackButton = false,
   showOnrampOption = true,
   showSwapOption = true,
   showBridgeOption = true,
-  onBackButtonClick,
   onCloseButtonClick,
+  showBackButton,
+  onBackButtonClick,
 }: AddFundsProps) {
-  const showBack = showBackButton || !!onBackButtonClick;
+  const { fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
+  const { showErrorHandover } = useError(config.environment);
 
-  const { addFundsDispatch } = useContext(AddFundsContext);
+  const {
+    addFundsState: {
+      squid,
+      chains,
+      balances,
+      tokens,
+      selectedAmount,
+      routes,
+      selectedRouteData,
+      selectedToken,
+    },
+    addFundsDispatch,
+  } = useContext(AddFundsContext);
 
   const { viewDispatch } = useContext(ViewContext);
+  const { track, page } = useAnalytics();
 
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
 
   const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
+  const [showPayWithDrawer, setShowPayWithDrawer] = useState(false);
+  const [showDeliverToDrawer, setShowDeliverToDrawer] = useState(false);
   const [onRampAllowedTokens, setOnRampAllowedTokens] = useState<TokenInfo[]>(
     [],
   );
   const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
-  const [currentToAmount, setCurrentToAmount] = useState<string>(
-    toAmount || '0',
+  const [inputValue, setInputValue] = useState<string>(
+    selectedAmount || toAmount || '',
   );
-  const [currentToTokenAddress, setCurrentToTokenAddress] = useState<
-  TokenInfo | undefined
-  >();
+  const [fetchingRoutes, setFetchingRoutes] = useState(false);
+  const [insufficientBalance, setInsufficientBalance] = useState(false);
 
-  const showErrorView = useCallback(
-    (error: Error) => {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SharedViews.ERROR_VIEW,
-            error,
-          },
-        },
-      });
+  const selectedAmountUsd = useMemo(
+    () => convertToUsd(tokens, inputValue, selectedToken),
+    [tokens, inputValue, selectedToken],
+  );
+
+  const setSelectedAmount = useMemo(() => debounce((value: string) => {
+    track({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'InputScreen',
+      control: 'AmountInput',
+      controlType: 'TextInput',
+      extras: {
+        toAmount: value,
+      },
+    });
+
+    addFundsDispatch({
+      payload: {
+        type: AddFundsActions.SET_SELECTED_AMOUNT,
+        selectedAmount: value,
+      },
+    });
+  }, 2500), []);
+
+  const setSelectedToken = (token: TokenInfo | undefined) => {
+    track({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'InputScreen',
+      control: 'TokensMenu',
+      controlType: 'MenuItem',
+      extras: {
+        tokenAddress: token?.address,
+      },
+    });
+
+    addFundsDispatch({
+      payload: {
+        type: AddFundsActions.SET_SELECTED_TOKEN,
+        selectedToken: token,
+      },
+    });
+  };
+
+  const setSelectedRouteData = (route: RouteData | undefined) => {
+    track({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'InputScreen',
+      control: 'RoutesMenu',
+      controlType: 'MenuItem',
+      extras: {
+        toTokenAddress: route?.amountData.toToken.address,
+        toTokenChainId: route?.amountData.toToken.chainId,
+        fromTokenAddress: route?.amountData.fromToken.address,
+        fromTokenChainId: route?.amountData.fromToken.chainId,
+        toAmount: route?.amountData.toAmount,
+        fromAmount: route?.amountData.fromAmount,
+      },
+    });
+
+    addFundsDispatch({
+      payload: {
+        type: AddFundsActions.SET_SELECTED_ROUTE_DATA,
+        selectedRouteData: route,
+      },
+    });
+  };
+
+  const handleOnAmountInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { value, amount, isValid } = validateToAmount(event.target.value);
+
+    if (!isValid && amount < 0) {
+      return;
+    }
+
+    setInputValue(value);
+    setSelectedAmount(value);
+  };
+
+  const {
+    providersState: {
+      fromProviderInfo,
+      toProviderInfo,
+      fromAddress,
+      toAddress,
     },
-    [viewDispatch],
+  } = useProvidersContext();
+
+  const { providers } = useInjectedProviders({ checkout });
+  const walletOptions = useMemo(
+    () => providers
+    // TODO: Check if must filter passport on L1
+      .map((detail) => {
+        if (detail.info.rdns === WalletProviderRdns.PASSPORT) {
+          return {
+            ...detail,
+            info: {
+              ...detail.info,
+              name: getProviderSlugFromRdns(detail.info.rdns).replace(
+                /^\w/,
+                (c) => c.toUpperCase(),
+              ),
+            },
+          };
+        }
+        return detail;
+      }),
+    [providers],
   );
 
   useEffect(() => {
-    if (!checkout) {
-      showErrorView(new Error('Checkout object is missing'));
-      return;
+    page({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'InputScreen',
+      extras: {
+        toAmount,
+        toTokenAddress,
+      },
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!toAmount) return;
+    setSelectedAmount(toAmount);
+  }, [toAmount]);
+
+  useEffect(() => {
+    resetRoutes();
+    setInsufficientBalance(false);
+    setSelectedRouteData(undefined);
+  }, [fromAddress]);
+
+  useEffect(() => {
+    resetRoutes();
+    setInsufficientBalance(false);
+    setSelectedRouteData(undefined);
+
+    (async () => {
+      const isValidAmount = validateToAmount(selectedAmount).isValid;
+      if (
+        balances
+        && squid
+        && tokens
+        && selectedToken?.address
+        && isValidAmount
+      ) {
+        setFetchingRoutes(true);
+        const availableRoutes = await fetchRoutesWithRateLimit(
+          squid,
+          tokens,
+          balances,
+          ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+          selectedToken.address === 'native'
+            ? SQUID_NATIVE_TOKEN
+            : selectedToken.address,
+          selectedAmount,
+          5,
+          1000,
+        );
+        setFetchingRoutes(false);
+
+        if (availableRoutes.length === 0) {
+          setInsufficientBalance(true);
+        }
+      }
+    })();
+  }, [balances, squid, selectedToken, selectedAmount]);
+
+  useEffect(() => {
+    if (!selectedRouteData && routes.length > 0) {
+      setSelectedRouteData(routes[0]);
     }
+  }, [routes]);
+
+  useEffect(() => {
+    if (!checkout) return;
 
     const fetchTokens = async () => {
       try {
@@ -102,9 +311,15 @@ export function AddFunds({
         if (tokenResponse?.tokens.length > 0) {
           setAllowedTokens(tokenResponse.tokens);
 
-          const token = tokenResponse.tokens.find((t) => t.address === toTokenAddress)
-            || tokenResponse.tokens[0];
-          setCurrentToTokenAddress(token);
+          if (toTokenAddress) {
+            const token = tokenResponse.tokens.find(
+              (t) => t.address?.toLowerCase() === toTokenAddress.toLowerCase(),
+            );
+
+            if (token) {
+              setSelectedToken(token);
+            }
+          }
 
           addFundsDispatch({
             payload: {
@@ -114,7 +329,7 @@ export function AddFunds({
           });
         }
       } catch (error) {
-        showErrorView(new Error('Failed to fetch tokens'));
+        showErrorHandover(AddFundsErrorTypes.SERVICE_BREAKDOWN);
       }
     };
 
@@ -122,10 +337,7 @@ export function AddFunds({
   }, [checkout, toTokenAddress]);
 
   useEffect(() => {
-    if (!checkout) {
-      showErrorView(new Error('Checkout object is missing'));
-      return;
-    }
+    if (!checkout) return;
 
     const fetchOnRampTokens = async () => {
       try {
@@ -138,183 +350,381 @@ export function AddFunds({
           setOnRampAllowedTokens(tokenResponse.tokens);
         }
       } catch (error) {
-        showErrorView(new Error('Failed to fetch onramp tokens'));
+        showErrorHandover(AddFundsErrorTypes.SERVICE_BREAKDOWN);
       }
     };
     fetchOnRampTokens();
   }, [checkout]);
 
-  const openDrawer = () => {
-    setShowOptionsDrawer(true);
+  const isSelected = useCallback(
+    (token: TokenInfo) => token.address === selectedToken,
+    [selectedToken],
+  );
+
+  const handleTokenChange = useCallback((token: TokenInfo) => {
+    setSelectedToken(token);
+  }, []);
+
+  const handleCardClick = () => {
+    track({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'InputScreen',
+      control: 'PayWithCardMenu',
+      controlType: 'MenuItem',
+      extras: {
+        tokenAddress: selectedToken?.address ?? '',
+        amount: selectedAmount ?? '',
+      },
+    });
+    const data = {
+      tokenAddress: selectedToken?.address ?? '',
+      amount: selectedAmount ?? '',
+      showBackButton: true,
+    };
+    orchestrationEvents.sendRequestOnrampEvent(
+      eventTarget,
+      IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+      data,
+    );
   };
 
-  const updateAmount = (value: string) => {
-    setCurrentToAmount(value);
+  const handleRouteClick = (route: RouteData) => {
+    setShowOptionsDrawer(false);
+    setShowPayWithDrawer(false);
+    setShowDeliverToDrawer(false);
+    setSelectedRouteData(route);
   };
 
-  const isSelected = (token: TokenInfo) => token.address === currentToTokenAddress;
+  const handleReviewClick = () => {
+    if (!selectedRouteData || !selectedToken?.address) return;
 
-  const isDisabled = !currentToTokenAddress || !currentToAmount || parseFloat(currentToAmount) <= 0;
+    track({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'InputScreen',
+      control: 'RoutesMenu',
+      controlType: 'MenuItem',
+      extras: {
+        toTokenAddress: selectedRouteData.amountData.toToken.address,
+        toTokenChainId: selectedRouteData.amountData.toToken.chainId,
+        fromTokenAddress: selectedRouteData.amountData.fromToken.address,
+        fromTokenChainId: selectedRouteData.amountData.fromToken.chainId,
+        toAmount: selectedRouteData.amountData.toAmount,
+        fromAmount: selectedRouteData.amountData.fromAmount,
+      },
+    });
 
-  const handleTokenChange = (token: TokenInfo) => {
-    setCurrentToTokenAddress(token);
-  };
-
-  // const handleReviewClick = () => {
-  //   console.log('handle review click');
-  // };
-
-  const onPayWithCard = (paymentType: OptionTypes) => {
-    if (paymentType === OptionTypes.SWAP) {
-      orchestrationEvents.sendRequestSwapEvent(
-        eventTarget,
-        IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
-        {
-          toTokenAddress: currentToTokenAddress?.address ?? '',
-          amount: toAmount ?? '',
-          fromTokenAddress: '',
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: AddFundsWidgetViews.REVIEW,
+          data: {
+            balance: selectedRouteData.amountData.balance,
+            toChainId: ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+            toTokenAddress: selectedToken.address,
+            toAmount: selectedAmount,
+            additionalBuffer: selectedRouteData.amountData.additionalBuffer,
+          },
         },
-      );
-    } else {
-      const data = {
-        tokenAddress: currentToTokenAddress?.address ?? '',
-        amount: toAmount ?? '',
-      };
-      orchestrationEvents.sendRequestOnrampEvent(
-        eventTarget,
-        IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
-        data,
-      );
-    }
+      },
+    });
   };
 
-  const checkShowOnRampOption = () => {
-    if (showOnrampOption && currentToTokenAddress) {
+  const shouldShowOnRampOption = useMemo(() => {
+    if (showOnrampOption && selectedToken) {
       const token = onRampAllowedTokens.find(
-        (t) => t.address?.toLowerCase()
-          === currentToTokenAddress.address?.toLowerCase(),
+        (t) => t.address?.toLowerCase() === selectedToken.address?.toLowerCase(),
       );
       return !!token;
     }
     return false;
+  }, [selectedToken, onRampAllowedTokens, showOnrampOption]);
+
+  const showInitialEmptyState = !selectedToken;
+  const defaultTokenImage = getDefaultTokenImage(
+    checkout?.config.environment,
+    config.theme,
+  );
+
+  const tokenChoiceOptions = useMemo(
+    () => allowedTokens.map((token) => (
+      <MenuItem
+        size="medium"
+        key={token.name}
+        onClick={() => handleTokenChange(token)}
+        selected={isSelected(token)}
+        emphasized
+      >
+        <MenuItem.FramedImage
+          circularFrame
+          use={(
+            <TokenImage
+              src={token.icon}
+              name={token.name}
+              defaultImage={defaultTokenImage}
+            />
+            )}
+          emphasized={false}
+        />
+        <MenuItem.Label>{token.symbol}</MenuItem.Label>
+        {token.symbol !== token.name && (
+        <MenuItem.Caption>{token.name}</MenuItem.Caption>
+        )}
+      </MenuItem>
+    )),
+    [allowedTokens, handleTokenChange, isSelected, defaultTokenImage],
+  );
+
+  const shouldShowBackButton = showBackButton ?? !!onBackButtonClick;
+  const routeInputsReady = !!selectedToken
+    && !!fromAddress
+    && validateToAmount(selectedAmount).isValid
+    && validateToAmount(inputValue).isValid;
+
+  const loading = (routeInputsReady || fetchingRoutes)
+    && !(selectedRouteData || insufficientBalance);
+
+  const readyToReview = routeInputsReady
+    && !!toAddress
+    && !!selectedRouteData
+    && !loading;
+
+  const handleWalletConnected = (
+    providerType: 'from' | 'to',
+    provider: Web3Provider,
+    providerInfo: EIP6963ProviderInfo,
+  ) => {
+    track({
+      userJourney: UserJourney.ADD_FUNDS,
+      screen: 'InputScreen',
+      control: 'WalletsMenu',
+      controlType: 'MenuItem',
+      extras: {
+        providerType,
+        providerName: providerInfo.name,
+        providerRdns: providerInfo.rdns,
+        providerUuid: providerInfo.uuid,
+      },
+    });
+    sendConnectProviderSuccessEvent(
+      eventTarget,
+      providerType,
+      provider,
+      providerInfo,
+    );
   };
 
   return (
     <SimpleLayout
+      containerSx={{ bg: 'transparent' }}
       header={(
-        <HeaderNavigation
-          title="Add"
-          onCloseButtonClick={onCloseButtonClick}
-          showBack={showBack}
-          onBackButtonClick={() => {
-            orchestrationEvents.sendRequestGoBackEvent(
-              eventTarget,
-              IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
-              {},
-            );
-            onBackButtonClick?.();
+        <Stack
+          direction="row"
+          sx={{
+            pos: 'absolute',
+            w: '100%',
+            top: '0',
+            pt: 'base.spacing.x4',
+            px: 'base.spacing.x5',
           }}
-        />
+          justifyContent="flex-start"
+        >
+          {shouldShowBackButton && (
+            <ButtCon
+              testId="backButton"
+              icon="ArrowBackward"
+              variant="tertiary"
+              size="small"
+              onClick={onBackButtonClick}
+            />
+          )}
+          <ButtCon
+            variant="tertiary"
+            size="small"
+            icon="Close"
+            onClick={onCloseButtonClick}
+            sx={{ ml: 'auto' }}
+          />
+        </Stack>
       )}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          height: '100%',
-        }}
-      >
-        <Box
+      <Stack alignItems="center" sx={{ flex: 1 }}>
+        <Stack
+          testId="topSection"
           sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            marginTop: 'base.spacing.x10',
+            flex: 1,
+            px: 'base.spacing.x2',
+            w: '100%',
+            pt: 'base.spacing.x1',
           }}
+          justifyContent="center"
+          alignItems="center"
         >
-          <Box sx={{ width: 'base.spacing.x40' }}>
-            <Box sx={{ marginBottom: 'base.spacing.x3' }}>
-              <TextInputForm
-                testId="add-funds-amount"
-                type="number"
-                value={currentToAmount}
-                validator={amountInputValidation}
-                onTextInputChange={(value) => updateAmount(value)}
-                textAlign="right"
-                inputMode="decimal"
-              />
-            </Box>
+          <OverflowDrawerMenu
+            drawerSize="full"
+            headerBarTitle="Add Token"
+            drawerCloseIcon="ChevronExpand"
+            {...(showInitialEmptyState
+              ? { icon: 'Add', size: 'large', variant: 'tertiary' }
+              : {
+                customTarget: (
+                  <FramedImage
+                    size="xLarge"
+                    use={(
+                      <TokenImage
+                        src={selectedToken?.icon}
+                        name={selectedToken?.name}
+                        defaultImage={defaultTokenImage}
+                      />
+                      )}
+                    padded
+                    emphasized
+                    circularFrame
+                    sx={{
+                      cursor: 'pointer',
+                      mb: 'base.spacing.x1',
+                      // eslint-disable-next-line @typescript-eslint/naming-convention
+                      '&:hover': {
+                        boxShadow: ({ base }) => `0 0 0 ${base.border.size[200]} ${base.color.text.body.primary}`,
+                      },
+                    }}
+                  />
+                ),
+              })}
+          >
+            {tokenChoiceOptions}
+          </OverflowDrawerMenu>
 
-            <Box
-              sx={{
-                display: 'flex',
-                borderRadius: 'base.borderRadius.x20',
-                alignItems: 'center',
-                gap: 'base.spacing.x5',
-                justifyContent: 'center',
-                border: '1px solid grey',
+          {showInitialEmptyState ? (
+            <Body>Add Token</Body>
+          ) : (
+            <HeroFormControl
+              validationStatus={inputValue === '0' ? 'error' : 'success'}
+            >
+              <HeroFormControl.Label>
+                Add
+                {' '}
+                {selectedToken.symbol}
+              </HeroFormControl.Label>
+              <HeroTextInput
+                testId="add-funds-amount-input"
+                type="number"
+                value={inputValue}
+                onChange={(value) => handleOnAmountInputChange(value)}
+                placeholder="0"
+                maxTextSize="xLarge"
+              />
+              {selectedAmountUsd > 0 && (
+                <HeroFormControl.Caption>
+                  USD $
+                  {selectedAmountUsd.toFixed(2)}
+                </HeroFormControl.Caption>
+              )}
+            </HeroFormControl>
+          )}
+        </Stack>
+        <Stack
+          testId="bottomSection"
+          sx={{
+            alignSelf: 'stretch',
+            p: 'base.spacing.x3',
+            pb: 'base.spacing.x10',
+            bg: 'base.color.neutral.800',
+          }}
+          gap="base.spacing.x6"
+        >
+          <Stack gap="0px">
+            <SelectedWallet
+              label="Pay with"
+              providerInfo={{
+                ...fromProviderInfo,
+                address: fromAddress,
+              }}
+              onClick={(event) => {
+                event.stopPropagation();
+                setShowPayWithDrawer(true);
               }}
             >
-              <Body size="large" weight="bold">
-                {currentToTokenAddress?.name ?? ''}
-              </Body>
-              <OverflowPopoverMenu testId="add-funds-tokens-menu">
-                {allowedTokens.map((token: any) => (
-                  <MenuItem
-                    key={token.address}
-                    onClick={() => handleTokenChange(token)}
-                    selected={isSelected(token)}
-                  >
-                    <MenuItem.Label>{token.name}</MenuItem.Label>
-                  </MenuItem>
-                ))}
-              </OverflowPopoverMenu>
-            </Box>
-          </Box>
-        </Box>
+              <MenuItem.BottomSlot.Divider
+                sx={{
+                  ml: fromAddress ? 'base.spacing.x2' : undefined,
+                }}
+              />
+              <SelectedRouteOption
+                loading={loading}
+                chains={chains}
+                routeData={selectedRouteData}
+                onClick={() => setShowOptionsDrawer(true)}
+                withSelectedToken={!!selectedToken}
+                withSelectedAmount={parseFloat(inputValue) > 0}
+                withSelectedWallet={!!fromAddress}
+                insufficientBalance={insufficientBalance}
+                showOnrampOption={shouldShowOnRampOption}
+              />
+            </SelectedWallet>
+            <Stack
+              sx={{ pos: 'relative', h: 'base.spacing.x3' }}
+              alignItems="center"
+            >
+              <FramedIcon
+                icon="ArrowDown"
+                sx={{
+                  top: '0',
+                  pos: 'absolute',
+                  translate: '0 -30%',
+                  bg: 'base.color.neutral.800',
+                }}
+              />
+            </Stack>
+            <SelectedWallet
+              label="Deliver to"
+              providerInfo={{
+                ...toProviderInfo,
+                address: toAddress,
+              }}
+              onClick={() => setShowDeliverToDrawer(true)}
+            />
+          </Stack>
 
-        <MenuItem
-          size="small"
-          emphasized
-          disabled={isDisabled}
-          sx={{
-            opacity: isDisabled ? 0.5 : 1,
-            cursor: isDisabled ? 'not-allowed' : 'pointer',
-          }}
-          onClick={() => {
-            openDrawer();
-          }}
-        >
-          <MenuItem.IntentIcon icon="ChevronExpand" />
-          <MenuItem.Label size="medium">Choose payment option</MenuItem.Label>
-        </MenuItem>
-        <Box
-          sx={{
-            marginBottom: 'base.spacing.x10',
-          }}
-        >
+          <Button
+            testId="add-funds-button"
+            size="large"
+            variant={readyToReview ? 'primary' : 'secondary'}
+            disabled={!readyToReview}
+            onClick={handleReviewClick}
+            sx={{ opacity: readyToReview ? 1 : 0.5 }}
+          >
+            Review
+          </Button>
+          <PayWithWalletDrawer
+            visible={showPayWithDrawer}
+            walletOptions={walletOptions}
+            onClose={() => setShowPayWithDrawer(false)}
+            onPayWithCard={handleCardClick}
+            onConnect={handleWalletConnected}
+            insufficientBalance={insufficientBalance}
+            showOnRampOption={shouldShowOnRampOption}
+          />
           <OptionsDrawer
-            showOnrampOption={checkShowOnRampOption()}
+            routes={routes}
+            showOnrampOption={shouldShowOnRampOption}
             showSwapOption={showSwapOption}
             showBridgeOption={showBridgeOption}
             visible={showOptionsDrawer}
             onClose={() => setShowOptionsDrawer(false)}
-            onPayWithCard={onPayWithCard}
+            onCardClick={handleCardClick}
+            onRouteClick={handleRouteClick}
+            insufficientBalance={insufficientBalance}
           />
-        </Box>
-        {/* <Button
-          testId="add-funds-button"
-          variant="primary"
-          onClick={handleReviewClick}
-          size="large"
-          sx={{
-            marginBottom: 'base.spacing.x10',
-            mx: 'base.spacing.x3',
-          }}
-        >
-          Review
-        </Button> */}
-      </Box>
+          <DeliverToWalletDrawer
+            visible={showDeliverToDrawer}
+            walletOptions={walletOptions}
+            onClose={() => setShowDeliverToDrawer(false)}
+            onConnect={handleWalletConnected}
+          />
+          <OnboardingDrawer environment={checkout?.config.environment!} />
+        </Stack>
+      </Stack>
     </SimpleLayout>
   );
 }

@@ -145,6 +145,7 @@ export type {
   WalletFilter,
   WalletInfo,
   SquidConfig,
+  CheckoutWidgetsVersionConfig,
 } from './types';
 
 export {
@@ -156,6 +157,6 @@ export { isAddressSanctioned } from './sanctions';
 
 export type { ErrorType } from './errors';
 
-export { CheckoutErrorType } from './errors';
+export { CheckoutErrorType, CheckoutError } from './errors';
 export { CheckoutConfiguration } from './config';
 export { BlockExplorerService } from './blockExplorer';
