@@ -39,10 +39,7 @@ export const useExecute = (environment: Environment) => {
     showErrorHandover(errorType, { error });
   };
 
-  const convertToNetworkChangeableProvider = async (
-    provider: Web3Provider,
-  ): Promise<Web3Provider> => new ethers.providers.Web3Provider(provider.provider, 'any');
-
+  // @TODO: Move to util function
   const checkProviderChain = async (
     provider: Web3Provider,
     chainId: string,
@@ -166,7 +163,6 @@ export const useExecute = (environment: Environment) => {
   };
 
   return {
-    convertToNetworkChangeableProvider,
     checkProviderChain,
     getAllowance,
     approve,
