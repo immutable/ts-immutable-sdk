@@ -1,5 +1,5 @@
 import { useLocalBundle } from '../env';
-import { generateSHA512Hash } from './generateHashes';
+import { generateSHA512Hash, validatedHashesUrl } from './hashUtils';
 
 // Loads the checkout widgets bundle from the CDN and appends the script to the document head
 export async function loadUnresolvedBundle(
@@ -14,8 +14,6 @@ export async function loadUnresolvedBundle(
   if (document === undefined) {
     throw new Error('missing document object: please run Checkout client side');
   }
-
-  console.log('test');
 
   let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout/widgets.js`;
   if (useLocalBundle()) cdnUrl = `http://${window.location.host}/lib/js/widgets.js`;
@@ -39,8 +37,8 @@ export async function getWidgetsEsmUrl(
   if (useLocalBundle()) return `http://${window.location.host}/lib/js/index.js`;
 
   const cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout/widgets-esm.js`;
-  // eslint-disable-next-line max-len
-  const validHashesUrl = `https://raw.githubusercontent.com/immutable/ts-immutable-sdk/refs/tags/${validVersion}/packages/checkout/widgets-lib/hashes.json`;
+
+  const validHashesUrl = await validatedHashesUrl(validVersion);
 
   const hash = await generateSHA512Hash(cdnUrl);
 

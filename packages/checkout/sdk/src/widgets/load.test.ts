@@ -2,7 +2,7 @@
 import { SDK_VERSION_MARKER } from '../env';
 import { getWidgetsEsmUrl, loadUnresolvedBundle } from './load';
 
-jest.mock('./generateHashes', () => ({
+jest.mock('./hashUtils', () => ({
   generateSHA512Hash: jest.fn(async () => 'sha512-abc123'),
 }));
 
