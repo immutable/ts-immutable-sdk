@@ -1,23 +1,5 @@
 import { useLocalBundle } from '../env';
-
-async function generateSHA512Hash(url: string): Promise<string> {
-  // Fetch the content of the remote JavaScript file
-  const response = await fetch(url);
-  const content = await response.text();
-
-  // Convert the content to an ArrayBuffer
-  const encoder = new TextEncoder();
-  const data = encoder.encode(content);
-
-  // Use the Browser WebCrypto SubtleCrypto API to generate a SHA-512 hash
-  const hashBuffer = await window.crypto.subtle.digest('SHA-512', data);
-
-  // Convert the hash to a Base64 string
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashBase64 = btoa(String.fromCharCode(...hashArray));
-
-  return `sha512-${hashBase64}`;
-}
+import { generateSHA512Hash } from './generateHashes';
 
 // Loads the checkout widgets bundle from the CDN and appends the script to the document head
 export async function loadUnresolvedBundle(
@@ -49,25 +31,27 @@ export async function loadUnresolvedBundle(
 }
 
 // Gets the CDN url for the split checkout widgets bundle
-export function getWidgetsEsmUrl(
+export async function getWidgetsEsmUrl(
   validVersion: string,
-): string {
+): Promise<Promise<string>> {
   if (useLocalBundle()) return `http://${window.location.host}/lib/js/index.js`;
 
   const cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout/widgets-esm.js`;
   // eslint-disable-next-line max-len
   const validHashesUrl = `https://raw.githubusercontent.com/immutable/ts-immutable-sdk/refs/tags/${validVersion}/packages/checkout/widgets-lib/hashes.json`;
 
-  generateSHA512Hash(cdnUrl)
-    .then(async (hash) => {
-      const widgetsEsmHash = await fetch(validHashesUrl)
-        .then((response) => response.json())
-        .then((hashes) => hashes['dist/index.js']) as string;
+  const hash = await generateSHA512Hash(cdnUrl);
 
-      if (hash !== widgetsEsmHash) {
-        throw new Error('Security Error: widgets-esm.js hash mismatch');
-      }
+  const widgetsEsmHash: string = await fetch(validHashesUrl)
+    .then((response) => response.json())
+    .then((hashes) => hashes['dist/index.js'])
+    .catch(() => {
+      throw new Error('Security Error: could not fetch widgets-esm.js hash');
     });
 
-  return `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout/widgets-esm.js`;
+  if (hash !== widgetsEsmHash) {
+    throw new Error('Security Error: widgets-esm.js hash mismatch');
+  }
+
+  return cdnUrl;
 }

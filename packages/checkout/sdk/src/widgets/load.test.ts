@@ -2,6 +2,10 @@
 import { SDK_VERSION_MARKER } from '../env';
 import { getWidgetsEsmUrl, loadUnresolvedBundle } from './load';
 
+jest.mock('./generateHashes', () => ({
+  generateSHA512Hash: jest.fn(async () => 'sha512-abc123'),
+}));
+
 describe('load', () => {
   const SDK_VERSION = SDK_VERSION_MARKER;
   const scriptId = 'immutable-checkout-widgets-bundle';
@@ -11,11 +15,14 @@ describe('load', () => {
   });
 
   describe('load unresolved bundle', () => {
-    it('should validate the versioning', () => {
+    it('should validate the versioning', async () => {
       const tag = document.createElement('script');
-      loadUnresolvedBundle(tag, scriptId, SDK_VERSION);
+      await loadUnresolvedBundle(tag, scriptId, SDK_VERSION);
+
       expect(document.head.innerHTML).toBe(
-        '<script id="immutable-checkout-widgets-bundle" '
+        '<script '
+        + 'integrity="sha512-abc123" '
+        + 'id="immutable-checkout-widgets-bundle" '
         + 'data-version="__SDK_VERSION__" '
         + `src="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/checkout/widgets.js"></script>`,
       );
@@ -23,14 +30,23 @@ describe('load', () => {
   });
 
   describe('get widgets esm url', () => {
-    it('should validate the versioning', () => {
-      expect(getWidgetsEsmUrl(SDK_VERSION)).toEqual(
+    beforeEach(() => {
+      // @ts-expect-error mocking only json value of fetch response
+      global.fetch = jest.fn(async () => ({
+        json: async () => ({ 'dist/index.js': 'sha512-abc123' }),
+      }));
+    });
+
+    it('should validate the versioning', async () => {
+      const widgetsEsmUrl = await getWidgetsEsmUrl(SDK_VERSION);
+      expect(widgetsEsmUrl).toEqual(
         `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/checkout/widgets-esm.js`,
       );
     });
 
-    it('should change version', () => {
-      expect(getWidgetsEsmUrl('1.2.3')).toEqual(
+    it('should change version', async () => {
+      const widgetsEsmUrl = await getWidgetsEsmUrl('1.2.3');
+      expect(widgetsEsmUrl).toEqual(
         'https://cdn.jsdelivr.net/npm/@imtbl/sdk@1.2.3/dist/browser/checkout/widgets-esm.js',
       );
     });
