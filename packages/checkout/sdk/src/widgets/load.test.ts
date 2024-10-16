@@ -2,12 +2,15 @@
 import { SDK_VERSION_MARKER } from '../env';
 import { getWidgetsEsmUrl, loadUnresolvedBundle } from './load';
 
+const SDK_VERSION = SDK_VERSION_MARKER;
+
 jest.mock('./hashUtils', () => ({
   generateSHA512Hash: jest.fn(async () => 'sha512-abc123'),
+  // eslint-disable-next-line max-len
+  validatedHashesUrl: jest.fn(async () => `https://raw.githubusercontent.com/immutable/ts-immutable-sdk/refs/tags/${SDK_VERSION}/packages/checkout/widgets-lib/hashes.json`),
 }));
 
 describe('load', () => {
-  const SDK_VERSION = SDK_VERSION_MARKER;
   const scriptId = 'immutable-checkout-widgets-bundle';
 
   beforeEach(() => {
