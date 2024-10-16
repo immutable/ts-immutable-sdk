@@ -50,11 +50,10 @@ jobs:
           mv hashes.json hashes.json.old
           yarn updateHashes
           if [ -n "$(git diff --exit-code hashes.json)" ]; then
-            git config user.name "${{ github.actor }}"
-            git config user.email "${{ github.actor }}@users.noreply.github.com"
-            git add hashes.json
-            git commit -m "Update hashes.json"
-            git push
+            echo "Hashes.json has changed. Please update the hashes.json file and commit the changes."
+            echo "You can use the following command in the root of the repo to update the hashes.json file:"
+            echo "yarn workspace @imtbl/checkout-widgets updateHashes"
+            exit 1
           fi
 
   build-lint-test-examples:
