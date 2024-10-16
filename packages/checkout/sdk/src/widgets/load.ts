@@ -15,6 +15,8 @@ export async function loadUnresolvedBundle(
     throw new Error('missing document object: please run Checkout client side');
   }
 
+  console.log('test');
+
   let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout/widgets.js`;
   if (useLocalBundle()) cdnUrl = `http://${window.location.host}/lib/js/widgets.js`;
 
