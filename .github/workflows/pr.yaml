@@ -44,6 +44,18 @@ jobs:
       - name: Build, Lint, Test & Typecheck
         run: yarn nx affected -t build,lint,test,typecheck 
 
+      - name: Validate Checkout Widgets Hashes
+        run: |
+          cd packages/checkout/widgets-lib
+          mv hashes.json hashes.json.old
+          yarn updateHashes
+          if [ -n "$(git diff --exit-code hashes.json)" ]; then
+            echo "Hashes.json has changed. Please update the hashes.json file and commit the changes."
+            echo "You can use the following command in the root of the repo to update the hashes.json file:"
+            echo "yarn workspace @imtbl/checkout-widgets updateHashes"
+            exit 1
+          fi
+
   build-lint-test-examples:
     name: Build, Lint & Test Examples
     runs-on: ubuntu-latest-8-cores
