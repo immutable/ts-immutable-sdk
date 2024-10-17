@@ -9,6 +9,7 @@ import {
 	Button,
 	Divider,
 	Heading,
+  Stack,
 } from "@biom3/react";
 import { Connect } from "./components/Connect";
 import { TransferAsset } from "./components/TransferAsset";
@@ -21,12 +22,9 @@ export default function Home() {
 	return (
 		<main>
 			<BiomeCombinedProviders>
-				<Box
+				<Stack
+          alignItems="center"
 					sx={{
-						display: "flex",
-						flexDirection: "column",
-						alignItems: "center",
-						justifyContent: "center",
 						padding: "base.spacing.x4",
 					}}
 				>
@@ -58,7 +56,7 @@ export default function Home() {
 							/>
 						</Box>
 					)}
-				</Box>
+				</Stack>
 			</BiomeCombinedProviders>
 		</main>
 	);
