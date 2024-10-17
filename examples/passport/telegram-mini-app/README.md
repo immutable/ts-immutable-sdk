@@ -9,3 +9,16 @@ Run the development server:
 ```bash
 yarn dev
 ```
+
+## Environment Variables
+
+Copy the `.env.example` file to a `.env` file and fill in the following environment variables:
+
+```bash
+# The Client ID of your application in Hub
+NEXT_PUBLIC_CLIENT_ID=
+# The redirect URI configured in your application in Hub
+NEXT_PUBLIC_REDIRECT_URI=
+# The logout redirect URI configured in your application in Hub
+NEXT_PUBLIC_LOGOUT_REDIRECT_URI=
+```

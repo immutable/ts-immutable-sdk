@@ -6,7 +6,6 @@ import {
 	BiomeCombinedProviders,
 	Body,
 	Box,
-	Button,
 	Divider,
 	Heading,
 	Stack,
