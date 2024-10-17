@@ -36,7 +36,9 @@ export function OptionsDrawer({
   showBridgeOption,
   insufficientBalance,
 }: OptionsDrawerProps) {
-  const { addFundsState: { chains } } = useContext(AddFundsContext);
+  const {
+    addFundsState: { chains },
+  } = useContext(AddFundsContext);
 
   const {
     providersState: { fromProviderInfo, fromAddress },
@@ -72,6 +74,7 @@ export function OptionsDrawer({
             use={
               <img src={fromProviderInfo?.icon} alt={fromProviderInfo?.name} />
             }
+            sx={{ mx: 'base.spacing.x2' }}
           />
           <MenuItem.Label>Pay from</MenuItem.Label>
           <MenuItem.Caption>

@@ -2,15 +2,17 @@ import { MouseEventHandler, ReactNode } from 'react';
 import { EllipsizedText, MenuItem, MenuItemProps } from '@biom3/react';
 import { EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
 
+const disabledStyles = {
+  cursor: 'not-allowed',
+  bg: 'base.color.translucent.inverse.800',
+};
+
 export interface SelectedWalletProps {
   children?: ReactNode;
   label: string;
-  providerInfo?: Partial<
-  EIP6963ProviderInfo & {
-    address?: string;
-  }
-  >;
+  providerInfo?: Partial<EIP6963ProviderInfo & { address?: string }>;
   onClick: MouseEventHandler<HTMLSpanElement>;
+  disabled?: boolean;
 }
 
 export function SelectedWallet({
@@ -18,12 +20,22 @@ export function SelectedWallet({
   children,
   onClick,
   providerInfo,
+  disabled,
 }: SelectedWalletProps) {
   const selected = !!children && providerInfo?.rdns;
   const size: MenuItemProps['size'] = selected ? 'xSmall' : 'small';
 
   return (
-    <MenuItem size={size} emphasized onClick={onClick}>
+    <MenuItem
+      size={size}
+      disabled={disabled}
+      emphasized={!disabled}
+      onClick={disabled ? undefined : onClick}
+      sx={{
+        py: selected ? 'base.spacing.x3' : undefined,
+        ...(disabled ? disabledStyles : {}),
+      }}
+    >
       {!providerInfo?.icon && (
         <MenuItem.FramedIcon icon="Wallet" variant="bold" emphasized={false} />
       )}
