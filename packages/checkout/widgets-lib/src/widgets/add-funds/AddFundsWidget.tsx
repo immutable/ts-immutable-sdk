@@ -58,7 +58,7 @@ export default function AddFundsWidget({
   config,
 }: AddFundsWidgetInputs) {
   const fetchingBalances = useRef(false);
-  const { base: { colorMode} } = useTheme();
+  const { base: { colorMode } } = useTheme();
   const [viewState, viewDispatch] = useReducer(viewReducer, {
     ...initialViewState,
     view: { type: AddFundsWidgetViews.ADD_FUNDS },
