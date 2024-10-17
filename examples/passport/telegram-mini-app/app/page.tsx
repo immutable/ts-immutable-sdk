@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Home from "./Home";
+import Home from "./components/Home";
 import { passport } from "@imtbl/sdk";
 import { Environment, ImmutableConfiguration } from "@imtbl/sdk/config";
 
