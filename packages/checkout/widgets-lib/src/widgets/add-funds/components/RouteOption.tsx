@@ -84,7 +84,6 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
 
           <MenuItem.FramedImage
             circularFrame
-            padded
             use={<img src={fromToken.iconUrl} alt={fromToken.name} />}
           />
         </Sticker>

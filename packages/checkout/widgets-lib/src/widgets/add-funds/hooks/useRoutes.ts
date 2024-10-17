@@ -71,7 +71,12 @@ export const useRoutes = () => {
     }
     return {
       fromToken,
-      fromAmount: calculateFromAmount(fromToken, toToken, toAmount, additionalBuffer),
+      fromAmount: calculateFromAmount(
+        fromToken,
+        toToken,
+        toAmount,
+        additionalBuffer,
+      ),
       toToken,
       toAmount,
       balance,
@@ -107,14 +112,9 @@ export const useRoutes = () => {
     });
   };
 
-  const convertToFormattedAmount = (amount : string, decimals:number) => {
-    const parsedFromAmount = parseFloat(amount).toFixed(
-      decimals,
-    );
-    const formattedFromAmount = utils.parseUnits(
-      parsedFromAmount,
-      decimals,
-    );
+  const convertToFormattedAmount = (amount: string, decimals: number) => {
+    const parsedFromAmount = parseFloat(amount).toFixed(decimals);
+    const formattedFromAmount = utils.parseUnits(parsedFromAmount, decimals);
     return formattedFromAmount.toString();
   };
 
@@ -145,7 +145,10 @@ export const useRoutes = () => {
     },
   );
 
-  const isRouteToAmountGreaterThanToAmount = (routeResponse:RouteResponse, toAmount :string) => {
+  const isRouteToAmountGreaterThanToAmount = (
+    routeResponse: RouteResponse,
+    toAmount: string,
+  ) => {
     const routeToAmount = getFormattedNumber(
       routeResponse?.route.estimate.toAmount,
       routeResponse?.route.estimate.toToken.decimals,
@@ -177,9 +180,13 @@ export const useRoutes = () => {
       if (!routeResponse?.route) {
         return {};
       }
-      if (isRouteToAmountGreaterThanToAmount(routeResponse, toAmount)) { return { route: routeResponse }; }
+      if (isRouteToAmountGreaterThanToAmount(routeResponse, toAmount)) {
+        return { route: routeResponse };
+      }
 
-      const additionalBuffer = Math.abs(Number(routeResponse?.route.estimate.aggregatePriceImpact));
+      const additionalBuffer = Math.abs(
+        Number(routeResponse?.route.estimate.aggregatePriceImpact),
+      );
       const newFromAmount = calculateFromAmount(
         fromToken,
         toToken,
@@ -265,13 +272,14 @@ export const useRoutes = () => {
         }),
     );
 
+    const sortedRoutes = sortRoutesByFastestTime(allRoutes);
+
     // Only update routes if the request is the latest one
     if (currentRequestId === latestRequestIdRef.current) {
-      const sortedRoutes = sortRoutesByFastestTime(allRoutes);
       setRoutes(sortedRoutes);
     }
 
-    return allRoutes;
+    return sortedRoutes;
   };
 
   return {

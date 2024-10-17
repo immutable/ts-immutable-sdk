@@ -130,24 +130,27 @@ export function AddFunds({
     [tokens, inputValue, selectedToken],
   );
 
-  const setSelectedAmount = useMemo(() => debounce((value: string) => {
-    track({
-      userJourney: UserJourney.ADD_FUNDS,
-      screen: 'InputScreen',
-      control: 'AmountInput',
-      controlType: 'TextInput',
-      extras: {
-        toAmount: value,
-      },
-    });
+  const setSelectedAmount = useMemo(
+    () => debounce((value: string) => {
+      track({
+        userJourney: UserJourney.ADD_FUNDS,
+        screen: 'InputScreen',
+        control: 'AmountInput',
+        controlType: 'TextInput',
+        extras: {
+          toAmount: value,
+        },
+      });
 
-    addFundsDispatch({
-      payload: {
-        type: AddFundsActions.SET_SELECTED_AMOUNT,
-        selectedAmount: value,
-      },
-    });
-  }, 2500), []);
+      addFundsDispatch({
+        payload: {
+          type: AddFundsActions.SET_SELECTED_AMOUNT,
+          selectedAmount: value,
+        },
+      });
+    }, 2500),
+    [],
+  );
 
   const setSelectedToken = (token: TokenInfo | undefined) => {
     track({
@@ -169,20 +172,22 @@ export function AddFunds({
   };
 
   const setSelectedRouteData = (route: RouteData | undefined) => {
-    track({
-      userJourney: UserJourney.ADD_FUNDS,
-      screen: 'InputScreen',
-      control: 'RoutesMenu',
-      controlType: 'MenuItem',
-      extras: {
-        toTokenAddress: route?.amountData.toToken.address,
-        toTokenChainId: route?.amountData.toToken.chainId,
-        fromTokenAddress: route?.amountData.fromToken.address,
-        fromTokenChainId: route?.amountData.fromToken.chainId,
-        toAmount: route?.amountData.toAmount,
-        fromAmount: route?.amountData.fromAmount,
-      },
-    });
+    if (route) {
+      track({
+        userJourney: UserJourney.ADD_FUNDS,
+        screen: 'InputScreen',
+        control: 'RoutesMenu',
+        controlType: 'MenuItem',
+        extras: {
+          toTokenAddress: route.amountData.toToken.address,
+          toTokenChainId: route.amountData.toToken.chainId,
+          fromTokenAddress: route.amountData.fromToken.address,
+          fromTokenChainId: route.amountData.fromToken.chainId,
+          toAmount: route.amountData.toAmount,
+          fromAmount: route.amountData.fromAmount,
+        },
+      });
+    }
 
     addFundsDispatch({
       payload: {
@@ -209,6 +214,7 @@ export function AddFunds({
       toProviderInfo,
       fromAddress,
       toAddress,
+      lockedToProvider,
     },
   } = useProvidersContext();
 
@@ -484,10 +490,7 @@ export function AddFunds({
   const loading = (routeInputsReady || fetchingRoutes)
     && !(selectedRouteData || insufficientBalance);
 
-  const readyToReview = routeInputsReady
-    && !!toAddress
-    && !!selectedRouteData
-    && !loading;
+  const readyToReview = routeInputsReady && !!toAddress && !!selectedRouteData && !loading;
 
   const handleWalletConnected = (
     providerType: 'from' | 'to',
@@ -614,12 +617,11 @@ export function AddFunds({
                 placeholder="0"
                 maxTextSize="xLarge"
               />
-              {selectedAmountUsd > 0 && (
-                <HeroFormControl.Caption>
-                  USD $
-                  {selectedAmountUsd.toFixed(2)}
-                </HeroFormControl.Caption>
-              )}
+
+              <HeroFormControl.Caption>
+                USD $
+                {selectedAmountUsd.toFixed(2)}
+              </HeroFormControl.Caption>
             </HeroFormControl>
           )}
         </Stack>
@@ -630,6 +632,8 @@ export function AddFunds({
             p: 'base.spacing.x3',
             pb: 'base.spacing.x10',
             bg: 'base.color.neutral.800',
+            bradtl: 'base.borderRadius.x8',
+            bradtr: 'base.borderRadius.x8',
           }}
           gap="base.spacing.x6"
         >
@@ -646,9 +650,7 @@ export function AddFunds({
               }}
             >
               <MenuItem.BottomSlot.Divider
-                sx={{
-                  ml: fromAddress ? 'base.spacing.x2' : undefined,
-                }}
+                sx={fromAddress ? { ml: 'base.spacing.x4' } : undefined}
               />
               <SelectedRouteOption
                 checkout={checkout}
@@ -684,6 +686,7 @@ export function AddFunds({
                 address: toAddress,
               }}
               onClick={() => setShowDeliverToDrawer(true)}
+              disabled={lockedToProvider}
             />
           </Stack>
 
