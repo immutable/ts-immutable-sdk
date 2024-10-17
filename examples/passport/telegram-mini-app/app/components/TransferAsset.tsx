@@ -45,13 +45,16 @@ export const TransferAsset = ({
 		}
 
 		// #doc passport-telegram-mini-app-transaction
+    // Setup the contract ABI with the safeTransferFrom function for transferring assets
 		const abi = [
 			"function safeTransferFrom(address from, address to, uint256 token_id)",
 		];
 
+    // Get the signer from the provider that was initialised in the Connect flow and create a contract instance
 		const signer = zkEvmProvider.getSigner();
 		const contract = new ethers.Contract(collectionAddress, abi, signer);
 		try {
+      // Call the transfer function on the contract
 			await contract.safeTransferFrom(walletAddress, toAddress, tokenId);
 			setTransferSuccess(true);
 		} catch (error: any) {
