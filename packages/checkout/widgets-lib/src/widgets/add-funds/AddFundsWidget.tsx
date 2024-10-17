@@ -2,9 +2,9 @@ import {
   useContext, useEffect, useMemo, useReducer, useRef,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AddFundsWidgetParams } from '@imtbl/checkout-sdk';
+import { AddFundsWidgetParams, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 
-import { Stack, CloudImage } from '@biom3/react';
+import { Stack, CloudImage, useTheme } from '@biom3/react';
 import { Environment } from '@imtbl/config';
 import { sendAddFundsCloseEvent } from './AddFundsWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
@@ -37,13 +37,14 @@ import { useTokens } from './hooks/useTokens';
 import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
 import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 import { ServiceType } from '../../views/error/serviceTypes';
+import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { getRemoteImage } from '../../lib/utils';
 import { isValidAddress } from '../../lib/validations/widgetValidators';
 import { amountInputValidation } from '../../lib/validations/amountInputValidations';
 import { useError } from './hooks/useError';
 import { AddFundsErrorTypes } from './types';
 
-export type AddFundsWidgetInputs = AddFundsWidgetParams & {
+export type AddFundsWidgetInputs = Omit<AddFundsWidgetParams, 'toProvider'> & {
   config: StrongCheckoutWidgetsConfig;
 };
 
@@ -57,7 +58,7 @@ export default function AddFundsWidget({
   config,
 }: AddFundsWidgetInputs) {
   const fetchingBalances = useRef(false);
-
+  const { base: { colorMode } } = useTheme();
   const [viewState, viewDispatch] = useReducer(viewReducer, {
     ...initialViewState,
     view: { type: AddFundsWidgetViews.ADD_FUNDS },
@@ -98,6 +99,12 @@ export default function AddFundsWidget({
   const { showErrorHandover } = useError(
     checkout.config.environment ?? Environment.SANDBOX,
   );
+
+  useEffect(() => {
+    if (config.environment !== Environment.PRODUCTION) {
+      showErrorHandover(AddFundsErrorTypes.ENVIRONMENT_ERROR);
+    }
+  }, [config]);
 
   useEffect(() => {
     const isInvalidToTokenAddress = toTokenAddress && !isValidAddress(toTokenAddress);
@@ -186,7 +193,7 @@ export default function AddFundsWidget({
               <img
                 src={getRemoteImage(
                   config.environment,
-                  '/add-funds-bg-texture.webp',
+                  `/add-funds-bg-texture-${colorMode}.webp`,
                 )}
                 alt="blurry bg texture"
               />
@@ -210,6 +217,13 @@ export default function AddFundsWidget({
               showSwapOption={showSwapOption}
               showBridgeOption={showBridgeOption}
               onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
+              onBackButtonClick={() => {
+                orchestrationEvents.sendRequestGoBackEvent(
+                  eventTarget,
+                  IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+                  {},
+                );
+              }}
             />
           )}
           {viewState.view.type === AddFundsWidgetViews.REVIEW && (

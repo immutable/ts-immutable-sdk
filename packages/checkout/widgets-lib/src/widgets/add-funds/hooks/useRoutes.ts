@@ -272,13 +272,14 @@ export const useRoutes = () => {
         }),
     );
 
+    const sortedRoutes = sortRoutesByFastestTime(allRoutes);
+
     // Only update routes if the request is the latest one
     if (currentRequestId === latestRequestIdRef.current) {
-      const sortedRoutes = sortRoutesByFastestTime(allRoutes);
       setRoutes(sortedRoutes);
     }
 
-    return allRoutes;
+    return sortedRoutes;
   };
 
   return {

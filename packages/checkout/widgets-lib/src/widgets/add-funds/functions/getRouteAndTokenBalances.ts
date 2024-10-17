@@ -20,8 +20,6 @@ export function getRouteAndTokenBalances(routeData?: RouteData): RouteBalance {
     return emptyRouteBalance;
   }
 
-  const { fromToken } = routeData.amountData;
-
   const usdPrice = routeData?.route.route.estimate.fromToken.usdPrice;
   if (!usdPrice) {
     return emptyRouteBalance;
@@ -31,8 +29,8 @@ export function getRouteAndTokenBalances(routeData?: RouteData): RouteBalance {
 
   const routeBalance = getFormattedNumber(
     balance.balance,
-    fromToken?.decimals,
-    fromToken?.decimals, // preserve precision for usd conversion down below
+    balance?.decimals,
+    balance?.decimals, // preserve precision for usd conversion down below
   );
   const routeBalanceUsd = (parseFloat(routeBalance) * usdPrice).toString();
 
