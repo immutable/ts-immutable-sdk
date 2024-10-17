@@ -1,7 +1,7 @@
 "use client";
 import { Box } from '@biom3/react';
 import { checkout } from '@imtbl/sdk';
-import { CheckoutFlowType, Widget, WidgetType } from '@imtbl/sdk/checkout';
+import { CheckoutFlowType, ConnectionSuccess, Widget, WidgetType } from '@imtbl/sdk/checkout';
 import { useEffect, useState } from 'react';
 
 const checkoutSDK = new checkout.Checkout();
@@ -26,7 +26,7 @@ function Widgets() {
   useEffect(() => {
     if (!widget) return;
     widget.mount("widget-root", {
-      flow: CheckoutFlowType.CONNECT,
+      flow: CheckoutFlowType.WALLET,
     });
 
     widget.addListener(
@@ -36,7 +36,8 @@ function Widgets() {
 
         // capture provider after user connects their wallet
         if (type === checkout.CheckoutSuccessEventType.CONNECT_SUCCESS) {
-          console.log('connected to ', data.walletProviderName);
+          const { walletProviderName } = data as ConnectionSuccess;
+          console.log('connected to ', walletProviderName);
           // setProvider(data.provider);
 
           // optional, immediately close the widget
