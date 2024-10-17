@@ -18,6 +18,7 @@ export const Connect = (
   const onConnect = async () => {
 		try {
       setErrorMessage("");
+      // #doc passport-telegram-mini-app-login
 			const deviceFlowParams = await passportInstance.loginWithDeviceFlow();
 			WebApp.openLink(deviceFlowParams.url);
 			await passportInstance.loginWithDeviceFlowCallback(
@@ -29,6 +30,7 @@ export const Connect = (
 				method: "eth_requestAccounts",
 			});
 			setWalletAddress(userAddress);
+      // #enddoc passport-telegram-mini-app-login
 			setZkEvmProvider(new providers.Web3Provider(provider));
 		} catch (error: any) {
 			setErrorMessage(error.message);

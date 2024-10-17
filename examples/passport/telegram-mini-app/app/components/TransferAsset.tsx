@@ -39,6 +39,7 @@ export const TransferAsset = (
       setToAddressError("To Address is required");
     }
 
+    // #doc passport-telegram-mini-app-transaction
     const abi = [
       'function safeTransferFrom(address from, address to, uint256 token_id)',
     ];
@@ -55,6 +56,7 @@ export const TransferAsset = (
 		} catch (error: any) {
 			setErrorMessage(error.message);
 		}
+    // #enddoc passport-telegram-mini-app-transaction
   }
 
   const onCollectionAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {

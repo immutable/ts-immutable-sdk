@@ -5,6 +5,7 @@ import Home from './Home';
 import { passport } from '@imtbl/sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/sdk/config';
 
+// #doc passport-telegram-mini-app-configuration
 export const passportInstance = new passport.Passport({
   baseConfig: new ImmutableConfiguration({ environment: Environment.SANDBOX }),
 	clientId: process.env.NEXT_PUBLIC_CLIENT_ID || '',
@@ -14,6 +15,7 @@ export const passportInstance = new passport.Passport({
 	scope: "openid offline_access email transact",
 	crossSdkBridgeEnabled: true,
 });
+// #enddoc passport-telegram-mini-app-configuration
 
 export default function App() {
   return (<Home />)
