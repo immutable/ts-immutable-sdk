@@ -113,7 +113,7 @@
     "test": "jest test --passWithNoTests",
     "test:watch": "jest test --passWithNoTests --watch",
     "typecheck": "tsc --customConditions \"default\" --noEmit",
-    "updateHashes": "node ./updateHashes.js"
+    "updateHashes": "yarn run --top-level nx run @imtbl/checkout-widgets:build && node ./updateHashes.js"
   },
   "type": "module",
   "types": "./dist/index.d.ts"
