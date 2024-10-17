@@ -481,7 +481,7 @@ export function AddFunds({
     [allowedTokens, handleTokenChange, isSelected, defaultTokenImage],
   );
 
-  const shouldShowBackButton = showBackButton ?? !!onBackButtonClick;
+  const shouldShowBackButton = showBackButton && onBackButtonClick;
   const routeInputsReady = !!selectedToken
     && !!fromAddress
     && validateToAmount(selectedAmount).isValid
