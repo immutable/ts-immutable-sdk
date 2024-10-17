@@ -118,6 +118,12 @@ export const useError = (environment: Environment) => {
       secondaryButtonText: 'Close',
       onSecondaryButtonClick: goBackToAddFundsView,
     },
+    [AddFundsErrorTypes.ENVIRONMENT_ERROR]: {
+      headingText: 'Unsupported environment',
+      subHeadingText: 'This is only supported in production environment.',
+      secondaryButtonText: 'Close',
+      onSecondaryButtonClick: closeWidget,
+    },
   };
 
   const getErrorConfig = (errorType: AddFundsErrorTypes) => errorConfig[errorType];
