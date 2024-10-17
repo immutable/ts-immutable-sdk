@@ -4,7 +4,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { AddFundsWidgetParams, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 
-import { Stack, CloudImage } from '@biom3/react';
+import { Stack, CloudImage, useTheme } from '@biom3/react';
 import { Environment } from '@imtbl/config';
 import { sendAddFundsCloseEvent } from './AddFundsWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
@@ -58,7 +58,7 @@ export default function AddFundsWidget({
   config,
 }: AddFundsWidgetInputs) {
   const fetchingBalances = useRef(false);
-
+  const { base: { colorMode } } = useTheme();
   const [viewState, viewDispatch] = useReducer(viewReducer, {
     ...initialViewState,
     view: { type: AddFundsWidgetViews.ADD_FUNDS },
@@ -187,7 +187,7 @@ export default function AddFundsWidget({
               <img
                 src={getRemoteImage(
                   config.environment,
-                  '/add-funds-bg-texture.webp',
+                  `/add-funds-bg-texture-${colorMode}.webp`,
                 )}
                 alt="blurry bg texture"
               />
