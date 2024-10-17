@@ -24,6 +24,7 @@ import * as sell from './smartCheckout/sell';
 import * as swap from './swap';
 import * as tokens from './tokens';
 import * as transaction from './transaction';
+import * as wrap from './wrap';
 import { handleProviderError } from './transaction';
 import {
   AddNetworkParams,
@@ -80,6 +81,7 @@ import { getWidgetsEsmUrl, loadUnresolvedBundle } from './widgets/load';
 import { determineWidgetsVersion, validateAndBuildVersion } from './widgets/version';
 import { globalPackageVersion } from './env';
 import { isAddressSanctioned } from './sanctions';
+import { WrapParams, WrapResult } from './types/wrap';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -800,6 +802,25 @@ export class Checkout {
       params.slippagePercent,
       params.maxHops,
       params.deadline,
+    );
+  }
+
+  /**
+   * Wraps or unwraps IMX tokens.
+   * @param {WrapParams} params - The parameters for the wrap transaction.
+   * @returns {Promise<WrapResult>} - A promise that resolves to the wrap result.
+   */
+  public async wrapIMX(params: WrapParams): Promise<WrapResult> {
+    const web3Provider = await provider.validateProvider(
+      this.config,
+      params.provider,
+    );
+
+    return wrap.wrap(
+      this.config,
+      web3Provider,
+      params.amount,
+      params.direction,
     );
   }
 }
