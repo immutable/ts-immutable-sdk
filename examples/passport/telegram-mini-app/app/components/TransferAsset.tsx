@@ -4,7 +4,6 @@ import {
 	Button,
 	FormControl,
 	Heading,
-	TextInput,
 } from "@biom3/react";
 import { ethers } from "ethers";
 import { useState } from "react";
