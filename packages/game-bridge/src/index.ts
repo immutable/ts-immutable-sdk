@@ -818,8 +818,19 @@ window.callFunction = async (jsonData: string) => {
         });
         break;
       }
-      default:
+      default: {
+        const request = JSON.parse(data);
+        const properties = request.properties ? JSON.parse(request.properties) : {};
+        properties.fxName = fxName;
+        track(moduleName, 'callFunctionDefaultCaseCalled', properties);
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: false,
+          error: `Invalid game bridge function: ${fxName}`,
+        });
         break;
+      }
     }
   } catch (error: any) {
     console.log(`Error in callFunction: ${error}`);
