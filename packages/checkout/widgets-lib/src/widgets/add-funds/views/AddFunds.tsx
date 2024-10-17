@@ -214,6 +214,7 @@ export function AddFunds({
       toProviderInfo,
       fromAddress,
       toAddress,
+      lockedToProvider,
     },
   } = useProvidersContext();
 
@@ -685,6 +686,7 @@ export function AddFunds({
                 address: toAddress,
               }}
               onClick={() => setShowDeliverToDrawer(true)}
+              disabled={lockedToProvider}
             />
           </Stack>
 

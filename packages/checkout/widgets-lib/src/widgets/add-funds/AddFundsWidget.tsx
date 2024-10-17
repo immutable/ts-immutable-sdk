@@ -44,7 +44,7 @@ import { amountInputValidation } from '../../lib/validations/amountInputValidati
 import { useError } from './hooks/useError';
 import { AddFundsErrorTypes } from './types';
 
-export type AddFundsWidgetInputs = AddFundsWidgetParams & {
+export type AddFundsWidgetInputs = Omit<AddFundsWidgetParams, 'toProvider'> & {
   config: StrongCheckoutWidgetsConfig;
 };
 
