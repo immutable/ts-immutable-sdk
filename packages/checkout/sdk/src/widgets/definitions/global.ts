@@ -10,6 +10,15 @@ import {
   WidgetEventData,
 } from './types';
 
+interface WidgetsFactoryCreate {
+  (type: WidgetType.CHECKOUT, props?: WidgetProperties<WidgetType.CHECKOUT>): Widget<WidgetType.CHECKOUT>;
+
+  /** @deprecated
+   * Use WidgetType.CHECKOUT instead, see https://docs.immutable.com/products/zkEVM/checkout/widget/setup
+   * */
+  <T extends Exclude<WidgetType, WidgetType.CHECKOUT>>(type: T, props?: WidgetProperties<T>): Widget<T>;
+}
+
 /**
  * Declares global interfaces and namespaces for the application.
  * @global
@@ -19,7 +28,7 @@ declare global {
   namespace ImmutableCheckoutWidgets {
     class WidgetsFactory implements IWidgetsFactory {
       constructor(sdk: Checkout, config: CheckoutWidgetsConfig);
-      create<T extends WidgetType>(type: T, props?: WidgetProperties<T>): Widget<T>;
+      create: WidgetsFactoryCreate;
       updateProvider(provider: Web3Provider): void;
     }
 
