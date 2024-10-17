@@ -55,6 +55,12 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
       console.warn('[IMTBL]: invalid "toTokenAddress" widget input');
     }
 
+    if (!params.toProvider?.provider) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "toProvider" widget input');
+      validatedParams.toProvider = undefined;
+    }
+
     return validatedParams;
   }
 
@@ -69,7 +75,10 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
           <ThemeProvider id="add-funds-container" config={this.strongConfig()}>
             <HandoverProvider>
               <ProvidersContextProvider
-                initialState={{ checkout: this.checkout }}
+                initialState={{
+                  checkout: this.checkout,
+                  toProvider: this.parameters.toProvider,
+                }}
               >
                 <Suspense
                   fallback={

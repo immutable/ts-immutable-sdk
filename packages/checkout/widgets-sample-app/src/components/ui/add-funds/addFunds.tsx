@@ -6,12 +6,14 @@ import {
   AddFundsEventType,
   OnRampEventType,
   OrchestrationEventType,
+  WalletProviderName,
 } from "@imtbl/checkout-sdk";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import { Environment } from "@imtbl/config";
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useState } from "react";
 
 import { passport } from "./passport";
+import { Web3Provider } from "@ethersproject/providers";
 
 const ADD_FUNDS_TARGET_ID = "add-funds-widget-target";
 
@@ -42,6 +44,12 @@ function AddFundsUI() {
     [checkout]
   );
 
+  const [presetToProvider, setPresetToProvider] = useState<boolean>(false);
+  const [toProvider, setToProvider] = useState<Web3Provider | undefined>(undefined);
+
+  const [toTokenAddress, setToTokenAddress] = useState<string | undefined>(undefined);
+  const [toAmount, setToAmount] = useState<string | undefined>(undefined);
+
   const addFunds = useMemo(
     () =>
       factory.create(WidgetType.ADD_FUNDS, {
@@ -55,49 +63,54 @@ function AddFundsUI() {
   const swap = useMemo(() => factory.create(WidgetType.SWAP), [factory]);
   const bridge = useMemo(() => factory.create(WidgetType.BRIDGE), [factory]);
 
-  useEffect(() => {
-    passport.connectEvm();
-  }, []);
 
-  // useEffect(() => {
-  //   if (!checkout || !factory) return;
-
-  //   (async () => {
-  //     const { provider } = await checkout.createProvider({
-  //       walletProviderName: WalletProviderName.METAMASK,
-  //     });
-
-  //     await checkout.connect({ provider, requestWalletPermissions: false });
-
-  //     const { isConnected } = await checkout.checkIsWalletConnected({
-  //       provider,
-  //     });
-
-  //     if (isConnected) {
-  //       factory.updateProvider(provider);
-  //     }
-  //   })();
-  // }, [checkout, factory]);
-
-  const goBack = () => {
-    addFunds.unmount();
+  const mount = () => {
     addFunds.mount(ADD_FUNDS_TARGET_ID, {
       showOnrampOption: true,
       showSwapOption: false,
       showBridgeOption: false,
-      // toAmount: "1",
-      // toTokenAddress: "native",
+      toProvider,
+      toTokenAddress,
+      toAmount,
     });
   };
 
   useEffect(() => {
-    addFunds.mount(ADD_FUNDS_TARGET_ID, {
-      showOnrampOption: true,
-      showSwapOption: false,
-      showBridgeOption: false,
-      // toAmount: "1",
-      // toTokenAddress: "native",
-    });
+    passport.connectEvm();
+  }, []);
+
+  useEffect(() => {
+    if (!checkout || !factory) return;
+    if (!presetToProvider) {
+      toProvider && addFunds.unmount();
+      setToProvider(undefined);
+      return;
+    }
+
+    (async () => {
+      const { provider } = await checkout.createProvider({
+        walletProviderName: WalletProviderName.METAMASK,
+      });
+
+      await checkout.connect({ provider, requestWalletPermissions: false });
+
+      const { isConnected } = await checkout.checkIsWalletConnected({
+        provider,
+      });
+
+      if (isConnected) {
+        setToProvider(provider);
+      }
+    })();
+  }, [checkout, factory, presetToProvider]);
+
+  const goBack = () => {
+    mount();
+  };
+
+
+  useEffect(() => {
+    mount();
     addFunds.addListener(AddFundsEventType.CLOSE_WIDGET, (data: any) => {
       console.log("CLOSE_WIDGET", data);
       addFunds.unmount();
@@ -120,13 +133,21 @@ function AddFundsUI() {
     onRamp.addListener(OrchestrationEventType.REQUEST_GO_BACK, () => {
       goBack();
     });
-  }, [addFunds]);
+
+    return () => {
+      addFunds.removeListener(AddFundsEventType.CLOSE_WIDGET);
+      addFunds.removeListener(OrchestrationEventType.REQUEST_ONRAMP);
+      addFunds.removeListener(AddFundsEventType.CONNECT_SUCCESS);
+      onRamp.removeListener(OnRampEventType.CLOSE_WIDGET);
+      onRamp.removeListener(OrchestrationEventType.REQUEST_GO_BACK);
+    }
+  }, [addFunds, toProvider, toTokenAddress, toAmount]);
 
   return (
     <div>
       <h1 className="sample-heading">Checkout Add Funds</h1>
       <div id={ADD_FUNDS_TARGET_ID}></div>
-      <button onClick={() => addFunds.mount(ADD_FUNDS_TARGET_ID)}>Mount</button>
+      <button onClick={() => mount()}>Mount</button>
       <button onClick={() => addFunds.unmount()}>Unmount</button>
       <button
         onClick={() =>
@@ -152,6 +173,21 @@ function AddFundsUI() {
         <option value="ko">KO</option>
         <option value="zh">ZH</option>
       </select>
+      <br />
+      <br />
+      <h2>Params</h2>
+      <div>
+        <b>address</b>
+        <input type="text" value={toTokenAddress} onChange={(e) => setToTokenAddress(e.target.value)} placeholder="native | 0x1234" />
+        <b>amount</b>
+        <input type="text" value={toAmount} onChange={(e) => setToAmount(e.target.value)} placeholder="0" />
+      </div>
+      <br />
+      <b>Deliver to wallet</b><br />
+      <button onClick={() => setPresetToProvider(prev => !prev)}>
+        {presetToProvider ? 'Disconnect destination wallet' : 'Connect destination wallet'}
+      </button>
+      
     </div>
   );
 }
