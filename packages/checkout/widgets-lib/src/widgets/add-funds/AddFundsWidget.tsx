@@ -101,6 +101,12 @@ export default function AddFundsWidget({
   );
 
   useEffect(() => {
+    if (config.environment !== Environment.PRODUCTION) {
+      showErrorHandover(AddFundsErrorTypes.ENVIRONMENT_ERROR);
+    }
+  }, [config]);
+
+  useEffect(() => {
     const isInvalidToTokenAddress = toTokenAddress && !isValidAddress(toTokenAddress);
     const isInvalidToAmount = toAmount && !amountInputValidation(toAmount);
 
