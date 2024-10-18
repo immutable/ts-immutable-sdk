@@ -28,13 +28,12 @@ export default function Home() {
 					}}
 				>
 					<Heading>Passport & Telegram</Heading>
-					{!walletAddress && (
+					{!walletAddress ? (
 						<Connect
 							setWalletAddress={setWalletAddress}
 							setZkEvmProvider={setZkEvmProvider}
 						/>
-					)}
-					{walletAddress && (
+					) : (
 						<Box
 							sx={{
 								paddingY: "base.spacing.x4",

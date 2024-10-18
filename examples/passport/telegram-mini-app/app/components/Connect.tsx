@@ -17,16 +17,16 @@ export const Connect = ({
 		try {
 			setErrorMessage("");
 			// #doc passport-telegram-mini-app-login
-      // Use loginWithDeviceFlow as the login method for Telegram Mini App to ensure support for all devices
+			// Use loginWithDeviceFlow as the login method for Telegram Mini App to ensure support for all devices
 			const deviceFlowParams = await passportInstance.loginWithDeviceFlow();
-      // Open the device flow url using the openLink function on the telegram sdk
+			// Open the device flow url using the openLink function on the telegram sdk
 			WebApp.openLink(deviceFlowParams.url);
-      // Wait for the user to complete the login before calling eth_requestAccounts
+			// Wait for the user to complete the login before calling eth_requestAccounts
 			await passportInstance.loginWithDeviceFlowCallback(
 				deviceFlowParams.deviceCode,
 				deviceFlowParams.interval,
 			);
-      // Get the provider and call eth_requestAccounts to get the user's wallet address
+			// Get the provider and call eth_requestAccounts to get the user's wallet address
 			const provider = passportInstance.connectEvm();
 			const [userAddress] = await provider.request({
 				method: "eth_requestAccounts",
@@ -46,7 +46,7 @@ export const Connect = ({
 			}}
 		>
 			<Button onClick={onConnect}>Sign in with Passport</Button>
-			{errorMessage && (
+			{errorMessage ? (
 				<Box
 					sx={{
 						width: "base.spacing.x50",
@@ -61,7 +61,7 @@ export const Connect = ({
 						{`Error: ${errorMessage}`}
 					</Body>
 				</Box>
-			)}
+			) : null}
 		</Box>
 	);
 };

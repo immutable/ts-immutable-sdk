@@ -1,10 +1,4 @@
-import {
-	Body,
-	Box,
-	Button,
-	FormControl,
-	Heading,
-} from "@biom3/react";
+import { Body, Box, Button, FormControl, Heading } from "@biom3/react";
 import { ethers } from "ethers";
 import { useState } from "react";
 
@@ -45,16 +39,16 @@ export const TransferAsset = ({
 		}
 
 		// #doc passport-telegram-mini-app-transaction
-    // Setup the contract ABI with the safeTransferFrom function for transferring assets
+		// Setup the contract ABI with the safeTransferFrom function for transferring assets
 		const abi = [
 			"function safeTransferFrom(address from, address to, uint256 token_id)",
 		];
 
-    // Get the signer from the provider that was initialised in the Connect flow and create a contract instance
+		// Get the signer from the provider that was initialised in the Connect flow and create a contract instance
 		const signer = zkEvmProvider.getSigner();
 		const contract = new ethers.Contract(collectionAddress, abi, signer);
 		try {
-      // Call the transfer function on the contract
+			// Call the transfer function on the contract
 			await contract.safeTransferFrom(walletAddress, toAddress, tokenId);
 			setTransferSuccess(true);
 		} catch (error: any) {
@@ -95,11 +89,11 @@ export const TransferAsset = ({
 					onInput={onCollectionAddressChange}
 					hideClearValueButton
 				/>
-				{collectionAddressError && (
+				{collectionAddressError ? (
 					<FormControl.Validation validationStatus="error">
 						{collectionAddressError}
 					</FormControl.Validation>
-				)}
+				) : null}
 			</FormControl>
 			<FormControl
 				sx={{
@@ -112,11 +106,11 @@ export const TransferAsset = ({
 					onInput={onTokenIdChange}
 					hideClearValueButton
 				/>
-				{tokenIdError && (
+				{tokenIdError ? (
 					<FormControl.Validation validationStatus="error">
 						{tokenIdError}
 					</FormControl.Validation>
-				)}
+				) : null}
 			</FormControl>
 			<FormControl
 				sx={{
@@ -129,11 +123,11 @@ export const TransferAsset = ({
 					onInput={onToAddressChange}
 					hideClearValueButton
 				/>
-				{toAddressError && (
+				{toAddressError ? (
 					<FormControl.Validation validationStatus="error">
 						{toAddressError}
 					</FormControl.Validation>
-				)}
+				) : null}
 			</FormControl>
 			<Box
 				sx={{
@@ -142,8 +136,8 @@ export const TransferAsset = ({
 			>
 				<Button onClick={transferAsset}>Transfer</Button>
 			</Box>
-			{transferSuccess && <Box>Transfer Completed</Box>}
-			{errorMessage && (
+			{transferSuccess ? <Box>Transfer Completed</Box> : null}
+			{errorMessage ? (
 				<Box
 					sx={{
 						width: "base.spacing.x50",
@@ -158,7 +152,7 @@ export const TransferAsset = ({
 						{`Error: ${errorMessage}`}
 					</Body>
 				</Box>
-			)}
+			) : null}
 		</Box>
 	);
 };
