@@ -1,8 +1,7 @@
 import { useLocalBundle } from '../env';
-import { generateSHA512Hash, validatedHashesUrl } from './hashUtils';
 
 // Loads the checkout widgets bundle from the CDN and appends the script to the document head
-export async function loadUnresolvedBundle(
+export function loadUnresolvedBundle(
   tag: HTMLScriptElement,
   scriptId: string,
   validVersion: string,
@@ -18,12 +17,6 @@ export async function loadUnresolvedBundle(
   let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout/widgets.js`;
   if (useLocalBundle()) cdnUrl = `http://${window.location.host}/lib/js/widgets.js`;
 
-  if (!useLocalBundle()) {
-    const integrityHash = await generateSHA512Hash(cdnUrl);
-    tag.setAttribute('integrity', integrityHash);
-    tag.setAttribute('crossorigin', 'anonymous');
-  }
-
   tag.setAttribute('id', scriptId);
   tag.setAttribute('data-version', validVersion);
   tag.setAttribute('src', cdnUrl);
@@ -32,27 +25,10 @@ export async function loadUnresolvedBundle(
 }
 
 // Gets the CDN url for the split checkout widgets bundle
-export async function getWidgetsEsmUrl(
+export function getWidgetsEsmUrl(
   validVersion: string,
-): Promise<Promise<string>> {
-  if (useLocalBundle()) return `http://${window.location.host}/lib/js/index.js`;
-
-  const cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout/widgets-esm.js`;
-
-  const validHashesUrl = await validatedHashesUrl(validVersion);
-
-  const hash = await generateSHA512Hash(cdnUrl);
-
-  const widgetsEsmHash: string = await fetch(validHashesUrl)
-    .then((response) => response.json())
-    .then((hashes) => hashes['dist/index.js'])
-    .catch(() => {
-      throw new Error('Security Error: could not fetch widgets-esm.js hash');
-    });
-
-  if (hash !== widgetsEsmHash) {
-    throw new Error('Security Error: widgets-esm.js hash mismatch');
-  }
-
+): string {
+  let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout/widgets-esm.js`;
+  if (useLocalBundle()) cdnUrl = `http://${window.location.host}/lib/js/index.js`;
   return cdnUrl;
 }
