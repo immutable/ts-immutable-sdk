@@ -1,6 +1,6 @@
 module.exports = {
   "extends": ["../../../.eslintrc"],
-  "ignorePatterns": ["jest.config.*", "rollup.config.*", "*.js"],
+  "ignorePatterns": ["jest.config.*", "rollup.config.*"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": "./tsconfig.json",

@@ -247,7 +247,7 @@ export class Checkout {
   ) {
     const checkout = this;
     try {
-      const cdnUrl = await getWidgetsEsmUrl(validVersion);
+      const cdnUrl = getWidgetsEsmUrl(validVersion);
 
       // WebpackIgnore comment required to prevent webpack modifying the import statement and
       // breaking the dynamic import in certain applications integrating checkout
