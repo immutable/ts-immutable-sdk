@@ -93,6 +93,12 @@ export interface PassportModuleConfiguration
   crossSdkBridgeEnabled?: boolean;
 
   /**
+   * Optional referrer URL to be sent with JSON-RPC requests.
+   * If specified, this value will be passed as the referrer in fetch options.
+   */
+  jsonRpcReferrer?: string;
+
+  /**
    * Options for disabling the Passport popup overlays.
    */
   popupOverlayOptions?: PopupOverlayOptions;
