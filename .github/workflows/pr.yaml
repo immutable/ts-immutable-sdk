@@ -1,12 +1,21 @@
 name: PR
 
 on:
+  push:
+    paths:
+       - 'packages/checkout/widgets-lib/hashes.json'
   pull_request:
     branches:
       - main
   merge_group:
     branches:
       - main
+  workflow_dispatch:
+  
+permissions:
+  contents: write
+  pull-requests: write
+  repository-projects: write
 
 env:
   NX_CLOUD_ACCESS_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NX_TOKEN }}
@@ -43,6 +52,35 @@ jobs:
 
       - name: Build, Lint, Test & Typecheck
         run: yarn nx affected -t build,lint,test,typecheck 
+
+      # Temporary disabled until we can automate this
+      - name: Validate Checkout Widgets Hashes
+        id: validate_checkout_widgets_hashes
+        env:
+          GITHUB_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
+        run: |
+          cd packages/checkout/widgets-lib
+          yarn updateHashes
+          if [ -n "$(git diff --exit-code hashes.json)" ]; then
+            git add hashes.json
+            git commit -m "Update hashes.json"
+            git push
+            echo "HASH_UPDATED=true" >> $GITHUB_OUTPUT
+          fi
+
+      # - name: Retrigger workflow
+      #   if: steps.validate_checkout_widgets_hashes.outputs.HASH_UPDATED == 'true'
+      #   uses: actions/github-script@v6
+      #   with:
+      #     script: |
+      #       const workflow = `${{ github.workflow }}`;  
+      #       const ref = `${{ github.event.pull_request.head.ref }}`;
+      #       await github.rest.actions.createWorkflowDispatch({
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         workflow_id: workflow,
+      #         ref: ref
+      #       });
 
   build-lint-test-examples:
     name: Build, Lint & Test Examples
