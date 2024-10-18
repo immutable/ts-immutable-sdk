@@ -54,7 +54,7 @@ jobs:
       - name: Validate Checkout Widgets Hashes
         id: validate_checkout_widgets_hashes
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
         run: |
           cd packages/checkout/widgets-lib
           yarn updateHashes
@@ -67,19 +67,19 @@ jobs:
             echo "HASH_UPDATED=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Retrigger workflow
-        if: steps.validate_checkout_widgets_hashes.outputs.HASH_UPDATED == 'true'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const workflow = `${{ github.workflow }}`;  
-            const ref = `${{ github.event.pull_request.head.ref }}`;
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: workflow,
-              ref: ref
-            });
+      # - name: Retrigger workflow
+      #   if: steps.validate_checkout_widgets_hashes.outputs.HASH_UPDATED == 'true'
+      #   uses: actions/github-script@v6
+      #   with:
+      #     script: |
+      #       const workflow = `${{ github.workflow }}`;  
+      #       const ref = `${{ github.event.pull_request.head.ref }}`;
+      #       await github.rest.actions.createWorkflowDispatch({
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         workflow_id: workflow,
+      #         ref: ref
+      #       });
 
   build-lint-test-examples:
     name: Build, Lint & Test Examples
