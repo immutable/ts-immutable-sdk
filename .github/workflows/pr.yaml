@@ -53,6 +53,8 @@ jobs:
       # Temporary disabled until we can automate this
       - name: Validate Checkout Widgets Hashes
         id: validate_checkout_widgets_hashes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd packages/checkout/widgets-lib
           yarn updateHashes
