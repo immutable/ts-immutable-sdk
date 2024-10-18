@@ -12184,6 +12184,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@twa-dev/sdk@npm:^7.8.0":
+  version: 7.10.1
+  resolution: "@twa-dev/sdk@npm:7.10.1"
+  dependencies:
+    "@twa-dev/types": ^7.10.0
+  peerDependencies:
+    react: ^18.3.1
+  checksum: 1317ebf5a7006a90b11e577ba2f1e734af5c3c5e7e03b8b8f266c849c66c49c63aa1e1bf575f683ad400a2267106a24f4c1fb317a99c731d63db57511fa161c7
+  languageName: node
+  linkType: hard
+
+"@twa-dev/types@npm:^7.10.0":
+  version: 7.10.0
+  resolution: "@twa-dev/types@npm:7.10.0"
+  checksum: dbd0867f091d2dd5aa267b85e3ba38b61ba0816b06f6ed6428c6421d26737d5884a14b224db791188040cec5778ae93e1551f808b0d6fa9fac13b25ebcc1efe1
+  languageName: node
+  linkType: hard
+
 "@typechain/ethers-v5@npm:^10.2.0":
   version: 10.2.1
   resolution: "@typechain/ethers-v5@npm:10.2.1"
@@ -31055,6 +31073,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"passport-telegram-mini-app@workspace:examples/passport/telegram-mini-app":
+  version: 0.0.0-use.local
+  resolution: "passport-telegram-mini-app@workspace:examples/passport/telegram-mini-app"
+  dependencies:
+    "@biom3/design-tokens": ^0.4.4
+    "@biom3/react": ^0.27.12
+    "@emotion/react": ^11.11.3
+    "@imtbl/sdk": latest
+    "@twa-dev/sdk": ^7.8.0
+    "@types/node": ^20
+    "@types/react": ^18
+    "@types/react-dom": ^18
+    ethers: ^5.7.2
+    next: 14.2.5
+    react: ^18.2.0
+    react-dom: ^18.2.0
+    react-router-dom: ^6.11.0
+    typescript: ^5.6.2
+  languageName: unknown
+  linkType: soft
+
 "path-browserify@npm:^1.0.1":
   version: 1.0.1
   resolution: "path-browserify@npm:1.0.1"
@@ -34895,7 +34934,7 @@ __metadata:
   resolution: "seaport-core@https://github.com/immutable/seaport-core.git#commit=0633350ec34f21fcede657ff812f11cf7d19144e"
   dependencies:
     seaport-types: ^0.0.1
-  checksum: 392bce86bbfc4f7c00b65575b238825f4c696bddf5af08be7aa496862e63879375387fd4400f6e900ffee08d65c1f75cf3adad9c6c41ddcf7a3b0389cd73c3c7
+  checksum: d8adba0d54106c6fe9370f0775fadef2198e5eab440b36919d1f917705ce2f0a7028e4da021b6df049aa3ca35d7e673a28b78a731130f0ff9fdf7a8bd32e3b94
   languageName: node
   linkType: hard
 
@@ -34939,7 +34978,7 @@ __metadata:
     seaport-sol: ^1.5.0
     seaport-types: ^0.0.1
     solady: ^0.0.84
-  checksum: f31a7443a50fa1c35ec03ea031743d1d10896653ae443fa15ab8e6f5b4a2ca43f6743d523ae4e1f14df867451e5b2b2130b0bfa58a1085b0bcae3fceb8dfdc9b
+  checksum: a77e141e4ab5d2c4bb190a38fbb6cda3011fdf5f350b250fbeb4d82ae81cf917a966a2dcb8d9e4fd1bed29e5510ede9b15941b0ac77aeb4272dab94c9f51e7ff
   languageName: node
   linkType: hard
 
