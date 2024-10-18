@@ -49,15 +49,32 @@ jobs:
 
       # Temporary disabled until we can automate this
       - name: Validate Checkout Widgets Hashes
+        id: validate_checkout_widgets_hashes
         run: |
           cd packages/checkout/widgets-lib
           yarn updateHashes
           if [ -n "$(git diff --exit-code hashes.json)" ]; then
-            echo "Hashes.json has changed. Please update the hashes.json file and commit the changes."
-            echo "You can use the following command in the root of the repo to update the hashes.json file:"
-            echo "yarn workspace @imtbl/checkout-widgets updateHashes"
-            exit 1
+            git config user.name "${{ github.actor }}"
+            git config user.email "${{ github.actor }}@users.noreply.github.com"
+            git add hashes.json
+            git commit -m "Update hashes.json"
+            git push
+            echo "HASH_UPDATED=true" >> $GITHUB_OUTPUT
           fi
+
+      - name: Retrigger workflow
+        if: steps.validate_checkout_widgets_hashes.outputs.HASH_UPDATED == 'true'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const workflow = `${{ github.workflow }}`;  
+            const ref = `${{ github.event.pull_request.head.ref }}`;
+            await github.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: workflow,
+              ref: ref
+            });
 
   build-lint-test-examples:
     name: Build, Lint & Test Examples
