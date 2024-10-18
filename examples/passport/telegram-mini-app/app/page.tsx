@@ -16,7 +16,7 @@ export const passportInstance = new passport.Passport({
 	logoutRedirectUri: process.env.NEXT_PUBLIC_LOGOUT_REDIRECT_URI || "",
 	audience: "platform_api",
 	scope: "openid offline_access email transact",
-	// Enable crossSdkBridge to enable pre-approved transactions
+	// Set crossSdkBridgeEnabled to enable pre-approved transactions
 	crossSdkBridgeEnabled: true,
 });
 // #enddoc passport-telegram-mini-app-configuration
