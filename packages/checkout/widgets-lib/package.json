@@ -104,15 +104,16 @@
     "build": "yarn clean && NODE_ENV=production rollup --config rollup.config.js",
     "build:analyse": "yarn build --plugin visualizer",
     "build:local": "yarn clean && yarn build && mkdir -p ../widgets-sample-app/public/lib/js && cp dist/*.js ../widgets-sample-app/public/lib/js/",
-    "prepare:examplewidgets": "yarn workspace @examples/sdk-load-widgets-with-nextjs exec mkdir -p tests/utils/local-widgets-js/ && cp $(yarn workspace @imtbl/sdk exec pwd)/dist/browser/checkout/*.js $(yarn workspace @examples/sdk-load-widgets-with-nextjs exec pwd)/tests/utils/local-widgets-js/",
     "clean": "rimraf ./dist",
     "d": "rollup --config rollup.config.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
+    "prepare:examplewidgets": "yarn workspace @examples/sdk-load-widgets-with-nextjs exec mkdir -p tests/utils/local-widgets-js/ && cp $(yarn workspace @imtbl/sdk exec pwd)/dist/browser/checkout/*.js $(yarn workspace @examples/sdk-load-widgets-with-nextjs exec pwd)/tests/utils/local-widgets-js/",
     "start": "yarn clean && NODE_ENV=development rollup --config rollup.config.js --watch",
     "test": "jest test --passWithNoTests",
     "test:watch": "jest test --passWithNoTests --watch",
-    "typecheck": "tsc --customConditions \"default\" --noEmit"
+    "typecheck": "tsc --customConditions \"default\" --noEmit",
+    "updateHashes": "yarn run --top-level nx run @imtbl/checkout-widgets:build && node ./updateHashes.js"
   },
   "type": "module",
   "types": "./dist/index.d.ts"
