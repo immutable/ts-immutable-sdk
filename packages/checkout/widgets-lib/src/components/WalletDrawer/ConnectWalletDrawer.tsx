@@ -68,7 +68,6 @@ export function ConnectWalletDrawer({
   const { identify, track } = useAnalytics();
 
   const prevWalletChangeEvent = useRef<WalletChangeEvent | undefined>();
-  const hasAcknowledgedEOAWarning = useRef(false);
 
   const [showUnableToConnectDrawer, setShowUnableToConnectDrawer] = useState(false);
   const [showChangedMindDrawer, setShowChangedMindDrawer] = useState(false);
@@ -105,7 +104,8 @@ export function ConnectWalletDrawer({
     return address;
   };
 
-  const handleWalletConnection = async (providerDetail: EIP6963ProviderDetail) => {
+  const handleWalletConnection = async (event: WalletChangeEvent) => {
+    const { providerDetail } = event;
     const { info } = providerDetail;
 
     // Trigger analytics connect wallet, menu item, with wallet details
@@ -185,12 +185,12 @@ export function ConnectWalletDrawer({
     const { providerDetail } = event;
     const { info } = providerDetail;
 
-    if (providerType === 'to' && info.rdns !== WalletProviderRdns.PASSPORT && !hasAcknowledgedEOAWarning.current) {
+    if (providerType === 'to' && info.rdns !== WalletProviderRdns.PASSPORT) {
       setShowEOAWarningDrawer(true);
       return;
     }
 
-    handleWalletConnection(providerDetail);
+    handleWalletConnection(event);
   };
 
   const retrySelectedWallet = () => {
@@ -205,8 +205,9 @@ export function ConnectWalletDrawer({
   };
 
   const handleProceedEOA = () => {
-    hasAcknowledgedEOAWarning.current = true;
-    retrySelectedWallet();
+    if (prevWalletChangeEvent.current) {
+      handleWalletConnection(prevWalletChangeEvent.current);
+    }
     setShowEOAWarningDrawer(false);
   };
 
