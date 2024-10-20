@@ -94,12 +94,12 @@ export class ZkEvmProvider implements Provider {
     this.#guardianClient = guardianClient;
     this.#passportEventEmitter = passportEventEmitter;
 
-    if (config.crossSdkBridgeEnabled) {
+    if (config.jsonRpcReferrer) {
       // StaticJsonRpcProvider by default sets the referrer as "client".
       // On Unreal 4 this errors as the browser used is expecting a valid URL.
       this.#rpcProvider = new StaticJsonRpcProvider({
         url: this.#config.zkEvmRpcUrl,
-        fetchOptions: { referrer: 'http://imtblgamesdk.local' },
+        fetchOptions: { referrer: config.jsonRpcReferrer },
       });
     } else {
       this.#rpcProvider = new StaticJsonRpcProvider(this.#config.zkEvmRpcUrl);
