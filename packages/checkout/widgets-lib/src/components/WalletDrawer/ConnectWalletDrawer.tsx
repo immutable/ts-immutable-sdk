@@ -173,12 +173,6 @@ export function ConnectWalletDrawer({
   };
 
   const handleOnWalletChangeEvent = async (event: WalletChangeEvent) => {
-    if (!checkout) {
-      setShowUnableToConnectDrawer(true);
-      onError?.(ConnectEIP6963ProviderError.CONNECT_ERROR);
-      throw new Error('Checkout is not initialized');
-    }
-
     // Keep prev wallet change event
     prevWalletChangeEvent.current = event;
 
