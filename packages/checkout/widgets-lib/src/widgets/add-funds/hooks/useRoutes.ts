@@ -52,6 +52,15 @@ export const useRoutes = () => {
     return fromAmountWithBuffer.toString();
   };
 
+  const calculateFromAmountFromRoute = (
+    exchangeRate: string,
+    toAmount: string,
+  ) => {
+    const fromAmount = Number(toAmount) / Number(exchangeRate);
+    const fromAmountWithBuffer = fromAmount * 1.02;
+    return fromAmountWithBuffer.toString();
+  };
+
   const getAmountData = (
     tokens: Token[],
     balance: TokenBalance,
@@ -183,18 +192,11 @@ export const useRoutes = () => {
       if (isRouteToAmountGreaterThanToAmount(routeResponse, toAmount)) {
         return { route: routeResponse };
       }
-
-      const additionalBuffer = Math.abs(
-        Number(routeResponse?.route.estimate.aggregatePriceImpact),
-      );
-      const newFromAmount = calculateFromAmount(
-        fromToken,
-        toToken,
+      const newFromAmount = calculateFromAmountFromRoute(
+        routeResponse.route.estimate.exchangeRate,
         toAmount,
-        additionalBuffer,
       );
-
-      const routeWithBufferResponse = await getRouteWithRetry(
+      const newRoute = await getRouteWithRetry(
         squid,
         fromToken,
         toToken,
@@ -203,8 +205,11 @@ export const useRoutes = () => {
         fromAddress,
         quoteOnly,
       );
-      if (isRouteToAmountGreaterThanToAmount(routeResponse, toAmount)) {
-        return { route: routeWithBufferResponse, additionalBuffer };
+      if (!newRoute?.route) {
+        return {};
+      }
+      if (isRouteToAmountGreaterThanToAmount(newRoute, toAmount)) {
+        return { route: newRoute };
       }
       return {};
     } catch (error) {
