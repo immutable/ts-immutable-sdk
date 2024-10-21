@@ -1,6 +1,6 @@
 import { Body, Box, Heading } from '@biom3/react';
 import {
-  ReactNode, useContext, useEffect, useState,
+  ReactNode, useContext, useEffect, useMemo, useState,
 } from 'react';
 import { StandardAnalyticsControlTypes } from '@imtbl/react-analytics';
 import {
@@ -38,6 +38,7 @@ import {
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { TopUpMenuItem, TopUpMenuItemProps } from './TopUpMenuItem';
+import { useAsyncMemo } from '../../lib/hooks/useAsyncMemo';
 
 type $Dictionary<T = unknown> = { [key: string]: T };
 
@@ -48,6 +49,7 @@ interface TopUpViewProps {
   showOnrampOption: boolean;
   showSwapOption: boolean;
   showBridgeOption: boolean;
+  showAddFundsOption?: boolean;
   tokenAddress?: string;
   amount?: string;
   analytics: {
@@ -81,6 +83,7 @@ export function TopUpView({
   showOnrampOption,
   showSwapOption,
   showBridgeOption,
+  showAddFundsOption,
   tokenAddress,
   amount,
   analytics,
@@ -106,19 +109,38 @@ export function TopUpView({
   const [onRampFeesPercentage, setOnRampFeesPercentage] = useState('-.--');
   const swapFeesInFiat = '0.05';
   const [, setBridgeFeesInFiat] = useState('-.--');
-  const [isSwapAvailable, setIsSwapAvailable] = useState(true);
 
   const title = heading ? t(...heading) : t('views.TOP_UP_VIEW.header.title');
   const description = subheading ? t(...subheading) : null;
 
   const { page, track } = useAnalytics();
 
+  const isSwapAvailable = useAsyncMemo<boolean | undefined>(async () => {
+    if (!checkout) return undefined;
+    try {
+      return checkout.isSwapAvailable();
+    } catch (error) {
+      return false;
+    }
+  }, [checkout]);
+
   useMount(() => {
-    page({
-      userJourney,
-      screen: 'TopUp',
-    });
+    page({ userJourney, screen: 'TopUp' });
   });
+
+  // Go to add funds widget if available
+  useMount(
+    () => {
+      if (showAddFundsOption) {
+        orchestrationEvents.sendRequestAddFundsEvent(eventTarget, widgetEvent, {
+          toTokenAddress: tokenAddress ?? '',
+          toAmount: amount ?? '',
+        });
+      }
+    },
+    () => showAddFundsOption !== undefined,
+    [showAddFundsOption],
+  );
 
   useEffect(() => {
     if (!cryptoFiatDispatch) return;
@@ -153,14 +175,6 @@ export function TopUpView({
       const onRampFeesEstimate = await checkout.getExchangeFeeEstimate();
       const onRampFees = getOnRampFeeEstimation(onRampFeesEstimate);
       setOnRampFeesPercentage(onRampFees);
-    })();
-  }, [checkout !== undefined]);
-
-  // Check if swap is available
-  useEffect(() => {
-    if (!checkout) return;
-    (async () => {
-      setIsSwapAvailable(await checkout.isSwapAvailable());
     })();
   }, [checkout !== undefined]);
 
@@ -287,68 +301,75 @@ export function TopUpView({
     </Box>
   );
 
-  const topUpFeatures: TopUpFeatures[] = [
-    {
-      testId: 'onramp',
-      icon: 'BankCard',
-      iconVariant: 'bold',
-      textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.debit',
-      onClickEvent: onClickOnRamp,
-      fee: () => renderFees(
-        `${t(
-          'views.TOP_UP_VIEW.topUpOptions.debit.subcaption',
-        )} ≈ ${onRampFeesPercentage}%`,
-      ),
-      isAvailable: true,
-      isEnabled: showOnrampOption,
-    },
-    {
-      testId: 'onramp',
-      icon: 'BankCard',
-      textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.credit',
-      onClickEvent: onClickOnRamp,
-      fee: () => renderFees(
-        `${t(
-          'views.TOP_UP_VIEW.topUpOptions.credit.subcaption',
-        )} ≈ ${onRampFeesPercentage}%`,
-      ),
-      isAvailable: true,
-      isEnabled: showOnrampOption,
-    },
-    {
-      testId: 'advanced',
-      icon: 'Minting',
-      iconVariant: 'bold',
-      intentIcon: 'JumpTo',
-      textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.advanced',
-      onClickEvent: onClickAdvancedOptions,
-      fee: () => renderFees(''),
-      isAvailable: true,
-      isEnabled: true,
-    },
-    {
-      testId: 'swap',
-      icon: 'Swap',
-      textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.swap',
-      onClickEvent: onClickSwap,
-      fee: () => renderFees(
-        `${t(
-          'views.TOP_UP_VIEW.topUpOptions.swap.subcaption',
-        )} ≈ $${swapFeesInFiat} ${fiatSymbol.toUpperCase()}`,
-      ),
-      isAvailable: isSwapAvailable,
-      isEnabled: showSwapOption,
-    },
-    {
-      testId: 'bridge',
-      icon: 'ArrowForward',
-      textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.bridge',
-      onClickEvent: onClickBridge,
-      fee: () => renderFees(''),
-      isAvailable: true,
-      isEnabled: showBridgeOption,
-    },
-  ];
+  const topUpFeatures: TopUpFeatures[] = useMemo(
+    () => [
+      {
+        testId: 'onramp',
+        icon: 'BankCard',
+        iconVariant: 'bold',
+        textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.debit',
+        onClickEvent: onClickOnRamp,
+        fee: () => renderFees(
+          `${t(
+            'views.TOP_UP_VIEW.topUpOptions.debit.subcaption',
+          )} ≈ ${onRampFeesPercentage}%`,
+        ),
+        isAvailable: true,
+        isEnabled: showOnrampOption,
+      },
+      {
+        testId: 'onramp',
+        icon: 'BankCard',
+        textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.credit',
+        onClickEvent: onClickOnRamp,
+        fee: () => renderFees(
+          `${t(
+            'views.TOP_UP_VIEW.topUpOptions.credit.subcaption',
+          )} ≈ ${onRampFeesPercentage}%`,
+        ),
+        isAvailable: true,
+        isEnabled: showOnrampOption,
+      },
+      {
+        testId: 'advanced',
+        icon: 'Minting',
+        iconVariant: 'bold',
+        intentIcon: 'JumpTo',
+        textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.advanced',
+        onClickEvent: onClickAdvancedOptions,
+        fee: () => renderFees(''),
+        isAvailable: true,
+        isEnabled: true,
+      },
+      {
+        testId: 'swap',
+        icon: 'Swap',
+        textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.swap',
+        onClickEvent: onClickSwap,
+        fee: () => renderFees(
+          `${t(
+            'views.TOP_UP_VIEW.topUpOptions.swap.subcaption',
+          )} ≈ $${swapFeesInFiat} ${fiatSymbol.toUpperCase()}`,
+        ),
+        isAvailable: !!isSwapAvailable,
+        isEnabled: showSwapOption,
+      },
+      {
+        testId: 'bridge',
+        icon: 'ArrowForward',
+        textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.bridge',
+        onClickEvent: onClickBridge,
+        fee: () => renderFees(''),
+        isAvailable: true,
+        isEnabled: showBridgeOption,
+      },
+    ],
+    [showAddFundsOption, showBridgeOption, showOnrampOption, showSwapOption],
+  );
+
+  // if swap is available, don't show top up view
+  // await for redirect to add funds widget
+  if (showAddFundsOption) return null;
 
   return (
     <SimpleLayout

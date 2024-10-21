@@ -40,6 +40,7 @@ export type {
   EIP1193Provider,
   EIP6963ProviderInfo,
   EIP6963ProviderDetail,
+  AddFundsConfig,
 } from './types';
 
 export type {

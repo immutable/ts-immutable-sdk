@@ -38,7 +38,6 @@ import { useAsyncMemo, usePrevState } from "../../../hooks";
 import { Message } from "./components/messages";
 import { Legend } from "./components/legend";
 import { itemsMock } from "./items.mock";
-import { ChainId } from "@imtbl/checkout-sdk";
 
 //
 const ENVIRONMENT_DEV = "development" as Environment;
@@ -155,18 +154,22 @@ function CheckoutUI() {
 
   const [checkoutAppURL, setCheckoutAppURL] = useState("");
 
+  const configEnvironment = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return (params.get("environment") as Environment) || Environment.SANDBOX;
+  }, []);
+
   // setup passport client
-  const passportClient = useMemo(
-    () => getPassportClient(environment),
-    [environment]
-  );
+  const passportClient = useMemo(() => {
+    return getPassportClient(configEnvironment);
+  }, []);
   // handle passport login
   usePassportLoginCallback(passportClient);
 
   // setup checkout sdk
   const checkoutSdk = useMemo(
-    () => getCheckoutSdk(passportClient, environment),
-    [passportClient, environment]
+    () => getCheckoutSdk(passportClient, configEnvironment),
+    [passportClient]
   );
 
   // set a state to keep widget params and configs
@@ -236,8 +239,6 @@ function CheckoutUI() {
   //   () => checkoutSdk?.widgets({ config: { theme, language } }),
   //   [checkoutSdk]
   // );
-
-
 
   // know connected wallet type
   const isMetamask = web3Provider?.provider?.isMetaMask;
@@ -396,9 +397,11 @@ function CheckoutUI() {
 
   // unmount when environment changes
   useEffect(() => {
-    if (environment !== prevEnvironment) {
-      console.log("ENV", environment, prevEnvironment);
-      unmount();
+    if (environment !== prevEnvironment && prevEnvironment !== undefined) {
+      const params = new URLSearchParams(window.location.search);
+      params.set("environment", environment);
+      window.location.href = `${window.location.href}?${params.toString()}`;
+
     }
   }, [environment, prevEnvironment]);
 
