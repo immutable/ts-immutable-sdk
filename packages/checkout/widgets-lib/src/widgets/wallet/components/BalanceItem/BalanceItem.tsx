@@ -3,7 +3,10 @@ import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
 import {
-  IMTBLWidgetEvents, TokenFilterTypes, TokenInfo, WidgetTheme,
+  IMTBLWidgetEvents,
+  TokenFilterTypes,
+  TokenInfo,
+  WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { TokenImage } from '../../../../components/TokenImage/TokenImage';
@@ -16,7 +19,10 @@ import { formatZeroAmount, tokenValueFormat } from '../../../../lib/utils';
 import { ConnectLoaderContext } from '../../../../context/connect-loader-context/ConnectLoaderContext';
 import { isPassportProvider } from '../../../../lib/provider';
 import { EventTargetContext } from '../../../../context/event-target-context/EventTargetContext';
-import { UserJourney, useAnalytics } from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
+import {
+  UserJourney,
+  useAnalytics,
+} from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export interface BalanceItemProps {
   balanceInfo: BalanceInfo;
@@ -38,55 +44,120 @@ export function BalanceItem({
   const [isOnRampEnabled, setIsOnRampEnabled] = useState<boolean>();
   const [isBridgeEnabled, setIsBridgeEnabled] = useState<boolean>();
   const [isSwapEnabled, setIsSwapEnabled] = useState<boolean>();
+  const [isAddFundsEnabled, setIsAddFundsEnabled] = useState<boolean>();
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
   const [onRampAllowedTokens, setOnRampAllowedTokens] = useState<TokenInfo[]>(
     [],
   );
+  const [swapAllowedTokens, setSwapAllowedTokens] = useState<TokenInfo[]>([]);
 
   const isPassport = isPassportProvider(provider);
 
   useEffect(() => {
-    const getOnRampAllowedTokens = async () => {
+    (async () => {
       if (!checkout) return;
-      const onRampAllowedTokensResult = await checkout.getTokenAllowList({
+      const onRampTokens = checkout.getTokenAllowList({
         type: TokenFilterTypes.ONRAMP,
         chainId: getL2ChainId(checkout.config),
       });
+      const swapTokens = checkout.getTokenAllowList({
+        type: TokenFilterTypes.SWAP,
+        chainId: getL2ChainId(checkout.config),
+      });
+
+      const [onRampAllowedTokensResult, swapAllowedTokensResult] = await Promise.all([onRampTokens, swapTokens]);
+
       setOnRampAllowedTokens(onRampAllowedTokensResult.tokens);
-    };
-    getOnRampAllowedTokens();
+      setSwapAllowedTokens(swapAllowedTokensResult.tokens);
+    })();
   }, [checkout]);
 
   useEffect(() => {
     if (!network || !supportedTopUps || !checkout) return;
 
-    const enableAddCoin = network.chainId === getL2ChainId(checkout.config)
-      && (supportedTopUps?.isOnRampEnabled ?? true);
-    setIsOnRampEnabled(enableAddCoin);
+    const enableAddCoin = (supportedTopUps?.isAddFundsEnabled ?? true)
+    && (supportedTopUps?.isSwapAvailable ?? true);
+    setIsAddFundsEnabled(enableAddCoin);
 
-    const enableMoveCoin = (network.chainId === getL1ChainId(checkout.config)
-    || network.chainId === getL2ChainId(checkout.config))
+    const enableBuyCoin = !enableAddCoin
+      && network.chainId === getL2ChainId(checkout.config)
+      && (supportedTopUps?.isOnRampEnabled ?? true);
+    setIsOnRampEnabled(enableBuyCoin);
+
+    const enableMoveCoin = !enableAddCoin
+      && (network.chainId === getL1ChainId(checkout.config)
+        || network.chainId === getL2ChainId(checkout.config))
       && (supportedTopUps?.isBridgeEnabled ?? true);
     setIsBridgeEnabled(enableMoveCoin);
 
-    const enableSwapCoin = network.chainId === getL2ChainId(checkout.config)
-        && (supportedTopUps?.isSwapEnabled ?? true)
-        && (supportedTopUps?.isSwapAvailable ?? true);
+    const enableSwapCoin = !enableAddCoin
+      && network.chainId === getL2ChainId(checkout.config)
+      && (supportedTopUps?.isSwapEnabled ?? true)
+      && (supportedTopUps?.isSwapAvailable ?? true);
     setIsSwapEnabled(enableSwapCoin);
   }, [network, supportedTopUps, checkout, isPassport]);
 
-  const showAddMenuItem = useMemo(
-    () => Boolean(
+  const showAddTokenMenuItem = useMemo(() => {
+    const canBuy = Boolean(
       isOnRampEnabled
-          && onRampAllowedTokens.length > 0
-          && onRampAllowedTokens.find(
-            (token) => token.address?.toLowerCase() === balanceInfo.address?.toLowerCase(),
-          ),
-    ),
-    [isOnRampEnabled, onRampAllowedTokens],
-  );
+        && onRampAllowedTokens.length > 0
+        && onRampAllowedTokens.find(
+          (token) => token.address?.toLowerCase() === balanceInfo.address?.toLowerCase(),
+        ),
+    );
+
+    const canAdd = Boolean(
+      isAddFundsEnabled
+        && swapAllowedTokens.length > 0
+        && swapAllowedTokens.find(
+          (token) => token.address?.toLowerCase() === balanceInfo.address?.toLowerCase(),
+        ),
+    );
+
+    return canBuy || canAdd;
+  }, [
+    isOnRampEnabled,
+    onRampAllowedTokens,
+    isAddFundsEnabled,
+    swapAllowedTokens,
+  ]);
+
+  const handleAddTokenClick = () => {
+    track({
+      userJourney: UserJourney.WALLET,
+      screen: 'WalletBalances',
+      control: 'AddTokens',
+      controlType: 'Button',
+      extras: {
+        tokenSymbol: balanceInfo.symbol,
+        tokenAddress: balanceInfo.address,
+      },
+    });
+
+    if (isAddFundsEnabled) {
+      orchestrationEvents.sendRequestAddFundsEvent(
+        eventTarget,
+        IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
+        {
+          toAmount: '',
+          toTokenAddress: balanceInfo.address ?? '',
+        },
+      );
+
+      return;
+    }
+
+    orchestrationEvents.sendRequestOnrampEvent(
+      eventTarget,
+      IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
+      {
+        tokenAddress: balanceInfo.address ?? '',
+        amount: '',
+      },
+    );
+  };
 
   return (
     <MenuItem testId={`balance-item-${balanceInfo.symbol}`} emphasized>
@@ -108,7 +179,7 @@ export function BalanceItem({
         price={tokenValueFormat(balanceInfo.balance)}
         fiatAmount={fiatAmount}
       />
-      {(isOnRampEnabled || isSwapEnabled || isBridgeEnabled) && (
+      {(isOnRampEnabled || isSwapEnabled || isBridgeEnabled || isAddFundsEnabled) && (
         <MenuItem.OverflowPopoverMenu
           size="small"
           testId="token-menu"
@@ -127,27 +198,8 @@ export function BalanceItem({
         >
           <MenuItem
             testId="balance-item-add-option"
-            sx={ShowMenuItem(showAddMenuItem)}
-            onClick={() => {
-              track({
-                userJourney: UserJourney.WALLET,
-                screen: 'WalletBalances',
-                control: 'AddTokens',
-                controlType: 'Button',
-                extras: {
-                  tokenSymbol: balanceInfo.symbol,
-                  tokenAddress: balanceInfo.address,
-                },
-              });
-              orchestrationEvents.sendRequestOnrampEvent(
-                eventTarget,
-                IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
-                {
-                  tokenAddress: balanceInfo.address ?? '',
-                  amount: '',
-                },
-              );
-            }}
+            sx={ShowMenuItem(showAddTokenMenuItem)}
+            onClick={handleAddTokenClick}
           >
             <MenuItem.Icon icon="Add" />
             <MenuItem.Label>{`Add ${balanceInfo.symbol}`}</MenuItem.Label>
