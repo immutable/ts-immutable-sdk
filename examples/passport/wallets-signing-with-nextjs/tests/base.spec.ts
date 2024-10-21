@@ -22,7 +22,7 @@ test.describe("sign message with EIP-712", () => {
     await expect(page.getByRole("heading", { name: "Passport Sign EIP-712 Message" })).toBeVisible();
 
     await expect(page.getByRole("button", { name: "Passport Login" })).toBeVisible();
-    await expect(page.getByText("Connected Account:")).toBeVisible();
+    await expect(page.getByText("Connected Account")).toBeVisible();
     await expect(page.getByRole("link", { name: "Return to Examples" })).toBeVisible();
   });
 });
@@ -34,7 +34,7 @@ test.describe("sign message with ERC-191", () => {
     await expect(page.getByRole("heading", { name: "Passport Sign ERC-191 Message" })).toBeVisible();
 
     await expect(page.getByRole("button", { name: "Passport Login" })).toBeVisible();
-    await expect(page.getByText("Connected Account:")).toBeVisible();
+    await expect(page.getByText("Connected Account")).toBeVisible();
     await expect(page.getByRole("link", { name: "Return to Examples" })).toBeVisible();
   });
 });
