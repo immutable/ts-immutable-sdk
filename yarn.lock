@@ -12204,6 +12204,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@twa-dev/sdk@npm:^7.8.0":
+  version: 7.10.1
+  resolution: "@twa-dev/sdk@npm:7.10.1"
+  dependencies:
+    "@twa-dev/types": ^7.10.0
+  peerDependencies:
+    react: ^18.3.1
+  checksum: 1317ebf5a7006a90b11e577ba2f1e734af5c3c5e7e03b8b8f266c849c66c49c63aa1e1bf575f683ad400a2267106a24f4c1fb317a99c731d63db57511fa161c7
+  languageName: node
+  linkType: hard
+
+"@twa-dev/types@npm:^7.10.0":
+  version: 7.10.0
+  resolution: "@twa-dev/types@npm:7.10.0"
+  checksum: dbd0867f091d2dd5aa267b85e3ba38b61ba0816b06f6ed6428c6421d26737d5884a14b224db791188040cec5778ae93e1551f808b0d6fa9fac13b25ebcc1efe1
+  languageName: node
+  linkType: hard
+
 "@typechain/ethers-v5@npm:^10.2.0":
   version: 10.2.1
   resolution: "@typechain/ethers-v5@npm:10.2.1"
@@ -31074,6 +31092,27 @@ __metadata:
   checksum: f83681c3c8ff75fa473a2bb2b113289952f802ff895d435edd717e7cb898b0408cbdb247117a938edcbc5d141020909846cc2b92c47213d764e2a94d2ad2b925
   languageName: node
   linkType: hard
+
+"passport-telegram-mini-app@workspace:examples/passport/telegram-mini-app":
+  version: 0.0.0-use.local
+  resolution: "passport-telegram-mini-app@workspace:examples/passport/telegram-mini-app"
+  dependencies:
+    "@biom3/design-tokens": ^0.4.4
+    "@biom3/react": ^0.27.12
+    "@emotion/react": ^11.11.3
+    "@imtbl/sdk": latest
+    "@twa-dev/sdk": ^7.8.0
+    "@types/node": ^20
+    "@types/react": ^18
+    "@types/react-dom": ^18
+    ethers: ^5.7.2
+    next: 14.2.5
+    react: ^18.2.0
+    react-dom: ^18.2.0
+    react-router-dom: ^6.11.0
+    typescript: ^5.6.2
+  languageName: unknown
+  linkType: soft
 
 "path-browserify@npm:^1.0.1":
   version: 1.0.1

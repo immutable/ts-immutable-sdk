@@ -9,7 +9,6 @@ import { Web3Provider } from '@ethersproject/providers';
 import { MenuItemProps } from '@biom3/react';
 import { WalletDrawer } from './WalletDrawer';
 import { WalletChangeEvent } from './WalletDrawerEvents';
-import { NonPassportWarningDrawer } from './NonPassportWarningDrawer';
 import { identifyUser } from '../../lib/analytics/identifyUser';
 import { getProviderSlugFromRdns } from '../../lib/provider';
 import {
@@ -22,11 +21,11 @@ import {
 } from '../../context/providers-context/ProvidersContext';
 import { UnableToConnectDrawer } from '../UnableToConnectDrawer/UnableToConnectDrawer';
 import { ChangedYourMindDrawer } from '../ChangedYourMindDrawer/ChangedYourMindDrawer';
-import { HAS_SEEN_NON_PASSPORT_WARNING_KEY } from '../../lib/constants';
 import {
   connectEIP6963Provider,
   ConnectEIP6963ProviderError,
 } from '../../lib/connectEIP6963Provider';
+import { EOAWarningDrawer } from '../EOAWarningDrawer/EOAWarningDrawer';
 
 type ConnectWalletDrawerProps = {
   heading: string;
@@ -69,21 +68,10 @@ export function ConnectWalletDrawer({
   const { identify, track } = useAnalytics();
 
   const prevWalletChangeEvent = useRef<WalletChangeEvent | undefined>();
-  const [showNonPassportWarning, setShowNonPassportWarning] = useState(false);
+
   const [showUnableToConnectDrawer, setShowUnableToConnectDrawer] = useState(false);
   const [showChangedMindDrawer, setShowChangedMindDrawer] = useState(false);
-
-  const shouldShowNonPassportWarning = (rdns: string): boolean => {
-    const hasSeenWarning = localStorage.getItem(
-      HAS_SEEN_NON_PASSPORT_WARNING_KEY,
-    );
-
-    if (rdns !== WalletProviderRdns.PASSPORT && !hasSeenWarning) {
-      return true;
-    }
-
-    return false;
-  };
+  const [showEOAWarningDrawer, setShowEOAWarningDrawer] = useState(false);
 
   const setProviderInContext = async (
     provider: Web3Provider,
@@ -116,24 +104,9 @@ export function ConnectWalletDrawer({
     return address;
   };
 
-  const handleOnWalletChangeEvent = async (event: WalletChangeEvent) => {
-    if (!checkout) {
-      setShowUnableToConnectDrawer(true);
-      onError?.(ConnectEIP6963ProviderError.CONNECT_ERROR);
-      throw new Error('Checkout is not initialized');
-    }
-
-    // Keep prev wallet change event
-    prevWalletChangeEvent.current = event;
-
+  const handleWalletConnection = async (event: WalletChangeEvent) => {
     const { providerDetail } = event;
     const { info } = providerDetail;
-
-    // check if selected a non passport wallet
-    if (shouldShowNonPassportWarning(info.rdns)) {
-      setShowNonPassportWarning(true);
-      return;
-    }
 
     // Trigger analytics connect wallet, menu item, with wallet details
     track({
@@ -199,21 +172,40 @@ export function ConnectWalletDrawer({
     onClose(address);
   };
 
+  const handleOnWalletChangeEvent = async (event: WalletChangeEvent) => {
+    // Keep prev wallet change event
+    prevWalletChangeEvent.current = event;
+
+    const { info } = event.providerDetail;
+
+    if (providerType === 'to' && info.rdns !== WalletProviderRdns.PASSPORT) {
+      setShowEOAWarningDrawer(true);
+      return;
+    }
+
+    handleWalletConnection(event);
+  };
+
   const retrySelectedWallet = () => {
     if (prevWalletChangeEvent.current) {
       handleOnWalletChangeEvent(prevWalletChangeEvent.current);
     }
   };
 
-  const handleCloseNonPassportWarningDrawer = () => {
-    localStorage.setItem(HAS_SEEN_NON_PASSPORT_WARNING_KEY, 'true');
-    setShowNonPassportWarning(false);
-    retrySelectedWallet();
-  };
-
   const handleCloseChangedMindDrawer = () => {
     setShowChangedMindDrawer(false);
     retrySelectedWallet();
+  };
+
+  const handleProceedEOA = () => {
+    if (prevWalletChangeEvent.current) {
+      handleWalletConnection(prevWalletChangeEvent.current);
+    }
+    setShowEOAWarningDrawer(false);
+  };
+
+  const handleCloseEOAWarningDrawer = () => {
+    setShowEOAWarningDrawer(false);
   };
 
   return (
@@ -232,11 +224,6 @@ export function ConnectWalletDrawer({
         onWalletChange={handleOnWalletChangeEvent}
         bottomSlot={bottomSlot}
       />
-      <NonPassportWarningDrawer
-        visible={showNonPassportWarning}
-        onCloseDrawer={handleCloseNonPassportWarningDrawer}
-        handleCtaButtonClick={handleCloseNonPassportWarningDrawer}
-      />
       <UnableToConnectDrawer
         visible={showUnableToConnectDrawer}
         checkout={checkout!}
@@ -248,6 +235,11 @@ export function ConnectWalletDrawer({
         checkout={checkout!}
         onCloseDrawer={() => setShowChangedMindDrawer(false)}
         onTryAgain={handleCloseChangedMindDrawer}
+      />
+      <EOAWarningDrawer
+        visible={showEOAWarningDrawer}
+        onProceedClick={handleProceedEOA}
+        onCloseDrawer={handleCloseEOAWarningDrawer}
       />
     </>
   );
