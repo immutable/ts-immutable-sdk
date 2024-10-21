@@ -84,6 +84,12 @@ export const useError = (environment: Environment) => {
       secondaryButtonText: 'Close',
       onSecondaryButtonClick: closeWidget,
     },
+    [AddFundsErrorTypes.UNRECOGNISED_CHAIN]: {
+      headingText: 'Unrecognised chain',
+      subHeadingText: 'Please add the chain to your account and try again.',
+      secondaryButtonText: 'Close',
+      onSecondaryButtonClick: closeWidget,
+    },
     [AddFundsErrorTypes.WALLET_FAILED]: {
       headingText: 'Transaction failed',
       subHeadingText: 'The transaction failed. Please try again.',
