@@ -13,6 +13,8 @@ import { retry } from '../../../lib/retry';
 import { getFormattedNumber } from '../functions/getFormattedNumber';
 import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
+const BASE_SLIPPAGE = 0.02;
+
 export const useRoutes = () => {
   const latestRequestIdRef = useRef<number>(0);
 
@@ -51,7 +53,7 @@ export const useRoutes = () => {
     const toAmountNumber = Number(toAmount);
     const toAmountInUsd = toAmountNumber * toToken.usdPrice;
     const baseFromAmount = toAmountInUsd / fromToken.usdPrice;
-    const fromAmountWithBuffer = baseFromAmount * (1.02 + additionalBuffer);
+    const fromAmountWithBuffer = baseFromAmount * (1 + BASE_SLIPPAGE + additionalBuffer);
     return fromAmountWithBuffer.toString();
   };
 
@@ -60,7 +62,7 @@ export const useRoutes = () => {
     toAmount: string,
   ) => {
     const fromAmount = Number(toAmount) / Number(exchangeRate);
-    const fromAmountWithBuffer = fromAmount * 1.02;
+    const fromAmountWithBuffer = fromAmount * (1 + BASE_SLIPPAGE);
     return fromAmountWithBuffer.toString();
   };
 
