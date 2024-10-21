@@ -176,8 +176,7 @@ export function ConnectWalletDrawer({
     // Keep prev wallet change event
     prevWalletChangeEvent.current = event;
 
-    const { providerDetail } = event;
-    const { info } = providerDetail;
+    const { info } = event.providerDetail;
 
     if (providerType === 'to' && info.rdns !== WalletProviderRdns.PASSPORT) {
       setShowEOAWarningDrawer(true);
