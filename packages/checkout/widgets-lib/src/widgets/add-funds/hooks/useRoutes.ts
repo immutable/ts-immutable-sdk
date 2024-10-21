@@ -11,11 +11,14 @@ import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
 import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
 import { retry } from '../../../lib/retry';
 import { getFormattedNumber } from '../functions/getFormattedNumber';
+import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export const useRoutes = () => {
   const latestRequestIdRef = useRef<number>(0);
 
   const { addFundsDispatch } = useContext(AddFundsContext);
+
+  const { track } = useAnalytics();
 
   const setRoutes = (routes: RouteData[]) => {
     addFundsDispatch({
@@ -211,6 +214,31 @@ export const useRoutes = () => {
       if (isRouteToAmountGreaterThanToAmount(newRoute, toAmount)) {
         return { route: newRoute };
       }
+      track({
+        userJourney: UserJourney.ADD_FUNDS,
+        screen: 'Routes',
+        action: 'Failed',
+        extras: {
+          fromToken: fromToken.symbol,
+          toToken: toToken.symbol,
+          fromChain: fromToken.chainId,
+          toChain: toToken.chainId,
+          initialRoute: {
+            fromAmount,
+            toAmount,
+            exchangeRate: routeResponse.route.estimate.exchangeRate,
+            routeFromAmount: routeResponse.route.estimate.fromAmount,
+            routeToAmount: routeResponse.route.estimate.toAmount,
+          },
+          newRoute: {
+            fromAmount: newFromAmount,
+            toAmount,
+            exchangeRate: newRoute.route.estimate.exchangeRate,
+            routeFromAmount: newRoute.route.estimate.fromAmount,
+            routeToAmount: newRoute.route.estimate.toAmount,
+          },
+        },
+      });
       return {};
     } catch (error) {
       return {};
