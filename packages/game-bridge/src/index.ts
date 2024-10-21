@@ -272,6 +272,7 @@ window.callFunction = async (jsonData: string) => {
               redirectUri: redirect ?? redirectUri,
               logoutRedirectUri: request?.logoutRedirectUri,
               crossSdkBridgeEnabled: true,
+              jsonRpcReferrer: 'http://imtblgamesdk.local',
               logoutMode,
             };
           }

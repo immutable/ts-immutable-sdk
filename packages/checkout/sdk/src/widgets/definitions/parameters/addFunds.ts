@@ -1,3 +1,4 @@
+import { Web3Provider } from '@ethersproject/providers';
 import { WidgetLanguage } from '../configurations';
 
 export type AddFundsWidgetParams = {
@@ -21,4 +22,7 @@ export type AddFundsWidgetParams = {
 
   /** Whether to show a back button on the first screen, on click triggers REQUEST_GO_BACK event */
   showBackButton?: boolean;
+
+  /** The destination wallet provider, when requiring to lock destination of funds */
+  toProvider?: Web3Provider;
 };

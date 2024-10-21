@@ -214,6 +214,7 @@ export function AddFunds({
       toProviderInfo,
       fromAddress,
       toAddress,
+      lockedToProvider,
     },
   } = useProvidersContext();
 
@@ -631,6 +632,8 @@ export function AddFunds({
             p: 'base.spacing.x3',
             pb: 'base.spacing.x10',
             bg: 'base.color.neutral.800',
+            bradtl: 'base.borderRadius.x8',
+            bradtr: 'base.borderRadius.x8',
           }}
           gap="base.spacing.x6"
         >
@@ -683,6 +686,7 @@ export function AddFunds({
                 address: toAddress,
               }}
               onClick={() => setShowDeliverToDrawer(true)}
+              disabled={lockedToProvider}
             />
           </Stack>
 

@@ -13,6 +13,13 @@ export function isWalletConnectProvider(provider?: Web3Provider | null) {
   return (provider?.provider as any)?.isWalletConnect === true;
 }
 
+export const getProviderDetailByProvider = (
+  web3Provider: Web3Provider,
+  providers?: EIP6963ProviderDetail[],
+) => providers?.find(
+  (providerDetail) => providerDetail.provider === web3Provider.provider,
+);
+
 export function getWalletProviderNameByProvider(
   web3Provider: Web3Provider | undefined,
   providers?: EIP6963ProviderDetail[],
@@ -23,7 +30,10 @@ export function getWalletProviderNameByProvider(
 
   if (providers && web3Provider) {
     // Find the matching provider in the providerDetail
-    const matchedProviderDetail = providers.find((providerDetail) => providerDetail.provider === web3Provider.provider);
+    const matchedProviderDetail = getProviderDetailByProvider(
+      web3Provider,
+      providers,
+    );
     if (matchedProviderDetail) {
       return matchedProviderDetail.info.name;
     }
