@@ -525,6 +525,7 @@ export function Review({
                     Powered by Squid
                     <br />
                     1
+                    {' '}
                     {route.route.estimate.fromToken.name}
                     {' '}
                     =
