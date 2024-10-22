@@ -25,6 +25,7 @@ import {
   connectEIP6963Provider,
   ConnectEIP6963ProviderError,
 } from '../../lib/connectEIP6963Provider';
+import { EOAWarningDrawer } from '../EOAWarningDrawer/EOAWarningDrawer';
 
 type ConnectWalletDrawerProps = {
   heading: string;
@@ -67,8 +68,10 @@ export function ConnectWalletDrawer({
   const { identify, track } = useAnalytics();
 
   const prevWalletChangeEvent = useRef<WalletChangeEvent | undefined>();
+
   const [showUnableToConnectDrawer, setShowUnableToConnectDrawer] = useState(false);
   const [showChangedMindDrawer, setShowChangedMindDrawer] = useState(false);
+  const [showEOAWarningDrawer, setShowEOAWarningDrawer] = useState(false);
 
   const setProviderInContext = async (
     provider: Web3Provider,
@@ -101,16 +104,7 @@ export function ConnectWalletDrawer({
     return address;
   };
 
-  const handleOnWalletChangeEvent = async (event: WalletChangeEvent) => {
-    if (!checkout) {
-      setShowUnableToConnectDrawer(true);
-      onError?.(ConnectEIP6963ProviderError.CONNECT_ERROR);
-      throw new Error('Checkout is not initialized');
-    }
-
-    // Keep prev wallet change event
-    prevWalletChangeEvent.current = event;
-
+  const handleWalletConnection = async (event: WalletChangeEvent) => {
     const { providerDetail } = event;
     const { info } = providerDetail;
 
@@ -178,6 +172,20 @@ export function ConnectWalletDrawer({
     onClose(address);
   };
 
+  const handleOnWalletChangeEvent = async (event: WalletChangeEvent) => {
+    // Keep prev wallet change event
+    prevWalletChangeEvent.current = event;
+
+    const { info } = event.providerDetail;
+
+    if (providerType === 'to' && info.rdns !== WalletProviderRdns.PASSPORT) {
+      setShowEOAWarningDrawer(true);
+      return;
+    }
+
+    handleWalletConnection(event);
+  };
+
   const retrySelectedWallet = () => {
     if (prevWalletChangeEvent.current) {
       handleOnWalletChangeEvent(prevWalletChangeEvent.current);
@@ -187,6 +195,17 @@ export function ConnectWalletDrawer({
   const handleCloseChangedMindDrawer = () => {
     setShowChangedMindDrawer(false);
     retrySelectedWallet();
+  };
+
+  const handleProceedEOA = () => {
+    if (prevWalletChangeEvent.current) {
+      handleWalletConnection(prevWalletChangeEvent.current);
+    }
+    setShowEOAWarningDrawer(false);
+  };
+
+  const handleCloseEOAWarningDrawer = () => {
+    setShowEOAWarningDrawer(false);
   };
 
   return (
@@ -216,6 +235,11 @@ export function ConnectWalletDrawer({
         checkout={checkout!}
         onCloseDrawer={() => setShowChangedMindDrawer(false)}
         onTryAgain={handleCloseChangedMindDrawer}
+      />
+      <EOAWarningDrawer
+        visible={showEOAWarningDrawer}
+        onProceedClick={handleProceedEOA}
+        onCloseDrawer={handleCloseEOAWarningDrawer}
       />
     </>
   );
