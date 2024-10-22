@@ -62,6 +62,10 @@ import {
 import { validateToAmount } from '../functions/amountValidation';
 import { OnboardingDrawer } from '../components/OnboardingDrawer';
 import { useError } from '../hooks/useError';
+import { SquidFooter } from '../components/SquidFooter';
+import {
+  getFormattedNumberWithDecimalPlaces,
+} from '../functions/getFormattedNumber';
 
 interface AddFundsProps {
   checkout: Checkout;
@@ -620,7 +624,7 @@ export function AddFunds({
 
               <HeroFormControl.Caption>
                 USD $
-                {selectedAmountUsd.toFixed(2)}
+                {getFormattedNumberWithDecimalPlaces(selectedAmountUsd)}
               </HeroFormControl.Caption>
             </HeroFormControl>
           )}
@@ -630,12 +634,12 @@ export function AddFunds({
           sx={{
             alignSelf: 'stretch',
             p: 'base.spacing.x3',
-            pb: 'base.spacing.x10',
+            pb: 'base.spacing.x5',
             bg: 'base.color.neutral.800',
             bradtl: 'base.borderRadius.x8',
             bradtr: 'base.borderRadius.x8',
           }}
-          gap="base.spacing.x6"
+          gap="base.spacing.x4"
         >
           <Stack gap="0px">
             <SelectedWallet
@@ -700,6 +704,9 @@ export function AddFunds({
           >
             Review
           </Button>
+
+          <SquidFooter />
+
           <PayWithWalletDrawer
             visible={showPayWithDrawer}
             walletOptions={walletOptions}

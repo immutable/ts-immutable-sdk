@@ -676,6 +676,9 @@
           "caption": "evolution",
           "buttonText": "Choose the Wallet to Pay with"
         }
+      },
+      "footer": {
+        "body":  "Swap functionality is powered by a third party, Squid. Immutable neither builds, owns, operates or deploys <squidLink>Squid</squidLink>."
       }
     }
   },

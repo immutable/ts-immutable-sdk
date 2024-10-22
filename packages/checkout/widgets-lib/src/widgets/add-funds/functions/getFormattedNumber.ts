@@ -45,3 +45,12 @@ export function getFormattedNumber(
 
   return getFormattedAmounts(formattedValue, maxDecimals);
 }
+
+export function getFormattedNumberWithDecimalPlaces(value: string | number, decimals = 2) : string {
+  const amount = typeof value === 'number' ? value : parseFloat(value);
+
+  return amount.toLocaleString('en-US', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: decimals,
+  });
+}

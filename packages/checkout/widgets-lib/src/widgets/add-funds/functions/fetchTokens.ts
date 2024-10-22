@@ -30,6 +30,10 @@ export const fetchTokens = async (integratorId: string): Promise<Token[]> => {
 
   const data: SquidTokensResponse = await response.json();
 
+  if (!data.tokens) {
+    return [];
+  }
+
   return data.tokens.map((tokenResponse: SquidTokenResponse) => ({
     chainId: tokenResponse.chainId.toString(),
     address: tokenResponse.address,

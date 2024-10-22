@@ -63,8 +63,10 @@ import { getRouteChains } from '../functions/getRouteChains';
 import {
   getFormattedAmounts,
   getFormattedNumber,
+  getFormattedNumberWithDecimalPlaces,
 } from '../functions/getFormattedNumber';
 import { convertToNetworkChangeableProvider } from '../functions/convertToNetworkChangeableProvider';
+import { SquidFooter } from '../components/SquidFooter';
 
 interface ReviewProps {
   data: AddFundsReviewData;
@@ -524,11 +526,12 @@ export function Review({
                     Powered by Squid
                     <br />
                     1
-                    {route.route.estimate.fromToken.name}
+                    {' '}
+                    {route.route.estimate.fromToken.symbol}
                     {' '}
                     =
                     {' '}
-                    {route.route.estimate.exchangeRate}
+                    {getFormattedNumberWithDecimalPlaces(route.route.estimate.exchangeRate)}
                     {' '}
                     {route.route.estimate.toToken.name}
                   </Body>
@@ -666,10 +669,12 @@ export function Review({
               size="large"
               onClick={handleTransaction}
               disabled={proceedDisabled}
-              sx={{ mt: 'auto', mb: 'base.spacing.x4', mx: 'base.spacing.x3' }}
+              sx={{ mx: 'base.spacing.x3' }}
             >
               {proceedDisabled ? 'Processing' : 'Proceed'}
             </Button>
+
+            <SquidFooter />
           </>
         )}
 
