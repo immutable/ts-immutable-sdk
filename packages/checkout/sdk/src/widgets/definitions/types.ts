@@ -78,7 +78,7 @@ export enum WidgetType {
   BRIDGE = 'bridge',
   ONRAMP = 'onramp',
   SALE = 'sale',
-  CHECKOUT = 'checkout',
+  UNIFIED_COMMERCE = 'checkout',
   ADD_FUNDS = 'addFunds',
 }
 
