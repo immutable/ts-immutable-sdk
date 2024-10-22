@@ -63,6 +63,9 @@ import { validateToAmount } from '../functions/amountValidation';
 import { OnboardingDrawer } from '../components/OnboardingDrawer';
 import { useError } from '../hooks/useError';
 import { SquidFooter } from '../components/SquidFooter';
+import {
+  getFormattedNumberWithDecimalPlaces,
+} from '../functions/getFormattedNumber';
 
 interface AddFundsProps {
   checkout: Checkout;
@@ -621,7 +624,7 @@ export function AddFunds({
 
               <HeroFormControl.Caption>
                 USD $
-                {selectedAmountUsd.toFixed(2)}
+                {getFormattedNumberWithDecimalPlaces(selectedAmountUsd)}
               </HeroFormControl.Caption>
             </HeroFormControl>
           )}

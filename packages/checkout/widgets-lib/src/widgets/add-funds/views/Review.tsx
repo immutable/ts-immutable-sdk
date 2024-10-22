@@ -63,6 +63,7 @@ import { getRouteChains } from '../functions/getRouteChains';
 import {
   getFormattedAmounts,
   getFormattedNumber,
+  getFormattedNumberWithDecimalPlaces,
 } from '../functions/getFormattedNumber';
 import { convertToNetworkChangeableProvider } from '../functions/convertToNetworkChangeableProvider';
 import { SquidFooter } from '../components/SquidFooter';
@@ -526,11 +527,11 @@ export function Review({
                     <br />
                     1
                     {' '}
-                    {route.route.estimate.fromToken.name}
+                    {route.route.estimate.fromToken.symbol}
                     {' '}
                     =
                     {' '}
-                    {route.route.estimate.exchangeRate}
+                    {getFormattedNumberWithDecimalPlaces(route.route.estimate.exchangeRate)}
                     {' '}
                     {route.route.estimate.toToken.name}
                   </Body>
