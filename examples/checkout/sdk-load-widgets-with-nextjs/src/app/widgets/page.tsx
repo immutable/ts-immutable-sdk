@@ -8,7 +8,7 @@ const checkoutSDK = new checkout.Checkout();
 
 function Widgets() {
 
-  const [widget, setWidget] = useState<Widget<WidgetType.UNIFIED_COMMERCE>>();
+  const [widget, setWidget] = useState<Widget<WidgetType.CHECKOUT>>();
 
   useEffect(() => {
 
