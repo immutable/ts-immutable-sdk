@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { Body, Link } from '@biom3/react';
 import { Trans, useTranslation } from 'react-i18next';
 
