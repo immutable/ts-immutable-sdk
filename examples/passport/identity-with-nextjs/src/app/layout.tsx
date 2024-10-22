@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { PassportProvider } from '@/context/passport';
 import { ReactNode } from 'react';
+import AppWrapper from './utils/wrapper';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -19,7 +20,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <PassportProvider>{children}</PassportProvider>
+        <AppWrapper>
+          <PassportProvider>
+            {children}
+          </PassportProvider>
+        </AppWrapper>
+
       </body>
     </html>
   );
