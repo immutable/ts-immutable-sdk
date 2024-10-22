@@ -31,6 +31,11 @@ export type TransactionParams = {
 };
 
 export type EjectionTransactionParams = Pick<TransactionParams, 'ethSigner' | 'zkEvmAddress' | 'flow'>;
+export type EjectionTransactionResponse = {
+  to: string;
+  data: string;
+  chainId: string;
+};
 
 const getFeeOption = async (
   metaTransaction: MetaTransaction,
@@ -255,14 +260,12 @@ export const prepareAndSignEjectionTransaction = async ({
   ethSigner,
   zkEvmAddress,
   flow,
-}: EjectionTransactionParams & { transactionRequest: TransactionRequest }) => {
+}: EjectionTransactionParams & { transactionRequest: TransactionRequest }): Promise<EjectionTransactionResponse> => {
   const metaTransaction = await buildMetaTransactionForEjection(
     transactionRequest,
   );
   flow.addEvent('endBuildMetaTransactions');
 
-  // NOTE: We sign again because we now are adding the fee transaction, so the
-  // whole payload is different and needs a new signature.
   const signedTransaction = await signMetaTransactions(
     metaTransaction,
     transactionRequest.nonce as BigNumberish,

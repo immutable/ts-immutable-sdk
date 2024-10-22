@@ -294,17 +294,6 @@ describe('ZkEvmProvider', () => {
       );
     });
 
-    it('should open a confirmation screen', async () => {
-      authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
-      authManager.getUser.mockResolvedValue(mockUserZkEvm);
-
-      const provider = getProvider();
-      await provider.request({ method: 'eth_requestAccounts' });
-      await provider.request({ method: 'im_signEjectionTransaction', params: [transaction] });
-
-      expect(guardianClient.withConfirmationScreen).toBeCalledTimes(1);
-    });
-
     it('should call im_signEjectionTransaction with the correct params', async () => {
       const signedTransaction = '0x789';
       authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);

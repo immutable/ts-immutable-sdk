@@ -10,7 +10,11 @@ jest.mock('./transactionHelpers');
 jest.mock('../network/retry');
 
 describe('im_signEjectionTransaction', () => {
-  const signedTransaction = 'signedTransaction123';
+  const signedTransaction = {
+    to: '123',
+    data: '123',
+    chainId: '123',
+  };
 
   const transactionRequest: TransactionRequest = {
     to: mockUserZkEvm.zkEvm.ethAddress,

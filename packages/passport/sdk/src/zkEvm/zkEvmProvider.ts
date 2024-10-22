@@ -477,19 +477,14 @@ export class ZkEvmProvider implements Provider {
         const flow = trackFlow('passport', 'imSignEjectionTransaction');
 
         try {
-          return await this.#guardianClient.withConfirmationScreen({
-            width: 480,
-            height: 720,
-          })(async () => {
-            const ethSigner = await this.#getSigner();
-            flow.addEvent('endGetSigner');
+          const ethSigner = await this.#getSigner();
+          flow.addEvent('endGetSigner');
 
-            return await signEjectionTransaction({
-              params: request.params || [],
-              ethSigner,
-              zkEvmAddress,
-              flow,
-            });
+          return await signEjectionTransaction({
+            params: request.params || [],
+            ethSigner,
+            zkEvmAddress,
+            flow,
           });
         } catch (error) {
           if (error instanceof Error) {

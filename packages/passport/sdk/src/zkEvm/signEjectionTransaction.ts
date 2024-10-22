@@ -2,6 +2,7 @@ import { TransactionRequest } from '@ethersproject/providers';
 import {
   prepareAndSignEjectionTransaction,
   EjectionTransactionParams,
+  EjectionTransactionResponse,
 } from './transactionHelpers';
 
 type EthSendTransactionEjectionParams = EjectionTransactionParams & {
@@ -13,7 +14,7 @@ export const signEjectionTransaction = async ({
   ethSigner,
   zkEvmAddress,
   flow,
-}: EthSendTransactionEjectionParams): Promise<string> => {
+}: EthSendTransactionEjectionParams): Promise<EjectionTransactionResponse> => {
   const transactionRequest = params[0] as TransactionRequest;
   return await prepareAndSignEjectionTransaction({
     transactionRequest,
