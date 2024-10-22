@@ -15,7 +15,7 @@ function Widgets() {
     const loadWidgets = async () => {
       const widgetsFactory = await checkoutSDK.widgets({ config: {} });
 
-      const widget = widgetsFactory.create(WidgetType.UNIFIED_COMMERCE, {})
+      const widget = widgetsFactory.create(WidgetType.CHECKOUT, {})
       setWidget(widget);
     }
 
