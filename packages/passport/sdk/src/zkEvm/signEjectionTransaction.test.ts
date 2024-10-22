@@ -5,23 +5,23 @@ import { BigNumber } from 'ethers';
 import { mockUserZkEvm } from '../test/mocks';
 import * as transactionHelpers from './transactionHelpers';
 import { signEjectionTransaction } from './signEjectionTransaction';
+import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 
 jest.mock('./transactionHelpers');
 jest.mock('../network/retry');
 
 describe('im_signEjectionTransaction', () => {
-  const signedTransaction = {
-    to: '123',
+  const signedTransactionPayload = {
+    to: mockUserZkEvm.zkEvm.ethAddress,
     data: '123',
-    chainId: '123',
+    chainId: '1',
   };
 
   const transactionRequest: TransactionRequest = {
     to: mockUserZkEvm.zkEvm.ethAddress,
-    data: '0x456',
     nonce: BigNumber.from(5),
     chainId: 1,
-    value: '0x00',
+    value: BigNumber.from('5'),
   };
   const ethSigner = {
     getAddress: jest.fn(),
@@ -33,7 +33,7 @@ describe('im_signEjectionTransaction', () => {
   beforeEach(() => {
     jest.resetAllMocks();
     (transactionHelpers.prepareAndSignEjectionTransaction as jest.Mock).mockResolvedValue(
-      signedTransaction,
+      signedTransactionPayload,
     );
   });
 
@@ -53,6 +53,17 @@ describe('im_signEjectionTransaction', () => {
     });
   });
 
+  it('calls signEjectionTransaction with invalid params', async () => {
+    await expect(signEjectionTransaction({
+      params: [transactionRequest, { test: 'test' }],
+      ethSigner,
+      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      flow: flow as unknown as Flow,
+    })).rejects.toThrow(
+      new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'im_signEjectionTransaction requires a singular param (hash)'),
+    );
+  });
+
   it('returns the transaction hash', async () => {
     const result = await signEjectionTransaction({
       params: [transactionRequest],
@@ -61,6 +72,6 @@ describe('im_signEjectionTransaction', () => {
       flow: flow as unknown as Flow,
     });
 
-    expect(result).toEqual(signedTransaction);
+    expect(result).toEqual(signedTransactionPayload);
   });
 });

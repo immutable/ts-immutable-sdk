@@ -52,6 +52,12 @@ const EthereumMethods: EthereumMethod[] = [
     exampleComponents: PersonalSignExamples,
   },
   {
+    name: 'im_signEjectionTransaction',
+    params: [
+      { name: 'transaction', placeholder: '{ "to": "0x", "data": "", "nonce": "", "chainId": "", "value": "" }',type: EthereumParamType.object },
+    ],
+  },
+  {
     name: 'eth_signTypedData_v4',
     params: [
       { name: 'address' },
