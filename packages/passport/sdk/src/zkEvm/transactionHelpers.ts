@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers';
+import { BigNumber, BigNumberish } from 'ethers';
 import {
   StaticJsonRpcProvider,
   TransactionRequest,
@@ -29,6 +29,8 @@ export type TransactionParams = {
   zkEvmAddress: string;
   flow: Flow;
 };
+
+export type EjectionTransactionParams = Pick<TransactionParams, 'ethSigner' | 'zkEvmAddress' | 'flow'>;
 
 const getFeeOption = async (
   metaTransaction: MetaTransaction,
@@ -211,4 +213,64 @@ export const prepareAndSignTransaction = async ({
   flow.addEvent('endRelayerSendTransaction');
 
   return { signedTransactions, relayerId, nonce };
+};
+
+const buildMetaTransactionForEjection = async (
+  transactionRequest: TransactionRequest,
+): Promise<[MetaTransaction, ...MetaTransaction[]]> => {
+  if (!transactionRequest.to) {
+    throw new JsonRpcError(
+      RpcErrorCode.INVALID_PARAMS,
+      'im_signEjectionTransaction requires a "to" field',
+    );
+  }
+
+  if (!transactionRequest.nonce) {
+    throw new JsonRpcError(
+      RpcErrorCode.INVALID_PARAMS,
+      'im_signEjectionTransaction requires a "nonce" field',
+    );
+  }
+
+  if (!transactionRequest.chainId) {
+    throw new JsonRpcError(
+      RpcErrorCode.INVALID_PARAMS,
+      'im_signEjectionTransaction requires a "chainId" field',
+    );
+  }
+
+  const metaTransaction: MetaTransaction = {
+    to: transactionRequest.to,
+    data: transactionRequest.data,
+    nonce: transactionRequest.nonce,
+    value: transactionRequest.value,
+    revertOnError: true,
+  };
+
+  return [metaTransaction];
+};
+
+export const prepareAndSignEjectionTransaction = async ({
+  transactionRequest,
+  ethSigner,
+  zkEvmAddress,
+  flow,
+}: EjectionTransactionParams & { transactionRequest: TransactionRequest }) => {
+  const metaTransaction = await buildMetaTransactionForEjection(
+    transactionRequest,
+  );
+  flow.addEvent('endBuildMetaTransactions');
+
+  // NOTE: We sign again because we now are adding the fee transaction, so the
+  // whole payload is different and needs a new signature.
+  const signedTransaction = await signMetaTransactions(
+    metaTransaction,
+    transactionRequest.nonce as BigNumberish,
+    BigNumber.from(transactionRequest.chainId),
+    zkEvmAddress,
+    ethSigner,
+  );
+  flow.addEvent('endGetSignedMetaTransactions');
+
+  return signedTransaction;
 };

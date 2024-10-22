@@ -24,7 +24,7 @@ import {
 import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
 import { registerZkEvmUser } from './user';
-import { sendTransaction } from './sendTransaction';
+import { signEjectionTransaction, sendTransaction } from './sendTransaction';
 import GuardianClient from '../guardian';
 import { signTypedDataV4 } from './signTypedDataV4';
 import { personalSign } from './personalSign';
@@ -463,6 +463,42 @@ export class ZkEvmProvider implements Provider {
       case 'eth_getTransactionByHash':
       case 'eth_getTransactionReceipt': {
         return this.#rpcProvider.send(request.method, request.params || []);
+      }
+      case 'im_signEjectionTransaction': {
+        const zkEvmAddress = await this.#getZkEvmAddress();
+        if (!zkEvmAddress) {
+          throw new JsonRpcError(
+            ProviderErrorCode.UNAUTHORIZED,
+            'Unauthorised - call eth_requestAccounts first',
+          );
+        }
+
+        const flow = trackFlow('passport', 'imSignEjectionTransaction');
+
+        try {
+          return await this.#guardianClient.withConfirmationScreen({
+            width: 480,
+            height: 720,
+          })(async () => {
+            const ethSigner = await this.#getSigner();
+            flow.addEvent('endGetSigner');
+
+            return await signEjectionTransaction({
+              params: request.params || [],
+              ethSigner,
+              zkEvmAddress,
+              flow,
+            });
+          });
+        } catch (error) {
+          if (error instanceof Error) {
+            trackError('passport', 'imSignEjectionTransaction', error);
+          }
+          flow.addEvent('errored');
+          throw error;
+        } finally {
+          flow.addEvent('End');
+        }
       }
       default: {
         throw new JsonRpcError(
