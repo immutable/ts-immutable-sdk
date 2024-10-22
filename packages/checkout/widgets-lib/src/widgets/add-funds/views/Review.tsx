@@ -65,6 +65,7 @@ import {
   getFormattedNumber,
 } from '../functions/getFormattedNumber';
 import { convertToNetworkChangeableProvider } from '../functions/convertToNetworkChangeableProvider';
+import { SquidFooter } from '../components/SquidFooter';
 
 interface ReviewProps {
   data: AddFundsReviewData;
@@ -666,10 +667,12 @@ export function Review({
               size="large"
               onClick={handleTransaction}
               disabled={proceedDisabled}
-              sx={{ mt: 'auto', mb: 'base.spacing.x4', mx: 'base.spacing.x3' }}
+              sx={{ mx: 'base.spacing.x3' }}
             >
               {proceedDisabled ? 'Processing' : 'Proceed'}
             </Button>
+
+            <SquidFooter />
           </>
         )}
 
