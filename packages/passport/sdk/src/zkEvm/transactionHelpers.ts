@@ -272,5 +272,9 @@ export const prepareAndSignEjectionTransaction = async ({
   );
   flow.addEvent('endGetSignedMetaTransactions');
 
-  return signedTransaction;
+  return {
+    to: zkEvmAddress,
+    data: signedTransaction,
+    chainId: getEip155ChainId(transactionRequest.chainId as number),
+  };
 };
