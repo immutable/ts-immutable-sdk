@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { interceptWidgets } from "./utils/intercept-widgets";
 
-const useLocalBundle = process.env.USE_LOCAL_BUNDLE === 'true';
+const useLocalBundle = process.env.USE_LOCAL_BUNDLE !== 'false';
 
 
 test.beforeEach(async ({ page }) => {
