@@ -71,11 +71,13 @@
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
       "heading": {
         "swap": "Swapping is not available in your region",
-        "generic": "This service is not available in your region"
+        "generic": "This service is not available in your region",
+        "addFunds": "This is not available in your region"
       },
       "body": {
         "swap": "Please refer to <quickswapLink>Quickswap’s</quickswapLink> website for further information.",
-        "generic": "For further assistance visit the <immutableSupport>Immutable</immutableSupport> support page."
+        "generic": "For further assistance visit the <immutableSupport>Immutable</immutableSupport> support page.",
+        "addFunds": "Please add tokens another way"
       }
     },
     "LOADING_VIEW": {
@@ -679,6 +681,10 @@
       },
       "footer": {
         "body":  "Swap functionality is powered by a third party, Squid. Immutable neither builds, owns, operates or deploys <squidLink>Squid</squidLink>."
+      },
+      "geoBlockError": {
+        "buyTokenButton": "Buy tokens",
+        "bridgeTokenButton": "Bridge tokens"
       }
     }
   },
