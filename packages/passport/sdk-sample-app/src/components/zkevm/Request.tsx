@@ -54,7 +54,12 @@ const EthereumMethods: EthereumMethod[] = [
   {
     name: 'im_signEjectionTransaction',
     params: [
-      { name: 'transaction', placeholder: '{ "to": "0x", "data": "", "nonce": "", "chainId": "", "value": "" }',type: EthereumParamType.object },
+      {
+        name: 'transaction',
+        placeholder:
+          '{ "to": "0x", "data": "", "nonce": "", "chainId": "", "value": "" }',
+        type: EthereumParamType.object,
+      },
     ],
   },
   {
