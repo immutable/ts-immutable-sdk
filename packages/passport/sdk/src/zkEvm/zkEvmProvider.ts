@@ -24,13 +24,14 @@ import {
 import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
 import { registerZkEvmUser } from './user';
-import { signEjectionTransaction, sendTransaction } from './sendTransaction';
+import { sendTransaction } from './sendTransaction';
 import GuardianClient from '../guardian';
 import { signTypedDataV4 } from './signTypedDataV4';
 import { personalSign } from './personalSign';
 import { trackSessionActivity } from './sessionActivity/sessionActivity';
 import { getNonce } from './walletHelpers';
 import { sendDeployTransactionAndPersonalSign } from './sendDeployTransactionAndPersonalSign';
+import { signEjectionTransaction } from './signEjectionTransaction';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;

@@ -1,14 +1,6 @@
-import { TransactionRequest } from '@ethersproject/providers';
-import {
-  prepareAndSignTransaction, pollRelayerTransaction, TransactionParams, prepareAndSignEjectionTransaction,
-  EjectionTransactionParams,
-} from './transactionHelpers';
+import { prepareAndSignTransaction, pollRelayerTransaction, TransactionParams } from './transactionHelpers';
 
 type EthSendTransactionParams = TransactionParams & {
-  params: Array<any>;
-};
-
-type EthSendTransactionEjectionParams = EjectionTransactionParams & {
   params: Array<any>;
 };
 
@@ -35,19 +27,4 @@ export const sendTransaction = async ({
 
   const { hash } = await pollRelayerTransaction(relayerClient, relayerId, flow);
   return hash;
-};
-
-export const signEjectionTransaction = async ({
-  params,
-  ethSigner,
-  zkEvmAddress,
-  flow,
-}: EthSendTransactionEjectionParams): Promise<string> => {
-  const transactionRequest = params[0] as TransactionRequest;
-  return await prepareAndSignEjectionTransaction({
-    transactionRequest,
-    ethSigner,
-    zkEvmAddress,
-    flow,
-  });
 };
