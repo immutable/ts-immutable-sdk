@@ -99,7 +99,7 @@ export type WidgetConfigurations = {
   [WidgetType.SALE]: SaleWidgetConfiguration;
   [WidgetType.ADD_FUNDS]: AddFundsWidgetConfiguration;
 
-  [WidgetType.CHECKOUT]: CheckoutWidgetConfiguration;
+  [WidgetType.UNIFIED_COMMERCE]: CheckoutWidgetConfiguration;
 };
 
 // Mapping each widget type to their parameters
@@ -112,7 +112,7 @@ export type WidgetParameters = {
   [WidgetType.SALE]: SaleWidgetParams;
   [WidgetType.ADD_FUNDS]: AddFundsWidgetParams;
 
-  [WidgetType.CHECKOUT]: CheckoutWidgetParams;
+  [WidgetType.UNIFIED_COMMERCE]: CheckoutWidgetParams;
 };
 
 /**
@@ -125,7 +125,7 @@ export type WidgetEventTypes = {
   [WidgetType.BRIDGE]: BridgeEventType | OrchestrationEventType;
   [WidgetType.ONRAMP]: OnRampEventType | OrchestrationEventType;
   [WidgetType.SALE]: SaleEventType | OrchestrationEventType;
-  [WidgetType.CHECKOUT]: CheckoutEventType | OrchestrationEventType;
+  [WidgetType.UNIFIED_COMMERCE]: CheckoutEventType | OrchestrationEventType;
   [WidgetType.ADD_FUNDS]: AddFundsEventType | OrchestrationEventType;
 };
 
@@ -203,7 +203,7 @@ export type WidgetEventData = {
   } & OrchestrationMapping &
   ProviderEventMapping;
 
-  [WidgetType.CHECKOUT]: {
+  [WidgetType.UNIFIED_COMMERCE]: {
     [CheckoutEventType.INITIALISED]: CheckoutWidgetParams;
     [CheckoutEventType.PROVIDER_UPDATED]: CheckoutProviderUpdatedEvent;
     [CheckoutEventType.CLOSE]: {};

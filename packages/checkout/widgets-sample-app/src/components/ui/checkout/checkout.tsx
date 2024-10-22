@@ -270,14 +270,14 @@ function CheckoutUI() {
 
   // create the widget once factory is available
   // ignore language or theme changes
-  const prevWidget = useRef<Widget<typeof WidgetType.CHECKOUT> | undefined>(
+  const prevWidget = useRef<Widget<typeof WidgetType.UNIFIED_COMMERCE> | undefined>(
     undefined
   );
   const widget = useAsyncMemo(async () => {
     if (widgetsFactory === undefined) return undefined;
     if (renderAfterConnect && !web3Provider) return undefined;
 
-    return widgetsFactory.create(WidgetType.CHECKOUT, {
+    return widgetsFactory.create(WidgetType.UNIFIED_COMMERCE, {
       provider: web3Provider,
       config: {
         theme,
