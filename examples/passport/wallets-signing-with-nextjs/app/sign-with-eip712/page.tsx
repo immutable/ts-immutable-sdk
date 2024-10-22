@@ -104,7 +104,7 @@ export default function ConnectWithEtherJS() {
         method: 'eth_signTypedData_v4',
         params: [address, etherMailTypedPayload],
       })
-
+      
       setSignature(signature)
       setSignedMessageState('user successfully signed message');
 
@@ -125,17 +125,18 @@ export default function ConnectWithEtherJS() {
   // #doc passport-wallets-nextjs-sign-eip712-verifysignature
   
   const isValidTypedDataSignature = async (
-    address: string,
-    payload: string,
-    signature: string,
-    zkEvmProvider: Provider,
+    address: string, //The Passport wallet address returned from eth_requestAccounts
+    payload: string, //The stringified payload
+    signature: string, //The signature
+    zkEvmProvider: Provider, // can be any provider, Passport or not
   ) => {
     const typedPayload: TypedDataPayload = JSON.parse(payload);
     const types = { ...typedPayload.types };
     // @ts-ignore
+    // Ethers auto-generates the EIP712Domain type in the TypedDataEncoder, and so it needs to be removed
     delete types.EIP712Domain;
   
-    // eslint-disable-next-line no-underscore-dangle
+    //The hashed string
     const digest = ethers.utils._TypedDataEncoder.hash(
       typedPayload.domain,
       types,

@@ -43,10 +43,8 @@ export default function ConnectWithEtherJS() {
       // disable button while loading
       setLoadingState(true);
 
-      // #doc passport-wallets-nextjs-sign-erc191-request
       // calling eth_requestAccounts triggers the Passport login flow
       const accounts = await web3Provider.provider.request({ method: 'eth_requestAccounts' });
-      // #enddoc passport-wallets-nextjs-sign-erc191-request
 
       // once logged in Passport is connected to the wallet and ready to transact
       setAccountsState(accounts);
@@ -106,10 +104,10 @@ export default function ConnectWithEtherJS() {
 
   // #doc passport-wallets-nextjs-sign-erc191-verifysignature
   const isValidERC191Signature = async (
-    address: string,
-    payload: string,
-    signature: string,
-    zkEvmProvider: Provider,
+    address: string, // The wallet address returned from eth_requestAccounts
+    payload: string, // The message string
+    signature: string, // The signature
+    zkEvmProvider: Provider, // Can be any provider, Passport or not
   ) => {
     const digest = utils.hashMessage(payload);
   

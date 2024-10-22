@@ -1,3 +1,5 @@
+// #doc passport-wallets-nextjs-sign-isvalidsignature
+
 import { ethers } from 'ethers';
 import { Provider } from '@imtbl/passport';
 
@@ -20,3 +22,4 @@ export const isValidSignature = async (
   const isValidSignatureHex = await contract.isValidSignature(digest, signature);
   return isValidSignatureHex === ERC_1271_MAGIC_VALUE;
 };
+// #enddoc passport-wallets-nextjs-sign-eip712-isvalidsignature
