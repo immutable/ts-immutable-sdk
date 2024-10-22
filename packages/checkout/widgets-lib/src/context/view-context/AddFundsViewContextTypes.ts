@@ -4,9 +4,10 @@ import { ViewType } from './ViewType';
 export enum AddFundsWidgetViews {
   ADD_FUNDS = 'ADD_FUNDS',
   REVIEW = 'REVIEW',
+  GEO_BLOCK_ERROR = 'GEO_BLOCK_ERROR',
 }
 
-export type AddFundsWidgetView = AddFundsView | AddFundsReview;
+export type AddFundsWidgetView = AddFundsView | AddFundsReview | GeoBlockErrorView;
 
 interface AddFundsView extends ViewType {
   type: AddFundsWidgetViews.ADD_FUNDS;
@@ -15,6 +16,10 @@ interface AddFundsView extends ViewType {
 interface AddFundsReview extends ViewType {
   type: AddFundsWidgetViews.REVIEW;
   data: AddFundsReviewData;
+}
+
+interface GeoBlockErrorView extends ViewType {
+  type: AddFundsWidgetViews.GEO_BLOCK_ERROR;
 }
 
 export interface AddFundsReviewData {

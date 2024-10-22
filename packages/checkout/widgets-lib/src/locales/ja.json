@@ -75,11 +75,13 @@
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
       "heading": {
         "swap": "お住まいの地域では交換が利用できません",
-        "generic": "このサービスはお住まいの地域では利用できません"
+        "generic": "このサービスはお住まいの地域では利用できません",
+        "addFunds": "このサービスはお住まいの地域では利用できません"
       },
       "body": {
         "swap": "<quickswapLink>Quickswap</quickswapLink>のウェブサイトで詳細情報をご覧ください。",
-        "generic": "詳しいサポートについては、<immutableSupport>Immutable</immutableSupport>サポートページをご覧ください."
+        "generic": "詳しいサポートについては、<immutableSupport>Immutable</immutableSupport>サポートページをご覧ください.",
+        "addFunds": "別の方法でトークンを追加してください。"
       }
     },
     "LOADING_VIEW": {
@@ -625,6 +627,51 @@
           "text": "取引失敗",
           "actionText": "再試行"
         }
+      }
+    },
+    "ADD_FUNDS": {
+      "drawer": {
+        "options": {
+          "swap": {
+            "heading": "スワップ",
+            "caption": "このネットワークでトークンをスワップします。",
+            "disabledCaption": "現在利用できません。"
+          },
+          "debit": {
+            "heading": "デビットカード",
+            "caption": "",
+            "disabledCaption": "選択した内容には利用できません。トークンを追加することをお勧めします。"
+          },
+          "credit": {
+            "heading": "クレジットカード",
+            "caption": "失敗や追加手数料が発生する可能性があります。",
+            "disabledCaption": "選択した内容には利用できません。トークンを追加することをお勧めします。"
+          }
+        }
+      },
+      "onboarding": {
+        "screen1": {
+          "title": "Immutableでの支払いが進化しました",
+          "caption": "よく聞いてください",
+          "buttonText": "次へ"
+        },
+        "screen2": {
+          "title": "トークンをPassportに転送し、\n任意のウォレットから支払います",
+          "caption": "進化した内容",
+          "buttonText": "次へ"
+        },
+        "screen3": {
+          "title": "他のチェーンでトークンを使用して支払う、\n最適なオプションを見つけます",
+          "caption": "進化",
+          "buttonText": "支払いに使用するウォレットを選択"
+        }
+      },
+      "footer": {
+        "body": "スワップ機能はサードパーティであるSquidによって提供されています。Immutableは<squidLink>Squid</squidLink>を構築、所有、運営、またはデプロイしていません。"
+      },
+      "geoBlockError": {
+        "buyTokenButton": "トークンを購入する",
+        "bridgeTokenButton": "トークンをブリッジする"
       }
     }
   },
