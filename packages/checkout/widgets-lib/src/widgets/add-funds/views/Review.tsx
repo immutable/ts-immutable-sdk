@@ -32,7 +32,7 @@ import {
   AddFundsReviewData,
   AddFundsWidgetViews,
 } from '../../../context/view-context/AddFundsViewContextTypes';
-import { RiveStateMachineInput } from '../types';
+import { AddFundsErrorTypes, RiveStateMachineInput } from '../types';
 import { useExecute } from '../hooks/useExecute';
 import {
   ViewActions,
@@ -67,6 +67,7 @@ import {
 } from '../functions/getFormattedNumber';
 import { convertToNetworkChangeableProvider } from '../functions/convertToNetworkChangeableProvider';
 import { SquidFooter } from '../components/SquidFooter';
+import { useError } from '../hooks/useError';
 
 interface ReviewProps {
   data: AddFundsReviewData;
@@ -90,7 +91,9 @@ export function Review({
   onCloseButtonClick,
 }: ReviewProps) {
   const { viewDispatch } = useContext(ViewContext);
+
   const { track, page } = useAnalytics();
+
   const {
     addFundsState: { squid, chains, tokens },
   } = useContext(AddFundsContext);
@@ -109,6 +112,8 @@ export function Review({
   const { addHandover, closeHandover } = useHandover({
     id: HandoverTarget.GLOBAL,
   });
+
+  const { showErrorHandover } = useError(checkout.config.environment);
 
   const {
     checkProviderChain,
@@ -242,7 +247,14 @@ export function Review({
       return;
     }
 
-    const currentFromAddress = await fromProvider.getSigner().getAddress();
+    let currentFromAddress = '';
+
+    try {
+      currentFromAddress = await fromProvider.getSigner().getAddress();
+    } catch (error) {
+      showErrorHandover(AddFundsErrorTypes.PROVIDER_ERROR, { error });
+      return;
+    }
 
     if (currentFromAddress !== fromAddress) {
       setShowAddressMissmatchDrawer(true);
