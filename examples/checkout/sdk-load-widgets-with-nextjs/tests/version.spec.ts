@@ -1,11 +1,10 @@
 import { test, expect } from "@playwright/test";
 import { interceptWidgets } from "./utils/intercept-widgets";
 
-const useLocalBundle = process.env.USE_LOCAL_BUNDLE === 'true';
-
+const USE_REMOTE_WIDGETS = process.env.USE_REMOTE_WIDGETS === 'true';
 
 test.beforeEach(async ({ page }) => {
-  if (useLocalBundle) {
+  if (!USE_REMOTE_WIDGETS) {
     await interceptWidgets(page);
   }
 

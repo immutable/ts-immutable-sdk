@@ -12,11 +12,6 @@ export const interceptWidgets = async (page: Page, widgetsVersion: string | 'lat
     const fileName = path.basename(url.pathname);
     let filePath = path.join(__dirname, 'local-widgets-js', fileName);
 
-    // Special case for widgets-esm.js
-    if (fileName === 'widgets-esm.js') {
-      filePath = path.join(__dirname, 'local-widgets-js', 'index.js');
-    }
-
     try {
       if (fs.existsSync(filePath)) {
         const fileContent = fs.readFileSync(filePath, 'utf8');
