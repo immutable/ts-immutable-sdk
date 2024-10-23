@@ -77,6 +77,11 @@ export const DEFAULT_SWAP_ENABLED = true;
 export const DEFAULT_BRIDGE_ENABLED = true;
 
 /**
+ * Checkout Widget default add funds enabled flag
+ */
+export const DEFAULT_ADD_FUNDS_ENABLED = true;
+
+/**
  * Checkout Widget default refresh quote interval
  */
 export const DEFAULT_QUOTE_REFRESH_INTERVAL = 30000;

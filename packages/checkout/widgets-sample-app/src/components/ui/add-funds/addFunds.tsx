@@ -1,12 +1,13 @@
 import {
-  Checkout,
-  WidgetTheme,
-  WidgetType,
-  WidgetLanguage,
   AddFundsEventType,
+  BridgeEventType,
+  Checkout,
   OnRampEventType,
   OrchestrationEventType,
   WalletProviderName,
+  WidgetLanguage,
+  WidgetTheme,
+  WidgetType,
 } from "@imtbl/checkout-sdk";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import { Environment } from "@imtbl/config";
@@ -130,7 +131,22 @@ function AddFundsUI() {
     addFunds.addListener(AddFundsEventType.CONNECT_SUCCESS, (data: any) => {
       console.log("CONNECT_SUCCESS", data);
     });
+    addFunds.addListener(OrchestrationEventType.REQUEST_BRIDGE, (data: any) => {
+      console.log("REQUEST_BRIDGE", data);
+      addFunds.unmount();
+      bridge.addListener(BridgeEventType.CLOSE_WIDGET, (data: any) => {
+        console.log("CLOSE_WIDGET", data);
+        bridge.unmount();
+      });
+      bridge.mount(ADD_FUNDS_TARGET_ID, {
+        ...data,
+        showBackButton: true,
+      });
+    });
     onRamp.addListener(OrchestrationEventType.REQUEST_GO_BACK, () => {
+      goBack();
+    });
+    bridge.addListener(OrchestrationEventType.REQUEST_GO_BACK, () => {
       goBack();
     });
 
@@ -140,6 +156,8 @@ function AddFundsUI() {
       addFunds.removeListener(AddFundsEventType.CONNECT_SUCCESS);
       onRamp.removeListener(OnRampEventType.CLOSE_WIDGET);
       onRamp.removeListener(OrchestrationEventType.REQUEST_GO_BACK);
+      bridge.removeListener(BridgeEventType.CLOSE_WIDGET);
+      bridge.removeListener(OrchestrationEventType.REQUEST_GO_BACK);
     }
   }, [addFunds, toProvider, toTokenAddress, toAmount]);
 
@@ -187,7 +205,7 @@ function AddFundsUI() {
       <button onClick={() => setPresetToProvider(prev => !prev)}>
         {presetToProvider ? 'Disconnect destination wallet' : 'Connect destination wallet'}
       </button>
-      
+
     </div>
   );
 }
