@@ -119,6 +119,7 @@ export const useRoutes = () => {
         data.balance.balance,
         data.balance.decimals,
       );
+
       return (
         parseFloat(formattedBalance.toString()) > parseFloat(data.fromAmount)
       );
@@ -204,6 +205,7 @@ export const useRoutes = () => {
         routeResponse.route.estimate.exchangeRate,
         toAmount,
       );
+
       const newRoute = await getRouteWithRetry(
         squid,
         fromToken,
@@ -213,12 +215,15 @@ export const useRoutes = () => {
         fromAddress,
         quoteOnly,
       );
+
       if (!newRoute?.route) {
         return {};
       }
+
       if (isRouteToAmountGreaterThanToAmount(newRoute, toAmount)) {
         return { route: newRoute };
       }
+
       track({
         userJourney: UserJourney.ADD_FUNDS,
         screen: 'Routes',
@@ -268,6 +273,7 @@ export const useRoutes = () => {
     })));
 
     const routesData = await Promise.all(routePromises);
+
     return routesData.filter(
       (route): route is RouteData => route?.route !== undefined,
     );
