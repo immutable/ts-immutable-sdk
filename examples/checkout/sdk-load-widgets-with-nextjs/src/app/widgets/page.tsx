@@ -8,14 +8,14 @@ const checkoutSDK = new checkout.Checkout();
 
 function Widgets() {
 
-  const [widget, setWidget] = useState<Widget<WidgetType.CHECKOUT>>();
+  const [widget, setWidget] = useState<Widget<WidgetType.UNIFIED_COMMERCE>>();
 
   useEffect(() => {
 
     const loadWidgets = async () => {
       const widgetsFactory = await checkoutSDK.widgets({ config: {} });
 
-      const widget = widgetsFactory.create(WidgetType.CHECKOUT, {})
+      const widget = widgetsFactory.create(WidgetType.UNIFIED_COMMERCE, {})
       setWidget(widget);
     }
 
