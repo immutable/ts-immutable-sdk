@@ -50,9 +50,13 @@ export const useRoutes = () => {
     additionalBuffer: number = 0,
   ) => {
     const toAmountNumber = parseFloat(toAmount);
+    // Calculate the USD value of the toAmount
     const toAmountInUsd = toAmountNumber * toToken.usdPrice;
+    // Calculate the amount of fromToken needed to match this USD value
     const baseFromAmount = toAmountInUsd / fromToken.usdPrice;
+    // Add a buffer for price fluctuations and fees
     const fromAmountWithBuffer = baseFromAmount * (1 + BASE_SLIPPAGE + additionalBuffer);
+
     return fromAmountWithBuffer.toString();
   };
 
