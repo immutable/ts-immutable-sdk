@@ -39,6 +39,13 @@ export const useExecute = (environment: Environment) => {
       errorType = AddFundsErrorTypes.TRANSACTION_FAILED;
     }
 
+    if (
+      reason.includes('unrecognized chain')
+      || reason.includes('unrecognized chain')
+    ) {
+      errorType = AddFundsErrorTypes.UNRECOGNISED_CHAIN;
+    }
+
     const error: AddFundsError = {
       type: errorType,
       data: { error: err },

@@ -339,7 +339,7 @@ export function AddFunds({
           });
         }
       } catch (error) {
-        showErrorHandover(AddFundsErrorTypes.SERVICE_BREAKDOWN);
+        showErrorHandover(AddFundsErrorTypes.SERVICE_BREAKDOWN, { error });
       }
     };
 
@@ -360,7 +360,7 @@ export function AddFunds({
           setOnRampAllowedTokens(tokenResponse.tokens);
         }
       } catch (error) {
-        showErrorHandover(AddFundsErrorTypes.SERVICE_BREAKDOWN);
+        showErrorHandover(AddFundsErrorTypes.SERVICE_BREAKDOWN, { error });
       }
     };
     fetchOnRampTokens();
