@@ -4193,7 +4193,7 @@ __metadata:
   dependencies:
     "@biom3/react": ^0.25.21
     "@ethersproject/providers": ^5.7.2
-    "@imtbl/sdk": "file:.yalc/@imtbl/sdk"
+    "@imtbl/sdk": 1.58.0
     "@playwright/test": ^1.45.3
     "@types/node": ^20
     "@types/react": ^18.3.4
@@ -5038,85 +5038,6 @@ __metadata:
       optional: true
   languageName: unknown
   linkType: soft
-
-"@imtbl/sdk@file:.yalc/@imtbl/sdk::locator=%40examples%2Fsdk-load-widgets-with-nextjs%40workspace%3Aexamples%2Fcheckout%2Fsdk-load-widgets-with-nextjs":
-  version: 0.0.0
-  resolution: "@imtbl/sdk@file:.yalc/@imtbl/sdk#.yalc/@imtbl/sdk::hash=d1d218&locator=%40examples%2Fsdk-load-widgets-with-nextjs%40workspace%3Aexamples%2Fcheckout%2Fsdk-load-widgets-with-nextjs"
-  dependencies:
-    "@0xsequence/abi": ^1.4.3
-    "@0xsequence/core": ^1.4.3
-    "@0xsquid/sdk": ^2.8.25
-    "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.12
-    "@ethersproject/abi": ^5.7.0
-    "@ethersproject/abstract-provider": ^5.7.0
-    "@ethersproject/abstract-signer": ^5.7.0
-    "@ethersproject/address": ^5.7.0
-    "@ethersproject/bignumber": ^5.7.0
-    "@ethersproject/bytes": ^5.7.0
-    "@ethersproject/contracts": ^5.7.0
-    "@ethersproject/keccak256": ^5.7.0
-    "@ethersproject/providers": ^5.7.2
-    "@ethersproject/solidity": ^5.7.0
-    "@ethersproject/strings": ^5.7.0
-    "@ethersproject/units": ^5.7.0
-    "@ethersproject/wallet": ^5.7.0
-    "@imtbl/react-analytics": 0.2.1-alpha
-    "@jest/globals": ^29.5.0
-    "@magic-ext/oidc": 4.3.1
-    "@magic-sdk/provider": ^21.2.0
-    "@metamask/detect-provider": ^2.0.0
-    "@opensea/seaport-js": 4.0.3
-    "@rive-app/react-canvas-lite": ^4.9.0
-    "@stdlib/number-float64-base-normalize": 0.0.8
-    "@uniswap/router-sdk": ^1.4.0
-    "@uniswap/sdk-core": ^3.0.1
-    "@uniswap/v3-sdk": ^3.9.0
-    "@walletconnect/ethereum-provider": ^2.11.1
-    "@walletconnect/modal": ^2.6.2
-    assert: ^2.0.0
-    axios: ^1.6.5
-    bn.js: ^5.2.1
-    buffer: ^6.0.3
-    crypto-browserify: ^3.12.0
-    elliptic: ^6.5.7
-    enc-utils: ^3.0.0
-    ethereumjs-wallet: ^1.0.2
-    ethers: ^5.7.2
-    ethers-v6: "npm:ethers@6.11.1"
-    events: ^3.3.0
-    form-data: ^4.0.0
-    framer-motion: ^11.0.6
-    global-const: ^0.1.2
-    hash.js: ^1.1.7
-    https-browserify: ^1.0.0
-    i18next: ^23.7.6
-    i18next-browser-languagedetector: ^7.2.0
-    jwt-decode: ^3.1.2
-    localforage: ^1.10.0
-    lru-memorise: 0.3.0
-    magic-sdk: ^21.2.0
-    merkletreejs: ^0.3.11
-    oidc-client-ts: 2.4.0
-    os-browserify: ^0.3.0
-    pako: ^2.1.0
-    pg: ^8.11.5
-    pino-pretty: ^11.2.2
-    prisma: ^5.13.0
-    react-i18next: ^13.5.0
-    sns-validator: ^0.3.5
-    stream-browserify: ^3.0.0
-    stream-http: ^3.2.0
-    url: ^0.11.0
-    uuid: ^8.3.2
-  dependenciesMeta:
-    pg:
-      optional: true
-    prisma:
-      optional: true
-  checksum: 1766f0ffed4bf6853b0c2e0a232d6d42600ea449155f3e948fd0fbc9bfb3f2aaa46a1d6c62331be8a62e69d0c7c2d199ccc93420d33727c5daa91151c3f8ef6d
-  languageName: node
-  linkType: hard
 
 "@imtbl/sdk@npm:1.58.0":
   version: 1.58.0
