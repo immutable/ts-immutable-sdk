@@ -1,7 +1,7 @@
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import { RouteResponse } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
-import { utils } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { useContext, useRef } from 'react';
 import { delay } from '../functions/delay';
 import {
@@ -10,7 +10,6 @@ import {
 import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
 import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
 import { retry } from '../../../lib/retry';
-import { getFormattedNumber } from '../functions/getFormattedNumber';
 import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 const BASE_SLIPPAGE = 0.02;
@@ -50,10 +49,14 @@ export const useRoutes = () => {
     toAmount: string,
     additionalBuffer: number = 0,
   ) => {
-    const toAmountNumber = Number(toAmount);
+    const toAmountNumber = parseFloat(toAmount);
+    // Calculate the USD value of the toAmount
     const toAmountInUsd = toAmountNumber * toToken.usdPrice;
+    // Calculate the amount of fromToken needed to match this USD value
     const baseFromAmount = toAmountInUsd / fromToken.usdPrice;
+    // Add a buffer for price fluctuations and fees
     const fromAmountWithBuffer = baseFromAmount * (1 + BASE_SLIPPAGE + additionalBuffer);
+
     return fromAmountWithBuffer.toString();
   };
 
@@ -61,7 +64,7 @@ export const useRoutes = () => {
     exchangeRate: string,
     toAmount: string,
   ) => {
-    const fromAmount = Number(toAmount) / Number(exchangeRate);
+    const fromAmount = parseFloat(toAmount) / parseFloat(exchangeRate);
     const fromAmountWithBuffer = fromAmount * (1 + BASE_SLIPPAGE);
     return fromAmountWithBuffer.toString();
   };
@@ -80,9 +83,11 @@ export const useRoutes = () => {
       balance.chainId.toString(),
     );
     const toToken = findToken(tokens, toTokenAddress, toChainId);
+
     if (!fromToken || !toToken) {
       return undefined;
     }
+
     return {
       fromToken,
       fromAmount: calculateFromAmount(
@@ -111,6 +116,7 @@ export const useRoutes = () => {
           && balance.chainId === toChainId
       ),
     );
+
     const amountDataArray: AmountData[] = filteredBalances
       .map((balance) => getAmountData(tokens, balance, toAmount, toChainId, toTokenAddress))
       .filter((value) => value !== undefined);
@@ -120,6 +126,7 @@ export const useRoutes = () => {
         data.balance.balance,
         data.balance.decimals,
       );
+
       return (
         parseFloat(formattedBalance.toString()) > parseFloat(data.fromAmount)
       );
@@ -163,11 +170,13 @@ export const useRoutes = () => {
     routeResponse: RouteResponse,
     toAmount: string,
   ) => {
-    const routeToAmount = getFormattedNumber(
-      routeResponse?.route.estimate.toAmount,
-      routeResponse?.route.estimate.toToken.decimals,
-    );
-    return Number(routeToAmount) > Number(toAmount);
+    if (!routeResponse?.route?.estimate?.toAmount || !routeResponse?.route?.estimate?.toToken?.decimals) {
+      throw new Error('Invalid route response or token decimals');
+    }
+
+    const toAmountInBaseUnits = utils.parseUnits(toAmount, routeResponse?.route.estimate.toToken.decimals);
+    const routeToAmountInBaseUnits = BigNumber.from(routeResponse.route.estimate.toAmount);
+    return routeToAmountInBaseUnits.gt(toAmountInBaseUnits);
   };
 
   const getRoute = async (
@@ -194,13 +203,16 @@ export const useRoutes = () => {
       if (!routeResponse?.route) {
         return {};
       }
+
       if (isRouteToAmountGreaterThanToAmount(routeResponse, toAmount)) {
         return { route: routeResponse };
       }
+
       const newFromAmount = calculateFromAmountFromRoute(
         routeResponse.route.estimate.exchangeRate,
         toAmount,
       );
+
       const newRoute = await getRouteWithRetry(
         squid,
         fromToken,
@@ -210,12 +222,15 @@ export const useRoutes = () => {
         fromAddress,
         quoteOnly,
       );
+
       if (!newRoute?.route) {
         return {};
       }
+
       if (isRouteToAmountGreaterThanToAmount(newRoute, toAmount)) {
         return { route: newRoute };
       }
+
       track({
         userJourney: UserJourney.ADD_FUNDS,
         screen: 'Routes',
@@ -265,6 +280,7 @@ export const useRoutes = () => {
     })));
 
     const routesData = await Promise.all(routePromises);
+
     return routesData.filter(
       (route): route is RouteData => route?.route !== undefined,
     );
