@@ -62,6 +62,9 @@ jobs:
       - name: Prepare examples
         run: yarn prepare:examples
 
+      - name: Install SDK at current version for @examples/sdk-load-widgets-with-nextjs
+        run: yarn workspace @examples/sdk-load-widgets-with-nextjs add @imtbl/sdk@$(npm view @imtbl/sdk version)
+
       - name: Build examples
         run: yarn build:examples
 
@@ -71,47 +74,11 @@ jobs:
       - name: Setup playwright
         uses: ./.github/actions/setup-playwright
 
-      - name: Prepare widgets bundle for Checkout Widgets example app
+      - name: Prepare widgets bundle for @examples/sdk-load-widgets-with-nextjs
         run: yarn workspace @imtbl/checkout-widgets prepare:examplewidgets
 
       - name: Test examples
         run: yarn test:examples
-
-  build-lint-test-example-widgets-with-sdk:
-    name: Build, Lint & Test Example Widgets with latest SDK
-    runs-on: ubuntu-latest-8-cores
-    env:
-      NODE_OPTIONS: --max-old-space-size=14366
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
-
-      - name: setup
-        uses: ./.github/actions/setup
-
-      - name: Setup playwright
-        uses: ./.github/actions/setup-playwright
-
-      - name: Install SDK at current version
-        run: yarn workspace @examples/sdk-load-widgets-with-nextjs add @imtbl/sdk@$(npm view @imtbl/sdk version)
-
-      - name: Build next app
-        run: yarn workspace @examples/sdk-load-widgets-with-nextjs build
-
-      - name: Build everything
-        run: yarn build
-
-      - name: Lint examples
-        run: yarn workspace @examples/sdk-load-widgets-with-nextjs lint
-
-      - name: Prepare widgets bundle for Checkout Widgets example app
-        run: yarn workspace @imtbl/checkout-widgets prepare:examplewidgets
-
-      - name: Test Widget example
-        run: yarn workspace @examples/sdk-load-widgets-with-nextjs test
 
   func-tests:
     name: Functional tests

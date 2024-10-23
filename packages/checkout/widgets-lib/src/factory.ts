@@ -95,14 +95,14 @@ export class WidgetsFactory implements IWidgetsFactory {
           provider,
         }) as Widget<WidgetType.SALE> as Widget<T>;
       }
-      case WidgetType.CHECKOUT: {
+      case WidgetType.UNIFIED_COMMERCE: {
         if (this.sdk.config.environment === Environment.PRODUCTION) {
           throw new Error('Checkout widget is not supported in production');
         }
         return new CheckoutWidgetRoot(this.sdk, {
           config: { ...this.widgetConfig, ...(config) },
           provider,
-        }) as Widget<WidgetType.CHECKOUT> as Widget<T>;
+        }) as Widget<WidgetType.UNIFIED_COMMERCE> as Widget<T>;
       }
       case WidgetType.ADD_FUNDS: {
         return new AddFunds(this.sdk, {

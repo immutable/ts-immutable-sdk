@@ -23,7 +23,7 @@ export type PostMessageProviderRelayData = any;
 export type PostMessageEIP6963Data = any;
 
 export type PostMessageWidgetEventData<
-  T extends WidgetType = WidgetType.CHECKOUT,
+  T extends WidgetType = WidgetType.UNIFIED_COMMERCE,
 > = {
   type: IMTBLWidgetEvents.IMTBL_CHECKOUT_WIDGET_EVENT;
   detail: WidgetEventDetail<T>;
