@@ -113,6 +113,42 @@ jobs:
       - name: Test Widget example
         run: yarn workspace @examples/sdk-load-widgets-with-nextjs test
 
+  test-checkout-widget-auto-updating:
+    name: Build, Lint & Test Example Widgets with latest SDK
+    runs-on: ubuntu-latest-8-cores
+    env:
+      NODE_OPTIONS: --max-old-space-size=14366
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: setup
+        uses: ./.github/actions/setup
+
+      - name: Setup playwright
+        uses: ./.github/actions/setup-playwright
+
+      - name: Install SDK at current version
+        run: yarn workspace @tests-checkout/widget-auto-updating add @imtbl/sdk@$(npm view @imtbl/sdk version)
+
+      - name: Build next app
+        run: yarn workspace @tests-checkout/widget-auto-updating build
+
+      - name: Build everything
+        run: yarn build
+
+      - name: Lint examples
+        run: yarn workspace @tests-checkout/widget-auto-updating lint
+
+      - name: Prepare widgets bundle for Checkout Widgets example app
+        run: yarn workspace @imtbl/checkout-widgets prepare:testwidgets
+
+      - name: Test Widget example
+        run: yarn workspace @tests-checkout/widget-auto-updating test
+
   func-tests:
     name: Functional tests
     runs-on: ubuntu-latest-8-cores
