@@ -644,19 +644,19 @@
       },
       "onboarding": {
         "screen1": {
-          "title": "Immutable에서 결제가 진화했습니다",
-          "caption": "잘 들으세요",
+          "title": "더 쉽게 이용할 수 있도록\n몇 가지를 변경했습니다",
+          "caption": "주의하세요",
           "buttonText": "다음"
         },
         "screen2": {
-          "title": "토큰을 Passport로 전달하고,\n어떤 지갑에서든지 결제하세요",
-          "caption": "진화된 내용",
+          "title": "패스포트로 토큰을 보내고\n어떤 지갑에서든 결제할 수 있습니다",
+          "caption": "변화된 점",
           "buttonText": "다음"
         },
         "screen3": {
-          "title": "다른 체인의 토큰으로 결제하고,\n최적의 옵션을 찾아드립니다",
+          "title": "다른 체인에서 토큰을 사용하고,\n최적의 옵션을 찾아드릴게요",
           "caption": "진화",
-          "buttonText": "결제할 지갑을 선택하세요"
+          "buttonText": "토큰 추가하기"
         }
       },
       "footer": {
