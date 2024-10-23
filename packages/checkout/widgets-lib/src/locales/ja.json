@@ -651,19 +651,19 @@
       },
       "onboarding": {
         "screen1": {
-          "title": "Immutableでの支払いが進化しました",
-          "caption": "よく聞いてください",
+          "title": "いくつか変更しました\nより簡単にするために",
+          "caption": "注目してください",
           "buttonText": "次へ"
         },
         "screen2": {
-          "title": "トークンをPassportに転送し、\n任意のウォレットから支払います",
-          "caption": "進化した内容",
+          "title": "トークンをパスポートに送って\nどのウォレットからでも支払い可能です",
+          "caption": "進化した点",
           "buttonText": "次へ"
         },
         "screen3": {
-          "title": "他のチェーンでトークンを使用して支払う、\n最適なオプションを見つけます",
+          "title": "他のチェーンでトークンを使用し、\n最適なオプションを見つけます",
           "caption": "進化",
-          "buttonText": "支払いに使用するウォレットを選択"
+          "buttonText": "トークンを追加しましょう"
         }
       },
       "footer": {
