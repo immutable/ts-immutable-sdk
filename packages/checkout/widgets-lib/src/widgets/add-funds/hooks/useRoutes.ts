@@ -83,9 +83,11 @@ export const useRoutes = () => {
       balance.chainId.toString(),
     );
     const toToken = findToken(tokens, toTokenAddress, toChainId);
+
     if (!fromToken || !toToken) {
       return undefined;
     }
+
     return {
       fromToken,
       fromAmount: calculateFromAmount(
@@ -114,6 +116,7 @@ export const useRoutes = () => {
           && balance.chainId === toChainId
       ),
     );
+
     const amountDataArray: AmountData[] = filteredBalances
       .map((balance) => getAmountData(tokens, balance, toAmount, toChainId, toTokenAddress))
       .filter((value) => value !== undefined);
