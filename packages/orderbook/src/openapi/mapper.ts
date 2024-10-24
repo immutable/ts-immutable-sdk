@@ -322,6 +322,11 @@ export function mapFromOpenApiTrade(trade: OpenApiTrade): Trade {
       recipientAddress: fee.recipient_address,
       type: fee.type as unknown as FeeType,
     })),
+    fees: trade.fees.map((fee) => ({
+      amount: fee.amount,
+      recipientAddress: fee.recipient_address,
+      type: fee.type as unknown as FeeType,
+    })),
     chain: trade.chain,
     indexedAt: trade.indexed_at,
     blockchainMetadata: {
