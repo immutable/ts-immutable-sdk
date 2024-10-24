@@ -355,11 +355,11 @@ export type SemanticVersion = {
  * @property {boolean | undefined} isBridgeEnabled
  */
 export type CheckoutWidgetsConfig = {
-  /** The theme of the Commerce Widget (default: "DARK") */
+  /** The theme of the Checkout Widget (default: "DARK") */
   theme?: WidgetTheme;
   /** The environment configuration (default: "SANDBOX") */
   environment?: Environment;
-  /** The version of the Commerce Widgets js file to use (default: "0.1.x") */
+  /** The version of the Checkout Widgets js file to use (default: "0.1.x") */
   version?: SemanticVersion;
   /** Enable on-ramp top-up method (default: "true") */
   isOnRampEnabled?: boolean;
