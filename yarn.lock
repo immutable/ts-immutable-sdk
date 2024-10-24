@@ -12168,6 +12168,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tests/checkout-widgets-nextjs@workspace:tests/func-tests/checkout/widgets-nextjs":
+  version: 0.0.0-use.local
+  resolution: "@tests/checkout-widgets-nextjs@workspace:tests/func-tests/checkout/widgets-nextjs"
+  dependencies:
+    "@biom3/react": ^0.25.21
+    "@ethersproject/providers": ^5.7.2
+    "@imtbl/sdk": latest
+    "@playwright/test": ^1.45.3
+    "@types/node": ^20
+    "@types/react": ^18.3.4
+    "@types/react-dom": ^18.3.0
+    eslint: ^8
+    eslint-config-next: 14.2.7
+    next: 14.2.7
+    react: ^18
+    react-dom: ^18
+    typescript: ^5.6.2
+  languageName: unknown
+  linkType: soft
+
 "@tests/func-tests-imx@workspace:tests/func-tests/imx":
   version: 0.0.0-use.local
   resolution: "@tests/func-tests-imx@workspace:tests/func-tests/imx"
