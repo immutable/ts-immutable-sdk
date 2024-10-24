@@ -111,11 +111,24 @@ export interface Trade {
   };
   buy: (NativeItem | ERC20Item | ERC721Item | ERC1155Item)[];
   sell: (ERC20Item | ERC721Item | ERC1155Item)[];
+  /**
+   * @deprecated Use {@linkcode Fees} instead (taker always pays the fees)
+   */
   buyerFees: Fee[];
+  /**
+   * @deprecated Use {@linkcode makerAddress} or {@linkcode takerAddress} instead
+   */
   sellerAddress: string;
+  /**
+   * @deprecated Use {@linkcode makerAddress} or {@linkcode takerAddress} instead
+   */
   buyerAddress: string;
   makerAddress: string;
   takerAddress: string;
+  /**
+   * Fees paid by the taker of the trade
+   */
+  fees: Fee[];
   /**
    * Time the on-chain event was indexed by the Immutable order book service
    */
