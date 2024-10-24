@@ -2,15 +2,15 @@ import {
   Suspense, useCallback, useEffect, useMemo,
 } from 'react';
 import {
-  CheckoutEventType,
-  CheckoutWidgetParams,
-  CheckoutFlowType,
-  CheckoutWidgetConfiguration,
+  CommerceEventType,
+  CommerceWidgetParams,
+  CommerceFlowType,
+  CommerceWidgetConfiguration,
   Checkout,
 } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { Web3Provider } from '@ethersproject/providers';
-import { CheckoutWidgetContextProvicer } from './context/CheckoutContextProvider';
+import { CommerceWidgetContextProvicer } from './context/CommerceContextProvider';
 import {
   useViewState,
   SharedViews,
@@ -18,7 +18,7 @@ import {
   ViewActions,
 } from '../../context/view-context/ViewContext';
 import { LoadingView } from '../../views/loading/LoadingView';
-import { sendCheckoutEvent } from './CheckoutWidgetEvents';
+import { sendCheckoutEvent } from './CommerceWidgetEvents';
 import { useEventTargetState } from '../../context/event-target-context/EventTargetContext';
 import { ErrorView } from '../../views/error/ErrorView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
@@ -36,18 +36,18 @@ import {
 } from './functions/getFlowRequiresContext';
 import { useWidgetEvents } from './hooks/useWidgetEvents';
 import { getConnectLoaderParams } from './functions/getConnectLoaderParams';
-import { checkoutFlows } from './functions/isValidCheckoutFlow';
+import { commerceFlows } from './functions/isValidCommerceFlow';
 import { ProvidersContextProvider } from '../../context/providers-context/ProvidersContext';
 
-export type CheckoutWidgetInputs = {
+export type CommerceWidgetInputs = {
   checkout: Checkout;
   web3Provider?: Web3Provider;
-  flowParams: CheckoutWidgetParams;
-  flowConfig: CheckoutWidgetConfiguration;
+  flowParams: CommerceWidgetParams;
+  flowConfig: CommerceWidgetConfiguration;
   widgetsConfig: StrongCheckoutWidgetsConfig;
 };
 
-export default function CheckoutWidget(props: CheckoutWidgetInputs) {
+export default function CommerceWidget(props: CommerceWidgetInputs) {
   const {
     flowParams, flowConfig, widgetsConfig, checkout, web3Provider,
   } = props;
@@ -117,7 +117,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
    * If invalid flow set error view
    */
   useEffect(() => {
-    if (checkoutFlows.includes(flowParams.flow)) return;
+    if (commerceFlows.includes(flowParams.flow)) return;
 
     viewDispatch({
       payload: {
@@ -156,7 +156,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
 
   return (
     <ViewContextProvider>
-      <CheckoutWidgetContextProvicer>
+      <CommerceWidgetContextProvicer>
         {/* --- Status Views --- */}
         {view.type === SharedViews.LOADING_VIEW && (
           <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
@@ -165,7 +165,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
           <ErrorView
             onCloseClick={() => {
               sendCheckoutEvent(eventTarget, {
-                type: CheckoutEventType.CLOSE,
+                type: CommerceEventType.CLOSE,
                 data: {},
               });
             }}
@@ -176,20 +176,20 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
           />
         )}
         {/* --- Widgets without connect loader or providers context --- */}
-        {view.type === CheckoutFlowType.CONNECT && (
+        {view.type === CommerceFlowType.CONNECT && (
           <ConnectWidget
             config={widgetsConfig}
             checkout={checkout}
             sendCloseEventOverride={() => {
               sendCheckoutEvent(eventTarget, {
-                type: CheckoutEventType.CLOSE,
+                type: CommerceEventType.CLOSE,
                 data: {},
               });
             }}
             {...(view.data.params || {})}
           />
         )}
-        {view.type === CheckoutFlowType.BRIDGE && (
+        {view.type === CommerceFlowType.BRIDGE && (
           <BridgeWidget
             config={widgetsConfig}
             checkout={checkout}
@@ -201,7 +201,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
         {/* --- Widgets that require providers context --- */}
         {shouldWrapWithProvidersContext && (
           <ProvidersContextProvider initialState={{ checkout }}>
-            {view.type === CheckoutFlowType.ADD_FUNDS && (
+            {view.type === CommerceFlowType.ADD_FUNDS && (
               <AddFundsWidget
                 config={widgetsConfig}
                 {...(view.data.params || {})}
@@ -218,7 +218,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
             params={connectLoaderParams}
             closeEvent={() => {
               sendCheckoutEvent(eventTarget, {
-                type: CheckoutEventType.CLOSE,
+                type: CommerceEventType.CLOSE,
                 data: {},
               });
             }}
@@ -230,7 +230,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
                 <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
               }
             >
-              {view.type === CheckoutFlowType.WALLET && (
+              {view.type === CommerceFlowType.WALLET && (
                 <WalletWidget
                   config={widgetsConfig}
                   walletConfig={{
@@ -241,7 +241,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
                   {...(view.data.params || {})}
                 />
               )}
-              {view.type === CheckoutFlowType.SALE && (
+              {view.type === CommerceFlowType.SALE && (
                 <SaleWidget
                   config={widgetsConfig}
                   {...(view.data.params || {})}
@@ -252,7 +252,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
                   }}
                 />
               )}
-              {view.type === CheckoutFlowType.SWAP && (
+              {view.type === CommerceFlowType.SWAP && (
                 <SwapWidget
                   config={widgetsConfig}
                   {...(view.data.params || {})}
@@ -260,7 +260,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
                   showBackButton={showBackButton}
                 />
               )}
-              {view.type === CheckoutFlowType.ONRAMP && (
+              {view.type === CommerceFlowType.ONRAMP && (
                 <OnRampWidget
                   config={widgetsConfig}
                   {...(view.data.params || {})}
@@ -271,7 +271,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
             </Suspense>
           </ConnectLoader>
         )}
-      </CheckoutWidgetContextProvicer>
+      </CommerceWidgetContextProvicer>
     </ViewContextProvider>
   );
 }

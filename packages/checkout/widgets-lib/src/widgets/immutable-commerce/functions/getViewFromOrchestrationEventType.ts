@@ -1,24 +1,24 @@
-import { CheckoutFlowType, OrchestrationEventType } from '@imtbl/checkout-sdk';
+import { CommerceFlowType, OrchestrationEventType } from '@imtbl/checkout-sdk';
 
 /**
  * Get view from orchestration event type
  */
 export function getViewFromOrchestrationEventType(
   type: OrchestrationEventType,
-): CheckoutFlowType | null {
+): CommerceFlowType | null {
   switch (type) {
     case OrchestrationEventType.REQUEST_SWAP:
-      return CheckoutFlowType.SWAP;
+      return CommerceFlowType.SWAP;
     case OrchestrationEventType.REQUEST_CONNECT:
-      return CheckoutFlowType.CONNECT;
+      return CommerceFlowType.CONNECT;
     case OrchestrationEventType.REQUEST_WALLET:
-      return CheckoutFlowType.WALLET;
+      return CommerceFlowType.WALLET;
     case OrchestrationEventType.REQUEST_BRIDGE:
-      return CheckoutFlowType.BRIDGE;
+      return CommerceFlowType.BRIDGE;
     case OrchestrationEventType.REQUEST_ONRAMP:
-      return CheckoutFlowType.ONRAMP;
+      return CommerceFlowType.ONRAMP;
     case OrchestrationEventType.REQUEST_ADD_FUNDS:
-      return CheckoutFlowType.ADD_FUNDS;
+      return CommerceFlowType.ADD_FUNDS;
     default:
       return null;
   }

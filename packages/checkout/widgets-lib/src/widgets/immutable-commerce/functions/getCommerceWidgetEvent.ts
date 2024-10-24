@@ -1,10 +1,10 @@
 import {
   AddFundsEventType,
   BridgeEventType,
-  CheckoutEventType,
-  CheckoutFailureEventType,
-  CheckoutSuccessEventType,
-  CheckoutUserActionEventType,
+  CommerceEventType,
+  CommerceFailureEventType,
+  CommerceSuccessEventType,
+  CommerceUserActionEventType,
   ConnectEventType,
   IMTBLWidgetEvents,
   OnRampEventType,
@@ -14,38 +14,38 @@ import {
   WalletEventType,
 } from '@imtbl/checkout-sdk';
 
-import { CheckoutEventDetail } from '../CheckoutWidgetEvents';
+import { CommerceEventDetail } from '../CommerceWidgetEvents';
 
 /**
  * Map Connect Widget Events
  */
 function mapConnectWidgetEvent(
   event: CustomEvent<{ type: ConnectEventType; data: Record<string, unknown> }>,
-): CheckoutEventDetail {
+): CommerceEventDetail {
   const { type, data } = event.detail;
 
   switch (type) {
     case ConnectEventType.SUCCESS:
       return {
-        type: CheckoutEventType.SUCCESS,
+        type: CommerceEventType.SUCCESS,
         data: {
-          type: CheckoutSuccessEventType.CONNECT_SUCCESS,
+          type: CommerceSuccessEventType.CONNECT_SUCCESS,
           data,
         },
       };
 
     case ConnectEventType.FAILURE:
       return {
-        type: CheckoutEventType.FAILURE,
+        type: CommerceEventType.FAILURE,
         data: {
-          type: CheckoutFailureEventType.CONNECT_FAILED,
+          type: CommerceFailureEventType.CONNECT_FAILED,
           data,
         },
       };
 
     case ConnectEventType.CLOSE_WIDGET:
       return {
-        type: CheckoutEventType.CLOSE,
+        type: CommerceEventType.CLOSE,
         data: {},
       };
 
@@ -59,26 +59,26 @@ function mapConnectWidgetEvent(
  */
 function mapWalletWidgetEvent(
   event: CustomEvent<{ type: WalletEventType; data: Record<string, unknown> }>,
-): CheckoutEventDetail {
+): CommerceEventDetail {
   const { type, data } = event.detail;
 
   switch (type) {
     case WalletEventType.NETWORK_SWITCH:
       return {
-        type: CheckoutEventType.USER_ACTION,
+        type: CommerceEventType.USER_ACTION,
         data: {
-          type: CheckoutUserActionEventType.NETWORK_SWITCH,
+          type: CommerceUserActionEventType.NETWORK_SWITCH,
           data,
         },
       };
     case WalletEventType.DISCONNECT_WALLET:
       return {
-        type: CheckoutEventType.DISCONNECTED,
+        type: CommerceEventType.DISCONNECTED,
         data: {},
       };
     case WalletEventType.CLOSE_WIDGET:
       return {
-        type: CheckoutEventType.CLOSE,
+        type: CommerceEventType.CLOSE,
         data: {},
       };
     default:
@@ -91,37 +91,37 @@ function mapWalletWidgetEvent(
  */
 function mapSwapWidgetEvent(
   event: CustomEvent<{ type: SwapEventType; data: Record<string, unknown> }>,
-): CheckoutEventDetail {
+): CommerceEventDetail {
   const { type, data } = event.detail;
 
   switch (type) {
     case SwapEventType.SUCCESS:
       return {
-        type: CheckoutEventType.SUCCESS,
+        type: CommerceEventType.SUCCESS,
         data: {
-          type: CheckoutSuccessEventType.SWAP_SUCCESS,
+          type: CommerceSuccessEventType.SWAP_SUCCESS,
           data,
         },
       };
     case SwapEventType.FAILURE:
       return {
-        type: CheckoutEventType.FAILURE,
+        type: CommerceEventType.FAILURE,
         data: {
-          type: CheckoutFailureEventType.SWAP_FAILED,
+          type: CommerceFailureEventType.SWAP_FAILED,
           data,
         },
       };
     case SwapEventType.REJECTED:
       return {
-        type: CheckoutEventType.FAILURE,
+        type: CommerceEventType.FAILURE,
         data: {
-          type: CheckoutFailureEventType.SWAP_REJECTED,
+          type: CommerceFailureEventType.SWAP_REJECTED,
           data,
         },
       };
     case SwapEventType.CLOSE_WIDGET:
       return {
-        type: CheckoutEventType.CLOSE,
+        type: CommerceEventType.CLOSE,
         data: {},
       };
 
@@ -135,7 +135,7 @@ function mapSwapWidgetEvent(
  */
 function mapAddFundsWidgetEvent(
   event: CustomEvent<{ type: AddFundsEventType; data: Record<string, unknown> }>,
-): CheckoutEventDetail {
+): CommerceEventDetail {
   const { type } = event.detail;
 
   switch (type) {
@@ -149,45 +149,45 @@ function mapAddFundsWidgetEvent(
  */
 function mapBridgeWidgetEvent(
   event: CustomEvent<{ type: BridgeEventType; data: Record<string, unknown> }>,
-): CheckoutEventDetail {
+): CommerceEventDetail {
   const { type, data } = event.detail;
 
   switch (type) {
     case BridgeEventType.TRANSACTION_SENT:
       return {
-        type: CheckoutEventType.SUCCESS,
+        type: CommerceEventType.SUCCESS,
         data: {
-          type: CheckoutSuccessEventType.BRIDGE_SUCCESS,
+          type: CommerceSuccessEventType.BRIDGE_SUCCESS,
           data,
         },
       };
     case BridgeEventType.CLAIM_WITHDRAWAL_SUCCESS:
       return {
-        type: CheckoutEventType.SUCCESS,
+        type: CommerceEventType.SUCCESS,
         data: {
-          type: CheckoutSuccessEventType.BRIDGE_CLAIM_WITHDRAWAL_SUCCESS,
+          type: CommerceSuccessEventType.BRIDGE_CLAIM_WITHDRAWAL_SUCCESS,
           data,
         },
       };
     case BridgeEventType.CLAIM_WITHDRAWAL_FAILURE:
       return {
-        type: CheckoutEventType.FAILURE,
+        type: CommerceEventType.FAILURE,
         data: {
-          type: CheckoutFailureEventType.BRIDGE_CLAIM_WITHDRAWAL_FAILED,
+          type: CommerceFailureEventType.BRIDGE_CLAIM_WITHDRAWAL_FAILED,
           data,
         },
       };
     case BridgeEventType.FAILURE:
       return {
-        type: CheckoutEventType.FAILURE,
+        type: CommerceEventType.FAILURE,
         data: {
-          type: CheckoutFailureEventType.BRIDGE_FAILED,
+          type: CommerceFailureEventType.BRIDGE_FAILED,
           data,
         },
       };
     case BridgeEventType.CLOSE_WIDGET:
       return {
-        type: CheckoutEventType.CLOSE,
+        type: CommerceEventType.CLOSE,
         data: {},
       };
     default:
@@ -200,29 +200,29 @@ function mapBridgeWidgetEvent(
  */
 function mapOnrampWidgetEvent(
   event: CustomEvent<{ type: OnRampEventType; data: Record<string, unknown> }>,
-): CheckoutEventDetail {
+): CommerceEventDetail {
   const { type, data } = event.detail;
 
   switch (type) {
     case OnRampEventType.SUCCESS:
       return {
-        type: CheckoutEventType.SUCCESS,
+        type: CommerceEventType.SUCCESS,
         data: {
-          type: CheckoutSuccessEventType.ONRAMP_SUCCESS,
+          type: CommerceSuccessEventType.ONRAMP_SUCCESS,
           data,
         },
       };
     case OnRampEventType.FAILURE:
       return {
-        type: CheckoutEventType.FAILURE,
+        type: CommerceEventType.FAILURE,
         data: {
-          type: CheckoutFailureEventType.ONRAMP_FAILED,
+          type: CommerceFailureEventType.ONRAMP_FAILED,
           data,
         },
       };
     case OnRampEventType.CLOSE_WIDGET:
       return {
-        type: CheckoutEventType.CLOSE,
+        type: CommerceEventType.CLOSE,
         data: {},
       };
     default:
@@ -232,52 +232,52 @@ function mapOnrampWidgetEvent(
 
 function mapSaleWidgetEvent(
   event: CustomEvent<{ type: SaleEventType; data: Record<string, unknown> }>,
-): CheckoutEventDetail {
+): CommerceEventDetail {
   const { type, data } = event.detail;
 
   switch (type) {
     case SaleEventType.SUCCESS:
       return {
-        type: CheckoutEventType.SUCCESS,
+        type: CommerceEventType.SUCCESS,
         data: {
-          type: CheckoutSuccessEventType.SALE_SUCCESS,
+          type: CommerceSuccessEventType.SALE_SUCCESS,
           data,
         },
       };
     case SaleEventType.FAILURE:
       return {
-        type: CheckoutEventType.FAILURE,
+        type: CommerceEventType.FAILURE,
         data: {
-          type: CheckoutFailureEventType.SALE_FAILED,
+          type: CommerceFailureEventType.SALE_FAILED,
           data,
         },
       };
     case SaleEventType.CLOSE_WIDGET:
       return {
-        type: CheckoutEventType.CLOSE,
+        type: CommerceEventType.CLOSE,
         data: {},
       };
     case SaleEventType.TRANSACTION_SUCCESS:
       return {
-        type: CheckoutEventType.SUCCESS,
+        type: CommerceEventType.SUCCESS,
         data: {
-          type: CheckoutSuccessEventType.SALE_TRANSACTION_SUCCESS,
+          type: CommerceSuccessEventType.SALE_TRANSACTION_SUCCESS,
           data,
         },
       };
     case SaleEventType.PAYMENT_METHOD:
       return {
-        type: CheckoutEventType.USER_ACTION,
+        type: CommerceEventType.USER_ACTION,
         data: {
-          type: CheckoutUserActionEventType.PAYMENT_METHOD_SELECTED,
+          type: CommerceUserActionEventType.PAYMENT_METHOD_SELECTED,
           data,
         },
       };
     case SaleEventType.PAYMENT_TOKEN:
       return {
-        type: CheckoutEventType.USER_ACTION,
+        type: CommerceEventType.USER_ACTION,
         data: {
-          type: CheckoutUserActionEventType.PAYMENT_TOKEN_SELECTED,
+          type: CommerceUserActionEventType.PAYMENT_TOKEN_SELECTED,
           data,
         },
       };
@@ -287,14 +287,14 @@ function mapSaleWidgetEvent(
 }
 
 /**
- * Map widget events to checkout widget event detail
+ * Map widget events to commerce widget event detail
  */
-export function getCheckoutWidgetEvent(
+export function getCommerceWidgetEvent(
   event: CustomEvent,
-): CheckoutEventDetail {
+): CommerceEventDetail {
   if (event.detail.type === ProviderEventType.PROVIDER_UPDATED) {
     return {
-      type: CheckoutEventType.PROVIDER_UPDATED,
+      type: CommerceEventType.PROVIDER_UPDATED,
       data: event.detail.data,
     };
   }

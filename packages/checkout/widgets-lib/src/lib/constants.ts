@@ -47,42 +47,42 @@ export const DEFAULT_TRANSACTIONS_RETRY_POLICY: RetryType = {
 };
 
 /**
- * Checkout Widget default env
+ * Commerce Widget default env
  */
 export const DEFAULT_ENV = Environment.SANDBOX;
 
 /**
- * Checkout Widget default theme
+ * Commerce Widget default theme
  */
 export const DEFAULT_THEME = WidgetTheme.DARK;
 
 /**
- * Checkout Widget default provider
+ * Commerce Widget default provider
  */
 export const DEFAULT_PROVIDER = WalletProviderName.METAMASK;
 
 /**
- * Checkout Widget default onramp enabled flag
+ * Commerce Widget default onramp enabled flag
  */
 export const DEFAULT_ON_RAMP_ENABLED = true;
 
 /**
- * Checkout Widget default swap enabled flag
+ * Commerce Widget default swap enabled flag
  */
 export const DEFAULT_SWAP_ENABLED = true;
 
 /**
- * Checkout Widget default bridge enabled flag
+ * Commerce Widget default bridge enabled flag
  */
 export const DEFAULT_BRIDGE_ENABLED = true;
 
 /**
- * Checkout Widget default add funds enabled flag
+ * Commerce Widget default add funds enabled flag
  */
 export const DEFAULT_ADD_FUNDS_ENABLED = true;
 
 /**
- * Checkout Widget default refresh quote interval
+ * Commerce Widget default refresh quote interval
  */
 export const DEFAULT_QUOTE_REFRESH_INTERVAL = 30000;
 

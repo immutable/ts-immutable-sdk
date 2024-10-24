@@ -1,18 +1,18 @@
 import {
   IMTBLWidgetEvents,
-  CheckoutWidgetConfiguration,
-  CheckoutWidgetParams,
+  CommerceWidgetConfiguration,
+  CommerceWidgetParams,
   WidgetProperties,
   WidgetTheme,
   WidgetType,
-  CheckoutWidgetConnectFlowParams,
-  CheckoutWidgetWalletFlowParams,
-  CheckoutWidgetAddFundsFlowParams,
-  CheckoutWidgetSwapFlowParams,
-  CheckoutWidgetBridgeFlowParams,
-  CheckoutWidgetOnRampFlowParams,
-  CheckoutWidgetSaleFlowParams,
-  CheckoutFlowType,
+  CommerceWidgetConnectFlowParams,
+  CommerceWidgetWalletFlowParams,
+  CommerceWidgetAddFundsFlowParams,
+  CommerceWidgetSwapFlowParams,
+  CommerceWidgetBridgeFlowParams,
+  CommerceWidgetOnRampFlowParams,
+  CommerceWidgetSaleFlowParams,
+  CommerceFlowType,
 } from '@imtbl/checkout-sdk';
 import React, { Suspense } from 'react';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
@@ -27,17 +27,17 @@ import {
   isValidWalletProvider,
 } from '../../lib/validations/widgetValidators';
 import { deduplicateSaleItemsArray } from './functions/deduplicateSaleItemsArray';
-import { checkoutFlows } from './functions/isValidCheckoutFlow';
+import { commerceFlows } from './functions/isValidCommerceFlow';
 
-const CheckoutWidget = React.lazy(() => import('./CheckoutWidget'));
+const CommerceWidget = React.lazy(() => import('./CommerceWidget'));
 
-export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
-  protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_CHECKOUT_WIDGET_EVENT;
+export class CommerceWidgetRoot extends Base<WidgetType.IMMUTABLE_COMMERCE> {
+  protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_COMMERCE_WIDGET_EVENT;
 
   protected getValidatedProperties({
     config,
-  }: WidgetProperties<WidgetType.CHECKOUT>): WidgetProperties<WidgetType.CHECKOUT> {
-    let validatedConfig: CheckoutWidgetConfiguration | undefined;
+  }: WidgetProperties<WidgetType.IMMUTABLE_COMMERCE>): WidgetProperties<WidgetType.IMMUTABLE_COMMERCE> {
+    let validatedConfig: CommerceWidgetConfiguration | undefined;
 
     if (config) {
       validatedConfig = config;
@@ -52,7 +52,7 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
     };
   }
 
-  protected getValidConnectFlowParams(params: CheckoutWidgetConnectFlowParams) {
+  protected getValidConnectFlowParams(params: CommerceWidgetConnectFlowParams) {
     const validatedParams = { ...params };
 
     if (!Array.isArray(validatedParams.blocklistWalletRdns)) {
@@ -64,11 +64,11 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
     return validatedParams;
   }
 
-  protected getValidWalletFlowParams(params: CheckoutWidgetWalletFlowParams) {
+  protected getValidWalletFlowParams(params: CommerceWidgetWalletFlowParams) {
     return params;
   }
 
-  protected getValidSaleFlowParams(params: CheckoutWidgetSaleFlowParams) {
+  protected getValidSaleFlowParams(params: CommerceWidgetSaleFlowParams) {
     const validatedParams = { ...params };
 
     if (!isValidWalletProvider(params.walletProviderName)) {
@@ -111,7 +111,7 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
   }
 
   protected getValidAddFundsFlowParams(
-    params: CheckoutWidgetAddFundsFlowParams,
+    params: CommerceWidgetAddFundsFlowParams,
   ) {
     const validatedParams = { ...params };
 
@@ -142,7 +142,7 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
     return validatedParams;
   }
 
-  protected getValidSwapFlowParams(params: CheckoutWidgetSwapFlowParams) {
+  protected getValidSwapFlowParams(params: CommerceWidgetSwapFlowParams) {
     const validatedParams = { ...params };
 
     if (!isValidAmount(params.amount)) {
@@ -170,7 +170,7 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
     return validatedParams;
   }
 
-  protected getValidBridgeFlowParams(params: CheckoutWidgetBridgeFlowParams) {
+  protected getValidBridgeFlowParams(params: CommerceWidgetBridgeFlowParams) {
     const validatedParams = { ...params };
 
     if (!isValidAmount(params.amount)) {
@@ -188,7 +188,7 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
     return validatedParams;
   }
 
-  protected getValidOnRampFlowParams(params: CheckoutWidgetOnRampFlowParams) {
+  protected getValidOnRampFlowParams(params: CommerceWidgetOnRampFlowParams) {
     const validatedParams = { ...params };
 
     if (!isValidAmount(params.amount)) {
@@ -207,30 +207,30 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
   }
 
   protected getValidatedParameters(
-    params: CheckoutWidgetParams,
-  ): CheckoutWidgetParams {
+    params: CommerceWidgetParams,
+  ): CommerceWidgetParams {
     // if empty do nothing
     if (Object.keys(params).length === 0) {
       return params;
     }
 
     const flowType = params.flow;
-    const supportedFlows = checkoutFlows.join(', ');
+    const supportedFlows = commerceFlows.join(', ');
 
     switch (flowType) {
-      case CheckoutFlowType.CONNECT:
+      case CommerceFlowType.CONNECT:
         return this.getValidConnectFlowParams(params);
-      case CheckoutFlowType.WALLET:
+      case CommerceFlowType.WALLET:
         return this.getValidWalletFlowParams(params);
-      case CheckoutFlowType.SALE:
+      case CommerceFlowType.SALE:
         return this.getValidSaleFlowParams(params);
-      case CheckoutFlowType.SWAP:
+      case CommerceFlowType.SWAP:
         return this.getValidSwapFlowParams(params);
-      case CheckoutFlowType.BRIDGE:
+      case CommerceFlowType.BRIDGE:
         return this.getValidBridgeFlowParams(params);
-      case CheckoutFlowType.ONRAMP:
+      case CommerceFlowType.ONRAMP:
         return this.getValidOnRampFlowParams(params);
-      case CheckoutFlowType.ADD_FUNDS:
+      case CommerceFlowType.ADD_FUNDS:
         return this.getValidAddFundsFlowParams(params);
       default:
         // eslint-disable-next-line no-console
@@ -255,7 +255,7 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
                 <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
               }
             >
-              <CheckoutWidget
+              <CommerceWidget
                 checkout={this.checkout}
                 web3Provider={this.web3Provider}
                 flowParams={this.parameters}

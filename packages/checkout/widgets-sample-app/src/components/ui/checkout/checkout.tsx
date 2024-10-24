@@ -21,11 +21,11 @@ import {
   WidgetLanguage,
   WidgetTheme,
   CreateProviderParams,
-  CheckoutWidgetParams,
-  CheckoutEventType,
-  CheckoutSuccessEventType,
+  CommerceWidgetParams,
+  CommerceEventType,
+  CommerceSuccessEventType,
   WidgetType,
-  CheckoutFlowType,
+  CommerceFlowType,
   WalletProviderName,
   Widget,
   SalePaymentTypes,
@@ -77,7 +77,6 @@ const getCheckoutSdk = (passportClient: Passport, environment: Environment) =>
     passport: passportClient,
     baseConfig: getBaseConfig(environment),
     overrides: {
-      // checkoutAppUrl: "http://localhost:3001",
       // environment: "development" as Environment,
     },
     // swap: { enable: true }
@@ -132,15 +131,15 @@ const createWeb3Provider = async (
   }
 };
 
-// checkout widget flows
-const flows: Array<CheckoutFlowType> = [
-  CheckoutFlowType.CONNECT,
-  CheckoutFlowType.WALLET,
-  CheckoutFlowType.ONRAMP,
-  CheckoutFlowType.SWAP,
-  CheckoutFlowType.BRIDGE,
-  CheckoutFlowType.SALE,
-  CheckoutFlowType.ADD_FUNDS,
+// Commerce Widget flows
+const flows: Array<CommerceFlowType> = [
+  CommerceFlowType.CONNECT,
+  CommerceFlowType.WALLET,
+  CommerceFlowType.ONRAMP,
+  CommerceFlowType.SWAP,
+  CommerceFlowType.BRIDGE,
+  CommerceFlowType.SALE,
+  CommerceFlowType.ADD_FUNDS,
 ];
 
 function CheckoutUI() {
@@ -151,8 +150,6 @@ function CheckoutUI() {
   const [environment, prevEnvironment, setEnvironment] = usePrevState(
     Environment.SANDBOX
   );
-
-  const [checkoutAppURL, setCheckoutAppURL] = useState("");
 
   const configEnvironment = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
@@ -173,22 +170,22 @@ function CheckoutUI() {
   );
 
   // set a state to keep widget params and configs
-  const [params, setParams] = useState<CheckoutWidgetParams | undefined>(
+  const [params, setParams] = useState<CommerceWidgetParams | undefined>(
     undefined
   );
 
   const [flowParams, setFlowParams] = useState<
-    Partial<Record<CheckoutFlowType, CheckoutWidgetParams>>
+    Partial<Record<CommerceFlowType, CommerceWidgetParams>>
   >({
     CONNECT: {
-      flow: CheckoutFlowType.CONNECT,
+      flow: CommerceFlowType.CONNECT,
       // blocklistWalletRdns: ["io.metamask"],
       // targetChainId: ChainId.SEPOLIA,
       // targetWalletRdns: "io.metamask",
       theme: WidgetTheme.LIGHT,
     },
     SALE: {
-      flow: CheckoutFlowType.SALE,
+      flow: CommerceFlowType.SALE,
       items: itemsMock,
       environmentId: "4dfc4bec-1867-49aa-ad35-d8a13b206c94",
       collectionName: "Pixel Aussie Farm",
@@ -196,16 +193,16 @@ function CheckoutUI() {
       // preferredCurrency: 'USDC',
     },
     SWAP: {
-      flow: CheckoutFlowType.SWAP,
+      flow: CommerceFlowType.SWAP,
       amount: "10",
       fromTokenAddress: "native",
       toTokenAddress: "0x3B2d8A1931736Fc321C24864BceEe981B11c3c57",
     },
     WALLET: {
-      flow: CheckoutFlowType.WALLET,
+      flow: CommerceFlowType.WALLET,
     },
     ADD_FUNDS: {
-      flow: CheckoutFlowType.ADD_FUNDS,
+      flow: CommerceFlowType.ADD_FUNDS,
       toAmount: "1",
       toTokenAddress: "native",
     },
@@ -271,14 +268,14 @@ function CheckoutUI() {
 
   // create the widget once factory is available
   // ignore language or theme changes
-  const prevWidget = useRef<Widget<typeof WidgetType.CHECKOUT> | undefined>(
+  const prevWidget = useRef<Widget<typeof WidgetType.IMMUTABLE_COMMERCE> | undefined>(
     undefined
   );
   const widget = useAsyncMemo(async () => {
     if (widgetsFactory === undefined) return undefined;
     if (renderAfterConnect && !web3Provider) return undefined;
 
-    return widgetsFactory.create(WidgetType.CHECKOUT, {
+    return widgetsFactory.create(WidgetType.IMMUTABLE_COMMERCE, {
       provider: web3Provider,
       config: {
         theme,
@@ -304,21 +301,11 @@ function CheckoutUI() {
     if (!widget || mounted.current) return;
 
     // add event listeners
-    widget.addListener(CheckoutEventType.INITIALISED, () => {
+    widget.addListener(CommerceEventType.INITIALISED, () => {
       setEventResults((prev) => [...prev, { initialised: true }]);
-
-      if (typeof window === "undefined") return;
-
-      const checkoutAppIframe = document.getElementById(
-        "checkout-app"
-      ) as HTMLIFrameElement;
-
-      if (checkoutAppIframe?.src) {
-        setCheckoutAppURL(checkoutAppIframe.src);
-      }
     });
 
-    widget.addListener(CheckoutEventType.DISCONNECTED, () => {
+    widget.addListener(CommerceEventType.DISCONNECTED, () => {
       setEventResults((prev) => [...prev, { disconnected: true }]);
     });
     // widget.addListener(
@@ -332,28 +319,28 @@ function CheckoutUI() {
     //     ]);
     //   }
     // );
-    widget.addListener(CheckoutEventType.SUCCESS, (payload) => {
-      if (payload.type === CheckoutSuccessEventType.CONNECT_SUCCESS) {
+    widget.addListener(CommerceEventType.SUCCESS, (payload) => {
+      if (payload.type === CommerceSuccessEventType.CONNECT_SUCCESS) {
         const { provider, ...data } = payload.data;
         console.log("SUCCESS ---->", provider);
         setWeb3Provider(provider);
         setEventResults((prev) => [...prev, { success: true, ...data }]);
       }
     });
-    widget.addListener(CheckoutEventType.USER_ACTION, (data) => {
+    widget.addListener(CommerceEventType.USER_ACTION, (data) => {
       setEventResults((prev) => [...prev, { userAction: true, ...data }]);
     });
-    widget.addListener(CheckoutEventType.FAILURE, (data) => {
+    widget.addListener(CommerceEventType.FAILURE, (data) => {
       setEventResults((prev) => [...prev, { failure: true, ...data }]);
     });
-    widget.addListener(CheckoutEventType.CLOSE, () => {
+    widget.addListener(CommerceEventType.CLOSE, () => {
       setEventResults((prev) => [...prev, { closed: true }]);
       widget.unmount();
     });
 
     // // set initial flow to wallet
     // setParams({
-    //   flow: checkout.CheckoutFlowType.CONNECT,
+    //   flow: checkout.CommerceFlowType.CONNECT,
     // });
   }, [widget]);
 
@@ -420,7 +407,7 @@ function CheckoutUI() {
             <MenuItem
               onClick={() => {
                 setParams({
-                  flow: CheckoutFlowType.CONNECT,
+                  flow: CommerceFlowType.CONNECT,
                 });
               }}
             >
@@ -429,7 +416,7 @@ function CheckoutUI() {
             <MenuItem
               onClick={() => {
                 setParams({
-                  flow: CheckoutFlowType.WALLET,
+                  flow: CommerceFlowType.WALLET,
                 });
               }}
             >
@@ -438,7 +425,7 @@ function CheckoutUI() {
             <MenuItem
               onClick={() => {
                 setParams({
-                  flow: CheckoutFlowType.SWAP,
+                  flow: CommerceFlowType.SWAP,
                   amount: "10",
                   fromTokenAddress: "native",
                 });
@@ -449,7 +436,7 @@ function CheckoutUI() {
             <MenuItem
               onClick={() => {
                 setParams({
-                  flow: CheckoutFlowType.BRIDGE,
+                  flow: CommerceFlowType.BRIDGE,
                 });
               }}
             >
@@ -458,7 +445,7 @@ function CheckoutUI() {
             <MenuItem
               onClick={() => {
                 setParams({
-                  flow: CheckoutFlowType.ONRAMP,
+                  flow: CommerceFlowType.ONRAMP,
                 });
               }}
             >
@@ -467,7 +454,7 @@ function CheckoutUI() {
             <MenuItem
               onClick={() => {
                 setParams({
-                  flow: CheckoutFlowType.SALE,
+                  flow: CommerceFlowType.SALE,
                   items: [
                     {
                       productId: "kangaroo",
@@ -544,7 +531,6 @@ function CheckoutUI() {
           <Stack sx={{ flexWrap: "wrap", py: "base.spacing.x2" }}>
             {/* --- --- --- */}
             <Legend>Environment: {environment.toUpperCase()}</Legend>
-            {checkoutAppURL && new URL(checkoutAppURL).origin}
             <Box
               sx={{
                 display: "flex",
@@ -667,7 +653,7 @@ function CheckoutUI() {
                 <Select
                   defaultLabel="Select a Flow"
                   onSelectChange={(value) => {
-                    const flow = value as CheckoutFlowType;
+                    const flow = value as CommerceFlowType;
                     setParams({
                       ...(flowParams[flow as keyof typeof flowParams] || {}),
                       flow,
@@ -702,22 +688,6 @@ function CheckoutUI() {
             brad: "base.borderRadius.x5",
           }}
         />
-      </Box>
-      <Box>
-        {checkoutAppURL && (
-          <Message type="success" title="Checkout App URL">
-            <Link
-              variant="secondary"
-              weight="bold"
-              onClick={() => {
-                window.open(checkoutAppURL, "_blank", "noopener,noreferrer");
-              }}
-            >
-              {checkoutAppURL}
-              <Link.Icon icon="JumpTo" />
-            </Link>
-          </Message>
-        )}
       </Box>
     </Box>
   );

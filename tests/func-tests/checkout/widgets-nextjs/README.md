@@ -1,11 +1,7 @@
-# Checkout SDK Widgets Example App
+# Checkout SDK Widgets Auto Updating Testing
 
-This example app shows how to use the Commerce Widget, loaded from the Checkout SDK. It will cover scenarios including mounting, executing flows, and handling events.
-
-**Example App implementation progress:**
-- [x] Mounting Commerce Widget
-- [ ] Executing different flows
-- [ ] Events
+This test covers autoupdating of the Checkout SDK's Widgets.
+See https://immutable.atlassian.net/wiki/spaces/PR/pages/2796814550/Checkout+Widgets+Auto-Updating+Docs
 
 ## Getting Started
 
@@ -29,7 +25,7 @@ yarn dev
 
 ## E2E Testing
 
-There are tests covering the auto updating of the Commerce Widget.
+There are tests covering the auto updating of the Checkout Widget.
 
 Build the app:
 
@@ -59,4 +55,12 @@ Run tests against the local bundle:
 
 ```bash
 yarn test
+```
+
+### Validating Widget Breaking Changes
+
+We can inject a Checkout Widgets Version Config into the app to validate auto updating.
+
+```bash
+INTERCEPT_CHECKOUT_VERSION_CONFIG=1.58.0 yarn workspace @examples/sdk-load-widgets-with-nextjs test
 ```
