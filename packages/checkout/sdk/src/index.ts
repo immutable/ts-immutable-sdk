@@ -149,11 +149,6 @@ export type {
   CheckoutWidgetsVersionConfig,
 } from './types';
 
-export {
-  PostMessageHandler, PostMessageHandlerEventType,
-} from './postMessageHandler';
-export type { PostMessageHandlerConfiguration, PostMessageData } from './postMessageHandler';
-
 export { isAddressSanctioned } from './sanctions';
 
 export type { ErrorType } from './errors';

@@ -644,19 +644,19 @@
       },
       "onboarding": {
         "screen1": {
-          "title": "Immutable的支付方式已进化",
+          "title": "我们做了一些改变\n让操作更简便",
           "caption": "请注意",
           "buttonText": "下一步"
         },
         "screen2": {
-          "title": "将代币传输到Passport，\n并从任何钱包付款",
-          "caption": "进化了什么",
+          "title": "你可以将代币发送到护照\n并使用任何钱包支付",
+          "caption": "更新内容",
           "buttonText": "下一步"
         },
         "screen3": {
-          "title": "使用其他链上的代币支付，\n我们会为您找到最佳选择",
-          "caption": "进化",
-          "buttonText": "选择要使用的付款钱包"
+          "title": "在其他链上使用代币，\n我们将为你找到最佳选项",
+          "caption": "演进",
+          "buttonText": "添加一些代币"
         }
       },
       "footer": {
