@@ -1,11 +1,7 @@
-# Checkout SDK Widgets Auto Updating Testiing
+# Checkout SDK Widgets Auto Updating Testing
 
-This example app shows how to use the Checkout Widget, loaded from the Checkout SDK. It will cover scenarios including mounting, executing flows, and handling events.
-
-**Example App implementation progress:**
-- [x] Mounting Checkout Widget
-- [ ] Executing different flows
-- [ ] Events
+This test covers autoupdating of the Checkout SDK's Widgets.
+See https://immutable.atlassian.net/wiki/spaces/PR/pages/2796814550/Checkout+Widgets+Auto-Updating+Docs
 
 ## Getting Started
 
