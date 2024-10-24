@@ -17,7 +17,7 @@ import {
 import { WalletConnectManager } from './lib/walletConnect';
 import { AddFunds } from './widgets/add-funds/AddFundsRoot';
 import { Bridge } from './widgets/bridge/BridgeWidgetRoot';
-import { CheckoutWidgetRoot } from './widgets/checkout/CheckoutWidgetRoot';
+import { CommerceWidgetRoot } from './widgets/immutable-commerce/CommerceWidgetRoot';
 import { Connect } from './widgets/connect/ConnectWidgetRoot';
 import { OnRamp } from './widgets/on-ramp/OnRampWidgetRoot';
 import { Sale } from './widgets/sale/SaleWidgetRoot';
@@ -95,7 +95,7 @@ export class WidgetsFactory implements IWidgetsFactory {
         }) as Widget<WidgetType.SALE> as Widget<T>;
       }
       case WidgetType.IMMUTABLE_COMMERCE: {
-        return new CheckoutWidgetRoot(this.sdk, {
+        return new CommerceWidgetRoot(this.sdk, {
           config: { ...this.widgetConfig, ...(config) },
           provider,
         }) as Widget<WidgetType.IMMUTABLE_COMMERCE> as Widget<T>;

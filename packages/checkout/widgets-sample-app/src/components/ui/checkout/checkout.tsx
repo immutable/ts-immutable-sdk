@@ -22,8 +22,8 @@ import {
   WidgetTheme,
   CreateProviderParams,
   CheckoutWidgetParams,
-  CheckoutEventType,
-  CheckoutSuccessEventType,
+  CommerceEventType,
+  CommerceSuccessEventType,
   WidgetType,
   CheckoutFlowType,
   WalletProviderName,
@@ -132,7 +132,7 @@ const createWeb3Provider = async (
   }
 };
 
-// checkout widget flows
+// Commerce Widget flows
 const flows: Array<CheckoutFlowType> = [
   CheckoutFlowType.CONNECT,
   CheckoutFlowType.WALLET,
@@ -304,7 +304,7 @@ function CheckoutUI() {
     if (!widget || mounted.current) return;
 
     // add event listeners
-    widget.addListener(CheckoutEventType.INITIALISED, () => {
+    widget.addListener(CommerceEventType.INITIALISED, () => {
       setEventResults((prev) => [...prev, { initialised: true }]);
 
       if (typeof window === "undefined") return;
@@ -318,7 +318,7 @@ function CheckoutUI() {
       }
     });
 
-    widget.addListener(CheckoutEventType.DISCONNECTED, () => {
+    widget.addListener(CommerceEventType.DISCONNECTED, () => {
       setEventResults((prev) => [...prev, { disconnected: true }]);
     });
     // widget.addListener(
@@ -332,21 +332,21 @@ function CheckoutUI() {
     //     ]);
     //   }
     // );
-    widget.addListener(CheckoutEventType.SUCCESS, (payload) => {
-      if (payload.type === CheckoutSuccessEventType.CONNECT_SUCCESS) {
+    widget.addListener(CommerceEventType.SUCCESS, (payload) => {
+      if (payload.type === CommerceSuccessEventType.CONNECT_SUCCESS) {
         const { provider, ...data } = payload.data;
         console.log("SUCCESS ---->", provider);
         setWeb3Provider(provider);
         setEventResults((prev) => [...prev, { success: true, ...data }]);
       }
     });
-    widget.addListener(CheckoutEventType.USER_ACTION, (data) => {
+    widget.addListener(CommerceEventType.USER_ACTION, (data) => {
       setEventResults((prev) => [...prev, { userAction: true, ...data }]);
     });
-    widget.addListener(CheckoutEventType.FAILURE, (data) => {
+    widget.addListener(CommerceEventType.FAILURE, (data) => {
       setEventResults((prev) => [...prev, { failure: true, ...data }]);
     });
-    widget.addListener(CheckoutEventType.CLOSE, () => {
+    widget.addListener(CommerceEventType.CLOSE, () => {
       setEventResults((prev) => [...prev, { closed: true }]);
       widget.unmount();
     });

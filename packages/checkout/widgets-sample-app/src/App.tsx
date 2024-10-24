@@ -28,7 +28,7 @@ function App() {
         </div>
         <br />
         <div>
-          <a href={"/checkout"}>Checkout Widget</a>
+          <a href={"/checkout"}>Commerce Widget</a>
         </div>
         <br />
         <div>

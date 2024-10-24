@@ -4,8 +4,8 @@ import {
   OrchestrationEvent,
   OrchestrationEventType,
 } from '@imtbl/checkout-sdk';
-import { getCheckoutWidgetEvent } from '../functions/getCheckoutWidgetEvent';
-import { sendCheckoutEvent } from '../CheckoutWidgetEvents';
+import { getCommerceWidgetEvent } from '../functions/getCommerceWidgetEvent';
+import { sendCheckoutEvent } from '../CommerceWidgetEvents';
 import {
   useViewState,
   ViewActions,
@@ -67,7 +67,7 @@ export function useWidgetEvents(
   };
 
   /**
-   * Proxy widget events to checkout widget events
+   * Proxy widget events to Commerce Widget events
    */
   const handleWidgetEvent = useMemo(() => {
     if (!eventTarget) return null;
@@ -80,7 +80,7 @@ export function useWidgetEvents(
         return;
       }
 
-      const eventDetail = getCheckoutWidgetEvent(customEvent);
+      const eventDetail = getCommerceWidgetEvent(customEvent);
       sendCheckoutEvent(eventTarget, eventDetail);
     };
   }, [eventTarget]);

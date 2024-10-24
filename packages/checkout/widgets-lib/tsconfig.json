@@ -11,6 +11,6 @@
     "jsxImportSource": "@emotion/react",
     "experimentalDecorators": true,
   },
-  "include": ["src"],
+  "include": ["src", "src/widgets/unified-commerce/.tsx"],
   "exclude": ["node_modules", "dist"]
 }

@@ -1,9 +1,9 @@
 # Checkout SDK Widgets Example App
 
-This example app shows how to use the Checkout Widget, loaded from the Checkout SDK. It will cover scenarios including mounting, executing flows, and handling events.
+This example app shows how to use the Commerce Widget, loaded from the Checkout SDK. It will cover scenarios including mounting, executing flows, and handling events.
 
 **Example App implementation progress:**
-- [x] Mounting Checkout Widget
+- [x] Mounting Commerce Widget
 - [ ] Executing different flows
 - [ ] Events
 
@@ -29,7 +29,7 @@ yarn dev
 
 ## E2E Testing
 
-There are tests covering the auto updating of the Checkout Widget.
+There are tests covering the auto updating of the Commerce Widget.
 
 Build the app:
 

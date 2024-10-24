@@ -5,24 +5,24 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 
-export interface CheckoutState {
+export interface CommerceState {
   checkout: Checkout | undefined;
   provider: Web3Provider | undefined;
   passport: Passport | undefined;
 }
 
-export const initialCheckoutState: CheckoutState = {
+export const initialCommerceState: CommerceState = {
   checkout: undefined,
   provider: undefined,
   passport: undefined,
 };
 
-export interface CheckoutContextState {
-  checkoutState: CheckoutState;
-  checkoutDispatch: React.Dispatch<CheckoutAction>;
+export interface CommerceContextState {
+  commerceState: CommerceState;
+  commerceDispatch: React.Dispatch<CommerceAction>;
 }
 
-export interface CheckoutAction {
+export interface CommerceAction {
   payload: ActionPayload;
 }
 
@@ -31,53 +31,53 @@ type ActionPayload =
   | SetProviderPayload
   | SetPassportPayload;
 
-export enum CheckoutActions {
+export enum CommerceActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
   SET_PASSPORT = 'SET_PASSPORT',
 }
 
 export interface SetCheckoutPayload {
-  type: CheckoutActions.SET_CHECKOUT;
+  type: CommerceActions.SET_CHECKOUT;
   checkout: Checkout;
 }
 
 export interface SetProviderPayload {
-  type: CheckoutActions.SET_PROVIDER;
+  type: CommerceActions.SET_PROVIDER;
   provider: Web3Provider | undefined;
 }
 
 export interface SetPassportPayload {
-  type: CheckoutActions.SET_PASSPORT;
+  type: CommerceActions.SET_PASSPORT;
   passport: Passport | undefined;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const CheckoutContext = createContext<CheckoutContextState>({
-  checkoutState: initialCheckoutState,
-  checkoutDispatch: () => { },
+export const CommerceContext = createContext<CommerceContextState>({
+  commerceState: initialCommerceState,
+  commerceDispatch: () => { },
 });
 
-CheckoutContext.displayName = 'CheckoutContext'; // help with debugging Context in browser
+CommerceContext.displayName = 'CommerceContext'; // help with debugging Context in browser
 
 export type Reducer<S, A> = (prevState: S, action: A) => S;
 
-export const checkoutReducer: Reducer<CheckoutState, CheckoutAction> = (
-  state: CheckoutState,
-  action: CheckoutAction,
+export const commerceReducer: Reducer<CommerceState, CommerceAction> = (
+  state: CommerceState,
+  action: CommerceAction,
 ) => {
   switch (action.payload.type) {
-    case CheckoutActions.SET_CHECKOUT:
+    case CommerceActions.SET_CHECKOUT:
       return {
         ...state,
         checkout: action.payload.checkout,
       };
-    case CheckoutActions.SET_PROVIDER:
+    case CommerceActions.SET_PROVIDER:
       return {
         ...state,
         provider: action.payload.provider,
       };
-    case CheckoutActions.SET_PASSPORT:
+    case CommerceActions.SET_PASSPORT:
       return {
         ...state,
         passport: action.payload.passport,

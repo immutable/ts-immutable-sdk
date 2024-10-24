@@ -12,7 +12,7 @@ export enum IMTBLWidgetEvents {
   IMTBL_BRIDGE_WIDGET_EVENT = 'imtbl-bridge-widget',
   IMTBL_ONRAMP_WIDGET_EVENT = 'imtbl-onramp-widget',
   IMTBL_SALE_WIDGET_EVENT = 'imtbl-sale-widget',
-  IMTBL_CHECKOUT_WIDGET_EVENT = 'imtbl-checkout-widget',
+  IMTBL_COMMERCE_WIDGET_EVENT = 'imtbl-commerce-widget',
   IMTBL_ADD_FUNDS_WIDGET_EVENT = 'imtbl-add-funds-widget',
 }
 

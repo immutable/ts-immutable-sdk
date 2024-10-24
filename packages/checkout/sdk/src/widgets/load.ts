@@ -1,6 +1,6 @@
 import { useLocalBundle } from '../env';
 
-// Loads the checkout widgets bundle from the CDN and appends the script to the document head
+// Loads the Commerce Widgets bundle from the CDN and appends the script to the document head
 export function loadUnresolvedBundle(
   tag: HTMLScriptElement,
   scriptId: string,
@@ -24,7 +24,7 @@ export function loadUnresolvedBundle(
   document.head.appendChild(tag);
 }
 
-// Gets the CDN url for the split checkout widgets bundle
+// Gets the CDN url for the split Commerce Widgets bundle
 export function getWidgetsEsmUrl(
   validVersion: string,
 ): string {

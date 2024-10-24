@@ -1,20 +1,20 @@
-import { CheckoutFlowType } from '@imtbl/checkout-sdk';
+import { CommerceFlowType } from '@imtbl/checkout-sdk';
 
 /**
  * List of views that require a connect loader wrapper
  */
 const connectLoaderFlows = [
-  CheckoutFlowType.SALE,
-  CheckoutFlowType.SWAP,
-  CheckoutFlowType.WALLET,
-  CheckoutFlowType.ONRAMP,
+  CommerceFlowType.SALE,
+  CommerceFlowType.SWAP,
+  CommerceFlowType.WALLET,
+  CommerceFlowType.ONRAMP,
 ] as unknown[];
 
 /**
  * List of views that require a providers context wrapper
  */
 const providersContextFlows = [
-  CheckoutFlowType.ADD_FUNDS,
+  CommerceFlowType.ADD_FUNDS,
 ] as unknown[];
 
 /**
