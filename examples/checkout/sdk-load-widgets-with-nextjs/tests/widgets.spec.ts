@@ -11,7 +11,7 @@ const INTERCEPT_CHECKOUT_VERSION_CONFIG = process.env.INTERCEPT_CHECKOUT_VERSION
 test.beforeEach(async ({ page }) => {
 
   if (!USE_REMOTE_WIDGETS) {
-    await interceptWidgets(page);
+    await interceptWidgets(page, '*');
   }
 
   if (INTERCEPT_CHECKOUT_VERSION_CONFIG) {

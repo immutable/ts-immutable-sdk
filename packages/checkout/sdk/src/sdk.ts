@@ -261,7 +261,7 @@ export class Checkout {
     } catch (err: any) {
       // eslint-disable-next-line no-console
       console.warn(
-        `Failed to resolve checkout widgets module, falling back to UMD bundle. Error: ${err.message}`,
+        `Failed to resolve Commerce Widgets module, falling back to UMD bundle. Error: ${err.message}`,
       );
     }
 

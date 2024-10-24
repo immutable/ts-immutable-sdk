@@ -34,11 +34,11 @@ import {
   WalletDisconnect,
   WalletEventType,
   WalletNetworkSwitch,
-  CheckoutEventType,
-  CheckoutProviderUpdatedEvent,
-  CheckoutSuccessEvent,
-  CheckoutFailureEvent,
-  CheckoutUserActionEvent,
+  CommerceEventType,
+  CommerceProviderUpdatedEvent,
+  CommerceSuccessEvent,
+  CommerceFailureEvent,
+  CommerceUserActionEvent,
   RequestAddFundsEvent,
   RequestGoBackEvent,
   AddFundsEventType,
@@ -52,7 +52,7 @@ import {
   SwapWidgetParams,
   WalletWidgetParams,
   OnRampWidgetParams,
-  CheckoutWidgetParams,
+  CommerceWidgetParams,
   AddFundsWidgetParams,
 } from './parameters';
 import { SaleWidgetParams } from './parameters/sale';
@@ -63,7 +63,7 @@ import {
   SaleWidgetConfiguration,
   SwapWidgetConfiguration,
   WalletWidgetConfiguration,
-  CheckoutWidgetConfiguration,
+  CommerceWidgetConfiguration,
   AddFundsWidgetConfiguration,
 } from './configurations';
 import { WidgetTheme } from './configurations/theme';
@@ -78,7 +78,7 @@ export enum WidgetType {
   BRIDGE = 'bridge',
   ONRAMP = 'onramp',
   SALE = 'sale',
-  CHECKOUT = 'checkout',
+  IMMUTABLE_COMMERCE = 'immutableCommerce',
   ADD_FUNDS = 'addFunds',
 }
 
@@ -98,8 +98,7 @@ export type WidgetConfigurations = {
   [WidgetType.ONRAMP]: OnrampWidgetConfiguration;
   [WidgetType.SALE]: SaleWidgetConfiguration;
   [WidgetType.ADD_FUNDS]: AddFundsWidgetConfiguration;
-
-  [WidgetType.CHECKOUT]: CheckoutWidgetConfiguration;
+  [WidgetType.IMMUTABLE_COMMERCE]: CommerceWidgetConfiguration;
 };
 
 // Mapping each widget type to their parameters
@@ -111,8 +110,7 @@ export type WidgetParameters = {
   [WidgetType.ONRAMP]: OnRampWidgetParams;
   [WidgetType.SALE]: SaleWidgetParams;
   [WidgetType.ADD_FUNDS]: AddFundsWidgetParams;
-
-  [WidgetType.CHECKOUT]: CheckoutWidgetParams;
+  [WidgetType.IMMUTABLE_COMMERCE]: CommerceWidgetParams;
 };
 
 /**
@@ -125,7 +123,7 @@ export type WidgetEventTypes = {
   [WidgetType.BRIDGE]: BridgeEventType | OrchestrationEventType;
   [WidgetType.ONRAMP]: OnRampEventType | OrchestrationEventType;
   [WidgetType.SALE]: SaleEventType | OrchestrationEventType;
-  [WidgetType.CHECKOUT]: CheckoutEventType | OrchestrationEventType;
+  [WidgetType.IMMUTABLE_COMMERCE]: CommerceEventType | OrchestrationEventType;
   [WidgetType.ADD_FUNDS]: AddFundsEventType | OrchestrationEventType;
 };
 
@@ -203,14 +201,14 @@ export type WidgetEventData = {
   } & OrchestrationMapping &
   ProviderEventMapping;
 
-  [WidgetType.CHECKOUT]: {
-    [CheckoutEventType.INITIALISED]: CheckoutWidgetParams;
-    [CheckoutEventType.PROVIDER_UPDATED]: CheckoutProviderUpdatedEvent;
-    [CheckoutEventType.CLOSE]: {};
-    [CheckoutEventType.SUCCESS]: CheckoutSuccessEvent;
-    [CheckoutEventType.FAILURE]: CheckoutFailureEvent;
-    [CheckoutEventType.DISCONNECTED]: {};
-    [CheckoutEventType.USER_ACTION]: CheckoutUserActionEvent;
+  [WidgetType.IMMUTABLE_COMMERCE]: {
+    [CommerceEventType.INITIALISED]: CommerceWidgetParams;
+    [CommerceEventType.PROVIDER_UPDATED]: CommerceProviderUpdatedEvent;
+    [CommerceEventType.CLOSE]: {};
+    [CommerceEventType.SUCCESS]: CommerceSuccessEvent;
+    [CommerceEventType.FAILURE]: CommerceFailureEvent;
+    [CommerceEventType.DISCONNECTED]: {};
+    [CommerceEventType.USER_ACTION]: CommerceUserActionEvent;
   };
 
   [WidgetType.ADD_FUNDS]: {
@@ -321,7 +319,7 @@ export interface Widget<T extends WidgetType> {
 }
 
 /**
- * Represents the version of the Checkout Widgets to use defaults to (0.1.9-alpha)
+ * Represents the version of the Commerce Widgets to use defaults to (0.1.9-alpha)
  * @property {number} major
  * @property {number | undefined} minor
  * @property {number | undefined} patch
@@ -348,7 +346,7 @@ export type SemanticVersion = {
 };
 
 /**
- * Represents the global configuration options for the Checkout Widgets.
+ * Represents the global configuration options for the Commerce Widgets.
  * @property {WidgetTheme | undefined} theme
  * @property {Environment | undefined} environment
  * @property {SemanticVersion | undefined} version
@@ -361,7 +359,7 @@ export type CheckoutWidgetsConfig = {
   theme?: WidgetTheme;
   /** The environment configuration (default: "SANDBOX") */
   environment?: Environment;
-  /** The version of the checkout widgets js file to use (default: "0.1.x") */
+  /** The version of the Checkout Widgets js file to use (default: "0.1.x") */
   version?: SemanticVersion;
   /** Enable on-ramp top-up method (default: "true") */
   isOnRampEnabled?: boolean;

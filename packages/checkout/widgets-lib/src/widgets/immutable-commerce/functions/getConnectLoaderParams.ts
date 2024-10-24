@@ -1,4 +1,4 @@
-import { ChainId, Checkout, CheckoutFlowType } from '@imtbl/checkout-sdk';
+import { ChainId, Checkout, CommerceFlowType } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { ConnectLoaderParams } from '../../../components/ConnectLoader/ConnectLoader';
 import { getL1ChainId, getL2ChainId } from '../../../lib/networkUtils';
@@ -22,7 +22,7 @@ export function getConnectLoaderParams(
   const { type, data } = view;
 
   switch (type) {
-    case CheckoutFlowType.WALLET:
+    case CommerceFlowType.WALLET:
       return {
         checkout,
         web3Provider,
@@ -33,8 +33,8 @@ export function getConnectLoaderParams(
           getL2ChainId(checkout.config),
         ],
       };
-    case CheckoutFlowType.ONRAMP:
-    case CheckoutFlowType.ADD_FUNDS:
+    case CommerceFlowType.ONRAMP:
+    case CommerceFlowType.ADD_FUNDS:
       return {
         checkout,
         web3Provider,
@@ -44,8 +44,8 @@ export function getConnectLoaderParams(
           getL2ChainId(checkout.config),
         ],
       };
-    case CheckoutFlowType.SALE:
-    case CheckoutFlowType.SWAP:
+    case CommerceFlowType.SALE:
+    case CommerceFlowType.SWAP:
       return {
         checkout,
         web3Provider,

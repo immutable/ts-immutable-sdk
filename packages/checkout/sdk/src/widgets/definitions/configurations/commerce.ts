@@ -9,7 +9,7 @@ import { AddFundsWidgetConfiguration } from './addFunds';
 
 import { WidgetConfiguration } from './widget';
 
-export type CheckoutWidgetConfiguration = {
+export type CommerceWidgetConfiguration = {
   CONNECT?: Omit<ConnectWidgetConfiguration, keyof WidgetConfiguration>;
   WALLET?: Omit<WalletWidgetConfiguration, keyof WidgetConfiguration>;
   SWAP?: Omit<SwapWidgetConfiguration, keyof WidgetConfiguration>;
