@@ -29,6 +29,7 @@ import {
   useState,
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
+import { Environment } from '@imtbl/config';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
@@ -40,7 +41,7 @@ import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { OptionsDrawer } from '../components/OptionsDrawer';
 import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
 import { TokenImage } from '../../../components/TokenImage/TokenImage';
-import { getDefaultTokenImage } from '../../../lib/utils';
+import { getDefaultTokenImage, getTokenImageByAddress, isNativeToken } from '../../../lib/utils';
 import type { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { useRoutes } from '../hooks/useRoutes';
 import { SQUID_NATIVE_TOKEN } from '../utils/config';
@@ -319,7 +320,20 @@ export function AddFunds({
         });
 
         if (tokenResponse?.tokens.length > 0) {
-          setAllowedTokens(tokenResponse.tokens);
+          const updatedTokens = tokenResponse.tokens.map((token) => {
+            if (isNativeToken(token.address)) {
+              return {
+                ...token,
+                icon: getTokenImageByAddress(
+                  checkout.config.environment as Environment,
+                  token.symbol,
+                ),
+              };
+            }
+            return token;
+          });
+
+          setAllowedTokens(updatedTokens);
 
           if (toTokenAddress) {
             const token = tokenResponse.tokens.find(
