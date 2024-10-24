@@ -31,12 +31,12 @@ import { checkoutFlows } from './functions/isValidCheckoutFlow';
 
 const CheckoutWidget = React.lazy(() => import('./CheckoutWidget'));
 
-export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
+export class CheckoutWidgetRoot extends Base<WidgetType.IMMUTABLE_COMMERCE> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_CHECKOUT_WIDGET_EVENT;
 
   protected getValidatedProperties({
     config,
-  }: WidgetProperties<WidgetType.CHECKOUT>): WidgetProperties<WidgetType.CHECKOUT> {
+  }: WidgetProperties<WidgetType.IMMUTABLE_COMMERCE>): WidgetProperties<WidgetType.IMMUTABLE_COMMERCE> {
     let validatedConfig: CheckoutWidgetConfiguration | undefined;
 
     if (config) {

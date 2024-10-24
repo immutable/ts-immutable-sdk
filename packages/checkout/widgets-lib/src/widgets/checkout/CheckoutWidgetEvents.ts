@@ -8,7 +8,7 @@ import {
 
 export type CheckoutEventDetail = {
   type: CheckoutEventType;
-  data: WidgetEventData[WidgetType.CHECKOUT][keyof WidgetEventData[WidgetType.CHECKOUT]];
+  data: WidgetEventData[WidgetType.IMMUTABLE_COMMERCE][keyof WidgetEventData[WidgetType.IMMUTABLE_COMMERCE]];
 };
 
 export const sendCheckoutEvent = (
@@ -16,7 +16,7 @@ export const sendCheckoutEvent = (
   detail: CheckoutEventDetail,
 ) => {
   const event = new CustomEvent<
-  WidgetEvent<WidgetType.CHECKOUT, CheckoutEventType>
+  WidgetEvent<WidgetType.IMMUTABLE_COMMERCE, CheckoutEventType>
   >(IMTBLWidgetEvents.IMTBL_CHECKOUT_WIDGET_EVENT, { detail });
   // eslint-disable-next-line no-console
   console.log('checkout app event ', eventTarget, event);
