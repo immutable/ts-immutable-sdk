@@ -31,6 +31,7 @@ import { personalSign } from './personalSign';
 import { trackSessionActivity } from './sessionActivity/sessionActivity';
 import { getNonce } from './walletHelpers';
 import { sendDeployTransactionAndPersonalSign } from './sendDeployTransactionAndPersonalSign';
+import { signEjectionTransaction } from './signEjectionTransaction';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
@@ -463,6 +464,37 @@ export class ZkEvmProvider implements Provider {
       case 'eth_getTransactionByHash':
       case 'eth_getTransactionReceipt': {
         return this.#rpcProvider.send(request.method, request.params || []);
+      }
+      case 'im_signEjectionTransaction': {
+        const zkEvmAddress = await this.#getZkEvmAddress();
+        if (!zkEvmAddress) {
+          throw new JsonRpcError(
+            ProviderErrorCode.UNAUTHORIZED,
+            'Unauthorised - call eth_requestAccounts first',
+          );
+        }
+
+        const flow = trackFlow('passport', 'imSignEjectionTransaction');
+
+        try {
+          const ethSigner = await this.#getSigner();
+          flow.addEvent('endGetSigner');
+
+          return await signEjectionTransaction({
+            params: request.params || [],
+            ethSigner,
+            zkEvmAddress,
+            flow,
+          });
+        } catch (error) {
+          if (error instanceof Error) {
+            trackError('passport', 'imSignEjectionTransaction', error);
+          }
+          flow.addEvent('errored');
+          throw error;
+        } finally {
+          flow.addEvent('End');
+        }
       }
       default: {
         throw new JsonRpcError(
