@@ -127,20 +127,6 @@ export default function AddFundsWidget({
   }, []);
 
   useEffect(() => {
-    if (!checkout) return;
-    (async () => {
-      if (!(await checkout.isSwapAvailable())) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: { type: AddFundsWidgetViews.GEO_BLOCK_ERROR },
-          },
-        });
-      }
-    })();
-  }, [checkout]);
-
-  useEffect(() => {
     if (!squid || !chains || !fromProvider || fetchingBalances.current) return;
 
     (async () => {
