@@ -29,6 +29,7 @@ import {
   useState,
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
+import { Environment } from '@imtbl/config';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
@@ -40,7 +41,7 @@ import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { OptionsDrawer } from '../components/OptionsDrawer';
 import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
 import { TokenImage } from '../../../components/TokenImage/TokenImage';
-import { getDefaultTokenImage } from '../../../lib/utils';
+import { getDefaultTokenImage, getTokenImageByAddress, isNativeToken } from '../../../lib/utils';
 import type { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { useRoutes } from '../hooks/useRoutes';
 import { SQUID_NATIVE_TOKEN } from '../utils/config';
@@ -62,6 +63,10 @@ import {
 import { validateToAmount } from '../functions/amountValidation';
 import { OnboardingDrawer } from '../components/OnboardingDrawer';
 import { useError } from '../hooks/useError';
+import { SquidFooter } from '../components/SquidFooter';
+import {
+  getFormattedNumberWithDecimalPlaces,
+} from '../functions/getFormattedNumber';
 
 interface AddFundsProps {
   checkout: Checkout;
@@ -315,7 +320,20 @@ export function AddFunds({
         });
 
         if (tokenResponse?.tokens.length > 0) {
-          setAllowedTokens(tokenResponse.tokens);
+          const updatedTokens = tokenResponse.tokens.map((token) => {
+            if (isNativeToken(token.address)) {
+              return {
+                ...token,
+                icon: getTokenImageByAddress(
+                  checkout.config.environment as Environment,
+                  token.symbol,
+                ),
+              };
+            }
+            return token;
+          });
+
+          setAllowedTokens(updatedTokens);
 
           if (toTokenAddress) {
             const token = tokenResponse.tokens.find(
@@ -335,7 +353,7 @@ export function AddFunds({
           });
         }
       } catch (error) {
-        showErrorHandover(AddFundsErrorTypes.SERVICE_BREAKDOWN);
+        showErrorHandover(AddFundsErrorTypes.SERVICE_BREAKDOWN, { error });
       }
     };
 
@@ -356,7 +374,7 @@ export function AddFunds({
           setOnRampAllowedTokens(tokenResponse.tokens);
         }
       } catch (error) {
-        showErrorHandover(AddFundsErrorTypes.SERVICE_BREAKDOWN);
+        showErrorHandover(AddFundsErrorTypes.SERVICE_BREAKDOWN, { error });
       }
     };
     fetchOnRampTokens();
@@ -481,7 +499,7 @@ export function AddFunds({
     [allowedTokens, handleTokenChange, isSelected, defaultTokenImage],
   );
 
-  const shouldShowBackButton = showBackButton ?? !!onBackButtonClick;
+  const shouldShowBackButton = showBackButton && onBackButtonClick;
   const routeInputsReady = !!selectedToken
     && !!fromAddress
     && validateToAmount(selectedAmount).isValid
@@ -620,7 +638,7 @@ export function AddFunds({
 
               <HeroFormControl.Caption>
                 USD $
-                {selectedAmountUsd.toFixed(2)}
+                {getFormattedNumberWithDecimalPlaces(selectedAmountUsd)}
               </HeroFormControl.Caption>
             </HeroFormControl>
           )}
@@ -630,12 +648,12 @@ export function AddFunds({
           sx={{
             alignSelf: 'stretch',
             p: 'base.spacing.x3',
-            pb: 'base.spacing.x10',
+            pb: 'base.spacing.x5',
             bg: 'base.color.neutral.800',
             bradtl: 'base.borderRadius.x8',
             bradtr: 'base.borderRadius.x8',
           }}
-          gap="base.spacing.x6"
+          gap="base.spacing.x4"
         >
           <Stack gap="0px">
             <SelectedWallet
@@ -700,6 +718,9 @@ export function AddFunds({
           >
             Review
           </Button>
+
+          <SquidFooter />
+
           <PayWithWalletDrawer
             visible={showPayWithDrawer}
             walletOptions={walletOptions}

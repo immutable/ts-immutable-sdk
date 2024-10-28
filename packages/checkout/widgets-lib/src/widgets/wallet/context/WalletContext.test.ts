@@ -96,9 +96,11 @@ describe('WalletContext', () => {
     });
     expect(supportedTopUps).toEqual({
       isSwapEnabled: true,
+      isSwapAvailable: true,
       isBridgeEnabled: false,
       isOnRampEnabled: false,
-      isSwapAvailable: true,
+      isAddFundsEnabled: true,
+      isAddFundsAvailable: true,
     });
   });
 

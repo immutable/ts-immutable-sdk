@@ -1,7 +1,7 @@
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import { RouteResponse } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
-import { utils } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { useContext, useRef } from 'react';
 import { delay } from '../functions/delay';
 import {
@@ -10,12 +10,16 @@ import {
 import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
 import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
 import { retry } from '../../../lib/retry';
-import { getFormattedNumber } from '../functions/getFormattedNumber';
+import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+
+const BASE_SLIPPAGE = 0.02;
 
 export const useRoutes = () => {
   const latestRequestIdRef = useRef<number>(0);
 
   const { addFundsDispatch } = useContext(AddFundsContext);
+
+  const { track } = useAnalytics();
 
   const setRoutes = (routes: RouteData[]) => {
     addFundsDispatch({
@@ -45,10 +49,23 @@ export const useRoutes = () => {
     toAmount: string,
     additionalBuffer: number = 0,
   ) => {
-    const toAmountNumber = Number(toAmount);
+    const toAmountNumber = parseFloat(toAmount);
+    // Calculate the USD value of the toAmount
     const toAmountInUsd = toAmountNumber * toToken.usdPrice;
+    // Calculate the amount of fromToken needed to match this USD value
     const baseFromAmount = toAmountInUsd / fromToken.usdPrice;
-    const fromAmountWithBuffer = baseFromAmount * (1.02 + additionalBuffer);
+    // Add a buffer for price fluctuations and fees
+    const fromAmountWithBuffer = baseFromAmount * (1 + BASE_SLIPPAGE + additionalBuffer);
+
+    return fromAmountWithBuffer.toString();
+  };
+
+  const calculateFromAmountFromRoute = (
+    exchangeRate: string,
+    toAmount: string,
+  ) => {
+    const fromAmount = parseFloat(toAmount) / parseFloat(exchangeRate);
+    const fromAmountWithBuffer = fromAmount * (1 + BASE_SLIPPAGE);
     return fromAmountWithBuffer.toString();
   };
 
@@ -66,9 +83,11 @@ export const useRoutes = () => {
       balance.chainId.toString(),
     );
     const toToken = findToken(tokens, toTokenAddress, toChainId);
+
     if (!fromToken || !toToken) {
       return undefined;
     }
+
     return {
       fromToken,
       fromAmount: calculateFromAmount(
@@ -97,6 +116,7 @@ export const useRoutes = () => {
           && balance.chainId === toChainId
       ),
     );
+
     const amountDataArray: AmountData[] = filteredBalances
       .map((balance) => getAmountData(tokens, balance, toAmount, toChainId, toTokenAddress))
       .filter((value) => value !== undefined);
@@ -106,6 +126,7 @@ export const useRoutes = () => {
         data.balance.balance,
         data.balance.decimals,
       );
+
       return (
         parseFloat(formattedBalance.toString()) > parseFloat(data.fromAmount)
       );
@@ -149,11 +170,13 @@ export const useRoutes = () => {
     routeResponse: RouteResponse,
     toAmount: string,
   ) => {
-    const routeToAmount = getFormattedNumber(
-      routeResponse?.route.estimate.toAmount,
-      routeResponse?.route.estimate.toToken.decimals,
-    );
-    return Number(routeToAmount) > Number(toAmount);
+    if (!routeResponse?.route?.estimate?.toAmount || !routeResponse?.route?.estimate?.toToken?.decimals) {
+      throw new Error('Invalid route response or token decimals');
+    }
+
+    const toAmountInBaseUnits = utils.parseUnits(toAmount, routeResponse?.route.estimate.toToken.decimals);
+    const routeToAmountInBaseUnits = BigNumber.from(routeResponse.route.estimate.toAmount);
+    return routeToAmountInBaseUnits.gt(toAmountInBaseUnits);
   };
 
   const getRoute = async (
@@ -180,21 +203,17 @@ export const useRoutes = () => {
       if (!routeResponse?.route) {
         return {};
       }
+
       if (isRouteToAmountGreaterThanToAmount(routeResponse, toAmount)) {
         return { route: routeResponse };
       }
 
-      const additionalBuffer = Math.abs(
-        Number(routeResponse?.route.estimate.aggregatePriceImpact),
-      );
-      const newFromAmount = calculateFromAmount(
-        fromToken,
-        toToken,
+      const newFromAmount = calculateFromAmountFromRoute(
+        routeResponse.route.estimate.exchangeRate,
         toAmount,
-        additionalBuffer,
       );
 
-      const routeWithBufferResponse = await getRouteWithRetry(
+      const newRoute = await getRouteWithRetry(
         squid,
         fromToken,
         toToken,
@@ -203,9 +222,40 @@ export const useRoutes = () => {
         fromAddress,
         quoteOnly,
       );
-      if (isRouteToAmountGreaterThanToAmount(routeResponse, toAmount)) {
-        return { route: routeWithBufferResponse, additionalBuffer };
+
+      if (!newRoute?.route) {
+        return {};
       }
+
+      if (isRouteToAmountGreaterThanToAmount(newRoute, toAmount)) {
+        return { route: newRoute };
+      }
+
+      track({
+        userJourney: UserJourney.ADD_FUNDS,
+        screen: 'Routes',
+        action: 'Failed',
+        extras: {
+          fromToken: fromToken.symbol,
+          toToken: toToken.symbol,
+          fromChain: fromToken.chainId,
+          toChain: toToken.chainId,
+          initialRoute: {
+            fromAmount,
+            toAmount,
+            exchangeRate: routeResponse.route.estimate.exchangeRate,
+            routeFromAmount: routeResponse.route.estimate.fromAmount,
+            routeToAmount: routeResponse.route.estimate.toAmount,
+          },
+          newRoute: {
+            fromAmount: newFromAmount,
+            toAmount,
+            exchangeRate: newRoute.route.estimate.exchangeRate,
+            routeFromAmount: newRoute.route.estimate.fromAmount,
+            routeToAmount: newRoute.route.estimate.toAmount,
+          },
+        },
+      });
       return {};
     } catch (error) {
       return {};
@@ -230,6 +280,7 @@ export const useRoutes = () => {
     })));
 
     const routesData = await Promise.all(routePromises);
+
     return routesData.filter(
       (route): route is RouteData => route?.route !== undefined,
     );

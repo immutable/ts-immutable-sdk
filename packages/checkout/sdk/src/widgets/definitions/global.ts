@@ -94,5 +94,17 @@ declare global {
       ): void;
       removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void;
     }
+
+    class Commerce<T extends WidgetType> implements Widget<T> {
+      constructor(sdk: Checkout, props: WidgetProperties<T>);
+      mount(id: string, params?: WidgetParameters[T]): void;
+      unmount(): void;
+      update(props: WidgetProperties<T>): void;
+      addListener<KEventName extends keyof WidgetEventData[T]>(
+        type: KEventName,
+        callback: (data: WidgetEventData[T][KEventName]) => void
+      ): void;
+      removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void;
+    }
   }
 }

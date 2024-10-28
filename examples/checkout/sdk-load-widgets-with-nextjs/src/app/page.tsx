@@ -14,7 +14,7 @@ export default function Home() {
       className="mb-1"
       size="medium"
       rc={<NextLink href="/widgets" />}>
-      Mount Checkout Widgets
+      Mount Commerce Widgets
     </Button>
   </>);
 }

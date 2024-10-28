@@ -70,12 +70,14 @@
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
       "heading": {
-        "swap": "您所在的地区不支持兑换",
-        "generic": "该服务在您的地区不可用"
+        "swap": "您的地区无法使用兑换功能",
+        "generic": "该服务在您的地区不可用",
+        "addFunds": "该服务在您的地区不可用"
       },
       "body": {
-        "swap": "请参考<quickswapLink>Quickswap</quickswapLink>的网站了解更多信息。",
-        "generic": "如需进一步帮助，请访问<immutableSupport>Immutable</immutableSupport>支持页面。"
+        "swap": "请访问<quickswapLink>Quickswap</quickswapLink>网站了解更多信息。",
+        "generic": "更多帮助，请访问<immutableSupport>Immutable</immutableSupport>支持页面。",
+        "addFunds": "请通过其他方式添加代币。"
       }
     },
     "LOADING_VIEW": {
@@ -618,6 +620,51 @@
           "text": "交易失败",
           "actionText": "请重试"
         }
+      }
+    },
+    "ADD_FUNDS": {
+      "drawer": {
+        "options": {
+          "swap": {
+            "heading": "兑换",
+            "caption": "在此网络上兑换代币。",
+            "disabledCaption": "当前不可用。"
+          },
+          "debit": {
+            "heading": "借记卡",
+            "caption": "",
+            "disabledCaption": "您的选择不可用。我们建议添加代币。"
+          },
+          "credit": {
+            "heading": "信用卡",
+            "caption": "可能会发生失败或额外费用。",
+            "disabledCaption": "您的选择不可用。我们建议添加代币。"
+          }
+        }
+      },
+      "onboarding": {
+        "screen1": {
+          "title": "我们做了一些改变\n让操作更简便",
+          "caption": "请注意",
+          "buttonText": "下一步"
+        },
+        "screen2": {
+          "title": "你可以将代币发送到护照\n并使用任何钱包支付",
+          "caption": "更新内容",
+          "buttonText": "下一步"
+        },
+        "screen3": {
+          "title": "在其他链上使用代币，\n我们将为你找到最佳选项",
+          "caption": "演进",
+          "buttonText": "添加一些代币"
+        }
+      },
+      "footer": {
+        "body": "交换功能由第三方 Squid 提供。Immutable 不构建、拥有、运营或部署 <squidLink>Squid</squidLink>。"
+      },
+      "geoBlockError": {
+        "buyTokenButton": "购买代币",
+        "bridgeTokenButton": "桥接代币"
       }
     }
   },

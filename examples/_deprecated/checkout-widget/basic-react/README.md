@@ -1,4 +1,4 @@
-This is a sample code to get started with the Checkout widget using React + Vite.
+This is a sample code to get started with the Commerce Widget using React + Vite.
 
 Run locally by using the `npm i && npm run dev` command.
 
