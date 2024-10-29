@@ -105,6 +105,18 @@ export default function AddFundsWidget({
   }, [config]);
 
   useEffect(() => {
+    if (!checkout) return;
+    (async () => {
+      addFundsDispatch({
+        payload: {
+          type: AddFundsActions.SET_IS_SWAP_AVAILABLE,
+          isSwapAvailable: await checkout.isSwapAvailable(),
+        },
+      });
+    })();
+  }, [checkout]);
+
+  useEffect(() => {
     const isInvalidToTokenAddress = toTokenAddress && !isValidAddress(toTokenAddress);
     const isInvalidToAmount = toAmount && !amountInputValidation(toAmount);
 
