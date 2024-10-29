@@ -6,9 +6,28 @@ const USE_REMOTE_WIDGETS = process.env.USE_REMOTE_WIDGETS === 'true';
 
 const INTERCEPT_CHECKOUT_VERSION_CONFIG = process.env.INTERCEPT_CHECKOUT_VERSION_CONFIG;
 
-
-
 test.beforeEach(async ({ page }) => {
+
+  // Mock window.ethereum for each page
+  await page.addInitScript(() => {
+    (window as any).ethereum = {
+      isMetaMask: true,
+      request: async ({ method, params }: { method: string; params?: any[] }) => {
+        switch (method) {
+          case 'eth_requestAccounts':
+            return ['0x0000000000000000000000000000000000000000'];
+          case 'eth_chainId':
+            return '0x1';
+          case 'eth_accounts':
+            return ['0x0000000000000000000000000000000000000000'];
+          default:
+            throw new Error(`Unhandled method: ${method}`);
+        }
+      },
+      on: () => {},
+      removeListener: () => {},
+    };
+  });
 
   if (!USE_REMOTE_WIDGETS) {
     await interceptWidgets(page);
@@ -35,5 +54,6 @@ test.describe("widget loading", () => {
 
     const connectWidget = page.getByTestId('connect-wallet');
     await expect(connectWidget).toBeVisible();
+
   });
 });
