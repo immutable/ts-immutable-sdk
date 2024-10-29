@@ -1,26 +1,13 @@
 "use client";
 import { Box } from '@biom3/react';
 import { checkout } from '@imtbl/sdk';
-import { CommerceFlowType, ConnectionSuccess, Widget, WidgetType } from '@imtbl/sdk/checkout';
-import { useEffect, useState } from 'react';
+import { CommerceFlowType, ConnectionSuccess } from '@imtbl/sdk/checkout';
+import { useEffect } from 'react';
+import { useCommerceWidget } from '../../hooks/useCommerceWidget';
 
-const checkoutSDK = new checkout.Checkout();
+function CommerceWallet() {
 
-function Widgets() {
-
-  const [widget, setWidget] = useState<Widget<WidgetType.IMMUTABLE_COMMERCE>>();
-
-  useEffect(() => {
-
-    const loadWidgets = async () => {
-      const widgetsFactory = await checkoutSDK.widgets({ config: {} });
-
-      const widget = widgetsFactory.create(WidgetType.IMMUTABLE_COMMERCE, {})
-      setWidget(widget);
-    }
-
-    loadWidgets();
-  }, []);
+  const widget = useCommerceWidget();
 
 
   useEffect(() => {
@@ -38,10 +25,6 @@ function Widgets() {
         if (type === checkout.CommerceSuccessEventType.CONNECT_SUCCESS) {
           const { walletProviderName } = data as ConnectionSuccess;
           console.log('connected to ', walletProviderName);
-          // setProvider(data.provider);
-
-          // optional, immediately close the widget
-          // widget.unmount();
         }
       }
     );
@@ -89,4 +72,4 @@ function Widgets() {
   )
 }
 
-export default Widgets;
+export default CommerceWallet;

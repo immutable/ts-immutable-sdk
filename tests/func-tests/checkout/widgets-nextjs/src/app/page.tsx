@@ -13,8 +13,15 @@ export default function Home() {
     <Button
       className="mb-1"
       size="medium"
-      rc={<NextLink href="/widgets" />}>
-      Mount Checkout Widgets
+      rc={<NextLink href="/commerce-connect" />}>
+      Mount Commerce Widget: Flow.Connect
+    </Button>
+
+    <Button
+      className="mb-1"
+      size="medium"
+      rc={<NextLink href="/commerce-bridge" />}>
+      Mount Commerce Widget: Flow.Bridge
     </Button>
   </>);
 }

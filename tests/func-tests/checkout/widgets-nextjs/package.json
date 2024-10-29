@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "func-test:ci": "playwright test",
+    "test": "playwright test",
+    "func-test:ci": "yarn test",
     "test:ui": "playwright test --ui",
     "test:remotewidgets": "USE_REMOTE_WIDGETS=true playwright test"
   },
