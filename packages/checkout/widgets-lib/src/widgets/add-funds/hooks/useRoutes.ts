@@ -1,5 +1,5 @@
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
-import { RouteResponse } from '@0xsquid/squid-types';
+import { RouteResponse, ActionType } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
 import { BigNumber, utils } from 'ethers';
 import { useContext, useRef } from 'react';
@@ -295,10 +295,11 @@ export const useRoutes = () => {
     toAmount: string,
     bulkNumber = 5,
     delayMs = 1000,
+    isSwapAllowed = true,
   ): Promise<RouteData[]> => {
     const currentRequestId = ++latestRequestIdRef.current;
 
-    const amountDataArray = getSufficientFromAmounts(
+    let amountDataArray = getSufficientFromAmounts(
       tokens,
       balances,
       toChanId,
@@ -306,7 +307,13 @@ export const useRoutes = () => {
       toAmount,
     );
 
-    const allRoutes: RouteData[] = [];
+    if (!isSwapAllowed) {
+      amountDataArray = amountDataArray.filter(
+        (amountData) => amountData.balance.chainId !== toChanId,
+      );
+    }
+
+    let allRoutes: RouteData[] = [];
     await Promise.all(
       amountDataArray
         .reduce((acc, _, i) => {
@@ -322,6 +329,14 @@ export const useRoutes = () => {
           await delay(delayMs);
         }),
     );
+
+    if (!isSwapAllowed) {
+      allRoutes = allRoutes.filter(
+        (routeData) => !routeData.route.route.estimate.actions.find(
+          (action) => action.type === ActionType.SWAP,
+        ),
+      );
+    }
 
     const sortedRoutes = sortRoutesByFastestTime(allRoutes);
 
