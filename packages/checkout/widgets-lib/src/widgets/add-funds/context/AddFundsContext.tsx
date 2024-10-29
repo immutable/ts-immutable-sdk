@@ -14,6 +14,7 @@ export interface AddFundsState {
   selectedRouteData: RouteData | undefined;
   selectedToken: TokenInfo | undefined;
   selectedAmount: string;
+  isSwapAvailable: boolean;
 }
 
 export const initialAddFundsState: AddFundsState = {
@@ -26,6 +27,7 @@ export const initialAddFundsState: AddFundsState = {
   selectedRouteData: undefined,
   selectedToken: undefined,
   selectedAmount: '',
+  isSwapAvailable: false,
 };
 
 export interface AddFundsContextState {
@@ -46,7 +48,8 @@ type ActionPayload =
   | SetRoutes
   | SetSelectedRouteData
   | SetSelectedToken
-  | SetSelectedAmount;
+  | SetSelectedAmount
+  | SetIsSwapAvailable;
 
 export enum AddFundsActions {
   SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
@@ -58,6 +61,7 @@ export enum AddFundsActions {
   SET_SELECTED_ROUTE_DATA = 'SET_SELECTED_ROUTE_DATA',
   SET_SELECTED_TOKEN = 'SET_SELECTED_TOKEN',
   SET_SELECTED_AMOUNT = 'SET_SELECTED_AMOUNT',
+  SET_IS_SWAP_AVAILABLE = 'SET_IS_SWAP_AVAILABLE',
 }
 
 export interface SetAllowedTokensPayload {
@@ -102,6 +106,11 @@ export interface SetSelectedToken {
 export interface SetSelectedAmount {
   type: AddFundsActions.SET_SELECTED_AMOUNT;
   selectedAmount: string;
+}
+
+export interface SetIsSwapAvailable {
+  type: AddFundsActions.SET_IS_SWAP_AVAILABLE;
+  isSwapAvailable: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -163,6 +172,11 @@ export const addFundsReducer: Reducer<AddFundsState, AddFundsAction> = (
       return {
         ...state,
         selectedAmount: action.payload.selectedAmount,
+      };
+    case AddFundsActions.SET_IS_SWAP_AVAILABLE:
+      return {
+        ...state,
+        isSwapAvailable: action.payload.isSwapAvailable,
       };
     default:
       return state;
