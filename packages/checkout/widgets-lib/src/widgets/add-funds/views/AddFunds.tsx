@@ -106,6 +106,7 @@ export function AddFunds({
       routes,
       selectedRouteData,
       selectedToken,
+      isSwapAvailable,
     },
     addFundsDispatch,
   } = useContext(AddFundsContext);
@@ -293,6 +294,7 @@ export function AddFunds({
           selectedAmount,
           5,
           1000,
+          isSwapAvailable,
         );
         setFetchingRoutes(false);
 
