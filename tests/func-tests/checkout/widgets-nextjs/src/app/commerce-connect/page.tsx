@@ -49,7 +49,7 @@ function CommerceConnect() {
     // clean up event listeners
     return () => {
       widget.removeListener(checkout.CommerceEventType.SUCCESS);
-      widget.removeListener(checkout.CommerceEventType.DISCONNECTED);
+      widget.removeListener(checkout.CommerceEventType.FAILURE);
       widget.removeListener(checkout.CommerceEventType.CLOSE);
     };
 
