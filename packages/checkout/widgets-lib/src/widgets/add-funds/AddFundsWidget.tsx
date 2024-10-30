@@ -105,6 +105,18 @@ export default function AddFundsWidget({
   }, [config]);
 
   useEffect(() => {
+    if (!checkout) return;
+    (async () => {
+      addFundsDispatch({
+        payload: {
+          type: AddFundsActions.SET_IS_SWAP_AVAILABLE,
+          isSwapAvailable: await checkout.isSwapAvailable(),
+        },
+      });
+    })();
+  }, [checkout]);
+
+  useEffect(() => {
     const isInvalidToTokenAddress = toTokenAddress && !isValidAddress(toTokenAddress);
     const isInvalidToAmount = toAmount && !amountInputValidation(toAmount);
 
@@ -125,20 +137,6 @@ export default function AddFundsWidget({
       });
     })();
   }, []);
-
-  useEffect(() => {
-    if (!checkout) return;
-    (async () => {
-      if (!(await checkout.isSwapAvailable())) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: { type: AddFundsWidgetViews.GEO_BLOCK_ERROR },
-          },
-        });
-      }
-    })();
-  }, [checkout]);
 
   useEffect(() => {
     if (!squid || !chains || !fromProvider || fetchingBalances.current) return;
@@ -270,44 +268,6 @@ export default function AddFundsWidget({
             <ServiceUnavailableErrorView
               service={ServiceType.GENERIC}
               onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
-            />
-          )}
-          {viewState.view.type === AddFundsWidgetViews.GEO_BLOCK_ERROR && (
-            <ServiceUnavailableErrorView
-              service={ServiceType.ADD_FUNDS}
-              onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
-              primaryActionText={
-              checkout.config.isOnRampEnabled
-                ? t('views.ADD_FUNDS.geoBlockError.buyTokenButton') : undefined
-              }
-              onPrimaryButtonClick={
-                () => {
-                  orchestrationEvents.sendRequestOnrampEvent(
-                    eventTarget,
-                    IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
-                    {
-                      tokenAddress: '',
-                      amount: '',
-                    },
-                  );
-                }
-              }
-              secondaryActionText={
-                checkout.config.isBridgeEnabled
-                  ? t('views.ADD_FUNDS.geoBlockError.bridgeTokenButton') : undefined
-              }
-              onSecondaryButtonClick={
-                () => {
-                  orchestrationEvents.sendRequestBridgeEvent(
-                    eventTarget,
-                    IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
-                    {
-                      tokenAddress: '',
-                      amount: '',
-                    },
-                  );
-                }
-              }
             />
           )}
         </Stack>
