@@ -3,9 +3,9 @@ import { Environment } from "@imtbl/config";
 
 export const passport = new Passport({
   baseConfig: {
-    environment: Environment.SANDBOX,
+    environment: Environment.PRODUCTION,
   },
-  clientId: "pbxyF4UdgfxO6SRxZczexs1hzaR6nTGN",
+  clientId: "gYT9Cj8xE7to2mWp4ztBTxBlXCTzAebU",
   redirectUri: "http://localhost:3000/add-tokens/login",
   logoutRedirectUri: "http://localhost:3000/add-tokens/logout",
   logoutMode: "silent",
