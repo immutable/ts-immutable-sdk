@@ -48,7 +48,7 @@ yarn build
 Copy over the created widgets bundle to use for testing:
 
 ```bash
-yarn workspace @examples/sdk-load-widgets-with-nextjs prepare:widgets
+yarn workspace @examples/commerce-widget-nextjs prepare:widgets
 ```
 
 Run tests against the local bundle:
@@ -62,5 +62,5 @@ yarn test
 We can inject a Checkout Widgets Version Config into the app to validate auto updating.
 
 ```bash
-INTERCEPT_CHECKOUT_VERSION_CONFIG=1.58.0 yarn workspace @examples/sdk-load-widgets-with-nextjs test
+INTERCEPT_CHECKOUT_VERSION_CONFIG=1.58.0 yarn workspace @examples/commerce-widget-nextjs test
 ```

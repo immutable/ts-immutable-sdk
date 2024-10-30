@@ -52,7 +52,7 @@ yarn build
 Copy over the created widgets bundle to use for testing:
 
 ```bash
-yarn workspace @examples/sdk-load-widgets-with-nextjs prepare:widgets
+yarn workspace @examples/commerce-widget-nextjs prepare:widgets
 ```
 
 Run tests against the local bundle:
