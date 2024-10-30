@@ -2,19 +2,19 @@ import {
   useContext, useEffect, useMemo, useReducer, useRef,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AddFundsWidgetParams, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
+import { AddTokensWidgetParams, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 
 import { Stack, CloudImage, useTheme } from '@biom3/react';
 import { Environment } from '@imtbl/config';
-import { sendAddFundsCloseEvent } from './AddFundsWidgetEvents';
+import { sendAddTokensCloseEvent } from './AddTokensWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import {
-  AddFundsActions,
-  AddFundsContext,
-  addFundsReducer,
-  initialAddFundsState,
-} from './context/AddFundsContext';
-import { AddFundsWidgetViews } from '../../context/view-context/AddFundsViewContextTypes';
+  AddTokensActions,
+  AddTokensContext,
+  addTokensReducer,
+  initialAddTokensState,
+} from './context/AddTokensContext';
+import { AddTokensWidgetViews } from '../../context/view-context/AddTokensViewContextTypes';
 import {
   initialViewState,
   SharedViews,
@@ -22,7 +22,7 @@ import {
   ViewContext,
   viewReducer,
 } from '../../context/view-context/ViewContext';
-import { AddFunds } from './views/AddFunds';
+import { AddTokens } from './views/AddTokens';
 import { ErrorView } from '../../views/error/ErrorView';
 import { useSquid } from './hooks/useSquid';
 import {
@@ -42,13 +42,13 @@ import { getRemoteImage } from '../../lib/utils';
 import { isValidAddress } from '../../lib/validations/widgetValidators';
 import { amountInputValidation } from '../../lib/validations/amountInputValidations';
 import { useError } from './hooks/useError';
-import { AddFundsErrorTypes } from './types';
+import { AddTokensErrorTypes } from './types';
 
-export type AddFundsWidgetInputs = Omit<AddFundsWidgetParams, 'toProvider'> & {
+export type AddTokensWidgetInputs = Omit<AddTokensWidgetParams, 'toProvider'> & {
   config: StrongCheckoutWidgetsConfig;
 };
 
-export default function AddFundsWidget({
+export default function AddTokensWidget({
   showOnrampOption = true,
   showSwapOption = true,
   showBridgeOption = true,
@@ -56,13 +56,13 @@ export default function AddFundsWidget({
   toAmount,
   showBackButton,
   config,
-}: AddFundsWidgetInputs) {
+}: AddTokensWidgetInputs) {
   const fetchingBalances = useRef(false);
   const { base: { colorMode } } = useTheme();
   const [viewState, viewDispatch] = useReducer(viewReducer, {
     ...initialViewState,
-    view: { type: AddFundsWidgetViews.ADD_FUNDS },
-    history: [{ type: AddFundsWidgetViews.ADD_FUNDS }],
+    view: { type: AddTokensWidgetViews.ADD_TOKENS },
+    history: [{ type: AddTokensWidgetViews.ADD_TOKENS }],
   });
   const { t } = useTranslation();
   const { page } = useAnalytics();
@@ -75,23 +75,23 @@ export default function AddFundsWidget({
     [viewState, viewReducer],
   );
 
-  const [addFundsState, addFundsDispatch] = useReducer(
-    addFundsReducer,
-    initialAddFundsState,
+  const [addTokensState, addTokensDispatch] = useReducer(
+    addTokensReducer,
+    initialAddTokensState,
   );
 
   const {
     providersState: { checkout, fromProvider },
   } = useProvidersContext();
 
-  const { squid, chains } = addFundsState;
+  const { squid, chains } = addTokensState;
 
-  const addFundsReducerValues = useMemo(
+  const addTokensReducerValues = useMemo(
     () => ({
-      addFundsState,
-      addFundsDispatch,
+      addTokensState,
+      addTokensDispatch,
     }),
-    [addFundsState, addFundsDispatch],
+    [addTokensState, addTokensDispatch],
   );
 
   const squidSdk = useSquid(checkout);
@@ -100,16 +100,16 @@ export default function AddFundsWidget({
 
   useEffect(() => {
     if (config.environment !== Environment.PRODUCTION) {
-      showErrorHandover(AddFundsErrorTypes.ENVIRONMENT_ERROR);
+      showErrorHandover(AddTokensErrorTypes.ENVIRONMENT_ERROR);
     }
   }, [config]);
 
   useEffect(() => {
     if (!checkout) return;
     (async () => {
-      addFundsDispatch({
+      addTokensDispatch({
         payload: {
-          type: AddFundsActions.SET_IS_SWAP_AVAILABLE,
+          type: AddTokensActions.SET_IS_SWAP_AVAILABLE,
           isSwapAvailable: await checkout.isSwapAvailable(),
         },
       });
@@ -121,7 +121,7 @@ export default function AddFundsWidget({
     const isInvalidToAmount = toAmount && !amountInputValidation(toAmount);
 
     if (isInvalidToTokenAddress || isInvalidToAmount) {
-      showErrorHandover(AddFundsErrorTypes.INVALID_PARAMETERS);
+      showErrorHandover(AddTokensErrorTypes.INVALID_PARAMETERS);
     }
   }, [toTokenAddress, toAmount]);
 
@@ -129,9 +129,9 @@ export default function AddFundsWidget({
     (async () => {
       const chainsResponse = await fetchChains();
 
-      addFundsDispatch({
+      addTokensDispatch({
         payload: {
-          type: AddFundsActions.SET_CHAINS,
+          type: AddTokensActions.SET_CHAINS,
           chains: chainsResponse,
         },
       });
@@ -147,9 +147,9 @@ export default function AddFundsWidget({
         const evmChains = chains.filter((chain) => chain.type === 'evm');
         const balances = await fetchBalances(squid, evmChains, fromProvider);
 
-        addFundsDispatch({
+        addTokensDispatch({
           payload: {
-            type: AddFundsActions.SET_BALANCES,
+            type: AddTokensActions.SET_BALANCES,
             balances,
           },
         });
@@ -162,9 +162,9 @@ export default function AddFundsWidget({
   useEffect(() => {
     if (!squidSdk) return;
 
-    addFundsDispatch({
+    addTokensDispatch({
       payload: {
-        type: AddFundsActions.SET_SQUID,
+        type: AddTokensActions.SET_SQUID,
         squid: squidSdk,
       },
     });
@@ -173,9 +173,9 @@ export default function AddFundsWidget({
   useEffect(() => {
     if (!tokensResponse) return;
 
-    addFundsDispatch({
+    addTokensDispatch({
       payload: {
-        type: AddFundsActions.SET_TOKENS,
+        type: AddTokensActions.SET_TOKENS,
         tokens: tokensResponse,
       },
     });
@@ -189,21 +189,21 @@ export default function AddFundsWidget({
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
-        view: { type: AddFundsWidgetViews.ADD_FUNDS },
+        view: { type: AddTokensWidgetViews.ADD_TOKENS },
       },
     });
   };
 
   return (
     <ViewContext.Provider value={viewReducerValues}>
-      <AddFundsContext.Provider value={addFundsReducerValues}>
+      <AddTokensContext.Provider value={addTokensReducerValues}>
         <Stack sx={{ pos: 'relative' }}>
           <CloudImage
             use={(
               <img
                 src={getRemoteImage(
                   config.environment,
-                  `/add-funds-bg-texture-${colorMode}.webp`,
+                  `/add-tokens-bg-texture-${colorMode}.webp`,
                 )}
                 alt="blurry bg texture"
               />
@@ -216,8 +216,8 @@ export default function AddFundsWidget({
               objectPosition: 'center',
             }}
           />
-          {viewState.view.type === AddFundsWidgetViews.ADD_FUNDS && (
-            <AddFunds
+          {viewState.view.type === AddTokensWidgetViews.ADD_TOKENS && (
+            <AddTokens
               config={config}
               checkout={checkout}
               toTokenAddress={toTokenAddress}
@@ -226,20 +226,20 @@ export default function AddFundsWidget({
               showOnrampOption={showOnrampOption}
               showSwapOption={showSwapOption}
               showBridgeOption={showBridgeOption}
-              onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
+              onCloseButtonClick={() => sendAddTokensCloseEvent(eventTarget)}
               onBackButtonClick={() => {
                 orchestrationEvents.sendRequestGoBackEvent(
                   eventTarget,
-                  IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+                  IMTBLWidgetEvents.IMTBL_ADD_TOKENS_WIDGET_EVENT,
                   {},
                 );
               }}
             />
           )}
-          {viewState.view.type === AddFundsWidgetViews.REVIEW && (
+          {viewState.view.type === AddTokensWidgetViews.REVIEW && (
             <Review
               data={viewState.view.data}
-              onCloseButtonClick={() => sendAddFundsCloseEvent(eventTarget)}
+              onCloseButtonClick={() => sendAddTokensCloseEvent(eventTarget)}
               onBackButtonClick={() => {
                 viewDispatch({
                   payload: {
@@ -254,10 +254,10 @@ export default function AddFundsWidget({
             <ErrorView
               actionText={t('views.ERROR_VIEW.actionText')}
               onActionClick={errorAction}
-              onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
+              onCloseClick={() => sendAddTokensCloseEvent(eventTarget)}
               errorEventAction={() => {
                 page({
-                  userJourney: UserJourney.ADD_FUNDS,
+                  userJourney: UserJourney.ADD_TOKENS,
                   screen: 'Error',
                 });
               }}
@@ -267,11 +267,11 @@ export default function AddFundsWidget({
             === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
             <ServiceUnavailableErrorView
               service={ServiceType.GENERIC}
-              onCloseClick={() => sendAddFundsCloseEvent(eventTarget)}
+              onCloseClick={() => sendAddTokensCloseEvent(eventTarget)}
             />
           )}
         </Stack>
-      </AddFundsContext.Provider>
+      </AddTokensContext.Provider>
     </ViewContext.Provider>
   );
 }

@@ -8,7 +8,7 @@ import {
   AmountData, RouteData, RouteResponseData, Token,
 } from '../types';
 import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
-import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
+import { AddTokensActions, AddTokensContext } from '../context/AddTokensContext';
 import { retry } from '../../../lib/retry';
 import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
@@ -17,14 +17,14 @@ const BASE_SLIPPAGE = 0.02;
 export const useRoutes = () => {
   const latestRequestIdRef = useRef<number>(0);
 
-  const { addFundsDispatch } = useContext(AddFundsContext);
+  const { addTokensDispatch } = useContext(AddTokensContext);
 
   const { track } = useAnalytics();
 
   const setRoutes = (routes: RouteData[]) => {
-    addFundsDispatch({
+    addTokensDispatch({
       payload: {
-        type: AddFundsActions.SET_ROUTES,
+        type: AddTokensActions.SET_ROUTES,
         routes,
       },
     });
@@ -232,7 +232,7 @@ export const useRoutes = () => {
       }
 
       track({
-        userJourney: UserJourney.ADD_FUNDS,
+        userJourney: UserJourney.ADD_TOKENS,
         screen: 'Routes',
         action: 'Failed',
         extras: {

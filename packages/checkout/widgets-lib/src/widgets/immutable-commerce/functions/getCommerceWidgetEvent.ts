@@ -1,5 +1,5 @@
 import {
-  AddFundsEventType,
+  AddTokensEventType,
   BridgeEventType,
   CommerceEventType,
   CommerceFailureEventType,
@@ -131,16 +131,16 @@ function mapSwapWidgetEvent(
 }
 
 /**
- * Map Add Funds Widget Events
+ * Map Add Tokens Widget Events
  */
-function mapAddFundsWidgetEvent(
-  event: CustomEvent<{ type: AddFundsEventType; data: Record<string, unknown> }>,
+function mapAddTokensWidgetEvent(
+  event: CustomEvent<{ type: AddTokensEventType; data: Record<string, unknown> }>,
 ): CommerceEventDetail {
   const { type } = event.detail;
 
   switch (type) {
     default:
-      throw new Error(`Unknown add funds event type "${event.detail.type}"`);
+      throw new Error(`Unknown add tokens event type "${event.detail.type}"`);
   }
 }
 
@@ -306,8 +306,8 @@ export function getCommerceWidgetEvent(
       return mapWalletWidgetEvent(event);
     case IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT:
       return mapSwapWidgetEvent(event);
-    case IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT:
-      return mapAddFundsWidgetEvent(event);
+    case IMTBLWidgetEvents.IMTBL_ADD_TOKENS_WIDGET_EVENT:
+      return mapAddTokensWidgetEvent(event);
     case IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT:
       return mapBridgeWidgetEvent(event);
     case IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT:

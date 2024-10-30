@@ -6,7 +6,7 @@ import { WalletWidgetParams } from './wallet';
 import { SwapWidgetParams } from './swap';
 import { OnRampWidgetParams } from './onramp';
 import { SaleWidgetParams } from './sale';
-import { AddFundsWidgetParams } from './addFunds';
+import { AddTokensWidgetParams } from './addTokens';
 
 export enum CommerceFlowType {
   CONNECT = 'CONNECT',
@@ -15,7 +15,7 @@ export enum CommerceFlowType {
   SWAP = 'SWAP',
   BRIDGE = 'BRIDGE',
   ONRAMP = 'ONRAMP',
-  ADD_FUNDS = 'ADD_FUNDS',
+  ADD_TOKENS = 'ADD_TOKENS',
 }
 
 export type CommerceWidgetConnectFlowParams = {
@@ -42,9 +42,9 @@ export type CommerceWidgetSaleFlowParams = {
   flow: CommerceFlowType.SALE;
 } & SaleWidgetParams;
 
-export type CommerceWidgetAddFundsFlowParams = {
-  flow: CommerceFlowType.ADD_FUNDS;
-} & AddFundsWidgetParams;
+export type CommerceWidgetAddTokensFlowParams = {
+  flow: CommerceFlowType.ADD_TOKENS;
+} & AddTokensWidgetParams;
 
 export type CommerceWidgetFlowParams =
   | CommerceWidgetConnectFlowParams
@@ -53,7 +53,7 @@ export type CommerceWidgetFlowParams =
   | CommerceWidgetBridgeFlowParams
   | CommerceWidgetOnRampFlowParams
   | CommerceWidgetSaleFlowParams
-  | CommerceWidgetAddFundsFlowParams;
+  | CommerceWidgetAddTokensFlowParams;
 
 export type CommerceWidgetParams = {
   /** The language to use for the Commerce Widget */

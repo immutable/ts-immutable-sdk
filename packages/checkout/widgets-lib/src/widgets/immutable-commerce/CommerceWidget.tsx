@@ -29,7 +29,7 @@ import BridgeWidget from '../bridge/BridgeWidget';
 import OnRampWidget from '../on-ramp/OnRampWidget';
 import WalletWidget from '../wallet/WalletWidget';
 import SaleWidget from '../sale/SaleWidget';
-import AddFundsWidget from '../add-funds/AddFundsWidget';
+import AddTokensWidget from '../add-tokens/AddTokensWidget';
 import {
   isConnectLoaderFlow,
   isProvidersContextFlow,
@@ -201,8 +201,8 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
         {/* --- Widgets that require providers context --- */}
         {shouldWrapWithProvidersContext && (
           <ProvidersContextProvider initialState={{ checkout }}>
-            {view.type === CommerceFlowType.ADD_FUNDS && (
-              <AddFundsWidget
+            {view.type === CommerceFlowType.ADD_TOKENS && (
+              <AddTokensWidget
                 config={widgetsConfig}
                 {...(view.data.params || {})}
                 {...(view.data.config || {})}

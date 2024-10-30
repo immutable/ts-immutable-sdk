@@ -49,7 +49,7 @@ interface TopUpViewProps {
   showOnrampOption: boolean;
   showSwapOption: boolean;
   showBridgeOption: boolean;
-  showAddFundsOption?: boolean;
+  showAddTokensOption?: boolean;
   tokenAddress?: string;
   amount?: string;
   analytics: {
@@ -83,7 +83,7 @@ export function TopUpView({
   showOnrampOption,
   showSwapOption,
   showBridgeOption,
-  showAddFundsOption,
+  showAddTokensOption,
   tokenAddress,
   amount,
   analytics,
@@ -128,18 +128,18 @@ export function TopUpView({
     page({ userJourney, screen: 'TopUp' });
   });
 
-  // Go to add funds widget if available
+  // Go to add tokens widget if available
   useMount(
     () => {
-      if (showAddFundsOption) {
-        orchestrationEvents.sendRequestAddFundsEvent(eventTarget, widgetEvent, {
+      if (showAddTokensOption) {
+        orchestrationEvents.sendRequestAddTokensEvent(eventTarget, widgetEvent, {
           toTokenAddress: tokenAddress ?? '',
           toAmount: amount ?? '',
         });
       }
     },
-    () => showAddFundsOption !== undefined,
-    [showAddFundsOption],
+    () => showAddTokensOption !== undefined,
+    [showAddTokensOption],
   );
 
   useEffect(() => {
@@ -364,12 +364,12 @@ export function TopUpView({
         isEnabled: showBridgeOption,
       },
     ],
-    [showAddFundsOption, showBridgeOption, showOnrampOption, showSwapOption],
+    [showAddTokensOption, showBridgeOption, showOnrampOption, showSwapOption],
   );
 
   // if swap is available, don't show top up view
-  // await for redirect to add funds widget
-  if (showAddFundsOption) return null;
+  // await for redirect to add tokens widget
+  if (showAddTokensOption) return null;
 
   return (
     <SimpleLayout

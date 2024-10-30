@@ -47,11 +47,11 @@ export function FiatOption<RC extends ReactElement | undefined = undefined>({
         emphasized={false}
       />
       <MenuItem.Label>
-        {t(`views.ADD_FUNDS.drawer.options.${type}.heading`)}
+        {t(`views.ADD_TOKENS.drawer.options.${type}.heading`)}
       </MenuItem.Label>
       <MenuItem.Caption>
         {t(
-          `views.ADD_FUNDS.drawer.options.${type}.${
+          `views.ADD_TOKENS.drawer.options.${type}.${
             disabled ? 'disabledCaption' : 'caption'
           }`,
         )}

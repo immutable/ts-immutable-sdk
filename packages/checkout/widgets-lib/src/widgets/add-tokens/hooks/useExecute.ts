@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { isSquidNativeToken } from '../functions/isSquidNativeToken';
 import { useError } from './useError';
-import { AddFundsError, AddFundsErrorTypes } from '../types';
+import { AddTokensError, AddTokensErrorTypes } from '../types';
 
 export const useExecute = (environment: Environment) => {
   const { showErrorHandover } = useError(environment);
@@ -15,38 +15,38 @@ export const useExecute = (environment: Environment) => {
       (err as any)?.reason || (err as any)?.message || ''
     }`.toLowerCase();
 
-    let errorType = AddFundsErrorTypes.WALLET_FAILED;
+    let errorType = AddTokensErrorTypes.WALLET_FAILED;
 
     if (reason.includes('failed') && reason.includes('open confirmation')) {
-      errorType = AddFundsErrorTypes.WALLET_POPUP_BLOCKED;
+      errorType = AddTokensErrorTypes.WALLET_POPUP_BLOCKED;
     }
 
     if (reason.includes('rejected') && reason.includes('user')) {
-      errorType = AddFundsErrorTypes.WALLET_REJECTED;
+      errorType = AddTokensErrorTypes.WALLET_REJECTED;
     }
 
     if (
       reason.includes('failed to submit')
       && reason.includes('highest gas limit')
     ) {
-      errorType = AddFundsErrorTypes.WALLET_REJECTED_NO_FUNDS;
+      errorType = AddTokensErrorTypes.WALLET_REJECTED_NO_FUNDS;
     }
 
     if (
       reason.includes('status failed')
       || reason.includes('transaction failed')
     ) {
-      errorType = AddFundsErrorTypes.TRANSACTION_FAILED;
+      errorType = AddTokensErrorTypes.TRANSACTION_FAILED;
     }
 
     if (
       reason.includes('unrecognized chain')
       || reason.includes('unrecognized chain')
     ) {
-      errorType = AddFundsErrorTypes.UNRECOGNISED_CHAIN;
+      errorType = AddTokensErrorTypes.UNRECOGNISED_CHAIN;
     }
 
-    const error: AddFundsError = {
+    const error: AddTokensError = {
       type: errorType,
       data: { error: err },
     };
@@ -115,7 +115,7 @@ export const useExecute = (environment: Environment) => {
 
       return ethers.constants.MaxUint256; // no approval is needed for native tokens
     } catch (error) {
-      showErrorHandover(AddFundsErrorTypes.DEFAULT, { error });
+      showErrorHandover(AddTokensErrorTypes.DEFAULT, { error });
       return undefined;
     }
   };

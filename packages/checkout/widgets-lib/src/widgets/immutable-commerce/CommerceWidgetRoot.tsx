@@ -7,7 +7,7 @@ import {
   WidgetType,
   CommerceWidgetConnectFlowParams,
   CommerceWidgetWalletFlowParams,
-  CommerceWidgetAddFundsFlowParams,
+  CommerceWidgetAddTokensFlowParams,
   CommerceWidgetSwapFlowParams,
   CommerceWidgetBridgeFlowParams,
   CommerceWidgetOnRampFlowParams,
@@ -110,8 +110,8 @@ export class CommerceWidgetRoot extends Base<WidgetType.IMMUTABLE_COMMERCE> {
     };
   }
 
-  protected getValidAddFundsFlowParams(
-    params: CommerceWidgetAddFundsFlowParams,
+  protected getValidAddTokensFlowParams(
+    params: CommerceWidgetAddTokensFlowParams,
   ) {
     const validatedParams = { ...params };
 
@@ -230,8 +230,8 @@ export class CommerceWidgetRoot extends Base<WidgetType.IMMUTABLE_COMMERCE> {
         return this.getValidBridgeFlowParams(params);
       case CommerceFlowType.ONRAMP:
         return this.getValidOnRampFlowParams(params);
-      case CommerceFlowType.ADD_FUNDS:
-        return this.getValidAddFundsFlowParams(params);
+      case CommerceFlowType.ADD_TOKENS:
+        return this.getValidAddTokensFlowParams(params);
       default:
         // eslint-disable-next-line no-console
         console.warn(

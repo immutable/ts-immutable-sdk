@@ -12,7 +12,7 @@ import {
   ChainId,
   IMTBLWidgetEvents,
   SaleWidgetParams,
-  AddFundsConfig,
+  AddTokensConfig,
 } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
@@ -92,16 +92,16 @@ export default function SaleWidget(props: SaleWidgetProps) {
 
   const loadingText = viewState.view.data?.loadingText || t('views.LOADING_VIEW.text');
 
-  const isAddFundsAvailable = useAsyncMemo<boolean>(async () => {
+  const isAddTokensAvailable = useAsyncMemo<boolean>(async () => {
     if (!checkout) return false;
 
     try {
       const isSwapAvailable = await checkout.isSwapAvailable();
-      const addFundsConfig = (await checkout.config.remote.getConfig(
-        'addfunds',
-      )) as AddFundsConfig;
+      const addTokensConfig = (await checkout.config.remote.getConfig(
+        'addTokens',
+      )) as AddTokensConfig;
 
-      return addFundsConfig.enabled && isSwapAvailable;
+      return addTokensConfig.enabled && isSwapAvailable;
     } catch (error) {
       return false;
     }
@@ -193,7 +193,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
               showOnrampOption={config.isOnRampEnabled}
               showSwapOption={false}
               showBridgeOption={config.isBridgeEnabled}
-              showAddFundsOption={isAddFundsAvailable}
+              showAddTokensOption={isAddTokensAvailable}
               onCloseButtonClick={() => sendSaleWidgetCloseEvent(eventTarget)}
               onBackButtonClick={() => {
                 viewDispatch({
