@@ -17,7 +17,7 @@ import {
 } from './bridge';
 import { SwapFailed, SwapRejected, SwapSuccess } from './swap';
 import { WalletNetworkSwitch } from './wallet';
-import { AddFundsFailed, AddFundsSuccess, AddFundsConnectSuccess } from './addFunds';
+import { AddTokensFailed, AddTokensSuccess, AddTokensConnectSuccess } from './addTokens';
 
 export enum CommerceEventType {
   INITIALISED = 'INITIALISED',
@@ -37,7 +37,7 @@ export enum CommerceSuccessEventType {
   SALE_TRANSACTION_SUCCESS = 'SALE_TRANSACTION_SUCCESS',
   BRIDGE_SUCCESS = 'BRIDGE_SUCCESS',
   BRIDGE_CLAIM_WITHDRAWAL_SUCCESS = 'BRIDGE_CLAIM_WITHDRAWAL_SUCCESS',
-  ADD_FUNDS_SUCCESS = 'ADD_FUNDS_SUCCESS',
+  ADD_TOKENS_SUCCESS = 'ADD_TOKENS_SUCCESS',
 }
 
 export enum CommerceFailureEventType {
@@ -48,7 +48,7 @@ export enum CommerceFailureEventType {
   CONNECT_FAILED = 'CONNECT_FAILED',
   SALE_FAILED = 'SALE_FAILED',
   ONRAMP_FAILED = 'ONRAMP_FAILED',
-  ADD_FUNDS_FAILED = 'ADD_FUNDS_FAILED',
+  ADD_TOKENS_FAILED = 'ADD_TOKENS_FAILED',
 }
 
 export enum CommerceUserActionEventType {
@@ -101,19 +101,19 @@ export type CommerceConnectSuccessEvent = {
   data: ConnectionSuccess;
 };
 
-export type CommerceAddFundsSuccessEvent = {
-  type: CommerceSuccessEventType.ADD_FUNDS_SUCCESS;
-  data: AddFundsSuccess;
+export type CommerceAddTokensSuccessEvent = {
+  type: CommerceSuccessEventType.ADD_TOKENS_SUCCESS;
+  data: AddTokensSuccess;
 };
 
-export type CommerceAddFundsConnectSuccessEvent = {
+export type CommerceAddTokensConnectSuccessEvent = {
   type: CommerceSuccessEventType.CONNECT_SUCCESS;
-  data: AddFundsConnectSuccess;
+  data: AddTokensConnectSuccess;
 };
 
 export type CommerceSuccessEvent =
-  | CommerceAddFundsSuccessEvent
-  | CommerceAddFundsConnectSuccessEvent
+  | CommerceAddTokensSuccessEvent
+  | CommerceAddTokensConnectSuccessEvent
   | CommerceConnectSuccessEvent
   | CommerceBridgeSuccessEvent
   | CommerceBridgeClaimWithdrawalSuccessEvent
@@ -157,13 +157,13 @@ export type CommerceSaleFailureEvent = {
   data: SaleFailed;
 };
 
-export type CommerceAddFundsFailureEvent = {
-  type: CommerceFailureEventType.ADD_FUNDS_FAILED;
-  data: AddFundsFailed;
+export type CommerceAddTokensFailureEvent = {
+  type: CommerceFailureEventType.ADD_TOKENS_FAILED;
+  data: AddTokensFailed;
 };
 
 export type CommerceFailureEvent =
-  | CommerceAddFundsFailureEvent
+  | CommerceAddTokensFailureEvent
   | CommerceBridgeFailureEvent
   | CommerceBridgeClaimWithdrawalFailedEvent
   | CommerceConnectFailureEvent

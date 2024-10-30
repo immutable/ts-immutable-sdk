@@ -7,8 +7,8 @@ import {
   SaleWidgetParams,
   SwapWidgetConfiguration,
   SwapWidgetParams,
-  AddFundsWidgetParams,
-  AddFundsWidgetConfiguration,
+  AddTokensWidgetParams,
+  AddTokensWidgetConfiguration,
   CommerceFlowType,
   ConnectWidgetParams,
   ConnectWidgetConfiguration,
@@ -20,7 +20,7 @@ import { ViewType } from './ViewType';
 export type CheckoutWidgetView =
   | ConnectView
   | WalletView
-  | AddFundsView
+  | AddTokensView
   | SaleView
   | SwapView
   | OnRampView
@@ -42,11 +42,11 @@ interface WalletView extends ViewType {
   };
 }
 
-interface AddFundsView extends ViewType {
-  type: CommerceFlowType.ADD_FUNDS;
+interface AddTokensView extends ViewType {
+  type: CommerceFlowType.ADD_TOKENS;
   data: {
-    params: AddFundsWidgetParams;
-    config: AddFundsWidgetConfiguration;
+    params: AddTokensWidgetParams;
+    config: AddTokensWidgetConfiguration;
   };
 }
 

@@ -4,7 +4,7 @@ import { Squid } from '@0xsquid/sdk';
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import { Chain, Token, RouteData } from '../types';
 
-export interface AddFundsState {
+export interface AddTokensState {
   allowedTokens: TokenInfo[] | null;
   squid: Squid | null;
   chains: Chain[] | null;
@@ -17,7 +17,7 @@ export interface AddFundsState {
   isSwapAvailable: boolean;
 }
 
-export const initialAddFundsState: AddFundsState = {
+export const initialAddTokensState: AddTokensState = {
   allowedTokens: null,
   squid: null,
   chains: null,
@@ -30,12 +30,12 @@ export const initialAddFundsState: AddFundsState = {
   isSwapAvailable: false,
 };
 
-export interface AddFundsContextState {
-  addFundsState: AddFundsState;
-  addFundsDispatch: React.Dispatch<AddFundsAction>;
+export interface AddTokensContextState {
+  addTokensState: AddTokensState;
+  addTokensDispatch: React.Dispatch<AddTokensAction>;
 }
 
-export interface AddFundsAction {
+export interface AddTokensAction {
   payload: ActionPayload;
 }
 
@@ -51,7 +51,7 @@ type ActionPayload =
   | SetSelectedAmount
   | SetIsSwapAvailable;
 
-export enum AddFundsActions {
+export enum AddTokensActions {
   SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
   SET_SQUID = 'SET_SQUID',
   SET_CHAINS = 'SET_CHAINS',
@@ -65,115 +65,115 @@ export enum AddFundsActions {
 }
 
 export interface SetAllowedTokensPayload {
-  type: AddFundsActions.SET_ALLOWED_TOKENS;
+  type: AddTokensActions.SET_ALLOWED_TOKENS;
   allowedTokens: TokenInfo[];
 }
 export interface SetSquid {
-  type: AddFundsActions.SET_SQUID;
+  type: AddTokensActions.SET_SQUID;
   squid: Squid;
 }
 
 export interface SetChains {
-  type: AddFundsActions.SET_CHAINS;
+  type: AddTokensActions.SET_CHAINS;
   chains: Chain[];
 }
 
 export interface SetBalances {
-  type: AddFundsActions.SET_BALANCES;
+  type: AddTokensActions.SET_BALANCES;
   balances: TokenBalance[];
 }
 
 export interface SetTokens {
-  type: AddFundsActions.SET_TOKENS;
+  type: AddTokensActions.SET_TOKENS;
   tokens: Token[];
 }
 
 export interface SetRoutes {
-  type: AddFundsActions.SET_ROUTES;
+  type: AddTokensActions.SET_ROUTES;
   routes: RouteData[];
 }
 
 export interface SetSelectedRouteData {
-  type: AddFundsActions.SET_SELECTED_ROUTE_DATA;
+  type: AddTokensActions.SET_SELECTED_ROUTE_DATA;
   selectedRouteData: RouteData | undefined;
 }
 
 export interface SetSelectedToken {
-  type: AddFundsActions.SET_SELECTED_TOKEN;
+  type: AddTokensActions.SET_SELECTED_TOKEN;
   selectedToken: TokenInfo | undefined;
 }
 
 export interface SetSelectedAmount {
-  type: AddFundsActions.SET_SELECTED_AMOUNT;
+  type: AddTokensActions.SET_SELECTED_AMOUNT;
   selectedAmount: string;
 }
 
 export interface SetIsSwapAvailable {
-  type: AddFundsActions.SET_IS_SWAP_AVAILABLE;
+  type: AddTokensActions.SET_IS_SWAP_AVAILABLE;
   isSwapAvailable: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const AddFundsContext = createContext<AddFundsContextState>({
-  addFundsState: initialAddFundsState,
-  addFundsDispatch: () => {},
+export const AddTokensContext = createContext<AddTokensContextState>({
+  addTokensState: initialAddTokensState,
+  addTokensDispatch: () => {},
 });
 
-AddFundsContext.displayName = 'AddFundsContext';
+AddTokensContext.displayName = 'AddTokensContext';
 
 export type Reducer<S, A> = (prevState: S, action: A) => S;
 
-export const addFundsReducer: Reducer<AddFundsState, AddFundsAction> = (
-  state: AddFundsState,
-  action: AddFundsAction,
+export const addTokensReducer: Reducer<AddTokensState, AddTokensAction> = (
+  state: AddTokensState,
+  action: AddTokensAction,
 ) => {
   switch (action.payload.type) {
-    case AddFundsActions.SET_ALLOWED_TOKENS:
+    case AddTokensActions.SET_ALLOWED_TOKENS:
       return {
         ...state,
         allowedTokens: action.payload.allowedTokens,
       };
-    case AddFundsActions.SET_SQUID:
+    case AddTokensActions.SET_SQUID:
       return {
         ...state,
         squid: action.payload.squid,
       };
-    case AddFundsActions.SET_CHAINS:
+    case AddTokensActions.SET_CHAINS:
       return {
         ...state,
         chains: action.payload.chains,
       };
-    case AddFundsActions.SET_BALANCES:
+    case AddTokensActions.SET_BALANCES:
       return {
         ...state,
         balances: action.payload.balances,
       };
-    case AddFundsActions.SET_TOKENS:
+    case AddTokensActions.SET_TOKENS:
       return {
         ...state,
         tokens: action.payload.tokens,
       };
-    case AddFundsActions.SET_ROUTES:
+    case AddTokensActions.SET_ROUTES:
       return {
         ...state,
         routes: action.payload.routes,
       };
-    case AddFundsActions.SET_SELECTED_ROUTE_DATA:
+    case AddTokensActions.SET_SELECTED_ROUTE_DATA:
       return {
         ...state,
         selectedRouteData: action.payload.selectedRouteData,
       };
-    case AddFundsActions.SET_SELECTED_TOKEN:
+    case AddTokensActions.SET_SELECTED_TOKEN:
       return {
         ...state,
         selectedToken: action.payload.selectedToken,
       };
-    case AddFundsActions.SET_SELECTED_AMOUNT:
+    case AddTokensActions.SET_SELECTED_AMOUNT:
       return {
         ...state,
         selectedAmount: action.payload.selectedAmount,
       };
-    case AddFundsActions.SET_IS_SWAP_AVAILABLE:
+    case AddTokensActions.SET_IS_SWAP_AVAILABLE:
       return {
         ...state,
         isSwapAvailable: action.payload.isSwapAvailable,

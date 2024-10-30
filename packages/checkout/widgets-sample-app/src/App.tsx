@@ -32,7 +32,7 @@ function App() {
         </div>
         <br />
         <div>
-          <a href={"/add-funds"}>Add Funds Widget</a>
+          <a href={"/add-tokens"}>Add Tokens Widget</a>
         </div>
         <br />
         <div>

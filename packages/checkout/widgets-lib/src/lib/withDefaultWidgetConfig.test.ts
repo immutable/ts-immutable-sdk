@@ -6,7 +6,7 @@ import {
   DEFAULT_ENV,
   DEFAULT_ON_RAMP_ENABLED,
   DEFAULT_SWAP_ENABLED,
-  DEFAULT_ADD_FUNDS_ENABLED,
+  DEFAULT_ADD_TOKENS_ENABLED,
   DEFAULT_THEME,
 } from './constants';
 
@@ -18,7 +18,7 @@ describe('withDefaultWidgetConfig', () => {
       isOnRampEnabled: DEFAULT_ON_RAMP_ENABLED,
       isSwapEnabled: DEFAULT_SWAP_ENABLED,
       isBridgeEnabled: DEFAULT_BRIDGE_ENABLED,
-      isAddFundsEnabled: DEFAULT_ADD_FUNDS_ENABLED,
+      isAddTokensEnabled: DEFAULT_ADD_TOKENS_ENABLED,
     });
     expect(withDefaultWidgetConfigs(undefined)).toEqual({
       theme: DEFAULT_THEME,
@@ -26,7 +26,7 @@ describe('withDefaultWidgetConfig', () => {
       isOnRampEnabled: DEFAULT_ON_RAMP_ENABLED,
       isSwapEnabled: DEFAULT_SWAP_ENABLED,
       isBridgeEnabled: DEFAULT_BRIDGE_ENABLED,
-      isAddFundsEnabled: DEFAULT_ADD_FUNDS_ENABLED,
+      isAddTokensEnabled: DEFAULT_ADD_TOKENS_ENABLED,
     });
   });
 
@@ -41,7 +41,7 @@ describe('withDefaultWidgetConfig', () => {
       isOnRampEnabled: DEFAULT_ON_RAMP_ENABLED,
       isSwapEnabled: DEFAULT_SWAP_ENABLED,
       isBridgeEnabled: DEFAULT_BRIDGE_ENABLED,
-      isAddFundsEnabled: DEFAULT_ADD_FUNDS_ENABLED,
+      isAddTokensEnabled: DEFAULT_ADD_TOKENS_ENABLED,
     });
     expect(
       withDefaultWidgetConfigs({
@@ -53,7 +53,7 @@ describe('withDefaultWidgetConfig', () => {
       isOnRampEnabled: false,
       isSwapEnabled: DEFAULT_SWAP_ENABLED,
       isBridgeEnabled: DEFAULT_BRIDGE_ENABLED,
-      isAddFundsEnabled: DEFAULT_ADD_FUNDS_ENABLED,
+      isAddTokensEnabled: DEFAULT_ADD_TOKENS_ENABLED,
     });
   });
 
@@ -68,7 +68,7 @@ describe('withDefaultWidgetConfig', () => {
       isOnRampEnabled: DEFAULT_ON_RAMP_ENABLED,
       isSwapEnabled: DEFAULT_SWAP_ENABLED,
       isBridgeEnabled: DEFAULT_BRIDGE_ENABLED,
-      isAddFundsEnabled: DEFAULT_ADD_FUNDS_ENABLED,
+      isAddTokensEnabled: DEFAULT_ADD_TOKENS_ENABLED,
     });
 
     expect(
@@ -81,7 +81,7 @@ describe('withDefaultWidgetConfig', () => {
       isOnRampEnabled: DEFAULT_ON_RAMP_ENABLED,
       isSwapEnabled: DEFAULT_SWAP_ENABLED,
       isBridgeEnabled: DEFAULT_BRIDGE_ENABLED,
-      isAddFundsEnabled: DEFAULT_ADD_FUNDS_ENABLED,
+      isAddTokensEnabled: DEFAULT_ADD_TOKENS_ENABLED,
     });
 
     expect(
@@ -94,7 +94,7 @@ describe('withDefaultWidgetConfig', () => {
       isOnRampEnabled: DEFAULT_ON_RAMP_ENABLED,
       isSwapEnabled: DEFAULT_SWAP_ENABLED,
       isBridgeEnabled: DEFAULT_BRIDGE_ENABLED,
-      isAddFundsEnabled: DEFAULT_ADD_FUNDS_ENABLED,
+      isAddTokensEnabled: DEFAULT_ADD_TOKENS_ENABLED,
     });
   });
 
@@ -109,7 +109,7 @@ describe('withDefaultWidgetConfig', () => {
       isOnRampEnabled: DEFAULT_ON_RAMP_ENABLED,
       isSwapEnabled: DEFAULT_SWAP_ENABLED,
       isBridgeEnabled: DEFAULT_BRIDGE_ENABLED,
-      isAddFundsEnabled: DEFAULT_ADD_FUNDS_ENABLED,
+      isAddTokensEnabled: DEFAULT_ADD_TOKENS_ENABLED,
     });
 
     expect(
@@ -122,7 +122,7 @@ describe('withDefaultWidgetConfig', () => {
       isOnRampEnabled: DEFAULT_ON_RAMP_ENABLED,
       isSwapEnabled: DEFAULT_SWAP_ENABLED,
       isBridgeEnabled: DEFAULT_BRIDGE_ENABLED,
-      isAddFundsEnabled: DEFAULT_ADD_FUNDS_ENABLED,
+      isAddTokensEnabled: DEFAULT_ADD_TOKENS_ENABLED,
     });
 
     expect(
@@ -135,7 +135,7 @@ describe('withDefaultWidgetConfig', () => {
       isOnRampEnabled: DEFAULT_ON_RAMP_ENABLED,
       isSwapEnabled: DEFAULT_SWAP_ENABLED,
       isBridgeEnabled: DEFAULT_BRIDGE_ENABLED,
-      isAddFundsEnabled: DEFAULT_ADD_FUNDS_ENABLED,
+      isAddTokensEnabled: DEFAULT_ADD_TOKENS_ENABLED,
     });
   });
 });

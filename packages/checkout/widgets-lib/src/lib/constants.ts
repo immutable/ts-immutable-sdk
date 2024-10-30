@@ -77,9 +77,9 @@ export const DEFAULT_SWAP_ENABLED = true;
 export const DEFAULT_BRIDGE_ENABLED = true;
 
 /**
- * Commerce Widget default add funds enabled flag
+ * Commerce Widget default add tokens enabled flag
  */
-export const DEFAULT_ADD_FUNDS_ENABLED = true;
+export const DEFAULT_ADD_TOKENS_ENABLED = true;
 
 /**
  * Commerce Widget default refresh quote interval

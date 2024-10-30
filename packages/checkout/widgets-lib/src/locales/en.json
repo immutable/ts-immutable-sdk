@@ -72,12 +72,12 @@
       "heading": {
         "swap": "Swapping is not available in your region",
         "generic": "This service is not available in your region",
-        "addFunds": "This is not available in your region"
+        "addTokens": "This is not available in your region"
       },
       "body": {
         "swap": "Please refer to <quickswapLink>Quickswap’s</quickswapLink> website for further information.",
         "generic": "For further assistance visit the <immutableSupport>Immutable</immutableSupport> support page.",
-        "addFunds": "Please add tokens another way"
+        "addTokens": "Please add tokens another way"
       }
     },
     "LOADING_VIEW": {
@@ -642,7 +642,7 @@
         }
       }
     },
-    "ADD_FUNDS": {
+    "ADD_TOKENS": {
       "drawer": {
         "options": {
           "swap": {

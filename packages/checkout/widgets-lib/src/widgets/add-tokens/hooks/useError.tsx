@@ -1,18 +1,18 @@
 import { Environment } from '@imtbl/config';
 import { useContext } from 'react';
-import { AddFundsErrorTypes, RiveStateMachineInput } from '../types';
+import { AddTokensErrorTypes, RiveStateMachineInput } from '../types';
 import { useHandover } from '../../../lib/hooks/useHandover';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
 import { getRemoteRive } from '../../../lib/utils';
 import { APPROVE_TXN_ANIMATION } from '../utils/config';
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
-import { sendAddFundsCloseEvent } from '../AddFundsWidgetEvents';
+import { sendAddTokensCloseEvent } from '../AddTokensWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
-import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
+import { AddTokensWidgetViews } from '../../../context/view-context/AddTokensViewContextTypes';
 import {
   useAnalytics,
   UserJourney,
@@ -40,102 +40,102 @@ export const useError = (environment: Environment) => {
   } = useContext(EventTargetContext);
 
   const closeWidget = () => {
-    sendAddFundsCloseEvent(eventTarget);
+    sendAddTokensCloseEvent(eventTarget);
   };
 
-  const goBackToAddFundsView = () => {
+  const goBackToAddTokensView = () => {
     closeHandover();
 
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: AddFundsWidgetViews.ADD_FUNDS,
+          type: AddTokensWidgetViews.ADD_TOKENS,
         },
       },
     });
   };
 
-  const errorConfig: Record<AddFundsErrorTypes, ErrorConfig> = {
-    [AddFundsErrorTypes.DEFAULT]: {
+  const errorConfig: Record<AddTokensErrorTypes, ErrorConfig> = {
+    [AddTokensErrorTypes.DEFAULT]: {
       headingText: 'Sorry, something went wrong. Please try again later.',
       secondaryButtonText: 'Close',
       onSecondaryButtonClick: closeWidget,
     },
-    [AddFundsErrorTypes.INVALID_PARAMETERS]: {
+    [AddTokensErrorTypes.INVALID_PARAMETERS]: {
       headingText: 'Invalid parameters',
       subHeadingText:
         'The widget parameters provided are invalid. Please check again.',
       secondaryButtonText: 'Close',
       onSecondaryButtonClick: closeWidget,
     },
-    [AddFundsErrorTypes.SERVICE_BREAKDOWN]: {
+    [AddTokensErrorTypes.SERVICE_BREAKDOWN]: {
       headingText: 'Our system is currently down',
       subHeadingText:
         'We are currently experiencing technical difficulties. Please try again later.',
       secondaryButtonText: 'Close',
       onSecondaryButtonClick: closeWidget,
     },
-    [AddFundsErrorTypes.TRANSACTION_FAILED]: {
+    [AddTokensErrorTypes.TRANSACTION_FAILED]: {
       headingText: 'Transaction failed',
       subHeadingText: 'The transaction failed. Please try again.',
       primaryButtonText: 'Retry',
-      onPrimaryButtonClick: goBackToAddFundsView,
+      onPrimaryButtonClick: goBackToAddTokensView,
       secondaryButtonText: 'Close',
       onSecondaryButtonClick: closeWidget,
     },
-    [AddFundsErrorTypes.UNRECOGNISED_CHAIN]: {
+    [AddTokensErrorTypes.UNRECOGNISED_CHAIN]: {
       headingText: 'Unrecognised chain',
       subHeadingText: 'Please add the chain to your account and try again.',
       primaryButtonText: 'Retry',
-      onPrimaryButtonClick: goBackToAddFundsView,
+      onPrimaryButtonClick: goBackToAddTokensView,
       secondaryButtonText: 'Close',
       onSecondaryButtonClick: closeWidget,
     },
-    [AddFundsErrorTypes.PROVIDER_ERROR]: {
+    [AddTokensErrorTypes.PROVIDER_ERROR]: {
       headingText: 'Wallet cannot be found',
       subHeadingText:
         'Please try to connect your wallet and try again.',
       primaryButtonText: 'Retry',
-      onPrimaryButtonClick: goBackToAddFundsView,
+      onPrimaryButtonClick: goBackToAddTokensView,
       secondaryButtonText: 'Close',
       onSecondaryButtonClick: closeWidget,
     },
-    [AddFundsErrorTypes.WALLET_FAILED]: {
+    [AddTokensErrorTypes.WALLET_FAILED]: {
       headingText: 'Transaction failed',
       subHeadingText: 'The transaction failed. Please try again.',
       primaryButtonText: 'Retry',
-      onPrimaryButtonClick: goBackToAddFundsView,
+      onPrimaryButtonClick: goBackToAddTokensView,
       secondaryButtonText: 'Close',
-      onSecondaryButtonClick: goBackToAddFundsView,
+      onSecondaryButtonClick: goBackToAddTokensView,
     },
-    [AddFundsErrorTypes.WALLET_REJECTED]: {
+    [AddTokensErrorTypes.WALLET_REJECTED]: {
       headingText: 'Transaction rejected',
       subHeadingText:
         "You'll need to approve the transaction in your wallet to proceed.",
       primaryButtonText: 'Retry',
-      onPrimaryButtonClick: goBackToAddFundsView,
+      onPrimaryButtonClick: goBackToAddTokensView,
       secondaryButtonText: 'Close',
       onSecondaryButtonClick: closeWidget,
     },
-    [AddFundsErrorTypes.WALLET_REJECTED_NO_FUNDS]: {
+    [AddTokensErrorTypes.WALLET_REJECTED_NO_FUNDS]: {
       headingText: 'Insufficient funds',
       subHeadingText:
         'You do not have enough funds to complete the transaction.',
       primaryButtonText: 'Retry',
-      onPrimaryButtonClick: goBackToAddFundsView,
+      onPrimaryButtonClick: goBackToAddTokensView,
       secondaryButtonText: 'Close',
       onSecondaryButtonClick: closeWidget,
     },
-    [AddFundsErrorTypes.WALLET_POPUP_BLOCKED]: {
+    [AddTokensErrorTypes.WALLET_POPUP_BLOCKED]: {
       headingText: "Browser's popup blocked",
       subHeadingText: 'Please allow pop-ups in your browser to proceed.',
       primaryButtonText: 'Retry',
-      onPrimaryButtonClick: goBackToAddFundsView,
+      onPrimaryButtonClick: goBackToAddTokensView,
       secondaryButtonText: 'Close',
-      onSecondaryButtonClick: goBackToAddFundsView,
+      onSecondaryButtonClick: goBackToAddTokensView,
     },
-    [AddFundsErrorTypes.ENVIRONMENT_ERROR]: {
+    [AddTokensErrorTypes.ENVIRONMENT_ERROR]: {
       headingText: 'Unsupported environment',
       subHeadingText: 'This is only supported in production environment.',
       secondaryButtonText: 'Close',
@@ -143,14 +143,14 @@ export const useError = (environment: Environment) => {
     },
   };
 
-  const getErrorConfig = (errorType: AddFundsErrorTypes) => errorConfig[errorType];
+  const getErrorConfig = (errorType: AddTokensErrorTypes) => errorConfig[errorType];
 
   const showErrorHandover = (
-    errorType: AddFundsErrorTypes,
+    errorType: AddTokensErrorTypes,
     data?: Record<string, unknown>,
   ) => {
     page({
-      userJourney: UserJourney.ADD_FUNDS,
+      userJourney: UserJourney.ADD_TOKENS,
       screen: 'Error',
       extras: {
         errorType,

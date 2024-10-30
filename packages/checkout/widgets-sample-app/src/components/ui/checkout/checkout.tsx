@@ -139,7 +139,7 @@ const flows: Array<CommerceFlowType> = [
   CommerceFlowType.SWAP,
   CommerceFlowType.BRIDGE,
   CommerceFlowType.SALE,
-  CommerceFlowType.ADD_FUNDS,
+  CommerceFlowType.ADD_TOKENS,
 ];
 
 function CheckoutUI() {
@@ -201,8 +201,8 @@ function CheckoutUI() {
     WALLET: {
       flow: CommerceFlowType.WALLET,
     },
-    ADD_FUNDS: {
-      flow: CommerceFlowType.ADD_FUNDS,
+    ADD_TOKENS: {
+      flow: CommerceFlowType.ADD_TOKENS,
       toAmount: "1",
       toTokenAddress: "native",
     },

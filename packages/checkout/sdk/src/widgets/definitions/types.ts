@@ -39,12 +39,12 @@ import {
   CommerceSuccessEvent,
   CommerceFailureEvent,
   CommerceUserActionEvent,
-  RequestAddFundsEvent,
+  RequestAddTokensEvent,
   RequestGoBackEvent,
-  AddFundsEventType,
-  AddFundsConnectSuccess,
-  AddFundsSuccess,
-  AddFundsFailed,
+  AddTokensEventType,
+  AddTokensConnectSuccess,
+  AddTokensSuccess,
+  AddTokensFailed,
 } from './events';
 import {
   BridgeWidgetParams,
@@ -53,7 +53,7 @@ import {
   WalletWidgetParams,
   OnRampWidgetParams,
   CommerceWidgetParams,
-  AddFundsWidgetParams,
+  AddTokensWidgetParams,
 } from './parameters';
 import { SaleWidgetParams } from './parameters/sale';
 import {
@@ -64,7 +64,7 @@ import {
   SwapWidgetConfiguration,
   WalletWidgetConfiguration,
   CommerceWidgetConfiguration,
-  AddFundsWidgetConfiguration,
+  AddTokensWidgetConfiguration,
 } from './configurations';
 import { WidgetTheme } from './configurations/theme';
 
@@ -79,7 +79,7 @@ export enum WidgetType {
   ONRAMP = 'onramp',
   SALE = 'sale',
   IMMUTABLE_COMMERCE = 'immutableCommerce',
-  ADD_FUNDS = 'addFunds',
+  ADD_TOKENS = 'addTokens',
 }
 
 /**
@@ -97,7 +97,7 @@ export type WidgetConfigurations = {
   [WidgetType.BRIDGE]: BridgeWidgetConfiguration;
   [WidgetType.ONRAMP]: OnrampWidgetConfiguration;
   [WidgetType.SALE]: SaleWidgetConfiguration;
-  [WidgetType.ADD_FUNDS]: AddFundsWidgetConfiguration;
+  [WidgetType.ADD_TOKENS]: AddTokensWidgetConfiguration;
   [WidgetType.IMMUTABLE_COMMERCE]: CommerceWidgetConfiguration;
 };
 
@@ -109,7 +109,7 @@ export type WidgetParameters = {
   [WidgetType.BRIDGE]: BridgeWidgetParams;
   [WidgetType.ONRAMP]: OnRampWidgetParams;
   [WidgetType.SALE]: SaleWidgetParams;
-  [WidgetType.ADD_FUNDS]: AddFundsWidgetParams;
+  [WidgetType.ADD_TOKENS]: AddTokensWidgetParams;
   [WidgetType.IMMUTABLE_COMMERCE]: CommerceWidgetParams;
 };
 
@@ -124,7 +124,7 @@ export type WidgetEventTypes = {
   [WidgetType.ONRAMP]: OnRampEventType | OrchestrationEventType;
   [WidgetType.SALE]: SaleEventType | OrchestrationEventType;
   [WidgetType.IMMUTABLE_COMMERCE]: CommerceEventType | OrchestrationEventType;
-  [WidgetType.ADD_FUNDS]: AddFundsEventType | OrchestrationEventType;
+  [WidgetType.ADD_TOKENS]: AddTokensEventType | OrchestrationEventType;
 };
 
 // Mapping of Orchestration events to their payloads
@@ -134,7 +134,7 @@ type OrchestrationMapping = {
   [OrchestrationEventType.REQUEST_SWAP]: RequestSwapEvent;
   [OrchestrationEventType.REQUEST_BRIDGE]: RequestBridgeEvent;
   [OrchestrationEventType.REQUEST_ONRAMP]: RequestOnrampEvent;
-  [OrchestrationEventType.REQUEST_ADD_FUNDS]: RequestAddFundsEvent;
+  [OrchestrationEventType.REQUEST_ADD_TOKENS]: RequestAddTokensEvent;
   [OrchestrationEventType.REQUEST_GO_BACK]: RequestGoBackEvent;
 };
 
@@ -211,11 +211,11 @@ export type WidgetEventData = {
     [CommerceEventType.USER_ACTION]: CommerceUserActionEvent;
   };
 
-  [WidgetType.ADD_FUNDS]: {
-    [AddFundsEventType.CLOSE_WIDGET]: {};
-    [AddFundsEventType.CONNECT_SUCCESS]: AddFundsConnectSuccess;
-    [AddFundsEventType.SUCCESS]: AddFundsSuccess;
-    [AddFundsEventType.FAILURE]: AddFundsFailed;
+  [WidgetType.ADD_TOKENS]: {
+    [AddTokensEventType.CLOSE_WIDGET]: {};
+    [AddTokensEventType.CONNECT_SUCCESS]: AddTokensConnectSuccess;
+    [AddTokensEventType.SUCCESS]: AddTokensSuccess;
+    [AddTokensEventType.FAILURE]: AddTokensFailed;
   } & OrchestrationMapping &
   ProviderEventMapping;
 };

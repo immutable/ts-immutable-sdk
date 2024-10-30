@@ -14,7 +14,7 @@ const connectLoaderFlows = [
  * List of views that require a providers context wrapper
  */
 const providersContextFlows = [
-  CommerceFlowType.ADD_FUNDS,
+  CommerceFlowType.ADD_TOKENS,
 ] as unknown[];
 
 /**

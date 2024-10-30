@@ -1,11 +1,11 @@
 import localForage from 'localforage';
 
-export const addFundsOnboardingCache = localForage.createInstance({
-  name: 'AddFunds Onboarding State',
+export const addTokensOnboardingCache = localForage.createInstance({
+  name: 'AddTokens Onboarding State',
   version: 1.0,
   storeName: 'Internal state',
   description:
-    'A small IndexDB for storage of state relating to the AddFunds Onboarding Drawer',
+    'A small IndexDB for storage of state relating to the AddTokens Onboarding Drawer',
 });
 
 export const SEEN_ONBOARDING_KEY = 'seen-onboarding';
@@ -15,18 +15,18 @@ type CacheItem = {
 } | null;
 
 export async function getCacheItem(key: string) {
-  const data: CacheItem = await addFundsOnboardingCache.getItem(key);
+  const data: CacheItem = await addTokensOnboardingCache.getItem(key);
   if (!data) return null;
   const { value } = data;
   return value;
 }
 
 export async function setCacheItem(key: string, value: boolean) {
-  return addFundsOnboardingCache.setItem(key, {
+  return addTokensOnboardingCache.setItem(key, {
     value,
   });
 }
 
 export async function clearCacheItems() {
-  return addFundsOnboardingCache.clear();
+  return addTokensOnboardingCache.clear();
 }

@@ -6,7 +6,7 @@ import { Checkout } from '@imtbl/checkout-sdk';
 import { listVariants } from '../../../lib/animation/listAnimation';
 import { Options } from './Options';
 import { FiatOptionType, RouteData } from '../types';
-import { AddFundsContext } from '../context/AddFundsContext';
+import { AddTokensContext } from '../context/AddTokensContext';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 
 type OptionsDrawerProps = {
@@ -37,8 +37,8 @@ export function OptionsDrawer({
   insufficientBalance,
 }: OptionsDrawerProps) {
   const {
-    addFundsState: { chains },
-  } = useContext(AddFundsContext);
+    addTokensState: { chains },
+  } = useContext(AddTokensContext);
 
   const {
     providersState: { fromProviderInfo, fromAddress },

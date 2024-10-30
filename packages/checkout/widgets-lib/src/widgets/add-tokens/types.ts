@@ -58,12 +58,12 @@ export enum RiveStateMachineInput {
   ERROR = 4,
 }
 
-export type AddFundsError = {
-  type: AddFundsErrorTypes;
+export type AddTokensError = {
+  type: AddTokensErrorTypes;
   data?: Record<string, unknown>;
 };
 
-export enum AddFundsErrorTypes {
+export enum AddTokensErrorTypes {
   DEFAULT = 'DEFAULT_ERROR',
   INVALID_PARAMETERS = 'INVALID_PARAMETERS',
   SERVICE_BREAKDOWN = 'SERVICE_BREAKDOWN',

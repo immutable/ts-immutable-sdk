@@ -1,5 +1,5 @@
 import {
-  AddFundsEventType,
+  AddTokensEventType,
   BridgeEventType,
   Checkout,
   OnRampEventType,
@@ -16,9 +16,9 @@ import { useMemo, useEffect, useState } from "react";
 import { passport } from "./passport";
 import { Web3Provider } from "@ethersproject/providers";
 
-const ADD_FUNDS_TARGET_ID = "add-funds-widget-target";
+const ADD_TOKENS_TARGET_ID = "add-tokens-widget-target";
 
-function AddFundsUI() {
+function AddTokensUI() {
   const checkout = useMemo(
     () =>
       new Checkout({
@@ -51,9 +51,9 @@ function AddFundsUI() {
   const [toTokenAddress, setToTokenAddress] = useState<string | undefined>(undefined);
   const [toAmount, setToAmount] = useState<string | undefined>(undefined);
 
-  const addFunds = useMemo(
+  const addTokens = useMemo(
     () =>
-      factory.create(WidgetType.ADD_FUNDS, {
+      factory.create(WidgetType.ADD_TOKENS, {
         config: {
           theme: WidgetTheme.DARK,
         },
@@ -66,7 +66,7 @@ function AddFundsUI() {
 
 
   const mount = () => {
-    addFunds.mount(ADD_FUNDS_TARGET_ID, {
+    addTokens.mount(ADD_TOKENS_TARGET_ID, {
       showOnrampOption: true,
       showSwapOption: false,
       showBridgeOption: false,
@@ -83,7 +83,7 @@ function AddFundsUI() {
   useEffect(() => {
     if (!checkout || !factory) return;
     if (!presetToProvider) {
-      toProvider && addFunds.unmount();
+      toProvider && addTokens.unmount();
       setToProvider(undefined);
       return;
     }
@@ -112,33 +112,33 @@ function AddFundsUI() {
 
   useEffect(() => {
     mount();
-    addFunds.addListener(AddFundsEventType.CLOSE_WIDGET, (data: any) => {
+    addTokens.addListener(AddTokensEventType.CLOSE_WIDGET, (data: any) => {
       console.log("CLOSE_WIDGET", data);
-      addFunds.unmount();
+      addTokens.unmount();
     });
-    addFunds.addListener(OrchestrationEventType.REQUEST_ONRAMP, (data: any) => {
+    addTokens.addListener(OrchestrationEventType.REQUEST_ONRAMP, (data: any) => {
       console.log("REQUEST_ONRAMP", data);
-      addFunds.unmount();
+      addTokens.unmount();
       onRamp.addListener(OnRampEventType.CLOSE_WIDGET, (data: any) => {
         console.log("CLOSE_WIDGET", data);
         onRamp.unmount();
       });
-      onRamp.mount(ADD_FUNDS_TARGET_ID, {
+      onRamp.mount(ADD_TOKENS_TARGET_ID, {
         ...data,
         showBackButton: true,
       });
     });
-    addFunds.addListener(AddFundsEventType.CONNECT_SUCCESS, (data: any) => {
+    addTokens.addListener(AddTokensEventType.CONNECT_SUCCESS, (data: any) => {
       console.log("CONNECT_SUCCESS", data);
     });
-    addFunds.addListener(OrchestrationEventType.REQUEST_BRIDGE, (data: any) => {
+    addTokens.addListener(OrchestrationEventType.REQUEST_BRIDGE, (data: any) => {
       console.log("REQUEST_BRIDGE", data);
-      addFunds.unmount();
+      addTokens.unmount();
       bridge.addListener(BridgeEventType.CLOSE_WIDGET, (data: any) => {
         console.log("CLOSE_WIDGET", data);
         bridge.unmount();
       });
-      bridge.mount(ADD_FUNDS_TARGET_ID, {
+      bridge.mount(ADD_TOKENS_TARGET_ID, {
         ...data,
         showBackButton: true,
       });
@@ -151,37 +151,37 @@ function AddFundsUI() {
     });
 
     return () => {
-      addFunds.removeListener(AddFundsEventType.CLOSE_WIDGET);
-      addFunds.removeListener(OrchestrationEventType.REQUEST_ONRAMP);
-      addFunds.removeListener(AddFundsEventType.CONNECT_SUCCESS);
+      addTokens.removeListener(AddTokensEventType.CLOSE_WIDGET);
+      addTokens.removeListener(OrchestrationEventType.REQUEST_ONRAMP);
+      addTokens.removeListener(AddTokensEventType.CONNECT_SUCCESS);
       onRamp.removeListener(OnRampEventType.CLOSE_WIDGET);
       onRamp.removeListener(OrchestrationEventType.REQUEST_GO_BACK);
       bridge.removeListener(BridgeEventType.CLOSE_WIDGET);
       bridge.removeListener(OrchestrationEventType.REQUEST_GO_BACK);
     }
-  }, [addFunds, toProvider, toTokenAddress, toAmount]);
+  }, [addTokens, toProvider, toTokenAddress, toAmount]);
 
   return (
     <div>
-      <h1 className="sample-heading">Checkout Add Funds</h1>
-      <div id={ADD_FUNDS_TARGET_ID}></div>
+      <h1 className="sample-heading">Checkout Add Tokens</h1>
+      <div id={ADD_TOKENS_TARGET_ID}></div>
       <button onClick={() => mount()}>Mount</button>
-      <button onClick={() => addFunds.unmount()}>Unmount</button>
+      <button onClick={() => addTokens.unmount()}>Unmount</button>
       <button
         onClick={() =>
-          addFunds.update({ config: { theme: WidgetTheme.LIGHT } })
+          addTokens.update({ config: { theme: WidgetTheme.LIGHT } })
         }
       >
         Update Config Light
       </button>
       <button
-        onClick={() => addFunds.update({ config: { theme: WidgetTheme.DARK } })}
+        onClick={() => addTokens.update({ config: { theme: WidgetTheme.DARK } })}
       >
         Update Config Dark
       </button>
       <select
         onChange={(e) =>
-          addFunds.update({
+          addTokens.update({
             config: { language: e.target.value as WidgetLanguage },
           })
         }
@@ -210,4 +210,4 @@ function AddFundsUI() {
   );
 }
 
-export default AddFundsUI;
+export default AddTokensUI;

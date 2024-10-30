@@ -13,7 +13,7 @@ export function SquidFooter() {
       }}
     >
       <Trans
-        i18nKey={t('views.ADD_FUNDS.footer.body')}
+        i18nKey={t('views.ADD_TOKENS.footer.body')}
         components={{
           squidLink: <Link
             size="xSmall"
