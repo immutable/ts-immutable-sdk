@@ -1,32 +1,19 @@
 "use client";
 import { Box } from '@biom3/react';
 import { checkout } from '@imtbl/sdk';
-import { CommerceFlowType, ConnectionSuccess, Widget, WidgetType } from '@imtbl/sdk/checkout';
-import { useEffect, useState } from 'react';
+import { CommerceFlowType, ConnectionSuccess } from '@imtbl/sdk/checkout';
+import { useEffect } from 'react';
+import { useCommerceWidget } from '../../hooks/useCommerceWidget';
 
-const checkoutSDK = new checkout.Checkout();
+function CommerceConnect() {
 
-function Widgets() {
-
-  const [widget, setWidget] = useState<Widget<WidgetType.IMMUTABLE_COMMERCE>>();
-
-  useEffect(() => {
-
-    const loadWidgets = async () => {
-      const widgetsFactory = await checkoutSDK.widgets({ config: {} });
-
-      const widget = widgetsFactory.create(WidgetType.IMMUTABLE_COMMERCE, {})
-      setWidget(widget);
-    }
-
-    loadWidgets();
-  }, []);
+  const { widget } = useCommerceWidget();
 
 
   useEffect(() => {
     if (!widget) return;
     widget.mount("widget-root", {
-      flow: CommerceFlowType.WALLET,
+      flow: CommerceFlowType.CONNECT,
     });
 
     widget.addListener(
@@ -38,10 +25,6 @@ function Widgets() {
         if (type === checkout.CommerceSuccessEventType.CONNECT_SUCCESS) {
           const { walletProviderName } = data as ConnectionSuccess;
           console.log('connected to ', walletProviderName);
-          // setProvider(data.provider);
-
-          // optional, immediately close the widget
-          // widget.unmount();
         }
       }
     );
@@ -66,7 +49,7 @@ function Widgets() {
     // clean up event listeners
     return () => {
       widget.removeListener(checkout.CommerceEventType.SUCCESS);
-      widget.removeListener(checkout.CommerceEventType.DISCONNECTED);
+      widget.removeListener(checkout.CommerceEventType.FAILURE);
       widget.removeListener(checkout.CommerceEventType.CLOSE);
     };
 
@@ -89,4 +72,4 @@ function Widgets() {
   )
 }
 
-export default Widgets;
+export default CommerceConnect;
