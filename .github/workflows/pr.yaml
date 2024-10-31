@@ -71,7 +71,7 @@ jobs:
       - name: Setup playwright
         uses: ./.github/actions/setup-playwright
 
-      - name: Prepare widgets bundle for @examples/sdk-load-widgets-with-nextjs
+      - name: Prepare widgets bundle for @examples/commerce-widget-nextjs
         run: yarn workspace @imtbl/checkout-widgets prepare:examplewidgets
 
       - name: Test examples

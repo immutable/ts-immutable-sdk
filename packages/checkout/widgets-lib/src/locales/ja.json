@@ -76,12 +76,12 @@
       "heading": {
         "swap": "お住まいの地域では交換が利用できません",
         "generic": "このサービスはお住まいの地域では利用できません",
-        "addFunds": "このサービスはお住まいの地域では利用できません"
+        "addTokens": "このサービスはお住まいの地域では利用できません"
       },
       "body": {
         "swap": "<quickswapLink>Quickswap</quickswapLink>のウェブサイトで詳細情報をご覧ください。",
         "generic": "詳しいサポートについては、<immutableSupport>Immutable</immutableSupport>サポートページをご覧ください.",
-        "addFunds": "別の方法でトークンを追加してください。"
+        "addTokens": "別の方法でトークンを追加してください。"
       }
     },
     "LOADING_VIEW": {
@@ -629,7 +629,7 @@
         }
       }
     },
-    "ADD_FUNDS": {
+    "ADD_TOKENS": {
       "drawer": {
         "options": {
           "swap": {

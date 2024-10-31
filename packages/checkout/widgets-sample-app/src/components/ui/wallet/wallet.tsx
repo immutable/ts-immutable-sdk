@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 import {
-  AddFundsEventType,
+  AddTokensEventType,
   Checkout,
   OnRampEventType,
   OrchestrationEventType,
@@ -22,8 +22,8 @@ function WalletUI() {
   );
   const factory = useMemo(() => new WidgetsFactory(checkout, {}), [checkout]);
   const wallet = useMemo(() => factory.create(WidgetType.WALLET), [factory]);
-  const addFunds = useMemo(
-    () => factory.create(WidgetType.ADD_FUNDS),
+  const addTokens = useMemo(
+    () => factory.create(WidgetType.ADD_TOKENS),
     [factory]
   );
   const onRamp = useMemo(() => factory.create(WidgetType.ONRAMP), [factory]);
@@ -57,12 +57,12 @@ function WalletUI() {
   };
   const update = (theme: WidgetTheme) => {
     wallet.update({ config: { theme } });
-    addFunds.update({ config: { theme } });
+    addTokens.update({ config: { theme } });
     onRamp.update({ config: { theme } });
   };
   const updateLanguage = (language: any) => {
     wallet.update({ config: { language } });
-    addFunds.update({ config: { language } });
+    addTokens.update({ config: { language } });
     onRamp.update({ config: { language } });
   };
 
@@ -74,21 +74,21 @@ function WalletUI() {
     wallet.addListener(WalletEventType.CLOSE_WIDGET, () => {
       unmount();
     });
-    wallet.addListener(OrchestrationEventType.REQUEST_ADD_FUNDS, (data) => {
+    wallet.addListener(OrchestrationEventType.REQUEST_ADD_TOKENS, (data) => {
       unmount();
-      addFunds.mount("wallet", { ...data, showBackButton: true });
+      addTokens.mount("wallet", { ...data, showBackButton: true });
     });
     wallet.addListener(OrchestrationEventType.REQUEST_ONRAMP, (data) => {
       unmount();
       onRamp.mount("wallet", { ...data, showBackButton: true });
     });
 
-    addFunds.addListener(OrchestrationEventType.REQUEST_GO_BACK, () => {
-      addFunds.unmount();
+    addTokens.addListener(OrchestrationEventType.REQUEST_GO_BACK, () => {
+      addTokens.unmount();
       mount();
     });
-    addFunds.addListener(AddFundsEventType.CLOSE_WIDGET, () => {
-      addFunds.unmount();
+    addTokens.addListener(AddTokensEventType.CLOSE_WIDGET, () => {
+      addTokens.unmount();
     });
 
     onRamp.addListener(OrchestrationEventType.REQUEST_GO_BACK, () => {

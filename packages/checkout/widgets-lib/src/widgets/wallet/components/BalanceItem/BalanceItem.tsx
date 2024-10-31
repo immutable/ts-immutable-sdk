@@ -44,7 +44,7 @@ export function BalanceItem({
   const [isOnRampEnabled, setIsOnRampEnabled] = useState<boolean>();
   const [isBridgeEnabled, setIsBridgeEnabled] = useState<boolean>();
   const [isSwapEnabled, setIsSwapEnabled] = useState<boolean>();
-  const [isAddFundsEnabled, setIsAddFundsEnabled] = useState<boolean>();
+  const [isAddTokensEnabled, setIsAddTokensEnabled] = useState<boolean>();
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
@@ -77,9 +77,9 @@ export function BalanceItem({
   useEffect(() => {
     if (!network || !supportedTopUps || !checkout) return;
 
-    const enableAddCoin = (supportedTopUps?.isAddFundsEnabled ?? true)
+    const enableAddCoin = (supportedTopUps?.isAddTokensEnabled ?? true)
     && (supportedTopUps?.isSwapAvailable ?? true);
-    setIsAddFundsEnabled(enableAddCoin);
+    setIsAddTokensEnabled(enableAddCoin);
 
     const enableBuyCoin = !enableAddCoin
       && network.chainId === getL2ChainId(checkout.config)
@@ -109,7 +109,7 @@ export function BalanceItem({
     );
 
     const canAdd = Boolean(
-      isAddFundsEnabled
+      isAddTokensEnabled
         && swapAllowedTokens.length > 0
         && swapAllowedTokens.find(
           (token) => token.address?.toLowerCase() === balanceInfo.address?.toLowerCase(),
@@ -120,7 +120,7 @@ export function BalanceItem({
   }, [
     isOnRampEnabled,
     onRampAllowedTokens,
-    isAddFundsEnabled,
+    isAddTokensEnabled,
     swapAllowedTokens,
   ]);
 
@@ -136,8 +136,8 @@ export function BalanceItem({
       },
     });
 
-    if (isAddFundsEnabled) {
-      orchestrationEvents.sendRequestAddFundsEvent(
+    if (isAddTokensEnabled) {
+      orchestrationEvents.sendRequestAddTokensEvent(
         eventTarget,
         IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
         {
@@ -179,7 +179,7 @@ export function BalanceItem({
         price={tokenValueFormat(balanceInfo.balance)}
         fiatAmount={fiatAmount}
       />
-      {(isOnRampEnabled || isSwapEnabled || isBridgeEnabled || isAddFundsEnabled) && (
+      {(isOnRampEnabled || isSwapEnabled || isBridgeEnabled || isAddTokensEnabled) && (
         <MenuItem.OverflowPopoverMenu
           size="small"
           testId="token-menu"

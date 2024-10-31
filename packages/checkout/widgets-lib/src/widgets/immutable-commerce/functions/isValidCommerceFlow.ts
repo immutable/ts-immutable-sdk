@@ -8,7 +8,7 @@ export const commerceFlows = [
   CommerceFlowType.SWAP,
   CommerceFlowType.BRIDGE,
   CommerceFlowType.ONRAMP,
-  CommerceFlowType.ADD_FUNDS,
+  CommerceFlowType.ADD_TOKENS,
 ];
 
 /**

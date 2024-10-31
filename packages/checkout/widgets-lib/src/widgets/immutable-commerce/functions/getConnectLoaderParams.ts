@@ -34,7 +34,7 @@ export function getConnectLoaderParams(
         ],
       };
     case CommerceFlowType.ONRAMP:
-    case CommerceFlowType.ADD_FUNDS:
+    case CommerceFlowType.ADD_TOKENS:
       return {
         checkout,
         web3Provider,

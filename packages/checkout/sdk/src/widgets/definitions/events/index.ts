@@ -7,4 +7,4 @@ export * from './bridge';
 export * from './orchestration';
 export * from './onramp';
 export * from './commerce';
-export * from './addFunds';
+export * from './addTokens';

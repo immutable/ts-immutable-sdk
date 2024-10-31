@@ -6,5 +6,5 @@ export * from './onramp';
 export * from './sale';
 export * from './theme';
 export * from './widget';
-export * from './addFunds';
+export * from './addTokens';
 export * from './commerce';

@@ -7,7 +7,7 @@ const orchestrationEvents = [
   OrchestrationEventType.REQUEST_SWAP,
   OrchestrationEventType.REQUEST_BRIDGE,
   OrchestrationEventType.REQUEST_ONRAMP,
-  OrchestrationEventType.REQUEST_ADD_FUNDS,
+  OrchestrationEventType.REQUEST_ADD_TOKENS,
   OrchestrationEventType.REQUEST_GO_BACK,
 ];
 
