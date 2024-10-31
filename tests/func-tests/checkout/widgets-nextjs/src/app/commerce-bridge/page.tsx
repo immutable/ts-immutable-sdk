@@ -8,7 +8,7 @@ import { useCommerceWidget } from '../../hooks/useCommerceWidget';
 
 function CommerceBridge() {
 
-  const widget = useCommerceWidget();
+  const { widget } = useCommerceWidget();
 
 
   useEffect(() => {

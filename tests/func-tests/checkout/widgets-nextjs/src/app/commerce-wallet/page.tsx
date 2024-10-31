@@ -2,16 +2,23 @@
 import { Box } from '@biom3/react';
 import { checkout } from '@imtbl/sdk';
 import { CommerceFlowType, ConnectionSuccess } from '@imtbl/sdk/checkout';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useCommerceWidget } from '../../hooks/useCommerceWidget';
+import { Web3Provider } from '@ethersproject/providers';
+import { MockProvider } from '../utils/mockProvider';
+
+
+
 
 function CommerceWallet() {
-
-  const widget = useCommerceWidget();
-
+  const { widget, factory } = useCommerceWidget();
+  const provider = useMemo(() => new Web3Provider(new MockProvider()), []);
 
   useEffect(() => {
-    if (!widget) return;
+    if (!widget || !factory) return;
+
+    factory.updateProvider(provider);
+
     widget.mount("widget-root", {
       flow: CommerceFlowType.WALLET,
     });
@@ -54,7 +61,7 @@ function CommerceWallet() {
     };
 
 
-  }, [widget]);
+  }, [widget, factory, provider]);
 
 
   return (

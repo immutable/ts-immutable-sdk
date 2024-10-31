@@ -7,7 +7,7 @@ import { useCommerceWidget } from '../../hooks/useCommerceWidget';
 
 function CommerceAddFunds() {
 
-  const widget = useCommerceWidget();
+  const { widget } = useCommerceWidget();
 
 
   useEffect(() => {

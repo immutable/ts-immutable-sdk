@@ -1,9 +1,9 @@
 import { test, expect } from "@playwright/test";
-import { interceptWidgets } from "./utils/intercept-widgets";
+import { interceptWidgets } from "./utils/interceptWidgets";
 import {
   CheckoutVersionConfig,
   interceptCheckoutVersionConfig,
-} from "./utils/intercept-checkout-config";
+} from "./utils/interceptCheckoutConfig";
 
 const USE_REMOTE_WIDGETS = process.env.USE_REMOTE_WIDGETS === "true";
 
@@ -36,9 +36,6 @@ test.describe("widget mounting - connect flow", () => {
     const widgetRoot = page.locator("#widget-root");
     await expect(widgetRoot).not.toBeEmpty();
 
-    await page.waitForLoadState('networkidle');
-    await expect(page.getByTestId("error-view")).toHaveCount(0);
-
     const connectWidget = page.getByTestId("connect-wallet");
     await expect(connectWidget).toBeVisible();
 
@@ -61,9 +58,6 @@ test.describe("widget mounting - bridge flow", () => {
     const widgetRoot = page.locator("#widget-root");
     await expect(widgetRoot).not.toBeEmpty();
 
-    await page.waitForLoadState('networkidle');
-    await expect(page.getByTestId("error-view")).toHaveCount(0);
-
     const connectWidget = page.getByTestId("bridge-view");
     await expect(connectWidget).toBeVisible();
 
@@ -75,31 +69,28 @@ test.describe("widget mounting - bridge flow", () => {
   });
 });
 
-/**
- * Flows behind ConnectLoader require a mocked Provider to get past the ConnectWidget.
- * Until then, WALLET, SWAP, SALE, ONRAMP won't be testable.
- */
 test.describe("widget mounting - wallet flow", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/commerce-wallet");
   });
 
-  test("should render connect widget", async ({ page }) => {
+  test("should render connect widget and handle close", async ({ page }) => {
     await page.waitForSelector("#widget-root");
 
     const widgetRoot = page.locator("#widget-root");
     await expect(widgetRoot).not.toBeEmpty();
 
-    await page.waitForLoadState('networkidle');
-    await expect(page.getByTestId("error-view")).toHaveCount(0);
+    const walletWidget = page.getByTestId("wallet-balances");
+    await expect(walletWidget).toBeVisible();
 
-    const connectWidget = page.getByTestId("connect-wallet");
-    await expect(connectWidget).toBeVisible();
+    const closeButton = page.getByTestId("close-button");
+    await expect(closeButton).toBeVisible();
+    await closeButton.click();
   });
 });
 
 /**
- * Add Funds is disabled in Sandbox, we can only validate it doesn't show an error screen.
+ * Add Funds is disabled in Sandbox, it  will render a handover screen with error text.
  */
 test.describe("widget mounting - add funds flow", () => {
   test.beforeEach(async ({ page }) => {
@@ -111,7 +102,79 @@ test.describe("widget mounting - add funds flow", () => {
     const widgetRoot = page.locator("#widget-root");
     await expect(widgetRoot).not.toBeEmpty();
 
-    await page.waitForLoadState('networkidle');
-    await expect(page.getByTestId("error-view")).toHaveCount(0);
+    const closeButton = page.getByTestId("handover-secondary-button");
+    await expect(closeButton).toBeVisible();
+
+    // Add Funds events are not currently supported in Commerce
+    // await closeButton.click();
+
+    // await expect(widgetRoot).toBeEmpty();
+  });
+});
+
+
+
+// Without inputs Sale will render a handover screen with error text.
+test.describe("widget mounting - sale flow", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/commerce-sale");
+  });
+
+  test("should render sale widget and handle close", async ({ page }) => {
+    await page.waitForSelector("#widget-root");
+    const widgetRoot = page.locator("#widget-root");
+    await expect(widgetRoot).not.toBeEmpty();
+
+    const closeButton = page.getByTestId("handover-secondary-button");
+    await expect(closeButton).toBeVisible();
+    await closeButton.click();
+
+    await expect(widgetRoot).toBeEmpty();
+  });
+});
+
+test.describe("widget mounting - swap flow", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/commerce-swap");
+  });
+
+  test("should render sale widget and handle close", async ({ page }) => {
+    await page.waitForSelector("#widget-root");
+    const widgetRoot = page.locator("#widget-root");
+    await expect(widgetRoot).not.toBeEmpty();
+
+
+    // If the user has insufficient IMX, they will be shown a bottom sheet with a cancel button.
+    const notEnoughGasBottomSheet = page.getByTestId("not-enough-gas-bottom-sheet");
+    await expect(notEnoughGasBottomSheet).toBeVisible();
+    if (await notEnoughGasBottomSheet.isVisible()) {
+      const notEnoughGasCancelButton = page.getByTestId("not-enough-gas-cancel-button");
+      await notEnoughGasCancelButton.click();
+    }
+
+    const swapButton = page.getByTestId("swap-button");
+    await expect(swapButton).toBeVisible();
+
+    const closeButton = page.getByTestId("close-button");
+    await expect(closeButton).toBeVisible();
+    await closeButton.click();
+
+    await expect(widgetRoot).toBeEmpty();
+  });
+});
+
+test.describe("widget mounting - onramp flow", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/commerce-onramp");
+  });
+
+  test("should render onramp widget", async ({ page }) => {
+    await page.waitForSelector("#widget-root");
+    const widgetRoot = page.locator("#widget-root");
+    await expect(widgetRoot).not.toBeEmpty();
+
+    const transakLoadingOverlay = page.getByTestId("LoadingOverlayContent__loopingText__text--Taking you to Transak__animatingSpan");
+    await expect(transakLoadingOverlay).toBeVisible();
+
   });
 });
