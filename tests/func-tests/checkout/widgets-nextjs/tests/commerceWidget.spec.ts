@@ -90,14 +90,14 @@ test.describe("widget mounting - wallet flow", () => {
 });
 
 /**
- * Add Funds is disabled in Sandbox, it  will render a handover screen with error text.
+ * Add Tokens is disabled in Sandbox, it  will render a handover screen with error text.
  */
-test.describe("widget mounting - add funds flow", () => {
+test.describe("widget mounting - add tokens flow", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/commerce-add-funds");
+    await page.goto("/commerce-add-tokens");
   });
 
-  test("should render add funds widget", async ({ page }) => {
+  test("should render add tokens widget", async ({ page }) => {
     await page.waitForSelector("#widget-root");
     const widgetRoot = page.locator("#widget-root");
     await expect(widgetRoot).not.toBeEmpty();
@@ -105,7 +105,7 @@ test.describe("widget mounting - add funds flow", () => {
     const closeButton = page.getByTestId("handover-secondary-button");
     await expect(closeButton).toBeVisible();
 
-    // Add Funds events are not currently supported in Commerce
+    // Add Tokens events are not currently supported in Commerce
     // await closeButton.click();
 
     // await expect(widgetRoot).toBeEmpty();

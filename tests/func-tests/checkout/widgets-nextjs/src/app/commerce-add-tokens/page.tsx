@@ -5,7 +5,7 @@ import { CommerceFlowType, ConnectionSuccess } from '@imtbl/sdk/checkout';
 import { useEffect } from 'react';
 import { useCommerceWidget } from '../../hooks/useCommerceWidget';
 
-function CommerceAddFunds() {
+function CommerceAddTokens() {
 
   const { widget } = useCommerceWidget();
 
@@ -13,7 +13,7 @@ function CommerceAddFunds() {
   useEffect(() => {
     if (!widget) return;
     widget.mount("widget-root", {
-      flow: CommerceFlowType.ADD_FUNDS,
+      flow: CommerceFlowType.ADD_TOKENS,
     });
 
     widget.addListener(
@@ -21,22 +21,22 @@ function CommerceAddFunds() {
       (payload: checkout.CommerceSuccessEvent) => {
         const { type, data } = payload;
 
-        // capture provider after user connects their wallet
-        if (type === checkout.CommerceSuccessEventType.ADD_FUNDS_SUCCESS) {
+        // capture transaction hash after user adds tokens
+        if (type === checkout.CommerceSuccessEventType.ADD_TOKENS_SUCCESS) {
           const { transactionHash } = data;
-          console.log('Add Funds Success: ', transactionHash);
+          console.log('Add Tokens Success: ', transactionHash);
         }
       }
     );
 
-    // detect when user fails to connect
+    // detect when user fails to add tokens
     widget.addListener(
       checkout.CommerceEventType.FAILURE,
       (payload: checkout.CommerceFailureEvent) => {
         const { type, data } = payload;
 
-        if (type === checkout.CommerceFailureEventType.ADD_FUNDS_FAILED) {
-          console.log('failed to add funds', data.reason);
+        if (type === checkout.CommerceFailureEventType.ADD_TOKENS_FAILED) {
+          console.log('failed to add tokens', data.reason);
         }
       }
     );
@@ -72,4 +72,4 @@ function CommerceAddFunds() {
   )
 }
 
-export default CommerceAddFunds;
+export default CommerceAddTokens;

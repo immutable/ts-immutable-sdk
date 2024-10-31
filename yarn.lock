@@ -5039,9 +5039,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/sdk@npm:1.61.0":
-  version: 1.61.0
-  resolution: "@imtbl/sdk@npm:1.61.0"
+"@imtbl/sdk@npm:1.62.0-alpha.4":
+  version: 1.62.0-alpha.4
+  resolution: "@imtbl/sdk@npm:1.62.0-alpha.4"
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
@@ -5114,7 +5114,7 @@ __metadata:
       optional: true
     prisma:
       optional: true
-  checksum: 93f3c3198842d5b4d7a44eb2b20091697c1dbc64fcc3e677fd7e8fa77c456611cb189aab874a8b8d4e8df27e83f189affbdfe40291e810f423d8f818da72b0c7
+  checksum: 9f792a9582b7040a249f2c86a2ab8fde4a7dcd0fa3020eb84d93e4551ec109461f6c8f8f49aa9e3511a0cbb37e613d00306eea15b2103d132cfe8292fce4e285
   languageName: node
   linkType: hard
 
@@ -12253,7 +12253,7 @@ __metadata:
   dependencies:
     "@biom3/react": ^0.25.21
     "@ethersproject/providers": ^5.7.2
-    "@imtbl/sdk": 1.61.0
+    "@imtbl/sdk": 1.62.0-alpha.4
     "@playwright/test": ^1.45.3
     "@types/node": ^20
     "@types/react": ^18.3.4
