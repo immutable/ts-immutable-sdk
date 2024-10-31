@@ -72,12 +72,12 @@
       "heading": {
         "swap": "해당 지역에서는 스왑을 이용할 수 없습니다",
         "generic": "이 서비스는 귀하의 지역에서 사용할 수 없습니다",
-        "addFunds": "이 서비스는 귀하의 지역에서 사용할 수 없습니다"
+        "addTokens": "이 서비스는 귀하의 지역에서 사용할 수 없습니다"
       },
       "body": {
         "swap": "<quickswapLink>Quickswap</quickswapLink> 웹사이트에서 자세한 내용을 확인하세요.",
         "generic": "자세한 내용은 <immutableSupport>Immutable</immutableSupport> 지원 페이지를 참조하세요.",
-        "addFunds": "다른 방법으로 토큰을 추가해 주세요."
+        "addTokens": "다른 방법으로 토큰을 추가해 주세요."
       }
     },
     "LOADING_VIEW": {
@@ -622,7 +622,7 @@
         }
       }
     },
-    "ADD_FUNDS": {
+    "ADD_TOKENS": {
       "drawer": {
         "options": {
           "swap": {

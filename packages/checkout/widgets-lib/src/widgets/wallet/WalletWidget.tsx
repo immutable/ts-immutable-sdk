@@ -5,7 +5,7 @@ import {
   useReducer,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IMTBLWidgetEvents, WalletWidgetParams, AddFundsConfig } from '@imtbl/checkout-sdk';
+import { IMTBLWidgetEvents, WalletWidgetParams, AddTokensConfig } from '@imtbl/checkout-sdk';
 import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import {
   initialWalletState,
@@ -54,7 +54,7 @@ export default function WalletWidget(props: WalletWidgetInputs) {
       isOnRampEnabled,
       isSwapEnabled,
       isBridgeEnabled,
-      isAddFundsEnabled,
+      isAddTokensEnabled,
       theme,
     },
     walletConfig: {
@@ -124,10 +124,10 @@ export default function WalletWidget(props: WalletWidgetInputs) {
         checkSwapAvailable = await checkout.isSwapAvailable();
       } catch { /* */ }
 
-      let checkAddFundsEnabled = isAddFundsEnabled;
+      let checkAddTokensEnabled = isAddTokensEnabled;
       try {
-        const addFundsConfig = (await checkout.config.remote.getConfig('addfunds') as AddFundsConfig);
-        checkAddFundsEnabled = addFundsConfig.enabled && isAddFundsEnabled;
+        const addTokensConfig = (await checkout.config.remote.getConfig('addTokens') as AddTokensConfig);
+        checkAddTokensEnabled = addTokensConfig.enabled && isAddTokensEnabled;
       } catch { /* */ }
 
       walletDispatch({
@@ -138,8 +138,8 @@ export default function WalletWidget(props: WalletWidgetInputs) {
             isSwapEnabled,
             isOnRampEnabled,
             isSwapAvailable: checkSwapAvailable,
-            isAddFundsEnabled: checkAddFundsEnabled,
-            isAddFundsAvailable: checkSwapAvailable && checkAddFundsEnabled,
+            isAddTokensEnabled: checkAddTokensEnabled,
+            isAddTokensAvailable: checkSwapAvailable && checkAddTokensEnabled,
           },
         },
       });
@@ -238,7 +238,7 @@ export default function WalletWidget(props: WalletWidgetInputs) {
               showOnrampOption={isOnRampEnabled}
               showSwapOption={isSwapEnabled}
               showBridgeOption={isBridgeEnabled}
-              showAddFundsOption={supportedTopUps?.isAddFundsAvailable}
+              showAddTokensOption={supportedTopUps?.isAddTokensAvailable}
               onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
             />
           )}

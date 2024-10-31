@@ -72,12 +72,12 @@
       "heading": {
         "swap": "您的地区无法使用兑换功能",
         "generic": "该服务在您的地区不可用",
-        "addFunds": "该服务在您的地区不可用"
+        "addTokens": "该服务在您的地区不可用"
       },
       "body": {
         "swap": "请访问<quickswapLink>Quickswap</quickswapLink>网站了解更多信息。",
         "generic": "更多帮助，请访问<immutableSupport>Immutable</immutableSupport>支持页面。",
-        "addFunds": "请通过其他方式添加代币。"
+        "addTokens": "请通过其他方式添加代币。"
       }
     },
     "LOADING_VIEW": {
@@ -622,7 +622,7 @@
         }
       }
     },
-    "ADD_FUNDS": {
+    "ADD_TOKENS": {
       "drawer": {
         "options": {
           "swap": {

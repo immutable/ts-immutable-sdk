@@ -17,8 +17,8 @@ export function getViewFromOrchestrationEventType(
       return CommerceFlowType.BRIDGE;
     case OrchestrationEventType.REQUEST_ONRAMP:
       return CommerceFlowType.ONRAMP;
-    case OrchestrationEventType.REQUEST_ADD_FUNDS:
-      return CommerceFlowType.ADD_FUNDS;
+    case OrchestrationEventType.REQUEST_ADD_TOKENS:
+      return CommerceFlowType.ADD_TOKENS;
     default:
       return null;
   }

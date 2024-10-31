@@ -4,7 +4,7 @@ import {
   WidgetProperties,
   WidgetTheme,
   WidgetType,
-  AddFundsWidgetParams,
+  AddTokensWidgetParams,
 } from '@imtbl/checkout-sdk';
 import React, { Suspense } from 'react';
 import { Base } from '../BaseWidgetRoot';
@@ -19,14 +19,14 @@ import {
 } from '../../lib/validations/widgetValidators';
 import { ProvidersContextProvider } from '../../context/providers-context/ProvidersContext';
 
-const AddFundsWidget = React.lazy(() => import('./AddFundsWidget'));
+const AddTokensWidget = React.lazy(() => import('./AddTokensWidget'));
 
-export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
-  protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT;
+export class AddTokens extends Base<WidgetType.ADD_TOKENS> {
+  protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_ADD_TOKENS_WIDGET_EVENT;
 
   protected getValidatedProperties({
     config,
-  }: WidgetProperties<WidgetType.ADD_FUNDS>): WidgetProperties<WidgetType.ADD_FUNDS> {
+  }: WidgetProperties<WidgetType.ADD_TOKENS>): WidgetProperties<WidgetType.ADD_TOKENS> {
     let validatedConfig: WidgetConfiguration | undefined;
 
     if (config) {
@@ -41,8 +41,8 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
   }
 
   protected getValidatedParameters(
-    params: AddFundsWidgetParams,
-  ): AddFundsWidgetParams {
+    params: AddTokensWidgetParams,
+  ): AddTokensWidgetParams {
     const validatedParams = params;
 
     if (!isValidAmount(params.toAmount)) {
@@ -72,7 +72,7 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
     this.reactRoot.render(
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
-          <ThemeProvider id="add-funds-container" config={this.strongConfig()}>
+          <ThemeProvider id="add-tokens-container" config={this.strongConfig()}>
             <HandoverProvider>
               <ProvidersContextProvider
                 initialState={{
@@ -85,7 +85,7 @@ export class AddFunds extends Base<WidgetType.ADD_FUNDS> {
                     <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
                   }
                 >
-                  <AddFundsWidget
+                  <AddTokensWidget
                     config={this.strongConfig()}
                     toTokenAddress={this.parameters.toTokenAddress}
                     toAmount={this.parameters.toAmount}

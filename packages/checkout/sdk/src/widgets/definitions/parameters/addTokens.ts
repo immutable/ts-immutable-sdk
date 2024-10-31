@@ -1,8 +1,8 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { WidgetLanguage } from '../configurations';
 
-export type AddFundsWidgetParams = {
-  /** The language to use for the Add Funds widget */
+export type AddTokensWidgetParams = {
+  /** The language to use for the Add Tokens widget */
   language?: WidgetLanguage;
 
   /** Configure to show on-ramp option */

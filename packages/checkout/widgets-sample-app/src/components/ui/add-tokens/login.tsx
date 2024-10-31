@@ -2,9 +2,9 @@ import { useEffect } from "react";
 import { passport } from "./passport";
 
 
-export function AddFundsPassportLogout() {
+export function AddTokensPassportLogin() {
   useEffect(() => {
-    passport.logoutSilentCallback('http://localhost:3000/add-funds');
+    passport.loginCallback();
   }, []);
 
   return null;

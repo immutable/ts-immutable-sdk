@@ -39,14 +39,14 @@ import {
 import { getL2ChainId } from '../../../lib';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { OptionsDrawer } from '../components/OptionsDrawer';
-import { AddFundsActions, AddFundsContext } from '../context/AddFundsContext';
+import { AddTokensActions, AddTokensContext } from '../context/AddTokensContext';
 import { TokenImage } from '../../../components/TokenImage/TokenImage';
 import { getDefaultTokenImage, getTokenImageByAddress, isNativeToken } from '../../../lib/utils';
 import type { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { useRoutes } from '../hooks/useRoutes';
 import { SQUID_NATIVE_TOKEN } from '../utils/config';
-import { AddFundsWidgetViews } from '../../../context/view-context/AddFundsViewContextTypes';
-import { AddFundsErrorTypes, type RouteData } from '../types';
+import { AddTokensWidgetViews } from '../../../context/view-context/AddTokensViewContextTypes';
+import { AddTokensErrorTypes, type RouteData } from '../types';
 import { SelectedRouteOption } from '../components/SelectedRouteOption';
 import { SelectedWallet } from '../components/SelectedWallet';
 import { DeliverToWalletDrawer } from '../../../components/WalletDrawer/DeliverToWalletDrawer';
@@ -54,7 +54,7 @@ import { PayWithWalletDrawer } from '../../../components/WalletDrawer/PayWithWal
 import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
 import { getProviderSlugFromRdns } from '../../../lib/provider';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
-import { sendConnectProviderSuccessEvent } from '../AddFundsWidgetEvents';
+import { sendConnectProviderSuccessEvent } from '../AddTokensWidgetEvents';
 import { convertToUsd } from '../functions/convertToUsd';
 import {
   useAnalytics,
@@ -68,7 +68,7 @@ import {
   getFormattedNumberWithDecimalPlaces,
 } from '../functions/getFormattedNumber';
 
-interface AddFundsProps {
+interface AddTokensProps {
   checkout: Checkout;
   showBackButton?: boolean;
   showOnrampOption?: boolean;
@@ -81,7 +81,7 @@ interface AddFundsProps {
   config: StrongCheckoutWidgetsConfig;
 }
 
-export function AddFunds({
+export function AddTokens({
   checkout,
   toAmount,
   config,
@@ -92,12 +92,12 @@ export function AddFunds({
   onCloseButtonClick,
   showBackButton,
   onBackButtonClick,
-}: AddFundsProps) {
+}: AddTokensProps) {
   const { fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
   const { showErrorHandover } = useError(config.environment);
 
   const {
-    addFundsState: {
+    addTokensState: {
       squid,
       chains,
       balances,
@@ -108,8 +108,8 @@ export function AddFunds({
       selectedToken,
       isSwapAvailable,
     },
-    addFundsDispatch,
-  } = useContext(AddFundsContext);
+    addTokensDispatch,
+  } = useContext(AddTokensContext);
 
   const { viewDispatch } = useContext(ViewContext);
   const { track, page } = useAnalytics();
@@ -139,7 +139,7 @@ export function AddFunds({
   const setSelectedAmount = useMemo(
     () => debounce((value: string) => {
       track({
-        userJourney: UserJourney.ADD_FUNDS,
+        userJourney: UserJourney.ADD_TOKENS,
         screen: 'InputScreen',
         control: 'AmountInput',
         controlType: 'TextInput',
@@ -148,9 +148,9 @@ export function AddFunds({
         },
       });
 
-      addFundsDispatch({
+      addTokensDispatch({
         payload: {
-          type: AddFundsActions.SET_SELECTED_AMOUNT,
+          type: AddTokensActions.SET_SELECTED_AMOUNT,
           selectedAmount: value,
         },
       });
@@ -160,7 +160,7 @@ export function AddFunds({
 
   const setSelectedToken = (token: TokenInfo | undefined) => {
     track({
-      userJourney: UserJourney.ADD_FUNDS,
+      userJourney: UserJourney.ADD_TOKENS,
       screen: 'InputScreen',
       control: 'TokensMenu',
       controlType: 'MenuItem',
@@ -169,9 +169,9 @@ export function AddFunds({
       },
     });
 
-    addFundsDispatch({
+    addTokensDispatch({
       payload: {
-        type: AddFundsActions.SET_SELECTED_TOKEN,
+        type: AddTokensActions.SET_SELECTED_TOKEN,
         selectedToken: token,
       },
     });
@@ -180,7 +180,7 @@ export function AddFunds({
   const setSelectedRouteData = (route: RouteData | undefined) => {
     if (route) {
       track({
-        userJourney: UserJourney.ADD_FUNDS,
+        userJourney: UserJourney.ADD_TOKENS,
         screen: 'InputScreen',
         control: 'RoutesMenu',
         controlType: 'MenuItem',
@@ -195,9 +195,9 @@ export function AddFunds({
       });
     }
 
-    addFundsDispatch({
+    addTokensDispatch({
       payload: {
-        type: AddFundsActions.SET_SELECTED_ROUTE_DATA,
+        type: AddTokensActions.SET_SELECTED_ROUTE_DATA,
         selectedRouteData: route,
       },
     });
@@ -248,7 +248,7 @@ export function AddFunds({
 
   useEffect(() => {
     page({
-      userJourney: UserJourney.ADD_FUNDS,
+      userJourney: UserJourney.ADD_TOKENS,
       screen: 'InputScreen',
       extras: {
         toAmount,
@@ -347,15 +347,15 @@ export function AddFunds({
             }
           }
 
-          addFundsDispatch({
+          addTokensDispatch({
             payload: {
-              type: AddFundsActions.SET_ALLOWED_TOKENS,
+              type: AddTokensActions.SET_ALLOWED_TOKENS,
               allowedTokens: tokenResponse.tokens,
             },
           });
         }
       } catch (error) {
-        showErrorHandover(AddFundsErrorTypes.SERVICE_BREAKDOWN, { error });
+        showErrorHandover(AddTokensErrorTypes.SERVICE_BREAKDOWN, { error });
       }
     };
 
@@ -376,7 +376,7 @@ export function AddFunds({
           setOnRampAllowedTokens(tokenResponse.tokens);
         }
       } catch (error) {
-        showErrorHandover(AddFundsErrorTypes.SERVICE_BREAKDOWN, { error });
+        showErrorHandover(AddTokensErrorTypes.SERVICE_BREAKDOWN, { error });
       }
     };
     fetchOnRampTokens();
@@ -393,7 +393,7 @@ export function AddFunds({
 
   const handleCardClick = () => {
     track({
-      userJourney: UserJourney.ADD_FUNDS,
+      userJourney: UserJourney.ADD_TOKENS,
       screen: 'InputScreen',
       control: 'PayWithCardMenu',
       controlType: 'MenuItem',
@@ -409,7 +409,7 @@ export function AddFunds({
     };
     orchestrationEvents.sendRequestOnrampEvent(
       eventTarget,
-      IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+      IMTBLWidgetEvents.IMTBL_ADD_TOKENS_WIDGET_EVENT,
       data,
     );
   };
@@ -425,7 +425,7 @@ export function AddFunds({
     if (!selectedRouteData || !selectedToken?.address) return;
 
     track({
-      userJourney: UserJourney.ADD_FUNDS,
+      userJourney: UserJourney.ADD_TOKENS,
       screen: 'InputScreen',
       control: 'RoutesMenu',
       controlType: 'MenuItem',
@@ -443,7 +443,7 @@ export function AddFunds({
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: AddFundsWidgetViews.REVIEW,
+          type: AddTokensWidgetViews.REVIEW,
           data: {
             balance: selectedRouteData.amountData.balance,
             toChainId: ChainId.IMTBL_ZKEVM_MAINNET.toString(),
@@ -518,7 +518,7 @@ export function AddFunds({
     providerInfo: EIP6963ProviderInfo,
   ) => {
     track({
-      userJourney: UserJourney.ADD_FUNDS,
+      userJourney: UserJourney.ADD_TOKENS,
       screen: 'InputScreen',
       control: 'WalletsMenu',
       controlType: 'MenuItem',
@@ -630,7 +630,7 @@ export function AddFunds({
                 {selectedToken.symbol}
               </HeroFormControl.Label>
               <HeroTextInput
-                testId="add-funds-amount-input"
+                testId="add-tokens-amount-input"
                 type="number"
                 value={inputValue}
                 onChange={(value) => handleOnAmountInputChange(value)}
@@ -711,7 +711,7 @@ export function AddFunds({
           </Stack>
 
           <Button
-            testId="add-funds-button"
+            testId="add-tokens-button"
             size="large"
             variant={readyToReview ? 'primary' : 'secondary'}
             disabled={!readyToReview}

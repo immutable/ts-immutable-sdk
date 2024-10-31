@@ -1,4 +1,4 @@
-export type { AddFundsWidgetParams } from './addFunds';
+export type { AddTokensWidgetParams } from './addTokens';
 
 export * from './connect';
 export * from './bridge';

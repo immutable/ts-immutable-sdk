@@ -26,13 +26,13 @@ import { RouteResponse } from '@0xsquid/squid-types';
 import { t } from 'i18next';
 import { Environment } from '@imtbl/config';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { AddFundsContext } from '../context/AddFundsContext';
+import { AddTokensContext } from '../context/AddTokensContext';
 import { useRoutes } from '../hooks/useRoutes';
 import {
-  AddFundsReviewData,
-  AddFundsWidgetViews,
-} from '../../../context/view-context/AddFundsViewContextTypes';
-import { AddFundsErrorTypes, RiveStateMachineInput } from '../types';
+  AddTokensReviewData,
+  AddTokensWidgetViews,
+} from '../../../context/view-context/AddTokensViewContextTypes';
+import { AddTokensErrorTypes, RiveStateMachineInput } from '../types';
 import { useExecute } from '../hooks/useExecute';
 import {
   ViewActions,
@@ -70,7 +70,7 @@ import { SquidFooter } from '../components/SquidFooter';
 import { useError } from '../hooks/useError';
 
 interface ReviewProps {
-  data: AddFundsReviewData;
+  data: AddTokensReviewData;
   showBackButton: boolean;
   onBackButtonClick?: () => void;
   onCloseButtonClick?: () => void;
@@ -95,8 +95,8 @@ export function Review({
   const { track, page } = useAnalytics();
 
   const {
-    addFundsState: { squid, chains, tokens },
-  } = useContext(AddFundsContext);
+    addTokensState: { squid, chains, tokens },
+  } = useContext(AddTokensContext);
 
   const {
     providersState: {
@@ -124,7 +124,7 @@ export function Review({
 
   useEffect(() => {
     page({
-      userJourney: UserJourney.ADD_FUNDS,
+      userJourney: UserJourney.ADD_TOKENS,
       screen: 'Review',
       extras: {
         toAmount: data.toAmount,
@@ -252,7 +252,7 @@ export function Review({
     try {
       currentFromAddress = await fromProvider.getSigner().getAddress();
     } catch (error) {
-      showErrorHandover(AddFundsErrorTypes.PROVIDER_ERROR, { error });
+      showErrorHandover(AddTokensErrorTypes.PROVIDER_ERROR, { error });
       return;
     }
 
@@ -320,7 +320,7 @@ export function Review({
 
     if (executeTxnReceipt) {
       track({
-        userJourney: UserJourney.ADD_FUNDS,
+        userJourney: UserJourney.ADD_TOKENS,
         screen: 'FundsAdded',
         action: 'Succeeded',
         extras: {
@@ -708,7 +708,7 @@ export function Review({
             payload: {
               type: ViewActions.UPDATE_VIEW,
               view: {
-                type: AddFundsWidgetViews.ADD_FUNDS,
+                type: AddTokensWidgetViews.ADD_TOKENS,
               },
             },
           });

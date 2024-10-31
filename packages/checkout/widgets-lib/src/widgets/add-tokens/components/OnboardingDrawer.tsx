@@ -20,9 +20,9 @@ import {
 import { getRemoteImage } from '../../../lib/utils';
 
 const HERO_IMAGES = [
-  '/add-funds-onboarding-1.svg',
-  '/add-funds-onboarding-2.svg',
-  '/add-funds-onboarding-3.svg',
+  '/add-tokens-onboarding-1.svg',
+  '/add-tokens-onboarding-2.svg',
+  '/add-tokens-onboarding-3.svg',
 ];
 
 export type OnboardingDrawerProps = {
@@ -85,7 +85,7 @@ export function OnboardingDrawer({ environment }: OnboardingDrawerProps) {
           textAlign="center"
           sx={{ mt: 'base.spacing.x6', mb: 'base.spacing.x4' }}
         >
-          {t(`views.ADD_FUNDS.onboarding.screen${screenIndex}.caption`)}
+          {t(`views.ADD_TOKENS.onboarding.screen${screenIndex}.caption`)}
         </Divider>
         <Heading
           size="small"
@@ -95,7 +95,7 @@ export function OnboardingDrawer({ environment }: OnboardingDrawerProps) {
             whiteSpace: 'pre-line',
           }}
         >
-          {t(`views.ADD_FUNDS.onboarding.screen${screenIndex}.title`)}
+          {t(`views.ADD_TOKENS.onboarding.screen${screenIndex}.title`)}
         </Heading>
         <OnboardingPagination
           disabled
@@ -110,7 +110,7 @@ export function OnboardingDrawer({ environment }: OnboardingDrawerProps) {
           size="large"
           sx={{ alignSelf: 'stretch' }}
         >
-          {t(`views.ADD_FUNDS.onboarding.screen${screenIndex}.buttonText`)}
+          {t(`views.ADD_TOKENS.onboarding.screen${screenIndex}.buttonText`)}
         </Button>
       </Drawer.Content>
     </Drawer>

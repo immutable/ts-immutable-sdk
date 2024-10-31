@@ -2,18 +2,18 @@ import { Web3Provider } from '@ethersproject/providers';
 import {
   WidgetEvent,
   WidgetType,
-  AddFundsEventType,
+  AddTokensEventType,
   IMTBLWidgetEvents,
   EIP6963ProviderInfo,
 } from '@imtbl/checkout-sdk';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function sendAddFundsCloseEvent(eventTarget: Window | EventTarget) {
+export function sendAddTokensCloseEvent(eventTarget: Window | EventTarget) {
   const closeWidgetEvent = new CustomEvent<
-  WidgetEvent<WidgetType.ADD_FUNDS, AddFundsEventType.CLOSE_WIDGET>
-  >(IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT, {
+  WidgetEvent<WidgetType.ADD_TOKENS, AddTokensEventType.CLOSE_WIDGET>
+  >(IMTBLWidgetEvents.IMTBL_ADD_TOKENS_WIDGET_EVENT, {
     detail: {
-      type: AddFundsEventType.CLOSE_WIDGET,
+      type: AddTokensEventType.CLOSE_WIDGET,
       data: {},
     },
   });
@@ -30,10 +30,10 @@ export function sendConnectProviderSuccessEvent(
   providerInfo: EIP6963ProviderInfo,
 ) {
   const successEvent = new CustomEvent<
-  WidgetEvent<WidgetType.ADD_FUNDS, AddFundsEventType.CONNECT_SUCCESS>
-  >(IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT, {
+  WidgetEvent<WidgetType.ADD_TOKENS, AddTokensEventType.CONNECT_SUCCESS>
+  >(IMTBLWidgetEvents.IMTBL_ADD_TOKENS_WIDGET_EVENT, {
     detail: {
-      type: AddFundsEventType.CONNECT_SUCCESS,
+      type: AddTokensEventType.CONNECT_SUCCESS,
       data: {
         provider,
         providerType,
@@ -50,12 +50,12 @@ export function sendConnectProviderSuccessEvent(
   if (eventTarget !== undefined) eventTarget.dispatchEvent(successEvent);
 }
 
-export const sendAddFundsSuccessEvent = (eventTarget: Window | EventTarget, transactionHash: string) => {
-  const successEvent = new CustomEvent<WidgetEvent<WidgetType.ADD_FUNDS, AddFundsEventType.SUCCESS>>(
-    IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+export const sendAddTokensSuccessEvent = (eventTarget: Window | EventTarget, transactionHash: string) => {
+  const successEvent = new CustomEvent<WidgetEvent<WidgetType.ADD_TOKENS, AddTokensEventType.SUCCESS>>(
+    IMTBLWidgetEvents.IMTBL_ADD_TOKENS_WIDGET_EVENT,
     {
       detail: {
-        type: AddFundsEventType.SUCCESS,
+        type: AddTokensEventType.SUCCESS,
         data: {
           transactionHash,
         },
@@ -63,16 +63,16 @@ export const sendAddFundsSuccessEvent = (eventTarget: Window | EventTarget, tran
     },
   );
   // eslint-disable-next-line no-console
-  console.log('add funds success event:', eventTarget, successEvent);
+  console.log('add tokens success event:', eventTarget, successEvent);
   if (eventTarget !== undefined) eventTarget.dispatchEvent(successEvent);
 };
 
-export const sendAddFundsFailedEvent = (eventTarget: Window | EventTarget, reason: string) => {
-  const failedEvent = new CustomEvent<WidgetEvent<WidgetType.ADD_FUNDS, AddFundsEventType.FAILURE>>(
-    IMTBLWidgetEvents.IMTBL_ADD_FUNDS_WIDGET_EVENT,
+export const sendAddTokensFailedEvent = (eventTarget: Window | EventTarget, reason: string) => {
+  const failedEvent = new CustomEvent<WidgetEvent<WidgetType.ADD_TOKENS, AddTokensEventType.FAILURE>>(
+    IMTBLWidgetEvents.IMTBL_ADD_TOKENS_WIDGET_EVENT,
     {
       detail: {
-        type: AddFundsEventType.FAILURE,
+        type: AddTokensEventType.FAILURE,
         data: {
           reason,
           timestamp: new Date().getTime(),
@@ -81,6 +81,6 @@ export const sendAddFundsFailedEvent = (eventTarget: Window | EventTarget, reaso
     },
   );
   // eslint-disable-next-line no-console
-  console.log('add funds failed event:', eventTarget, failedEvent);
+  console.log('add tokens failed event:', eventTarget, failedEvent);
   if (eventTarget !== undefined) eventTarget.dispatchEvent(failedEvent);
 };

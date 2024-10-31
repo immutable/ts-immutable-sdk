@@ -2,9 +2,9 @@ import { Web3Provider } from '@ethersproject/providers';
 import { EIP6963ProviderInfo } from '../../../types';
 
 /**
- * Enum of possible Add Funds Widget event types.
+ * Enum of possible Add Tokens Widget event types.
  */
-export enum AddFundsEventType {
+export enum AddTokensEventType {
   CLOSE_WIDGET = 'close-widget',
   LANGUAGE_CHANGED = 'language-changed',
   CONNECT_SUCCESS = 'connect-success',
@@ -13,20 +13,20 @@ export enum AddFundsEventType {
 }
 
 /**
- * Represents a successful add funds transaction.
+ * Represents a successful add tokens transaction.
  * @property {string} transactionHash
  */
-export type AddFundsSuccess = {
+export type AddTokensSuccess = {
   /** The transaction hash of the successful transaction. */
   transactionHash: string;
 };
 
 /**
- * Type representing a add funds failure
+ * Type representing a add tokens failure
  * @property {string} reason
  * @property {number} timestamp
  */
-export type AddFundsFailed = {
+export type AddTokensFailed = {
   /** The reason why it failed. */
   reason: string;
   /** The timestamp of the failed transaction. */
@@ -39,7 +39,7 @@ export type AddFundsFailed = {
  * @property {EIP6963ProviderInfo} providerInfo
  * @property {'from' | 'to'} providerType
  */
-export type AddFundsConnectSuccess = {
+export type AddTokensConnectSuccess = {
   provider: Web3Provider;
   providerInfo: EIP6963ProviderInfo;
   providerType: 'from' | 'to';

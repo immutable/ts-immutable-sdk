@@ -99,8 +99,8 @@ describe('WalletContext', () => {
       isSwapAvailable: true,
       isBridgeEnabled: false,
       isOnRampEnabled: false,
-      isAddFundsEnabled: true,
-      isAddFundsAvailable: true,
+      isAddTokensEnabled: true,
+      isAddTokensAvailable: true,
     });
   });
 
