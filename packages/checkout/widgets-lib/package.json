@@ -108,7 +108,7 @@
     "d": "rollup --config rollup.config.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
-    "prepare:examplewidgets": "yarn workspace @examples/sdk-load-widgets-with-nextjs exec mkdir -p tests/utils/local-widgets-js/ && cp $(yarn workspace @imtbl/sdk exec pwd)/dist/browser/checkout/*.js $(yarn workspace @examples/sdk-load-widgets-with-nextjs exec pwd)/tests/utils/local-widgets-js/",
+    "prepare:examplewidgets": "yarn workspace @examples/commerce-widget-nextjs exec mkdir -p tests/utils/local-widgets-js/ && cp $(yarn workspace @imtbl/sdk exec pwd)/dist/browser/checkout/*.js $(yarn workspace @examples/commerce-widget-nextjs exec pwd)/tests/utils/local-widgets-js/",
     "prepare:testwidgets": "yarn workspace @tests/checkout-widgets-nextjs exec mkdir -p tests/utils/local-widgets-js/ && cp $(yarn workspace @imtbl/sdk exec pwd)/dist/browser/checkout/*.js $(yarn workspace @tests/checkout-widgets-nextjs exec pwd)/tests/utils/local-widgets-js/",
     "start": "yarn clean && NODE_ENV=development rollup --config rollup.config.js --watch",
     "test": "jest test --passWithNoTests",
