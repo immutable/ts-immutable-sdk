@@ -11,6 +11,8 @@ import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
 import { AddTokensActions, AddTokensContext } from '../context/AddTokensContext';
 import { retry } from '../../../lib/retry';
 import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
+import { isPassportProvider } from '../../../lib/provider';
 
 const BASE_SLIPPAGE = 0.02;
 
@@ -18,6 +20,12 @@ export const useRoutes = () => {
   const latestRequestIdRef = useRef<number>(0);
 
   const { addTokensDispatch } = useContext(AddTokensContext);
+
+  const {
+    providersState: {
+      toProvider,
+    },
+  } = useProvidersContext();
 
   const { track } = useAnalytics();
 
@@ -158,6 +166,7 @@ export const useRoutes = () => {
       toAddress,
       quoteOnly,
       enableBoost: true,
+      receiveGasOnDestination: !isPassportProvider(toProvider),
     }),
     {
       retryIntervalMs: 1000,
