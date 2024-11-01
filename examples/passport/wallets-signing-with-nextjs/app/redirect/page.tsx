@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { passportInstance } from '../utils';
+import { passportInstance } from '../utils/passport';
 
 export default function Redirect() {
   useEffect(() => {
