@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { ethers, utils } from 'ethers';
 import { passportInstance } from '../utils/passport';
-import { Provider } from '@imtbl/passport';
+import { passport } from '@imtbl/sdk';
 import { isValidSignature } from '../utils/isValidSignature';
 import { Button, Heading, Link, Table } from '@biom3/react';
 import NextLink from 'next/link';
@@ -107,7 +107,7 @@ export default function ConnectWithEtherJS() {
     address: string, // The wallet address returned from eth_requestAccounts
     payload: string, // The message string
     signature: string, // The signature
-    zkEvmProvider: Provider, // Can be any provider, Passport or not
+    zkEvmProvider: passport.Provider, // Can be any provider, Passport or not
   ) => {
     const digest = utils.hashMessage(payload);
   

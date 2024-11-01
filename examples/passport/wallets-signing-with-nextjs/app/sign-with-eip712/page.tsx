@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ethers } from 'ethers';
-import { Provider, TypedDataPayload } from '@imtbl/passport';
+import { passport } from '@imtbl/sdk';
 import { passportInstance } from '../utils/passport';
 import { getEtherMailTypedPayload } from '../utils/etherMailTypedPayload'
 import { isValidSignature } from '../utils/isValidSignature'
@@ -35,9 +35,7 @@ export default function ConnectWithEtherJS() {
 
   // create the Web3Provider using the Passport provider
   const web3Provider = new ethers.providers.Web3Provider(passportProvider);
-
-  // const address = await signer.getAddress();
-
+  
   // #enddoc passport-wallets-nextjs-sign-eip712-create
 
   const passportLogin = async () => {
@@ -128,9 +126,9 @@ export default function ConnectWithEtherJS() {
     address: string, //The Passport wallet address returned from eth_requestAccounts
     payload: string, //The stringified payload
     signature: string, //The signature
-    zkEvmProvider: Provider, // can be any provider, Passport or not
+    zkEvmProvider: passport.Provider, // can be any provider, Passport or not
   ) => {
-    const typedPayload: TypedDataPayload = JSON.parse(payload);
+    const typedPayload: passport.TypedDataPayload = JSON.parse(payload);
     const types = { ...typedPayload.types };
     // @ts-ignore
     // Ethers auto-generates the EIP712Domain type in the TypedDataEncoder, and so it needs to be removed
