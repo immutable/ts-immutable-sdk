@@ -338,7 +338,7 @@ export function AddTokens({
           setAllowedTokens(updatedTokens);
 
           if (toTokenAddress) {
-            const token = tokenResponse.tokens.find(
+            const token = updatedTokens.find(
               (t) => t.address?.toLowerCase() === toTokenAddress.toLowerCase(),
             );
 
