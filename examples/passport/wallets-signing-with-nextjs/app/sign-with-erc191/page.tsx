@@ -43,9 +43,11 @@ export default function ConnectWithEtherJS() {
       // disable button while loading
       setLoadingState(true);
 
+      // #doc passport-wallets-nextjs-sign-erc191-request
       // calling eth_requestAccounts triggers the Passport login flow
       const accounts = await web3Provider.provider.request({ method: 'eth_requestAccounts' });
-
+      // #enddoc passport-wallets-nextjs-sign-erc191-request
+      
       // once logged in Passport is connected to the wallet and ready to transact
       setAccountsState(accounts);
       // enable button when loading has finished
