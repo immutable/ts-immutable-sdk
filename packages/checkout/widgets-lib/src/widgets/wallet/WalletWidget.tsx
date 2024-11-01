@@ -5,7 +5,7 @@ import {
   useReducer,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IMTBLWidgetEvents, WalletWidgetParams } from '@imtbl/checkout-sdk';
+import { IMTBLWidgetEvents, WalletWidgetParams, AddTokensConfig } from '@imtbl/checkout-sdk';
 import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import {
   initialWalletState,
@@ -54,6 +54,7 @@ export default function WalletWidget(props: WalletWidgetInputs) {
       isOnRampEnabled,
       isSwapEnabled,
       isBridgeEnabled,
+      isAddTokensEnabled,
       theme,
     },
     walletConfig: {
@@ -83,6 +84,8 @@ export default function WalletWidget(props: WalletWidgetInputs) {
     () => ({ viewState, viewDispatch }),
     [viewState, viewDispatch],
   );
+
+  const { supportedTopUps } = walletState;
 
   const { balancesLoading, refreshBalances } = useBalance({
     checkout,
@@ -116,13 +119,16 @@ export default function WalletWidget(props: WalletWidgetInputs) {
     (async () => {
       if (!checkout) return;
 
-      let checkSwapAvailable;
-
+      let checkSwapAvailable = false;
       try {
         checkSwapAvailable = await checkout.isSwapAvailable();
-      } catch (err: any) {
-        checkSwapAvailable = false;
-      }
+      } catch { /* */ }
+
+      let checkAddTokensEnabled = isAddTokensEnabled;
+      try {
+        const addTokensConfig = (await checkout.config.remote.getConfig('addTokens') as AddTokensConfig);
+        checkAddTokensEnabled = addTokensConfig.enabled && isAddTokensEnabled;
+      } catch { /* */ }
 
       walletDispatch({
         payload: {
@@ -132,6 +138,8 @@ export default function WalletWidget(props: WalletWidgetInputs) {
             isSwapEnabled,
             isOnRampEnabled,
             isSwapAvailable: checkSwapAvailable,
+            isAddTokensEnabled: checkAddTokensEnabled,
+            isAddTokensAvailable: checkSwapAvailable && checkAddTokensEnabled,
           },
         },
       });
@@ -227,10 +235,10 @@ export default function WalletWidget(props: WalletWidgetInputs) {
               analytics={{ userJourney: UserJourney.WALLET }}
               widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
               checkout={checkout}
-              provider={provider}
               showOnrampOption={isOnRampEnabled}
               showSwapOption={isSwapEnabled}
               showBridgeOption={isBridgeEnabled}
+              showAddTokensOption={supportedTopUps?.isAddTokensAvailable}
               onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
             />
           )}

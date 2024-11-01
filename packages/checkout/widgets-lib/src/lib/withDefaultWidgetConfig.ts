@@ -1,6 +1,7 @@
 import { Environment } from '@imtbl/config';
 import { WidgetTheme } from '@imtbl/checkout-sdk';
 import {
+  DEFAULT_ADD_TOKENS_ENABLED,
   DEFAULT_BRIDGE_ENABLED,
   DEFAULT_ENV,
   DEFAULT_ON_RAMP_ENABLED,
@@ -14,6 +15,7 @@ export type StrongCheckoutWidgetsConfig = {
   isOnRampEnabled: boolean;
   isSwapEnabled: boolean;
   isBridgeEnabled: boolean;
+  isAddTokensEnabled: boolean;
 };
 
 function getValidTheme(theme?: string): WidgetTheme {
@@ -51,5 +53,9 @@ export const withDefaultWidgetConfigs = (
   isBridgeEnabled: getValidBoolean(
     DEFAULT_BRIDGE_ENABLED,
     configs?.isBridgeEnabled?.toString(),
+  ),
+  isAddTokensEnabled: getValidBoolean(
+    DEFAULT_ADD_TOKENS_ENABLED,
+    configs?.isAddTokensEnabled?.toString(),
   ),
 });

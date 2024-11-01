@@ -15,10 +15,10 @@ import {
   sendProviderUpdatedEvent,
 } from './lib';
 import { WalletConnectManager } from './lib/walletConnect';
-import { AddFunds } from './widgets/add-funds/AddFundsRoot';
+import { AddTokens } from './widgets/add-tokens/AddTokensRoot';
 import { Bridge } from './widgets/bridge/BridgeWidgetRoot';
-import { CheckoutWidgetRoot } from './widgets/checkout/CheckoutWidgetRoot';
 import { Connect } from './widgets/connect/ConnectWidgetRoot';
+import { CommerceWidgetRoot } from './widgets/immutable-commerce/CommerceWidgetRoot';
 import { OnRamp } from './widgets/on-ramp/OnRampWidgetRoot';
 import { Sale } from './widgets/sale/SaleWidgetRoot';
 import { Swap } from './widgets/swap/SwapWidgetRoot';
@@ -94,17 +94,17 @@ export class WidgetsFactory implements IWidgetsFactory {
           provider,
         }) as Widget<WidgetType.SALE> as Widget<T>;
       }
-      case WidgetType.CHECKOUT: {
-        return new CheckoutWidgetRoot(this.sdk, {
+      case WidgetType.IMMUTABLE_COMMERCE: {
+        return new CommerceWidgetRoot(this.sdk, {
           config: { ...this.widgetConfig, ...(config) },
           provider,
-        }) as Widget<WidgetType.CHECKOUT> as Widget<T>;
+        }) as Widget<WidgetType.IMMUTABLE_COMMERCE> as Widget<T>;
       }
-      case WidgetType.ADD_FUNDS: {
-        return new AddFunds(this.sdk, {
+      case WidgetType.ADD_TOKENS: {
+        return new AddTokens(this.sdk, {
           config: { ...this.widgetConfig, ...(config) },
           provider,
-        }) as Widget<WidgetType.ADD_FUNDS> as Widget<T>;
+        }) as Widget<WidgetType.ADD_TOKENS> as Widget<T>;
       }
       default:
         throw new Error('widget type not supported');

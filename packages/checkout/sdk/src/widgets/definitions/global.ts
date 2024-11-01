@@ -11,12 +11,13 @@ import {
 } from './types';
 
 interface WidgetsFactoryCreate {
-  (type: WidgetType.CHECKOUT, props?: WidgetProperties<WidgetType.CHECKOUT>): Widget<WidgetType.CHECKOUT>;
+  (type: WidgetType.IMMUTABLE_COMMERCE, props?: WidgetProperties<WidgetType.IMMUTABLE_COMMERCE>):
+  Widget<WidgetType.IMMUTABLE_COMMERCE>;
 
   /** @deprecated
-   * Use WidgetType.CHECKOUT instead, see https://docs.immutable.com/products/zkEVM/checkout/widget/setup
+   * Use WidgetType.IMMUTABLE_COMMERCE instead, see https://docs.immutable.com/products/zkEVM/checkout/commerce-widget
    * */
-  <T extends Exclude<WidgetType, WidgetType.CHECKOUT>>(type: T, props?: WidgetProperties<T>): Widget<T>;
+  <T extends Exclude<WidgetType, WidgetType.IMMUTABLE_COMMERCE>>(type: T, props?: WidgetProperties<T>): Widget<T>;
 }
 
 /**
@@ -93,6 +94,18 @@ declare global {
     }
 
     class Sale<T extends WidgetType> implements Widget<T> {
+      constructor(sdk: Checkout, props: WidgetProperties<T>);
+      mount(id: string, params?: WidgetParameters[T]): void;
+      unmount(): void;
+      update(props: WidgetProperties<T>): void;
+      addListener<KEventName extends keyof WidgetEventData[T]>(
+        type: KEventName,
+        callback: (data: WidgetEventData[T][KEventName]) => void
+      ): void;
+      removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void;
+    }
+
+    class Commerce<T extends WidgetType> implements Widget<T> {
       constructor(sdk: Checkout, props: WidgetProperties<T>);
       mount(id: string, params?: WidgetParameters[T]): void;
       unmount(): void;
