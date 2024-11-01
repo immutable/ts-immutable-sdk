@@ -79,6 +79,7 @@ import { WidgetConfiguration } from './widgets/definitions/configurations';
 import { getWidgetsEsmUrl, loadUnresolvedBundle } from './widgets/load';
 import { determineWidgetsVersion, validateAndBuildVersion } from './widgets/version';
 import { globalPackageVersion } from './env';
+import { isAddressSanctioned } from './sanctions';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -260,7 +261,7 @@ export class Checkout {
     } catch (err: any) {
       // eslint-disable-next-line no-console
       console.warn(
-        `Failed to resolve checkout widgets module, falling back to UMD bundle. Error: ${err.message}`,
+        `Failed to resolve Commerce Widgets module, falling back to UMD bundle. Error: ${err.message}`,
       );
     }
 
@@ -331,6 +332,16 @@ export class Checkout {
       } as ValidateProviderOptions,
     );
     return connect.checkIsWalletConnected(web3Provider);
+  }
+
+  /**
+   * Checks if an address is sanctioned.
+   * @param {string} address - The address to check.
+   * @param {Environment} environment - The environment to check.
+   * @returns {Promise<boolean>} - A promise that resolves to the result of the check.
+   */
+  public async checkIsAddressSanctioned(address: string, environment: Environment): Promise<boolean> {
+    return await isAddressSanctioned(address, environment);
   }
 
   /**

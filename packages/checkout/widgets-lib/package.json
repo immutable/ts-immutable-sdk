@@ -16,7 +16,7 @@
   "dependencies": {
     "@0xsquid/sdk": "^2.8.25",
     "@biom3/design-tokens": "^0.4.4",
-    "@biom3/react": "^0.27.10",
+    "@biom3/react": "^0.27.12",
     "@ethersproject/bignumber": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/bridge-sdk": "0.0.0",
@@ -108,6 +108,8 @@
     "d": "rollup --config rollup.config.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
+    "prepare:examplewidgets": "yarn workspace @examples/commerce-widget-nextjs exec mkdir -p tests/utils/local-widgets-js/ && cp $(yarn workspace @imtbl/sdk exec pwd)/dist/browser/checkout/*.js $(yarn workspace @examples/commerce-widget-nextjs exec pwd)/tests/utils/local-widgets-js/",
+    "prepare:testwidgets": "yarn workspace @tests/checkout-widgets-nextjs exec mkdir -p tests/utils/local-widgets-js/ && cp $(yarn workspace @imtbl/sdk exec pwd)/dist/browser/checkout/*.js $(yarn workspace @tests/checkout-widgets-nextjs exec pwd)/tests/utils/local-widgets-js/",
     "start": "yarn clean && NODE_ENV=development rollup --config rollup.config.js --watch",
     "test": "jest test --passWithNoTests",
     "test:watch": "jest test --passWithNoTests --watch",

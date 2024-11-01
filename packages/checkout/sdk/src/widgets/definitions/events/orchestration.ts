@@ -7,7 +7,7 @@ export enum OrchestrationEventType {
   REQUEST_SWAP = 'request-swap',
   REQUEST_BRIDGE = 'request-bridge',
   REQUEST_ONRAMP = 'request-onramp',
-  REQUEST_ADD_FUNDS = 'request-add-funds',
+  REQUEST_ADD_TOKENS = 'request-add-tokens',
   REQUEST_GO_BACK = 'request-go-back',
 }
 
@@ -69,9 +69,17 @@ export type RequestOnrampEvent = {
 };
 
 /**
- * Represents the add funds event object when the add funds widget is requested.
+ * Represents the add tokens event object when the add tokens widget is requested.
  */
-export type RequestAddFundsEvent = {
+export type RequestAddTokensEvent = {
+  /** Token address of the fund to be added */
+  toTokenAddress?: string;
+
+  /** Amount of the fund to be added */
+  toAmount?: string;
+
+  /** Whether to show a back button on the first screen, on click triggers REQUEST_GO_BACK event */
+  showBackButton?: boolean;
 };
 
 /**
@@ -89,4 +97,5 @@ export type OrchestrationEventData =
   | RequestSwapEvent
   | RequestBridgeEvent
   | RequestOnrampEvent
-  | RequestGoBackEvent;
+  | RequestGoBackEvent
+  | RequestAddTokensEvent;

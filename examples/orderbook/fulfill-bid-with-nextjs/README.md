@@ -1,6 +1,6 @@
 This example application demonstrates how to fill a bid using the Immutable SDK. The application connects to the Immutable Sandbox environment and requires a valid client ID and publishable API key (which can be retrieved from the Immutable Hub).
 
-In order to fill a bid, valid ERC721 or ERC1155 bids should exist in the system. The application will prompt the user to connect their Passport wallet and approve the settlement contract to transfer the ERC721 or ERC1155 tokens on their behalf. Once the token is approved, a bid is filled on a best effort basis.
+In order to fill a bid, valid ERC721 or ERC1155 bids should exist in the system. The application will prompt the user to connect their Passport wallet and approve the settlement contract to transfer any ERC20, ERC721 or ERC1155 tokens on their behalf. Once the token/s are approved, a bid is filled on a best effort basis.
 
 ## Features
 - Fill a ERC721 bid
@@ -38,10 +38,9 @@ Open [http://localhost:3000](http://localhost:3000) with your browser and you'll
 2. Connect your Passport wallet
 3. Filter bids based on criteria:
    - NFT Contract Address: The contract address of the ERC721 token
-   - Currency Type: The type of currency (Native or ERC20) you'd like to receive for the item
-4. Click on the "Buy" button
+4. Click on the "Submit" button
 5. Approve the settlement contract to transfer tokens on your behalf
-6. If successful, the bid will be created and the order ID will be displayed
+6. If successful, the bid will be fulfilled
 7. If unsuccessful, an error message will be displayed
 
 ## Fill a ERC1155 bid
@@ -49,11 +48,11 @@ Open [http://localhost:3000](http://localhost:3000) with your browser and you'll
 2. Connect your Passport wallet
 3. Filter bids based on criteria:
    - NFT Contract Address: The contract address of the ERC1155 token
-   - Currency Type: The type of currency (Native or ERC20) you'd like to receive for the item
-4. Click on the "Buy" button
-5. Approve the settlement contract to transfer tokens on your behalf
-6. If successful, the bid will be created and the order ID will be displayed
-7. If unsuccessful, an error message will be displayed
+4. Provide the number of units to fill
+5. Click on the "Submit" button
+6. Approve the settlement contract to transfer tokens on your behalf
+7. If successful, the bid will be fulfilled
+8. If unsuccessful, an error message will be displayed
 
 ## Required Environment Variables
 

@@ -71,11 +71,13 @@
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
       "heading": {
         "swap": "Swapping is not available in your region",
-        "generic": "This service is not available in your region"
+        "generic": "This service is not available in your region",
+        "addTokens": "This is not available in your region"
       },
       "body": {
         "swap": "Please refer to <quickswapLink>Quickswap’s</quickswapLink> website for further information.",
-        "generic": "For further assistance visit the <immutableSupport>Immutable</immutableSupport> support page."
+        "generic": "For further assistance visit the <immutableSupport>Immutable</immutableSupport> support page.",
+        "addTokens": "Please add tokens another way"
       }
     },
     "LOADING_VIEW": {
@@ -640,7 +642,7 @@
         }
       }
     },
-    "ADD_FUNDS": {
+    "ADD_TOKENS": {
       "drawer": {
         "options": {
           "swap": {
@@ -650,15 +652,39 @@
           },
           "debit": {
             "heading": "Debit Card",
-            "caption": "The recommended way to pay with card.",
+            "caption": "",
             "disabledCaption": "Unavailable for your selection. We recommend adding tokens."
           },
           "credit": {
             "heading": "Credit Card",
-            "caption": "Not recommended since transactions may be blocked by your bank.",
+            "caption": "Failures and extra fees may occur.",
             "disabledCaption": "Unavailable for your selection. We recommend adding tokens."
           }
         }
+      },
+      "onboarding": {
+        "screen1": {
+          "title": "We've changed a few things\nto make it easier",
+          "caption": "listen up",
+          "buttonText": "Next"
+        },
+        "screen2": {
+          "title": "You can deliver tokens to Passport\n& pay from any wallet",
+          "caption": "whats evolved",
+          "buttonText": "Next"
+        },
+        "screen3": {
+          "title": "Use tokens on other chains,\nwe'll find you the best option",
+          "caption": "evolution",
+          "buttonText": "Let's add some tokens"
+        }
+      },
+      "footer": {
+        "body":  "Swap functionality is powered by a third party, Squid. Immutable neither builds, owns, operates or deploys <squidLink>Squid</squidLink>."
+      },
+      "geoBlockError": {
+        "buyTokenButton": "Buy tokens",
+        "bridgeTokenButton": "Bridge tokens"
       }
     }
   },

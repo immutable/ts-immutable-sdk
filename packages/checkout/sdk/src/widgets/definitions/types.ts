@@ -34,14 +34,17 @@ import {
   WalletDisconnect,
   WalletEventType,
   WalletNetworkSwitch,
-  CheckoutEventType,
-  CheckoutProviderUpdatedEvent,
-  CheckoutSuccessEvent,
-  CheckoutFailureEvent,
-  CheckoutUserActionEvent,
-  RequestAddFundsEvent,
+  CommerceEventType,
+  CommerceProviderUpdatedEvent,
+  CommerceSuccessEvent,
+  CommerceFailureEvent,
+  CommerceUserActionEvent,
+  RequestAddTokensEvent,
   RequestGoBackEvent,
-  AddFundsEventType,
+  AddTokensEventType,
+  AddTokensConnectSuccess,
+  AddTokensSuccess,
+  AddTokensFailed,
 } from './events';
 import {
   BridgeWidgetParams,
@@ -49,8 +52,8 @@ import {
   SwapWidgetParams,
   WalletWidgetParams,
   OnRampWidgetParams,
-  CheckoutWidgetParams,
-  AddFundsWidgetParams,
+  CommerceWidgetParams,
+  AddTokensWidgetParams,
 } from './parameters';
 import { SaleWidgetParams } from './parameters/sale';
 import {
@@ -60,8 +63,8 @@ import {
   SaleWidgetConfiguration,
   SwapWidgetConfiguration,
   WalletWidgetConfiguration,
-  CheckoutWidgetConfiguration,
-  AddFundsWidgetConfiguration,
+  CommerceWidgetConfiguration,
+  AddTokensWidgetConfiguration,
 } from './configurations';
 import { WidgetTheme } from './configurations/theme';
 
@@ -75,8 +78,8 @@ export enum WidgetType {
   BRIDGE = 'bridge',
   ONRAMP = 'onramp',
   SALE = 'sale',
-  CHECKOUT = 'checkout',
-  ADD_FUNDS = 'addFunds',
+  IMMUTABLE_COMMERCE = 'immutableCommerce',
+  ADD_TOKENS = 'addTokens',
 }
 
 /**
@@ -94,9 +97,8 @@ export type WidgetConfigurations = {
   [WidgetType.BRIDGE]: BridgeWidgetConfiguration;
   [WidgetType.ONRAMP]: OnrampWidgetConfiguration;
   [WidgetType.SALE]: SaleWidgetConfiguration;
-  [WidgetType.ADD_FUNDS]: AddFundsWidgetConfiguration;
-
-  [WidgetType.CHECKOUT]: CheckoutWidgetConfiguration;
+  [WidgetType.ADD_TOKENS]: AddTokensWidgetConfiguration;
+  [WidgetType.IMMUTABLE_COMMERCE]: CommerceWidgetConfiguration;
 };
 
 // Mapping each widget type to their parameters
@@ -107,9 +109,8 @@ export type WidgetParameters = {
   [WidgetType.BRIDGE]: BridgeWidgetParams;
   [WidgetType.ONRAMP]: OnRampWidgetParams;
   [WidgetType.SALE]: SaleWidgetParams;
-  [WidgetType.ADD_FUNDS]: AddFundsWidgetParams;
-
-  [WidgetType.CHECKOUT]: CheckoutWidgetParams;
+  [WidgetType.ADD_TOKENS]: AddTokensWidgetParams;
+  [WidgetType.IMMUTABLE_COMMERCE]: CommerceWidgetParams;
 };
 
 /**
@@ -122,8 +123,8 @@ export type WidgetEventTypes = {
   [WidgetType.BRIDGE]: BridgeEventType | OrchestrationEventType;
   [WidgetType.ONRAMP]: OnRampEventType | OrchestrationEventType;
   [WidgetType.SALE]: SaleEventType | OrchestrationEventType;
-  [WidgetType.CHECKOUT]: CheckoutEventType | OrchestrationEventType;
-  [WidgetType.ADD_FUNDS]: AddFundsEventType | OrchestrationEventType;
+  [WidgetType.IMMUTABLE_COMMERCE]: CommerceEventType | OrchestrationEventType;
+  [WidgetType.ADD_TOKENS]: AddTokensEventType | OrchestrationEventType;
 };
 
 // Mapping of Orchestration events to their payloads
@@ -133,7 +134,7 @@ type OrchestrationMapping = {
   [OrchestrationEventType.REQUEST_SWAP]: RequestSwapEvent;
   [OrchestrationEventType.REQUEST_BRIDGE]: RequestBridgeEvent;
   [OrchestrationEventType.REQUEST_ONRAMP]: RequestOnrampEvent;
-  [OrchestrationEventType.REQUEST_ADD_FUNDS]: RequestAddFundsEvent;
+  [OrchestrationEventType.REQUEST_ADD_TOKENS]: RequestAddTokensEvent;
   [OrchestrationEventType.REQUEST_GO_BACK]: RequestGoBackEvent;
 };
 
@@ -200,21 +201,21 @@ export type WidgetEventData = {
   } & OrchestrationMapping &
   ProviderEventMapping;
 
-  [WidgetType.CHECKOUT]: {
-    [CheckoutEventType.INITIALISED]: CheckoutWidgetParams;
-    [CheckoutEventType.PROVIDER_UPDATED]: CheckoutProviderUpdatedEvent;
-    [CheckoutEventType.CLOSE]: {};
-    [CheckoutEventType.SUCCESS]: CheckoutSuccessEvent;
-    [CheckoutEventType.FAILURE]: CheckoutFailureEvent;
-    [CheckoutEventType.DISCONNECTED]: {};
-    [CheckoutEventType.USER_ACTION]: CheckoutUserActionEvent;
+  [WidgetType.IMMUTABLE_COMMERCE]: {
+    [CommerceEventType.INITIALISED]: CommerceWidgetParams;
+    [CommerceEventType.PROVIDER_UPDATED]: CommerceProviderUpdatedEvent;
+    [CommerceEventType.CLOSE]: {};
+    [CommerceEventType.SUCCESS]: CommerceSuccessEvent;
+    [CommerceEventType.FAILURE]: CommerceFailureEvent;
+    [CommerceEventType.DISCONNECTED]: {};
+    [CommerceEventType.USER_ACTION]: CommerceUserActionEvent;
   };
 
-  [WidgetType.ADD_FUNDS]: {
-    [AddFundsEventType.CLOSE_WIDGET]: {};
-    [AddFundsEventType.REQUEST_BRIDGE]: {};
-    [AddFundsEventType.REQUEST_SWAP]: {};
-    [AddFundsEventType.REQUEST_ONRAMP]: {};
+  [WidgetType.ADD_TOKENS]: {
+    [AddTokensEventType.CLOSE_WIDGET]: {};
+    [AddTokensEventType.CONNECT_SUCCESS]: AddTokensConnectSuccess;
+    [AddTokensEventType.SUCCESS]: AddTokensSuccess;
+    [AddTokensEventType.FAILURE]: AddTokensFailed;
   } & OrchestrationMapping &
   ProviderEventMapping;
 };
@@ -318,7 +319,7 @@ export interface Widget<T extends WidgetType> {
 }
 
 /**
- * Represents the version of the Checkout Widgets to use defaults to (0.1.9-alpha)
+ * Represents the version of the Commerce Widgets to use defaults to (0.1.9-alpha)
  * @property {number} major
  * @property {number | undefined} minor
  * @property {number | undefined} patch
@@ -345,7 +346,7 @@ export type SemanticVersion = {
 };
 
 /**
- * Represents the global configuration options for the Checkout Widgets.
+ * Represents the global configuration options for the Commerce Widgets.
  * @property {WidgetTheme | undefined} theme
  * @property {Environment | undefined} environment
  * @property {SemanticVersion | undefined} version
@@ -358,7 +359,7 @@ export type CheckoutWidgetsConfig = {
   theme?: WidgetTheme;
   /** The environment configuration (default: "SANDBOX") */
   environment?: Environment;
-  /** The version of the checkout widgets js file to use (default: "0.1.x") */
+  /** The version of the Checkout Widgets js file to use (default: "0.1.x") */
   version?: SemanticVersion;
   /** Enable on-ramp top-up method (default: "true") */
   isOnRampEnabled?: boolean;

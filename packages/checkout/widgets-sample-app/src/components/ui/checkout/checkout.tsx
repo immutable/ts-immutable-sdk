@@ -21,11 +21,11 @@ import {
   WidgetLanguage,
   WidgetTheme,
   CreateProviderParams,
-  CheckoutWidgetParams,
-  CheckoutEventType,
-  CheckoutSuccessEventType,
+  CommerceWidgetParams,
+  CommerceEventType,
+  CommerceSuccessEventType,
   WidgetType,
-  CheckoutFlowType,
+  CommerceFlowType,
   WalletProviderName,
   Widget,
   SalePaymentTypes,
@@ -38,7 +38,6 @@ import { useAsyncMemo, usePrevState } from "../../../hooks";
 import { Message } from "./components/messages";
 import { Legend } from "./components/legend";
 import { itemsMock } from "./items.mock";
-import { ChainId } from "@imtbl/checkout-sdk";
 
 //
 const ENVIRONMENT_DEV = "development" as Environment;
@@ -68,6 +67,7 @@ const getPassportClient = (environment: Environment) =>
     clientId: "ViaYO6JWck4TZOiiojEak8mz6WvQh3wK",
     redirectUri: "http://localhost:3000/checkout?login=true",
     logoutRedirectUri: "http://localhost:3000/checkout?logout=true",
+    logoutMode: "silent",
   });
 
 // create Checkout SDK
@@ -77,7 +77,6 @@ const getCheckoutSdk = (passportClient: Passport, environment: Environment) =>
     passport: passportClient,
     baseConfig: getBaseConfig(environment),
     overrides: {
-      // checkoutAppUrl: "http://localhost:3001",
       // environment: "development" as Environment,
     },
     // swap: { enable: true }
@@ -89,6 +88,14 @@ const getCheckoutSdk = (passportClient: Passport, environment: Environment) =>
 const usePassportLoginCallback = (passportClient: Passport) => {
   const params = new URLSearchParams(window.location.search);
   const loginParam = params.get("login");
+  const logoutParam = params.get("logout");
+
+  useEffect(() => {
+    if (logoutParam === "true") {
+      passportClient?.logoutSilentCallback('http://localhost:3000/checkout');
+    }
+  }, [logoutParam, passportClient]);
+
 
   useEffect(() => {
     if (loginParam === "true") {
@@ -124,15 +131,15 @@ const createWeb3Provider = async (
   }
 };
 
-// checkout widget flows
-const flows: Array<CheckoutFlowType> = [
-  CheckoutFlowType.CONNECT,
-  CheckoutFlowType.WALLET,
-  CheckoutFlowType.ONRAMP,
-  CheckoutFlowType.SWAP,
-  CheckoutFlowType.BRIDGE,
-  CheckoutFlowType.SALE,
-  CheckoutFlowType.ADD_FUNDS,
+// Commerce Widget flows
+const flows: Array<CommerceFlowType> = [
+  CommerceFlowType.CONNECT,
+  CommerceFlowType.WALLET,
+  CommerceFlowType.ONRAMP,
+  CommerceFlowType.SWAP,
+  CommerceFlowType.BRIDGE,
+  CommerceFlowType.SALE,
+  CommerceFlowType.ADD_TOKENS,
 ];
 
 function CheckoutUI() {
@@ -144,39 +151,41 @@ function CheckoutUI() {
     Environment.SANDBOX
   );
 
-  const [checkoutAppURL, setCheckoutAppURL] = useState("");
+  const configEnvironment = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return (params.get("environment") as Environment) || Environment.SANDBOX;
+  }, []);
 
   // setup passport client
-  const passportClient = useMemo(
-    () => getPassportClient(environment),
-    [environment]
-  );
+  const passportClient = useMemo(() => {
+    return getPassportClient(configEnvironment);
+  }, []);
   // handle passport login
   usePassportLoginCallback(passportClient);
 
   // setup checkout sdk
   const checkoutSdk = useMemo(
-    () => getCheckoutSdk(passportClient, environment),
-    [passportClient, environment]
+    () => getCheckoutSdk(passportClient, configEnvironment),
+    [passportClient]
   );
 
   // set a state to keep widget params and configs
-  const [params, setParams] = useState<CheckoutWidgetParams | undefined>(
+  const [params, setParams] = useState<CommerceWidgetParams | undefined>(
     undefined
   );
 
   const [flowParams, setFlowParams] = useState<
-    Partial<Record<CheckoutFlowType, CheckoutWidgetParams>>
+    Partial<Record<CommerceFlowType, CommerceWidgetParams>>
   >({
     CONNECT: {
-      flow: CheckoutFlowType.CONNECT,
+      flow: CommerceFlowType.CONNECT,
       // blocklistWalletRdns: ["io.metamask"],
       // targetChainId: ChainId.SEPOLIA,
       // targetWalletRdns: "io.metamask",
       theme: WidgetTheme.LIGHT,
     },
     SALE: {
-      flow: CheckoutFlowType.SALE,
+      flow: CommerceFlowType.SALE,
       items: itemsMock,
       environmentId: "4dfc4bec-1867-49aa-ad35-d8a13b206c94",
       collectionName: "Pixel Aussie Farm",
@@ -184,17 +193,17 @@ function CheckoutUI() {
       // preferredCurrency: 'USDC',
     },
     SWAP: {
-      flow: CheckoutFlowType.SWAP,
+      flow: CommerceFlowType.SWAP,
       amount: "10",
       fromTokenAddress: "native",
       toTokenAddress: "0x3B2d8A1931736Fc321C24864BceEe981B11c3c57",
     },
     WALLET: {
-      flow: CheckoutFlowType.WALLET,
+      flow: CommerceFlowType.WALLET,
     },
-    ADD_FUNDS: {
-      flow: CheckoutFlowType.ADD_FUNDS,
-      toAmount: "100",
+    ADD_TOKENS: {
+      flow: CommerceFlowType.ADD_TOKENS,
+      toAmount: "1",
       toTokenAddress: "native",
     },
   });
@@ -228,8 +237,6 @@ function CheckoutUI() {
   //   [checkoutSdk]
   // );
 
-
-
   // know connected wallet type
   const isMetamask = web3Provider?.provider?.isMetaMask;
   const isPassport = (
@@ -261,14 +268,14 @@ function CheckoutUI() {
 
   // create the widget once factory is available
   // ignore language or theme changes
-  const prevWidget = useRef<Widget<typeof WidgetType.CHECKOUT> | undefined>(
+  const prevWidget = useRef<Widget<typeof WidgetType.IMMUTABLE_COMMERCE> | undefined>(
     undefined
   );
   const widget = useAsyncMemo(async () => {
     if (widgetsFactory === undefined) return undefined;
     if (renderAfterConnect && !web3Provider) return undefined;
 
-    return widgetsFactory.create(WidgetType.CHECKOUT, {
+    return widgetsFactory.create(WidgetType.IMMUTABLE_COMMERCE, {
       provider: web3Provider,
       config: {
         theme,
@@ -294,21 +301,11 @@ function CheckoutUI() {
     if (!widget || mounted.current) return;
 
     // add event listeners
-    widget.addListener(CheckoutEventType.INITIALISED, () => {
+    widget.addListener(CommerceEventType.INITIALISED, () => {
       setEventResults((prev) => [...prev, { initialised: true }]);
-
-      if (typeof window === "undefined") return;
-
-      const checkoutAppIframe = document.getElementById(
-        "checkout-app"
-      ) as HTMLIFrameElement;
-
-      if (checkoutAppIframe?.src) {
-        setCheckoutAppURL(checkoutAppIframe.src);
-      }
     });
 
-    widget.addListener(CheckoutEventType.DISCONNECTED, () => {
+    widget.addListener(CommerceEventType.DISCONNECTED, () => {
       setEventResults((prev) => [...prev, { disconnected: true }]);
     });
     // widget.addListener(
@@ -322,28 +319,28 @@ function CheckoutUI() {
     //     ]);
     //   }
     // );
-    widget.addListener(CheckoutEventType.SUCCESS, (payload) => {
-      if (payload.type === CheckoutSuccessEventType.CONNECT_SUCCESS) {
+    widget.addListener(CommerceEventType.SUCCESS, (payload) => {
+      if (payload.type === CommerceSuccessEventType.CONNECT_SUCCESS) {
         const { provider, ...data } = payload.data;
         console.log("SUCCESS ---->", provider);
         setWeb3Provider(provider);
         setEventResults((prev) => [...prev, { success: true, ...data }]);
       }
     });
-    widget.addListener(CheckoutEventType.USER_ACTION, (data) => {
+    widget.addListener(CommerceEventType.USER_ACTION, (data) => {
       setEventResults((prev) => [...prev, { userAction: true, ...data }]);
     });
-    widget.addListener(CheckoutEventType.FAILURE, (data) => {
+    widget.addListener(CommerceEventType.FAILURE, (data) => {
       setEventResults((prev) => [...prev, { failure: true, ...data }]);
     });
-    widget.addListener(CheckoutEventType.CLOSE, () => {
+    widget.addListener(CommerceEventType.CLOSE, () => {
       setEventResults((prev) => [...prev, { closed: true }]);
       widget.unmount();
     });
 
     // // set initial flow to wallet
     // setParams({
-    //   flow: checkout.CheckoutFlowType.CONNECT,
+    //   flow: checkout.CommerceFlowType.CONNECT,
     // });
   }, [widget]);
 
@@ -387,9 +384,11 @@ function CheckoutUI() {
 
   // unmount when environment changes
   useEffect(() => {
-    if (environment !== prevEnvironment) {
-      console.log("ENV", environment, prevEnvironment);
-      unmount();
+    if (environment !== prevEnvironment && prevEnvironment !== undefined) {
+      const params = new URLSearchParams(window.location.search);
+      params.set("environment", environment);
+      window.location.href = `${window.location.href}?${params.toString()}`;
+
     }
   }, [environment, prevEnvironment]);
 
@@ -408,7 +407,7 @@ function CheckoutUI() {
             <MenuItem
               onClick={() => {
                 setParams({
-                  flow: CheckoutFlowType.CONNECT,
+                  flow: CommerceFlowType.CONNECT,
                 });
               }}
             >
@@ -417,7 +416,7 @@ function CheckoutUI() {
             <MenuItem
               onClick={() => {
                 setParams({
-                  flow: CheckoutFlowType.WALLET,
+                  flow: CommerceFlowType.WALLET,
                 });
               }}
             >
@@ -426,7 +425,7 @@ function CheckoutUI() {
             <MenuItem
               onClick={() => {
                 setParams({
-                  flow: CheckoutFlowType.SWAP,
+                  flow: CommerceFlowType.SWAP,
                   amount: "10",
                   fromTokenAddress: "native",
                 });
@@ -437,7 +436,7 @@ function CheckoutUI() {
             <MenuItem
               onClick={() => {
                 setParams({
-                  flow: CheckoutFlowType.BRIDGE,
+                  flow: CommerceFlowType.BRIDGE,
                 });
               }}
             >
@@ -446,7 +445,7 @@ function CheckoutUI() {
             <MenuItem
               onClick={() => {
                 setParams({
-                  flow: CheckoutFlowType.ONRAMP,
+                  flow: CommerceFlowType.ONRAMP,
                 });
               }}
             >
@@ -455,7 +454,7 @@ function CheckoutUI() {
             <MenuItem
               onClick={() => {
                 setParams({
-                  flow: CheckoutFlowType.SALE,
+                  flow: CommerceFlowType.SALE,
                   items: [
                     {
                       productId: "kangaroo",
@@ -523,7 +522,7 @@ function CheckoutUI() {
             </Box>
           </AppHeaderBar.RightSlot>
           <AppHeaderBar.LeftSlot gap="base.spacing.x4">
-            <AppHeaderBar.Title>{params?.flow || ""}</AppHeaderBar.Title>
+            <Heading>{params?.flow || ""}</Heading>
           </AppHeaderBar.LeftSlot>
         </AppHeaderBar>
       </Box>
@@ -532,7 +531,6 @@ function CheckoutUI() {
           <Stack sx={{ flexWrap: "wrap", py: "base.spacing.x2" }}>
             {/* --- --- --- */}
             <Legend>Environment: {environment.toUpperCase()}</Legend>
-            {checkoutAppURL && new URL(checkoutAppURL).origin}
             <Box
               sx={{
                 display: "flex",
@@ -655,7 +653,7 @@ function CheckoutUI() {
                 <Select
                   defaultLabel="Select a Flow"
                   onSelectChange={(value) => {
-                    const flow = value as CheckoutFlowType;
+                    const flow = value as CommerceFlowType;
                     setParams({
                       ...(flowParams[flow as keyof typeof flowParams] || {}),
                       flow,
@@ -690,22 +688,6 @@ function CheckoutUI() {
             brad: "base.borderRadius.x5",
           }}
         />
-      </Box>
-      <Box>
-        {checkoutAppURL && (
-          <Message type="success" title="Checkout App URL">
-            <Link
-              variant="secondary"
-              weight="bold"
-              onClick={() => {
-                window.open(checkoutAppURL, "_blank", "noopener,noreferrer");
-              }}
-            >
-              {checkoutAppURL}
-              <Link.Icon icon="JumpTo" />
-            </Link>
-          </Message>
-        )}
       </Box>
     </Box>
   );

@@ -71,6 +71,8 @@ export type RemoteConfiguration = {
   onramp: OnRampConfig;
   /** The config used for the Bridge. */
   bridge: BridgeConfig;
+  /** The config used for Add Tokens */
+  addTokens: AddTokensConfig;
   /** An array representing the allowed networks. */
   allowedNetworks: AllowedNetworkConfig[];
   /** The config for the tokens used to estimate gas. */
@@ -83,6 +85,15 @@ export type RemoteConfiguration = {
   squid?: SquidConfig;
   /** The checkout version info. */
   checkoutWidgetsVersion: CheckoutWidgetsVersionConfig;
+};
+
+/**
+ * A type representing the configuration for the Add Tokens.
+ * @property {TokenInfo[] | undefined} tokens
+ */
+export type AddTokensConfig = {
+  /** A boolean value for enabling/disabling Add Tokens */
+  enabled: boolean;
 };
 
 /**

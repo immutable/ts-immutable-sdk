@@ -5,7 +5,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import GetAllBalances from '../components/GetAllBalances';
 import CheckConnection from '../components/CheckConnection';
 import GetAllowList from '../components/GetAllowList';
-import { Body, Box, Checkbox, Divider, Heading, Toggle } from '@biom3/react';
+import { Body, Box, Checkbox, Divider, Heading } from '@biom3/react';
 import GetBalance from '../components/GetBalance';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';

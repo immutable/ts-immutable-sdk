@@ -57,7 +57,7 @@ generate-blockchain-data: get-blockchain-data-openapi generate-blockchain-data-c
 get-blockchain-data-openapi:
 	rimraf src/blockchain-data-openapi.json && touch src/blockchain-data-openapi.json && \
 	curl -H "Accept: application/json+v3" \
-    https://imtbl-sdk.s3.us-east-2.amazonaws.com/openapi/indexer-mr-oas.json \
+    https://imtbl-sdk.s3.us-east-2.amazonaws.com/openapi/blockchain-data-oas.json \
     -o src/blockchain-data-openapi.json
 
 # TODO

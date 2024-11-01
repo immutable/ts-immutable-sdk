@@ -6,6 +6,7 @@ import {
   RequestOnrampEvent,
   RequestSwapEvent,
   RequestGoBackEvent,
+  RequestAddTokensEvent,
 } from '@imtbl/checkout-sdk';
 
 function sendRequestOnrampEvent(
@@ -86,9 +87,30 @@ function sendRequestGoBackEvent(
   if (eventTarget !== undefined) eventTarget.dispatchEvent(requestGoBackEvent);
 }
 
+function sendRequestAddTokensEvent(
+  eventTarget: Window | EventTarget,
+  imtblWidgetEvent: IMTBLWidgetEvents,
+  eventData: RequestAddTokensEvent,
+) {
+  // eslint-disable-next-line max-len
+  const requestAddTokensEvent = new CustomEvent<
+  OrchestrationEvent<OrchestrationEventType.REQUEST_ADD_TOKENS>
+  >(imtblWidgetEvent, {
+    detail: {
+      type: OrchestrationEventType.REQUEST_ADD_TOKENS,
+      data: eventData,
+    },
+  });
+  // TODO: please remove or if necessary keep the eslint ignore
+  // eslint-disable-next-line no-console
+  console.log('add tokens event:', eventTarget, requestAddTokensEvent);
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(requestAddTokensEvent);
+}
+
 export const orchestrationEvents = {
   sendRequestBridgeEvent,
   sendRequestSwapEvent,
   sendRequestOnrampEvent,
   sendRequestGoBackEvent,
+  sendRequestAddTokensEvent,
 };

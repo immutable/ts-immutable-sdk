@@ -40,6 +40,7 @@ export type {
   EIP1193Provider,
   EIP6963ProviderInfo,
   EIP6963ProviderDetail,
+  AddTokensConfig,
 } from './types';
 
 export type {
@@ -148,15 +149,10 @@ export type {
   CheckoutWidgetsVersionConfig,
 } from './types';
 
-export {
-  PostMessageHandler, PostMessageHandlerEventType,
-} from './postMessageHandler';
-export type { PostMessageHandlerConfiguration, PostMessageData } from './postMessageHandler';
-
 export { isAddressSanctioned } from './sanctions';
 
 export type { ErrorType } from './errors';
 
-export { CheckoutErrorType } from './errors';
+export { CheckoutErrorType, CheckoutError } from './errors';
 export { CheckoutConfiguration } from './config';
 export { BlockExplorerService } from './blockExplorer';

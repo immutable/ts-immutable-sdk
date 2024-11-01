@@ -8,7 +8,7 @@ import { BridgeWidgetView } from './BridgeViewContextTypes';
 import { SaleWidgetView } from './SaleViewContextTypes';
 import { ViewType } from './ViewType';
 import { OnRampWidgetView } from './OnRampViewContextTypes';
-import { AddFundsWidgetView } from './AddFundsViewContextTypes';
+import { AddTokensWidgetView } from './AddTokensViewContextTypes';
 import { CheckoutWidgetView } from './CheckoutWidgetViewContextTypes';
 
 export enum SharedViews {
@@ -53,7 +53,7 @@ export type View =
   | OnRampWidgetView
   | SaleWidgetView
   | BridgeWidgetView
-  | AddFundsWidgetView
+  | AddTokensWidgetView
   | CheckoutWidgetView;
 
 export interface ViewState {
@@ -186,8 +186,11 @@ export const viewReducer: Reducer<ViewState, ViewAction> = (
   }
 };
 
-export const useViewState = () => {
-  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+export const useViewState = (initialState?: ViewState) => {
+  const [viewState, viewDispatch] = useReducer(viewReducer, {
+    ...initialViewState,
+    ...(initialState ?? {}),
+  });
 
   return [viewState, viewDispatch] as const;
 };

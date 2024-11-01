@@ -32,3 +32,7 @@ dep-graph.json
 examples/**/.env
 examples/**/playwright-report/
 examples/**/test-results/
+
+tests/**/.env
+tests/**/playwright-report/
+tests/**/test-results/
