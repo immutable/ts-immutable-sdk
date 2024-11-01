@@ -4002,6 +4002,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@examples/commerce-widget-nextjs@workspace:examples/checkout/commerce-widget-nextjs":
+  version: 0.0.0-use.local
+  resolution: "@examples/commerce-widget-nextjs@workspace:examples/checkout/commerce-widget-nextjs"
+  dependencies:
+    "@biom3/react": ^0.25.21
+    "@ethersproject/providers": ^5.7.2
+    "@imtbl/sdk": ^1.62.0
+    "@playwright/test": ^1.45.3
+    "@types/node": ^20
+    "@types/react": ^18.3.4
+    "@types/react-dom": ^18.3.0
+    eslint: ^8
+    eslint-config-next: 14.2.7
+    next: 14.2.7
+    react: ^18
+    react-dom: ^18
+    typescript: ^5.6.2
+  languageName: unknown
+  linkType: soft
+
 "@examples/create-bid-with-nextjs@workspace:examples/orderbook/create-bid-with-nextjs":
   version: 0.0.0-use.local
   resolution: "@examples/create-bid-with-nextjs@workspace:examples/orderbook/create-bid-with-nextjs"
@@ -4170,26 +4190,6 @@ __metadata:
 "@examples/sdk-connect-with-nextjs@workspace:examples/checkout/sdk-connect-with-nextjs":
   version: 0.0.0-use.local
   resolution: "@examples/sdk-connect-with-nextjs@workspace:examples/checkout/sdk-connect-with-nextjs"
-  dependencies:
-    "@biom3/react": ^0.25.21
-    "@ethersproject/providers": ^5.7.2
-    "@imtbl/sdk": latest
-    "@playwright/test": ^1.45.3
-    "@types/node": ^20
-    "@types/react": ^18.3.4
-    "@types/react-dom": ^18.3.0
-    eslint: ^8
-    eslint-config-next: 14.2.7
-    next: 14.2.7
-    react: ^18
-    react-dom: ^18
-    typescript: ^5.6.2
-  languageName: unknown
-  linkType: soft
-
-"@examples/sdk-load-widgets-with-nextjs@workspace:examples/checkout/sdk-load-widgets-with-nextjs":
-  version: 0.0.0-use.local
-  resolution: "@examples/sdk-load-widgets-with-nextjs@workspace:examples/checkout/sdk-load-widgets-with-nextjs"
   dependencies:
     "@biom3/react": ^0.25.21
     "@ethersproject/providers": ^5.7.2
@@ -5038,6 +5038,164 @@ __metadata:
       optional: true
   languageName: unknown
   linkType: soft
+
+"@imtbl/sdk@npm:1.63.0":
+  version: 1.63.0
+  resolution: "@imtbl/sdk@npm:1.63.0"
+  dependencies:
+    "@0xsequence/abi": ^1.4.3
+    "@0xsequence/core": ^1.4.3
+    "@0xsquid/sdk": ^2.8.25
+    "@biom3/design-tokens": ^0.4.4
+    "@biom3/react": ^0.27.12
+    "@ethersproject/abi": ^5.7.0
+    "@ethersproject/abstract-provider": ^5.7.0
+    "@ethersproject/abstract-signer": ^5.7.0
+    "@ethersproject/address": ^5.7.0
+    "@ethersproject/bignumber": ^5.7.0
+    "@ethersproject/bytes": ^5.7.0
+    "@ethersproject/contracts": ^5.7.0
+    "@ethersproject/keccak256": ^5.7.0
+    "@ethersproject/providers": ^5.7.2
+    "@ethersproject/solidity": ^5.7.0
+    "@ethersproject/strings": ^5.7.0
+    "@ethersproject/units": ^5.7.0
+    "@ethersproject/wallet": ^5.7.0
+    "@imtbl/react-analytics": 0.2.1-alpha
+    "@jest/globals": ^29.5.0
+    "@magic-ext/oidc": 4.3.1
+    "@magic-sdk/provider": ^21.2.0
+    "@metamask/detect-provider": ^2.0.0
+    "@opensea/seaport-js": 4.0.3
+    "@rive-app/react-canvas-lite": ^4.9.0
+    "@stdlib/number-float64-base-normalize": 0.0.8
+    "@uniswap/router-sdk": ^1.4.0
+    "@uniswap/sdk-core": ^3.0.1
+    "@uniswap/v3-sdk": ^3.9.0
+    "@walletconnect/ethereum-provider": ^2.11.1
+    "@walletconnect/modal": ^2.6.2
+    assert: ^2.0.0
+    axios: ^1.6.5
+    bn.js: ^5.2.1
+    buffer: ^6.0.3
+    crypto-browserify: ^3.12.0
+    elliptic: ^6.5.7
+    enc-utils: ^3.0.0
+    ethereumjs-wallet: ^1.0.2
+    ethers: ^5.7.2
+    ethers-v6: "npm:ethers@6.11.1"
+    events: ^3.3.0
+    form-data: ^4.0.0
+    framer-motion: ^11.0.6
+    global-const: ^0.1.2
+    hash.js: ^1.1.7
+    https-browserify: ^1.0.0
+    i18next: ^23.7.6
+    i18next-browser-languagedetector: ^7.2.0
+    jwt-decode: ^3.1.2
+    localforage: ^1.10.0
+    lru-memorise: 0.3.0
+    magic-sdk: ^21.2.0
+    merkletreejs: ^0.3.11
+    oidc-client-ts: 2.4.0
+    os-browserify: ^0.3.0
+    pako: ^2.1.0
+    pg: ^8.11.5
+    pino-pretty: ^11.2.2
+    prisma: ^5.13.0
+    react-i18next: ^13.5.0
+    sns-validator: ^0.3.5
+    stream-browserify: ^3.0.0
+    stream-http: ^3.2.0
+    url: ^0.11.0
+    uuid: ^8.3.2
+  dependenciesMeta:
+    pg:
+      optional: true
+    prisma:
+      optional: true
+  checksum: 7c1695455fd060d38b145ce6539142a31c569bcfe5cea399f2bf68832439fcb4617473633df6c3e96ab9e99259ac8ef3830b13af4bf5a66c48c724d8f369c1a2
+  languageName: node
+  linkType: hard
+
+"@imtbl/sdk@npm:^1.62.0":
+  version: 1.62.0
+  resolution: "@imtbl/sdk@npm:1.62.0"
+  dependencies:
+    "@0xsequence/abi": ^1.4.3
+    "@0xsequence/core": ^1.4.3
+    "@0xsquid/sdk": ^2.8.25
+    "@biom3/design-tokens": ^0.4.4
+    "@biom3/react": ^0.27.12
+    "@ethersproject/abi": ^5.7.0
+    "@ethersproject/abstract-provider": ^5.7.0
+    "@ethersproject/abstract-signer": ^5.7.0
+    "@ethersproject/address": ^5.7.0
+    "@ethersproject/bignumber": ^5.7.0
+    "@ethersproject/bytes": ^5.7.0
+    "@ethersproject/contracts": ^5.7.0
+    "@ethersproject/keccak256": ^5.7.0
+    "@ethersproject/providers": ^5.7.2
+    "@ethersproject/solidity": ^5.7.0
+    "@ethersproject/strings": ^5.7.0
+    "@ethersproject/units": ^5.7.0
+    "@ethersproject/wallet": ^5.7.0
+    "@imtbl/react-analytics": 0.2.1-alpha
+    "@jest/globals": ^29.5.0
+    "@magic-ext/oidc": 4.3.1
+    "@magic-sdk/provider": ^21.2.0
+    "@metamask/detect-provider": ^2.0.0
+    "@opensea/seaport-js": 4.0.3
+    "@rive-app/react-canvas-lite": ^4.9.0
+    "@stdlib/number-float64-base-normalize": 0.0.8
+    "@uniswap/router-sdk": ^1.4.0
+    "@uniswap/sdk-core": ^3.0.1
+    "@uniswap/v3-sdk": ^3.9.0
+    "@walletconnect/ethereum-provider": ^2.11.1
+    "@walletconnect/modal": ^2.6.2
+    assert: ^2.0.0
+    axios: ^1.6.5
+    bn.js: ^5.2.1
+    buffer: ^6.0.3
+    crypto-browserify: ^3.12.0
+    elliptic: ^6.5.7
+    enc-utils: ^3.0.0
+    ethereumjs-wallet: ^1.0.2
+    ethers: ^5.7.2
+    ethers-v6: "npm:ethers@6.11.1"
+    events: ^3.3.0
+    form-data: ^4.0.0
+    framer-motion: ^11.0.6
+    global-const: ^0.1.2
+    hash.js: ^1.1.7
+    https-browserify: ^1.0.0
+    i18next: ^23.7.6
+    i18next-browser-languagedetector: ^7.2.0
+    jwt-decode: ^3.1.2
+    localforage: ^1.10.0
+    lru-memorise: 0.3.0
+    magic-sdk: ^21.2.0
+    merkletreejs: ^0.3.11
+    oidc-client-ts: 2.4.0
+    os-browserify: ^0.3.0
+    pako: ^2.1.0
+    pg: ^8.11.5
+    pino-pretty: ^11.2.2
+    prisma: ^5.13.0
+    react-i18next: ^13.5.0
+    sns-validator: ^0.3.5
+    stream-browserify: ^3.0.0
+    stream-http: ^3.2.0
+    url: ^0.11.0
+    uuid: ^8.3.2
+  dependenciesMeta:
+    pg:
+      optional: true
+    prisma:
+      optional: true
+  checksum: fbeca01d47dce9a04c710bbde042402f638ac18464dd5815eacf2e366146bcd35ebed109e0457fd79aaf67e3348486fe51aaccefc239bf6e693a501dc4cb7c0a
+  languageName: node
+  linkType: hard
 
 "@imtbl/sdk@npm:latest":
   version: 1.56.0
@@ -12088,6 +12246,26 @@ __metadata:
   checksum: 16319de685fbb7008f1ba667928f458b2d08196918002daca56996de80ef35e6d9de26e9e1ece7d00a004692b95a597cf9142fff0dc53f2f51606a776584f549
   languageName: node
   linkType: hard
+
+"@tests/checkout-widgets-nextjs@workspace:tests/func-tests/checkout/widgets-nextjs":
+  version: 0.0.0-use.local
+  resolution: "@tests/checkout-widgets-nextjs@workspace:tests/func-tests/checkout/widgets-nextjs"
+  dependencies:
+    "@biom3/react": ^0.25.21
+    "@ethersproject/providers": ^5.7.2
+    "@imtbl/sdk": 1.63.0
+    "@playwright/test": ^1.45.3
+    "@types/node": ^20
+    "@types/react": ^18.3.4
+    "@types/react-dom": ^18.3.0
+    eslint: ^8
+    eslint-config-next: 14.2.7
+    next: 14.2.7
+    react: ^18
+    react-dom: ^18
+    typescript: ^5.6.2
+  languageName: unknown
+  linkType: soft
 
 "@tests/func-tests-imx@workspace:tests/func-tests/imx":
   version: 0.0.0-use.local

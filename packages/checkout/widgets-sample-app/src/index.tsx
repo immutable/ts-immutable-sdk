@@ -14,9 +14,9 @@ import {
   Checkout,
 } from "./components/ui/marketplace-orchestrator";
 import { SaleUI } from "./components/ui/sale/sale";
-import AddFundsUI from "./components/ui/add-funds/addFunds";
-import { AddFundsPassportLogin } from "./components/ui/add-funds/login";
-import { AddFundsPassportLogout } from "./components/ui/add-funds/logout";
+import AddTokensUI from "./components/ui/add-tokens/addTokens";
+import { AddTokensPassportLogin } from "./components/ui/add-tokens/login";
+import { AddTokensPassportLogout } from "./components/ui/add-tokens/logout";
 
 const router = createBrowserRouter([
   {
@@ -52,16 +52,16 @@ const router = createBrowserRouter([
     element: <Checkout />,
   },
   {
-    path: "/add-funds",
-    element: <AddFundsUI />,
+    path: "/add-tokens",
+    element: <AddTokensUI />,
   },
   {
-    path: "/add-funds/login",
-    element: <AddFundsPassportLogin />,
+    path: "/add-tokens/login",
+    element: <AddTokensPassportLogin />,
   },
   {
-    path: "/add-funds/logout",
-    element: <AddFundsPassportLogout />,
+    path: "/add-tokens/logout",
+    element: <AddTokensPassportLogout />,
   },
   {
     path: "/marketplace-orchestrator",

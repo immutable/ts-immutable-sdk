@@ -28,11 +28,11 @@ function App() {
         </div>
         <br />
         <div>
-          <a href={"/checkout"}>Checkout Widget</a>
+          <a href={"/checkout"}>Commerce Widget</a>
         </div>
         <br />
         <div>
-          <a href={"/add-funds"}>Add Funds Widget</a>
+          <a href={"/add-tokens"}>Add Tokens Widget</a>
         </div>
         <br />
         <div>

@@ -1,0 +1,31 @@
+{
+  "name": "@examples/commerce-widget-nextjs",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:remotewidgets": "USE_REMOTE_WIDGETS=true playwright test"
+  },
+  "dependencies": {
+    "@biom3/react": "^0.25.21",
+    "@ethersproject/providers": "^5.7.2",
+    "@imtbl/sdk": "^1.62.0",
+    "next": "14.2.7",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.45.3",
+    "@types/node": "^20",
+    "@types/react": "^18.3.4",
+    "@types/react-dom": "^18.3.0",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.7",
+    "typescript": "^5.6.2"
+  }
+}
