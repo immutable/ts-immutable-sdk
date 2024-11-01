@@ -17,10 +17,10 @@ test.describe("Login with NextJS", () => {
   test("has heading and correct buttons", async ({ page }) => {
     await page.click("text=Login with NextJS");
     await expect(page.getByRole("heading", { name: "Login with NextJS" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Login" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Login", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Login without Wallet" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Login with EtherJS" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Logout" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Login with EthersJS" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Logout", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Logout in Silent Mode" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Return to Examples" })).toBeVisible();
   });
