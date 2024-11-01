@@ -1,7 +1,8 @@
 'use client';
 
 import { usePassport } from '@/context/passport';
-import { Heading, Button } from '@biom3/react';
+import { Heading, Button, Link } from '@biom3/react';
+import NextLink from 'next/link';
 
 export default function PassportMethods() {
   const {
@@ -38,6 +39,8 @@ export default function PassportMethods() {
         onClick={getUserInfo}>
         Get User Info
       </Button>
+      <br />
+    <Link rc={<NextLink href="/" />}>Return to Examples</Link>
     </div>
     );
 }

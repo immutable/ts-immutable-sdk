@@ -6,7 +6,7 @@ import NextLink from 'next/link';
 export default function Home() {
   return (
     <div className="flex-container">
-      <Heading className="mb-1">Identity with NextJS Examples</Heading>
+      <Heading className="mb-1">Passport Identity Examples</Heading>
       <Button       
         className="mb-1"
         size="medium" 

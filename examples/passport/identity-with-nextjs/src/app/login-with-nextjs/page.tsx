@@ -1,7 +1,8 @@
 'use client';
 
 import { usePassport } from '@/context/passport';
-import { Heading, Button } from '@biom3/react';
+import { Heading, Button, Link } from '@biom3/react';
+import NextLink from 'next/link';
 
 export default function LoginWithNextJS() {
   const {
@@ -25,7 +26,7 @@ export default function LoginWithNextJS() {
         className="mb-1"
         size="medium" 
         onClick={loginWithoutWallet}>
-        Login Without Wallet
+        Login without Wallet
       </Button>
       <Button       
         className="mb-1"
@@ -45,6 +46,8 @@ export default function LoginWithNextJS() {
         onClick={logoutSilent}>
         Logout in Silent Mode
       </Button>
+      <br />
+    <Link rc={<NextLink href="/" />}>Return to Examples</Link>
     </div>
     );
   }
