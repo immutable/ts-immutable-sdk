@@ -7,9 +7,9 @@ import {
   SaleWidgetParams,
   SwapWidgetConfiguration,
   SwapWidgetParams,
-  AddFundsWidgetParams,
-  AddFundsWidgetConfiguration,
-  CheckoutFlowType,
+  AddTokensWidgetParams,
+  AddTokensWidgetConfiguration,
+  CommerceFlowType,
   ConnectWidgetParams,
   ConnectWidgetConfiguration,
   WalletWidgetParams,
@@ -20,14 +20,14 @@ import { ViewType } from './ViewType';
 export type CheckoutWidgetView =
   | ConnectView
   | WalletView
-  | AddFundsView
+  | AddTokensView
   | SaleView
   | SwapView
   | OnRampView
   | BrdigeView;
 
 interface ConnectView extends ViewType {
-  type: CheckoutFlowType.CONNECT;
+  type: CommerceFlowType.CONNECT;
   data: {
     params: ConnectWidgetParams;
     config: ConnectWidgetConfiguration;
@@ -35,23 +35,23 @@ interface ConnectView extends ViewType {
 }
 
 interface WalletView extends ViewType {
-  type: CheckoutFlowType.WALLET;
+  type: CommerceFlowType.WALLET;
   data: {
     params: WalletWidgetParams;
     config: WalletWidgetConfiguration;
   };
 }
 
-interface AddFundsView extends ViewType {
-  type: CheckoutFlowType.ADD_FUNDS;
+interface AddTokensView extends ViewType {
+  type: CommerceFlowType.ADD_TOKENS;
   data: {
-    params: AddFundsWidgetParams;
-    config: AddFundsWidgetConfiguration;
+    params: AddTokensWidgetParams;
+    config: AddTokensWidgetConfiguration;
   };
 }
 
 interface SaleView extends ViewType {
-  type: CheckoutFlowType.SALE;
+  type: CommerceFlowType.SALE;
   data: {
     params: Required<SaleWidgetParams>;
     config: SaleWidgetConfiguration;
@@ -59,7 +59,7 @@ interface SaleView extends ViewType {
 }
 
 interface SwapView extends ViewType {
-  type: CheckoutFlowType.SWAP;
+  type: CommerceFlowType.SWAP;
   data: {
     params: SwapWidgetParams;
     config: SwapWidgetConfiguration;
@@ -67,7 +67,7 @@ interface SwapView extends ViewType {
 }
 
 interface OnRampView extends ViewType {
-  type: CheckoutFlowType.ONRAMP;
+  type: CommerceFlowType.ONRAMP;
   data: {
     params: OnRampWidgetParams;
     config: OnrampWidgetConfiguration;
@@ -75,7 +75,7 @@ interface OnRampView extends ViewType {
 }
 
 interface BrdigeView extends ViewType {
-  type: CheckoutFlowType.BRIDGE;
+  type: CommerceFlowType.BRIDGE;
   data: {
     params: BridgeWidgetParams;
     config: BridgeWidgetConfiguration;

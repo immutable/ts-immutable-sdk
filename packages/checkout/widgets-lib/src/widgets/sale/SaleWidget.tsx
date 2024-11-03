@@ -12,6 +12,7 @@ import {
   ChainId,
   IMTBLWidgetEvents,
   SaleWidgetParams,
+  AddTokensConfig,
 } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
@@ -38,8 +39,12 @@ import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { OrderSummary } from './views/OrderSummary';
 import { CreditCardWarningDrawer } from './components/CreditCardWarningDrawer';
+import { useAsyncMemo } from '../../lib/hooks/useAsyncMemo';
 
-type OptionalWidgetParams = Pick<SaleWidgetParams, 'excludePaymentTypes' | 'excludeFiatCurrencies' | 'customOrderData'>;
+type OptionalWidgetParams = Pick<
+SaleWidgetParams,
+'excludePaymentTypes' | 'excludeFiatCurrencies' | 'customOrderData'
+>;
 type RequiredWidgetParams = Required<
 Omit<SaleWidgetParams, 'walletProviderName'>
 >;
@@ -86,6 +91,21 @@ export default function SaleWidget(props: SaleWidgetProps) {
   );
 
   const loadingText = viewState.view.data?.loadingText || t('views.LOADING_VIEW.text');
+
+  const isAddTokensAvailable = useAsyncMemo<boolean>(async () => {
+    if (!checkout) return false;
+
+    try {
+      const isSwapAvailable = await checkout.isSwapAvailable();
+      const addTokensConfig = (await checkout.config.remote.getConfig(
+        'addTokens',
+      )) as AddTokensConfig;
+
+      return addTokensConfig.enabled && isSwapAvailable;
+    } catch (error) {
+      return false;
+    }
+  }, [checkout]);
 
   useEffect(() => {
     if (!checkout || !provider) return;
@@ -173,6 +193,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
               showOnrampOption={config.isOnRampEnabled}
               showSwapOption={false}
               showBridgeOption={config.isBridgeEnabled}
+              showAddTokensOption={isAddTokensAvailable}
               onCloseButtonClick={() => sendSaleWidgetCloseEvent(eventTarget)}
               onBackButtonClick={() => {
                 viewDispatch({

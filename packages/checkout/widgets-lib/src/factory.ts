@@ -1,29 +1,28 @@
-import {
-  Widget,
-  Checkout,
-  WidgetType,
-  IWidgetsFactory,
-  WidgetConfiguration,
-  WidgetProperties,
-  WidgetConfigurations,
-} from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
-import { Environment } from '@imtbl/config';
-import { Connect } from './widgets/connect/ConnectWidgetRoot';
-import { Swap } from './widgets/swap/SwapWidgetRoot';
-import { OnRamp } from './widgets/on-ramp/OnRampWidgetRoot';
-import { Wallet } from './widgets/wallet/WalletWidgetRoot';
-import { Sale } from './widgets/sale/SaleWidgetRoot';
-import { Bridge } from './widgets/bridge/BridgeWidgetRoot';
-import { WalletConnectManager } from './lib/walletConnect';
 import {
-  sendProviderUpdatedEvent,
+  Checkout,
+  IWidgetsFactory,
+  Widget,
+  WidgetConfiguration,
+  WidgetConfigurations,
+  WidgetProperties,
+  WidgetType,
+} from '@imtbl/checkout-sdk';
+import './i18n';
+import {
   addProviderListenersForWidgetRoot,
   DEFAULT_THEME,
+  sendProviderUpdatedEvent,
 } from './lib';
-import './i18n';
-import { CheckoutWidgetRoot } from './widgets/checkout/CheckoutWidgetRoot';
-import { AddFunds } from './widgets/add-funds/AddFundsRoot';
+import { WalletConnectManager } from './lib/walletConnect';
+import { AddTokens } from './widgets/add-tokens/AddTokensRoot';
+import { Bridge } from './widgets/bridge/BridgeWidgetRoot';
+import { CommerceWidgetRoot } from './widgets/immutable-commerce/CommerceWidgetRoot';
+import { Connect } from './widgets/connect/ConnectWidgetRoot';
+import { OnRamp } from './widgets/on-ramp/OnRampWidgetRoot';
+import { Sale } from './widgets/sale/SaleWidgetRoot';
+import { Swap } from './widgets/swap/SwapWidgetRoot';
+import { Wallet } from './widgets/wallet/WalletWidgetRoot';
 
 export class WidgetsFactory implements IWidgetsFactory {
   private sdk: Checkout;
@@ -95,20 +94,17 @@ export class WidgetsFactory implements IWidgetsFactory {
           provider,
         }) as Widget<WidgetType.SALE> as Widget<T>;
       }
-      case WidgetType.CHECKOUT: {
-        if (this.sdk.config.environment === Environment.PRODUCTION) {
-          throw new Error('Checkout widget is not supported in production');
-        }
-        return new CheckoutWidgetRoot(this.sdk, {
+      case WidgetType.IMMUTABLE_COMMERCE: {
+        return new CommerceWidgetRoot(this.sdk, {
           config: { ...this.widgetConfig, ...(config) },
           provider,
-        }) as Widget<WidgetType.CHECKOUT> as Widget<T>;
+        }) as Widget<WidgetType.IMMUTABLE_COMMERCE> as Widget<T>;
       }
-      case WidgetType.ADD_FUNDS: {
-        return new AddFunds(this.sdk, {
+      case WidgetType.ADD_TOKENS: {
+        return new AddTokens(this.sdk, {
           config: { ...this.widgetConfig, ...(config) },
           provider,
-        }) as Widget<WidgetType.ADD_FUNDS> as Widget<T>;
+        }) as Widget<WidgetType.ADD_TOKENS> as Widget<T>;
       }
       default:
         throw new Error('widget type not supported');

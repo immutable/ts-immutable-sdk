@@ -188,19 +188,17 @@ export function ConnectWalletDrawer({
 
   const retrySelectedWallet = () => {
     if (prevWalletChangeEvent.current) {
-      handleOnWalletChangeEvent(prevWalletChangeEvent.current);
+      handleWalletConnection(prevWalletChangeEvent.current);
     }
   };
 
   const handleCloseChangedMindDrawer = () => {
-    setShowChangedMindDrawer(false);
     retrySelectedWallet();
+    setShowChangedMindDrawer(false);
   };
 
   const handleProceedEOA = () => {
-    if (prevWalletChangeEvent.current) {
-      handleWalletConnection(prevWalletChangeEvent.current);
-    }
+    retrySelectedWallet();
     setShowEOAWarningDrawer(false);
   };
 

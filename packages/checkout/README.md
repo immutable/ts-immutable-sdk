@@ -202,9 +202,9 @@ In a production release, this script is loaded from a CDN. We are currently usin
       │
       ├── sdk-sample-app - Sample app where the Checkout SDK is consumed
       │
-      ├── widgets-lib - Checkout widgets
+      ├── widgets-lib - Commerce Widgets
       │
-      ├── widgets-sample-app - Sample app where the Checkout Widgets are consumed
+      ├── widgets-sample-app - Sample app where the Commerce Widgets are consumed
       │
       └── README.md
 ```

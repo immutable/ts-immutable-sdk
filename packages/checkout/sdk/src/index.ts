@@ -40,6 +40,7 @@ export type {
   EIP1193Provider,
   EIP6963ProviderInfo,
   EIP6963ProviderDetail,
+  AddTokensConfig,
 } from './types';
 
 export type {
@@ -147,11 +148,6 @@ export type {
   SquidConfig,
   CheckoutWidgetsVersionConfig,
 } from './types';
-
-export {
-  PostMessageHandler, PostMessageHandlerEventType,
-} from './postMessageHandler';
-export type { PostMessageHandlerConfiguration, PostMessageData } from './postMessageHandler';
 
 export { isAddressSanctioned } from './sanctions';
 
