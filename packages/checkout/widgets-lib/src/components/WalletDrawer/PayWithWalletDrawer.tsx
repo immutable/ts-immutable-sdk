@@ -86,7 +86,7 @@ export function PayWithWalletDrawer({
 
   return (
     <ConnectWalletDrawer
-      heading={insufficientBalance ? 'Choose another option' : 'Pay With'}
+      heading={insufficientBalance ? 'Choose another option' : 'Send from'}
       visible={visible}
       onClose={onClose}
       providerType="from"

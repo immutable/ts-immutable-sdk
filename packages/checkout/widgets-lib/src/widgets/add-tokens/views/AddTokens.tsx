@@ -659,7 +659,7 @@ export function AddTokens({
         >
           <Stack gap="0px">
             <SelectedWallet
-              label="Pay with"
+              label="Send from"
               providerInfo={{
                 ...fromProviderInfo,
                 address: fromAddress,
