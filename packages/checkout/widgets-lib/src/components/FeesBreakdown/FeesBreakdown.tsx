@@ -30,6 +30,7 @@ export function FeesBreakdown({
   loading = false,
 }: FeesBreakdownProps) {
   const { t } = useTranslation();
+
   return (
     <Drawer
       headerBarTitle={t('drawers.feesBreakdown.heading')}

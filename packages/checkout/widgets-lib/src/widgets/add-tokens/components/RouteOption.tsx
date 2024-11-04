@@ -93,7 +93,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
 
       <MenuItem.PriceDisplay price={fromAmount}>
         <MenuItem.PriceDisplay.Caption>
-          {`USD $${fromAmountUsd}`}
+          {`≈ USD $${fromAmountUsd}`}
         </MenuItem.PriceDisplay.Caption>
       </MenuItem.PriceDisplay>
 

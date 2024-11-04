@@ -193,7 +193,7 @@ export function Review({
           }}
         >
           Included fees
-          {` USD $${getFormattedAmounts(totalFeesUsd)}`}
+          {` ≈ USD $${getFormattedAmounts(totalFeesUsd)}`}
           <Icon
             icon="ChevronExpand"
             sx={{ ml: 'base.spacing.x2', w: 'base.icon.size.200' }}

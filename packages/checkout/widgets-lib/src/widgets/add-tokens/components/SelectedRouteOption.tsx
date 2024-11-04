@@ -181,11 +181,11 @@ export function SelectedRouteOption({
       >
         <Stack gap="0px">
           <MenuItem.Label>{fromToken?.name}</MenuItem.Label>
-          <MenuItem.Caption>{`Balance USD $${routeBalanceUsd}`}</MenuItem.Caption>
+          <MenuItem.Caption>{`Balance ≈ USD $${routeBalanceUsd}`}</MenuItem.Caption>
         </Stack>
         <MenuItem.PriceDisplay price={fromAmount}>
           <MenuItem.PriceDisplay.Caption>
-            {`USD $${fromAmountUsd}`}
+            {`≈ USD $${fromAmountUsd}`}
           </MenuItem.PriceDisplay.Caption>
         </MenuItem.PriceDisplay>
       </Stack>
