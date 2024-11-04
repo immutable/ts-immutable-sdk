@@ -685,6 +685,9 @@
       "geoBlockError": {
         "buyTokenButton": "Buy tokens",
         "bridgeTokenButton": "Bridge tokens"
+      },
+      "fees": {
+        "fiatPricePrefix": "≈ USD"
       }
     }
   },

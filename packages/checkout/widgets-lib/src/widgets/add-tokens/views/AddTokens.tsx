@@ -30,6 +30,7 @@ import {
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
+import { useTranslation } from 'react-i18next';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
@@ -113,6 +114,7 @@ export function AddTokens({
 
   const { viewDispatch } = useContext(ViewContext);
   const { track, page } = useAnalytics();
+  const { t } = useTranslation();
 
   const {
     eventTargetState: { eventTarget },
@@ -338,12 +340,12 @@ export function AddTokens({
           setAllowedTokens(updatedTokens);
 
           if (toTokenAddress) {
-            const token = updatedTokens.find(
-              (t) => t.address?.toLowerCase() === toTokenAddress.toLowerCase(),
+            const preselectedToken = updatedTokens.find(
+              (token) => token.address?.toLowerCase() === toTokenAddress.toLowerCase(),
             );
 
-            if (token) {
-              setSelectedToken(token);
+            if (preselectedToken) {
+              setSelectedToken(preselectedToken);
             }
           }
 
@@ -458,10 +460,10 @@ export function AddTokens({
 
   const shouldShowOnRampOption = useMemo(() => {
     if (showOnrampOption && selectedToken) {
-      const token = onRampAllowedTokens.find(
-        (t) => t.address?.toLowerCase() === selectedToken.address?.toLowerCase(),
+      const isAllowedToken = onRampAllowedTokens.find(
+        (token) => token.address?.toLowerCase() === selectedToken.address?.toLowerCase(),
       );
-      return !!token;
+      return !!isAllowedToken;
     }
     return false;
   }, [selectedToken, onRampAllowedTokens, showOnrampOption]);
@@ -639,8 +641,8 @@ export function AddTokens({
               />
 
               <HeroFormControl.Caption>
-                USD $
-                {getFormattedNumberWithDecimalPlaces(selectedAmountUsd)}
+                {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} 
+                $${getFormattedNumberWithDecimalPlaces(selectedAmountUsd)}`}
               </HeroFormControl.Caption>
             </HeroFormControl>
           )}
