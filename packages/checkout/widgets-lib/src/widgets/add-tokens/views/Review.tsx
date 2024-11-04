@@ -193,7 +193,7 @@ export function Review({
           }}
         >
           Included fees
-          {` ≈ USD $${getFormattedAmounts(totalFeesUsd)}`}
+          {` ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${getFormattedAmounts(totalFeesUsd)}`}
           <Icon
             icon="ChevronExpand"
             sx={{ ml: 'base.spacing.x2', w: 'base.icon.size.200' }}
@@ -484,7 +484,7 @@ export function Review({
                   sx={{ flexShrink: 0, alignSelf: 'flex-start' }}
                 >
                   <PriceDisplay.Caption size="small">
-                    {`USD $${route?.route.estimate.fromAmountUSD ?? ''}`}
+                    {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${route?.route.estimate.fromAmountUSD ?? ''}`}
                   </PriceDisplay.Caption>
                 </PriceDisplay>
               </Stack>
@@ -625,7 +625,7 @@ export function Review({
                   sx={{ flexShrink: 0, alignSelf: 'flex-start' }}
                 >
                   <PriceDisplay.Caption size="small">
-                    {`USD $${route?.route.estimate.toAmountUSD ?? ''}`}
+                    {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${route?.route.estimate.toAmountUSD ?? ''}`}
                   </PriceDisplay.Caption>
                 </PriceDisplay>
               </Stack>

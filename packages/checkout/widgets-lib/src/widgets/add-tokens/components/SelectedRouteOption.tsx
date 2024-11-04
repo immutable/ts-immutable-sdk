@@ -10,6 +10,7 @@ import {
 } from 'react';
 
 import { Checkout } from '@imtbl/checkout-sdk';
+import { useTranslation } from 'react-i18next';
 import { Chain, RouteData } from '../types';
 import { getRouteAndTokenBalances } from '../functions/getRouteAndTokenBalances';
 import { getRemoteVideo } from '../../../lib/utils';
@@ -68,6 +69,8 @@ export function SelectedRouteOption({
   showOnrampOption = false,
   onClick,
 }: SelectedRouteOptionProps) {
+  const { t } = useTranslation();
+
   const { fromToken } = routeData?.amountData ?? {};
   const chain = chains?.find((c) => c.id === fromToken?.chainId);
 
@@ -181,11 +184,13 @@ export function SelectedRouteOption({
       >
         <Stack gap="0px">
           <MenuItem.Label>{fromToken?.name}</MenuItem.Label>
-          <MenuItem.Caption>{`Balance ≈ USD $${routeBalanceUsd}`}</MenuItem.Caption>
+          <MenuItem.Caption>
+            {`Balance ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${routeBalanceUsd}`}
+          </MenuItem.Caption>
         </Stack>
         <MenuItem.PriceDisplay price={fromAmount}>
           <MenuItem.PriceDisplay.Caption>
-            {`≈ USD $${fromAmountUsd}`}
+            {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${fromAmountUsd}`}
           </MenuItem.PriceDisplay.Caption>
         </MenuItem.PriceDisplay>
       </Stack>
