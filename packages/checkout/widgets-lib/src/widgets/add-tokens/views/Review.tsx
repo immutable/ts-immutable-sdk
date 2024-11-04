@@ -380,6 +380,7 @@ export function Review({
 
   return (
     <SimpleLayout
+      containerSx={{ bg: 'transparent' }}
       header={(
         <Stack
           rc={<header />}
@@ -690,7 +691,12 @@ export function Review({
           </>
         )}
 
-        {!route && !showAddressMissmatchDrawer && <LoadingView loadingText="Securing quote" />}
+        {!route && !showAddressMissmatchDrawer && (
+        <LoadingView
+          loadingText="Securing quote"
+          containerSx={{ bg: 'transparent' }}
+        />
+        )}
       </Stack>
       <RouteFees
         routeData={route}
