@@ -122,7 +122,7 @@ export function ConnectWalletDrawer({
     });
 
     // Proceed to disconnect current provider if Passport
-    if (info.rdns === WalletProviderRdns.PASSPORT) {
+    if (providerType === 'from' && info.rdns === WalletProviderRdns.PASSPORT) {
       const { isConnected } = await checkout.checkIsWalletConnected({
         provider: new Web3Provider(providerDetail.provider!),
       });
@@ -136,6 +136,7 @@ export function ConnectWalletDrawer({
 
     // Proceed to connect selected provider
     const shouldRequestWalletPermissions = getShouldRequestWalletPermissions?.(info);
+
     try {
       const { provider } = await connectEIP6963Provider(
         providerDetail,
