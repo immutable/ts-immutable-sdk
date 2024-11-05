@@ -49,7 +49,6 @@ interface TopUpViewProps {
   showOnrampOption: boolean;
   showSwapOption: boolean;
   showBridgeOption: boolean;
-  showAddTokensOption?: boolean;
   tokenAddress?: string;
   amount?: string;
   analytics: {
@@ -83,7 +82,6 @@ export function TopUpView({
   showOnrampOption,
   showSwapOption,
   showBridgeOption,
-  showAddTokensOption,
   tokenAddress,
   amount,
   analytics,
@@ -127,20 +125,6 @@ export function TopUpView({
   useMount(() => {
     page({ userJourney, screen: 'TopUp' });
   });
-
-  // Go to add tokens widget if available
-  useMount(
-    () => {
-      if (showAddTokensOption) {
-        orchestrationEvents.sendRequestAddTokensEvent(eventTarget, widgetEvent, {
-          toTokenAddress: tokenAddress ?? '',
-          toAmount: amount ?? '',
-        });
-      }
-    },
-    () => showAddTokensOption !== undefined,
-    [showAddTokensOption],
-  );
 
   useEffect(() => {
     if (!cryptoFiatDispatch) return;
@@ -364,12 +348,8 @@ export function TopUpView({
         isEnabled: showBridgeOption,
       },
     ],
-    [showAddTokensOption, showBridgeOption, showOnrampOption, showSwapOption],
+    [showBridgeOption, showOnrampOption, showSwapOption],
   );
-
-  // if swap is available, don't show top up view
-  // await for redirect to add tokens widget
-  if (showAddTokensOption) return null;
 
   return (
     <SimpleLayout
