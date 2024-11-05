@@ -5,8 +5,7 @@ import {
   useReducer,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IMTBLWidgetEvents, WalletWidgetParams, AddTokensConfig } from '@imtbl/checkout-sdk';
-import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { WalletWidgetParams } from '@imtbl/checkout-sdk';
 import {
   initialWalletState,
   WalletActions,
@@ -30,7 +29,6 @@ import { WalletWidgetViews } from '../../context/view-context/WalletViewContextT
 import { Settings } from './views/Settings';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { CoinInfo } from './views/CoinInfo';
-import { TopUpView } from '../../views/top-up/TopUpView';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { useBalance } from '../../lib/hooks/useBalance';
@@ -85,8 +83,6 @@ export default function WalletWidget(props: WalletWidgetInputs) {
     [viewState, viewDispatch],
   );
 
-  const { supportedTopUps } = walletState;
-
   const { balancesLoading, refreshBalances } = useBalance({
     checkout,
     provider,
@@ -124,12 +120,6 @@ export default function WalletWidget(props: WalletWidgetInputs) {
         checkSwapAvailable = await checkout.isSwapAvailable();
       } catch { /* */ }
 
-      let checkAddTokensEnabled = isAddTokensEnabled;
-      try {
-        const addTokensConfig = (await checkout.config.remote.getConfig('addTokens') as AddTokensConfig);
-        checkAddTokensEnabled = addTokensConfig.enabled && isAddTokensEnabled;
-      } catch { /* */ }
-
       walletDispatch({
         payload: {
           type: WalletActions.SET_SUPPORTED_TOP_UPS,
@@ -138,8 +128,7 @@ export default function WalletWidget(props: WalletWidgetInputs) {
             isSwapEnabled,
             isOnRampEnabled,
             isSwapAvailable: checkSwapAvailable,
-            isAddTokensEnabled: checkAddTokensEnabled,
-            isAddTokensAvailable: checkSwapAvailable && checkAddTokensEnabled,
+            isAddTokensEnabled,
           },
         },
       });
@@ -228,18 +217,6 @@ export default function WalletWidget(props: WalletWidgetInputs) {
               actionText={errorActionText}
               onActionClick={errorAction}
               onCloseClick={() => sendWalletWidgetCloseEvent(eventTarget)}
-            />
-          )}
-          {viewState.view.type === SharedViews.TOP_UP_VIEW && (
-            <TopUpView
-              analytics={{ userJourney: UserJourney.WALLET }}
-              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-              checkout={checkout}
-              showOnrampOption={isOnRampEnabled}
-              showSwapOption={isSwapEnabled}
-              showBridgeOption={isBridgeEnabled}
-              showAddTokensOption={supportedTopUps?.isAddTokensAvailable}
-              onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
             />
           )}
         </WalletContext.Provider>

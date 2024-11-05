@@ -24,7 +24,6 @@ import {
 import { getL2ChainId } from '../../../lib/networkUtils';
 import { WalletWidgetViews } from '../../../context/view-context/WalletViewContextTypes';
 import {
-  SharedViews,
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
@@ -124,12 +123,7 @@ export function WalletBalances({
       control: 'AddCoins',
       controlType: 'Button',
     });
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: { type: SharedViews.TOP_UP_VIEW },
-      },
-    });
+    orchestrationEvents.sendRequestAddTokensEvent(eventTarget, IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {});
   };
 
   const handleBridgeToL2OnClick = (address?: string) => {

@@ -100,7 +100,6 @@ describe('WalletContext', () => {
       isBridgeEnabled: false,
       isOnRampEnabled: false,
       isAddTokensEnabled: true,
-      isAddTokensAvailable: true,
     });
   });
 
