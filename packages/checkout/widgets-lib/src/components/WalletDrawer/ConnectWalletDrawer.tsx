@@ -127,13 +127,7 @@ export function ConnectWalletDrawer({
       });
 
       if (isConnected) {
-        const isFromPassportProvider = providerType === 'from' && info.rdns === WalletProviderRdns.PASSPORT;
-        const isToPassportProvider = providerType === 'to' && info.rdns === WalletProviderRdns.PASSPORT;
-        const isFromProviderNotPassport = !isPassportProvider(fromProvider);
-
-        const shouldLogoutPassport = isFromPassportProvider || (isToPassportProvider && isFromProviderNotPassport);
-
-        if (shouldLogoutPassport) {
+        if (providerType === 'from' || (providerType === 'to' && !isPassportProvider(fromProvider))) {
           await checkout.passport?.logout();
         }
       }
