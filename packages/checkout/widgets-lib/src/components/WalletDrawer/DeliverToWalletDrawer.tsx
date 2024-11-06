@@ -58,7 +58,7 @@ export function DeliverToWalletDrawer({
     }
   };
 
-  // Becuase wallets extensions don't support multiple wallet connections
+  // Because wallets extensions don't support multiple wallet connections
   // UX decides to have the user use the same wallet type they selected to pay with
   // ie: Metamask to Metamsk, will send to same wallet address
   const selectedSameFromWalletType = (

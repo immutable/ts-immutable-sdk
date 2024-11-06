@@ -30,7 +30,7 @@ export function RouteFees({
     () => routeData?.route.estimate.feeCosts.map((fee) => ({
       label: fee.name,
       amount: getFormattedNumber(fee.amount, fee.token.decimals),
-      fiatAmount: `${t('views.ADD_TOKENS.fees.fiatPricePrefix')}${getFormattedAmounts(fee.amountUsd)}`,
+      fiatAmount: `${t('views.ADD_TOKENS.fees.fiatPricePrefix')} ${getFormattedAmounts(fee.amountUsd)}`,
       token: {
         name: fee.token.name,
         symbol: fee.token.symbol,
@@ -47,7 +47,7 @@ export function RouteFees({
     () => routeData?.route.estimate.gasCosts.map((fee) => ({
       label: 'Gas (transaction)',
       amount: getFormattedNumber(fee.amount, fee.token.decimals),
-      fiatAmount: `${t('views.ADD_TOKENS.fees.fiatPricePrefix')}${getFormattedAmounts(fee.amountUsd)}`,
+      fiatAmount: `${t('views.ADD_TOKENS.fees.fiatPricePrefix')} ${getFormattedAmounts(fee.amountUsd)}`,
       token: {
         name: fee.token.name,
         symbol: fee.token.symbol,

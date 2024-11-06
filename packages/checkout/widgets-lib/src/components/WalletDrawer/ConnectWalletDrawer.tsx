@@ -10,7 +10,7 @@ import { MenuItemProps } from '@biom3/react';
 import { WalletDrawer } from './WalletDrawer';
 import { WalletChangeEvent } from './WalletDrawerEvents';
 import { identifyUser } from '../../lib/analytics/identifyUser';
-import { getProviderSlugFromRdns } from '../../lib/provider';
+import { getProviderSlugFromRdns, isPassportProvider } from '../../lib/provider';
 import {
   useAnalytics,
   UserJourney,
@@ -61,7 +61,7 @@ export function ConnectWalletDrawer({
   getShouldRequestWalletPermissions,
 }: ConnectWalletDrawerProps) {
   const {
-    providersState: { checkout },
+    providersState: { checkout, fromProvider },
     providersDispatch,
   } = useProvidersContext();
 
@@ -121,14 +121,15 @@ export function ConnectWalletDrawer({
       },
     });
 
-    // Proceed to disconnect current provider if Passport
     if (info.rdns === WalletProviderRdns.PASSPORT) {
       const { isConnected } = await checkout.checkIsWalletConnected({
         provider: new Web3Provider(providerDetail.provider!),
       });
 
       if (isConnected) {
-        await checkout.passport?.logout();
+        if (providerType === 'from' || (providerType === 'to' && !isPassportProvider(fromProvider))) {
+          await checkout.passport?.logout();
+        }
       }
     }
 
@@ -136,6 +137,7 @@ export function ConnectWalletDrawer({
 
     // Proceed to connect selected provider
     const shouldRequestWalletPermissions = getShouldRequestWalletPermissions?.(info);
+
     try {
       const { provider } = await connectEIP6963Provider(
         providerDetail,
