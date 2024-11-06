@@ -580,8 +580,8 @@ export function Review({
                   <FramedImage
                     use={(
                       <img
-                        src={toChain?.nativeCurrency.iconUrl}
-                        alt={toChain?.nativeCurrency.name}
+                        src={route.route.estimate.toToken.logoURI}
+                        alt={route.route.estimate.toToken.name}
                       />
                     )}
                     circularFrame
