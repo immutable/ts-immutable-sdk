@@ -441,8 +441,10 @@ export function AddTokens({
     setSelectedRouteData(route);
   };
 
-  const handleDeliverToClose = () => {
-    setPayWithCardClicked(false);
+  const handleDeliverToClose = (connectedToAddress?: string) => {
+    if (!connectedToAddress) {
+      setPayWithCardClicked(false);
+    }
     setShowDeliverToDrawer(false);
   };
 
