@@ -121,18 +121,18 @@ export function ConnectWalletDrawer({
       },
     });
 
-    const isFromPassportProvider = providerType === 'from' && info.rdns === WalletProviderRdns.PASSPORT;
-    const isToPassportProvider = providerType === 'to' && info.rdns === WalletProviderRdns.PASSPORT;
-    const isFromProviderNotPassport = !isPassportProvider(fromProvider);
+    const { isConnected } = await checkout.checkIsWalletConnected({
+      provider: new Web3Provider(providerDetail.provider!),
+    });
 
-    const shouldLogoutPassport = isFromPassportProvider || (isToPassportProvider && isFromProviderNotPassport);
+    if (isConnected) {
+      const isFromPassportProvider = providerType === 'from' && info.rdns === WalletProviderRdns.PASSPORT;
+      const isToPassportProvider = providerType === 'to' && info.rdns === WalletProviderRdns.PASSPORT;
+      const isFromProviderNotPassport = !isPassportProvider(fromProvider);
 
-    if (shouldLogoutPassport) {
-      const { isConnected } = await checkout.checkIsWalletConnected({
-        provider: new Web3Provider(providerDetail.provider!),
-      });
+      const shouldLogoutPassport = isFromPassportProvider || (isToPassportProvider && isFromProviderNotPassport);
 
-      if (isConnected) {
+      if (shouldLogoutPassport) {
         await checkout.passport?.logout();
       }
     }
