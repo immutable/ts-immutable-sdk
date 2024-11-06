@@ -60,6 +60,7 @@ import { SwitchNetworkZkEVM } from './views/SwitchNetworkZkEVM';
 export type ConnectWidgetInputs = ConnectWidgetParams & {
   config: StrongCheckoutWidgetsConfig
   deepLink?: ConnectWidgetViews;
+  sendSuccessEventOverride?: () => void;
   sendCloseEventOverride?: () => void;
   allowedChains?: ChainId[];
   checkout: Checkout;
@@ -71,6 +72,7 @@ export type ConnectWidgetInputs = ConnectWidgetParams & {
 
 export default function ConnectWidget({
   config,
+  sendSuccessEventOverride,
   sendCloseEventOverride,
   web3Provider,
   checkout,
@@ -210,6 +212,10 @@ export default function ConnectWidget({
       }
     }
 
+    if (sendSuccessEventOverride) {
+      sendSuccessEventOverride();
+      return;
+    }
     sendConnectSuccessEvent(eventTarget, provider, walletProviderName ?? undefined, walletProviderInfo);
   }, [provider, identify]);
 

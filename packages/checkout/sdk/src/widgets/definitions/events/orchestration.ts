@@ -1,3 +1,5 @@
+import { Web3Provider } from '@ethersproject/providers';
+
 /**
  * Enum representing different types of orchestration events.
  */
@@ -66,6 +68,8 @@ export type RequestOnrampEvent = {
   tokenAddress: string;
   /** The amount of tokens to onramp. */
   amount: string;
+  /** The connected provider. */
+  provider?: Web3Provider;
 };
 
 /**

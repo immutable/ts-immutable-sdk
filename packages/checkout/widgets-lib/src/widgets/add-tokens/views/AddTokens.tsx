@@ -120,6 +120,7 @@ export function AddTokens({
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
 
+  const [payWithCardClicked, setPayWithCardClicked] = useState(false);
   const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
   const [showPayWithDrawer, setShowPayWithDrawer] = useState(false);
   const [showDeliverToDrawer, setShowDeliverToDrawer] = useState(false);
@@ -220,6 +221,7 @@ export function AddTokens({
     providersState: {
       fromProviderInfo,
       toProviderInfo,
+      toProvider,
       fromAddress,
       toAddress,
       lockedToProvider,
@@ -393,7 +395,7 @@ export function AddTokens({
     setSelectedToken(token);
   }, []);
 
-  const handleCardClick = () => {
+  const sendRequestOnRampEvent = () => {
     track({
       userJourney: UserJourney.ADD_TOKENS,
       screen: 'InputScreen',
@@ -408,6 +410,7 @@ export function AddTokens({
       tokenAddress: selectedToken?.address ?? '',
       amount: selectedAmount ?? '',
       showBackButton: true,
+      provider: toProvider,
     };
     orchestrationEvents.sendRequestOnrampEvent(
       eventTarget,
@@ -416,11 +419,33 @@ export function AddTokens({
     );
   };
 
+  const handleCardClick = () => {
+    setPayWithCardClicked(true);
+    if (!toProvider) {
+      setShowDeliverToDrawer(true);
+      return;
+    }
+    sendRequestOnRampEvent();
+  };
+
+  useEffect(() => {
+    if (toProvider && payWithCardClicked) {
+      sendRequestOnRampEvent();
+    }
+  }, [toProvider]);
+
   const handleRouteClick = (route: RouteData) => {
     setShowOptionsDrawer(false);
     setShowPayWithDrawer(false);
     setShowDeliverToDrawer(false);
     setSelectedRouteData(route);
+  };
+
+  const handleDeliverToClose = (connectedToAddress?: string) => {
+    if (!connectedToAddress) {
+      setPayWithCardClicked(false);
+    }
+    setShowDeliverToDrawer(false);
   };
 
   const handleReviewClick = () => {
@@ -749,7 +774,7 @@ export function AddTokens({
           <DeliverToWalletDrawer
             visible={showDeliverToDrawer}
             walletOptions={walletOptions}
-            onClose={() => setShowDeliverToDrawer(false)}
+            onClose={handleDeliverToClose}
           />
           <OnboardingDrawer environment={checkout?.config.environment!} />
         </Stack>
