@@ -10,7 +10,7 @@ import { MenuItemProps } from '@biom3/react';
 import { WalletDrawer } from './WalletDrawer';
 import { WalletChangeEvent } from './WalletDrawerEvents';
 import { identifyUser } from '../../lib/analytics/identifyUser';
-import { getProviderSlugFromRdns } from '../../lib/provider';
+import { getProviderSlugFromRdns, isPassportProvider } from '../../lib/provider';
 import {
   useAnalytics,
   UserJourney,
@@ -61,7 +61,7 @@ export function ConnectWalletDrawer({
   getShouldRequestWalletPermissions,
 }: ConnectWalletDrawerProps) {
   const {
-    providersState: { checkout },
+    providersState: { checkout, fromProvider },
     providersDispatch,
   } = useProvidersContext();
 
@@ -121,8 +121,13 @@ export function ConnectWalletDrawer({
       },
     });
 
-    // Proceed to disconnect current provider if Passport
-    if (providerType === 'from' && info.rdns === WalletProviderRdns.PASSPORT) {
+    const isFromPassportProvider = providerType === 'from' && info.rdns === WalletProviderRdns.PASSPORT;
+    const isToPassportProvider = providerType === 'to' && info.rdns === WalletProviderRdns.PASSPORT;
+    const isFromProviderNotPassport = !isPassportProvider(fromProvider);
+
+    const shouldLogoutPassport = isFromPassportProvider || (isToPassportProvider && isFromProviderNotPassport);
+
+    if (shouldLogoutPassport) {
       const { isConnected } = await checkout.checkIsWalletConnected({
         provider: new Web3Provider(providerDetail.provider!),
       });
