@@ -22,7 +22,7 @@ export type AddTokensSuccess = {
 };
 
 /**
- * Type representing a add tokens failure
+ * Type representing add tokens failure
  * @property {string} reason
  * @property {number} timestamp
  */
@@ -34,7 +34,7 @@ export type AddTokensFailed = {
 };
 
 /**
- * Type representing a successfull provider connection
+ * Type representing a successful provider connection
  * @property {Web3Provider} provider
  * @property {EIP6963ProviderInfo} providerInfo
  * @property {'from' | 'to'} providerType
