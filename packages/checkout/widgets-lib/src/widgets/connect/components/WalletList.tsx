@@ -182,7 +182,7 @@ export function WalletList(props: WalletListProps) {
           // CM-793 Check for sanctioned address
           if (await isAddressSanctioned(
             await connectResult.provider.getSigner().getAddress(),
-            checkout.config.environment,
+            checkout.config,
           )) {
             viewDispatch({
               payload: {

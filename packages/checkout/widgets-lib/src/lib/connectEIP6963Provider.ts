@@ -36,10 +36,7 @@ export const connectEIP6963Provider = async (
     });
 
     const address = await connectResult.provider.getSigner().getAddress();
-    const isSanctioned = await checkout.checkIsAddressSanctioned(
-      address,
-      checkout.config.environment,
-    );
+    const isSanctioned = await checkout.checkIsAddressSanctioned(address);
 
     if (isSanctioned) {
       throw new CheckoutError(

@@ -210,7 +210,7 @@ export function WalletAndNetworkSelector() {
       const connectedProvider = await connectToProvider(checkout, web3Provider, changeAccount);
 
       // CM-793 Check for sanctioned address
-      if (await isAddressSanctioned(await connectedProvider.getSigner().getAddress(), checkout.config.environment)) {
+      if (await isAddressSanctioned(await connectedProvider.getSigner().getAddress(), checkout.config)) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
@@ -340,7 +340,7 @@ export function WalletAndNetworkSelector() {
         const connectedProvider = await connectToProvider(checkout, web3Provider, false);
 
         // CM-793 Check for sanctioned address
-        if (await isAddressSanctioned(await connectedProvider.getSigner().getAddress(), checkout.config.environment)) {
+        if (await isAddressSanctioned(await connectedProvider.getSigner().getAddress(), checkout.config)) {
           viewDispatch({
             payload: {
               type: ViewActions.UPDATE_VIEW,
