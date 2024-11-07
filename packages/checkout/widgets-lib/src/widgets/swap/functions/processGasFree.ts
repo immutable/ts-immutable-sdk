@@ -1,6 +1,5 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import { TransactionResponse } from '@imtbl/dex-sdk';
-import { BigNumber } from 'ethers';
 import { isGasFree } from '../../../lib/provider';
 
 /**
@@ -8,7 +7,7 @@ import { isGasFree } from '../../../lib/provider';
  * @param checkProvider
  * @param currentQuote
  */
-export const processGasFree = (checkProvider: Web3Provider, currentQuote: TransactionResponse) => {
+export const processGasFree = (checkProvider: BrowserProvider, currentQuote: TransactionResponse) => {
   if (!isGasFree(checkProvider)) {
     return currentQuote;
   }
@@ -16,10 +15,10 @@ export const processGasFree = (checkProvider: Web3Provider, currentQuote: Transa
   // Remove the quote gas fees as they are being covered by Relayer
   const adjustedQuote = { ...currentQuote };
   if (adjustedQuote.swap?.gasFeeEstimate) {
-    adjustedQuote.swap.gasFeeEstimate.value = BigNumber.from(0);
+    adjustedQuote.swap.gasFeeEstimate.value = BigInt(0);
   }
   if (adjustedQuote.approval?.gasFeeEstimate) {
-    adjustedQuote.approval.gasFeeEstimate.value = BigNumber.from(0);
+    adjustedQuote.approval.gasFeeEstimate.value = BigInt(0);
   }
 
   return adjustedQuote;

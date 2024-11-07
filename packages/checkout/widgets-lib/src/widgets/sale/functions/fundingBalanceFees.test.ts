@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { BigNumber } from 'ethers';
 import { FeeType } from '@imtbl/checkout-sdk';
 import { FundingBalance, FundingBalanceType } from '../types';
 import {
@@ -14,11 +13,11 @@ export const SwapFundingBalanceMock = {
   fundingItem: {
     type: 'ERC20',
     fundsRequired: {
-      amount: BigNumber.from('500000000000000000'),
+      amount: BigInt('500000000000000000'),
       formattedAmount: '5',
     },
     userBalance: {
-      balance: BigNumber.from('100000000000000000'),
+      balance: BigInt('100000000000000000'),
       formattedBalance: '10',
     },
     token: {
@@ -38,7 +37,7 @@ export const SwapFundingBalanceMock = {
   fees: {
     approvalGasFee: {
       type: 'GAS',
-      amount: BigNumber.from('10000000000000'),
+      amount: BigInt('10000000000000'),
       formattedAmount: '0.0001',
       token: {
         name: 'Immutable Testnet Token',
@@ -49,7 +48,7 @@ export const SwapFundingBalanceMock = {
     },
     swapGasFee: {
       type: 'GAS',
-      amount: BigNumber.from('200000000000000'),
+      amount: BigInt('200000000000000'),
       formattedAmount: '0.002',
       token: {
         name: 'Immutable Testnet Token',
@@ -61,7 +60,7 @@ export const SwapFundingBalanceMock = {
     swapFees: [
       {
         type: 'SWAP_FEE',
-        amount: BigNumber.from('500000000000000000'),
+        amount: BigInt('500000000000000000'),
         formattedAmount: '0.5',
         token: {
           name: 'Core',
@@ -72,7 +71,7 @@ export const SwapFundingBalanceMock = {
       },
       {
         type: 'SWAP_FEE',
-        amount: BigNumber.from('100000000000000000'),
+        amount: BigInt('100000000000000000'),
         formattedAmount: '0.1',
         token: {
           name: 'Core',

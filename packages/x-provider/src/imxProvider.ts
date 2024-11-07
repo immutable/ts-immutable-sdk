@@ -10,7 +10,7 @@ import {
   TokenAmount,
   UnsignedTransferRequest,
 } from '@imtbl/x-client';
-import { TransactionResponse } from '@ethersproject/providers';
+import { TransactionResponse } from 'ethers';
 
 export interface IMXProvider {
   /**

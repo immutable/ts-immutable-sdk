@@ -1,16 +1,15 @@
 import { Pool } from '@uniswap/v3-sdk';
-import { BigNumber } from 'ethers';
 import { ProviderCallError } from '../../errors';
 import { erc20ToUniswapToken } from '../utils';
 import { ERC20 } from '../../types';
-import { MulticallResponse, multicallSingleCallDataMultipleContracts } from '../multicall';
 import { generatePossiblePoolsFromERC20Pair } from './generatePossiblePoolsFromERC20Pairs';
 import { ERC20Pair } from './generateERC20Pairs';
 import { Multicall, UniswapV3Pool__factory } from '../../contracts/types';
 import { UniswapV3PoolInterface } from '../../contracts/types/UniswapV3Pool';
+import { MulticallResponse, multicallSingleCallDataMultipleContracts } from '../multicall';
 
 export type Slot0 = {
-  sqrtPriceX96: BigNumber;
+  sqrtPriceX96: bigint;
   tick: number;
 
   observationIndex: number;
@@ -82,10 +81,10 @@ export const fetchValidPools = async (
     const poolLiquidity = uniswapV3Pool.decodeFunctionResult(
       liquidityFuncString,
       liquidities[index].returnData,
-    ) as [BigNumber];
+    ) as unknown as [bigint]
 
-    const zeroPrice = poolSlot0.sqrtPriceX96.isZero();
-    const zeroLiquidity: boolean = poolLiquidity[0].isZero();
+    const zeroPrice = poolSlot0.sqrtPriceX96 === BigInt(0);
+    const zeroLiquidity: boolean = poolLiquidity[0] === BigInt(0);
 
     // If there is no price or no liquidity in the pool then we do not want to consider
     // it for swapping
@@ -99,7 +98,8 @@ export const fetchValidPools = async (
       poolID.fee,
       poolSlot0.sqrtPriceX96.toString(),
       poolLiquidity.toString(),
-      poolSlot0.tick,
+      // poolSlot0.tick is a bigint but Pool expects a number
+      Number(poolSlot0.tick),
     );
     validPools.push(validPool);
   });

@@ -4,7 +4,7 @@ import {
 import { ChainId, EIP6963ProviderDetail, WalletProviderRdns } from '@imtbl/checkout-sdk';
 import { useEffect, useMemo, useState } from 'react';
 import { Environment } from '@imtbl/config';
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import { getChainNameById } from '../../../lib/chains';
 import { useWalletConnect } from '../../../lib/hooks/useWalletConnect';
 import {
@@ -20,7 +20,7 @@ import { getChainImage } from '../../../lib/utils';
 
 interface WalletNetworkButtonProps {
   testId: string;
-  walletProvider: Web3Provider;
+  walletProvider: BrowserProvider;
   walletProviderDetail: EIP6963ProviderDetail | undefined;
   walletAddress: string;
   walletName: string,

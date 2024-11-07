@@ -1,6 +1,5 @@
 import { Token, TradeType } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
-import { providers } from 'ethers';
 import { NoRoutesAvailableError } from '../errors';
 import { CoinAmount, ERC20 } from '../types';
 import { erc20ToUniswapToken, poolEquals, uniswapTokenToERC20 } from './utils';
@@ -8,6 +7,7 @@ import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
 import { ERC20Pair } from './poolUtils/generateERC20Pairs';
 import type { Multicall } from '../contracts/types';
+import { JsonRpcProvider } from 'ethers';
 
 export type RoutingContracts = {
   multicall: string;
@@ -17,7 +17,7 @@ export type RoutingContracts = {
 
 export class Router {
   constructor(
-    public provider: providers.JsonRpcBatchProvider,
+    public provider: JsonRpcProvider,
     public multicallContract: Multicall,
     public routingTokens: ERC20[],
     public routingContracts: RoutingContracts,
@@ -99,7 +99,7 @@ export class Router {
     let bestQuote = quotes[0];
 
     for (let i = 1; i < quotes.length; i++) {
-      if (quotes[i].amountOut.value.gt(bestQuote.amountOut.value)) {
+      if (quotes[i].amountOut.value > bestQuote.amountOut.value) {
         bestQuote = quotes[i];
       }
     }
@@ -112,7 +112,7 @@ export class Router {
     let bestQuote = quotes[0];
 
     for (let i = 1; i < quotes.length; i++) {
-      if (quotes[i].amountIn.value.lt(bestQuote.amountIn.value)) {
+      if (quotes[i].amountIn.value < bestQuote.amountIn.value) {
         bestQuote = quotes[i];
       }
     }

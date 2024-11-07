@@ -1,7 +1,4 @@
-import { StaticJsonRpcProvider } from '@ethersproject/providers';
-import { Signer } from '@ethersproject/abstract-signer';
 import { Flow } from '@imtbl/metrics';
-import { BigNumber } from 'ethers';
 import { RelayerClient } from './relayerClient';
 import GuardianClient from '../guardian';
 import { FeeOption, MetaTransaction, RelayerTransactionStatus } from './types';
@@ -9,6 +6,7 @@ import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { pollRelayerTransaction, prepareAndSignTransaction } from './transactionHelpers';
 import * as walletHelpers from './walletHelpers';
 import { retryWithDelay } from '../network/retry';
+import { JsonRpcProvider, Signer } from 'ethers';
 
 jest.mock('./walletHelpers');
 jest.mock('../network/retry');
@@ -64,7 +62,7 @@ describe('transactionHelpers', () => {
 
   describe('prepareAndSignTransaction', () => {
     const chainId = 123;
-    const nonce = BigNumber.from(5);
+    const nonce = BigInt(5);
     const zkEvmAddress = '0x1234567890123456789012345678901234567890';
     const transactionRequest = {
       to: '0x1234567890123456789012345678901234567890',
@@ -94,8 +92,8 @@ describe('transactionHelpers', () => {
     };
 
     const rpcProvider = {
-      detectNetwork: jest.fn().mockResolvedValue({ chainId }),
-    } as unknown as StaticJsonRpcProvider;
+      _detectNetwork: jest.fn().mockResolvedValue({ chainId }),
+    } as unknown as JsonRpcProvider;
 
     const relayerClient = {
       imGetFeeOptions: jest.fn().mockResolvedValue([imxFeeOption]),
@@ -115,7 +113,7 @@ describe('transactionHelpers', () => {
       (walletHelpers.getNonce as jest.Mock).mockResolvedValue(nonce);
       (walletHelpers.getNormalisedTransactions as jest.Mock).mockReturnValue(metaTransactions);
       (walletHelpers.encodedTransactions as jest.Mock).mockReturnValue('encodedTransactions123');
-      (rpcProvider.detectNetwork as jest.Mock).mockResolvedValue({ chainId });
+      (rpcProvider._detectNetwork as jest.Mock).mockResolvedValue({ chainId });
       (relayerClient.imGetFeeOptions as jest.Mock).mockResolvedValue([imxFeeOption]);
       (relayerClient.ethSendTransaction as jest.Mock).mockResolvedValue(relayerId);
       (guardianClient.validateEVMTransaction as jest.Mock).mockResolvedValue(undefined);
@@ -138,7 +136,7 @@ describe('transactionHelpers', () => {
         nonce,
       });
 
-      expect(rpcProvider.detectNetwork).toHaveBeenCalled();
+      expect(rpcProvider._detectNetwork).toHaveBeenCalled();
       expect(guardianClient.validateEVMTransaction).toHaveBeenCalled();
       expect(walletHelpers.signMetaTransactions).toHaveBeenCalled();
       expect(relayerClient.ethSendTransaction).toHaveBeenCalledWith(zkEvmAddress, signedTransactions);
@@ -171,7 +169,7 @@ describe('transactionHelpers', () => {
               revertOnError: true,
               to: transactionRequest.to,
               value: '0x00',
-              nonce: expect.any(BigNumber),
+              nonce: expect.any(BigInt),
             }),
           ]),
         }),
@@ -206,13 +204,13 @@ describe('transactionHelpers', () => {
               revertOnError: true,
               to: transactionRequest.to,
               value: '0x00',
-              nonce: expect.any(BigNumber),
+              nonce: expect.any(BigInt),
             }),
             expect.objectContaining({
               to: '0x7331',
-              value: expect.any(BigNumber),
+              value: expect.any(BigInt),
               revertOnError: true,
-              nonce: expect.any(BigNumber),
+              nonce: expect.any(BigInt),
             }),
           ]),
         }),
@@ -225,17 +223,17 @@ describe('transactionHelpers', () => {
             revertOnError: true,
             to: transactionRequest.to,
             value: '0x00',
-            nonce: expect.any(BigNumber),
+            nonce: expect.any(BigInt),
           }),
           expect.objectContaining({
             to: '0x7331',
-            value: expect.any(BigNumber),
+            value: expect.any(BigInt),
             revertOnError: true,
-            nonce: expect.any(BigNumber),
+            nonce: expect.any(BigInt),
           }),
         ]),
-        expect.any(BigNumber),
-        expect.any(BigNumber),
+        expect.any(BigInt),
+        expect.any(BigInt),
         zkEvmAddress,
         ethSigner,
       );

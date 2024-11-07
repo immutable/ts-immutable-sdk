@@ -1,6 +1,5 @@
 import { log } from 'console';
 import { Environment } from '@imtbl/config';
-import { BigNumber, Wallet } from 'ethers';
 import { OrderStatusName } from '../openapi/sdk';
 import { Orderbook } from '../orderbook';
 import {
@@ -8,20 +7,23 @@ import {
   getFulfillerWallet,
   getOffererWallet,
   getLocalhostProvider,
-  TestToken,
   waitForOrderToBeOfStatus,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getConfigFromEnv,
+  TestERC721Token,
+  getRandomTokenId,
 } from './helpers';
 import { actionAll } from './helpers/actions';
+import { Wallet } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 
-async function deployAndMintNftContract(wallet: Wallet): Promise<TestToken> {
-  log(await wallet.getTransactionCount());
+async function deployAndMintNftContract(wallet: Wallet, provider: JsonRpcProvider): Promise<TestERC721Token> {
+  log(await provider.getTransactionCount(wallet.address));
   const { contract } = await deployTestToken(wallet);
   log('contract deployed');
-  const receipt = await contract.safeMint(wallet.address, {
-    maxFeePerGas: BigNumber.from(102e9),
-    maxPriorityFeePerGas: BigNumber.from(101e9),
+  const receipt = await contract.safeMint(wallet.address, getRandomTokenId(), {
+    maxFeePerGas: BigInt(102e9),
+    maxPriorityFeePerGas: BigInt(101e9),
   });
   await receipt.wait();
   log('token minted');
@@ -47,7 +49,9 @@ describe('', () => {
 
     log('Deploying a new NFT collection and minting a token...');
     // Deploy an NFT contract and mint a token for the offerer
-    const nftContract = await deployAndMintNftContract(offerer);
+    const nftContract = await deployAndMintNftContract(offerer, provider);
+
+    const nftAddress = await nftContract.getAddress();
 
     // uncomment the overrides and set variables in
     // .env to run on environments other than testnet (e.g. devnet)
@@ -69,7 +73,7 @@ describe('', () => {
         type: 'NATIVE',
       },
       sell: {
-        contractAddress: nftContract.address,
+        contractAddress: nftAddress,
         tokenId: '0',
         type: 'ERC721',
       },
@@ -120,10 +124,10 @@ describe('', () => {
     log('Listing all orders for the NFT collection');
 
     const listOfOrders = await sdk.listListings({
-      sellItemContractAddress: nftContract.address,
+      sellItemContractAddress: nftAddress,
     });
 
-    log(`List of orders for contract ${nftContract.address}:`);
+    log(`List of orders for contract ${nftAddress}:`);
     log(JSON.stringify(listOfOrders, null, 2));
   }, 200_000);
 });

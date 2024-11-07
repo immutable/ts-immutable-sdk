@@ -10,9 +10,8 @@ import {
   isAddressSanctioned,
 } from '@imtbl/checkout-sdk';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
-import { BigNumber, utils } from 'ethers';
 import { useTranslation } from 'react-i18next';
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider, formatUnits, parseUnits } from 'ethers';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import { abbreviateAddress } from '../../../lib/addressUtils';
 import { CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
@@ -129,14 +128,14 @@ export function BridgeReviewSummary() {
     const nativeTokenBalance = tokenBalances
       .find((balance) => isNativeToken(balance.token.address));
 
-    let requiredAmount = BigNumber.from(estimates.fees.totalFees);
+    let requiredAmount = BigInt(estimates.fees.totalFees);
     if (isNativeToken(token.address)) {
       // add native move amount to required amount as they need to cover
       // the gas + move amount
-      requiredAmount = requiredAmount.add(utils.parseUnits(amount, token.decimals));
+      requiredAmount += (parseUnits(amount, token.decimals));
     }
 
-    return !nativeTokenBalance || nativeTokenBalance.balance.lt(requiredAmount);
+    return !nativeTokenBalance || nativeTokenBalance.balance < requiredAmount;
   }, [tokenBalances, estimates, token, amount]);
 
   const displayAmount = useMemo(
@@ -174,23 +173,25 @@ export function BridgeReviewSummary() {
       fees: {},
       token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
     } as GasEstimateBridgeToL2Result;
-    let estimatePromise: Promise<BigNumber>;
+    let estimatePromise: Promise<bigint>;
     if (tokenToTransfer === NATIVE.toLowerCase()) {
       estimatePromise = checkout.providerCall(from.web3Provider, async (provider) => await provider.estimateGas({
         to: toAddress,
         // If 'from' not provided it assumes the transaction is being sent from the zero address.
         // Estimation will fail unless the amount is within the zero addresses balance.
         from: fromAddress,
-        value: utils.parseUnits(amount, token.decimals),
+        value: parseUnits(amount, token.decimals),
       }));
     } else {
-      const erc20 = getErc20Contract(tokenToTransfer, from.web3Provider.getSigner());
-      estimatePromise = erc20.estimateGas.transfer(toAddress, utils.parseUnits(amount, token.decimals));
+      const erc20 = getErc20Contract(tokenToTransfer, await from.web3Provider.getSigner());
+      estimatePromise = erc20.transfer.estimateGas(toAddress, parseUnits(amount, token.decimals));
     }
     try {
-      const [estimate, gasPrice] = await Promise.all([estimatePromise, from.web3Provider.getGasPrice()]);
-      const gas = estimate.mul(gasPrice);
-      const formattedEstimate = utils.formatUnits(gas, DEFAULT_TOKEN_DECIMALS);
+      const [estimate, gasPrice] = await Promise.all([
+        estimatePromise, (await from.web3Provider.getFeeData()).gasPrice,
+      ]);
+      const gas = estimate * (gasPrice ?? 0n);
+      const formattedEstimate = formatUnits(gas, DEFAULT_TOKEN_DECIMALS);
       gasEstimateResult.fees.sourceChainGas = gas;
       gasEstimateResult.fees.totalFees = gas;
       setEstimates(gasEstimateResult);
@@ -209,7 +210,7 @@ export function BridgeReviewSummary() {
       senderAddress: fromAddress,
       recipientAddress: toAddress,
       token: token.address ?? NATIVE.toUpperCase(),
-      amount: utils.parseUnits(amount, token.decimals),
+      amount: parseUnits(amount, token.decimals),
       sourceChainId: from?.network.toString(),
       destinationChainId: to?.network.toString(),
       gasMultiplier: 'auto',
@@ -221,7 +222,7 @@ export function BridgeReviewSummary() {
         warningType: WithdrawalQueueWarningType.TYPE_ACTIVE_QUEUE,
       });
     } else if (bundledTxn.delayWithdrawalLargeAmount && bundledTxn.largeTransferThresholds) {
-      const threshold = utils.formatUnits(bundledTxn.largeTransferThresholds, token.decimals);
+      const threshold = formatUnits(bundledTxn.largeTransferThresholds, token.decimals);
 
       setWithdrawalQueueWarning({
         visible: true,
@@ -251,8 +252,8 @@ export function BridgeReviewSummary() {
 
     let rawTotalFees = totalFees;
     if (!unsignedApproveTransaction.unsignedTx) {
-      rawTotalFees = totalFees.sub(approvalFee);
-      transactionFeeData.approvalFee = BigNumber.from(0);
+      rawTotalFees = totalFees - approvalFee;
+      transactionFeeData.approvalFee = BigInt(0);
     }
 
     const gasEstimateResult = {
@@ -264,7 +265,7 @@ export function BridgeReviewSummary() {
       token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
     } as GasEstimateBridgeToL2Result;
     setEstimates(gasEstimateResult);
-    const estimatedAmount = utils.formatUnits(
+    const estimatedAmount = formatUnits(
       gasEstimateResult?.fees.totalFees || 0,
       DEFAULT_TOKEN_DECIMALS,
     );
@@ -303,7 +304,7 @@ export function BridgeReviewSummary() {
     })();
   }, []);
 
-  const handleNetworkSwitch = useCallback((provider: Web3Provider) => {
+  const handleNetworkSwitch = useCallback((provider: BrowserProvider) => {
     bridgeDispatch({
       payload: {
         type: BridgeActions.SET_WALLETS_AND_NETWORKS,
@@ -327,8 +328,7 @@ export function BridgeReviewSummary() {
     if (!from?.web3Provider) return;
 
     const handleChainChanged = () => {
-      const newProvider = new Web3Provider(from?.web3Provider.provider);
-      handleNetworkSwitch(newProvider);
+      handleNetworkSwitch(from?.web3Provider);
       setShowSwitchNetworkDrawer(false);
     };
     addChainChangedListener(from?.web3Provider, handleChainChanged);

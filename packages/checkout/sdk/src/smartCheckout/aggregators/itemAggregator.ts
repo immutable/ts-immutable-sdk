@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { ItemRequirement, ItemType } from '../../types';
 
 export const nativeAggregator = (
@@ -24,7 +23,7 @@ export const nativeAggregator = (
 
     const aggregateItem = aggregatedMap.get(type);
     if (aggregateItem && aggregateItem.type === ItemType.NATIVE) {
-      aggregateItem.amount = BigNumber.from(aggregateItem.amount).add(amount);
+      aggregateItem.amount = aggregateItem.amount + amount;
     } else {
       aggregatedMap.set(type, { ...itemRequirement });
     }
@@ -56,7 +55,7 @@ export const erc20ItemAggregator = (
     const key = `${tokenAddress}${spenderAddress}`;
     const aggregateItem = aggregatedMap.get(key);
     if (aggregateItem && aggregateItem.type === ItemType.ERC20) {
-      aggregateItem.amount = BigNumber.from(aggregateItem.amount).add(amount);
+      aggregateItem.amount = aggregateItem.amount + amount;
     } else {
       aggregatedMap.set(key, { ...itemRequirement });
     }
@@ -108,7 +107,7 @@ export const erc1155ItemAggregator = (
     const key = `${contractAddress}${spenderAddress}${id}`;
     const aggregateItem = aggregatedMap.get(key);
     if (aggregateItem && aggregateItem.type === ItemType.ERC1155) {
-      aggregateItem.amount = BigNumber.from(aggregateItem.amount).add(amount);
+      aggregateItem.amount = aggregateItem.amount + amount
     } else {
       aggregatedMap.set(key, { ...itemRequirement });
     }

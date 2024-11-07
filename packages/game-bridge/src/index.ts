@@ -9,7 +9,7 @@ import {
   trackDuration,
   identify,
 } from '@imtbl/metrics';
-import { providers } from 'ethers';
+import { BrowserProvider } from 'ethers';
 
 /* eslint-disable no-undef */
 const scope = 'openid offline_access profile email transact';
@@ -695,8 +695,8 @@ window.callFunction = async (jsonData: string) => {
       case PASSPORT_FUNCTIONS.zkEvm.sendTransactionWithConfirmation: {
         const transaction = JSON.parse(data);
         const zkEvmProvider = getZkEvmProvider();
-        const web3Provider = new providers.Web3Provider(zkEvmProvider);
-        const signer = web3Provider.getSigner();
+        const web3Provider = new BrowserProvider(zkEvmProvider);
+        const signer = await web3Provider.getSigner();
 
         const tx = await signer.sendTransaction(transaction);
         const response = await tx.wait();

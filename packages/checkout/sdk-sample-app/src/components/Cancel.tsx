@@ -1,13 +1,13 @@
-import { Checkout } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
 import { Box, Checkbox, FormControl, TextInput } from '@biom3/react';
+import { BrowserProvider } from 'ethers';
+import { Checkout } from '@imtbl/checkout-sdk';
 
 interface CancelProps {
   checkout: Checkout;
-  provider: Web3Provider | undefined;
+  provider: BrowserProvider | undefined;
 }
 
 export default function Cancel({ checkout, provider }: CancelProps) {

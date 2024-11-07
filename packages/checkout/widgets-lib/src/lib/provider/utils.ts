@@ -1,15 +1,15 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import { EIP6963ProviderDetail, WalletProviderName } from '@imtbl/checkout-sdk';
 
-export function isPassportProvider(provider?: Web3Provider | null) {
+export function isPassportProvider(provider?: BrowserProvider | null) {
   return (provider?.provider as any)?.isPassport === true;
 }
 
-export function isMetaMaskProvider(provider?: Web3Provider | null) {
-  return provider?.provider?.isMetaMask === true;
+export function isMetaMaskProvider(provider?: BrowserProvider | null) {
+  return provider?.isMetaMask === true;
 }
 
-export function isWalletConnectProvider(provider?: Web3Provider | null) {
+export function isWalletConnectProvider(provider?: BrowserProvider | null) {
   return (provider?.provider as any)?.isWalletConnect === true;
 }
 
@@ -21,7 +21,7 @@ export const getProviderDetailByProvider = (
 );
 
 export function getWalletProviderNameByProvider(
-  web3Provider: Web3Provider | undefined,
+  web3Provider: BrowserProvider | undefined,
   providers?: EIP6963ProviderDetail[],
 ) {
   if (isMetaMaskProvider(web3Provider)) return WalletProviderName.METAMASK.toString();
@@ -74,6 +74,6 @@ export function getProviderSlugFromRdns(rdns: string) {
  * Refer to the docs for more details:
  * https://docs.immutable.com/docs/zkevm/architecture/gas-sponsorship-for-gamers/
  */
-export function isGasFree(provider?: Web3Provider | null) {
+export function isGasFree(provider?: BrowserProvider | null) {
   return isPassportProvider(provider);
 }

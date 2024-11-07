@@ -1,4 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import {
   SaleItem,
   FundingStep,
@@ -47,7 +47,7 @@ export type SignResponse = {
 };
 
 export type SignOrderInput = {
-  provider: Web3Provider | undefined;
+  provider: BrowserProvider | undefined;
   items: SaleItem[];
   fromTokenAddress: string;
   recipientAddress: string;

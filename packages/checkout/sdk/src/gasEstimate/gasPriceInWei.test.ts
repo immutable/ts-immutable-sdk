@@ -1,53 +1,52 @@
-import { BigNumber } from 'ethers';
 import { getGasPriceInWei } from './gasPriceInWei';
 
 describe('gasPriceInWei', () => {
   it('should return gas price in wei using lastBaseFeePerGas and maxPriorityFeePerGas', () => {
     const fee = getGasPriceInWei({
-      lastBaseFeePerGas: BigNumber.from(1),
-      maxFeePerGas: BigNumber.from(22),
-      maxPriorityFeePerGas: BigNumber.from(2),
-      gasPrice: BigNumber.from(11),
+      maxFeePerGas: BigInt(22),
+      maxPriorityFeePerGas: BigInt(2),
+      gasPrice: BigInt(11),
+      toJSON: () => ({ }),
     });
-    expect(fee).toEqual(BigNumber.from(3));
+    expect(fee).toEqual(BigInt(3));
   });
 
   it('should return gas price in wei using gasPrice', () => {
     const fee = getGasPriceInWei({
-      lastBaseFeePerGas: null,
       maxFeePerGas: null,
       maxPriorityFeePerGas: null,
-      gasPrice: BigNumber.from(11),
+      gasPrice: BigInt(11),
+      toJSON: () => ({ }),
     });
-    expect(fee).toEqual(BigNumber.from(11));
+    expect(fee).toEqual(BigInt(11));
   });
 
   it('should return gas price in wei when lastBaseFeePerGas missing', () => {
     const fee = getGasPriceInWei({
-      lastBaseFeePerGas: null,
       maxFeePerGas: null,
-      maxPriorityFeePerGas: BigNumber.from(2),
-      gasPrice: BigNumber.from(11),
+      maxPriorityFeePerGas: BigInt(2),
+      gasPrice: BigInt(11),
+      toJSON: () => ({ }),
     });
-    expect(fee).toEqual(BigNumber.from(11));
+    expect(fee).toEqual(BigInt(11));
   });
 
   it('should return gas price in wei when maxPriorityFeePerGas missing', () => {
     const fee = getGasPriceInWei({
-      lastBaseFeePerGas: BigNumber.from(2),
-      maxFeePerGas: BigNumber.from(22),
+      maxFeePerGas: BigInt(22),
       maxPriorityFeePerGas: null,
-      gasPrice: BigNumber.from(11),
+      gasPrice: BigInt(11),
+      toJSON: () => ({ }),
     });
-    expect(fee).toEqual(BigNumber.from(11));
+    expect(fee).toEqual(BigInt(11));
   });
 
   it('should return undefined if missing gas fields', () => {
     const fee = getGasPriceInWei({
-      lastBaseFeePerGas: null,
       maxFeePerGas: null,
       maxPriorityFeePerGas: null,
       gasPrice: null,
+      toJSON: () => ({ }),
     });
     expect(fee).toBeNull();
   });

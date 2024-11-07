@@ -1,12 +1,12 @@
 /* eslint-disable arrow-body-style */
 import { TradeType } from '@uniswap/sdk-core';
-import { providers, utils } from 'ethers';
 import { SUPPORTED_SANDBOX_CHAINS } from '../config';
 import { WIMX_IMMUTABLE_TESTNET } from '../constants/tokens';
 import { IMMUTABLE_TESTNET_CHAIN_ID } from '../constants/chains';
 import { newAmountFromString } from '../test/utils';
 import { Multicall__factory, QuoterV2__factory } from '../contracts/types';
 import { Router } from './router';
+import { formatEther, JsonRpcProvider, parseEther } from 'ethers';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const zkONE = {
@@ -26,14 +26,14 @@ const zkWAT = {
 const fees = [100, 500, 10000];
 
 const config = SUPPORTED_SANDBOX_CHAINS[IMMUTABLE_TESTNET_CHAIN_ID];
-const provider = new providers.JsonRpcBatchProvider(config.rpcUrl, config.chainId);
+const provider = new JsonRpcProvider(config.rpcUrl, config.chainId);
 
 const q = QuoterV2__factory.connect(config.contracts.quoter, provider);
 const m = Multicall__factory.connect(config.contracts.multicall, provider);
 
 const callDatas = () => fees.map((fee) => {
   // const rand = Math.floor(Math.random() * 100);
-  const amountIn = utils.parseEther('20700000'); //  BigNumber.from(rand).mul(BigNumber.from(10).pow(18));
+  const amountIn = parseEther('20700000'); //  BigInt(rand).mul(BigInt(10).pow(18));
   return q.interface.encodeFunctionData('quoteExactInputSingle', [
     {
       amountIn,
@@ -51,7 +51,7 @@ describe('router', () => {
       const amountSpecified = newAmountFromString('20700000', zkWAT);
       const router = new Router(provider, m, config.commonRoutingTokens, config.contracts);
       const quoteResult = await router.findOptimalRoute(amountSpecified, WIMX_IMMUTABLE_TESTNET, TradeType.EXACT_INPUT);
-      expect(utils.formatEther(quoteResult.amountOut.value)).toEqual('7089.43335507464515036');
+      expect(formatEther(quoteResult.amountOut.value)).toEqual('7089.43335507464515036');
     });
 
     it.each(Array(10).fill(null))('parallel', async () => {
@@ -64,7 +64,7 @@ describe('router', () => {
           'quoteExactInputSingle',
           res,
         );
-        return utils.formatEther(amountOut);
+        return formatEther(amountOut);
       });
       const results = await Promise.all(promises);
 
@@ -80,12 +80,12 @@ describe('router', () => {
         };
       });
 
-      const { returnData } = await m.callStatic.multicall(calls);
+      const { returnData } = await m.multicall.staticCall(calls);
 
       const results = returnData.map((data) => {
         if (data.returnData === '0x') return [];
         const res = q.interface.decodeFunctionResult('quoteExactInputSingle', data.returnData);
-        return utils.formatEther(res.amountOut);
+        return formatEther(res.amountOut);
       });
 
       expect(results).toEqual(['516.580710655537430041', '7089.43335507464515036', '3.718255837400445597']);
@@ -105,7 +105,7 @@ describe('router', () => {
         if (data.status === 'rejected') return [];
         if (data.value === '0x') return [];
         const res = q.interface.decodeFunctionResult('quoteExactInputSingle', data.value);
-        return utils.formatEther(res.amountOut);
+        return formatEther(res.amountOut);
       });
 
       expect(results).toEqual(['516.580710655537430041', '7089.43335507464515036', '3.718255837400445597']);

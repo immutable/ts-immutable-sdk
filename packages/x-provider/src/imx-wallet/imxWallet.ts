@@ -1,4 +1,3 @@
-import { ethers } from 'ethers';
 import { Environment } from '@imtbl/config';
 import {
   ConnectRequest,
@@ -15,15 +14,16 @@ import { postRequestMessage } from './postRequestMessage';
 import { messageResponseListener } from './messageResponseListener';
 import { ImxSigner } from './ImxSigner';
 import { getOrSetupIFrame } from './imxWalletIFrame';
+import { BrowserProvider } from 'ethers';
 
 const DEFAULT_CONNECTION_MESSAGE = 'Only sign this request if you’ve initiated an action with Immutable X.';
 const CONNECTION_FAILED_ERROR = 'The L2 IMX Wallet connection has failed';
 
 export async function connect(
-  l1Provider: ethers.providers.Web3Provider,
+  l1Provider: BrowserProvider,
   env: Environment,
 ): Promise<ImxSigner> {
-  const l1Signer = l1Provider.getSigner();
+  const l1Signer = await l1Provider.getSigner();
   const address = await l1Signer.getAddress();
   const signature = await l1Signer.signMessage(DEFAULT_CONNECTION_MESSAGE);
   const iframe = await getOrSetupIFrame(env);

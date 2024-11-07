@@ -1,9 +1,9 @@
 import { Amount, Token, TransactionResponse } from '@imtbl/dex-sdk';
 import { TFunction } from 'i18next';
-import { BigNumber, utils } from 'ethers';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { CryptoFiatState } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { calculateCryptoToFiat, tokenValueFormat } from '../../../lib/utils';
+import { formatUnits } from 'ethers';
 
 export type FormattedFee = {
   label: string;
@@ -28,9 +28,9 @@ export const formatSwapFees = (
   if (!swapQuote.swap) return fees;
 
   const addFee = (estimate: Amount | undefined, label: string, prefix: string = '≈ ') => {
-    const value = BigNumber.from(estimate?.value ?? 0);
-    if (estimate && value.gt(0)) {
-      const formattedFee = utils.formatUnits(value, estimate.token.decimals);
+    const value = BigInt(estimate?.value ?? 0);
+    if (estimate && value > 0) {
+      const formattedFee = formatUnits(value, estimate.token.decimals);
       fees.push({
         label,
         fiatAmount: `≈ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${calculateCryptoToFiat(

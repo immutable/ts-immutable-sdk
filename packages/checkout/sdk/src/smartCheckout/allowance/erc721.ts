@@ -1,13 +1,12 @@
-import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
-import { BigNumber, Contract } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { ItemRequirement, ItemType } from '../../types';
 import { Allowance, InsufficientERC721 } from './types';
 import { ERC721ABI } from '../../env';
+import { BrowserProvider, Contract, TransactionRequest } from 'ethers';
 
 // Returns true if the spender address is approved for all ERC721s of this collection
 export const getERC721ApprovedForAll = async (
-  provider: Web3Provider,
+  provider: BrowserProvider,
   ownerAddress: string,
   contractAddress: string,
   spenderAddress: string,
@@ -35,11 +34,11 @@ export const getERC721ApprovedForAll = async (
 
 // Returns a populated transaction to approve the ERC721 for the spender.
 export const getApproveTransaction = async (
-  provider: Web3Provider,
+  provider: BrowserProvider,
   ownerAddress: string,
   contractAddress: string,
   spenderAddress: string,
-  id: BigNumber,
+  id: bigint,
 ): Promise<TransactionRequest | undefined> => {
   try {
     const contract = new Contract(
@@ -47,7 +46,7 @@ export const getApproveTransaction = async (
       JSON.stringify(ERC721ABI),
       provider,
     );
-    const transaction = await contract.populateTransaction.approve(spenderAddress, id);
+    const transaction = await contract.approve.populateTransaction(spenderAddress, id);
     if (transaction) transaction.from = ownerAddress;
     return transaction;
   } catch (err: any) {
@@ -68,9 +67,9 @@ export const getApproveTransaction = async (
 // Returns the address that is approved for the ERC721.
 // This is sufficient when the spender is the approved address
 export const getERC721ApprovedAddress = async (
-  provider: Web3Provider,
+  provider: BrowserProvider,
   contractAddress: string,
-  id: BigNumber,
+  id: bigint,
 ): Promise<string> => {
   try {
     const contract = new Contract(
@@ -92,9 +91,9 @@ export const getERC721ApprovedAddress = async (
   }
 };
 
-export const convertIdToNumber = (id: string, contractAddress: string): BigNumber => {
+export const convertIdToNumber = (id: string, contractAddress: string): bigint => {
   try {
-    return BigNumber.from(id);
+    return BigInt(id);
   } catch (e) {
     throw new CheckoutError(
       'Invalid ERC721 ID',
@@ -105,7 +104,7 @@ export const convertIdToNumber = (id: string, contractAddress: string): BigNumbe
 };
 
 export const getApprovedCollections = async (
-  provider: Web3Provider,
+  provider: BrowserProvider,
   itemRequirements: ItemRequirement[],
   owner: string,
 ): Promise<Map<string, boolean>> => {
@@ -136,7 +135,7 @@ export const getApprovedCollections = async (
 };
 
 export const hasERC721Allowances = async (
-  provider: Web3Provider,
+  provider: BrowserProvider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
 ): Promise<{

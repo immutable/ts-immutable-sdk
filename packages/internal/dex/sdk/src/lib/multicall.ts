@@ -1,17 +1,9 @@
-import { BigNumber } from 'ethers';
-import { Interface } from '@ethersproject/abi';
 import {
+  Multicall,
   UniswapInterfaceMulticall,
 } from '../contracts/types/Multicall';
 import { UniswapV3Pool__factory } from '../contracts/types';
-
-export interface Multicall {
-  callStatic: {
-    multicall(
-      calls: UniswapInterfaceMulticall.CallStruct[],
-    ): Promise<MulticallResponse>;
-  }
-}
+import { Interface } from 'ethers';
 
 const DEFAULT_GAS_QUOTE = 2_000_000;
 
@@ -22,7 +14,7 @@ export type SingleContractCallOptions = {
 };
 
 export type MulticallResponse = {
-  blockNumber: BigNumber;
+  blockNumber: bigint;
   returnData: UniswapInterfaceMulticall.ResultStructOutput[];
 };
 
@@ -46,13 +38,13 @@ export async function multicallSingleCallDataMultipleContracts(
         calls.push({
           target: address,
           callData,
-          gasLimit: BigNumber.from('1000000'),
+          gasLimit: BigInt('1000000'),
         });
       }
     });
   }
 
-  return multicallContract.callStatic.multicall(calls);
+  return multicallContract.multicall.staticCall(calls);
 }
 
 // TODO: Better description of function and args
@@ -75,7 +67,7 @@ export async function multicallMultipleCallDataSingContract(
     };
   }
 
-  return multicallContract.callStatic.multicall(calls);
+  return multicallContract.multicall.staticCall(calls);
 }
 
 const getCallData = (
