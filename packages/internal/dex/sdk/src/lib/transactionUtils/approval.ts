@@ -1,12 +1,10 @@
-import { JsonRpcProvider, TransactionRequest } from '@ethersproject/providers';
-import { BigNumber } from '@ethersproject/bignumber';
-import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import { ERC20__factory } from '../../contracts/types/factories/ERC20__factory';
 import { ApproveError } from '../../errors';
 import { isERC20Amount, toPublicAmount } from '../utils';
 import { CoinAmount, Coin, ERC20, Native, SecondaryFee, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
+import { JsonRpcProvider, MaxUint256, TransactionRequest } from 'ethers';
 
 type PreparedApproval = {
   spender: string;
@@ -33,7 +31,7 @@ const doesSpenderNeedApproval = async (
 
   // get the allowance for the token spender
   // the minimum allowance is 0 - no allowance
-  let allowance: BigNumber;
+  let allowance: bigint;
   try {
     allowance = await erc20Contract.allowance(ownerAddress, spenderAddress);
   } catch (e) {
@@ -42,8 +40,8 @@ const doesSpenderNeedApproval = async (
   }
 
   // check if approval is needed
-  const requiredAmount = tokenAmount.value.sub(allowance);
-  if (requiredAmount.isNegative() || requiredAmount.isZero()) {
+  const requiredAmount = tokenAmount.value - allowance;
+  if (requiredAmount <= 0) {
     return false;
   }
 
@@ -125,9 +123,10 @@ export async function getApproveGasEstimate(
   ownerAddress: string,
   spenderAddress: string,
   tokenAddress: string,
-): Promise<ethers.BigNumber> {
+): Promise<bigint> {
   const erc20Contract = ERC20__factory.connect(tokenAddress, provider);
-  return await erc20Contract.estimateGas.approve(spenderAddress, ethers.constants.MaxUint256, {
+  // @ts-expect-error Contract types arent matching the implementation
+  return await erc20Contract.estimateGas.approve(spenderAddress, MaxUint256, {
     from: ownerAddress,
   });
 }

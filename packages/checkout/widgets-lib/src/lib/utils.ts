@@ -39,11 +39,11 @@ export const sortTokensByAmount = (
     return 1;
   }
 
-  if (a.balance.lt(b.balance)) {
+  if (a.balance < b.balance) {
     return 1;
   }
 
-  if (a.balance.gt(b.balance)) {
+  if (a.balance > b.balance) {
     return -1;
   }
 

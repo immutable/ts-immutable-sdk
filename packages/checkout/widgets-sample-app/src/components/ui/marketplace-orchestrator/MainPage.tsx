@@ -1,4 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import { Box, Button, Heading } from "@biom3/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
@@ -34,7 +34,7 @@ export const MainPage = () => {
   const [doneSwap, setDoneSwap] = useState<boolean>(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
   const [selectedTheme, setSelectedTheme] = useState<WidgetTheme>(WidgetTheme.DARK);
-  const [web3Provider, setWeb3Provider] = useState<Web3Provider | undefined>(undefined);
+  const [web3Provider, setBrowserProvider] = useState<BrowserProvider | undefined>(undefined);
 
   const widgetsFactory = useMemo(() => new WidgetsFactory(
     checkout,
@@ -70,10 +70,10 @@ export const MainPage = () => {
   useEffect(() => {
     connectWidget.addListener(ConnectEventType.CLOSE_WIDGET, () => connectWidget.unmount());
     connectWidget.addListener(ConnectEventType.SUCCESS, (eventData: ConnectionSuccess) => {
-      setWeb3Provider(eventData.provider);
+      setBrowserProvider(eventData.provider);
     });
     walletWidget.addListener(WalletEventType.NETWORK_SWITCH, (eventData: WalletNetworkSwitch) => {
-      setWeb3Provider(eventData.provider)
+      setBrowserProvider(eventData.provider)
     });
   }, [connectWidget, walletWidget, swapWidget]);
 

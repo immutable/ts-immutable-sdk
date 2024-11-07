@@ -1,6 +1,4 @@
 import { Environment } from '@imtbl/config';
-import { JsonRpcProvider } from '@ethersproject/providers';
-import { BigNumber, utils } from 'ethers';
 import {
   BridgeRequirement,
   bridgeRoute,
@@ -21,6 +19,7 @@ import { allowListCheckForBridge } from '../../allowList/allowListCheck';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../indexer/fetchL1Representation';
 import { DEFAULT_TOKEN_DECIMALS } from '../../../env';
 import { HttpClient } from '../../../api/http';
+import { formatUnits, JsonRpcProvider } from 'ethers';
 
 jest.mock('../../../gasEstimate');
 jest.mock('../../../instance');
@@ -41,7 +40,7 @@ describe('bridgeRoute', () => {
   describe('bridgeRoute', () => {
     describe('Bridge ETH', () => {
       const bridgeRequirement: BridgeRequirement = {
-        amount: BigNumber.from(10),
+        amount: BigInt(10),
         formattedAmount: '10',
         l2address: '0xL2ADDRESS',
       };
@@ -57,11 +56,11 @@ describe('bridgeRoute', () => {
         });
 
         (getBridgeFeeEstimate as jest.Mock).mockResolvedValue({
-          approvalGas: BigNumber.from(0),
-          sourceChainGas: BigNumber.from(2),
-          bridgeFee: BigNumber.from(3),
-          imtblFee: BigNumber.from(4),
-          totalFees: BigNumber.from(9),
+          approvalGas: BigInt(0),
+          sourceChainGas: BigInt(2),
+          bridgeFee: BigInt(3),
+          imtblFee: BigInt(4),
+          totalFees: BigInt(9),
         });
 
         (allowListCheckForBridge as jest.Mock).mockResolvedValue([
@@ -79,7 +78,7 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(20),
+                balance: BigInt(20),
                 formattedBalance: '20',
                 token: {
                   name: 'Immutable X',
@@ -89,7 +88,7 @@ describe('bridgeRoute', () => {
                 },
               },
               {
-                balance: BigNumber.from(20),
+                balance: BigInt(20),
                 formattedBalance: '20',
                 token: {
                   name: 'Sep Eth',
@@ -118,11 +117,11 @@ describe('bridgeRoute', () => {
           fundingItem: {
             type: ItemType.NATIVE,
             fundsRequired: {
-              amount: BigNumber.from(10),
+              amount: BigInt(10),
               formattedAmount: '10',
             },
             userBalance: {
-              balance: BigNumber.from(20),
+              balance: BigInt(20),
               formattedBalance: '20',
             },
             token: {
@@ -135,8 +134,8 @@ describe('bridgeRoute', () => {
           fees: {
             approvalGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(0),
-              formattedAmount: utils.formatUnits(BigNumber.from(0), DEFAULT_TOKEN_DECIMALS),
+              amount: BigInt(0),
+              formattedAmount: formatUnits(BigInt(0), DEFAULT_TOKEN_DECIMALS),
               token: {
                 name: 'Sep Eth',
                 symbol: 'ETH',
@@ -145,8 +144,8 @@ describe('bridgeRoute', () => {
             },
             bridgeGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(2),
-              formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
+              amount: BigInt(2),
+              formattedAmount: formatUnits(BigInt(2), DEFAULT_TOKEN_DECIMALS),
               token: {
                 name: 'Sep Eth',
                 symbol: 'ETH',
@@ -156,8 +155,8 @@ describe('bridgeRoute', () => {
             bridgeFees: [
               {
                 type: FeeType.BRIDGE_FEE,
-                amount: BigNumber.from(3),
-                formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
+                amount: BigInt(3),
+                formattedAmount: formatUnits(BigInt(3), DEFAULT_TOKEN_DECIMALS),
                 token: {
                   name: 'Sep Eth',
                   symbol: 'ETH',
@@ -166,8 +165,8 @@ describe('bridgeRoute', () => {
               },
               {
                 type: FeeType.IMMUTABLE_FEE,
-                amount: BigNumber.from(4),
-                formattedAmount: utils.formatUnits(BigNumber.from(4), DEFAULT_TOKEN_DECIMALS),
+                amount: BigInt(4),
+                formattedAmount: formatUnits(BigInt(4), DEFAULT_TOKEN_DECIMALS),
                 token: {
                   name: 'Sep Eth',
                   symbol: 'ETH',
@@ -185,7 +184,7 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(19),
+                balance: BigInt(19),
                 formattedBalance: '19',
                 token: {
                   name: 'Sep Eth',
@@ -213,11 +212,11 @@ describe('bridgeRoute', () => {
           fundingItem: {
             type: ItemType.NATIVE,
             fundsRequired: {
-              amount: BigNumber.from(10),
+              amount: BigInt(10),
               formattedAmount: '10',
             },
             userBalance: {
-              balance: BigNumber.from(19),
+              balance: BigInt(19),
               formattedBalance: '19',
             },
             token: {
@@ -230,8 +229,8 @@ describe('bridgeRoute', () => {
           fees: {
             approvalGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(0),
-              formattedAmount: utils.formatUnits(BigNumber.from(0), DEFAULT_TOKEN_DECIMALS),
+              amount: BigInt(0),
+              formattedAmount: formatUnits(BigInt(0), DEFAULT_TOKEN_DECIMALS),
               token: {
                 name: 'Sep Eth',
                 symbol: 'ETH',
@@ -240,8 +239,8 @@ describe('bridgeRoute', () => {
             },
             bridgeGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(2),
-              formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
+              amount: BigInt(2),
+              formattedAmount: formatUnits(BigInt(2), DEFAULT_TOKEN_DECIMALS),
               token: {
                 name: 'Sep Eth',
                 symbol: 'ETH',
@@ -251,8 +250,8 @@ describe('bridgeRoute', () => {
             bridgeFees: [
               {
                 type: FeeType.BRIDGE_FEE,
-                amount: BigNumber.from(3),
-                formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
+                amount: BigInt(3),
+                formattedAmount: formatUnits(BigInt(3), DEFAULT_TOKEN_DECIMALS),
                 token: {
                   name: 'Sep Eth',
                   symbol: 'ETH',
@@ -261,8 +260,8 @@ describe('bridgeRoute', () => {
               },
               {
                 type: FeeType.IMMUTABLE_FEE,
-                amount: BigNumber.from(4),
-                formattedAmount: utils.formatUnits(BigNumber.from(4), DEFAULT_TOKEN_DECIMALS),
+                amount: BigInt(4),
+                formattedAmount: formatUnits(BigInt(4), DEFAULT_TOKEN_DECIMALS),
                 token: {
                   name: 'Sep Eth',
                   symbol: 'ETH',
@@ -280,7 +279,7 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(18),
+                balance: BigInt(18),
                 formattedBalance: '18',
                 token: {
                   name: 'Sep Eth',
@@ -311,7 +310,7 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(20),
+                balance: BigInt(20),
                 formattedBalance: '20',
                 token: {
                   name: 'Immutable X',
@@ -321,7 +320,7 @@ describe('bridgeRoute', () => {
                 },
               },
               {
-                balance: BigNumber.from(20),
+                balance: BigInt(20),
                 formattedBalance: '20',
                 token: {
                   name: 'Sep Eth',
@@ -351,7 +350,7 @@ describe('bridgeRoute', () => {
 
     describe('Bridge ERC20', () => {
       const bridgeRequirement = {
-        amount: BigNumber.from(10),
+        amount: BigInt(10),
         formattedAmount: '10',
         l2address: '0xL2ADDRESS',
       };
@@ -367,11 +366,11 @@ describe('bridgeRoute', () => {
         });
 
         (getBridgeFeeEstimate as jest.Mock).mockResolvedValue({
-          approvalGas: BigNumber.from(1),
-          sourceChainGas: BigNumber.from(2),
-          bridgeFee: BigNumber.from(3),
-          imtblFee: BigNumber.from(4),
-          totalFees: BigNumber.from(9),
+          approvalGas: BigInt(1),
+          sourceChainGas: BigInt(2),
+          bridgeFee: BigInt(3),
+          imtblFee: BigInt(4),
+          totalFees: BigInt(9),
         });
 
         (allowListCheckForBridge as jest.Mock).mockResolvedValue([
@@ -390,7 +389,7 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'Sep Eth',
@@ -399,7 +398,7 @@ describe('bridgeRoute', () => {
                 },
               },
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: '0xERC20',
@@ -428,11 +427,11 @@ describe('bridgeRoute', () => {
           fundingItem: {
             type: ItemType.ERC20,
             fundsRequired: {
-              amount: BigNumber.from(10),
+              amount: BigInt(10),
               formattedAmount: '10',
             },
             userBalance: {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
             },
             token: {
@@ -445,8 +444,8 @@ describe('bridgeRoute', () => {
           fees: {
             approvalGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(1),
-              formattedAmount: utils.formatUnits(BigNumber.from(1), DEFAULT_TOKEN_DECIMALS),
+              amount: BigInt(1),
+              formattedAmount: formatUnits(BigInt(1), DEFAULT_TOKEN_DECIMALS),
               token: {
                 name: 'Sep Eth',
                 symbol: 'ETH',
@@ -455,8 +454,8 @@ describe('bridgeRoute', () => {
             },
             bridgeGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(2),
-              formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
+              amount: BigInt(2),
+              formattedAmount: formatUnits(BigInt(2), DEFAULT_TOKEN_DECIMALS),
               token: {
                 name: 'Sep Eth',
                 symbol: 'ETH',
@@ -466,8 +465,8 @@ describe('bridgeRoute', () => {
             bridgeFees: [
               {
                 type: FeeType.BRIDGE_FEE,
-                amount: BigNumber.from(3),
-                formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
+                amount: BigInt(3),
+                formattedAmount: formatUnits(BigInt(3), DEFAULT_TOKEN_DECIMALS),
                 token: {
                   name: 'Sep Eth',
                   symbol: 'ETH',
@@ -476,8 +475,8 @@ describe('bridgeRoute', () => {
               },
               {
                 type: FeeType.IMMUTABLE_FEE,
-                amount: BigNumber.from(4),
-                formattedAmount: utils.formatUnits(BigNumber.from(4), DEFAULT_TOKEN_DECIMALS),
+                amount: BigInt(4),
+                formattedAmount: formatUnits(BigInt(4), DEFAULT_TOKEN_DECIMALS),
                 token: {
                   name: 'Sep Eth',
                   symbol: 'ETH',
@@ -495,7 +494,7 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(9),
+                balance: BigInt(9),
                 formattedBalance: '9',
                 token: {
                   name: 'Sep Eth',
@@ -504,7 +503,7 @@ describe('bridgeRoute', () => {
                 },
               },
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: '0xERC20',
@@ -533,11 +532,11 @@ describe('bridgeRoute', () => {
           fundingItem: {
             type: ItemType.ERC20,
             fundsRequired: {
-              amount: BigNumber.from(10),
+              amount: BigInt(10),
               formattedAmount: '10',
             },
             userBalance: {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
             },
             token: {
@@ -550,8 +549,8 @@ describe('bridgeRoute', () => {
           fees: {
             approvalGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(1),
-              formattedAmount: utils.formatUnits(BigNumber.from(1), DEFAULT_TOKEN_DECIMALS),
+              amount: BigInt(1),
+              formattedAmount: formatUnits(BigInt(1), DEFAULT_TOKEN_DECIMALS),
               token: {
                 name: 'Sep Eth',
                 symbol: 'ETH',
@@ -560,8 +559,8 @@ describe('bridgeRoute', () => {
             },
             bridgeGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(2),
-              formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
+              amount: BigInt(2),
+              formattedAmount: formatUnits(BigInt(2), DEFAULT_TOKEN_DECIMALS),
               token: {
                 name: 'Sep Eth',
                 symbol: 'ETH',
@@ -571,8 +570,8 @@ describe('bridgeRoute', () => {
             bridgeFees: [
               {
                 type: FeeType.BRIDGE_FEE,
-                amount: BigNumber.from(3),
-                formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
+                amount: BigInt(3),
+                formattedAmount: formatUnits(BigInt(3), DEFAULT_TOKEN_DECIMALS),
                 token: {
                   name: 'Sep Eth',
                   symbol: 'ETH',
@@ -581,8 +580,8 @@ describe('bridgeRoute', () => {
               },
               {
                 type: FeeType.IMMUTABLE_FEE,
-                amount: BigNumber.from(4),
-                formattedAmount: utils.formatUnits(BigNumber.from(4), DEFAULT_TOKEN_DECIMALS),
+                amount: BigInt(4),
+                formattedAmount: formatUnits(BigInt(4), DEFAULT_TOKEN_DECIMALS),
                 token: {
                   name: 'Sep Eth',
                   symbol: 'ETH',
@@ -600,7 +599,7 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'Sep Eth',
@@ -609,7 +608,7 @@ describe('bridgeRoute', () => {
                 },
               },
               {
-                balance: BigNumber.from(9),
+                balance: BigInt(9),
                 formattedBalance: '9',
                 token: {
                   name: '0xERC20',
@@ -641,7 +640,7 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(8),
+                balance: BigInt(8),
                 formattedBalance: '8',
                 token: {
                   name: 'Sep Eth',
@@ -650,7 +649,7 @@ describe('bridgeRoute', () => {
                 },
               },
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: '0xERC20',
@@ -682,7 +681,7 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'Sep Eth',
@@ -691,7 +690,7 @@ describe('bridgeRoute', () => {
                 },
               },
               {
-                balance: BigNumber.from(11),
+                balance: BigInt(11),
                 formattedBalance: '11',
                 token: {
                   name: '0xERC20',
@@ -722,7 +721,7 @@ describe('bridgeRoute', () => {
 
     it('should return undefined if no balance on layer 1', async () => {
       const bridgeRequirement = {
-        amount: BigNumber.from(10),
+        amount: BigInt(10),
         formattedAmount: '10',
         l2address: '0xL2ADDRESS',
       };
@@ -757,7 +756,7 @@ describe('bridgeRoute', () => {
 
     it('should return undefined if no token balance result for L1', async () => {
       const bridgeRequirement = {
-        amount: BigNumber.from(10),
+        amount: BigInt(10),
         formattedAmount: '10',
         l2address: '0xL2ADDRESS',
       };
@@ -784,7 +783,7 @@ describe('bridgeRoute', () => {
 
     it('should return undefined if token balance returned unsuccessful on L1', async () => {
       const bridgeRequirement = {
-        amount: BigNumber.from(10),
+        amount: BigInt(10),
         formattedAmount: '10',
         l2address: '0xL2ADDRESS',
       };
@@ -811,7 +810,7 @@ describe('bridgeRoute', () => {
 
     it('should throw error if readonly providers missing L1', async () => {
       const bridgeRequirement = {
-        amount: BigNumber.from(10),
+        amount: BigInt(10),
         formattedAmount: '10',
         l2address: '0xL2ADDRESS',
       };
@@ -855,7 +854,7 @@ describe('bridgeRoute', () => {
           success: true,
           balances: [
             {
-              balance: BigNumber.from(2),
+              balance: BigInt(2),
               formattedBalance: '2',
               token: {
                 name: 'Sep Eth',
@@ -865,7 +864,7 @@ describe('bridgeRoute', () => {
             },
           ],
         },
-        BigNumber.from(1),
+        BigInt(1),
       );
 
       expect(hasSufficientEth).toBeTruthy();
@@ -877,7 +876,7 @@ describe('bridgeRoute', () => {
           success: true,
           balances: [
             {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1',
               token: {
                 name: 'Sep Eth',
@@ -887,7 +886,7 @@ describe('bridgeRoute', () => {
             },
           ],
         },
-        BigNumber.from(1),
+        BigInt(1),
       );
 
       expect(hasSufficientEth).toBeTruthy();
@@ -899,7 +898,7 @@ describe('bridgeRoute', () => {
           success: true,
           balances: [
             {
-              balance: BigNumber.from(0),
+              balance: BigInt(0),
               formattedBalance: '0',
               token: {
                 name: 'Sep Eth',
@@ -909,7 +908,7 @@ describe('bridgeRoute', () => {
             },
           ],
         },
-        BigNumber.from(1),
+        BigInt(1),
       );
 
       expect(hasSufficientEth).toBeFalsy();

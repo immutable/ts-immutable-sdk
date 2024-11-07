@@ -1,5 +1,6 @@
 import { Environment, ModuleConfiguration } from '@imtbl/config';
-import { providers } from 'ethers';
+import { FetchRequest } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 
 export const TESTNET_CHAIN_NAME = 'imtbl-zkevm-testnet';
 export const MAINNET_CHAIN_NAME = 'imtbl-zkevm-mainnet';
@@ -17,20 +18,17 @@ export interface OrderbookModuleConfiguration {
   zoneContractAddress: string;
   apiEndpoint: string;
   chainName: string;
-  provider: providers.JsonRpcProvider;
+  provider: JsonRpcProvider;
 }
 
 export function getConfiguredProvider(
   url: string,
   rateLimitingKey?: string,
-): providers.JsonRpcProvider {
-  return new providers.JsonRpcProvider({
-    url,
-    headers: rateLimitingKey ? {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      'x-api-key': rateLimitingKey!,
-    } : undefined,
-  });
+): JsonRpcProvider {
+  const fetchRequest = new FetchRequest(url)
+  if (rateLimitingKey) fetchRequest.setHeader('x-api-key', rateLimitingKey);
+  
+  return new JsonRpcProvider(fetchRequest);
 }
 
 export function getOrderbookConfig(

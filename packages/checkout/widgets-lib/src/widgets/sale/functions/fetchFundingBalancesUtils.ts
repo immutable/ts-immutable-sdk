@@ -15,9 +15,8 @@ import {
   SwapFees,
 } from '@imtbl/checkout-sdk';
 
-import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import { getTokenImageByAddress, isNativeToken } from '../../../lib/utils';
 import { isGasFree } from '../../../lib/provider';
 import {
@@ -46,7 +45,7 @@ export const getGasEstimate = (): GasAmount => ({
   type: TransactionOrGasType.GAS,
   gasToken: {
     type: GasTokenType.NATIVE,
-    limit: BigNumber.from(MAX_GAS_LIMIT),
+    limit: BigInt(MAX_GAS_LIMIT),
   },
 });
 
@@ -138,7 +137,7 @@ export const getFundingBalances = (
   if (
     smartCheckoutResult.sufficient === false
     && smartCheckoutResult?.router?.routingOutcome.type
-    === RoutingOutcomeType.ROUTES_FOUND
+   === RoutingOutcomeType.ROUTES_FOUND
   ) {
     return getAlternativeFundingSteps(
       smartCheckoutResult.router.routingOutcome.fundingRoutes,
@@ -204,13 +203,13 @@ export const getFnToPushAndSortFundingBalances = (
 
 const getZeroFee = (fee: Fee): Fee => ({
   ...fee,
-  amount: BigNumber.from(0),
+  amount: BigInt(0),
   formattedAmount: '0',
 });
 
 const getGasFreeBalanceAdjustment = (
   balance: FundingBalance,
-  provider?: Web3Provider,
+  provider?: BrowserProvider,
 ): FundingBalance => {
   if (balance.type !== FundingStepType.SWAP) {
     return balance;
@@ -234,5 +233,5 @@ const getGasFreeBalanceAdjustment = (
 
 export const processGasFreeBalances = (
   balances: FundingBalance[],
-  provider?: Web3Provider,
+  provider?: BrowserProvider,
 ) => balances.map((balance) => getGasFreeBalanceAdjustment(balance, provider));

@@ -1,7 +1,7 @@
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
-import { TransactionResponse } from '@ethersproject/providers';
 import { Transaction } from '../../lib/clients';
 import { ViewType } from './ViewType';
+import { TransactionResponse } from 'ethers';
 
 export enum BridgeWidgetViews {
   WALLET_NETWORK_SELECTION = 'WALLET_NETWORK_SELECTION',

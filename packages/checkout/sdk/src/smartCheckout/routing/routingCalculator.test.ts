@@ -1,6 +1,4 @@
-import { BigNumber, utils } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { JsonRpcProvider } from '@ethersproject/providers';
 import {
   getBridgeAndSwapFundingSteps,
   getSwapFundingSteps,
@@ -32,6 +30,7 @@ import { bridgeAndSwapRoute } from './bridgeAndSwap/bridgeAndSwapRoute';
 import { RoutingTokensAllowList } from '../allowList/types';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './indexer/fetchL1Representation';
 import { HttpClient } from '../../api/http';
+import { formatUnits, JsonRpcProvider } from 'ethers';
 
 jest.mock('./tokenBalances');
 jest.mock('./bridge/bridgeRoute');
@@ -84,12 +83,12 @@ describe('routingCalculator', () => {
       type: ItemType.ERC20,
       sufficient: false,
       delta: {
-        balance: BigNumber.from(1),
+        balance: BigInt(1),
         formattedBalance: '1',
       },
       current: {
         type: ItemType.ERC20,
-        balance: BigNumber.from(1),
+        balance: BigInt(1),
         formattedBalance: '1',
         token: {
           name: 'ERC20_1',
@@ -100,7 +99,7 @@ describe('routingCalculator', () => {
       },
       required: {
         type: ItemType.ERC20,
-        balance: BigNumber.from(2),
+        balance: BigInt(2),
         formattedBalance: '2',
         token: {
           name: 'ERC20_1',
@@ -131,7 +130,7 @@ describe('routingCalculator', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'ERC20',
@@ -141,7 +140,7 @@ describe('routingCalculator', () => {
                 },
               },
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'IMX',
@@ -163,11 +162,11 @@ describe('routingCalculator', () => {
       fundingItem: {
         type: ItemType.ERC20,
         fundsRequired: {
-          amount: BigNumber.from(1),
-          formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+          amount: BigInt(1),
+          formattedAmount: formatUnits(BigInt(1), 18),
         },
         userBalance: {
-          balance: BigNumber.from(10),
+          balance: BigInt(10),
           formattedBalance: '10',
         },
         token: {
@@ -292,12 +291,12 @@ describe('routingCalculator', () => {
       sufficient: false,
       isFee: false,
       delta: {
-        balance: BigNumber.from(10),
+        balance: BigInt(10),
         formattedBalance: '10',
       },
       current: {
         type: ItemType.ERC20,
-        balance: BigNumber.from(0),
+        balance: BigInt(0),
         formattedBalance: '0',
         token: {
           name: 'ETH-ERC20',
@@ -308,7 +307,7 @@ describe('routingCalculator', () => {
       },
       required: {
         type: ItemType.ERC20,
-        balance: BigNumber.from(10),
+        balance: BigInt(10),
         formattedBalance: '10',
         token: {
           name: 'ETH-ERC20',
@@ -340,11 +339,11 @@ describe('routingCalculator', () => {
       fundingItem: {
         type: ItemType.NATIVE,
         fundsRequired: {
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           formattedAmount: '1',
         },
         userBalance: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         token: {
@@ -356,18 +355,18 @@ describe('routingCalculator', () => {
       fees: {
         approvalGasFee: {
           type: FeeType.GAS,
-          amount: BigNumber.from(0),
+          amount: BigInt(0),
           formattedAmount: '0',
         },
         bridgeGasFee: {
           type: FeeType.GAS,
-          amount: BigNumber.from(0),
+          amount: BigInt(0),
           formattedAmount: '0',
         },
         bridgeFees: [
           {
             type: FeeType.BRIDGE_FEE,
-            amount: BigNumber.from(0),
+            amount: BigInt(0),
             formattedAmount: '0',
           },
         ],
@@ -424,12 +423,12 @@ describe('routingCalculator', () => {
       type: ItemType.ERC20,
       sufficient: false,
       delta: {
-        balance: BigNumber.from(1),
+        balance: BigInt(1),
         formattedBalance: '1',
       },
       current: {
         type: ItemType.ERC20,
-        balance: BigNumber.from(1),
+        balance: BigInt(1),
         formattedBalance: '1',
         token: {
           name: 'ERC20_1',
@@ -440,7 +439,7 @@ describe('routingCalculator', () => {
       },
       required: {
         type: ItemType.ERC20,
-        balance: BigNumber.from(2),
+        balance: BigInt(2),
         formattedBalance: '2',
         token: {
           name: 'ERC20_1',
@@ -471,7 +470,7 @@ describe('routingCalculator', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'ERC20',
@@ -481,7 +480,7 @@ describe('routingCalculator', () => {
                 },
               },
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'IMX',
@@ -503,11 +502,11 @@ describe('routingCalculator', () => {
       fundingItem: {
         type: ItemType.ERC20,
         fundsRequired: {
-          amount: BigNumber.from(1),
-          formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+          amount: BigInt(1),
+          formattedAmount: formatUnits(BigInt(1), 18),
         },
         userBalance: {
-          balance: BigNumber.from(10),
+          balance: BigInt(10),
           formattedBalance: '10',
         },
         token: {
@@ -574,12 +573,12 @@ describe('routingCalculator', () => {
       type: ItemType.ERC20,
       sufficient: false,
       delta: {
-        balance: BigNumber.from(1),
+        balance: BigInt(1),
         formattedBalance: '1',
       },
       current: {
         type: ItemType.ERC20,
-        balance: BigNumber.from(1),
+        balance: BigInt(1),
         formattedBalance: '1',
         token: {
           name: 'ERC20_1',
@@ -590,7 +589,7 @@ describe('routingCalculator', () => {
       },
       required: {
         type: ItemType.ERC20,
-        balance: BigNumber.from(2),
+        balance: BigInt(2),
         formattedBalance: '2',
         token: {
           name: 'ERC20_1',
@@ -621,7 +620,7 @@ describe('routingCalculator', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'ERC20',
@@ -631,7 +630,7 @@ describe('routingCalculator', () => {
                 },
               },
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'ERC20_3',
@@ -641,7 +640,7 @@ describe('routingCalculator', () => {
                 },
               },
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'IMX',
@@ -663,11 +662,11 @@ describe('routingCalculator', () => {
       fundingItem: {
         type: ItemType.ERC20,
         fundsRequired: {
-          amount: BigNumber.from(1),
-          formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+          amount: BigInt(1),
+          formattedAmount: formatUnits(BigInt(1), 18),
         },
         userBalance: {
-          balance: BigNumber.from(10),
+          balance: BigInt(10),
           formattedBalance: '10',
         },
         token: {
@@ -685,11 +684,11 @@ describe('routingCalculator', () => {
       fundingItem: {
         type: ItemType.ERC20,
         fundsRequired: {
-          amount: BigNumber.from(1),
-          formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+          amount: BigInt(1),
+          formattedAmount: formatUnits(BigInt(1), 18),
         },
         userBalance: {
-          balance: BigNumber.from(10),
+          balance: BigInt(10),
           formattedBalance: '10',
         },
         token: {
@@ -758,12 +757,12 @@ describe('routingCalculator', () => {
       type: ItemType.ERC20,
       sufficient: false,
       delta: {
-        balance: BigNumber.from(1),
+        balance: BigInt(1),
         formattedBalance: '1',
       },
       current: {
         type: ItemType.ERC20,
-        balance: BigNumber.from(1),
+        balance: BigInt(1),
         formattedBalance: '1',
         token: {
           name: 'ERC20_1',
@@ -774,7 +773,7 @@ describe('routingCalculator', () => {
       },
       required: {
         type: ItemType.ERC20,
-        balance: BigNumber.from(2),
+        balance: BigInt(2),
         formattedBalance: '2',
         token: {
           name: 'ERC20_1',
@@ -805,7 +804,7 @@ describe('routingCalculator', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'ERC20_2',
@@ -815,7 +814,7 @@ describe('routingCalculator', () => {
                 },
               },
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'IMX',
@@ -834,11 +833,11 @@ describe('routingCalculator', () => {
       chainId: ChainId.IMTBL_ZKEVM_TESTNET,
       asset: {
         fundsRequired: {
-          amount: BigNumber.from(10),
+          amount: BigInt(10),
           formattedAmount: '10',
         },
         userBalance: {
-          balance: BigNumber.from(0),
+          balance: BigInt(0),
           formattedBalance: '0',
         },
         token: {
@@ -901,12 +900,12 @@ describe('routingCalculator', () => {
       type: ItemType.ERC20,
       sufficient: false,
       delta: {
-        balance: BigNumber.from(1),
+        balance: BigInt(1),
         formattedBalance: '1',
       },
       current: {
         type: ItemType.ERC20,
-        balance: BigNumber.from(1),
+        balance: BigInt(1),
         formattedBalance: '1',
         token: {
           name: 'ERC20_1',
@@ -917,7 +916,7 @@ describe('routingCalculator', () => {
       },
       required: {
         type: ItemType.ERC20,
-        balance: BigNumber.from(2),
+        balance: BigInt(2),
         formattedBalance: '2',
         token: {
           name: 'ERC20_1',
@@ -947,7 +946,7 @@ describe('routingCalculator', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'ETH',
@@ -956,7 +955,7 @@ describe('routingCalculator', () => {
                 },
               },
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'IMX',
@@ -974,7 +973,7 @@ describe('routingCalculator', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'ERC20',
@@ -984,7 +983,7 @@ describe('routingCalculator', () => {
                 },
               },
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'IMX',
@@ -1004,11 +1003,11 @@ describe('routingCalculator', () => {
       fundingItem: {
         type: ItemType.NATIVE,
         fundsRequired: {
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           formattedAmount: '1',
         },
         userBalance: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         token: {
@@ -1020,18 +1019,18 @@ describe('routingCalculator', () => {
       fees: {
         approvalGasFee: {
           type: FeeType.GAS,
-          amount: BigNumber.from(0),
+          amount: BigInt(0),
           formattedAmount: '0',
         },
         bridgeGasFee: {
           type: FeeType.GAS,
-          amount: BigNumber.from(0),
+          amount: BigInt(0),
           formattedAmount: '0',
         },
         bridgeFees: [
           {
             type: FeeType.BRIDGE_FEE,
-            amount: BigNumber.from(0),
+            amount: BigInt(0),
             formattedAmount: '0',
           },
         ],
@@ -1045,11 +1044,11 @@ describe('routingCalculator', () => {
       fundingItem: {
         type: ItemType.ERC20,
         fundsRequired: {
-          amount: BigNumber.from(1),
-          formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+          amount: BigInt(1),
+          formattedAmount: formatUnits(BigInt(1), 18),
         },
         userBalance: {
-          balance: BigNumber.from(10),
+          balance: BigInt(10),
           formattedBalance: '10',
         },
         token: {
@@ -1068,11 +1067,11 @@ describe('routingCalculator', () => {
       fundingItem: {
         type: ItemType.ERC20,
         fundsRequired: {
-          amount: BigNumber.from(1),
-          formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+          amount: BigInt(1),
+          formattedAmount: formatUnits(BigInt(1), 18),
         },
         userBalance: {
-          balance: BigNumber.from(5),
+          balance: BigInt(5),
           formattedBalance: '5',
         },
         token: {
@@ -1089,11 +1088,11 @@ describe('routingCalculator', () => {
       fundingItem: {
         type: ItemType.ERC20,
         fundsRequired: {
-          amount: BigNumber.from(1),
-          formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+          amount: BigInt(1),
+          formattedAmount: formatUnits(BigInt(1), 18),
         },
         userBalance: {
-          balance: BigNumber.from(10),
+          balance: BigInt(10),
           formattedBalance: '10',
         },
         token: {
@@ -1150,12 +1149,12 @@ describe('routingCalculator', () => {
       sufficient: false,
       isFee: false,
       delta: {
-        balance: BigNumber.from(10),
+        balance: BigInt(10),
         formattedBalance: '10',
       },
       current: {
         type: ItemType.ERC20,
-        balance: BigNumber.from(0),
+        balance: BigInt(0),
         formattedBalance: '0',
         token: {
           name: 'ETH-ERC20',
@@ -1166,7 +1165,7 @@ describe('routingCalculator', () => {
       },
       required: {
         type: ItemType.ERC20,
-        balance: BigNumber.from(10),
+        balance: BigInt(10),
         formattedBalance: '10',
         token: {
           name: 'ETH-ERC20',
@@ -1205,7 +1204,7 @@ describe('routingCalculator', () => {
       type: FundingStepType.BRIDGE,
       chainId: 1,
       asset: {
-        balance: BigNumber.from(1),
+        balance: BigInt(1),
         formattedBalance: '1',
         token: {
           name: 'ETH',
@@ -1276,12 +1275,12 @@ describe('routingCalculator', () => {
       sufficient: false,
       isFee: false,
       delta: {
-        balance: BigNumber.from(10),
+        balance: BigInt(10),
         formattedBalance: '10',
       },
       current: {
         type: ItemType.ERC20,
-        balance: BigNumber.from(0),
+        balance: BigInt(0),
         formattedBalance: '0',
         token: {
           name: 'ETH-ERC20',
@@ -1292,7 +1291,7 @@ describe('routingCalculator', () => {
       },
       required: {
         type: ItemType.ERC20,
-        balance: BigNumber.from(10),
+        balance: BigInt(10),
         formattedBalance: '10',
         token: {
           name: 'ETH-ERC20',
@@ -1322,7 +1321,7 @@ describe('routingCalculator', () => {
       type: FundingStepType.BRIDGE,
       chainId: 1,
       asset: {
-        balance: BigNumber.from(1),
+        balance: BigInt(1),
         formattedBalance: '1',
         token: {
           name: 'ETH',
@@ -1364,11 +1363,11 @@ describe('routingCalculator', () => {
         fundingItem: {
           type: ItemType.ERC20,
           fundsRequired: {
-            amount: BigNumber.from(1),
-            formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+            amount: BigInt(1),
+            formattedAmount: formatUnits(BigInt(1), 18),
           },
           userBalance: {
-            balance: BigNumber.from(10),
+            balance: BigInt(10),
             formattedBalance: '10',
           },
           token: {
@@ -1385,12 +1384,12 @@ describe('routingCalculator', () => {
         type: ItemType.ERC20,
         sufficient: false,
         delta: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         current: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           token: {
             name: 'ERC20_1',
@@ -1401,7 +1400,7 @@ describe('routingCalculator', () => {
         },
         required: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(2),
+          balance: BigInt(2),
           formattedBalance: '2',
           token: {
             name: 'ERC20_1',
@@ -1419,7 +1418,7 @@ describe('routingCalculator', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'ERC20',
@@ -1429,7 +1428,7 @@ describe('routingCalculator', () => {
                 },
               },
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'IMX',
@@ -1479,7 +1478,7 @@ describe('routingCalculator', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'ERC20',
@@ -1489,7 +1488,7 @@ describe('routingCalculator', () => {
                 },
               },
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'IMX',
@@ -1536,12 +1535,12 @@ describe('routingCalculator', () => {
         type: ItemType.ERC20,
         sufficient: false,
         delta: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         current: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           token: {
             name: 'ERC20_1',
@@ -1552,7 +1551,7 @@ describe('routingCalculator', () => {
         },
         required: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(2),
+          balance: BigInt(2),
           formattedBalance: '2',
           token: {
             name: 'ERC20_1',
@@ -1570,7 +1569,7 @@ describe('routingCalculator', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'ERC20',
@@ -1580,7 +1579,7 @@ describe('routingCalculator', () => {
                 },
               },
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'IMX',
@@ -1627,12 +1626,12 @@ describe('routingCalculator', () => {
         type: ItemType.ERC20,
         sufficient: false,
         delta: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         current: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           token: {
             name: 'ERC20_1',
@@ -1643,7 +1642,7 @@ describe('routingCalculator', () => {
         },
         required: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(2),
+          balance: BigInt(2),
           formattedBalance: '2',
           token: {
             name: 'ERC20_1',
@@ -1665,7 +1664,7 @@ describe('routingCalculator', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'ERC20',
@@ -1675,7 +1674,7 @@ describe('routingCalculator', () => {
                 },
               },
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'IMX',
@@ -1722,12 +1721,12 @@ describe('routingCalculator', () => {
         type: ItemType.ERC20,
         sufficient: false,
         delta: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         current: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           token: {
             name: 'ERC20_1',
@@ -1738,7 +1737,7 @@ describe('routingCalculator', () => {
         },
         required: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(2),
+          balance: BigInt(2),
           formattedBalance: '2',
           token: {
             name: 'ERC20_1',
@@ -1756,7 +1755,7 @@ describe('routingCalculator', () => {
             success: false,
             balances: [
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'ERC20',
@@ -1766,7 +1765,7 @@ describe('routingCalculator', () => {
                 },
               },
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'IMX',
@@ -1813,7 +1812,7 @@ describe('routingCalculator', () => {
         type: FundingStepType.SWAP,
         chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         asset: {
-          balance: BigNumber.from(10),
+          balance: BigInt(10),
           formattedBalance: '10',
           token: {
             name: 'ERC20',
@@ -1828,12 +1827,12 @@ describe('routingCalculator', () => {
         type: ItemType.ERC20,
         sufficient: false,
         delta: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         current: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           token: {
             name: 'ERC20_1',
@@ -1844,7 +1843,7 @@ describe('routingCalculator', () => {
         },
         required: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(2),
+          balance: BigInt(2),
           formattedBalance: '2',
           token: {
             name: 'ERC20_1',
@@ -1862,7 +1861,7 @@ describe('routingCalculator', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'ERC20',
@@ -1872,7 +1871,7 @@ describe('routingCalculator', () => {
                 },
               },
               {
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'IMX',
@@ -1907,12 +1906,12 @@ describe('routingCalculator', () => {
       type: ItemType.NATIVE,
       sufficient: false,
       delta: {
-        balance: BigNumber.from(5),
+        balance: BigInt(5),
         formattedBalance: '5',
       },
       current: {
         type: ItemType.NATIVE,
-        balance: BigNumber.from(5),
+        balance: BigInt(5),
         formattedBalance: '5',
         token: {
           name: 'IMX',
@@ -1923,7 +1922,7 @@ describe('routingCalculator', () => {
       },
       required: {
         type: ItemType.NATIVE,
-        balance: BigNumber.from(10),
+        balance: BigInt(10),
         formattedBalance: '10',
         token: {
           name: 'IMX',
@@ -1938,7 +1937,7 @@ describe('routingCalculator', () => {
       success: true,
       balances: [
         {
-          balance: BigNumber.from(10),
+          balance: BigInt(10),
           formattedBalance: '10',
           token: {
             name: 'ETH',
@@ -1947,7 +1946,7 @@ describe('routingCalculator', () => {
           },
         },
         {
-          balance: BigNumber.from(10),
+          balance: BigInt(10),
           formattedBalance: '10',
           token: {
             name: 'IMX',
@@ -1962,7 +1961,7 @@ describe('routingCalculator', () => {
       success: true,
       balances: [
         {
-          balance: BigNumber.from(10),
+          balance: BigInt(10),
           formattedBalance: '10',
           token: {
             name: 'ERC20',
@@ -1972,7 +1971,7 @@ describe('routingCalculator', () => {
           },
         },
         {
-          balance: BigNumber.from(10),
+          balance: BigInt(10),
           formattedBalance: '10',
           token: {
             name: 'IMX',
@@ -2155,11 +2154,11 @@ describe('routingCalculator', () => {
         fundingItem: {
           type: ItemType.ERC20,
           fundsRequired: {
-            amount: BigNumber.from(1),
-            formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+            amount: BigInt(1),
+            formattedAmount: formatUnits(BigInt(1), 18),
           },
           userBalance: {
-            balance: BigNumber.from(5),
+            balance: BigInt(5),
             formattedBalance: '5',
           },
           token: {
@@ -2176,11 +2175,11 @@ describe('routingCalculator', () => {
         fundingItem: {
           type: ItemType.ERC20,
           fundsRequired: {
-            amount: BigNumber.from(1),
-            formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+            amount: BigInt(1),
+            formattedAmount: formatUnits(BigInt(1), 18),
           },
           userBalance: {
-            balance: BigNumber.from(10),
+            balance: BigInt(10),
             formattedBalance: '10',
           },
           token: {

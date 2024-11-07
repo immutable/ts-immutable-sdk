@@ -12,7 +12,7 @@ import {
   TokenAmount,
   UnsignedTransferRequest,
 } from '@imtbl/x-client';
-import { TransactionResponse } from '@ethersproject/providers';
+import { TransactionResponse } from 'ethers';
 import { ProviderConfiguration } from './config';
 import { IMXProvider } from './imxProvider';
 import { Signers } from './signable-actions/types';

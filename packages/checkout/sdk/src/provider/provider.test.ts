@@ -1,7 +1,7 @@
 /*
  * @jest-environment jsdom
  */
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import { Passport } from '@imtbl/passport';
 import { CheckoutErrorType } from '../errors';
 import { WalletProviderName } from '../types';
@@ -20,7 +20,7 @@ let windowSpy: any;
 describe('createProvider', () => {
   const providerRequestMock: jest.Mock = jest.fn();
   const mockFindProvider = jest.fn().mockReturnValue(null);
-  const mockWeb3Provider: Web3Provider = new Web3Provider({
+  const mockBrowserProvider: BrowserProvider = new BrowserProvider({
     request: jest.fn(),
   });
 
@@ -50,27 +50,27 @@ describe('createProvider', () => {
   });
 
   it('should create a provider for Passport with a valid passport instance', async () => {
-    const mockPassport = { connectEvm: jest.fn(() => mockWeb3Provider) } as unknown as Passport;
+    const mockPassport = { connectEvm: jest.fn(() => mockBrowserProvider) } as unknown as Passport;
     const result = await createProvider(WalletProviderName.PASSPORT, mockPassport);
 
-    expect(result.provider).toBeInstanceOf(Web3Provider);
+    expect(result.provider).toBeInstanceOf(BrowserProvider);
     expect(result.walletProviderName).toBe(WalletProviderName.PASSPORT);
     expect(mockPassport.connectEvm).toHaveBeenCalled();
   });
 
   it('should create a provider for Passport when Passport is injected via EIP-6963', async () => {
-    mockFindProvider.mockReturnValue({ provider: mockWeb3Provider });
+    mockFindProvider.mockReturnValue({ provider: mockBrowserProvider });
     const result = await createProvider(WalletProviderName.PASSPORT);
 
-    expect(result.provider).toBeInstanceOf(Web3Provider);
+    expect(result.provider).toBeInstanceOf(BrowserProvider);
     expect(result.walletProviderName).toBe(WalletProviderName.PASSPORT);
   });
 
   it('should create a provider for Metamask when Metamask is injected via EIP-6963', async () => {
-    mockFindProvider.mockReturnValue({ provider: mockWeb3Provider });
+    mockFindProvider.mockReturnValue({ provider: mockBrowserProvider });
     const result = await createProvider(WalletProviderName.METAMASK);
 
-    expect(result.provider).toBeInstanceOf(Web3Provider);
+    expect(result.provider).toBeInstanceOf(BrowserProvider);
     expect(result.walletProviderName).toBe(WalletProviderName.METAMASK);
   });
 

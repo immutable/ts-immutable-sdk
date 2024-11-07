@@ -1,7 +1,3 @@
-import { TransactionRequest, TransactionResponse, Web3Provider } from '@ethersproject/providers';
-import {
-  BigNumber,
-} from 'ethers';
 import {
   ERC20Item,
   NativeItem,
@@ -41,11 +37,13 @@ import { calculateFees } from '../fees/fees';
 import { getAllBalances, resetBlockscoutClientMap } from '../../balances';
 import { debugLogger, measureAsyncExecution } from '../../logger/debugLogger';
 import { sendTransaction } from '../../transaction';
+import { TransactionRequest, TransactionResponse } from 'ethers';
+import { BrowserProvider } from 'ethers';
 
 export const getItemRequirement = (
   type: ItemType,
   tokenAddress: string,
-  amount: BigNumber,
+  amount: bigint,
   spenderAddress: string,
   isFee: boolean = false,
 ): ItemRequirement => {
@@ -83,14 +81,14 @@ export const getTransactionOrGas = (
     type: TransactionOrGasType.GAS,
     gasToken: {
       type: GasTokenType.NATIVE,
-      limit: BigNumber.from(gasLimit),
+      limit: BigInt(gasLimit),
     },
   };
 };
 
 export const buy = async (
   config: CheckoutConfiguration,
-  provider: Web3Provider,
+  provider: BrowserProvider,
   orders: Array<BuyOrder>,
   overrides: BuyOverrides = {
     waitFulfillmentSettlements: true,
@@ -116,7 +114,7 @@ export const buy = async (
   const fulfillerAddress = await measureAsyncExecution<string>(
     config,
     'Time to get the address from the provider',
-    provider.getSigner().getAddress(),
+    (await provider.getSigner()).getAddress(),
   );
 
   // Prefetch balances and store them in memory
@@ -173,7 +171,7 @@ export const buy = async (
   let fees: FeeValue[] = [];
   if (takerFees && takerFees.length > 0) {
     // eslint-disable-next-line max-len
-    const tokenQuantity = order.result.sell[0].type === ItemType.ERC721 ? BigNumber.from(1) : BigNumber.from(order.result.sell[0].amount);
+    const tokenQuantity = order.result.sell[0].type === ItemType.ERC721 ? BigInt(1) : BigInt(order.result.sell[0].amount);
     fees = calculateFees(takerFees, buyToken.amount, decimals, tokenQuantity);
   }
 
@@ -228,7 +226,7 @@ export const buy = async (
     // but get the fulfillment transactions after they have approved the spending
   }
 
-  let amount = BigNumber.from('0');
+  let amount = BigInt('0');
   let type: ItemType = ItemType.NATIVE;
   let contractAddress = '';
 
@@ -255,18 +253,18 @@ export const buy = async (
 
   buyArray.forEach((item: (ERC20Item | NativeItem)) => {
     if (item.type !== ItemType.ERC721 as string) {
-      amount = amount.add(BigNumber.from(item.amount));
+      amount = amount + BigInt(item.amount);
     }
   });
 
   const feeArray = order.result.fees;
   feeArray.forEach((item: any) => {
-    amount = amount.add(BigNumber.from(item.amount));
+    amount = amount + BigInt(item.amount);
   });
 
   // In the event that the user is filling an ERC1155 listing, the amount required will be scaled by the fill ratio
   if (order.result.sell[0].type === 'ERC1155' && fillAmount) {
-    amount = amount.mul(BigNumber.from(fillAmount)).div(BigNumber.from(order.result.sell[0].amount));
+    amount = amount * BigInt(fillAmount) / BigInt(order.result.sell[0].amount);
   }
 
   const itemRequirements = [

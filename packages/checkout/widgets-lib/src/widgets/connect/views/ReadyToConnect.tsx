@@ -1,4 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import {
   ChainId,
   WalletProviderName,
@@ -87,8 +87,8 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
   }, [history]);
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  const handleConnectViewUpdate = async (provider: Web3Provider) => {
-    const chainId = await provider.provider.request!({ method: 'eth_chainId', params: [] });
+  const handleConnectViewUpdate = async (provider: BrowserProvider) => {
+    const chainId = await provider.send!('eth_chainId', []);
     // eslint-disable-next-line radix
     const parsedChainId = parseInt(chainId.toString());
     if (parsedChainId !== targetChainId && !allowedChains?.includes(parsedChainId)) {

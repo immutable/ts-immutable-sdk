@@ -1,4 +1,4 @@
-import { toBeHex } from 'ethers-v6';
+import { toBeHex } from 'ethers';
 import type {
   ConsiderationItem,
   OfferItem,

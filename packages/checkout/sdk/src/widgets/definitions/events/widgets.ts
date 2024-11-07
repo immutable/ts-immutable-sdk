@@ -1,4 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import { WidgetLanguage } from '../configurations';
 
 /**
@@ -28,7 +28,7 @@ export enum ProviderEventType {
  * Payload type for the PROVIDER_UPDATED event
  */
 export type ProviderUpdated = {
-  provider: Web3Provider;
+  provider: BrowserProvider;
 };
 
 /**

@@ -1,7 +1,3 @@
-import { JsonRpcProvider } from '@ethersproject/providers';
-import { BigNumber } from '@ethersproject/bignumber';
-import { Contract } from '@ethersproject/contracts';
-import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import {
   expectToBeDefined,
@@ -17,14 +13,18 @@ import { ERC20__factory } from '../../contracts/types/factories/ERC20__factory';
 import { ApproveError } from '../../errors';
 import { SecondaryFee } from '../../types';
 import { getApproveGasEstimate, getApproveTransaction, prepareApproval } from './approval';
+import { Contract, JsonRpcProvider, MaxUint256 } from 'ethers';
 
-jest.mock('@ethersproject/providers');
-jest.mock('@ethersproject/contracts');
+jest.mock('ethers', () => ({
+  ...jest.requireActual('ethers'),
+  Contract: jest.fn(),
+  JsonRpcProvider: jest.fn(),
+}));
 
 // Mock the ERC20 token contract address and allowance values
 const spenderAddress = TEST_ROUTER_ADDRESS;
 const fromAddress = TEST_FROM_ADDRESS;
-const existingAllowance = BigNumber.from('1000000000000000000');
+const existingAllowance = BigInt('1000000000000000000');
 const tokenInAmount = newAmountFromString('2', WETH_TEST_TOKEN);
 
 describe('getApprovalTransaction', () => {
@@ -65,7 +65,7 @@ describe('getApprovalTransaction', () => {
   describe('when the allowance is less than the given amount', () => {
     it('should create an unsigned approve transaction with the full amount of the input token', async () => {
       const erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(() => ({
-        allowance: jest.fn().mockResolvedValue(BigNumber.from('1000000000000000000')),
+        allowance: jest.fn().mockResolvedValue(BigInt('1000000000000000000')),
       }));
       const provider = (JsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
         connect: jest.fn().mockResolvedValue(erc20Contract),
@@ -103,7 +103,7 @@ describe('getApprovalTransaction', () => {
   describe('when the allowance is 0', () => {
     it('should return the input amount', async () => {
       const erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(() => ({
-        allowance: jest.fn().mockResolvedValue(BigNumber.from('0')),
+        allowance: jest.fn().mockResolvedValue(BigInt('0')),
       }));
       const provider = (JsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
         connect: jest.fn().mockResolvedValue(erc20Contract),
@@ -167,7 +167,7 @@ describe('getApprovalTransaction', () => {
       const amount = newAmountFromString('2', WETH_TEST_TOKEN);
 
       const erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(() => ({
-        allowance: jest.fn().mockResolvedValue(BigNumber.from('0')),
+        allowance: jest.fn().mockResolvedValue(BigInt('0')),
       }));
       const provider = (JsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
         connect: jest.fn().mockResolvedValue(erc20Contract),
@@ -183,7 +183,7 @@ describe('getApprovalTransaction', () => {
 describe('getApproveGasEstimate', () => {
   describe('when given valid arguments', () => {
     it('should include the fromAddress when estimating gas for approval', async () => {
-      const approveGasEstimate = BigNumber.from('100000');
+      const approveGasEstimate = BigInt('100000');
       const approveMock = jest.fn().mockResolvedValue(approveGasEstimate);
 
       const erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(() => ({
@@ -194,7 +194,7 @@ describe('getApproveGasEstimate', () => {
       })) as unknown as JsonRpcProvider;
 
       await getApproveGasEstimate(provider, fromAddress, spenderAddress, WETH_TEST_TOKEN.address);
-      expect(approveMock).toHaveBeenCalledWith(spenderAddress, ethers.constants.MaxUint256, {
+      expect(approveMock).toHaveBeenCalledWith(spenderAddress, MaxUint256, {
         from: fromAddress,
       });
     });

@@ -1,5 +1,3 @@
-import { BigNumber } from 'ethers';
-import { Web3Provider } from '@ethersproject/providers';
 import { overrideBalanceCheckResult, smartCheckout } from './smartCheckout';
 import {
   GasAmount,
@@ -16,6 +14,7 @@ import { balanceCheck } from './balanceCheck';
 import { routingCalculator } from './routing/routingCalculator';
 import { getAvailableRoutingOptions } from './routing';
 import { BalanceCheckResult } from './balanceCheck/types';
+import { BrowserProvider } from 'ethers';
 
 jest.mock('./routing');
 jest.mock('./allowance');
@@ -24,7 +23,7 @@ jest.mock('./balanceCheck');
 jest.mock('./routing/routingCalculator');
 
 describe('smartCheckout', () => {
-  let mockProvider: Web3Provider;
+  let mockProvider: BrowserProvider;
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -33,7 +32,7 @@ describe('smartCheckout', () => {
       getSigner: jest.fn().mockReturnValue({
         getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
       }),
-    } as unknown as Web3Provider;
+    } as unknown as BrowserProvider;
 
     (routingCalculator as jest.Mock).mockResolvedValue({
       type: RoutingOutcomeType.NO_ROUTES_FOUND,
@@ -70,7 +69,7 @@ describe('smartCheckout', () => {
 
       (gasCalculator as jest.Mock).mockResolvedValue({
         type: ItemType.NATIVE,
-        amount: BigNumber.from(1),
+        amount: BigInt(1),
       });
 
       (balanceCheck as jest.Mock).mockResolvedValue({
@@ -80,7 +79,7 @@ describe('smartCheckout', () => {
             type: ItemType.NATIVE,
             sufficient: true,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'IMX',
@@ -90,7 +89,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'IMX',
@@ -100,7 +99,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -108,7 +107,7 @@ describe('smartCheckout', () => {
             type: ItemType.ERC20,
             sufficient: true,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -118,7 +117,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -128,7 +127,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -136,17 +135,17 @@ describe('smartCheckout', () => {
             type: ItemType.ERC721,
             sufficient: true,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               id: '0',
               contractAddress: '0xCollection',
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -156,7 +155,7 @@ describe('smartCheckout', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
       ];
@@ -165,7 +164,7 @@ describe('smartCheckout', () => {
         type: TransactionOrGasType.GAS,
         gasToken: {
           type: GasTokenType.NATIVE,
-          limit: BigNumber.from(1),
+          limit: BigInt(1),
         },
       };
 
@@ -183,7 +182,7 @@ describe('smartCheckout', () => {
             type: ItemType.NATIVE,
             sufficient: true,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'IMX',
@@ -193,7 +192,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'IMX',
@@ -203,7 +202,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -211,7 +210,7 @@ describe('smartCheckout', () => {
             type: ItemType.ERC20,
             sufficient: true,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -221,7 +220,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -231,7 +230,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -239,17 +238,17 @@ describe('smartCheckout', () => {
             type: ItemType.ERC721,
             sufficient: true,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               id: '0',
               contractAddress: '0xCollection',
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -275,7 +274,7 @@ describe('smartCheckout', () => {
 
       (gasCalculator as jest.Mock).mockResolvedValue({
         type: ItemType.NATIVE,
-        amount: BigNumber.from(1),
+        amount: BigInt(1),
       });
 
       (balanceCheck as jest.Mock).mockResolvedValue({
@@ -285,7 +284,7 @@ describe('smartCheckout', () => {
             type: ItemType.NATIVE,
             sufficient: true,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'IMX',
@@ -295,7 +294,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'IMX',
@@ -305,7 +304,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(0),
+              balance: BigInt(0),
               formattedBalance: '0',
             },
           },
@@ -313,7 +312,7 @@ describe('smartCheckout', () => {
             type: ItemType.ERC20,
             sufficient: true,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -323,7 +322,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -333,7 +332,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(0),
+              balance: BigInt(0),
               formattedBalance: '0',
             },
           },
@@ -341,17 +340,17 @@ describe('smartCheckout', () => {
             type: ItemType.ERC1155,
             sufficient: true,
             required: {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10.0',
               id: '0',
               contractAddress: '0xCollection',
             },
             current: {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10.0',
             },
             delta: {
-              balance: BigNumber.from(0),
+              balance: BigInt(0),
               formattedBalance: '0',
             },
           },
@@ -361,7 +360,7 @@ describe('smartCheckout', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
       ];
@@ -370,7 +369,7 @@ describe('smartCheckout', () => {
         type: TransactionOrGasType.GAS,
         gasToken: {
           type: GasTokenType.NATIVE,
-          limit: BigNumber.from(1),
+          limit: BigInt(1),
         },
       };
 
@@ -388,7 +387,7 @@ describe('smartCheckout', () => {
             type: ItemType.NATIVE,
             sufficient: true,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'IMX',
@@ -398,7 +397,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'IMX',
@@ -408,7 +407,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(0),
+              balance: BigInt(0),
               formattedBalance: '0',
             },
           },
@@ -416,7 +415,7 @@ describe('smartCheckout', () => {
             type: ItemType.ERC20,
             sufficient: true,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -426,7 +425,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -436,7 +435,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(0),
+              balance: BigInt(0),
               formattedBalance: '0',
             },
           },
@@ -444,17 +443,17 @@ describe('smartCheckout', () => {
             type: ItemType.ERC1155,
             sufficient: true,
             required: {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10.0',
               id: '0',
               contractAddress: '0xCollection',
             },
             current: {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10.0',
             },
             delta: {
-              balance: BigNumber.from(0),
+              balance: BigInt(0),
               formattedBalance: '0',
             },
           },
@@ -480,7 +479,7 @@ describe('smartCheckout', () => {
 
       (gasCalculator as jest.Mock).mockResolvedValue({
         type: ItemType.NATIVE,
-        amount: BigNumber.from(1),
+        amount: BigInt(1),
       });
 
       (balanceCheck as jest.Mock).mockResolvedValue({
@@ -490,7 +489,7 @@ describe('smartCheckout', () => {
             type: ItemType.NATIVE,
             sufficient: true,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'IMX',
@@ -500,7 +499,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'IMX',
@@ -510,7 +509,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -518,7 +517,7 @@ describe('smartCheckout', () => {
             type: ItemType.ERC20,
             sufficient: true,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -528,7 +527,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -538,7 +537,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -546,17 +545,17 @@ describe('smartCheckout', () => {
             type: ItemType.ERC721,
             sufficient: true,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               id: '0',
               contractAddress: '0xCollection',
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -566,7 +565,7 @@ describe('smartCheckout', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
       ];
@@ -575,7 +574,7 @@ describe('smartCheckout', () => {
         type: TransactionOrGasType.GAS,
         gasToken: {
           type: GasTokenType.NATIVE,
-          limit: BigNumber.from(1),
+          limit: BigInt(1),
         },
       };
 
@@ -587,7 +586,7 @@ describe('smartCheckout', () => {
               type: ItemType.NATIVE,
               sufficient: true,
               required: {
-                balance: BigNumber.from(1),
+                balance: BigInt(1),
                 formattedBalance: '1.0',
                 token: {
                   name: 'IMX',
@@ -597,7 +596,7 @@ describe('smartCheckout', () => {
                 },
               },
               current: {
-                balance: BigNumber.from(1),
+                balance: BigInt(1),
                 formattedBalance: '1.0',
                 token: {
                   name: 'IMX',
@@ -607,7 +606,7 @@ describe('smartCheckout', () => {
                 },
               },
               delta: {
-                balance: BigNumber.from(1),
+                balance: BigInt(1),
                 formattedBalance: '1.0',
               },
             },
@@ -615,7 +614,7 @@ describe('smartCheckout', () => {
               type: ItemType.ERC20,
               sufficient: true,
               required: {
-                balance: BigNumber.from(1),
+                balance: BigInt(1),
                 formattedBalance: '1.0',
                 token: {
                   name: 'zkTKN',
@@ -625,7 +624,7 @@ describe('smartCheckout', () => {
                 },
               },
               current: {
-                balance: BigNumber.from(1),
+                balance: BigInt(1),
                 formattedBalance: '1.0',
                 token: {
                   name: 'zkTKN',
@@ -635,7 +634,7 @@ describe('smartCheckout', () => {
                 },
               },
               delta: {
-                balance: BigNumber.from(1),
+                balance: BigInt(1),
                 formattedBalance: '1.0',
               },
             },
@@ -643,17 +642,17 @@ describe('smartCheckout', () => {
               type: ItemType.ERC721,
               sufficient: true,
               required: {
-                balance: BigNumber.from(1),
+                balance: BigInt(1),
                 formattedBalance: '1.0',
                 id: '0',
                 contractAddress: '0xCollection',
               },
               current: {
-                balance: BigNumber.from(1),
+                balance: BigInt(1),
                 formattedBalance: '1.0',
               },
               delta: {
-                balance: BigNumber.from(1),
+                balance: BigInt(1),
                 formattedBalance: '1.0',
               },
             },
@@ -690,7 +689,7 @@ describe('smartCheckout', () => {
 
       (gasCalculator as jest.Mock).mockResolvedValue({
         type: ItemType.NATIVE,
-        amount: BigNumber.from(1),
+        amount: BigInt(1),
       });
 
       (balanceCheck as jest.Mock).mockResolvedValue({
@@ -700,7 +699,7 @@ describe('smartCheckout', () => {
             type: ItemType.NATIVE,
             sufficient: false,
             required: {
-              balance: BigNumber.from(2),
+              balance: BigInt(2),
               formattedBalance: '2.0',
               token: {
                 name: 'IMX',
@@ -710,7 +709,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'IMX',
@@ -720,7 +719,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -728,7 +727,7 @@ describe('smartCheckout', () => {
             type: ItemType.ERC20,
             sufficient: false,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -738,7 +737,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -748,7 +747,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -756,19 +755,19 @@ describe('smartCheckout', () => {
             type: ItemType.ERC721,
             sufficient: false,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               id: '0',
               contractAddress: '0xCollection',
             },
             current: {
-              balance: BigNumber.from(0),
+              balance: BigInt(0),
               formattedBalance: '0.0',
               id: '0',
               contractAddress: '0xCollection',
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -778,7 +777,7 @@ describe('smartCheckout', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
       ];
@@ -787,7 +786,7 @@ describe('smartCheckout', () => {
         type: TransactionOrGasType.GAS,
         gasToken: {
           type: GasTokenType.NATIVE,
-          limit: BigNumber.from(1),
+          limit: BigInt(1),
         },
       };
 
@@ -805,7 +804,7 @@ describe('smartCheckout', () => {
             type: ItemType.NATIVE,
             sufficient: false,
             required: {
-              balance: BigNumber.from(2),
+              balance: BigInt(2),
               formattedBalance: '2.0',
               token: {
                 name: 'IMX',
@@ -815,7 +814,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'IMX',
@@ -825,7 +824,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -833,7 +832,7 @@ describe('smartCheckout', () => {
             type: ItemType.ERC20,
             sufficient: false,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -843,7 +842,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -853,7 +852,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -861,19 +860,19 @@ describe('smartCheckout', () => {
             type: ItemType.ERC721,
             sufficient: false,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               id: '0',
               contractAddress: '0xCollection',
             },
             current: {
-              balance: BigNumber.from(0),
+              balance: BigInt(0),
               formattedBalance: '0.0',
               id: '0',
               contractAddress: '0xCollection',
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -910,7 +909,7 @@ describe('smartCheckout', () => {
 
       (gasCalculator as jest.Mock).mockResolvedValue({
         type: ItemType.NATIVE,
-        amount: BigNumber.from(1),
+        amount: BigInt(1),
       });
 
       (balanceCheck as jest.Mock).mockResolvedValue({
@@ -920,7 +919,7 @@ describe('smartCheckout', () => {
             type: ItemType.NATIVE,
             sufficient: false,
             required: {
-              balance: BigNumber.from(2),
+              balance: BigInt(2),
               formattedBalance: '2.0',
               token: {
                 name: 'IMX',
@@ -930,7 +929,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'IMX',
@@ -940,7 +939,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -948,7 +947,7 @@ describe('smartCheckout', () => {
             type: ItemType.ERC20,
             sufficient: false,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -958,7 +957,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -968,7 +967,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -976,19 +975,19 @@ describe('smartCheckout', () => {
             type: ItemType.ERC721,
             sufficient: false,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               id: '0',
               contractAddress: '0xCollection',
             },
             current: {
-              balance: BigNumber.from(0),
+              balance: BigInt(0),
               formattedBalance: '0.0',
               id: '0',
               contractAddress: '0xCollection',
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -998,7 +997,7 @@ describe('smartCheckout', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
       ];
@@ -1007,7 +1006,7 @@ describe('smartCheckout', () => {
         type: TransactionOrGasType.GAS,
         gasToken: {
           type: GasTokenType.NATIVE,
-          limit: BigNumber.from(1),
+          limit: BigInt(1),
         },
       };
 
@@ -1015,7 +1014,7 @@ describe('smartCheckout', () => {
         getSigner: jest.fn().mockReturnValue({
           getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
         }),
-      } as unknown as Web3Provider;
+      } as unknown as BrowserProvider;
 
       const result = await smartCheckout(
         {} as CheckoutConfiguration,
@@ -1031,7 +1030,7 @@ describe('smartCheckout', () => {
             type: ItemType.NATIVE,
             sufficient: false,
             required: {
-              balance: BigNumber.from(2),
+              balance: BigInt(2),
               formattedBalance: '2.0',
               token: {
                 name: 'IMX',
@@ -1041,7 +1040,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'IMX',
@@ -1051,7 +1050,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -1059,7 +1058,7 @@ describe('smartCheckout', () => {
             type: ItemType.ERC20,
             sufficient: false,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -1069,7 +1068,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -1079,7 +1078,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -1087,19 +1086,19 @@ describe('smartCheckout', () => {
             type: ItemType.ERC721,
             sufficient: false,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               id: '0',
               contractAddress: '0xCollection',
             },
             current: {
-              balance: BigNumber.from(0),
+              balance: BigInt(0),
               formattedBalance: '0.0',
               id: '0',
               contractAddress: '0xCollection',
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -1141,7 +1140,7 @@ describe('smartCheckout', () => {
             type: ItemType.ERC20,
             sufficient: false,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -1151,7 +1150,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -1161,7 +1160,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -1172,7 +1171,7 @@ describe('smartCheckout', () => {
         {
           type: ItemType.ERC20,
           tokenAddress: '0xERC20',
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           spenderAddress: '0x1',
           isFee: false,
         },
@@ -1194,7 +1193,7 @@ describe('smartCheckout', () => {
             type: ItemType.ERC20,
             sufficient: false,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -1204,7 +1203,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -1214,7 +1213,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -1262,7 +1261,7 @@ describe('smartCheckout', () => {
             type: ItemType.ERC20,
             sufficient: false,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -1272,7 +1271,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -1282,7 +1281,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -1293,7 +1292,7 @@ describe('smartCheckout', () => {
         {
           type: ItemType.ERC20,
           tokenAddress: '0xERC20',
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           spenderAddress: '0x1',
           isFee: false,
         },
@@ -1316,7 +1315,7 @@ describe('smartCheckout', () => {
             type: ItemType.ERC20,
             sufficient: false,
             required: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -1326,7 +1325,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
               token: {
                 name: 'zkTKN',
@@ -1336,7 +1335,7 @@ describe('smartCheckout', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1.0',
             },
           },
@@ -1366,11 +1365,11 @@ describe('smartCheckout', () => {
             sufficient: true,
             type: ItemType.NATIVE,
             delta: {
-              balance: BigNumber.from(0),
+              balance: BigInt(0),
               formattedBalance: '0.0',
             },
             current: {
-              balance: BigNumber.from(100),
+              balance: BigInt(100),
               formattedBalance: '100.0',
               token: {
                 address: 'native',
@@ -1381,7 +1380,7 @@ describe('smartCheckout', () => {
               type: ItemType.NATIVE,
             },
             required: {
-              balance: BigNumber.from(100),
+              balance: BigInt(100),
               formattedBalance: '100.0',
               token: {
                 address: 'native',
@@ -1397,12 +1396,12 @@ describe('smartCheckout', () => {
             sufficient: true,
             type: ItemType.ERC20,
             delta: {
-              balance: BigNumber.from(-50),
+              balance: BigInt(-50),
               formattedBalance: '-50.0',
             },
             current: {
               type: ItemType.ERC20,
-              balance: BigNumber.from(50),
+              balance: BigInt(50),
               formattedBalance: '50.0',
               token: {
                 address: '0x3b2d8a1931736fc321c24864bceee981b11c3c57',
@@ -1413,7 +1412,7 @@ describe('smartCheckout', () => {
             },
             required: {
               type: ItemType.ERC20,
-              balance: BigNumber.from(100),
+              balance: BigInt(100),
               formattedBalance: '100.0',
               token: {
                 address: '0x3b2d8a1931736fc321c24864bceee981b11c3c57',
@@ -1463,15 +1462,15 @@ describe('smartCheckout', () => {
             type: ItemType.ERC20,
             sufficient: true,
             required: {
-              balance: BigNumber.from(100),
+              balance: BigInt(100),
               formattedBalance: '100.0',
             },
             current: {
-              balance: BigNumber.from(90),
+              balance: BigInt(90),
               formattedBalance: '90.0',
             },
             delta: {
-              balance: BigNumber.from(-10),
+              balance: BigInt(-10),
               formattedBalance: '-10.0',
             },
           },
@@ -1484,7 +1483,7 @@ describe('smartCheckout', () => {
         {
           type: ItemType.ERC20,
           tokenAddress: '0xERC20',
-          amount: BigNumber.from(10),
+          amount: BigInt(10),
           spenderAddress: '0x1',
           isFee: false,
         },

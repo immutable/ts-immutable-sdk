@@ -1,14 +1,14 @@
 import { ChainId, Checkout, GetBalanceResult, TokenInfo } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
 import { Box, FormControl, TextInput } from '@biom3/react';
 import React from 'react';
+import { BrowserProvider } from 'ethers';
 
 interface SwapProps {
   checkout: Checkout | undefined;
-  provider: Web3Provider | undefined;
+  provider: BrowserProvider | undefined;
 }
 
 export default function Swap(props: SwapProps) {

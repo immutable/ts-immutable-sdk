@@ -2,17 +2,17 @@
 import { checkout } from '@imtbl/sdk';
 import { checkoutSDK } from '../utils/setupDefault';
 import { useState } from 'react';
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers/providers';
 import { WalletInfo, WalletProviderName } from '@imtbl/sdk/checkout';
-import { Button, Heading, Body, Link, Table } from '@biom3/react';
+import { Button, Heading, Link, Table } from '@biom3/react';
 import NextLink from 'next/link';
 
 export default function ConnectWithMetamask() {
 
-const [provider, setProvider] = useState<Web3Provider>();
+const [provider, setProvider] = useState<BrowserProvider>();
 const [walletProviderName, setWalletProviderName] = useState<WalletProviderName>();
 const [supportedWallets, setSupportedWallets] = useState<WalletInfo[]>();
-const [connectedProvider, setConnectedProvider] = useState<Web3Provider>();
+const [connectedProvider, setConnectedProvider] = useState<BrowserProvider>();
 const [isValidProvider, setIsValidProvider] = useState<boolean>();
 const [isConnected, setIsConnected] = useState<boolean>();
 const [walletAddress, setWalletAddress] = useState<string>();

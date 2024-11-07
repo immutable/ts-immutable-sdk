@@ -1,4 +1,3 @@
-import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
   IWidgetsFactory,
@@ -10,6 +9,7 @@ import {
   WidgetType,
 } from '@imtbl/checkout-sdk';
 import './i18n';
+import { BrowserProvider } from 'ethers';
 import {
   addProviderListenersForWidgetRoot,
   DEFAULT_THEME,
@@ -50,7 +50,7 @@ export class WidgetsFactory implements IWidgetsFactory {
     }
   }
 
-  updateProvider(provider: Web3Provider) {
+  updateProvider(provider: BrowserProvider) {
     addProviderListenersForWidgetRoot(provider);
     sendProviderUpdatedEvent({ provider });
   }

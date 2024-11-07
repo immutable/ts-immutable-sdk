@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import {
   Amount,
   Fee,
@@ -28,7 +27,7 @@ describe('formatSwapFees', () => {
       } as Quote,
       swap: {
         gasFeeEstimate: {
-          value: BigNumber.from(100),
+          value: BigInt(100),
           token: {
             decimals: 18,
             symbol: 'ETH',
@@ -68,7 +67,7 @@ describe('formatSwapFees', () => {
           recipient: '0x123',
           basisPoints: 100,
           amount: {
-            value: BigNumber.from(100),
+            value: BigInt(100),
             token: {
               symbol: 'ETH',
               address: '0x123',
@@ -80,7 +79,7 @@ describe('formatSwapFees', () => {
       } as Quote,
       swap: {
         gasFeeEstimate: {
-          value: BigNumber.from(0),
+          value: BigInt(0),
         },
       },
       approval: null,

@@ -1,4 +1,3 @@
-import { BigNumber, utils } from 'ethers';
 import {
   Amount,
   Fee,
@@ -8,6 +7,7 @@ import {
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { TFunction } from 'i18next';
 import { formatQuoteConversionRate } from './swapConversionRate';
+import { parseEther } from 'ethers';
 
 describe('formatQuoteConversionRate', () => {
   const mockTranslate = jest.fn();
@@ -28,7 +28,7 @@ describe('formatQuoteConversionRate', () => {
     const mockQuote = {
       quote: {
         amount: {
-          value: BigNumber.from('2000000000000000000'),
+          value: BigInt('2000000000000000000'),
           token: {
             symbol: 'DAI',
             address: '0x456',
@@ -42,7 +42,7 @@ describe('formatQuoteConversionRate', () => {
           recipient: '0x000',
           basisPoints: 100,
           amount: {
-            value: BigNumber.from('100000000000000000'),
+            value: BigInt('100000000000000000'),
             token: {
               symbol: 'ETH',
               address: '0x123',
@@ -54,12 +54,12 @@ describe('formatQuoteConversionRate', () => {
       } as Quote,
       swap: {
         gasFeeEstimate: {
-          value: BigNumber.from(100),
+          value: BigInt(100),
         },
       },
       approval: {
         gasFeeEstimate: {
-          value: BigNumber.from(50),
+          value: BigInt(50),
         },
       },
     } as TransactionResponse;
@@ -87,7 +87,7 @@ describe('formatQuoteConversionRate', () => {
     const mockQuote = {
       quote: {
         amount: {
-          value: BigNumber.from('2000000000000000000'),
+          value: BigInt('2000000000000000000'),
           token: {
             symbol: 'DAI',
             address: '0x456',
@@ -101,7 +101,7 @@ describe('formatQuoteConversionRate', () => {
           recipient: '0x000',
           basisPoints: 100,
           amount: {
-            value: BigNumber.from('150000000000000000'),
+            value: BigInt('150000000000000000'),
             token: {
               symbol: 'ETH',
               address: '0x123',
@@ -113,12 +113,12 @@ describe('formatQuoteConversionRate', () => {
       } as Quote,
       swap: {
         gasFeeEstimate: {
-          value: BigNumber.from(100),
+          value: BigInt(100),
         },
       },
       approval: {
         gasFeeEstimate: {
-          value: BigNumber.from(50),
+          value: BigInt(50),
         },
       },
     } as TransactionResponse;
@@ -146,7 +146,7 @@ describe('formatQuoteConversionRate', () => {
     const mockQuote = {
       quote: {
         amount: {
-          value: utils.parseEther('500'),
+          value: parseEther('500'),
           token: {
             symbol: 'DAI',
             address: '0x456',
@@ -161,7 +161,7 @@ describe('formatQuoteConversionRate', () => {
             recipient: '0x000',
             basisPoints: 100,
             amount: {
-              value: BigNumber.from('150000000000000000'),
+              value: BigInt('150000000000000000'),
               token: {
                 symbol: 'ETH',
                 address: '0x123',
@@ -174,12 +174,12 @@ describe('formatQuoteConversionRate', () => {
       } as Quote,
       swap: {
         gasFeeEstimate: {
-          value: BigNumber.from(100),
+          value: BigInt(100),
         },
       },
       approval: {
         gasFeeEstimate: {
-          value: BigNumber.from(50),
+          value: BigInt(50),
         },
       },
     } as TransactionResponse;
@@ -213,7 +213,7 @@ describe('formatQuoteConversionRate', () => {
     const mockQuote = {
       quote: {
         amount: {
-          value: BigNumber.from('2000000000000000000'),
+          value: BigInt('2000000000000000000'),
           token: {
             symbol: 'DAI',
             address: '0x456',
@@ -227,12 +227,12 @@ describe('formatQuoteConversionRate', () => {
       } as Quote,
       swap: {
         gasFeeEstimate: {
-          value: BigNumber.from(100),
+          value: BigInt(100),
         },
       },
       approval: {
         gasFeeEstimate: {
-          value: BigNumber.from(50),
+          value: BigInt(50),
         },
       },
     } as TransactionResponse;

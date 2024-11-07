@@ -1,4 +1,3 @@
-import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
 import {
   ChainId,
@@ -25,6 +24,7 @@ import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContex
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { identifyUser } from '../../lib/analytics/identifyUser';
+import { BrowserProvider } from 'ethers';
 
 export interface ConnectLoaderProps {
   children?: React.ReactNode;
@@ -39,7 +39,7 @@ export interface ConnectLoaderProps {
 export interface ConnectLoaderParams {
   targetChainId: ChainId;
   walletProviderName?: WalletProviderName;
-  web3Provider?: Web3Provider;
+  web3Provider?: BrowserProvider;
   checkout: Checkout;
   allowedChains: ChainId[];
   isCheckNetworkEnabled?: boolean;
@@ -79,7 +79,7 @@ export function ConnectLoader({
 
   const { identify, user } = useAnalytics();
 
-  const hasNoWalletProviderNameAndNoWeb3Provider = (localProvider?: Web3Provider): boolean => {
+  const hasNoWalletProviderNameAndNoBrowserProvider = (localProvider?: BrowserProvider): boolean => {
     if (!walletProviderName && !localProvider) {
       connectLoaderDispatch({
         payload: {
@@ -93,7 +93,7 @@ export function ConnectLoader({
     return false;
   };
 
-  const hasWalletProviderNameAndNoWeb3Provider = async (localProvider?: Web3Provider): Promise<boolean> => {
+  const hasWalletProviderNameAndNoBrowserProvider = async (localProvider?: BrowserProvider): Promise<boolean> => {
     try {
       // If the wallet provider name was passed through but the provider was
       // not injected then create a provider using the wallet provider name
@@ -142,7 +142,7 @@ export function ConnectLoader({
     return false;
   };
 
-  const isWalletConnected = async (localProvider: Web3Provider): Promise<boolean> => {
+  const isWalletConnected = async (localProvider: BrowserProvider): Promise<boolean> => {
     const { isConnected } = await checkout.checkIsWalletConnected({
       provider: localProvider!,
     });
@@ -169,8 +169,8 @@ export function ConnectLoader({
     (async () => {
       if (!checkout) return;
 
-      if (hasNoWalletProviderNameAndNoWeb3Provider(web3Provider)) return;
-      if (await hasWalletProviderNameAndNoWeb3Provider(web3Provider)) return;
+      if (hasNoWalletProviderNameAndNoBrowserProvider(web3Provider)) return;
+      if (await hasWalletProviderNameAndNoBrowserProvider(web3Provider)) return;
 
       try {
         connectLoaderDispatch({
@@ -180,7 +180,7 @@ export function ConnectLoader({
           },
         });
         // TODO: handle all of the inner try catches with error handling
-        // At this point the Web3Provider exists
+        // At this point the BrowserProvider exists
         // This will bypass the wallet list screen
         const isConnected = (await isWalletConnected(web3Provider!));
         if (!isConnected) return;

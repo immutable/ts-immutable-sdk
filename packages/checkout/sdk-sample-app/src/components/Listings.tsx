@@ -1,15 +1,15 @@
 import { Checkout } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
 import { Body, Box, FormControl, TextInput } from '@biom3/react';
 import { OrderStatusName, Orderbook } from '@imtbl/orderbook';
 import { Environment } from '@imtbl/config';
+import { BrowserProvider } from 'ethers';
 
 interface ListingsProps {
   checkout: Checkout;
-  provider: Web3Provider | undefined;
+  provider: BrowserProvider | undefined;
 }
 
 export default function Listings({ checkout, provider }: ListingsProps) {

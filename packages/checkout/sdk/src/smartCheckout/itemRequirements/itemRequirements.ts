@@ -1,5 +1,3 @@
-import { Web3Provider } from '@ethersproject/providers';
-import { utils } from 'ethers';
 import {
   ERC1155Item,
   ERC1155ItemRequirement,
@@ -14,9 +12,10 @@ import {
 } from '../../types';
 import { getTokenContract } from '../../instance';
 import { ERC20ABI } from '../../env';
+import { BrowserProvider, parseUnits } from 'ethers';
 
 export async function getItemRequirementsFromRequirements(
-  provider: Web3Provider,
+  provider: BrowserProvider,
   requirements: (NativeItemRequirement | ERC20ItemRequirement | ERC721ItemRequirement | ERC1155ItemRequirement)[],
 ): Promise<ItemRequirement[]> {
   // Get all decimal values by calling contracts for each ERC20
@@ -35,14 +34,14 @@ export async function getItemRequirementsFromRequirements(
     if (itemRequirementParam.type === ItemType.NATIVE) {
       return {
         ...itemRequirementParam,
-        amount: utils.parseUnits(itemRequirementParam.amount, 18),
+        amount: parseUnits(itemRequirementParam.amount, 18),
       } as NativeItem;
     }
 
     if (itemRequirementParam.type === ItemType.ERC20) {
       return {
         ...itemRequirementParam,
-        amount: utils.parseUnits(itemRequirementParam.amount, decimals[index]),
+        amount: parseUnits(itemRequirementParam.amount, decimals[index]),
       } as ERC20Item;
     }
 

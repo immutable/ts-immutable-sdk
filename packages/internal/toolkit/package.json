@@ -5,16 +5,13 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "@ethersproject/abstract-signer": "^5.7.0",
-    "@ethersproject/providers": "^5.7.2",
-    "@ethersproject/wallet": "^5.7.0",
     "@imtbl/x-client": "workspace:*",
     "@magic-ext/oidc": "4.3.1",
     "@metamask/detect-provider": "^2.0.0",
     "axios": "^1.6.5",
     "bn.js": "^5.2.1",
     "enc-utils": "^3.0.0",
-    "ethers": "^5.7.2",
+    "ethers": "^6.13.4",
     "magic-sdk": "^21.2.0",
     "oidc-client-ts": "2.4.0"
   },

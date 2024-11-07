@@ -1,4 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import {
   ChainId,
   Checkout,
@@ -13,7 +13,7 @@ import { getTokenImageByAddress, isNativeToken } from './utils';
 
 export type GetAllowedBalancesParamsType = {
   checkout: Checkout,
-  provider: Web3Provider,
+  provider: BrowserProvider,
   allowTokenListType: TokenFilterTypes,
   allowZero?: boolean,
   retryPolicy?: RetryType,
@@ -35,7 +35,7 @@ export const getAllowedBalances = async ({
 }: GetAllowedBalancesParamsType): Promise<GetAllowedBalancesResultType | undefined> => {
   const currentChainId = chainId || (await checkout.getNetworkInfo({ provider })).chainId;
 
-  const walletAddress = await provider.getSigner().getAddress();
+  const walletAddress = await (await provider.getSigner()).getAddress();
   const tokenBalances = await retry(
     () => checkout.getAllBalances({
       provider,
@@ -67,7 +67,7 @@ export const getAllowedBalances = async ({
   const allowedBalances = tokenBalances.balances
     .filter((balance) => {
       // Balance is <= 0 and it is not allow to have zeros
-      if (balance.balance.lte(0) && !allowZero) return false;
+      if (balance.balance <= 0 && !allowZero) return false;
       return tokensAddresses.get(balance.token.address?.toLowerCase() || NATIVE);
     })
     .map((balanceResult) => ({

@@ -1,20 +1,20 @@
 import { Checkout } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
 import { Stack } from '@biom3/react';
+import { BrowserProvider } from 'ethers';
 
 interface ConnectProps {
   checkout: Checkout;
-  setProvider: (provider: Web3Provider) => void;
-  provider: Web3Provider | undefined;
+  setProvider: (provider: BrowserProvider) => void;
+  provider: BrowserProvider | undefined;
 }
 
 export default function Connect(props: ConnectProps) {
   const { setProvider, checkout, provider } = props;
 
-  const [result, setResult] = useState<Web3Provider>();
+  const [result, setResult] = useState<BrowserProvider>();
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 

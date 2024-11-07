@@ -1,5 +1,3 @@
-import { Web3Provider } from '@ethersproject/providers';
-import { BigNumber, Contract, utils } from 'ethers';
 import {
   ERC20Item,
   ERC721Balance,
@@ -24,13 +22,14 @@ import {
 } from './balanceRequirement';
 import { ERC721ABI, NATIVE } from '../../env';
 import { isMatchingAddress } from '../../utils/utils';
+import { BrowserProvider, Contract, formatUnits } from 'ethers';
 
 /**
  * Gets the balances for all NATIVE and ERC20 balance requirements.
  */
 const getTokenBalances = async (
   config: CheckoutConfiguration,
-  provider: Web3Provider,
+  provider: BrowserProvider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
   forceFetch: boolean = false,
@@ -60,7 +59,7 @@ const getTokenBalances = async (
  * Gets the balances for all ERC721 balance requirements.
  */
 const getERC721Balances = async (
-  provider: Web3Provider,
+  provider: BrowserProvider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
 ) : Promise<ItemBalance[]> => {
@@ -94,7 +93,7 @@ const getERC721Balances = async (
       }
       erc721Balances.push({
         type: ItemType.ERC721,
-        balance: BigNumber.from(itemCount),
+        balance: BigInt(itemCount),
         formattedBalance: itemCount.toString(),
         contractAddress: (itemRequirement as ERC721Item).contractAddress,
         id: (itemRequirement as ERC721Item).id,
@@ -116,7 +115,7 @@ const getERC721Balances = async (
  */
 export const balanceCheck = async (
   config: CheckoutConfiguration,
-  provider: Web3Provider,
+  provider: BrowserProvider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
   forceFetch: boolean = false,
@@ -189,12 +188,12 @@ export const balanceCheck = async (
         return;
       }
 
-      const updatedBalance = currentBalance.balance.sub(requirement.required.balance);
+      const updatedBalance = currentBalance.balance - requirement.required.balance;
 
       balances.set(tokenAddress, {
         ...currentBalance,
         balance: updatedBalance,
-        formattedBalance: utils.formatUnits(updatedBalance, requirement.required.token.decimals),
+        formattedBalance: formatUnits(updatedBalance, requirement.required.token.decimals),
       });
     });
   }

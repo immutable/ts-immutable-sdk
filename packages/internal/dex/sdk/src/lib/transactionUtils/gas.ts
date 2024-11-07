@@ -1,30 +1,26 @@
-import { BigNumber, providers } from 'ethers';
 import { newAmount } from '../utils';
 import { CoinAmount, Native } from '../../types';
 import { AVERAGE_SECONDARY_FEE_EXTRA_GAS } from '../../constants';
+import { Block, Provider as EthersProvider } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 
 type FeeData = {
-  maxFeePerGas: BigNumber;
-  maxPriorityFeePerGas: BigNumber;
-  lastBaseFeePerGas: BigNumber;
+  maxFeePerGas: bigint;
+  maxPriorityFeePerGas: bigint;
+  lastBaseFeePerGas: bigint;
 };
 
-interface Provider {
-  getBlock(blockHashOrBlockTag: string): Promise<providers.Block>
-  send(method: string, params: Array<any>): Promise<any>
-}
-
-const getFeeData = async (provider: Provider): Promise<FeeData> => {
+const getFeeData = async (provider: JsonRpcProvider): Promise<FeeData> => {
   const [block, maxPriorityFeePerGas] = await Promise.all([
     provider.getBlock('latest'),
-    provider.send('eth_maxPriorityFeePerGas', []) as Promise<BigNumber>,
+    provider.send('eth_maxPriorityFeePerGas', []) as Promise<bigint>,
   ]);
 
-  if (!block.baseFeePerGas) throw new Error('Base fee per gas not found in block');
+  if (!block?.baseFeePerGas) throw new Error('Base fee per gas not found in block');
 
   return {
     // https://www.blocknative.com/blog/eip-1559-fees
-    maxFeePerGas: block.baseFeePerGas.mul(2).add(maxPriorityFeePerGas),
+    maxFeePerGas: block.baseFeePerGas * BigInt(2) + maxPriorityFeePerGas,
     maxPriorityFeePerGas,
     lastBaseFeePerGas: block.baseFeePerGas,
   };
@@ -32,13 +28,13 @@ const getFeeData = async (provider: Provider): Promise<FeeData> => {
 
 /**
  * Fetch the current gas price estimate. Supports both EIP-1559 and non-EIP1559 chains
- * @param {Provider} provider - The JSON RPC provider used to fetch fee data
+ * @param {JsonRpcProvider} provider - The JSON RPC provider used to fetch fee data
  * @param {Native} nativeToken - The native token of the chain. Gas prices will be denominated in this token
  * @returns {CoinAmount<Native> | null} - The gas price in the smallest denomination of the chain's currency,
  *  or null if no gas price is available
  */
 // eslint-disable-next-line max-len
-export const fetchGasPrice = async (provider: Provider, nativeToken: Native): Promise<CoinAmount<Native> | null> => {
+export const fetchGasPrice = async (provider: JsonRpcProvider, nativeToken: Native): Promise<CoinAmount<Native> | null> => {
   const feeData = await getFeeData(provider).catch(() => null);
   if (!feeData) return null;
 
@@ -55,10 +51,10 @@ export const fetchGasPrice = async (provider: Provider, nativeToken: Native): Pr
 export const calculateGasFee = (
   hasSecondaryFees: boolean,
   gasPrice: CoinAmount<Native>,
-  gasEstimate: BigNumber,
+  gasEstimate: bigint,
 ): CoinAmount<Native> => {
-  const baseGasFee = newAmount(gasEstimate.mul(gasPrice.value), gasPrice.token);
+  const baseGasFee = newAmount(gasEstimate * gasPrice.value, gasPrice.token);
   if (!hasSecondaryFees) return baseGasFee;
-  return newAmount(baseGasFee.value.add(gasPrice.value.mul(AVERAGE_SECONDARY_FEE_EXTRA_GAS)), gasPrice.token);
+  return newAmount(baseGasFee.value + (gasPrice.value * BigInt(AVERAGE_SECONDARY_FEE_EXTRA_GAS)), gasPrice.token);
   // eslint-disable-next-line implicit-arrow-linebreak
 };

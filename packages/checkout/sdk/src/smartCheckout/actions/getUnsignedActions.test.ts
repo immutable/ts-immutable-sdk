@@ -1,13 +1,13 @@
 import {
   Action, ActionType, SignablePurpose, TransactionPurpose,
 } from '@imtbl/orderbook';
-import { PopulatedTransaction, TypedDataDomain } from 'ethers';
 import {
   getUnsignedERC20ApprovalTransactions,
   getUnsignedSellTransactions,
   getUnsignedFulfillmentTransactions,
   getUnsignedMessage,
 } from './getUnsignedActions';
+import { PreparedTransactionRequest, TypedDataDomain } from 'ethers';
 
 describe('getUnsignedActions', () => {
   describe('getUnsignedERC721Transactions', () => {
@@ -16,7 +16,7 @@ describe('getUnsignedActions', () => {
         {
           type: ActionType.TRANSACTION,
           purpose: TransactionPurpose.APPROVAL,
-          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL1' } as PopulatedTransaction),
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL1' } as PreparedTransactionRequest),
         },
         {
           type: ActionType.SIGNABLE,
@@ -30,12 +30,12 @@ describe('getUnsignedActions', () => {
         {
           type: ActionType.TRANSACTION,
           purpose: TransactionPurpose.FULFILL_ORDER,
-          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION1' } as PopulatedTransaction),
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION1' } as PreparedTransactionRequest),
         },
         {
           type: ActionType.TRANSACTION,
           purpose: TransactionPurpose.APPROVAL,
-          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL2' } as PopulatedTransaction),
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL2' } as PreparedTransactionRequest),
         },
         {
           type: ActionType.SIGNABLE,
@@ -49,7 +49,7 @@ describe('getUnsignedActions', () => {
         {
           type: ActionType.TRANSACTION,
           purpose: TransactionPurpose.FULFILL_ORDER,
-          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION2' } as PopulatedTransaction),
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION2' } as PreparedTransactionRequest),
         },
       ];
 
@@ -75,17 +75,17 @@ describe('getUnsignedActions', () => {
         {
           type: ActionType.TRANSACTION,
           purpose: TransactionPurpose.APPROVAL,
-          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL1' } as PopulatedTransaction),
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL1' } as PreparedTransactionRequest),
         },
         {
           type: ActionType.TRANSACTION,
           purpose: TransactionPurpose.APPROVAL,
-          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL2' } as PopulatedTransaction),
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL2' } as PreparedTransactionRequest),
         },
         {
           type: ActionType.TRANSACTION,
           purpose: TransactionPurpose.FULFILL_ORDER,
-          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION1' } as PopulatedTransaction),
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION1' } as PreparedTransactionRequest),
         },
       ];
 
@@ -106,17 +106,17 @@ describe('getUnsignedActions', () => {
         {
           type: ActionType.TRANSACTION,
           purpose: TransactionPurpose.FULFILL_ORDER,
-          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION1' } as PopulatedTransaction),
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION1' } as PreparedTransactionRequest),
         },
         {
           type: ActionType.TRANSACTION,
           purpose: TransactionPurpose.FULFILL_ORDER,
-          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION2' } as PopulatedTransaction),
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION2' } as PreparedTransactionRequest),
         },
         {
           type: ActionType.TRANSACTION,
           purpose: TransactionPurpose.APPROVAL,
-          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL1' } as PopulatedTransaction),
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL1' } as PreparedTransactionRequest),
         },
       ];
 
@@ -137,7 +137,7 @@ describe('getUnsignedActions', () => {
         {
           type: ActionType.TRANSACTION,
           purpose: TransactionPurpose.APPROVAL,
-          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL1' } as PopulatedTransaction),
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL1' } as PreparedTransactionRequest),
         },
         {
           type: ActionType.SIGNABLE,
@@ -151,7 +151,7 @@ describe('getUnsignedActions', () => {
         {
           type: ActionType.TRANSACTION,
           purpose: TransactionPurpose.FULFILL_ORDER,
-          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION1' } as PopulatedTransaction),
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION1' } as PreparedTransactionRequest),
         },
       ];
 
@@ -172,12 +172,12 @@ describe('getUnsignedActions', () => {
         {
           type: ActionType.TRANSACTION,
           purpose: TransactionPurpose.APPROVAL,
-          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL1' } as PopulatedTransaction),
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL1' } as PreparedTransactionRequest),
         },
         {
           type: ActionType.TRANSACTION,
           purpose: TransactionPurpose.FULFILL_ORDER,
-          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION1' } as PopulatedTransaction),
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION1' } as PreparedTransactionRequest),
         },
       ];
 

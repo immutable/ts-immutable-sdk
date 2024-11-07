@@ -17,7 +17,7 @@ import {
 } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import { UnableToConnectDrawer } from '../../../components/UnableToConnectDrawer/UnableToConnectDrawer';
 import { ChangedYourMindDrawer } from '../../../components/ChangedYourMindDrawer/ChangedYourMindDrawer';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
@@ -103,8 +103,8 @@ export function WalletList(props: WalletListProps) {
     [providers, checkout],
   );
 
-  const selectWeb3Provider = useCallback(
-    (web3Provider: Web3Provider, providerName: string) => {
+  const selectBrowserProvider = useCallback(
+    (web3Provider: BrowserProvider, providerName: string) => {
       connectDispatch({
         payload: {
           type: ConnectActions.SET_PROVIDER,
@@ -121,12 +121,9 @@ export function WalletList(props: WalletListProps) {
     [],
   );
 
-  const handleConnectViewUpdate = async (provider: Web3Provider) => {
+  const handleConnectViewUpdate = async (provider: BrowserProvider) => {
     const isPassport = isPassportProvider(provider);
-    const chainId = await provider.provider.request!({
-      method: 'eth_chainId',
-      params: [],
-    });
+    const chainId = await provider.send!('eth_chainId', []);
     // eslint-disable-next-line radix
     const parsedChainId = parseInt(chainId.toString());
     if (
@@ -168,7 +165,7 @@ export function WalletList(props: WalletListProps) {
 
       try {
         const isMetaMask = providerDetail.info.rdns === WalletProviderRdns.METAMASK;
-        const web3Provider = new Web3Provider(providerDetail.provider as any);
+        const web3Provider = new BrowserProvider(providerDetail.provider as any);
 
         try {
           // TODO: Find a nice way to detect if the wallet supports switching accounts via requestPermissions
@@ -185,7 +182,7 @@ export function WalletList(props: WalletListProps) {
           const anonymousId = userData?.anonymousId();
           await identifyUser(identify, connectResult.provider, { anonymousId });
 
-          selectWeb3Provider(
+          selectBrowserProvider(
             web3Provider,
             getProviderSlugFromRdns(providerDetail.info.rdns),
           );
@@ -215,17 +212,17 @@ export function WalletList(props: WalletListProps) {
 
   const connectCallback = async (ethereumProvider: EthereumProvider) => {
     if (ethereumProvider.connected && ethereumProvider.session) {
-      const web3Provider = new Web3Provider(ethereumProvider);
-      selectWeb3Provider(web3Provider, 'walletconnect');
+      const web3Provider = new BrowserProvider(ethereumProvider);
+      selectBrowserProvider(web3Provider, 'walletconnect');
 
-      const chainId = await web3Provider.getSigner().getChainId();
+      const { chainId } = await ((await web3Provider.getSigner()).provider.getNetwork());
 
       if (ethereumProvider.chainId !== targetChainId) {
         // @ts-ignore allow protected method `switchEthereumChain` to be called
         await ethereumProvider.switchEthereumChain(targetChainId);
       }
 
-      if (chainId !== targetChainId) {
+      if (chainId as unknown as ChainId !== targetChainId) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,

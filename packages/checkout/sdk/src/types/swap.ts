@@ -1,10 +1,10 @@
-import { TransactionReceipt, Web3Provider } from '@ethersproject/providers';
 import { Quote, TransactionDetails } from '@imtbl/dex-sdk';
 import { TokenInfo } from './tokenInfo';
+import { BrowserProvider, TransactionReceipt } from 'ethers';
 
 /**
  * Interface representing the parameters for {@link Checkout.swap}.
- * @property {Web3Provider} provider - The provider used to get the wallet address.
+ * @property {BrowserProvider} provider - The provider used to get the wallet address.
  * @property {TokenInfo} fromToken - The token to swap from.
  * @property {TokenInfo} toToken - The token to swap to.
  * @property {string | undefined} fromAmount - The amount to swap from.
@@ -15,7 +15,7 @@ import { TokenInfo } from './tokenInfo';
  */
 
 export interface SwapParams {
-  provider: Web3Provider;
+  provider: BrowserProvider;
   fromToken: TokenInfo,
   toToken: TokenInfo,
   fromAmount?: string,
@@ -46,5 +46,5 @@ export interface SwapQuoteResult {
 export interface SwapResult {
   swap: TransactionDetails;
   quote: Quote;
-  swapReceipt: TransactionReceipt;
+  swapReceipt: TransactionReceipt | null;
 }

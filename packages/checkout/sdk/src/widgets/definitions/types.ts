@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import {
   BridgeClaimWithdrawalFailed,
   BridgeClaimWithdrawalSuccess,
@@ -94,7 +94,7 @@ export enum WidgetType {
  */
 export type WidgetProperties<T extends WidgetType> = {
   config?: WidgetConfigurations[T];
-  provider?: Web3Provider;
+  provider?: BrowserProvider;
 };
 
 export type WidgetConfigurations = {
@@ -294,7 +294,7 @@ export interface IWidgetsFactory {
    * Update the widgets provider instance.
    * @param provider the provider instance to update all widgets.
    */
-  updateProvider(provider: Web3Provider): void;
+  updateProvider(provider: BrowserProvider): void;
 }
 
 export interface IWidgetsFactoryCreate {

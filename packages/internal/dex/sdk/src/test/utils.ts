@@ -1,20 +1,20 @@
 import { TradeType } from '@uniswap/sdk-core';
-import { BigNumber, BigNumberish, utils, providers } from 'ethers';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
-import { SwapRouter } from '@uniswap/router-sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { PromiseOrValue } from '../contracts/types/common';
+import { BigNumberish, BytesLike, formatUnits, keccak256, parseUnits, Result, toUtf8Bytes } from 'ethers';
 import { QuoteResult } from '../lib/getQuotesForRoutes';
 import { NativeTokenService } from '../lib/nativeTokenService';
 import { ExchangeModuleConfiguration, SecondaryFee, CoinAmount, Coin, ERC20, Native, Amount } from '../types';
 import { ImmutableSwapProxy__factory } from '../contracts/types';
 import { IV3SwapRouter } from '../contracts/types/ImmutableSwapProxy';
 import { erc20ToUniswapToken, newAmount, Router, RoutingContracts } from '../lib';
+import swapRouterContract from '@uniswap/swap-router-contracts/artifacts/contracts/interfaces/ISwapRouter02.sol/ISwapRouter02.json'
+import { Interface, formatEther as eFormatEther } from 'ethers';
 
-export const TEST_BASE_FEE = BigNumber.from('49'); // 49 wei
-export const TEST_MAX_PRIORITY_FEE_PER_GAS = BigNumber.from('10000000000'); // 10 gwei
-export const TEST_GAS_PRICE = BigNumber.from('10000000098'); // TEST_MAX_PRIORITY_FEE_PER_GAS + 2 * TEST_BASE_FEE
-export const TEST_TRANSACTION_GAS_USAGE = BigNumber.from('200000'); // 200,000 gas units
+export const TEST_BASE_FEE = BigInt('49'); // 49 wei
+export const TEST_MAX_PRIORITY_FEE_PER_GAS = BigInt('10000000000'); // 10 gwei
+export const TEST_GAS_PRICE = BigInt('10000000098'); // TEST_MAX_PRIORITY_FEE_PER_GAS + 2 * TEST_BASE_FEE
+export const TEST_TRANSACTION_GAS_USAGE = BigInt('200000'); // 200,000 gas units
 
 export const TEST_CHAIN_ID = 999;
 export const TEST_RPC_URL = 'https://0.net';
@@ -119,6 +119,8 @@ export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
 
 export const refundETHFunctionSignature = '0x12210e8a';
 
+export type PromiseOrValue<T> = T | Promise<T>;
+
 export type SwapTest = {
   fromAddress: string;
   pools: Pool[];
@@ -143,9 +145,9 @@ export function uniqBy<K, T extends string | number>(array: K[], comparator: (ar
 export function decodePathForExactInput(path: string) {
   return {
     inputToken: path.substring(0, 42),
-    firstPoolFee: BigNumber.from(parseInt(`0x${path.substring(42, 48)}`, 16)),
+    firstPoolFee: BigInt(parseInt(`0x${path.substring(42, 48)}`, 16)),
     intermediaryToken: `0x${path.substring(48, 88)}`,
-    secondPoolFee: BigNumber.from(parseInt(`0x${path.substring(88, 94)}`, 16)),
+    secondPoolFee: BigInt(parseInt(`0x${path.substring(88, 94)}`, 16)),
     outputToken: `0x${path.substring(94, 134)}`,
   };
 }
@@ -153,9 +155,9 @@ export function decodePathForExactInput(path: string) {
 export function decodePathForExactOutput(path: string) {
   return {
     outputToken: path.substring(0, 42),
-    firstPoolFee: BigNumber.from(parseInt(`0x${path.substring(42, 48)}`, 16)),
+    firstPoolFee: BigInt(parseInt(`0x${path.substring(42, 48)}`, 16)),
     intermediaryToken: `0x${path.substring(48, 88)}`,
-    secondPoolFee: BigNumber.from(parseInt(`0x${path.substring(88, 94)}`, 16)),
+    secondPoolFee: BigInt(parseInt(`0x${path.substring(88, 94)}`, 16)),
     inputToken: `0x${path.substring(94, 134)}`,
   };
 }
@@ -170,28 +172,29 @@ type SecondaryFeeFunctionName =
 type SwapRouterFunctionName = 'exactInputSingle' | 'exactOutputSingle' | 'exactInput' | 'exactOutput';
 
 function decodeSecondaryFeeCall(
-  calldata: utils.BytesLike,
+  calldata: BytesLike,
   ...functionNames: SecondaryFeeFunctionName[]
-): { deadline: BigNumber; functionData: Record<string, utils.Result> } {
+): { deadline: bigint; functionData: Record<string, Result> } {
   const iface = ImmutableSwapProxy__factory.createInterface();
   const topLevelParams = iface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
 
-  const functionData: Record<string, utils.Result> = {};
+  const functionData: Record<string, Result> = {};
 
   functionNames.forEach((functionName, i) => {
+    if (topLevelParams.data.length <= i) return;
     const data = topLevelParams.data[i];
     if (typeof data === 'string') {
       functionData[functionName] = iface.decodeFunctionData(functionName, data);
     } else {
-      functionData[functionName] = [];
+      functionData[functionName] = [] as any;
     }
   });
 
   return { deadline: topLevelParams.deadline, functionData };
 }
 
-function decodeSwapRouterCall(calldata: utils.BytesLike, functionName: SwapRouterFunctionName) {
-  const iface = SwapRouter.INTERFACE;
+function decodeSwapRouterCall(calldata: BytesLike, functionName: SwapRouterFunctionName) {
+  const iface = new Interface(swapRouterContract.abi);
   const topLevelParams = iface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
   const data = topLevelParams.data[0];
   if (typeof data !== 'string') throw new Error();
@@ -199,7 +202,7 @@ function decodeSwapRouterCall(calldata: utils.BytesLike, functionName: SwapRoute
   return iface.decodeFunctionData(functionName, data);
 }
 
-export function decodeMulticallExactInputWithFees(data: utils.BytesLike) {
+export function decodeMulticallExactInputWithFees(data: BytesLike) {
   const {
     functionData: { exactInputWithSecondaryFee, unwrapNativeToken },
     deadline,
@@ -220,7 +223,7 @@ export function decodeMulticallExactInputWithFees(data: utils.BytesLike) {
   return { secondaryFeeParams, swapParams, unwrapTokenParams: unwrapNativeToken, deadline };
 }
 
-export function decodeMulticallExactInputWithoutFees(data: utils.BytesLike) {
+export function decodeMulticallExactInputWithoutFees(data: BytesLike) {
   const decodedParams = decodeSwapRouterCall(data, 'exactInput');
 
   const swapParams: IV3SwapRouter.ExactInputParamsStruct = {
@@ -233,7 +236,7 @@ export function decodeMulticallExactInputWithoutFees(data: utils.BytesLike) {
   return { swapParams };
 }
 
-export function decodeMulticallExactOutputWithFees(data: utils.BytesLike) {
+export function decodeMulticallExactOutputWithFees(data: BytesLike) {
   const {
     functionData: { exactOutputWithSecondaryFee, unwrapNativeToken },
     deadline,
@@ -258,7 +261,7 @@ export function decodeMulticallExactOutputWithFees(data: utils.BytesLike) {
   return { secondaryFeeParams, swapParams, unwrapTokenParams: unwrapNativeToken, deadline };
 }
 
-export function decodeMulticallExactInputSingleWithFees(data: utils.BytesLike) {
+export function decodeMulticallExactInputSingleWithFees(data: BytesLike) {
   const {
     functionData: { exactInputSingleWithSecondaryFee, unwrapNativeToken },
     deadline,
@@ -286,7 +289,7 @@ export function decodeMulticallExactInputSingleWithFees(data: utils.BytesLike) {
   return { secondaryFeeParams, swapParams, unwrapTokenParams: unwrapNativeToken, deadline };
 }
 
-export function decodeMulticallExactOutputSingleWithFees(data: utils.BytesLike) {
+export function decodeMulticallExactOutputSingleWithFees(data: BytesLike) {
   const {
     functionData: { exactOutputSingleWithSecondaryFee, unwrapNativeToken },
     deadline,
@@ -314,7 +317,7 @@ export function decodeMulticallExactOutputSingleWithFees(data: utils.BytesLike) 
   return { secondaryFeeParams, swapParams, unwrapTokenParams: unwrapNativeToken, deadline };
 }
 
-export function decodeMulticallExactInputSingleWithoutFees(data: utils.BytesLike) {
+export function decodeMulticallExactInputSingleWithoutFees(data: BytesLike) {
   const decodedParams = decodeSwapRouterCall(data, 'exactInputSingle');
 
   const swapParams: IV3SwapRouter.ExactInputSingleParamsStruct = {
@@ -330,7 +333,7 @@ export function decodeMulticallExactInputSingleWithoutFees(data: utils.BytesLike
   return { swapParams };
 }
 
-export function decodeMulticallExactOutputSingleWithoutFees(data: utils.BytesLike) {
+export function decodeMulticallExactOutputSingleWithoutFees(data: BytesLike) {
   const decodedParams = decodeSwapRouterCall(data, 'exactOutputSingle');
 
   const swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct = {
@@ -392,28 +395,28 @@ type MockParams = {
 };
 
 export const amountOutFromAmountIn = (amountIn: CoinAmount<ERC20>, tokenOut: ERC20, exchangeRate: number) => {
-  let amountOut = amountIn.value.mul(exchangeRate); // 10 * 10^18
+  let amountOut = amountIn.value * BigInt(exchangeRate); // 10 * 10^18
 
   if (amountIn.token.decimals > tokenOut.decimals) {
-    amountOut = amountOut.div(BigNumber.from(10).pow(amountIn.token.decimals - tokenOut.decimals)); // 10^(18-6) = 10^12
+    amountOut /= BigInt(10) ** BigInt(amountIn.token.decimals - tokenOut.decimals); // 10^(18-6) = 10^12
   }
 
   if (amountIn.token.decimals < tokenOut.decimals) {
-    amountOut = amountOut.mul(BigNumber.from(10).pow(tokenOut.decimals - amountIn.token.decimals)); // 10^(18-6) = 10^12
+    amountOut *= (BigInt(10) ** BigInt(tokenOut.decimals - amountIn.token.decimals)); // 10^(18-6) = 10^12
   }
 
   return newAmount(amountOut, tokenOut);
 };
 
 export const amountInFromAmountOut = (amountOut: CoinAmount<ERC20>, tokenIn: ERC20, exchangeRate: number) => {
-  let amountIn = amountOut.value.div(exchangeRate); // 1 * 10^6
+  let amountIn = amountOut.value / BigInt(exchangeRate); // 1 * 10^6
 
   if (tokenIn.decimals > amountOut.token.decimals) {
-    amountIn = amountIn.mul(BigNumber.from(10).pow(tokenIn.decimals - amountOut.token.decimals)); // 10^(18-6) = 10^12
+    amountIn *= (BigInt(10) ** BigInt(tokenIn.decimals - amountOut.token.decimals)); // 10^(18-6) = 10^12
   }
 
   if (tokenIn.decimals < amountOut.token.decimals) {
-    amountIn = amountIn.div(BigNumber.from(10).pow(amountOut.token.decimals - tokenIn.decimals)); // 10^(18-6) = 10^12
+    amountIn /= BigInt(10) ** BigInt(amountOut.token.decimals - tokenIn.decimals); // 10^(18-6) = 10^12
   }
 
   return newAmount(amountIn, tokenIn);
@@ -479,12 +482,6 @@ export function expectToBeString(x: unknown): asserts x is string {
   expect(typeof x).toBe('string');
 }
 
-// expectInstanceOf ensurance that a variable is an instance of a class, while
-// also narrowing its type.
-export function expectInstanceOf<T>(className: { new(...args: any[]): T }, x: unknown): asserts x is T {
-  expect(x).toBeInstanceOf(className);
-}
-
 export function expectERC20(token: Coin, expectedAddress?: string): asserts token is ERC20 {
   expect(token.type).toBe('erc20');
   if (expectedAddress) expect((token as ERC20).address).toBe(expectedAddress);
@@ -499,37 +496,35 @@ export function expectNative(token: Coin): asserts token is Native {
  * @param str Arbitrary string to create the address from
  */
 export function makeAddr(str: string): string {
-  return utils.keccak256(utils.toUtf8Bytes(str)).slice(0, 42);
+  return keccak256(toUtf8Bytes(str)).slice(0, 42);
 }
 
 export function formatAmount(amount: CoinAmount<Coin> | Amount): string {
-  return utils.formatUnits(amount.value, amount.token.decimals);
+  return formatUnits(amount.value, amount.token.decimals);
 }
 
 export function formatTokenAmount(amount: BigNumberish, token: ERC20): string {
-  return utils.formatUnits(amount, token.decimals);
+  return formatUnits(amount, token.decimals);
 }
 
 export function formatEther(bn: PromiseOrValue<BigNumberish>): string {
-  if (BigNumber.isBigNumber(bn) || typeof bn === 'string') {
-    return utils.formatEther(bn);
+  if (typeof bn === 'bigint' || typeof bn === 'string') {
+    return eFormatEther(bn);
   }
   throw new Error('formatEther: bn is not a BigNumber');
 }
 
 export function newAmountFromString<T extends Coin>(amount: string, token: T): CoinAmount<T> {
-  const bn = utils.parseUnits(amount, token.decimals);
+  const bn = parseUnits(amount, token.decimals);
   return newAmount(bn, token);
 }
 
-export const buildBlock = ({ baseFeePerGas }: { baseFeePerGas: BigNumber | null }): providers.Block => ({
+export const buildBlock = ({ baseFeePerGas }: { baseFeePerGas: bigint | null }) => ({
   baseFeePerGas,
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  _difficulty: BigNumber.from('0'),
-  difficulty: 0,
+  difficulty: BigInt(0),
   extraData: '',
-  gasLimit: BigNumber.from('0'),
-  gasUsed: BigNumber.from('0'),
+  gasLimit: BigInt('0'),
+  gasUsed: BigInt('0'),
   hash: '',
   miner: '',
   nonce: '',

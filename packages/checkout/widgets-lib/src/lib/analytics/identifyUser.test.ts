@@ -1,4 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import { identifyUser } from './identifyUser';
 
 describe('identifyUser', () => {
@@ -19,7 +19,7 @@ describe('identifyUser', () => {
         isMetaMask: true,
         request: jest.fn(),
       },
-    } as any as Web3Provider;
+    } as any as BrowserProvider;
 
     await identifyUser(identify, provider);
     expect(identify).toBeCalledWith('0xtest', { isMetaMask: true, isPassportWallet: false }, undefined);
@@ -36,7 +36,7 @@ describe('identifyUser', () => {
         isPassport: true,
         request: jest.fn(),
       },
-    } as any as Web3Provider;
+    } as any as BrowserProvider;
     await identifyUser(identify, provider, options);
     expect(identify).toBeCalledWith('0xtest', { isMetaMask: false, isPassportWallet: true }, options);
   });

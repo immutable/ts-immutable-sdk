@@ -1,24 +1,27 @@
-import { ethers } from 'ethers';
+import { ethers, JsonRpcProvider } from 'ethers';
 import { getWithdrawRootToken } from './axelarUtils';
 
-const rootToken = '0x1f9090aaE28b8a3dCeaDf281B0F12828e676c326';
-describe('Axelar', () => {
-  const mockERC20Contract = {
-    allowance: jest.fn(),
-    interface: {
-      encodeFunctionData: jest.fn(),
-    },
-    rootToken: jest.fn().mockImplementation(async () => rootToken),
-  };
-  describe('getWithdrawRootToken', () => {
-    beforeEach(() => {
-      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20Contract as any);
-    });
+const rootToken = '0x1f9090aaE28b8a3dCeaDf281B0F12828e676c326'
 
+jest.mock('ethers', () => ({
+  ...jest.requireActual('ethers'),
+  Contract: jest.fn().mockImplementation(() => {
+    return {
+      allowance: jest.fn(),
+      interface: {
+        encodeFunctionData: jest.fn(),
+      },
+      rootToken: jest.fn().mockImplementation(async () => rootToken),
+    };
+  })
+}));
+
+describe('Axelar', () => {
+  describe('getWithdrawRootToken', () => {
     it('should return the root token for a child token', async () => {
       const childToken = '0x388c818ca8b9251b393131c08a736a67ccb19297';
       const destinationChainId = '1';
-      const mockChildProvider = new ethers.providers.JsonRpcProvider('x');
+      const mockChildProvider = new JsonRpcProvider('x')
       const receivedRootToken = await getWithdrawRootToken(
         childToken,
         destinationChainId,
@@ -30,7 +33,7 @@ describe('Axelar', () => {
     it('should return the root IMX token withdrawing NATIVE', async () => {
       const childToken = 'NATIVE';
       const destinationChainId = '1';
-      const mockChildProvider = new ethers.providers.JsonRpcProvider('x');
+      const mockChildProvider = new JsonRpcProvider('x');
       const receivedRootToken = await getWithdrawRootToken(
         childToken,
         destinationChainId,

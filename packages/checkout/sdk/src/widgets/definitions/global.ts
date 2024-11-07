@@ -1,4 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import { Checkout } from '../../sdk';
 import {
   CheckoutWidgetsConfig,
@@ -21,7 +21,7 @@ declare global {
     class WidgetsFactory implements IWidgetsFactory {
       constructor(sdk: Checkout, config: CheckoutWidgetsConfig);
       create: IWidgetsFactoryCreate;
-      updateProvider(provider: Web3Provider): void;
+      updateProvider(provider: BrowserProvider): void;
     }
 
     class Connect<T extends WidgetType> implements Widget<T> {

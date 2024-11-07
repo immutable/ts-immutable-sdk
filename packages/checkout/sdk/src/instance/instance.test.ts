@@ -1,6 +1,6 @@
 import { Environment } from '@imtbl/config';
 import { Exchange, SUPPORTED_CHAIN_IDS_FOR_ENVIRONMENT } from '@imtbl/dex-sdk';
-import { ethers } from 'ethers';
+import { ethers, JsonRpcProvider } from 'ethers';
 import { TokenBridge } from '@imtbl/bridge-sdk';
 import { Orderbook } from '@imtbl/orderbook';
 import { ChainId } from '../types';
@@ -47,12 +47,12 @@ describe('instance', () => {
   describe('createBridgeInstance', () => {
     const readOnlyProviders = new Map<
     ChainId,
-    ethers.providers.JsonRpcProvider
+    JsonRpcProvider
     >([
-      [ChainId.SEPOLIA, new ethers.providers.JsonRpcProvider('sepolia')],
+      [ChainId.SEPOLIA, new JsonRpcProvider('sepolia')],
       [
         ChainId.IMTBL_ZKEVM_TESTNET,
-        new ethers.providers.JsonRpcProvider('devnet'),
+        new JsonRpcProvider('devnet'),
       ],
     ]);
 

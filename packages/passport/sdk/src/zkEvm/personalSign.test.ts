@@ -1,6 +1,3 @@
-import { Signer } from '@ethersproject/abstract-signer';
-import { StaticJsonRpcProvider } from '@ethersproject/providers';
-import { BigNumber } from 'ethers';
 import { Flow } from '@imtbl/metrics';
 import { personalSign } from './personalSign';
 import {
@@ -10,6 +7,7 @@ import {
 import { chainId } from '../test/mocks';
 import { RelayerClient } from './relayerClient';
 import GuardianClient from '../guardian';
+import { JsonRpcProvider, Signer } from 'ethers';
 
 jest.mock('./walletHelpers');
 
@@ -26,7 +24,7 @@ describe('personalSign', () => {
     getAddress: jest.fn(),
   };
   const rpcProvider = {
-    detectNetwork: jest.fn(),
+    _detectNetwork: jest.fn(),
   };
   const relayerClient = {
     imSign: jest.fn(),
@@ -47,7 +45,7 @@ describe('personalSign', () => {
 
     ethSigner.getAddress.mockResolvedValue(eoaAddress);
     relayerClient.imSign.mockResolvedValue(relayerSignature);
-    rpcProvider.detectNetwork.mockResolvedValue({ chainId });
+    rpcProvider._detectNetwork.mockResolvedValue({ chainId });
   });
 
   describe('when a valid address and message are provided', () => {
@@ -55,7 +53,7 @@ describe('personalSign', () => {
       const result = await personalSign({
         params: [message, eoaAddress],
         ethSigner: ethSigner as unknown as Signer,
-        rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+        rpcProvider: rpcProvider as unknown as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
         guardianClient: guardianClient as unknown as GuardianClient,
         zkEvmAddress: eoaAddress,
@@ -69,7 +67,7 @@ describe('personalSign', () => {
       });
       expect(relayerClient.imSign).toHaveBeenCalledWith(eoaAddress, message);
       expect(signERC191Message).toHaveBeenCalledWith(
-        BigNumber.from(chainId),
+        BigInt(chainId),
         message,
         ethSigner,
         eoaAddress,
@@ -84,7 +82,7 @@ describe('personalSign', () => {
       const result = await personalSign({
         params: [hexMessage, eoaAddress],
         ethSigner: ethSigner as unknown as Signer,
-        rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+        rpcProvider: rpcProvider as unknown as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
         guardianClient: guardianClient as unknown as GuardianClient,
         zkEvmAddress: eoaAddress,
@@ -98,7 +96,7 @@ describe('personalSign', () => {
       });
       expect(relayerClient.imSign).toHaveBeenCalledWith(eoaAddress, message);
       expect(signERC191Message).toHaveBeenCalledWith(
-        BigNumber.from(chainId),
+        BigInt(chainId),
         message,
         ethSigner,
         eoaAddress,
@@ -111,7 +109,7 @@ describe('personalSign', () => {
       await expect(personalSign({
         params: [eoaAddress],
         ethSigner: ethSigner as unknown as Signer,
-        rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+        rpcProvider: rpcProvider as unknown as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
         guardianClient: guardianClient as unknown as GuardianClient,
         zkEvmAddress: eoaAddress,

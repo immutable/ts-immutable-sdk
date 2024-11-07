@@ -1,10 +1,11 @@
-import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import { Signer } from '@ethersproject/abstract-signer';
-import { BigNumber, utils } from 'ethers';
 import {
   Flow, identify, trackError, trackFlow,
 } from '@imtbl/metrics';
+import {
+  JsonRpcProvider, Signer, toBeHex,
+  BrowserProvider,
+} from 'ethers';
 import {
   JsonRpcRequestCallback,
   JsonRpcRequestPayload,
@@ -61,7 +62,7 @@ export class ZkEvmProvider implements Provider {
 
   readonly #guardianClient: GuardianClient;
 
-  readonly #rpcProvider: StaticJsonRpcProvider; // Used for read
+  readonly #rpcProvider: JsonRpcProvider; // Used for read
 
   readonly #magicAdapter: MagicAdapter;
 
@@ -98,12 +99,13 @@ export class ZkEvmProvider implements Provider {
     if (config.jsonRpcReferrer) {
       // StaticJsonRpcProvider by default sets the referrer as "client".
       // On Unreal 4 this errors as the browser used is expecting a valid URL.
-      this.#rpcProvider = new StaticJsonRpcProvider({
-        url: this.#config.zkEvmRpcUrl,
-        fetchOptions: { referrer: config.jsonRpcReferrer },
+      this.#rpcProvider = new JsonRpcProvider(this.#config.zkEvmRpcUrl, undefined, {
+        staticNetwork: true,
       });
     } else {
-      this.#rpcProvider = new StaticJsonRpcProvider(this.#config.zkEvmRpcUrl);
+      this.#rpcProvider = new JsonRpcProvider(this.#config.zkEvmRpcUrl, undefined, {
+        staticNetwork: true,
+      });
     }
 
     this.#relayerClient = new RelayerClient({
@@ -157,10 +159,10 @@ export class ZkEvmProvider implements Provider {
    * @see #getSigner
    *
    */
-  #initialiseEthSigner(user: User) {
+  async #initialiseEthSigner(user: User) {
     const generateSigner = async (): Promise<Signer> => {
       const magicRpcProvider = await this.#magicAdapter.login(user.idToken!);
-      const web3Provider = new Web3Provider(magicRpcProvider);
+      const web3Provider = new BrowserProvider(magicRpcProvider);
 
       return web3Provider.getSigner();
     };
@@ -171,6 +173,7 @@ export class ZkEvmProvider implements Provider {
       try {
         resolve(await generateSigner());
       } catch (err) {
+        console.log('Error initialising signer', err);
         // Capture and store the initialization error
         this.#signerInitialisationError = err;
         resolve(undefined);
@@ -197,7 +200,7 @@ export class ZkEvmProvider implements Provider {
     // other sendTransaction requests are processed in nonce space 0. This means
     // we can submit a session activity request per SCW in parallel without a SCW
     // INVALID_NONCE error.
-    const nonceSpace: BigNumber = BigNumber.from(1);
+    const nonceSpace: bigint = BigInt(1);
     const sendTransactionClosure = async (params: Array<any>, flow: Flow) => {
       const ethSigner = await this.#getSigner();
       return await sendTransaction({
@@ -246,7 +249,6 @@ export class ZkEvmProvider implements Provider {
         try {
           const user = await this.#authManager.getUserOrLogin();
           flow.addEvent('endGetUserOrLogin');
-
           if (!this.#ethSigner) {
             this.#initialiseEthSigner(user);
           }
@@ -357,7 +359,7 @@ export class ZkEvmProvider implements Provider {
             if (this.#config.forceScwDeployBeforeMessageSignature) {
               // Check if the smart contract wallet has been deployed
               const nonce = await getNonce(this.#rpcProvider, zkEvmAddress);
-              if (!nonce.gt(0)) {
+              if (nonce ! > BigInt(0)) {
                 // If the smart contract wallet has not been deployed,
                 // submit a transaction before signing the message
                 return await sendDeployTransactionAndPersonalSign({
@@ -441,8 +443,9 @@ export class ZkEvmProvider implements Provider {
         // JsonRpcProvider, this function will still work as expected given
         // that detectNetwork call _uncachedDetectNetwork which will force
         // the provider to re-fetch the chainId from remote.
-        const { chainId } = await this.#rpcProvider.detectNetwork();
-        return utils.hexlify(chainId);
+        // eslint-disable-next-line no-underscore-dangle
+        const { chainId } = await this.#rpcProvider._detectNetwork();
+        return toBeHex(chainId);
       }
       // Pass through methods
       case 'eth_getBalance':

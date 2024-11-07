@@ -1,11 +1,11 @@
-import { utils } from 'ethers';
+import { getBytes, stripZerosLeft, toUtf8String } from "ethers";
 
 export const hexToString = (hex: string) => {
   if (!hex) return hex;
 
   try {
-    const stripped = utils.stripZeros(utils.arrayify(hex));
-    return utils.toUtf8String(stripped);
+    const stripped = stripZerosLeft(getBytes(hex));
+    return toUtf8String(stripped);
   } catch (e) {
     return hex;
   }

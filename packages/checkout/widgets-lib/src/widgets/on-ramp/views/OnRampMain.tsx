@@ -65,7 +65,7 @@ export function OnRampMain({
   const openedFromTopUpView = useMemo(
     () => viewState.history.length > 2
       && viewState.history[viewState.history.length - 2].type
-        === SharedViews.TOP_UP_VIEW,
+       === SharedViews.TOP_UP_VIEW,
     [viewState.history],
   );
 
@@ -255,7 +255,7 @@ export function OnRampMain({
       };
 
       setWidgetUrl(await checkout.createFiatRampUrl(params));
-      userWalletAddress = await provider!.getSigner().getAddress();
+      userWalletAddress = await (await provider!.getSigner()).getAddress();
     })();
 
     const domIframe: HTMLIFrameElement = document.getElementById(

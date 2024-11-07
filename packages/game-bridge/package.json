@@ -7,7 +7,7 @@
     "@imtbl/passport": "workspace:*",
     "@imtbl/x-client": "workspace:*",
     "@imtbl/x-provider": "workspace:*",
-    "ethers": "^5.7.2"
+    "ethers": "^6.13.4"
   },
   "devDependencies": {
     "eslint": "^8.40.0",

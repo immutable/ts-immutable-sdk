@@ -1,7 +1,5 @@
 // Note that this file contains withdrawal functions that are shared
 // by both ERC20 and ETH in completeERC20WithdrawalAction and completeEthWithdrawalAction
-import { Signer } from '@ethersproject/abstract-signer';
-import { TransactionResponse } from '@ethersproject/providers';
 import {
   Contracts,
   ERC20Token,
@@ -14,6 +12,7 @@ import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import { validateChain } from '../helpers';
 import { ProviderConfiguration } from '../../config';
 import { getWithdrawalBalances } from './getWithdrawalBalance';
+import { Signer, TransactionResponse } from 'ethers';
 
 type CompleteERC20WithdrawalWorkflowParams = {
   ethSigner: Signer;
@@ -47,7 +46,7 @@ export async function executeRegisterAndWithdrawAllFungible(
     ethSigner,
   );
 
-  const populatedTransaction = await contract.populateTransaction.registerAndWithdrawAll(
+  const populatedTransaction = await contract.registerAndWithdrawAll.populateTransaction(
     etherKey,
     starkPublicKey,
     starkSignature,
@@ -71,7 +70,7 @@ export async function executeWithdrawAllFungible(
     ethSigner,
   );
 
-  const populatedTransaction = await contract.populateTransaction.withdrawAll(
+  const populatedTransaction = await contract.withdrawAll.populateTransaction(
     await ethSigner.getAddress(),
     starkPublicKey,
     assetType,
@@ -91,7 +90,7 @@ export async function executeWithdrawFungible(
     ethSigner,
   );
 
-  const populatedTransaction = await contract.populateTransaction.withdraw(
+  const populatedTransaction = await contract.withdraw.populateTransaction(
     await ethSigner.getAddress(),
     assetType,
   );
@@ -128,7 +127,7 @@ export async function completeERC20WithdrawalAction({
     token_address: token.tokenAddress,
   });
 
-  if (!v3Balance.isZero() && !v3Balance.isNegative()) {
+  if (v3Balance > 0) {
     const isRegistered = await isRegisteredOnChain(
       starkPublicKey,
       ethSigner,
@@ -146,7 +145,7 @@ export async function completeERC20WithdrawalAction({
     );
   }
 
-  if (!v4Balance.isZero() && !v4Balance.isNegative()) {
+  if (v4Balance > 0) {
     return executeWithdrawFungible(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
   }
 

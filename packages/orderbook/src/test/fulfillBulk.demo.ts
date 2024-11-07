@@ -8,21 +8,22 @@ import {
   getFulfillerWallet,
   getOffererWallet,
   getLocalhostProvider,
-  TestToken,
   waitForOrderToBeOfStatus,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getConfigFromEnv,
+  TestERC721Token,
+  getRandomTokenId,
 } from './helpers';
 import { actionAll } from './helpers/actions';
 import { GAS_OVERRIDES } from './helpers/gas';
 
-async function deployAndMintNftContract(wallet: Wallet, count?: number): Promise<TestToken> {
+async function deployAndMintNftContract(wallet: Wallet, count?: number): Promise<TestERC721Token> {
   const { contract } = await deployTestToken(wallet);
   log('contract deployed');
   if (count) {
     for (let i = 0; i < count; i += 1) {
       // eslint-disable-next-line no-await-in-loop
-      const receipt = await contract.safeMint(wallet.address, GAS_OVERRIDES);
+      const receipt = await contract.safeMint(wallet.address, getRandomTokenId(), GAS_OVERRIDES);
       // eslint-disable-next-line no-await-in-loop
       await receipt.wait();
       log('token minted');
@@ -43,7 +44,9 @@ describe('', () => {
     // Deploy an NFT contract and mint a token for the offerer
     const nftContract = await deployAndMintNftContract(offerer, 2);
 
-    log(`current id ${await nftContract.getCurrentIdCounter()}`);
+    const nftAddress = await nftContract.getAddress();
+
+    // log(`current id ${await nftContract.getCurrentIdCounter()}`);
 
     // uncomment the overrides and set variables in
     // .env to run on environments other than testnet (e.g. devnet)
@@ -65,7 +68,7 @@ describe('', () => {
         type: 'NATIVE',
       },
       sell: {
-        contractAddress: nftContract.address,
+        contractAddress: nftAddress,
         tokenId: '0',
         type: 'ERC721',
       },
@@ -80,7 +83,7 @@ describe('', () => {
         type: 'NATIVE',
       },
       sell: {
-        contractAddress: nftContract.address,
+        contractAddress: nftAddress,
         tokenId: '1',
         type: 'ERC721',
       },
@@ -121,7 +124,7 @@ describe('', () => {
     await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatusName.ACTIVE);
     log(`Listings ${orderId1} and ${orderId2} is now ACTIVE, fulfilling order...`);
 
-    log(`new fulfiller has ${(await newFulfiller.getBalance()).toString()} balance`);
+    // log(`new fulfiller has ${(await newFulfiller.getBalance()).toString()} balance`);
 
     const fulfillResponse1 = await sdk.fulfillBulkOrders(
       [
@@ -187,10 +190,10 @@ describe('', () => {
       log('Listing all orders for the NFT collection');
 
       const listOfOrders = await sdk.listListings({
-        sellItemContractAddress: nftContract.address,
+        sellItemContractAddress: nftAddress,
       });
 
-      log(`List of orders for contract ${nftContract.address}:`);
+      log(`List of orders for contract ${nftAddress}:`);
       log(JSON.stringify(listOfOrders, null, 2));
     }
   }, 200_000);

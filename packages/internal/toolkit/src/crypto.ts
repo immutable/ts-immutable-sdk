@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import * as encUtils from 'enc-utils';
-import { Signer } from '@ethersproject/abstract-signer';
+import { Signer } from 'ethers';
 
 type SignatureOptions = {
   r: BN;

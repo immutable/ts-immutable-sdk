@@ -1,13 +1,13 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { describe, expect } from '@jest/globals';
-import { ethers } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 import { ETH_SEPOLIA_TO_ZKEVM_DEVNET, ZKEVM_DEVNET_CHAIN_ID } from '../constants/bridges';
 import { BridgeConfiguration } from './index';
 import { BridgeModuleConfiguration } from '../types';
 
 describe('config', () => {
-  const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
-  const voidChildProvider = new ethers.providers.JsonRpcProvider('y');
+  const voidRootProvider = new JsonRpcProvider('x');
+  const voidChildProvider = new JsonRpcProvider('y');
   it('should create successfully', () => {
     const bridgeModuleConfiguration: BridgeModuleConfiguration = {
       baseConfig: new ImmutableConfiguration({

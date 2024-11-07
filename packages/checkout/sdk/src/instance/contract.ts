@@ -1,9 +1,8 @@
-import { Provider } from '@ethersproject/providers';
-import { Contract, ContractInterface, Signer } from 'ethers';
+import { Contract, InterfaceAbi, Provider, Signer } from 'ethers';
 
 export function getTokenContract(
   address: string,
-  contractInterface: ContractInterface,
+  contractInterface: InterfaceAbi,
   signerOrProvider: Provider | Signer | undefined,
 ) {
   return new Contract(address, contractInterface, signerOrProvider);
