@@ -1,5 +1,6 @@
 import * as GeneratedClients from '@imtbl/generated-clients';
 import { BigNumber, ethers } from 'ethers';
+import axios from 'axios';
 import AuthManager from '../authManager';
 import { ConfirmationScreen } from '../confirmation';
 import { retryWithDelay } from '../network/retry';
@@ -7,6 +8,7 @@ import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from '../zkEvm/JsonRpcE
 import { MetaTransaction, TypedDataPayload } from '../zkEvm/types';
 import { PassportConfiguration } from '../config';
 import { getEip155ChainId } from '../zkEvm/walletHelpers';
+import { PassportError, PassportErrorType } from '../errors/passportError';
 
 export type GuardianClientParams = {
   confirmationScreen: ConfirmationScreen;
@@ -102,6 +104,11 @@ export default class GuardianClient {
       try {
         return await task();
       } catch (err) {
+        if (err instanceof PassportError && err.type === PassportErrorType.SERVICE_UNAVAILABLE_ERROR) {
+          this.confirmationScreen.showServiceUnavailable();
+          throw err;
+        }
+
         this.confirmationScreen.closeWindow();
         throw err;
       }
@@ -113,48 +120,55 @@ export default class GuardianClient {
   }
 
   public async evaluateImxTransaction({ payloadHash }: GuardianEvaluateImxTransactionParams): Promise<void> {
-    const finallyFn = () => {
-      this.confirmationScreen.closeWindow();
-    };
-    const user = await this.authManager.getUserImx();
+    try {
+      const finallyFn = () => {
+        this.confirmationScreen.closeWindow();
+      };
+      const user = await this.authManager.getUserImx();
 
-    const headers = { Authorization: `Bearer ${user.accessToken}` };
-    const transactionRes = await retryWithDelay(
-      async () => this.guardianApi.getTransactionByID({
-        transactionID: payloadHash,
-        chainType: 'starkex',
-      }, { headers }),
-      { finallyFn },
-    );
-
-    if (!transactionRes.data.id) {
-      throw new Error("Transaction doesn't exists");
-    }
-
-    const evaluateImxRes = await this.guardianApi.evaluateTransaction({
-      id: payloadHash,
-      transactionEvaluationRequest: {
-        chainType: 'starkex',
-      },
-    }, { headers });
-
-    const { confirmationRequired } = evaluateImxRes.data;
-    if (confirmationRequired) {
-      if (this.crossSdkBridgeEnabled) {
-        throw new Error(transactionRejectedCrossSdkBridgeError);
-      }
-
-      const confirmationResult = await this.confirmationScreen.requestConfirmation(
-        payloadHash,
-        user.imx.ethAddress,
-        GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Starkex,
+      const headers = { Authorization: `Bearer ${user.accessToken}` };
+      const transactionRes = await retryWithDelay(
+        async () => this.guardianApi.getTransactionByID({
+          transactionID: payloadHash,
+          chainType: 'starkex',
+        }, { headers }),
+        { finallyFn },
       );
 
-      if (!confirmationResult.confirmed) {
-        throw new Error('Transaction rejected by user');
+      if (!transactionRes.data.id) {
+        throw new Error("Transaction doesn't exists");
       }
-    } else {
-      this.confirmationScreen.closeWindow();
+
+      const evaluateImxRes = await this.guardianApi.evaluateTransaction({
+        id: payloadHash,
+        transactionEvaluationRequest: {
+          chainType: 'starkex',
+        },
+      }, { headers });
+
+      const { confirmationRequired } = evaluateImxRes.data;
+      if (confirmationRequired) {
+        if (this.crossSdkBridgeEnabled) {
+          throw new Error(transactionRejectedCrossSdkBridgeError);
+        }
+
+        const confirmationResult = await this.confirmationScreen.requestConfirmation(
+          payloadHash,
+          user.imx.ethAddress,
+          GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Starkex,
+        );
+
+        if (!confirmationResult.confirmed) {
+          throw new Error('Transaction rejected by user');
+        }
+      } else {
+        this.confirmationScreen.closeWindow();
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 403) {
+        throw new PassportError('Service unavailable', PassportErrorType.SERVICE_UNAVAILABLE_ERROR);
+      }
+      throw error;
     }
   }
 
@@ -185,6 +199,10 @@ export default class GuardianClient {
 
       return response.data;
     } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 403) {
+        throw new PassportError('Service unavailable', PassportErrorType.SERVICE_UNAVAILABLE_ERROR);
+      }
+
       const errorMessage = error instanceof Error ? error.message : String(error);
       throw new JsonRpcError(
         RpcErrorCode.INTERNAL_ERROR,
