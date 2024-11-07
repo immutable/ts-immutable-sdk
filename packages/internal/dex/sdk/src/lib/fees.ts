@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { BASIS_POINT_PRECISION } from '../constants/router';
 import { Coin, CoinAmount, SecondaryFee } from '../types';
 import { addAmount, newAmount, subtractAmount } from './utils';
@@ -10,7 +9,7 @@ export class Fees {
 
   constructor(secondaryFees: SecondaryFee[], token: Coin) {
     this.secondaryFees = secondaryFees;
-    this.amount = newAmount(BigNumber.from(0), token);
+    this.amount = newAmount(BigInt(0), token);
   }
 
   get token(): Coin {
@@ -31,9 +30,7 @@ export class Fees {
 
   withAmounts() {
     return this.secondaryFees.map((fee) => {
-      const feeAmount = this.amount.value
-        .mul(fee.basisPoints)
-        .div(BASIS_POINT_PRECISION);
+      const feeAmount = this.amount.value * BigInt(fee.basisPoints) / BigInt(BASIS_POINT_PRECISION)
 
       return {
         ...fee,
@@ -43,12 +40,10 @@ export class Fees {
   }
 
   private total(): CoinAmount<Coin> {
-    let totalFees = newAmount(BigNumber.from(0), this.amount.token);
+    let totalFees = newAmount(BigInt(0), this.amount.token);
 
     for (const fee of this.secondaryFees) {
-      const feeAmount = this.amount.value
-        .mul(fee.basisPoints)
-        .div(BASIS_POINT_PRECISION);
+      const feeAmount = this.amount.value * BigInt(fee.basisPoints) / BigInt(BASIS_POINT_PRECISION)
       totalFees = addAmount(totalFees, newAmount(feeAmount, this.amount.token));
     }
 

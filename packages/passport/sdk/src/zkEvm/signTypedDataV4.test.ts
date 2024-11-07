@@ -1,6 +1,3 @@
-import { StaticJsonRpcProvider } from '@ethersproject/providers';
-import { BigNumber } from 'ethers';
-import { Signer } from '@ethersproject/abstract-signer';
 import { Flow } from '@imtbl/metrics';
 import GuardianClient from '../guardian';
 import { signAndPackTypedData } from './walletHelpers';
@@ -12,6 +9,8 @@ import { RelayerClient } from './relayerClient';
 import { signTypedDataV4 } from './signTypedDataV4';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { TypedDataPayload } from './types';
+import { Signer } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 
 jest.mock('./walletHelpers');
 
@@ -27,7 +26,7 @@ describe('signTypedDataV4', () => {
   const combinedSignature = '0x000202011b1d383526a2815d26550eb314b5d7e0551327330043c4d07715346a7d5517ecbc32304fc1ccdcd52fea386c94c3b58b90410f20cd1d5c6db8fa1f03c34e82dce78c3445ce38583e0b0689c69b8fbedbc33d3a2e45431b01030001d25acf5eef26fb627f91e02ebd111580030ab8fb0a55567ac8cc66c34de7ae98185125a76adc6ee2fea042c7fce9c85a41e790ce3529f93dfec281bf56620ef21b02';
   const ethSigner = {} as Signer;
   const rpcProvider = {
-    detectNetwork: jest.fn(),
+    _detectNetwork: jest.fn(),
   };
   const relayerClient = {
     imSignTypedData: jest.fn(),
@@ -45,7 +44,7 @@ describe('signTypedDataV4', () => {
     (signAndPackTypedData as jest.Mock).mockResolvedValueOnce(
       combinedSignature,
     );
-    rpcProvider.detectNetwork.mockResolvedValue({ chainId });
+    rpcProvider._detectNetwork.mockResolvedValue({ chainId });
   });
 
   describe('when a valid address and json are provided', () => {
@@ -54,7 +53,7 @@ describe('signTypedDataV4', () => {
         method: 'eth_signTypedData_v4',
         params: [address, JSON.stringify(eip712Payload)],
         ethSigner,
-        rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+        rpcProvider: rpcProvider as unknown as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
         guardianClient: guardianClient as unknown as GuardianClient,
         flow: flow as unknown as Flow,
@@ -68,7 +67,7 @@ describe('signTypedDataV4', () => {
       expect(signAndPackTypedData).toHaveBeenCalledWith(
         eip712Payload,
         relayerSignature,
-        BigNumber.from(chainId),
+        BigInt(chainId),
         address,
         ethSigner,
       );
@@ -81,7 +80,7 @@ describe('signTypedDataV4', () => {
         method: 'eth_signTypedData_v4',
         params: [address, eip712Payload],
         ethSigner,
-        rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+        rpcProvider: rpcProvider as unknown as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
         guardianClient: guardianClient as any,
         flow: flow as unknown as Flow,
@@ -95,7 +94,7 @@ describe('signTypedDataV4', () => {
       expect(signAndPackTypedData).toHaveBeenCalledWith(
         eip712Payload,
         relayerSignature,
-        BigNumber.from(chainId),
+        BigInt(chainId),
         address,
         ethSigner,
       );
@@ -109,7 +108,7 @@ describe('signTypedDataV4', () => {
           method: 'eth_signTypedData_v4',
           params: [address],
           ethSigner,
-          rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+          rpcProvider: rpcProvider as unknown as JsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
           guardianClient: guardianClient as any,
           flow: flow as unknown as Flow,
@@ -127,7 +126,7 @@ describe('signTypedDataV4', () => {
           method: 'eth_signTypedData_v4',
           params: [address, '*~<|8)-/-<'],
           ethSigner,
-          rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+          rpcProvider: rpcProvider as unknown as JsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
           guardianClient: guardianClient as any,
           flow: flow as unknown as Flow,
@@ -153,7 +152,7 @@ describe('signTypedDataV4', () => {
           method: 'eth_signTypedData_v4',
           params: [address, payload],
           ethSigner,
-          rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+          rpcProvider: rpcProvider as unknown as JsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
           guardianClient: guardianClient as any,
           flow: flow as unknown as Flow,
@@ -179,7 +178,7 @@ describe('signTypedDataV4', () => {
             },
           ],
           ethSigner,
-          rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+          rpcProvider: rpcProvider as unknown as JsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
           guardianClient: guardianClient as any,
           flow: flow as unknown as Flow,
@@ -204,7 +203,7 @@ describe('signTypedDataV4', () => {
         payload,
       ],
       ethSigner,
-      rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+      rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
       guardianClient: guardianClient as any,
       flow: flow as unknown as Flow,
@@ -218,7 +217,7 @@ describe('signTypedDataV4', () => {
     expect(signAndPackTypedData).toHaveBeenCalledWith(
       payload,
       relayerSignature,
-      BigNumber.from(chainId),
+      BigInt(chainId),
       address,
       ethSigner,
     );

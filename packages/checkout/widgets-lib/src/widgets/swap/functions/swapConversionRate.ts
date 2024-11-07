@@ -1,8 +1,8 @@
 import { TransactionResponse } from '@imtbl/dex-sdk';
-import { BigNumber, utils } from 'ethers';
 import { TFunction } from 'i18next';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
+import { formatUnits, parseUnits } from 'ethers';
 
 export const formatQuoteConversionRate = (
   amount: string,
@@ -19,8 +19,8 @@ export const formatQuoteConversionRate = (
 
   // Parse the fromAmount input, multiply by 10^decimals to convert to integer units
   const parsedFromAmount = parseFloat(amount);
-  const relativeFromAmount = utils.parseUnits(parsedFromAmount.toString(), fromToken.decimals);
-  const relativeToAmount = BigNumber.from(quote.quote.amount.value);
+  const relativeFromAmount = parseUnits(parsedFromAmount.toString(), fromToken.decimals);
+  const relativeToAmount = BigInt(quote.quote.amount.value);
 
   // Determine the maximum decimal places to equalize to
   const fromDecimals = fromToken.decimals;
@@ -28,25 +28,25 @@ export const formatQuoteConversionRate = (
   const maxDecimals = Math.max(fromDecimals, toDecimals);
 
   // Calculate scale factors based on maximum decimals
-  const fromScaleFactor = BigNumber.from('10').pow(maxDecimals - fromDecimals);
-  const toScaleFactor = BigNumber.from('10').pow(maxDecimals - toDecimals);
+  const fromScaleFactor = BigInt('10') ** BigInt(maxDecimals - fromDecimals);
+  const toScaleFactor = BigInt('10') ** BigInt(maxDecimals - toDecimals);
 
   // Adjust amounts to the same decimal scale
-  const adjustedFromAmount = relativeFromAmount.mul(fromScaleFactor);
-  const adjustedToAmount = relativeToAmount.mul(toScaleFactor);
+  const adjustedFromAmount = relativeFromAmount * fromScaleFactor;
+  const adjustedToAmount = relativeToAmount * toScaleFactor;
 
   // Calculate conversion rate
-  const initialRate = adjustedToAmount.div(adjustedFromAmount);
+  const initialRate = adjustedToAmount / adjustedFromAmount;
 
   // Calculate the remainder and adjust it correctly
-  const conversionRemainder = adjustedToAmount.mod(adjustedFromAmount);
-  const remainderAdjustmentFactor = BigNumber.from('10').pow(maxDecimals);
-  const adjustedRemainder = conversionRemainder.mul(remainderAdjustmentFactor).div(adjustedFromAmount);
+  const conversionRemainder = adjustedToAmount % adjustedFromAmount;
+  const remainderAdjustmentFactor = BigInt('10') ** BigInt(maxDecimals);
+  const adjustedRemainder = conversionRemainder * remainderAdjustmentFactor / adjustedFromAmount;
 
   // Compose the total conversion rate by adding the adjusted remainder
-  const accurateRate = initialRate.mul(remainderAdjustmentFactor).add(adjustedRemainder);
+  const accurateRate = initialRate * remainderAdjustmentFactor + adjustedRemainder;
   const formattedConversion = formatZeroAmount(tokenValueFormat(
-    utils.formatUnits(accurateRate, maxDecimals),
+    formatUnits(accurateRate, maxDecimals),
   ), true);
 
   return t(labelKey, {

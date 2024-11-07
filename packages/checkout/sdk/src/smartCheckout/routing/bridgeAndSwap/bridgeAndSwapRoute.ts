@@ -1,5 +1,3 @@
-import { BigNumber, utils } from 'ethers';
-import { JsonRpcProvider } from '@ethersproject/providers';
 import { CheckoutConfiguration, getL2ChainId } from '../../../config';
 import {
   AvailableRoutingOptions,
@@ -25,6 +23,7 @@ import { fetchL1ToL2Mappings } from './fetchL1ToL2Mappings';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, L1ToL2TokenAddressMapping } from '../indexer/fetchL1Representation';
 import { getDexQuotes } from './getDexQuotes';
 import { isMatchingAddress } from '../../../utils/utils';
+import { formatUnits, JsonRpcProvider } from 'ethers';
 
 export const abortBridgeAndSwap = (
   bridgeableTokens: string[],
@@ -100,18 +99,18 @@ const modifyTokenBalancesWithBridgedAmount = (
     const { amount, l2address } = bridgedToken;
     if (l2address === '') continue;
 
-    let l2balance = BigNumber.from(0);
+    let l2balance = BigInt(0);
     // Find the current balance of this token
     const currentBalance = balanceMap.get(l2address);
     if (currentBalance) l2balance = currentBalance.balance;
 
-    const newBalance = l2balance.add(amount);
+    const newBalance = l2balance + amount;
 
     const tokenInfo = swappableTokens.find((token) => isMatchingAddress(token.address, l2address)) as TokenInfo;
 
     balanceMap.set(l2address, {
       balance: newBalance,
-      formattedBalance: utils.formatUnits(
+      formattedBalance: formatUnits(
         newBalance,
         tokenInfo.decimals,
       ),
@@ -144,7 +143,7 @@ export const reapplyOriginalSwapBalances = (
     const tokenBalance = tokenBalances.get(chainId);
     if (!tokenBalance) continue;
 
-    let originalBalance = BigNumber.from(0);
+    let originalBalance = BigInt(0);
     let originalFormattedBalance = '0';
     const l2balance = tokenBalance.balances.find(
       (balance) => isMatchingAddress(balance.token.address, fundingItem.token.address),

@@ -1,6 +1,4 @@
 import { Environment } from '@imtbl/config';
-import { BigNumber } from 'ethers';
-import { JsonRpcProvider } from '@ethersproject/providers';
 import { Quote } from '@imtbl/dex-sdk';
 import { CheckoutConfiguration } from '../../../config';
 import {
@@ -22,6 +20,7 @@ import { getDexQuotes } from './getDexQuotes';
 import { constructBridgeRequirements } from './constructBridgeRequirements';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../indexer/fetchL1Representation';
 import { HttpClient } from '../../../api/http';
+import { JsonRpcProvider } from 'ethers';
 
 jest.mock('./fetchL1ToL2Mappings');
 jest.mock('./getDexQuotes');
@@ -50,7 +49,7 @@ describe('bridgeAndSwapRoute', () => {
       success: true,
       balances: [
         {
-          balance: BigNumber.from(5),
+          balance: BigInt(5),
           formattedBalance: '5',
           token: {
             name: 'zkYEET',
@@ -60,7 +59,7 @@ describe('bridgeAndSwapRoute', () => {
           },
         },
         {
-          balance: BigNumber.from(15),
+          balance: BigInt(15),
           formattedBalance: '15',
           token: {
             name: 'IMX',
@@ -70,7 +69,7 @@ describe('bridgeAndSwapRoute', () => {
           },
         },
         {
-          balance: BigNumber.from(5),
+          balance: BigInt(5),
           formattedBalance: '5',
           token: {
             name: 'IMX',
@@ -85,7 +84,7 @@ describe('bridgeAndSwapRoute', () => {
       success: true,
       balances: [
         {
-          balance: BigNumber.from(10),
+          balance: BigInt(10),
           formattedBalance: '10',
           token: {
             name: 'ETH',
@@ -94,7 +93,7 @@ describe('bridgeAndSwapRoute', () => {
           },
         },
         {
-          balance: BigNumber.from(10),
+          balance: BigInt(10),
           formattedBalance: '10',
           token: {
             name: 'IMX',
@@ -114,13 +113,13 @@ describe('bridgeAndSwapRoute', () => {
     const dexQuoteIMX: DexQuote = {
       quote: {
         amount: {
-          value: BigNumber.from(10),
+          value: BigInt(10),
           token: {
             address: '0xYEET',
           } as TokenInfo,
         },
         amountWithMaxSlippage: {
-          value: BigNumber.from(15),
+          value: BigInt(15),
           token: {
             address: '0xIMX',
           } as TokenInfo,
@@ -129,7 +128,7 @@ describe('bridgeAndSwapRoute', () => {
         fees: [
           {
             amount: {
-              value: BigNumber.from(5),
+              value: BigInt(5),
               token: {
                 address: '0xIMX',
               } as TokenInfo,
@@ -145,13 +144,13 @@ describe('bridgeAndSwapRoute', () => {
     const dexQuoteETH: DexQuote = {
       quote: {
         amount: {
-          value: BigNumber.from(10),
+          value: BigInt(10),
           token: {
             address: '0xYEET',
           } as TokenInfo,
         },
         amountWithMaxSlippage: {
-          value: BigNumber.from(15),
+          value: BigInt(15),
           token: {
             address: '0xETH',
           } as TokenInfo,
@@ -160,7 +159,7 @@ describe('bridgeAndSwapRoute', () => {
         fees: [
           {
             amount: {
-              value: BigNumber.from(5),
+              value: BigInt(5),
               token: {
                 address: '0xETH',
               } as TokenInfo,
@@ -201,11 +200,11 @@ describe('bridgeAndSwapRoute', () => {
           fundingItem: {
             type: ItemType.ERC20,
             fundsRequired: {
-              amount: BigNumber.from(1),
+              amount: BigInt(1),
               formattedAmount: '1',
             },
             userBalance: {
-              balance: BigNumber.from(5),
+              balance: BigInt(5),
               formattedBalance: '5',
             },
             token: {
@@ -218,17 +217,17 @@ describe('bridgeAndSwapRoute', () => {
           fees: {
             approvalGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(0),
+              amount: BigInt(0),
               formattedAmount: '0',
             },
             bridgeGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(0),
+              amount: BigInt(0),
               formattedAmount: '0',
             },
             bridgeFees: [{
               type: FeeType.BRIDGE_FEE,
-              amount: BigNumber.from(0),
+              amount: BigInt(0),
               formattedAmount: '0',
             }],
           },
@@ -241,11 +240,11 @@ describe('bridgeAndSwapRoute', () => {
           fundingItem: {
             type: ItemType.NATIVE,
             fundsRequired: {
-              amount: BigNumber.from(10),
+              amount: BigInt(10),
               formattedAmount: '10',
             },
             userBalance: {
-              balance: BigNumber.from(15),
+              balance: BigInt(15),
               formattedBalance: '15',
             },
             token: {
@@ -257,17 +256,17 @@ describe('bridgeAndSwapRoute', () => {
           fees: {
             approvalGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(0),
+              amount: BigInt(0),
               formattedAmount: '0',
             },
             bridgeGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(0),
+              amount: BigInt(0),
               formattedAmount: '0',
             },
             bridgeFees: [{
               type: FeeType.BRIDGE_FEE,
-              amount: BigNumber.from(0),
+              amount: BigInt(0),
               formattedAmount: '0',
             }],
           },
@@ -281,11 +280,11 @@ describe('bridgeAndSwapRoute', () => {
           fundingItem: {
             type: ItemType.NATIVE,
             fundsRequired: {
-              amount: BigNumber.from(10),
+              amount: BigInt(10),
               formattedAmount: '10',
             },
             userBalance: {
-              balance: BigNumber.from(15),
+              balance: BigInt(15),
               formattedBalance: '15',
             },
             token: {
@@ -298,17 +297,17 @@ describe('bridgeAndSwapRoute', () => {
           fees: {
             approvalGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(0),
+              amount: BigInt(0),
               formattedAmount: '0',
             },
             swapGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(0),
+              amount: BigInt(0),
               formattedAmount: '0',
             },
             swapFees: [{
               type: FeeType.SWAP_FEE,
-              amount: BigNumber.from(0),
+              amount: BigInt(0),
               formattedAmount: '0',
             }],
           },
@@ -319,11 +318,11 @@ describe('bridgeAndSwapRoute', () => {
           fundingItem: {
             type: ItemType.ERC20,
             fundsRequired: {
-              amount: BigNumber.from(1),
+              amount: BigInt(1),
               formattedAmount: '1',
             },
             userBalance: {
-              balance: BigNumber.from(5),
+              balance: BigInt(5),
               formattedBalance: '5',
             },
             token: {
@@ -336,17 +335,17 @@ describe('bridgeAndSwapRoute', () => {
           fees: {
             approvalGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(0),
+              amount: BigInt(0),
               formattedAmount: '0',
             },
             swapGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(0),
+              amount: BigInt(0),
               formattedAmount: '0',
             },
             swapFees: [{
               type: FeeType.SWAP_FEE,
-              amount: BigNumber.from(0),
+              amount: BigInt(0),
               formattedAmount: '0',
             }],
           },
@@ -356,12 +355,12 @@ describe('bridgeAndSwapRoute', () => {
     (constructBridgeRequirements as jest.Mock).mockReturnValue(
       [
         {
-          amount: BigNumber.from(10),
+          amount: BigInt(10),
           formattedAmount: '10',
           l2address: '0xIMX',
         },
         {
-          amount: BigNumber.from(10),
+          amount: BigInt(10),
           formattedAmount: '10',
           l2address: '0xETH',
         },
@@ -372,12 +371,12 @@ describe('bridgeAndSwapRoute', () => {
       type: ItemType.ERC20,
       sufficient: false,
       delta: {
-        balance: BigNumber.from(5),
+        balance: BigInt(5),
         formattedBalance: '5',
       },
       current: {
         type: ItemType.ERC20,
-        balance: BigNumber.from(5),
+        balance: BigInt(5),
         formattedBalance: '5',
         token: {
           address: '0xYEET',
@@ -388,7 +387,7 @@ describe('bridgeAndSwapRoute', () => {
       },
       required: {
         type: ItemType.ERC20,
-        balance: BigNumber.from(10),
+        balance: BigInt(10),
         formattedBalance: '10',
         token: {
           address: '0xYEET',
@@ -448,11 +447,11 @@ describe('bridgeAndSwapRoute', () => {
             fundingItem: {
               type: ItemType.ERC20,
               fundsRequired: {
-                amount: BigNumber.from(1),
+                amount: BigInt(1),
                 formattedAmount: '1',
               },
               userBalance: {
-                balance: BigNumber.from(5),
+                balance: BigInt(5),
                 formattedBalance: '5',
               },
               token: {
@@ -465,17 +464,17 @@ describe('bridgeAndSwapRoute', () => {
             fees: {
               approvalGasFee: {
                 type: FeeType.GAS,
-                amount: BigNumber.from(0),
+                amount: BigInt(0),
                 formattedAmount: '0',
               },
               bridgeGasFee: {
                 type: FeeType.GAS,
-                amount: BigNumber.from(0),
+                amount: BigInt(0),
                 formattedAmount: '0',
               },
               bridgeFees: [{
                 type: FeeType.BRIDGE_FEE,
-                amount: BigNumber.from(0),
+                amount: BigInt(0),
                 formattedAmount: '0',
               }],
             },
@@ -486,11 +485,11 @@ describe('bridgeAndSwapRoute', () => {
             fundingItem: {
               type: ItemType.NATIVE,
               fundsRequired: {
-                amount: BigNumber.from(10),
+                amount: BigInt(10),
                 formattedAmount: '10',
               },
               userBalance: {
-                balance: BigNumber.from(15),
+                balance: BigInt(15),
                 formattedBalance: '15',
               },
               token: {
@@ -503,17 +502,17 @@ describe('bridgeAndSwapRoute', () => {
             fees: {
               approvalGasFee: {
                 type: FeeType.GAS,
-                amount: BigNumber.from(0),
+                amount: BigInt(0),
                 formattedAmount: '0',
               },
               swapGasFee: {
                 type: FeeType.GAS,
-                amount: BigNumber.from(0),
+                amount: BigInt(0),
                 formattedAmount: '0',
               },
               swapFees: [{
                 type: FeeType.SWAP_FEE,
-                amount: BigNumber.from(0),
+                amount: BigInt(0),
                 formattedAmount: '0',
               }],
             },
@@ -526,11 +525,11 @@ describe('bridgeAndSwapRoute', () => {
             fundingItem: {
               type: ItemType.NATIVE,
               fundsRequired: {
-                amount: BigNumber.from(10),
+                amount: BigInt(10),
                 formattedAmount: '10',
               },
               userBalance: {
-                balance: BigNumber.from(15),
+                balance: BigInt(15),
                 formattedBalance: '15',
               },
               token: {
@@ -542,17 +541,17 @@ describe('bridgeAndSwapRoute', () => {
             fees: {
               approvalGasFee: {
                 type: FeeType.GAS,
-                amount: BigNumber.from(0),
+                amount: BigInt(0),
                 formattedAmount: '0',
               },
               bridgeGasFee: {
                 type: FeeType.GAS,
-                amount: BigNumber.from(0),
+                amount: BigInt(0),
                 formattedAmount: '0',
               },
               bridgeFees: [{
                 type: FeeType.BRIDGE_FEE,
-                amount: BigNumber.from(0),
+                amount: BigInt(0),
                 formattedAmount: '0',
               }],
             },
@@ -563,11 +562,11 @@ describe('bridgeAndSwapRoute', () => {
             fundingItem: {
               type: ItemType.ERC20,
               fundsRequired: {
-                amount: BigNumber.from(1),
+                amount: BigInt(1),
                 formattedAmount: '1',
               },
               userBalance: {
-                balance: BigNumber.from(5),
+                balance: BigInt(5),
                 formattedBalance: '5',
               },
               token: {
@@ -580,17 +579,17 @@ describe('bridgeAndSwapRoute', () => {
             fees: {
               approvalGasFee: {
                 type: FeeType.GAS,
-                amount: BigNumber.from(0),
+                amount: BigInt(0),
                 formattedAmount: '0',
               },
               swapGasFee: {
                 type: FeeType.GAS,
-                amount: BigNumber.from(0),
+                amount: BigInt(0),
                 formattedAmount: '0',
               },
               swapFees: [{
                 type: FeeType.SWAP_FEE,
-                amount: BigNumber.from(0),
+                amount: BigInt(0),
                 formattedAmount: '0',
               }],
             },
@@ -605,12 +604,12 @@ describe('bridgeAndSwapRoute', () => {
       type: ItemType.ERC20,
       sufficient: false,
       delta: {
-        balance: BigNumber.from(5),
+        balance: BigInt(5),
         formattedBalance: '5',
       },
       current: {
         type: ItemType.ERC20,
-        balance: BigNumber.from(5),
+        balance: BigInt(5),
         formattedBalance: '5',
         token: {
           address: '0xIMX',
@@ -621,7 +620,7 @@ describe('bridgeAndSwapRoute', () => {
       },
       required: {
         type: ItemType.ERC20,
-        balance: BigNumber.from(10),
+        balance: BigInt(10),
         formattedBalance: '10',
         token: {
           address: '0xIMX',

@@ -1,13 +1,13 @@
 import {
-  BigNumber, Wallet, Contract, errors,
-} from 'ethers';
-import { StaticJsonRpcProvider } from '@ethersproject/providers';
-import {
   getNonce, signMetaTransactions, signAndPackTypedData, packSignatures,
   coerceNonceSpace,
   encodeNonce,
 } from './walletHelpers';
 import { TypedDataPayload } from './types';
+import { Contract, isCallException, Wallet } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
+import { ErrorCode } from 'ethers';
+import { CallExceptionError } from 'ethers';
 
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
@@ -38,7 +38,7 @@ describe('signMetaTransactions', () => {
     const signature = await signMetaTransactions(
       transactions,
       nonce,
-      BigNumber.from(chainId),
+      BigInt(chainId),
       walletAddress,
       signer,
     );
@@ -61,7 +61,7 @@ describe('signAndPackTypedData', () => {
     const signature = await signAndPackTypedData(
       typedDataPayload,
       relayerSignature,
-      BigNumber.from(chainId),
+      BigInt(chainId),
       walletAddress,
       signer,
     );
@@ -79,7 +79,7 @@ describe('signAndPackTypedData', () => {
       const result = await signAndPackTypedData(
         typedDataPayload,
         relayerSignature,
-        BigNumber.from(chainId),
+        BigInt(chainId),
         walletAddress,
         lowAddressSigner,
       );
@@ -105,7 +105,7 @@ describe('signAndPackTypedData', () => {
       const result = await signAndPackTypedData(
         typedDataPayload,
         relayerSignature,
-        BigNumber.from(chainId),
+        BigInt(chainId),
         walletAddress,
         signer,
       );
@@ -152,7 +152,7 @@ describe('encodeNonce', () => {
 });
 
 describe('getNonce', () => {
-  const rpcProvider = {} as StaticJsonRpcProvider;
+  const rpcProvider = {} as JsonRpcProvider;
   const nonceMock = jest.fn();
 
   beforeEach(() => {
@@ -166,21 +166,20 @@ describe('getNonce', () => {
   describe('when an error is thrown', () => {
     describe('and the error is a call_exception', () => {
       it('should return 0', async () => {
-        const error = new Error('call revert exception');
-        Object.defineProperty(error, 'code', { value: errors.CALL_EXCEPTION });
+        const error = { code: 'CALL_EXCEPTION' } as CallExceptionError
 
         nonceMock.mockRejectedValue(error);
 
         const result = await getNonce(rpcProvider, walletAddress);
 
-        expect(result).toEqual(BigNumber.from(0));
+        expect(result).toEqual(BigInt(0));
       });
     });
 
     describe('and the error is NOT a call_exception', () => {
       it('should throw the error', async () => {
         const error = new Error('call revert exception');
-        Object.defineProperty(error, 'code', { value: errors.NETWORK_ERROR });
+        Object.defineProperty(error, 'code', { value: "NETWORK_ERROR" satisfies ErrorCode });
         nonceMock.mockRejectedValue(error);
 
         await expect(() => getNonce(rpcProvider, walletAddress)).rejects.toThrow(error);
@@ -190,11 +189,11 @@ describe('getNonce', () => {
 
   describe('when a BigNumber is returned', () => {
     it('should return a number', async () => {
-      nonceMock.mockResolvedValue(BigNumber.from(20));
+      nonceMock.mockResolvedValue(BigInt(20));
 
       const result = await getNonce(rpcProvider, walletAddress);
 
-      expect(result).toEqual(BigNumber.from(20));
+      expect(result).toEqual(BigInt(20));
     });
   });
 });

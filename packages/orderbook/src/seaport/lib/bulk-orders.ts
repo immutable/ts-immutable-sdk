@@ -1,4 +1,4 @@
-import { TypedDataEncoder, keccak256, toUtf8Bytes } from 'ethers-v6';
+import { keccak256, toUtf8Bytes, TypedDataEncoder } from 'ethers';
 import type { OrderComponents } from '../types';
 import { EIP_712_ORDER_TYPE } from '../constants';
 

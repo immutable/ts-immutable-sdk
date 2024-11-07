@@ -1,8 +1,7 @@
 import { Exchange } from '@imtbl/dex-sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider, parseUnits } from 'ethers';
 import { ChainId, TokenInfo } from '@imtbl/checkout-sdk';
-import { BigNumber, utils } from 'ethers';
 import { quotesProcessor } from './FetchQuote';
 
 const overrides: any = {
@@ -28,7 +27,7 @@ describe('QuotesProcessor', () => {
     describe('fromAmountIn', () => {
       let exchange: Exchange;
       let getUnsignedSwapTxFromAmountIn: jest.Mock;
-      let provider: Web3Provider;
+      let provider: BrowserProvider;
       let toToken: TokenInfo;
       let fromToken: TokenInfo;
       let fromAmount: string;
@@ -51,7 +50,7 @@ describe('QuotesProcessor', () => {
           provider: {
             request: async () => null,
           },
-        } as unknown as Web3Provider;
+        } as unknown as BrowserProvider;
 
         fromAmount = '100';
       });
@@ -76,7 +75,7 @@ describe('QuotesProcessor', () => {
           '0x123',
           '0x124',
           '0x125',
-          BigNumber.from(utils.parseUnits(fromAmount, fromToken.decimals)),
+          BigInt(parseUnits(fromAmount, fromToken.decimals)),
         );
       });
     });
@@ -84,7 +83,7 @@ describe('QuotesProcessor', () => {
     describe('fromAmountOut', () => {
       let exchange: Exchange;
       let getUnsignedSwapTxFromAmountOut: jest.Mock;
-      let provider: Web3Provider;
+      let provider: BrowserProvider;
       let toToken: TokenInfo;
       let fromToken: TokenInfo;
       let toAmount: string;
@@ -105,7 +104,7 @@ describe('QuotesProcessor', () => {
           provider: {
             request: async () => null,
           },
-        } as unknown as Web3Provider;
+        } as unknown as BrowserProvider;
 
         toAmount = '100';
       });
@@ -131,7 +130,7 @@ describe('QuotesProcessor', () => {
           '0x123',
           '0x124',
           '0x125',
-          BigNumber.from(utils.parseUnits(toAmount, toToken.decimals)),
+          BigInt(parseUnits(toAmount, toToken.decimals)),
         );
       });
     });

@@ -4,17 +4,17 @@ import {
   EIP6963ProviderDetail,
   TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
 import LoadingButton from './LoadingButton';
 import { Box } from '@biom3/react';
 import { NetworkInfo } from '@imtbl/checkout-sdk';
 import { TokenInfo } from '@imtbl/checkout-sdk';
+import { BrowserProvider } from 'ethers';
 
 export interface AllowListProps {
   checkout: Checkout | undefined;
-  provider: Web3Provider | undefined;
+  provider: BrowserProvider | undefined;
 }
 
 export default function GetInjectedProviders(props: AllowListProps) {

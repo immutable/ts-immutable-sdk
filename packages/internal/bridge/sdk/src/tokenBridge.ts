@@ -1,7 +1,13 @@
 /* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
 import axios, { AxiosResponse } from 'axios';
-import { ethers, utils } from 'ethers';
+import {
+  concat,
+  Contract, getAddress, keccak256, Provider, toBeHex, toQuantity, TransactionRequest,
+  zeroPadValue,
+  AbiCoder,
+  ZeroAddress,
+} from 'ethers';
 import { ROOT_AXELAR_ADAPTOR } from './contracts/ABIs/RootAxelarBridgeAdaptor';
 import {
   checkReceiver, validateBridgeReqArgs, validateChainConfiguration, validateChainIds,
@@ -163,14 +169,14 @@ export class TokenBridge {
     return res;
   }
 
-  private async getFinaliseWithdrawFee(): Promise<ethers.BigNumber> {
+  private async getFinaliseWithdrawFee(): Promise<bigint> {
     const feeData = await this.config.rootProvider.getFeeData();
     const sourceChainFee = calculateGasFee(feeData, BridgeMethodsGasLimit.FINALISE_WITHDRAWAL);
     return sourceChainFee;
   }
 
   private async getDepositOrWithdrawFee(req: BridgeFeeRequest):
-  Promise<{ sourceChainFee: ethers.BigNumber, approvalFee: ethers.BigNumber, bridgeFee: ethers.BigNumber }> {
+  Promise<{ sourceChainFee: bigint, approvalFee: bigint, bridgeFee: bigint }> {
     let feeData;
     if (req.sourceChainId === this.config.bridgeInstance.rootChainID) {
       feeData = await this.config.rootProvider.getFeeData();
@@ -178,9 +184,9 @@ export class TokenBridge {
       feeData = await this.config.childProvider.getFeeData();
     }
 
-    let sourceChainFee: ethers.BigNumber = ethers.BigNumber.from(0);
-    let approvalFee: ethers.BigNumber = ethers.BigNumber.from(0);
-    let bridgeFee: ethers.BigNumber = ethers.BigNumber.from(0);
+    let sourceChainFee: bigint = BigInt(0);
+    let approvalFee: bigint = BigInt(0);
+    let bridgeFee: bigint = BigInt(0);
 
     let direction: BridgeDirection;
     if (req.action === BridgeFeeActions.DEPOSIT) {
@@ -238,9 +244,9 @@ export class TokenBridge {
   private async getFeePrivate(req: BridgeFeeRequest): Promise<BridgeFeeResponse> {
     validateGetFee(req, this.config);
 
-    let sourceChainFee: ethers.BigNumber = ethers.BigNumber.from(0);
-    let approvalFee: ethers.BigNumber = ethers.BigNumber.from(0);
-    let bridgeFee: ethers.BigNumber = ethers.BigNumber.from(0);
+    let sourceChainFee: bigint = BigInt(0);
+    let approvalFee: bigint = BigInt(0);
+    let bridgeFee: bigint = BigInt(0);
 
     if (req.action === BridgeFeeActions.FINALISE_WITHDRAWAL) {
       sourceChainFee = await this.getFinaliseWithdrawFee();
@@ -251,9 +257,9 @@ export class TokenBridge {
       bridgeFee = fees.bridgeFee;
     }
 
-    const totalFees: ethers.BigNumber = sourceChainFee.add(approvalFee).add(bridgeFee);
+    const totalFees: bigint = sourceChainFee + approvalFee + bridgeFee;
 
-    const imtblFee = ethers.BigNumber.from('0'); // This currently only exists for interface compatibility
+    const imtblFee = BigInt('0'); // This currently only exists for interface compatibility
 
     return {
       sourceChainGas: sourceChainFee,
@@ -377,7 +383,7 @@ export class TokenBridge {
   private async getConfigAndBridgeTxCalldata(
     sender: string,
     recipient: string,
-    amount: ethers.BigNumber,
+    amount: bigint,
     token: string,
     direction: BridgeDirection,
   ) {
@@ -603,7 +609,7 @@ export class TokenBridge {
     sender: string,
     recipient: string,
     token: FungibleToken,
-    amount: ethers.BigNumber,
+    amount: bigint,
     gasMultiplier: number | string,
   ): Promise<BridgeBundledTxResponse> {
     const [allowance, feeData, rootGas, axelarFee] = await Promise.all([
@@ -619,16 +625,16 @@ export class TokenBridge {
     ]);
 
     let contractToApprove: string | null;
-    let unsignedApprovalTx: ethers.providers.TransactionRequest | null;
-    let sourceChainFee: ethers.BigNumber = ethers.BigNumber.from(0);
-    let approvalFee: ethers.BigNumber = ethers.BigNumber.from(0);
-    const bridgeFee: ethers.BigNumber = axelarFee;
-    const imtblFee: ethers.BigNumber = ethers.BigNumber.from(0);
+    let unsignedApprovalTx: TransactionRequest | null;
+    let sourceChainFee: bigint = BigInt(0);
+    let approvalFee: bigint = BigInt(0);
+    const bridgeFee: bigint = axelarFee;
+    const imtblFee: bigint = BigInt(0);
 
     // Approval required for non-native tokens with insufficient allowance.
-    if (token.toUpperCase() !== NATIVE && allowance.lt(amount)) {
-      contractToApprove = token;
-      const erc20Contract = await createContract(token, ERC20, this.config.rootProvider);
+    if (token.toUpperCase() !== NATIVE && allowance < amount) {
+      contractToApprove = token.startsWith('0x') ? token : `0x${token}`;
+      const erc20Contract = await createContract(contractToApprove, ERC20, this.config.rootProvider);
       const data: string = await withBridgeError<string>(async () => erc20Contract.interface
         .encodeFunctionData('approve', [
           this.config.bridgeContracts.rootERC20BridgeFlowRate,
@@ -656,8 +662,8 @@ export class TokenBridge {
       direction,
     );
     const txValue = (token.toUpperCase() === NATIVE)
-      ? amount.add(bridgeFee).toString() : bridgeFee.toString();
-    const unsignedBridgeTx: ethers.providers.TransactionRequest = {
+      ? (amount + bridgeFee).toString() : bridgeFee.toString();
+    const unsignedBridgeTx: TransactionRequest = {
       data: txData,
       to: this.config.bridgeContracts.rootERC20BridgeFlowRate,
       value: txValue,
@@ -666,7 +672,7 @@ export class TokenBridge {
     };
     sourceChainFee = calculateGasFee(feeData, rootGas.sourceChainGas);
 
-    const totalFees: ethers.BigNumber = sourceChainFee.add(approvalFee).add(bridgeFee).add(imtblFee);
+    const totalFees: bigint = sourceChainFee + approvalFee + bridgeFee + imtblFee;
 
     return {
       feeData: {
@@ -691,7 +697,7 @@ export class TokenBridge {
     sender: string,
     recipient: string,
     token: FungibleToken,
-    amount: ethers.BigNumber,
+    amount: bigint,
     gasMultiplier: number | string,
   ): Promise<BridgeBundledTxResponse> {
     const [allowance, feeData, tenderlyRes] = await Promise.all([
@@ -715,14 +721,14 @@ export class TokenBridge {
     );
 
     let contractToApprove: string | null;
-    let unsignedApprovalTx: ethers.providers.TransactionRequest | null;
-    let sourceChainFee: ethers.BigNumber = ethers.BigNumber.from(0);
-    let approvalFee: ethers.BigNumber = ethers.BigNumber.from(0);
-    const bridgeFee: ethers.BigNumber = axelarFee;
-    const imtblFee: ethers.BigNumber = ethers.BigNumber.from(0);
+    let unsignedApprovalTx: TransactionRequest | null;
+    let sourceChainFee: bigint = BigInt(0);
+    let approvalFee: bigint = BigInt(0);
+    const bridgeFee: bigint = axelarFee;
+    const imtblFee: bigint = BigInt(0);
 
     // Approval required only for WIMX tokens with insufficient allowance.
-    if (isWrappedIMX(token, this.config.bridgeInstance.childChainID) && allowance.lt(amount)) {
+    if (isWrappedIMX(token, this.config.bridgeInstance.childChainID) && allowance < amount) {
       contractToApprove = token;
       const erc20Contract = await createContract(token, ERC20, this.config.childProvider);
       const data: string = await withBridgeError<string>(async () => erc20Contract.interface
@@ -752,8 +758,8 @@ export class TokenBridge {
       direction,
     );
     const txValue = (token.toUpperCase() === NATIVE)
-      ? amount.add(bridgeFee).toString() : bridgeFee.toString();
-    const unsignedBridgeTx: ethers.providers.TransactionRequest = {
+      ? (amount + bridgeFee).toString() : bridgeFee.toString();
+    const unsignedBridgeTx: TransactionRequest = {
       data: txData,
       to: this.config.bridgeContracts.rootERC20BridgeFlowRate,
       value: txValue,
@@ -762,7 +768,7 @@ export class TokenBridge {
     };
     sourceChainFee = calculateGasFee(feeData, BridgeMethodsGasLimit.WITHDRAW_SOURCE);
 
-    const totalFees: ethers.BigNumber = sourceChainFee.add(approvalFee).add(bridgeFee).add(imtblFee);
+    const totalFees: bigint = sourceChainFee + approvalFee + bridgeFee + imtblFee;
 
     return {
       feeData: {
@@ -787,7 +793,7 @@ export class TokenBridge {
     sender: string,
     recipient: string,
     token: FungibleToken,
-    amount: ethers.BigNumber,
+    amount: bigint,
   ): Promise<DynamicGasEstimatesResponse> {
     const simulations: Array<TenderlySimulation> = [];
 
@@ -827,7 +833,7 @@ export class TokenBridge {
 
     // tx value for simulation mocked as amount + 1 wei for a native bridge and 1 wei for token bridges
     // hexValue() is required to remove leading zeros, which tenderly does not support.
-    const txValue = (token.toUpperCase() !== NATIVE) ? '0x1' : utils.hexValue(amount.add('1').toHexString());
+    const txValue = (token.toUpperCase() !== NATIVE) ? '0x1' : toQuantity(toBeHex(amount + BigInt(1)));
 
     simulations.push({
       from: sender,
@@ -856,7 +862,7 @@ export class TokenBridge {
     sender: string,
     recipient: string,
     token: FungibleToken,
-    amount: ethers.BigNumber,
+    amount: bigint,
   ): Promise<TenderlyResult> {
     const rootToken = await getWithdrawRootToken(token, destinationChainId, this.config.childProvider);
     const payload = genAxelarWithdrawPayload(
@@ -867,19 +873,19 @@ export class TokenBridge {
     );
     const commandId = genUniqueAxelarCommandId(payload);
     const sourceChain = getChildchain(destinationChainId);
-    const sourceAddress = ethers.utils.getAddress(getChildAdaptor(destinationChainId)).toString();
+    const sourceAddress = getAddress(getChildAdaptor(destinationChainId)).toString();
     const destinationAddress = getRootAdaptor(destinationChainId);
-    const payloadHash = utils.keccak256(payload);
+    const payloadHash = keccak256(payload);
 
     // Calculate slot key for given command ID.
-    const command = utils.defaultAbiCoder.encode(
+    const command = AbiCoder.defaultAbiCoder().encode(
       ['bytes32', 'bytes32', 'string', 'string', 'address', 'bytes32'],
       [SLOT_PREFIX_CONTRACT_CALL_APPROVED, commandId, sourceChain, sourceAddress, destinationAddress, payloadHash],
     );
-    const commandHash = utils.keccak256(command);
-    const gatewayCallApprovedSlot = utils.keccak256(utils.concat([
+    const commandHash = keccak256(command);
+    const gatewayCallApprovedSlot = keccak256(concat([
       commandHash,
-      utils.hexlify(utils.zeroPad(utils.hexlify(SLOT_POS_CONTRACT_CALL_APPROVED), 32)),
+      toBeHex(zeroPadValue(toBeHex(SLOT_POS_CONTRACT_CALL_APPROVED), 32)),
     ]));
 
     // Encode execute data
@@ -930,17 +936,17 @@ export class TokenBridge {
     return await submitTenderlySimulations(destinationChainId, simulations, [stateObject]);
   }
 
-  private async getAllowance(direction: BridgeDirection, token: string, sender: string): Promise<ethers.BigNumber> {
+  private async getAllowance(direction: BridgeDirection, token: string, sender: string): Promise<bigint> {
     if (token.toUpperCase() === NATIVE) {
       // Return immediately for native token.
-      return ethers.BigNumber.from(0);
+      return BigInt(0);
     }
     if (isWithdrawNativeIMX(token, direction, this.config.bridgeInstance)) {
       // Return immediately for non wrapped IMX on child chain.
-      return ethers.BigNumber.from(0);
+      return BigInt(0);
     }
 
-    let provider: ethers.providers.Provider;
+    let provider: Provider;
     let bridgeContract: string;
     if (isValidDeposit(direction, this.config.bridgeInstance)) {
       provider = this.config.rootProvider;
@@ -950,9 +956,9 @@ export class TokenBridge {
       bridgeContract = this.config.bridgeContracts.childERC20Bridge;
     }
 
-    const erc20Contract: ethers.Contract = await createContract(token, ERC20, provider);
+    const erc20Contract: Contract = await createContract(token, ERC20, provider);
 
-    return await withBridgeError<ethers.BigNumber>(() => erc20Contract
+    return await withBridgeError<bigint>(() => erc20Contract
       .allowance(
         sender,
         bridgeContract,
@@ -972,7 +978,7 @@ export class TokenBridge {
     destinationChainId: string,
     destinationChainGaslimit: number,
     gasMultiplier: number | string = 'auto',
-  ): Promise<ethers.BigNumber> {
+  ): Promise<bigint> {
     const sourceAxelar: AxelarChainDetails = axelarChains[sourceChainId];
     const destinationAxelar: AxelarChainDetails = axelarChains[destinationChainId];
 
@@ -1017,7 +1023,7 @@ export class TokenBridge {
     }
 
     try {
-      return ethers.BigNumber.from(`${axiosResponse.data}`);
+      return BigInt(`${axiosResponse.data}`);
     } catch (err) {
       throw new BridgeError(
         `Estimating Axelar Gas failed with the reason: ${err}`,
@@ -1123,7 +1129,7 @@ export class TokenBridge {
     const statusPromises: Array<Promise<GMPStatusResponse>> = [];
     const axelarAPIEndpoint: string = getAxelarEndpoint(sourceChainId);
     const unpaidGasStatus = [GasPaidStatus.GAS_UNPAID, GasPaidStatus.GAS_PAID_NOT_ENOUGH_GAS];
-    const abiCoder = new ethers.utils.AbiCoder();
+    const abiCoder = new AbiCoder();
 
     for (const transaction of transactions) {
       statusPromises.push(queryTransactionStatus(axelarAPIEndpoint, transaction.txHash));
@@ -1291,18 +1297,18 @@ export class TokenBridge {
     const rootBridgeAddress = this.config.bridgeContracts.rootERC20BridgeFlowRate;
     const rootBridge = await createContract(rootBridgeAddress, ROOT_ERC20_BRIDGE_FLOW_RATE, this.config.rootProvider);
 
-    const pendingLength: ethers.BigNumber = await rootBridge.getPendingWithdrawalsLength(req.recipient);
+    const pendingLength: bigint = await rootBridge.getPendingWithdrawalsLength(req.recipient);
 
     const pendingWithdrawals: PendingWithdrawalsResponse = {
       pending: [],
     };
 
-    if (pendingLength.toNumber() === 0) {
+    if (Number(pendingLength) === 0) {
       return pendingWithdrawals;
     }
 
     const indices: Array<number> = [];
-    for (let i = 0; i < pendingLength.toNumber(); i++) {
+    for (let i = 0; i < Number(pendingLength); i++) {
       indices.push(i);
     }
 
@@ -1310,10 +1316,10 @@ export class TokenBridge {
 
     const timestampNow = Math.floor(Date.now() / 1000);
 
-    const withdrawalDelay: ethers.BigNumber = await rootBridge.withdrawalDelay();
+    const withdrawalDelay: bigint = await rootBridge.withdrawalDelay();
 
     for (let i = 0, l = pending.length; i < l; i++) {
-      const timeoutEnd = pending[i].timestamp.add(withdrawalDelay).toNumber();
+      const timeoutEnd = Number(pending[i].timestamp + withdrawalDelay);
       if (timeoutEnd > timestampNow) {
         pendingWithdrawals.pending[i] = {
           canWithdraw: false,
@@ -1327,7 +1333,7 @@ export class TokenBridge {
       pendingWithdrawals.pending[i].withdrawer = pending[i].withdrawer;
       pendingWithdrawals.pending[i].token = pending[i].token;
       pendingWithdrawals.pending[i].amount = pending[i].amount;
-      pendingWithdrawals.pending[i].timeoutStart = pending[i].timestamp.toNumber();
+      pendingWithdrawals.pending[i].timeoutStart = Number(pending[i].timestamp);
       pendingWithdrawals.pending[i].timeoutEnd = timeoutEnd;
     }
 
@@ -1365,18 +1371,18 @@ export class TokenBridge {
     const pending: Array<RootBridgePendingWithdrawal> = await
     rootBridge.getPendingWithdrawals(req.recipient, [req.index]);
 
-    if (pending[0].withdrawer === ethers.constants.AddressZero
-      || pending[0].token === ethers.constants.AddressZero
-      || pending[0].amount === ethers.BigNumber.from(0)
-      || pending[0].timestamp === ethers.BigNumber.from(0)) {
+    if (pending[0].withdrawer === ZeroAddress
+      || pending[0].token === ZeroAddress
+      || pending[0].amount === BigInt(0)
+      || pending[0].timestamp === BigInt(0)) {
       throw new BridgeError(
         `pending withdrawal not found for ${req.recipient} at index ${req.index}`,
         BridgeErrorType.FLOW_RATE_ERROR,
       );
     }
 
-    const withdrawalDelay: ethers.BigNumber = await rootBridge.withdrawalDelay();
-    const timeoutEnd = pending[0].timestamp.add(withdrawalDelay).toNumber();
+    const withdrawalDelay: bigint = await rootBridge.withdrawalDelay();
+    const timeoutEnd = Number(pending[0].timestamp + withdrawalDelay);
     const timestampNow = Math.floor(Date.now() / 1000);
 
     if (timeoutEnd > timestampNow) {
@@ -1387,7 +1393,7 @@ export class TokenBridge {
           recipient: req.recipient,
           token: pending[0].token,
           amount: pending[0].amount,
-          timeoutStart: pending[0].timestamp.toNumber(),
+          timeoutStart: Number(pending[0].timestamp),
           timeoutEnd,
         },
         unsignedTx: null,
@@ -1406,7 +1412,7 @@ export class TokenBridge {
         recipient: req.recipient,
         token: pending[0].token,
         amount: pending[0].amount,
-        timeoutStart: pending[0].timestamp.toNumber(),
+        timeoutStart: Number(pending[0].timestamp),
         timeoutEnd,
       },
       unsignedTx: {
@@ -1447,7 +1453,7 @@ export class TokenBridge {
     const rootBridge = await createContract(rootBridgeAddress, ROOT_ERC20_BRIDGE_FLOW_RATE, this.config.rootProvider);
     const rootTokenChildAddress = await rootBridge.rootTokenToChildToken(req.rootToken);
 
-    if (rootTokenChildAddress === ethers.constants.AddressZero) {
+    if (rootTokenChildAddress === ZeroAddress) {
       return {
         rootToken: req.rootToken,
         childToken: null,

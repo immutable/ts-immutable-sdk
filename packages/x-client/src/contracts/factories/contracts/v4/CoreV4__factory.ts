@@ -2,8 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer, utils } from "ethers";
-import type { Provider } from "@ethersproject/providers";
+import { Contract, Interface, type ContractRunner } from "ethers";
 import type { CoreV4, CoreV4Interface } from "../../../contracts/v4/CoreV4";
 
 const _abi = [
@@ -2420,14 +2419,14 @@ const _abi = [
     stateMutability: "payable",
     type: "receive",
   },
-];
+] as const;
 
 export class CoreV4__factory {
   static readonly abi = _abi;
   static createInterface(): CoreV4Interface {
-    return new utils.Interface(_abi) as CoreV4Interface;
+    return new Interface(_abi) as CoreV4Interface;
   }
-  static connect(address: string, signerOrProvider: Signer | Provider): CoreV4 {
-    return new Contract(address, _abi, signerOrProvider) as CoreV4;
+  static connect(address: string, runner?: ContractRunner | null): CoreV4 {
+    return new Contract(address, _abi, runner) as unknown as CoreV4;
   }
 }

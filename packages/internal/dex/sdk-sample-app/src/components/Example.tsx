@@ -122,7 +122,7 @@ export function Example() {
     setSwapTransaction(null);
     setIsFetching(true);
     const provider = new ethers.providers.Web3Provider((window as any).ethereum);
-    const signer = provider.getSigner();
+    const signer = await provider.getSigner();
 
     // Approve the ERC20 spend
     if (!approved) {

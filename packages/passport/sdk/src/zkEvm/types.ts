@@ -1,4 +1,4 @@
-import { BigNumberish, BytesLike } from 'ethers';
+import { BigNumberish } from 'ethers';
 import { JsonRpcError } from './JsonRpcError';
 
 export enum RelayerTransactionStatus {
@@ -28,9 +28,9 @@ export interface FeeOption {
 
 export interface MetaTransaction {
   to: string;
-  value?: BigNumberish;
-  data?: BytesLike;
-  nonce?: BigNumberish;
+  value?: BigNumberish | null;
+  data?: string | null;
+  nonce?: BigNumberish | null;
   gasLimit?: BigNumberish;
   delegateCall?: boolean;
   revertOnError?: boolean;
@@ -42,7 +42,7 @@ export interface MetaTransactionNormalised {
   gasLimit: BigNumberish;
   target: string;
   value: BigNumberish;
-  data: BytesLike;
+  data: string;
 }
 
 // https://eips.ethereum.org/EIPS/eip-712
@@ -54,7 +54,7 @@ export interface TypedDataPayload {
   domain: {
     name?: string;
     version?: string;
-    chainId?: number;
+    chainId?: string;
     verifyingContract?: string;
     salt?: string;
   };

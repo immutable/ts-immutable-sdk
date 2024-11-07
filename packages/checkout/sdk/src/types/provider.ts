@@ -1,4 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 
 /**
  * Enum representing the names of different wallet providers.
@@ -29,11 +29,11 @@ export interface CreateProviderParams {
 
 /**
  * Represents the result of creating a Web3 provider {@link Checkout.createProvider}.
- * @property {Web3Provider} provider - The created Web3 provider.
+ * @property {BrowserProvider} provider - The created Web3 provider.
  * @property {WalletProviderName} walletProviderName - The wallet provider name of the provider that was created.
  */
 export type CreateProviderResult = {
-  provider: Web3Provider,
+  provider: BrowserProvider,
   walletProviderName: WalletProviderName
 };
 

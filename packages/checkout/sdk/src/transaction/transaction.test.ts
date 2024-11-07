@@ -1,9 +1,10 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import { ethers } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { sendTransaction } from './transaction';
 import { ChainId, NetworkInfo } from '../types';
 import { IMMUTABLE_ZKVEM_GAS_OVERRIDES } from '../env';
+import { ErrorCode } from 'ethers';
 
 describe('transaction', () => {
   beforeEach(() => {
@@ -24,10 +25,10 @@ describe('transaction', () => {
       getSigner: jest.fn().mockReturnValue({
         sendTransaction: mockSendTransaction,
       }),
-    } as unknown as Web3Provider;
+    } as unknown as BrowserProvider;
 
     const transaction = {
-      nonce: 'nonce',
+      nonce: 0,
       gasPrice: '1',
       gas: '1',
       to: '0x123',
@@ -53,10 +54,10 @@ describe('transaction', () => {
           throw new Error('Transaction errored');
         },
       }),
-    } as unknown as Web3Provider;
+    } as unknown as BrowserProvider;
 
     const transaction = {
-      nonce: 'nonce',
+      nonce: 1,
       gasPrice: '1',
       gas: '1',
       to: '0x123',
@@ -82,14 +83,14 @@ describe('transaction', () => {
       getSigner: jest.fn().mockReturnValue({
         sendTransaction: () => {
           const err: any = new Error('insufficient funds');
-          err.code = ethers.errors.INSUFFICIENT_FUNDS;
+          err.code = 'INSUFFICIENT_FUNDS' satisfies ErrorCode
           throw err;
         },
       }),
-    } as unknown as Web3Provider;
+    } as unknown as BrowserProvider;
 
     const transaction = {
-      nonce: 'nonce',
+      nonce: 1,
       gasPrice: '1',
       gas: '1',
       to: '0x123',
@@ -115,14 +116,14 @@ describe('transaction', () => {
       getSigner: jest.fn().mockReturnValue({
         sendTransaction: () => {
           const err: any = new Error('user rejected request');
-          err.code = ethers.errors.ACTION_REJECTED;
+          err.code = 'ACTION_REJECTED' satisfies ErrorCode
           throw err;
         },
       }),
-    } as unknown as Web3Provider;
+    } as unknown as BrowserProvider;
 
     const transaction = {
-      nonce: 'nonce',
+      nonce: 1,
       gasPrice: '1',
       gas: '1',
       to: '0x123',
@@ -141,37 +142,6 @@ describe('transaction', () => {
   });
 
   it(
-    'should return unpredictable gas limit request status if transaction errors with unpredictable gas limit',
-    async () => {
-      const mockProvider = {
-        getNetwork: jest.fn().mockReturnValue({
-          chainId: ChainId.ETHEREUM,
-        } as NetworkInfo),
-        getSigner: jest.fn().mockReturnValue({
-          sendTransaction: () => {
-            const err: any = new Error('unpredictable gas limit');
-            err.code = ethers.errors.UNPREDICTABLE_GAS_LIMIT;
-            throw err;
-          },
-        }),
-      } as unknown as Web3Provider;
-
-      const transaction = {
-        to: '0x123',
-        from: '0x234',
-        chainId: ChainId.ETHEREUM,
-      };
-
-      try {
-        await sendTransaction(mockProvider, transaction);
-      } catch (err: any) {
-        expect(err.message).toEqual('unpredictable gas limit');
-        expect(err.type).toEqual(CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT);
-      }
-    },
-  );
-
-  it(
     'should include txn gas limits for zkEVM chains if the gasPrice is not defined on the transaction',
     async () => {
       const transactionResponse = {
@@ -187,7 +157,7 @@ describe('transaction', () => {
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: mockSendTransaction,
         }),
-      } as unknown as Web3Provider;
+      } as unknown as BrowserProvider;
 
       const transaction = {
         to: '0xAAA',

@@ -1,7 +1,5 @@
-import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import { ActionType, SignablePurpose, constants } from '@imtbl/orderbook';
-import { BigNumber, TypedDataDomain } from 'ethers';
 import {
   getBuyToken, getERC1155Requirement, getERC721Requirement, sell,
 } from './sell';
@@ -26,6 +24,7 @@ import {
 } from '../actions';
 import { SignTransactionStatusType } from '../actions/types';
 import { HttpClient } from '../../api/http';
+import { BrowserProvider, TypedDataDomain } from 'ethers';
 
 jest.mock('../../instance');
 jest.mock('../smartCheckout');
@@ -35,14 +34,14 @@ describe('sell', () => {
   const seaportContractAddress = '0xSEAPORT';
   const walletAddress = '0xADDRESS';
   let config: CheckoutConfiguration;
-  let mockProvider: Web3Provider;
+  let mockProvider: BrowserProvider;
 
   beforeEach(() => {
     mockProvider = {
       getSigner: jest.fn().mockReturnValue({
         getAddress: jest.fn().mockResolvedValue(walletAddress),
       }),
-    } as unknown as Web3Provider;
+    } as unknown as BrowserProvider;
 
     const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     config = new CheckoutConfiguration({
@@ -69,20 +68,20 @@ describe('sell', () => {
         sufficient: true,
         required: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
           id: '0',
         },
         current: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
           id: '0',
         },
         delta: {
-          balance: BigNumber.from(0),
+          balance: BigInt(0),
           formattedBalance: '0',
         },
       };
@@ -185,7 +184,7 @@ describe('sell', () => {
           type: TransactionOrGasType.GAS,
           gasToken: {
             type: GasTokenType.NATIVE,
-            limit: BigNumber.from(constants.estimatedFulfillmentGasGwei),
+            limit: BigInt(constants.estimatedFulfillmentGasGwei),
           },
         },
       );
@@ -247,20 +246,20 @@ describe('sell', () => {
         sufficient: true,
         required: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
           id: '0',
         },
         current: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
           id: '0',
         },
         delta: {
-          balance: BigNumber.from(0),
+          balance: BigInt(0),
           formattedBalance: '0',
         },
       };
@@ -364,7 +363,7 @@ describe('sell', () => {
           type: TransactionOrGasType.GAS,
           gasToken: {
             type: GasTokenType.NATIVE,
-            limit: BigNumber.from(constants.estimatedFulfillmentGasGwei),
+            limit: BigInt(constants.estimatedFulfillmentGasGwei),
           },
         },
       );
@@ -420,7 +419,7 @@ describe('sell', () => {
         id,
         contractAddress,
         spenderAddress: seaportContractAddress,
-        amount: BigNumber.from(amount),
+        amount: BigInt(amount),
       };
 
       const erc1155TransactionRequirement = {
@@ -428,20 +427,20 @@ describe('sell', () => {
         sufficient: true,
         required: {
           type: ItemType.ERC1155,
-          balance: BigNumber.from(5),
+          balance: BigInt(5),
           formattedBalance: '5',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
           id: '0',
         },
         current: {
           type: ItemType.ERC1155,
-          balance: BigNumber.from(5),
+          balance: BigInt(5),
           formattedBalance: '5',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
           id: '0',
         },
         delta: {
-          balance: BigNumber.from(0),
+          balance: BigInt(0),
           formattedBalance: '0',
         },
       };
@@ -546,7 +545,7 @@ describe('sell', () => {
           type: TransactionOrGasType.GAS,
           gasToken: {
             type: GasTokenType.NATIVE,
-            limit: BigNumber.from(constants.estimatedFulfillmentGasGwei),
+            limit: BigInt(constants.estimatedFulfillmentGasGwei),
           },
         },
       );
@@ -609,20 +608,20 @@ describe('sell', () => {
         sufficient: false,
         required: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
           id: '0',
         },
         current: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(0),
+          balance: BigInt(0),
           formattedBalance: '0',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
           id: '0',
         },
         delta: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
       };
@@ -712,7 +711,7 @@ describe('sell', () => {
           type: TransactionOrGasType.GAS,
           gasToken: {
             type: GasTokenType.NATIVE,
-            limit: BigNumber.from(constants.estimatedFulfillmentGasGwei),
+            limit: BigInt(constants.estimatedFulfillmentGasGwei),
           },
         },
       );
@@ -737,20 +736,20 @@ describe('sell', () => {
         sufficient: true,
         required: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
           id: '0',
         },
         current: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
           id: '0',
         },
         delta: {
-          balance: BigNumber.from(0),
+          balance: BigInt(0),
           formattedBalance: '0',
         },
       };
@@ -841,7 +840,7 @@ describe('sell', () => {
           type: TransactionOrGasType.GAS,
           gasToken: {
             type: GasTokenType.NATIVE,
-            limit: BigNumber.from(constants.estimatedFulfillmentGasGwei),
+            limit: BigInt(constants.estimatedFulfillmentGasGwei),
           },
         },
       );
@@ -932,7 +931,7 @@ describe('sell', () => {
         getSigner: jest.fn().mockReturnValue({
           getAddress: jest.fn().mockRejectedValue(new Error('error from provider')),
         }),
-      } as unknown as Web3Provider;
+      } as unknown as BrowserProvider;
 
       let message;
       let type;
@@ -984,20 +983,20 @@ describe('sell', () => {
         sufficient: true,
         required: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
           id: '0',
         },
         current: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
           id: '0',
         },
         delta: {
-          balance: BigNumber.from(0),
+          balance: BigInt(0),
           formattedBalance: '0',
         },
       };
@@ -1090,20 +1089,20 @@ describe('sell', () => {
         sufficient: true,
         required: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
           id: '0',
         },
         current: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
           id: '0',
         },
         delta: {
-          balance: BigNumber.from(0),
+          balance: BigInt(0),
           formattedBalance: '0',
         },
       };
@@ -1179,20 +1178,20 @@ describe('sell', () => {
         sufficient: true,
         required: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
           id: '0',
         },
         current: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
           id: '0',
         },
         delta: {
-          balance: BigNumber.from(0),
+          balance: BigInt(0),
           formattedBalance: '0',
         },
       };
@@ -1270,20 +1269,20 @@ describe('sell', () => {
         sufficient: true,
         required: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
           id: '0',
         },
         current: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
           id: '0',
         },
         delta: {
-          balance: BigNumber.from(0),
+          balance: BigInt(0),
           formattedBalance: '0',
         },
       };
@@ -1365,20 +1364,20 @@ describe('sell', () => {
         sufficient: true,
         required: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
           collectionId: '0',
         },
         current: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
           collectionId: '0',
         },
         delta: {
-          balance: BigNumber.from(0),
+          balance: BigInt(0),
           formattedBalance: '0',
         },
       };
@@ -1554,7 +1553,7 @@ describe('sell', () => {
         id,
         contractAddress,
         spenderAddress,
-        amount: BigNumber.from(55),
+        amount: BigInt(55),
       });
     });
   });

@@ -1,16 +1,15 @@
-import { StaticJsonRpcProvider } from '@ethersproject/providers';
-import { BigNumber } from 'ethers';
-import { Signer } from '@ethersproject/abstract-signer';
 import { Flow } from '@imtbl/metrics';
 import GuardianClient from '../guardian';
 import { signAndPackTypedData } from './walletHelpers';
 import { TypedDataPayload } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { RelayerClient } from './relayerClient';
+import { Signer } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 
 export type SignTypedDataV4Params = {
   ethSigner: Signer;
-  rpcProvider: StaticJsonRpcProvider;
+  rpcProvider: JsonRpcProvider;
   relayerClient: RelayerClient;
   method: string;
   params: Array<any>;
@@ -23,7 +22,7 @@ const isValidTypedDataPayload = (typedData: object): typedData is TypedDataPaylo
   REQUIRED_TYPED_DATA_PROPERTIES.every((key) => key in typedData)
 );
 
-const transformTypedData = (typedData: string | object, chainId: number): TypedDataPayload => {
+const transformTypedData = (typedData: string | object, chainId: string): TypedDataPayload => {
   let transformedTypedData: object | TypedDataPayload;
 
   if (typeof typedData === 'string') {
@@ -50,9 +49,9 @@ const transformTypedData = (typedData: string | object, chainId: number): TypedD
     // domain.chainId (if defined) can be a number, string, or hex value, but the relayer & guardian only accept a number.
     if (typeof providedChainId === 'string') {
       if (providedChainId.startsWith('0x')) {
-        transformedTypedData.domain.chainId = parseInt(providedChainId, 16);
+        transformedTypedData.domain.chainId = parseInt(providedChainId, 16).toString()
       } else {
-        transformedTypedData.domain.chainId = parseInt(providedChainId, 10);
+        transformedTypedData.domain.chainId = parseInt(providedChainId, 10).toString()
       }
     }
 
@@ -80,8 +79,8 @@ export const signTypedDataV4 = async ({
     throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `${method} requires an address and a typed data JSON`);
   }
 
-  const { chainId } = await rpcProvider.detectNetwork();
-  const typedData = transformTypedData(typedDataParam, chainId);
+  const { chainId } = await rpcProvider._detectNetwork();
+  const typedData = transformTypedData(typedDataParam, chainId.toString());
   flow.addEvent('endDetectNetwork');
 
   await guardianClient.evaluateEIP712Message({ chainID: String(chainId), payload: typedData });
@@ -93,7 +92,7 @@ export const signTypedDataV4 = async ({
   const signature = await signAndPackTypedData(
     typedData,
     relayerSignature,
-    BigNumber.from(chainId),
+    BigInt(chainId),
     fromAddress,
     ethSigner,
   );

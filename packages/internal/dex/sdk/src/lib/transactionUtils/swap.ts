@@ -1,7 +1,6 @@
 import { Trade, toHex, encodeRouteToPath, Route } from '@uniswap/v3-sdk';
-import { PaymentsExtended, SwapRouter } from '@uniswap/router-sdk';
 import * as Uniswap from '@uniswap/sdk-core';
-import { utils } from 'ethers';
+import { Interface } from 'ethers';
 import { Fees } from '../fees';
 import { isNative, toCurrencyAmount, toPublicAmount } from '../utils';
 import { QuoteResult } from '../getQuotesForRoutes';
@@ -11,6 +10,8 @@ import { IImmutableSwapProxy, ImmutableSwapProxyInterface } from '../../contract
 import { ImmutableSwapProxy__factory } from '../../contracts/types';
 import { calculateGasFee } from './gas';
 import { slippageToFraction } from './slippage';
+import swapRouterContract from '@uniswap/swap-router-contracts/artifacts/contracts/interfaces/ISwapRouter02.sol/ISwapRouter02.json'
+import paymentsExtendedContract from '@uniswap/swap-router-contracts/artifacts/contracts/interfaces/IPeripheryPaymentsWithFeeExtended.sol/IPeripheryPaymentsWithFeeExtended.json'
 
 type SwapOptions = {
   slippageTolerance: Uniswap.Percent;
@@ -29,8 +30,8 @@ function buildSinglePoolSwap(
   route: Route<Uniswap.Token, Uniswap.Token>,
   amountIn: string,
   amountOut: string,
-  routerContract: utils.Interface,
-  paymentsContract: utils.Interface,
+  routerContract: Interface,
+  paymentsContract: Interface,
 ) {
   const calldatas: string[] = [];
 
@@ -152,8 +153,8 @@ function buildMultiPoolSwap(
   route: Route<Uniswap.Token, Uniswap.Token>,
   amountIn: string,
   amountOut: string,
-  routerContract: utils.Interface,
-  paymentsContract: utils.Interface,
+  routerContract: Interface,
+  paymentsContract: Interface,
 ) {
   const path: string = encodeRouteToPath(route, trade.tradeType === Uniswap.TradeType.EXACT_OUTPUT);
   const calldatas: string[] = [];
@@ -279,8 +280,8 @@ function buildSwapParameters(
   trade: Trade<Uniswap.Token, Uniswap.Token, Uniswap.TradeType>,
   secondaryFees: SecondaryFee[],
   swapProxyContract: ImmutableSwapProxyInterface,
-  routerContract: utils.Interface,
-  paymentsContract: utils.Interface,
+  routerContract: Interface,
+  paymentsContract: Interface,
   maximumAmountIn: string,
   minimumAmountOut: string,
 ) {
@@ -355,8 +356,8 @@ function createSwapCallParameters(
   minimumAmountOut: string,
 ): string {
   const swapProxyContract = ImmutableSwapProxy__factory.createInterface();
-  const routerContract = SwapRouter.INTERFACE;
-  const paymentsContract = PaymentsExtended.INTERFACE;
+  const routerContract = new Interface(swapRouterContract.abi)
+  const paymentsContract = new Interface(paymentsExtendedContract.abi)
 
   const calldatas = buildSwapParameters(
     tokenIn,

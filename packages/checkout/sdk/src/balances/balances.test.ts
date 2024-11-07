@@ -1,5 +1,3 @@
-import { Web3Provider } from '@ethersproject/providers';
-import { BigNumber, Contract } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { HttpStatusCode } from 'axios';
 import {
@@ -28,6 +26,7 @@ import {
 } from '../api/blockscout';
 import { ERC20ABI, NATIVE } from '../env';
 import { HttpClient } from '../api/http';
+import { BrowserProvider, Contract } from 'ethers';
 
 jest.mock('../api/http');
 jest.mock('../api/blockscout');
@@ -46,7 +45,7 @@ describe('balances', () => {
     },
     mockedHttpClient,
   );
-  const currentBalance = BigNumber.from('1000000000000000000');
+  const currentBalance = BigInt('1000000000000000000');
   const formattedBalance = '1.0';
   const mockGetBalance = jest.fn().mockResolvedValue(currentBalance);
   const mockGetNetwork = jest
@@ -69,7 +68,7 @@ describe('balances', () => {
   const mockProvider = jest.fn().mockImplementation(() => ({
     getBalance: mockGetBalance,
     getNetwork: mockGetNetwork,
-  } as unknown as Web3Provider));
+  } as unknown as BrowserProvider));
 
   beforeEach(() => {
     jest.spyOn(console, 'info').mockImplementation(() => {});
@@ -79,7 +78,7 @@ describe('balances', () => {
     it('should call getBalance() on provider and return the balance', async () => {
       const balanceResult = await getBalance(
         testCheckoutConfig,
-        mockProvider() as unknown as Web3Provider,
+        mockProvider() as unknown as BrowserProvider,
         '0xAddress',
       );
       expect(mockGetBalance).toBeCalledTimes(1);
@@ -282,7 +281,7 @@ describe('balances', () => {
         provider: {
           request: jest.fn(),
         },
-      } as unknown as Web3Provider));
+      } as unknown as BrowserProvider));
 
       balanceOfMock = jest.fn().mockResolvedValue(currentBalance);
 
@@ -364,7 +363,7 @@ describe('balances', () => {
           },
           networkMap: testCheckoutConfig.networkMap,
         } as unknown as CheckoutConfiguration,
-        mockProviderForAllBalances() as unknown as Web3Provider,
+        mockProviderForAllBalances() as unknown as BrowserProvider,
         'abc123',
         ChainId.ETHEREUM,
       );
@@ -467,7 +466,7 @@ describe('balances', () => {
           },
           networkMap: testCheckoutConfig.networkMap,
         } as unknown as CheckoutConfiguration,
-        jest.fn() as unknown as Web3Provider,
+        jest.fn() as unknown as BrowserProvider,
         'abc123',
         ChainId.ETHEREUM,
       );
@@ -477,7 +476,7 @@ describe('balances', () => {
 
       expect(getAllBalancesResult.balances).toEqual([
         {
-          balance: BigNumber.from('330000000000000000'),
+          balance: BigInt('330000000000000000'),
           formattedBalance: '0.33',
           token: {
             address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
@@ -488,7 +487,7 @@ describe('balances', () => {
           },
         },
         {
-          balance: BigNumber.from('777777777777777777'),
+          balance: BigInt('777777777777777777'),
           formattedBalance: '0.777777777777777777',
           token: {
             address: NATIVE,
@@ -552,7 +551,7 @@ describe('balances', () => {
             mockedHttpClient,
           ).networkMap,
         } as unknown as CheckoutConfiguration,
-        jest.fn() as unknown as Web3Provider,
+        jest.fn() as unknown as BrowserProvider,
         'abc123',
         ChainId.SEPOLIA, // L1 Chain chain will pass a filterTokens list
       );
@@ -590,7 +589,7 @@ describe('balances', () => {
           },
           networkMap: testCheckoutConfig.networkMap,
         } as unknown as CheckoutConfiguration,
-        jest.fn() as unknown as Web3Provider,
+        jest.fn() as unknown as BrowserProvider,
         'abc123',
         ChainId.ETHEREUM,
       );
@@ -600,7 +599,7 @@ describe('balances', () => {
 
       expect(getAllBalancesResult.balances).toEqual([
         {
-          balance: BigNumber.from('777777777777777777'),
+          balance: BigInt('777777777777777777'),
           formattedBalance: '0.777777777777777777',
           token: {
             address: NATIVE,
@@ -657,7 +656,7 @@ describe('balances', () => {
           },
           networkMap: testCheckoutConfig.networkMap,
         } as unknown as CheckoutConfiguration,
-        jest.fn() as unknown as Web3Provider,
+        jest.fn() as unknown as BrowserProvider,
         'abc123',
         ChainId.ETHEREUM,
       );
@@ -667,7 +666,7 @@ describe('balances', () => {
 
       expect(getAllBalancesResult.balances).toEqual([
         {
-          balance: BigNumber.from('330000000000000000'),
+          balance: BigInt('330000000000000000'),
           formattedBalance: '0.33',
           token: {
             address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
@@ -701,7 +700,7 @@ describe('balances', () => {
           },
           networkMap: testCheckoutConfig.networkMap,
         } as unknown as CheckoutConfiguration,
-        jest.fn() as unknown as Web3Provider,
+        jest.fn() as unknown as BrowserProvider,
         'abc123',
         ChainId.ETHEREUM,
       );
@@ -732,7 +731,7 @@ describe('balances', () => {
             },
             networkMap: testCheckoutConfig.networkMap,
           } as unknown as CheckoutConfiguration,
-          jest.fn() as unknown as Web3Provider,
+          jest.fn() as unknown as BrowserProvider,
           '0xabc123', // use unique wallet address to prevent cached data
           ChainId.ETHEREUM,
         );
@@ -806,7 +805,7 @@ describe('balances', () => {
               },
               networkMap: testCheckoutConfig.networkMap,
             } as unknown as CheckoutConfiguration,
-            jest.fn() as unknown as Web3Provider,
+            jest.fn() as unknown as BrowserProvider,
             '0xabc123', // use unique wallet address to prevent cached data
             ChainId.ETHEREUM,
           );
@@ -836,7 +835,7 @@ describe('balances', () => {
             remote: {},
             networkMap: testCheckoutConfig.networkMap,
           } as unknown as CheckoutConfiguration,
-          jest.fn() as unknown as Web3Provider,
+          jest.fn() as unknown as BrowserProvider,
           '0xabc123', // use unique wallet address to prevent cached data
           ChainId.SEPOLIA,
         );
@@ -862,7 +861,7 @@ describe('balances', () => {
         provider: {
           request: jest.fn(),
         },
-      } as unknown as Web3Provider));
+      } as unknown as BrowserProvider));
       getERC20TokenInfoMock = jest.fn()
         .mockResolvedValueOnce({
           name: 'zkCATS',
@@ -882,7 +881,7 @@ describe('balances', () => {
 
       const getBalancesResult = await getBalances(
         testCheckoutConfig,
-        mockProviderForAllBalances() as unknown as Web3Provider,
+        mockProviderForAllBalances() as unknown as BrowserProvider,
         'abc123',
         [{
           name: 'zkCATS',
@@ -913,7 +912,7 @@ describe('balances', () => {
     it('should return an empty list if the token list is empty', async () => {
       const getBalancesResult = await getBalances(
         testCheckoutConfig,
-        mockProvider() as unknown as Web3Provider,
+        mockProvider() as unknown as BrowserProvider,
         'abc123',
         [],
       );

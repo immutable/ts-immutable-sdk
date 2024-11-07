@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import detectEthereumProvider from '@metamask/detect-provider';
-import { Web3Provider, ExternalProvider } from '@ethersproject/providers';
 import { Passport } from '@imtbl/passport';
 import {
   CreateProviderResult, EIP6963ProviderDetail,
@@ -9,9 +8,11 @@ import {
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { InjectedProvidersManager } from './injectedProvidersManager';
 import { metaMaskProviderInfo, passportProviderInfo } from './providerDetail';
+import { BrowserProvider } from 'ethers';
+import { Eip1193Provider } from 'ethers';
 
-async function getMetaMaskProvider(): Promise<Web3Provider> {
-  const provider = await withCheckoutError<ExternalProvider | null>(
+async function getMetaMaskProvider(): Promise<BrowserProvider> {
+  const provider = await withCheckoutError<Eip1193Provider | null>(
     async () => await detectEthereumProvider(),
     { type: CheckoutErrorType.METAMASK_PROVIDER_ERROR },
   );
@@ -23,21 +24,21 @@ async function getMetaMaskProvider(): Promise<Web3Provider> {
     );
   }
 
-  return new Web3Provider(provider);
+  return new BrowserProvider(provider);
 }
 
 export async function createProvider(
   walletProviderName: WalletProviderName,
   passport?: Passport,
 ): Promise<CreateProviderResult> {
-  let web3Provider: Web3Provider | null = null;
+  let web3Provider: BrowserProvider | null = null;
   let providerDetail: EIP6963ProviderDetail | undefined;
   switch (walletProviderName) {
     case WalletProviderName.PASSPORT: {
       providerDetail = InjectedProvidersManager.getInstance().findProvider({ rdns: passportProviderInfo.rdns });
       if (!providerDetail) {
         if (passport) {
-          web3Provider = new Web3Provider(passport.connectEvm({ announceProvider: false }));
+          web3Provider = new BrowserProvider(passport.connectEvm({ announceProvider: false }));
         } else {
           // eslint-disable-next-line no-console
           console.error(
@@ -55,6 +56,11 @@ export async function createProvider(
       providerDetail = InjectedProvidersManager.getInstance().findProvider({ rdns: metaMaskProviderInfo.rdns });
       if (!providerDetail) {
         web3Provider = await getMetaMaskProvider();
+
+
+      
+      console.log('AFTERGTEWQRQWET')
+      console.log(web3Provider)
       }
       break;
     }
@@ -73,10 +79,10 @@ export async function createProvider(
   }
 
   if (!web3Provider && providerDetail) {
-    web3Provider = new Web3Provider(providerDetail.provider);
+    web3Provider = new BrowserProvider(providerDetail.provider);
   }
   return {
-    provider: web3Provider as Web3Provider,
+    provider: web3Provider as BrowserProvider,
     walletProviderName,
   };
 }

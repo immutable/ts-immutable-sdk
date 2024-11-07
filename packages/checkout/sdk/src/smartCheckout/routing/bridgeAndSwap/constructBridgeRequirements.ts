@@ -1,10 +1,10 @@
-import { BigNumber, utils } from 'ethers';
 import { GetBalanceResult, ItemType } from '../../../types';
 import { BridgeRequirement } from '../bridge/bridgeRoute';
 import { DexQuote, DexQuotes } from '../types';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, L1ToL2TokenAddressMapping } from '../indexer/fetchL1Representation';
 import { BalanceCheckResult } from '../../balanceCheck/types';
 import { formatSmartCheckoutAmount, isMatchingAddress } from '../../../utils/utils';
+import { formatUnits } from 'ethers';
 
 // The dex will return all the fees which is in a particular token (currently always IMX)
 // If any of the fees are in the same token that is trying to be swapped (e.g. trying to swap IMX)
@@ -13,18 +13,18 @@ import { formatSmartCheckoutAmount, isMatchingAddress } from '../../../utils/uti
 export const getFeesForTokenAddress = (
   dexQuote: DexQuote,
   tokenAddress: string,
-): BigNumber => {
-  let fees = BigNumber.from(0);
+): bigint => {
+  let fees = BigInt(0);
 
   dexQuote.quote.fees.forEach((fee) => {
     if (isMatchingAddress(fee.amount.token.address, tokenAddress)) {
-      fees = fees.add(fee.amount.value);
+      fees = fees + fee.amount.value;
     }
   });
 
   if (dexQuote.approval) {
     if (isMatchingAddress(dexQuote.approval.token.address, tokenAddress)) {
-      fees = fees.add(dexQuote.approval.value);
+      fees = fees + dexQuote.approval.value;
     }
   }
 
@@ -37,7 +37,7 @@ export const getFeesForTokenAddress = (
 export const getAmountFromBalanceRequirement = (
   balanceRequirements: BalanceCheckResult,
   quotedTokenAddress: string,
-): BigNumber => {
+): bigint => {
   // Find if there is an existing balance requirement of the token attempting to be bridged->swapped
   for (const requirement of balanceRequirements.balanceRequirements) {
     if (requirement.type === ItemType.NATIVE || requirement.type === ItemType.ERC20) {
@@ -47,43 +47,43 @@ export const getAmountFromBalanceRequirement = (
     }
   }
 
-  return BigNumber.from(0);
+  return BigInt(0);
 };
 
 // Get the total amount to bridge factoring in any balance requirements
 // of this token and the current balance on L2
 export const getAmountToBridge = (
-  quotedAmountWithFees: BigNumber,
-  amountFromBalanceRequirement: BigNumber,
+  quotedAmountWithFees: bigint,
+  amountFromBalanceRequirement: bigint,
   l2balance: GetBalanceResult | undefined,
-): BigNumber => {
-  const balance = l2balance?.balance ?? BigNumber.from(0);
+): bigint => {
+  const balance = l2balance?.balance ?? BigInt(0);
 
   // Balance is fully covered and does not require bridging
   // then the one swap route will be suggested
-  if (balance.gte(quotedAmountWithFees.add(amountFromBalanceRequirement))) {
-    return BigNumber.from(0);
+  if (balance >= (quotedAmountWithFees + amountFromBalanceRequirement)) {
+    return BigInt(0);
   }
 
   // If no balance on L2 then bridge full amount and balance requirement amount if any
-  if (balance.lte(0)) {
-    return quotedAmountWithFees.add(amountFromBalanceRequirement);
+  if (balance <= 0) {
+    return quotedAmountWithFees + amountFromBalanceRequirement;
   }
 
   // Get the remainder from the balance after subtracting the balance requirement amount
-  const remainder = balance.sub(amountFromBalanceRequirement);
+  const remainder = balance - amountFromBalanceRequirement;
 
   // Remove the remainder from the amount needed as the user has some balance left over
   // after covering the balance requirement or the remainder is 0 indicating they have
   // just enough to cover the balance requirement
-  if (remainder.gte(0)) {
-    return quotedAmountWithFees.sub(remainder);
+  if (remainder >= 0) {
+    return quotedAmountWithFees - remainder;
   }
 
   // If the remainder is less than 0 then add the quoted amount with the balance requirement
   // and sub the users current balance to get the total amount needed to be bridged to cover
   // the quoted amount + balance requirement
-  return quotedAmountWithFees.add(amountFromBalanceRequirement).sub(balance);
+  return quotedAmountWithFees + amountFromBalanceRequirement - balance;
 };
 
 // to be sent to the bridge route
@@ -121,7 +121,7 @@ export const constructBridgeRequirements = (
     const quotedAmount = quote.quote.amountWithMaxSlippage.value;
     // Add fees to the quoted amount if the fees are in the same token as the token being swapped
     const fees = getFeesForTokenAddress(quote, tokenAddress);
-    const quotedAmountWithFees = quotedAmount.add(fees);
+    const quotedAmountWithFees = quotedAmount + fees;
 
     // Get the amount from the balance requirement if the token is also a balance requirement
     const amountFromBalanceRequirement = getAmountFromBalanceRequirement(
@@ -134,18 +134,18 @@ export const constructBridgeRequirements = (
     const amountToBridge = getAmountToBridge(quotedAmountWithFees, amountFromBalanceRequirement, l2balance);
 
     // No amount to bridge as user has sufficient balance for one swap
-    if (amountToBridge.lte(0)) {
+    if (amountToBridge <= 0) {
       continue;
     }
 
     // If the amount to bridge is greater than the L1 balance then cannot bridge
-    if (amountToBridge.gte(l1balance.balance)) {
+    if (amountToBridge >= l1balance.balance) {
       continue;
     }
 
     bridgeRequirements.push({
       amount: amountToBridge,
-      formattedAmount: formatSmartCheckoutAmount(utils.formatUnits(amountToBridge, l1balance.token.decimals)),
+      formattedAmount: formatSmartCheckoutAmount(formatUnits(amountToBridge, l1balance.token.decimals)),
       // L2 address is used for the bridge requirement as the bridge route uses the indexer to find L1 address
       l2address,
     });

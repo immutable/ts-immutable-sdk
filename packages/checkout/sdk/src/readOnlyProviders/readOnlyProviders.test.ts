@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { JsonRpcProvider } from 'ethers';
 import { ChainId, ChainName, GetNetworkAllowListResult } from '../types';
 import { createReadOnlyProviders } from './readOnlyProvider';
 import { CheckoutConfiguration } from '../config';
@@ -7,7 +7,7 @@ import * as network from '../network';
 import { HttpClient } from '../api/http';
 
 jest.mock('../network');
-jest.mock('@ethersproject/providers', () => ({
+jest.mock('ethers', () => ({
   // eslint-disable-next-line @typescript-eslint/naming-convention
   JsonRpcProvider: jest.fn(),
 }));

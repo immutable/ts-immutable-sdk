@@ -12,7 +12,7 @@ import {
   WidgetParameters,
   WalletEventType,
 } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import i18next from 'i18next';
 import {
   StrongCheckoutWidgetsConfig,
@@ -36,7 +36,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
   protected parameters: WidgetParameters[T];
 
-  protected web3Provider: Web3Provider | undefined;
+  protected web3Provider: BrowserProvider | undefined;
 
   protected eventHandlers: Map<keyof WidgetEventData[T], Function> = new Map<
   keyof WidgetEventData[T],
@@ -227,7 +227,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   private handleEIP1193ProviderEvents(widgetRoot: Base<T>) {
     if (widgetRoot.web3Provider) {
       // eslint-disable-next-line no-param-reassign
-      widgetRoot.web3Provider = new Web3Provider(
+      widgetRoot.web3Provider = new BrowserProvider(
         widgetRoot.web3Provider!.provider,
       );
     }

@@ -1,6 +1,4 @@
 import { Environment } from '@imtbl/config';
-import { JsonRpcProvider } from '@ethersproject/providers';
-import { BigNumber } from 'ethers';
 import { getAllTokenBalances } from './tokenBalances';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
 import { ChainId } from '../../types';
@@ -8,6 +6,7 @@ import { getAllBalances } from '../../balances';
 import { CheckoutErrorType } from '../../errors';
 import { TokenBalanceResult } from './types';
 import { HttpClient } from '../../api/http';
+import { JsonRpcProvider } from 'ethers';
 
 jest.mock('../../balances');
 jest.mock('../../config');
@@ -43,7 +42,7 @@ describe('tokenBalances', () => {
       balances:
         [
           {
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'IMX',
@@ -85,7 +84,7 @@ describe('tokenBalances', () => {
       balances:
         [
           {
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'IMX',
@@ -154,7 +153,7 @@ describe('tokenBalances', () => {
       balances:
         [
           {
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'IMX',
@@ -199,7 +198,7 @@ describe('tokenBalances', () => {
       balances:
         [
           {
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'IMX',

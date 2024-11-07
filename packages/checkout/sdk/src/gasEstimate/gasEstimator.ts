@@ -1,8 +1,3 @@
-import {
-  BigNumber,
-  utils,
-  ethers,
-} from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import {
   ChainId,
@@ -18,12 +13,13 @@ import {
 } from './bridgeGasEstimate';
 import * as instance from '../instance';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../config';
+import { JsonRpcProvider, parseUnits } from 'ethers';
 
 const DUMMY_WALLET_ADDRESS = '0x0000000000000000000000000000000000000001';
 const DEFAULT_TOKEN_DECIMALS = 18;
 
 async function bridgeToL2GasEstimator(
-  readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
+  readOnlyProviders: Map<ChainId, JsonRpcProvider>,
   config: CheckoutConfiguration,
 ): Promise<GasEstimateBridgeToL2Result> {
   const fromChainId = getL1ChainId(config);
@@ -58,11 +54,11 @@ async function bridgeToL2GasEstimator(
     return {
       gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
       fees: {
-        sourceChainGas: BigNumber.from(0),
-        approvalFee: BigNumber.from(0),
-        bridgeFee: BigNumber.from(0),
-        imtblFee: BigNumber.from(0),
-        totalFees: BigNumber.from(0),
+        sourceChainGas: BigInt(0),
+        approvalFee: BigInt(0),
+        bridgeFee: BigInt(0),
+        imtblFee: BigInt(0),
+        totalFees: BigInt(0),
       },
       token: config.networkMap.get(fromChainId)?.nativeCurrency,
     };
@@ -89,7 +85,7 @@ async function swapGasEstimator(
       DUMMY_WALLET_ADDRESS,
       inAddress,
       outAddress,
-      BigNumber.from(utils.parseUnits('1', DEFAULT_TOKEN_DECIMALS)),
+      BigInt(parseUnits('1', DEFAULT_TOKEN_DECIMALS)),
     );
 
     if (!swap.gasFeeEstimate) {
@@ -102,7 +98,7 @@ async function swapGasEstimator(
     return {
       gasEstimateType: GasEstimateType.SWAP,
       fees: {
-        totalFees: swap.gasFeeEstimate.value ? BigNumber.from(swap.gasFeeEstimate.value) : undefined,
+        totalFees: swap.gasFeeEstimate.value ? BigInt(swap.gasFeeEstimate.value) : undefined,
         token: {
           address: swap.gasFeeEstimate.token.address,
           symbol: swap.gasFeeEstimate.token.symbol ?? '',
@@ -123,7 +119,7 @@ async function swapGasEstimator(
 
 export async function gasEstimator(
   params: GasEstimateParams,
-  readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
+  readOnlyProviders: Map<ChainId, JsonRpcProvider>,
   config: CheckoutConfiguration,
 ): Promise<GasEstimateSwapResult | GasEstimateBridgeToL2Result> {
   switch (params.gasEstimateType) {

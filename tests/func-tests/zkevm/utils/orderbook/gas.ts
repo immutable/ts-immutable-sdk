@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 
 export const GAS_OVERRIDES = {
   maxFeePerGas: BigNumber.from(150e9),

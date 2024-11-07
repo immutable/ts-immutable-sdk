@@ -1,6 +1,6 @@
 import { Pool } from '@uniswap/v3-sdk';
 import * as Uniswap from '@uniswap/sdk-core';
-import { ethers } from 'ethers';
+import { ethers, getAddress, id, JsonRpcProvider, ZeroAddress } from 'ethers';
 import { ProviderCallError } from '../errors';
 import { Amount, Coin, CoinAmount, ERC20, Native, Token } from '../types';
 import { DEFAULT_DEADLINE_SECONDS } from '../constants/router';
@@ -28,11 +28,11 @@ export function poolEquals(poolA: Pool, poolB: Pool): boolean {
   );
 }
 
-export const decimalsFunctionSig = ethers.utils.id('decimals()').substring(0, 10);
+export const decimalsFunctionSig = id('decimals()').substring(0, 10);
 
 export async function getTokenDecimals(
   tokenAddress: string,
-  provider: ethers.providers.JsonRpcProvider,
+  provider: JsonRpcProvider,
   nativeToken: Coin,
 ): Promise<number> {
   if (tokenAddress === 'native') {
@@ -56,12 +56,12 @@ export async function getTokenDecimals(
  * Based on https://github.com/ethers-io/ethers.js/blob/main/src.ts/address/checks.ts#L51
  */
 export function isValidNonZeroAddress(address: string): boolean {
-  if (address === ethers.constants.AddressZero) {
+  if (address === ZeroAddress) {
     return false;
   }
 
   try {
-    ethers.utils.getAddress(address);
+    getAddress(address);
     return true;
   } catch (error) {
     return false;
@@ -84,8 +84,8 @@ export const uniswapTokenToERC20 = (token: Uniswap.Token): ERC20 => ({
   type: 'erc20',
 });
 
-export const toBigNumber = (amount: Uniswap.CurrencyAmount<Uniswap.Token>): ethers.BigNumber =>
-  ethers.BigNumber.from(amount.multiply(amount.decimalScale).toExact());
+export const toBigNumber = (amount: Uniswap.CurrencyAmount<Uniswap.Token>): bigint =>
+  BigInt(amount.multiply(amount.decimalScale).toExact());
 
 export const toAmount = (amount: Uniswap.CurrencyAmount<Uniswap.Token>): CoinAmount<ERC20> => ({
   token: uniswapTokenToERC20(amount.currency),
@@ -97,7 +97,7 @@ export const toCurrencyAmount = (amount: CoinAmount<ERC20>): Uniswap.CurrencyAmo
   return Uniswap.CurrencyAmount.fromRawAmount(token, amount.value.toString());
 };
 
-export const newAmount = <T extends Coin>(amount: ethers.BigNumber, token: T): CoinAmount<T> => ({
+export const newAmount = <T extends Coin>(amount: bigint, token: T): CoinAmount<T> => ({
   value: amount,
   token,
 });
@@ -112,11 +112,11 @@ export const isNative = (token: Coin): token is Native => token.type === 'native
 export const addERC20Amount = (a: CoinAmount<ERC20>, b: CoinAmount<ERC20>) => {
   // Make sure the ERC20s have the same address
   if (a.token.address !== b.token.address) throw new Error('Token mismatch: token addresses must be the same');
-  return { value: a.value.add(b.value), token: a.token };
+  return { value: a.value + b.value, token: a.token };
 };
 
 const addNativeAmount = (a: CoinAmount<Native>, b: CoinAmount<Native>) => ({
-  value: a.value.add(b.value),
+  value: a.value + b.value,
   token: a.token,
 });
 
@@ -135,11 +135,11 @@ export const addAmount = <T extends Coin>(a: CoinAmount<T>, b: CoinAmount<T>) =>
 export const subtractERC20Amount = (a: CoinAmount<ERC20>, b: CoinAmount<ERC20>) => {
   // Make sure the ERC20s have the same address
   if (a.token.address !== b.token.address) throw new Error('Token mismatch: token addresses must be the same');
-  return { value: a.value.sub(b.value), token: a.token };
+  return { value: a.value - b.value, token: a.token };
 };
 
 const subtractNativeAmount = (a: CoinAmount<Native>, b: CoinAmount<Native>) => ({
-  value: a.value.sub(b.value),
+  value: a.value - b.value,
   token: a.token,
 });
 

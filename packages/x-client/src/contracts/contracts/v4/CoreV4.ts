@@ -3,122 +3,29 @@
 /* eslint-disable */
 import type {
   BaseContract,
-  BigNumber,
   BigNumberish,
   BytesLike,
-  CallOverrides,
-  ContractTransaction,
-  Overrides,
-  PayableOverrides,
-  PopulatedTransaction,
-  Signer,
-  utils,
-} from "ethers";
-import type {
   FunctionFragment,
   Result,
+  Interface,
   EventFragment,
-} from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
+  AddressLike,
+  ContractRunner,
+  ContractMethod,
+  Listener,
+} from "ethers";
 import type {
-  TypedEventFilter,
-  TypedEvent,
+  TypedContractEvent,
+  TypedDeferredTopicFilter,
+  TypedEventLog,
+  TypedLogDescription,
   TypedListener,
-  OnEvent,
-  PromiseOrValue,
+  TypedContractMethod,
 } from "../../common";
 
-export interface CoreV4Interface extends utils.Interface {
-  functions: {
-    "DEPOSIT_CANCEL_DELAY()": FunctionFragment;
-    "FREEZE_GRACE_PERIOD()": FunctionFragment;
-    "MAIN_GOVERNANCE_INFO_TAG()": FunctionFragment;
-    "MAX_FORCED_ACTIONS_REQS_PER_BLOCK()": FunctionFragment;
-    "MAX_VERIFIER_COUNT()": FunctionFragment;
-    "STARKEX_MAX_DEFAULT_VAULT_LOCK()": FunctionFragment;
-    "UNFREEZE_DELAY()": FunctionFragment;
-    "VERIFIER_REMOVAL_DELAY()": FunctionFragment;
-    "VERSION()": FunctionFragment;
-    "announceAvailabilityVerifierRemovalIntent(address)": FunctionFragment;
-    "announceVerifierRemovalIntent(address)": FunctionFragment;
-    "defaultVaultWithdrawalLock()": FunctionFragment;
-    "deposit(uint256,uint256,uint256)": FunctionFragment;
-    "deposit(uint256,uint256,uint256,uint256)": FunctionFragment;
-    "depositCancel(uint256,uint256,uint256)": FunctionFragment;
-    "depositERC20(uint256,uint256,uint256,uint256)": FunctionFragment;
-    "depositERC20ToVault(uint256,uint256,uint256)": FunctionFragment;
-    "depositEth(uint256,uint256,uint256)": FunctionFragment;
-    "depositEthToVault(uint256,uint256)": FunctionFragment;
-    "depositNft(uint256,uint256,uint256,uint256)": FunctionFragment;
-    "depositNftReclaim(uint256,uint256,uint256,uint256)": FunctionFragment;
-    "depositReclaim(uint256,uint256,uint256)": FunctionFragment;
-    "escape(uint256,uint256,uint256,uint256)": FunctionFragment;
-    "freezeRequest(uint256,uint256)": FunctionFragment;
-    "fullWithdrawalRequest(uint256,uint256)": FunctionFragment;
-    "getActionCount()": FunctionFragment;
-    "getActionHashByIndex(uint256)": FunctionFragment;
-    "getAssetInfo(uint256)": FunctionFragment;
-    "getCancellationRequest(uint256,uint256,uint256)": FunctionFragment;
-    "getDepositBalance(uint256,uint256,uint256)": FunctionFragment;
-    "getEthKey(uint256)": FunctionFragment;
-    "getFullWithdrawalRequest(uint256,uint256)": FunctionFragment;
-    "getLastBatchId()": FunctionFragment;
-    "getOrderRoot()": FunctionFragment;
-    "getOrderTreeHeight()": FunctionFragment;
-    "getQuantizedDepositBalance(uint256,uint256,uint256)": FunctionFragment;
-    "getQuantizedVaultBalance(address,uint256,uint256)": FunctionFragment;
-    "getQuantum(uint256)": FunctionFragment;
-    "getRegisteredAvailabilityVerifiers()": FunctionFragment;
-    "getRegisteredVerifiers()": FunctionFragment;
-    "getSequenceNumber()": FunctionFragment;
-    "getVaultBalance(address,uint256,uint256)": FunctionFragment;
-    "getVaultRoot()": FunctionFragment;
-    "getVaultTreeHeight()": FunctionFragment;
-    "getVaultWithdrawalLock(address,uint256,uint256)": FunctionFragment;
-    "getWithdrawalBalance(uint256,uint256)": FunctionFragment;
-    "initialize(bytes)": FunctionFragment;
-    "isAssetRegistered(uint256)": FunctionFragment;
-    "isAvailabilityVerifier(address)": FunctionFragment;
-    "isFrozen()": FunctionFragment;
-    "isOperator(address)": FunctionFragment;
-    "isStrictVaultBalancePolicy()": FunctionFragment;
-    "isTokenAdmin(address)": FunctionFragment;
-    "isVaultLocked(address,uint256,uint256)": FunctionFragment;
-    "isVerifier(address)": FunctionFragment;
-    "lockVault(uint256,uint256,uint256)": FunctionFragment;
-    "mainAcceptGovernance()": FunctionFragment;
-    "mainCancelNomination()": FunctionFragment;
-    "mainIsGovernor(address)": FunctionFragment;
-    "mainNominateNewGovernor(address)": FunctionFragment;
-    "mainRemoveGovernor(address)": FunctionFragment;
-    "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
-    "orderRegistryAddress()": FunctionFragment;
-    "registerAndDepositERC20(address,uint256,bytes,uint256,uint256,uint256)": FunctionFragment;
-    "registerAndDepositEth(address,uint256,bytes,uint256,uint256)": FunctionFragment;
-    "registerAvailabilityVerifier(address,string)": FunctionFragment;
-    "registerEthAddress(address,uint256,bytes)": FunctionFragment;
-    "registerOperator(address)": FunctionFragment;
-    "registerSender(uint256,bytes)": FunctionFragment;
-    "registerToken(uint256,bytes)": FunctionFragment;
-    "registerToken(uint256,bytes,uint256)": FunctionFragment;
-    "registerTokenAdmin(address)": FunctionFragment;
-    "registerVerifier(address,string)": FunctionFragment;
-    "removeAvailabilityVerifier(address)": FunctionFragment;
-    "removeVerifier(address)": FunctionFragment;
-    "setDefaultVaultWithdrawalLock(uint256)": FunctionFragment;
-    "unFreeze()": FunctionFragment;
-    "unregisterOperator(address)": FunctionFragment;
-    "unregisterTokenAdmin(address)": FunctionFragment;
-    "updateImplementationActivationTime(address,bytes,bool)": FunctionFragment;
-    "updateState(uint256[],uint256[])": FunctionFragment;
-    "withdraw(uint256,uint256)": FunctionFragment;
-    "withdrawAndMint(uint256,uint256,bytes)": FunctionFragment;
-    "withdrawFromVault(uint256,uint256,uint256)": FunctionFragment;
-    "withdrawNft(uint256,uint256,uint256)": FunctionFragment;
-  };
-
+export interface CoreV4Interface extends Interface {
   getFunction(
-    nameOrSignatureOrTopic:
+    nameOrSignature:
       | "DEPOSIT_CANCEL_DELAY"
       | "FREEZE_GRACE_PERIOD"
       | "MAIN_GOVERNANCE_INFO_TAG"
@@ -206,6 +113,45 @@ export interface CoreV4Interface extends utils.Interface {
       | "withdrawNft"
   ): FunctionFragment;
 
+  getEvent(
+    nameOrSignatureOrTopic:
+      | "ImplementationActivationRescheduled"
+      | "LogDefaultVaultWithdrawalLockSet"
+      | "LogDeposit"
+      | "LogDepositCancel"
+      | "LogDepositCancelReclaimed"
+      | "LogDepositNftCancelReclaimed"
+      | "LogDepositToVault"
+      | "LogFrozen"
+      | "LogFullWithdrawalRequest"
+      | "LogMintWithdrawalPerformed"
+      | "LogMintableWithdrawalAllowed"
+      | "LogNewGovernorAccepted"
+      | "LogNftDeposit"
+      | "LogNftWithdrawalAllowed"
+      | "LogNftWithdrawalPerformed"
+      | "LogNominatedGovernor"
+      | "LogNominationCancelled"
+      | "LogOperatorAdded"
+      | "LogOperatorRemoved"
+      | "LogRegistered"
+      | "LogRemovalIntent"
+      | "LogRemoved"
+      | "LogRemovedGovernor"
+      | "LogRootUpdate"
+      | "LogStateTransitionFact"
+      | "LogTokenAdminAdded"
+      | "LogTokenAdminRemoved"
+      | "LogTokenRegistered"
+      | "LogUnFrozen"
+      | "LogUserRegistered"
+      | "LogVaultBalanceChangeApplied"
+      | "LogVaultWithdrawalLockSet"
+      | "LogWithdrawalAllowed"
+      | "LogWithdrawalFromVault"
+      | "LogWithdrawalPerformed"
+  ): EventFragment;
+
   encodeFunctionData(
     functionFragment: "DEPOSIT_CANCEL_DELAY",
     values?: undefined
@@ -241,11 +187,11 @@ export interface CoreV4Interface extends utils.Interface {
   encodeFunctionData(functionFragment: "VERSION", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "announceAvailabilityVerifierRemovalIntent",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "announceVerifierRemovalIntent",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "defaultVaultWithdrawalLock",
@@ -253,100 +199,55 @@ export interface CoreV4Interface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "deposit(uint256,uint256,uint256)",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "deposit(uint256,uint256,uint256,uint256)",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [BigNumberish, BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "depositCancel",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "depositERC20",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [BigNumberish, BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "depositERC20ToVault",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "depositEth",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "depositEthToVault",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "depositNft",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [BigNumberish, BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "depositNftReclaim",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [BigNumberish, BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "depositReclaim",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "escape",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [BigNumberish, BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "freezeRequest",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "fullWithdrawalRequest",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getActionCount",
@@ -354,35 +255,27 @@ export interface CoreV4Interface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getActionHashByIndex",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getAssetInfo",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getCancellationRequest",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getDepositBalance",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getEthKey",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getFullWithdrawalRequest",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getLastBatchId",
@@ -398,23 +291,15 @@ export interface CoreV4Interface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getQuantizedDepositBalance",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getQuantizedVaultBalance",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [AddressLike, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getQuantum",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getRegisteredAvailabilityVerifiers",
@@ -430,11 +315,7 @@ export interface CoreV4Interface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getVaultBalance",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [AddressLike, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getVaultRoot",
@@ -446,32 +327,28 @@ export interface CoreV4Interface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getVaultWithdrawalLock",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [AddressLike, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getWithdrawalBalance",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [PromiseOrValue<BytesLike>]
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "isAssetRegistered",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "isAvailabilityVerifier",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(functionFragment: "isFrozen", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "isOperator",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "isStrictVaultBalancePolicy",
@@ -479,27 +356,19 @@ export interface CoreV4Interface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "isTokenAdmin",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "isVaultLocked",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [AddressLike, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "isVerifier",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "lockVault",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "mainAcceptGovernance",
@@ -511,24 +380,19 @@ export interface CoreV4Interface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "mainIsGovernor",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "mainNominateNewGovernor",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "mainRemoveGovernor",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "onERC721Received",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>
-    ]
+    values: [AddressLike, AddressLike, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "orderRegistryAddress",
@@ -537,124 +401,94 @@ export interface CoreV4Interface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "registerAndDepositERC20",
     values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
+      AddressLike,
+      BigNumberish,
+      BytesLike,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish
     ]
   ): string;
   encodeFunctionData(
     functionFragment: "registerAndDepositEth",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [AddressLike, BigNumberish, BytesLike, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "registerAvailabilityVerifier",
-    values: [PromiseOrValue<string>, PromiseOrValue<string>]
+    values: [AddressLike, string]
   ): string;
   encodeFunctionData(
     functionFragment: "registerEthAddress",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>
-    ]
+    values: [AddressLike, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "registerOperator",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "registerSender",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BytesLike>]
+    values: [BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "registerToken(uint256,bytes)",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BytesLike>]
+    values: [BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "registerToken(uint256,bytes,uint256)",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [BigNumberish, BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "registerTokenAdmin",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "registerVerifier",
-    values: [PromiseOrValue<string>, PromiseOrValue<string>]
+    values: [AddressLike, string]
   ): string;
   encodeFunctionData(
     functionFragment: "removeAvailabilityVerifier",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "removeVerifier",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "setDefaultVaultWithdrawalLock",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "unFreeze", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "unregisterOperator",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "unregisterTokenAdmin",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "updateImplementationActivationTime",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<boolean>
-    ]
+    values: [AddressLike, BytesLike, boolean]
   ): string;
   encodeFunctionData(
     functionFragment: "updateState",
-    values: [PromiseOrValue<BigNumberish>[], PromiseOrValue<BigNumberish>[]]
+    values: [BigNumberish[], BigNumberish[]]
   ): string;
   encodeFunctionData(
     functionFragment: "withdraw",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "withdrawAndMint",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>
-    ]
+    values: [BigNumberish, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "withdrawFromVault",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "withdrawNft",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
 
   decodeFunctionResult(
@@ -958,3113 +792,2259 @@ export interface CoreV4Interface extends utils.Interface {
     functionFragment: "withdrawNft",
     data: BytesLike
   ): Result;
-
-  events: {
-    "ImplementationActivationRescheduled(address,uint256)": EventFragment;
-    "LogDefaultVaultWithdrawalLockSet(uint256)": EventFragment;
-    "LogDeposit(address,uint256,uint256,uint256,uint256,uint256)": EventFragment;
-    "LogDepositCancel(uint256,uint256,uint256)": EventFragment;
-    "LogDepositCancelReclaimed(uint256,uint256,uint256,uint256,uint256)": EventFragment;
-    "LogDepositNftCancelReclaimed(uint256,uint256,uint256,uint256,uint256)": EventFragment;
-    "LogDepositToVault(address,uint256,uint256,uint256,uint256)": EventFragment;
-    "LogFrozen()": EventFragment;
-    "LogFullWithdrawalRequest(uint256,uint256)": EventFragment;
-    "LogMintWithdrawalPerformed(uint256,uint256,uint256,uint256,uint256)": EventFragment;
-    "LogMintableWithdrawalAllowed(uint256,uint256,uint256)": EventFragment;
-    "LogNewGovernorAccepted(address)": EventFragment;
-    "LogNftDeposit(address,uint256,uint256,uint256,uint256,uint256)": EventFragment;
-    "LogNftWithdrawalAllowed(uint256,uint256)": EventFragment;
-    "LogNftWithdrawalPerformed(uint256,uint256,uint256,uint256,address)": EventFragment;
-    "LogNominatedGovernor(address)": EventFragment;
-    "LogNominationCancelled()": EventFragment;
-    "LogOperatorAdded(address)": EventFragment;
-    "LogOperatorRemoved(address)": EventFragment;
-    "LogRegistered(address,string)": EventFragment;
-    "LogRemovalIntent(address,string)": EventFragment;
-    "LogRemoved(address,string)": EventFragment;
-    "LogRemovedGovernor(address)": EventFragment;
-    "LogRootUpdate(uint256,uint256,uint256,uint256)": EventFragment;
-    "LogStateTransitionFact(bytes32)": EventFragment;
-    "LogTokenAdminAdded(address)": EventFragment;
-    "LogTokenAdminRemoved(address)": EventFragment;
-    "LogTokenRegistered(uint256,bytes,uint256)": EventFragment;
-    "LogUnFrozen()": EventFragment;
-    "LogUserRegistered(address,uint256,address)": EventFragment;
-    "LogVaultBalanceChangeApplied(address,uint256,uint256,int256)": EventFragment;
-    "LogVaultWithdrawalLockSet(address,uint256,uint256,uint256)": EventFragment;
-    "LogWithdrawalAllowed(uint256,uint256,uint256,uint256)": EventFragment;
-    "LogWithdrawalFromVault(address,uint256,uint256,uint256,uint256)": EventFragment;
-    "LogWithdrawalPerformed(uint256,uint256,uint256,uint256,address)": EventFragment;
-  };
-
-  getEvent(
-    nameOrSignatureOrTopic: "ImplementationActivationRescheduled"
-  ): EventFragment;
-  getEvent(
-    nameOrSignatureOrTopic: "LogDefaultVaultWithdrawalLockSet"
-  ): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogDeposit"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogDepositCancel"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogDepositCancelReclaimed"): EventFragment;
-  getEvent(
-    nameOrSignatureOrTopic: "LogDepositNftCancelReclaimed"
-  ): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogDepositToVault"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogFrozen"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogFullWithdrawalRequest"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogMintWithdrawalPerformed"): EventFragment;
-  getEvent(
-    nameOrSignatureOrTopic: "LogMintableWithdrawalAllowed"
-  ): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogNewGovernorAccepted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogNftDeposit"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogNftWithdrawalAllowed"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogNftWithdrawalPerformed"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogNominatedGovernor"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogNominationCancelled"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogOperatorAdded"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogOperatorRemoved"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogRegistered"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogRemovalIntent"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogRemoved"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogRemovedGovernor"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogRootUpdate"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogStateTransitionFact"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogTokenAdminAdded"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogTokenAdminRemoved"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogTokenRegistered"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogUnFrozen"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogUserRegistered"): EventFragment;
-  getEvent(
-    nameOrSignatureOrTopic: "LogVaultBalanceChangeApplied"
-  ): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogVaultWithdrawalLockSet"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogWithdrawalAllowed"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogWithdrawalFromVault"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogWithdrawalPerformed"): EventFragment;
 }
 
-export interface ImplementationActivationRescheduledEventObject {
-  implementation: string;
-  updatedActivationTime: BigNumber;
+export namespace ImplementationActivationRescheduledEvent {
+  export type InputTuple = [
+    implementation: AddressLike,
+    updatedActivationTime: BigNumberish
+  ];
+  export type OutputTuple = [
+    implementation: string,
+    updatedActivationTime: bigint
+  ];
+  export interface OutputObject {
+    implementation: string;
+    updatedActivationTime: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type ImplementationActivationRescheduledEvent = TypedEvent<
-  [string, BigNumber],
-  ImplementationActivationRescheduledEventObject
->;
 
-export type ImplementationActivationRescheduledEventFilter =
-  TypedEventFilter<ImplementationActivationRescheduledEvent>;
-
-export interface LogDefaultVaultWithdrawalLockSetEventObject {
-  newDefaultLockTime: BigNumber;
+export namespace LogDefaultVaultWithdrawalLockSetEvent {
+  export type InputTuple = [newDefaultLockTime: BigNumberish];
+  export type OutputTuple = [newDefaultLockTime: bigint];
+  export interface OutputObject {
+    newDefaultLockTime: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogDefaultVaultWithdrawalLockSetEvent = TypedEvent<
-  [BigNumber],
-  LogDefaultVaultWithdrawalLockSetEventObject
->;
 
-export type LogDefaultVaultWithdrawalLockSetEventFilter =
-  TypedEventFilter<LogDefaultVaultWithdrawalLockSetEvent>;
-
-export interface LogDepositEventObject {
-  depositorEthKey: string;
-  starkKey: BigNumber;
-  vaultId: BigNumber;
-  assetType: BigNumber;
-  nonQuantizedAmount: BigNumber;
-  quantizedAmount: BigNumber;
+export namespace LogDepositEvent {
+  export type InputTuple = [
+    depositorEthKey: AddressLike,
+    starkKey: BigNumberish,
+    vaultId: BigNumberish,
+    assetType: BigNumberish,
+    nonQuantizedAmount: BigNumberish,
+    quantizedAmount: BigNumberish
+  ];
+  export type OutputTuple = [
+    depositorEthKey: string,
+    starkKey: bigint,
+    vaultId: bigint,
+    assetType: bigint,
+    nonQuantizedAmount: bigint,
+    quantizedAmount: bigint
+  ];
+  export interface OutputObject {
+    depositorEthKey: string;
+    starkKey: bigint;
+    vaultId: bigint;
+    assetType: bigint;
+    nonQuantizedAmount: bigint;
+    quantizedAmount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogDepositEvent = TypedEvent<
-  [string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber],
-  LogDepositEventObject
->;
 
-export type LogDepositEventFilter = TypedEventFilter<LogDepositEvent>;
-
-export interface LogDepositCancelEventObject {
-  starkKey: BigNumber;
-  vaultId: BigNumber;
-  assetId: BigNumber;
+export namespace LogDepositCancelEvent {
+  export type InputTuple = [
+    starkKey: BigNumberish,
+    vaultId: BigNumberish,
+    assetId: BigNumberish
+  ];
+  export type OutputTuple = [
+    starkKey: bigint,
+    vaultId: bigint,
+    assetId: bigint
+  ];
+  export interface OutputObject {
+    starkKey: bigint;
+    vaultId: bigint;
+    assetId: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogDepositCancelEvent = TypedEvent<
-  [BigNumber, BigNumber, BigNumber],
-  LogDepositCancelEventObject
->;
 
-export type LogDepositCancelEventFilter =
-  TypedEventFilter<LogDepositCancelEvent>;
-
-export interface LogDepositCancelReclaimedEventObject {
-  starkKey: BigNumber;
-  vaultId: BigNumber;
-  assetType: BigNumber;
-  nonQuantizedAmount: BigNumber;
-  quantizedAmount: BigNumber;
+export namespace LogDepositCancelReclaimedEvent {
+  export type InputTuple = [
+    starkKey: BigNumberish,
+    vaultId: BigNumberish,
+    assetType: BigNumberish,
+    nonQuantizedAmount: BigNumberish,
+    quantizedAmount: BigNumberish
+  ];
+  export type OutputTuple = [
+    starkKey: bigint,
+    vaultId: bigint,
+    assetType: bigint,
+    nonQuantizedAmount: bigint,
+    quantizedAmount: bigint
+  ];
+  export interface OutputObject {
+    starkKey: bigint;
+    vaultId: bigint;
+    assetType: bigint;
+    nonQuantizedAmount: bigint;
+    quantizedAmount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogDepositCancelReclaimedEvent = TypedEvent<
-  [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber],
-  LogDepositCancelReclaimedEventObject
->;
 
-export type LogDepositCancelReclaimedEventFilter =
-  TypedEventFilter<LogDepositCancelReclaimedEvent>;
-
-export interface LogDepositNftCancelReclaimedEventObject {
-  starkKey: BigNumber;
-  vaultId: BigNumber;
-  assetType: BigNumber;
-  tokenId: BigNumber;
-  assetId: BigNumber;
+export namespace LogDepositNftCancelReclaimedEvent {
+  export type InputTuple = [
+    starkKey: BigNumberish,
+    vaultId: BigNumberish,
+    assetType: BigNumberish,
+    tokenId: BigNumberish,
+    assetId: BigNumberish
+  ];
+  export type OutputTuple = [
+    starkKey: bigint,
+    vaultId: bigint,
+    assetType: bigint,
+    tokenId: bigint,
+    assetId: bigint
+  ];
+  export interface OutputObject {
+    starkKey: bigint;
+    vaultId: bigint;
+    assetType: bigint;
+    tokenId: bigint;
+    assetId: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogDepositNftCancelReclaimedEvent = TypedEvent<
-  [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber],
-  LogDepositNftCancelReclaimedEventObject
->;
 
-export type LogDepositNftCancelReclaimedEventFilter =
-  TypedEventFilter<LogDepositNftCancelReclaimedEvent>;
-
-export interface LogDepositToVaultEventObject {
-  ethKey: string;
-  assetId: BigNumber;
-  vaultId: BigNumber;
-  nonQuantizedAmount: BigNumber;
-  quantizedAmount: BigNumber;
+export namespace LogDepositToVaultEvent {
+  export type InputTuple = [
+    ethKey: AddressLike,
+    assetId: BigNumberish,
+    vaultId: BigNumberish,
+    nonQuantizedAmount: BigNumberish,
+    quantizedAmount: BigNumberish
+  ];
+  export type OutputTuple = [
+    ethKey: string,
+    assetId: bigint,
+    vaultId: bigint,
+    nonQuantizedAmount: bigint,
+    quantizedAmount: bigint
+  ];
+  export interface OutputObject {
+    ethKey: string;
+    assetId: bigint;
+    vaultId: bigint;
+    nonQuantizedAmount: bigint;
+    quantizedAmount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogDepositToVaultEvent = TypedEvent<
-  [string, BigNumber, BigNumber, BigNumber, BigNumber],
-  LogDepositToVaultEventObject
->;
 
-export type LogDepositToVaultEventFilter =
-  TypedEventFilter<LogDepositToVaultEvent>;
-
-export interface LogFrozenEventObject {}
-export type LogFrozenEvent = TypedEvent<[], LogFrozenEventObject>;
-
-export type LogFrozenEventFilter = TypedEventFilter<LogFrozenEvent>;
-
-export interface LogFullWithdrawalRequestEventObject {
-  starkKey: BigNumber;
-  vaultId: BigNumber;
+export namespace LogFrozenEvent {
+  export type InputTuple = [];
+  export type OutputTuple = [];
+  export interface OutputObject {}
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogFullWithdrawalRequestEvent = TypedEvent<
-  [BigNumber, BigNumber],
-  LogFullWithdrawalRequestEventObject
->;
 
-export type LogFullWithdrawalRequestEventFilter =
-  TypedEventFilter<LogFullWithdrawalRequestEvent>;
-
-export interface LogMintWithdrawalPerformedEventObject {
-  ownerKey: BigNumber;
-  assetType: BigNumber;
-  nonQuantizedAmount: BigNumber;
-  quantizedAmount: BigNumber;
-  assetId: BigNumber;
+export namespace LogFullWithdrawalRequestEvent {
+  export type InputTuple = [starkKey: BigNumberish, vaultId: BigNumberish];
+  export type OutputTuple = [starkKey: bigint, vaultId: bigint];
+  export interface OutputObject {
+    starkKey: bigint;
+    vaultId: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogMintWithdrawalPerformedEvent = TypedEvent<
-  [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber],
-  LogMintWithdrawalPerformedEventObject
->;
 
-export type LogMintWithdrawalPerformedEventFilter =
-  TypedEventFilter<LogMintWithdrawalPerformedEvent>;
-
-export interface LogMintableWithdrawalAllowedEventObject {
-  ownerKey: BigNumber;
-  assetId: BigNumber;
-  quantizedAmount: BigNumber;
+export namespace LogMintWithdrawalPerformedEvent {
+  export type InputTuple = [
+    ownerKey: BigNumberish,
+    assetType: BigNumberish,
+    nonQuantizedAmount: BigNumberish,
+    quantizedAmount: BigNumberish,
+    assetId: BigNumberish
+  ];
+  export type OutputTuple = [
+    ownerKey: bigint,
+    assetType: bigint,
+    nonQuantizedAmount: bigint,
+    quantizedAmount: bigint,
+    assetId: bigint
+  ];
+  export interface OutputObject {
+    ownerKey: bigint;
+    assetType: bigint;
+    nonQuantizedAmount: bigint;
+    quantizedAmount: bigint;
+    assetId: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogMintableWithdrawalAllowedEvent = TypedEvent<
-  [BigNumber, BigNumber, BigNumber],
-  LogMintableWithdrawalAllowedEventObject
->;
 
-export type LogMintableWithdrawalAllowedEventFilter =
-  TypedEventFilter<LogMintableWithdrawalAllowedEvent>;
-
-export interface LogNewGovernorAcceptedEventObject {
-  acceptedGovernor: string;
+export namespace LogMintableWithdrawalAllowedEvent {
+  export type InputTuple = [
+    ownerKey: BigNumberish,
+    assetId: BigNumberish,
+    quantizedAmount: BigNumberish
+  ];
+  export type OutputTuple = [
+    ownerKey: bigint,
+    assetId: bigint,
+    quantizedAmount: bigint
+  ];
+  export interface OutputObject {
+    ownerKey: bigint;
+    assetId: bigint;
+    quantizedAmount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogNewGovernorAcceptedEvent = TypedEvent<
-  [string],
-  LogNewGovernorAcceptedEventObject
->;
 
-export type LogNewGovernorAcceptedEventFilter =
-  TypedEventFilter<LogNewGovernorAcceptedEvent>;
-
-export interface LogNftDepositEventObject {
-  depositorEthKey: string;
-  starkKey: BigNumber;
-  vaultId: BigNumber;
-  assetType: BigNumber;
-  tokenId: BigNumber;
-  assetId: BigNumber;
+export namespace LogNewGovernorAcceptedEvent {
+  export type InputTuple = [acceptedGovernor: AddressLike];
+  export type OutputTuple = [acceptedGovernor: string];
+  export interface OutputObject {
+    acceptedGovernor: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogNftDepositEvent = TypedEvent<
-  [string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber],
-  LogNftDepositEventObject
->;
 
-export type LogNftDepositEventFilter = TypedEventFilter<LogNftDepositEvent>;
-
-export interface LogNftWithdrawalAllowedEventObject {
-  ownerKey: BigNumber;
-  assetId: BigNumber;
+export namespace LogNftDepositEvent {
+  export type InputTuple = [
+    depositorEthKey: AddressLike,
+    starkKey: BigNumberish,
+    vaultId: BigNumberish,
+    assetType: BigNumberish,
+    tokenId: BigNumberish,
+    assetId: BigNumberish
+  ];
+  export type OutputTuple = [
+    depositorEthKey: string,
+    starkKey: bigint,
+    vaultId: bigint,
+    assetType: bigint,
+    tokenId: bigint,
+    assetId: bigint
+  ];
+  export interface OutputObject {
+    depositorEthKey: string;
+    starkKey: bigint;
+    vaultId: bigint;
+    assetType: bigint;
+    tokenId: bigint;
+    assetId: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogNftWithdrawalAllowedEvent = TypedEvent<
-  [BigNumber, BigNumber],
-  LogNftWithdrawalAllowedEventObject
->;
 
-export type LogNftWithdrawalAllowedEventFilter =
-  TypedEventFilter<LogNftWithdrawalAllowedEvent>;
-
-export interface LogNftWithdrawalPerformedEventObject {
-  ownerKey: BigNumber;
-  assetType: BigNumber;
-  tokenId: BigNumber;
-  assetId: BigNumber;
-  recipient: string;
+export namespace LogNftWithdrawalAllowedEvent {
+  export type InputTuple = [ownerKey: BigNumberish, assetId: BigNumberish];
+  export type OutputTuple = [ownerKey: bigint, assetId: bigint];
+  export interface OutputObject {
+    ownerKey: bigint;
+    assetId: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogNftWithdrawalPerformedEvent = TypedEvent<
-  [BigNumber, BigNumber, BigNumber, BigNumber, string],
-  LogNftWithdrawalPerformedEventObject
->;
 
-export type LogNftWithdrawalPerformedEventFilter =
-  TypedEventFilter<LogNftWithdrawalPerformedEvent>;
-
-export interface LogNominatedGovernorEventObject {
-  nominatedGovernor: string;
+export namespace LogNftWithdrawalPerformedEvent {
+  export type InputTuple = [
+    ownerKey: BigNumberish,
+    assetType: BigNumberish,
+    tokenId: BigNumberish,
+    assetId: BigNumberish,
+    recipient: AddressLike
+  ];
+  export type OutputTuple = [
+    ownerKey: bigint,
+    assetType: bigint,
+    tokenId: bigint,
+    assetId: bigint,
+    recipient: string
+  ];
+  export interface OutputObject {
+    ownerKey: bigint;
+    assetType: bigint;
+    tokenId: bigint;
+    assetId: bigint;
+    recipient: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogNominatedGovernorEvent = TypedEvent<
-  [string],
-  LogNominatedGovernorEventObject
->;
 
-export type LogNominatedGovernorEventFilter =
-  TypedEventFilter<LogNominatedGovernorEvent>;
-
-export interface LogNominationCancelledEventObject {}
-export type LogNominationCancelledEvent = TypedEvent<
-  [],
-  LogNominationCancelledEventObject
->;
-
-export type LogNominationCancelledEventFilter =
-  TypedEventFilter<LogNominationCancelledEvent>;
-
-export interface LogOperatorAddedEventObject {
-  operator: string;
+export namespace LogNominatedGovernorEvent {
+  export type InputTuple = [nominatedGovernor: AddressLike];
+  export type OutputTuple = [nominatedGovernor: string];
+  export interface OutputObject {
+    nominatedGovernor: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogOperatorAddedEvent = TypedEvent<
-  [string],
-  LogOperatorAddedEventObject
->;
 
-export type LogOperatorAddedEventFilter =
-  TypedEventFilter<LogOperatorAddedEvent>;
-
-export interface LogOperatorRemovedEventObject {
-  operator: string;
+export namespace LogNominationCancelledEvent {
+  export type InputTuple = [];
+  export type OutputTuple = [];
+  export interface OutputObject {}
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogOperatorRemovedEvent = TypedEvent<
-  [string],
-  LogOperatorRemovedEventObject
->;
 
-export type LogOperatorRemovedEventFilter =
-  TypedEventFilter<LogOperatorRemovedEvent>;
-
-export interface LogRegisteredEventObject {
-  entry: string;
-  entryId: string;
+export namespace LogOperatorAddedEvent {
+  export type InputTuple = [operator: AddressLike];
+  export type OutputTuple = [operator: string];
+  export interface OutputObject {
+    operator: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogRegisteredEvent = TypedEvent<
-  [string, string],
-  LogRegisteredEventObject
->;
 
-export type LogRegisteredEventFilter = TypedEventFilter<LogRegisteredEvent>;
-
-export interface LogRemovalIntentEventObject {
-  entry: string;
-  entryId: string;
+export namespace LogOperatorRemovedEvent {
+  export type InputTuple = [operator: AddressLike];
+  export type OutputTuple = [operator: string];
+  export interface OutputObject {
+    operator: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogRemovalIntentEvent = TypedEvent<
-  [string, string],
-  LogRemovalIntentEventObject
->;
 
-export type LogRemovalIntentEventFilter =
-  TypedEventFilter<LogRemovalIntentEvent>;
-
-export interface LogRemovedEventObject {
-  entry: string;
-  entryId: string;
+export namespace LogRegisteredEvent {
+  export type InputTuple = [entry: AddressLike, entryId: string];
+  export type OutputTuple = [entry: string, entryId: string];
+  export interface OutputObject {
+    entry: string;
+    entryId: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogRemovedEvent = TypedEvent<
-  [string, string],
-  LogRemovedEventObject
->;
 
-export type LogRemovedEventFilter = TypedEventFilter<LogRemovedEvent>;
-
-export interface LogRemovedGovernorEventObject {
-  removedGovernor: string;
+export namespace LogRemovalIntentEvent {
+  export type InputTuple = [entry: AddressLike, entryId: string];
+  export type OutputTuple = [entry: string, entryId: string];
+  export interface OutputObject {
+    entry: string;
+    entryId: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogRemovedGovernorEvent = TypedEvent<
-  [string],
-  LogRemovedGovernorEventObject
->;
 
-export type LogRemovedGovernorEventFilter =
-  TypedEventFilter<LogRemovedGovernorEvent>;
-
-export interface LogRootUpdateEventObject {
-  sequenceNumber: BigNumber;
-  batchId: BigNumber;
-  vaultRoot: BigNumber;
-  orderRoot: BigNumber;
+export namespace LogRemovedEvent {
+  export type InputTuple = [entry: AddressLike, entryId: string];
+  export type OutputTuple = [entry: string, entryId: string];
+  export interface OutputObject {
+    entry: string;
+    entryId: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogRootUpdateEvent = TypedEvent<
-  [BigNumber, BigNumber, BigNumber, BigNumber],
-  LogRootUpdateEventObject
->;
 
-export type LogRootUpdateEventFilter = TypedEventFilter<LogRootUpdateEvent>;
-
-export interface LogStateTransitionFactEventObject {
-  stateTransitionFact: string;
+export namespace LogRemovedGovernorEvent {
+  export type InputTuple = [removedGovernor: AddressLike];
+  export type OutputTuple = [removedGovernor: string];
+  export interface OutputObject {
+    removedGovernor: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogStateTransitionFactEvent = TypedEvent<
-  [string],
-  LogStateTransitionFactEventObject
->;
 
-export type LogStateTransitionFactEventFilter =
-  TypedEventFilter<LogStateTransitionFactEvent>;
-
-export interface LogTokenAdminAddedEventObject {
-  tokenAdmin: string;
+export namespace LogRootUpdateEvent {
+  export type InputTuple = [
+    sequenceNumber: BigNumberish,
+    batchId: BigNumberish,
+    vaultRoot: BigNumberish,
+    orderRoot: BigNumberish
+  ];
+  export type OutputTuple = [
+    sequenceNumber: bigint,
+    batchId: bigint,
+    vaultRoot: bigint,
+    orderRoot: bigint
+  ];
+  export interface OutputObject {
+    sequenceNumber: bigint;
+    batchId: bigint;
+    vaultRoot: bigint;
+    orderRoot: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogTokenAdminAddedEvent = TypedEvent<
-  [string],
-  LogTokenAdminAddedEventObject
->;
 
-export type LogTokenAdminAddedEventFilter =
-  TypedEventFilter<LogTokenAdminAddedEvent>;
-
-export interface LogTokenAdminRemovedEventObject {
-  tokenAdmin: string;
+export namespace LogStateTransitionFactEvent {
+  export type InputTuple = [stateTransitionFact: BytesLike];
+  export type OutputTuple = [stateTransitionFact: string];
+  export interface OutputObject {
+    stateTransitionFact: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogTokenAdminRemovedEvent = TypedEvent<
-  [string],
-  LogTokenAdminRemovedEventObject
->;
 
-export type LogTokenAdminRemovedEventFilter =
-  TypedEventFilter<LogTokenAdminRemovedEvent>;
-
-export interface LogTokenRegisteredEventObject {
-  assetType: BigNumber;
-  assetInfo: string;
-  quantum: BigNumber;
+export namespace LogTokenAdminAddedEvent {
+  export type InputTuple = [tokenAdmin: AddressLike];
+  export type OutputTuple = [tokenAdmin: string];
+  export interface OutputObject {
+    tokenAdmin: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogTokenRegisteredEvent = TypedEvent<
-  [BigNumber, string, BigNumber],
-  LogTokenRegisteredEventObject
->;
 
-export type LogTokenRegisteredEventFilter =
-  TypedEventFilter<LogTokenRegisteredEvent>;
-
-export interface LogUnFrozenEventObject {}
-export type LogUnFrozenEvent = TypedEvent<[], LogUnFrozenEventObject>;
-
-export type LogUnFrozenEventFilter = TypedEventFilter<LogUnFrozenEvent>;
-
-export interface LogUserRegisteredEventObject {
-  ethKey: string;
-  starkKey: BigNumber;
-  sender: string;
+export namespace LogTokenAdminRemovedEvent {
+  export type InputTuple = [tokenAdmin: AddressLike];
+  export type OutputTuple = [tokenAdmin: string];
+  export interface OutputObject {
+    tokenAdmin: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogUserRegisteredEvent = TypedEvent<
-  [string, BigNumber, string],
-  LogUserRegisteredEventObject
->;
 
-export type LogUserRegisteredEventFilter =
-  TypedEventFilter<LogUserRegisteredEvent>;
-
-export interface LogVaultBalanceChangeAppliedEventObject {
-  ethKey: string;
-  assetId: BigNumber;
-  vaultId: BigNumber;
-  quantizedAmountChange: BigNumber;
+export namespace LogTokenRegisteredEvent {
+  export type InputTuple = [
+    assetType: BigNumberish,
+    assetInfo: BytesLike,
+    quantum: BigNumberish
+  ];
+  export type OutputTuple = [
+    assetType: bigint,
+    assetInfo: string,
+    quantum: bigint
+  ];
+  export interface OutputObject {
+    assetType: bigint;
+    assetInfo: string;
+    quantum: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogVaultBalanceChangeAppliedEvent = TypedEvent<
-  [string, BigNumber, BigNumber, BigNumber],
-  LogVaultBalanceChangeAppliedEventObject
->;
 
-export type LogVaultBalanceChangeAppliedEventFilter =
-  TypedEventFilter<LogVaultBalanceChangeAppliedEvent>;
-
-export interface LogVaultWithdrawalLockSetEventObject {
-  ethKey: string;
-  assetId: BigNumber;
-  vaultId: BigNumber;
-  timeRelease: BigNumber;
+export namespace LogUnFrozenEvent {
+  export type InputTuple = [];
+  export type OutputTuple = [];
+  export interface OutputObject {}
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogVaultWithdrawalLockSetEvent = TypedEvent<
-  [string, BigNumber, BigNumber, BigNumber],
-  LogVaultWithdrawalLockSetEventObject
->;
 
-export type LogVaultWithdrawalLockSetEventFilter =
-  TypedEventFilter<LogVaultWithdrawalLockSetEvent>;
-
-export interface LogWithdrawalAllowedEventObject {
-  ownerKey: BigNumber;
-  assetType: BigNumber;
-  nonQuantizedAmount: BigNumber;
-  quantizedAmount: BigNumber;
+export namespace LogUserRegisteredEvent {
+  export type InputTuple = [
+    ethKey: AddressLike,
+    starkKey: BigNumberish,
+    sender: AddressLike
+  ];
+  export type OutputTuple = [ethKey: string, starkKey: bigint, sender: string];
+  export interface OutputObject {
+    ethKey: string;
+    starkKey: bigint;
+    sender: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogWithdrawalAllowedEvent = TypedEvent<
-  [BigNumber, BigNumber, BigNumber, BigNumber],
-  LogWithdrawalAllowedEventObject
->;
 
-export type LogWithdrawalAllowedEventFilter =
-  TypedEventFilter<LogWithdrawalAllowedEvent>;
-
-export interface LogWithdrawalFromVaultEventObject {
-  ethKey: string;
-  assetId: BigNumber;
-  vaultId: BigNumber;
-  nonQuantizedAmount: BigNumber;
-  quantizedAmount: BigNumber;
+export namespace LogVaultBalanceChangeAppliedEvent {
+  export type InputTuple = [
+    ethKey: AddressLike,
+    assetId: BigNumberish,
+    vaultId: BigNumberish,
+    quantizedAmountChange: BigNumberish
+  ];
+  export type OutputTuple = [
+    ethKey: string,
+    assetId: bigint,
+    vaultId: bigint,
+    quantizedAmountChange: bigint
+  ];
+  export interface OutputObject {
+    ethKey: string;
+    assetId: bigint;
+    vaultId: bigint;
+    quantizedAmountChange: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogWithdrawalFromVaultEvent = TypedEvent<
-  [string, BigNumber, BigNumber, BigNumber, BigNumber],
-  LogWithdrawalFromVaultEventObject
->;
 
-export type LogWithdrawalFromVaultEventFilter =
-  TypedEventFilter<LogWithdrawalFromVaultEvent>;
-
-export interface LogWithdrawalPerformedEventObject {
-  ownerKey: BigNumber;
-  assetType: BigNumber;
-  nonQuantizedAmount: BigNumber;
-  quantizedAmount: BigNumber;
-  recipient: string;
+export namespace LogVaultWithdrawalLockSetEvent {
+  export type InputTuple = [
+    ethKey: AddressLike,
+    assetId: BigNumberish,
+    vaultId: BigNumberish,
+    timeRelease: BigNumberish
+  ];
+  export type OutputTuple = [
+    ethKey: string,
+    assetId: bigint,
+    vaultId: bigint,
+    timeRelease: bigint
+  ];
+  export interface OutputObject {
+    ethKey: string;
+    assetId: bigint;
+    vaultId: bigint;
+    timeRelease: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type LogWithdrawalPerformedEvent = TypedEvent<
-  [BigNumber, BigNumber, BigNumber, BigNumber, string],
-  LogWithdrawalPerformedEventObject
->;
 
-export type LogWithdrawalPerformedEventFilter =
-  TypedEventFilter<LogWithdrawalPerformedEvent>;
+export namespace LogWithdrawalAllowedEvent {
+  export type InputTuple = [
+    ownerKey: BigNumberish,
+    assetType: BigNumberish,
+    nonQuantizedAmount: BigNumberish,
+    quantizedAmount: BigNumberish
+  ];
+  export type OutputTuple = [
+    ownerKey: bigint,
+    assetType: bigint,
+    nonQuantizedAmount: bigint,
+    quantizedAmount: bigint
+  ];
+  export interface OutputObject {
+    ownerKey: bigint;
+    assetType: bigint;
+    nonQuantizedAmount: bigint;
+    quantizedAmount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace LogWithdrawalFromVaultEvent {
+  export type InputTuple = [
+    ethKey: AddressLike,
+    assetId: BigNumberish,
+    vaultId: BigNumberish,
+    nonQuantizedAmount: BigNumberish,
+    quantizedAmount: BigNumberish
+  ];
+  export type OutputTuple = [
+    ethKey: string,
+    assetId: bigint,
+    vaultId: bigint,
+    nonQuantizedAmount: bigint,
+    quantizedAmount: bigint
+  ];
+  export interface OutputObject {
+    ethKey: string;
+    assetId: bigint;
+    vaultId: bigint;
+    nonQuantizedAmount: bigint;
+    quantizedAmount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace LogWithdrawalPerformedEvent {
+  export type InputTuple = [
+    ownerKey: BigNumberish,
+    assetType: BigNumberish,
+    nonQuantizedAmount: BigNumberish,
+    quantizedAmount: BigNumberish,
+    recipient: AddressLike
+  ];
+  export type OutputTuple = [
+    ownerKey: bigint,
+    assetType: bigint,
+    nonQuantizedAmount: bigint,
+    quantizedAmount: bigint,
+    recipient: string
+  ];
+  export interface OutputObject {
+    ownerKey: bigint;
+    assetType: bigint;
+    nonQuantizedAmount: bigint;
+    quantizedAmount: bigint;
+    recipient: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
 
 export interface CoreV4 extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(runner?: ContractRunner | null): CoreV4;
+  waitForDeployment(): Promise<this>;
 
   interface: CoreV4Interface;
 
-  queryFilter<TEvent extends TypedEvent>(
-    event: TypedEventFilter<TEvent>,
+  queryFilter<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TEvent>>;
-
-  listeners<TEvent extends TypedEvent>(
-    eventFilter?: TypedEventFilter<TEvent>
-  ): Array<TypedListener<TEvent>>;
-  listeners(eventName?: string): Array<Listener>;
-  removeAllListeners<TEvent extends TypedEvent>(
-    eventFilter: TypedEventFilter<TEvent>
-  ): this;
-  removeAllListeners(eventName?: string): this;
-  off: OnEvent<this>;
-  on: OnEvent<this>;
-  once: OnEvent<this>;
-  removeListener: OnEvent<this>;
-
-  functions: {
-    DEPOSIT_CANCEL_DELAY(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    FREEZE_GRACE_PERIOD(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    MAIN_GOVERNANCE_INFO_TAG(overrides?: CallOverrides): Promise<[string]>;
-
-    MAX_FORCED_ACTIONS_REQS_PER_BLOCK(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    MAX_VERIFIER_COUNT(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    STARKEX_MAX_DEFAULT_VAULT_LOCK(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    UNFREEZE_DELAY(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    VERIFIER_REMOVAL_DELAY(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    VERSION(overrides?: CallOverrides): Promise<[string]>;
-
-    announceAvailabilityVerifierRemovalIntent(
-      verifier: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    announceVerifierRemovalIntent(
-      verifier: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    defaultVaultWithdrawalLock(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "deposit(uint256,uint256,uint256)"(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    "deposit(uint256,uint256,uint256,uint256)"(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    depositCancel(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    depositERC20(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    depositERC20ToVault(
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    depositEth(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    depositEthToVault(
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    depositNft(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    depositNftReclaim(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    depositReclaim(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    escape(
-      starkKey: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    freezeRequest(
-      starkKey: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    fullWithdrawalRequest(
-      starkKey: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    getActionCount(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    getActionHashByIndex(
-      actionIndex: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    getAssetInfo(
-      assetType: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[string] & { assetInfo: string }>;
-
-    getCancellationRequest(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { request: BigNumber }>;
-
-    getDepositBalance(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { balance: BigNumber }>;
-
-    getEthKey(
-      ownerKey: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    getFullWithdrawalRequest(
-      starkKey: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { res: BigNumber }>;
-
-    getLastBatchId(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { batchId: BigNumber }>;
-
-    getOrderRoot(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { root: BigNumber }>;
-
-    getOrderTreeHeight(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { height: BigNumber }>;
-
-    getQuantizedDepositBalance(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { balance: BigNumber }>;
-
-    getQuantizedVaultBalance(
-      ethKey: PromiseOrValue<string>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    getQuantum(
-      presumedAssetType: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { quantum: BigNumber }>;
-
-    getRegisteredAvailabilityVerifiers(
-      overrides?: CallOverrides
-    ): Promise<[string[]] & { _verifers: string[] }>;
-
-    getRegisteredVerifiers(
-      overrides?: CallOverrides
-    ): Promise<[string[]] & { _verifers: string[] }>;
-
-    getSequenceNumber(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { seq: BigNumber }>;
-
-    getVaultBalance(
-      ethKey: PromiseOrValue<string>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    getVaultRoot(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { root: BigNumber }>;
-
-    getVaultTreeHeight(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { height: BigNumber }>;
-
-    getVaultWithdrawalLock(
-      ethKey: PromiseOrValue<string>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    getWithdrawalBalance(
-      ownerKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { balance: BigNumber }>;
-
-    initialize(
-      data: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    isAssetRegistered(
-      assetType: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
-    isAvailabilityVerifier(
-      verifierAddress: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
-    isFrozen(overrides?: CallOverrides): Promise<[boolean]>;
-
-    isOperator(
-      testedOperator: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
-    isStrictVaultBalancePolicy(overrides?: CallOverrides): Promise<[boolean]>;
-
-    isTokenAdmin(
-      testedAdmin: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
-    isVaultLocked(
-      ethKey: PromiseOrValue<string>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
-    isVerifier(
-      verifierAddress: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
-    lockVault(
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      lockTime: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    mainAcceptGovernance(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    mainCancelNomination(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    mainIsGovernor(
-      testGovernor: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
-    mainNominateNewGovernor(
-      newGovernor: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    mainRemoveGovernor(
-      governorForRemoval: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    onERC721Received(
-      arg0: PromiseOrValue<string>,
-      arg1: PromiseOrValue<string>,
-      arg2: PromiseOrValue<BigNumberish>,
-      arg3: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    orderRegistryAddress(overrides?: CallOverrides): Promise<[string]>;
-
-    registerAndDepositERC20(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    registerAndDepositEth(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    registerAvailabilityVerifier(
-      verifier: PromiseOrValue<string>,
-      identifier: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    registerEthAddress(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      starkSignature: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    registerOperator(
-      newOperator: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    registerSender(
-      starkKey: PromiseOrValue<BigNumberish>,
-      starkSignature: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    "registerToken(uint256,bytes)"(
-      assetType: PromiseOrValue<BigNumberish>,
-      assetInfo: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    "registerToken(uint256,bytes,uint256)"(
-      assetType: PromiseOrValue<BigNumberish>,
-      assetInfo: PromiseOrValue<BytesLike>,
-      quantum: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    registerTokenAdmin(
-      newAdmin: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    registerVerifier(
-      verifier: PromiseOrValue<string>,
-      identifier: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    removeAvailabilityVerifier(
-      verifier: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    removeVerifier(
-      verifier: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    setDefaultVaultWithdrawalLock(
-      newDefaultTime: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    unFreeze(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    unregisterOperator(
-      removedOperator: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    unregisterTokenAdmin(
-      oldAdmin: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    updateImplementationActivationTime(
-      implementation: PromiseOrValue<string>,
-      data: PromiseOrValue<BytesLike>,
-      finalize: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    updateState(
-      publicInput: PromiseOrValue<BigNumberish>[],
-      applicationData: PromiseOrValue<BigNumberish>[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    withdraw(
-      ownerKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    withdrawAndMint(
-      ownerKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      mintingBlob: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    withdrawFromVault(
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    withdrawNft(
-      ownerKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-  };
-
-  DEPOSIT_CANCEL_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
-
-  FREEZE_GRACE_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
-
-  MAIN_GOVERNANCE_INFO_TAG(overrides?: CallOverrides): Promise<string>;
-
-  MAX_FORCED_ACTIONS_REQS_PER_BLOCK(
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  MAX_VERIFIER_COUNT(overrides?: CallOverrides): Promise<BigNumber>;
-
-  STARKEX_MAX_DEFAULT_VAULT_LOCK(overrides?: CallOverrides): Promise<BigNumber>;
-
-  UNFREEZE_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
-
-  VERIFIER_REMOVAL_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
-
-  VERSION(overrides?: CallOverrides): Promise<string>;
-
-  announceAvailabilityVerifierRemovalIntent(
-    verifier: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  announceVerifierRemovalIntent(
-    verifier: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  defaultVaultWithdrawalLock(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "deposit(uint256,uint256,uint256)"(
-    starkKey: PromiseOrValue<BigNumberish>,
-    assetType: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  "deposit(uint256,uint256,uint256,uint256)"(
-    starkKey: PromiseOrValue<BigNumberish>,
-    assetType: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    quantizedAmount: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  depositCancel(
-    starkKey: PromiseOrValue<BigNumberish>,
-    assetId: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  depositERC20(
-    starkKey: PromiseOrValue<BigNumberish>,
-    assetType: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    quantizedAmount: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  depositERC20ToVault(
-    assetId: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    quantizedAmount: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  depositEth(
-    starkKey: PromiseOrValue<BigNumberish>,
-    assetType: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  depositEthToVault(
-    assetId: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  depositNft(
-    starkKey: PromiseOrValue<BigNumberish>,
-    assetType: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    tokenId: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  depositNftReclaim(
-    starkKey: PromiseOrValue<BigNumberish>,
-    assetType: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    tokenId: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  depositReclaim(
-    starkKey: PromiseOrValue<BigNumberish>,
-    assetId: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  escape(
-    starkKey: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    assetId: PromiseOrValue<BigNumberish>,
-    quantizedAmount: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  freezeRequest(
-    starkKey: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  fullWithdrawalRequest(
-    starkKey: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  getActionCount(overrides?: CallOverrides): Promise<BigNumber>;
-
-  getActionHashByIndex(
-    actionIndex: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  getAssetInfo(
-    assetType: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  getCancellationRequest(
-    starkKey: PromiseOrValue<BigNumberish>,
-    assetId: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  getDepositBalance(
-    starkKey: PromiseOrValue<BigNumberish>,
-    assetId: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  getEthKey(
-    ownerKey: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  getFullWithdrawalRequest(
-    starkKey: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  getLastBatchId(overrides?: CallOverrides): Promise<BigNumber>;
-
-  getOrderRoot(overrides?: CallOverrides): Promise<BigNumber>;
-
-  getOrderTreeHeight(overrides?: CallOverrides): Promise<BigNumber>;
-
-  getQuantizedDepositBalance(
-    starkKey: PromiseOrValue<BigNumberish>,
-    assetId: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  getQuantizedVaultBalance(
-    ethKey: PromiseOrValue<string>,
-    assetId: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  getQuantum(
-    presumedAssetType: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  getRegisteredAvailabilityVerifiers(
-    overrides?: CallOverrides
-  ): Promise<string[]>;
-
-  getRegisteredVerifiers(overrides?: CallOverrides): Promise<string[]>;
-
-  getSequenceNumber(overrides?: CallOverrides): Promise<BigNumber>;
-
-  getVaultBalance(
-    ethKey: PromiseOrValue<string>,
-    assetId: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  getVaultRoot(overrides?: CallOverrides): Promise<BigNumber>;
-
-  getVaultTreeHeight(overrides?: CallOverrides): Promise<BigNumber>;
-
-  getVaultWithdrawalLock(
-    ethKey: PromiseOrValue<string>,
-    assetId: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  getWithdrawalBalance(
-    ownerKey: PromiseOrValue<BigNumberish>,
-    assetId: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  initialize(
-    data: PromiseOrValue<BytesLike>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  isAssetRegistered(
-    assetType: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  isAvailabilityVerifier(
-    verifierAddress: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  isFrozen(overrides?: CallOverrides): Promise<boolean>;
-
-  isOperator(
-    testedOperator: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  isStrictVaultBalancePolicy(overrides?: CallOverrides): Promise<boolean>;
-
-  isTokenAdmin(
-    testedAdmin: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  isVaultLocked(
-    ethKey: PromiseOrValue<string>,
-    assetId: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  isVerifier(
-    verifierAddress: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  lockVault(
-    assetId: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    lockTime: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  mainAcceptGovernance(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  mainCancelNomination(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  mainIsGovernor(
-    testGovernor: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  mainNominateNewGovernor(
-    newGovernor: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  mainRemoveGovernor(
-    governorForRemoval: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  onERC721Received(
-    arg0: PromiseOrValue<string>,
-    arg1: PromiseOrValue<string>,
-    arg2: PromiseOrValue<BigNumberish>,
-    arg3: PromiseOrValue<BytesLike>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  orderRegistryAddress(overrides?: CallOverrides): Promise<string>;
-
-  registerAndDepositERC20(
-    ethKey: PromiseOrValue<string>,
-    starkKey: PromiseOrValue<BigNumberish>,
-    signature: PromiseOrValue<BytesLike>,
-    assetType: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    quantizedAmount: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  registerAndDepositEth(
-    ethKey: PromiseOrValue<string>,
-    starkKey: PromiseOrValue<BigNumberish>,
-    signature: PromiseOrValue<BytesLike>,
-    assetType: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  registerAvailabilityVerifier(
-    verifier: PromiseOrValue<string>,
-    identifier: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  registerEthAddress(
-    ethKey: PromiseOrValue<string>,
-    starkKey: PromiseOrValue<BigNumberish>,
-    starkSignature: PromiseOrValue<BytesLike>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  registerOperator(
-    newOperator: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  registerSender(
-    starkKey: PromiseOrValue<BigNumberish>,
-    starkSignature: PromiseOrValue<BytesLike>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  "registerToken(uint256,bytes)"(
-    assetType: PromiseOrValue<BigNumberish>,
-    assetInfo: PromiseOrValue<BytesLike>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  "registerToken(uint256,bytes,uint256)"(
-    assetType: PromiseOrValue<BigNumberish>,
-    assetInfo: PromiseOrValue<BytesLike>,
-    quantum: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  registerTokenAdmin(
-    newAdmin: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  registerVerifier(
-    verifier: PromiseOrValue<string>,
-    identifier: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  removeAvailabilityVerifier(
-    verifier: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  removeVerifier(
-    verifier: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  setDefaultVaultWithdrawalLock(
-    newDefaultTime: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  unFreeze(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  unregisterOperator(
-    removedOperator: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  unregisterTokenAdmin(
-    oldAdmin: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  updateImplementationActivationTime(
-    implementation: PromiseOrValue<string>,
-    data: PromiseOrValue<BytesLike>,
-    finalize: PromiseOrValue<boolean>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  updateState(
-    publicInput: PromiseOrValue<BigNumberish>[],
-    applicationData: PromiseOrValue<BigNumberish>[],
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  withdraw(
-    ownerKey: PromiseOrValue<BigNumberish>,
-    assetType: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  withdrawAndMint(
-    ownerKey: PromiseOrValue<BigNumberish>,
-    assetType: PromiseOrValue<BigNumberish>,
-    mintingBlob: PromiseOrValue<BytesLike>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  withdrawFromVault(
-    assetId: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    quantizedAmount: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  withdrawNft(
-    ownerKey: PromiseOrValue<BigNumberish>,
-    assetType: PromiseOrValue<BigNumberish>,
-    tokenId: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  callStatic: {
-    DEPOSIT_CANCEL_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
-
-    FREEZE_GRACE_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
-
-    MAIN_GOVERNANCE_INFO_TAG(overrides?: CallOverrides): Promise<string>;
-
-    MAX_FORCED_ACTIONS_REQS_PER_BLOCK(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    MAX_VERIFIER_COUNT(overrides?: CallOverrides): Promise<BigNumber>;
-
-    STARKEX_MAX_DEFAULT_VAULT_LOCK(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    UNFREEZE_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
-
-    VERIFIER_REMOVAL_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
-
-    VERSION(overrides?: CallOverrides): Promise<string>;
-
-    announceAvailabilityVerifierRemovalIntent(
-      verifier: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    announceVerifierRemovalIntent(
-      verifier: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    defaultVaultWithdrawalLock(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "deposit(uint256,uint256,uint256)"(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "deposit(uint256,uint256,uint256,uint256)"(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    depositCancel(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    depositERC20(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    depositERC20ToVault(
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    depositEth(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    depositEthToVault(
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    depositNft(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    depositNftReclaim(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    depositReclaim(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    escape(
-      starkKey: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    freezeRequest(
-      starkKey: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    fullWithdrawalRequest(
-      starkKey: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    getActionCount(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getActionHashByIndex(
-      actionIndex: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    getAssetInfo(
-      assetType: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    getCancellationRequest(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getDepositBalance(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getEthKey(
-      ownerKey: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    getFullWithdrawalRequest(
-      starkKey: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getLastBatchId(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getOrderRoot(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getOrderTreeHeight(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getQuantizedDepositBalance(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getQuantizedVaultBalance(
-      ethKey: PromiseOrValue<string>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getQuantum(
-      presumedAssetType: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getRegisteredAvailabilityVerifiers(
-      overrides?: CallOverrides
-    ): Promise<string[]>;
-
-    getRegisteredVerifiers(overrides?: CallOverrides): Promise<string[]>;
-
-    getSequenceNumber(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getVaultBalance(
-      ethKey: PromiseOrValue<string>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getVaultRoot(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getVaultTreeHeight(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getVaultWithdrawalLock(
-      ethKey: PromiseOrValue<string>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getWithdrawalBalance(
-      ownerKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    initialize(
-      data: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    isAssetRegistered(
-      assetType: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    isAvailabilityVerifier(
-      verifierAddress: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    isFrozen(overrides?: CallOverrides): Promise<boolean>;
-
-    isOperator(
-      testedOperator: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    isStrictVaultBalancePolicy(overrides?: CallOverrides): Promise<boolean>;
-
-    isTokenAdmin(
-      testedAdmin: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    isVaultLocked(
-      ethKey: PromiseOrValue<string>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    isVerifier(
-      verifierAddress: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    lockVault(
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      lockTime: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    mainAcceptGovernance(overrides?: CallOverrides): Promise<void>;
-
-    mainCancelNomination(overrides?: CallOverrides): Promise<void>;
-
-    mainIsGovernor(
-      testGovernor: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    mainNominateNewGovernor(
-      newGovernor: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    mainRemoveGovernor(
-      governorForRemoval: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    onERC721Received(
-      arg0: PromiseOrValue<string>,
-      arg1: PromiseOrValue<string>,
-      arg2: PromiseOrValue<BigNumberish>,
-      arg3: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    orderRegistryAddress(overrides?: CallOverrides): Promise<string>;
-
-    registerAndDepositERC20(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    registerAndDepositEth(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    registerAvailabilityVerifier(
-      verifier: PromiseOrValue<string>,
-      identifier: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    registerEthAddress(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      starkSignature: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    registerOperator(
-      newOperator: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    registerSender(
-      starkKey: PromiseOrValue<BigNumberish>,
-      starkSignature: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "registerToken(uint256,bytes)"(
-      assetType: PromiseOrValue<BigNumberish>,
-      assetInfo: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "registerToken(uint256,bytes,uint256)"(
-      assetType: PromiseOrValue<BigNumberish>,
-      assetInfo: PromiseOrValue<BytesLike>,
-      quantum: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    registerTokenAdmin(
-      newAdmin: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    registerVerifier(
-      verifier: PromiseOrValue<string>,
-      identifier: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    removeAvailabilityVerifier(
-      verifier: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    removeVerifier(
-      verifier: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setDefaultVaultWithdrawalLock(
-      newDefaultTime: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    unFreeze(overrides?: CallOverrides): Promise<void>;
-
-    unregisterOperator(
-      removedOperator: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    unregisterTokenAdmin(
-      oldAdmin: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    updateImplementationActivationTime(
-      implementation: PromiseOrValue<string>,
-      data: PromiseOrValue<BytesLike>,
-      finalize: PromiseOrValue<boolean>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    updateState(
-      publicInput: PromiseOrValue<BigNumberish>[],
-      applicationData: PromiseOrValue<BigNumberish>[],
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    withdraw(
-      ownerKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    withdrawAndMint(
-      ownerKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      mintingBlob: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    withdrawFromVault(
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    withdrawNft(
-      ownerKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-  };
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
+  queryFilter<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    fromBlockOrBlockhash?: string | number | undefined,
+    toBlock?: string | number | undefined
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
+
+  on<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  on<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+
+  once<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  once<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+
+  listeners<TCEvent extends TypedContractEvent>(
+    event: TCEvent
+  ): Promise<Array<TypedListener<TCEvent>>>;
+  listeners(eventName?: string): Promise<Array<Listener>>;
+  removeAllListeners<TCEvent extends TypedContractEvent>(
+    event?: TCEvent
+  ): Promise<this>;
+
+  DEPOSIT_CANCEL_DELAY: TypedContractMethod<[], [bigint], "view">;
+
+  FREEZE_GRACE_PERIOD: TypedContractMethod<[], [bigint], "view">;
+
+  MAIN_GOVERNANCE_INFO_TAG: TypedContractMethod<[], [string], "view">;
+
+  MAX_FORCED_ACTIONS_REQS_PER_BLOCK: TypedContractMethod<[], [bigint], "view">;
+
+  MAX_VERIFIER_COUNT: TypedContractMethod<[], [bigint], "view">;
+
+  STARKEX_MAX_DEFAULT_VAULT_LOCK: TypedContractMethod<[], [bigint], "view">;
+
+  UNFREEZE_DELAY: TypedContractMethod<[], [bigint], "view">;
+
+  VERIFIER_REMOVAL_DELAY: TypedContractMethod<[], [bigint], "view">;
+
+  VERSION: TypedContractMethod<[], [string], "view">;
+
+  announceAvailabilityVerifierRemovalIntent: TypedContractMethod<
+    [verifier: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  announceVerifierRemovalIntent: TypedContractMethod<
+    [verifier: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  defaultVaultWithdrawalLock: TypedContractMethod<[], [bigint], "view">;
+
+  "deposit(uint256,uint256,uint256)": TypedContractMethod<
+    [starkKey: BigNumberish, assetType: BigNumberish, vaultId: BigNumberish],
+    [void],
+    "payable"
+  >;
+
+  "deposit(uint256,uint256,uint256,uint256)": TypedContractMethod<
+    [
+      starkKey: BigNumberish,
+      assetType: BigNumberish,
+      vaultId: BigNumberish,
+      quantizedAmount: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+
+  depositCancel: TypedContractMethod<
+    [starkKey: BigNumberish, assetId: BigNumberish, vaultId: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  depositERC20: TypedContractMethod<
+    [
+      starkKey: BigNumberish,
+      assetType: BigNumberish,
+      vaultId: BigNumberish,
+      quantizedAmount: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+
+  depositERC20ToVault: TypedContractMethod<
+    [
+      assetId: BigNumberish,
+      vaultId: BigNumberish,
+      quantizedAmount: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+
+  depositEth: TypedContractMethod<
+    [starkKey: BigNumberish, assetType: BigNumberish, vaultId: BigNumberish],
+    [void],
+    "payable"
+  >;
+
+  depositEthToVault: TypedContractMethod<
+    [assetId: BigNumberish, vaultId: BigNumberish],
+    [void],
+    "payable"
+  >;
+
+  depositNft: TypedContractMethod<
+    [
+      starkKey: BigNumberish,
+      assetType: BigNumberish,
+      vaultId: BigNumberish,
+      tokenId: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+
+  depositNftReclaim: TypedContractMethod<
+    [
+      starkKey: BigNumberish,
+      assetType: BigNumberish,
+      vaultId: BigNumberish,
+      tokenId: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+
+  depositReclaim: TypedContractMethod<
+    [starkKey: BigNumberish, assetId: BigNumberish, vaultId: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  escape: TypedContractMethod<
+    [
+      starkKey: BigNumberish,
+      vaultId: BigNumberish,
+      assetId: BigNumberish,
+      quantizedAmount: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+
+  freezeRequest: TypedContractMethod<
+    [starkKey: BigNumberish, vaultId: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  fullWithdrawalRequest: TypedContractMethod<
+    [starkKey: BigNumberish, vaultId: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  getActionCount: TypedContractMethod<[], [bigint], "view">;
+
+  getActionHashByIndex: TypedContractMethod<
+    [actionIndex: BigNumberish],
+    [string],
+    "view"
+  >;
+
+  getAssetInfo: TypedContractMethod<
+    [assetType: BigNumberish],
+    [string],
+    "view"
+  >;
+
+  getCancellationRequest: TypedContractMethod<
+    [starkKey: BigNumberish, assetId: BigNumberish, vaultId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
+  getDepositBalance: TypedContractMethod<
+    [starkKey: BigNumberish, assetId: BigNumberish, vaultId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
+  getEthKey: TypedContractMethod<[ownerKey: BigNumberish], [string], "view">;
+
+  getFullWithdrawalRequest: TypedContractMethod<
+    [starkKey: BigNumberish, vaultId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
+  getLastBatchId: TypedContractMethod<[], [bigint], "view">;
+
+  getOrderRoot: TypedContractMethod<[], [bigint], "view">;
+
+  getOrderTreeHeight: TypedContractMethod<[], [bigint], "view">;
+
+  getQuantizedDepositBalance: TypedContractMethod<
+    [starkKey: BigNumberish, assetId: BigNumberish, vaultId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
+  getQuantizedVaultBalance: TypedContractMethod<
+    [ethKey: AddressLike, assetId: BigNumberish, vaultId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
+  getQuantum: TypedContractMethod<
+    [presumedAssetType: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
+  getRegisteredAvailabilityVerifiers: TypedContractMethod<
+    [],
+    [string[]],
+    "view"
+  >;
+
+  getRegisteredVerifiers: TypedContractMethod<[], [string[]], "view">;
+
+  getSequenceNumber: TypedContractMethod<[], [bigint], "view">;
+
+  getVaultBalance: TypedContractMethod<
+    [ethKey: AddressLike, assetId: BigNumberish, vaultId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
+  getVaultRoot: TypedContractMethod<[], [bigint], "view">;
+
+  getVaultTreeHeight: TypedContractMethod<[], [bigint], "view">;
+
+  getVaultWithdrawalLock: TypedContractMethod<
+    [ethKey: AddressLike, assetId: BigNumberish, vaultId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
+  getWithdrawalBalance: TypedContractMethod<
+    [ownerKey: BigNumberish, assetId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
+  initialize: TypedContractMethod<[data: BytesLike], [void], "nonpayable">;
+
+  isAssetRegistered: TypedContractMethod<
+    [assetType: BigNumberish],
+    [boolean],
+    "view"
+  >;
+
+  isAvailabilityVerifier: TypedContractMethod<
+    [verifierAddress: AddressLike],
+    [boolean],
+    "view"
+  >;
+
+  isFrozen: TypedContractMethod<[], [boolean], "view">;
+
+  isOperator: TypedContractMethod<
+    [testedOperator: AddressLike],
+    [boolean],
+    "view"
+  >;
+
+  isStrictVaultBalancePolicy: TypedContractMethod<[], [boolean], "view">;
+
+  isTokenAdmin: TypedContractMethod<
+    [testedAdmin: AddressLike],
+    [boolean],
+    "view"
+  >;
+
+  isVaultLocked: TypedContractMethod<
+    [ethKey: AddressLike, assetId: BigNumberish, vaultId: BigNumberish],
+    [boolean],
+    "view"
+  >;
+
+  isVerifier: TypedContractMethod<
+    [verifierAddress: AddressLike],
+    [boolean],
+    "view"
+  >;
+
+  lockVault: TypedContractMethod<
+    [assetId: BigNumberish, vaultId: BigNumberish, lockTime: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  mainAcceptGovernance: TypedContractMethod<[], [void], "nonpayable">;
+
+  mainCancelNomination: TypedContractMethod<[], [void], "nonpayable">;
+
+  mainIsGovernor: TypedContractMethod<
+    [testGovernor: AddressLike],
+    [boolean],
+    "view"
+  >;
+
+  mainNominateNewGovernor: TypedContractMethod<
+    [newGovernor: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  mainRemoveGovernor: TypedContractMethod<
+    [governorForRemoval: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  onERC721Received: TypedContractMethod<
+    [arg0: AddressLike, arg1: AddressLike, arg2: BigNumberish, arg3: BytesLike],
+    [string],
+    "nonpayable"
+  >;
+
+  orderRegistryAddress: TypedContractMethod<[], [string], "view">;
+
+  registerAndDepositERC20: TypedContractMethod<
+    [
+      ethKey: AddressLike,
+      starkKey: BigNumberish,
+      signature: BytesLike,
+      assetType: BigNumberish,
+      vaultId: BigNumberish,
+      quantizedAmount: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+
+  registerAndDepositEth: TypedContractMethod<
+    [
+      ethKey: AddressLike,
+      starkKey: BigNumberish,
+      signature: BytesLike,
+      assetType: BigNumberish,
+      vaultId: BigNumberish
+    ],
+    [void],
+    "payable"
+  >;
+
+  registerAvailabilityVerifier: TypedContractMethod<
+    [verifier: AddressLike, identifier: string],
+    [void],
+    "nonpayable"
+  >;
+
+  registerEthAddress: TypedContractMethod<
+    [ethKey: AddressLike, starkKey: BigNumberish, starkSignature: BytesLike],
+    [void],
+    "nonpayable"
+  >;
+
+  registerOperator: TypedContractMethod<
+    [newOperator: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  registerSender: TypedContractMethod<
+    [starkKey: BigNumberish, starkSignature: BytesLike],
+    [void],
+    "nonpayable"
+  >;
+
+  "registerToken(uint256,bytes)": TypedContractMethod<
+    [assetType: BigNumberish, assetInfo: BytesLike],
+    [void],
+    "nonpayable"
+  >;
+
+  "registerToken(uint256,bytes,uint256)": TypedContractMethod<
+    [assetType: BigNumberish, assetInfo: BytesLike, quantum: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  registerTokenAdmin: TypedContractMethod<
+    [newAdmin: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  registerVerifier: TypedContractMethod<
+    [verifier: AddressLike, identifier: string],
+    [void],
+    "nonpayable"
+  >;
+
+  removeAvailabilityVerifier: TypedContractMethod<
+    [verifier: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  removeVerifier: TypedContractMethod<
+    [verifier: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  setDefaultVaultWithdrawalLock: TypedContractMethod<
+    [newDefaultTime: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  unFreeze: TypedContractMethod<[], [void], "nonpayable">;
+
+  unregisterOperator: TypedContractMethod<
+    [removedOperator: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  unregisterTokenAdmin: TypedContractMethod<
+    [oldAdmin: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  updateImplementationActivationTime: TypedContractMethod<
+    [implementation: AddressLike, data: BytesLike, finalize: boolean],
+    [void],
+    "nonpayable"
+  >;
+
+  updateState: TypedContractMethod<
+    [publicInput: BigNumberish[], applicationData: BigNumberish[]],
+    [void],
+    "nonpayable"
+  >;
+
+  withdraw: TypedContractMethod<
+    [ownerKey: BigNumberish, assetType: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  withdrawAndMint: TypedContractMethod<
+    [ownerKey: BigNumberish, assetType: BigNumberish, mintingBlob: BytesLike],
+    [void],
+    "nonpayable"
+  >;
+
+  withdrawFromVault: TypedContractMethod<
+    [
+      assetId: BigNumberish,
+      vaultId: BigNumberish,
+      quantizedAmount: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+
+  withdrawNft: TypedContractMethod<
+    [ownerKey: BigNumberish, assetType: BigNumberish, tokenId: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  getFunction<T extends ContractMethod = ContractMethod>(
+    key: string | FunctionFragment
+  ): T;
+
+  getFunction(
+    nameOrSignature: "DEPOSIT_CANCEL_DELAY"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "FREEZE_GRACE_PERIOD"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "MAIN_GOVERNANCE_INFO_TAG"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "MAX_FORCED_ACTIONS_REQS_PER_BLOCK"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "MAX_VERIFIER_COUNT"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "STARKEX_MAX_DEFAULT_VAULT_LOCK"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "UNFREEZE_DELAY"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "VERIFIER_REMOVAL_DELAY"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "VERSION"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "announceAvailabilityVerifierRemovalIntent"
+  ): TypedContractMethod<[verifier: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "announceVerifierRemovalIntent"
+  ): TypedContractMethod<[verifier: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "defaultVaultWithdrawalLock"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "deposit(uint256,uint256,uint256)"
+  ): TypedContractMethod<
+    [starkKey: BigNumberish, assetType: BigNumberish, vaultId: BigNumberish],
+    [void],
+    "payable"
+  >;
+  getFunction(
+    nameOrSignature: "deposit(uint256,uint256,uint256,uint256)"
+  ): TypedContractMethod<
+    [
+      starkKey: BigNumberish,
+      assetType: BigNumberish,
+      vaultId: BigNumberish,
+      quantizedAmount: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "depositCancel"
+  ): TypedContractMethod<
+    [starkKey: BigNumberish, assetId: BigNumberish, vaultId: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "depositERC20"
+  ): TypedContractMethod<
+    [
+      starkKey: BigNumberish,
+      assetType: BigNumberish,
+      vaultId: BigNumberish,
+      quantizedAmount: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "depositERC20ToVault"
+  ): TypedContractMethod<
+    [
+      assetId: BigNumberish,
+      vaultId: BigNumberish,
+      quantizedAmount: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "depositEth"
+  ): TypedContractMethod<
+    [starkKey: BigNumberish, assetType: BigNumberish, vaultId: BigNumberish],
+    [void],
+    "payable"
+  >;
+  getFunction(
+    nameOrSignature: "depositEthToVault"
+  ): TypedContractMethod<
+    [assetId: BigNumberish, vaultId: BigNumberish],
+    [void],
+    "payable"
+  >;
+  getFunction(
+    nameOrSignature: "depositNft"
+  ): TypedContractMethod<
+    [
+      starkKey: BigNumberish,
+      assetType: BigNumberish,
+      vaultId: BigNumberish,
+      tokenId: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "depositNftReclaim"
+  ): TypedContractMethod<
+    [
+      starkKey: BigNumberish,
+      assetType: BigNumberish,
+      vaultId: BigNumberish,
+      tokenId: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "depositReclaim"
+  ): TypedContractMethod<
+    [starkKey: BigNumberish, assetId: BigNumberish, vaultId: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "escape"
+  ): TypedContractMethod<
+    [
+      starkKey: BigNumberish,
+      vaultId: BigNumberish,
+      assetId: BigNumberish,
+      quantizedAmount: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "freezeRequest"
+  ): TypedContractMethod<
+    [starkKey: BigNumberish, vaultId: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "fullWithdrawalRequest"
+  ): TypedContractMethod<
+    [starkKey: BigNumberish, vaultId: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "getActionCount"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getActionHashByIndex"
+  ): TypedContractMethod<[actionIndex: BigNumberish], [string], "view">;
+  getFunction(
+    nameOrSignature: "getAssetInfo"
+  ): TypedContractMethod<[assetType: BigNumberish], [string], "view">;
+  getFunction(
+    nameOrSignature: "getCancellationRequest"
+  ): TypedContractMethod<
+    [starkKey: BigNumberish, assetId: BigNumberish, vaultId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getDepositBalance"
+  ): TypedContractMethod<
+    [starkKey: BigNumberish, assetId: BigNumberish, vaultId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getEthKey"
+  ): TypedContractMethod<[ownerKey: BigNumberish], [string], "view">;
+  getFunction(
+    nameOrSignature: "getFullWithdrawalRequest"
+  ): TypedContractMethod<
+    [starkKey: BigNumberish, vaultId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getLastBatchId"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getOrderRoot"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getOrderTreeHeight"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getQuantizedDepositBalance"
+  ): TypedContractMethod<
+    [starkKey: BigNumberish, assetId: BigNumberish, vaultId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getQuantizedVaultBalance"
+  ): TypedContractMethod<
+    [ethKey: AddressLike, assetId: BigNumberish, vaultId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getQuantum"
+  ): TypedContractMethod<[presumedAssetType: BigNumberish], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getRegisteredAvailabilityVerifiers"
+  ): TypedContractMethod<[], [string[]], "view">;
+  getFunction(
+    nameOrSignature: "getRegisteredVerifiers"
+  ): TypedContractMethod<[], [string[]], "view">;
+  getFunction(
+    nameOrSignature: "getSequenceNumber"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getVaultBalance"
+  ): TypedContractMethod<
+    [ethKey: AddressLike, assetId: BigNumberish, vaultId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getVaultRoot"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getVaultTreeHeight"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getVaultWithdrawalLock"
+  ): TypedContractMethod<
+    [ethKey: AddressLike, assetId: BigNumberish, vaultId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getWithdrawalBalance"
+  ): TypedContractMethod<
+    [ownerKey: BigNumberish, assetId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "initialize"
+  ): TypedContractMethod<[data: BytesLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "isAssetRegistered"
+  ): TypedContractMethod<[assetType: BigNumberish], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "isAvailabilityVerifier"
+  ): TypedContractMethod<[verifierAddress: AddressLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "isFrozen"
+  ): TypedContractMethod<[], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "isOperator"
+  ): TypedContractMethod<[testedOperator: AddressLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "isStrictVaultBalancePolicy"
+  ): TypedContractMethod<[], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "isTokenAdmin"
+  ): TypedContractMethod<[testedAdmin: AddressLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "isVaultLocked"
+  ): TypedContractMethod<
+    [ethKey: AddressLike, assetId: BigNumberish, vaultId: BigNumberish],
+    [boolean],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "isVerifier"
+  ): TypedContractMethod<[verifierAddress: AddressLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "lockVault"
+  ): TypedContractMethod<
+    [assetId: BigNumberish, vaultId: BigNumberish, lockTime: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "mainAcceptGovernance"
+  ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "mainCancelNomination"
+  ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "mainIsGovernor"
+  ): TypedContractMethod<[testGovernor: AddressLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "mainNominateNewGovernor"
+  ): TypedContractMethod<[newGovernor: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "mainRemoveGovernor"
+  ): TypedContractMethod<
+    [governorForRemoval: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "onERC721Received"
+  ): TypedContractMethod<
+    [arg0: AddressLike, arg1: AddressLike, arg2: BigNumberish, arg3: BytesLike],
+    [string],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "orderRegistryAddress"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "registerAndDepositERC20"
+  ): TypedContractMethod<
+    [
+      ethKey: AddressLike,
+      starkKey: BigNumberish,
+      signature: BytesLike,
+      assetType: BigNumberish,
+      vaultId: BigNumberish,
+      quantizedAmount: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "registerAndDepositEth"
+  ): TypedContractMethod<
+    [
+      ethKey: AddressLike,
+      starkKey: BigNumberish,
+      signature: BytesLike,
+      assetType: BigNumberish,
+      vaultId: BigNumberish
+    ],
+    [void],
+    "payable"
+  >;
+  getFunction(
+    nameOrSignature: "registerAvailabilityVerifier"
+  ): TypedContractMethod<
+    [verifier: AddressLike, identifier: string],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "registerEthAddress"
+  ): TypedContractMethod<
+    [ethKey: AddressLike, starkKey: BigNumberish, starkSignature: BytesLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "registerOperator"
+  ): TypedContractMethod<[newOperator: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "registerSender"
+  ): TypedContractMethod<
+    [starkKey: BigNumberish, starkSignature: BytesLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "registerToken(uint256,bytes)"
+  ): TypedContractMethod<
+    [assetType: BigNumberish, assetInfo: BytesLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "registerToken(uint256,bytes,uint256)"
+  ): TypedContractMethod<
+    [assetType: BigNumberish, assetInfo: BytesLike, quantum: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "registerTokenAdmin"
+  ): TypedContractMethod<[newAdmin: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "registerVerifier"
+  ): TypedContractMethod<
+    [verifier: AddressLike, identifier: string],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "removeAvailabilityVerifier"
+  ): TypedContractMethod<[verifier: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "removeVerifier"
+  ): TypedContractMethod<[verifier: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setDefaultVaultWithdrawalLock"
+  ): TypedContractMethod<[newDefaultTime: BigNumberish], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "unFreeze"
+  ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "unregisterOperator"
+  ): TypedContractMethod<[removedOperator: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "unregisterTokenAdmin"
+  ): TypedContractMethod<[oldAdmin: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "updateImplementationActivationTime"
+  ): TypedContractMethod<
+    [implementation: AddressLike, data: BytesLike, finalize: boolean],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "updateState"
+  ): TypedContractMethod<
+    [publicInput: BigNumberish[], applicationData: BigNumberish[]],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "withdraw"
+  ): TypedContractMethod<
+    [ownerKey: BigNumberish, assetType: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "withdrawAndMint"
+  ): TypedContractMethod<
+    [ownerKey: BigNumberish, assetType: BigNumberish, mintingBlob: BytesLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "withdrawFromVault"
+  ): TypedContractMethod<
+    [
+      assetId: BigNumberish,
+      vaultId: BigNumberish,
+      quantizedAmount: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "withdrawNft"
+  ): TypedContractMethod<
+    [ownerKey: BigNumberish, assetType: BigNumberish, tokenId: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  getEvent(
+    key: "ImplementationActivationRescheduled"
+  ): TypedContractEvent<
+    ImplementationActivationRescheduledEvent.InputTuple,
+    ImplementationActivationRescheduledEvent.OutputTuple,
+    ImplementationActivationRescheduledEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogDefaultVaultWithdrawalLockSet"
+  ): TypedContractEvent<
+    LogDefaultVaultWithdrawalLockSetEvent.InputTuple,
+    LogDefaultVaultWithdrawalLockSetEvent.OutputTuple,
+    LogDefaultVaultWithdrawalLockSetEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogDeposit"
+  ): TypedContractEvent<
+    LogDepositEvent.InputTuple,
+    LogDepositEvent.OutputTuple,
+    LogDepositEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogDepositCancel"
+  ): TypedContractEvent<
+    LogDepositCancelEvent.InputTuple,
+    LogDepositCancelEvent.OutputTuple,
+    LogDepositCancelEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogDepositCancelReclaimed"
+  ): TypedContractEvent<
+    LogDepositCancelReclaimedEvent.InputTuple,
+    LogDepositCancelReclaimedEvent.OutputTuple,
+    LogDepositCancelReclaimedEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogDepositNftCancelReclaimed"
+  ): TypedContractEvent<
+    LogDepositNftCancelReclaimedEvent.InputTuple,
+    LogDepositNftCancelReclaimedEvent.OutputTuple,
+    LogDepositNftCancelReclaimedEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogDepositToVault"
+  ): TypedContractEvent<
+    LogDepositToVaultEvent.InputTuple,
+    LogDepositToVaultEvent.OutputTuple,
+    LogDepositToVaultEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogFrozen"
+  ): TypedContractEvent<
+    LogFrozenEvent.InputTuple,
+    LogFrozenEvent.OutputTuple,
+    LogFrozenEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogFullWithdrawalRequest"
+  ): TypedContractEvent<
+    LogFullWithdrawalRequestEvent.InputTuple,
+    LogFullWithdrawalRequestEvent.OutputTuple,
+    LogFullWithdrawalRequestEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogMintWithdrawalPerformed"
+  ): TypedContractEvent<
+    LogMintWithdrawalPerformedEvent.InputTuple,
+    LogMintWithdrawalPerformedEvent.OutputTuple,
+    LogMintWithdrawalPerformedEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogMintableWithdrawalAllowed"
+  ): TypedContractEvent<
+    LogMintableWithdrawalAllowedEvent.InputTuple,
+    LogMintableWithdrawalAllowedEvent.OutputTuple,
+    LogMintableWithdrawalAllowedEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogNewGovernorAccepted"
+  ): TypedContractEvent<
+    LogNewGovernorAcceptedEvent.InputTuple,
+    LogNewGovernorAcceptedEvent.OutputTuple,
+    LogNewGovernorAcceptedEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogNftDeposit"
+  ): TypedContractEvent<
+    LogNftDepositEvent.InputTuple,
+    LogNftDepositEvent.OutputTuple,
+    LogNftDepositEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogNftWithdrawalAllowed"
+  ): TypedContractEvent<
+    LogNftWithdrawalAllowedEvent.InputTuple,
+    LogNftWithdrawalAllowedEvent.OutputTuple,
+    LogNftWithdrawalAllowedEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogNftWithdrawalPerformed"
+  ): TypedContractEvent<
+    LogNftWithdrawalPerformedEvent.InputTuple,
+    LogNftWithdrawalPerformedEvent.OutputTuple,
+    LogNftWithdrawalPerformedEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogNominatedGovernor"
+  ): TypedContractEvent<
+    LogNominatedGovernorEvent.InputTuple,
+    LogNominatedGovernorEvent.OutputTuple,
+    LogNominatedGovernorEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogNominationCancelled"
+  ): TypedContractEvent<
+    LogNominationCancelledEvent.InputTuple,
+    LogNominationCancelledEvent.OutputTuple,
+    LogNominationCancelledEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogOperatorAdded"
+  ): TypedContractEvent<
+    LogOperatorAddedEvent.InputTuple,
+    LogOperatorAddedEvent.OutputTuple,
+    LogOperatorAddedEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogOperatorRemoved"
+  ): TypedContractEvent<
+    LogOperatorRemovedEvent.InputTuple,
+    LogOperatorRemovedEvent.OutputTuple,
+    LogOperatorRemovedEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogRegistered"
+  ): TypedContractEvent<
+    LogRegisteredEvent.InputTuple,
+    LogRegisteredEvent.OutputTuple,
+    LogRegisteredEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogRemovalIntent"
+  ): TypedContractEvent<
+    LogRemovalIntentEvent.InputTuple,
+    LogRemovalIntentEvent.OutputTuple,
+    LogRemovalIntentEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogRemoved"
+  ): TypedContractEvent<
+    LogRemovedEvent.InputTuple,
+    LogRemovedEvent.OutputTuple,
+    LogRemovedEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogRemovedGovernor"
+  ): TypedContractEvent<
+    LogRemovedGovernorEvent.InputTuple,
+    LogRemovedGovernorEvent.OutputTuple,
+    LogRemovedGovernorEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogRootUpdate"
+  ): TypedContractEvent<
+    LogRootUpdateEvent.InputTuple,
+    LogRootUpdateEvent.OutputTuple,
+    LogRootUpdateEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogStateTransitionFact"
+  ): TypedContractEvent<
+    LogStateTransitionFactEvent.InputTuple,
+    LogStateTransitionFactEvent.OutputTuple,
+    LogStateTransitionFactEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogTokenAdminAdded"
+  ): TypedContractEvent<
+    LogTokenAdminAddedEvent.InputTuple,
+    LogTokenAdminAddedEvent.OutputTuple,
+    LogTokenAdminAddedEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogTokenAdminRemoved"
+  ): TypedContractEvent<
+    LogTokenAdminRemovedEvent.InputTuple,
+    LogTokenAdminRemovedEvent.OutputTuple,
+    LogTokenAdminRemovedEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogTokenRegistered"
+  ): TypedContractEvent<
+    LogTokenRegisteredEvent.InputTuple,
+    LogTokenRegisteredEvent.OutputTuple,
+    LogTokenRegisteredEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogUnFrozen"
+  ): TypedContractEvent<
+    LogUnFrozenEvent.InputTuple,
+    LogUnFrozenEvent.OutputTuple,
+    LogUnFrozenEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogUserRegistered"
+  ): TypedContractEvent<
+    LogUserRegisteredEvent.InputTuple,
+    LogUserRegisteredEvent.OutputTuple,
+    LogUserRegisteredEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogVaultBalanceChangeApplied"
+  ): TypedContractEvent<
+    LogVaultBalanceChangeAppliedEvent.InputTuple,
+    LogVaultBalanceChangeAppliedEvent.OutputTuple,
+    LogVaultBalanceChangeAppliedEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogVaultWithdrawalLockSet"
+  ): TypedContractEvent<
+    LogVaultWithdrawalLockSetEvent.InputTuple,
+    LogVaultWithdrawalLockSetEvent.OutputTuple,
+    LogVaultWithdrawalLockSetEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogWithdrawalAllowed"
+  ): TypedContractEvent<
+    LogWithdrawalAllowedEvent.InputTuple,
+    LogWithdrawalAllowedEvent.OutputTuple,
+    LogWithdrawalAllowedEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogWithdrawalFromVault"
+  ): TypedContractEvent<
+    LogWithdrawalFromVaultEvent.InputTuple,
+    LogWithdrawalFromVaultEvent.OutputTuple,
+    LogWithdrawalFromVaultEvent.OutputObject
+  >;
+  getEvent(
+    key: "LogWithdrawalPerformed"
+  ): TypedContractEvent<
+    LogWithdrawalPerformedEvent.InputTuple,
+    LogWithdrawalPerformedEvent.OutputTuple,
+    LogWithdrawalPerformedEvent.OutputObject
+  >;
 
   filters: {
-    "ImplementationActivationRescheduled(address,uint256)"(
-      implementation?: PromiseOrValue<string> | null,
-      updatedActivationTime?: null
-    ): ImplementationActivationRescheduledEventFilter;
-    ImplementationActivationRescheduled(
-      implementation?: PromiseOrValue<string> | null,
-      updatedActivationTime?: null
-    ): ImplementationActivationRescheduledEventFilter;
-
-    "LogDefaultVaultWithdrawalLockSet(uint256)"(
-      newDefaultLockTime?: null
-    ): LogDefaultVaultWithdrawalLockSetEventFilter;
-    LogDefaultVaultWithdrawalLockSet(
-      newDefaultLockTime?: null
-    ): LogDefaultVaultWithdrawalLockSetEventFilter;
-
-    "LogDeposit(address,uint256,uint256,uint256,uint256,uint256)"(
-      depositorEthKey?: null,
-      starkKey?: null,
-      vaultId?: null,
-      assetType?: null,
-      nonQuantizedAmount?: null,
-      quantizedAmount?: null
-    ): LogDepositEventFilter;
-    LogDeposit(
-      depositorEthKey?: null,
-      starkKey?: null,
-      vaultId?: null,
-      assetType?: null,
-      nonQuantizedAmount?: null,
-      quantizedAmount?: null
-    ): LogDepositEventFilter;
-
-    "LogDepositCancel(uint256,uint256,uint256)"(
-      starkKey?: null,
-      vaultId?: null,
-      assetId?: null
-    ): LogDepositCancelEventFilter;
-    LogDepositCancel(
-      starkKey?: null,
-      vaultId?: null,
-      assetId?: null
-    ): LogDepositCancelEventFilter;
-
-    "LogDepositCancelReclaimed(uint256,uint256,uint256,uint256,uint256)"(
-      starkKey?: null,
-      vaultId?: null,
-      assetType?: null,
-      nonQuantizedAmount?: null,
-      quantizedAmount?: null
-    ): LogDepositCancelReclaimedEventFilter;
-    LogDepositCancelReclaimed(
-      starkKey?: null,
-      vaultId?: null,
-      assetType?: null,
-      nonQuantizedAmount?: null,
-      quantizedAmount?: null
-    ): LogDepositCancelReclaimedEventFilter;
-
-    "LogDepositNftCancelReclaimed(uint256,uint256,uint256,uint256,uint256)"(
-      starkKey?: null,
-      vaultId?: null,
-      assetType?: null,
-      tokenId?: null,
-      assetId?: null
-    ): LogDepositNftCancelReclaimedEventFilter;
-    LogDepositNftCancelReclaimed(
-      starkKey?: null,
-      vaultId?: null,
-      assetType?: null,
-      tokenId?: null,
-      assetId?: null
-    ): LogDepositNftCancelReclaimedEventFilter;
-
-    "LogDepositToVault(address,uint256,uint256,uint256,uint256)"(
-      ethKey?: null,
-      assetId?: null,
-      vaultId?: null,
-      nonQuantizedAmount?: null,
-      quantizedAmount?: null
-    ): LogDepositToVaultEventFilter;
-    LogDepositToVault(
-      ethKey?: null,
-      assetId?: null,
-      vaultId?: null,
-      nonQuantizedAmount?: null,
-      quantizedAmount?: null
-    ): LogDepositToVaultEventFilter;
-
-    "LogFrozen()"(): LogFrozenEventFilter;
-    LogFrozen(): LogFrozenEventFilter;
-
-    "LogFullWithdrawalRequest(uint256,uint256)"(
-      starkKey?: null,
-      vaultId?: null
-    ): LogFullWithdrawalRequestEventFilter;
-    LogFullWithdrawalRequest(
-      starkKey?: null,
-      vaultId?: null
-    ): LogFullWithdrawalRequestEventFilter;
-
-    "LogMintWithdrawalPerformed(uint256,uint256,uint256,uint256,uint256)"(
-      ownerKey?: null,
-      assetType?: null,
-      nonQuantizedAmount?: null,
-      quantizedAmount?: null,
-      assetId?: null
-    ): LogMintWithdrawalPerformedEventFilter;
-    LogMintWithdrawalPerformed(
-      ownerKey?: null,
-      assetType?: null,
-      nonQuantizedAmount?: null,
-      quantizedAmount?: null,
-      assetId?: null
-    ): LogMintWithdrawalPerformedEventFilter;
-
-    "LogMintableWithdrawalAllowed(uint256,uint256,uint256)"(
-      ownerKey?: null,
-      assetId?: null,
-      quantizedAmount?: null
-    ): LogMintableWithdrawalAllowedEventFilter;
-    LogMintableWithdrawalAllowed(
-      ownerKey?: null,
-      assetId?: null,
-      quantizedAmount?: null
-    ): LogMintableWithdrawalAllowedEventFilter;
-
-    "LogNewGovernorAccepted(address)"(
-      acceptedGovernor?: null
-    ): LogNewGovernorAcceptedEventFilter;
-    LogNewGovernorAccepted(
-      acceptedGovernor?: null
-    ): LogNewGovernorAcceptedEventFilter;
-
-    "LogNftDeposit(address,uint256,uint256,uint256,uint256,uint256)"(
-      depositorEthKey?: null,
-      starkKey?: null,
-      vaultId?: null,
-      assetType?: null,
-      tokenId?: null,
-      assetId?: null
-    ): LogNftDepositEventFilter;
-    LogNftDeposit(
-      depositorEthKey?: null,
-      starkKey?: null,
-      vaultId?: null,
-      assetType?: null,
-      tokenId?: null,
-      assetId?: null
-    ): LogNftDepositEventFilter;
-
-    "LogNftWithdrawalAllowed(uint256,uint256)"(
-      ownerKey?: null,
-      assetId?: null
-    ): LogNftWithdrawalAllowedEventFilter;
-    LogNftWithdrawalAllowed(
-      ownerKey?: null,
-      assetId?: null
-    ): LogNftWithdrawalAllowedEventFilter;
-
-    "LogNftWithdrawalPerformed(uint256,uint256,uint256,uint256,address)"(
-      ownerKey?: null,
-      assetType?: null,
-      tokenId?: null,
-      assetId?: null,
-      recipient?: null
-    ): LogNftWithdrawalPerformedEventFilter;
-    LogNftWithdrawalPerformed(
-      ownerKey?: null,
-      assetType?: null,
-      tokenId?: null,
-      assetId?: null,
-      recipient?: null
-    ): LogNftWithdrawalPerformedEventFilter;
-
-    "LogNominatedGovernor(address)"(
-      nominatedGovernor?: null
-    ): LogNominatedGovernorEventFilter;
-    LogNominatedGovernor(
-      nominatedGovernor?: null
-    ): LogNominatedGovernorEventFilter;
-
-    "LogNominationCancelled()"(): LogNominationCancelledEventFilter;
-    LogNominationCancelled(): LogNominationCancelledEventFilter;
-
-    "LogOperatorAdded(address)"(operator?: null): LogOperatorAddedEventFilter;
-    LogOperatorAdded(operator?: null): LogOperatorAddedEventFilter;
-
-    "LogOperatorRemoved(address)"(
-      operator?: null
-    ): LogOperatorRemovedEventFilter;
-    LogOperatorRemoved(operator?: null): LogOperatorRemovedEventFilter;
-
-    "LogRegistered(address,string)"(
-      entry?: null,
-      entryId?: null
-    ): LogRegisteredEventFilter;
-    LogRegistered(entry?: null, entryId?: null): LogRegisteredEventFilter;
-
-    "LogRemovalIntent(address,string)"(
-      entry?: null,
-      entryId?: null
-    ): LogRemovalIntentEventFilter;
-    LogRemovalIntent(entry?: null, entryId?: null): LogRemovalIntentEventFilter;
-
-    "LogRemoved(address,string)"(
-      entry?: null,
-      entryId?: null
-    ): LogRemovedEventFilter;
-    LogRemoved(entry?: null, entryId?: null): LogRemovedEventFilter;
-
-    "LogRemovedGovernor(address)"(
-      removedGovernor?: null
-    ): LogRemovedGovernorEventFilter;
-    LogRemovedGovernor(removedGovernor?: null): LogRemovedGovernorEventFilter;
-
-    "LogRootUpdate(uint256,uint256,uint256,uint256)"(
-      sequenceNumber?: null,
-      batchId?: null,
-      vaultRoot?: null,
-      orderRoot?: null
-    ): LogRootUpdateEventFilter;
-    LogRootUpdate(
-      sequenceNumber?: null,
-      batchId?: null,
-      vaultRoot?: null,
-      orderRoot?: null
-    ): LogRootUpdateEventFilter;
-
-    "LogStateTransitionFact(bytes32)"(
-      stateTransitionFact?: null
-    ): LogStateTransitionFactEventFilter;
-    LogStateTransitionFact(
-      stateTransitionFact?: null
-    ): LogStateTransitionFactEventFilter;
-
-    "LogTokenAdminAdded(address)"(
-      tokenAdmin?: null
-    ): LogTokenAdminAddedEventFilter;
-    LogTokenAdminAdded(tokenAdmin?: null): LogTokenAdminAddedEventFilter;
-
-    "LogTokenAdminRemoved(address)"(
-      tokenAdmin?: null
-    ): LogTokenAdminRemovedEventFilter;
-    LogTokenAdminRemoved(tokenAdmin?: null): LogTokenAdminRemovedEventFilter;
-
-    "LogTokenRegistered(uint256,bytes,uint256)"(
-      assetType?: null,
-      assetInfo?: null,
-      quantum?: null
-    ): LogTokenRegisteredEventFilter;
-    LogTokenRegistered(
-      assetType?: null,
-      assetInfo?: null,
-      quantum?: null
-    ): LogTokenRegisteredEventFilter;
-
-    "LogUnFrozen()"(): LogUnFrozenEventFilter;
-    LogUnFrozen(): LogUnFrozenEventFilter;
-
-    "LogUserRegistered(address,uint256,address)"(
-      ethKey?: null,
-      starkKey?: null,
-      sender?: null
-    ): LogUserRegisteredEventFilter;
-    LogUserRegistered(
-      ethKey?: null,
-      starkKey?: null,
-      sender?: null
-    ): LogUserRegisteredEventFilter;
-
-    "LogVaultBalanceChangeApplied(address,uint256,uint256,int256)"(
-      ethKey?: null,
-      assetId?: null,
-      vaultId?: null,
-      quantizedAmountChange?: null
-    ): LogVaultBalanceChangeAppliedEventFilter;
-    LogVaultBalanceChangeApplied(
-      ethKey?: null,
-      assetId?: null,
-      vaultId?: null,
-      quantizedAmountChange?: null
-    ): LogVaultBalanceChangeAppliedEventFilter;
-
-    "LogVaultWithdrawalLockSet(address,uint256,uint256,uint256)"(
-      ethKey?: null,
-      assetId?: null,
-      vaultId?: null,
-      timeRelease?: null
-    ): LogVaultWithdrawalLockSetEventFilter;
-    LogVaultWithdrawalLockSet(
-      ethKey?: null,
-      assetId?: null,
-      vaultId?: null,
-      timeRelease?: null
-    ): LogVaultWithdrawalLockSetEventFilter;
-
-    "LogWithdrawalAllowed(uint256,uint256,uint256,uint256)"(
-      ownerKey?: null,
-      assetType?: null,
-      nonQuantizedAmount?: null,
-      quantizedAmount?: null
-    ): LogWithdrawalAllowedEventFilter;
-    LogWithdrawalAllowed(
-      ownerKey?: null,
-      assetType?: null,
-      nonQuantizedAmount?: null,
-      quantizedAmount?: null
-    ): LogWithdrawalAllowedEventFilter;
-
-    "LogWithdrawalFromVault(address,uint256,uint256,uint256,uint256)"(
-      ethKey?: null,
-      assetId?: null,
-      vaultId?: null,
-      nonQuantizedAmount?: null,
-      quantizedAmount?: null
-    ): LogWithdrawalFromVaultEventFilter;
-    LogWithdrawalFromVault(
-      ethKey?: null,
-      assetId?: null,
-      vaultId?: null,
-      nonQuantizedAmount?: null,
-      quantizedAmount?: null
-    ): LogWithdrawalFromVaultEventFilter;
-
-    "LogWithdrawalPerformed(uint256,uint256,uint256,uint256,address)"(
-      ownerKey?: null,
-      assetType?: null,
-      nonQuantizedAmount?: null,
-      quantizedAmount?: null,
-      recipient?: null
-    ): LogWithdrawalPerformedEventFilter;
-    LogWithdrawalPerformed(
-      ownerKey?: null,
-      assetType?: null,
-      nonQuantizedAmount?: null,
-      quantizedAmount?: null,
-      recipient?: null
-    ): LogWithdrawalPerformedEventFilter;
-  };
-
-  estimateGas: {
-    DEPOSIT_CANCEL_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
-
-    FREEZE_GRACE_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
-
-    MAIN_GOVERNANCE_INFO_TAG(overrides?: CallOverrides): Promise<BigNumber>;
-
-    MAX_FORCED_ACTIONS_REQS_PER_BLOCK(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    MAX_VERIFIER_COUNT(overrides?: CallOverrides): Promise<BigNumber>;
-
-    STARKEX_MAX_DEFAULT_VAULT_LOCK(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    UNFREEZE_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
-
-    VERIFIER_REMOVAL_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
-
-    VERSION(overrides?: CallOverrides): Promise<BigNumber>;
-
-    announceAvailabilityVerifierRemovalIntent(
-      verifier: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    announceVerifierRemovalIntent(
-      verifier: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    defaultVaultWithdrawalLock(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "deposit(uint256,uint256,uint256)"(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    "deposit(uint256,uint256,uint256,uint256)"(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    depositCancel(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    depositERC20(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    depositERC20ToVault(
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    depositEth(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    depositEthToVault(
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    depositNft(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    depositNftReclaim(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    depositReclaim(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    escape(
-      starkKey: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    freezeRequest(
-      starkKey: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    fullWithdrawalRequest(
-      starkKey: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    getActionCount(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getActionHashByIndex(
-      actionIndex: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getAssetInfo(
-      assetType: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getCancellationRequest(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getDepositBalance(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getEthKey(
-      ownerKey: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getFullWithdrawalRequest(
-      starkKey: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getLastBatchId(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getOrderRoot(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getOrderTreeHeight(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getQuantizedDepositBalance(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getQuantizedVaultBalance(
-      ethKey: PromiseOrValue<string>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getQuantum(
-      presumedAssetType: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getRegisteredAvailabilityVerifiers(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getRegisteredVerifiers(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getSequenceNumber(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getVaultBalance(
-      ethKey: PromiseOrValue<string>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getVaultRoot(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getVaultTreeHeight(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getVaultWithdrawalLock(
-      ethKey: PromiseOrValue<string>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getWithdrawalBalance(
-      ownerKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    initialize(
-      data: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    isAssetRegistered(
-      assetType: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    isAvailabilityVerifier(
-      verifierAddress: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    isFrozen(overrides?: CallOverrides): Promise<BigNumber>;
-
-    isOperator(
-      testedOperator: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    isStrictVaultBalancePolicy(overrides?: CallOverrides): Promise<BigNumber>;
-
-    isTokenAdmin(
-      testedAdmin: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    isVaultLocked(
-      ethKey: PromiseOrValue<string>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    isVerifier(
-      verifierAddress: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    lockVault(
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      lockTime: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    mainAcceptGovernance(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    mainCancelNomination(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    mainIsGovernor(
-      testGovernor: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    mainNominateNewGovernor(
-      newGovernor: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    mainRemoveGovernor(
-      governorForRemoval: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    onERC721Received(
-      arg0: PromiseOrValue<string>,
-      arg1: PromiseOrValue<string>,
-      arg2: PromiseOrValue<BigNumberish>,
-      arg3: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    orderRegistryAddress(overrides?: CallOverrides): Promise<BigNumber>;
-
-    registerAndDepositERC20(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    registerAndDepositEth(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    registerAvailabilityVerifier(
-      verifier: PromiseOrValue<string>,
-      identifier: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    registerEthAddress(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      starkSignature: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    registerOperator(
-      newOperator: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    registerSender(
-      starkKey: PromiseOrValue<BigNumberish>,
-      starkSignature: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    "registerToken(uint256,bytes)"(
-      assetType: PromiseOrValue<BigNumberish>,
-      assetInfo: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    "registerToken(uint256,bytes,uint256)"(
-      assetType: PromiseOrValue<BigNumberish>,
-      assetInfo: PromiseOrValue<BytesLike>,
-      quantum: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    registerTokenAdmin(
-      newAdmin: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    registerVerifier(
-      verifier: PromiseOrValue<string>,
-      identifier: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    removeAvailabilityVerifier(
-      verifier: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    removeVerifier(
-      verifier: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    setDefaultVaultWithdrawalLock(
-      newDefaultTime: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    unFreeze(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    unregisterOperator(
-      removedOperator: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    unregisterTokenAdmin(
-      oldAdmin: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    updateImplementationActivationTime(
-      implementation: PromiseOrValue<string>,
-      data: PromiseOrValue<BytesLike>,
-      finalize: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    updateState(
-      publicInput: PromiseOrValue<BigNumberish>[],
-      applicationData: PromiseOrValue<BigNumberish>[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    withdraw(
-      ownerKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    withdrawAndMint(
-      ownerKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      mintingBlob: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    withdrawFromVault(
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    withdrawNft(
-      ownerKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-  };
-
-  populateTransaction: {
-    DEPOSIT_CANCEL_DELAY(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    FREEZE_GRACE_PERIOD(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    MAIN_GOVERNANCE_INFO_TAG(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    MAX_FORCED_ACTIONS_REQS_PER_BLOCK(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    MAX_VERIFIER_COUNT(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    STARKEX_MAX_DEFAULT_VAULT_LOCK(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    UNFREEZE_DELAY(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    VERIFIER_REMOVAL_DELAY(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    VERSION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    announceAvailabilityVerifierRemovalIntent(
-      verifier: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    announceVerifierRemovalIntent(
-      verifier: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    defaultVaultWithdrawalLock(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "deposit(uint256,uint256,uint256)"(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "deposit(uint256,uint256,uint256,uint256)"(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    depositCancel(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    depositERC20(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    depositERC20ToVault(
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    depositEth(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    depositEthToVault(
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    depositNft(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    depositNftReclaim(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    depositReclaim(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    escape(
-      starkKey: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    freezeRequest(
-      starkKey: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    fullWithdrawalRequest(
-      starkKey: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    getActionCount(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getActionHashByIndex(
-      actionIndex: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getAssetInfo(
-      assetType: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getCancellationRequest(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getDepositBalance(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getEthKey(
-      ownerKey: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getFullWithdrawalRequest(
-      starkKey: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getLastBatchId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getOrderRoot(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getOrderTreeHeight(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getQuantizedDepositBalance(
-      starkKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getQuantizedVaultBalance(
-      ethKey: PromiseOrValue<string>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getQuantum(
-      presumedAssetType: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getRegisteredAvailabilityVerifiers(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getRegisteredVerifiers(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getSequenceNumber(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getVaultBalance(
-      ethKey: PromiseOrValue<string>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getVaultRoot(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getVaultTreeHeight(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getVaultWithdrawalLock(
-      ethKey: PromiseOrValue<string>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getWithdrawalBalance(
-      ownerKey: PromiseOrValue<BigNumberish>,
-      assetId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    initialize(
-      data: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    isAssetRegistered(
-      assetType: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    isAvailabilityVerifier(
-      verifierAddress: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    isFrozen(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    isOperator(
-      testedOperator: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    isStrictVaultBalancePolicy(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    isTokenAdmin(
-      testedAdmin: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    isVaultLocked(
-      ethKey: PromiseOrValue<string>,
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    isVerifier(
-      verifierAddress: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    lockVault(
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      lockTime: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    mainAcceptGovernance(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    mainCancelNomination(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    mainIsGovernor(
-      testGovernor: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    mainNominateNewGovernor(
-      newGovernor: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    mainRemoveGovernor(
-      governorForRemoval: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    onERC721Received(
-      arg0: PromiseOrValue<string>,
-      arg1: PromiseOrValue<string>,
-      arg2: PromiseOrValue<BigNumberish>,
-      arg3: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    orderRegistryAddress(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    registerAndDepositERC20(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    registerAndDepositEth(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    registerAvailabilityVerifier(
-      verifier: PromiseOrValue<string>,
-      identifier: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    registerEthAddress(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      starkSignature: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    registerOperator(
-      newOperator: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    registerSender(
-      starkKey: PromiseOrValue<BigNumberish>,
-      starkSignature: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "registerToken(uint256,bytes)"(
-      assetType: PromiseOrValue<BigNumberish>,
-      assetInfo: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "registerToken(uint256,bytes,uint256)"(
-      assetType: PromiseOrValue<BigNumberish>,
-      assetInfo: PromiseOrValue<BytesLike>,
-      quantum: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    registerTokenAdmin(
-      newAdmin: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    registerVerifier(
-      verifier: PromiseOrValue<string>,
-      identifier: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    removeAvailabilityVerifier(
-      verifier: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    removeVerifier(
-      verifier: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setDefaultVaultWithdrawalLock(
-      newDefaultTime: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    unFreeze(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    unregisterOperator(
-      removedOperator: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    unregisterTokenAdmin(
-      oldAdmin: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    updateImplementationActivationTime(
-      implementation: PromiseOrValue<string>,
-      data: PromiseOrValue<BytesLike>,
-      finalize: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    updateState(
-      publicInput: PromiseOrValue<BigNumberish>[],
-      applicationData: PromiseOrValue<BigNumberish>[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    withdraw(
-      ownerKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    withdrawAndMint(
-      ownerKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      mintingBlob: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    withdrawFromVault(
-      assetId: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      quantizedAmount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    withdrawNft(
-      ownerKey: PromiseOrValue<BigNumberish>,
-      assetType: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
+    "ImplementationActivationRescheduled(address,uint256)": TypedContractEvent<
+      ImplementationActivationRescheduledEvent.InputTuple,
+      ImplementationActivationRescheduledEvent.OutputTuple,
+      ImplementationActivationRescheduledEvent.OutputObject
+    >;
+    ImplementationActivationRescheduled: TypedContractEvent<
+      ImplementationActivationRescheduledEvent.InputTuple,
+      ImplementationActivationRescheduledEvent.OutputTuple,
+      ImplementationActivationRescheduledEvent.OutputObject
+    >;
+
+    "LogDefaultVaultWithdrawalLockSet(uint256)": TypedContractEvent<
+      LogDefaultVaultWithdrawalLockSetEvent.InputTuple,
+      LogDefaultVaultWithdrawalLockSetEvent.OutputTuple,
+      LogDefaultVaultWithdrawalLockSetEvent.OutputObject
+    >;
+    LogDefaultVaultWithdrawalLockSet: TypedContractEvent<
+      LogDefaultVaultWithdrawalLockSetEvent.InputTuple,
+      LogDefaultVaultWithdrawalLockSetEvent.OutputTuple,
+      LogDefaultVaultWithdrawalLockSetEvent.OutputObject
+    >;
+
+    "LogDeposit(address,uint256,uint256,uint256,uint256,uint256)": TypedContractEvent<
+      LogDepositEvent.InputTuple,
+      LogDepositEvent.OutputTuple,
+      LogDepositEvent.OutputObject
+    >;
+    LogDeposit: TypedContractEvent<
+      LogDepositEvent.InputTuple,
+      LogDepositEvent.OutputTuple,
+      LogDepositEvent.OutputObject
+    >;
+
+    "LogDepositCancel(uint256,uint256,uint256)": TypedContractEvent<
+      LogDepositCancelEvent.InputTuple,
+      LogDepositCancelEvent.OutputTuple,
+      LogDepositCancelEvent.OutputObject
+    >;
+    LogDepositCancel: TypedContractEvent<
+      LogDepositCancelEvent.InputTuple,
+      LogDepositCancelEvent.OutputTuple,
+      LogDepositCancelEvent.OutputObject
+    >;
+
+    "LogDepositCancelReclaimed(uint256,uint256,uint256,uint256,uint256)": TypedContractEvent<
+      LogDepositCancelReclaimedEvent.InputTuple,
+      LogDepositCancelReclaimedEvent.OutputTuple,
+      LogDepositCancelReclaimedEvent.OutputObject
+    >;
+    LogDepositCancelReclaimed: TypedContractEvent<
+      LogDepositCancelReclaimedEvent.InputTuple,
+      LogDepositCancelReclaimedEvent.OutputTuple,
+      LogDepositCancelReclaimedEvent.OutputObject
+    >;
+
+    "LogDepositNftCancelReclaimed(uint256,uint256,uint256,uint256,uint256)": TypedContractEvent<
+      LogDepositNftCancelReclaimedEvent.InputTuple,
+      LogDepositNftCancelReclaimedEvent.OutputTuple,
+      LogDepositNftCancelReclaimedEvent.OutputObject
+    >;
+    LogDepositNftCancelReclaimed: TypedContractEvent<
+      LogDepositNftCancelReclaimedEvent.InputTuple,
+      LogDepositNftCancelReclaimedEvent.OutputTuple,
+      LogDepositNftCancelReclaimedEvent.OutputObject
+    >;
+
+    "LogDepositToVault(address,uint256,uint256,uint256,uint256)": TypedContractEvent<
+      LogDepositToVaultEvent.InputTuple,
+      LogDepositToVaultEvent.OutputTuple,
+      LogDepositToVaultEvent.OutputObject
+    >;
+    LogDepositToVault: TypedContractEvent<
+      LogDepositToVaultEvent.InputTuple,
+      LogDepositToVaultEvent.OutputTuple,
+      LogDepositToVaultEvent.OutputObject
+    >;
+
+    "LogFrozen()": TypedContractEvent<
+      LogFrozenEvent.InputTuple,
+      LogFrozenEvent.OutputTuple,
+      LogFrozenEvent.OutputObject
+    >;
+    LogFrozen: TypedContractEvent<
+      LogFrozenEvent.InputTuple,
+      LogFrozenEvent.OutputTuple,
+      LogFrozenEvent.OutputObject
+    >;
+
+    "LogFullWithdrawalRequest(uint256,uint256)": TypedContractEvent<
+      LogFullWithdrawalRequestEvent.InputTuple,
+      LogFullWithdrawalRequestEvent.OutputTuple,
+      LogFullWithdrawalRequestEvent.OutputObject
+    >;
+    LogFullWithdrawalRequest: TypedContractEvent<
+      LogFullWithdrawalRequestEvent.InputTuple,
+      LogFullWithdrawalRequestEvent.OutputTuple,
+      LogFullWithdrawalRequestEvent.OutputObject
+    >;
+
+    "LogMintWithdrawalPerformed(uint256,uint256,uint256,uint256,uint256)": TypedContractEvent<
+      LogMintWithdrawalPerformedEvent.InputTuple,
+      LogMintWithdrawalPerformedEvent.OutputTuple,
+      LogMintWithdrawalPerformedEvent.OutputObject
+    >;
+    LogMintWithdrawalPerformed: TypedContractEvent<
+      LogMintWithdrawalPerformedEvent.InputTuple,
+      LogMintWithdrawalPerformedEvent.OutputTuple,
+      LogMintWithdrawalPerformedEvent.OutputObject
+    >;
+
+    "LogMintableWithdrawalAllowed(uint256,uint256,uint256)": TypedContractEvent<
+      LogMintableWithdrawalAllowedEvent.InputTuple,
+      LogMintableWithdrawalAllowedEvent.OutputTuple,
+      LogMintableWithdrawalAllowedEvent.OutputObject
+    >;
+    LogMintableWithdrawalAllowed: TypedContractEvent<
+      LogMintableWithdrawalAllowedEvent.InputTuple,
+      LogMintableWithdrawalAllowedEvent.OutputTuple,
+      LogMintableWithdrawalAllowedEvent.OutputObject
+    >;
+
+    "LogNewGovernorAccepted(address)": TypedContractEvent<
+      LogNewGovernorAcceptedEvent.InputTuple,
+      LogNewGovernorAcceptedEvent.OutputTuple,
+      LogNewGovernorAcceptedEvent.OutputObject
+    >;
+    LogNewGovernorAccepted: TypedContractEvent<
+      LogNewGovernorAcceptedEvent.InputTuple,
+      LogNewGovernorAcceptedEvent.OutputTuple,
+      LogNewGovernorAcceptedEvent.OutputObject
+    >;
+
+    "LogNftDeposit(address,uint256,uint256,uint256,uint256,uint256)": TypedContractEvent<
+      LogNftDepositEvent.InputTuple,
+      LogNftDepositEvent.OutputTuple,
+      LogNftDepositEvent.OutputObject
+    >;
+    LogNftDeposit: TypedContractEvent<
+      LogNftDepositEvent.InputTuple,
+      LogNftDepositEvent.OutputTuple,
+      LogNftDepositEvent.OutputObject
+    >;
+
+    "LogNftWithdrawalAllowed(uint256,uint256)": TypedContractEvent<
+      LogNftWithdrawalAllowedEvent.InputTuple,
+      LogNftWithdrawalAllowedEvent.OutputTuple,
+      LogNftWithdrawalAllowedEvent.OutputObject
+    >;
+    LogNftWithdrawalAllowed: TypedContractEvent<
+      LogNftWithdrawalAllowedEvent.InputTuple,
+      LogNftWithdrawalAllowedEvent.OutputTuple,
+      LogNftWithdrawalAllowedEvent.OutputObject
+    >;
+
+    "LogNftWithdrawalPerformed(uint256,uint256,uint256,uint256,address)": TypedContractEvent<
+      LogNftWithdrawalPerformedEvent.InputTuple,
+      LogNftWithdrawalPerformedEvent.OutputTuple,
+      LogNftWithdrawalPerformedEvent.OutputObject
+    >;
+    LogNftWithdrawalPerformed: TypedContractEvent<
+      LogNftWithdrawalPerformedEvent.InputTuple,
+      LogNftWithdrawalPerformedEvent.OutputTuple,
+      LogNftWithdrawalPerformedEvent.OutputObject
+    >;
+
+    "LogNominatedGovernor(address)": TypedContractEvent<
+      LogNominatedGovernorEvent.InputTuple,
+      LogNominatedGovernorEvent.OutputTuple,
+      LogNominatedGovernorEvent.OutputObject
+    >;
+    LogNominatedGovernor: TypedContractEvent<
+      LogNominatedGovernorEvent.InputTuple,
+      LogNominatedGovernorEvent.OutputTuple,
+      LogNominatedGovernorEvent.OutputObject
+    >;
+
+    "LogNominationCancelled()": TypedContractEvent<
+      LogNominationCancelledEvent.InputTuple,
+      LogNominationCancelledEvent.OutputTuple,
+      LogNominationCancelledEvent.OutputObject
+    >;
+    LogNominationCancelled: TypedContractEvent<
+      LogNominationCancelledEvent.InputTuple,
+      LogNominationCancelledEvent.OutputTuple,
+      LogNominationCancelledEvent.OutputObject
+    >;
+
+    "LogOperatorAdded(address)": TypedContractEvent<
+      LogOperatorAddedEvent.InputTuple,
+      LogOperatorAddedEvent.OutputTuple,
+      LogOperatorAddedEvent.OutputObject
+    >;
+    LogOperatorAdded: TypedContractEvent<
+      LogOperatorAddedEvent.InputTuple,
+      LogOperatorAddedEvent.OutputTuple,
+      LogOperatorAddedEvent.OutputObject
+    >;
+
+    "LogOperatorRemoved(address)": TypedContractEvent<
+      LogOperatorRemovedEvent.InputTuple,
+      LogOperatorRemovedEvent.OutputTuple,
+      LogOperatorRemovedEvent.OutputObject
+    >;
+    LogOperatorRemoved: TypedContractEvent<
+      LogOperatorRemovedEvent.InputTuple,
+      LogOperatorRemovedEvent.OutputTuple,
+      LogOperatorRemovedEvent.OutputObject
+    >;
+
+    "LogRegistered(address,string)": TypedContractEvent<
+      LogRegisteredEvent.InputTuple,
+      LogRegisteredEvent.OutputTuple,
+      LogRegisteredEvent.OutputObject
+    >;
+    LogRegistered: TypedContractEvent<
+      LogRegisteredEvent.InputTuple,
+      LogRegisteredEvent.OutputTuple,
+      LogRegisteredEvent.OutputObject
+    >;
+
+    "LogRemovalIntent(address,string)": TypedContractEvent<
+      LogRemovalIntentEvent.InputTuple,
+      LogRemovalIntentEvent.OutputTuple,
+      LogRemovalIntentEvent.OutputObject
+    >;
+    LogRemovalIntent: TypedContractEvent<
+      LogRemovalIntentEvent.InputTuple,
+      LogRemovalIntentEvent.OutputTuple,
+      LogRemovalIntentEvent.OutputObject
+    >;
+
+    "LogRemoved(address,string)": TypedContractEvent<
+      LogRemovedEvent.InputTuple,
+      LogRemovedEvent.OutputTuple,
+      LogRemovedEvent.OutputObject
+    >;
+    LogRemoved: TypedContractEvent<
+      LogRemovedEvent.InputTuple,
+      LogRemovedEvent.OutputTuple,
+      LogRemovedEvent.OutputObject
+    >;
+
+    "LogRemovedGovernor(address)": TypedContractEvent<
+      LogRemovedGovernorEvent.InputTuple,
+      LogRemovedGovernorEvent.OutputTuple,
+      LogRemovedGovernorEvent.OutputObject
+    >;
+    LogRemovedGovernor: TypedContractEvent<
+      LogRemovedGovernorEvent.InputTuple,
+      LogRemovedGovernorEvent.OutputTuple,
+      LogRemovedGovernorEvent.OutputObject
+    >;
+
+    "LogRootUpdate(uint256,uint256,uint256,uint256)": TypedContractEvent<
+      LogRootUpdateEvent.InputTuple,
+      LogRootUpdateEvent.OutputTuple,
+      LogRootUpdateEvent.OutputObject
+    >;
+    LogRootUpdate: TypedContractEvent<
+      LogRootUpdateEvent.InputTuple,
+      LogRootUpdateEvent.OutputTuple,
+      LogRootUpdateEvent.OutputObject
+    >;
+
+    "LogStateTransitionFact(bytes32)": TypedContractEvent<
+      LogStateTransitionFactEvent.InputTuple,
+      LogStateTransitionFactEvent.OutputTuple,
+      LogStateTransitionFactEvent.OutputObject
+    >;
+    LogStateTransitionFact: TypedContractEvent<
+      LogStateTransitionFactEvent.InputTuple,
+      LogStateTransitionFactEvent.OutputTuple,
+      LogStateTransitionFactEvent.OutputObject
+    >;
+
+    "LogTokenAdminAdded(address)": TypedContractEvent<
+      LogTokenAdminAddedEvent.InputTuple,
+      LogTokenAdminAddedEvent.OutputTuple,
+      LogTokenAdminAddedEvent.OutputObject
+    >;
+    LogTokenAdminAdded: TypedContractEvent<
+      LogTokenAdminAddedEvent.InputTuple,
+      LogTokenAdminAddedEvent.OutputTuple,
+      LogTokenAdminAddedEvent.OutputObject
+    >;
+
+    "LogTokenAdminRemoved(address)": TypedContractEvent<
+      LogTokenAdminRemovedEvent.InputTuple,
+      LogTokenAdminRemovedEvent.OutputTuple,
+      LogTokenAdminRemovedEvent.OutputObject
+    >;
+    LogTokenAdminRemoved: TypedContractEvent<
+      LogTokenAdminRemovedEvent.InputTuple,
+      LogTokenAdminRemovedEvent.OutputTuple,
+      LogTokenAdminRemovedEvent.OutputObject
+    >;
+
+    "LogTokenRegistered(uint256,bytes,uint256)": TypedContractEvent<
+      LogTokenRegisteredEvent.InputTuple,
+      LogTokenRegisteredEvent.OutputTuple,
+      LogTokenRegisteredEvent.OutputObject
+    >;
+    LogTokenRegistered: TypedContractEvent<
+      LogTokenRegisteredEvent.InputTuple,
+      LogTokenRegisteredEvent.OutputTuple,
+      LogTokenRegisteredEvent.OutputObject
+    >;
+
+    "LogUnFrozen()": TypedContractEvent<
+      LogUnFrozenEvent.InputTuple,
+      LogUnFrozenEvent.OutputTuple,
+      LogUnFrozenEvent.OutputObject
+    >;
+    LogUnFrozen: TypedContractEvent<
+      LogUnFrozenEvent.InputTuple,
+      LogUnFrozenEvent.OutputTuple,
+      LogUnFrozenEvent.OutputObject
+    >;
+
+    "LogUserRegistered(address,uint256,address)": TypedContractEvent<
+      LogUserRegisteredEvent.InputTuple,
+      LogUserRegisteredEvent.OutputTuple,
+      LogUserRegisteredEvent.OutputObject
+    >;
+    LogUserRegistered: TypedContractEvent<
+      LogUserRegisteredEvent.InputTuple,
+      LogUserRegisteredEvent.OutputTuple,
+      LogUserRegisteredEvent.OutputObject
+    >;
+
+    "LogVaultBalanceChangeApplied(address,uint256,uint256,int256)": TypedContractEvent<
+      LogVaultBalanceChangeAppliedEvent.InputTuple,
+      LogVaultBalanceChangeAppliedEvent.OutputTuple,
+      LogVaultBalanceChangeAppliedEvent.OutputObject
+    >;
+    LogVaultBalanceChangeApplied: TypedContractEvent<
+      LogVaultBalanceChangeAppliedEvent.InputTuple,
+      LogVaultBalanceChangeAppliedEvent.OutputTuple,
+      LogVaultBalanceChangeAppliedEvent.OutputObject
+    >;
+
+    "LogVaultWithdrawalLockSet(address,uint256,uint256,uint256)": TypedContractEvent<
+      LogVaultWithdrawalLockSetEvent.InputTuple,
+      LogVaultWithdrawalLockSetEvent.OutputTuple,
+      LogVaultWithdrawalLockSetEvent.OutputObject
+    >;
+    LogVaultWithdrawalLockSet: TypedContractEvent<
+      LogVaultWithdrawalLockSetEvent.InputTuple,
+      LogVaultWithdrawalLockSetEvent.OutputTuple,
+      LogVaultWithdrawalLockSetEvent.OutputObject
+    >;
+
+    "LogWithdrawalAllowed(uint256,uint256,uint256,uint256)": TypedContractEvent<
+      LogWithdrawalAllowedEvent.InputTuple,
+      LogWithdrawalAllowedEvent.OutputTuple,
+      LogWithdrawalAllowedEvent.OutputObject
+    >;
+    LogWithdrawalAllowed: TypedContractEvent<
+      LogWithdrawalAllowedEvent.InputTuple,
+      LogWithdrawalAllowedEvent.OutputTuple,
+      LogWithdrawalAllowedEvent.OutputObject
+    >;
+
+    "LogWithdrawalFromVault(address,uint256,uint256,uint256,uint256)": TypedContractEvent<
+      LogWithdrawalFromVaultEvent.InputTuple,
+      LogWithdrawalFromVaultEvent.OutputTuple,
+      LogWithdrawalFromVaultEvent.OutputObject
+    >;
+    LogWithdrawalFromVault: TypedContractEvent<
+      LogWithdrawalFromVaultEvent.InputTuple,
+      LogWithdrawalFromVaultEvent.OutputTuple,
+      LogWithdrawalFromVaultEvent.OutputObject
+    >;
+
+    "LogWithdrawalPerformed(uint256,uint256,uint256,uint256,address)": TypedContractEvent<
+      LogWithdrawalPerformedEvent.InputTuple,
+      LogWithdrawalPerformedEvent.OutputTuple,
+      LogWithdrawalPerformedEvent.OutputObject
+    >;
+    LogWithdrawalPerformed: TypedContractEvent<
+      LogWithdrawalPerformedEvent.InputTuple,
+      LogWithdrawalPerformedEvent.OutputTuple,
+      LogWithdrawalPerformedEvent.OutputObject
+    >;
   };
 }

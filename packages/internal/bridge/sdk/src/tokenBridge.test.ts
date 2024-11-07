@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/dot-notation */
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { BigNumber, ethers } from 'ethers';
+import { Contract, ethers } from 'ethers';
 import { TokenBridge } from './tokenBridge';
 import { BridgeConfiguration } from './config';
 import { ETH_SEPOLIA_TO_ZKEVM_TESTNET, NATIVE } from './constants/bridges';
@@ -31,8 +31,8 @@ jest.mock('./lib/validation', () => ({
 
 describe('Token Bridge', () => {
   it('Constructor works correctly', async () => {
-    const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
-    const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+    const voidRootProvider = new ethers.JsonRpcProvider('x');
+    const voidChildProvider = new ethers.JsonRpcProvider('x');
 
     const bridgeConfig = new BridgeConfiguration({
       baseConfig: new ImmutableConfiguration({
@@ -51,8 +51,8 @@ describe('Token Bridge', () => {
   describe('getUnsignedBridgeBundledTx', () => {
     let tokenBridge: TokenBridge;
 
-    const mockRootProvider = new ethers.providers.JsonRpcProvider('x');
-    const mockChildProvider = new ethers.providers.JsonRpcProvider('x');
+    const mockRootProvider = new ethers.JsonRpcProvider('x');
+    const mockChildProvider = new ethers.JsonRpcProvider('x');
     const bridgeConfig = new BridgeConfiguration({
       baseConfig: new ImmutableConfiguration({
         environment: Environment.SANDBOX,
@@ -70,10 +70,10 @@ describe('Token Bridge', () => {
         }));
       jest.spyOn(mockRootProvider, 'getFeeData')
         .mockImplementation(async () => ({
-          lastBaseFeePerGas: BigNumber.from('50'),
-          maxFeePerGas: BigNumber.from('100'),
-          maxPriorityFeePerGas: BigNumber.from('50'),
-          gasPrice: BigNumber.from('100'),
+          maxFeePerGas: BigInt('100'),
+          maxPriorityFeePerGas: BigInt('50'),
+          gasPrice: BigInt('100'),
+          toJSON: () => {},
         }));
       tokenBridge = new TokenBridge(bridgeConfig);
     });
@@ -84,8 +84,8 @@ describe('Token Bridge', () => {
 
     it('returns the both approval tx and bridge tx when allowance is insufficient for ERC20', async () => {
       expect.assertions(9);
-      const allowance = ethers.utils.parseUnits('50', 18);
-      const amount = ethers.utils.parseUnits('100', 18);
+      const allowance = ethers.parseUnits('50', 18);
+      const amount = ethers.parseUnits('100', 18);
 
       jest.spyOn(TokenBridge.prototype as any, 'getAllowance')
         .mockImplementation(async () => allowance);
@@ -117,14 +117,14 @@ describe('Token Bridge', () => {
       expect(result.unsignedBridgeTx.to).toBe(
         bridgeConfig.bridgeContracts.rootERC20BridgeFlowRate,
       );
-      expect(result.unsignedBridgeTx.value).toBe(ethers.utils.parseUnits('0.0000000001', 18).toString());
+      expect(result.unsignedBridgeTx.value).toBe(ethers.parseUnits('0.0000000001', 18).toString());
       expect(result.unsignedBridgeTx.data).not.toBeNull();
     });
 
     it('returns the only bridge tx when allowance is more than deposit amount for ERC20', async () => {
       expect.assertions(5);
-      const allowance = ethers.utils.parseUnits('100', 18);
-      const amount = ethers.utils.parseUnits('100', 18);
+      const allowance = ethers.parseUnits('100', 18);
+      const amount = ethers.parseUnits('100', 18);
 
       jest.spyOn(TokenBridge.prototype as any, 'getAllowance')
         .mockImplementation(async () => allowance);
@@ -145,13 +145,13 @@ describe('Token Bridge', () => {
       expect(result.unsignedBridgeTx.to).toBe(
         bridgeConfig.bridgeContracts.rootERC20BridgeFlowRate,
       );
-      expect(result.unsignedBridgeTx.value).toBe(ethers.utils.parseUnits('0.0000000001', 18).toString());
+      expect(result.unsignedBridgeTx.value).toBe(ethers.parseUnits('0.0000000001', 18).toString());
       expect(result.unsignedBridgeTx.data).not.toBeNull();
     });
 
     it('returns the only bridge tx for NATIVE', async () => {
       expect.assertions(5);
-      const amount = ethers.utils.parseUnits('100', 18);
+      const amount = ethers.parseUnits('100', 18);
 
       const req = {
         senderAddress: '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816',
@@ -169,7 +169,7 @@ describe('Token Bridge', () => {
       expect(result.unsignedBridgeTx.to).toBe(
         bridgeConfig.bridgeContracts.rootERC20BridgeFlowRate,
       );
-      expect(result.unsignedBridgeTx.value).toBe(ethers.utils.parseUnits('0.0000000001', 18).add(amount).toString());
+      expect(result.unsignedBridgeTx.value).toBe((ethers.parseUnits('0.0000000001', 18) + amount).toString());
       expect(result.unsignedBridgeTx.data).not.toBeNull();
     });
   });
@@ -177,8 +177,8 @@ describe('Token Bridge', () => {
   describe('getUnsignedApproveBridgeTx', () => {
     let tokenBridge: TokenBridge;
 
-    const mockRootProvider = new ethers.providers.JsonRpcProvider('x');
-    const mockChildProvider = new ethers.providers.JsonRpcProvider('x');
+    const mockRootProvider = new ethers.JsonRpcProvider('x');
+    const mockChildProvider = new ethers.JsonRpcProvider('x');
     const bridgeConfig = new BridgeConfiguration({
       baseConfig: new ImmutableConfiguration({
         environment: Environment.SANDBOX,
@@ -196,10 +196,10 @@ describe('Token Bridge', () => {
         }));
       jest.spyOn(mockRootProvider, 'getFeeData')
         .mockImplementation(async () => ({
-          lastBaseFeePerGas: BigNumber.from('50'),
-          maxFeePerGas: BigNumber.from('100'),
-          maxPriorityFeePerGas: BigNumber.from('50'),
-          gasPrice: BigNumber.from('100'),
+          maxFeePerGas: BigInt('100'),
+          maxPriorityFeePerGas: BigInt('50'),
+          gasPrice: BigInt('100'),
+          toJSON: () => {},
         }));
       tokenBridge = new TokenBridge(bridgeConfig);
     });
@@ -210,8 +210,8 @@ describe('Token Bridge', () => {
 
     it('returns the unsigned approval transaction when allowance is less than deposit amount', async () => {
       expect.assertions(5);
-      const allowance = ethers.utils.parseUnits('50', 18);
-      const amount = ethers.utils.parseUnits('100', 18);
+      const allowance = ethers.parseUnits('50', 18);
+      const amount = ethers.parseUnits('100', 18);
 
       jest.spyOn(TokenBridge.prototype as any, 'getAllowance')
         .mockImplementation(async () => allowance);
@@ -241,8 +241,8 @@ describe('Token Bridge', () => {
 
     it('return null tx when the allowance is greater than the deposit amount', async () => {
       expect.assertions(1);
-      const allowance = ethers.utils.parseUnits('200', 18);
-      const amount = ethers.utils.parseUnits('100', 18);
+      const allowance = ethers.parseUnits('200', 18);
+      const amount = ethers.parseUnits('100', 18);
 
       jest.spyOn(TokenBridge.prototype as any, 'getAllowance')
         .mockImplementation(async () => allowance);
@@ -265,7 +265,7 @@ describe('Token Bridge', () => {
         {
           token: 'NATIVE',
           senderAddress: '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816',
-          amount: ethers.utils.parseUnits('0.01', 18),
+          amount: ethers.parseUnits('0.01', 18),
           sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
           destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
         },
@@ -277,8 +277,8 @@ describe('Token Bridge', () => {
   describe('getUnsignedBridgeTx', () => {
     let tokenBridge: TokenBridge;
 
-    const mockRootProvider = new ethers.providers.JsonRpcProvider('x');
-    const mockChildProvider = new ethers.providers.JsonRpcProvider('x');
+    const mockRootProvider = new ethers.JsonRpcProvider('x');
+    const mockChildProvider = new ethers.JsonRpcProvider('x');
     const bridgeConfig = new BridgeConfiguration({
       baseConfig: new ImmutableConfiguration({
         environment: Environment.SANDBOX,
@@ -295,13 +295,13 @@ describe('Token Bridge', () => {
           sourceChainGas: 120000,
         }));
       jest.spyOn(TokenBridge.prototype as any, 'getAllowance')
-        .mockImplementation(async () => ethers.BigNumber.from(10000));
+        .mockImplementation(async () => BigInt(10000));
       jest.spyOn(mockRootProvider, 'getFeeData')
         .mockImplementation(async () => ({
-          lastBaseFeePerGas: BigNumber.from('50'),
-          maxFeePerGas: BigNumber.from('100'),
-          maxPriorityFeePerGas: BigNumber.from('50'),
-          gasPrice: BigNumber.from('100'),
+          maxFeePerGas: BigInt('100'),
+          maxPriorityFeePerGas: BigInt('50'),
+          gasPrice: BigInt('100'),
+          toJSON: () => {},
         }));
       tokenBridge = new TokenBridge(bridgeConfig);
     });
@@ -314,7 +314,7 @@ describe('Token Bridge', () => {
       expect.assertions(3);
       const recipientAddress = '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816';
       const token = '0x2f14582947E292a2eCd20C430B46f2d27CFE213c';
-      const amount = ethers.utils.parseUnits('0.01', 18);
+      const amount = ethers.parseUnits('0.01', 18);
       const request: BridgeTxRequest = {
         senderAddress: recipientAddress,
         recipientAddress,
@@ -329,7 +329,7 @@ describe('Token Bridge', () => {
       expect(response.unsignedTx.to).toBe(
         bridgeConfig.bridgeContracts.rootERC20BridgeFlowRate,
       );
-      expect(response.unsignedTx.value).toBe(ethers.utils.parseUnits('0.0000000001', 18).toString());
+      expect(response.unsignedTx.value).toBe(ethers.parseUnits('0.0000000001', 18).toString());
       expect(response.unsignedTx.data).not.toBeNull();
     });
 
@@ -337,7 +337,7 @@ describe('Token Bridge', () => {
       expect.assertions(3);
       const recipientAddress = '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816';
       const token = 'NATIVE';
-      const amount = ethers.utils.parseUnits('0.01', 18);
+      const amount = ethers.parseUnits('0.01', 18);
       const request: BridgeTxRequest = {
         senderAddress: recipientAddress,
         recipientAddress,
@@ -350,7 +350,7 @@ describe('Token Bridge', () => {
 
       const response: BridgeTxResponse = await tokenBridge.getUnsignedBridgeTx(request);
       expect(response.unsignedTx.to).toBe(bridgeConfig.bridgeContracts.rootERC20BridgeFlowRate);
-      expect(response.unsignedTx.value).toBe(amount.add(ethers.utils.parseUnits('0.0000000001', 18)).toString());
+      expect(response.unsignedTx.value).toBe((amount + ethers.parseUnits('0.0000000001', 18)).toString());
       expect(response.unsignedTx.data).not.toBeNull();
     });
 
@@ -358,7 +358,7 @@ describe('Token Bridge', () => {
       expect.assertions(3);
       const recipientAddress = '3095171469a0db24D9Fb9C789D62dF22BBAfa816';
       const token = '2f14582947E292a2eCd20C430B46f2d27CFE213c';
-      const amount = ethers.utils.parseUnits('0.01', 18);
+      const amount = ethers.parseUnits('0.01', 18);
       const request: BridgeTxRequest = {
         senderAddress: recipientAddress,
         recipientAddress,
@@ -372,7 +372,7 @@ describe('Token Bridge', () => {
       expect(response.unsignedTx.to).toBe(
         bridgeConfig.bridgeContracts.rootERC20BridgeFlowRate,
       );
-      expect(response.unsignedTx.value).toBe(ethers.utils.parseUnits('0.0000000001', 18).toString());
+      expect(response.unsignedTx.value).toBe(ethers.parseUnits('0.0000000001', 18).toString());
       expect(response.unsignedTx.data).not.toBeNull();
     });
   });
@@ -386,15 +386,15 @@ describe('Token Bridge', () => {
       },
     };
 
-    const sourceChainGas: ethers.BigNumber = ethers.utils.parseUnits('0.000000000015', 18);
-    const approavalGas: ethers.BigNumber = ethers.utils.parseUnits('0.0000000000055', 18);
-    const bridgeFee: ethers.BigNumber = ethers.utils.parseUnits('0.0000000001', 18);
-    const imtblFee: ethers.BigNumber = ethers.BigNumber.from(0);
-    const totalFees: ethers.BigNumber = sourceChainGas.add(bridgeFee).add(imtblFee);
+    const sourceChainGas: bigint = ethers.parseUnits('0.00000000001125', 18);
+    const approavalGas: bigint = ethers.parseUnits('0.000000000004125', 18);
+    const bridgeFee: bigint = ethers.parseUnits('0.0000000001', 18);
+    const imtblFee: bigint = BigInt(0);
+    const totalFees: bigint = sourceChainGas + bridgeFee + imtblFee;
 
     beforeEach(() => {
-      const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
-      const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+      const voidRootProvider = new ethers.JsonRpcProvider('x');
+      const voidChildProvider = new ethers.JsonRpcProvider('x');
       const bridgeConfig = new BridgeConfiguration({
         baseConfig: new ImmutableConfiguration({
           environment: Environment.SANDBOX,
@@ -406,17 +406,17 @@ describe('Token Bridge', () => {
       jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20Contract as any);
       jest.spyOn(voidRootProvider, 'getFeeData')
         .mockImplementation(async () => ({
-          lastBaseFeePerGas: BigNumber.from('50'),
-          maxFeePerGas: BigNumber.from('100'),
-          maxPriorityFeePerGas: BigNumber.from('50'),
-          gasPrice: BigNumber.from('100'),
+          maxFeePerGas: BigInt('100'),
+          maxPriorityFeePerGas: BigInt('50'),
+          gasPrice: BigInt('100'),
+          toJSON: () => {},
         }));
       jest.spyOn(voidChildProvider, 'getFeeData')
         .mockImplementation(async () => ({
-          lastBaseFeePerGas: BigNumber.from('50'),
-          maxFeePerGas: BigNumber.from('100'),
-          maxPriorityFeePerGas: BigNumber.from('50'),
-          gasPrice: BigNumber.from('100'),
+          maxFeePerGas: BigInt('100'),
+          maxPriorityFeePerGas: BigInt('50'),
+          gasPrice: BigInt('100'),
+          toJSON: () => {},
         }));
       tokenBridge = new TokenBridge(bridgeConfig);
     });
@@ -436,10 +436,10 @@ describe('Token Bridge', () => {
       );
 
       expect(result).not.toBeNull();
-      expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
-      expect(result.bridgeFee).toStrictEqual(bridgeFee);
-      expect(result.imtblFee).toStrictEqual(imtblFee);
-      expect(result.totalFees).toStrictEqual(totalFees);
+      expect(result.sourceChainGas.toString()).toStrictEqual(sourceChainGas.toString());
+      expect(result.bridgeFee.toString()).toStrictEqual(bridgeFee.toString());
+      expect(result.imtblFee.toString()).toStrictEqual(imtblFee.toString());
+      expect(result.totalFees.toString()).toStrictEqual(totalFees.toString());
     });
 
     it('returns the deposit fees for ERC20 tokens', async () => {
@@ -451,31 +451,31 @@ describe('Token Bridge', () => {
           sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
           destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
           token: '0x40b87d235A5B010a20A241F15797C9debf1ecd01',
-          amount: ethers.BigNumber.from(1000),
+          amount: BigInt(1000),
         },
       );
 
       expect(result).not.toBeNull();
-      expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
-      expect(result.approvalFee).toStrictEqual(approavalGas);
-      expect(result.bridgeFee).toStrictEqual(bridgeFee);
-      expect(result.imtblFee).toStrictEqual(imtblFee);
-      expect(result.totalFees).toStrictEqual(totalFees.add(approavalGas));
+      expect(result.sourceChainGas.toString()).toStrictEqual(sourceChainGas.toString());
+      expect(result.approvalFee.toString()).toStrictEqual(approavalGas.toString());
+      expect(result.bridgeFee.toString()).toStrictEqual(bridgeFee.toString());
+      expect(result.imtblFee.toString()).toStrictEqual(imtblFee.toString());
+      expect(result.totalFees.toString()).toStrictEqual((totalFees + approavalGas).toString());
     });
   });
 
   describe('getTransactionStatus', () => {
     let tokenBridge: TokenBridge;
 
-    const DEPOSIT_SIG = ethers.utils.keccak256(ethers.utils.toUtf8Bytes('DEPOSIT'));
-    const WITHDRAW_SIG = ethers.utils.keccak256(ethers.utils.toUtf8Bytes('WITHDRAW'));
+    const DEPOSIT_SIG = ethers.keccak256(ethers.toUtf8Bytes('DEPOSIT'));
+    const WITHDRAW_SIG = ethers.keccak256(ethers.toUtf8Bytes('WITHDRAW'));
 
-    const amount = ethers.BigNumber.from(1000);
+    const amount = BigInt(1000);
     const token = '0x40b87d235A5B010a20A241F15797C9debf1ecd01';
     const sender = '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772';
     const recipient = '0xA383968dC8711FFE8A7353AdE9feF7Ddcb1473a0';
 
-    const abiCoder = new ethers.utils.AbiCoder();
+    const abiCoder = new ethers.AbiCoder();
     const mockDepositPayload = abiCoder.encode(
       ['bytes32', 'address', 'address', 'address', 'uint256'],
       [
@@ -507,11 +507,11 @@ describe('Token Bridge', () => {
           withdrawer: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
           token: '0x40b87d235A5B010a20A241F15797C9debf1ecd01',
           amount,
-          timestamp: ethers.BigNumber.from(1000),
+          timestamp: BigInt(1000),
         },
       ]),
-      getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(1)),
-      withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
+      getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => BigInt(1)),
+      withdrawalDelay: jest.fn().mockImplementation(async () => BigInt(60 * 60 * 24)),
     };
 
     const mockERC20ContractFlowRateMultiple = {
@@ -524,17 +524,17 @@ describe('Token Bridge', () => {
           withdrawer: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
           token: '0x40b87d235A5B010a20A241F15797C9debf1ecd01',
           amount,
-          timestamp: ethers.BigNumber.from(1000),
+          timestamp: BigInt(1000),
         },
         {
           withdrawer: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
           token: '0x40b87d235A5B010a20A241F15797C9debf1ecd01',
           amount,
-          timestamp: ethers.BigNumber.from(1001),
+          timestamp: BigInt(1001),
         },
       ]),
-      getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(1)),
-      withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
+      getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => BigInt(1)),
+      withdrawalDelay: jest.fn().mockImplementation(async () => BigInt(60 * 60 * 24)),
     };
 
     const mockERC20Contract = {
@@ -543,12 +543,12 @@ describe('Token Bridge', () => {
         encodeFunctionData: jest.fn(),
       },
       getPendingWithdrawals: jest.fn().mockImplementation(async () => []),
-      getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(0)),
+      getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => BigInt(0)),
     };
 
     beforeEach(() => {
-      const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
-      const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+      const voidRootProvider = new ethers.JsonRpcProvider('x');
+      const voidChildProvider = new ethers.JsonRpcProvider('x');
       const bridgeConfig = new BridgeConfiguration({
         baseConfig: new ImmutableConfiguration({
           environment: Environment.SANDBOX,
@@ -789,7 +789,7 @@ describe('Token Bridge', () => {
       expect(result.transactions[0].recipient).toBe(recipient);
       expect(result.transactions[0].amount).toStrictEqual(amount);
     });
-    it('returns the COMPLETE status for a withdrawal', async () => {
+    it.only('returns the COMPLETE status for a withdrawal', async () => {
       expect.assertions(8);
 
       (queryTransactionStatus as jest.Mock).mockReturnValue({
@@ -971,9 +971,9 @@ describe('Token Bridge', () => {
 
     const recipient = '0xA383968dC8711FFE8A7353AdE9feF7Ddcb1473a0';
     const token = '0x40b87d235A5B010a20A241F15797C9debf1ecd01';
-    const amount = ethers.BigNumber.from(1000);
+    const amount = BigInt(1000);
 
-    const defaultTimestamp = ethers.BigNumber.from(1000);
+    const defaultTimestamp = BigInt(1000);
 
     const mockERC20ContractFlowRate = {
       allowance: jest.fn(),
@@ -988,12 +988,12 @@ describe('Token Bridge', () => {
           timestamp: defaultTimestamp,
         },
       ]),
-      getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(1)),
-      withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
+      getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => BigInt(1)),
+      withdrawalDelay: jest.fn().mockImplementation(async () => BigInt(60 * 60 * 24)),
     };
 
-    const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
-    const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+    const voidRootProvider = new ethers.JsonRpcProvider('x');
+    const voidChildProvider = new ethers.JsonRpcProvider('x');
 
     const bridgeConfig = new BridgeConfiguration({
       baseConfig: new ImmutableConfiguration({
@@ -1030,8 +1030,8 @@ describe('Token Bridge', () => {
       expect(result.pendingWithdrawal.withdrawer).toBe(recipient);
       expect(result.pendingWithdrawal.token).toBe(token);
       expect(result.pendingWithdrawal.amount).toBe(amount);
-      expect(result.pendingWithdrawal.timeoutStart).toBe(defaultTimestamp.toNumber());
-      expect(result.pendingWithdrawal.timeoutEnd).toBe(defaultTimestamp.toNumber() + (60 * 60 * 24));
+      expect(result.pendingWithdrawal.timeoutStart).toBe(Number(defaultTimestamp));
+      expect(result.pendingWithdrawal.timeoutEnd).toBe(Number(defaultTimestamp) + (60 * 60 * 24));
     });
 
     it('throws an error when the index is not valid', async () => {
@@ -1048,14 +1048,14 @@ describe('Token Bridge', () => {
         },
         getPendingWithdrawals: jest.fn().mockImplementation(async () => [
           {
-            withdrawer: ethers.constants.AddressZero,
-            token: ethers.constants.AddressZero,
-            amount: ethers.BigNumber.from(0),
-            timestamp: ethers.BigNumber.from(0),
+            withdrawer: ethers.ZeroAddress,
+            token: ethers.ZeroAddress,
+            amount: BigInt(0),
+            timestamp: BigInt(0),
           },
         ]),
-        getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(0)),
-        withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
+        getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => BigInt(0)),
+        withdrawalDelay: jest.fn().mockImplementation(async () => BigInt(60 * 60 * 24)),
       };
 
       jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateNotFound as any);
@@ -1077,7 +1077,7 @@ describe('Token Bridge', () => {
 
       const timestampNow = Math.floor(Date.now() / 1000);
 
-      const timestamp = ethers.BigNumber.from(timestampNow + (60 * 60 * 12));
+      const timestamp = BigInt(timestampNow + (60 * 60 * 12));
 
       const mockERC20ContractFlowRateNotReady = {
         allowance: jest.fn(),
@@ -1092,7 +1092,7 @@ describe('Token Bridge', () => {
             timestamp,
           },
         ]),
-        withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
+        withdrawalDelay: jest.fn().mockImplementation(async () => BigInt(60 * 60 * 24)),
       };
 
       jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateNotReady as any);
@@ -1104,8 +1104,8 @@ describe('Token Bridge', () => {
       expect(result.pendingWithdrawal.withdrawer).toBe(recipient);
       expect(result.pendingWithdrawal.token).toBe(token);
       expect(result.pendingWithdrawal.amount).toBe(amount);
-      expect(result.pendingWithdrawal.timeoutStart).toBe(timestamp.toNumber());
-      expect(result.pendingWithdrawal.timeoutEnd).toBe(timestamp.toNumber() + (60 * 60 * 24));
+      expect(result.pendingWithdrawal.timeoutStart).toBe(Number(timestamp));
+      expect(result.pendingWithdrawal.timeoutEnd).toBe(Number(timestamp) + (60 * 60 * 24));
     });
   });
 
@@ -1114,10 +1114,10 @@ describe('Token Bridge', () => {
 
     const recipient = '0xA383968dC8711FFE8A7353AdE9feF7Ddcb1473a0';
     const token = '0x40b87d235A5B010a20A241F15797C9debf1ecd01';
-    const amount = ethers.BigNumber.from(1000);
+    const amount = BigInt(1000);
 
-    const defaultTimestamp = ethers.BigNumber.from(1000);
-    const futureTimestamp = ethers.BigNumber.from(1000000000000);
+    const defaultTimestamp = BigInt(1000);
+    const futureTimestamp = BigInt(1000000000000);
 
     const mockERC20ContractFlowRate = {
       allowance: jest.fn(),
@@ -1132,12 +1132,12 @@ describe('Token Bridge', () => {
           timestamp: defaultTimestamp,
         },
       ]),
-      getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(1)),
-      withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
+      getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => BigInt(1)),
+      withdrawalDelay: jest.fn().mockImplementation(async () => BigInt(60 * 60 * 24)),
     };
 
-    const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
-    const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+    const voidRootProvider = new ethers.JsonRpcProvider('x');
+    const voidChildProvider = new ethers.JsonRpcProvider('x');
 
     const bridgeConfig = new BridgeConfiguration({
       baseConfig: new ImmutableConfiguration({
@@ -1171,8 +1171,8 @@ describe('Token Bridge', () => {
       expect(result.pending[0].withdrawer).toBe(recipient);
       expect(result.pending[0].token).toBe(token);
       expect(result.pending[0].amount).toBe(amount);
-      expect(result.pending[0].timeoutStart).toBe(defaultTimestamp.toNumber());
-      expect(result.pending[0].timeoutEnd).toBe(defaultTimestamp.toNumber() + (60 * 60 * 24));
+      expect(result.pending[0].timeoutStart).toBe(Number(defaultTimestamp));
+      expect(result.pending[0].timeoutEnd).toBe(Number(defaultTimestamp) + (60 * 60 * 24));
     });
 
     it('returns the flowRate pending withdrawals [3] when the recipient is valid', async () => {
@@ -1190,24 +1190,24 @@ describe('Token Bridge', () => {
           {
             withdrawer: `${recipient}1`,
             token: `${token}1`,
-            amount: amount.mul(1),
-            timestamp: defaultTimestamp.mul(1),
+            amount: amount * 1n,
+            timestamp: defaultTimestamp * 1n,
           },
           {
             withdrawer: `${recipient}2`,
             token: `${token}2`,
-            amount: amount.mul(2),
+            amount: amount * 2n,
             timestamp: futureTimestamp,
           },
           {
             withdrawer: `${recipient}3`,
             token: `${token}3`,
-            amount: amount.mul(3),
-            timestamp: defaultTimestamp.mul(3),
+            amount: amount * 3n,
+            timestamp: defaultTimestamp * 3n,
           },
         ]),
-        getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(3)),
-        withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
+        getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => BigInt(3)),
+        withdrawalDelay: jest.fn().mockImplementation(async () => BigInt(60 * 60 * 24)),
 
       };
 
@@ -1220,21 +1220,21 @@ describe('Token Bridge', () => {
       expect(result.pending[0].canWithdraw).toBe(true);
       expect(result.pending[0].withdrawer).toBe(`${recipient}1`);
       expect(result.pending[0].token).toBe(`${token}1`);
-      expect(result.pending[0].amount).toStrictEqual(amount.mul(1));
-      expect(result.pending[0].timeoutStart).toBe(defaultTimestamp.mul(1).toNumber());
-      expect(result.pending[0].timeoutEnd).toBe(defaultTimestamp.mul(1).toNumber() + (60 * 60 * 24));
+      expect(result.pending[0].amount).toStrictEqual(amount * 1n);
+      expect(result.pending[0].timeoutStart).toBe(Number(defaultTimestamp * 1n));
+      expect(result.pending[0].timeoutEnd).toBe(Number(defaultTimestamp * 1n) + (60 * 60 * 24));
       expect(result.pending[1].canWithdraw).toBe(false);
       expect(result.pending[1].withdrawer).toBe(`${recipient}2`);
       expect(result.pending[1].token).toBe(`${token}2`);
-      expect(result.pending[1].amount).toStrictEqual(amount.mul(2));
-      expect(result.pending[1].timeoutStart).toBe(futureTimestamp.toNumber());
-      expect(result.pending[1].timeoutEnd).toBe(futureTimestamp.toNumber() + (60 * 60 * 24));
+      expect(result.pending[1].amount).toStrictEqual(amount * 2n);
+      expect(result.pending[1].timeoutStart).toBe(Number(futureTimestamp));
+      expect(result.pending[1].timeoutEnd).toBe(Number(futureTimestamp) + (60 * 60 * 24));
       expect(result.pending[2].canWithdraw).toBe(true);
       expect(result.pending[2].withdrawer).toBe(`${recipient}3`);
       expect(result.pending[2].token).toBe(`${token}3`);
-      expect(result.pending[2].amount).toStrictEqual(amount.mul(3));
-      expect(result.pending[2].timeoutStart).toBe(defaultTimestamp.mul(3).toNumber());
-      expect(result.pending[2].timeoutEnd).toBe(defaultTimestamp.mul(3).toNumber() + (60 * 60 * 24));
+      expect(result.pending[2].amount).toStrictEqual(amount * 3n);
+      expect(result.pending[2].timeoutStart).toBe(Number(defaultTimestamp * 3n));
+      expect(result.pending[2].timeoutEnd).toBe(Number(defaultTimestamp * 3n) + (60 * 60 * 24));
     });
 
     it('returns empty pending array when no flowRated transactions found', async () => {
@@ -1250,14 +1250,14 @@ describe('Token Bridge', () => {
         },
         getPendingWithdrawals: jest.fn().mockImplementation(async () => [
           {
-            withdrawer: ethers.constants.AddressZero,
-            token: ethers.constants.AddressZero,
-            amount: ethers.BigNumber.from(0),
-            timestamp: ethers.BigNumber.from(0),
+            withdrawer: ethers.ZeroAddress,
+            token: ethers.ZeroAddress,
+            amount: BigInt(0),
+            timestamp: BigInt(0),
           },
         ]),
-        getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(0)),
-        withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
+        getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => BigInt(0)),
+        withdrawalDelay: jest.fn().mockImplementation(async () => BigInt(60 * 60 * 24)),
       };
 
       jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateNone as any);
@@ -1273,12 +1273,12 @@ describe('Token Bridge', () => {
     let tokenBridge: TokenBridge;
 
     const token = '0x40b87d235A5B010a20A241F15797C9debf1ecd01';
-    const capacity = ethers.BigNumber.from(500000);
-    const depth = ethers.BigNumber.from(300000);
-    const refillTime = ethers.BigNumber.from(5000);
-    const refillRate = ethers.BigNumber.from(100000);
-    const withdrawalDelay = ethers.BigNumber.from(60 * 60 * 24);
-    const largeTxThreshold = ethers.BigNumber.from(300000);
+    const capacity = BigInt(500000);
+    const depth = BigInt(300000);
+    const refillTime = BigInt(5000);
+    const refillRate = BigInt(100000);
+    const withdrawalDelay = BigInt(60 * 60 * 24);
+    const largeTxThreshold = BigInt(300000);
 
     const mockERC20ContractFlowRate = {
       withdrawalQueueActivated: jest.fn().mockImplementation(async () => false),
@@ -1292,8 +1292,8 @@ describe('Token Bridge', () => {
       largeTransferThresholds: jest.fn().mockImplementation(async () => largeTxThreshold),
     };
 
-    const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
-    const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+    const voidRootProvider = new ethers.JsonRpcProvider('x');
+    const voidChildProvider = new ethers.JsonRpcProvider('x');
 
     const bridgeConfig = new BridgeConfiguration({
       baseConfig: new ImmutableConfiguration({
@@ -1323,10 +1323,10 @@ describe('Token Bridge', () => {
 
       expect(result).toBeDefined();
       expect(result.withdrawalQueueActivated).toBe(false);
-      expect(result.withdrawalDelay).toBe(withdrawalDelay.toNumber());
+      expect(result.withdrawalDelay).toBe(Number(withdrawalDelay));
       expect(result.tokens[token].capacity).toStrictEqual(capacity);
       expect(result.tokens[token].depth).toStrictEqual(depth);
-      expect(result.tokens[token].refillTime).toBe(refillTime.toNumber());
+      expect(result.tokens[token].refillTime).toBe(Number(refillTime));
       expect(result.tokens[token].refillRate).toStrictEqual(refillRate);
     });
 
@@ -1342,10 +1342,10 @@ describe('Token Bridge', () => {
 
       expect(result).toBeDefined();
       expect(result.withdrawalQueueActivated).toBe(false);
-      expect(result.withdrawalDelay).toBe(withdrawalDelay.toNumber());
+      expect(result.withdrawalDelay).toBe(Number(withdrawalDelay));
       expect(result.tokens['NATIVE'].capacity).toStrictEqual(capacity);
       expect(result.tokens['NATIVE'].depth).toStrictEqual(depth);
-      expect(result.tokens['NATIVE'].refillTime).toBe(refillTime.toNumber());
+      expect(result.tokens['NATIVE'].refillTime).toBe(Number(refillTime));
       expect(result.tokens['NATIVE'].refillRate).toStrictEqual(refillRate);
     });
 
@@ -1374,18 +1374,18 @@ describe('Token Bridge', () => {
 
       expect(result).toBeDefined();
       expect(result.withdrawalQueueActivated).toBe(false);
-      expect(result.withdrawalDelay).toBe(withdrawalDelay.toNumber());
+      expect(result.withdrawalDelay).toBe(Number(withdrawalDelay));
       expect(result.tokens['NATIVE'].capacity).toStrictEqual(capacity);
       expect(result.tokens['NATIVE'].depth).toStrictEqual(depth);
-      expect(result.tokens['NATIVE'].refillTime).toBe(refillTime.toNumber());
+      expect(result.tokens['NATIVE'].refillTime).toBe(Number(refillTime));
       expect(result.tokens['NATIVE'].refillRate).toStrictEqual(refillRate);
       expect(result.tokens[token].capacity).toStrictEqual(capacity);
       expect(result.tokens[token].depth).toStrictEqual(depth);
-      expect(result.tokens[token].refillTime).toBe(refillTime.toNumber());
+      expect(result.tokens[token].refillTime).toBe(Number(refillTime));
       expect(result.tokens[token].refillRate).toStrictEqual(refillRate);
       expect(result.tokens[otherToken].capacity).toStrictEqual(capacity);
       expect(result.tokens[otherToken].depth).toStrictEqual(depth);
-      expect(result.tokens[otherToken].refillTime).toBe(refillTime.toNumber());
+      expect(result.tokens[otherToken].refillTime).toBe(Number(refillTime));
       expect(result.tokens[otherToken].refillRate).toStrictEqual(refillRate);
     });
     it('returns the withdrawalQueueActivated as true ', async () => {
@@ -1413,10 +1413,10 @@ describe('Token Bridge', () => {
 
       expect(result).toBeDefined();
       expect(result.withdrawalQueueActivated).toBe(true);
-      expect(result.withdrawalDelay).toBe(withdrawalDelay.toNumber());
+      expect(result.withdrawalDelay).toBe(Number(withdrawalDelay));
       expect(result.tokens['NATIVE'].capacity).toStrictEqual(capacity);
       expect(result.tokens['NATIVE'].depth).toStrictEqual(depth);
-      expect(result.tokens['NATIVE'].refillTime).toBe(refillTime.toNumber());
+      expect(result.tokens['NATIVE'].refillTime).toBe(Number(refillTime));
       expect(result.tokens['NATIVE'].refillRate).toStrictEqual(refillRate);
     });
   });
@@ -1428,8 +1428,8 @@ describe('Token Bridge', () => {
     const childUSDCToken = '0x222';
     const rootUSDCToken = '0x333';
 
-    const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
-    const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+    const voidRootProvider = new ethers.JsonRpcProvider('x');
+    const voidChildProvider = new ethers.JsonRpcProvider('x');
 
     const bridgeConfig = new BridgeConfiguration({
       baseConfig: new ImmutableConfiguration({

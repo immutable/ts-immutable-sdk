@@ -1,5 +1,3 @@
-import { Web3Provider } from '@ethersproject/providers';
-import { Signer } from 'ethers';
 import { AxiosError } from 'axios';
 import { ImxApiClients } from '@imtbl/generated-clients';
 import { StarkSigner } from '@imtbl/x-client';
@@ -8,8 +6,13 @@ import { mockUserImx } from '../../test/mocks';
 import registerPassportStarkEx from './registration';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
 import registerOffchain from './registerOffchain';
+import { Signer } from 'ethers';
+import { BrowserProvider } from 'ethers';
 
-jest.mock('@ethersproject/providers');
+jest.mock('ethers', () => ({
+  ...jest.requireActual('ethers'),
+  BrowserProvider: jest.fn()
+}));
 jest.mock('./registration');
 jest.mock('@imtbl/generated-clients');
 
@@ -34,7 +37,7 @@ const mockStarkSigner = {
 const mockReturnHash = '0x123';
 
 mockGetSigner.mockReturnValue(mockEthSigner);
-(Web3Provider as unknown as jest.Mock).mockReturnValue({
+(BrowserProvider as unknown as jest.Mock).mockReturnValue({
   getSigner: mockGetSigner,
 });
 

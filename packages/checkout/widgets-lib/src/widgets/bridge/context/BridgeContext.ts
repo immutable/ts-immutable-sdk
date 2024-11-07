@@ -1,4 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import { TokenBridge } from '@imtbl/bridge-sdk';
 import {
   WalletProviderName,
@@ -12,7 +12,7 @@ import {
 import { createContext } from 'react';
 
 export type WalletAndNetworkDetails = {
-  web3Provider: Web3Provider;
+  web3Provider: BrowserProvider;
   walletProviderInfo: EIP6963ProviderInfo | undefined;
   walletAddress: string;
   network: ChainId;
@@ -20,7 +20,7 @@ export type WalletAndNetworkDetails = {
 
 export interface BridgeState {
   checkout: Checkout;
-  web3Provider: Web3Provider | null;
+  web3Provider: BrowserProvider | null;
   walletProviderName: WalletProviderName | null;
   from: WalletAndNetworkDetails | null;
   to: WalletAndNetworkDetails | null;
@@ -82,7 +82,7 @@ export interface SetWalletProviderNamePayload {
 
 export interface SetProviderPayload {
   type: BridgeActions.SET_PROVIDER;
-  web3Provider: Web3Provider | null;
+  web3Provider: BrowserProvider | null;
 }
 
 export interface SetTokenBridgePayload {

@@ -1,2 +1,2 @@
-export * from './test-token';
-export * from './test-token-factory';
+export * from './TestERC721Token'
+export * from './TestERC721Token__factory'
