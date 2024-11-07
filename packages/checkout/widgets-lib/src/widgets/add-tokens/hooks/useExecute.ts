@@ -1,4 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
+import { useContext } from 'react';
 import { RouteResponse } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
 import { ethers } from 'ethers';
@@ -6,9 +7,14 @@ import { Environment } from '@imtbl/config';
 import { isSquidNativeToken } from '../functions/isSquidNativeToken';
 import { useError } from './useError';
 import { AddTokensError, AddTokensErrorTypes } from '../types';
+import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { sendAddTokensFailedEvent } from '../AddTokensWidgetEvents';
 
 export const useExecute = (environment: Environment) => {
   const { showErrorHandover } = useError(environment);
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
 
   const handleTransactionError = (err: unknown) => {
     const reason = `${
@@ -37,6 +43,7 @@ export const useExecute = (environment: Environment) => {
       || reason.includes('transaction failed')
     ) {
       errorType = AddTokensErrorTypes.TRANSACTION_FAILED;
+      sendAddTokensFailedEvent(eventTarget, errorType);
     }
 
     if (

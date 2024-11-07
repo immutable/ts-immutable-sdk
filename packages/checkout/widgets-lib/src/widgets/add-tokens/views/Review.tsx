@@ -68,6 +68,8 @@ import {
 import { convertToNetworkChangeableProvider } from '../functions/convertToNetworkChangeableProvider';
 import { SquidFooter } from '../components/SquidFooter';
 import { useError } from '../hooks/useError';
+import { sendAddTokensSuccessEvent } from '../AddTokensWidgetEvents';
+import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
 interface ReviewProps {
   data: AddTokensReviewData;
@@ -103,6 +105,8 @@ export function Review({
       checkout, fromProvider, fromAddress, toAddress,
     },
   } = useProvidersContext();
+
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const [route, setRoute] = useState<RouteResponse | undefined>();
   const [proceedDisabled, setProceedDisabled] = useState(true);
@@ -327,6 +331,8 @@ export function Review({
           txHash: executeTxnReceipt.transactionHash,
         },
       });
+
+      sendAddTokensSuccessEvent(eventTarget, executeTxnReceipt.transactionHash);
 
       showHandover(
         EXECUTE_TXN_ANIMATION,
