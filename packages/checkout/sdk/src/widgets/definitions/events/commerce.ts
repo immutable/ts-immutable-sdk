@@ -38,6 +38,7 @@ export enum CommerceSuccessEventType {
   BRIDGE_SUCCESS = 'BRIDGE_SUCCESS',
   BRIDGE_CLAIM_WITHDRAWAL_SUCCESS = 'BRIDGE_CLAIM_WITHDRAWAL_SUCCESS',
   ADD_TOKENS_SUCCESS = 'ADD_TOKENS_SUCCESS',
+  ADD_TOKENS_CONNECT_SUCCESS = 'ADD_TOKENS_CONNECT_SUCCESS',
 }
 
 export enum CommerceFailureEventType {
@@ -107,7 +108,7 @@ export type CommerceAddTokensSuccessEvent = {
 };
 
 export type CommerceAddTokensConnectSuccessEvent = {
-  type: CommerceSuccessEventType.CONNECT_SUCCESS;
+  type: CommerceSuccessEventType.ADD_TOKENS_CONNECT_SUCCESS;
   data: AddTokensConnectSuccess;
 };
 

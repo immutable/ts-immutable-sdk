@@ -151,7 +151,7 @@ function mapAddTokensWidgetEvent(
       return {
         type: CommerceEventType.SUCCESS,
         data: {
-          type: CommerceSuccessEventType.CONNECT_SUCCESS,
+          type: CommerceSuccessEventType.ADD_TOKENS_CONNECT_SUCCESS,
           data: event.detail.data,
         },
       };
