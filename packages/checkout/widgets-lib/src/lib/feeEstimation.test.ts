@@ -1,7 +1,6 @@
 import {
   GasEstimateBridgeToL2Result, GasEstimateSwapResult, GasEstimateType, OnRampProviderFees,
 } from '@imtbl/checkout-sdk';
-import { BigNumber } from 'ethers';
 import {
   formatFiatDecimals, getBridgeFeeEstimation, getOnRampFeeEstimation, getSwapFeeEstimation,
 } from './feeEstimation';
@@ -41,7 +40,7 @@ describe('feeEstimation', () => {
       const swapFee = {
         gasEstimateType: GasEstimateType.SWAP,
         fees: {
-          totalFees: BigNumber.from(100000000000000),
+          totalFees: BigInt(100000000000000),
           token: {
             name: 'Ethereum',
             symbol: 'ETH',
@@ -74,7 +73,7 @@ describe('feeEstimation', () => {
       const swapFee = {
         gasEstimateType: GasEstimateType.SWAP,
         fees: {
-          totalFees: BigNumber.from(100000000000000),
+          totalFees: BigInt(100000000000000),
         },
       } as GasEstimateSwapResult;
       const conversions: Map<string, number> = new Map([['eth', 1800]]);
@@ -86,7 +85,7 @@ describe('feeEstimation', () => {
       const swapFee = {
         gasEstimateType: GasEstimateType.SWAP,
         fees: {
-          totalFees: BigNumber.from(100000000000000),
+          totalFees: BigInt(100000000000000),
           token: {
             name: 'Immutable X',
             symbol: 'IMX',
@@ -105,7 +104,7 @@ describe('feeEstimation', () => {
       const bridgeFees = {
         gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
         fees: {
-          totalFees: BigNumber.from(100000000000000),
+          totalFees: BigInt(100000000000000),
         },
         token: {
           name: 'Ethereum',
@@ -137,7 +136,7 @@ describe('feeEstimation', () => {
       const bridgeFees = {
         gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
         fees: {
-          totalFees: BigNumber.from(100000000000000),
+          totalFees: BigInt(100000000000000),
         },
       } as GasEstimateBridgeToL2Result;
       const conversions: Map<string, number> = new Map([['eth', 1800]]);
@@ -149,7 +148,7 @@ describe('feeEstimation', () => {
       const bridgeFees = {
         gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
         fees: {
-          totalFees: BigNumber.from(100000000000000),
+          totalFees: BigInt(100000000000000),
         },
         token: {
           name: 'Ethereum',
@@ -168,7 +167,7 @@ describe('feeEstimation', () => {
       const bridgeFees = {
         gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
         fees: {
-          totalFees: BigNumber.from(100000000000000),
+          totalFees: BigInt(100000000000000),
         },
         token: {
           name: 'Ethereum',
@@ -185,7 +184,7 @@ describe('feeEstimation', () => {
       const bridgeFees = {
         gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
         fees: {
-          totalFees: BigNumber.from(100000000000000),
+          totalFees: BigInt(100000000000000),
         },
         token: {
           name: 'Ethereum',

@@ -1,25 +1,25 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import { ChainId } from './chains';
 import { NetworkInfo } from './networkInfo';
 import { TokenInfo } from './tokenInfo';
 
 /**
  * Interface representing the parameters for {@link Checkout.addNetwork}.
- * @property {Web3Provider} provider - The provider to connect to the network.
+ * @property {BrowserProvider} provider - The provider to connect to the network.
  * @property {ChainId} chainId - The ID of the network to add. We only support adding Immutable zkEVM and Immutable zkEVM Testnet.
  */
 export interface AddNetworkParams {
-  provider: Web3Provider;
+  provider: BrowserProvider;
   chainId: ChainId;
 }
 
 /**
  * Interface representing the parameters for {@link Checkout.switchNetwork}.
- * @property {Web3Provider} provider - The provider to connect to the network.
+ * @property {BrowserProvider} provider - The provider to connect to the network.
  * @property {ChainId} chainId - The ID of the network to switch to.
  */
 export interface SwitchNetworkParams {
-  provider: Web3Provider;
+  provider: BrowserProvider;
   chainId: ChainId;
 }
 
@@ -27,19 +27,19 @@ export interface SwitchNetworkParams {
  * Represents the result of switching the network in a Web3 application {@link Checkout.switchNetwork}.
  * @interface SwitchNetworkResult
  * @property {NetworkInfo} network - The information about the switched network.
- * @property {Web3Provider} provider - The Web3 provider for the switched network.
+ * @property {BrowserProvider} provider - The Web3 provider for the switched network.
  */
 export interface SwitchNetworkResult {
   network: NetworkInfo;
-  provider: Web3Provider;
+  provider: BrowserProvider;
 }
 
 /**
  * * Interface representing the parameters for {@link Checkout.getNetworkInfo}.
- * @property {Web3Provider} provider - The provider to connect to the network.
+ * @property {BrowserProvider} provider - The provider to connect to the network.
  */
 export interface GetNetworkParams {
-  provider: Web3Provider;
+  provider: BrowserProvider;
 }
 
 /**

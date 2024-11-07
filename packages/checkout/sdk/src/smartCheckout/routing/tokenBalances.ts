@@ -1,14 +1,13 @@
-import { Web3Provider } from '@ethersproject/providers';
-import { ethers } from 'ethers';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
 import { ChainId, GetAllBalancesResult, AvailableRoutingOptions } from '../../types';
 import { getAllBalances } from '../../balances';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { TokenBalanceResult } from './types';
+import { BrowserProvider, JsonRpcProvider } from 'ethers';
 
 export const getAllTokenBalances = async (
   config: CheckoutConfiguration,
-  readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
+  readOnlyProviders: Map<ChainId, JsonRpcProvider>,
   ownerAddress: string,
   availableRoutingOptions: AvailableRoutingOptions,
 ): Promise<Map<ChainId, TokenBalanceResult>> => {
@@ -32,7 +31,7 @@ export const getAllTokenBalances = async (
     if (readOnlyProviders.has(chainId)) {
       chainBalancePromises.set(chainId, getAllBalances(
         config,
-        readOnlyProviders.get(chainId) as Web3Provider,
+        readOnlyProviders.get(chainId) as unknown as BrowserProvider,
         ownerAddress,
         chainId,
       ));
@@ -49,7 +48,7 @@ export const getAllTokenBalances = async (
   if (readOnlyProviders.has(chainId)) {
     chainBalancePromises.set(chainId, getAllBalances(
       config,
-      readOnlyProviders.get(chainId) as Web3Provider,
+      readOnlyProviders.get(chainId) as unknown as BrowserProvider,
       ownerAddress,
       chainId,
     ));

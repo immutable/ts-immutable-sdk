@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { TokenBridge } from '@imtbl/bridge-sdk';
 import { getBridgeFeeEstimate } from './bridgeGasEstimate';
 import { CheckoutConfiguration } from '../config';
@@ -13,7 +12,7 @@ describe('getBridgeGasEstimate', () => {
   beforeEach(() => {
     tokenBridge = {
       getFee: jest.fn().mockResolvedValue({
-        totalFees: BigNumber.from(280000),
+        totalFees: BigInt(280000),
       }),
     } as unknown as TokenBridge;
     fromChainId = ChainId.ETHEREUM;
@@ -27,6 +26,6 @@ describe('getBridgeGasEstimate', () => {
   it('should return gas estimate for supported eip1159 txn', async () => {
     const result = await getBridgeFeeEstimate(tokenBridge, fromChainId, toChainId, config);
 
-    expect(result.totalFees).toEqual(BigNumber.from(280000));
+    expect(result.totalFees).toEqual(BigInt(280000));
   });
 });

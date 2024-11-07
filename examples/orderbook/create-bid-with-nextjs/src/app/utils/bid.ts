@@ -7,7 +7,7 @@ export const signAndSubmitApproval = async (
   bid: orderbook.PrepareBidResponse,
 ): Promise<void> => {
   // get your user's Web3 wallet, e.g. MetaMask, Passport, etc
-  const signer = provider.getSigner();
+  const signer = await provider.getSigner();
 
   // If the user hasn't yet approved the Immutable Seaport contract to transfer assets from this
   // collection on their behalf they'll need to do so before they create an order
@@ -32,7 +32,7 @@ export const signBid = async (
   bid: orderbook.PrepareBidResponse,
 ): Promise<string> => {
   // get your user's Web3 wallet, e.g. MetaMask, Passport, etc
-  const signer = provider.getSigner();
+  const signer = await provider.getSigner();
 
   // For an order to be created (and subsequently filled), Immutable needs a valid signature for the order data.
   // This signature is stored off-chain and is later provided to any user wishing to fulfil the open order.

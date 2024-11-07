@@ -1,18 +1,18 @@
-import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { signRaw } from '@imtbl/toolkit';
-import { Signer } from '@ethersproject/abstract-signer';
 import { Flow } from '@imtbl/metrics';
 import { getEip155ChainId } from '../walletHelpers';
 import AuthManager from '../../authManager';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
+import { Signer } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 
 export type RegisterZkEvmUserInput = {
   authManager: AuthManager;
   ethSigner: Signer,
   multiRollupApiClients: MultiRollupApiClients,
   accessToken: string;
-  rpcProvider: StaticJsonRpcProvider;
+  rpcProvider: JsonRpcProvider;
   flow: Flow;
 };
 
@@ -33,7 +33,7 @@ export async function registerZkEvmUser({
   const signRawPromise = signRaw(MESSAGE_TO_SIGN, ethSigner);
   signRawPromise.then(() => flow.addEvent('endSignRaw'));
 
-  const detectNetworkPromise = rpcProvider.detectNetwork();
+  const detectNetworkPromise = rpcProvider._detectNetwork();
   detectNetworkPromise.then(() => flow.addEvent('endDetectNetwork'));
 
   const listChainsPromise = multiRollupApiClients.chainsApi.listChains();

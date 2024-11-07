@@ -2,8 +2,8 @@ import {
   useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
 import { Box } from '@biom3/react';
-import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import {
+  ChainId,
   TokenFilterTypes,
   TokenInfo, WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
@@ -52,6 +52,7 @@ import { TransactionList } from './TransactionList';
 import { NoTransactions } from './NoTransactions';
 import { useInjectedProviders } from '../../lib/hooks/useInjectedProviders';
 import { WalletChangeEvent } from '../WalletDrawer/WalletDrawerEvents';
+import { BrowserProvider, JsonRpcProvider } from 'ethers';
 
 type TransactionsProps = {
   defaultTokenImage: string;
@@ -254,10 +255,10 @@ export function Transactions({
         if (event.providerDetail.info.rdns === WalletProviderRdns.METAMASK) {
           changeAccount = true;
         }
-        const web3Provider = new Web3Provider(event.provider as any);
+        const web3Provider = new BrowserProvider(event.provider as any);
         const connectedProvider = await connectToProvider(checkout, web3Provider, changeAccount);
         const network = await connectedProvider.getNetwork();
-        const address = await connectedProvider.getSigner().getAddress();
+        const address = await (await connectedProvider.getSigner()).getAddress();
 
         setTxs([]);
         bridgeDispatch({
@@ -269,7 +270,7 @@ export function Transactions({
                 ...event.providerDetail.info,
               },
               walletAddress: address.toLowerCase(),
-              network: network.chainId,
+              network: network.chainId as unknown as ChainId,
             },
             to: null,
           },

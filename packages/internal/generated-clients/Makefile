@@ -27,7 +27,7 @@ get-mr-openapi:
 
 .PHONY: generate-imx-api-client
 generate-imx-api-client:
-	rimraf src/imx && \
+	pnpm rimraf src/imx && \
     mkdir src/imx && \
 	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v6.2.1 generate \
     -i ./app/src/imx-openapi.json \
@@ -37,7 +37,7 @@ generate-imx-api-client:
 
 .PHONY: generate-mr-api-client
 generate-mr-api-client:
-	rimraf src/multi-rollup && \
+	pnpm rimraf src/multi-rollup && \
     mkdir src/multi-rollup && \
 	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v7.0.1 generate \
     --inline-schema-options REFACTOR_ALLOF_INLINE_SCHEMAS=true \
@@ -55,7 +55,7 @@ generate-blockchain-data: get-blockchain-data-openapi generate-blockchain-data-c
 
 .PHONY: get-blockchain-data-openapi
 get-blockchain-data-openapi:
-	rimraf src/blockchain-data-openapi.json && touch src/blockchain-data-openapi.json && \
+	pnpm rimraf src/blockchain-data-openapi.json && touch src/blockchain-data-openapi.json && \
 	curl -H "Accept: application/json+v3" \
     https://imtbl-sdk.s3.us-east-2.amazonaws.com/openapi/blockchain-data-oas.json \
     -o src/blockchain-data-openapi.json
@@ -67,7 +67,7 @@ generate-blockchain-data-client:
 # TODO remove once combined with API functions in above command
 .PHONY: generate-blockchain-data-types
 generate-blockchain-data-types:
-	rimraf src/blockchain-data && \
+	pnpm rimraf src/blockchain-data && \
     mkdir src/blockchain-data && \
 	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v7.0.1 generate \
     --inline-schema-options REFACTOR_ALLOF_INLINE_SCHEMAS=true \

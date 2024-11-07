@@ -7,7 +7,7 @@ import {
   getPassportProviderDetail,
   WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 
 const DEFAULT_PRIORITY_INDEX = 999;
 
@@ -28,7 +28,7 @@ declare global {
   }
 }
 
-let passportWeb3Provider: Web3Provider;
+let passportBrowserProvider: BrowserProvider;
 const processProviders = (
   checkout: Checkout | null,
   injectedProviders: EIP6963ProviderDetail[],
@@ -53,10 +53,10 @@ const processProviders = (
   if (checkout?.passport
     && priorityWalletRdns.includes(WalletProviderRdns.PASSPORT)
     && !filteredProviders.some((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT)) {
-    if (!passportWeb3Provider) {
-      passportWeb3Provider = new Web3Provider(checkout.passport.connectEvm());
+    if (!passportBrowserProvider) {
+      passportBrowserProvider = new BrowserProvider(checkout.passport.connectEvm());
     }
-    filteredProviders.unshift(getPassportProviderDetail(passportWeb3Provider.provider as EIP1193Provider));
+    filteredProviders.unshift(getPassportProviderDetail(passportBrowserProvider.provider as unknown as EIP1193Provider));
   }
 
   // Filter & sort providers

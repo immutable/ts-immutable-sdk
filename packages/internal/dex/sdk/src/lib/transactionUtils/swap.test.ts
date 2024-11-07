@@ -1,4 +1,3 @@
-import { BigNumber, utils } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import {
@@ -9,7 +8,6 @@ import {
   decodeMulticallExactInputSingleWithoutFees,
   decodeMulticallExactOutputSingleWithFees,
   decodeMulticallExactOutputSingleWithoutFees,
-  expectInstanceOf,
   expectToBeDefined,
   makeAddr,
   formatAmount,
@@ -29,8 +27,9 @@ import { erc20ToUniswapToken, newAmount } from '../utils';
 import { QuoteResult } from '../getQuotesForRoutes';
 import { Coin, ERC20 } from '../../types';
 import { getSwap, adjustQuoteWithFees } from './swap';
+import { parseEther } from 'ethers';
 
-const gasEstimate = BigNumber.from(0);
+const gasEstimate = BigInt(0);
 const slippagePercentage = 3;
 const deadline = 0;
 
@@ -119,7 +118,7 @@ describe('getSwap', () => {
   describe('without fees', () => {
     it('subtracts inverted slippage to calculate the amountOutMinimum', () => {
       const quote = buildExactInputQuote();
-      quote.amountOut.value = utils.parseEther('990');
+      quote.amountOut.value = parseEther('990');
 
       const swap = getSwap(
         quote.amountIn.token,
@@ -130,20 +129,20 @@ describe('getSwap', () => {
         deadline,
         makeAddr('routerContract'),
         makeAddr('swapProxyContract'),
-        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        newAmount(BigInt(0), NATIVE_TEST_TOKEN),
         [],
       );
 
       expectToBeDefined(swap.transaction.data);
       const { swapParams } = decodeMulticallExactInputSingleWithoutFees(swap.transaction.data);
 
-      expectInstanceOf(BigNumber, swapParams.amountOutMinimum);
-      expect(utils.formatEther(swapParams.amountOutMinimum)).toEqual('961.165048543689320388');
+      expect(typeof swapParams.amountOutMinimum).toBe('bigint');
+      expect(formatEther(swapParams.amountOutMinimum)).toEqual('961.165048543689320388');
     });
 
     it('adds non-inverted slippage to calculate the amountInMaximum', () => {
       const quote = buildExactOutputQuote();
-      quote.amountIn.value = utils.parseEther('100');
+      quote.amountIn.value = parseEther('100');
 
       const swap = getSwap(
         quote.amountIn.token,
@@ -154,15 +153,15 @@ describe('getSwap', () => {
         deadline,
         makeAddr('routerContract'),
         makeAddr('swapProxyContract'),
-        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        newAmount(BigInt(0), NATIVE_TEST_TOKEN),
         [],
       );
 
       expectToBeDefined(swap.transaction.data);
       const { swapParams } = decodeMulticallExactOutputSingleWithoutFees(swap.transaction.data);
 
-      expectInstanceOf(BigNumber, swapParams.amountInMaximum);
-      expect(utils.formatEther(swapParams.amountInMaximum)).toEqual('103.0');
+      expect(typeof swapParams.amountInMaximum).toBe('bigint');
+      expect(formatEther(swapParams.amountInMaximum)).toEqual('103.0');
     });
   });
 
@@ -180,7 +179,7 @@ describe('getSwap', () => {
           deadline,
           makeAddr('routerContract'),
           makeAddr('swapProxyContract'),
-          newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+          newAmount(BigInt(0), NATIVE_TEST_TOKEN),
           [],
         );
 
@@ -204,7 +203,7 @@ describe('getSwap', () => {
           deadline,
           makeAddr('routerContract'),
           makeAddr('swapProxyContract'),
-          newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+          newAmount(BigInt(0), NATIVE_TEST_TOKEN),
           [],
         );
 
@@ -228,7 +227,7 @@ describe('getSwap', () => {
           deadline,
           makeAddr('routerContract'),
           makeAddr('swapProxyContract'),
-          newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+          newAmount(BigInt(0), NATIVE_TEST_TOKEN),
           [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
         );
 
@@ -243,7 +242,7 @@ describe('getSwap', () => {
   describe('with fees', () => {
     it('subtracts inverted slippage to calculate the amountOutMinimum', () => {
       const quote = buildExactInputQuote();
-      quote.amountOut.value = utils.parseEther('990');
+      quote.amountOut.value = parseEther('990');
 
       const swap = getSwap(
         quote.amountIn.token,
@@ -254,20 +253,20 @@ describe('getSwap', () => {
         deadline,
         makeAddr('routerContract'),
         makeAddr('swapProxyContract'),
-        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        newAmount(BigInt(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
 
       expectToBeDefined(swap.transaction.data);
       const { swapParams } = decodeMulticallExactInputSingleWithFees(swap.transaction.data);
 
-      expectInstanceOf(BigNumber, swapParams.amountOutMinimum);
-      expect(utils.formatEther(swapParams.amountOutMinimum)).toEqual('961.165048543689320388');
+      expect(typeof swapParams.amountOutMinimum).toBe('bigint');
+      expect(formatEther(swapParams.amountOutMinimum)).toEqual('961.165048543689320388');
     });
 
     it('adds non-inverted slippage to calculate the amountInMaximum', () => {
       const quote = buildExactOutputQuote();
-      quote.amountIn.value = utils.parseEther('100');
+      quote.amountIn.value = parseEther('100');
 
       const swap = getSwap(
         quote.amountIn.token,
@@ -278,15 +277,15 @@ describe('getSwap', () => {
         deadline,
         makeAddr('routerContract'),
         makeAddr('swapProxyContract'),
-        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        newAmount(BigInt(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
 
       expectToBeDefined(swap.transaction.data);
       const { swapParams } = decodeMulticallExactOutputSingleWithFees(swap.transaction.data);
 
-      expectInstanceOf(BigNumber, swapParams.amountInMaximum);
-      expect(utils.formatEther(swapParams.amountInMaximum)).toEqual('103.0');
+      expect(typeof swapParams.amountInMaximum).toBe('bigint');
+      expect(formatEther(swapParams.amountInMaximum)).toEqual('103.0');
     });
   });
 
@@ -295,7 +294,7 @@ describe('getSwap', () => {
       const originalTokenIn = nativeTokenService.nativeToken;
       const originalTokenOut = FUN_TEST_TOKEN;
       const quote = buildExactInputQuote(nativeTokenService.wrappedToken, FUN_TEST_TOKEN);
-      quote.amountIn.value = utils.parseEther('99');
+      quote.amountIn.value = parseEther('99');
 
       const swap = getSwap(
         originalTokenIn,
@@ -306,11 +305,11 @@ describe('getSwap', () => {
         deadline,
         makeAddr('routerContract'),
         makeAddr('swapProxyContract'),
-        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        newAmount(BigInt(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
 
-      expect(formatEther(BigNumber.from(swap.transaction.value))).toEqual('99.0');
+      expect(formatEther(BigInt(swap.transaction.value ?? 0))).toEqual('99.0');
     });
   });
 
@@ -329,7 +328,7 @@ describe('getSwap', () => {
         deadline,
         makeAddr('routerContract'),
         makeAddr('swapProxyContract'),
-        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        newAmount(BigInt(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
 
@@ -340,7 +339,7 @@ describe('getSwap', () => {
   describe('with fees + EXACT_INPUT + single pool + native out', () => {
     it('adds an unwrapNativeToken to the calldata', () => {
       const quote = buildExactInputQuote(FUN_TEST_TOKEN, nativeTokenService.wrappedToken);
-      quote.amountOut.value = utils.parseEther('990');
+      quote.amountOut.value = parseEther('990');
 
       const swap = getSwap(
         quote.amountIn.token,
@@ -351,7 +350,7 @@ describe('getSwap', () => {
         deadline,
         makeAddr('routerContract'),
         makeAddr('swapProxyContract'),
-        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        newAmount(BigInt(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
 
@@ -364,7 +363,7 @@ describe('getSwap', () => {
   describe('with fees + EXACT_INPUT + multi pool + native out', () => {
     it('adds an unwrapNativeToken to the calldata', () => {
       const quote = buildMultiExactInputQuote(FUN_TEST_TOKEN, USDC_TEST_TOKEN, nativeTokenService.wrappedToken);
-      quote.amountOut.value = utils.parseEther('990');
+      quote.amountOut.value = parseEther('990');
 
       const swap = getSwap(
         quote.amountIn.token,
@@ -375,7 +374,7 @@ describe('getSwap', () => {
         deadline,
         makeAddr('routerContract'),
         makeAddr('swapProxyContract'),
-        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        newAmount(BigInt(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
 
@@ -390,7 +389,7 @@ describe('getSwap', () => {
       const originalTokenIn = nativeTokenService.nativeToken;
       const originalTokenOut = FUN_TEST_TOKEN;
       const quote = buildExactOutputQuote(nativeTokenService.wrappedToken, FUN_TEST_TOKEN);
-      quote.amountIn.value = utils.parseEther('100');
+      quote.amountIn.value = parseEther('100');
 
       const swap = getSwap(
         originalTokenIn,
@@ -401,11 +400,11 @@ describe('getSwap', () => {
         deadline,
         makeAddr('routerContract'),
         makeAddr('swapProxyContract'),
-        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        newAmount(BigInt(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
 
-      expect(formatEther(BigNumber.from(swap.transaction.value))).toEqual('103.0');
+      expect(formatEther(BigInt(swap.transaction.value ?? 0))).toEqual('103.0');
     });
   });
 
@@ -424,7 +423,7 @@ describe('getSwap', () => {
         deadline,
         makeAddr('routerContract'),
         makeAddr('swapProxyContract'),
-        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        newAmount(BigInt(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
 
@@ -445,7 +444,7 @@ describe('getSwap', () => {
         deadline,
         makeAddr('routerContract'),
         makeAddr('swapProxyContract'),
-        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        newAmount(BigInt(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
 
@@ -468,7 +467,7 @@ describe('getSwap', () => {
         deadline,
         makeAddr('routerContract'),
         makeAddr('swapProxyContract'),
-        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        newAmount(BigInt(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
 
@@ -583,7 +582,7 @@ describe('adjustQuoteWithFees', () => {
     describe('with fees', () => {
       it('applies fees to the quoted amount', async () => {
         const quote = buildExactOutputQuote();
-        quote.amountOut.value = utils.parseEther('100');
+        quote.amountOut.value = parseEther('100');
         // In this case, the user-specified amount is always equal to the amountOut in the quote
         const userSpecifiedAmountOut = quote.amountOut;
 

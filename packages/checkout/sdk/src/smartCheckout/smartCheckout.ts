@@ -1,4 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import {
   AvailableRoutingOptions,
   FulfillmentTransaction,
@@ -87,7 +87,7 @@ const processRoutes = async (
 
 export const smartCheckout = async (
   config: CheckoutConfiguration,
-  provider: Web3Provider,
+  provider: BrowserProvider,
   itemRequirements: ItemRequirement[],
   transactionOrGasAmount?: FulfillmentTransaction | GasAmount,
   routingOptions?: AvailableRoutingOptions,
@@ -95,7 +95,7 @@ export const smartCheckout = async (
   onFundingRoute?: (fundingRoute: FundingRoute) => void,
   fundingRouteFullAmount: boolean = false,
 ): Promise<SmartCheckoutResult> => {
-  const ownerAddress = await provider.getSigner().getAddress();
+  const ownerAddress = await (await provider.getSigner()).getAddress();
 
   let aggregatedItems = itemAggregator(itemRequirements);
 

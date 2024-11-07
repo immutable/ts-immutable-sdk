@@ -1,4 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from "ethers";
 
 /**
  * Enum representing possible Wallet Widget event types.
@@ -14,7 +14,7 @@ export enum WalletEventType {
  * Represents an event that is triggered when the user switches the network in their wallet.
  * @property {string} network
  * @property {number} chainId
- * @property {Web3Provider} provider
+ * @property {BrowserProvider} provider
  */
 export type WalletNetworkSwitch = {
   /**  The name of the network that the user switched to. */
@@ -22,7 +22,7 @@ export type WalletNetworkSwitch = {
   /**  The chain ID of the network that the user switched to. */
   chainId: number;
   /** The Web3 provider object for the switched network. */
-  provider: Web3Provider;
+  provider: BrowserProvider;
 };
 
 /**

@@ -5,12 +5,10 @@ import {
   EthConfiguration,
   EthSigner,
 } from '@imtbl/x-client';
-import { TransactionResponse } from '@ethersproject/providers';
-import { parseUnits } from '@ethersproject/units';
-import { BigNumber } from '@ethersproject/bignumber';
 import { validateChain } from '../helpers';
 import { Signers } from '../types';
 import { ProviderConfiguration } from '../../config';
+import { parseUnits, TransactionResponse } from 'ethers';
 
 interface ERC20TokenData {
   decimals: number;
@@ -25,7 +23,7 @@ type DepositERC20Params = {
 };
 async function executeDepositERC20(
   ethSigner: EthSigner,
-  quantizedAmount: BigNumber,
+  quantizedAmount: bigint,
   assetType: string,
   starkPublicKey: string,
   vaultId: number,
@@ -36,7 +34,7 @@ async function executeDepositERC20(
     ethSigner,
   );
 
-  const populatedTransaction = await coreContract.populateTransaction.depositERC20(
+  const populatedTransaction = await coreContract.depositERC20.populateTransaction(
     starkPublicKey,
     assetType,
     vaultId,
@@ -77,7 +75,7 @@ export async function depositERC20({
     deposit.tokenAddress,
     ethSigner,
   );
-  const approveTransaction = await tokenContract.populateTransaction.approve(
+  const approveTransaction = await tokenContract.approve.populateTransaction(
     ethConfiguration.coreContractAddress,
     amount,
   );
@@ -112,7 +110,7 @@ export async function depositERC20({
   const assetType = encodingResult.data.asset_type;
   const starkPublicKey = signableDepositResult.data.stark_key;
   const vaultId = signableDepositResult.data.vault_id;
-  const quantizedAmount = BigNumber.from(signableDepositResult.data.amount);
+  const quantizedAmount = BigInt(signableDepositResult.data.amount);
 
   return executeDepositERC20(
     ethSigner,

@@ -16,7 +16,7 @@
     "bootstrap-icons": "^1.10.3",
     "embla-carousel-react": "^8.1.5",
     "enc-utils": "^3.0.0",
-    "ethers": "^5.7.2",
+    "ethers": "^6.13.4",
     "framer-motion": "^11.0.6",
     "next": "14.2.10",
     "react": "^18.2.0",

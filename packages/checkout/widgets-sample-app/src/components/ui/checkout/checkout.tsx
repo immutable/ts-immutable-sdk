@@ -14,7 +14,6 @@ import {
   Sticker,
   Toggle,
 } from "@biom3/react";
-import { Web3Provider, ExternalProvider } from "@ethersproject/providers";
 
 import {
   Checkout,
@@ -33,6 +32,7 @@ import {
 import { Passport } from "@imtbl/passport";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import { Environment, ImmutableConfiguration } from "@imtbl/config";
+import { BrowserProvider, Eip1193Provider } from "ethers";
 
 import { useAsyncMemo, usePrevState } from "../../../hooks";
 import { Message } from "./components/messages";
@@ -105,10 +105,10 @@ const usePassportLoginCallback = (passportClient: Passport) => {
 };
 
 // handle creating and connecting a provider
-const createWeb3Provider = async (
+const createBrowserProvider = async (
   checkoutSdk: Checkout,
   params: CreateProviderParams
-): Promise<Web3Provider> => {
+): Promise<BrowserProvider> => {
   try {
     const { provider } = await checkoutSdk.createProvider({ ...params });
     const { isConnected } = await checkoutSdk.checkIsWalletConnected({
@@ -219,7 +219,7 @@ function CheckoutUI() {
   );
 
   // set a state to keep connected wallet web3Provider
-  const [web3Provider, setWeb3Provider] = useState<Web3Provider | undefined>(
+  const [web3Provider, setBrowserProvider] = useState<BrowserProvider | undefined>(
     undefined
   );
 
@@ -240,7 +240,7 @@ function CheckoutUI() {
   // know connected wallet type
   const isMetamask = web3Provider?.provider?.isMetaMask;
   const isPassport = (
-    web3Provider?.provider as unknown as ExternalProvider & {
+    web3Provider?.provider as unknown as Eip1193Provider & {
       isPassport: boolean;
     }
   )?.isPassport;
@@ -312,7 +312,7 @@ function CheckoutUI() {
     //   checkout.CheckoutEventType.PROVIDER_UPDATED,
     //   ({ provider, ...data }) => {
     //     console.log('PROVIDER_UPDATED ---->', provider);
-    //     setWeb3Provider(provider);
+    //     setBrowserProvider(provider);
     //     setEventResults((prev) => [
     //       ...prev,
     //       { providerUpdated: true, ...data },
@@ -323,7 +323,7 @@ function CheckoutUI() {
       if (payload.type === CommerceSuccessEventType.CONNECT_SUCCESS) {
         const { provider, ...data } = payload.data;
         console.log("SUCCESS ---->", provider);
-        setWeb3Provider(provider);
+        setBrowserProvider(provider);
         setEventResults((prev) => [...prev, { success: true, ...data }]);
       }
     });
@@ -378,7 +378,7 @@ function CheckoutUI() {
       unmount();
     }
     if (prevRenderAfterConnect === true && renderAfterConnect === false) {
-      setWeb3Provider(undefined);
+      setBrowserProvider(undefined);
     }
   }, [renderAfterConnect, prevRenderAfterConnect, unmount]);
 
@@ -588,12 +588,12 @@ function CheckoutUI() {
                       variant="secondary"
                       onClick={async () => {
                         if (web3Provider) {
-                          setWeb3Provider(undefined);
+                          setBrowserProvider(undefined);
                           return;
                         }
 
-                        setWeb3Provider(
-                          await createWeb3Provider(checkoutSdk, {
+                        setBrowserProvider(
+                          await createBrowserProvider(checkoutSdk, {
                             walletProviderName: WalletProviderName.PASSPORT,
                           })
                         );
@@ -618,12 +618,12 @@ function CheckoutUI() {
                       variant="secondary"
                       onClick={async () => {
                         if (web3Provider) {
-                          setWeb3Provider(undefined);
+                          setBrowserProvider(undefined);
                           return;
                         }
 
-                        setWeb3Provider(
-                          await createWeb3Provider(checkoutSdk, {
+                        setBrowserProvider(
+                          await createBrowserProvider(checkoutSdk, {
                             walletProviderName: WalletProviderName.METAMASK,
                           })
                         );

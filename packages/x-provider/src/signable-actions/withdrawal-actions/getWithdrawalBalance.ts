@@ -1,9 +1,8 @@
-import { Signer } from '@ethersproject/abstract-signer';
 import {
   AnyToken, Contracts, EncodingApi, ERC721Token, ImmutableXConfiguration, MintsApi,
 } from '@imtbl/x-client';
-import { BigNumber } from '@ethersproject/bignumber';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
+import { Signer } from 'ethers';
 
 async function getWithdrawalBalance(
   signer: Signer,
@@ -22,7 +21,7 @@ async function getETHWithdrawalBalance(
   signer: Signer,
   ownerKey: string,
   config: ImmutableXConfiguration,
-): Promise<BigNumber> {
+): Promise<bigint> {
   const assetType = await getEncodeAssetInfo('asset', 'ETH', config);
   return await getWithdrawalBalance(
     signer,
@@ -37,7 +36,7 @@ async function getERC20WithdrawalBalance(
   ownerKey: string,
   tokenAddress: string,
   config: ImmutableXConfiguration,
-): Promise<BigNumber> {
+): Promise<bigint> {
   const assetType = await getEncodeAssetInfo('asset', 'ERC20', config, {
     token_address: tokenAddress,
   });
@@ -56,7 +55,7 @@ async function getERC721WithdrawalBalance(
   encodingApi: EncodingApi,
   mintsApi: MintsApi,
   config: ImmutableXConfiguration,
-): Promise<BigNumber> {
+): Promise<bigint> {
   try {
     const mintableToken = await mintsApi
       .getMintableTokenDetailsByClientTokenId({
@@ -112,7 +111,7 @@ export async function getWithdrawalBalanceWorkflow(
   encodingApi: EncodingApi,
   mintsApi: MintsApi,
   config: ImmutableXConfiguration,
-): Promise<BigNumber> {
+): Promise<bigint> {
   switch (token.type) {
     case 'ETH':
       return await getETHWithdrawalBalance(
@@ -147,7 +146,7 @@ export async function getWithdrawalBalances(
   ethAddress: string,
   token: AnyToken,
   config: ImmutableXConfiguration,
-): Promise<{ v3Balance: BigNumber; v4Balance: BigNumber }> {
+): Promise<{ v3Balance: bigint; v4Balance: bigint }> {
   const encodingApi = new EncodingApi(config.apiConfiguration);
   const mintsApi = new MintsApi(config.apiConfiguration);
 
@@ -180,7 +179,7 @@ export async function getWithdrawalBalancesERC721(
   token: AnyToken,
   config: ImmutableXConfiguration,
   mintsApi: MintsApi,
-): Promise<{ v3Balance: BigNumber; v4Balance: BigNumber }> {
+): Promise<{ v3Balance: bigint; v4Balance: bigint }> {
   const encodingApi = new EncodingApi(config.apiConfiguration);
 
   const v3Balance = await getWithdrawalBalanceWorkflow(

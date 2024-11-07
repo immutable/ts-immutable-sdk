@@ -1,8 +1,8 @@
-import { ethers, zeroPadValue, TypedDataField } from 'ethers-v6';
+import { TypedDataField, zeroPadValue } from "ethers";
 
 const baseDefaults: Record<string, any> = {
   integer: 0,
-  address: ethers.zeroPadValue('0x', 20),
+  address: zeroPadValue('0x', 20),
   bool: false,
   bytes: '0x',
   string: '',

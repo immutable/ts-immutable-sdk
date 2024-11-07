@@ -1,7 +1,7 @@
-import { ethers } from 'ethers';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { connect } from './metaMask';
 import { WALLET_ACTION } from './rpc';
+import { BrowserProvider } from 'ethers';
 
 jest.mock('@metamask/detect-provider');
 
@@ -18,7 +18,7 @@ describe('the connect function', () => {
       method: WALLET_ACTION.CONNECT,
     });
     expect(web3Provider).not.toBeNull();
-    expect(web3Provider).toBeInstanceOf(ethers.providers.Web3Provider);
+    expect(web3Provider).toBeInstanceOf(BrowserProvider);
   });
 
   it('Should switch to the mainnet', async () => {
@@ -33,7 +33,7 @@ describe('the connect function', () => {
       method: WALLET_ACTION.SWITCH_CHAIN,
       params: [{ chainId: '0x1' }],
     });
-    expect(web3Provider).toBeInstanceOf(ethers.providers.Web3Provider);
+    expect(web3Provider).toBeInstanceOf(BrowserProvider);
   });
 
   it('Should throw an error', async () => {
