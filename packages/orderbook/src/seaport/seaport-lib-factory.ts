@@ -1,62 +1,19 @@
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
-import { FetchRequest, JsonRpcProvider, JsonRpcSigner } from 'ethers-v6';
-import { providers } from 'ethers';
 import { SEAPORT_CONTRACT_VERSION_V1_5 } from './constants';
+import { JsonRpcProvider } from 'ethers';
 
-export type SeaportVersion =
-  typeof SEAPORT_CONTRACT_VERSION_V1_5;
-
-// The order book module only supports V5 JsonRpcProviders. These are instantiated
-// by the environment or by providing an RPC URL override. For this reason we can
-// safely instantiate a V6 provider for the V5 provider URL.
-function convertToV6Provider(
-  provider: providers.JsonRpcProvider,
-  rateLimitingKey?: string,
-): JsonRpcProvider {
-  const fetch = new FetchRequest(provider.connection.url);
-  if (rateLimitingKey) {
-    fetch.setHeader('x-api-key', rateLimitingKey);
-  }
-
-  const overwrittenProvider = new JsonRpcProvider(fetch);
-
-  // Need to override the getSigner method to mimic V5 behaviour
-  overwrittenProvider.getSigner = async function getSigner(
-    address?: number | string,
-  ): Promise<JsonRpcSigner> {
-    if (address == null) {
-      // eslint-disable-next-line no-param-reassign
-      address = 0;
-    }
-
-    const accountsPromise = this.send('eth_accounts', []);
-
-    // Account index
-    if (typeof (address) === 'number') {
-      const accounts = <Array<string>>(await accountsPromise);
-      if (address >= accounts.length) { throw new Error('no such account'); }
-      return new JsonRpcSigner(this, accounts[address]);
-    }
-
-    // Account address
-    // This is where the override comes in to effect. We explicitly do not confirm if the
-    // provider has access to the address as a signer.
-    return new JsonRpcSigner(this, address);
-  };
-
-  return overwrittenProvider;
-}
+export type SeaportVersion = typeof SEAPORT_CONTRACT_VERSION_V1_5;
 
 export class SeaportLibFactory {
   constructor(
     private readonly defaultSeaportContractAddress: string,
-    private readonly provider: providers.JsonRpcProvider,
+    private readonly provider: JsonRpcProvider,
   ) { }
 
   create(orderSeaportAddress?: string, rateLimitingKey?: string): SeaportLib {
     const seaportContractAddress = orderSeaportAddress ?? this.defaultSeaportContractAddress;
 
-    return new SeaportLib(convertToV6Provider(this.provider, rateLimitingKey), {
+    return new SeaportLib(this.provider, {
       balanceAndApprovalChecksOnOrderCreation: true,
       overrides: {
         contractAddress: seaportContractAddress,

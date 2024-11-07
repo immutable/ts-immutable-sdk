@@ -5,12 +5,10 @@ import {
   EthSigner,
   ImmutableXConfiguration,
 } from '@imtbl/x-client';
-import { parseUnits } from '@ethersproject/units';
-import { BigNumber } from '@ethersproject/bignumber';
-import { TransactionResponse } from '@ethersproject/providers';
 import { validateChain } from '../helpers';
 import { Signers } from '../types';
 import { ProviderConfiguration } from '../../config';
+import { parseUnits, TransactionResponse } from 'ethers';
 
 interface ETHTokenData {
   decimals: number;
@@ -24,7 +22,7 @@ type DepositEthParams = {
 
 async function executeDepositEth(
   ethSigner: EthSigner,
-  amount: BigNumber,
+  amount: bigint,
   assetType: string,
   starkPublicKey: string,
   vaultId: number,
@@ -35,6 +33,7 @@ async function executeDepositEth(
     ethSigner,
   );
 
+  // @ts-expect-error populateTransaction['deposit(uint256,uint256,uint256)'] is not in the types for CoreV4 but it is in the implementation
   const populatedTransaction = await coreContract.populateTransaction[
     'deposit(uint256,uint256,uint256)'
   ](starkPublicKey, assetType, vaultId);

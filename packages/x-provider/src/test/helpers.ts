@@ -1,8 +1,8 @@
-import { Signer } from '@ethersproject/abstract-signer';
 import { ImmutableXConfiguration, StarkSigner } from '@imtbl/x-client';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { Signers } from '../signable-actions/types';
 import { ProviderConfiguration } from '../config';
+import { Signer } from 'ethers';
 
 export const privateKey1 = 'd90915fa5bce418a23184c9asdfasfasdf5c8e900e3035cf34e2dd36';
 export const privateKey2 = '013fe4a5265bc6deb3f3b524b987sdf987f8c7a8ec2a998ae0512f493d763c8f';

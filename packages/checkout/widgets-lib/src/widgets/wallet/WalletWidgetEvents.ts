@@ -1,4 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import {
   NetworkInfo,
   IMTBLWidgetEvents,
@@ -25,7 +25,7 @@ export function sendWalletWidgetCloseEvent(eventTarget: Window | EventTarget) {
 
 export function sendNetworkSwitchEvent(
   eventTarget: Window | EventTarget,
-  provider: Web3Provider,
+  provider: BrowserProvider,
   network: NetworkInfo,
 ) {
   const walletWidgetSwitchNetworkEvent = new CustomEvent<

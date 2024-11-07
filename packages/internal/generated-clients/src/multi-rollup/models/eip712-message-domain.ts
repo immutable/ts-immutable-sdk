@@ -34,10 +34,10 @@ export interface EIP712MessageDomain {
     'version'?: string;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof EIP712MessageDomain
      */
-    'chainId'?: number;
+    'chainId'?: string;
     /**
      * 
      * @type {string}

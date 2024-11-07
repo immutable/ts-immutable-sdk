@@ -1,7 +1,6 @@
-import { keccak256 } from '@ethersproject/solidity';
 import { FeeAmount } from '@uniswap/v3-sdk';
-import { ethers } from 'ethers';
 import { ERC20Pair } from './generateERC20Pairs';
+import { AbiCoder, getCreate2Address, keccak256 } from 'ethers';
 
 // Hard-coded into factory contract
 const POOL_INIT_CODE_HASH = '0xe34f199b19b2b4f47f68442619d555527d244f78a3297ea89325f843f87b8b54';
@@ -20,16 +19,13 @@ export function computePoolAddress({
   // erc20 addresses need to be in alphabetical order to correctly identify a pool
   // eslint-disable-next-line @typescript-eslint/no-use-before-define, no-param-reassign
   erc20Pair = ensureCorrectERC20AddressOrder(erc20Pair);
-  return ethers.utils.getCreate2Address(
+  return getCreate2Address(
     factoryAddress,
     keccak256(
-      ['bytes'],
-      [
-        ethers.utils.defaultAbiCoder.encode(
+        AbiCoder.defaultAbiCoder().encode(
           ['address', 'address', 'uint24'],
           [erc20Pair[0].address, erc20Pair[1].address, fee],
         ),
-      ],
     ),
     initCodeHashManualOverride ?? POOL_INIT_CODE_HASH,
   );

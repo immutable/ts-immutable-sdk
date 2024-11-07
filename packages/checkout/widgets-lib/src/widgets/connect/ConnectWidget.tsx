@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-no-constructed-context-values */
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import {
   ChainId,
   Checkout,
@@ -63,7 +63,7 @@ export type ConnectWidgetInputs = ConnectWidgetParams & {
   sendCloseEventOverride?: () => void;
   allowedChains?: ChainId[];
   checkout: Checkout;
-  web3Provider?: Web3Provider;
+  web3Provider?: BrowserProvider;
   isCheckNetworkEnabled?: boolean;
   sendGoBackEventOverride?: () => void;
   showBackButton?: boolean;

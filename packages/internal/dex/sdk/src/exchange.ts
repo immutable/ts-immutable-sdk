@@ -1,4 +1,3 @@
-import { BigNumber, ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import assert from 'assert';
 import { DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError } from './errors';
@@ -32,6 +31,7 @@ import {
 } from './types';
 import { getSwap, adjustQuoteWithFees } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
+import { BigNumberish, FetchRequest, Interface, JsonRpcProvider } from 'ethers';
 
 const toPublicQuote = (
   amount: CoinAmount<Coin>,
@@ -59,9 +59,9 @@ type WrapUnwrapTransactionDetails = {
 };
 
 export class Exchange {
-  private provider: ethers.providers.StaticJsonRpcProvider;
+  private provider: JsonRpcProvider;
 
-  private batchProvider: ethers.providers.JsonRpcBatchProvider;
+  private batchProvider: JsonRpcProvider;
 
   private router: Router;
 
@@ -90,15 +90,11 @@ export class Exchange {
     this.routerContractAddress = config.chain.contracts.swapRouter;
     this.swapProxyContractAddress = config.chain.contracts.immutableSwapProxy;
 
-    this.provider = new ethers.providers.StaticJsonRpcProvider({
-      url: config.chain.rpcUrl,
-      skipFetchSetup: true,
-    }, config.chain.chainId);
+    this.provider = new JsonRpcProvider(config.chain.rpcUrl, config.chain.chainId, {
+      staticNetwork: true
+    });
 
-    this.batchProvider = new ethers.providers.JsonRpcBatchProvider({
-      url: config.chain.rpcUrl,
-      skipFetchSetup: true,
-    }, config.chain.chainId);
+    this.batchProvider = new JsonRpcProvider(config.chain.rpcUrl, config.chain.chainId);
 
     const multicallContract = Multicall__factory.connect(config.chain.contracts.multicall, this.provider);
 
@@ -127,7 +123,7 @@ export class Exchange {
     assert(slippagePercent >= 0, new InvalidSlippageError('slippage percent must be greater than or equal to 0'));
   }
 
-  private async getSecondaryFees(provider: ethers.providers.JsonRpcBatchProvider) {
+  private async getSecondaryFees(provider: JsonRpcProvider) {
     if (this.secondaryFees.length === 0) {
       return [];
     }
@@ -157,12 +153,12 @@ export class Exchange {
 
   private async getUnwrapTransaction(
     fromAddress: string,
-    tokenAmount: BigNumber,
-    wimxInterface: ethers.utils.Interface,
+    tokenAmount: bigint,
+    wimxInterface: Interface,
     gasPrice: CoinAmount<Native> | null,
   ): Promise<WrapUnwrapTransactionDetails> {
     const calldata = wimxInterface.encodeFunctionData('withdraw', [tokenAmount]);
-    const gasEstimate = ethers.BigNumber.from(IMX_UNWRAP_GAS_COST);
+    const gasEstimate = BigInt(IMX_UNWRAP_GAS_COST);
 
     const gasFeeEstimate = gasPrice ? toPublicAmount(calculateGasFee(false, gasPrice, gasEstimate)) : null;
     // This transaction is for calling calling `withdraw` on the WETH/WIMX contract.
@@ -183,12 +179,12 @@ export class Exchange {
 
   private getWrapTransaction(
     fromAddress: string,
-    tokenAmount: BigNumber,
-    wimxInterface: ethers.utils.Interface,
+    tokenAmount: bigint,
+    wimxInterface: Interface,
     gasPrice: CoinAmount<Native> | null,
   ): WrapUnwrapTransactionDetails {
     const calldata = wimxInterface.encodeFunctionData('deposit');
-    const gasEstimate = ethers.BigNumber.from(IMX_WRAP_GAS_COST);
+    const gasEstimate = BigInt(IMX_WRAP_GAS_COST);
 
     const gasFeeEstimate = gasPrice ? toPublicAmount(calculateGasFee(false, gasPrice, gasEstimate)) : null;
     // This transaction is for calling calling `deposit` on the WETH/WIMX contract.
@@ -255,7 +251,7 @@ export class Exchange {
     fromAddress: string,
     tokenInLiteral: string,
     tokenOutLiteral: string,
-    amount: ethers.BigNumber,
+    amount: bigint,
     slippagePercent: number,
     maxHops: number,
     deadline: number,
@@ -365,7 +361,7 @@ export class Exchange {
     fromAddress: string,
     tokenInAddress: string,
     tokenOutAddress: string,
-    amountIn: ethers.BigNumberish,
+    amountIn: BigNumberish,
     slippagePercent: number = DEFAULT_SLIPPAGE,
     maxHops: number = DEFAULT_MAX_HOPS,
     deadline: number = getDefaultDeadlineSeconds(),
@@ -374,7 +370,7 @@ export class Exchange {
       fromAddress,
       tokenInAddress,
       tokenOutAddress,
-      ethers.BigNumber.from(amountIn),
+      BigInt(amountIn),
       slippagePercent,
       maxHops,
       deadline,
@@ -399,7 +395,7 @@ export class Exchange {
     fromAddress: string,
     tokenInAddress: string,
     tokenOutAddress: string,
-    amountOut: ethers.BigNumberish,
+    amountOut: BigNumberish,
     slippagePercent: number = DEFAULT_SLIPPAGE,
     maxHops: number = DEFAULT_MAX_HOPS,
     deadline: number = getDefaultDeadlineSeconds(),
@@ -408,7 +404,7 @@ export class Exchange {
       fromAddress,
       tokenInAddress,
       tokenOutAddress,
-      ethers.BigNumber.from(amountOut),
+      BigInt(amountOut),
       slippagePercent,
       maxHops,
       deadline,

@@ -1,5 +1,4 @@
 import { ChainId, GetBalanceResult, WalletProviderName } from '@imtbl/checkout-sdk';
-import { BigNumber } from '@ethersproject/bignumber';
 import {
   SetSwitchNetworkPayload,
   WalletActions,
@@ -48,7 +47,7 @@ describe('WalletContext', () => {
       type: WalletActions.SET_TOKEN_BALANCES,
       tokenBalances: [
         {
-          balance: BigNumber.from('1000000000000000000'),
+          balance: BigInt('1000000000000000000'),
           formattedBalance: '1',
           token: {
             name: 'Ethereum',
@@ -67,7 +66,7 @@ describe('WalletContext', () => {
     });
     expect(tokenBalances).toEqual([
       {
-        balance: BigNumber.from('1000000000000000000'),
+        balance: BigInt('1000000000000000000'),
         formattedBalance: '1',
         token: {
           name: 'Ethereum',

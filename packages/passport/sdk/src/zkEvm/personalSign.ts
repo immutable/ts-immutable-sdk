@@ -1,16 +1,15 @@
-import { Signer } from '@ethersproject/abstract-signer';
-import { StaticJsonRpcProvider } from '@ethersproject/providers';
-import { BigNumber } from 'ethers';
 import { Flow } from '@imtbl/metrics';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { hexToString } from '../utils/string';
 import GuardianClient from '../guardian';
 import { RelayerClient } from './relayerClient';
 import { packSignatures, signERC191Message } from './walletHelpers';
+import { Signer } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 
 interface PersonalSignParams {
   ethSigner: Signer;
-  rpcProvider: StaticJsonRpcProvider;
+  rpcProvider: JsonRpcProvider;
   params: any[];
   zkEvmAddress: string;
   guardianClient: GuardianClient;
@@ -40,9 +39,9 @@ export const personalSign = async ({
 
   // Convert message into a string if it's a hex
   const payload = hexToString(message);
-  const { chainId } = await rpcProvider.detectNetwork();
+  const { chainId } = await rpcProvider._detectNetwork();
   flow.addEvent('endDetectNetwork');
-  const chainIdBigNumber = BigNumber.from(chainId);
+  const chainIdBigNumber = BigInt(chainId);
 
   // Sign the message with the EOA without blocking
   const eoaSignaturePromise = signERC191Message(chainIdBigNumber, payload, ethSigner, fromAddress);

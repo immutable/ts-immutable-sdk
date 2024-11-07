@@ -1,4 +1,3 @@
-import { TransactionRequest } from '@ethersproject/providers';
 import {
   Action,
   TransactionPurpose,
@@ -6,6 +5,7 @@ import {
   SignablePurpose,
 } from '@imtbl/orderbook';
 import { UnsignedMessage, UnsignedTransactions } from './types';
+import { TransactionRequest } from 'ethers';
 
 export const getUnsignedSellTransactions = async (
   actions: Action[],

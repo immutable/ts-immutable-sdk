@@ -1,5 +1,3 @@
-import { Web3Provider } from '@ethersproject/providers';
-import { BigNumber, Contract, utils } from 'ethers';
 import { HttpStatusCode } from 'axios';
 import {
   ChainId,
@@ -25,10 +23,11 @@ import {
 } from '../env';
 import { measureAsyncExecution } from '../logger/debugLogger';
 import { isMatchingAddress } from '../utils/utils';
+import { BrowserProvider, Contract, formatUnits } from 'ethers';
 
 export const getBalance = async (
   config: CheckoutConfiguration,
-  web3Provider: Web3Provider,
+  web3Provider: BrowserProvider,
   walletAddress: string,
 ): Promise<GetBalanceResult> => await withCheckoutError<GetBalanceResult>(
   async () => {
@@ -45,7 +44,7 @@ export const getBalance = async (
     const balance = await web3Provider.getBalance(walletAddress);
     return {
       balance,
-      formattedBalance: utils.formatUnits(
+      formattedBalance: formatUnits(
         balance,
         networkInfo.nativeCurrency.decimals,
       ),
@@ -56,7 +55,7 @@ export const getBalance = async (
 );
 
 export async function getERC20Balance(
-  web3Provider: Web3Provider,
+  web3Provider: BrowserProvider,
   walletAddress: string,
   tokenAddress: string,
 ) {
@@ -73,7 +72,7 @@ export async function getERC20Balance(
         contract.balanceOf(walletAddress),
       ])
         .then(([tokenInfo, balance]) => {
-          const formattedBalance = utils.formatUnits(balance, tokenInfo.decimals);
+          const formattedBalance = formatUnits(balance, tokenInfo.decimals);
           return {
             balance,
             formattedBalance,
@@ -193,7 +192,7 @@ export const getBlockscoutBalance = async (
     const tokenData = item.token || {};
 
     if (item.value == null) return;
-    const balance = BigNumber.from(item.value);
+    const balance = BigInt(item.value);
 
     let decimals = parseInt(tokenData.decimals, 10);
     if (Number.isNaN(decimals)) decimals = DEFAULT_TOKEN_DECIMALS;
@@ -206,7 +205,7 @@ export const getBlockscoutBalance = async (
       icon,
     };
 
-    const formattedBalance = utils.formatUnits(item.value, token.decimals);
+    const formattedBalance = formatUnits(item.value, token.decimals);
 
     balances.push({ balance, formattedBalance, token } as GetBalanceResult);
   });
@@ -216,7 +215,7 @@ export const getBlockscoutBalance = async (
 
 export const getBalances = async (
   config: CheckoutConfiguration,
-  web3Provider: Web3Provider,
+  web3Provider: BrowserProvider,
   walletAddress: string,
   tokens: TokenInfo[],
 ): Promise<GetBalancesResult> => {
@@ -256,7 +255,7 @@ export const getBalances = async (
 
 const getTokenBalances = async (
   config: CheckoutConfiguration,
-  web3Provider: Web3Provider | undefined,
+  web3Provider: BrowserProvider | undefined,
   walletAddress: string | undefined,
   chainId: ChainId,
   filterTokens: TokenInfo[],
@@ -272,7 +271,7 @@ const getTokenBalances = async (
   // Fails in fetching data from the RCP calls might result in some
   // missing data.
   let address = walletAddress;
-  if (!address) address = await web3Provider?.getSigner().getAddress();
+  if (!address) address = await (await web3Provider?.getSigner()).getAddress();
   return await measureAsyncExecution<GetBalancesResult>(
     config,
     `Time to fetch balances using RPC for ${chainId}`,
@@ -282,7 +281,7 @@ const getTokenBalances = async (
 
 export const getAllBalances = async (
   config: CheckoutConfiguration,
-  web3Provider: Web3Provider | undefined,
+  web3Provider: BrowserProvider | undefined,
   walletAddress: string | undefined,
   chainId: ChainId,
   forceFetch: boolean = false,
@@ -314,7 +313,7 @@ export const getAllBalances = async (
   }
 
   if (Blockscout.isChainSupported(chainId)) {
-    const address = walletAddress ?? await web3Provider?.getSigner().getAddress();
+    const address = walletAddress ?? await (await web3Provider?.getSigner())?.getAddress();
 
     try {
       return await measureAsyncExecution<GetAllBalancesResult>(

@@ -15,10 +15,10 @@ const filterTokens = (allowedTokens: TokenInfo[], balances: TokenBalanceResult |
       if ('address' in token) {
         return balances.balances.find(
           (balance) => isMatchingAddress(balance.token.address, token.address)
-          && balance.balance.gt(0),
+          && balance.balance > 0,
         );
       }
-      return balances.balances.find((balance) => !('address' in balance.token) && balance.balance.gt(0));
+      return balances.balances.find((balance) => !('address' in balance.token) && balance.balance > 0);
     });
   }
 

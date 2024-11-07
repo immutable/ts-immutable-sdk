@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { ethers, isAddress, Network } from 'ethers';
 import {
   BridgeBundledTxRequest, BridgeFeeActions, BridgeFeeRequest, FungibleToken,
 } from '../types';
@@ -14,7 +14,7 @@ import {
 
 export async function validateChainConfiguration(config: BridgeConfiguration): Promise<void> {
   const errMessage = 'Please upgrade to the latest version of the Bridge SDK or provide valid configuration';
-  const rootNetwork = await withBridgeError<ethers.providers.Network>(
+  const rootNetwork = await withBridgeError<Network>(
     async () => config.rootProvider.getNetwork(),
     BridgeErrorType.ROOT_PROVIDER_ERROR,
   );
@@ -27,7 +27,7 @@ export async function validateChainConfiguration(config: BridgeConfiguration): P
     );
   }
 
-  const childNetwork = await withBridgeError<ethers.providers.Network>(
+  const childNetwork = await withBridgeError<Network>(
     async () => config.childProvider.getNetwork(),
     BridgeErrorType.CHILD_PROVIDER_ERROR,
   );
@@ -72,7 +72,7 @@ export async function checkReceiver(
 
   try {
     // try to estimate gas for the receive function, if it works it exists
-    await contract.estimateGas.receive();
+    await contract.receive.estimateGas();
   } catch {
     try {
       // if receive fails, try to estimate this way which will work if a fallback function is present
@@ -131,7 +131,7 @@ export async function validateBridgeReqArgs(
   await validateChainIds(req.sourceChainId, req.destinationChainId, config);
 
   // Validate address
-  if (!ethers.utils.isAddress(req.senderAddress) || !ethers.utils.isAddress(req.recipientAddress)) {
+  if (!isAddress(req.senderAddress) || !isAddress(req.recipientAddress)) {
     throw new BridgeError(
       `address ${req.senderAddress} or ${req.recipientAddress} is not a valid address`,
       BridgeErrorType.INVALID_ADDRESS,
@@ -139,7 +139,7 @@ export async function validateBridgeReqArgs(
   }
 
   // Validate amount
-  if (req.amount.isNegative() || req.amount.isZero()) {
+  if (req.amount <= 0n) {
     throw new BridgeError(
       `deposit amount ${req.amount.toString()} is invalid`,
       BridgeErrorType.INVALID_AMOUNT,
@@ -147,7 +147,7 @@ export async function validateBridgeReqArgs(
   }
 
   // If the token is not native, it must be a valid address
-  if (req.token.toUpperCase() !== NATIVE && !ethers.utils.isAddress(req.token)) {
+  if (req.token.toUpperCase() !== NATIVE && !isAddress(req.token)) {
     throw new BridgeError(
       `token address ${req.token} is not a valid address`,
       BridgeErrorType.INVALID_ADDRESS,

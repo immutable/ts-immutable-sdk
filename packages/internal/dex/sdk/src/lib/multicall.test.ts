@@ -1,8 +1,4 @@
-import { ethers, providers } from 'ethers';
-import { getCreate2Address } from '@ethersproject/address';
-import { keccak256 } from '@ethersproject/solidity';
-import { defaultAbiCoder } from '@ethersproject/abi';
-import { Contract } from '@ethersproject/contracts';
+import { Contract, getCreate2Address, JsonRpcProvider, keccak256, AbiCoder } from 'ethers';
 import {
   multicallSingleCallDataMultipleContracts,
   multicallMultipleCallDataSingContract,
@@ -21,25 +17,28 @@ import { Multicall__factory } from '../contracts/types';
 const token0 = 'token0';
 const POOL_INIT_CODE_HASH = '0xe34f199b19b2b4f47f68442619d555527d244f78a3297ea89325f843f87b8b54';
 
-jest.mock('@ethersproject/contracts');
+jest.mock('ethers', () => ({
+  ...jest.requireActual('ethers'),
+  Contract: jest.fn(),
+}));
 
 describe('multicallSingleCallDataMultipleContracts', () => {
   let mockedContract: jest.Mock;
   beforeEach(() => {
     mockedContract = (Contract as unknown as jest.Mock).mockImplementationOnce(
       () => ({
-        callStatic: {
+        multicall: {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          multicall: async () => ({
+          staticCall: async () => ({
             returnData: [
               {
-                returnData: ethers.utils.defaultAbiCoder.encode(
+                returnData: AbiCoder.defaultAbiCoder().encode(
                   ['address'],
                   [WETH_TEST_TOKEN.address],
                 ),
               },
               {
-                returnData: ethers.utils.defaultAbiCoder.encode(
+                returnData: AbiCoder.defaultAbiCoder().encode(
                   ['address'],
                   [WETH_TEST_TOKEN.address],
                 ),
@@ -57,32 +56,26 @@ describe('multicallSingleCallDataMultipleContracts', () => {
       const addr: string = getCreate2Address(
         coreFactoryV3,
         keccak256(
-          ['bytes'],
-          [
-            defaultAbiCoder.encode(
-              ['address', 'address', 'uint24'],
-              [WETH_TEST_TOKEN.address, IMX_TEST_TOKEN.address, '3000'],
-            ),
-          ],
+          AbiCoder.defaultAbiCoder().encode(
+            ['address', 'address', 'uint24'],
+            [WETH_TEST_TOKEN.address, IMX_TEST_TOKEN.address, '3000'],
+          ),
         ),
         POOL_INIT_CODE_HASH,
       );
       const addrToken0: string = getCreate2Address(
         coreFactoryV3,
         keccak256(
-          ['bytes'],
-          [
-            defaultAbiCoder.encode(
-              ['address', 'address', 'uint24'],
-              [WETH_TEST_TOKEN.address, IMX_TEST_TOKEN.address, '10000'],
-            ),
-          ],
+          AbiCoder.defaultAbiCoder().encode(
+            ['address', 'address', 'uint24'],
+            [WETH_TEST_TOKEN.address, IMX_TEST_TOKEN.address, '10000'],
+          ),
         ),
         POOL_INIT_CODE_HASH,
       );
 
       const addresses = [addr, addrToken0];
-      const provider = new providers.JsonRpcProvider(
+      const provider = new JsonRpcProvider(
         TEST_RPC_URL,
         TEST_CHAIN_ID,
       );
@@ -99,11 +92,11 @@ describe('multicallSingleCallDataMultipleContracts', () => {
 
       const encodedToken0First = result.returnData[0].returnData;
       const encodedToken0Second = result.returnData[1].returnData;
-      const decodedToken0First = ethers.utils.defaultAbiCoder.decode(
+      const decodedToken0First = AbiCoder.defaultAbiCoder().decode(
         ['address'],
         encodedToken0First,
       )[0];
-      const decodedToken0Second = ethers.utils.defaultAbiCoder.decode(
+      const decodedToken0Second = AbiCoder.defaultAbiCoder().decode(
         ['address'],
         encodedToken0Second,
       )[0];
@@ -120,19 +113,19 @@ describe('multicallMultipleCallDataSingContract', () => {
   beforeEach(() => {
     mockedContract = (Contract as unknown as jest.Mock).mockImplementation(
       () => ({
-        callStatic: {
+        multicall: {
           // TODO fix
           // eslint-disable-next-line no-promise-executor-return, @typescript-eslint/no-unused-vars
-          multicall: async () => ({
+          staticCall: async () => ({
             returnData: [
               {
-                returnData: ethers.utils.defaultAbiCoder.encode(
+                returnData: AbiCoder.defaultAbiCoder().encode(
                   ['address'],
                   [WETH_TEST_TOKEN.address],
                 ),
               },
               {
-                returnData: ethers.utils.defaultAbiCoder.encode(
+                returnData: AbiCoder.defaultAbiCoder().encode(
                   ['address'],
                   [WETH_TEST_TOKEN.address],
                 ),
@@ -156,18 +149,15 @@ describe('multicallMultipleCallDataSingContract', () => {
       const addrToken0: string = getCreate2Address(
         coreFactoryV3,
         keccak256(
-          ['bytes'],
-          [
-            defaultAbiCoder.encode(
-              ['address', 'address', 'uint24'],
-              [WETH_TEST_TOKEN.address, USDC_TEST_TOKEN.address, '10000'],
-            ),
-          ],
+          AbiCoder.defaultAbiCoder().encode(
+            ['address', 'address', 'uint24'],
+            [WETH_TEST_TOKEN.address, USDC_TEST_TOKEN.address, '10000'],
+          ),
         ),
         POOL_INIT_CODE_HASH,
       );
 
-      const provider = new providers.JsonRpcProvider(
+      const provider = new JsonRpcProvider(
         TEST_RPC_URL,
         TEST_CHAIN_ID,
       );

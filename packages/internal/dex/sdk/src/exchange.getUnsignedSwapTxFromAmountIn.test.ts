@@ -1,9 +1,4 @@
-import { JsonRpcProvider, JsonRpcBatchProvider } from '@ethersproject/providers';
-import { Contract } from '@ethersproject/contracts';
-import { BigNumber } from '@ethersproject/bignumber';
-import { constants, utils } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { PaymentsExtended, SwapRouter } from '@uniswap/router-sdk';
 import { InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError, NoRoutesAvailableError } from './errors';
 import { ERC20__factory } from './contracts/types/factories/ERC20__factory';
 import { SecondaryFee } from './types';
@@ -29,7 +24,6 @@ import {
   formatAmount,
   formatEther,
   USDC_TEST_TOKEN,
-  expectInstanceOf,
   newAmountFromString,
   formatTokenAmount,
   WIMX_TEST_TOKEN,
@@ -47,9 +41,16 @@ import {
   TEST_MAX_PRIORITY_FEE_PER_GAS,
   TEST_BASE_FEE,
 } from './test/utils';
+import { Contract, getAddress, JsonRpcProvider, ZeroAddress } from 'ethers';
+import { Interface } from 'ethers';
+import swapRouterContract from '@uniswap/swap-router-contracts/artifacts/contracts/interfaces/ISwapRouter02.sol/ISwapRouter02.json'
+import { abi as PaymentsExtendedAbi } from '@uniswap/swap-router-contracts/artifacts/contracts/interfaces/IPeripheryPaymentsWithFeeExtended.sol/IPeripheryPaymentsWithFeeExtended.json'
 
-jest.mock('@ethersproject/providers');
-jest.mock('@ethersproject/contracts');
+jest.mock('ethers', () => ({
+  ...jest.requireActual('ethers'),
+  Contract: jest.fn(),
+  JsonRpcProvider: jest.fn(),
+}));
 jest.mock('./lib/router');
 jest.mock('./lib/utils', () => ({
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -63,7 +64,7 @@ jest.mock('./lib/utils', () => ({
 
 const HIGHER_SLIPPAGE = 0.2;
 const APPROVED_AMOUNT = newAmountFromString('1', USDC_TEST_TOKEN);
-const APPROVE_GAS_ESTIMATE = BigNumber.from('100000'); // gas units
+const APPROVE_GAS_ESTIMATE = BigInt('100000'); // gas units
 
 describe('getUnsignedSwapTxFromAmountIn', () => {
   let erc20Contract: jest.Mock<any, any, any>;
@@ -79,12 +80,12 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       connect: jest.fn().mockResolvedValue(erc20Contract),
     })) as unknown as JsonRpcProvider;
 
-    (JsonRpcBatchProvider as unknown as jest.Mock).mockImplementation(() => ({
-      getBlock: async () => buildBlock({ baseFeePerGas: BigNumber.from(TEST_BASE_FEE) }),
+    (JsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
+      getBlock: async () => buildBlock({ baseFeePerGas: BigInt(TEST_BASE_FEE) }),
       send: jest.fn().mockImplementation(async (method) => {
         switch (method) {
           case 'eth_maxPriorityFeePerGas':
-            return BigNumber.from(TEST_MAX_PRIORITY_FEE_PER_GAS);
+            return BigInt(TEST_MAX_PRIORITY_FEE_PER_GAS);
           default:
             throw new Error('Method not implemented');
         }
@@ -173,7 +174,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
     it('should have no approval if already approved', async () => {
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
-      const amountIn = newAmount(BigNumber.from(APPROVED_AMOUNT.value), nativeTokenService.wrappedToken);
+      const amountIn = newAmount(BigInt(APPROVED_AMOUNT.value), nativeTokenService.wrappedToken);
       const { approval } = await exchange.getUnsignedSwapTxFromAmountIn(
         TEST_FROM_ADDRESS,
         nativeTokenService.wrappedToken.address,
@@ -240,7 +241,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         secondResponse.swap.transaction.data,
       );
 
-      expect(secondDeadline.toBigInt()).toBeGreaterThan(firstDeadline.toBigInt());
+      expect(secondDeadline).toBeGreaterThan(firstDeadline);
     });
 
     it('uses the native IMX as the gas token', async () => {
@@ -291,11 +292,11 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const data = swap.transaction.data.toString();
 
       const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
-      expectInstanceOf(BigNumber, swapParams.amountIn);
+      expect(typeof swapParams.amountIn).toBe('bigint');
 
       expect(swapParams.tokenIn).toBe(params.inputToken); // input token
       expect(swapParams.tokenOut).toBe(params.outputToken); // output token
-      expect(swapParams.fee).toBe(10000); // fee
+      expect(swapParams.fee).toBe(BigInt(10000)); // fee
       expect(swapParams.recipient).toBe(params.fromAddress); // recipient
       expect(swap.transaction.to).toBe(TEST_ROUTER_ADDRESS); // to address
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
@@ -321,7 +322,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       expectToBeDefined(tx.swap.gasFeeEstimate);
 
-      expect(tx.swap.gasFeeEstimate.value).toEqual(TEST_TRANSACTION_GAS_USAGE.mul(TEST_GAS_PRICE));
+      expect(tx.swap.gasFeeEstimate.value).toEqual(TEST_TRANSACTION_GAS_USAGE * TEST_GAS_PRICE);
       expect(tx.swap.gasFeeEstimate.token.chainId).toEqual(NATIVE_TEST_TOKEN.chainId);
       expect(tx.swap.gasFeeEstimate.token.address).toEqual('native'); // Default configuration is a native token for gas and not an ERC20
       expect(tx.swap.gasFeeEstimate.token.decimals).toEqual(NATIVE_TEST_TOKEN.decimals);
@@ -372,11 +373,11 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const data = swap.transaction.data.toString();
 
       const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
-      expectInstanceOf(BigNumber, swapParams.amountIn);
+      expect(typeof swapParams.amountIn).toBe('bigint');
 
       expect(swapParams.tokenIn).toBe(params.inputToken); // input token
       expect(swapParams.tokenOut).toBe(params.outputToken); // output token
-      expect(swapParams.fee).toBe(10000); // fee
+      expect(swapParams.fee).toBe(BigInt(10000)); // fee
       expect(swapParams.recipient).toBe(params.fromAddress); // recipient
       expect(swap.transaction.to).toBe(TEST_ROUTER_ADDRESS); // to address
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
@@ -436,14 +437,14 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const data = swap.transaction.data.toString();
 
       const { swapParams, secondaryFeeParams } = decodeMulticallExactInputSingleWithFees(data);
-      expectInstanceOf(BigNumber, swapParams.amountIn);
+      expect(typeof swapParams.amountIn).toBe('bigint');
 
       expect(secondaryFeeParams[0].recipient).toBe(TEST_FEE_RECIPIENT);
       expect(secondaryFeeParams[0].basisPoints.toString()).toBe('100');
 
       expect(swapParams.tokenIn).toBe(params.inputToken);
       expect(swapParams.tokenOut).toBe(params.outputToken);
-      expect(swapParams.fee).toBe(10000);
+      expect(swapParams.fee).toBe(BigInt(10000));
       expect(swapParams.recipient).toBe(params.fromAddress);
       expect(formatTokenAmount(swapParams.amountIn, USDC_TEST_TOKEN)).toBe('100.0'); // swap.amountIn = userQuoteReq.amountIn
       expect(formatEther(swapParams.amountOutMinimum)).toBe('961.165048543689320388'); // swap.amountOutMinimum = ourQuoteRes.amountOut - slippage
@@ -454,7 +455,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swap.transaction.value).toBe('0x00');
       expect(
         swap.gasFeeEstimate?.value.toString(),
-      ).toBe((TEST_TRANSACTION_GAS_USAGE.add(AVERAGE_SECONDARY_FEE_EXTRA_GAS)).mul(TEST_GAS_PRICE).toString());
+      ).toBe(((TEST_TRANSACTION_GAS_USAGE + BigInt(AVERAGE_SECONDARY_FEE_EXTRA_GAS)) * TEST_GAS_PRICE).toString());
     });
   });
 
@@ -481,7 +482,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const data = swap.transaction.data.toString();
 
       const { swapParams } = decodeMulticallExactInputSingleWithFees(data);
-      expectInstanceOf(BigNumber, swapParams.amountIn);
+      expect(typeof swapParams.amountIn).toBe('bigint');
 
       expect(swapParams.tokenIn).toBe(WIMX_TEST_TOKEN.address); // should be the wrapped native token
       expect(swapParams.tokenOut).toBe(FUN_TEST_TOKEN.address);
@@ -510,7 +511,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const data = swap.transaction.data.toString();
 
       const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
-      expectInstanceOf(BigNumber, swapParams.amountIn);
+      expect(typeof swapParams.amountIn).toBe('bigint');
 
       expect(swapParams.tokenIn).toBe(WIMX_TEST_TOKEN.address); // should be the wrapped native token
       expect(swapParams.tokenOut).toBe(FUN_TEST_TOKEN.address);
@@ -527,7 +528,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         makeAddr('fromAddress'),
         'native',
         FUN_TEST_TOKEN.address,
-        BigNumber.from(1),
+        BigInt(1),
       );
 
       expect(result.quote.amount.token.address).toEqual(FUN_TEST_TOKEN.address);
@@ -542,7 +543,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         makeAddr('fromAddress'),
         'native',
         FUN_TEST_TOKEN.address,
-        BigNumber.from(1),
+        BigInt(1),
       );
 
       expect(result.approval).toBeNull();
@@ -553,8 +554,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
       });
 
-      const swapRouterInterface = SwapRouter.INTERFACE;
-      const paymentsInterface = PaymentsExtended.INTERFACE;
+      const swapRouterInterface = new Interface(swapRouterContract.abi)
+      const paymentsInterface = new Interface(PaymentsExtendedAbi)
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
       // Sell 100 native tokens for X amount of FUN where the exchange rate is 1 token-in : 10 token-out
@@ -607,7 +608,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const data = swap.transaction.data.toString();
 
       const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
-      expectInstanceOf(BigNumber, swapParams.amountIn);
+      expect(typeof swapParams.amountIn).toBe('bigint');
 
       expect(swapParams.tokenIn).toBe(FUN_TEST_TOKEN.address); // should be the token-in
       expect(swapParams.tokenOut).toBe(WIMX_TEST_TOKEN.address); // should be the wrapped native token
@@ -624,7 +625,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         makeAddr('fromAddress'),
         FUN_TEST_TOKEN.address,
         'native',
-        BigNumber.from(1),
+        BigInt(1),
       );
 
       expect(result.quote.amount.token.address).toEqual('native');
@@ -637,8 +638,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
       });
 
-      const swapRouterInterface = SwapRouter.INTERFACE;
-      const paymentsInterface = PaymentsExtended.INTERFACE;
+      const swapRouterInterface = new Interface(swapRouterContract.abi)
+      const paymentsInterface = new Interface(PaymentsExtendedAbi)
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
       // Buy 100 native tokens for X amount of FUN where the exchange rate is 1 token-in : 10 token-out
@@ -666,8 +667,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const swapFunctionFragment = swapRouterInterface.getFunction(swapFunctionCalldata.slice(0, 10));
       const unwrapFunctionFragment = paymentsInterface.getFunction(unwrapWETHFunctionCalldata.slice(0, 10));
 
-      expect(swapFunctionFragment.name).toEqual('exactInputSingle');
-      expect(unwrapFunctionFragment.name).toEqual('unwrapWETH9');
+      expect(swapFunctionFragment?.name).toEqual('exactInputSingle');
+      expect(unwrapFunctionFragment?.name).toEqual('unwrapWETH9');
     });
 
     it('should specify the quoted amount with slippage applied in the unwrapWETH9 function calldata', async () => {
@@ -675,8 +676,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
       });
 
-      const swapRouterInterface = SwapRouter.INTERFACE;
-      const paymentsInterface = PaymentsExtended.INTERFACE;
+      const swapRouterInterface = new Interface(swapRouterContract.abi)
+      const paymentsInterface = new Interface(PaymentsExtendedAbi)
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
       // Buy 100 native tokens for X amount of FUN where the exchange rate is 1 token-in : 10 token-out
@@ -744,8 +745,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           ],
         });
 
-        const swapRouterInterface = SwapRouter.INTERFACE;
-        const paymentsInterface = PaymentsExtended.INTERFACE;
+        const swapRouterInterface = new Interface(swapRouterContract.abi)
+        const paymentsInterface = new Interface(PaymentsExtendedAbi)
         const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
         // Sell 100 native tokens for X amount of FUN where the exchange rate is 1 token-in : 10 token-out
@@ -831,7 +832,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         const data = swap.transaction.data.toString();
 
         const { swapParams, secondaryFeeParams } = decodeMulticallExactInputWithFees(data);
-        expectInstanceOf(BigNumber, swapParams.amountIn);
+        expect(typeof swapParams.amountIn).toBe('bigint');
 
         expect(secondaryFeeParams[0].recipient).toBe(TEST_FEE_RECIPIENT);
         expect(secondaryFeeParams[0].basisPoints.toString()).toBe(TEST_MAX_FEE_BASIS_POINTS.toString());
@@ -842,9 +843,9 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         expect(swap.transaction.from).toBe(params.fromAddress); // from address
         expect(swap.transaction.value).toBe('0x00'); // refers to 0 amount of the native token
 
-        expect(utils.getAddress(decodedPath.inputToken)).toBe(params.inputToken);
-        expect(utils.getAddress(decodedPath.intermediaryToken)).toBe(params.intermediaryToken);
-        expect(utils.getAddress(decodedPath.outputToken)).toBe(params.outputToken);
+        expect(getAddress(decodedPath.inputToken)).toBe(params.inputToken);
+        expect(getAddress(decodedPath.intermediaryToken)).toBe(params.intermediaryToken);
+        expect(getAddress(decodedPath.outputToken)).toBe(params.outputToken);
         expect(decodedPath.firstPoolFee.toString()).toBe('10000');
         expect(decodedPath.secondPoolFee.toString()).toBe('10000');
 
@@ -1013,7 +1014,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       );
 
       expectToBeDefined(tx.approval?.gasFeeEstimate);
-      expect(tx.approval.gasFeeEstimate.value).toEqual(TEST_GAS_PRICE.mul(APPROVE_GAS_ESTIMATE));
+      expect(tx.approval.gasFeeEstimate.value).toEqual(TEST_GAS_PRICE * APPROVE_GAS_ESTIMATE);
       expect(tx.approval.gasFeeEstimate.token.chainId).toEqual(NATIVE_TEST_TOKEN.chainId);
       expect(tx.approval.gasFeeEstimate.token.address).toEqual('native');
       expect(tx.approval.gasFeeEstimate.token.decimals).toEqual(NATIVE_TEST_TOKEN.decimals);
@@ -1068,7 +1069,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
-      const invalidAddress = constants.AddressZero;
+      const invalidAddress = ZeroAddress;
 
       await expect(
         exchange.getUnsignedSwapTxFromAmountIn(

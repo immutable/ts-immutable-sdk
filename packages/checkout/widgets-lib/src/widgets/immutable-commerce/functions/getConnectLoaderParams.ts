@@ -1,5 +1,5 @@
 import { ChainId, Checkout, CommerceFlowType } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import { ConnectLoaderParams } from '../../../components/ConnectLoader/ConnectLoader';
 import { getL1ChainId, getL2ChainId } from '../../../lib/networkUtils';
 import { View } from '../../../context/view-context/ViewContext';
@@ -17,7 +17,7 @@ const getChainId = (checkout: Checkout) => (checkout.config.isProduction
 export function getConnectLoaderParams(
   view: View,
   checkout: Checkout,
-  web3Provider: Web3Provider | undefined,
+  web3Provider: BrowserProvider | undefined,
 ): ConnectLoaderParams {
   const { type, data } = view;
 

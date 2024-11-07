@@ -1,5 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
-import { utils } from 'ethers';
+import { BrowserProvider, parseUnits } from 'ethers';
 import { getTokenContract } from '../../instance';
 import { getItemRequirementsFromRequirements } from './itemRequirements';
 import {
@@ -11,7 +10,7 @@ describe('itemRequirements', () => {
   describe('getItemRequirementsFromParams', () => {
     it('should map each token requirement to an itemRequirement with BigNumber amount', async () => {
       (getTokenContract as jest.Mock).mockReturnValue({ decimals: jest.fn().mockResolvedValue(18) });
-      const mockProvider = {} as Web3Provider;
+      const mockProvider = {} as BrowserProvider;
       const erc20ItemRequirements: (NativeItemRequirement | ERC20ItemRequirement | ERC721ItemRequirement)[] = [
         {
           type: ItemType.NATIVE,
@@ -42,18 +41,18 @@ describe('itemRequirements', () => {
       expect(itemRequirements).toEqual([
         {
           type: ItemType.NATIVE,
-          amount: utils.parseUnits('2.0', 18),
+          amount: parseUnits('2.0', 18),
         },
         {
           type: ItemType.ERC20,
           spenderAddress: '0xSPENDER',
-          amount: utils.parseUnits('1.5', 18),
+          amount: parseUnits('1.5', 18),
           tokenAddress: '0xCONTRACTADDRESS1',
         },
         {
           type: ItemType.ERC20,
           spenderAddress: '0xSPENDER',
-          amount: utils.parseUnits('0.5', 18),
+          amount: parseUnits('0.5', 18),
           tokenAddress: '0xCONTRACTADDRESS2',
         },
         {

@@ -1,4 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import { Squid } from '@0xsquid/sdk';
 import { CosmosBalance, TokenBalance } from '@0xsquid/sdk/dist/types';
 import { Chain } from '../types';
@@ -6,10 +6,10 @@ import { Chain } from '../types';
 export const fetchBalances = async (
   squid: Squid,
   chains: Chain[],
-  provider: Web3Provider,
+  provider: BrowserProvider,
 ): Promise<TokenBalance[]> => {
   const chainIds = chains.map((chain) => chain.id);
-  const address = await provider?.getSigner().getAddress();
+  const address = await (await provider.getSigner()).getAddress();
 
   const promises: Promise<{
     cosmosBalances?: CosmosBalance[];

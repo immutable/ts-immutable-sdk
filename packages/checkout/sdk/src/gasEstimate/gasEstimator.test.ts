@@ -1,4 +1,4 @@
-import { BigNumber, Contract, ethers } from 'ethers';
+import { Contract, ethers, JsonRpcProvider } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { Exchange, TransactionResponse } from '@imtbl/dex-sdk';
 import { TokenBridge } from '@imtbl/bridge-sdk';
@@ -27,7 +27,7 @@ jest.mock('ethers', () => ({
 }));
 
 describe('gasServiceEstimator', () => {
-  let readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
+  let readOnlyProviders: Map<ChainId, JsonRpcProvider>;
   let config: CheckoutConfiguration;
   let decimalsMock: jest.Mock;
   let nameMock: jest.Mock;
@@ -43,7 +43,7 @@ describe('gasServiceEstimator', () => {
       symbol: symbolMock,
     });
 
-    readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>([
+    readOnlyProviders = new Map<ChainId, JsonRpcProvider>([
       [
         ChainId.SEPOLIA,
         {
@@ -52,7 +52,7 @@ describe('gasServiceEstimator', () => {
             maxPriorityFeePerGas: '0x1',
             gasPrice: null,
           }),
-        } as unknown as ethers.providers.JsonRpcProvider,
+        } as unknown as JsonRpcProvider,
       ],
     ]);
 
@@ -86,7 +86,7 @@ describe('gasServiceEstimator', () => {
           swap: {
             transaction: {} as any,
             gasFeeEstimate: {
-              value: BigNumber.from(1),
+              value: BigInt(1),
               token: {
                 address: '0x1',
                 symbol: 'TEST',
@@ -108,7 +108,7 @@ describe('gasServiceEstimator', () => {
       )) as GasEstimateSwapResult;
 
       expect(result.gasEstimateType).toEqual(GasEstimateType.SWAP);
-      expect(result.fees.totalFees).toEqual(BigNumber.from(1));
+      expect(result.fees.totalFees).toEqual(BigInt(1));
       expect(result.fees.token?.address).toEqual('0x1');
       expect(result.fees.token?.symbol).toEqual('TEST');
       expect(result.fees.token?.name).toEqual('TEST');
@@ -202,10 +202,10 @@ describe('gasServiceEstimator', () => {
     it('should estimate gas for bridging L1 to L2', async () => {
       (createBridgeInstance as jest.Mock).mockReturnValue({
         getFee: jest.fn().mockResolvedValue({
-          sourceChainGas: BigNumber.from('100000000000000'),
-          imtblFee: BigNumber.from('0'),
-          bridgeFee: BigNumber.from('2000000000000000'),
-          totalFees: BigNumber.from('2100000000000000'),
+          sourceChainGas: BigInt('100000000000000'),
+          imtblFee: BigInt('0'),
+          bridgeFee: BigInt('2000000000000000'),
+          totalFees: BigInt('2100000000000000'),
         }),
       } as unknown as TokenBridge);
 
@@ -218,17 +218,17 @@ describe('gasServiceEstimator', () => {
       )) as GasEstimateBridgeToL2Result;
 
       expect(result.gasEstimateType).toEqual(GasEstimateType.BRIDGE_TO_L2);
-      expect(result.fees.totalFees).toEqual(BigNumber.from('2100000000000000'));
+      expect(result.fees.totalFees).toEqual(BigInt('2100000000000000'));
       expect(result.token?.symbol).toEqual('ETH');
     });
 
     it('should estimate gas for bridging L1 to L2 with approval transaction included in estimate', async () => {
       (createBridgeInstance as jest.Mock).mockReturnValue({
         getFee: jest.fn().mockResolvedValue({
-          sourceChainGas: BigNumber.from('100000000000000'),
-          imtblFee: BigNumber.from('0'),
-          bridgeFee: BigNumber.from('2000000000000000'),
-          totalFees: BigNumber.from('2100000000000000'),
+          sourceChainGas: BigInt('100000000000000'),
+          imtblFee: BigInt('0'),
+          bridgeFee: BigInt('2000000000000000'),
+          totalFees: BigInt('2100000000000000'),
         }),
       } as unknown as TokenBridge);
 
@@ -241,23 +241,23 @@ describe('gasServiceEstimator', () => {
       )) as GasEstimateBridgeToL2Result;
 
       expect(result.gasEstimateType).toEqual(GasEstimateType.BRIDGE_TO_L2);
-      expect(result.fees.totalFees).toEqual(BigNumber.from('2100000000000000'));
+      expect(result.fees.totalFees).toEqual(BigInt('2100000000000000'));
       expect(result.token?.symbol).toEqual('ETH');
     });
 
     it('should handle non-supported EIP-1559 chain', async () => {
       (createBridgeInstance as jest.Mock).mockReturnValue({
         getFee: jest.fn().mockResolvedValue({
-          sourceChainGas: BigNumber.from('100000000000000'),
-          imtblFee: BigNumber.from('0'),
-          bridgeFee: BigNumber.from('2000000000000000'),
-          totalFees: BigNumber.from('2100000000000000'),
+          sourceChainGas: BigInt('100000000000000'),
+          imtblFee: BigInt('0'),
+          bridgeFee: BigInt('2000000000000000'),
+          totalFees: BigInt('2100000000000000'),
         }),
       } as unknown as TokenBridge);
 
       const readOnlyProvidersUndefinedFees = new Map<
       ChainId,
-      ethers.providers.JsonRpcProvider
+      JsonRpcProvider
       >([
         [
           ChainId.SEPOLIA,
@@ -268,7 +268,7 @@ describe('gasServiceEstimator', () => {
               maxPriorityFeePerGas: null,
               gasPrice: '0x1',
             }),
-          } as unknown as ethers.providers.JsonRpcProvider,
+          } as unknown as JsonRpcProvider,
         ],
       ]);
       const result = (await gasEstimator(
@@ -279,7 +279,7 @@ describe('gasServiceEstimator', () => {
         config,
       )) as GasEstimateBridgeToL2Result;
 
-      expect(result.fees.totalFees).toEqual(BigNumber.from('2100000000000000'));
+      expect(result.fees.totalFees).toEqual(BigInt('2100000000000000'));
     });
 
     it('should handle error when calling bridge', async () => {
@@ -296,11 +296,11 @@ describe('gasServiceEstimator', () => {
       expect(result).toEqual({
         gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
         fees: {
-          sourceChainGas: BigNumber.from(0),
-          approvalFee: BigNumber.from(0),
-          bridgeFee: BigNumber.from(0),
-          imtblFee: BigNumber.from(0),
-          totalFees: BigNumber.from(0),
+          sourceChainGas: BigInt(0),
+          approvalFee: BigInt(0),
+          bridgeFee: BigInt(0),
+          imtblFee: BigInt(0),
+          totalFees: BigInt(0),
         },
         token: {
           decimals: 18,

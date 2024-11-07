@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { ItemType } from '../../types';
 import { ItemAllowance } from '../allowance/types';
 import { allowanceAggregator } from './allowanceAggregator';
@@ -11,11 +10,11 @@ describe('allowanceAggregator', () => {
         {
           sufficient: false,
           type: ItemType.ERC20,
-          delta: BigNumber.from(1),
+          delta: BigInt(1),
           itemRequirement: {
             type: ItemType.ERC20,
             tokenAddress: '0xERC20_1',
-            amount: BigNumber.from(1),
+            amount: BigInt(1),
             spenderAddress: '0xSEAPORT',
             isFee: false,
           },
@@ -26,7 +25,7 @@ describe('allowanceAggregator', () => {
           itemRequirement: {
             type: ItemType.ERC20,
             tokenAddress: '0xERC20_2',
-            amount: BigNumber.from(1),
+            amount: BigInt(1),
             spenderAddress: '0xSEAPORT',
             isFee: false,
           },
@@ -53,11 +52,11 @@ describe('allowanceAggregator', () => {
     expect(result).toEqual([{
       sufficient: false,
       type: ItemType.ERC20,
-      delta: BigNumber.from(1),
+      delta: BigInt(1),
       itemRequirement: {
         type: ItemType.ERC20,
         tokenAddress: '0xERC20_1',
-        amount: BigNumber.from(1),
+        amount: BigInt(1),
         spenderAddress: '0xSEAPORT',
         isFee: false,
       },
@@ -73,7 +72,7 @@ describe('allowanceAggregator', () => {
         itemRequirement: {
           type: ItemType.ERC20,
           tokenAddress: '0xERC20',
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           spenderAddress: '0xSEAPORT',
           isFee: false,
         },
@@ -101,7 +100,7 @@ describe('allowanceAggregator', () => {
           approvalTransaction: undefined,
           type: ItemType.ERC1155,
           itemRequirement: {
-            amount: BigNumber.from(10),
+            amount: BigInt(10),
             type: ItemType.ERC1155,
             contractAddress: '0xERC1155',
             id: '0xID',
@@ -115,7 +114,7 @@ describe('allowanceAggregator', () => {
       sufficient: false,
       type: ItemType.ERC1155,
       itemRequirement: {
-        amount: BigNumber.from(10),
+        amount: BigInt(10),
         type: ItemType.ERC1155,
         contractAddress: '0xERC1155',
         id: '0xID',
@@ -133,7 +132,7 @@ describe('allowanceAggregator', () => {
         itemRequirement: {
           type: ItemType.ERC20,
           tokenAddress: '0xERC20',
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           spenderAddress: '0xSEAPORT',
           isFee: false,
         },
@@ -188,11 +187,11 @@ describe('allowanceAggregator', () => {
       allowances: [{
         sufficient: false,
         type: ItemType.ERC20,
-        delta: BigNumber.from(1),
+        delta: BigInt(1),
         itemRequirement: {
           type: ItemType.ERC20,
           tokenAddress: '0xERC20',
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           spenderAddress: '0xSEAPORT',
           isFee: false,
         },
@@ -221,7 +220,7 @@ describe('allowanceAggregator', () => {
           approvalTransaction: undefined,
           type: ItemType.ERC1155,
           itemRequirement: {
-            amount: BigNumber.from(10),
+            amount: BigInt(10),
             type: ItemType.ERC1155,
             contractAddress: '0xERC1155',
             id: '0xID',
@@ -235,11 +234,11 @@ describe('allowanceAggregator', () => {
       {
         sufficient: false,
         type: ItemType.ERC20,
-        delta: BigNumber.from(1),
+        delta: BigInt(1),
         itemRequirement: {
           type: ItemType.ERC20,
           tokenAddress: '0xERC20',
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           spenderAddress: '0xSEAPORT',
           isFee: false,
         },
@@ -260,7 +259,7 @@ describe('allowanceAggregator', () => {
         sufficient: false,
         type: ItemType.ERC1155,
         itemRequirement: {
-          amount: BigNumber.from(10),
+          amount: BigInt(10),
           type: ItemType.ERC1155,
           contractAddress: '0xERC1155',
           id: '0xID',
@@ -280,7 +279,7 @@ describe('allowanceAggregator', () => {
           itemRequirement: {
             type: ItemType.ERC20,
             tokenAddress: '0xERC20',
-            amount: BigNumber.from(1),
+            amount: BigInt(1),
             spenderAddress: '0xSEAPORT',
             isFee: false,
           },
@@ -308,7 +307,7 @@ describe('allowanceAggregator', () => {
           sufficient: true,
           itemRequirement: {
             type: ItemType.ERC1155,
-            amount: BigNumber.from(5),
+            amount: BigInt(5),
             contractAddress: '0xERC1155',
             id: '0xID',
             spenderAddress: '0xSEAPORT',

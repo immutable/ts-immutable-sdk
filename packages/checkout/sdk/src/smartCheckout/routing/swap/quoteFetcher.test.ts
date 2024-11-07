@@ -1,17 +1,16 @@
 import { Environment } from '@imtbl/config';
-import { BigNumber } from 'ethers';
 import {
   Token,
   TransactionDetails,
   TransactionResponse,
 } from '@imtbl/dex-sdk';
-import { TransactionRequest } from '@ethersproject/providers';
 import { CheckoutConfiguration } from '../../../config';
 import { ChainId } from '../../../types';
 import { quoteFetcher } from './quoteFetcher';
 import { createExchangeInstance } from '../../../instance';
 import { DexQuote, DexQuotes } from '../types';
 import { HttpClient } from '../../../api/http';
+import { TransactionRequest } from 'ethers';
 
 jest.mock('../../../instance');
 
@@ -29,18 +28,18 @@ describe('quoteFetcher', () => {
       },
       quote: {
         amount: {
-          value: BigNumber.from(quoteAmount),
+          value: BigInt(quoteAmount),
           token: {} as Token,
         },
         amountWithMaxSlippage: {
-          value: BigNumber.from(quoteAmount),
+          value: BigInt(quoteAmount),
           token: {} as Token,
         },
         slippage: 0,
         fees: [
           {
             amount: {
-              value: BigNumber.from(feeAmount),
+              value: BigInt(feeAmount),
               token: {} as Token,
             },
             recipient: '',
@@ -53,7 +52,7 @@ describe('quoteFetcher', () => {
 
     if (swapGasFeeEstimate) {
       transactionResponse.swap.gasFeeEstimate = {
-        value: BigNumber.from(swapGasFeeEstimate),
+        value: BigInt(swapGasFeeEstimate),
         token: {} as Token,
       };
     }
@@ -61,7 +60,7 @@ describe('quoteFetcher', () => {
     if (approvalGasFeeEstimate) {
       transactionResponse.approval = {
         gasFeeEstimate: {
-          value: BigNumber.from(approvalGasFeeEstimate),
+          value: BigInt(approvalGasFeeEstimate),
           token: {} as Token,
         },
       } as TransactionDetails;
@@ -81,18 +80,18 @@ describe('quoteFetcher', () => {
       swap: null,
       quote: {
         amount: {
-          value: BigNumber.from(quoteAmount),
+          value: BigInt(quoteAmount),
           token: {} as Token,
         },
         amountWithMaxSlippage: {
-          value: BigNumber.from(quoteAmount),
+          value: BigInt(quoteAmount),
           token: {} as Token,
         },
         slippage: 0,
         fees: [
           {
             amount: {
-              value: BigNumber.from(feeAmount),
+              value: BigInt(feeAmount),
               token: {} as Token,
             },
             recipient: '',
@@ -104,14 +103,14 @@ describe('quoteFetcher', () => {
 
     if (swap) {
       dexQuote.swap = {
-        value: BigNumber.from(swap),
+        value: BigInt(swap),
         token: {} as Token,
       };
     }
 
     if (approval) {
       dexQuote.approval = {
-        value: BigNumber.from(approval),
+        value: BigInt(approval),
         token: {} as Token,
       };
     }
@@ -153,7 +152,7 @@ describe('quoteFetcher', () => {
       '0xADDRESS',
       {
         address: '0xREQUIRED_ERC20',
-        amount: BigNumber.from(0),
+        amount: BigInt(0),
       },
       ['0xERC20_1', '0xERC20_2', '0xERC20_3'],
     );
@@ -186,7 +185,7 @@ describe('quoteFetcher', () => {
       '0xADDRESS',
       {
         address: '0xREQUIRED_ERC20',
-        amount: BigNumber.from(0),
+        amount: BigInt(0),
       },
       ['0xERC20_1', '0xERC20_2', '0xERC20_3'],
     );
@@ -219,7 +218,7 @@ describe('quoteFetcher', () => {
       '0xADDRESS',
       {
         address: '0xREQUIRED_ERC20',
-        amount: BigNumber.from(0),
+        amount: BigInt(0),
       },
       ['0xERC20_1', '0xERC20_2', '0xERC20_3'],
     );
@@ -236,7 +235,7 @@ describe('quoteFetcher', () => {
       '0xADDRESS',
       {
         address: '0xREQUIRED_ERC20',
-        amount: BigNumber.from(0),
+        amount: BigInt(0),
       },
       ['0xERC20_1', '0xERC20_2', '0xERC20_3'],
     );
@@ -268,7 +267,7 @@ describe('quoteFetcher', () => {
       '0xADDRESS',
       {
         address: '0xREQUIRED_ERC20',
-        amount: BigNumber.from(0),
+        amount: BigInt(0),
       },
       ['0xERC20_1', '0xERC20_2', '0xERC20_3'],
     );
@@ -288,7 +287,7 @@ describe('quoteFetcher', () => {
       '0xADDRESS',
       {
         address: '0xREQUIRED_ERC20',
-        amount: BigNumber.from(0),
+        amount: BigInt(0),
       },
       ['0xREQUIRED_ERC20'],
     );
@@ -314,7 +313,7 @@ describe('quoteFetcher', () => {
       '0xADDRESS',
       {
         address: '0xREQUIRED_ERC20',
-        amount: BigNumber.from(0),
+        amount: BigInt(0),
       },
       ['0xREQUIRED_ERC20', '0xERC20_1'],
     );

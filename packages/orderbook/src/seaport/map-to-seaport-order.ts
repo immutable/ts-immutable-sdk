@@ -4,10 +4,10 @@ import {
   OrderComponents,
   TipInputItem,
 } from '@opensea/seaport-js/lib/types';
-import { constants } from 'ethers';
 import { Item, Order, ProtocolData } from '../openapi/sdk';
 import { exhaustiveSwitch } from '../utils';
 import { ItemType, OrderType } from './constants';
+import { ZeroAddress, ZeroHash } from 'ethers';
 
 function mapImmutableItemToSeaportOfferItem(item: Item): OfferItem {
   switch (item.type) {
@@ -56,7 +56,7 @@ function mapImmutableItemToSeaportConsiderationItem(
         itemType: ItemType.NATIVE,
         startAmount: item.amount,
         endAmount: item.amount,
-        token: constants.AddressZero,
+        token: ZeroAddress,
         identifierOrCriteria: '0',
         recipient,
       };
@@ -161,9 +161,9 @@ export function mapImmutableOrderToSeaportOrderComponents(
         new Date(order.start_at).getTime() / 1000,
       ).toString(),
       endTime: Math.round(new Date(order.end_at).getTime() / 1000).toString(),
-      zoneHash: constants.HashZero,
+      zoneHash: ZeroHash,
       salt: order.salt,
-      conduitKey: constants.HashZero,
+      conduitKey: ZeroHash,
       counter: order.protocol_data.counter,
       // this should be the fee exclusive number of items the user signed for
       totalOriginalConsiderationItems: considerationItems.length,

@@ -16,7 +16,7 @@ import {
   WalletProviderName,
   WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import { useTranslation } from 'react-i18next';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import {
@@ -62,26 +62,26 @@ export function WalletAndNetworkSelector() {
 
   // add default state from context values
   // if user has clicked back button
-  const defaultFromWeb3Provider = from?.web3Provider ?? null;
+  const defaultFromBrowserProvider = from?.web3Provider ?? null;
   const defaultFromNetwork = from?.network ?? null;
   const defaultFromWalletAddress = from?.walletAddress?.toLowerCase() ?? '';
   const defaultFromWallet = from ? {
-    provider: defaultFromWeb3Provider,
+    provider: defaultFromBrowserProvider,
     providerDetail: {
-      provider: defaultFromWeb3Provider,
+      provider: defaultFromBrowserProvider,
       info: {
         ...from.walletProviderInfo,
       },
     },
   } as unknown as WalletChangeEvent : null;
 
-  const defaultToWeb3Provider = to?.web3Provider ?? null;
+  const defaultToBrowserProvider = to?.web3Provider ?? null;
   const defaultToNetwork = to?.network ?? null;
   const defaultToWalletAddress = to?.walletAddress?.toLowerCase() ?? '';
   const defaultToWallet = to ? {
-    provider: defaultToWeb3Provider,
+    provider: defaultToBrowserProvider,
     providerDetail: {
-      provider: defaultToWeb3Provider,
+      provider: defaultToBrowserProvider,
       info: {
         ...to.walletProviderInfo,
       },
@@ -97,7 +97,8 @@ export function WalletAndNetworkSelector() {
   /** From wallet and from network local state */
   const [fromWalletDrawerOpen, setFromWalletDrawerOpen] = useState(false);
   const [fromNetworkDrawerOpen, setFromNetworkDrawerOpen] = useState(false);
-  const [fromWalletWeb3Provider, setFromWalletWeb3Provider] = useState<Web3Provider | null>(defaultFromWeb3Provider);
+  // eslint-disable-next-line max-len
+  const [fromWalletBrowserProvider, setFromWalletBrowserProvider] = useState<BrowserProvider | null>(defaultFromBrowserProvider);
   const [fromNetwork, setFromNetwork] = useState<ChainId | null>(defaultFromNetwork);
   const [fromWalletAddress, setFromWalletAddress] = useState<string>(defaultFromWalletAddress);
   const [fromWallet, setFromWallet] = useState<WalletChangeEvent | null>(defaultFromWallet);
@@ -105,24 +106,25 @@ export function WalletAndNetworkSelector() {
   /** To wallet local state */
   const [toNetworkDrawerOpen, setToNetworkDrawerOpen] = useState(false);
   const [toWalletDrawerOpen, setToWalletDrawerOpen] = useState(false);
-  const [toWalletWeb3Provider, setToWalletWeb3Provider] = useState<Web3Provider | null>(defaultToWeb3Provider);
+  // eslint-disable-next-line max-len
+  const [toWalletBrowserProvider, setToWalletBrowserProvider] = useState<BrowserProvider | null>(defaultToBrowserProvider);
   const [toNetwork, setToNetwork] = useState<ChainId | null>(defaultToNetwork);
   const [toWalletAddress, setToWalletAddress] = useState<string>(defaultToWalletAddress);
   const [toWallet, setToWallet] = useState<WalletChangeEvent | null>(defaultToWallet);
 
   /* Derived state */
-  const isFromWalletAndNetworkSelected = fromWalletWeb3Provider && fromNetwork;
-  const isToWalletAndNetworkSelected = toWalletWeb3Provider && toNetwork;
+  const isFromWalletAndNetworkSelected = fromWalletBrowserProvider && fromNetwork;
+  const isToWalletAndNetworkSelected = toWalletBrowserProvider && toNetwork;
 
   const fromWalletProviderName = useMemo(() => {
-    if (!fromWalletWeb3Provider) return null;
-    return getWalletProviderNameByProvider(fromWalletWeb3Provider);
-  }, [fromWalletWeb3Provider]);
+    if (!fromWalletBrowserProvider) return null;
+    return getWalletProviderNameByProvider(fromWalletBrowserProvider);
+  }, [fromWalletBrowserProvider]);
 
   const toWalletProviderName = useMemo(() => {
-    if (!toWalletWeb3Provider) return null;
-    return getWalletProviderNameByProvider(toWalletWeb3Provider);
-  }, [toWalletWeb3Provider]);
+    if (!toWalletBrowserProvider) return null;
+    return getWalletProviderNameByProvider(toWalletBrowserProvider);
+  }, [toWalletBrowserProvider]);
 
   const fromWalletSelectorOptions = useMemo(() => providers, [providers]);
 
@@ -148,7 +150,7 @@ export function WalletAndNetworkSelector() {
   }, [from, to]);
 
   function clearToWalletSelections() {
-    setToWalletWeb3Provider(null);
+    setToWalletBrowserProvider(null);
     setToNetwork(null);
   }
 
@@ -156,9 +158,9 @@ export function WalletAndNetworkSelector() {
   /* --- Handling selections --- */
   /* --------------------------- */
 
-  const handleFromWalletConnectionSuccess = async (provider: Web3Provider) => {
-    setFromWalletWeb3Provider(provider);
-    const address = await provider!.getSigner().getAddress();
+  const handleFromWalletConnectionSuccess = async (provider: BrowserProvider) => {
+    setFromWalletBrowserProvider(provider);
+    const address = await (await provider!.getSigner()).getAddress();
     setFromWalletAddress(address.toLowerCase());
 
     track({
@@ -208,7 +210,7 @@ export function WalletAndNetworkSelector() {
       if (event.providerDetail.info.rdns === WalletProviderRdns.METAMASK) {
         changeAccount = true;
       }
-      const web3Provider = new Web3Provider(event.provider as any);
+      const web3Provider = new BrowserProvider(event.provider as any);
       const connectedProvider = await connectToProvider(checkout, web3Provider, changeAccount);
 
       await handleFromWalletConnectionSuccess(connectedProvider);
@@ -218,7 +220,7 @@ export function WalletAndNetworkSelector() {
 
   const handleFromNetworkSelection = useCallback(
     async (chainId: ChainId) => {
-      if (!fromWalletWeb3Provider) return;
+      if (!fromWalletBrowserProvider) return;
 
       clearToWalletSelections();
       setFromNetworkDrawerOpen(false);
@@ -234,12 +236,12 @@ export function WalletAndNetworkSelector() {
         },
       });
     },
-    [checkout, fromWalletWeb3Provider],
+    [checkout, fromWalletBrowserProvider],
   );
 
   const handleToNetworkSelection = useCallback(
     async (chainId: ChainId) => {
-      if (!toWalletWeb3Provider) return;
+      if (!toWalletBrowserProvider) return;
       setToNetworkDrawerOpen(false);
       setToNetwork(chainId);
 
@@ -253,7 +255,7 @@ export function WalletAndNetworkSelector() {
         },
       });
     },
-    [checkout, toWalletWeb3Provider],
+    [checkout, toWalletBrowserProvider],
   );
 
   const handleSettingToNetwork = useCallback((toAddress: string) => {
@@ -277,10 +279,10 @@ export function WalletAndNetworkSelector() {
   }, [fromWalletAddress, fromNetwork]);
 
   const handleWalletConnectToWalletConnection = useCallback(
-    (provider: Web3Provider) => {
-      setToWalletWeb3Provider(provider);
-      provider!
-        .getSigner()
+    async (provider: BrowserProvider) => {
+      setToWalletBrowserProvider(provider);
+      (await provider!
+        .getSigner())
         .getAddress()
         .then((address) => {
           setToWalletAddress(address.toLowerCase());
@@ -303,11 +305,10 @@ export function WalletAndNetworkSelector() {
   const handleToWalletSelection = useCallback(
     async (event: WalletChangeEvent) => {
       if (fromWallet?.providerDetail.info.rdns === event.providerDetail.info.rdns) {
-        // if same from wallet and to wallet, just use the existing fromWalletLocalWeb3Provider
-        setToWalletWeb3Provider(fromWalletWeb3Provider);
+        // if same from wallet and to wallet, just use the existing fromWalletLocalBrowserProvider
+        setToWalletBrowserProvider(fromWalletBrowserProvider);
         setToWallet(event);
-        const address = await fromWalletWeb3Provider!.getSigner().getAddress();
-
+        const address = await (await fromWalletBrowserProvider!.getSigner()).getAddress();
         setToWalletAddress(address.toLowerCase());
         handleSettingToNetwork(address.toLowerCase());
 
@@ -325,15 +326,15 @@ export function WalletAndNetworkSelector() {
 
       try {
         setToWallet(event);
-        const web3Provider = new Web3Provider(event.provider as any);
+        const web3Provider = new BrowserProvider(event.provider as any);
         const connectedProvider = await connectToProvider(checkout, web3Provider, false);
 
-        const address = await connectedProvider.getSigner().getAddress();
+        const address = await (await connectedProvider.getSigner()).getAddress();
 
         if (isWalletConnectProvider(connectedProvider)) {
           handleWalletConnectToWalletConnection(connectedProvider);
         } else {
-          setToWalletWeb3Provider(connectedProvider);
+          setToWalletBrowserProvider(connectedProvider);
           setToWalletAddress(address.toLowerCase());
           handleSettingToNetwork(address.toLowerCase());
 
@@ -354,7 +355,7 @@ export function WalletAndNetworkSelector() {
     },
     [
       fromWalletProviderName,
-      fromWalletWeb3Provider,
+      fromWalletBrowserProvider,
       handleSettingToNetwork,
       handleWalletConnectToWalletConnection,
     ],
@@ -362,9 +363,9 @@ export function WalletAndNetworkSelector() {
 
   const handleSubmitDetails = useCallback(() => {
     if (
-      !fromWalletWeb3Provider
+      !fromWalletBrowserProvider
       || !fromNetwork
-      || !toWalletWeb3Provider
+      || !toWalletBrowserProvider
       || !toNetwork
     ) return;
 
@@ -386,13 +387,13 @@ export function WalletAndNetworkSelector() {
       payload: {
         type: BridgeActions.SET_WALLETS_AND_NETWORKS,
         from: {
-          web3Provider: fromWalletWeb3Provider,
+          web3Provider: fromWalletBrowserProvider,
           walletAddress: fromWalletAddress.toLowerCase(),
           walletProviderInfo: fromWallet?.providerDetail.info,
           network: fromNetwork,
         },
         to: {
-          web3Provider: toWalletWeb3Provider,
+          web3Provider: toWalletBrowserProvider,
           walletAddress: toWalletAddress.toLowerCase(),
           walletProviderInfo: toWallet?.providerDetail.info,
           network: toNetwork,
@@ -412,8 +413,8 @@ export function WalletAndNetworkSelector() {
           address: fromWalletAddress,
           rdns: fromWallet?.providerDetail.info.rdns,
           uuid: fromWallet?.providerDetail.info.uuid,
-          isPassportWallet: isPassportProvider(fromWalletWeb3Provider),
-          isMetaMask: isMetaMaskProvider(fromWalletWeb3Provider),
+          isPassportWallet: isPassportProvider(fromWalletBrowserProvider),
+          isMetaMask: isMetaMaskProvider(fromWalletBrowserProvider),
         },
         toWalletAddress,
         toNetwork,
@@ -421,8 +422,8 @@ export function WalletAndNetworkSelector() {
           address: toWalletAddress,
           rdns: toWallet?.providerDetail.info.rdns,
           uuid: toWallet?.providerDetail.info.uuid,
-          isPassportWallet: isPassportProvider(toWalletWeb3Provider),
-          isMetaMask: isMetaMaskProvider(toWalletWeb3Provider),
+          isPassportWallet: isPassportProvider(toWalletBrowserProvider),
+          isMetaMask: isMetaMaskProvider(toWalletBrowserProvider),
         },
         moveType: fromNetwork && fromNetwork === toNetwork ? 'transfer' : 'bridge',
       },
@@ -436,11 +437,11 @@ export function WalletAndNetworkSelector() {
     });
   }, [
     fromWallet,
-    fromWalletWeb3Provider,
+    fromWalletBrowserProvider,
     fromNetwork,
     fromWalletAddress,
     toWallet,
-    toWalletWeb3Provider,
+    toWalletBrowserProvider,
     toNetwork,
     toWalletAddress,
   ]);
@@ -489,7 +490,7 @@ export function WalletAndNetworkSelector() {
           <WalletNetworkButton
             testId={testId}
             walletProviderDetail={fromWallet?.providerDetail}
-            walletProvider={fromWalletWeb3Provider}
+            walletProvider={fromWalletBrowserProvider}
             walletName={fromWalletProviderName}
             walletAddress={abbreviateAddress(fromWalletAddress)}
             chainId={fromNetwork}
@@ -578,7 +579,7 @@ export function WalletAndNetworkSelector() {
           <WalletNetworkButton
             testId={testId}
             walletProviderDetail={toWallet?.providerDetail}
-            walletProvider={toWalletWeb3Provider}
+            walletProvider={toWalletBrowserProvider}
             walletName={toWalletProviderName}
             walletAddress={abbreviateAddress(toWalletAddress)}
             chainId={toNetwork!}

@@ -1,5 +1,4 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { Web3Provider } from '@ethersproject/providers';
 import {
   imx,
   ImxApiClients,
@@ -26,8 +25,12 @@ import AuthManager from '../authManager';
 import MagicAdapter from '../magicAdapter';
 import { getStarkSigner } from './getStarkSigner';
 import GuardianClient from '../guardian';
+import { BrowserProvider } from 'ethers';
 
-jest.mock('@ethersproject/providers');
+jest.mock('ethers', () => ({
+  ...jest.requireActual('ethers'),
+  BrowserProvider: jest.fn()
+}));
 jest.mock('./workflows');
 jest.mock('./workflows/registration');
 jest.mock('./getStarkSigner');
@@ -92,7 +95,7 @@ describe('PassportImxProvider', () => {
 
     // Signers
     magicAdapterMock.login.mockResolvedValue({ getSigner: getSignerMock });
-    (Web3Provider as unknown as jest.Mock).mockReturnValue({ getSigner: getSignerMock });
+    (BrowserProvider as unknown as jest.Mock).mockReturnValue({ getSigner: getSignerMock });
     (getStarkSigner as jest.Mock).mockResolvedValue(mockStarkSigner);
 
     passportImxProvider = new PassportImxProvider({
@@ -124,9 +127,6 @@ describe('PassportImxProvider', () => {
     });
 
     it('re-throws the initialisation error when a method is called', async () => {
-      jest.resetAllMocks();
-      jest.restoreAllMocks();
-
       mockAuthManager.getUser.mockResolvedValue(mockUserImx);
       // Signers
       magicAdapterMock.login.mockResolvedValue({});

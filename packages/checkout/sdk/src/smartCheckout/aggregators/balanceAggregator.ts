@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { ItemRequirement, ItemType } from '../../types';
 
 export const nativeBalanceAggregator = (
@@ -19,7 +18,7 @@ export const nativeBalanceAggregator = (
 
     const aggregateItem = aggregatedMap.get(type);
     if (aggregateItem && aggregateItem.type === ItemType.NATIVE) {
-      aggregateItem.amount = BigNumber.from(aggregateItem.amount).add(amount);
+      aggregateItem.amount = aggregateItem.amount + amount
     } else {
       aggregatedMap.set(type, { ...itemRequirement });
     }
@@ -46,7 +45,7 @@ export const erc20BalanceAggregator = (
     const key = `${tokenAddress}`;
     const aggregateItem = aggregatedMap.get(key);
     if (aggregateItem && aggregateItem.type === ItemType.ERC20) {
-      aggregateItem.amount = BigNumber.from(aggregateItem.amount).add(amount);
+      aggregateItem.amount = aggregateItem.amount + amount
     } else {
       aggregatedMap.set(key, { ...itemRequirement });
     }
