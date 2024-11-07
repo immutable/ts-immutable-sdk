@@ -1,9 +1,8 @@
 /* eslint-disable class-methods-use-this */
-import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import { track } from '@imtbl/metrics';
 import { Passport } from '@imtbl/passport';
-import { ethers } from 'ethers';
+import { JsonRpcProvider, BrowserProvider } from 'ethers';
 import { HttpClient } from './api/http';
 import { AvailabilityService, availabilityService } from './availability';
 import * as balances from './balances';
@@ -90,7 +89,7 @@ const SANDBOX_CONFIGURATION = {
 
 // Checkout SDK
 export class Checkout {
-  private readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
+  private readOnlyProviders: Map<ChainId, JsonRpcProvider>;
 
   private httpClient: HttpClient;
 
@@ -112,7 +111,7 @@ export class Checkout {
     this.fiatRampService = new FiatRampService(this.config);
     this.readOnlyProviders = new Map<
     ChainId,
-    ethers.providers.JsonRpcProvider
+    JsonRpcProvider
     >();
     this.availability = availabilityService(
       this.config.isDevelopment,
@@ -527,14 +526,14 @@ export class Checkout {
   }
 
   /**
-   * Wraps a Web3Provider call to validate the provider and handle errors.
-   * @param {Web3Provider} web3Provider - The provider to connect to the network.
-   * @param {(web3Provider: Web3Provider) => Promise<T>)} block - The block executing the provider call.
+   * Wraps a BrowserProvider call to validate the provider and handle errors.
+   * @param {BrowserProvider} web3Provider - The provider to connect to the network.
+   * @param {(web3Provider: BrowserProvider) => Promise<T>)} block - The block executing the provider call.
    * @returns {Promise<T>} Returns the result of the provided block param.
    */
   public async providerCall<T>(
-    web3Provider: Web3Provider,
-    block: (web3Provider: Web3Provider) => Promise<T>,
+    web3Provider: BrowserProvider,
+    block: (web3Provider: BrowserProvider) => Promise<T>,
   ): Promise<T> {
     const validatedProvider = await provider.validateProvider(
       this.config,
@@ -683,11 +682,11 @@ export class Checkout {
 
   /**
    * Checks if the given object is a Web3 provider.
-   * @param {Web3Provider} web3Provider - The object to check.
+   * @param {BrowserProvider} web3Provider - The object to check.
    * @returns {boolean} - True if the object is a Web3 provider, false otherwise.
    */
-  static isWeb3Provider(web3Provider: Web3Provider) {
-    return provider.isWeb3Provider(web3Provider);
+  static isBrowserProvider(web3Provider: BrowserProvider) {
+    return provider.isBrowserProvider(web3Provider);
   }
 
   /**
@@ -720,7 +719,7 @@ export class Checkout {
     let tokenSymbol = 'IMX';
     let email;
 
-    const walletAddress = await params.web3Provider.getSigner().getAddress();
+    const walletAddress = await (await params.web3Provider.getSigner()).getAddress();
     const isPassport = (params.web3Provider.provider as any)?.isPassport || false;
 
     if (isPassport && params.passport) {

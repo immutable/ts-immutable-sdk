@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import {
   ChainId,
@@ -14,6 +13,7 @@ import {
 } from '../types';
 import { CheckoutConfiguration } from '../config';
 import { getUnderlyingChainId } from '../provider/getUnderlyingProvider';
+import { BrowserProvider } from 'ethers';
 
 const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
 
@@ -22,28 +22,23 @@ const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
 // eslint-disable-next-line consistent-return
 async function switchNetworkInWallet(
   networkMap: NetworkMap,
-  web3Provider: Web3Provider,
+  web3Provider: BrowserProvider,
   chainId: ChainId,
 ) {
-  if (web3Provider.provider?.request) {
-    return await web3Provider.provider.request({
-      method: WalletAction.SWITCH_NETWORK,
-      params: [
-        {
-          chainId: networkMap.get(chainId)?.chainIdHex,
-        },
-      ],
-    });
+  if (Boolean(web3Provider.send)) {
+    return await web3Provider.provider.send(WalletAction.SWITCH_NETWORK, [
+      { chainId: networkMap.get(chainId)?.chainIdHex },
+    ]);
   }
 }
 
 // eslint-disable-next-line consistent-return
 export async function addNetworkToWallet(
   networkMap: NetworkMap,
-  web3Provider: Web3Provider,
+  web3Provider: BrowserProvider,
   chainId: ChainId,
 ) {
-  if (web3Provider.provider?.request) {
+  if (web3Provider.send) {
     const networkDetails = networkMap.get(chainId);
     const addNetwork = {
       chainId: networkDetails?.chainIdHex,
@@ -52,10 +47,7 @@ export async function addNetworkToWallet(
       nativeCurrency: networkDetails?.nativeCurrency,
       blockExplorerUrls: networkDetails?.blockExplorerUrls,
     };
-    return await web3Provider.provider.request({
-      method: WalletAction.ADD_NETWORK,
-      params: [addNetwork],
-    });
+    return await web3Provider.send(WalletAction.ADD_NETWORK, [addNetwork]);
   }
 
   return Promise.reject('Provider does not support request method');
@@ -103,17 +95,19 @@ export async function getNetworkAllowList(
 
 export async function getNetworkInfo(
   config: CheckoutConfiguration,
-  web3Provider: Web3Provider,
+  web3Provider: BrowserProvider,
 ): Promise<NetworkInfo> {
+  console.log('QWERQWERQWER')
+  console.log(web3Provider)
   const { networkMap } = config;
   return withCheckoutError(
     async () => {
       try {
         const network = await web3Provider.getNetwork();
         if (
-          Array.from(networkMap.keys()).includes(network.chainId as ChainId)
+          Array.from(networkMap.keys()).includes(network.chainId as unknown as ChainId)
         ) {
-          const chainIdNetworkInfo = networkMap.get(network.chainId as ChainId);
+          const chainIdNetworkInfo = networkMap.get(network.chainId as unknown as ChainId);
           return {
             name: chainIdNetworkInfo!.chainName,
             chainId: parseInt(chainIdNetworkInfo!.chainIdHex, 16),
@@ -122,7 +116,7 @@ export async function getNetworkInfo(
           };
         }
         return {
-          chainId: network.chainId,
+          chainId: network.chainId as unknown as ChainId,
           name: network.name,
           isSupported: false,
         } as NetworkInfo;
@@ -145,7 +139,7 @@ export async function getNetworkInfo(
 
 export async function switchWalletNetwork(
   config: CheckoutConfiguration,
-  web3Provider: Web3Provider,
+  web3Provider: BrowserProvider,
   chainId: ChainId,
 ): Promise<SwitchNetworkResult> {
   const { networkMap } = config;
@@ -195,20 +189,18 @@ export async function switchWalletNetwork(
     }
   }
 
-  const newProvider = new Web3Provider(web3Provider.provider);
-
-  const newProviderNetwork = await newProvider.getNetwork();
-  if (newProviderNetwork.chainId !== chainId) {
+  const newProviderNetwork = await web3Provider.getNetwork();
+  if (newProviderNetwork.chainId !== chainId as unknown as bigint) {
     throw new CheckoutError(
       'User cancelled switch network request',
       CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
     );
   }
 
-  const networkInfo: NetworkInfo = await getNetworkInfo(config, newProvider);
+  const networkInfo: NetworkInfo = await getNetworkInfo(config, web3Provider);
 
   return {
     network: networkInfo,
-    provider: newProvider,
+    provider: web3Provider,
   } as SwitchNetworkResult;
 }

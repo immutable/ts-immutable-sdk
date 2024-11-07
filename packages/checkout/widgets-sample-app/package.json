@@ -16,12 +16,12 @@
   "dependencies": {
     "@biom3/design-tokens": "^0.4.4",
     "@biom3/react": "^0.28.13",
-    "@ethersproject/providers": "^5.7.2",
     "@imtbl/checkout-sdk": "workspace:*",
     "@imtbl/checkout-widgets": "workspace:*",
     "@imtbl/config": "workspace:*",
     "@imtbl/passport": "workspace:*",
     "embla-carousel-react": "^8.1.5",
+    "ethers": "^6.13.4",
     "framer-motion": "^11.0.6",
     "jsbi": "^3.2.1",
     "react": "^18.2.0",

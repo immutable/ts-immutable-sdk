@@ -1,4 +1,3 @@
-import { BigNumber, ethers } from 'ethers';
 import { BridgeFeeActions, BridgeFeeResponse } from '@imtbl/bridge-sdk';
 import {
   ChainId,
@@ -6,13 +5,14 @@ import {
 import { CheckoutConfiguration } from '../../../config';
 import { CheckoutError, CheckoutErrorType } from '../../../errors';
 import * as instance from '../../../instance';
+import { JsonRpcProvider } from 'ethers';
 
 export const getBridgeFeeEstimate = async (
   config: CheckoutConfiguration,
-  readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
+  readOnlyProviders: Map<ChainId, JsonRpcProvider>,
   fromChainId: ChainId,
   toChainId: ChainId,
-): Promise<BridgeFeeResponse & { approvalGas: BigNumber; }> => {
+): Promise<BridgeFeeResponse & { approvalGas: bigint; }> => {
   const bridge = instance.createBridgeInstance(
     fromChainId,
     toChainId,
@@ -32,7 +32,7 @@ export const getBridgeFeeEstimate = async (
 
     return {
       ...bridgeFeeResponse,
-      approvalGas: BigNumber.from(0),
+      approvalGas: BigInt(0),
     };
   } catch (err: any) {
     throw new CheckoutError(

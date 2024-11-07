@@ -1,9 +1,8 @@
-import { Web3Provider } from '@ethersproject/providers';
-import { BigNumber, utils, ethers } from 'ethers';
 import { CheckoutConfiguration } from '../config/config';
 import { TokenInfo } from '../types';
 import { swap, swapQuote } from './swap';
 import { createExchangeInstance } from '../instance';
+import { BrowserProvider, parseUnits, TransactionRequest } from 'ethers';
 
 jest.mock('../instance', () => ({
   createExchangeInstance: jest.fn(),
@@ -16,7 +15,7 @@ describe('swapQuote', () => {
     getSigner: jest.fn().mockReturnValue({
       getAddress: jest.fn().mockResolvedValue('0xmockaddress'),
     }),
-  } as unknown as Web3Provider;
+  } as unknown as BrowserProvider;
   const mockFromToken: TokenInfo = {
     address: '0x123',
     symbol: 'FROM',
@@ -47,7 +46,7 @@ describe('swapQuote', () => {
       '0xmockaddress',
       mockFromToken.address,
       mockToToken.address,
-      BigNumber.from(utils.parseUnits('100', mockFromToken.decimals)),
+      BigInt(parseUnits('100', mockFromToken.decimals)),
       undefined,
       undefined,
       undefined,
@@ -68,7 +67,7 @@ describe('swapQuote', () => {
       '0xmockaddress',
       mockFromToken.address,
       mockToToken.address,
-      BigNumber.from(utils.parseUnits('200', mockToToken.decimals)),
+      BigInt(parseUnits('200', mockToToken.decimals)),
       undefined,
       undefined,
       undefined,
@@ -121,7 +120,7 @@ describe('swap', () => {
   const mockProvider = {
     getSigner: jest.fn().mockReturnValue(mockSigner),
     getNetwork: jest.fn().mockResolvedValue({ chainId: mockChainId }),
-  } as unknown as Web3Provider;
+  } as unknown as BrowserProvider;
   const mockFromToken: TokenInfo = {
     address: '0x123',
     symbol: 'FROM',
@@ -147,8 +146,8 @@ describe('swap', () => {
     const mockExchange = {
       getUnsignedSwapTxFromAmountIn: jest.fn().mockResolvedValue({
         quote: '0xquotehash',
-        swap: { transaction: { maxFeePerGas: '0xunsignedtx' } as ethers.providers.TransactionRequest },
-        approve: { transaction: { maxFeePerGas: '0xunsignedtx' } as ethers.providers.TransactionRequest },
+        swap: { transaction: { maxFeePerGas: '0xunsignedtx' } as TransactionRequest },
+        approve: { transaction: { maxFeePerGas: '0xunsignedtx' } as TransactionRequest },
       }),
     };
     (createExchangeInstance as jest.Mock).mockResolvedValue(mockExchange);
@@ -165,23 +164,23 @@ describe('swap', () => {
       '0xmockaddress',
       mockFromToken.address,
       mockToToken.address,
-      BigNumber.from(utils.parseUnits('100', mockFromToken.decimals)),
+      BigInt(parseUnits('100', mockFromToken.decimals)),
       undefined,
       undefined,
       undefined,
     );
     expect(mockProvider.getNetwork).toHaveBeenCalled();
     expect(mockSigner.sendTransaction).toHaveBeenCalledWith({
-      maxFeePerGas: BigNumber.from('0x037e11d600'),
-      maxPriorityFeePerGas: BigNumber.from('0x02540be400'),
+      maxFeePerGas: BigInt('0x037e11d600'),
+      maxPriorityFeePerGas: BigInt('0x02540be400'),
     });
     expect(mockTransactionResponse.wait).toHaveBeenCalled();
     expect(result).toEqual({
       quote: '0xquotehash',
       swap: {
         transaction: {
-          maxFeePerGas: BigNumber.from('0x037e11d600'),
-          maxPriorityFeePerGas: BigNumber.from('0x02540be400'),
+          maxFeePerGas: BigInt('0x037e11d600'),
+          maxPriorityFeePerGas: BigInt('0x02540be400'),
         },
       },
       swapReceipt: { status: 1 },

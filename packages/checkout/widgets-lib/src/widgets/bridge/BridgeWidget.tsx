@@ -18,8 +18,8 @@ import {
   TokenBridge,
 } from '@imtbl/bridge-sdk';
 import { useTranslation } from 'react-i18next';
-import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { ImmutableConfiguration } from '@imtbl/config';
+import { BrowserProvider, JsonRpcProvider } from 'ethers';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { StatusView } from '../../components/Status/StatusView';
@@ -67,7 +67,7 @@ import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailabl
 export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
   checkout: Checkout;
-  web3Provider?: Web3Provider;
+  web3Provider?: BrowserProvider;
 };
 
 export default function BridgeWidget({

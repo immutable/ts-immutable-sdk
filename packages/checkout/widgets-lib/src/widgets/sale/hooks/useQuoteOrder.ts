@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Environment } from '@imtbl/config';
 import { SaleItem } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import { compareStr } from '../../../lib/utils';
 import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 
@@ -12,7 +12,7 @@ type UseQuoteOrderParams = {
   items: SaleItem[];
   environmentId: string;
   environment: Environment;
-  provider: Web3Provider | undefined;
+  provider: BrowserProvider | undefined;
   preferredCurrency?: string;
 };
 
@@ -64,7 +64,7 @@ export const useQuoteOrder = ({
         const products = items.map(({ productId: id, qty }) => ({ id, qty }));
         params.append('products', btoa(JSON.stringify(products)));
 
-        const signer = provider.getSigner();
+        const signer = await provider.getSigner();
         const address = await signer.getAddress();
         params.append('wallet_address', address);
 

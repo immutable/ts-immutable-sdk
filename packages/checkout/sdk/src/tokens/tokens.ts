@@ -1,5 +1,4 @@
-import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
-import { Contract } from 'ethers';
+import { Contract, JsonRpcProvider, BrowserProvider } from 'ethers';
 import {
   ChainId,
   DexConfig,
@@ -73,7 +72,7 @@ export const isNativeToken = (
 ): boolean => !address || isMatchingAddress(address, NATIVE);
 
 export async function getERC20TokenInfo(
-  web3Provider: Web3Provider | JsonRpcProvider,
+  web3Provider: BrowserProvider | JsonRpcProvider,
   tokenAddress: string,
 ) {
   return await withCheckoutError<TokenInfo>(

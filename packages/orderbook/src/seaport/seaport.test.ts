@@ -2,7 +2,6 @@ import {
   anything, deepEqual, instance, mock, when,
 } from 'ts-mockito';
 import type { TransactionMethods } from '@opensea/seaport-js/lib/utils/usecase';
-import { ContractTransaction, ZeroHash, ZeroAddress } from 'ethers-v6';
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
 import type {
   ApprovalAction,
@@ -12,7 +11,6 @@ import type {
   OfferItem,
   OrderComponents,
 } from '@opensea/seaport-js/lib/types';
-import { BigNumber, providers } from 'ethers';
 import {
   ActionType,
   TransactionAction,
@@ -32,6 +30,7 @@ import {
 } from './constants';
 import { Seaport } from './seaport';
 import { SeaportLibFactory } from './seaport-lib-factory';
+import { ContractTransaction, JsonRpcProvider, toBeHex, ZeroAddress, ZeroHash } from 'ethers';
 
 const fakeExtraData = '0x0000000000000000000000000000000000000000000000000064ec2faca1186bef338313426612ad6ed494b50e5ddc65ad4e6067df53d6625f921b22156ac9435d4fd946bc5f07859ecd7aca94f87da703b9204f9c09f0089be18d5c268a5f36c80c779ed3cbf6ed54b7c7bf2991a4b11065b01c1a2594619f1a0d49f9';
 
@@ -90,7 +89,7 @@ describe('Seaport', () => {
         ],
         startTime: (orderStart.getTime() / 1000).toFixed(0),
         endTime: (orderExpiry.getTime() / 1000).toFixed(0),
-        salt: BigNumber.from('123').toHexString(),
+        salt: toBeHex(BigInt('123')),
         counter: 0,
         zone: zoneAddress,
         zoneHash: ZeroHash,
@@ -129,14 +128,14 @@ describe('Seaport', () => {
       beforeEach(() => {
         const mockedSeaportJs = mock(SeaportLib);
         const mockedSeaportLibFactory = mock(SeaportLibFactory);
-        const mockedProvider = mock(providers.JsonRpcProvider);
+        const mockedProvider = mock(JsonRpcProvider);
 
         const createAction = mock<CreateOrderAction>();
         const createActionInstance = instance(createAction);
         createActionInstance.type = 'create';
 
         when(mockedProvider.getNetwork()).thenReturn(
-          Promise.resolve({ chainId: network, name: 'foobar' }),
+          Promise.resolve({ chainId: network, name: 'foobar' }) as any,
         );
         when(mockedSeaportLibFactory.create(anything(), anything())).thenReturn(
           instance(mockedSeaportJs),
@@ -300,7 +299,7 @@ describe('Seaport', () => {
         ],
         startTime: (orderStart.getTime() / 1000).toFixed(0),
         endTime: (orderExpiry.getTime() / 1000).toFixed(0),
-        salt: BigNumber.from('123').toHexString(),
+        salt: toBeHex(BigInt('123')),
         counter: 0,
         zone: zoneAddress,
         zoneHash: ZeroHash,
@@ -346,7 +345,7 @@ describe('Seaport', () => {
       beforeEach(() => {
         const mockedSeaportJs = mock(SeaportLib);
         const mockedSeaportLibFactory = mock(SeaportLibFactory);
-        const mockedProvider = mock(providers.JsonRpcProvider);
+        const mockedProvider = mock(JsonRpcProvider);
 
         const createAction = mock<CreateOrderAction>();
         const createActionInstance = instance(createAction);
@@ -366,7 +365,7 @@ describe('Seaport', () => {
         when(transactionMethods.estimateGas()).thenReturn(Promise.resolve(approvalGas));
 
         when(mockedProvider.getNetwork()).thenReturn(
-          Promise.resolve({ chainId: network, name: 'foobar' }),
+          Promise.resolve({ chainId: network, name: 'foobar' }) as any,
         );
         when(mockedSeaportLibFactory.create(anything(), anything())).thenReturn(
           instance(mockedSeaportJs),
@@ -430,8 +429,8 @@ describe('Seaport', () => {
         expect(unsignedApprovalTransaction!.from).toEqual(approvalTransaction.from);
         expect(unsignedApprovalTransaction!.to).toEqual(approvalTransaction.to);
 
-        const approvalGasAsBigNumber = BigNumber.from(approvalGas);
-        const expectedGasLimit = approvalGasAsBigNumber.add(approvalGasAsBigNumber.div(5));
+        const approvalGasAsBigNumber = BigInt(approvalGas);
+        const expectedGasLimit = approvalGasAsBigNumber + (approvalGasAsBigNumber / BigInt(5));
         expect(unsignedApprovalTransaction!.gasLimit).toEqual(expectedGasLimit);
       });
 
@@ -546,7 +545,7 @@ describe('Seaport', () => {
       beforeEach(() => {
         const mockedSeaportJs = mock(SeaportLib);
         const mockedSeaportLibFactory = mock(SeaportLibFactory);
-        const mockedProvider = mock(providers.JsonRpcProvider);
+        const mockedProvider = mock(JsonRpcProvider);
         when(mockedProvider.getNetwork()).thenReturn(
           Promise.resolve({
             chainId: 0,
@@ -626,8 +625,8 @@ describe('Seaport', () => {
         expect(unsignedApprovalTransaction!.from).toEqual(fulfiller);
         expect(unsignedApprovalTransaction!.to).toEqual(approvalTransaction.to);
 
-        const approvalGasAsBigNumber = BigNumber.from(approvalGas);
-        const expectedGasLimit = approvalGasAsBigNumber.add(approvalGasAsBigNumber.div(5));
+        const approvalGasAsBigNumber = BigInt(approvalGas);
+        const expectedGasLimit = approvalGasAsBigNumber + (approvalGasAsBigNumber / BigInt(5));
         expect(unsignedApprovalTransaction!.gasLimit).toEqual(expectedGasLimit);
       });
 
@@ -641,8 +640,8 @@ describe('Seaport', () => {
         expect(unsignedFulfillmentTransaction!.from).toEqual(fulfiller);
         expect(unsignedFulfillmentTransaction!.to).toEqual(approvalTransaction.to);
 
-        const fulfilGasAsBigNumber = BigNumber.from(fulfilGas);
-        const expectedGasLimit = fulfilGasAsBigNumber.add(fulfilGasAsBigNumber.div(5));
+        const fulfilGasAsBigNumber = BigInt(fulfilGas);
+        const expectedGasLimit = fulfilGasAsBigNumber + (fulfilGasAsBigNumber / BigInt(5));
         expect(unsignedFulfillmentTransaction!.gasLimit).toEqual(expectedGasLimit);
       });
     });

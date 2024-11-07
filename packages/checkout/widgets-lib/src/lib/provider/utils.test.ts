@@ -1,18 +1,18 @@
-import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import { isMetaMaskProvider, isPassportProvider } from './utils';
 
 describe('providerUtils', () => {
-  const mockPassportWeb3Provider = { provider: { isPassport: true } as ExternalProvider } as Web3Provider;
-  const mockMetaMaskWeb3Provider = { provider: { isMetaMask: true } as ExternalProvider } as Web3Provider;
+  const mockPassportBrowserProvider = { provider: { isPassport: true } } as unknown as BrowserProvider;
+  const mockMetaMaskBrowserProvider = { provider: { isMetaMask: true } } as unknown as BrowserProvider;
 
   describe('isPassport', () => {
     it('should return true when provider is valid and passport flag is true', () => {
-      const result = isPassportProvider(mockPassportWeb3Provider);
+      const result = isPassportProvider(mockPassportBrowserProvider);
       expect(result).toBe(true);
     });
 
     it('should return false when provider is valid and passport flag is missing', () => {
-      const result = isPassportProvider(mockMetaMaskWeb3Provider);
+      const result = isPassportProvider(mockMetaMaskBrowserProvider);
       expect(result).toBe(false);
     });
 
@@ -29,12 +29,12 @@ describe('providerUtils', () => {
 
   describe('isMetaMask', () => {
     it('should return true when provider is valid and metamask flag is true', () => {
-      const result = isMetaMaskProvider(mockMetaMaskWeb3Provider);
+      const result = isMetaMaskProvider(mockMetaMaskBrowserProvider);
       expect(result).toBe(true);
     });
 
     it('should return false when provider is valid and metamask flag is missing', () => {
-      const result = isMetaMaskProvider(mockPassportWeb3Provider);
+      const result = isMetaMaskProvider(mockPassportBrowserProvider);
       expect(result).toBe(false);
     });
 

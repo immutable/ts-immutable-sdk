@@ -1,5 +1,4 @@
-import { BigNumber, Contract } from 'ethers';
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider, Contract } from 'ethers';
 import {
   getSetERC1155ApprovalForAllTransaction,
   isERC1155ApprovedForAll,
@@ -15,7 +14,7 @@ jest.mock('ethers', () => ({
 }));
 
 describe('erc1155', () => {
-  const mockProvider = {} as unknown as Web3Provider;
+  const mockProvider = {} as unknown as BrowserProvider;
 
   describe('isERC1155ApprovedForAll', () => {
     it('should return true if the operator has been approved for all', async () => {
@@ -125,7 +124,7 @@ describe('erc1155', () => {
         const itemRequirements: ItemRequirement[] = [
           {
             type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
+            amount: BigInt(1),
             isFee: false,
           },
           {
@@ -136,7 +135,7 @@ describe('erc1155', () => {
           },
           {
             type: ItemType.ERC1155,
-            amount: BigNumber.from(5),
+            amount: BigInt(5),
             contractAddress: '0xERC1155',
             id: '0',
             spenderAddress: '0xSEAPORT',
@@ -165,7 +164,7 @@ describe('erc1155', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
         {
@@ -176,7 +175,7 @@ describe('erc1155', () => {
         },
         {
           type: ItemType.ERC1155,
-          amount: BigNumber.from(5),
+          amount: BigInt(5),
           contractAddress: '0xERC1155',
           id: '0',
           spenderAddress: '0xSEAPORT',
@@ -206,27 +205,27 @@ describe('erc1155', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
         {
           type: ItemType.ERC1155,
           contractAddress: '0xERC1155',
-          amount: BigNumber.from(5),
+          amount: BigInt(5),
           id: '0',
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC1155,
           contractAddress: '0xERC1155',
-          amount: BigNumber.from(5),
+          amount: BigInt(5),
           id: '1',
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC1155,
           contractAddress: '0xERC1155',
-          amount: BigNumber.from(5),
+          amount: BigInt(5),
           id: '2',
           spenderAddress: '0x00000000',
         },

@@ -235,7 +235,7 @@ export function SaleContextProvider(props: {
 
   useEffect(() => {
     const getUserInfo = async () => {
-      const signer = provider?.getSigner();
+      const signer = await provider?.getSigner();
       const address = (await signer?.getAddress()) || '';
       const email = (await passport?.getUserInfo())?.email || '';
 

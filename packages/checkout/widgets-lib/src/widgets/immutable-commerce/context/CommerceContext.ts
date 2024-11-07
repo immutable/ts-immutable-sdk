@@ -1,4 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import { createContext } from 'react';
 import {
   Checkout,
@@ -7,7 +7,7 @@ import { Passport } from '@imtbl/passport';
 
 export interface CommerceState {
   checkout: Checkout | undefined;
-  provider: Web3Provider | undefined;
+  provider: BrowserProvider | undefined;
   passport: Passport | undefined;
 }
 
@@ -44,7 +44,7 @@ export interface SetCheckoutPayload {
 
 export interface SetProviderPayload {
   type: CommerceActions.SET_PROVIDER;
-  provider: Web3Provider | undefined;
+  provider: BrowserProvider | undefined;
 }
 
 export interface SetPassportPayload {

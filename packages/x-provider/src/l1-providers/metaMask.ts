@@ -1,8 +1,8 @@
-import { ethers } from 'ethers';
 import detectEthereumProvider from '@metamask/detect-provider';
 
 import { MetamaskConnectParams } from './types';
 import { connectProvider, isRequestableProvider } from './rpc';
+import { BrowserProvider, Eip1193Provider } from 'ethers';
 
 const ERRORS = {
   // TODO: remove once fixed - consider using something in line with the naming convention
@@ -12,8 +12,8 @@ const ERRORS = {
 
 export async function connect({
   chainID,
-}: MetamaskConnectParams): Promise<ethers.providers.Web3Provider> {
-  const provider = (await detectEthereumProvider()) as ethers.providers.ExternalProvider;
+}: MetamaskConnectParams): Promise<BrowserProvider> {
+  const provider = (await detectEthereumProvider()) as Eip1193Provider;
 
   if (!isRequestableProvider(provider)) {
     throw new Error(ERRORS.PROVIDER_NOT_FOUND);
@@ -24,5 +24,5 @@ export async function connect({
   // NOTE: if we want to listen to Metamask events in the future, we can add a
   // listener here.
 
-  return new ethers.providers.Web3Provider(provider);
+  return new BrowserProvider(provider);
 }

@@ -1,6 +1,5 @@
-import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { identify, trackFlow } from '@imtbl/metrics';
-import { BigNumber, utils } from 'ethers';
+import { BrowserProvider, JsonRpcProvider, toBeHex } from 'ethers';
 import AuthManager from '../authManager';
 import { ZkEvmProvider, ZkEvmProviderInput } from './zkEvmProvider';
 import { sendTransaction } from './sendTransaction';
@@ -15,7 +14,11 @@ import { signTypedDataV4 } from './signTypedDataV4';
 import MagicAdapter from '../magicAdapter';
 import { signEjectionTransaction } from './signEjectionTransaction';
 
-jest.mock('@ethersproject/providers');
+jest.mock('ethers', () => ({
+  ...jest.requireActual('ethers'),
+  JsonRpcProvider: jest.fn(),
+  BrowserProvider: jest.fn(),
+}));
 jest.mock('@imtbl/metrics');
 jest.mock('./relayerClient');
 jest.mock('./user');
@@ -41,7 +44,7 @@ describe('ZkEvmProvider', () => {
   beforeEach(() => {
     passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
     jest.resetAllMocks();
-    (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
+    (BrowserProvider as unknown as jest.Mock).mockImplementation(() => ({
       getSigner: jest.fn().mockImplementation(() => ethSigner),
     }));
     (trackFlow as unknown as jest.Mock).mockImplementation(() => ({
@@ -74,7 +77,7 @@ describe('ZkEvmProvider', () => {
 
         expect(authManager.getUser).toBeCalledTimes(1);
         expect(magicAdapter.login).toBeCalledTimes(1);
-        expect(Web3Provider).toBeCalledTimes(1);
+        expect(BrowserProvider).toBeCalledTimes(1);
       });
 
       describe('and the user has not registered before', () => {
@@ -117,7 +120,7 @@ describe('ZkEvmProvider', () => {
         await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
 
         expect(magicAdapter.login).toBeCalledTimes(1);
-        expect(Web3Provider).toBeCalledTimes(1);
+        expect(BrowserProvider).toBeCalledTimes(1);
       });
 
       describe('and the user has not registered before', () => {
@@ -185,7 +188,7 @@ describe('ZkEvmProvider', () => {
       authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
       authManager.getUser.mockResolvedValue(mockUserZkEvm);
 
-      (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
+      (BrowserProvider as unknown as jest.Mock).mockImplementation(() => ({
         getSigner: () => {
           throw new Error('Something went wrong');
         },
@@ -205,7 +208,7 @@ describe('ZkEvmProvider', () => {
       await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
 
       expect(magicAdapter.login).toBeCalledTimes(1);
-      expect(Web3Provider).toBeCalledTimes(1);
+      expect(BrowserProvider).toBeCalledTimes(1);
 
       await provider.request({ method: 'eth_requestAccounts' });
 
@@ -213,7 +216,7 @@ describe('ZkEvmProvider', () => {
       await new Promise(process.nextTick);
 
       expect(magicAdapter.login).toBeCalledTimes(1);
-      expect(Web3Provider).toBeCalledTimes(1);
+      expect(BrowserProvider).toBeCalledTimes(1);
     });
   });
 
@@ -278,7 +281,7 @@ describe('ZkEvmProvider', () => {
       from: '0x123',
       to: '0x456',
       value: '1',
-      nonce: BigNumber.from(5),
+      nonce: BigInt(5),
       chainId: 1,
     };
 
@@ -450,9 +453,9 @@ describe('ZkEvmProvider', () => {
     beforeEach(() => {
       jest.resetAllMocks();
 
-      (StaticJsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
+      (JsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
         send: sendMock,
-        detectNetwork: detectNetworkMock,
+        _detectNetwork: detectNetworkMock,
       }));
     });
 
@@ -468,7 +471,7 @@ describe('ZkEvmProvider', () => {
 
       expect(detectNetworkMock).toBeCalledTimes(1);
       expect(sendMock).not.toBeCalled();
-      expect(result).toBe(utils.hexlify(chainId));
+      expect(result).toBe(toBeHex(chainId));
     });
   });
 
@@ -614,7 +617,7 @@ describe('ZkEvmProvider', () => {
     beforeEach(() => {
       jest.resetAllMocks();
 
-      (StaticJsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
+      (JsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
         send: sendMock,
       }));
     });

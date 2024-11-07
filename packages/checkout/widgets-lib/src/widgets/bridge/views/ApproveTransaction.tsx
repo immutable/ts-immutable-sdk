@@ -8,7 +8,7 @@ import {
 import { CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
 import { useTranslation } from 'react-i18next';
-import { utils } from 'ethers';
+import { parseUnits } from 'ethers';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -146,7 +146,7 @@ export function ApproveTransaction({ bridgeTransaction }: ApproveTransactionProp
       if (tokenToTransfer === NATIVE.toLowerCase()) {
         const request = {
           to: to?.walletAddress,
-          value: utils.parseUnits(amount, token?.decimals),
+          value: parseUnits(amount, token?.decimals),
         };
         const result = await checkout.sendTransaction({
           provider: from.web3Provider,
@@ -154,8 +154,8 @@ export function ApproveTransaction({ bridgeTransaction }: ApproveTransactionProp
         });
         txHash = result.transactionResponse.hash;
       } else {
-        const erc20 = getErc20Contract(tokenToTransfer, from.web3Provider.getSigner());
-        const parsedAmount = utils.parseUnits(amount, token?.decimals);
+        const erc20 = getErc20Contract(tokenToTransfer, await from.web3Provider.getSigner());
+        const parsedAmount = parseUnits(amount, token?.decimals);
         const response = await checkout.providerCall(
           from.web3Provider,
           async () => await erc20.transfer(to?.walletAddress, parsedAmount),
@@ -210,7 +210,7 @@ export function ApproveTransaction({ bridgeTransaction }: ApproveTransactionProp
           transaction: approveTransaction.unsignedTx,
         });
         const approvalReceipt = await approveSpendingResult.transactionResponse.wait();
-        if (approvalReceipt.status !== 1) {
+        if (approvalReceipt?.status !== 1) {
           viewDispatch({
             payload: {
               type: ViewActions.UPDATE_VIEW,
@@ -254,7 +254,7 @@ export function ApproveTransaction({ bridgeTransaction }: ApproveTransactionProp
       });
 
       const receipt = await sendResult.transactionResponse.wait();
-      if (receipt.status === 0) {
+      if (receipt?.status === 0) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,

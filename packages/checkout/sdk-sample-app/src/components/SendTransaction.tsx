@@ -1,16 +1,15 @@
 import { Checkout, NetworkInfo } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
 import { SuccessMessage, ErrorMessage } from './messages';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { Box } from '@biom3/react';
 import { NetworkFilterTypes } from '@imtbl/checkout-sdk';
-import { utils } from 'ethers';
+import { BrowserProvider, hexlify, parseUnits, toBeHex } from 'ethers';
 
 export interface SendTransactionProps {
   checkout: Checkout | undefined;
-  provider: Web3Provider | undefined;
-  setProvider: (provider: Web3Provider) => void;
+  provider: BrowserProvider | undefined;
+  setProvider: (provider: BrowserProvider) => void;
 }
 
 export default function SendTransaction(props: SendTransactionProps) {
@@ -62,7 +61,7 @@ export default function SendTransaction(props: SendTransactionProps) {
       const transaction = {
         from: resp.walletAddress, // The user's active address.
         to: '0x72E45FF29bcF2C8640a025585A4fB58cC2dd1bfb', // Required except during contract publications.
-        value: utils.parseUnits('0.0001', 'ether').toHexString()
+        value: toBeHex(parseUnits('0.0001', 'ether'))
       }
   
       try {

@@ -1,9 +1,6 @@
 /*
  * @jest-environment jsdom
  */
-
-import { ethers } from 'ethers';
-
 import { Environment } from '@imtbl/config';
 import { RequestEventType, ResponseEventType } from './events';
 import { connect, disconnect } from './imxWallet';
@@ -11,6 +8,7 @@ import { postRequestMessage } from './postRequestMessage';
 import { asyncTriggerIFrameOnLoad } from './testUtils';
 import { getOrSetupIFrame } from './imxWalletIFrame';
 import { ImxSigner } from './ImxSigner';
+import { BrowserProvider } from 'ethers';
 
 jest.mock('./postRequestMessage');
 
@@ -18,7 +16,7 @@ describe('imxWallet', () => {
   const env = Environment.SANDBOX;
   const signature = 'The signature';
   const address = '0x1234';
-  let l1Provider: ethers.providers.Web3Provider;
+  let l1Provider: BrowserProvider;
 
   beforeEach(() => {
     l1Provider = {
@@ -26,7 +24,7 @@ describe('imxWallet', () => {
         getAddress: jest.fn().mockResolvedValue(address),
         signMessage: jest.fn().mockResolvedValue(signature),
       }),
-    } as unknown as ethers.providers.Web3Provider;
+    } as unknown as BrowserProvider;
   });
 
   afterEach(() => jest.clearAllMocks());

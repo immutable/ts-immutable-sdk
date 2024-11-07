@@ -4,17 +4,17 @@ import {
   OnRampProviderFees,
   TokenInfo,
 } from '@imtbl/checkout-sdk';
-import { BigNumber, ethers } from 'ethers';
+import { formatUnits } from 'ethers';
 
 const convertFeeToFiat = (
-  fee: BigNumber | undefined,
+  fee: bigint | undefined,
   token: TokenInfo | undefined,
   conversions: Map<string, number>,
 ): number => {
   let feeAmountInFiat = -1;
 
   if (fee && token) {
-    const formattedAmount = ethers.utils.formatUnits(fee, token.decimals);
+    const formattedAmount = formatUnits(fee, token.decimals);
     const gasFeeTokenConversion = conversions.get(
       token.symbol.toLocaleLowerCase(),
     );

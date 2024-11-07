@@ -1,15 +1,14 @@
-import { BigNumber, utils } from 'ethers';
-import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { TokenInfo } from '../types';
 import { createExchangeInstance } from '../instance';
 import { CheckoutConfiguration, getL2ChainId } from '../config';
 import { SwapQuoteResult, SwapResult } from '../types/swap';
 import { sendTransaction } from '../transaction/transaction';
+import { BrowserProvider, parseUnits } from 'ethers';
 
 const swapQuote = async (
   config: CheckoutConfiguration,
-  provider: Web3Provider,
+  provider: BrowserProvider,
   fromToken: TokenInfo,
   toToken: TokenInfo,
   fromAmount?: string,
@@ -45,14 +44,14 @@ const swapQuote = async (
   const chainId = getL2ChainId(config);
   const exchange = await createExchangeInstance(chainId, config);
 
-  const address = await provider.getSigner().getAddress();
+  const address = await (await provider.getSigner()).getAddress();
 
   if (fromAmount) {
     return exchange.getUnsignedSwapTxFromAmountIn(
       address,
       fromToken.address as string,
       toToken.address as string,
-      BigNumber.from(utils.parseUnits(fromAmount, fromToken.decimals)),
+      BigInt(parseUnits(fromAmount, fromToken.decimals)),
       slippagePercent,
       maxHops,
       deadline,
@@ -62,7 +61,7 @@ const swapQuote = async (
     address,
     fromToken.address as string,
     toToken.address as string,
-    BigNumber.from(utils.parseUnits(toAmount!, toToken.decimals)),
+    BigInt(parseUnits(toAmount!, toToken.decimals)),
     slippagePercent,
     maxHops,
     deadline,
@@ -71,7 +70,7 @@ const swapQuote = async (
 
 const swap = async (
   config: CheckoutConfiguration,
-  provider: Web3Provider,
+  provider: BrowserProvider,
   fromToken: TokenInfo,
   toToken: TokenInfo,
   fromAmount?: string,
@@ -94,7 +93,7 @@ const swap = async (
   if (quoteResult.approval) {
     const approvalTx = await sendTransaction(provider, quoteResult.approval.transaction);
     const receipt = await approvalTx.transactionResponse.wait();
-    if (receipt.status === 0) {
+    if (receipt?.status === 0) {
       throw new CheckoutError(
         'Approval transaction failed and was reverted',
         CheckoutErrorType.APPROVAL_TRANSACTION_FAILED,
@@ -103,7 +102,7 @@ const swap = async (
   }
   const swapTx = await sendTransaction(provider, quoteResult.swap.transaction);
   const receipt = await swapTx.transactionResponse.wait();
-  if (receipt.status === 0) {
+  if (receipt?.status === 0) {
     throw new CheckoutError(
       'Swap transaction failed and was reverted',
       CheckoutErrorType.TRANSACTION_FAILED,

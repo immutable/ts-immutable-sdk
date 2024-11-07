@@ -1,16 +1,13 @@
-import {
-  CheckConnectionResult,
-  Checkout,
-} from '@imtbl/checkout-sdk';
 import { useEffect, useState } from 'react';
 import LoadingButton from './LoadingButton';
-import { Web3Provider } from '@ethersproject/providers';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
 import { Box } from '@biom3/react';
+import { CheckConnectionResult, Checkout } from '@imtbl/checkout-sdk';
+import { BrowserProvider } from 'ethers';
 
 interface CheckConnectionProps {
   checkout: Checkout | undefined;
-  provider: Web3Provider | undefined;
+  provider: BrowserProvider | undefined;
 }
 
 export default function CheckConnection(props: CheckConnectionProps) {

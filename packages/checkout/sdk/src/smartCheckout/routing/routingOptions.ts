@@ -1,9 +1,9 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import { CheckoutConfiguration } from '../../config';
 import { isOnRampAvailable, isSwapAvailable } from './geoBlocking';
 import { AvailableRoutingOptions } from '../../types';
 
-const isPassportProvider = (provider: Web3Provider) => (provider.provider as any)?.isPassport === true;
+const isPassportProvider = (provider: BrowserProvider) => (provider.provider as any)?.isPassport === true;
 
 type GeoBlockingCheck = {
   id: 'onRamp' | 'swap';
@@ -15,7 +15,7 @@ type GeoBlockingCheck = {
  */
 export const getAvailableRoutingOptions = async (
   config: CheckoutConfiguration,
-  provider: Web3Provider,
+  provider: BrowserProvider,
 ) : Promise<AvailableRoutingOptions> => {
   const availableRoutingOptions = {
     onRamp: config.isOnRampEnabled,

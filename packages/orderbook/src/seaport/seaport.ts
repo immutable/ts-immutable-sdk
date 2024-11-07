@@ -9,7 +9,6 @@ import type {
   OrderComponents,
   OrderUseCase,
 } from '@opensea/seaport-js/lib/types';
-import { providers } from 'ethers';
 import { mapOrderFromOpenApiOrder } from '../openapi/mapper';
 import { Order as OpenApiOrder } from '../openapi/sdk';
 import {
@@ -43,6 +42,7 @@ import {
 import { mapImmutableOrderToSeaportOrderComponents } from './map-to-seaport-order';
 import { SeaportLibFactory } from './seaport-lib-factory';
 import { prepareTransaction } from './transaction';
+import { JsonRpcProvider } from 'ethers';
 
 type FulfillmentOrderDetails = Parameters<SeaportLib['fulfillOrders']>[0]['fulfillOrderDetails'][0] & { extraData: string };
 
@@ -136,7 +136,7 @@ function mapImmutableSdkItemToSeaportSdkConsiderationInputItem(
 export class Seaport {
   constructor(
     private seaportLibFactory: SeaportLibFactory,
-    private provider: providers.JsonRpcProvider,
+    private provider: JsonRpcProvider,
     private seaportContractAddress: string,
     private zoneContractAddress: string,
     private rateLimitingKey?: string,

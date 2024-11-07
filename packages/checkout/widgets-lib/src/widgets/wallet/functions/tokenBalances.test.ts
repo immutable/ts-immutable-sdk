@@ -4,8 +4,7 @@ import {
   GetBalanceResult,
   TokenInfo,
 } from '@imtbl/checkout-sdk';
-import { BigNumber } from 'ethers';
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { getTokenBalances, mapTokenBalancesWithConversions } from './tokenBalances';
 
@@ -13,12 +12,12 @@ describe('token balance tests', () => {
   it('should return balances for all tokens', async () => {
     const balances: GetBalanceResult[] = [
       {
-        balance: BigNumber.from(1),
+        balance: BigInt(1),
         token: { symbol: 'QQQ', name: 'QQQ', address: '0xQ' } as TokenInfo,
         formattedBalance: '12.34',
       },
       {
-        balance: BigNumber.from(2),
+        balance: BigInt(2),
         token: { symbol: 'AAA', name: 'AAA' } as TokenInfo,
         formattedBalance: '26.34',
       },
@@ -44,7 +43,7 @@ describe('token balance tests', () => {
       chainId,
       await getTokenBalances(
         checkout,
-        mockProvider as unknown as Web3Provider,
+        mockProvider as unknown as BrowserProvider,
         chainId,
       ),
       conversions,
@@ -84,7 +83,7 @@ describe('token balance tests', () => {
       chainId,
       await getTokenBalances(
         checkout,
-        null as unknown as Web3Provider,
+        null as unknown as BrowserProvider,
         chainId,
       ),
       conversions,

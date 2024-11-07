@@ -1,6 +1,4 @@
 /* eslint-disable arrow-body-style */
-import { BigNumber, Contract, utils } from 'ethers';
-import { Web3Provider } from '@ethersproject/providers';
 import {
   ERC20Item,
   ERC721Balance,
@@ -25,6 +23,7 @@ import {
 } from '../../env';
 import { isNativeToken } from '../../tokens';
 import { isMatchingAddress } from '../../utils/utils';
+import { BrowserProvider, Contract, formatUnits } from 'ethers';
 
 export const getTokensFromRequirements = (
   itemRequirements: ItemRequirement[],
@@ -53,7 +52,7 @@ export const getERC721BalanceRequirement = (
   itemRequirement: ERC721Item,
   balances: ItemBalance[],
 ): BalanceERC721Requirement => {
-  const requiredBalance = BigNumber.from(1);
+  const requiredBalance = BigInt(1);
 
   // Find the requirements related balance
   const itemBalanceResult = balances.find((balance) => {
@@ -67,24 +66,22 @@ export const getERC721BalanceRequirement = (
   });
 
   // Calculate the balance delta
-  const sufficient = requiredBalance.isNegative()
-    || requiredBalance.isZero()
-    || (itemBalanceResult?.balance.gte(requiredBalance) ?? false);
-  const delta = requiredBalance.sub(
-    itemBalanceResult?.balance ?? BigNumber.from(0),
-  );
+  const sufficient = requiredBalance < 0
+    || requiredBalance === 0n
+    || (itemBalanceResult && itemBalanceResult.balance >= requiredBalance);
+  const delta = requiredBalance - (itemBalanceResult?.balance ?? BigInt(0))
   let erc721BalanceResult = itemBalanceResult as ERC721Balance;
   if (!erc721BalanceResult) {
     erc721BalanceResult = {
       type: ItemType.ERC721,
-      balance: BigNumber.from(0),
+      balance: BigInt(0),
       formattedBalance: '0',
       contractAddress: itemRequirement.contractAddress,
       id: itemRequirement.id,
     };
   }
   return {
-    sufficient,
+    sufficient: sufficient ?? false,
     type: ItemType.ERC721,
     delta: {
       balance: delta,
@@ -93,7 +90,7 @@ export const getERC721BalanceRequirement = (
     current: erc721BalanceResult,
     required: {
       ...erc721BalanceResult,
-      balance: BigNumber.from(1),
+      balance: BigInt(1),
       formattedBalance: '1',
     },
     isFee: false,
@@ -125,7 +122,7 @@ type TokensInfoMap = {
 export const getTokensInfo = async (
   itemRequirements: Array<ERC20Item | NativeItem>,
   balances: ItemBalance[],
-  provider: Web3Provider,
+  provider: BrowserProvider,
 ): Promise<TokensInfoMap> => {
   const tokensInfo: TokensInfoMap = {};
 
@@ -196,34 +193,32 @@ export const getTokenBalanceRequirement = (
 ): BalanceNativeRequirement | BalanceERC20Requirement => {
   let tokenBalance = getTokenFromBalances(itemRequirement, balances);
 
-  const requiredBalance: BigNumber = itemRequirement.amount;
+  const requiredBalance: bigint = itemRequirement.amount;
 
   // Calculate the balance delta
-  const sufficient = requiredBalance.isNegative()
-    || requiredBalance.isZero()
-    || (tokenBalance?.balance.gte(requiredBalance) ?? false);
+  const sufficient = requiredBalance < 0
+    || requiredBalance === 0n
+    || (tokenBalance && tokenBalance?.balance >= requiredBalance);
 
-  const delta = requiredBalance.sub(
-    tokenBalance?.balance ?? BigNumber.from(0),
-  );
+  const delta = requiredBalance - (tokenBalance?.balance ?? BigInt(0));
 
   if (itemRequirement.type === ItemType.NATIVE) {
     // No token balance so mark as zero native
     if (!tokenBalance) {
       tokenBalance = {
         type: ItemType.NATIVE,
-        balance: BigNumber.from(0),
+        balance: BigInt(0),
         formattedBalance: '0',
         token,
       };
     }
 
     return {
-      sufficient,
+      sufficient: sufficient ?? false,
       type: ItemType.NATIVE,
       delta: {
         balance: delta,
-        formattedBalance: utils.formatUnits(delta, token.decimals),
+        formattedBalance: formatUnits(delta, token.decimals),
       },
       current: {
         ...tokenBalance,
@@ -233,8 +228,8 @@ export const getTokenBalanceRequirement = (
       required: {
         ...tokenBalance,
         type: ItemType.NATIVE,
-        balance: BigNumber.from(itemRequirement.amount),
-        formattedBalance: utils.formatUnits(itemRequirement.amount, token.decimals),
+        balance: BigInt(itemRequirement.amount),
+        formattedBalance: formatUnits(itemRequirement.amount, token.decimals),
         token,
       },
       isFee: itemRequirement.isFee,
@@ -245,18 +240,18 @@ export const getTokenBalanceRequirement = (
   if (!tokenBalance) {
     tokenBalance = {
       type: itemRequirement.type,
-      balance: BigNumber.from(0),
+      balance: BigInt(0),
       formattedBalance: '0',
       token,
     };
   }
 
   return {
-    sufficient,
+    sufficient: sufficient ?? false,
     type: ItemType.ERC20,
     delta: {
       balance: delta,
-      formattedBalance: utils.formatUnits(delta, token.decimals),
+      formattedBalance: formatUnits(delta, token.decimals),
     },
     current: {
       ...tokenBalance,
@@ -265,8 +260,8 @@ export const getTokenBalanceRequirement = (
     required: {
       ...tokenBalance,
       token,
-      balance: BigNumber.from(itemRequirement.amount),
-      formattedBalance: utils.formatUnits(itemRequirement.amount, token.decimals),
+      balance: BigInt(itemRequirement.amount),
+      formattedBalance: formatUnits(itemRequirement.amount, token.decimals),
     },
     isFee: itemRequirement.isFee,
   };

@@ -3,7 +3,6 @@ import {
   isDualVariantIcon,
   MenuItem, type SxProps,
 } from '@biom3/react';
-import type { Web3Provider } from '@ethersproject/providers';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -13,6 +12,7 @@ import {
 import { getWalletLogoByName } from '../../../../lib/logoUtils';
 import { getWalletProviderNameByProvider, isPassportProvider } from '../../../../lib/provider';
 import { abbreviateWalletAddress } from '../../../../lib/utils';
+import { BrowserProvider } from 'ethers';
 
 const isCopiedStyle: SxProps = {
   background: 'base.color.status.success.bright',
@@ -28,7 +28,7 @@ export function WalletAddress({
   showL1Warning,
   setShowL1Warning,
 }: {
-  provider?: Web3Provider;
+  provider?: BrowserProvider;
   showL1Warning: boolean;
   setShowL1Warning: (show: boolean) => void;
 }) {
@@ -50,7 +50,7 @@ export function WalletAddress({
     if (!provider || walletAddress !== '') return;
 
     (async () => {
-      const address = await provider.getSigner().getAddress();
+      const address = await (await provider.getSigner()).getAddress();
       setWalletAddress(address);
     })();
   }, [provider, walletAddress]);

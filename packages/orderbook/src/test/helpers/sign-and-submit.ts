@@ -1,15 +1,12 @@
-import {
-  PopulatedTransaction, Signer, TypedDataDomain,
-  Wallet,
-} from 'ethers';
+import { PreparedTransactionRequest, Signer, TypedDataDomain, Wallet } from 'ethers';
 import { GAS_OVERRIDES } from './gas';
 
 export async function signAndSubmitTx(
-  transaction: PopulatedTransaction,
+  transaction: PreparedTransactionRequest,
   signer: Signer,
 ) {
   const rawTx = transaction;
-  rawTx.nonce = await signer.getTransactionCount();
+  rawTx.nonce = await signer.provider?.getTransactionCount(signer.getAddress());
   rawTx.maxFeePerGas = GAS_OVERRIDES.maxFeePerGas;
   rawTx.maxPriorityFeePerGas = GAS_OVERRIDES.maxPriorityFeePerGas;
   const signedTx = await signer.sendTransaction(rawTx);
@@ -24,6 +21,5 @@ export async function signMessage(
   }: { domain: TypedDataDomain, types: any, value: Record<string, any> },
   signer: Wallet,
 ): Promise<string> {
-  // eslint-disable-next-line
-  return signer._signTypedData(domain, types, value);
+  return signer.signTypedData(domain, types, value);
 }

@@ -3,164 +3,137 @@
 /* eslint-disable */
 import type {
   BaseContract,
-  BigNumber,
   BigNumberish,
   BytesLike,
-  CallOverrides,
-  ContractTransaction,
-  Overrides,
-  PayableOverrides,
-  PopulatedTransaction,
-  Signer,
-  utils,
-} from "ethers";
-import type {
   FunctionFragment,
   Result,
+  Interface,
   EventFragment,
-} from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
+  AddressLike,
+  ContractRunner,
+  ContractMethod,
+  Listener,
+} from "ethers";
 import type {
-  TypedEventFilter,
-  TypedEvent,
+  TypedContractEvent,
+  TypedDeferredTopicFilter,
+  TypedEventLog,
+  TypedLogDescription,
   TypedListener,
-  OnEvent,
-  PromiseOrValue,
+  TypedContractMethod,
 } from "./common";
 
 export declare namespace IImmutableSwapProxy {
   export type SecondaryFeeParamsStruct = {
-    recipient: PromiseOrValue<string>;
-    feeBasisPoints: PromiseOrValue<BigNumberish>;
+    recipient: AddressLike;
+    feeBasisPoints: BigNumberish;
   };
 
-  export type SecondaryFeeParamsStructOutput = [string, BigNumber] & {
-    recipient: string;
-    feeBasisPoints: BigNumber;
-  };
+  export type SecondaryFeeParamsStructOutput = [
+    recipient: string,
+    feeBasisPoints: bigint
+  ] & { recipient: string; feeBasisPoints: bigint };
 }
 
 export declare namespace IV3SwapRouter {
   export type ExactInputSingleParamsStruct = {
-    tokenIn: PromiseOrValue<string>;
-    tokenOut: PromiseOrValue<string>;
-    fee: PromiseOrValue<BigNumberish>;
-    recipient: PromiseOrValue<string>;
-    amountIn: PromiseOrValue<BigNumberish>;
-    amountOutMinimum: PromiseOrValue<BigNumberish>;
-    sqrtPriceLimitX96: PromiseOrValue<BigNumberish>;
+    tokenIn: AddressLike;
+    tokenOut: AddressLike;
+    fee: BigNumberish;
+    recipient: AddressLike;
+    amountIn: BigNumberish;
+    amountOutMinimum: BigNumberish;
+    sqrtPriceLimitX96: BigNumberish;
   };
 
   export type ExactInputSingleParamsStructOutput = [
-    string,
-    string,
-    number,
-    string,
-    BigNumber,
-    BigNumber,
-    BigNumber
+    tokenIn: string,
+    tokenOut: string,
+    fee: bigint,
+    recipient: string,
+    amountIn: bigint,
+    amountOutMinimum: bigint,
+    sqrtPriceLimitX96: bigint
   ] & {
     tokenIn: string;
     tokenOut: string;
-    fee: number;
+    fee: bigint;
     recipient: string;
-    amountIn: BigNumber;
-    amountOutMinimum: BigNumber;
-    sqrtPriceLimitX96: BigNumber;
+    amountIn: bigint;
+    amountOutMinimum: bigint;
+    sqrtPriceLimitX96: bigint;
   };
 
   export type ExactInputParamsStruct = {
-    path: PromiseOrValue<BytesLike>;
-    recipient: PromiseOrValue<string>;
-    amountIn: PromiseOrValue<BigNumberish>;
-    amountOutMinimum: PromiseOrValue<BigNumberish>;
+    path: BytesLike;
+    recipient: AddressLike;
+    amountIn: BigNumberish;
+    amountOutMinimum: BigNumberish;
   };
 
   export type ExactInputParamsStructOutput = [
-    string,
-    string,
-    BigNumber,
-    BigNumber
+    path: string,
+    recipient: string,
+    amountIn: bigint,
+    amountOutMinimum: bigint
   ] & {
     path: string;
     recipient: string;
-    amountIn: BigNumber;
-    amountOutMinimum: BigNumber;
+    amountIn: bigint;
+    amountOutMinimum: bigint;
   };
 
   export type ExactOutputSingleParamsStruct = {
-    tokenIn: PromiseOrValue<string>;
-    tokenOut: PromiseOrValue<string>;
-    fee: PromiseOrValue<BigNumberish>;
-    recipient: PromiseOrValue<string>;
-    amountOut: PromiseOrValue<BigNumberish>;
-    amountInMaximum: PromiseOrValue<BigNumberish>;
-    sqrtPriceLimitX96: PromiseOrValue<BigNumberish>;
+    tokenIn: AddressLike;
+    tokenOut: AddressLike;
+    fee: BigNumberish;
+    recipient: AddressLike;
+    amountOut: BigNumberish;
+    amountInMaximum: BigNumberish;
+    sqrtPriceLimitX96: BigNumberish;
   };
 
   export type ExactOutputSingleParamsStructOutput = [
-    string,
-    string,
-    number,
-    string,
-    BigNumber,
-    BigNumber,
-    BigNumber
+    tokenIn: string,
+    tokenOut: string,
+    fee: bigint,
+    recipient: string,
+    amountOut: bigint,
+    amountInMaximum: bigint,
+    sqrtPriceLimitX96: bigint
   ] & {
     tokenIn: string;
     tokenOut: string;
-    fee: number;
+    fee: bigint;
     recipient: string;
-    amountOut: BigNumber;
-    amountInMaximum: BigNumber;
-    sqrtPriceLimitX96: BigNumber;
+    amountOut: bigint;
+    amountInMaximum: bigint;
+    sqrtPriceLimitX96: bigint;
   };
 
   export type ExactOutputParamsStruct = {
-    path: PromiseOrValue<BytesLike>;
-    recipient: PromiseOrValue<string>;
-    amountOut: PromiseOrValue<BigNumberish>;
-    amountInMaximum: PromiseOrValue<BigNumberish>;
+    path: BytesLike;
+    recipient: AddressLike;
+    amountOut: BigNumberish;
+    amountInMaximum: BigNumberish;
   };
 
   export type ExactOutputParamsStructOutput = [
-    string,
-    string,
-    BigNumber,
-    BigNumber
+    path: string,
+    recipient: string,
+    amountOut: bigint,
+    amountInMaximum: bigint
   ] & {
     path: string;
     recipient: string;
-    amountOut: BigNumber;
-    amountInMaximum: BigNumber;
+    amountOut: bigint;
+    amountInMaximum: bigint;
   };
 }
 
-export interface ImmutableSwapProxyInterface extends utils.Interface {
-  functions: {
-    "DEFAULT_ADMIN_ROLE()": FunctionFragment;
-    "exactInputSingleWithSecondaryFee((address,uint256)[],(address,address,uint24,address,uint256,uint256,uint160))": FunctionFragment;
-    "exactInputWithSecondaryFee((address,uint256)[],(bytes,address,uint256,uint256))": FunctionFragment;
-    "exactOutputSingleWithSecondaryFee((address,uint256)[],(address,address,uint24,address,uint256,uint256,uint160))": FunctionFragment;
-    "exactOutputWithSecondaryFee((address,uint256)[],(bytes,address,uint256,uint256))": FunctionFragment;
-    "getRoleAdmin(bytes32)": FunctionFragment;
-    "grantRole(bytes32,address)": FunctionFragment;
-    "hasRole(bytes32,address)": FunctionFragment;
-    "multicall(uint256,bytes[])": FunctionFragment;
-    "multicall(bytes[])": FunctionFragment;
-    "pause()": FunctionFragment;
-    "paused()": FunctionFragment;
-    "renounceRole(bytes32,address)": FunctionFragment;
-    "revokeRole(bytes32,address)": FunctionFragment;
-    "supportsInterface(bytes4)": FunctionFragment;
-    "unpause()": FunctionFragment;
-    "unwrapNativeToken(uint256)": FunctionFragment;
-    "withdrawFunds(address,address)": FunctionFragment;
-    "withdrawFunds(address)": FunctionFragment;
-  };
-
+export interface ImmutableSwapProxyInterface extends Interface {
   getFunction(
-    nameOrSignatureOrTopic:
+    nameOrSignature:
       | "DEFAULT_ADMIN_ROLE"
       | "exactInputSingleWithSecondaryFee"
       | "exactInputWithSecondaryFee"
@@ -181,6 +154,17 @@ export interface ImmutableSwapProxyInterface extends utils.Interface {
       | "withdrawFunds(address,address)"
       | "withdrawFunds(address)"
   ): FunctionFragment;
+
+  getEvent(
+    nameOrSignatureOrTopic:
+      | "FeeTaken(address,address,address,uint256)"
+      | "FeeTaken(address,address,uint256)"
+      | "Paused"
+      | "RoleAdminChanged"
+      | "RoleGranted"
+      | "RoleRevoked"
+      | "Unpaused"
+  ): EventFragment;
 
   encodeFunctionData(
     functionFragment: "DEFAULT_ADMIN_ROLE",
@@ -216,50 +200,50 @@ export interface ImmutableSwapProxyInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getRoleAdmin",
-    values: [PromiseOrValue<BytesLike>]
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "grantRole",
-    values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
+    values: [BytesLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "hasRole",
-    values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
+    values: [BytesLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "multicall(uint256,bytes[])",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BytesLike>[]]
+    values: [BigNumberish, BytesLike[]]
   ): string;
   encodeFunctionData(
     functionFragment: "multicall(bytes[])",
-    values: [PromiseOrValue<BytesLike>[]]
+    values: [BytesLike[]]
   ): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "renounceRole",
-    values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
+    values: [BytesLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "revokeRole",
-    values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
+    values: [BytesLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
-    values: [PromiseOrValue<BytesLike>]
+    values: [BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "unwrapNativeToken",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "withdrawFunds(address,address)",
-    values: [PromiseOrValue<string>, PromiseOrValue<string>]
+    values: [AddressLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "withdrawFunds(address)",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
 
   decodeFunctionResult(
@@ -320,675 +304,515 @@ export interface ImmutableSwapProxyInterface extends utils.Interface {
     functionFragment: "withdrawFunds(address)",
     data: BytesLike
   ): Result;
-
-  events: {
-    "FeeTaken(address,address,address,uint256)": EventFragment;
-    "FeeTaken(address,address,uint256)": EventFragment;
-    "Paused(address)": EventFragment;
-    "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
-    "RoleGranted(bytes32,address,address)": EventFragment;
-    "RoleRevoked(bytes32,address,address)": EventFragment;
-    "Unpaused(address)": EventFragment;
-  };
-
-  getEvent(
-    nameOrSignatureOrTopic: "FeeTaken(address,address,address,uint256)"
-  ): EventFragment;
-  getEvent(
-    nameOrSignatureOrTopic: "FeeTaken(address,address,uint256)"
-  ): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
 }
 
-export interface FeeTaken_address_address_address_uint256_EventObject {
-  feeToken: string;
-  feePayer: string;
-  feeRecipient: string;
-  feeAmount: BigNumber;
+export namespace FeeTaken_address_address_address_uint256_Event {
+  export type InputTuple = [
+    feeToken: AddressLike,
+    feePayer: AddressLike,
+    feeRecipient: AddressLike,
+    feeAmount: BigNumberish
+  ];
+  export type OutputTuple = [
+    feeToken: string,
+    feePayer: string,
+    feeRecipient: string,
+    feeAmount: bigint
+  ];
+  export interface OutputObject {
+    feeToken: string;
+    feePayer: string;
+    feeRecipient: string;
+    feeAmount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type FeeTaken_address_address_address_uint256_Event = TypedEvent<
-  [string, string, string, BigNumber],
-  FeeTaken_address_address_address_uint256_EventObject
->;
 
-export type FeeTaken_address_address_address_uint256_EventFilter =
-  TypedEventFilter<FeeTaken_address_address_address_uint256_Event>;
-
-export interface FeeTaken_address_address_uint256_EventObject {
-  feePayer: string;
-  feeRecipient: string;
-  feeAmount: BigNumber;
+export namespace FeeTaken_address_address_uint256_Event {
+  export type InputTuple = [
+    feePayer: AddressLike,
+    feeRecipient: AddressLike,
+    feeAmount: BigNumberish
+  ];
+  export type OutputTuple = [
+    feePayer: string,
+    feeRecipient: string,
+    feeAmount: bigint
+  ];
+  export interface OutputObject {
+    feePayer: string;
+    feeRecipient: string;
+    feeAmount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type FeeTaken_address_address_uint256_Event = TypedEvent<
-  [string, string, BigNumber],
-  FeeTaken_address_address_uint256_EventObject
->;
 
-export type FeeTaken_address_address_uint256_EventFilter =
-  TypedEventFilter<FeeTaken_address_address_uint256_Event>;
-
-export interface PausedEventObject {
-  account: string;
+export namespace PausedEvent {
+  export type InputTuple = [account: AddressLike];
+  export type OutputTuple = [account: string];
+  export interface OutputObject {
+    account: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type PausedEvent = TypedEvent<[string], PausedEventObject>;
 
-export type PausedEventFilter = TypedEventFilter<PausedEvent>;
-
-export interface RoleAdminChangedEventObject {
-  role: string;
-  previousAdminRole: string;
-  newAdminRole: string;
+export namespace RoleAdminChangedEvent {
+  export type InputTuple = [
+    role: BytesLike,
+    previousAdminRole: BytesLike,
+    newAdminRole: BytesLike
+  ];
+  export type OutputTuple = [
+    role: string,
+    previousAdminRole: string,
+    newAdminRole: string
+  ];
+  export interface OutputObject {
+    role: string;
+    previousAdminRole: string;
+    newAdminRole: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type RoleAdminChangedEvent = TypedEvent<
-  [string, string, string],
-  RoleAdminChangedEventObject
->;
 
-export type RoleAdminChangedEventFilter =
-  TypedEventFilter<RoleAdminChangedEvent>;
-
-export interface RoleGrantedEventObject {
-  role: string;
-  account: string;
-  sender: string;
+export namespace RoleGrantedEvent {
+  export type InputTuple = [
+    role: BytesLike,
+    account: AddressLike,
+    sender: AddressLike
+  ];
+  export type OutputTuple = [role: string, account: string, sender: string];
+  export interface OutputObject {
+    role: string;
+    account: string;
+    sender: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type RoleGrantedEvent = TypedEvent<
-  [string, string, string],
-  RoleGrantedEventObject
->;
 
-export type RoleGrantedEventFilter = TypedEventFilter<RoleGrantedEvent>;
-
-export interface RoleRevokedEventObject {
-  role: string;
-  account: string;
-  sender: string;
+export namespace RoleRevokedEvent {
+  export type InputTuple = [
+    role: BytesLike,
+    account: AddressLike,
+    sender: AddressLike
+  ];
+  export type OutputTuple = [role: string, account: string, sender: string];
+  export interface OutputObject {
+    role: string;
+    account: string;
+    sender: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type RoleRevokedEvent = TypedEvent<
-  [string, string, string],
-  RoleRevokedEventObject
->;
 
-export type RoleRevokedEventFilter = TypedEventFilter<RoleRevokedEvent>;
-
-export interface UnpausedEventObject {
-  account: string;
+export namespace UnpausedEvent {
+  export type InputTuple = [account: AddressLike];
+  export type OutputTuple = [account: string];
+  export interface OutputObject {
+    account: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type UnpausedEvent = TypedEvent<[string], UnpausedEventObject>;
-
-export type UnpausedEventFilter = TypedEventFilter<UnpausedEvent>;
 
 export interface ImmutableSwapProxy extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(runner?: ContractRunner | null): ImmutableSwapProxy;
+  waitForDeployment(): Promise<this>;
 
   interface: ImmutableSwapProxyInterface;
 
-  queryFilter<TEvent extends TypedEvent>(
-    event: TypedEventFilter<TEvent>,
+  queryFilter<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TEvent>>;
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
+  queryFilter<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    fromBlockOrBlockhash?: string | number | undefined,
+    toBlock?: string | number | undefined
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
 
-  listeners<TEvent extends TypedEvent>(
-    eventFilter?: TypedEventFilter<TEvent>
-  ): Array<TypedListener<TEvent>>;
-  listeners(eventName?: string): Array<Listener>;
-  removeAllListeners<TEvent extends TypedEvent>(
-    eventFilter: TypedEventFilter<TEvent>
-  ): this;
-  removeAllListeners(eventName?: string): this;
-  off: OnEvent<this>;
-  on: OnEvent<this>;
-  once: OnEvent<this>;
-  removeListener: OnEvent<this>;
+  on<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  on<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-  functions: {
-    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
+  once<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  once<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-    exactInputSingleWithSecondaryFee(
+  listeners<TCEvent extends TypedContractEvent>(
+    event: TCEvent
+  ): Promise<Array<TypedListener<TCEvent>>>;
+  listeners(eventName?: string): Promise<Array<Listener>>;
+  removeAllListeners<TCEvent extends TypedContractEvent>(
+    event?: TCEvent
+  ): Promise<this>;
+
+  DEFAULT_ADMIN_ROLE: TypedContractMethod<[], [string], "view">;
+
+  exactInputSingleWithSecondaryFee: TypedContractMethod<
+    [
       secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
-      swapParams: IV3SwapRouter.ExactInputSingleParamsStruct,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+      swapParams: IV3SwapRouter.ExactInputSingleParamsStruct
+    ],
+    [bigint],
+    "payable"
+  >;
 
-    exactInputWithSecondaryFee(
+  exactInputWithSecondaryFee: TypedContractMethod<
+    [
       secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
-      swapParams: IV3SwapRouter.ExactInputParamsStruct,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+      swapParams: IV3SwapRouter.ExactInputParamsStruct
+    ],
+    [bigint],
+    "payable"
+  >;
 
-    exactOutputSingleWithSecondaryFee(
+  exactOutputSingleWithSecondaryFee: TypedContractMethod<
+    [
       secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
-      swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+      swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct
+    ],
+    [bigint],
+    "payable"
+  >;
 
-    exactOutputWithSecondaryFee(
+  exactOutputWithSecondaryFee: TypedContractMethod<
+    [
       secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
-      swapParams: IV3SwapRouter.ExactOutputParamsStruct,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+      swapParams: IV3SwapRouter.ExactOutputParamsStruct
+    ],
+    [bigint],
+    "payable"
+  >;
 
-    getRoleAdmin(
-      role: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
+  getRoleAdmin: TypedContractMethod<[role: BytesLike], [string], "view">;
 
-    grantRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  grantRole: TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
-    hasRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
+  hasRole: TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [boolean],
+    "view"
+  >;
 
-    "multicall(uint256,bytes[])"(
-      deadline: PromiseOrValue<BigNumberish>,
-      data: PromiseOrValue<BytesLike>[],
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  "multicall(uint256,bytes[])": TypedContractMethod<
+    [deadline: BigNumberish, data: BytesLike[]],
+    [string[]],
+    "payable"
+  >;
 
-    "multicall(bytes[])"(
-      data: PromiseOrValue<BytesLike>[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  "multicall(bytes[])": TypedContractMethod<
+    [data: BytesLike[]],
+    [string[]],
+    "nonpayable"
+  >;
 
-    pause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  pause: TypedContractMethod<[], [void], "nonpayable">;
 
-    paused(overrides?: CallOverrides): Promise<[boolean]>;
+  paused: TypedContractMethod<[], [boolean], "view">;
 
-    renounceRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  renounceRole: TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
-    revokeRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  revokeRole: TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
-    supportsInterface(
-      interfaceId: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
+  supportsInterface: TypedContractMethod<
+    [interfaceId: BytesLike],
+    [boolean],
+    "view"
+  >;
 
-    unpause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  unpause: TypedContractMethod<[], [void], "nonpayable">;
 
-    unwrapNativeToken(
-      amountMinimum: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  unwrapNativeToken: TypedContractMethod<
+    [amountMinimum: BigNumberish],
+    [void],
+    "payable"
+  >;
 
-    "withdrawFunds(address,address)"(
-      to: PromiseOrValue<string>,
-      erc20: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  "withdrawFunds(address,address)": TypedContractMethod<
+    [to: AddressLike, erc20: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
-    "withdrawFunds(address)"(
-      to: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-  };
+  "withdrawFunds(address)": TypedContractMethod<
+    [to: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
-  DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+  getFunction<T extends ContractMethod = ContractMethod>(
+    key: string | FunctionFragment
+  ): T;
 
-  exactInputSingleWithSecondaryFee(
-    secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
-    swapParams: IV3SwapRouter.ExactInputSingleParamsStruct,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  exactInputWithSecondaryFee(
-    secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
-    swapParams: IV3SwapRouter.ExactInputParamsStruct,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  exactOutputSingleWithSecondaryFee(
-    secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
-    swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  exactOutputWithSecondaryFee(
-    secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
-    swapParams: IV3SwapRouter.ExactOutputParamsStruct,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  getRoleAdmin(
-    role: PromiseOrValue<BytesLike>,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  grantRole(
-    role: PromiseOrValue<BytesLike>,
-    account: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  hasRole(
-    role: PromiseOrValue<BytesLike>,
-    account: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  "multicall(uint256,bytes[])"(
-    deadline: PromiseOrValue<BigNumberish>,
-    data: PromiseOrValue<BytesLike>[],
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  "multicall(bytes[])"(
-    data: PromiseOrValue<BytesLike>[],
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  pause(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  paused(overrides?: CallOverrides): Promise<boolean>;
-
-  renounceRole(
-    role: PromiseOrValue<BytesLike>,
-    account: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  revokeRole(
-    role: PromiseOrValue<BytesLike>,
-    account: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  supportsInterface(
-    interfaceId: PromiseOrValue<BytesLike>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  unpause(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  unwrapNativeToken(
-    amountMinimum: PromiseOrValue<BigNumberish>,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  "withdrawFunds(address,address)"(
-    to: PromiseOrValue<string>,
-    erc20: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  "withdrawFunds(address)"(
-    to: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  callStatic: {
-    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
-
-    exactInputSingleWithSecondaryFee(
+  getFunction(
+    nameOrSignature: "DEFAULT_ADMIN_ROLE"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "exactInputSingleWithSecondaryFee"
+  ): TypedContractMethod<
+    [
       secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
-      swapParams: IV3SwapRouter.ExactInputSingleParamsStruct,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    exactInputWithSecondaryFee(
+      swapParams: IV3SwapRouter.ExactInputSingleParamsStruct
+    ],
+    [bigint],
+    "payable"
+  >;
+  getFunction(
+    nameOrSignature: "exactInputWithSecondaryFee"
+  ): TypedContractMethod<
+    [
       secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
-      swapParams: IV3SwapRouter.ExactInputParamsStruct,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    exactOutputSingleWithSecondaryFee(
+      swapParams: IV3SwapRouter.ExactInputParamsStruct
+    ],
+    [bigint],
+    "payable"
+  >;
+  getFunction(
+    nameOrSignature: "exactOutputSingleWithSecondaryFee"
+  ): TypedContractMethod<
+    [
       secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
-      swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    exactOutputWithSecondaryFee(
+      swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct
+    ],
+    [bigint],
+    "payable"
+  >;
+  getFunction(
+    nameOrSignature: "exactOutputWithSecondaryFee"
+  ): TypedContractMethod<
+    [
       secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
-      swapParams: IV3SwapRouter.ExactOutputParamsStruct,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+      swapParams: IV3SwapRouter.ExactOutputParamsStruct
+    ],
+    [bigint],
+    "payable"
+  >;
+  getFunction(
+    nameOrSignature: "getRoleAdmin"
+  ): TypedContractMethod<[role: BytesLike], [string], "view">;
+  getFunction(
+    nameOrSignature: "grantRole"
+  ): TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "hasRole"
+  ): TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [boolean],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "multicall(uint256,bytes[])"
+  ): TypedContractMethod<
+    [deadline: BigNumberish, data: BytesLike[]],
+    [string[]],
+    "payable"
+  >;
+  getFunction(
+    nameOrSignature: "multicall(bytes[])"
+  ): TypedContractMethod<[data: BytesLike[]], [string[]], "nonpayable">;
+  getFunction(
+    nameOrSignature: "pause"
+  ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "paused"
+  ): TypedContractMethod<[], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "renounceRole"
+  ): TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "revokeRole"
+  ): TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "supportsInterface"
+  ): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "unpause"
+  ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "unwrapNativeToken"
+  ): TypedContractMethod<[amountMinimum: BigNumberish], [void], "payable">;
+  getFunction(
+    nameOrSignature: "withdrawFunds(address,address)"
+  ): TypedContractMethod<
+    [to: AddressLike, erc20: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "withdrawFunds(address)"
+  ): TypedContractMethod<[to: AddressLike], [void], "nonpayable">;
 
-    getRoleAdmin(
-      role: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    grantRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    hasRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    "multicall(uint256,bytes[])"(
-      deadline: PromiseOrValue<BigNumberish>,
-      data: PromiseOrValue<BytesLike>[],
-      overrides?: CallOverrides
-    ): Promise<string[]>;
-
-    "multicall(bytes[])"(
-      data: PromiseOrValue<BytesLike>[],
-      overrides?: CallOverrides
-    ): Promise<string[]>;
-
-    pause(overrides?: CallOverrides): Promise<void>;
-
-    paused(overrides?: CallOverrides): Promise<boolean>;
-
-    renounceRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    revokeRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    supportsInterface(
-      interfaceId: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    unpause(overrides?: CallOverrides): Promise<void>;
-
-    unwrapNativeToken(
-      amountMinimum: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "withdrawFunds(address,address)"(
-      to: PromiseOrValue<string>,
-      erc20: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "withdrawFunds(address)"(
-      to: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-  };
+  getEvent(
+    key: "FeeTaken(address,address,address,uint256)"
+  ): TypedContractEvent<
+    FeeTaken_address_address_address_uint256_Event.InputTuple,
+    FeeTaken_address_address_address_uint256_Event.OutputTuple,
+    FeeTaken_address_address_address_uint256_Event.OutputObject
+  >;
+  getEvent(
+    key: "FeeTaken(address,address,uint256)"
+  ): TypedContractEvent<
+    FeeTaken_address_address_uint256_Event.InputTuple,
+    FeeTaken_address_address_uint256_Event.OutputTuple,
+    FeeTaken_address_address_uint256_Event.OutputObject
+  >;
+  getEvent(
+    key: "Paused"
+  ): TypedContractEvent<
+    PausedEvent.InputTuple,
+    PausedEvent.OutputTuple,
+    PausedEvent.OutputObject
+  >;
+  getEvent(
+    key: "RoleAdminChanged"
+  ): TypedContractEvent<
+    RoleAdminChangedEvent.InputTuple,
+    RoleAdminChangedEvent.OutputTuple,
+    RoleAdminChangedEvent.OutputObject
+  >;
+  getEvent(
+    key: "RoleGranted"
+  ): TypedContractEvent<
+    RoleGrantedEvent.InputTuple,
+    RoleGrantedEvent.OutputTuple,
+    RoleGrantedEvent.OutputObject
+  >;
+  getEvent(
+    key: "RoleRevoked"
+  ): TypedContractEvent<
+    RoleRevokedEvent.InputTuple,
+    RoleRevokedEvent.OutputTuple,
+    RoleRevokedEvent.OutputObject
+  >;
+  getEvent(
+    key: "Unpaused"
+  ): TypedContractEvent<
+    UnpausedEvent.InputTuple,
+    UnpausedEvent.OutputTuple,
+    UnpausedEvent.OutputObject
+  >;
 
   filters: {
-    "FeeTaken(address,address,address,uint256)"(
-      feeToken?: PromiseOrValue<string> | null,
-      feePayer?: PromiseOrValue<string> | null,
-      feeRecipient?: PromiseOrValue<string> | null,
-      feeAmount?: null
-    ): FeeTaken_address_address_address_uint256_EventFilter;
-    "FeeTaken(address,address,uint256)"(
-      feePayer?: PromiseOrValue<string> | null,
-      feeRecipient?: PromiseOrValue<string> | null,
-      feeAmount?: null
-    ): FeeTaken_address_address_uint256_EventFilter;
+    "FeeTaken(address,address,address,uint256)": TypedContractEvent<
+      FeeTaken_address_address_address_uint256_Event.InputTuple,
+      FeeTaken_address_address_address_uint256_Event.OutputTuple,
+      FeeTaken_address_address_address_uint256_Event.OutputObject
+    >;
+    "FeeTaken(address,address,uint256)": TypedContractEvent<
+      FeeTaken_address_address_uint256_Event.InputTuple,
+      FeeTaken_address_address_uint256_Event.OutputTuple,
+      FeeTaken_address_address_uint256_Event.OutputObject
+    >;
 
-    "Paused(address)"(account?: null): PausedEventFilter;
-    Paused(account?: null): PausedEventFilter;
+    "Paused(address)": TypedContractEvent<
+      PausedEvent.InputTuple,
+      PausedEvent.OutputTuple,
+      PausedEvent.OutputObject
+    >;
+    Paused: TypedContractEvent<
+      PausedEvent.InputTuple,
+      PausedEvent.OutputTuple,
+      PausedEvent.OutputObject
+    >;
 
-    "RoleAdminChanged(bytes32,bytes32,bytes32)"(
-      role?: PromiseOrValue<BytesLike> | null,
-      previousAdminRole?: PromiseOrValue<BytesLike> | null,
-      newAdminRole?: PromiseOrValue<BytesLike> | null
-    ): RoleAdminChangedEventFilter;
-    RoleAdminChanged(
-      role?: PromiseOrValue<BytesLike> | null,
-      previousAdminRole?: PromiseOrValue<BytesLike> | null,
-      newAdminRole?: PromiseOrValue<BytesLike> | null
-    ): RoleAdminChangedEventFilter;
+    "RoleAdminChanged(bytes32,bytes32,bytes32)": TypedContractEvent<
+      RoleAdminChangedEvent.InputTuple,
+      RoleAdminChangedEvent.OutputTuple,
+      RoleAdminChangedEvent.OutputObject
+    >;
+    RoleAdminChanged: TypedContractEvent<
+      RoleAdminChangedEvent.InputTuple,
+      RoleAdminChangedEvent.OutputTuple,
+      RoleAdminChangedEvent.OutputObject
+    >;
 
-    "RoleGranted(bytes32,address,address)"(
-      role?: PromiseOrValue<BytesLike> | null,
-      account?: PromiseOrValue<string> | null,
-      sender?: PromiseOrValue<string> | null
-    ): RoleGrantedEventFilter;
-    RoleGranted(
-      role?: PromiseOrValue<BytesLike> | null,
-      account?: PromiseOrValue<string> | null,
-      sender?: PromiseOrValue<string> | null
-    ): RoleGrantedEventFilter;
+    "RoleGranted(bytes32,address,address)": TypedContractEvent<
+      RoleGrantedEvent.InputTuple,
+      RoleGrantedEvent.OutputTuple,
+      RoleGrantedEvent.OutputObject
+    >;
+    RoleGranted: TypedContractEvent<
+      RoleGrantedEvent.InputTuple,
+      RoleGrantedEvent.OutputTuple,
+      RoleGrantedEvent.OutputObject
+    >;
 
-    "RoleRevoked(bytes32,address,address)"(
-      role?: PromiseOrValue<BytesLike> | null,
-      account?: PromiseOrValue<string> | null,
-      sender?: PromiseOrValue<string> | null
-    ): RoleRevokedEventFilter;
-    RoleRevoked(
-      role?: PromiseOrValue<BytesLike> | null,
-      account?: PromiseOrValue<string> | null,
-      sender?: PromiseOrValue<string> | null
-    ): RoleRevokedEventFilter;
+    "RoleRevoked(bytes32,address,address)": TypedContractEvent<
+      RoleRevokedEvent.InputTuple,
+      RoleRevokedEvent.OutputTuple,
+      RoleRevokedEvent.OutputObject
+    >;
+    RoleRevoked: TypedContractEvent<
+      RoleRevokedEvent.InputTuple,
+      RoleRevokedEvent.OutputTuple,
+      RoleRevokedEvent.OutputObject
+    >;
 
-    "Unpaused(address)"(account?: null): UnpausedEventFilter;
-    Unpaused(account?: null): UnpausedEventFilter;
-  };
-
-  estimateGas: {
-    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    exactInputSingleWithSecondaryFee(
-      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
-      swapParams: IV3SwapRouter.ExactInputSingleParamsStruct,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    exactInputWithSecondaryFee(
-      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
-      swapParams: IV3SwapRouter.ExactInputParamsStruct,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    exactOutputSingleWithSecondaryFee(
-      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
-      swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    exactOutputWithSecondaryFee(
-      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
-      swapParams: IV3SwapRouter.ExactOutputParamsStruct,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    getRoleAdmin(
-      role: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    grantRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    hasRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "multicall(uint256,bytes[])"(
-      deadline: PromiseOrValue<BigNumberish>,
-      data: PromiseOrValue<BytesLike>[],
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    "multicall(bytes[])"(
-      data: PromiseOrValue<BytesLike>[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    pause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    paused(overrides?: CallOverrides): Promise<BigNumber>;
-
-    renounceRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    revokeRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    supportsInterface(
-      interfaceId: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    unpause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    unwrapNativeToken(
-      amountMinimum: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    "withdrawFunds(address,address)"(
-      to: PromiseOrValue<string>,
-      erc20: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    "withdrawFunds(address)"(
-      to: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-  };
-
-  populateTransaction: {
-    DEFAULT_ADMIN_ROLE(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    exactInputSingleWithSecondaryFee(
-      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
-      swapParams: IV3SwapRouter.ExactInputSingleParamsStruct,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    exactInputWithSecondaryFee(
-      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
-      swapParams: IV3SwapRouter.ExactInputParamsStruct,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    exactOutputSingleWithSecondaryFee(
-      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
-      swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    exactOutputWithSecondaryFee(
-      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
-      swapParams: IV3SwapRouter.ExactOutputParamsStruct,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    getRoleAdmin(
-      role: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    grantRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    hasRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "multicall(uint256,bytes[])"(
-      deadline: PromiseOrValue<BigNumberish>,
-      data: PromiseOrValue<BytesLike>[],
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "multicall(bytes[])"(
-      data: PromiseOrValue<BytesLike>[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    pause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    renounceRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    revokeRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    supportsInterface(
-      interfaceId: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    unpause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    unwrapNativeToken(
-      amountMinimum: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "withdrawFunds(address,address)"(
-      to: PromiseOrValue<string>,
-      erc20: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "withdrawFunds(address)"(
-      to: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
+    "Unpaused(address)": TypedContractEvent<
+      UnpausedEvent.InputTuple,
+      UnpausedEvent.OutputTuple,
+      UnpausedEvent.OutputObject
+    >;
+    Unpaused: TypedContractEvent<
+      UnpausedEvent.InputTuple,
+      UnpausedEvent.OutputTuple,
+      UnpausedEvent.OutputObject
+    >;
   };
 }

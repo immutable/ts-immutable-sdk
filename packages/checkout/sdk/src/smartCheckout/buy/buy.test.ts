@@ -1,9 +1,7 @@
-import { BigNumber, PopulatedTransaction } from 'ethers';
 import { Environment } from '@imtbl/config';
 import {
   ActionType, TransactionPurpose, constants,
 } from '@imtbl/orderbook';
-import { Web3Provider } from '@ethersproject/providers';
 import {
   getItemRequirement, buy, getTransactionOrGas,
 } from './buy';
@@ -27,6 +25,7 @@ import { SignTransactionStatusType } from '../actions/types';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../routing/indexer/fetchL1Representation';
 import { HttpClient } from '../../api/http';
 import { sendTransaction } from '../../transaction';
+import { BrowserProvider, PreparedTransactionRequest } from 'ethers';
 
 jest.mock('../../instance');
 jest.mock('../smartCheckout');
@@ -45,14 +44,14 @@ describe('buy', () => {
 
   describe('buy', () => {
     let config: CheckoutConfiguration;
-    let mockProvider: Web3Provider;
+    let mockProvider: BrowserProvider;
 
     beforeEach(() => {
       mockProvider = {
         getSigner: jest.fn().mockReturnValue({
           getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
         }),
-      } as unknown as Web3Provider;
+      } as unknown as BrowserProvider;
 
       config = new CheckoutConfiguration({
         baseConfig: { environment: Environment.SANDBOX },
@@ -67,7 +66,7 @@ describe('buy', () => {
           sufficient: true,
           required: {
             type: ItemType.NATIVE,
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'IMX',
@@ -77,7 +76,7 @@ describe('buy', () => {
           },
           current: {
             type: ItemType.NATIVE,
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'IMX',
@@ -86,7 +85,7 @@ describe('buy', () => {
             },
           },
           delta: {
-            balance: BigNumber.from(0),
+            balance: BigInt(0),
             formattedBalance: '0',
           },
           isFee: false,
@@ -97,12 +96,12 @@ describe('buy', () => {
           {
             type: ActionType.TRANSACTION,
             purpose: TransactionPurpose.FULFILL_ORDER,
-            buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PopulatedTransaction),
+            buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PreparedTransactionRequest),
           },
           {
             type: ActionType.TRANSACTION,
             purpose: TransactionPurpose.APPROVAL,
-            buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PopulatedTransaction),
+            buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PreparedTransactionRequest),
           },
         ],
       });
@@ -151,7 +150,7 @@ describe('buy', () => {
       const itemRequirements = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from('2000000000000000000'),
+          amount: BigInt('2000000000000000000'),
           isFee: false,
         },
       ];
@@ -199,7 +198,7 @@ describe('buy', () => {
           sufficient: true,
           required: {
             type: ItemType.NATIVE,
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'IMX',
@@ -209,7 +208,7 @@ describe('buy', () => {
           },
           current: {
             type: ItemType.NATIVE,
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'IMX',
@@ -218,7 +217,7 @@ describe('buy', () => {
             },
           },
           delta: {
-            balance: BigNumber.from(0),
+            balance: BigInt(0),
             formattedBalance: '0',
           },
           isFee: false,
@@ -228,7 +227,7 @@ describe('buy', () => {
           sufficient: true,
           required: {
             type: ItemType.ERC20,
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'IMX',
@@ -238,7 +237,7 @@ describe('buy', () => {
           },
           current: {
             type: ItemType.ERC20,
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'IMX',
@@ -247,7 +246,7 @@ describe('buy', () => {
             },
           },
           delta: {
-            balance: BigNumber.from(0),
+            balance: BigInt(0),
             formattedBalance: '0',
           },
           isFee: false,
@@ -258,12 +257,12 @@ describe('buy', () => {
           {
             type: ActionType.TRANSACTION,
             purpose: TransactionPurpose.FULFILL_ORDER,
-            buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PopulatedTransaction),
+            buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PreparedTransactionRequest),
           },
           {
             type: ActionType.TRANSACTION,
             purpose: TransactionPurpose.APPROVAL,
-            buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PopulatedTransaction),
+            buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PreparedTransactionRequest),
           },
         ],
       });
@@ -326,7 +325,7 @@ describe('buy', () => {
       const itemRequirements = [
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from('2000000000000000000'),
+          amount: BigInt('2000000000000000000'),
           tokenAddress: '0xCONTRACTADDRESS',
           spenderAddress: '0xSEAPORT',
           isFee: false,
@@ -337,7 +336,7 @@ describe('buy', () => {
         type: TransactionOrGasType.GAS,
         gasToken: {
           type: GasTokenType.NATIVE,
-          limit: BigNumber.from(constants.estimatedFulfillmentGasGwei),
+          limit: BigInt(constants.estimatedFulfillmentGasGwei),
         },
       };
 
@@ -378,7 +377,7 @@ describe('buy', () => {
           sufficient: true,
           required: {
             type: ItemType.NATIVE,
-            balance: BigNumber.from(10),
+            balance: BigInt(10),
             formattedBalance: '10',
             token: {
               name: 'IMX',
@@ -388,7 +387,7 @@ describe('buy', () => {
           },
           current: {
             type: ItemType.NATIVE,
-            balance: BigNumber.from(10),
+            balance: BigInt(10),
             formattedBalance: '10',
             token: {
               name: 'IMX',
@@ -397,7 +396,7 @@ describe('buy', () => {
             },
           },
           delta: {
-            balance: BigNumber.from(0),
+            balance: BigInt(0),
             formattedBalance: '0',
           },
           isFee: false,
@@ -408,12 +407,12 @@ describe('buy', () => {
           {
             type: ActionType.TRANSACTION,
             purpose: TransactionPurpose.FULFILL_ORDER,
-            buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PopulatedTransaction),
+            buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PreparedTransactionRequest),
           },
           {
             type: ActionType.TRANSACTION,
             purpose: TransactionPurpose.APPROVAL,
-            buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PopulatedTransaction),
+            buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PreparedTransactionRequest),
           },
         ],
       });
@@ -462,7 +461,7 @@ describe('buy', () => {
       const itemRequirements = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from('10010000000000000000'), // 101e16
+          amount: BigInt('10010000000000000000'), // 101e16
           isFee: false,
         },
       ];
@@ -510,7 +509,7 @@ describe('buy', () => {
           sufficient: true,
           required: {
             type: ItemType.NATIVE,
-            balance: BigNumber.from(10),
+            balance: BigInt(10),
             formattedBalance: '10',
             token: {
               name: 'IMX',
@@ -520,7 +519,7 @@ describe('buy', () => {
           },
           current: {
             type: ItemType.NATIVE,
-            balance: BigNumber.from(10),
+            balance: BigInt(10),
             formattedBalance: '10',
             token: {
               name: 'IMX',
@@ -529,7 +528,7 @@ describe('buy', () => {
             },
           },
           delta: {
-            balance: BigNumber.from(0),
+            balance: BigInt(0),
             formattedBalance: '0',
           },
           isFee: false,
@@ -540,12 +539,12 @@ describe('buy', () => {
           {
             type: ActionType.TRANSACTION,
             purpose: TransactionPurpose.FULFILL_ORDER,
-            buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PopulatedTransaction),
+            buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PreparedTransactionRequest),
           },
           {
             type: ActionType.TRANSACTION,
             purpose: TransactionPurpose.APPROVAL,
-            buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PopulatedTransaction),
+            buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PreparedTransactionRequest),
           },
         ],
       });
@@ -595,7 +594,7 @@ describe('buy', () => {
       const itemRequirements = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from('5005000000000000000'), // 5005e15
+          amount: BigInt('5005000000000000000'), // 5005e15
           isFee: false,
         },
       ];
@@ -642,7 +641,7 @@ describe('buy', () => {
           sufficient: true,
           required: {
             type: ItemType.NATIVE,
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'IMX',
@@ -652,7 +651,7 @@ describe('buy', () => {
           },
           current: {
             type: ItemType.NATIVE,
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'IMX',
@@ -661,7 +660,7 @@ describe('buy', () => {
             },
           },
           delta: {
-            balance: BigNumber.from(0),
+            balance: BigInt(0),
             formattedBalance: '0',
           },
           isFee: false,
@@ -671,7 +670,7 @@ describe('buy', () => {
           sufficient: true,
           required: {
             type: ItemType.ERC20,
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'IMX',
@@ -681,7 +680,7 @@ describe('buy', () => {
           },
           current: {
             type: ItemType.ERC20,
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'IMX',
@@ -690,7 +689,7 @@ describe('buy', () => {
             },
           },
           delta: {
-            balance: BigNumber.from(0),
+            balance: BigInt(0),
             formattedBalance: '0',
           },
           isFee: false,
@@ -701,12 +700,12 @@ describe('buy', () => {
           {
             type: ActionType.TRANSACTION,
             purpose: TransactionPurpose.FULFILL_ORDER,
-            buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PopulatedTransaction),
+            buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PreparedTransactionRequest),
           },
           {
             type: ActionType.TRANSACTION,
             purpose: TransactionPurpose.APPROVAL,
-            buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PopulatedTransaction),
+            buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PreparedTransactionRequest),
           },
         ],
       });
@@ -769,7 +768,7 @@ describe('buy', () => {
       const itemRequirements = [
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from('2000000000000000000'),
+          amount: BigInt('2000000000000000000'),
           tokenAddress: '0xCONTRACTADDRESS',
           spenderAddress: '0xSEAPORT',
           isFee: false,
@@ -780,7 +779,7 @@ describe('buy', () => {
         type: TransactionOrGasType.GAS,
         gasToken: {
           type: GasTokenType.NATIVE,
-          limit: BigNumber.from(constants.estimatedFulfillmentGasGwei),
+          limit: BigInt(constants.estimatedFulfillmentGasGwei),
         },
       };
 
@@ -828,7 +827,7 @@ describe('buy', () => {
             sufficient: true,
             required: {
               type: ItemType.NATIVE,
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1',
               token: {
                 name: 'IMX',
@@ -838,7 +837,7 @@ describe('buy', () => {
             },
             current: {
               type: ItemType.NATIVE,
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1',
               token: {
                 name: 'IMX',
@@ -847,7 +846,7 @@ describe('buy', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(0),
+              balance: BigInt(0),
               formattedBalance: '0',
             },
             isFee: false,
@@ -857,7 +856,7 @@ describe('buy', () => {
             sufficient: true,
             required: {
               type: ItemType.ERC20,
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1',
               token: {
                 name: 'IMX',
@@ -867,7 +866,7 @@ describe('buy', () => {
             },
             current: {
               type: ItemType.ERC20,
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1',
               token: {
                 name: 'IMX',
@@ -876,7 +875,7 @@ describe('buy', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(0),
+              balance: BigInt(0),
               formattedBalance: '0',
             },
             isFee: false,
@@ -887,12 +886,12 @@ describe('buy', () => {
             {
               type: ActionType.TRANSACTION,
               purpose: TransactionPurpose.FULFILL_ORDER,
-              buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PopulatedTransaction),
+              buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PreparedTransactionRequest),
             },
             {
               type: ActionType.TRANSACTION,
               purpose: TransactionPurpose.APPROVAL,
-              buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PopulatedTransaction),
+              buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PreparedTransactionRequest),
             },
           ],
         });
@@ -954,7 +953,7 @@ describe('buy', () => {
         const itemRequirements = [
           {
             type: ItemType.ERC20,
-            amount: BigNumber.from('2000000000000000000'),
+            amount: BigInt('2000000000000000000'),
             tokenAddress: '0xCONTRACTADDRESS',
             spenderAddress: '0xSEAPORT',
             isFee: false,
@@ -965,7 +964,7 @@ describe('buy', () => {
           type: TransactionOrGasType.GAS,
           gasToken: {
             type: GasTokenType.NATIVE,
-            limit: BigNumber.from(constants.estimatedFulfillmentGasGwei),
+            limit: BigInt(constants.estimatedFulfillmentGasGwei),
           },
         };
         let errorType;
@@ -1036,7 +1035,7 @@ describe('buy', () => {
         const itemRequirements = [
           {
             type: ItemType.NATIVE,
-            amount: BigNumber.from('2000000000000000000'),
+            amount: BigInt('2000000000000000000'),
             isFee: false,
           },
         ];
@@ -1044,7 +1043,7 @@ describe('buy', () => {
           type: TransactionOrGasType.GAS,
           gasToken: {
             type: GasTokenType.NATIVE,
-            limit: BigNumber.from(gasLimit),
+            limit: BigInt(gasLimit),
           },
         };
 
@@ -1099,7 +1098,7 @@ describe('buy', () => {
           sufficient: true,
           required: {
             type: ItemType.ERC20,
-            balance: BigNumber.from('1000000000000000000'),
+            balance: BigInt('1000000000000000000'),
             formattedBalance: '1',
             token: {
               name: 'ERC20',
@@ -1110,7 +1109,7 @@ describe('buy', () => {
           },
           current: {
             type: ItemType.ERC20,
-            balance: BigNumber.from('1000000000000000000'),
+            balance: BigInt('1000000000000000000'),
             formattedBalance: '1',
             token: {
               name: 'ERC20',
@@ -1120,7 +1119,7 @@ describe('buy', () => {
             },
           },
           delta: {
-            balance: BigNumber.from(0),
+            balance: BigInt(0),
             formattedBalance: '0',
           },
         }],
@@ -1143,7 +1142,7 @@ describe('buy', () => {
       const itemRequirements = [
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from('2000000000000000000'),
+          amount: BigInt('2000000000000000000'),
           tokenAddress: '0x123',
           spenderAddress: seaportContractAddress,
           isFee: false,
@@ -1153,7 +1152,7 @@ describe('buy', () => {
         type: TransactionOrGasType.GAS,
         gasToken: {
           type: GasTokenType.NATIVE,
-          limit: BigNumber.from(gasLimit),
+          limit: BigInt(gasLimit),
         },
       };
 
@@ -1176,7 +1175,7 @@ describe('buy', () => {
           sufficient: false,
           required: {
             type: ItemType.NATIVE,
-            balance: BigNumber.from(2),
+            balance: BigInt(2),
             formattedBalance: '2',
             token: {
               name: 'IMX',
@@ -1186,7 +1185,7 @@ describe('buy', () => {
           },
           current: {
             type: ItemType.NATIVE,
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'IMX',
@@ -1195,7 +1194,7 @@ describe('buy', () => {
             },
           },
           delta: {
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
           },
         }],
@@ -1231,12 +1230,12 @@ describe('buy', () => {
             {
               type: ActionType.TRANSACTION,
               purpose: TransactionPurpose.FULFILL_ORDER,
-              buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PopulatedTransaction),
+              buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PreparedTransactionRequest),
             },
             {
               type: ActionType.TRANSACTION,
               purpose: TransactionPurpose.APPROVAL,
-              buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PopulatedTransaction),
+              buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PreparedTransactionRequest),
             },
           ],
         }),
@@ -1254,7 +1253,7 @@ describe('buy', () => {
       const itemRequirements = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from('2'),
+          amount: BigInt('2'),
           isFee: false,
         },
       ];
@@ -1288,7 +1287,7 @@ describe('buy', () => {
           sufficient: true,
           required: {
             type: ItemType.NATIVE,
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'IMX',
@@ -1298,7 +1297,7 @@ describe('buy', () => {
           },
           current: {
             type: ItemType.NATIVE,
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'IMX',
@@ -1307,7 +1306,7 @@ describe('buy', () => {
             },
           },
           delta: {
-            balance: BigNumber.from(0),
+            balance: BigInt(0),
             formattedBalance: '0',
           },
         }],
@@ -1343,12 +1342,12 @@ describe('buy', () => {
             {
               type: ActionType.TRANSACTION,
               purpose: TransactionPurpose.FULFILL_ORDER,
-              buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PopulatedTransaction),
+              buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PreparedTransactionRequest),
             },
             {
               type: ActionType.TRANSACTION,
               purpose: TransactionPurpose.APPROVAL,
-              buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PopulatedTransaction),
+              buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PreparedTransactionRequest),
             },
           ],
         }),
@@ -1373,7 +1372,7 @@ describe('buy', () => {
       const itemRequirements = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from('2'),
+          amount: BigInt('2'),
           isFee: false,
         },
       ];
@@ -1411,7 +1410,7 @@ describe('buy', () => {
           sufficient: true,
           required: {
             type: ItemType.NATIVE,
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'IMX',
@@ -1421,7 +1420,7 @@ describe('buy', () => {
           },
           current: {
             type: ItemType.NATIVE,
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'IMX',
@@ -1430,7 +1429,7 @@ describe('buy', () => {
             },
           },
           delta: {
-            balance: BigNumber.from(0),
+            balance: BigInt(0),
             formattedBalance: '0',
           },
           isFee: false,
@@ -1467,12 +1466,12 @@ describe('buy', () => {
             {
               type: ActionType.TRANSACTION,
               purpose: TransactionPurpose.FULFILL_ORDER,
-              buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PopulatedTransaction),
+              buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PreparedTransactionRequest),
             },
             {
               type: ActionType.TRANSACTION,
               purpose: TransactionPurpose.APPROVAL,
-              buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PopulatedTransaction),
+              buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PreparedTransactionRequest),
             },
           ],
         }),
@@ -1497,7 +1496,7 @@ describe('buy', () => {
       const itemRequirements = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from('2'),
+          amount: BigInt('2'),
           isFee: false,
         },
       ];
@@ -1740,14 +1739,14 @@ describe('buy', () => {
 
   describe('taker fees', () => {
     let config: CheckoutConfiguration;
-    let mockProvider: Web3Provider;
+    let mockProvider: BrowserProvider;
 
     beforeEach(() => {
       mockProvider = {
         getSigner: jest.fn().mockReturnValue({
           getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
         }),
-      } as unknown as Web3Provider;
+      } as unknown as BrowserProvider;
 
       config = new CheckoutConfiguration({
         baseConfig: { environment: Environment.SANDBOX },
@@ -1846,7 +1845,7 @@ describe('buy', () => {
             sufficient: true,
             required: {
               type: ItemType.NATIVE,
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1',
               token: {
                 name: 'IMX',
@@ -1856,7 +1855,7 @@ describe('buy', () => {
             },
             current: {
               type: ItemType.NATIVE,
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1',
               token: {
                 name: 'IMX',
@@ -1865,7 +1864,7 @@ describe('buy', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(0),
+              balance: BigInt(0),
               formattedBalance: '0',
             },
             isFee: false,
@@ -1876,12 +1875,12 @@ describe('buy', () => {
             {
               type: ActionType.TRANSACTION,
               purpose: TransactionPurpose.FULFILL_ORDER,
-              buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PopulatedTransaction),
+              buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PreparedTransactionRequest),
             },
             {
               type: ActionType.TRANSACTION,
               purpose: TransactionPurpose.APPROVAL,
-              buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PopulatedTransaction),
+              buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PreparedTransactionRequest),
             },
           ],
         });
@@ -1924,7 +1923,7 @@ describe('buy', () => {
         const itemRequirements = [
           {
             type: ItemType.NATIVE,
-            amount: BigNumber.from('2000000000000000000'),
+            amount: BigInt('2000000000000000000'),
             isFee: false,
           },
         ];
@@ -2053,7 +2052,7 @@ describe('buy', () => {
             sufficient: true,
             required: {
               type: ItemType.ERC20,
-              balance: BigNumber.from('1000000'),
+              balance: BigInt('1000000'),
               formattedBalance: '1',
               token: {
                 name: 'USDC',
@@ -2064,7 +2063,7 @@ describe('buy', () => {
             },
             current: {
               type: ItemType.ERC20,
-              balance: BigNumber.from('1000000'),
+              balance: BigInt('1000000'),
               formattedBalance: '1',
               token: {
                 name: 'USDC',
@@ -2074,7 +2073,7 @@ describe('buy', () => {
               },
             },
             delta: {
-              balance: BigNumber.from(0),
+              balance: BigInt(0),
               formattedBalance: '0',
             },
           }],
@@ -2085,12 +2084,12 @@ describe('buy', () => {
             {
               type: ActionType.TRANSACTION,
               purpose: TransactionPurpose.FULFILL_ORDER,
-              buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PopulatedTransaction),
+              buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PreparedTransactionRequest),
             },
             {
               type: ActionType.TRANSACTION,
               purpose: TransactionPurpose.APPROVAL,
-              buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PopulatedTransaction),
+              buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PreparedTransactionRequest),
             },
           ],
         });
@@ -2141,7 +2140,7 @@ describe('buy', () => {
         const itemRequirements = [
           {
             type: ItemType.ERC20,
-            amount: BigNumber.from('2000000'),
+            amount: BigInt('2000000'),
             tokenAddress: '0xCONTRACTADDRESS',
             spenderAddress: '0xSEAPORT',
             isFee: false,
@@ -2180,7 +2179,7 @@ describe('buy', () => {
   describe('getItemRequirement', () => {
     it('should return type of native and amount', () => {
       const type = ItemType.NATIVE;
-      const amount = BigNumber.from('1');
+      const amount = BigInt('1');
       const tokenAddress = '';
       const result = getItemRequirement(type, tokenAddress, amount, seaportContractAddress);
       expect(result).toEqual({
@@ -2192,7 +2191,7 @@ describe('buy', () => {
 
     it('should return type of erc20 and amount', () => {
       const type = ItemType.ERC20;
-      const amount = BigNumber.from('1');
+      const amount = BigInt('1');
       const tokenAddress = '0x123';
       const result = getItemRequirement(type, tokenAddress, amount, seaportContractAddress);
       expect(result).toEqual({
@@ -2206,7 +2205,7 @@ describe('buy', () => {
 
     it('should return type of native and amount if erc721', () => {
       const type = ItemType.ERC721;
-      const amount = BigNumber.from('1');
+      const amount = BigInt('1');
       const contractAddress = '0x123';
       const result = getItemRequirement(type, contractAddress, amount, seaportContractAddress);
       expect(result).toEqual({
@@ -2217,7 +2216,7 @@ describe('buy', () => {
     });
 
     it('should return type of native and amount for default case', () => {
-      const amount = BigNumber.from('1');
+      const amount = BigInt('1');
       const tokenAddress = '';
       const result = getItemRequirement('default' as ItemType, tokenAddress, amount, seaportContractAddress);
       expect(result).toEqual({
@@ -2252,7 +2251,7 @@ describe('buy', () => {
           type: TransactionOrGasType.GAS,
           gasToken: {
             type: GasTokenType.NATIVE,
-            limit: BigNumber.from(gasLimit),
+            limit: BigInt(gasLimit),
           },
         },
       );

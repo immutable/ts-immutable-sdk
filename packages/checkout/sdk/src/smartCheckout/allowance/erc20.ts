@@ -1,17 +1,16 @@
-import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
-import { BigNumber, Contract } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { ItemRequirement, ItemType } from '../../types';
 import { Allowance, InsufficientERC20 } from './types';
 import { ERC20ABI } from '../../env';
+import { BrowserProvider, Contract, TransactionRequest } from 'ethers';
 
 // Gets the amount an address has allowed to be spent by the spender for the ERC20.
 export const getERC20Allowance = async (
-  provider: Web3Provider,
+  provider: BrowserProvider,
   ownerAddress: string,
   contractAddress: string,
   spenderAddress: string,
-): Promise<BigNumber> => {
+): Promise<bigint> => {
   try {
     const contract = new Contract(
       contractAddress,
@@ -31,11 +30,11 @@ export const getERC20Allowance = async (
 // Returns the approval transaction for the ERC20 that the owner can sign
 // to approve the spender spending the provided amount of ERC20.
 export const getERC20ApprovalTransaction = async (
-  provider: Web3Provider,
+  provider: BrowserProvider,
   ownerAddress: string,
   contractAddress: string,
   spenderAddress: string,
-  amount: BigNumber,
+  amount: bigint,
 ): Promise<TransactionRequest | undefined> => {
   try {
     const contract = new Contract(
@@ -43,7 +42,7 @@ export const getERC20ApprovalTransaction = async (
       JSON.stringify(ERC20ABI),
       provider,
     );
-    const approveTransaction = await contract.populateTransaction.approve(spenderAddress, amount);
+    const approveTransaction = await contract.approve.populateTransaction(spenderAddress, amount);
     if (approveTransaction) approveTransaction.from = ownerAddress;
     return approveTransaction;
   } catch (err: any) {
@@ -56,7 +55,7 @@ export const getERC20ApprovalTransaction = async (
 };
 
 export const hasERC20Allowances = async (
-  provider: Web3Provider,
+  provider: BrowserProvider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
 ): Promise<{
@@ -66,7 +65,7 @@ export const hasERC20Allowances = async (
   let sufficient = true;
   const sufficientAllowances: Allowance[] = [];
   const erc20s = new Map<string, ItemRequirement>();
-  const allowancePromises = new Map<string, Promise<BigNumber>>();
+  const allowancePromises = new Map<string, Promise<bigint>>();
   const insufficientERC20s = new Map<string, InsufficientERC20>();
   const transactionPromises = new Map<string, Promise<TransactionRequest | undefined>>();
 
@@ -93,7 +92,7 @@ export const hasERC20Allowances = async (
     const itemRequirement = erc20s.get(allowancePromiseIds[index]);
     if (!itemRequirement || itemRequirement.type !== ItemType.ERC20) continue;
 
-    if (allowances[index].gte(itemRequirement.amount)) {
+    if (allowances[index] >= itemRequirement.amount) {
       sufficientAllowances.push({
         sufficient: true,
         itemRequirement,
@@ -104,7 +103,7 @@ export const hasERC20Allowances = async (
     sufficient = false; // Set sufficient false on the root of the return object when an ERC20 is insufficient
     const { tokenAddress, spenderAddress } = itemRequirement;
     const key = `${tokenAddress}${spenderAddress}`;
-    const delta = itemRequirement.amount.sub(allowances[index]);
+    const delta = itemRequirement.amount - allowances[index];
     // Create maps for both the insufficient ERC20 data and the transaction promises using the same key so the results can be merged
     insufficientERC20s.set(
       key,

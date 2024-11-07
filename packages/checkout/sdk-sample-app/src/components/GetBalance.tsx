@@ -1,13 +1,13 @@
 import { Checkout, GetBalanceResult } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
 import LoadingButton from './LoadingButton';
 import { Box } from '@biom3/react';
+import { BrowserProvider } from 'ethers';
 
 interface BalanceProps {
   checkout: Checkout | undefined;
-  provider: Web3Provider | undefined;
+  provider: BrowserProvider | undefined;
 }
 
 export default function GetBalance(props: BalanceProps) {
@@ -36,7 +36,7 @@ export default function GetBalance(props: BalanceProps) {
     setErrorNative(null);
     setLoadingNative(true);
 
-    const walletAddress = await provider.getSigner().getAddress();
+    const walletAddress = await (await provider.getSigner()).getAddress();
     try {
       const resp = await checkout.getBalance({
         provider,
@@ -67,7 +67,7 @@ export default function GetBalance(props: BalanceProps) {
     setErrorBalance(null);
     setLoadingBalance(true);
 
-    const walletAddress = await provider.getSigner().getAddress();
+    const walletAddress = await (await provider.getSigner()).getAddress();
     try {
       const resp = await checkout.getBalance({
         provider,

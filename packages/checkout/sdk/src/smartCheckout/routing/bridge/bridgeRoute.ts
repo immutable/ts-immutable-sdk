@@ -1,4 +1,3 @@
-import { BigNumber, ethers, utils } from 'ethers';
 import {
   BridgeFundingStep,
   ChainId,
@@ -25,39 +24,40 @@ import {
 import { DEFAULT_TOKEN_DECIMALS } from '../../../env';
 import { isNativeToken } from '../../../tokens';
 import { formatSmartCheckoutAmount, isMatchingAddress } from '../../../utils/utils';
+import { formatUnits, JsonRpcProvider } from 'ethers';
 
 export const hasSufficientL1Eth = (
   tokenBalanceResult: TokenBalanceResult,
-  totalFees: BigNumber,
+  totalFees: bigint,
 ): boolean => {
   const balance = getEthBalance(tokenBalanceResult);
-  return balance.gte(totalFees);
+  return balance >= totalFees;
 };
 
 const constructFees = (
-  bridgeGasFee: BigNumber,
-  bridgeFee: BigNumber,
-  imtblFee: BigNumber,
-  approvalGasFee: BigNumber,
+  bridgeGasFee: bigint,
+  bridgeFee: bigint,
+  imtblFee: bigint,
+  approvalGasFee: bigint,
   token?: TokenInfo,
 ): BridgeFees => {
   const bridgeFeeDecimals = token?.decimals ?? DEFAULT_TOKEN_DECIMALS;
   const bridgeFees = [];
 
-  if (bridgeFee.gt(0)) {
+  if (bridgeFee > 0) {
     bridgeFees.push({
       type: FeeType.BRIDGE_FEE,
       amount: bridgeFee,
-      formattedAmount: utils.formatUnits(bridgeFee, bridgeFeeDecimals),
+      formattedAmount: formatUnits(bridgeFee, bridgeFeeDecimals),
       token,
     });
   }
 
-  if (imtblFee.gt(0)) {
+  if (imtblFee > 0) {
     bridgeFees.push({
       type: FeeType.IMMUTABLE_FEE,
       amount: imtblFee,
-      formattedAmount: utils.formatUnits(imtblFee, bridgeFeeDecimals),
+      formattedAmount: formatUnits(imtblFee, bridgeFeeDecimals),
       token,
     });
   }
@@ -66,13 +66,13 @@ const constructFees = (
     approvalGasFee: {
       type: FeeType.GAS,
       amount: approvalGasFee,
-      formattedAmount: utils.formatUnits(approvalGasFee, DEFAULT_TOKEN_DECIMALS),
+      formattedAmount: formatUnits(approvalGasFee, DEFAULT_TOKEN_DECIMALS),
       token,
     },
     bridgeGasFee: {
       type: FeeType.GAS,
       amount: bridgeGasFee,
-      formattedAmount: utils.formatUnits(bridgeGasFee, DEFAULT_TOKEN_DECIMALS),
+      formattedAmount: formatUnits(bridgeGasFee, DEFAULT_TOKEN_DECIMALS),
       token,
     },
     bridgeFees,
@@ -109,13 +109,13 @@ const constructBridgeFundingRoute = (
 });
 
 export type BridgeRequirement = {
-  amount: BigNumber;
+  amount: bigint;
   formattedAmount: string;
   l2address: string;
 };
 export const bridgeRoute = async (
   config: CheckoutConfiguration,
-  readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
+  readOnlyProviders: Map<ChainId, JsonRpcProvider>,
   availableRoutingOptions: AvailableRoutingOptions,
   bridgeRequirement: BridgeRequirement,
   tokenBalanceResults: Map<ChainId, TokenBalanceResult>,
@@ -175,8 +175,8 @@ export const bridgeRoute = async (
     const nativeETHBalance = tokenBalanceResult.balances
       .find((balance) => isNativeToken(balance.token.address));
 
-    if (nativeETHBalance && nativeETHBalance.balance.gte(
-      bridgeRequirement.amount.add(totalFees),
+    if (nativeETHBalance && nativeETHBalance.balance >= (
+      bridgeRequirement.amount + totalFees
     )) {
       const bridgeFees = constructFees(
         sourceChainGas,
@@ -196,9 +196,7 @@ export const bridgeRoute = async (
     (balance) => isMatchingAddress(balance.token.address, l1address),
   );
 
-  if (erc20balance && erc20balance.balance.gte(
-    bridgeRequirement.amount,
-  )) {
+  if (erc20balance && erc20balance.balance >=  bridgeRequirement.amount) {
     const bridgeFees = constructFees(
       sourceChainGas,
       bridgeFee,

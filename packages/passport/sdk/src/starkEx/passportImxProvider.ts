@@ -1,4 +1,3 @@
-import { TransactionResponse } from '@ethersproject/abstract-provider';
 import {
   AnyToken,
   EthSigner,
@@ -11,7 +10,6 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/x-client';
 import { IMXProvider } from '@imtbl/x-provider';
-import { Web3Provider } from '@ethersproject/providers';
 import {
   imx,
   ImxApiClients,
@@ -30,6 +28,7 @@ import registerOffchain from './workflows/registerOffchain';
 import MagicAdapter from '../magicAdapter';
 import { getStarkSigner } from './getStarkSigner';
 import { withMetricsAsync } from '../utils/metrics';
+import { BrowserProvider, TransactionResponse } from 'ethers';
 
 export interface PassportImxProviderOptions {
   authManager: AuthManager;
@@ -106,9 +105,9 @@ export class PassportImxProvider implements IMXProvider {
       const user = await this.authManager.getUser();
       // The user will be present because the factory validates it
       const magicRpcProvider = await this.magicAdapter.login(user!.idToken!);
-      const web3Provider = new Web3Provider(magicRpcProvider);
+      const web3Provider = new BrowserProvider(magicRpcProvider);
 
-      const ethSigner = web3Provider.getSigner();
+      const ethSigner = await web3Provider.getSigner();
       const starkSigner = await getStarkSigner(ethSigner);
 
       return { ethSigner, starkSigner };

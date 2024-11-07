@@ -1,5 +1,3 @@
-import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
-import { PopulatedTransaction } from 'ethers';
 import { CancelOrdersOnChainResponse, Orderbook } from '@imtbl/orderbook';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
@@ -17,15 +15,17 @@ import {
 import { SignTransactionStatusType } from '../actions/types';
 import { measureAsyncExecution } from '../../logger/debugLogger';
 import { sendTransaction } from '../../transaction';
+import { BrowserProvider, TransactionResponse } from 'ethers';
+import { PreparedTransactionRequest } from 'ethers';
 
 const cancelOnChain = async (
   config: CheckoutConfiguration,
   orderbook: Orderbook,
-  provider: Web3Provider,
+  provider: BrowserProvider,
   orderIds: string[],
   waitFulfillmentSettlements: boolean,
 ): Promise<CancelResultSuccess | CancelResultFailed | CancelResultFulfillmentsUnsettled> => {
-  let unsignedCancelOrderTransaction: PopulatedTransaction;
+  let unsignedCancelOrderTransaction: PreparedTransactionRequest;
   if (orderIds.length === 0) {
     throw new CheckoutError(
       'No orderIds were provided to the orderIds array. Please provide at least one orderId.',
@@ -38,7 +38,7 @@ const cancelOnChain = async (
     const offererAddress = await measureAsyncExecution<string>(
       config,
       'Time to get the address from the provider',
-      provider.getSigner().getAddress(),
+      (await provider.getSigner()).getAddress(),
     );
     const cancelOrderResponse = await measureAsyncExecution<CancelOrdersOnChainResponse>(
       config,
@@ -99,17 +99,17 @@ const cancelOnChain = async (
 
 const gaslessCancel = async (
   orderbook: Orderbook,
-  provider: Web3Provider,
+  provider: BrowserProvider,
   orderIds: string[],
 ): Promise<CancelResultGasless> => {
   try {
-    const signer = provider.getSigner();
+    const signer = await provider.getSigner();
     const address = await signer.getAddress();
 
     const { signableAction } = await orderbook.prepareOrderCancellations(orderIds);
 
     // eslint-disable-next-line no-underscore-dangle
-    const signedMessage = await signer._signTypedData(
+    const signedMessage = await signer.signTypedData(
       signableAction.message.domain,
       signableAction.message.types,
       signableAction.message.value,
@@ -158,7 +158,7 @@ const gaslessCancel = async (
 
 export const cancel = async (
   config: CheckoutConfiguration,
-  provider: Web3Provider,
+  provider: BrowserProvider,
   orderIds: string[],
   overrides: CancelOverrides = {
     waitFulfillmentSettlements: true,

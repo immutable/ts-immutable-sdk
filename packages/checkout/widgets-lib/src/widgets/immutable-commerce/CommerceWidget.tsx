@@ -13,7 +13,8 @@ import {
   Checkout,
 } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
-import { Web3Provider } from '@ethersproject/providers';
+import { BrowserProvider } from 'ethers';
+import { CheckoutWidgetContextProvicer } from './context/CheckoutContextProvider';
 import {
   useViewState,
   SharedViews,
@@ -50,7 +51,7 @@ import {
 
 export type CommerceWidgetInputs = {
   checkout: Checkout;
-  web3Provider?: Web3Provider;
+  web3Provider?: BrowserProvider;
   flowParams: CommerceWidgetParams;
   flowConfig: CommerceWidgetConfiguration;
   widgetsConfig: StrongCheckoutWidgetsConfig;
@@ -109,7 +110,7 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
   }, [history]);
 
   const handleProviderUpdated = useMemo(
-    () => (updatedProvider: Web3Provider) => {
+    () => (updatedProvider: BrowserProvider) => {
       commerceDispatch({
         payload: {
           type: CommerceActions.SET_PROVIDER,

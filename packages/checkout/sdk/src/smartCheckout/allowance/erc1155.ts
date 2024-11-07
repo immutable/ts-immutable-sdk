@@ -1,5 +1,4 @@
-import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
-import { Contract } from 'ethers';
+import { BrowserProvider, Contract, TransactionRequest } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { ERC1155ItemRequirement, ItemRequirement, ItemType } from '../../types';
 import { Allowance, InsufficientERC1155, SufficientAllowance } from './types';
@@ -8,7 +7,7 @@ import { ERC1155ABI } from '../../env';
 // Returns true if the spender address is approved for all ERC1155s of this collection
 // Note: ERC1155 only support approvedForAll
 export const isERC1155ApprovedForAll = async (
-  provider: Web3Provider,
+  provider: BrowserProvider,
   ownerAddress: string,
   contractAddress: string,
   spenderAddress: string,
@@ -36,7 +35,7 @@ export const isERC1155ApprovedForAll = async (
 
 // Returns a populated transaction to setApprovalForAll for the spender against the ERC1155 collection.
 export const getSetERC1155ApprovalForAllTransaction = async (
-  provider: Web3Provider,
+  provider: BrowserProvider,
   ownerAddress: string,
   contractAddress: string,
   spenderAddress: string,
@@ -47,7 +46,7 @@ export const getSetERC1155ApprovalForAllTransaction = async (
       JSON.stringify(ERC1155ABI),
       provider,
     );
-    const transaction = await contract.populateTransaction.setApprovalForAll(spenderAddress, true);
+    const transaction = await contract.setApprovalForAll.populateTransaction(spenderAddress, true);
     if (transaction) transaction.from = ownerAddress;
     return transaction;
   } catch (err: any) {
@@ -65,7 +64,7 @@ export const getSetERC1155ApprovalForAllTransaction = async (
 };
 
 export const hasERC1155Allowances = async (
-  provider: Web3Provider,
+  provider: BrowserProvider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
 ): Promise<{

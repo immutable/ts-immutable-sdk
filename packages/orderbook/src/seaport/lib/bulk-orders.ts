@@ -1,11 +1,11 @@
 import type { OrderComponents } from '@opensea/seaport-js/lib/types';
-import { TypedDataEncoder, keccak256, toUtf8Bytes } from 'ethers-v6';
 import { EIP_712_ORDER_TYPE } from '../constants';
 
 import { Eip712MerkleTree } from './merkle';
 import { DefaultGetter } from './defaults';
 import { fillArray } from './utils';
 import type { EIP712TypeDefinitions } from './defaults';
+import { keccak256, toUtf8Bytes, TypedDataEncoder } from 'ethers';
 
 function getBulkOrderTypes(height: number): EIP712TypeDefinitions {
   return {

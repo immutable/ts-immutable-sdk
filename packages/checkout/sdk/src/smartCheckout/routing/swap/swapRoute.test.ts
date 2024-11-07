@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Environment } from '@imtbl/config';
 import { Fee, Token } from '@imtbl/dex-sdk';
-import { BigNumber, utils } from 'ethers';
 import { CheckoutConfiguration } from '../../../config';
 import { BalanceRequirement, BalanceCheckResult } from '../../balanceCheck/types';
 import {
@@ -26,6 +25,7 @@ import {
 import { quoteFetcher } from './quoteFetcher';
 import { HttpClient } from '../../../api/http';
 import { formatSmartCheckoutAmount } from '../../../utils/utils';
+import { formatUnits } from 'ethers';
 
 jest.mock('../../../config/remoteConfigFetcher');
 jest.mock('./quoteFetcher');
@@ -42,7 +42,7 @@ describe('swapRoute', () => {
         {
           quote: {
             amount: {
-              value: BigNumber.from(1),
+              value: BigInt(1),
               token: {
                 chainId: ChainId.IMTBL_ZKEVM_TESTNET,
                 name: 'ERC20_2',
@@ -52,14 +52,14 @@ describe('swapRoute', () => {
               } as Token,
             },
             amountWithMaxSlippage: {
-              value: BigNumber.from(1),
+              value: BigInt(1),
               token: {} as Token,
             },
             slippage: 0,
             fees: [
               {
                 amount: {
-                  value: BigNumber.from(3),
+                  value: BigInt(3),
                   token: {
                     chainId: ChainId.IMTBL_ZKEVM_TESTNET,
                     name: 'IMX',
@@ -73,7 +73,7 @@ describe('swapRoute', () => {
             ],
           },
           approval: {
-            value: BigNumber.from(1),
+            value: BigInt(1),
             token: {
               chainId: ChainId.IMTBL_ZKEVM_TESTNET,
               name: 'IMX',
@@ -82,7 +82,7 @@ describe('swapRoute', () => {
             } as Token,
           },
           swap: {
-            value: BigNumber.from(2),
+            value: BigInt(2),
             token: {
               chainId: ChainId.IMTBL_ZKEVM_TESTNET,
               name: 'IMX',
@@ -96,7 +96,7 @@ describe('swapRoute', () => {
         {
           quote: {
             amount: {
-              value: BigNumber.from(1),
+              value: BigInt(1),
               token: {
                 chainId: ChainId.IMTBL_ZKEVM_TESTNET,
                 name: 'ERC20_3',
@@ -106,14 +106,14 @@ describe('swapRoute', () => {
               } as Token,
             },
             amountWithMaxSlippage: {
-              value: BigNumber.from(1),
+              value: BigInt(1),
               token: {} as Token,
             },
             slippage: 0,
             fees: [
               {
                 amount: {
-                  value: BigNumber.from(3),
+                  value: BigInt(3),
                   token: {
                     chainId: ChainId.IMTBL_ZKEVM_TESTNET,
                     name: 'IMX',
@@ -127,7 +127,7 @@ describe('swapRoute', () => {
             ],
           },
           approval: {
-            value: BigNumber.from(1),
+            value: BigInt(1),
             token: {
               chainId: ChainId.IMTBL_ZKEVM_TESTNET,
               name: 'IMX',
@@ -136,7 +136,7 @@ describe('swapRoute', () => {
             } as Token,
           },
           swap: {
-            value: BigNumber.from(2),
+            value: BigInt(2),
             token: {
               chainId: ChainId.IMTBL_ZKEVM_TESTNET,
               name: 'IMX',
@@ -159,12 +159,12 @@ describe('swapRoute', () => {
         type: ItemType.ERC20,
         sufficient: false,
         delta: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         current: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           token: {
             name: 'ERC20_1',
@@ -175,7 +175,7 @@ describe('swapRoute', () => {
         },
         required: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(2),
+          balance: BigInt(2),
           formattedBalance: '2',
           token: {
             name: 'ERC20_1',
@@ -191,7 +191,7 @@ describe('swapRoute', () => {
           success: true,
           balances: [
             {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
               token: {
                 name: 'ERC20',
@@ -201,7 +201,7 @@ describe('swapRoute', () => {
               },
             },
             {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
               token: {
                 name: 'IMX',
@@ -236,11 +236,11 @@ describe('swapRoute', () => {
           fundingItem: {
             type: ItemType.ERC20,
             fundsRequired: {
-              amount: BigNumber.from(1),
-              formattedAmount: formatSmartCheckoutAmount(utils.formatUnits(BigNumber.from(1), 18)),
+              amount: BigInt(1),
+              formattedAmount: formatSmartCheckoutAmount(formatUnits(BigInt(1), 18)),
             },
             userBalance: {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
             },
             token: {
@@ -253,8 +253,8 @@ describe('swapRoute', () => {
           fees: {
             approvalGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(1),
-              formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+              amount: BigInt(1),
+              formattedAmount: formatUnits(BigInt(1), 18),
               token: {
                 decimals: 18,
                 name: 'IMX',
@@ -264,8 +264,8 @@ describe('swapRoute', () => {
             },
             swapGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(2),
-              formattedAmount: utils.formatUnits(BigNumber.from(2), 18),
+              amount: BigInt(2),
+              formattedAmount: formatUnits(BigInt(2), 18),
               token: {
                 decimals: 18,
                 name: 'IMX',
@@ -275,8 +275,8 @@ describe('swapRoute', () => {
             },
             swapFees: [{
               type: FeeType.SWAP_FEE,
-              amount: BigNumber.from(3),
-              formattedAmount: utils.formatUnits(BigNumber.from(3), 18),
+              amount: BigInt(3),
+              formattedAmount: formatUnits(BigInt(3), 18),
               basisPoints: 0,
               token: {
                 decimals: 18,
@@ -295,12 +295,12 @@ describe('swapRoute', () => {
         type: ItemType.NATIVE,
         sufficient: false,
         delta: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         current: {
           type: ItemType.NATIVE,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '10',
           token: {
             name: 'IMX',
@@ -310,7 +310,7 @@ describe('swapRoute', () => {
         },
         required: {
           type: ItemType.NATIVE,
-          balance: BigNumber.from(2),
+          balance: BigInt(2),
           formattedBalance: '20',
           token: {
             name: 'IMX',
@@ -325,7 +325,7 @@ describe('swapRoute', () => {
           success: true,
           balances: [
             {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '18',
               token: {
                 name: 'IMX',
@@ -334,7 +334,7 @@ describe('swapRoute', () => {
               },
             },
             {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
               token: {
                 name: 'ERC20',
@@ -370,11 +370,11 @@ describe('swapRoute', () => {
           fundingItem: {
             type: ItemType.ERC20,
             fundsRequired: {
-              amount: BigNumber.from(1),
-              formattedAmount: formatSmartCheckoutAmount(utils.formatUnits(BigNumber.from(1), 18)),
+              amount: BigInt(1),
+              formattedAmount: formatSmartCheckoutAmount(formatUnits(BigInt(1), 18)),
             },
             userBalance: {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
             },
             token: {
@@ -387,8 +387,8 @@ describe('swapRoute', () => {
           fees: {
             approvalGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(1),
-              formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+              amount: BigInt(1),
+              formattedAmount: formatUnits(BigInt(1), 18),
               token: {
                 decimals: 18,
                 name: 'IMX',
@@ -398,8 +398,8 @@ describe('swapRoute', () => {
             },
             swapGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(2),
-              formattedAmount: utils.formatUnits(BigNumber.from(2), 18),
+              amount: BigInt(2),
+              formattedAmount: formatUnits(BigInt(2), 18),
               token: {
                 decimals: 18,
                 name: 'IMX',
@@ -409,8 +409,8 @@ describe('swapRoute', () => {
             },
             swapFees: [{
               type: FeeType.SWAP_FEE,
-              amount: BigNumber.from(3),
-              formattedAmount: utils.formatUnits(BigNumber.from(3), 18),
+              amount: BigInt(3),
+              formattedAmount: formatUnits(BigInt(3), 18),
               basisPoints: 0,
               token: {
                 decimals: 18,
@@ -429,12 +429,12 @@ describe('swapRoute', () => {
         type: ItemType.ERC20,
         sufficient: false,
         delta: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         current: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           token: {
             name: 'ERC20_1',
@@ -445,7 +445,7 @@ describe('swapRoute', () => {
         },
         required: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(2),
+          balance: BigInt(2),
           formattedBalance: '2',
           token: {
             name: 'ERC20_1',
@@ -461,7 +461,7 @@ describe('swapRoute', () => {
           success: true,
           balances: [
             {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
               token: {
                 name: 'ERC20',
@@ -471,7 +471,7 @@ describe('swapRoute', () => {
               },
             },
             {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
               token: {
                 name: 'ERC20_3',
@@ -481,7 +481,7 @@ describe('swapRoute', () => {
               },
             },
             {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
               token: {
                 name: 'IMX',
@@ -516,11 +516,11 @@ describe('swapRoute', () => {
           fundingItem: {
             type: ItemType.ERC20,
             fundsRequired: {
-              amount: BigNumber.from(1),
-              formattedAmount: formatSmartCheckoutAmount(utils.formatUnits(BigNumber.from(1), 18)),
+              amount: BigInt(1),
+              formattedAmount: formatSmartCheckoutAmount(formatUnits(BigInt(1), 18)),
             },
             userBalance: {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
             },
             token: {
@@ -533,8 +533,8 @@ describe('swapRoute', () => {
           fees: {
             approvalGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(1),
-              formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+              amount: BigInt(1),
+              formattedAmount: formatUnits(BigInt(1), 18),
               token: {
                 decimals: 18,
                 name: 'IMX',
@@ -544,8 +544,8 @@ describe('swapRoute', () => {
             },
             swapGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(2),
-              formattedAmount: utils.formatUnits(BigNumber.from(2), 18),
+              amount: BigInt(2),
+              formattedAmount: formatUnits(BigInt(2), 18),
               token: {
                 decimals: 18,
                 name: 'IMX',
@@ -555,8 +555,8 @@ describe('swapRoute', () => {
             },
             swapFees: [{
               type: FeeType.SWAP_FEE,
-              amount: BigNumber.from(3),
-              formattedAmount: utils.formatUnits(BigNumber.from(3), 18),
+              amount: BigInt(3),
+              formattedAmount: formatUnits(BigInt(3), 18),
               basisPoints: 0,
               token: {
                 decimals: 18,
@@ -573,11 +573,11 @@ describe('swapRoute', () => {
           fundingItem: {
             type: ItemType.ERC20,
             fundsRequired: {
-              amount: BigNumber.from(1),
-              formattedAmount: formatSmartCheckoutAmount(utils.formatUnits(BigNumber.from(1), 18)),
+              amount: BigInt(1),
+              formattedAmount: formatSmartCheckoutAmount(formatUnits(BigInt(1), 18)),
             },
             userBalance: {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
             },
             token: {
@@ -590,8 +590,8 @@ describe('swapRoute', () => {
           fees: {
             approvalGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(1),
-              formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+              amount: BigInt(1),
+              formattedAmount: formatUnits(BigInt(1), 18),
               token: {
                 decimals: 18,
                 name: 'IMX',
@@ -601,8 +601,8 @@ describe('swapRoute', () => {
             },
             swapGasFee: {
               type: FeeType.GAS,
-              amount: BigNumber.from(2),
-              formattedAmount: utils.formatUnits(BigNumber.from(2), 18),
+              amount: BigInt(2),
+              formattedAmount: formatUnits(BigInt(2), 18),
               token: {
                 decimals: 18,
                 name: 'IMX',
@@ -612,8 +612,8 @@ describe('swapRoute', () => {
             },
             swapFees: [{
               type: FeeType.SWAP_FEE,
-              amount: BigNumber.from(3),
-              formattedAmount: utils.formatUnits(BigNumber.from(3), 18),
+              amount: BigInt(3),
+              formattedAmount: formatUnits(BigInt(3), 18),
               basisPoints: 0,
               token: {
                 decimals: 18,
@@ -634,7 +634,7 @@ describe('swapRoute', () => {
           success: true,
           balances: [
             {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
               token: {
                 name: 'IMX',
@@ -671,7 +671,7 @@ describe('swapRoute', () => {
           success: true,
           balances: [
             {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
               token: {
                 name: 'IMX',
@@ -706,11 +706,11 @@ describe('swapRoute', () => {
         type: ItemType.ERC20,
         sufficient: false,
         delta: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         current: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           token: {
             name: 'ERC20',
@@ -719,7 +719,7 @@ describe('swapRoute', () => {
           },
         },
         required: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           token: {
             name: 'ERC20',
@@ -733,7 +733,7 @@ describe('swapRoute', () => {
           success: true,
           balances: [
             {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
               token: {
                 name: 'IMX',
@@ -768,12 +768,12 @@ describe('swapRoute', () => {
         type: ItemType.ERC20,
         sufficient: false,
         delta: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         current: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           token: {
             name: 'ERC20_1',
@@ -784,7 +784,7 @@ describe('swapRoute', () => {
         },
         required: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(2),
+          balance: BigInt(2),
           formattedBalance: '2',
           token: {
             name: 'ERC20_1',
@@ -800,7 +800,7 @@ describe('swapRoute', () => {
           success: true,
           balances: [
             {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
               token: {
                 name: 'ERC20',
@@ -836,12 +836,12 @@ describe('swapRoute', () => {
         type: ItemType.ERC20,
         sufficient: false,
         delta: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         current: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           token: {
             name: 'ERC20_1',
@@ -852,7 +852,7 @@ describe('swapRoute', () => {
         },
         required: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(2),
+          balance: BigInt(2),
           formattedBalance: '2',
           token: {
             name: 'ERC20_1',
@@ -868,7 +868,7 @@ describe('swapRoute', () => {
           success: true,
           balances: [
             {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1',
               token: {
                 name: 'ERC20',
@@ -878,7 +878,7 @@ describe('swapRoute', () => {
               },
             },
             {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
               token: {
                 name: 'ERC20',
@@ -915,12 +915,12 @@ describe('swapRoute', () => {
         type: ItemType.ERC20,
         sufficient: false,
         delta: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         current: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           token: {
             name: 'ERC20_2',
@@ -931,7 +931,7 @@ describe('swapRoute', () => {
         },
         required: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(2),
+          balance: BigInt(2),
           formattedBalance: '2',
           token: {
             name: 'ERC20_2',
@@ -947,7 +947,7 @@ describe('swapRoute', () => {
           success: true,
           balances: [
             {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1',
               token: {
                 name: 'ERC20',
@@ -957,7 +957,7 @@ describe('swapRoute', () => {
               },
             },
             {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
               token: {
                 name: 'ERC20',
@@ -994,12 +994,12 @@ describe('swapRoute', () => {
         type: ItemType.ERC20,
         sufficient: false,
         delta: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         current: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           token: {
             name: 'ERC20_1',
@@ -1010,7 +1010,7 @@ describe('swapRoute', () => {
         },
         required: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(2),
+          balance: BigInt(2),
           formattedBalance: '2',
           token: {
             name: 'ERC20_1',
@@ -1026,7 +1026,7 @@ describe('swapRoute', () => {
           success: true,
           balances: [
             {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
               token: {
                 name: 'ERC20',
@@ -1063,12 +1063,12 @@ describe('swapRoute', () => {
         type: ItemType.ERC20,
         sufficient: false,
         delta: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         current: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           token: {
             name: 'ERC20_1',
@@ -1079,7 +1079,7 @@ describe('swapRoute', () => {
         },
         required: {
           type: ItemType.ERC20,
-          balance: BigNumber.from(2),
+          balance: BigInt(2),
           formattedBalance: '2',
           token: {
             name: 'ERC20_1',
@@ -1095,7 +1095,7 @@ describe('swapRoute', () => {
           success: true,
           balances: [
             {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
               token: {
                 name: 'ERC20',
@@ -1105,7 +1105,7 @@ describe('swapRoute', () => {
               },
             },
             {
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1',
               token: {
                 name: 'ERC20',
@@ -1141,9 +1141,9 @@ describe('swapRoute', () => {
   describe('constructSwapRoute', () => {
     it('should return type NATIVE', () => {
       const chainId = ChainId.IMTBL_ZKEVM_TESTNET;
-      const fundsRequired = BigNumber.from(100);
+      const fundsRequired = BigInt(100);
       const userBalance = {
-        balance: BigNumber.from(100),
+        balance: BigInt(100),
         formattedBalance: '100',
         token: {
           name: 'IMX',
@@ -1154,17 +1154,17 @@ describe('swapRoute', () => {
       const fees = {
         approvalGasFee: {
           type: FeeType.GAS,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           formattedAmount: '1',
         },
         swapGasFee: {
           type: FeeType.GAS,
-          amount: BigNumber.from(2),
+          amount: BigInt(2),
           formattedAmount: '2',
         },
         swapFees: [{
           type: FeeType.SWAP_FEE,
-          amount: BigNumber.from(3),
+          amount: BigInt(3),
           formattedAmount: '3',
         }],
       };
@@ -1177,11 +1177,11 @@ describe('swapRoute', () => {
           fundingItem: {
             type: ItemType.NATIVE,
             fundsRequired: {
-              amount: BigNumber.from(100),
-              formattedAmount: formatSmartCheckoutAmount(utils.formatUnits(BigNumber.from(100), 18)),
+              amount: BigInt(100),
+              formattedAmount: formatSmartCheckoutAmount(formatUnits(BigInt(100), 18)),
             },
             userBalance: {
-              balance: BigNumber.from(100),
+              balance: BigInt(100),
               formattedBalance: '100',
             },
             token: {
@@ -1197,9 +1197,9 @@ describe('swapRoute', () => {
 
     it('should return type ERC20', () => {
       const chainId = ChainId.IMTBL_ZKEVM_TESTNET;
-      const fundsRequired = BigNumber.from(100);
+      const fundsRequired = BigInt(100);
       const userBalance = {
-        balance: BigNumber.from(100),
+        balance: BigInt(100),
         formattedBalance: '100',
         token: {
           name: 'ERC20',
@@ -1211,17 +1211,17 @@ describe('swapRoute', () => {
       const fees = {
         approvalGasFee: {
           type: FeeType.GAS,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           formattedAmount: '1',
         },
         swapGasFee: {
           type: FeeType.GAS,
-          amount: BigNumber.from(2),
+          amount: BigInt(2),
           formattedAmount: '2',
         },
         swapFees: [{
           type: FeeType.SWAP_FEE,
-          amount: BigNumber.from(3),
+          amount: BigInt(3),
           formattedAmount: '3',
         }],
       };
@@ -1234,11 +1234,11 @@ describe('swapRoute', () => {
           fundingItem: {
             type: ItemType.ERC20,
             fundsRequired: {
-              amount: BigNumber.from(100),
-              formattedAmount: formatSmartCheckoutAmount(utils.formatUnits(BigNumber.from(100), 18)),
+              amount: BigInt(100),
+              formattedAmount: formatSmartCheckoutAmount(formatUnits(BigInt(100), 18)),
             },
             userBalance: {
-              balance: BigNumber.from(100),
+              balance: BigInt(100),
               formattedBalance: '100',
             },
             token: {
@@ -1266,7 +1266,7 @@ describe('swapRoute', () => {
             symbol: 'NATIVE',
             decimals: 18,
           },
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         current: {
@@ -1276,11 +1276,11 @@ describe('swapRoute', () => {
             symbol: 'NATIVE',
             decimals: 18,
           },
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         delta: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         isFee: false,
@@ -1290,7 +1290,7 @@ describe('swapRoute', () => {
       expect(requiredToken).toEqual(
         {
           address: '',
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
         },
       );
     });
@@ -1307,7 +1307,7 @@ describe('swapRoute', () => {
             decimals: 18,
             address: '0xERC20',
           },
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         current: {
@@ -1318,11 +1318,11 @@ describe('swapRoute', () => {
             decimals: 18,
             address: '0xERC20',
           },
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         delta: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         isFee: false,
@@ -1332,7 +1332,7 @@ describe('swapRoute', () => {
       expect(requiredToken).toEqual(
         {
           address: '0xERC20',
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
         },
       );
     });
@@ -1343,7 +1343,7 @@ describe('swapRoute', () => {
       const approvalFees = checkUserCanCoverApprovalFees(
         [
           {
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'IMX',
@@ -1358,7 +1358,7 @@ describe('swapRoute', () => {
       expect(approvalFees).toEqual(
         {
           sufficient: true,
-          approvalGasFee: BigNumber.from(0),
+          approvalGasFee: BigInt(0),
           approvalGasTokenAddress: '',
         },
       );
@@ -1368,7 +1368,7 @@ describe('swapRoute', () => {
       const approvalFees = checkUserCanCoverApprovalFees(
         [],
         {
-          value: BigNumber.from(1),
+          value: BigInt(1),
           token: {
             chainId: ChainId.IMTBL_ZKEVM_TESTNET,
             name: 'IMX',
@@ -1382,7 +1382,7 @@ describe('swapRoute', () => {
       expect(approvalFees).toEqual(
         {
           sufficient: false,
-          approvalGasFee: BigNumber.from(1),
+          approvalGasFee: BigInt(1),
           approvalGasTokenAddress: '',
         },
       );
@@ -1392,7 +1392,7 @@ describe('swapRoute', () => {
       const approvalFees = checkUserCanCoverApprovalFees(
         [
           {
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'ERC20',
@@ -1403,7 +1403,7 @@ describe('swapRoute', () => {
           },
         ],
         {
-          value: BigNumber.from(1),
+          value: BigInt(1),
           token: {
             chainId: ChainId.IMTBL_ZKEVM_TESTNET,
             name: 'IMX',
@@ -1417,7 +1417,7 @@ describe('swapRoute', () => {
       expect(approvalFees).toEqual(
         {
           sufficient: false,
-          approvalGasFee: BigNumber.from(1),
+          approvalGasFee: BigInt(1),
           approvalGasTokenAddress: '',
         },
       );
@@ -1427,7 +1427,7 @@ describe('swapRoute', () => {
       const approvalFees = checkUserCanCoverApprovalFees(
         [
           {
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               name: 'IMX',
@@ -1437,7 +1437,7 @@ describe('swapRoute', () => {
           },
         ],
         {
-          value: BigNumber.from(2),
+          value: BigInt(2),
           token: {
             chainId: ChainId.IMTBL_ZKEVM_TESTNET,
             name: 'IMX',
@@ -1451,7 +1451,7 @@ describe('swapRoute', () => {
       expect(approvalFees).toEqual(
         {
           sufficient: false,
-          approvalGasFee: BigNumber.from(2),
+          approvalGasFee: BigInt(2),
           approvalGasTokenAddress: '',
         },
       );
@@ -1461,7 +1461,7 @@ describe('swapRoute', () => {
       const approvalFees = checkUserCanCoverApprovalFees(
         [
           {
-            balance: BigNumber.from(2),
+            balance: BigInt(2),
             formattedBalance: '2',
             token: {
               name: 'IMX',
@@ -1471,7 +1471,7 @@ describe('swapRoute', () => {
           },
         ],
         {
-          value: BigNumber.from(1),
+          value: BigInt(1),
           token: {
             chainId: ChainId.IMTBL_ZKEVM_TESTNET,
             name: 'IMX',
@@ -1485,7 +1485,7 @@ describe('swapRoute', () => {
       expect(approvalFees).toEqual(
         {
           sufficient: true,
-          approvalGasFee: BigNumber.from(1),
+          approvalGasFee: BigInt(1),
           approvalGasTokenAddress: '',
         },
       );
@@ -1496,7 +1496,7 @@ describe('swapRoute', () => {
     it('should return true if user has enough balance to cover gas fees', () => {
       const l2Balances = [
         {
-          balance: BigNumber.from(2),
+          balance: BigInt(2),
           formattedBalance: '2',
           token: {
             name: 'IMX',
@@ -1510,7 +1510,7 @@ describe('swapRoute', () => {
 
       const approvalFees = {
         sufficient: true,
-        approvalGasFee: BigNumber.from(0),
+        approvalGasFee: BigInt(0),
         approvalGasTokenAddress: '',
       };
 
@@ -1520,11 +1520,11 @@ describe('swapRoute', () => {
           address: '',
           decimals: 18,
         },
-        value: BigNumber.from(1),
+        value: BigInt(1),
       };
 
       const tokenBeingSwapped = {
-        amount: BigNumber.from(1),
+        amount: BigInt(1),
         address: '',
       };
 
@@ -1542,7 +1542,7 @@ describe('swapRoute', () => {
     it('should return true if user has enough balance to cover gas and swap fees', () => {
       const l2Balances = [
         {
-          balance: BigNumber.from(3),
+          balance: BigInt(3),
           formattedBalance: '3',
           token: {
             name: 'IMX',
@@ -1557,7 +1557,7 @@ describe('swapRoute', () => {
           recipient: '',
           basisPoints: 0,
           amount: {
-            value: BigNumber.from(1),
+            value: BigInt(1),
             token: {
               chainId: ChainId.IMTBL_ZKEVM_TESTNET,
               name: 'IMX',
@@ -1571,7 +1571,7 @@ describe('swapRoute', () => {
 
       const approvalFees = {
         sufficient: true,
-        approvalGasFee: BigNumber.from(0),
+        approvalGasFee: BigInt(0),
         approvalGasTokenAddress: '',
       };
 
@@ -1581,11 +1581,11 @@ describe('swapRoute', () => {
           address: '',
           decimals: 18,
         },
-        value: BigNumber.from(1),
+        value: BigInt(1),
       };
 
       const tokenBeingSwapped = {
-        amount: BigNumber.from(1),
+        amount: BigInt(1),
         address: '',
       };
 
@@ -1603,7 +1603,7 @@ describe('swapRoute', () => {
     it('should return true if user has enough balance to cover the approval, gas and swap fees', () => {
       const l2Balances = [
         {
-          balance: BigNumber.from(4),
+          balance: BigInt(4),
           formattedBalance: '4',
           token: {
             name: 'IMX',
@@ -1618,7 +1618,7 @@ describe('swapRoute', () => {
           recipient: '',
           basisPoints: 0,
           amount: {
-            value: BigNumber.from(1),
+            value: BigInt(1),
             token: {
               chainId: ChainId.IMTBL_ZKEVM_TESTNET,
               name: 'IMX',
@@ -1632,7 +1632,7 @@ describe('swapRoute', () => {
 
       const approvalFees = {
         sufficient: true,
-        approvalGasFee: BigNumber.from(1),
+        approvalGasFee: BigInt(1),
         approvalGasTokenAddress: '',
       };
 
@@ -1642,11 +1642,11 @@ describe('swapRoute', () => {
           address: '',
           decimals: 18,
         },
-        value: BigNumber.from(1),
+        value: BigInt(1),
       };
 
       const tokenBeingSwapped = {
-        amount: BigNumber.from(1),
+        amount: BigInt(1),
         address: '',
       };
 
@@ -1667,7 +1667,7 @@ describe('swapRoute', () => {
       () => {
         const l2Balances = [
           {
-            balance: BigNumber.from(6),
+            balance: BigInt(6),
             formattedBalance: '6',
             token: {
               name: 'IMX',
@@ -1677,7 +1677,7 @@ describe('swapRoute', () => {
             },
           },
           {
-            balance: BigNumber.from(5),
+            balance: BigInt(5),
             formattedBalance: '5',
             token: {
               name: 'IMX',
@@ -1687,7 +1687,7 @@ describe('swapRoute', () => {
             },
           },
           {
-            balance: BigNumber.from(5),
+            balance: BigInt(5),
             formattedBalance: '5',
             token: {
               name: 'IMX',
@@ -1703,7 +1703,7 @@ describe('swapRoute', () => {
             recipient: '',
             basisPoints: 0,
             amount: {
-              value: BigNumber.from(1),
+              value: BigInt(1),
               token: {
                 chainId: ChainId.IMTBL_ZKEVM_TESTNET,
                 name: 'IMX',
@@ -1717,7 +1717,7 @@ describe('swapRoute', () => {
             recipient: '',
             basisPoints: 0,
             amount: {
-              value: BigNumber.from(5),
+              value: BigInt(5),
               token: {
                 chainId: ChainId.IMTBL_ZKEVM_TESTNET,
                 name: 'IMX',
@@ -1731,7 +1731,7 @@ describe('swapRoute', () => {
             recipient: '',
             basisPoints: 0,
             amount: {
-              value: BigNumber.from(5),
+              value: BigInt(5),
               token: {
                 chainId: ChainId.IMTBL_ZKEVM_TESTNET,
                 name: 'IMX',
@@ -1745,7 +1745,7 @@ describe('swapRoute', () => {
 
         const approvalFees = {
           sufficient: true,
-          approvalGasFee: BigNumber.from(1),
+          approvalGasFee: BigInt(1),
           approvalGasTokenAddress: '0xERC20_1',
         };
 
@@ -1755,11 +1755,11 @@ describe('swapRoute', () => {
             address: '0xERC20_1',
             decimals: 18,
           },
-          value: BigNumber.from(1),
+          value: BigInt(1),
         };
 
         const tokenBeingSwapped = {
-          amount: BigNumber.from(3),
+          amount: BigInt(3),
           address: '0xERC20_1',
         };
 
@@ -1778,7 +1778,7 @@ describe('swapRoute', () => {
     it('should return false if user does not have enough balance to cover gas', () => {
       const l2Balances = [
         {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           token: {
             name: 'IMX',
@@ -1793,7 +1793,7 @@ describe('swapRoute', () => {
 
       const approvalFees = {
         sufficient: true,
-        approvalGasFee: BigNumber.from(0),
+        approvalGasFee: BigInt(0),
         approvalGasTokenAddress: '',
       };
 
@@ -1803,11 +1803,11 @@ describe('swapRoute', () => {
           address: '',
           decimals: 18,
         },
-        value: BigNumber.from(1),
+        value: BigInt(1),
       };
 
       const tokenBeingSwapped = {
-        amount: BigNumber.from(1),
+        amount: BigInt(1),
         address: '',
       };
 
@@ -1825,7 +1825,7 @@ describe('swapRoute', () => {
     it('should return false if user does not have enough balance to cover the fee', () => {
       const l2Balances = [
         {
-          balance: BigNumber.from(2),
+          balance: BigInt(2),
           formattedBalance: '2',
           token: {
             name: 'IMX',
@@ -1841,7 +1841,7 @@ describe('swapRoute', () => {
           recipient: '',
           basisPoints: 0,
           amount: {
-            value: BigNumber.from(1),
+            value: BigInt(1),
             token: {
               chainId: ChainId.IMTBL_ZKEVM_TESTNET,
               name: 'IMX',
@@ -1855,7 +1855,7 @@ describe('swapRoute', () => {
 
       const approvalFees = {
         sufficient: true,
-        approvalGasFee: BigNumber.from(0),
+        approvalGasFee: BigInt(0),
         approvalGasTokenAddress: '',
       };
 
@@ -1865,11 +1865,11 @@ describe('swapRoute', () => {
           address: '',
           decimals: 18,
         },
-        value: BigNumber.from(1),
+        value: BigInt(1),
       };
 
       const tokenBeingSwapped = {
-        amount: BigNumber.from(1),
+        amount: BigInt(1),
         address: '',
       };
 
@@ -1887,7 +1887,7 @@ describe('swapRoute', () => {
     it('should return false if user does not have enough balance to cover the approval, gas and fees', () => {
       const l2Balances = [
         {
-          balance: BigNumber.from(3),
+          balance: BigInt(3),
           formattedBalance: '3',
           token: {
             name: 'IMX',
@@ -1902,7 +1902,7 @@ describe('swapRoute', () => {
           recipient: '',
           basisPoints: 0,
           amount: {
-            value: BigNumber.from(1),
+            value: BigInt(1),
             token: {
               chainId: ChainId.IMTBL_ZKEVM_TESTNET,
               name: 'IMX',
@@ -1920,17 +1920,17 @@ describe('swapRoute', () => {
           address: '',
           decimals: 18,
         },
-        value: BigNumber.from(1),
+        value: BigInt(1),
       };
 
       const approvalFees = {
         sufficient: true,
-        approvalGasFee: BigNumber.from(1),
+        approvalGasFee: BigInt(1),
         approvalGasTokenAddress: '',
       };
 
       const tokenBeingSwapped = {
-        amount: BigNumber.from(1),
+        amount: BigInt(1),
         address: '',
       };
 
@@ -1948,7 +1948,7 @@ describe('swapRoute', () => {
     it('should return false if user has no balance of the fee token', () => {
       const l2Balances = [
         {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           token: {
             name: 'IMX',
@@ -1964,7 +1964,7 @@ describe('swapRoute', () => {
           recipient: '',
           basisPoints: 0,
           amount: {
-            value: BigNumber.from(1),
+            value: BigInt(1),
             token: {
               chainId: ChainId.IMTBL_ZKEVM_TESTNET,
               name: 'IMX',
@@ -1978,7 +1978,7 @@ describe('swapRoute', () => {
 
       const approvalFees = {
         sufficient: true,
-        approvalGasFee: BigNumber.from(1),
+        approvalGasFee: BigInt(1),
         approvalGasTokenAddress: '',
       };
 
@@ -1988,11 +1988,11 @@ describe('swapRoute', () => {
           address: '',
           decimals: 18,
         },
-        value: BigNumber.from(1),
+        value: BigInt(1),
       };
 
       const tokenBeingSwapped = {
-        amount: BigNumber.from(1),
+        amount: BigInt(1),
         address: '',
       };
 
@@ -2017,7 +2017,7 @@ describe('swapRoute', () => {
             type: ItemType.ERC20,
             required: {
               type: ItemType.ERC20,
-              balance: BigNumber.from(2),
+              balance: BigInt(2),
               formattedBalance: '2',
               token: {
                 name: 'ERC20',
@@ -2030,14 +2030,14 @@ describe('swapRoute', () => {
         ],
       };
       const quoteTokenAddress = '0xIMX';
-      const amountBeingSwapped = BigNumber.from(10);
+      const amountBeingSwapped = BigInt(10);
       const approvalFees = {
         sufficient: true,
-        approvalGasFee: BigNumber.from(5),
+        approvalGasFee: BigInt(5),
         approvalGasTokenAddress: '0xIMX',
       };
       const swapFees: Fee[] = [];
-      const l2balance = BigNumber.from(1);
+      const l2balance = BigInt(1);
       const canCoverRequirement = checkIfUserCanCoverRequirement(
         l2balance,
         balanceRequirements,
@@ -2058,7 +2058,7 @@ describe('swapRoute', () => {
             type: ItemType.ERC20,
             required: {
               type: ItemType.ERC20,
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
               token: {
                 name: 'ERC20',
@@ -2071,15 +2071,15 @@ describe('swapRoute', () => {
         ],
       };
       const quoteTokenAddress = '0xERC20';
-      const amountBeingSwapped = BigNumber.from(10);
+      const amountBeingSwapped = BigInt(10);
       const approvalFees = {
         sufficient: true,
-        approvalGasFee: BigNumber.from(5),
+        approvalGasFee: BigInt(5),
         approvalGasTokenAddress: '0xIMX',
       };
       const swapFees: Fee[] = [];
 
-      const l2balance = BigNumber.from(25);
+      const l2balance = BigInt(25);
       const canCoverRequirement = checkIfUserCanCoverRequirement(
         l2balance,
         balanceRequirements,
@@ -2103,7 +2103,7 @@ describe('swapRoute', () => {
               type: ItemType.ERC20,
               required: {
                 type: ItemType.ERC20,
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'ERC20',
@@ -2116,10 +2116,10 @@ describe('swapRoute', () => {
           ],
         };
         const quoteTokenAddress = '0xERC20';
-        const amountBeingSwapped = BigNumber.from(10);
+        const amountBeingSwapped = BigInt(10);
         const approvalFees = {
           sufficient: true,
-          approvalGasFee: BigNumber.from(5),
+          approvalGasFee: BigInt(5),
           approvalGasTokenAddress: '0xERC20',
         };
         const swapFees: Fee[] = [
@@ -2127,7 +2127,7 @@ describe('swapRoute', () => {
             recipient: '0xRECIPIENT',
             basisPoints: 0,
             amount: {
-              value: BigNumber.from(5),
+              value: BigInt(5),
               token: {
                 chainId: ChainId.IMTBL_ZKEVM_TESTNET,
                 name: 'ERC20',
@@ -2141,7 +2141,7 @@ describe('swapRoute', () => {
             recipient: '0xRECIPIENT',
             basisPoints: 0,
             amount: {
-              value: BigNumber.from(5),
+              value: BigInt(5),
               token: {
                 chainId: ChainId.IMTBL_ZKEVM_TESTNET,
                 name: 'ERC20',
@@ -2153,7 +2153,7 @@ describe('swapRoute', () => {
           },
         ];
 
-        const l2balance = BigNumber.from(35);
+        const l2balance = BigInt(35);
         const canCoverRequirement = checkIfUserCanCoverRequirement(
           l2balance,
           balanceRequirements,
@@ -2177,7 +2177,7 @@ describe('swapRoute', () => {
               type: ItemType.ERC20,
               required: {
                 type: ItemType.ERC20,
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'ERC20',
@@ -2190,15 +2190,15 @@ describe('swapRoute', () => {
           ],
         };
         const quoteTokenAddress = '0xERC20';
-        const amountBeingSwapped = BigNumber.from(10);
+        const amountBeingSwapped = BigInt(10);
         const approvalFees = {
           sufficient: true,
-          approvalGasFee: BigNumber.from(5),
+          approvalGasFee: BigInt(5),
           approvalGasTokenAddress: '0xIMX',
         };
         const swapFees: Fee[] = [];
 
-        const l2balance = BigNumber.from(9);
+        const l2balance = BigInt(9);
         const canCoverRequirement = checkIfUserCanCoverRequirement(
           l2balance,
           balanceRequirements,
@@ -2223,7 +2223,7 @@ describe('swapRoute', () => {
               type: ItemType.ERC20,
               required: {
                 type: ItemType.ERC20,
-                balance: BigNumber.from(10),
+                balance: BigInt(10),
                 formattedBalance: '10',
                 token: {
                   name: 'ERC20',
@@ -2236,10 +2236,10 @@ describe('swapRoute', () => {
           ],
         };
         const quoteTokenAddress = '0xERC20';
-        const amountBeingSwapped = BigNumber.from(10);
+        const amountBeingSwapped = BigInt(10);
         const approvalFees = {
           sufficient: true,
-          approvalGasFee: BigNumber.from(5),
+          approvalGasFee: BigInt(5),
           approvalGasTokenAddress: '0xERC20',
         };
         const swapFees: Fee[] = [
@@ -2247,7 +2247,7 @@ describe('swapRoute', () => {
             recipient: '0xRECIPIENT',
             basisPoints: 0,
             amount: {
-              value: BigNumber.from(5),
+              value: BigInt(5),
               token: {
                 chainId: ChainId.IMTBL_ZKEVM_TESTNET,
                 name: 'ERC20',
@@ -2261,7 +2261,7 @@ describe('swapRoute', () => {
             recipient: '0xRECIPIENT',
             basisPoints: 0,
             amount: {
-              value: BigNumber.from(5),
+              value: BigInt(5),
               token: {
                 chainId: ChainId.IMTBL_ZKEVM_TESTNET,
                 name: 'ERC20',
@@ -2273,7 +2273,7 @@ describe('swapRoute', () => {
           },
         ];
 
-        const l2balance = BigNumber.from(34);
+        const l2balance = BigInt(34);
         const canCoverRequirement = checkIfUserCanCoverRequirement(
           l2balance,
           balanceRequirements,

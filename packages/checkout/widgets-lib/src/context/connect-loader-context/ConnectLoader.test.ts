@@ -1,5 +1,4 @@
 import { describe, expect } from '@jest/globals';
-import { Web3Provider } from '@ethersproject/providers';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import {
@@ -11,6 +10,7 @@ import {
   connectLoaderReducer,
   initialConnectLoaderState,
 } from './ConnectLoaderContext';
+import { BrowserProvider } from 'ethers';
 
 describe('connect-loader-context', () => {
   it('should update connection status when reducer called with UPDATE_CONNECTION_STATUS', () => {
@@ -48,7 +48,7 @@ describe('connect-loader-context', () => {
   it('should update state with provider when reducer called with SET_PROVIDER action', () => {
     const setProviderPayload: SetProviderPayload = {
       type: ConnectLoaderActions.SET_PROVIDER,
-      provider: {} as Web3Provider,
+      provider: {} as BrowserProvider,
     };
     expect(initialConnectLoaderState.provider).toBeUndefined();
     const { provider } = connectLoaderReducer(initialConnectLoaderState, {

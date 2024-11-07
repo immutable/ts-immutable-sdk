@@ -1,5 +1,4 @@
-import { TransactionRequest } from '@ethersproject/providers';
-import { TypedDataDomain, TypedDataField } from 'ethers';
+import { TransactionRequest, TypedDataDomain, TypedDataField } from 'ethers';
 
 export type UnsignedTransactions = {
   approvalTransactions: TransactionRequest[];

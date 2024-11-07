@@ -1,16 +1,15 @@
-import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
-import { BigNumber } from 'ethers';
 import {
   FulfillmentTransaction, GasAmount, GasTokenType, ItemRequirement, ItemType, TransactionOrGasType,
 } from '../../types';
 import { InsufficientERC1155, InsufficientERC20, InsufficientERC721 } from '../allowance/types';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { getGasPriceInWei } from '../../gasEstimate';
+import { BrowserProvider, TransactionRequest } from 'ethers';
 
 export const estimateGas = async (
-  provider: Web3Provider,
+  provider: BrowserProvider,
   transaction: TransactionRequest,
-): Promise<BigNumber> => {
+): Promise<bigint> => {
   try {
     return await provider.estimateGas(transaction);
   } catch (err: any) {
@@ -23,7 +22,7 @@ export const estimateGas = async (
 };
 
 export const getGasItemRequirement = (
-  gas: BigNumber,
+  gas: bigint,
   transactionOrGas: FulfillmentTransaction | GasAmount,
 ): ItemRequirement => {
   if (transactionOrGas.type === TransactionOrGasType.TRANSACTION
@@ -45,12 +44,12 @@ export const getGasItemRequirement = (
 };
 
 export const gasCalculator = async (
-  provider: Web3Provider,
+  provider: BrowserProvider,
   insufficientItems: (InsufficientERC20 | InsufficientERC721 | InsufficientERC1155)[],
   transactionOrGas: FulfillmentTransaction | GasAmount,
 ): Promise<ItemRequirement | null> => {
   const estimateGasPromises = [];
-  let totalGas = BigNumber.from(0);
+  let totalGas = BigInt(0);
 
   // Get all the gas estimate promises for the approval transactions
   for (const item of insufficientItems) {
@@ -66,17 +65,17 @@ export const gasCalculator = async (
     const feeData = await provider.getFeeData();
     const gasPrice = getGasPriceInWei(feeData);
     if (gasPrice !== null) {
-      const gas = gasPrice?.mul(transactionOrGas.gasToken.limit);
-      if (gas) totalGas = totalGas.add(gas);
+      const gas = gasPrice * transactionOrGas.gasToken.limit;
+      if (gas) totalGas = totalGas + gas;
     }
   }
 
   // Get the gas estimates for all the transactions and calculate the total gas
   const gasEstimatePromises = await Promise.all(estimateGasPromises);
   gasEstimatePromises.forEach((gasEstimate) => {
-    totalGas = totalGas.add(gasEstimate);
+    totalGas = totalGas + gasEstimate;
   });
 
-  if (totalGas.eq(0)) return null;
+  if (totalGas === 0n) return null;
   return getGasItemRequirement(totalGas, transactionOrGas);
 };
