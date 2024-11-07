@@ -230,7 +230,7 @@ const buildMetaTransactionForEjection = async (
     );
   }
 
-  if (!transactionRequest.nonce) {
+  if (typeof transactionRequest.nonce === 'undefined') {
     throw new JsonRpcError(
       RpcErrorCode.INVALID_PARAMS,
       'im_signEjectionTransaction requires a "nonce" field',
