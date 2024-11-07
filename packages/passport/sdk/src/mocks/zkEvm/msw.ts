@@ -10,6 +10,7 @@ export const relayerId = '0x745';
 export const transactionHash = '0x867';
 
 const mandatoryHandlers = [
+  rest.get('https://api.sandbox.immutable.com/v1/sdk/session-activity/check', async (req, res, ctx) => res(ctx.status(404))),
   rest.post('https://rpc.testnet.immutable.com', async (req, res, ctx) => {
     const body = await req.json<JsonRpcRequestPayload>();
     switch (body.method) {
