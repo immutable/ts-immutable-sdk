@@ -170,9 +170,7 @@ export default class ConfirmationScreen {
     this.showConfirmationScreen(
       this.getHref('unavailable'),
       () => this.closeWindow(),
-      () => {
-        this.closeWindow();
-      },
+      () => this.closeWindow(),
     );
   }
 
