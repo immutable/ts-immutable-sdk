@@ -3,7 +3,9 @@ import {
   IMTBLWidgetEvents,
   OrchestrationEvent,
   OrchestrationEventType,
+  RequestOnrampEvent,
 } from '@imtbl/checkout-sdk';
+import { Web3Provider } from '@ethersproject/providers';
 import { getCommerceWidgetEvent } from '../functions/getCommerceWidgetEvent';
 import { sendCheckoutEvent } from '../CommerceWidgetEvents';
 import {
@@ -30,6 +32,7 @@ const widgetEvents = [
 export function useWidgetEvents(
   eventTarget: Window | EventTarget,
   viewState: ReturnType<typeof useViewState>,
+  handleProviderUpdated: (provider: Web3Provider) => void,
 ) {
   const [{ history }, viewDispatch] = viewState;
 
@@ -50,6 +53,13 @@ export function useWidgetEvents(
       });
 
       return;
+    }
+
+    if (type === OrchestrationEventType.REQUEST_ONRAMP) {
+      const onRampEvent = data as RequestOnrampEvent;
+      if (onRampEvent.provider) {
+        handleProviderUpdated(onRampEvent.provider);
+      }
     }
 
     const flow = getViewFromOrchestrationEventType(type);

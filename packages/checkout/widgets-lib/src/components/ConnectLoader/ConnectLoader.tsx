@@ -29,6 +29,7 @@ import { identifyUser } from '../../lib/analytics/identifyUser';
 export interface ConnectLoaderProps {
   children?: React.ReactNode;
   params: ConnectLoaderParams;
+  successEvent?: () => void;
   closeEvent: () => void;
   widgetConfig: StrongCheckoutWidgetsConfig;
   goBackEvent?: () => void;
@@ -48,6 +49,7 @@ export function ConnectLoader({
   children,
   params,
   widgetConfig,
+  successEvent,
   closeEvent,
   goBackEvent,
   showBackButton,
@@ -251,6 +253,7 @@ export function ConnectLoader({
                       web3Provider={provider}
                       checkout={checkout}
                       deepLink={deepLink}
+                      sendSuccessEventOverride={successEvent}
                       sendCloseEventOverride={closeEvent}
                       allowedChains={allowedChains}
                       isCheckNetworkEnabled={isCheckNetworkEnabled ?? true}
