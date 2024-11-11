@@ -150,6 +150,7 @@ export type {
 } from './types';
 
 export { fetchRiskAssessment, isAddressSanctioned } from './riskAssessment';
+export type { AssessmentResult } from './riskAssessment';
 
 export type { ErrorType } from './errors';
 

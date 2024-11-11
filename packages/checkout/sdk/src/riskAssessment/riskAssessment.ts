@@ -64,5 +64,11 @@ export const fetchRiskAssessment = async (
 
 export const isAddressSanctioned = (
   riskAssessment: AssessmentResult,
-  address: string,
-): boolean => riskAssessment[address.toLowerCase()].sanctioned;
+  address?: string,
+): boolean => {
+  if (address) {
+    return riskAssessment[address.toLowerCase()].sanctioned;
+  }
+
+  return Object.values(riskAssessment).some((assessment) => assessment.sanctioned);
+};

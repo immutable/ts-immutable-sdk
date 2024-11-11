@@ -92,7 +92,20 @@ describe('riskAssessment', () => {
   });
 
   describe('isAddressSanctioned', () => {
-    it('should return true if address is sanctioned', () => {
+    it('should return true if any address is sanctioned', () => {
+      const assessment = {
+        '0x9999999123123123': {
+          sanctioned: false,
+        },
+        '0xabcdef1234567890': {
+          sanctioned: true,
+        },
+      };
+
+      expect(isAddressSanctioned(assessment)).toBe(true);
+    });
+
+    it('should return true if single address is sanctioned', () => {
       const address = '0x1234567890ABCdef';
       const assessment = {
         [address.toLowerCase()]: {
@@ -103,7 +116,7 @@ describe('riskAssessment', () => {
       expect(isAddressSanctioned(assessment, address)).toBe(true);
     });
 
-    it('should return false if address is not sanctioned', () => {
+    it('should return false if single address is not sanctioned', () => {
       const address = '0x1234567890ABCdef';
       const assessment = {
         [address.toLowerCase()]: {
