@@ -740,8 +740,6 @@ export function AddTokens({
                   chains={chains}
                   routeData={selectedRouteData}
                   onClick={() => setShowOptionsDrawer(true)}
-                  withSelectedToken={!!selectedToken}
-                  withSelectedAmount={parseFloat(inputValue) > 0}
                   withSelectedWallet={!!fromAddress}
                   insufficientBalance={insufficientBalance}
                   showOnrampOption={shouldShowOnRampOption}
