@@ -55,7 +55,7 @@ export function ServiceUnavailableErrorView({
             <Button
               sx={{ width: '100%' }}
               testId="primary-action-button"
-              variant="secondary"
+              variant="tertiary"
               size="large"
               onClick={onBackButtonClick}
             >

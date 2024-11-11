@@ -7,7 +7,6 @@ export function SanctionsHero() {
     <Box
       sx={{
         ...heroBackGroundStyles,
-        background: 'base.color.translucent.emphasis.100',
       }}
     >
       <Box sx={heroImageStyles}>
