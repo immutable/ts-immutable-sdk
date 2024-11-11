@@ -1,28 +1,17 @@
-import { Box, Button, Link } from '@biom3/react';
-import { Trans, useTranslation } from 'react-i18next';
+import { Box, Button, Heading } from '@biom3/react';
+import { useTranslation } from 'react-i18next';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
-import { SimpleTextBody } from '../../components/Body/SimpleTextBody';
-import { NoServiceHero } from '../../components/Hero/NoServiceHero';
-import { FooterLogo } from '../../components/Footer/FooterLogo';
-import { ServiceType } from './serviceTypes';
+import { SanctionsHero } from '../../components/Hero/SanctionsHero';
 
 export interface ServiceUnavailableErrorViewProps {
-  service: ServiceType;
   onCloseClick: () => void;
-  primaryActionText?: string;
-  onPrimaryButtonClick?: () => void;
-  secondaryActionText?: string;
-  onSecondaryButtonClick?: () => void;
+  onBackButtonClick?: () => void;
 }
 
 export function ServiceUnavailableErrorView({
-  service,
   onCloseClick,
-  primaryActionText,
-  onPrimaryButtonClick,
-  secondaryActionText,
-  onSecondaryButtonClick,
+  onBackButtonClick,
 }: ServiceUnavailableErrorViewProps) {
   const { t } = useTranslation();
 
@@ -31,26 +20,20 @@ export function ServiceUnavailableErrorView({
       header={
         <HeaderNavigation transparent onCloseButtonClick={onCloseClick} />
       }
-      heroContent={<NoServiceHero />}
+      heroContent={<SanctionsHero />}
       floatHeader
-      footer={<FooterLogo />}
       testId="service-unavailable-error-view"
     >
-      <SimpleTextBody heading={t(`views.SERVICE_UNAVAILABLE_ERROR_VIEW.heading.${service}`)}>
-        <Trans
-          i18nKey={t(`views.SERVICE_UNAVAILABLE_ERROR_VIEW.body.${service}`)}
-          components={{
-            quickswapLink: <Link
-              size="small"
-              rc={<a target="_blank" href="https://quickswap.exchange" rel="noreferrer" />}
-            />,
-            immutableSupport: <Link
-              size="small"
-              rc={<a target="_blank" href="https://support.immutable.com/" rel="noreferrer" />}
-            />,
-          }}
-        />
-      </SimpleTextBody>
+      <Box
+        sx={{
+          textAlign: 'center',
+          fontSize: 'base.type.size.x10',
+          paddingLeft: 'base.spacing.x20',
+          paddingRight: 'base.spacing.x20',
+        }}
+      >
+        <Heading size="medium">{t('views.SERVICE_UNAVAILABLE_SANCTIONS_ERROR_VIEW.heading')}</Heading>
+      </Box>
 
       <Box
         testId="button-container"
@@ -62,40 +45,21 @@ export function ServiceUnavailableErrorView({
         }}
       >
 
-        {primaryActionText && onPrimaryButtonClick && (
+        {onBackButtonClick && (
           <Box
             sx={{
               paddingX: 'base.spacing.x4',
-              paddingBottom: 'base.spacing.x2',
+              paddingBottom: 'base.spacing.x15',
             }}
           >
             <Button
               sx={{ width: '100%' }}
               testId="primary-action-button"
-              variant="primary"
-              size="large"
-              onClick={onPrimaryButtonClick}
-            >
-              {primaryActionText}
-            </Button>
-          </Box>
-        )}
-
-        {secondaryActionText && onSecondaryButtonClick && (
-          <Box
-            sx={{
-              paddingX: 'base.spacing.x4',
-              paddingBottom: 'base.spacing.x2',
-            }}
-          >
-            <Button
-              sx={{ width: '100%' }}
-              testId="secondary-action-button"
               variant="secondary"
               size="large"
-              onClick={onSecondaryButtonClick}
+              onClick={onBackButtonClick}
             >
-              {secondaryActionText}
+              {t('views.SERVICE_UNAVAILABLE_SANCTIONS_ERROR_VIEW.actionText')}
             </Button>
           </Box>
         )}

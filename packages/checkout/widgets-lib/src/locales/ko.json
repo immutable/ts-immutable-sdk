@@ -81,8 +81,8 @@
       }
     },
     "SERVICE_UNAVAILABLE_SANCTIONS_ERROR_VIEW": {
-      "heading": "This service is not available",
-      "actionText": "Go back"
+      "heading": "이 서비스는 제공되지 않습니다.",
+      "actionText": "돌아가기"
     },
     "LOADING_VIEW": {
       "text": "로딩 중"

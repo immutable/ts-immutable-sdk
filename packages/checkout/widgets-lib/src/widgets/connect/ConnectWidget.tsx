@@ -39,7 +39,7 @@ import { WalletConnectManager, walletConnectProviderInfo } from '../../lib/walle
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { ErrorView } from '../../views/error/ErrorView';
 import { ServiceType } from '../../views/error/serviceTypes';
-import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
+import { ServiceUnavailableToRegionErrorView } from '../../views/error/ServiceUnavailableToRegionErrorView';
 import { LoadingView } from '../../views/loading/LoadingView';
 import {
   sendCloseWidgetEvent,
@@ -274,7 +274,7 @@ export default function ConnectWidget({
               />
             )}
           {view.type === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
-            <ServiceUnavailableErrorView
+            <ServiceUnavailableToRegionErrorView
               service={ServiceType.GENERIC}
               onCloseClick={sendCloseEvent}
             />

@@ -81,8 +81,8 @@
       }
     },
     "SERVICE_UNAVAILABLE_SANCTIONS_ERROR_VIEW": {
-      "heading": "This service is not available",
-      "actionText": "Go back"
+      "heading": "此服务不可用。",
+      "actionText": "返回"
     },
     "LOADING_VIEW": {
       "text": "加载中"

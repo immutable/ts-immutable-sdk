@@ -63,7 +63,7 @@ import {
 } from '../../context/view-context/BridgeViewContextTypes';
 import { ClaimWithdrawal } from './views/ClaimWithdrawal';
 import { ServiceType } from '../../views/error/serviceTypes';
-import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
+import { ServiceUnavailableToRegionErrorView } from '../../views/error/ServiceUnavailableToRegionErrorView';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
@@ -341,7 +341,7 @@ export default function BridgeWidget({
             />
           )}
           {viewState.view.type === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
-            <ServiceUnavailableErrorView
+            <ServiceUnavailableToRegionErrorView
               service={ServiceType.GENERIC}
               onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
             />
