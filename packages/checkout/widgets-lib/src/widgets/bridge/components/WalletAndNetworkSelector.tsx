@@ -12,7 +12,11 @@ import {
   useState,
 } from 'react';
 import {
-  ChainId, isAddressSanctioned, WalletProviderName, WalletProviderRdns,
+  ChainId,
+  fetchRiskAssessment,
+  isAddressSanctioned,
+  WalletProviderName,
+  WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
@@ -210,7 +214,9 @@ export function WalletAndNetworkSelector() {
       const connectedProvider = await connectToProvider(checkout, web3Provider, changeAccount);
 
       // CM-793 Check for sanctioned address
-      if (await isAddressSanctioned(await connectedProvider.getSigner().getAddress(), checkout.config.environment)) {
+      const address = await connectedProvider.getSigner().getAddress();
+      const sanctions = await fetchRiskAssessment([address], checkout.config);
+      if (isAddressSanctioned(sanctions, address)) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
@@ -340,7 +346,9 @@ export function WalletAndNetworkSelector() {
         const connectedProvider = await connectToProvider(checkout, web3Provider, false);
 
         // CM-793 Check for sanctioned address
-        if (await isAddressSanctioned(await connectedProvider.getSigner().getAddress(), checkout.config.environment)) {
+        const address = await connectedProvider.getSigner().getAddress();
+        const sanctions = await fetchRiskAssessment([address], checkout.config);
+        if (isAddressSanctioned(sanctions, address)) {
           viewDispatch({
             payload: {
               type: ViewActions.UPDATE_VIEW,
@@ -357,7 +365,6 @@ export function WalletAndNetworkSelector() {
           handleWalletConnectToWalletConnection(connectedProvider);
         } else {
           setToWalletWeb3Provider(connectedProvider);
-          const address = await connectedProvider!.getSigner().getAddress();
           setToWalletAddress(address.toLowerCase());
           handleSettingToNetwork(address.toLowerCase());
 

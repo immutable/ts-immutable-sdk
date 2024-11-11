@@ -85,6 +85,8 @@ export type RemoteConfiguration = {
   squid?: SquidConfig;
   /** The checkout version info. */
   checkoutWidgetsVersion: CheckoutWidgetsVersionConfig;
+  /** Risk assessment config. */
+  riskAssessment?: RiskAssessmentConfig;
 };
 
 /**
@@ -277,4 +279,9 @@ export type ChainTokensConfig = {
 
 export type CheckoutWidgetsVersionConfig = {
   compatibleVersionMarkers: string[];
+};
+
+export type RiskAssessmentConfig = {
+  enabled: boolean;
+  levels: string[];
 };
