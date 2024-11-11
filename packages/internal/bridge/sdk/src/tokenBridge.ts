@@ -642,7 +642,7 @@ export class TokenBridge {
         ]), BridgeErrorType.INTERNAL_ERROR);
       unsignedApprovalTx = {
         data,
-        to: token,
+        to: contractToApprove,
         value: 0,
         from: sender,
         chainId: parseInt(this.config.bridgeInstance.rootChainID, 10),
@@ -1251,7 +1251,7 @@ export class TokenBridge {
     const tokensRes: Record<FungibleToken, FlowRateInfoItem> = {};
 
     const withdrawalQueueActivated = contractPromisesRes[0];
-    const withdrawalDelay = contractPromisesRes[1].toNumber();
+    const withdrawalDelay = Number(contractPromisesRes[1]);
 
     // remove first 2 items from promise all response
     contractPromisesRes.splice(0, 2);
@@ -1262,7 +1262,7 @@ export class TokenBridge {
       tokensRes[req.tokens[i]] = {
         capacity: contractPromisesRes[shifter].capacity,
         depth: contractPromisesRes[shifter].depth,
-        refillTime: contractPromisesRes[shifter].refillTime.toNumber(),
+        refillTime: Number(contractPromisesRes[shifter].refillTime),
         refillRate: contractPromisesRes[shifter].refillRate,
         largeTransferThreshold: contractPromisesRes[shifter + 1],
       };
