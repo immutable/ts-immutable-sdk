@@ -35,6 +35,7 @@ import {
 import { getL2ChainId } from '../../../lib';
 import { AddTokensErrorTypes } from '../types';
 import { TokenImage } from '../../../components/TokenImage/TokenImage';
+import { TOKEN_PRIORITY_ORDER } from '../utils/config';
 
 export interface TokenDrawerMenuProps {
   checkout: Checkout;
@@ -132,6 +133,23 @@ export function TokenDrawerMenu({
               };
             }
             return token;
+          });
+          updatedTokens.sort((a, b) => {
+            const aIndex = TOKEN_PRIORITY_ORDER.findIndex((token) => token === a.symbol);
+            const bIndex = TOKEN_PRIORITY_ORDER.findIndex((token) => token === b.symbol);
+            // If both tokens are not in the priority list, sort by symbol
+            if (aIndex === -1 && bIndex === -1) {
+              return a.symbol.localeCompare(b.symbol);
+            }
+            // If only one token is in the priority list, sort it first
+            if (aIndex === -1) {
+              return 1;
+            }
+            if (bIndex === -1) {
+              return -1;
+            }
+            // If both tokens are in the priority list, sort by index
+            return aIndex < bIndex ? -1 : 1;
           });
 
           setAllowedTokens(updatedTokens);
