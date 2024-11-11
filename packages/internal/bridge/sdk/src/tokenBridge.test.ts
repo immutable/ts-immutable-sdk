@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/dot-notation */
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { Contract, ethers } from 'ethers';
+import * as ethers from 'ethers';
 import { TokenBridge } from './tokenBridge';
 import { BridgeConfiguration } from './config';
 import { ETH_SEPOLIA_TO_ZKEVM_TESTNET, NATIVE } from './constants/bridges';
@@ -789,7 +789,7 @@ describe('Token Bridge', () => {
       expect(result.transactions[0].recipient).toBe(recipient);
       expect(result.transactions[0].amount).toStrictEqual(amount);
     });
-    it.only('returns the COMPLETE status for a withdrawal', async () => {
+    it('returns the COMPLETE status for a withdrawal', async () => {
       expect.assertions(8);
 
       (queryTransactionStatus as jest.Mock).mockReturnValue({
