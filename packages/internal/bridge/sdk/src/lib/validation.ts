@@ -1,4 +1,4 @@
-import { ethers, isAddress, Network } from 'ethers';
+import { isAddress, Network } from 'ethers';
 import {
   BridgeBundledTxRequest, BridgeFeeActions, BridgeFeeRequest, FungibleToken,
 } from '../types';
