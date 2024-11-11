@@ -1,11 +1,11 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { Contract, JsonRpcProvider } from 'ethers';
 import { BridgeConfiguration } from '../config';
 import { ETH_SEPOLIA_TO_ZKEVM_TESTNET, bridgeMethods } from '../constants/bridges';
 import { createContract } from '../contracts/createContract';
 import { ROOT_ERC20_BRIDGE_FLOW_RATE } from '../contracts/ABIs/RootERC20BridgeFlowRate';
 import { CHILD_ERC20_BRIDGE } from '../contracts/ABIs/ChildERC20Bridge';
 import { getBridgeTxCalldata } from './transactions';
-import { Contract, JsonRpcProvider } from 'ethers';
 
 const sender = '0x95222290DD7278Aa3Ddd389Cc1E1d165CC4BAfe5';
 const recipient = '0x220866B1A2219f40e72f5c628B65D54268cA3A9D';
