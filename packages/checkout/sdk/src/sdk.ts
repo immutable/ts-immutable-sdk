@@ -79,7 +79,7 @@ import { WidgetConfiguration } from './widgets/definitions/configurations';
 import { getWidgetsEsmUrl, loadUnresolvedBundle } from './widgets/load';
 import { determineWidgetsVersion, validateAndBuildVersion } from './widgets/version';
 import { globalPackageVersion } from './env';
-import { isAddressSanctioned } from './sanctions';
+import { AssessmentResult, fetchRiskAssessment, isAddressSanctioned } from './riskAssessment';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -335,12 +335,22 @@ export class Checkout {
   }
 
   /**
-   * Checks if an address is sanctioned.
-   * @param {string} address - The address to check.
-   * @returns {Promise<boolean>} - A promise that resolves to the result of the check.
+   * Fetches the risk assessment for the given addresses.
+   * @param {string[]} addresses - The addresses to assess.
+   * @returns {Promise<AssessmentResult>} - A promise that resolves to the risk assessment result.
    */
-  public async checkIsAddressSanctioned(address: string): Promise<boolean> {
-    return await isAddressSanctioned(address, this.config);
+  public async getRiskAssessment(addresses: string[]): Promise<AssessmentResult> {
+    return await fetchRiskAssessment(addresses, this.config);
+  }
+
+  /**
+   * Helper method that checks if an address is sanctioned based on risk assessment results from {getRiskAssessment}.
+   * @param {AssessmentResult} assessment - Risk assessment to analyse.
+   * @param {string} address - The address to check.
+   * @returns {boolean} - Result of the check.
+   */
+  public checkIsAddressSanctioned(assessment: AssessmentResult, address: string): boolean {
+    return isAddressSanctioned(assessment, address);
   }
 
   /**

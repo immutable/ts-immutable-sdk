@@ -7,7 +7,7 @@ import {
   WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 import { addProviderListenersForWidgetRoot } from './eip1193Events';
-import { getProviderSlugFromRdns } from './provider/utils';
+import { getProviderSlugFromRdns } from './provider';
 
 export enum ConnectEIP6963ProviderError {
   CONNECT_ERROR = 'CONNECT_ERROR',
@@ -36,9 +36,9 @@ export const connectEIP6963Provider = async (
     });
 
     const address = await connectResult.provider.getSigner().getAddress();
-    const isSanctioned = await checkout.checkIsAddressSanctioned(address);
+    const riskAssessment = await checkout.getRiskAssessment([address]);
 
-    if (isSanctioned) {
+    if (checkout.checkIsAddressSanctioned(riskAssessment, address)) {
       throw new CheckoutError(
         'Sanctioned address',
         ConnectEIP6963ProviderError.SANCTIONED_ADDRESS,
