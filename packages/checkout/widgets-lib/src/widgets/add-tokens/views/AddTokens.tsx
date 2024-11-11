@@ -1,5 +1,6 @@
 import {
   Body,
+  Box,
   ButtCon,
   Button,
   FramedIcon,
@@ -26,11 +27,13 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import { useTranslation } from 'react-i18next';
+import { keyframes } from '@emotion/react';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
@@ -94,6 +97,8 @@ export function AddTokens({
   showBackButton,
   onBackButtonClick,
 }: AddTokensProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const { fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
   const { showErrorHandover } = useError(config.environment);
 
@@ -499,6 +504,12 @@ export function AddTokens({
     config.theme,
   );
 
+  useEffect(() => {
+    if (inputRef.current && !showInitialEmptyState) {
+      inputRef.current.focus();
+    }
+  }, [showInitialEmptyState]);
+
   const tokenChoiceOptions = useMemo(
     () => allowedTokens.map((token) => (
       <MenuItem
@@ -564,6 +575,18 @@ export function AddTokens({
     );
   };
 
+  const pulseShadow = keyframes`
+    0% {
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 1);
+    }
+    50% {
+      box-shadow: 0 0 10px 3px rgba(54, 210, 227, 0.1);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    }
+  `;
+
   return (
     <SimpleLayout
       containerSx={{ bg: 'transparent' }}
@@ -611,36 +634,40 @@ export function AddTokens({
           alignItems="center"
         >
           <OverflowDrawerMenu
+            customTarget={showInitialEmptyState ? (
+              <Box sx={{ animation: `${pulseShadow} 2s infinite ease-in-out`, borderRadius: '50%' }}>
+                <ButtCon
+                  icon="Add"
+                  size="large"
+                  variant="tertiary"
+                />
+              </Box>
+            ) : (
+              <FramedImage
+                size="xLarge"
+                use={(
+                  <TokenImage
+                    src={selectedToken?.icon}
+                    name={selectedToken?.name}
+                    defaultImage={defaultTokenImage}
+                  />
+                )}
+                padded
+                emphasized
+                circularFrame
+                sx={{
+                  cursor: 'pointer',
+                  mb: 'base.spacing.x1',
+                  // eslint-disable-next-line @typescript-eslint/naming-convention
+                  '&:hover': {
+                    boxShadow: ({ base }) => `0 0 0 ${base.border.size[200]} ${base.color.text.body.primary}`,
+                  },
+                }}
+              />
+            )}
             drawerSize="full"
             headerBarTitle="Add Token"
             drawerCloseIcon="ChevronExpand"
-            {...(showInitialEmptyState
-              ? { icon: 'Add', size: 'large', variant: 'tertiary' }
-              : {
-                customTarget: (
-                  <FramedImage
-                    size="xLarge"
-                    use={(
-                      <TokenImage
-                        src={selectedToken?.icon}
-                        name={selectedToken?.name}
-                        defaultImage={defaultTokenImage}
-                      />
-                      )}
-                    padded
-                    emphasized
-                    circularFrame
-                    sx={{
-                      cursor: 'pointer',
-                      mb: 'base.spacing.x1',
-                      // eslint-disable-next-line @typescript-eslint/naming-convention
-                      '&:hover': {
-                        boxShadow: ({ base }) => `0 0 0 ${base.border.size[200]} ${base.color.text.body.primary}`,
-                      },
-                    }}
-                  />
-                ),
-              })}
           >
             {tokenChoiceOptions}
           </OverflowDrawerMenu>
@@ -657,6 +684,7 @@ export function AddTokens({
                 {selectedToken.symbol}
               </HeroFormControl.Label>
               <HeroTextInput
+                inputRef={inputRef}
                 testId="add-tokens-amount-input"
                 type="number"
                 value={inputValue}
@@ -686,6 +714,11 @@ export function AddTokens({
         >
           <Stack gap="0px">
             <SelectedWallet
+              sx={selectedToken
+                && !fromAddress
+                && inputValue
+                ? { animation: `${pulseShadow} 2s infinite ease-in-out` }
+                : {}}
               label="Send from"
               providerInfo={{
                 ...fromProviderInfo,
@@ -696,21 +729,24 @@ export function AddTokens({
                 setShowPayWithDrawer(true);
               }}
             >
-              <MenuItem.BottomSlot.Divider
-                sx={fromAddress ? { ml: 'base.spacing.x4' } : undefined}
-              />
-              <SelectedRouteOption
-                checkout={checkout}
-                loading={loading}
-                chains={chains}
-                routeData={selectedRouteData}
-                onClick={() => setShowOptionsDrawer(true)}
-                withSelectedToken={!!selectedToken}
-                withSelectedAmount={parseFloat(inputValue) > 0}
-                withSelectedWallet={!!fromAddress}
-                insufficientBalance={insufficientBalance}
-                showOnrampOption={shouldShowOnRampOption}
-              />
+              {selectedToken && fromAddress && inputValue && (
+              <>
+                <MenuItem.BottomSlot.Divider
+                  sx={fromAddress ? { ml: 'base.spacing.x4' } : undefined}
+                />
+                <SelectedRouteOption
+                  checkout={checkout}
+                  loading={loading}
+                  chains={chains}
+                  routeData={selectedRouteData}
+                  onClick={() => setShowOptionsDrawer(true)}
+                  withSelectedWallet={!!fromAddress}
+                  insufficientBalance={insufficientBalance}
+                  showOnrampOption={shouldShowOnRampOption}
+                />
+              </>
+              )}
+
             </SelectedWallet>
             <Stack
               sx={{ pos: 'relative', h: 'base.spacing.x3' }}
@@ -727,6 +763,12 @@ export function AddTokens({
               />
             </Stack>
             <SelectedWallet
+              sx={selectedToken
+                && fromAddress
+                && !toAddress
+                && inputValue
+                ? { animation: `${pulseShadow} 2s infinite ease-in-out` }
+                : {}}
               label="Deliver to"
               providerInfo={{
                 ...toProviderInfo,

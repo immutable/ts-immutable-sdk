@@ -21,8 +21,6 @@ export interface SelectedRouteOptionProps {
   chains: Chain[] | null;
   onClick: MouseEventHandler<HTMLSpanElement>;
   loading?: boolean;
-  withSelectedToken?: boolean;
-  withSelectedAmount?: boolean;
   withSelectedWallet?: boolean;
   insufficientBalance?: boolean;
   showOnrampOption?: boolean;
@@ -63,8 +61,6 @@ export function SelectedRouteOption({
   chains,
   loading = false,
   withSelectedWallet = false,
-  withSelectedToken = false,
-  withSelectedAmount = false,
   insufficientBalance = false,
   showOnrampOption = false,
   onClick,
@@ -115,19 +111,7 @@ export function SelectedRouteOption({
 
   if ((!routeData && !loading) || insufficientBalance) {
     let icon: AllDualVariantIconKeys = 'Sparkle';
-    let copy = "Add your token, we'll find the best payment";
-
-    if (!withSelectedToken && withSelectedAmount) {
-      copy = "Add your token, we'll find the best payment";
-    }
-
-    if (withSelectedToken && !withSelectedAmount) {
-      copy = "Add your amount, we'll find the best payment";
-    }
-
-    if (!withSelectedWallet && withSelectedToken && withSelectedAmount) {
-      copy = "Select a wallet, we'll find the best payment";
-    }
+    let copy = '';
 
     if (insufficientBalance) {
       icon = 'InformationCircle';
