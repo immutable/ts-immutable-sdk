@@ -149,7 +149,7 @@ export type {
   CheckoutWidgetsVersionConfig,
 } from './types';
 
-export { isAddressSanctioned } from './sanctions';
+export { fetchRiskAssessment, isAddressSanctioned } from './riskAssessment';
 
 export type { ErrorType } from './errors';
 

@@ -1,5 +1,6 @@
 import { Checkout, TokenFilterTypes, TokenInfo } from '@imtbl/checkout-sdk';
 import {
+  Box,
   ButtCon,
   Drawer,
   FramedImage,
@@ -36,6 +37,7 @@ import { getL2ChainId } from '../../../lib';
 import { AddTokensErrorTypes } from '../types';
 import { TokenImage } from '../../../components/TokenImage/TokenImage';
 import { TOKEN_PRIORITY_ORDER } from '../utils/config';
+import { PULSE_SHADOW } from '../utils/animation';
 
 export interface TokenDrawerMenuProps {
   checkout: Checkout;
@@ -216,19 +218,21 @@ export function TokenDrawerMenu({
             />
           </SmartClone>
         ) : (
-          <ButtCon
-            size="large"
-            variant="tertiary"
-            icon="Add"
-            onClick={handleTokenIconClick}
-          />
+          <Box sx={{ animation: `${PULSE_SHADOW} 2s infinite ease-in-out`, borderRadius: '50%' }}>
+            <ButtCon
+              size="large"
+              variant="tertiary"
+              icon="Add"
+              onClick={handleTokenIconClick}
+            />
+          </Box>
         )}
       </Drawer.Target>
       <Drawer.Content sx={{ paddingX: 'base.spacing.x2' }}>
         <TextInput
           sx={{ marginBottom: 'base.spacing.x2' }}
           placeholder="Search tokens"
-          sizeVariant="large"
+          sizeVariant="medium"
           onChange={(event) => {
             setSearchValue(event.target.value);
           }}

@@ -23,6 +23,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
@@ -64,6 +65,7 @@ import { useError } from '../hooks/useError';
 import { SquidFooter } from '../components/SquidFooter';
 import { getFormattedNumberWithDecimalPlaces } from '../functions/getFormattedNumber';
 import { TokenDrawerMenu } from '../components/TokenDrawerMenu';
+import { PULSE_SHADOW } from '../utils/animation';
 
 interface AddTokensProps {
   checkout: Checkout;
@@ -90,6 +92,8 @@ export function AddTokens({
   showBackButton,
   onBackButtonClick,
 }: AddTokensProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const { fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
   const { showErrorHandover } = useError(config.environment);
 
@@ -510,6 +514,7 @@ export function AddTokens({
                 {selectedToken.symbol}
               </HeroFormControl.Label>
               <HeroTextInput
+                inputRef={inputRef}
                 testId="add-tokens-amount-input"
                 type="number"
                 value={inputValue}
@@ -539,6 +544,11 @@ export function AddTokens({
         >
           <Stack gap="0px">
             <SelectedWallet
+              sx={selectedToken
+                && !fromAddress
+                && inputValue
+                ? { animation: `${PULSE_SHADOW} 2s infinite ease-in-out` }
+                : {}}
               label="Send from"
               providerInfo={{
                 ...fromProviderInfo,
@@ -549,21 +559,24 @@ export function AddTokens({
                 setShowPayWithDrawer(true);
               }}
             >
-              <MenuItem.BottomSlot.Divider
-                sx={fromAddress ? { ml: 'base.spacing.x4' } : undefined}
-              />
-              <SelectedRouteOption
-                checkout={checkout}
-                loading={loading}
-                chains={chains}
-                routeData={selectedRouteData}
-                onClick={() => setShowOptionsDrawer(true)}
-                withSelectedToken={!!selectedToken}
-                withSelectedAmount={parseFloat(inputValue) > 0}
-                withSelectedWallet={!!fromAddress}
-                insufficientBalance={insufficientBalance}
-                showOnrampOption={shouldShowOnRampOption}
-              />
+              {selectedToken && fromAddress && inputValue && (
+              <>
+                <MenuItem.BottomSlot.Divider
+                  sx={fromAddress ? { ml: 'base.spacing.x4' } : undefined}
+                />
+                <SelectedRouteOption
+                  checkout={checkout}
+                  loading={loading}
+                  chains={chains}
+                  routeData={selectedRouteData}
+                  onClick={() => setShowOptionsDrawer(true)}
+                  withSelectedWallet={!!fromAddress}
+                  insufficientBalance={insufficientBalance}
+                  showOnrampOption={shouldShowOnRampOption}
+                />
+              </>
+              )}
+
             </SelectedWallet>
             <Stack
               sx={{ pos: 'relative', h: 'base.spacing.x3' }}
@@ -580,6 +593,12 @@ export function AddTokens({
               />
             </Stack>
             <SelectedWallet
+              sx={selectedToken
+                && fromAddress
+                && !toAddress
+                && inputValue
+                ? { animation: `${PULSE_SHADOW} 2s infinite ease-in-out` }
+                : {}}
               label="Deliver to"
               providerInfo={{
                 ...toProviderInfo,
