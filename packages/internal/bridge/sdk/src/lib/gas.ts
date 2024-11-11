@@ -1,6 +1,6 @@
 import { FeeData } from 'ethers';
 
-const doesChainSupportEIP1559 = (feeData: FeeData) => !!feeData.maxFeePerGas&& !!feeData.maxPriorityFeePerGas;
+const doesChainSupportEIP1559 = (feeData: FeeData) => !!feeData.maxFeePerGas && !!feeData.maxPriorityFeePerGas;
 
 export const getGasPriceInWei = (feeData: FeeData): bigint | null => {
   if (doesChainSupportEIP1559(feeData)) {
@@ -8,9 +8,9 @@ export const getGasPriceInWei = (feeData: FeeData): bigint | null => {
     const { maxFeePerGas, maxPriorityFeePerGas } = feeData;
     if (maxFeePerGas === null || maxPriorityFeePerGas === null) return null;
     const lastBaseFeePerGas = (maxFeePerGas - maxPriorityFeePerGas) / BigInt(2);
-    return maxPriorityFeePerGas + lastBaseFeePerGas; 
+    return maxPriorityFeePerGas + lastBaseFeePerGas;
   }
-  if (feeData.gasPrice) return feeData.gasPrice
+  if (feeData.gasPrice) return feeData.gasPrice;
   return null;
 };
 
