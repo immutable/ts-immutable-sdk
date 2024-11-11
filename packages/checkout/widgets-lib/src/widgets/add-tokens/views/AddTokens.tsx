@@ -3,11 +3,9 @@ import {
   ButtCon,
   Button,
   FramedIcon,
-  FramedImage,
   HeroFormControl,
   HeroTextInput,
   MenuItem,
-  OverflowDrawerMenu,
   Stack,
 } from '@biom3/react';
 import debounce from 'lodash.debounce';
@@ -22,14 +20,12 @@ import {
 } from '@imtbl/checkout-sdk';
 import {
   type ChangeEvent,
-  useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
-import { Environment } from '@imtbl/config';
 import { useTranslation } from 'react-i18next';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
@@ -40,9 +36,10 @@ import {
 import { getL2ChainId } from '../../../lib';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { OptionsDrawer } from '../components/OptionsDrawer';
-import { AddTokensActions, AddTokensContext } from '../context/AddTokensContext';
-import { TokenImage } from '../../../components/TokenImage/TokenImage';
-import { getDefaultTokenImage, getTokenImageByAddress, isNativeToken } from '../../../lib/utils';
+import {
+  AddTokensActions,
+  AddTokensContext,
+} from '../context/AddTokensContext';
 import type { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { useRoutes } from '../hooks/useRoutes';
 import { SQUID_NATIVE_TOKEN } from '../utils/config';
@@ -65,9 +62,8 @@ import { validateToAmount } from '../functions/amountValidation';
 import { OnboardingDrawer } from '../components/OnboardingDrawer';
 import { useError } from '../hooks/useError';
 import { SquidFooter } from '../components/SquidFooter';
-import {
-  getFormattedNumberWithDecimalPlaces,
-} from '../functions/getFormattedNumber';
+import { getFormattedNumberWithDecimalPlaces } from '../functions/getFormattedNumber';
+import { TokenDrawerMenu } from '../components/TokenDrawerMenu';
 
 interface AddTokensProps {
   checkout: Checkout;
@@ -127,7 +123,6 @@ export function AddTokens({
   const [onRampAllowedTokens, setOnRampAllowedTokens] = useState<TokenInfo[]>(
     [],
   );
-  const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
   const [inputValue, setInputValue] = useState<string>(
     selectedAmount || toAmount || '',
   );
@@ -160,25 +155,6 @@ export function AddTokens({
     }, 2500),
     [],
   );
-
-  const setSelectedToken = (token: TokenInfo | undefined) => {
-    track({
-      userJourney: UserJourney.ADD_TOKENS,
-      screen: 'InputScreen',
-      control: 'TokensMenu',
-      controlType: 'MenuItem',
-      extras: {
-        tokenAddress: token?.address,
-      },
-    });
-
-    addTokensDispatch({
-      payload: {
-        type: AddTokensActions.SET_SELECTED_TOKEN,
-        selectedToken: token,
-      },
-    });
-  };
 
   const setSelectedRouteData = (route: RouteData | undefined) => {
     if (route) {
@@ -318,57 +294,6 @@ export function AddTokens({
   useEffect(() => {
     if (!checkout) return;
 
-    const fetchTokens = async () => {
-      try {
-        const tokenResponse = await checkout.getTokenAllowList({
-          type: TokenFilterTypes.SWAP,
-          chainId: getL2ChainId(checkout.config),
-        });
-
-        if (tokenResponse?.tokens.length > 0) {
-          const updatedTokens = tokenResponse.tokens.map((token) => {
-            if (isNativeToken(token.address)) {
-              return {
-                ...token,
-                icon: getTokenImageByAddress(
-                  checkout.config.environment as Environment,
-                  token.symbol,
-                ),
-              };
-            }
-            return token;
-          });
-
-          setAllowedTokens(updatedTokens);
-
-          if (toTokenAddress) {
-            const preselectedToken = updatedTokens.find(
-              (token) => token.address?.toLowerCase() === toTokenAddress.toLowerCase(),
-            );
-
-            if (preselectedToken) {
-              setSelectedToken(preselectedToken);
-            }
-          }
-
-          addTokensDispatch({
-            payload: {
-              type: AddTokensActions.SET_ALLOWED_TOKENS,
-              allowedTokens: tokenResponse.tokens,
-            },
-          });
-        }
-      } catch (error) {
-        showErrorHandover(AddTokensErrorTypes.SERVICE_BREAKDOWN, { error });
-      }
-    };
-
-    fetchTokens();
-  }, [checkout, toTokenAddress]);
-
-  useEffect(() => {
-    if (!checkout) return;
-
     const fetchOnRampTokens = async () => {
       try {
         const tokenResponse = await checkout.getTokenAllowList({
@@ -385,15 +310,6 @@ export function AddTokens({
     };
     fetchOnRampTokens();
   }, [checkout]);
-
-  const isSelected = useCallback(
-    (token: TokenInfo) => token.address === selectedToken,
-    [selectedToken],
-  );
-
-  const handleTokenChange = useCallback((token: TokenInfo) => {
-    setSelectedToken(token);
-  }, []);
 
   const sendRequestOnRampEvent = () => {
     track({
@@ -494,39 +410,6 @@ export function AddTokens({
   }, [selectedToken, onRampAllowedTokens, showOnrampOption]);
 
   const showInitialEmptyState = !selectedToken;
-  const defaultTokenImage = getDefaultTokenImage(
-    checkout?.config.environment,
-    config.theme,
-  );
-
-  const tokenChoiceOptions = useMemo(
-    () => allowedTokens.map((token) => (
-      <MenuItem
-        size="medium"
-        key={token.name}
-        onClick={() => handleTokenChange(token)}
-        selected={isSelected(token)}
-        emphasized
-      >
-        <MenuItem.FramedImage
-          circularFrame
-          use={(
-            <TokenImage
-              src={token.icon}
-              name={token.name}
-              defaultImage={defaultTokenImage}
-            />
-            )}
-          emphasized={false}
-        />
-        <MenuItem.Label>{token.symbol}</MenuItem.Label>
-        {token.symbol !== token.name && (
-        <MenuItem.Caption>{token.name}</MenuItem.Caption>
-        )}
-      </MenuItem>
-    )),
-    [allowedTokens, handleTokenChange, isSelected, defaultTokenImage],
-  );
 
   const shouldShowBackButton = showBackButton && onBackButtonClick;
   const routeInputsReady = !!selectedToken
@@ -610,41 +493,11 @@ export function AddTokens({
           justifyContent="center"
           alignItems="center"
         >
-          <OverflowDrawerMenu
-            drawerSize="full"
-            headerBarTitle="Add Token"
-            drawerCloseIcon="ChevronExpand"
-            {...(showInitialEmptyState
-              ? { icon: 'Add', size: 'large', variant: 'tertiary' }
-              : {
-                customTarget: (
-                  <FramedImage
-                    size="xLarge"
-                    use={(
-                      <TokenImage
-                        src={selectedToken?.icon}
-                        name={selectedToken?.name}
-                        defaultImage={defaultTokenImage}
-                      />
-                      )}
-                    padded
-                    emphasized
-                    circularFrame
-                    sx={{
-                      cursor: 'pointer',
-                      mb: 'base.spacing.x1',
-                      // eslint-disable-next-line @typescript-eslint/naming-convention
-                      '&:hover': {
-                        boxShadow: ({ base }) => `0 0 0 ${base.border.size[200]} ${base.color.text.body.primary}`,
-                      },
-                    }}
-                  />
-                ),
-              })}
-          >
-            {tokenChoiceOptions}
-          </OverflowDrawerMenu>
-
+          <TokenDrawerMenu
+            checkout={checkout}
+            config={config}
+            toTokenAddress={toTokenAddress}
+          />
           {showInitialEmptyState ? (
             <Body>Add Token</Body>
           ) : (
