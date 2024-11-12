@@ -196,7 +196,7 @@ export function Review({
             cursor: 'pointer',
           }}
         >
-          Included fees
+          {t('views.ADD_TOKENS.fees.includedFees')}
           {` ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${getFormattedAmounts(totalFeesUsd)}`}
           <Icon
             icon="ChevronExpand"
@@ -215,7 +215,7 @@ export function Review({
           c: 'base.color.text.body.secondary',
         }}
       >
-        {t('Zero fees')}
+        {t('views.ADD_TOKENS.fees.zeroFees')}
       </Body>
     );
   }, [totalFeesUsd]);
@@ -271,7 +271,7 @@ export function Review({
     showHandover(
       APPROVE_TXN_ANIMATION,
       RiveStateMachineInput.START,
-      'Preparing',
+      t('views.ADD_TOKENS.handover.preparing.heading'),
     );
 
     const changeableProvider = await convertToNetworkChangeableProvider(
@@ -294,8 +294,8 @@ export function Review({
       showHandover(
         APPROVE_TXN_ANIMATION,
         RiveStateMachineInput.WAITING,
-        'Waiting for access approval in your wallet',
-        'Approve the transaction request to complete this transaction',
+        t('views.ADD_TOKENS.handover.requestingApproval.heading'),
+        t('views.ADD_TOKENS.handover.requestingApproval.subheading'),
       );
 
       const approveTxnReceipt = await approve(changeableProvider, route);
@@ -307,7 +307,7 @@ export function Review({
       showHandover(
         APPROVE_TXN_ANIMATION,
         RiveStateMachineInput.COMPLETED,
-        'Granted access to your tokens',
+        t('views.ADD_TOKENS.handover.approved.heading'),
         '',
         FIXED_HANDOVER_DURATION,
       );
@@ -316,8 +316,8 @@ export function Review({
     showHandover(
       EXECUTE_TXN_ANIMATION,
       RiveStateMachineInput.WAITING,
-      'Waiting for transaction confirmation in your wallet',
-      'Confirm the transaction request to complete this transaction',
+      t('views.ADD_TOKENS.handover.requestingExecution.heading'),
+      t('views.ADD_TOKENS.handover.requestingExecution.subheading'),
     );
 
     const executeTxnReceipt = await execute(squid, changeableProvider, route);
@@ -337,7 +337,7 @@ export function Review({
       showHandover(
         EXECUTE_TXN_ANIMATION,
         RiveStateMachineInput.PROCESSING,
-        'Processing',
+        t('views.ADD_TOKENS.handover.executing.heading'),
         '',
         FIXED_HANDOVER_DURATION,
       );
@@ -345,9 +345,9 @@ export function Review({
       showHandover(
         EXECUTE_TXN_ANIMATION,
         RiveStateMachineInput.COMPLETED,
-        'Funds added successfully',
+        t('views.ADD_TOKENS.handover.executed.heading'),
         <>
-          Go to
+          {t('views.ADD_TOKENS.handover.executed.subHeadingGoTo')}
           {' '}
           <Link
             size="small"
@@ -362,7 +362,7 @@ export function Review({
             Axelarscan
           </Link>
           {' '}
-          for transaction details
+          {t('views.ADD_TOKENS.handover.executed.subHeadingTransactionDetails')}
         </>,
       );
     }
@@ -431,7 +431,7 @@ export function Review({
         {!!route && (
           <>
             <Heading weight="bold" sx={{ textAlign: 'center' }}>
-              Review
+              {t('views.ADD_TOKENS.review.heading')}
             </Heading>
 
             <Stack gap="0px">
@@ -463,7 +463,7 @@ export function Review({
                 </Sticker>
                 <Stack sx={{ flex: 1 }} gap="0px">
                   <Body weight="bold">
-                    Send
+                    {t('views.ADD_TOKENS.review.send')}
                     {' '}
                     {route.route.estimate.fromToken.name}
                   </Body>
@@ -530,11 +530,11 @@ export function Review({
                 </Stack>
                 <Stack sx={{ flex: 1 }} gap="0px">
                   <Body weight="bold">
-                    Swap
+                    {t('views.ADD_TOKENS.review.swap')}
                     {' '}
                     {route.route.estimate.fromToken.name}
                     {' '}
-                    to
+                    {t('views.ADD_TOKENS.review.to')}
                     {' '}
                     {route.route.estimate.toToken.name}
                   </Body>
@@ -604,7 +604,7 @@ export function Review({
                 </Sticker>
                 <Stack sx={{ flex: 1 }} gap="0px">
                   <Body weight="bold">
-                    Receive
+                    {t('views.ADD_TOKENS.review.receive')}
                     {' '}
                     {route?.route.estimate.toToken.name}
                   </Body>
@@ -699,7 +699,7 @@ export function Review({
 
         {!route && !showAddressMissmatchDrawer && (
         <LoadingView
-          loadingText="Securing quote"
+          loadingText={t('views.ADD_TOKENS.review.loadingText')}
           containerSx={{ bg: 'transparent' }}
         />
         )}

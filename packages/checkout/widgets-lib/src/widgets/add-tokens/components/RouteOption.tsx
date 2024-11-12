@@ -92,7 +92,9 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
         </Sticker>
       )}
 
-      <MenuItem.Caption>{`Balance ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${routeBalanceUsd}`}</MenuItem.Caption>
+      <MenuItem.Caption>
+        {`${t('views.ADD_TOKENS.fees.balance')} ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${routeBalanceUsd}`}
+      </MenuItem.Caption>
 
       <MenuItem.PriceDisplay price={fromAmount}>
         <MenuItem.PriceDisplay.Caption>

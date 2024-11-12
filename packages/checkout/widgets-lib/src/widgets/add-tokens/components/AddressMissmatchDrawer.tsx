@@ -1,6 +1,7 @@
 import {
   Body, Box, Button, Drawer, Heading,
 } from '@biom3/react';
+import { useTranslation } from 'react-i18next';
 import { WalletWarningHero } from '../../../components/Hero/WalletWarningHero';
 
 export interface AddressMissmatchDrawerProps {
@@ -12,6 +13,7 @@ export function AddressMissmatchDrawer({
   visible,
   onClick,
 }: AddressMissmatchDrawerProps) {
+  const { t } = useTranslation();
   return (
     <Drawer size="full" visible={visible} showHeaderBar={false}>
       <Drawer.Content>
@@ -24,7 +26,7 @@ export function AddressMissmatchDrawer({
               textAlign: 'center',
             }}
           >
-            Oops! It seems your payment wallet has changed
+            {t('views.ADD_TOKENS.error.addressMismatch.heading')}
           </Heading>
           <Body
             size="medium"
@@ -35,7 +37,7 @@ export function AddressMissmatchDrawer({
               marginBottom: 'base.spacing.x21',
             }}
           >
-            You&apos;ll be ask to re-connect the same wallet you selected to pay with before proceeding.
+            {t('views.ADD_TOKENS.error.addressMismatch.body')}
           </Body>
         </Box>
         <Box
@@ -53,7 +55,7 @@ export function AddressMissmatchDrawer({
             size="large"
             onClick={onClick}
           >
-            Re-select payment wallet
+            {t('views.ADD_TOKENS.error.addressMismatch.buttonText')}
           </Button>
         </Box>
       </Drawer.Content>

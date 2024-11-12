@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useContext, useRef } from 'react';
 
 import { Checkout } from '@imtbl/checkout-sdk';
+import { useTranslation } from 'react-i18next';
 import { listVariants } from '../../../lib/animation/listAnimation';
 import { Options } from './Options';
 import { FiatOptionType, RouteData } from '../types';
@@ -36,6 +37,7 @@ export function OptionsDrawer({
   showBridgeOption,
   insufficientBalance,
 }: OptionsDrawerProps) {
+  const { t } = useTranslation();
   const {
     addTokensState: { chains },
   } = useContext(AddTokensContext);
@@ -76,7 +78,7 @@ export function OptionsDrawer({
             }
             sx={{ mx: 'base.spacing.x2' }}
           />
-          <MenuItem.Label>Pay from</MenuItem.Label>
+          <MenuItem.Label>{t('views.ADD_TOKENS.drawer.options.heading')}</MenuItem.Label>
           <MenuItem.Caption>
             {fromProviderInfo?.name}
             {' • '}

@@ -1,5 +1,6 @@
 import { Environment } from '@imtbl/config';
 import { useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AddTokensErrorTypes, RiveStateMachineInput } from '../types';
 import { useHandover } from '../../../lib/hooks/useHandover';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
@@ -31,6 +32,7 @@ export const useError = (environment: Environment) => {
   const { viewDispatch } = useContext(ViewContext);
 
   const { page } = useAnalytics();
+  const { t } = useTranslation();
   const { addHandover, closeHandover } = useHandover({
     id: HandoverTarget.GLOBAL,
   });
@@ -58,87 +60,82 @@ export const useError = (environment: Environment) => {
 
   const errorConfig: Record<AddTokensErrorTypes, ErrorConfig> = {
     [AddTokensErrorTypes.DEFAULT]: {
-      headingText: 'Sorry, something went wrong. Please try again later.',
-      secondaryButtonText: 'Close',
+      headingText: t('views.ADD_TOKENS.error.default.heading'),
+      secondaryButtonText: t('views.ADD_TOKENS.error.default.secondaryButton'),
       onSecondaryButtonClick: closeWidget,
     },
     [AddTokensErrorTypes.INVALID_PARAMETERS]: {
-      headingText: 'Invalid parameters',
-      subHeadingText:
-        'The widget parameters provided are invalid. Please check again.',
-      secondaryButtonText: 'Close',
+      headingText: t('views.ADD_TOKENS.error.invalidParameters.heading'),
+      subHeadingText: t('views.ADD_TOKENS.error.invalidParameters.subHeading'),
+      secondaryButtonText: t('views.ADD_TOKENS.error.invalidParameters.secondaryButton'),
       onSecondaryButtonClick: closeWidget,
     },
     [AddTokensErrorTypes.SERVICE_BREAKDOWN]: {
-      headingText: 'Our system is currently down',
-      subHeadingText:
-        'We are currently experiencing technical difficulties. Please try again later.',
-      secondaryButtonText: 'Close',
+      headingText: t('views.ADD_TOKENS.error.serviceBreakdown.heading'),
+      subHeadingText: t('views.ADD_TOKENS.error.serviceBreakdown.subHeading'),
+      secondaryButtonText: t('views.ADD_TOKENS.error.serviceBreakdown.secondaryButton'),
       onSecondaryButtonClick: closeWidget,
     },
     [AddTokensErrorTypes.TRANSACTION_FAILED]: {
-      headingText: 'Transaction failed',
-      subHeadingText: 'The transaction failed. Please try again.',
-      primaryButtonText: 'Retry',
+      headingText: t('views.ADD_TOKENS.error.transactionFailed.heading'),
+      subHeadingText: t('views.ADD_TOKENS.error.transactionFailed.subHeading'),
+      primaryButtonText: t('views.ADD_TOKENS.error.transactionFailed.primaryButton'),
       onPrimaryButtonClick: goBackToAddTokensView,
-      secondaryButtonText: 'Close',
+      secondaryButtonText: t('views.ADD_TOKENS.error.transactionFailed.secondaryButton'),
       onSecondaryButtonClick: closeWidget,
     },
     [AddTokensErrorTypes.UNRECOGNISED_CHAIN]: {
-      headingText: 'Unrecognised chain',
-      subHeadingText: 'Please add the chain to your account and try again.',
-      primaryButtonText: 'Retry',
+      headingText: t('views.ADD_TOKENS.error.unrecognisedChain.heading'),
+      subHeadingText: t('views.ADD_TOKENS.error.unrecognisedChain.subHeading'),
+      primaryButtonText: t('views.ADD_TOKENS.error.unrecognisedChain.primaryButton'),
       onPrimaryButtonClick: goBackToAddTokensView,
-      secondaryButtonText: 'Close',
+      secondaryButtonText: t('views.ADD_TOKENS.error.unrecognisedChain.secondaryButton'),
       onSecondaryButtonClick: closeWidget,
     },
     [AddTokensErrorTypes.PROVIDER_ERROR]: {
-      headingText: 'Wallet cannot be found',
-      subHeadingText:
-        'Please try to connect your wallet and try again.',
-      primaryButtonText: 'Retry',
+      headingText: t('views.ADD_TOKENS.error.providerError.heading'),
+      subHeadingText: t('views.ADD_TOKENS.error.providerError.subHeading'),
+      primaryButtonText: t('views.ADD_TOKENS.error.providerError.primaryButton'),
       onPrimaryButtonClick: goBackToAddTokensView,
-      secondaryButtonText: 'Close',
+      secondaryButtonText: t('views.ADD_TOKENS.error.providerError.secondaryButton'),
       onSecondaryButtonClick: closeWidget,
     },
     [AddTokensErrorTypes.WALLET_FAILED]: {
-      headingText: 'Transaction failed',
-      subHeadingText: 'The transaction failed. Please try again.',
-      primaryButtonText: 'Retry',
+      headingText: t('views.ADD_TOKENS.error.walletFailed.heading'),
+      subHeadingText: t('views.ADD_TOKENS.error.walletFailed.subHeading'),
+      primaryButtonText: t('views.ADD_TOKENS.error.walletFailed.primaryButton'),
       onPrimaryButtonClick: goBackToAddTokensView,
-      secondaryButtonText: 'Close',
+      secondaryButtonText: t('views.ADD_TOKENS.error.walletFailed.secondaryButton'),
       onSecondaryButtonClick: goBackToAddTokensView,
     },
     [AddTokensErrorTypes.WALLET_REJECTED]: {
-      headingText: 'Transaction rejected',
-      subHeadingText:
-        "You'll need to approve the transaction in your wallet to proceed.",
-      primaryButtonText: 'Retry',
+      headingText: t('views.ADD_TOKENS.error.walletRejected.heading'),
+      subHeadingText: t('views.ADD_TOKENS.error.walletRejected.subHeading'),
+      primaryButtonText: t('views.ADD_TOKENS.error.walletRejected.primaryButton'),
       onPrimaryButtonClick: goBackToAddTokensView,
-      secondaryButtonText: 'Close',
+      secondaryButtonText: t('views.ADD_TOKENS.error.walletRejected.secondaryButton'),
       onSecondaryButtonClick: closeWidget,
     },
     [AddTokensErrorTypes.WALLET_REJECTED_NO_FUNDS]: {
-      headingText: 'Insufficient funds',
-      subHeadingText:
-        'You do not have enough funds to complete the transaction.',
-      primaryButtonText: 'Retry',
+      headingText: t('views.ADD_TOKENS.error.walletRejectedNoFunds.heading'),
+      subHeadingText: t('views.ADD_TOKENS.error.walletRejectedNoFunds.subHeading'),
+      primaryButtonText: t('views.ADD_TOKENS.error.walletRejectedNoFunds.primaryButton'),
       onPrimaryButtonClick: goBackToAddTokensView,
-      secondaryButtonText: 'Close',
+      secondaryButtonText: t('views.ADD_TOKENS.error.walletRejectedNoFunds.secondaryButton'),
       onSecondaryButtonClick: closeWidget,
     },
     [AddTokensErrorTypes.WALLET_POPUP_BLOCKED]: {
-      headingText: "Browser's popup blocked",
-      subHeadingText: 'Please allow pop-ups in your browser to proceed.',
-      primaryButtonText: 'Retry',
+      headingText: t('views.ADD_TOKENS.error.walletPopupBlocked.heading'),
+      subHeadingText: t('views.ADD_TOKENS.error.walletPopupBlocked.subHeading'),
+      primaryButtonText: t('views.ADD_TOKENS.error.walletPopupBlocked.primaryButton'),
       onPrimaryButtonClick: goBackToAddTokensView,
-      secondaryButtonText: 'Close',
+      secondaryButtonText: t('views.ADD_TOKENS.error.walletPopupBlocked.secondaryButton'),
       onSecondaryButtonClick: goBackToAddTokensView,
     },
     [AddTokensErrorTypes.ENVIRONMENT_ERROR]: {
-      headingText: 'Unsupported environment',
-      subHeadingText: 'This is only supported in production environment.',
-      secondaryButtonText: 'Close',
+      headingText: t('views.ADD_TOKENS.error.environmentError.heading'),
+      subHeadingText: t('views.ADD_TOKENS.error.environmentError.subHeading'),
+      secondaryButtonText: t('views.ADD_TOKENS.error.environmentError.secondaryButton'),
       onSecondaryButtonClick: closeWidget,
     },
   };

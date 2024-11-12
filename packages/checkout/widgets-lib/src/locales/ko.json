@@ -627,48 +627,177 @@
       }
     },
     "ADD_TOKENS": {
+      "tokenSelection": {
+        "buttonText": "토큰 추가",
+        "drawerHeading": "토큰 추가",
+        "searchPlaceholder": "토큰 검색"
+      },
+      "walletSelection": {
+        "fromText": "보내는 곳",
+        "toText": "받는 곳"
+      },
+      "routeSelection": {
+        "loadingText": "최적의 결제 경로를 찾는 중...",
+        "noRoute": "경로를 찾을 수 없습니다. 다른 지갑, 토큰 또는 금액을 선택하세요.",
+        "payWithCard": "경로를 찾을 수 없습니다. 카드 결제가 가능합니다"
+      },
       "drawer": {
         "options": {
+          "heading": "지불 방식",
+          "moreOptionsDividerText": "다른 결제 방법",
+          "loadingText1": "최적의 가치를 찾는 중",
+          "loadingText2": "모든 체인에서",
+          "noRoutes": {
+            "heading": "경로를 찾을 수 없음",
+            "caption": "다른 지갑, 토큰 또는 금액을 선택하고 다시 시도하세요."
+          },
           "swap": {
             "heading": "스왑",
-            "caption": "이 네트워크에서 토큰을 스왑합니다.",
+            "caption": "이 네트워크에서 토큰을 교환합니다.",
             "disabledCaption": "현재 이용할 수 없습니다."
           },
           "debit": {
-            "heading": "직불카드",
+            "heading": "직불 카드",
             "caption": "",
-            "disabledCaption": "선택한 항목에서 사용할 수 없습니다. 토큰 추가를 권장합니다."
+            "disabledCaption": "선택한 옵션으로 이용할 수 없습니다. 토큰 추가를 권장합니다."
           },
           "credit": {
-            "heading": "신용카드",
-            "caption": "실패하거나 추가 수수료가 발생할 수 있습니다.",
-            "disabledCaption": "선택한 항목에서 사용할 수 없습니다. 토큰 추가를 권장합니다."
+            "heading": "신용 카드",
+            "caption": "실패 및 추가 수수료가 발생할 수 있습니다.",
+            "disabledCaption": "선택한 옵션으로 이용할 수 없습니다. 토큰 추가를 권장합니다."
           }
+        }
+      },
+      "error": {
+        "default": {
+          "heading": "죄송합니다, 문제가 발생했습니다. 나중에 다시 시도해 주세요.",
+          "secondaryButtonText": "닫기"
+        },
+        "invalidParameters": {
+          "heading": "잘못된 매개변수",
+          "subHeading": "제공된 위젯 매개변수가 잘못되었습니다. 다시 확인해 주세요.",
+          "secondaryButtonText": "닫기"
+        },
+        "serviceBreakdown": {
+          "heading": "시스템이 현재 중단되었습니다",
+          "subHeading": "현재 기술적인 문제가 발생했습니다. 나중에 다시 시도해 주세요.",
+          "secondaryButtonText": "닫기"
+        },
+        "transactionFailed": {
+          "heading": "거래 실패",
+          "subHeading": "거래가 실패했습니다. 다시 시도해 주세요.",
+          "primaryButtonText": "재시도",
+          "secondaryButtonText": "닫기"
+        },
+        "unrecognisedChain": {
+          "heading": "인식할 수 없는 체인",
+          "subHeading": "계정에 체인을 추가하고 다시 시도해 주세요.",
+          "primaryButtonText": "재시도",
+          "secondaryButtonText": "닫기"
+        },
+        "providerError": {
+          "heading": "지갑을 찾을 수 없습니다",
+          "subHeading": "지갑을 연결하고 다시 시도해 주세요.",
+          "primaryButtonText": "재시도",
+          "secondaryButtonText": "닫기"
+        },
+        "walletFailed": {
+          "heading": "거래 실패",
+          "subHeading": "거래가 실패했습니다. 다시 시도해 주세요.",
+          "primaryButtonText": "재시도",
+          "secondaryButtonText": "닫기"
+        },
+        "walletRejected": {
+          "heading": "거래 거부됨",
+          "subHeading": "진행하려면 지갑에서 거래를 승인해야 합니다.",
+          "primaryButtonText": "재시도",
+          "secondaryButtonText": "닫기"
+        },
+        "walletRejectedNoFunds": {
+          "heading": "잔액 부족",
+          "subHeading": "거래를 완료할 수 있는 충분한 자금이 없습니다.",
+          "primaryButtonText": "재시도",
+          "secondaryButtonText": "닫기"
+        },
+        "walletPopupBlocked": {
+          "heading": "브라우저의 팝업이 차단되었습니다",
+          "subHeading": "계속 진행하려면 브라우저에서 팝업을 허용해 주세요.",
+          "primaryButtonText": "재시도",
+          "secondaryButtonText": "닫기"
+        },
+        "environmentError": {
+          "heading": "지원되지 않는 환경",
+          "subHeading": "이것은 프로덕션 환경에서만 지원됩니다.",
+          "secondaryButtonText": "닫기"
+        },
+        "addressMismatch": {
+          "heading": "앗! 결제 지갑이 변경되었습니다",
+          "body": "이전에 선택한 지갑과 다시 연결하라는 메시지가 표시됩니다",
+          "buttonText": "결제 지갑 재선택"
+        }
+      },
+      "review": {
+        "buttonText": "검토",
+        "heading": "검토",
+        "send": "보내기",
+        "receive": "받기",
+        "swap": "스왑",
+        "to": "대상",
+        "loadingText": "견적 확보 중"
+      },
+      "handover": {
+        "preparing": {
+          "heading": "준비 중"
+        },
+        "requestingApproval": {
+          "heading": "지갑에서 액세스 승인 대기 중",
+          "subHeading": "거래 요청을 승인하여 이 거래를 완료하세요"
+        },
+        "approved": {
+          "heading": "토큰에 대한 액세스가 승인되었습니다"
+        },
+        "requestingExecution": {
+          "heading": "지갑에서 거래 확인 대기 중",
+          "subHeading": "거래 요청을 확인하여 이 거래를 완료하세요"
+        },
+        "executing": {
+          "heading": "처리 중"
+        },
+        "executed": {
+          "heading": "자금이 성공적으로 추가되었습니다",
+          "subHeadingGoTo": "이동",
+          "subHeadingTransactionDetails": "거래 세부 정보 보기"
         }
       },
       "onboarding": {
         "screen1": {
-          "title": "더 쉽게 이용할 수 있도록\n몇 가지를 변경했습니다",
-          "caption": "주의하세요",
+          "title": "몇 가지를 변경하여\n더 쉽게 만들었습니다",
+          "caption": "잘 들어보세요",
           "buttonText": "다음"
         },
         "screen2": {
-          "title": "패스포트로 토큰을 보내고\n어떤 지갑에서든 결제할 수 있습니다",
-          "caption": "변화된 점",
+          "title": "토큰을 Passport로 전송하고\n어느 지갑에서든 결제할 수 있습니다",
+          "caption": "무엇이 바뀌었나요",
           "buttonText": "다음"
         },
         "screen3": {
-          "title": "다른 체인에서 토큰을 사용하고,\n최적의 옵션을 찾아드릴게요",
+          "title": "다른 체인에서 토큰을 사용하세요,\n최적의 옵션을 찾아드리겠습니다",
           "caption": "진화",
           "buttonText": "토큰 추가하기"
         }
       },
       "footer": {
-        "body": "스왑 기능은 제3자인 Squid에 의해 제공됩니다. Immutable은 <squidLink>Squid</squidLink>를 구축, 소유, 운영 또는 배포하지 않습니다."
+        "body": "스왑 기능은 제3자 Squid에 의해 제공됩니다. Immutable은 <squidLink>Squid</squidLink>를 구축, 소유, 운영 또는 배포하지 않습니다."
       },
       "geoBlockError": {
         "buyTokenButton": "토큰 구매",
         "bridgeTokenButton": "토큰 브릿지"
+      },
+      "fees": {
+        "balance": "잔액",
+        "fiatPricePrefix": "≈ USD",
+        "zeroFees": "수수료 없음",
+        "includedFees": "수수료 포함"
       }
     }
   },
