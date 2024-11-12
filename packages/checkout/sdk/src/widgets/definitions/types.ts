@@ -271,7 +271,7 @@ export interface IWidgetsFactory {
    * @param type widget type to instantiate.
    * @param props widget configurations and provider.
    */
-  create<T extends WidgetType>(type: T, props?: WidgetProperties<T>): Widget<T>;
+  create: IWidgetsFactoryCreate;
   /**
    * Update the widgets provider instance.
    * @param provider the provider instance to update all widgets.

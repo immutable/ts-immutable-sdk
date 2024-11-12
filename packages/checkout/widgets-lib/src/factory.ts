@@ -54,7 +54,7 @@ export class WidgetsFactory implements IWidgetsFactory {
     sendProviderUpdatedEvent({ provider });
   }
 
-  create: IWidgetsFactoryCreate = (type: WidgetType, props?: WidgetProperties<WidgetType>) => {
+  create: IWidgetsFactoryCreate = <T extends WidgetType>(type: T, props?: WidgetProperties<T>) => {
     const { provider } = props ?? {};
     const config = props?.config as WidgetConfigurations[WidgetType] || {};
 
