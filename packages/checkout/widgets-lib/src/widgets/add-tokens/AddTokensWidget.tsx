@@ -126,17 +126,15 @@ export default function AddTokensWidget({
   }, [toTokenAddress, toAmount]);
 
   useEffect(() => {
-    (async () => {
-      const chainsResponse = await fetchChains();
+    if (!squid) return;
 
-      addTokensDispatch({
-        payload: {
-          type: AddTokensActions.SET_CHAINS,
-          chains: chainsResponse,
-        },
-      });
-    })();
-  }, []);
+    addTokensDispatch({
+      payload: {
+        type: AddTokensActions.SET_CHAINS,
+        chains: fetchChains(squid),
+      },
+    });
+  }, [squid]);
 
   useEffect(() => {
     if (!squid || !chains || !fromProvider || fetchingBalances.current) return;
