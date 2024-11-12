@@ -381,7 +381,12 @@ export function Review({
   ]);
 
   const formattedDuration = route
-    ? getDurationFormatted(route.route.estimate.estimatedRouteDuration)
+    ? getDurationFormatted(
+      route.route.estimate.estimatedRouteDuration,
+      t('views.ADD_TOKENS.routeSelection.minutesText'),
+      t('views.ADD_TOKENS.routeSelection.minuteText'),
+      t('views.ADD_TOKENS.routeSelection.secondsText'),
+    )
     : '';
 
   return (

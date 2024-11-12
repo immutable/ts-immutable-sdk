@@ -65,7 +65,11 @@
     },
     "ERROR_VIEW": {
       "heading": "문제가 발생했습니다",
-      "body": ["다시 시도하거나", "지원팀에", "도움을 요청하세요."],
+      "body": [
+        "다시 시도하거나",
+        "지원팀에",
+        "도움을 요청하세요."
+      ],
       "actionText": "다시 시도"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
@@ -629,6 +633,7 @@
     "ADD_TOKENS": {
       "tokenSelection": {
         "buttonText": "토큰 추가",
+        "tokenLabel": "추가",
         "drawerHeading": "토큰 추가",
         "searchPlaceholder": "토큰 검색"
       },
@@ -639,7 +644,11 @@
       "routeSelection": {
         "loadingText": "최적의 결제 경로를 찾는 중...",
         "noRoute": "경로를 찾을 수 없습니다. 다른 지갑, 토큰 또는 금액을 선택하세요.",
-        "payWithCard": "경로를 찾을 수 없습니다. 카드 결제가 가능합니다"
+        "payWithCard": "경로를 찾을 수 없습니다. 카드 결제가 가능합니다",
+        "fastestBadge": "가장 빠름",
+        "minutesText": "분",
+        "minuteText": "분",
+        "secondsText": "초"
       },
       "drawer": {
         "options": {
@@ -794,6 +803,7 @@
         "bridgeTokenButton": "토큰 브릿지"
       },
       "fees": {
+        "fee": "수수료",
         "balance": "잔액",
         "fiatPricePrefix": "≈ USD",
         "zeroFees": "수수료 없음",
@@ -953,6 +963,20 @@
           "proceed": "이해합니다"
         }
       }
+    },
+    "wallet": {
+      "payWithHeading": "송신 계좌",
+      "payWithHeadingInsufficientBalance": "다른 옵션을 선택하세요",
+      "deliverToHeading": "배송지",
+      "payWithCard": "카드로 결제",
+      "insufficientFunds": "잔액 부족",
+      "noFunds": "잔액이 없습니다"
+    },
+    "eoaWarning": {
+      "dividerText": "경고",
+      "heading": "자산을 Passport에 전달하지 않으면 잃어버릴 수 있습니다",
+      "passportButtonText": "Passport로 대신 전달",
+      "proceedButtonText": "계속 진행"
     }
   }
 }

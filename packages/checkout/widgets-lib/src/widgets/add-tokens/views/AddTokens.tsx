@@ -509,7 +509,7 @@ export function AddTokens({
               validationStatus={inputValue === '0' ? 'error' : 'success'}
             >
               <HeroFormControl.Label>
-                Add
+                {t('views.ADD_TOKENS.tokenSelection.tokenLabel')}
                 {' '}
                 {selectedToken.symbol}
               </HeroFormControl.Label>

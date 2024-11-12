@@ -636,6 +636,7 @@
     "ADD_TOKENS": {
       "tokenSelection": {
         "buttonText": "トークンを追加",
+        "tokenLabel": "追加",
         "drawerHeading": "トークンを追加",
         "searchPlaceholder": "トークンを検索"
       },
@@ -646,7 +647,11 @@
       "routeSelection": {
         "loadingText": "最適な支払いルートを検索中...",
         "noRoute": "ルートが見つかりません。他のウォレット、トークン、または金額を選択してください。",
-        "payWithCard": "ルートが見つかりません。カードでの支払いが利用可能です"
+        "payWithCard": "ルートが見つかりません。カードでの支払いが利用可能です",
+        "fastestBadge": "最速",
+        "minutesText": "分",
+        "minuteText": "分",
+        "secondsText": "秒"
       },
       "drawer": {
         "options": {
@@ -801,6 +806,7 @@
         "bridgeTokenButton": "トークンをブリッジ"
       },
       "fees": {
+        "fee": "手数料",
         "balance": "残高",
         "fiatPricePrefix": "≈ USD",
         "zeroFees": "手数料無料",
@@ -960,6 +966,20 @@
           "proceed": "わかりました"
         }
       }
+    },
+    "wallet": {
+      "payWithHeading": "送信元",
+      "payWithHeadingInsufficientBalance": "別のオプションを選択してください",
+      "deliverToHeading": "配送先",
+      "payWithCard": "カードで支払う",
+      "insufficientFunds": "残高不足",
+      "noFunds": "資金がありません"
+    },
+    "eoaWarning": {
+      "dividerText": "警告",
+      "heading": "資産をPassportに送らないと見失う可能性があります",
+      "passportButtonText": "代わりにPassportに送る",
+      "proceedButtonText": "それでも続行"
     }
   }
 }

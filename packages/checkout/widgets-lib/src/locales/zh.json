@@ -633,6 +633,7 @@
     "ADD_TOKENS": {
       "tokenSelection": {
         "buttonText": "添加代币",
+        "tokenLabel": "添加",
         "drawerHeading": "添加代币",
         "searchPlaceholder": "搜索代币"
       },
@@ -643,7 +644,11 @@
       "routeSelection": {
         "loadingText": "寻找最佳支付路线中...",
         "noRoute": "未找到路线，请选择其他钱包、代币或金额。",
-        "payWithCard": "未找到路线，可选择用卡支付"
+        "payWithCard": "未找到路线，可选择用卡支付",
+        "fastestBadge": "最快",
+        "minutesText": "分钟",
+        "minuteText": "分钟",
+        "secondsText": "秒"
       },
       "drawer": {
         "options": {
@@ -798,6 +803,7 @@
         "bridgeTokenButton": "桥接代币"
       },
       "fees": {
+        "fee": "费用",
         "balance": "余额",
         "fiatPricePrefix": "≈ 美元",
         "zeroFees": "零手续费",
@@ -957,6 +963,20 @@
           "proceed": "我明白"
         }
       }
+    },
+    "wallet": {
+      "payWithHeading": "付款方式",
+      "payWithHeadingInsufficientBalance": "请选择其他选项",
+      "deliverToHeading": "送货至",
+      "payWithCard": "用卡支付",
+      "insufficientFunds": "余额不足",
+      "noFunds": "没有资金"
+    },
+    "eoaWarning": {
+      "dividerText": "警告",
+      "heading": "如果不将资产转移到Passport，您可能会丢失它们",
+      "passportButtonText": "转移到Passport",
+      "proceedButtonText": "仍要继续"
     }
   }
 }

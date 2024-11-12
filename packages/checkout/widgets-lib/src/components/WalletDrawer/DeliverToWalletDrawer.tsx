@@ -4,6 +4,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ConnectWalletDrawer } from './ConnectWalletDrawer';
 import { ConnectEIP6963ProviderError } from '../../lib/connectEIP6963Provider';
 import {
@@ -64,10 +65,10 @@ export function DeliverToWalletDrawer({
   const selectedSameFromWalletType = (
     providerInfo: EIP6963ProviderInfo,
   ): boolean | undefined => (fromProviderInfo?.rdns !== providerInfo.rdns ? undefined : false);
-
+  const { t } = useTranslation();
   return (
     <ConnectWalletDrawer
-      heading="Deliver To"
+      heading={t('drawers.wallet.deliverToHeading')}
       visible={visible}
       onClose={onClose}
       providerType="to"

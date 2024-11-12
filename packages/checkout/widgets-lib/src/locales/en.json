@@ -65,7 +65,11 @@
     },
     "ERROR_VIEW": {
       "heading": "Something's gone wrong",
-      "body": ["You can try again or contact", "support", "for help."],
+      "body": [
+        "You can try again or contact",
+        "support",
+        "for help."
+      ],
       "actionText": "Try again"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
@@ -649,6 +653,7 @@
     "ADD_TOKENS": {
       "tokenSelection": {
         "buttonText": "Add Token",
+        "tokenLabel": "Add",
         "drawerHeading": "Add Token",
         "searchPlaceholder": "Search tokens"
       },
@@ -659,7 +664,11 @@
       "routeSelection": {
         "loadingText": "Finding the best payment route...",
         "noRoute": "No routes found, choose a different wallet, token or amount.",
-        "payWithCard": "No routes found, pay with card available"
+        "payWithCard": "No routes found, pay with card available",
+        "fastestBadge": "Fastest",
+        "minutesText": "mins",
+        "minuteText": "min",
+        "secondsText": "s"
       },
       "drawer": {
         "options": {
@@ -814,6 +823,7 @@
         "bridgeTokenButton": "Bridge tokens"
       },
       "fees": {
+        "fee": "Fee",
         "balance": "Balance",
         "fiatPricePrefix": "≈ USD",
         "zeroFees": "Zero fees",
@@ -973,6 +983,20 @@
           "proceed": "I understand"
         }
       }
+    },
+    "wallet": {
+      "payWithHeading": "Send from",
+      "payWithHeadingInsufficientBalance": "Choose another option",
+      "deliverToHeading": "Deliver to",
+      "payWithCard": "Pay with Card",
+      "insufficientFunds": "insufficient funds",
+      "noFunds": "no funds"
+    },
+    "eoaWarning": {
+      "dividerText": "WARNING",
+      "heading": "You could lose sight of your assets if you don’t deliver them to Passport",
+      "passportButtonText": "Deliver to Passport instead",
+      "proceedButtonText": "Proceed anyway"
     }
   }
 }
