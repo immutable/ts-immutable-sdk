@@ -6,7 +6,7 @@ import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps, EnvironmentNames } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
-import { utils } from 'ethers';
+import { Interface } from 'ethers';
 
 enum ApproveType {
   NFTApprove = 'NFT_APPROVE',
@@ -33,7 +33,7 @@ function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) 
       'function setApprovalForAll(address to, bool approved)',
       'function approve(address to, uint256 tokenId)',
     ];
-    return new utils.Interface(abi);
+    return new Interface(abi);
   }, []);
 
   const [choosedApproveType, setChoosedApproveType] = useState<ApproveType>(ApproveType.NFTApprove);

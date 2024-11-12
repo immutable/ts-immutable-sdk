@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { BrowserProvider } from 'ethers';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import {
   ChainId,
@@ -13,7 +14,6 @@ import {
 } from '../types';
 import { CheckoutConfiguration } from '../config';
 import { getUnderlyingChainId } from '../provider/getUnderlyingProvider';
-import { BrowserProvider } from 'ethers';
 
 const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
 
@@ -25,11 +25,9 @@ async function switchNetworkInWallet(
   web3Provider: BrowserProvider,
   chainId: ChainId,
 ) {
-  if (Boolean(web3Provider.send)) {
-    return await web3Provider.provider.send(WalletAction.SWITCH_NETWORK, [
-      { chainId: networkMap.get(chainId)?.chainIdHex },
-    ]);
-  }
+  return await web3Provider.provider.send(WalletAction.SWITCH_NETWORK, [
+    { chainId: networkMap.get(chainId)?.chainIdHex },
+  ]);
 }
 
 // eslint-disable-next-line consistent-return
@@ -97,8 +95,6 @@ export async function getNetworkInfo(
   config: CheckoutConfiguration,
   web3Provider: BrowserProvider,
 ): Promise<NetworkInfo> {
-  console.log('QWERQWERQWER')
-  console.log(web3Provider)
   const { networkMap } = config;
   return withCheckoutError(
     async () => {

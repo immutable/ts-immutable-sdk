@@ -1,4 +1,5 @@
 import { Flow } from '@imtbl/metrics';
+import { Signer, JsonRpcProvider } from 'ethers';
 import GuardianClient from '../guardian';
 import { signAndPackTypedData } from './walletHelpers';
 import {
@@ -9,8 +10,6 @@ import { RelayerClient } from './relayerClient';
 import { signTypedDataV4 } from './signTypedDataV4';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { TypedDataPayload } from './types';
-import { Signer } from 'ethers';
-import { JsonRpcProvider } from 'ethers';
 
 jest.mock('./walletHelpers');
 

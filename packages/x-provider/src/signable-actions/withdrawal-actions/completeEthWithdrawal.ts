@@ -1,6 +1,7 @@
 import {
   StarkSigner,
 } from '@imtbl/x-client';
+import { Signer, TransactionResponse } from 'ethers';
 import { ProviderConfiguration } from '../../config';
 import { isRegisteredOnChain } from '../registration';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
@@ -11,7 +12,6 @@ import {
   executeWithdrawAllFungible,
   executeWithdrawFungible,
 } from './completeERC20Withdrawal';
-import { Signer, TransactionResponse } from 'ethers';
 
 type CompleteEthWithdrawalActionParams = {
   ethSigner: Signer;

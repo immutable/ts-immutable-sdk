@@ -6,10 +6,10 @@ import * as encUtils from 'enc-utils';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
 import { hdkey } from '@ethereumjs/wallet';
+import { Signature, Signer } from 'ethers';
 import { createStarkSigner } from './starkSigner';
 import * as legacy from './legacy/crypto';
 import { getStarkPublicKeyFromImx } from './getStarkPublicKeyFromImx';
-import { Signature, Signer } from 'ethers';
 
 const { curves, ec } = elliptic;
 

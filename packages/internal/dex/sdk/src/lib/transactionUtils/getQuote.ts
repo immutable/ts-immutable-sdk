@@ -1,5 +1,4 @@
 import { TradeType } from '@uniswap/sdk-core';
-import { ethers } from 'ethers';
 import { Fees } from '../fees';
 import { QuoteResult } from '../getQuotesForRoutes';
 import { NativeTokenService, canUnwrapToken } from '../nativeTokenService';

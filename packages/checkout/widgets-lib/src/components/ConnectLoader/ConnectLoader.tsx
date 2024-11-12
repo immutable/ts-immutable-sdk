@@ -10,6 +10,7 @@ import React, {
   useMemo,
   useReducer,
 } from 'react';
+import { BrowserProvider } from 'ethers';
 import { ErrorView } from '../../views/error/ErrorView';
 import {
   ConnectLoaderActions,
@@ -24,7 +25,6 @@ import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContex
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { identifyUser } from '../../lib/analytics/identifyUser';
-import { BrowserProvider } from 'ethers';
 
 export interface ConnectLoaderProps {
   children?: React.ReactNode;

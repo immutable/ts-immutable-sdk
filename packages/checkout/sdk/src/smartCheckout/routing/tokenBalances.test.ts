@@ -1,4 +1,5 @@
 import { Environment } from '@imtbl/config';
+import { JsonRpcProvider } from 'ethers';
 import { getAllTokenBalances } from './tokenBalances';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
 import { ChainId } from '../../types';
@@ -6,7 +7,6 @@ import { getAllBalances } from '../../balances';
 import { CheckoutErrorType } from '../../errors';
 import { TokenBalanceResult } from './types';
 import { HttpClient } from '../../api/http';
-import { JsonRpcProvider } from 'ethers';
 
 jest.mock('../../balances');
 jest.mock('../../config');

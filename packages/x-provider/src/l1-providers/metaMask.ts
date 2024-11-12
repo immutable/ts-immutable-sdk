@@ -1,8 +1,8 @@
 import detectEthereumProvider from '@metamask/detect-provider';
 
+import { BrowserProvider, Eip1193Provider } from 'ethers';
 import { MetamaskConnectParams } from './types';
 import { connectProvider, isRequestableProvider } from './rpc';
-import { BrowserProvider, Eip1193Provider } from 'ethers';
 
 const ERRORS = {
   // TODO: remove once fixed - consider using something in line with the naming convention

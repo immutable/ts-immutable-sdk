@@ -1,9 +1,9 @@
 import { UnsignedOrderRequest, GetSignableCancelOrderRequest } from '@imtbl/x-client';
 import { imx } from '@imtbl/generated-clients';
 import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
+import { parseEther } from 'ethers';
 import { cancelOrder, createOrder } from './orders';
 import { generateSigners, privateKey1, testConfig } from '../test/helpers';
-import { parseEther } from 'ethers';
 
 jest.mock('@imtbl/toolkit');
 jest.mock('@imtbl/generated-clients');

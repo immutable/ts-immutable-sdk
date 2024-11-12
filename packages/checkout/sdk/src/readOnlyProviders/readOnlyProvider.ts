@@ -1,7 +1,7 @@
+import { JsonRpcProvider } from 'ethers';
 import * as network from '../network';
 import { ChainId, NetworkFilterTypes } from '../types';
 import { CheckoutConfiguration } from '../config';
-import { JsonRpcProvider } from 'ethers';
 
 export async function createReadOnlyProviders(
   config: CheckoutConfiguration,

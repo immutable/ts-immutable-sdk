@@ -39,8 +39,6 @@ export async function checkIsWalletConnected(
 }
 
 export async function connectSite(web3Provider: BrowserProvider): Promise<BrowserProvider> {
-  console.log('QWERQWERQWER');
-  console.log(web3Provider);
   if (!web3Provider || !web3Provider.send) {
     throw new CheckoutError(
       'Incompatible provider',
@@ -62,8 +60,6 @@ export async function connectSite(web3Provider: BrowserProvider): Promise<Browse
 }
 
 export async function requestPermissions(web3Provider: BrowserProvider): Promise<BrowserProvider> {
-  console.log('QWERQWERQWER');
-  console.log(web3Provider);
   if (!web3Provider || !web3Provider.send) {
     throw new CheckoutError(
       'Incompatible provider',

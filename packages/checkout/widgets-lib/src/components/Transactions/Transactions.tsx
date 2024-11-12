@@ -9,6 +9,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { useTranslation } from 'react-i18next';
+import { BrowserProvider, JsonRpcProvider } from 'ethers';
 import { HeaderNavigation } from '../Header/HeaderNavigation';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../Footer/FooterLogo';
@@ -52,7 +53,6 @@ import { TransactionList } from './TransactionList';
 import { NoTransactions } from './NoTransactions';
 import { useInjectedProviders } from '../../lib/hooks/useInjectedProviders';
 import { WalletChangeEvent } from '../WalletDrawer/WalletDrawerEvents';
-import { BrowserProvider, JsonRpcProvider } from 'ethers';
 
 type TransactionsProps = {
   defaultTokenImage: string;

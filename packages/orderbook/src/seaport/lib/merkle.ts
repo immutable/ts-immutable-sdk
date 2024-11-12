@@ -1,5 +1,8 @@
 import { MerkleTree } from 'merkletreejs';
 
+import {
+  AbiCoder, concat, keccak256, toUtf8Bytes, TypedDataEncoder,
+} from 'ethers';
 import { DefaultGetter } from './defaults';
 import {
   bufferKeccak,
@@ -11,7 +14,6 @@ import {
 } from './utils';
 
 import type { EIP712TypeDefinitions } from './defaults';
-import { AbiCoder, concat, keccak256, toUtf8Bytes, TypedDataEncoder } from 'ethers';
 
 type BulkOrderElements<T> =
   | [T, T]

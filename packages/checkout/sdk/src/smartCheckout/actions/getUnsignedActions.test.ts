@@ -1,13 +1,13 @@
 import {
   Action, ActionType, SignablePurpose, TransactionPurpose,
 } from '@imtbl/orderbook';
+import { PreparedTransactionRequest, TypedDataDomain } from 'ethers';
 import {
   getUnsignedERC20ApprovalTransactions,
   getUnsignedSellTransactions,
   getUnsignedFulfillmentTransactions,
   getUnsignedMessage,
 } from './getUnsignedActions';
-import { PreparedTransactionRequest, TypedDataDomain } from 'ethers';
 
 describe('getUnsignedActions', () => {
   describe('getUnsignedERC721Transactions', () => {

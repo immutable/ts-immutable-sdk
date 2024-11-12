@@ -1,11 +1,10 @@
 import { Flow } from '@imtbl/metrics';
+import { Signer, JsonRpcProvider } from 'ethers';
 import GuardianClient from '../guardian';
 import { signAndPackTypedData } from './walletHelpers';
 import { TypedDataPayload } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { RelayerClient } from './relayerClient';
-import { Signer } from 'ethers';
-import { JsonRpcProvider } from 'ethers';
 
 export type SignTypedDataV4Params = {
   ethSigner: Signer;
@@ -49,9 +48,9 @@ const transformTypedData = (typedData: string | object, chainId: string): TypedD
     // domain.chainId (if defined) can be a number, string, or hex value, but the relayer & guardian only accept a number.
     if (typeof providedChainId === 'string') {
       if (providedChainId.startsWith('0x')) {
-        transformedTypedData.domain.chainId = parseInt(providedChainId, 16).toString()
+        transformedTypedData.domain.chainId = parseInt(providedChainId, 16).toString();
       } else {
-        transformedTypedData.domain.chainId = parseInt(providedChainId, 10).toString()
+        transformedTypedData.domain.chainId = parseInt(providedChainId, 10).toString();
       }
     }
 

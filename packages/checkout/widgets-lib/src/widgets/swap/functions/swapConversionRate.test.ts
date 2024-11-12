@@ -6,8 +6,8 @@ import {
 } from '@imtbl/dex-sdk';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { TFunction } from 'i18next';
-import { formatQuoteConversionRate } from './swapConversionRate';
 import { parseEther } from 'ethers';
+import { formatQuoteConversionRate } from './swapConversionRate';
 
 describe('formatQuoteConversionRate', () => {
   const mockTranslate = jest.fn();

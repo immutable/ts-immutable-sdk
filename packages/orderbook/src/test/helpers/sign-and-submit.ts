@@ -1,4 +1,6 @@
-import { PreparedTransactionRequest, Signer, TypedDataDomain, Wallet } from 'ethers';
+import {
+  PreparedTransactionRequest, Signer, TypedDataDomain, Wallet,
+} from 'ethers';
 import { GAS_OVERRIDES } from './gas';
 
 export async function signAndSubmitTx(

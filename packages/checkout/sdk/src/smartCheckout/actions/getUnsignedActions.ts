@@ -4,8 +4,8 @@ import {
   ActionType,
   SignablePurpose,
 } from '@imtbl/orderbook';
-import { UnsignedMessage, UnsignedTransactions } from './types';
 import { TransactionRequest } from 'ethers';
+import { UnsignedMessage, UnsignedTransactions } from './types';
 
 export const getUnsignedSellTransactions = async (
   actions: Action[],

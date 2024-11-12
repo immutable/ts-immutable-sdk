@@ -1,8 +1,8 @@
+import { BrowserProvider, parseUnits, TransactionRequest } from 'ethers';
 import { CheckoutConfiguration } from '../config/config';
 import { TokenInfo } from '../types';
 import { swap, swapQuote } from './swap';
 import { createExchangeInstance } from '../instance';
-import { BrowserProvider, parseUnits, TransactionRequest } from 'ethers';
 
 jest.mock('../instance', () => ({
   createExchangeInstance: jest.fn(),

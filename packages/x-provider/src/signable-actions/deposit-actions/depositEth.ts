@@ -5,10 +5,10 @@ import {
   EthSigner,
   ImmutableXConfiguration,
 } from '@imtbl/x-client';
+import { parseUnits, TransactionResponse } from 'ethers';
 import { validateChain } from '../helpers';
 import { Signers } from '../types';
 import { ProviderConfiguration } from '../../config';
-import { parseUnits, TransactionResponse } from 'ethers';
 
 interface ETHTokenData {
   decimals: number;

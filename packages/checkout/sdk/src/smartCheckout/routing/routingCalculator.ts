@@ -1,3 +1,4 @@
+import { JsonRpcProvider } from 'ethers';
 import { BalanceCheckResult, BalanceRequirement } from '../balanceCheck/types';
 import {
   AvailableRoutingOptions,
@@ -32,7 +33,6 @@ import { BridgeRequirement, bridgeRoute } from './bridge/bridgeRoute';
 import { onRampRoute } from './onRamp';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './indexer/fetchL1Representation';
 import { measureAsyncExecution } from '../../logger/debugLogger';
-import { JsonRpcProvider } from 'ethers';
 
 const hasAvailableRoutingOptions = (
   availableRoutingOptions: AvailableRoutingOptions,

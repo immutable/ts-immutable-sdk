@@ -64,7 +64,11 @@ export const MainPage = () => {
   onRampWidget.addListener(OnRampEventType.CLOSE_WIDGET, () => { onRampWidget.unmount() });
 
   useEffect(() => {
-    passport.connectEvm();
+    const connectPassport = async () => {
+      await passport.connectEvm();
+    }
+
+    connectPassport();
   }, []);
   
   useEffect(() => {

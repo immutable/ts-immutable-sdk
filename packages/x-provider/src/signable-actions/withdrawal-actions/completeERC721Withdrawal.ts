@@ -7,12 +7,12 @@ import {
   StarkSigner,
 } from '@imtbl/x-client';
 import * as encUtils from 'enc-utils';
+import { Signer, TransactionResponse } from 'ethers';
 import { ProviderConfiguration } from '../../config';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import { isRegisteredOnChain } from '../registration';
 import { validateChain } from '../helpers';
 import { getWithdrawalBalancesERC721 } from './getWithdrawalBalance';
-import { Signer, TransactionResponse } from 'ethers';
 
 interface MintableERC721Withdrawal {
   type: 'ERC721';
@@ -70,7 +70,7 @@ async function executeERC721RegisterAndWithdraw(
     registrationStarkSignature,
     assetType.asset_type,
     token.tokenId,
-  )
+  );
 
   return ethSigner.sendTransaction(populatedTransaction);
 }

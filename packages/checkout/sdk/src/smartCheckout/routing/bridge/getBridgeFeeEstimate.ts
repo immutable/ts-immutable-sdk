@@ -1,11 +1,11 @@
 import { BridgeFeeActions, BridgeFeeResponse } from '@imtbl/bridge-sdk';
+import { JsonRpcProvider } from 'ethers';
 import {
   ChainId,
 } from '../../../types';
 import { CheckoutConfiguration } from '../../../config';
 import { CheckoutError, CheckoutErrorType } from '../../../errors';
 import * as instance from '../../../instance';
-import { JsonRpcProvider } from 'ethers';
 
 export const getBridgeFeeEstimate = async (
   config: CheckoutConfiguration,

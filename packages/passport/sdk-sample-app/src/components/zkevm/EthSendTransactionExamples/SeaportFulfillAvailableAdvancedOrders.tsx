@@ -1,4 +1,3 @@
-import { PopulatedTransaction } from 'ethers';
 import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
@@ -10,6 +9,7 @@ import { RequestExampleProps } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
 import { ActionType, TransactionAction, TransactionPurpose } from '@imtbl/orderbook';
+import { PreparedTransactionRequest } from 'ethers';
 
 function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitted }: RequestExampleProps) {
   const { orderbookClient } = useImmutableProvider();
@@ -18,7 +18,7 @@ function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitte
   const [listingIds, setListingIds] = useState<string>('');
   const [walletAddress, setWalletAddress] = useState<string>('');
   const [isBuldingTransaction, setIsBuildingTransaction] = useState<boolean>(false);
-  const [transaction, setTransaction] = useState<PopulatedTransaction>();
+  const [transaction, setTransaction] = useState<PreparedTransactionRequest>();
   const [transactionError, setTransactionError] = useState<string>('');
 
   const seaportContractAddress = useMemo(

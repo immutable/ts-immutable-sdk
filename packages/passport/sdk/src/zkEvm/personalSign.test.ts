@@ -1,4 +1,5 @@
 import { Flow } from '@imtbl/metrics';
+import { JsonRpcProvider, Signer } from 'ethers';
 import { personalSign } from './personalSign';
 import {
   packSignatures,
@@ -7,7 +8,6 @@ import {
 import { chainId } from '../test/mocks';
 import { RelayerClient } from './relayerClient';
 import GuardianClient from '../guardian';
-import { JsonRpcProvider, Signer } from 'ethers';
 
 jest.mock('./walletHelpers');
 
