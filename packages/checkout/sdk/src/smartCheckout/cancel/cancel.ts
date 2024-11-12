@@ -1,4 +1,5 @@
 import { CancelOrdersOnChainResponse, Orderbook } from '@imtbl/orderbook';
+import { BrowserProvider, TransactionResponse, PreparedTransactionRequest } from 'ethers';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import * as instance from '../../instance';
@@ -15,8 +16,6 @@ import {
 import { SignTransactionStatusType } from '../actions/types';
 import { measureAsyncExecution } from '../../logger/debugLogger';
 import { sendTransaction } from '../../transaction';
-import { BrowserProvider, TransactionResponse } from 'ethers';
-import { PreparedTransactionRequest } from 'ethers';
 
 const cancelOnChain = async (
   config: CheckoutConfiguration,

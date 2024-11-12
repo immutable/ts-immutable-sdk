@@ -29,7 +29,7 @@ export const getNormalisedTransactions = (txs: MetaTransaction[]): MetaTransacti
   gasLimit: t.gasLimit ?? BigInt(0),
   target: t.to ?? ZeroAddress,
   value: t.value ?? BigInt(0),
-  data: t.data ?? '',
+  data: t.data ?? '0x',
 }));
 
 export const digestOfTransactionsAndNonce = (

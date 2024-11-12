@@ -1,8 +1,8 @@
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { TFunction } from 'i18next';
 import { TokenInfo } from '@imtbl/checkout-sdk';
-import { formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
 import { formatUnits, parseUnits } from 'ethers';
+import { formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
 
 export const formatQuoteConversionRate = (
   amount: string,
@@ -41,7 +41,7 @@ export const formatQuoteConversionRate = (
   // Calculate the remainder and adjust it correctly
   const conversionRemainder = adjustedToAmount % adjustedFromAmount;
   const remainderAdjustmentFactor = BigInt('10') ** BigInt(maxDecimals);
-  const adjustedRemainder = conversionRemainder * remainderAdjustmentFactor / adjustedFromAmount;
+  const adjustedRemainder = (conversionRemainder * remainderAdjustmentFactor) / adjustedFromAmount;
 
   // Compose the total conversion rate by adding the adjusted remainder
   const accurateRate = initialRate * remainderAdjustmentFactor + adjustedRemainder;

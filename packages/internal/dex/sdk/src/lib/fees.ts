@@ -30,7 +30,7 @@ export class Fees {
 
   withAmounts() {
     return this.secondaryFees.map((fee) => {
-      const feeAmount = this.amount.value * BigInt(fee.basisPoints) / BigInt(BASIS_POINT_PRECISION)
+      const feeAmount = (this.amount.value * BigInt(fee.basisPoints)) / BigInt(BASIS_POINT_PRECISION);
 
       return {
         ...fee,
@@ -43,7 +43,7 @@ export class Fees {
     let totalFees = newAmount(BigInt(0), this.amount.token);
 
     for (const fee of this.secondaryFees) {
-      const feeAmount = this.amount.value * BigInt(fee.basisPoints) / BigInt(BASIS_POINT_PRECISION)
+      const feeAmount = (this.amount.value * BigInt(fee.basisPoints)) / BigInt(BASIS_POINT_PRECISION);
       totalFees = addAmount(totalFees, newAmount(feeAmount, this.amount.token));
     }
 

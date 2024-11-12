@@ -580,7 +580,7 @@ export class Seaport {
 
   private getSeaportLib(order?: OpenApiOrder): SeaportLib {
     const seaportAddress = order?.protocol_data?.seaport_address ?? this.seaportContractAddress;
-    return this.seaportLibFactory.create(seaportAddress, this.rateLimitingKey);
+    return this.seaportLibFactory.create(seaportAddress);
   }
 
   private static getExpirationISOTimeFromExtraData(extraData: string): string {

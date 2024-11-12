@@ -1,4 +1,5 @@
 import { TradeType } from '@uniswap/sdk-core';
+import { Contract, JsonRpcProvider, MaxUint256 } from 'ethers';
 import {
   expectToBeDefined,
   FUN_TEST_TOKEN,
@@ -13,7 +14,6 @@ import { ERC20__factory } from '../../contracts/types/factories/ERC20__factory';
 import { ApproveError } from '../../errors';
 import { SecondaryFee } from '../../types';
 import { getApproveGasEstimate, getApproveTransaction, prepareApproval } from './approval';
-import { Contract, JsonRpcProvider, MaxUint256 } from 'ethers';
 
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),

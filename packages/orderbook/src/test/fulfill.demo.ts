@@ -1,5 +1,6 @@
 import { log } from 'console';
 import { Environment } from '@imtbl/config';
+import { Wallet, JsonRpcProvider } from 'ethers';
 import { OrderStatusName } from '../openapi/sdk';
 import { Orderbook } from '../orderbook';
 import {
@@ -8,15 +9,12 @@ import {
   getOffererWallet,
   getLocalhostProvider,
   waitForOrderToBeOfStatus,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getConfigFromEnv,
   TestERC721Token,
   getRandomTokenId,
 } from './helpers';
 import { actionAll } from './helpers/actions';
-import { Wallet } from 'ethers';
-import { JsonRpcProvider } from 'ethers';
 
+// eslint-disable-next-line max-len
 async function deployAndMintNftContract(wallet: Wallet, provider: JsonRpcProvider): Promise<TestERC721Token> {
   log(await provider.getTransactionCount(wallet.address));
   const { contract } = await deployTestToken(wallet);

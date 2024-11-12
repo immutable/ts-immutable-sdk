@@ -1,5 +1,4 @@
-import { BrowserProvider } from "ethers";
-import { JsonRpcProvider } from "ethers";
+import { BrowserProvider, JsonRpcProvider } from 'ethers';
 
 /**
  * Represents information about a token.

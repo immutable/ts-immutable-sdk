@@ -23,7 +23,7 @@ export const nativeAggregator = (
 
     const aggregateItem = aggregatedMap.get(type);
     if (aggregateItem && aggregateItem.type === ItemType.NATIVE) {
-      aggregateItem.amount = aggregateItem.amount + amount;
+      aggregateItem.amount += amount;
     } else {
       aggregatedMap.set(type, { ...itemRequirement });
     }
@@ -55,7 +55,7 @@ export const erc20ItemAggregator = (
     const key = `${tokenAddress}${spenderAddress}`;
     const aggregateItem = aggregatedMap.get(key);
     if (aggregateItem && aggregateItem.type === ItemType.ERC20) {
-      aggregateItem.amount = aggregateItem.amount + amount;
+      aggregateItem.amount += amount;
     } else {
       aggregatedMap.set(key, { ...itemRequirement });
     }
@@ -107,7 +107,7 @@ export const erc1155ItemAggregator = (
     const key = `${contractAddress}${spenderAddress}${id}`;
     const aggregateItem = aggregatedMap.get(key);
     if (aggregateItem && aggregateItem.type === ItemType.ERC1155) {
-      aggregateItem.amount = aggregateItem.amount + amount
+      aggregateItem.amount += amount;
     } else {
       aggregatedMap.set(key, { ...itemRequirement });
     }

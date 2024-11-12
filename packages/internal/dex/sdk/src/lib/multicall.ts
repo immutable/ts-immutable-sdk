@@ -1,9 +1,9 @@
+import { Interface } from 'ethers';
 import {
   Multicall,
   UniswapInterfaceMulticall,
 } from '../contracts/types/Multicall';
 import { UniswapV3Pool__factory } from '../contracts/types';
-import { Interface } from 'ethers';
 
 const DEFAULT_GAS_QUOTE = 2_000_000;
 

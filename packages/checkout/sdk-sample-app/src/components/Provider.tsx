@@ -9,7 +9,7 @@ import { passport } from '../passport';
 import { BrowserProvider } from 'ethers';
 
 // Connect Passport EVM
-passport.connectEvm();
+await passport.connectEvm();
 
 interface ProviderProps {
   checkout: Checkout;

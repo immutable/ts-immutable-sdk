@@ -1,3 +1,4 @@
+import { BrowserProvider } from 'ethers';
 import { overrideBalanceCheckResult, smartCheckout } from './smartCheckout';
 import {
   GasAmount,
@@ -14,7 +15,6 @@ import { balanceCheck } from './balanceCheck';
 import { routingCalculator } from './routing/routingCalculator';
 import { getAvailableRoutingOptions } from './routing';
 import { BalanceCheckResult } from './balanceCheck/types';
-import { BrowserProvider } from 'ethers';
 
 jest.mock('./routing');
 jest.mock('./allowance');

@@ -1,4 +1,5 @@
 import { TradeType } from '@uniswap/sdk-core';
+import { BigNumberish, Interface, JsonRpcProvider } from 'ethers';
 import { DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError } from './errors';
 import { calculateGasFee, fetchGasPrice } from './lib/transactionUtils/gas';
 import { getApproval, prepareApproval } from './lib/transactionUtils/approval';
@@ -30,7 +31,6 @@ import {
 } from './types';
 import { getSwap, adjustQuoteWithFees } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
-import { BigNumberish, FetchRequest, Interface, JsonRpcProvider } from 'ethers';
 
 const toPublicQuote = (
   amount: CoinAmount<Coin>,
@@ -90,7 +90,7 @@ export class Exchange {
     this.swapProxyContractAddress = config.chain.contracts.immutableSwapProxy;
 
     this.provider = new JsonRpcProvider(config.chain.rpcUrl, config.chain.chainId, {
-      staticNetwork: true
+      staticNetwork: true,
     });
 
     this.batchProvider = new JsonRpcProvider(config.chain.rpcUrl, config.chain.chainId);

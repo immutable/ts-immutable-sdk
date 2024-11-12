@@ -1,5 +1,6 @@
 import { Environment } from '@imtbl/config';
 import { HttpStatusCode } from 'axios';
+import { BrowserProvider, Contract } from 'ethers';
 import {
   getAllBalances,
   getBalance,
@@ -26,7 +27,6 @@ import {
 } from '../api/blockscout';
 import { ERC20ABI, NATIVE } from '../env';
 import { HttpClient } from '../api/http';
-import { BrowserProvider, Contract } from 'ethers';
 
 jest.mock('../api/http');
 jest.mock('../api/blockscout');

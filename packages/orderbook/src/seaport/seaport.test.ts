@@ -140,7 +140,7 @@ describe('Seaport', () => {
         when(mockedProvider.getNetwork()).thenReturn(
           Promise.resolve({ chainId: network, name: 'foobar' }) as any,
         );
-        when(mockedSeaportLibFactory.create(anything(), anything())).thenReturn(
+        when(mockedSeaportLibFactory.create(anything())).thenReturn(
           instance(mockedSeaportJs),
         );
         when(
@@ -370,7 +370,7 @@ describe('Seaport', () => {
         when(mockedProvider.getNetwork()).thenReturn(
           Promise.resolve({ chainId: network, name: 'foobar' }) as any,
         );
-        when(mockedSeaportLibFactory.create(anything(), anything())).thenReturn(
+        when(mockedSeaportLibFactory.create(anything())).thenReturn(
           instance(mockedSeaportJs),
         );
         when(
@@ -575,7 +575,7 @@ describe('Seaport', () => {
         );
         when(approvalTransactionMethods.estimateGas()).thenReturn(Promise.resolve(approvalGas));
 
-        when(mockedSeaportLibFactory.create(anything(), anything())).thenReturn(
+        when(mockedSeaportLibFactory.create(anything())).thenReturn(
           instance(mockedSeaportJs),
         );
         when(

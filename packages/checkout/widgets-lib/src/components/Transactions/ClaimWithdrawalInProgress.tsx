@@ -1,10 +1,10 @@
 import { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { TransactionResponse } from 'ethers';
 import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { ViewActions, ViewContext } from '../../context/view-context/ViewContext';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { LoadingView } from '../../views/loading/LoadingView';
-import { TransactionResponse } from 'ethers';
 
 interface ClaimWithdrawalInProgressProps {
   transactionResponse: TransactionResponse;

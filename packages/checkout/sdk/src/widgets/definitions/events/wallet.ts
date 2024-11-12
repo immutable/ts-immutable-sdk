@@ -1,4 +1,4 @@
-import { BrowserProvider } from "ethers";
+import { BrowserProvider } from 'ethers';
 
 /**
  * Enum representing possible Wallet Widget event types.
