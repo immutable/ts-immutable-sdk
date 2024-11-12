@@ -98,9 +98,8 @@
       "x-displayName": "pricing"
     },
     {
-      "name": "stacks",
-      "description": "Stacks Endpoints",
-      "x-displayName": "stacks"
+      "name": "metadata-search",
+      "x-displayName": "metadata-search"
     }
   ],
   "paths": {
@@ -4698,6 +4697,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "includeSimulation",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Include simulation results"
           }
         ],
         "responses": {
@@ -6389,10 +6396,22 @@
                 "type": "string",
                 "nullable": true,
                 "description": "URL for RPC node"
+              },
+              "operator_allowlist_address": {
+                "type": "string",
+                "nullable": true,
+                "description": "The address of the Operator Allowlist - https://docs.immutable.com/products/zkevm/minting/royalties/allowlist-spec/"
+              },
+              "minter_address": {
+                "type": "string",
+                "nullable": true,
+                "description": "The address of the minter used in the Minting API - https://docs.immutable.com/products/zkEVM/minting/minting-api#minting-api-prerequisites"
               }
             },
             "required": [
-              "rpc_url"
+              "rpc_url",
+              "operator_allowlist_address",
+              "minter_address"
             ]
           }
         ]
@@ -7603,7 +7622,7 @@
           },
           "token_id": {
             "type": "string",
-            "description": "Token ID for the ERC721 or ERC1155 token",
+            "description": "Token ID for the ERC721 or ERC1155 token when fulfilling a collection order",
             "example": "123",
             "pattern": "\\d+"
           }
@@ -7617,11 +7636,17 @@
       "FulfillableOrder": {
         "type": "object",
         "properties": {
-          "extra_data": {
-            "type": "string"
-          },
           "order": {
             "$ref": "#/components/schemas/Order"
+          },
+          "token_id": {
+            "type": "string",
+            "description": "Token ID for the ERC721 or ERC1155 token when fulfilling a collection order",
+            "example": "123",
+            "pattern": "\\d+"
+          },
+          "extra_data": {
+            "type": "string"
           }
         },
         "required": [
@@ -7636,6 +7661,12 @@
             "type": "string",
             "description": "OrderID for the requested but unfulfillable order",
             "example": "7df3e99e-f7b3-459c-bef6-ffb66a18bb59"
+          },
+          "token_id": {
+            "type": "string",
+            "description": "Token ID for the ERC721 or ERC1155 token when fulfilling a collection order",
+            "example": "123",
+            "pattern": "\\d+"
           },
           "reason": {
             "type": "string",
@@ -10503,6 +10534,11 @@
             "description": "The name of the collection",
             "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
           },
+          "image_url": {
+            "type": "string",
+            "description": "The URL of the collection image",
+            "example": "https://example.com/nft.jpeg"
+          },
           "amount": {
             "type": "string",
             "description": "A string representing the total units of an ERC721 token which the user is buying",
@@ -10525,6 +10561,7 @@
         "required": [
           "type",
           "contract_address",
+          "image_url",
           "amount",
           "immutable_verification_status"
         ]
@@ -10545,6 +10582,11 @@
             "description": "Address of ERC1155 token",
             "example": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
             "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "image_url": {
+            "type": "string",
+            "description": "The URL of the collection image",
+            "example": "https://example.com/nft.jpeg"
           },
           "contract_name": {
             "type": "string",
@@ -10574,6 +10616,7 @@
         ],
         "required": [
           "type",
+          "image_url",
           "contract_address",
           "amount",
           "immutable_verification_status"
@@ -11008,7 +11051,6 @@
           },
           "validation": {
             "description": "Validation results",
-            "type": "object",
             "$ref": "#/components/schemas/ValidationResult",
             "nullable": true
           }
@@ -11274,6 +11316,11 @@
           "data": {
             "description": "evm message data",
             "$ref": "#/components/schemas/EIP712Message"
+          },
+          "validation": {
+            "description": "Validation results",
+            "$ref": "#/components/schemas/ValidationResult",
+            "nullable": true
           }
         }
       },
@@ -11317,13 +11364,17 @@
           },
           {
             "$ref": "#/components/schemas/ValidationErrorResults"
+          },
+          {
+            "$ref": "#/components/schemas/ValidationSimulationFailedResults"
           }
         ],
         "discriminator": {
           "propertyName": "status",
           "mapping": {
             "error": "#/components/schemas/ValidationErrorResults",
-            "success": "#/components/schemas/ValidationSuccessResults"
+            "success": "#/components/schemas/ValidationSuccessResults",
+            "simulation_failed": "#/components/schemas/ValidationSimulationFailedResults"
           }
         }
       },
@@ -11351,6 +11402,22 @@
           }
         }
       },
+      "ValidationSimulationFailedResults": {
+        "type": "object",
+        "required": [
+          "status",
+          "error"
+        ],
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/ValidationStatus"
+          },
+          "error": {
+            "description": "human-readable error message representing a failure to simulate the transaction",
+            "type": "string"
+          }
+        }
+      },
       "ValidationErrorResults": {
         "type": "object",
         "required": [
@@ -11362,7 +11429,7 @@
             "$ref": "#/components/schemas/ValidationStatus"
           },
           "error": {
-            "description": "human-readable error message",
+            "description": "human-readable error message representing a failure with the simulated transaction, such as a reversion",
             "type": "string"
           }
         }
@@ -11420,7 +11487,8 @@
         "description": "Status of the validation",
         "enum": [
           "success",
-          "error"
+          "error",
+          "simulation_failed"
         ]
       },
       "ERC191Message": {
@@ -11430,50 +11498,5 @@
         "minLength": 1
       }
     }
-  },
-  "x-tagGroups": [
-    {
-      "name": "Multi Rollup API",
-      "tags": [
-        "activities",
-        "chains",
-        "collections",
-        "nfts",
-        "nft owners",
-        "metadata",
-        "tokens",
-        "demopage",
-        "verification",
-        "operatorallowlist",
-        "crafting",
-        "listings",
-        "orders"
-      ]
-    },
-    {
-      "name": "Passport MR",
-      "tags": [
-        "passport"
-      ]
-    },
-    {
-      "name": "Passport Profile Service API",
-      "tags": [
-        "passport profile"
-      ]
-    },
-    {
-      "name": "Guardian",
-      "tags": [
-        "guardian"
-      ]
-    },
-    {
-      "name": "Indexer Marketplace APIs",
-      "tags": [
-        "pricing",
-        "stacks"
-      ]
-    }
-  ]
+  }
 }

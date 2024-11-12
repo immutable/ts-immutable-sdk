@@ -16,6 +16,9 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import { EIP712Message } from './eip712-message';
+// May contain unused imports in some cases
+// @ts-ignore
+import { ValidationResult } from './validation-result';
 
 /**
  * 
@@ -53,5 +56,11 @@ export interface EVMMessage {
      * @memberof EVMMessage
      */
     'data': EIP712Message;
+    /**
+     * 
+     * @type {ValidationResult}
+     * @memberof EVMMessage
+     */
+    'validation'?: ValidationResult;
 }
 

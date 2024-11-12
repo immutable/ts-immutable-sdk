@@ -20,19 +20,19 @@ import { ValidationStatus } from './validation-status';
 /**
  * 
  * @export
- * @interface ValidationErrorResults
+ * @interface ValidationSimulationFailedResults
  */
-export interface ValidationErrorResults {
+export interface ValidationSimulationFailedResults {
     /**
      * 
      * @type {ValidationStatus}
-     * @memberof ValidationErrorResults
+     * @memberof ValidationSimulationFailedResults
      */
     'status': ValidationStatus;
     /**
-     * human-readable error message representing a failure with the simulated transaction, such as a reversion
+     * human-readable error message representing a failure to simulate the transaction
      * @type {string}
-     * @memberof ValidationErrorResults
+     * @memberof ValidationSimulationFailedResults
      */
     'error': string;
 }

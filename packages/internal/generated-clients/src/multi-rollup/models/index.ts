@@ -191,6 +191,7 @@ export * from './unknown-typed-data-metadata';
 export * from './user-info';
 export * from './validation-error-results';
 export * from './validation-result';
+export * from './validation-simulation-failed-results';
 export * from './validation-status';
 export * from './validation-success-results';
 export * from './verification-request';

@@ -36,6 +36,12 @@ export interface SeaportERC1155CollectionItem {
      */
     'contract_address': string;
     /**
+     * The URL of the collection image
+     * @type {string}
+     * @memberof SeaportERC1155CollectionItem
+     */
+    'image_url': string;
+    /**
      * The name of the collection
      * @type {string}
      * @memberof SeaportERC1155CollectionItem
