@@ -47,6 +47,22 @@
     {
       "name": "demopage",
       "description": "Temporary HTML endpoint for demo purposes"
+    },
+    {
+      "name": "verification"
+    },
+    {
+      "name": "operatorallowlist"
+    },
+    {
+      "name": "crafting"
+    },
+    {
+      "name": "pricing",
+      "description": "Pricing Endpoints"
+    },
+    {
+      "name": "metadata-search"
     }
   ],
   "paths": {
@@ -3411,8 +3427,8 @@
         "properties": {
           "display_type": {
             "description": "Display type for this attribute",
-            "nullable": true,
             "type": "string",
+            "nullable": true,
             "enum": [
               "number",
               "boost_percentage",
@@ -3692,10 +3708,22 @@
                 "type": "string",
                 "nullable": true,
                 "description": "URL for RPC node"
+              },
+              "operator_allowlist_address": {
+                "type": "string",
+                "nullable": true,
+                "description": "The address of the Operator Allowlist - https://docs.immutable.com/products/zkevm/minting/royalties/allowlist-spec/"
+              },
+              "minter_address": {
+                "type": "string",
+                "nullable": true,
+                "description": "The address of the minter used in the Minting API - https://docs.immutable.com/products/zkEVM/minting/minting-api#minting-api-prerequisites"
               }
             },
             "required": [
-              "rpc_url"
+              "rpc_url",
+              "operator_allowlist_address",
+              "minter_address"
             ]
           }
         ]
