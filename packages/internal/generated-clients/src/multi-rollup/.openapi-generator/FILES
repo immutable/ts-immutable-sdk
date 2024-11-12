@@ -213,6 +213,7 @@ models/unknown-typed-data-metadata.ts
 models/user-info.ts
 models/validation-error-results.ts
 models/validation-result.ts
+models/validation-simulation-failed-results.ts
 models/validation-status.ts
 models/validation-success-results.ts
 models/verification-request-contract-type.ts

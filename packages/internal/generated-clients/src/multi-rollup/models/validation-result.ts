@@ -24,6 +24,9 @@ import { HighestSeverity } from './highest-severity';
 import { ValidationErrorResults } from './validation-error-results';
 // May contain unused imports in some cases
 // @ts-ignore
+import { ValidationSimulationFailedResults } from './validation-simulation-failed-results';
+// May contain unused imports in some cases
+// @ts-ignore
 import { ValidationStatus } from './validation-status';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -33,6 +36,6 @@ import { ValidationSuccessResults } from './validation-success-results';
  * @type ValidationResult
  * @export
  */
-export type ValidationResult = { status: 'error' } & ValidationErrorResults | { status: 'success' } & ValidationSuccessResults;
+export type ValidationResult = { status: 'error' } & ValidationErrorResults | { status: 'simulation_failed' } & ValidationSimulationFailedResults | { status: 'success' } & ValidationSuccessResults;
 
 

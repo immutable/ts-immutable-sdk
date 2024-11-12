@@ -22,7 +22,8 @@
 
 export const ValidationStatus = {
     Success: 'success',
-    Error: 'error'
+    Error: 'error',
+    SimulationFailed: 'simulation_failed'
 } as const;
 
 export type ValidationStatus = typeof ValidationStatus[keyof typeof ValidationStatus];
