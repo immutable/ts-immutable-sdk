@@ -7,12 +7,12 @@ import {
   StarkSigner,
   signRegisterEthAddress,
 } from '@imtbl/x-client';
+import { Signer, TransactionResponse } from 'ethers';
 import { isRegisteredOnChain } from '../registration';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import { validateChain } from '../helpers';
 import { ProviderConfiguration } from '../../config';
 import { getWithdrawalBalances } from './getWithdrawalBalance';
-import { Signer, TransactionResponse } from 'ethers';
 
 type CompleteERC20WithdrawalWorkflowParams = {
   ethSigner: Signer;

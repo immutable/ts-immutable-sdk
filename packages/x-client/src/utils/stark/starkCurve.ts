@@ -7,10 +7,10 @@ import * as encUtils from 'enc-utils';
 import BN from 'bn.js';
 // import { hdkey } from 'ethereumjs-wallet';
 import * as ethereumJsWallet from 'ethereumjs-wallet';
+import { Signature, Signer } from 'ethers';
 import { createStarkSigner } from './starkSigner';
 import * as legacy from './legacy/crypto';
 import { getStarkPublicKeyFromImx } from './getStarkPublicKeyFromImx';
-import { Signature, Signer } from 'ethers';
 
 const { curves, ec } = elliptic;
 

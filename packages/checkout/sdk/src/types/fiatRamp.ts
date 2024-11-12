@@ -1,6 +1,6 @@
 // import { Passport } from '@imtbl/passport';
 
-import { BrowserProvider } from "ethers";
+import { BrowserProvider } from 'ethers';
 
 /**
  * An enum representing the type of exchange.

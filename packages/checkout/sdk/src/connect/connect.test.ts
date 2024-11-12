@@ -3,11 +3,11 @@
  */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { BrowserProvider } from 'ethers';
 import { checkIsWalletConnected, connectSite, requestPermissions } from './connect';
 import { WalletAction, WalletProviderName } from '../types';
 import { CheckoutErrorType } from '../errors';
 import { createProvider } from '../provider';
-import { BrowserProvider } from 'ethers';
 
 let windowSpy: any;
 

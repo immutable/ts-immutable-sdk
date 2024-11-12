@@ -1,8 +1,8 @@
+import { BrowserProvider, Contract, TransactionRequest } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { ItemRequirement, ItemType } from '../../types';
 import { Allowance, InsufficientERC20 } from './types';
 import { ERC20ABI } from '../../env';
-import { BrowserProvider, Contract, TransactionRequest } from 'ethers';
 
 // Gets the amount an address has allowed to be spent by the spender for the ERC20.
 export const getERC20Allowance = async (

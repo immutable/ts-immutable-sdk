@@ -1,3 +1,4 @@
+import { BrowserProvider, Contract, formatUnits } from 'ethers';
 import {
   ERC20Item,
   ERC721Balance,
@@ -22,7 +23,6 @@ import {
 } from './balanceRequirement';
 import { ERC721ABI, NATIVE } from '../../env';
 import { isMatchingAddress } from '../../utils/utils';
-import { BrowserProvider, Contract, formatUnits } from 'ethers';
 
 /**
  * Gets the balances for all NATIVE and ERC20 balance requirements.

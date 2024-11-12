@@ -148,8 +148,8 @@ export class Passport {
     announceProvider: boolean
   } = {
     announceProvider: true,
-  }): Provider {
-    return withMetrics(() => {
+  }): Promise<Provider> {
+    return withMetricsAsync(async () => {
       const provider = new ZkEvmProvider({
         passportEventEmitter: this.passportEventEmitter,
         authManager: this.authManager,

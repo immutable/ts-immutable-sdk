@@ -10,7 +10,7 @@ import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps, EnvironmentNames } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
-import { utils } from 'ethers';
+import { Interface } from 'ethers';
 
 const getErc20DefaultContractAddress = (environment: EnvironmentNames) => {
   switch (environment) {
@@ -42,7 +42,7 @@ function TransferERC20({ disabled, handleExampleSubmitted }: RequestExampleProps
       'function transfer(address to, uint256 amount)',
       'function transferFrom(address from, address to, uint256 amount)',
     ];
-    return new utils.Interface(abi);
+    return new Interface(abi);
   }, []);
 
   useEffect(() => {

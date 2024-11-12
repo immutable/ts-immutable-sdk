@@ -1,11 +1,10 @@
 import { Flow } from '@imtbl/metrics';
+import { Signer, JsonRpcProvider } from 'ethers';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { hexToString } from '../utils/string';
 import GuardianClient from '../guardian';
 import { RelayerClient } from './relayerClient';
 import { packSignatures, signERC191Message } from './walletHelpers';
-import { Signer } from 'ethers';
-import { JsonRpcProvider } from 'ethers';
 
 interface PersonalSignParams {
   ethSigner: Signer;

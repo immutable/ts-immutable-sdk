@@ -1,10 +1,10 @@
 import { TradeType } from '@uniswap/sdk-core';
+import { JsonRpcProvider, MaxUint256, TransactionRequest } from 'ethers';
 import { ERC20__factory } from '../../contracts/types/factories/ERC20__factory';
 import { ApproveError } from '../../errors';
 import { isERC20Amount, toPublicAmount } from '../utils';
 import { CoinAmount, Coin, ERC20, Native, SecondaryFee, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
-import { JsonRpcProvider, MaxUint256, TransactionRequest } from 'ethers';
 
 type PreparedApproval = {
   spender: string;

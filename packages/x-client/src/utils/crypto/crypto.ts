@@ -3,9 +3,9 @@ import BN from 'bn.js';
 // @ts-ignore
 import elliptic from 'elliptic';
 import * as encUtils from 'enc-utils';
+import { Signer, solidityPackedKeccak256 } from 'ethers';
 import { StarkSigner } from '../../types';
 import { starkEcOrder } from '../stark/starkCurve';
-import { Signer, solidityPackedKeccak256 } from 'ethers';
 
 type SignatureOptions = {
   r: BN;

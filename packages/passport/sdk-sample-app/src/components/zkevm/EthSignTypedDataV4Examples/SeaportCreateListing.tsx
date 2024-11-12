@@ -1,4 +1,3 @@
-import { utils } from 'ethers';
 import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
@@ -12,10 +11,9 @@ import { usePassportProvider } from '@/context/PassportProvider';
 import {
   ActionType, ERC1155Item, ERC721Item, SignableAction, SignablePurpose,
 } from '@imtbl/orderbook';
+import { TypedDataEncoder } from 'ethers';
 
 type TokenType = 'NATIVE' | 'ERC20';
-
-const { _TypedDataEncoder: typedDataEncoder } = utils;
 
 function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExampleProps) {
   const { orderbookClient } = useImmutableProvider();
@@ -104,14 +102,14 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
         action.type === ActionType.SIGNABLE && action.purpose === SignablePurpose.CREATE_LISTING
       )) as SignableAction | undefined;
 
-      const populated = await typedDataEncoder.resolveNames(
+      const populated = await TypedDataEncoder.resolveNames(
         signAction!.message!.domain,
         signAction!.message!.types,
         signAction!.message!.value,
         (name: string) => Promise.resolve(name),
       );
 
-      const payload = typedDataEncoder.getPayload(populated.domain, signAction!.message!.types, populated.value);
+      const payload = TypedDataEncoder.getPayload(populated.domain, signAction!.message!.types, populated.value);
       setTransaction(payload);
     } catch (err) {
       setSignMessageError(`Failed to validate listing: ${err}`);

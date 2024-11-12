@@ -1,3 +1,4 @@
+import { BrowserProvider, Contract } from 'ethers';
 import {
   ChainId,
   ERC20Item,
@@ -15,7 +16,6 @@ import {
   getTokensInfo,
 } from './balanceRequirement';
 import { NATIVE, ZKEVM_NATIVE_TOKEN } from '../../env';
-import { BrowserProvider, Contract } from 'ethers';
 
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),

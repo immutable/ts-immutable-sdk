@@ -1,6 +1,6 @@
 // this function needs to be in a separate file to prevent circular dependencies with ./network
 
-import { BrowserProvider, Eip1193Provider } from 'ethers';
+import { BrowserProvider } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { WalletAction } from '../types';
 
@@ -25,8 +25,6 @@ const parseChainId = (chainId: unknown): number => {
  * @returns chainId number
  */
 async function requestChainId(web3Provider: BrowserProvider): Promise<number> {
-  console.log('qwerqwerqwerqwer')
-  console.log(web3Provider)
   if (!web3Provider.send) {
     throw new CheckoutError(
       'Parsed provider is not a valid BrowserProvider',

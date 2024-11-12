@@ -4,6 +4,9 @@
 import { Environment } from '@imtbl/config';
 import { Passport, UserProfile } from '@imtbl/passport';
 import {
+  BrowserProvider, Eip1193Provider, JsonRpcProvider, TransactionReceipt,
+} from 'ethers';
+import {
   getNetworkAllowList,
   getNetworkInfo,
   switchWalletNetwork,
@@ -55,8 +58,6 @@ import { CheckoutErrorType } from './errors';
 import { availabilityService } from './availability';
 import * as swap from './swap';
 import { SwapParams, SwapResult } from './types/swap';
-import { BrowserProvider, Eip1193Provider, JsonRpcProvider } from 'ethers';
-import { TransactionReceipt } from 'ethers';
 
 jest.mock('./connect');
 jest.mock('./network');
@@ -1081,7 +1082,7 @@ describe('Connect', () => {
           gasPrice: BigInt('20000000000'),
           status: 1,
           type: 2,
-        } as unknown as TransactionReceipt
+        } as unknown as TransactionReceipt,
       };
 
       (swap.swap as jest.Mock).mockResolvedValue(mockSwapResult);

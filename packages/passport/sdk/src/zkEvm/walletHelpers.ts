@@ -1,11 +1,11 @@
 import { walletContracts } from '@0xsequence/abi';
 import { v1 as sequenceCoreV1 } from '@0xsequence/core';
 import { trackDuration } from '@imtbl/metrics';
+import {
+  BigNumberish, Contract, getBytes, hashMessage, Interface, isCallException,
+  keccak256, Signer, solidityPacked, ZeroAddress, TypedDataEncoder, JsonRpcProvider, AbiCoder,
+} from 'ethers';
 import { MetaTransaction, MetaTransactionNormalised, TypedDataPayload } from './types';
-import { BigNumberish, Contract, getBytes, hashMessage, Interface, isCallException, keccak256, Signer, solidityPacked, ZeroAddress } from 'ethers';
-import { TypedDataEncoder } from 'ethers';
-import { JsonRpcProvider } from 'ethers';
-import { AbiCoder } from 'ethers';
 
 const SIGNATURE_WEIGHT = 1; // Weight of a single signature in the multi-sig
 const TRANSACTION_SIGNATURE_THRESHOLD = 1; // Total required weight in the multi-sig for a transaction
@@ -28,7 +28,7 @@ export const getNormalisedTransactions = (txs: MetaTransaction[]): MetaTransacti
   gasLimit: t.gasLimit ?? BigInt(0),
   target: t.to ?? ZeroAddress,
   value: t.value ?? BigInt(0),
-  data: t.data ?? '',
+  data: t.data ?? '0x',
 }));
 
 export const digestOfTransactionsAndNonce = (

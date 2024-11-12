@@ -1,4 +1,4 @@
-import { BrowserProvider } from "ethers";
+import { BrowserProvider } from 'ethers';
 
 /**
  * Interface representing the params of {@link Checkout.connect}.

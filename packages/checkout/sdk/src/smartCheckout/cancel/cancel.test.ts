@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Environment } from '@imtbl/config';
 import { OrderStatusName } from '@imtbl/orderbook';
+import { BrowserProvider, TypedDataDomain, PreparedTransactionRequest } from 'ethers';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutErrorType } from '../../errors';
 import { cancel } from './cancel';
@@ -10,8 +11,6 @@ import { CheckoutStatus } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
 import { HttpClient } from '../../api/http';
 import { sendTransaction } from '../../transaction';
-import { BrowserProvider, TypedDataDomain } from 'ethers';
-import { PreparedTransactionRequest } from 'ethers';
 
 jest.mock('../../instance');
 jest.mock('../actions');

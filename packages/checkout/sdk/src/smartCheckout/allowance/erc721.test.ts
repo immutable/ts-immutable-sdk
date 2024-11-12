@@ -1,3 +1,4 @@
+import { BrowserProvider, Contract } from 'ethers';
 import {
   convertIdToNumber,
   getApproveTransaction,
@@ -7,7 +8,6 @@ import {
 } from './erc721';
 import { CheckoutErrorType } from '../../errors';
 import { ItemRequirement, ItemType } from '../../types';
-import { BrowserProvider, Contract } from 'ethers';
 
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),

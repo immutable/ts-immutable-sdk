@@ -1,4 +1,9 @@
 import { Environment } from '@imtbl/config';
+import { Contract, getAddress, JsonRpcProvider, ZeroAddress, Interface } from 'ethers';
+// eslint-disable-next-line max-len
+import swapRouterContract from '@uniswap/swap-router-contracts/artifacts/contracts/interfaces/ISwapRouter02.sol/ISwapRouter02.json';
+// eslint-disable-next-line max-len
+import { abi as PaymentsExtendedAbi } from '@uniswap/swap-router-contracts/artifacts/contracts/interfaces/IPeripheryPaymentsWithFeeExtended.sol/IPeripheryPaymentsWithFeeExtended.json';
 import { InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError, NoRoutesAvailableError } from './errors';
 import { ERC20__factory } from './contracts/types/factories/ERC20__factory';
 import { SecondaryFee } from './types';
@@ -41,10 +46,6 @@ import {
   TEST_MAX_PRIORITY_FEE_PER_GAS,
   TEST_BASE_FEE,
 } from './test/utils';
-import { Contract, getAddress, JsonRpcProvider, ZeroAddress } from 'ethers';
-import { Interface } from 'ethers';
-import swapRouterContract from '@uniswap/swap-router-contracts/artifacts/contracts/interfaces/ISwapRouter02.sol/ISwapRouter02.json'
-import { abi as PaymentsExtendedAbi } from '@uniswap/swap-router-contracts/artifacts/contracts/interfaces/IPeripheryPaymentsWithFeeExtended.sol/IPeripheryPaymentsWithFeeExtended.json'
 
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
@@ -554,8 +555,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
       });
 
-      const swapRouterInterface = new Interface(swapRouterContract.abi)
-      const paymentsInterface = new Interface(PaymentsExtendedAbi)
+      const swapRouterInterface = new Interface(swapRouterContract.abi);
+      const paymentsInterface = new Interface(PaymentsExtendedAbi);
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
       // Sell 100 native tokens for X amount of FUN where the exchange rate is 1 token-in : 10 token-out
@@ -638,8 +639,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
       });
 
-      const swapRouterInterface = new Interface(swapRouterContract.abi)
-      const paymentsInterface = new Interface(PaymentsExtendedAbi)
+      const swapRouterInterface = new Interface(swapRouterContract.abi);
+      const paymentsInterface = new Interface(PaymentsExtendedAbi);
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
       // Buy 100 native tokens for X amount of FUN where the exchange rate is 1 token-in : 10 token-out
@@ -676,8 +677,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
       });
 
-      const swapRouterInterface = new Interface(swapRouterContract.abi)
-      const paymentsInterface = new Interface(PaymentsExtendedAbi)
+      const swapRouterInterface = new Interface(swapRouterContract.abi);
+      const paymentsInterface = new Interface(PaymentsExtendedAbi);
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
       // Buy 100 native tokens for X amount of FUN where the exchange rate is 1 token-in : 10 token-out
@@ -745,8 +746,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           ],
         });
 
-        const swapRouterInterface = new Interface(swapRouterContract.abi)
-        const paymentsInterface = new Interface(PaymentsExtendedAbi)
+        const swapRouterInterface = new Interface(swapRouterContract.abi);
+        const paymentsInterface = new Interface(PaymentsExtendedAbi);
         const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
         // Sell 100 native tokens for X amount of FUN where the exchange rate is 1 token-in : 10 token-out

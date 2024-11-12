@@ -2,6 +2,7 @@ import { Environment } from '@imtbl/config';
 import {
   ActionType, TransactionPurpose, constants,
 } from '@imtbl/orderbook';
+import { BrowserProvider, PreparedTransactionRequest } from 'ethers';
 import {
   getItemRequirement, buy, getTransactionOrGas,
 } from './buy';
@@ -25,7 +26,6 @@ import { SignTransactionStatusType } from '../actions/types';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../routing/indexer/fetchL1Representation';
 import { HttpClient } from '../../api/http';
 import { sendTransaction } from '../../transaction';
-import { BrowserProvider, PreparedTransactionRequest } from 'ethers';
 
 jest.mock('../../instance');
 jest.mock('../smartCheckout');

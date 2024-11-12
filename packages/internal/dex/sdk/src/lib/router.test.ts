@@ -1,12 +1,12 @@
 /* eslint-disable arrow-body-style */
 import { TradeType } from '@uniswap/sdk-core';
+import { formatEther, JsonRpcProvider, parseEther } from 'ethers';
 import { SUPPORTED_SANDBOX_CHAINS } from '../config';
 import { WIMX_IMMUTABLE_TESTNET } from '../constants/tokens';
 import { IMMUTABLE_TESTNET_CHAIN_ID } from '../constants/chains';
 import { newAmountFromString } from '../test/utils';
 import { Multicall__factory, QuoterV2__factory } from '../contracts/types';
 import { Router } from './router';
-import { formatEther, JsonRpcProvider, parseEther } from 'ethers';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const zkONE = {

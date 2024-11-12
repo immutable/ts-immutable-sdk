@@ -202,7 +202,7 @@ export const useSignOrder = (input: SignOrderInput) => {
     ): Promise<[hash: string | undefined, error?: SignOrderError]> => {
       try {
         const signer = await provider?.getSigner();
-        const gasPrice = (await provider?.getFeeData())?.gasPrice
+        const gasPrice = (await provider?.getFeeData())?.gasPrice;
         const txnResponse = await signer?.sendTransaction({
           to,
           data,

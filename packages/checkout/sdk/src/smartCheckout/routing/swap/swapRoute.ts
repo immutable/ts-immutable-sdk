@@ -1,4 +1,5 @@
 import { Amount, Fee } from '@imtbl/dex-sdk';
+import { formatUnits } from 'ethers';
 import { CheckoutConfiguration, getL2ChainId } from '../../../config';
 import {
   AvailableRoutingOptions,
@@ -17,7 +18,6 @@ import { TokenBalanceResult } from '../types';
 import { quoteFetcher } from './quoteFetcher';
 import { isNativeToken } from '../../../tokens';
 import { formatSmartCheckoutAmount, isMatchingAddress } from '../../../utils/utils';
-import { formatUnits } from 'ethers';
 
 const constructFees = (
   approvalGasFee: Amount | null | undefined,
@@ -296,13 +296,13 @@ export const checkIfUserCanCoverRequirement = (
 
   // Remove approval fees from the remainder if token matches as these need to be taken out to cover the swap
   if (isMatchingAddress(approvalFees.approvalGasTokenAddress, balanceRequirementToken)) {
-    remainingBalance = remainingBalance - approvalFees.approvalGasFee;
+    remainingBalance -= approvalFees.approvalGasFee;
   }
 
   // Remove swap fees from the remainder if token matches as these need to be taken out to cover the swap
   for (const swapFee of swapFees) {
     if (isMatchingAddress(swapFee.amount.token.address, balanceRequirementToken)) {
-      remainingBalance = remainingBalance - swapFee.amount.value;
+      remainingBalance -= swapFee.amount.value;
     }
   }
 
