@@ -62,8 +62,7 @@ import {
   BridgeWidgetViews,
 } from '../../context/view-context/BridgeViewContextTypes';
 import { ClaimWithdrawal } from './views/ClaimWithdrawal';
-import { ServiceType } from '../../views/error/serviceTypes';
-import { ServiceUnavailableToRegionErrorView } from '../../views/error/ServiceUnavailableToRegionErrorView';
+import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
@@ -341,9 +340,16 @@ export default function BridgeWidget({
             />
           )}
           {viewState.view.type === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
-            <ServiceUnavailableToRegionErrorView
-              service={ServiceType.GENERIC}
+            <ServiceUnavailableErrorView
               onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
+              onBackButtonClick={() => {
+                viewDispatch({
+                  payload: {
+                    type: ViewActions.UPDATE_VIEW,
+                    view: { type: BridgeWidgetViews.WALLET_NETWORK_SELECTION },
+                  },
+                });
+              }}
             />
           )}
         </CryptoFiatProvider>

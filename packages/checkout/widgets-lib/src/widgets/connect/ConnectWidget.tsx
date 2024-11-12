@@ -38,8 +38,7 @@ import { isL1EthChainId, isZkEvmChainId } from '../../lib/utils';
 import { WalletConnectManager, walletConnectProviderInfo } from '../../lib/walletConnect';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { ErrorView } from '../../views/error/ErrorView';
-import { ServiceType } from '../../views/error/serviceTypes';
-import { ServiceUnavailableToRegionErrorView } from '../../views/error/ServiceUnavailableToRegionErrorView';
+import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 import { LoadingView } from '../../views/loading/LoadingView';
 import {
   sendCloseWidgetEvent,
@@ -274,9 +273,18 @@ export default function ConnectWidget({
               />
             )}
           {view.type === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
-            <ServiceUnavailableToRegionErrorView
-              service={ServiceType.GENERIC}
+            <ServiceUnavailableErrorView
               onCloseClick={sendCloseEvent}
+              onBackButtonClick={() => {
+                viewDispatch({
+                  payload: {
+                    type: ViewActions.UPDATE_VIEW,
+                    view: {
+                      type: ConnectWidgetViews.CONNECT_WALLET,
+                    } as ConnectWidgetView,
+                  },
+                });
+              }}
             />
           )}
         </>
