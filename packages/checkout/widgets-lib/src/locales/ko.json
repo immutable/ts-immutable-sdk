@@ -80,6 +80,10 @@
         "addTokens": "다른 방법으로 토큰을 추가해 주세요."
       }
     },
+    "SERVICE_UNAVAILABLE_SANCTIONS_ERROR_VIEW": {
+      "heading": "이 서비스는 제공되지 않습니다.",
+      "actionText": "돌아가기"
+    },
     "LOADING_VIEW": {
       "text": "로딩 중"
     },

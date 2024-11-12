@@ -35,7 +35,7 @@ import { Review } from './views/Review';
 import { fetchBalances } from './functions/fetchBalances';
 import { useTokens } from './hooks/useTokens';
 import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
-import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
+import { ServiceUnavailableToRegionErrorView } from '../../views/error/ServiceUnavailableToRegionErrorView';
 import { ServiceType } from '../../views/error/serviceTypes';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { getRemoteImage } from '../../lib/utils';
@@ -265,7 +265,7 @@ export default function AddTokensWidget({
           )}
           {viewState.view.type
             === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
-            <ServiceUnavailableErrorView
+            <ServiceUnavailableToRegionErrorView
               service={ServiceType.GENERIC}
               onCloseClick={() => sendAddTokensCloseEvent(eventTarget)}
             />
