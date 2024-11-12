@@ -2,6 +2,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
   IWidgetsFactory,
+  IWidgetsFactoryCreate,
   Widget,
   WidgetConfiguration,
   WidgetConfigurations,
@@ -53,9 +54,9 @@ export class WidgetsFactory implements IWidgetsFactory {
     sendProviderUpdatedEvent({ provider });
   }
 
-  create<T extends WidgetType>(type: T, props?: WidgetProperties<T>): Widget<T> {
+  create: IWidgetsFactoryCreate = (type: WidgetType, props?: WidgetProperties<WidgetType>) => {
     const { provider } = props ?? {};
-    const config = props?.config as WidgetConfigurations[T] || {};
+    const config = props?.config as WidgetConfigurations[WidgetType] || {};
 
     switch (type) {
       case WidgetType.CONNECT: {
@@ -109,5 +110,5 @@ export class WidgetsFactory implements IWidgetsFactory {
       default:
         throw new Error('widget type not supported');
     }
-  }
+  };
 }

@@ -279,6 +279,16 @@ export interface IWidgetsFactory {
   updateProvider(provider: Web3Provider): void;
 }
 
+export interface IWidgetsFactoryCreate {
+  (type: WidgetType.IMMUTABLE_COMMERCE, props?: WidgetProperties<WidgetType.IMMUTABLE_COMMERCE>):
+  Widget<WidgetType.IMMUTABLE_COMMERCE>;
+
+  /** @deprecated
+   * Use WidgetType.IMMUTABLE_COMMERCE instead, see https://docs.immutable.com/products/zkEVM/checkout/commerce-widget
+   * */
+  <T extends Exclude<WidgetType, WidgetType.IMMUTABLE_COMMERCE>>(type: T, props?: WidgetProperties<T>): Widget<T>;
+}
+
 /**
  * Widget interface. Every widget implements this interface.
  */
