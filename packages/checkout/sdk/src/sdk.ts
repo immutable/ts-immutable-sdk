@@ -344,12 +344,12 @@ export class Checkout {
   }
 
   /**
-   * Helper method that checks if an address is sanctioned based on risk assessment results from {getRiskAssessment}.
+   * Helper method that checks if given risk assessment results contain sanctioned addresses.
    * @param {AssessmentResult} assessment - Risk assessment to analyse.
-   * @param {string} address - The address to check.
+   * @param {string | undefined} address - If defined, only sanctions for the given address will be checked.
    * @returns {boolean} - Result of the check.
    */
-  public checkIsAddressSanctioned(assessment: AssessmentResult, address: string): boolean {
+  public checkIsAddressSanctioned(assessment: AssessmentResult, address?: string): boolean {
     return isAddressSanctioned(assessment, address);
   }
 
