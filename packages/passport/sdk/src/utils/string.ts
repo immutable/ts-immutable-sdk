@@ -1,4 +1,4 @@
-import { getBytes, stripZerosLeft, toUtf8String } from "ethers";
+import { getBytes, stripZerosLeft, toUtf8String } from 'ethers';
 
 export const hexToString = (hex: string) => {
   if (!hex) return hex;

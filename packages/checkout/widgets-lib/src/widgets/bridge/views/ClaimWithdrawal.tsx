@@ -8,6 +8,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { ChainId, WalletProviderName } from '@imtbl/checkout-sdk';
 import { FlowRateWithdrawResponse } from '@imtbl/bridge-sdk';
+import { FeeData } from 'ethers';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { Transaction } from '../../../lib/clients';
 import { getChainNameById } from '../../../lib/chains';
@@ -25,7 +26,6 @@ import { BridgeContext } from '../context/BridgeContext';
 import { WalletApproveHero } from '../../../components/Hero/WalletApproveHero';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
-import { FeeData } from 'ethers';
 
 export interface ClaimWithdrawalProps {
   transaction: Transaction,

@@ -1,5 +1,6 @@
 import { TradeType } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
+import { parseEther } from 'ethers';
 import {
   FUN_TEST_TOKEN,
   IMX_TEST_TOKEN,
@@ -27,7 +28,6 @@ import { erc20ToUniswapToken, newAmount } from '../utils';
 import { QuoteResult } from '../getQuotesForRoutes';
 import { Coin, ERC20 } from '../../types';
 import { getSwap, adjustQuoteWithFees } from './swap';
-import { parseEther } from 'ethers';
 
 const gasEstimate = BigInt(0);
 const slippagePercentage = 3;

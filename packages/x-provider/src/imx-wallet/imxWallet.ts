@@ -1,4 +1,5 @@
 import { Environment } from '@imtbl/config';
+import { BrowserProvider } from 'ethers';
 import {
   ConnectRequest,
   ConnectResponse,
@@ -14,7 +15,6 @@ import { postRequestMessage } from './postRequestMessage';
 import { messageResponseListener } from './messageResponseListener';
 import { ImxSigner } from './ImxSigner';
 import { getOrSetupIFrame } from './imxWalletIFrame';
-import { BrowserProvider } from 'ethers';
 
 const DEFAULT_CONNECTION_MESSAGE = 'Only sign this request if you’ve initiated an action with Immutable X.';
 const CONNECTION_FAILED_ERROR = 'The L2 IMX Wallet connection has failed';

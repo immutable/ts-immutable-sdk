@@ -14,6 +14,7 @@ import {
   imx,
   ImxApiClients,
 } from '@imtbl/generated-clients';
+import { BrowserProvider, TransactionResponse } from 'ethers';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import AuthManager from '../authManager';
 import GuardianClient from '../guardian';
@@ -28,7 +29,6 @@ import registerOffchain from './workflows/registerOffchain';
 import MagicAdapter from '../magicAdapter';
 import { getStarkSigner } from './getStarkSigner';
 import { withMetricsAsync } from '../utils/metrics';
-import { BrowserProvider, TransactionResponse } from 'ethers';
 
 export interface PassportImxProviderOptions {
   authManager: AuthManager;

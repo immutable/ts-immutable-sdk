@@ -9,6 +9,7 @@ import type {
   OrderComponents,
   OrderUseCase,
 } from '@opensea/seaport-js/lib/types';
+import { JsonRpcProvider } from 'ethers';
 import { mapOrderFromOpenApiOrder } from '../openapi/mapper';
 import { Order as OpenApiOrder } from '../openapi/sdk';
 import {
@@ -42,7 +43,6 @@ import {
 import { mapImmutableOrderToSeaportOrderComponents } from './map-to-seaport-order';
 import { SeaportLibFactory } from './seaport-lib-factory';
 import { prepareTransaction } from './transaction';
-import { JsonRpcProvider } from 'ethers';
 
 type FulfillmentOrderDetails = Parameters<SeaportLib['fulfillOrders']>[0]['fulfillOrderDetails'][0] & { extraData: string };
 
@@ -579,7 +579,7 @@ export class Seaport {
 
   private getSeaportLib(order?: OpenApiOrder): SeaportLib {
     const seaportAddress = order?.protocol_data?.seaport_address ?? this.seaportContractAddress;
-    return this.seaportLibFactory.create(seaportAddress, this.rateLimitingKey);
+    return this.seaportLibFactory.create(seaportAddress);
   }
 
   private static getExpirationISOTimeFromExtraData(extraData: string): string {

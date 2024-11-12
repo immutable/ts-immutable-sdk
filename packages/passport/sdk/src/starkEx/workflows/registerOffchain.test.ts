@@ -1,17 +1,16 @@
 import { AxiosError } from 'axios';
 import { ImxApiClients } from '@imtbl/generated-clients';
 import { StarkSigner } from '@imtbl/x-client';
+import { Signer, BrowserProvider } from 'ethers';
 import AuthManager from '../../authManager';
 import { mockUserImx } from '../../test/mocks';
 import registerPassportStarkEx from './registration';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
 import registerOffchain from './registerOffchain';
-import { Signer } from 'ethers';
-import { BrowserProvider } from 'ethers';
 
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
-  BrowserProvider: jest.fn()
+  BrowserProvider: jest.fn(),
 }));
 jest.mock('./registration');
 jest.mock('@imtbl/generated-clients');

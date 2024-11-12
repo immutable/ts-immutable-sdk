@@ -1,10 +1,10 @@
+import { BrowserProvider, TransactionRequest } from 'ethers';
 import {
   FulfillmentTransaction, GasAmount, GasTokenType, ItemRequirement, ItemType, TransactionOrGasType,
 } from '../../types';
 import { InsufficientERC1155, InsufficientERC20, InsufficientERC721 } from '../allowance/types';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { getGasPriceInWei } from '../../gasEstimate';
-import { BrowserProvider, TransactionRequest } from 'ethers';
 
 export const estimateGas = async (
   provider: BrowserProvider,
@@ -66,14 +66,14 @@ export const gasCalculator = async (
     const gasPrice = getGasPriceInWei(feeData);
     if (gasPrice !== null) {
       const gas = gasPrice * transactionOrGas.gasToken.limit;
-      if (gas) totalGas = totalGas + gas;
+      if (gas) totalGas += gas;
     }
   }
 
   // Get the gas estimates for all the transactions and calculate the total gas
   const gasEstimatePromises = await Promise.all(estimateGasPromises);
   gasEstimatePromises.forEach((gasEstimate) => {
-    totalGas = totalGas + gasEstimate;
+    totalGas += gasEstimate;
   });
 
   if (totalGas === 0n) return null;

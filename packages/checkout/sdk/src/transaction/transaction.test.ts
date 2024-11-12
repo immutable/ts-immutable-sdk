@@ -1,10 +1,8 @@
-import { BrowserProvider } from 'ethers';
-import { ethers } from 'ethers';
+import { BrowserProvider, ErrorCode } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { sendTransaction } from './transaction';
 import { ChainId, NetworkInfo } from '../types';
 import { IMMUTABLE_ZKVEM_GAS_OVERRIDES } from '../env';
-import { ErrorCode } from 'ethers';
 
 describe('transaction', () => {
   beforeEach(() => {
@@ -83,7 +81,7 @@ describe('transaction', () => {
       getSigner: jest.fn().mockReturnValue({
         sendTransaction: () => {
           const err: any = new Error('insufficient funds');
-          err.code = 'INSUFFICIENT_FUNDS' satisfies ErrorCode
+          err.code = 'INSUFFICIENT_FUNDS' satisfies ErrorCode;
           throw err;
         },
       }),
@@ -116,7 +114,7 @@ describe('transaction', () => {
       getSigner: jest.fn().mockReturnValue({
         sendTransaction: () => {
           const err: any = new Error('user rejected request');
-          err.code = 'ACTION_REJECTED' satisfies ErrorCode
+          err.code = 'ACTION_REJECTED' satisfies ErrorCode;
           throw err;
         },
       }),

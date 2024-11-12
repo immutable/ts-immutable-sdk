@@ -1,9 +1,9 @@
+import { BrowserProvider } from 'ethers';
 import {
   GasTokenType, ItemType, TransactionOrGasType,
 } from '../../types';
 import { estimateGas, gasCalculator, getGasItemRequirement } from './gasCalculator';
 import { CheckoutErrorType } from '../..';
-import { BrowserProvider } from 'ethers';
 
 describe('gasCalculator', () => {
   describe('gasCalculator', () => {

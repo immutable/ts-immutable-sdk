@@ -1,8 +1,8 @@
+import { BrowserProvider, ErrorCode, TransactionRequest } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { ChainId, SendTransactionResult } from '../types';
 import { IMMUTABLE_ZKVEM_GAS_OVERRIDES } from '../env';
 import { isZkEvmChainId } from '../utils/utils';
-import { BrowserProvider, ErrorCode, TransactionRequest } from 'ethers';
 
 export function isPassportProvider(provider?: BrowserProvider | null) {
   return (provider?.provider as any)?.isPassport === true;

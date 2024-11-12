@@ -32,7 +32,7 @@ export const filterAllowedTransactions = async (
     const currentAmount = BigInt(allowance);
     const desiredAmount = approveTxn.params.amount ? BigInt(approveTxn.params.amount) : BigInt(0);
 
-    const isAllowed = currentAmount >= BigInt('0') && currentAmount >=(desiredAmount);
+    const isAllowed = currentAmount >= BigInt('0') && currentAmount >= (desiredAmount);
 
     if (isAllowed) {
       return transactions.filter((txn) => txn.methodCall !== approveTxn.methodCall);

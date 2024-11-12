@@ -1,4 +1,5 @@
 import { Environment } from '@imtbl/config';
+import { BrowserProvider } from 'ethers';
 import {
   BridgeClaimWithdrawalFailed,
   BridgeClaimWithdrawalSuccess,
@@ -66,7 +67,6 @@ import {
   AddTokensWidgetConfiguration,
 } from './configurations';
 import { WidgetTheme } from './configurations/theme';
-import { BrowserProvider } from 'ethers';
 
 /**
  * Enum representing the list of widget types.

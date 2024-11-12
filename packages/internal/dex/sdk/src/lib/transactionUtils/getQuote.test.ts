@@ -1,5 +1,6 @@
 import { TradeType } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
+import { formatEther, parseEther } from 'ethers';
 import { Fees } from '../fees';
 import {
   newAmountFromString,
@@ -14,7 +15,6 @@ import {
 import { QuoteResult } from '../getQuotesForRoutes';
 import { erc20ToUniswapToken } from '../utils';
 import { applySlippage, getOurQuoteReqAmount, prepareUserQuote } from './getQuote';
-import { formatEther, parseEther } from 'ethers';
 
 const DEFAULT_SLIPPAGE = 0.1;
 const wimx = erc20ToUniswapToken(WIMX_TEST_TOKEN);

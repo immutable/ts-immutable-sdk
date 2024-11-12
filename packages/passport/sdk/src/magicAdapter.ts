@@ -2,11 +2,11 @@ import { SDKBase, InstanceWithExtensions } from '@magic-sdk/provider';
 import { Magic } from 'magic-sdk';
 import { OpenIdExtension } from '@magic-ext/oidc';
 import { Flow, trackDuration } from '@imtbl/metrics';
+import { Eip1193Provider } from 'ethers';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import { PassportConfiguration } from './config';
 import { lazyDocumentReady } from './utils/lazyLoad';
 import { withMetricsAsync } from './utils/metrics';
-import { Eip1193Provider } from 'ethers';
 
 type MagicClient = InstanceWithExtensions<SDKBase, [OpenIdExtension]>;
 

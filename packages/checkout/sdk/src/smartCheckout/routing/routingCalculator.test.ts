@@ -1,4 +1,5 @@
 import { Environment } from '@imtbl/config';
+import { formatUnits, JsonRpcProvider } from 'ethers';
 import {
   getBridgeAndSwapFundingSteps,
   getSwapFundingSteps,
@@ -30,7 +31,6 @@ import { bridgeAndSwapRoute } from './bridgeAndSwap/bridgeAndSwapRoute';
 import { RoutingTokensAllowList } from '../allowList/types';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './indexer/fetchL1Representation';
 import { HttpClient } from '../../api/http';
-import { formatUnits, JsonRpcProvider } from 'ethers';
 
 jest.mock('./tokenBalances');
 jest.mock('./bridge/bridgeRoute');

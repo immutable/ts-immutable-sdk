@@ -1,11 +1,10 @@
 import {
+  Contract, Wallet, JsonRpcProvider, ErrorCode, CallExceptionError,
+} from 'ethers';
+import { TypedDataPayload } from './types';
+import {
   getNonce, signMetaTransactions, signAndPackTypedData, packSignatures,
 } from './walletHelpers';
-import { TypedDataPayload } from './types';
-import { Contract, isCallException, Wallet } from 'ethers';
-import { JsonRpcProvider } from 'ethers';
-import { ErrorCode } from 'ethers';
-import { CallExceptionError } from 'ethers';
 
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
@@ -135,7 +134,7 @@ describe('getNonce', () => {
   describe('when an error is thrown', () => {
     describe('and the error is a call_exception', () => {
       it('should return 0', async () => {
-        const error = { code: 'CALL_EXCEPTION' } as CallExceptionError
+        const error = { code: 'CALL_EXCEPTION' } as CallExceptionError;
 
         nonceMock.mockRejectedValue(error);
 
@@ -148,7 +147,7 @@ describe('getNonce', () => {
     describe('and the error is NOT a call_exception', () => {
       it('should throw the error', async () => {
         const error = new Error('call revert exception');
-        Object.defineProperty(error, 'code', { value: "NETWORK_ERROR" satisfies ErrorCode });
+        Object.defineProperty(error, 'code', { value: 'NETWORK_ERROR' satisfies ErrorCode });
         nonceMock.mockRejectedValue(error);
 
         await expect(() => getNonce(rpcProvider, walletAddress)).rejects.toThrow(error);

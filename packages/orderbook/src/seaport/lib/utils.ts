@@ -1,4 +1,6 @@
-import { BytesLike, concat, keccak256, toBeHex } from "ethers";
+import {
+  BytesLike, concat, keccak256, toBeHex,
+} from 'ethers';
 
 export const makeArray = <T>(len: number, getValue: (i: number) => T) => Array(len)
   .fill(0)

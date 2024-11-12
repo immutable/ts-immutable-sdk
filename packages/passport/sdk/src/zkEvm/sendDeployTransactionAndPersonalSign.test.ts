@@ -1,12 +1,11 @@
 import { Flow } from '@imtbl/metrics';
+import { Signer, JsonRpcProvider } from 'ethers';
 import { sendDeployTransactionAndPersonalSign } from './sendDeployTransactionAndPersonalSign';
 import { mockUserZkEvm } from '../test/mocks';
 import { RelayerClient } from './relayerClient';
 import GuardianClient from '../guardian';
 import * as transactionHelpers from './transactionHelpers';
 import * as personalSign from './personalSign';
-import { Signer } from 'ethers';
-import { JsonRpcProvider } from 'ethers';
 
 jest.mock('./transactionHelpers');
 jest.mock('./personalSign');

@@ -1,8 +1,8 @@
+import { BrowserProvider, Contract, TransactionRequest } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { ItemRequirement, ItemType } from '../../types';
 import { Allowance, InsufficientERC721 } from './types';
 import { ERC721ABI } from '../../env';
-import { BrowserProvider, Contract, TransactionRequest } from 'ethers';
 
 // Returns true if the spender address is approved for all ERC721s of this collection
 export const getERC721ApprovedForAll = async (

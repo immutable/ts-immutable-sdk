@@ -1,6 +1,6 @@
 import { FeeAmount } from '@uniswap/v3-sdk';
-import { ERC20Pair } from './generateERC20Pairs';
 import { AbiCoder, getCreate2Address, keccak256 } from 'ethers';
+import { ERC20Pair } from './generateERC20Pairs';
 
 // Hard-coded into factory contract
 const POOL_INIT_CODE_HASH = '0xe34f199b19b2b4f47f68442619d555527d244f78a3297ea89325f843f87b8b54';
@@ -22,10 +22,10 @@ export function computePoolAddress({
   return getCreate2Address(
     factoryAddress,
     keccak256(
-        AbiCoder.defaultAbiCoder().encode(
-          ['address', 'address', 'uint24'],
-          [erc20Pair[0].address, erc20Pair[1].address, fee],
-        ),
+      AbiCoder.defaultAbiCoder().encode(
+        ['address', 'address', 'uint24'],
+        [erc20Pair[0].address, erc20Pair[1].address, fee],
+      ),
     ),
     initCodeHashManualOverride ?? POOL_INIT_CODE_HASH,
   );

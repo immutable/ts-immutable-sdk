@@ -1,9 +1,9 @@
+import { BrowserProvider, TransactionReceipt, TransactionRequest } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import {
   SignTransactionResult, SignTransactionStatusType, SignedMessage, UnsignedMessage,
 } from './types';
 import { sendTransaction } from '../../transaction';
-import { BrowserProvider, TransactionReceipt, TransactionRequest } from 'ethers';
 
 export const signApprovalTransactions = async (
   provider: BrowserProvider,

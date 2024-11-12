@@ -112,7 +112,7 @@ describe('network functions', () => {
         getNetwork: async () => ethNetworkInfo,
         network: { chainId: ethNetworkInfo.chainId },
       });
-      
+
       const { provider } = await createProvider(WalletProviderName.METAMASK);
 
       const switchNetworkResult = await switchWalletNetwork(

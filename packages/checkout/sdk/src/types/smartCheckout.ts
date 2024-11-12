@@ -1,7 +1,6 @@
+import { TransactionRequest, TransactionResponse, BrowserProvider } from 'ethers';
 import { TokenInfo } from './tokenInfo';
 import { OrderFee } from './fees';
-import { TransactionRequest, TransactionResponse } from 'ethers';
-import { BrowserProvider } from 'ethers';
 
 /*
  * Type representing the result of the buy
