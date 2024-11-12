@@ -43,6 +43,8 @@ import { MetadataRefreshRateLimitResult } from '../models';
 import { RefreshMetadataByIDRequest } from '../models';
 // @ts-ignore
 import { RefreshNFTMetadataByTokenIDRequest } from '../models';
+// @ts-ignore
+import { StackBundle } from '../models';
 /**
  * MetadataApi - axios parameter creator
  * @export
@@ -184,6 +186,47 @@ export const MetadataApiAxiosParamCreator = function (configuration?: Configurat
 
             if (pageSize !== undefined) {
                 localVarQueryParameter['page_size'] = pageSize;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * List NFT stack bundles by stack_id. This endpoint functions similarly to `ListMetadataByID` but extends the response to include Market, Listings & Stack Count information for each stack.
+         * @summary List NFT stack bundles by stack_id. Response will include Market, Listings & Stack Count information for each stack
+         * @param {string} chainName The name of chain
+         * @param {Array<string>} stackId List of stack_id to filter by
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listStacks: async (chainName: string, stackId: Array<string>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'chainName' is not null or undefined
+            assertParamExists('listStacks', 'chainName', chainName)
+            // verify required parameter 'stackId' is not null or undefined
+            assertParamExists('listStacks', 'stackId', stackId)
+            const localVarPath = `/v1/chains/{chain_name}/stacks`
+                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (stackId) {
+                localVarQueryParameter['stack_id'] = stackId;
             }
 
 
@@ -344,6 +387,18 @@ export const MetadataApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * List NFT stack bundles by stack_id. This endpoint functions similarly to `ListMetadataByID` but extends the response to include Market, Listings & Stack Count information for each stack.
+         * @summary List NFT stack bundles by stack_id. Response will include Market, Listings & Stack Count information for each stack
+         * @param {string} chainName The name of chain
+         * @param {Array<string>} stackId List of stack_id to filter by
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listStacks(chainName: string, stackId: Array<string>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<StackBundle>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listStacks(chainName, stackId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Refresh stacked metadata
          * @summary Refresh stacked metadata
          * @param {string} chainName The name of chain
@@ -408,6 +463,16 @@ export const MetadataApiFactory = function (configuration?: Configuration, baseP
          */
         listMetadataForChain(requestParameters: MetadataApiListMetadataForChainRequest, options?: AxiosRequestConfig): AxiosPromise<ListMetadataResult> {
             return localVarFp.listMetadataForChain(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * List NFT stack bundles by stack_id. This endpoint functions similarly to `ListMetadataByID` but extends the response to include Market, Listings & Stack Count information for each stack.
+         * @summary List NFT stack bundles by stack_id. Response will include Market, Listings & Stack Count information for each stack
+         * @param {MetadataApiListStacksRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listStacks(requestParameters: MetadataApiListStacksRequest, options?: AxiosRequestConfig): AxiosPromise<Array<StackBundle>> {
+            return localVarFp.listStacks(requestParameters.chainName, requestParameters.stackId, options).then((request) => request(axios, basePath));
         },
         /**
          * Refresh stacked metadata
@@ -538,6 +603,27 @@ export interface MetadataApiListMetadataForChainRequest {
 }
 
 /**
+ * Request parameters for listStacks operation in MetadataApi.
+ * @export
+ * @interface MetadataApiListStacksRequest
+ */
+export interface MetadataApiListStacksRequest {
+    /**
+     * The name of chain
+     * @type {string}
+     * @memberof MetadataApiListStacks
+     */
+    readonly chainName: string
+
+    /**
+     * List of stack_id to filter by
+     * @type {Array<string>}
+     * @memberof MetadataApiListStacks
+     */
+    readonly stackId: Array<string>
+}
+
+/**
  * Request parameters for refreshMetadataByID operation in MetadataApi.
  * @export
  * @interface MetadataApiRefreshMetadataByIDRequest
@@ -634,6 +720,18 @@ export class MetadataApi extends BaseAPI {
      */
     public listMetadataForChain(requestParameters: MetadataApiListMetadataForChainRequest, options?: AxiosRequestConfig) {
         return MetadataApiFp(this.configuration).listMetadataForChain(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * List NFT stack bundles by stack_id. This endpoint functions similarly to `ListMetadataByID` but extends the response to include Market, Listings & Stack Count information for each stack.
+     * @summary List NFT stack bundles by stack_id. Response will include Market, Listings & Stack Count information for each stack
+     * @param {MetadataApiListStacksRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MetadataApi
+     */
+    public listStacks(requestParameters: MetadataApiListStacksRequest, options?: AxiosRequestConfig) {
+        return MetadataApiFp(this.configuration).listStacks(requestParameters.chainName, requestParameters.stackId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

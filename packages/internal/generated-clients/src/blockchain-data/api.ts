@@ -19,7 +19,9 @@ export * from './domain/chains-api';
 export * from './domain/collections-api';
 export * from './domain/crafting-api';
 export * from './domain/metadata-api';
+export * from './domain/metadata-search-api';
 export * from './domain/nft-owners-api';
 export * from './domain/nfts-api';
+export * from './domain/pricing-api';
 export * from './domain/tokens-api';
 

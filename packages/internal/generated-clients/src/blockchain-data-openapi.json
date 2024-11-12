@@ -2222,6 +2222,616 @@
           }
         }
       }
+    },
+    "/v1/chains/{chain_name}/search/filters/{contract_address}": {
+      "get": {
+        "tags": [
+          "metadata-search"
+        ],
+        "operationId": "ListFilters",
+        "summary": "Get list of metadata attribute filters",
+        "description": "Get list of metadata filters",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "in": "path",
+            "required": true,
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "contract_address",
+            "in": "path",
+            "required": true,
+            "description": "Contract addresses for collection",
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[a-fA-F0-9]{40}$",
+              "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListFiltersResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/search/nfts": {
+      "get": {
+        "tags": [
+          "metadata-search"
+        ],
+        "operationId": "SearchNFTs",
+        "summary": "Search NFTs",
+        "description": "Search NFTs",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "in": "path",
+            "required": true,
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "contract_address",
+            "in": "query",
+            "required": true,
+            "description": "List of contract addresses to filter by",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^0x[a-fA-F0-9]{40}$",
+                "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+              },
+              "maxItems": 20,
+              "minItems": 1
+            }
+          },
+          {
+            "name": "account_address",
+            "in": "query",
+            "required": false,
+            "description": "Account address to filter by",
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[a-fA-F0-9]{40}$",
+              "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+            }
+          },
+          {
+            "name": "stack_id",
+            "in": "query",
+            "required": false,
+            "description": "Filters NFTs that belong to any of these stacks",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid",
+                "example": "7053e765-c119-4efb-b5cf-405ccccaf6c4"
+              },
+              "minItems": 1,
+              "maxItems": 20
+            }
+          },
+          {
+            "name": "only_include_owner_listings",
+            "in": "query",
+            "required": false,
+            "description": "Whether the listings should include only the owner created listings",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "description": "Number of results to return per page",
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchNFTsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/search/stacks": {
+      "get": {
+        "tags": [
+          "metadata-search"
+        ],
+        "operationId": "SearchStacks",
+        "summary": "Search NFT stacks",
+        "description": "Search NFT stacks",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "in": "path",
+            "required": true,
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "contract_address",
+            "in": "query",
+            "required": true,
+            "description": "List of contract addresses to filter by",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^0x[a-fA-F0-9]{40}$",
+                "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+              },
+              "maxItems": 20,
+              "minItems": 1
+            }
+          },
+          {
+            "name": "account_address",
+            "in": "query",
+            "required": false,
+            "description": "Account address to filter by",
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[a-fA-F0-9]{40}$",
+              "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+            }
+          },
+          {
+            "name": "only_include_owner_listings",
+            "in": "query",
+            "required": false,
+            "description": "Whether to the listings should include only the owner created listings",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          },
+          {
+            "name": "only_if_has_active_listings",
+            "in": "query",
+            "required": false,
+            "description": "Filters results to include only stacks that have a current active listing. False and 'null' return all unfiltered stacks.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          },
+          {
+            "name": "traits",
+            "in": "query",
+            "required": false,
+            "description": "JSON encoded traits to filter by. e.g. encodeURIComponent(JSON.stringify({\"rarity\": {\"values\": [\"common\", \"rare\"], \"condition\": \"eq\"}}))",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "required": false,
+            "description": "Keyword to search NFT name and description. Alphanumeric characters only.",
+            "schema": {
+              "type": "string",
+              "example": "sword"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "description": "Sort results in a specific order",
+            "schema": {
+              "type": "string",
+              "nullable": false,
+              "enum": [
+                "cheapest_first"
+              ]
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "description": "Number of results to return per page",
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchStacksResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/stacks": {
+      "get": {
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "ListStacks",
+        "summary": "List NFT stack bundles by stack_id. Response will include Market, Listings & Stack Count information for each stack",
+        "description": "List NFT stack bundles by stack_id. This endpoint functions similarly to `ListMetadataByID` but extends the response to include Market, Listings & Stack Count information for each stack.",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "in": "path",
+            "required": true,
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "stack_id",
+            "in": "query",
+            "required": true,
+            "description": "List of stack_id to filter by",
+            "schema": {
+              "type": "array",
+              "items": {
+                "format": "uuid",
+                "type": "string",
+                "example": "7053e765-c119-4efb-b5cf-405ccccaf6c4"
+              },
+              "maxItems": 20,
+              "minItems": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "description": "List of stack bundles",
+                  "items": {
+                    "$ref": "#/components/schemas/StackBundle"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/quotes/{contract_address}/stacks": {
+      "get": {
+        "tags": [
+          "pricing"
+        ],
+        "operationId": "QuotesForStacks",
+        "summary": "Get pricing data for a list of stack ids",
+        "description": "Get pricing data for a list of stack ids",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "in": "path",
+            "required": true,
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "contract_address",
+            "in": "path",
+            "required": true,
+            "description": "Contract address for collection that these stacks are on",
+            "schema": {
+              "pattern": "^0x[a-fA-F0-9]{40}$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "stack_id",
+            "in": "query",
+            "required": true,
+            "description": "List of stack ids to get pricing data for",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid",
+                "example": "7053e765-c119-4efb-b5cf-405ccccaf6c4"
+              },
+              "minItems": 1,
+              "maxItems": 20
+            }
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuotesForStacksResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/quotes/{contract_address}/nfts": {
+      "get": {
+        "tags": [
+          "pricing"
+        ],
+        "operationId": "QuotesForNFTs",
+        "summary": "Get pricing data for a list of token ids",
+        "description": "pricing data for a list of token ids",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "in": "path",
+            "required": true,
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "contract_address",
+            "in": "path",
+            "required": true,
+            "description": "Contract address for collection that these token ids are on",
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "name": "token_id",
+            "in": "query",
+            "required": true,
+            "description": "List of token ids to get pricing data for",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "example": "1337"
+              },
+              "minItems": 1,
+              "maxItems": 20
+            }
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuotesForNFTsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2315,6 +2925,21 @@
           }
         }
       },
+      "TooManyRequests": {
+        "description": "Too Many Requests (429)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/APIError429"
+            }
+          }
+        },
+        "headers": {
+          "Retry-After": {
+            "$ref": "#/components/headers/RetryAfter"
+          }
+        }
+      },
       "TooManyMetadataRefreshes": {
         "description": "Too Many Metadata refreshes (429)",
         "content": {
@@ -2398,6 +3023,12 @@
       },
       "MetadataRefreshRetryAfter": {
         "description": "The number of seconds until the next refresh request can be made.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "RetryAfter": {
+        "description": "The number of seconds until the next request can be made.",
         "schema": {
           "type": "string"
         }
@@ -4616,6 +5247,796 @@
               "details"
             ]
           }
+        ]
+      },
+      "FilterValue": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          },
+          "nft_count": {
+            "type": "string",
+            "description": "Number of NFTs that have this trait. Uint256 as string"
+          }
+        },
+        "example": [
+          {
+            "value": "Common",
+            "nft_count": "42"
+          },
+          {
+            "value": "Rare",
+            "nft_count": "17"
+          }
+        ],
+        "required": [
+          "value",
+          "nft_count"
+        ]
+      },
+      "Filter": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of trait",
+            "example": "Rarity"
+          },
+          "values": {
+            "description": "List of 100 most common values for this trait sorted by number of associated NFTs",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterValue"
+            }
+          },
+          "omitted_values_count": {
+            "type": "integer",
+            "description": "Indicated how many more distinct values exist",
+            "example": 0
+          }
+        },
+        "required": [
+          "name",
+          "values",
+          "omitted_values_count"
+        ]
+      },
+      "FilterResult": {
+        "type": "object",
+        "properties": {
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "ETH Address of collection that the asset belongs to",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          "filters": {
+            "description": "List of all filters and the most common values",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Filter"
+            }
+          }
+        },
+        "required": [
+          "chain",
+          "contract_address",
+          "filters"
+        ]
+      },
+      "ListFiltersResult": {
+        "type": "object",
+        "description": "List filters result",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/FilterResult"
+          },
+          "page": {
+            "$ref": "#/components/schemas/Page"
+          }
+        },
+        "required": [
+          "result",
+          "page"
+        ]
+      },
+      "MarketplaceContractType": {
+        "description": "The contract type for a collection",
+        "type": "string",
+        "enum": [
+          "ERC721",
+          "ERC1155"
+        ]
+      },
+      "NFTWithStack": {
+        "type": "object",
+        "description": "Stack",
+        "properties": {
+          "token_id": {
+            "description": "Token id of NFT (uint256 as string)",
+            "type": "string"
+          },
+          "stack_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Stack ID"
+          },
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "Contract address"
+          },
+          "contract_type": {
+            "$ref": "#/components/schemas/MarketplaceContractType"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2022-08-16T17:43:26.991388Z",
+            "description": "When the metadata was created"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the metadata was last updated",
+            "example": "2022-08-16T17:43:26.991388Z"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "example": "Sword",
+            "description": "The name of the NFT"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "example": "2022-08-16T17:43:26.991388Z",
+            "description": "The description of the NFT"
+          },
+          "image": {
+            "type": "string",
+            "nullable": true,
+            "description": "The image url of the NFT",
+            "example": "https://some-url"
+          },
+          "external_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "The external website link of NFT",
+            "example": "https://some-url"
+          },
+          "animation_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "The animation url of the NFT",
+            "example": "https://some-url"
+          },
+          "youtube_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "The youtube URL of NFT",
+            "example": "https://some-url"
+          },
+          "attributes": {
+            "type": "array",
+            "description": "List of Metadata attributes",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/NFTMetadataAttribute"
+            }
+          },
+          "balance": {
+            "type": "integer",
+            "description": "Balance of NFT",
+            "minimum": 1,
+            "nullable": true
+          }
+        },
+        "required": [
+          "token_id",
+          "stack_id",
+          "chain",
+          "contract_address",
+          "contract_type",
+          "updated_at",
+          "created_at",
+          "name",
+          "description",
+          "image",
+          "external_url",
+          "animation_url",
+          "youtube_url",
+          "attributes",
+          "balance"
+        ]
+      },
+      "MarketPriceNativeToken": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Token type user is offering, which in this case is the native IMX token",
+            "example": "NATIVE",
+            "enum": [
+              "NATIVE"
+            ]
+          },
+          "symbol": {
+            "nullable": true,
+            "type": "string",
+            "description": "The symbol of token",
+            "example": "IMX"
+          }
+        },
+        "required": [
+          "type",
+          "symbol"
+        ]
+      },
+      "MarketPriceERC20Token": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Token type user is offering, which in this case is ERC20",
+            "example": "ERC20",
+            "enum": [
+              "ERC20"
+            ]
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "Address of ERC20 token",
+            "example": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "symbol": {
+            "nullable": true,
+            "type": "string",
+            "description": "The symbol of token",
+            "example": "ETH"
+          },
+          "decimals": {
+            "nullable": true,
+            "type": "integer",
+            "description": "The decimals of token",
+            "example": 18
+          }
+        },
+        "required": [
+          "type",
+          "contract_address",
+          "symbol",
+          "decimals"
+        ]
+      },
+      "PaymentAmount": {
+        "type": "string",
+        "description": "The token amount value. This value is provided in the smallest unit of the token (e.g. wei for ETH)",
+        "example": "9750000000000000000",
+        "pattern": "\\d+"
+      },
+      "MarketPriceFees": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string",
+            "description": "Fee in the payment currency",
+            "example": "1000000000000000000"
+          },
+          "type": {
+            "type": "string",
+            "description": "Fee type",
+            "example": "ROYALTY",
+            "enum": [
+              "ROYALTY",
+              "MAKER_ECOSYSTEM",
+              "TAKER_ECOSYSTEM",
+              "PROTOCOL"
+            ]
+          },
+          "recipient_address": {
+            "type": "string",
+            "description": "Wallet address of fee recipient",
+            "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          }
+        },
+        "example": {
+          "amount": "1000000000000000000",
+          "type": "ROYALTY",
+          "recipient_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233"
+        },
+        "required": [
+          "type",
+          "amount",
+          "recipient_address"
+        ]
+      },
+      "ConvertedPrices": {
+        "type": "object",
+        "description": "A mapping of converted prices for major currencies such as ETH, USD. All converted prices are fee-inclusive.",
+        "nullable": true,
+        "additionalProperties": {
+          "type": "string"
+        },
+        "example": {
+          "ETH": "0.0058079775",
+          "USD": "15.89"
+        }
+      },
+      "MarketPriceDetails": {
+        "type": "object",
+        "description": "Market Price details",
+        "properties": {
+          "token": {
+            "description": "Token details",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MarketPriceNativeToken"
+              },
+              {
+                "$ref": "#/components/schemas/MarketPriceERC20Token"
+              }
+            ],
+            "discriminator": {
+              "propertyName": "type",
+              "mapping": {
+                "NATIVE": "#/components/schemas/MarketPriceNativeToken",
+                "ERC20": "#/components/schemas/MarketPriceERC20Token"
+              }
+            }
+          },
+          "amount": {
+            "$ref": "#/components/schemas/PaymentAmount"
+          },
+          "fee_inclusive_amount": {
+            "$ref": "#/components/schemas/PaymentAmount"
+          },
+          "fees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MarketPriceFees"
+            },
+            "example": [
+              {
+                "type": "TAKER_ECOSYSTEM",
+                "recipient_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233",
+                "amount": "1000000000000000000"
+              }
+            ]
+          },
+          "converted_prices": {
+            "$ref": "#/components/schemas/ConvertedPrices"
+          }
+        },
+        "required": [
+          "token",
+          "amount",
+          "fee_inclusive_amount",
+          "fees",
+          "converted_prices"
+        ]
+      },
+      "Listing": {
+        "type": "object",
+        "properties": {
+          "listing_id": {
+            "type": "string",
+            "description": "Global Order identifier",
+            "example": "018792C9-4AD7-8EC4-4038-9E05C598534A"
+          },
+          "price_details": {
+            "$ref": "#/components/schemas/MarketPriceDetails"
+          },
+          "token_id": {
+            "type": "string",
+            "description": "Token ID",
+            "example": "1"
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "ETH Address of collection that the asset belongs to",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          "creator": {
+            "type": "string",
+            "description": "ETH Address of listing creator",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Amount of token included in the listing",
+            "example": "1"
+          }
+        },
+        "required": [
+          "listing_id",
+          "price_details",
+          "creator",
+          "token_id",
+          "contract_address",
+          "amount"
+        ]
+      },
+      "LastTrade": {
+        "type": "object",
+        "nullable": true,
+        "description": "Most recent trade",
+        "properties": {
+          "trade_id": {
+            "type": "string",
+            "description": "Trade ID",
+            "format": "uuid",
+            "example": "4e28df8d-f65c-4c11-ba04-6a9dd47b179b"
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "ETH Address of collection that the asset belongs to",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          "token_id": {
+            "type": "string",
+            "description": "Token id of the traded asset (uint256 as string)",
+            "example": "1"
+          },
+          "price_details": {
+            "type": "array",
+            "description": "Price details, list of payments involved in this trade",
+            "items": {
+              "$ref": "#/components/schemas/MarketPriceDetails"
+            }
+          },
+          "amount": {
+            "type": "string",
+            "description": "Amount of the trade (uint256 as string)",
+            "example": "1"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the trade was created",
+            "example": "2022-08-16T17:43:26.991388Z"
+          }
+        },
+        "required": [
+          "trade_id",
+          "token_id",
+          "contract_address",
+          "price_details",
+          "amount",
+          "created_at"
+        ]
+      },
+      "Market": {
+        "type": "object",
+        "description": "Market data",
+        "properties": {
+          "floor_listing": {
+            "description": "Cheapest active listing",
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Listing"
+              }
+            ]
+          },
+          "last_trade": {
+            "$ref": "#/components/schemas/LastTrade"
+          }
+        },
+        "required": [
+          "floor_listing",
+          "last_trade"
+        ]
+      },
+      "NFTBundle": {
+        "type": "object",
+        "description": "NFT bundle includes NFT with stack, markets and listings",
+        "properties": {
+          "nft_with_stack": {
+            "$ref": "#/components/schemas/NFTWithStack"
+          },
+          "market": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Market"
+              }
+            ]
+          },
+          "listings": {
+            "type": "array",
+            "description": "List of open listings for the stack.",
+            "maxItems": 10,
+            "items": {
+              "$ref": "#/components/schemas/Listing"
+            }
+          }
+        },
+        "required": [
+          "nft_with_stack",
+          "market",
+          "listings"
+        ]
+      },
+      "SearchNFTsResult": {
+        "type": "object",
+        "description": "Search NFTs result",
+        "properties": {
+          "result": {
+            "type": "array",
+            "description": "List of nft bundles",
+            "items": {
+              "$ref": "#/components/schemas/NFTBundle"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/Page"
+          }
+        },
+        "required": [
+          "result",
+          "page"
+        ]
+      },
+      "Stack": {
+        "type": "object",
+        "description": "Stack",
+        "properties": {
+          "stack_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Stack ID"
+          },
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "Contract address"
+          },
+          "contract_type": {
+            "$ref": "#/components/schemas/MarketplaceContractType"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2022-08-16T17:43:26.991388Z",
+            "description": "When the metadata was created"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the metadata was last updated",
+            "example": "2022-08-16T17:43:26.991388Z"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "example": "Sword",
+            "description": "The name of the NFT"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "example": "2022-08-16T17:43:26.991388Z",
+            "description": "The description of the NFT"
+          },
+          "image": {
+            "type": "string",
+            "nullable": true,
+            "description": "The image url of the NFT",
+            "example": "https://some-url"
+          },
+          "external_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "The external website link of NFT",
+            "example": "https://some-url"
+          },
+          "animation_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "The animation url of the NFT",
+            "example": "https://some-url"
+          },
+          "youtube_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "The youtube URL of NFT",
+            "example": "https://some-url"
+          },
+          "attributes": {
+            "type": "array",
+            "description": "List of Metadata attributes",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/NFTMetadataAttribute"
+            }
+          }
+        },
+        "required": [
+          "stack_id",
+          "chain",
+          "contract_address",
+          "contract_type",
+          "updated_at",
+          "created_at",
+          "name",
+          "description",
+          "image",
+          "external_url",
+          "animation_url",
+          "youtube_url",
+          "attributes"
+        ]
+      },
+      "StackBundle": {
+        "type": "object",
+        "description": "Stack bundle includes stacks, markets and listings",
+        "properties": {
+          "stack": {
+            "$ref": "#/components/schemas/Stack"
+          },
+          "stack_count": {
+            "type": "integer",
+            "description": "Total count of NFTs in the stack matching the filter params",
+            "example": 1
+          },
+          "market": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Market"
+              }
+            ]
+          },
+          "listings": {
+            "type": "array",
+            "description": "List of open listings for the stack.",
+            "maxItems": 10,
+            "items": {
+              "$ref": "#/components/schemas/Listing"
+            }
+          }
+        },
+        "required": [
+          "stack",
+          "stack_count",
+          "market",
+          "listings"
+        ]
+      },
+      "SearchStacksResult": {
+        "type": "object",
+        "description": "Search stacks result",
+        "properties": {
+          "result": {
+            "type": "array",
+            "description": "List of stack bundles",
+            "items": {
+              "$ref": "#/components/schemas/StackBundle"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/Page"
+          }
+        },
+        "required": [
+          "result",
+          "page"
+        ]
+      },
+      "StackQuoteResult": {
+        "type": "object",
+        "description": "Stack quote result",
+        "properties": {
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "stack_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "market_stack": {
+            "$ref": "#/components/schemas/Market"
+          },
+          "market_collection": {
+            "$ref": "#/components/schemas/Market"
+          }
+        },
+        "required": [
+          "stack_id",
+          "market_stack",
+          "market_collection",
+          "chain"
+        ]
+      },
+      "QuotesForStacksResult": {
+        "type": "object",
+        "description": "Quotes for stacks result",
+        "properties": {
+          "result": {
+            "type": "array",
+            "description": "List of quotes",
+            "items": {
+              "$ref": "#/components/schemas/StackQuoteResult"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/Page"
+          }
+        },
+        "required": [
+          "result",
+          "page"
+        ]
+      },
+      "MarketNft": {
+        "type": "object",
+        "description": "NFT market data",
+        "properties": {
+          "last_trade": {
+            "$ref": "#/components/schemas/LastTrade"
+          }
+        },
+        "required": [
+          "last_trade"
+        ]
+      },
+      "NFTQuoteResult": {
+        "type": "object",
+        "description": "NFT quote result",
+        "properties": {
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "token_id": {
+            "description": "Token id of NFT (uint256 as string)",
+            "type": "string"
+          },
+          "market_stack": {
+            "$ref": "#/components/schemas/Market"
+          },
+          "market_nft": {
+            "$ref": "#/components/schemas/MarketNft"
+          },
+          "market_collection": {
+            "$ref": "#/components/schemas/Market"
+          }
+        },
+        "required": [
+          "token_id",
+          "market_stack",
+          "market_nft",
+          "market_collection",
+          "chain"
+        ]
+      },
+      "QuotesForNFTsResult": {
+        "type": "object",
+        "description": "Quotes for NFTs result",
+        "properties": {
+          "result": {
+            "type": "array",
+            "description": "List of quotes",
+            "items": {
+              "$ref": "#/components/schemas/NFTQuoteResult"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/Page"
+          }
+        },
+        "required": [
+          "result",
+          "page"
         ]
       }
     }

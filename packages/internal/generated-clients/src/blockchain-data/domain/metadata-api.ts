@@ -36,6 +36,8 @@ import { RefreshMetadataByIDRequest } from '../models';
 // @ts-ignore
 import { RefreshNFTMetadataByTokenIDRequest } from '../models';
 // @ts-ignore
+import { StackBundle } from '../models';
+// @ts-ignore
 export type { APIError400 } from '../models';
 // @ts-ignore
 export type { APIError401 } from '../models';
@@ -57,6 +59,8 @@ export type { MetadataRefreshRateLimitResult } from '../models';
 export type { RefreshMetadataByIDRequest } from '../models';
 // @ts-ignore
 export type { RefreshNFTMetadataByTokenIDRequest } from '../models';
+// @ts-ignore
+export type { StackBundle } from '../models';
 
 /**
  * Request parameters for getMetadata operation in MetadataApi.
@@ -161,6 +165,27 @@ export interface ListMetadataForChainRequestParams {
      * @memberof ListMetadataForChain
      */
     readonly pageSize?: number
+}
+
+/**
+ * Request parameters for listStacks operation in MetadataApi.
+ * @export
+ * @interface ListStacksRequest
+ */
+export interface ListStacksRequestParams {
+    /**
+     * The name of chain
+     * @type {string}
+     * @memberof ListStacks
+     */
+    readonly chainName: string
+
+    /**
+     * List of stack_id to filter by
+     * @type {Array<string>}
+     * @memberof ListStacks
+     */
+    readonly stackId: Array<string>
 }
 
 /**
