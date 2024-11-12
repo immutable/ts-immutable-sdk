@@ -1,5 +1,9 @@
 import {
-  Suspense, useCallback, useEffect, useMemo,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
 } from 'react';
 import {
   CommerceEventType,
@@ -10,7 +14,6 @@ import {
 } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { Web3Provider } from '@ethersproject/providers';
-import { CommerceWidgetContextProvicer } from './context/CommerceContextProvider';
 import {
   useViewState,
   SharedViews,
@@ -38,6 +41,12 @@ import { useWidgetEvents } from './hooks/useWidgetEvents';
 import { getConnectLoaderParams } from './functions/getConnectLoaderParams';
 import { commerceFlows } from './functions/isValidCommerceFlow';
 import { ProvidersContextProvider } from '../../context/providers-context/ProvidersContext';
+import {
+  CommerceActions,
+  CommerceContext,
+  commerceReducer,
+  initialCommerceState,
+} from './context/CommerceContext';
 
 export type CommerceWidgetInputs = {
   checkout: Checkout;
@@ -57,10 +66,23 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
   const [{ view, history }, viewDispatch] = viewState;
   const [{ eventTarget }] = useEventTargetState();
 
-  const connectLoaderParams = useMemo(
-    () => getConnectLoaderParams(view, checkout, web3Provider),
-    [view, checkout, web3Provider],
+  const [commerceState, commerceDispatch] = useReducer(
+    commerceReducer,
+    initialCommerceState,
   );
+  const commerceReducerValues = useMemo(
+    () => ({ commerceState, commerceDispatch }),
+    [commerceState, commerceDispatch],
+  );
+
+  const { provider } = commerceState;
+
+  const connectLoaderParams = useMemo(
+    () => getConnectLoaderParams(view, checkout, provider || web3Provider),
+    [view, checkout, provider, web3Provider],
+  );
+
+  const connectLoaderSuccessEvent = flowParams.flow === CommerceFlowType.ADD_TOKENS ? () => {} : undefined;
 
   const goToPreviousView = useCallback(() => {
     const sharedViews = [
@@ -86,10 +108,34 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
     }
   }, [history]);
 
+  const handleProviderUpdated = useMemo(
+    () => (updatedProvider: Web3Provider) => {
+      commerceDispatch({
+        payload: {
+          type: CommerceActions.SET_PROVIDER,
+          provider: updatedProvider,
+        },
+      });
+    },
+    [commerceDispatch],
+  );
+
   /**
    * Subscribe and Handle widget events
    */
-  useWidgetEvents(eventTarget, viewState);
+  useWidgetEvents(eventTarget, viewState, handleProviderUpdated);
+
+  useEffect(() => {
+    if (!web3Provider) {
+      return;
+    }
+    commerceDispatch({
+      payload: {
+        type: CommerceActions.SET_PROVIDER,
+        provider: web3Provider,
+      },
+    });
+  }, [commerceDispatch, web3Provider]);
 
   /**
    * Mount the view according to set flow in params
@@ -156,7 +202,7 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
 
   return (
     <ViewContextProvider>
-      <CommerceWidgetContextProvicer>
+      <CommerceContext.Provider value={commerceReducerValues}>
         {/* --- Status Views --- */}
         {view.type === SharedViews.LOADING_VIEW && (
           <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
@@ -216,6 +262,7 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
           <ConnectLoader
             widgetConfig={widgetsConfig}
             params={connectLoaderParams}
+            successEvent={connectLoaderSuccessEvent}
             closeEvent={() => {
               sendCheckoutEvent(eventTarget, {
                 type: CommerceEventType.CLOSE,
@@ -271,7 +318,7 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
             </Suspense>
           </ConnectLoader>
         )}
-      </CommerceWidgetContextProvicer>
+      </CommerceContext.Provider>
     </ViewContextProvider>
   );
 }

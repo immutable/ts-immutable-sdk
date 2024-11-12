@@ -139,6 +139,35 @@ function mapAddTokensWidgetEvent(
   const { type } = event.detail;
 
   switch (type) {
+    case AddTokensEventType.SUCCESS:
+      return {
+        type: CommerceEventType.SUCCESS,
+        data: {
+          type: CommerceSuccessEventType.ADD_TOKENS_SUCCESS,
+          data: event.detail.data,
+        },
+      };
+    case AddTokensEventType.CONNECT_SUCCESS:
+      return {
+        type: CommerceEventType.SUCCESS,
+        data: {
+          type: CommerceSuccessEventType.ADD_TOKENS_CONNECT_SUCCESS,
+          data: event.detail.data,
+        },
+      };
+    case AddTokensEventType.FAILURE:
+      return {
+        type: CommerceEventType.FAILURE,
+        data: {
+          type: CommerceFailureEventType.ADD_TOKENS_FAILED,
+          data: event.detail.data,
+        },
+      };
+    case AddTokensEventType.CLOSE_WIDGET:
+      return {
+        type: CommerceEventType.CLOSE,
+        data: {},
+      };
     default:
       throw new Error(`Unknown add tokens event type "${event.detail.type}"`);
   }

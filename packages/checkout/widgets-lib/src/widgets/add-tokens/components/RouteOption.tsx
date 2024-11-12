@@ -10,6 +10,7 @@ import {
   Sticker,
 } from '@biom3/react';
 import { ReactElement, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Chain, RouteData } from '../types';
 import { getDurationFormatted } from '../functions/getDurationFormatted';
 import { getTotalRouteFees } from '../functions/getTotalRouteFees';
@@ -39,6 +40,8 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
   rc = <span />,
   selected = false,
 }: RouteOptionProps<RC>) {
+  const { t } = useTranslation();
+
   const { fromToken } = routeData.amountData;
   const { estimate } = routeData.route.route;
 
@@ -89,11 +92,11 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
         </Sticker>
       )}
 
-      <MenuItem.Caption>{`Balance: USD ${routeBalanceUsd}`}</MenuItem.Caption>
+      <MenuItem.Caption>{`Balance ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${routeBalanceUsd}`}</MenuItem.Caption>
 
       <MenuItem.PriceDisplay price={fromAmount}>
         <MenuItem.PriceDisplay.Caption>
-          {`USD $${fromAmountUsd}`}
+          {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${fromAmountUsd}`}
         </MenuItem.PriceDisplay.Caption>
       </MenuItem.PriceDisplay>
 
@@ -135,7 +138,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
                 sx={{ mr: 'base.spacing.x2' }}
               />
             )}
-            {`Fee ~ USD $${getFormattedAmounts(totalFeesUsd)}`}
+            {`Fee ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${getFormattedAmounts(totalFeesUsd)}`}
           </Body>
         </Stack>
       </MenuItem.BottomSlot>

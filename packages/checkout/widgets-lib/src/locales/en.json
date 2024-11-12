@@ -80,6 +80,10 @@
         "addTokens": "Please add tokens another way"
       }
     },
+    "SERVICE_UNAVAILABLE_SANCTIONS_ERROR_VIEW": {
+      "heading": "This service is not available",
+      "actionText": "Go back"
+    },
     "LOADING_VIEW": {
       "text": "Loading"
     },
@@ -685,6 +689,9 @@
       "geoBlockError": {
         "buyTokenButton": "Buy tokens",
         "bridgeTokenButton": "Bridge tokens"
+      },
+      "fees": {
+        "fiatPricePrefix": "≈ USD"
       }
     }
   },

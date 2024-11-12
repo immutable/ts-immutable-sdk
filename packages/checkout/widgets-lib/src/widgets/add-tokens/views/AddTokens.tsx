@@ -3,11 +3,9 @@ import {
   ButtCon,
   Button,
   FramedIcon,
-  FramedImage,
   HeroFormControl,
   HeroTextInput,
   MenuItem,
-  OverflowDrawerMenu,
   Stack,
 } from '@biom3/react';
 import debounce from 'lodash.debounce';
@@ -22,14 +20,14 @@ import {
 } from '@imtbl/checkout-sdk';
 import {
   type ChangeEvent,
-  useCallback,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
-import { Environment } from '@imtbl/config';
+import { useTranslation } from 'react-i18next';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
@@ -39,9 +37,10 @@ import {
 import { getL2ChainId } from '../../../lib';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { OptionsDrawer } from '../components/OptionsDrawer';
-import { AddTokensActions, AddTokensContext } from '../context/AddTokensContext';
-import { TokenImage } from '../../../components/TokenImage/TokenImage';
-import { getDefaultTokenImage, getTokenImageByAddress, isNativeToken } from '../../../lib/utils';
+import {
+  AddTokensActions,
+  AddTokensContext,
+} from '../context/AddTokensContext';
 import type { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { useRoutes } from '../hooks/useRoutes';
 import { SQUID_NATIVE_TOKEN } from '../utils/config';
@@ -64,9 +63,9 @@ import { validateToAmount } from '../functions/amountValidation';
 import { OnboardingDrawer } from '../components/OnboardingDrawer';
 import { useError } from '../hooks/useError';
 import { SquidFooter } from '../components/SquidFooter';
-import {
-  getFormattedNumberWithDecimalPlaces,
-} from '../functions/getFormattedNumber';
+import { getFormattedNumberWithDecimalPlaces } from '../functions/getFormattedNumber';
+import { TokenDrawerMenu } from '../components/TokenDrawerMenu';
+import { PULSE_SHADOW } from '../utils/animation';
 
 interface AddTokensProps {
   checkout: Checkout;
@@ -93,6 +92,8 @@ export function AddTokens({
   showBackButton,
   onBackButtonClick,
 }: AddTokensProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const { fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
   const { showErrorHandover } = useError(config.environment);
 
@@ -113,18 +114,19 @@ export function AddTokens({
 
   const { viewDispatch } = useContext(ViewContext);
   const { track, page } = useAnalytics();
+  const { t } = useTranslation();
 
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
 
+  const [payWithCardClicked, setPayWithCardClicked] = useState(false);
   const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
   const [showPayWithDrawer, setShowPayWithDrawer] = useState(false);
   const [showDeliverToDrawer, setShowDeliverToDrawer] = useState(false);
   const [onRampAllowedTokens, setOnRampAllowedTokens] = useState<TokenInfo[]>(
     [],
   );
-  const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
   const [inputValue, setInputValue] = useState<string>(
     selectedAmount || toAmount || '',
   );
@@ -157,25 +159,6 @@ export function AddTokens({
     }, 2500),
     [],
   );
-
-  const setSelectedToken = (token: TokenInfo | undefined) => {
-    track({
-      userJourney: UserJourney.ADD_TOKENS,
-      screen: 'InputScreen',
-      control: 'TokensMenu',
-      controlType: 'MenuItem',
-      extras: {
-        tokenAddress: token?.address,
-      },
-    });
-
-    addTokensDispatch({
-      payload: {
-        type: AddTokensActions.SET_SELECTED_TOKEN,
-        selectedToken: token,
-      },
-    });
-  };
 
   const setSelectedRouteData = (route: RouteData | undefined) => {
     if (route) {
@@ -218,6 +201,7 @@ export function AddTokens({
     providersState: {
       fromProviderInfo,
       toProviderInfo,
+      toProvider,
       fromAddress,
       toAddress,
       lockedToProvider,
@@ -314,57 +298,6 @@ export function AddTokens({
   useEffect(() => {
     if (!checkout) return;
 
-    const fetchTokens = async () => {
-      try {
-        const tokenResponse = await checkout.getTokenAllowList({
-          type: TokenFilterTypes.SWAP,
-          chainId: getL2ChainId(checkout.config),
-        });
-
-        if (tokenResponse?.tokens.length > 0) {
-          const updatedTokens = tokenResponse.tokens.map((token) => {
-            if (isNativeToken(token.address)) {
-              return {
-                ...token,
-                icon: getTokenImageByAddress(
-                  checkout.config.environment as Environment,
-                  token.symbol,
-                ),
-              };
-            }
-            return token;
-          });
-
-          setAllowedTokens(updatedTokens);
-
-          if (toTokenAddress) {
-            const token = tokenResponse.tokens.find(
-              (t) => t.address?.toLowerCase() === toTokenAddress.toLowerCase(),
-            );
-
-            if (token) {
-              setSelectedToken(token);
-            }
-          }
-
-          addTokensDispatch({
-            payload: {
-              type: AddTokensActions.SET_ALLOWED_TOKENS,
-              allowedTokens: tokenResponse.tokens,
-            },
-          });
-        }
-      } catch (error) {
-        showErrorHandover(AddTokensErrorTypes.SERVICE_BREAKDOWN, { error });
-      }
-    };
-
-    fetchTokens();
-  }, [checkout, toTokenAddress]);
-
-  useEffect(() => {
-    if (!checkout) return;
-
     const fetchOnRampTokens = async () => {
       try {
         const tokenResponse = await checkout.getTokenAllowList({
@@ -382,16 +315,7 @@ export function AddTokens({
     fetchOnRampTokens();
   }, [checkout]);
 
-  const isSelected = useCallback(
-    (token: TokenInfo) => token.address === selectedToken,
-    [selectedToken],
-  );
-
-  const handleTokenChange = useCallback((token: TokenInfo) => {
-    setSelectedToken(token);
-  }, []);
-
-  const handleCardClick = () => {
+  const sendRequestOnRampEvent = () => {
     track({
       userJourney: UserJourney.ADD_TOKENS,
       screen: 'InputScreen',
@@ -406,6 +330,7 @@ export function AddTokens({
       tokenAddress: selectedToken?.address ?? '',
       amount: selectedAmount ?? '',
       showBackButton: true,
+      provider: toProvider,
     };
     orchestrationEvents.sendRequestOnrampEvent(
       eventTarget,
@@ -414,11 +339,33 @@ export function AddTokens({
     );
   };
 
+  const handleCardClick = () => {
+    setPayWithCardClicked(true);
+    if (!toProvider) {
+      setShowDeliverToDrawer(true);
+      return;
+    }
+    sendRequestOnRampEvent();
+  };
+
+  useEffect(() => {
+    if (toProvider && payWithCardClicked) {
+      sendRequestOnRampEvent();
+    }
+  }, [toProvider]);
+
   const handleRouteClick = (route: RouteData) => {
     setShowOptionsDrawer(false);
     setShowPayWithDrawer(false);
     setShowDeliverToDrawer(false);
     setSelectedRouteData(route);
+  };
+
+  const handleDeliverToClose = (connectedToAddress?: string) => {
+    if (!connectedToAddress) {
+      setPayWithCardClicked(false);
+    }
+    setShowDeliverToDrawer(false);
   };
 
   const handleReviewClick = () => {
@@ -458,48 +405,15 @@ export function AddTokens({
 
   const shouldShowOnRampOption = useMemo(() => {
     if (showOnrampOption && selectedToken) {
-      const token = onRampAllowedTokens.find(
-        (t) => t.address?.toLowerCase() === selectedToken.address?.toLowerCase(),
+      const isAllowedToken = onRampAllowedTokens.find(
+        (token) => token.address?.toLowerCase() === selectedToken.address?.toLowerCase(),
       );
-      return !!token;
+      return !!isAllowedToken;
     }
     return false;
   }, [selectedToken, onRampAllowedTokens, showOnrampOption]);
 
   const showInitialEmptyState = !selectedToken;
-  const defaultTokenImage = getDefaultTokenImage(
-    checkout?.config.environment,
-    config.theme,
-  );
-
-  const tokenChoiceOptions = useMemo(
-    () => allowedTokens.map((token) => (
-      <MenuItem
-        size="medium"
-        key={token.name}
-        onClick={() => handleTokenChange(token)}
-        selected={isSelected(token)}
-        emphasized
-      >
-        <MenuItem.FramedImage
-          circularFrame
-          use={(
-            <TokenImage
-              src={token.icon}
-              name={token.name}
-              defaultImage={defaultTokenImage}
-            />
-            )}
-          emphasized={false}
-        />
-        <MenuItem.Label>{token.symbol}</MenuItem.Label>
-        {token.symbol !== token.name && (
-        <MenuItem.Caption>{token.name}</MenuItem.Caption>
-        )}
-      </MenuItem>
-    )),
-    [allowedTokens, handleTokenChange, isSelected, defaultTokenImage],
-  );
 
   const shouldShowBackButton = showBackButton && onBackButtonClick;
   const routeInputsReady = !!selectedToken
@@ -583,41 +497,11 @@ export function AddTokens({
           justifyContent="center"
           alignItems="center"
         >
-          <OverflowDrawerMenu
-            drawerSize="full"
-            headerBarTitle="Add Token"
-            drawerCloseIcon="ChevronExpand"
-            {...(showInitialEmptyState
-              ? { icon: 'Add', size: 'large', variant: 'tertiary' }
-              : {
-                customTarget: (
-                  <FramedImage
-                    size="xLarge"
-                    use={(
-                      <TokenImage
-                        src={selectedToken?.icon}
-                        name={selectedToken?.name}
-                        defaultImage={defaultTokenImage}
-                      />
-                      )}
-                    padded
-                    emphasized
-                    circularFrame
-                    sx={{
-                      cursor: 'pointer',
-                      mb: 'base.spacing.x1',
-                      // eslint-disable-next-line @typescript-eslint/naming-convention
-                      '&:hover': {
-                        boxShadow: ({ base }) => `0 0 0 ${base.border.size[200]} ${base.color.text.body.primary}`,
-                      },
-                    }}
-                  />
-                ),
-              })}
-          >
-            {tokenChoiceOptions}
-          </OverflowDrawerMenu>
-
+          <TokenDrawerMenu
+            checkout={checkout}
+            config={config}
+            toTokenAddress={toTokenAddress}
+          />
           {showInitialEmptyState ? (
             <Body>Add Token</Body>
           ) : (
@@ -630,6 +514,7 @@ export function AddTokens({
                 {selectedToken.symbol}
               </HeroFormControl.Label>
               <HeroTextInput
+                inputRef={inputRef}
                 testId="add-tokens-amount-input"
                 type="number"
                 value={inputValue}
@@ -639,8 +524,8 @@ export function AddTokens({
               />
 
               <HeroFormControl.Caption>
-                USD $
-                {getFormattedNumberWithDecimalPlaces(selectedAmountUsd)}
+                {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} 
+                $${getFormattedNumberWithDecimalPlaces(selectedAmountUsd)}`}
               </HeroFormControl.Caption>
             </HeroFormControl>
           )}
@@ -659,7 +544,12 @@ export function AddTokens({
         >
           <Stack gap="0px">
             <SelectedWallet
-              label="Pay with"
+              sx={selectedToken
+                && !fromAddress
+                && inputValue
+                ? { animation: `${PULSE_SHADOW} 2s infinite ease-in-out` }
+                : {}}
+              label="Send from"
               providerInfo={{
                 ...fromProviderInfo,
                 address: fromAddress,
@@ -669,21 +559,24 @@ export function AddTokens({
                 setShowPayWithDrawer(true);
               }}
             >
-              <MenuItem.BottomSlot.Divider
-                sx={fromAddress ? { ml: 'base.spacing.x4' } : undefined}
-              />
-              <SelectedRouteOption
-                checkout={checkout}
-                loading={loading}
-                chains={chains}
-                routeData={selectedRouteData}
-                onClick={() => setShowOptionsDrawer(true)}
-                withSelectedToken={!!selectedToken}
-                withSelectedAmount={parseFloat(inputValue) > 0}
-                withSelectedWallet={!!fromAddress}
-                insufficientBalance={insufficientBalance}
-                showOnrampOption={shouldShowOnRampOption}
-              />
+              {selectedToken && fromAddress && inputValue && (
+              <>
+                <MenuItem.BottomSlot.Divider
+                  sx={fromAddress ? { ml: 'base.spacing.x4' } : undefined}
+                />
+                <SelectedRouteOption
+                  checkout={checkout}
+                  loading={loading}
+                  chains={chains}
+                  routeData={selectedRouteData}
+                  onClick={() => setShowOptionsDrawer(true)}
+                  withSelectedWallet={!!fromAddress}
+                  insufficientBalance={insufficientBalance}
+                  showOnrampOption={shouldShowOnRampOption}
+                />
+              </>
+              )}
+
             </SelectedWallet>
             <Stack
               sx={{ pos: 'relative', h: 'base.spacing.x3' }}
@@ -700,6 +593,12 @@ export function AddTokens({
               />
             </Stack>
             <SelectedWallet
+              sx={selectedToken
+                && fromAddress
+                && !toAddress
+                && inputValue
+                ? { animation: `${PULSE_SHADOW} 2s infinite ease-in-out` }
+                : {}}
               label="Deliver to"
               providerInfo={{
                 ...toProviderInfo,
@@ -747,7 +646,7 @@ export function AddTokens({
           <DeliverToWalletDrawer
             visible={showDeliverToDrawer}
             walletOptions={walletOptions}
-            onClose={() => setShowDeliverToDrawer(false)}
+            onClose={handleDeliverToClose}
           />
           <OnboardingDrawer environment={checkout?.config.environment!} />
         </Stack>

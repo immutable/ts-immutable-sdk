@@ -118,6 +118,7 @@ function AddTokensUI() {
     });
     addTokens.addListener(OrchestrationEventType.REQUEST_ONRAMP, (data: any) => {
       console.log("REQUEST_ONRAMP", data);
+      factory.updateProvider(data.provider);
       addTokens.unmount();
       onRamp.addListener(OnRampEventType.CLOSE_WIDGET, (data: any) => {
         console.log("CLOSE_WIDGET", data);

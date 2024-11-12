@@ -38,7 +38,6 @@ import { isL1EthChainId, isZkEvmChainId } from '../../lib/utils';
 import { WalletConnectManager, walletConnectProviderInfo } from '../../lib/walletConnect';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { ErrorView } from '../../views/error/ErrorView';
-import { ServiceType } from '../../views/error/serviceTypes';
 import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 import { LoadingView } from '../../views/loading/LoadingView';
 import {
@@ -60,6 +59,7 @@ import { SwitchNetworkZkEVM } from './views/SwitchNetworkZkEVM';
 export type ConnectWidgetInputs = ConnectWidgetParams & {
   config: StrongCheckoutWidgetsConfig
   deepLink?: ConnectWidgetViews;
+  sendSuccessEventOverride?: () => void;
   sendCloseEventOverride?: () => void;
   allowedChains?: ChainId[];
   checkout: Checkout;
@@ -71,6 +71,7 @@ export type ConnectWidgetInputs = ConnectWidgetParams & {
 
 export default function ConnectWidget({
   config,
+  sendSuccessEventOverride,
   sendCloseEventOverride,
   web3Provider,
   checkout,
@@ -210,6 +211,10 @@ export default function ConnectWidget({
       }
     }
 
+    if (sendSuccessEventOverride) {
+      sendSuccessEventOverride();
+      return;
+    }
     sendConnectSuccessEvent(eventTarget, provider, walletProviderName ?? undefined, walletProviderInfo);
   }, [provider, identify]);
 
@@ -269,8 +274,17 @@ export default function ConnectWidget({
             )}
           {view.type === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
             <ServiceUnavailableErrorView
-              service={ServiceType.GENERIC}
               onCloseClick={sendCloseEvent}
+              onBackButtonClick={() => {
+                viewDispatch({
+                  payload: {
+                    type: ViewActions.UPDATE_VIEW,
+                    view: {
+                      type: ConnectWidgetViews.CONNECT_WALLET,
+                    } as ConnectWidgetView,
+                  },
+                });
+              }}
             />
           )}
         </>

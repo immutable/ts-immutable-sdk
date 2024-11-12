@@ -1,6 +1,7 @@
 import { RouteResponse } from '@0xsquid/squid-types';
 
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FeesBreakdown } from '../../../components/FeesBreakdown/FeesBreakdown';
 import { FormattedFee } from '../../swap/functions/swapFees';
 import {
@@ -23,11 +24,13 @@ export function RouteFees({
   totalAmount,
   totalFiatAmount,
 }: RouteFeesProps) {
+  const { t } = useTranslation();
+
   const feeCosts = useMemo<FormattedFee[]>(
     () => routeData?.route.estimate.feeCosts.map((fee) => ({
       label: fee.name,
       amount: getFormattedNumber(fee.amount, fee.token.decimals),
-      fiatAmount: `USD ≈ ${getFormattedAmounts(fee.amountUsd)}`,
+      fiatAmount: `${t('views.ADD_TOKENS.fees.fiatPricePrefix')} ${getFormattedAmounts(fee.amountUsd)}`,
       token: {
         name: fee.token.name,
         symbol: fee.token.symbol,
@@ -44,7 +47,7 @@ export function RouteFees({
     () => routeData?.route.estimate.gasCosts.map((fee) => ({
       label: 'Gas (transaction)',
       amount: getFormattedNumber(fee.amount, fee.token.decimals),
-      fiatAmount: `USD ≈ ${getFormattedAmounts(fee.amountUsd)}`,
+      fiatAmount: `${t('views.ADD_TOKENS.fees.fiatPricePrefix')} ${getFormattedAmounts(fee.amountUsd)}`,
       token: {
         name: fee.token.name,
         symbol: fee.token.symbol,

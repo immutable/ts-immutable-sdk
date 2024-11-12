@@ -286,5 +286,28 @@ describe('transactionHelpers', () => {
         flow,
       })).rejects.toThrow('Transaction send failed');
     });
+
+    describe('when the nonce is 0', () => {
+      it('prepares and signs transaction correctly', async () => {
+        const result = await prepareAndSignTransaction({
+          transactionRequest: {
+            ...transactionRequest,
+            nonce: 0,
+          },
+          ethSigner,
+          rpcProvider,
+          guardianClient,
+          relayerClient,
+          zkEvmAddress,
+          flow,
+        });
+
+        expect(result).toEqual({
+          signedTransactions,
+          relayerId,
+          nonce,
+        });
+      });
+    });
   });
 });

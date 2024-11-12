@@ -3,7 +3,7 @@ import { SQUID_API_BASE_URL } from '../utils/config';
 
 type SquidChain = {
   chainId: string;
-  chainName: string;
+  networkName: string;
   chainIconURI: string;
   chainType: string;
   nativeCurrency: SquidNativeCurrency;
@@ -35,7 +35,7 @@ export const fetchChains = async (): Promise<Chain[]> => {
 
   return data.chains.map((chain: SquidChain) => ({
     id: chain.chainId.toString(),
-    name: chain.chainName,
+    name: chain.networkName,
     iconUrl: chain.chainIconURI,
     type: chain.chainType,
     nativeCurrency: {

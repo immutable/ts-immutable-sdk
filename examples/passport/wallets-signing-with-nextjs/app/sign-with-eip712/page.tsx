@@ -2,7 +2,13 @@
 
 import { useState } from 'react';
 import { ethers } from 'ethers';
-import { passportInstance } from '../utils';
+import { passport } from '@imtbl/sdk';
+import { passportInstance } from '../utils/passport';
+import { getEtherMailTypedPayload } from '../utils/etherMailTypedPayload'
+import { isValidSignature } from '../utils/isValidSignature'
+import { Button, Heading, Link, Table } from '@biom3/react';
+import NextLink from 'next/link';
+import React from 'react';
 
 export default function ConnectWithEtherJS() {
   // setup the accounts state
@@ -11,15 +17,25 @@ export default function ConnectWithEtherJS() {
   // setup the loading state to enable/disable buttons when loading
   const [loading, setLoadingState] = useState<boolean>(false);
 
-  // setup the signed state to show messages on success or failure
+  const [loggingOut, setLoggingOut] = useState<boolean>(false);
+
+  // setup the signed/verified states to show messages on success or failure
   const [signedStateMessage, setSignedMessageState] = useState<string>('(not signed)');
 
+  const [verifiedStateMessage, setVerifiedStateMessage] = useState<string>('(not verified)');
+
+  // setup necessary states for verifying messages (params - address, payload; signature)
+  const [params, setParams] = useState<any[]>([]);
+
+  const [signature, setSignature] = useState<any>('');
   // #doc passport-wallets-nextjs-sign-eip712-create
+  
   // fetch the Passport provider from the Passport instance
   const passportProvider = passportInstance.connectEvm();
 
   // create the Web3Provider using the Passport provider
   const web3Provider = new ethers.providers.Web3Provider(passportProvider);
+  
   // #enddoc passport-wallets-nextjs-sign-eip712-create
 
   const passportLogin = async () => {
@@ -34,6 +50,7 @@ export default function ConnectWithEtherJS() {
 
       // once logged in Passport is connected to the wallet and ready to transact
       setAccountsState(accounts);
+
       // enable button when loading has finished
       setLoadingState(false);
     }
@@ -42,11 +59,19 @@ export default function ConnectWithEtherJS() {
   const passportLogout = async () => {
     // disable button while loading
     setLoadingState(true);
-    // reset the account state
+
+    // hide table during logout
+    setLoggingOut(true)
+
+    // reset states
     setAccountsState([]);
+    setParams([]);
+    setSignature('');
+    
     // logout from passport
     await passportInstance.logout();
   };
+
 
   // #doc passport-wallets-nextjs-sign-eip712-signmessage
   const signMessage = async () => {
@@ -62,46 +87,25 @@ export default function ConnectWithEtherJS() {
     // set the sender address
     const address = await signer.getAddress();
 
-    // Define our "domain separator" to ensure user signatures are unique across apps/chains
-    const domain = {
-      name: 'Ether Mail',
-      version: '1',
-      chainId,
-      verifyingContract: address,
-    };
+    // get our message payload - including domain, message and types (see utils/etherMailTypedPayload)
+    const etherMailTypedPayload = getEtherMailTypedPayload(chainId, address)
 
-    // setup the types for displaying the message in the signing window
-    const types = {
-      Person: [
-        { name: 'name', type: 'string' },
-        { name: 'wallet', type: 'address' },
-      ],
-      Mail: [
-        { name: 'from', type: 'Person' },
-        { name: 'to', type: 'Person' },
-        { name: 'contents', type: 'string' },
-      ],
-    };
-
-    // setup the message to be signed
-    const message = {
-      from: {
-        name: 'Cow',
-        wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-      },
-      to: {
-        name: 'Bob',
-        wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-      },
-      contents: 'Hello, Bob!',
-    };
+    setParams([
+      address,
+      etherMailTypedPayload
+    ])
 
     try {
       // attempt to sign the message, this brings up the passport popup
-      await signer._signTypedData(domain, types, message);
-
       // if successful update the signed message to successful in the view
+      const signature = await passportProvider.request({
+        method: 'eth_signTypedData_v4',
+        params: [address, etherMailTypedPayload],
+      })
+      
+      setSignature(signature)
       setSignedMessageState('user successfully signed message');
+
     } catch (error: any) {
       // Handle user denying signature
       if (error.code === 4001) {
@@ -110,64 +114,146 @@ export default function ConnectWithEtherJS() {
       } else {
         // if something else went wrong, update the generic error with message in the view
         setSignedMessageState(`something went wrong - ${error.message}`);
+        console.log(error);
       }
     }
   };
   // #enddoc passport-wallets-nextjs-sign-eip712-signmessage
 
+  // #doc passport-wallets-nextjs-sign-eip712-verifysignature
+  
+  const isValidTypedDataSignature = async (
+    address: string, //The Passport wallet address returned from eth_requestAccounts
+    payload: string, //The stringified payload
+    signature: string, //The signature
+    zkEvmProvider: passport.Provider, // can be any provider, Passport or not
+  ) => {
+    const typedPayload: passport.TypedDataPayload = JSON.parse(payload);
+    const types = { ...typedPayload.types };
+    // @ts-ignore
+    // Ethers auto-generates the EIP712Domain type in the TypedDataEncoder, and so it needs to be removed
+    delete types.EIP712Domain;
+  
+    //The hashed string
+    const digest = ethers.utils._TypedDataEncoder.hash(
+      typedPayload.domain,
+      types,
+      typedPayload.message,
+    );
+    return isValidSignature(address, digest, signature, zkEvmProvider);
+  };
+
+  const verifySignature = async () => {
+    setVerifiedStateMessage("Pending Verification");
+
+    try {
+      // validate the signature
+      const isValid = await isValidTypedDataSignature(
+        params[0], // the signer address
+        JSON.stringify(params[1]), // the etherMail payload
+        signature,
+        passportProvider,
+      );
+
+      // set verified message state based on validation value
+      isValid ? setVerifiedStateMessage("Signature verified") : setVerifiedStateMessage("Signature couldn't be verified");
+
+    } catch (error: any) {
+      // if something else went wrong, update the generic error with message in the view
+      setSignedMessageState(`something went wrong - ${error.message}`);
+      console.log(error);
+    }
+  }
+  
+  // #enddoc passport-wallets-nextjs-sign-eip712-verifysignature
+
+
   // render the view to login/logout and show the connected accounts and sign message
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-8">
-      <h1 className="text-3xl font-bold mb-8">Passport Sign EIP-712 Message</h1>
-      {accountsState.length === 0
+      <>
+      <Heading className="mb-1">Passport Sign EIP-712 Message</Heading>
+      {(accountsState.length === 0 && !loggingOut) 
       && (
-      <button
-        className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
+      <Button
+        className="mb-1"
+        size="medium"
         onClick={passportLogin}
         disabled={loading}
       >
         Passport Login
-      </button>
+      </Button>
       )}
       {accountsState.length >= 1 && (
       <>
         <p>
-          <button
-            className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
+          <Button
+            className="mb-1"
+            size="medium"
             onClick={signMessage}
             disabled={loading}
           >
             Sign Message
-          </button>
+          </Button>
+        </p>
+        <p>
+          Message Signed: {signedStateMessage}
         </p>
         <br />
         <p>
-          Message Signed:
-          {signedStateMessage}
+          <Button
+            className="mb-1"
+            size="medium"
+            onClick={verifySignature}
+            disabled={loading || !signature}
+          >
+            Verify Signature
+          </Button>
+        </p>
+        <p>
+          Message Verified: {verifiedStateMessage}
         </p>
         <br />
         <p>
-          <button
-            className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
+          <Button
+            className="mb-1"
             onClick={passportLogout}
             disabled={loading}
           >
             Passport Logout
-          </button>
+          </Button>
         </p>
       </>
       )}
       <br />
-      {loading
-        ? <p>Loading...</p>
-        : (
-          <p>
-            Connected Account:
-            {accountsState.length >= 1 ? accountsState : '(not connected)'}
-          </p>
-        )}
-      <br />
-      <a href="/" className="underline">Return to Examples</a>
-    </div>
+
+      {loggingOut ? (
+        <h1 className="text-3xl font-bold mb-8">Logging Out...</h1>
+      ) : (
+        <>
+          <Table>
+          <Table.Head>
+            <Table.Row>
+              <Table.Cell>Item</Table.Cell>
+              <Table.Cell>Value</Table.Cell>
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>
+            <Table.Row>
+              <Table.Cell><b>Connected Account</b></Table.Cell>
+              <Table.Cell>
+                {accountsState.length === 0 && (
+                  <span>(not&nbsp;connected)</span>
+                )
+                }
+                {accountsState.length > 0 && accountsState[0]}
+              </Table.Cell>
+            </Table.Row>
+          </Table.Body>
+          </Table>
+          <br />
+          <Link rc={<NextLink href="/" />}>Return to Examples</Link>
+        </>
+      )}
+    </>
   );
 }

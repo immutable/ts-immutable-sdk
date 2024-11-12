@@ -10,6 +10,7 @@ import {
 } from 'react';
 
 import { Checkout } from '@imtbl/checkout-sdk';
+import { useTranslation } from 'react-i18next';
 import { Chain, RouteData } from '../types';
 import { getRouteAndTokenBalances } from '../functions/getRouteAndTokenBalances';
 import { getRemoteVideo } from '../../../lib/utils';
@@ -20,8 +21,6 @@ export interface SelectedRouteOptionProps {
   chains: Chain[] | null;
   onClick: MouseEventHandler<HTMLSpanElement>;
   loading?: boolean;
-  withSelectedToken?: boolean;
-  withSelectedAmount?: boolean;
   withSelectedWallet?: boolean;
   insufficientBalance?: boolean;
   showOnrampOption?: boolean;
@@ -62,12 +61,12 @@ export function SelectedRouteOption({
   chains,
   loading = false,
   withSelectedWallet = false,
-  withSelectedToken = false,
-  withSelectedAmount = false,
   insufficientBalance = false,
   showOnrampOption = false,
   onClick,
 }: SelectedRouteOptionProps) {
+  const { t } = useTranslation();
+
   const { fromToken } = routeData?.amountData ?? {};
   const chain = chains?.find((c) => c.id === fromToken?.chainId);
 
@@ -112,19 +111,7 @@ export function SelectedRouteOption({
 
   if ((!routeData && !loading) || insufficientBalance) {
     let icon: AllDualVariantIconKeys = 'Sparkle';
-    let copy = "Add your token, we'll find the best payment";
-
-    if (!withSelectedToken && withSelectedAmount) {
-      copy = "Add your token, we'll find the best payment";
-    }
-
-    if (withSelectedToken && !withSelectedAmount) {
-      copy = "Add your amount, we'll find the best payment";
-    }
-
-    if (!withSelectedWallet && withSelectedToken && withSelectedAmount) {
-      copy = "Select a wallet, we'll find the best payment";
-    }
+    let copy = '';
 
     if (insufficientBalance) {
       icon = 'InformationCircle';
@@ -181,11 +168,13 @@ export function SelectedRouteOption({
       >
         <Stack gap="0px">
           <MenuItem.Label>{fromToken?.name}</MenuItem.Label>
-          <MenuItem.Caption>{`Balance USD $${routeBalanceUsd}`}</MenuItem.Caption>
+          <MenuItem.Caption>
+            {`Balance ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${routeBalanceUsd}`}
+          </MenuItem.Caption>
         </Stack>
         <MenuItem.PriceDisplay price={fromAmount}>
           <MenuItem.PriceDisplay.Caption>
-            {`USD $${fromAmountUsd}`}
+            {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${fromAmountUsd}`}
           </MenuItem.PriceDisplay.Caption>
         </MenuItem.PriceDisplay>
       </Stack>
