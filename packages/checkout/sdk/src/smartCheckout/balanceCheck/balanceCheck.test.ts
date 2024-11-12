@@ -1,4 +1,5 @@
 import { Environment } from '@imtbl/config';
+import { BrowserProvider, Contract } from 'ethers';
 import {
   ItemRequirement,
   ItemType,
@@ -9,7 +10,6 @@ import { getAllBalances } from '../../balances';
 import { BalanceCheckResult } from './types';
 import { DEFAULT_TOKEN_DECIMALS, ZKEVM_NATIVE_TOKEN } from '../../env';
 import { HttpClient } from '../../api/http';
-import { BrowserProvider, Contract } from 'ethers';
 
 jest.mock('../../balances');
 jest.mock('ethers', () => ({

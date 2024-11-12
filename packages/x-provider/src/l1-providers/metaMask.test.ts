@@ -1,7 +1,7 @@
 import detectEthereumProvider from '@metamask/detect-provider';
+import { BrowserProvider } from 'ethers';
 import { connect } from './metaMask';
 import { WALLET_ACTION } from './rpc';
-import { BrowserProvider } from 'ethers';
 
 jest.mock('@metamask/detect-provider');
 

@@ -1,4 +1,4 @@
-import { TypedDataField, zeroPadValue } from "ethers";
+import { TypedDataField, zeroPadValue } from 'ethers';
 
 const baseDefaults: Record<string, any> = {
   integer: 0,

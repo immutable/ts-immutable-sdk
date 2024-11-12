@@ -4,13 +4,13 @@ import {
   TransactionDetails,
   TransactionResponse,
 } from '@imtbl/dex-sdk';
+import { TransactionRequest } from 'ethers';
 import { CheckoutConfiguration } from '../../../config';
 import { ChainId } from '../../../types';
 import { quoteFetcher } from './quoteFetcher';
 import { createExchangeInstance } from '../../../instance';
 import { DexQuote, DexQuotes } from '../types';
 import { HttpClient } from '../../../api/http';
-import { TransactionRequest } from 'ethers';
 
 jest.mock('../../../instance');
 

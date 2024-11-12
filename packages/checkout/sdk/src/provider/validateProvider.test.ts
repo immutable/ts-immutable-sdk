@@ -1,11 +1,10 @@
 import { Environment } from '@imtbl/config';
+import { BrowserProvider, Eip1193Provider } from 'ethers';
 import { isBrowserProvider, validateProvider } from './validateProvider';
 import { ChainId } from '../types';
 import { CheckoutConfiguration } from '../config';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 import { HttpClient } from '../api/http';
-import { BrowserProvider } from 'ethers';
-import { Eip1193Provider } from 'ethers';
 
 jest.mock('../config/remoteConfigFetcher');
 
@@ -78,6 +77,7 @@ describe('provider validation', () => {
       );
     });
 
+    // eslint-disable-next-line max-len
     it('should throw an error if the underlying provider is not on the same network as the BrowserProvider', async () => {
       requestMock.mockResolvedValue('0x1');
       const testBrowserProvider = new BrowserProvider(

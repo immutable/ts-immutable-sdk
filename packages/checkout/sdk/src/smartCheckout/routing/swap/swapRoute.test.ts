@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Environment } from '@imtbl/config';
 import { Fee, Token } from '@imtbl/dex-sdk';
+import { formatUnits } from 'ethers';
 import { CheckoutConfiguration } from '../../../config';
 import { BalanceRequirement, BalanceCheckResult } from '../../balanceCheck/types';
 import {
@@ -25,7 +26,6 @@ import {
 import { quoteFetcher } from './quoteFetcher';
 import { HttpClient } from '../../../api/http';
 import { formatSmartCheckoutAmount } from '../../../utils/utils';
-import { formatUnits } from 'ethers';
 
 jest.mock('../../../config/remoteConfigFetcher');
 jest.mock('./quoteFetcher');

@@ -1,7 +1,7 @@
+import { parseUnits } from 'ethers';
 import { calculateFees } from './fees';
 import { BuyToken, ItemType } from '../../types';
 import { CheckoutErrorType } from '../../errors';
-import { parseUnits } from 'ethers';
 
 jest.mock('../../instance');
 jest.mock('../actions');

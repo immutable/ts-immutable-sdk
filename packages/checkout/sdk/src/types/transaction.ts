@@ -1,4 +1,4 @@
-import { BrowserProvider, TransactionRequest, TransactionResponse } from "ethers";
+import { BrowserProvider, TransactionRequest, TransactionResponse } from 'ethers';
 
 /**
  * Interface representing the parameters for {@link Checkout.sendTransaction}.

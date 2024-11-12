@@ -1,4 +1,5 @@
 import { Environment } from '@imtbl/config';
+import { formatUnits, JsonRpcProvider } from 'ethers';
 import {
   BridgeRequirement,
   bridgeRoute,
@@ -19,7 +20,6 @@ import { allowListCheckForBridge } from '../../allowList/allowListCheck';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../indexer/fetchL1Representation';
 import { DEFAULT_TOKEN_DECIMALS } from '../../../env';
 import { HttpClient } from '../../../api/http';
-import { formatUnits, JsonRpcProvider } from 'ethers';
 
 jest.mock('../../../gasEstimate');
 jest.mock('../../../instance');

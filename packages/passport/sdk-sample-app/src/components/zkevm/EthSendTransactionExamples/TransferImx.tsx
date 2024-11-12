@@ -4,7 +4,7 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps } from '@/types';
-import { utils } from 'ethers';
+import { parseUnits } from 'ethers';
 
 function TransferImx({ disabled, handleExampleSubmitted }: RequestExampleProps) {
   const [fromAddress, setFromAddress] = useState<string>('');
@@ -23,7 +23,7 @@ function TransferImx({ disabled, handleExampleSubmitted }: RequestExampleProps) 
       if (Number(rawAmount) < 0) {
         setAmountConvertError(amountRange);
       }
-      const value = utils.parseUnits(rawAmount, imxTokenDecimal).toString();
+      const value = parseUnits(rawAmount, imxTokenDecimal).toString();
       setParams([{
         from: fromAddress,
         to: toAddress,

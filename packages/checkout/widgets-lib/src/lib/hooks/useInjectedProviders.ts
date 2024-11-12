@@ -29,7 +29,7 @@ declare global {
 }
 
 let passportBrowserProvider: BrowserProvider;
-const processProviders = (
+const processProviders = async (
   checkout: Checkout | null,
   injectedProviders: EIP6963ProviderDetail[],
   priorityWalletRdns: WalletProviderRdns | string[] = [],
@@ -54,8 +54,9 @@ const processProviders = (
     && priorityWalletRdns.includes(WalletProviderRdns.PASSPORT)
     && !filteredProviders.some((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT)) {
     if (!passportBrowserProvider) {
-      passportBrowserProvider = new BrowserProvider(checkout.passport.connectEvm());
+      passportBrowserProvider = new BrowserProvider(await checkout.passport.connectEvm());
     }
+    // eslint-disable-next-line max-len
     filteredProviders.unshift(getPassportProviderDetail(passportBrowserProvider.provider as unknown as EIP1193Provider));
   }
 
@@ -81,7 +82,7 @@ export const useInjectedProviders = ({ checkout }: UseInjectedProvidersParams) =
     const connectConfig = await checkout?.config.remote.getConfig('connect') as ConnectConfig;
     const priorityWalletRdns = connectConfig.injected?.priorityWalletRdns ?? [];
     const blocklistWalletRdns = connectConfig.injected?.blocklistWalletRdns ?? [];
-    const filteredProviders = processProviders(
+    const filteredProviders = await processProviders(
       checkout,
       injectedProviders,
       priorityWalletRdns,

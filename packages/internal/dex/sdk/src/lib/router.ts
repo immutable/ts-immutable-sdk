@@ -1,5 +1,6 @@
 import { Token, TradeType } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
+import { JsonRpcProvider } from 'ethers';
 import { NoRoutesAvailableError } from '../errors';
 import { CoinAmount, ERC20 } from '../types';
 import { erc20ToUniswapToken, poolEquals, uniswapTokenToERC20 } from './utils';
@@ -7,7 +8,6 @@ import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
 import { ERC20Pair } from './poolUtils/generateERC20Pairs';
 import type { Multicall } from '../contracts/types';
-import { JsonRpcProvider } from 'ethers';
 
 export type RoutingContracts = {
   multicall: string;

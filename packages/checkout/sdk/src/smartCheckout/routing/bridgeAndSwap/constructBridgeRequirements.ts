@@ -1,10 +1,10 @@
+import { formatUnits } from 'ethers';
 import { GetBalanceResult, ItemType } from '../../../types';
 import { BridgeRequirement } from '../bridge/bridgeRoute';
 import { DexQuote, DexQuotes } from '../types';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, L1ToL2TokenAddressMapping } from '../indexer/fetchL1Representation';
 import { BalanceCheckResult } from '../../balanceCheck/types';
 import { formatSmartCheckoutAmount, isMatchingAddress } from '../../../utils/utils';
-import { formatUnits } from 'ethers';
 
 // The dex will return all the fees which is in a particular token (currently always IMX)
 // If any of the fees are in the same token that is trying to be swapped (e.g. trying to swap IMX)
@@ -18,13 +18,13 @@ export const getFeesForTokenAddress = (
 
   dexQuote.quote.fees.forEach((fee) => {
     if (isMatchingAddress(fee.amount.token.address, tokenAddress)) {
-      fees = fees + fee.amount.value;
+      fees += fee.amount.value;
     }
   });
 
   if (dexQuote.approval) {
     if (isMatchingAddress(dexQuote.approval.token.address, tokenAddress)) {
-      fees = fees + dexQuote.approval.value;
+      fees += dexQuote.approval.value;
     }
   }
 

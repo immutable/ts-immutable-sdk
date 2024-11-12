@@ -1,7 +1,7 @@
 import { FeeValue } from '@imtbl/orderbook';
+import { parseUnits } from 'ethers';
 import { FeePercentage, FeeToken, OrderFee } from '../../types/fees';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
-import { parseUnits } from 'ethers';
 
 export const MAX_FEE_PERCENTAGE_DECIMAL = 1; // 100%
 export const MAX_FEE_DECIMAL_PLACES = 6; // will allow 0.000001 (0.0001%) as the minimum value
@@ -16,7 +16,7 @@ const calculateFeesPercent = (
   // note: multiply in and out of the maximum decimal places to the power of ten to do the math in big number integers
   const feePercentageMultiplier = Math.round(feePercentage.percentageDecimal * (10 ** MAX_FEE_DECIMAL_PLACES));
 
-  const bnFeeAmount = amountBn * BigInt(feePercentageMultiplier) / BigInt(10 ** MAX_FEE_DECIMAL_PLACES);
+  const bnFeeAmount = (amountBn * BigInt(feePercentageMultiplier)) / BigInt(10 ** MAX_FEE_DECIMAL_PLACES);
 
   // always round down to have a fee amount divisible by the token quantity
   return bnFeeAmount - (bnFeeAmount % tokenQuantity);
@@ -43,7 +43,7 @@ export const calculateFees = (
 
   // note: multiply in and out of the maximum decimal places to the power of ten to do the math in big number integers
   const totalAllowableFees: bigint = (amountBn
-    * BigInt(MAX_FEE_PERCENTAGE_DECIMAL * (10 ** MAX_FEE_DECIMAL_PLACES))) 
+    * BigInt(MAX_FEE_PERCENTAGE_DECIMAL * (10 ** MAX_FEE_DECIMAL_PLACES)))
     / BigInt(10 ** MAX_FEE_DECIMAL_PLACES);
 
   const calculateFeesResult: Array<FeeValue> = [];
@@ -53,10 +53,10 @@ export const calculateFees = (
     if (Object.hasOwn(orderFee.amount, 'percentageDecimal')) {
       currentFeeBn = calculateFeesPercent(orderFee, amountBn, tokenQuantity);
 
-      totalTokenFees = totalTokenFees + currentFeeBn;
+      totalTokenFees += currentFeeBn;
     } else if (Object.hasOwn(orderFee.amount, 'token')) {
       currentFeeBn = calculateFeesToken(orderFee, decimals);
-      totalTokenFees = totalTokenFees + currentFeeBn;
+      totalTokenFees += currentFeeBn;
     } else {
       throw new CheckoutError(
         'Unknown fee type parsed, must be percentageDecimal or token',

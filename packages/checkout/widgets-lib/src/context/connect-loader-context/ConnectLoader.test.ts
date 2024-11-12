@@ -1,6 +1,7 @@
 import { describe, expect } from '@jest/globals';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
+import { BrowserProvider } from 'ethers';
 import {
   ConnectLoaderActions,
   ConnectionStatus,
@@ -10,7 +11,6 @@ import {
   connectLoaderReducer,
   initialConnectLoaderState,
 } from './ConnectLoaderContext';
-import { BrowserProvider } from 'ethers';
 
 describe('connect-loader-context', () => {
   it('should update connection status when reducer called with UPDATE_CONNECTION_STATUS', () => {

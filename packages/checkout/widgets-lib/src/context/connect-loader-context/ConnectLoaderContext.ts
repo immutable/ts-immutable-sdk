@@ -1,7 +1,7 @@
 import { createContext, useReducer } from 'react';
 import { Checkout } from '@imtbl/checkout-sdk';
-import { ConnectWidgetViews } from '../view-context/ConnectViewContextTypes';
 import { BrowserProvider } from 'ethers';
+import { ConnectWidgetViews } from '../view-context/ConnectViewContextTypes';
 
 export enum ConnectionStatus {
   NOT_CONNECTED_NO_PROVIDER = 'NOT_CONNECTED_NO_PROVIDER',

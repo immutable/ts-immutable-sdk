@@ -1,9 +1,9 @@
 import { Amount, Token, TransactionResponse } from '@imtbl/dex-sdk';
 import { TFunction } from 'i18next';
 import { TokenInfo } from '@imtbl/checkout-sdk';
+import { formatUnits } from 'ethers';
 import { CryptoFiatState } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { calculateCryptoToFiat, tokenValueFormat } from '../../../lib/utils';
-import { formatUnits } from 'ethers';
 
 export type FormattedFee = {
   label: string;

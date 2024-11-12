@@ -1,6 +1,6 @@
 import { Environment } from '@imtbl/config';
 import { Exchange, SUPPORTED_CHAIN_IDS_FOR_ENVIRONMENT } from '@imtbl/dex-sdk';
-import { ethers, JsonRpcProvider } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 import { TokenBridge } from '@imtbl/bridge-sdk';
 import { Orderbook } from '@imtbl/orderbook';
 import { ChainId } from '../types';

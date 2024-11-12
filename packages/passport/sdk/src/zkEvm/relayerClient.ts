@@ -1,8 +1,8 @@
+import { BytesLike, JsonRpcProvider } from 'ethers';
 import AuthManager from '../authManager';
 import { PassportConfiguration } from '../config';
 import { FeeOption, RelayerTransaction, TypedDataPayload } from './types';
 import { getEip155ChainId } from './walletHelpers';
-import { JsonRpcProvider, BytesLike } from 'ethers';
 
 export type RelayerClientInput = {
   config: PassportConfiguration,

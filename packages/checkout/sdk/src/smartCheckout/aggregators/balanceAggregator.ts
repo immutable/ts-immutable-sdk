@@ -18,7 +18,7 @@ export const nativeBalanceAggregator = (
 
     const aggregateItem = aggregatedMap.get(type);
     if (aggregateItem && aggregateItem.type === ItemType.NATIVE) {
-      aggregateItem.amount = aggregateItem.amount + amount
+      aggregateItem.amount += amount;
     } else {
       aggregatedMap.set(type, { ...itemRequirement });
     }
@@ -45,7 +45,7 @@ export const erc20BalanceAggregator = (
     const key = `${tokenAddress}`;
     const aggregateItem = aggregatedMap.get(key);
     if (aggregateItem && aggregateItem.type === ItemType.ERC20) {
-      aggregateItem.amount = aggregateItem.amount + amount
+      aggregateItem.amount += amount;
     } else {
       aggregatedMap.set(key, { ...itemRequirement });
     }

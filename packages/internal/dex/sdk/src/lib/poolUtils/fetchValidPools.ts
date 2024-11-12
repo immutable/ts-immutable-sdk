@@ -81,7 +81,7 @@ export const fetchValidPools = async (
     const poolLiquidity = uniswapV3Pool.decodeFunctionResult(
       liquidityFuncString,
       liquidities[index].returnData,
-    ) as unknown as [bigint]
+    ) as unknown as [bigint];
 
     const zeroPrice = poolSlot0.sqrtPriceX96 === BigInt(0);
     const zeroLiquidity: boolean = poolLiquidity[0] === BigInt(0);

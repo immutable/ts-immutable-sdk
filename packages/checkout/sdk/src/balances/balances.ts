@@ -1,4 +1,5 @@
 import { HttpStatusCode } from 'axios';
+import { BrowserProvider, Contract, formatUnits } from 'ethers';
 import {
   ChainId,
   GetAllBalancesResult,
@@ -23,7 +24,6 @@ import {
 } from '../env';
 import { measureAsyncExecution } from '../logger/debugLogger';
 import { isMatchingAddress } from '../utils/utils';
-import { BrowserProvider, Contract, formatUnits } from 'ethers';
 
 export const getBalance = async (
   config: CheckoutConfiguration,
@@ -271,7 +271,7 @@ const getTokenBalances = async (
   // Fails in fetching data from the RCP calls might result in some
   // missing data.
   let address = walletAddress;
-  if (!address) address = await (await web3Provider?.getSigner()).getAddress();
+  if (!address) address = await (await web3Provider.getSigner()).getAddress();
   return await measureAsyncExecution<GetBalancesResult>(
     config,
     `Time to fetch balances using RPC for ${chainId}`,

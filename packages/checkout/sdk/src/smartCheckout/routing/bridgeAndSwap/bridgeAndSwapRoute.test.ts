@@ -1,5 +1,6 @@
 import { Environment } from '@imtbl/config';
 import { Quote } from '@imtbl/dex-sdk';
+import { JsonRpcProvider } from 'ethers';
 import { CheckoutConfiguration } from '../../../config';
 import {
   ChainId,
@@ -20,7 +21,6 @@ import { getDexQuotes } from './getDexQuotes';
 import { constructBridgeRequirements } from './constructBridgeRequirements';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../indexer/fetchL1Representation';
 import { HttpClient } from '../../../api/http';
-import { JsonRpcProvider } from 'ethers';
 
 jest.mock('./fetchL1ToL2Mappings');
 jest.mock('./getDexQuotes');

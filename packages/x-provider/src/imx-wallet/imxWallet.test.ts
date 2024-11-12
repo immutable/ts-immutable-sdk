@@ -2,13 +2,13 @@
  * @jest-environment jsdom
  */
 import { Environment } from '@imtbl/config';
+import { BrowserProvider } from 'ethers';
 import { RequestEventType, ResponseEventType } from './events';
 import { connect, disconnect } from './imxWallet';
 import { postRequestMessage } from './postRequestMessage';
 import { asyncTriggerIFrameOnLoad } from './testUtils';
 import { getOrSetupIFrame } from './imxWalletIFrame';
 import { ImxSigner } from './ImxSigner';
-import { BrowserProvider } from 'ethers';
 
 jest.mock('./postRequestMessage');
 

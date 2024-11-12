@@ -1,5 +1,5 @@
 import 'cross-fetch/polyfill';
-import { RequestHandler, rest } from 'msw';
+import { MockedRequest, RequestHandler, rest } from 'msw';
 import { SetupServer, setupServer } from 'msw/node';
 import { ChainName } from '../../network/chains';
 import { RelayerTransactionRequest } from '../../zkEvm/relayerClient';
@@ -56,7 +56,7 @@ export const mswHandlers = {
             ctx.json({
               id: body.id,
               jsonrpc: '2.0',
-              result: '0x',
+              result: '0x00000000000000000000000000000000000000000000000000000000000000b9',
             }),
           );
         }
@@ -141,7 +141,11 @@ const getMswWorker = (): SetupServer => {
   if (!mswWorker) {
     mswWorker = setupServer();
     mswWorker.listen({
-      onUnhandledRequest: 'error',
+      onUnhandledRequest: (request: MockedRequest, print: { error: () => void }) => {
+        // eslint-disable-next-line no-console
+        console.error('Unexpected request', request.url.href, request.text());
+        print.error();
+      },
     });
   }
   return mswWorker;
@@ -152,7 +156,7 @@ export const resetMswHandlers = () => {
 };
 
 export const useMswHandlers = (handlers: RequestHandler[]) => {
-  getMswWorker().use(...handlers);
+  getMswWorker().use(...mandatoryHandlers, ...handlers);
 };
 
 export const closeMswWorker = () => {
