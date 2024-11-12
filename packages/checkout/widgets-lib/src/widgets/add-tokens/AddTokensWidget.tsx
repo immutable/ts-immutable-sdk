@@ -35,14 +35,13 @@ import { Review } from './views/Review';
 import { fetchBalances } from './functions/fetchBalances';
 import { useTokens } from './hooks/useTokens';
 import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
-import { ServiceUnavailableToRegionErrorView } from '../../views/error/ServiceUnavailableToRegionErrorView';
-import { ServiceType } from '../../views/error/serviceTypes';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { getRemoteImage } from '../../lib/utils';
 import { isValidAddress } from '../../lib/validations/widgetValidators';
 import { amountInputValidation } from '../../lib/validations/amountInputValidations';
 import { useError } from './hooks/useError';
 import { AddTokensErrorTypes } from './types';
+import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 
 export type AddTokensWidgetInputs = Omit<AddTokensWidgetParams, 'toProvider'> & {
   config: StrongCheckoutWidgetsConfig;
@@ -265,9 +264,15 @@ export default function AddTokensWidget({
           )}
           {viewState.view.type
             === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
-            <ServiceUnavailableToRegionErrorView
-              service={ServiceType.GENERIC}
+            <ServiceUnavailableErrorView
               onCloseClick={() => sendAddTokensCloseEvent(eventTarget)}
+              onBackButtonClick={() => {
+                viewDispatch({
+                  payload: {
+                    type: ViewActions.GO_BACK,
+                  },
+                });
+              }}
             />
           )}
         </Stack>

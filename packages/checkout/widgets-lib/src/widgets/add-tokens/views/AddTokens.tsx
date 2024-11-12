@@ -14,6 +14,7 @@ import {
   type Checkout,
   EIP6963ProviderInfo,
   IMTBLWidgetEvents,
+  isAddressSanctioned,
   TokenFilterTypes,
   type TokenInfo,
   WalletProviderRdns,
@@ -31,6 +32,7 @@ import { useTranslation } from 'react-i18next';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
+  SharedViews,
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
@@ -66,6 +68,7 @@ import { SquidFooter } from '../components/SquidFooter';
 import { getFormattedNumberWithDecimalPlaces } from '../functions/getFormattedNumber';
 import { TokenDrawerMenu } from '../components/TokenDrawerMenu';
 import { PULSE_SHADOW } from '../utils/animation';
+import { useRiskAssessment } from '../hooks/useRiskAssessment';
 
 interface AddTokensProps {
   checkout: Checkout;
@@ -132,6 +135,8 @@ export function AddTokens({
   );
   const [fetchingRoutes, setFetchingRoutes] = useState(false);
   const [insufficientBalance, setInsufficientBalance] = useState(false);
+
+  const { riskAssessment } = useRiskAssessment();
 
   const selectedAmountUsd = useMemo(
     () => convertToUsd(tokens, inputValue, selectedToken),
@@ -316,6 +321,20 @@ export function AddTokens({
   }, [checkout]);
 
   const sendRequestOnRampEvent = () => {
+    if (!riskAssessment || isAddressSanctioned(riskAssessment)) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
+            error: new Error('Sanctioned address'),
+          },
+        },
+      });
+
+      return;
+    }
+
     track({
       userJourney: UserJourney.ADD_TOKENS,
       screen: 'InputScreen',
@@ -349,10 +368,10 @@ export function AddTokens({
   };
 
   useEffect(() => {
-    if (toProvider && payWithCardClicked) {
+    if (toProvider && riskAssessment && payWithCardClicked) {
       sendRequestOnRampEvent();
     }
-  }, [toProvider]);
+  }, [toProvider, riskAssessment, payWithCardClicked]);
 
   const handleRouteClick = (route: RouteData) => {
     setShowOptionsDrawer(false);
@@ -370,6 +389,20 @@ export function AddTokens({
 
   const handleReviewClick = () => {
     if (!selectedRouteData || !selectedToken?.address) return;
+
+    if (!riskAssessment || isAddressSanctioned(riskAssessment)) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
+            error: new Error('Sanctioned address'),
+          },
+        },
+      });
+
+      return;
+    }
 
     track({
       userJourney: UserJourney.ADD_TOKENS,
@@ -424,7 +457,7 @@ export function AddTokens({
   const loading = (routeInputsReady || fetchingRoutes)
     && !(selectedRouteData || insufficientBalance);
 
-  const readyToReview = routeInputsReady && !!toAddress && !!selectedRouteData && !loading;
+  const readyToReview = routeInputsReady && !!toAddress && !!selectedRouteData && !loading && !!riskAssessment;
 
   const handleWalletConnected = (
     providerType: 'from' | 'to',
