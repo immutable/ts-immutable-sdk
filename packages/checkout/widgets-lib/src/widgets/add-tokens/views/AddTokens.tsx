@@ -415,6 +415,12 @@ export function AddTokens({
 
   const showInitialEmptyState = !selectedToken;
 
+  useEffect(() => {
+    if (inputRef.current && !showInitialEmptyState) {
+      inputRef.current.focus();
+    }
+  }, [showInitialEmptyState]);
+
   const shouldShowBackButton = showBackButton && onBackButtonClick;
   const routeInputsReady = !!selectedToken
     && !!fromAddress
