@@ -1,8 +1,8 @@
+import { JsonRpcProvider } from 'ethers';
 import { buildBlock, expectToBeDefined, formatAmount, NATIVE_TEST_TOKEN } from '../../test/utils';
 import { newAmount } from '../utils';
 import { IMMUTABLE_TESTNET_RPC_URL, IMMUTABLE_TESTNET_CHAIN_ID } from '../../constants/chains';
 import { calculateGasFee, fetchGasPrice } from './gas';
-import { Block, JsonRpcProvider } from 'ethers';
 
 describe('calculateGasFee', () => {
   describe('when given a price and gas used', () => {
@@ -33,7 +33,7 @@ describe('fetchGasPrice', () => {
       const provider = {
         getBlock: jest.fn().mockRejectedValue(new Error('failed to get block')),
         send: jest.fn().mockRejectedValue(new Error('failed to get maxPriorityFeePerGas')),
-      } as unknown as JsonRpcProvider
+      } as unknown as JsonRpcProvider;
 
       const gasPriceEstimate = await fetchGasPrice(provider, NATIVE_TEST_TOKEN);
       expect(gasPriceEstimate).toBeNull();
@@ -48,7 +48,7 @@ describe('fetchGasPrice', () => {
       const provider = {
         getBlock: async () => buildBlock({ baseFeePerGas: lastBaseFeePerGas }),
         send: jest.fn().mockResolvedValueOnce(maxPriorityFeePerGas),
-      } as unknown as JsonRpcProvider
+      } as unknown as JsonRpcProvider;
 
       const gasPriceEstimate = await fetchGasPrice(provider, NATIVE_TEST_TOKEN);
       expectToBeDefined(gasPriceEstimate);

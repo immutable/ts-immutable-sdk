@@ -1,4 +1,6 @@
-import { Contract, InterfaceAbi, Provider, Signer } from 'ethers';
+import {
+  Contract, InterfaceAbi, Provider, Signer,
+} from 'ethers';
 
 export function getTokenContract(
   address: string,

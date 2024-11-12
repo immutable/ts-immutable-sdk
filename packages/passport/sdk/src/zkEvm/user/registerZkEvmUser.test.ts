@@ -1,11 +1,11 @@
 import { signRaw } from '@imtbl/toolkit';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { Flow } from '@imtbl/metrics';
+import { JsonRpcProvider, JsonRpcSigner, Signer } from 'ethers';
 import { ChainId, ChainName } from '../../network/chains';
 import { registerZkEvmUser } from './registerZkEvmUser';
 import AuthManager from '../../authManager';
 import { mockListChains, mockUserZkEvm } from '../../test/mocks';
-import { JsonRpcProvider, JsonRpcSigner, Signer } from 'ethers';
 
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),

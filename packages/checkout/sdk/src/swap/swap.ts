@@ -1,10 +1,10 @@
+import { BrowserProvider, parseUnits } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { TokenInfo } from '../types';
 import { createExchangeInstance } from '../instance';
 import { CheckoutConfiguration, getL2ChainId } from '../config';
 import { SwapQuoteResult, SwapResult } from '../types/swap';
 import { sendTransaction } from '../transaction/transaction';
-import { BrowserProvider, parseUnits } from 'ethers';
 
 const swapQuote = async (
   config: CheckoutConfiguration,

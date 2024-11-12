@@ -1,3 +1,4 @@
+import { BrowserProvider, parseUnits } from 'ethers';
 import {
   ERC1155Item,
   ERC1155ItemRequirement,
@@ -12,7 +13,6 @@ import {
 } from '../../types';
 import { getTokenContract } from '../../instance';
 import { ERC20ABI } from '../../env';
-import { BrowserProvider, parseUnits } from 'ethers';
 
 export async function getItemRequirementsFromRequirements(
   provider: BrowserProvider,

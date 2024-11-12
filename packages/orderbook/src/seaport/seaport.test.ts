@@ -12,6 +12,9 @@ import type {
   OrderComponents,
 } from '@opensea/seaport-js/lib/types';
 import {
+  ContractTransaction, JsonRpcProvider, toBeHex, ZeroAddress, ZeroHash,
+} from 'ethers';
+import {
   ActionType,
   TransactionAction,
   ERC20Item,
@@ -30,7 +33,6 @@ import {
 } from './constants';
 import { Seaport } from './seaport';
 import { SeaportLibFactory } from './seaport-lib-factory';
-import { ContractTransaction, JsonRpcProvider, toBeHex, ZeroAddress, ZeroHash } from 'ethers';
 
 const fakeExtraData = '0x0000000000000000000000000000000000000000000000000064ec2faca1186bef338313426612ad6ed494b50e5ddc65ad4e6067df53d6625f921b22156ac9435d4fd946bc5f07859ecd7aca94f87da703b9204f9c09f0089be18d5c268a5f36c80c779ed3cbf6ed54b7c7bf2991a4b11065b01c1a2594619f1a0d49f9';
 
@@ -137,7 +139,7 @@ describe('Seaport', () => {
         when(mockedProvider.getNetwork()).thenReturn(
           Promise.resolve({ chainId: network, name: 'foobar' }) as any,
         );
-        when(mockedSeaportLibFactory.create(anything(), anything())).thenReturn(
+        when(mockedSeaportLibFactory.create(anything())).thenReturn(
           instance(mockedSeaportJs),
         );
         when(
@@ -367,7 +369,7 @@ describe('Seaport', () => {
         when(mockedProvider.getNetwork()).thenReturn(
           Promise.resolve({ chainId: network, name: 'foobar' }) as any,
         );
-        when(mockedSeaportLibFactory.create(anything(), anything())).thenReturn(
+        when(mockedSeaportLibFactory.create(anything())).thenReturn(
           instance(mockedSeaportJs),
         );
         when(
@@ -572,7 +574,7 @@ describe('Seaport', () => {
         );
         when(approvalTransactionMethods.estimateGas()).thenReturn(Promise.resolve(approvalGas));
 
-        when(mockedSeaportLibFactory.create(anything(), anything())).thenReturn(
+        when(mockedSeaportLibFactory.create(anything())).thenReturn(
           instance(mockedSeaportJs),
         );
         when(

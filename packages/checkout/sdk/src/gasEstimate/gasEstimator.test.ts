@@ -1,4 +1,4 @@
-import { Contract, ethers, JsonRpcProvider } from 'ethers';
+import { Contract, JsonRpcProvider } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { Exchange, TransactionResponse } from '@imtbl/dex-sdk';
 import { TokenBridge } from '@imtbl/bridge-sdk';

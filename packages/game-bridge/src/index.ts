@@ -648,7 +648,7 @@ window.callFunction = async (jsonData: string) => {
         break;
       }
       case PASSPORT_FUNCTIONS.zkEvm.connectEvm: {
-        const zkEvmProvider = getPassportClient().connectEvm();
+        const zkEvmProvider = await getPassportClient().connectEvm();
         const providerSet = setZkEvmProvider(zkEvmProvider);
 
         if (!providerSet) {

@@ -18930,15 +18930,15 @@ snapshots:
   '@emnapi/core@1.2.0':
     dependencies:
       '@emnapi/wasi-threads': 1.0.1
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@emnapi/runtime@1.2.0':
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@emnapi/wasi-threads@1.0.1':
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@emotion/babel-plugin@11.11.0':
     dependencies:
@@ -20635,7 +20635,7 @@ snapshots:
       '@motionone/easing': 10.17.0
       '@motionone/types': 10.17.0
       '@motionone/utils': 10.17.0
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@motionone/dom@10.17.0':
     dependencies:
@@ -20644,23 +20644,23 @@ snapshots:
       '@motionone/types': 10.17.0
       '@motionone/utils': 10.17.0
       hey-listen: 1.0.8
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@motionone/easing@10.17.0':
     dependencies:
       '@motionone/utils': 10.17.0
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@motionone/generators@10.17.0':
     dependencies:
       '@motionone/types': 10.17.0
       '@motionone/utils': 10.17.0
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@motionone/svelte@10.16.4':
     dependencies:
       '@motionone/dom': 10.17.0
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@motionone/types@10.17.0': {}
 
@@ -20668,12 +20668,12 @@ snapshots:
     dependencies:
       '@motionone/types': 10.17.0
       hey-listen: 1.0.8
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@motionone/vue@10.16.4':
     dependencies:
       '@motionone/dom': 10.17.0
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.2':
     optional: true
@@ -21124,7 +21124,7 @@ snapshots:
       nx: 19.7.2(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.9.3(@swc/helpers@0.5.13))
       semver: 7.6.3
       tmp: 0.2.3
-      tslib: 2.6.3
+      tslib: 2.7.0
       yargs-parser: 21.1.1
 
   '@nx/devkit@19.7.3(nx@19.7.3(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.9.3(@swc/helpers@0.5.13)))':
@@ -21137,7 +21137,7 @@ snapshots:
       nx: 19.7.3(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.9.3(@swc/helpers@0.5.13))
       semver: 7.6.3
       tmp: 0.2.3
-      tslib: 2.6.3
+      tslib: 2.7.0
       yargs-parser: 21.1.1
 
   '@nx/js@19.7.3(@babel/traverse@7.25.6)(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@22.7.5)(nx@19.7.2(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.9.3(@swc/helpers@0.5.13)))(typescript@5.6.2)':
@@ -23497,7 +23497,7 @@ snapshots:
   '@swc-node/sourcemap-support@0.5.1':
     dependencies:
       source-map-support: 0.5.21
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@swc/cli@0.4.0(@swc/core@1.9.3(@swc/helpers@0.5.13))(chokidar@3.6.0)':
     dependencies:
@@ -23662,7 +23662,7 @@ snapshots:
 
   '@tybys/wasm-util@0.9.0':
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@typechain/ethers-v5@10.2.1(@ethersproject/abi@5.7.0)(@ethersproject/providers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)':
     dependencies:
@@ -24788,7 +24788,7 @@ snapshots:
   '@yarnpkg/parsers@3.0.0-rc.46':
     dependencies:
       js-yaml: 3.14.1
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@zkochan/js-yaml@0.0.7':
     dependencies:
@@ -25164,7 +25164,7 @@ snapshots:
 
   ast-types@0.15.2:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   astral-regex@1.0.0: {}
 
@@ -25176,7 +25176,7 @@ snapshots:
 
   async-mutex@0.2.6:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   async@1.5.2: {}
 
@@ -25841,7 +25841,7 @@ snapshots:
   camel-case@4.1.2:
     dependencies:
       pascal-case: 3.1.2
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   camelcase-css@2.0.1: {}
 
@@ -26991,7 +26991,7 @@ snapshots:
   dot-case@3.0.4:
     dependencies:
       no-case: 3.0.4
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   dotenv-expand@10.0.0: {}
 
@@ -32002,7 +32002,7 @@ snapshots:
 
   lower-case@2.0.2:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   lowercase-keys@2.0.0: {}
 
@@ -32704,7 +32704,7 @@ snapshots:
   no-case@3.0.4:
     dependencies:
       lower-case: 2.0.2
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   nocache@3.0.4: {}
 
@@ -32987,7 +32987,7 @@ snapshots:
       tar-stream: 2.2.0
       tmp: 0.2.3
       tsconfig-paths: 4.2.0
-      tslib: 2.6.3
+      tslib: 2.7.0
       yargs: 17.7.2
       yargs-parser: 21.1.1
     optionalDependencies:
@@ -33295,7 +33295,7 @@ snapshots:
   param-case@3.0.4:
     dependencies:
       dot-case: 3.0.4
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   parcel@2.9.3(@swc/helpers@0.5.13)(postcss@8.4.49)(relateurl@0.2.7)(srcset@4.0.0)(terser@5.34.1)(typescript@5.6.2):
     dependencies:
@@ -33363,7 +33363,7 @@ snapshots:
   pascal-case@3.1.2:
     dependencies:
       no-case: 3.0.4
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   pascalcase@0.1.1: {}
 
@@ -34810,7 +34810,7 @@ snapshots:
       ast-types: 0.15.2
       esprima: 4.0.1
       source-map: 0.6.1
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   rechoir@0.6.2:
     dependencies:
@@ -35075,7 +35075,7 @@ snapshots:
 
   rxjs@7.8.1:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   safe-array-concat@1.1.2:
     dependencies:
@@ -35463,7 +35463,7 @@ snapshots:
   snake-case@3.0.4:
     dependencies:
       dot-case: 3.0.4
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   snapdragon-node@2.1.1:
     dependencies:
@@ -36057,7 +36057,7 @@ snapshots:
   synckit@0.8.5:
     dependencies:
       '@pkgr/utils': 2.4.2
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   syncpack@13.0.0(typescript@5.6.2):
     dependencies:

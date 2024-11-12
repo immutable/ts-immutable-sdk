@@ -1,4 +1,3 @@
-import { utils } from 'ethers';
 import React, { useEffect, useState } from 'react';
 import {
   Alert, Button, Form, Image, Offcanvas, Spinner, Stack, Table,
@@ -12,6 +11,7 @@ import { useStatusProvider } from '@/context/StatusProvider';
 import EthBalance from '@/components/imx/EthBalance';
 import MakeOfferModal from '@/components/imx/MakeOfferModal';
 import { MARKETPLACE_FEE_PERCENTAGE, MARKETPLACE_FEE_RECIPIENT } from '@/config';
+import { formatEther } from 'ethers';
 
 function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: ModalProps) {
   const [sellTokenName, setSellTokenName] = useState<string>('');
@@ -147,7 +147,7 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
                             thumbnail
                           />
                         </td>
-                        <td>{ utils.formatEther(order.buy.data.quantity_with_fees).toString() }</td>
+                        <td>{ formatEther(order.buy.data.quantity_with_fees).toString() }</td>
                         <td>
                           { !loadingTrade
                           && (

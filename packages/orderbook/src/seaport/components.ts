@@ -3,9 +3,9 @@ import type {
   OfferItem,
   OrderComponents,
 } from '@opensea/seaport-js/lib/types';
+import { toBeHex } from 'ethers';
 import { getBulkOrderTree } from './lib/bulk-orders';
 import { ItemType, OrderType } from './constants';
-import { toBeHex } from 'ethers';
 
 function orderTypeStringToEnum(orderTypeString: string): OrderType {
   if (

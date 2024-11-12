@@ -5,6 +5,7 @@ import {
 } from '@biom3/react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { BrowserProvider } from 'ethers';
 import {
   UserJourney,
   useAnalytics,
@@ -12,7 +13,6 @@ import {
 import { getWalletLogoByName } from '../../../../lib/logoUtils';
 import { getWalletProviderNameByProvider, isPassportProvider } from '../../../../lib/provider';
 import { abbreviateWalletAddress } from '../../../../lib/utils';
-import { BrowserProvider } from 'ethers';
 
 const isCopiedStyle: SxProps = {
   background: 'base.color.status.success.bright',

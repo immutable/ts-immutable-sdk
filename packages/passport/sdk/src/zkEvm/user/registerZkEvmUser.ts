@@ -1,11 +1,10 @@
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { signRaw } from '@imtbl/toolkit';
 import { Flow } from '@imtbl/metrics';
+import { Signer, JsonRpcProvider } from 'ethers';
 import { getEip155ChainId } from '../walletHelpers';
 import AuthManager from '../../authManager';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
-import { Signer } from 'ethers';
-import { JsonRpcProvider } from 'ethers';
 
 export type RegisterZkEvmUserInput = {
   authManager: AuthManager;
@@ -45,6 +44,8 @@ export async function registerZkEvmUser({
     detectNetworkPromise,
     listChainsPromise,
   ]);
+
+  // const network = new Network('qwerqwer', 12353n)
 
   const eipChainId = getEip155ChainId(network.chainId);
   const chainName = chainListResponse.data?.result?.find((chain) => chain.id === eipChainId)?.name;

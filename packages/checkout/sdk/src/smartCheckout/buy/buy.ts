@@ -10,6 +10,7 @@ import {
 } from '@imtbl/orderbook';
 import { mr } from '@imtbl/generated-clients';
 import { track } from '@imtbl/metrics';
+import { TransactionRequest, TransactionResponse, BrowserProvider } from 'ethers';
 import * as instance from '../../instance';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
@@ -37,8 +38,6 @@ import { calculateFees } from '../fees/fees';
 import { getAllBalances, resetBlockscoutClientMap } from '../../balances';
 import { debugLogger, measureAsyncExecution } from '../../logger/debugLogger';
 import { sendTransaction } from '../../transaction';
-import { TransactionRequest, TransactionResponse } from 'ethers';
-import { BrowserProvider } from 'ethers';
 
 export const getItemRequirement = (
   type: ItemType,
@@ -253,18 +252,18 @@ export const buy = async (
 
   buyArray.forEach((item: (ERC20Item | NativeItem)) => {
     if (item.type !== ItemType.ERC721 as string) {
-      amount = amount + BigInt(item.amount);
+      amount += BigInt(item.amount);
     }
   });
 
   const feeArray = order.result.fees;
   feeArray.forEach((item: any) => {
-    amount = amount + BigInt(item.amount);
+    amount += BigInt(item.amount);
   });
 
   // In the event that the user is filling an ERC1155 listing, the amount required will be scaled by the fill ratio
   if (order.result.sell[0].type === 'ERC1155' && fillAmount) {
-    amount = amount * BigInt(fillAmount) / BigInt(order.result.sell[0].amount);
+    amount = (amount * BigInt(fillAmount)) / BigInt(order.result.sell[0].amount);
   }
 
   const itemRequirements = [

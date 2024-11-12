@@ -1,3 +1,4 @@
+import { formatUnits, JsonRpcProvider } from 'ethers';
 import {
   BridgeFundingStep,
   ChainId,
@@ -24,7 +25,6 @@ import {
 import { DEFAULT_TOKEN_DECIMALS } from '../../../env';
 import { isNativeToken } from '../../../tokens';
 import { formatSmartCheckoutAmount, isMatchingAddress } from '../../../utils/utils';
-import { formatUnits, JsonRpcProvider } from 'ethers';
 
 export const hasSufficientL1Eth = (
   tokenBalanceResult: TokenBalanceResult,
@@ -196,7 +196,7 @@ export const bridgeRoute = async (
     (balance) => isMatchingAddress(balance.token.address, l1address),
   );
 
-  if (erc20balance && erc20balance.balance >=  bridgeRequirement.amount) {
+  if (erc20balance && erc20balance.balance >= bridgeRequirement.amount) {
     const bridgeFees = constructFees(
       sourceChainGas,
       bridgeFee,

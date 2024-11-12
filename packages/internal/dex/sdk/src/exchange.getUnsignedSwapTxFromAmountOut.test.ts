@@ -1,5 +1,7 @@
 import { Contract, getAddress, JsonRpcProvider, Interface } from 'ethers';
+// eslint-disable-next-line max-len
 import swapRouterContract from '@uniswap/swap-router-contracts/artifacts/contracts/interfaces/ISwapRouter02.sol/ISwapRouter02.json';
+// eslint-disable-next-line max-len
 import paymentsExtendedContract from '@uniswap/swap-router-contracts/artifacts/contracts/interfaces/IPeripheryPaymentsWithFeeExtended.sol/IPeripheryPaymentsWithFeeExtended.json';
 import { ERC20__factory, WIMX__factory } from './contracts/types';
 import { newAmount } from './lib/utils';

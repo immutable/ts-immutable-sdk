@@ -13,7 +13,7 @@ import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
 import { BlockchainData } from '@imtbl/generated-clients';
 import WorkflowButton from '@/components/WorkflowButton';
-import { utils } from 'ethers';
+import { Interface } from 'ethers';
 
 type GroupedAsset = {
   contract_address: string;
@@ -54,7 +54,7 @@ function NFTTransfer({ disabled, handleExampleSubmitted }: RequestExampleProps) 
       'function safeTransferFrom(address from, address to, uint256 token_id)',
       'function safeTransferFromBatch((address, address[], uint256[]))',
     ];
-    return new utils.Interface(abi);
+    return new Interface(abi);
   }, []);
 
   useEffect(() => {

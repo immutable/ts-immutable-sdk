@@ -1,11 +1,10 @@
+import { JsonRpcApiProvider, JsonRpcProvider } from 'ethers';
 import AuthManager from '../authManager';
 import { RelayerClient } from './relayerClient';
 import { PassportConfiguration } from '../config';
 import { UserZkEvm } from '../types';
 import { RelayerTransactionStatus, TypedDataPayload } from './types';
 import { chainId, chainIdEip155 } from '../test/mocks';
-import { JsonRpcApiProvider } from 'ethers';
-import { JsonRpcProvider } from 'ethers';
 
 describe('relayerClient', () => {
   const transactionHash = '0x456';

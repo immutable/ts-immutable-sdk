@@ -1,11 +1,11 @@
 import { Environment } from '@imtbl/config';
+import { JsonRpcProvider } from 'ethers';
 import { ChainId } from '../../../types';
 import { getBridgeFeeEstimate } from './getBridgeFeeEstimate';
 import { CheckoutConfiguration } from '../../../config';
 import { CheckoutErrorType } from '../../../errors';
 import { createBridgeInstance } from '../../../instance';
 import { HttpClient } from '../../../api/http';
-import { JsonRpcProvider } from 'ethers';
 
 jest.mock('../../../gasEstimate');
 jest.mock('../../../instance');

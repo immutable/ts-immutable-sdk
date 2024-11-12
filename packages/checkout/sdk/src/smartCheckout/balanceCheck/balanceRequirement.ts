@@ -1,4 +1,5 @@
 /* eslint-disable arrow-body-style */
+import { BrowserProvider, Contract, formatUnits } from 'ethers';
 import {
   ERC20Item,
   ERC721Balance,
@@ -23,7 +24,6 @@ import {
 } from '../../env';
 import { isNativeToken } from '../../tokens';
 import { isMatchingAddress } from '../../utils/utils';
-import { BrowserProvider, Contract, formatUnits } from 'ethers';
 
 export const getTokensFromRequirements = (
   itemRequirements: ItemRequirement[],
@@ -69,7 +69,7 @@ export const getERC721BalanceRequirement = (
   const sufficient = requiredBalance < 0
     || requiredBalance === 0n
     || (itemBalanceResult && itemBalanceResult.balance >= requiredBalance);
-  const delta = requiredBalance - (itemBalanceResult?.balance ?? BigInt(0))
+  const delta = requiredBalance - (itemBalanceResult?.balance ?? BigInt(0));
   let erc721BalanceResult = itemBalanceResult as ERC721Balance;
   if (!erc721BalanceResult) {
     erc721BalanceResult = {

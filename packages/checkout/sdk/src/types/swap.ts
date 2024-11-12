@@ -1,6 +1,6 @@
 import { Quote, TransactionDetails } from '@imtbl/dex-sdk';
-import { TokenInfo } from './tokenInfo';
 import { BrowserProvider, TransactionReceipt } from 'ethers';
+import { TokenInfo } from './tokenInfo';
 
 /**
  * Interface representing the parameters for {@link Checkout.swap}.

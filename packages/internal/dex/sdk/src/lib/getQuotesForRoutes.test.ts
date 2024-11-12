@@ -2,6 +2,7 @@ import {
   FeeAmount, Pool, Route, TickMath,
 } from '@uniswap/v3-sdk';
 import { TradeType } from '@uniswap/sdk-core';
+import { formatEther, parseEther, AbiCoder } from 'ethers';
 import { ProviderCallError } from '../errors';
 import { getQuotesForRoutes, Provider } from './getQuotesForRoutes';
 import {
@@ -12,8 +13,6 @@ import {
   newAmountFromString,
 } from '../test/utils';
 import { erc20ToUniswapToken, newAmount } from './utils';
-import { formatEther, parseEther } from 'ethers';
-import { AbiCoder } from 'ethers';
 
 const UNISWAP_IMX = erc20ToUniswapToken(IMX_TEST_TOKEN);
 const UNISWAP_WETH = erc20ToUniswapToken(WETH_TEST_TOKEN);

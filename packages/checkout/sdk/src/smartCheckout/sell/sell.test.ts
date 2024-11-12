@@ -1,5 +1,6 @@
 import { Environment } from '@imtbl/config';
 import { ActionType, SignablePurpose, constants } from '@imtbl/orderbook';
+import { BrowserProvider, TypedDataDomain } from 'ethers';
 import {
   getBuyToken, getERC1155Requirement, getERC721Requirement, sell,
 } from './sell';
@@ -24,7 +25,6 @@ import {
 } from '../actions';
 import { SignTransactionStatusType } from '../actions/types';
 import { HttpClient } from '../../api/http';
-import { BrowserProvider, TypedDataDomain } from 'ethers';
 
 jest.mock('../../instance');
 jest.mock('../smartCheckout');

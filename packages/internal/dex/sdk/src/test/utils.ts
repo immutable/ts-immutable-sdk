@@ -1,15 +1,18 @@
 import { TradeType } from '@uniswap/sdk-core';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { BigNumberish, BytesLike, formatUnits, keccak256, parseUnits, Result, toUtf8Bytes } from 'ethers';
+import {
+  BigNumberish, BytesLike, formatUnits, keccak256, parseUnits,
+  Result, toUtf8Bytes, Interface, formatEther as eFormatEther }
+  from 'ethers';
+// eslint-disable-next-line max-len
+import swapRouterContract from '@uniswap/swap-router-contracts/artifacts/contracts/interfaces/ISwapRouter02.sol/ISwapRouter02.json';
 import { QuoteResult } from '../lib/getQuotesForRoutes';
 import { NativeTokenService } from '../lib/nativeTokenService';
 import { ExchangeModuleConfiguration, SecondaryFee, CoinAmount, Coin, ERC20, Native, Amount } from '../types';
 import { ImmutableSwapProxy__factory } from '../contracts/types';
 import { IV3SwapRouter } from '../contracts/types/ImmutableSwapProxy';
 import { erc20ToUniswapToken, newAmount, Router, RoutingContracts } from '../lib';
-import swapRouterContract from '@uniswap/swap-router-contracts/artifacts/contracts/interfaces/ISwapRouter02.sol/ISwapRouter02.json'
-import { Interface, formatEther as eFormatEther } from 'ethers';
 
 export const TEST_BASE_FEE = BigInt('49'); // 49 wei
 export const TEST_MAX_PRIORITY_FEE_PER_GAS = BigInt('10000000000'); // 10 gwei

@@ -1,4 +1,5 @@
 import { Flow } from '@imtbl/metrics';
+import { JsonRpcProvider, Signer } from 'ethers';
 import { RelayerClient } from './relayerClient';
 import GuardianClient from '../guardian';
 import { FeeOption, MetaTransaction, RelayerTransactionStatus } from './types';
@@ -6,7 +7,6 @@ import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { pollRelayerTransaction, prepareAndSignTransaction } from './transactionHelpers';
 import * as walletHelpers from './walletHelpers';
 import { retryWithDelay } from '../network/retry';
-import { JsonRpcProvider, Signer } from 'ethers';
 
 jest.mock('./walletHelpers');
 jest.mock('../network/retry');

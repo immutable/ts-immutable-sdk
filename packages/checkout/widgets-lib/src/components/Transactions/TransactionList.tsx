@@ -9,6 +9,7 @@ import {
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
+import { formatUnits } from 'ethers';
 import { AXELAR_SCAN_URL } from '../../lib';
 import { Transaction, TransactionStatus } from '../../lib/clients';
 import { CryptoFiatContext } from '../../context/crypto-fiat-context/CryptoFiatContext';
@@ -19,7 +20,6 @@ import { containerStyles, transactionsListStyle } from './TransactionListStyles'
 import { TransactionItemWithdrawPending } from './TransactionItemWithdrawPending';
 import { ChangeWallet } from './ChangeWallet';
 import { getNativeSymbolByChainSlug } from '../../lib/chains';
-import { formatUnits } from 'ethers';
 
 type TransactionListProps = {
   checkout: Checkout,

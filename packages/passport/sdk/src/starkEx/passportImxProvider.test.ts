@@ -12,6 +12,7 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/x-client';
 import { trackError, trackFlow } from '@imtbl/metrics';
+import { BrowserProvider } from 'ethers';
 import registerPassportStarkEx from './workflows/registration';
 import { mockUser, mockUserImx } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
@@ -25,11 +26,10 @@ import AuthManager from '../authManager';
 import MagicAdapter from '../magicAdapter';
 import { getStarkSigner } from './getStarkSigner';
 import GuardianClient from '../guardian';
-import { BrowserProvider } from 'ethers';
 
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
-  BrowserProvider: jest.fn()
+  BrowserProvider: jest.fn(),
 }));
 jest.mock('./workflows');
 jest.mock('./workflows/registration');

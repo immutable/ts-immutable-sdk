@@ -1,6 +1,6 @@
 import type { TransactionMethods } from '@opensea/seaport-js/lib/utils/usecase';
-import { TransactionBuilder } from '../types';
 import { PreparedTransactionRequest } from 'ethers';
+import { TransactionBuilder } from '../types';
 
 // Add 20% more gas than estimate to prevent out of gas errors
 // This can always be overwritten by the user signing the transaction
@@ -30,7 +30,7 @@ export function prepareTransaction(
     };
 
     v5PopulatedTransaction.gasLimit = BigInt(await transactionMethods.estimateGas());
-    v5PopulatedTransaction.gasLimit = v5PopulatedTransaction.gasLimit + (v5PopulatedTransaction.gasLimit / BigInt(5));
+    v5PopulatedTransaction.gasLimit += (v5PopulatedTransaction.gasLimit / BigInt(5));
 
     return v5PopulatedTransaction;
   };

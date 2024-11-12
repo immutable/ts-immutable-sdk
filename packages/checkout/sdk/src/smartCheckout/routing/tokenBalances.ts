@@ -1,9 +1,9 @@
+import { BrowserProvider, JsonRpcProvider } from 'ethers';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
 import { ChainId, GetAllBalancesResult, AvailableRoutingOptions } from '../../types';
 import { getAllBalances } from '../../balances';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { TokenBalanceResult } from './types';
-import { BrowserProvider, JsonRpcProvider } from 'ethers';
 
 export const getAllTokenBalances = async (
   config: CheckoutConfiguration,

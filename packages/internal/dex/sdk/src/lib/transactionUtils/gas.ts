@@ -1,8 +1,7 @@
+import { JsonRpcProvider } from 'ethers';
 import { newAmount } from '../utils';
 import { CoinAmount, Native } from '../../types';
 import { AVERAGE_SECONDARY_FEE_EXTRA_GAS } from '../../constants';
-import { Block, Provider as EthersProvider } from 'ethers';
-import { JsonRpcProvider } from 'ethers';
 
 type FeeData = {
   maxFeePerGas: bigint;

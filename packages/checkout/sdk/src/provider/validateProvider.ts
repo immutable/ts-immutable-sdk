@@ -23,8 +23,6 @@ export async function validateProvider(
   web3Provider: BrowserProvider,
   validateProviderOptions?: ValidateProviderOptions,
 ): Promise<BrowserProvider> {
-  console.log('qwerqwerqwer')
-  console.log(web3Provider)
   return withCheckoutError(
     async () => {
       if ((web3Provider.provider as any)?.isPassport) {

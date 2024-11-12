@@ -1,6 +1,5 @@
 import { Environment, ModuleConfiguration } from '@imtbl/config';
-import { FetchRequest } from 'ethers';
-import { JsonRpcProvider } from 'ethers';
+import { FetchRequest, JsonRpcProvider } from 'ethers';
 
 export const TESTNET_CHAIN_NAME = 'imtbl-zkevm-testnet';
 export const MAINNET_CHAIN_NAME = 'imtbl-zkevm-mainnet';
@@ -25,9 +24,9 @@ export function getConfiguredProvider(
   url: string,
   rateLimitingKey?: string,
 ): JsonRpcProvider {
-  const fetchRequest = new FetchRequest(url)
+  const fetchRequest = new FetchRequest(url);
   if (rateLimitingKey) fetchRequest.setHeader('x-api-key', rateLimitingKey);
-  
+
   return new JsonRpcProvider(fetchRequest);
 }
 

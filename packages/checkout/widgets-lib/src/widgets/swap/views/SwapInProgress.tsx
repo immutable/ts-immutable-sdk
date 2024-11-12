@@ -1,5 +1,6 @@
 import { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { TransactionResponse } from 'ethers';
 import {
   ViewActions,
   ViewContext,
@@ -10,7 +11,6 @@ import {
 } from '../../../context/view-context/SwapViewContextTypes';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
-import { TransactionResponse } from 'ethers';
 
 interface SwapInProgressProps {
   transactionResponse: TransactionResponse;

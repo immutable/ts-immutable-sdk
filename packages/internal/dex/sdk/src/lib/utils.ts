@@ -1,6 +1,6 @@
 import { Pool } from '@uniswap/v3-sdk';
 import * as Uniswap from '@uniswap/sdk-core';
-import { ethers, getAddress, id, JsonRpcProvider, ZeroAddress } from 'ethers';
+import { getAddress, id, JsonRpcProvider, ZeroAddress } from 'ethers';
 import { ProviderCallError } from '../errors';
 import { Amount, Coin, CoinAmount, ERC20, Native, Token } from '../types';
 import { DEFAULT_DEADLINE_SECONDS } from '../constants/router';
