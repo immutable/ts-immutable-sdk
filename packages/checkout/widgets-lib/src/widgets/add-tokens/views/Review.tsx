@@ -295,7 +295,7 @@ export function Review({
         APPROVE_TXN_ANIMATION,
         RiveStateMachineInput.WAITING,
         t('views.ADD_TOKENS.handover.requestingApproval.heading'),
-        t('views.ADD_TOKENS.handover.requestingApproval.subheading'),
+        t('views.ADD_TOKENS.handover.requestingApproval.subHeading'),
       );
 
       const approveTxnReceipt = await approve(changeableProvider, route);
@@ -317,7 +317,7 @@ export function Review({
       EXECUTE_TXN_ANIMATION,
       RiveStateMachineInput.WAITING,
       t('views.ADD_TOKENS.handover.requestingExecution.heading'),
-      t('views.ADD_TOKENS.handover.requestingExecution.subheading'),
+      t('views.ADD_TOKENS.handover.requestingExecution.subHeading'),
     );
 
     const executeTxnReceipt = await execute(squid, changeableProvider, route);
