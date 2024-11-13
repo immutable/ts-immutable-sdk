@@ -6,7 +6,7 @@ import {
   Box, Heading, Icon, OptionKey, Tooltip,
 } from '@biom3/react';
 import { BigNumber, utils } from 'ethers';
-import { TokenInfo, WidgetTheme } from '@imtbl/checkout-sdk';
+import { isAddressSanctioned, TokenInfo, WidgetTheme } from '@imtbl/checkout-sdk';
 
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { useTranslation } from 'react-i18next';
@@ -83,6 +83,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       tokenBalances,
       network,
       autoProceed,
+      riskAssessment,
     },
   } = useContext(SwapContext);
 
@@ -695,6 +696,18 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
 
   const sendTransaction = async () => {
     if (!quote) return;
+    if (riskAssessment && isAddressSanctioned(riskAssessment)) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SwapWidgetViews.SERVICE_UNAVAILABLE,
+          },
+        },
+      });
+
+      return;
+    }
     const transaction = quote;
     const isValid = SwapFormValidator();
     // Tracking swap from data here and is valid or not to understand behaviour
