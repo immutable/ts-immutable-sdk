@@ -267,8 +267,6 @@ export function BridgeForm(props: BridgeFormProps) {
     if (!bridgeFormValidator()) return;
     if (!checkout || !from?.web3Provider || !formToken) return;
 
-    console.log('from', from);
-    console.log('to', to);
     track({
       userJourney: UserJourney.BRIDGE,
       screen: 'TokenAmount',
