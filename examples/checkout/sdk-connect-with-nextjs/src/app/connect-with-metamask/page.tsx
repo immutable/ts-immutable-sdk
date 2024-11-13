@@ -2,10 +2,10 @@
 import { checkout } from '@imtbl/sdk';
 import { checkoutSDK } from '../utils/setupDefault';
 import { useState } from 'react';
-import { BrowserProvider } from 'ethers/providers';
 import { WalletInfo, WalletProviderName } from '@imtbl/sdk/checkout';
 import { Button, Heading, Link, Table } from '@biom3/react';
 import NextLink from 'next/link';
+import { BrowserProvider } from 'ethers';
 
 export default function ConnectWithMetamask() {
 
@@ -42,8 +42,8 @@ const connectWithMetamask = async (connectWithPerms:boolean) => {
   setWalletProviderName(providerRes.walletProviderName);
 
   // #doc check-is-valid-provider
-  // Check if the provider if a Web3Provider
-  const isProviderRes = await checkout.Checkout.isWeb3Provider(providerRes.provider);
+  // Check if the provider if a BrowserProvider
+  const isProviderRes = checkout.Checkout.isBrowserProvider(providerRes.provider);
   // #enddoc check-is-valid-provider
 
   setIsValidProvider(isProviderRes);
@@ -71,7 +71,7 @@ const connectWithMetamask = async (connectWithPerms:boolean) => {
   }
   
   // #doc check-is-connected
-  // Check if the provider if a Web3Provider
+  // Check if the provider if a BrowserProvider
   const isConnectedRes = await checkoutSDK.checkIsWalletConnected({
     provider: providerRes.provider
   });

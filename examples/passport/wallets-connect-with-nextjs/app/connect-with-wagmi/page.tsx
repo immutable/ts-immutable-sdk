@@ -11,9 +11,9 @@ import NextLink from 'next/link';
 // initialise the QueryClient for the Provider
 const queryClient = new QueryClient();
 
-export default function ConnectWithWagmi() {
+export default async function ConnectWithWagmi() {
   // calling connectEVM() makes Passport available as an option to Wagmi
-  passportInstance.connectEvm();
+  await passportInstance.connectEvm();
 
   // render the ConnectWallet component
   // wrapping it in the Wagami and QueryClient Providers

@@ -2,7 +2,6 @@
 import { checkout } from '@imtbl/sdk';
 import { checkoutSDK } from '../utils/setupDefault';
 import { useState, useEffect } from 'react';
-import { Web3Provider } from '@ethersproject/providers';
 import {
   GetTokenAllowListResult, 
   TokenInfo, 
@@ -12,9 +11,10 @@ import {
 import { Button, Heading, Link, Table } from '@biom3/react';
 import NextLink from 'next/link';
 import Image from 'next/image';
+import { BrowserProvider, toBeHex } from 'ethers';
 
 export default function ConnectWithMetamask() {
-  const [connectedProvider, setConnectedProvider] = useState<Web3Provider>();
+  const [connectedProvider, setConnectedProvider] = useState<BrowserProvider>();
   const [walletAddress, setWalletAddress] = useState<string>();
   const [tokenAllowList, setTokenAllowList] = useState<GetTokenAllowListResult>();
   const [selectedToken, setSelectedToken] = useState<TokenInfo>();
@@ -37,11 +37,11 @@ export default function ConnectWithMetamask() {
     const walletProviderName = checkout.WalletProviderName.METAMASK;
     const providerRes = await checkoutSDK.createProvider({ walletProviderName });
     
-    // Check if the provider if a Web3Provider
-    const isProviderRes = await checkout.Checkout.isWeb3Provider(providerRes.provider);
+    // Check if the provider if a BrowserProvider
+    const isProviderRes = await checkout.Checkout.isBrowserProvider(providerRes.provider);
 
     if(!isProviderRes) {
-      console.error('Provider is not a valid Web3Provider');
+      console.error('Provider is not a valid BrowserProvider');
     }
 
     // Get the current network information
@@ -53,7 +53,7 @@ export default function ConnectWithMetamask() {
 
     setConnectedProvider(connectRes.provider);
 
-    // Check if the provider if a Web3Provider
+    // Check if the provider if a BrowserProvider
     const isConnectedRes = await checkoutSDK.checkIsWalletConnected({
       provider: providerRes.provider
     });
@@ -62,7 +62,7 @@ export default function ConnectWithMetamask() {
     // #doc get-token-allow-list
     // Get the list of supported tokens
     const tokenType = await checkout.TokenFilterTypes.ALL;
-    const chainId = connectRes.provider._network.chainId ?? checkout.ChainId.IMTBL_ZKEVM_TESTNET;
+    const chainId = connectRes.provider._network.chainId as unknown as checkout.ChainId ?? checkout.ChainId.IMTBL_ZKEVM_TESTNET
     const tokenAllowList = await checkoutSDK.getTokenAllowList({ type: tokenType, chainId });
     // #enddoc get-token-allow-list
     setTokenAllowList(tokenAllowList);
@@ -75,7 +75,7 @@ export default function ConnectWithMetamask() {
       if (connectedProvider && walletAddress) {
         // #doc get-all-balances
         // Get all token balances of the wallet
-        const chainId = connectedProvider._network.chainId ?? checkout.ChainId.IMTBL_ZKEVM_TESTNET;
+        const chainId = connectedProvider._network.chainId as unknown as checkout.ChainId ?? checkout.ChainId.IMTBL_ZKEVM_TESTNET;
         const allBalancesResponse = await checkoutSDK.getAllBalances({ provider: connectedProvider, walletAddress, chainId });
         // #enddoc get-all-balances
         setAllBalances(allBalancesResponse);
@@ -210,7 +210,7 @@ export default function ConnectWithMetamask() {
                   {balanceResult.token.name} ({balanceResult.token.symbol})
                 </Table.Cell>
                 <Table.Cell>
-                  {balanceResult.balance._hex || 'N/A'}
+                  {toBeHex(balanceResult.balance) || 'N/A'}
                 </Table.Cell>
                 <Table.Cell>
                   {balanceResult.formattedBalance || 'N/A'}
@@ -239,7 +239,7 @@ export default function ConnectWithMetamask() {
                 {tokenBalance.token.name || 'N/A'}
               </Table.Cell>
               <Table.Cell>
-                {tokenBalance.balance._hex || 'N/A'}
+                {toBeHex(tokenBalance.balance) || 'N/A'}
               </Table.Cell>
               <Table.Cell>
                 {tokenBalance.formattedBalance || 'N/A'}
@@ -267,7 +267,7 @@ export default function ConnectWithMetamask() {
                 {nativeBalance.token.name || 'N/A'}
               </Table.Cell>
               <Table.Cell>
-                {nativeBalance.balance._hex || 'N/A'}
+                {toBeHex(nativeBalance.balance) || 'N/A'}
               </Table.Cell>
               <Table.Cell>
                 {nativeBalance.formattedBalance || 'N/A'}

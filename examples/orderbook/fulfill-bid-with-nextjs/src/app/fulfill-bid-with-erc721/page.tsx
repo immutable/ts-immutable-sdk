@@ -1,5 +1,9 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+import { Provider, ProviderEvent } from "@imtbl/sdk/passport";
+import { passportInstance } from "../utils/setupPassport";
+import { orderbookSDK } from "../utils/setupOrderbook";
 import {
   Body,
   Box,
@@ -14,12 +18,8 @@ import {
 } from "@biom3/react";
 import { orderbook } from "@imtbl/sdk";
 import { OrderStatusName } from "@imtbl/sdk/orderbook";
-import { ProviderEvent } from "@imtbl/sdk/passport";
-import { ethers } from "ethers";
 import NextLink from "next/link";
-import { useMemo, useState } from "react";
-import { orderbookSDK } from "../utils/setupOrderbook";
-import { passportInstance } from "../utils/setupPassport";
+import { BrowserProvider, JsonRpcSigner } from "ethers";
 
 export default function FulfillERC721WithPassport() {
   // setup the accounts state
@@ -32,13 +32,29 @@ export default function FulfillERC721WithPassport() {
   const [loadingText, setLoadingText] = useState<string>("");
 
   // fetch the Passport provider from the Passport instance
-  const passportProvider = passportInstance.connectEvm();
+  const [passportProvider, setPassportProvider] = useState<Provider>();
 
-  // create the Web3Provider using the Passport provider
-  const web3Provider = new ethers.providers.Web3Provider(passportProvider);
+  useEffect(() => {
+    const fetchPassportProvider = async () => {
+      const passportProvider = await passportInstance.connectEvm();
+      setPassportProvider(passportProvider);
+    };
+    fetchPassportProvider();
+  }, []);
 
-  // create the signer using the Web3Provider
-  const signer = web3Provider.getSigner();
+  // create the BrowserProvider using the Passport provider
+  const web3Provider = useMemo(() => passportProvider ? new BrowserProvider(passportProvider) : undefined, [passportProvider]);
+
+  // create the signer using the BrowserProvider
+  const [signer, setSigner] = useState<JsonRpcSigner>();
+
+  useEffect(() => {
+    const fetchSigner = async () => {
+      const signer = await web3Provider?.getSigner();
+      setSigner(signer);
+    };
+    fetchSigner();
+  }, [web3Provider]);
 
   // setup the buy item contract address state
   const [buyItemContractAddress, setBuyItemContractAddressState] =
@@ -60,15 +76,13 @@ export default function FulfillERC721WithPassport() {
   const [errorMessage, setErrorMessageState] = useState<string | null>(null);
 
   const passportLogin = async () => {
-    if (web3Provider.provider.request) {
+    if (web3Provider?.send) {
       // disable button while loading
       setLoadingState(true);
       setLoadingText("Connecting to Passport");
 
       // calling eth_requestAccounts triggers the Passport login flow
-      const accounts = await web3Provider.provider.request({
-        method: "eth_requestAccounts",
-      });
+      const accounts = await web3Provider.send("eth_requestAccounts", []);
 
       // once logged in Passport is connected to the wallet and ready to transact
       setAccountsState(accounts);
@@ -80,7 +94,7 @@ export default function FulfillERC721WithPassport() {
   };
 
   // listen to the ACCOUNTS_CHANGED event and update the accounts state when it changes
-  passportProvider.on(ProviderEvent.ACCOUNTS_CHANGED, (accounts: string[]) => {
+  passportProvider?.on(ProviderEvent.ACCOUNTS_CHANGED, (accounts: string[]) => {
     setAccountsState(accounts);
   });
 
@@ -180,7 +194,7 @@ export default function FulfillERC721WithPassport() {
     );
 
     for (const action of actions) {
-      if (action.type === orderbook.ActionType.TRANSACTION) {
+      if (action.type === orderbook.ActionType.TRANSACTION && signer) {
         const builtTx = await action.buildTransaction();
         await (await signer.sendTransaction(builtTx)).wait(1);
       }
