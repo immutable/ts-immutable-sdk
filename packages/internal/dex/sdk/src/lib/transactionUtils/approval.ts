@@ -125,8 +125,7 @@ export async function getApproveGasEstimate(
   tokenAddress: string,
 ): Promise<bigint> {
   const erc20Contract = ERC20__factory.connect(tokenAddress, provider);
-  // @ts-expect-error Contract types arent matching the implementation
-  return await erc20Contract.estimateGas.approve(spenderAddress, MaxUint256, {
+  return await erc20Contract.approve.estimateGas(spenderAddress, MaxUint256, {
     from: ownerAddress,
   });
 }

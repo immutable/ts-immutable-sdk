@@ -33,10 +33,11 @@ async function executeDepositEth(
     ethSigner,
   );
 
-  // @ts-expect-error populateTransaction['deposit(uint256,uint256,uint256)'] is not in the types for CoreV4 but it is in the implementation
-  const populatedTransaction = await coreContract.populateTransaction[
-    'deposit(uint256,uint256,uint256)'
-  ](starkPublicKey, assetType, vaultId);
+  const populatedTransaction = await coreContract['deposit(uint256,uint256,uint256)'].populateTransaction(
+    starkPublicKey,
+    assetType,
+    vaultId,
+  );
 
   return ethSigner.sendTransaction({ ...populatedTransaction, value: amount });
 }
