@@ -3,10 +3,10 @@ import { client } from '../lib';
 
 export async function listStacks(
   chainName: string,
-  contractAddress: string,
-): Promise<blockchainData.Types.ListMetadataResult> {
-  return await client.listNFTMetadataByContractAddress({
+  stackId: string[],
+): Promise<blockchainData.Types.StackBundle[]> {
+  return await client.listStacks({
     chainName,
-    contractAddress,
+    stackId,
   });
 }

@@ -3,9 +3,9 @@ import { client } from '../lib';
 
 export async function searchNFTs(
   chainName: string,
-  contractAddress: string,
-): Promise<blockchainData.Types.ListMetadataResult> {
-  return await client.listNFTMetadataByContractAddress({
+  contractAddress: string[],
+): Promise<blockchainData.Types.SearchNFTsResult> {
+  return await client.searchNFTs({
     chainName,
     contractAddress,
   });

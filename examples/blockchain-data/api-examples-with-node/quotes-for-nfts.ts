@@ -4,9 +4,11 @@ import { client } from '../lib';
 export async function quotesForNFTs(
   chainName: string,
   contractAddress: string,
-): Promise<blockchainData.Types.ListMetadataResult> {
-  return await client.listNFTMetadataByContractAddress({
+  tokenId: string[],
+): Promise<blockchainData.Types.QuotesForNFTsResult> {
+  return await client.quotesForNFTs({
     chainName,
     contractAddress,
+    tokenId,
   });
 }

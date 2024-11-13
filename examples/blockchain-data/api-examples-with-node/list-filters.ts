@@ -4,8 +4,8 @@ import { client } from '../lib';
 export async function listFilters(
   chainName: string,
   contractAddress: string,
-): Promise<blockchainData.Types.ListMetadataResult> {
-  return await client.listNFTMetadataByContractAddress({
+): Promise<blockchainData.Types.ListFiltersResult> {
+  return await client.listFilters({
     chainName,
     contractAddress,
   });
