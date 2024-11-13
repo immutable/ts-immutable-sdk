@@ -99,7 +99,8 @@
       "examples/orderbook/**",
       "examples/checkout/**",
       "examples/blockchain-data/**",
-      "examples/contracts/**"
+      "examples/contracts/**",
+      "examples/x-to-zkevm-migration-app/**"
     ],
     "nohoist": [
       "examples/**",
