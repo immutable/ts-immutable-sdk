@@ -2670,6 +2670,9 @@ importers:
       dotenv:
         specifier: ^16.3.1
         version: 16.4.5
+      ethers:
+        specifier: ^6.13.4
+        version: 6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     devDependencies:
       '@swc/jest':
         specifier: ^0.2.29
@@ -2727,7 +2730,7 @@ importers:
         version: 4.9.3
       '@typechain/ethers-v6':
         specifier: ^0.5.0
-        version: 0.5.1(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)
+        version: 0.5.1(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)
       '@typechain/hardhat':
         specifier: ^9.0.0
         version: 9.1.0(@typechain/ethers-v6@0.5.1(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2))(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))
@@ -2741,8 +2744,8 @@ importers:
         specifier: ^16.3.1
         version: 16.4.5
       ethers:
-        specifier: ^5.7.0
-        version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^6.13.4
+        version: 6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       hardhat:
         specifier: ^2.19.4
         version: 2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
@@ -23664,19 +23667,11 @@ snapshots:
     dependencies:
       tslib: 2.7.0
 
-  '@typechain/ethers-v5@10.2.1(@ethersproject/abi@5.7.0)(@ethersproject/providers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)':
+  '@typechain/ethers-v5@10.2.1(@ethersproject/abi@5.7.0)(@ethersproject/providers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)':
     dependencies:
       '@ethersproject/abi': 5.7.0
       '@ethersproject/providers': 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      ethers: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      lodash: 4.17.21
-      ts-essentials: 7.0.3(typescript@5.6.2)
-      typechain: 8.3.0(typescript@5.6.2)
-      typescript: 5.6.2
-
-  '@typechain/ethers-v6@0.5.1(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)':
-    dependencies:
-      ethers: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ethers: 6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       lodash: 4.17.21
       ts-essentials: 7.0.3(typescript@5.6.2)
       typechain: 8.3.0(typescript@5.6.2)
@@ -23684,8 +23679,8 @@ snapshots:
 
   '@typechain/hardhat@9.1.0(@typechain/ethers-v6@0.5.1(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2))(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))':
     dependencies:
-      '@typechain/ethers-v6': 0.5.1(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)
-      ethers: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@typechain/ethers-v6': 0.5.1(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)
+      ethers: 6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       fs-extra: 9.1.0
       hardhat: 2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
       typechain: 8.3.0(typescript@5.6.2)

@@ -1,6 +1,6 @@
 import { orderbook } from "@imtbl/sdk";
 import { Environment } from "@imtbl/sdk/config";
-import { BigNumber, Wallet } from "ethers";
+import { Wallet } from "ethers";
 import { withBankerRetry } from "../step-definitions/shared";
 import {
   TestERC1155Token,
@@ -85,30 +85,26 @@ describe("Orderbook", () => {
 
   afterEach(async () => {
     await withBankerRetry(async () => {
-      const makerBalance = await maker.getBalance();
-      const takerBalance = await taker.getBalance();
+      const makerBalance = await maker.provider?.getBalance(maker.address) ?? 0n
+      const takerBalance = await taker.provider?.getBalance(taker.address) ?? 0n
 
-      if (makerBalance.gt(BigNumber.from(transferTxnFee))) {
+      if (makerBalance > BigInt(transferTxnFee)) {
         // maker returns funds
         await (
           await maker.sendTransaction({
             to: banker.address,
-            value: `${makerBalance
-              .sub(BigNumber.from(transferTxnFee))
-              .toString()}`,
+            value: `${(makerBalance - BigInt(transferTxnFee)).toString()}`,
             ...GAS_OVERRIDES,
           })
         ).wait(1);
       }
 
-      if (takerBalance.gt(BigNumber.from(transferTxnFee))) {
+      if (takerBalance > BigInt(transferTxnFee)) {
         // taker returns funds
         await (
           await taker.sendTransaction({
             to: banker.address,
-            value: `${takerBalance
-              .sub(BigNumber.from(transferTxnFee))
-              .toString()}`,
+            value: `${(takerBalance - BigInt(transferTxnFee)).toString()}`,
             ...GAS_OVERRIDES,
           })
         ).wait(1);
@@ -159,12 +155,12 @@ describe("Orderbook", () => {
       makerAddress: maker.address,
       sell: {
         type: "ERC20",
-        contractAddress: erc20Contract.address,
+        contractAddress: await erc20Contract.getAddress(),
         amount: "100",
       },
       buy: {
         type: "ERC721",
-        contractAddress: erc721Contract.address,
+        contractAddress: await erc721Contract.getAddress(),
         tokenId: erc721TokenId,
       },
       orderStart: new Date(2000, 1, 15),
@@ -248,12 +244,12 @@ describe("Orderbook", () => {
         makerAddress: maker.address,
         sell: {
           type: "ERC20",
-          contractAddress: erc20Contract.address,
+          contractAddress: await erc20Contract.getAddress(),
           amount: "100",
         },
         buy: {
           type: "ERC1155",
-          contractAddress: erc1155Contract.address,
+          contractAddress: await erc1155Contract.getAddress(),
           tokenId: erc1155TokenId,
           amount: "50",
         },
@@ -383,12 +379,12 @@ describe("Orderbook", () => {
         makerAddress: maker.address,
         sell: {
           type: "ERC20",
-          contractAddress: erc20Contract.address,
+          contractAddress: await erc20Contract.getAddress(),
           amount: "100",
         },
         buy: {
           type: "ERC721_COLLECTION",
-          contractAddress: erc721Contract.address,
+          contractAddress: await erc721Contract.getAddress(),
           amount: "1",
         },
         orderStart: new Date(2000, 1, 15),
@@ -461,12 +457,12 @@ describe("Orderbook", () => {
         makerAddress: maker.address,
         sell: {
           type: "ERC20",
-          contractAddress: erc20Contract.address,
+          contractAddress: await erc20Contract.getAddress(),
           amount: "100",
         },
         buy: {
           type: "ERC721_COLLECTION",
-          contractAddress: erc721Contract.address,
+          contractAddress: await erc721Contract.getAddress(),
           amount: "2",
         },
         orderStart: new Date(2000, 1, 15),
@@ -556,12 +552,12 @@ describe("Orderbook", () => {
         makerAddress: maker.address,
         sell: {
           type: "ERC20",
-          contractAddress: erc20Contract.address,
+          contractAddress: await erc20Contract.getAddress(),
           amount: "100",
         },
         buy: {
           type: "ERC1155_COLLECTION",
-          contractAddress: erc1155Contract.address,
+          contractAddress: await erc1155Contract.getAddress(),
           amount: "50",
         },
         orderStart: new Date(2000, 1, 15),
@@ -640,12 +636,12 @@ describe("Orderbook", () => {
         makerAddress: maker.address,
         sell: {
           type: "ERC20",
-          contractAddress: erc20Contract.address,
+          contractAddress: await erc20Contract.getAddress(),
           amount: "100",
         },
         buy: {
           type: "ERC1155_COLLECTION",
-          contractAddress: erc1155Contract.address,
+          contractAddress: await erc1155Contract.getAddress(),
           amount: "50",
         },
         orderStart: new Date(2000, 1, 15),
@@ -739,12 +735,12 @@ describe("Orderbook", () => {
           makerAddress: maker.address,
           sell: {
             type: 'ERC721',
-            contractAddress: erc721Contract.address,
+            contractAddress: await erc721Contract.getAddress(),
             tokenId,
           },
           buy: {
             type: 'ERC20',
-            contractAddress: erc20Contract.address,
+            contractAddress: await erc20Contract.getAddress(),
             amount: '100',
           },
           orderStart: new Date(2000, 1, 15),
@@ -842,12 +838,12 @@ describe("Orderbook", () => {
           makerAddress: maker.address,
           sell: {
             type: 'ERC20',
-            contractAddress: erc20Contract.address,
+            contractAddress: await erc20Contract.getAddress(),
             amount: '100',
           },
           buy: {
             type: 'ERC721',
-            contractAddress: erc721Contract.address,
+            contractAddress: await erc721Contract.getAddress(),
             tokenId,
           },
           orderStart: new Date(2000, 1, 15),
@@ -942,12 +938,12 @@ describe("Orderbook", () => {
         makerAddress: maker.address,
         sell: {
           type: 'ERC20',
-          contractAddress: erc20Contract.address,
+          contractAddress: await erc20Contract.getAddress(),
           amount: '100',
         },
         buy: {
           type: 'ERC721_COLLECTION',
-          contractAddress: erc721Contract.address,
+          contractAddress: await erc721Contract.getAddress(),
           amount: '10',
         },
         orderStart: new Date(2000, 1, 15),
@@ -1036,12 +1032,12 @@ describe("Orderbook", () => {
         makerAddress: maker.address,
         sell: {
           type: "ERC721",
-          contractAddress: erc721Contract.address,
+          contractAddress: await erc721Contract.getAddress(),
           tokenId: erc721TokenIdForListing,
         },
         buy: {
           type: "ERC20",
-          contractAddress: erc20Contract.address,
+          contractAddress: await erc20Contract.getAddress(),
           amount: "100",
         },
       });
@@ -1071,12 +1067,12 @@ describe("Orderbook", () => {
         makerAddress: maker.address,
         sell: {
           type: "ERC20",
-          contractAddress: erc20Contract.address,
+          contractAddress: await erc20Contract.getAddress(),
           amount: "100",
         },
         buy: {
           type: "ERC721",
-          contractAddress: erc721Contract.address,
+          contractAddress: await erc721Contract.getAddress(),
           tokenId: erc721TokenIdForBid,
         },
       });
@@ -1106,12 +1102,12 @@ describe("Orderbook", () => {
         makerAddress: maker.address,
         sell: {
           type: "ERC20",
-          contractAddress: erc20Contract.address,
+          contractAddress: await erc20Contract.getAddress(),
           amount: "100",
         },
         buy: {
           type: "ERC1155_COLLECTION",
-          contractAddress: erc1155Contract.address,
+          contractAddress: await erc1155Contract.getAddress(),
           amount: "50",
         },
       });
