@@ -183,7 +183,10 @@ export function BridgeForm(props: BridgeFormProps) {
     }
 
     (async () => {
-      const addresses = [from.walletAddress, to.walletAddress];
+      const addresses = [from.walletAddress];
+      if (to.walletAddress.toLowerCase() !== from.walletAddress.toLowerCase()) {
+        addresses.push(to.walletAddress);
+      }
 
       const assessment = await fetchRiskAssessment(addresses, checkout.config);
       bridgeDispatch({
