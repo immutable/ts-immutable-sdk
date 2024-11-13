@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { parseEther } from '@ethersproject/units';
 import {
   ImxModuleConfiguration,
   GenericIMXProvider,
   ProviderConfiguration,
 } from '@imtbl/sdk/x';
-import { env, getProvider } from 'common';
+import { env, getProvider } from '../common';
 import { configuration, StepSharedState } from './stepSharedState';
+import { parseEther } from 'ethers';
 
 export class Transfer {
   constructor(protected stepSharedState: StepSharedState) {}

@@ -1,11 +1,14 @@
 import { CHILD_ERC20, CHILD_ERC20_BRIDGE, ERC20, ROOT_ERC20_BRIDGE_FLOW_RATE } from "@imtbl/bridge-sdk";
-import { providers, ethers } from "ethers";
+import { ethers, JsonRpcProvider } from "ethers";
 
 export function delay(time: number) {
     return new Promise(resolve => setTimeout(resolve, time));
 }
 
-export async function waitForReceipt(txHash: string, provider: providers.JsonRpcProvider) {
+export async function waitForReceipt(txHash: string | undefined, provider: JsonRpcProvider) {
+    if (txHash == undefined) {
+        throw("txHash is undefined");
+    }
     let receipt;
     console.log("Wait until receipt... tx hash: ", txHash);
     let attempt = 0;
@@ -24,7 +27,7 @@ export async function waitForReceipt(txHash: string, provider: providers.JsonRpc
     console.log("Tx " + txHash + " succeed.");
 }
 
-export function getContract(contract: string, contractAddr: string, provider: providers.JsonRpcProvider) {
+export function getContract(contract: string, contractAddr: string, provider: JsonRpcProvider) {
     let contractABI: any;
     switch(contract) {
         case 'RootERC20BridgeFlowRate':

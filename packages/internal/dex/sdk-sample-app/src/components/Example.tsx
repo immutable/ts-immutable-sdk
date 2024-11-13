@@ -1,4 +1,3 @@
-import { ethers } from 'ethers';
 import { useState } from 'react';
 import { Exchange, TransactionDetails, TransactionResponse } from '@imtbl/dex-sdk';
 import { configuration } from '../config';
@@ -6,6 +5,7 @@ import { ConnectAccount } from './ConnectAccount';
 import { AmountInput, AmountOutput } from './AmountInput';
 import { SecondaryFeeInput } from './SecondaryFeeInput';
 import { FeeBreakdown } from './FeeBreakdown';
+import { BrowserProvider, formatEther, parseEther, TransactionReceipt } from 'ethers';
 
 type Token = {
   symbol: string;
@@ -61,7 +61,7 @@ export function Example() {
   const [isFetching, setIsFetching] = useState(false);
   const [inputAmount, setInputAmount] = useState<string>('0');
   const [outputAmount, setOutputAmount] = useState<string>('0');
-  const [swapTransaction, setSwapTransaction] = useState<ethers.providers.TransactionReceipt | null>(null);
+  const [swapTransaction, setSwapTransaction] = useState<TransactionReceipt | null>(null);
   const [approved, setApproved] = useState<boolean>(false);
   const [result, setResult] = useState<TransactionResponse | null>();
   const [error, setError] = useState<string | null>(null);
@@ -95,13 +95,13 @@ export function Example() {
               ethereumAccount,
               tokenInAddress,
               tokenOutAddress,
-              ethers.utils.parseEther(`${inputAmount}`),
+              parseEther(`${inputAmount}`),
             )
           : await exchange.getUnsignedSwapTxFromAmountOut(
               ethereumAccount,
               tokenInAddress,
               tokenOutAddress,
-              ethers.utils.parseEther(`${outputAmount}`),
+              parseEther(`${outputAmount}`),
             );
 
       setResult(txn);
@@ -121,7 +121,7 @@ export function Example() {
   const performSwap = async (result: TransactionResponse) => {
     setSwapTransaction(null);
     setIsFetching(true);
-    const provider = new ethers.providers.Web3Provider((window as any).ethereum);
+    const provider = new BrowserProvider((window as any).ethereum);
     const signer = await provider.getSigner();
 
     // Approve the ERC20 spend
@@ -256,12 +256,12 @@ export function Example() {
       {result && (
         <>
           <h3>
-            Expected amount: {ethers.utils.formatEther(result.quote.amount.value)}{' '}
+            Expected amount: {formatEther(result.quote.amount.value)}{' '}
             {`${addressToSymbolMapping[result.quote.amount.token.address]}`}
           </h3>
           <h3>
             {tradeType === 'exactInput' ? 'Minimum' : 'Maximum'} amount:{' '}
-            {ethers.utils.formatEther(result.quote.amountWithMaxSlippage.value)}{' '}
+            {formatEther(result.quote.amountWithMaxSlippage.value)}{' '}
             {`${addressToSymbolMapping[result.quote.amountWithMaxSlippage.token.address]}`}
           </h3>
 
@@ -286,7 +286,7 @@ export function Example() {
                 </h3>
                 <a
                   className='underline text-blue-600 hover:text-blue-800 visited:text-purple-600'
-                  href={`https://explorer.testnet.immutable.com/tx/${swapTransaction.transactionHash}`}
+                  href={`https://explorer.testnet.immutable.com/tx/${swapTransaction.hash}`}
                   target='_blank'>
                   Transaction
                 </a>
@@ -300,7 +300,7 @@ export function Example() {
 }
 
 const showGasEstimate = (txn: TransactionDetails) =>
-  txn.gasFeeEstimate ? `${ethers.utils.formatEther(txn.gasFeeEstimate.value)} IMX` : 'No gas estimate available';
+  txn.gasFeeEstimate ? `${formatEther(txn.gasFeeEstimate.value)} IMX` : 'No gas estimate available';
 
 const ErrorMessage = ({ message }: { message: string }) => {
   return (
