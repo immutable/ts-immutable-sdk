@@ -113,9 +113,17 @@ export function OrderReview({
       return;
     }
 
-    const [[, fee]] = Object.entries(
-      getFundingBalanceTotalFees(fundingBalance),
-    );
+    const totalFees = getFundingBalanceTotalFees(fundingBalance);
+    if (!totalFees) {
+      return;
+    }
+
+    const entries = Object.entries(totalFees);
+    if (!entries.length) {
+      return;
+    }
+
+    const [[, fee]] = entries;
     if (!fee || !fee.token) {
       return;
     }
