@@ -1,9 +1,9 @@
 import { orderbook } from "@imtbl/sdk";
-import { Web3Provider } from "@ethersproject/providers";
+import { BrowserProvider } from "ethers";
 
 // #doc sign-and-submit-approval
 export const signAndSubmitApproval = async (
-  provider: Web3Provider,
+  provider: BrowserProvider,
   bid: orderbook.PrepareBidResponse,
 ): Promise<void> => {
   // get your user's Web3 wallet, e.g. MetaMask, Passport, etc
@@ -28,7 +28,7 @@ export const signAndSubmitApproval = async (
 
 // #doc sign-bid
 export const signBid = async (
-  provider: Web3Provider,
+  provider: BrowserProvider,
   bid: orderbook.PrepareBidResponse,
 ): Promise<string> => {
   // get your user's Web3 wallet, e.g. MetaMask, Passport, etc
@@ -42,7 +42,7 @@ export const signBid = async (
       action.type === orderbook.ActionType.SIGNABLE,
   )!;
 
-  const signature = await signer._signTypedData(
+  const signature = await signer.signTypedData(
     signableAction.message.domain,
     signableAction.message.types,
     signableAction.message.value,

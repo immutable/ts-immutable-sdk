@@ -2,9 +2,9 @@
 import { checkout } from "@imtbl/sdk";
 import { checkoutSDK } from "../utils/setupDefault";
 import { useState } from "react";
-import { Web3Provider } from "@ethersproject/providers";
 import { Button, Heading, Body, Link, Table } from "@biom3/react";
 import NextLink from "next/link";
+import { BrowserProvider } from "ethers";
 
 export default function ConnectWithMetamask() {
   const [isConnected, setIsConnected] = useState<boolean>();
@@ -13,11 +13,11 @@ export default function ConnectWithMetamask() {
   const [nativeCurrency, setNativeCurrency] = useState<string>();
   // setup the loading state to enable/disable buttons when loading
   const [loading, setLoadingState] = useState<boolean>(false);
-  const [connectedProvider, setConnectedProvider] = useState<Web3Provider>();
+  const [connectedProvider, setConnectedProvider] = useState<BrowserProvider>();
   const [supportedNetworks, setSupportedNetworks] = useState<string[]>();
   const [switchNetworkLoading, setSwitchNetworkLoading] = useState<boolean>(false);
 
-  const updateNetworkInfo = async (provider: Web3Provider) => {
+  const updateNetworkInfo = async (provider: BrowserProvider) => {
     try {
       // #doc get-network-details
       // Get the network details
@@ -62,7 +62,7 @@ export default function ConnectWithMetamask() {
     setConnectedProvider(connectRes.provider);
 
     // #doc check-is-connected
-    // Check if the provider if a Web3Provider
+    // Check if the provider if a BrowserProvider
     const isConnectedRes = await checkoutSDK.checkIsWalletConnected({
       provider: providerRes.provider,
     });
