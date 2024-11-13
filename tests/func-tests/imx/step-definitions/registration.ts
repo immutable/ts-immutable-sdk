@@ -1,6 +1,5 @@
 import fs from 'fs';
 import { strict as assert } from 'assert';
-import { Wallet } from '@ethersproject/wallet';
 import {
   ProviderConfiguration,
   GenericIMXProvider,
@@ -9,6 +8,7 @@ import {
 } from '@imtbl/sdk/x';
 import { configuration, StepSharedState } from './stepSharedState';
 import { getProvider, env } from '../common';
+import { Wallet } from 'ethers';
 
 const provider = getProvider(env.network, env.alchemyApiKey);
 
