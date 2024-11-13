@@ -13,7 +13,6 @@ import {
 } from 'react';
 import {
   ChainId,
-  fetchRiskAssessment,
   WalletProviderName,
   WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
@@ -212,16 +211,6 @@ export function WalletAndNetworkSelector() {
       const web3Provider = new Web3Provider(event.provider as any);
       const connectedProvider = await connectToProvider(checkout, web3Provider, changeAccount);
 
-      const address = await connectedProvider.getSigner().getAddress();
-      const assessment = await fetchRiskAssessment([address], checkout.config);
-      bridgeDispatch({
-        payload: {
-          type: BridgeActions.SET_RISK_ASSESSMENT,
-          fromRiskAssessment: assessment,
-          toRiskAssessment: undefined,
-        },
-      });
-
       await handleFromWalletConnectionSuccess(connectedProvider);
     },
     [checkout],
@@ -340,14 +329,6 @@ export function WalletAndNetworkSelector() {
         const connectedProvider = await connectToProvider(checkout, web3Provider, false);
 
         const address = await connectedProvider.getSigner().getAddress();
-        const assessment = await fetchRiskAssessment([address], checkout.config);
-        bridgeDispatch({
-          payload: {
-            type: BridgeActions.SET_RISK_ASSESSMENT,
-            fromRiskAssessment: undefined,
-            toRiskAssessment: assessment,
-          },
-        });
 
         if (isWalletConnectProvider(connectedProvider)) {
           handleWalletConnectToWalletConnection(connectedProvider);

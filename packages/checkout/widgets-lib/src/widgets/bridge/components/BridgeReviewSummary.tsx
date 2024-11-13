@@ -77,7 +77,7 @@ export function BridgeReviewSummary() {
 
   const {
     bridgeState: {
-      checkout, tokenBridge, from, to, token, amount, tokenBalances, fromRiskAssessment, toRiskAssessment,
+      checkout, tokenBridge, from, to, token, amount, tokenBalances, riskAssessment,
     },
     bridgeDispatch,
   } = useContext(BridgeContext);
@@ -364,8 +364,9 @@ export function BridgeReviewSummary() {
 
   const submitBridge = useCallback(async () => {
     if (!isTransfer && (!approveTransaction || !transaction)) return;
-    if ((fromRiskAssessment && isAddressSanctioned(fromRiskAssessment))
-      || (toRiskAssessment && isAddressSanctioned(toRiskAssessment))) {
+    if (!from || !to) return;
+    if (riskAssessment && (isAddressSanctioned(riskAssessment, from.walletAddress)
+      || isAddressSanctioned(riskAssessment, to.walletAddress))) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,

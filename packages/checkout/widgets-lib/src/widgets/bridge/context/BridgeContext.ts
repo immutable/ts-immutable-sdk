@@ -29,8 +29,7 @@ export interface BridgeState {
   allowedTokens: TokenInfo[];
   token: TokenInfo | null;
   amount: string;
-  fromRiskAssessment: AssessmentResult | undefined;
-  toRiskAssessment: AssessmentResult | undefined;
+  riskAssessment: AssessmentResult | undefined;
 }
 
 export const initialBridgeState: Omit<BridgeState, 'checkout'> = {
@@ -43,8 +42,7 @@ export const initialBridgeState: Omit<BridgeState, 'checkout'> = {
   allowedTokens: [],
   token: null,
   amount: '0',
-  fromRiskAssessment: undefined,
-  toRiskAssessment: undefined,
+  riskAssessment: undefined,
 };
 
 export interface BridgeContextState {
@@ -116,8 +114,7 @@ export interface SetTokenAndAmountPayload {
 
 export interface SetRiskAssessmentPayload {
   type: BridgeActions.SET_RISK_ASSESSMENT;
-  fromRiskAssessment: AssessmentResult | undefined;
-  toRiskAssessment: AssessmentResult | undefined;
+  riskAssessment: AssessmentResult;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -175,12 +172,7 @@ export const bridgeReducer: Reducer<BridgeState, BridgeAction> = (
     case BridgeActions.SET_RISK_ASSESSMENT:
       return {
         ...state,
-        fromRiskAssessment: action.payload.fromRiskAssessment !== undefined
-          ? action.payload.fromRiskAssessment
-          : state.fromRiskAssessment,
-        toRiskAssessment: action.payload.toRiskAssessment !== undefined
-          ? action.payload.toRiskAssessment
-          : state.toRiskAssessment,
+        riskAssessment: action.payload.riskAssessment,
       };
     default:
       return state;
