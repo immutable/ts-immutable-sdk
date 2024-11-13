@@ -365,8 +365,7 @@ export function BridgeReviewSummary() {
   const submitBridge = useCallback(async () => {
     if (!isTransfer && (!approveTransaction || !transaction)) return;
     if (!from || !to) return;
-    if (riskAssessment && (isAddressSanctioned(riskAssessment, from.walletAddress)
-      || isAddressSanctioned(riskAssessment, to.walletAddress))) {
+    if (riskAssessment && isAddressSanctioned(riskAssessment)) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
