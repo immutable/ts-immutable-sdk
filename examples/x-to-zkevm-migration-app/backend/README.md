@@ -52,7 +52,7 @@ docker-compose up --build
 2. The service will be available at:
 ```bash
 # Expose local port
-localhost:3000
+localhost:3001
 
 # Postgres
 localhost:5432
@@ -64,7 +64,7 @@ You can use services like below to expose ports locally.
 - https://ngrok.com/
 - localtunnel
 
-Please make sure the url with port 3000 exposed is set up in the webhook section in [Immutable Hub](hub.immmutable.com).
+Please make sure the url with port 3001 exposed is set up in the webhook section in [Immutable Hub](hub.immmutable.com).
 
 ## Webhook Configuration
 
@@ -73,8 +73,8 @@ Configure your webhook endpoint in the [Immutable Hub](https://hub.immutable.com
 1. Navigate to your project's webhook configuration
 2. Add webhook endpoint: `http://your-server:3000/webhook`
 3. Subscribe to events:
-   - `imtbl_x_transfer_created`
-   - `imtbl_zkevm_mint_request_updated`
+   - `imtbl_x_transfer_created` on the same collection as `IMX_MONITORED_COLLECTION_ADDRESS`
+   - `imtbl_zkevm_mint_request_updated` on the same collection as `ZKEVM_COLLECTION_ADDRESS`
 
 ## Testing Locally
 
@@ -85,7 +85,7 @@ docker-compose up --build
 
 2. Use ngrok or similar to expose your local endpoint:
 ```bash
-ngrok http 3000
+ngrok http 3001
 ```
 
 3. Update your webhook URL in Immutable Hub to the ngrok URL (e.g. `http://your-server:3000/webhook`)
@@ -112,5 +112,4 @@ The service uses:
 ## Database
 
 The service uses PostgreSQL for persistence. Tables are automatically created on startup:
-- Uses minting-backend tables for mint requests
-- Automatically applies migrations
+- Uses `im_assets` tables for mint requests
