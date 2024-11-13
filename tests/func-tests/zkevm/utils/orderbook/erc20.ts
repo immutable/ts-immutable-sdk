@@ -27,8 +27,8 @@ export async function deployERC20Token(deployer: Wallet): Promise<void> {
     GAS_OVERRIDES
   );
 
-  await testTokenContract.deployed();
-  console.log(`Test ERC20 token contract deployed: ${testTokenContract.address}`)
+  await testTokenContract.waitForDeployment();
+  console.log(`Test ERC20 token contract deployed: ${await testTokenContract.getAddress()}`)
 
   const minterRoleTx = await testTokenContract.grantMinterRole(deployerAddress, GAS_OVERRIDES);
   await minterRoleTx.wait()

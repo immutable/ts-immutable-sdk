@@ -269,7 +269,7 @@ export interface BridgeTxRequest {
   amount: bigint;
   sourceChainId: string;
   destinationChainId: string;
-  gasMultiplier: number;
+  gasMultiplier: number | string;
 }
 
 /**
