@@ -8,8 +8,7 @@ export async function validateChain(
   signer: EthSigner,
   config: ImmutableXConfiguration,
 ) {
-  // @ts-expect-error getChainId is not in the types for signer but it is in the implementation
-  const chainID = await signer.getChainId();
+  const chainID = (await signer.provider?.getNetwork())?.chainId;
 
   if (!isChainValid(Number(chainID), config)) {
     throw new Error(
