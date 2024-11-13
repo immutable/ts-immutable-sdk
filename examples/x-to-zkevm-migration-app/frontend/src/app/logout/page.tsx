@@ -10,7 +10,7 @@ export default function Logout() {
             className="underline"
             href="/"
           >
-            Return to examples
+            Return to app
           </a>
         </div>
       </div>

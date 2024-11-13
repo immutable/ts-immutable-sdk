@@ -22,7 +22,7 @@ export function PassportProvider({ children }: { children: React.ReactNode }) {
     const [imxProvider, setImxProvider] = useState<IMXProvider | undefined>();
     const passportInstance = new passport.Passport({
         baseConfig: {
-          environment: config.Environment.SANDBOX, // or config.Environment.SANDBOX
+          environment: config.Environment.SANDBOX,
         },
         clientId: process.env.NEXT_PUBLIC_CLIENT_ID || '<YOUR_CLIENT_ID>', // replace with your client ID from Hub
         redirectUri: 'http://localhost:3000/redirect', // replace with one of your redirect URIs from Hub
