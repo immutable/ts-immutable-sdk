@@ -7,6 +7,7 @@ import {
 import {
   GasEstimateBridgeToL2Result,
   GasEstimateType,
+  isAddressSanctioned,
 } from '@imtbl/checkout-sdk';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
 import { BigNumber, utils } from 'ethers';
@@ -76,7 +77,7 @@ export function BridgeReviewSummary() {
 
   const {
     bridgeState: {
-      checkout, tokenBridge, from, to, token, amount, tokenBalances,
+      checkout, tokenBridge, from, to, token, amount, tokenBalances, fromRiskAssessment, toRiskAssessment,
     },
     bridgeDispatch,
   } = useContext(BridgeContext);
@@ -363,6 +364,22 @@ export function BridgeReviewSummary() {
 
   const submitBridge = useCallback(async () => {
     if (!isTransfer && (!approveTransaction || !transaction)) return;
+
+    console.log('fromRiskAssessment', fromRiskAssessment);
+    console.log('toRiskAssessment', toRiskAssessment);
+
+    if (fromRiskAssessment && isAddressSanctioned(fromRiskAssessment)) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: BridgeWidgetViews.SERVICE_UNAVAILABLE,
+          },
+        },
+      });
+
+      return;
+    }
 
     if (insufficientFundsForGas) {
       setShowNotEnoughGasDrawer(true);

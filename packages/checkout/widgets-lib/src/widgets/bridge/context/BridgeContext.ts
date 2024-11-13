@@ -7,6 +7,7 @@ import {
   Checkout,
   ChainId,
   EIP6963ProviderInfo,
+  AssessmentResult,
 } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
 
@@ -28,6 +29,8 @@ export interface BridgeState {
   allowedTokens: TokenInfo[];
   token: TokenInfo | null;
   amount: string;
+  fromRiskAssessment: AssessmentResult | undefined;
+  toRiskAssessment: AssessmentResult | undefined;
 }
 
 export const initialBridgeState: Omit<BridgeState, 'checkout'> = {
@@ -40,6 +43,8 @@ export const initialBridgeState: Omit<BridgeState, 'checkout'> = {
   allowedTokens: [],
   token: null,
   amount: '0',
+  fromRiskAssessment: undefined,
+  toRiskAssessment: undefined,
 };
 
 export interface BridgeContextState {
@@ -58,7 +63,8 @@ type ActionPayload =
   | SetTokenBalancesPayload
   | SetAllowedTokensPayload
   | SetTokenAndAmountPayload
-  | SetWalletsAndNetworksPayload;
+  | SetWalletsAndNetworksPayload
+  | SetRiskAssessmentPayload;
 
 export enum BridgeActions {
   SET_WALLETS_AND_NETWORKS = 'SET_WALLETS_AND_NETWORKS',
@@ -68,6 +74,7 @@ export enum BridgeActions {
   SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES',
   SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
   SET_TOKEN_AND_AMOUNT = 'SET_TOKEN_AND_AMOUNT',
+  SET_RISK_ASSESSMENT = 'SET_RISK_ASSESSMENT',
 }
 
 export interface SetWalletProviderNamePayload {
@@ -105,6 +112,12 @@ export interface SetTokenAndAmountPayload {
   type: BridgeActions.SET_TOKEN_AND_AMOUNT;
   token: TokenInfo | null;
   amount: string;
+}
+
+export interface SetRiskAssessmentPayload {
+  type: BridgeActions.SET_RISK_ASSESSMENT;
+  fromRiskAssessment: AssessmentResult | undefined;
+  toRiskAssessment: AssessmentResult | undefined;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -158,6 +171,16 @@ export const bridgeReducer: Reducer<BridgeState, BridgeAction> = (
         ...state,
         token: action.payload.token,
         amount: action.payload.amount,
+      };
+    case BridgeActions.SET_RISK_ASSESSMENT:
+      return {
+        ...state,
+        fromRiskAssessment: action.payload.fromRiskAssessment !== undefined
+          ? action.payload.fromRiskAssessment
+          : state.fromRiskAssessment,
+        toRiskAssessment: action.payload.toRiskAssessment !== undefined
+          ? action.payload.toRiskAssessment
+          : state.toRiskAssessment,
       };
     default:
       return state;

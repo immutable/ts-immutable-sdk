@@ -14,7 +14,6 @@ import {
 import {
   ChainId,
   fetchRiskAssessment,
-  isAddressSanctioned,
   WalletProviderName,
   WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
@@ -30,7 +29,7 @@ import {
 } from '../../../lib/provider';
 import { getL1ChainId, getL2ChainId } from '../../../lib';
 import { getChainNameById } from '../../../lib/chains';
-import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { abbreviateAddress } from '../../../lib/addressUtils';
 import {
   useAnalytics,
@@ -213,21 +212,15 @@ export function WalletAndNetworkSelector() {
       const web3Provider = new Web3Provider(event.provider as any);
       const connectedProvider = await connectToProvider(checkout, web3Provider, changeAccount);
 
-      // CM-793 Check for sanctioned address
       const address = await connectedProvider.getSigner().getAddress();
-      const sanctions = await fetchRiskAssessment([address], checkout.config);
-      if (isAddressSanctioned(sanctions, address)) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
-              error: new Error('Sanctioned address'),
-            },
-          },
-        });
-        return;
-      }
+      const assessment = await fetchRiskAssessment([address], checkout.config);
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_RISK_ASSESSMENT,
+          fromRiskAssessment: assessment,
+          toRiskAssessment: undefined,
+        },
+      });
 
       await handleFromWalletConnectionSuccess(connectedProvider);
     },
@@ -325,6 +318,14 @@ export function WalletAndNetworkSelector() {
         setToWalletWeb3Provider(fromWalletWeb3Provider);
         setToWallet(event);
         const address = await fromWalletWeb3Provider!.getSigner().getAddress();
+        const assessment = await fetchRiskAssessment([address], checkout.config);
+        bridgeDispatch({
+          payload: {
+            type: BridgeActions.SET_RISK_ASSESSMENT,
+            fromRiskAssessment: undefined,
+            toRiskAssessment: assessment,
+          },
+        });
         setToWalletAddress(address.toLowerCase());
         handleSettingToNetwork(address.toLowerCase());
 
@@ -347,19 +348,19 @@ export function WalletAndNetworkSelector() {
 
         // CM-793 Check for sanctioned address
         const address = await connectedProvider.getSigner().getAddress();
-        const sanctions = await fetchRiskAssessment([address], checkout.config);
-        if (isAddressSanctioned(sanctions, address)) {
-          viewDispatch({
-            payload: {
-              type: ViewActions.UPDATE_VIEW,
-              view: {
-                type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
-                error: new Error('Sanctioned address'),
-              },
-            },
-          });
-          return;
-        }
+        // const sanctions = await fetchRiskAssessment([address], checkout.config);
+        // if (isAddressSanctioned(sanctions, address)) {
+        //   viewDispatch({
+        //     payload: {
+        //       type: ViewActions.UPDATE_VIEW,
+        //       view: {
+        //         type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
+        //         error: new Error('Sanctioned address'),
+        //       },
+        //     },
+        //   });
+        //   return;
+        // }
 
         if (isWalletConnectProvider(connectedProvider)) {
           handleWalletConnectToWalletConnection(connectedProvider);
