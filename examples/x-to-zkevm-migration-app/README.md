@@ -66,7 +66,7 @@ cd frontend
 3. Select an NFT from your Immutable X collection
 4. Initiate the migration (this will transfer the NFT to the burn address)
 5. Backend will automatically handle the minting on zkEVM
-6. Check your wallet for the new NFT on zkEVM
+6. Check your wallet for the new NFT on zkEVM (it should show in your zkEVM assets section of the UI)
 
 ## Development
 
