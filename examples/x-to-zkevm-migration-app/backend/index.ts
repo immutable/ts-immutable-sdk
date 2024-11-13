@@ -59,7 +59,6 @@ fastify.post('/webhook', async (request, reply) => {
                 token_id: event.data.token.data.token_id,
                 metadata: {} // Add any metadata if needed
               };
-              console.log(mintRequest);
               await minting.recordMint(mintRequest);
   
               console.log(`Created mint request for burned token ${event.data.token.data.token_id}`);
@@ -72,8 +71,6 @@ fastify.post('/webhook', async (request, reply) => {
     return reply.send({ status: 'ok' });
   } catch (error: unknown) {
     console.log(error)
-    console.log(error instanceof Error ? error.message : 'Unknown error')
-    fastify.log.error('Error processing webhook:', error);
     return reply.status(500).send({ 
       error: 'Failed to process webhook',
       message: error instanceof Error ? error.message : 'Unknown error'
@@ -88,7 +85,7 @@ const start = async () => {
     // long running process to submit minting requests
     await minting.submitMintingRequests({});
   } catch (err) {
-    fastify.log.error(err);
+    console.log(err);
     process.exit(1);
   }
 };
