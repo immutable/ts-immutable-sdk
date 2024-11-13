@@ -1,6 +1,3 @@
-import { Wallet } from '@ethersproject/wallet';
-import { JsonRpcProvider } from '@ethersproject/providers';
-import { ethers } from 'ethers';
 import {
   createStarkSigner,
   WalletConnection,
@@ -13,6 +10,7 @@ import {
 import { Environment, ImmutableConfiguration } from '@imtbl/sdk/config';
 import { env, getProvider } from '../common';
 import genericErc20Abi from '../abi/ERC20.json';
+import { Contract, JsonRpcProvider, Wallet } from 'ethers';
 
 const provider = getProvider(env.network, env.alchemyApiKey);
 
@@ -161,7 +159,7 @@ export class StepSharedState {
 
   static getTokenContract(symbol: string) {
     const tokenAddress = StepSharedState.getTokenAddress(symbol);
-    const contract = new ethers.Contract(
+    const contract = new Contract(
       tokenAddress,
       genericErc20Abi,
       provider,
