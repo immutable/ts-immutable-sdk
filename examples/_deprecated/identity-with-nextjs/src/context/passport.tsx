@@ -5,7 +5,7 @@ import {
   useMemo,
 } from 'react';
 import { config, passport } from '@imtbl/sdk';
-import { ethers } from 'ethers';
+import { BrowserProvider } from 'ethers';
 
 type PassportContextType = {
   passportInstance?: passport.Passport;
@@ -25,7 +25,7 @@ const PassportContext = createContext<PassportContextType>({});
 
 export function PassportProvider({ children }: { children: ReactNode }) {
   // #doc passport-instance
-  const passportInstance = new passport.Passport({
+  const passportInstance = useMemo(() => new passport.Passport({
     baseConfig: {
       environment: config.Environment.SANDBOX, // or config.Environment.SANDBOX
       publishableKey:
@@ -36,11 +36,11 @@ export function PassportProvider({ children }: { children: ReactNode }) {
     logoutRedirectUri: 'http://localhost:3000/logout', // replace with one of your logout URIs from Hub
     audience: 'platform_api',
     scope: 'openid offline_access email transact',
-  });
+  }), []);
   // #enddoc passport-instance
 
   // #doc passport-silent-instance
-  const passportSilentInstance = new passport.Passport({
+  const passportSilentInstance = useMemo(() => new passport.Passport({
     baseConfig: {
       environment: config.Environment.SANDBOX, // or config.Environment.SANDBOX
       publishableKey:
@@ -52,13 +52,13 @@ export function PassportProvider({ children }: { children: ReactNode }) {
     logoutMode: 'silent',
     audience: 'platform_api',
     scope: 'openid offline_access email transact',
-  });
+  }), []);
   // #enddoc passport-silent-instance
 
   const login = useCallback(async () => {
     if (!passportInstance) return;
     // #doc passport-evm-login
-    const provider = passportInstance.connectEvm();
+    const provider = await passportInstance.connectEvm();
     const accounts = await provider.request({ method: 'eth_requestAccounts' });
     // #enddoc passport-evm-login
     window.alert(`accounts: ${accounts}`);
@@ -89,14 +89,14 @@ export function PassportProvider({ children }: { children: ReactNode }) {
   const loginWithEthersjs = useCallback(async () => {
     if (!passportInstance) return;
     // #doc passport-login-with-ethersjs
-    const passportProvider = passportInstance.connectEvm();
+    const passportProvider = await passportInstance.connectEvm();
 
-    const web3Provider = new ethers.providers.Web3Provider(passportProvider);
+    const web3Provider = new BrowserProvider(passportProvider);
 
     const accounts = await web3Provider.send('eth_requestAccounts', []);
     // #enddoc passport-login-with-ethersjs
 
-    const signer = web3Provider.getSigner();
+    const signer = await web3Provider.getSigner();
 
     window.alert(
       `accounts: ${accounts} signer: ${JSON.stringify(signer)}`,
