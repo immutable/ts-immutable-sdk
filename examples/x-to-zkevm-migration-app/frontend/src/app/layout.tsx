@@ -1,8 +1,11 @@
-import { IMXProvider } from '@/context/imx'
-import { PassportProvider } from '@/context/passport'
-import { ZkEVMProvider } from '@/context/zkevm'
-import { Inter } from 'next/font/google'
-import './globals.css'
+'use client';
+
+import { IMXProvider } from '@/context/imx';
+import { PassportProvider } from '@/context/passport';
+import { ZkEVMProvider } from '@/context/zkevm';
+import { BiomeCombinedProviders, Stack } from '@biom3/react';
+import { Inter } from 'next/font/google';
+import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -14,13 +17,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <IMXProvider>
-          <ZkEVMProvider>
-            <PassportProvider>
-              {children}
-            </PassportProvider>
-          </ZkEVMProvider>
-        </IMXProvider>
+        <BiomeCombinedProviders>
+          <Stack>
+            <IMXProvider>
+              <ZkEVMProvider>
+                <PassportProvider>
+                  {children}
+                </PassportProvider>
+              </ZkEVMProvider>
+            </IMXProvider>
+          </Stack>
+        </BiomeCombinedProviders>
       </body>
     </html>
   )
