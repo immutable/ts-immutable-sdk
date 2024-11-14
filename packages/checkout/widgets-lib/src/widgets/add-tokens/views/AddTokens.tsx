@@ -542,13 +542,13 @@ export function AddTokens({
             toTokenAddress={toTokenAddress}
           />
           {showInitialEmptyState ? (
-            <Body>Add Token</Body>
+            <Body>{t('views.ADD_TOKENS.tokenSelection.buttonText')}</Body>
           ) : (
             <HeroFormControl
               validationStatus={inputValue === '0' ? 'error' : 'success'}
             >
               <HeroFormControl.Label>
-                Add
+                {t('views.ADD_TOKENS.tokenSelection.tokenLabel')}
                 {' '}
                 {selectedToken.symbol}
               </HeroFormControl.Label>
@@ -588,7 +588,7 @@ export function AddTokens({
                 && inputValue
                 ? { animation: `${PULSE_SHADOW} 2s infinite ease-in-out` }
                 : {}}
-              label="Send from"
+              label={t('views.ADD_TOKENS.walletSelection.fromText')}
               providerInfo={{
                 ...fromProviderInfo,
                 address: fromAddress,
@@ -638,7 +638,7 @@ export function AddTokens({
                 && inputValue
                 ? { animation: `${PULSE_SHADOW} 2s infinite ease-in-out` }
                 : {}}
-              label="Deliver to"
+              label={t('views.ADD_TOKENS.walletSelection.toText')}
               providerInfo={{
                 ...toProviderInfo,
                 address: toAddress,
@@ -656,7 +656,7 @@ export function AddTokens({
             onClick={handleReviewClick}
             sx={{ opacity: readyToReview ? 1 : 0.5 }}
           >
-            Review
+            {t('views.ADD_TOKENS.review.buttonText')}
           </Button>
 
           <SquidFooter />

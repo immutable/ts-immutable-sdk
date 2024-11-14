@@ -634,48 +634,186 @@
       }
     },
     "ADD_TOKENS": {
+      "tokenSelection": {
+        "buttonText": "トークンを追加",
+        "tokenLabel": "追加",
+        "drawerHeading": "トークンを追加",
+        "searchPlaceholder": "トークンを検索"
+      },
+      "walletSelection": {
+        "fromText": "送金元",
+        "toText": "送金先"
+      },
+      "routeSelection": {
+        "loadingText": "最適な支払いルートを検索中...",
+        "noRoute": "ルートが見つかりません。他のウォレット、トークン、または金額を選択してください。",
+        "payWithCard": "ルートが見つかりません。カードでの支払いが利用可能です",
+        "fastestBadge": "最速",
+        "minutesText": "分",
+        "minuteText": "分",
+        "secondsText": "秒"
+      },
       "drawer": {
         "options": {
+          "heading": "支払い元",
+          "moreOptionsDividerText": "支払い方法の追加",
+          "loadingText1": "最適な価値を検索中",
+          "loadingText2": "すべてのチェーンを横断",
+          "noRoutes": {
+            "heading": "ルートが見つかりません",
+            "caption": "他のウォレット、トークン、または金額を選択して再試行してください。"
+          },
           "swap": {
             "heading": "スワップ",
-            "caption": "このネットワークでトークンをスワップします。",
+            "caption": "このネットワークでトークンを交換します。",
             "disabledCaption": "現在利用できません。"
           },
           "debit": {
             "heading": "デビットカード",
             "caption": "",
-            "disabledCaption": "選択した内容には利用できません。トークンを追加することをお勧めします。"
+            "disabledCaption": "お客様の選択では利用できません。トークンの追加をお勧めします。"
           },
           "credit": {
             "heading": "クレジットカード",
-            "caption": "失敗や追加手数料が発生する可能性があります。",
-            "disabledCaption": "選択した内容には利用できません。トークンを追加することをお勧めします。"
+            "caption": "失敗や追加料金が発生する可能性があります。",
+            "disabledCaption": "お客様の選択では利用できません。トークンの追加をお勧めします。"
           }
+        }
+      },
+      "error": {
+        "default": {
+          "heading": "申し訳ありませんが、問題が発生しました。後でもう一度お試しください。",
+          "secondaryButtonText": "閉じる"
+        },
+        "invalidParameters": {
+          "heading": "無効なパラメータ",
+          "subHeading": "提供されたウィジェットパラメータが無効です。再度確認してください。",
+          "secondaryButtonText": "閉じる"
+        },
+        "serviceBreakdown": {
+          "heading": "現在システムがダウンしています",
+          "subHeading": "現在技術的な問題が発生しています。後でもう一度お試しください。",
+          "secondaryButtonText": "閉じる"
+        },
+        "transactionFailed": {
+          "heading": "取引が失敗しました",
+          "subHeading": "取引に失敗しました。もう一度お試しください。",
+          "primaryButtonText": "再試行",
+          "secondaryButtonText": "閉じる"
+        },
+        "unrecognisedChain": {
+          "heading": "認識できないチェーン",
+          "subHeading": "チェーンをアカウントに追加して再試行してください。",
+          "primaryButtonText": "再試行",
+          "secondaryButtonText": "閉じる"
+        },
+        "providerError": {
+          "heading": "ウォレットが見つかりません",
+          "subHeading": "ウォレットを接続して再試行してください。",
+          "primaryButtonText": "再試行",
+          "secondaryButtonText": "閉じる"
+        },
+        "walletFailed": {
+          "heading": "取引が失敗しました",
+          "subHeading": "取引に失敗しました。もう一度お試しください。",
+          "primaryButtonText": "再試行",
+          "secondaryButtonText": "閉じる"
+        },
+        "walletRejected": {
+          "heading": "取引が拒否されました",
+          "subHeading": "続行するにはウォレットで取引を承認してください。",
+          "primaryButtonText": "再試行",
+          "secondaryButtonText": "閉じる"
+        },
+        "walletRejectedNoFunds": {
+          "heading": "資金が不足しています",
+          "subHeading": "取引を完了するのに十分な資金がありません。",
+          "primaryButtonText": "再試行",
+          "secondaryButtonText": "閉じる"
+        },
+        "walletPopupBlocked": {
+          "heading": "ブラウザのポップアップがブロックされました",
+          "subHeading": "続行するにはブラウザでポップアップを許可してください。",
+          "primaryButtonText": "再試行",
+          "secondaryButtonText": "閉じる"
+        },
+        "environmentError": {
+          "heading": "サポートされていない環境",
+          "subHeading": "これは本番環境でのみサポートされています。",
+          "secondaryButtonText": "閉じる"
+        },
+        "addressMismatch": {
+          "heading": "おっと！支払いウォレットが変更されました",
+          "body": "以前に選択したウォレットと再接続するように求められます",
+          "buttonText": "支払いウォレットを再選択"
+        }
+      },
+      "review": {
+        "buttonText": "確認",
+        "heading": "確認",
+        "send": "送信",
+        "receive": "受信",
+        "swap": "交換",
+        "to": "に",
+        "loadingText": "見積もりを確保中",
+        "processingButtonText": "処理中",
+        "proceedButtonText": "進む",
+        "poweredBySquid": "Squidによる提供"
+      },
+      "handover": {
+        "preparing": {
+          "heading": "準備中"
+        },
+        "requestingApproval": {
+          "heading": "ウォレットでのアクセス承認待ち",
+          "subHeading": "取引リクエストを承認してこの取引を完了してください"
+        },
+        "approved": {
+          "heading": "トークンへのアクセスが許可されました"
+        },
+        "requestingExecution": {
+          "heading": "ウォレットでの取引確認待ち",
+          "subHeading": "取引リクエストを確認してこの取引を完了してください"
+        },
+        "executing": {
+          "heading": "処理中"
+        },
+        "executed": {
+          "heading": "資金が正常に追加されました",
+          "subHeadingGoTo": "移動",
+          "subHeadingTransactionDetails": "取引詳細はこちら"
         }
       },
       "onboarding": {
         "screen1": {
-          "title": "いくつか変更しました\nより簡単にするために",
+          "title": "いくつか変更して\nより簡単になりました",
           "caption": "注目してください",
           "buttonText": "次へ"
         },
         "screen2": {
-          "title": "トークンをパスポートに送って\nどのウォレットからでも支払い可能です",
+          "title": "トークンをPassportに送信して\nどのウォレットからでも支払えます",
           "caption": "進化した点",
           "buttonText": "次へ"
         },
         "screen3": {
-          "title": "他のチェーンでトークンを使用し、\n最適なオプションを見つけます",
+          "title": "他のチェーンでトークンを使用できます。\n最適なオプションを見つけます",
           "caption": "進化",
           "buttonText": "トークンを追加しましょう"
         }
       },
       "footer": {
-        "body": "スワップ機能はサードパーティであるSquidによって提供されています。Immutableは<squidLink>Squid</squidLink>を構築、所有、運営、またはデプロイしていません。"
+        "body": "スワップ機能は第三者のSquidによって提供されています。Immutableは<squidLink>Squid</squidLink>を構築、所有、運営、または配信していません。"
       },
       "geoBlockError": {
-        "buyTokenButton": "トークンを購入する",
-        "bridgeTokenButton": "トークンをブリッジする"
+        "buyTokenButton": "トークンを購入",
+        "bridgeTokenButton": "トークンをブリッジ"
+      },
+      "fees": {
+        "fee": "手数料",
+        "balance": "残高",
+        "fiatPricePrefix": "≈ USD",
+        "zeroFees": "手数料無料",
+        "includedFees": "手数料込み"
       }
     }
   },
@@ -831,6 +969,20 @@
           "proceed": "わかりました"
         }
       }
+    },
+    "wallet": {
+      "payWithHeading": "送信元",
+      "payWithHeadingInsufficientBalance": "別のオプションを選択してください",
+      "deliverToHeading": "配送先",
+      "payWithCard": "カードで支払う",
+      "insufficientFunds": "残高不足",
+      "noFunds": "資金がありません"
+    },
+    "eoaWarning": {
+      "dividerText": "警告",
+      "heading": "資産をPassportに送らないと見失う可能性があります",
+      "passportButtonText": "代わりにPassportに送る",
+      "proceedButtonText": "それでも続行"
     }
   }
 }
