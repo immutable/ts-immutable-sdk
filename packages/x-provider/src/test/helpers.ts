@@ -80,7 +80,9 @@ export const generateSigners = async (privateKey: string): Promise<Signers> => {
   const ethSigner = {
     signMessage: async (message: string) => message + ethKey,
     getAddress: async () => ethKey,
-    getChainId: async () => testChainId,
+    provider: {
+      getNetwork: async () => ({ chainId: testChainId }),
+    },
     sendTransaction: async () => transactionResponse,
   } as unknown as Signer;
 
