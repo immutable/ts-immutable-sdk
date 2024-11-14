@@ -115,14 +115,7 @@ export default function Home() {
       <div className="max-w-6xl mx-auto">
         <header className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">Immutable X to Immutable zkEVM Asset Migrator</h1>
-          {!userProfile ? (
-            <button
-              onClick={handleLogin}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Login to Passport
-            </button>
-          ) : (
+          {userProfile ? (
             <div className="flex items-center gap-4">
               <span className="text-gray-600">
                 {imxWalletAddress}
@@ -134,21 +127,28 @@ export default function Home() {
                 Logout
               </button>
             </div>
+          ) : (
+            <button
+              onClick={handleLogin}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Login to Passport
+            </button>
           )}
         </header>
 
-        {userProfile && (
+        {userProfile ? (
           <div>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-gray-700">IMX Assets for Migration</h2>
-              {selectedAssets.length > 0 && (
+              {selectedAssets.length > 0 ? (
                 <button
                   onClick={handleBurn}
                   className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                 >
                   Migrate Selected ({selectedAssets.length})
                 </button>
-              )}
+              ) : null}
             </div>
 
             {loading ? (
@@ -202,7 +202,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-        )}
+        ) : null}
       </div>
     </main>
   );
