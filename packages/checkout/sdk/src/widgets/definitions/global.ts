@@ -8,6 +8,7 @@ import {
   WidgetProperties,
   WidgetType,
   WidgetEventData,
+  IWidgetsFactoryCreate,
 } from './types';
 
 /**
@@ -19,7 +20,7 @@ declare global {
   namespace ImmutableCheckoutWidgets {
     class WidgetsFactory implements IWidgetsFactory {
       constructor(sdk: Checkout, config: CheckoutWidgetsConfig);
-      create<T extends WidgetType>(type: T, props?: WidgetProperties<T>): Widget<T>;
+      create: IWidgetsFactoryCreate;
       updateProvider(provider: Web3Provider): void;
     }
 

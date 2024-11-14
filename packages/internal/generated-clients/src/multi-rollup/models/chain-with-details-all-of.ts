@@ -26,5 +26,17 @@ export interface ChainWithDetailsAllOf {
      * @memberof ChainWithDetailsAllOf
      */
     'rpc_url': string | null;
+    /**
+     * The address of the Operator Allowlist - https://docs.immutable.com/products/zkevm/minting/royalties/allowlist-spec/
+     * @type {string}
+     * @memberof ChainWithDetailsAllOf
+     */
+    'operator_allowlist_address': string | null;
+    /**
+     * The address of the minter used in the Minting API - https://docs.immutable.com/products/zkEVM/minting/minting-api#minting-api-prerequisites
+     * @type {string}
+     * @memberof ChainWithDetailsAllOf
+     */
+    'minter_address': string | null;
 }
 

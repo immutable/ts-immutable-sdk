@@ -9,6 +9,7 @@ import {
 import {
   TokenFilterTypes, IMTBLWidgetEvents, SwapWidgetParams,
   SwapDirection,
+  fetchRiskAssessment,
 } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { SwapCoins } from './views/SwapCoins';
@@ -50,6 +51,7 @@ import { ConnectLoaderContext } from '../../context/connect-loader-context/Conne
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { getAllowedBalances } from '../../lib/balance';
 import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 
 export type SwapWidgetInputs = SwapWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
@@ -183,6 +185,28 @@ export default function SwapWidget({
       if (viewState.view.type === SharedViews.LOADING_VIEW) {
         showSwapView();
       }
+    })();
+  }, [checkout, provider]);
+
+  useEffect(() => {
+    if (!checkout || swapState.riskAssessment) {
+      return;
+    }
+
+    (async () => {
+      const address = await provider?.getSigner()?.getAddress();
+
+      if (!address) {
+        return;
+      }
+
+      const assessment = await fetchRiskAssessment([address], checkout.config);
+      swapDispatch({
+        payload: {
+          type: SwapActions.SET_RISK_ASSESSMENT,
+          riskAssessment: assessment,
+        },
+      });
     })();
   }, [checkout, provider]);
 
@@ -339,6 +363,16 @@ export default function SwapWidget({
             }}
             onCloseClick={() => sendSwapWidgetCloseEvent(eventTarget)}
             errorEventActionLoading={errorViewLoading}
+          />
+          )}
+          {viewState.view.type === SwapWidgetViews.SERVICE_UNAVAILABLE && (
+          <ServiceUnavailableErrorView
+            onCloseClick={() => sendSwapWidgetCloseEvent(eventTarget)}
+            onBackButtonClick={() => {
+              viewDispatch({
+                payload: { type: ViewActions.UPDATE_VIEW, view: { type: SwapWidgetViews.SWAP } },
+              });
+            }}
           />
           )}
           {viewState.view.type === SharedViews.TOP_UP_VIEW && (

@@ -460,10 +460,6 @@ export function Review({
                   <Sticker.FramedImage
                     use={<img src={fromChain?.iconUrl} alt={fromChain?.name} />}
                     emphasized
-                    sx={{
-                      bottom: 'base.spacing.x2',
-                      right: 'base.spacing.x2',
-                    }}
                   />
                 </Sticker>
                 <Stack sx={{ flex: 1 }} gap="0px">
@@ -601,10 +597,6 @@ export function Review({
                   <Sticker.FramedImage
                     use={<img src={toChain?.iconUrl} alt={toChain?.name} />}
                     emphasized
-                    sx={{
-                      bottom: 'base.spacing.x2',
-                      right: 'base.spacing.x2',
-                    }}
                   />
                 </Sticker>
                 <Stack sx={{ flex: 1 }} gap="0px">

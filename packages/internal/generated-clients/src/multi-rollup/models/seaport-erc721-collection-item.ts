@@ -42,6 +42,12 @@ export interface SeaportERC721CollectionItem {
      */
     'contract_name'?: string | null;
     /**
+     * The URL of the collection image
+     * @type {string}
+     * @memberof SeaportERC721CollectionItem
+     */
+    'image_url': string;
+    /**
      * A string representing the total units of an ERC721 token which the user is buying
      * @type {string}
      * @memberof SeaportERC721CollectionItem

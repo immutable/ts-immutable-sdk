@@ -24,6 +24,10 @@ export class BlockchainData {
 
   private readonly crafting: mr.CraftingApi;
 
+  private readonly pricing: mr.PricingApi;
+
+  private readonly metadataSearch: mr.MetadataSearchApi;
+
   constructor(moduleConfig: BlockchainDataModuleConfiguration) {
     this.config = new BlockchainDataConfiguration(moduleConfig);
 
@@ -35,6 +39,8 @@ export class BlockchainData {
     this.tokens = new mr.TokensApi(this.config.apiConfig);
     this.metadata = new mr.MetadataApi(this.config.apiConfig);
     this.crafting = new mr.CraftingApi(this.config.apiConfig);
+    this.pricing = new mr.PricingApi(this.config.apiConfig);
+    this.metadataSearch = new mr.MetadataSearchApi(this.config.apiConfig);
   }
 
   /**
@@ -477,5 +483,122 @@ export class BlockchainData {
       .catch((err) => {
         throw formatError(err);
       })) as Types.SignCraftingResult;
+  }
+
+  /**
+   * Marketplace APIs
+   * - Metadata search
+   */
+
+  /**
+   * Get list of metadata filters
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with the a list of metadata filters
+   * @throws {@link index.APIError}
+   */
+  public async listFilters(
+    request: Types.ListFiltersRequestParams,
+  ): Promise<Types.ListFiltersResult> {
+    return (await this.metadataSearch
+      .listFilters(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      })) as Types.ListFiltersResult;
+  }
+
+  /**
+   * Search NFTs
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with the a list NFTs with metadata, market and listings information
+   * @throws {@link index.APIError}
+   */
+  public async searchNFTs(
+    request: Types.SearchNFTsRequestParams,
+  ): Promise<Types.SearchNFTsResult> {
+    return (await this.metadataSearch
+      .searchNFTs(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      })) as Types.SearchNFTsResult;
+  }
+
+  /**
+   * Search NFT stacks
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with the a list NFT stacks with stack count, market and listings information
+   * @throws {@link index.APIError}
+   */
+  public async searchStacks(
+    request: Types.SearchStacksRequestParams,
+  ): Promise<Types.SearchStacksResult> {
+    return (await this.metadataSearch
+      .searchStacks(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      })) as Types.SearchStacksResult;
+  }
+
+  /**
+   * Marketplace APIs
+   * - Pricing
+   */
+
+  /**
+   * Get pricing data for a list of token ids
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with the a list of pricing data for particular NFTs
+   * @throws {@link index.APIError}
+   */
+  public async quotesForNFTs(
+    request: Types.QuotesForNFTsRequestParams,
+  ): Promise<Types.QuotesForNFTsResult> {
+    return (await this.pricing
+      .quotesForNFTs(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      })) as Types.QuotesForNFTsResult;
+  }
+
+  /**
+   * Get pricing data for a list of stack ids
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with the a list of pricing data for particular stack ids
+   * @throws {@link index.APIError}
+   */
+  public async quotesForStacks(
+    request: Types.QuotesForStacksRequestParams,
+  ): Promise<Types.QuotesForStacksResult> {
+    return (await this.pricing
+      .quotesForStacks(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      })) as Types.QuotesForStacksResult;
+  }
+
+  /**
+   * Marketplace APIs
+   * - Metadata
+   */
+
+  /**
+   * List NFT stack bundles by stack_id.
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with a list of NFT stacks with stack count, market and listings information
+   * @throws {@link index.APIError}
+   */
+  public async listStacks(
+    request: Types.ListStacksRequestParams,
+  ): Promise<Types.StackBundle[]> {
+    return (await this.metadata
+      .listStacks(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      })) as Types.StackBundle[];
   }
 }

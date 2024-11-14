@@ -49,7 +49,7 @@ describe('formatError', () => {
 
     const client = new ImmutableX(config);
     await expect(client.getUser('')).rejects.toThrowError(
-      'Error: Request failed with status code 404',
+      'no matching operation was found',
     );
   });
 });

@@ -30,7 +30,7 @@ export interface ValidationErrorResults {
      */
     'status': ValidationStatus;
     /**
-     * human-readable error message
+     * human-readable error message representing a failure with the simulated transaction, such as a reversion
      * @type {string}
      * @memberof ValidationErrorResults
      */
