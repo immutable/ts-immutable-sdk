@@ -4,6 +4,7 @@ import {
 import { ReactNode, useState } from 'react';
 import { motion } from 'framer-motion';
 import { EIP1193Provider, EIP6963ProviderDetail, WalletProviderRdns } from '@imtbl/checkout-sdk';
+import { useTranslation } from 'react-i18next';
 import { FormControlWrapper } from '../FormComponents/FormControlWrapper/FormControlWrapper';
 import { WalletItem } from './WalletItem';
 import { walletItemListStyles } from './WalletDrawerStyles';
@@ -48,6 +49,7 @@ export function WalletDrawer({
   bottomSlot,
   disabledOptions,
 }: WalletDrawerProps) {
+  const { t } = useTranslation();
   const { isWalletConnectEnabled, openWalletConnectModal } = useWalletConnect();
   const [walletItemLoading, setWalletItemLoading] = useState(false);
   const { heading, defaultText } = drawerText;
@@ -136,7 +138,7 @@ export function WalletDrawer({
             <MenuItem.Badge
               variant="dark"
               badgeContent={
-                disabledOptions?.[unavailableIndex]?.label ?? 'no funds'
+                disabledOptions?.[unavailableIndex]?.label ?? t('drawers.wallet.noFunds')
               }
             />
           ) : undefined;

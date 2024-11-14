@@ -24,6 +24,7 @@ import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { OrderInProgress } from './views/OrderInProgress';
+import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 
 export type OnRampWidgetInputs = OnRampWidgetParams & {
   config: StrongCheckoutWidgetsConfig
@@ -152,6 +153,12 @@ export default function OnRampWidget({
           showBridgeOption={isBridgeEnabled}
           onCloseButtonClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
         />
+      )}
+      {viewState.view.type
+        === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
+          <ServiceUnavailableErrorView
+            onCloseClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
+          />
       )}
     </ViewContext.Provider>
   );

@@ -5,6 +5,7 @@ import {
   Drawer,
   Heading,
 } from '@biom3/react';
+import { useTranslation } from 'react-i18next';
 import { WarningHero } from '../Hero/WarningHero';
 
 export function EOAWarningDrawer({
@@ -16,6 +17,7 @@ export function EOAWarningDrawer({
   onProceedClick: () => void;
   onCloseDrawer: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <Drawer
       size="threeQuarter"
@@ -32,7 +34,7 @@ export function EOAWarningDrawer({
             textAlign="center"
             sx={{ mb: 'base.spacing.x2' }}
           >
-            WARNING
+            {t('drawers.eoaWarning.dividerText')}
           </Divider>
           <Box sx={{ px: 'base.spacing.x4' }}>
             <Heading
@@ -42,7 +44,7 @@ export function EOAWarningDrawer({
                 textAlign: 'center',
               }}
             >
-              You could lose sight of your assets if you don’t deliver them to Passport
+              {t('drawers.eoaWarning.heading')}
             </Heading>
           </Box>
           <Box
@@ -59,7 +61,7 @@ export function EOAWarningDrawer({
               size="large"
               onClick={onCloseDrawer}
             >
-              Deliver to Passport instead
+              {t('drawers.eoaWarning.passportButtonText')}
             </Button>
 
             <Button
@@ -69,7 +71,7 @@ export function EOAWarningDrawer({
               size="large"
               onClick={onProceedClick}
             >
-              Proceed anyway
+              {t('drawers.eoaWarning.proceedButtonText')}
             </Button>
           </Box>
         </Box>

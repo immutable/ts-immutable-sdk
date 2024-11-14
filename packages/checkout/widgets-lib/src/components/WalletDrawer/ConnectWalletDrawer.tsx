@@ -153,7 +153,6 @@ export function ConnectWalletDrawer({
     } catch (error: ConnectEIP6963ProviderError | any) {
       let errorType = error.message;
       switch (error.message) {
-        case ConnectEIP6963ProviderError.SANCTIONED_ADDRESS:
         case ConnectEIP6963ProviderError.CONNECT_ERROR:
           setShowUnableToConnectDrawer(true);
           break;
