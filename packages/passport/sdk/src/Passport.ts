@@ -192,10 +192,8 @@ export class Passport {
       try {
         user = await this.authManager.getUser();
       } catch (error) {
-        if (error instanceof Error) {
-          trackError('passport', 'login', error);
-        }
         if (useCachedSession) {
+          if (error instanceof Error) trackError('passport', 'login', error);
           throw error;
         }
         logger.warn('Failed to retrieve a cached user session', error);
