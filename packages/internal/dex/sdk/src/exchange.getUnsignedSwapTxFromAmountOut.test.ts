@@ -71,7 +71,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
   beforeAll(() => {
     (Contract as unknown as jest.Mock).mockImplementation(() => ({
       allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
-      estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
+      approve: { estimateGas: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
       paused: jest.fn().mockResolvedValue(false),
     }));
 
