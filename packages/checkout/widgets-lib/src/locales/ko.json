@@ -752,7 +752,10 @@
         "receive": "받기",
         "swap": "스왑",
         "to": "대상",
-        "loadingText": "견적 확보 중"
+        "loadingText": "견적 확보 중",
+        "processingButtonText": "처리 중",
+        "proceedButtonText": "진행",
+        "poweredBySquid": "Squid 제공"
       },
       "handover": {
         "preparing": {

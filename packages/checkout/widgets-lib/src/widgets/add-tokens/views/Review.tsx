@@ -547,7 +547,7 @@ export function Review({
                     size="small"
                     sx={{ c: 'base.color.text.body.secondary' }}
                   >
-                    Powered by Squid
+                    {t('views.ADD_TOKENS.review.poweredBySquid')}
                     <br />
                     1
                     {' '}
@@ -695,7 +695,8 @@ export function Review({
               disabled={proceedDisabled}
               sx={{ mx: 'base.spacing.x3' }}
             >
-              {proceedDisabled ? 'Processing' : 'Proceed'}
+              {proceedDisabled ? t('views.ADD_TOKENS.review.processingButtonText')
+                : t('views.ADD_TOKENS.review.proceedButtonText')}
             </Button>
 
             <SquidFooter />

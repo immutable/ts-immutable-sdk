@@ -755,7 +755,10 @@
         "receive": "受信",
         "swap": "交換",
         "to": "に",
-        "loadingText": "見積もりを確保中"
+        "loadingText": "見積もりを確保中",
+        "processingButtonText": "処理中",
+        "proceedButtonText": "進む",
+        "poweredBySquid": "Squidによる提供"
       },
       "handover": {
         "preparing": {

@@ -772,7 +772,10 @@
         "receive": "Receive",
         "swap": "Swap",
         "to": "to",
-        "loadingText": "Securing quote"
+        "loadingText": "Securing quote",
+        "processingButtonText": "Processing",
+        "proceedButtonText": "Proceed",
+        "poweredBySquid": "Powered by Squid"
       },
       "handover": {
         "preparing": {
