@@ -9,6 +9,7 @@ import {
   Stack,
 } from '@biom3/react';
 import debounce from 'lodash.debounce';
+import { ActionType } from '@0xsquid/squid-types';
 import {
   ChainId,
   type Checkout,
@@ -145,16 +146,6 @@ export function AddTokens({
 
   const setSelectedAmount = useMemo(
     () => debounce((value: string) => {
-      track({
-        userJourney: UserJourney.ADD_TOKENS,
-        screen: 'InputScreen',
-        control: 'AmountInput',
-        controlType: 'TextInput',
-        extras: {
-          toAmount: value,
-        },
-      });
-
       addTokensDispatch({
         payload: {
           type: AddTokensActions.SET_SELECTED_AMOUNT,
@@ -179,6 +170,9 @@ export function AddTokens({
           fromTokenChainId: route.amountData.fromToken.chainId,
           toAmount: route.amountData.toAmount,
           fromAmount: route.amountData.fromAmount,
+          hasEmbeddedSwap: !!route.route.route.estimate.actions.find(
+            (action) => action.type === ActionType.SWAP,
+          ),
         },
       });
     }
@@ -200,6 +194,16 @@ export function AddTokens({
 
     setInputValue(value);
     setSelectedAmount(value);
+
+    track({
+      userJourney: UserJourney.ADD_TOKENS,
+      screen: 'InputScreen',
+      control: 'AmountInput',
+      controlType: 'TextInput',
+      extras: {
+        toAmount: value,
+      },
+    });
   };
 
   const {
@@ -242,9 +246,10 @@ export function AddTokens({
       extras: {
         toAmount,
         toTokenAddress,
+        geoBlocked: !isSwapAvailable,
       },
     });
-  }, []);
+  }, [isSwapAvailable]);
 
   useEffect(() => {
     if (!toAmount) return;
@@ -407,8 +412,8 @@ export function AddTokens({
     track({
       userJourney: UserJourney.ADD_TOKENS,
       screen: 'InputScreen',
-      control: 'RoutesMenu',
-      controlType: 'MenuItem',
+      control: 'Review',
+      controlType: 'Button',
       extras: {
         toTokenAddress: selectedRouteData.amountData.toToken.address,
         toTokenChainId: selectedRouteData.amountData.toToken.chainId,
@@ -686,6 +691,7 @@ export function AddTokens({
             visible={showDeliverToDrawer}
             walletOptions={walletOptions}
             onClose={handleDeliverToClose}
+            onConnect={handleWalletConnected}
           />
           <OnboardingDrawer environment={checkout?.config.environment!} />
         </Stack>

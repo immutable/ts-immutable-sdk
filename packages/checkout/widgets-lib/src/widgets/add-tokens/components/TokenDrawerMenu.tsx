@@ -67,16 +67,6 @@ export function TokenDrawerMenu({
   const { t } = useTranslation();
 
   const setSelectedToken = (token: TokenInfo | undefined) => {
-    track({
-      userJourney: UserJourney.ADD_TOKENS,
-      screen: 'InputScreen',
-      control: 'TokensMenu',
-      controlType: 'MenuItem',
-      extras: {
-        tokenAddress: token?.address,
-      },
-    });
-
     addTokensDispatch({
       payload: {
         type: AddTokensActions.SET_SELECTED_TOKEN,
@@ -86,6 +76,15 @@ export function TokenDrawerMenu({
   };
 
   const handleTokenChange = useCallback((token: TokenInfo) => {
+    track({
+      userJourney: UserJourney.ADD_TOKENS,
+      screen: 'InputScreen',
+      control: 'TokensMenu',
+      controlType: 'MenuItem',
+      extras: {
+        tokenAddress: token?.address,
+      },
+    });
     setSelectedToken(token);
     setVisible(false);
     setSearchValue('');
