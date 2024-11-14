@@ -1,7 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
-  CheckoutError,
   CheckoutErrorType,
   EIP6963ProviderDetail,
   WalletProviderRdns,
@@ -34,16 +33,6 @@ export const connectEIP6963Provider = async (
       provider: web3Provider,
       requestWalletPermissions,
     });
-
-    const address = await connectResult.provider.getSigner().getAddress();
-    const riskAssessment = await checkout.getRiskAssessment([address]);
-
-    if (checkout.checkIsAddressSanctioned(riskAssessment, address)) {
-      throw new CheckoutError(
-        'Sanctioned address',
-        ConnectEIP6963ProviderError.SANCTIONED_ADDRESS,
-      );
-    }
 
     addProviderListenersForWidgetRoot(connectResult.provider);
     return {
