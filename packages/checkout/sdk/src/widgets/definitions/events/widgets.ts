@@ -14,6 +14,7 @@ export enum IMTBLWidgetEvents {
   IMTBL_SALE_WIDGET_EVENT = 'imtbl-sale-widget',
   IMTBL_COMMERCE_WIDGET_EVENT = 'imtbl-commerce-widget',
   IMTBL_ADD_TOKENS_WIDGET_EVENT = 'imtbl-add-tokens-widget',
+  IMTBL_PURCHASE_WIDGET_EVENT = 'imtbl-purchase-widget',
 }
 
 /**
