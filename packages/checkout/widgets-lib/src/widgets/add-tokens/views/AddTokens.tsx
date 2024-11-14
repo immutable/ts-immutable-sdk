@@ -188,22 +188,25 @@ export function AddTokens({
   const handleOnAmountInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value, amount, isValid } = validateToAmount(event.target.value);
 
-    if (!isValid && amount < 0) {
-      return;
+    if (isValid || amount === 0 || value === '') {
+      setInputValue(value);
+
+      if (amount > 0) {
+        setSelectedAmount(value);
+
+        track({
+          userJourney: UserJourney.ADD_TOKENS,
+          screen: 'InputScreen',
+          control: 'AmountInput',
+          controlType: 'TextInput',
+          extras: {
+            toAmount: value,
+          },
+        });
+      } else {
+        setSelectedAmount('');
+      }
     }
-
-    setInputValue(value);
-    setSelectedAmount(value);
-
-    track({
-      userJourney: UserJourney.ADD_TOKENS,
-      screen: 'InputScreen',
-      control: 'AmountInput',
-      controlType: 'TextInput',
-      extras: {
-        toAmount: value,
-      },
-    });
   };
 
   const {
@@ -550,7 +553,7 @@ export function AddTokens({
             <Body>{t('views.ADD_TOKENS.tokenSelection.buttonText')}</Body>
           ) : (
             <HeroFormControl
-              validationStatus={inputValue === '0' ? 'error' : 'success'}
+              validationStatus={validateToAmount(inputValue).isValid || inputValue === '' ? 'success' : 'error'}
             >
               <HeroFormControl.Label>
                 {t('views.ADD_TOKENS.tokenSelection.tokenLabel')}
@@ -560,9 +563,9 @@ export function AddTokens({
               <HeroTextInput
                 inputRef={inputRef}
                 testId="add-tokens-amount-input"
-                type="number"
+                type="text"
                 value={inputValue}
-                onChange={(value) => handleOnAmountInputChange(value)}
+                onChange={(event) => handleOnAmountInputChange(event)}
                 placeholder="0"
                 maxTextSize="xLarge"
               />
@@ -590,7 +593,7 @@ export function AddTokens({
             <SelectedWallet
               sx={selectedToken
                 && !fromAddress
-                && inputValue
+                && selectedAmount
                 ? { animation: `${PULSE_SHADOW} 2s infinite ease-in-out` }
                 : {}}
               label={t('views.ADD_TOKENS.walletSelection.fromText')}
@@ -603,7 +606,7 @@ export function AddTokens({
                 setShowPayWithDrawer(true);
               }}
             >
-              {selectedToken && fromAddress && inputValue && (
+              {selectedToken && fromAddress && selectedAmount && (
               <>
                 <MenuItem.BottomSlot.Divider
                   sx={fromAddress ? { ml: 'base.spacing.x4' } : undefined}
@@ -640,7 +643,7 @@ export function AddTokens({
               sx={selectedToken
                 && fromAddress
                 && !toAddress
-                && inputValue
+                && selectedAmount
                 ? { animation: `${PULSE_SHADOW} 2s infinite ease-in-out` }
                 : {}}
               label={t('views.ADD_TOKENS.walletSelection.toText')}
