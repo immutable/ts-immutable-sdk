@@ -21,12 +21,21 @@ import {
   listNFTOwnersByTokenId,
   listNFTOwnersByContractAddress,
   listTokens,
+  listFilters,
+  searchNFTs,
+  searchStacks,
+  quotesForNFTs,
+  quotesForStacks,
+  listStacks,
 } from '../api-examples-with-node';
 
 const CHAIN_NAME = 'imtbl-zkevm-testnet';
 const CONTRACT_ADDRESS = '0x21F0D60cfE554B6d5b7f9E799BDeBD97C5d64274';
 const NFT_OWNER = '0x9C1634bebC88653D2Aebf4c14a3031f62092b1D9';
 const TOKEN_ADDRESS = '0x007a4bdf308ca0074d7b95628e72a62f12b2c58f';
+const MARKETPLACE_API_COLLECTION_ADDRESS =
+  '0x908aab24939160aca78c4267ddc291c5891b952d';
+const MARKETPLACE_API_STACK_ID = '018c623c-da05-1104-88b1-71a536f0f8fb';
 
 describe('Chains', () => {
   describe('listChains', () => {
@@ -191,6 +200,55 @@ describe('Setup', () => {
     test('returns a chain', async () => {
       const result = await getChains({});
       expect(result).not.toBe(null);
+    });
+  });
+});
+
+describe('Marketplace API endpoints', () => {
+  describe('listFilters', () => {
+    test('returns successfully', async () => {
+      const result = await listFilters(CHAIN_NAME, CONTRACT_ADDRESS);
+      expect(result).not.toBe(null);
+      expect(result.result.filters.length).toBeGreaterThan(0);
+    });
+  });
+  describe('searchNFTs', () => {
+    test('returns successfully', async () => {
+      const result = await searchNFTs(CHAIN_NAME, [CONTRACT_ADDRESS]);
+      expect(result).not.toBe(null);
+      expect(result.result.length).toBeGreaterThan(0);
+    });
+  });
+  describe('searchStacks', () => {
+    test('returns successfully', async () => {
+      const result = await searchStacks(CHAIN_NAME, [CONTRACT_ADDRESS]);
+      expect(result).not.toBe(null);
+      expect(result.result.length).toBeGreaterThan(0);
+    });
+  });
+  describe('quotesForNFTs', () => {
+    test('returns successfully', async () => {
+      const result = await quotesForNFTs(CHAIN_NAME, CONTRACT_ADDRESS, ['1']);
+      expect(result).not.toBe(null);
+      expect(result.result.length).toBeGreaterThan(0);
+    });
+  });
+  describe('quotesForStacks', () => {
+    test('returns successfully', async () => {
+      const result = await quotesForStacks(
+        CHAIN_NAME,
+        MARKETPLACE_API_COLLECTION_ADDRESS,
+        [MARKETPLACE_API_STACK_ID],
+      );
+      expect(result).not.toBe(null);
+      expect(result.result.length).toBeGreaterThan(0);
+    });
+  });
+  describe('listStacks', () => {
+    test('returns successfully', async () => {
+      const result = await listStacks(CHAIN_NAME, [MARKETPLACE_API_STACK_ID]);
+      expect(result).not.toBe(null);
+      expect(result.length).toBeGreaterThan(0);
     });
   });
 });
