@@ -193,6 +193,16 @@ export function AddTokens({
 
       if (amount > 0) {
         setSelectedAmount(value);
+
+        track({
+          userJourney: UserJourney.ADD_TOKENS,
+          screen: 'InputScreen',
+          control: 'AmountInput',
+          controlType: 'TextInput',
+          extras: {
+            toAmount: value,
+          },
+        });
       } else {
         setSelectedAmount('');
       }
