@@ -9,11 +9,13 @@ import {
   Stack,
 } from '@biom3/react';
 import debounce from 'lodash.debounce';
+import { ActionType } from '@0xsquid/squid-types';
 import {
   ChainId,
   type Checkout,
   EIP6963ProviderInfo,
   IMTBLWidgetEvents,
+  isAddressSanctioned,
   TokenFilterTypes,
   type TokenInfo,
   WalletProviderRdns,
@@ -31,6 +33,7 @@ import { useTranslation } from 'react-i18next';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
+  SharedViews,
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
@@ -66,6 +69,7 @@ import { SquidFooter } from '../components/SquidFooter';
 import { getFormattedNumberWithDecimalPlaces } from '../functions/getFormattedNumber';
 import { TokenDrawerMenu } from '../components/TokenDrawerMenu';
 import { PULSE_SHADOW } from '../utils/animation';
+import { useRiskAssessment } from '../hooks/useRiskAssessment';
 
 interface AddTokensProps {
   checkout: Checkout;
@@ -133,6 +137,8 @@ export function AddTokens({
   const [fetchingRoutes, setFetchingRoutes] = useState(false);
   const [insufficientBalance, setInsufficientBalance] = useState(false);
 
+  const { riskAssessment } = useRiskAssessment();
+
   const selectedAmountUsd = useMemo(
     () => convertToUsd(tokens, inputValue, selectedToken),
     [tokens, inputValue, selectedToken],
@@ -140,16 +146,6 @@ export function AddTokens({
 
   const setSelectedAmount = useMemo(
     () => debounce((value: string) => {
-      track({
-        userJourney: UserJourney.ADD_TOKENS,
-        screen: 'InputScreen',
-        control: 'AmountInput',
-        controlType: 'TextInput',
-        extras: {
-          toAmount: value,
-        },
-      });
-
       addTokensDispatch({
         payload: {
           type: AddTokensActions.SET_SELECTED_AMOUNT,
@@ -174,6 +170,9 @@ export function AddTokens({
           fromTokenChainId: route.amountData.fromToken.chainId,
           toAmount: route.amountData.toAmount,
           fromAmount: route.amountData.fromAmount,
+          hasEmbeddedSwap: !!route.route.route.estimate.actions.find(
+            (action) => action.type === ActionType.SWAP,
+          ),
         },
       });
     }
@@ -191,6 +190,7 @@ export function AddTokens({
 
     if (isValid || amount === 0 || value === '') {
       setInputValue(value);
+
       if (amount > 0) {
         setSelectedAmount(value);
       } else {
@@ -239,9 +239,10 @@ export function AddTokens({
       extras: {
         toAmount,
         toTokenAddress,
+        geoBlocked: !isSwapAvailable,
       },
     });
-  }, []);
+  }, [isSwapAvailable]);
 
   useEffect(() => {
     if (!toAmount) return;
@@ -318,6 +319,20 @@ export function AddTokens({
   }, [checkout]);
 
   const sendRequestOnRampEvent = () => {
+    if (!riskAssessment || isAddressSanctioned(riskAssessment)) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
+            error: new Error('Sanctioned address'),
+          },
+        },
+      });
+
+      return;
+    }
+
     track({
       userJourney: UserJourney.ADD_TOKENS,
       screen: 'InputScreen',
@@ -351,10 +366,10 @@ export function AddTokens({
   };
 
   useEffect(() => {
-    if (toProvider && payWithCardClicked) {
+    if (toProvider && riskAssessment && payWithCardClicked) {
       sendRequestOnRampEvent();
     }
-  }, [toProvider]);
+  }, [toProvider, riskAssessment, payWithCardClicked]);
 
   const handleRouteClick = (route: RouteData) => {
     setShowOptionsDrawer(false);
@@ -373,11 +388,25 @@ export function AddTokens({
   const handleReviewClick = () => {
     if (!selectedRouteData || !selectedToken?.address) return;
 
+    if (!riskAssessment || isAddressSanctioned(riskAssessment)) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
+            error: new Error('Sanctioned address'),
+          },
+        },
+      });
+
+      return;
+    }
+
     track({
       userJourney: UserJourney.ADD_TOKENS,
       screen: 'InputScreen',
-      control: 'RoutesMenu',
-      controlType: 'MenuItem',
+      control: 'Review',
+      controlType: 'Button',
       extras: {
         toTokenAddress: selectedRouteData.amountData.toToken.address,
         toTokenChainId: selectedRouteData.amountData.toToken.chainId,
@@ -432,7 +461,7 @@ export function AddTokens({
   const loading = (routeInputsReady || fetchingRoutes)
     && !(selectedRouteData || insufficientBalance);
 
-  const readyToReview = routeInputsReady && !!toAddress && !!selectedRouteData && !loading;
+  const readyToReview = routeInputsReady && !!toAddress && !!selectedRouteData && !loading && !!riskAssessment;
 
   const handleWalletConnected = (
     providerType: 'from' | 'to',
@@ -511,13 +540,13 @@ export function AddTokens({
             toTokenAddress={toTokenAddress}
           />
           {showInitialEmptyState ? (
-            <Body>Add Token</Body>
+            <Body>{t('views.ADD_TOKENS.tokenSelection.buttonText')}</Body>
           ) : (
             <HeroFormControl
               validationStatus={validateToAmount(inputValue).isValid || inputValue === '' ? 'success' : 'error'}
             >
               <HeroFormControl.Label>
-                Add
+                {t('views.ADD_TOKENS.tokenSelection.tokenLabel')}
                 {' '}
                 {selectedToken.symbol}
               </HeroFormControl.Label>
@@ -557,7 +586,7 @@ export function AddTokens({
                 && selectedAmount
                 ? { animation: `${PULSE_SHADOW} 2s infinite ease-in-out` }
                 : {}}
-              label="Send from"
+              label={t('views.ADD_TOKENS.walletSelection.fromText')}
               providerInfo={{
                 ...fromProviderInfo,
                 address: fromAddress,
@@ -607,7 +636,7 @@ export function AddTokens({
                 && selectedAmount
                 ? { animation: `${PULSE_SHADOW} 2s infinite ease-in-out` }
                 : {}}
-              label="Deliver to"
+              label={t('views.ADD_TOKENS.walletSelection.toText')}
               providerInfo={{
                 ...toProviderInfo,
                 address: toAddress,
@@ -625,7 +654,7 @@ export function AddTokens({
             onClick={handleReviewClick}
             sx={{ opacity: readyToReview ? 1 : 0.5 }}
           >
-            Review
+            {t('views.ADD_TOKENS.review.buttonText')}
           </Button>
 
           <SquidFooter />
@@ -655,6 +684,7 @@ export function AddTokens({
             visible={showDeliverToDrawer}
             walletOptions={walletOptions}
             onClose={handleDeliverToClose}
+            onConnect={handleWalletConnected}
           />
           <OnboardingDrawer environment={checkout?.config.environment!} />
         </Stack>
