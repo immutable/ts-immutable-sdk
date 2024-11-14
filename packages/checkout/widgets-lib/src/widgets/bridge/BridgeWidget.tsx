@@ -339,7 +339,7 @@ export default function BridgeWidget({
               testId="claim-withdrawal-fail-view"
             />
           )}
-          {viewState.view.type === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
+          {viewState.view.type === BridgeWidgetViews.SERVICE_UNAVAILABLE && (
             <ServiceUnavailableErrorView
               onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
               onBackButtonClick={() => {

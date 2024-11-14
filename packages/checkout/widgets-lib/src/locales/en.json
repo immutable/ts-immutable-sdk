@@ -65,7 +65,11 @@
     },
     "ERROR_VIEW": {
       "heading": "Something's gone wrong",
-      "body": ["You can try again or contact", "support", "for help."],
+      "body": [
+        "You can try again or contact",
+        "support",
+        "for help."
+      ],
       "actionText": "Try again"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
@@ -647,8 +651,35 @@
       }
     },
     "ADD_TOKENS": {
+      "tokenSelection": {
+        "buttonText": "Add Token",
+        "tokenLabel": "Add",
+        "drawerHeading": "Add Token",
+        "searchPlaceholder": "Search tokens"
+      },
+      "walletSelection": {
+        "fromText": "Send from",
+        "toText": "Deliver to"
+      },
+      "routeSelection": {
+        "loadingText": "Finding the best payment route...",
+        "noRoute": "No routes found, choose a different wallet, token or amount.",
+        "payWithCard": "No routes found, pay with card available",
+        "fastestBadge": "Fastest",
+        "minutesText": "mins",
+        "minuteText": "min",
+        "secondsText": "s"
+      },
       "drawer": {
         "options": {
+          "heading": "Pay from",
+          "moreOptionsDividerText": "More ways to Pay",
+          "loadingText1": "Finding the best value",
+          "loadingText2": "across all chains",
+          "noRoutes": {
+            "heading": "No routes found",
+            "caption": "Choose a different wallet, token or amount and try again."
+          },
           "swap": {
             "heading": "Swap",
             "caption": "Swap tokens on this network.",
@@ -664,6 +695,110 @@
             "caption": "Failures and extra fees may occur.",
             "disabledCaption": "Unavailable for your selection. We recommend adding tokens."
           }
+        }
+      },
+      "error": {
+        "default": {
+          "heading": "Sorry, something went wrong. Please try again later.",
+          "secondaryButtonText": "Close"
+        },
+        "invalidParameters": {
+          "heading": "Invalid parameters",
+          "subHeading": "The widget parameters provided are invalid. Please check again.",
+          "secondaryButtonText": "Close"
+        },
+        "serviceBreakdown": {
+          "heading": "Our system is currently down",
+          "subHeading": "We are currently experiencing technical difficulties. Please try again later.",
+          "secondaryButtonText": "Close"
+        },
+        "transactionFailed": {
+          "heading": "Transaction failed",
+          "subHeading": "The transaction failed. Please try again.",
+          "primaryButtonText": "Retry",
+          "secondaryButtonText": "Close"
+        },
+        "unrecognisedChain": {
+          "heading": "Unrecognised chain",
+          "subHeading": "Please add the chain to your account and try again.",
+          "primaryButtonText": "Retry",
+          "secondaryButtonText": "Close"
+        },
+        "providerError": {
+          "heading": "Wallet cannot be found",
+          "subHeading": "Please try to connect your wallet and try again.",
+          "primaryButtonText": "Retry",
+          "secondaryButtonText": "Close"
+        },
+        "walletFailed": {
+          "heading": "Transaction failed",
+          "subHeading": "The transaction failed. Please try again.",
+          "primaryButtonText": "Retry",
+          "secondaryButtonText": "Close"
+        },
+        "walletRejected": {
+          "heading": "Transaction rejected",
+          "subHeading": "You'll need to approve the transaction in your wallet to proceed.",
+          "primaryButtonText": "Retry",
+          "secondaryButtonText": "Close"
+        },
+        "walletRejectedNoFunds": {
+          "heading": "Insufficient funds",
+          "subHeading": "You do not have enough funds to complete the transaction.",
+          "primaryButtonText": "Retry",
+          "secondaryButtonText": "Close"
+        },
+        "walletPopupBlocked": {
+          "heading": "Browser's popup blocked",
+          "subHeading": "Please allow pop-ups in your browser to proceed.",
+          "primaryButtonText": "Retry",
+          "secondaryButtonText": "Close"
+        },
+        "environmentError": {
+          "heading": "Unsupported environment",
+          "subHeading": "This is only supported in production environment.",
+          "secondaryButtonText": "Close"
+        },
+        "addressMismatch": {
+          "heading": "Oops! It seems your payment wallet has changed",
+          "body": "You'll be ask to re-connect the same wallet you selected to pay with before proceeding",
+          "buttonText": "Re-select payment wallet"
+        }
+      },
+      "review": {
+        "buttonText": "Review",
+        "heading": "Review",
+        "send": "Send",
+        "receive": "Receive",
+        "swap": "Swap",
+        "to": "to",
+        "loadingText": "Securing quote",
+        "processingButtonText": "Processing",
+        "proceedButtonText": "Proceed",
+        "poweredBySquid": "Powered by Squid"
+      },
+      "handover": {
+        "preparing": {
+          "heading": "Preparing"
+        },
+        "requestingApproval": {
+          "heading": "Waiting for access approval in your wallet",
+          "subHeading": "Approve the transaction request to complete this transaction"
+        },
+        "approved": {
+          "heading": "Granted access to your tokens"
+        },
+        "requestingExecution": {
+          "heading": "Waiting for transaction confirmation in your wallet",
+          "subHeading": "Confirm the transaction request to complete this transaction"
+        },
+        "executing": {
+          "heading": "Processing"
+        },
+        "executed": {
+          "heading": "Funds added successfully",
+          "subHeadingGoTo": "Go to",
+          "subHeadingTransactionDetails": "for transaction details"
         }
       },
       "onboarding": {
@@ -684,14 +819,18 @@
         }
       },
       "footer": {
-        "body":  "Swap functionality is powered by a third party, Squid. Immutable neither builds, owns, operates or deploys <squidLink>Squid</squidLink>."
+        "body": "Swap functionality is powered by a third party, Squid. Immutable neither builds, owns, operates or deploys <squidLink>Squid</squidLink>."
       },
       "geoBlockError": {
         "buyTokenButton": "Buy tokens",
         "bridgeTokenButton": "Bridge tokens"
       },
       "fees": {
-        "fiatPricePrefix": "≈ USD"
+        "fee": "Fee",
+        "balance": "Balance",
+        "fiatPricePrefix": "≈ USD",
+        "zeroFees": "Zero fees",
+        "includedFees": "Included fees"
       }
     }
   },
@@ -847,6 +986,20 @@
           "proceed": "I understand"
         }
       }
+    },
+    "wallet": {
+      "payWithHeading": "Send from",
+      "payWithHeadingInsufficientBalance": "Choose another option",
+      "deliverToHeading": "Deliver to",
+      "payWithCard": "Pay with Card",
+      "insufficientFunds": "insufficient funds",
+      "noFunds": "no funds"
+    },
+    "eoaWarning": {
+      "dividerText": "WARNING",
+      "heading": "You could lose sight of your assets if you don’t deliver them to Passport",
+      "passportButtonText": "Deliver to Passport instead",
+      "proceedButtonText": "Proceed anyway"
     }
   }
 }

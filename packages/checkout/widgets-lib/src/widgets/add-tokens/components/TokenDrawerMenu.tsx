@@ -18,6 +18,7 @@ import {
   useState,
 } from 'react';
 import { Environment } from '@imtbl/config';
+import { useTranslation } from 'react-i18next';
 import type { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import {
   AddTokensActions,
@@ -63,18 +64,9 @@ export function TokenDrawerMenu({
     config.theme,
   );
   const { track } = useAnalytics();
+  const { t } = useTranslation();
 
   const setSelectedToken = (token: TokenInfo | undefined) => {
-    track({
-      userJourney: UserJourney.ADD_TOKENS,
-      screen: 'InputScreen',
-      control: 'TokensMenu',
-      controlType: 'MenuItem',
-      extras: {
-        tokenAddress: token?.address,
-      },
-    });
-
     addTokensDispatch({
       payload: {
         type: AddTokensActions.SET_SELECTED_TOKEN,
@@ -84,6 +76,15 @@ export function TokenDrawerMenu({
   };
 
   const handleTokenChange = useCallback((token: TokenInfo) => {
+    track({
+      userJourney: UserJourney.ADD_TOKENS,
+      screen: 'InputScreen',
+      control: 'TokensMenu',
+      controlType: 'MenuItem',
+      extras: {
+        tokenAddress: token?.address,
+      },
+    });
     setSelectedToken(token);
     setVisible(false);
     setSearchValue('');
@@ -184,7 +185,7 @@ export function TokenDrawerMenu({
       visible={visible}
       onCloseDrawer={handleDrawerClose}
       size="full"
-      headerBarTitle="Add Tokens"
+      headerBarTitle={t('views.ADD_TOKENS.tokenSelection.drawerHeading')}
       drawerCloseIcon="ChevronExpand"
       showHeaderBar
       outsideClicksClose
@@ -231,7 +232,7 @@ export function TokenDrawerMenu({
       <Drawer.Content sx={{ paddingX: 'base.spacing.x2' }}>
         <TextInput
           sx={{ marginBottom: 'base.spacing.x2' }}
-          placeholder="Search tokens"
+          placeholder={t('views.ADD_TOKENS.tokenSelection.searchPlaceholder')}
           sizeVariant="medium"
           onChange={(event) => {
             setSearchValue(event.target.value);
