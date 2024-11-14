@@ -10,7 +10,6 @@ import { getProviderSlugFromRdns } from './provider';
 
 export enum ConnectEIP6963ProviderError {
   CONNECT_ERROR = 'CONNECT_ERROR',
-  SANCTIONED_ADDRESS = 'SANCTIONED_ADDRESS',
   USER_REJECTED_REQUEST_ERROR = 'USER_REJECTED_REQUEST_ERROR',
 }
 
@@ -45,8 +44,6 @@ export const connectEIP6963Provider = async (
         throw new Error(
           ConnectEIP6963ProviderError.USER_REJECTED_REQUEST_ERROR,
         );
-      case ConnectEIP6963ProviderError.SANCTIONED_ADDRESS:
-        throw new Error(ConnectEIP6963ProviderError.SANCTIONED_ADDRESS);
       default:
         throw new Error(ConnectEIP6963ProviderError.CONNECT_ERROR);
     }
