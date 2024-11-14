@@ -73,7 +73,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   beforeAll(() => {
     erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(() => ({
       allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT.value),
-      estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
+      approve: { estimateGas: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
       paused: jest.fn().mockResolvedValue(false),
     }));
 
@@ -889,7 +889,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     it('should use the default router contract with no fees applied to the swap', async () => {
       erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(() => ({
         allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT.value),
-        estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
+        approve: { estimateGas: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
         paused: jest.fn().mockResolvedValue(true),
       }));
 
@@ -924,7 +924,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       it('should apply secondary fees to a subsequent swap request', async () => {
         erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(() => ({
           allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT.value),
-          estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
+          approve: { estimateGas: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
           paused: jest.fn().mockResolvedValue(true),
         }));
 
@@ -947,7 +947,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         // Unpause the secondary fee contract
         erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(() => ({
           allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT.value),
-          estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
+          approve: { estimateGas: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
           paused: jest.fn().mockResolvedValue(false),
         }));
 

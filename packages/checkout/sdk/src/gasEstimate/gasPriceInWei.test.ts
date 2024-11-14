@@ -8,7 +8,7 @@ describe('gasPriceInWei', () => {
       gasPrice: BigInt(11),
       toJSON: () => ({ }),
     });
-    expect(fee).toEqual(BigInt(3));
+    expect(fee?.toString()).toEqual('12');
   });
 
   it('should return gas price in wei using gasPrice', () => {
@@ -18,7 +18,7 @@ describe('gasPriceInWei', () => {
       gasPrice: BigInt(11),
       toJSON: () => ({ }),
     });
-    expect(fee).toEqual(BigInt(11));
+    expect(fee?.toString()).toEqual('11');
   });
 
   it('should return gas price in wei when lastBaseFeePerGas missing', () => {
@@ -28,7 +28,7 @@ describe('gasPriceInWei', () => {
       gasPrice: BigInt(11),
       toJSON: () => ({ }),
     });
-    expect(fee).toEqual(BigInt(11));
+    expect(fee?.toString()).toEqual('11');
   });
 
   it('should return gas price in wei when maxPriorityFeePerGas missing', () => {
@@ -38,7 +38,7 @@ describe('gasPriceInWei', () => {
       gasPrice: BigInt(11),
       toJSON: () => ({ }),
     });
-    expect(fee).toEqual(BigInt(11));
+    expect(fee?.toString()).toEqual('11');
   });
 
   it('should return undefined if missing gas fields', () => {

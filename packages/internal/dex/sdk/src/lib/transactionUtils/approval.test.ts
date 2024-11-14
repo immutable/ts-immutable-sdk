@@ -187,7 +187,7 @@ describe('getApproveGasEstimate', () => {
       const approveMock = jest.fn().mockResolvedValue(approveGasEstimate);
 
       const erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(() => ({
-        estimateGas: { approve: approveMock },
+        approve: { estimateGas: approveMock },
       }));
       const provider = (JsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
         connect: jest.fn().mockResolvedValue(erc20Contract),
