@@ -455,8 +455,10 @@ export default class AuthManager {
     });
   }
 
-  public async forceUserRefresh(): Promise<User | null> {
-    return this.refreshTokenAndUpdatePromise();
+  public async forceUserRefresh(): Promise<User> {
+    return this.refreshTokenAndUpdatePromise().catch((error) => {
+      logger.warn('Failed to refresh user token', error);
+    });
   }
 
   /**
