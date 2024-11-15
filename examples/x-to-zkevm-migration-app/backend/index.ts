@@ -43,26 +43,24 @@ fastify.post('/webhook', async (request, reply) => {
           await minting.processMint(request.body as any);
           console.log('Processed minting update:', event);
         },
-        all: async (event) => {
+        xTransferCreated: async (event) => {
           console.log('Received webhook event:', event);
-          if (event.event_name == 'imtbl_x_transfer_created') {
-            // Check if this is a transfer to burn address for our monitored collection
-            if (
-              event.data.receiver.toLowerCase() === process.env.IMX_BURN_ADDRESS?.toLowerCase() &&
-              event.data.token?.data?.token_address?.toLowerCase() === process.env.IMX_MONITORED_COLLECTION_ADDRESS?.toLowerCase()
-            ) {
-              // Create mint request on zkEVM
-              let mintRequest = {
-                asset_id: uuidv4(),
-                contract_address: process.env.ZKEVM_COLLECTION_ADDRESS!,
-                owner_address: event.data.user,
-                token_id: event.data.token.data.token_id,
-                metadata: {} // Add any metadata if needed
-              };
-              await minting.recordMint(mintRequest);
-  
-              console.log(`Created mint request for burned token ${event.data.token.data.token_id}`);
-            }
+          // Check if this is a transfer to burn address for our monitored collection
+          if (
+            event.data.receiver.toLowerCase() === process.env.IMX_BURN_ADDRESS?.toLowerCase() &&
+            event.data.token?.data?.token_address?.toLowerCase() === process.env.IMX_MONITORED_COLLECTION_ADDRESS?.toLowerCase()
+          ) {
+            // Create mint request on zkEVM
+            let mintRequest = {
+              asset_id: uuidv4(),
+              contract_address: process.env.ZKEVM_COLLECTION_ADDRESS!,
+              owner_address: event.data.user,
+              token_id: event.data.token.data.token_id,
+              metadata: {} // Add any metadata if needed
+            };
+            await minting.recordMint(mintRequest);
+
+            console.log(`Created mint request for burned token ${event.data.token.data.token_id}`);
           }
         }
       }
