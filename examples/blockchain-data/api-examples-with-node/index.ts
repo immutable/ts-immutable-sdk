@@ -19,6 +19,12 @@ import { listNFTOwnersByTokenId } from './list-nft-owners-by-token-id';
 import { listTokens } from './list-tokens';
 import { refreshNFTMetadata } from './refresh-nft-metadata';
 import { refreshStackedMetadata } from './refresh-stacked-metadata';
+import { listFilters } from './list-filters';
+import { searchNFTs } from './search-nfts';
+import { searchStacks } from './search-stacks';
+import { quotesForNFTs } from './quotes-for-nfts';
+import { quotesForStacks } from './quotes-for-stacks';
+import { listStacks } from './list-stacks';
 
 export {
   verifySuccessfulMints,
@@ -42,4 +48,10 @@ export {
   listTokens,
   refreshNFTMetadata,
   refreshStackedMetadata,
+  listFilters,
+  searchNFTs,
+  searchStacks,
+  quotesForNFTs,
+  quotesForStacks,
+  listStacks,
 };

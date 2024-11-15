@@ -49,6 +49,9 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
 
   const estimatedDurationFormatted = getDurationFormatted(
     estimate.estimatedRouteDuration,
+    t('views.ADD_TOKENS.routeSelection.minutesText'),
+    t('views.ADD_TOKENS.routeSelection.minuteText'),
+    t('views.ADD_TOKENS.routeSelection.secondsText'),
   );
 
   const { totalFeesUsd } = useMemo(
@@ -92,7 +95,9 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
         </Sticker>
       )}
 
-      <MenuItem.Caption>{`Balance ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${routeBalanceUsd}`}</MenuItem.Caption>
+      <MenuItem.Caption>
+        {`${t('views.ADD_TOKENS.fees.balance')} ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${routeBalanceUsd}`}
+      </MenuItem.Caption>
 
       <MenuItem.PriceDisplay price={fromAmount}>
         <MenuItem.PriceDisplay.Caption>
@@ -133,12 +138,15 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
           <Body size="xSmall" sx={{ ...hFlex, ...centerFlexChildren }}>
             {isFastest && (
               <Badge
-                badgeContent="Fastest"
+                badgeContent={t('views.ADD_TOKENS.routeSelection.fastestBadge')}
                 variant="emphasis"
                 sx={{ mr: 'base.spacing.x2' }}
               />
             )}
-            {`Fee ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${getFormattedAmounts(totalFeesUsd)}`}
+            {
+              `${t('views.ADD_TOKENS.fees.fee')} ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} 
+              $${getFormattedAmounts(totalFeesUsd)}`
+            }
           </Body>
         </Stack>
       </MenuItem.BottomSlot>

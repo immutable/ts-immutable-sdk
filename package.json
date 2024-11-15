@@ -98,7 +98,7 @@
       "examples/passport/**",
       "examples/orderbook/**",
       "examples/checkout/**",
-      "examples/blockchain-data/**",
+      "examples/blockchain-data",
       "examples/contracts/**",
       "examples/x-to-zkevm-migration-app/**"
     ],

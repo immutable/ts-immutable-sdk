@@ -9,6 +9,7 @@ import {
   Stack,
 } from '@biom3/react';
 import debounce from 'lodash.debounce';
+import { ActionType } from '@0xsquid/squid-types';
 import {
   ChainId,
   type Checkout,
@@ -145,16 +146,6 @@ export function AddTokens({
 
   const setSelectedAmount = useMemo(
     () => debounce((value: string) => {
-      track({
-        userJourney: UserJourney.ADD_TOKENS,
-        screen: 'InputScreen',
-        control: 'AmountInput',
-        controlType: 'TextInput',
-        extras: {
-          toAmount: value,
-        },
-      });
-
       addTokensDispatch({
         payload: {
           type: AddTokensActions.SET_SELECTED_AMOUNT,
@@ -179,6 +170,9 @@ export function AddTokens({
           fromTokenChainId: route.amountData.fromToken.chainId,
           toAmount: route.amountData.toAmount,
           fromAmount: route.amountData.fromAmount,
+          hasEmbeddedSwap: !!route.route.route.estimate.actions.find(
+            (action) => action.type === ActionType.SWAP,
+          ),
         },
       });
     }
@@ -194,12 +188,25 @@ export function AddTokens({
   const handleOnAmountInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value, amount, isValid } = validateToAmount(event.target.value);
 
-    if (!isValid && amount < 0) {
-      return;
-    }
+    if (isValid || amount === 0 || value === '') {
+      setInputValue(value);
 
-    setInputValue(value);
-    setSelectedAmount(value);
+      if (amount > 0) {
+        setSelectedAmount(value);
+
+        track({
+          userJourney: UserJourney.ADD_TOKENS,
+          screen: 'InputScreen',
+          control: 'AmountInput',
+          controlType: 'TextInput',
+          extras: {
+            toAmount: value,
+          },
+        });
+      } else {
+        setSelectedAmount('');
+      }
+    }
   };
 
   const {
@@ -242,9 +249,10 @@ export function AddTokens({
       extras: {
         toAmount,
         toTokenAddress,
+        geoBlocked: !isSwapAvailable,
       },
     });
-  }, []);
+  }, [isSwapAvailable]);
 
   useEffect(() => {
     if (!toAmount) return;
@@ -407,8 +415,8 @@ export function AddTokens({
     track({
       userJourney: UserJourney.ADD_TOKENS,
       screen: 'InputScreen',
-      control: 'RoutesMenu',
-      controlType: 'MenuItem',
+      control: 'Review',
+      controlType: 'Button',
       extras: {
         toTokenAddress: selectedRouteData.amountData.toToken.address,
         toTokenChainId: selectedRouteData.amountData.toToken.chainId,
@@ -542,22 +550,22 @@ export function AddTokens({
             toTokenAddress={toTokenAddress}
           />
           {showInitialEmptyState ? (
-            <Body>Add Token</Body>
+            <Body>{t('views.ADD_TOKENS.tokenSelection.buttonText')}</Body>
           ) : (
             <HeroFormControl
-              validationStatus={inputValue === '0' ? 'error' : 'success'}
+              validationStatus={validateToAmount(inputValue).isValid || inputValue === '' ? 'success' : 'error'}
             >
               <HeroFormControl.Label>
-                Add
+                {t('views.ADD_TOKENS.tokenSelection.tokenLabel')}
                 {' '}
                 {selectedToken.symbol}
               </HeroFormControl.Label>
               <HeroTextInput
                 inputRef={inputRef}
                 testId="add-tokens-amount-input"
-                type="number"
+                type="text"
                 value={inputValue}
-                onChange={(value) => handleOnAmountInputChange(value)}
+                onChange={(event) => handleOnAmountInputChange(event)}
                 placeholder="0"
                 maxTextSize="xLarge"
               />
@@ -585,10 +593,10 @@ export function AddTokens({
             <SelectedWallet
               sx={selectedToken
                 && !fromAddress
-                && inputValue
+                && selectedAmount
                 ? { animation: `${PULSE_SHADOW} 2s infinite ease-in-out` }
                 : {}}
-              label="Send from"
+              label={t('views.ADD_TOKENS.walletSelection.fromText')}
               providerInfo={{
                 ...fromProviderInfo,
                 address: fromAddress,
@@ -598,7 +606,7 @@ export function AddTokens({
                 setShowPayWithDrawer(true);
               }}
             >
-              {selectedToken && fromAddress && inputValue && (
+              {selectedToken && fromAddress && selectedAmount && (
               <>
                 <MenuItem.BottomSlot.Divider
                   sx={fromAddress ? { ml: 'base.spacing.x4' } : undefined}
@@ -635,10 +643,10 @@ export function AddTokens({
               sx={selectedToken
                 && fromAddress
                 && !toAddress
-                && inputValue
+                && selectedAmount
                 ? { animation: `${PULSE_SHADOW} 2s infinite ease-in-out` }
                 : {}}
-              label="Deliver to"
+              label={t('views.ADD_TOKENS.walletSelection.toText')}
               providerInfo={{
                 ...toProviderInfo,
                 address: toAddress,
@@ -656,7 +664,7 @@ export function AddTokens({
             onClick={handleReviewClick}
             sx={{ opacity: readyToReview ? 1 : 0.5 }}
           >
-            Review
+            {t('views.ADD_TOKENS.review.buttonText')}
           </Button>
 
           <SquidFooter />
@@ -686,6 +694,7 @@ export function AddTokens({
             visible={showDeliverToDrawer}
             walletOptions={walletOptions}
             onClose={handleDeliverToClose}
+            onConnect={handleWalletConnected}
           />
           <OnboardingDrawer environment={checkout?.config.environment!} />
         </Stack>

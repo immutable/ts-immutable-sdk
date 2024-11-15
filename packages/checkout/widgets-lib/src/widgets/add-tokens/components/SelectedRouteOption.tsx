@@ -104,7 +104,7 @@ export function SelectedRouteOption({
           mimeType="video/mp4"
           circularFrame
         />
-        <MenuItem.Caption>Finding the best payment route...</MenuItem.Caption>
+        <MenuItem.Caption>{t('views.ADD_TOKENS.routeSelection.loadingText')}</MenuItem.Caption>
       </SelectedRouteOptionContainer>
     );
   }
@@ -115,12 +115,12 @@ export function SelectedRouteOption({
 
     if (insufficientBalance) {
       icon = 'InformationCircle';
-      copy = 'No routes found, choose a different wallet, token or amount.';
+      copy = t('views.ADD_TOKENS.routeSelection.noRoute');
     }
 
     if (insufficientBalancePayWithCard) {
       icon = 'BankCard';
-      copy = 'No routes found, pay with card available';
+      copy = t('views.ADD_TOKENS.routeSelection.payWithCard');
     }
 
     return (
@@ -169,7 +169,7 @@ export function SelectedRouteOption({
         <Stack gap="0px">
           <MenuItem.Label>{fromToken?.name}</MenuItem.Label>
           <MenuItem.Caption>
-            {`Balance ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${routeBalanceUsd}`}
+            {`${t('views.ADD_TOKENS.fees.balance')} ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${routeBalanceUsd}`}
           </MenuItem.Caption>
         </Stack>
         <MenuItem.PriceDisplay price={fromAmount}>
