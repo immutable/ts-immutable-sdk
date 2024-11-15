@@ -2609,6 +2609,33 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@biom3/react@npm:^0.27.24":
+  version: 0.27.25
+  resolution: "@biom3/react@npm:0.27.25"
+  dependencies:
+    "@biom3/design-tokens": ~0.4.4
+    "@imtbl/image-resizer-utils": ~0.0.2
+    csstype: ^3.1.2
+    hls.js: ^1.5.11
+    localforage: ^1.10.0
+    lodash.debounce: ^4.0.8
+    lodash.get: ^4.4.2
+    lodash.isequal: ^4.5.0
+    lodash.throttle: ^4.1.1
+    react-is: ^18.2.0
+    react-keyed-flatten-children: ^3.0.0
+    ts-deepmerge: ^6.2.0
+  peerDependencies:
+    "@emotion/react": ^11.11.4
+    "@rive-app/react-canvas-lite": ^4.9.0
+    embla-carousel-react: ^8.0.4
+    framer-motion: ^10.12.12
+    react: ^18.3.0
+    react-dom: ^18.3.0
+  checksum: 72296b3ca583c96b1bd5bb08d8dc7c0ad0524e17479d62432a66f5a0e8c10a6d23056b01507324543099de8d939b2d124f49d3d1c2c4914bfe1e2389319fc32e
+  languageName: node
+  linkType: hard
+
 "@cnakazawa/watch@npm:^1.0.3":
   version: 1.0.4
   resolution: "@cnakazawa/watch@npm:1.0.4"
@@ -4194,6 +4221,29 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@examples/imx-to-zkevm-migrator@workspace:examples/x-to-zkevm-migration-app/frontend":
+  version: 0.0.0-use.local
+  resolution: "@examples/imx-to-zkevm-migrator@workspace:examples/x-to-zkevm-migration-app/frontend"
+  dependencies:
+    "@biom3/react": ^0.27.24
+    "@imtbl/sdk": ^1.52.0
+    "@types/node": ^20
+    "@types/react": ^18
+    "@types/react-dom": ^18
+    autoprefixer: ^10.4.20
+    dotenv: ^16.4.5
+    eslint: ^8
+    eslint-config-next: 14.2.10
+    ethers: ^5.7.2
+    next: 14.2.10
+    postcss: ^8
+    react: ^18
+    react-dom: ^18
+    tailwindcss: ^3.4.1
+    typescript: ^5
+  languageName: unknown
+  linkType: soft
+
 "@examples/sdk-connect-with-nextjs@workspace:examples/checkout/sdk-connect-with-nextjs":
   version: 0.0.0-use.local
   resolution: "@examples/sdk-connect-with-nextjs@workspace:examples/checkout/sdk-connect-with-nextjs"
@@ -4302,6 +4352,25 @@ __metadata:
     react-dom: ^18.2.0
     tailwindcss: ^3.4.6
     typescript: ^5.6.2
+  languageName: unknown
+  linkType: soft
+
+"@examples/x-to-zkevm-migration-backend@workspace:examples/x-to-zkevm-migration-app/backend":
+  version: 0.0.0-use.local
+  resolution: "@examples/x-to-zkevm-migration-backend@workspace:examples/x-to-zkevm-migration-app/backend"
+  dependencies:
+    "@fastify/cors": ^8.0.0
+    "@imtbl/sdk": latest
+    "@types/node": ^18.0.0
+    "@types/pg": ^8.11.6
+    "@types/uuid": ^9.0.8
+    fastify: ^4.27.0
+    fastify-cli: ^6.1.1
+    pg: ^8.11.5
+    ts-node: ^10.8.1
+    ts-node-dev: ^2.0.0
+    typescript: ^4.7.4
+    uuid: ^9.0.1
   languageName: unknown
   linkType: soft
 
@@ -5178,86 +5247,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@imtbl/sdk@npm:1.70.0":
-  version: 1.70.0
-  resolution: "@imtbl/sdk@npm:1.70.0"
-  dependencies:
-    "@0xsequence/abi": ^1.4.3
-    "@0xsequence/core": ^1.4.3
-    "@0xsquid/sdk": ^2.8.25
-    "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.12
-    "@ethersproject/abi": ^5.7.0
-    "@ethersproject/abstract-provider": ^5.7.0
-    "@ethersproject/abstract-signer": ^5.7.0
-    "@ethersproject/address": ^5.7.0
-    "@ethersproject/bignumber": ^5.7.0
-    "@ethersproject/bytes": ^5.7.0
-    "@ethersproject/contracts": ^5.7.0
-    "@ethersproject/keccak256": ^5.7.0
-    "@ethersproject/providers": ^5.7.2
-    "@ethersproject/solidity": ^5.7.0
-    "@ethersproject/strings": ^5.7.0
-    "@ethersproject/units": ^5.7.0
-    "@ethersproject/wallet": ^5.7.0
-    "@imtbl/react-analytics": 0.2.1-alpha
-    "@jest/globals": ^29.5.0
-    "@magic-ext/oidc": 4.3.1
-    "@magic-sdk/provider": ^21.2.0
-    "@metamask/detect-provider": ^2.0.0
-    "@opensea/seaport-js": 4.0.3
-    "@rive-app/react-canvas-lite": ^4.9.0
-    "@stdlib/number-float64-base-normalize": 0.0.8
-    "@uniswap/router-sdk": ^1.4.0
-    "@uniswap/sdk-core": ^3.0.1
-    "@uniswap/v3-sdk": ^3.9.0
-    "@walletconnect/ethereum-provider": ^2.11.1
-    "@walletconnect/modal": ^2.6.2
-    assert: ^2.0.0
-    axios: ^1.6.5
-    bn.js: ^5.2.1
-    buffer: ^6.0.3
-    crypto-browserify: ^3.12.0
-    elliptic: ^6.5.7
-    enc-utils: ^3.0.0
-    ethereumjs-wallet: ^1.0.2
-    ethers: ^5.7.2
-    ethers-v6: "npm:ethers@6.11.1"
-    events: ^3.3.0
-    form-data: ^4.0.0
-    framer-motion: ^11.0.6
-    global-const: ^0.1.2
-    hash.js: ^1.1.7
-    https-browserify: ^1.0.0
-    i18next: ^23.7.6
-    i18next-browser-languagedetector: ^7.2.0
-    jwt-decode: ^3.1.2
-    localforage: ^1.10.0
-    lru-memorise: 0.3.0
-    magic-sdk: ^21.2.0
-    merkletreejs: ^0.3.11
-    oidc-client-ts: 2.4.0
-    os-browserify: ^0.3.0
-    pako: ^2.1.0
-    pg: ^8.11.5
-    pino-pretty: ^11.2.2
-    prisma: ^5.13.0
-    react-i18next: ^13.5.0
-    sns-validator: ^0.3.5
-    stream-browserify: ^3.0.0
-    stream-http: ^3.2.0
-    url: ^0.11.0
-    uuid: ^8.3.2
-  dependenciesMeta:
-    pg:
-      optional: true
-    prisma:
-      optional: true
-  checksum: cae0ef705b4b3fbc8cf4701f2da89b20cf0481598e91a69a358cfb53e8976c870de8a89585b5de8d0a8022863b9ae89ebcc98b965094383df1c845a6a5eaaad0
-  languageName: node
-  linkType: hard
-
-"@imtbl/sdk@npm:^1.52.0":
+"@imtbl/sdk@npm:1.70.0, @imtbl/sdk@npm:^1.52.0":
   version: 1.70.0
   resolution: "@imtbl/sdk@npm:1.70.0"
   dependencies:
@@ -25107,28 +25097,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"imx-to-zkevm-migrator@workspace:examples/x-to-zkevm-migration-app/frontend":
-  version: 0.0.0-use.local
-  resolution: "imx-to-zkevm-migrator@workspace:examples/x-to-zkevm-migration-app/frontend"
-  dependencies:
-    "@imtbl/sdk": ^1.52.0
-    "@types/node": ^20
-    "@types/react": ^18
-    "@types/react-dom": ^18
-    autoprefixer: ^10.4.20
-    dotenv: ^16.4.5
-    eslint: ^8
-    eslint-config-next: 14.2.10
-    ethers: ^5.7.2
-    next: 14.2.10
-    postcss: ^8
-    react: ^18
-    react-dom: ^18
-    tailwindcss: ^3.4.1
-    typescript: ^5
-  languageName: unknown
-  linkType: soft
-
 "indent-string@npm:^4.0.0":
   version: 4.0.0
   resolution: "indent-string@npm:4.0.0"
@@ -39348,16 +39316,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5":
-  version: 5.6.3
-  resolution: "typescript@npm:5.6.3"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: ba302f8822777ebefb28b554105f3e074466b671e7444ec6b75dadc008a62f46f373d9e57ceced1c433756d06c8b7dc569a7eefdf3a9573122a49205ff99021a
-  languageName: node
-  linkType: hard
-
 "typescript@npm:^4.7.4":
   version: 4.9.5
   resolution: "typescript@npm:4.9.5"
@@ -39385,16 +39343,6 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: c084ee1ab865f108c787e6233a5f63c126c482c0c8e87ec998ac5288a2ad54b603e1ea8b8b272355823b833eb31b9fabb99e8c6152283e1cb47e3a76bd6faf6c
-  languageName: node
-  linkType: hard
-
-"typescript@patch:typescript@^5#~builtin<compat/typescript>":
-  version: 5.6.3
-  resolution: "typescript@patch:typescript@npm%3A5.6.3#~builtin<compat/typescript>::version=5.6.3&hash=14eedb"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: ade87bce2363ee963eed0e4ca8a312ea02c81873ebd53609bc3f6dc0a57f6e61ad7e3fb8cbb7f7ab8b5081cbee801b023f7c4823ee70b1c447eae050e6c7622b
   languageName: node
   linkType: hard
 
@@ -41460,25 +41408,6 @@ __metadata:
     stream-browserify: ^3.0.0
     typescript: ^5.6.2
     web-vitals: ^2.1.4
-  languageName: unknown
-  linkType: soft
-
-"x-to-zkevm-migration-backend@workspace:examples/x-to-zkevm-migration-app/backend":
-  version: 0.0.0-use.local
-  resolution: "x-to-zkevm-migration-backend@workspace:examples/x-to-zkevm-migration-app/backend"
-  dependencies:
-    "@fastify/cors": ^8.0.0
-    "@imtbl/sdk": latest
-    "@types/node": ^18.0.0
-    "@types/pg": ^8.11.6
-    "@types/uuid": ^9.0.8
-    fastify: ^4.27.0
-    fastify-cli: ^6.1.1
-    pg: ^8.11.5
-    ts-node: ^10.8.1
-    ts-node-dev: ^2.0.0
-    typescript: ^4.7.4
-    uuid: ^9.0.1
   languageName: unknown
   linkType: soft
 

@@ -1,5 +1,5 @@
 {
-  "name": "x-to-zkevm-migration-backend",
+  "name": "@examples/x-to-zkevm-migration-backend",
   "version": "1.0.0",
   "dependencies": {
     "@fastify/cors": "^8.0.0",

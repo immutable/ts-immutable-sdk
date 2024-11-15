@@ -1,5 +1,5 @@
 {
-  "name": "imx-to-zkevm-migrator",
+  "name": "@examples/imx-to-zkevm-migrator",
   "version": "0.1.0",
   "private": true,
   "scripts": {

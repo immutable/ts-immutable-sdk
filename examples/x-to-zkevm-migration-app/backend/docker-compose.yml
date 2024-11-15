@@ -21,6 +21,6 @@ services:
     depends_on:
       - postgres
     volumes:
-      - ./:/app
+      - ../../../:/app
     working_dir: /app
-    command: npm run dev
+    command: yarn workspace @examples/x-to-zkevm-migration-backend run dev
