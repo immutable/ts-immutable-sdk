@@ -1,7 +1,12 @@
 import MessageValidator from 'sns-validator';
 import { Environment } from '@imtbl/config';
-import { imx } from '@imtbl/generated-clients';
 import {
+  XNftCreated,
+  XNftUpdated,
+  XOrderAccepted,
+  XOrderCancelled,
+  XOrderFilled,
+  XTransferCreated,
   ZkevmActivityBurn, ZkevmActivityDeposit, ZkevmActivityMint, ZkevmActivitySale,
   ZkevmActivityTransfer, ZkevmActivityWithdrawal, ZkevmCollectionUpdated, ZkevmMetadataUpdated,
   ZkevmMintRequestUpdated, ZkevmNftUpdated, ZkevmOrderUpdated, ZkevmTokenUpdated,
@@ -29,12 +34,12 @@ export type WebhookHandlers = {
   zkEvmTokenUpdated?: (event: ZkevmTokenUpdated) => Promise<void>;
   zkEvmOrderUpdated?: (event: ZkevmOrderUpdated) => Promise<void>;
   zkEvmTradeCreated?: (event: ZkevmTradeCreated) => Promise<void>;
-  xNftCreated?: (event: imx.Asset) => Promise<void>;
-  xNftUpdated?: (event: imx.Asset) => Promise<void>;
-  xOrderAccepted?: (event: imx.OrderV3) => Promise<void>;
-  xOrderFilled?: (event: imx.OrderV3) => Promise<void>;
-  xOrderCancelled?: (event: imx.OrderV3) => Promise<void>;
-  xTransferCreated?: (event: imx.Transfer) => Promise<void>;
+  xNftCreated?: (event: XNftCreated) => Promise<void>;
+  xNftUpdated?: (event: XNftUpdated) => Promise<void>;
+  xOrderAccepted?: (event: XOrderAccepted) => Promise<void>;
+  xOrderFilled?: (event: XOrderFilled) => Promise<void>;
+  xOrderCancelled?: (event: XOrderCancelled) => Promise<void>;
+  xTransferCreated?: (event: XTransferCreated) => Promise<void>;
   all?: (event: any) => Promise<void>;
 };
 
