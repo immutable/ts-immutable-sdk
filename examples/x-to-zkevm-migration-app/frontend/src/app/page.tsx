@@ -3,7 +3,7 @@
 import { useIMX } from '@/context/imx';
 import { usePassport } from '@/context/passport';
 import { useZkEVM } from '@/context/zkevm';
-import { Box, Button, Heading } from '@biom3/react';
+import { Box, Button, Grid, Heading, Stack } from '@biom3/react';
 import { passport } from "@imtbl/sdk";
 import { useEffect, useState } from 'react';
 
@@ -112,99 +112,159 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen p-8 bg-gray-50">
-      <Box className="max-w-6xl mx-auto">
-        <header className="flex justify-between items-center mb-8">
-          <Heading>Immutable X to Immutable zkEVM Asset Migrator</Heading>
-          {!userProfile ? (
-            <Button
-              onClick={handleLogin}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Login to Passport
-            </Button>
-          ) : (
-            <Box className="flex items-center gap-4">
-              <span className="text-gray-600">
-                {imxWalletAddress}
-              </span>
+    <Box sx={{ mb: "base.spacing.x5", m: "base.spacing.x4" }}>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        sx={{ mb: "base.spacing.x4" }}
+      >
+        <Heading>Immutable X to Immutable zkEVM Asset Migrator</Heading>
+        {!userProfile ? (
+          <Button onClick={handleLogin} size="medium">
+            Login to Passport
+          </Button>
+        ) : (
+          <Button onClick={logout} size="medium">
+            Logout
+          </Button>
+        )}
+      </Stack>
+  
+      {userProfile ? (
+        <>
+          <Box sx={{ mb: "base.spacing.x5" }}>
+            <Heading size="small" sx={{ mb: "base.spacing.x2" }}>
+              Immutable X Assets (select to migrate)
+            </Heading>
+            {selectedAssets.length > 0 ? (
               <Button
-                onClick={logout}
-                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                onClick={handleBurn}
+                size="medium"
+                sx={{ mb: "base.spacing.x2" }}
               >
-                Logout
+                Migrate Selected ({selectedAssets.length})
               </Button>
-            </Box>
-          )}
-        </header>
-
-        {userProfile && (
-          <Box>
-            <Box className="flex justify-between items-center mb-4">
-              <Heading size="small">Immutable X Assets (select to migrate)</Heading>
-              {selectedAssets.length > 0 && (
-                <Button
-                  onClick={handleBurn}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                >
-                  Migrate Selected ({selectedAssets.length})
-                </Button>
-              )}
-            </Box>
-
+            ) : null}
+  
             {loading ? (
-              <Box className="flex justify-center items-center h-64">
-                <Box className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></Box>
-              </Box>
+              <Box>Loading...</Box>
             ) : (
-              <Box className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Grid
+                sx={{
+                  gap: "base.spacing.x3",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+                }}
+              >
                 {imxAssets.map((asset) => (
                   <Box
                     key={asset.token_id}
                     onClick={() => handleAssetSelection(asset)}
-                    className={`p-4 rounded-lg border cursor-pointer transition-all ${
-                      selectedAssets.includes(asset.token_id)
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-blue-300'
-                    }`}
+                    sx={{
+                      p: "base.spacing.x3",
+                      borderRadius: "8px",
+                      b: "1px solid",
+                      cursor: "pointer",
+                      transition: "border-color 0.2s",
+                      borderColor: selectedAssets.includes(asset)
+                        ? "base.color.brand.3"
+                        : "base.color.brand.1",
+                      bg: "transparent",
+                    }}
                   >
-                    {asset.image_url && (
+                    {asset.image_url ? (
                       <img
                         src={asset.image_url}
                         alt={asset.name}
-                        className="w-full h-48 object-cover rounded-md mb-3"
+                        style={{
+                          width: "100%",
+                          height: "192px",
+                          objectFit: "cover",
+                          borderRadius: "8px",
+                          marginBottom: "12px",
+                        }}
                       />
-                    )}
-                    <h3 className="font-semibold text-gray-800">{asset.name}</h3>
-                    <p className="text-sm text-gray-600">ID: {asset.token_id}</p>
+                    ) : null}
+                    <Box
+                      sx={{
+                        fontWeight: "600",
+                        c: "base.color.text.body.primary",
+                        mb: "base.spacing.x1",
+                      }}
+                    >
+                      {asset.name}
+                    </Box>
+                    <Box
+                      sx={{
+                        fontSize: "sm",
+                        c: "base.color.text.body.primary",
+                      }}
+                    >
+                      ID: {asset.token_id}
+                    </Box>
                   </Box>
                 ))}
-              </Box>
+              </Grid>
             )}
-            <Box className="mt-8">
-              <Heading size="small">Immutable zkEVM Assets</Heading>
-              <Box className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {zkevmAssets.map((asset) => (
-                  <Box
-                    key={asset.token_id}
-                    className="p-4 rounded-lg border border-gray-200 hover:border-blue-300"
-                  >
-                    {asset.image && (
-                      <img
-                        src={asset.image}
-                        alt={asset.name}
-                        className="w-full h-48 object-cover rounded-md mb-3"
-                      />
-                    )}
-                    <h3 className="font-semibold text-gray-800">{asset.name}</h3>
-                    <p className="text-sm text-gray-600">ID: {asset.token_id}</p>
-                  </Box>
-                ))}
-              </Box>
-            </Box>
           </Box>
-        )}
-      </Box>
-    </main>
+  
+          <Box>
+            <Heading size="small" sx={{ mb: "base.spacing.x2" }}>
+              Immutable zkEVM Assets
+            </Heading>
+            <Grid
+              sx={{
+                gap: "base.spacing.x3",
+                gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              }}
+            >
+              {zkevmAssets.map((asset) => (
+                <Box
+                  key={asset.token_id}
+                  sx={{
+                    p: "base.spacing.x3",
+                    borderRadius: "8px",
+                    b: "1px solid",
+                    borderColor: "base.color.brand.1",
+                    bg: "transparent",
+                  }}
+                >
+                  {asset.image ? (
+                    <img
+                      src={asset.image}
+                      alt={asset.name}
+                      style={{
+                        width: "100%",
+                        height: "192px",
+                        objectFit: "cover",
+                        borderRadius: "8px",
+                        marginBottom: "12px",
+                      }}
+                    />
+                  ) : null}
+                  <Box
+                    sx={{
+                      fontWeight: "600",
+                      c: "base.color.text.body.primary",
+                      mb: "base.spacing.x1",
+                    }}
+                  >
+                    {asset.name}
+                  </Box>
+                  <Box
+                    sx={{
+                      fontSize: "sm",
+                      c: "base.color.text.body.primary",
+                    }}
+                  >
+                    ID: {asset.token_id}
+                  </Box>
+                </Box>
+              ))}
+            </Grid>
+          </Box>
+        </>
+      ) : null}
+    </Box>
   );
 }

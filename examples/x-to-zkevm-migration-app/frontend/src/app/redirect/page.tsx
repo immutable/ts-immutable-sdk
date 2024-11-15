@@ -1,6 +1,7 @@
 "use client";
 
 import { PassportProvider, usePassport } from "@/context/passport";
+import { Box, Heading } from "@biom3/react";
 import { useEffect } from "react";
 
 function Redirect() {
@@ -20,9 +21,9 @@ function Redirect() {
     }, [passportInstance]);
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen p-8">
-            <h1 className="text-3xl font-bold mb-8">Logged in</h1>
-        </div>
+        <Box>
+            <Heading size="medium">Logged in</Heading>
+        </Box>
     );
 }
 
