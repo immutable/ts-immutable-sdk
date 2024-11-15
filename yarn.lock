@@ -2609,6 +2609,33 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@biom3/react@npm:^0.27.25":
+  version: 0.27.25
+  resolution: "@biom3/react@npm:0.27.25"
+  dependencies:
+    "@biom3/design-tokens": ~0.4.4
+    "@imtbl/image-resizer-utils": ~0.0.2
+    csstype: ^3.1.2
+    hls.js: ^1.5.11
+    localforage: ^1.10.0
+    lodash.debounce: ^4.0.8
+    lodash.get: ^4.4.2
+    lodash.isequal: ^4.5.0
+    lodash.throttle: ^4.1.1
+    react-is: ^18.2.0
+    react-keyed-flatten-children: ^3.0.0
+    ts-deepmerge: ^6.2.0
+  peerDependencies:
+    "@emotion/react": ^11.11.4
+    "@rive-app/react-canvas-lite": ^4.9.0
+    embla-carousel-react: ^8.0.4
+    framer-motion: ^10.12.12
+    react: ^18.3.0
+    react-dom: ^18.3.0
+  checksum: 72296b3ca583c96b1bd5bb08d8dc7c0ad0524e17479d62432a66f5a0e8c10a6d23056b01507324543099de8d939b2d124f49d3d1c2c4914bfe1e2389319fc32e
+  languageName: node
+  linkType: hard
+
 "@cnakazawa/watch@npm:^1.0.3":
   version: 1.0.4
   resolution: "@cnakazawa/watch@npm:1.0.4"
@@ -4198,6 +4225,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/imx-to-zkevm-migrator@workspace:examples/x-to-zkevm-migration-app/frontend"
   dependencies:
+    "@biom3/react": ^0.27.25
     "@imtbl/sdk": ^1.52.0
     "@types/node": ^20
     "@types/react": ^18

@@ -3,6 +3,7 @@
 import { useIMX } from '@/context/imx';
 import { usePassport } from '@/context/passport';
 import { useZkEVM } from '@/context/zkevm';
+import { Box, Button, Heading } from '@biom3/react';
 import { passport } from "@imtbl/sdk";
 import { useEffect, useState } from 'react';
 
@@ -112,53 +113,53 @@ export default function Home() {
 
   return (
     <main className="min-h-screen p-8 bg-gray-50">
-      <div className="max-w-6xl mx-auto">
+      <Box className="max-w-6xl mx-auto">
         <header className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Immutable X to Immutable zkEVM Asset Migrator</h1>
+          <Heading>Immutable X to Immutable zkEVM Asset Migrator</Heading>
           {!userProfile ? (
-            <button
+            <Button
               onClick={handleLogin}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               Login to Passport
-            </button>
+            </Button>
           ) : (
-            <div className="flex items-center gap-4">
+            <Box className="flex items-center gap-4">
               <span className="text-gray-600">
                 {imxWalletAddress}
               </span>
-              <button
+              <Button
                 onClick={logout}
                 className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
               >
                 Logout
-              </button>
-            </div>
+              </Button>
+            </Box>
           )}
         </header>
 
         {userProfile && (
-          <div>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold text-gray-700">IMX Assets for Migration</h2>
+          <Box>
+            <Box className="flex justify-between items-center mb-4">
+              <Heading size="small">Immutable X Assets (select to migrate)</Heading>
               {selectedAssets.length > 0 && (
-                <button
+                <Button
                   onClick={handleBurn}
                   className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                 >
                   Migrate Selected ({selectedAssets.length})
-                </button>
+                </Button>
               )}
-            </div>
+            </Box>
 
             {loading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-              </div>
+              <Box className="flex justify-center items-center h-64">
+                <Box className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></Box>
+              </Box>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Box className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {imxAssets.map((asset) => (
-                  <div
+                  <Box
                     key={asset.token_id}
                     onClick={() => handleAssetSelection(asset)}
                     className={`p-4 rounded-lg border cursor-pointer transition-all ${
@@ -176,15 +177,15 @@ export default function Home() {
                     )}
                     <h3 className="font-semibold text-gray-800">{asset.name}</h3>
                     <p className="text-sm text-gray-600">ID: {asset.token_id}</p>
-                  </div>
+                  </Box>
                 ))}
-              </div>
+              </Box>
             )}
-            <div className="mt-8">
-              <h2 className="text-xl font-semibold text-gray-700">ZKEVM Assets</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Box className="mt-8">
+              <Heading size="small">Immutable zkEVM Assets</Heading>
+              <Box className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {zkevmAssets.map((asset) => (
-                  <div
+                  <Box
                     key={asset.token_id}
                     className="p-4 rounded-lg border border-gray-200 hover:border-blue-300"
                   >
@@ -197,13 +198,13 @@ export default function Home() {
                     )}
                     <h3 className="font-semibold text-gray-800">{asset.name}</h3>
                     <p className="text-sm text-gray-600">ID: {asset.token_id}</p>
-                  </div>
+                  </Box>
                 ))}
-              </div>
-            </div>
-          </div>
+              </Box>
+            </Box>
+          </Box>
         )}
-      </div>
+      </Box>
     </main>
   );
 }

@@ -3,6 +3,7 @@
 import { IMXProvider } from '@/context/imx';
 import { PassportProvider } from '@/context/passport';
 import { ZkEVMProvider } from '@/context/zkevm';
+import { BiomeCombinedProviders } from '@biom3/react';
 import { Inter } from 'next/font/google';
 import './globals.css';
 
@@ -16,13 +17,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <IMXProvider>
-          <ZkEVMProvider>
-            <PassportProvider>
-              {children}
-            </PassportProvider>
-          </ZkEVMProvider>
-        </IMXProvider>
+        <BiomeCombinedProviders>
+          <IMXProvider>
+            <ZkEVMProvider>
+              <PassportProvider>
+                {children}
+              </PassportProvider>
+            </ZkEVMProvider>
+          </IMXProvider>
+        </BiomeCombinedProviders>
       </body>
     </html>
   )
