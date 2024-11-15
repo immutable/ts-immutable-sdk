@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
+import { imx } from '@imtbl/generated-clients';
+
 export interface BlockChainMetadata {
   log_index: string;
   block_number: string;
@@ -343,4 +345,61 @@ export interface ZkevmTradeCreated {
     tx_index_in_block: string;
     log_index_in_block: string;
   };
+}
+
+export enum imxEventName {
+  imtbl_x_nft_created = '',
+  imtbl_x_nft_updated = '',
+  imtbl_x_order_accepted = '',
+  imtbl_x_order_filled = '',
+  imtbl_x_order_cancelled = 'imtbl_x_order_cancelled',
+  imtbl_x_transfer_created = 'imtbl_x_transfer_created',
+}
+
+// imtbl_x_nft_created
+export interface XNftCreated {
+  event_name: 'imtbl_x_nft_created';
+  event_id: string;
+  chain: string;
+  data: imx.Asset;
+}
+
+// imtbl_x_nft_updated
+export interface XNftUpdated {
+  event_name: 'imtbl_x_nft_updated';
+  event_id: string;
+  chain: string;
+  data: imx.Asset;
+}
+
+// imtbl_x_order_accepted
+export interface XOrderAccepted {
+  event_name: 'imtbl_x_order_accepted';
+  event_id: string;
+  chain: string;
+  data: imx.Order;
+}
+
+// imtbl_x_order_filled
+export interface XOrderFilled {
+  event_name: 'imtbl_x_order_filled';
+  event_id: string;
+  chain: string;
+  data: imx.Order;
+}
+
+// imtbl_x_order_cancelled
+export interface XOrderCancelled {
+  event_name: 'imtbl_x_order_cancelled';
+  event_id: string;
+  chain: string;
+  data: imx.Order;
+}
+
+// imtbl_x_transfer_created
+export interface XTransferCreated {
+  event_name: 'imtbl_x_transfer_created';
+  event_id: string;
+  chain: string;
+  data: imx.Transfer;
 }
