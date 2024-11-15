@@ -3,13 +3,6 @@
 import { useIMX } from '@/context/imx';
 import { usePassport } from '@/context/passport';
 import { useZkEVM } from '@/context/zkevm';
-import {
-  Body,
-  Box,
-  Button,
-  Heading,
-  Stack
-} from '@biom3/react';
 import { passport } from "@imtbl/sdk";
 import { useEffect, useState } from 'react';
 
@@ -119,87 +112,43 @@ export default function Home() {
 
   return (
     <main className="min-h-screen p-8 bg-gray-50">
-      <Box sx={{ marginBottom: "base.spacing.x5" }}>
-        <Heading size="medium" sx={{ marginBottom: "base.spacing.x5" }}>
-          Passport
-        </Heading>
-        <Stack direction="row" justifyContent={"space-between"}>
-          <Box sx={{ marginBottom: "base.spacing.x5" }}>
-            {userProfile == null ? (
-              <Button
-                size="medium"
-                variant="primary"
-                sx={{ width: "100%", marginBottom: "base.spacing.x10" }}
-                disabled={loading}
-                onClick={handleLogin}
-              >
-                Login
-              </Button>
-            ) : (
-              <Button
-                size="medium"
-                variant="primary"
-                sx={{ width: "90%", marginBottom: "base.spacing.x10" }}
-                disabled={loading}
-                onClick={logout}
-              >
-                Logout
-              </Button>
-            )}
-          </Box>
-          <Box sx={{ marginBottom: "base.spacing.x5", marginTop: "base.spacing.x1", textAlign: "right" }}>
-            <div>
-              <Body size="small" weight="bold">Connected Account:</Body>
-            </div>
-            <div>
-              <Body size="xSmall" mono={true}>{userProfile ? imxWalletAddress : "(not connected)"}</Body>
-            </div>
-          </Box>
-        </Stack>
-      </Box>
       <div className="max-w-6xl mx-auto">
-        {/* <header className="flex justify-between items-center mb-8">
+        <header className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">Immutable X to Immutable zkEVM Asset Migrator</h1>
-          {userProfile ? (
+          {!userProfile ? (
+            <button
+              onClick={handleLogin}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Login to Passport
+            </button>
+          ) : (
             <div className="flex items-center gap-4">
               <span className="text-gray-600">
                 {imxWalletAddress}
               </span>
-              <Button
+              <button
                 onClick={logout}
-                size="medium"
-                variant="primary"
-                sx={{ width: "100%", marginBottom: "base.spacing.x10" }}
+                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
               >
                 Logout
-              </Button>
+              </button>
             </div>
-          ) : (
-            <Button
-              onClick={handleLogin}
-              size="medium"
-              variant="primary"
-              sx={{ width: "100%", marginBottom: "base.spacing.x10" }}
-            >
-              Login to Passport
-            </Button>
           )}
-        </header> */}
+        </header>
 
-        {userProfile ? (
+        {userProfile && (
           <div>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-gray-700">IMX Assets for Migration</h2>
-              {selectedAssets.length > 0 ? (
-                <Button
+              {selectedAssets.length > 0 && (
+                <button
                   onClick={handleBurn}
-                  size="medium"
-                  variant="primary"
-                  sx={{ width: "100%", marginBottom: "base.spacing.x10" }}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                 >
                   Migrate Selected ({selectedAssets.length})
-                </Button>
-              ) : null}
+                </button>
+              )}
             </div>
 
             {loading ? (
@@ -253,7 +202,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-        ) : null}
+        )}
       </div>
     </main>
   );
