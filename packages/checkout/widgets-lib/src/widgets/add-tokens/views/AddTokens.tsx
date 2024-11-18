@@ -15,7 +15,6 @@ import {
   type Checkout,
   EIP6963ProviderInfo,
   IMTBLWidgetEvents,
-  isAddressSanctioned,
   TokenFilterTypes,
   type TokenInfo,
   WalletProviderRdns,
@@ -69,7 +68,7 @@ import { SquidFooter } from '../components/SquidFooter';
 import { getFormattedNumberWithDecimalPlaces } from '../functions/getFormattedNumber';
 import { TokenDrawerMenu } from '../components/TokenDrawerMenu';
 import { PULSE_SHADOW } from '../utils/animation';
-import { useRiskAssessment } from '../hooks/useRiskAssessment';
+import { checkSanctionedAddresses } from '../functions/checkSanctionedAddresses';
 
 interface AddTokensProps {
   checkout: Checkout;
@@ -136,8 +135,6 @@ export function AddTokens({
   );
   const [fetchingRoutes, setFetchingRoutes] = useState(false);
   const [insufficientBalance, setInsufficientBalance] = useState(false);
-
-  const { riskAssessment } = useRiskAssessment();
 
   const selectedAmountUsd = useMemo(
     () => convertToUsd(tokens, inputValue, selectedToken),
@@ -328,8 +325,11 @@ export function AddTokens({
     fetchOnRampTokens();
   }, [checkout]);
 
-  const sendRequestOnRampEvent = () => {
-    if (!riskAssessment || isAddressSanctioned(riskAssessment)) {
+  const sendRequestOnRampEvent = async () => {
+    if (
+      toAddress
+      && (await checkSanctionedAddresses([toAddress], checkout.config))
+    ) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -376,10 +376,10 @@ export function AddTokens({
   };
 
   useEffect(() => {
-    if (toProvider && riskAssessment && payWithCardClicked) {
+    if (toProvider && payWithCardClicked) {
       sendRequestOnRampEvent();
     }
-  }, [toProvider, riskAssessment, payWithCardClicked]);
+  }, [toProvider, payWithCardClicked]);
 
   const handleRouteClick = (route: RouteData) => {
     setShowOptionsDrawer(false);
@@ -395,10 +395,17 @@ export function AddTokens({
     setShowDeliverToDrawer(false);
   };
 
-  const handleReviewClick = () => {
+  const handleReviewClick = async () => {
     if (!selectedRouteData || !selectedToken?.address) return;
 
-    if (!riskAssessment || isAddressSanctioned(riskAssessment)) {
+    if (
+      fromAddress
+      && toAddress
+      && (await checkSanctionedAddresses(
+        [fromAddress, toAddress],
+        checkout.config,
+      ))
+    ) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -471,7 +478,7 @@ export function AddTokens({
   const loading = (routeInputsReady || fetchingRoutes)
     && !(selectedRouteData || insufficientBalance);
 
-  const readyToReview = routeInputsReady && !!toAddress && !!selectedRouteData && !loading && !!riskAssessment;
+  const readyToReview = routeInputsReady && !!toAddress && !!selectedRouteData && !loading;
 
   const handleWalletConnected = (
     providerType: 'from' | 'to',
@@ -676,7 +683,7 @@ export function AddTokens({
             onPayWithCard={handleCardClick}
             onConnect={handleWalletConnected}
             insufficientBalance={insufficientBalance}
-            showOnRampOption={shouldShowOnRampOption}
+            showOnRampOption={shouldShowOnRampOption || !selectedToken}
           />
           <OptionsDrawer
             checkout={checkout}
