@@ -166,12 +166,17 @@ export default class ConfirmationScreen {
     });
   }
 
-  showServiceUnavailable() {
-    this.showConfirmationScreen(
-      this.getHref('unavailable'),
-      () => this.closeWindow(),
-      () => this.closeWindow(),
-    );
+  showServiceUnavailable(): Promise<void> {
+    return new Promise((_, reject) => {
+      this.showConfirmationScreen(
+        this.getHref('unavailable'),
+        () => {},
+        () => {
+          this.closeWindow();
+          reject(new Error('Service unavailable'));
+        },
+      );
+    });
   }
 
   loading(popupOptions?: { width: number; height: number }) {
