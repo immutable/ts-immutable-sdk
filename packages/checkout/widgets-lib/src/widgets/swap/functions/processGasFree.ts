@@ -1,5 +1,5 @@
-import { BrowserProvider } from 'ethers';
 import { TransactionResponse } from '@imtbl/dex-sdk';
+import { NamedBrowserProvider } from '@imtbl/checkout-sdk';
 import { isGasFree } from '../../../lib/provider';
 
 /**
@@ -7,7 +7,7 @@ import { isGasFree } from '../../../lib/provider';
  * @param checkProvider
  * @param currentQuote
  */
-export const processGasFree = (checkProvider: BrowserProvider, currentQuote: TransactionResponse) => {
+export const processGasFree = (checkProvider: NamedBrowserProvider, currentQuote: TransactionResponse) => {
   if (!isGasFree(checkProvider)) {
     return currentQuote;
   }

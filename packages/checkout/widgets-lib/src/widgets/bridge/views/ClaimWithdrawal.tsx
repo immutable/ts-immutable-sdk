@@ -6,7 +6,7 @@ import {
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChainId, WalletProviderName } from '@imtbl/checkout-sdk';
+import { ChainId, getGasPriceInWei, WalletProviderName } from '@imtbl/checkout-sdk';
 import { FlowRateWithdrawResponse } from '@imtbl/bridge-sdk';
 import { FeeData } from 'ethers';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
@@ -86,7 +86,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
   }, [tokenBridge, transaction]);
 
   const handleWithdrawalClaimClick = useCallback(async ({ forceChangeAccount }: { forceChangeAccount: boolean }) => {
-    if (!checkout || !tokenBridge || !from?.web3Provider || !withdrawalResponse) return;
+    if (!checkout || !tokenBridge || !from?.browserProvider || !withdrawalResponse) return;
 
     if (!withdrawalResponse.pendingWithdrawal.canWithdraw || !withdrawalResponse.unsignedTx) {
       // eslint-disable-next-line max-len, no-console
@@ -94,12 +94,12 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
       return;
     }
 
-    let providerToUse = from?.web3Provider;
+    let providerToUse = from?.browserProvider;
     const l1ChainId = getL1ChainId(checkout.config);
 
     setTxProcessing(true);
 
-    if (isPassportProvider(from?.web3Provider) || forceChangeAccount) {
+    if (isPassportProvider(from?.browserProvider.name) || forceChangeAccount) {
       // user should switch to MetaMask
       try {
         const createProviderResult = await checkout.createProvider({ walletProviderName: WalletProviderName.METAMASK });
@@ -142,11 +142,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
       }
 
       let gasPriceInWei: bigint | null = null;
-      if (feeData && feeData.lastBaseFeePerGas && feeData.maxPriorityFeePerGas) {
-        gasPriceInWei = feeData.lastBaseFeePerGas.add(feeData.maxPriorityFeePerGas);
-      } else if (feeData && feeData.gasPrice) {
-        gasPriceInWei = feeData.gasPrice;
-      }
+      if (feeData) gasPriceInWei = getGasPriceInWei(feeData);
       if (gasPriceInWei) {
         ethGasCostWei = gasEstimate * gasPriceInWei;
       }

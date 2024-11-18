@@ -79,7 +79,7 @@ export function SwapCoins({
   }, []);
 
   useEffect(() => {
-    if (hasZeroBalance(tokenBalances, IMX_TOKEN_SYMBOL) && !isPassportProvider(provider)) {
+    if (hasZeroBalance(tokenBalances, IMX_TOKEN_SYMBOL) && !isPassportProvider(provider?.name)) {
       setShowNotEnoughImxDrawer(true);
     }
   }, [tokenBalances]);

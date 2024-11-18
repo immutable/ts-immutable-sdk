@@ -6,9 +6,9 @@ import {
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 
 export async function checkIsWalletConnected(
-  web3Provider: BrowserProvider,
+  browserProvider: BrowserProvider,
 ): Promise<CheckConnectionResult> {
-  if (!web3Provider?.send) {
+  if (!browserProvider?.send) {
     throw new CheckoutError(
       'Check wallet connection request failed',
       CheckoutErrorType.PROVIDER_REQUEST_FAILED_ERROR,
@@ -19,7 +19,7 @@ export async function checkIsWalletConnected(
   }
   let accounts = [];
   try {
-    accounts = await web3Provider.send(WalletAction.CHECK_CONNECTION, []);
+    accounts = await browserProvider.send(WalletAction.CHECK_CONNECTION, []);
   } catch (err: any) {
     throw new CheckoutError(
       'Check wallet connection request failed',
@@ -38,8 +38,8 @@ export async function checkIsWalletConnected(
   };
 }
 
-export async function connectSite(web3Provider: BrowserProvider): Promise<BrowserProvider> {
-  if (!web3Provider || !web3Provider.send) {
+export async function connectSite(browserProvider: BrowserProvider): Promise<BrowserProvider> {
+  if (!browserProvider || !browserProvider.send) {
     throw new CheckoutError(
       'Incompatible provider',
       CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
@@ -49,18 +49,18 @@ export async function connectSite(web3Provider: BrowserProvider): Promise<Browse
 
   await withCheckoutError<void>(
     async () => {
-      if (!web3Provider.send) return;
+      if (!browserProvider.send) return;
       // this makes the request to the wallet to connect i.e request eth accounts ('eth_requestAccounts')
-      await web3Provider.send(WalletAction.CONNECT, []);
+      await browserProvider.send(WalletAction.CONNECT, []);
     },
     { type: CheckoutErrorType.USER_REJECTED_REQUEST_ERROR },
   );
 
-  return web3Provider;
+  return browserProvider;
 }
 
-export async function requestPermissions(web3Provider: BrowserProvider): Promise<BrowserProvider> {
-  if (!web3Provider || !web3Provider.send) {
+export async function requestPermissions(browserProvider: BrowserProvider): Promise<BrowserProvider> {
+  if (!browserProvider || !browserProvider.send) {
     throw new CheckoutError(
       'Incompatible provider',
       CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
@@ -70,12 +70,12 @@ export async function requestPermissions(web3Provider: BrowserProvider): Promise
 
   await withCheckoutError<void>(
     async () => {
-      if (!web3Provider.send) return;
+      if (!browserProvider.send) return;
 
-      await web3Provider.send(WalletAction.REQUEST_PERMISSIONS, [{ eth_accounts: {} }]);
+      await browserProvider.send(WalletAction.REQUEST_PERMISSIONS, [{ eth_accounts: {} }]);
     },
     { type: CheckoutErrorType.USER_REJECTED_REQUEST_ERROR },
   );
 
-  return web3Provider;
+  return browserProvider;
 }

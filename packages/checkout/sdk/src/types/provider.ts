@@ -1,4 +1,6 @@
-import { BrowserProvider } from 'ethers';
+import {
+  BrowserProvider, BrowserProviderOptions, Eip1193Provider, Networkish,
+} from 'ethers';
 
 /**
  * Enum representing the names of different wallet providers.
@@ -27,16 +29,6 @@ export interface CreateProviderParams {
   walletProviderName: WalletProviderName;
 }
 
-/**
- * Represents the result of creating a Web3 provider {@link Checkout.createProvider}.
- * @property {BrowserProvider} provider - The created Web3 provider.
- * @property {WalletProviderName} walletProviderName - The wallet provider name of the provider that was created.
- */
-export type CreateProviderResult = {
-  provider: BrowserProvider,
-  walletProviderName: WalletProviderName
-};
-
 export type ValidateProviderOptions = {
   allowMistmatchedChainId: boolean;
   allowUnsupportedProvider: boolean;
@@ -46,3 +38,17 @@ export const validateProviderDefaults: ValidateProviderOptions = {
   allowMistmatchedChainId: false,
   allowUnsupportedProvider: false,
 };
+
+// export type NamedBrowserProvider = {
+//   name: WalletProviderName
+// } & BrowserProvider;
+
+export class NamedBrowserProvider extends BrowserProvider {
+  name: WalletProviderName;
+
+  // eslint-disable-next-line max-len
+  constructor(name: WalletProviderName, ethereum: Eip1193Provider, network?: Networkish, _options?: BrowserProviderOptions) {
+    super(ethereum, network, _options);
+    this.name = name;
+  }
+}

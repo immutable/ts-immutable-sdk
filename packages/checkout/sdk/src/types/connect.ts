@@ -1,4 +1,4 @@
-import { BrowserProvider } from 'ethers';
+import { NamedBrowserProvider } from './provider';
 
 /**
  * Interface representing the params of {@link Checkout.connect}.
@@ -6,7 +6,7 @@ import { BrowserProvider } from 'ethers';
  * @property {boolean | undefined} requestWalletPermissions - A boolean that will trigger a permission request for wallet connection.
  */
 export interface ConnectParams {
-  provider: BrowserProvider
+  provider: NamedBrowserProvider
   requestWalletPermissions?: boolean
 }
 
@@ -15,7 +15,7 @@ export interface ConnectParams {
  * @property {BrowserProvider} provider - The provider used to connect to the network.
  */
 export interface ConnectResult {
-  provider: BrowserProvider;
+  provider: NamedBrowserProvider;
 }
 
 /**
@@ -23,7 +23,7 @@ export interface ConnectResult {
  * @property {BrowserProvider} provider - The provider used to connect to the network.
  */
 export interface CheckConnectionParams {
-  provider: BrowserProvider
+  provider: NamedBrowserProvider
 }
 
 /**

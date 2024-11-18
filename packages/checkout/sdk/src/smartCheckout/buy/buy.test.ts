@@ -2,7 +2,7 @@ import { Environment } from '@imtbl/config';
 import {
   ActionType, TransactionPurpose, constants,
 } from '@imtbl/orderbook';
-import { BrowserProvider, PreparedTransactionRequest } from 'ethers';
+import { PreparedTransactionRequest } from 'ethers';
 import {
   getItemRequirement, buy, getTransactionOrGas,
 } from './buy';
@@ -21,7 +21,7 @@ import {
   signApprovalTransactions,
   signFulfillmentTransactions,
 } from '../actions';
-import { BuyOrder, OrderFee } from '../../types';
+import { BuyOrder, NamedBrowserProvider, OrderFee } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../routing/indexer/fetchL1Representation';
 import { HttpClient } from '../../api/http';
@@ -44,14 +44,14 @@ describe('buy', () => {
 
   describe('buy', () => {
     let config: CheckoutConfiguration;
-    let mockProvider: BrowserProvider;
+    let mockProvider: NamedBrowserProvider;
 
     beforeEach(() => {
       mockProvider = {
         getSigner: jest.fn().mockReturnValue({
           getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
         }),
-      } as unknown as BrowserProvider;
+      } as unknown as NamedBrowserProvider;
 
       config = new CheckoutConfiguration({
         baseConfig: { environment: Environment.SANDBOX },
@@ -1739,14 +1739,14 @@ describe('buy', () => {
 
   describe('taker fees', () => {
     let config: CheckoutConfiguration;
-    let mockProvider: BrowserProvider;
+    let mockProvider: NamedBrowserProvider;
 
     beforeEach(() => {
       mockProvider = {
         getSigner: jest.fn().mockReturnValue({
           getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
         }),
-      } as unknown as BrowserProvider;
+      } as unknown as NamedBrowserProvider;
 
       config = new CheckoutConfiguration({
         baseConfig: { environment: Environment.SANDBOX },

@@ -1,11 +1,13 @@
-import { BrowserProvider, ErrorCode, TransactionRequest } from 'ethers';
+import { ErrorCode, TransactionRequest } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { ChainId, SendTransactionResult } from '../types';
+import {
+  ChainId, NamedBrowserProvider, SendTransactionResult, WalletProviderName,
+} from '../types';
 import { IMMUTABLE_ZKVEM_GAS_OVERRIDES } from '../env';
 import { isZkEvmChainId } from '../utils/utils';
 
-export function isPassportProvider(provider?: BrowserProvider | null) {
-  return (provider?.provider as any)?.isPassport === true;
+export function isPassportProvider(providerName?: WalletProviderName) {
+  return providerName === WalletProviderName.PASSPORT;
 }
 
 /**
@@ -21,20 +23,20 @@ export function isPassportProvider(provider?: BrowserProvider | null) {
  * Refer to the docs for more details:
  * https://docs.immutable.com/docs/zkevm/architecture/gas-sponsorship-for-gamers/
  */
-export function isGasFree(provider?: BrowserProvider | null) {
-  return isPassportProvider(provider);
+export function isGasFree(provider?: NamedBrowserProvider | null) {
+  return isPassportProvider(provider?.name);
 }
 
 export const setTransactionGasLimits = async (
-  web3Provider: BrowserProvider,
+  browserProvider: NamedBrowserProvider,
   transaction: TransactionRequest,
 ): Promise<TransactionRequest> => {
   const rawTx = transaction;
 
-  const { chainId } = await web3Provider.getNetwork();
+  const { chainId } = await browserProvider.getNetwork();
   if (!isZkEvmChainId(chainId as unknown as ChainId)) return rawTx;
   if (typeof rawTx.gasPrice !== 'undefined') return rawTx;
-  if (isGasFree(web3Provider)) {
+  if (isGasFree(browserProvider)) {
     rawTx.gasPrice = BigInt(0);
   } else {
     rawTx.maxFeePerGas = IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxFeePerGas;
@@ -66,13 +68,13 @@ export const handleProviderError = (err: any) => {
 };
 
 export const sendTransaction = async (
-  web3Provider: BrowserProvider,
+  browserProvider: NamedBrowserProvider,
   transaction: TransactionRequest,
 ): Promise<SendTransactionResult> => {
   try {
-    const signer = await web3Provider.getSigner();
+    const signer = await browserProvider.getSigner();
 
-    const rawTx = await setTransactionGasLimits(web3Provider, transaction);
+    const rawTx = await setTransactionGasLimits(browserProvider, transaction);
     const transactionResponse = await signer.sendTransaction(rawTx);
 
     return {

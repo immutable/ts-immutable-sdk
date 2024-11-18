@@ -41,6 +41,7 @@ export function SwitchNetworkZkEVM() {
         connectDispatch({
           payload: {
             type: ConnectActions.SET_PROVIDER,
+            // @ts-expect-error TODO
             provider: new BrowserProvider(provider.provider as any),
           },
         });
@@ -102,7 +103,7 @@ export function SwitchNetworkZkEVM() {
 
     try {
       let walletName = '';
-      if (isWalletConnectProvider(provider)) {
+      if (isWalletConnectProvider(provider.name)) {
         walletName = (provider.provider as any)?.session?.peer?.metadata?.name.toLowerCase();
       }
       if (walletName.includes('metamask')) {
@@ -178,7 +179,7 @@ export function SwitchNetworkZkEVM() {
       <SimpleTextBody
         heading={t('views.SWITCH_NETWORK.zkEVM.heading')}
       >
-        {isWalletConnectProvider(provider) ? (
+        {isWalletConnectProvider(provider?.name) ? (
           t('views.SWITCH_NETWORK.zkEVM.bodyWalletConnect')) : (
           t('views.SWITCH_NETWORK.zkEVM.body'))}
       </SimpleTextBody>

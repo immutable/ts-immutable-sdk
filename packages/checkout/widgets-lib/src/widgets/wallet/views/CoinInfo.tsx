@@ -14,7 +14,7 @@ import { UserJourney, useAnalytics } from '../../../context/analytics-provider/S
 export function CoinInfo() {
   const { t } = useTranslation();
   const { connectLoaderState: { provider } } = useContext(ConnectLoaderContext);
-  const isPassport = isPassportProvider(provider);
+  const isPassport = isPassportProvider(provider?.name);
 
   const { page } = useAnalytics();
 

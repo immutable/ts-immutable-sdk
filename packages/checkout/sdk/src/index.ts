@@ -19,6 +19,10 @@ export {
 } from './provider';
 
 export {
+  getGasPriceInWei,
+} from './gasEstimate';
+
+export {
   ChainId,
   ChainName,
   ChainSlug,
@@ -28,6 +32,7 @@ export {
   GasEstimateType,
   GasTokenType,
   ItemType,
+  NamedBrowserProvider,
   NetworkFilterTypes,
   RoutingOutcomeType,
   TokenFilterTypes,
@@ -73,7 +78,6 @@ export type {
   ConnectParams,
   ConnectResult,
   CreateProviderParams,
-  CreateProviderResult,
   DexConfig,
   ERC20ItemRequirement,
   ERC721Balance,

@@ -1,4 +1,3 @@
-import { BrowserProvider } from 'ethers';
 import {
   AvailableRoutingOptions,
   FulfillmentTransaction,
@@ -20,6 +19,7 @@ import { routingCalculator } from './routing/routingCalculator';
 import { Allowance } from './allowance/types';
 import { BalanceCheckResult, BalanceRequirement } from './balanceCheck/types';
 import { measureAsyncExecution } from '../logger/debugLogger';
+import { NamedBrowserProvider } from '../types';
 
 export const overrideBalanceCheckResult = (
   balanceCheckResult: BalanceCheckResult,
@@ -87,7 +87,7 @@ const processRoutes = async (
 
 export const smartCheckout = async (
   config: CheckoutConfiguration,
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   itemRequirements: ItemRequirement[],
   transactionOrGasAmount?: FulfillmentTransaction | GasAmount,
   routingOptions?: AvailableRoutingOptions,
