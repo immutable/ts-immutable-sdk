@@ -2,7 +2,7 @@ import {
   Body, Box, ButtCon, Drawer, Heading,
 } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
-import { BrowserProvider } from 'ethers';
+import { NamedBrowserProvider } from '@imtbl/checkout-sdk';
 import { TransferAssetsL1WarningHero } from '../../../components/Hero/TransferAssetsL1WarningHero';
 import { WalletAddress } from './WalletAddress/WalletAddress';
 
@@ -11,7 +11,7 @@ export function TransferAssetsL1Warning({
   showL1Warning,
   setShowL1Warning,
 }: {
-  provider?: BrowserProvider;
+  provider?: NamedBrowserProvider;
   showL1Warning: boolean;
   setShowL1Warning: (show: boolean) => void;
 }) {

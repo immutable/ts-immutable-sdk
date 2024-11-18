@@ -12,6 +12,7 @@ import {
   CancelResultGasless,
   CancelResultSuccess,
   CheckoutStatus,
+  NamedBrowserProvider,
 } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
 import { measureAsyncExecution } from '../../logger/debugLogger';
@@ -20,7 +21,7 @@ import { sendTransaction } from '../../transaction';
 const cancelOnChain = async (
   config: CheckoutConfiguration,
   orderbook: Orderbook,
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   orderIds: string[],
   waitFulfillmentSettlements: boolean,
 ): Promise<CancelResultSuccess | CancelResultFailed | CancelResultFulfillmentsUnsettled> => {
@@ -157,7 +158,7 @@ const gaslessCancel = async (
 
 export const cancel = async (
   config: CheckoutConfiguration,
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   orderIds: string[],
   overrides: CancelOverrides = {
     waitFulfillmentSettlements: true,

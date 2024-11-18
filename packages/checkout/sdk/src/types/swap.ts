@@ -1,6 +1,7 @@
 import { Quote, TransactionDetails } from '@imtbl/dex-sdk';
-import { BrowserProvider, TransactionReceipt } from 'ethers';
+import { TransactionReceipt } from 'ethers';
 import { TokenInfo } from './tokenInfo';
+import { NamedBrowserProvider } from './provider';
 
 /**
  * Interface representing the parameters for {@link Checkout.swap}.
@@ -15,7 +16,7 @@ import { TokenInfo } from './tokenInfo';
  */
 
 export interface SwapParams {
-  provider: BrowserProvider;
+  provider: NamedBrowserProvider;
   fromToken: TokenInfo,
   toToken: TokenInfo,
   fromAmount?: string,

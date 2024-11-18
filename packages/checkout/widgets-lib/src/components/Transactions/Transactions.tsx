@@ -4,12 +4,13 @@ import {
 import { Box } from '@biom3/react';
 import {
   ChainId,
+  NamedBrowserProvider,
   TokenFilterTypes,
-  TokenInfo, WalletProviderRdns,
+  TokenInfo, WalletProviderName, WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { useTranslation } from 'react-i18next';
-import { BrowserProvider, JsonRpcProvider } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 import { HeaderNavigation } from '../Header/HeaderNavigation';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../Footer/FooterLogo';
@@ -83,7 +84,7 @@ export function Transactions({
   const [txs, setTxs] = useState<Transaction[]>([]);
   const [showWalletDrawer, setShowWalletDrawer] = useState(false);
 
-  const isPassport = isPassportProvider(from?.web3Provider);
+  const isPassport = isPassportProvider(from?.browserProvider.name);
 
   // Fetch the tokens for the root chain using the allowed tokens.
   // In case this list does not have all the tokens, there is logic
@@ -117,7 +118,7 @@ export function Transactions({
   // built into the <TransactionsList /> component to fetch the
   // the missing data.
   const childChainTokensHashmap = useCallback(async () => {
-    if (!from?.web3Provider) return {};
+    if (!from?.browserProvider) return {};
 
     if (!from?.walletAddress) return {};
 
@@ -125,7 +126,7 @@ export function Transactions({
 
     try {
       const data = await checkout.getAllBalances({
-        provider: from?.web3Provider,
+        provider: from?.browserProvider,
         walletAddress: from?.walletAddress,
         chainId: childChainId,
       });
@@ -255,8 +256,11 @@ export function Transactions({
         if (event.providerDetail.info.rdns === WalletProviderRdns.METAMASK) {
           changeAccount = true;
         }
-        const web3Provider = new BrowserProvider(event.provider as any);
-        const connectedProvider = await connectToProvider(checkout, web3Provider, changeAccount);
+        const browserProvider = new NamedBrowserProvider(
+          event.providerDetail.info.name as WalletProviderName,
+          event.provider,
+        );
+        const connectedProvider = await connectToProvider(checkout, browserProvider, changeAccount);
         const network = await connectedProvider.getNetwork();
         const address = await (await connectedProvider.getSigner()).getAddress();
 
@@ -265,7 +269,7 @@ export function Transactions({
           payload: {
             type: BridgeActions.SET_WALLETS_AND_NETWORKS,
             from: {
-              web3Provider: connectedProvider,
+              browserProvider: connectedProvider,
               walletProviderInfo: {
                 ...event.providerDetail.info,
               },
@@ -291,7 +295,7 @@ export function Transactions({
         payload: {
           type: BridgeActions.SET_WALLETS_AND_NETWORKS,
           from: {
-            web3Provider: from?.web3Provider,
+            browserProvider: from?.browserProvider,
             walletAddress: from?.walletAddress,
             walletProviderInfo: from?.walletProviderInfo,
             network: from?.network,
@@ -382,13 +386,13 @@ export function Transactions({
     >
       <Box sx={transactionsContainerStyle}>
         <Box sx={transactionsListContainerStyle}>
-          {!from?.web3Provider && (
+          {!from?.browserProvider && (
             <EmptyStateNotConnected
               openWalletDrawer={() => setShowWalletDrawer(true)}
             />
           )}
-          {from?.web3Provider && loading && <Shimmer />}
-          {from?.web3Provider
+          {from?.browserProvider && loading && <Shimmer />}
+          {from?.browserProvider
             && !loading
             && txs.length > 0
             && knownTokenMap && (
@@ -401,7 +405,7 @@ export function Transactions({
                 changeWallet={() => setShowWalletDrawer(true)}
               />
           )}
-          {from?.web3Provider && !loading && txs.length === 0 && (
+          {from?.browserProvider && !loading && txs.length === 0 && (
             <NoTransactions
               checkout={checkout}
               isPassport={isPassport}
@@ -409,7 +413,7 @@ export function Transactions({
             />
           )}
         </Box>
-        {from?.web3Provider && txs.length > 0 && (
+        {from?.browserProvider && txs.length > 0 && (
           <Box sx={supportBoxContainerStyle}>
             <SupportMessage checkout={checkout} isPassport={isPassport} />
           </Box>

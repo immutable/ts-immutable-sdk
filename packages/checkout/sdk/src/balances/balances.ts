@@ -27,11 +27,11 @@ import { isMatchingAddress } from '../utils/utils';
 
 export const getBalance = async (
   config: CheckoutConfiguration,
-  web3Provider: BrowserProvider,
+  browserProvider: BrowserProvider,
   walletAddress: string,
 ): Promise<GetBalanceResult> => await withCheckoutError<GetBalanceResult>(
   async () => {
-    const networkInfo = await getNetworkInfo(config, web3Provider);
+    const networkInfo = await getNetworkInfo(config, browserProvider);
 
     if (!networkInfo.isSupported) {
       throw new CheckoutError(
@@ -41,7 +41,7 @@ export const getBalance = async (
       );
     }
 
-    const balance = await web3Provider.getBalance(walletAddress);
+    const balance = await browserProvider.getBalance(walletAddress);
     return {
       balance,
       formattedBalance: formatUnits(
@@ -55,7 +55,7 @@ export const getBalance = async (
 );
 
 export async function getERC20Balance(
-  web3Provider: BrowserProvider,
+  browserProvider: BrowserProvider,
   walletAddress: string,
   tokenAddress: string,
 ) {
@@ -64,11 +64,11 @@ export async function getERC20Balance(
       const contract = new Contract(
         tokenAddress,
         JSON.stringify(ERC20ABI),
-        web3Provider,
+        browserProvider,
       );
 
       return Promise.all([
-        getERC20TokenInfo(web3Provider, tokenAddress),
+        getERC20TokenInfo(browserProvider, tokenAddress),
         contract.balanceOf(walletAddress),
       ])
         .then(([tokenInfo, balance]) => {
@@ -215,7 +215,7 @@ export const getBlockscoutBalance = async (
 
 export const getBalances = async (
   config: CheckoutConfiguration,
-  web3Provider: BrowserProvider,
+  browserProvider: BrowserProvider,
   walletAddress: string,
   tokens: TokenInfo[],
 ): Promise<GetBalancesResult> => {
@@ -227,11 +227,11 @@ export const getBalances = async (
       // That we have given up -- keep it as it is for now.
       if (!token.address || isMatchingAddress(token.address, NATIVE)) {
         allBalancePromises.push(
-          getBalance(config, web3Provider, walletAddress),
+          getBalance(config, browserProvider, walletAddress),
         );
       } else {
         allBalancePromises.push(
-          getERC20Balance(web3Provider, walletAddress, token.address!),
+          getERC20Balance(browserProvider, walletAddress, token.address!),
         );
       }
     });
@@ -255,12 +255,12 @@ export const getBalances = async (
 
 const getTokenBalances = async (
   config: CheckoutConfiguration,
-  web3Provider: BrowserProvider | undefined,
+  browserProvider: BrowserProvider | undefined,
   walletAddress: string | undefined,
   chainId: ChainId,
   filterTokens: TokenInfo[],
 ): Promise<GetAllBalancesResult> => {
-  if (!web3Provider) {
+  if (!browserProvider) {
     throw new CheckoutError(
       'indexer is disabled for this chain, you must provide a provider.',
       CheckoutErrorType.MISSING_PARAMS,
@@ -271,22 +271,22 @@ const getTokenBalances = async (
   // Fails in fetching data from the RCP calls might result in some
   // missing data.
   let address = walletAddress;
-  if (!address) address = await (await web3Provider.getSigner()).getAddress();
+  if (!address) address = await (await browserProvider.getSigner()).getAddress();
   return await measureAsyncExecution<GetBalancesResult>(
     config,
     `Time to fetch balances using RPC for ${chainId}`,
-    getBalances(config, web3Provider, address, filterTokens),
+    getBalances(config, browserProvider, address, filterTokens),
   );
 };
 
 export const getAllBalances = async (
   config: CheckoutConfiguration,
-  web3Provider: BrowserProvider | undefined,
+  browserProvider: BrowserProvider | undefined,
   walletAddress: string | undefined,
   chainId: ChainId,
   forceFetch: boolean = false,
 ): Promise<GetAllBalancesResult> => {
-  if (!walletAddress && !web3Provider) {
+  if (!walletAddress && !browserProvider) {
     throw new CheckoutError(
       'both walletAddress and provider are missing. At least one must be provided.',
       CheckoutErrorType.MISSING_PARAMS,
@@ -313,7 +313,7 @@ export const getAllBalances = async (
   }
 
   if (Blockscout.isChainSupported(chainId)) {
-    const address = walletAddress ?? await (await web3Provider?.getSigner())?.getAddress();
+    const address = walletAddress ?? await (await browserProvider?.getSigner())?.getAddress();
 
     try {
       return await measureAsyncExecution<GetAllBalancesResult>(
@@ -325,12 +325,12 @@ export const getAllBalances = async (
       // Blockscout rate limiting, fallback to RPC node
       if ((error as CheckoutError).type === CheckoutErrorType.GET_INDEXER_BALANCE_ERROR
         && (error as CheckoutError).data?.error?.code === HttpStatusCode.TooManyRequests) {
-        return getTokenBalances(config, web3Provider, walletAddress, chainId, tokens);
+        return getTokenBalances(config, browserProvider, walletAddress, chainId, tokens);
       }
       throw error;
     }
   }
 
   // Blockscout not supported, fallback to RPC node
-  return getTokenBalances(config, web3Provider, walletAddress, chainId, tokens);
+  return getTokenBalances(config, browserProvider, walletAddress, chainId, tokens);
 };

@@ -11,10 +11,10 @@ import {
   CommerceFlowType,
   CommerceWidgetConfiguration,
   Checkout,
+  NamedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { BrowserProvider } from 'ethers';
-import { CheckoutWidgetContextProvicer } from './context/CheckoutContextProvider';
 import {
   useViewState,
   SharedViews,
@@ -51,7 +51,7 @@ import {
 
 export type CommerceWidgetInputs = {
   checkout: Checkout;
-  web3Provider?: BrowserProvider;
+  browserProvider?: NamedBrowserProvider;
   flowParams: CommerceWidgetParams;
   flowConfig: CommerceWidgetConfiguration;
   widgetsConfig: StrongCheckoutWidgetsConfig;
@@ -59,7 +59,7 @@ export type CommerceWidgetInputs = {
 
 export default function CommerceWidget(props: CommerceWidgetInputs) {
   const {
-    flowParams, flowConfig, widgetsConfig, checkout, web3Provider,
+    flowParams, flowConfig, widgetsConfig, checkout, browserProvider,
   } = props;
 
   const { t } = useTranslation();
@@ -79,8 +79,8 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
   const { provider } = commerceState;
 
   const connectLoaderParams = useMemo(
-    () => getConnectLoaderParams(view, checkout, provider || web3Provider),
-    [view, checkout, provider, web3Provider],
+    () => getConnectLoaderParams(view, checkout, provider || browserProvider),
+    [view, checkout, provider, browserProvider],
   );
 
   const connectLoaderSuccessEvent = flowParams.flow === CommerceFlowType.ADD_TOKENS ? () => {} : undefined;
@@ -127,16 +127,16 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
   useWidgetEvents(eventTarget, viewState, handleProviderUpdated);
 
   useEffect(() => {
-    if (!web3Provider) {
+    if (!browserProvider) {
       return;
     }
     commerceDispatch({
       payload: {
         type: CommerceActions.SET_PROVIDER,
-        provider: web3Provider,
+        provider: browserProvider,
       },
     });
-  }, [commerceDispatch, web3Provider]);
+  }, [commerceDispatch, browserProvider]);
 
   /**
    * Mount the view according to set flow in params
@@ -240,7 +240,7 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
           <BridgeWidget
             config={widgetsConfig}
             checkout={checkout}
-            web3Provider={web3Provider}
+            browserProvider={browserProvider}
             showBackButton={showBackButton}
             {...(view.data.params || {})}
           />

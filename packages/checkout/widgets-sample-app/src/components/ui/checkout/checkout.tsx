@@ -38,6 +38,8 @@ import { useAsyncMemo, usePrevState } from "../../../hooks";
 import { Message } from "./components/messages";
 import { Legend } from "./components/legend";
 import { itemsMock } from "./items.mock";
+import { ChainId } from "@imtbl/checkout-sdk";
+import { NamedBrowserProvider } from "@imtbl/checkout-sdk";
 
 //
 const ENVIRONMENT_DEV = "development" as Environment;
@@ -108,7 +110,7 @@ const usePassportLoginCallback = (passportClient: Passport) => {
 const createBrowserProvider = async (
   checkoutSdk: Checkout,
   params: CreateProviderParams
-): Promise<BrowserProvider> => {
+): Promise<NamedBrowserProvider> => {
   try {
     const { provider } = await checkoutSdk.createProvider({ ...params });
     const { isConnected } = await checkoutSdk.checkIsWalletConnected({
@@ -218,8 +220,8 @@ function CheckoutUI() {
     WidgetTheme.DARK
   );
 
-  // set a state to keep connected wallet web3Provider
-  const [web3Provider, setBrowserProvider] = useState<BrowserProvider | undefined>(
+  // set a state to keep connected wallet browserProvider
+  const [browserProvider, setBrowserProvider] = useState<NamedBrowserProvider | undefined>(
     undefined
   );
 
@@ -238,12 +240,8 @@ function CheckoutUI() {
   // );
 
   // know connected wallet type
-  const isMetamask = web3Provider?.provider?.isMetaMask;
-  const isPassport = (
-    web3Provider?.provider as unknown as Eip1193Provider & {
-      isPassport: boolean;
-    }
-  )?.isPassport;
+  const isMetamask = browserProvider?.name.toLowerCase() === 'metamask'
+  const isPassport = browserProvider?.name.toLowerCase() === 'immutable passport'
 
   // handle removing widget
   const unmount = () => {
@@ -259,7 +257,7 @@ function CheckoutUI() {
     widget?.mount("widget-root", params);
   };
 
-  // should wait until web3Provider is set to render widget?
+  // should wait until browserProvider is set to render widget?
   const [renderAfterConnect, prevRenderAfterConnect, setRenderAfterConnect] =
     usePrevState(false);
   const toggleRenderAfterConnect = () => {
@@ -273,10 +271,10 @@ function CheckoutUI() {
   );
   const widget = useAsyncMemo(async () => {
     if (widgetsFactory === undefined) return undefined;
-    if (renderAfterConnect && !web3Provider) return undefined;
+    if (renderAfterConnect && !browserProvider) return undefined;
 
     return widgetsFactory.create(WidgetType.IMMUTABLE_COMMERCE, {
-      provider: web3Provider,
+      provider: browserProvider,
       config: {
         theme,
         language,
@@ -294,7 +292,7 @@ function CheckoutUI() {
         },
       },
     });
-  }, [widgetsFactory, web3Provider, renderAfterConnect]);
+  }, [widgetsFactory, browserProvider, renderAfterConnect]);
 
   // init, and add event listeners
   useEffect(() => {
@@ -347,10 +345,10 @@ function CheckoutUI() {
   // mount & re-render widget everytime params change
   useEffect(() => {
     if (params?.flow === undefined) return;
-    if (renderAfterConnect && !web3Provider) return;
+    if (renderAfterConnect && !browserProvider) return;
 
     mount();
-  }, [params, renderAfterConnect, web3Provider]);
+  }, [params, renderAfterConnect, browserProvider]);
 
   // if language or theme change, notify widget
   useEffect(() => {
@@ -365,12 +363,12 @@ function CheckoutUI() {
     passportClient.connectEvm({ announceProvider: true });
   }, []);
 
-  // after this dApp creates a web3Provider recreate widget
+  // after this dApp creates a browserProvider recreate widget
   useEffect(() => {
-    if (web3Provider === undefined || widgetsFactory === undefined) return;
+    if (browserProvider === undefined || widgetsFactory === undefined) return;
 
-    widgetsFactory.updateProvider(web3Provider);
-  }, [web3Provider, widgetsFactory]);
+    widgetsFactory.updateProvider(browserProvider);
+  }, [browserProvider, widgetsFactory]);
 
   // if render after connect is switched on reset
   useEffect(() => {
@@ -392,12 +390,12 @@ function CheckoutUI() {
     }
   }, [environment, prevEnvironment]);
 
-  // unmount when web3Provider is undefined
+  // unmount when browserProvider is undefined
   useEffect(() => {
-    if (web3Provider === undefined && widget && mounted.current) {
+    if (browserProvider === undefined && widget && mounted.current) {
       unmount();
     }
-  }, [web3Provider, widget]);
+  }, [browserProvider, widget]);
 
   return (
     <Box sx={{ p: "base.spacing.x4" }}>
@@ -578,7 +576,7 @@ function CheckoutUI() {
               />
             </FormControl>
 
-            {(renderAfterConnect || web3Provider) && (
+            {(renderAfterConnect || browserProvider) && (
               <>
                 <Heading size="xSmall">Connect a provider</Heading>
                 <Stack direction="row" gap="base.spacing.x6">
@@ -587,7 +585,7 @@ function CheckoutUI() {
                       size="small"
                       variant="secondary"
                       onClick={async () => {
-                        if (web3Provider) {
+                        if (browserProvider) {
                           setBrowserProvider(undefined);
                           return;
                         }
@@ -617,7 +615,7 @@ function CheckoutUI() {
                       size="small"
                       variant="secondary"
                       onClick={async () => {
-                        if (web3Provider) {
+                        if (browserProvider) {
                           setBrowserProvider(undefined);
                           return;
                         }
@@ -647,7 +645,7 @@ function CheckoutUI() {
               </>
             )}
 
-            {((renderAfterConnect && web3Provider) || !renderAfterConnect) && (
+            {((renderAfterConnect && browserProvider) || !renderAfterConnect) && (
               <>
                 <Heading size="xSmall">Select a flow</Heading>
                 <Select

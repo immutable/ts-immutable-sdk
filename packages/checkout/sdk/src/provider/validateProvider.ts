@@ -4,15 +4,18 @@ import { BrowserProvider } from 'ethers';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { CheckoutConfiguration } from '../config';
 import {
-  NetworkFilterTypes, ValidateProviderOptions, validateProviderDefaults,
+  NamedBrowserProvider,
+  NetworkFilterTypes, ValidateProviderOptions, WalletProviderName, validateProviderDefaults,
 } from '../types';
 import { getNetworkAllowList } from '../network';
 import { getUnderlyingChainId } from './getUnderlyingProvider';
 
 export function isBrowserProvider(
-  web3Provider: BrowserProvider,
+  browserProvider: BrowserProvider,
 ): boolean {
-  if (web3Provider && Boolean(web3Provider.send) && typeof web3Provider.send === 'function') {
+  console.log('isBrowserProvider');
+  console.log(browserProvider);
+  if (browserProvider && Boolean(browserProvider.send) && typeof browserProvider.send === 'function') {
     return true;
   }
   return false;
@@ -20,16 +23,16 @@ export function isBrowserProvider(
 
 export async function validateProvider(
   config: CheckoutConfiguration,
-  web3Provider: BrowserProvider,
+  browserProvider: NamedBrowserProvider,
   validateProviderOptions?: ValidateProviderOptions,
-): Promise<BrowserProvider> {
+): Promise<NamedBrowserProvider> {
   return withCheckoutError(
     async () => {
-      if ((web3Provider.provider as any)?.isPassport) {
+      if (browserProvider.name === WalletProviderName.PASSPORT) {
         // if Passport skip the validation checks
-        return web3Provider;
+        return browserProvider;
       }
-      if (!isBrowserProvider(web3Provider)) {
+      if (!isBrowserProvider(browserProvider)) {
         throw new CheckoutError(
           'Parsed provider is not a valid BrowserProvider',
           CheckoutErrorType.WEB3_PROVIDER_ERROR,
@@ -42,17 +45,17 @@ export async function validateProvider(
         ...validateProviderOptions,
       };
 
-      const underlyingChainId = await getUnderlyingChainId(web3Provider);
-      let web3ChainId = web3Provider._network.chainId;
+      const underlyingChainId = await getUnderlyingChainId(browserProvider);
+      let web3ChainId = (await browserProvider.getNetwork()).chainId;
 
       try {
-        web3ChainId = web3Provider._network.chainId;
+        web3ChainId = (await browserProvider.getNetwork()).chainId;
         if (!web3ChainId) {
-          web3ChainId = (await web3Provider.getNetwork()).chainId;
+          web3ChainId = (await browserProvider.getNetwork()).chainId;
         }
       } catch (err) {
         throw new CheckoutError(
-          'Unable to detect the web3Provider network',
+          'Unable to detect the browserProvider network',
           CheckoutErrorType.WEB3_PROVIDER_ERROR,
           { error: err },
         );
@@ -79,7 +82,7 @@ export async function validateProvider(
           CheckoutErrorType.WEB3_PROVIDER_ERROR,
         );
       }
-      return web3Provider;
+      return browserProvider;
     },
     {
       type: CheckoutErrorType.WEB3_PROVIDER_ERROR,

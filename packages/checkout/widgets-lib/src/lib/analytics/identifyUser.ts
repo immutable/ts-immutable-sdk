@@ -1,4 +1,4 @@
-import { BrowserProvider } from 'ethers';
+import { NamedBrowserProvider } from '@imtbl/checkout-sdk';
 import { isMetaMaskProvider, isPassportProvider } from '../provider';
 
 /**
@@ -8,12 +8,12 @@ import { isMetaMaskProvider, isPassportProvider } from '../provider';
  */
 export async function identifyUser(
   identify: (id: string, attributes: Record<string, any>) => void,
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
 ) {
   // WT-1698 Analytics - Identify user here then progress to widget
   const walletAddress = (await (await provider.getSigner()).getAddress()).toLowerCase();
-  const isMetaMask = isMetaMaskProvider(provider);
-  const isPassport = isPassportProvider(provider);
+  const isMetaMask = isMetaMaskProvider(provider.name);
+  const isPassport = isPassportProvider(provider.name);
   try {
     identify(walletAddress, {
       isMetaMask,
