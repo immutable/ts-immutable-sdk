@@ -38,6 +38,7 @@ import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { OrderSummary } from './views/OrderSummary';
 import { CreditCardWarningDrawer } from './components/CreditCardWarningDrawer';
+import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 
 type OptionalWidgetParams = Pick<
 SaleWidgetParams,
@@ -189,6 +190,18 @@ export default function SaleWidget(props: SaleWidgetProps) {
               tokenAddress={viewState.view.data?.tokenAddress}
               heading={viewState.view.data?.heading}
               subheading={viewState.view.data?.subheading}
+            />
+          )}
+          {viewState.view.type === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
+            <ServiceUnavailableErrorView
+              onCloseClick={() => sendSaleWidgetCloseEvent(eventTarget)}
+              onBackButtonClick={() => {
+                viewDispatch({
+                  payload: {
+                    type: ViewActions.GO_BACK,
+                  },
+                });
+              }}
             />
           )}
           <CreditCardWarningDrawer />

@@ -14,7 +14,7 @@ import { Base } from '../BaseWidgetRoot';
 import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 import { getL2ChainId } from '../../lib';
 import { isPassportProvider } from '../../lib/provider';
-import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
+import { ServiceUnavailableToRegionErrorView } from '../../views/error/ServiceUnavailableToRegionErrorView';
 import { ServiceType } from '../../views/error/serviceTypes';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/validations/widgetValidators';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
@@ -146,7 +146,7 @@ export class Swap extends Base<WidgetType.SWAP> {
               }
                 serviceUnavailableView={
                 (
-                  <ServiceUnavailableErrorView
+                  <ServiceUnavailableToRegionErrorView
                     service={ServiceType.SWAP}
                     onCloseClick={() => sendSwapWidgetCloseEvent(window)}
                     primaryActionText={

@@ -12,7 +12,9 @@ import {
   useState,
 } from 'react';
 import {
-  ChainId, isAddressSanctioned, WalletProviderName, WalletProviderRdns,
+  ChainId,
+  WalletProviderName,
+  WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
@@ -26,7 +28,7 @@ import {
 } from '../../../lib/provider';
 import { getL1ChainId, getL2ChainId } from '../../../lib';
 import { getChainNameById } from '../../../lib/chains';
-import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { abbreviateAddress } from '../../../lib/addressUtils';
 import {
   useAnalytics,
@@ -209,20 +211,6 @@ export function WalletAndNetworkSelector() {
       const web3Provider = new Web3Provider(event.provider as any);
       const connectedProvider = await connectToProvider(checkout, web3Provider, changeAccount);
 
-      // CM-793 Check for sanctioned address
-      if (await isAddressSanctioned(await connectedProvider.getSigner().getAddress(), checkout.config.environment)) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
-              error: new Error('Sanctioned address'),
-            },
-          },
-        });
-        return;
-      }
-
       await handleFromWalletConnectionSuccess(connectedProvider);
     },
     [checkout],
@@ -319,6 +307,7 @@ export function WalletAndNetworkSelector() {
         setToWalletWeb3Provider(fromWalletWeb3Provider);
         setToWallet(event);
         const address = await fromWalletWeb3Provider!.getSigner().getAddress();
+
         setToWalletAddress(address.toLowerCase());
         handleSettingToNetwork(address.toLowerCase());
 
@@ -339,25 +328,12 @@ export function WalletAndNetworkSelector() {
         const web3Provider = new Web3Provider(event.provider as any);
         const connectedProvider = await connectToProvider(checkout, web3Provider, false);
 
-        // CM-793 Check for sanctioned address
-        if (await isAddressSanctioned(await connectedProvider.getSigner().getAddress(), checkout.config.environment)) {
-          viewDispatch({
-            payload: {
-              type: ViewActions.UPDATE_VIEW,
-              view: {
-                type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
-                error: new Error('Sanctioned address'),
-              },
-            },
-          });
-          return;
-        }
+        const address = await connectedProvider.getSigner().getAddress();
 
         if (isWalletConnectProvider(connectedProvider)) {
           handleWalletConnectToWalletConnection(connectedProvider);
         } else {
           setToWalletWeb3Provider(connectedProvider);
-          const address = await connectedProvider!.getSigner().getAddress();
           setToWalletAddress(address.toLowerCase());
           handleSettingToNetwork(address.toLowerCase());
 

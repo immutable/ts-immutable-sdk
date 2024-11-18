@@ -5,6 +5,7 @@ import {
   OptionKey,
 } from '@biom3/react';
 import {
+  fetchRiskAssessment,
   GetBalanceResult, WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import {
@@ -175,6 +176,27 @@ export function BridgeForm(props: BridgeFormProps) {
       : undefined),
     [formToken, tokenBalances, cryptoFiatState.conversions, formatTokenOptionsId],
   );
+
+  useEffect(() => {
+    if (!checkout || !from || !to) {
+      return;
+    }
+
+    (async () => {
+      const addresses = [from.walletAddress];
+      if (to.walletAddress.toLowerCase() !== from.walletAddress.toLowerCase()) {
+        addresses.push(to.walletAddress);
+      }
+
+      const assessment = await fetchRiskAssessment(addresses, checkout.config);
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_RISK_ASSESSMENT,
+          riskAssessment: assessment,
+        },
+      });
+    })();
+  }, [checkout, from, to]);
 
   const canFetchEstimates = (silently: boolean): boolean => {
     if (Number.isNaN(parseFloat(formAmount))) return false;

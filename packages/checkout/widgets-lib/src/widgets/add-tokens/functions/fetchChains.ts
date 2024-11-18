@@ -1,16 +1,12 @@
+import { Squid } from '@0xsquid/sdk';
 import { Chain } from '../types';
-import { SQUID_API_BASE_URL } from '../utils/config';
 
 type SquidChain = {
   chainId: string;
-  chainName: string;
+  networkName: string;
   chainIconURI: string;
   chainType: string;
   nativeCurrency: SquidNativeCurrency;
-};
-
-type SquidChains = {
-  chains: SquidChain[];
 };
 
 export type SquidNativeCurrency = {
@@ -20,22 +16,12 @@ export type SquidNativeCurrency = {
   icon: string;
 };
 
-export const fetchChains = async (): Promise<Chain[]> => {
-  const url = `${SQUID_API_BASE_URL}/chains`;
+export const fetchChains = (squid: Squid): Chain[] => {
+  const { chains } = squid;
 
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      'Content-Type': 'application/json',
-    },
-  });
-
-  const data: SquidChains = await response.json();
-
-  return data.chains.map((chain: SquidChain) => ({
+  return chains.map((chain: SquidChain) => ({
     id: chain.chainId.toString(),
-    name: chain.chainName,
+    name: chain.networkName,
     iconUrl: chain.chainIconURI,
     type: chain.chainType,
     nativeCurrency: {

@@ -20,7 +20,6 @@ import {
   useProvidersContext,
 } from '../../context/providers-context/ProvidersContext';
 import { UnableToConnectDrawer } from '../UnableToConnectDrawer/UnableToConnectDrawer';
-import { ChangedYourMindDrawer } from '../ChangedYourMindDrawer/ChangedYourMindDrawer';
 import {
   connectEIP6963Provider,
   ConnectEIP6963ProviderError,
@@ -70,7 +69,6 @@ export function ConnectWalletDrawer({
   const prevWalletChangeEvent = useRef<WalletChangeEvent | undefined>();
 
   const [showUnableToConnectDrawer, setShowUnableToConnectDrawer] = useState(false);
-  const [showChangedMindDrawer, setShowChangedMindDrawer] = useState(false);
   const [showEOAWarningDrawer, setShowEOAWarningDrawer] = useState(false);
 
   const setProviderInContext = async (
@@ -155,10 +153,6 @@ export function ConnectWalletDrawer({
     } catch (error: ConnectEIP6963ProviderError | any) {
       let errorType = error.message;
       switch (error.message) {
-        case ConnectEIP6963ProviderError.USER_REJECTED_REQUEST_ERROR:
-          setShowChangedMindDrawer(true);
-          break;
-        case ConnectEIP6963ProviderError.SANCTIONED_ADDRESS:
         case ConnectEIP6963ProviderError.CONNECT_ERROR:
           setShowUnableToConnectDrawer(true);
           break;
@@ -194,11 +188,6 @@ export function ConnectWalletDrawer({
     }
   };
 
-  const handleCloseChangedMindDrawer = () => {
-    retrySelectedWallet();
-    setShowChangedMindDrawer(false);
-  };
-
   const handleProceedEOA = () => {
     retrySelectedWallet();
     setShowEOAWarningDrawer(false);
@@ -229,12 +218,6 @@ export function ConnectWalletDrawer({
         checkout={checkout!}
         onCloseDrawer={() => setShowUnableToConnectDrawer(false)}
         onTryAgain={() => setShowUnableToConnectDrawer(false)}
-      />
-      <ChangedYourMindDrawer
-        visible={showChangedMindDrawer}
-        checkout={checkout!}
-        onCloseDrawer={() => setShowChangedMindDrawer(false)}
-        onTryAgain={handleCloseChangedMindDrawer}
       />
       <EOAWarningDrawer
         visible={showEOAWarningDrawer}

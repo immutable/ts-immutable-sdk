@@ -1,4 +1,6 @@
 import {
+  AssessmentResult,
+  fetchRiskAssessment,
   FundingRoute,
   SaleItem, SalePaymentTypes,
 } from '@imtbl/checkout-sdk';
@@ -95,6 +97,7 @@ type SaleContextValues = SaleContextProps & {
   orderQuote: OrderQuote;
   signTokenIds: string[];
   selectedCurrency: OrderQuoteCurrency | undefined;
+  riskAssessment: AssessmentResult | undefined;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -137,6 +140,7 @@ const SaleContext = createContext<SaleContextValues>({
   selectedCurrency: undefined,
   waitFulfillmentSettlements: true,
   hideExcludedPaymentTypes: false,
+  riskAssessment: undefined,
 });
 
 SaleContext.displayName = 'SaleSaleContext';
@@ -201,6 +205,8 @@ export function SaleContextProvider(props: {
 
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
+  const [riskAssessment, setRiskAssessment] = useState<AssessmentResult | undefined>();
+
   const { selectedCurrency, orderQuote, orderQuoteError } = useQuoteOrder({
     items,
     provider,
@@ -238,6 +244,23 @@ export function SaleContextProvider(props: {
 
     getUserInfo();
   }, [provider]);
+
+  useEffect(() => {
+    if (!checkout || riskAssessment) {
+      return;
+    }
+
+    (async () => {
+      const address = await provider?.getSigner()?.getAddress();
+
+      if (!address) {
+        return;
+      }
+
+      const assessment = await fetchRiskAssessment([address], checkout.config);
+      setRiskAssessment(assessment);
+    })();
+  }, [checkout, provider]);
 
   const {
     sign: signOrder,
@@ -390,6 +413,7 @@ export function SaleContextProvider(props: {
       selectedCurrency,
       waitFulfillmentSettlements,
       hideExcludedPaymentTypes,
+      riskAssessment,
     }),
     [
       config,
@@ -424,6 +448,7 @@ export function SaleContextProvider(props: {
       selectedCurrency,
       waitFulfillmentSettlements,
       hideExcludedPaymentTypes,
+      riskAssessment,
     ],
   );
 

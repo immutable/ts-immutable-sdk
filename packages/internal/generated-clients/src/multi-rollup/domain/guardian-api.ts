@@ -343,10 +343,11 @@ export const GuardianApiAxiosParamCreator = function (configuration?: Configurat
          * Get an evm message by id
          * @summary Info for a specific evm message
          * @param {string} messageID The id of the evm message
+         * @param {boolean} [includeSimulation] Include simulation results
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMessageByID: async (messageID: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getMessageByID: async (messageID: string, includeSimulation?: boolean, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'messageID' is not null or undefined
             assertParamExists('getMessageByID', 'messageID', messageID)
             const localVarPath = `/guardian/v1/messages/{messageID}`
@@ -365,6 +366,10 @@ export const GuardianApiAxiosParamCreator = function (configuration?: Configurat
             // authentication BearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (includeSimulation !== undefined) {
+                localVarQueryParameter['includeSimulation'] = includeSimulation;
+            }
 
 
     
@@ -525,11 +530,12 @@ export const GuardianApiFp = function(configuration?: Configuration) {
          * Get an evm message by id
          * @summary Info for a specific evm message
          * @param {string} messageID The id of the evm message
+         * @param {boolean} [includeSimulation] Include simulation results
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getMessageByID(messageID: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EVMMessage>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getMessageByID(messageID, options);
+        async getMessageByID(messageID: string, includeSimulation?: boolean, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EVMMessage>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMessageByID(messageID, includeSimulation, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -634,7 +640,7 @@ export const GuardianApiFactory = function (configuration?: Configuration, baseP
          * @throws {RequiredError}
          */
         getMessageByID(requestParameters: GuardianApiGetMessageByIDRequest, options?: AxiosRequestConfig): AxiosPromise<EVMMessage> {
-            return localVarFp.getMessageByID(requestParameters.messageID, options).then((request) => request(axios, basePath));
+            return localVarFp.getMessageByID(requestParameters.messageID, requestParameters.includeSimulation, options).then((request) => request(axios, basePath));
         },
         /**
          * Get a transaction by payload hash
@@ -773,6 +779,13 @@ export interface GuardianApiGetMessageByIDRequest {
      * @memberof GuardianApiGetMessageByID
      */
     readonly messageID: string
+
+    /**
+     * Include simulation results
+     * @type {boolean}
+     * @memberof GuardianApiGetMessageByID
+     */
+    readonly includeSimulation?: boolean
 }
 
 /**
@@ -910,7 +923,7 @@ export class GuardianApi extends BaseAPI {
      * @memberof GuardianApi
      */
     public getMessageByID(requestParameters: GuardianApiGetMessageByIDRequest, options?: AxiosRequestConfig) {
-        return GuardianApiFp(this.configuration).getMessageByID(requestParameters.messageID, options).then((request) => request(this.axios, this.basePath));
+        return GuardianApiFp(this.configuration).getMessageByID(requestParameters.messageID, requestParameters.includeSimulation, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

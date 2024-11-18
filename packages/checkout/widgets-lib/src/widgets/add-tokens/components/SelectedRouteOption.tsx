@@ -21,8 +21,6 @@ export interface SelectedRouteOptionProps {
   chains: Chain[] | null;
   onClick: MouseEventHandler<HTMLSpanElement>;
   loading?: boolean;
-  withSelectedToken?: boolean;
-  withSelectedAmount?: boolean;
   withSelectedWallet?: boolean;
   insufficientBalance?: boolean;
   showOnrampOption?: boolean;
@@ -63,8 +61,6 @@ export function SelectedRouteOption({
   chains,
   loading = false,
   withSelectedWallet = false,
-  withSelectedToken = false,
-  withSelectedAmount = false,
   insufficientBalance = false,
   showOnrampOption = false,
   onClick,
@@ -108,35 +104,23 @@ export function SelectedRouteOption({
           mimeType="video/mp4"
           circularFrame
         />
-        <MenuItem.Caption>Finding the best payment route...</MenuItem.Caption>
+        <MenuItem.Caption>{t('views.ADD_TOKENS.routeSelection.loadingText')}</MenuItem.Caption>
       </SelectedRouteOptionContainer>
     );
   }
 
   if ((!routeData && !loading) || insufficientBalance) {
     let icon: AllDualVariantIconKeys = 'Sparkle';
-    let copy = "Add your token, we'll find the best payment";
-
-    if (!withSelectedToken && withSelectedAmount) {
-      copy = "Add your token, we'll find the best payment";
-    }
-
-    if (withSelectedToken && !withSelectedAmount) {
-      copy = "Add your amount, we'll find the best payment";
-    }
-
-    if (!withSelectedWallet && withSelectedToken && withSelectedAmount) {
-      copy = "Select a wallet, we'll find the best payment";
-    }
+    let copy = '';
 
     if (insufficientBalance) {
       icon = 'InformationCircle';
-      copy = 'No routes found, choose a different wallet, token or amount.';
+      copy = t('views.ADD_TOKENS.routeSelection.noRoute');
     }
 
     if (insufficientBalancePayWithCard) {
       icon = 'BankCard';
-      copy = 'No routes found, pay with card available';
+      copy = t('views.ADD_TOKENS.routeSelection.payWithCard');
     }
 
     return (
@@ -185,7 +169,7 @@ export function SelectedRouteOption({
         <Stack gap="0px">
           <MenuItem.Label>{fromToken?.name}</MenuItem.Label>
           <MenuItem.Caption>
-            {`Balance ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${routeBalanceUsd}`}
+            {`${t('views.ADD_TOKENS.fees.balance')} ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${routeBalanceUsd}`}
           </MenuItem.Caption>
         </Stack>
         <MenuItem.PriceDisplay price={fromAmount}>

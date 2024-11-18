@@ -4,6 +4,7 @@ import {
   NetworkInfo,
   TokenInfo,
   SwapDirection,
+  AssessmentResult,
 } from '@imtbl/checkout-sdk';
 import { Exchange } from '@imtbl/dex-sdk';
 import { createContext } from 'react';
@@ -16,6 +17,7 @@ export interface SwapState {
   supportedTopUps: TopUpFeature | null;
   allowedTokens: TokenInfo[];
   autoProceed: boolean;
+  riskAssessment: AssessmentResult | undefined;
 }
 
 export interface TopUpFeature {
@@ -32,6 +34,7 @@ export const initialSwapState: SwapState = {
   supportedTopUps: null,
   allowedTokens: [],
   autoProceed: false,
+  riskAssessment: undefined,
 };
 
 export interface SwapContextState {
@@ -50,7 +53,8 @@ type ActionPayload =
   | SetSupportedTopUpPayload
   | SetTokenBalancesPayload
   | SetAllowedTokensPayload
-  | SetAutoProceedPayload;
+  | SetAutoProceedPayload
+  | SetRiskAssessmentPayload;
 
 export enum SwapActions {
   SET_EXCHANGE = 'SET_EXCHANGE',
@@ -60,6 +64,7 @@ export enum SwapActions {
   SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES',
   SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
   SET_AUTO_PROCEED = 'SET_AUTO_PROCEED',
+  SET_RISK_ASSESSMENT = 'SET_RISK_ASSESSMENT',
 }
 
 export interface SetExchangePayload {
@@ -96,6 +101,11 @@ export interface SetAutoProceedPayload {
   type: SwapActions.SET_AUTO_PROCEED;
   autoProceed: boolean;
   direction: SwapDirection;
+}
+
+export interface SetRiskAssessmentPayload {
+  type: SwapActions.SET_RISK_ASSESSMENT;
+  riskAssessment: AssessmentResult;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -154,6 +164,11 @@ export const swapReducer: Reducer<SwapState, SwapAction> = (
         ...state,
         autoProceed: action.payload.autoProceed,
         direction: action.payload.direction,
+      };
+    case SwapActions.SET_RISK_ASSESSMENT:
+      return {
+        ...state,
+        riskAssessment: action.payload.riskAssessment,
       };
     default:
       return state;

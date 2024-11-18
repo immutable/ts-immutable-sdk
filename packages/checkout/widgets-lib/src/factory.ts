@@ -2,6 +2,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
   IWidgetsFactory,
+  IWidgetsFactoryCreate,
   Widget,
   WidgetConfiguration,
   WidgetConfigurations,
@@ -17,8 +18,8 @@ import {
 import { WalletConnectManager } from './lib/walletConnect';
 import { AddTokens } from './widgets/add-tokens/AddTokensRoot';
 import { Bridge } from './widgets/bridge/BridgeWidgetRoot';
-import { CommerceWidgetRoot } from './widgets/immutable-commerce/CommerceWidgetRoot';
 import { Connect } from './widgets/connect/ConnectWidgetRoot';
+import { CommerceWidgetRoot } from './widgets/immutable-commerce/CommerceWidgetRoot';
 import { OnRamp } from './widgets/on-ramp/OnRampWidgetRoot';
 import { Sale } from './widgets/sale/SaleWidgetRoot';
 import { Swap } from './widgets/swap/SwapWidgetRoot';
@@ -53,9 +54,9 @@ export class WidgetsFactory implements IWidgetsFactory {
     sendProviderUpdatedEvent({ provider });
   }
 
-  create<T extends WidgetType>(type: T, props?: WidgetProperties<T>): Widget<T> {
+  create: IWidgetsFactoryCreate = <T extends WidgetType>(type: T, props?: WidgetProperties<T>) => {
     const { provider } = props ?? {};
-    const config = props?.config as WidgetConfigurations[T] || {};
+    const config = props?.config as WidgetConfigurations[WidgetType] || {};
 
     switch (type) {
       case WidgetType.CONNECT: {
@@ -109,5 +110,5 @@ export class WidgetsFactory implements IWidgetsFactory {
       default:
         throw new Error('widget type not supported');
     }
-  }
+  };
 }

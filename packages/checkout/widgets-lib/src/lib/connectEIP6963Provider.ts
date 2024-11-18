@@ -1,17 +1,15 @@
 import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
-  CheckoutError,
   CheckoutErrorType,
   EIP6963ProviderDetail,
   WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 import { addProviderListenersForWidgetRoot } from './eip1193Events';
-import { getProviderSlugFromRdns } from './provider/utils';
+import { getProviderSlugFromRdns } from './provider';
 
 export enum ConnectEIP6963ProviderError {
   CONNECT_ERROR = 'CONNECT_ERROR',
-  SANCTIONED_ADDRESS = 'SANCTIONED_ADDRESS',
   USER_REJECTED_REQUEST_ERROR = 'USER_REJECTED_REQUEST_ERROR',
 }
 
@@ -35,19 +33,6 @@ export const connectEIP6963Provider = async (
       requestWalletPermissions,
     });
 
-    const address = await connectResult.provider.getSigner().getAddress();
-    const isSanctioned = await checkout.checkIsAddressSanctioned(
-      address,
-      checkout.config.environment,
-    );
-
-    if (isSanctioned) {
-      throw new CheckoutError(
-        'Sanctioned address',
-        ConnectEIP6963ProviderError.SANCTIONED_ADDRESS,
-      );
-    }
-
     addProviderListenersForWidgetRoot(connectResult.provider);
     return {
       provider: connectResult.provider,
@@ -59,8 +44,6 @@ export const connectEIP6963Provider = async (
         throw new Error(
           ConnectEIP6963ProviderError.USER_REJECTED_REQUEST_ERROR,
         );
-      case ConnectEIP6963ProviderError.SANCTIONED_ADDRESS:
-        throw new Error(ConnectEIP6963ProviderError.SANCTIONED_ADDRESS);
       default:
         throw new Error(ConnectEIP6963ProviderError.CONNECT_ERROR);
     }

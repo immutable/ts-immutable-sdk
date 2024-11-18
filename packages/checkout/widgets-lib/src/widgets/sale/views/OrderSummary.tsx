@@ -1,7 +1,7 @@
 import { Box, Heading } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SalePaymentTypes } from '@imtbl/checkout-sdk';
+import { isAddressSanctioned, SalePaymentTypes } from '@imtbl/checkout-sdk';
 
 import {
   OrderSummarySubViews,
@@ -40,7 +40,7 @@ type OrderSummaryProps = {
 
 export function OrderSummary({ subView }: OrderSummaryProps) {
   const { t } = useTranslation();
-  const { sendProceedToPay, sendInsufficientFunds } = useSaleEvent();
+  const { sendFailedEvent, sendProceedToPay, sendInsufficientFunds } = useSaleEvent();
   const {
     fromTokenAddress,
     collectionName,
@@ -50,6 +50,8 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     selectedCurrency,
     setPaymentMethod,
     environment,
+    riskAssessment,
+    paymentMethod,
   } = useSaleContext();
 
   const { viewDispatch, viewState } = useContext(ViewContext);
@@ -91,6 +93,23 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
   };
 
   const onProceedToBuy = (fundingBalance: FundingBalance) => {
+    if (riskAssessment && isAddressSanctioned(riskAssessment)) {
+      const error = new Error('Sanctioned address');
+      sendFailedEvent(error.message, {}, [], undefined, { riskAssessment, paymentMethod });
+
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
+            error,
+          },
+        },
+      });
+
+      return;
+    }
+
     const { type, fundingItem } = fundingBalance;
 
     sendProceedToPay(

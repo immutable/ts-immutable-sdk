@@ -15,6 +15,7 @@ export enum BridgeWidgetViews {
   CLAIM_WITHDRAWAL_IN_PROGRESS = 'CLAIM_WITHDRAWAL_IN_PROGRESS',
   CLAIM_WITHDRAWAL_SUCCESS = 'CLAIM_WITHDRAWAL_SUCCESS',
   CLAIM_WITHDRAWAL_FAILURE = 'CLAIM_WITHDRAWAL_FAILURE',
+  SERVICE_UNAVAILABLE = 'SERVICE_UNAVAILABLE',
 }
 
 export type BridgeWidgetView =
@@ -28,7 +29,8 @@ export type BridgeWidgetView =
   | BridgeClaimWithdrawal
   | BridgeClaimWithdrawalInProgress
   | BridgeClaimWithdrawalSuccess
-  | BridgeClaimWithdrawalFailure;
+  | BridgeClaimWithdrawalFailure
+  | BridgeServiceUnavailableView;
 
 interface BridgeCrossWalletSelection extends ViewType {
   type: BridgeWidgetViews.WALLET_NETWORK_SELECTION,
@@ -82,4 +84,8 @@ export interface BridgeClaimWithdrawalFailure extends ViewType {
   type: BridgeWidgetViews.CLAIM_WITHDRAWAL_FAILURE,
   transactionHash: string;
   reason: string;
+}
+
+export interface BridgeServiceUnavailableView extends ViewType {
+  type: BridgeWidgetViews.SERVICE_UNAVAILABLE;
 }

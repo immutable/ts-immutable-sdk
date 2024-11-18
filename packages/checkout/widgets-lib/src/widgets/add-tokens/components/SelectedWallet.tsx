@@ -1,5 +1,7 @@
 import { MouseEventHandler, ReactNode } from 'react';
-import { EllipsizedText, MenuItem, MenuItemProps } from '@biom3/react';
+import {
+  EllipsizedText, MenuItem, MenuItemProps, SxProps,
+} from '@biom3/react';
 import { EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
 
 const disabledStyles = {
@@ -13,6 +15,7 @@ export interface SelectedWalletProps {
   providerInfo?: Partial<EIP6963ProviderInfo & { address?: string }>;
   onClick: MouseEventHandler<HTMLSpanElement>;
   disabled?: boolean;
+  sx?: SxProps;
 }
 
 export function SelectedWallet({
@@ -21,6 +24,7 @@ export function SelectedWallet({
   onClick,
   providerInfo,
   disabled,
+  sx,
 }: SelectedWalletProps) {
   const selected = !!children && providerInfo?.rdns;
   const size: MenuItemProps['size'] = selected ? 'xSmall' : 'small';
@@ -34,6 +38,7 @@ export function SelectedWallet({
       sx={{
         py: selected ? 'base.spacing.x3' : undefined,
         ...(disabled ? disabledStyles : {}),
+        ...sx,
       }}
     >
       {!providerInfo?.icon && (
