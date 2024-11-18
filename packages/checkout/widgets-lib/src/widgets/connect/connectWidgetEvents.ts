@@ -6,14 +6,14 @@ import {
   WidgetType,
   WalletConnectManager,
   EIP6963ProviderInfo,
+  NamedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 
-import { BrowserProvider } from 'ethers';
 import EthereumProvider from '@walletconnect/ethereum-provider';
 
 export function sendConnectSuccessEvent(
   eventTarget: Window | EventTarget,
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   walletProviderName?: WalletProviderName,
   walletProviderInfo?: EIP6963ProviderInfo,
 ) {

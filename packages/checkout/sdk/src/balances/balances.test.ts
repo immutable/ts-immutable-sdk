@@ -1,6 +1,6 @@
 import { Environment } from '@imtbl/config';
 import { HttpStatusCode } from 'axios';
-import { BrowserProvider, Contract } from 'ethers';
+import { BrowserProvider, Contract, JsonRpcProvider } from 'ethers';
 import {
   getAllBalances,
   getBalance,
@@ -78,7 +78,7 @@ describe('balances', () => {
     it('should call getBalance() on provider and return the balance', async () => {
       const balanceResult = await getBalance(
         testCheckoutConfig,
-        mockProvider() as unknown as BrowserProvider,
+        mockProvider(),
         '0xAddress',
       );
       expect(mockGetBalance).toBeCalledTimes(1);
@@ -363,7 +363,7 @@ describe('balances', () => {
           },
           networkMap: testCheckoutConfig.networkMap,
         } as unknown as CheckoutConfiguration,
-        mockProviderForAllBalances() as unknown as BrowserProvider,
+        mockProviderForAllBalances(),
         'abc123',
         ChainId.ETHEREUM,
       );
@@ -466,7 +466,7 @@ describe('balances', () => {
           },
           networkMap: testCheckoutConfig.networkMap,
         } as unknown as CheckoutConfiguration,
-        jest.fn() as unknown as BrowserProvider,
+        jest.fn() as unknown as JsonRpcProvider,
         'abc123',
         ChainId.ETHEREUM,
       );
@@ -551,7 +551,7 @@ describe('balances', () => {
             mockedHttpClient,
           ).networkMap,
         } as unknown as CheckoutConfiguration,
-        jest.fn() as unknown as BrowserProvider,
+        jest.fn() as unknown as JsonRpcProvider,
         'abc123',
         ChainId.SEPOLIA, // L1 Chain chain will pass a filterTokens list
       );
@@ -589,7 +589,7 @@ describe('balances', () => {
           },
           networkMap: testCheckoutConfig.networkMap,
         } as unknown as CheckoutConfiguration,
-        jest.fn() as unknown as BrowserProvider,
+        jest.fn() as unknown as JsonRpcProvider,
         'abc123',
         ChainId.ETHEREUM,
       );
@@ -656,7 +656,7 @@ describe('balances', () => {
           },
           networkMap: testCheckoutConfig.networkMap,
         } as unknown as CheckoutConfiguration,
-        jest.fn() as unknown as BrowserProvider,
+        jest.fn() as unknown as JsonRpcProvider,
         'abc123',
         ChainId.ETHEREUM,
       );
@@ -700,7 +700,7 @@ describe('balances', () => {
           },
           networkMap: testCheckoutConfig.networkMap,
         } as unknown as CheckoutConfiguration,
-        jest.fn() as unknown as BrowserProvider,
+        jest.fn() as unknown as JsonRpcProvider,
         'abc123',
         ChainId.ETHEREUM,
       );
@@ -731,7 +731,7 @@ describe('balances', () => {
             },
             networkMap: testCheckoutConfig.networkMap,
           } as unknown as CheckoutConfiguration,
-          jest.fn() as unknown as BrowserProvider,
+          jest.fn() as unknown as JsonRpcProvider,
           '0xabc123', // use unique wallet address to prevent cached data
           ChainId.ETHEREUM,
         );
@@ -805,7 +805,7 @@ describe('balances', () => {
               },
               networkMap: testCheckoutConfig.networkMap,
             } as unknown as CheckoutConfiguration,
-            jest.fn() as unknown as BrowserProvider,
+            jest.fn() as unknown as JsonRpcProvider,
             '0xabc123', // use unique wallet address to prevent cached data
             ChainId.ETHEREUM,
           );
@@ -835,7 +835,7 @@ describe('balances', () => {
             remote: {},
             networkMap: testCheckoutConfig.networkMap,
           } as unknown as CheckoutConfiguration,
-          jest.fn() as unknown as BrowserProvider,
+          jest.fn() as unknown as JsonRpcProvider,
           '0xabc123', // use unique wallet address to prevent cached data
           ChainId.SEPOLIA,
         );
@@ -881,7 +881,7 @@ describe('balances', () => {
 
       const getBalancesResult = await getBalances(
         testCheckoutConfig,
-        mockProviderForAllBalances() as unknown as BrowserProvider,
+        mockProviderForAllBalances(),
         'abc123',
         [{
           name: 'zkCATS',
@@ -912,7 +912,7 @@ describe('balances', () => {
     it('should return an empty list if the token list is empty', async () => {
       const getBalancesResult = await getBalances(
         testCheckoutConfig,
-        mockProvider() as unknown as BrowserProvider,
+        mockProvider(),
         'abc123',
         [],
       );

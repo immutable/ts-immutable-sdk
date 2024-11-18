@@ -1,4 +1,4 @@
-import { BrowserProvider, Contract, formatUnits } from 'ethers';
+import { Contract, formatUnits } from 'ethers';
 import {
   ERC20Item,
   ERC721Balance,
@@ -6,6 +6,7 @@ import {
   ItemBalance,
   ItemRequirement,
   ItemType,
+  NamedBrowserProvider,
   NativeItem,
   TokenBalance,
   TokenInfo,
@@ -29,7 +30,7 @@ import { isMatchingAddress } from '../../utils/utils';
  */
 const getTokenBalances = async (
   config: CheckoutConfiguration,
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
   forceFetch: boolean = false,
@@ -59,7 +60,7 @@ const getTokenBalances = async (
  * Gets the balances for all ERC721 balance requirements.
  */
 const getERC721Balances = async (
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
 ) : Promise<ItemBalance[]> => {
@@ -115,7 +116,7 @@ const getERC721Balances = async (
  */
 export const balanceCheck = async (
   config: CheckoutConfiguration,
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
   forceFetch: boolean = false,

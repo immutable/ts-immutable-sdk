@@ -1,5 +1,5 @@
 import { CancelOrdersOnChainResponse, Orderbook } from '@imtbl/orderbook';
-import { BrowserProvider, TransactionResponse, PreparedTransactionRequest } from 'ethers';
+import { TransactionResponse, PreparedTransactionRequest } from 'ethers';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import * as instance from '../../instance';
@@ -99,7 +99,7 @@ const cancelOnChain = async (
 
 const gaslessCancel = async (
   orderbook: Orderbook,
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   orderIds: string[],
 ): Promise<CancelResultGasless> => {
   try {
@@ -108,7 +108,6 @@ const gaslessCancel = async (
 
     const { signableAction } = await orderbook.prepareOrderCancellations(orderIds);
 
-    // eslint-disable-next-line no-underscore-dangle
     const signedMessage = await signer.signTypedData(
       signableAction.message.domain,
       signableAction.message.types,

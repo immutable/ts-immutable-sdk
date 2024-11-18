@@ -3,14 +3,13 @@ import { Environment } from '@imtbl/config';
 import CheckConnection from '../components/CheckConnection';
 import Connect from '../components/Connect';
 import Provider from '../components/Provider';
-import { Checkout } from '@imtbl/checkout-sdk';
+import { Checkout, NamedBrowserProvider } from '@imtbl/checkout-sdk';
 import { useState, useMemo } from 'react';
 import Buy from '../components/Buy';
 import { SmartCheckoutForm } from '../components/SmartCheckoutForm';
 import Sell from '../components/Sell';
 import Cancel from '../components/Cancel';
 import Listings from '../components/Listings';
-import { BrowserProvider } from 'ethers';
 
 export default function SmartCheckout() {
   const [environment, setEnvironment] = useState(Environment.SANDBOX);
@@ -19,7 +18,7 @@ export default function SmartCheckout() {
       environment: environment,
     }});
   }, [environment]);
-  const [provider, setProvider] = useState<BrowserProvider>();
+  const [provider, setProvider] = useState<NamedBrowserProvider>();
 
   return (
     <div>

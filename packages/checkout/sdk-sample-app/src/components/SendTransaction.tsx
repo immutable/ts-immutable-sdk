@@ -1,15 +1,15 @@
-import { Checkout, NetworkInfo } from '@imtbl/checkout-sdk';
+import { Checkout, NamedBrowserProvider, NetworkInfo } from '@imtbl/checkout-sdk';
 import { SuccessMessage, ErrorMessage } from './messages';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { Box } from '@biom3/react';
 import { NetworkFilterTypes } from '@imtbl/checkout-sdk';
-import { BrowserProvider, hexlify, parseUnits, toBeHex } from 'ethers';
+import { parseUnits, toBeHex } from 'ethers';
 
 export interface SendTransactionProps {
   checkout: Checkout | undefined;
-  provider: BrowserProvider | undefined;
-  setProvider: (provider: BrowserProvider) => void;
+  provider: NamedBrowserProvider | undefined;
+  setProvider: (provider: NamedBrowserProvider) => void;
 }
 
 export default function SendTransaction(props: SendTransactionProps) {

@@ -1,11 +1,11 @@
-import { BrowserProvider, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import {
   getSetERC1155ApprovalForAllTransaction,
   isERC1155ApprovedForAll,
   hasERC1155Allowances,
 } from './erc1155';
 import { CheckoutErrorType } from '../../errors';
-import { ItemRequirement, ItemType } from '../../types';
+import { ItemRequirement, ItemType, NamedBrowserProvider } from '../../types';
 
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
@@ -14,7 +14,7 @@ jest.mock('ethers', () => ({
 }));
 
 describe('erc1155', () => {
-  const mockProvider = {} as unknown as BrowserProvider;
+  const mockProvider = {} as unknown as NamedBrowserProvider;
 
   describe('isERC1155ApprovedForAll', () => {
     it('should return true if the operator has been approved for all', async () => {

@@ -6,6 +6,7 @@ import {
   GasAmount,
   GasTokenType,
   ItemType,
+  NamedBrowserProvider,
   NativeItemRequirement,
   TransactionOrGasType,
 } from '@imtbl/checkout-sdk';
@@ -16,11 +17,11 @@ import { useEffect, useState } from 'react';
 import { Body, Box, Button, FormControl, Heading, Select, TextInput, OptionKey, Checkbox } from '@biom3/react';
 import LoadingButton from './LoadingButton';
 import { ErrorMessage, SuccessMessage } from './messages';
-import { BrowserProvider, parseUnits as parseUnitsEthers } from 'ethers';
+import { parseUnits as parseUnitsEthers } from 'ethers';
 
 interface SmartCheckoutProps {
   checkout: Checkout;
-  provider: BrowserProvider | undefined;
+  provider: NamedBrowserProvider | undefined;
 }
 
 export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) => {

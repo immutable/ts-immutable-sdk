@@ -1,12 +1,12 @@
-import { BrowserProvider, Contract, TransactionRequest } from 'ethers';
+import { Contract, TransactionRequest } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
-import { ItemRequirement, ItemType } from '../../types';
+import { ItemRequirement, ItemType, NamedBrowserProvider } from '../../types';
 import { Allowance, InsufficientERC721 } from './types';
 import { ERC721ABI } from '../../env';
 
 // Returns true if the spender address is approved for all ERC721s of this collection
 export const getERC721ApprovedForAll = async (
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   ownerAddress: string,
   contractAddress: string,
   spenderAddress: string,
@@ -34,7 +34,7 @@ export const getERC721ApprovedForAll = async (
 
 // Returns a populated transaction to approve the ERC721 for the spender.
 export const getApproveTransaction = async (
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   ownerAddress: string,
   contractAddress: string,
   spenderAddress: string,
@@ -67,7 +67,7 @@ export const getApproveTransaction = async (
 // Returns the address that is approved for the ERC721.
 // This is sufficient when the spender is the approved address
 export const getERC721ApprovedAddress = async (
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   contractAddress: string,
   id: bigint,
 ): Promise<string> => {
@@ -104,7 +104,7 @@ export const convertIdToNumber = (id: string, contractAddress: string): bigint =
 };
 
 export const getApprovedCollections = async (
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   itemRequirements: ItemRequirement[],
   owner: string,
 ): Promise<Map<string, boolean>> => {
@@ -135,7 +135,7 @@ export const getApprovedCollections = async (
 };
 
 export const hasERC721Allowances = async (
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
 ): Promise<{

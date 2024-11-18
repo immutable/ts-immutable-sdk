@@ -1,10 +1,11 @@
 import { HttpStatusCode } from 'axios';
-import { BrowserProvider, Contract, formatUnits } from 'ethers';
+import { Contract, formatUnits, JsonRpcProvider } from 'ethers';
 import {
   ChainId,
   GetAllBalancesResult,
   GetBalanceResult,
   GetBalancesResult,
+  NamedBrowserProvider,
   TokenFilterTypes,
   TokenInfo,
 } from '../types';
@@ -27,11 +28,11 @@ import { isMatchingAddress } from '../utils/utils';
 
 export const getBalance = async (
   config: CheckoutConfiguration,
-  browserProvider: BrowserProvider,
+  provider: JsonRpcProvider | NamedBrowserProvider,
   walletAddress: string,
 ): Promise<GetBalanceResult> => await withCheckoutError<GetBalanceResult>(
   async () => {
-    const networkInfo = await getNetworkInfo(config, browserProvider);
+    const networkInfo = await getNetworkInfo(config, provider);
 
     if (!networkInfo.isSupported) {
       throw new CheckoutError(
@@ -41,7 +42,7 @@ export const getBalance = async (
       );
     }
 
-    const balance = await browserProvider.getBalance(walletAddress);
+    const balance = await provider.getBalance(walletAddress);
     return {
       balance,
       formattedBalance: formatUnits(
@@ -55,7 +56,7 @@ export const getBalance = async (
 );
 
 export async function getERC20Balance(
-  browserProvider: BrowserProvider,
+  provider: JsonRpcProvider | NamedBrowserProvider,
   walletAddress: string,
   tokenAddress: string,
 ) {
@@ -64,11 +65,11 @@ export async function getERC20Balance(
       const contract = new Contract(
         tokenAddress,
         JSON.stringify(ERC20ABI),
-        browserProvider,
+        provider,
       );
 
       return Promise.all([
-        getERC20TokenInfo(browserProvider, tokenAddress),
+        getERC20TokenInfo(provider, tokenAddress),
         contract.balanceOf(walletAddress),
       ])
         .then(([tokenInfo, balance]) => {
@@ -215,7 +216,7 @@ export const getBlockscoutBalance = async (
 
 export const getBalances = async (
   config: CheckoutConfiguration,
-  browserProvider: BrowserProvider,
+  provider: JsonRpcProvider | NamedBrowserProvider,
   walletAddress: string,
   tokens: TokenInfo[],
 ): Promise<GetBalancesResult> => {
@@ -227,11 +228,11 @@ export const getBalances = async (
       // That we have given up -- keep it as it is for now.
       if (!token.address || isMatchingAddress(token.address, NATIVE)) {
         allBalancePromises.push(
-          getBalance(config, browserProvider, walletAddress),
+          getBalance(config, provider, walletAddress),
         );
       } else {
         allBalancePromises.push(
-          getERC20Balance(browserProvider, walletAddress, token.address!),
+          getERC20Balance(provider, walletAddress, token.address!),
         );
       }
     });
@@ -255,12 +256,12 @@ export const getBalances = async (
 
 const getTokenBalances = async (
   config: CheckoutConfiguration,
-  browserProvider: BrowserProvider | undefined,
+  provider: JsonRpcProvider | NamedBrowserProvider | undefined,
   walletAddress: string | undefined,
   chainId: ChainId,
   filterTokens: TokenInfo[],
 ): Promise<GetAllBalancesResult> => {
-  if (!browserProvider) {
+  if (!provider) {
     throw new CheckoutError(
       'indexer is disabled for this chain, you must provide a provider.',
       CheckoutErrorType.MISSING_PARAMS,
@@ -271,22 +272,22 @@ const getTokenBalances = async (
   // Fails in fetching data from the RCP calls might result in some
   // missing data.
   let address = walletAddress;
-  if (!address) address = await (await browserProvider.getSigner()).getAddress();
+  if (!address) address = await (await provider.getSigner()).getAddress();
   return await measureAsyncExecution<GetBalancesResult>(
     config,
     `Time to fetch balances using RPC for ${chainId}`,
-    getBalances(config, browserProvider, address, filterTokens),
+    getBalances(config, provider, address, filterTokens),
   );
 };
 
 export const getAllBalances = async (
   config: CheckoutConfiguration,
-  browserProvider: BrowserProvider | undefined,
+  provider: JsonRpcProvider | NamedBrowserProvider | undefined,
   walletAddress: string | undefined,
   chainId: ChainId,
   forceFetch: boolean = false,
 ): Promise<GetAllBalancesResult> => {
-  if (!walletAddress && !browserProvider) {
+  if (!walletAddress && !provider) {
     throw new CheckoutError(
       'both walletAddress and provider are missing. At least one must be provided.',
       CheckoutErrorType.MISSING_PARAMS,
@@ -313,7 +314,7 @@ export const getAllBalances = async (
   }
 
   if (Blockscout.isChainSupported(chainId)) {
-    const address = walletAddress ?? await (await browserProvider?.getSigner())?.getAddress();
+    const address = walletAddress ?? await (await provider?.getSigner())?.getAddress();
 
     try {
       return await measureAsyncExecution<GetAllBalancesResult>(
@@ -325,12 +326,12 @@ export const getAllBalances = async (
       // Blockscout rate limiting, fallback to RPC node
       if ((error as CheckoutError).type === CheckoutErrorType.GET_INDEXER_BALANCE_ERROR
         && (error as CheckoutError).data?.error?.code === HttpStatusCode.TooManyRequests) {
-        return getTokenBalances(config, browserProvider, walletAddress, chainId, tokens);
+        return getTokenBalances(config, provider, walletAddress, chainId, tokens);
       }
       throw error;
     }
   }
 
   // Blockscout not supported, fallback to RPC node
-  return getTokenBalances(config, browserProvider, walletAddress, chainId, tokens);
+  return getTokenBalances(config, provider, walletAddress, chainId, tokens);
 };

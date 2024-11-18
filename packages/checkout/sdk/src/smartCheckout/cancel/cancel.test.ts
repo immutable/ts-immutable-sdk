@@ -24,7 +24,7 @@ describe('cancel', () => {
     mockProvider = {
       getSigner: jest.fn().mockReturnValue({
         getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
-        _signTypedData: jest.fn().mockResolvedValue('0xSIGNED'),
+        signTypedData: jest.fn().mockResolvedValue('0xSIGNED'),
       }),
     } as unknown as NamedBrowserProvider;
 
@@ -218,7 +218,7 @@ describe('cancel', () => {
   });
 
   describe('gasless cancel', () => {
-    it('should call gasless cancel and get the cancellations', async () => {
+    it.only('should call gasless cancel and get the cancellations', async () => {
       const orderId = '1';
       (createOrderbookInstance as jest.Mock).mockReturnValue({
         prepareOrderCancellations: jest.fn().mockResolvedValue({

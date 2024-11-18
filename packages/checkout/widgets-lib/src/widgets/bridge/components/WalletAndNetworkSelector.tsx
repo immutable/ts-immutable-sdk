@@ -14,12 +14,10 @@ import {
 import {
   ChainId, isAddressSanctioned, WalletProviderName, WalletProviderRdns, NamedBrowserProvider,
 } from '@imtbl/checkout-sdk';
-import { BrowserProvider } from 'ethers';
 import { useTranslation } from 'react-i18next';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import {
   connectToProvider,
-  getWalletProviderNameByProvider,
   isMetaMaskProvider,
   isPassportProvider,
   isWalletConnectProvider,
@@ -116,12 +114,12 @@ export function WalletAndNetworkSelector() {
 
   const fromWalletProviderName = useMemo(() => {
     if (!fromWalletBrowserProvider) return null;
-    return getWalletProviderNameByProvider(fromWalletBrowserProvider);
+    return fromWalletBrowserProvider.name;
   }, [fromWalletBrowserProvider]);
 
   const toWalletProviderName = useMemo(() => {
     if (!toWalletBrowserProvider) return null;
-    return getWalletProviderNameByProvider(toWalletBrowserProvider);
+    return toWalletBrowserProvider.name;
   }, [toWalletBrowserProvider]);
 
   const fromWalletSelectorOptions = useMemo(() => providers, [providers]);
@@ -209,7 +207,8 @@ export function WalletAndNetworkSelector() {
       if (event.providerDetail.info.rdns === WalletProviderRdns.METAMASK) {
         changeAccount = true;
       }
-      const browserProvider = new BrowserProvider(event.provider as any);
+      // eslint-disable-next-line max-len
+      const browserProvider = new NamedBrowserProvider(event.providerDetail.info.name as WalletProviderName, event.provider);
       const namedBrowserProvider = {
         ...browserProvider,
         name: event.providerDetail.info.name as WalletProviderName,
@@ -329,7 +328,8 @@ export function WalletAndNetworkSelector() {
 
       try {
         setToWallet(event);
-        const browserProvider = new BrowserProvider(event.provider as any);
+        // eslint-disable-next-line max-len
+        const browserProvider = new NamedBrowserProvider(event.providerDetail.info.name as WalletProviderName, event.provider);
         const namedBrowserProvider = {
           ...browserProvider,
           name: event.providerDetail.info.name as WalletProviderName,

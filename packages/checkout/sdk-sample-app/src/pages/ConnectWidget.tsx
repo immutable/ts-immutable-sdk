@@ -6,20 +6,19 @@ import CheckConnection from '../components/CheckConnection';
 import GetAllowList from '../components/GetAllowList';
 import { Body, Box, Checkbox, Divider, Heading } from '@biom3/react';
 import GetBalance from '../components/GetBalance';
-import { Checkout } from '@imtbl/checkout-sdk';
+import { Checkout, NamedBrowserProvider } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import Provider from '../components/Provider';
 import SendTransaction from '../components/SendTransaction';
 import GetInjectedProviders from '../components/GetInjectedProviders';
 import Swap from '../components/Swap';
-import { BrowserProvider } from 'ethers';
 
 export default function ConnectWidget() {
   const [environment, setEnvironment] = useState(Environment.SANDBOX);
   const checkout = useMemo(() => {
     return new Checkout({ baseConfig: { environment: environment } });
   }, [environment]);
-  const [provider, setProvider] = useState<BrowserProvider>();
+  const [provider, setProvider] = useState<NamedBrowserProvider>();
 
   function toggleEnvironment() {
     if (environment === Environment.PRODUCTION) {
