@@ -1,5 +1,4 @@
 import { Environment } from '@imtbl/config';
-import { BrowserProvider } from 'ethers';
 import {
   BridgeClaimWithdrawalFailed,
   BridgeClaimWithdrawalSuccess,
@@ -94,7 +93,7 @@ export enum WidgetType {
  */
 export type WidgetProperties<T extends WidgetType> = {
   config?: WidgetConfigurations[T];
-  provider?: BrowserProvider;
+  provider?: NamedBrowserProvider;
 };
 
 export type WidgetConfigurations = {
@@ -294,7 +293,7 @@ export interface IWidgetsFactory {
    * Update the widgets provider instance.
    * @param provider the provider instance to update all widgets.
    */
-  updateProvider(provider: BrowserProvider): void;
+  updateProvider(provider: NamedBrowserProvider): void;
 }
 
 export interface IWidgetsFactoryCreate {

@@ -1,6 +1,5 @@
-import { BrowserProvider } from 'ethers';
 import {
-  ChainId, Checkout, GetBalanceResult, NetworkInfo, TokenFilterTypes, TokenInfo,
+  ChainId, Checkout, GetBalanceResult, NamedBrowserProvider, NetworkInfo, TokenFilterTypes, TokenInfo,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { getAllowedBalances } from './balance';
@@ -79,7 +78,7 @@ describe('getAllowedBalances', () => {
 
     const resp = await getAllowedBalances({
       checkout,
-      provider: mockProvider as unknown as BrowserProvider,
+      provider: mockProvider as unknown as NamedBrowserProvider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
     });
 
@@ -122,7 +121,7 @@ describe('getAllowedBalances', () => {
 
     await getAllowedBalances({
       checkout,
-      provider: mockProvider as unknown as BrowserProvider,
+      provider: mockProvider as unknown as NamedBrowserProvider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
     });
 
@@ -133,7 +132,7 @@ describe('getAllowedBalances', () => {
     getTokenAllowListMock.mockClear();
     await getAllowedBalances({
       checkout,
-      provider: mockProvider as unknown as BrowserProvider,
+      provider: mockProvider as unknown as NamedBrowserProvider,
       allowTokenListType: TokenFilterTypes.SWAP,
     });
 
@@ -160,7 +159,7 @@ describe('getAllowedBalances', () => {
 
     await getAllowedBalances({
       checkout,
-      provider: mockProvider as unknown as BrowserProvider,
+      provider: mockProvider as unknown as NamedBrowserProvider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
       chainId: ChainId.IMTBL_ZKEVM_DEVNET,
     });
@@ -201,7 +200,7 @@ describe('getAllowedBalances', () => {
 
     const resp = await getAllowedBalances({
       checkout,
-      provider: mockProvider as unknown as BrowserProvider,
+      provider: mockProvider as unknown as NamedBrowserProvider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
     });
 
@@ -245,7 +244,7 @@ describe('getAllowedBalances', () => {
     try {
       await getAllowedBalances({
         checkout,
-        provider: mockProvider as unknown as BrowserProvider,
+        provider: mockProvider as unknown as NamedBrowserProvider,
         allowTokenListType: TokenFilterTypes.BRIDGE,
         retryPolicy: {
           retryIntervalMs: 0,
@@ -289,7 +288,7 @@ describe('getAllowedBalances', () => {
 
     const resp = await getAllowedBalances({
       checkout,
-      provider: mockProvider as unknown as BrowserProvider,
+      provider: mockProvider as unknown as NamedBrowserProvider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
     });
 
@@ -332,7 +331,7 @@ describe('getAllowedBalances', () => {
 
     const resp = await getAllowedBalances({
       checkout,
-      provider: mockProvider as unknown as BrowserProvider,
+      provider: mockProvider as unknown as NamedBrowserProvider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
     });
 
@@ -371,7 +370,7 @@ describe('getAllowedBalances', () => {
 
     const resp = await getAllowedBalances({
       checkout,
-      provider: mockProvider as unknown as BrowserProvider,
+      provider: mockProvider as unknown as NamedBrowserProvider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
     });
 
@@ -419,7 +418,7 @@ describe('getAllowedBalances', () => {
 
     const resp = await getAllowedBalances({
       checkout,
-      provider: mockProvider as unknown as BrowserProvider,
+      provider: mockProvider as unknown as NamedBrowserProvider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
     });
 

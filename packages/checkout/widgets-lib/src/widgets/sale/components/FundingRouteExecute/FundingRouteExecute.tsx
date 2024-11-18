@@ -247,6 +247,7 @@ export function FundingRouteExecute({
         connectLoaderDispatch({
           payload: {
             type: ConnectLoaderActions.SET_PROVIDER,
+            // @ts-expect-error TODO
             provider: eventData.provider,
           },
         });
@@ -331,7 +332,7 @@ export function FundingRouteExecute({
           targetChainId={
             checkout!.config.isProduction ? ChainId.ETHEREUM : ChainId.SEPOLIA
           }
-          web3Provider={provider}
+          browserProvider={provider}
           checkout={checkout!}
           deepLink={ConnectWidgetViews.SWITCH_NETWORK}
         />
@@ -344,7 +345,7 @@ export function FundingRouteExecute({
               ? ChainId.IMTBL_ZKEVM_MAINNET
               : ChainId.IMTBL_ZKEVM_TESTNET
           }
-          web3Provider={provider}
+          browserProvider={provider}
           checkout={checkout!}
           deepLink={ConnectWidgetViews.SWITCH_NETWORK}
         />

@@ -150,7 +150,7 @@ export function PayWithCoins() {
     const hadPendingTransactions = currentTransactionIndex < filteredTransactions.length
       && prevTransactionIndexRef.current !== currentTransactionIndex;
 
-    if (isPassportProvider(provider) && hadPendingTransactions) {
+    if (isPassportProvider(provider.name) && hadPendingTransactions) {
       prevTransactionIndexRef.current = currentTransactionIndex;
       executeUserInitiatedTransaction();
     }
@@ -159,7 +159,7 @@ export function PayWithCoins() {
   useEffect(() => {
     if (!signResponse || !provider || processing.current) return;
 
-    if (!isPassportProvider(provider)) {
+    if (!isPassportProvider(provider.name)) {
       processing.current = true;
       executeAllTransactions();
     }

@@ -4,6 +4,7 @@ import {
   ChainId,
   CheckoutErrorType,
   EIP6963ProviderDetail,
+  NamedBrowserProvider,
   WalletProviderName,
   WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
@@ -104,11 +105,11 @@ export function WalletList(props: WalletListProps) {
   );
 
   const selectBrowserProvider = useCallback(
-    (web3Provider: BrowserProvider, providerName: string) => {
+    (browserProvider: NamedBrowserProvider, providerName: string) => {
       connectDispatch({
         payload: {
           type: ConnectActions.SET_PROVIDER,
-          provider: web3Provider,
+          provider: browserProvider,
         },
       });
       connectDispatch({
@@ -121,8 +122,8 @@ export function WalletList(props: WalletListProps) {
     [],
   );
 
-  const handleConnectViewUpdate = async (provider: BrowserProvider) => {
-    const isPassport = isPassportProvider(provider);
+  const handleConnectViewUpdate = async (provider: NamedBrowserProvider) => {
+    const isPassport = isPassportProvider(provider.name);
     const chainId = await provider.send!('eth_chainId', []);
     // eslint-disable-next-line radix
     const parsedChainId = parseInt(chainId.toString());
@@ -165,13 +166,17 @@ export function WalletList(props: WalletListProps) {
 
       try {
         const isMetaMask = providerDetail.info.rdns === WalletProviderRdns.METAMASK;
-        const web3Provider = new BrowserProvider(providerDetail.provider as any);
+
+        const browserProvider = new NamedBrowserProvider(
+          providerDetail.info.name as WalletProviderName,
+          providerDetail.provider,
+        );
 
         try {
           // TODO: Find a nice way to detect if the wallet supports switching accounts via requestPermissions
           const changeAccount = isMetaMask;
           const connectResult = await checkout.connect({
-            provider: web3Provider,
+            provider: browserProvider,
             requestWalletPermissions: changeAccount,
           });
 
@@ -183,10 +188,10 @@ export function WalletList(props: WalletListProps) {
           await identifyUser(identify, connectResult.provider, { anonymousId });
 
           selectBrowserProvider(
-            web3Provider,
+            browserProvider,
             getProviderSlugFromRdns(providerDetail.info.rdns),
           );
-          await handleConnectViewUpdate(web3Provider);
+          await handleConnectViewUpdate(browserProvider);
         } catch (err: CheckoutErrorType | any) {
           if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
             // eslint-disable-next-line no-console
@@ -212,10 +217,11 @@ export function WalletList(props: WalletListProps) {
 
   const connectCallback = async (ethereumProvider: EthereumProvider) => {
     if (ethereumProvider.connected && ethereumProvider.session) {
-      const web3Provider = new BrowserProvider(ethereumProvider);
-      selectBrowserProvider(web3Provider, 'walletconnect');
+      const browserProvider = new BrowserProvider(ethereumProvider);
+      // @ts-expect-error TODO
+      selectBrowserProvider(browserProvider, 'walletconnect');
 
-      const { chainId } = await ((await web3Provider.getSigner()).provider.getNetwork());
+      const { chainId } = await ((await browserProvider.getSigner()).provider.getNetwork());
 
       if (ethereumProvider.chainId !== targetChainId) {
         // @ts-ignore allow protected method `switchEthereumChain` to be called

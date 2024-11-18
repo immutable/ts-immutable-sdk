@@ -53,7 +53,7 @@ export function BalanceItem({
   );
   const [swapAllowedTokens, setSwapAllowedTokens] = useState<TokenInfo[]>([]);
 
-  const isPassport = isPassportProvider(provider);
+  const isPassport = isPassportProvider(provider?.name);
 
   useEffect(() => {
     (async () => {

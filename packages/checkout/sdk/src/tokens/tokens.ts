@@ -72,12 +72,12 @@ export const isNativeToken = (
 ): boolean => !address || isMatchingAddress(address, NATIVE);
 
 export async function getERC20TokenInfo(
-  web3Provider: BrowserProvider | JsonRpcProvider,
+  browserProvider: BrowserProvider | JsonRpcProvider,
   tokenAddress: string,
 ) {
   return await withCheckoutError<TokenInfo>(
     async () => {
-      const contract = new Contract(tokenAddress, JSON.stringify(ERC20ABI), web3Provider);
+      const contract = new Contract(tokenAddress, JSON.stringify(ERC20ABI), browserProvider);
 
       const [name, symbol, decimals] = await Promise.all([
         contract.name(),

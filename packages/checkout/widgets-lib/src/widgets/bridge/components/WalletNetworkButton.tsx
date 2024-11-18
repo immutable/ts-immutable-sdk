@@ -1,10 +1,11 @@
 import {
   Body, Box, Button, FramedImage, Heading, Logo, useTheme,
 } from '@biom3/react';
-import { ChainId, EIP6963ProviderDetail, WalletProviderRdns } from '@imtbl/checkout-sdk';
+import {
+  ChainId, EIP6963ProviderDetail, NamedBrowserProvider, WalletProviderRdns,
+} from '@imtbl/checkout-sdk';
 import { useEffect, useMemo, useState } from 'react';
 import { Environment } from '@imtbl/config';
-import { BrowserProvider } from 'ethers';
 import { getChainNameById } from '../../../lib/chains';
 import { useWalletConnect } from '../../../lib/hooks/useWalletConnect';
 import {
@@ -20,7 +21,7 @@ import { getChainImage } from '../../../lib/utils';
 
 interface WalletNetworkButtonProps {
   testId: string;
-  walletProvider: BrowserProvider;
+  walletProvider: NamedBrowserProvider;
   walletProviderDetail: EIP6963ProviderDetail | undefined;
   walletAddress: string;
   walletName: string,
@@ -55,7 +56,7 @@ export function WalletNetworkButton({
       return walletName;
     }
 
-    if (isWalletConnectProvider(walletProvider)) {
+    if (isWalletConnectProvider(walletProvider.name)) {
       return walletConnectPeerName;
     }
 
@@ -64,7 +65,7 @@ export function WalletNetworkButton({
 
   useEffect(() => {
     if (isWalletConnectEnabled) {
-      const isProviderWalletConnect = isWalletConnectProvider(walletProvider);
+      const isProviderWalletConnect = isWalletConnectProvider(walletProvider.name);
       setIsWalletConnect(isProviderWalletConnect);
       if (isProviderWalletConnect) {
         (async () => {

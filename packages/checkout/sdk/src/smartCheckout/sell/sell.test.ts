@@ -1,6 +1,6 @@
 import { Environment } from '@imtbl/config';
 import { ActionType, SignablePurpose, constants } from '@imtbl/orderbook';
-import { BrowserProvider, TypedDataDomain } from 'ethers';
+import { TypedDataDomain } from 'ethers';
 import {
   getBuyToken, getERC1155Requirement, getERC721Requirement, sell,
 } from './sell';
@@ -13,6 +13,7 @@ import {
   SellOrder,
   TransactionOrGasType,
   ERC1155SellToken,
+  NamedBrowserProvider,
 } from '../../types';
 import { smartCheckout } from '../smartCheckout';
 import { createOrderbookInstance } from '../../instance';
@@ -34,14 +35,14 @@ describe('sell', () => {
   const seaportContractAddress = '0xSEAPORT';
   const walletAddress = '0xADDRESS';
   let config: CheckoutConfiguration;
-  let mockProvider: BrowserProvider;
+  let mockProvider: NamedBrowserProvider;
 
   beforeEach(() => {
     mockProvider = {
       getSigner: jest.fn().mockReturnValue({
         getAddress: jest.fn().mockResolvedValue(walletAddress),
       }),
-    } as unknown as BrowserProvider;
+    } as unknown as NamedBrowserProvider;
 
     const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     config = new CheckoutConfiguration({
@@ -931,7 +932,7 @@ describe('sell', () => {
         getSigner: jest.fn().mockReturnValue({
           getAddress: jest.fn().mockRejectedValue(new Error('error from provider')),
         }),
-      } as unknown as BrowserProvider;
+      } as unknown as NamedBrowserProvider;
 
       let message;
       let type;
