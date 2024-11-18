@@ -60,8 +60,8 @@ export function validateAndBuildVersion(
  * Falls back to 'latest' if an error occurs or if the response is invalid.
  * @returns {Promise<string>} A promise resolving to the latest version string or 'latest'.
  */
-export async function getLatestVersionFromNpm() {
-  const npmRegistryUrl = 'https://registry.npmjs.org/@imtbl/sdk';
+export async function getLatestVersionFromNpm(): Promise<string> {
+  const npmRegistryUrl = 'https://registry.npmjs.org/@imtbl/sdk/latest';
   const fallbackVersion = 'latest';
 
   try {
@@ -72,12 +72,12 @@ export async function getLatestVersionFromNpm() {
     }
 
     const data = await response.json();
+    const version = data.version?.trim();
 
-    const latestVersion = data.version;
-
-    if (typeof data.version === 'string' && latestVersion.trim() !== '') {
-      return latestVersion;
+    if (version) {
+      return version;
     }
+
     return fallbackVersion;
   } catch (error) {
     return fallbackVersion;

@@ -357,7 +357,7 @@ describe('CheckoutWidgets', () => {
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          'dist-tags': { latest: '1.82.3' },
+          version: '1.82.3',
         }),
       });
 
