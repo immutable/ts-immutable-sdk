@@ -1,6 +1,5 @@
 // this function needs to be in a separate file to prevent circular dependencies with ./network
 
-import { BrowserProvider } from 'ethers';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { CheckoutConfiguration } from '../config';
 import {
@@ -10,11 +9,9 @@ import {
 import { getNetworkAllowList } from '../network';
 import { getUnderlyingChainId } from './getUnderlyingProvider';
 
-export function isBrowserProvider(
-  browserProvider: BrowserProvider,
+export function isNamedBrowserProvider(
+  browserProvider: NamedBrowserProvider,
 ): boolean {
-  console.log('isBrowserProvider');
-  console.log(browserProvider);
   if (browserProvider && Boolean(browserProvider.send) && typeof browserProvider.send === 'function') {
     return true;
   }
@@ -32,9 +29,9 @@ export async function validateProvider(
         // if Passport skip the validation checks
         return browserProvider;
       }
-      if (!isBrowserProvider(browserProvider)) {
+      if (!isNamedBrowserProvider(browserProvider)) {
         throw new CheckoutError(
-          'Parsed provider is not a valid BrowserProvider',
+          'Parsed provider is not a valid NamedBrowserProvider',
           CheckoutErrorType.WEB3_PROVIDER_ERROR,
         );
       }

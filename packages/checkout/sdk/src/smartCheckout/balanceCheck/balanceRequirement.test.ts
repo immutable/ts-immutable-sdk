@@ -1,4 +1,4 @@
-import { BrowserProvider, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import {
   ChainId,
   ERC20Item,
@@ -6,6 +6,7 @@ import {
   ItemBalance,
   ItemRequirement,
   ItemType,
+  NamedBrowserProvider,
   NativeItem,
   TokenInfo,
 } from '../../types';
@@ -151,7 +152,7 @@ describe('balanceRequirement', () => {
   });
 
   describe('getTokensInfo', () => {
-    let mockProvider: BrowserProvider;
+    let mockProvider: NamedBrowserProvider;
 
     beforeEach(() => {
       jest.resetAllMocks();
@@ -160,10 +161,10 @@ describe('balanceRequirement', () => {
         getSigner: jest.fn().mockReturnValue({
           getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
         }),
-        network: {
+        getNetwork: jest.fn().mockResolvedValue({
           chainId: ChainId.ETHEREUM,
-        },
-      } as unknown as BrowserProvider;
+        }),
+      } as unknown as NamedBrowserProvider;
     });
 
     it('should return native token data if type is native', async () => {

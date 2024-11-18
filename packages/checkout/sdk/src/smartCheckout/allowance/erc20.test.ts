@@ -1,7 +1,7 @@
-import { BrowserProvider, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import { getERC20Allowance, getERC20ApprovalTransaction, hasERC20Allowances } from './erc20';
 import { CheckoutErrorType } from '../../errors';
-import { ItemRequirement, ItemType } from '../../types';
+import { ItemRequirement, ItemType, NamedBrowserProvider } from '../../types';
 
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
@@ -10,7 +10,7 @@ jest.mock('ethers', () => ({
 }));
 
 describe('allowance', () => {
-  const mockProvider = {} as unknown as BrowserProvider;
+  const mockProvider = {} as unknown as NamedBrowserProvider;
 
   describe('getERC20Allowance', () => {
     it('should get the allowance from the contract', async () => {

@@ -1,13 +1,12 @@
-import { BuyToken, Checkout, ItemType, SellOrder, SellToken } from '@imtbl/checkout-sdk';
+import { BuyToken, Checkout, ItemType, NamedBrowserProvider, SellOrder, SellToken } from '@imtbl/checkout-sdk';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
 import { Box, FormControl, Select, TextInput, OptionKey, Body } from '@biom3/react';
-import { BrowserProvider } from 'ethers';
 
 interface SellProps {
   checkout: Checkout;
-  provider: BrowserProvider | undefined;
+  provider: NamedBrowserProvider | undefined;
 }
 
 export default function Sell({ checkout, provider }: SellProps) {

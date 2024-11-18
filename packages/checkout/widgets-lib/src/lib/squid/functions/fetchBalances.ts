@@ -1,12 +1,12 @@
-import { BrowserProvider } from 'ethers';
 import { Squid } from '@0xsquid/sdk';
 import { CosmosBalance, TokenBalance } from '@0xsquid/sdk/dist/types';
+import { NamedBrowserProvider } from '@imtbl/checkout-sdk';
 import { Chain } from '../types';
 
 export const fetchBalances = async (
   squid: Squid,
   chains: Chain[],
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
 ): Promise<TokenBalance[]> => {
   const chainIds = chains.map((chain) => chain.id);
   const address = await (await provider.getSigner()).getAddress();

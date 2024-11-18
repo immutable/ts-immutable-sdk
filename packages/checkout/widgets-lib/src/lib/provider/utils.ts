@@ -1,14 +1,14 @@
 import {
-  EIP6963ProviderDetail, NamedBrowserProvider, WalletProviderName, WalletProviderRdns,
+  EIP6963ProviderDetail,
+  NamedBrowserProvider, WalletProviderName, WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
-import { BrowserProvider } from 'ethers';
 
 export function isPassportProvider(provider?: WalletProviderName | WalletProviderRdns) {
-  return provider === WalletProviderName.PASSPORT || provider === WalletProviderRdns.PASSPORT;
+  return provider?.toLowerCase() === WalletProviderName.PASSPORT || provider === WalletProviderRdns.PASSPORT;
 }
 
 export function isMetaMaskProvider(provider?: WalletProviderName | WalletProviderRdns) {
-  return provider === WalletProviderName.METAMASK || provider === WalletProviderRdns.METAMASK;
+  return provider?.toLowerCase() === WalletProviderName.METAMASK || provider === WalletProviderRdns.METAMASK;
 }
 
 export function isWalletConnectProvider(provider?: WalletProviderName | WalletProviderRdns) {
@@ -16,7 +16,7 @@ export function isWalletConnectProvider(provider?: WalletProviderName | WalletPr
 }
 
 export const getProviderDetailByProvider = (
-  web3Provider: BrowserProvider,
+  web3Provider: NamedBrowserProvider,
   providers?: EIP6963ProviderDetail[],
 ) => providers?.find(
   (providerDetail) => providerDetail.provider === web3Provider.ethereumProvider,

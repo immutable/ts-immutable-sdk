@@ -1,5 +1,5 @@
 /* eslint-disable arrow-body-style */
-import { BrowserProvider, Contract, formatUnits } from 'ethers';
+import { Contract, formatUnits } from 'ethers';
 import {
   ERC20Item,
   ERC721Balance,
@@ -7,6 +7,7 @@ import {
   ItemBalance,
   ItemRequirement,
   ItemType,
+  NamedBrowserProvider,
   NativeItem,
   TokenBalance,
   TokenInfo,
@@ -122,7 +123,7 @@ type TokensInfoMap = {
 export const getTokensInfo = async (
   itemRequirements: Array<ERC20Item | NativeItem>,
   balances: ItemBalance[],
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
 ): Promise<TokensInfoMap> => {
   const tokensInfo: TokensInfoMap = {};
 

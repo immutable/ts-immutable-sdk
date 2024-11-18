@@ -1,4 +1,5 @@
-import { BrowserProvider, JsonRpcProvider } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
+import { NamedBrowserProvider } from './provider';
 
 /**
  * Represents information about a token.
@@ -19,10 +20,10 @@ export interface TokenInfo {
 
 /**
  * Interface representing the parameters for {@link Checkout.getTokenInfo}.
- * @property {BrowserProvider | JsonRpcProvider} provider - The provider used to get the balance.
+ * @property {NamedBrowserProvider | JsonRpcProvider} provider - The provider used to get the balance.
  * @property {string} tokenAddress - The contract address of the token.
  */
 export interface GetTokenInfoParams {
-  provider: BrowserProvider | JsonRpcProvider;
+  provider: NamedBrowserProvider | JsonRpcProvider;
   tokenAddress: string;
 }

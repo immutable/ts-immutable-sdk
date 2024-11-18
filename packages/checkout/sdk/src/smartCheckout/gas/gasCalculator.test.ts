@@ -1,6 +1,6 @@
-import { BrowserProvider } from 'ethers';
+import { FeeData } from 'ethers';
 import {
-  GasTokenType, ItemType, TransactionOrGasType,
+  GasTokenType, ItemType, NamedBrowserProvider, TransactionOrGasType,
 } from '../../types';
 import { estimateGas, gasCalculator, getGasItemRequirement } from './gasCalculator';
 import { CheckoutErrorType } from '../..';
@@ -9,8 +9,8 @@ describe('gasCalculator', () => {
   describe('gasCalculator', () => {
     it('should return gas for transaction', async () => {
       const mockProvider = {
-        estimateGas: jest.fn().mockResolvedValue(100000),
-      } as unknown as BrowserProvider;
+        estimateGas: jest.fn().mockResolvedValue(100000n),
+      } as unknown as NamedBrowserProvider;
 
       const item = await gasCalculator(
         mockProvider,
@@ -32,8 +32,8 @@ describe('gasCalculator', () => {
 
     it('should return the total gas required for approvals and transaction', async () => {
       const mockProvider = {
-        estimateGas: jest.fn().mockResolvedValue(100000),
-      } as unknown as BrowserProvider;
+        estimateGas: jest.fn().mockResolvedValue(100000n),
+      } as unknown as NamedBrowserProvider;
 
       const item = await gasCalculator(
         mockProvider,
@@ -80,14 +80,13 @@ describe('gasCalculator', () => {
 
     it('should use gas limit if transactionOrGas is GasAmount', async () => {
       const mockProvider = {
-        estimateGas: jest.fn().mockResolvedValue(100000),
+        estimateGas: jest.fn().mockResolvedValue(100000n),
         getFeeData: jest.fn().mockResolvedValue({
-          maxFeePerGas: '0x1',
-          lastBaseFeePerGas: '0x1',
-          maxPriorityFeePerGas: '0x1',
+          maxFeePerGas: 1n,
+          maxPriorityFeePerGas: 1n,
           gasPrice: null,
         }),
-      } as unknown as BrowserProvider;
+      } as unknown as NamedBrowserProvider;
 
       const item = await gasCalculator(
         mockProvider,
@@ -128,21 +127,20 @@ describe('gasCalculator', () => {
 
       expect(item).toEqual({
         type: ItemType.NATIVE,
-        amount: BigInt(400000),
+        amount: BigInt(300000),
         isFee: true,
       });
     });
 
     it('should use ERC20 for gas if GasAmount in ERC20', async () => {
       const mockProvider = {
-        estimateGas: jest.fn().mockResolvedValue(100000),
+        estimateGas: jest.fn().mockResolvedValue(100000n),
         getFeeData: jest.fn().mockResolvedValue({
-          maxFeePerGas: '0x1',
-          lastBaseFeePerGas: '0x1',
-          maxPriorityFeePerGas: '0x1',
+          maxFeePerGas: 1n,
+          maxPriorityFeePerGas: 1n,
           gasPrice: null,
         }),
-      } as unknown as BrowserProvider;
+      } as unknown as NamedBrowserProvider;
 
       const items = await gasCalculator(
         mockProvider,
@@ -185,7 +183,7 @@ describe('gasCalculator', () => {
       expect(items).toEqual({
         type: ItemType.ERC20,
         tokenAddress: '0xERC20',
-        amount: BigInt(400000),
+        amount: BigInt(300000),
         spenderAddress: '',
         isFee: true,
       });
@@ -193,8 +191,8 @@ describe('gasCalculator', () => {
 
     it('should return null if no gas required', async () => {
       const mockProvider = {
-        estimateGas: jest.fn().mockResolvedValue(0),
-      } as unknown as BrowserProvider;
+        estimateGas: jest.fn().mockResolvedValue(0n),
+      } as unknown as NamedBrowserProvider;
 
       const item = await gasCalculator(
         mockProvider,
@@ -215,7 +213,7 @@ describe('gasCalculator', () => {
     it('should return gas for transaction', async () => {
       const mockProvider = {
         estimateGas: jest.fn().mockResolvedValue(BigInt(100000)),
-      } as unknown as BrowserProvider;
+      } as unknown as NamedBrowserProvider;
 
       const item = await estimateGas(
         mockProvider,
@@ -230,7 +228,7 @@ describe('gasCalculator', () => {
     it('should throw error if estimate gas fails', async () => {
       const mockProvider = {
         estimateGas: jest.fn().mockRejectedValue(new Error('Failed to estimate gas')),
-      } as unknown as BrowserProvider;
+      } as unknown as NamedBrowserProvider;
 
       let message = '';
       let type = '';
