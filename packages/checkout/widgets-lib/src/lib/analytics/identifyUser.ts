@@ -4,7 +4,7 @@ import { isMetaMaskProvider, isPassportProvider } from '../provider';
 /**
  * identifyUser - function to identify a user by their wallet address and call the function to raise analytics
  * @param identify - The identify function from the useAnalytics() hook
- * @param provider - the BrowserProvider used to find the user's walletAddress
+ * @param provider - the NamedBrowserProvider used to find the user's walletAddress
  * @param options - additional options to pass to the identify function
  */
 export async function identifyUser(

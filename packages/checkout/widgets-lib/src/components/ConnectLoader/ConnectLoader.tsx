@@ -10,7 +10,6 @@ import React, {
   useMemo,
   useReducer,
 } from 'react';
-import { BrowserProvider } from 'ethers';
 import { ErrorView } from '../../views/error/ErrorView';
 import {
   ConnectLoaderActions,
@@ -77,7 +76,7 @@ export function ConnectLoader({
 
   const { identify, user } = useAnalytics();
 
-  const hasNoWalletProviderNameAndNoBrowserProvider = (localProvider?: BrowserProvider): boolean => {
+  const hasNoWalletProviderNameAndNoBrowserProvider = (localProvider?: NamedBrowserProvider): boolean => {
     if (!browserProvider?.name && !localProvider) {
       connectLoaderDispatch({
         payload: {
@@ -91,7 +90,7 @@ export function ConnectLoader({
     return false;
   };
 
-  const hasWalletProviderNameAndNoBrowserProvider = async (localProvider?: BrowserProvider): Promise<boolean> => {
+  const hasWalletProviderNameAndNoBrowserProvider = async (localProvider?: NamedBrowserProvider): Promise<boolean> => {
     try {
       // If the wallet provider name was passed through but the provider was
       // not injected then create a provider using the wallet provider name
@@ -178,7 +177,7 @@ export function ConnectLoader({
           },
         });
         // TODO: handle all of the inner try catches with error handling
-        // At this point the BrowserProvider exists
+        // At this point the NamedBrowserProvider exists
         // This will bypass the wallet list screen
         const isConnected = (await isWalletConnected(browserProvider!));
         if (!isConnected) return;

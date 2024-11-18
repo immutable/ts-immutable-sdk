@@ -1,6 +1,8 @@
-import { BrowserProvider, JsonRpcProvider } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
-import { ChainId, GetAllBalancesResult, AvailableRoutingOptions } from '../../types';
+import {
+  ChainId, GetAllBalancesResult, AvailableRoutingOptions,
+} from '../../types';
 import { getAllBalances } from '../../balances';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { TokenBalanceResult } from './types';
@@ -31,7 +33,7 @@ export const getAllTokenBalances = async (
     if (readOnlyProviders.has(chainId)) {
       chainBalancePromises.set(chainId, getAllBalances(
         config,
-        readOnlyProviders.get(chainId) as unknown as BrowserProvider,
+        readOnlyProviders.get(chainId),
         ownerAddress,
         chainId,
       ));
@@ -48,7 +50,7 @@ export const getAllTokenBalances = async (
   if (readOnlyProviders.has(chainId)) {
     chainBalancePromises.set(chainId, getAllBalances(
       config,
-      readOnlyProviders.get(chainId) as unknown as BrowserProvider,
+      readOnlyProviders.get(chainId),
       ownerAddress,
       chainId,
     ));

@@ -32,13 +32,11 @@ import {
 import { Passport } from "@imtbl/passport";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import { Environment, ImmutableConfiguration } from "@imtbl/config";
-import { BrowserProvider, Eip1193Provider } from "ethers";
 
 import { useAsyncMemo, usePrevState } from "../../../hooks";
 import { Message } from "./components/messages";
 import { Legend } from "./components/legend";
 import { itemsMock } from "./items.mock";
-import { ChainId } from "@imtbl/checkout-sdk";
 import { NamedBrowserProvider } from "@imtbl/checkout-sdk";
 
 //

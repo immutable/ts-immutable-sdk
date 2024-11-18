@@ -4,7 +4,7 @@
 import { Environment } from '@imtbl/config';
 import { Passport, UserProfile } from '@imtbl/passport';
 import {
-  BrowserProvider, Eip1193Provider, JsonRpcProvider, TransactionReceipt,
+  Eip1193Provider, JsonRpcProvider, TransactionReceipt,
 } from 'ethers';
 import {
   getNetworkAllowList,
@@ -45,7 +45,7 @@ import {
   requestPermissions,
 } from './connect';
 import * as network from './network';
-import { createProvider, isBrowserProvider, validateProvider } from './provider';
+import { createProvider, isNamedBrowserProvider, validateProvider } from './provider';
 import { getERC20TokenInfo, getTokenAllowList } from './tokens';
 import { getWalletAllowList } from './wallet';
 import { buy } from './smartCheckout/buy';
@@ -60,10 +60,13 @@ import { availabilityService } from './availability';
 import * as swap from './swap';
 import { SwapParams, SwapResult } from './types/swap';
 
+jest.mock('./transaction', () => ({
+  ...jest.requireActual('./transaction'),
+  sendTransaction: jest.fn(),
+}));
 jest.mock('./connect');
 jest.mock('./network');
 jest.mock('./balances');
-jest.mock('./transaction');
 jest.mock('./gasEstimate/gasEstimator');
 jest.mock('./readOnlyProviders/readOnlyProvider');
 jest.mock('./provider');
@@ -124,8 +127,8 @@ describe('Connect', () => {
     expect(connectSite).toBeCalledTimes(1);
   });
 
-  it(`should call the requestPermissions function if requestWalletPermissions is
-  true and provider is not Passport`, async () => {
+  // eslint-disable-next-line max-len
+  it('should call the requestPermissions function if requestWalletPermissions is true and provider is not Passport', async () => {
     const checkout = new Checkout({
       baseConfig: { environment: Environment.PRODUCTION },
     });
@@ -145,21 +148,19 @@ describe('Connect', () => {
     expect(requestPermissions).toBeCalledWith(provider);
   });
 
-  it(`should call the connectSite function if requestWalletPermissions is
-  true and provider is Passport`, async () => {
+  it('should call the connectSite function if requestWalletPermissions is true and provider is Passport', async () => {
     const checkout = new Checkout({
       baseConfig: { environment: Environment.PRODUCTION },
     });
 
     const requestMock = jest.fn();
     providerMock = {
-      isPassport: true,
       request: requestMock,
-    } as unknown as Eip1193Provider;
+    } as Eip1193Provider;
     requestMock.mockResolvedValue('0x1');
 
     const provider = new NamedBrowserProvider(
-      'test' as WalletProviderName,
+      WalletProviderName.PASSPORT,
       providerMock,
     );
     (validateProvider as jest.Mock).mockResolvedValue(provider);
@@ -201,7 +202,7 @@ describe('Connect', () => {
       baseConfig: { environment: Environment.PRODUCTION },
     });
 
-    const provider = new BrowserProvider(providerMock, ChainId.ETHEREUM);
+    const provider = new NamedBrowserProvider('test' as WalletProviderName, providerMock, ChainId.ETHEREUM);
     (getBalance as jest.Mock).mockResolvedValue({});
     (validateProvider as jest.Mock).mockResolvedValue(provider);
 
@@ -221,7 +222,7 @@ describe('Connect', () => {
       baseConfig: { environment: Environment.PRODUCTION },
     });
 
-    const provider = new BrowserProvider(providerMock, ChainId.ETHEREUM);
+    const provider = new NamedBrowserProvider('test' as WalletProviderName, providerMock, ChainId.ETHEREUM);
     (getERC20TokenInfo as jest.Mock).mockResolvedValue({});
 
     await checkout.getTokenInfo({
@@ -336,7 +337,7 @@ describe('Connect', () => {
 
   it('should call createProvider function', async () => {
     const createProviderResult = {
-      provider: {} as BrowserProvider,
+      provider: {} as NamedBrowserProvider,
       walletProviderName: WalletProviderName.METAMASK,
     };
     (createProvider as jest.Mock).mockResolvedValue(createProviderResult);
@@ -770,9 +771,9 @@ describe('Connect', () => {
   });
 
   it('should call isBrowserProvider', async () => {
-    (isBrowserProvider as jest.Mock).mockResolvedValue(true);
+    (isNamedBrowserProvider as jest.Mock).mockResolvedValue(true);
     const result = await Checkout.isBrowserProvider(
-      new BrowserProvider(providerMock, ChainId.ETHEREUM),
+      new NamedBrowserProvider('test' as WalletProviderName, providerMock, ChainId.ETHEREUM),
     );
     expect(result).toBeTruthy();
   });
@@ -958,12 +959,10 @@ describe('Connect', () => {
         getSigner: jest.fn().mockReturnValue({
           getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
         }),
-        network: {
+        getNetwork: jest.fn().mockResolvedValue({
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-        },
-        provider: {
-          isPassport: true,
-        },
+        }),
+        name: WalletProviderName.PASSPORT,
       } as unknown as NamedBrowserProvider;
       const mockUser: UserProfile = {
         sub: 'email|123',

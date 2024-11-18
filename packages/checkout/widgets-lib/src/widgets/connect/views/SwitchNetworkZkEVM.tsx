@@ -1,7 +1,6 @@
 import {
   useCallback, useContext, useEffect, useState,
 } from 'react';
-import { BrowserProvider } from 'ethers';
 import { useTranslation } from 'react-i18next';
 import { isWalletConnectProvider } from '../../../lib/provider';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
@@ -41,8 +40,7 @@ export function SwitchNetworkZkEVM() {
         connectDispatch({
           payload: {
             type: ConnectActions.SET_PROVIDER,
-            // @ts-expect-error TODO
-            provider: new BrowserProvider(provider.provider as any),
+            provider,
           },
         });
 

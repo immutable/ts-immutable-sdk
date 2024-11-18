@@ -3,12 +3,11 @@ import {
   ChainId,
   Checkout,
   ConnectWidgetParams,
-  EIP1193Provider,
   EIP6963ProviderInfo,
-  getMetaMaskProviderDetail,
-  getPassportProviderDetail,
   WalletConnectManager as IWalletConnectManager,
+  metaMaskProviderInfo,
   NamedBrowserProvider,
+  passportProviderInfo,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback,
@@ -34,7 +33,9 @@ import {
 import { addProviderListenersForWidgetRoot, sendProviderUpdatedEvent } from '../../lib';
 import { identifyUser } from '../../lib/analytics/identifyUser';
 import { useWalletConnect } from '../../lib/hooks/useWalletConnect';
-import { isMetaMaskProvider, isPassportProvider, isWalletConnectProvider } from '../../lib/provider';
+import {
+  isMetaMaskProvider, isPassportProvider, isWalletConnectProvider,
+} from '../../lib/provider';
 import { isL1EthChainId, isZkEvmChainId } from '../../lib/utils';
 import { WalletConnectManager, walletConnectProviderInfo } from '../../lib/walletConnect';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
@@ -198,25 +199,10 @@ export default function ConnectWidget({
     let walletProviderInfo: EIP6963ProviderInfo | undefined;
     if (isWalletConnectProvider(provider.name)) {
       walletProviderInfo = walletConnectProviderInfo;
-    } else {
-      const injectedProviderDetails = checkout.getInjectedProviders();
-      const walletProviderDetail = injectedProviderDetails.find((providerDetail) => (
-        // @ts-expect-error TODO
-        providerDetail.provider === provider.provider
-      ));
-      if (walletProviderDetail) {
-        walletProviderInfo = walletProviderDetail.info;
-      }
-      if (!walletProviderInfo) {
-        if (isPassportProvider(provider.name)) {
-          // @ts-expect-error TODO
-          walletProviderInfo = getPassportProviderDetail(provider.provider as EIP1193Provider).info;
-        }
-        if (isMetaMaskProvider(provider.name)) {
-          // @ts-expect-error TODO
-          walletProviderInfo = getMetaMaskProviderDetail(provider.provider as EIP1193Provider).info;
-        }
-      }
+    } else if (isPassportProvider(provider.name)) {
+      walletProviderInfo = passportProviderInfo;
+    } else if (isMetaMaskProvider(provider.name)) {
+      walletProviderInfo = metaMaskProviderInfo;
     }
 
     if (sendSuccessEventOverride) {

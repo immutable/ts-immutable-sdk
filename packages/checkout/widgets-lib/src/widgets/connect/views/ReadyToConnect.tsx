@@ -1,6 +1,6 @@
-import { BrowserProvider } from 'ethers';
 import {
   ChainId,
+  NamedBrowserProvider,
   WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import {
@@ -87,7 +87,7 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
   }, [history]);
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  const handleConnectViewUpdate = async (provider: BrowserProvider) => {
+  const handleConnectViewUpdate = async (provider: NamedBrowserProvider) => {
     const chainId = await provider.send!('eth_chainId', []);
     // eslint-disable-next-line radix
     const parsedChainId = parseInt(chainId.toString());

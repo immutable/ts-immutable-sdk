@@ -1,8 +1,9 @@
 import { Environment } from '@imtbl/config';
-import { BrowserProvider, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import {
   ItemRequirement,
   ItemType,
+  NamedBrowserProvider,
 } from '../../types';
 import { balanceCheck } from './balanceCheck';
 import { CheckoutConfiguration } from '../../config';
@@ -20,7 +21,7 @@ jest.mock('ethers', () => ({
 
 describe('balanceCheck', () => {
   let config: CheckoutConfiguration;
-  let mockProvider: BrowserProvider;
+  let mockProvider: NamedBrowserProvider;
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -28,10 +29,8 @@ describe('balanceCheck', () => {
       getSigner: jest.fn().mockReturnValue({
         getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
       }),
-      network: {
-        chainId: 1,
-      },
-    } as unknown as BrowserProvider;
+      getNetwork: jest.fn().mockResolvedValue({ chainId: 1 }),
+    } as unknown as NamedBrowserProvider;
 
     const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     config = new CheckoutConfiguration({

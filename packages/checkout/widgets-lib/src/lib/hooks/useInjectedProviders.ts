@@ -5,9 +5,10 @@ import {
   EIP6963ProviderDetail,
   getMetaMaskProviderDetail,
   getPassportProviderDetail,
+  NamedBrowserProvider,
+  WalletProviderName,
   WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
-import { BrowserProvider } from 'ethers';
 
 const DEFAULT_PRIORITY_INDEX = 999;
 
@@ -28,7 +29,7 @@ declare global {
   }
 }
 
-let passportBrowserProvider: BrowserProvider;
+let passportBrowserProvider: NamedBrowserProvider;
 const processProviders = async (
   checkout: Checkout | null,
   injectedProviders: EIP6963ProviderDetail[],
@@ -54,7 +55,8 @@ const processProviders = async (
     && priorityWalletRdns.includes(WalletProviderRdns.PASSPORT)
     && !filteredProviders.some((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT)) {
     if (!passportBrowserProvider) {
-      passportBrowserProvider = new BrowserProvider(await checkout.passport.connectEvm());
+      // eslint-disable-next-line max-len
+      passportBrowserProvider = new NamedBrowserProvider(WalletProviderName.PASSPORT, await checkout.passport.connectEvm());
     }
     // eslint-disable-next-line max-len
     filteredProviders.unshift(getPassportProviderDetail(passportBrowserProvider.provider as unknown as EIP1193Provider));

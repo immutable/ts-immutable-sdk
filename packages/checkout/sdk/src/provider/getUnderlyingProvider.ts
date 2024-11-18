@@ -1,8 +1,7 @@
 // this function needs to be in a separate file to prevent circular dependencies with ./network
-
-import { BrowserProvider } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { WalletAction } from '../types';
+import { NamedBrowserProvider, WalletAction } from '../types';
 
 const parseChainId = (chainId: unknown): number => {
   if (typeof chainId === 'number') {
@@ -21,33 +20,33 @@ const parseChainId = (chainId: unknown): number => {
 
 /**
  * Get chain id from RPC method
- * @param browserProvider
+ * @param provider
  * @returns chainId number
  */
-async function requestChainId(browserProvider: BrowserProvider): Promise<number> {
-  if (!browserProvider.send) {
+async function requestChainId(provider: JsonRpcProvider | NamedBrowserProvider): Promise<number> {
+  if (!provider.send) {
     throw new CheckoutError(
-      'Parsed provider is not a valid BrowserProvider',
+      'Parsed provider is not a valid NamedBrowserProvider',
       CheckoutErrorType.WEB3_PROVIDER_ERROR,
     );
   }
 
-  const chainId: string = await browserProvider.send(WalletAction.GET_CHAINID, []);
+  const chainId: string = await provider.send(WalletAction.GET_CHAINID, []);
 
   return parseChainId(chainId);
 }
 
 /**
  * Get the underlying chain id from the provider
- * @param browserProvider
+ * @param provider
  * @returns chainId number
  */
-export async function getUnderlyingChainId(browserProvider: BrowserProvider): Promise<number> {
-  const chainId = (browserProvider.provider as any)?.chainId;
+export async function getUnderlyingChainId(provider: JsonRpcProvider | NamedBrowserProvider): Promise<number> {
+  const { chainId } = await provider.getNetwork();
 
   if (chainId) {
     return parseChainId(chainId);
   }
 
-  return requestChainId(browserProvider);
+  return requestChainId(provider);
 }

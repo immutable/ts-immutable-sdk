@@ -1,5 +1,5 @@
-import { BrowserProvider } from 'ethers';
 import { WidgetLanguage } from '../configurations';
+import { NamedBrowserProvider } from '../../../types';
 
 /**
  * Enum representing the events emitted by the widgets.
@@ -28,7 +28,7 @@ export enum ProviderEventType {
  * Payload type for the PROVIDER_UPDATED event
  */
 export type ProviderUpdated = {
-  provider: BrowserProvider;
+  provider: NamedBrowserProvider;
 };
 
 /**

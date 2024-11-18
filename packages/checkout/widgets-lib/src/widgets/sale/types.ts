@@ -1,9 +1,9 @@
-import { BrowserProvider } from 'ethers';
 import {
   SaleItem,
   FundingStep,
   FundingItem,
   SmartCheckoutResult,
+  NamedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 
 export type SignedOrderProduct = {
@@ -47,7 +47,7 @@ export type SignResponse = {
 };
 
 export type SignOrderInput = {
-  provider: BrowserProvider | undefined;
+  provider: NamedBrowserProvider | undefined;
   items: SaleItem[];
   fromTokenAddress: string;
   recipientAddress: string;

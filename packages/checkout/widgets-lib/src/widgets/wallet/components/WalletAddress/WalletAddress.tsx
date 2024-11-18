@@ -11,7 +11,7 @@ import {
   useAnalytics,
 } from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { getWalletLogoByName } from '../../../../lib/logoUtils';
-import { getWalletProviderNameByProvider, isPassportProvider } from '../../../../lib/provider';
+import { isPassportProvider } from '../../../../lib/provider';
 import { abbreviateWalletAddress } from '../../../../lib/utils';
 
 const isCopiedStyle: SxProps = {
@@ -74,7 +74,7 @@ export function WalletAddress({
   return (
     <MenuItem testId="wallet-address" emphasized size="medium">
       <MenuItem.FramedLogo
-        logo={getWalletLogoByName(getWalletProviderNameByProvider(provider))}
+        logo={getWalletLogoByName(provider?.name ?? 'Other')}
         sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
       />
       {isDualVariantIcon(ctaIcon) ? (

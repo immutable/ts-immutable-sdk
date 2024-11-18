@@ -1,10 +1,11 @@
-import { BrowserProvider, Contract } from 'ethers';
+import { Contract } from 'ethers';
 
+import { NamedBrowserProvider } from '@imtbl/checkout-sdk';
 import { SignedTransaction } from '../types';
 
 export const filterAllowedTransactions = async (
   transactions: SignedTransaction[],
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
 ): Promise<SignedTransaction[]> => {
   try {
     const signer = await provider.getSigner();

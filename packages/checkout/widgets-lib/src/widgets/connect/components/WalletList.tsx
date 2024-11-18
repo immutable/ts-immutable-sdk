@@ -18,7 +18,6 @@ import {
 } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { BrowserProvider } from 'ethers';
 import { UnableToConnectDrawer } from '../../../components/UnableToConnectDrawer/UnableToConnectDrawer';
 import { ChangedYourMindDrawer } from '../../../components/ChangedYourMindDrawer/ChangedYourMindDrawer';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
@@ -217,8 +216,7 @@ export function WalletList(props: WalletListProps) {
 
   const connectCallback = async (ethereumProvider: EthereumProvider) => {
     if (ethereumProvider.connected && ethereumProvider.session) {
-      const browserProvider = new BrowserProvider(ethereumProvider);
-      // @ts-expect-error TODO
+      const browserProvider = new NamedBrowserProvider(WalletProviderName.WALLETCONNECT, ethereumProvider);
       selectBrowserProvider(browserProvider, 'walletconnect');
 
       const { chainId } = await ((await browserProvider.getSigner()).provider.getNetwork());

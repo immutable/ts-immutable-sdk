@@ -1,4 +1,5 @@
 import { Environment } from '@imtbl/config';
+import { Eip1193Provider } from 'ethers';
 import {
   BridgeClaimWithdrawalFailed,
   BridgeClaimWithdrawalSuccess,
@@ -94,6 +95,7 @@ export enum WidgetType {
 export type WidgetProperties<T extends WidgetType> = {
   config?: WidgetConfigurations[T];
   provider?: NamedBrowserProvider;
+  eipProvider?: Eip1193Provider;
 };
 
 export type WidgetConfigurations = {
