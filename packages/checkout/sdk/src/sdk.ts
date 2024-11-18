@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import { Environment } from '@imtbl/config';
 import { Passport } from '@imtbl/passport';
-import { JsonRpcProvider, BrowserProvider } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 import { HttpClient } from './api/http';
 import { AvailabilityService, availabilityService } from './availability';
 import * as balances from './balances';
@@ -545,9 +545,9 @@ export class Checkout {
   }
 
   /**
-   * Wraps a BrowserProvider call to validate the provider and handle errors.
+   * Wraps a NamedBrowserProvider call to validate the provider and handle errors.
    * @param {BrowserProvider} browserProvider - The provider to connect to the network.
-   * @param {(browserProvider: BrowserProvider) => Promise<T>)} block - The block executing the provider call.
+   * @param {(browserProvider: NamedBrowserProvider) => Promise<T>)} block - The block executing the provider call.
    * @returns {Promise<T>} Returns the result of the provided block param.
    */
   public async providerCall<T>(
@@ -704,8 +704,8 @@ export class Checkout {
    * @param {BrowserProvider} browserProvider - The object to check.
    * @returns {boolean} - True if the object is a Web3 provider, false otherwise.
    */
-  static isBrowserProvider(browserProvider: BrowserProvider) {
-    return provider.isBrowserProvider(browserProvider);
+  static isBrowserProvider(browserProvider: NamedBrowserProvider) {
+    return provider.isNamedBrowserProvider(browserProvider);
   }
 
   /**

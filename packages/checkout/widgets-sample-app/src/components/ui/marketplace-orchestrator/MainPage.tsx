@@ -1,4 +1,3 @@
-import { BrowserProvider } from 'ethers';
 import { Box, Button, Heading } from "@biom3/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
@@ -15,7 +14,7 @@ import {
   SwapEventType,
   WalletEventType,
   WalletNetworkSwitch,
-  WidgetTheme, WidgetType, ProviderEventType, ProviderUpdated, WidgetProperties, ChainId
+  WidgetTheme, WidgetType, WidgetProperties, ChainId
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { passport } from './passport';

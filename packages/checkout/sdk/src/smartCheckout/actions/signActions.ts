@@ -1,4 +1,4 @@
-import { BrowserProvider, TransactionReceipt, TransactionRequest } from 'ethers';
+import { TransactionReceipt, TransactionRequest } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import {
   SignTransactionResult, SignTransactionStatusType, SignedMessage, UnsignedMessage,
@@ -75,7 +75,7 @@ export const signFulfillmentTransactions = async (
 };
 
 export const signMessage = async (
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   unsignedMessage: UnsignedMessage,
 ): Promise<SignedMessage> => {
   try {

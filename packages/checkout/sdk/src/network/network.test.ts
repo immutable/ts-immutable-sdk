@@ -16,6 +16,7 @@ import {
   NetworkFilterTypes,
   ChainName,
   NetworkInfo,
+  NamedBrowserProvider,
 } from '../types';
 import { createProvider } from '../provider';
 import { CheckoutError, CheckoutErrorType } from '../errors';
@@ -32,7 +33,6 @@ const providerMock = {
 };
 const passportProviderMock = {
   ...providerMock,
-  isPassport: true,
 };
 const ethNetworkInfo = {
   name: ChainName.ETHEREUM,
@@ -56,9 +56,9 @@ jest.mock('../api/http', () => ({
   })),
 }));
 
-jest.mock('ethers', () => ({
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  BrowserProvider: jest.fn(),
+jest.mock('../types/provider', () => ({
+  ...jest.requireActual('../types/provider'),
+  NamedBrowserProvider: jest.fn(),
 }));
 
 jest.mock('../config/remoteConfigFetcher');
@@ -107,13 +107,15 @@ describe('network functions', () => {
 
   describe('switchWalletNetwork()', () => {
     it.only('should make request for the user to switch network', async () => {
-      (BrowserProvider as unknown as jest.Mock).mockReturnValue({
-        provider: providerMock,
+      (NamedBrowserProvider as unknown as jest.Mock).mockReturnValue({
+        send: jest.fn(),
         getNetwork: async () => ethNetworkInfo,
-        network: { chainId: ethNetworkInfo.chainId },
       });
 
       const { provider } = await createProvider(WalletProviderName.METAMASK);
+
+      console.log('QWERQEWR');
+      console.log(provider);
 
       const switchNetworkResult = await switchWalletNetwork(
         new CheckoutConfiguration({
@@ -360,7 +362,7 @@ describe('network functions', () => {
       try {
         await switchWalletNetwork(
           testCheckoutConfiguration,
-          { provider: passportProviderMock } as unknown as BrowserProvider,
+          { provider: passportProviderMock } as unknown as NamedBrowserProvider,
           ChainId.SEPOLIA,
         );
       } catch (err: any) {
@@ -393,7 +395,7 @@ describe('network functions', () => {
         };
         const result = await getNetworkInfo(
           testCheckoutConfiguration,
-          mockProvider as unknown as BrowserProvider,
+          mockProvider as unknown as NamedBrowserProvider,
         );
         expect(result.name).toBe(
           SANDBOX_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.chainName,
@@ -421,7 +423,7 @@ describe('network functions', () => {
       };
       const result = await getNetworkInfo(
         testCheckoutConfiguration,
-        mockProvider as unknown as BrowserProvider,
+        mockProvider as unknown as NamedBrowserProvider,
       );
       expect(result).toEqual({
         chainId: 3,
@@ -440,7 +442,7 @@ describe('network functions', () => {
 
       const result = await getNetworkInfo(
         testCheckoutConfiguration,
-        mockProvider as unknown as BrowserProvider,
+        mockProvider as unknown as NamedBrowserProvider,
       );
 
       expect(result).toEqual({

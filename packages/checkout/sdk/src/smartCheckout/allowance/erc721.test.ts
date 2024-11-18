@@ -1,4 +1,4 @@
-import { BrowserProvider, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import {
   convertIdToNumber,
   getApproveTransaction,
@@ -7,7 +7,7 @@ import {
   hasERC721Allowances,
 } from './erc721';
 import { CheckoutErrorType } from '../../errors';
-import { ItemRequirement, ItemType } from '../../types';
+import { ItemRequirement, ItemType, NamedBrowserProvider } from '../../types';
 
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
@@ -16,7 +16,7 @@ jest.mock('ethers', () => ({
 }));
 
 describe('erc721', () => {
-  const mockProvider = {} as unknown as BrowserProvider;
+  const mockProvider = {} as unknown as NamedBrowserProvider;
 
   describe('getERC721ApprovedAddress', () => {
     it('should get the allowance from the contract', async () => {

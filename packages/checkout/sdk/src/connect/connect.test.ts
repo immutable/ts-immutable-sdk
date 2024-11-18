@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { BrowserProvider } from 'ethers';
 import { checkIsWalletConnected, connectSite, requestPermissions } from './connect';
-import { WalletAction, WalletProviderName } from '../types';
+import { NamedBrowserProvider, WalletAction, WalletProviderName } from '../types';
 import { CheckoutErrorType } from '../errors';
 import { createProvider } from '../provider';
 
@@ -64,7 +64,7 @@ describe('connect', () => {
 
     it('should throw an error if provider missing from BrowserProvider', async () => {
       try {
-        await checkIsWalletConnected({} as BrowserProvider);
+        await checkIsWalletConnected({} as NamedBrowserProvider);
       } catch (err: any) {
         expect(err.message).toEqual('Check wallet connection request failed');
         expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_FAILED_ERROR);
@@ -73,7 +73,7 @@ describe('connect', () => {
 
     it('should throw an error if provider.request is not found', async () => {
       try {
-        await checkIsWalletConnected({ provider: {} } as BrowserProvider);
+        await checkIsWalletConnected({ provider: {} } as NamedBrowserProvider);
       } catch (err: any) {
         expect(err.message).toEqual('Check wallet connection request failed');
         expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_FAILED_ERROR);
@@ -84,9 +84,9 @@ describe('connect', () => {
       try {
         await checkIsWalletConnected({
           provider: {
-            request: () => { throw new Error(''); },
+            send: () => { throw new Error(''); },
           },
-        } as unknown as BrowserProvider);
+        } as unknown as NamedBrowserProvider);
       } catch (err: any) {
         expect(err.message).toEqual('Check wallet connection request failed');
         expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_FAILED_ERROR);
@@ -109,7 +109,7 @@ describe('connect', () => {
 
     it('should throw an error if provider missing from BrowserProvider', async () => {
       try {
-        await connectSite({} as BrowserProvider);
+        await connectSite({} as NamedBrowserProvider);
       } catch (err: any) {
         expect(err.message).toEqual('Incompatible provider');
         expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR);
@@ -119,7 +119,7 @@ describe('connect', () => {
 
     it('should throw an error if provider.request is not found', async () => {
       try {
-        await connectSite({ provider: {} } as BrowserProvider);
+        await connectSite({ provider: {} } as NamedBrowserProvider);
       } catch (err: any) {
         expect(err.message).toEqual('Incompatible provider');
         expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR);
@@ -164,7 +164,7 @@ describe('connect', () => {
 
     it('should throw an error if provider missing from BrowserProvider', async () => {
       try {
-        await requestPermissions({} as BrowserProvider);
+        await requestPermissions({} as NamedBrowserProvider);
       } catch (err: any) {
         expect(err.message).toEqual('Incompatible provider');
         expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR);
@@ -174,7 +174,7 @@ describe('connect', () => {
 
     it('should throw an error if provider.request is not found', async () => {
       try {
-        await requestPermissions({ provider: {} } as BrowserProvider);
+        await requestPermissions({ provider: {} } as NamedBrowserProvider);
       } catch (err: any) {
         expect(err.message).toEqual('Incompatible provider');
         expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR);

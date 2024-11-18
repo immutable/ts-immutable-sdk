@@ -1,8 +1,8 @@
-import { BrowserProvider } from 'ethers';
 import { ChainId } from '../types/chains';
 import { getUnderlyingChainId } from './getUnderlyingProvider';
 import { WalletAction } from '../types/wallet';
 import { CheckoutErrorType } from '../errors';
+import { NamedBrowserProvider } from '../types';
 
 describe('getUnderlyingChainId', () => {
   it('should return underlying chain id from property', async () => {
@@ -11,7 +11,7 @@ describe('getUnderlyingChainId', () => {
         chainId: ChainId.SEPOLIA,
         request: jest.fn(),
       },
-    } as unknown as BrowserProvider;
+    } as unknown as NamedBrowserProvider;
 
     const chainId = await getUnderlyingChainId(provider);
     expect(chainId).toEqual(ChainId.SEPOLIA);
@@ -23,7 +23,7 @@ describe('getUnderlyingChainId', () => {
       provider: {
         request: jest.fn().mockResolvedValue('0xaa36a7'),
       },
-    } as unknown as BrowserProvider;
+    } as unknown as NamedBrowserProvider;
 
     const chainId = await getUnderlyingChainId(provider);
     expect(chainId).toEqual(ChainId.SEPOLIA);
@@ -37,7 +37,8 @@ describe('getUnderlyingChainId', () => {
     const intChainId = 13473;
     const strChainId = intChainId.toString();
     const hexChainId = `0x${intChainId.toString(16)}`;
-    const getMockProvider = (chainId: unknown) => ({ provider: { chainId } } as unknown as BrowserProvider);
+    // eslint-disable-next-line max-len
+    const getMockProvider = (chainId: unknown) => ({ getNetwork: () => Promise.resolve({ chainId }) } as unknown as NamedBrowserProvider);
 
     // Number
     expect(await getUnderlyingChainId(getMockProvider(intChainId))).toEqual(
@@ -57,7 +58,7 @@ describe('getUnderlyingChainId', () => {
 
   it('should throw an error if provider missing from web3provider', async () => {
     try {
-      await getUnderlyingChainId({} as BrowserProvider);
+      await getUnderlyingChainId({} as NamedBrowserProvider);
     } catch (err: any) {
       expect(err.message).toEqual(
         'Parsed provider is not a valid BrowserProvider',
@@ -68,7 +69,7 @@ describe('getUnderlyingChainId', () => {
 
   it('should throw an error if provider.request missing', async () => {
     try {
-      await getUnderlyingChainId({ provider: {} } as BrowserProvider);
+      await getUnderlyingChainId({ provider: {} } as NamedBrowserProvider);
     } catch (err: any) {
       expect(err.message).toEqual(
         'Parsed provider is not a valid BrowserProvider',
@@ -83,7 +84,7 @@ describe('getUnderlyingChainId', () => {
         chainId: 'invalid',
         request: jest.fn(),
       },
-    } as unknown as BrowserProvider;
+    } as unknown as NamedBrowserProvider;
 
     expect(provider.send).not.toHaveBeenCalled();
     expect(getUnderlyingChainId(provider)).rejects.toThrow('Invalid chainId');
@@ -91,10 +92,8 @@ describe('getUnderlyingChainId', () => {
 
   it('should throw an error if invalid chain id value returned from rpc call ', async () => {
     const provider = {
-      provider: {
-        request: jest.fn().mockResolvedValue('invalid'),
-      },
-    } as unknown as BrowserProvider;
+      send: jest.fn().mockResolvedValue('invalid'),
+    } as unknown as NamedBrowserProvider;
 
     expect(getUnderlyingChainId(provider)).rejects.toThrow('Invalid chainId');
     expect(provider.send).toHaveBeenCalled();
