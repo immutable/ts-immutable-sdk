@@ -14,7 +14,7 @@ export enum ExchangeType {
 /**
  * Interface representing the result of {@link Checkout.createFiatRampUrl}.
  * @property {ExchangeType} exchangeType - The ExchangeType specified.
- * @property {BrowserProvider} browserProvider - The BrowserProvider used to exchange.
+ * @property {NamedBrowserProvider} browserProvider - The NamedBrowserProvider used to exchange.
  * @property {string | undefined} tokenAmount - The token amount specified as input.
  * @property {string | undefined} tokenAddress - The token address specified as input.
  * @property {Passport | undefined} passport - The Passport instance specified as input.

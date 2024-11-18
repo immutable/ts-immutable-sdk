@@ -1,12 +1,12 @@
-import { BrowserProvider, Contract, TransactionRequest } from 'ethers';
+import { Contract, TransactionRequest } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
-import { ItemRequirement, ItemType } from '../../types';
+import { ItemRequirement, ItemType, NamedBrowserProvider } from '../../types';
 import { Allowance, InsufficientERC20 } from './types';
 import { ERC20ABI } from '../../env';
 
 // Gets the amount an address has allowed to be spent by the spender for the ERC20.
 export const getERC20Allowance = async (
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   ownerAddress: string,
   contractAddress: string,
   spenderAddress: string,
@@ -30,7 +30,7 @@ export const getERC20Allowance = async (
 // Returns the approval transaction for the ERC20 that the owner can sign
 // to approve the spender spending the provided amount of ERC20.
 export const getERC20ApprovalTransaction = async (
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   ownerAddress: string,
   contractAddress: string,
   spenderAddress: string,
@@ -55,7 +55,7 @@ export const getERC20ApprovalTransaction = async (
 };
 
 export const hasERC20Allowances = async (
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
 ): Promise<{

@@ -150,7 +150,7 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: flow as any,
+          type: CheckoutFlowType.WALLET,
           data: {
             params: mountedWidgetParams,
             config: { ...(flowConfig?.[flow] || {}) },

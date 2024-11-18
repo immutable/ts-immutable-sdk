@@ -13,7 +13,9 @@ export { Checkout } from './sdk';
 export { IMMUTABLE_API_BASE_URL } from './env';
 
 export {
+  passportProviderInfo,
   getPassportProviderDetail,
+  metaMaskProviderInfo,
   getMetaMaskProviderDetail,
   validateProvider,
 } from './provider';

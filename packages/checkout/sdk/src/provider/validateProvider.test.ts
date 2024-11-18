@@ -1,6 +1,6 @@
 import { Environment } from '@imtbl/config';
-import { BrowserProvider, Eip1193Provider } from 'ethers';
-import { isBrowserProvider, validateProvider } from './validateProvider';
+import { Eip1193Provider } from 'ethers';
+import { isNamedBrowserProvider, validateProvider } from './validateProvider';
 import { ChainId, NamedBrowserProvider, WalletProviderName } from '../types';
 import { CheckoutConfiguration } from '../config';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
@@ -19,8 +19,8 @@ describe('provider validation', () => {
 
   describe('isBrowserProvider', () => {
     it('should return true when provider is BrowserProvider shape and request method is present', () => {
-      const browserProvider = new BrowserProvider({ request: mockRequestFunc });
-      const result = isBrowserProvider(browserProvider);
+      const browserProvider = new NamedBrowserProvider('test' as WalletProviderName, { request: mockRequestFunc });
+      const result = isNamedBrowserProvider(browserProvider);
 
       expect(result).toBeTruthy();
     });
@@ -29,8 +29,8 @@ describe('provider validation', () => {
       // pass in object which is not a BrowserProvider
       const browserProvider = {
         request: mockRequestFunc,
-      } as unknown as BrowserProvider;
-      const result = isBrowserProvider(browserProvider);
+      } as unknown as NamedBrowserProvider;
+      const result = isNamedBrowserProvider(browserProvider);
 
       expect(result).toBeFalsy();
     });
