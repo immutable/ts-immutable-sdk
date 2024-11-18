@@ -1,6 +1,7 @@
-import { TransactionRequest, TransactionResponse, BrowserProvider } from 'ethers';
+import { TransactionRequest, TransactionResponse } from 'ethers';
 import { TokenInfo } from './tokenInfo';
 import { OrderFee } from './fees';
+import { NamedBrowserProvider } from './provider';
 
 /*
  * Type representing the result of the buy
@@ -363,7 +364,7 @@ export type ERC1155SellToken = {
  */
 export interface SmartCheckoutParams {
   /** The provider to use for smart checkout. */
-  provider: BrowserProvider;
+  provider: NamedBrowserProvider;
   /** The item requirements for the transaction. */
   itemRequirements: (
     | NativeItemRequirement

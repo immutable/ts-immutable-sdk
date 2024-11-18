@@ -1,37 +1,39 @@
+import {
+  EIP6963ProviderDetail, NamedBrowserProvider, WalletProviderName, WalletProviderRdns,
+} from '@imtbl/checkout-sdk';
 import { BrowserProvider } from 'ethers';
-import { EIP6963ProviderDetail, WalletProviderName } from '@imtbl/checkout-sdk';
 
-export function isPassportProvider(provider?: BrowserProvider | null) {
-  return (provider?.provider as any)?.isPassport === true;
+export function isPassportProvider(provider?: WalletProviderName | WalletProviderRdns) {
+  return provider === WalletProviderName.PASSPORT || provider === WalletProviderRdns.PASSPORT;
 }
 
-export function isMetaMaskProvider(provider?: BrowserProvider | null) {
-  return provider?.isMetaMask === true;
+export function isMetaMaskProvider(provider?: WalletProviderName | WalletProviderRdns) {
+  return provider === WalletProviderName.METAMASK || provider === WalletProviderRdns.METAMASK;
 }
 
-export function isWalletConnectProvider(provider?: BrowserProvider | null) {
-  return (provider?.provider as any)?.isWalletConnect === true;
+export function isWalletConnectProvider(provider?: WalletProviderName | WalletProviderRdns) {
+  return provider === WalletProviderName.WALLETCONNECT || provider === WalletProviderRdns.WALLETCONNECT;
 }
 
 export const getProviderDetailByProvider = (
-  web3Provider: Web3Provider,
+  web3Provider: BrowserProvider,
   providers?: EIP6963ProviderDetail[],
 ) => providers?.find(
-  (providerDetail) => providerDetail.provider === web3Provider.provider,
+  (providerDetail) => providerDetail.provider === web3Provider.ethereumProvider,
 );
 
 export function getWalletProviderNameByProvider(
-  web3Provider: BrowserProvider | undefined,
+  browserProvider: NamedBrowserProvider | undefined,
   providers?: EIP6963ProviderDetail[],
 ) {
-  if (isMetaMaskProvider(web3Provider)) return WalletProviderName.METAMASK.toString();
-  if (isPassportProvider(web3Provider)) return WalletProviderName.PASSPORT.toString();
-  if (isWalletConnectProvider(web3Provider)) return 'walletconnect';
+  if (isMetaMaskProvider(browserProvider?.name)) return WalletProviderName.METAMASK.toString();
+  if (isPassportProvider(browserProvider?.name)) return WalletProviderName.PASSPORT.toString();
+  if (isWalletConnectProvider(browserProvider?.name)) return 'walletconnect';
 
-  if (providers && web3Provider) {
+  if (providers && browserProvider) {
     // Find the matching provider in the providerDetail
     const matchedProviderDetail = getProviderDetailByProvider(
-      web3Provider,
+      browserProvider,
       providers,
     );
     if (matchedProviderDetail) {
@@ -74,6 +76,6 @@ export function getProviderSlugFromRdns(rdns: string) {
  * Refer to the docs for more details:
  * https://docs.immutable.com/docs/zkevm/architecture/gas-sponsorship-for-gamers/
  */
-export function isGasFree(provider?: BrowserProvider | null) {
-  return isPassportProvider(provider);
+export function isGasFree(provider?: NamedBrowserProvider | null) {
+  return isPassportProvider(provider?.name);
 }

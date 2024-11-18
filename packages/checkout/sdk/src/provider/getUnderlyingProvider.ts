@@ -21,33 +21,33 @@ const parseChainId = (chainId: unknown): number => {
 
 /**
  * Get chain id from RPC method
- * @param web3Provider
+ * @param browserProvider
  * @returns chainId number
  */
-async function requestChainId(web3Provider: BrowserProvider): Promise<number> {
-  if (!web3Provider.send) {
+async function requestChainId(browserProvider: BrowserProvider): Promise<number> {
+  if (!browserProvider.send) {
     throw new CheckoutError(
       'Parsed provider is not a valid BrowserProvider',
       CheckoutErrorType.WEB3_PROVIDER_ERROR,
     );
   }
 
-  const chainId: string = await web3Provider.send(WalletAction.GET_CHAINID, []);
+  const chainId: string = await browserProvider.send(WalletAction.GET_CHAINID, []);
 
   return parseChainId(chainId);
 }
 
 /**
  * Get the underlying chain id from the provider
- * @param web3Provider
+ * @param browserProvider
  * @returns chainId number
  */
-export async function getUnderlyingChainId(web3Provider: BrowserProvider): Promise<number> {
-  const chainId = (web3Provider.provider as any)?.chainId;
+export async function getUnderlyingChainId(browserProvider: BrowserProvider): Promise<number> {
+  const chainId = (browserProvider.provider as any)?.chainId;
 
   if (chainId) {
     return parseChainId(chainId);
   }
 
-  return requestChainId(web3Provider);
+  return requestChainId(browserProvider);
 }

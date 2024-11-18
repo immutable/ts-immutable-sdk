@@ -10,7 +10,7 @@ import {
 } from '@imtbl/orderbook';
 import { mr } from '@imtbl/generated-clients';
 import { track } from '@imtbl/metrics';
-import { TransactionRequest, TransactionResponse, BrowserProvider } from 'ethers';
+import { TransactionRequest, TransactionResponse } from 'ethers';
 import * as instance from '../../instance';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
@@ -38,6 +38,7 @@ import { calculateFees } from '../fees/fees';
 import { getAllBalances, resetBlockscoutClientMap } from '../../balances';
 import { debugLogger, measureAsyncExecution } from '../../logger/debugLogger';
 import { sendTransaction } from '../../transaction';
+import { NamedBrowserProvider } from '../../types';
 
 export const getItemRequirement = (
   type: ItemType,
@@ -87,7 +88,7 @@ export const getTransactionOrGas = (
 
 export const buy = async (
   config: CheckoutConfiguration,
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   orders: Array<BuyOrder>,
   overrides: BuyOverrides = {
     waitFulfillmentSettlements: true,

@@ -49,9 +49,9 @@ export default function Provider(props: ProviderProps) {
 
   const handleSelectChange = (providerRdns: any) => {
     const selectedProvider = injectedProviders.find((providerDetail) => providerDetail.info.rdns === providerRdns);
-    const web3Provider = new BrowserProvider(selectedProvider?.provider as any);
-    setProvider(web3Provider);
-    setResult1(web3Provider);
+    const browserProvider = new BrowserProvider(selectedProvider?.provider as any);
+    setProvider(browserProvider);
+    setResult1(browserProvider);
     setLoading(false);
   }
 

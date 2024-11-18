@@ -1,5 +1,5 @@
-import { BrowserProvider } from 'ethers';
 import { CancelOverrides } from './smartCheckout';
+import { NamedBrowserProvider } from './provider';
 
 /**
  * Interface representing the parameters for {@link Checkout.cancel}
@@ -9,7 +9,7 @@ import { CancelOverrides } from './smartCheckout';
  * Currently only processes the first order in the array until batch processing is supported.
  */
 export interface CancelParams {
-  provider: BrowserProvider;
+  provider: NamedBrowserProvider;
   orderIds: string[];
   overrides?: CancelOverrides;
 }

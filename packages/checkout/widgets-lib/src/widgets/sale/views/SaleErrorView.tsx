@@ -145,7 +145,7 @@ export function SaleErrorView({
     },
     [SaleErrorTypes.WALLET_FAILED]: {
       onActionClick: () => {
-        if (isPassportProvider(provider)) {
+        if (isPassportProvider(provider?.name)) {
           retryLastTransaction();
         } else {
           closeHandover();
@@ -168,7 +168,7 @@ export function SaleErrorView({
     },
     [SaleErrorTypes.WALLET_REJECTED]: {
       onActionClick: () => {
-        if (isPassportProvider(provider)) {
+        if (isPassportProvider(provider?.name)) {
           retryLastTransaction();
         } else {
           closeHandover();
@@ -180,7 +180,7 @@ export function SaleErrorView({
     },
     [SaleErrorTypes.WALLET_POPUP_BLOCKED]: {
       onActionClick: () => {
-        if (isPassportProvider(provider)) {
+        if (isPassportProvider(provider?.name)) {
           retryLastTransaction();
         } else {
           closeHandover();

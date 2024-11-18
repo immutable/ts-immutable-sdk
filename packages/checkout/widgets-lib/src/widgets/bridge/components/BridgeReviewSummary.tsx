@@ -8,10 +8,11 @@ import {
   GasEstimateBridgeToL2Result,
   GasEstimateType,
   isAddressSanctioned,
+  NamedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
 import { useTranslation } from 'react-i18next';
-import { BrowserProvider, formatUnits, parseUnits } from 'ethers';
+import { formatUnits, parseUnits } from 'ethers';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import { abbreviateAddress } from '../../../lib/addressUtils';
 import { CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
@@ -175,7 +176,7 @@ export function BridgeReviewSummary() {
     } as GasEstimateBridgeToL2Result;
     let estimatePromise: Promise<bigint>;
     if (tokenToTransfer === NATIVE.toLowerCase()) {
-      estimatePromise = checkout.providerCall(from.web3Provider, async (provider) => await provider.estimateGas({
+      estimatePromise = checkout.providerCall(from.browserProvider, async (provider) => await provider.estimateGas({
         to: toAddress,
         // If 'from' not provided it assumes the transaction is being sent from the zero address.
         // Estimation will fail unless the amount is within the zero addresses balance.
@@ -183,12 +184,12 @@ export function BridgeReviewSummary() {
         value: parseUnits(amount, token.decimals),
       }));
     } else {
-      const erc20 = getErc20Contract(tokenToTransfer, await from.web3Provider.getSigner());
+      const erc20 = getErc20Contract(tokenToTransfer, await from.browserProvider.getSigner());
       estimatePromise = erc20.transfer.estimateGas(toAddress, parseUnits(amount, token.decimals));
     }
     try {
       const [estimate, gasPrice] = await Promise.all([
-        estimatePromise, (await from.web3Provider.getFeeData()).gasPrice,
+        estimatePromise, (await from.browserProvider.getFeeData()).gasPrice,
       ]);
       const gas = estimate * (gasPrice ?? 0n);
       const formattedEstimate = formatUnits(gas, DEFAULT_TOKEN_DECIMALS);
@@ -304,45 +305,45 @@ export function BridgeReviewSummary() {
     })();
   }, []);
 
-  const handleNetworkSwitch = useCallback((provider: BrowserProvider) => {
+  const handleNetworkSwitch = useCallback((provider: NamedBrowserProvider) => {
     bridgeDispatch({
       payload: {
         type: BridgeActions.SET_WALLETS_AND_NETWORKS,
         from: {
-          web3Provider: provider,
+          browserProvider: provider,
           walletAddress: from?.walletAddress!,
           walletProviderInfo: from?.walletProviderInfo!,
           network: from?.network!,
         },
         to: {
-          web3Provider: to?.web3Provider!,
+          browserProvider: to?.browserProvider!,
           walletAddress: to?.walletAddress!,
           walletProviderInfo: to?.walletProviderInfo!,
           network: to?.network!,
         },
       },
     });
-  }, [from?.web3Provider, from?.network, to?.web3Provider, to?.network]);
+  }, [from?.browserProvider, from?.network, to?.browserProvider, to?.network]);
 
   useEffect(() => {
-    if (!from?.web3Provider) return;
+    if (!from?.browserProvider) return;
 
     const handleChainChanged = () => {
-      handleNetworkSwitch(from?.web3Provider);
+      handleNetworkSwitch(from?.browserProvider);
       setShowSwitchNetworkDrawer(false);
     };
-    addChainChangedListener(from?.web3Provider, handleChainChanged);
+    addChainChangedListener(from?.browserProvider, handleChainChanged);
 
     // eslint-disable-next-line consistent-return
     return () => {
-      removeChainChangedListener(from?.web3Provider, handleChainChanged);
+      removeChainChangedListener(from?.browserProvider, handleChainChanged);
     };
-  }, [from?.web3Provider]);
+  }, [from?.browserProvider]);
 
   useEffect(() => {
     if (isWalletConnectEnabled) {
-      const isFromProviderWalletConnect = isWalletConnectProvider(from?.web3Provider);
-      const isToProviderWalletConnect = isWalletConnectProvider(to?.web3Provider);
+      const isFromProviderWalletConnect = isWalletConnectProvider(from?.browserProvider.name);
+      const isToProviderWalletConnect = isWalletConnectProvider(to?.browserProvider.name);
       setFromWalletIsWalletConnect(isFromProviderWalletConnect);
       setToWalletIsWalletConnect(isToProviderWalletConnect);
       (async () => {
@@ -354,7 +355,7 @@ export function BridgeReviewSummary() {
         }
       })();
     }
-  }, [isWalletConnectEnabled, from?.web3Provider, to?.web3Provider]);
+  }, [isWalletConnectEnabled, from?.browserProvider, to?.browserProvider]);
 
   useEffect(() => {
     if (insufficientFundsForGas) {
@@ -384,7 +385,8 @@ export function BridgeReviewSummary() {
     }
 
     try {
-      const currentChainId = await (from?.web3Provider.provider as any).request({ method: 'eth_chainId', params: [] });
+      // eslint-disable-next-line max-len
+      const currentChainId = await (from?.browserProvider.provider as any).request({ method: 'eth_chainId', params: [] });
       // eslint-disable-next-line radix
       const parsedChainId = parseInt(currentChainId.toString());
       if (parsedChainId !== from?.network) {
@@ -408,8 +410,8 @@ export function BridgeReviewSummary() {
           address: fromAddress,
           rdns: from?.walletProviderInfo?.rdns,
           uuid: from?.walletProviderInfo?.uuid,
-          isPassportWallet: isPassportProvider(from?.web3Provider),
-          isMetaMask: isMetaMaskProvider(from?.web3Provider),
+          isPassportWallet: isPassportProvider(from?.browserProvider.name),
+          isMetaMask: isMetaMaskProvider(from?.browserProvider.name),
         },
         toWalletAddress: toAddress,
         toNetwork,
@@ -417,8 +419,8 @@ export function BridgeReviewSummary() {
           address: toAddress,
           rdns: to?.walletProviderInfo?.rdns,
           uuid: to?.walletProviderInfo?.uuid,
-          isPassportWallet: isPassportProvider(to?.web3Provider),
-          isMetaMask: isMetaMaskProvider(to?.web3Provider),
+          isPassportWallet: isPassportProvider(to?.browserProvider.name),
+          isMetaMask: isMetaMaskProvider(to?.browserProvider.name),
         },
         amount,
         fiatAmount: fromFiatAmount,
@@ -441,10 +443,10 @@ export function BridgeReviewSummary() {
     viewDispatch,
     approveTransaction,
     transaction,
-    from?.web3Provider,
+    from?.browserProvider,
     from?.network,
     from?.walletProviderInfo,
-    to?.web3Provider,
+    to?.browserProvider,
     to?.network,
     to?.walletProviderInfo,
   ]);
@@ -624,7 +626,7 @@ export function BridgeReviewSummary() {
       <NetworkSwitchDrawer
         visible={showSwitchNetworkDrawer}
         targetChainId={from?.network!}
-        provider={from?.web3Provider!}
+        provider={from?.browserProvider!}
         checkout={checkout}
         onCloseDrawer={() => setShowSwitchNetworkDrawer(false)}
         onNetworkSwitch={handleNetworkSwitch}

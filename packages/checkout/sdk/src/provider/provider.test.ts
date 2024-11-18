@@ -54,7 +54,7 @@ describe('createProvider', () => {
     const result = await createProvider(WalletProviderName.PASSPORT, mockPassport);
 
     expect(result.provider).toBeInstanceOf(BrowserProvider);
-    expect(result.walletProviderName).toBe(WalletProviderName.PASSPORT);
+    expect(result.name).toBe(WalletProviderName.PASSPORT);
     expect(mockPassport.connectEvm).toHaveBeenCalled();
   });
 
@@ -63,7 +63,7 @@ describe('createProvider', () => {
     const result = await createProvider(WalletProviderName.PASSPORT);
 
     expect(result.provider).toBeInstanceOf(BrowserProvider);
-    expect(result.walletProviderName).toBe(WalletProviderName.PASSPORT);
+    expect(result.name).toBe(WalletProviderName.PASSPORT);
   });
 
   it('should create a provider for Metamask when Metamask is injected via EIP-6963', async () => {
@@ -71,7 +71,7 @@ describe('createProvider', () => {
     const result = await createProvider(WalletProviderName.METAMASK);
 
     expect(result.provider).toBeInstanceOf(BrowserProvider);
-    expect(result.walletProviderName).toBe(WalletProviderName.METAMASK);
+    expect(result.name).toBe(WalletProviderName.METAMASK);
   });
 
   it('should throw an error if connect is called with a preference that is not expected', async () => {

@@ -11,9 +11,8 @@ import {
   useCallback, useMemo, useEffect,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChainId, Checkout } from '@imtbl/checkout-sdk';
+import { ChainId, Checkout, NamedBrowserProvider } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
-import { BrowserProvider } from 'ethers';
 import { FooterLogo } from '../Footer/FooterLogo';
 import { getL1ChainId } from '../../lib';
 import { getChainNameById } from '../../lib/chains';
@@ -26,10 +25,10 @@ import { getRemoteImage } from '../../lib/utils';
 export interface NetworkSwitchDrawerProps {
   visible: boolean;
   targetChainId: ChainId;
-  provider: BrowserProvider;
+  provider: NamedBrowserProvider;
   checkout: Checkout;
   onCloseDrawer: () => void;
-  onNetworkSwitch?: (provider: BrowserProvider) => void;
+  onNetworkSwitch?: (provider: NamedBrowserProvider) => void;
 }
 export function NetworkSwitchDrawer({
   visible,
@@ -65,7 +64,7 @@ export function NetworkSwitchDrawer({
     }
   }, [checkout, provider, onNetworkSwitch, targetChainId]);
 
-  const isWalletConnect = isWalletConnectProvider(provider);
+  const isWalletConnect = isWalletConnectProvider(provider.name);
 
   const walletConnectPeerName = useMemo(() => {
     if (!isWalletConnect) return '';
@@ -78,7 +77,7 @@ export function NetworkSwitchDrawer({
   );
 
   const walletDisplayName = useMemo(() => {
-    if (isMetaMaskProvider(provider)) return 'MetaMask wallet';
+    if (isMetaMaskProvider(provider.name)) return 'MetaMask wallet';
     if (isWalletConnect && walletConnectPeerName) return walletConnectPeerName;
     return 'wallet';
   }, [provider, isWalletConnect, walletConnectPeerName]);
