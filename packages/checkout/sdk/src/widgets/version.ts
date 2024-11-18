@@ -73,8 +73,9 @@ export async function getLatestVersionFromNpm() {
 
     const data = await response.json();
 
-    const latestVersion = data['dist-tags']?.latest;
-    if (typeof latestVersion === 'string' && latestVersion.trim() !== '') {
+    const latestVersion = data.version;
+
+    if (typeof data.version === 'string' && latestVersion.trim() !== '') {
       return latestVersion;
     }
     return fallbackVersion;
