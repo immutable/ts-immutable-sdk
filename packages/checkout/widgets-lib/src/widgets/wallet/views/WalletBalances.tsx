@@ -59,7 +59,7 @@ export function WalletBalances({
     tokenBalances,
   } = walletState;
   const { conversions } = cryptoFiatState;
-  const isPassport = isPassportProvider(provider);
+  const isPassport = isPassportProvider(provider?.name);
   const enableNetworkMenu = !isPassport && showNetworkMenu;
 
   const { track, page } = useAnalytics();

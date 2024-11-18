@@ -1,16 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import detectEthereumProvider from '@metamask/detect-provider';
 import { Passport } from '@imtbl/passport';
-import { BrowserProvider, Eip1193Provider } from 'ethers';
+import { Eip1193Provider } from 'ethers';
 import {
-  CreateProviderResult, EIP6963ProviderDetail,
+  EIP6963ProviderDetail,
+  NamedBrowserProvider,
   WalletProviderName,
 } from '../types';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { InjectedProvidersManager } from './injectedProvidersManager';
 import { metaMaskProviderInfo, passportProviderInfo } from './providerDetail';
 
-async function getMetaMaskProvider(): Promise<BrowserProvider> {
+async function getMetaMaskProvider(): Promise<NamedBrowserProvider> {
   const provider = await withCheckoutError<Eip1193Provider | null>(
     async () => await detectEthereumProvider(),
     { type: CheckoutErrorType.METAMASK_PROVIDER_ERROR },
@@ -23,21 +24,24 @@ async function getMetaMaskProvider(): Promise<BrowserProvider> {
     );
   }
 
-  return new BrowserProvider(provider);
+  return new NamedBrowserProvider(WalletProviderName.METAMASK, provider);
 }
 
 export async function createProvider(
   walletProviderName: WalletProviderName,
   passport?: Passport,
-): Promise<CreateProviderResult> {
-  let web3Provider: BrowserProvider | null = null;
+): Promise<NamedBrowserProvider> {
+  let browserProvider: NamedBrowserProvider | null = null;
   let providerDetail: EIP6963ProviderDetail | undefined;
   switch (walletProviderName) {
     case WalletProviderName.PASSPORT: {
       providerDetail = InjectedProvidersManager.getInstance().findProvider({ rdns: passportProviderInfo.rdns });
       if (!providerDetail) {
         if (passport) {
-          web3Provider = new BrowserProvider(await passport.connectEvm({ announceProvider: false }));
+          browserProvider = new NamedBrowserProvider(
+            WalletProviderName.PASSPORT,
+            await passport.connectEvm({ announceProvider: false }),
+          );
         } else {
           // eslint-disable-next-line no-console
           console.error(
@@ -54,7 +58,7 @@ export async function createProvider(
     case WalletProviderName.METAMASK: {
       providerDetail = InjectedProvidersManager.getInstance().findProvider({ rdns: metaMaskProviderInfo.rdns });
       if (!providerDetail) {
-        web3Provider = await getMetaMaskProvider();
+        browserProvider = await getMetaMaskProvider();
       }
       break;
     }
@@ -72,11 +76,21 @@ export async function createProvider(
       }
   }
 
-  if (!web3Provider && providerDetail) {
-    web3Provider = new BrowserProvider(providerDetail.provider);
+  if (!browserProvider && providerDetail) {
+    browserProvider = new NamedBrowserProvider(
+      providerDetail.info.name as WalletProviderName,
+      providerDetail.provider,
+    );
   }
-  return {
-    provider: web3Provider as BrowserProvider,
-    walletProviderName,
-  };
+
+  if (!browserProvider) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to create provider');
+    throw new CheckoutError(
+      'Failed to create provider',
+      CheckoutErrorType.DEFAULT_PROVIDER_ERROR,
+    );
+  }
+
+  return browserProvider;
 }

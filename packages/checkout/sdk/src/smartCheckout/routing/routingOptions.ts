@@ -1,9 +1,10 @@
-import { BrowserProvider } from 'ethers';
 import { CheckoutConfiguration } from '../../config';
 import { isOnRampAvailable, isSwapAvailable } from './geoBlocking';
-import { AvailableRoutingOptions } from '../../types';
+import { AvailableRoutingOptions, NamedBrowserProvider, WalletProviderName } from '../../types';
 
-const isPassportProvider = (provider: BrowserProvider) => (provider.provider as any)?.isPassport === true;
+export function isPassportProvider(providerName?: WalletProviderName) {
+  return providerName === WalletProviderName.PASSPORT;
+}
 
 type GeoBlockingCheck = {
   id: 'onRamp' | 'swap';
@@ -15,7 +16,7 @@ type GeoBlockingCheck = {
  */
 export const getAvailableRoutingOptions = async (
   config: CheckoutConfiguration,
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
 ) : Promise<AvailableRoutingOptions> => {
   const availableRoutingOptions = {
     onRamp: config.isOnRampEnabled,
@@ -45,7 +46,7 @@ export const getAvailableRoutingOptions = async (
   }
 
   // Bridge not available if passport provider
-  availableRoutingOptions.bridge = availableRoutingOptions.bridge && !isPassportProvider(provider);
+  availableRoutingOptions.bridge = availableRoutingOptions.bridge && !isPassportProvider(provider.name);
 
   return availableRoutingOptions;
 };

@@ -1,9 +1,9 @@
-import { BrowserProvider } from 'ethers';
 import {
   ChainId,
   Checkout,
   GetBalanceResult,
   GetTokenAllowListResult,
+  NamedBrowserProvider,
   TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
@@ -13,7 +13,7 @@ import { getTokenImageByAddress, isNativeToken } from './utils';
 
 export type GetAllowedBalancesParamsType = {
   checkout: Checkout,
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   allowTokenListType: TokenFilterTypes,
   allowZero?: boolean,
   retryPolicy?: RetryType,

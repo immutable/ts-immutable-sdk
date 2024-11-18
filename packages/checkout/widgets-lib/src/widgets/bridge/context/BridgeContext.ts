@@ -1,4 +1,3 @@
-import { BrowserProvider } from 'ethers';
 import { TokenBridge } from '@imtbl/bridge-sdk';
 import {
   WalletProviderName,
@@ -8,11 +7,12 @@ import {
   ChainId,
   EIP6963ProviderInfo,
   AssessmentResult,
+  NamedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
 
 export type WalletAndNetworkDetails = {
-  web3Provider: BrowserProvider;
+  browserProvider: NamedBrowserProvider;
   walletProviderInfo: EIP6963ProviderInfo | undefined;
   walletAddress: string;
   network: ChainId;
@@ -20,7 +20,7 @@ export type WalletAndNetworkDetails = {
 
 export interface BridgeState {
   checkout: Checkout;
-  web3Provider: BrowserProvider | null;
+  browserProvider: NamedBrowserProvider | null;
   walletProviderName: WalletProviderName | null;
   from: WalletAndNetworkDetails | null;
   to: WalletAndNetworkDetails | null;
@@ -33,7 +33,7 @@ export interface BridgeState {
 }
 
 export const initialBridgeState: Omit<BridgeState, 'checkout'> = {
-  web3Provider: null,
+  browserProvider: null,
   walletProviderName: null,
   from: null,
   to: null,
@@ -82,7 +82,7 @@ export interface SetWalletProviderNamePayload {
 
 export interface SetProviderPayload {
   type: BridgeActions.SET_PROVIDER;
-  web3Provider: BrowserProvider | null;
+  browserProvider: NamedBrowserProvider | null;
 }
 
 export interface SetTokenBridgePayload {
@@ -146,7 +146,7 @@ export const bridgeReducer: Reducer<BridgeState, BridgeAction> = (
     case BridgeActions.SET_PROVIDER:
       return {
         ...state,
-        web3Provider: action.payload.web3Provider,
+        browserProvider: action.payload.browserProvider,
       };
     case BridgeActions.SET_TOKEN_BRIDGE:
       return {

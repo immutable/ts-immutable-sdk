@@ -1,4 +1,4 @@
-import { BrowserProvider, Contract, parseUnits } from 'ethers';
+import { Contract, parseUnits } from 'ethers';
 import {
   CreateListingParams,
   ERC20Item,
@@ -22,6 +22,8 @@ import {
   CheckoutStatus,
   SmartCheckoutResult,
   SmartCheckoutSufficient,
+  NamedBrowserProvider,
+  WalletProviderName,
 } from '../../types';
 import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
@@ -84,7 +86,7 @@ export const getBuyToken = (
 
 export const sell = async (
   config: CheckoutConfiguration,
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   orders: Array<SellOrder>,
 ): Promise<SellResult> => {
   let orderbook: Orderbook;
@@ -186,7 +188,7 @@ export const sell = async (
   }
 
   let smartCheckoutResult;
-  const isPassport = (provider.provider as any)?.isPassport;
+  const isPassport = provider.name === WalletProviderName.PASSPORT;
   if (!isPassport) {
     smartCheckoutResult = await measureAsyncExecution<SmartCheckoutResult>(
       config,

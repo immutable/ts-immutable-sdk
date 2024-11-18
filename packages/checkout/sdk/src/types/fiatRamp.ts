@@ -1,6 +1,6 @@
 // import { Passport } from '@imtbl/passport';
 
-import { BrowserProvider } from 'ethers';
+import { NamedBrowserProvider } from './provider';
 
 /**
  * An enum representing the type of exchange.
@@ -14,14 +14,14 @@ export enum ExchangeType {
 /**
  * Interface representing the result of {@link Checkout.createFiatRampUrl}.
  * @property {ExchangeType} exchangeType - The ExchangeType specified.
- * @property {BrowserProvider} web3Provider - The BrowserProvider used to exchange.
+ * @property {BrowserProvider} browserProvider - The BrowserProvider used to exchange.
  * @property {string | undefined} tokenAmount - The token amount specified as input.
  * @property {string | undefined} tokenAddress - The token address specified as input.
  * @property {Passport | undefined} passport - The Passport instance specified as input.
  */
 export interface FiatRampParams {
   exchangeType: ExchangeType;
-  web3Provider: BrowserProvider;
+  browserProvider: NamedBrowserProvider;
   tokenAmount?: string;
   tokenAddress?: string;
   passport?: any;
