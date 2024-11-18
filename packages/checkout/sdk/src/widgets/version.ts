@@ -55,6 +55,35 @@ export function validateAndBuildVersion(
 }
 
 /**
+ * Fetches the latest version of the package from the NPM registry.
+ * Loads a specific latest version instead of relying on the latest tag helps with caching issues.
+ * Falls back to 'latest' if an error occurs or if the response is invalid.
+ * @returns {Promise<string>} A promise resolving to the latest version string or 'latest'.
+ */
+export async function getLatestVersionFromNpm() {
+  const npmRegistryUrl = 'https://registry.npmjs.org/@imtbl/sdk';
+  const fallbackVersion = 'latest';
+
+  try {
+    const response = await fetch(npmRegistryUrl);
+
+    if (!response.ok) {
+      return fallbackVersion;
+    }
+
+    const data = await response.json();
+
+    const latestVersion = data['dist-tags']?.latest;
+    if (typeof latestVersion === 'string' && latestVersion.trim() !== '') {
+      return latestVersion;
+    }
+    return fallbackVersion;
+  } catch (error) {
+    return fallbackVersion;
+  }
+}
+
+/**
  * Returns the latest compatible version based on the provided checkout version config.
  * If no compatible version markers are provided, it returns 'latest'.
  */
@@ -76,12 +105,12 @@ function latestCompatibleVersion(
  * If the build version is an alpha, it uses that version.
  * Defaults to 'latest' if no compatible version markers are found.
  */
-export function determineWidgetsVersion(
+export async function determineWidgetsVersion(
   validatedBuildVersion: string,
   initVersionProvided: boolean,
   versionConfig?: CheckoutWidgetsVersionConfig,
 ) {
-  // If version is provided in widget init parms, use that
+  // If version is provided in widget init params, use that
   if (initVersionProvided) {
     return validatedBuildVersion;
   }
@@ -96,5 +125,16 @@ export function determineWidgetsVersion(
     return validatedBuildVersion;
   }
 
-  return latestCompatibleVersion(validatedBuildVersion, versionConfig.compatibleVersionMarkers);
+  const compatibleVersion = latestCompatibleVersion(
+    validatedBuildVersion,
+    versionConfig.compatibleVersionMarkers,
+  );
+
+  // If `latest` is returned, query NPM registry for the actual latest version
+  if (compatibleVersion === 'latest') {
+    const latestVersion = await getLatestVersionFromNpm();
+    return latestVersion;
+  }
+
+  return compatibleVersion;
 }
