@@ -2,6 +2,7 @@ import {
   Checkout,
   IWidgetsFactory,
   IWidgetsFactoryCreate,
+  NamedBrowserProvider,
   Widget,
   WidgetConfiguration,
   WidgetConfigurations,
@@ -9,7 +10,6 @@ import {
   WidgetType,
 } from '@imtbl/checkout-sdk';
 import './i18n';
-import { BrowserProvider } from 'ethers';
 import { Connect } from './widgets/connect/ConnectWidgetRoot';
 import { Swap } from './widgets/swap/SwapWidgetRoot';
 import { OnRamp } from './widgets/on-ramp/OnRampWidgetRoot';
@@ -50,7 +50,7 @@ export class WidgetsFactory implements IWidgetsFactory {
     }
   }
 
-  updateProvider(provider: BrowserProvider) {
+  updateProvider(provider: NamedBrowserProvider) {
     addProviderListenersForWidgetRoot(provider);
     sendProviderUpdatedEvent({ provider });
   }

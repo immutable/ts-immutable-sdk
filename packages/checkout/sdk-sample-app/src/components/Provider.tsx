@@ -1,27 +1,27 @@
 import {
   Checkout,
+  NamedBrowserProvider,
   WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { useEffect, useMemo, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
 import { Box, Select, Stack } from '@biom3/react';
 import { passport } from '../passport';
-import { BrowserProvider } from 'ethers';
 
 // Connect Passport EVM
 await passport.connectEvm();
 
 interface ProviderProps {
   checkout: Checkout;
-  provider: BrowserProvider | undefined;
-  setProvider: (provider: BrowserProvider) => void;
+  provider: NamedBrowserProvider | undefined;
+  setProvider: (provider: NamedBrowserProvider) => void;
 }
 
 export default function Provider(props: ProviderProps) {
   const { setProvider, checkout, provider } = props;
   const injectedProviders = useMemo(() => checkout && checkout.getInjectedProviders(), [checkout])
 
-  const [result1, setResult1] = useState<BrowserProvider>();
+  const [result1, setResult1] = useState<NamedBrowserProvider>();
 
   const [error1, setError1] = useState<any>(null);
 
@@ -49,7 +49,7 @@ export default function Provider(props: ProviderProps) {
 
   const handleSelectChange = (providerRdns: any) => {
     const selectedProvider = injectedProviders.find((providerDetail) => providerDetail.info.rdns === providerRdns);
-    const browserProvider = new BrowserProvider(selectedProvider?.provider as any);
+    const browserProvider = new NamedBrowserProvider(selectedProvider?.info.name as WalletProviderName, selectedProvider?.provider as any);
     setProvider(browserProvider);
     setResult1(browserProvider);
     setLoading(false);

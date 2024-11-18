@@ -1,15 +1,14 @@
-import { Checkout, ChainId, NetworkInfo } from '@imtbl/checkout-sdk';
+import { Checkout, ChainId, NetworkInfo, NamedBrowserProvider } from '@imtbl/checkout-sdk';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
 import LoadingButton from './LoadingButton';
 import { useCallback, useEffect, useState } from 'react';
 import { Box } from '@biom3/react';
 import { NetworkFilterTypes } from '@imtbl/checkout-sdk';
-import { BrowserProvider } from 'ethers';
 
 export interface SwitchNetworkProps {
   checkout: Checkout | undefined;
-  provider: BrowserProvider | undefined;
-  setProvider: (provider: BrowserProvider) => void;
+  provider: NamedBrowserProvider | undefined;
+  setProvider: (provider: NamedBrowserProvider) => void;
 }
 
 export default function SwitchNetwork(props: SwitchNetworkProps) {

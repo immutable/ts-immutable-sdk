@@ -1,6 +1,7 @@
 import {
   ChainId,
   Checkout,
+  NamedBrowserProvider,
   NetworkFilterTypes,
   TokenFilterTypes,
   WalletFilterTypes,
@@ -12,11 +13,10 @@ import { Box } from '@biom3/react';
 import { NetworkInfo } from '@imtbl/checkout-sdk';
 import { WalletInfo } from '@imtbl/checkout-sdk';
 import { TokenInfo } from '@imtbl/checkout-sdk';
-import { BrowserProvider } from 'ethers';
 
 export interface AllowListProps {
   checkout: Checkout | undefined;
-  provider: BrowserProvider | undefined;
+  provider: NamedBrowserProvider | undefined;
 }
 
 export default function GetAllowList(props: AllowListProps) {

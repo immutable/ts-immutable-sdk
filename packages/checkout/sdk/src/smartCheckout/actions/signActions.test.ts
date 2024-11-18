@@ -225,7 +225,7 @@ describe('signActions', () => {
     it('should sign the signable message', async () => {
       mockProvider = {
         getSigner: jest.fn().mockReturnValue({
-          _signTypedData: jest.fn().mockResolvedValue('0xSIGNATURE'),
+          signTypedData: jest.fn().mockResolvedValue('0xSIGNATURE'),
         }),
       } as unknown as NamedBrowserProvider;
 
@@ -259,7 +259,7 @@ describe('signActions', () => {
     it('should throw error when sign message errors', async () => {
       mockProvider = {
         getSigner: jest.fn().mockReturnValue({
-          _signTypedData: jest.fn().mockRejectedValue(new Error('sign message error')),
+          signTypedData: jest.fn().mockRejectedValue(new Error('sign message error')),
         }),
       } as unknown as NamedBrowserProvider;
 

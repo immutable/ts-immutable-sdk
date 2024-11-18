@@ -247,7 +247,6 @@ export function FundingRouteExecute({
         connectLoaderDispatch({
           payload: {
             type: ConnectLoaderActions.SET_PROVIDER,
-            // @ts-expect-error TODO
             provider: eventData.provider,
           },
         });

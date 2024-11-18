@@ -1,4 +1,3 @@
-import { BrowserProvider } from 'ethers';
 import { ChainId } from './chains';
 import { NetworkInfo } from './networkInfo';
 import { TokenInfo } from './tokenInfo';
@@ -6,11 +5,11 @@ import { NamedBrowserProvider } from './provider';
 
 /**
  * Interface representing the parameters for {@link Checkout.addNetwork}.
- * @property {BrowserProvider} provider - The provider to connect to the network.
+ * @property {NamedBrowserProvider} provider - The provider to connect to the network.
  * @property {ChainId} chainId - The ID of the network to add. We only support adding Immutable zkEVM and Immutable zkEVM Testnet.
  */
 export interface AddNetworkParams {
-  provider: BrowserProvider;
+  provider: NamedBrowserProvider;
   chainId: ChainId;
 }
 

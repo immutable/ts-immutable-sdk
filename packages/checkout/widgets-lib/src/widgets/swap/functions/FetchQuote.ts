@@ -1,12 +1,12 @@
 import {
   Exchange, TransactionResponse,
 } from '@imtbl/dex-sdk';
-import { BrowserProvider, parseUnits } from 'ethers';
-import { TokenInfo } from '@imtbl/checkout-sdk';
+import { parseUnits } from 'ethers';
+import { NamedBrowserProvider, TokenInfo } from '@imtbl/checkout-sdk';
 
 const fromAmountIn = async (
   exchange: Exchange,
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   fromToken: TokenInfo,
   fromAmount: string,
   toToken: TokenInfo,
@@ -22,7 +22,7 @@ const fromAmountIn = async (
 
 const fromAmountOut = async (
   exchange: Exchange,
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   toToken: TokenInfo,
   toAmount: string,
   fromToken: TokenInfo,

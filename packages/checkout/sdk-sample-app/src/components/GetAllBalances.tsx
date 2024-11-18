@@ -1,13 +1,12 @@
-import { ChainId, Checkout, GetBalanceResult } from '@imtbl/checkout-sdk';
+import { ChainId, Checkout, GetBalanceResult, NamedBrowserProvider } from '@imtbl/checkout-sdk';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
 import { Box } from '@biom3/react';
-import { BrowserProvider } from 'ethers';
 
 interface BalanceProps {
   checkout: Checkout | undefined;
-  provider: BrowserProvider | undefined;
+  provider: NamedBrowserProvider | undefined;
 }
 
 export default function GetAllBalances(props: BalanceProps) {

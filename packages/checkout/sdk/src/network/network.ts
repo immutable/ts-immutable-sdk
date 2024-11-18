@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BrowserProvider } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import {
   ChainId,
@@ -20,14 +20,14 @@ import { getUnderlyingChainId } from '../provider/getUnderlyingProvider';
 const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
 
 // these functions should not be exported. These functions should be used as part of an exported function e.g switchWalletNetwork() above.
-// make sure to check if(provider.provider?.request) in the exported function and throw an error
+// make sure to check if(provider.send) in the exported function and throw an error
 // eslint-disable-next-line consistent-return
 async function switchNetworkInWallet(
   networkMap: NetworkMap,
-  browserProvider: BrowserProvider,
+  browserProvider: NamedBrowserProvider,
   chainId: ChainId,
 ) {
-  return await browserProvider.provider.send(WalletAction.SWITCH_NETWORK, [
+  return await browserProvider.send(WalletAction.SWITCH_NETWORK, [
     { chainId: networkMap.get(chainId)?.chainIdHex },
   ]);
 }
@@ -35,7 +35,7 @@ async function switchNetworkInWallet(
 // eslint-disable-next-line consistent-return
 export async function addNetworkToWallet(
   networkMap: NetworkMap,
-  browserProvider: BrowserProvider,
+  browserProvider: NamedBrowserProvider,
   chainId: ChainId,
 ) {
   if (browserProvider.send) {
@@ -95,13 +95,13 @@ export async function getNetworkAllowList(
 
 export async function getNetworkInfo(
   config: CheckoutConfiguration,
-  browserProvider: BrowserProvider,
+  provider: JsonRpcProvider | NamedBrowserProvider,
 ): Promise<NetworkInfo> {
   const { networkMap } = config;
   return withCheckoutError(
     async () => {
       try {
-        const network = await browserProvider.getNetwork();
+        const network = await provider.getNetwork();
         if (
           Array.from(networkMap.keys()).includes(network.chainId as unknown as ChainId)
         ) {
@@ -119,7 +119,7 @@ export async function getNetworkInfo(
           isSupported: false,
         } as NetworkInfo;
       } catch (err) {
-        const chainId = await getUnderlyingChainId(browserProvider);
+        const chainId = await getUnderlyingChainId(provider);
         const isSupported = Array.from(networkMap.keys()).includes(
           chainId as ChainId,
         );
@@ -137,7 +137,7 @@ export async function getNetworkInfo(
 
 export async function switchWalletNetwork(
   config: CheckoutConfiguration,
-  browserProvider: NamedBrowserProvider,
+  provider: JsonRpcProvider | NamedBrowserProvider,
   chainId: ChainId,
 ): Promise<SwitchNetworkResult> {
   const { networkMap } = config;
@@ -155,7 +155,7 @@ export async function switchWalletNetwork(
     );
   }
 
-  if (browserProvider.name === WalletProviderName.PASSPORT) {
+  if ('name' in provider && provider.name === WalletProviderName.PASSPORT) {
     throw new CheckoutError(
       'Switching networks with Passport provider is not supported',
       CheckoutErrorType.SWITCH_NETWORK_UNSUPPORTED,
@@ -164,13 +164,27 @@ export async function switchWalletNetwork(
 
   // WT-1146 - Refer to the README in this folder for explanation on the switch network flow
   try {
-    await switchNetworkInWallet(networkMap, browserProvider, chainId);
+    if ('name' in provider) {
+      await switchNetworkInWallet(networkMap, provider, chainId);
+    } else {
+      throw new CheckoutError(
+        'Incorrect provider type',
+        CheckoutErrorType.PROVIDER_ERROR,
+      );
+    }
   } catch (err: any) {
     // eslint-disable-next-line no-console
     console.error(err);
     if (err.code === UNRECOGNISED_CHAIN_ERROR_CODE) {
       try {
-        await addNetworkToWallet(networkMap, browserProvider, chainId);
+        if ('name' in provider) {
+          await addNetworkToWallet(networkMap, provider, chainId);
+        } else {
+          throw new CheckoutError(
+            'Incorrect provider type',
+            CheckoutErrorType.PROVIDER_ERROR,
+          );
+        }
         // eslint-disable-next-line @typescript-eslint/no-shadow
       } catch (err: any) {
         throw new CheckoutError(
@@ -187,7 +201,7 @@ export async function switchWalletNetwork(
     }
   }
 
-  const newProviderNetwork = await browserProvider.getNetwork();
+  const newProviderNetwork = await provider.getNetwork();
   if (newProviderNetwork.chainId !== chainId as unknown as bigint) {
     throw new CheckoutError(
       'User cancelled switch network request',
@@ -195,10 +209,10 @@ export async function switchWalletNetwork(
     );
   }
 
-  const networkInfo: NetworkInfo = await getNetworkInfo(config, browserProvider);
+  const networkInfo: NetworkInfo = await getNetworkInfo(config, provider);
 
   return {
     network: networkInfo,
-    provider: browserProvider,
+    provider,
   } as SwitchNetworkResult;
 }

@@ -1,7 +1,6 @@
 import {
   Checkout, CheckoutErrorType, NamedBrowserProvider, WalletProviderName,
 } from '@imtbl/checkout-sdk';
-import { BrowserProvider } from 'ethers';
 
 export async function connectToProvider(
   checkout: Checkout,
@@ -45,7 +44,7 @@ export async function createAndConnectToProvider(
   checkout: Checkout,
   walletProviderName: WalletProviderName,
   changeAccount?: boolean,
-): Promise<BrowserProvider> {
+): Promise<NamedBrowserProvider> {
   let provider: NamedBrowserProvider;
   try {
     const createResult = await checkout.createProvider({ walletProviderName });

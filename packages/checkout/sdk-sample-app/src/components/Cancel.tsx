@@ -2,12 +2,11 @@ import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
 import { Box, Checkbox, FormControl, TextInput } from '@biom3/react';
-import { BrowserProvider } from 'ethers';
-import { Checkout } from '@imtbl/checkout-sdk';
+import { Checkout, NamedBrowserProvider } from '@imtbl/checkout-sdk';
 
 interface CancelProps {
   checkout: Checkout;
-  provider: BrowserProvider | undefined;
+  provider: NamedBrowserProvider | undefined;
 }
 
 export default function Cancel({ checkout, provider }: CancelProps) {
