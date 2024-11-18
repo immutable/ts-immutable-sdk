@@ -2,6 +2,7 @@ import {
   BridgeWidgetParams,
   Checkout,
   IMTBLWidgetEvents,
+  NamedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback,
@@ -19,7 +20,7 @@ import {
 } from '@imtbl/bridge-sdk';
 import { useTranslation } from 'react-i18next';
 import { ImmutableConfiguration } from '@imtbl/config';
-import { BrowserProvider, JsonRpcProvider } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { StatusView } from '../../components/Status/StatusView';
@@ -67,12 +68,12 @@ import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailabl
 export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
   checkout: Checkout;
-  web3Provider?: BrowserProvider;
+  browserProvider?: NamedBrowserProvider;
 };
 
 export default function BridgeWidget({
   checkout,
-  web3Provider,
+  browserProvider,
   config,
   amount,
   tokenAddress,
@@ -105,7 +106,7 @@ export default function BridgeWidget({
     {
       ...initialBridgeState,
       checkout,
-      web3Provider: web3Provider ?? null,
+      browserProvider: browserProvider ?? null,
       tokenBridge: (() => {
         let bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_TESTNET;
         if (checkout.config.isDevelopment) bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_DEVNET;
@@ -192,11 +193,11 @@ export default function BridgeWidget({
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_PROVIDER,
-          web3Provider: web3Provider ?? null,
+          browserProvider: browserProvider ?? null,
         },
       });
     })();
-  }, [web3Provider]);
+  }, [browserProvider]);
 
   return (
     <ViewContext.Provider value={viewReducerValues}>
@@ -280,7 +281,7 @@ export default function BridgeWidget({
               analytics={{ userJourney: UserJourney.BRIDGE }}
               widgetEvent={IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT}
               checkout={checkout}
-              provider={web3Provider}
+              provider={browserProvider}
               showOnrampOption={isOnRampEnabled}
               showSwapOption={isSwapEnabled}
               showBridgeOption={isBridgeEnabled}

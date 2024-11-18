@@ -1,5 +1,4 @@
 /* eslint-disable react/jsx-no-constructed-context-values */
-import { BrowserProvider } from 'ethers';
 import {
   ChainId,
   Checkout,
@@ -7,7 +6,9 @@ import {
   EIP1193Provider,
   EIP6963ProviderInfo,
   getMetaMaskProviderDetail,
-  getPassportProviderDetail, WalletConnectManager as IWalletConnectManager,
+  getPassportProviderDetail,
+  WalletConnectManager as IWalletConnectManager,
+  NamedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback,
@@ -63,7 +64,7 @@ export type ConnectWidgetInputs = ConnectWidgetParams & {
   sendCloseEventOverride?: () => void;
   allowedChains?: ChainId[];
   checkout: Checkout;
-  web3Provider?: BrowserProvider;
+  browserProvider?: NamedBrowserProvider;
   isCheckNetworkEnabled?: boolean;
   sendGoBackEventOverride?: () => void;
   showBackButton?: boolean;
@@ -73,7 +74,7 @@ export default function ConnectWidget({
   config,
   sendSuccessEventOverride,
   sendCloseEventOverride,
-  web3Provider,
+  browserProvider,
   checkout,
   targetWalletRdns,
   targetChainId,
@@ -120,14 +121,14 @@ export default function ConnectWidget({
   }
 
   useEffect(() => {
-    if (!web3Provider) return;
+    if (!browserProvider) return;
     connectDispatch({
       payload: {
         type: ConnectActions.SET_PROVIDER,
-        provider: web3Provider,
+        provider: browserProvider,
       },
     });
-  }, [web3Provider]);
+  }, [browserProvider]);
 
   useEffect(() => {
     connectDispatch({
@@ -195,21 +196,24 @@ export default function ConnectWidget({
 
     // Find the wallet provider info via injected with Passport and MetaMask fallbacks
     let walletProviderInfo: EIP6963ProviderInfo | undefined;
-    if (isWalletConnectProvider(provider)) {
+    if (isWalletConnectProvider(provider.name)) {
       walletProviderInfo = walletConnectProviderInfo;
     } else {
       const injectedProviderDetails = checkout.getInjectedProviders();
       const walletProviderDetail = injectedProviderDetails.find((providerDetail) => (
+        // @ts-expect-error TODO
         providerDetail.provider === provider.provider
       ));
       if (walletProviderDetail) {
         walletProviderInfo = walletProviderDetail.info;
       }
       if (!walletProviderInfo) {
-        if (isPassportProvider(provider)) {
+        if (isPassportProvider(provider.name)) {
+          // @ts-expect-error TODO
           walletProviderInfo = getPassportProviderDetail(provider.provider as EIP1193Provider).info;
         }
-        if (isMetaMaskProvider(provider)) {
+        if (isMetaMaskProvider(provider.name)) {
+          // @ts-expect-error TODO
           walletProviderInfo = getMetaMaskProviderDetail(provider.provider as EIP1193Provider).info;
         }
       }

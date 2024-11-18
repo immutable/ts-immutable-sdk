@@ -5,7 +5,7 @@ import {
 } from '@biom3/react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BrowserProvider } from 'ethers';
+import { NamedBrowserProvider } from '@imtbl/checkout-sdk';
 import {
   UserJourney,
   useAnalytics,
@@ -28,7 +28,7 @@ export function WalletAddress({
   showL1Warning,
   setShowL1Warning,
 }: {
-  provider?: BrowserProvider;
+  provider?: NamedBrowserProvider;
   showL1Warning: boolean;
   setShowL1Warning: (show: boolean) => void;
 }) {
@@ -40,7 +40,7 @@ export function WalletAddress({
   const { track } = useAnalytics();
 
   const ctaIcon = useMemo<AllIconKeys>(() => {
-    if (isPassportProvider(provider) && !showL1Warning) {
+    if (isPassportProvider(provider?.name) && !showL1Warning) {
       return 'ShowPassword';
     }
     return isCopied ? 'Tick' : 'CopyText';

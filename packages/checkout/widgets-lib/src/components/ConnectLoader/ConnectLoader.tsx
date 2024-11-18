@@ -2,8 +2,8 @@ import { useTranslation } from 'react-i18next';
 import {
   ChainId,
   Checkout,
-  WalletProviderName,
   CheckoutErrorType,
+  NamedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import React, {
   useEffect,
@@ -38,8 +38,7 @@ export interface ConnectLoaderProps {
 
 export interface ConnectLoaderParams {
   targetChainId: ChainId;
-  walletProviderName?: WalletProviderName;
-  web3Provider?: BrowserProvider;
+  browserProvider?: NamedBrowserProvider;
   checkout: Checkout;
   allowedChains: ChainId[];
   isCheckNetworkEnabled?: boolean;
@@ -57,9 +56,8 @@ export function ConnectLoader({
   const {
     checkout,
     targetChainId,
-    walletProviderName,
     allowedChains,
-    web3Provider,
+    browserProvider,
     isCheckNetworkEnabled,
   } = params;
 
@@ -80,7 +78,7 @@ export function ConnectLoader({
   const { identify, user } = useAnalytics();
 
   const hasNoWalletProviderNameAndNoBrowserProvider = (localProvider?: BrowserProvider): boolean => {
-    if (!walletProviderName && !localProvider) {
+    if (!browserProvider?.name && !localProvider) {
       connectLoaderDispatch({
         payload: {
           type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
@@ -97,9 +95,9 @@ export function ConnectLoader({
     try {
       // If the wallet provider name was passed through but the provider was
       // not injected then create a provider using the wallet provider name
-      if (!localProvider && walletProviderName) {
+      if (!localProvider && browserProvider?.name) {
         const createProviderResult = await checkout.createProvider({
-          walletProviderName,
+          walletProviderName: browserProvider.name,
         });
         connectLoaderDispatch({
           payload: {
@@ -142,7 +140,7 @@ export function ConnectLoader({
     return false;
   };
 
-  const isWalletConnected = async (localProvider: BrowserProvider): Promise<boolean> => {
+  const isWalletConnected = async (localProvider: NamedBrowserProvider): Promise<boolean> => {
     const { isConnected } = await checkout.checkIsWalletConnected({
       provider: localProvider!,
     });
@@ -169,28 +167,28 @@ export function ConnectLoader({
     (async () => {
       if (!checkout) return;
 
-      if (hasNoWalletProviderNameAndNoBrowserProvider(web3Provider)) return;
-      if (await hasWalletProviderNameAndNoBrowserProvider(web3Provider)) return;
+      if (hasNoWalletProviderNameAndNoBrowserProvider(browserProvider)) return;
+      if (await hasWalletProviderNameAndNoBrowserProvider(browserProvider)) return;
 
       try {
         connectLoaderDispatch({
           payload: {
             type: ConnectLoaderActions.SET_PROVIDER,
-            provider: web3Provider!,
+            provider: browserProvider!,
           },
         });
         // TODO: handle all of the inner try catches with error handling
         // At this point the BrowserProvider exists
         // This will bypass the wallet list screen
-        const isConnected = (await isWalletConnected(web3Provider!));
+        const isConnected = (await isWalletConnected(browserProvider!));
         if (!isConnected) return;
 
         try {
-          const currentNetworkInfo = await checkout.getNetworkInfo({ provider: web3Provider! });
+          const currentNetworkInfo = await checkout.getNetworkInfo({ provider: browserProvider! });
 
           // TODO: do this instead, replace chainId check with below code instead of checkout.getNetworkInfo
           // Also, skip the entire section if it is Passport.
-          // const currentChainId = await web3Provider?.getSigner().getChainId();
+          // const currentChainId = await browserProvider?.getSigner().getChainId();
 
           // If unsupported network or current network is not in the allowed chains
           // then show the switch network screen
@@ -214,7 +212,7 @@ export function ConnectLoader({
           // TODO: Identify user should be separated out into a use Effect with only the provider (from connect loader state) as dependency
           const userData = user ? await user() : undefined;
           const anonymousId = userData?.anonymousId();
-          await identifyUser(identify, web3Provider!, { anonymousId });
+          await identifyUser(identify, browserProvider!, { anonymousId });
         } catch (err) {
           return;
         }
@@ -238,7 +236,7 @@ export function ConnectLoader({
         });
       }
     })();
-  }, [checkout, walletProviderName, web3Provider]);
+  }, [checkout, browserProvider?.name, browserProvider]);
 
   return (
     <>
@@ -252,7 +250,7 @@ export function ConnectLoader({
                     <ConnectWidget
                       config={widgetConfig}
                       targetChainId={targetChainId}
-                      web3Provider={provider}
+                      browserProvider={provider}
                       checkout={checkout}
                       deepLink={deepLink}
                       sendSuccessEventOverride={successEvent}

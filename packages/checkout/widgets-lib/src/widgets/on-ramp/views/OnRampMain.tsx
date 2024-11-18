@@ -5,6 +5,7 @@ import {
 } from 'react';
 import {
   ExchangeType, fetchRiskAssessment, IMTBLWidgetEvents, isAddressSanctioned,
+  WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import url from 'url';
 import { useTranslation } from 'react-i18next';
@@ -60,7 +61,7 @@ export function OnRampMain({
 
   const eventTimer = useRef<number | undefined>();
 
-  const isPassport = !!passport && (provider?.provider as any)?.isPassport;
+  const isPassport = !!passport && provider?.name === WalletProviderName.PASSPORT;
 
   const openedFromTopUpView = useMemo(
     () => viewState.history.length > 2
@@ -228,7 +229,7 @@ export function OnRampMain({
     let userWalletAddress = '';
 
     (async () => {
-      const walletAddress = await provider.getSigner().getAddress();
+      const walletAddress = await (await provider.getSigner()).getAddress();
 
       const assessment = await fetchRiskAssessment([walletAddress], checkout.config);
 
@@ -248,7 +249,7 @@ export function OnRampMain({
 
       const params = {
         exchangeType: ExchangeType.ONRAMP,
-        web3Provider: provider,
+        browserProvider: provider,
         tokenAddress,
         tokenAmount,
         passport,

@@ -1,4 +1,4 @@
-import { BrowserProvider } from 'ethers';
+import { NamedBrowserProvider } from '../../../types';
 
 /**
  * Enum representing possible Wallet Widget event types.
@@ -22,7 +22,7 @@ export type WalletNetworkSwitch = {
   /**  The chain ID of the network that the user switched to. */
   chainId: number;
   /** The Web3 provider object for the switched network. */
-  provider: BrowserProvider;
+  provider: NamedBrowserProvider;
 };
 
 /**

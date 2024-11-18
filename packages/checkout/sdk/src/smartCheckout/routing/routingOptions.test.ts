@@ -1,15 +1,15 @@
-import { BrowserProvider } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { getAvailableRoutingOptions } from './routingOptions';
 import { CheckoutConfiguration } from '../../config';
 import * as geoBlocking from './geoBlocking';
 import { DEFAULT_BRIDGE_ENABLED, DEFAULT_ON_RAMP_ENABLED, DEFAULT_SWAP_ENABLED } from '../../env';
 import { HttpClient } from '../../api/http';
+import { NamedBrowserProvider } from '../../types';
 
 jest.mock('./geoBlocking');
 
 describe('getAvailableRoutingOptions', () => {
-  let mockProvider: BrowserProvider;
+  let mockProvider: NamedBrowserProvider;
   let config: CheckoutConfiguration;
   let mockedHttpClient: jest.Mocked<HttpClient>;
 
@@ -18,7 +18,7 @@ describe('getAvailableRoutingOptions', () => {
       getSigner: jest.fn().mockReturnValue({
         getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
       }),
-    } as unknown as BrowserProvider;
+    } as unknown as NamedBrowserProvider;
 
     mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     config = new CheckoutConfiguration({
@@ -109,7 +109,7 @@ describe('getAvailableRoutingOptions', () => {
       provider: {
         isPassport: true,
       },
-    } as unknown as BrowserProvider;
+    } as unknown as NamedBrowserProvider;
 
     const routingOptions = await getAvailableRoutingOptions(config, mockPassportProvider);
     expect(routingOptions.bridge).toEqual(false);
@@ -118,7 +118,7 @@ describe('getAvailableRoutingOptions', () => {
   it('should enable Bridge options if non-Passport provider', async () => {
     const mockPassportProvider = {
       provider: {},
-    } as unknown as BrowserProvider;
+    } as unknown as NamedBrowserProvider;
 
     const routingOptions = await getAvailableRoutingOptions(config, mockPassportProvider);
     expect(routingOptions.bridge).toEqual(true);

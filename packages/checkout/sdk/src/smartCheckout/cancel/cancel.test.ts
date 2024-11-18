@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Environment } from '@imtbl/config';
 import { OrderStatusName } from '@imtbl/orderbook';
-import { BrowserProvider, TypedDataDomain, PreparedTransactionRequest } from 'ethers';
+import { TypedDataDomain, PreparedTransactionRequest } from 'ethers';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutErrorType } from '../../errors';
 import { cancel } from './cancel';
 import { createOrderbookInstance } from '../../instance';
 import { signFulfillmentTransactions } from '../actions';
-import { CheckoutStatus } from '../../types';
+import { CheckoutStatus, NamedBrowserProvider } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
 import { HttpClient } from '../../api/http';
 import { sendTransaction } from '../../transaction';
@@ -18,7 +18,7 @@ jest.mock('../../transaction');
 
 describe('cancel', () => {
   let config: CheckoutConfiguration;
-  let mockProvider: BrowserProvider;
+  let mockProvider: NamedBrowserProvider;
 
   beforeEach(() => {
     mockProvider = {
@@ -26,7 +26,7 @@ describe('cancel', () => {
         getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
         _signTypedData: jest.fn().mockResolvedValue('0xSIGNED'),
       }),
-    } as unknown as BrowserProvider;
+    } as unknown as NamedBrowserProvider;
 
     const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     config = new CheckoutConfiguration({

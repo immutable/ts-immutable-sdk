@@ -51,7 +51,7 @@ export function Settings({ showDisconnectButton }: SettingsProps) {
   // disconnect all Wallet Connect pairings and disconnect the provider
   // so that restoreSession doesn't pick up the previous sessions
   const handleWCDisconnect = async () => {
-    if (isWalletConnectProvider(provider)) {
+    if (isWalletConnectProvider(provider?.name)) {
       try {
         if ((provider!.provider as any)?.session) {
           const pairings = (

@@ -1,18 +1,18 @@
-import { BrowserProvider } from 'ethers';
 import {
   Amount,
   Fee,
   Quote,
   TransactionResponse,
 } from '@imtbl/dex-sdk';
+import { NamedBrowserProvider, WalletProviderName } from '@imtbl/checkout-sdk';
 import { isGasFree } from '../../../lib/provider';
 import { processGasFree } from './processGasFree';
 
 jest.mock('../../../lib/provider');
 
 describe('processGasFree', () => {
-  let mockPassportProvider: BrowserProvider;
-  let mockMetaMaskProvider: BrowserProvider;
+  let mockPassportProvider: NamedBrowserProvider;
+  let mockMetaMaskProvider: NamedBrowserProvider;
   const mockQuote = {
     quote: {
       amount: {} as Amount,
@@ -48,22 +48,18 @@ describe('processGasFree', () => {
     jest.clearAllMocks();
 
     mockPassportProvider = {
-      provider: {
-        isPassport: true,
-      },
+      name: WalletProviderName.PASSPORT,
       getSigner: jest.fn().mockReturnValue({
         getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
       }),
-    } as unknown as BrowserProvider;
+    } as unknown as NamedBrowserProvider;
 
     mockMetaMaskProvider = {
-      provider: {
-        isMetaMask: true,
-      },
+      name: WalletProviderName.METAMASK,
       getSigner: jest.fn().mockReturnValue({
         getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
       }),
-    } as unknown as BrowserProvider;
+    } as unknown as NamedBrowserProvider;
   });
 
   it('should return the unmodified quote if the provider is not a passport provider', () => {

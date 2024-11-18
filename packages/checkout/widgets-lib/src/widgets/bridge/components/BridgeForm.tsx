@@ -268,7 +268,7 @@ export function BridgeForm(props: BridgeFormProps) {
 
   const submitBridgeValues = useCallback(async () => {
     if (!bridgeFormValidator()) return;
-    if (!checkout || !from?.web3Provider || !formToken) return;
+    if (!checkout || !from?.browserProvider || !formToken) return;
 
     track({
       userJourney: UserJourney.BRIDGE,
@@ -299,7 +299,7 @@ export function BridgeForm(props: BridgeFormProps) {
     });
   }, [
     checkout,
-    from?.web3Provider,
+    from?.browserProvider,
     bridgeFormValidator,
     formToken,
   ]);

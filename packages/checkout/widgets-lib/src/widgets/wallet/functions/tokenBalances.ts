@@ -1,5 +1,6 @@
-import { BrowserProvider } from 'ethers';
-import { Checkout, ChainId, GetBalanceResult } from '@imtbl/checkout-sdk';
+import {
+  Checkout, ChainId, GetBalanceResult, NamedBrowserProvider,
+} from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import {
   calculateCryptoToFiat,
@@ -22,7 +23,7 @@ export type BalanceInfo = {
 
 export const getTokenBalances = async (
   checkout: Checkout,
-  provider: BrowserProvider,
+  provider: NamedBrowserProvider,
   chainId: ChainId,
 ): Promise<GetBalanceResult[]> => {
   if (!checkout || !provider || !chainId) return [];

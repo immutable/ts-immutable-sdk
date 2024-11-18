@@ -1,10 +1,10 @@
-import { BrowserProvider } from 'ethers';
 import { overrideBalanceCheckResult, smartCheckout } from './smartCheckout';
 import {
   GasAmount,
   GasTokenType,
   ItemRequirement,
   ItemType,
+  NamedBrowserProvider,
   RoutingOutcomeType,
   TransactionOrGasType,
 } from '../types';
@@ -23,7 +23,7 @@ jest.mock('./balanceCheck');
 jest.mock('./routing/routingCalculator');
 
 describe('smartCheckout', () => {
-  let mockProvider: BrowserProvider;
+  let mockProvider: NamedBrowserProvider;
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -32,7 +32,7 @@ describe('smartCheckout', () => {
       getSigner: jest.fn().mockReturnValue({
         getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
       }),
-    } as unknown as BrowserProvider;
+    } as unknown as NamedBrowserProvider;
 
     (routingCalculator as jest.Mock).mockResolvedValue({
       type: RoutingOutcomeType.NO_ROUTES_FOUND,
@@ -1014,7 +1014,7 @@ describe('smartCheckout', () => {
         getSigner: jest.fn().mockReturnValue({
           getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
         }),
-      } as unknown as BrowserProvider;
+      } as unknown as NamedBrowserProvider;
 
       const result = await smartCheckout(
         {} as CheckoutConfiguration,

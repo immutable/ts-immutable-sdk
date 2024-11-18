@@ -1,5 +1,6 @@
-import { ChainId, Checkout, CommerceFlowType } from '@imtbl/checkout-sdk';
-import { BrowserProvider } from 'ethers';
+import {
+  ChainId, Checkout, CommerceFlowType, NamedBrowserProvider,
+} from '@imtbl/checkout-sdk';
 import { ConnectLoaderParams } from '../../../components/ConnectLoader/ConnectLoader';
 import { getL1ChainId, getL2ChainId } from '../../../lib/networkUtils';
 import { View } from '../../../context/view-context/ViewContext';
@@ -17,17 +18,16 @@ const getChainId = (checkout: Checkout) => (checkout.config.isProduction
 export function getConnectLoaderParams(
   view: View,
   checkout: Checkout,
-  web3Provider: BrowserProvider | undefined,
+  browserProvider: NamedBrowserProvider | undefined,
 ): ConnectLoaderParams {
-  const { type, data } = view;
+  const { type } = view;
 
   switch (type) {
     case CommerceFlowType.WALLET:
       return {
         checkout,
-        web3Provider,
+        browserProvider,
         targetChainId: getChainId(checkout),
-        walletProviderName: data.params.walletProviderName,
         allowedChains: [
           getL1ChainId(checkout.config),
           getL2ChainId(checkout.config),
@@ -37,7 +37,7 @@ export function getConnectLoaderParams(
     case CommerceFlowType.ADD_TOKENS:
       return {
         checkout,
-        web3Provider,
+        browserProvider,
         targetChainId: getChainId(checkout),
         allowedChains: [
           getL1ChainId(checkout.config),
@@ -48,7 +48,7 @@ export function getConnectLoaderParams(
     case CommerceFlowType.SWAP:
       return {
         checkout,
-        web3Provider,
+        browserProvider,
         targetChainId: getChainId(checkout),
         allowedChains: [getL2ChainId(checkout.config)],
       };

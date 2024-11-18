@@ -36,7 +36,6 @@ import {
   ConnectParams,
   ConnectResult,
   CreateProviderParams,
-  CreateProviderResult,
   EIP6963ProviderDetail,
   FiatRampParams,
   GasEstimateBridgeToL2Result,
@@ -54,6 +53,7 @@ import {
   GetTokenInfoParams,
   GetWalletAllowListParams,
   GetWalletAllowListResult,
+  NamedBrowserProvider,
   NetworkInfo,
   OnRampProviderFees,
   SellResult,
@@ -66,6 +66,7 @@ import {
   TokenFilterTypes,
   TokenInfo,
   ValidateProviderOptions,
+  WalletProviderName,
 } from './types';
 import { CancelParams } from './types/cancel';
 import { SellParams } from './types/sell';
@@ -294,7 +295,7 @@ export class Checkout {
    */
   public async createProvider(
     params: CreateProviderParams,
-  ): Promise<CreateProviderResult> {
+  ): Promise<NamedBrowserProvider> {
     return await provider.createProvider(
       params.walletProviderName,
       this.passport,
@@ -341,7 +342,7 @@ export class Checkout {
   public async checkIsWalletConnected(
     params: CheckConnectionParams,
   ): Promise<CheckConnectionResult> {
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
       {
@@ -349,7 +350,7 @@ export class Checkout {
         allowUnsupportedProvider: true,
       } as ValidateProviderOptions,
     );
-    return connect.checkIsWalletConnected(web3Provider);
+    return connect.checkIsWalletConnected(browserProvider);
   }
 
   /**
@@ -378,7 +379,7 @@ export class Checkout {
    * @throws {Error} If the provider is not valid or if there is an error connecting to the network.
    */
   public async connect(params: ConnectParams): Promise<ConnectResult> {
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
       {
@@ -389,14 +390,14 @@ export class Checkout {
 
     if (
       params.requestWalletPermissions
-      && !(web3Provider.provider as any)?.isPassport
+      && !transaction.isPassportProvider(browserProvider.name)
     ) {
-      await connect.requestPermissions(web3Provider);
+      await connect.requestPermissions(browserProvider);
     } else {
-      await connect.connectSite(web3Provider);
+      await connect.connectSite(browserProvider);
     }
 
-    return { provider: web3Provider };
+    return browserProvider;
   }
 
   /**
@@ -422,7 +423,7 @@ export class Checkout {
   public async switchNetwork(
     params: SwitchNetworkParams,
   ): Promise<SwitchNetworkResult> {
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
       {
@@ -433,7 +434,7 @@ export class Checkout {
 
     const switchNetworkRes = await network.switchWalletNetwork(
       this.config,
-      web3Provider,
+      browserProvider,
       params.chainId,
     );
 
@@ -456,7 +457,7 @@ export class Checkout {
    * @returns {Promise<GetBalanceResult>} - A promise that resolves to the balance result.
    */
   public async getBalance(params: GetBalanceParams): Promise<GetBalanceResult> {
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
     );
@@ -464,12 +465,12 @@ export class Checkout {
     if (!params.tokenAddress || params.tokenAddress === '') {
       return await balances.getBalance(
         this.config,
-        web3Provider,
+        browserProvider,
         params.walletAddress,
       );
     }
     return await balances.getERC20Balance(
-      web3Provider,
+      browserProvider,
       params.walletAddress,
       params.tokenAddress,
     );
@@ -532,7 +533,7 @@ export class Checkout {
   public async sendTransaction(
     params: SendTransactionParams,
   ): Promise<SendTransactionResult> {
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
       {
@@ -540,22 +541,22 @@ export class Checkout {
         allowMistmatchedChainId: true,
       } as ValidateProviderOptions,
     );
-    return await transaction.sendTransaction(web3Provider, params.transaction);
+    return await transaction.sendTransaction(browserProvider, params.transaction);
   }
 
   /**
    * Wraps a BrowserProvider call to validate the provider and handle errors.
-   * @param {BrowserProvider} web3Provider - The provider to connect to the network.
-   * @param {(web3Provider: BrowserProvider) => Promise<T>)} block - The block executing the provider call.
+   * @param {BrowserProvider} browserProvider - The provider to connect to the network.
+   * @param {(browserProvider: BrowserProvider) => Promise<T>)} block - The block executing the provider call.
    * @returns {Promise<T>} Returns the result of the provided block param.
    */
   public async providerCall<T>(
-    web3Provider: BrowserProvider,
-    block: (web3Provider: BrowserProvider) => Promise<T>,
+    browserProvider: NamedBrowserProvider,
+    block: (browserProvider: NamedBrowserProvider) => Promise<T>,
   ): Promise<T> {
     const validatedProvider = await provider.validateProvider(
       this.config,
-      web3Provider,
+      browserProvider,
       {
         allowUnsupportedProvider: true,
         allowMistmatchedChainId: true,
@@ -574,7 +575,7 @@ export class Checkout {
    * @returns {Promise<NetworkInfo>} A promise that resolves to the network information.
    */
   public async getNetworkInfo(params: GetNetworkParams): Promise<NetworkInfo> {
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
       {
@@ -582,7 +583,7 @@ export class Checkout {
         allowMistmatchedChainId: true,
       } as ValidateProviderOptions,
     );
-    return await network.getNetworkInfo(this.config, web3Provider);
+    return await network.getNetworkInfo(this.config, browserProvider);
   }
 
   /**
@@ -599,14 +600,14 @@ export class Checkout {
       );
     }
 
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
     );
 
     return await buy.buy(
       this.config,
-      web3Provider,
+      browserProvider,
       params.orders,
       params.overrides,
     );
@@ -628,12 +629,12 @@ export class Checkout {
       );
     }
 
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
     );
 
-    return await sell.sell(this.config, web3Provider, params.orders);
+    return await sell.sell(this.config, browserProvider, params.orders);
   }
 
   /**
@@ -647,14 +648,14 @@ export class Checkout {
       'This endpoint currently only processes the first order in the array.',
     );
 
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
     );
 
     return await cancel.cancel(
       this.config,
-      web3Provider,
+      browserProvider,
       params.orderIds,
       params.overrides,
     );
@@ -667,7 +668,7 @@ export class Checkout {
   public async smartCheckout(
     params: SmartCheckoutParams,
   ): Promise<SmartCheckoutResult> {
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
     );
@@ -675,7 +676,7 @@ export class Checkout {
     let itemRequirements = [];
     try {
       itemRequirements = await getItemRequirementsFromRequirements(
-        web3Provider,
+        browserProvider,
         params.itemRequirements,
       );
     } catch (err: any) {
@@ -688,7 +689,7 @@ export class Checkout {
 
     return await smartCheckout.smartCheckout(
       this.config,
-      web3Provider,
+      browserProvider,
       itemRequirements,
       params.transactionOrGasAmount,
       params.routingOptions,
@@ -700,11 +701,11 @@ export class Checkout {
 
   /**
    * Checks if the given object is a Web3 provider.
-   * @param {BrowserProvider} web3Provider - The object to check.
+   * @param {BrowserProvider} browserProvider - The object to check.
    * @returns {boolean} - True if the object is a Web3 provider, false otherwise.
    */
-  static isBrowserProvider(web3Provider: BrowserProvider) {
-    return provider.isBrowserProvider(web3Provider);
+  static isBrowserProvider(browserProvider: BrowserProvider) {
+    return provider.isBrowserProvider(browserProvider);
   }
 
   /**
@@ -737,8 +738,8 @@ export class Checkout {
     let tokenSymbol = 'IMX';
     let email;
 
-    const walletAddress = await (await params.web3Provider.getSigner()).getAddress();
-    const isPassport = (params.web3Provider.provider as any)?.isPassport || false;
+    const walletAddress = await (await params.browserProvider.getSigner()).getAddress();
+    const isPassport = params.browserProvider.name === WalletProviderName.PASSPORT || false;
 
     if (isPassport && params.passport) {
       const userInfo = await params.passport.getUserInfo();
@@ -790,13 +791,13 @@ export class Checkout {
    * @returns {Promise<SwapResult>} - A promise that resolves to the swap result (swap tx, swap tx receipt, quote used in the swap).
    */
   public async swap(params: SwapParams): Promise<SwapResult> {
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
     );
     return swap.swap(
       this.config,
-      web3Provider,
+      browserProvider,
       params.fromToken,
       params.toToken,
       params.fromAmount,
@@ -813,13 +814,13 @@ export class Checkout {
    * @returns {Promise<SwapQuoteResult>} - A promise that resolves to the swap quote result.
    */
   public async swapQuote(params: SwapParams): Promise<SwapQuoteResult> {
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
     );
     return swap.swapQuote(
       this.config,
-      web3Provider,
+      browserProvider,
       params.fromToken,
       params.toToken,
       params.fromAmount,

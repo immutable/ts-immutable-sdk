@@ -1,5 +1,4 @@
-import { BrowserProvider } from 'ethers';
-import { EIP6963ProviderInfo, WalletProviderName } from '../../../types';
+import { EIP6963ProviderInfo, NamedBrowserProvider, WalletProviderName } from '../../../types';
 
 /**
  * Enum representing possible Connect Widget event types.
@@ -20,7 +19,7 @@ export enum ConnectEventType {
 
 export type ConnectionSuccess = {
   /** The connected provider. */
-  provider: BrowserProvider;
+  provider: NamedBrowserProvider;
   /** The wallet provider name of the connected provider. */
   walletProviderName: WalletProviderName | undefined;
   /** The wallet provider EIP-6963 metadata. */
