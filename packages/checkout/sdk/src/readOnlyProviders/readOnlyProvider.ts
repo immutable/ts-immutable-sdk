@@ -17,9 +17,9 @@ export async function createReadOnlyProviders(
   });
 
   allowedNetworks.networks.forEach((networkInfo) => {
-    const rpcUrl = config.networkMap.get(networkInfo.chainId)?.rpcUrls[0];
+    const rpcUrl = config.networkMap.get(Number(networkInfo.chainId))?.rpcUrls[0];
     const provider = new JsonRpcProvider(rpcUrl);
-    readOnlyProviders.set(networkInfo.chainId, provider);
+    readOnlyProviders.set(Number(networkInfo.chainId), provider);
   });
 
   return readOnlyProviders;

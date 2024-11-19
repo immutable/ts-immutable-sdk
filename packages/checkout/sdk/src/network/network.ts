@@ -81,7 +81,7 @@ export async function getNetworkAllowList(
     if (newNetwork) {
       allowedNetworks.push({
         name: newNetwork.chainName,
-        chainId: parseInt(newNetwork.chainIdHex, 16),
+        chainId: BigInt(parseInt(newNetwork.chainIdHex, 16)),
         nativeCurrency: newNetwork.nativeCurrency,
         isSupported: true,
       });
@@ -108,21 +108,19 @@ export async function getNetworkInfo(
           const chainIdNetworkInfo = networkMap.get(network.chainId as unknown as ChainId);
           return {
             name: chainIdNetworkInfo!.chainName,
-            chainId: parseInt(chainIdNetworkInfo!.chainIdHex, 16),
+            chainId: BigInt(parseInt(chainIdNetworkInfo!.chainIdHex, 16)),
             nativeCurrency: chainIdNetworkInfo!.nativeCurrency,
             isSupported: true,
           };
         }
         return {
-          chainId: network.chainId as unknown as ChainId,
+          chainId: network.chainId,
           name: network.name,
           isSupported: false,
         } as NetworkInfo;
       } catch (err) {
         const chainId = await getUnderlyingChainId(provider);
-        const isSupported = Array.from(networkMap.keys()).includes(
-          chainId as ChainId,
-        );
+        const isSupported = Array.from(networkMap.keys()).includes(Number(chainId));
         return {
           chainId,
           isSupported,
@@ -147,7 +145,7 @@ export async function switchWalletNetwork(
   });
 
   if (
-    !allowedNetworks.networks.some((network) => network.chainId === chainId)
+    !allowedNetworks.networks.some((network) => Number(network.chainId) === chainId)
   ) {
     throw new CheckoutError(
       `Chain:${chainId} is not a supported chain`,
