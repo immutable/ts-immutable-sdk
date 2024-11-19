@@ -208,11 +208,7 @@ export function WalletAndNetworkSelector() {
         changeAccount = true;
       }
       // eslint-disable-next-line max-len
-      const browserProvider = new NamedBrowserProvider(event.providerDetail.info.name as WalletProviderName, event.provider);
-      const namedBrowserProvider = {
-        ...browserProvider,
-        name: event.providerDetail.info.name as WalletProviderName,
-      } as NamedBrowserProvider;
+      const namedBrowserProvider = new NamedBrowserProvider(event.providerDetail.info.name as WalletProviderName, event.provider);
       const connectedProvider = await connectToProvider(checkout, namedBrowserProvider, changeAccount);
 
       await handleFromWalletConnectionSuccess(connectedProvider);
@@ -329,11 +325,7 @@ export function WalletAndNetworkSelector() {
       try {
         setToWallet(event);
         // eslint-disable-next-line max-len
-        const browserProvider = new NamedBrowserProvider(event.providerDetail.info.name as WalletProviderName, event.provider);
-        const namedBrowserProvider = {
-          ...browserProvider,
-          name: event.providerDetail.info.name as WalletProviderName,
-        } as NamedBrowserProvider;
+        const namedBrowserProvider = new NamedBrowserProvider(event.providerDetail.info.name as WalletProviderName, event.provider);
         const connectedProvider = await connectToProvider(checkout, namedBrowserProvider, false);
 
         const address = await (await connectedProvider.getSigner()).getAddress();
