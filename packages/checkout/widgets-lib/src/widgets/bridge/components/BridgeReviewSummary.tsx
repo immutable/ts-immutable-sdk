@@ -386,7 +386,7 @@ export function BridgeReviewSummary() {
 
     try {
       // eslint-disable-next-line max-len
-      const currentChainId = await (from?.browserProvider.provider as any).request({ method: 'eth_chainId', params: [] });
+      const currentChainId = await (from?.browserProvider.provider as any).send('eth_chainId', []);
       // eslint-disable-next-line radix
       const parsedChainId = parseInt(currentChainId.toString());
       if (parsedChainId !== from?.network) {
