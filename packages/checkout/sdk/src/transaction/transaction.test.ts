@@ -18,7 +18,7 @@ describe('transaction', () => {
     const mockSendTransaction = jest.fn().mockResolvedValue(transactionResponse);
     const mockProvider = {
       getNetwork: jest.fn().mockReturnValue({
-        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        chainId: BigInt(ChainId.IMTBL_ZKEVM_TESTNET),
       } as NetworkInfo),
       getSigner: jest.fn().mockReturnValue({
         sendTransaction: mockSendTransaction,
@@ -45,7 +45,7 @@ describe('transaction', () => {
   it('should return errored status if transaction errors', async () => {
     const mockProvider = {
       getNetwork: jest.fn().mockReturnValue({
-        chainId: ChainId.ETHEREUM,
+        chainId: BigInt(ChainId.ETHEREUM),
       } as NetworkInfo),
       getSigner: jest.fn().mockReturnValue({
         sendTransaction: () => {
@@ -76,7 +76,7 @@ describe('transaction', () => {
   it('should return insufficient funds status if transaction errors with insufficient funds', async () => {
     const mockProvider = {
       getNetwork: jest.fn().mockReturnValue({
-        chainId: ChainId.ETHEREUM,
+        chainId: BigInt(ChainId.ETHEREUM),
       } as NetworkInfo),
       getSigner: jest.fn().mockReturnValue({
         sendTransaction: () => {
@@ -109,7 +109,7 @@ describe('transaction', () => {
   it('should return user rejected request status if transaction errors with action rejected', async () => {
     const mockProvider = {
       getNetwork: jest.fn().mockReturnValue({
-        chainId: ChainId.ETHEREUM,
+        chainId: BigInt(ChainId.ETHEREUM),
       } as NetworkInfo),
       getSigner: jest.fn().mockReturnValue({
         sendTransaction: () => {
@@ -150,7 +150,7 @@ describe('transaction', () => {
       const mockSendTransaction = jest.fn().mockResolvedValue(transactionResponse);
       const mockProvider = {
         getNetwork: jest.fn().mockReturnValue({
-          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          chainId: BigInt(ChainId.IMTBL_ZKEVM_TESTNET),
         } as NetworkInfo),
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: mockSendTransaction,
