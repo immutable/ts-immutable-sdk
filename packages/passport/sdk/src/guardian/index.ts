@@ -105,7 +105,7 @@ export default class GuardianClient {
         return await task();
       } catch (err) {
         if (err instanceof PassportError && err.type === PassportErrorType.SERVICE_UNAVAILABLE_ERROR) {
-          this.confirmationScreen.showServiceUnavailable();
+          await this.confirmationScreen.showServiceUnavailable();
           throw err;
         }
 
