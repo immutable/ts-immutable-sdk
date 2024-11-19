@@ -738,7 +738,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
 
     try {
     // check for switch network here
-      const currentChainId = await (provider.provider as any).request({ method: 'eth_chainId', params: [] });
+      const currentChainId = await (provider.provider as any).send('eth_chainId', []);
       // eslint-disable-next-line radix
       const parsedChainId = parseInt(currentChainId.toString());
       if (parsedChainId !== getL2ChainId(checkout.config)) {
