@@ -22,6 +22,7 @@ export enum PassportErrorType {
   LINK_WALLET_VALIDATION_ERROR = 'LINK_WALLET_VALIDATION_ERROR',
   LINK_WALLET_DUPLICATE_NONCE_ERROR = 'LINK_WALLET_DUPLICATE_NONCE_ERROR',
   LINK_WALLET_GENERIC_ERROR = 'LINK_WALLET_GENERIC_ERROR',
+  SERVICE_UNAVAILABLE_ERROR = 'SERVICE_UNAVAILABLE_ERROR',
 }
 
 export function isAPIError(error: any): error is imx.APIError {
@@ -45,6 +46,10 @@ export const withPassportError = async <T>(
     return await fn();
   } catch (error) {
     let errorMessage: string;
+
+    if (error instanceof PassportError && error.type === PassportErrorType.SERVICE_UNAVAILABLE_ERROR) {
+      throw new PassportError(error.message, error.type);
+    }
 
     if (isAxiosError(error) && error.response?.data && isAPIError(error.response.data)) {
       errorMessage = error.response.data.message;

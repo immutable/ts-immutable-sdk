@@ -8,6 +8,7 @@ import { mockUser, mockUserImx, mockUserZkEvm } from '../test/mocks';
 import { JsonRpcError, RpcErrorCode } from '../zkEvm/JsonRpcError';
 import { PassportConfiguration } from '../config';
 import { ChainId } from '../network/chains';
+import { PassportError, PassportErrorType } from '../errors/passportError';
 
 jest.mock('../confirmation/confirmation');
 
@@ -100,6 +101,33 @@ describe('Guardian', () => {
       (mockConfirmationScreen.requestConfirmation as jest.Mock).mockResolvedValueOnce({ confirmed: false });
 
       await expect(getGuardianClient().evaluateImxTransaction({ payloadHash: 'hash' })).rejects.toThrow('Transaction rejected by user');
+    });
+
+    it('should throw PassportError with SERVICE_UNAVAILABLE_ERROR when evaluateTransaction returns 403', async () => {
+      mockEvaluateTransaction.mockRejectedValueOnce({
+        isAxiosError: true,
+        response: {
+          status: 403,
+        },
+        message: 'Request failed with status code 403',
+        config: {},
+      });
+
+      mockGetTransactionByID.mockResolvedValueOnce({ data: { id: '1234' } });
+
+      // biome-ignore lint/suspicious/noExplicitAny: test
+      let caughtError: any;
+      try {
+        await getGuardianClient().evaluateImxTransaction({ payloadHash: 'hash' });
+      } catch (err) {
+        caughtError = err;
+      }
+
+      expect(caughtError).toBeInstanceOf(PassportError);
+      expect(caughtError.type).toBe(PassportErrorType.SERVICE_UNAVAILABLE_ERROR);
+      expect(caughtError.message).toBe('Service unavailable');
+
+      expect(mockConfirmationScreen.requestConfirmation).not.toHaveBeenCalled();
     });
 
     describe('crossSdkBridgeEnabled', () => {
@@ -203,6 +231,49 @@ describe('Guardian', () => {
       });
     });
 
+    it('should throw PassportError with SERVICE_UNAVAILABLE_ERROR when evaluateTransaction returns 403', async () => {
+      mockEvaluateTransaction.mockRejectedValueOnce({
+        isAxiosError: true,
+        response: {
+          status: 403,
+        },
+        message: 'Request failed with status code 403',
+        config: {},
+      });
+
+      const transactionRequest: TransactionRequest = {
+        to: mockUserZkEvm.zkEvm.ethAddress,
+        data: '0x456',
+        value: '0x',
+      };
+
+      // biome-ignore lint/suspicious/noExplicitAny: test
+      let caughtError: any;
+      try {
+        await getGuardianClient().validateEVMTransaction({
+          chainId: 'epi123',
+          nonce: '5',
+          metaTransactions: [
+            {
+              data: transactionRequest.data,
+              revertOnError: true,
+              to: mockUserZkEvm.zkEvm.ethAddress,
+              value: '0x00',
+              nonce: 5,
+            },
+          ],
+        });
+      } catch (err) {
+        caughtError = err;
+      }
+
+      expect(caughtError).toBeInstanceOf(PassportError);
+      expect(caughtError.type).toBe(PassportErrorType.SERVICE_UNAVAILABLE_ERROR);
+      expect(caughtError.message).toBe('Service unavailable');
+
+      expect(mockConfirmationScreen.requestConfirmation).toBeCalledTimes(0);
+    });
+
     describe('crossSdkBridgeEnabled', () => {
       it('throws an error if confirmation is required and the cross sdk bridge flag is enabled', async () => {
         mockEvaluateTransaction.mockResolvedValue({ data: { confirmationRequired: true } });
@@ -259,6 +330,29 @@ describe('Guardian', () => {
       await expect(wrappedTask()).resolves.toEqual('result');
 
       expect(mockConfirmationScreen.closeWindow).toBeCalledTimes(0);
+    });
+
+    it('should call showServiceUnavailable and not closeWindow when task errors with SERVICE_UNAVAILABLE_ERROR', async () => {
+      const mockTask = jest.fn().mockRejectedValueOnce(
+        new PassportError('Service unavailable', PassportErrorType.SERVICE_UNAVAILABLE_ERROR),
+      );
+
+      const wrappedTask = getGuardianClient().withConfirmationScreenTask()(mockTask);
+
+      // biome-ignore lint/suspicious/noExplicitAny: test
+      let caughtError: any;
+      try {
+        await wrappedTask();
+      } catch (err) {
+        caughtError = err;
+      }
+
+      expect(caughtError).toBeInstanceOf(PassportError);
+      expect(caughtError.type).toBe(PassportErrorType.SERVICE_UNAVAILABLE_ERROR);
+      expect(caughtError.message).toBe('Service unavailable');
+
+      expect(mockConfirmationScreen.showServiceUnavailable).toHaveBeenCalled();
+      expect(mockConfirmationScreen.closeWindow).not.toHaveBeenCalled();
     });
 
     describe('withConfirmationScreen', () => {
