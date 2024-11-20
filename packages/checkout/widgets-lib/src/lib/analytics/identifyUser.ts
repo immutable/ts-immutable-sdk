@@ -14,8 +14,8 @@ export async function identifyUser(
 ) {
   // WT-1698 Analytics - Identify user here then progress to widget
   const walletAddress = (await (await provider.getSigner()).getAddress()).toLowerCase();
-  const isMetaMask = isMetaMaskProvider(provider.name);
-  const isPassport = isPassportProvider(provider.name);
+  const isMetaMask = isMetaMaskProvider(provider);
+  const isPassport = isPassportProvider(provider);
   try {
     identify(walletAddress, {
       isMetaMask,

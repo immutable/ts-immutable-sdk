@@ -40,7 +40,7 @@ export function WalletAddress({
   const { track } = useAnalytics();
 
   const ctaIcon = useMemo<AllIconKeys>(() => {
-    if (isPassportProvider(provider?.name) && !showL1Warning) {
+    if (isPassportProvider(provider) && !showL1Warning) {
       return 'ShowPassword';
     }
     return isCopied ? 'Tick' : 'CopyText';

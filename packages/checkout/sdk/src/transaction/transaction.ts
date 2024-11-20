@@ -1,13 +1,13 @@
 import { ErrorCode, TransactionRequest } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import {
-  NamedBrowserProvider, SendTransactionResult, WalletProviderName,
+  NamedBrowserProvider, SendTransactionResult,
 } from '../types';
 import { IMMUTABLE_ZKVEM_GAS_OVERRIDES } from '../env';
 import { isZkEvmChainId } from '../utils/utils';
 
-export function isPassportProvider(providerName?: WalletProviderName) {
-  return providerName === WalletProviderName.PASSPORT;
+export function isPassportProvider(provider?: NamedBrowserProvider | null) {
+  return provider?.ethereumProvider?.isPassport === true;
 }
 
 /**
@@ -24,7 +24,7 @@ export function isPassportProvider(providerName?: WalletProviderName) {
  * https://docs.immutable.com/docs/zkevm/architecture/gas-sponsorship-for-gamers/
  */
 export function isGasFree(provider?: NamedBrowserProvider | null) {
-  return isPassportProvider(provider?.name);
+  return isPassportProvider(provider);
 }
 
 export const setTransactionGasLimits = async (

@@ -12,7 +12,6 @@ import {
   NetworkMap,
   AllowedNetworkConfig,
   NamedBrowserProvider,
-  WalletProviderName,
 } from '../types';
 import { CheckoutConfiguration } from '../config';
 import { getUnderlyingChainId } from '../provider/getUnderlyingProvider';
@@ -153,7 +152,7 @@ export async function switchWalletNetwork(
     );
   }
 
-  if (provider && 'name' in provider && provider.name === WalletProviderName.PASSPORT) {
+  if (provider && 'name' in provider && provider.ethereumProvider?.isPassport) {
     throw new CheckoutError(
       'Switching networks with Passport provider is not supported',
       CheckoutErrorType.SWITCH_NETWORK_UNSUPPORTED,
