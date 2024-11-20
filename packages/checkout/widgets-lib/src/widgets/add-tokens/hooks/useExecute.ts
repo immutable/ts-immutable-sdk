@@ -9,6 +9,7 @@ import { useError } from './useError';
 import { AddTokensError, AddTokensErrorTypes } from '../types';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { sendAddTokensFailedEvent } from '../AddTokensWidgetEvents';
+import { retry } from '../../../lib/retry';
 
 export const useExecute = (environment: Environment) => {
   const { showErrorHandover } = useError(environment);
@@ -17,21 +18,29 @@ export const useExecute = (environment: Environment) => {
   } = useContext(EventTargetContext);
 
   const waitForReceipt = async (provider: Web3Provider, txHash: string, maxAttempts = 60) => {
-    let attempts = 0;
-    while (attempts < maxAttempts) {
-      // eslint-disable-next-line no-await-in-loop
-      const receipt = await provider.getTransactionReceipt(txHash);
-      if (receipt) {
+    const result = await retry(
+      async () => {
+        const receipt = await provider.getTransactionReceipt(txHash);
+        if (!receipt) {
+          throw new Error('Receipt not found');
+        }
         if (receipt.status === 0) {
           throw new Error('Transaction failed');
         }
         return receipt;
-      }
-      attempts += 1;
-      // eslint-disable-next-line no-await-in-loop, no-promise-executor-return
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      },
+      {
+        retries: maxAttempts,
+        retryIntervalMs: 1000,
+        nonRetryable: (error) => error.message === 'Transaction failed',
+      },
+    );
+
+    if (!result) {
+      throw new Error(`Transaction receipt not found after ${maxAttempts} attempts`);
     }
-    throw new Error(`Transaction receipt not found after ${maxAttempts} attempts`);
+
+    return result;
   };
 
   const handleTransactionError = (err: unknown) => {
