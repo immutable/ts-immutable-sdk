@@ -1,7 +1,7 @@
 import { ErrorCode, TransactionRequest } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import {
-  ChainId, NamedBrowserProvider, SendTransactionResult, WalletProviderName,
+  NamedBrowserProvider, SendTransactionResult, WalletProviderName,
 } from '../types';
 import { IMMUTABLE_ZKVEM_GAS_OVERRIDES } from '../env';
 import { isZkEvmChainId } from '../utils/utils';
@@ -34,7 +34,8 @@ export const setTransactionGasLimits = async (
   const rawTx = transaction;
 
   const { chainId } = await browserProvider.getNetwork();
-  if (!isZkEvmChainId(chainId as unknown as ChainId)) return rawTx;
+
+  if (!isZkEvmChainId(Number(chainId))) return rawTx;
   if (typeof rawTx.gasPrice !== 'undefined') return rawTx;
   if (isGasFree(browserProvider)) {
     rawTx.gasPrice = BigInt(0);
