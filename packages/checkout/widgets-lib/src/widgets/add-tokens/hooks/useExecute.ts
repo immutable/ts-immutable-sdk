@@ -22,17 +22,17 @@ export const useExecute = (environment: Environment) => {
       async () => {
         const receipt = await provider.getTransactionReceipt(txHash);
         if (!receipt) {
-          throw new Error('Receipt not found');
+          throw new Error('receipt not found');
         }
         if (receipt.status === 0) {
-          throw new Error('Transaction failed');
+          throw new Error('status failed');
         }
         return receipt;
       },
       {
         retries: maxAttempts,
         retryIntervalMs: 1000,
-        nonRetryable: (error) => error.message === 'Transaction failed',
+        nonRetryable: (error) => error.message === 'status failed',
       },
     );
 
