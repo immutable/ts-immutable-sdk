@@ -70,6 +70,7 @@ import { SquidFooter } from '../components/SquidFooter';
 import { useError } from '../hooks/useError';
 import { sendAddTokensSuccessEvent } from '../AddTokensWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { withMetricsAsync } from '../../../lib/metrics';
 
 interface ReviewProps {
   data: AddTokensReviewData;
@@ -298,7 +299,10 @@ export function Review({
         t('views.ADD_TOKENS.handover.requestingApproval.subHeading'),
       );
 
-      const approveTxnReceipt = await approve(changeableProvider, route);
+      const approveTxnReceipt = await withMetricsAsync(
+        () => approve(changeableProvider, route),
+        `${UserJourney.ADD_TOKENS}_Approve`,
+      );
 
       if (!approveTxnReceipt) {
         return;
@@ -320,7 +324,10 @@ export function Review({
       t('views.ADD_TOKENS.handover.requestingExecution.subHeading'),
     );
 
-    const executeTxnReceipt = await execute(squid, changeableProvider, route);
+    const executeTxnReceipt = await withMetricsAsync(
+      () => execute(squid, changeableProvider, route),
+      `${UserJourney.ADD_TOKENS}_Execute`,
+    );
 
     if (executeTxnReceipt) {
       track({
