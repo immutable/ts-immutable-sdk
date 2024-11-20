@@ -33,9 +33,9 @@ export function SwitchNetworkZkEVM() {
     if (!provider || !checkout) return;
 
     const checkCorrectNetwork = async () => {
-      const currentChainId = await provider.send!('eth_chainId', []);
+      const currentChainId = await provider.send('eth_chainId', []);
       // eslint-disable-next-line radix
-      const parsedChainId = parseInt(currentChainId.toString());
+      const parsedChainId = Number(currentChainId.toString());
       if (parsedChainId === getL2ChainId(checkout.config)) {
         connectDispatch({
           payload: {
@@ -75,9 +75,9 @@ export function SwitchNetworkZkEVM() {
 
     if (!provider.send) return;
 
-    const currentChainId = provider.send('eth_chainId', []);
+    const currentChainId = await provider.send('eth_chainId', []);
     // eslint-disable-next-line radix
-    const parsedChainId = parseInt(currentChainId.toString());
+    const parsedChainId = Number(currentChainId.toString());
 
     if (parsedChainId === getL2ChainId(checkout.config)) {
       connectDispatch({
