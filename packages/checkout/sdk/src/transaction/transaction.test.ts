@@ -149,10 +149,10 @@ describe('transaction', () => {
       };
       const mockSendTransaction = jest.fn().mockResolvedValue(transactionResponse);
       const mockProvider = {
-        getNetwork: jest.fn().mockReturnValue({
+        getNetwork: jest.fn().mockResolvedValue({
           chainId: BigInt(ChainId.IMTBL_ZKEVM_TESTNET),
         } as NetworkInfo),
-        getSigner: jest.fn().mockReturnValue({
+        getSigner: jest.fn().mockResolvedValue({
           sendTransaction: mockSendTransaction,
         }),
       } as unknown as NamedBrowserProvider;
