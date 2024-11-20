@@ -16,7 +16,13 @@ async function requestChainId(provider: JsonRpcProvider | NamedBrowserProvider):
     );
   }
 
-  return await provider.send(WalletAction.GET_CHAINID, []);
+  const chainId = await provider.send(WalletAction.GET_CHAINID, []);
+
+  if (typeof chainId !== 'bigint') {
+    throw new CheckoutError('Invalid chainId', CheckoutErrorType.WEB3_PROVIDER_ERROR);
+  }
+
+  return chainId;
 }
 
 /**
@@ -25,10 +31,10 @@ async function requestChainId(provider: JsonRpcProvider | NamedBrowserProvider):
  * @returns chainId number
  */
 export async function getUnderlyingChainId(provider: JsonRpcProvider | NamedBrowserProvider): Promise<bigint> {
-  const { chainId } = await provider.getNetwork();
+  const network = await provider.getNetwork();
 
-  if (chainId) {
-    return chainId;
+  if (network.chainId && typeof network.chainId === 'bigint') {
+    return network.chainId;
   }
 
   return requestChainId(provider);
