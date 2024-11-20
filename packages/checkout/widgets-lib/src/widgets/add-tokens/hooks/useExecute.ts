@@ -9,12 +9,39 @@ import { useError } from './useError';
 import { AddTokensError, AddTokensErrorTypes } from '../types';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { sendAddTokensFailedEvent } from '../AddTokensWidgetEvents';
+import { retry } from '../../../lib/retry';
 
 export const useExecute = (environment: Environment) => {
   const { showErrorHandover } = useError(environment);
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
+
+  const waitForReceipt = async (provider: Web3Provider, txHash: string, maxAttempts = 60) => {
+    const result = await retry(
+      async () => {
+        const receipt = await provider.getTransactionReceipt(txHash);
+        if (!receipt) {
+          throw new Error('receipt not found');
+        }
+        if (receipt.status === 0) {
+          throw new Error('status failed');
+        }
+        return receipt;
+      },
+      {
+        retries: maxAttempts,
+        retryIntervalMs: 1000,
+        nonRetryable: (error) => error.message === 'status failed',
+      },
+    );
+
+    if (!result) {
+      throw new Error(`Transaction receipt not found after ${maxAttempts} attempts`);
+    }
+
+    return result;
+  };
 
   const handleTransactionError = (err: unknown) => {
     const reason = `${
@@ -154,7 +181,7 @@ export const useExecute = (environment: Environment) => {
           transactionRequestTarget,
           fromAmount,
         );
-        return tx.wait();
+        return waitForReceipt(provider, tx.hash);
       }
       return undefined;
     } catch (error) {
@@ -177,7 +204,7 @@ export const useExecute = (environment: Environment) => {
         signer: provider.getSigner(),
         route: routeResponse.route,
       })) as unknown as ethers.providers.TransactionResponse;
-      return tx.wait();
+      return waitForReceipt(provider, tx.hash);
     } catch (error) {
       handleTransactionError(error);
       return undefined;
