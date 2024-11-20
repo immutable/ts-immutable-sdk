@@ -519,7 +519,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
   //    as user will need enough imx for the swap amount and the gas
   const insufficientFundsForGas = useMemo(() => {
     if (!provider) return true;
-    if (isPassportProvider(provider.name)) return false;
+    if (isPassportProvider(provider)) return false;
 
     const imxBalance = tokenBalances.find((b) => b.token.address?.toLowerCase() === NATIVE);
     if (!imxBalance) return true;
@@ -976,7 +976,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
             />
           </Box>
         </Box>
-        {!isPassportProvider(provider?.name) && (
+        {!isPassportProvider(provider) && (
         <Fees
           gasFeeFiatValue={gasFeeFiatValue}
           gasFeeToken={gasFeeToken}

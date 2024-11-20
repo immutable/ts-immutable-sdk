@@ -66,7 +66,6 @@ import {
   TokenFilterTypes,
   TokenInfo,
   ValidateProviderOptions,
-  WalletProviderName,
 } from './types';
 import { CancelParams } from './types/cancel';
 import { SellParams } from './types/sell';
@@ -390,7 +389,7 @@ export class Checkout {
 
     if (
       params.requestWalletPermissions
-      && !transaction.isPassportProvider(browserProvider.name)
+      && !transaction.isPassportProvider(browserProvider)
     ) {
       await connect.requestPermissions(browserProvider);
     } else {
@@ -739,7 +738,7 @@ export class Checkout {
     let email;
 
     const walletAddress = await (await params.browserProvider.getSigner()).getAddress();
-    const isPassport = params.browserProvider.name === WalletProviderName.PASSPORT || false;
+    const isPassport = params.browserProvider.ethereumProvider?.isPassport || false;
 
     if (isPassport && params.passport) {
       const userInfo = await params.passport.getUserInfo();

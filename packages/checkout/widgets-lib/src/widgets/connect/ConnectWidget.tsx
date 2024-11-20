@@ -197,11 +197,11 @@ export default function ConnectWidget({
 
     // Find the wallet provider info via injected with Passport and MetaMask fallbacks
     let walletProviderInfo: EIP6963ProviderInfo | undefined;
-    if (isWalletConnectProvider(provider.name)) {
+    if (isWalletConnectProvider(provider)) {
       walletProviderInfo = walletConnectProviderInfo;
-    } else if (isPassportProvider(provider.name)) {
+    } else if (isPassportProvider(provider)) {
       walletProviderInfo = passportProviderInfo;
-    } else if (isMetaMaskProvider(provider.name)) {
+    } else if (isMetaMaskProvider(provider)) {
       walletProviderInfo = metaMaskProviderInfo;
     }
 

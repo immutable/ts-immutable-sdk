@@ -7,12 +7,12 @@ describe('providerUtils', () => {
 
   describe('isPassport', () => {
     it('should return true when provider is valid and passport flag is true', () => {
-      const result = isPassportProvider(mockPassportBrowserProvider.name);
+      const result = isPassportProvider(mockPassportBrowserProvider);
       expect(result).toBe(true);
     });
 
     it('should return false when provider is valid and passport flag is missing', () => {
-      const result = isPassportProvider(mockMetaMaskBrowserProvider.name);
+      const result = isPassportProvider(mockMetaMaskBrowserProvider);
       expect(result).toBe(false);
     });
 
@@ -29,12 +29,12 @@ describe('providerUtils', () => {
 
   describe('isMetaMask', () => {
     it('should return true when provider is valid and metamask flag is true', () => {
-      const result = isMetaMaskProvider(mockMetaMaskBrowserProvider.name);
+      const result = isMetaMaskProvider(mockMetaMaskBrowserProvider);
       expect(result).toBe(true);
     });
 
     it('should return false when provider is valid and metamask flag is missing', () => {
-      const result = isMetaMaskProvider(mockPassportBrowserProvider.name);
+      const result = isMetaMaskProvider(mockPassportBrowserProvider);
       expect(result).toBe(false);
     });
 

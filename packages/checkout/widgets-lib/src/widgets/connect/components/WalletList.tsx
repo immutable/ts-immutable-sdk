@@ -122,7 +122,7 @@ export function WalletList(props: WalletListProps) {
   );
 
   const handleConnectViewUpdate = async (provider: NamedBrowserProvider) => {
-    const isPassport = isPassportProvider(provider.name);
+    const isPassport = isPassportProvider(provider);
     const chainId = await provider.send!('eth_chainId', []);
     // eslint-disable-next-line radix
     const parsedChainId = parseInt(chainId.toString());
