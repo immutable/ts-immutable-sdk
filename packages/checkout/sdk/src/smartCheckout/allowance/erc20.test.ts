@@ -63,8 +63,8 @@ describe('allowance', () => {
     it('should get the approval transaction from the contract with the from added', async () => {
       const approveMock = jest.fn().mockResolvedValue({ data: '0xDATA' });
       (Contract as unknown as jest.Mock).mockReturnValue({
-        populateTransaction: {
-          approve: approveMock,
+        approve: {
+          populateTransaction: approveMock,
         },
       });
 
@@ -82,8 +82,8 @@ describe('allowance', () => {
     it('should error is call to approve fails', async () => {
       const approveMock = jest.fn().mockRejectedValue({ from: '0xADDRESS' });
       (Contract as unknown as jest.Mock).mockReturnValue({
-        populateTransaction: {
-          approve: approveMock,
+        approve: {
+          populateTransaction: approveMock,
         },
       });
 
@@ -119,8 +119,8 @@ describe('allowance', () => {
       const allowanceMock = jest.fn().mockResolvedValue(BigInt(1));
       (Contract as unknown as jest.Mock).mockReturnValue({
         allowance: allowanceMock,
-        populateTransaction: {
-          approve: approveMock,
+        approve: {
+          populateTransaction: approveMock,
         },
       });
 
@@ -157,8 +157,8 @@ describe('allowance', () => {
       const allowanceMock = jest.fn().mockResolvedValue(BigInt(1));
       (Contract as unknown as jest.Mock).mockReturnValue({
         allowance: allowanceMock,
-        populateTransaction: {
-          approve: approveMock,
+        approve: {
+          populateTransaction: approveMock,
         },
       });
 
@@ -192,8 +192,8 @@ describe('allowance', () => {
       const allowanceMock = jest.fn().mockResolvedValue(BigInt(1));
       (Contract as unknown as jest.Mock).mockReturnValue({
         allowance: allowanceMock,
-        populateTransaction: {
-          approve: approveMock,
+        approve: {
+          populateTransaction: approveMock,
         },
       });
 
