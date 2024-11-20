@@ -77,23 +77,25 @@ export function BalanceItem({
   useEffect(() => {
     if (!network || !supportedTopUps || !checkout) return;
 
+    const currentChainId = Number(network.chainId);
+
     const enableAddCoin = (supportedTopUps?.isAddTokensEnabled ?? true)
     && (supportedTopUps?.isSwapAvailable ?? true);
     setIsAddTokensEnabled(enableAddCoin);
 
     const enableBuyCoin = !enableAddCoin
-      && network.chainId === getL2ChainId(checkout.config)
+      && currentChainId === getL2ChainId(checkout.config)
       && (supportedTopUps?.isOnRampEnabled ?? true);
     setIsOnRampEnabled(enableBuyCoin);
 
     const enableMoveCoin = !enableAddCoin
-      && (network.chainId === getL1ChainId(checkout.config)
-        || network.chainId === getL2ChainId(checkout.config))
+      && (currentChainId === getL1ChainId(checkout.config)
+        || currentChainId === getL2ChainId(checkout.config))
       && (supportedTopUps?.isBridgeEnabled ?? true);
     setIsBridgeEnabled(enableMoveCoin);
 
     const enableSwapCoin = !enableAddCoin
-      && network.chainId === getL2ChainId(checkout.config)
+      && currentChainId === getL2ChainId(checkout.config)
       && (supportedTopUps?.isSwapEnabled ?? true)
       && (supportedTopUps?.isSwapAvailable ?? true);
     setIsSwapEnabled(enableSwapCoin);

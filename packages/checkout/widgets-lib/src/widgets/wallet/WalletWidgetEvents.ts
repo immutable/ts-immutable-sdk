@@ -35,7 +35,7 @@ export function sendNetworkSwitchEvent(
       type: WalletEventType.NETWORK_SWITCH,
       data: {
         network: network.name,
-        chainId: network.chainId,
+        chainId: Number(network.chainId),
         provider,
       },
     },

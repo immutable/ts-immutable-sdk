@@ -6,7 +6,7 @@ import {
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChainId, getGasPriceInWei, WalletProviderName } from '@imtbl/checkout-sdk';
+import { getGasPriceInWei, WalletProviderName } from '@imtbl/checkout-sdk';
 import { FlowRateWithdrawResponse } from '@imtbl/bridge-sdk';
 import { FeeData } from 'ethers';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
@@ -173,7 +173,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
     // check that provider is connected to L1
     const network = await providerToUse.getNetwork();
 
-    if (network.chainId as unknown as ChainId !== l1ChainId) {
+    if (Number(network.chainId) !== l1ChainId) {
       try {
         const switchNetworkResult = await checkout.switchNetwork({
           provider: providerToUse,

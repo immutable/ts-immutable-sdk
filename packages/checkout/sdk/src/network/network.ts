@@ -103,9 +103,9 @@ export async function getNetworkInfo(
       try {
         const network = await provider.getNetwork();
         if (
-          Array.from(networkMap.keys()).includes(network.chainId as unknown as ChainId)
+          Array.from(networkMap.keys()).includes(Number(network.chainId))
         ) {
-          const chainIdNetworkInfo = networkMap.get(network.chainId as unknown as ChainId);
+          const chainIdNetworkInfo = networkMap.get(Number(network.chainId));
           return {
             name: chainIdNetworkInfo!.chainName,
             chainId: BigInt(parseInt(chainIdNetworkInfo!.chainIdHex, 16)),

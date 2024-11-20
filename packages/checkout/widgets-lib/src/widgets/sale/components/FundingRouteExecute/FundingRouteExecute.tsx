@@ -142,7 +142,7 @@ export function FundingRouteExecute({
           tokenAddress: step.fundingItem.token.address,
           amount: step.fundingItem.fundsRequired.formattedAmount,
         });
-        if (network.chainId === getL1ChainId(checkout!.config)) {
+        if (Number(network.chainId) === getL1ChainId(checkout!.config)) {
           setView(FundingRouteExecuteViews.EXECUTE_BRIDGE);
           return;
         }
@@ -158,7 +158,7 @@ export function FundingRouteExecute({
           toTokenAddress: requiredTokenAddress,
           autoProceed: true,
         });
-        if (network.chainId === getL2ChainId(checkout!.config)) {
+        if (Number(network.chainId) === getL2ChainId(checkout!.config)) {
           setView(FundingRouteExecuteViews.EXECUTE_SWAP);
           return;
         }
