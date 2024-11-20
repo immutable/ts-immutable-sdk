@@ -13,9 +13,9 @@ describe('signActions', () => {
   describe('signApprovalTransactions', () => {
     it('should sign approval transactions', async () => {
       mockProvider = {
-        getNetwork: jest.fn().mockReturnValue({
+        getNetwork: jest.fn().mockResolvedValue({
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-        } as NetworkInfo),
+        } as unknown as NetworkInfo),
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: jest.fn().mockResolvedValue({
             wait: jest.fn().mockResolvedValue({
@@ -57,14 +57,14 @@ describe('signActions', () => {
 
     it('should return failed when approval transaction reverted', async () => {
       mockProvider = {
-        getNetwork: jest.fn().mockReturnValue({
+        getNetwork: jest.fn().mockResolvedValue({
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-        } as NetworkInfo),
+        } as unknown as NetworkInfo),
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: jest.fn().mockResolvedValue({
             wait: jest.fn().mockResolvedValue({
               status: 0,
-              transactionHash: '0xHASH',
+              hash: '0xHASH',
             }),
           }),
         }),
@@ -122,7 +122,7 @@ describe('signActions', () => {
       mockProvider = {
         getNetwork: jest.fn().mockReturnValue({
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-        } as NetworkInfo),
+        } as unknown as NetworkInfo),
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: jest.fn().mockResolvedValue({
             wait: jest.fn().mockResolvedValue({
@@ -163,12 +163,12 @@ describe('signActions', () => {
       mockProvider = {
         getNetwork: jest.fn().mockReturnValue({
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-        } as NetworkInfo),
+        } as unknown as NetworkInfo),
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: jest.fn().mockResolvedValue({
             wait: jest.fn().mockResolvedValue({
               status: 0,
-              transactionHash: '0xHASH',
+              hash: '0xHASH',
             }),
           }),
         }),
