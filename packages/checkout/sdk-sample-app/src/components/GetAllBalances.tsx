@@ -33,7 +33,7 @@ export default function GetAllBalances(props: BalanceProps) {
       const resp = await checkout.getAllBalances({
         provider,
         walletAddress,
-        chainId: (await provider.getNetwork()).chainId as unknown as ChainId,
+        chainId: Number((await provider.getNetwork()).chainId),
       });
       setResult(resp.balances);
       setLoading(false);

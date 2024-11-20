@@ -184,6 +184,7 @@ export function ConnectLoader({
 
         try {
           const currentNetworkInfo = await checkout.getNetworkInfo({ provider: browserProvider! });
+          const currentChainId = Number(currentNetworkInfo.chainId);
 
           // TODO: do this instead, replace chainId check with below code instead of checkout.getNetworkInfo
           // Also, skip the entire section if it is Passport.
@@ -192,7 +193,7 @@ export function ConnectLoader({
           // If unsupported network or current network is not in the allowed chains
           // then show the switch network screen
           if ((isCheckNetworkEnabled === undefined || isCheckNetworkEnabled)
-              && (!allowedChains.includes(currentNetworkInfo.chainId) || !currentNetworkInfo.isSupported)) {
+              && (!allowedChains.includes(currentChainId) || !currentNetworkInfo.isSupported)) {
             connectLoaderDispatch({
               payload: {
                 type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,

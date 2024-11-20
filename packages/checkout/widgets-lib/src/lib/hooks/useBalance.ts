@@ -40,7 +40,7 @@ export const useBalance = ({
       if (!silent) {
         setBalancesLoading(true);
       }
-      const balances: GetBalanceResult[] = await getTokenBalances(checkout, provider, network.chainId);
+      const balances: GetBalanceResult[] = await getTokenBalances(checkout, provider, Number(network.chainId));
       if (!silent) {
         setBalancesLoading(false);
       }

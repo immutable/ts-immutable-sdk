@@ -154,7 +154,7 @@ export default function WalletWidget(props: WalletWidgetInputs) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: WalletWidgetViews.SETTINGS },
+          view: { type: WalletWidgetViews.WALLET_BALANCES },
         },
       });
 

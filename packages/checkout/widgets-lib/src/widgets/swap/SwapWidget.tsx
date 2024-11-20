@@ -171,7 +171,7 @@ export default function SwapWidget({
 
       // If the provider's network is not the correct network, return out of this and let the
       // connect loader handle the switch network functionality
-      if (network.chainId !== getL2ChainId(checkout.config)) return;
+      if (Number(network.chainId) !== getL2ChainId(checkout.config)) return;
 
       swapDispatch({
         payload: {
