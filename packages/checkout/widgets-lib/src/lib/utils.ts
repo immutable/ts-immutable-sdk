@@ -56,10 +56,10 @@ export const sortNetworksCompareFn = (
   config: CheckoutConfiguration,
 ) => {
   // make sure zkEVM at start of the list then L1
-  if (a.chainId === getL2ChainId(config)) {
+  if (Number(a.chainId) === getL2ChainId(config)) {
     return -1;
   }
-  if (a.chainId === getL1ChainId(config)) {
+  if (Number(a.chainId) === getL1ChainId(config)) {
     return 0;
   }
   return 1;
