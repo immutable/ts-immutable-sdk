@@ -8,7 +8,7 @@ import { HttpClient } from '../api/http';
 
 jest.mock('../network');
 jest.mock('ethers', () => ({
-  // eslint-disable-next-line @typescript-eslint/naming-convention
+  ...jest.requireActual('ethers'),
   JsonRpcProvider: jest.fn(),
 }));
 
@@ -23,13 +23,13 @@ describe('read only providers', () => {
     const getNetworkAllListMock = jest.fn().mockResolvedValue({
       networks: [
         {
-          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          chainId: BigInt(ChainId.IMTBL_ZKEVM_TESTNET),
           name: ChainName.IMTBL_ZKEVM_TESTNET,
           isSupported: true,
           nativeCurrency: {},
         },
         {
-          chainId: ChainId.SEPOLIA,
+          chainId: BigInt(ChainId.SEPOLIA),
           name: ChainName.SEPOLIA,
           isSupported: true,
           nativeCurrency: {},

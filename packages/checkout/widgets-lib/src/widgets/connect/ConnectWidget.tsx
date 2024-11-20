@@ -17,6 +17,7 @@ import {
   useReducer,
 } from 'react';
 import { useTranslation } from 'react-i18next';
+import { BrowserProvider } from 'ethers';
 import { ConnectLoaderSuccess } from '../../components/ConnectLoader/ConnectLoaderSuccess';
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
@@ -194,6 +195,11 @@ export default function ConnectWidget({
 
     await identifyUser(identify, provider, { anonymousId });
     sendProviderUpdatedEvent({ provider });
+
+    console.log('qwerqwerqwer');
+    console.log(await provider.send('eth_accounts', []));
+    const bla = new BrowserProvider({ request: ({ method, params }) => provider.send(method, params ?? []) });
+    console.log(await bla.send('eth_accounts', []));
 
     // Find the wallet provider info via injected with Passport and MetaMask fallbacks
     let walletProviderInfo: EIP6963ProviderInfo | undefined;

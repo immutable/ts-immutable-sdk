@@ -1,7 +1,6 @@
 /*
  * @jest-environment jsdom
  */
-import { BrowserProvider } from 'ethers';
 import { Environment } from '@imtbl/config';
 import {
   getNetworkAllowList,
@@ -28,12 +27,6 @@ import {
 } from '../env';
 
 let windowSpy: any;
-const providerMock = {
-  request: jest.fn(),
-};
-const passportProviderMock = {
-  ...providerMock,
-};
 const ethNetworkInfo = {
   name: ChainName.ETHEREUM,
   chainId: ChainId.ETHEREUM,
@@ -106,16 +99,14 @@ describe('network functions', () => {
   });
 
   describe('switchWalletNetwork()', () => {
-    it.only('should make request for the user to switch network', async () => {
+    it('should make request for the user to switch network', async () => {
       (NamedBrowserProvider as unknown as jest.Mock).mockReturnValue({
         send: jest.fn(),
         getNetwork: async () => ethNetworkInfo,
+        name: WalletProviderName.METAMASK,
       });
 
-      const { provider } = await createProvider(WalletProviderName.METAMASK);
-
-      console.log('QWERQEWR');
-      console.log(provider);
+      const provider = await createProvider(WalletProviderName.METAMASK);
 
       const switchNetworkResult = await switchWalletNetwork(
         new CheckoutConfiguration({
@@ -125,17 +116,14 @@ describe('network functions', () => {
         ChainId.ETHEREUM,
       );
 
-      expect(provider.send).toBeCalledWith({
-        method: WalletAction.SWITCH_NETWORK,
-        params: [
-          {
-            chainId: PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.ETHEREUM)!.chainIdHex,
-          },
-        ],
-      });
+      expect(provider.send).toBeCalledWith(WalletAction.SWITCH_NETWORK, [
+        {
+          chainId: PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.ETHEREUM)!.chainIdHex,
+        },
+      ]);
       expect(switchNetworkResult.network).toEqual({
         name: ChainName.ETHEREUM,
-        chainId: ChainId.ETHEREUM,
+        chainId: BigInt(ChainId.ETHEREUM),
         isSupported: true,
         nativeCurrency: {
           name: ChainName.ETHEREUM,
@@ -146,25 +134,19 @@ describe('network functions', () => {
     });
 
     it('should make request for the user to switch network zkevm', async () => {
-      (BrowserProvider as unknown as jest.Mock)
+      (NamedBrowserProvider as unknown as jest.Mock)
         .mockReturnValueOnce({
-          provider: providerMock,
-          getNetwork: async () => ethNetworkInfo,
-          network: {
-            chainId: ethNetworkInfo.chainId,
-          },
+          send: jest.fn(),
+          getNetwork: jest.fn().mockResolvedValue(ethNetworkInfo),
+          name: WalletProviderName.METAMASK,
         })
         .mockReturnValueOnce({
-          provider: {
-            request: jest.fn(),
-          },
-          getNetwork: async () => zkevmNetworkInfo,
-          network: {
-            chainId: zkevmNetworkInfo.chainId,
-          },
+          send: jest.fn(),
+          getNetwork: jest.fn().mockResolvedValue(zkevmNetworkInfo),
+          name: WalletProviderName.METAMASK,
         });
 
-      const { provider } = await createProvider(WalletProviderName.METAMASK);
+      const provider = await createProvider(WalletProviderName.METAMASK);
 
       const switchNetworkResult = await switchWalletNetwork(
         testCheckoutConfiguration,
@@ -172,31 +154,27 @@ describe('network functions', () => {
         ChainId.IMTBL_ZKEVM_TESTNET,
       );
 
-      expect(provider.send).toBeCalledWith({
-        method: WalletAction.SWITCH_NETWORK,
-        params: [
-          {
-            chainId: testCheckoutConfiguration.networkMap.get(
-              ChainId.IMTBL_ZKEVM_TESTNET,
-            )?.chainIdHex,
-          },
-        ],
-      });
-      const copyZkevmNetworkInfo = zkevmNetworkInfo as NetworkInfo;
+      expect(provider.send).toBeCalledWith(WalletAction.SWITCH_NETWORK, [
+        {
+          chainId: testCheckoutConfiguration.networkMap.get(
+            ChainId.IMTBL_ZKEVM_TESTNET,
+          )?.chainIdHex,
+        },
+      ]);
+      const copyZkevmNetworkInfo = zkevmNetworkInfo as unknown as NetworkInfo;
       copyZkevmNetworkInfo.isSupported = true;
+      copyZkevmNetworkInfo.chainId = BigInt(zkevmNetworkInfo.chainId);
       expect(switchNetworkResult.network).toEqual(copyZkevmNetworkInfo);
     });
 
     it('should throw an error if the network is not in our whitelist', async () => {
-      (BrowserProvider as unknown as jest.Mock).mockReturnValueOnce({
-        provider: providerMock,
-        getNetwork: async () => ethNetworkInfo,
-        network: {
-          chainId: ethNetworkInfo.chainId,
-        },
+      (NamedBrowserProvider as unknown as jest.Mock).mockReturnValueOnce({
+        send: jest.fn(),
+        getNetwork: jest.fn().mockResolvedValue(ethNetworkInfo),
+        name: WalletProviderName.METAMASK,
       });
 
-      const { provider } = await createProvider(WalletProviderName.METAMASK);
+      const provider = await createProvider(WalletProviderName.METAMASK);
 
       await expect(
         switchWalletNetwork(testCheckoutConfiguration, provider, 56 as ChainId),
@@ -209,12 +187,10 @@ describe('network functions', () => {
     });
 
     it('should throw an error if the user rejects the switch network request', async () => {
-      (BrowserProvider as unknown as jest.Mock).mockReturnValue({
-        provider: providerMock,
-        getNetwork: async () => ethNetworkInfo,
-        network: {
-          chainId: ethNetworkInfo.chainId,
-        },
+      (NamedBrowserProvider as unknown as jest.Mock).mockReturnValue({
+        send: jest.fn(),
+        getNetwork: jest.fn().mockResolvedValue(ethNetworkInfo),
+        name: WalletProviderName.METAMASK,
       });
 
       windowSpy.mockImplementation(() => ({
@@ -226,10 +202,12 @@ describe('network functions', () => {
               message: 'Provider error',
             }),
         },
+        addEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
         removeEventListener: () => {},
       }));
 
-      const { provider } = await createProvider(WalletProviderName.METAMASK);
+      const provider = await createProvider(WalletProviderName.METAMASK);
 
       try {
         await switchWalletNetwork(
@@ -244,22 +222,18 @@ describe('network functions', () => {
     });
 
     it('should throw an error if the user rejects the add network request', async () => {
-      (BrowserProvider as unknown as jest.Mock).mockReturnValue({
-        provider: {
-          request: jest
-            .fn()
-            .mockRejectedValue({
-              message: 'Provider error',
-              code: 4902,
-            }),
-        },
-        getNetwork: async () => ethNetworkInfo,
-        network: {
-          chainId: ethNetworkInfo.chainId,
-        },
+      (NamedBrowserProvider as unknown as jest.Mock).mockReturnValue({
+        send: jest
+          .fn()
+          .mockRejectedValue({
+            message: 'Provider error',
+            code: 4902,
+          }),
+        name: WalletProviderName.METAMASK,
+        getNetwork: jest.fn().mockResolvedValue(ethNetworkInfo),
       });
 
-      const { provider } = await createProvider(WalletProviderName.METAMASK);
+      const provider = await createProvider(WalletProviderName.METAMASK);
 
       try {
         await switchWalletNetwork(
@@ -274,22 +248,18 @@ describe('network functions', () => {
     });
 
     it('should throw an error if user rejects request and non-4902 code', async () => {
-      (BrowserProvider as unknown as jest.Mock).mockReturnValue({
-        provider: {
-          request: jest
-            .fn()
-            .mockRejectedValue({
-              message: 'Provider error',
-              code: 4000,
-            }),
-        },
-        getNetwork: async () => ethNetworkInfo,
-        network: {
-          chainId: ethNetworkInfo.chainId,
-        },
+      (NamedBrowserProvider as unknown as jest.Mock).mockReturnValue({
+        send: jest
+          .fn()
+          .mockRejectedValue({
+            message: 'Provider error',
+            code: 4000,
+          }),
+        name: WalletProviderName.METAMASK,
+        getNetwork: jest.fn().mockResolvedValue(ethNetworkInfo),
       });
 
-      const { provider } = await createProvider(WalletProviderName.METAMASK);
+      const provider = await createProvider(WalletProviderName.METAMASK);
 
       try {
         await switchWalletNetwork(
@@ -304,29 +274,21 @@ describe('network functions', () => {
     });
 
     it('should request the user to add a new network if their wallet does not already have it', async () => {
-      (BrowserProvider as unknown as jest.Mock)
+      (NamedBrowserProvider as unknown as jest.Mock)
         .mockReturnValueOnce({
-          provider: {
-            request: jest
-              .fn()
-              .mockRejectedValueOnce({ code: 4902 })
-              .mockResolvedValueOnce({}),
-          },
-          getNetwork: async () => zkevmNetworkInfo,
-          network: {
-            chainId: zkevmNetworkInfo.chainId,
-          },
+          send: jest
+            .fn()
+            .mockRejectedValueOnce({ code: 4902 })
+            .mockResolvedValueOnce({}),
+          name: WalletProviderName.METAMASK,
+          getNetwork: jest.fn().mockResolvedValue(zkevmNetworkInfo),
         })
         .mockReturnValueOnce({
-          provider: {
-            request: jest.fn().mockResolvedValueOnce({}),
-          },
-          getNetwork: async () => zkevmNetworkInfo,
-          network: {
-            chainId: zkevmNetworkInfo.chainId,
-          },
+          send: jest.fn().mockResolvedValueOnce({}),
+          name: WalletProviderName.METAMASK,
+          getNetwork: jest.fn().mockResolvedValue(zkevmNetworkInfo),
         });
-      const { provider } = await createProvider(WalletProviderName.METAMASK);
+      const provider = await createProvider(WalletProviderName.METAMASK);
 
       await switchWalletNetwork(
         testCheckoutConfiguration,
@@ -334,35 +296,32 @@ describe('network functions', () => {
         ChainId.IMTBL_ZKEVM_TESTNET,
       );
 
-      expect(provider.send).toHaveBeenCalledWith({
-        method: WalletAction.ADD_NETWORK,
-        params: [
-          {
-            chainId: testCheckoutConfiguration.networkMap.get(
-              ChainId.IMTBL_ZKEVM_TESTNET,
-            )?.chainIdHex,
-            chainName: testCheckoutConfiguration.networkMap.get(
-              ChainId.IMTBL_ZKEVM_TESTNET,
-            )?.chainName,
-            rpcUrls: testCheckoutConfiguration.networkMap.get(
-              ChainId.IMTBL_ZKEVM_TESTNET,
-            )?.rpcUrls,
-            nativeCurrency: testCheckoutConfiguration.networkMap.get(
-              ChainId.IMTBL_ZKEVM_TESTNET,
-            )?.nativeCurrency,
-            blockExplorerUrls: testCheckoutConfiguration.networkMap.get(
-              ChainId.IMTBL_ZKEVM_TESTNET,
-            )?.blockExplorerUrls,
-          },
-        ],
-      });
+      expect(provider.send).toHaveBeenCalledWith(WalletAction.ADD_NETWORK, [
+        {
+          chainId: testCheckoutConfiguration.networkMap.get(
+            ChainId.IMTBL_ZKEVM_TESTNET,
+          )?.chainIdHex,
+          chainName: testCheckoutConfiguration.networkMap.get(
+            ChainId.IMTBL_ZKEVM_TESTNET,
+          )?.chainName,
+          rpcUrls: testCheckoutConfiguration.networkMap.get(
+            ChainId.IMTBL_ZKEVM_TESTNET,
+          )?.rpcUrls,
+          nativeCurrency: testCheckoutConfiguration.networkMap.get(
+            ChainId.IMTBL_ZKEVM_TESTNET,
+          )?.nativeCurrency,
+          blockExplorerUrls: testCheckoutConfiguration.networkMap.get(
+            ChainId.IMTBL_ZKEVM_TESTNET,
+          )?.blockExplorerUrls,
+        },
+      ]);
     });
 
     it('should throw an error when switch network is called with a passport provider', async () => {
       try {
         await switchWalletNetwork(
           testCheckoutConfiguration,
-          { provider: passportProviderMock } as unknown as NamedBrowserProvider,
+          { name: WalletProviderName.PASSPORT } as unknown as NamedBrowserProvider,
           ChainId.SEPOLIA,
         );
       } catch (err: any) {
@@ -401,11 +360,11 @@ describe('network functions', () => {
           SANDBOX_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.chainName,
         );
         expect(result.chainId).toBe(
-          parseInt(
+          BigInt(parseInt(
             SANDBOX_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.chainIdHex
               ?? '',
             16,
-          ),
+          )),
         );
         expect(result.nativeCurrency).toEqual(
           SANDBOX_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.nativeCurrency,
@@ -477,7 +436,7 @@ describe('network functions', () => {
         networks: [
           {
             name: ChainName.SEPOLIA,
-            chainId: ChainId.SEPOLIA,
+            chainId: BigInt(ChainId.SEPOLIA),
             isSupported: true,
             nativeCurrency: {
               name: 'Sep Eth',
@@ -487,7 +446,7 @@ describe('network functions', () => {
           },
           {
             name: ChainName.IMTBL_ZKEVM_TESTNET,
-            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+            chainId: BigInt(ChainId.IMTBL_ZKEVM_TESTNET),
             isSupported: true,
             nativeCurrency: ZKEVM_NATIVE_SANDBOX_TOKEN,
           },
@@ -504,7 +463,7 @@ describe('network functions', () => {
         networks: [
           {
             name: ChainName.SEPOLIA,
-            chainId: ChainId.SEPOLIA,
+            chainId: BigInt(ChainId.SEPOLIA),
             isSupported: true,
             nativeCurrency: {
               name: 'Sep Eth',

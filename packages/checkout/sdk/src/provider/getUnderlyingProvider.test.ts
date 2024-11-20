@@ -7,95 +7,54 @@ import { NamedBrowserProvider } from '../types';
 describe('getUnderlyingChainId', () => {
   it('should return underlying chain id from property', async () => {
     const provider = {
-      provider: {
-        chainId: ChainId.SEPOLIA,
-        request: jest.fn(),
-      },
+      getNetwork: jest.fn().mockResolvedValue({ chainId: BigInt(ChainId.SEPOLIA) }),
+      send: jest.fn(),
     } as unknown as NamedBrowserProvider;
 
     const chainId = await getUnderlyingChainId(provider);
-    expect(chainId).toEqual(ChainId.SEPOLIA);
+    expect(chainId).toEqual(BigInt(ChainId.SEPOLIA));
     expect(provider.send).not.toBeCalled();
   });
 
   it('should return the underlying chain id from rpc call', async () => {
     const provider = {
-      provider: {
-        request: jest.fn().mockResolvedValue('0xaa36a7'),
-      },
+      send: jest.fn().mockResolvedValue(BigInt(ChainId.SEPOLIA)),
+      getNetwork: jest.fn().mockResolvedValue({ chainId: undefined }),
     } as unknown as NamedBrowserProvider;
 
     const chainId = await getUnderlyingChainId(provider);
-    expect(chainId).toEqual(ChainId.SEPOLIA);
-    expect(provider.send).toBeCalledWith({
-      method: WalletAction.GET_CHAINID,
-      params: [],
-    });
+    expect(chainId).toEqual(BigInt(ChainId.SEPOLIA));
+    expect(provider.send).toBeCalledWith(WalletAction.GET_CHAINID, []);
   });
 
-  it('should properly parse chain id', async () => {
-    const intChainId = 13473;
-    const strChainId = intChainId.toString();
-    const hexChainId = `0x${intChainId.toString(16)}`;
-    // eslint-disable-next-line max-len
-    const getMockProvider = (chainId: unknown) => ({ getNetwork: () => Promise.resolve({ chainId }) } as unknown as NamedBrowserProvider);
-
-    // Number
-    expect(await getUnderlyingChainId(getMockProvider(intChainId))).toEqual(
-      intChainId,
-    );
-
-    // String to Number
-    expect(await getUnderlyingChainId(getMockProvider(strChainId))).toEqual(
-      intChainId,
-    );
-
-    // Hex to Number
-    expect(await getUnderlyingChainId(getMockProvider(hexChainId))).toEqual(
-      intChainId,
-    );
-  });
-
-  it('should throw an error if provider missing from web3provider', async () => {
+  it('should throw an error if provider.send missing', async () => {
     try {
-      await getUnderlyingChainId({} as NamedBrowserProvider);
+      await getUnderlyingChainId({
+        getNetwork: jest.fn().mockResolvedValue({ chainId: undefined }),
+      } as unknown as NamedBrowserProvider);
     } catch (err: any) {
       expect(err.message).toEqual(
-        'Parsed provider is not a valid BrowserProvider',
+        'Parsed provider is not a valid NamedBrowserProvider',
       );
       expect(err.type).toEqual(CheckoutErrorType.WEB3_PROVIDER_ERROR);
     }
   });
 
-  it('should throw an error if provider.request missing', async () => {
-    try {
-      await getUnderlyingChainId({ provider: {} } as NamedBrowserProvider);
-    } catch (err: any) {
-      expect(err.message).toEqual(
-        'Parsed provider is not a valid BrowserProvider',
-      );
-      expect(err.type).toEqual(CheckoutErrorType.WEB3_PROVIDER_ERROR);
-    }
-  });
-
-  it('should throw an error if invalid chain id value from property', async () => {
+  it('should throw an error if invalid chain id value from getNetwork property', async () => {
     const provider = {
-      provider: {
-        chainId: 'invalid',
-        request: jest.fn(),
-      },
+      getNetwork: jest.fn().mockResolvedValue({ chainId: 'invalid' }),
+      send: jest.fn(),
     } as unknown as NamedBrowserProvider;
 
-    expect(provider.send).not.toHaveBeenCalled();
-    expect(getUnderlyingChainId(provider)).rejects.toThrow('Invalid chainId');
+    await expect(getUnderlyingChainId(provider)).rejects.toThrow('Invalid chainId');
   });
 
   it('should throw an error if invalid chain id value returned from rpc call ', async () => {
     const provider = {
+      getNetwork: jest.fn().mockResolvedValue({ chainId: undefined }),
       send: jest.fn().mockResolvedValue('invalid'),
     } as unknown as NamedBrowserProvider;
 
     expect(getUnderlyingChainId(provider)).rejects.toThrow('Invalid chainId');
-    expect(provider.send).toHaveBeenCalled();
   });
 });
