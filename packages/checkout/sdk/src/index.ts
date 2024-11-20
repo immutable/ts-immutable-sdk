@@ -18,7 +18,7 @@ export {
   metaMaskProviderInfo,
   getMetaMaskProviderDetail,
   validateProvider,
-  getUnderlyingProvider,
+  getUnderlyingChainId,
 } from './provider';
 
 export {
