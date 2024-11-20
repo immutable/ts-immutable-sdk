@@ -46,7 +46,7 @@ export function ChangeWallet({ onChangeWalletClick }: ChangeWalletProps) {
 
   useEffect(() => {
     if (isWalletConnectEnabled) {
-      const isProviderWalletConnect = isWalletConnectProvider(from?.browserProvider.name);
+      const isProviderWalletConnect = isWalletConnectProvider(from?.browserProvider);
       setIsWalletConnect(isProviderWalletConnect);
       if (isProviderWalletConnect) {
         (async () => {

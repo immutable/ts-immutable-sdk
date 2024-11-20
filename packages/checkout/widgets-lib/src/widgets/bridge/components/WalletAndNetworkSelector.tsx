@@ -171,7 +171,7 @@ export function WalletAndNetworkSelector() {
     });
 
     /** if Passport skip from network selector and default to zkEVM */
-    if (isPassportProvider(providerName)) {
+    if (isPassportProvider(provider)) {
       setFromNetwork(imtblZkEvmNetworkChainId);
       setFromWalletDrawerOpen(false);
 
@@ -330,7 +330,7 @@ export function WalletAndNetworkSelector() {
 
         const address = await (await connectedProvider.getSigner()).getAddress();
 
-        if (isWalletConnectProvider(connectedProvider.name)) {
+        if (isWalletConnectProvider(connectedProvider)) {
           handleWalletConnectToWalletConnection(connectedProvider);
         } else {
           setToWalletBrowserProvider(connectedProvider);
@@ -412,8 +412,8 @@ export function WalletAndNetworkSelector() {
           address: fromWalletAddress,
           rdns: fromWallet?.providerDetail.info.rdns,
           uuid: fromWallet?.providerDetail.info.uuid,
-          isPassportWallet: isPassportProvider(fromWalletBrowserProvider.name),
-          isMetaMask: isMetaMaskProvider(fromWalletBrowserProvider.name),
+          isPassportWallet: isPassportProvider(fromWalletBrowserProvider),
+          isMetaMask: isMetaMaskProvider(fromWalletBrowserProvider),
         },
         toWalletAddress,
         toNetwork,
@@ -421,8 +421,8 @@ export function WalletAndNetworkSelector() {
           address: toWalletAddress,
           rdns: toWallet?.providerDetail.info.rdns,
           uuid: toWallet?.providerDetail.info.uuid,
-          isPassportWallet: isPassportProvider(toWalletBrowserProvider.name),
-          isMetaMask: isMetaMaskProvider(toWalletBrowserProvider.name),
+          isPassportWallet: isPassportProvider(toWalletBrowserProvider),
+          isMetaMask: isMetaMaskProvider(toWalletBrowserProvider),
         },
         moveType: fromNetwork && fromNetwork === toNetwork ? 'transfer' : 'bridge',
       },

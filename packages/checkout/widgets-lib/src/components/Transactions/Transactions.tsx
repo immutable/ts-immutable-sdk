@@ -84,7 +84,7 @@ export function Transactions({
   const [txs, setTxs] = useState<Transaction[]>([]);
   const [showWalletDrawer, setShowWalletDrawer] = useState(false);
 
-  const isPassport = isPassportProvider(from?.browserProvider.name);
+  const isPassport = isPassportProvider(from?.browserProvider);
 
   // Fetch the tokens for the root chain using the allowed tokens.
   // In case this list does not have all the tokens, there is logic

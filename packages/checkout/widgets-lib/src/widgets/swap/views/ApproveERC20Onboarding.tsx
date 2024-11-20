@@ -35,7 +35,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   const { viewDispatch } = useContext(ViewContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
-  const isPassport = isPassportProvider(provider?.name);
+  const isPassport = isPassportProvider(provider);
   const noApprovalTransaction = data.approveTransaction === undefined;
 
   // Local state

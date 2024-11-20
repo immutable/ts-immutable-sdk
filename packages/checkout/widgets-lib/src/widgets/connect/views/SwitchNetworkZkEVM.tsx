@@ -101,7 +101,7 @@ export function SwitchNetworkZkEVM() {
 
     try {
       let walletName = '';
-      if (isWalletConnectProvider(provider.name)) {
+      if (isWalletConnectProvider(provider)) {
         walletName = (provider.provider as any)?.session?.peer?.metadata?.name.toLowerCase();
       }
       if (walletName.includes('metamask')) {
@@ -177,7 +177,7 @@ export function SwitchNetworkZkEVM() {
       <SimpleTextBody
         heading={t('views.SWITCH_NETWORK.zkEVM.heading')}
       >
-        {isWalletConnectProvider(provider?.name) ? (
+        {isWalletConnectProvider(provider) ? (
           t('views.SWITCH_NETWORK.zkEVM.bodyWalletConnect')) : (
           t('views.SWITCH_NETWORK.zkEVM.body'))}
       </SimpleTextBody>
