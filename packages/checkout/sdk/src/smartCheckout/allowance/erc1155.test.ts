@@ -54,8 +54,8 @@ describe('erc1155', () => {
     it('should get the approval transaction from the contract with the from added', async () => {
       const setERC1155ApprovalForAllTransactionMock = jest.fn().mockResolvedValue({ data: '0xDATA' });
       (Contract as unknown as jest.Mock).mockReturnValue({
-        populateTransaction: {
-          setApprovalForAll: setERC1155ApprovalForAllTransactionMock,
+        setApprovalForAll: {
+          populateTransaction: setERC1155ApprovalForAllTransactionMock,
         },
       });
 
@@ -72,8 +72,8 @@ describe('erc1155', () => {
     it('should throw checkout error if call to approve fails', async () => {
       const setERC1155ApprovalForAllTransactionMock = jest.fn().mockRejectedValue({ from: '0xADDRESS' });
       (Contract as unknown as jest.Mock).mockReturnValue({
-        populateTransaction: {
-          setApprovalForAll: setERC1155ApprovalForAllTransactionMock,
+        setApprovalForAll: {
+          populateTransaction: setERC1155ApprovalForAllTransactionMock,
         },
       });
 
@@ -116,8 +116,8 @@ describe('erc1155', () => {
         const approveTxMock = jest.fn().mockResolvedValue({ data: '0xDATA', to: '0x00000' });
         (Contract as unknown as jest.Mock).mockReturnValue({
           isApprovedForAll: isApprovedForAllMock,
-          populateTransaction: {
-            setApprovalForAll: approveTxMock,
+          setApprovalForAll: {
+            populateTransaction: approveTxMock,
           },
         });
 

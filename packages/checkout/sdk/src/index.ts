@@ -18,6 +18,7 @@ export {
   metaMaskProviderInfo,
   getMetaMaskProviderDetail,
   validateProvider,
+  getUnderlyingProvider,
 } from './provider';
 
 export {
