@@ -64,7 +64,7 @@ export function NetworkSwitchDrawer({
     }
   }, [checkout, provider, onNetworkSwitch, targetChainId]);
 
-  const isWalletConnect = isWalletConnectProvider(provider.name);
+  const isWalletConnect = isWalletConnectProvider(provider);
 
   const walletConnectPeerName = useMemo(() => {
     if (!isWalletConnect) return '';
@@ -77,7 +77,7 @@ export function NetworkSwitchDrawer({
   );
 
   const walletDisplayName = useMemo(() => {
-    if (isMetaMaskProvider(provider.name)) return 'MetaMask wallet';
+    if (isMetaMaskProvider(provider)) return 'MetaMask wallet';
     if (isWalletConnect && walletConnectPeerName) return walletConnectPeerName;
     return 'wallet';
   }, [provider, isWalletConnect, walletConnectPeerName]);

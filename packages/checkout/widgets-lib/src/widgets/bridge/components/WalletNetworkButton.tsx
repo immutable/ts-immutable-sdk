@@ -56,7 +56,7 @@ export function WalletNetworkButton({
       return walletName;
     }
 
-    if (isWalletConnectProvider(walletProvider.name)) {
+    if (isWalletConnectProvider(walletProvider)) {
       return walletConnectPeerName;
     }
 
@@ -65,7 +65,7 @@ export function WalletNetworkButton({
 
   useEffect(() => {
     if (isWalletConnectEnabled) {
-      const isProviderWalletConnect = isWalletConnectProvider(walletProvider.name);
+      const isProviderWalletConnect = isWalletConnectProvider(walletProvider);
       setIsWalletConnect(isProviderWalletConnect);
       if (isProviderWalletConnect) {
         (async () => {

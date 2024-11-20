@@ -342,8 +342,8 @@ export function BridgeReviewSummary() {
 
   useEffect(() => {
     if (isWalletConnectEnabled) {
-      const isFromProviderWalletConnect = isWalletConnectProvider(from?.browserProvider.name);
-      const isToProviderWalletConnect = isWalletConnectProvider(to?.browserProvider.name);
+      const isFromProviderWalletConnect = isWalletConnectProvider(from?.browserProvider);
+      const isToProviderWalletConnect = isWalletConnectProvider(to?.browserProvider);
       setFromWalletIsWalletConnect(isFromProviderWalletConnect);
       setToWalletIsWalletConnect(isToProviderWalletConnect);
       (async () => {
@@ -410,8 +410,8 @@ export function BridgeReviewSummary() {
           address: fromAddress,
           rdns: from?.walletProviderInfo?.rdns,
           uuid: from?.walletProviderInfo?.uuid,
-          isPassportWallet: isPassportProvider(from?.browserProvider.name),
-          isMetaMask: isMetaMaskProvider(from?.browserProvider.name),
+          isPassportWallet: isPassportProvider(from?.browserProvider),
+          isMetaMask: isMetaMaskProvider(from?.browserProvider),
         },
         toWalletAddress: toAddress,
         toNetwork,
@@ -419,8 +419,8 @@ export function BridgeReviewSummary() {
           address: toAddress,
           rdns: to?.walletProviderInfo?.rdns,
           uuid: to?.walletProviderInfo?.uuid,
-          isPassportWallet: isPassportProvider(to?.browserProvider.name),
-          isMetaMask: isMetaMaskProvider(to?.browserProvider.name),
+          isPassportWallet: isPassportProvider(to?.browserProvider),
+          isMetaMask: isMetaMaskProvider(to?.browserProvider),
         },
         amount,
         fiatAmount: fromFiatAmount,

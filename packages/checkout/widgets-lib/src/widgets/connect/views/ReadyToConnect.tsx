@@ -33,8 +33,8 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
   } = useContext(ConnectContext);
   const { viewState: { history }, viewDispatch } = useContext(ViewContext);
 
-  const isPassport = isPassportProvider(provider?.name);
-  const isMetaMask = isMetaMaskProvider(provider?.name);
+  const isPassport = isPassportProvider(provider);
+  const isMetaMask = isMetaMaskProvider(provider);
 
   const { page, identify, track } = useAnalytics();
 
@@ -133,7 +133,7 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
       });
 
       let changeAccount = false;
-      if (isMetaMaskProvider(provider.name)) {
+      if (isMetaMaskProvider(provider)) {
         changeAccount = true;
       }
 
