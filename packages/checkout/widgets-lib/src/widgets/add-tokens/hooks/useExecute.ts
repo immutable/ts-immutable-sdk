@@ -19,18 +19,13 @@ export const useExecute = (environment: Environment) => {
   const waitForReceipt = async (provider: Web3Provider, txHash: string, maxAttempts = 60) => {
     let attempts = 0;
     while (attempts < maxAttempts) {
-      try {
-        // eslint-disable-next-line no-await-in-loop
-        const receipt = await provider.getTransactionReceipt(txHash);
-        if (receipt) {
-          if (receipt.status === 0) {
-            throw new Error('Transaction failed');
-          }
-          return receipt;
+      // eslint-disable-next-line no-await-in-loop
+      const receipt = await provider.getTransactionReceipt(txHash);
+      if (receipt) {
+        if (receipt.status === 0) {
+          throw new Error('Transaction failed');
         }
-      } catch (err) {
-        console.warn('Error checking receipt:', err);
-        throw err;
+        return receipt;
       }
       attempts += 1;
       // eslint-disable-next-line no-await-in-loop, no-promise-executor-return
