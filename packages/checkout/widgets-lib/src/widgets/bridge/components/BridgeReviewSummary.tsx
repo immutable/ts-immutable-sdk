@@ -329,14 +329,14 @@ export function BridgeReviewSummary() {
     if (!from?.browserProvider) return;
 
     const handleChainChanged = () => {
-      handleNetworkSwitch(from?.browserProvider);
+      handleNetworkSwitch(from.browserProvider);
       setShowSwitchNetworkDrawer(false);
     };
-    addChainChangedListener(from?.browserProvider, handleChainChanged);
+    addChainChangedListener(from.browserProvider, handleChainChanged);
 
     // eslint-disable-next-line consistent-return
     return () => {
-      removeChainChangedListener(from?.browserProvider, handleChainChanged);
+      removeChainChangedListener(from.browserProvider, handleChainChanged);
     };
   }, [from?.browserProvider]);
 
