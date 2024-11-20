@@ -65,7 +65,11 @@ export function WalletBalances({
   const { track, page } = useAnalytics();
 
   const balanceInfos: BalanceInfo[] = useMemo(
-    () => mapTokenBalancesWithConversions(network?.chainId!, tokenBalances, conversions),
+    () => {
+      if (!network?.chainId) return [];
+
+      return mapTokenBalancesWithConversions(Number(network.chainId), tokenBalances, conversions);
+    },
     [tokenBalances, conversions, network?.chainId],
   );
 
@@ -82,7 +86,7 @@ export function WalletBalances({
       if (!cryptoFiatDispatch) return;
       if (!network) return;
 
-      const tokenSymbols = await fetchTokenSymbols(checkout, network.chainId);
+      const tokenSymbols = await fetchTokenSymbols(checkout, Number(network.chainId));
 
       cryptoFiatDispatch({
         payload: {
@@ -107,7 +111,7 @@ export function WalletBalances({
   const showAddCoins = useMemo(() => {
     if (!checkout || !network) return false;
     return (
-      network.chainId === getL2ChainId(checkout.config)
+      Number(network.chainId) === getL2ChainId(checkout.config)
       && Boolean(
         supportedTopUps?.isBridgeEnabled
         || supportedTopUps?.isSwapEnabled
