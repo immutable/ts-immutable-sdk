@@ -198,3 +198,7 @@ export function abbreviateWalletAddress(address: string, separator = '.....', fi
 export function compareStr(a: string, b: string): boolean {
   return a.toLowerCase() === b.toLowerCase();
 }
+
+export function removeSpace(str: string): string {
+  return str.replace(/\s/g, '');
+}
