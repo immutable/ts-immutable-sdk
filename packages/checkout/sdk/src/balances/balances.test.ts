@@ -54,7 +54,7 @@ describe('balances', () => {
 
   jest.mock('../connect', () => ({
     getNetworkInfo: jest.fn().mockResolvedValue({
-      chainId: ChainId.ETHEREUM,
+      chainId: BigInt(ChainId.ETHEREUM),
       name: ChainName.ETHEREUM,
       isSupported: true,
       nativeCurrency: {
