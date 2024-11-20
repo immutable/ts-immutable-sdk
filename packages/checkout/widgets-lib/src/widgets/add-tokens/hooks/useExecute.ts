@@ -16,6 +16,29 @@ export const useExecute = (environment: Environment) => {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
 
+  const waitForReceipt = async (provider: Web3Provider, txHash: string, maxAttempts = 60) => {
+    let attempts = 0;
+    while (attempts < maxAttempts) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        const receipt = await provider.getTransactionReceipt(txHash);
+        if (receipt) {
+          if (receipt.status === 0) {
+            throw new Error('Transaction failed');
+          }
+          return receipt;
+        }
+      } catch (err) {
+        console.warn('Error checking receipt:', err);
+        throw err;
+      }
+      attempts += 1;
+      // eslint-disable-next-line no-await-in-loop, no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+    throw new Error(`Transaction receipt not found after ${maxAttempts} attempts`);
+  };
+
   const handleTransactionError = (err: unknown) => {
     const reason = `${
       (err as any)?.reason || (err as any)?.message || ''
@@ -154,7 +177,7 @@ export const useExecute = (environment: Environment) => {
           transactionRequestTarget,
           fromAmount,
         );
-        return tx.wait();
+        return waitForReceipt(provider, tx.hash);
       }
       return undefined;
     } catch (error) {
@@ -177,7 +200,7 @@ export const useExecute = (environment: Environment) => {
         signer: provider.getSigner(),
         route: routeResponse.route,
       })) as unknown as ethers.providers.TransactionResponse;
-      return tx.wait();
+      return waitForReceipt(provider, tx.hash);
     } catch (error) {
       handleTransactionError(error);
       return undefined;
