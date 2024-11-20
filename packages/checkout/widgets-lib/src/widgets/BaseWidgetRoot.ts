@@ -209,7 +209,6 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
   // Subscribe to PROVIDER_UPDATED events from our widgets
   private setupProviderUpdatedListener() {
-    console.log('setupProviderUpdatedListener');
     window.addEventListener(
       IMTBLWidgetEvents.IMTBL_WIDGETS_PROVIDER,
       this.handleProviderUpdatedEvent,
@@ -227,7 +226,6 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
   private handleEIP1193ProviderEvents(widgetRoot: Base<T>) {
     if (widgetRoot.browserProvider) {
-      console.log('handleEIP1193ProviderEvents', widgetRoot.browserProvider);
       // eslint-disable-next-line no-param-reassign
       widgetRoot.browserProvider = new NamedBrowserProvider(
         widgetRoot.browserProvider!.name,
