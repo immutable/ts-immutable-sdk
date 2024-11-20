@@ -10,12 +10,14 @@ type FeeData = {
 };
 
 const getFeeData = async (provider: JsonRpcProvider): Promise<FeeData> => {
-  const [block, maxPriorityFeePerGas] = await Promise.all([
+  const [block, maxPriorityFeePerGasHex] = await Promise.all([
     provider.getBlock('latest'),
-    provider.send('eth_maxPriorityFeePerGas', []) as Promise<bigint>,
+    provider.send('eth_maxPriorityFeePerGas', []) as Promise<string>,
   ]);
 
   if (!block?.baseFeePerGas) throw new Error('Base fee per gas not found in block');
+
+  const maxPriorityFeePerGas: bigint = BigInt(maxPriorityFeePerGasHex);
 
   return {
     // https://www.blocknative.com/blog/eip-1559-fees
