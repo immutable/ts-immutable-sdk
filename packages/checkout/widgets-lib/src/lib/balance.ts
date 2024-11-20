@@ -33,7 +33,7 @@ export const getAllowedBalances = async ({
   allowZero = false,
   retryPolicy = DEFAULT_BALANCE_RETRY_POLICY,
 }: GetAllowedBalancesParamsType): Promise<GetAllowedBalancesResultType | undefined> => {
-  const currentChainId = chainId || (await checkout.getNetworkInfo({ provider })).chainId;
+  const currentChainId = chainId || Number((await checkout.getNetworkInfo({ provider })).chainId);
 
   const walletAddress = await (await provider.getSigner()).getAddress();
   const tokenBalances = await retry(
