@@ -1,6 +1,7 @@
 import {
-  BrowserProvider, BrowserProviderOptions, Eip1193Provider, Networkish,
+  BrowserProvider, BrowserProviderOptions, Eip1193Provider as EthersEip1193Provider, Networkish,
 } from 'ethers';
+import { EIP1193Provider } from './eip1193';
 
 /**
  * Enum representing the names of different wallet providers.
@@ -46,9 +47,25 @@ export const validateProviderDefaults: ValidateProviderOptions = {
 export class NamedBrowserProvider extends BrowserProvider {
   name: WalletProviderName;
 
+  ethereumProvider: EIP1193Provider | undefined;
+
   // eslint-disable-next-line max-len
-  constructor(name: WalletProviderName, ethereum: Eip1193Provider, network?: Networkish, _options?: BrowserProviderOptions) {
+  constructor(name: WalletProviderName, ethereum: EthersEip1193Provider, network?: Networkish, _options?: BrowserProviderOptions) {
     super(ethereum, network, _options);
     this.name = name;
+
+    this.#setEthereumProvider(ethereum);
+  }
+
+  #setEthereumProvider(ethereum: EthersEip1193Provider) {
+    if (!('on' in ethereum) || typeof ethereum.on !== 'function') {
+      return;
+    }
+
+    if (!('removeListener' in ethereum) || typeof ethereum.removeListener !== 'function') {
+      return;
+    }
+
+    this.ethereumProvider = ethereum as unknown as EIP1193Provider;
   }
 }

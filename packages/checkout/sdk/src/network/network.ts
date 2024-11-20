@@ -199,18 +199,21 @@ export async function switchWalletNetwork(
     }
   }
 
-  const newProviderNetwork = await provider.getNetwork();
-  if (newProviderNetwork.chainId !== chainId as unknown as bigint) {
+  const newProvider = new NamedBrowserProvider(provider.name, provider.ethereumProvider!);
+
+  const newProviderNetwork = await newProvider.getNetwork();
+
+  if (Number(newProviderNetwork.chainId) !== chainId) {
     throw new CheckoutError(
       'User cancelled switch network request',
       CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
     );
   }
 
-  const networkInfo: NetworkInfo = await getNetworkInfo(config, provider);
+  const networkInfo: NetworkInfo = await getNetworkInfo(config, newProvider);
 
   return {
     network: networkInfo,
-    provider,
+    provider: newProvider,
   } as SwitchNetworkResult;
 }

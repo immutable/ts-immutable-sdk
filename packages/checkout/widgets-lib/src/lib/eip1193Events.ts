@@ -10,20 +10,20 @@ export enum ProviderEvent {
 
 // eslint-disable-next-line max-len
 export function addAccountsChangedListener(browserProvider: NamedBrowserProvider, handleAccountsChanged: (e:any) => void) {
-  (browserProvider.provider as any).on(ProviderEvent.ACCOUNTS_CHANGED, handleAccountsChanged);
+  browserProvider.ethereumProvider?.on(ProviderEvent.ACCOUNTS_CHANGED, handleAccountsChanged);
 }
 
 // eslint-disable-next-line max-len
 export function removeAccountsChangedListener(browserProvider: NamedBrowserProvider, handleAccountsChanged: (e:any) => void) {
-  (browserProvider.provider as any).removeListener(ProviderEvent.ACCOUNTS_CHANGED, handleAccountsChanged);
+  browserProvider.ethereumProvider?.removeListener(ProviderEvent.ACCOUNTS_CHANGED, handleAccountsChanged);
 }
 
 export function addChainChangedListener(browserProvider: NamedBrowserProvider, handleChainChanged: (e:any) => void) {
-  (browserProvider.provider as any).on(ProviderEvent.CHAIN_CHANGED, handleChainChanged);
+  browserProvider.ethereumProvider?.on(ProviderEvent.CHAIN_CHANGED, handleChainChanged);
 }
 
 export function removeChainChangedListener(browserProvider: NamedBrowserProvider, handleChainChanged: (e:any) => void) {
-  (browserProvider.provider as any).removeListener(ProviderEvent.CHAIN_CHANGED, handleChainChanged);
+  browserProvider.ethereumProvider?.removeListener(ProviderEvent.CHAIN_CHANGED, handleChainChanged);
 }
 
 export function imtblWidgetsProviderUpdated() {
