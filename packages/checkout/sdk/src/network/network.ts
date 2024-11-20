@@ -153,7 +153,7 @@ export async function switchWalletNetwork(
     );
   }
 
-  if ('name' in provider && provider.name === WalletProviderName.PASSPORT) {
+  if (provider && 'name' in provider && provider.name === WalletProviderName.PASSPORT) {
     throw new CheckoutError(
       'Switching networks with Passport provider is not supported',
       CheckoutErrorType.SWITCH_NETWORK_UNSUPPORTED,
@@ -162,7 +162,7 @@ export async function switchWalletNetwork(
 
   // WT-1146 - Refer to the README in this folder for explanation on the switch network flow
   try {
-    if ('name' in provider) {
+    if (provider && 'name' in provider) {
       await switchNetworkInWallet(networkMap, provider, chainId);
     } else {
       throw new CheckoutError(

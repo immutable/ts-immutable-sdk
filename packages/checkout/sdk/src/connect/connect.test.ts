@@ -100,7 +100,7 @@ describe('connect', () => {
       const connRes = await connectSite(provider);
 
       expect(connRes).toBeInstanceOf(BrowserProvider);
-      expect(connRes?.provider).not.toBe(null);
+      expect(connRes).not.toBe(null);
       expect(connRes?.send).toBeCalledWith({
         method: WalletAction.CONNECT,
         params: [],

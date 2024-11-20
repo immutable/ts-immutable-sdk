@@ -14,7 +14,6 @@ import {
   NamedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import i18next from 'i18next';
-import { Eip1193Provider } from 'ethers';
 import {
   StrongCheckoutWidgetsConfig,
   withDefaultWidgetConfigs,
@@ -39,8 +38,6 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
   protected browserProvider: NamedBrowserProvider | undefined;
 
-  protected eipProvider: Eip1193Provider | undefined;
-
   protected eventHandlers: Map<keyof WidgetEventData[T], Function> = new Map<
   keyof WidgetEventData[T],
   Function
@@ -57,7 +54,6 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     this.checkout = sdk;
     this.properties = validatedProps;
     this.browserProvider = props?.provider;
-    this.eipProvider = props?.eipProvider;
 
     if (this.browserProvider) {
       addProviderListenersForWidgetRoot(this.browserProvider);
@@ -229,11 +225,11 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   }
 
   private handleEIP1193ProviderEvents(widgetRoot: Base<T>) {
-    if (widgetRoot.browserProvider && widgetRoot.eipProvider) {
+    if (widgetRoot.browserProvider && widgetRoot.browserProvider.ethereumProvider) {
       // eslint-disable-next-line no-param-reassign
       widgetRoot.browserProvider = new NamedBrowserProvider(
         widgetRoot.browserProvider!.name,
-        widgetRoot.eipProvider,
+        widgetRoot.browserProvider.ethereumProvider,
       );
     }
     widgetRoot.render();

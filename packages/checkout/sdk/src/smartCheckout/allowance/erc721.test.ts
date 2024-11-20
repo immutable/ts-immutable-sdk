@@ -11,7 +11,6 @@ import { ItemRequirement, ItemType, NamedBrowserProvider } from '../../types';
 
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   Contract: jest.fn(),
 }));
 
@@ -71,8 +70,8 @@ describe('erc721', () => {
     it('should get the approval transaction from the contract with the from added', async () => {
       const approveMock = jest.fn().mockResolvedValue({ data: '0xDATA' });
       (Contract as unknown as jest.Mock).mockReturnValue({
-        populateTransaction: {
-          approve: approveMock,
+        approve: {
+          populateTransaction: approveMock,
         },
       });
 
@@ -90,8 +89,8 @@ describe('erc721', () => {
     it('should throw checkout error if call to approve fails', async () => {
       const approveMock = jest.fn().mockRejectedValue({ from: '0xADDRESS' });
       (Contract as unknown as jest.Mock).mockReturnValue({
-        populateTransaction: {
-          approve: approveMock,
+        approve: {
+          populateTransaction: approveMock,
         },
       });
 
@@ -187,8 +186,8 @@ describe('erc721', () => {
         (Contract as unknown as jest.Mock).mockReturnValue({
           getApproved: getApprovedMock,
           isApprovedForAll: isApprovedForAllMock,
-          populateTransaction: {
-            approve: approveMock,
+          approve: {
+            populateTransaction: approveMock,
           },
         });
 
@@ -258,8 +257,8 @@ describe('erc721', () => {
       (Contract as unknown as jest.Mock).mockReturnValue({
         getApproved: getApprovedMock,
         isApprovedForAll: isApprovedForAllMock,
-        populateTransaction: {
-          approve: approveMock,
+        approve: {
+          populateTransaction: approveMock,
         },
       });
 
@@ -365,8 +364,8 @@ describe('erc721', () => {
       (Contract as unknown as jest.Mock).mockReturnValue({
         getApproved: getApprovedMock,
         isApprovedForAll: isApprovedForAllMock,
-        populateTransaction: {
-          approve: approveMock,
+        approve: {
+          populateTransaction: approveMock,
         },
       });
 
@@ -424,8 +423,8 @@ describe('erc721', () => {
         (Contract as unknown as jest.Mock).mockReturnValue({
           getApproved: getApprovedMock,
           isApprovedForAll: isApprovedForAllMock,
-          populateTransaction: {
-            approve: approveMock,
+          approve: {
+            populateTransaction: approveMock,
           },
         });
 

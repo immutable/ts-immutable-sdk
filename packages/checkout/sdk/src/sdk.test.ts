@@ -98,7 +98,7 @@ describe('Connect', () => {
     const getNetworkAllListMock = jest.fn().mockResolvedValue({
       networks: [
         {
-          chainId: ChainId.ETHEREUM,
+          chainId: BigInt(ChainId.ETHEREUM),
           name: ChainName.ETHEREUM,
           isSupported: true,
           nativeCurrency: {},
@@ -817,7 +817,7 @@ describe('Connect', () => {
 
       networkInfoResult = {
         name: ChainName.ETHEREUM,
-        chainId: ChainId.ETHEREUM,
+        chainId: BigInt(ChainId.ETHEREUM),
         nativeCurrency: {
           name: 'ETHEREUM',
           symbol: 'ETH',
