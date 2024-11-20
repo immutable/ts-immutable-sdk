@@ -99,7 +99,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
 
     setTxProcessing(true);
 
-    if (isPassportProvider(from?.browserProvider.name) || forceChangeAccount) {
+    if (isPassportProvider(from?.browserProvider) || forceChangeAccount) {
       // user should switch to MetaMask
       try {
         const createProviderResult = await checkout.createProvider({ walletProviderName: WalletProviderName.METAMASK });

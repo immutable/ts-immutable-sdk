@@ -20,7 +20,6 @@ import { Environment } from '@imtbl/config';
 import { passport } from './passport';
 import { LanguageSelector } from './LanguageSelector';
 import { NamedBrowserProvider } from '@imtbl/checkout-sdk';
-import { WalletProviderName } from '@imtbl/checkout-sdk';
 
 // Create one instance of Checkout and inject Passport
 const checkout = new Checkout({
@@ -71,7 +70,7 @@ export const MainPage = () => {
 
     connectPassport();
   }, []);
-  
+
   useEffect(() => {
     connectWidget.addListener(ConnectEventType.CLOSE_WIDGET, () => connectWidget.unmount());
     connectWidget.addListener(ConnectEventType.SUCCESS, (eventData: ConnectionSuccess) => {
@@ -188,7 +187,7 @@ export const MainPage = () => {
           <Button onClick={toggleTheme}>Toggle theme</Button>
           <LanguageSelector onLanguageChange={(language: string) => updateLanguage(language)} language={selectedLanguage} />
         </Box>
-        {passport && browserProvider && browserProvider.name === WalletProviderName.PASSPORT && <Button onClick={logout}>Passport Logout</Button>}
+        {passport && browserProvider && browserProvider.ethereumProvider?.isPassport && <Button onClick={logout}>Passport Logout</Button>}
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', gap: 'base.spacing.x3', flexWrap: 'wrap' }}>
         <div id="connect-target"></div>

@@ -79,7 +79,7 @@ export class Swap extends Base<WidgetType.SWAP> {
     return validatedParams;
   }
 
-  private isNotPassport = !isPassportProvider(this.browserProvider?.name)
+  private isNotPassport = !isPassportProvider(this.browserProvider)
     || this.parameters?.walletProviderName !== WalletProviderName.PASSPORT;
 
   private topUpOptions(): { textKey: string; action: () => void }[] | undefined {

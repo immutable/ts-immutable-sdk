@@ -3,12 +3,12 @@ import {
   NamedBrowserProvider, WalletProviderName, WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 
-export function isPassportProvider(provider?: WalletProviderName | WalletProviderRdns) {
-  return provider?.toLowerCase() === WalletProviderName.PASSPORT || provider === WalletProviderRdns.PASSPORT;
+export function isPassportProvider(provider?: NamedBrowserProvider | null) {
+  return provider?.ethereumProvider?.isPassport === true;
 }
 
-export function isMetaMaskProvider(provider?: WalletProviderName | WalletProviderRdns) {
-  return provider?.toLowerCase() === WalletProviderName.METAMASK || provider === WalletProviderRdns.METAMASK;
+export function isMetaMaskProvider(provider?: NamedBrowserProvider | null) {
+  return provider?.ethereumProvider?.isMetaMask === true;
 }
 
 export function isWalletConnectProvider(provider?: WalletProviderName | WalletProviderRdns) {
@@ -26,8 +26,8 @@ export function getWalletProviderNameByProvider(
   browserProvider: NamedBrowserProvider | undefined,
   providers?: EIP6963ProviderDetail[],
 ) {
-  if (isMetaMaskProvider(browserProvider?.name)) return WalletProviderName.METAMASK.toString();
-  if (isPassportProvider(browserProvider?.name)) return WalletProviderName.PASSPORT.toString();
+  if (isMetaMaskProvider(browserProvider)) return WalletProviderName.METAMASK.toString();
+  if (isPassportProvider(browserProvider)) return WalletProviderName.PASSPORT.toString();
   if (isWalletConnectProvider(browserProvider?.name)) return 'walletconnect';
 
   if (providers && browserProvider) {
@@ -77,5 +77,5 @@ export function getProviderSlugFromRdns(rdns: string) {
  * https://docs.immutable.com/docs/zkevm/architecture/gas-sponsorship-for-gamers/
  */
 export function isGasFree(provider?: NamedBrowserProvider | null) {
-  return isPassportProvider(provider?.name);
+  return isPassportProvider(provider);
 }

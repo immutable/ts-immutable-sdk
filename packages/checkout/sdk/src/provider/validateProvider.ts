@@ -4,7 +4,7 @@ import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { CheckoutConfiguration } from '../config';
 import {
   NamedBrowserProvider,
-  NetworkFilterTypes, ValidateProviderOptions, WalletProviderName, validateProviderDefaults,
+  NetworkFilterTypes, ValidateProviderOptions, validateProviderDefaults,
 } from '../types';
 import { getNetworkAllowList } from '../network';
 import { getUnderlyingChainId } from './getUnderlyingProvider';
@@ -25,7 +25,7 @@ export async function validateProvider(
 ): Promise<NamedBrowserProvider> {
   return withCheckoutError(
     async () => {
-      if (browserProvider.name === WalletProviderName.PASSPORT) {
+      if (browserProvider.ethereumProvider?.isPassport) {
         // if Passport skip the validation checks
         return browserProvider;
       }
