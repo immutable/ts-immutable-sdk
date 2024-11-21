@@ -14,7 +14,6 @@ import {
   WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
-import { BrowserProvider } from 'ethers';
 import {
   useViewState,
   SharedViews,
@@ -110,7 +109,7 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
   }, [history]);
 
   const handleProviderUpdated = useMemo(
-    () => (updatedProvider: BrowserProvider) => {
+    () => (updatedProvider: WrappedBrowserProvider) => {
       commerceDispatch({
         payload: {
           type: CommerceActions.SET_PROVIDER,
