@@ -11,7 +11,7 @@ export default defineConfig((options) => ({
   bundle: true,
   clean: !options.watch,
   splitting: false,
-  minify: !options.watch,
+  minify: false, //causes Critical dependency: the request of a dependency is an expression
   skipNodeModulesBundle: true,
   esbuildPlugins: [
     replace({ 

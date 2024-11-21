@@ -80,6 +80,9 @@ jobs:
       - name: Setup playwright
         uses: ./.github/actions/setup-playwright
 
+      - name: Prepare Checkout SDK bundle for @examples/commerce-widget-nextjs
+        run: pnpm --filter @imtbl/checkout-sdk prepare:examplesdk
+
       - name: Prepare widgets bundle for @examples/commerce-widget-nextjs
         run: pnpm --filter @imtbl/checkout-widgets prepare:examplewidgets
 
@@ -139,6 +142,9 @@ jobs:
 
       - name: Build @tests/checkout-widgets-nextjs
         run: pnpm --filter @tests/checkout-widgets-nextjs build
+
+      - name: Prepare Checkout SDK bundle for @tests/checkout-widgets-nextjs
+        run: pnpm --filter @imtbl/checkout-sdk prepare:testsdk
 
       - name: Prepare widgets bundle for @tests/checkout-widgets-nextjs
         run: pnpm --filter @imtbl/checkout-widgets prepare:testwidgets

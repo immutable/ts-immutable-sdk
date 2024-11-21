@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "dependencies": {
     "@fastify/cors": "^8.0.0",
-    "@imtbl/sdk": "latest",
+    "@imtbl/sdk": "workspace:*",
     "@types/pg": "^8.11.6",
     "@types/uuid": "^9.0.8",
     "fastify": "^4.27.0",

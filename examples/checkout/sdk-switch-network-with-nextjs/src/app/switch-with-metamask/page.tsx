@@ -4,7 +4,7 @@ import { checkoutSDK } from "../utils/setupDefault";
 import { useState } from "react";
 import { Button, Heading, Body, Link, Table } from "@biom3/react";
 import NextLink from "next/link";
-import { BrowserProvider } from "ethers";
+import { WrappedBrowserProvider } from "@imtbl/sdk/checkout";
 
 export default function ConnectWithMetamask() {
   const [isConnected, setIsConnected] = useState<boolean>();
@@ -13,11 +13,11 @@ export default function ConnectWithMetamask() {
   const [nativeCurrency, setNativeCurrency] = useState<string>();
   // setup the loading state to enable/disable buttons when loading
   const [loading, setLoadingState] = useState<boolean>(false);
-  const [connectedProvider, setConnectedProvider] = useState<BrowserProvider>();
+  const [connectedProvider, setConnectedProvider] = useState<WrappedBrowserProvider>();
   const [supportedNetworks, setSupportedNetworks] = useState<string[]>();
   const [switchNetworkLoading, setSwitchNetworkLoading] = useState<boolean>(false);
 
-  const updateNetworkInfo = async (provider: BrowserProvider) => {
+  const updateNetworkInfo = async (provider: WrappedBrowserProvider) => {
     try {
       // #doc get-network-details
       // Get the network details

@@ -14,7 +14,6 @@ import { Environment } from "@imtbl/config";
 import { useMemo, useEffect, useState } from "react";
 
 import { passport } from "./passport";
-import { Web3Provider } from "@ethersproject/providers";
 import { WrappedBrowserProvider } from "@imtbl/checkout-sdk";
 
 const ADD_TOKENS_TARGET_ID = "add-tokens-widget-target";
