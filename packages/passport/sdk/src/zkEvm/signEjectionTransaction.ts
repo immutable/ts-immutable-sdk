@@ -1,4 +1,4 @@
-import { TransactionRequest } from '@ethersproject/providers';
+import { TransactionRequest } from 'ethers';
 import {
   prepareAndSignEjectionTransaction,
   EjectionTransactionParams,
