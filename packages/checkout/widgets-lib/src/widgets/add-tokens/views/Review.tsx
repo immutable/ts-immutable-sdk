@@ -307,7 +307,7 @@ export function Review({
     });
 
     try {
-      currentFromAddress = await fromProvider.getSigner().getAddress();
+      currentFromAddress = await (await fromProvider.getSigner()).getAddress();
     } catch (error) {
       showErrorHandover(AddTokensErrorTypes.PROVIDER_ERROR, {
         contextId: id,
@@ -346,7 +346,7 @@ export function Review({
     const allowance = await getAllowance(changeableProvider, route);
 
     const { fromAmount } = route.route.params;
-    if (allowance?.lt(fromAmount)) {
+    if (allowance && allowance < BigInt(fromAmount)) {
       showHandover({
         animationPath: APPROVE_TXN_ANIMATION,
         state: RiveStateMachineInput.WAITING,
@@ -405,7 +405,7 @@ export function Review({
         trackFlow('commerce', `addTokensFundsAdded_${ctx.event.messageId}`);
       });
 
-      sendAddTokensSuccessEvent(eventTarget, executeTxnReceipt.transactionHash);
+      sendAddTokensSuccessEvent(eventTarget, executeTxnReceipt.hash);
 
       if (toChain === fromChain) {
         showHandover({
@@ -422,7 +422,7 @@ export function Review({
                     rc={(
                       <a
                         target="_blank"
-                        href={`https://explorer.immutable.com/tx/${executeTxnReceipt.transactionHash}`}
+                        href={`https://explorer.immutable.com/tx/${executeTxnReceipt.hash}`}
                         rel="noreferrer"
                       />
                     )}
@@ -465,7 +465,7 @@ export function Review({
                     rc={(
                       <a
                         target="_blank"
-                        href={`https://axelarscan.io/gmp/${executeTxnReceipt?.transactionHash}`}
+                        href={`https://axelarscan.io/gmp/${executeTxnReceipt?.hash}`}
                         rel="noreferrer"
                       />
                     )}
@@ -477,8 +477,8 @@ export function Review({
         ),
       });
 
-      const status = await getStatus(squid, executeTxnReceipt.transactionHash);
-      const axelarscanUrl = `https://axelarscan.io/gmp/${executeTxnReceipt?.transactionHash}`;
+      const status = await getStatus(squid, executeTxnReceipt.hash);
+      const axelarscanUrl = `https://axelarscan.io/gmp/${executeTxnReceipt?.hash}`;
 
       if (status?.squidTransactionStatus === 'success') {
         showHandover({

@@ -4,8 +4,8 @@ import {
   OrchestrationEvent,
   OrchestrationEventType,
   RequestOnrampEvent,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
-import { BrowserProvider } from 'ethers';
 import { getCommerceWidgetEvent } from '../functions/getCommerceWidgetEvent';
 import { sendCheckoutEvent } from '../CommerceWidgetEvents';
 import {
@@ -32,7 +32,7 @@ const widgetEvents = [
 export function useWidgetEvents(
   eventTarget: Window | EventTarget,
   viewState: ReturnType<typeof useViewState>,
-  handleProviderUpdated: (provider: BrowserProvider) => void,
+  handleProviderUpdated: (provider: WrappedBrowserProvider) => void,
 ) {
   const [{ history }, viewDispatch] = viewState;
 

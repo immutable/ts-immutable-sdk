@@ -1,4 +1,3 @@
-import { Web3Provider } from '@ethersproject/providers';
 import { ConnectionFailed, ConnectionSuccess } from './connect';
 import {
   SaleFailed,
@@ -7,7 +6,7 @@ import {
   SaleSuccess,
   SaleTransactionSuccess,
 } from './sale';
-import { EIP6963ProviderInfo, WalletProviderName } from '../../../types';
+import { EIP6963ProviderInfo, WalletProviderName, WrappedBrowserProvider } from '../../../types';
 import { OnRampFailed, OnRampSuccess } from './onramp';
 import {
   BridgeClaimWithdrawalFailed,
@@ -60,7 +59,7 @@ export enum CommerceUserActionEventType {
 
 export type CommerceProviderUpdatedEvent = {
   /** The connected provider. */
-  provider: Web3Provider;
+  provider: WrappedBrowserProvider;
   /** The wallet provider name of the connected provider. */
   walletProviderName: WalletProviderName | undefined;
   /** The wallet provider EIP-6963 metadata. */

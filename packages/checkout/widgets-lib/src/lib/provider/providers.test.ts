@@ -1,8 +1,8 @@
-import { Checkout, NamedBrowserProvider, WalletProviderName } from '@imtbl/checkout-sdk';
+import { Checkout, WalletProviderName, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { createAndConnectToProvider } from './providers';
 
 describe('providerUtils', () => {
-  const mockPassportBrowserProvider = { name: WalletProviderName.PASSPORT } as unknown as NamedBrowserProvider;
+  const mockPassportBrowserProvider = { ethereumProvider: { isPassport: true } } as WrappedBrowserProvider;
 
   describe('createAndConnectToProvider', () => {
     it('should return provider', () => {

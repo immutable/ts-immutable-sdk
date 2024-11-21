@@ -1,7 +1,6 @@
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import { RouteResponse, ActionType } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
-import { BigNumber, utils } from 'ethers';
 import { useContext, useRef } from 'react';
 import { delay } from '../../../widgets/add-tokens/functions/delay';
 import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
@@ -10,6 +9,7 @@ import { retry } from '../../retry';
 import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { isPassportProvider } from '../../provider';
+import { formatUnits, parseUnits } from 'ethers';
 import {
   AmountData, RouteData, RouteResponseData, Token,
 } from '../types';
@@ -130,7 +130,7 @@ export const useRoutes = () => {
       .filter((value) => value !== undefined);
 
     return amountDataArray.filter((data: AmountData) => {
-      const formattedBalance = utils.formatUnits(
+      const formattedBalance = formatUnits(
         data.balance.balance,
         data.balance.decimals,
       );
@@ -143,7 +143,7 @@ export const useRoutes = () => {
 
   const convertToFormattedAmount = (amount: string, decimals: number) => {
     const parsedFromAmount = parseFloat(amount).toFixed(decimals);
-    const formattedFromAmount = utils.parseUnits(parsedFromAmount, decimals);
+    const formattedFromAmount = parseUnits(parsedFromAmount, decimals);
     return formattedFromAmount.toString();
   };
 
@@ -183,9 +183,9 @@ export const useRoutes = () => {
       throw new Error('Invalid route response or token decimals');
     }
 
-    const toAmountInBaseUnits = utils.parseUnits(toAmount, routeResponse?.route.estimate.toToken.decimals);
-    const routeToAmountInBaseUnits = BigNumber.from(routeResponse.route.estimate.toAmount);
-    return routeToAmountInBaseUnits.gt(toAmountInBaseUnits);
+    const toAmountInBaseUnits = parseUnits(toAmount, routeResponse?.route.estimate.toToken.decimals);
+    const routeToAmountInBaseUnits = BigInt(routeResponse.route.estimate.toAmount);
+    return routeToAmountInBaseUnits > toAmountInBaseUnits;
   };
 
   const getRoute = async (

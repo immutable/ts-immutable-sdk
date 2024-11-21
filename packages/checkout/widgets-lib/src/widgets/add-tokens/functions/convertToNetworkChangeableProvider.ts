@@ -1,6 +1,5 @@
-import { ethers } from 'ethers';
-import { Web3Provider } from '@ethersproject/providers';
+import { WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 
 export const convertToNetworkChangeableProvider = async (
-  provider: Web3Provider,
-): Promise<Web3Provider> => new ethers.providers.Web3Provider(provider.provider, 'any');
+  provider: WrappedBrowserProvider,
+): Promise<WrappedBrowserProvider> => new WrappedBrowserProvider(provider.ethereumProvider!, 'any');

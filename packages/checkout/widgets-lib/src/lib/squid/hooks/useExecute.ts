@@ -1,13 +1,14 @@
-import { Web3Provider } from '@ethersproject/providers';
 import { useContext } from 'react';
 import { RouteResponse } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
-import { ethers } from 'ethers';
+import {
+  ethers, MaxUint256, TransactionReceipt, TransactionResponse,
+} from 'ethers';
 import { Environment } from '@imtbl/config';
 
-import { StatusResponse } from '@0xsquid/sdk/dist/types';
+import { StatusResponse, EvmWallet } from '@0xsquid/sdk/dist/types';
 import { Flow } from '@imtbl/metrics';
-import { EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
+import { EIP6963ProviderInfo, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { isSquidNativeToken } from '../functions/isSquidNativeToken';
 import { useError } from '../../../widgets/add-tokens/hooks/useError';
 import { AddTokensError, AddTokensErrorTypes } from '../../../widgets/add-tokens/types';
@@ -28,7 +29,7 @@ export const useExecute = (contextId: string, environment: Environment) => {
   } = useContext(EventTargetContext);
 
   const waitForReceipt = async (
-    provider: Web3Provider,
+    provider: WrappedBrowserProvider,
     txHash: string,
     maxAttempts = 120,
   ) => {
@@ -106,27 +107,22 @@ export const useExecute = (contextId: string, environment: Environment) => {
 
   // @TODO: Move to util function
   const checkProviderChain = async (
-    provider: Web3Provider,
+    provider: WrappedBrowserProvider,
     chainId: string,
   ): Promise<boolean> => {
-    if (!provider.provider.request) {
+    if (!provider.send) {
       throw new Error('provider does not have request method');
     }
     try {
       const fromChainHex = `0x${parseInt(chainId, 10).toString(16)}`;
-      const providerChainId = await provider.provider.request({
-        method: 'eth_chainId',
-      });
+      const providerChainId = await provider.send('eth_chainId', []);
 
       if (fromChainHex !== providerChainId) {
-        await provider.provider.request({
-          method: 'wallet_switchEthereumChain',
-          params: [
-            {
-              chainId: fromChainHex,
-            },
-          ],
-        });
+        await provider.send('wallet_switchEthereumChain', [
+          {
+            chainId: fromChainHex,
+          },
+        ]);
         return true;
       }
       return true;
@@ -137,16 +133,16 @@ export const useExecute = (contextId: string, environment: Environment) => {
   };
 
   const getAllowance = async (
-    provider: Web3Provider,
+    provider: WrappedBrowserProvider,
     routeResponse: RouteResponse,
-  ): Promise<ethers.BigNumber | undefined> => {
+  ): Promise<bigint | undefined> => {
     try {
       if (!isSquidNativeToken(routeResponse?.route?.params.fromToken)) {
         const erc20Abi = [
           'function allowance(address owner, address spender) public view returns (uint256)',
         ];
         const fromToken = routeResponse?.route.params.fromToken;
-        const signer = provider.getSigner();
+        const signer = await provider.getSigner();
         const tokenContract = new ethers.Contract(fromToken, erc20Abi, signer);
 
         const ownerAddress = await signer.getAddress();
@@ -162,7 +158,7 @@ export const useExecute = (contextId: string, environment: Environment) => {
         );
       }
 
-      return ethers.constants.MaxUint256; // no approval is needed for native tokens
+      return MaxUint256; // no approval is needed for native tokens
     } catch (error) {
       showErrorHandover(AddTokensErrorTypes.DEFAULT, { contextId, error });
       return undefined;
@@ -172,15 +168,15 @@ export const useExecute = (contextId: string, environment: Environment) => {
   const callApprove = async (
     flow:Flow,
     fromProviderInfo: EIP6963ProviderInfo,
-    provider: Web3Provider,
+    provider: WrappedBrowserProvider,
     routeResponse: RouteResponse,
-  ): Promise<ethers.providers.TransactionReceipt> => {
+  ): Promise<TransactionReceipt> => {
     flow.addEvent(`provider_${fromProviderInfo.name}`);
     const erc20Abi = [
       'function approve(address spender, uint256 amount) public returns (bool)',
     ];
     const fromToken = routeResponse?.route.params.fromToken;
-    const signer = provider.getSigner();
+    const signer = await provider.getSigner();
     const tokenContract = new ethers.Contract(fromToken, erc20Abi, signer);
 
     const fromAmount = routeResponse?.route.params.fromAmount;
@@ -213,9 +209,9 @@ export const useExecute = (contextId: string, environment: Environment) => {
 
   const approve = async (
     fromProviderInfo: EIP6963ProviderInfo,
-    provider: Web3Provider,
+    provider: WrappedBrowserProvider,
     routeResponse: RouteResponse,
-  ): Promise<ethers.providers.TransactionReceipt | undefined> => {
+  ): Promise<TransactionReceipt | undefined> => {
     try {
       if (!isSquidNativeToken(routeResponse?.route?.params.fromToken)) {
         return await withMetricsAsync(
@@ -236,14 +232,14 @@ export const useExecute = (contextId: string, environment: Environment) => {
     flow: Flow,
     squid: Squid,
     fromProviderInfo: EIP6963ProviderInfo,
-    provider: Web3Provider,
+    provider: WrappedBrowserProvider,
     routeResponse: RouteResponse,
-  ): Promise<ethers.providers.TransactionReceipt> => {
+  ): Promise<TransactionReceipt> => {
     flow.addEvent(`provider_${fromProviderInfo.name}`);
     const tx = (await squid.executeRoute({
-      signer: provider.getSigner(),
+      signer: await provider.getSigner() as unknown as EvmWallet,
       route: routeResponse.route,
-    })) as unknown as ethers.providers.TransactionResponse;
+    })) as unknown as TransactionResponse;
     flow.addEvent('transactionSent');
     return await waitForReceipt(provider, tx.hash);
   };
@@ -251,11 +247,11 @@ export const useExecute = (contextId: string, environment: Environment) => {
   const execute = async (
     squid: Squid,
     fromProviderInfo: EIP6963ProviderInfo,
-    provider: Web3Provider,
+    provider: WrappedBrowserProvider,
     routeResponse: RouteResponse,
-  ): Promise<ethers.providers.TransactionReceipt | undefined> => {
-    if (!provider.provider.request) {
-      throw new Error('provider does not have request method');
+  ): Promise<TransactionReceipt | undefined> => {
+    if (!provider.send) {
+      throw new Error('provider does not have send method');
     }
     try {
       return await withMetricsAsync(
