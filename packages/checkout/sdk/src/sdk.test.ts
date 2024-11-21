@@ -156,6 +156,9 @@ describe('Connect', () => {
     const requestMock = jest.fn();
     providerMock = {
       request: requestMock,
+      isPassport: true,
+      on: jest.fn(),
+      removeListener: jest.fn(),
     } as Eip1193Provider;
     requestMock.mockResolvedValue('0x1');
 
@@ -962,7 +965,9 @@ describe('Connect', () => {
         getNetwork: jest.fn().mockResolvedValue({
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         }),
-        name: WalletProviderName.PASSPORT,
+        ethereumProvider: {
+          isPassport: true,
+        },
       } as unknown as NamedBrowserProvider;
       const mockUser: UserProfile = {
         sub: 'email|123',

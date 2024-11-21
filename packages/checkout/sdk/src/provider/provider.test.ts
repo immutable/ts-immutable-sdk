@@ -20,9 +20,9 @@ let windowSpy: any;
 describe('createProvider', () => {
   const providerRequestMock: jest.Mock = jest.fn();
   const mockFindProvider = jest.fn().mockReturnValue(null);
-  const mockBrowserProvider: BrowserProvider = new BrowserProvider({
+  const mockEipProvider = {
     request: jest.fn(),
-  });
+  };
 
   // const originalGetInstance = InjectedProvidersManager.getInstance;
 
@@ -50,7 +50,7 @@ describe('createProvider', () => {
   });
 
   it('should create a provider for Passport with a valid passport instance', async () => {
-    const mockPassport = { connectEvm: jest.fn(() => mockBrowserProvider) } as unknown as Passport;
+    const mockPassport = { connectEvm: jest.fn(() => mockEipProvider) } as unknown as Passport;
     const result = await createProvider(WalletProviderName.PASSPORT, mockPassport);
 
     expect(result.provider).toBeInstanceOf(BrowserProvider);
@@ -59,7 +59,7 @@ describe('createProvider', () => {
   });
 
   it('should create a provider for Passport when Passport is injected via EIP-6963', async () => {
-    mockFindProvider.mockReturnValue({ provider: mockBrowserProvider });
+    mockFindProvider.mockReturnValue({ provider: mockEipProvider, info: { name: WalletProviderName.PASSPORT } });
     const result = await createProvider(WalletProviderName.PASSPORT);
 
     expect(result.provider).toBeInstanceOf(BrowserProvider);
@@ -67,7 +67,7 @@ describe('createProvider', () => {
   });
 
   it('should create a provider for Metamask when Metamask is injected via EIP-6963', async () => {
-    mockFindProvider.mockReturnValue({ provider: mockBrowserProvider });
+    mockFindProvider.mockReturnValue({ provider: mockEipProvider, info: { name: WalletProviderName.METAMASK } });
     const result = await createProvider(WalletProviderName.METAMASK);
 
     expect(result.provider).toBeInstanceOf(BrowserProvider);

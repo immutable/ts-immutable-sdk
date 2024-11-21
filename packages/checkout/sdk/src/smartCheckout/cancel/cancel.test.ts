@@ -218,7 +218,7 @@ describe('cancel', () => {
   });
 
   describe('gasless cancel', () => {
-    it.only('should call gasless cancel and get the cancellations', async () => {
+    it('should call gasless cancel and get the cancellations', async () => {
       const orderId = '1';
       (createOrderbookInstance as jest.Mock).mockReturnValue({
         prepareOrderCancellations: jest.fn().mockResolvedValue({

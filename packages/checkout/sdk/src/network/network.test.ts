@@ -103,7 +103,9 @@ describe('network functions', () => {
       (NamedBrowserProvider as unknown as jest.Mock).mockReturnValue({
         send: jest.fn(),
         getNetwork: async () => ethNetworkInfo,
-        name: WalletProviderName.METAMASK,
+        ethereumProvider: {
+          isMetaMask: true,
+        },
       });
 
       const provider = await createProvider(WalletProviderName.METAMASK);
@@ -138,12 +140,16 @@ describe('network functions', () => {
         .mockReturnValueOnce({
           send: jest.fn(),
           getNetwork: jest.fn().mockResolvedValue(ethNetworkInfo),
-          name: WalletProviderName.METAMASK,
+          ethereumProvider: {
+            isMetaMask: true,
+          },
         })
         .mockReturnValueOnce({
           send: jest.fn(),
           getNetwork: jest.fn().mockResolvedValue(zkevmNetworkInfo),
-          name: WalletProviderName.METAMASK,
+          ethereumProvider: {
+            isMetaMask: true,
+          },
         });
 
       const provider = await createProvider(WalletProviderName.METAMASK);
@@ -171,7 +177,9 @@ describe('network functions', () => {
       (NamedBrowserProvider as unknown as jest.Mock).mockReturnValueOnce({
         send: jest.fn(),
         getNetwork: jest.fn().mockResolvedValue(ethNetworkInfo),
-        name: WalletProviderName.METAMASK,
+        ethereumProvider: {
+          isMetaMask: true,
+        },
       });
 
       const provider = await createProvider(WalletProviderName.METAMASK);
@@ -190,7 +198,9 @@ describe('network functions', () => {
       (NamedBrowserProvider as unknown as jest.Mock).mockReturnValue({
         send: jest.fn(),
         getNetwork: jest.fn().mockResolvedValue(ethNetworkInfo),
-        name: WalletProviderName.METAMASK,
+        ethereumProvider: {
+          isMetaMask: true,
+        },
       });
 
       windowSpy.mockImplementation(() => ({
@@ -229,7 +239,9 @@ describe('network functions', () => {
             message: 'Provider error',
             code: 4902,
           }),
-        name: WalletProviderName.METAMASK,
+        ethereumProvider: {
+          isMetaMask: true,
+        },
         getNetwork: jest.fn().mockResolvedValue(ethNetworkInfo),
       });
 
@@ -255,7 +267,9 @@ describe('network functions', () => {
             message: 'Provider error',
             code: 4000,
           }),
-        name: WalletProviderName.METAMASK,
+        ethereumProvider: {
+          isMetaMask: true,
+        },
         getNetwork: jest.fn().mockResolvedValue(ethNetworkInfo),
       });
 
@@ -280,12 +294,16 @@ describe('network functions', () => {
             .fn()
             .mockRejectedValueOnce({ code: 4902 })
             .mockResolvedValueOnce({}),
-          name: WalletProviderName.METAMASK,
+          ethereumProvider: {
+            isMetaMask: true,
+          },
           getNetwork: jest.fn().mockResolvedValue(zkevmNetworkInfo),
         })
         .mockReturnValueOnce({
           send: jest.fn().mockResolvedValueOnce({}),
-          name: WalletProviderName.METAMASK,
+          ethereumProvider: {
+            isMetaMask: true,
+          },
           getNetwork: jest.fn().mockResolvedValue(zkevmNetworkInfo),
         });
       const provider = await createProvider(WalletProviderName.METAMASK);
@@ -321,7 +339,7 @@ describe('network functions', () => {
       try {
         await switchWalletNetwork(
           testCheckoutConfiguration,
-          { name: WalletProviderName.PASSPORT } as unknown as NamedBrowserProvider,
+          { ethereumProvider: { isPassport: true } } as unknown as NamedBrowserProvider,
           ChainId.SEPOLIA,
         );
       } catch (err: any) {

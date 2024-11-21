@@ -3,7 +3,6 @@
  */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BrowserProvider } from 'ethers';
 import { checkIsWalletConnected, connectSite, requestPermissions } from './connect';
 import { NamedBrowserProvider, WalletAction, WalletProviderName } from '../types';
 import { CheckoutErrorType } from '../errors';
@@ -96,15 +95,14 @@ describe('connect', () => {
 
   describe('connectWalletProvider', () => {
     it('should call the connect function with metamask and return a BrowserProvider', async () => {
-      const { provider } = await createProvider(WalletProviderName.METAMASK);
+      jest.spyOn(NamedBrowserProvider.prototype, 'send');
+
+      const provider = await createProvider(WalletProviderName.METAMASK);
       const connRes = await connectSite(provider);
 
-      expect(connRes).toBeInstanceOf(BrowserProvider);
+      expect(connRes).toBeInstanceOf(NamedBrowserProvider);
       expect(connRes).not.toBe(null);
-      expect(connRes?.send).toBeCalledWith({
-        method: WalletAction.CONNECT,
-        params: [],
-      });
+      expect(connRes?.send).toBeCalledWith(WalletAction.CONNECT, []);
     });
 
     it('should throw an error if provider missing from BrowserProvider', async () => {
@@ -134,10 +132,12 @@ describe('connect', () => {
             .fn()
             .mockRejectedValue(new Error('User rejected request')),
         },
-        removeEventListener: () => {},
+        removeEventListener: jest.fn(),
+        addEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
       }));
 
-      const { provider } = await createProvider(WalletProviderName.METAMASK);
+      const provider = await createProvider(WalletProviderName.METAMASK);
 
       try {
         await connectSite(provider);
@@ -150,16 +150,12 @@ describe('connect', () => {
 
   describe('requestPermissions', () => {
     it('should call the requestPermissions function with metamask and return a BrowserProvider', async () => {
-      const { provider } = await createProvider(WalletProviderName.METAMASK);
+      const provider = await createProvider(WalletProviderName.METAMASK);
       const reqRes = await requestPermissions(provider);
 
-      expect(reqRes).toBeInstanceOf(BrowserProvider);
+      expect(reqRes).toBeInstanceOf(NamedBrowserProvider);
       expect(reqRes?.provider).not.toBe(null);
-      expect(reqRes?.send).toBeCalledWith({
-        method: WalletAction.REQUEST_PERMISSIONS,
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        params: [{ eth_accounts: {} }],
-      });
+      expect(reqRes?.send).toBeCalledWith(WalletAction.REQUEST_PERMISSIONS, [{ eth_accounts: {} }]);
     });
 
     it('should throw an error if provider missing from BrowserProvider', async () => {
