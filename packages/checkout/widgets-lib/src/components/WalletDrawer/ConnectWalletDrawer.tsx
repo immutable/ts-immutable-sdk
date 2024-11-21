@@ -25,6 +25,7 @@ import {
   ConnectEIP6963ProviderError,
 } from '../../lib/connectEIP6963Provider';
 import { EOAWarningDrawer } from '../EOAWarningDrawer/EOAWarningDrawer';
+import { removeSpace } from '../../lib/utils';
 
 type ConnectWalletDrawerProps = {
   heading: string;
@@ -110,7 +111,7 @@ export function ConnectWalletDrawer({
     track({
       userJourney: UserJourney.CONNECT,
       screen: 'ConnectWallet',
-      control: info.name,
+      control: removeSpace(info.name),
       controlType: 'MenuItem',
       extras: {
         providerType,

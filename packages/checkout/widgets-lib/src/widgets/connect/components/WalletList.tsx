@@ -49,6 +49,7 @@ import { WalletConnectItem } from './WalletConnectItem';
 import { BrowserWalletItem } from './BrowserWalletItem';
 import { identifyUser } from '../../../lib/analytics/identifyUser';
 import { NonPassportWarningDrawer } from './NonPassportWarningDrawer';
+import { removeSpace } from '../../../lib/utils';
 
 export interface WalletListProps {
   targetWalletRdns?: string;
@@ -258,7 +259,7 @@ export function WalletList(props: WalletListProps) {
     track({
       userJourney: UserJourney.CONNECT,
       screen: 'ConnectWallet',
-      control: providerDetail.info.name,
+      control: removeSpace(providerDetail.info.name),
       controlType: 'MenuItem',
       extras: {
         wallet: getProviderSlugFromRdns(providerDetail.info.rdns),
@@ -289,7 +290,7 @@ export function WalletList(props: WalletListProps) {
       track({
         userJourney: UserJourney.CONNECT,
         screen: 'ConnectWallet',
-        control: providerDetail.info.name,
+        control: removeSpace(providerDetail.info.name),
         controlType: 'MenuItem',
         extras: {
           wallet: getProviderSlugFromRdns(providerDetail.info.rdns),

@@ -10,9 +10,9 @@ import {
   VerticalMenu,
 } from '@biom3/react';
 import {
+  Dispatch,
   type MouseEventHandler,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useState,
@@ -21,8 +21,9 @@ import { Environment } from '@imtbl/config';
 import { useTranslation } from 'react-i18next';
 import type { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import {
+  AddTokensAction,
   AddTokensActions,
-  AddTokensContext,
+  AddTokensState,
 } from '../context/AddTokensContext';
 import { useError } from '../hooks/useError';
 import {
@@ -44,20 +45,19 @@ export interface TokenDrawerMenuProps {
   checkout: Checkout;
   config: StrongCheckoutWidgetsConfig;
   toTokenAddress?: string;
+  addTokensState: AddTokensState;
+  addTokensDispatch: Dispatch<AddTokensAction>;
 }
 
 export function TokenDrawerMenu({
   checkout,
   config,
   toTokenAddress,
+  addTokensState,
+  addTokensDispatch,
 }: TokenDrawerMenuProps) {
-  const {
-    addTokensState: { tokens, selectedToken },
-    addTokensDispatch,
-  } = useContext(AddTokensContext);
   const { showErrorHandover } = useError(config.environment);
   const [visible, setVisible] = useState(false);
-  const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const defaultTokenImage = getDefaultTokenImage(
     checkout?.config.environment,
@@ -75,32 +75,43 @@ export function TokenDrawerMenu({
     });
   };
 
-  const handleTokenChange = useCallback((token: TokenInfo) => {
-    track({
-      userJourney: UserJourney.ADD_TOKENS,
-      screen: 'InputScreen',
-      control: 'TokensMenu',
-      controlType: 'MenuItem',
-      extras: {
-        tokenAddress: token?.address,
-      },
-    });
-    setSelectedToken(token);
-    setVisible(false);
-    setSearchValue('');
-  }, []);
+  const handleTokenChange = useCallback(
+    (token: TokenInfo) => {
+      track({
+        userJourney: UserJourney.ADD_TOKENS,
+        screen: 'InputScreen',
+        control: 'TokensMenu',
+        controlType: 'MenuItem',
+        extras: {
+          contextId: addTokensState.id,
+          tokenAddress: token?.address,
+        },
+      });
+      setSelectedToken(token);
+      setVisible(false);
+      setSearchValue('');
+    },
+    [addTokensState.id],
+  );
 
   const isSelected = useCallback(
-    (token: TokenInfo) => token.address === selectedToken?.address,
-    [selectedToken],
+    (token: TokenInfo) => token.address === addTokensState.selectedToken?.address,
+    [addTokensState.selectedToken],
   );
 
   const tokenChoiceOptions = useMemo(
-    () => allowedTokens.filter((token) => {
+    () => addTokensState.allowedTokens?.filter((token) => {
       if (!searchValue) return true;
       return token.symbol.toLowerCase().startsWith(searchValue.toLowerCase());
     }),
-    [tokens, handleTokenChange, isSelected, defaultTokenImage, searchValue],
+    [
+      addTokensState.allowedTokens,
+      addTokensState.tokens,
+      handleTokenChange,
+      isSelected,
+      defaultTokenImage,
+      searchValue,
+    ],
   );
 
   const handleTokenIconClick = useCallback<
@@ -115,7 +126,7 @@ export function TokenDrawerMenu({
   }, [setVisible, setSearchValue]);
 
   useEffect(() => {
-    if (!checkout) return;
+    if (!checkout || addTokensState.tokens != null) return;
 
     (async () => {
       try {
@@ -138,8 +149,12 @@ export function TokenDrawerMenu({
             return token;
           });
           updatedTokens.sort((a, b) => {
-            const aIndex = TOKEN_PRIORITY_ORDER.findIndex((token) => token === a.symbol);
-            const bIndex = TOKEN_PRIORITY_ORDER.findIndex((token) => token === b.symbol);
+            const aIndex = TOKEN_PRIORITY_ORDER.findIndex(
+              (token) => token === a.symbol,
+            );
+            const bIndex = TOKEN_PRIORITY_ORDER.findIndex(
+              (token) => token === b.symbol,
+            );
             // If both tokens are not in the priority list, sort by symbol
             if (aIndex === -1 && bIndex === -1) {
               return a.symbol.localeCompare(b.symbol);
@@ -155,8 +170,6 @@ export function TokenDrawerMenu({
             return aIndex < bIndex ? -1 : 1;
           });
 
-          setAllowedTokens(updatedTokens);
-
           if (toTokenAddress) {
             const preselectedToken = updatedTokens.find(
               (token) => token.address?.toLowerCase() === toTokenAddress.toLowerCase(),
@@ -170,15 +183,15 @@ export function TokenDrawerMenu({
           addTokensDispatch({
             payload: {
               type: AddTokensActions.SET_ALLOWED_TOKENS,
-              allowedTokens: tokenResponse.tokens,
+              allowedTokens: updatedTokens,
             },
           });
         }
       } catch (error) {
-        showErrorHandover(AddTokensErrorTypes.SERVICE_BREAKDOWN, { error });
+        showErrorHandover(AddTokensErrorTypes.SERVICE_BREAKDOWN, { contextId: addTokensState.id, error });
       }
     })();
-  }, [checkout, toTokenAddress]);
+  }, [addTokensState.tokens, checkout, toTokenAddress]);
 
   return (
     <Drawer
@@ -192,7 +205,7 @@ export function TokenDrawerMenu({
       escapeKeyClose
     >
       <Drawer.Target>
-        {selectedToken ? (
+        {addTokensState.selectedToken ? (
           <SmartClone
             onClick={handleTokenIconClick as MouseEventHandler<unknown>}
           >
@@ -200,8 +213,8 @@ export function TokenDrawerMenu({
               size="xLarge"
               use={(
                 <TokenImage
-                  src={selectedToken?.icon}
-                  name={selectedToken?.name}
+                  src={addTokensState.selectedToken?.icon}
+                  name={addTokensState.selectedToken?.name}
                   defaultImage={defaultTokenImage}
                 />
               )}
@@ -219,7 +232,12 @@ export function TokenDrawerMenu({
             />
           </SmartClone>
         ) : (
-          <Box sx={{ animation: `${PULSE_SHADOW} 2s infinite ease-in-out`, borderRadius: '50%' }}>
+          <Box
+            sx={{
+              animation: `${PULSE_SHADOW} 2s infinite ease-in-out`,
+              borderRadius: '50%',
+            }}
+          >
             <ButtCon
               size="large"
               variant="tertiary"
@@ -241,7 +259,8 @@ export function TokenDrawerMenu({
           <TextInput.Icon icon="Search" />
         </TextInput>
         <VerticalMenu sx={{ maxHeight: '100%' }}>
-          {tokenChoiceOptions.length > 0
+          {tokenChoiceOptions
+            && tokenChoiceOptions.length > 0
             && tokenChoiceOptions.map((token) => (
               <MenuItem
                 size="medium"

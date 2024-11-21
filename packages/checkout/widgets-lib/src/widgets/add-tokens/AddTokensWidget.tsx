@@ -3,7 +3,7 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AddTokensWidgetParams, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
-
+import { v4 as uuidv4 } from 'uuid';
 import { Stack, CloudImage, useTheme } from '@biom3/react';
 import { Environment } from '@imtbl/config';
 import { sendAddTokensCloseEvent } from './AddTokensWidgetEvents';
@@ -83,7 +83,7 @@ export default function AddTokensWidget({
     providersState: { checkout, fromProvider },
   } = useProvidersContext();
 
-  const { squid, chains } = addTokensState;
+  const { id, squid, chains } = addTokensState;
 
   const addTokensReducerValues = useMemo(
     () => ({
@@ -98,10 +98,19 @@ export default function AddTokensWidget({
   const { showErrorHandover } = useError(checkout.config.environment);
 
   useEffect(() => {
+    addTokensDispatch({
+      payload: {
+        type: AddTokensActions.SET_ID,
+        id: uuidv4(),
+      },
+    });
+  }, []);
+
+  useEffect(() => {
     if (config.environment !== Environment.PRODUCTION) {
-      showErrorHandover(AddTokensErrorTypes.ENVIRONMENT_ERROR);
+      showErrorHandover(AddTokensErrorTypes.ENVIRONMENT_ERROR, { contextId: id });
     }
-  }, [config]);
+  }, [config, id]);
 
   useEffect(() => {
     if (!checkout) return;
@@ -120,9 +129,9 @@ export default function AddTokensWidget({
     const isInvalidToAmount = toAmount && !amountInputValidation(toAmount);
 
     if (isInvalidToTokenAddress || isInvalidToAmount) {
-      showErrorHandover(AddTokensErrorTypes.INVALID_PARAMETERS);
+      showErrorHandover(AddTokensErrorTypes.INVALID_PARAMETERS, { contextId: id });
     }
-  }, [toTokenAddress, toAmount]);
+  }, [toTokenAddress, toAmount, id]);
 
   useEffect(() => {
     if (!squid) return;
@@ -169,7 +178,6 @@ export default function AddTokensWidget({
 
   useEffect(() => {
     if (!tokensResponse) return;
-
     addTokensDispatch({
       payload: {
         type: AddTokensActions.SET_TOKENS,
@@ -256,6 +264,9 @@ export default function AddTokensWidget({
                 page({
                   userJourney: UserJourney.ADD_TOKENS,
                   screen: 'Error',
+                  extras: {
+                    contextId: id,
+                  },
                 });
               }}
             />
