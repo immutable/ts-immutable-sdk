@@ -49,7 +49,7 @@ export default function Provider(props: ProviderProps) {
 
   const handleSelectChange = (providerRdns: any) => {
     const selectedProvider = injectedProviders.find((providerDetail) => providerDetail.info.rdns === providerRdns);
-    const browserProvider = new WrappedBrowserProvider(selectedProvider?.provider);
+    const browserProvider = new WrappedBrowserProvider(selectedProvider?.provider!);
     setProvider(browserProvider);
     setResult1(browserProvider);
     setLoading(false);

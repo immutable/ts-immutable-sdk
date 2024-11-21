@@ -1,9 +1,9 @@
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import { RouteResponse, ActionType } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
-import { utils } from 'ethers';
 import { useRef } from 'react';
-import { Web3Provider } from '@ethersproject/providers';
+import { formatUnits } from 'ethers';
+import { WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { delay } from '../../../functions/delay';
 import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
 import { retry } from '../../retry';
@@ -85,7 +85,7 @@ export const useRoutes = () => {
       .filter((value) => value !== undefined);
 
     return fromAmountDataArray.filter((data: FromAmountData) => {
-      const formattedBalance = utils.formatUnits(
+      const formattedBalance = formatUnits(
         data.balance.balance,
         data.balance.decimals,
       );
@@ -196,7 +196,7 @@ export const useRoutes = () => {
     ) => (route.route?.route.estimate.gasCosts || [])
       .filter((gasCost) => gasCost.token.chainId === chainId.toString())
       .reduce(
-        (sum, gasCost) => sum + parseFloat(utils.formatUnits(gasCost.amount, gasCost.token.decimals)),
+        (sum, gasCost) => sum + parseFloat(formatUnits(gasCost.amount, gasCost.token.decimals)),
         0,
       );
 
@@ -206,7 +206,7 @@ export const useRoutes = () => {
     ) => (route.route?.route.estimate.feeCosts || [])
       .filter((fee) => fee.token.chainId === chainId.toString())
       .reduce(
-        (sum, fee) => sum + parseFloat(utils.formatUnits(fee.amount, fee.token.decimals)),
+        (sum, fee) => sum + parseFloat(formatUnits(fee.amount, fee.token.decimals)),
         0,
       );
 
@@ -225,7 +225,7 @@ export const useRoutes = () => {
       if (!userGasBalance) return false;
 
       const userBalance = parseFloat(
-        utils.formatUnits(userGasBalance.balance, userGasBalance.decimals),
+        formatUnits(userGasBalance.balance, userGasBalance.decimals),
       );
 
       // If the fromToken is the native token, validate balance for both fromAmount and gas + fee costs
@@ -370,7 +370,7 @@ export const useRoutes = () => {
 
     if (matchingTokens.length > 0) {
       return matchingTokens.some((balance) => {
-        const tokenAmount = parseFloat(utils.formatUnits(balance.balance, balance.decimals));
+        const tokenAmount = parseFloat(formatUnits(balance.balance, balance.decimals));
         return tokenAmount >= parseFloat(toAmount);
       });
     }
@@ -381,7 +381,7 @@ export const useRoutes = () => {
   const hasSufficientGas = (
     balances: TokenBalance[],
     selectedChainId: string | number,
-    provider: Web3Provider | undefined,
+    provider: WrappedBrowserProvider | undefined,
   ): boolean => {
     if (!provider) return false;
     if (isPassportProvider(provider)) return true;
@@ -393,7 +393,7 @@ export const useRoutes = () => {
     if (!nativeCurrencyBalance) return false;
 
     const nativeCurrencyBalanceAmount = parseFloat(
-      utils.formatUnits(nativeCurrencyBalance.balance, nativeCurrencyBalance.decimals),
+      formatUnits(nativeCurrencyBalance.balance, nativeCurrencyBalance.decimals),
     );
     if (nativeCurrencyBalanceAmount < INSUFFICIENT_GAS_THRESHOLD) return false;
     return true;

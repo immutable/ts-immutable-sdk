@@ -12,7 +12,7 @@ import {
   useState,
 } from 'react';
 import {
-  ChainId, isAddressSanctioned, WalletProviderName, WalletProviderRdns, WrappedBrowserProvider,
+  ChainId, WalletProviderName, WalletProviderRdns, WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
