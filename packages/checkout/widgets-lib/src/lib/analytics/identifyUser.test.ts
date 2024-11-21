@@ -1,4 +1,5 @@
 import { BrowserProvider } from 'ethers';
+import { NamedBrowserProvider, WalletProviderName } from '@imtbl/checkout-sdk';
 import { identifyUser } from './identifyUser';
 
 describe('identifyUser', () => {
@@ -30,11 +31,9 @@ describe('identifyUser', () => {
       getSigner: jest.fn().mockReturnValue({
         getAddress: jest.fn().mockResolvedValue('0xtest'),
       }),
-      provider: {
-        isPassport: true,
-        request: jest.fn(),
-      },
-    } as any as BrowserProvider;
+      send: jest.fn(),
+      name: WalletProviderName.PASSPORT,
+    } as any as NamedBrowserProvider;
     await identifyUser(identify, provider);
     expect(identify).toBeCalledWith('0xtest', { isMetaMask: false, isPassportWallet: true });
   });
