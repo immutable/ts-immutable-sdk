@@ -6,7 +6,7 @@ import {
   ItemBalance,
   ItemRequirement,
   ItemType,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
   NativeItem,
   TokenInfo,
 } from '../../types';
@@ -152,7 +152,7 @@ describe('balanceRequirement', () => {
   });
 
   describe('getTokensInfo', () => {
-    let mockProvider: NamedBrowserProvider;
+    let mockProvider: WrappedBrowserProvider;
 
     beforeEach(() => {
       jest.resetAllMocks();
@@ -164,7 +164,7 @@ describe('balanceRequirement', () => {
         getNetwork: jest.fn().mockResolvedValue({
           chainId: ChainId.ETHEREUM,
         }),
-      } as unknown as NamedBrowserProvider;
+      } as unknown as WrappedBrowserProvider;
     });
 
     it('should return native token data if type is native', async () => {

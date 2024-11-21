@@ -6,7 +6,7 @@ import {
   GasAmount,
   GasTokenType,
   ItemType,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
   NativeItemRequirement,
   TransactionOrGasType,
 } from '@imtbl/checkout-sdk';
@@ -21,7 +21,7 @@ import { parseUnits as parseUnitsEthers } from 'ethers';
 
 interface SmartCheckoutProps {
   checkout: Checkout;
-  provider: NamedBrowserProvider | undefined;
+  provider: WrappedBrowserProvider | undefined;
 }
 
 export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) => {

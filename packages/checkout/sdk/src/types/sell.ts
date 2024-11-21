@@ -1,5 +1,5 @@
 import { SellOrder } from './smartCheckout';
-import { NamedBrowserProvider } from './provider';
+import { WrappedBrowserProvider } from './provider';
 
 /**
  * Interface representing the parameters for {@link Checkout.sell}
@@ -8,6 +8,6 @@ import { NamedBrowserProvider } from './provider';
  * Currently only processes the first order in the array until batch processing is supported.
  */
 export interface SellParams {
-  provider: NamedBrowserProvider;
+  provider: WrappedBrowserProvider;
   orders: Array<SellOrder>;
 }

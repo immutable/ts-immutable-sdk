@@ -1,15 +1,15 @@
 import { ChainId } from './chains';
 import { NetworkInfo } from './networkInfo';
 import { TokenInfo } from './tokenInfo';
-import { NamedBrowserProvider } from './provider';
+import { WrappedBrowserProvider } from './provider';
 
 /**
  * Interface representing the parameters for {@link Checkout.addNetwork}.
- * @property {NamedBrowserProvider} provider - The provider to connect to the network.
+ * @property {WrappedBrowserProvider} provider - The provider to connect to the network.
  * @property {ChainId} chainId - The ID of the network to add. We only support adding Immutable zkEVM and Immutable zkEVM Testnet.
  */
 export interface AddNetworkParams {
-  provider: NamedBrowserProvider;
+  provider: WrappedBrowserProvider;
   chainId: ChainId;
 }
 
@@ -19,7 +19,7 @@ export interface AddNetworkParams {
  * @property {ChainId} chainId - The ID of the network to switch to.
  */
 export interface SwitchNetworkParams {
-  provider: NamedBrowserProvider;
+  provider: WrappedBrowserProvider;
   chainId: ChainId;
 }
 
@@ -31,7 +31,7 @@ export interface SwitchNetworkParams {
  */
 export interface SwitchNetworkResult {
   network: NetworkInfo;
-  provider: NamedBrowserProvider;
+  provider: WrappedBrowserProvider;
 }
 
 /**
@@ -39,7 +39,7 @@ export interface SwitchNetworkResult {
  * @property {BrowserProvider} provider - The provider to connect to the network.
  */
 export interface GetNetworkParams {
-  provider: NamedBrowserProvider;
+  provider: WrappedBrowserProvider;
 }
 
 /**

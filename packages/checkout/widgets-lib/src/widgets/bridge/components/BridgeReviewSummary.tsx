@@ -8,7 +8,7 @@ import {
   GasEstimateBridgeToL2Result,
   GasEstimateType,
   isAddressSanctioned,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
 import { useTranslation } from 'react-i18next';
@@ -305,7 +305,7 @@ export function BridgeReviewSummary() {
     })();
   }, []);
 
-  const handleNetworkSwitch = useCallback((provider: NamedBrowserProvider) => {
+  const handleNetworkSwitch = useCallback((provider: WrappedBrowserProvider) => {
     bridgeDispatch({
       payload: {
         type: BridgeActions.SET_WALLETS_AND_NETWORKS,

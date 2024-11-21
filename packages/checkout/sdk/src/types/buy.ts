@@ -1,4 +1,4 @@
-import { NamedBrowserProvider } from './provider';
+import { WrappedBrowserProvider } from './provider';
 import { BuyOrder, BuyOverrides } from './smartCheckout';
 
 /**
@@ -9,7 +9,7 @@ import { BuyOrder, BuyOverrides } from './smartCheckout';
  * Currently only processes the first order in the array until batch processing is supported.
  */
 export interface BuyParams {
-  provider: NamedBrowserProvider;
+  provider: WrappedBrowserProvider;
   orders: Array<BuyOrder>;
   overrides?: BuyOverrides;
 }

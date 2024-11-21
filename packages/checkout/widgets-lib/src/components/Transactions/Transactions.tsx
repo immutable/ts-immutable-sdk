@@ -4,9 +4,10 @@ import {
 import { Box } from '@biom3/react';
 import {
   ChainId,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
   TokenFilterTypes,
-  TokenInfo, WalletProviderName, WalletProviderRdns,
+  TokenInfo,
+  WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { useTranslation } from 'react-i18next';
@@ -256,10 +257,7 @@ export function Transactions({
         if (event.providerDetail.info.rdns === WalletProviderRdns.METAMASK) {
           changeAccount = true;
         }
-        const browserProvider = new NamedBrowserProvider(
-          event.providerDetail.info.name as WalletProviderName,
-          event.provider,
-        );
+        const browserProvider = new WrappedBrowserProvider(event.provider);
         const connectedProvider = await connectToProvider(checkout, browserProvider, changeAccount);
         const network = await connectedProvider.getNetwork();
         const address = await (await connectedProvider.getSigner()).getAddress();

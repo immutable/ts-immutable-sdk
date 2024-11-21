@@ -5,10 +5,10 @@ import { signApprovalTransactions, signFulfillmentTransactions, signMessage } fr
 import { CheckoutErrorType } from '../../errors';
 import { SignTransactionStatusType, UnsignedMessage } from './types';
 import { IMMUTABLE_ZKVEM_GAS_OVERRIDES } from '../../env';
-import { ChainId, NamedBrowserProvider, NetworkInfo } from '../../types';
+import { ChainId, WrappedBrowserProvider, NetworkInfo } from '../../types';
 
 describe('signActions', () => {
-  let mockProvider: NamedBrowserProvider;
+  let mockProvider: WrappedBrowserProvider;
 
   describe('signApprovalTransactions', () => {
     it('should sign approval transactions', async () => {
@@ -23,7 +23,7 @@ describe('signActions', () => {
             }),
           }),
         }),
-      } as unknown as NamedBrowserProvider;
+      } as unknown as WrappedBrowserProvider;
 
       const approvalTransactions: TransactionRequest[] = [
         {
@@ -68,7 +68,7 @@ describe('signActions', () => {
             }),
           }),
         }),
-      } as unknown as NamedBrowserProvider;
+      } as unknown as WrappedBrowserProvider;
 
       const approvalTransactions: TransactionRequest[] = [
         {
@@ -90,7 +90,7 @@ describe('signActions', () => {
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: jest.fn().mockRejectedValue(new Error('approval error')),
         }),
-      } as unknown as NamedBrowserProvider;
+      } as unknown as WrappedBrowserProvider;
 
       const approvalTransactions: TransactionRequest[] = [
         {
@@ -130,7 +130,7 @@ describe('signActions', () => {
             }),
           }),
         }),
-      } as unknown as NamedBrowserProvider;
+      } as unknown as WrappedBrowserProvider;
 
       const approvalTransactions: TransactionRequest[] = [
         {
@@ -172,7 +172,7 @@ describe('signActions', () => {
             }),
           }),
         }),
-      } as unknown as NamedBrowserProvider;
+      } as unknown as WrappedBrowserProvider;
 
       const fulfillmentTransactions: TransactionRequest[] = [
         {
@@ -194,7 +194,7 @@ describe('signActions', () => {
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: jest.fn().mockRejectedValue(new Error('fulfillment error')),
         }),
-      } as unknown as NamedBrowserProvider;
+      } as unknown as WrappedBrowserProvider;
 
       const approvalTransactions: TransactionRequest[] = [
         {
@@ -227,7 +227,7 @@ describe('signActions', () => {
         getSigner: jest.fn().mockReturnValue({
           signTypedData: jest.fn().mockResolvedValue('0xSIGNATURE'),
         }),
-      } as unknown as NamedBrowserProvider;
+      } as unknown as WrappedBrowserProvider;
 
       const unsignedMessage: UnsignedMessage = {
         orderHash: 'hash',
@@ -261,7 +261,7 @@ describe('signActions', () => {
         getSigner: jest.fn().mockReturnValue({
           signTypedData: jest.fn().mockRejectedValue(new Error('sign message error')),
         }),
-      } as unknown as NamedBrowserProvider;
+      } as unknown as WrappedBrowserProvider;
 
       const unsignedMessage: UnsignedMessage = {
         orderHash: 'hash',

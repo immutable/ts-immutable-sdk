@@ -6,7 +6,7 @@ import {
   EIP6963ProviderInfo,
   WalletConnectManager as IWalletConnectManager,
   metaMaskProviderInfo,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
   passportProviderInfo,
 } from '@imtbl/checkout-sdk';
 import {
@@ -65,7 +65,7 @@ export type ConnectWidgetInputs = ConnectWidgetParams & {
   sendCloseEventOverride?: () => void;
   allowedChains?: ChainId[];
   checkout: Checkout;
-  browserProvider?: NamedBrowserProvider;
+  browserProvider?: WrappedBrowserProvider;
   isCheckNetworkEnabled?: boolean;
   sendGoBackEventOverride?: () => void;
   showBackButton?: boolean;

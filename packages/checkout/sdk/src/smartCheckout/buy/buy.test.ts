@@ -21,7 +21,7 @@ import {
   signApprovalTransactions,
   signFulfillmentTransactions,
 } from '../actions';
-import { BuyOrder, NamedBrowserProvider, OrderFee } from '../../types';
+import { BuyOrder, WrappedBrowserProvider, OrderFee } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../routing/indexer/fetchL1Representation';
 import { HttpClient } from '../../api/http';
@@ -44,14 +44,14 @@ describe('buy', () => {
 
   describe('buy', () => {
     let config: CheckoutConfiguration;
-    let mockProvider: NamedBrowserProvider;
+    let mockProvider: WrappedBrowserProvider;
 
     beforeEach(() => {
       mockProvider = {
         getSigner: jest.fn().mockReturnValue({
           getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
         }),
-      } as unknown as NamedBrowserProvider;
+      } as unknown as WrappedBrowserProvider;
 
       config = new CheckoutConfiguration({
         baseConfig: { environment: Environment.SANDBOX },
@@ -1739,14 +1739,14 @@ describe('buy', () => {
 
   describe('taker fees', () => {
     let config: CheckoutConfiguration;
-    let mockProvider: NamedBrowserProvider;
+    let mockProvider: WrappedBrowserProvider;
 
     beforeEach(() => {
       mockProvider = {
         getSigner: jest.fn().mockReturnValue({
           getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
         }),
-      } as unknown as NamedBrowserProvider;
+      } as unknown as WrappedBrowserProvider;
 
       config = new CheckoutConfiguration({
         baseConfig: { environment: Environment.SANDBOX },
