@@ -10,6 +10,8 @@ import { AddTokensError, AddTokensErrorTypes } from '../types';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { sendAddTokensFailedEvent } from '../AddTokensWidgetEvents';
 import { retry } from '../../../lib/retry';
+import { withMetricsAsync } from '../../../lib/metrics';
+import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export const useExecute = (contextId: string, environment: Environment) => {
   const { showErrorHandover } = useError(environment);
@@ -160,40 +162,62 @@ export const useExecute = (contextId: string, environment: Environment) => {
     }
   };
 
+  const callApprove = async (
+    provider: Web3Provider,
+    routeResponse: RouteResponse,
+  ):Promise<ethers.providers.TransactionReceipt> => {
+    const erc20Abi = [
+      'function approve(address spender, uint256 amount) public returns (bool)',
+    ];
+    const fromToken = routeResponse?.route.params.fromToken;
+    const signer = provider.getSigner();
+    const tokenContract = new ethers.Contract(fromToken, erc20Abi, signer);
+
+    const fromAmount = routeResponse?.route.params.fromAmount;
+    if (!fromAmount) {
+      throw new Error('fromAmount is undefined');
+    }
+
+    const transactionRequestTarget = routeResponse?.route?.transactionRequest?.target;
+    if (!transactionRequestTarget) {
+      throw new Error('transactionRequest target is undefined');
+    }
+
+    const tx = await tokenContract.approve(
+      transactionRequestTarget,
+      fromAmount,
+    );
+    return await waitForReceipt(provider, tx.hash);
+  };
+
   const approve = async (
     provider: Web3Provider,
     routeResponse: RouteResponse,
   ): Promise<ethers.providers.TransactionReceipt | undefined> => {
     try {
       if (!isSquidNativeToken(routeResponse?.route?.params.fromToken)) {
-        const erc20Abi = [
-          'function approve(address spender, uint256 amount) public returns (bool)',
-        ];
-        const fromToken = routeResponse?.route.params.fromToken;
-        const signer = provider.getSigner();
-        const tokenContract = new ethers.Contract(fromToken, erc20Abi, signer);
-
-        const fromAmount = routeResponse?.route.params.fromAmount;
-        if (!fromAmount) {
-          throw new Error('fromAmount is undefined');
-        }
-
-        const transactionRequestTarget = routeResponse?.route?.transactionRequest?.target;
-        if (!transactionRequestTarget) {
-          throw new Error('transactionRequest target is undefined');
-        }
-
-        const tx = await tokenContract.approve(
-          transactionRequestTarget,
-          fromAmount,
+        return await withMetricsAsync(
+          () => callApprove(provider, routeResponse),
+          `${UserJourney.ADD_TOKENS}_Approve`,
         );
-        return waitForReceipt(provider, tx.hash);
       }
       return undefined;
     } catch (error) {
       handleTransactionError(error);
       return undefined;
     }
+  };
+
+  const callExecute = async (
+    squid: Squid,
+    provider: Web3Provider,
+    routeResponse: RouteResponse,
+  ):Promise<ethers.providers.TransactionReceipt> => {
+    const tx = (await squid.executeRoute({
+      signer: provider.getSigner(),
+      route: routeResponse.route,
+    })) as unknown as ethers.providers.TransactionResponse;
+    return await waitForReceipt(provider, tx.hash);
   };
 
   const execute = async (
@@ -204,13 +228,11 @@ export const useExecute = (contextId: string, environment: Environment) => {
     if (!provider.provider.request) {
       throw new Error('provider does not have request method');
     }
-
     try {
-      const tx = (await squid.executeRoute({
-        signer: provider.getSigner(),
-        route: routeResponse.route,
-      })) as unknown as ethers.providers.TransactionResponse;
-      return waitForReceipt(provider, tx.hash);
+      return await withMetricsAsync(
+        () => callExecute(squid, provider, routeResponse),
+        `${UserJourney.ADD_TOKENS}_Execute`,
+      );
     } catch (error) {
       handleTransactionError(error);
       return undefined;
