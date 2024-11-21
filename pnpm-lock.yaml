@@ -423,8 +423,8 @@ importers:
         specifier: workspace:*
         version: link:../../../sdk
       ethers:
-        specifier: ^5.7.2
-        version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^6.13.4
+        version: 6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.10
         version: 14.2.10(@babel/core@7.24.9)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -512,8 +512,8 @@ importers:
         specifier: workspace:*
         version: link:../../../sdk
       ethers:
-        specifier: ^5.7.2
-        version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^6.13.4
+        version: 6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.10
         version: 14.2.10(@babel/core@7.24.9)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -699,8 +699,8 @@ importers:
         specifier: ^7.8.0
         version: 7.10.1(react@18.3.1)
       ethers:
-        specifier: ^5.7.2
-        version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^6.13.4
+        version: 6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.5
         version: 14.2.5(@babel/core@7.24.9)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -971,9 +971,6 @@ importers:
       eslint-config-next:
         specifier: 14.2.10
         version: 14.2.10(eslint@8.57.0)(typescript@5.6.2)
-      ethers:
-        specifier: ^5.7.2
-        version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       typescript:
         specifier: ^5
         version: 5.6.2
@@ -6743,11 +6740,6 @@ packages:
 
   '@stdlib/number-float64-base-get-high-word@0.0.6':
     resolution: {integrity: sha512-jSFSYkgiG/IzDurbwrDKtWiaZeSEJK8iJIsNtbPG1vOIdQMRyw+t0bf3Kf3vuJu/+bnSTvYZLqpCO6wzT/ve9g==}
-    engines: {node: '>=0.10.0', npm: '>2.7.0'}
-    os: [aix, darwin, freebsd, linux, macos, openbsd, sunos, win32, windows]
-
-  '@stdlib/number-float64-base-normalize@0.0.8':
-    resolution: {integrity: sha512-4P3c7YD0hahCgflxxTWrjR8457o2ViYu32MH/M166Aj6nkPj0ZovYj/X1DdyiYAAMHhVePGGMl0JAL3X141FVQ==}
     engines: {node: '>=0.10.0', npm: '>2.7.0'}
     os: [aix, darwin, freebsd, linux, macos, openbsd, sunos, win32, windows]
 
@@ -23104,17 +23096,6 @@ snapshots:
       '@stdlib/assert-is-little-endian': 0.0.7
       '@stdlib/number-float64-base-to-words': 0.0.7
       '@stdlib/utils-library-manifest': 0.0.8
-    transitivePeerDependencies:
-      - supports-color
-
-  '@stdlib/number-float64-base-normalize@0.0.8':
-    dependencies:
-      '@stdlib/constants-float64-smallest-normal': 0.0.8
-      '@stdlib/math-base-assert-is-infinite': 0.0.9
-      '@stdlib/math-base-assert-is-nan': 0.0.8
-      '@stdlib/math-base-special-abs': 0.0.6
-      '@stdlib/types': 0.0.14
-      '@stdlib/utils-define-nonenumerable-read-only-property': 0.0.7
     transitivePeerDependencies:
       - supports-color
 

@@ -11,12 +11,12 @@ const Context = createContext<ContextType>({});
 
 export function ZkEVMProvider({ children }: { children: React.ReactNode }) {
     console.log('Provider: Initializing');
-    const client = new blockchainData.BlockchainData({
+    const client = useMemo(() => new blockchainData.BlockchainData({
         baseConfig: {
             environment: config.Environment.SANDBOX,
             apiKey: process.env.NEXT_PUBLIC_API_KEY,
         },
-    });
+    }), []);
 
     const listAssets = useCallback(async (userAddress: string): Promise<blockchainData.Types.ListNFTsResult> => {
         console.log('listAssets: Attempting to list assets for user', userAddress);

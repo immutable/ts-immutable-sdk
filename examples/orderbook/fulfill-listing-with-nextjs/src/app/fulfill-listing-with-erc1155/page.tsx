@@ -21,6 +21,7 @@ import { orderbook } from "@imtbl/sdk";
 import { OrderStatusName } from "@imtbl/sdk/orderbook";
 import NextLink from "next/link";
 import { BrowserProvider, JsonRpcSigner } from "ethers";
+import { unitsRemaining, unitsTotal } from "../utils/listing";
 
 export default function FulfillERC1155WithPassport() {
   interface UnitsToFill {
