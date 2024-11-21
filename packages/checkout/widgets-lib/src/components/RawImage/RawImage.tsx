@@ -26,7 +26,7 @@ export function RawImage({
         src={src}
         alt={alt}
         className="CloudImage"
-        style={useConvertSxToEmotionStyles(imageStyles)}
+        style={useConvertSxToEmotionStyles(imageStyles) as React.CSSProperties}
         loading="lazy"
       />
     </Box>
