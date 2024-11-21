@@ -107,7 +107,7 @@ export const withCheckoutError = async <T>(
   try {
     return await fn();
   } catch (error: any) {
-    const cause = `${(error as Error).message}` || 'UnknownError';
+    const cause = error?.error?.message ?? ((error as Error).message || 'UnknownError');
 
     const errorMessage = customError.message
       ? `[${customError.type}]:${customError.message}. Cause:${cause}`
