@@ -81,7 +81,7 @@ jobs:
         uses: ./.github/actions/setup-playwright
 
       - name: Prepare widgets bundle for @examples/commerce-widget-nextjs
-        run: yarn workspace @imtbl/checkout-widgets prepare:examplewidgets
+        run: pnpm --filter @imtbl/checkout-widgets prepare:examplewidgets
 
       - name: Test examples
         run: pnpm test:examples
