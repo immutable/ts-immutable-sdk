@@ -106,7 +106,7 @@ describe('getAvailableRoutingOptions', () => {
 
   it('should disable Bridge options if Passport provider', async () => {
     const mockPassportProvider = {
-      provider: {
+      ethereumProvider: {
         isPassport: true,
       },
     } as unknown as NamedBrowserProvider;

@@ -58,11 +58,7 @@ export class NamedBrowserProvider extends BrowserProvider {
   }
 
   #setEthereumProvider(ethereum: EthersEip1193Provider) {
-    if (!('on' in ethereum) || typeof ethereum.on !== 'function') {
-      return;
-    }
-
-    if (!('removeListener' in ethereum) || typeof ethereum.removeListener !== 'function') {
+    if (!('request' in ethereum) || typeof ethereum.request !== 'function') {
       return;
     }
 
