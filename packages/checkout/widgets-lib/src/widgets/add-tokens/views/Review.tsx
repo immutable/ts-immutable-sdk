@@ -98,7 +98,9 @@ export function Review({
   const { track, page } = useAnalytics();
 
   const {
-    addTokensState: { squid, chains, tokens },
+    addTokensState: {
+      id, squid, chains, tokens,
+    },
   } = useContext(AddTokensContext);
 
   const {
@@ -125,19 +127,20 @@ export function Review({
     getAllowance,
     approve,
     execute,
-  } = useExecute(checkout?.config.environment || Environment.SANDBOX);
+  } = useExecute(id, checkout?.config.environment || Environment.SANDBOX);
 
   useEffect(() => {
     page({
       userJourney: UserJourney.ADD_TOKENS,
       screen: 'Review',
       extras: {
+        contextId: id,
         toAmount: data.toAmount,
         toChainId: data.toChainId,
         toTokenAddress: data.toTokenAddress,
       },
     });
-  }, []);
+  }, [id]);
 
   const getFromAmountAndRoute = async () => {
     if (!squid || !tokens) return;
@@ -166,6 +169,7 @@ export function Review({
       fromAddress,
       false,
     );
+
     setRoute(routeResponse.route);
     setProceedDisabled(false);
   };
@@ -184,6 +188,7 @@ export function Review({
     () => getTotalRouteFees(route),
     [route],
   );
+
   const routeFees = useMemo(() => {
     if (totalFeesUsd) {
       return (
@@ -254,10 +259,27 @@ export function Review({
 
     let currentFromAddress = '';
 
+    track({
+      userJourney: UserJourney.ADD_TOKENS,
+      screen: 'Review',
+      control: 'Proceed',
+      controlType: 'Button',
+      extras: {
+        contextId: id,
+        toTokenAddress: route.route.params.toToken,
+        toTokenChainId: route.route.params.toChain,
+        fromTokenAddress: route.route.params.fromToken,
+        fromTokenChainId: route.route.params.fromChain,
+        fromAmount: route.route.params.fromAmount,
+        fromAddress: route.route.params.fromAddress,
+        toAddress: route.route.params.toAddress,
+      },
+    });
+
     try {
       currentFromAddress = await fromProvider.getSigner().getAddress();
     } catch (error) {
-      showErrorHandover(AddTokensErrorTypes.PROVIDER_ERROR, { error });
+      showErrorHandover(AddTokensErrorTypes.PROVIDER_ERROR, { contextId: id, error });
       return;
     }
 
@@ -335,6 +357,7 @@ export function Review({
         screen: 'FundsAdded',
         action: 'Succeeded',
         extras: {
+          contextId: id,
           txHash: executeTxnReceipt.transactionHash,
         },
       });

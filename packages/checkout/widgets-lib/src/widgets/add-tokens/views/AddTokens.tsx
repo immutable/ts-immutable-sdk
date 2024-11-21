@@ -101,19 +101,21 @@ export function AddTokens({
   const { showErrorHandover } = useError(config.environment);
 
   const {
-    addTokensState: {
-      squid,
-      chains,
-      balances,
-      tokens,
-      selectedAmount,
-      routes,
-      selectedRouteData,
-      selectedToken,
-      isSwapAvailable,
-    },
+    addTokensState,
     addTokensDispatch,
   } = useContext(AddTokensContext);
+  const {
+    id,
+    squid,
+    chains,
+    balances,
+    tokens,
+    selectedAmount,
+    routes,
+    selectedRouteData,
+    selectedToken,
+    isSwapAvailable,
+  } = addTokensState;
 
   const { viewDispatch } = useContext(ViewContext);
   const { track, page } = useAnalytics();
@@ -161,6 +163,7 @@ export function AddTokens({
         control: 'RoutesMenu',
         controlType: 'MenuItem',
         extras: {
+          contextId: id,
           toTokenAddress: route.amountData.toToken.address,
           toTokenChainId: route.amountData.toToken.chainId,
           fromTokenAddress: route.amountData.fromToken.address,
@@ -197,6 +200,7 @@ export function AddTokens({
           control: 'AmountInput',
           controlType: 'TextInput',
           extras: {
+            contextId: id,
             toAmount: value,
           },
         });
@@ -240,16 +244,18 @@ export function AddTokens({
   );
 
   useEffect(() => {
+    if (!id) { return; }
     page({
       userJourney: UserJourney.ADD_TOKENS,
       screen: 'InputScreen',
       extras: {
+        contextId: id,
         toAmount,
         toTokenAddress,
         geoBlocked: !isSwapAvailable,
       },
     });
-  }, [isSwapAvailable]);
+  }, [id, isSwapAvailable]);
 
   useEffect(() => {
     if (!toAmount) return;
@@ -319,11 +325,11 @@ export function AddTokens({
           setOnRampAllowedTokens(tokenResponse.tokens);
         }
       } catch (error) {
-        showErrorHandover(AddTokensErrorTypes.SERVICE_BREAKDOWN, { error });
+        showErrorHandover(AddTokensErrorTypes.SERVICE_BREAKDOWN, { contextId: id, error });
       }
     };
     fetchOnRampTokens();
-  }, [checkout]);
+  }, [checkout, id]);
 
   const sendRequestOnRampEvent = async () => {
     if (
@@ -349,6 +355,7 @@ export function AddTokens({
       control: 'PayWithCardMenu',
       controlType: 'MenuItem',
       extras: {
+        contextId: id,
         tokenAddress: selectedToken?.address ?? '',
         amount: selectedAmount ?? '',
       },
@@ -425,6 +432,7 @@ export function AddTokens({
       control: 'Review',
       controlType: 'Button',
       extras: {
+        contextId: id,
         toTokenAddress: selectedRouteData.amountData.toToken.address,
         toTokenChainId: selectedRouteData.amountData.toToken.chainId,
         fromTokenAddress: selectedRouteData.amountData.fromToken.address,
@@ -491,6 +499,7 @@ export function AddTokens({
       control: 'WalletsMenu',
       controlType: 'MenuItem',
       extras: {
+        contextId: id,
         providerType,
         providerName: providerInfo.name,
         providerRdns: providerInfo.rdns,
@@ -555,6 +564,8 @@ export function AddTokens({
             checkout={checkout}
             config={config}
             toTokenAddress={toTokenAddress}
+            addTokensState={addTokensState}
+            addTokensDispatch={addTokensDispatch}
           />
           {showInitialEmptyState ? (
             <Body>{t('views.ADD_TOKENS.tokenSelection.buttonText')}</Body>

@@ -2,9 +2,10 @@ import { createContext } from 'react';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { Squid } from '@0xsquid/sdk';
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
-import { Chain, Token, RouteData } from '../types';
+import { Chain, RouteData, Token } from '../types';
 
 export interface AddTokensState {
+  id: string;
   allowedTokens: TokenInfo[] | null;
   squid: Squid | null;
   chains: Chain[] | null;
@@ -18,6 +19,7 @@ export interface AddTokensState {
 }
 
 export const initialAddTokensState: AddTokensState = {
+  id: '',
   allowedTokens: null,
   squid: null,
   chains: null,
@@ -40,6 +42,7 @@ export interface AddTokensAction {
 }
 
 type ActionPayload =
+  | SetId
   | SetAllowedTokensPayload
   | SetSquid
   | SetChains
@@ -52,6 +55,7 @@ type ActionPayload =
   | SetIsSwapAvailable;
 
 export enum AddTokensActions {
+  SET_ID = 'SET_ID',
   SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
   SET_SQUID = 'SET_SQUID',
   SET_CHAINS = 'SET_CHAINS',
@@ -64,10 +68,16 @@ export enum AddTokensActions {
   SET_IS_SWAP_AVAILABLE = 'SET_IS_SWAP_AVAILABLE',
 }
 
+export interface SetId {
+  type: AddTokensActions.SET_ID;
+  id: string;
+}
+
 export interface SetAllowedTokensPayload {
   type: AddTokensActions.SET_ALLOWED_TOKENS;
   allowedTokens: TokenInfo[];
 }
+
 export interface SetSquid {
   type: AddTokensActions.SET_SQUID;
   squid: Squid;
@@ -128,6 +138,11 @@ export const addTokensReducer: Reducer<AddTokensState, AddTokensAction> = (
   action: AddTokensAction,
 ) => {
   switch (action.payload.type) {
+    case AddTokensActions.SET_ID:
+      return {
+        ...state,
+        id: action.payload.id,
+      };
     case AddTokensActions.SET_ALLOWED_TOKENS:
       return {
         ...state,

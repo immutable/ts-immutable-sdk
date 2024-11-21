@@ -19,7 +19,7 @@ const BASE_SLIPPAGE = 0.02;
 export const useRoutes = () => {
   const latestRequestIdRef = useRef<number>(0);
 
-  const { addTokensDispatch } = useContext(AddTokensContext);
+  const { addTokensState: { id }, addTokensDispatch } = useContext(AddTokensContext);
 
   const {
     providersState: {
@@ -245,6 +245,7 @@ export const useRoutes = () => {
         screen: 'Routes',
         action: 'Failed',
         extras: {
+          contextId: id,
           fromToken: fromToken.symbol,
           toToken: toToken.symbol,
           fromChain: fromToken.chainId,
