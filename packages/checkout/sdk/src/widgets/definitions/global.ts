@@ -1,5 +1,5 @@
 import { Checkout } from '../../sdk';
-import { NamedBrowserProvider } from '../../types';
+import { WrappedBrowserProvider } from '../../types';
 import {
   CheckoutWidgetsConfig,
   WidgetParameters,
@@ -21,7 +21,7 @@ declare global {
     class WidgetsFactory implements IWidgetsFactory {
       constructor(sdk: Checkout, config: CheckoutWidgetsConfig);
       create: IWidgetsFactoryCreate;
-      updateProvider(provider: NamedBrowserProvider): void;
+      updateProvider(provider: WrappedBrowserProvider): void;
     }
 
     class Connect<T extends WidgetType> implements Widget<T> {

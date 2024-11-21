@@ -1,4 +1,4 @@
-import { Checkout, NamedBrowserProvider, WalletProviderName } from '@imtbl/checkout-sdk';
+import { Checkout, WrappedBrowserProvider, WalletProviderName } from '@imtbl/checkout-sdk';
 import { describe, expect } from '@jest/globals';
 import { Environment } from '@imtbl/config';
 import {
@@ -29,7 +29,7 @@ describe('connect-context', () => {
   it('should update state with provider when reducer called with SET_PROVIDER action', () => {
     const setProviderPayload: SetProviderPayload = {
       type: ConnectActions.SET_PROVIDER,
-      provider: {} as NamedBrowserProvider,
+      provider: {} as WrappedBrowserProvider,
     };
     expect(initialConnectState.provider).toBeNull();
     const { provider } = connectReducer(initialConnectState, {

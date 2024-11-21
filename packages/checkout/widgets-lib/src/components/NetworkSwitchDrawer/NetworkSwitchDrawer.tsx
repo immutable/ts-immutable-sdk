@@ -11,7 +11,7 @@ import {
   useCallback, useMemo, useEffect,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChainId, Checkout, NamedBrowserProvider } from '@imtbl/checkout-sdk';
+import { ChainId, Checkout, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { FooterLogo } from '../Footer/FooterLogo';
 import { getL1ChainId } from '../../lib';
@@ -25,10 +25,10 @@ import { getRemoteImage } from '../../lib/utils';
 export interface NetworkSwitchDrawerProps {
   visible: boolean;
   targetChainId: ChainId;
-  provider: NamedBrowserProvider;
+  provider: WrappedBrowserProvider;
   checkout: Checkout;
   onCloseDrawer: () => void;
-  onNetworkSwitch?: (provider: NamedBrowserProvider) => void;
+  onNetworkSwitch?: (provider: WrappedBrowserProvider) => void;
 }
 export function NetworkSwitchDrawer({
   visible,

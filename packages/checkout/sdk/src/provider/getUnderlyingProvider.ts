@@ -1,17 +1,17 @@
 // this function needs to be in a separate file to prevent circular dependencies with ./network
 import { JsonRpcProvider } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { NamedBrowserProvider, WalletAction } from '../types';
+import { WrappedBrowserProvider, WalletAction } from '../types';
 
 /**
  * Get chain id from RPC method
  * @param provider
  * @returns chainId number
  */
-async function requestChainId(provider: JsonRpcProvider | NamedBrowserProvider): Promise<bigint> {
+async function requestChainId(provider: JsonRpcProvider | WrappedBrowserProvider): Promise<bigint> {
   if (!provider.send) {
     throw new CheckoutError(
-      'Parsed provider is not a valid NamedBrowserProvider',
+      'Parsed provider is not a valid WrappedBrowserProvider',
       CheckoutErrorType.WEB3_PROVIDER_ERROR,
     );
   }
@@ -30,7 +30,7 @@ async function requestChainId(provider: JsonRpcProvider | NamedBrowserProvider):
  * @param provider
  * @returns chainId number
  */
-export async function getUnderlyingChainId(provider: JsonRpcProvider | NamedBrowserProvider): Promise<bigint> {
+export async function getUnderlyingChainId(provider: JsonRpcProvider | WrappedBrowserProvider): Promise<bigint> {
   const network = await provider.getNetwork();
 
   if (network.chainId && typeof network.chainId === 'bigint') {

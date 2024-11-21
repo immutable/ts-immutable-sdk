@@ -6,7 +6,7 @@ import {
   ItemBalance,
   ItemRequirement,
   ItemType,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
   NativeItem,
   TokenBalance,
   TokenInfo,
@@ -30,7 +30,7 @@ import { isMatchingAddress } from '../../utils/utils';
  */
 const getTokenBalances = async (
   config: CheckoutConfiguration,
-  provider: NamedBrowserProvider,
+  provider: WrappedBrowserProvider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
   forceFetch: boolean = false,
@@ -60,7 +60,7 @@ const getTokenBalances = async (
  * Gets the balances for all ERC721 balance requirements.
  */
 const getERC721Balances = async (
-  provider: NamedBrowserProvider,
+  provider: WrappedBrowserProvider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
 ) : Promise<ItemBalance[]> => {
@@ -116,7 +116,7 @@ const getERC721Balances = async (
  */
 export const balanceCheck = async (
   config: CheckoutConfiguration,
-  provider: NamedBrowserProvider,
+  provider: WrappedBrowserProvider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
   forceFetch: boolean = false,

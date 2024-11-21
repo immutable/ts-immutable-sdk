@@ -1,5 +1,5 @@
 import { TransactionRequest, TransactionResponse } from 'ethers';
-import { NamedBrowserProvider } from './provider';
+import { WrappedBrowserProvider } from './provider';
 
 /**
  * Interface representing the parameters for {@link Checkout.sendTransaction}.
@@ -7,7 +7,7 @@ import { NamedBrowserProvider } from './provider';
  * @property {TransactionRequest} transaction - The transaction to send.
  */
 export interface SendTransactionParams {
-  provider: NamedBrowserProvider;
+  provider: WrappedBrowserProvider;
   transaction: TransactionRequest;
 }
 

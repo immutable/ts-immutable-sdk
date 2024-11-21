@@ -2,7 +2,7 @@ import {
   ChainId,
   Checkout,
   EIP6963ProviderDetail,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
   TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
 import { useEffect, useState } from 'react';
@@ -12,7 +12,7 @@ import { Box } from '@biom3/react';
 
 export interface AllowListProps {
   checkout: Checkout | undefined;
-  provider: NamedBrowserProvider | undefined;
+  provider: WrappedBrowserProvider | undefined;
 }
 
 export default function GetInjectedProviders(props: AllowListProps) {

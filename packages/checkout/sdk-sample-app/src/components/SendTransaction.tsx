@@ -1,4 +1,4 @@
-import { Checkout, NamedBrowserProvider, NetworkInfo } from '@imtbl/checkout-sdk';
+import { Checkout, WrappedBrowserProvider, NetworkInfo } from '@imtbl/checkout-sdk';
 import { SuccessMessage, ErrorMessage } from './messages';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
@@ -8,8 +8,8 @@ import { parseUnits, toBeHex } from 'ethers';
 
 export interface SendTransactionProps {
   checkout: Checkout | undefined;
-  provider: NamedBrowserProvider | undefined;
-  setProvider: (provider: NamedBrowserProvider) => void;
+  provider: WrappedBrowserProvider | undefined;
+  setProvider: (provider: WrappedBrowserProvider) => void;
 }
 
 export default function SendTransaction(props: SendTransactionProps) {
@@ -63,13 +63,13 @@ export default function SendTransaction(props: SendTransactionProps) {
         to: '0x72E45FF29bcF2C8640a025585A4fB58cC2dd1bfb', // Required except during contract publications.
         value: toBeHex(parseUnits('0.0001', 'ether'))
       }
-  
+
       try {
         const resp = await checkout.sendTransaction({
           provider,
           transaction,
         });
-  
+
         console.log('resp', resp)
         setLoading(false);
       } catch (err: any) {
@@ -88,9 +88,9 @@ export default function SendTransaction(props: SendTransactionProps) {
       console.log(err.data);
       console.log(err.stack);
     }
-  
 
-    
+
+
   }
 
   return (

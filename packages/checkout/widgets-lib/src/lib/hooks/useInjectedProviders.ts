@@ -5,8 +5,7 @@ import {
   EIP6963ProviderDetail,
   getMetaMaskProviderDetail,
   getPassportProviderDetail,
-  NamedBrowserProvider,
-  WalletProviderName,
+  WrappedBrowserProvider,
   WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 
@@ -29,7 +28,7 @@ declare global {
   }
 }
 
-let passportBrowserProvider: NamedBrowserProvider;
+let passportBrowserProvider: WrappedBrowserProvider;
 const processProviders = async (
   checkout: Checkout | null,
   injectedProviders: EIP6963ProviderDetail[],
@@ -56,7 +55,7 @@ const processProviders = async (
     && !filteredProviders.some((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT)) {
     if (!passportBrowserProvider) {
       // eslint-disable-next-line max-len
-      passportBrowserProvider = new NamedBrowserProvider(WalletProviderName.PASSPORT, await checkout.passport.connectEvm());
+      passportBrowserProvider = new WrappedBrowserProvider(await checkout.passport.connectEvm());
     }
     // eslint-disable-next-line max-len
     filteredProviders.unshift(getPassportProviderDetail(passportBrowserProvider.provider as unknown as EIP1193Provider));

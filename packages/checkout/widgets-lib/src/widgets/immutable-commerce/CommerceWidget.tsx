@@ -11,7 +11,7 @@ import {
   CommerceFlowType,
   CommerceWidgetConfiguration,
   Checkout,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { BrowserProvider } from 'ethers';
@@ -52,7 +52,7 @@ import PurchaseWidget from '../purchase/PurchaseWidget';
 
 export type CommerceWidgetInputs = {
   checkout: Checkout;
-  browserProvider?: NamedBrowserProvider;
+  browserProvider?: WrappedBrowserProvider;
   flowParams: CommerceWidgetParams;
   flowConfig: CommerceWidgetConfiguration;
   widgetsConfig: StrongCheckoutWidgetsConfig;
@@ -154,7 +154,7 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: CheckoutFlowType.WALLET,
+          type: flow as any,
           data: {
             params: mountedWidgetParams,
             config: { ...(flowConfig?.[flow] || {}) },

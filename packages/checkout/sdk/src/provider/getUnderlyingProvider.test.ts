@@ -2,14 +2,14 @@ import { ChainId } from '../types/chains';
 import { getUnderlyingChainId } from './getUnderlyingProvider';
 import { WalletAction } from '../types/wallet';
 import { CheckoutErrorType } from '../errors';
-import { NamedBrowserProvider } from '../types';
+import { WrappedBrowserProvider } from '../types';
 
 describe('getUnderlyingChainId', () => {
   it('should return underlying chain id from property', async () => {
     const provider = {
       getNetwork: jest.fn().mockResolvedValue({ chainId: BigInt(ChainId.SEPOLIA) }),
       send: jest.fn(),
-    } as unknown as NamedBrowserProvider;
+    } as unknown as WrappedBrowserProvider;
 
     const chainId = await getUnderlyingChainId(provider);
     expect(chainId).toEqual(BigInt(ChainId.SEPOLIA));
@@ -20,7 +20,7 @@ describe('getUnderlyingChainId', () => {
     const provider = {
       send: jest.fn().mockResolvedValue(BigInt(ChainId.SEPOLIA)),
       getNetwork: jest.fn().mockResolvedValue({ chainId: undefined }),
-    } as unknown as NamedBrowserProvider;
+    } as unknown as WrappedBrowserProvider;
 
     const chainId = await getUnderlyingChainId(provider);
     expect(chainId).toEqual(BigInt(ChainId.SEPOLIA));
@@ -31,10 +31,10 @@ describe('getUnderlyingChainId', () => {
     try {
       await getUnderlyingChainId({
         getNetwork: jest.fn().mockResolvedValue({ chainId: undefined }),
-      } as unknown as NamedBrowserProvider);
+      } as unknown as WrappedBrowserProvider);
     } catch (err: any) {
       expect(err.message).toEqual(
-        'Parsed provider is not a valid NamedBrowserProvider',
+        'Parsed provider is not a valid WrappedBrowserProvider',
       );
       expect(err.type).toEqual(CheckoutErrorType.WEB3_PROVIDER_ERROR);
     }
@@ -44,7 +44,7 @@ describe('getUnderlyingChainId', () => {
     const provider = {
       getNetwork: jest.fn().mockResolvedValue({ chainId: 'invalid' }),
       send: jest.fn(),
-    } as unknown as NamedBrowserProvider;
+    } as unknown as WrappedBrowserProvider;
 
     await expect(getUnderlyingChainId(provider)).rejects.toThrow('Invalid chainId');
   });
@@ -53,7 +53,7 @@ describe('getUnderlyingChainId', () => {
     const provider = {
       getNetwork: jest.fn().mockResolvedValue({ chainId: undefined }),
       send: jest.fn().mockResolvedValue('invalid'),
-    } as unknown as NamedBrowserProvider;
+    } as unknown as WrappedBrowserProvider;
 
     expect(getUnderlyingChainId(provider)).rejects.toThrow('Invalid chainId');
   });

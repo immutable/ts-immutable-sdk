@@ -1,7 +1,7 @@
 import { Environment } from '@imtbl/config';
 import { Eip1193Provider } from 'ethers';
-import { isNamedBrowserProvider, validateProvider } from './validateProvider';
-import { ChainId, NamedBrowserProvider, WalletProviderName } from '../types';
+import { isWrappedBrowserProvider, validateProvider } from './validateProvider';
+import { ChainId, WrappedBrowserProvider } from '../types';
 import { CheckoutConfiguration } from '../config';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 import { HttpClient } from '../api/http';
@@ -19,8 +19,8 @@ describe('provider validation', () => {
 
   describe('isBrowserProvider', () => {
     it('should return true when provider is BrowserProvider shape and request method is present', () => {
-      const browserProvider = new NamedBrowserProvider('test' as WalletProviderName, { request: mockRequestFunc });
-      const result = isNamedBrowserProvider(browserProvider);
+      const browserProvider = new WrappedBrowserProvider({ request: mockRequestFunc });
+      const result = isWrappedBrowserProvider(browserProvider);
 
       expect(result).toBeTruthy();
     });
@@ -29,8 +29,8 @@ describe('provider validation', () => {
       // pass in object which is not a BrowserProvider
       const browserProvider = {
         request: mockRequestFunc,
-      } as unknown as NamedBrowserProvider;
-      const result = isNamedBrowserProvider(browserProvider);
+      } as unknown as WrappedBrowserProvider;
+      const result = isWrappedBrowserProvider(browserProvider);
 
       expect(result).toBeFalsy();
     });
@@ -68,8 +68,7 @@ describe('provider validation', () => {
 
     it('should not throw an error when valid web3provider', async () => {
       requestMock.mockResolvedValue('0x1');
-      const testBrowserProvider = new NamedBrowserProvider(
-        'test' as WalletProviderName,
+      const testBrowserProvider = new WrappedBrowserProvider(
         underlyingProviderMock,
         ChainId.ETHEREUM,
       );
@@ -81,8 +80,7 @@ describe('provider validation', () => {
     // eslint-disable-next-line max-len
     it('should throw an error if the underlying provider is not on the same network as the BrowserProvider', async () => {
       requestMock.mockResolvedValue('0x1');
-      const testBrowserProvider = new NamedBrowserProvider(
-        'test' as WalletProviderName,
+      const testBrowserProvider = new WrappedBrowserProvider(
         underlyingProviderMock,
         ChainId.IMTBL_ZKEVM_TESTNET,
       );
@@ -96,8 +94,7 @@ describe('provider validation', () => {
 
     it('should not throw an error if allowMistmatchedChainId is true and underlying network different', async () => {
       requestMock.mockResolvedValue('0x1');
-      const testBrowserProvider = new NamedBrowserProvider(
-        'test' as WalletProviderName,
+      const testBrowserProvider = new WrappedBrowserProvider(
         underlyingProviderMock,
         'any',
       );
@@ -117,8 +114,7 @@ describe('provider validation', () => {
 
     it('should throw an error if the underlying provider is on an unsupported network', async () => {
       requestMock.mockResolvedValue('0xfa');
-      const testBrowserProvider = new NamedBrowserProvider(
-        'test' as WalletProviderName,
+      const testBrowserProvider = new WrappedBrowserProvider(
         underlyingProviderMock,
         ChainId.ETHEREUM,
       );
@@ -141,8 +137,7 @@ describe('provider validation', () => {
     it('should not throw an error if allowUnsupportedProvider true and underlying network is unsupported', async () => {
       // HEX 0xfa -> 250 , underlying provider matches BrowserProvider, but unsupported chain
       requestMock.mockResolvedValue('0xfa');
-      const testBrowserProvider = new NamedBrowserProvider(
-        'test' as WalletProviderName,
+      const testBrowserProvider = new WrappedBrowserProvider(
         underlyingProviderMock,
         250,
       );

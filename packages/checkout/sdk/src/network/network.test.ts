@@ -15,13 +15,12 @@ import {
   NetworkFilterTypes,
   ChainName,
   NetworkInfo,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
 } from '../types';
-import { createProvider } from '../provider';
+import { createProvider, getUnderlyingChainId } from '../provider';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { CheckoutConfiguration } from '../config';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
-import { getUnderlyingChainId } from '../provider/getUnderlyingProvider';
 import {
   PRODUCTION_CHAIN_ID_NETWORK_MAP, SANDBOX_CHAIN_ID_NETWORK_MAP, ZKEVM_NATIVE_SANDBOX_TOKEN,
 } from '../env';
@@ -51,7 +50,7 @@ jest.mock('../api/http', () => ({
 
 jest.mock('../types/provider', () => ({
   ...jest.requireActual('../types/provider'),
-  NamedBrowserProvider: jest.fn(),
+  WrappedBrowserProvider: jest.fn(),
 }));
 
 jest.mock('../config/remoteConfigFetcher');
@@ -100,7 +99,7 @@ describe('network functions', () => {
 
   describe('switchWalletNetwork()', () => {
     it('should make request for the user to switch network', async () => {
-      (NamedBrowserProvider as unknown as jest.Mock).mockReturnValue({
+      (WrappedBrowserProvider as unknown as jest.Mock).mockReturnValue({
         send: jest.fn(),
         getNetwork: async () => ethNetworkInfo,
         ethereumProvider: {
@@ -108,7 +107,7 @@ describe('network functions', () => {
         },
       });
 
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
 
       const switchNetworkResult = await switchWalletNetwork(
         new CheckoutConfiguration({
@@ -136,7 +135,7 @@ describe('network functions', () => {
     });
 
     it('should make request for the user to switch network zkevm', async () => {
-      (NamedBrowserProvider as unknown as jest.Mock)
+      (WrappedBrowserProvider as unknown as jest.Mock)
         .mockReturnValueOnce({
           send: jest.fn(),
           getNetwork: jest.fn().mockResolvedValue(ethNetworkInfo),
@@ -152,7 +151,7 @@ describe('network functions', () => {
           },
         });
 
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
 
       const switchNetworkResult = await switchWalletNetwork(
         testCheckoutConfiguration,
@@ -174,7 +173,7 @@ describe('network functions', () => {
     });
 
     it('should throw an error if the network is not in our whitelist', async () => {
-      (NamedBrowserProvider as unknown as jest.Mock).mockReturnValueOnce({
+      (WrappedBrowserProvider as unknown as jest.Mock).mockReturnValueOnce({
         send: jest.fn(),
         getNetwork: jest.fn().mockResolvedValue(ethNetworkInfo),
         ethereumProvider: {
@@ -182,7 +181,7 @@ describe('network functions', () => {
         },
       });
 
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
 
       await expect(
         switchWalletNetwork(testCheckoutConfiguration, provider, 56 as ChainId),
@@ -195,7 +194,7 @@ describe('network functions', () => {
     });
 
     it('should throw an error if the user rejects the switch network request', async () => {
-      (NamedBrowserProvider as unknown as jest.Mock).mockReturnValue({
+      (WrappedBrowserProvider as unknown as jest.Mock).mockReturnValue({
         send: jest.fn(),
         getNetwork: jest.fn().mockResolvedValue(ethNetworkInfo),
         ethereumProvider: {
@@ -217,7 +216,7 @@ describe('network functions', () => {
         removeEventListener: () => {},
       }));
 
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
 
       try {
         await switchWalletNetwork(
@@ -232,7 +231,7 @@ describe('network functions', () => {
     });
 
     it('should throw an error if the user rejects the add network request', async () => {
-      (NamedBrowserProvider as unknown as jest.Mock).mockReturnValue({
+      (WrappedBrowserProvider as unknown as jest.Mock).mockReturnValue({
         send: jest
           .fn()
           .mockRejectedValue({
@@ -245,7 +244,7 @@ describe('network functions', () => {
         getNetwork: jest.fn().mockResolvedValue(ethNetworkInfo),
       });
 
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
 
       try {
         await switchWalletNetwork(
@@ -260,7 +259,7 @@ describe('network functions', () => {
     });
 
     it('should throw an error if user rejects request and non-4902 code', async () => {
-      (NamedBrowserProvider as unknown as jest.Mock).mockReturnValue({
+      (WrappedBrowserProvider as unknown as jest.Mock).mockReturnValue({
         send: jest
           .fn()
           .mockRejectedValue({
@@ -273,7 +272,7 @@ describe('network functions', () => {
         getNetwork: jest.fn().mockResolvedValue(ethNetworkInfo),
       });
 
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
 
       try {
         await switchWalletNetwork(
@@ -288,7 +287,7 @@ describe('network functions', () => {
     });
 
     it('should request the user to add a new network if their wallet does not already have it', async () => {
-      (NamedBrowserProvider as unknown as jest.Mock)
+      (WrappedBrowserProvider as unknown as jest.Mock)
         .mockReturnValueOnce({
           send: jest
             .fn()
@@ -306,7 +305,7 @@ describe('network functions', () => {
           },
           getNetwork: jest.fn().mockResolvedValue(zkevmNetworkInfo),
         });
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
 
       await switchWalletNetwork(
         testCheckoutConfiguration,
@@ -339,7 +338,7 @@ describe('network functions', () => {
       try {
         await switchWalletNetwork(
           testCheckoutConfiguration,
-          { ethereumProvider: { isPassport: true } } as unknown as NamedBrowserProvider,
+          { ethereumProvider: { isPassport: true } } as unknown as WrappedBrowserProvider,
           ChainId.SEPOLIA,
         );
       } catch (err: any) {
@@ -372,7 +371,7 @@ describe('network functions', () => {
         };
         const result = await getNetworkInfo(
           testCheckoutConfiguration,
-          mockProvider as unknown as NamedBrowserProvider,
+          mockProvider as unknown as WrappedBrowserProvider,
         );
         expect(result.name).toBe(
           SANDBOX_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.chainName,
@@ -400,7 +399,7 @@ describe('network functions', () => {
       };
       const result = await getNetworkInfo(
         testCheckoutConfiguration,
-        mockProvider as unknown as NamedBrowserProvider,
+        mockProvider as unknown as WrappedBrowserProvider,
       );
       expect(result).toEqual({
         chainId: 3,
@@ -419,7 +418,7 @@ describe('network functions', () => {
 
       const result = await getNetworkInfo(
         testCheckoutConfiguration,
-        mockProvider as unknown as NamedBrowserProvider,
+        mockProvider as unknown as WrappedBrowserProvider,
       );
 
       expect(result).toEqual({

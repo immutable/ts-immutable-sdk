@@ -1,14 +1,14 @@
 import { TransactionRequest } from 'ethers';
 import {
   FulfillmentTransaction, GasAmount, GasTokenType, ItemRequirement,
-  ItemType, NamedBrowserProvider, TransactionOrGasType,
+  ItemType, WrappedBrowserProvider, TransactionOrGasType,
 } from '../../types';
 import { InsufficientERC1155, InsufficientERC20, InsufficientERC721 } from '../allowance/types';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { getGasPriceInWei } from '../../gasEstimate';
 
 export const estimateGas = async (
-  provider: NamedBrowserProvider,
+  provider: WrappedBrowserProvider,
   transaction: TransactionRequest,
 ): Promise<bigint> => {
   try {
@@ -45,7 +45,7 @@ export const getGasItemRequirement = (
 };
 
 export const gasCalculator = async (
-  provider: NamedBrowserProvider,
+  provider: WrappedBrowserProvider,
   insufficientItems: (InsufficientERC20 | InsufficientERC721 | InsufficientERC1155)[],
   transactionOrGas: FulfillmentTransaction | GasAmount,
 ): Promise<ItemRequirement | null> => {

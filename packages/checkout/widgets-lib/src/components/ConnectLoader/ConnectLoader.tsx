@@ -2,8 +2,8 @@ import { useTranslation } from 'react-i18next';
 import {
   ChainId,
   Checkout,
-  CheckoutErrorType,
-  NamedBrowserProvider,
+  CheckoutErrorType, WalletProviderName,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import React, {
   useEffect,
@@ -37,7 +37,8 @@ export interface ConnectLoaderProps {
 
 export interface ConnectLoaderParams {
   targetChainId: ChainId;
-  browserProvider?: NamedBrowserProvider;
+  walletProviderName?: WalletProviderName;
+  browserProvider?: WrappedBrowserProvider;
   checkout: Checkout;
   allowedChains: ChainId[];
   isCheckNetworkEnabled?: boolean;
@@ -55,6 +56,7 @@ export function ConnectLoader({
   const {
     checkout,
     targetChainId,
+    walletProviderName,
     allowedChains,
     browserProvider,
     isCheckNetworkEnabled,
@@ -76,8 +78,8 @@ export function ConnectLoader({
 
   const { identify, user } = useAnalytics();
 
-  const hasNoWalletProviderNameAndNoBrowserProvider = (localProvider?: NamedBrowserProvider): boolean => {
-    if (!browserProvider?.name && !localProvider) {
+  const hasNoWalletProviderNameAndNoBrowserProvider = (localProvider?: WrappedBrowserProvider): boolean => {
+    if (!walletProviderName && !localProvider) {
       connectLoaderDispatch({
         payload: {
           type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
@@ -90,13 +92,14 @@ export function ConnectLoader({
     return false;
   };
 
-  const hasWalletProviderNameAndNoBrowserProvider = async (localProvider?: NamedBrowserProvider): Promise<boolean> => {
+  // eslint-disable-next-line max-len
+  const hasWalletProviderNameAndNoBrowserProvider = async (localProvider?: WrappedBrowserProvider): Promise<boolean> => {
     try {
       // If the wallet provider name was passed through but the provider was
       // not injected then create a provider using the wallet provider name
-      if (!localProvider && browserProvider?.name) {
+      if (!localProvider && walletProviderName) {
         const createProviderResult = await checkout.createProvider({
-          walletProviderName: browserProvider.name,
+          walletProviderName,
         });
         connectLoaderDispatch({
           payload: {
@@ -139,7 +142,7 @@ export function ConnectLoader({
     return false;
   };
 
-  const isWalletConnected = async (localProvider: NamedBrowserProvider): Promise<boolean> => {
+  const isWalletConnected = async (localProvider: WrappedBrowserProvider): Promise<boolean> => {
     const { isConnected } = await checkout.checkIsWalletConnected({
       provider: localProvider!,
     });
@@ -177,7 +180,7 @@ export function ConnectLoader({
           },
         });
         // TODO: handle all of the inner try catches with error handling
-        // At this point the NamedBrowserProvider exists
+        // At this point the WrappedBrowserProvider exists
         // This will bypass the wallet list screen
         const isConnected = (await isWalletConnected(browserProvider!));
         if (!isConnected) return;
@@ -236,7 +239,7 @@ export function ConnectLoader({
         });
       }
     })();
-  }, [checkout, browserProvider?.name, browserProvider]);
+  }, [checkout, walletProviderName, browserProvider]);
 
   return (
     <>

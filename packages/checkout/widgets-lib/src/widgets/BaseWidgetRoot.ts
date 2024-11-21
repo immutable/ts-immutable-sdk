@@ -11,7 +11,7 @@ import {
   ProviderUpdated,
   WidgetParameters,
   WalletEventType,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import i18next from 'i18next';
 import {
@@ -36,7 +36,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
   protected parameters: WidgetParameters[T];
 
-  protected browserProvider: NamedBrowserProvider | undefined;
+  protected browserProvider: WrappedBrowserProvider | undefined;
 
   protected eventHandlers: Map<keyof WidgetEventData[T], Function> = new Map<
   keyof WidgetEventData[T],
@@ -225,11 +225,10 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   }
 
   private handleEIP1193ProviderEvents(widgetRoot: Base<T>) {
-    if (widgetRoot.browserProvider) {
+    if (widgetRoot.browserProvider?.ethereumProvider) {
       // eslint-disable-next-line no-param-reassign
-      widgetRoot.browserProvider = new NamedBrowserProvider(
-        widgetRoot.browserProvider!.name,
-        widgetRoot.browserProvider.ethereumProvider!,
+      widgetRoot.browserProvider = new WrappedBrowserProvider(
+        widgetRoot.browserProvider.ethereumProvider,
       );
     }
     widgetRoot.render();

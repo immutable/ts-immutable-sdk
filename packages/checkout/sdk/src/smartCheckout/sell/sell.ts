@@ -22,8 +22,7 @@ import {
   CheckoutStatus,
   SmartCheckoutResult,
   SmartCheckoutSufficient,
-  NamedBrowserProvider,
-  WalletProviderName,
+  WrappedBrowserProvider,
 } from '../../types';
 import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
@@ -39,6 +38,7 @@ import { SignTransactionStatusType } from '../actions/types';
 import { calculateFees } from '../fees/fees';
 import { ERC20ABI } from '../../env';
 import { measureAsyncExecution } from '../../logger/debugLogger';
+import { isPassportProvider } from '../routing';
 
 export const getERC721Requirement = (
   id: string,
@@ -86,7 +86,7 @@ export const getBuyToken = (
 
 export const sell = async (
   config: CheckoutConfiguration,
-  provider: NamedBrowserProvider,
+  provider: WrappedBrowserProvider,
   orders: Array<SellOrder>,
 ): Promise<SellResult> => {
   let orderbook: Orderbook;
@@ -188,8 +188,7 @@ export const sell = async (
   }
 
   let smartCheckoutResult;
-  const isPassport = provider.name === WalletProviderName.PASSPORT;
-  if (!isPassport) {
+  if (!isPassportProvider(provider)) {
     smartCheckoutResult = await measureAsyncExecution<SmartCheckoutResult>(
       config,
       'Total time running smart checkout',

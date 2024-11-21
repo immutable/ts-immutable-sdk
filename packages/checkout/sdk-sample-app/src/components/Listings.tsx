@@ -1,4 +1,4 @@
-import { Checkout, NamedBrowserProvider } from '@imtbl/checkout-sdk';
+import { Checkout, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
@@ -7,7 +7,7 @@ import { OrderStatusName, Orderbook } from '@imtbl/orderbook';
 
 interface ListingsProps {
   checkout: Checkout;
-  provider: NamedBrowserProvider | undefined;
+  provider: WrappedBrowserProvider | undefined;
 }
 
 export default function Listings({ checkout, provider }: ListingsProps) {
@@ -16,7 +16,7 @@ export default function Listings({ checkout, provider }: ListingsProps) {
 
   const [listingId, setListingId] = useState<string>('');
   const [listingIdError, setListingIdError] = useState<any>(null);
-  
+
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 

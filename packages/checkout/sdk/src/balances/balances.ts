@@ -5,7 +5,7 @@ import {
   GetAllBalancesResult,
   GetBalanceResult,
   GetBalancesResult,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
   TokenFilterTypes,
   TokenInfo,
 } from '../types';
@@ -28,7 +28,7 @@ import { isMatchingAddress } from '../utils/utils';
 
 export const getBalance = async (
   config: CheckoutConfiguration,
-  provider: JsonRpcProvider | NamedBrowserProvider,
+  provider: JsonRpcProvider | WrappedBrowserProvider,
   walletAddress: string,
 ): Promise<GetBalanceResult> => await withCheckoutError<GetBalanceResult>(
   async () => {
@@ -56,7 +56,7 @@ export const getBalance = async (
 );
 
 export async function getERC20Balance(
-  provider: JsonRpcProvider | NamedBrowserProvider,
+  provider: JsonRpcProvider | WrappedBrowserProvider,
   walletAddress: string,
   tokenAddress: string,
 ) {
@@ -216,7 +216,7 @@ export const getBlockscoutBalance = async (
 
 export const getBalances = async (
   config: CheckoutConfiguration,
-  provider: JsonRpcProvider | NamedBrowserProvider,
+  provider: JsonRpcProvider | WrappedBrowserProvider,
   walletAddress: string,
   tokens: TokenInfo[],
 ): Promise<GetBalancesResult> => {
@@ -256,7 +256,7 @@ export const getBalances = async (
 
 const getTokenBalances = async (
   config: CheckoutConfiguration,
-  provider: JsonRpcProvider | NamedBrowserProvider | undefined,
+  provider: JsonRpcProvider | WrappedBrowserProvider | undefined,
   walletAddress: string | undefined,
   chainId: ChainId,
   filterTokens: TokenInfo[],
@@ -282,7 +282,7 @@ const getTokenBalances = async (
 
 export const getAllBalances = async (
   config: CheckoutConfiguration,
-  provider: JsonRpcProvider | NamedBrowserProvider | undefined,
+  provider: JsonRpcProvider | WrappedBrowserProvider | undefined,
   walletAddress: string | undefined,
   chainId: ChainId,
   forceFetch: boolean = false,

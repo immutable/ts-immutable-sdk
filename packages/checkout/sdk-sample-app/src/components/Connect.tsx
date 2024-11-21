@@ -1,4 +1,4 @@
-import { Checkout, NamedBrowserProvider } from '@imtbl/checkout-sdk';
+import { Checkout, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
@@ -6,14 +6,14 @@ import { Stack } from '@biom3/react';
 
 interface ConnectProps {
   checkout: Checkout;
-  setProvider: (provider: NamedBrowserProvider) => void;
-  provider: NamedBrowserProvider | undefined;
+  setProvider: (provider: WrappedBrowserProvider) => void;
+  provider: WrappedBrowserProvider | undefined;
 }
 
 export default function Connect(props: ConnectProps) {
   const { setProvider, checkout, provider } = props;
 
-  const [result, setResult] = useState<NamedBrowserProvider>();
+  const [result, setResult] = useState<WrappedBrowserProvider>();
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 

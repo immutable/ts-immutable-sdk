@@ -1,5 +1,5 @@
 import { describe, expect } from '@jest/globals';
-import { Checkout, NamedBrowserProvider } from '@imtbl/checkout-sdk';
+import { Checkout, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import {
   ConnectLoaderActions,
@@ -47,7 +47,7 @@ describe('connect-loader-context', () => {
   it('should update state with provider when reducer called with SET_PROVIDER action', () => {
     const setProviderPayload: SetProviderPayload = {
       type: ConnectLoaderActions.SET_PROVIDER,
-      provider: {} as NamedBrowserProvider,
+      provider: {} as WrappedBrowserProvider,
     };
     expect(initialConnectLoaderState.provider).toBeUndefined();
     const { provider } = connectLoaderReducer(initialConnectLoaderState, {
