@@ -7,13 +7,20 @@ import { config } from './config';
 import { ConnectWallet } from './connect';
 import { Heading, Link } from '@biom3/react';
 import NextLink from 'next/link';
+import { useEffect } from 'react';
 
 // initialise the QueryClient for the Provider
 const queryClient = new QueryClient();
 
-export default async function ConnectWithWagmi() {
-  // calling connectEVM() makes Passport available as an option to Wagmi
-  await passportInstance.connectEvm();
+export default function ConnectWithWagmi() {
+  useEffect(() => {
+    const init = async () => {
+    // calling connectEVM() makes Passport available as an option to Wagmi
+      await passportInstance.connectEvm();
+    }
+
+    init();
+  }, []);
 
   // render the ConnectWallet component
   // wrapping it in the Wagami and QueryClient Providers

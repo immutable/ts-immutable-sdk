@@ -2,13 +2,13 @@
 import CommerceWallet from '../../commerce-wallet/page';
 import { MockProvider } from '../../utils/mockProvider';
 import { ProviderContextProvider } from '../../../contexts/ProviderContext';
-import { Web3Provider } from '@ethersproject/providers';
+import { WrappedBrowserProvider } from '@imtbl/sdk/checkout';
 
 export default function TestCommerceWallet() {
   const mockProvider = new MockProvider();
 
   return (
-    <ProviderContextProvider provider={new Web3Provider(mockProvider)}>
+    <ProviderContextProvider provider={new WrappedBrowserProvider(mockProvider)}>
       <CommerceWallet />
     </ProviderContextProvider>
   );

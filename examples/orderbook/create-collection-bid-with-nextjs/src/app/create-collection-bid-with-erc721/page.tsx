@@ -17,10 +17,10 @@ import type {
   ERC721CollectionItem,
   PrepareCollectionBidParams
 } from "@imtbl/sdk/orderbook";
-import { ProviderEvent } from "@imtbl/sdk/passport";
-import { ethers } from "ethers";
+import { Provider, ProviderEvent } from "@imtbl/sdk/passport";
+import { BrowserProvider, ethers } from "ethers";
 import NextLink from "next/link";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   createCollectionBid,
   signAndSubmitApproval,
@@ -40,10 +40,18 @@ export default function CreateERC721CollectionBidWithPassport() {
   const [loadingText, setLoadingText] = useState<string>("");
 
   // fetch the Passport provider from the Passport instance
-  const passportProvider = passportInstance.connectEvm();
+  const [passportProvider, setPassportProvider] = useState<Provider>();
 
-  // create the Web3Provider using the Passport provider
-  const web3Provider = new ethers.providers.Web3Provider(passportProvider);
+  useEffect(() => {
+    const fetchPassportProvider = async () => {
+      const passportProvider = await passportInstance.connectEvm();
+      setPassportProvider(passportProvider);
+    };
+    fetchPassportProvider();
+  }, []);
+
+  // create the BrowserProvider using the Passport provider
+  const web3Provider = useMemo(() => passportProvider ? new BrowserProvider(passportProvider) : undefined, [passportProvider]);
 
   // setup the state for the ERC721 collection bid creation form elements
 
@@ -74,15 +82,13 @@ export default function CreateERC721CollectionBidWithPassport() {
   const [collectionBidError, setCollectionBidErrorState] = useState<string | null>(null);
 
   const passportLogin = async () => {
-    if (web3Provider.provider.request) {
+    if (web3Provider?.send) {
       // disable button while loading
       setLoadingState(true);
       setLoadingText("Connecting to Passport");
 
       // calling eth_requestAccounts triggers the Passport login flow
-      const accounts = await web3Provider.provider.request({
-        method: "eth_requestAccounts",
-      });
+      const accounts = await web3Provider.send("eth_requestAccounts", []);
 
       // once logged in Passport is connected to the wallet and ready to transact
       setAccountsState(accounts);
@@ -92,7 +98,7 @@ export default function CreateERC721CollectionBidWithPassport() {
   };
 
   // listen to the ACCOUNTS_CHANGED event and update the accounts state when it changes
-  passportProvider.on(ProviderEvent.ACCOUNTS_CHANGED, (accounts: string[]) => {
+  passportProvider?.on(ProviderEvent.ACCOUNTS_CHANGED, (accounts: string[]) => {
     setAccountsState(accounts);
   });
 
@@ -170,6 +176,11 @@ export default function CreateERC721CollectionBidWithPassport() {
     setCollectionBidErrorState(null);
     setLoadingState(true);
     setLoadingText('Creating collection bid');
+
+    if (!web3Provider) {
+      setCollectionBidErrorState("Please connect to Passport");
+      return;
+    }
 
     try {
       // prepare the collection bid

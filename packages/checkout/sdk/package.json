@@ -69,6 +69,8 @@
     "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/index.ts",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
+    "prepare:examplesdk": "pnpm --filter @examples/commerce-widget-nextjs exec mkdir -p tests/utils/local-widgets-js/ && cp ./dist/*.js $(pnpm --filter @examples/commerce-widget-nextjs exec pwd)/tests/utils/local-widgets-js/",
+    "prepare:testsdk": "pnpm --filter @tests/checkout-widgets-nextjs exec mkdir -p tests/utils/local-widgets-js/ && cp ./dist/*.js $(pnpm --filter @tests/checkout-widgets-nextjs exec pwd)/tests/utils/local-widgets-js/",
     "start": "tsup --config ./tsup.config.js --watch",
     "start:dev": "CHECKOUT_DEV_MODE=true pnpm start",
     "start:local": "CHECKOUT_LOCAL_MODE=true pnpm start",
