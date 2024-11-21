@@ -3,7 +3,7 @@ import { Environment } from '@imtbl/config';
 import CheckConnection from '../components/CheckConnection';
 import Connect from '../components/Connect';
 import Provider from '../components/Provider';
-import { Checkout, NamedBrowserProvider } from '@imtbl/checkout-sdk';
+import { Checkout, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { useState, useMemo } from 'react';
 import Buy from '../components/Buy';
 import { SmartCheckoutForm } from '../components/SmartCheckoutForm';
@@ -18,7 +18,7 @@ export default function SmartCheckout() {
       environment: environment,
     }});
   }, [environment]);
-  const [provider, setProvider] = useState<NamedBrowserProvider>();
+  const [provider, setProvider] = useState<WrappedBrowserProvider>();
 
   return (
     <div>

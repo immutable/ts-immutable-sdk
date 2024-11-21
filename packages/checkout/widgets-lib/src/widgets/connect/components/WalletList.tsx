@@ -4,7 +4,7 @@ import {
   ChainId,
   CheckoutErrorType,
   EIP6963ProviderDetail,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
   WalletProviderName,
   WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
@@ -103,7 +103,7 @@ export function WalletList(props: WalletListProps) {
   );
 
   const selectBrowserProvider = useCallback(
-    (browserProvider: NamedBrowserProvider, providerName: string) => {
+    (browserProvider: WrappedBrowserProvider, providerName: string) => {
       connectDispatch({
         payload: {
           type: ConnectActions.SET_PROVIDER,
@@ -120,7 +120,7 @@ export function WalletList(props: WalletListProps) {
     [],
   );
 
-  const handleConnectViewUpdate = async (provider: NamedBrowserProvider) => {
+  const handleConnectViewUpdate = async (provider: WrappedBrowserProvider) => {
     const isPassport = isPassportProvider(provider);
     const chainId = await provider.send!('eth_chainId', []);
     // eslint-disable-next-line radix
@@ -165,8 +165,7 @@ export function WalletList(props: WalletListProps) {
       try {
         const isMetaMask = providerDetail.info.rdns === WalletProviderRdns.METAMASK;
 
-        const browserProvider = new NamedBrowserProvider(
-          providerDetail.info.name as WalletProviderName,
+        const browserProvider = new WrappedBrowserProvider(
           providerDetail.provider,
         );
 
@@ -212,7 +211,7 @@ export function WalletList(props: WalletListProps) {
 
   const connectCallback = async (ethereumProvider: EthereumProvider) => {
     if (ethereumProvider.connected && ethereumProvider.session) {
-      const browserProvider = new NamedBrowserProvider(WalletProviderName.WALLETCONNECT, ethereumProvider);
+      const browserProvider = new WrappedBrowserProvider(ethereumProvider);
       selectBrowserProvider(browserProvider, 'walletconnect');
 
       const { chainId } = await ((await browserProvider.getSigner()).provider.getNetwork());

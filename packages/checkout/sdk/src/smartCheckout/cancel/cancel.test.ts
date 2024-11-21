@@ -7,7 +7,7 @@ import { CheckoutErrorType } from '../../errors';
 import { cancel } from './cancel';
 import { createOrderbookInstance } from '../../instance';
 import { signFulfillmentTransactions } from '../actions';
-import { CheckoutStatus, NamedBrowserProvider } from '../../types';
+import { CheckoutStatus, WrappedBrowserProvider } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
 import { HttpClient } from '../../api/http';
 import { sendTransaction } from '../../transaction';
@@ -18,7 +18,7 @@ jest.mock('../../transaction');
 
 describe('cancel', () => {
   let config: CheckoutConfiguration;
-  let mockProvider: NamedBrowserProvider;
+  let mockProvider: WrappedBrowserProvider;
 
   beforeEach(() => {
     mockProvider = {
@@ -26,7 +26,7 @@ describe('cancel', () => {
         getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
         signTypedData: jest.fn().mockResolvedValue('0xSIGNED'),
       }),
-    } as unknown as NamedBrowserProvider;
+    } as unknown as WrappedBrowserProvider;
 
     const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     config = new CheckoutConfiguration({

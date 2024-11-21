@@ -38,7 +38,7 @@ import { calculateFees } from '../fees/fees';
 import { getAllBalances, resetBlockscoutClientMap } from '../../balances';
 import { debugLogger, measureAsyncExecution } from '../../logger/debugLogger';
 import { sendTransaction } from '../../transaction';
-import { NamedBrowserProvider } from '../../types';
+import { WrappedBrowserProvider } from '../../types';
 
 export const getItemRequirement = (
   type: ItemType,
@@ -88,7 +88,7 @@ export const getTransactionOrGas = (
 
 export const buy = async (
   config: CheckoutConfiguration,
-  provider: NamedBrowserProvider,
+  provider: WrappedBrowserProvider,
   orders: Array<BuyOrder>,
   overrides: BuyOverrides = {
     waitFulfillmentSettlements: true,

@@ -1,13 +1,13 @@
 import { createContext } from 'react';
 import {
   Checkout,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 
 export interface CommerceState {
   checkout: Checkout | undefined;
-  provider: NamedBrowserProvider | undefined;
+  provider: WrappedBrowserProvider | undefined;
   passport: Passport | undefined;
 }
 
@@ -44,7 +44,7 @@ export interface SetCheckoutPayload {
 
 export interface SetProviderPayload {
   type: CommerceActions.SET_PROVIDER;
-  provider: NamedBrowserProvider | undefined;
+  provider: WrappedBrowserProvider | undefined;
 }
 
 export interface SetPassportPayload {

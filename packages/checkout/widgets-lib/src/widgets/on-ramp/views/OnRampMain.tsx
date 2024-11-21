@@ -5,7 +5,6 @@ import {
 } from 'react';
 import {
   ExchangeType, fetchRiskAssessment, IMTBLWidgetEvents, isAddressSanctioned,
-  WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import url from 'url';
 import { useTranslation } from 'react-i18next';
@@ -32,6 +31,7 @@ import { ConnectLoaderContext } from '../../../context/connect-loader-context/Co
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { TRANSAK_ORIGIN } from '../../../components/Transak/useTransakEvents';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
+import { isPassportProvider } from '../../../lib/provider';
 
 const transakIframeId = 'transak-iframe';
 const IN_PROGRESS_VIEW_DELAY_MS = 6000; // 6 second
@@ -61,7 +61,7 @@ export function OnRampMain({
 
   const eventTimer = useRef<number | undefined>();
 
-  const isPassport = !!passport && provider?.name === WalletProviderName.PASSPORT;
+  const isPassport = !!passport && isPassportProvider(provider);
 
   const openedFromTopUpView = useMemo(
     () => viewState.history.length > 2

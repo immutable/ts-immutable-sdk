@@ -1,5 +1,5 @@
 import {
-  ChainId, Checkout, CommerceFlowType, NamedBrowserProvider,
+  ChainId, Checkout, CommerceFlowType, WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import { ConnectLoaderParams } from '../../../components/ConnectLoader/ConnectLoader';
 import { getL1ChainId, getL2ChainId } from '../../../lib/networkUtils';
@@ -18,7 +18,7 @@ const getChainId = (checkout: Checkout) => (checkout.config.isProduction
 export function getConnectLoaderParams(
   view: View,
   checkout: Checkout,
-  browserProvider: NamedBrowserProvider | undefined,
+  browserProvider: WrappedBrowserProvider | undefined,
 ): ConnectLoaderParams {
   const { type } = view;
 

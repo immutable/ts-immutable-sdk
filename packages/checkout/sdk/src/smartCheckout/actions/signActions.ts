@@ -4,10 +4,10 @@ import {
   SignTransactionResult, SignTransactionStatusType, SignedMessage, UnsignedMessage,
 } from './types';
 import { sendTransaction } from '../../transaction';
-import { NamedBrowserProvider } from '../../types';
+import { WrappedBrowserProvider } from '../../types';
 
 export const signApprovalTransactions = async (
-  provider: NamedBrowserProvider,
+  provider: WrappedBrowserProvider,
   approvalTransactions: TransactionRequest[],
 ): Promise<SignTransactionResult> => {
   let receipts: (TransactionReceipt | null)[] = [];
@@ -41,7 +41,7 @@ export const signApprovalTransactions = async (
 };
 
 export const signFulfillmentTransactions = async (
-  provider: NamedBrowserProvider,
+  provider: WrappedBrowserProvider,
   fulfillmentTransactions: TransactionRequest[],
 ): Promise<SignTransactionResult> => {
   let receipts: (TransactionReceipt | null)[] = [];
@@ -75,7 +75,7 @@ export const signFulfillmentTransactions = async (
 };
 
 export const signMessage = async (
-  provider: NamedBrowserProvider,
+  provider: WrappedBrowserProvider,
   unsignedMessage: UnsignedMessage,
 ): Promise<SignedMessage> => {
   try {

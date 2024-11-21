@@ -3,7 +3,7 @@ import {
   Checkout,
   GetBalanceResult,
   GetTokenAllowListResult,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
   TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
@@ -13,7 +13,7 @@ import { getTokenImageByAddress, isNativeToken } from './utils';
 
 export type GetAllowedBalancesParamsType = {
   checkout: Checkout,
-  provider: NamedBrowserProvider,
+  provider: WrappedBrowserProvider,
   allowTokenListType: TokenFilterTypes,
   allowZero?: boolean,
   retryPolicy?: RetryType,

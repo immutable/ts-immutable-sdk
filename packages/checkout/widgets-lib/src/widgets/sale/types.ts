@@ -3,7 +3,7 @@ import {
   FundingStep,
   FundingItem,
   SmartCheckoutResult,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 
 export type SignedOrderProduct = {
@@ -47,7 +47,7 @@ export type SignResponse = {
 };
 
 export type SignOrderInput = {
-  provider: NamedBrowserProvider | undefined;
+  provider: WrappedBrowserProvider | undefined;
   items: SaleItem[];
   fromTokenAddress: string;
   recipientAddress: string;

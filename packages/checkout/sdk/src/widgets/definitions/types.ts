@@ -66,7 +66,7 @@ import {
   AddTokensWidgetConfiguration,
 } from './configurations';
 import { WidgetTheme } from './configurations/theme';
-import { NamedBrowserProvider } from '../../types';
+import { WrappedBrowserProvider } from '../../types';
 
 /**
  * Enum representing the list of widget types.
@@ -87,7 +87,7 @@ export enum WidgetType {
  */
 export type WidgetProperties<T extends WidgetType> = {
   config?: WidgetConfigurations[T];
-  provider?: NamedBrowserProvider;
+  provider?: WrappedBrowserProvider;
 };
 
 export type WidgetConfigurations = {
@@ -276,7 +276,7 @@ export interface IWidgetsFactory {
    * Update the widgets provider instance.
    * @param provider the provider instance to update all widgets.
    */
-  updateProvider(provider: NamedBrowserProvider): void;
+  updateProvider(provider: WrappedBrowserProvider): void;
 }
 
 export interface IWidgetsFactoryCreate {

@@ -5,7 +5,7 @@ import {
   hasERC1155Allowances,
 } from './erc1155';
 import { CheckoutErrorType } from '../../errors';
-import { ItemRequirement, ItemType, NamedBrowserProvider } from '../../types';
+import { ItemRequirement, ItemType, WrappedBrowserProvider } from '../../types';
 
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
@@ -14,7 +14,7 @@ jest.mock('ethers', () => ({
 }));
 
 describe('erc1155', () => {
-  const mockProvider = {} as unknown as NamedBrowserProvider;
+  const mockProvider = {} as unknown as WrappedBrowserProvider;
 
   describe('isERC1155ApprovedForAll', () => {
     it('should return true if the operator has been approved for all', async () => {

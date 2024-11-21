@@ -1,7 +1,7 @@
 import {
   Checkout,
-  NamedBrowserProvider,
   WalletProviderName,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import { useEffect, useMemo, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
@@ -13,15 +13,15 @@ await passport.connectEvm();
 
 interface ProviderProps {
   checkout: Checkout;
-  provider: NamedBrowserProvider | undefined;
-  setProvider: (provider: NamedBrowserProvider) => void;
+  provider: WrappedBrowserProvider | undefined;
+  setProvider: (provider: WrappedBrowserProvider) => void;
 }
 
 export default function Provider(props: ProviderProps) {
   const { setProvider, checkout, provider } = props;
   const injectedProviders = useMemo(() => checkout && checkout.getInjectedProviders(), [checkout])
 
-  const [result1, setResult1] = useState<NamedBrowserProvider>();
+  const [result1, setResult1] = useState<WrappedBrowserProvider>();
 
   const [error1, setError1] = useState<any>(null);
 
@@ -49,7 +49,7 @@ export default function Provider(props: ProviderProps) {
 
   const handleSelectChange = (providerRdns: any) => {
     const selectedProvider = injectedProviders.find((providerDetail) => providerDetail.info.rdns === providerRdns);
-    const browserProvider = new NamedBrowserProvider(selectedProvider?.info.name as WalletProviderName, selectedProvider?.provider as any);
+    const browserProvider = new WrappedBrowserProvider(selectedProvider?.provider);
     setProvider(browserProvider);
     setResult1(browserProvider);
     setLoading(false);

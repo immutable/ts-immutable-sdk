@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { checkIsWalletConnected, connectSite, requestPermissions } from './connect';
-import { NamedBrowserProvider, WalletAction, WalletProviderName } from '../types';
+import { WrappedBrowserProvider, WalletAction, WalletProviderName } from '../types';
 import { CheckoutErrorType } from '../errors';
 import { createProvider } from '../provider';
 
@@ -18,6 +18,9 @@ describe('connect', () => {
     windowSpy.mockImplementation(() => ({
       ethereum: {
         request: providerRequestMock,
+        isMetaMask: true,
+        on: jest.fn(),
+        removeListener: jest.fn(),
       },
       dispatchEvent: jest.fn(),
       addEventListener: jest.fn(),
@@ -32,38 +35,38 @@ describe('connect', () => {
   describe('checkIsWalletConnected', () => {
     it('should call request with eth_accounts method', async () => {
       providerRequestMock.mockResolvedValue([]);
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider, walletProviderName } = await createProvider(WalletProviderName.METAMASK);
       await checkIsWalletConnected(provider);
       expect(providerRequestMock).toBeCalledWith({
         method: WalletAction.CHECK_CONNECTION,
         params: [],
       });
-      expect(provider.name).toEqual(WalletProviderName.METAMASK);
+      expect(walletProviderName).toEqual(WalletProviderName.METAMASK);
     });
 
     it('should return isConnected as true when accounts array has an entry', async () => {
       // mock return array with active wallet address so we are connected
       providerRequestMock.mockResolvedValue(['0xmyWallet']);
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider, walletProviderName } = await createProvider(WalletProviderName.METAMASK);
       const checkConnection = await checkIsWalletConnected(provider);
       expect(checkConnection.isConnected).toBe(true);
       expect(checkConnection.walletAddress).toBe('0xmyWallet');
-      expect(provider.name).toEqual(WalletProviderName.METAMASK);
+      expect(walletProviderName).toEqual(WalletProviderName.METAMASK);
     });
 
     it('should return isConnected as false when no accounts returned', async () => {
       // mock return empty array of accounts so not connected
       providerRequestMock.mockResolvedValue([]);
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider, walletProviderName } = await createProvider(WalletProviderName.METAMASK);
       const checkConnection = await checkIsWalletConnected(provider);
       expect(checkConnection.isConnected).toBe(false);
       expect(checkConnection.walletAddress).toBe('');
-      expect(provider.name).toEqual(WalletProviderName.METAMASK);
+      expect(walletProviderName).toEqual(WalletProviderName.METAMASK);
     });
 
     it('should throw an error if provider missing from BrowserProvider', async () => {
       try {
-        await checkIsWalletConnected({} as NamedBrowserProvider);
+        await checkIsWalletConnected({} as WrappedBrowserProvider);
       } catch (err: any) {
         expect(err.message).toEqual('Check wallet connection request failed');
         expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_FAILED_ERROR);
@@ -72,7 +75,7 @@ describe('connect', () => {
 
     it('should throw an error if provider.request is not found', async () => {
       try {
-        await checkIsWalletConnected({ provider: {} } as NamedBrowserProvider);
+        await checkIsWalletConnected({ provider: {} } as WrappedBrowserProvider);
       } catch (err: any) {
         expect(err.message).toEqual('Check wallet connection request failed');
         expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_FAILED_ERROR);
@@ -85,7 +88,7 @@ describe('connect', () => {
           provider: {
             send: () => { throw new Error(''); },
           },
-        } as unknown as NamedBrowserProvider);
+        } as unknown as WrappedBrowserProvider);
       } catch (err: any) {
         expect(err.message).toEqual('Check wallet connection request failed');
         expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_FAILED_ERROR);
@@ -107,7 +110,7 @@ describe('connect', () => {
 
     it('should throw an error if provider missing from BrowserProvider', async () => {
       try {
-        await connectSite({} as NamedBrowserProvider);
+        await connectSite({} as WrappedBrowserProvider);
       } catch (err: any) {
         expect(err.message).toEqual('Incompatible provider');
         expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR);
@@ -117,7 +120,7 @@ describe('connect', () => {
 
     it('should throw an error if provider.request is not found', async () => {
       try {
-        await connectSite({ provider: {} } as NamedBrowserProvider);
+        await connectSite({ provider: {} } as WrappedBrowserProvider);
       } catch (err: any) {
         expect(err.message).toEqual('Incompatible provider');
         expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR);
@@ -160,7 +163,7 @@ describe('connect', () => {
 
     it('should throw an error if provider missing from BrowserProvider', async () => {
       try {
-        await requestPermissions({} as NamedBrowserProvider);
+        await requestPermissions({} as WrappedBrowserProvider);
       } catch (err: any) {
         expect(err.message).toEqual('Incompatible provider');
         expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR);
@@ -170,7 +173,7 @@ describe('connect', () => {
 
     it('should throw an error if provider.request is not found', async () => {
       try {
-        await requestPermissions({ provider: {} } as NamedBrowserProvider);
+        await requestPermissions({ provider: {} } as WrappedBrowserProvider);
       } catch (err: any) {
         expect(err.message).toEqual('Incompatible provider');
         expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR);

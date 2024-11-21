@@ -1,6 +1,6 @@
 import { ChainId } from './chains';
 import { TokenInfo } from './tokenInfo';
-import { NamedBrowserProvider } from './provider';
+import { WrappedBrowserProvider } from './provider';
 
 /**
  * Interface representing the parameters for {@link Checkout.getBalance}.
@@ -9,7 +9,7 @@ import { NamedBrowserProvider } from './provider';
  * @property {string | undefined} tokenAddress - The contract address of the token.
  */
 export interface GetBalanceParams {
-  provider: NamedBrowserProvider;
+  provider: WrappedBrowserProvider;
   walletAddress: string;
   tokenAddress?: string;
 }
@@ -33,7 +33,7 @@ export interface GetBalanceResult {
  * @property {ChainId} chainId - The ID of the network.
  */
 export interface GetAllBalancesParams {
-  provider?: NamedBrowserProvider;
+  provider?: WrappedBrowserProvider;
   walletAddress?: string;
   chainId: ChainId;
 }

@@ -108,6 +108,7 @@ export class Swap extends Base<WidgetType.SWAP> {
       targetChainId: this.checkout.config.isProduction
         ? ChainId.IMTBL_ZKEVM_MAINNET
         : ChainId.IMTBL_ZKEVM_TESTNET,
+      walletProviderName: this.parameters.walletProviderName,
       browserProvider: this.browserProvider,
       checkout: this.checkout,
       allowedChains: [getL2ChainId(this.checkout!.config)],
