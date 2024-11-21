@@ -201,7 +201,7 @@ export default function SwapWidget({
     }
 
     (async () => {
-      const address = await provider?.getSigner()?.getAddress();
+      const address = await (await provider?.getSigner())?.getAddress();
 
       if (!address) {
         return;

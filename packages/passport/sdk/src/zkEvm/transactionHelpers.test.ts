@@ -92,7 +92,7 @@ describe('transactionHelpers', () => {
     };
 
     const rpcProvider = {
-      _detectNetwork: jest.fn().mockResolvedValue({ chainId }),
+      getNetwork: jest.fn().mockResolvedValue({ chainId }),
     } as unknown as JsonRpcProvider;
 
     const relayerClient = {
@@ -113,7 +113,7 @@ describe('transactionHelpers', () => {
       (walletHelpers.getNonce as jest.Mock).mockResolvedValue(nonce);
       (walletHelpers.getNormalisedTransactions as jest.Mock).mockReturnValue(metaTransactions);
       (walletHelpers.encodedTransactions as jest.Mock).mockReturnValue('encodedTransactions123');
-      (rpcProvider._detectNetwork as jest.Mock).mockResolvedValue({ chainId });
+      (rpcProvider.getNetwork as jest.Mock).mockResolvedValue({ chainId });
       (relayerClient.imGetFeeOptions as jest.Mock).mockResolvedValue([imxFeeOption]);
       (relayerClient.ethSendTransaction as jest.Mock).mockResolvedValue(relayerId);
       (guardianClient.validateEVMTransaction as jest.Mock).mockResolvedValue(undefined);
@@ -136,7 +136,7 @@ describe('transactionHelpers', () => {
         nonce,
       });
 
-      expect(rpcProvider._detectNetwork).toHaveBeenCalled();
+      expect(rpcProvider.getNetwork).toHaveBeenCalled();
       expect(guardianClient.validateEVMTransaction).toHaveBeenCalled();
       expect(walletHelpers.signMetaTransactions).toHaveBeenCalled();
       expect(relayerClient.ethSendTransaction).toHaveBeenCalledWith(zkEvmAddress, signedTransactions);
