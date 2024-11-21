@@ -54,7 +54,7 @@ import {
   GetTokenInfoParams,
   GetWalletAllowListParams,
   GetWalletAllowListResult,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
   NetworkInfo,
   OnRampProviderFees,
   SellResult,
@@ -66,7 +66,7 @@ import {
   SwitchNetworkResult,
   TokenFilterTypes,
   TokenInfo,
-  ValidateProviderOptions,
+  ValidateProviderOptions, CreateProviderResult,
 } from './types';
 import { CancelParams } from './types/cancel';
 import { SellParams } from './types/sell';
@@ -276,7 +276,7 @@ export class Checkout {
    */
   public async createProvider(
     params: CreateProviderParams,
-  ): Promise<NamedBrowserProvider> {
+  ): Promise<CreateProviderResult> {
     return await provider.createProvider(
       params.walletProviderName,
       this.passport,
@@ -526,14 +526,14 @@ export class Checkout {
   }
 
   /**
-   * Wraps a NamedBrowserProvider call to validate the provider and handle errors.
+   * Wraps a WrappedBrowserProvider call to validate the provider and handle errors.
    * @param {BrowserProvider} browserProvider - The provider to connect to the network.
-   * @param {(browserProvider: NamedBrowserProvider) => Promise<T>)} block - The block executing the provider call.
+   * @param {(browserProvider: WrappedBrowserProvider) => Promise<T>)} block - The block executing the provider call.
    * @returns {Promise<T>} Returns the result of the provided block param.
    */
   public async providerCall<T>(
-    browserProvider: NamedBrowserProvider,
-    block: (browserProvider: NamedBrowserProvider) => Promise<T>,
+    browserProvider: WrappedBrowserProvider,
+    block: (browserProvider: WrappedBrowserProvider) => Promise<T>,
   ): Promise<T> {
     const validatedProvider = await provider.validateProvider(
       this.config,
@@ -685,8 +685,8 @@ export class Checkout {
    * @param {BrowserProvider} browserProvider - The object to check.
    * @returns {boolean} - True if the object is a Web3 provider, false otherwise.
    */
-  static isBrowserProvider(browserProvider: NamedBrowserProvider) {
-    return provider.isNamedBrowserProvider(browserProvider);
+  static isBrowserProvider(browserProvider: WrappedBrowserProvider) {
+    return provider.isWrappedBrowserProvider(browserProvider);
   }
 
   /**

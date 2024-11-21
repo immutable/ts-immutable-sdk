@@ -4,14 +4,14 @@ import { Passport } from '@imtbl/passport';
 import { Eip1193Provider } from 'ethers';
 import {
   EIP6963ProviderDetail,
-  NamedBrowserProvider,
-  WalletProviderName,
+  WrappedBrowserProvider,
+  WalletProviderName, CreateProviderResult,
 } from '../types';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { InjectedProvidersManager } from './injectedProvidersManager';
 import { metaMaskProviderInfo, passportProviderInfo } from './providerDetail';
 
-async function getMetaMaskProvider(): Promise<NamedBrowserProvider> {
+async function getMetaMaskProvider(): Promise<WrappedBrowserProvider> {
   const provider = await withCheckoutError<Eip1193Provider | null>(
     async () => await detectEthereumProvider(),
     { type: CheckoutErrorType.METAMASK_PROVIDER_ERROR },
@@ -24,22 +24,21 @@ async function getMetaMaskProvider(): Promise<NamedBrowserProvider> {
     );
   }
 
-  return new NamedBrowserProvider(WalletProviderName.METAMASK, provider);
+  return new WrappedBrowserProvider(provider);
 }
 
 export async function createProvider(
   walletProviderName: WalletProviderName,
   passport?: Passport,
-): Promise<NamedBrowserProvider> {
-  let browserProvider: NamedBrowserProvider | null = null;
+): Promise<CreateProviderResult> {
+  let browserProvider: WrappedBrowserProvider | null = null;
   let providerDetail: EIP6963ProviderDetail | undefined;
   switch (walletProviderName) {
     case WalletProviderName.PASSPORT: {
       providerDetail = InjectedProvidersManager.getInstance().findProvider({ rdns: passportProviderInfo.rdns });
       if (!providerDetail) {
         if (passport) {
-          browserProvider = new NamedBrowserProvider(
-            WalletProviderName.PASSPORT,
+          browserProvider = new WrappedBrowserProvider(
             await passport.connectEvm({ announceProvider: false }),
           );
         } else {
@@ -77,10 +76,7 @@ export async function createProvider(
   }
 
   if (!browserProvider && providerDetail) {
-    browserProvider = new NamedBrowserProvider(
-      providerDetail.info.name as WalletProviderName,
-      providerDetail.provider,
-    );
+    browserProvider = new WrappedBrowserProvider(providerDetail.provider);
   }
 
   if (!browserProvider) {
@@ -92,5 +88,8 @@ export async function createProvider(
     );
   }
 
-  return browserProvider;
+  return {
+    provider: browserProvider,
+    walletProviderName,
+  };
 }

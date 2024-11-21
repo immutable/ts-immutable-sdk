@@ -1,4 +1,4 @@
-import { Checkout, ChainId, NetworkInfo, NamedBrowserProvider } from '@imtbl/checkout-sdk';
+import { Checkout, ChainId, NetworkInfo, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
 import LoadingButton from './LoadingButton';
 import { useCallback, useEffect, useState } from 'react';
@@ -7,8 +7,8 @@ import { NetworkFilterTypes } from '@imtbl/checkout-sdk';
 
 export interface SwitchNetworkProps {
   checkout: Checkout | undefined;
-  provider: NamedBrowserProvider | undefined;
-  setProvider: (provider: NamedBrowserProvider) => void;
+  provider: WrappedBrowserProvider | undefined;
+  setProvider: (provider: WrappedBrowserProvider) => void;
 }
 
 export default function SwitchNetwork(props: SwitchNetworkProps) {
@@ -123,7 +123,7 @@ export default function SwitchNetwork(props: SwitchNetworkProps) {
             return (
               <LoadingButton
                 key={networkInfo.name}
-                onClick={() => switchNetwork(networkInfo.chainId as ChainId)}
+                onClick={() => switchNetwork(Number(networkInfo.chainId) as ChainId)}
                 loading={loading}
               >
                 Switch to {networkInfo.name}
@@ -150,7 +150,7 @@ export default function SwitchNetwork(props: SwitchNetworkProps) {
         </LoadingButton>
         {resultNetInfo && !errorNetInfo && (
           <SuccessMessage>
-            <Box>ChainId: {resultNetInfo.chainId}</Box>
+            <Box>ChainId: {Number(resultNetInfo.chainId)}</Box>
             <Box>Name: {resultNetInfo.name}</Box>
             { resultNetInfo.isSupported && (
               <Box>Symbol: {resultNetInfo.nativeCurrency.symbol}</Box>

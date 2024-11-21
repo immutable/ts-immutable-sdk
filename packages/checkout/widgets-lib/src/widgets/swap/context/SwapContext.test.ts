@@ -10,6 +10,14 @@ import {
   SetWalletProviderNamePayload,
 } from './SwapContext';
 
+declare global {
+  interface BigInt {
+    toJSON(): Number,
+  }
+}
+// eslint-disable-next-line no-extend-native
+BigInt.prototype.toJSON = () => Number(this);
+
 describe('WalletContext', () => {
   it('should update state with network info when reducer called with SET_NETWORK action', () => {
     const setNetworkPayload: SetNetworkPayload = {

@@ -1,5 +1,5 @@
 import {
-  Checkout, ItemBalance, NamedBrowserProvider, TokenBalance, TransactionRequirement,
+  Checkout, ItemBalance, WrappedBrowserProvider, TokenBalance, TransactionRequirement,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { compareStr } from '../../../lib/utils';
@@ -21,7 +21,7 @@ import {
 const isTokenFee = (balance: ItemBalance): balance is TokenBalance => 'token' in balance && balance.token !== undefined;
 
 export type FundingBalanceParams = {
-  provider: NamedBrowserProvider;
+  provider: WrappedBrowserProvider;
   checkout: Checkout;
   currencies: OrderQuoteCurrency[];
   baseCurrency: OrderQuoteCurrency;

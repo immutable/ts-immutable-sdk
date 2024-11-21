@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import LoadingButton from './LoadingButton';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
 import { Box } from '@biom3/react';
-import { CheckConnectionResult, Checkout, NamedBrowserProvider } from '@imtbl/checkout-sdk';
+import { CheckConnectionResult, Checkout, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 
 interface CheckConnectionProps {
   checkout: Checkout | undefined;
-  provider: NamedBrowserProvider | undefined;
+  provider: WrappedBrowserProvider | undefined;
 }
 
 export default function CheckConnection(props: CheckConnectionProps) {

@@ -37,7 +37,7 @@ import { useAsyncMemo, usePrevState } from "../../../hooks";
 import { Message } from "./components/messages";
 import { Legend } from "./components/legend";
 import { itemsMock } from "./items.mock";
-import { NamedBrowserProvider } from "@imtbl/checkout-sdk";
+import { WrappedBrowserProvider } from "@imtbl/checkout-sdk";
 
 //
 const ENVIRONMENT_DEV = "development" as Environment;
@@ -108,7 +108,7 @@ const usePassportLoginCallback = (passportClient: Passport) => {
 const createBrowserProvider = async (
   checkoutSdk: Checkout,
   params: CreateProviderParams
-): Promise<NamedBrowserProvider> => {
+): Promise<WrappedBrowserProvider> => {
   try {
     const { provider } = await checkoutSdk.createProvider({ ...params });
     const { isConnected } = await checkoutSdk.checkIsWalletConnected({
@@ -219,7 +219,7 @@ function CheckoutUI() {
   );
 
   // set a state to keep connected wallet browserProvider
-  const [browserProvider, setBrowserProvider] = useState<NamedBrowserProvider | undefined>(
+  const [browserProvider, setBrowserProvider] = useState<WrappedBrowserProvider | undefined>(
     undefined
   );
 
@@ -238,8 +238,8 @@ function CheckoutUI() {
   // );
 
   // know connected wallet type
-  const isMetamask = browserProvider?.name.toLowerCase() === 'metamask'
-  const isPassport = browserProvider?.name.toLowerCase() === 'immutable passport'
+  const isMetamask = browserProvider?.ethereumProvider?.isMetaMask;
+  const isPassport = browserProvider?.ethereumProvider?.isPassport;
 
   // handle removing widget
   const unmount = () => {

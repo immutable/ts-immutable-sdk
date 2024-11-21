@@ -19,7 +19,7 @@ import {
 import { Environment } from '@imtbl/config';
 import { passport } from './passport';
 import { LanguageSelector } from './LanguageSelector';
-import { NamedBrowserProvider } from '@imtbl/checkout-sdk';
+import { WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 
 // Create one instance of Checkout and inject Passport
 const checkout = new Checkout({
@@ -34,7 +34,7 @@ export const MainPage = () => {
   const [doneSwap, setDoneSwap] = useState<boolean>(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
   const [selectedTheme, setSelectedTheme] = useState<WidgetTheme>(WidgetTheme.DARK);
-  const [browserProvider, setBrowserProvider] = useState<NamedBrowserProvider | undefined>(undefined);
+  const [browserProvider, setBrowserProvider] = useState<WrappedBrowserProvider | undefined>(undefined);
 
   const widgetsFactory = useMemo(() => new WidgetsFactory(
     checkout,

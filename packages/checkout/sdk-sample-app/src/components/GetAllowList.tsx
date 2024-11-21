@@ -1,7 +1,7 @@
 import {
   ChainId,
   Checkout,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
   NetworkFilterTypes,
   TokenFilterTypes,
   WalletFilterTypes,
@@ -16,7 +16,7 @@ import { TokenInfo } from '@imtbl/checkout-sdk';
 
 export interface AllowListProps {
   checkout: Checkout | undefined;
-  provider: NamedBrowserProvider | undefined;
+  provider: WrappedBrowserProvider | undefined;
 }
 
 export default function GetAllowList(props: AllowListProps) {

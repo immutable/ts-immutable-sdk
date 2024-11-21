@@ -11,7 +11,7 @@ import {
   WalletAction,
   NetworkMap,
   AllowedNetworkConfig,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
 } from '../types';
 import { CheckoutConfiguration } from '../config';
 import { getUnderlyingChainId } from '../provider/getUnderlyingProvider';
@@ -23,7 +23,7 @@ const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
 // eslint-disable-next-line consistent-return
 async function switchNetworkInWallet(
   networkMap: NetworkMap,
-  browserProvider: NamedBrowserProvider,
+  browserProvider: WrappedBrowserProvider,
   chainId: ChainId,
 ) {
   return await browserProvider.send(WalletAction.SWITCH_NETWORK, [
@@ -34,7 +34,7 @@ async function switchNetworkInWallet(
 // eslint-disable-next-line consistent-return
 export async function addNetworkToWallet(
   networkMap: NetworkMap,
-  browserProvider: NamedBrowserProvider,
+  browserProvider: WrappedBrowserProvider,
   chainId: ChainId,
 ) {
   if (browserProvider.send) {
@@ -94,7 +94,7 @@ export async function getNetworkAllowList(
 
 export async function getNetworkInfo(
   config: CheckoutConfiguration,
-  provider: JsonRpcProvider | NamedBrowserProvider,
+  provider: JsonRpcProvider | WrappedBrowserProvider,
 ): Promise<NetworkInfo> {
   const { networkMap } = config;
   return withCheckoutError(
@@ -134,7 +134,7 @@ export async function getNetworkInfo(
 
 export async function switchWalletNetwork(
   config: CheckoutConfiguration,
-  provider: JsonRpcProvider | NamedBrowserProvider,
+  provider: JsonRpcProvider | WrappedBrowserProvider,
   chainId: ChainId,
 ): Promise<SwitchNetworkResult> {
   const { networkMap } = config;
@@ -198,7 +198,7 @@ export async function switchWalletNetwork(
     }
   }
 
-  const newProvider = new NamedBrowserProvider(provider.name, provider.ethereumProvider!);
+  const newProvider = new WrappedBrowserProvider(provider.ethereumProvider!);
 
   const newProviderNetwork = await newProvider.getNetwork();
 

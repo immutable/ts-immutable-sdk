@@ -2,7 +2,7 @@ import {
   Checkout,
   IWidgetsFactory,
   IWidgetsFactoryCreate,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
   Widget,
   WidgetConfiguration,
   WidgetConfigurations,
@@ -50,7 +50,7 @@ export class WidgetsFactory implements IWidgetsFactory {
     }
   }
 
-  updateProvider(provider: NamedBrowserProvider) {
+  updateProvider(provider: WrappedBrowserProvider) {
     addProviderListenersForWidgetRoot(provider);
     sendProviderUpdatedEvent({ provider });
   }

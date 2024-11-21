@@ -2,7 +2,7 @@ import { parseUnits } from 'ethers';
 import { getTokenContract } from '../../instance';
 import { getItemRequirementsFromRequirements } from './itemRequirements';
 import {
-  ERC20ItemRequirement, ERC721ItemRequirement, ItemType, NamedBrowserProvider, NativeItemRequirement,
+  ERC20ItemRequirement, ERC721ItemRequirement, ItemType, WrappedBrowserProvider, NativeItemRequirement,
 } from '../../types';
 
 jest.mock('../../instance');
@@ -10,7 +10,7 @@ describe('itemRequirements', () => {
   describe('getItemRequirementsFromParams', () => {
     it('should map each token requirement to an itemRequirement with BigNumber amount', async () => {
       (getTokenContract as jest.Mock).mockReturnValue({ decimals: jest.fn().mockResolvedValue(18) });
-      const mockProvider = {} as NamedBrowserProvider;
+      const mockProvider = {} as WrappedBrowserProvider;
       const erc20ItemRequirements: (NativeItemRequirement | ERC20ItemRequirement | ERC721ItemRequirement)[] = [
         {
           type: ItemType.NATIVE,
