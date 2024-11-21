@@ -5,13 +5,13 @@ import {
 } from '@biom3/react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NamedBrowserProvider } from '@imtbl/checkout-sdk';
+import { WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import {
   UserJourney,
   useAnalytics,
 } from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { getWalletLogoByName } from '../../../../lib/logoUtils';
-import { isPassportProvider } from '../../../../lib/provider';
+import { getWalletProviderNameByProvider, isPassportProvider } from '../../../../lib/provider';
 import { abbreviateWalletAddress } from '../../../../lib/utils';
 
 const isCopiedStyle: SxProps = {
@@ -28,7 +28,7 @@ export function WalletAddress({
   showL1Warning,
   setShowL1Warning,
 }: {
-  provider?: NamedBrowserProvider;
+  provider?: WrappedBrowserProvider;
   showL1Warning: boolean;
   setShowL1Warning: (show: boolean) => void;
 }) {
@@ -74,7 +74,7 @@ export function WalletAddress({
   return (
     <MenuItem testId="wallet-address" emphasized size="medium">
       <MenuItem.FramedLogo
-        logo={getWalletLogoByName(provider?.name ?? 'Other')}
+        logo={getWalletLogoByName(getWalletProviderNameByProvider(provider))}
         sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
       />
       {isDualVariantIcon(ctaIcon) ? (

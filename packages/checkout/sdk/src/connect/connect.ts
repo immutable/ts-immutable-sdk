@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   WalletAction, CheckConnectionResult,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
 } from '../types';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 
 export async function checkIsWalletConnected(
-  browserProvider: NamedBrowserProvider,
+  browserProvider: WrappedBrowserProvider,
 ): Promise<CheckConnectionResult> {
   if (!browserProvider?.send) {
     throw new CheckoutError(
@@ -38,7 +38,7 @@ export async function checkIsWalletConnected(
   };
 }
 
-export async function connectSite(browserProvider: NamedBrowserProvider): Promise<NamedBrowserProvider> {
+export async function connectSite(browserProvider: WrappedBrowserProvider): Promise<WrappedBrowserProvider> {
   if (!browserProvider || !browserProvider.send) {
     throw new CheckoutError(
       'Incompatible provider',
@@ -59,7 +59,7 @@ export async function connectSite(browserProvider: NamedBrowserProvider): Promis
   return browserProvider;
 }
 
-export async function requestPermissions(browserProvider: NamedBrowserProvider): Promise<NamedBrowserProvider> {
+export async function requestPermissions(browserProvider: WrappedBrowserProvider): Promise<WrappedBrowserProvider> {
   if (!browserProvider || !browserProvider.send) {
     throw new CheckoutError(
       'Incompatible provider',

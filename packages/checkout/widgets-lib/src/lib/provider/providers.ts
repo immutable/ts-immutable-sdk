@@ -1,14 +1,14 @@
 import {
-  Checkout, CheckoutErrorType, NamedBrowserProvider, WalletProviderName,
+  Checkout, CheckoutErrorType, WrappedBrowserProvider, WalletProviderName,
 } from '@imtbl/checkout-sdk';
 
 export async function connectToProvider(
   checkout: Checkout,
-  provider: NamedBrowserProvider,
+  provider: WrappedBrowserProvider,
   changeAccount?: boolean,
-): Promise<NamedBrowserProvider> {
+): Promise<WrappedBrowserProvider> {
   let connected = false;
-  let browserProvider: NamedBrowserProvider = provider;
+  let browserProvider: WrappedBrowserProvider = provider;
   try {
     const { isConnected } = await checkout.checkIsWalletConnected({ provider });
     connected = isConnected;
@@ -44,8 +44,8 @@ export async function createAndConnectToProvider(
   checkout: Checkout,
   walletProviderName: WalletProviderName,
   changeAccount?: boolean,
-): Promise<NamedBrowserProvider> {
-  let provider: NamedBrowserProvider;
+): Promise<WrappedBrowserProvider> {
+  let provider: WrappedBrowserProvider;
   try {
     const createResult = await checkout.createProvider({ walletProviderName });
     provider = createResult.provider;

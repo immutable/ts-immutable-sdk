@@ -13,7 +13,7 @@ import {
   FundingStepType,
   Fee,
   SwapFees,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 
 import { Environment } from '@imtbl/config';
@@ -209,7 +209,7 @@ const getZeroFee = (fee: Fee): Fee => ({
 
 const getGasFreeBalanceAdjustment = (
   balance: FundingBalance,
-  provider?: NamedBrowserProvider,
+  provider?: WrappedBrowserProvider,
 ): FundingBalance => {
   if (balance.type !== FundingStepType.SWAP) {
     return balance;
@@ -233,5 +233,5 @@ const getGasFreeBalanceAdjustment = (
 
 export const processGasFreeBalances = (
   balances: FundingBalance[],
-  provider?: NamedBrowserProvider,
+  provider?: WrappedBrowserProvider,
 ) => balances.map((balance) => getGasFreeBalanceAdjustment(balance, provider));

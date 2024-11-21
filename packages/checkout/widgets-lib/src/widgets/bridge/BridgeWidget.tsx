@@ -2,7 +2,7 @@ import {
   BridgeWidgetParams,
   Checkout,
   IMTBLWidgetEvents,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback,
@@ -68,7 +68,7 @@ import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailabl
 export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
   checkout: Checkout;
-  browserProvider?: NamedBrowserProvider;
+  browserProvider?: WrappedBrowserProvider;
 };
 
 export default function BridgeWidget({

@@ -3,35 +3,32 @@
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { CheckoutConfiguration } from '../config';
 import {
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
   NetworkFilterTypes, ValidateProviderOptions, validateProviderDefaults,
 } from '../types';
 import { getNetworkAllowList } from '../network';
 import { getUnderlyingChainId } from './getUnderlyingProvider';
 
-export function isNamedBrowserProvider(
-  browserProvider: NamedBrowserProvider,
+export function isWrappedBrowserProvider(
+  browserProvider: WrappedBrowserProvider,
 ): boolean {
-  if (browserProvider && Boolean(browserProvider.send) && typeof browserProvider.send === 'function') {
-    return true;
-  }
-  return false;
+  return browserProvider && Boolean(browserProvider.send) && typeof browserProvider.send === 'function';
 }
 
 export async function validateProvider(
   config: CheckoutConfiguration,
-  browserProvider: NamedBrowserProvider,
+  browserProvider: WrappedBrowserProvider,
   validateProviderOptions?: ValidateProviderOptions,
-): Promise<NamedBrowserProvider> {
+): Promise<WrappedBrowserProvider> {
   return withCheckoutError(
     async () => {
       if (browserProvider.ethereumProvider?.isPassport) {
         // if Passport skip the validation checks
         return browserProvider;
       }
-      if (!isNamedBrowserProvider(browserProvider)) {
+      if (!isWrappedBrowserProvider(browserProvider)) {
         throw new CheckoutError(
-          'Parsed provider is not a valid NamedBrowserProvider',
+          'Parsed provider is not a valid WrappedBrowserProvider',
           CheckoutErrorType.WEB3_PROVIDER_ERROR,
         );
       }
@@ -46,7 +43,6 @@ export async function validateProvider(
       let web3ChainId = (await browserProvider.getNetwork()).chainId;
 
       try {
-        web3ChainId = (await browserProvider.getNetwork()).chainId;
         if (!web3ChainId) {
           web3ChainId = (await browserProvider.getNetwork()).chainId;
         }

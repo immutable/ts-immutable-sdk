@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Environment } from '@imtbl/config';
-import { NamedBrowserProvider, SaleItem } from '@imtbl/checkout-sdk';
+import { WrappedBrowserProvider, SaleItem } from '@imtbl/checkout-sdk';
 import { compareStr } from '../../../lib/utils';
 import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 
@@ -11,7 +11,7 @@ type UseQuoteOrderParams = {
   items: SaleItem[];
   environmentId: string;
   environment: Environment;
-  provider: NamedBrowserProvider | undefined;
+  provider: WrappedBrowserProvider | undefined;
   preferredCurrency?: string;
 };
 

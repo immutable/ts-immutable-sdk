@@ -7,7 +7,7 @@ import {
   ItemBalance,
   ItemRequirement,
   ItemType,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
   NativeItem,
   TokenBalance,
   TokenInfo,
@@ -123,7 +123,7 @@ type TokensInfoMap = {
 export const getTokensInfo = async (
   itemRequirements: Array<ERC20Item | NativeItem>,
   balances: ItemBalance[],
-  provider: NamedBrowserProvider,
+  provider: WrappedBrowserProvider,
 ): Promise<TokensInfoMap> => {
   const tokensInfo: TokensInfoMap = {};
 

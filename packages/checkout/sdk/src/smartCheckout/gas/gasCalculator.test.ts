@@ -1,6 +1,5 @@
-import { FeeData } from 'ethers';
 import {
-  GasTokenType, ItemType, NamedBrowserProvider, TransactionOrGasType,
+  GasTokenType, ItemType, WrappedBrowserProvider, TransactionOrGasType,
 } from '../../types';
 import { estimateGas, gasCalculator, getGasItemRequirement } from './gasCalculator';
 import { CheckoutErrorType } from '../..';
@@ -10,7 +9,7 @@ describe('gasCalculator', () => {
     it('should return gas for transaction', async () => {
       const mockProvider = {
         estimateGas: jest.fn().mockResolvedValue(100000n),
-      } as unknown as NamedBrowserProvider;
+      } as unknown as WrappedBrowserProvider;
 
       const item = await gasCalculator(
         mockProvider,
@@ -33,7 +32,7 @@ describe('gasCalculator', () => {
     it('should return the total gas required for approvals and transaction', async () => {
       const mockProvider = {
         estimateGas: jest.fn().mockResolvedValue(100000n),
-      } as unknown as NamedBrowserProvider;
+      } as unknown as WrappedBrowserProvider;
 
       const item = await gasCalculator(
         mockProvider,
@@ -86,7 +85,7 @@ describe('gasCalculator', () => {
           maxPriorityFeePerGas: 1n,
           gasPrice: null,
         }),
-      } as unknown as NamedBrowserProvider;
+      } as unknown as WrappedBrowserProvider;
 
       const item = await gasCalculator(
         mockProvider,
@@ -140,7 +139,7 @@ describe('gasCalculator', () => {
           maxPriorityFeePerGas: 1n,
           gasPrice: null,
         }),
-      } as unknown as NamedBrowserProvider;
+      } as unknown as WrappedBrowserProvider;
 
       const items = await gasCalculator(
         mockProvider,
@@ -192,7 +191,7 @@ describe('gasCalculator', () => {
     it('should return null if no gas required', async () => {
       const mockProvider = {
         estimateGas: jest.fn().mockResolvedValue(0n),
-      } as unknown as NamedBrowserProvider;
+      } as unknown as WrappedBrowserProvider;
 
       const item = await gasCalculator(
         mockProvider,
@@ -213,7 +212,7 @@ describe('gasCalculator', () => {
     it('should return gas for transaction', async () => {
       const mockProvider = {
         estimateGas: jest.fn().mockResolvedValue(BigInt(100000)),
-      } as unknown as NamedBrowserProvider;
+      } as unknown as WrappedBrowserProvider;
 
       const item = await estimateGas(
         mockProvider,
@@ -228,7 +227,7 @@ describe('gasCalculator', () => {
     it('should throw error if estimate gas fails', async () => {
       const mockProvider = {
         estimateGas: jest.fn().mockRejectedValue(new Error('Failed to estimate gas')),
-      } as unknown as NamedBrowserProvider;
+      } as unknown as WrappedBrowserProvider;
 
       let message = '';
       let type = '';

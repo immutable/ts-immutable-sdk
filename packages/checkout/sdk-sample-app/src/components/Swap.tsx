@@ -1,4 +1,4 @@
-import { ChainId, Checkout, GetBalanceResult, NamedBrowserProvider, TokenInfo } from '@imtbl/checkout-sdk';
+import { ChainId, Checkout, GetBalanceResult, WrappedBrowserProvider, TokenInfo } from '@imtbl/checkout-sdk';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
@@ -7,7 +7,7 @@ import React from 'react';
 
 interface SwapProps {
   checkout: Checkout | undefined;
-  provider: NamedBrowserProvider | undefined;
+  provider: WrappedBrowserProvider | undefined;
 }
 
 export default function Swap(props: SwapProps) {

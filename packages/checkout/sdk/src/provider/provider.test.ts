@@ -20,9 +20,6 @@ let windowSpy: any;
 describe('createProvider', () => {
   const providerRequestMock: jest.Mock = jest.fn();
   const mockFindProvider = jest.fn().mockReturnValue(null);
-  const mockEipProvider = {
-    request: jest.fn(),
-  };
 
   // const originalGetInstance = InjectedProvidersManager.getInstance;
 
@@ -50,28 +47,30 @@ describe('createProvider', () => {
   });
 
   it('should create a provider for Passport with a valid passport instance', async () => {
-    const mockPassport = { connectEvm: jest.fn(() => mockEipProvider) } as unknown as Passport;
+    const mockPassport = {
+      connectEvm: jest.fn(() => ({ request: jest.fn(), isPassport: true })),
+    } as unknown as Passport;
     const result = await createProvider(WalletProviderName.PASSPORT, mockPassport);
 
     expect(result.provider).toBeInstanceOf(BrowserProvider);
-    expect(result.name).toBe(WalletProviderName.PASSPORT);
+    expect(result.walletProviderName).toBe(WalletProviderName.PASSPORT);
     expect(mockPassport.connectEvm).toHaveBeenCalled();
   });
 
   it('should create a provider for Passport when Passport is injected via EIP-6963', async () => {
-    mockFindProvider.mockReturnValue({ provider: mockEipProvider, info: { name: WalletProviderName.PASSPORT } });
+    mockFindProvider.mockReturnValue({ provider: { request: jest.fn(), isPassport: true } });
     const result = await createProvider(WalletProviderName.PASSPORT);
 
     expect(result.provider).toBeInstanceOf(BrowserProvider);
-    expect(result.name).toBe(WalletProviderName.PASSPORT);
+    expect(result.walletProviderName).toBe(WalletProviderName.PASSPORT);
   });
 
   it('should create a provider for Metamask when Metamask is injected via EIP-6963', async () => {
-    mockFindProvider.mockReturnValue({ provider: mockEipProvider, info: { name: WalletProviderName.METAMASK } });
+    mockFindProvider.mockReturnValue({ provider: { request: jest.fn(), isMetaMask: true } });
     const result = await createProvider(WalletProviderName.METAMASK);
 
     expect(result.provider).toBeInstanceOf(BrowserProvider);
-    expect(result.name).toBe(WalletProviderName.METAMASK);
+    expect(result.walletProviderName).toBe(WalletProviderName.METAMASK);
   });
 
   it('should throw an error if connect is called with a preference that is not expected', async () => {

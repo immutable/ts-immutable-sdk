@@ -35,7 +35,7 @@ export {
   GasEstimateType,
   GasTokenType,
   ItemType,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
   NetworkFilterTypes,
   RoutingOutcomeType,
   TokenFilterTypes,

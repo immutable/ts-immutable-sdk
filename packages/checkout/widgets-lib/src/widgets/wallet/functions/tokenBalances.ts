@@ -1,5 +1,5 @@
 import {
-  Checkout, ChainId, GetBalanceResult, NamedBrowserProvider,
+  Checkout, ChainId, GetBalanceResult, WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import {
@@ -23,7 +23,7 @@ export type BalanceInfo = {
 
 export const getTokenBalances = async (
   checkout: Checkout,
-  provider: NamedBrowserProvider,
+  provider: WrappedBrowserProvider,
   chainId: ChainId,
 ): Promise<GetBalanceResult[]> => {
   if (!checkout || !provider || !chainId) return [];
