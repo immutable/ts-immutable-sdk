@@ -1,9 +1,9 @@
-import { NamedBrowserProvider } from '@imtbl/checkout-sdk';
+import { WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { isMetaMaskProvider, isPassportProvider } from './utils';
 
 describe('providerUtils', () => {
-  const mockPassportBrowserProvider = { provider: { isPassport: true } } as unknown as NamedBrowserProvider;
-  const mockMetaMaskBrowserProvider = { provider: { isMetaMask: true } } as unknown as NamedBrowserProvider;
+  const mockPassportBrowserProvider = { ethereumProvider: { isPassport: true } } as unknown as WrappedBrowserProvider;
+  const mockMetaMaskBrowserProvider = { ethereumProvider: { isMetaMask: true } } as unknown as WrappedBrowserProvider;
 
   describe('isPassport', () => {
     it('should return true when provider is valid and passport flag is true', () => {

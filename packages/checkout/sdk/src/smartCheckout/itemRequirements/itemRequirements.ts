@@ -8,7 +8,7 @@ import {
   ERC721ItemRequirement,
   ItemRequirement,
   ItemType,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
   NativeItem,
   NativeItemRequirement,
 } from '../../types';
@@ -16,7 +16,7 @@ import { getTokenContract } from '../../instance';
 import { ERC20ABI } from '../../env';
 
 export async function getItemRequirementsFromRequirements(
-  provider: NamedBrowserProvider,
+  provider: WrappedBrowserProvider,
   requirements: (NativeItemRequirement | ERC20ItemRequirement | ERC721ItemRequirement | ERC1155ItemRequirement)[],
 ): Promise<ItemRequirement[]> {
   // Get all decimal values by calling contracts for each ERC20

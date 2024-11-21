@@ -79,6 +79,7 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
       targetChainId: this.checkout.config.isProduction
         ? ChainId.IMTBL_ZKEVM_MAINNET
         : ChainId.IMTBL_ZKEVM_TESTNET,
+      walletProviderName: this.parameters.walletProviderName,
       browserProvider: this.browserProvider,
       checkout: this.checkout,
       allowedChains: [getL1ChainId(this.checkout.config), getL2ChainId(this.checkout.config)],

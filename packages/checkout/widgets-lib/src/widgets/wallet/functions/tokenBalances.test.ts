@@ -2,7 +2,7 @@ import {
   ChainId,
   Checkout,
   GetBalanceResult,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
   TokenInfo,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
@@ -43,7 +43,7 @@ describe('token balance tests', () => {
       chainId,
       await getTokenBalances(
         checkout,
-        mockProvider as unknown as NamedBrowserProvider,
+        mockProvider as unknown as WrappedBrowserProvider,
         chainId,
       ),
       conversions,
@@ -83,7 +83,7 @@ describe('token balance tests', () => {
       chainId,
       await getTokenBalances(
         checkout,
-        null as unknown as NamedBrowserProvider,
+        null as unknown as WrappedBrowserProvider,
         chainId,
       ),
       conversions,

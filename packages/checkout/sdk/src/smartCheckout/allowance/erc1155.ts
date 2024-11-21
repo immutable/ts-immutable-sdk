@@ -1,7 +1,7 @@
 import { Contract, TransactionRequest } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import {
-  ERC1155ItemRequirement, ItemRequirement, ItemType, NamedBrowserProvider,
+  ERC1155ItemRequirement, ItemRequirement, ItemType, WrappedBrowserProvider,
 } from '../../types';
 import { Allowance, InsufficientERC1155, SufficientAllowance } from './types';
 import { ERC1155ABI } from '../../env';
@@ -9,7 +9,7 @@ import { ERC1155ABI } from '../../env';
 // Returns true if the spender address is approved for all ERC1155s of this collection
 // Note: ERC1155 only support approvedForAll
 export const isERC1155ApprovedForAll = async (
-  provider: NamedBrowserProvider,
+  provider: WrappedBrowserProvider,
   ownerAddress: string,
   contractAddress: string,
   spenderAddress: string,
@@ -37,7 +37,7 @@ export const isERC1155ApprovedForAll = async (
 
 // Returns a populated transaction to setApprovalForAll for the spender against the ERC1155 collection.
 export const getSetERC1155ApprovalForAllTransaction = async (
-  provider: NamedBrowserProvider,
+  provider: WrappedBrowserProvider,
   ownerAddress: string,
   contractAddress: string,
   spenderAddress: string,
@@ -66,7 +66,7 @@ export const getSetERC1155ApprovalForAllTransaction = async (
 };
 
 export const hasERC1155Allowances = async (
-  provider: NamedBrowserProvider,
+  provider: WrappedBrowserProvider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
 ): Promise<{

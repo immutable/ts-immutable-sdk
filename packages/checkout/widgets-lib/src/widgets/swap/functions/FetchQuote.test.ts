@@ -1,7 +1,7 @@
 import { Exchange } from '@imtbl/dex-sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { parseUnits } from 'ethers';
-import { ChainId, NamedBrowserProvider, TokenInfo } from '@imtbl/checkout-sdk';
+import { ChainId, WrappedBrowserProvider, TokenInfo } from '@imtbl/checkout-sdk';
 import { quotesProcessor } from './FetchQuote';
 
 const overrides: any = {
@@ -27,7 +27,7 @@ describe('QuotesProcessor', () => {
     describe('fromAmountIn', () => {
       let exchange: Exchange;
       let getUnsignedSwapTxFromAmountIn: jest.Mock;
-      let provider: NamedBrowserProvider;
+      let provider: WrappedBrowserProvider;
       let toToken: TokenInfo;
       let fromToken: TokenInfo;
       let fromAmount: string;
@@ -50,7 +50,7 @@ describe('QuotesProcessor', () => {
           provider: {
             request: async () => null,
           },
-        } as unknown as NamedBrowserProvider;
+        } as unknown as WrappedBrowserProvider;
 
         fromAmount = '100';
       });
@@ -83,7 +83,7 @@ describe('QuotesProcessor', () => {
     describe('fromAmountOut', () => {
       let exchange: Exchange;
       let getUnsignedSwapTxFromAmountOut: jest.Mock;
-      let provider: NamedBrowserProvider;
+      let provider: WrappedBrowserProvider;
       let toToken: TokenInfo;
       let fromToken: TokenInfo;
       let toAmount: string;
@@ -104,7 +104,7 @@ describe('QuotesProcessor', () => {
           provider: {
             request: async () => null,
           },
-        } as unknown as NamedBrowserProvider;
+        } as unknown as WrappedBrowserProvider;
 
         toAmount = '100';
       });

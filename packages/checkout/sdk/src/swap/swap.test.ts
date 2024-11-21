@@ -1,6 +1,6 @@
 import { BrowserProvider, parseUnits, TransactionRequest } from 'ethers';
 import { CheckoutConfiguration } from '../config/config';
-import { NamedBrowserProvider, TokenInfo } from '../types';
+import { WrappedBrowserProvider, TokenInfo } from '../types';
 import { swap, swapQuote } from './swap';
 import { createExchangeInstance } from '../instance';
 
@@ -120,7 +120,7 @@ describe('swap', () => {
   const mockProvider = {
     getSigner: jest.fn().mockReturnValue(mockSigner),
     getNetwork: jest.fn().mockResolvedValue({ chainId: mockChainId }),
-  } as unknown as NamedBrowserProvider;
+  } as unknown as WrappedBrowserProvider;
   const mockFromToken: TokenInfo = {
     address: '0x123',
     symbol: 'FROM',

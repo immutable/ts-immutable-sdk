@@ -7,12 +7,12 @@ import {
   ChainId,
   EIP6963ProviderInfo,
   AssessmentResult,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
 
 export type WalletAndNetworkDetails = {
-  browserProvider: NamedBrowserProvider;
+  browserProvider: WrappedBrowserProvider;
   walletProviderInfo: EIP6963ProviderInfo | undefined;
   walletAddress: string;
   network: ChainId;
@@ -20,7 +20,7 @@ export type WalletAndNetworkDetails = {
 
 export interface BridgeState {
   checkout: Checkout;
-  browserProvider: NamedBrowserProvider | null;
+  browserProvider: WrappedBrowserProvider | null;
   walletProviderName: WalletProviderName | null;
   from: WalletAndNetworkDetails | null;
   to: WalletAndNetworkDetails | null;
@@ -82,7 +82,7 @@ export interface SetWalletProviderNamePayload {
 
 export interface SetProviderPayload {
   type: BridgeActions.SET_PROVIDER;
-  browserProvider: NamedBrowserProvider | null;
+  browserProvider: WrappedBrowserProvider | null;
 }
 
 export interface SetTokenBridgePayload {

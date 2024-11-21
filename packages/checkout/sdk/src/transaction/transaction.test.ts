@@ -1,7 +1,7 @@
 import { ErrorCode } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { sendTransaction } from './transaction';
-import { ChainId, NamedBrowserProvider, NetworkInfo } from '../types';
+import { ChainId, WrappedBrowserProvider, NetworkInfo } from '../types';
 import { IMMUTABLE_ZKVEM_GAS_OVERRIDES } from '../env';
 
 describe('transaction', () => {
@@ -23,7 +23,7 @@ describe('transaction', () => {
       getSigner: jest.fn().mockReturnValue({
         sendTransaction: mockSendTransaction,
       }),
-    } as unknown as NamedBrowserProvider;
+    } as unknown as WrappedBrowserProvider;
 
     const transaction = {
       nonce: 0,
@@ -52,7 +52,7 @@ describe('transaction', () => {
           throw new Error('Transaction errored');
         },
       }),
-    } as unknown as NamedBrowserProvider;
+    } as unknown as WrappedBrowserProvider;
 
     const transaction = {
       nonce: 1,
@@ -85,7 +85,7 @@ describe('transaction', () => {
           throw err;
         },
       }),
-    } as unknown as NamedBrowserProvider;
+    } as unknown as WrappedBrowserProvider;
 
     const transaction = {
       nonce: 1,
@@ -118,7 +118,7 @@ describe('transaction', () => {
           throw err;
         },
       }),
-    } as unknown as NamedBrowserProvider;
+    } as unknown as WrappedBrowserProvider;
 
     const transaction = {
       nonce: 1,
@@ -155,7 +155,7 @@ describe('transaction', () => {
         getSigner: jest.fn().mockResolvedValue({
           sendTransaction: mockSendTransaction,
         }),
-      } as unknown as NamedBrowserProvider;
+      } as unknown as WrappedBrowserProvider;
 
       const transaction = {
         to: '0xAAA',

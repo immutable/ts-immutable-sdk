@@ -2,7 +2,7 @@ import {
   Body, Box, Button, FramedImage, Heading, Logo, useTheme,
 } from '@biom3/react';
 import {
-  ChainId, EIP6963ProviderDetail, NamedBrowserProvider, WalletProviderRdns,
+  ChainId, EIP6963ProviderDetail, WrappedBrowserProvider, WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 import { useEffect, useMemo, useState } from 'react';
 import { Environment } from '@imtbl/config';
@@ -21,7 +21,7 @@ import { getChainImage } from '../../../lib/utils';
 
 interface WalletNetworkButtonProps {
   testId: string;
-  walletProvider: NamedBrowserProvider;
+  walletProvider: WrappedBrowserProvider;
   walletProviderDetail: EIP6963ProviderDetail | undefined;
   walletAddress: string;
   walletName: string,

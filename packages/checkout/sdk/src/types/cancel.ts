@@ -1,5 +1,5 @@
 import { CancelOverrides } from './smartCheckout';
-import { NamedBrowserProvider } from './provider';
+import { WrappedBrowserProvider } from './provider';
 
 /**
  * Interface representing the parameters for {@link Checkout.cancel}
@@ -9,7 +9,7 @@ import { NamedBrowserProvider } from './provider';
  * Currently only processes the first order in the array until batch processing is supported.
  */
 export interface CancelParams {
-  provider: NamedBrowserProvider;
+  provider: WrappedBrowserProvider;
   orderIds: string[];
   overrides?: CancelOverrides;
 }

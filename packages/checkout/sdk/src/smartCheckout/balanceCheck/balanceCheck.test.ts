@@ -3,7 +3,7 @@ import { Contract } from 'ethers';
 import {
   ItemRequirement,
   ItemType,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
 } from '../../types';
 import { balanceCheck } from './balanceCheck';
 import { CheckoutConfiguration } from '../../config';
@@ -21,7 +21,7 @@ jest.mock('ethers', () => ({
 
 describe('balanceCheck', () => {
   let config: CheckoutConfiguration;
-  let mockProvider: NamedBrowserProvider;
+  let mockProvider: WrappedBrowserProvider;
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -30,7 +30,7 @@ describe('balanceCheck', () => {
         getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
       }),
       getNetwork: jest.fn().mockResolvedValue({ chainId: 1 }),
-    } as unknown as NamedBrowserProvider;
+    } as unknown as WrappedBrowserProvider;
 
     const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     config = new CheckoutConfiguration({

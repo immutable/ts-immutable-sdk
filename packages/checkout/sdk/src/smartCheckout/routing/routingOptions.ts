@@ -1,8 +1,8 @@
 import { CheckoutConfiguration } from '../../config';
 import { isOnRampAvailable, isSwapAvailable } from './geoBlocking';
-import { AvailableRoutingOptions, NamedBrowserProvider } from '../../types';
+import { AvailableRoutingOptions, WrappedBrowserProvider } from '../../types';
 
-export function isPassportProvider(provider?: NamedBrowserProvider | null) {
+export function isPassportProvider(provider?: WrappedBrowserProvider | null) {
   return provider?.ethereumProvider?.isPassport === true;
 }
 
@@ -16,7 +16,7 @@ type GeoBlockingCheck = {
  */
 export const getAvailableRoutingOptions = async (
   config: CheckoutConfiguration,
-  provider: NamedBrowserProvider,
+  provider: WrappedBrowserProvider,
 ) : Promise<AvailableRoutingOptions> => {
   const availableRoutingOptions = {
     onRamp: config.isOnRampEnabled,

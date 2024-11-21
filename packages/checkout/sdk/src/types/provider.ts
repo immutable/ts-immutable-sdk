@@ -30,6 +30,16 @@ export interface CreateProviderParams {
   walletProviderName: WalletProviderName;
 }
 
+/**
+ * Represents the result of creating a Web3 provider {@link Checkout.createProvider}.
+ * @property {WrappedBrowserProvider} provider - The created Browser provider.
+ * @property {WalletProviderName} walletProviderName - The wallet provider name of the provider that was created.
+ */
+export type CreateProviderResult = {
+  provider: WrappedBrowserProvider,
+  walletProviderName: WalletProviderName
+};
+
 export type ValidateProviderOptions = {
   allowMistmatchedChainId: boolean;
   allowUnsupportedProvider: boolean;
@@ -40,19 +50,12 @@ export const validateProviderDefaults: ValidateProviderOptions = {
   allowUnsupportedProvider: false,
 };
 
-// export type NamedBrowserProvider = {
-//   name: WalletProviderName
-// } & BrowserProvider;
-
-export class NamedBrowserProvider extends BrowserProvider {
-  name: WalletProviderName;
-
+export class WrappedBrowserProvider extends BrowserProvider {
   ethereumProvider: EIP1193Provider | undefined;
 
   // eslint-disable-next-line max-len
-  constructor(name: WalletProviderName, ethereum: EthersEip1193Provider, network?: Networkish, _options?: BrowserProviderOptions) {
+  constructor(ethereum: EthersEip1193Provider, network?: Networkish, _options?: BrowserProviderOptions) {
     super(ethereum, network, _options);
-    this.name = name;
 
     this.#setEthereumProvider(ethereum);
   }

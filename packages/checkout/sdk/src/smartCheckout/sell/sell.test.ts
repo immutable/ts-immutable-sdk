@@ -13,7 +13,7 @@ import {
   SellOrder,
   TransactionOrGasType,
   ERC1155SellToken,
-  NamedBrowserProvider,
+  WrappedBrowserProvider,
 } from '../../types';
 import { smartCheckout } from '../smartCheckout';
 import { createOrderbookInstance } from '../../instance';
@@ -35,14 +35,14 @@ describe('sell', () => {
   const seaportContractAddress = '0xSEAPORT';
   const walletAddress = '0xADDRESS';
   let config: CheckoutConfiguration;
-  let mockProvider: NamedBrowserProvider;
+  let mockProvider: WrappedBrowserProvider;
 
   beforeEach(() => {
     mockProvider = {
       getSigner: jest.fn().mockReturnValue({
         getAddress: jest.fn().mockResolvedValue(walletAddress),
       }),
-    } as unknown as NamedBrowserProvider;
+    } as unknown as WrappedBrowserProvider;
 
     const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     config = new CheckoutConfiguration({
@@ -932,7 +932,7 @@ describe('sell', () => {
         getSigner: jest.fn().mockReturnValue({
           getAddress: jest.fn().mockRejectedValue(new Error('error from provider')),
         }),
-      } as unknown as NamedBrowserProvider;
+      } as unknown as WrappedBrowserProvider;
 
       let message;
       let type;
