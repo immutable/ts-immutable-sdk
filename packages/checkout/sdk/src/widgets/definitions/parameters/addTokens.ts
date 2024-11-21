@@ -1,4 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { WrappedBrowserProvider } from '../../../types';
 import { WidgetLanguage } from '../configurations';
 
 export type AddTokensWidgetParams = {
@@ -24,5 +24,5 @@ export type AddTokensWidgetParams = {
   showBackButton?: boolean;
 
   /** The destination wallet provider, when requiring to lock destination of funds */
-  toProvider?: Web3Provider;
+  toProvider?: WrappedBrowserProvider;
 };

@@ -254,7 +254,7 @@ export function Review({
     let currentFromAddress = '';
 
     try {
-      currentFromAddress = await fromProvider.getSigner().getAddress();
+      currentFromAddress = await (await fromProvider.getSigner()).getAddress();
     } catch (error) {
       showErrorHandover(AddTokensErrorTypes.PROVIDER_ERROR, { error });
       return;
@@ -290,7 +290,7 @@ export function Review({
     const allowance = await getAllowance(changeableProvider, route);
 
     const { fromAmount } = route.route.params;
-    if (allowance?.lt(fromAmount)) {
+    if (allowance && allowance < BigInt(fromAmount)) {
       showHandover(
         APPROVE_TXN_ANIMATION,
         RiveStateMachineInput.WAITING,
@@ -328,11 +328,11 @@ export function Review({
         screen: 'FundsAdded',
         action: 'Succeeded',
         extras: {
-          txHash: executeTxnReceipt.transactionHash,
+          txHash: executeTxnReceipt.hash,
         },
       });
 
-      sendAddTokensSuccessEvent(eventTarget, executeTxnReceipt.transactionHash);
+      sendAddTokensSuccessEvent(eventTarget, executeTxnReceipt.hash);
 
       showHandover(
         EXECUTE_TXN_ANIMATION,
@@ -354,7 +354,7 @@ export function Review({
             rc={(
               <a
                 target="_blank"
-                href={`https://axelarscan.io/gmp/${executeTxnReceipt?.transactionHash}`}
+                href={`https://axelarscan.io/gmp/${executeTxnReceipt?.hash}`}
                 rel="noreferrer"
               />
             )}

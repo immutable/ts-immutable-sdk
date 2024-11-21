@@ -155,7 +155,7 @@ export default function GetAllowList(props: AllowListProps) {
           {resultNetwork?.map((network) => (
             <div key={network.chainId}>
               <Box>
-                ({network.chainId}) - {network.name} -
+                ({network.chainId.toString()}) - {network.name} -
                 {network.nativeCurrency.symbol}
               </Box>
             </div>

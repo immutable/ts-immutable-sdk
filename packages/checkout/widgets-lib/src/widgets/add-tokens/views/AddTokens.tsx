@@ -18,6 +18,7 @@ import {
   TokenFilterTypes,
   type TokenInfo,
   WalletProviderRdns,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import {
   type ChangeEvent,
@@ -27,7 +28,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
@@ -482,7 +482,7 @@ export function AddTokens({
 
   const handleWalletConnected = (
     providerType: 'from' | 'to',
-    provider: Web3Provider,
+    provider: WrappedBrowserProvider,
     providerInfo: EIP6963ProviderInfo,
   ) => {
     track({

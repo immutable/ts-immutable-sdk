@@ -98,12 +98,12 @@ describe('connect', () => {
 
   describe('connectWalletProvider', () => {
     it('should call the connect function with metamask and return a BrowserProvider', async () => {
-      jest.spyOn(NamedBrowserProvider.prototype, 'send');
+      jest.spyOn(WrappedBrowserProvider.prototype, 'send');
 
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
       const connRes = await connectSite(provider);
 
-      expect(connRes).toBeInstanceOf(NamedBrowserProvider);
+      expect(connRes).toBeInstanceOf(WrappedBrowserProvider);
       expect(connRes).not.toBe(null);
       expect(connRes?.send).toBeCalledWith(WalletAction.CONNECT, []);
     });
@@ -140,7 +140,7 @@ describe('connect', () => {
         dispatchEvent: jest.fn(),
       }));
 
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
 
       try {
         await connectSite(provider);
@@ -153,10 +153,10 @@ describe('connect', () => {
 
   describe('requestPermissions', () => {
     it('should call the requestPermissions function with metamask and return a BrowserProvider', async () => {
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
       const reqRes = await requestPermissions(provider);
 
-      expect(reqRes).toBeInstanceOf(NamedBrowserProvider);
+      expect(reqRes).toBeInstanceOf(WrappedBrowserProvider);
       expect(reqRes?.provider).not.toBe(null);
       expect(reqRes?.send).toBeCalledWith(WalletAction.REQUEST_PERMISSIONS, [{ eth_accounts: {} }]);
     });
