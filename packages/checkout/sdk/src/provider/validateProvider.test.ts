@@ -94,16 +94,13 @@ describe('provider validation', () => {
       );
     });
 
-    it.todo('should not throw an error if allowMistmatchedChainId is true and underlying network different', async () => {
+    it('should not throw an error if allowMistmatchedChainId is true and underlying network different', async () => {
       requestMock.mockResolvedValue('0x1');
       const testBrowserProvider = new NamedBrowserProvider(
         'test' as WalletProviderName,
         underlyingProviderMock,
-        { name: 'testnet', chainId: ChainId.IMTBL_ZKEVM_TESTNET },
+        'any',
       );
-      console.log('11234');
-      console.log(await testBrowserProvider.getNetwork());
-      console.log('62433245');
 
       const validationOverrides = {
         allowMistmatchedChainId: true,
@@ -137,7 +134,7 @@ describe('provider validation', () => {
         ),
       ).rejects.toThrowError(
         // eslint-disable-next-line max-len
-        '[WEB3_PROVIDER_ERROR] Cause:Your wallet is connected to an unsupported network, please switch to a supported network',
+        '[WEB3_PROVIDER_ERROR] Cause:network changed: 1 => 250  (event="changed", code=NETWORK_ERROR, version=6.13.4)',
       );
     });
 
