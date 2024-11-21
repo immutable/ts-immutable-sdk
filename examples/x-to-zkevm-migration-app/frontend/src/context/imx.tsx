@@ -10,7 +10,7 @@ type IMXContextType = {
 const IMXContext = createContext<IMXContextType>({});
 
 export function IMXProvider({ children }: { children: React.ReactNode }) {
-    const client = new x.IMXClient(x.imxClientConfig({ environment: config.Environment.SANDBOX }));
+    const client = useMemo(() => new x.IMXClient(x.imxClientConfig({ environment: config.Environment.SANDBOX })), []);
     
     const listAssets = useCallback(async (userAddress: string): Promise<x.ListAssetsResponse> => {
         console.log('listAssets: Attempting to list assets for user', userAddress);

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import type { ethers } from "ethers";
 import {
 	BiomeCombinedProviders,
 	Body,
@@ -12,11 +11,11 @@ import {
 } from "@biom3/react";
 import { Connect } from "./Connect";
 import { TransferAsset } from "./TransferAsset";
+import { BrowserProvider } from "ethers";
 
 export default function Home() {
 	const [walletAddress, setWalletAddress] = useState<string>("");
-	const [zkEvmProvider, setZkEvmProvider] =
-		useState<ethers.providers.Web3Provider | null>(null);
+	const [zkEvmProvider, setZkEvmProvider] = useState<BrowserProvider | null>(null);
 
 	return (
 		<main>
