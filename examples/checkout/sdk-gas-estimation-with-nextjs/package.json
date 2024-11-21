@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@biom3/react": "^0.25.21",
-    "@ethersproject/providers": "^5.7.2",
     "@imtbl/sdk": "workspace:*",
+    "ethers": "^6.13.4",
     "next": "14.2.7",
     "react": "^18",
     "react-dom": "^18"

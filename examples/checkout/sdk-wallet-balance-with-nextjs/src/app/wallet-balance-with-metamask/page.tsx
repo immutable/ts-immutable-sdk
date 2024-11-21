@@ -6,15 +6,16 @@ import {
   GetTokenAllowListResult, 
   TokenInfo, 
   GetAllBalancesResult, 
-  GetBalanceResult 
+  GetBalanceResult, 
+  WrappedBrowserProvider
 } from '@imtbl/sdk/checkout';
 import { Button, Heading, Link, Table } from '@biom3/react';
 import NextLink from 'next/link';
 import Image from 'next/image';
-import { BrowserProvider, toBeHex } from 'ethers';
+import { toBeHex } from 'ethers';
 
 export default function ConnectWithMetamask() {
-  const [connectedProvider, setConnectedProvider] = useState<BrowserProvider>();
+  const [connectedProvider, setConnectedProvider] = useState<WrappedBrowserProvider>();
   const [walletAddress, setWalletAddress] = useState<string>();
   const [tokenAllowList, setTokenAllowList] = useState<GetTokenAllowListResult>();
   const [selectedToken, setSelectedToken] = useState<TokenInfo>();

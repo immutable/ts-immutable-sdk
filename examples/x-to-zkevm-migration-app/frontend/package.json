@@ -22,7 +22,6 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.10",
-    "ethers": "^5.7.2",
     "typescript": "^5"
   }
 }
