@@ -11,13 +11,17 @@ import { EventTargetContext } from '../../../context/event-target-context/EventT
 import { sendAddTokensFailedEvent } from '../AddTokensWidgetEvents';
 import { retry } from '../../../lib/retry';
 
-export const useExecute = (environment: Environment) => {
+export const useExecute = (contextId: string, environment: Environment) => {
   const { showErrorHandover } = useError(environment);
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
 
-  const waitForReceipt = async (provider: Web3Provider, txHash: string, maxAttempts = 60) => {
+  const waitForReceipt = async (
+    provider: Web3Provider,
+    txHash: string,
+    maxAttempts = 60,
+  ) => {
     const result = await retry(
       async () => {
         const receipt = await provider.getTransactionReceipt(txHash);
@@ -37,7 +41,9 @@ export const useExecute = (environment: Environment) => {
     );
 
     if (!result) {
-      throw new Error(`Transaction receipt not found after ${maxAttempts} attempts`);
+      throw new Error(
+        `Transaction receipt not found after ${maxAttempts} attempts`,
+      );
     }
 
     return result;
@@ -85,7 +91,7 @@ export const useExecute = (environment: Environment) => {
       data: { error: err },
     };
 
-    showErrorHandover(errorType, { error });
+    showErrorHandover(errorType, { contextId, error });
   };
 
   // @TODO: Move to util function
@@ -149,7 +155,7 @@ export const useExecute = (environment: Environment) => {
 
       return ethers.constants.MaxUint256; // no approval is needed for native tokens
     } catch (error) {
-      showErrorHandover(AddTokensErrorTypes.DEFAULT, { error });
+      showErrorHandover(AddTokensErrorTypes.DEFAULT, { contextId, error });
       return undefined;
     }
   };

@@ -151,7 +151,7 @@ export const useError = (environment: Environment) => {
       screen: 'Error',
       extras: {
         errorType,
-        data,
+        ...data,
       },
     });
 
