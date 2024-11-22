@@ -4,6 +4,8 @@ import { RouteResponse } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
 import { ethers } from 'ethers';
 import { Environment } from '@imtbl/config';
+
+import { StatusResponse } from '@0xsquid/sdk/dist/types';
 import { isSquidNativeToken } from '../functions/isSquidNativeToken';
 import { useError } from './useError';
 import { AddTokensError, AddTokensErrorTypes } from '../types';
@@ -12,6 +14,8 @@ import { sendAddTokensFailedEvent } from '../AddTokensWidgetEvents';
 import { retry } from '../../../lib/retry';
 import { withMetricsAsync } from '../../../lib/metrics';
 import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+
+const TRANSACTION_NOT_COMPLETED = 'transaction not completed';
 
 export const useExecute = (contextId: string, environment: Environment) => {
   const { showErrorHandover } = useError(environment);
@@ -165,7 +169,7 @@ export const useExecute = (contextId: string, environment: Environment) => {
   const callApprove = async (
     provider: Web3Provider,
     routeResponse: RouteResponse,
-  ):Promise<ethers.providers.TransactionReceipt> => {
+  ): Promise<ethers.providers.TransactionReceipt> => {
     const erc20Abi = [
       'function approve(address spender, uint256 amount) public returns (bool)',
     ];
@@ -212,7 +216,7 @@ export const useExecute = (contextId: string, environment: Environment) => {
     squid: Squid,
     provider: Web3Provider,
     routeResponse: RouteResponse,
-  ):Promise<ethers.providers.TransactionReceipt> => {
+  ): Promise<ethers.providers.TransactionReceipt> => {
     const tx = (await squid.executeRoute({
       signer: provider.getSigner(),
       route: routeResponse.route,
@@ -239,10 +243,53 @@ export const useExecute = (contextId: string, environment: Environment) => {
     }
   };
 
+  const getStatus = async (
+    squid: Squid,
+    transactionHash: string,
+  ): Promise<StatusResponse | undefined> => {
+    const completedTransactionStatus = [
+      'success',
+      'partial_success',
+      'needs_gas',
+      'not_found',
+    ];
+    try {
+      return await retry(
+        async () => {
+          const result = await squid.getStatus({
+            transactionId: transactionHash,
+          });
+          if (
+            completedTransactionStatus.includes(
+              result.squidTransactionStatus ?? '',
+            )
+          ) {
+            return result;
+          }
+          return Promise.reject(TRANSACTION_NOT_COMPLETED);
+        },
+        {
+          retries: 240,
+          retryIntervalMs: 5000,
+          nonRetryable: (err) => {
+            if (err.response) {
+              return err.response.status === 400 || err.response.status === 500;
+            }
+            return err !== TRANSACTION_NOT_COMPLETED;
+          },
+        },
+      );
+    } catch (error) {
+      handleTransactionError(error);
+      return undefined;
+    }
+  };
+
   return {
     checkProviderChain,
     getAllowance,
     approve,
     execute,
+    getStatus,
   };
 };
