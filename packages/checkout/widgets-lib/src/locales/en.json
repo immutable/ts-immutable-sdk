@@ -793,12 +793,36 @@
           "subHeading": "Confirm the transaction request to complete this transaction"
         },
         "executing": {
-          "heading": "Processing"
+          "heading": "Processing",
+          "subHeadingDuration": "This should take {{duration}}",
+          "subHeading": "Go to <axelarscanLink>Axelarscan</axelarscanLink> for transaction details"
         },
         "executed": {
-          "heading": "Funds added successfully",
-          "subHeadingGoTo": "Go to",
-          "subHeadingTransactionDetails": "for transaction details"
+          "heading": "Tokens Added",
+          "subHeading": "Go to <axelarscanLink>Axelarscan</axelarscanLink> for transaction details",
+          "primaryButtonText": "Done"
+        },
+        "executedZkEVM": {
+          "heading": "Tokens Added",
+          "subHeading": "Go to <explorerLink>Immutable zkEVM explorer</explorerLink> for transaction details",
+          "primaryButtonText": "Done"
+        },
+        "needsGas": {
+          "heading": "Gas has surged",
+          "subHeading": "You’ll need to pay more gas to complete this transaction. You can do this via <axelarscanLink>Axelarscan</axelarscanLink>.",
+          "primaryButtonText": "Go to Axelarscan",
+          "secondaryButtonText": "Dismiss"
+        },
+        "partialSuccess": {
+          "heading": "You’ve received axlUSDC",
+          "subHeading": "Your transaction was subject to slippage and you’ve received axlUSDC. To receive the token you intended to add, you may need to complete a swap via <squidLink>Squid</squidLink>. ",
+          "primaryButtonText": "Go to Squid",
+          "secondaryButtonText": "Dismiss"
+        },
+        "statusFailed": {
+          "heading": "Unable to complete transaction",
+          "subHeading": "Something went wrong, and we were unable to complete this transaction. Visit <axelarscanLink>Axelarscan</axelarscanLink> for details.",
+          "secondaryButtonText": "Dismiss"
         }
       },
       "onboarding": {

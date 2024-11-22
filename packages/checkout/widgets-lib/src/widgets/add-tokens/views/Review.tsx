@@ -24,6 +24,7 @@ import {
 } from '@biom3/react';
 import { RouteResponse } from '@0xsquid/squid-types';
 import { t } from 'i18next';
+import { Trans } from 'react-i18next';
 import { Environment } from '@imtbl/config';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { AddTokensContext } from '../context/AddTokensContext';
@@ -65,11 +66,14 @@ import {
   getFormattedNumber,
   getFormattedNumberWithDecimalPlaces,
 } from '../functions/getFormattedNumber';
-import { convertToNetworkChangeableProvider } from '../functions/convertToNetworkChangeableProvider';
 import { SquidFooter } from '../components/SquidFooter';
 import { useError } from '../hooks/useError';
-import { sendAddTokensSuccessEvent } from '../AddTokensWidgetEvents';
+import {
+  sendAddTokensCloseEvent,
+  sendAddTokensSuccessEvent,
+} from '../AddTokensWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { convertToNetworkChangeableProvider } from '../functions/convertToNetworkChangeableProvider';
 
 interface ReviewProps {
   data: AddTokensReviewData;
@@ -108,7 +112,9 @@ export function Review({
     },
   } = useProvidersContext();
 
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
 
   const [route, setRoute] = useState<RouteResponse | undefined>();
   const [proceedDisabled, setProceedDisabled] = useState(true);
@@ -122,10 +128,7 @@ export function Review({
   const { showErrorHandover } = useError(checkout.config.environment);
 
   const {
-    checkProviderChain,
-    getAllowance,
-    approve,
-    execute,
+    checkProviderChain, getAllowance, approve, execute, getStatus,
   } = useExecute(id, checkout?.config.environment || Environment.SANDBOX);
 
   useEffect(() => {
@@ -202,7 +205,9 @@ export function Review({
           }}
         >
           {t('views.ADD_TOKENS.fees.includedFees')}
-          {` ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${getFormattedAmounts(totalFeesUsd)}`}
+          {` ${t(
+            'views.ADD_TOKENS.fees.fiatPricePrefix',
+          )} $${getFormattedAmounts(totalFeesUsd)}`}
           <Icon
             icon="ChevronExpand"
             sx={{ ml: 'base.spacing.x2', w: 'base.icon.size.200' }}
@@ -225,14 +230,30 @@ export function Review({
     );
   }, [totalFeesUsd]);
 
+  interface HandoverProps {
+    animationPath: string;
+    state: RiveStateMachineInput;
+    headingText: string;
+    subheadingText?: ReactNode;
+    primaryButtonText?: string;
+    onPrimaryButtonClick?: () => void;
+    secondaryButtonText?: string;
+    onSecondaryButtonClick?: () => void;
+    duration?: number;
+  }
+
   const showHandover = useCallback(
-    (
-      animationPath: string,
-      state: RiveStateMachineInput,
-      headingText: string,
-      subheadingText?: ReactNode,
-      duration?: number,
-    ) => {
+    ({
+      animationPath,
+      state,
+      headingText,
+      subheadingText,
+      primaryButtonText,
+      onPrimaryButtonClick,
+      secondaryButtonText,
+      onSecondaryButtonClick,
+      duration,
+    }: HandoverProps) => {
       addHandover({
         animationUrl: getRemoteRive(
           checkout?.config.environment,
@@ -244,6 +265,10 @@ export function Review({
           <HandoverContent
             headingText={headingText}
             subheadingText={subheadingText}
+            primaryButtonText={primaryButtonText}
+            onPrimaryButtonClick={onPrimaryButtonClick}
+            secondaryButtonText={secondaryButtonText}
+            onSecondaryButtonClick={onSecondaryButtonClick}
           />
         ),
       });
@@ -278,7 +303,10 @@ export function Review({
     try {
       currentFromAddress = await fromProvider.getSigner().getAddress();
     } catch (error) {
-      showErrorHandover(AddTokensErrorTypes.PROVIDER_ERROR, { contextId: id, error });
+      showErrorHandover(AddTokensErrorTypes.PROVIDER_ERROR, {
+        contextId: id,
+        error,
+      });
       return;
     }
 
@@ -290,11 +318,11 @@ export function Review({
     clearInterval(getRouteIntervalIdRef.current);
     setProceedDisabled(true);
 
-    showHandover(
-      APPROVE_TXN_ANIMATION,
-      RiveStateMachineInput.START,
-      t('views.ADD_TOKENS.handover.preparing.heading'),
-    );
+    showHandover({
+      animationPath: APPROVE_TXN_ANIMATION,
+      state: RiveStateMachineInput.START,
+      headingText: t('views.ADD_TOKENS.handover.preparing.heading'),
+    });
 
     const changeableProvider = await convertToNetworkChangeableProvider(
       fromProvider,
@@ -313,37 +341,38 @@ export function Review({
 
     const { fromAmount } = route.route.params;
     if (allowance?.lt(fromAmount)) {
-      showHandover(
-        APPROVE_TXN_ANIMATION,
-        RiveStateMachineInput.WAITING,
-        t('views.ADD_TOKENS.handover.requestingApproval.heading'),
-        t('views.ADD_TOKENS.handover.requestingApproval.subHeading'),
-      );
+      showHandover({
+        animationPath: APPROVE_TXN_ANIMATION,
+        state: RiveStateMachineInput.WAITING,
+        headingText: t('views.ADD_TOKENS.handover.requestingApproval.heading'),
+        subheadingText: t(
+          'views.ADD_TOKENS.handover.requestingApproval.subHeading',
+        ),
+      });
 
       const approveTxnReceipt = await approve(changeableProvider, route);
 
       if (!approveTxnReceipt) {
         return;
       }
-
-      showHandover(
-        APPROVE_TXN_ANIMATION,
-        RiveStateMachineInput.COMPLETED,
-        t('views.ADD_TOKENS.handover.approved.heading'),
-        '',
-        FIXED_HANDOVER_DURATION,
-      );
+      showHandover({
+        animationPath: APPROVE_TXN_ANIMATION,
+        state: RiveStateMachineInput.COMPLETED,
+        headingText: t('views.ADD_TOKENS.handover.approved.heading'),
+        duration: FIXED_HANDOVER_DURATION,
+      });
     }
 
-    showHandover(
-      EXECUTE_TXN_ANIMATION,
-      RiveStateMachineInput.WAITING,
-      t('views.ADD_TOKENS.handover.requestingExecution.heading'),
-      t('views.ADD_TOKENS.handover.requestingExecution.subHeading'),
-    );
+    showHandover({
+      animationPath: EXECUTE_TXN_ANIMATION,
+      state: RiveStateMachineInput.WAITING,
+      headingText: t('views.ADD_TOKENS.handover.requestingExecution.heading'),
+      subheadingText: t(
+        'views.ADD_TOKENS.handover.requestingExecution.subHeading',
+      ),
+    });
 
     const executeTxnReceipt = await execute(squid, changeableProvider, route);
-
     if (executeTxnReceipt) {
       track({
         userJourney: UserJourney.ADD_TOKENS,
@@ -357,37 +386,219 @@ export function Review({
 
       sendAddTokensSuccessEvent(eventTarget, executeTxnReceipt.transactionHash);
 
-      showHandover(
-        EXECUTE_TXN_ANIMATION,
-        RiveStateMachineInput.PROCESSING,
-        t('views.ADD_TOKENS.handover.executing.heading'),
-        '',
-        FIXED_HANDOVER_DURATION,
-      );
+      showHandover({
+        animationPath: EXECUTE_TXN_ANIMATION,
+        state: RiveStateMachineInput.PROCESSING,
+        headingText: t('views.ADD_TOKENS.handover.executing.heading'),
+        subheadingText: (
+          <>
+            {t('views.ADD_TOKENS.handover.executing.subHeadingDuration', {
+              duration: getDurationFormatted(
+                route.route.estimate.estimatedRouteDuration,
+                t('views.ADD_TOKENS.routeSelection.minutesText'),
+                t('views.ADD_TOKENS.routeSelection.minuteText'),
+                t('views.ADD_TOKENS.routeSelection.secondsText'),
+              ),
+            })}
+            <br />
+            <Trans
+              i18nKey={t('views.ADD_TOKENS.handover.executing.subHeading')}
+              components={{
+                axelarscanLink: (
+                  <Link
+                    size="small"
+                    rc={(
+                      <a
+                        target="_blank"
+                        href={`https://axelarscan.io/gmp/${executeTxnReceipt?.transactionHash}`}
+                        rel="noreferrer"
+                      />
+                    )}
+                  />
+                ),
+              }}
+            />
+          </>
+        ),
+      });
 
-      showHandover(
-        EXECUTE_TXN_ANIMATION,
-        RiveStateMachineInput.COMPLETED,
-        t('views.ADD_TOKENS.handover.executed.heading'),
-        <>
-          {t('views.ADD_TOKENS.handover.executed.subHeadingGoTo')}
-          {' '}
-          <Link
-            size="small"
-            rc={(
-              <a
-                target="_blank"
-                href={`https://axelarscan.io/gmp/${executeTxnReceipt?.transactionHash}`}
-                rel="noreferrer"
-              />
-            )}
-          >
-            Axelarscan
-          </Link>
-          {' '}
-          {t('views.ADD_TOKENS.handover.executed.subHeadingTransactionDetails')}
-        </>,
-      );
+      if (toChain === fromChain) {
+        showHandover({
+          animationPath: EXECUTE_TXN_ANIMATION,
+          state: RiveStateMachineInput.COMPLETED,
+          headingText: t('views.ADD_TOKENS.handover.executedZkEVM.heading'),
+          subheadingText: (
+            <Trans
+              i18nKey={t('views.ADD_TOKENS.handover.executedZkEVM.subHeading')}
+              components={{
+                explorerLink: (
+                  <Link
+                    size="small"
+                    rc={(
+                      <a
+                        target="_blank"
+                        href={`https://explorer.immutable.com/tx/${executeTxnReceipt.transactionHash}`}
+                        rel="noreferrer"
+                      />
+                    )}
+                  />
+                ),
+              }}
+            />
+          ),
+          primaryButtonText: t(
+            'views.ADD_TOKENS.handover.executed.primaryButtonText',
+          ),
+          onPrimaryButtonClick: () => {
+            sendAddTokensCloseEvent(eventTarget);
+          },
+        });
+      }
+
+      const status = await getStatus(squid, executeTxnReceipt.transactionHash);
+      const axelarscanUrl = `https://axelarscan.io/gmp/${executeTxnReceipt?.transactionHash}`;
+
+      if (status?.squidTransactionStatus === 'success') {
+        showHandover({
+          animationPath: EXECUTE_TXN_ANIMATION,
+          state: RiveStateMachineInput.COMPLETED,
+          headingText: t('views.ADD_TOKENS.handover.executed.heading'),
+          subheadingText: (
+            <Trans
+              i18nKey={t('views.ADD_TOKENS.handover.executed.subHeading')}
+              components={{
+                axelarscanLink: (
+                  <Link
+                    size="small"
+                    rc={(
+                      <a
+                        target="_blank"
+                        href={axelarscanUrl}
+                        rel="noreferrer"
+                      />
+                    )}
+                  />
+                ),
+              }}
+            />
+          ),
+          primaryButtonText: t(
+            'views.ADD_TOKENS.handover.executed.primaryButtonText',
+          ),
+          onPrimaryButtonClick: () => {
+            sendAddTokensCloseEvent(eventTarget);
+          },
+        });
+      } else if (status?.squidTransactionStatus === 'needs_gas') {
+        showHandover({
+          animationPath: APPROVE_TXN_ANIMATION,
+          state: RiveStateMachineInput.COMPLETED,
+          headingText: t('views.ADD_TOKENS.handover.needsGas.heading'),
+          subheadingText: (
+            <Trans
+              i18nKey={t('views.ADD_TOKENS.handover.needsGas.subHeading')}
+              components={{
+                axelarscanLink: (
+                  <Link
+                    size="small"
+                    rc={(
+                      <a
+                        target="_blank"
+                        href={axelarscanUrl}
+                        rel="noreferrer"
+                      />
+                    )}
+                  />
+                ),
+              }}
+            />
+          ),
+          primaryButtonText: t(
+            'views.ADD_TOKENS.handover.needsGas.primaryButtonText',
+          ),
+          onPrimaryButtonClick: () => {
+            window.open(axelarscanUrl, '_blank', 'noreferrer');
+          },
+          secondaryButtonText: t(
+            'views.ADD_TOKENS.handover.needsGas.secondaryButtonText',
+          ),
+          onSecondaryButtonClick: () => {
+            sendAddTokensCloseEvent(eventTarget);
+          },
+        });
+      } else if (status?.squidTransactionStatus === 'partial_success') {
+        showHandover({
+          animationPath: APPROVE_TXN_ANIMATION,
+          state: RiveStateMachineInput.COMPLETED,
+          headingText: t('views.ADD_TOKENS.handover.partialSuccess.heading'),
+          subheadingText: (
+            <Trans
+              i18nKey={t('views.ADD_TOKENS.handover.partialSuccess.subHeading')}
+              components={{
+                squidLink: (
+                  <Link
+                    size="small"
+                    rc={(
+                      <a
+                        target="_blank"
+                        href="https://toolkit.immutable.com/squid-bridge/"
+                        rel="noreferrer"
+                      />
+                    )}
+                  />
+                ),
+              }}
+            />
+          ),
+          primaryButtonText: t(
+            'views.ADD_TOKENS.handover.partialSuccess.primaryButtonText',
+          ),
+          onPrimaryButtonClick: () => {
+            window.open(
+              'https://toolkit.immutable.com/squid-bridge/',
+              '_blank',
+              'noreferrer',
+            );
+          },
+          secondaryButtonText: t(
+            'views.ADD_TOKENS.handover.partialSuccess.secondaryButtonText',
+          ),
+          onSecondaryButtonClick: () => {
+            sendAddTokensCloseEvent(eventTarget);
+          },
+        });
+      } else {
+        showHandover({
+          animationPath: APPROVE_TXN_ANIMATION,
+          state: RiveStateMachineInput.COMPLETED,
+          headingText: t('views.ADD_TOKENS.handover.statusFailed.heading'),
+          subheadingText: (
+            <Trans
+              i18nKey={t('views.ADD_TOKENS.handover.statusFailed.subHeading')}
+              components={{
+                axelarscanLink: (
+                  <Link
+                    size="small"
+                    rc={(
+                      <a
+                        target="_blank"
+                        href={axelarscanUrl}
+                        rel="noreferrer"
+                      />
+                    )}
+                  />
+                ),
+              }}
+            />
+          ),
+          secondaryButtonText: t(
+            'views.ADD_TOKENS.handover.statusFailed.secondaryButtonText',
+          ),
+          onSecondaryButtonClick: () => {
+            sendAddTokensCloseEvent(eventTarget);
+          },
+        });
+      }
     }
   }, [
     route,
@@ -515,7 +726,9 @@ export function Review({
                   sx={{ flexShrink: 0, alignSelf: 'flex-start' }}
                 >
                   <PriceDisplay.Caption size="small">
-                    {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${route?.route.estimate.fromAmountUSD ?? ''}`}
+                    {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${
+                      route?.route.estimate.fromAmountUSD ?? ''
+                    }`}
                   </PriceDisplay.Caption>
                 </PriceDisplay>
               </Stack>
@@ -569,12 +782,13 @@ export function Review({
                     {t('views.ADD_TOKENS.review.poweredBySquid')}
                     <br />
                     1
-                    {' '}
                     {route.route.estimate.fromToken.symbol}
                     {' '}
                     =
                     {' '}
-                    {getFormattedNumberWithDecimalPlaces(route.route.estimate.exchangeRate)}
+                    {getFormattedNumberWithDecimalPlaces(
+                      route.route.estimate.exchangeRate,
+                    )}
                     {' '}
                     {route.route.estimate.toToken.name}
                   </Body>
@@ -652,7 +866,9 @@ export function Review({
                   sx={{ flexShrink: 0, alignSelf: 'flex-start' }}
                 >
                   <PriceDisplay.Caption size="small">
-                    {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${route?.route.estimate.toAmountUSD ?? ''}`}
+                    {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${
+                      route?.route.estimate.toAmountUSD ?? ''
+                    }`}
                   </PriceDisplay.Caption>
                 </PriceDisplay>
               </Stack>
@@ -710,7 +926,8 @@ export function Review({
               disabled={proceedDisabled}
               sx={{ mx: 'base.spacing.x3' }}
             >
-              {proceedDisabled ? t('views.ADD_TOKENS.review.processingButtonText')
+              {proceedDisabled
+                ? t('views.ADD_TOKENS.review.processingButtonText')
                 : t('views.ADD_TOKENS.review.proceedButtonText')}
             </Button>
 
@@ -719,10 +936,10 @@ export function Review({
         )}
 
         {!route && !showAddressMissmatchDrawer && (
-        <LoadingView
-          loadingText={t('views.ADD_TOKENS.review.loadingText')}
-          containerSx={{ bg: 'transparent' }}
-        />
+          <LoadingView
+            loadingText={t('views.ADD_TOKENS.review.loadingText')}
+            containerSx={{ bg: 'transparent' }}
+          />
         )}
       </Stack>
       <RouteFees
