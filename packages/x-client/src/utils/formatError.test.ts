@@ -8,9 +8,11 @@ import { ImmutableX } from '../IMXClient';
 
 describe('formatError', () => {
   it('should format api errors to IMXError', async () => {
-    const client = new ImmutableX(imxClientConfig({
-      environment: Environment.SANDBOX,
-    }));
+    const client = new ImmutableX(
+      imxClientConfig({
+        environment: Environment.SANDBOX,
+      }),
+    );
     await expect(
       client.getAsset({
         tokenAddress: '0',
@@ -20,9 +22,11 @@ describe('formatError', () => {
   });
 
   it('should format axios errors to IMXError', async () => {
-    const client = new ImmutableX(imxClientConfig({
-      environment: Environment.SANDBOX,
-    }));
+    const client = new ImmutableX(
+      imxClientConfig({
+        environment: Environment.SANDBOX,
+      }),
+    );
     await expect(client.getUser('')).rejects.toThrowError(
       'Error: Request failed with status code 405',
     );
@@ -49,7 +53,7 @@ describe('formatError', () => {
 
     const client = new ImmutableX(config);
     await expect(client.getUser('')).rejects.toThrowError(
-      'no matching operation was found',
+      'AxiosError: Request failed with status code 404',
     );
   });
 });
