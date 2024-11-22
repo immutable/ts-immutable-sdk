@@ -50,6 +50,7 @@ models/asset-collection-item.ts
 models/asset-verification-status.ts
 models/basic-apierror.ts
 models/bid-result.ts
+models/bid.ts
 models/blockchain-metadata.ts
 models/burn.ts
 models/call.ts
@@ -146,6 +147,7 @@ models/market-price-details.ts
 models/market-price-erc20-token.ts
 models/market-price-fees.ts
 models/market-price-native-token.ts
+models/market-top-bid.ts
 models/market.ts
 models/marketplace-contract-type.ts
 models/message-evaluation-request.ts

@@ -19,6 +19,9 @@ import { LastTrade } from './last-trade';
 // May contain unused imports in some cases
 // @ts-ignore
 import { MarketFloorListing } from './market-floor-listing';
+// May contain unused imports in some cases
+// @ts-ignore
+import { MarketTopBid } from './market-top-bid';
 
 /**
  * Market data
@@ -32,6 +35,12 @@ export interface Market {
      * @memberof Market
      */
     'floor_listing': MarketFloorListing | null;
+    /**
+     * 
+     * @type {MarketTopBid}
+     * @memberof Market
+     */
+    'top_bid': MarketTopBid | null;
     /**
      * 
      * @type {LastTrade}
