@@ -773,12 +773,36 @@
           "subHeading": "确认交易请求以完成此交易"
         },
         "executing": {
-          "heading": "处理中"
+          "heading": "处理中",
+          "subHeadingDuration": "预计耗时{{duration}}",
+          "subHeading": "您可以前往<axelarscanLink>Axelarscan</axelarscanLink>查看交易详情"
         },
         "executed": {
-          "heading": "资金添加成功",
-          "subHeadingGoTo": "前往",
-          "subHeadingTransactionDetails": "查看交易详情"
+          "heading": "代币已添加",
+          "subHeading": "您可以前往<axelarscanLink>Axelarscan</axelarscanLink>查看交易详情",
+          "primaryButtonText": "完成"
+        },
+        "executedZkEVM": {
+          "heading": "代币已添加",
+          "subHeading": "您可以前往<explorerLink>Immutable zkEVM explorer</explorerLink>查看交易详情",
+          "primaryButtonText": "完成"
+        },
+        "needsGas": {
+          "heading": "Gas费用激增",
+          "subHeading": "完成此交易需要支付更高的Gas费用。您可以通过<axelarscanLink>Axelarscan</axelarscanLink>完成。",
+          "primaryButtonText": "前往Axelarscan",
+          "secondaryButtonText": "关闭"
+        },
+        "partialSuccess": {
+          "heading": "您已收到axlUSDC",
+          "subHeading": "交易受到滑点影响，您已收到axlUSDC。如需获得目标代币，可能需要通过<squidLink>Squid</squidLink>完成兑换。",
+          "primaryButtonText": "前往Squid",
+          "secondaryButtonText": "关闭"
+        },
+        "statusFailed": {
+          "heading": "交易未能完成",
+          "subHeading": "交易发生错误，未能完成。详情请前往<axelarscanLink>Axelarscan</axelarscanLink>查看。",
+          "secondaryButtonText": "关闭"
         }
       },
       "onboarding": {

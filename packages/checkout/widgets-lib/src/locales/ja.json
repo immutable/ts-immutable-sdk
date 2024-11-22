@@ -776,12 +776,36 @@
           "subHeading": "取引リクエストを確認してこの取引を完了してください"
         },
         "executing": {
-          "heading": "処理中"
+          "heading": "処理中",
+          "subHeadingDuration": "この処理には{{duration}}かかります",
+          "subHeading": "<axelarscanLink>Axelarscan</axelarscanLink>でトランザクションの詳細をご確認ください"
         },
         "executed": {
-          "heading": "資金が正常に追加されました",
-          "subHeadingGoTo": "移動",
-          "subHeadingTransactionDetails": "取引詳細はこちら"
+          "heading": "トークンが追加されました",
+          "subHeading": "<axelarscanLink>Axelarscan</axelarscanLink>でトランザクションの詳細をご確認ください",
+          "primaryButtonText": "完了"
+        },
+        "executedZkEVM": {
+          "heading": "トークンが追加されました",
+          "subHeading": "<explorerLink>Immutable zkEVM explorer</explorerLink>でトランザクションの詳細をご確認ください",
+          "primaryButtonText": "完了"
+        },
+        "needsGas": {
+          "heading": "ガス料金が急騰しました",
+          "subHeading": "このトランザクションを完了するためには、さらにガス料金を支払う必要があります。<axelarscanLink>Axelarscan</axelarscanLink>で手続きを行えます。",
+          "primaryButtonText": "Axelarscanに移動",
+          "secondaryButtonText": "閉じる"
+        },
+        "partialSuccess": {
+          "heading": "axlUSDCを受け取りました",
+          "subHeading": "トランザクションはスリッページの影響を受け、axlUSDCを受け取りました。意図したトークンを受け取るには、<squidLink>Squid</squidLink>でスワップを完了する必要があります。",
+          "primaryButtonText": "Squidに移動",
+          "secondaryButtonText": "閉じる"
+        },
+        "statusFailed": {
+          "heading": "トランザクションを完了できませんでした",
+          "subHeading": "問題が発生し、トランザクションを完了できませんでした。詳細は<axelarscanLink>Axelarscan</axelarscanLink>をご確認ください。",
+          "secondaryButtonText": "閉じる"
         }
       },
       "onboarding": {
