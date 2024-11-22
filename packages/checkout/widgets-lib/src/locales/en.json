@@ -830,7 +830,7 @@
         "balance": "Balance",
         "fiatPricePrefix": "≈ USD",
         "zeroFees": "Zero fees",
-        "includedFees": "Included fees"
+        "includedFees": "Fees"
       }
     }
   },

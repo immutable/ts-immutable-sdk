@@ -810,7 +810,7 @@
         "balance": "余额",
         "fiatPricePrefix": "≈ 美元",
         "zeroFees": "零手续费",
-        "includedFees": "包含的手续费"
+        "includedFees": "费用"
       }
     }
   },
