@@ -21,8 +21,9 @@ This React application allows users to migrate their NFTs from Immutable X to Im
 ## Setup
 
 1. **Install dependencies**:
+   At the root of the repo, run the following if you haven't already.
    ```bash
-   npm install
+   yarn install
    ```
 
 2. **Set up environment variables**:
@@ -64,7 +65,7 @@ The application uses:
 - **Next.js** for the framework
 - **Immutable SDK** for blockchain interactions
 - **Passport** for wallet connection
-- **TailwindCSS** for styling
+- **Biom3** for styling
 
 ## Important Notes
 
