@@ -453,6 +453,7 @@ export function Review({
             sendAddTokensCloseEvent(eventTarget);
           },
         });
+        return;
       }
 
       const status = await getStatus(squid, executeTxnReceipt.transactionHash);
