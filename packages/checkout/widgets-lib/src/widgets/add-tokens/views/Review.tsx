@@ -386,6 +386,40 @@ export function Review({
 
       sendAddTokensSuccessEvent(eventTarget, executeTxnReceipt.transactionHash);
 
+      if (toChain === fromChain) {
+        showHandover({
+          animationPath: EXECUTE_TXN_ANIMATION,
+          state: RiveStateMachineInput.COMPLETED,
+          headingText: t('views.ADD_TOKENS.handover.executedZkEVM.heading'),
+          subheadingText: (
+            <Trans
+              i18nKey={t('views.ADD_TOKENS.handover.executedZkEVM.subHeading')}
+              components={{
+                explorerLink: (
+                  <Link
+                    size="small"
+                    rc={(
+                      <a
+                        target="_blank"
+                        href={`https://explorer.immutable.com/tx/${executeTxnReceipt.transactionHash}`}
+                        rel="noreferrer"
+                      />
+                    )}
+                  />
+                ),
+              }}
+            />
+          ),
+          primaryButtonText: t(
+            'views.ADD_TOKENS.handover.executed.primaryButtonText',
+          ),
+          onPrimaryButtonClick: () => {
+            sendAddTokensCloseEvent(eventTarget);
+          },
+        });
+        return;
+      }
+
       showHandover({
         animationPath: EXECUTE_TXN_ANIMATION,
         state: RiveStateMachineInput.PROCESSING,
@@ -421,40 +455,6 @@ export function Review({
           </>
         ),
       });
-
-      if (toChain === fromChain) {
-        showHandover({
-          animationPath: EXECUTE_TXN_ANIMATION,
-          state: RiveStateMachineInput.COMPLETED,
-          headingText: t('views.ADD_TOKENS.handover.executedZkEVM.heading'),
-          subheadingText: (
-            <Trans
-              i18nKey={t('views.ADD_TOKENS.handover.executedZkEVM.subHeading')}
-              components={{
-                explorerLink: (
-                  <Link
-                    size="small"
-                    rc={(
-                      <a
-                        target="_blank"
-                        href={`https://explorer.immutable.com/tx/${executeTxnReceipt.transactionHash}`}
-                        rel="noreferrer"
-                      />
-                    )}
-                  />
-                ),
-              }}
-            />
-          ),
-          primaryButtonText: t(
-            'views.ADD_TOKENS.handover.executed.primaryButtonText',
-          ),
-          onPrimaryButtonClick: () => {
-            sendAddTokensCloseEvent(eventTarget);
-          },
-        });
-        return;
-      }
 
       const status = await getStatus(squid, executeTxnReceipt.transactionHash);
       const axelarscanUrl = `https://axelarscan.io/gmp/${executeTxnReceipt?.transactionHash}`;
