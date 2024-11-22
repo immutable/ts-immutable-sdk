@@ -1,12 +1,9 @@
 # -------------------------------------------------
-# Combined clients
+# Immutable X
 # -------------------------------------------------
 
 .PHONY: generate-imx-openapi
 generate-imx-openapi: get-imx-openapi generate-imx-api-client
-
-.PHONY: generate-mr-openapi
-generate-mr-openapi: get-mr-openapi generate-mr-api-client
 
 # Note: We generate clients with sandbox spec only as Prod and Sandbox are maintained to be same.
 #.      Prod url is passed in via config to talk to prod API.
@@ -17,14 +14,6 @@ get-imx-openapi:
     https://api.sandbox.x.immutable.com/openapi \
     -o src/imx-openapi.json
 
-# TODO: update URL once we release to testnet
-.PHONY: get-mr-openapi
-get-mr-openapi:
-	rm -f src/mr-openapi.json && touch src/mr-openapi.json && \
-	curl -H "Accept: application/json+v3" \
-    https://imx-openapiv3-mr-sandbox.s3.us-east-2.amazonaws.com/openapi-sdk.json \
-    -o src/mr-openapi.json
-
 .PHONY: generate-imx-api-client
 generate-imx-api-client:
 	rimraf src/imx && \
@@ -34,6 +23,21 @@ generate-imx-api-client:
     -g typescript-axios \
     -o /app/src/imx \
     -c /app/config/imx.config.json
+
+# -------------------------------------------------
+# Immutable zkEVM - Combined clients
+# -------------------------------------------------
+
+.PHONY: generate-mr-openapi
+generate-mr-openapi: get-mr-openapi generate-mr-api-client
+
+# TODO: update URL once we release to testnet
+.PHONY: get-mr-openapi
+get-mr-openapi:
+	rm -f src/mr-openapi.json && touch src/mr-openapi.json && \
+	curl -H "Accept: application/json+v3" \
+    https://imx-openapiv3-mr-sandbox.s3.us-east-2.amazonaws.com/openapi-sdk.json \
+    -o src/mr-openapi.json
 
 .PHONY: generate-mr-api-client
 generate-mr-api-client:
@@ -47,7 +51,7 @@ generate-mr-api-client:
     -c /app/config/mr.config.json
 
 # -------------------------------------------------
-# Seperate clients
+# Immutable zkEVM - Seperate clients
 # -------------------------------------------------
 
 .PHONY: generate-blockchain-data
