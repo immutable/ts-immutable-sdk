@@ -1,5 +1,5 @@
 import { WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 
-export const convertToNetworkChangeableProvider = async (
+export const convertToNetworkChangeableProvider = (
   provider: WrappedBrowserProvider,
-): Promise<WrappedBrowserProvider> => new WrappedBrowserProvider(provider.ethereumProvider!, 'any');
+): WrappedBrowserProvider => new WrappedBrowserProvider(provider.ethereumProvider!, 'any');
