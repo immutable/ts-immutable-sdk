@@ -15,6 +15,9 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import { Bid } from './bid';
+// May contain unused imports in some cases
+// @ts-ignore
 import { Listing } from './listing';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -53,5 +56,11 @@ export interface StackBundle {
      * @memberof StackBundle
      */
     'listings': Array<Listing>;
+    /**
+     * List of open bids for the stack.
+     * @type {Array<Bid>}
+     * @memberof StackBundle
+     */
+    'bids': Array<Bid>;
 }
 
