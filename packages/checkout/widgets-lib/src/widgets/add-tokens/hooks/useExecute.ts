@@ -13,12 +13,15 @@ import { AddTokensError, AddTokensErrorTypes } from '../types';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { sendAddTokensFailedEvent } from '../AddTokensWidgetEvents';
 import { retry } from '../../../lib/retry';
+import { ProvidersContext, ProvidersContextActions } from '../../../context/providers-context/ProvidersContext';
 
 export const useExecute = (environment: Environment) => {
   const { showErrorHandover } = useError(environment);
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
+
+  const { providersDispatch } = useContext(ProvidersContext);
 
   const waitForReceipt = async (provider: WrappedBrowserProvider, txHash: string, maxAttempts = 60) => {
     const result = await retry(
@@ -92,29 +95,40 @@ export const useExecute = (environment: Environment) => {
   };
 
   // @TODO: Move to util function
-  const checkProviderChain = async (
+  const updateFromProviderChain = async (
     provider: WrappedBrowserProvider,
     chainId: string,
-  ): Promise<boolean> => {
-    if (!provider.send) {
-      throw new Error('provider does not have request method');
+  ): Promise<WrappedBrowserProvider> => {
+    if (!provider.ethereumProvider) {
+      throw new Error('provider is not a valid WrappedBrowserProvider');
     }
     try {
       const fromChainHex = `0x${parseInt(chainId, 10).toString(16)}`;
-      const providerChainId = await provider.send('eth_chainId', []);
+      const providerChainId = (await provider.getNetwork()).chainId;
 
-      if (fromChainHex !== providerChainId) {
+      if (chainId !== providerChainId.toString()) {
         await provider.send('wallet_switchEthereumChain', [
           {
             chainId: fromChainHex,
           },
         ]);
-        return true;
+
+        const updatedProvider = new WrappedBrowserProvider(provider.ethereumProvider);
+
+        providersDispatch({
+          payload: {
+            type: ProvidersContextActions.SET_PROVIDER,
+            fromProvider: updatedProvider,
+          },
+        });
+
+        return updatedProvider;
       }
-      return true;
+
+      return provider;
     } catch (error) {
       handleTransactionError(error);
-      return false;
+      return provider;
     }
   };
 
@@ -210,7 +224,7 @@ export const useExecute = (environment: Environment) => {
   };
 
   return {
-    checkProviderChain,
+    updateFromProviderChain,
     getAllowance,
     approve,
     execute,

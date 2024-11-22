@@ -120,7 +120,7 @@ export function Review({
   const { showErrorHandover } = useError(checkout.config.environment);
 
   const {
-    checkProviderChain,
+    updateFromProviderChain,
     getAllowance,
     approve,
     execute,
@@ -274,20 +274,12 @@ export function Review({
       t('views.ADD_TOKENS.handover.preparing.heading'),
     );
 
-    const changeableProvider = await convertToNetworkChangeableProvider(
-      fromProvider,
-    );
-
-    const isValidNetwork = await checkProviderChain(
-      changeableProvider,
+    const updatedFromProvider = await updateFromProviderChain(
+      convertToNetworkChangeableProvider(fromProvider),
       route.route.params.fromChain,
     );
 
-    if (!isValidNetwork) {
-      return;
-    }
-
-    const allowance = await getAllowance(changeableProvider, route);
+    const allowance = await getAllowance(updatedFromProvider, route);
 
     const { fromAmount } = route.route.params;
     if (allowance && allowance < BigInt(fromAmount)) {
@@ -298,7 +290,7 @@ export function Review({
         t('views.ADD_TOKENS.handover.requestingApproval.subHeading'),
       );
 
-      const approveTxnReceipt = await approve(changeableProvider, route);
+      const approveTxnReceipt = await approve(updatedFromProvider, route);
 
       if (!approveTxnReceipt) {
         return;
@@ -320,7 +312,7 @@ export function Review({
       t('views.ADD_TOKENS.handover.requestingExecution.subHeading'),
     );
 
-    const executeTxnReceipt = await execute(squid, changeableProvider, route);
+    const executeTxnReceipt = await execute(squid, updatedFromProvider, route);
 
     if (executeTxnReceipt) {
       track({
@@ -373,7 +365,7 @@ export function Review({
     getRouteIntervalIdRef,
     approve,
     showHandover,
-    checkProviderChain,
+    updateFromProviderChain,
     getAllowance,
     execute,
     closeHandover,
