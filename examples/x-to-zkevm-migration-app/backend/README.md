@@ -24,12 +24,15 @@ This service:
 
 ### Installation
 
-1. Install dependencies:
+1. **Install dependencies:**
+
+At the root of the repo, run the following if you haven't already.
 ```bash
-npm install
+yarn install
 ```
 
-2. Set up environment variables:
+2. **Set up environment variables:**
+
 Update the following variables in `.env`:
 ```bash
 # IMX (L2) configuration
@@ -43,13 +46,14 @@ ZKEVM_COLLECTION_ADDRESS=your_zkevm_collection_address
 ```
 
 ### Running with Docker
+1. Make sure you have Docker installed and running.
 
-1. Expose local port:
+2. Expose local port:
 ```bash
 docker-compose up --build
 ```
 
-2. The service will be available at:
+3. The service will be available at:
 ```bash
 # Expose local port
 localhost:3001
