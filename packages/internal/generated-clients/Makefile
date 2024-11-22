@@ -80,4 +80,3 @@ generate-blockchain-data-types:
     -o /app/src/blockchain-data \
     -c /app/config/blockchain-data.config.json \
     --additional-properties=stringEnums=true
-
