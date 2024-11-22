@@ -1,5 +1,5 @@
 {
-  "name": "@tests/checkout-widgets-nextjs",
+  "name": "@tests-fix-post-v2/checkout-widgets-nextjs",
   "version": "0.1.0",
   "private": true,
   "scripts": {
