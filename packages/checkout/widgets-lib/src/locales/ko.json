@@ -834,7 +834,7 @@
         "balance": "잔액",
         "fiatPricePrefix": "≈ USD",
         "zeroFees": "수수료 없음",
-        "includedFees": "수수료 포함"
+        "includedFees": "수수료"
       }
     }
   },

@@ -837,7 +837,7 @@
         "balance": "残高",
         "fiatPricePrefix": "≈ USD",
         "zeroFees": "手数料無料",
-        "includedFees": "手数料込み"
+        "includedFees": "手数料"
       }
     }
   },
