@@ -514,6 +514,8 @@ export class Seaport {
   ): Promise<OrderUseCase<CreateOrderAction>> {
     const seaportLib = this.getSeaportLib();
 
+    console.log('Seaport offerrer address:', offerer);
+
     return seaportLib.createOrder(
       {
         allowPartialFills,
