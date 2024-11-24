@@ -74,7 +74,7 @@ export const getAllowedBalances = async ({
       ...balanceResult,
       token: {
         ...balanceResult.token,
-        icon: getTokenImageByAddress(
+        icon: balanceResult.token.icon ?? getTokenImageByAddress(
           checkout.config.environment as Environment,
           isNativeToken(balanceResult.token.address)
             ? balanceResult.token.symbol
@@ -86,7 +86,7 @@ export const getAllowedBalances = async ({
   // Map token icon assets to allowlist
   allowList.tokens = allowList.tokens.map((token) => ({
     ...token,
-    icon: getTokenImageByAddress(
+    icon: token.icon ?? getTokenImageByAddress(
       checkout.config.environment as Environment,
       isNativeToken(token.address) ? token.symbol : token.address ?? '',
     ),

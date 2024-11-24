@@ -3,9 +3,9 @@ import {
 } from '@biom3/react';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { useState, useEffect } from 'react';
-import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
-import { PASSPORT_URL } from 'lib';
 import { useTranslation } from 'react-i18next';
+import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { PASSPORT_URL } from '../../lib';
 import {
   noTransactionsBodyStyle, noTransactionsContainerStyle, passportBodyStyle, containerStyles,
 } from './noTransactionStyles';

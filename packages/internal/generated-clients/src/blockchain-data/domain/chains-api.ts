@@ -22,13 +22,13 @@ import { APIError500 } from '../models';
 // @ts-ignore
 import { ListChainsResult } from '../models';
 // @ts-ignore
-export { APIError400 } from '../models';
+export type { APIError400 } from '../models';
 // @ts-ignore
-export { APIError404 } from '../models';
+export type { APIError404 } from '../models';
 // @ts-ignore
-export { APIError500 } from '../models';
+export type { APIError500 } from '../models';
 // @ts-ignore
-export { ListChainsResult } from '../models';
+export type { ListChainsResult } from '../models';
 
 /**
  * Request parameters for listChains operation in ChainsApi.

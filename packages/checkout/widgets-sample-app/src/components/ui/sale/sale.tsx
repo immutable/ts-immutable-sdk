@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Environment } from "@imtbl/config";
-import { config, passport } from "@imtbl/sdk";
+import { Environment, ImmutableConfiguration } from "@imtbl/config";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import {
   BridgeEventType,
@@ -27,12 +26,44 @@ const defaultPassportConfig = {
 
 const defaultItems: SaleItem[] = [
   {
-    productId: "biker",
+    productId: "kangaroo",
     qty: 1,
-    name: "Biker Iguana",
+    name: "Kangaroo",
     image:
-      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2023/12/img-IsR4OA7a9IStLeQ9cPo75tII.png",
-    description: "Biker Iguana",
+      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-10-1.png",
+    description: "Kangaroo",
+  },
+  {
+    productId: "kookaburra",
+    qty: 3,
+    name: "Kookaburra",
+    image:
+      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-4-1.png",
+    description: "Kookaburra",
+  },
+  {
+    productId: "quokka",
+    qty: 2,
+    name: "Quokka",
+    image:
+      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-8-1.png",
+    description: "Quokka",
+  },
+  {
+    productId: "ibis",
+    qty: 1,
+    name: "Ibis",
+    image:
+      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-1-1.png",
+    description: "Ibis",
+  },
+  {
+    productId: "emu",
+    qty: 5,
+    name: "Emu",
+    image:
+      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-5-1.png",
+    description: "Emu",
   },
 ];
 
@@ -40,22 +71,26 @@ const useParams = () => {
   const urlParams = new URLSearchParams(window.location.search);
 
   const login = urlParams.get("login") as string;
-  const amount = urlParams.get("amount") as string;
   const environmentId = urlParams.get("environmentId") as string;
   const collectionName = urlParams.get("collectionName") as string;
   const excludePaymentTypes = urlParams
     .get("excludePaymentTypes")
     ?.split(",") as SalePaymentTypes[];
 
-  const multicurrency = urlParams.get("multicurrency") === "true";
+  const preferredCurrency = (urlParams.get("preferredCurrency") as string) ?? undefined;
+  const excludeFiatCurrencies = (urlParams.get("excludeFiatCurrencies") as string) ?? undefined;
+  const hideExcludedPaymentTypes = Boolean(
+    urlParams.get("hideExcludedPaymentTypes")
+  );
 
   return {
     login,
-    amount,
     environmentId,
     collectionName,
     excludePaymentTypes,
-    multicurrency,
+    preferredCurrency,
+    hideExcludedPaymentTypes,
+    excludeFiatCurrencies: excludeFiatCurrencies?.split(","),
   };
 };
 
@@ -73,9 +108,9 @@ const usePassportInstance = (passportConfig: any) => {
     return undefined;
   }
 
-  const passportInstance = new passport.Passport({
-    baseConfig: new config.ImmutableConfiguration({
-      environment: environment || config.Environment.SANDBOX,
+  const passportInstance = new Passport({
+    baseConfig: new ImmutableConfiguration({
+      environment: environment || Environment.SANDBOX,
     }),
     clientId,
     redirectUri,
@@ -91,11 +126,12 @@ export function SaleUI() {
   const params = useParams();
   const {
     login,
-    amount,
     environmentId,
     collectionName,
     excludePaymentTypes,
-    multicurrency,
+    preferredCurrency,
+    hideExcludedPaymentTypes,
+    excludeFiatCurrencies,
   } = params;
   const [passportConfig, setPassportConfig] = useState(
     JSON.stringify(defaultPassportConfig, null, 2)
@@ -115,44 +151,57 @@ export function SaleUI() {
     [passportInstance]
   );
   const factory = useMemo(
-    () => new WidgetsFactory(checkout, { theme: WidgetTheme.DARK }),
+    () =>
+      new WidgetsFactory(checkout, {
+        theme: WidgetTheme.DARK,
+        walletConnect: {
+          projectId: "938b553484e344b1e0b4bb80edf8c362",
+          metadata: {
+            name: "Checkout Marketplace",
+            description: "Checkout Marketplace",
+            url: "http://localhost:3000/marketplace-orchestrator",
+            icons: [],
+          },
+        },
+      }),
     [checkout]
   );
   const saleWidget = useMemo(
     () =>
       factory.create(WidgetType.SALE, {
-        config: { theme: WidgetTheme.DARK, multicurrency },
+        config: { theme: WidgetTheme.DARK, hideExcludedPaymentTypes },
       }),
-    [factory, amount, environmentId, collectionName, defaultItems]
+    [factory, environmentId, collectionName, defaultItems]
   );
   const bridgeWidget = useMemo(
     () =>
       factory.create(WidgetType.BRIDGE, {
         config: { theme: WidgetTheme.DARK },
       }),
-    [factory, amount, environmentId, collectionName, defaultItems]
+    [factory, environmentId, collectionName, defaultItems]
   );
   const swapWidget = useMemo(
     () =>
       factory.create(WidgetType.SWAP, { config: { theme: WidgetTheme.DARK } }),
-    [factory, amount, environmentId, collectionName, defaultItems]
+    [factory, environmentId, collectionName, defaultItems]
   );
   const onrampWidget = useMemo(
     () =>
       factory.create(WidgetType.ONRAMP, {
         config: { theme: WidgetTheme.DARK },
       }),
-    [factory, amount, environmentId, collectionName, defaultItems]
+    [factory, environmentId, collectionName, defaultItems]
   );
 
   // mount sale widget and subscribe to close event
   useEffect(() => {
     saleWidget.mount("sale", {
-      amount,
       environmentId,
       collectionName,
       items: defaultItems,
       excludePaymentTypes,
+      excludeFiatCurrencies,
+      preferredCurrency,
     });
     saleWidget.addListener(SaleEventType.CLOSE_WIDGET, () => {
       saleWidget.unmount();
@@ -179,7 +228,7 @@ export function SaleUI() {
     saleWidget.addListener(SaleEventType.REQUEST_ONRAMP, (event) => {
       saleWidget.unmount();
 
-      onrampWidget.mount("onramp");
+      onrampWidget.mount("onramp", event);
       onrampWidget.addListener(OnRampEventType.CLOSE_WIDGET, () => {
         onrampWidget.unmount();
       });
@@ -250,11 +299,12 @@ export function SaleUI() {
       <button
         onClick={() =>
           saleWidget.mount("sale", {
-            amount,
             environmentId,
             collectionName,
             items: defaultItems,
             excludePaymentTypes,
+            preferredCurrency,
+            excludeFiatCurrencies,
           })
         }
       >

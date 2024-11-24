@@ -196,6 +196,7 @@ describe('view-context', () => {
             {
               type: BridgeWidgetViews.IN_PROGRESS,
               transactionHash: '',
+              isTransfer: false,
             },
             {
               type: BridgeWidgetViews.BRIDGE_FAILURE,
@@ -233,6 +234,7 @@ describe('view-context', () => {
             {
               type: BridgeWidgetViews.IN_PROGRESS,
               transactionHash: '',
+              isTransfer: false,
             },
             {
               type: BridgeWidgetViews.BRIDGE_FAILURE,
@@ -270,6 +272,7 @@ describe('view-context', () => {
             {
               type: BridgeWidgetViews.IN_PROGRESS,
               transactionHash: '',
+              isTransfer: false,
             },
             {
               type: BridgeWidgetViews.BRIDGE_FAILURE,
@@ -292,6 +295,7 @@ describe('view-context', () => {
           {
             type: BridgeWidgetViews.IN_PROGRESS,
             transactionHash: '',
+            isTransfer: false,
           },
           {
             type: BridgeWidgetViews.BRIDGE_FAILURE,

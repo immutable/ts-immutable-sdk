@@ -17,6 +17,7 @@ describe('allowanceAggregator', () => {
             tokenAddress: '0xERC20_1',
             amount: BigNumber.from(1),
             spenderAddress: '0xSEAPORT',
+            isFee: false,
           },
           approvalTransaction: undefined,
         },
@@ -27,6 +28,7 @@ describe('allowanceAggregator', () => {
             tokenAddress: '0xERC20_2',
             amount: BigNumber.from(1),
             spenderAddress: '0xSEAPORT',
+            isFee: false,
           },
         },
       ],
@@ -43,7 +45,11 @@ describe('allowanceAggregator', () => {
         },
       }],
     };
-    const result = allowanceAggregator(erc20Allowances, erc721Allowances);
+    const erc1155Allowances: ItemAllowance = {
+      sufficient: true,
+      allowances: [],
+    };
+    const result = allowanceAggregator(erc20Allowances, erc721Allowances, erc1155Allowances);
     expect(result).toEqual([{
       sufficient: false,
       type: ItemType.ERC20,
@@ -52,6 +58,67 @@ describe('allowanceAggregator', () => {
         type: ItemType.ERC20,
         tokenAddress: '0xERC20_1',
         amount: BigNumber.from(1),
+        spenderAddress: '0xSEAPORT',
+        isFee: false,
+      },
+      approvalTransaction: undefined,
+    }]);
+  });
+
+  it('should return an array with the insufficient ERC1155 allowance', () => {
+    const erc20Allowances: ItemAllowance = {
+      sufficient: true,
+      allowances: [{
+        sufficient: true,
+        itemRequirement: {
+          type: ItemType.ERC20,
+          tokenAddress: '0xERC20',
+          amount: BigNumber.from(1),
+          spenderAddress: '0xSEAPORT',
+          isFee: false,
+        },
+      }],
+    };
+    const erc721Allowances: ItemAllowance = {
+      sufficient: true,
+      allowances: [
+        {
+          sufficient: true,
+          itemRequirement: {
+            type: ItemType.ERC721,
+            contractAddress: '0xERC721',
+            id: '0xID',
+            spenderAddress: '0xSEAPORT',
+          },
+        },
+      ],
+    };
+    const erc1155Allowances: ItemAllowance = {
+      sufficient: false,
+      allowances: [
+        {
+          sufficient: false,
+          approvalTransaction: undefined,
+          type: ItemType.ERC1155,
+          itemRequirement: {
+            amount: BigNumber.from(10),
+            type: ItemType.ERC1155,
+            contractAddress: '0xERC1155',
+            id: '0xID',
+            spenderAddress: '0xSEAPORT',
+          },
+        },
+      ],
+    };
+    const result = allowanceAggregator(erc20Allowances, erc721Allowances, erc1155Allowances);
+    expect(result).toEqual([{
+      sufficient: false,
+      type: ItemType.ERC1155,
+      itemRequirement: {
+        amount: BigNumber.from(10),
+        type: ItemType.ERC1155,
+        contractAddress: '0xERC1155',
+        id: '0xID',
         spenderAddress: '0xSEAPORT',
       },
       approvalTransaction: undefined,
@@ -68,6 +135,7 @@ describe('allowanceAggregator', () => {
           tokenAddress: '0xERC20',
           amount: BigNumber.from(1),
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
       }],
     };
@@ -96,7 +164,11 @@ describe('allowanceAggregator', () => {
         },
       ],
     };
-    const result = allowanceAggregator(erc20Allowances, erc721Allowances);
+    const erc1155Allowances: ItemAllowance = {
+      sufficient: true,
+      allowances: [],
+    };
+    const result = allowanceAggregator(erc20Allowances, erc721Allowances, erc1155Allowances);
     expect(result).toEqual([{
       sufficient: false,
       type: ItemType.ERC721,
@@ -110,7 +182,7 @@ describe('allowanceAggregator', () => {
     }]);
   });
 
-  it('should return an array with both allowances if they are not sufficient', () => {
+  it('should return an array with all allowances if they are not sufficient', () => {
     const erc20Allowances: ItemAllowance = {
       sufficient: false,
       allowances: [{
@@ -122,6 +194,7 @@ describe('allowanceAggregator', () => {
           tokenAddress: '0xERC20',
           amount: BigNumber.from(1),
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         approvalTransaction: undefined,
       }],
@@ -140,7 +213,24 @@ describe('allowanceAggregator', () => {
         approvalTransaction: undefined,
       }],
     };
-    const result = allowanceAggregator(erc20Allowances, erc721Allowances);
+    const erc1155Allowances: ItemAllowance = {
+      sufficient: false,
+      allowances: [
+        {
+          sufficient: false,
+          approvalTransaction: undefined,
+          type: ItemType.ERC1155,
+          itemRequirement: {
+            amount: BigNumber.from(10),
+            type: ItemType.ERC1155,
+            contractAddress: '0xERC1155',
+            id: '0xID',
+            spenderAddress: '0xSEAPORT',
+          },
+        },
+      ],
+    };
+    const result = allowanceAggregator(erc20Allowances, erc721Allowances, erc1155Allowances);
     expect(result).toEqual(expect.arrayContaining([
       {
         sufficient: false,
@@ -151,6 +241,7 @@ describe('allowanceAggregator', () => {
           tokenAddress: '0xERC20',
           amount: BigNumber.from(1),
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         approvalTransaction: undefined,
       },
@@ -165,10 +256,22 @@ describe('allowanceAggregator', () => {
         },
         approvalTransaction: undefined,
       },
+      {
+        sufficient: false,
+        type: ItemType.ERC1155,
+        itemRequirement: {
+          amount: BigNumber.from(10),
+          type: ItemType.ERC1155,
+          contractAddress: '0xERC1155',
+          id: '0xID',
+          spenderAddress: '0xSEAPORT',
+        },
+        approvalTransaction: undefined,
+      },
     ]));
   });
 
-  it('should return an empty array if both allowances are sufficient', () => {
+  it('should return an empty array if all allowances are sufficient', () => {
     const erc20Allowances: ItemAllowance = {
       sufficient: true,
       allowances: [
@@ -179,6 +282,7 @@ describe('allowanceAggregator', () => {
             tokenAddress: '0xERC20',
             amount: BigNumber.from(1),
             spenderAddress: '0xSEAPORT',
+            isFee: false,
           },
         },
       ],
@@ -197,7 +301,22 @@ describe('allowanceAggregator', () => {
         },
       ],
     };
-    const result = allowanceAggregator(erc20Allowances, erc721Allowances);
+    const erc1155Allowances: ItemAllowance = {
+      sufficient: true,
+      allowances: [
+        {
+          sufficient: true,
+          itemRequirement: {
+            type: ItemType.ERC1155,
+            amount: BigNumber.from(5),
+            contractAddress: '0xERC1155',
+            id: '0xID',
+            spenderAddress: '0xSEAPORT',
+          },
+        },
+      ],
+    };
+    const result = allowanceAggregator(erc20Allowances, erc721Allowances, erc1155Allowances);
     expect(result).toEqual([]);
   });
 });

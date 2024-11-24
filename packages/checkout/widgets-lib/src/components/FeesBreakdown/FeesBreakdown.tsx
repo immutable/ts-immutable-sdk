@@ -1,22 +1,16 @@
 import {
   Drawer, Box, Divider, MenuItem,
 } from '@biom3/react';
-import { formatZeroAmount, tokenValueFormat } from 'lib/utils';
 import { useTranslation } from 'react-i18next';
+import { formatZeroAmount, tokenValueFormat } from '../../lib/utils';
+import { FormattedFee } from '../../widgets/swap/functions/swapFees';
 import { feeItemContainerStyles, feeItemLoadingStyles, feesBreakdownContentStyles } from './FeesBreakdownStyles';
 import { FeeItem } from './FeeItem';
 import { FooterLogo } from '../Footer/FooterLogo';
 
-type Fee = {
-  label: string;
-  amount: string;
-  fiatAmount: string;
-  prefix?: string;
-};
-
 type FeesBreakdownProps = {
   onCloseDrawer?: () => void;
-  fees: Fee[];
+  fees: FormattedFee[];
   children?: any;
   visible?: boolean;
   totalFiatAmount?: string;
@@ -36,6 +30,7 @@ export function FeesBreakdown({
   loading = false,
 }: FeesBreakdownProps) {
   const { t } = useTranslation();
+
   return (
     <Drawer
       headerBarTitle={t('drawers.feesBreakdown.heading')}
@@ -62,13 +57,14 @@ export function FeesBreakdown({
               amount,
               fiatAmount,
               prefix,
+              token,
             }) => (
               <FeeItem
                 key={label}
                 label={label}
                 amount={amount}
                 fiatAmount={fiatAmount}
-                tokenSymbol={tokenSymbol}
+                tokenSymbol={token.symbol ?? tokenSymbol}
                 prefix={prefix}
               />
             ))
@@ -81,7 +77,7 @@ export function FeesBreakdown({
                 label={t('drawers.feesBreakdown.total')}
                 amount={tokenValueFormat(totalAmount)}
                 fiatAmount={totalFiatAmount
-                  ? `~ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${totalFiatAmount}`
+                  ? `≈ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${totalFiatAmount}`
                   : formatZeroAmount('0')}
                 tokenSymbol={tokenSymbol}
                 boldLabel

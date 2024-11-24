@@ -10,13 +10,6 @@ import {
   useMemo,
   useReducer,
 } from 'react';
-import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
-import { CryptoFiatProvider } from 'context/crypto-fiat-context/CryptoFiatProvider';
-import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
-import { BridgeClaimWithdrawalFailure, BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
-import { StatusView } from 'components/Status/StatusView';
-import { StatusType } from 'components/Status/StatusType';
-import { ImmutableConfiguration } from '@imtbl/config';
 import {
   BridgeConfiguration,
   ETH_MAINNET_TO_ZKEVM_MAINNET,
@@ -24,13 +17,19 @@ import {
   ETH_SEPOLIA_TO_ZKEVM_TESTNET,
   TokenBridge,
 } from '@imtbl/bridge-sdk';
-import { getL1ChainId, getL2ChainId } from 'lib';
-import { Transactions } from 'components/Transactions/Transactions';
-import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
-import { TopUpView } from 'views/top-up/TopUpView';
 import { useTranslation } from 'react-i18next';
-import { ClaimWithdrawalInProgress } from 'components/Transactions/ClaimWithdrawalInProgress';
-import { getDefaultTokenImage } from 'lib/utils';
+import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { ImmutableConfiguration } from '@imtbl/config';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
+import { StatusView } from '../../components/Status/StatusView';
+import { StatusType } from '../../components/Status/StatusType';
+import { getL1ChainId, getL2ChainId } from '../../lib';
+import { Transactions } from '../../components/Transactions/Transactions';
+import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { TopUpView } from '../../views/top-up/TopUpView';
+import { ClaimWithdrawalInProgress } from '../../components/Transactions/ClaimWithdrawalInProgress';
+import { getDefaultTokenImage } from '../../lib/utils';
 import {
   ViewActions,
   ViewContext,
@@ -59,8 +58,11 @@ import {
 } from './BridgeWidgetEvents';
 import {
   BridgeClaimWithdrawalSuccess,
+  BridgeClaimWithdrawalFailure,
+  BridgeWidgetViews,
 } from '../../context/view-context/BridgeViewContextTypes';
 import { ClaimWithdrawal } from './views/ClaimWithdrawal';
+import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
@@ -74,6 +76,7 @@ export default function BridgeWidget({
   config,
   amount,
   tokenAddress,
+  showBackButton,
 }: BridgeWidgetInputs) {
   const { t } = useTranslation();
   const {
@@ -200,10 +203,15 @@ export default function BridgeWidget({
       <BridgeContext.Provider value={bridgeReducerValues}>
         <CryptoFiatProvider environment={environment}>
           {viewState.view.type === BridgeWidgetViews.WALLET_NETWORK_SELECTION && (
-            <WalletNetworkSelectionView />
+            <WalletNetworkSelectionView showBackButton={showBackButton} />
           )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_FORM && (
-            <Bridge amount={amount} tokenAddress={tokenAddress} defaultTokenImage={defaultTokenImage} />
+            <Bridge
+              amount={amount}
+              tokenAddress={tokenAddress}
+              defaultTokenImage={defaultTokenImage}
+              theme={theme}
+            />
           )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_REVIEW && (
             <BridgeReview />
@@ -211,6 +219,7 @@ export default function BridgeWidget({
           {viewState.view.type === BridgeWidgetViews.IN_PROGRESS && (
             <MoveInProgress
               transactionHash={viewState.view.transactionHash}
+              isTransfer={viewState.view.isTransfer}
             />
           )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_FAILURE
@@ -242,8 +251,9 @@ export default function BridgeWidget({
 
           {viewState.view.type === BridgeWidgetViews.APPROVE_TRANSACTION && (
             <ApproveTransaction
-              approveTransaction={viewState.view.approveTransaction}
-              transaction={viewState.view.transaction}
+              bridgeTransaction={viewState.view.approveTransaction && viewState.view.transaction
+                ? { approveTransaction: viewState.view.approveTransaction, transaction: viewState.view.transaction }
+                : undefined}
             />
           )}
           {viewState.view.type === BridgeWidgetViews.TRANSACTIONS && (
@@ -327,6 +337,19 @@ export default function BridgeWidget({
               statusType={StatusType.FAILURE}
               onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
               testId="claim-withdrawal-fail-view"
+            />
+          )}
+          {viewState.view.type === BridgeWidgetViews.SERVICE_UNAVAILABLE && (
+            <ServiceUnavailableErrorView
+              onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
+              onBackButtonClick={() => {
+                viewDispatch({
+                  payload: {
+                    type: ViewActions.UPDATE_VIEW,
+                    view: { type: BridgeWidgetViews.WALLET_NETWORK_SELECTION },
+                  },
+                });
+              }}
             />
           )}
         </CryptoFiatProvider>

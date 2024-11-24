@@ -1,4 +1,4 @@
-import { ERC20 } from 'types';
+import { ERC20 } from '../../types';
 import { generateERC20Pairs, ERC20Pair } from './generateERC20Pairs';
 import {
   FUN_TEST_TOKEN,

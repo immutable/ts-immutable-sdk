@@ -3,10 +3,13 @@ import {
   WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
-import LoadingButton from './LoadingButton';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
-import { Box } from '@biom3/react';
+import { Box, Select, Stack } from '@biom3/react';
+import { passport } from '../passport';
+
+// Connect Passport EVM
+passport.connectEvm();
 
 interface ProviderProps {
   checkout: Checkout;
@@ -16,6 +19,7 @@ interface ProviderProps {
 
 export default function Provider(props: ProviderProps) {
   const { setProvider, checkout, provider } = props;
+  const injectedProviders = useMemo(() => checkout && checkout.getInjectedProviders(), [checkout])
 
   const [result1, setResult1] = useState<Web3Provider>();
 
@@ -23,7 +27,7 @@ export default function Provider(props: ProviderProps) {
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  async function createMetamaskClick() {
+  async function createProviderClick() {
     setError1(null);
     setLoading(true);
     try {
@@ -43,6 +47,14 @@ export default function Provider(props: ProviderProps) {
     }
   }
 
+  const handleSelectChange = (providerRdns: any) => {
+    const selectedProvider = injectedProviders.find((providerDetail) => providerDetail.info.rdns === providerRdns);
+    const web3Provider = new Web3Provider(selectedProvider?.provider as any);
+    setProvider(web3Provider);
+    setResult1(web3Provider);
+    setLoading(false);
+  }
+
   useEffect(() => {
     // reset state wehn checkout changes from environment switch
     setResult1(undefined);
@@ -57,9 +69,17 @@ export default function Provider(props: ProviderProps) {
           marginTop: 'base.spacing.x4',
         }}
       >
-        <LoadingButton onClick={createMetamaskClick} loading={loading}>
-          Create Metamask Web3Provider
-        </LoadingButton>
+        <Stack direction="row" alignItems="center">
+          <Select onSelectChange={handleSelectChange}>
+            {injectedProviders?.map((providerDetail) => (
+              <Select.Option key={providerDetail.info.rdns} optionKey={providerDetail.info.rdns}>
+                <img src={providerDetail.info.icon} width="36px" height="36px"></img>
+                <Select.Option.Label>{providerDetail.info.name}</Select.Option.Label>
+                <Select.Option.Caption>{providerDetail.info.rdns}</Select.Option.Caption>
+              </Select.Option>
+            ))}
+          </Select>
+        </Stack>
         {result1 && !error1 && (
           <SuccessMessage>Web3Provider Created.</SuccessMessage>
         )}

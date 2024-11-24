@@ -1,9 +1,9 @@
 import React from 'react';
-import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
-import { withDefaultWidgetConfigs } from 'lib/withDefaultWidgetConfig';
 import { Checkout, WidgetTheme } from '@imtbl/checkout-sdk';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { I18nextProvider } from 'react-i18next';
+import { ThemeProvider } from '../../../components/ThemeProvider/ThemeProvider';
+import { withDefaultWidgetConfigs } from '../../../lib/withDefaultWidgetConfig';
+import { CustomAnalyticsProvider } from '../../analytics-provider/CustomAnalyticsProvider';
 import i18n from '../../../i18n';
 
 export interface TestProps {

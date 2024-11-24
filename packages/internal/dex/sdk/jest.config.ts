@@ -4,9 +4,7 @@ const config: Config = {
   clearMocks: true,
   coverageProvider: 'v8',
   moduleDirectories: ['node_modules', 'src'],
-  moduleNameMapper: {
-    '@imtbl/config': '<rootDir>../../../config/src'
-  },
+  moduleNameMapper: { '^@imtbl/(.*)$': '<rootDir>/../../../../node_modules/@imtbl/$1/src' },
   verbose: true,
   testEnvironment: 'jsdom',
   transform: {
@@ -14,6 +12,7 @@ const config: Config = {
   },
   coveragePathIgnorePatterns:['node_modules', 'src/contracts/', 'src/test/'],
   transformIgnorePatterns: [],
+  modulePathIgnorePatterns: ['<rootDir>/.yalc'],
 };
 
 export default config;

@@ -133,6 +133,7 @@ export interface EIP6963ProviderInfo {
 /**
  * Event type to announce an EIP-1193 Provider.
  */
-export interface EIP6963AnnounceProviderEvent extends CustomEvent<EIP6963ProviderDetail> {
-  type: 'eip6963:announceProvider'
+export interface EIP6963AnnounceProviderEvent
+  extends CustomEvent<EIP6963ProviderDetail> {
+  type: 'eip6963:announceProvider';
 }

@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useReducer } from 'react';
 import { Checkout } from '@imtbl/checkout-sdk';
-import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
+import { ViewContextTestComponent } from '../../../context/view-context/test-components/ViewContextTestComponent';
 import {
   initialBridgeState,
   BridgeContext,

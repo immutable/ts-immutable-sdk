@@ -1,33 +1,40 @@
-import * as guardian from '@imtbl/guardian';
-import { TransactionApprovalRequestChainTypeEnum, TransactionEvaluationResponse } from '@imtbl/guardian';
+import * as GeneratedClients from '@imtbl/generated-clients';
 import { BigNumber, ethers } from 'ethers';
-import { PassportError, PassportErrorType } from 'errors/passportError';
+import axios from 'axios';
 import AuthManager from '../authManager';
 import { ConfirmationScreen } from '../confirmation';
 import { retryWithDelay } from '../network/retry';
-import { JsonRpcError, RpcErrorCode } from '../zkEvm/JsonRpcError';
+import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from '../zkEvm/JsonRpcError';
 import { MetaTransaction, TypedDataPayload } from '../zkEvm/types';
 import { PassportConfiguration } from '../config';
+import { getEip155ChainId } from '../zkEvm/walletHelpers';
+import { PassportError, PassportErrorType } from '../errors/passportError';
 
 export type GuardianClientParams = {
   confirmationScreen: ConfirmationScreen;
   config: PassportConfiguration;
   authManager: AuthManager;
+  guardianApi: GeneratedClients.mr.GuardianApi;
 };
 
 export type GuardianEvaluateImxTransactionParams = {
   payloadHash: string;
 };
 
-type GuardianEVMValidationParams = {
+type GuardianEVMTxnEvaluationParams = {
   chainId: string;
   nonce: string;
   metaTransactions: MetaTransaction[];
 };
 
-type GuardianMessageValidationParams = {
+type GuardianEIP712MessageEvaluationParams = {
   chainID: string;
   payload: TypedDataPayload;
+};
+
+type GuardianERC191MessageEvaluationParams = {
+  chainID: number;
+  payload: string;
 };
 
 const transactionRejectedCrossSdkBridgeError = 'Transaction requires confirmation but this functionality is not'
@@ -39,7 +46,7 @@ export const convertBigNumberishToString = (
 
 const transformGuardianTransactions = (
   txs: MetaTransaction[],
-): guardian.MetaTransaction[] => {
+): GeneratedClients.mr.MetaTransaction[] => {
   try {
     return txs.map((t) => ({
       delegateCall: t.delegateCall === true,
@@ -59,9 +66,7 @@ const transformGuardianTransactions = (
 };
 
 export default class GuardianClient {
-  private readonly transactionAPI: guardian.TransactionsApi;
-
-  private readonly messageAPI: guardian.MessagesApi;
+  private readonly guardianApi: GeneratedClients.mr.GuardianApi;
 
   private readonly confirmationScreen: ConfirmationScreen;
 
@@ -69,12 +74,12 @@ export default class GuardianClient {
 
   private readonly authManager: AuthManager;
 
-  constructor({ confirmationScreen, config, authManager }: GuardianClientParams) {
-    const guardianConfiguration = new guardian.Configuration({ basePath: config.imxPublicApiDomain });
+  constructor({
+    confirmationScreen, config, authManager, guardianApi,
+  }: GuardianClientParams) {
     this.confirmationScreen = confirmationScreen;
     this.crossSdkBridgeEnabled = config.crossSdkBridgeEnabled;
-    this.messageAPI = new guardian.MessagesApi(guardianConfiguration);
-    this.transactionAPI = new guardian.TransactionsApi(guardianConfiguration);
+    this.guardianApi = guardianApi;
     this.authManager = authManager;
   }
 
@@ -99,6 +104,11 @@ export default class GuardianClient {
       try {
         return await task();
       } catch (err) {
+        if (err instanceof PassportError && err.type === PassportErrorType.SERVICE_UNAVAILABLE_ERROR) {
+          await this.confirmationScreen.showServiceUnavailable();
+          throw err;
+        }
+
         this.confirmationScreen.closeWindow();
         throw err;
       }
@@ -110,48 +120,55 @@ export default class GuardianClient {
   }
 
   public async evaluateImxTransaction({ payloadHash }: GuardianEvaluateImxTransactionParams): Promise<void> {
-    const finallyFn = () => {
-      this.confirmationScreen.closeWindow();
-    };
-    const user = await this.authManager.getUserImx();
+    try {
+      const finallyFn = () => {
+        this.confirmationScreen.closeWindow();
+      };
+      const user = await this.authManager.getUserImx();
 
-    const headers = { Authorization: `Bearer ${user.accessToken}` };
-    const transactionRes = await retryWithDelay(
-      async () => this.transactionAPI.getTransactionByID({
-        transactionID: payloadHash,
-        chainType: 'starkex',
-      }, { headers }),
-      { finallyFn },
-    );
-
-    if (!transactionRes.data.id) {
-      throw new Error("Transaction doesn't exists");
-    }
-
-    const evaluateImxRes = await this.transactionAPI.evaluateTransaction({
-      id: payloadHash,
-      transactionEvaluationRequest: {
-        chainType: 'starkex',
-      },
-    }, { headers });
-
-    const { confirmationRequired } = evaluateImxRes.data;
-    if (confirmationRequired) {
-      if (this.crossSdkBridgeEnabled) {
-        throw new Error(transactionRejectedCrossSdkBridgeError);
-      }
-
-      const confirmationResult = await this.confirmationScreen.requestConfirmation(
-        payloadHash,
-        user.imx.ethAddress,
-        TransactionApprovalRequestChainTypeEnum.Starkex,
+      const headers = { Authorization: `Bearer ${user.accessToken}` };
+      const transactionRes = await retryWithDelay(
+        async () => this.guardianApi.getTransactionByID({
+          transactionID: payloadHash,
+          chainType: 'starkex',
+        }, { headers }),
+        { finallyFn },
       );
 
-      if (!confirmationResult.confirmed) {
-        throw new Error('Transaction rejected by user');
+      if (!transactionRes.data.id) {
+        throw new Error("Transaction doesn't exists");
       }
-    } else {
-      this.confirmationScreen.closeWindow();
+
+      const evaluateImxRes = await this.guardianApi.evaluateTransaction({
+        id: payloadHash,
+        transactionEvaluationRequest: {
+          chainType: 'starkex',
+        },
+      }, { headers });
+
+      const { confirmationRequired } = evaluateImxRes.data;
+      if (confirmationRequired) {
+        if (this.crossSdkBridgeEnabled) {
+          throw new Error(transactionRejectedCrossSdkBridgeError);
+        }
+
+        const confirmationResult = await this.confirmationScreen.requestConfirmation(
+          payloadHash,
+          user.imx.ethAddress,
+          GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Starkex,
+        );
+
+        if (!confirmationResult.confirmed) {
+          throw new Error('Transaction rejected by user');
+        }
+      } else {
+        this.confirmationScreen.closeWindow();
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 403) {
+        throw new PassportError('Service unavailable', PassportErrorType.SERVICE_UNAVAILABLE_ERROR);
+      }
+      throw error;
     }
   }
 
@@ -159,12 +176,12 @@ export default class GuardianClient {
     chainId,
     nonce,
     metaTransactions,
-  }: GuardianEVMValidationParams): Promise<TransactionEvaluationResponse> {
+  }: GuardianEVMTxnEvaluationParams): Promise<GeneratedClients.mr.TransactionEvaluationResponse> {
     const user = await this.authManager.getUserZkEvm();
     const headers = { Authorization: `Bearer ${user.accessToken}` };
     const guardianTransactions = transformGuardianTransactions(metaTransactions);
     try {
-      const transactionEvaluationResponseAxiosResponse = await this.transactionAPI.evaluateTransaction(
+      const response = await this.guardianApi.evaluateTransaction(
         {
           id: 'evm',
           transactionEvaluationRequest: {
@@ -179,8 +196,13 @@ export default class GuardianClient {
         },
         { headers },
       );
-      return transactionEvaluationResponseAxiosResponse.data;
+
+      return response.data;
     } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 403) {
+        throw new PassportError('Service unavailable', PassportErrorType.SERVICE_UNAVAILABLE_ERROR);
+      }
+
       const errorMessage = error instanceof Error ? error.message : String(error);
       throw new JsonRpcError(
         RpcErrorCode.INTERNAL_ERROR,
@@ -193,7 +215,7 @@ export default class GuardianClient {
     chainId,
     nonce,
     metaTransactions,
-  }: GuardianEVMValidationParams): Promise<void> {
+  }: GuardianEVMTxnEvaluationParams): Promise<void> {
     const transactionEvaluationResponse = await this.evaluateEVMTransaction({
       chainId,
       nonce,
@@ -213,7 +235,7 @@ export default class GuardianClient {
       const confirmationResult = await this.confirmationScreen.requestConfirmation(
         transactionId,
         user.zkEvm.ethAddress,
-        TransactionApprovalRequestChainTypeEnum.Evm,
+        GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Evm,
         chainId,
       );
 
@@ -228,27 +250,33 @@ export default class GuardianClient {
     }
   }
 
-  private async evaluateMessage(
-    { chainID, payload }:GuardianMessageValidationParams,
-  ): Promise<guardian.MessageEvaluationResponse> {
+  private async handleEIP712MessageEvaluation(
+    { chainID, payload }: GuardianEIP712MessageEvaluationParams,
+  ): Promise<GeneratedClients.mr.MessageEvaluationResponse> {
     try {
       const user = await this.authManager.getUserZkEvm();
       if (user === null) {
-        throw new PassportError('evaluateMessage requires a valid ID token or refresh token. Please log in first', PassportErrorType.NOT_LOGGED_IN_ERROR);
+        throw new JsonRpcError(
+          ProviderErrorCode.UNAUTHORIZED,
+          'User not logged in. Please log in first.',
+        );
       }
-      const messageEvalResponse = await this.messageAPI.evaluateMessage(
+      const messageEvalResponse = await this.guardianApi.evaluateMessage(
         { messageEvaluationRequest: { chainID, payload } },
         { headers: { Authorization: `Bearer ${user.accessToken}` } },
       );
       return messageEvalResponse.data;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Message failed to validate with error: ${errorMessage}`);
+      throw new JsonRpcError(
+        RpcErrorCode.INTERNAL_ERROR,
+        `Message failed to validate with error: ${errorMessage}`,
+      );
     }
   }
 
-  public async validateMessage({ chainID, payload }: GuardianMessageValidationParams) {
-    const { messageId, confirmationRequired } = await this.evaluateMessage({ chainID, payload });
+  public async evaluateEIP712Message({ chainID, payload }: GuardianEIP712MessageEvaluationParams) {
+    const { messageId, confirmationRequired } = await this.handleEIP712MessageEvaluation({ chainID, payload });
     if (confirmationRequired && this.crossSdkBridgeEnabled) {
       throw new JsonRpcError(RpcErrorCode.TRANSACTION_REJECTED, transactionRejectedCrossSdkBridgeError);
     }
@@ -257,6 +285,61 @@ export default class GuardianClient {
       const confirmationResult = await this.confirmationScreen.requestMessageConfirmation(
         messageId,
         user.zkEvm.ethAddress,
+        'eip712',
+      );
+
+      if (!confirmationResult.confirmed) {
+        throw new JsonRpcError(
+          RpcErrorCode.TRANSACTION_REJECTED,
+          'Signature rejected by user',
+        );
+      }
+    } else {
+      this.confirmationScreen.closeWindow();
+    }
+  }
+
+  private async handleERC191MessageEvaluation(
+    { chainID, payload }: GuardianERC191MessageEvaluationParams,
+  ): Promise<GeneratedClients.mr.MessageEvaluationResponse> {
+    try {
+      const user = await this.authManager.getUserZkEvm();
+      if (user === null) {
+        throw new JsonRpcError(
+          ProviderErrorCode.UNAUTHORIZED,
+          'User not logged in. Please log in first.',
+        );
+      }
+      const messageEvalResponse = await this.guardianApi.evaluateErc191Message(
+        {
+          eRC191MessageEvaluationRequest: {
+            chainID: getEip155ChainId(chainID),
+            payload,
+          },
+        },
+        { headers: { Authorization: `Bearer ${user.accessToken}` } },
+      );
+      return messageEvalResponse.data;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new JsonRpcError(
+        RpcErrorCode.INTERNAL_ERROR,
+        `Message failed to validate with error: ${errorMessage}`,
+      );
+    }
+  }
+
+  public async evaluateERC191Message({ chainID, payload }: GuardianERC191MessageEvaluationParams) {
+    const { messageId, confirmationRequired } = await this.handleERC191MessageEvaluation({ chainID, payload });
+    if (confirmationRequired && this.crossSdkBridgeEnabled) {
+      throw new JsonRpcError(RpcErrorCode.TRANSACTION_REJECTED, transactionRejectedCrossSdkBridgeError);
+    }
+    if (confirmationRequired && !!messageId) {
+      const user = await this.authManager.getUserZkEvm();
+      const confirmationResult = await this.confirmationScreen.requestMessageConfirmation(
+        messageId,
+        user.zkEvm.ethAddress,
+        'erc191',
       );
 
       if (!confirmationResult.confirmed) {

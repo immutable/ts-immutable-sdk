@@ -1,18 +1,21 @@
-import { useRef, useState } from 'react';
-import { TransactionRequirement } from '@imtbl/checkout-sdk';
+import { useContext, useRef, useState } from 'react';
+import { TokenBalance, TransactionRequirement } from '@imtbl/checkout-sdk';
+import { CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { fetchFundingBalances } from '../functions/fetchFundingBalances';
 import { FundingBalance, FundingBalanceResult } from '../types';
 import { useSaleContext } from '../context/SaleContextProvider';
+import { getPricingBySymbol } from '../utils/pricing';
 
 export const useFundingBalances = () => {
   const fetching = useRef(false);
   const {
     fromTokenAddress,
-    clientConfig,
+    orderQuote,
     provider,
     checkout,
     selectedCurrency,
   } = useSaleContext();
+  const { cryptoFiatState } = useContext(CryptoFiatContext);
   const [transactionRequirement, setTransactionRequirement] = useState<
   TransactionRequirement | undefined
   >();
@@ -21,17 +24,18 @@ export const useFundingBalances = () => {
   FundingBalanceResult[]
   >([]);
   const [loadingBalances, setLoadingBalances] = useState(false);
+  const [gasFees, setGasFees] = useState<TokenBalance | undefined>();
 
   const queryFundingBalances = () => {
     if (
       !fromTokenAddress
       || !provider
       || !checkout
-      || !clientConfig
+      || !orderQuote
       || !selectedCurrency
     ) return;
 
-    if (fetching.current) return;
+    if (fetching.current || loadingBalances) return;
 
     (async () => {
       fetching.current = true;
@@ -40,12 +44,13 @@ export const useFundingBalances = () => {
         const results = await fetchFundingBalances({
           provider,
           checkout,
-          currencies: clientConfig.currencies,
+          currencies: orderQuote.currencies,
           routingOptions: { bridge: false, onRamp: false, swap: true },
           baseCurrency: selectedCurrency,
-          getAmountByCurrency: (currency) => clientConfig.currencyConversion?.[
-            currency.name.toUpperCase()
-          ]?.amount?.toString(),
+          getAmountByCurrency: (currency) => {
+            const pricing = getPricingBySymbol(currency.name, orderQuote.totalAmount, cryptoFiatState.conversions);
+            return pricing ? pricing.amount.toString() : '';
+          },
           getIsGasless: () => (provider.provider as any)?.isPassport || false,
           onFundingBalance: (foundBalances) => {
             setFundingBalances([...foundBalances]);
@@ -55,6 +60,9 @@ export const useFundingBalances = () => {
           },
           onFundingRequirement: (requirement) => {
             setTransactionRequirement(requirement);
+          },
+          onUpdateGasFees: (fees) => {
+            setGasFees(fees);
           },
         });
 
@@ -72,6 +80,7 @@ export const useFundingBalances = () => {
     loadingBalances,
     fundingBalancesResult,
     transactionRequirement,
+    gasFees,
     queryFundingBalances,
   };
 };

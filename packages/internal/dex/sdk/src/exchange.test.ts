@@ -1,6 +1,6 @@
 import { Environment } from '@imtbl/config';
-import { IMMUTABLE_TESTNET_CHAIN_ID } from 'constants/chains';
-import { Exchange } from 'exchange';
+import { IMMUTABLE_TESTNET_CHAIN_ID } from './constants/chains';
+import { Exchange } from './exchange';
 
 describe('Exchange', () => {
   describe('when given an invalid chain ID', () => {

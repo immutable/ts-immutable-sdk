@@ -2,8 +2,8 @@ import { getItem, setItem } from './localStorage';
 import { Detail } from './constants';
 
 export enum Store {
-  EVENTS = 'events',
-  RUNTIME = 'runtime',
+  EVENTS = 'metrics-events',
+  RUNTIME = 'metrics-runtime',
 }
 
 // In memory storage for events and other data
@@ -48,9 +48,12 @@ export const removeSentEvents = (numberOfEvents: number) => {
   setItem(Store.EVENTS, EVENT_STORE);
 };
 
-export const flattenProperties = (
-  properties: Record<string, string | number | boolean>,
-) => {
+type TrackProperties = Record<
+string,
+string | number | boolean | undefined
+>;
+
+export const flattenProperties = (properties: TrackProperties) => {
   const propertyMap: [string, string][] = [];
   Object.entries(properties).forEach(([key, value]) => {
     if (
@@ -59,7 +62,7 @@ export const flattenProperties = (
       || typeof value === 'number'
       || typeof value === 'boolean'
     ) {
-      propertyMap.push([key, value.toString()]);
+      propertyMap.push([key, value!.toString()]);
     }
   });
   return propertyMap;

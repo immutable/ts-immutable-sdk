@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const dirname = path.dirname(new URL(import.meta.url).pathname);
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Read the JSON file
 const fileData = fs.readFileSync(
@@ -12,11 +13,7 @@ const moduleData = JSON.parse(fileData);
 // Get the release type from the environment variable or default to 'alpha'
 const releaseType = process.env.RELEASE_TYPE || 'alpha';
 
-
-let indexFileContent = '';
-
-// Generate the index.ts file contents based on the release type
-Object.keys(moduleData.modules).forEach((moduleName) => {
+const genExportStatements = (moduleName) => {
   const moduleReleaseType = moduleData.modules[moduleName];
 
   if (
@@ -34,13 +31,28 @@ Object.keys(moduleData.modules).forEach((moduleName) => {
       .join('');
 
     const modulePath = `./${moduleName}`;
-    const exportStatement = `export * as ${moduleNameCapitalized} from '${modulePath}';\n`;
-    indexFileContent += exportStatement;
+    return `export * as ${moduleNameCapitalized} from '${modulePath}';\n`;
   }
-});
+  return '';
+}
 
+// Generate the index.ts file contents based on the release type
+const indexFileContent = Object.keys(moduleData.modules).reduce((acc, moduleName) => {
+  return acc + genExportStatements(moduleName);
+}, '');
 // Write the index.ts file
 fs.writeFileSync(
   path.join(process.cwd(), 'src', 'index.ts'),
   indexFileContent,
+);
+
+// Generate the index.ts file contents based on the release type
+const browserIndexFileContent = Object.keys(moduleData.modules).filter(m => !moduleData.excludeForBrowser.includes(m)).reduce((acc, moduleName) => {
+  return acc + genExportStatements(moduleName);
+}, '');
+
+// Write the browser.index.ts file
+fs.writeFileSync(
+  path.join(process.cwd(), 'src', 'browser.index.ts'),
+  browserIndexFileContent,
 );

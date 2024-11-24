@@ -2,8 +2,8 @@ import {
   useContext, useEffect, useMemo, useReducer, useState,
 } from 'react';
 import { IMTBLWidgetEvents, OnRampWidgetParams } from '@imtbl/checkout-sdk';
-import { UserJourney } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
+import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { NATIVE } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
@@ -24,13 +24,14 @@ import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { OrderInProgress } from './views/OrderInProgress';
+import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 
 export type OnRampWidgetInputs = OnRampWidgetParams & {
   config: StrongCheckoutWidgetsConfig
 };
 
 export default function OnRampWidget({
-  amount, tokenAddress, config,
+  amount, tokenAddress, config, showBackButton,
 }: OnRampWidgetInputs) {
   const {
     isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
@@ -133,10 +134,11 @@ export default function OnRampWidget({
         <OnRampMain
           passport={checkout?.passport}
           showIframe={showIframe}
-          tokenAmount={viewState.view.data?.amount ?? amount}
+          tokenAmount={amount ?? viewState.view.data?.amount}
           tokenAddress={
-            viewState.view.data?.tokenAddress ?? tknAddr
+              tknAddr ?? viewState.view.data?.tokenAddress
           }
+          showBackButton={showBackButton}
         />
       )}
 
@@ -151,6 +153,12 @@ export default function OnRampWidget({
           showBridgeOption={isBridgeEnabled}
           onCloseButtonClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
         />
+      )}
+      {viewState.view.type
+        === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
+          <ServiceUnavailableErrorView
+            onCloseClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
+          />
       )}
     </ViewContext.Provider>
   );

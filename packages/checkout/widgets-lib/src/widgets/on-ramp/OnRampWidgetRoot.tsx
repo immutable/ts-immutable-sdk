@@ -8,15 +8,17 @@ import {
   WidgetTheme,
   WidgetType,
 } from '@imtbl/checkout-sdk';
-import { Base } from 'widgets/BaseWidgetRoot';
-import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
-import { getL1ChainId, getL2ChainId } from 'lib';
-import { isValidAddress, isValidAmount } from 'lib/validations/widgetValidators';
-import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
-import { LoadingView } from 'views/loading/LoadingView';
+import { Base } from '../BaseWidgetRoot';
+import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
+import { getL1ChainId, getL2ChainId } from '../../lib';
+import { isValidAddress, isValidAmount } from '../../lib/validations/widgetValidators';
+import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
+import { LoadingView } from '../../views/loading/LoadingView';
+import { HandoverProvider } from '../../context/handover-context/HandoverProvider';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
 import i18n from '../../i18n';
+import { orchestrationEvents } from '../../lib/orchestrationEvents';
 
 const OnRampWidget = React.lazy(() => import('./OnRampWidget'));
 
@@ -40,7 +42,7 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
   }
 
   protected getValidatedParameters(params: OnRampWidgetParams): OnRampWidgetParams {
-    const validatedParams = params;
+    const validatedParams = { ...params };
 
     if (!isValidAmount(params.amount)) {
       // eslint-disable-next-line no-console
@@ -54,8 +56,20 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
       validatedParams.tokenAddress = '';
     }
 
+    if (params.showBackButton) {
+      validatedParams.showBackButton = true;
+    }
+
     return validatedParams;
   }
+
+  private goBackEvent = (eventTarget: Window | EventTarget) => {
+    orchestrationEvents.sendRequestGoBackEvent(
+      eventTarget,
+      IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT,
+      {},
+    );
+  };
 
   protected render() {
     if (!this.reactRoot) return;
@@ -75,19 +89,24 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="onramp-container" config={this.strongConfig()}>
-            <ConnectLoader
-              widgetConfig={this.strongConfig()}
-              params={connectLoaderParams}
-              closeEvent={() => sendOnRampWidgetCloseEvent(window)}
-            >
-              <Suspense fallback={<LoadingView loadingText={t('views.ONRAMP.initialLoadingText')} />}>
-                <OnRampWidget
-                  tokenAddress={this.parameters.tokenAddress}
-                  amount={this.parameters.amount}
-                  config={this.strongConfig()}
-                />
-              </Suspense>
-            </ConnectLoader>
+            <HandoverProvider>
+              <ConnectLoader
+                widgetConfig={this.strongConfig()}
+                params={connectLoaderParams}
+                closeEvent={() => sendOnRampWidgetCloseEvent(window)}
+                goBackEvent={() => this.goBackEvent(window)}
+                showBackButton={this.parameters.showBackButton}
+              >
+                <Suspense fallback={<LoadingView loadingText={t('views.ONRAMP.initialLoadingText')} />}>
+                  <OnRampWidget
+                    tokenAddress={this.parameters.tokenAddress}
+                    amount={this.parameters.amount}
+                    config={this.strongConfig()}
+                    showBackButton={this.parameters.showBackButton}
+                  />
+                </Suspense>
+              </ConnectLoader>
+            </HandoverProvider>
           </ThemeProvider>
         </CustomAnalyticsProvider>
       </React.StrictMode>,

@@ -4,10 +4,10 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { WidgetTheme } from '@imtbl/checkout-sdk';
+import { IMTBLWidgetEvents, WidgetTheme } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
-import { ConnectLoaderContext } from 'context/connect-loader-context/ConnectLoaderContext';
 import { Environment } from '@imtbl/config';
+import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { QuickswapFooter } from '../../../components/Footer/QuickswapFooter';
@@ -21,21 +21,27 @@ import { IMX_TOKEN_SYMBOL } from '../../../lib';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { isPassportProvider } from '../../../lib/provider';
+import { LoadingView } from '../../../views/loading/LoadingView';
+import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 
 export interface SwapCoinsProps {
   theme: WidgetTheme;
+  cancelAutoProceed: () => void;
   fromAmount?: string;
   toAmount?: string;
   fromTokenAddress?: string;
   toTokenAddress?: string;
+  showBackButton?: boolean;
 }
 
 export function SwapCoins({
   theme,
+  cancelAutoProceed,
   fromAmount,
   toAmount,
   fromTokenAddress,
   toTokenAddress,
+  showBackButton,
 }: SwapCoinsProps) {
   const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
@@ -44,6 +50,7 @@ export function SwapCoins({
   const {
     swapState: {
       tokenBalances,
+      autoProceed,
     },
   } = useContext(SwapContext);
 
@@ -79,12 +86,20 @@ export function SwapCoins({
 
   return (
     <SimpleLayout
-      header={(
+      header={!autoProceed ? (
         <HeaderNavigation
           title={t('views.SWAP.header.title')}
           onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
+          showBack={showBackButton}
+          onBackButtonClick={() => {
+            orchestrationEvents.sendRequestGoBackEvent(
+              eventTarget,
+              IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
+              {},
+            );
+          }}
         />
-      )}
+      ) : ''}
       footer={<QuickswapFooter environment={checkout?.config.environment} theme={theme} />}
     >
       <Box
@@ -96,6 +111,7 @@ export function SwapCoins({
         }}
       >
         <SwapForm
+          cancelAutoProceed={cancelAutoProceed}
           data={{
             fromAmount,
             toAmount,
@@ -124,6 +140,7 @@ export function SwapCoins({
           }}
         />
       </Box>
+      {autoProceed && <LoadingView loadingText={t('views.SWAP.PREPARE_SWAP.loading.text')} />}
     </SimpleLayout>
   );
 }

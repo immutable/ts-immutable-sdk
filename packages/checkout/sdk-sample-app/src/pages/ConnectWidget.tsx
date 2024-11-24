@@ -5,13 +5,14 @@ import { Web3Provider } from '@ethersproject/providers';
 import GetAllBalances from '../components/GetAllBalances';
 import CheckConnection from '../components/CheckConnection';
 import GetAllowList from '../components/GetAllowList';
-import { Body, Box, Checkbox, Divider, Heading, Toggle } from '@biom3/react';
+import { Body, Box, Checkbox, Divider, Heading } from '@biom3/react';
 import GetBalance from '../components/GetBalance';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import Provider from '../components/Provider';
 import SendTransaction from '../components/SendTransaction';
 import GetInjectedProviders from '../components/GetInjectedProviders';
+import Swap from '../components/Swap';
 
 export default function ConnectWidget() {
   const [environment, setEnvironment] = useState(Environment.SANDBOX);
@@ -168,6 +169,17 @@ export default function ConnectWidget() {
         Get injected providers
       </Divider>
       <GetInjectedProviders checkout={checkout} provider={provider} />
+
+      <Divider
+        sx={{
+          marginTop: 'base.spacing.x6',
+          marginBottom: 'base.spacing.x2',
+        }}
+      >
+        Swap
+      </Divider>
+      <Swap checkout={checkout} provider={provider} />
+
     </div>
   );
 }

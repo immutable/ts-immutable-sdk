@@ -1,13 +1,12 @@
 import { Box, Heading } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 
-import { SalePaymentTypes } from '@imtbl/checkout-sdk';
+import { isAddressSanctioned, SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import {
-  FundWithSmartCheckoutSubViews,
   OrderSummarySubViews,
   SaleWidgetViews,
 } from '../../../context/view-context/SaleViewContextTypes';
@@ -30,11 +29,14 @@ export function PaymentMethods() {
     goToErrorView,
     paymentMethod,
     setPaymentMethod,
-    disabledPaymentTypes,
     invalidParameters,
-    multicurrency,
+    disabledPaymentTypes,
+    hideExcludedPaymentTypes,
+    riskAssessment,
   } = useSaleContext();
-  const { sendPageView, sendCloseEvent, sendSelectedPaymentMethod } = useSaleEvent();
+  const {
+    sendFailedEvent, sendPageView, sendCloseEvent, sendSelectedPaymentMethod,
+  } = useSaleEvent();
 
   const handleOptionClick = (type: SalePaymentTypes) => {
     setPaymentMethod(type);
@@ -49,6 +51,25 @@ export function PaymentMethods() {
       paymentMethod
       && [SalePaymentTypes.DEBIT, SalePaymentTypes.CREDIT].includes(paymentMethod)
     ) {
+      if (riskAssessment && isAddressSanctioned(riskAssessment)) {
+        const error = new Error('Sanctioned address');
+        sendFailedEvent(error.message, {}, [], undefined, { riskAssessment, paymentMethod });
+
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
+              error,
+            },
+          },
+        });
+
+        setPaymentMethod(undefined);
+
+        return;
+      }
+
       sign(SignPaymentTypes.FIAT, undefined, () => {
         viewDispatch({
           payload: {
@@ -72,25 +93,12 @@ export function PaymentMethods() {
     }
 
     if (paymentMethod && paymentMethod === SalePaymentTypes.CRYPTO) {
-      if (multicurrency) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: SaleWidgetViews.ORDER_SUMMARY,
-              subView: OrderSummarySubViews.INIT,
-            },
-          },
-        });
-        return;
-      }
-
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
-            subView: FundWithSmartCheckoutSubViews.INIT,
+            type: SaleWidgetViews.ORDER_SUMMARY,
+            subView: OrderSummarySubViews.INIT,
           },
         },
       });
@@ -132,6 +140,7 @@ export function PaymentMethods() {
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
           <PaymentOptions
+            hideDisabledOptions={hideExcludedPaymentTypes}
             disabledOptions={disabledPaymentTypes}
             onClick={handleOptionClick}
           />

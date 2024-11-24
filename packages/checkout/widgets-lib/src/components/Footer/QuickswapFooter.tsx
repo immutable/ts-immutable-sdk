@@ -3,7 +3,7 @@ import { Body, Box } from '@biom3/react';
 import { WidgetTheme } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { Environment } from '@imtbl/config';
-import { getRemoteImage } from 'lib/utils';
+import { getRemoteImage } from '../../lib/utils';
 import { quickswapFooterStyles, quickswapFooterDisclaimerTextStyles, quickswapFooterLogoStyles } from './FooterStyles';
 
 export interface QuickswapFooterProps {

@@ -2,11 +2,11 @@ import {
   Body,
   Box, Button, CloudImage, Drawer, Heading,
 } from '@biom3/react';
-import { ETH_TOKEN_SYMBOL, IMAGE_RESIZER_URL } from 'lib';
 import { useTranslation } from 'react-i18next';
 import { useContext } from 'react';
-import { BridgeContext } from 'widgets/bridge/context/BridgeContext';
-import { getEthTokenImage } from 'lib/utils';
+import { ETH_TOKEN_SYMBOL } from '../../lib';
+import { getEthTokenImage } from '../../lib/utils';
+import { BridgeContext } from '../../widgets/bridge/context/BridgeContext';
 import {
   actionButtonContainerStyles, actionButtonStyles, containerStyles, contentTextStyles,
 } from './NotEnoughEthToWithdrawStyles';
@@ -38,9 +38,13 @@ export function NotEnoughEthToWithdraw({
       <Drawer.Content>
         <Box testId="not-enough-eth-drawer" sx={containerStyles}>
           <CloudImage
-            imageUrl={ethLogo}
-            imageResizeServiceUrl={IMAGE_RESIZER_URL[checkout.config.environment]}
             sx={{ w: 'base.icon.size.600', h: 'base.icon.size.600' }}
+            use={(
+              <img
+                src={ethLogo}
+                alt="ETH"
+              />
+            )}
           />
           <Heading
             size="small"

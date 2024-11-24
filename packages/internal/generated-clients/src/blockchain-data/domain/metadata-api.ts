@@ -36,27 +36,31 @@ import { RefreshMetadataByIDRequest } from '../models';
 // @ts-ignore
 import { RefreshNFTMetadataByTokenIDRequest } from '../models';
 // @ts-ignore
-export { APIError400 } from '../models';
+import { StackBundle } from '../models';
 // @ts-ignore
-export { APIError401 } from '../models';
+export type { APIError400 } from '../models';
 // @ts-ignore
-export { APIError403 } from '../models';
+export type { APIError401 } from '../models';
 // @ts-ignore
-export { APIError404 } from '../models';
+export type { APIError403 } from '../models';
 // @ts-ignore
-export { APIError429 } from '../models';
+export type { APIError404 } from '../models';
 // @ts-ignore
-export { APIError500 } from '../models';
+export type { APIError429 } from '../models';
 // @ts-ignore
-export { GetMetadataResult } from '../models';
+export type { APIError500 } from '../models';
 // @ts-ignore
-export { ListMetadataResult } from '../models';
+export type { GetMetadataResult } from '../models';
 // @ts-ignore
-export { MetadataRefreshRateLimitResult } from '../models';
+export type { ListMetadataResult } from '../models';
 // @ts-ignore
-export { RefreshMetadataByIDRequest } from '../models';
+export type { MetadataRefreshRateLimitResult } from '../models';
 // @ts-ignore
-export { RefreshNFTMetadataByTokenIDRequest } from '../models';
+export type { RefreshMetadataByIDRequest } from '../models';
+// @ts-ignore
+export type { RefreshNFTMetadataByTokenIDRequest } from '../models';
+// @ts-ignore
+export type { StackBundle } from '../models';
 
 /**
  * Request parameters for getMetadata operation in MetadataApi.
@@ -161,6 +165,27 @@ export interface ListMetadataForChainRequestParams {
      * @memberof ListMetadataForChain
      */
     readonly pageSize?: number
+}
+
+/**
+ * Request parameters for listStacks operation in MetadataApi.
+ * @export
+ * @interface ListStacksRequest
+ */
+export interface ListStacksRequestParams {
+    /**
+     * The name of chain
+     * @type {string}
+     * @memberof ListStacks
+     */
+    readonly chainName: string
+
+    /**
+     * List of stack_id to filter by
+     * @type {Array<string>}
+     * @memberof ListStacks
+     */
+    readonly stackId: Array<string>
 }
 
 /**

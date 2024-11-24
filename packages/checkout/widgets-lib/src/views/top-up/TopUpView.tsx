@@ -1,11 +1,7 @@
 import { Body, Box, Heading } from '@biom3/react';
 import {
-  ReactNode, useContext, useEffect, useState,
+  ReactNode, useContext, useEffect, useMemo, useState,
 } from 'react';
-import {
-  UserJourney,
-  useAnalytics,
-} from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { StandardAnalyticsControlTypes } from '@imtbl/react-analytics';
 import {
   Checkout,
@@ -14,12 +10,15 @@ import {
   IMTBLWidgetEvents,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
-import { DEFAULT_TOKEN_SYMBOLS } from 'context/crypto-fiat-context/CryptoFiatProvider';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
-import { $Dictionary } from 'i18next/typescript/helpers';
-import { FooterLogo } from '../../components/Footer/FooterLogo';
+import {
+  UserJourney,
+  useAnalytics,
+} from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { DEFAULT_TOKEN_SYMBOLS } from '../../context/crypto-fiat-context/CryptoFiatProvider';
+import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
+import { useMount } from '../../hooks/useMount';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import {
@@ -38,7 +37,10 @@ import {
 } from '../../context/crypto-fiat-context/CryptoFiatContext';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
-import { TopUpMenuItem } from './TopUpMenuItem';
+import { TopUpMenuItem, TopUpMenuItemProps } from './TopUpMenuItem';
+import { useAsyncMemo } from '../../lib/hooks/useAsyncMemo';
+
+type $Dictionary<T = unknown> = { [key: string]: T };
 
 interface TopUpViewProps {
   widgetEvent: IMTBLWidgetEvents;
@@ -57,6 +59,15 @@ interface TopUpViewProps {
   heading?: [key: string, options?: $Dictionary];
   subheading?: [key: string, options?: $Dictionary];
 }
+
+type TopUpFeatures = Partial<TopUpMenuItemProps> & {
+  testId: string;
+  textConfigKey: string;
+  onClickEvent: () => void;
+  fee: (txt: string) => ReactNode;
+  isAvailable: boolean;
+  isEnabled: boolean;
+};
 
 export const TOOLKIT_BASE_URL = {
   [Environment.SANDBOX]: 'https://checkout-playground.sandbox.immutable.com',
@@ -95,20 +106,25 @@ export function TopUpView({
 
   const [onRampFeesPercentage, setOnRampFeesPercentage] = useState('-.--');
   const swapFeesInFiat = '0.05';
-  const [bridgeFeesInFiat, setBridgeFeesInFiat] = useState('-.--');
-  const [isSwapAvailable, setIsSwapAvailable] = useState(true);
+  const [, setBridgeFeesInFiat] = useState('-.--');
 
   const title = heading ? t(...heading) : t('views.TOP_UP_VIEW.header.title');
   const description = subheading ? t(...subheading) : null;
 
   const { page, track } = useAnalytics();
 
-  useEffect(() => {
-    page({
-      userJourney,
-      screen: 'TopUp',
-    });
-  }, []);
+  const isSwapAvailable = useAsyncMemo<boolean | undefined>(async () => {
+    if (!checkout) return undefined;
+    try {
+      return checkout.isSwapAvailable();
+    } catch (error) {
+      return false;
+    }
+  }, [checkout]);
+
+  useMount(() => {
+    page({ userJourney, screen: 'TopUp' });
+  });
 
   useEffect(() => {
     if (!cryptoFiatDispatch) return;
@@ -143,14 +159,6 @@ export function TopUpView({
       const onRampFeesEstimate = await checkout.getExchangeFeeEstimate();
       const onRampFees = getOnRampFeeEstimation(onRampFeesEstimate);
       setOnRampFeesPercentage(onRampFees);
-    })();
-  }, [checkout !== undefined]);
-
-  // Check if swap is available
-  useEffect(() => {
-    if (!checkout) return;
-    (async () => {
-      setIsSwapAvailable(await checkout.isSwapAvailable());
     })();
   }, [checkout !== undefined]);
 
@@ -263,7 +271,7 @@ export function TopUpView({
 
     localTrack('AdvancedOptions', { ...data, widgetEvent });
 
-    window.open(`${toolkitBaseUrl}/faster-bridge/`, '_blank');
+    window.open(`${toolkitBaseUrl}/squid-bridge/`, '_blank');
   };
 
   const renderFees = (txt: string): ReactNode => (
@@ -277,56 +285,71 @@ export function TopUpView({
     </Box>
   );
 
-  const topUpFeatures = [
-    {
-      testId: 'onramp',
-      icon: 'BankCard',
-      textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.onramp',
-      onClickEvent: onClickOnRamp,
-      fee: () => renderFees(
-        `${t(
-          'views.TOP_UP_VIEW.topUpOptions.onramp.subcaption',
-        )} ≈ ${onRampFeesPercentage}%`,
-      ),
-      isAvailable: true,
-      isEnabled: showOnrampOption,
-    },
-    {
-      testId: 'swap',
-      icon: 'Swap',
-      textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.swap',
-      onClickEvent: onClickSwap,
-      fee: () => renderFees(
-        `${t(
-          'views.TOP_UP_VIEW.topUpOptions.swap.subcaption',
-        )} ≈ $${swapFeesInFiat} ${fiatSymbol.toUpperCase()}`,
-      ),
-      isAvailable: isSwapAvailable,
-      isEnabled: showSwapOption,
-    },
-    {
-      testId: 'bridge',
-      icon: 'Minting',
-      textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.bridge',
-      onClickEvent: onClickBridge,
-      fee: () => renderFees(
-        `${t(
-          'views.TOP_UP_VIEW.topUpOptions.bridge.subcaption',
-        )} ≈ $${bridgeFeesInFiat} ${fiatSymbol.toUpperCase()}`,
-      ),
-      isAvailable: true,
-      isEnabled: showBridgeOption,
-    },
-    {
-      testId: 'advanced',
-      icon: 'JumpTo',
-      textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.advanced',
-      onClickEvent: onClickAdvancedOptions,
-      fee: () => renderFees(''),
-      isAvailable: true,
-      isEnabled: true,
-    },
-  ];
+  const topUpFeatures: TopUpFeatures[] = useMemo(
+    () => [
+      {
+        testId: 'onramp',
+        icon: 'BankCard',
+        iconVariant: 'bold',
+        textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.debit',
+        onClickEvent: onClickOnRamp,
+        fee: () => renderFees(
+          `${t(
+            'views.TOP_UP_VIEW.topUpOptions.debit.subcaption',
+          )} ≈ ${onRampFeesPercentage}%`,
+        ),
+        isAvailable: true,
+        isEnabled: showOnrampOption,
+      },
+      {
+        testId: 'onramp',
+        icon: 'BankCard',
+        textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.credit',
+        onClickEvent: onClickOnRamp,
+        fee: () => renderFees(
+          `${t(
+            'views.TOP_UP_VIEW.topUpOptions.credit.subcaption',
+          )} ≈ ${onRampFeesPercentage}%`,
+        ),
+        isAvailable: true,
+        isEnabled: showOnrampOption,
+      },
+      {
+        testId: 'advanced',
+        icon: 'Minting',
+        iconVariant: 'bold',
+        intentIcon: 'JumpTo',
+        textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.advanced',
+        onClickEvent: onClickAdvancedOptions,
+        fee: () => renderFees(''),
+        isAvailable: true,
+        isEnabled: true,
+      },
+      {
+        testId: 'swap',
+        icon: 'Swap',
+        textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.swap',
+        onClickEvent: onClickSwap,
+        fee: () => renderFees(
+          `${t(
+            'views.TOP_UP_VIEW.topUpOptions.swap.subcaption',
+          )} ≈ $${swapFeesInFiat} ${fiatSymbol.toUpperCase()}`,
+        ),
+        isAvailable: !!isSwapAvailable,
+        isEnabled: showSwapOption,
+      },
+      {
+        testId: 'bridge',
+        icon: 'ArrowForward',
+        textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.bridge',
+        onClickEvent: onClickBridge,
+        fee: () => renderFees(''),
+        isAvailable: true,
+        isEnabled: showBridgeOption,
+      },
+    ],
+    [showBridgeOption, showOnrampOption, showSwapOption],
+  );
 
   return (
     <SimpleLayout
@@ -337,7 +360,6 @@ export function TopUpView({
           showBack
         />
       )}
-      footer={<FooterLogo />}
     >
       <Box sx={{ paddingX: 'base.spacing.x4', paddingY: 'base.spacing.x4' }}>
         <Heading size="small">{title}</Heading>
@@ -354,7 +376,9 @@ export function TopUpView({
               <TopUpMenuItem
                 key={t(`${element.textConfigKey}.heading`).toLowerCase()}
                 testId={element.testId}
-                icon={element.icon as 'Wallet' | 'Coins' | 'Minting'}
+                icon={element.icon!}
+                iconVariant={element.iconVariant}
+                intentIcon={element.intentIcon}
                 heading={t(`${element.textConfigKey}.heading`)}
                 caption={
                       !element.isAvailable

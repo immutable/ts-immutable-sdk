@@ -2,8 +2,9 @@ import fs from 'fs';
 import * as glob from 'glob';
 import path from 'path';
 import pkg from '../package.json' assert { type: 'json' };
+import { fileURLToPath } from 'url';
 
-const dirname = path.dirname(new URL(import.meta.url).pathname);
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const SDK_VERSION = '__SDK_VERSION__';
 

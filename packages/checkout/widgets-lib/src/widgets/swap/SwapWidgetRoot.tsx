@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import {
   ChainId,
   IMTBLWidgetEvents,
+  SwapDirection,
   SwapWidgetParams,
   WalletProviderName,
   WidgetConfiguration,
@@ -9,16 +10,17 @@ import {
   WidgetTheme,
   WidgetType,
 } from '@imtbl/checkout-sdk';
-import { Base } from 'widgets/BaseWidgetRoot';
-import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
-import { getL2ChainId } from 'lib';
-import { isPassportProvider } from 'lib/provider';
-import { ServiceUnavailableErrorView } from 'views/error/ServiceUnavailableErrorView';
-import { ServiceType } from 'views/error/serviceTypes';
-import { isValidAddress, isValidAmount, isValidWalletProvider } from 'lib/validations/widgetValidators';
-import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
-import { LoadingView } from 'views/loading/LoadingView';
+import { Base } from '../BaseWidgetRoot';
+import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
+import { getL2ChainId } from '../../lib';
+import { isPassportProvider } from '../../lib/provider';
+import { ServiceUnavailableToRegionErrorView } from '../../views/error/ServiceUnavailableToRegionErrorView';
+import { ServiceType } from '../../views/error/serviceTypes';
+import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/validations/widgetValidators';
+import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
+import { LoadingView } from '../../views/loading/LoadingView';
+import { HandoverProvider } from '../../context/handover-context/HandoverProvider';
 import { topUpBridgeOption, topUpOnRampOption } from './helpers';
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
 import i18n from '../../i18n';
@@ -70,6 +72,10 @@ export class Swap extends Base<WidgetType.SWAP> {
       validatedParams.toTokenAddress = '';
     }
 
+    if (params.autoProceed) {
+      validatedParams.autoProceed = true;
+    }
+
     return validatedParams;
   }
 
@@ -114,10 +120,10 @@ export class Swap extends Base<WidgetType.SWAP> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="swap-container" config={this.strongConfig()}>
-            <GeoblockLoader
-              checkout={this.checkout}
-              loadingView={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}
-              widget={
+            <HandoverProvider>
+              <GeoblockLoader
+                checkout={this.checkout}
+                widget={
                 (
                   <ConnectLoader
                     params={connectLoaderParams}
@@ -130,14 +136,17 @@ export class Swap extends Base<WidgetType.SWAP> {
                         toTokenAddress={this.parameters.toTokenAddress}
                         amount={this.parameters.amount}
                         config={this.strongConfig()}
+                        autoProceed={this.parameters.autoProceed}
+                        direction={this.parameters.direction ?? SwapDirection.FROM}
+                        showBackButton={this.parameters.showBackButton}
                       />
                     </Suspense>
                   </ConnectLoader>
                 )
               }
-              serviceUnavailableView={
+                serviceUnavailableView={
                 (
-                  <ServiceUnavailableErrorView
+                  <ServiceUnavailableToRegionErrorView
                     service={ServiceType.SWAP}
                     onCloseClick={() => sendSwapWidgetCloseEvent(window)}
                     primaryActionText={
@@ -163,7 +172,8 @@ export class Swap extends Base<WidgetType.SWAP> {
                   />
                 )
               }
-            />
+              />
+            </HandoverProvider>
           </ThemeProvider>
         </CustomAnalyticsProvider>
       </React.StrictMode>,

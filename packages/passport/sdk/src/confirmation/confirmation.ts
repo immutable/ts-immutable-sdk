@@ -1,4 +1,6 @@
-import { TransactionApprovalRequestChainTypeEnum } from '@imtbl/guardian';
+import * as GeneratedClients from '@imtbl/generated-clients';
+import { trackError } from '@imtbl/metrics';
+
 import {
   ConfirmationResult,
   PASSPORT_EVENT_TYPE,
@@ -7,6 +9,7 @@ import {
 } from './types';
 import { openPopupCenter } from './popup';
 import { PassportConfiguration } from '../config';
+import Overlay from '../overlay';
 
 const CONFIRMATION_WINDOW_TITLE = 'Confirm this transaction';
 const CONFIRMATION_WINDOW_HEIGHT = 720;
@@ -18,13 +21,24 @@ export const CONFIRMATION_IFRAME_STYLE = 'display: none; position: absolute;widt
 
 type MessageHandler = (arg0: MessageEvent) => void;
 
+type MessageType = 'erc191' | 'eip712';
+
 export default class ConfirmationScreen {
   private config: PassportConfiguration;
 
   private confirmationWindow: Window | undefined;
 
+  private popupOptions: { width: number; height: number } | undefined;
+
+  private overlay: Overlay | undefined;
+
+  private overlayClosed: boolean;
+
+  private timer: NodeJS.Timeout | undefined;
+
   constructor(config: PassportConfiguration) {
     this.config = config;
+    this.overlayClosed = false;
   }
 
   private getHref(relativePath: string, queryStringParams?: { [key: string]: any }) {
@@ -46,8 +60,64 @@ export default class ConfirmationScreen {
   requestConfirmation(
     transactionId: string,
     etherAddress: string,
-    chainType: TransactionApprovalRequestChainTypeEnum,
+    chainType: GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum,
     chainId?: string,
+  ): Promise<ConfirmationResult> {
+    return new Promise((resolve, reject) => {
+      const messageHandler = ({ data, origin }: MessageEvent) => {
+        if (
+          origin !== this.config.passportDomain
+          || data.eventType !== PASSPORT_EVENT_TYPE
+        ) {
+          return;
+        }
+
+        switch (data.messageType as ReceiveMessage) {
+          case ReceiveMessage.CONFIRMATION_WINDOW_READY: {
+            this.confirmationWindow?.postMessage({
+              eventType: PASSPORT_EVENT_TYPE,
+              messageType: SendMessage.CONFIRMATION_START,
+            }, this.config.passportDomain);
+            break;
+          }
+          case ReceiveMessage.TRANSACTION_CONFIRMED: {
+            this.closeWindow();
+            resolve({ confirmed: true });
+            break;
+          }
+          case ReceiveMessage.TRANSACTION_REJECTED: {
+            this.closeWindow();
+            resolve({ confirmed: false });
+            break;
+          }
+          case ReceiveMessage.TRANSACTION_ERROR: {
+            this.closeWindow();
+            reject(new Error('Error during transaction confirmation'));
+            break;
+          }
+          default:
+            this.closeWindow();
+            reject(new Error('Unsupported message type'));
+        }
+      };
+
+      let href = '';
+      if (chainType === GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Starkex) {
+        href = this.getHref('transaction', { transactionId, etherAddress, chainType });
+      } else {
+        href = this.getHref('zkevm/transaction', {
+          transactionID: transactionId, etherAddress, chainType, chainID: chainId,
+        });
+      }
+      window.addEventListener('message', messageHandler);
+      this.showConfirmationScreen(href, messageHandler, resolve);
+    });
+  }
+
+  requestMessageConfirmation(
+    messageID: string,
+    etherAddress: string,
+    messageType?: MessageType,
   ): Promise<ConfirmationResult> {
     return new Promise((resolve, reject) => {
       const messageHandler = ({ data, origin }: MessageEvent) => {
@@ -65,81 +135,47 @@ export default class ConfirmationScreen {
             }, this.config.passportDomain);
             break;
           }
-          case ReceiveMessage.TRANSACTION_CONFIRMED: {
+          case ReceiveMessage.MESSAGE_CONFIRMED: {
+            this.closeWindow();
             resolve({ confirmed: true });
             break;
           }
-          case ReceiveMessage.TRANSACTION_ERROR: {
-            reject(new Error('Error during transaction confirmation'));
+          case ReceiveMessage.MESSAGE_REJECTED: {
+            this.closeWindow();
+            resolve({ confirmed: false });
             break;
           }
-          case ReceiveMessage.TRANSACTION_REJECTED: {
-            reject(new Error('User rejected transaction'));
+          case ReceiveMessage.MESSAGE_ERROR: {
+            this.closeWindow();
+            reject(new Error('Error during message confirmation'));
             break;
           }
           default:
+            this.closeWindow();
             reject(new Error('Unsupported message type'));
         }
       };
-      if (!this.confirmationWindow) {
-        resolve({ confirmed: false });
-        return;
-      }
-      window.addEventListener('message', messageHandler);
 
-      let href = '';
-      if (chainType === TransactionApprovalRequestChainTypeEnum.Starkex) {
-        href = this.getHref('transaction', { transactionId, etherAddress, chainType });
-      } else {
-        href = this.getHref('zkevm/transaction', {
-          transactionID: transactionId, etherAddress, chainType, chainID: chainId,
-        });
-      }
+      window.addEventListener('message', messageHandler);
+      const href = this.getHref('zkevm/message', {
+        messageID,
+        etherAddress,
+        ...(messageType ? { messageType } : {}),
+      });
       this.showConfirmationScreen(href, messageHandler, resolve);
     });
   }
 
-  requestMessageConfirmation(messageID: string, etherAddress: string): Promise<ConfirmationResult> {
-    return new Promise((resolve, reject) => {
-      const messageHandler = ({ data, origin }: MessageEvent) => {
-        if (
-          origin !== this.config.passportDomain
-          || data.eventType !== PASSPORT_EVENT_TYPE
-        ) {
-          return;
-        }
-        switch (data.messageType as ReceiveMessage) {
-          case ReceiveMessage.CONFIRMATION_WINDOW_READY: {
-            this.confirmationWindow?.postMessage({
-              eventType: PASSPORT_EVENT_TYPE,
-              messageType: SendMessage.CONFIRMATION_START,
-            }, this.config.passportDomain);
-            break;
-          }
-          case ReceiveMessage.MESSAGE_CONFIRMED: {
-            resolve({ confirmed: true });
-            break;
-          }
-          case ReceiveMessage.MESSAGE_ERROR: {
-            reject(new Error('Error during message confirmation'));
-            break;
-          }
-          case ReceiveMessage.MESSAGE_REJECTED: {
-            reject(new Error('User rejected message'));
-            break;
-          }
-
-          default:
-            reject(new Error('Unsupported message type'));
-        }
-      };
-      if (!this.confirmationWindow) {
-        resolve({ confirmed: false });
-        return;
-      }
-      window.addEventListener('message', messageHandler);
-      const href = this.getHref('zkevm/message', { messageID, etherAddress });
-      this.showConfirmationScreen(href, messageHandler, resolve);
+  showServiceUnavailable(): Promise<void> {
+    return new Promise((_, reject) => {
+      this.showConfirmationScreen(
+        this.getHref('unavailable'),
+        () => {},
+        () => {
+          this.closeWindow();
+          reject(new Error('Service unavailable'));
+        },
+      );
     });
   }
 
@@ -149,27 +185,91 @@ export default class ConfirmationScreen {
       return;
     }
 
-    this.confirmationWindow = openPopupCenter({
-      url: this.getHref('loading'),
-      title: CONFIRMATION_WINDOW_TITLE,
-      width: popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
-      height: popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
-    });
+    this.popupOptions = popupOptions;
+
+    try {
+      this.confirmationWindow = openPopupCenter({
+        url: this.getHref('loading'),
+        title: CONFIRMATION_WINDOW_TITLE,
+        width: popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
+        height: popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
+      });
+      this.overlay = new Overlay(this.config.popupOverlayOptions);
+    } catch (error) {
+      // If an error is thrown here then the popup is blocked
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      trackError('passport', 'confirmationPopupDenied', new Error(errorMessage));
+      this.overlay = new Overlay(this.config.popupOverlayOptions, true);
+    }
+
+    this.overlay.append(
+      () => {
+        try {
+          this.confirmationWindow?.close();
+          this.confirmationWindow = openPopupCenter({
+            url: this.getHref('loading'),
+            title: CONFIRMATION_WINDOW_TITLE,
+            width: this.popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
+            height: this.popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
+          });
+        } catch { /* Empty */ }
+      },
+      () => {
+        this.overlayClosed = true;
+        this.closeWindow();
+      },
+    );
   }
 
   closeWindow() {
     this.confirmationWindow?.close();
+    this.overlay?.remove();
+    this.overlay = undefined;
   }
 
   showConfirmationScreen(href: string, messageHandler: MessageHandler, resolve: Function) {
-    this.confirmationWindow!.location.href = href;
+    // If popup blocked, the confirmation window will not exist
+    if (this.confirmationWindow) {
+      this.confirmationWindow.location.href = href;
+    }
+
+    // This indicates the user closed the overlay so the transaction should be rejected
+    if (!this.overlay) {
+      this.overlayClosed = false;
+      resolve({ confirmed: false });
+      return;
+    }
+
     // https://stackoverflow.com/questions/9388380/capture-the-close-event-of-popup-window-in-javascript/48240128#48240128
-    const timer = setInterval(() => {
-      if (this.confirmationWindow?.closed) {
-        clearInterval(timer);
+    const timerCallback = () => {
+      if (this.confirmationWindow?.closed || this.overlayClosed) {
+        clearInterval(this.timer);
         window.removeEventListener('message', messageHandler);
         resolve({ confirmed: false });
+        this.overlayClosed = false;
+        this.confirmationWindow = undefined;
       }
-    }, CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION);
+    };
+    this.timer = setInterval(
+      timerCallback,
+      CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION,
+    );
+    this.overlay.update(() => this.recreateConfirmationWindow(href, timerCallback));
+  }
+
+  private recreateConfirmationWindow(href: string, timerCallback: () => void) {
+    try {
+      // Clears and recreates the timer to ensure when the confirmation window
+      // is closed and recreated the transaction is not rejected.
+      clearInterval(this.timer);
+      this.confirmationWindow?.close();
+      this.confirmationWindow = openPopupCenter({
+        url: href,
+        title: CONFIRMATION_WINDOW_TITLE,
+        width: this.popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
+        height: this.popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
+      });
+      this.timer = setInterval(timerCallback, CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION);
+    } catch { /* Empty */ }
   }
 }

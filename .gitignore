@@ -13,13 +13,8 @@ cache/
 *version.properties
 
 .pnp.*
-.yarn/
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
+.yarn/cache
+.yarn/install-state.gz
 
 .yalc
 yalc.lock
@@ -27,3 +22,17 @@ yalc.lock
 package-lock.json
 
 docs/
+
+
+
+.nx/cache
+.nx/workspace-data
+nx-cloud.env
+dep-graph.json
+examples/**/.env
+examples/**/playwright-report/
+examples/**/test-results/
+
+tests/**/.env
+tests/**/playwright-report/
+tests/**/test-results/

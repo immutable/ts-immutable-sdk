@@ -20,7 +20,7 @@ export async function getBridgeFeeEstimate(
 
   return await tokenBridge.getFee({
     action: bridgeFeeAction,
-    gasMultiplier: 1.1,
+    gasMultiplier: 'auto',
     sourceChainId: fromChainId.toString(),
     destinationChainId: toChainId.toString(),
     token: NATIVE.toUpperCase(),

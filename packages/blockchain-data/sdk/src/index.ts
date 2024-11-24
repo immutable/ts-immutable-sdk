@@ -14,7 +14,9 @@ type ActivityType = mr.ActivityType;
 export {
   Types,
   APIError,
-  BlockchainData,
+  BlockchainData
+};
+export type {
   BlockchainDataModuleConfiguration,
-  ActivityType,
+  ActivityType
 };

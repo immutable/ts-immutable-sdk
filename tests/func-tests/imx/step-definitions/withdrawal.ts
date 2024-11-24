@@ -40,13 +40,18 @@ export class Withdrawal {
     withdrawalName: string,
     ethAmount: string,
   ) {
-    const user = this.stepSharedState.users[userVar];
-    const imxProvider = new GenericIMXProvider(this.providerConfig, user.ethSigner, user.starkSigner);
-    const ethAmountInWei = parseUnits(ethAmount);
-    const result = await imxProvider.prepareWithdrawal({ type: 'ETH', amount: ethAmountInWei.toString() });
+    try {
+      const user = this.stepSharedState.users[userVar];
+      const imxProvider = new GenericIMXProvider(this.providerConfig, user.ethSigner, user.starkSigner);
+      const ethAmountInWei = parseUnits(ethAmount);
+      const result = await imxProvider.prepareWithdrawal({ type: 'ETH', amount: ethAmountInWei.toString() });
 
-    this.stepSharedState.withdrawals[withdrawalName] = result;
-    return result;
+      this.stepSharedState.withdrawals[withdrawalName] = result;
+      return result;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
   }
 
   // because withdrawable status needs a larger timeout, we set 300 seconds here.
@@ -91,9 +96,14 @@ export class Withdrawal {
     const user = this.stepSharedState.users[userVar];
     const starkAddress = await user.starkSigner.getAddress();
     const imxProvider = new GenericIMXProvider(this.providerConfig, user.ethSigner, user.starkSigner);
-    const result = await imxProvider.completeWithdrawal(starkAddress, { type: 'ETH' });
-    // eslint-disable-next-line no-console
-    console.log(`Eth withdrawal transaction complete. txHash: ${result.hash}`);
+    try {
+      const result = await imxProvider.completeWithdrawal(starkAddress, { type: 'ETH' });
+      // eslint-disable-next-line no-console
+      console.log(`Eth withdrawal transaction complete. txHash: ${result.hash}`);
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
   }
 
   // @when('user {string} completes withdrawal of NFT {string}', undefined, 60000)

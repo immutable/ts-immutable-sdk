@@ -67,3 +67,10 @@ export const rawImageStyle = {
   padding: '6px',
   left: 'base.spacing.x3',
 };
+
+export const networkIconStyles = {
+  position: 'absolute',
+  right: 'base.spacing.x3',
+  w: 'base.icon.size.400',
+  h: 'base.icon.size.400',
+};

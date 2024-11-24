@@ -14,6 +14,13 @@ export type SignMessageResponse = {
   signedMessage: string;
 };
 
+export type GetYCoordinateMessageRequest = {
+  starkPublicKey: string;
+};
+export type GetYCoordinateMessageResponse = {
+  yCoordinate: string;
+};
+
 export type DisconnectRequest = {
   starkPublicKey: string;
 };

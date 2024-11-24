@@ -1,6 +1,6 @@
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
 import { TransactionResponse } from '@ethersproject/providers';
-import { Transaction } from 'lib/clients';
+import { Transaction } from '../../lib/clients';
 import { ViewType } from './ViewType';
 
 export enum BridgeWidgetViews {
@@ -15,6 +15,7 @@ export enum BridgeWidgetViews {
   CLAIM_WITHDRAWAL_IN_PROGRESS = 'CLAIM_WITHDRAWAL_IN_PROGRESS',
   CLAIM_WITHDRAWAL_SUCCESS = 'CLAIM_WITHDRAWAL_SUCCESS',
   CLAIM_WITHDRAWAL_FAILURE = 'CLAIM_WITHDRAWAL_FAILURE',
+  SERVICE_UNAVAILABLE = 'SERVICE_UNAVAILABLE',
 }
 
 export type BridgeWidgetView =
@@ -28,7 +29,8 @@ export type BridgeWidgetView =
   | BridgeClaimWithdrawal
   | BridgeClaimWithdrawalInProgress
   | BridgeClaimWithdrawalSuccess
-  | BridgeClaimWithdrawalFailure;
+  | BridgeClaimWithdrawalFailure
+  | BridgeServiceUnavailableView;
 
 interface BridgeCrossWalletSelection extends ViewType {
   type: BridgeWidgetViews.WALLET_NETWORK_SELECTION,
@@ -45,6 +47,7 @@ interface BridgeReview extends ViewType {
 interface BridgeInProgress extends ViewType {
   type: BridgeWidgetViews.IN_PROGRESS,
   transactionHash: string,
+  isTransfer: boolean,
 }
 
 interface BridgeFailure extends ViewType {
@@ -54,8 +57,8 @@ interface BridgeFailure extends ViewType {
 
 interface BridgeApproveTransaction extends ViewType {
   type: BridgeWidgetViews.APPROVE_TRANSACTION,
-  approveTransaction: ApproveBridgeResponse;
-  transaction: BridgeTxResponse;
+  approveTransaction: ApproveBridgeResponse | undefined;
+  transaction: BridgeTxResponse | undefined;
 }
 
 interface BridgeTransactions extends ViewType {
@@ -81,4 +84,8 @@ export interface BridgeClaimWithdrawalFailure extends ViewType {
   type: BridgeWidgetViews.CLAIM_WITHDRAWAL_FAILURE,
   transactionHash: string;
   reason: string;
+}
+
+export interface BridgeServiceUnavailableView extends ViewType {
+  type: BridgeWidgetViews.SERVICE_UNAVAILABLE;
 }

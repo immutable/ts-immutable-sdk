@@ -27,7 +27,6 @@ import { LoadingView } from '../../views/loading/LoadingView';
 import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
 import { widgetTheme } from '../../lib/theme';
 import { SaleContextProvider } from './context/SaleContextProvider';
-import { FundWithSmartCheckout } from './views/FundWithSmartCheckout';
 import { PayWithCard } from './views/PayWithCard';
 import { PayWithCoins } from './views/PayWithCoins';
 import { PaymentMethods } from './views/PaymentMethods';
@@ -39,15 +38,20 @@ import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { OrderSummary } from './views/OrderSummary';
 import { CreditCardWarningDrawer } from './components/CreditCardWarningDrawer';
+import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 
-type OptionalWidgetParams = Pick<SaleWidgetParams, 'excludePaymentTypes'>;
+type OptionalWidgetParams = Pick<
+SaleWidgetParams,
+'excludePaymentTypes' | 'excludeFiatCurrencies' | 'customOrderData'
+>;
 type RequiredWidgetParams = Required<
 Omit<SaleWidgetParams, 'walletProviderName'>
 >;
 
 type WidgetParams = RequiredWidgetParams &
 OptionalWidgetParams & {
-  multicurrency: boolean;
+  hideExcludedPaymentTypes: boolean;
+  waitFulfillmentSettlements: boolean;
 };
 export interface SaleWidgetProps extends WidgetParams {
   config: StrongCheckoutWidgetsConfig;
@@ -57,13 +61,17 @@ export default function SaleWidget(props: SaleWidgetProps) {
   const { t } = useTranslation();
   const {
     config,
-    amount,
     items,
     environmentId,
     collectionName,
     excludePaymentTypes,
-    multicurrency = false,
+    excludeFiatCurrencies,
+    preferredCurrency,
+    customOrderData,
+    hideExcludedPaymentTypes,
+    waitFulfillmentSettlements = true,
   } = props;
+
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
   const chainId = useRef<ChainId>();
@@ -119,7 +127,6 @@ export default function SaleWidget(props: SaleWidgetProps) {
         value={{
           config,
           items,
-          amount,
           environment: config.environment,
           environmentId,
           provider,
@@ -127,7 +134,11 @@ export default function SaleWidget(props: SaleWidgetProps) {
           passport: checkout?.passport,
           collectionName,
           excludePaymentTypes,
-          multicurrency,
+          excludeFiatCurrencies,
+          preferredCurrency,
+          customOrderData,
+          waitFulfillmentSettlements,
+          hideExcludedPaymentTypes,
         }}
       >
         <CryptoFiatProvider environment={config.environment}>
@@ -154,9 +165,6 @@ export default function SaleWidget(props: SaleWidgetProps) {
               )}
             />
           )}
-          {viewState.view.type === SaleWidgetViews.FUND_WITH_SMART_CHECKOUT && (
-            <FundWithSmartCheckout subView={viewState.view.subView} />
-          )}
           {viewState.view.type === SaleWidgetViews.ORDER_SUMMARY && (
             <OrderSummary subView={viewState.view.subView} />
           )}
@@ -167,7 +175,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
               checkout={checkout}
               provider={provider}
               showOnrampOption={config.isOnRampEnabled}
-              showSwapOption={config.isSwapEnabled}
+              showSwapOption={false}
               showBridgeOption={config.isBridgeEnabled}
               onCloseButtonClick={() => sendSaleWidgetCloseEvent(eventTarget)}
               onBackButtonClick={() => {
@@ -182,6 +190,18 @@ export default function SaleWidget(props: SaleWidgetProps) {
               tokenAddress={viewState.view.data?.tokenAddress}
               heading={viewState.view.data?.heading}
               subheading={viewState.view.data?.subheading}
+            />
+          )}
+          {viewState.view.type === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
+            <ServiceUnavailableErrorView
+              onCloseClick={() => sendSaleWidgetCloseEvent(eventTarget)}
+              onBackButtonClick={() => {
+                viewDispatch({
+                  payload: {
+                    type: ViewActions.GO_BACK,
+                  },
+                });
+              }}
             />
           )}
           <CreditCardWarningDrawer />

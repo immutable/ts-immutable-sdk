@@ -1,17 +1,12 @@
-import { Box } from '@biom3/react';
+import { Box, Heading } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  SharedViews,
-  ViewActions,
-  ViewContext,
-} from 'context/view-context/ViewContext';
-import { SalePaymentTypes } from '@imtbl/checkout-sdk';
+import { isAddressSanctioned, SalePaymentTypes } from '@imtbl/checkout-sdk';
+
 import {
   OrderSummarySubViews,
   SaleWidgetViews,
 } from '../../../context/view-context/SaleViewContextTypes';
-import { LoadingView } from '../../../views/loading/LoadingView';
 import { useSaleContext } from '../context/SaleContextProvider';
 import {
   CryptoFiatActions,
@@ -28,7 +23,16 @@ import {
 } from '../types';
 import { FundingRouteExecute } from '../components/FundingRouteExecute/FundingRouteExecute';
 import { useSaleEvent } from '../hooks/useSaleEvents';
-import { getPaymentTokenDetails } from '../utils/analytics';
+import { LoadingHandover } from './LoadingHandover';
+import {
+  TransactionMethod,
+  getRiveAnimationName,
+  transactionRiveAnimations,
+} from '../hooks/useHandoverSteps';
+import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
+import { ViewContext, ViewActions, SharedViews } from '../../../context/view-context/ViewContext';
+import { useHandover } from '../../../lib/hooks/useHandover';
+import { getRemoteRive } from '../../../lib/utils';
 
 type OrderSummaryProps = {
   subView: OrderSummarySubViews;
@@ -36,25 +40,44 @@ type OrderSummaryProps = {
 
 export function OrderSummary({ subView }: OrderSummaryProps) {
   const { t } = useTranslation();
-  const { sendPageView, sendProceedToPay } = useSaleEvent();
+  const { sendFailedEvent, sendProceedToPay, sendInsufficientFunds } = useSaleEvent();
   const {
-    items,
     fromTokenAddress,
     collectionName,
-    disabledPaymentTypes,
     goToErrorView,
     goBackToPaymentMethods,
     sign,
     selectedCurrency,
+    setPaymentMethod,
+    environment,
+    riskAssessment,
+    paymentMethod,
   } = useSaleContext();
 
   const { viewDispatch, viewState } = useContext(ViewContext);
   const { cryptoFiatDispatch, cryptoFiatState } = useContext(CryptoFiatContext);
+  const { addHandover, closeHandover } = useHandover({
+    id: HandoverTarget.GLOBAL,
+  });
 
   const onPayWithCard = (paymentType: SalePaymentTypes) => goBackToPaymentMethods(paymentType);
 
   const signAndProceed = (tokenAddress?: string) => {
+    addHandover({
+      animationUrl: getRemoteRive(
+        environment,
+        getRiveAnimationName(TransactionMethod.APPROVE),
+      ),
+      inputValue:
+        transactionRiveAnimations[TransactionMethod.APPROVE].inputValues.start,
+      children: (
+        <Heading sx={{ px: 'base.spacing.x6' }}>
+          {t('views.PAYMENT_METHODS.handover.initial')}
+        </Heading>
+      ),
+    });
     sign(SignPaymentTypes.CRYPTO, tokenAddress);
+
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
@@ -70,11 +93,28 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
   };
 
   const onProceedToBuy = (fundingBalance: FundingBalance) => {
+    if (riskAssessment && isAddressSanctioned(riskAssessment)) {
+      const error = new Error('Sanctioned address');
+      sendFailedEvent(error.message, {}, [], undefined, { riskAssessment, paymentMethod });
+
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
+            error,
+          },
+        },
+      });
+
+      return;
+    }
+
     const { type, fundingItem } = fundingBalance;
 
     sendProceedToPay(
       SaleWidgetViews.ORDER_SUMMARY,
-      fundingItem,
+      fundingBalance,
       cryptoFiatState.conversions,
     );
     // checkoutPrimarySaleProceedToPay
@@ -84,6 +124,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       return;
     }
 
+    closeHandover();
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
@@ -104,6 +145,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     loadingBalances,
     fundingBalancesResult,
     transactionRequirement,
+    gasFees,
     queryFundingBalances,
   } = useFundingBalances();
 
@@ -113,10 +155,11 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     queryFundingBalances();
   }, [subView, fromTokenAddress]);
 
-  // If one ore more balances found, go to Order Review
+  // If one or more balances found, go to Order Review
   useEffect(() => {
     if (fundingBalances.length === 0) return;
 
+    closeHandover();
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
@@ -141,6 +184,15 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       const data = getTopUpViewData(
         smartCheckoutResult.transactionRequirements,
       );
+      setPaymentMethod(undefined);
+
+      // Send analytics event to track insufficient funds
+      sendInsufficientFunds(
+        SaleWidgetViews.ORDER_SUMMARY,
+        data,
+      );
+
+      closeHandover();
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -151,7 +203,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
         },
       });
     } catch (error: any) {
-      goToErrorView(SaleErrorTypes.SMART_CHECKOUT_EXECUTE_ERROR, error);
+      goToErrorView(SaleErrorTypes.SERVICE_BREAKDOWN, error);
     }
   }, [fundingBalances, loadingBalances, fundingBalancesResult]);
 
@@ -177,37 +229,17 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     });
   }, [cryptoFiatDispatch, fundingBalances, loadingBalances]);
 
-  // Trigger page loaded event
-  useEffect(() => {
-    if (loadingBalances || !items.length || !cryptoFiatState.conversions) {
-      return;
-    }
-
-    const tokens = fundingBalances.map(
-      ({ fundingItem }) => getPaymentTokenDetails(fundingItem, cryptoFiatState.conversions),
-    );
-
-    sendPageView(SaleWidgetViews.ORDER_SUMMARY, {
-      subView: OrderSummarySubViews.REVIEW_ORDER,
-      tokens,
-      items,
-      collectionName,
-    });
-    // checkoutPrimarySaleOrderSummaryViewed
-  }, [items, collectionName, fundingBalances, loadingBalances, cryptoFiatState]);
-
   return (
     <Box>
       {subView === OrderSummarySubViews.INIT && (
-        <LoadingView
-          loadingText={t(
-            'views.FUND_WITH_SMART_CHECKOUT.loading.checkingBalances',
-          )}
+        <LoadingHandover
+          text={t('views.ORDER_SUMMARY.loading.balances')}
+          animationUrl={getRemoteRive(environment, '/preparing_order.riv')}
+          inputValue={0}
         />
       )}
       {subView === OrderSummarySubViews.REVIEW_ORDER && (
         <OrderReview
-          items={items}
           fundingBalances={fundingBalances}
           conversions={cryptoFiatState.conversions}
           collectionName={collectionName}
@@ -216,7 +248,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
           onProceedToBuy={onProceedToBuy}
           transactionRequirement={transactionRequirement}
           onPayWithCard={onPayWithCard}
-          disabledPaymentTypes={disabledPaymentTypes}
+          gasFees={gasFees}
         />
       )}
       {subView === OrderSummarySubViews.EXECUTE_FUNDING_ROUTE && (

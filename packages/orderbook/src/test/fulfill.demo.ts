@@ -1,7 +1,7 @@
 import { log } from 'console';
 import { Environment } from '@imtbl/config';
 import { BigNumber, Wallet } from 'ethers';
-import { OrderStatusName } from 'openapi/sdk';
+import { OrderStatusName } from '../openapi/sdk';
 import { Orderbook } from '../orderbook';
 import {
   deployTestToken,

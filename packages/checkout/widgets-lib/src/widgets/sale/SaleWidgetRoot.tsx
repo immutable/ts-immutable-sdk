@@ -5,23 +5,22 @@ import {
   SaleItem,
   SaleWidgetParams,
   WidgetConfiguration,
+  WidgetLanguage,
   WidgetProperties,
   WidgetTheme,
   WidgetType,
 } from '@imtbl/checkout-sdk';
-import { Base } from 'widgets/BaseWidgetRoot';
+import { Base } from '../BaseWidgetRoot';
 import {
   ConnectLoader,
   ConnectLoaderParams,
-} from 'components/ConnectLoader/ConnectLoader';
-import { getL2ChainId } from 'lib';
-import {
-  isValidAmount,
-  isValidWalletProvider,
-} from 'lib/validations/widgetValidators';
-import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
-import { LoadingView } from 'views/loading/LoadingView';
+} from '../../components/ConnectLoader/ConnectLoader';
+import { getL2ChainId } from '../../lib';
+import { isValidWalletProvider } from '../../lib/validations/widgetValidators';
+import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
+import { LoadingView } from '../../views/loading/LoadingView';
+import { HandoverProvider } from '../../context/handover-context/HandoverProvider';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import i18n from '../../i18n';
 
@@ -31,12 +30,31 @@ export class Sale extends Base<WidgetType.SALE> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT;
 
   // TODO: add specific validation logic for the sale items
-  private isValidProucts(products: SaleItem[]): boolean {
+  private isValidArray(items: SaleItem[] | undefined): boolean {
     try {
-      return Array.isArray(products);
+      return Array.isArray(items);
     } catch {
       return false;
     }
+  }
+
+  private deduplicateItems(items: SaleItem[] | undefined): SaleItem[] {
+    if (!items || !this.isValidArray(items)) return [];
+
+    const uniqueItems = items.reduce((acc, item) => {
+      const itemIndex = acc.findIndex(
+        ({ productId }) => productId === item.productId,
+      );
+
+      if (itemIndex !== -1) {
+        acc[itemIndex] = { ...item, qty: acc[itemIndex].qty + item.qty };
+        return acc;
+      }
+
+      return [...acc, { ...item }];
+    }, [] as SaleItem[]);
+
+    return uniqueItems;
   }
 
   protected getValidatedProperties({
@@ -63,14 +81,7 @@ export class Sale extends Base<WidgetType.SALE> {
       validatedParams.walletProviderName = undefined;
     }
 
-    if (!isValidAmount(params.amount)) {
-      // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "amount" widget input');
-      validatedParams.amount = '';
-    }
-
-    // TODO: fix the logic here when proper , currently saying if valid then reset to empty array.
-    if (!this.isValidProucts(params.items ?? [])) {
+    if (!this.isValidArray(params.items)) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "items" widget input.');
       validatedParams.items = [];
@@ -88,13 +99,19 @@ export class Sale extends Base<WidgetType.SALE> {
       validatedParams.collectionName = '';
     }
 
-    if (params.excludePaymentTypes !== undefined && !Array.isArray(params.excludePaymentTypes)) {
+    if (
+      params.excludePaymentTypes !== undefined
+      && !Array.isArray(params.excludePaymentTypes)
+    ) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "excludePaymentTypes" widget input');
       validatedParams.excludePaymentTypes = [];
     }
 
-    return validatedParams;
+    return {
+      ...validatedParams,
+      items: this.deduplicateItems(params.items),
+    };
   }
 
   protected render() {
@@ -115,26 +132,42 @@ export class Sale extends Base<WidgetType.SALE> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="sale-container" config={config}>
-            <ConnectLoader
-              widgetConfig={config}
-              params={connectLoaderParams}
-              closeEvent={() => {
-                sendSaleWidgetCloseEvent(window);
-              }}
-            >
-              <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
-                <SaleWidget
-                  config={config}
-                  amount={this.parameters.amount!}
-                  items={this.parameters.items!}
-                  environmentId={this.parameters.environmentId!}
-                  collectionName={this.parameters.collectionName!}
-                  excludePaymentTypes={this.parameters.excludePaymentTypes!}
-                  language="en"
-                  multicurrency={!!this.properties?.config?.multicurrency}
-                />
-              </Suspense>
-            </ConnectLoader>
+            <HandoverProvider>
+              <ConnectLoader
+                widgetConfig={config}
+                params={connectLoaderParams}
+                closeEvent={() => {
+                  sendSaleWidgetCloseEvent(window);
+                }}
+              >
+                <Suspense
+                  fallback={
+                    <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
+                  }
+                >
+                  <SaleWidget
+                    config={config}
+                    items={this.parameters.items!}
+                    language={this.parameters.language as WidgetLanguage}
+                    environmentId={this.parameters.environmentId!}
+                    collectionName={this.parameters.collectionName!}
+                    excludePaymentTypes={this.parameters.excludePaymentTypes!}
+                    excludeFiatCurrencies={
+                      this.parameters.excludeFiatCurrencies!
+                    }
+                    preferredCurrency={this.parameters.preferredCurrency!}
+                    customOrderData={this.parameters.customOrderData!}
+                    hideExcludedPaymentTypes={
+                      this.properties?.config?.hideExcludedPaymentTypes ?? false
+                    }
+                    waitFulfillmentSettlements={
+                      this.properties?.config?.waitFulfillmentSettlements
+                      ?? true
+                    }
+                  />
+                </Suspense>
+              </ConnectLoader>
+            </HandoverProvider>
           </ThemeProvider>
         </CustomAnalyticsProvider>
       </React.StrictMode>,

@@ -3,6 +3,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
+import { Stack } from '@biom3/react';
 
 interface ConnectProps {
   checkout: Checkout;
@@ -18,6 +19,35 @@ export default function Connect(props: ConnectProps) {
   const [loading, setLoading] = useState<boolean>(false);
 
   async function connectClick() {
+    if (!checkout) {
+      console.error('missing checkout, please connect first');
+      return;
+    }
+    if (!provider) {
+      console.error('missing provider, please connect first');
+      return;
+    }
+    setError(null);
+    setLoading(true);
+    try {
+      const resp = await checkout.connect({
+        provider,
+        requestWalletPermissions: false,
+      });
+      setProvider(resp.provider);
+      setResult(resp.provider);
+      setLoading(false);
+    } catch (err: any) {
+      setError(err);
+      setLoading(false);
+      console.log(err.message);
+      console.log(err.type);
+      console.log(err.data);
+      console.log(err.stack);
+    }
+  }
+
+  async function connectPermissionsClick() {
     if (!checkout) {
       console.error('missing checkout, please connect first');
       return;
@@ -55,9 +85,14 @@ export default function Connect(props: ConnectProps) {
 
   return (
     <div>
-      <LoadingButton onClick={connectClick} loading={loading}>
-        Connect
-      </LoadingButton>
+      <Stack direction="row">
+        <LoadingButton onClick={connectClick} loading={loading}>
+          Connect
+        </LoadingButton>
+        <LoadingButton onClick={connectPermissionsClick} loading={loading}>
+          Connect with Permissions
+        </LoadingButton>
+      </Stack>
       {result && !error && <SuccessMessage>Connected.</SuccessMessage>}
       {error && (
         <ErrorMessage>

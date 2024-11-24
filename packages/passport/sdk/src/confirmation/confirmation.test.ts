@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { TransactionApprovalRequestChainTypeEnum } from '@imtbl/guardian';
+import * as GeneratedClients from '@imtbl/generated-clients';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import ConfirmationScreen from './confirmation';
 import SpyInstance = jest.SpyInstance;
@@ -79,7 +79,7 @@ describe('confirmation', () => {
       const res = await confirmationScreen.requestConfirmation(
         transactionId,
         mockEtherAddress,
-        TransactionApprovalRequestChainTypeEnum.Starkex,
+        GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Starkex,
       );
 
       expect(res.confirmed).toEqual(false);
@@ -104,7 +104,7 @@ describe('confirmation', () => {
       await confirmationScreen.requestConfirmation(
         transactionId,
         mockEtherAddress,
-        TransactionApprovalRequestChainTypeEnum.Starkex,
+        GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Starkex,
       );
 
       expect(postMessageMock).toHaveBeenCalledTimes(1);
@@ -116,6 +116,30 @@ describe('confirmation', () => {
         'https://passport.sandbox.immutable.com',
       );
     });
+
+    describe('when the transaction is rejected', () => {
+      it('should resolve with confirmed: false', async () => {
+        const transactionId = 'transactionId123';
+        addEventListenerMock
+          .mockImplementationOnce((event, callback) => {
+            callback({
+              origin: testConfig.passportDomain,
+              data: {
+                eventType: PASSPORT_EVENT_TYPE,
+                messageType: ReceiveMessage.TRANSACTION_REJECTED,
+              },
+            });
+          });
+
+        const res = await confirmationScreen.requestConfirmation(
+          transactionId,
+          mockEtherAddress,
+          GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Starkex,
+        );
+
+        expect(res.confirmed).toEqual(false);
+      });
+    });
   });
 
   describe('requestMessageConfirmation', () => {
@@ -123,11 +147,28 @@ describe('confirmation', () => {
       const messageId = 'transactionId123';
       const etherAddress = 'etherAddress123';
       confirmationScreen.loading();
+
       const res = await confirmationScreen.requestMessageConfirmation(messageId, etherAddress);
+
       expect(res.confirmed).toEqual(false);
       expect(mockNewWindow.location.href).toEqual(
         'https://passport.sandbox.immutable.com/'
         + `transaction-confirmation/zkevm/message?messageID=${messageId}&etherAddress=${etherAddress}`,
+      );
+    });
+
+    it('should pass the message type as a query string arg when it is provided', async () => {
+      const messageId = 'transactionId123';
+      const etherAddress = 'etherAddress123';
+      const messageType = 'erc191';
+      confirmationScreen.loading();
+
+      const res = await confirmationScreen.requestMessageConfirmation(messageId, etherAddress, messageType);
+
+      expect(res.confirmed).toEqual(false);
+      expect(mockNewWindow.location.href).toEqual(
+        'https://passport.sandbox.immutable.com/transaction-confirmation/zkevm/message?'
+            + `messageID=${messageId}&etherAddress=${etherAddress}&messageType=${messageType}`,
       );
     });
 
@@ -157,6 +198,52 @@ describe('confirmation', () => {
         },
         'https://passport.sandbox.immutable.com',
       );
+    });
+
+    describe('when the message is rejected', () => {
+      it('should resolve with confirmed: false', async () => {
+        const transactionId = 'transactionId123';
+        addEventListenerMock
+          .mockImplementationOnce((event, callback) => {
+            callback({
+              origin: testConfig.passportDomain,
+              data: {
+                eventType: PASSPORT_EVENT_TYPE,
+                messageType: ReceiveMessage.MESSAGE_REJECTED,
+              },
+            });
+          });
+
+        const res = await confirmationScreen.requestMessageConfirmation(
+          transactionId,
+          mockEtherAddress,
+        );
+
+        expect(res.confirmed).toEqual(false);
+      });
+    });
+  });
+
+  describe('showServiceUnavailable', () => {
+    it('should reject with "Service unavailable" when the unavailable flow is triggered', async () => {
+      const showConfirmationScreenMock = jest.spyOn(confirmationScreen, 'showConfirmationScreen')
+        .mockImplementation((href, messageHandler, resolve) => {
+          resolve();
+        });
+
+      const expectedHref = 'mocked-unavailable-href';
+      // biome-ignore lint/suspicious/noExplicitAny: test
+      jest.spyOn(confirmationScreen as any, 'getHref').mockReturnValue(expectedHref);
+
+      await expect(confirmationScreen.showServiceUnavailable()).rejects.toThrow('Service unavailable');
+
+      expect(showConfirmationScreenMock).toHaveBeenCalledWith(
+        expectedHref,
+        expect.any(Function),
+        expect.any(Function),
+      );
+
+      showConfirmationScreenMock.mockRestore();
     });
   });
 });

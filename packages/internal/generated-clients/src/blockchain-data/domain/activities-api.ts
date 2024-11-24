@@ -26,17 +26,17 @@ import { GetActivityResult } from '../models';
 // @ts-ignore
 import { ListActivitiesResult } from '../models';
 // @ts-ignore
-export { APIError400 } from '../models';
+export type { APIError400 } from '../models';
 // @ts-ignore
-export { APIError404 } from '../models';
+export type { APIError404 } from '../models';
 // @ts-ignore
-export { APIError500 } from '../models';
+export type { APIError500 } from '../models';
 // @ts-ignore
-export { ActivityType } from '../models';
+export type { ActivityType } from '../models';
 // @ts-ignore
-export { GetActivityResult } from '../models';
+export type { GetActivityResult } from '../models';
 // @ts-ignore
-export { ListActivitiesResult } from '../models';
+export type { ListActivitiesResult } from '../models';
 
 /**
  * Request parameters for getActivity operation in ActivitiesApi.

@@ -33,7 +33,7 @@ export interface CancelledOrderStatus {
      */
     'pending': boolean;
     /**
-     * Whether the cancellation was done on-chain or off-chain
+     * Whether the cancellation was done on-chain or off-chain or as a result of an underfunded account
      * @type {string}
      * @memberof CancelledOrderStatus
      */
@@ -47,7 +47,8 @@ export const CancelledOrderStatusNameEnum = {
 export type CancelledOrderStatusNameEnum = typeof CancelledOrderStatusNameEnum[keyof typeof CancelledOrderStatusNameEnum];
 export const CancelledOrderStatusCancellationTypeEnum = {
     OnChain: 'ON_CHAIN',
-    OffChain: 'OFF_CHAIN'
+    OffChain: 'OFF_CHAIN',
+    Underfunded: 'UNDERFUNDED'
 } as const;
 
 export type CancelledOrderStatusCancellationTypeEnum = typeof CancelledOrderStatusCancellationTypeEnum[keyof typeof CancelledOrderStatusCancellationTypeEnum];

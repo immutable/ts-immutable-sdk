@@ -5,8 +5,8 @@ import { Accordion, Form } from 'react-bootstrap';
 import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps, EnvironmentNames } from '@/types';
-import { Interface } from 'ethers/lib/utils';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
+import { utils } from 'ethers';
 
 enum ApproveType {
   NFTApprove = 'NFT_APPROVE',
@@ -33,7 +33,7 @@ function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) 
       'function setApprovalForAll(address to, bool approved)',
       'function approve(address to, uint256 tokenId)',
     ];
-    return new Interface(abi);
+    return new utils.Interface(abi);
   }, []);
 
   const [choosedApproveType, setChoosedApproveType] = useState<ApproveType>(ApproveType.NFTApprove);

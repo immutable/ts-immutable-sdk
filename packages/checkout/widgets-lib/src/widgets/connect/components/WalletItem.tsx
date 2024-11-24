@@ -1,7 +1,7 @@
-import { MenuItem } from '@biom3/react';
+import { Badge, Box, MenuItem } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
 import { cloneElement, ReactElement, useState } from 'react';
-import { EIP6963ProviderDetail, WalletProviderName } from '@imtbl/checkout-sdk';
+import { EIP6963ProviderInfo, WalletProviderName } from '@imtbl/checkout-sdk';
 import { RawImage } from '../../../components/RawImage/RawImage';
 import { getProviderSlugFromRdns } from '../../../lib/provider';
 import useIsSmallScreen from '../../../lib/hooks/useIsSmallScreen';
@@ -9,8 +9,8 @@ import useIsSmallScreen from '../../../lib/hooks/useIsSmallScreen';
 export interface WalletProps<RC extends ReactElement | undefined = undefined> {
   loading?: boolean;
   recommended?: boolean;
-  onWalletItemClick: (providerDetail: EIP6963ProviderDetail) => void;
-  providerDetail: EIP6963ProviderDetail;
+  onWalletItemClick: () => void;
+  providerInfo: EIP6963ProviderInfo;
   rc?: RC;
 }
 
@@ -20,13 +20,13 @@ export function WalletItem<
   rc = <span />,
   loading = false,
   recommended = false,
-  providerDetail,
+  providerInfo,
   onWalletItemClick,
 }: WalletProps<RC>) {
   const { t } = useTranslation();
   const { isSmallScreenMode } = useIsSmallScreen();
   const [busy, setBusy] = useState(false);
-  const providerSlug = getProviderSlugFromRdns(providerDetail.info.rdns);
+  const providerSlug = getProviderSlugFromRdns(providerInfo.rdns);
   const isPassport = providerSlug === WalletProviderName.PASSPORT;
   const isPassportOrMetamask = isPassport || providerSlug === WalletProviderName.METAMASK;
   const offsetStyles = { marginLeft: '65px' };
@@ -39,13 +39,13 @@ export function WalletItem<
           setBusy(true);
           // let the parent handle errors
           try {
-            await onWalletItemClick(providerDetail);
+            await onWalletItemClick();
           } finally {
             setBusy(false);
           }
         },
       })}
-      testId={`wallet-list-${providerDetail.info.rdns}`}
+      testId={`wallet-list-${providerInfo.rdns}`}
       size="medium"
       emphasized
       sx={{
@@ -54,25 +54,43 @@ export function WalletItem<
       }}
     >
       <RawImage
-        src={providerDetail.info.icon}
-        alt={providerDetail.info.name}
+        src={providerInfo.icon}
+        alt={providerInfo.name}
         sx={{
           position: 'absolute',
           left: 'base.spacing.x3',
         }}
       />
-      <MenuItem.Label size="medium" sx={offsetStyles}>
-        {providerDetail.info.name}
+      <MenuItem.Label
+        size="medium"
+        sx={{
+          ...offsetStyles,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          WebkitLineClamp: 3,
+        }}
+      >
+        {((recommended && isSmallScreenMode) && (
+          <Badge
+            variant="guidance"
+            isAnimated={false}
+            badgeContent={t('wallets.recommended')}
+            sx={{
+              display: 'inline-flex',
+              marginBottom: 'base.spacing.x1',
+            }}
+          />
+        ))}
+        <Box>{providerInfo.name}</Box>
       </MenuItem.Label>
       {(!busy && <MenuItem.IntentIcon />)}
-      <MenuItem.Caption sx={{ ...offsetStyles, width: '200px' }}>
+      <MenuItem.Caption sx={{ ...offsetStyles }}>
         {(isPassportOrMetamask) && t(`wallets.${providerSlug}.description`)}
       </MenuItem.Caption>
-      {((recommended || busy) && (
+      {(((recommended || busy) && !isSmallScreenMode) && (
         <MenuItem.Badge
           variant="guidance"
           isAnimated={busy}
-          badgeContent={busy || isSmallScreenMode ? '' : t('wallets.recommended')}
+          badgeContent={busy ? '' : t('wallets.recommended')}
         />
       ))}
     </MenuItem>

@@ -1,6 +1,7 @@
 import { BigNumber } from 'ethers';
 import { ItemRequirement, ItemType } from '../../types';
 import {
+  erc1155ItemAggregator,
   erc20ItemAggregator, erc721ItemAggregator, itemAggregator, nativeAggregator,
 } from './itemAggregator';
 
@@ -11,22 +12,31 @@ describe('itemAggregator', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
+        },
+        {
+          type: ItemType.NATIVE,
+          amount: BigNumber.from(1),
+          isFee: true,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.ERC721,
@@ -46,13 +56,20 @@ describe('itemAggregator', () => {
       expect(aggregatedItems).toEqual([
         {
           type: ItemType.NATIVE,
+          amount: BigNumber.from(1),
+          isFee: true,
+        },
+        {
+          type: ItemType.NATIVE,
           amount: BigNumber.from(2),
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(2),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.ERC721,
@@ -70,22 +87,26 @@ describe('itemAggregator', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: true,
         },
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
       ];
 
@@ -94,33 +115,38 @@ describe('itemAggregator', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: true,
         },
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(2),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
       ]);
     });
 
-    it('should not aggregate erc20s', () => {
+    it('should not aggregate different erc20s', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
           tokenAddress: '0xERC20_1',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
           tokenAddress: '0xERC20_2',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
       ];
 
@@ -131,12 +157,51 @@ describe('itemAggregator', () => {
           amount: BigNumber.from(1),
           tokenAddress: '0xERC20_1',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
           tokenAddress: '0xERC20_2',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
+        },
+      ]);
+    });
+
+    it('should not aggregate erc20s when one is a fee', () => {
+      const itemRequirements: ItemRequirement[] = [
+        {
+          type: ItemType.ERC20,
+          amount: BigNumber.from(1),
+          tokenAddress: '0xERC20_1',
+          spenderAddress: '0xSEAPORT',
+          isFee: true,
+        },
+        {
+          type: ItemType.ERC20,
+          amount: BigNumber.from(2),
+          tokenAddress: '0xERC20_1',
+          spenderAddress: '0xSEAPORT',
+          isFee: false,
+        },
+      ];
+
+      const aggregatedItems = erc20ItemAggregator(itemRequirements);
+      expect(aggregatedItems).toEqual([
+        {
+          type: ItemType.ERC20,
+          amount: BigNumber.from(1),
+          tokenAddress: '0xERC20_1',
+          spenderAddress: '0xSEAPORT',
+          isFee: true,
+        },
+        {
+          type: ItemType.ERC20,
+          amount: BigNumber.from(2),
+          tokenAddress: '0xERC20_1',
+          spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
       ]);
     });
@@ -153,22 +218,26 @@ describe('itemAggregator', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
       ];
 
@@ -178,16 +247,19 @@ describe('itemAggregator', () => {
           {
             type: ItemType.NATIVE,
             amount: BigNumber.from(1),
+            isFee: false,
           },
           {
             type: ItemType.NATIVE,
             amount: BigNumber.from(1),
+            isFee: false,
           },
           {
             type: ItemType.ERC20,
             amount: BigNumber.from(2),
             tokenAddress: '0xERC20',
             spenderAddress: '0xSEAPORT',
+            isFee: false,
           },
         ]),
       );
@@ -198,22 +270,26 @@ describe('itemAggregator', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: true,
         },
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigNumber.from(2),
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: 'ERC1559' as ItemType,
@@ -233,16 +309,19 @@ describe('itemAggregator', () => {
           {
             type: ItemType.NATIVE,
             amount: BigNumber.from(1),
+            isFee: true,
           },
           {
             type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
+            amount: BigNumber.from(2),
+            isFee: false,
           },
           {
             type: ItemType.ERC20,
             amount: BigNumber.from(2),
             tokenAddress: '0xERC20',
             spenderAddress: '0xSEAPORT',
+            isFee: false,
           },
           {
             type: 'ERC1559' as ItemType,
@@ -265,10 +344,12 @@ describe('itemAggregator', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: true,
         },
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigNumber.from(2),
+          isFee: false,
         },
         {
           type: ItemType.ERC721,
@@ -289,10 +370,12 @@ describe('itemAggregator', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: true,
         },
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigNumber.from(2),
+          isFee: false,
         },
         {
           type: ItemType.ERC721,
@@ -308,6 +391,7 @@ describe('itemAggregator', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: true,
         },
         {
           type: ItemType.ERC721,
@@ -328,6 +412,7 @@ describe('itemAggregator', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: true,
         },
         {
           type: ItemType.ERC721,
@@ -356,6 +441,7 @@ describe('itemAggregator', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: true,
         },
         {
           type: ItemType.ERC721,
@@ -366,6 +452,7 @@ describe('itemAggregator', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
         {
           type: ItemType.ERC721,
@@ -381,10 +468,12 @@ describe('itemAggregator', () => {
           {
             type: ItemType.NATIVE,
             amount: BigNumber.from(1),
+            isFee: true,
           },
           {
             type: ItemType.NATIVE,
             amount: BigNumber.from(1),
+            isFee: false,
           },
           {
             type: ItemType.ERC721,
@@ -401,10 +490,12 @@ describe('itemAggregator', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
         {
           type: ItemType.ERC721,
@@ -436,15 +527,274 @@ describe('itemAggregator', () => {
           {
             type: ItemType.NATIVE,
             amount: BigNumber.from(1),
+            isFee: false,
           },
           {
             type: ItemType.NATIVE,
             amount: BigNumber.from(1),
+            isFee: false,
           },
           {
             type: ItemType.ERC721,
             id: '1',
             contractAddress: '0xERC721',
+            spenderAddress: '0xSEAPORT',
+          },
+          {
+            type: 'ERC1559' as ItemType,
+            contractAddress: '0xERC1559',
+            spenderAddress: '0xSEAPORT',
+          } as ItemRequirement,
+          {
+            type: 'ERC1559' as ItemType,
+            contractAddress: '0xERC1559',
+            spenderAddress: '0xSEAPORT',
+          } as ItemRequirement,
+        ]),
+      );
+    });
+  });
+
+  describe('erc1155ItemAggregator', () => {
+    it('should return aggregated ERC1155 items', () => {
+      const itemRequirements: ItemRequirement[] = [
+        {
+          type: ItemType.NATIVE,
+          amount: BigNumber.from(1),
+          isFee: true,
+        },
+        {
+          type: ItemType.NATIVE,
+          amount: BigNumber.from(1),
+          isFee: false,
+        },
+        {
+          type: ItemType.ERC1155,
+          id: '1',
+          amount: BigNumber.from(10),
+          contractAddress: '0xERC1155',
+          spenderAddress: '0xSEAPORT',
+        },
+        {
+          type: ItemType.ERC1155,
+          id: '1',
+          amount: BigNumber.from(20),
+          contractAddress: '0xERC1155',
+          spenderAddress: '0xSEAPORT',
+        },
+      ];
+
+      const aggregatedItems = erc1155ItemAggregator(itemRequirements);
+      expect(aggregatedItems).toEqual([
+        {
+          type: ItemType.NATIVE,
+          amount: BigNumber.from(1),
+          isFee: true,
+        },
+        {
+          type: ItemType.NATIVE,
+          amount: BigNumber.from(1),
+          isFee: false,
+        },
+        {
+          type: ItemType.ERC1155,
+          id: '1',
+          amount: BigNumber.from(30),
+          contractAddress: '0xERC1155',
+          spenderAddress: '0xSEAPORT',
+        },
+      ]);
+    });
+
+    it('should not aggregate ERC1155s - different token IDs', () => {
+      const itemRequirements: ItemRequirement[] = [
+        {
+          type: ItemType.ERC1155,
+          id: '1',
+          amount: BigNumber.from(20),
+          contractAddress: '0xERC1155',
+          spenderAddress: '0xSEAPORT',
+        },
+        {
+          type: ItemType.ERC1155,
+          id: '2',
+          amount: BigNumber.from(20),
+          contractAddress: '0xERC1155',
+          spenderAddress: '0xSEAPORT',
+        },
+      ];
+
+      const aggregatedItems = erc1155ItemAggregator(itemRequirements);
+      expect(aggregatedItems).toEqual([
+        {
+          type: ItemType.ERC1155,
+          id: '1',
+          amount: BigNumber.from(20),
+          contractAddress: '0xERC1155',
+          spenderAddress: '0xSEAPORT',
+        },
+        {
+          type: ItemType.ERC1155,
+          id: '2',
+          amount: BigNumber.from(20),
+          contractAddress: '0xERC1155',
+          spenderAddress: '0xSEAPORT',
+        },
+      ]);
+    });
+
+    it('should not aggregate ERC1155s - different spender addresses', () => {
+      const itemRequirements: ItemRequirement[] = [
+        {
+          type: ItemType.ERC1155,
+          id: '1',
+          amount: BigNumber.from(20),
+          contractAddress: '0xERC1155',
+          spenderAddress: '0xSEAPORT',
+        },
+        {
+          type: ItemType.ERC1155,
+          id: '1',
+          amount: BigNumber.from(20),
+          contractAddress: '0xERC1155',
+          spenderAddress: '0xDIFFSEAPORT',
+        },
+      ];
+
+      const aggregatedItems = erc1155ItemAggregator(itemRequirements);
+      expect(aggregatedItems).toEqual([
+        {
+          type: ItemType.ERC1155,
+          id: '1',
+          amount: BigNumber.from(20),
+          contractAddress: '0xERC1155',
+          spenderAddress: '0xSEAPORT',
+        },
+        {
+          type: ItemType.ERC1155,
+          id: '1',
+          amount: BigNumber.from(20),
+          contractAddress: '0xERC1155',
+          spenderAddress: '0xDIFFSEAPORT',
+        },
+      ]);
+    });
+
+    it('should return empty array', () => {
+      const itemRequirements: ItemRequirement[] = [];
+
+      const aggregatedItems = erc1155ItemAggregator(itemRequirements);
+      expect(aggregatedItems).toEqual([]);
+    });
+
+    it('should return aggregated items when not ordered', () => {
+      const itemRequirements: ItemRequirement[] = [
+        {
+          type: ItemType.NATIVE,
+          amount: BigNumber.from(2),
+          isFee: false,
+        },
+        {
+          type: ItemType.ERC1155,
+          id: '1',
+          amount: BigNumber.from(10),
+          contractAddress: '0xERC1155',
+          spenderAddress: '0xSEAPORT',
+        },
+        {
+          type: ItemType.NATIVE,
+          amount: BigNumber.from(1),
+          isFee: true,
+        },
+        {
+          type: ItemType.ERC1155,
+          id: '1',
+          amount: BigNumber.from(20),
+          contractAddress: '0xERC1155',
+          spenderAddress: '0xSEAPORT',
+        },
+      ];
+
+      const aggregatedItems = erc1155ItemAggregator(itemRequirements);
+      expect(aggregatedItems).toEqual(
+        expect.arrayContaining([
+          {
+            type: ItemType.NATIVE,
+            amount: BigNumber.from(1),
+            isFee: true,
+          },
+          {
+            type: ItemType.NATIVE,
+            amount: BigNumber.from(2),
+            isFee: false,
+          },
+          {
+            type: ItemType.ERC1155,
+            id: '1',
+            amount: BigNumber.from(30),
+            contractAddress: '0xERC1155',
+            spenderAddress: '0xSEAPORT',
+          },
+        ]),
+      );
+    });
+
+    it('should not aggregate unknown item types', () => {
+      const itemRequirements: ItemRequirement[] = [
+        {
+          type: ItemType.NATIVE,
+          amount: BigNumber.from(2),
+          isFee: false,
+        },
+        {
+          type: ItemType.NATIVE,
+          amount: BigNumber.from(1),
+          isFee: true,
+        },
+        {
+          type: ItemType.ERC1155,
+          id: '1',
+          amount: BigNumber.from(10),
+          contractAddress: '0xERC1155',
+          spenderAddress: '0xSEAPORT',
+        },
+        {
+          type: ItemType.ERC1155,
+          id: '1',
+          amount: BigNumber.from(20),
+          contractAddress: '0xERC1155',
+          spenderAddress: '0xSEAPORT',
+        },
+        {
+          type: 'ERC1559' as ItemType,
+          contractAddress: '0xERC1559',
+          spenderAddress: '0xSEAPORT',
+        } as ItemRequirement,
+        {
+          type: 'ERC1559' as ItemType,
+          contractAddress: '0xERC1559',
+          spenderAddress: '0xSEAPORT',
+        } as ItemRequirement,
+      ];
+
+      const aggregatedItems = erc1155ItemAggregator(itemRequirements);
+      expect(aggregatedItems).toEqual(
+        expect.arrayContaining([
+          {
+            type: ItemType.NATIVE,
+            amount: BigNumber.from(2),
+            isFee: false,
+          },
+          {
+            type: ItemType.NATIVE,
+            amount: BigNumber.from(1),
+            isFee: true,
+          },
+          {
+            type: ItemType.ERC1155,
+            id: '1',
+            amount: BigNumber.from(30),
+            contractAddress: '0xERC1155',
             spenderAddress: '0xSEAPORT',
           },
           {
@@ -468,22 +818,26 @@ describe('itemAggregator', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
       ];
 
@@ -494,16 +848,48 @@ describe('itemAggregator', () => {
           amount: BigNumber.from(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(2),
+          isFee: false,
+        },
+      ]);
+    });
+
+    it('should not aggregate native fee items', () => {
+      const itemRequirements: ItemRequirement[] = [
+        {
+          type: ItemType.NATIVE,
+          amount: BigNumber.from(1),
+          isFee: true,
+        },
+        {
+          type: ItemType.NATIVE,
+          amount: BigNumber.from(2),
+          isFee: true,
+        },
+      ];
+
+      const aggregatedItems = nativeAggregator(itemRequirements);
+      expect(aggregatedItems).toEqual([
+        {
+          type: ItemType.NATIVE,
+          amount: BigNumber.from(1),
+          isFee: true,
+        },
+        {
+          type: ItemType.NATIVE,
+          amount: BigNumber.from(2),
+          isFee: true,
         },
       ]);
     });

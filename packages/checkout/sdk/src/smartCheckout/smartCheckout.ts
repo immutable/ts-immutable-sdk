@@ -10,7 +10,7 @@ import {
   SmartCheckoutResult,
 } from '../types/smartCheckout';
 import { itemAggregator } from './aggregators';
-import { hasERC20Allowances, hasERC721Allowances } from './allowance';
+import { hasERC1155Allowances, hasERC20Allowances, hasERC721Allowances } from './allowance';
 import { balanceCheck } from './balanceCheck';
 import { CheckoutConfiguration } from '../config';
 import { allowanceAggregator } from './aggregators/allowanceAggregator';
@@ -109,18 +109,24 @@ export const smartCheckout = async (
     ownerAddress,
     aggregatedItems,
   );
+  const erc1155AllowancePromise = hasERC1155Allowances(
+    provider,
+    ownerAddress,
+    aggregatedItems,
+  );
 
   const resolvedAllowances = await measureAsyncExecution<
   { sufficient: boolean; allowances: Allowance[] }[]
   >(
     config,
     'Time to calculate token allowances',
-    Promise.all([erc20AllowancePromise, erc721AllowancePromise]),
+    Promise.all([erc20AllowancePromise, erc721AllowancePromise, erc1155AllowancePromise]),
   );
 
   const aggregatedAllowances = allowanceAggregator(
     resolvedAllowances[0],
     resolvedAllowances[1],
+    resolvedAllowances[2],
   );
 
   // Skip gas calculation if transactionOrGasAmount is not provided

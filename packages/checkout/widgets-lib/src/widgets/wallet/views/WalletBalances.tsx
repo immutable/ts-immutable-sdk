@@ -2,11 +2,11 @@ import { Box, ButtCon, MenuItem } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
-import { IMTBLWidgetEvents, WidgetTheme } from '@imtbl/checkout-sdk';
-import { fetchTokenSymbols } from 'lib/fetchTokenSymbols';
-import { CryptoFiatActions, CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
-import { ButtonNavigationStyles } from 'components/Header/HeaderStyles';
 import { useTranslation } from 'react-i18next';
+import { IMTBLWidgetEvents, WidgetTheme } from '@imtbl/checkout-sdk';
+import { fetchTokenSymbols } from '../../../lib/fetchTokenSymbols';
+import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
+import { ButtonNavigationStyles } from '../../../components/Header/HeaderStyles';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -24,7 +24,6 @@ import {
 import { getL2ChainId } from '../../../lib/networkUtils';
 import { WalletWidgetViews } from '../../../context/view-context/WalletViewContextTypes';
 import {
-  SharedViews,
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
@@ -124,12 +123,7 @@ export function WalletBalances({
       control: 'AddCoins',
       controlType: 'Button',
     });
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: { type: SharedViews.TOP_UP_VIEW },
-      },
-    });
+    orchestrationEvents.sendRequestAddTokensEvent(eventTarget, IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {});
   };
 
   const handleBridgeToL2OnClick = (address?: string) => {

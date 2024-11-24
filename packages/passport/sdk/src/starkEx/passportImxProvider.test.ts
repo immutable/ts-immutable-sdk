@@ -12,6 +12,7 @@ import {
   UnsignedOrderRequest,
   UnsignedTransferRequest,
 } from '@imtbl/x-client';
+import { trackError, trackFlow } from '@imtbl/metrics';
 import registerPassportStarkEx from './workflows/registration';
 import { mockUser, mockUserImx } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
@@ -32,6 +33,7 @@ jest.mock('./workflows/registration');
 jest.mock('./getStarkSigner');
 jest.mock('@imtbl/generated-clients');
 jest.mock('@imtbl/x-client');
+jest.mock('@imtbl/metrics');
 
 describe('PassportImxProvider', () => {
   afterEach(jest.resetAllMocks);
@@ -53,6 +55,7 @@ describe('PassportImxProvider', () => {
   const mockStarkSigner = {
     signMessage: jest.fn(),
     getAddress: jest.fn(),
+    getYCoordinate: jest.fn(),
   } as StarkSigner;
 
   const mockEthSigner = {
@@ -64,7 +67,10 @@ describe('PassportImxProvider', () => {
     login: jest.fn(),
   };
 
-  const mockGuardianClient = {};
+  const mockGuardianClient = {
+    withDefaultConfirmationScreenTask: (task: () => any) => task,
+    withConfirmationScreenTask: () => (task: () => any) => task,
+  };
 
   const getSignerMock = jest.fn();
 
@@ -78,6 +84,11 @@ describe('PassportImxProvider', () => {
     (registerPassportStarkEx as jest.Mock).mockResolvedValue(null);
     passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
     mockAuthManager.getUser.mockResolvedValue(mockUserImx);
+
+    // Metrics
+    (trackFlow as unknown as jest.Mock).mockImplementation(() => ({
+      addEvent: jest.fn(),
+    }));
 
     // Signers
     magicAdapterMock.login.mockResolvedValue({ getSigner: getSignerMock });
@@ -121,6 +132,11 @@ describe('PassportImxProvider', () => {
       magicAdapterMock.login.mockResolvedValue({});
       (getStarkSigner as jest.Mock).mockRejectedValue(new Error('error'));
 
+      // Metrics
+      (trackFlow as unknown as jest.Mock).mockImplementation(() => ({
+        addEvent: jest.fn(),
+      }));
+
       const pp = new PassportImxProvider({
         authManager: mockAuthManager as unknown as AuthManager,
         magicAdapter: magicAdapterMock as unknown as MagicAdapter,
@@ -136,12 +152,14 @@ describe('PassportImxProvider', () => {
 
   describe('transfer', () => {
     it('calls transfer workflow', async () => {
+      const withDefaultConfirmationSpy = jest.spyOn(mockGuardianClient, 'withDefaultConfirmationScreenTask');
       const returnValue = {} as imx.CreateTransferResponseV1;
       const request = {} as UnsignedTransferRequest;
 
       (transfer as jest.Mock).mockResolvedValue(returnValue);
       const result = await passportImxProvider.transfer(request);
 
+      expect(withDefaultConfirmationSpy).toBeCalled();
       expect(transfer as jest.Mock)
         .toHaveBeenCalledWith({
           request,
@@ -179,11 +197,13 @@ describe('PassportImxProvider', () => {
 
   describe('createOrder', () => {
     it('calls createOrder workflow', async () => {
+      const withDefaultConfirmationScreenSpy = jest.spyOn(mockGuardianClient, 'withDefaultConfirmationScreenTask');
       const returnValue = {} as imx.CreateOrderResponse;
       const request = {} as UnsignedOrderRequest;
 
       (createOrder as jest.Mock).mockResolvedValue(returnValue);
       const result = await passportImxProvider.createOrder(request);
+      expect(withDefaultConfirmationScreenSpy).toBeCalled();
 
       expect(createOrder)
         .toHaveBeenCalledWith({
@@ -200,11 +220,14 @@ describe('PassportImxProvider', () => {
 
   describe('cancelOrder', () => {
     it('calls cancelOrder workflow', async () => {
+      const withDefaultConfirmationScreenSpy = jest.spyOn(mockGuardianClient, 'withDefaultConfirmationScreenTask');
       const returnValue = {} as imx.CancelOrderResponse;
       const request = {} as imx.GetSignableCancelOrderRequest;
 
       (cancelOrder as jest.Mock).mockResolvedValue(returnValue);
       const result = await passportImxProvider.cancelOrder(request);
+
+      expect(withDefaultConfirmationScreenSpy).toBeCalled();
 
       expect(cancelOrder)
         .toHaveBeenCalledWith({
@@ -224,8 +247,10 @@ describe('PassportImxProvider', () => {
       const returnValue = {} as imx.CreateTradeResponse;
       const request = {} as imx.GetSignableTradeRequest;
 
+      const withDefaultConfirmationScreenSpy = jest.spyOn(mockGuardianClient, 'withDefaultConfirmationScreenTask');
       (createTrade as jest.Mock).mockResolvedValue(returnValue);
       const result = await passportImxProvider.createTrade(request);
+      expect(withDefaultConfirmationScreenSpy).toBeCalled();
 
       expect(createTrade)
         .toHaveBeenCalledWith({
@@ -244,10 +269,12 @@ describe('PassportImxProvider', () => {
     it('calls batchNftTransfer workflow', async () => {
       const returnValue = {} as imx.CreateTransferResponse;
       const request = [] as NftTransferDetails[];
+      const withConfirmationScreenSpy = jest.spyOn(mockGuardianClient, 'withConfirmationScreenTask');
 
       (batchNftTransfer as jest.Mock).mockResolvedValue(returnValue);
       const result = await passportImxProvider.batchNftTransfer(request);
 
+      expect(withConfirmationScreenSpy).toBeCalledWith({ height: 784, width: 480 });
       expect(batchNftTransfer)
         .toHaveBeenCalledWith({
           request,
@@ -344,15 +371,15 @@ describe('PassportImxProvider', () => {
   });
 
   describe.each([
-    ['transfer' as const, {} as UnsignedTransferRequest],
-    ['createOrder' as const, {} as UnsignedOrderRequest],
-    ['cancelOrder' as const, {} as imx.GetSignableCancelOrderRequest],
-    ['createTrade' as const, {} as imx.GetSignableTradeRequest],
-    ['batchNftTransfer' as const, [] as NftTransferDetails[]],
-    ['exchangeTransfer' as const, {} as UnsignedExchangeTransferRequest],
-    ['getAddress' as const, {} as any],
-    ['isRegisteredOffchain' as const, {} as any],
-  ])('when the user has been logged out - %s', (methodName, args) => {
+    ['transfer' as const, 'imxTransfer', {} as UnsignedTransferRequest],
+    ['createOrder' as const, 'imxCreateOrder', {} as UnsignedOrderRequest],
+    ['cancelOrder' as const, 'imxCancelOrder', {} as imx.GetSignableCancelOrderRequest],
+    ['createTrade' as const, 'imxCreateTrade', {} as imx.GetSignableTradeRequest],
+    ['batchNftTransfer' as const, 'imxBatchNftTransfer', [] as NftTransferDetails[]],
+    ['exchangeTransfer' as const, 'imxExchangeTransfer', {} as UnsignedExchangeTransferRequest],
+    ['getAddress' as const, 'imxGetAddress', {} as any],
+    ['isRegisteredOffchain' as const, 'imxIsRegisteredOffchain', {} as any],
+  ])('when the user has been logged out - %s', (methodName, eventName, args) => {
     beforeEach(() => {
       passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
     });
@@ -367,18 +394,34 @@ describe('PassportImxProvider', () => {
           ),
         );
     });
+
+    it(`should track metrics when error thrown for ${methodName}`, async () => {
+      try {
+        await passportImxProvider[methodName!](args);
+      } catch (error) {
+        expect(trackFlow).toHaveBeenCalledWith(
+          'passport',
+          eventName,
+        );
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          eventName,
+          error,
+        );
+      }
+    });
   });
 
   describe.each([
-    ['transfer' as const, {} as UnsignedTransferRequest],
-    ['createOrder' as const, {} as UnsignedOrderRequest],
-    ['cancelOrder' as const, {} as imx.GetSignableCancelOrderRequest],
-    ['createTrade' as const, {} as imx.GetSignableTradeRequest],
-    ['batchNftTransfer' as const, [] as NftTransferDetails[]],
-    ['exchangeTransfer' as const, {} as UnsignedExchangeTransferRequest],
-    ['getAddress' as const, {} as any],
-    ['isRegisteredOffchain' as const, {} as any],
-  ])('when the user\'s access token is expired and cannot be retrieved', (methodName, args) => {
+    ['transfer' as const, 'imxTransfer', {} as UnsignedTransferRequest],
+    ['createOrder' as const, 'imxCreateOrder', {} as UnsignedOrderRequest],
+    ['cancelOrder' as const, 'imxCancelOrder', {} as imx.GetSignableCancelOrderRequest],
+    ['createTrade' as const, 'imxCreateTrade', {} as imx.GetSignableTradeRequest],
+    ['batchNftTransfer' as const, 'imxBatchNftTransfer', [] as NftTransferDetails[]],
+    ['exchangeTransfer' as const, 'imxExchangeTransfer', {} as UnsignedExchangeTransferRequest],
+    ['getAddress' as const, 'imxGetAddress', {} as any],
+    ['isRegisteredOffchain' as const, 'imxIsRegisteredOffchain', {} as any],
+  ])('when the user\'s access token is expired and cannot be retrieved', (methodName, eventName, args) => {
     beforeEach(() => {
       mockAuthManager.getUser.mockResolvedValue(null);
     });
@@ -392,6 +435,22 @@ describe('PassportImxProvider', () => {
             PassportErrorType.NOT_LOGGED_IN_ERROR,
           ),
         );
+    });
+
+    it(`should track metrics when error thrown for ${methodName}`, async () => {
+      try {
+        await passportImxProvider[methodName!](args);
+      } catch (error) {
+        expect(trackFlow).toHaveBeenCalledWith(
+          'passport',
+          eventName,
+        );
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          eventName,
+          error,
+        );
+      }
     });
   });
 });

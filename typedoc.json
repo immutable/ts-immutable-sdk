@@ -1,13 +1,6 @@
 {
   "entryPoints": [
     "sdk/",
-    "packages/blockchain-data/sdk/",
-    "packages/checkout/sdk/",
-    "packages/config/",
-    "packages/x-client/",
-    "packages/orderbook/",
-    "packages/passport/sdk/",
-    "packages/x-provider/"
   ],
   "name": "ts-immutable-sdk",
   "entryPointStrategy": "packages",
@@ -20,7 +13,7 @@
   "readme": "./sdk/README.md",
   // Potentially useful for debugging
   "logLevel": "Verbose",
-  "titleLink": "https://docs.immutable.com/docs/x/sdks/typescript",
+  "titleLink": "https://docs.immutable.com/sdks/zkEVM/typescript",
   "navigationLinks": {
     "Immutable Docs": "https://docs.immutable.com",
     "Immutable Hub": "https://hub.immutable.com"

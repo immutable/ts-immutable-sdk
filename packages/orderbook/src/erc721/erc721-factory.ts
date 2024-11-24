@@ -1,5 +1,5 @@
 import { providers } from 'ethers';
-import { ImmutableERC721Base__factory, ImmutableERC721Base } from 'typechain/types';
+import { ImmutableERC721Base__factory, ImmutableERC721Base } from '../typechain/types';
 import { ERC721 } from './erc721';
 
 export class ERC721Factory {

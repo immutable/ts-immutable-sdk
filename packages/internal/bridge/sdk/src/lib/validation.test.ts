@@ -1,9 +1,9 @@
-import { ImmutableConfiguration, Environment } from '@imtbl/config';
-import { BridgeConfiguration } from 'config';
-import { ETH_SEPOLIA_TO_ZKEVM_TESTNET, NATIVE, childETHs } from 'constants/bridges';
-import { BridgeError, BridgeErrorType } from 'errors';
 import { BigNumber, ethers } from 'ethers';
-import { BridgeFeeActions } from 'types';
+import { ImmutableConfiguration, Environment } from '@imtbl/config';
+import { BridgeConfiguration } from '../config';
+import { ETH_SEPOLIA_TO_ZKEVM_TESTNET, NATIVE, childETHs } from '../constants/bridges';
+import { BridgeError, BridgeErrorType } from '../errors';
+import { BridgeFeeActions } from '../types';
 import {
   checkReceiver, validateBridgeReqArgs, validateChainConfiguration, validateChainIds,
   validateGetFee,

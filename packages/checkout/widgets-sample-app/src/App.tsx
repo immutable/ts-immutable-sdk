@@ -28,9 +28,17 @@ function App() {
         </div>
         <br />
         <div>
+          <a href={"/checkout"}>Commerce Widget</a>
+        </div>
+        <br />
+        <div>
+          <a href={"/add-tokens"}>Add Tokens Widget</a>
+        </div>
+        <br />
+        <div>
           <a
             href={
-              "/sale?amount=1&environmentId=249d9b0b-ee16-4dd5-91ee-96bece3b0473&collectionName=Iguanas&excludePaymentTypes=credit&multicurrency=true"
+              "/sale?environmentId=249d9b0b-ee16-4dd5-91ee-96bece3b0473&collectionName=Iguanas&excludePaymentTypes=credit"
             }
           >
             Sale Widget

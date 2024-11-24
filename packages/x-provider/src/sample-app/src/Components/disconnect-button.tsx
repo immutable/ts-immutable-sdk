@@ -1,13 +1,13 @@
 import { Actions, AppCtx } from '../Context/app-context';
 import { Box, Heading, Button } from '@biom3/react';
 import { useContext } from 'react';
-import { provider } from '@imtbl/sdk';
+import { x } from '@imtbl/sdk';
 
 export const DisconnectButton = () => {
   const { state, dispatch } = useContext(AppCtx);
 
   const disconnect = async () => {
-    await provider.MetaMaskIMXProvider.disconnect();
+    await x.MetaMaskIMXProvider.disconnect();
 
     dispatch({
       payload: {

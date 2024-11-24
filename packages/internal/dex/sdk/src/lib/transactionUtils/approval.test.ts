@@ -1,5 +1,8 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
+import { Contract } from '@ethersproject/contracts';
+import { ethers } from 'ethers';
+import { TradeType } from '@uniswap/sdk-core';
 import {
   expectToBeDefined,
   FUN_TEST_TOKEN,
@@ -9,13 +12,10 @@ import {
   TEST_ROUTER_ADDRESS,
   TEST_SWAP_PROXY_ADDRESS,
   WETH_TEST_TOKEN,
-} from 'test/utils';
-import { Contract } from '@ethersproject/contracts';
-import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
-import { ApproveError } from 'errors';
-import { ethers } from 'ethers';
-import { TradeType } from '@uniswap/sdk-core';
-import { SecondaryFee } from 'types';
+} from '../../test/utils';
+import { ERC20__factory } from '../../contracts/types/factories/ERC20__factory';
+import { ApproveError } from '../../errors';
+import { SecondaryFee } from '../../types';
 import { getApproveGasEstimate, getApproveTransaction, prepareApproval } from './approval';
 
 jest.mock('@ethersproject/providers');

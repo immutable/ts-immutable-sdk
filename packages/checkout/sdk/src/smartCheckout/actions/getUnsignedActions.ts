@@ -7,7 +7,7 @@ import {
 } from '@imtbl/orderbook';
 import { UnsignedMessage, UnsignedTransactions } from './types';
 
-export const getUnsignedERC721Transactions = async (
+export const getUnsignedSellTransactions = async (
   actions: Action[],
 ): Promise<UnsignedTransactions> => {
   let approvalTransactions: TransactionRequest[] = [];

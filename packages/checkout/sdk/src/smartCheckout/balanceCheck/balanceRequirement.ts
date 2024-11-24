@@ -96,84 +96,125 @@ export const getERC721BalanceRequirement = (
       balance: BigNumber.from(1),
       formattedBalance: '1',
     },
+    isFee: false,
   };
+};
+
+export const getTokenFromBalances = (
+  itemRequirement: ERC20Item | NativeItem,
+  balances: ItemBalance[],
+): TokenBalance | undefined => {
+  if (itemRequirement.type === ItemType.ERC20) {
+    return balances.find((balance) => {
+      return isMatchingAddress(
+        (balance as TokenBalance).token?.address,
+        itemRequirement.tokenAddress,
+      );
+    }) as TokenBalance;
+  }
+
+  return balances.find((balance) => {
+    return isNativeToken((balance as TokenBalance).token?.address);
+  }) as TokenBalance;
+};
+
+type TokensInfoMap = {
+  [key: string]: TokenInfo;
+};
+
+export const getTokensInfo = async (
+  itemRequirements: Array<ERC20Item | NativeItem>,
+  balances: ItemBalance[],
+  provider: Web3Provider,
+): Promise<TokensInfoMap> => {
+  const tokensInfo: TokensInfoMap = {};
+
+  for (const itemRequirement of itemRequirements) {
+    if (itemRequirement.type === ItemType.NATIVE) {
+      tokensInfo[NATIVE] = ZKEVM_NATIVE_TOKEN;
+      continue;
+    }
+
+    const tokenBalance = getTokenFromBalances(itemRequirement, balances);
+
+    let address = tokenBalance?.token.address ?? '';
+    let name = tokenBalance?.token.name ?? '';
+    let symbol = tokenBalance?.token.symbol ?? '';
+    let decimals = tokenBalance?.token.decimals ?? DEFAULT_TOKEN_DECIMALS;
+
+    if (!tokenBalance && itemRequirement.type === ItemType.ERC20) {
+      address = itemRequirement.tokenAddress;
+
+      if (address.toLowerCase() in tokensInfo) {
+        continue;
+      }
+
+      // Missing item balance so we need to query contract
+      try {
+        const contract = new Contract(
+          itemRequirement.tokenAddress,
+          JSON.stringify(ERC20ABI),
+          provider,
+        );
+        // eslint-disable-next-line no-await-in-loop
+        const [contractName, contractSymbol, contractDecimals] = await Promise.all([
+          contract.name(),
+          contract.symbol(),
+          contract.decimals(),
+        ]);
+        address = itemRequirement.tokenAddress;
+        decimals = contractDecimals;
+        name = contractName;
+        symbol = contractSymbol;
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(
+          'Failed to query contract information',
+          itemRequirement.tokenAddress,
+        );
+      }
+    }
+
+    tokensInfo[address.toLowerCase()] = {
+      address,
+      name,
+      symbol,
+      decimals,
+    };
+  }
+
+  return tokensInfo;
 };
 
 /**
  * Gets the balance requirement for a NATIVE or ERC20 requirement.
  */
-export const getTokenBalanceRequirement = async (
+export const getTokenBalanceRequirement = (
   itemRequirement: ERC20Item | NativeItem,
   balances: ItemBalance[],
-  provider: Web3Provider,
-): Promise<BalanceNativeRequirement | BalanceERC20Requirement> => {
-  let itemBalanceResult: ItemBalance | undefined;
+  token: TokenInfo,
+): BalanceNativeRequirement | BalanceERC20Requirement => {
+  let tokenBalance = getTokenFromBalances(itemRequirement, balances);
 
-  // Get the requirements related balance
-  if (itemRequirement.type === ItemType.ERC20) {
-    itemBalanceResult = balances.find((balance) => {
-      return isMatchingAddress(
-        (balance as TokenBalance).token?.address,
-        itemRequirement.tokenAddress,
-      );
-    });
-  } else if (itemRequirement.type === ItemType.NATIVE) {
-    itemBalanceResult = balances.find((balance) => {
-      return isNativeToken((balance as TokenBalance).token?.address);
-    });
-  }
+  const requiredBalance: BigNumber = itemRequirement.amount;
 
   // Calculate the balance delta
-  const requiredBalance: BigNumber = itemRequirement.amount;
   const sufficient = requiredBalance.isNegative()
     || requiredBalance.isZero()
-    || (itemBalanceResult?.balance.gte(requiredBalance) ?? false);
+    || (tokenBalance?.balance.gte(requiredBalance) ?? false);
 
   const delta = requiredBalance.sub(
-    itemBalanceResult?.balance ?? BigNumber.from(0),
+    tokenBalance?.balance ?? BigNumber.from(0),
   );
-  let name = '';
-  let symbol = '';
-  let decimals = DEFAULT_TOKEN_DECIMALS;
-  if (itemBalanceResult) {
-    decimals = (itemBalanceResult as TokenBalance).token?.decimals
-      ?? DEFAULT_TOKEN_DECIMALS;
-    name = (itemBalanceResult as TokenBalance).token.name;
-    symbol = (itemBalanceResult as TokenBalance).token.symbol;
-  } else if (itemRequirement.type === ItemType.ERC20) {
-    // Missing item balance so we need to query contract
-    try {
-      const contract = new Contract(
-        itemRequirement.tokenAddress,
-        JSON.stringify(ERC20ABI),
-        provider,
-      );
-      const [contractName, contractSymbol, contractDecimals] = await Promise.all([
-        contract.name(),
-        contract.symbol(),
-        contract.decimals(),
-      ]);
-      decimals = contractDecimals;
-      name = contractName;
-      symbol = contractSymbol;
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(
-        'Failed to query contract information',
-        itemRequirement.tokenAddress,
-      );
-    }
-  }
 
-  let tokenBalanceResult = itemBalanceResult as TokenBalance;
   if (itemRequirement.type === ItemType.NATIVE) {
     // No token balance so mark as zero native
-    if (!tokenBalanceResult) {
-      tokenBalanceResult = {
+    if (!tokenBalance) {
+      tokenBalance = {
         type: ItemType.NATIVE,
         balance: BigNumber.from(0),
         formattedBalance: '0',
-        token: ZKEVM_NATIVE_TOKEN,
+        token,
       };
     }
 
@@ -182,33 +223,31 @@ export const getTokenBalanceRequirement = async (
       type: ItemType.NATIVE,
       delta: {
         balance: delta,
-        formattedBalance: utils.formatUnits(delta, decimals),
+        formattedBalance: utils.formatUnits(delta, token.decimals),
       },
       current: {
-        ...tokenBalanceResult,
+        ...tokenBalance,
         type: ItemType.NATIVE,
+        token,
       },
       required: {
-        ...tokenBalanceResult,
+        ...tokenBalance,
         type: ItemType.NATIVE,
         balance: BigNumber.from(itemRequirement.amount),
-        formattedBalance: utils.formatUnits(itemRequirement.amount, decimals),
+        formattedBalance: utils.formatUnits(itemRequirement.amount, token.decimals),
+        token,
       },
+      isFee: itemRequirement.isFee,
     };
   }
 
   // No token balance so mark as zero
-  if (!tokenBalanceResult) {
-    tokenBalanceResult = {
+  if (!tokenBalance) {
+    tokenBalance = {
       type: itemRequirement.type,
       balance: BigNumber.from(0),
       formattedBalance: '0',
-      token: {
-        name,
-        symbol,
-        address: itemRequirement.tokenAddress,
-        decimals,
-      },
+      token,
     };
   }
 
@@ -217,27 +256,18 @@ export const getTokenBalanceRequirement = async (
     type: ItemType.ERC20,
     delta: {
       balance: delta,
-      formattedBalance: utils.formatUnits(delta, decimals),
+      formattedBalance: utils.formatUnits(delta, token.decimals),
     },
     current: {
-      ...tokenBalanceResult,
-      token: {
-        address: itemRequirement.tokenAddress,
-        name,
-        symbol,
-        decimals,
-      },
+      ...tokenBalance,
+      token,
     },
     required: {
-      ...tokenBalanceResult,
-      token: {
-        address: itemRequirement.tokenAddress,
-        name,
-        symbol,
-        decimals,
-      },
+      ...tokenBalance,
+      token,
       balance: BigNumber.from(itemRequirement.amount),
-      formattedBalance: utils.formatUnits(itemRequirement.amount, decimals),
+      formattedBalance: utils.formatUnits(itemRequirement.amount, token.decimals),
     },
+    isFee: itemRequirement.isFee,
   };
 };

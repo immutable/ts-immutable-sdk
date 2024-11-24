@@ -1,4 +1,4 @@
-import { Orderbook } from 'orderbook';
+import { Orderbook } from '../../orderbook';
 import { Order, OrderStatusName } from '../../types';
 
 export async function waitForOrderToBeOfStatus(

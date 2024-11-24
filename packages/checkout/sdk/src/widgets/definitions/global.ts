@@ -8,6 +8,7 @@ import {
   WidgetProperties,
   WidgetType,
   WidgetEventData,
+  IWidgetsFactoryCreate,
 } from './types';
 
 /**
@@ -19,7 +20,7 @@ declare global {
   namespace ImmutableCheckoutWidgets {
     class WidgetsFactory implements IWidgetsFactory {
       constructor(sdk: Checkout, config: CheckoutWidgetsConfig);
-      create<T extends WidgetType>(type: T, props?: WidgetProperties<T>): Widget<T>;
+      create: IWidgetsFactoryCreate;
       updateProvider(provider: Web3Provider): void;
     }
 
@@ -84,6 +85,18 @@ declare global {
     }
 
     class Sale<T extends WidgetType> implements Widget<T> {
+      constructor(sdk: Checkout, props: WidgetProperties<T>);
+      mount(id: string, params?: WidgetParameters[T]): void;
+      unmount(): void;
+      update(props: WidgetProperties<T>): void;
+      addListener<KEventName extends keyof WidgetEventData[T]>(
+        type: KEventName,
+        callback: (data: WidgetEventData[T][KEventName]) => void
+      ): void;
+      removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void;
+    }
+
+    class Commerce<T extends WidgetType> implements Widget<T> {
       constructor(sdk: Checkout, props: WidgetProperties<T>);
       mount(id: string, params?: WidgetParameters[T]): void;
       unmount(): void;

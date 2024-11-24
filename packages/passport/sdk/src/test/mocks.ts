@@ -71,3 +71,34 @@ export const mockListChains = {
     ],
   },
 };
+
+export const mockLinkedWallet = {
+  data: {
+    address: '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
+    type: 'MetaMask',
+    created_at: '2021-08-31T00:00:00Z',
+    updated_at: '2021-08-31T00:00:00Z',
+    name: 'Test',
+    clientName: 'Passport Dashboard',
+  },
+  status: 200,
+};
+
+export const mockApiError = {
+  response: {
+    data: {
+      code: 'api_error',
+      message: 'API error occurred',
+    },
+    status: 500,
+  },
+};
+export const mockPassportBadRequest = {
+  response: {
+    data: {
+      code: 'ALREADY_LINKED',
+      message: 'Already linked',
+    },
+    status: 400,
+  },
+};

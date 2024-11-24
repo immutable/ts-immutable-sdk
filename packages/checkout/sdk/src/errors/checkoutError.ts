@@ -32,6 +32,7 @@ export enum CheckoutErrorType {
   SWITCH_NETWORK_UNSUPPORTED = 'SWITCH_NETWORK_UNSUPPORTED',
   GET_ERC20_ALLOWANCE_ERROR = 'GET_ERC20_ALLOWANCE_ERROR',
   GET_ERC721_ALLOWANCE_ERROR = 'GET_ERC721_ALLOWANCE_ERROR',
+  GET_ERC1155_ALLOWANCE_ERROR = 'GET_ERC1155_ALLOWANCE_ERROR',
   EXECUTE_APPROVAL_TRANSACTION_ERROR = 'EXECUTE_APPROVAL_TRANSACTION_ERROR',
   EXECUTE_FULFILLMENT_TRANSACTION_ERROR = 'EXECUTE_FULFILLMENT_TRANSACTION_ERROR',
   SIGN_MESSAGE_ERROR = 'SIGN_MESSAGE_ERROR',
@@ -41,6 +42,7 @@ export enum CheckoutErrorType {
   API_ERROR = 'API_ERROR',
   ORDER_EXPIRED_ERROR = 'ORDER_EXPIRED_ERROR',
   WIDGETS_SCRIPT_LOAD_ERROR = 'WIDGETS_SCRIPT_LOAD_ERROR',
+  APPROVAL_TRANSACTION_FAILED = 'APPROVAL_TRANSACTION_FAILED',
 }
 
 /**
@@ -60,16 +62,16 @@ export type ErrorType = {
 
 /* The CheckoutError class is a custom error class in TypeScript that includes a message, type, and
 optional data object. */
-export class CheckoutError extends Error {
+export class CheckoutError<T = CheckoutErrorType> extends Error {
   public message: string;
 
-  public type: CheckoutErrorType;
+  public type: T;
 
   public data?: { [key: string]: any };
 
   constructor(
     message: string,
-    type: CheckoutErrorType,
+    type: T,
     data?: {
       [key: string]: any
     },

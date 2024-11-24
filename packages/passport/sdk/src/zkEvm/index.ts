@@ -1,2 +1,2 @@
 export * from './zkEvmProvider';
-export * from 'types';
+export * from './types';

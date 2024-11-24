@@ -1,0 +1,11 @@
+{
+    "extends": "fastify-tsconfig",
+    "compilerOptions": {
+        "outDir": "build",
+        "lib": ["es2018"],
+        "target": "es2018",
+        "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "typeRoots": ["./node_modules/@types", "./src/types"]
+    }
+}

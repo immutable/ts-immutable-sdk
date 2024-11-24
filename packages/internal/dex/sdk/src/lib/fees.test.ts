@@ -1,5 +1,5 @@
-import { IMX_TEST_TOKEN, WETH_TEST_TOKEN, makeAddr } from 'test/utils';
 import { BigNumber } from 'ethers';
+import { IMX_TEST_TOKEN, WETH_TEST_TOKEN, makeAddr } from '../test/utils';
 import { Fees } from './fees';
 
 const buildFees = () => new Fees(

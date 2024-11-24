@@ -1,4 +1,4 @@
-import { BridgeEventType, Checkout, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { BridgeEventType, Checkout, WidgetTheme, WidgetType, WidgetLanguage } from '@imtbl/checkout-sdk';
 import { WidgetsFactory } from '@imtbl/checkout-widgets'
 import { useEffect, useMemo } from 'react';
 
@@ -30,6 +30,18 @@ function BridgeUI() {
       <button onClick={() => bridge.unmount()}>Unmount</button>
       <button onClick={() => bridge.update({ config: { theme: WidgetTheme.LIGHT } })}>Update Config Light</button>
       <button onClick={() => bridge.update({ config: { theme: WidgetTheme.DARK } })}>Update Config Dark</button>
+      <select
+        onChange={(e) =>
+          bridge.update({
+            config: { language: e.target.value as WidgetLanguage },
+          })
+        }
+      >
+        <option value="en">EN</option>
+        <option value="ja">JA</option>
+        <option value="ko">KO</option>
+        <option value="zh">ZH</option>
+      </select>
     </div>
   );
 }

@@ -13,10 +13,30 @@ import {
   getGlobalisedCachedFunction,
   getGlobalisedValue,
 } from './utils/globalise';
+import { getCorrectedTime } from './utils/clock';
 
 export const POLLING_FREQUENCY = 5000;
 
-export type TrackProperties = Record<string, string | number | boolean>;
+export type TrackProperties = Record<
+string,
+string | number | boolean | undefined
+>;
+
+// List of properties that are allowed to be sent with the track request
+// As these are used by other types of tracking
+export type AllowedTrackProperties = TrackProperties & {
+  // Performance
+  duration?: never;
+  // Flow
+  flowId?: never;
+  flowName?: never;
+  flowEventName?: never;
+  flowStep?: never;
+  // Error
+  isTrackError?: never;
+  errorMessage?: never;
+  errorStack?: never;
+};
 
 const trackFn = (
   moduleName: string,
@@ -25,7 +45,7 @@ const trackFn = (
 ): void => {
   const event = {
     event: `${moduleName}.${eventName}`,
-    time: new Date().toISOString(),
+    time: getCorrectedTime(),
     ...(properties && { properties: flattenProperties(properties) }),
   };
   addEvent(event);

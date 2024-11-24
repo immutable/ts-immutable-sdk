@@ -9,7 +9,7 @@ import { {{classname}} } from '{{apiRelativeToRoot}}{{tsModelPackage}}';
 {{/imports}}
 {{#imports}}
 // @ts-ignore
-export { {{classname}} } from '{{apiRelativeToRoot}}{{tsModelPackage}}';
+export type { {{classname}} } from '{{apiRelativeToRoot}}{{tsModelPackage}}';
 {{/imports}}
 {{/withSeparateModelsAndApi}}
 {{^withSeparateModelsAndApi}}

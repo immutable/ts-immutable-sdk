@@ -54,16 +54,17 @@ const lightThemeVariables = {
   '--wcm-overlay-background-color': 'rgba(255, 255, 255, 0.1)',
 };
 
-// Whitelisted wallet ids on WalletConnect explorer API
+// Whitelisted wallet ids on WalletConnect explorer (https://explorer.walletconnect.com/)
 const metamaskId = 'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96';
 const frontierId = '85db431492aa2e8672e93f4ea7acf10c88b97b867b0d373107af63dc4880f041';
 const ledgerLiveId = '19177a98252e07ddfc9af2083ba8e07ef627cb6103467ffebb3f8f4205fd7927';
+const wombatId = 'cb604c517064f096976972384dc89948a5c850bca9b04866a443e10171d5965d';
 // const coinbaseId = 'fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa';
 // const phantomId = 'a797aa35c0fadbfc1a53e7f675162ed5226968b44a19ee3d24385c64d1d3c393';
 // const rainbowId = '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369';
 
-const productionWalletWhitelist = [metamaskId, frontierId, ledgerLiveId];
-const sandboxWalletWhitelist = [metamaskId];
+const productionWalletWhitelist = [metamaskId, frontierId, ledgerLiveId, wombatId];
+const sandboxWalletWhitelist = [metamaskId, wombatId];
 
 export class WalletConnectManager {
   private static instance: WalletConnectManager;

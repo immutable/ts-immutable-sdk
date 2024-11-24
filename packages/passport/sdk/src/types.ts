@@ -1,17 +1,26 @@
-import { ModuleConfiguration } from '@imtbl/config';
-import {
-  EthSigner,
-  IMXClient,
-  StarkSigner,
-} from '@imtbl/x-client';
+import { Environment, ModuleConfiguration } from '@imtbl/config';
+import { EthSigner, IMXClient, StarkSigner } from '@imtbl/x-client';
 import { ImxApiClients } from '@imtbl/generated-clients';
+import { Flow } from '@imtbl/metrics';
 
 export enum PassportEvents {
   LOGGED_OUT = 'loggedOut',
+  LOGGED_IN = 'loggedIn',
+  ACCOUNTS_REQUESTED = 'accountsRequested',
 }
+
+export type AccountsRequestedEvent = {
+  environment: Environment;
+  sendTransaction: (params: Array<any>, flow: Flow) => Promise<string>;
+  walletAddress: string;
+  passportClient: string;
+  flow?: Flow;
+};
 
 export interface PassportEventMap extends Record<string, any> {
   [PassportEvents.LOGGED_OUT]: [];
+  [PassportEvents.LOGGED_IN]: [User];
+  [PassportEvents.ACCOUNTS_REQUESTED]: [AccountsRequestedEvent];
 }
 
 export type UserProfile = {
@@ -69,13 +78,38 @@ export interface PassportOverrides {
   imxApiClients?: ImxApiClients; // needs to be optional because ImxApiClients is not exposed publicly
 }
 
-export interface PassportModuleConfiguration extends ModuleConfiguration<PassportOverrides>,
+export interface PopupOverlayOptions {
+  disableGenericPopupOverlay?: boolean;
+  disableBlockedPopupOverlay?: boolean;
+}
+
+export interface PassportModuleConfiguration
+  extends ModuleConfiguration<PassportOverrides>,
   OidcConfiguration {
   /**
    * This flag indicates that Passport is being used in a cross-sdk bridge scenario
    * and not directly on the web.
    */
   crossSdkBridgeEnabled?: boolean;
+
+  /**
+   * Optional referrer URL to be sent with JSON-RPC requests.
+   * If specified, this value will be passed as the referrer in fetch options.
+   */
+  jsonRpcReferrer?: string;
+
+  /**
+   * Options for disabling the Passport popup overlays.
+   */
+  popupOverlayOptions?: PopupOverlayOptions;
+
+  /**
+   * This flag controls whether a deploy transaction is sent before signing an ERC191 message.
+   *
+   * @default false - By default, this behavior is disabled and the user will not be asked
+   * to approve a deploy transaction before signing.
+   */
+  forceScwDeployBeforeMessageSignature?: boolean;
 }
 
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
@@ -133,11 +167,27 @@ export type DeviceErrorResponse = {
 };
 
 export type PKCEData = {
-  state: string,
-  verifier: string
+  state: string;
+  verifier: string;
 };
 
 export type IMXSigners = {
-  starkSigner: StarkSigner,
+  starkSigner: StarkSigner;
   ethSigner: EthSigner;
+};
+
+export type LinkWalletParams = {
+  type: string;
+  walletAddress: string;
+  signature: string;
+  nonce: string;
+};
+
+export type LinkedWallet = {
+  address: string;
+  type: string;
+  created_at: string;
+  updated_at: string;
+  name?: string;
+  clientName: string;
 };

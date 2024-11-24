@@ -1,8 +1,8 @@
 import React, { ComponentProps } from 'react';
 import { BiomeCombinedProviders, Box } from '@biom3/react';
-import { widgetTheme } from 'lib/theme';
-import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
-import { usePortalId } from 'lib/hooks/usePortalId';
+import { widgetTheme } from '../../lib/theme';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { usePortalId } from '../../lib/hooks/usePortalId';
 import { containerStyles } from './themeProviderStyles';
 
 export interface ThemeProviderProps {

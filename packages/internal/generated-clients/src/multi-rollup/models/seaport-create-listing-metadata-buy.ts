@@ -15,7 +15,22 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import { ImmutableVerificationStatusEnum } from './immutable-verification-status-enum';
+// May contain unused imports in some cases
+// @ts-ignore
+import { SeaportERC1155CollectionItem } from './seaport-erc1155-collection-item';
+// May contain unused imports in some cases
+// @ts-ignore
+import { SeaportERC1155Item } from './seaport-erc1155-item';
+// May contain unused imports in some cases
+// @ts-ignore
 import { SeaportERC20Item } from './seaport-erc20-item';
+// May contain unused imports in some cases
+// @ts-ignore
+import { SeaportERC721CollectionItem } from './seaport-erc721-collection-item';
+// May contain unused imports in some cases
+// @ts-ignore
+import { SeaportERC721Item } from './seaport-erc721-item';
 // May contain unused imports in some cases
 // @ts-ignore
 import { SeaportNativeItem } from './seaport-native-item';
@@ -24,6 +39,6 @@ import { SeaportNativeItem } from './seaport-native-item';
  * @type SeaportCreateListingMetadataBuy
  * @export
  */
-export type SeaportCreateListingMetadataBuy = SeaportERC20Item | SeaportNativeItem;
+export type SeaportCreateListingMetadataBuy = SeaportERC1155CollectionItem | SeaportERC1155Item | SeaportERC20Item | SeaportERC721CollectionItem | SeaportERC721Item | SeaportNativeItem;
 
 

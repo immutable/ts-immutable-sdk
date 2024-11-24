@@ -1,7 +1,7 @@
 import { Box } from '@biom3/react';
 import { Fit, Layout, useRive } from '@rive-app/react-canvas-lite';
 import { Environment } from '@imtbl/config';
-import { CHECKOUT_CDN_BASE_URL } from 'lib';
+import { CHECKOUT_CDN_BASE_URL } from '../../lib';
 import { heroBackGroundStyles, heroImageStyles } from './HeroImageStyles';
 
 interface RocketHeroProps {

@@ -1,27 +1,27 @@
 import {
-  AspectRatioImage,
   Body,
   Box,
   ButtCon,
   Button,
+  CloudImage,
   Drawer,
   Heading,
 } from '@biom3/react';
-import { Web3Provider } from '@ethersproject/providers';
-import { ChainId, Checkout } from '@imtbl/checkout-sdk';
-import { Environment } from '@imtbl/config';
-import { FooterLogo } from 'components/Footer/FooterLogo';
-import { getL1ChainId } from 'lib';
-import { getChainNameById } from 'lib/chains';
-import {
-  isMetaMaskProvider,
-  isWalletConnectProvider,
-} from 'lib/provider';
-import { getRemoteImage } from 'lib/utils';
 import {
   useCallback, useMemo, useEffect,
 } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Web3Provider } from '@ethersproject/providers';
+import { ChainId, Checkout } from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
+import { FooterLogo } from '../Footer/FooterLogo';
+import { getL1ChainId } from '../../lib';
+import { getChainNameById } from '../../lib/chains';
+import {
+  isMetaMaskProvider,
+  isWalletConnectProvider,
+} from '../../lib/provider';
+import { getRemoteImage } from '../../lib/utils';
 
 export interface NetworkSwitchDrawerProps {
   visible: boolean;
@@ -43,12 +43,12 @@ export function NetworkSwitchDrawer({
 
   const ethImageUrl = getRemoteImage(
     checkout.config.environment ?? Environment.PRODUCTION,
-    '/switchnetworkethereum.png',
+    '/switchnetworkethereum.svg',
   );
 
   const zkevmImageUrl = getRemoteImage(
     checkout.config.environment ?? Environment.PRODUCTION,
-    '/switchnetworkzkevm.png',
+    '/switchnetworkzkevm.svg',
   );
 
   const targetChainName = getChainNameById(targetChainId);
@@ -108,10 +108,15 @@ export function NetworkSwitchDrawer({
         alignItems: 'center',
       }}
       >
-        <AspectRatioImage
-          aspectRatio="21:9"
-          responsiveSizes={[450, 512, 640, 720, 860, 1024, 1280, 1440]}
-          imageUrl={showEthImage ? ethImageUrl : zkevmImageUrl}
+        <CloudImage
+          use={(
+            <img
+              src={showEthImage ? ethImageUrl : zkevmImageUrl}
+              alt={t('drawers.networkSwitch.heading', {
+                wallet: walletDisplayName,
+              })}
+            />
+          )}
         />
         <ButtCon
           icon="Close"

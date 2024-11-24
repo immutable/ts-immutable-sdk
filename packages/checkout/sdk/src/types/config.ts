@@ -1,10 +1,12 @@
-import { ModuleConfiguration } from '@imtbl/config';
+import { Environment, ModuleConfiguration } from '@imtbl/config';
 import { ExchangeOverrides, SecondaryFee } from '@imtbl/dex-sdk';
 import { Passport } from '@imtbl/passport';
 import { TokenInfo } from './tokenInfo';
 import { ChainId } from './chains';
 
 export interface CheckoutOverrides {
+  environment?: Environment;
+  [key: string]: unknown;
 }
 
 interface CheckoutFeatureConfiguration {
@@ -15,19 +17,19 @@ interface CheckoutFeatureConfiguration {
  * A type representing the on-ramp configurations for the checkout SDK.
  * @property {boolean} enable - To enable on-ramp feature in Checkout sdk.
 */
-export interface CheckoutOnRampConfiguration extends CheckoutFeatureConfiguration {}
+export interface CheckoutOnRampConfiguration extends CheckoutFeatureConfiguration { }
 
 /**
  * A type representing the swap configurations for the checkout SDK.
  * @property {boolean} enable - To enable swap feature in Checkout sdk.
 */
-export interface CheckoutSwapConfiguration extends CheckoutFeatureConfiguration {}
+export interface CheckoutSwapConfiguration extends CheckoutFeatureConfiguration { }
 
 /**
  * A type representing the bridge configurations for the checkout SDK.
  * @property {boolean} enable - To enable bridge feature in Checkout sdk.
 */
-export interface CheckoutBridgeConfiguration extends CheckoutFeatureConfiguration {}
+export interface CheckoutBridgeConfiguration extends CheckoutFeatureConfiguration { }
 
 /**
  * A type representing checkout SDK configurations.
@@ -43,6 +45,8 @@ export interface CheckoutModuleConfiguration extends ModuleConfiguration<Checkou
   bridge?: CheckoutBridgeConfiguration;
   passport?: Passport;
   publishableKey?: string;
+  environment?: Environment;
+  overrides?: CheckoutOverrides;
 }
 
 /**
@@ -56,6 +60,7 @@ export interface CheckoutModuleConfiguration extends ModuleConfiguration<Checkou
  * @property {GasEstimateTokenConfig | undefined} gasEstimateTokens
  * @property {ImxAddressConfig | undefined} imxAddressMapping
  * @property {TelemetryConfig | undefined} telemetry
+ * @property {SquidConfig | undefined} squid
  */
 export type RemoteConfiguration = {
   /** The config used for the Connect. */
@@ -66,6 +71,8 @@ export type RemoteConfiguration = {
   onramp: OnRampConfig;
   /** The config used for the Bridge. */
   bridge: BridgeConfig;
+  /** The config used for Add Tokens */
+  addTokens: AddTokensConfig;
   /** An array representing the allowed networks. */
   allowedNetworks: AllowedNetworkConfig[];
   /** The config for the tokens used to estimate gas. */
@@ -74,6 +81,21 @@ export type RemoteConfiguration = {
   imxAddressMapping?: ImxAddressConfig;
   /** Telemetry config. */
   telemetry?: TelemetryConfig;
+  /** Squid config. */
+  squid?: SquidConfig;
+  /** The checkout version info. */
+  checkoutWidgetsVersion: CheckoutWidgetsVersionConfig;
+  /** Risk assessment config. */
+  riskAssessment?: RiskAssessmentConfig;
+};
+
+/**
+ * A type representing the configuration for the Add Tokens.
+ * @property {TokenInfo[] | undefined} tokens
+ */
+export type AddTokensConfig = {
+  /** A boolean value for enabling/disabling Add Tokens */
+  enabled: boolean;
 };
 
 /**
@@ -146,6 +168,16 @@ export type DexConfig = {
   tokens?: TokenInfo[];
   /** An array of secondary fees to be applied to swaps */
   secondaryFees?: SecondaryFee[];
+  /** An array of tokens to be blocked from the DEX */
+  blocklist?: BlockedToken[];
+};
+
+/**
+ * A type representing a token that is blocked from the DEX.
+ */
+export type BlockedToken = {
+  address: string;
+  symbol: string;
 };
 
 /**
@@ -191,6 +223,14 @@ export type TelemetryConfig = {
 };
 
 /**
+ * A type representing the squid integrator id.
+ * @property {string} integratorId
+ */
+export type SquidConfig = {
+  integratorId: string
+};
+
+/**
  * A type representing the required information to estimate gas for a transaction.
  * @type {{ [key: string]: { bridgeToL2Addresses?: GasEstimateBridgeToL2TokenConfig, swapAddresses?: GasEstimateSwapTokenConfig } }}
  * - A map of addresses for estimating gas keyed by the network chain id.
@@ -233,18 +273,15 @@ export type GasEstimateSwapTokenConfig = {
 /**
  * A type that represents the tokens configuration for chain.
  */
-export type ChainsTokensConfig = {
-  [key in ChainId]: ChainTokensConfig;
+export type ChainTokensConfig = {
+  [key in ChainId]?: TokenInfo[];
 };
 
-/**
- * A type representing all the feature flags available.
- * @property {TokenInfo[] | undefined} allowed -
- * @property {boolean | undefined} blockscout -
- */
-export type ChainTokensConfig = {
-  /** List of allowed tokens for a given chain. */
-  allowed?: TokenInfo[];
-  /** Feature flag to enable/disable blockscout integration. */
-  blockscout?: boolean;
+export type CheckoutWidgetsVersionConfig = {
+  compatibleVersionMarkers: string[];
+};
+
+export type RiskAssessmentConfig = {
+  enabled: boolean;
+  levels: string[];
 };

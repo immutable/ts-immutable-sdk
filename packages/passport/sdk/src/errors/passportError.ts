@@ -17,9 +17,15 @@ export enum PassportErrorType {
   EXCHANGE_TRANSFER_ERROR = 'EXCHANGE_TRANSFER_ERROR',
   CREATE_TRADE_ERROR = 'CREATE_TRADE_ERROR',
   OPERATION_NOT_SUPPORTED_ERROR = 'OPERATION_NOT_SUPPORTED_ERROR',
+  LINK_WALLET_ALREADY_LINKED_ERROR = 'LINK_WALLET_ALREADY_LINKED_ERROR',
+  LINK_WALLET_MAX_WALLETS_LINKED_ERROR = 'LINK_WALLET_MAX_WALLETS_LINKED_ERROR',
+  LINK_WALLET_VALIDATION_ERROR = 'LINK_WALLET_VALIDATION_ERROR',
+  LINK_WALLET_DUPLICATE_NONCE_ERROR = 'LINK_WALLET_DUPLICATE_NONCE_ERROR',
+  LINK_WALLET_GENERIC_ERROR = 'LINK_WALLET_GENERIC_ERROR',
+  SERVICE_UNAVAILABLE_ERROR = 'SERVICE_UNAVAILABLE_ERROR',
 }
 
-function isAPIError(error: any): error is imx.APIError {
+export function isAPIError(error: any): error is imx.APIError {
   return 'code' in error && 'message' in error;
 }
 
@@ -40,6 +46,10 @@ export const withPassportError = async <T>(
     return await fn();
   } catch (error) {
     let errorMessage: string;
+
+    if (error instanceof PassportError && error.type === PassportErrorType.SERVICE_UNAVAILABLE_ERROR) {
+      throw new PassportError(error.message, error.type);
+    }
 
     if (isAxiosError(error) && error.response?.data && isAPIError(error.response.data)) {
       errorMessage = error.response.data.message;

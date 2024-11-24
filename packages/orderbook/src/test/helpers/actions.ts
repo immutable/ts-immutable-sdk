@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 import { Wallet } from 'ethers';
-import { Action, ActionType } from 'types';
+import { Action, ActionType } from '../../types';
 import { signAndSubmitTx, signMessage } from './sign-and-submit';
 
 // Sign and submit all transaction actions. Collect and return all signatures from signable actions.

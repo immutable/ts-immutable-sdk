@@ -7,11 +7,12 @@ import {
   WidgetTheme,
   WidgetType,
 } from '@imtbl/checkout-sdk';
-import { Base } from 'widgets/BaseWidgetRoot';
-import { isValidWalletProvider, isValidAmount, isValidAddress } from 'lib/validations/widgetValidators';
-import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
-import { LoadingView } from 'views/loading/LoadingView';
+import { Base } from '../BaseWidgetRoot';
+import { isValidWalletProvider, isValidAmount, isValidAddress } from '../../lib/validations/widgetValidators';
+import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
+import { LoadingView } from '../../views/loading/LoadingView';
+import { HandoverProvider } from '../../context/handover-context/HandoverProvider';
 import i18n from '../../i18n';
 
 const BridgeWidget = React.lazy(() => import('./BridgeWidget'));
@@ -66,16 +67,19 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="bridge-container" config={this.strongConfig()}>
-            <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
-              <BridgeWidget
-                checkout={this.checkout}
-                config={this.strongConfig()}
-                web3Provider={this.web3Provider}
-                tokenAddress={this.parameters.tokenAddress}
-                amount={this.parameters.amount}
-                walletProviderName={this.parameters.walletProviderName}
-              />
-            </Suspense>
+            <HandoverProvider>
+              <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
+                <BridgeWidget
+                  checkout={this.checkout}
+                  config={this.strongConfig()}
+                  web3Provider={this.web3Provider}
+                  tokenAddress={this.parameters.tokenAddress}
+                  amount={this.parameters.amount}
+                  walletProviderName={this.parameters.walletProviderName}
+                  showBackButton={!!this.parameters.showBackButton}
+                />
+              </Suspense>
+            </HandoverProvider>
           </ThemeProvider>
         </CustomAnalyticsProvider>
       </React.StrictMode>,

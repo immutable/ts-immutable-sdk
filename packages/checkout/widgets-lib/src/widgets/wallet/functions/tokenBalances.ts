@@ -48,12 +48,14 @@ export const getTokenBalances = async (
     ...balanceResult,
     token: {
       ...balanceResult.token,
-      icon: getTokenImageByAddress(
-        checkout.config.environment as Environment,
-        isNativeToken(balanceResult.token.address)
-          ? balanceResult.token.symbol
-          : balanceResult.token.address ?? '',
-      ),
+      icon:
+        balanceResult.token.icon
+        ?? getTokenImageByAddress(
+          checkout.config.environment as Environment,
+          isNativeToken(balanceResult.token.address)
+            ? balanceResult.token.symbol
+            : balanceResult.token.address ?? '',
+        ),
     },
   }));
 

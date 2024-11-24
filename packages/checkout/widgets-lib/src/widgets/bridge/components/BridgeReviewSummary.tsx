@@ -1,22 +1,27 @@
 import {
   useCallback, useContext, useMemo, useState, useEffect,
 } from 'react';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import {
   Body, Box, Button, Heading, Icon, Logo, MenuItem,
 } from '@biom3/react';
 import {
   GasEstimateBridgeToL2Result,
   GasEstimateType,
+  isAddressSanctioned,
 } from '@imtbl/checkout-sdk';
-import { abbreviateAddress } from 'lib/addressUtils';
-import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
+import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
+import { BigNumber, utils } from 'ethers';
+import { useTranslation } from 'react-i18next';
+import { Web3Provider } from '@ethersproject/providers';
+import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
+import { abbreviateAddress } from '../../../lib/addressUtils';
+import { CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import {
   isMetaMaskProvider,
   isPassportProvider,
   isWalletConnectProvider,
-} from 'lib/provider';
-import { calculateCryptoToFiat, isNativeToken } from 'lib/utils';
+} from '../../../lib/provider';
+import { calculateCryptoToFiat, getChainImage, isNativeToken } from '../../../lib/utils';
 import {
   DEFAULT_QUOTE_REFRESH_INTERVAL,
   DEFAULT_TOKEN_DECIMALS,
@@ -25,22 +30,18 @@ import {
   NATIVE,
   addChainChangedListener,
   getL1ChainId,
-  networkIcon,
+  getL2ChainId,
+  networkName,
   removeChainChangedListener,
-} from 'lib';
-import { useInterval } from 'lib/hooks/useInterval';
-import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
-import { BigNumber, utils } from 'ethers';
+} from '../../../lib';
+import { useInterval } from '../../../lib/hooks/useInterval';
 import {
   UserJourney,
   useAnalytics,
-} from 'context/analytics-provider/SegmentAnalyticsProvider';
-import { useTranslation } from 'react-i18next';
-import { NetworkSwitchDrawer } from 'components/NetworkSwitchDrawer/NetworkSwitchDrawer';
-import { Web3Provider } from '@ethersproject/providers';
-import { useWalletConnect } from 'lib/hooks/useWalletConnect';
-import { NotEnoughGas } from 'components/NotEnoughGas/NotEnoughGas';
-import { networkIconStyles } from './WalletNetworkButtonStyles';
+} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { NetworkSwitchDrawer } from '../../../components/NetworkSwitchDrawer/NetworkSwitchDrawer';
+import { useWalletConnect } from '../../../lib/hooks/useWalletConnect';
+import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
 import {
   arrowIconStyles,
   arrowIconWrapperStyles,
@@ -51,6 +52,7 @@ import {
   topMenuItemStyles,
   wcStickerLogoStyles,
   wcWalletLogoStyles,
+  networkIconStyles,
 } from './BridgeReviewSummaryStyles';
 import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import {
@@ -61,6 +63,11 @@ import {
 import { Fees } from '../../../components/Fees/Fees';
 import { formatBridgeFees } from '../functions/BridgeFees';
 import { RawImage } from '../../../components/RawImage/RawImage';
+import { getErc20Contract } from '../functions/TransferErc20';
+import {
+  WithdrawalQueueDrawer,
+  WithdrawalQueueWarningType,
+} from '../../../components/WithdrawalQueueDrawer/WithdrawalQueueDrawer';
 
 const testId = 'bridge-review-summary';
 
@@ -70,16 +77,17 @@ export function BridgeReviewSummary() {
 
   const {
     bridgeState: {
-      checkout, tokenBridge, from, to, token, amount, tokenBalances,
+      checkout, tokenBridge, from, to, token, amount, tokenBalances, riskAssessment,
     },
     bridgeDispatch,
   } = useContext(BridgeContext);
+  const { environment } = checkout.config;
 
   const { track } = useAnalytics();
 
   const { cryptoFiatState } = useContext(CryptoFiatContext);
   const [loading, setLoading] = useState(false);
-  const [estimates, setEstimates] = useState<any | undefined>(undefined);
+  const [estimates, setEstimates] = useState<GasEstimateBridgeToL2Result | undefined>(undefined);
   const [gasFee, setGasFee] = useState<string>('');
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [approveTransaction, setApproveTransaction] = useState<
@@ -103,6 +111,17 @@ export function BridgeReviewSummary() {
   // Not enough ETH to cover gas
   const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
 
+  const [withdrawalQueueWarning, setWithdrawalQueueWarning] = useState<{
+    visible: boolean;
+    warningType?: WithdrawalQueueWarningType;
+    threshold?: number;
+  }>({ visible: false });
+
+  const isTransfer = useMemo(() => from?.network === to?.network, [from, to]);
+  const isDeposit = useMemo(
+    () => (getL2ChainId(checkout.config) === to?.network),
+    [from, to, checkout],
+  );
   const insufficientFundsForGas = useMemo(() => {
     if (!estimates) return false;
     if (!token) return true;
@@ -146,7 +165,44 @@ export function BridgeReviewSummary() {
 
   const toNetwork = useMemo(() => to?.network, [to]);
 
-  const fetchGasEstimate = useCallback(async () => {
+  const fetchTransferGasEstimate = useCallback(async () => {
+    if (!tokenBridge || !amount || !from || !to || !token) return;
+
+    const tokenToTransfer = token?.address?.toLowerCase() ?? NATIVE.toUpperCase();
+    const gasEstimateResult = {
+      gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+      fees: {},
+      token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
+    } as GasEstimateBridgeToL2Result;
+    let estimatePromise: Promise<BigNumber>;
+    if (tokenToTransfer === NATIVE.toLowerCase()) {
+      estimatePromise = checkout.providerCall(from.web3Provider, async (provider) => await provider.estimateGas({
+        to: toAddress,
+        // If 'from' not provided it assumes the transaction is being sent from the zero address.
+        // Estimation will fail unless the amount is within the zero addresses balance.
+        from: fromAddress,
+        value: utils.parseUnits(amount, token.decimals),
+      }));
+    } else {
+      const erc20 = getErc20Contract(tokenToTransfer, from.web3Provider.getSigner());
+      estimatePromise = erc20.estimateGas.transfer(toAddress, utils.parseUnits(amount, token.decimals));
+    }
+    try {
+      const [estimate, gasPrice] = await Promise.all([estimatePromise, from.web3Provider.getGasPrice()]);
+      const gas = estimate.mul(gasPrice);
+      const formattedEstimate = utils.formatUnits(gas, DEFAULT_TOKEN_DECIMALS);
+      gasEstimateResult.fees.sourceChainGas = gas;
+      gasEstimateResult.fees.totalFees = gas;
+      setEstimates(gasEstimateResult);
+      setGasFee(formattedEstimate);
+      setGasFeeFiatValue(calculateCryptoToFiat(formattedEstimate, NATIVE.toUpperCase(), cryptoFiatState.conversions));
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('Unable to fetch gas estimate', e);
+    }
+  }, [checkout, from, to, token, amount]);
+
+  const fetchBridgeGasEstimate = useCallback(async () => {
     if (!tokenBridge || !amount || !from || !to || !token) return;
 
     const bundledTxn = await tokenBridge!.getUnsignedBridgeBundledTx({
@@ -156,8 +212,23 @@ export function BridgeReviewSummary() {
       amount: utils.parseUnits(amount, token.decimals),
       sourceChainId: from?.network.toString(),
       destinationChainId: to?.network.toString(),
-      gasMultiplier: 1.1,
+      gasMultiplier: 'auto',
     });
+
+    if (bundledTxn.withdrawalQueueActivated) {
+      setWithdrawalQueueWarning({
+        visible: true,
+        warningType: WithdrawalQueueWarningType.TYPE_ACTIVE_QUEUE,
+      });
+    } else if (bundledTxn.delayWithdrawalLargeAmount && bundledTxn.largeTransferThresholds) {
+      const threshold = utils.formatUnits(bundledTxn.largeTransferThresholds, token.decimals);
+
+      setWithdrawalQueueWarning({
+        visible: true,
+        warningType: WithdrawalQueueWarningType.TYPE_THRESHOLD,
+        threshold: parseInt(threshold, 10),
+      });
+    }
 
     const unsignedApproveTransaction = {
       contractToApprove: bundledTxn.contractToApprove,
@@ -192,7 +263,6 @@ export function BridgeReviewSummary() {
       },
       token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
     } as GasEstimateBridgeToL2Result;
-
     setEstimates(gasEstimateResult);
     const estimatedAmount = utils.formatUnits(
       gasEstimateResult?.fees.totalFees || 0,
@@ -208,17 +278,27 @@ export function BridgeReviewSummary() {
       ),
     );
   }, [checkout, tokenBridge]);
-  useInterval(() => fetchGasEstimate(), DEFAULT_QUOTE_REFRESH_INTERVAL);
+  useInterval(() => {
+    if (isTransfer) {
+      fetchTransferGasEstimate();
+    } else {
+      fetchBridgeGasEstimate();
+    }
+  }, DEFAULT_QUOTE_REFRESH_INTERVAL);
 
   const formatFeeBreakdown = useCallback(
-    (): any => formatBridgeFees(estimates, cryptoFiatState, t),
-    [estimates],
+    () => formatBridgeFees(estimates, isDeposit, cryptoFiatState, t),
+    [estimates, isDeposit],
   );
 
   useEffect(() => {
     (async () => {
       setLoading(true);
-      await fetchGasEstimate();
+      if (isTransfer) {
+        await fetchTransferGasEstimate();
+      } else {
+        await fetchBridgeGasEstimate();
+      }
       setLoading(false);
     })();
   }, []);
@@ -283,7 +363,20 @@ export function BridgeReviewSummary() {
   }, [insufficientFundsForGas]);
 
   const submitBridge = useCallback(async () => {
-    if (!approveTransaction || !transaction) return;
+    if (!isTransfer && (!approveTransaction || !transaction)) return;
+    if (!from || !to) return;
+    if (riskAssessment && isAddressSanctioned(riskAssessment)) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: BridgeWidgetViews.SERVICE_UNAVAILABLE,
+          },
+        },
+      });
+
+      return;
+    }
 
     if (insufficientFundsForGas) {
       setShowNotEnoughGasDrawer(true);
@@ -330,6 +423,7 @@ export function BridgeReviewSummary() {
         amount,
         fiatAmount: fromFiatAmount,
         tokenAddress: token?.address,
+        moveType: isTransfer ? 'transfer' : 'bridge',
       },
     });
 
@@ -381,7 +475,6 @@ export function BridgeReviewSummary() {
         </MenuItem.Label>
         <MenuItem.Caption />
         <MenuItem.PriceDisplay
-          use={<Heading size="xSmall" weight="light" />}
           price={displayAmount ?? '-'}
           fiatAmount={`${t(
             'views.BRIDGE_REVIEW.fiatPricePrefix',
@@ -423,9 +516,14 @@ export function BridgeReviewSummary() {
           </Body>
         </MenuItem.Label>
         {fromNetwork && (
-          <MenuItem.IntentIcon
-            icon={networkIcon[fromNetwork] as any}
-            sx={networkIconStyles(fromNetwork)}
+          <MenuItem.FramedImage
+            use={(
+              <img
+                src={getChainImage(environment, fromNetwork)}
+                alt={networkName[fromNetwork]}
+              />
+            )}
+            sx={networkIconStyles}
           />
         )}
       </MenuItem>
@@ -470,9 +568,14 @@ export function BridgeReviewSummary() {
           </Body>
         </MenuItem.Label>
         {toNetwork && (
-          <MenuItem.IntentIcon
-            icon={networkIcon[toNetwork] as any}
-            sx={networkIconStyles(toNetwork)}
+          <MenuItem.FramedImage
+            use={(
+              <img
+                src={getChainImage(environment, toNetwork)}
+                alt={networkName[toNetwork]}
+              />
+            )}
+            sx={networkIconStyles}
           />
         )}
       </MenuItem>
@@ -546,6 +649,27 @@ export function BridgeReviewSummary() {
             },
           });
         }}
+      />
+
+      <WithdrawalQueueDrawer
+        visible={withdrawalQueueWarning.visible}
+        warningType={withdrawalQueueWarning.warningType}
+        checkout={checkout}
+        onAdjustAmount={() => {
+          setWithdrawalQueueWarning({ visible: false });
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: {
+                type: BridgeWidgetViews.BRIDGE_FORM,
+              },
+            },
+          });
+        }}
+        onCloseDrawer={() => {
+          setWithdrawalQueueWarning({ visible: false });
+        }}
+        threshold={withdrawalQueueWarning.threshold}
       />
     </Box>
   );

@@ -1,4 +1,7 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+# prevent heap limit allocation errors
+export NODE_OPTIONS="--max-old-space-size=4096"
+
 yarn lint-staged

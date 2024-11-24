@@ -3,6 +3,7 @@ import { createConfig, MultiRollupAPIConfiguration, multiRollupConfig } from '@i
 import {
   OidcConfiguration,
   PassportModuleConfiguration,
+  PopupOverlayOptions,
 } from '../types';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 
@@ -49,10 +50,19 @@ export class PassportConfiguration {
 
   readonly crossSdkBridgeEnabled: boolean;
 
+  readonly jsonRpcReferrer: string;
+
+  readonly forceScwDeployBeforeMessageSignature: boolean;
+
+  readonly popupOverlayOptions: PopupOverlayOptions;
+
   constructor({
     baseConfig,
     overrides,
     crossSdkBridgeEnabled,
+    jsonRpcReferrer,
+    forceScwDeployBeforeMessageSignature,
+    popupOverlayOptions,
     ...oidcConfiguration
   }: PassportModuleConfiguration) {
     validateConfiguration(oidcConfiguration, [
@@ -62,6 +72,12 @@ export class PassportConfiguration {
     this.oidcConfiguration = oidcConfiguration;
     this.baseConfig = baseConfig;
     this.crossSdkBridgeEnabled = crossSdkBridgeEnabled || false;
+    this.jsonRpcReferrer = jsonRpcReferrer || '';
+    this.forceScwDeployBeforeMessageSignature = forceScwDeployBeforeMessageSignature || false;
+    this.popupOverlayOptions = popupOverlayOptions || {
+      disableGenericPopupOverlay: false,
+      disableBlockedPopupOverlay: false,
+    };
 
     if (overrides) {
       validateConfiguration(

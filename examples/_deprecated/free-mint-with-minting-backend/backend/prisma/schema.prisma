@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model ImAssets {
+  id                                    String   @id @default(uuid())
+  assetId                               String   // Previously @db.Uuid in Postgres
+  ownerAddress                          String
+  metadata                              String?  // Previously Json? @db.JsonB in Postgres
+  tokenId                               String?
+  contractAddress                       String
+  error                                 String?
+  mintingStatus                         String?
+  metadataId                            String?  // Previously @db.Uuid in Postgres
+  triedCount                            Int      @default(0)
+  lastImtblZkevmMintRequestUpdatedId    String?  // Previously @db.Uuid in Postgres
+  createdAt                             DateTime @default(now()) // Stored as TEXT
+  updatedAt                             DateTime @default(now()) // Stored as TEXT
+
+  @@map("im_assets")
+  @@unique([assetId, contractAddress], name: "im_assets_uindex")
+}
+
+model Allowlist {
+  address   String  @id
+  phase   Int
+}

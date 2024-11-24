@@ -1,5 +1,5 @@
 import { ImmutableConfiguration } from '@imtbl/config';
-import { CryptoFiatModuleConfiguration } from 'types';
+import { CryptoFiatModuleConfiguration } from '../types';
 
 /**
  * Class representing the configuration for the CryptoFiatModule.

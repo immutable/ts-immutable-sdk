@@ -36,11 +36,17 @@ export interface MintAsset {
      */
     'owner_address': string;
     /**
-     * An optional `uint256` token id as string. It is recommended to omit token_id for more efficient minting
+     * An optional `uint256` token id as string. Required for ERC1155 collections.
      * @type {string}
      * @memberof MintAsset
      */
     'token_id'?: string | null;
+    /**
+     * Optional mount of tokens to mint. Required for ERC1155 collections. ERC712 collections can omit this field or set it to 1
+     * @type {string}
+     * @memberof MintAsset
+     */
+    'amount'?: string | null;
     /**
      * 
      * @type {NFTMetadataRequest}

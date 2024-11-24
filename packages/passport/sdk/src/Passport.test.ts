@@ -1,14 +1,24 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { IMXClient } from '@imtbl/x-client';
-import { ImxApiClients, MultiRollupApiClients, imxApiConfig } from '@imtbl/generated-clients';
+import { ImxApiClients, imxApiConfig, MultiRollupApiClients } from '@imtbl/generated-clients';
+import { trackError, trackFlow } from '@imtbl/metrics';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
-import { OidcConfiguration } from './types';
-import { mockUser, mockLinkedAddresses, mockUserImx } from './test/mocks';
+import { OidcConfiguration, UserProfile } from './types';
+import {
+  mockApiError,
+  mockLinkedAddresses,
+  mockLinkedWallet,
+  mockPassportBadRequest,
+  mockUser,
+  mockUserImx,
+  mockUserZkEvm,
+} from './test/mocks';
 import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
 import { ZkEvmProvider } from './zkEvm';
+import { PassportError, PassportErrorType } from './errors/passportError';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
@@ -17,6 +27,7 @@ jest.mock('./confirmation');
 jest.mock('./zkEvm');
 jest.mock('./zkEvm/provider/eip6963');
 jest.mock('@imtbl/generated-clients');
+jest.mock('@imtbl/metrics');
 
 const oidcConfiguration: OidcConfiguration = {
   clientId: '11111',
@@ -40,6 +51,8 @@ describe('Passport', () => {
   let getProviderMock: jest.Mock;
   let getProviderSilentMock: jest.Mock;
   let getLinkedAddressesMock: jest.Mock;
+  let linkExternalWalletMock: jest.Mock;
+  let forceUserRefreshMock: jest.Mock;
 
   beforeEach(() => {
     authLoginMock = jest.fn().mockReturnValue(mockUser);
@@ -54,6 +67,8 @@ describe('Passport', () => {
     getProviderMock = jest.fn();
     getProviderSilentMock = jest.fn();
     getLinkedAddressesMock = jest.fn();
+    linkExternalWalletMock = jest.fn();
+    forceUserRefreshMock = jest.fn();
     (AuthManager as unknown as jest.Mock).mockReturnValue({
       login: authLoginMock,
       loginCallback: loginCallbackMock,
@@ -62,6 +77,7 @@ describe('Passport', () => {
       getDeviceFlowEndSessionEndpoint: getDeviceFlowEndSessionEndpointMock,
       getUser: getUserMock,
       requestRefreshTokenAfterRegistration: requestRefreshTokenMock,
+      forceUserRefresh: forceUserRefreshMock,
     });
     (MagicAdapter as jest.Mock).mockReturnValue({
       login: magicLoginMock,
@@ -74,8 +90,12 @@ describe('Passport', () => {
     (MultiRollupApiClients as jest.Mock).mockReturnValue({
       passportProfileApi: {
         getUserInfo: getLinkedAddressesMock,
+        linkWalletV2: linkExternalWalletMock,
       },
     });
+    (trackFlow as unknown as jest.Mock).mockImplementation(() => ({
+      addEvent: jest.fn(),
+    }));
     passport = new Passport({
       baseConfig: new ImmutableConfiguration({
         environment: Environment.SANDBOX,
@@ -128,6 +148,21 @@ describe('Passport', () => {
       expect(result).toBe(passportImxProvider);
       expect(getProviderMock).toHaveBeenCalled();
     });
+
+    it('should call track error function if an error occurs', async () => {
+      const error = new Error('Error');
+      getProviderMock.mockRejectedValue(error);
+
+      try {
+        await passport.connectImx();
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'connectImx',
+          e,
+        );
+      }
+    });
   });
 
   describe('connectImxSilent', () => {
@@ -152,19 +187,36 @@ describe('Passport', () => {
         expect(getProviderSilentMock).toHaveBeenCalled();
       });
     });
+
+    it('should call track error function if an error occurs', async () => {
+      const error = new Error('Unknown or invalid refresh token.');
+      getProviderSilentMock.mockRejectedValue(error);
+
+      try {
+        await passport.connectImxSilent();
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'connectImxSilent',
+          e,
+        );
+      }
+    });
   });
 
   describe('connectEvm', () => {
     it('should execute connectEvm without error and return the provider', async () => {
-      const provider = await passport.connectEvm();
+      // #doc connect-evm
+      const passportProvider = await passport.connectEvm();
+      // #enddoc connect-evm
 
-      expect(provider).toBeInstanceOf(ZkEvmProvider);
+      expect(passportProvider).toBeInstanceOf(ZkEvmProvider);
       expect(ZkEvmProvider).toHaveBeenCalled();
     });
 
     it('should announce the provider by default', async () => {
       passportProviderInfo.uuid = 'mock123';
-      const provider = await passport.connectEvm();
+      const provider = passport.connectEvm();
 
       expect(announceProvider).toHaveBeenCalledWith({
         info: passportProviderInfo,
@@ -180,9 +232,25 @@ describe('Passport', () => {
         ...oidcConfiguration,
       });
 
-      await passportInstance.connectEvm({ announceProvider: false });
+      passportInstance.connectEvm({ announceProvider: false });
 
       expect(announceProvider).not.toHaveBeenCalled();
+    });
+
+    it('should call track error function if an error occurs', () => {
+      (ZkEvmProvider as jest.Mock).mockImplementation(() => {
+        throw new Error('Error');
+      });
+
+      try {
+        passport.connectEvm();
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'connectEvm',
+          e,
+        );
+      }
     });
   });
 
@@ -191,6 +259,21 @@ describe('Passport', () => {
       await passport.loginCallback();
 
       expect(loginCallbackMock).toBeCalledTimes(1);
+    });
+
+    it('should call track error function if an error occurs', async () => {
+      const error = new Error('error');
+      loginCallbackMock.mockRejectedValue(error);
+
+      try {
+        await passport.loginCallback();
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'loginCallback',
+          e,
+        );
+      }
     });
   });
 
@@ -216,6 +299,21 @@ describe('Passport', () => {
         expect(magicLogoutMockOrder).toBeLessThan(logoutMockOrder);
       });
     });
+
+    it('should call track error function if an error occurs', async () => {
+      const error = new Error('error');
+      magicLogoutMock.mockRejectedValue(error);
+
+      try {
+        await passport.logout();
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'logout',
+          e,
+        );
+      }
+    });
   });
 
   describe('logoutDeviceFlow', () => {
@@ -229,6 +327,21 @@ describe('Passport', () => {
       expect(removeUserMock).toHaveBeenCalledTimes(1);
       expect(magicLogoutMock).toHaveBeenCalledTimes(1);
       expect(getDeviceFlowEndSessionEndpointMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('should call track error function if an error occurs', async () => {
+      const error = new Error('error');
+      removeUserMock.mockRejectedValue(error);
+
+      try {
+        await passport.logoutDeviceFlow();
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'logoutDeviceFlow',
+          e,
+        );
+      }
     });
   });
 
@@ -248,6 +361,21 @@ describe('Passport', () => {
 
       expect(result).toEqual(undefined);
     });
+
+    it('should call track error function if an error occurs', async () => {
+      const error = new Error('Unknown or invalid refresh token.');
+      getUserMock.mockRejectedValue(error);
+
+      try {
+        await passport.getUserInfo();
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'getUserInfo',
+          e,
+        );
+      }
+    });
   });
 
   describe('getIdToken', () => {
@@ -266,6 +394,21 @@ describe('Passport', () => {
 
       expect(result).toEqual(undefined);
     });
+
+    it('should call track error function if an error occurs', async () => {
+      const error = new Error('Unknown or invalid refresh token.');
+      getUserMock.mockRejectedValue(error);
+
+      try {
+        await passport.getIdToken();
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'getIdToken',
+          e,
+        );
+      }
+    });
   });
 
   describe('getAccessToken', () => {
@@ -283,6 +426,21 @@ describe('Passport', () => {
       const result = await passport.getAccessToken();
 
       expect(result).toEqual(undefined);
+    });
+
+    it('should call track error function if an error occurs', async () => {
+      const error = new Error('Unknown or invalid refresh token.');
+      getUserMock.mockRejectedValue(error);
+
+      try {
+        await passport.getAccessToken();
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'getAccessToken',
+          e,
+        );
+      }
     });
   });
 
@@ -309,19 +467,36 @@ describe('Passport', () => {
 
       expect(result).toHaveLength(0);
     });
+
+    it('should call track error function if an error occurs', async () => {
+      const error = new Error('Unknown or invalid refresh token.');
+      getUserMock.mockRejectedValue(error);
+
+      try {
+        await passport.getLinkedAddresses();
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'getLinkedAddresses',
+          e,
+        );
+      }
+    });
   });
 
   describe('login', () => {
     it('should login silently if there is a user', async () => {
       getUserMock.mockReturnValue(mockUserImx);
-      const user = await passport.login();
+      // #doc auth-users-without-wallet
+      const user: UserProfile | null = await passport.login();
+      // #enddoc auth-users-without-wallet
 
       expect(getUserMock).toBeCalledTimes(1);
       expect(authLoginMock).toBeCalledTimes(0);
       expect(user).toEqual(mockUser.profile);
     });
 
-    it('should login if login sliently returns error', async () => {
+    it('should login if login silently returns error', async () => {
       getUserMock.mockRejectedValue(new Error('Unknown or invalid refresh token.'));
       authLoginMock.mockReturnValue(mockUserImx);
       const user = await passport.login();
@@ -358,6 +533,98 @@ describe('Passport', () => {
       await expect(passport.login({ useCachedSession: true })).rejects.toThrow(error);
       expect(getUserMock).toBeCalledTimes(1);
       expect(authLoginMock).toBeCalledTimes(0);
+    });
+
+    it('should call track error function if an error occurs', async () => {
+      const error = new Error('Unknown or invalid refresh token.');
+      getUserMock.mockRejectedValue(error);
+      authLoginMock.mockReturnValue(mockUserImx);
+
+      try {
+        await passport.login({ useCachedSession: true });
+      } catch (e) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'login',
+          e,
+        );
+      }
+    });
+
+    it('should try to login silently if silent is true', async () => {
+      getUserMock.mockReturnValue(null);
+
+      await passport.login({ useSilentLogin: true });
+
+      expect(forceUserRefreshMock).toBeCalledTimes(1);
+      expect(authLoginMock).toBeCalledTimes(0);
+    });
+  });
+
+  describe('linkExternalWallet', () => {
+    const linkWalletParams = {
+      type: 'MetaMask',
+      walletAddress: '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
+      signature: 'signature123',
+      nonce: 'nonce123',
+    };
+
+    it('should link external wallet when user is logged in', async () => {
+      getUserMock.mockReturnValue(mockUserZkEvm);
+      linkExternalWalletMock.mockReturnValue(mockLinkedWallet);
+
+      const result = await passport.linkExternalWallet(linkWalletParams);
+
+      expect(result).toEqual(mockLinkedWallet.data);
+    });
+
+    it('should throw error if user is not logged in', async () => {
+      getUserMock.mockReturnValue(null);
+
+      await expect(passport.linkExternalWallet(linkWalletParams)).rejects.toThrow(
+        new PassportError('User is not logged in', PassportErrorType.NOT_LOGGED_IN_ERROR),
+      );
+    });
+
+    it('should handle generic errors from the linkWalletV2 API call', async () => {
+      getUserMock.mockReturnValue(mockUserImx);
+      linkExternalWalletMock.mockReturnValue(mockApiError);
+
+      try {
+        await passport.linkExternalWallet(linkWalletParams);
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(PassportError);
+        expect(error.type).toEqual(PassportErrorType.LINK_WALLET_GENERIC_ERROR);
+        expect(error.message).toEqual(`Link wallet request failed with status code ${mockApiError.response.status}`);
+      }
+    });
+
+    it('should handle 400 bad requests from the linkWalletV2 API call', async () => {
+      getUserMock.mockReturnValue(mockUserImx);
+      linkExternalWalletMock.mockReturnValue(mockPassportBadRequest);
+
+      try {
+        await passport.linkExternalWallet(linkWalletParams);
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(PassportError);
+        expect(error.type).toEqual(PassportErrorType.LINK_WALLET_ALREADY_LINKED_ERROR);
+        expect(error.message).toEqual('Already linked');
+      }
+    });
+
+    it('should call track error function if an error occurs', async () => {
+      getUserMock.mockReturnValue(mockUserImx);
+      linkExternalWalletMock.mockReturnValue(mockPassportBadRequest);
+
+      try {
+        await passport.linkExternalWallet(linkWalletParams);
+      } catch (error) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'linkExternalWallet',
+          error,
+        );
+      }
     });
   });
 });

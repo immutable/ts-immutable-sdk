@@ -36,6 +36,9 @@ import { ERC721SafeTransferFromBatchMetadata } from './erc721-safe-transfer-from
 import { ERC721TransferFromMetadata } from './erc721-transfer-from-metadata';
 // May contain unused imports in some cases
 // @ts-ignore
+import { ImmutableVerificationStatusEnum } from './immutable-verification-status-enum';
+// May contain unused imports in some cases
+// @ts-ignore
 import { NFTSetApprovalForAllMetadata } from './nftset-approval-for-all-metadata';
 // May contain unused imports in some cases
 // @ts-ignore

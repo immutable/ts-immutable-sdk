@@ -2,7 +2,7 @@ import {
   BigNumber, Contract, providers, utils,
 } from 'ethers';
 import { TickMath } from '@uniswap/v3-sdk';
-import { ProviderCallError } from 'errors';
+import { ProviderCallError } from '../../errors';
 import { fetchValidPools } from './fetchValidPools';
 import { Multicall__factory } from '../../contracts/types';
 import {

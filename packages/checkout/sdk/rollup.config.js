@@ -5,6 +5,9 @@ import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
 import replace from '@rollup/plugin-replace';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
+import swc from 'unplugin-swc'
+
+const isProduction = process.env.NODE_ENV === 'production';
 
 const commonPlugins = [
   replace({
@@ -14,7 +17,7 @@ const commonPlugins = [
     'process.env.CHECKOUT_LOCAL_MODE': JSON.stringify(process.env.CHECKOUT_LOCAL_MODE || 'false'),
     'process.versions': JSON.stringify(process.versions || {}),
   }),
-  typescript()
+  isProduction ? typescript({customConditions: ["default"]}) : swc.rollup()
 ]
 
 export default [
@@ -38,10 +41,10 @@ export default [
     context: 'window',
     plugins: [
       json(),
-      nodeResolve({ browser: true }),
+      nodeResolve({ browser: true, exportConditions: ['browser'] }),
       commonjs(),
       nodePolyfills(),
-      terser(),
+      terser({ keep_fnames: /./ }),
       ...commonPlugins,
     ],
   }

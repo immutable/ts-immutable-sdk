@@ -1,8 +1,7 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { ChainNotSupportedError, InvalidConfigurationError } from 'errors';
-import * as test from 'test/utils';
-import { ERC20 } from 'types';
-import { ExchangeContracts, ExchangeModuleConfiguration, ExchangeOverrides } from '../types';
+import { ChainNotSupportedError, InvalidConfigurationError } from '../errors';
+import * as test from '../test/utils';
+import { ERC20, ExchangeContracts, ExchangeModuleConfiguration, ExchangeOverrides } from '../types';
 import { ExchangeConfiguration } from './index';
 import { IMMUTABLE_MAINNET_CHAIN_ID, IMMUTABLE_TESTNET_CHAIN_ID } from '../constants/chains';
 

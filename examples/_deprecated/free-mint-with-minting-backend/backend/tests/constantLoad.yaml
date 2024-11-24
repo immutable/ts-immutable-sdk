@@ -1,0 +1,34 @@
+config:
+  target: "http://localhost:3001"
+  phases:
+    - duration: 60
+      arrivalRate: 20
+      name: "Constant Load"
+  payload:
+    path: "./signers.csv"
+    fields:
+      - "address"
+      - "signature"
+    skipHeader: true
+    order: random
+    cast: false
+
+scenarios:
+  - name: "EOA mint"
+    flow:
+      - get:
+          url: "/config"
+      - get:
+          url: "/eligibility/{{ address }}"
+      - post:
+          url: "/mint/eoa"
+          json:
+            signature: "{{ signature }}"
+          headers:
+            Content-Type: "application/json"
+      - get:
+          url: "/get-mint-request/4a2b9487-2251-455b-98fc-289891528e02"
+
+    # - name: "Test Payload Injection"
+  #   flow:
+  #     - log: "Test Address: {{ address }}, Signature: {{ signature }}"

@@ -31,7 +31,7 @@ export const getCryptoToFiatConversion = async (
 
     const cryptoToFiatResult = await cryptoFiat.convert({
       tokenSymbols,
-      fiatSymbol,
+      fiatSymbols: [fiatSymbol],
     });
 
     return updateConversions(cryptoToFiatResult, fiatSymbol);

@@ -6,12 +6,14 @@ import { PassportError } from '@imtbl/passport';
 const MessageContext = createContext<{
   messages: string[],
   addMessage:(operation: string, ...messages: any[]) => void,
+  clearMessages: () => void,
   isLoading: boolean,
   setIsLoading: (isLoading: boolean) => void,
 }>({
       messages: [],
       isLoading: false,
       addMessage: () => null,
+      clearMessages: () => null,
       setIsLoading: () => null,
     });
 
@@ -38,12 +40,17 @@ export function StatusProvider({
     setMessages((prevMessages) => [...prevMessages, messageString]);
   }, []);
 
+  const clearMessages = useCallback(() => {
+    setMessages([]);
+  }, [setMessages]);
+
   const providerValues = useMemo(() => ({
     messages,
     addMessage,
+    clearMessages,
     isLoading,
     setIsLoading,
-  }), [messages, addMessage, isLoading, setIsLoading]);
+  }), [messages, addMessage, clearMessages, isLoading, setIsLoading]);
 
   return (
     <MessageContext.Provider value={providerValues}>
@@ -56,12 +63,14 @@ export function useStatusProvider() {
   const {
     messages,
     addMessage,
+    clearMessages,
     isLoading,
     setIsLoading,
   } = useContext(MessageContext);
   return {
     messages,
     addMessage,
+    clearMessages,
     isLoading,
     setIsLoading,
   };

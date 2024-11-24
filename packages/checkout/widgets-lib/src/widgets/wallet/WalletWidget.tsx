@@ -4,9 +4,8 @@ import {
   useMemo,
   useReducer,
 } from 'react';
-import { IMTBLWidgetEvents, WalletWidgetParams } from '@imtbl/checkout-sdk';
-import { UserJourney } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
+import { WalletWidgetParams } from '@imtbl/checkout-sdk';
 import {
   initialWalletState,
   WalletActions,
@@ -30,7 +29,6 @@ import { WalletWidgetViews } from '../../context/view-context/WalletViewContextT
 import { Settings } from './views/Settings';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { CoinInfo } from './views/CoinInfo';
-import { TopUpView } from '../../views/top-up/TopUpView';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { useBalance } from '../../lib/hooks/useBalance';
@@ -54,6 +52,7 @@ export default function WalletWidget(props: WalletWidgetInputs) {
       isOnRampEnabled,
       isSwapEnabled,
       isBridgeEnabled,
+      isAddTokensEnabled,
       theme,
     },
     walletConfig: {
@@ -116,13 +115,10 @@ export default function WalletWidget(props: WalletWidgetInputs) {
     (async () => {
       if (!checkout) return;
 
-      let checkSwapAvailable;
-
+      let checkSwapAvailable = false;
       try {
         checkSwapAvailable = await checkout.isSwapAvailable();
-      } catch (err: any) {
-        checkSwapAvailable = false;
-      }
+      } catch { /* */ }
 
       walletDispatch({
         payload: {
@@ -132,6 +128,7 @@ export default function WalletWidget(props: WalletWidgetInputs) {
             isSwapEnabled,
             isOnRampEnabled,
             isSwapAvailable: checkSwapAvailable,
+            isAddTokensEnabled,
           },
         },
       });
@@ -220,18 +217,6 @@ export default function WalletWidget(props: WalletWidgetInputs) {
               actionText={errorActionText}
               onActionClick={errorAction}
               onCloseClick={() => sendWalletWidgetCloseEvent(eventTarget)}
-            />
-          )}
-          {viewState.view.type === SharedViews.TOP_UP_VIEW && (
-            <TopUpView
-              analytics={{ userJourney: UserJourney.WALLET }}
-              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-              checkout={checkout}
-              provider={provider}
-              showOnrampOption={isOnRampEnabled}
-              showSwapOption={isSwapEnabled}
-              showBridgeOption={isBridgeEnabled}
-              onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
             />
           )}
         </WalletContext.Provider>

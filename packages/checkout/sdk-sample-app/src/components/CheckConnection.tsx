@@ -36,6 +36,7 @@ export default function CheckConnection(props: CheckConnectionProps) {
       const resp = await checkout.checkIsWalletConnected({
         provider,
       });
+      console.log('Connection result', resp);
       setResult(resp);
       setLoading(false);
     } catch (err: any) {
@@ -57,7 +58,7 @@ export default function CheckConnection(props: CheckConnectionProps) {
 
   return (
     <div>
-      {!provider && !result?.isConnected && (
+      {!provider || !result?.isConnected && (
         <WarningMessage>Not connected.</WarningMessage>
       )}
       <Box

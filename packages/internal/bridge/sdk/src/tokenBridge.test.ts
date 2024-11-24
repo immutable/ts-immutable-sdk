@@ -2,18 +2,17 @@
 /* eslint-disable @typescript-eslint/dot-notation */
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { TokenBridge } from 'tokenBridge';
-import { BridgeConfiguration } from 'config';
-import { ETH_SEPOLIA_TO_ZKEVM_TESTNET, NATIVE } from 'constants/bridges';
+import { BigNumber, ethers } from 'ethers';
+import { TokenBridge } from './tokenBridge';
+import { BridgeConfiguration } from './config';
+import { ETH_SEPOLIA_TO_ZKEVM_TESTNET, NATIVE } from './constants/bridges';
 import {
   BridgeFeeActions, BridgeTxRequest, BridgeTxResponse, StatusResponse,
-} from 'types';
-import { BigNumber, ethers } from 'ethers';
-import { BridgeError, BridgeErrorType } from 'errors';
-import { GMPStatus, GasPaidStatus } from 'types/axelar';
-import { queryTransactionStatus } from 'lib/gmpRecovery';
-import { ERC20 } from 'contracts/ABIs/ERC20';
-import { validateBridgeReqArgs, validateChainConfiguration, validateChainIds } from './lib/validation';
+} from './types';
+import { BridgeError, BridgeErrorType } from './errors';
+import { GMPStatus, GasPaidStatus } from './types/axelar';
+import { queryTransactionStatus } from './lib/gmpRecovery';
+import { ERC20 } from './contracts/ABIs/ERC20';
 
 jest.mock('axios', () => ({
   post: jest.fn().mockReturnValue({
@@ -21,13 +20,13 @@ jest.mock('axios', () => ({
   }),
 }));
 
-jest.mock('lib/gmpRecovery');
+jest.mock('./lib/gmpRecovery');
 
 jest.mock('./lib/validation', () => ({
   ...jest.requireActual('./lib/validation'),
-  validateChainConfiguration: async () => {},
-  validateChainIds: async () => {},
-  validateBridgeReqArgs: async () => {},
+  validateChainConfiguration: async () => { },
+  validateChainIds: async () => { },
+  validateBridgeReqArgs: async () => { },
 }));
 
 describe('Token Bridge', () => {
@@ -387,11 +386,11 @@ describe('Token Bridge', () => {
       },
     };
 
-    const sourceChainGas:ethers.BigNumber = ethers.utils.parseUnits('0.000000000015', 18);
-    const approavalGas:ethers.BigNumber = ethers.utils.parseUnits('0.0000000000055', 18);
-    const bridgeFee:ethers.BigNumber = ethers.utils.parseUnits('0.0000000001', 18);
-    const imtblFee:ethers.BigNumber = ethers.BigNumber.from(0);
-    const totalFees:ethers.BigNumber = sourceChainGas.add(bridgeFee).add(imtblFee);
+    const sourceChainGas: ethers.BigNumber = ethers.utils.parseUnits('0.000000000015', 18);
+    const approavalGas: ethers.BigNumber = ethers.utils.parseUnits('0.0000000000055', 18);
+    const bridgeFee: ethers.BigNumber = ethers.utils.parseUnits('0.0000000001', 18);
+    const imtblFee: ethers.BigNumber = ethers.BigNumber.from(0);
+    const totalFees: ethers.BigNumber = sourceChainGas.add(bridgeFee).add(imtblFee);
 
     beforeEach(() => {
       const voidRootProvider = new ethers.providers.JsonRpcProvider('x');

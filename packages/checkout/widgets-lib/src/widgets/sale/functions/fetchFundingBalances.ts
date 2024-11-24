@@ -1,8 +1,11 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { Checkout, TransactionRequirement } from '@imtbl/checkout-sdk';
-import { Environment } from '@imtbl/config';
 import {
-  ClientConfigCurrency,
+  Checkout, ItemBalance, TokenBalance, TransactionRequirement,
+} from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
+import { compareStr } from '../../../lib/utils';
+import {
+  OrderQuoteCurrency,
   FundingBalance,
   FundingBalanceResult,
 } from '../types';
@@ -12,22 +15,26 @@ import {
   getFnToPushAndSortFundingBalances,
   getFundingBalances,
   getGasEstimate,
+  processGasFreeBalances,
   wrapPromisesWithOnResolve,
 } from './fetchFundingBalancesUtils';
+
+const isTokenFee = (balance: ItemBalance): balance is TokenBalance => 'token' in balance && balance.token !== undefined;
 
 export type FundingBalanceParams = {
   provider: Web3Provider;
   checkout: Checkout;
-  currencies: ClientConfigCurrency[];
-  baseCurrency: ClientConfigCurrency;
+  currencies: OrderQuoteCurrency[];
+  baseCurrency: OrderQuoteCurrency;
   routingOptions: { bridge: boolean; onRamp: boolean; swap: boolean };
-  getAmountByCurrency: (currency: ClientConfigCurrency) => string;
+  getAmountByCurrency: (currency: OrderQuoteCurrency) => string;
   getIsGasless: () => boolean;
   onFundingBalance: (balances: FundingBalance[]) => void;
   onFundingRequirement: (
     fundingItemRequirement: TransactionRequirement
   ) => void;
   onComplete?: (balances: FundingBalance[]) => void;
+  onUpdateGasFees?: (fees: TokenBalance) => void;
 };
 
 export const fetchFundingBalances = async (
@@ -43,6 +50,7 @@ export const fetchFundingBalances = async (
     getIsGasless,
     onComplete,
     onFundingRequirement,
+    onUpdateGasFees,
   } = params;
 
   const signer = provider?.getSigner();
@@ -52,9 +60,13 @@ export const fetchFundingBalances = async (
   const pushToFoundBalances = getFnToPushAndSortFundingBalances(baseCurrency);
   const updateFundingBalances = (balances: FundingBalance[] | null) => {
     if (Array.isArray(balances) && balances.length > 0) {
-      onFundingBalance(pushToFoundBalances(balances));
+      onFundingBalance(
+        pushToFoundBalances(processGasFreeBalances(balances, provider)),
+      );
     }
   };
+
+  const isBaseCurrency = (name: string) => compareStr(name, baseCurrency.name);
 
   const balancePromises: Promise<FundingBalanceResult>[] = currencies
     .map(async (currency) => {
@@ -74,39 +86,51 @@ export const fetchFundingBalances = async (
         ? undefined
         : getGasEstimate();
 
+      const handleOnComplete = () => {
+        onComplete?.(pushToFoundBalances([]));
+      };
+
+      const handleOnFundingRoute = (route) => {
+        updateFundingBalances(getAlternativeFundingSteps([route], environment));
+      };
+
       const smartCheckoutResult = await checkout.smartCheckout({
         provider,
         itemRequirements,
         transactionOrGasAmount,
         routingOptions: { bridge: false, onRamp: false, swap: true },
         fundingRouteFullAmount: true,
-        onComplete: () => {
-          onComplete?.(pushToFoundBalances([]));
-        },
-        onFundingRoute: (route) => {
-          updateFundingBalances(
-            getAlternativeFundingSteps([route], environment),
-          );
-        },
+        onComplete: isBaseCurrency(currency.name)
+          ? handleOnComplete
+          : undefined,
+        onFundingRoute: isBaseCurrency(currency.name)
+          ? handleOnFundingRoute
+          : undefined,
       });
 
       return { currency, smartCheckoutResult };
     })
     .filter(Boolean) as Promise<FundingBalanceResult>[];
 
-  const results = await wrapPromisesWithOnResolve(
+  return await wrapPromisesWithOnResolve(
     balancePromises,
     ({ currency, smartCheckoutResult }) => {
-      updateFundingBalances(
-        getFundingBalances(smartCheckoutResult, environment),
-      );
-
-      if (currency.base) {
+      if (isBaseCurrency(currency.name)) {
         const fundingItemRequirement = smartCheckoutResult.transactionRequirements[0];
         onFundingRequirement(fundingItemRequirement);
       }
+
+      if (smartCheckoutResult.sufficient) {
+        updateFundingBalances(
+          getFundingBalances(smartCheckoutResult, environment),
+        );
+
+        const feeRequirement = smartCheckoutResult.transactionRequirements.find((requirement) => requirement.isFee);
+
+        if (feeRequirement && isTokenFee(feeRequirement.required) && onUpdateGasFees) {
+          onUpdateGasFees(feeRequirement.required);
+        }
+      }
     },
   );
-
-  return results;
 };

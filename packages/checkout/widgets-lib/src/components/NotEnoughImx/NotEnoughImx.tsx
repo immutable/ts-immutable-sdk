@@ -4,7 +4,7 @@ import {
 } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
 import { Environment } from '@imtbl/config';
-import { getImxTokenImage } from 'lib/utils';
+import { getImxTokenImage } from '../../lib/utils';
 import {
   containerStyles,
   contentTextStyles,
@@ -12,7 +12,6 @@ import {
   actionButtonContainerStyles,
   logoContainerStyles,
 } from './NotEnoughImxStyles';
-import { IMAGE_RESIZER_URL } from '../../lib';
 
 type NotEnoughImxProps = {
   environment: Environment;
@@ -45,9 +44,13 @@ export function NotEnoughImx({
       <Drawer.Content>
         <Box testId="not-enough-gas-bottom-sheet" sx={containerStyles}>
           <CloudImage
-            imageUrl={imxLogo}
-            imageResizeServiceUrl={IMAGE_RESIZER_URL[environment]}
             sx={{ w: 'base.icon.size.600', h: 'base.icon.size.600' }}
+            use={(
+              <img
+                src={imxLogo}
+                alt={t(`drawers.notEnoughImx.content.${hasZeroImx ? 'noImx' : 'insufficientImx'}.heading`)}
+              />
+            )}
           />
           <Heading
             size="small"

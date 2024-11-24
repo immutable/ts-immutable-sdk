@@ -15,17 +15,14 @@ export { IMMUTABLE_API_BASE_URL } from './env';
 export {
   getPassportProviderDetail,
   getMetaMaskProviderDetail,
+  validateProvider,
 } from './provider';
 
 export {
   ChainId,
   ChainName,
   ChainSlug,
-  CheckoutStatus,
-  EIP1193Provider,
-  EIP6963ProviderInfo,
-  EIP6963ProviderDetail,
-  ExchangeType,
+  CheckoutStatus, ExchangeType,
   FeeType,
   FundingStepType,
   GasEstimateType,
@@ -38,6 +35,12 @@ export {
   WalletFilterTypes,
   WalletProviderName,
   WalletProviderRdns,
+} from './types';
+export type {
+  EIP1193Provider,
+  EIP6963ProviderInfo,
+  EIP6963ProviderDetail,
+  AddTokensConfig,
 } from './types';
 
 export type {
@@ -130,9 +133,11 @@ export type {
   SmartCheckoutRouter,
   SmartCheckoutSufficient,
   SuccessfulGaslessCancellation,
+  SwapFees,
   SwapFundingStep,
   SwitchNetworkParams,
   SwitchNetworkResult,
+  TelemetryConfig,
   TokenAmountEstimate,
   TokenBalance,
   TokenFilter,
@@ -140,10 +145,15 @@ export type {
   TransactionRequirement,
   WalletFilter,
   WalletInfo,
+  SquidConfig,
+  CheckoutWidgetsVersionConfig,
 } from './types';
+
+export { fetchRiskAssessment, isAddressSanctioned } from './riskAssessment';
+export type { AssessmentResult } from './riskAssessment';
 
 export type { ErrorType } from './errors';
 
-export { CheckoutErrorType } from './errors';
+export { CheckoutErrorType, CheckoutError } from './errors';
 export { CheckoutConfiguration } from './config';
 export { BlockExplorerService } from './blockExplorer';

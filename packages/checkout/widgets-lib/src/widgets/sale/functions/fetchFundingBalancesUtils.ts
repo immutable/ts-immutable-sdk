@@ -9,12 +9,19 @@ import {
   ERC20ItemRequirement,
   FundingRoute,
   RoutingOutcomeType,
+  FundingStep,
+  FundingStepType,
+  Fee,
+  SwapFees,
 } from '@imtbl/checkout-sdk';
+
 import { BigNumber } from 'ethers';
-import { getTokenImageByAddress, isNativeToken } from 'lib/utils';
 import { Environment } from '@imtbl/config';
+import { Web3Provider } from '@ethersproject/providers';
+import { getTokenImageByAddress, isNativeToken } from '../../../lib/utils';
+import { isGasFree } from '../../../lib/provider';
 import {
-  ClientConfigCurrency,
+  OrderQuoteCurrency,
   FundingBalance,
   FundingBalanceType,
   SufficientFundingStep,
@@ -69,7 +76,7 @@ const getTokenInfo = (
 
   return {
     ...tokenInfo,
-    icon: getTokenImageByAddress(environment, address),
+    icon: tokenInfo.icon ?? getTokenImageByAddress(environment, address),
   };
 };
 
@@ -95,7 +102,7 @@ export const getSufficientFundingStep = (
 export const getAlternativeFundingSteps = (
   fundingRoutes: FundingRoute[],
   environment: Environment,
-) => {
+): FundingStep[] => {
   if (fundingRoutes.length === 0) {
     return [];
   }
@@ -131,7 +138,7 @@ export const getFundingBalances = (
   if (
     smartCheckoutResult.sufficient === false
     && smartCheckoutResult?.router?.routingOutcome.type
-      === RoutingOutcomeType.ROUTES_FOUND
+    === RoutingOutcomeType.ROUTES_FOUND
   ) {
     return getAlternativeFundingSteps(
       smartCheckoutResult.router.routingOutcome.fundingRoutes,
@@ -144,13 +151,13 @@ export const getFundingBalances = (
 
 export const getFnToSortFundingBalancesByPriority = (baseSymbol?: string) => (a: FundingBalance, b: FundingBalance) => {
   const aIsBase = a.fundingItem
-      && a.fundingItem.token
-      && a.fundingItem.token.symbol === baseSymbol
+    && a.fundingItem.token
+    && a.fundingItem.token.symbol === baseSymbol
     ? -1
     : 0;
   const bIsBase = b.fundingItem
-      && b.fundingItem.token
-      && b.fundingItem.token.symbol === baseSymbol
+    && b.fundingItem.token
+    && b.fundingItem.token.symbol === baseSymbol
     ? -1
     : 0;
 
@@ -160,7 +167,7 @@ export const getFnToSortFundingBalancesByPriority = (baseSymbol?: string) => (a:
 
   if (
     a.type === FundingBalanceType.SUFFICIENT
-      && b.type === FundingBalanceType.SUFFICIENT
+    && b.type === FundingBalanceType.SUFFICIENT
   ) {
     return 0;
   }
@@ -175,7 +182,7 @@ export const getFnToSortFundingBalancesByPriority = (baseSymbol?: string) => (a:
 };
 
 export const getFnToPushAndSortFundingBalances = (
-  baseCurrency: ClientConfigCurrency,
+  baseCurrency: OrderQuoteCurrency,
 ): ((balances: FundingBalance[]) => FundingBalance[]) => {
   let currentBalances: FundingBalance[] = [];
   const sortByBaseAndPriority = getFnToSortFundingBalancesByPriority(
@@ -194,3 +201,38 @@ export const getFnToPushAndSortFundingBalances = (
     return currentBalances;
   };
 };
+
+const getZeroFee = (fee: Fee): Fee => ({
+  ...fee,
+  amount: BigNumber.from(0),
+  formattedAmount: '0',
+});
+
+const getGasFreeBalanceAdjustment = (
+  balance: FundingBalance,
+  provider?: Web3Provider,
+): FundingBalance => {
+  if (balance.type !== FundingStepType.SWAP) {
+    return balance;
+  }
+
+  if (!isGasFree(provider)) {
+    return balance;
+  }
+
+  const adjustedFees: SwapFees = {
+    ...balance.fees,
+    approvalGasFee: getZeroFee(balance.fees.approvalGasFee),
+    swapGasFee: getZeroFee(balance.fees.swapGasFee),
+  };
+
+  return {
+    ...balance,
+    fees: adjustedFees,
+  };
+};
+
+export const processGasFreeBalances = (
+  balances: FundingBalance[],
+  provider?: Web3Provider,
+) => balances.map((balance) => getGasFreeBalanceAdjustment(balance, provider));

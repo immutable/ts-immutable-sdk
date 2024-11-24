@@ -1,7 +1,7 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { describe, expect } from '@jest/globals';
-import { ETH_SEPOLIA_TO_ZKEVM_DEVNET, ZKEVM_DEVNET_CHAIN_ID } from 'constants/bridges';
 import { ethers } from 'ethers';
+import { ETH_SEPOLIA_TO_ZKEVM_DEVNET, ZKEVM_DEVNET_CHAIN_ID } from '../constants/bridges';
 import { BridgeConfiguration } from './index';
 import { BridgeModuleConfiguration } from '../types';
 

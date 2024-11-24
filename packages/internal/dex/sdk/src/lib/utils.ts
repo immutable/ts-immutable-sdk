@@ -1,9 +1,9 @@
 import { Pool } from '@uniswap/v3-sdk';
 import * as Uniswap from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
-import { ProviderCallError } from 'errors';
-import { Amount, Coin, CoinAmount, ERC20, Native, Token } from 'types';
-import { DEFAULT_DEADLINE_SECONDS } from 'constants/router';
+import { ProviderCallError } from '../errors';
+import { Amount, Coin, CoinAmount, ERC20, Native, Token } from '../types';
+import { DEFAULT_DEADLINE_SECONDS } from '../constants/router';
 
 export const quoteReturnMapping: { [signature: string]: string[] } = {
   // eslint-disable-next-line @typescript-eslint/naming-convention

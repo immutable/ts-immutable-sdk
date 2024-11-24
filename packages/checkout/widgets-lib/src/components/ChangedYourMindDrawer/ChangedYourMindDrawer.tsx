@@ -9,9 +9,8 @@ import {
 } from '@biom3/react';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
-import { getRemoteImage } from 'lib/utils';
 import { useTranslation } from 'react-i18next';
-import { IMAGE_RESIZER_URL } from '../../lib';
+import { getRemoteImage } from '../../lib/utils';
 
 export interface ChangedYourMindDrawerProps {
   visible: boolean;
@@ -57,12 +56,17 @@ export function ChangedYourMindDrawer({
           }}
         >
           <CloudImage
-            imageUrl={walletErrorRedUrl}
-            imageResizeServiceUrl={IMAGE_RESIZER_URL[checkout.config.environment]}
             sx={{ paddingTop: 'base.spacing.x4', paddingBottom: 'base.spacing.x9' }}
+            use={(
+              <img
+                src={walletErrorRedUrl}
+                alt={t('drawers.walletConnectionError.changedYourMind.heading')}
+              />
+            )}
           />
           <ButtCon
             icon="Close"
+            size="small"
             variant="tertiary"
             sx={{
               pos: 'absolute',

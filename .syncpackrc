@@ -1,0 +1,3 @@
+{
+  "source": ["packages/**/package.json", "sdk/package.json"]
+}

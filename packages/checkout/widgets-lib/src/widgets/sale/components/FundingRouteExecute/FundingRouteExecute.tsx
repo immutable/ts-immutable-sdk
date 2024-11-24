@@ -27,9 +27,9 @@ import {
   useRef,
   useState,
 } from 'react';
-import BridgeWidget from 'widgets/bridge/BridgeWidget';
 import { useTranslation } from 'react-i18next';
-import OnRampWidget from 'widgets/on-ramp/OnRampWidget';
+import BridgeWidget from '../../../bridge/BridgeWidget';
+import OnRampWidget from '../../../on-ramp/OnRampWidget';
 import {
   ConnectLoaderActions,
   ConnectLoaderContext,
@@ -119,7 +119,7 @@ export function FundingRouteExecute({
         view: {
           type: SaleWidgetViews.SALE_FAIL,
           data: {
-            errorType: SaleErrorTypes.SMART_CHECKOUT_EXECUTE_ERROR,
+            errorType: SaleErrorTypes.FUNDING_ROUTE_EXECUTE_ERROR,
             errorData,
           },
         },
@@ -156,13 +156,13 @@ export function FundingRouteExecute({
           amount: step.fundingItem.fundsRequired.formattedAmount,
           fromTokenAddress: step.fundingItem.token.address,
           toTokenAddress: requiredTokenAddress,
+          autoProceed: true,
         });
         if (network.chainId === getL2ChainId(checkout!.config)) {
           setView(FundingRouteExecuteViews.EXECUTE_SWAP);
           return;
         }
         nextView.current = FundingRouteExecuteViews.EXECUTE_SWAP;
-
         setView(FundingRouteExecuteViews.SWITCH_NETWORK_ZKEVM);
       }
 
@@ -312,7 +312,7 @@ export function FundingRouteExecute({
       {view === FundingRouteExecuteViews.LOADING && (
         <LoadingView
           loadingText={t(
-            'views.FUND_WITH_SMART_CHECKOUT.loading.checkingBalances',
+            'views.ORDER_SUMMARY.loading.balances',
           )}
         />
       )}

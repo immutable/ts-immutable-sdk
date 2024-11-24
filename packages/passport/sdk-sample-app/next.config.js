@@ -12,6 +12,10 @@ if (basePath) {
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   ...pathConfig,
+  typescript: {
+    tsconfigPath: './tsconfig.build.json',
+  },
+  output: 'export',
   reactStrictMode: true,
 };
 

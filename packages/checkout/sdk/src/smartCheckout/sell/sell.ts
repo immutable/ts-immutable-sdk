@@ -6,10 +6,14 @@ import {
   Orderbook,
   PrepareListingResponse,
   constants,
+  ERC721Item as OrderbookERC721Item,
+  ERC1155Item as OrderbookERC1155Item,
 } from '@imtbl/orderbook';
 import { BigNumber, Contract, utils } from 'ethers';
+import { track } from '@imtbl/metrics';
 import {
   ERC721Item,
+  ERC1155Item,
   GasTokenType,
   ItemType,
   TransactionOrGasType,
@@ -25,7 +29,7 @@ import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { smartCheckout } from '../smartCheckout';
 import {
-  getUnsignedERC721Transactions,
+  getUnsignedSellTransactions,
   getUnsignedMessage,
   signApprovalTransactions,
   signMessage,
@@ -44,6 +48,19 @@ export const getERC721Requirement = (
   id,
   contractAddress,
   spenderAddress,
+});
+
+export const getERC1155Requirement = (
+  id: string,
+  contractAddress: string,
+  spenderAddress: string,
+  amount: string,
+): ERC1155Item => ({
+  type: ItemType.ERC1155,
+  id,
+  contractAddress,
+  spenderAddress,
+  amount: BigNumber.from(amount),
 });
 
 export const getBuyToken = (
@@ -74,6 +91,8 @@ export const sell = async (
   let orderbook: Orderbook;
   let listing: PrepareListingResponse;
   let spenderAddress = '';
+
+  track('checkout_sdk', 'sell_initiated');
 
   if (orders.length === 0) {
     throw new CheckoutError(
@@ -106,6 +125,7 @@ export const sell = async (
   }
 
   const buyTokenOrNative = getBuyToken(buyToken, decimals);
+  const sellTokenHasType = 'type' in sellToken;
 
   try {
     const walletAddress = await measureAsyncExecution<string>(
@@ -116,17 +136,27 @@ export const sell = async (
     orderbook = instance.createOrderbookInstance(config);
     const { seaportContractAddress } = orderbook.config();
     spenderAddress = seaportContractAddress;
+
+    const sellItem: OrderbookERC721Item | OrderbookERC1155Item = sellTokenHasType && sellToken.type === ItemType.ERC1155
+      ? {
+        type: ItemType.ERC1155,
+        contractAddress: sellToken.collectionAddress,
+        tokenId: sellToken.id,
+        amount: sellToken.amount,
+      }
+      : {
+        type: ItemType.ERC721,
+        contractAddress: sellToken.collectionAddress,
+        tokenId: sellToken.id,
+      };
+
     listing = await measureAsyncExecution<PrepareListingResponse>(
       config,
       'Time to prepare the listing from the orderbook',
       orderbook.prepareListing({
         makerAddress: walletAddress,
         buy: buyTokenOrNative,
-        sell: {
-          type: ItemType.ERC721,
-          contractAddress: sellToken.collectionAddress,
-          tokenId: sellToken.id,
-        },
+        sell: sellItem,
         orderExpiry,
       }),
     );
@@ -142,9 +172,19 @@ export const sell = async (
     );
   }
 
-  const itemRequirements = [
-    getERC721Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress),
-  ];
+  const itemRequirements: (ERC721Item | ERC1155Item)[] = [];
+  if (sellTokenHasType && sellToken.type === ItemType.ERC1155) {
+    const erc1155ItemRequirement = getERC1155Requirement(
+      sellToken.id,
+      sellToken.collectionAddress,
+      spenderAddress,
+      sellToken.amount,
+    );
+    itemRequirements.push(erc1155ItemRequirement);
+  } else {
+    const erc721ItemRequirement = getERC721Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress);
+    itemRequirements.push(erc721ItemRequirement);
+  }
 
   let smartCheckoutResult;
   const isPassport = (provider.provider as any)?.isPassport;
@@ -170,7 +210,7 @@ export const sell = async (
   }
 
   if (smartCheckoutResult.sufficient) {
-    const unsignedTransactions = await getUnsignedERC721Transactions(listing.actions);
+    const unsignedTransactions = await getUnsignedSellTransactions(listing.actions);
     const approvalResult = await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
     if (approvalResult.type === SignTransactionStatusType.FAILED) {
       return {
@@ -213,7 +253,12 @@ export const sell = async (
     };
 
     if (makerFees !== undefined) {
-      const orderBookFees = calculateFees(makerFees, buyTokenOrNative.amount, decimals);
+      let tokenQuantity = BigNumber.from(1);
+
+      // if type exists in sellToken then it is valid ERC721 or ERC1155 and not deprecated type
+      if (sellTokenHasType && sellToken.type === ItemType.ERC1155) tokenQuantity = BigNumber.from(sellToken.amount);
+
+      const orderBookFees = calculateFees(makerFees, buyTokenOrNative.amount, decimals, tokenQuantity);
       if (orderBookFees.length !== makerFees.length) {
         throw new CheckoutError(
           'One of the fees is too small, must be greater than 0.000001',

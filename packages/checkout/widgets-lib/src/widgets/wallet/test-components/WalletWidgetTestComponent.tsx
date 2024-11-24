@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useReducer } from 'react';
-import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
+import { ViewContextTestComponent } from '../../../context/view-context/test-components/ViewContextTestComponent';
 import {
   initialWalletState,
   WalletContext,

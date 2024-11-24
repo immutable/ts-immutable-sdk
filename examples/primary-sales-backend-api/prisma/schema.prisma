@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id                String          @id @default(cuid())
+  productPrices     ProductPrice[]
+  collectionAddress String
+  contractType      String
+  stockQuantity     Int
+  orders            OrderLineItem[]
+}
+
+enum CurrencyType {
+  crypto
+  fiat
+}
+
+model Currency {
+  name          String         @id
+  type          CurrencyType
+  productPrices ProductPrice[]
+}
+
+model ProductPrice {
+  product       Product  @relation(fields: [product_id], references: [id])
+  product_id    String
+  currency      Currency @relation(fields: [currency_name], references: [name])
+  currency_name String
+  amount        Float
+
+  @@id([product_id, currency_name])
+}
+
+enum OrderStatus {
+  reserved
+  completed
+  expired
+  failed
+}
+
+model Order {
+  id               String          @id @default(cuid())
+  status           OrderStatus
+  lineItems        OrderLineItem[]
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  transactionHash  String?
+  recipientAddress String
+}
+
+model OrderLineItem {
+  order_id   String
+  product_id String
+  quantity   Int
+  order      Order   @relation(fields: [order_id], references: [id])
+  product    Product @relation(fields: [product_id], references: [id])
+
+  @@id([order_id, product_id])
+}

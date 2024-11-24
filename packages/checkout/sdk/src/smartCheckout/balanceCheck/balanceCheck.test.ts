@@ -46,6 +46,7 @@ describe('balanceCheck', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
       ];
       const getBalancesResult = {
@@ -73,6 +74,7 @@ describe('balanceCheck', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(3),
+          isFee: false,
         },
       ];
       const getBalancesResult = {
@@ -81,11 +83,7 @@ describe('balanceCheck', () => {
             {
               balance: BigNumber.from(1),
               formattedBalance: '0.000000000000000001',
-              token: {
-                name: 'IMX',
-                symbol: 'IMX',
-                decimals: 18,
-              },
+              token: ZKEVM_NATIVE_TOKEN,
             },
           ],
       };
@@ -105,17 +103,15 @@ describe('balanceCheck', () => {
               current: {
                 ...getBalancesResult.balances[0],
                 type: ItemType.NATIVE,
+                token: ZKEVM_NATIVE_TOKEN,
               },
               required: {
                 type: ItemType.NATIVE,
                 balance: BigNumber.from(3),
                 formattedBalance: '0.000000000000000003',
-                token: {
-                  name: 'IMX',
-                  symbol: 'IMX',
-                  decimals: 18,
-                },
+                token: ZKEVM_NATIVE_TOKEN,
               },
+              isFee: false,
             },
           ],
           sufficient: false,
@@ -131,6 +127,7 @@ describe('balanceCheck', () => {
           amount: BigNumber.from(10),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
       ];
       const getBalancesResult = {
@@ -161,6 +158,7 @@ describe('balanceCheck', () => {
           amount: BigNumber.from(10),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
       ];
       const getBalancesResult = {
@@ -202,6 +200,7 @@ describe('balanceCheck', () => {
                   address: '0xERC20',
                 },
               },
+              isFee: false,
             },
           ],
           sufficient: false,
@@ -235,22 +234,26 @@ describe('balanceCheck', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: true,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(10),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(10),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
       ];
       const getBalancesResult = { balances: [] };
@@ -276,17 +279,39 @@ describe('balanceCheck', () => {
               token: ZKEVM_NATIVE_TOKEN,
             },
             delta: {
-              balance: BigNumber.from(2),
-              formattedBalance: '0.000000000000000002',
+              balance: BigNumber.from(1),
+              formattedBalance: '0.000000000000000001',
             },
             required: {
               type: ItemType.NATIVE,
-              balance: BigNumber.from(2),
-              formattedBalance: '0.000000000000000002',
+              balance: BigNumber.from(1),
+              formattedBalance: '0.000000000000000001',
               token: ZKEVM_NATIVE_TOKEN,
             },
             sufficient: false,
             type: ItemType.NATIVE,
+            isFee: false,
+          },
+          {
+            current: {
+              type: ItemType.NATIVE,
+              balance: BigNumber.from(0),
+              formattedBalance: '0',
+              token: ZKEVM_NATIVE_TOKEN,
+            },
+            delta: {
+              balance: BigNumber.from(1),
+              formattedBalance: '0.000000000000000001',
+            },
+            required: {
+              type: ItemType.NATIVE,
+              balance: BigNumber.from(1),
+              formattedBalance: '0.000000000000000001',
+              token: ZKEVM_NATIVE_TOKEN,
+            },
+            sufficient: false,
+            type: ItemType.NATIVE,
+            isFee: true,
           },
           {
             delta: {
@@ -315,6 +340,7 @@ describe('balanceCheck', () => {
                 decimals: DEFAULT_TOKEN_DECIMALS,
               },
             },
+            isFee: false,
             sufficient: false,
             type: ItemType.ERC20,
           },
@@ -328,12 +354,14 @@ describe('balanceCheck', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from('1'),
+          isFee: true,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from('10'),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.ERC721,
@@ -380,22 +408,26 @@ describe('balanceCheck', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from('1'),
+          isFee: false,
         },
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from('1'),
+          isFee: true,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from('10'),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from('10'),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
+          isFee: false,
         },
         {
           type: ItemType.ERC721,
@@ -439,34 +471,6 @@ describe('balanceCheck', () => {
       expect(result.balanceRequirements)
         .toEqual(expect.arrayContaining([
           {
-            current: {
-              type: ItemType.NATIVE,
-              balance: BigNumber.from(1),
-              formattedBalance: '0.000000000000000001',
-              token: {
-                decimals: 18,
-                name: '',
-                symbol: '',
-              },
-            },
-            delta: {
-              balance: BigNumber.from(1),
-              formattedBalance: '0.000000000000000001',
-            },
-            required: {
-              type: ItemType.NATIVE,
-              balance: BigNumber.from(2),
-              formattedBalance: '0.000000000000000002',
-              token: {
-                name: '',
-                symbol: '',
-                decimals: 18,
-              },
-            },
-            sufficient: false,
-            type: ItemType.NATIVE,
-          },
-          {
             delta: {
               balance: BigNumber.from(20),
               formattedBalance: '0.00000000000000002',
@@ -495,6 +499,49 @@ describe('balanceCheck', () => {
             },
             sufficient: false,
             type: ItemType.ERC20,
+            isFee: false,
+          },
+          {
+            current: {
+              type: ItemType.NATIVE,
+              balance: BigNumber.from(1),
+              formattedBalance: '0.000000000000000001',
+              token: ZKEVM_NATIVE_TOKEN,
+            },
+            delta: {
+              balance: BigNumber.from(0),
+              formattedBalance: '0.0',
+            },
+            required: {
+              type: ItemType.NATIVE,
+              balance: BigNumber.from(1),
+              formattedBalance: '0.000000000000000001',
+              token: ZKEVM_NATIVE_TOKEN,
+            },
+            sufficient: true,
+            type: ItemType.NATIVE,
+            isFee: false,
+          },
+          {
+            current: {
+              type: ItemType.NATIVE,
+              balance: BigNumber.from(0),
+              formattedBalance: '0.0',
+              token: ZKEVM_NATIVE_TOKEN,
+            },
+            delta: {
+              balance: BigNumber.from(1),
+              formattedBalance: '0.000000000000000001',
+            },
+            required: {
+              type: ItemType.NATIVE,
+              balance: BigNumber.from(1),
+              formattedBalance: '0.000000000000000001',
+              token: ZKEVM_NATIVE_TOKEN,
+            },
+            sufficient: false,
+            type: ItemType.NATIVE,
+            isFee: true,
           },
           {
             delta: {
@@ -517,6 +564,7 @@ describe('balanceCheck', () => {
             },
             sufficient: true,
             type: ItemType.ERC721,
+            isFee: false,
           },
         ]));
     });
@@ -580,6 +628,7 @@ describe('balanceCheck', () => {
             },
             sufficient: false,
             type: ItemType.ERC721,
+            isFee: false,
           },
           {
             current: {
@@ -602,6 +651,7 @@ describe('balanceCheck', () => {
             },
             sufficient: false,
             type: ItemType.ERC721,
+            isFee: false,
           },
         ]));
     });
@@ -612,6 +662,7 @@ describe('balanceCheck', () => {
       {
         type: ItemType.NATIVE,
         amount: BigNumber.from(1),
+        isFee: false,
       },
     ];
     const getBalancesResult = {

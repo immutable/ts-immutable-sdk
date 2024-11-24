@@ -17,6 +17,7 @@ export enum ConnectEventType {
  * @property {Web3Provider} provider
  * @property {WalletProviderName | undefined} walletProviderName
  */
+
 export type ConnectionSuccess = {
   /** The connected provider. */
   provider: Web3Provider;

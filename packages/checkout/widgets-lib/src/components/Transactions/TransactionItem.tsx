@@ -5,9 +5,11 @@ import {
   MenuItem,
   Link,
 } from '@biom3/react';
-import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
-import { Transaction } from 'lib/clients/checkoutApiType';
 import { MouseEvent, useMemo } from 'react';
+import { Environment } from '@imtbl/config';
+import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { Transaction } from '../../lib/clients/checkoutApiType';
+import { TokenImage } from '../TokenImage/TokenImage';
 import { containerStyles } from './transactionItemStyles';
 import { TransactionDetails } from './TransactionDetails';
 
@@ -23,6 +25,7 @@ type TransactionItemProps = {
   amount: string,
   icon: string,
   defaultTokenImage: string,
+  environment: Environment,
 };
 
 export function TransactionItem({
@@ -33,9 +36,9 @@ export function TransactionItem({
   amount,
   icon,
   defaultTokenImage,
+  environment,
 }: TransactionItemProps) {
   const { track } = useAnalytics();
-
   const txnDetailsLink = useMemo(() => `${details.link}${details.hash}`, [details]);
 
   const handleDetailsLinkClick = (
@@ -79,7 +82,16 @@ export function TransactionItem({
       >
         <Accordion.TargetLeftSlot sx={{ pr: 'base.spacing.x2' }}>
           <MenuItem size="xSmall">
-            <MenuItem.FramedImage imageUrl={icon} circularFrame defaultImageUrl={defaultTokenImage} />
+            <MenuItem.FramedImage
+              circularFrame
+              use={(
+                <TokenImage
+                  src={icon}
+                  name={label}
+                  defaultImage={defaultTokenImage}
+                />
+              )}
+            />
             <MenuItem.Label>
               {label}
             </MenuItem.Label>
@@ -117,7 +129,7 @@ export function TransactionItem({
               px: 'base.spacing.x2',
             }}
           />
-          <TransactionDetails transaction={transaction} />
+          <TransactionDetails transaction={transaction} environment={environment} />
         </Accordion.ExpandedContent>
       </Accordion>
     </Box>

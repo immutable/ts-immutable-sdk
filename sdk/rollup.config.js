@@ -1,6 +1,6 @@
 import typescript from '@rollup/plugin-typescript';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
-import { readFileSync } from 'fs';
+import { execSync } from 'child_process';
 import commonJs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import dts from 'rollup-plugin-dts';
@@ -14,11 +14,12 @@ import babel from '@rollup/plugin-babel';
 // RELEASE_TYPE environment variable is set by the CI/CD pipeline
 const releaseType = process.env.RELEASE_TYPE || 'alpha';
 
-const packages = JSON.parse(
-  readFileSync('./workspace-packages.json', { encoding: 'utf8' })
-);
-
-const getPackages = () => packages.map((pkg) => pkg.name);
+const packages = execSync('yarn workspaces list --json')
+  .toString()
+  .trim()
+  .split('\n')
+  .map((line) => JSON.parse(line))
+  .map((pkg) => pkg.name);
 
 // Get relevant files to bundle
 const getFilesToBuild = () => {
@@ -36,30 +37,42 @@ const getFilesToBuild = () => {
   return [...files, ...returnModules];
 };
 
-const getFileBuild = (inputFilename) => [
-  {
-    input: `./src/${inputFilename}.ts`,
-    output: {
-      dir: 'dist',
-      format: 'es',
-    },
-    plugins: [
-      nodeResolve({
-        resolveOnly: getPackages(),
-      }),
-      json(),
-      commonJs(),
-      typescript({
-        declaration: true,
-        declarationDir: './dist/types',
-      }),
-      replace({
-        exclude: 'node_modules/**',
-        preventAssignment: true,
-        __SDK_VERSION__: pkg.version,
-      }),
-    ],
-  },
+
+const buildJS = () => {
+  const filesToBuild = getFilesToBuild();
+  // generate a single object that contains all the files under input
+  const [inputs] = filesToBuild.reduce((acc, f) => {
+    return [{...acc[0], [f] : `./src/${f}.ts`}]
+  }, [{}])
+
+  return  {
+      input: inputs,
+      output: {
+        dir: 'dist',
+        format: 'es',
+      },
+      plugins: [
+        nodeResolve({
+          resolveOnly: packages,
+          exportConditions: ["default"],
+        }),
+        json(),
+        commonJs(),
+        typescript({
+          declaration: true,
+          declarationDir: './dist/types',
+        }),
+        replace({
+          exclude: 'node_modules/**',
+          preventAssignment: true,
+          __SDK_VERSION__: pkg.version,
+        }),
+      ],
+      external: ['pg'] 
+    }
+};
+
+const getTypesBuild = (inputFilename) => [
   {
     input: `./dist/types/${inputFilename}.d.ts`,
     output: {
@@ -71,14 +84,15 @@ const getFileBuild = (inputFilename) => [
         respectExternal: true,
       }),
     ],
+    external: ['pg'] 
   },
 ];
 
-const buildBundles = () => {
+const buildTypes = () => {
   const modules = [];
   const filesToBuild = getFilesToBuild();
   for (const file of filesToBuild) {
-    modules.push(...getFileBuild(file));
+    modules.push(...getTypesBuild(file));
   }
   return modules;
 };
@@ -93,7 +107,8 @@ export default [
     },
     plugins: [
       nodeResolve({
-        resolveOnly: getPackages(),
+        resolveOnly: packages,
+        exportConditions: ["default"]
       }),
       json(),
       commonJs(),
@@ -107,7 +122,7 @@ export default [
   },
   // Browser Bundle
   {
-    input: 'src/index.ts',
+    input: 'src/browser.index.ts',
     output: {
       file: 'dist/index.browser.js',
       format: 'umd',
@@ -120,6 +135,7 @@ export default [
         main: true,
         browser: true,
         preferBuiltins: false,
+        exportConditions: ["default"],
       }),
       nodePolyfills(),
       json(),
@@ -140,10 +156,11 @@ export default [
         'process.env.NODE_ENV': '"production"',
         'process': 'undefined'
       }),
-      terser(),
+      terser({ keep_fnames: /./ }),
     ],
   },
 
   // Export ES Modules
-  ...buildBundles(),
+  buildJS(),
+  ...buildTypes(),
 ];

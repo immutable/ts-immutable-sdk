@@ -59,11 +59,3 @@ export const networkButtonStyles = {
   paddingY: 'base.spacing.x6',
   borderRadius: 'base.borderRadius.x18',
 };
-
-export const networkIconStyles = (chainId: ChainId) => ({
-  fill: 'base.color.brand.2',
-  width: 'base.icon.size.300',
-  backgroundColor: logoColour[chainId],
-  borderRadius: '100%',
-  padding: 'base.spacing.x1',
-});

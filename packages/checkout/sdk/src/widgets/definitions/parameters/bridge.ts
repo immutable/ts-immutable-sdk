@@ -17,4 +17,6 @@ export type BridgeWidgetParams = {
   walletProviderName?: WalletProviderName;
   /** The language to use for the bridge widget */
   language?: WidgetLanguage;
+  /** Whether to show a back button on the first screen, on click triggers REQUEST_GO_BACK event */
+  showBackButton?: boolean;
 };

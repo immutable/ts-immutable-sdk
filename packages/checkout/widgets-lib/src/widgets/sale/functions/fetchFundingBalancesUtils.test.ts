@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { ClientConfigCurrency, FundingBalance } from '../types';
+import { OrderQuoteCurrency, FundingBalance } from '../types';
 import {
   getGasEstimate,
   getERC20ItemRequirement,
@@ -340,7 +340,7 @@ describe('getFnToSortFundingBalancesByPriority', () => {
 
 describe('getFnToPushAndSortFundingBalances', () => {
   let balances: FundingBalance[] = [];
-  let baseCurrency: ClientConfigCurrency;
+  let baseCurrency: OrderQuoteCurrency;
   let pushAndSortByUSDC: (balances: FundingBalance[]) => FundingBalance[];
 
   beforeAll(() => {

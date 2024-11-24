@@ -24,7 +24,7 @@ import {
 } from '../indexer/fetchL1Representation';
 import { DEFAULT_TOKEN_DECIMALS } from '../../../env';
 import { isNativeToken } from '../../../tokens';
-import { isMatchingAddress } from '../../../utils/utils';
+import { formatSmartCheckoutAmount, isMatchingAddress } from '../../../utils/utils';
 
 export const hasSufficientL1Eth = (
   tokenBalanceResult: TokenBalanceResult,
@@ -92,7 +92,7 @@ const constructBridgeFundingRoute = (
     type: itemType,
     fundsRequired: {
       amount: bridgeRequirement.amount,
-      formattedAmount: bridgeRequirement.formattedAmount,
+      formattedAmount: formatSmartCheckoutAmount(bridgeRequirement.formattedAmount),
     },
     userBalance: {
       balance: balance.balance,

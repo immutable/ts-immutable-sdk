@@ -1,31 +1,49 @@
 /* eslint-disable class-methods-use-this */
 import { Web3Provider } from '@ethersproject/providers';
-import { ethers } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { Passport } from '@imtbl/passport';
 import { track } from '@imtbl/metrics';
+import { Passport } from '@imtbl/passport';
+import { ethers } from 'ethers';
+import { HttpClient } from './api/http';
+import { AvailabilityService, availabilityService } from './availability';
 import * as balances from './balances';
-import * as tokens from './tokens';
+import { CheckoutConfiguration } from './config';
 import * as connect from './connect';
-import * as provider from './provider';
-import * as wallet from './wallet';
-import * as network from './network';
-import * as transaction from './transaction';
+import { CheckoutError, CheckoutErrorType } from './errors';
+import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
 import * as gasEstimatorService from './gasEstimate';
+import * as network from './network';
+import * as provider from './provider';
+import { InjectedProvidersManager } from './provider/injectedProvidersManager';
+import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
+import * as smartCheckout from './smartCheckout';
 import * as buy from './smartCheckout/buy';
 import * as cancel from './smartCheckout/cancel';
+import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequirements';
 import * as sell from './smartCheckout/sell';
-import * as smartCheckout from './smartCheckout';
+import * as swap from './swap';
+import * as tokens from './tokens';
+import * as transaction from './transaction';
+import { handleProviderError } from './transaction';
 import {
+  AddNetworkParams,
   BuyParams,
+  BuyResult,
+  CancelResult,
   ChainId,
   CheckConnectionParams,
   CheckConnectionResult,
   CheckoutModuleConfiguration,
+  CheckoutWidgetsVersionConfig,
   ConnectParams,
   ConnectResult,
   CreateProviderParams,
   CreateProviderResult,
+  EIP6963ProviderDetail,
+  FiatRampParams,
+  GasEstimateBridgeToL2Result,
+  GasEstimateParams,
+  GasEstimateSwapResult,
   GetAllBalancesParams,
   GetAllBalancesResult,
   GetBalanceParams,
@@ -35,46 +53,33 @@ import {
   GetNetworkParams,
   GetTokenAllowListParams,
   GetTokenAllowListResult,
+  GetTokenInfoParams,
   GetWalletAllowListParams,
   GetWalletAllowListResult,
   NetworkInfo,
+  OnRampProviderFees,
+  SellResult,
   SendTransactionParams,
   SendTransactionResult,
+  SmartCheckoutParams,
+  SmartCheckoutResult,
   SwitchNetworkParams,
   SwitchNetworkResult,
-  ValidateProviderOptions,
-  GasEstimateParams,
-  GasEstimateSwapResult,
-  GasEstimateBridgeToL2Result,
-  SmartCheckoutParams,
   TokenFilterTypes,
-  OnRampProviderFees,
-  FiatRampParams,
-  SmartCheckoutResult,
-  CancelResult,
-  BuyResult,
-  SellResult,
   TokenInfo,
-  GetTokenInfoParams,
-  AddNetworkParams,
-  EIP6963ProviderDetail,
+  ValidateProviderOptions,
 } from './types';
-import { CheckoutConfiguration } from './config';
-import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
-import { SellParams } from './types/sell';
 import { CancelParams } from './types/cancel';
-import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
-import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequirements';
-import { CheckoutError, CheckoutErrorType } from './errors';
-import { AvailabilityService, availabilityService } from './availability';
-import { getWidgetsEsmUrl, loadUnresolvedBundle } from './widgets/load';
+import { SellParams } from './types/sell';
+import { SwapParams, SwapQuoteResult, SwapResult } from './types/swap';
 import { WidgetsInit } from './types/widgets';
-import { HttpClient } from './api/http';
 import { isMatchingAddress } from './utils/utils';
+import * as wallet from './wallet';
 import { WidgetConfiguration } from './widgets/definitions/configurations';
-import { SemanticVersion } from './widgets/definitions/types';
-import { validateAndBuildVersion } from './widgets/version';
-import { InjectedProvidersManager } from './provider/injectedProvidersManager';
+import { getWidgetsEsmUrl, loadUnresolvedBundle } from './widgets/load';
+import { determineWidgetsVersion, validateAndBuildVersion } from './widgets/version';
+import { globalPackageVersion } from './env';
+import { AssessmentResult, fetchRiskAssessment, isAddressSanctioned } from './riskAssessment';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -131,10 +136,28 @@ export class Checkout {
     const checkout = this;
 
     // Preload the configurations
-    await checkout.config.remote.getConfig();
+    const versionConfig = (
+      await checkout.config.remote.getConfig('checkoutWidgetsVersion')
+    ) as CheckoutWidgetsVersionConfig | undefined;
+
+    // Determine the version of the widgets to load
+    const validatedBuildVersion = validateAndBuildVersion(init.version);
+    const initVersionProvided = init.version !== undefined;
+
+    const widgetsVersion = await determineWidgetsVersion(
+      validatedBuildVersion,
+      initVersionProvided,
+      versionConfig,
+    );
+
+    track('checkout_sdk', 'widgets', {
+      sdkVersion: globalPackageVersion(),
+      validatedSdkVersion: validatedBuildVersion,
+      widgetsVersion,
+    });
 
     try {
-      const factory = await this.loadEsModules(init.config, init.version);
+      const factory = await this.loadEsModules(init.config, widgetsVersion);
       return factory;
     } catch (err: any) {
       throw new CheckoutError(
@@ -147,7 +170,7 @@ export class Checkout {
 
   private async loadUmdBundle(
     config: WidgetConfiguration,
-    version?: SemanticVersion,
+    validVersion: string,
   ) {
     const checkout = this;
 
@@ -155,7 +178,6 @@ export class Checkout {
       (resolve, reject) => {
         try {
           const scriptId = 'immutable-checkout-widgets-bundle';
-          const validVersion = validateAndBuildVersion(version);
 
           // Prevent the script to be loaded more than once
           // by checking the presence of the script and its version.
@@ -222,11 +244,11 @@ export class Checkout {
 
   private async loadEsModules(
     config: WidgetConfiguration,
-    version?: SemanticVersion,
+    validVersion: string,
   ) {
     const checkout = this;
     try {
-      const cdnUrl = getWidgetsEsmUrl(version);
+      const cdnUrl = getWidgetsEsmUrl(validVersion);
 
       // WebpackIgnore comment required to prevent webpack modifying the import statement and
       // breaking the dynamic import in certain applications integrating checkout
@@ -240,12 +262,12 @@ export class Checkout {
     } catch (err: any) {
       // eslint-disable-next-line no-console
       console.warn(
-        `Failed to resolve checkout widgets module, falling back to UMD bundle. Error: ${err.message}`,
+        `Failed to resolve Commerce Widgets module, falling back to UMD bundle. Error: ${err.message}`,
       );
     }
 
     // Fallback to UMD bundle if esm bundle fails to load
-    return await checkout.loadUmdBundle(config, version);
+    return await checkout.loadUmdBundle(config, validVersion);
   }
 
   /**
@@ -290,6 +312,10 @@ export class Checkout {
     return InjectedProvidersManager.getInstance().subscribe(listener);
   }
 
+  public clearInjectedProviders() {
+    return InjectedProvidersManager.getInstance().clear();
+  }
+
   /**
    * Checks if a wallet is connected to the specified provider.
    * @param {CheckConnectionParams} params - The parameters for checking the wallet connection.
@@ -307,6 +333,25 @@ export class Checkout {
       } as ValidateProviderOptions,
     );
     return connect.checkIsWalletConnected(web3Provider);
+  }
+
+  /**
+   * Fetches the risk assessment for the given addresses.
+   * @param {string[]} addresses - The addresses to assess.
+   * @returns {Promise<AssessmentResult>} - A promise that resolves to the risk assessment result.
+   */
+  public async getRiskAssessment(addresses: string[]): Promise<AssessmentResult> {
+    return await fetchRiskAssessment(addresses, this.config);
+  }
+
+  /**
+   * Helper method that checks if given risk assessment results contain sanctioned addresses.
+   * @param {AssessmentResult} assessment - Risk assessment to analyse.
+   * @param {string | undefined} address - If defined, only sanctions for the given address will be checked.
+   * @returns {boolean} - Result of the check.
+   */
+  public checkIsAddressSanctioned(assessment: AssessmentResult, address?: string): boolean {
+    return isAddressSanctioned(assessment, address);
   }
 
   /**
@@ -482,6 +527,31 @@ export class Checkout {
   }
 
   /**
+   * Wraps a Web3Provider call to validate the provider and handle errors.
+   * @param {Web3Provider} web3Provider - The provider to connect to the network.
+   * @param {(web3Provider: Web3Provider) => Promise<T>)} block - The block executing the provider call.
+   * @returns {Promise<T>} Returns the result of the provided block param.
+   */
+  public async providerCall<T>(
+    web3Provider: Web3Provider,
+    block: (web3Provider: Web3Provider) => Promise<T>,
+  ): Promise<T> {
+    const validatedProvider = await provider.validateProvider(
+      this.config,
+      web3Provider,
+      {
+        allowUnsupportedProvider: true,
+        allowMistmatchedChainId: true,
+      } as ValidateProviderOptions,
+    );
+    try {
+      return await block(validatedProvider);
+    } catch (err: any) {
+      throw handleProviderError(err);
+    }
+  }
+
+  /**
    * Retrieves network information using the specified provider.
    * @param {GetNetworkParams} params - The parameters for retrieving network information.
    * @returns {Promise<NetworkInfo>} A promise that resolves to the network information.
@@ -501,6 +571,8 @@ export class Checkout {
   /**
    * Determines the requirements for performing a buy.
    * @param {BuyParams} params - The parameters for the buy.
+   * @deprecated Please use orderbook.fulfillOrder or orderbook.fulfillBulkOrders instead. The smartCheckout
+   * method can still be used to ensure the transaction requirements are met before preparing the order fulfillment
    */
   public async buy(params: BuyParams): Promise<BuyResult> {
     if (params.orders.length > 1) {
@@ -528,6 +600,8 @@ export class Checkout {
    * @param {SellParams} params - The parameters for the sell.
    * Only currently actions the first order in the array until we support batch processing.
    * Only currently actions the first fee in the fees array of each order until we support multiple fees.
+   * @deprecated Please use orderbook.prepareListing or orderbook.prepareBulkListing instead. The smartCheckout
+   * method can still be used to ensure the transaction requirements are met before preparing the listing
    */
   public async sell(params: SellParams): Promise<SellResult> {
     if (params.orders.length > 1) {
@@ -548,6 +622,7 @@ export class Checkout {
   /**
    * Cancels a sell.
    * @param {CancelParams} params - The parameters for the cancel.
+   * @deprecated Please use orderbook.prepareOrderCancellations instead.
    */
   public async cancel(params: CancelParams): Promise<CancelResult> {
     // eslint-disable-next-line no-console
@@ -690,5 +765,51 @@ export class Checkout {
    */
   public async isSwapAvailable(): Promise<boolean> {
     return this.availability.checkDexAvailability();
+  }
+
+  /**
+   * Fetches a quote and then performs the approval and swap transaction.
+   * @param {SwapParams} params - The parameters for the swap.
+   * @returns {Promise<SwapResult>} - A promise that resolves to the swap result (swap tx, swap tx receipt, quote used in the swap).
+   */
+  public async swap(params: SwapParams): Promise<SwapResult> {
+    const web3Provider = await provider.validateProvider(
+      this.config,
+      params.provider,
+    );
+    return swap.swap(
+      this.config,
+      web3Provider,
+      params.fromToken,
+      params.toToken,
+      params.fromAmount,
+      params.toAmount,
+      params.slippagePercent,
+      params.maxHops,
+      params.deadline,
+    );
+  }
+
+  /**
+   * Fetches a quote for the swap.
+   * @param {SwapParams} params - The parameters for the swap.
+   * @returns {Promise<SwapQuoteResult>} - A promise that resolves to the swap quote result.
+   */
+  public async swapQuote(params: SwapParams): Promise<SwapQuoteResult> {
+    const web3Provider = await provider.validateProvider(
+      this.config,
+      params.provider,
+    );
+    return swap.swapQuote(
+      this.config,
+      web3Provider,
+      params.fromToken,
+      params.toToken,
+      params.fromAmount,
+      params.toAmount,
+      params.slippagePercent,
+      params.maxHops,
+      params.deadline,
+    );
   }
 }

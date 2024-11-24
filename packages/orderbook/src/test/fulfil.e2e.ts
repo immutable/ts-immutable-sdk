@@ -1,6 +1,6 @@
 import { Environment } from '@imtbl/config';
-import { OrderStatusName } from 'openapi/sdk';
-import { Orderbook } from 'orderbook';
+import { OrderStatusName } from '../openapi/sdk';
+import { Orderbook } from '../orderbook';
 import { getLocalhostProvider } from './helpers/provider';
 import { getFulfillerWallet, getOffererWallet } from './helpers/signers';
 import { deployTestToken } from './helpers/erc721';

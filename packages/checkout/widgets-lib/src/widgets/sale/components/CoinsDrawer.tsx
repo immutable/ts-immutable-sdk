@@ -1,10 +1,20 @@
 import {
-  Box, Caption, Drawer, MenuItem, Divider,
+  Box,
+  Caption,
+  Drawer,
+  MenuItem,
+  Divider,
+  MenuItemSize,
 } from '@biom3/react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { listVariants, listItemVariants } from 'lib/animation/listAnimation';
-import { SalePaymentTypes, TransactionRequirement } from '@imtbl/checkout-sdk';
+import {
+  SalePaymentTypes,
+  TransactionRequirement,
+  WidgetTheme,
+} from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
+import { listVariants, listItemVariants } from '../../../lib/animation/listAnimation';
 import { CoinsDrawerItem } from './CoinsDrawerItem';
 import { FundingBalance } from '../types';
 import { PaymentOptions } from './PaymentOptions';
@@ -20,6 +30,8 @@ type CoinsDrawerProps = {
   onClose: () => void;
   onPayWithCard?: (paymentType: SalePaymentTypes) => void;
   disabledPaymentTypes?: SalePaymentTypes[];
+  theme: WidgetTheme;
+  environment: Environment;
 };
 
 export function CoinsDrawer({
@@ -33,12 +45,22 @@ export function CoinsDrawer({
   onSelect,
   onPayWithCard,
   disabledPaymentTypes,
+  theme,
+  environment,
 }: CoinsDrawerProps) {
   const { t } = useTranslation();
   const handleOnclick = (index: number) => () => {
     onSelect(index);
     onClose();
   };
+
+  let size: MenuItemSize = 'medium';
+  if (balances.length > 3) {
+    size = 'small';
+  }
+
+  const otherPaymentOptions = [SalePaymentTypes.DEBIT, SalePaymentTypes.CREDIT];
+  const withOtherOptions = !otherPaymentOptions.every((type) => disabledPaymentTypes?.includes(type));
 
   return (
     <Drawer
@@ -85,6 +107,9 @@ export function CoinsDrawer({
                 selected={selectedIndex === idx}
                 conversions={conversions}
                 transactionRequirement={transactionRequirement}
+                size={size}
+                theme={theme}
+                environment={environment}
                 rc={<motion.div variants={listItemVariants} custom={idx} />}
               />
             ))}
@@ -97,6 +122,7 @@ export function CoinsDrawer({
                 <MenuItem
                   shimmer
                   emphasized
+                  size={size}
                   testId="funding-balance-item-shimmer"
                 />
               </motion.div>
@@ -112,24 +138,27 @@ export function CoinsDrawer({
                 />
               )}
             >
-              <Divider
-                size="small"
-                rc={<Caption />}
-                sx={{ my: 'base.spacing.x4' }}
-              >
-                {t('views.ORDER_SUMMARY.coinsDrawer.divider')}
-              </Divider>
+              {withOtherOptions && (
+                <Divider
+                  size="small"
+                  rc={<Caption />}
+                  sx={{ my: 'base.spacing.x4' }}
+                >
+                  {t('views.ORDER_SUMMARY.coinsDrawer.divider')}
+                </Divider>
+              )}
               <PaymentOptions
                 onClick={onPayWithCard}
-                paymentOptions={[SalePaymentTypes.DEBIT, SalePaymentTypes.CREDIT].filter(
-                  (type) => !disabledPaymentTypes?.includes(type),
-                )}
+                size={size}
+                hideDisabledOptions
+                paymentOptions={otherPaymentOptions}
+                disabledOptions={disabledPaymentTypes}
                 captions={{
                   [SalePaymentTypes.DEBIT]: t(
-                    'views.ORDER_SUMMARY.coinsDrawer.payWithCard.caption',
+                    'views.PAYMENT_METHODS.options.debit.caption',
                   ),
                   [SalePaymentTypes.CREDIT]: t(
-                    'views.ORDER_SUMMARY.coinsDrawer.payWithCard.caption',
+                    'views.PAYMENT_METHODS.options.credit.caption',
                   ),
                 }}
               />

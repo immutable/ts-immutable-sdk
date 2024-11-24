@@ -24,7 +24,7 @@ export const getBridgeFeeEstimate = async (
     const bridgeFeeResponse = await bridge.getFee(
       {
         action: BridgeFeeActions.DEPOSIT,
-        gasMultiplier: 1.1,
+        gasMultiplier: 'auto',
         sourceChainId: fromChainId.toString(),
         destinationChainId: toChainId.toString(),
       },

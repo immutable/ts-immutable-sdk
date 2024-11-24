@@ -12,7 +12,6 @@
     "TypeAlias",
     "Variable",
     "Function",
-    "ObjectLiteral",
     "Property",
     "Constructor",
     "Method",

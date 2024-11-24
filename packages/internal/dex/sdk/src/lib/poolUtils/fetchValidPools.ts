@@ -1,8 +1,8 @@
 import { Pool } from '@uniswap/v3-sdk';
 import { BigNumber } from 'ethers';
-import { ProviderCallError } from 'errors';
-import { erc20ToUniswapToken } from 'lib/utils';
-import { ERC20 } from 'types';
+import { ProviderCallError } from '../../errors';
+import { erc20ToUniswapToken } from '../utils';
+import { ERC20 } from '../../types';
 import { MulticallResponse, multicallSingleCallDataMultipleContracts } from '../multicall';
 import { generatePossiblePoolsFromERC20Pair } from './generatePossiblePoolsFromERC20Pairs';
 import { ERC20Pair } from './generateERC20Pairs';

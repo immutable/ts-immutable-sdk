@@ -3,7 +3,7 @@ import {
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
-import { isWalletConnectProvider } from 'lib/provider';
+import { isWalletConnectProvider } from '../../../lib/provider';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';

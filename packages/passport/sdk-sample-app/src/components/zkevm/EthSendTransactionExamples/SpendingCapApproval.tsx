@@ -5,8 +5,8 @@ import { Accordion, Form } from 'react-bootstrap';
 import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps, EnvironmentNames } from '@/types';
-import { Interface } from 'ethers/lib/utils';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
+import { utils } from 'ethers';
 
 const getErc20DefaultContractAddress = (environment: EnvironmentNames) => {
   switch (environment) {
@@ -27,7 +27,7 @@ function SpendingCapApproval({ disabled, handleExampleSubmitted }: RequestExampl
     const abi = [
       'function approve(address spender, uint256 amount)',
     ];
-    return new Interface(abi);
+    return new utils.Interface(abi);
   }, []);
   const [fromAddress, setFromAddress] = useState<string>('');
   const [erc20ContractAddress, setErc20ContractAddress] = useState<string>(getErc20DefaultContractAddress(environment));

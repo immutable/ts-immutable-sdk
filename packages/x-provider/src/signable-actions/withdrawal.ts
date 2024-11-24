@@ -1,11 +1,12 @@
+import { imx } from '@imtbl/generated-clients';
 import { AnyToken, TokenAmount } from '@imtbl/x-client';
 import { ProviderConfiguration } from '../config';
 import { Signers } from './types';
 import {
-  prepareWithdrawalAction,
   completeEthWithdrawalAction,
   completeERC20WithdrawalAction,
   completeERC721WithdrawalAction,
+  prepareWithdrawalAction,
 } from './withdrawal-actions';
 
 type CompleteWithdrawalParams = {
@@ -26,29 +27,34 @@ export async function prepareWithdrawal({
   withdrawal,
   config,
 }: PrepareWithdrawalParams) {
+  const withdrawalsApi = new imx.WithdrawalsApi(config.immutableXConfig.apiConfiguration);
   return prepareWithdrawalAction({
     signers,
     config: config.immutableXConfig,
     ...withdrawal,
-  });
+  }, withdrawalsApi);
 }
 
 // TODO: remove once fixed
 // eslint-disable-next-line consistent-return
 export async function completeWithdrawal({
-  signers: { ethSigner },
+  signers: { ethSigner, starkSigner },
   starkPublicKey,
   token,
   config,
 }: CompleteWithdrawalParams) {
-  // TODO: please add a reasonable default here
+  const mintsApi = new imx.MintsApi(config.immutableXConfig.apiConfiguration);
+
   // eslint-disable-next-line default-case
   switch (token.type) {
     case 'ETH':
-      return completeEthWithdrawalAction({ ethSigner, starkPublicKey, config });
+      return completeEthWithdrawalAction({
+        ethSigner, starkSigner, starkPublicKey, config,
+      });
     case 'ERC20':
       return completeERC20WithdrawalAction({
         ethSigner,
+        starkSigner,
         starkPublicKey,
         token,
         config,
@@ -56,9 +62,10 @@ export async function completeWithdrawal({
     case 'ERC721':
       return completeERC721WithdrawalAction({
         ethSigner,
+        starkSigner,
         starkPublicKey,
         token,
         config,
-      });
+      }, mintsApi);
   }
 }

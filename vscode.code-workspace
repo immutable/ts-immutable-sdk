@@ -4,7 +4,7 @@
       "path": "."
     },
     {
-      "path": "samples/apps/ts-immutable-sample"
+      "path": "examples/ts-immutable-sample"
     },
     {
       "path": "tests/func-tests/imx"

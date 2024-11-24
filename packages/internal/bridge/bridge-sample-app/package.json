@@ -13,7 +13,7 @@
     "eslint": "^8.40.0",
     "eslint-config-next": "13.3.1",
     "ts-node": "^10.9.1",
-    "typescript": "^4.9.5"
+    "typescript": "^5.6.2"
   },
   "private": true,
   "scripts": {
@@ -25,7 +25,7 @@
     "flowRateInfo": "node --loader ts-node/esm ./src/flowRateInfo.ts",
     "getMapping": "node --loader ts-node/esm ./src/getMapping.ts",
     "issueUSDC": "node --loader ts-node/esm ./src/issueUSDC.ts",
-    "lint": "eslint ./src --ext .ts --max-warnings=0",
+    "lint": "eslint ./src --ext .ts --max-warnings=0 --no-error-on-unmatched-pattern",
     "mapToken": "node --loader ts-node/esm ./src/mapToken.ts",
     "pending": "node --loader ts-node/esm ./src/pending.ts",
     "setFlowRate": "node --loader ts-node/esm ./src/setFlowRate.ts",

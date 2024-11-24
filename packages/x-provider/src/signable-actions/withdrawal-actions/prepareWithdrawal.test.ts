@@ -13,15 +13,20 @@ describe('prepareWithdrawal', () => {
   describe('prepareWithdrawal action', () => {
     let getSignableWithdrawalMock: jest.Mock;
     let createWithdrawalMock: jest.Mock;
-    const getSignableWithdrawalResponse: imx.GetSignableWithdrawalResponse = {
-      signable_message: 'hello',
-      payload_hash: 'hash',
-      nonce: 0,
-      stark_key: '0x10c',
-      vault_id: 123,
-      amount: '1',
+
+    const getSignableWithdrawalResponse: imx.GetSignableWithdrawalResponseV2 = {
+      sender_stark_key: '0x10c',
+      sender_vault_id: 123,
+      receiver_stark_key: '0xabc',
+      receiver_vault_id: 0,
       asset_id: '22',
+      amount: '1',
+      quantized_amount: '1',
+      expiration_timestamp: 999,
+      nonce: 0,
+      payload_hash: 'hash',
       readable_transaction: '',
+      signable_message: 'hello',
       verification_signature: '',
     };
     const createWithdrawalResponse: imx.CreateWithdrawalResponse = {
@@ -41,8 +46,8 @@ describe('prepareWithdrawal', () => {
       });
 
       (imx.WithdrawalsApi as jest.Mock).mockReturnValue({
-        getSignableWithdrawal: getSignableWithdrawalMock,
-        createWithdrawal: createWithdrawalMock,
+        getSignableWithdrawalV2: getSignableWithdrawalMock,
+        createWithdrawalV2: createWithdrawalMock,
       });
     });
 
@@ -63,7 +68,8 @@ describe('prepareWithdrawal', () => {
         tokenId: '1',
         tokenAddress: 'asd',
       };
-      const resposne = await prepareWithdrawalAction(request);
+      const withdrawalsApi = new imx.WithdrawalsApi(testConfig.immutableXConfig.apiConfiguration);
+      const resposne = await prepareWithdrawalAction(request, withdrawalsApi);
 
       expect(resposne).toEqual(createWithdrawalResponse);
       expect(getSignableWithdrawalMock).toHaveBeenCalledWith({
@@ -74,14 +80,17 @@ describe('prepareWithdrawal', () => {
         },
       });
       expect(createWithdrawalMock).toHaveBeenCalledWith({
-        createWithdrawalRequest: {
-          stark_key: getSignableWithdrawalResponse.stark_key,
+        createWithdrawalRequestV2: {
+          sender_stark_key: getSignableWithdrawalResponse.sender_stark_key,
+          sender_vault_id: getSignableWithdrawalResponse.sender_vault_id,
+          receiver_stark_key: getSignableWithdrawalResponse.receiver_stark_key,
+          receiver_vault_id: getSignableWithdrawalResponse.receiver_vault_id,
           amount: '1',
           asset_id: getSignableWithdrawalResponse.asset_id,
-          vault_id: getSignableWithdrawalResponse.vault_id,
           nonce: getSignableWithdrawalResponse.nonce,
           stark_signature:
             `${getSignableWithdrawalResponse.payload_hash}STX${privateKey1}`,
+          expiration_timestamp: getSignableWithdrawalResponse.expiration_timestamp,
         },
         xImxEthAddress: ethKey,
         xImxEthSignature: 'raw-eth-signature',
@@ -105,7 +114,8 @@ describe('prepareWithdrawal', () => {
         amount: '1.02',
         tokenAddress: 'asd',
       };
-      const resposne = await prepareWithdrawalAction(request);
+      const withdrawalsApi = new imx.WithdrawalsApi(testConfig.immutableXConfig.apiConfiguration);
+      const resposne = await prepareWithdrawalAction(request, withdrawalsApi);
 
       expect(resposne).toEqual(createWithdrawalResponse);
       expect(getSignableWithdrawalMock).toHaveBeenCalledWith({
@@ -116,14 +126,17 @@ describe('prepareWithdrawal', () => {
         },
       });
       expect(createWithdrawalMock).toHaveBeenCalledWith({
-        createWithdrawalRequest: {
-          stark_key: getSignableWithdrawalResponse.stark_key,
+        createWithdrawalRequestV2: {
+          sender_stark_key: getSignableWithdrawalResponse.sender_stark_key,
+          sender_vault_id: getSignableWithdrawalResponse.sender_vault_id,
+          receiver_stark_key: getSignableWithdrawalResponse.receiver_stark_key,
+          receiver_vault_id: getSignableWithdrawalResponse.receiver_vault_id,
           amount: request.amount,
           asset_id: getSignableWithdrawalResponse.asset_id,
-          vault_id: getSignableWithdrawalResponse.vault_id,
           nonce: getSignableWithdrawalResponse.nonce,
           stark_signature:
             `${getSignableWithdrawalResponse.payload_hash}STX${privateKey1}`,
+          expiration_timestamp: getSignableWithdrawalResponse.expiration_timestamp,
         },
         xImxEthAddress: ethKey,
         xImxEthSignature: 'raw-eth-signature',

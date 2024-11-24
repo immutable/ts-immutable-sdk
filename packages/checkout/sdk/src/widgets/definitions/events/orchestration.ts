@@ -1,3 +1,5 @@
+import { Web3Provider } from '@ethersproject/providers';
+
 /**
  * Enum representing different types of orchestration events.
  */
@@ -7,6 +9,8 @@ export enum OrchestrationEventType {
   REQUEST_SWAP = 'request-swap',
   REQUEST_BRIDGE = 'request-bridge',
   REQUEST_ONRAMP = 'request-onramp',
+  REQUEST_ADD_TOKENS = 'request-add-tokens',
+  REQUEST_GO_BACK = 'request-go-back',
 }
 
 /**
@@ -64,14 +68,38 @@ export type RequestOnrampEvent = {
   tokenAddress: string;
   /** The amount of tokens to onramp. */
   amount: string;
+  /** The connected provider. */
+  provider?: Web3Provider;
+};
+
+/**
+ * Represents the add tokens event object when the add tokens widget is requested.
+ */
+export type RequestAddTokensEvent = {
+  /** Token address of the fund to be added */
+  toTokenAddress?: string;
+
+  /** Amount of the fund to be added */
+  toAmount?: string;
+
+  /** Whether to show a back button on the first screen, on click triggers REQUEST_GO_BACK event */
+  showBackButton?: boolean;
+};
+
+/**
+ * Represents the object provide after go back event is requested
+ */
+export type RequestGoBackEvent = {
 };
 
 /*
-* Type representing the orchestration events.
-*/
+ * Type representing the orchestration events.
+ */
 export type OrchestrationEventData =
-  RequestConnectEvent
+  | RequestConnectEvent
   | RequestWalletEvent
   | RequestSwapEvent
   | RequestBridgeEvent
-  | RequestOnrampEvent;
+  | RequestOnrampEvent
+  | RequestGoBackEvent
+  | RequestAddTokensEvent;

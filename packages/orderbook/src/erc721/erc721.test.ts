@@ -1,6 +1,6 @@
 import { mock, when, instance } from 'ts-mockito';
-import { ImmutableERC721Base } from 'typechain/types';
 import { BigNumber } from 'ethers';
+import { ImmutableERC721Base } from '../typechain/types';
 import { ERC721 } from './erc721';
 
 describe('ERC721', () => {

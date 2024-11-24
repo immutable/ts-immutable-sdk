@@ -1,17 +1,17 @@
 import { Web3Provider } from '@ethersproject/providers';
+import { useTranslation } from 'react-i18next';
 import {
   ChainId,
   Checkout,
   WalletProviderName,
   CheckoutErrorType,
-
 } from '@imtbl/checkout-sdk';
 import React, {
   useEffect,
   useMemo,
   useReducer,
 } from 'react';
-import { ErrorView } from 'views/error/ErrorView';
+import { ErrorView } from '../../views/error/ErrorView';
 import {
   ConnectLoaderActions,
   ConnectLoaderContext,
@@ -29,8 +29,11 @@ import { identifyUser } from '../../lib/analytics/identifyUser';
 export interface ConnectLoaderProps {
   children?: React.ReactNode;
   params: ConnectLoaderParams;
+  successEvent?: () => void;
   closeEvent: () => void;
   widgetConfig: StrongCheckoutWidgetsConfig;
+  goBackEvent?: () => void;
+  showBackButton?: boolean;
 }
 
 export interface ConnectLoaderParams {
@@ -39,13 +42,17 @@ export interface ConnectLoaderParams {
   web3Provider?: Web3Provider;
   checkout: Checkout;
   allowedChains: ChainId[];
+  isCheckNetworkEnabled?: boolean;
 }
 
 export function ConnectLoader({
   children,
   params,
   widgetConfig,
+  successEvent,
   closeEvent,
+  goBackEvent,
+  showBackButton,
 }: ConnectLoaderProps) {
   const {
     checkout,
@@ -53,7 +60,10 @@ export function ConnectLoader({
     walletProviderName,
     allowedChains,
     web3Provider,
+    isCheckNetworkEnabled,
   } = params;
+
+  const { t } = useTranslation();
 
   const [connectLoaderState, connectLoaderDispatch] = useReducer(
     connectLoaderReducer,
@@ -184,7 +194,8 @@ export function ConnectLoader({
 
           // If unsupported network or current network is not in the allowed chains
           // then show the switch network screen
-          if (!currentNetworkInfo.isSupported || !allowedChains.includes(currentNetworkInfo.chainId)) {
+          if ((isCheckNetworkEnabled === undefined || isCheckNetworkEnabled)
+              && (!allowedChains.includes(currentNetworkInfo.chainId) || !currentNetworkInfo.isSupported)) {
             connectLoaderDispatch({
               payload: {
                 type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
@@ -230,38 +241,42 @@ export function ConnectLoader({
   return (
     <>
       {(connectionStatus === ConnectionStatus.LOADING) && (
-      <LoadingView loadingText="Loading" />
+        <LoadingView loadingText="Loading" />
       )}
       <ConnectLoaderContext.Provider value={connectLoaderReducerValues}>
         {(connectionStatus === ConnectionStatus.NOT_CONNECTED_NO_PROVIDER
-        || connectionStatus === ConnectionStatus.NOT_CONNECTED
-        || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
-          <ConnectWidget
-            config={widgetConfig}
-            targetChainId={targetChainId}
-            web3Provider={provider}
-            checkout={checkout}
-            deepLink={deepLink}
-            sendCloseEventOverride={closeEvent}
-            allowedChains={allowedChains}
-          />
+                    || connectionStatus === ConnectionStatus.NOT_CONNECTED
+                    || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
+                    <ConnectWidget
+                      config={widgetConfig}
+                      targetChainId={targetChainId}
+                      web3Provider={provider}
+                      checkout={checkout}
+                      deepLink={deepLink}
+                      sendSuccessEventOverride={successEvent}
+                      sendCloseEventOverride={closeEvent}
+                      allowedChains={allowedChains}
+                      isCheckNetworkEnabled={isCheckNetworkEnabled ?? true}
+                      showBackButton={showBackButton}
+                      sendGoBackEventOverride={goBackEvent}
+                    />
         )}
         {/* If the user has connected then render the widget */}
         {connectionStatus === ConnectionStatus.CONNECTED_WITH_NETWORK && (children)}
       </ConnectLoaderContext.Provider>
       {connectionStatus === ConnectionStatus.ERROR && (
-      <ErrorView
-        onCloseClick={closeEvent}
-        onActionClick={() => {
-          connectLoaderDispatch({
-            payload: {
-              type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
-              connectionStatus: ConnectionStatus.NOT_CONNECTED,
-            },
-          });
-        }}
-        actionText="Try Again"
-      />
+        <ErrorView
+          onCloseClick={closeEvent}
+          onActionClick={() => {
+            connectLoaderDispatch({
+              payload: {
+                type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+                connectionStatus: ConnectionStatus.NOT_CONNECTED,
+              },
+            });
+          }}
+          actionText={t('views.ERROR_VIEW.actionText')}
+        />
       )}
     </>
   );

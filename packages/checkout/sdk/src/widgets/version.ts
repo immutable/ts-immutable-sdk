@@ -1,5 +1,7 @@
+import semver from 'semver';
 import { globalPackageVersion } from '../env';
 import { SemanticVersion } from './definitions/types';
+import { CheckoutWidgetsVersionConfig } from '../types';
 
 /**
  * Validates and builds a version string based on the given SemanticVersion object.
@@ -50,4 +52,90 @@ export function validateAndBuildVersion(
   }
 
   return validatedVersion;
+}
+
+/**
+ * Fetches the latest version of the package from the NPM registry.
+ * Loads a specific latest version instead of relying on the latest tag helps with caching issues.
+ * Falls back to 'latest' if an error occurs or if the response is invalid.
+ * @returns {Promise<string>} A promise resolving to the latest version string or 'latest'.
+ */
+export async function getLatestVersionFromNpm(): Promise<string> {
+  const npmRegistryUrl = 'https://registry.npmjs.org/@imtbl/sdk/latest';
+  const fallbackVersion = 'latest';
+
+  try {
+    const response = await fetch(npmRegistryUrl);
+
+    if (!response.ok) {
+      return fallbackVersion;
+    }
+
+    const data = await response.json();
+    const version = data.version?.trim();
+
+    if (version) {
+      return version;
+    }
+
+    return fallbackVersion;
+  } catch (error) {
+    return fallbackVersion;
+  }
+}
+
+/**
+ * Returns the latest compatible version based on the provided checkout version config.
+ * If no compatible version markers are provided, it returns 'latest'.
+ */
+function latestCompatibleVersion(
+  validVersion: string,
+  compatibleVersionMarkers: string[],
+) {
+  for (const comptabileVersionMarker of compatibleVersionMarkers) {
+    if (semver.valid(comptabileVersionMarker) && semver.lte(validVersion, comptabileVersionMarker)) {
+      return comptabileVersionMarker;
+    }
+  }
+  return 'latest';
+}
+
+/**
+ * Determines the version of the widgets to use based on the provided validated build version and checkout version config.
+ * If a version is provided in the widget init parameters, it uses that version.
+ * If the build version is an alpha, it uses that version.
+ * Defaults to 'latest' if no compatible version markers are found.
+ */
+export async function determineWidgetsVersion(
+  validatedBuildVersion: string,
+  initVersionProvided: boolean,
+  versionConfig?: CheckoutWidgetsVersionConfig,
+) {
+  // If version is provided in widget init params, use that
+  if (initVersionProvided) {
+    return validatedBuildVersion;
+  }
+
+  // If validated build version is an alpha, use that
+  if (validatedBuildVersion.includes('alpha')) {
+    return validatedBuildVersion;
+  }
+
+  // If there's version config is invalid, default to use current build version
+  if (!versionConfig || !Array.isArray(versionConfig.compatibleVersionMarkers)) {
+    return validatedBuildVersion;
+  }
+
+  const compatibleVersion = latestCompatibleVersion(
+    validatedBuildVersion,
+    versionConfig.compatibleVersionMarkers,
+  );
+
+  // If `latest` is returned, query NPM registry for the actual latest version
+  if (compatibleVersion === 'latest') {
+    const latestVersion = await getLatestVersionFromNpm();
+    return latestVersion;
+  }
+
+  return compatibleVersion;
 }

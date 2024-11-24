@@ -11,6 +11,7 @@ import WorkflowButton from '@/components/WorkflowButton';
 import RequestExampleAccordion from '@/components/zkevm/RequestExampleAccordion';
 import EthSendTransactionExamples from './EthSendTransactionExamples';
 import EthSignTypedDataV4Examples from './EthSignTypedDataV4Examples';
+import PersonalSignExamples from './PersonalSignExamples';
 
 enum EthereumParamType {
   string = 'string',
@@ -41,6 +42,25 @@ const EthereumMethods: EthereumMethod[] = [
       { name: 'transaction', type: EthereumParamType.object },
     ],
     exampleComponents: EthSendTransactionExamples,
+  },
+  {
+    name: 'personal_sign',
+    params: [
+      { name: 'message' },
+      { name: 'address' },
+    ],
+    exampleComponents: PersonalSignExamples,
+  },
+  {
+    name: 'im_signEjectionTransaction',
+    params: [
+      {
+        name: 'transaction',
+        placeholder:
+          '{ "to": "0x", "data": "", "nonce": "", "chainId": "", "value": "" }',
+        type: EthereumParamType.object,
+      },
+    ],
   },
   {
     name: 'eth_signTypedData_v4',
@@ -77,6 +97,7 @@ const EthereumMethods: EthereumMethod[] = [
     name: 'eth_estimateGas',
     params: [
       { name: 'transaction', type: EthereumParamType.object },
+      { name: 'blockNumber/tag', default: 'latest' },
     ],
   },
   {
@@ -118,6 +139,7 @@ const EthereumMethods: EthereumMethod[] = [
     name: 'eth_getTransactionCount',
     params: [
       { name: 'address' },
+      { name: 'blockNumber/tag', default: 'latest' },
     ],
   },
 ];

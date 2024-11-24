@@ -1,5 +1,6 @@
 // @ts-ignore
 import elliptic from 'elliptic';
+// @ts-ignore
 import * as encUtils from 'enc-utils';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
@@ -29,6 +30,14 @@ export class StandardStarkSigner implements StarkSigner {
       encUtils.padLeft(sig.r.toString('hex'), 64)
         + encUtils.padLeft(sig.s.toString('hex'), 64),
     );
+  }
+
+  public getYCoordinate(): Promise<string> {
+    const coordinate = encUtils.sanitizeBytes(
+      this.keyPair.getPublic().getY().toString(16),
+      2,
+    );
+    return Promise.resolve(coordinate);
   }
 
   /*

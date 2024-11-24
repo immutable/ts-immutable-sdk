@@ -397,6 +397,7 @@ describe('bridgeAndSwapRoute', () => {
           symbol: 'YEET',
         } as TokenInfo,
       },
+      isFee: false,
     };
 
     const bridgeableTokens: string[] = [INDEXER_ETH_ROOT_CONTRACT_ADDRESS, '0xIMXL1'];
@@ -629,6 +630,7 @@ describe('bridgeAndSwapRoute', () => {
           symbol: 'YEET',
         } as TokenInfo,
       },
+      isFee: false,
     };
 
     const bridgeableTokens: string[] = [];

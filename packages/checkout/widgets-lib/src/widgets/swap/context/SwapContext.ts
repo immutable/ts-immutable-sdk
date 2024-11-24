@@ -3,6 +3,8 @@ import {
   GetBalanceResult,
   NetworkInfo,
   TokenInfo,
+  SwapDirection,
+  AssessmentResult,
 } from '@imtbl/checkout-sdk';
 import { Exchange } from '@imtbl/dex-sdk';
 import { createContext } from 'react';
@@ -14,6 +16,8 @@ export interface SwapState {
   tokenBalances: GetBalanceResult[];
   supportedTopUps: TopUpFeature | null;
   allowedTokens: TokenInfo[];
+  autoProceed: boolean;
+  riskAssessment: AssessmentResult | undefined;
 }
 
 export interface TopUpFeature {
@@ -29,6 +33,8 @@ export const initialSwapState: SwapState = {
   tokenBalances: [],
   supportedTopUps: null,
   allowedTokens: [],
+  autoProceed: false,
+  riskAssessment: undefined,
 };
 
 export interface SwapContextState {
@@ -46,7 +52,9 @@ type ActionPayload =
   | SetNetworkPayload
   | SetSupportedTopUpPayload
   | SetTokenBalancesPayload
-  | SetAllowedTokensPayload;
+  | SetAllowedTokensPayload
+  | SetAutoProceedPayload
+  | SetRiskAssessmentPayload;
 
 export enum SwapActions {
   SET_EXCHANGE = 'SET_EXCHANGE',
@@ -55,6 +63,8 @@ export enum SwapActions {
   SET_SUPPORTED_TOP_UPS = 'SET_SUPPORTED_TOP_UPS',
   SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES',
   SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
+  SET_AUTO_PROCEED = 'SET_AUTO_PROCEED',
+  SET_RISK_ASSESSMENT = 'SET_RISK_ASSESSMENT',
 }
 
 export interface SetExchangePayload {
@@ -85,6 +95,17 @@ export interface SetSupportedTopUpPayload {
 export interface SetAllowedTokensPayload {
   type: SwapActions.SET_ALLOWED_TOKENS;
   allowedTokens: TokenInfo[];
+}
+
+export interface SetAutoProceedPayload {
+  type: SwapActions.SET_AUTO_PROCEED;
+  autoProceed: boolean;
+  direction: SwapDirection;
+}
+
+export interface SetRiskAssessmentPayload {
+  type: SwapActions.SET_RISK_ASSESSMENT;
+  riskAssessment: AssessmentResult;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -137,6 +158,17 @@ export const swapReducer: Reducer<SwapState, SwapAction> = (
       return {
         ...state,
         allowedTokens: action.payload.allowedTokens,
+      };
+    case SwapActions.SET_AUTO_PROCEED:
+      return {
+        ...state,
+        autoProceed: action.payload.autoProceed,
+        direction: action.payload.direction,
+      };
+    case SwapActions.SET_RISK_ASSESSMENT:
+      return {
+        ...state,
+        riskAssessment: action.payload.riskAssessment,
       };
     default:
       return state;

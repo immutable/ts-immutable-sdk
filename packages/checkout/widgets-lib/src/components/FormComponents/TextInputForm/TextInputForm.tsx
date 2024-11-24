@@ -10,6 +10,7 @@ interface TextInputFormProps {
   type?: TextInputType;
   errorMessage?: string;
   disabled?: boolean;
+  inputMode?: InputMode;
   validator: (value: string) => boolean;
   onTextInputChange: (value: string) => void;
   onTextInputBlur?: (value: string) => void;
@@ -19,6 +20,8 @@ interface TextInputFormProps {
 }
 
 export type TextInputType = 'text' | 'number';
+
+export type InputMode = 'none' | 'text' | 'decimal' | 'numeric' | 'tel' | 'search' | 'email' | 'url';
 
 export function TextInputForm({
   testId,
@@ -35,6 +38,7 @@ export function TextInputForm({
   subtext,
   maxButtonClick,
   disabled,
+  inputMode,
 }: TextInputFormProps) {
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>, previousValue: string) => {
     let inputValue = event.target.value;
@@ -84,6 +88,7 @@ export function TextInputForm({
         onChange={(event) => handleOnChange(event, value)}
         sizeVariant="large"
         value={value}
+        inputMode={inputMode}
         validationStatus={errorMessage ? 'error' : 'success'}
         placeholder={placeholder}
         onBlur={handleOnBlur}

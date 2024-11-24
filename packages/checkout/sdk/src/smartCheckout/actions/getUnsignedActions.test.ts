@@ -4,7 +4,7 @@ import {
 import { PopulatedTransaction, TypedDataDomain } from 'ethers';
 import {
   getUnsignedERC20ApprovalTransactions,
-  getUnsignedERC721Transactions,
+  getUnsignedSellTransactions,
   getUnsignedFulfillmentTransactions,
   getUnsignedMessage,
 } from './getUnsignedActions';
@@ -53,7 +53,7 @@ describe('getUnsignedActions', () => {
         },
       ];
 
-      await expect(getUnsignedERC721Transactions(actions)).resolves.toEqual({
+      await expect(getUnsignedSellTransactions(actions)).resolves.toEqual({
         approvalTransactions: [{ from: '0xAPPROVAL1' }, { from: '0xAPPROVAL2' }],
         fulfillmentTransactions: [{ from: '0xTRANSACTION1' }, { from: '0xTRANSACTION2' }],
       });
@@ -62,7 +62,7 @@ describe('getUnsignedActions', () => {
     it('should return empty arrays if no transactions or signable messages', async () => {
       const actions: Action[] = [];
 
-      await expect(getUnsignedERC721Transactions(actions)).resolves.toEqual({
+      await expect(getUnsignedSellTransactions(actions)).resolves.toEqual({
         approvalTransactions: [],
         fulfillmentTransactions: [],
       });

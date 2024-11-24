@@ -1,11 +1,11 @@
 /* eslint-disable arrow-body-style */
 import { TradeType } from '@uniswap/sdk-core';
-import { SUPPORTED_SANDBOX_CHAINS } from 'config';
-import { WIMX_IMMUTABLE_TESTNET } from 'constants/tokens';
-import { IMMUTABLE_TESTNET_CHAIN_ID } from 'constants/chains';
 import { providers, utils } from 'ethers';
-import { newAmountFromString } from 'test/utils';
-import { Multicall__factory, QuoterV2__factory } from 'contracts/types';
+import { SUPPORTED_SANDBOX_CHAINS } from '../config';
+import { WIMX_IMMUTABLE_TESTNET } from '../constants/tokens';
+import { IMMUTABLE_TESTNET_CHAIN_ID } from '../constants/chains';
+import { newAmountFromString } from '../test/utils';
+import { Multicall__factory, QuoterV2__factory } from '../contracts/types';
 import { Router } from './router';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

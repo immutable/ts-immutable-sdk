@@ -9,6 +9,7 @@ export enum SwapWidgetViews {
   FAIL = 'FAIL',
   PRICE_SURGE = 'PRICE_SURGE',
   APPROVE_ERC20 = 'APPROVE_ERC20_SWAP',
+  SERVICE_UNAVAILABLE = 'SERVICE_UNAVAILABLE',
 }
 
 export type SwapWidgetView =
@@ -17,7 +18,8 @@ export type SwapWidgetView =
   | SwapSuccessView
   | PriceSurgeView
   | SwapFailView
-  | ApproveERC20View;
+  | ApproveERC20View
+  | ServiceUnavailableView;
 
 export interface SwapSuccessView extends ViewType {
   type: SwapWidgetViews.SUCCESS;
@@ -50,6 +52,10 @@ interface ApproveERC20View extends ViewType {
   data: ApproveERC20SwapData
 }
 
+interface ServiceUnavailableView extends ViewType {
+  type: SwapWidgetViews.SERVICE_UNAVAILABLE;
+}
+
 interface SwapInProgressView extends ViewType {
   type: SwapWidgetViews.IN_PROGRESS;
   data: {
@@ -58,10 +64,11 @@ interface SwapInProgressView extends ViewType {
   }
 }
 export interface ApproveERC20SwapData {
-  approveTransaction: TransactionRequest;
+  approveTransaction?: TransactionRequest;
   transaction: TransactionRequest;
   info: Quote;
   swapFormInfo: PrefilledSwapForm;
+  autoProceed: boolean;
 }
 export interface PrefilledSwapForm {
   fromAmount: string;

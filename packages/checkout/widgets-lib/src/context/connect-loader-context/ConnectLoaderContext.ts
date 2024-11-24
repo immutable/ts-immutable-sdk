@@ -1,4 +1,4 @@
-import { createContext } from 'react';
+import { createContext, useReducer } from 'react';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { ConnectWidgetViews } from '../view-context/ConnectViewContextTypes';
@@ -61,7 +61,7 @@ export interface SetProviderPayload {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const ConnectLoaderContext = createContext<ConnectLoaderContextState>({
   connectLoaderState: initialConnectLoaderState,
-  connectLoaderDispatch: () => {},
+  connectLoaderDispatch: () => { },
 });
 
 export type Reducer<S, A> = (prevState: S, action: A) => S;
@@ -90,4 +90,10 @@ ConnectLoaderAction
     default:
       return state;
   }
+};
+
+export const useConnectLoaderState = () => {
+  const [connectLoaderState, connectLoaderDispatch] = useReducer(connectLoaderReducer, initialConnectLoaderState);
+
+  return [connectLoaderState, connectLoaderDispatch] as const;
 };

@@ -13,6 +13,9 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { ImmutableVerificationStatusEnum } from './immutable-verification-status-enum';
 
 /**
  * 
@@ -62,6 +65,12 @@ export interface ERC721TransferFromMetadata {
      * @memberof ERC721TransferFromMetadata
      */
     'asset_image': string;
+    /**
+     * 
+     * @type {ImmutableVerificationStatusEnum}
+     * @memberof ERC721TransferFromMetadata
+     */
+    'immutable_verification_status': ImmutableVerificationStatusEnum;
 }
 
 export const ERC721TransferFromMetadataTransactionTypeEnum = {

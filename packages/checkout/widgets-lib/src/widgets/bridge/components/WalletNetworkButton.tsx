@@ -1,15 +1,14 @@
 import {
-  Body, Box, Button, FramedImage, Heading, Logo,
+  Body, Box, Button, FramedImage, Heading, Logo, useTheme,
 } from '@biom3/react';
 import { ChainId, EIP6963ProviderDetail, WalletProviderRdns } from '@imtbl/checkout-sdk';
-import { getChainNameById } from 'lib/chains';
-import { networkIcon } from 'lib';
-import { Web3Provider } from '@ethersproject/providers';
 import { useEffect, useMemo, useState } from 'react';
-import { useWalletConnect } from 'lib/hooks/useWalletConnect';
+import { Environment } from '@imtbl/config';
+import { Web3Provider } from '@ethersproject/providers';
+import { getChainNameById } from '../../../lib/chains';
+import { useWalletConnect } from '../../../lib/hooks/useWalletConnect';
 import {
   networkButtonStyles,
-  networkIconStyles,
   walletButtonOuterStyles,
   walletCaptionStyles,
   wcStickerLogoStyles,
@@ -17,6 +16,7 @@ import {
 } from './WalletNetworkButtonStyles';
 import { RawImage } from '../../../components/RawImage/RawImage';
 import { isWalletConnectProvider } from '../../../lib/provider';
+import { getChainImage } from '../../../lib/utils';
 
 interface WalletNetworkButtonProps {
   testId: string;
@@ -28,6 +28,7 @@ interface WalletNetworkButtonProps {
   disableNetworkButton?: boolean;
   onWalletClick: (e) => void;
   onNetworkClick: (e) => void;
+  environment: Environment;
 }
 export function WalletNetworkButton({
   testId,
@@ -39,6 +40,7 @@ export function WalletNetworkButton({
   disableNetworkButton = false,
   onWalletClick,
   onNetworkClick,
+  environment,
 }: WalletNetworkButtonProps) {
   const networkName = getChainNameById(chainId);
   const [walletLogoUrl, setWalletLogoUrl] = useState<string | undefined>(
@@ -72,6 +74,7 @@ export function WalletNetworkButton({
       }
     }
   }, [isWalletConnectEnabled, walletProvider, getWalletLogoUrl, getWalletName]);
+  const { base } = useTheme();
 
   return (
     <Box
@@ -83,6 +86,7 @@ export function WalletNetworkButton({
         <>
           <FramedImage
             imageUrl={walletLogoUrl}
+            relativeImageSizeInLayout={base.icon.size[500]}
             alt="walletconnect"
             sx={wcWalletLogoStyles}
           />
@@ -111,16 +115,20 @@ export function WalletNetworkButton({
         size="small"
         disabled={disableNetworkButton}
         onClick={(e) => {
-          // stop propogation so onWalletClick is not triggered
+          // stop propagation so onWalletClick is not triggered
           e.stopPropagation();
           onNetworkClick(e);
         }}
         variant="tertiary"
         sx={networkButtonStyles}
       >
-        <Button.Icon
-          icon={networkIcon[chainId] as any}
-          sx={networkIconStyles(chainId)}
+        <Button.FramedImage
+          use={(
+            <img
+              src={getChainImage(environment, chainId)}
+              alt={networkName[chainId]}
+            />
+          )}
         />
         {networkName}
       </Button>

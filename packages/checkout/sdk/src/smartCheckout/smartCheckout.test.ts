@@ -9,7 +9,7 @@ import {
   RoutingOutcomeType,
   TransactionOrGasType,
 } from '../types';
-import { hasERC20Allowances, hasERC721Allowances } from './allowance';
+import { hasERC20Allowances, hasERC721Allowances, hasERC1155Allowances } from './allowance';
 import { gasCalculator } from './gas';
 import { CheckoutConfiguration } from '../config';
 import { balanceCheck } from './balanceCheck';
@@ -52,13 +52,18 @@ describe('smartCheckout', () => {
   });
 
   describe('smartCheckout', () => {
-    it('should return sufficient true with item requirements', async () => {
+    it('should return sufficient true with item requirements - ERC721 item', async () => {
       (hasERC20Allowances as jest.Mock).mockResolvedValue({
         sufficient: true,
         allowances: [],
       });
 
       (hasERC721Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
+      (hasERC1155Allowances as jest.Mock).mockResolvedValue({
         sufficient: true,
         allowances: [],
       });
@@ -152,6 +157,7 @@ describe('smartCheckout', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
       ];
 
@@ -251,6 +257,211 @@ describe('smartCheckout', () => {
       });
     });
 
+    it('should return sufficient true with item requirements - ERC1155 item', async () => {
+      (hasERC20Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
+      (hasERC721Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
+      (hasERC1155Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
+      (gasCalculator as jest.Mock).mockResolvedValue({
+        type: ItemType.NATIVE,
+        amount: BigNumber.from(1),
+      });
+
+      (balanceCheck as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        balanceRequirements: [
+          {
+            type: ItemType.NATIVE,
+            sufficient: true,
+            required: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
+              token: {
+                name: 'IMX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0x1010',
+              },
+            },
+            current: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
+              token: {
+                name: 'IMX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0x1010',
+              },
+            },
+            delta: {
+              balance: BigNumber.from(0),
+              formattedBalance: '0',
+            },
+          },
+          {
+            type: ItemType.ERC20,
+            sufficient: true,
+            required: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
+              token: {
+                name: 'zkTKN',
+                symbol: 'zkTKN',
+                decimals: 18,
+                address: '0xERC20',
+              },
+            },
+            current: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
+              token: {
+                name: 'zkTKN',
+                symbol: 'zkTKN',
+                decimals: 18,
+                address: '0xERC20',
+              },
+            },
+            delta: {
+              balance: BigNumber.from(0),
+              formattedBalance: '0',
+            },
+          },
+          {
+            type: ItemType.ERC1155,
+            sufficient: true,
+            required: {
+              balance: BigNumber.from(10),
+              formattedBalance: '10.0',
+              id: '0',
+              contractAddress: '0xCollection',
+            },
+            current: {
+              balance: BigNumber.from(10),
+              formattedBalance: '10.0',
+            },
+            delta: {
+              balance: BigNumber.from(0),
+              formattedBalance: '0',
+            },
+          },
+        ],
+      });
+
+      const itemRequirements: ItemRequirement[] = [
+        {
+          type: ItemType.NATIVE,
+          amount: BigNumber.from(1),
+          isFee: false,
+        },
+      ];
+
+      const transactionOrGasAmount: GasAmount = {
+        type: TransactionOrGasType.GAS,
+        gasToken: {
+          type: GasTokenType.NATIVE,
+          limit: BigNumber.from(1),
+        },
+      };
+
+      const result = await smartCheckout(
+        {} as CheckoutConfiguration,
+        mockProvider,
+        itemRequirements,
+        transactionOrGasAmount,
+      );
+
+      expect(result).toEqual({
+        sufficient: true,
+        transactionRequirements: [
+          {
+            type: ItemType.NATIVE,
+            sufficient: true,
+            required: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
+              token: {
+                name: 'IMX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0x1010',
+              },
+            },
+            current: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
+              token: {
+                name: 'IMX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0x1010',
+              },
+            },
+            delta: {
+              balance: BigNumber.from(0),
+              formattedBalance: '0',
+            },
+          },
+          {
+            type: ItemType.ERC20,
+            sufficient: true,
+            required: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
+              token: {
+                name: 'zkTKN',
+                symbol: 'zkTKN',
+                decimals: 18,
+                address: '0xERC20',
+              },
+            },
+            current: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
+              token: {
+                name: 'zkTKN',
+                symbol: 'zkTKN',
+                decimals: 18,
+                address: '0xERC20',
+              },
+            },
+            delta: {
+              balance: BigNumber.from(0),
+              formattedBalance: '0',
+            },
+          },
+          {
+            type: ItemType.ERC1155,
+            sufficient: true,
+            required: {
+              balance: BigNumber.from(10),
+              formattedBalance: '10.0',
+              id: '0',
+              contractAddress: '0xCollection',
+            },
+            current: {
+              balance: BigNumber.from(10),
+              formattedBalance: '10.0',
+            },
+            delta: {
+              balance: BigNumber.from(0),
+              formattedBalance: '0',
+            },
+          },
+        ],
+      });
+    });
+
     it('should invoke onComplete callback once funding routes are returned', (done) => {
       (hasERC20Allowances as jest.Mock).mockResolvedValue({
         sufficient: true,
@@ -258,6 +469,11 @@ describe('smartCheckout', () => {
       });
 
       (hasERC721Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
+      (hasERC1155Allowances as jest.Mock).mockResolvedValue({
         sufficient: true,
         allowances: [],
       });
@@ -351,6 +567,7 @@ describe('smartCheckout', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
       ];
 
@@ -466,6 +683,11 @@ describe('smartCheckout', () => {
         allowances: [],
       });
 
+      (hasERC1155Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
       (gasCalculator as jest.Mock).mockResolvedValue({
         type: ItemType.NATIVE,
         amount: BigNumber.from(1),
@@ -557,6 +779,7 @@ describe('smartCheckout', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
       ];
 
@@ -680,6 +903,11 @@ describe('smartCheckout', () => {
         allowances: [],
       });
 
+      (hasERC1155Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
       (gasCalculator as jest.Mock).mockResolvedValue({
         type: ItemType.NATIVE,
         amount: BigNumber.from(1),
@@ -771,6 +999,7 @@ describe('smartCheckout', () => {
         {
           type: ItemType.NATIVE,
           amount: BigNumber.from(1),
+          isFee: false,
         },
       ];
 
@@ -900,6 +1129,11 @@ describe('smartCheckout', () => {
         allowances: [],
       });
 
+      (hasERC1155Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
       (balanceCheck as jest.Mock).mockResolvedValue({
         sufficient: false,
         balanceRequirements: [
@@ -940,6 +1174,7 @@ describe('smartCheckout', () => {
           tokenAddress: '0xERC20',
           amount: BigNumber.from(1),
           spenderAddress: '0x1',
+          isFee: false,
         },
       ];
 
@@ -1015,6 +1250,11 @@ describe('smartCheckout', () => {
         allowances: [],
       });
 
+      (hasERC1155Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
       (balanceCheck as jest.Mock).mockResolvedValue({
         sufficient: false,
         balanceRequirements: [
@@ -1055,6 +1295,7 @@ describe('smartCheckout', () => {
           tokenAddress: '0xERC20',
           amount: BigNumber.from(1),
           spenderAddress: '0x1',
+          isFee: false,
         },
       ];
 
@@ -1150,6 +1391,7 @@ describe('smartCheckout', () => {
               },
               type: ItemType.NATIVE,
             },
+            isFee: false,
           },
           {
             sufficient: true,
@@ -1180,6 +1422,7 @@ describe('smartCheckout', () => {
                 decimals: 6,
               },
             },
+            isFee: false,
           },
         ],
       };
@@ -1204,6 +1447,11 @@ describe('smartCheckout', () => {
       });
 
       (hasERC721Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
+      (hasERC1155Allowances as jest.Mock).mockResolvedValue({
         sufficient: true,
         allowances: [],
       });
@@ -1238,6 +1486,7 @@ describe('smartCheckout', () => {
           tokenAddress: '0xERC20',
           amount: BigNumber.from(10),
           spenderAddress: '0x1',
+          isFee: false,
         },
       ];
 

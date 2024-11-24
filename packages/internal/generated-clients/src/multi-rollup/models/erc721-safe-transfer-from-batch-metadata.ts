@@ -16,6 +16,9 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import { ERC721SafeTransferFromBatchItem } from './erc721-safe-transfer-from-batch-item';
+// May contain unused imports in some cases
+// @ts-ignore
+import { ImmutableVerificationStatusEnum } from './immutable-verification-status-enum';
 
 /**
  * 
@@ -47,6 +50,12 @@ export interface ERC721SafeTransferFromBatchMetadata {
      * @memberof ERC721SafeTransferFromBatchMetadata
      */
     'items': Array<ERC721SafeTransferFromBatchItem>;
+    /**
+     * 
+     * @type {ImmutableVerificationStatusEnum}
+     * @memberof ERC721SafeTransferFromBatchMetadata
+     */
+    'immutable_verification_status': ImmutableVerificationStatusEnum;
 }
 
 export const ERC721SafeTransferFromBatchMetadataTransactionTypeEnum = {

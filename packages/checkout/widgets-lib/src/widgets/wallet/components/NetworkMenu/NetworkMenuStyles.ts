@@ -16,10 +16,8 @@ export const networkButtonStyle = {
   fontWeight: 'base.text.caption.small.bold.fontWeight',
 };
 
-export const logoStyle = (logoColor: string, isActive: boolean) => ({
-  paddingRight: 'base.spacing.x1',
-  width: '22px',
-  fill: isActive ? logoColor : 'base.color.brand.4',
+export const logoStyle = (isActive: boolean) => ({
+  filter: isActive ? undefined : 'grayscale(1)',
 });
 
 export const networkHeadingStyle = {

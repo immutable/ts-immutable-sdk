@@ -10,7 +10,7 @@ import { RequestExampleProps } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
 import {
-  ActionType, SignableAction, SignablePurpose,
+  ActionType, ERC1155Item, ERC721Item, SignableAction, SignablePurpose,
 } from '@imtbl/orderbook';
 
 type TokenType = 'NATIVE' | 'ERC20';
@@ -31,6 +31,9 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
   const [buyAmount, setBuyAmount] = useState<string>('');
   const [buyType, setBuyType] = useState<'NATIVE' | 'ERC20'>('NATIVE');
   const [tokenId, setTokenId] = useState<string>('');
+  const [sellTokenUnits, setSellTokenUnits] = useState<string>('1');
+  const [showSellTokenUnitsField, setShowSellTokenUnitsField] = useState(false);
+  const [sellTokenType, setSellTokenType] = useState<'ERC721' | 'ERC1155'>('ERC721');
 
   const seaportContractAddress = useMemo(
     () => (
@@ -55,22 +58,46 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
   useEffect(() => {
     setSignMessageError('');
     setTransaction(undefined);
-  }, [NFTContractAddress, tokenContractAddress, buyAmount, buyType, tokenId]);
+  }, [NFTContractAddress, tokenContractAddress, buyAmount, buyType, tokenId, sellTokenUnits, sellTokenType]);
+
+  const resetForm = () => {
+    setSellTokenType('ERC721');
+    setNFTContractAddress('');
+    setTokenContractAddress('');
+    setBuyAmount('');
+    setTokenId('');
+    setBuyType('NATIVE');
+    setSellTokenUnits('1');
+    setShowSellTokenUnitsField(false);
+  };
 
   const validate = useCallback(async () => {
     const buy = buyType === 'NATIVE'
       ? { amount: buyAmount, type: buyType }
       : { amount: buyAmount, type: buyType, contractAddress: tokenContractAddress };
+    const sell = sellTokenType === 'ERC721'
+      ? {
+        contractAddress: NFTContractAddress,
+        tokenId,
+        type: 'ERC721',
+      } as ERC721Item : {
+        contractAddress: NFTContractAddress,
+        tokenId,
+        type: 'ERC1155',
+        amount: sellTokenUnits,
+      } as ERC1155Item;
+
     try {
       setIsBuildingTransaction(true);
+
+      if (sellTokenType === 'ERC1155' && sellTokenUnits === '0') {
+        throw new Error('Units for sale must be greater than 0');
+      }
+
       const { actions } = await orderbookClient.prepareListing({
         makerAddress: walletAddress,
         buy,
-        sell: {
-          contractAddress: NFTContractAddress,
-          tokenId,
-          type: 'ERC721',
-        },
+        sell,
       });
 
       const signAction = actions.find((action) => (
@@ -91,7 +118,18 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
     } finally {
       setIsBuildingTransaction(false);
     }
-  }, [NFTContractAddress, buyAmount, buyType, orderbookClient, tokenContractAddress, tokenId, walletAddress]);
+  }, [NFTContractAddress, buyAmount, buyType, orderbookClient,
+    tokenContractAddress, tokenId, walletAddress, sellTokenUnits, sellTokenType]);
+
+  const handleSetSellTokenType = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    resetForm();
+    const tokenType = e.target.value === 'ERC721'
+      ? 'ERC721'
+      : 'ERC1155';
+    setSellTokenType(tokenType);
+    const showTokenUnits: boolean = tokenType === 'ERC1155';
+    setShowSellTokenUnitsField(showTokenUnits);
+  };
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -104,7 +142,7 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
   }, [handleExampleSubmitted, transaction, walletAddress]);
 
   return (
-    <Accordion.Item eventKey="5">
+    <Accordion.Item eventKey="3">
       <Accordion.Header>Seaport Create Listing</Accordion.Header>
       <Accordion.Body>
         <Alert variant="warning">
@@ -117,6 +155,15 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
         </Alert>
         )}
         <Form onSubmit={handleSubmit} className="mb-4">
+          <Form.Group className="mb-3">
+            <Form.Label>Listing Token Type</Form.Label>
+            <Form.Select
+              onChange={handleSetSellTokenType}
+            >
+              <option key="erc721" value="ERC721">ERC721</option>
+              <option key="erc1155" value="ERC1155">ERC1155</option>
+            </Form.Select>
+          </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>
               Seaport Contract Address
@@ -154,6 +201,22 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
               onChange={(e) => setTokenId(e.target.value)}
             />
           </Form.Group>
+          {showSellTokenUnitsField
+          && (
+          <Form.Group className="mb-3">
+            <Form.Label>
+              Units for sale
+            </Form.Label>
+            <Form.Control
+              type="number"
+              placeholder="1"
+              value={sellTokenUnits}
+              isValid={transaction && !transactionError}
+              isInvalid={!!transactionError}
+              onChange={(e) => setSellTokenUnits(e.target.value)}
+            />
+          </Form.Group>
+          )}
           <Form.Group className="mb-3">
             <Form.Label>
               Currency Type

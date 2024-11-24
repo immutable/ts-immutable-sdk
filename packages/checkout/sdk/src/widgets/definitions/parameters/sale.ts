@@ -12,8 +12,6 @@ import { SalePaymentTypes } from '../events/sale';
  * @property {WalletProviderName | undefined} walletProviderName
  */
 export type SaleWidgetParams = {
-  /** The total price to pay for the items in the sale */
-  amount?: string;
   /** Environment id from Immutable Hub */
   environmentId?: string;
   /** The list of products to be purchased */
@@ -26,6 +24,12 @@ export type SaleWidgetParams = {
   language?: WidgetLanguage;
   /** The disabled payment types */
   excludePaymentTypes?: SalePaymentTypes[];
+  /** Fiat currencies excluded from on-ramp */
+  excludeFiatCurrencies?: string[];
+  /** Preferred currency, replacing the backend's base currency */
+  preferredCurrency?: string;
+  /** Custom key-value pairs to be passed to the order */
+  customOrderData?: Record<string, unknown>;
 };
 
 /**

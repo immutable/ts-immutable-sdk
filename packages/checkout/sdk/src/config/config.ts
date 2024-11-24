@@ -1,19 +1,17 @@
 import { Environment } from '@imtbl/config';
-import {
-  CheckoutModuleConfiguration,
-  ChainId,
-  NetworkMap,
-} from '../types';
+import { CheckoutModuleConfiguration, ChainId, NetworkMap } from '../types';
 import { RemoteConfigFetcher } from './remoteConfigFetcher';
 import {
   DEFAULT_BRIDGE_ENABLED,
   DEFAULT_ON_RAMP_ENABLED,
   DEFAULT_SWAP_ENABLED,
   DEV_CHAIN_ID_NETWORK_MAP,
+  globalPackageVersion,
   PRODUCTION_CHAIN_ID_NETWORK_MAP,
   SANDBOX_CHAIN_ID_NETWORK_MAP,
 } from '../env';
 import { HttpClient } from '../api/http/httpClient';
+import { TokensFetcher } from './tokensFetcher';
 
 export class CheckoutConfigurationError extends Error {
   public message: string;
@@ -67,9 +65,15 @@ export class CheckoutConfiguration {
 
   readonly remote: RemoteConfigFetcher;
 
+  readonly tokens: TokensFetcher;
+
   readonly environment: Environment;
 
   readonly networkMap: NetworkMap;
+
+  readonly publishableKey: string;
+
+  readonly overrides: CheckoutModuleConfiguration['overrides'];
 
   constructor(config: CheckoutModuleConfiguration, httpClient: HttpClient) {
     if (!Object.values(Environment).includes(config.baseConfig.environment)) {
@@ -85,15 +89,25 @@ export class CheckoutConfiguration {
     this.isOnRampEnabled = config.onRamp?.enable ?? DEFAULT_ON_RAMP_ENABLED;
     this.isSwapEnabled = config.swap?.enable ?? DEFAULT_SWAP_ENABLED;
     this.isBridgeEnabled = config.bridge?.enable ?? DEFAULT_BRIDGE_ENABLED;
+    this.publishableKey = config.publishableKey ?? '<no-publishable-key>';
 
-    this.networkMap = networkMap(
-      this.isProduction,
-      this.isDevelopment,
-    );
+    this.networkMap = networkMap(this.isProduction, this.isDevelopment);
 
     this.remote = new RemoteConfigFetcher(httpClient, {
       isDevelopment: this.isDevelopment,
       isProduction: this.isProduction,
     });
+
+    this.tokens = new TokensFetcher(httpClient, this.remote, {
+      isDevelopment: this.isDevelopment,
+      isProduction: this.isProduction,
+    });
+
+    this.overrides = config.overrides ?? {};
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  get sdkVersion(): string {
+    return globalPackageVersion();
   }
 }

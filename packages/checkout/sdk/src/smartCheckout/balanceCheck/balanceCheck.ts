@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { BigNumber, Contract } from 'ethers';
+import { BigNumber, Contract, utils } from 'ethers';
 import {
   ERC20Item,
   ERC721Balance,
@@ -20,6 +20,7 @@ import {
   getERC721BalanceRequirement,
   getTokenBalanceRequirement,
   getTokensFromRequirements,
+  getTokensInfo,
 } from './balanceRequirement';
 import { ERC721ABI, NATIVE } from '../../env';
 import { isMatchingAddress } from '../../utils/utils';
@@ -122,7 +123,7 @@ export const balanceCheck = async (
 ) : Promise<BalanceCheckResult> => {
   const aggregatedItems = balanceAggregator(itemRequirements);
 
-  const requiredToken: ItemRequirement[] = [];
+  const requiredToken: Array<NativeItem | ERC20Item> = [];
   const requiredERC721: ItemRequirement[] = [];
 
   aggregatedItems.forEach((item) => {
@@ -137,6 +138,9 @@ export const balanceCheck = async (
       default:
     }
   });
+
+  // Non-fee requirements first
+  requiredToken.sort((token) => ('isFee' in token && token.isFee ? 1 : -1));
 
   if (requiredERC721.length === 0 && requiredToken.length === 0) {
     throw new CheckoutError(
@@ -158,39 +162,56 @@ export const balanceCheck = async (
 
   // Wait for all balances and calculate the requirements
   const promisesResponses = await Promise.all(balancePromises);
-  const erc721BalanceRequirements: BalanceRequirement[] = [];
-  const tokenBalanceRequirementPromises: Promise<BalanceRequirement>[] = [];
+  const balanceRequirements: BalanceRequirement[] = [];
 
-  // Get all ERC20 and NATIVE balances
-  if (requiredToken.length > 0 && promisesResponses.length > 0) {
-    const result = promisesResponses.shift();
-    if (result) {
-      requiredToken.forEach((item) => {
-        tokenBalanceRequirementPromises.push(
-          getTokenBalanceRequirement(item as (NativeItem | ERC20Item), result, provider),
-        );
+  // Check ERC20 and NATIVE requirements against balances
+  if (requiredToken.length > 0) {
+    const tokenBalances = promisesResponses.shift() ?? [];
+
+    const balances = new Map(tokenBalances.map((balance) => {
+      const address = balance.type === ItemType.NATIVE
+        ? NATIVE
+        : (balance as TokenBalance).token.address?.toLowerCase();
+      return [address, balance];
+    }));
+    const tokensInfo = await getTokensInfo(requiredToken, tokenBalances, provider);
+
+    requiredToken.forEach((item) => {
+      const tokenAddress = ((item as ERC20Item).tokenAddress ?? NATIVE).toLowerCase();
+      const tokenInfo = tokensInfo[tokenAddress];
+      const currentBalance = balances.get(tokenAddress);
+
+      const requirement = getTokenBalanceRequirement(item, [...balances.values()], tokenInfo);
+
+      balanceRequirements.push(requirement);
+
+      if (!currentBalance) {
+        return;
+      }
+
+      const updatedBalance = currentBalance.balance.sub(requirement.required.balance);
+
+      balances.set(tokenAddress, {
+        ...currentBalance,
+        balance: updatedBalance,
+        formattedBalance: utils.formatUnits(updatedBalance, requirement.required.token.decimals),
       });
-    }
+    });
   }
 
-  // Get all ERC721 balances
-  if (requiredERC721.length > 0 && promisesResponses.length > 0) {
-    const result = promisesResponses.shift();
-    if (result) {
-      requiredERC721.forEach((item) => {
-        erc721BalanceRequirements.push(getERC721BalanceRequirement(item as (ERC721Item), result));
-      });
-    }
+  // Check ERC721 requirements against balances
+  if (requiredERC721.length > 0) {
+    const erc721Balances = promisesResponses.shift() ?? [];
+
+    requiredERC721.forEach((item) => {
+      balanceRequirements.push(getERC721BalanceRequirement(item as (ERC721Item), erc721Balances));
+    });
   }
-  const balanceRequirements = [
-    ...erc721BalanceRequirements,
-    ...(await Promise.all(tokenBalanceRequirementPromises)),
-  ];
 
   // Find if there are any requirements that aren't sufficient.
   // If there is not item with sufficient === false then the requirements
   // are satisfied.
-  const sufficient = balanceRequirements.find((req) => req.sufficient === false) === undefined;
+  const sufficient = balanceRequirements.find((req) => !req.sufficient) === undefined;
 
   return {
     sufficient,

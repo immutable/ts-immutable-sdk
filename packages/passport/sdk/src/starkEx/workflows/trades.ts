@@ -19,7 +19,7 @@ export async function createTrade({
   starkSigner,
   guardianClient,
 }: CreateTradeParams): Promise<imx.CreateTradeResponse> {
-  return withPassportError<imx.CreateTradeResponse>(guardianClient.withDefaultConfirmationScreenTask(async () => {
+  return withPassportError<imx.CreateTradeResponse>(async () => {
     const { ethAddress } = user.imx;
     const getSignableTradeRequest: imx.GetSignableTradeRequest = {
       expiration_timestamp: request.expiration_timestamp,
@@ -70,5 +70,5 @@ export async function createTrade({
       },
     );
     return createTradeResponse;
-  }), PassportErrorType.CREATE_TRADE_ERROR);
+  }, PassportErrorType.CREATE_TRADE_ERROR);
 }

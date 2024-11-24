@@ -13,16 +13,18 @@ export class ApiConfiguration extends imx.Configuration { }
 const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
 
 interface ImmutableXConfigurationParams {
-  basePath: string,
-  chainID: number,
-  coreContractAddress: string,
-  registrationContractAddress: string,
-  baseConfig?: ImmutableConfiguration,
+  basePath: string;
+  chainID: number;
+  coreContractAddress: string;
+  registrationContractAddress: string;
+  registrationV4ContractAddress?: string;
+  baseConfig?: ImmutableConfiguration;
 }
 
 export interface EthConfiguration {
   coreContractAddress: string;
   registrationContractAddress: string;
+  registrationV4ContractAddress?: string;
   chainID: number;
 }
 
@@ -50,6 +52,7 @@ export interface ImmutableXConfiguration {
 export const createConfig = ({
   coreContractAddress,
   registrationContractAddress,
+  registrationV4ContractAddress,
   chainID,
   basePath,
   headers,
@@ -81,6 +84,7 @@ export const createConfig = ({
     ethConfiguration: {
       coreContractAddress,
       registrationContractAddress,
+      registrationV4ContractAddress,
       chainID,
     },
   };
@@ -95,12 +99,14 @@ export const createImmutableXConfiguration = ({
   chainID,
   coreContractAddress,
   registrationContractAddress,
+  registrationV4ContractAddress,
   baseConfig,
 }: ImmutableXConfigurationParams): ImmutableXConfiguration => createConfig({
   basePath,
   chainID,
   coreContractAddress,
   registrationContractAddress,
+  registrationV4ContractAddress,
   sdkVersion: 'ts-immutable-sdk-__SDK_VERSION__',
   baseConfig,
 });
@@ -114,6 +120,7 @@ export const production = ({ baseConfig }: environmentConfig) => createImmutable
   chainID: 1,
   coreContractAddress: '0x5FDCCA53617f4d2b9134B29090C87D01058e27e9',
   registrationContractAddress: '0x72a06bf2a1CE5e39cBA06c0CAb824960B587d64c',
+  registrationV4ContractAddress: '0xac88a57943b5BBa1ecd931F8494cAd0B7F717590',
   baseConfig,
 });
 
@@ -122,6 +129,7 @@ export const sandbox = ({ baseConfig }: environmentConfig) => createImmutableXCo
   chainID: 11155111,
   coreContractAddress: '0x2d5C349fD8464DA06a3f90b4B0E9195F3d1b7F98',
   registrationContractAddress: '0xDbA6129C02E69405622fAdc3d5A7f8d23eac3b97',
+  registrationV4ContractAddress: '0xd1527c65c6287ec5ab816d328eb83bb4cb690e92',
   baseConfig,
 });
 

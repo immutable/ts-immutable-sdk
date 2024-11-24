@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import {
   GMPError, GMPStatus, GMPStatusResponse, GasPaidInfo,
-} from 'types/axelar';
+} from '../types/axelar';
 
 const parseGMPStatus = (response: any): GMPStatus | string => {
   const { error, status } = response;
@@ -78,10 +78,10 @@ export const queryTransactionStatus = async (
   const timeSpent: Record<string, number> = txDetails.time_spent;
   if (timeSpent) {
     timeSpent.total = timeSpent.total
-        || Object.values(timeSpent).reduce(
-          (accumulator: number, value: number) => accumulator + value,
-          0,
-        );
+      || Object.values(timeSpent).reduce(
+        (accumulator: number, value: number) => accumulator + value,
+        0,
+      );
   }
 
   return {

@@ -1,8 +1,8 @@
 import { Body, Box, Link } from '@biom3/react';
 import { Checkout } from '@imtbl/checkout-sdk';
-import { PASSPORT_URL } from 'lib';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { PASSPORT_URL } from '../../lib';
 import { supportMessageBoxStyle, bodyStyle } from './SupportMessageStyles';
 
 type SupportMessageProps = {

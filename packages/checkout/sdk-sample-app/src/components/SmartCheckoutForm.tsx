@@ -174,7 +174,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
     }
     updateItemRequirements({
       type: ItemType.NATIVE,
-      amount
+      amount,
     });
   }
 

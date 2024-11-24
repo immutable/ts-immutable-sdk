@@ -33,6 +33,7 @@ export function TransakIframe(props: TransakIframeProps) {
     estimatedGasLimit,
     exchangeScreenTitle,
     partnerOrderId,
+    excludeFiatCurrencies,
     onOpen,
     onInit,
     onOrderCreated,
@@ -74,6 +75,7 @@ export function TransakIframe(props: TransakIframeProps) {
       email,
       walletAddress,
       partnerOrderId,
+      excludeFiatCurrencies,
     },
     onError: onFailedToLoad,
   });

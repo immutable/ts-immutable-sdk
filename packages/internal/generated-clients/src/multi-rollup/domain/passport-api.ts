@@ -102,11 +102,12 @@ export const PassportApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Get all the Ethereum linked addresses for a user based on its userId
+         * This API has been deprecated, please use https://docs.immutable.com/zkevm/api/reference/#/operations/getUserInfo instead to get a list of linked addresses.
          * @summary Get Ethereum linked addresses for a user
          * @param {string} userId The user\&#39;s userId
          * @param {string} chainName 
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         getLinkedAddresses: async (userId: string, chainName: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
@@ -293,11 +294,12 @@ export const PassportApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Get all the Ethereum linked addresses for a user based on its userId
+         * This API has been deprecated, please use https://docs.immutable.com/zkevm/api/reference/#/operations/getUserInfo instead to get a list of linked addresses.
          * @summary Get Ethereum linked addresses for a user
          * @param {string} userId The user\&#39;s userId
          * @param {string} chainName 
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         async getLinkedAddresses(userId: string, chainName: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetLinkedAddressesRes>> {
@@ -361,10 +363,11 @@ export const PassportApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.createCounterfactualAddressV2(requestParameters.chainName, requestParameters.createCounterfactualAddressRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get all the Ethereum linked addresses for a user based on its userId
+         * This API has been deprecated, please use https://docs.immutable.com/zkevm/api/reference/#/operations/getUserInfo instead to get a list of linked addresses.
          * @summary Get Ethereum linked addresses for a user
          * @param {PassportApiGetLinkedAddressesRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         getLinkedAddresses(requestParameters: PassportApiGetLinkedAddressesRequest, options?: AxiosRequestConfig): AxiosPromise<GetLinkedAddressesRes> {
@@ -522,10 +525,11 @@ export class PassportApi extends BaseAPI {
     }
 
     /**
-     * Get all the Ethereum linked addresses for a user based on its userId
+     * This API has been deprecated, please use https://docs.immutable.com/zkevm/api/reference/#/operations/getUserInfo instead to get a list of linked addresses.
      * @summary Get Ethereum linked addresses for a user
      * @param {PassportApiGetLinkedAddressesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
      * @memberof PassportApi
      */

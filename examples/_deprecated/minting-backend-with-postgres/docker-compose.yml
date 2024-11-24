@@ -1,0 +1,26 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:14
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=minting_backend
+    expose:
+      - '5432'
+    ports:
+      - 5432:5432
+    volumes:
+      - ../../packages/minting-backend/sdk/src/persistence/pg/seed.sql:/docker-entrypoint-initdb.d/seed.sql
+  backend:
+    image: node:20-alpine
+    restart: always
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+    volumes:
+      - ./:/app
+    working_dir: /app
+    command: npm run dev

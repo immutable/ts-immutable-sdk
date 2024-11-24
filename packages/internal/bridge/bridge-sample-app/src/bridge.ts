@@ -35,7 +35,7 @@ async function getBridgeTxs() {
       amount: params.amount,
       sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
       destinationChainId: bridgeConfig.bridgeInstance.childChainID,
-      gasMultiplier: 1.1,
+      gasMultiplier: 'auto',
     }
 
     console.log('depositReq', depositReq)
@@ -54,7 +54,7 @@ async function getBridgeTxs() {
       amount: params.amount,
       sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
       destinationChainId: bridgeConfig.bridgeInstance.childChainID,
-      gasMultiplier: 1.1,
+      gasMultiplier: 'auto',
     }
 
     console.log('depositNativeReq', depositNativeReq)
@@ -73,7 +73,7 @@ async function getBridgeTxs() {
       amount: params.amount,
       sourceChainId: bridgeConfig.bridgeInstance.childChainID,
       destinationChainId: bridgeConfig.bridgeInstance.rootChainID,
-      gasMultiplier: 1.1,
+      gasMultiplier: 'auto',
     }
 
     console.log('withdrawReq', withdrawReq)
@@ -92,7 +92,7 @@ async function getBridgeTxs() {
       amount: params.amount,
       sourceChainId: bridgeConfig.bridgeInstance.childChainID,
       destinationChainId: bridgeConfig.bridgeInstance.rootChainID,
-      gasMultiplier: 1.1,
+      gasMultiplier: 'auto',
     }
 
     console.log('withdrawNativeReq', withdrawNativeReq)

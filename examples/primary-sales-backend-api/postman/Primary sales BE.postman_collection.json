@@ -1,0 +1,189 @@
+{
+	"info": {
+		"_postman_id": "c754b503-fb61-4722-8fac-47fecc2efb3e",
+		"name": "Primary sales BE",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25754861"
+	},
+	"item": [
+		{
+			"name": "Quote",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "QUOTE_API_KEY",
+						"value": "test_api_key",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"recipient_address\": \"0xdd9AAE1C317eE6EFEb0F3DB0A068e9Ed952a6CEB\",\n  \"products\": [\n    {\n      \"product_id\": \"vi7age4ku18qynwbk4wx90ge\",\n      \"quantity\": 1\n    }\n  ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/api/v1/orders/quotes",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"orders",
+						"quotes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create order",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "QUOTE_API_KEY",
+						"value": "test_api_key",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"recipient_address\": \"0xdd9AAE1C317eE6EFEb0F3DB0A068e9Ed952a6CEB\",\n  \"currency\": \"USDC\",\n  \"products\": [\n    {\n      \"product_id\": \"vi7age4ku18qynwbk4wx90ge\",\n      \"quantity\": 1\n    },\n    {\n      \"product_id\": \"jtwrclpj0v1zab865ne893hb\",\n      \"quantity\": 1\n    }\n  ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/api/v1/sale-authorization",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"sale-authorization"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Expire an order",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "QUOTE_API_KEY",
+						"value": "test_api_key",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"reference\": \"cm02a70000001updhnudm7bop\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/api/v1/expire",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"expire"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "QUOTE_API_KEY",
+						"value": "test_api_key",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"reference\": \"cm02apig000035o3ipwszr02z\",\n  \"tx_hash\": \"test\",\n  \"recipient_address\": \"0xdd9AAE1C317eE6EFEb0F3DB0A068e9Ed952a6CEB\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/api/v1/confirm",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"confirm"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Products",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "QUOTE_API_KEY",
+						"value": "test_api_key",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"reference\": \"cm02a70000001updhnudm7bop\",\n  \"tx_hash\": \"test\",\n  \"recipient_address\": \"0xdd9AAE1C317eE6EFEb0F3DB0A068e9Ed952a6CEB\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/api/v1/products",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"products"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

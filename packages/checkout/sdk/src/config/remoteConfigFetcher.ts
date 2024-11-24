@@ -1,11 +1,6 @@
 import { Environment } from '@imtbl/config';
 import { AxiosResponse } from 'axios';
-import {
-  ChainId,
-  ChainsTokensConfig,
-  RemoteConfiguration,
-  ChainTokensConfig,
-} from '../types';
+import { RemoteConfiguration } from '../types';
 import { CHECKOUT_CDN_BASE_URL, ENV_DEVELOPMENT } from '../env';
 import { HttpClient } from '../api/http';
 import { CheckoutError, CheckoutErrorType } from '../errors';
@@ -23,8 +18,6 @@ export class RemoteConfigFetcher {
   private isProduction: boolean;
 
   private configCache: RemoteConfiguration | undefined;
-
-  private tokensCache: ChainsTokensConfig | undefined;
 
   private version: string = 'v1';
 
@@ -54,7 +47,6 @@ export class RemoteConfigFetcher {
         );
       }
     }
-
     return responseData!;
   }
 
@@ -80,28 +72,6 @@ export class RemoteConfigFetcher {
     return this.configCache;
   }
 
-  private async loadConfigTokens(): Promise<ChainsTokensConfig | undefined> {
-    if (this.tokensCache) return this.tokensCache;
-
-    let response: AxiosResponse;
-    try {
-      response = await this.httpClient.get(
-        `${this.getEndpoint()}/${this.version}/config/tokens`,
-      );
-    } catch (err: any) {
-      throw new CheckoutError(
-        `Error: ${err.message}`,
-        CheckoutErrorType.API_ERROR,
-        { error: err },
-      );
-    }
-
-    // Ensure that the configuration is valid
-    this.tokensCache = this.parseResponse<ChainsTokensConfig>(response);
-
-    return this.tokensCache;
-  }
-
   public async getConfig(
     key?: keyof RemoteConfiguration,
   ): Promise<
@@ -113,12 +83,6 @@ export class RemoteConfigFetcher {
     if (!config) return undefined;
     if (!key) return config;
     return config[key];
-  }
-
-  public async getTokensConfig(chainId: ChainId): Promise<ChainTokensConfig> {
-    const config = await this.loadConfigTokens();
-    if (!config || !config[chainId]) return {};
-    return config[chainId] ?? [];
   }
 
   public getHttpClient = () => this.httpClient;

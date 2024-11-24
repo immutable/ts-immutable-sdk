@@ -42,6 +42,24 @@ export class Transfer {
     }
   }
 
+  public async transferL1EthFromBanker(amount: string, userVar: string) {
+    try {
+      const banker = await this.stepSharedState.getBanker();
+      const receiver = await this.stepSharedState.users[
+        userVar
+      ].ethSigner.getAddress();
+
+      await banker.ethSigner.sendTransaction({
+        to: receiver,
+        value: parseEther(amount),
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      throw e;
+    }
+  }
+
   // cleanup - transfer eth back to banker
   // @then('{string} transfer {string} eth to banker', undefined, 10000)
   public async transferToBanker(userVar: string, amount: string) {

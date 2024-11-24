@@ -1,6 +1,5 @@
 import {
   Button,
-  Heading,
   MenuItem,
   ShimmerCircle,
   Stack,
@@ -8,16 +7,16 @@ import {
 } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
 import {
-  calculateCryptoToFiat,
-  getDefaultTokenImage,
-  tokenValueFormat,
-} from 'lib/utils';
+  calculateCryptoToFiat, tokenValueFormat,
+} from '../../../lib/utils';
+import { TokenImage } from '../../../components/TokenImage/TokenImage';
 import { FundingBalance } from '../types';
 import { useSaleContext } from '../context/SaleContextProvider';
 
 type SelectCoinDropdownProps = {
   balance: FundingBalance;
   conversions: Map<string, number>;
+  isFreeMint: boolean;
   canOpen: boolean;
   onClick: () => void;
   onProceed: (balance: FundingBalance) => void;
@@ -28,6 +27,7 @@ type SelectCoinDropdownProps = {
 export function SelectCoinDropdown({
   balance,
   conversions,
+  isFreeMint,
   canOpen,
   onClick,
   onProceed,
@@ -56,6 +56,8 @@ export function SelectCoinDropdown({
     '',
   );
 
+  const displayDropdown = !isFreeMint;
+
   return (
     <Stack
       sx={{
@@ -63,6 +65,7 @@ export function SelectCoinDropdown({
         bradtl: 'base.borderRadius.x6',
         bradtr: 'base.borderRadius.x6',
         px: 'base.spacing.x4',
+        pt: (displayDropdown ? '0' : 'base.spacing.x6'),
         pb: 'base.spacing.x6',
         bg: 'base.color.neutral.800',
         border: '0px solid transparent',
@@ -70,54 +73,61 @@ export function SelectCoinDropdown({
         borderTopColor: 'base.color.translucent.emphasis.400',
       }}
     >
-      <MenuItem size="medium">
-        <MenuItem.FramedImage
-          alt={token.name}
-          circularFrame
-          imageUrl={token.icon}
-          defaultImageUrl={getDefaultTokenImage(environment, theme)}
-        />
-        <MenuItem.Label>
-          {t('views.ORDER_SUMMARY.orderReview.payWith', {
-            symbol: token.symbol,
-          })}
-        </MenuItem.Label>
-        <MenuItem.Caption rc={<Heading size="xSmall" />}>
-          {`${t('views.ORDER_SUMMARY.orderReview.balance', {
-            amount: prettyFormatNumber(
-              tokenValueFormat(userBalance.formattedBalance),
-            ),
-          })} ${
-            balanceFiatAmount
-              ? t('views.ORDER_SUMMARY.currency.fiat', {
-                amount: prettyFormatNumber(
-                  tokenValueFormat(balanceFiatAmount),
-                ),
-              })
-              : ''
-          }`}
-        </MenuItem.Caption>
-        {priceDisplay && (
-          <MenuItem.PriceDisplay
-            use={<Heading size="xSmall" />}
-            fiatAmount={
-              fiatAmount
-                ? t('views.ORDER_SUMMARY.currency.fiat', { amount: fiatAmount })
-                : undefined
-            }
-            price={t('views.ORDER_SUMMARY.currency.price', {
-              symbol: token.symbol,
-              amount: tokenValueFormat(fundsRequired.formattedAmount),
-            })}
+      {displayDropdown && (
+        <MenuItem size="medium">
+          <MenuItem.FramedImage
+            circularFrame
+            use={(
+              <TokenImage
+                environment={environment}
+                theme={theme}
+                name={token.name}
+                src={token.icon}
+              />
+            )}
           />
-        )}
-        {canOpen && (
-          <MenuItem.StatefulButtCon icon="ChevronExpand" onClick={onClick} />
-        )}
-        {!canOpen && loading && <ShimmerCircle radius="base.icon.size.400" />}
-      </MenuItem>
+          <MenuItem.Label>
+            {t(`views.ORDER_SUMMARY.orderReview.payWith.${balance.type}`, {
+              symbol: token.symbol,
+            })}
+          </MenuItem.Label>
+          <MenuItem.Caption>
+            {`${t('views.ORDER_SUMMARY.orderReview.balance', {
+              amount: prettyFormatNumber(
+                tokenValueFormat(userBalance.formattedBalance),
+              ),
+            })} ${
+              balanceFiatAmount
+                ? t('views.ORDER_SUMMARY.currency.fiat', {
+                  amount: prettyFormatNumber(
+                    tokenValueFormat(balanceFiatAmount),
+                  ),
+                })
+                : ''
+            }`}
+          </MenuItem.Caption>
+          {priceDisplay && (
+            <MenuItem.PriceDisplay
+              fiatAmount={
+                fiatAmount
+                  ? t('views.ORDER_SUMMARY.currency.fiat', { amount: fiatAmount })
+                  : undefined
+              }
+              price={tokenValueFormat(fundsRequired.formattedAmount)}
+            />
+          )}
+          {canOpen && (
+            <MenuItem.StatefulButtCon icon="ChevronExpand" onClick={onClick} />
+          )}
+          {!canOpen && loading && <ShimmerCircle radius="base.icon.size.400" />}
+        </MenuItem>
+      )}
       <Button size="large" onClick={() => onProceed(balance)}>
-        {t('views.ORDER_SUMMARY.orderReview.continue')}
+        {isFreeMint ? (
+          t('views.ORDER_SUMMARY.orderReview.continueFreeMint')
+        ) : (
+          t('views.ORDER_SUMMARY.orderReview.continue')
+        )}
       </Button>
     </Stack>
   );

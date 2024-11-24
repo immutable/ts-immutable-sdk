@@ -315,15 +315,13 @@ describe('balances', () => {
     });
 
     it('should fail if no wallet address or provider are given', async () => {
+      jest.spyOn(Blockscout, 'isChainSupported').mockReturnValue(false);
+
       let message;
       try {
         await getAllBalances(
           {
-            remote: {
-              getTokensConfig: () => ({
-                blockscout: false,
-              }),
-            },
+            remote: {},
             networkMap: testCheckoutConfig.networkMap,
           } as unknown as CheckoutConfiguration,
           undefined,
@@ -337,15 +335,13 @@ describe('balances', () => {
     });
 
     it('should fail if no provider is given and indexer is disabled', async () => {
+      jest.spyOn(Blockscout, 'isChainSupported').mockReturnValue(false);
+
       let message;
       try {
         await getAllBalances(
           {
-            remote: {
-              getTokensConfig: () => ({
-                blockscout: false,
-              }),
-            },
+            remote: {},
             networkMap: testCheckoutConfig.networkMap,
           } as unknown as CheckoutConfiguration,
           undefined,
@@ -359,12 +355,11 @@ describe('balances', () => {
     });
 
     it('should call getBalance and getERC20Balance functions with native and ERC20 tokens', async () => {
+      jest.spyOn(Blockscout, 'isChainSupported').mockReturnValue(false);
+
       const getAllBalancesResult = await getAllBalances(
         {
           remote: {
-            getTokensConfig: () => ({
-              blockscout: false,
-            }),
             getHttpClient: () => mockedHttpClient,
           },
           networkMap: testCheckoutConfig.networkMap,
@@ -415,7 +410,24 @@ describe('balances', () => {
       );
     });
 
-    it('should call getIndexerBalance', async () => {
+    it('should call getBlockscoutBalance', async () => {
+      (tokens.getTokenAllowList as jest.Mock).mockReturnValue({
+        tokens: [
+          {
+            name: 'Immutable X',
+            address: 'native',
+            symbol: 'IMX',
+            decimals: 18,
+          } as TokenInfo,
+          {
+            name: ChainName.ETHEREUM,
+            address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
+            symbol: 'ETH',
+            decimals: 18,
+          } as TokenInfo,
+        ],
+      });
+
       getTokensByWalletAddressMock = jest.fn().mockResolvedValue({
         items: [
           {
@@ -451,9 +463,6 @@ describe('balances', () => {
       const getAllBalancesResult = await getAllBalances(
         {
           remote: {
-            getTokensConfig: () => ({
-              blockscout: true,
-            }),
             getHttpClient: () => mockedHttpClient,
           },
           networkMap: testCheckoutConfig.networkMap,
@@ -491,7 +500,7 @@ describe('balances', () => {
       ]);
     });
 
-    it('should call getIndexerBalance with undefined filterTokens', async () => {
+    it('should call getBlockscoutBalance with undefined filterTokens', async () => {
       getTokenAllowListMock = jest.fn().mockReturnValue({
         tokens: [],
       } as GetTokenAllowListResult);
@@ -534,9 +543,6 @@ describe('balances', () => {
       const getAllBalancesResult = await getAllBalances(
         {
           remote: {
-            getTokensConfig: () => ({
-              blockscout: true,
-            }),
             getHttpClient: () => mockedHttpClient,
           },
           networkMap: new CheckoutConfiguration(
@@ -557,7 +563,7 @@ describe('balances', () => {
       expect(getAllBalancesResult.balances).toEqual([]);
     });
 
-    it('should call getIndexerBalance and return native balance on ERC20 404', async () => {
+    it('should call getBlockscoutBalance and return native balance on ERC20 404', async () => {
       getTokensByWalletAddressMock = jest.fn().mockRejectedValue(
         { code: HttpStatusCode.NotFound, message: 'not found' },
       );
@@ -580,9 +586,6 @@ describe('balances', () => {
       const getAllBalancesResult = await getAllBalances(
         {
           remote: {
-            getTokensConfig: () => ({
-              blockscout: true,
-            }),
             getHttpClient: () => mockedHttpClient,
           },
           networkMap: testCheckoutConfig.networkMap,
@@ -609,7 +612,18 @@ describe('balances', () => {
       ]);
     });
 
-    it('should call getIndexerBalance and return ERC20 balances on native 404', async () => {
+    it('should call getBlockscoutBalance and return ERC20 balances on native 404', async () => {
+      (tokens.getTokenAllowList as jest.Mock).mockReturnValue({
+        tokens: [
+          {
+            name: ChainName.ETHEREUM,
+            address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
+            symbol: 'ETH',
+            decimals: 18,
+          } as TokenInfo,
+        ],
+      });
+
       getTokensByWalletAddressMock = jest.fn().mockResolvedValue({
         items: [
           {
@@ -639,9 +653,6 @@ describe('balances', () => {
       const getAllBalancesResult = await getAllBalances(
         {
           remote: {
-            getTokensConfig: () => ({
-              blockscout: true,
-            }),
             getHttpClient: () => mockedHttpClient,
           },
           networkMap: testCheckoutConfig.networkMap,
@@ -669,7 +680,7 @@ describe('balances', () => {
       ]);
     });
 
-    it('should call getIndexerBalance and return empty balance due to 404', async () => {
+    it('should call getBlockscoutBalance and return empty balance due to 404', async () => {
       getTokensByWalletAddressMock = jest.fn().mockRejectedValue(
         { code: HttpStatusCode.NotFound, message: 'not found' },
       );
@@ -686,9 +697,6 @@ describe('balances', () => {
       const getAllBalancesResult = await getAllBalances(
         {
           remote: {
-            getTokensConfig: () => ({
-              blockscout: true,
-            }),
             getHttpClient: () => mockedHttpClient,
           },
           networkMap: testCheckoutConfig.networkMap,
@@ -720,9 +728,6 @@ describe('balances', () => {
         getAllBalancesResult = await getAllBalances(
           {
             remote: {
-              getTokensConfig: () => ({
-                blockscout: true,
-              }),
               getHttpClient: () => mockedHttpClient,
             },
             networkMap: testCheckoutConfig.networkMap,
@@ -780,7 +785,7 @@ describe('balances', () => {
     }];
 
     testCases.forEach(async (testCase) => {
-      it('should call getIndexerBalance and throw error', async () => {
+      it('should call getBlockscoutBalance and throw error', async () => {
         getTokensByWalletAddressMock = jest.fn().mockRejectedValue(
           { code: HttpStatusCode.Forbidden, message: testCase.errorMessage },
         );
@@ -797,9 +802,6 @@ describe('balances', () => {
           await getAllBalances(
             {
               remote: {
-                getTokensConfig: () => ({
-                  blockscout: true,
-                }),
                 getHttpClient: () => mockedHttpClient,
               },
               networkMap: testCheckoutConfig.networkMap,
@@ -831,11 +833,7 @@ describe('balances', () => {
       try {
         await getAllBalances(
           {
-            remote: {
-              getTokensConfig: () => ({
-                blockscout: true,
-              }),
-            },
+            remote: {},
             networkMap: testCheckoutConfig.networkMap,
           } as unknown as CheckoutConfiguration,
           jest.fn() as unknown as Web3Provider,

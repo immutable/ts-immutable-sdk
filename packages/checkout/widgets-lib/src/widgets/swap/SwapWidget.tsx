@@ -7,10 +7,10 @@ import {
   useState,
 } from 'react';
 import {
-  DexConfig, TokenFilterTypes, IMTBLWidgetEvents, SwapWidgetParams,
+  TokenFilterTypes, IMTBLWidgetEvents, SwapWidgetParams,
+  SwapDirection,
+  fetchRiskAssessment,
 } from '@imtbl/checkout-sdk';
-import { ImmutableConfiguration } from '@imtbl/config';
-import { Exchange } from '@imtbl/dex-sdk';
 import { useTranslation } from 'react-i18next';
 import { SwapCoins } from './views/SwapCoins';
 import { LoadingView } from '../../views/loading/LoadingView';
@@ -51,6 +51,7 @@ import { ConnectLoaderContext } from '../../context/connect-loader-context/Conne
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { getAllowedBalances } from '../../lib/balance';
 import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 
 export type SwapWidgetInputs = SwapWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
@@ -61,6 +62,9 @@ export default function SwapWidget({
   fromTokenAddress,
   toTokenAddress,
   config,
+  autoProceed,
+  direction,
+  showBackButton,
 }: SwapWidgetInputs) {
   const { t } = useTranslation();
   const {
@@ -169,30 +173,6 @@ export default function SwapWidget({
       // connect loader handle the switch network functionality
       if (network.chainId !== getL2ChainId(checkout.config)) return;
 
-      let dexConfig: DexConfig | undefined;
-      try {
-        dexConfig = (
-          (await checkout.config.remote.getConfig('dex')) as DexConfig
-        );
-      } catch (err: any) {
-        showErrorView(err);
-        return;
-      }
-
-      const exchange = new Exchange({
-        chainId: network.chainId,
-        baseConfig: new ImmutableConfiguration({ environment }),
-        secondaryFees: dexConfig.secondaryFees,
-        overrides: dexConfig.overrides,
-      });
-
-      swapDispatch({
-        payload: {
-          type: SwapActions.SET_EXCHANGE,
-          exchange,
-        },
-      });
-
       swapDispatch({
         payload: {
           type: SwapActions.SET_NETWORK,
@@ -208,6 +188,53 @@ export default function SwapWidget({
     })();
   }, [checkout, provider]);
 
+  useEffect(() => {
+    if (!checkout || swapState.riskAssessment) {
+      return;
+    }
+
+    (async () => {
+      const address = await provider?.getSigner()?.getAddress();
+
+      if (!address) {
+        return;
+      }
+
+      const assessment = await fetchRiskAssessment([address], checkout.config);
+      swapDispatch({
+        payload: {
+          type: SwapActions.SET_RISK_ASSESSMENT,
+          riskAssessment: assessment,
+        },
+      });
+    })();
+  }, [checkout, provider]);
+
+  useEffect(() => {
+    swapDispatch({
+      payload: {
+        type: SwapActions.SET_AUTO_PROCEED,
+        autoProceed: autoProceed ?? false,
+        direction: direction ?? SwapDirection.FROM,
+      },
+    });
+  }, [autoProceed, direction]);
+
+  const cancelAutoProceed = useCallback(() => {
+    if (autoProceed) {
+      swapDispatch({
+        payload: {
+          type: SwapActions.SET_AUTO_PROCEED,
+          autoProceed: false,
+          direction: SwapDirection.FROM,
+        },
+      });
+    }
+  }, [autoProceed, swapDispatch]);
+
+  const fromAmount = direction === SwapDirection.FROM || direction == null ? amount : undefined;
+  const toAmount = direction === SwapDirection.TO ? amount : undefined;
+
   return (
     <ViewContext.Provider value={viewReducerValues}>
       <SwapContext.Provider value={swapReducerValues}>
@@ -218,14 +245,12 @@ export default function SwapWidget({
           {viewState.view.type === SwapWidgetViews.SWAP && (
           <SwapCoins
             theme={theme}
-            fromAmount={viewState.view.data?.fromAmount ?? amount}
-            fromTokenAddress={
-                  viewState.view.data?.fromTokenAddress
-                  ?? fromTokenAddress
-                }
-            toTokenAddress={
-                  viewState.view.data?.toTokenAddress ?? toTokenAddress
-                }
+            cancelAutoProceed={cancelAutoProceed}
+            fromAmount={viewState.view.data?.fromAmount ?? fromAmount}
+            toAmount={viewState.view.data?.toAmount ?? toAmount}
+            fromTokenAddress={viewState.view.data?.fromTokenAddress ?? fromTokenAddress}
+            toTokenAddress={viewState.view.data?.toTokenAddress ?? toTokenAddress}
+            showBackButton={showBackButton}
           />
           )}
           {viewState.view.type === SwapWidgetViews.IN_PROGRESS && (
@@ -338,6 +363,16 @@ export default function SwapWidget({
             }}
             onCloseClick={() => sendSwapWidgetCloseEvent(eventTarget)}
             errorEventActionLoading={errorViewLoading}
+          />
+          )}
+          {viewState.view.type === SwapWidgetViews.SERVICE_UNAVAILABLE && (
+          <ServiceUnavailableErrorView
+            onCloseClick={() => sendSwapWidgetCloseEvent(eventTarget)}
+            onBackButtonClick={() => {
+              viewDispatch({
+                payload: { type: ViewActions.UPDATE_VIEW, view: { type: SwapWidgetViews.SWAP } },
+              });
+            }}
           />
           )}
           {viewState.view.type === SharedViews.TOP_UP_VIEW && (

@@ -15,12 +15,12 @@ export const feeItemContainerStyles = {
 export const feeItemStyles = { display: 'flex', width: '100%' };
 
 export const feeItemLabelStyles = (boldLabel?: boolean) => ({
-  width: '50%',
+  width: '65%',
   color: boldLabel ? 'base.color.text.body.primary' : 'base.color.text.body.secondary',
 });
 
 export const feeItemPriceDisplayStyles = {
-  width: '50%',
+  width: '35%',
 };
 
 export const feeItemLoadingStyles = {
