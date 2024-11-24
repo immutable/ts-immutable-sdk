@@ -13,10 +13,10 @@
 /packages/internal/bridge @immutable/rollups
 /packages/orderbook @immutable/traders
 /packages/passport @immutable/passport
-/packages/x-provider @immutable/commerce
+/packages/x-provider @immutable/passport
 /packages/checkout @immutable/commerce
 /packages/checkout/widgets-lib @immutable/commerce
-/packages/blockchain-data @immutable/assets
+/packages/blockchain-data @immutable/activation
 /packages/minting-backend @shineli1984
 /packages/webhook @shineli1984
 /packages/game-bridge @immutable/sdk
