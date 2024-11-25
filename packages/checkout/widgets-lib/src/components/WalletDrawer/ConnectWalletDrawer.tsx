@@ -45,6 +45,7 @@ type ConnectWalletDrawerProps = {
     rdns: string;
   }[];
   getShouldRequestWalletPermissions?: (providerInfo: EIP6963ProviderInfo) => boolean | undefined;
+  shouldIdentifyUser?: boolean;
 };
 
 export function ConnectWalletDrawer({
@@ -59,6 +60,7 @@ export function ConnectWalletDrawer({
   menuItemSize = 'small',
   disabledOptions = [],
   getShouldRequestWalletPermissions,
+  shouldIdentifyUser = true,
 }: ConnectWalletDrawerProps) {
   const {
     providersState: { checkout, fromProvider },
@@ -143,8 +145,11 @@ export function ConnectWalletDrawer({
         checkout,
         shouldRequestWalletPermissions,
       );
-      // Identify connected wallet
-      await identifyUser(identify, provider);
+
+      if (shouldIdentifyUser) {
+        // Identify connected wallet
+        await identifyUser(identify, provider);
+      }
 
       // Store selected provider as fromProvider in context
       address = await setProviderInContext(provider, providerDetail.info);
