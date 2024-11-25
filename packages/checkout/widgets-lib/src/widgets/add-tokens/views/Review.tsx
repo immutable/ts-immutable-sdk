@@ -108,7 +108,7 @@ export function Review({
 
   const {
     providersState: {
-      checkout, fromProvider, fromAddress, toAddress,
+      checkout, fromProvider, fromAddress, toAddress, fromProviderInfo,
     },
   } = useProvidersContext();
 
@@ -277,7 +277,7 @@ export function Review({
   );
 
   const handleTransaction = useCallback(async () => {
-    if (!squid || !fromProvider || !route) {
+    if (!squid || !fromProvider || !route || !fromProviderInfo) {
       return;
     }
 
@@ -350,7 +350,7 @@ export function Review({
         ),
       });
 
-      const approveTxnReceipt = await approve(changeableProvider, route);
+      const approveTxnReceipt = await approve(fromProviderInfo, changeableProvider, route);
 
       if (!approveTxnReceipt) {
         return;
@@ -372,7 +372,7 @@ export function Review({
       ),
     });
 
-    const executeTxnReceipt = await execute(squid, changeableProvider, route);
+    const executeTxnReceipt = await execute(squid, fromProviderInfo, changeableProvider, route);
     if (executeTxnReceipt) {
       track({
         userJourney: UserJourney.ADD_TOKENS,

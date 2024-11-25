@@ -7,6 +7,7 @@ import { Environment } from '@imtbl/config';
 
 import { StatusResponse } from '@0xsquid/sdk/dist/types';
 import { Flow } from '@imtbl/metrics';
+import { EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
 import { isSquidNativeToken } from '../functions/isSquidNativeToken';
 import { useError } from './useError';
 import { AddTokensError, AddTokensErrorTypes } from '../types';
@@ -170,9 +171,11 @@ export const useExecute = (contextId: string, environment: Environment) => {
 
   const callApprove = async (
     flow:Flow,
+    fromProviderInfo: EIP6963ProviderInfo,
     provider: Web3Provider,
     routeResponse: RouteResponse,
   ): Promise<ethers.providers.TransactionReceipt> => {
+    flow.addEvent(`provider_${fromProviderInfo.name}`);
     const erc20Abi = [
       'function approve(address spender, uint256 amount) public returns (bool)',
     ];
@@ -195,17 +198,19 @@ export const useExecute = (contextId: string, environment: Environment) => {
       fromAmount,
     );
     flow.addEvent('transactionSent');
+
     return await waitForReceipt(provider, tx.hash);
   };
 
   const approve = async (
+    fromProviderInfo: EIP6963ProviderInfo,
     provider: Web3Provider,
     routeResponse: RouteResponse,
   ): Promise<ethers.providers.TransactionReceipt | undefined> => {
     try {
       if (!isSquidNativeToken(routeResponse?.route?.params.fromToken)) {
         return await withMetricsAsync(
-          (flow) => callApprove(flow, provider, routeResponse),
+          (flow) => callApprove(flow, fromProviderInfo, provider, routeResponse),
           `${UserJourney.ADD_TOKENS}_Approve`,
           (error) => (isRejectedError(error) ? 'rejected' : ''),
         );
@@ -220,9 +225,11 @@ export const useExecute = (contextId: string, environment: Environment) => {
   const callExecute = async (
     flow: Flow,
     squid: Squid,
+    fromProviderInfo: EIP6963ProviderInfo,
     provider: Web3Provider,
     routeResponse: RouteResponse,
   ): Promise<ethers.providers.TransactionReceipt> => {
+    flow.addEvent(`provider_${fromProviderInfo.name}`);
     const tx = (await squid.executeRoute({
       signer: provider.getSigner(),
       route: routeResponse.route,
@@ -233,6 +240,7 @@ export const useExecute = (contextId: string, environment: Environment) => {
 
   const execute = async (
     squid: Squid,
+    fromProviderInfo: EIP6963ProviderInfo,
     provider: Web3Provider,
     routeResponse: RouteResponse,
   ): Promise<ethers.providers.TransactionReceipt | undefined> => {
@@ -241,7 +249,7 @@ export const useExecute = (contextId: string, environment: Environment) => {
     }
     try {
       return await withMetricsAsync(
-        (flow) => callExecute(flow, squid, provider, routeResponse),
+        (flow) => callExecute(flow, squid, fromProviderInfo, provider, routeResponse),
         `${UserJourney.ADD_TOKENS}_Execute`,
         (error) => (isRejectedError(error) ? 'rejected' : ''),
       );
