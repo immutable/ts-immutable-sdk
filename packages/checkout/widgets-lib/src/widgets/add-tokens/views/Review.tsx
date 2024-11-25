@@ -297,6 +297,7 @@ export function Review({
         fromAmount: route.route.params.fromAmount,
         fromAddress: route.route.params.fromAddress,
         toAddress: route.route.params.toAddress,
+        estimatedRouteDuration: route.route.estimate.estimatedRouteDuration,
       },
     });
 
