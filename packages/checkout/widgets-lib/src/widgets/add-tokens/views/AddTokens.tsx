@@ -637,7 +637,7 @@ export function AddTokens({
                 setShowPayWithDrawer(true);
               }}
             >
-              {selectedToken && fromAddress && selectedAmount && (
+              {selectedToken && fromAddress && selectedAmount && isAmountInputSynced && (
               <>
                 <MenuItem.BottomSlot.Divider
                   sx={fromAddress ? { ml: 'base.spacing.x4' } : undefined}
