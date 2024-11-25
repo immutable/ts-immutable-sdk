@@ -4,13 +4,13 @@ export const withMetrics = <T>(
   fn: (flow: Flow) => T,
   flowName: string,
 ): T => {
-  const flow: Flow = trackFlow('checkout', flowName);
+  const flow: Flow = trackFlow('commerce', flowName);
 
   try {
     return fn(flow);
   } catch (error) {
     if (error instanceof Error) {
-      trackError('checkout', flowName, error);
+      trackError('commerce', flowName, error);
     }
     flow.addEvent('errored');
     throw error;
@@ -22,16 +22,21 @@ export const withMetrics = <T>(
 export const withMetricsAsync = async <T>(
   fn: (flow: Flow) => Promise<T>,
   flowName: string,
+  errorType?: (error:any)=>string,
 ): Promise<T> => {
-  const flow: Flow = trackFlow('checkout', flowName);
+  const flow: Flow = trackFlow('commerce', flowName);
 
   try {
     return await fn(flow);
-  } catch (error) {
+  } catch (error:any) {
     if (error instanceof Error) {
-      trackError('checkout', flowName, error);
+      trackError('commerce', flowName, error);
     }
-    flow.addEvent('errored');
+    if (errorType && errorType(error)) {
+      flow.addEvent(`errored_${errorType(error)}`);
+    } else {
+      flow.addEvent('errored');
+    }
     throw error;
   } finally {
     flow.addEvent('End');
