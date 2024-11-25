@@ -137,14 +137,10 @@ export function AddTokens({
   );
   const [fetchingRoutes, setFetchingRoutes] = useState(false);
   const [insufficientBalance, setInsufficientBalance] = useState(false);
+  const [isAmountInputSynced, setIsAmountInputSynced] = useState(false);
 
-  const selectedAmountUsd = useMemo(
-    () => convertToUsd(tokens, inputValue, selectedToken),
-    [tokens, inputValue, selectedToken],
-  );
-
-  const setSelectedAmount = useMemo(
-    () => debounce((value: string) => {
+  const debouncedSetSelectedAmount = useRef(
+    debounce((value: string) => {
       addTokensDispatch({
         payload: {
           type: AddTokensActions.SET_SELECTED_AMOUNT,
@@ -152,8 +148,23 @@ export function AddTokens({
         },
       });
     }, 2500),
-    [],
   );
+
+  const selectedAmountUsd = useMemo(
+    () => convertToUsd(tokens, inputValue, selectedToken),
+    [tokens, inputValue, selectedToken],
+  );
+
+  const setSelectedAmount = (value: string) => {
+    setIsAmountInputSynced(false);
+    debouncedSetSelectedAmount.current(value);
+  };
+
+  useEffect(() => {
+    if (selectedAmount === inputValue) {
+      setIsAmountInputSynced(true);
+    }
+  }, [selectedAmount, inputValue]);
 
   const setSelectedRouteData = (route: RouteData | undefined) => {
     if (route) {
@@ -478,10 +489,12 @@ export function AddTokens({
   }, [showInitialEmptyState]);
 
   const shouldShowBackButton = showBackButton && onBackButtonClick;
+
   const routeInputsReady = !!selectedToken
     && !!fromAddress
     && validateToAmount(selectedAmount).isValid
-    && validateToAmount(inputValue).isValid;
+    && validateToAmount(inputValue).isValid
+    && isAmountInputSynced;
 
   const loading = (routeInputsReady || fetchingRoutes)
     && !(selectedRouteData || insufficientBalance);
@@ -624,7 +637,7 @@ export function AddTokens({
                 setShowPayWithDrawer(true);
               }}
             >
-              {selectedToken && fromAddress && selectedAmount && (
+              {selectedToken && fromAddress && selectedAmount && isAmountInputSynced && (
               <>
                 <MenuItem.BottomSlot.Divider
                   sx={fromAddress ? { ml: 'base.spacing.x4' } : undefined}

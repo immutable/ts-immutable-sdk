@@ -702,7 +702,7 @@ export function Review({
                   <Body weight="bold">
                     {t('views.ADD_TOKENS.review.send')}
                     {' '}
-                    {route.route.estimate.fromToken.name}
+                    {route.route.estimate.fromToken.symbol}
                   </Body>
                   <Body
                     size="small"
@@ -771,11 +771,11 @@ export function Review({
                   <Body weight="bold">
                     {t('views.ADD_TOKENS.review.swap')}
                     {' '}
-                    {route.route.estimate.fromToken.name}
+                    {route.route.estimate.fromToken.symbol}
                     {' '}
                     {t('views.ADD_TOKENS.review.to')}
                     {' '}
-                    {route.route.estimate.toToken.name}
+                    {route.route.estimate.toToken.symbol}
                   </Body>
                   <Body
                     size="small"
@@ -792,7 +792,7 @@ export function Review({
                       route.route.estimate.exchangeRate,
                     )}
                     {' '}
-                    {route.route.estimate.toToken.name}
+                    {route.route.estimate.toToken.symbol}
                   </Body>
                 </Stack>
               </Stack>
@@ -842,7 +842,7 @@ export function Review({
                   <Body weight="bold">
                     {t('views.ADD_TOKENS.review.receive')}
                     {' '}
-                    {route?.route.estimate.toToken.name}
+                    {route?.route.estimate.toToken.symbol}
                   </Body>
                   <Body
                     size="small"
