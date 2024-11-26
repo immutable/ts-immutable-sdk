@@ -166,28 +166,28 @@ export function AddTokens({
   }, [selectedAmount, inputValue]);
 
   const setSelectedRouteData = (route: RouteData | undefined) => {
-    track({
-      userJourney: UserJourney.ADD_TOKENS,
-      screen: 'InputScreen',
-      control: 'RoutesMenu',
-      controlType: 'MenuItem',
-      extras: {
-        contextId: id,
-        isRouteAvailable: !!route,
-        toTokenAddress: route?.amountData.toToken.address,
-        toTokenChainId: route?.amountData.toToken.chainId,
-        toTokenSymbol: route?.amountData.toToken.symbol,
-        fromTokenAddress: route?.amountData.fromToken.address,
-        fromTokenChainId: route?.amountData.fromToken.chainId,
-        fromTokenSymbol: route?.amountData.fromToken.symbol,
-        toAmount: route?.amountData.toAmount,
-        fromAmount: route?.amountData.fromAmount,
-        hasSwap: getRouteInfo(route).hasSwap,
-        hasBridge: getRouteInfo(route).hasBridge,
-        hasEmbeddedSwap: getRouteInfo(route).hasEmbeddedSwap,
-      },
-    });
-
+    if (route) {
+      track({
+        userJourney: UserJourney.ADD_TOKENS,
+        screen: 'InputScreen',
+        control: 'RoutesMenu',
+        controlType: 'MenuItem',
+        extras: {
+          contextId: id,
+          toTokenAddress: route.amountData.toToken.address,
+          toTokenChainId: route.amountData.toToken.chainId,
+          toTokenSymbol: route.amountData.toToken.symbol,
+          fromTokenAddress: route.amountData.fromToken.address,
+          fromTokenChainId: route.amountData.fromToken.chainId,
+          fromTokenSymbol: route.amountData.fromToken.symbol,
+          toAmount: route.amountData.toAmount,
+          fromAmount: route.amountData.fromAmount,
+          hasSwap: getRouteInfo(route).hasSwap,
+          hasBridge: getRouteInfo(route).hasBridge,
+          hasEmbeddedSwap: getRouteInfo(route).hasEmbeddedSwap,
+        },
+      });
+    }
     addTokensDispatch({
       payload: {
         type: AddTokensActions.SET_SELECTED_ROUTE_DATA,

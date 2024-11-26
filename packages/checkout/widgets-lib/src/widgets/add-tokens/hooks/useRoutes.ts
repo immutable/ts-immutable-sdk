@@ -358,15 +358,7 @@ export const useRoutes = () => {
     return sortedRoutes;
   };
 
-  const getRouteInfo = (route?: RouteData): RouteInfo => {
-    if (!route) {
-      return {
-        hasBridge: undefined,
-        hasSwap: undefined,
-        hasEmbeddedSwap: undefined,
-      };
-    }
-
+  const getRouteInfo = (route: RouteData): RouteInfo => {
     const hasSwap = !!route.route.route.estimate.actions.find(
       (action) => action.type === ActionType.SWAP,
     );
