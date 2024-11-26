@@ -25,7 +25,7 @@ describe('signTypedDataV4', () => {
   const combinedSignature = '0x000202011b1d383526a2815d26550eb314b5d7e0551327330043c4d07715346a7d5517ecbc32304fc1ccdcd52fea386c94c3b58b90410f20cd1d5c6db8fa1f03c34e82dce78c3445ce38583e0b0689c69b8fbedbc33d3a2e45431b01030001d25acf5eef26fb627f91e02ebd111580030ab8fb0a55567ac8cc66c34de7ae98185125a76adc6ee2fea042c7fce9c85a41e790ce3529f93dfec281bf56620ef21b02';
   const ethSigner = {} as Signer;
   const rpcProvider = {
-    _detectNetwork: jest.fn(),
+    getNetwork: jest.fn(),
   };
   const relayerClient = {
     imSignTypedData: jest.fn(),
@@ -43,7 +43,7 @@ describe('signTypedDataV4', () => {
     (signAndPackTypedData as jest.Mock).mockResolvedValueOnce(
       combinedSignature,
     );
-    rpcProvider._detectNetwork.mockResolvedValue({ chainId });
+    rpcProvider.getNetwork.mockResolvedValue({ chainId });
   });
 
   describe('when a valid address and json are provided', () => {

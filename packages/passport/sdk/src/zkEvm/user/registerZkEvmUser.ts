@@ -32,7 +32,7 @@ export async function registerZkEvmUser({
   const signRawPromise = signRaw(MESSAGE_TO_SIGN, ethSigner);
   signRawPromise.then(() => flow.addEvent('endSignRaw'));
 
-  const detectNetworkPromise = rpcProvider._detectNetwork();
+  const detectNetworkPromise = rpcProvider.getNetwork();
   detectNetworkPromise.then(() => flow.addEvent('endDetectNetwork'));
 
   const listChainsPromise = multiRollupApiClients.chainsApi.listChains();
@@ -45,9 +45,7 @@ export async function registerZkEvmUser({
     listChainsPromise,
   ]);
 
-  // const network = new Network('qwerqwer', 12353n)
-
-  const eipChainId = getEip155ChainId(network.chainId);
+  const eipChainId = getEip155ChainId(Number(network.chainId));
   const chainName = chainListResponse.data?.result?.find((chain) => chain.id === eipChainId)?.name;
   if (!chainName) {
     throw new JsonRpcError(
