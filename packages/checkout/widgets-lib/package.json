@@ -15,8 +15,8 @@
   },
   "dependencies": {
     "@0xsquid/sdk": "^2.8.25",
-    "@biom3/design-tokens": "^0.4.4",
-    "@biom3/react": "^0.27.12",
+    "@biom3/design-tokens": "^0.4.5",
+    "@biom3/react": "^0.28.3",
     "@imtbl/bridge-sdk": "workspace:*",
     "@imtbl/checkout-sdk": "workspace:*",
     "@imtbl/config": "workspace:*",
@@ -46,7 +46,7 @@
     "react-i18next": "^13.5.0",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
-    "ts-deepmerge": "^6.2.0",
+    "ts-deepmerge": "^7.0.2",
     "url": "^0.11.0"
   },
   "devDependencies": {
