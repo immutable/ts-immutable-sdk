@@ -45,12 +45,6 @@ export type RouteResponseData = {
   additionalBuffer?: number;
 };
 
-export type RouteInfo = {
-  hasBridge: boolean | undefined;
-  hasSwap: boolean | undefined;
-  hasEmbeddedSwap: boolean | undefined;
-};
-
 export enum FiatOptionType {
   CREDIT = 'credit',
   DEBIT = 'debit',

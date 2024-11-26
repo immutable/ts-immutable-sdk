@@ -28,6 +28,7 @@ import {
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
+import { ActionType } from '@0xsquid/squid-types';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
@@ -96,7 +97,7 @@ export function AddTokens({
 }: AddTokensProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { fetchRoutesWithRateLimit, resetRoutes, getRouteInfo } = useRoutes();
+  const { fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
   const { showErrorHandover } = useError(config.environment);
 
   const {
@@ -182,9 +183,11 @@ export function AddTokens({
           fromTokenSymbol: route.amountData.fromToken.symbol,
           toAmount: route.amountData.toAmount,
           fromAmount: route.amountData.fromAmount,
-          hasSwap: getRouteInfo(route).hasSwap,
-          hasBridge: getRouteInfo(route).hasBridge,
-          hasEmbeddedSwap: getRouteInfo(route).hasEmbeddedSwap,
+          isBridge: route.amountData.toToken.chainId !== route.amountData.fromToken.chainId,
+          isSwap: route.amountData.toToken.chainId === route.amountData.fromToken.chainId,
+          isEmbeddedSwap: !!route.route.route.estimate.actions.find(
+            (action) => action.type === ActionType.SWAP,
+          ),
         },
       });
     }
