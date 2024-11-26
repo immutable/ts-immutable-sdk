@@ -16,7 +16,7 @@ describe('relayerClient', () => {
   };
 
   const rpcProvider: Partial<JsonRpcApiProvider> = {
-    _detectNetwork: jest.fn().mockResolvedValue({ chainId, name: '' }),
+    getNetwork: jest.fn().mockResolvedValue({ chainId, name: '' }),
   };
   const relayerClient = new RelayerClient({
     config: config as PassportConfiguration,

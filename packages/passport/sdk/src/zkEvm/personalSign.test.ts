@@ -24,7 +24,7 @@ describe('personalSign', () => {
     getAddress: jest.fn(),
   };
   const rpcProvider = {
-    _detectNetwork: jest.fn(),
+    getNetwork: jest.fn(),
   };
   const relayerClient = {
     imSign: jest.fn(),
@@ -45,7 +45,7 @@ describe('personalSign', () => {
 
     ethSigner.getAddress.mockResolvedValue(eoaAddress);
     relayerClient.imSign.mockResolvedValue(relayerSignature);
-    rpcProvider._detectNetwork.mockResolvedValue({ chainId });
+    rpcProvider.getNetwork.mockResolvedValue({ chainId });
   });
 
   describe('when a valid address and message are provided', () => {

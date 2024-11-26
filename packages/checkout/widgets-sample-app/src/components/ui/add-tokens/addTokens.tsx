@@ -77,7 +77,9 @@ function AddTokensUI() {
   };
 
   useEffect(() => {
-    passport.connectEvm();
+    const connectEvm = async () => await passport.connectEvm()
+
+    connectEvm();
   }, []);
 
   useEffect(() => {

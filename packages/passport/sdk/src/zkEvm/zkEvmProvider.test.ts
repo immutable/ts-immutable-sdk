@@ -447,7 +447,7 @@ describe('ZkEvmProvider', () => {
 
   describe('eth_chainId', () => {
     const chainId = 13371;
-    const detectNetworkMock = jest.fn();
+    const getNetworkMock = jest.fn();
     const sendMock = jest.fn();
 
     beforeEach(() => {
@@ -455,21 +455,21 @@ describe('ZkEvmProvider', () => {
 
       (JsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
         send: sendMock,
-        _detectNetwork: detectNetworkMock,
+        getNetwork: getNetworkMock,
       }));
     });
 
     it('should call detectNetwork', async () => {
       authManager.getUser.mockResolvedValue(mockUserZkEvm);
 
-      detectNetworkMock.mockResolvedValueOnce({ chainId });
+      getNetworkMock.mockResolvedValueOnce({ chainId });
 
       const provider = getProvider();
 
       const providerParams = { method: 'eth_chainId', params: [] };
       const result = await provider.request(providerParams);
 
-      expect(detectNetworkMock).toBeCalledTimes(1);
+      expect(getNetworkMock).toBeCalledTimes(1);
       expect(sendMock).not.toBeCalled();
       expect(result).toBe(toBeHex(chainId));
     });

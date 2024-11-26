@@ -39,7 +39,7 @@ export default function ConnectWithMetamask() {
     const providerRes = await checkoutSDK.createProvider({ walletProviderName });
     
     // Check if the provider if a BrowserProvider
-    const isProviderRes = await checkout.Checkout.isBrowserProvider(providerRes.provider);
+    const isProviderRes = checkout.Checkout.isBrowserProvider(providerRes.provider);
 
     if(!isProviderRes) {
       console.error('Provider is not a valid BrowserProvider');
@@ -63,7 +63,7 @@ export default function ConnectWithMetamask() {
     // #doc get-token-allow-list
     // Get the list of supported tokens
     const tokenType = await checkout.TokenFilterTypes.ALL;
-    const chainId = connectRes.provider._network.chainId as unknown as checkout.ChainId ?? checkout.ChainId.IMTBL_ZKEVM_TESTNET
+    const chainId = Number((await connectRes.provider.getNetwork()).chainId) as checkout.ChainId ?? checkout.ChainId.IMTBL_ZKEVM_TESTNET
     const tokenAllowList = await checkoutSDK.getTokenAllowList({ type: tokenType, chainId });
     // #enddoc get-token-allow-list
     setTokenAllowList(tokenAllowList);
@@ -76,7 +76,7 @@ export default function ConnectWithMetamask() {
       if (connectedProvider && walletAddress) {
         // #doc get-all-balances
         // Get all token balances of the wallet
-        const chainId = connectedProvider._network.chainId as unknown as checkout.ChainId ?? checkout.ChainId.IMTBL_ZKEVM_TESTNET;
+        const chainId = Number((await connectedProvider.provider.getNetwork()).chainId) as checkout.ChainId ?? checkout.ChainId.IMTBL_ZKEVM_TESTNET
         const allBalancesResponse = await checkoutSDK.getAllBalances({ provider: connectedProvider, walletAddress, chainId });
         // #enddoc get-all-balances
         setAllBalances(allBalancesResponse);
