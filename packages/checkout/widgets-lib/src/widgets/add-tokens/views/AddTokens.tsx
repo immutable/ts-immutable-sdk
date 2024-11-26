@@ -185,7 +185,7 @@ export function AddTokens({
           fromAmount: route.amountData.fromAmount,
           isBridge: route.amountData.toToken.chainId !== route.amountData.fromToken.chainId,
           isSwap: route.amountData.toToken.chainId === route.amountData.fromToken.chainId,
-          isEmbeddedSwap: !!route.route.route.estimate.actions.find(
+          hasEmbeddedSwap: !!route.route.route.estimate.actions.find(
             (action) => action.type === ActionType.SWAP,
           ),
         },
