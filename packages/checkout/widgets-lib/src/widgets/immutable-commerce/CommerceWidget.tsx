@@ -245,16 +245,14 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
           />
         )}
         {/* --- Widgets that require providers context --- */}
-        {shouldWrapWithProvidersContext && (
-          <ProvidersContextProvider initialState={{ checkout }}>
-            {view.type === CommerceFlowType.ADD_TOKENS && (
-              <AddTokensWidget
-                config={widgetsConfig}
-                {...(view.data.params || {})}
-                {...(view.data.config || {})}
-                showBackButton={showBackButton}
-              />
-            )}
+        {shouldWrapWithProvidersContext && view.type === CommerceFlowType.ADD_TOKENS && (
+          <ProvidersContextProvider initialState={{ checkout, toProvider: view.data.params.toProvider }}>
+            <AddTokensWidget
+              config={widgetsConfig}
+              {...(view.data.params || {})}
+              {...(view.data.config || {})}
+              showBackButton={showBackButton}
+            />
           </ProvidersContextProvider>
         )}
         {/* --- Widgets that require connect loader --- */}
