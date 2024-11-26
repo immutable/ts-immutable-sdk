@@ -19,7 +19,7 @@
   },
   "private": true,
   "scripts": {
-    "dev": "concurrently 'next dev' 'pnpm run -w dev @imtbl/dex-sdk'",
+    "dev": "concurrently 'next dev' 'pnpm run -w dev'",
     "lint": "eslint ./src --ext .ts --max-warnings=0 --no-error-on-unmatched-pattern",
     "start": "next start"
   }
