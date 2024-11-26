@@ -15,7 +15,7 @@ export interface AddTokensState {
   selectedRouteData: RouteData | undefined;
   selectedToken: TokenInfo | undefined;
   selectedAmount: string;
-  isSwapAvailable: boolean;
+  isSwapAvailable: boolean | undefined;
 }
 
 export const initialAddTokensState: AddTokensState = {
@@ -29,7 +29,7 @@ export const initialAddTokensState: AddTokensState = {
   selectedRouteData: undefined,
   selectedToken: undefined,
   selectedAmount: '',
-  isSwapAvailable: false,
+  isSwapAvailable: undefined,
 };
 
 export interface AddTokensContextState {
