@@ -10,8 +10,9 @@ export default defineConfig((options) => ({
   target: 'es2022',
   bundle: true,
   clean: !options.watch,
-  splitting: false,
-  minify: !options.watch,
+  splitting: false,  
+  //only minify identifiers, other settings cause: Critical dependency: the request of a dependency is an expression
+  minifyIdentifiers: !options.watch,
   skipNodeModulesBundle: true,
   esbuildPlugins: [
     replace({ 
