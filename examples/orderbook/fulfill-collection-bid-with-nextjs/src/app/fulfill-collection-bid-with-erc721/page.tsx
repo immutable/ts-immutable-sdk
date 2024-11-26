@@ -15,7 +15,7 @@ import {
 import { orderbook } from "@imtbl/sdk";
 import { OrderStatusName } from "@imtbl/sdk/orderbook";
 import { Provider, ProviderEvent } from "@imtbl/sdk/passport";
-import { BrowserProvider, ethers, JsonRpcSigner } from "ethers";
+import { BrowserProvider, JsonRpcSigner } from "ethers";
 import NextLink from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { unitsRemaining, unitsTotal } from "../utils/collectionBid";
