@@ -358,7 +358,9 @@ function CheckoutUI() {
 
   // announce passport provider
   useEffect(() => {
-    passportClient.connectEvm({ announceProvider: true });
+    const connectEvm = async () => await passportClient.connectEvm({ announceProvider: true });
+
+    connectEvm();
   }, []);
 
   // after this dApp creates a browserProvider recreate widget

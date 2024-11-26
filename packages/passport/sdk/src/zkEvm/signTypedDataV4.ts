@@ -78,7 +78,7 @@ export const signTypedDataV4 = async ({
     throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `${method} requires an address and a typed data JSON`);
   }
 
-  const { chainId } = await rpcProvider._detectNetwork();
+  const { chainId } = await rpcProvider.getNetwork();
   const typedData = transformTypedData(typedDataParam, chainId.toString());
   flow.addEvent('endDetectNetwork');
 

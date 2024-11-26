@@ -1,6 +1,6 @@
 import { Flow } from '@imtbl/metrics';
 import {
-  Signer, TransactionRequest, ZeroAddress, JsonRpcProvider,
+  Signer, TransactionRequest, JsonRpcProvider,
   BigNumberish,
 } from 'ethers';
 import {
@@ -59,13 +59,6 @@ const getFeeOption = async (
   return imxFeeOption;
 };
 
-export const getTransactionRequestTo = async (transactionRequest: TransactionRequest) => {
-  if (!transactionRequest.to) return ZeroAddress;
-  if (transactionRequest.to instanceof Promise) return await transactionRequest.to;
-  if (typeof transactionRequest.to === 'string') return transactionRequest.to;
-  return transactionRequest.to?.getAddress();
-};
-
 /**
  * Prepares the meta transactions array to be signed by estimating the fee and
  * getting the nonce from the smart wallet.
@@ -84,10 +77,8 @@ const buildMetaTransactions = async (
     );
   }
 
-  const to = await getTransactionRequestTo(transactionRequest);
-
   const metaTransaction: MetaTransaction = {
-    to,
+    to: transactionRequest.to.toString(),
     data: transactionRequest.data,
     nonce: BigInt(0), // NOTE: We don't need a valid nonce to estimate the fee
     value: transactionRequest.value,
@@ -195,7 +186,7 @@ export const prepareAndSignTransaction = async ({
   // without waiting for the validation to complete
   const validateTransaction = async () => {
     await guardianClient.validateEVMTransaction({
-      chainId: getEip155ChainId(chainId),
+      chainId: getEip155ChainId(Number(chainId)),
       nonce: convertBigNumberishToString(nonce),
       metaTransactions,
     });
@@ -285,6 +276,6 @@ export const prepareAndSignEjectionTransaction = async ({
   return {
     to: zkEvmAddress,
     data: signedTransaction,
-    chainId: getEip155ChainId(BigInt(transactionRequest.chainId ?? 0)),
+    chainId: getEip155ChainId(Number(transactionRequest.chainId ?? 0)),
   };
 };
