@@ -61,7 +61,7 @@ export function ConnectWalletDrawer({
   getShouldRequestWalletPermissions,
 }: ConnectWalletDrawerProps) {
   const {
-    providersState: { checkout, fromProvider },
+    providersState: { checkout, fromProvider, lockedToProvider },
     providersDispatch,
   } = useProvidersContext();
 
@@ -126,7 +126,8 @@ export function ConnectWalletDrawer({
       });
 
       if (isConnected) {
-        if (providerType === 'from' || (providerType === 'to' && !isPassportProvider(fromProvider))) {
+        if ((providerType === 'from' && !lockedToProvider)
+         || (providerType === 'to' && !isPassportProvider(fromProvider))) {
           await checkout.passport?.logout();
         }
       }
