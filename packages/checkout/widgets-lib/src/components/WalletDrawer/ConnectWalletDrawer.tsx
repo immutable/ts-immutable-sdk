@@ -67,7 +67,7 @@ export function ConnectWalletDrawer({
     providersDispatch,
   } = useProvidersContext();
 
-  const { identify, track } = useAnalytics();
+  const { identify, track, user } = useAnalytics();
 
   const prevWalletChangeEvent = useRef<WalletChangeEvent | undefined>();
 
@@ -147,9 +147,16 @@ export function ConnectWalletDrawer({
         shouldRequestWalletPermissions,
       );
 
+      // Identify connected wallet, retaining current anonymousId
       if (shouldIdentifyUser) {
-        // Identify connected wallet
+        const userData = user ? await user() : undefined;
+        const anonymousId = userData?.anonymousId();
+
         await identifyUser(identify, provider);
+
+        if (anonymousId) {
+          (await user()).anonymousId(anonymousId);
+        }
       }
 
       // Store selected provider as fromProvider in context
