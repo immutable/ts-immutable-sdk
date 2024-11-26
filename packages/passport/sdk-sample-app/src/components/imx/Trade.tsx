@@ -49,7 +49,7 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
 
   useEffect(() => {
     getOrders().catch(console.error);
-  }, [showTradeModal, sdkClient]);
+  }, [showTradeModal, sdkClient, getOrders]);
 
   const handleCloseTrade = () => {
     setLoadingTrade(false);
