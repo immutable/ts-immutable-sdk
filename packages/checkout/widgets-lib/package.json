@@ -16,7 +16,8 @@
   "dependencies": {
     "@0xsquid/sdk": "^2.8.25",
     "@biom3/design-tokens": "^0.4.5",
-    "@biom3/react": "^0.28.3",
+    "@biom3/react": "^0.28.6",
+    "@emotion/react": "^11.13.5",
     "@imtbl/bridge-sdk": "workspace:*",
     "@imtbl/checkout-sdk": "workspace:*",
     "@imtbl/config": "workspace:*",
