@@ -21,6 +21,7 @@ packages:
   - "packages/checkout/widgets-lib"
   - "packages/blockchain-data/sdk"
   - "packages/game-bridge"
+  - "packages/moo"
   - "packages/webhook/sdk"
   - "packages/minting-backend/sdk"
   - "tests/**"
