@@ -1094,8 +1094,8 @@ importers:
         specifier: ^0.4.4
         version: 0.4.4
       '@biom3/react':
-        specifier: ^0.27.12
-        version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.28.3
+        version: 0.28.3(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ts-deepmerge@7.0.2)
       '@imtbl/checkout-sdk':
         specifier: workspace:*
         version: link:../sdk
@@ -1197,11 +1197,11 @@ importers:
         specifier: ^2.8.25
         version: 2.8.25(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@biom3/design-tokens':
-        specifier: ^0.4.4
-        version: 0.4.4
+        specifier: ^0.4.5
+        version: 0.4.5
       '@biom3/react':
-        specifier: ^0.27.12
-        version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.28.3
+        version: 0.28.3(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ts-deepmerge@7.0.2)
       '@imtbl/bridge-sdk':
         specifier: workspace:*
         version: link:../../internal/bridge/sdk
@@ -1290,8 +1290,8 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0
       ts-deepmerge:
-        specifier: ^6.2.0
-        version: 6.2.0
+        specifier: ^7.0.2
+        version: 7.0.2
       url:
         specifier: ^0.11.0
         version: 0.11.1
@@ -1381,8 +1381,8 @@ importers:
         specifier: ^0.4.4
         version: 0.4.4
       '@biom3/react':
-        specifier: ^0.27.12
-        version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.28.3
+        version: 0.28.3(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ts-deepmerge@7.0.2)
       '@imtbl/checkout-sdk':
         specifier: workspace:*
         version: link:../sdk
@@ -2181,8 +2181,8 @@ importers:
         specifier: ^0.4.4
         version: 0.4.4
       '@biom3/react':
-        specifier: ^0.27.12
-        version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.28.3
+        version: 0.28.3(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ts-deepmerge@7.0.2)
       '@imtbl/blockchain-data':
         specifier: workspace:*
         version: link:../../blockchain-data/sdk
@@ -2458,8 +2458,8 @@ importers:
   packages/x-provider/src/sample-app:
     dependencies:
       '@biom3/react':
-        specifier: ^0.27.12
-        version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.28.3
+        version: 0.28.3(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ts-deepmerge@7.0.2)
       '@imtbl/sdk':
         specifier: workspace:*
         version: link:../../../../sdk
@@ -4030,6 +4030,17 @@ packages:
       framer-motion: ^10.12.12
       react: ^18.3.0
       react-dom: ^18.3.0
+
+  '@biom3/react@0.28.3':
+    resolution: {integrity: sha512-wZrc0G7x4DtdgOi09/MBWweqvs9pwPVgoZTfRIODI6BtJeKv0QK8LCLqwaz49mTZPA2hlM8UuCGq64MRJZuO4A==}
+    peerDependencies:
+      '@emotion/react': ^11.11.4
+      '@rive-app/react-canvas-lite': ^4.9.0
+      embla-carousel-react: ^8.0.4
+      framer-motion: ^10.12.12
+      react: ^18.3.0
+      react-dom: ^18.3.0
+      ts-deepmerge: ^7.0.2
 
   '@cnakazawa/watch@1.0.4':
     resolution: {integrity: sha512-v9kIhKwjeZThiWrLmj0y17CWoyddASLj9O2yvbZkbvw/N3rWOYy9zkV66ursAoVr0mV15bL8g0c4QZUE6cdDoQ==}
@@ -16637,6 +16648,10 @@ packages:
     resolution: {integrity: sha512-2qxI/FZVDPbzh63GwWIZYE7daWKtwXZYuyc8YNq0iTmMUwn4mL0jRLsp6hfFlgbdRSR4x2ppe+E86FnvEpN7Nw==}
     engines: {node: '>=14.13.1'}
 
+  ts-deepmerge@7.0.2:
+    resolution: {integrity: sha512-akcpDTPuez4xzULo5NwuoKwYRtjQJ9eoNfBACiBMaXwNAx7B1PKfe5wqUFJuW5uKzQ68YjDFwPaWHDG1KnFGsA==}
+    engines: {node: '>=14.13.1'}
+
   ts-essentials@7.0.3:
     resolution: {integrity: sha512-8+gr5+lqO3G84KdiTSMRLtuyJ+nTBVRKuCrK4lidMPdVeEp0uqC875uE5NMcaA7YYMN7XsNiFQuMvasF8HT/xQ==}
     peerDependencies:
@@ -19510,6 +19525,27 @@ snapshots:
       react-is: 18.2.0
       react-keyed-flatten-children: 3.0.0(react@18.3.1)
       ts-deepmerge: 6.2.0
+
+  '@biom3/react@0.28.3(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ts-deepmerge@7.0.2)':
+    dependencies:
+      '@biom3/design-tokens': 0.4.5
+      '@emotion/react': 11.11.3(@types/react@18.3.7)(react@18.3.1)
+      '@imtbl/image-resizer-utils': 0.0.2
+      '@rive-app/react-canvas-lite': 4.9.0(react@18.3.1)
+      csstype: 3.1.2
+      embla-carousel-react: 8.1.5(react@18.3.1)
+      framer-motion: 11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      hls.js: 1.5.13
+      localforage: 1.10.0
+      lodash.debounce: 4.0.8
+      lodash.get: 4.4.2
+      lodash.isequal: 4.5.0
+      lodash.throttle: 4.1.1
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      react-is: 18.2.0
+      react-keyed-flatten-children: 3.0.0(react@18.3.1)
+      ts-deepmerge: 7.0.2
 
   '@cnakazawa/watch@1.0.4':
     dependencies:
@@ -37477,6 +37513,8 @@ snapshots:
       string-format: 2.0.0
 
   ts-deepmerge@6.2.0: {}
+
+  ts-deepmerge@7.0.2: {}
 
   ts-essentials@7.0.3(typescript@5.6.2):
     dependencies:
