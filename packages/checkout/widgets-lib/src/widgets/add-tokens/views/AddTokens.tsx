@@ -258,7 +258,8 @@ export function AddTokens({
   );
 
   useEffect(() => {
-    if (!id) { return; }
+    if (!id || isSwapAvailable === undefined) { return; }
+
     page({
       userJourney: UserJourney.ADD_TOKENS,
       screen: 'InputScreen',
