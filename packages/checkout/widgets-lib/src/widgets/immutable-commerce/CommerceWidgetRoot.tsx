@@ -139,6 +139,12 @@ export class CommerceWidgetRoot extends Base<WidgetType.IMMUTABLE_COMMERCE> {
       validatedParams.toTokenAddress = '';
     }
 
+    if (!params.toProvider?.provider) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "toProvider" widget input');
+      validatedParams.toProvider = undefined;
+    }
+
     return validatedParams;
   }
 
