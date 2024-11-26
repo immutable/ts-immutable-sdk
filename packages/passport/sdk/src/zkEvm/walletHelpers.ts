@@ -188,8 +188,8 @@ export const packSignatures = (
     },
   ];
   const sortedSigners = combinedSigners.sort((a, b) => {
-    const bigA = BigInt(a.address ?? '');
-    const bigB = BigInt(b.address ?? '');
+    const bigA = BigInt(a.address ?? 0);
+    const bigB = BigInt(b.address ?? 0);
 
     if (bigA <= bigB) {
       return -1;
@@ -256,4 +256,4 @@ export const signERC191Message = async (
   return signer.signMessage(subDigestHashArray);
 };
 
-export const getEip155ChainId = (chainId: bigint) => `eip155:${chainId}`;
+export const getEip155ChainId = (chainId: number) => `eip155:${chainId}`;

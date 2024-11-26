@@ -1,7 +1,6 @@
 import { passport } from "@imtbl/sdk";
 import { Environment, ImmutableConfiguration } from "@imtbl/sdk/config";
 
-
 	// #doc passport-telegram-mini-app-configuration
 	export const passportInstance = new passport.Passport({
 		baseConfig: new ImmutableConfiguration({ environment: Environment.SANDBOX }),

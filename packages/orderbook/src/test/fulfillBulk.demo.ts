@@ -46,8 +46,6 @@ describe('', () => {
 
     const nftAddress = await nftContract.getAddress();
 
-    // log(`current id ${await nftContract.getCurrentIdCounter()}`);
-
     // uncomment the overrides and set variables in
     // .env to run on environments other than testnet (e.g. devnet)
     // const configOverrides = getConfigFromEnv();
@@ -123,8 +121,6 @@ describe('', () => {
     await waitForOrderToBeOfStatus(sdk, orderId1, OrderStatusName.ACTIVE);
     await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatusName.ACTIVE);
     log(`Listings ${orderId1} and ${orderId2} is now ACTIVE, fulfilling order...`);
-
-    // log(`new fulfiller has ${(await newFulfiller.getBalance()).toString()} balance`);
 
     const fulfillResponse1 = await sdk.fulfillBulkOrders(
       [

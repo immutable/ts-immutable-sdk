@@ -31,7 +31,7 @@ describe('registerZkEvmUser', () => {
     },
   };
   const jsonRPCProvider = {
-    _detectNetwork: jest.fn(),
+    getNetwork: jest.fn(),
   };
   const flow = {
     addEvent: jest.fn(),
@@ -46,7 +46,7 @@ describe('registerZkEvmUser', () => {
     ethSignerMock.getAddress.mockResolvedValue(ethereumAddress);
     (signRaw as jest.Mock).mockResolvedValue(ethereumSignature);
     multiRollupApiClients.chainsApi.listChains.mockResolvedValue(mockListChains);
-    jsonRPCProvider._detectNetwork.mockResolvedValue({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
+    jsonRPCProvider.getNetwork.mockResolvedValue({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
   });
 
   describe('when createCounterfactualAddressV2 doesn\'t return a 201', () => {

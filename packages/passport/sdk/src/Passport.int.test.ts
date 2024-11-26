@@ -56,7 +56,7 @@ const oidcConfiguration: OidcConfiguration = {
   logoutRedirectUri,
 };
 
-const getZkEvmProvider = () => {
+const getZkEvmProvider = async () => {
   const passport = new Passport({
     baseConfig: new ImmutableConfiguration({
       environment: Environment.SANDBOX,
@@ -68,7 +68,7 @@ const getZkEvmProvider = () => {
     scope: 'openid offline_access profile email transact',
   });
 
-  return passport.connectEvm();
+  return await passport.connectEvm();
 };
 
 describe('Passport', () => {
