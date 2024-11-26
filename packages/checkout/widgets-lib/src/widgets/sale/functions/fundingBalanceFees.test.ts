@@ -97,7 +97,7 @@ describe('getFundingBalanceTotalFees', () => {
     const expected: FeesBySymbol = {
       tIMX: {
         type: FeeType.GAS,
-        amount: expect.any(Object),
+        amount: expect.any(BigInt),
         formattedAmount: '0.00021', // sum amount of all tIMX
         token: {
           name: 'Immutable Testnet Token',
@@ -108,7 +108,7 @@ describe('getFundingBalanceTotalFees', () => {
       },
       zkCORE: {
         type: FeeType.SWAP_FEE,
-        amount: expect.any(Object),
+        amount: expect.any(BigInt),
         formattedAmount: '0.6', // sum amount of all zkCORE
         token: {
           name: 'Core',

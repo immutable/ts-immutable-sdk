@@ -3,6 +3,7 @@ import {
   Body,
   Box,
   Button,
+  DeeplyNestedSx,
   Divider,
   Icon,
   MenuItem,
@@ -139,8 +140,7 @@ export function TransactionItemWithdrawPending({
             pr: 'base.spacing.x10',
           },
           borderTopRightRadius: '0',
-          borderTopLeftRadius: '0',
-        }}
+        } as unknown as DeeplyNestedSx}
         onExpandChange={
           (expanded) => expanded
             && track({

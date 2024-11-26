@@ -12,7 +12,7 @@ export function SquidIcon({
     <SvgIcon
       viewBox="0 0 24 24"
       xmlns="http://www.w3.org/2000/svg"
-      sx={merge({ w: '100%' }, sx)}
+      sx={merge({ w: '100%' }, sx) as DeeplyNestedSx}
       className={className}
     >
       <rect width="24" height="24" fill="#E6FA36" />

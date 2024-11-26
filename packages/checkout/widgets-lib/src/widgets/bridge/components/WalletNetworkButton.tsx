@@ -1,5 +1,5 @@
 import {
-  Body, Box, Button, FramedImage, Heading, Logo, useTheme,
+  Body, Box, Button, DeeplyNestedSx, FramedImage, Heading, Logo, useTheme,
 } from '@biom3/react';
 import {
   ChainId, EIP6963ProviderDetail, WrappedBrowserProvider, WalletProviderRdns,
@@ -80,7 +80,7 @@ export function WalletNetworkButton({
   return (
     <Box
       testId={`${testId}-${walletProviderDetail?.info.rdns}-${chainId}-button-wrapper`}
-      sx={walletButtonOuterStyles}
+      sx={walletButtonOuterStyles as unknown as DeeplyNestedSx}
       onClick={onWalletClick}
     >
       {isWalletConnect && walletLogoUrl ? (
