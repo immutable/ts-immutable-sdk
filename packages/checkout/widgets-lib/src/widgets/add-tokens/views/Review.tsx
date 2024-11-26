@@ -10,6 +10,7 @@ import {
   Body,
   ButtCon,
   Button,
+  DeeplyNestedSx,
   EllipsizedText,
   FramedIcon,
   FramedImage,
@@ -761,7 +762,7 @@ export function Review({
                     top: '-14px',
                     h: 'base.spacing.x10',
                   },
-                }}
+                } as unknown as DeeplyNestedSx}
               />
               {/*
 
@@ -823,7 +824,7 @@ export function Review({
                     top: '-26px',
                     h: 'base.spacing.x10',
                   },
-                }}
+                } as unknown as DeeplyNestedSx}
               />
               {/*
 
@@ -901,7 +902,7 @@ export function Review({
                     top: '-8px',
                     h: 'base.spacing.x5',
                   },
-                }}
+                } as unknown as DeeplyNestedSx}
               />
               {/*
 
