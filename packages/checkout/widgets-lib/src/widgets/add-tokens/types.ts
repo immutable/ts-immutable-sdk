@@ -46,9 +46,9 @@ export type RouteResponseData = {
 };
 
 export type RouteInfo = {
-  hasBridge: boolean;
-  hasSwap: boolean;
-  hasEmbeddedSwap: boolean;
+  hasBridge: boolean | undefined;
+  hasSwap: boolean | undefined;
+  hasEmbeddedSwap: boolean | undefined;
 };
 
 export enum FiatOptionType {

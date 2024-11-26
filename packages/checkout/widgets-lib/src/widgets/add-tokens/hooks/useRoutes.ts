@@ -361,9 +361,9 @@ export const useRoutes = () => {
   const getRouteInfo = (route?: RouteData): RouteInfo => {
     if (!route) {
       return {
-        hasBridge: false,
-        hasSwap: false,
-        hasEmbeddedSwap: false,
+        hasBridge: undefined,
+        hasSwap: undefined,
+        hasEmbeddedSwap: undefined,
       };
     }
 
