@@ -9,7 +9,6 @@ import {
   Stack,
 } from '@biom3/react';
 import debounce from 'lodash.debounce';
-import { ActionType } from '@0xsquid/squid-types';
 import {
   ChainId,
   type Checkout,
@@ -97,7 +96,7 @@ export function AddTokens({
 }: AddTokensProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
+  const { fetchRoutesWithRateLimit, resetRoutes, getRouteInfo } = useRoutes();
   const { showErrorHandover } = useError(config.environment);
 
   const {
@@ -177,13 +176,15 @@ export function AddTokens({
           contextId: id,
           toTokenAddress: route.amountData.toToken.address,
           toTokenChainId: route.amountData.toToken.chainId,
+          toTokenSymbol: route.amountData.toToken.symbol,
           fromTokenAddress: route.amountData.fromToken.address,
           fromTokenChainId: route.amountData.fromToken.chainId,
+          fromTokenSymbol: route.amountData.fromToken.symbol,
           toAmount: route.amountData.toAmount,
           fromAmount: route.amountData.fromAmount,
-          hasEmbeddedSwap: !!route.route.route.estimate.actions.find(
-            (action) => action.type === ActionType.SWAP,
-          ),
+          hasSwap: getRouteInfo(route).hasSwap,
+          hasBridge: getRouteInfo(route).hasBridge,
+          hasEmbeddedSwap: getRouteInfo(route).hasEmbeddedSwap,
         },
       });
     }

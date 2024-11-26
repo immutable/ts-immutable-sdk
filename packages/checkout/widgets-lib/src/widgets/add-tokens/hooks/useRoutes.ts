@@ -5,7 +5,7 @@ import { BigNumber, utils } from 'ethers';
 import { useContext, useRef } from 'react';
 import { delay } from '../functions/delay';
 import {
-  AmountData, RouteData, RouteResponseData, Token,
+  AmountData, RouteData, RouteResponseData, Token, RouteInfo,
 } from '../types';
 import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
 import { AddTokensActions, AddTokensContext } from '../context/AddTokensContext';
@@ -358,10 +358,30 @@ export const useRoutes = () => {
     return sortedRoutes;
   };
 
+  const getRouteInfo = (route: RouteData): RouteInfo => {
+    const hasSwap = !!route.route.route.estimate.actions.find(
+      (action) => action.type === ActionType.SWAP,
+    );
+
+    const hasBridge = !!route.route.route.estimate.actions.find(
+      (action) => action.type === ActionType.BRIDGE,
+    );
+
+    const hasEmbeddedSwap = hasSwap
+      && route.amountData.toToken.symbol === route.amountData.fromToken.symbol;
+
+    return {
+      hasBridge,
+      hasSwap,
+      hasEmbeddedSwap,
+    };
+  };
+
   return {
     fetchRoutesWithRateLimit,
     getAmountData,
     getRoute,
     resetRoutes,
+    getRouteInfo,
   };
 };
