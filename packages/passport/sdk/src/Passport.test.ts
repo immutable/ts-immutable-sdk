@@ -232,7 +232,7 @@ describe('Passport', () => {
         ...oidcConfiguration,
       });
 
-      passportInstance.connectEvm({ announceProvider: false });
+      await passportInstance.connectEvm({ announceProvider: false });
 
       expect(announceProvider).not.toHaveBeenCalled();
     });

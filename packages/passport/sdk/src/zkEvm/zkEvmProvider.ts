@@ -244,6 +244,7 @@ export class ZkEvmProvider implements Provider {
         try {
           const user = await this.#authManager.getUserOrLogin();
           flow.addEvent('endGetUserOrLogin');
+
           if (!this.#ethSigner) {
             this.#initialiseEthSigner(user);
           }
@@ -352,7 +353,7 @@ export class ZkEvmProvider implements Provider {
             if (this.#config.forceScwDeployBeforeMessageSignature) {
               // Check if the smart contract wallet has been deployed
               const nonce = await getNonce(this.#rpcProvider, zkEvmAddress);
-              if (nonce ! > BigInt(0)) {
+              if (!(nonce > BigInt(0))) {
                 // If the smart contract wallet has not been deployed,
                 // submit a transaction before signing the message
                 return await sendDeployTransactionAndPersonalSign({
@@ -434,8 +435,7 @@ export class ZkEvmProvider implements Provider {
         // JsonRpcProvider, this function will still work as expected given
         // that detectNetwork call _uncachedDetectNetwork which will force
         // the provider to re-fetch the chainId from remote.
-        // eslint-disable-next-line no-underscore-dangle
-        const { chainId } = await this.#rpcProvider._detectNetwork();
+        const { chainId } = await this.#rpcProvider.getNetwork();
         return toBeHex(chainId);
       }
       // Pass through methods

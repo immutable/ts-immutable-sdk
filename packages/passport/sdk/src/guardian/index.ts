@@ -313,7 +313,7 @@ export default class GuardianClient {
       const messageEvalResponse = await this.guardianApi.evaluateErc191Message(
         {
           eRC191MessageEvaluationRequest: {
-            chainID: getEip155ChainId(chainID),
+            chainID: getEip155ChainId(Number(chainID)),
             payload,
           },
         },
