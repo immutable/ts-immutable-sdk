@@ -9,7 +9,6 @@ import {
   Stack,
 } from '@biom3/react';
 import debounce from 'lodash.debounce';
-import { ActionType } from '@0xsquid/squid-types';
 import {
   ChainId,
   type Checkout,
@@ -29,6 +28,7 @@ import {
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
+import { ActionType } from '@0xsquid/squid-types';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
@@ -177,17 +177,20 @@ export function AddTokens({
           contextId: id,
           toTokenAddress: route.amountData.toToken.address,
           toTokenChainId: route.amountData.toToken.chainId,
+          toTokenSymbol: route.amountData.toToken.symbol,
           fromTokenAddress: route.amountData.fromToken.address,
           fromTokenChainId: route.amountData.fromToken.chainId,
+          fromTokenSymbol: route.amountData.fromToken.symbol,
           toAmount: route.amountData.toAmount,
           fromAmount: route.amountData.fromAmount,
+          isBridge: route.amountData.toToken.chainId !== route.amountData.fromToken.chainId,
+          isSwap: route.amountData.toToken.chainId === route.amountData.fromToken.chainId,
           hasEmbeddedSwap: !!route.route.route.estimate.actions.find(
             (action) => action.type === ActionType.SWAP,
           ),
         },
       });
     }
-
     addTokensDispatch({
       payload: {
         type: AddTokensActions.SET_SELECTED_ROUTE_DATA,
