@@ -1,3 +1,4 @@
+import { Eip1193Provider } from 'ethers';
 import { ChainId } from './chains';
 import { TokenInfo } from './tokenInfo';
 import { WrappedBrowserProvider } from './provider';
@@ -33,7 +34,7 @@ export interface GetBalanceResult {
  * @property {ChainId} chainId - The ID of the network.
  */
 export interface GetAllBalancesParams {
-  provider?: WrappedBrowserProvider;
+  provider?: WrappedBrowserProvider | Eip1193Provider;
   walletAddress?: string;
   chainId: ChainId;
 }
