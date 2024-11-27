@@ -2,7 +2,6 @@ import { Checkout, TokenFilterTypes, TokenInfo } from '@imtbl/checkout-sdk';
 import {
   Box,
   ButtCon,
-  DeeplyNestedSx,
   Drawer,
   FramedImage,
   MenuItem,
@@ -229,7 +228,7 @@ export function TokenDrawerMenu({
                 '&:hover': {
                   boxShadow: ({ base }) => `0 0 0 ${base.border.size[200]} ${base.color.text.body.primary}`,
                 },
-              } as unknown as DeeplyNestedSx}
+              }}
             />
           </SmartClone>
         ) : (
