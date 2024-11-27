@@ -1254,8 +1254,8 @@ importers:
         specifier: workspace:*
         version: link:../../passport/sdk
       '@imtbl/react-analytics':
-        specifier: 0.2.1-alpha
-        version: 0.2.1-alpha(encoding@0.1.13)
+        specifier: 0.3.2-alpha
+        version: 0.3.2-alpha(encoding@0.1.13)
       '@rive-app/react-canvas-lite':
         specifier: ^4.9.0
         version: 4.9.0(react@18.3.1)
@@ -4864,6 +4864,9 @@ packages:
 
   '@imtbl/react-analytics@0.2.1-alpha':
     resolution: {integrity: sha512-oDqDmCn+qJPsLnXV+DnP7VxNWLs6wES1020AprgqZh1k5lq0hoZ1ATtEPsq/u1zg9V94glC6lLCVtl28eHbj9w==}
+
+  '@imtbl/react-analytics@0.3.2-alpha':
+    resolution: {integrity: sha512-HQuVby8XK3koyphtKmBVtezN86xhkshaP+VJgKxDgGhYzVkNbKOffLrtSapCqWB/0v5THmsahLVq0xIWQM67RA==}
 
   '@imtbl/sdk@1.63.0':
     resolution: {integrity: sha512-qyv+tl28UTFRNKW2p5G0Zo5PJfas7k7UwsBqAXm7PenFUEt18HBMW/rBJgqc2jxFZqt0tmEVJHGWCc6nd7DxjQ==}
@@ -20647,6 +20650,14 @@ snapshots:
       buffer: 6.0.3
 
   '@imtbl/react-analytics@0.2.1-alpha(encoding@0.1.13)':
+    dependencies:
+      '@segment/analytics-next': 1.54.0(encoding@0.1.13)
+      react: 18.3.1
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
+
+  '@imtbl/react-analytics@0.3.2-alpha(encoding@0.1.13)':
     dependencies:
       '@segment/analytics-next': 1.54.0(encoding@0.1.13)
       react: 18.3.1
