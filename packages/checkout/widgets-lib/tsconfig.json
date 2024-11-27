@@ -1,25 +1,17 @@
 {
-	"extends": "../../../tsconfig.base.json",
-	"compilerOptions": {
-		"jsx": "react-jsx",
-		"lib": ["ES2022", "DOM"],
-		"baseUrl": "./",
-		"esModuleInterop": true,
-		"target": "ESNext",
-		"composite": false,
-		"declaration": true,
-		"declarationMap": true,
-		"forceConsistentCasingInFileNames": true,
-		"inlineSources": false,
-		"isolatedModules": true,
-		"moduleResolution": "node",
-		"noUnusedLocals": false,
-		"noUnusedParameters": false,
-		"preserveWatchOutput": true,
-		"skipLibCheck": true,
-		"strict": true,
-		"jsxImportSource": "@emotion/react"
-	},
-	"include": ["src"],
-	"exclude": ["node_modules", "dist"]
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "customConditions": ["development"],
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "jsx": "react-jsx",
+    "noImplicitAny": false,
+    "jsxImportSource": "@emotion/react",
+    "experimentalDecorators": true,
+    "types": ["@segment/analytics-next", "jest", "node"]
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }
