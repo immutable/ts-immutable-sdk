@@ -1,3 +1,4 @@
+import { Eip1193Provider } from 'ethers';
 import { CancelOverrides } from './smartCheckout';
 import { WrappedBrowserProvider } from './provider';
 
@@ -9,7 +10,7 @@ import { WrappedBrowserProvider } from './provider';
  * Currently only processes the first order in the array until batch processing is supported.
  */
 export interface CancelParams {
-  provider: WrappedBrowserProvider;
+  provider: WrappedBrowserProvider | Eip1193Provider;
   orderIds: string[];
   overrides?: CancelOverrides;
 }
