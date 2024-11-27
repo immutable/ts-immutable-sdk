@@ -1,3 +1,4 @@
+import { Eip1193Provider } from 'ethers';
 import { SellOrder } from './smartCheckout';
 import { WrappedBrowserProvider } from './provider';
 
@@ -8,6 +9,6 @@ import { WrappedBrowserProvider } from './provider';
  * Currently only processes the first order in the array until batch processing is supported.
  */
 export interface SellParams {
-  provider: WrappedBrowserProvider;
+  provider: WrappedBrowserProvider | Eip1193Provider;
   orders: Array<SellOrder>;
 }

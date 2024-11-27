@@ -1,5 +1,6 @@
 // this function needs to be in a separate file to prevent circular dependencies with ./network
 
+import { Eip1193Provider } from 'ethers';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { CheckoutConfiguration } from '../config';
 import {
@@ -10,27 +11,25 @@ import { getNetworkAllowList } from '../network';
 import { getUnderlyingChainId } from './getUnderlyingProvider';
 
 export function isWrappedBrowserProvider(
-  browserProvider: WrappedBrowserProvider,
+  browserProvider: WrappedBrowserProvider | Eip1193Provider,
 ): boolean {
-  return browserProvider && Boolean(browserProvider.send) && typeof browserProvider.send === 'function';
+  return browserProvider && 'send' in browserProvider && typeof browserProvider.send === 'function';
 }
 
 export async function validateProvider(
   config: CheckoutConfiguration,
-  browserProvider: WrappedBrowserProvider,
+  browserProvider: WrappedBrowserProvider | Eip1193Provider,
   validateProviderOptions?: ValidateProviderOptions,
 ): Promise<WrappedBrowserProvider> {
   return withCheckoutError(
     async () => {
+      if ('request' in browserProvider) {
+        return new WrappedBrowserProvider(browserProvider);
+      }
+
       if (browserProvider.ethereumProvider?.isPassport) {
         // if Passport skip the validation checks
         return browserProvider;
-      }
-      if (!isWrappedBrowserProvider(browserProvider)) {
-        throw new CheckoutError(
-          'Parsed provider is not a valid WrappedBrowserProvider',
-          CheckoutErrorType.WEB3_PROVIDER_ERROR,
-        );
       }
 
       // this sets the default options and overrides them with any parsed options
