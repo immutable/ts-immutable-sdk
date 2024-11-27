@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "dependencies": {
     "@biom3/design-tokens": "^0.4.5",
-    "@biom3/react": "^0.28.6",
+    "@biom3/react": "^0.28.7",
     "@imtbl/blockchain-data": "workspace:*",
     "@imtbl/config": "workspace:*",
     "@imtbl/generated-clients": "workspace:*",

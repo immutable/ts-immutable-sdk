@@ -1,4 +1,4 @@
-import { Box, BoxProps, DeeplyNestedSx } from '@biom3/react';
+import { Box, BoxProps } from '@biom3/react';
 import { merge } from 'ts-deepmerge';
 import {
   simpleLayoutStyle,
@@ -35,7 +35,7 @@ export function SimpleLayout({
 }: SimpleLayoutProps) {
   return (
     <Box sx={responsiveStyles} testId="simpleLayout">
-      <Box testId={testId} sx={merge(simpleLayoutStyle, containerSx) as DeeplyNestedSx}>
+      <Box testId={testId} sx={merge(simpleLayoutStyle, containerSx)}>
         {header && (
           <Box sx={headerStyle(floatHeader)} testId="header">
             {header}
