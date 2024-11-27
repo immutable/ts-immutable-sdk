@@ -729,7 +729,7 @@ export function Review({
                 >
                   <PriceDisplay.Caption size="small">
                     {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${
-                      route?.route.estimate.fromAmountUSD ?? ''
+                      getFormattedNumberWithDecimalPlaces(route?.route.estimate.fromAmountUSD ?? '')
                     }`}
                   </PriceDisplay.Caption>
                 </PriceDisplay>
@@ -869,7 +869,7 @@ export function Review({
                 >
                   <PriceDisplay.Caption size="small">
                     {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${
-                      route?.route.estimate.toAmountUSD ?? ''
+                      getFormattedNumberWithDecimalPlaces(route?.route.estimate.toAmountUSD ?? '')
                     }`}
                   </PriceDisplay.Caption>
                 </PriceDisplay>

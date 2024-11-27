@@ -48,8 +48,11 @@ export function getFormattedNumber(
 export function getFormattedNumberWithDecimalPlaces(value: string | number, decimals = 5) : string {
   const amount = typeof value === 'number' ? value : parseFloat(value);
 
-  return amount.toLocaleString('en-US', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: decimals,
-  });
+  if (amount) {
+    return amount.toLocaleString('en-US', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    });
+  }
+  return '-.--';
 }
