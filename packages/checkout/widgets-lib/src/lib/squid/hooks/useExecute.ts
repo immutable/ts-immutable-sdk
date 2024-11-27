@@ -106,28 +106,23 @@ export const useExecute = (contextId: string, environment: Environment) => {
   };
 
   // @TODO: Move to util function
-  const updateFromProviderChain = async (
+  const checkProviderChain = async (
     provider: WrappedBrowserProvider,
     chainId: string,
-  ): Promise<WrappedBrowserProvider> => {
+  ): Promise<boolean> => {
     if (!provider.ethereumProvider) {
       throw new Error('provider is not a valid WrappedBrowserProvider');
     }
     try {
       const fromChainHex = `0x${parseInt(chainId, 10).toString(16)}`;
-      const providerChainId = await provider.provider.request({
-        method: 'eth_chainId',
-      });
+      const providerChainId = await provider.send('eth_chainId', []);
 
       if (fromChainHex !== providerChainId) {
-        await provider.provider.request({
-          method: 'wallet_switchEthereumChain',
-          params: [
-            {
-              chainId: fromChainHex,
-            },
-          ],
-        });
+        await provider.send('wallet_switchEthereumChain', [
+          {
+            chainId: fromChainHex,
+          },
+        ]);
         return true;
       }
       return true;
@@ -314,7 +309,7 @@ export const useExecute = (contextId: string, environment: Environment) => {
   };
 
   return {
-    updateFromProviderChain,
+    checkProviderChain,
     getAllowance,
     approve,
     execute,

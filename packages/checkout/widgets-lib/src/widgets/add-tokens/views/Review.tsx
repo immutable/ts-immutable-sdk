@@ -330,12 +330,20 @@ export function Review({
       headingText: t('views.ADD_TOKENS.handover.preparing.heading'),
     });
 
-    const updatedFromProvider = await updateFromProviderChain(
-      convertToNetworkChangeableProvider(fromProvider),
+    const changeableProvider = await convertToNetworkChangeableProvider(
+      fromProvider,
+    );
+
+    const isValidNetwork = await checkProviderChain(
+      changeableProvider,
       route.route.params.fromChain,
     );
 
-    const allowance = await getAllowance(updatedFromProvider, route);
+    if (!isValidNetwork) {
+      return;
+    }
+
+    const allowance = await getAllowance(changeableProvider, route);
 
     const { fromAmount } = route.route.params;
     if (allowance && allowance < BigInt(fromAmount)) {
@@ -621,7 +629,7 @@ export function Review({
     getRouteIntervalIdRef,
     approve,
     showHandover,
-    updateFromProviderChain,
+    checkProviderChain,
     getAllowance,
     execute,
     closeHandover,
