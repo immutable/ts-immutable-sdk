@@ -1,3 +1,4 @@
+import { Eip1193Provider } from 'ethers';
 import { ChainId } from './chains';
 import { NetworkInfo } from './networkInfo';
 import { TokenInfo } from './tokenInfo';
@@ -9,7 +10,7 @@ import { WrappedBrowserProvider } from './provider';
  * @property {ChainId} chainId - The ID of the network to add. We only support adding Immutable zkEVM and Immutable zkEVM Testnet.
  */
 export interface AddNetworkParams {
-  provider: WrappedBrowserProvider;
+  provider: WrappedBrowserProvider | Eip1193Provider
   chainId: ChainId;
 }
 
@@ -19,7 +20,7 @@ export interface AddNetworkParams {
  * @property {ChainId} chainId - The ID of the network to switch to.
  */
 export interface SwitchNetworkParams {
-  provider: WrappedBrowserProvider;
+  provider: WrappedBrowserProvider | Eip1193Provider;
   chainId: ChainId;
 }
 
@@ -39,7 +40,7 @@ export interface SwitchNetworkResult {
  * @property {BrowserProvider} provider - The provider to connect to the network.
  */
 export interface GetNetworkParams {
-  provider: WrappedBrowserProvider;
+  provider: WrappedBrowserProvider | Eip1193Provider;
 }
 
 /**

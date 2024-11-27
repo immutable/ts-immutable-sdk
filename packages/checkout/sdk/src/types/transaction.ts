@@ -1,4 +1,4 @@
-import { TransactionRequest, TransactionResponse } from 'ethers';
+import { TransactionRequest, TransactionResponse, Eip1193Provider } from 'ethers';
 import { WrappedBrowserProvider } from './provider';
 
 /**
@@ -7,7 +7,7 @@ import { WrappedBrowserProvider } from './provider';
  * @property {TransactionRequest} transaction - The transaction to send.
  */
 export interface SendTransactionParams {
-  provider: WrappedBrowserProvider;
+  provider: WrappedBrowserProvider | Eip1193Provider;
   transaction: TransactionRequest;
 }
 

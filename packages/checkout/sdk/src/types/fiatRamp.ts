@@ -1,5 +1,6 @@
 // import { Passport } from '@imtbl/passport';
 
+import { Eip1193Provider } from 'ethers';
 import { WrappedBrowserProvider } from './provider';
 
 /**
@@ -21,7 +22,7 @@ export enum ExchangeType {
  */
 export interface FiatRampParams {
   exchangeType: ExchangeType;
-  browserProvider: WrappedBrowserProvider;
+  browserProvider: WrappedBrowserProvider | Eip1193Provider;
   tokenAmount?: string;
   tokenAddress?: string;
   passport?: any;

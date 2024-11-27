@@ -2,7 +2,7 @@
 import { Environment } from '@imtbl/config';
 import { track } from '@imtbl/metrics';
 import { Passport } from '@imtbl/passport';
-import { JsonRpcProvider } from 'ethers';
+import { JsonRpcProvider, Eip1193Provider } from 'ethers';
 import { HttpClient } from './api/http';
 import { AvailabilityService, availabilityService } from './availability';
 import * as balances from './balances';
@@ -387,9 +387,18 @@ export class Checkout {
    * @returns {Promise<any>} - A promise that resolves to the result of adding the network.
    */
   public async addNetwork(params: AddNetworkParams): Promise<any> {
+    const browserProvider = await provider.validateProvider(
+      this.config,
+      params.provider,
+      {
+        allowUnsupportedProvider: true,
+        allowMistmatchedChainId: true,
+      } as ValidateProviderOptions,
+    );
+
     const addNetworkRes = await network.addNetworkToWallet(
       this.config.networkMap,
-      params.provider,
+      browserProvider,
       params.chainId,
     );
 
@@ -465,9 +474,23 @@ export class Checkout {
   public async getAllBalances(
     params: GetAllBalancesParams,
   ): Promise<GetAllBalancesResult> {
-    return balances.getAllBalances(
+    if (!params.provider) {
+      return balances.getAllBalances(
+        this.config,
+        params.provider,
+        params.walletAddress,
+        params.chainId,
+      );
+    }
+
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
+    );
+
+    return balances.getAllBalances(
+      this.config,
+      browserProvider,
       params.walletAddress,
       params.chainId,
     );
@@ -532,7 +555,7 @@ export class Checkout {
    * @returns {Promise<T>} Returns the result of the provided block param.
    */
   public async providerCall<T>(
-    browserProvider: WrappedBrowserProvider,
+    browserProvider: WrappedBrowserProvider | Eip1193Provider,
     block: (browserProvider: WrappedBrowserProvider) => Promise<T>,
   ): Promise<T> {
     const validatedProvider = await provider.validateProvider(
@@ -719,8 +742,12 @@ export class Checkout {
     let tokenSymbol = 'IMX';
     let email;
 
-    const walletAddress = await (await params.browserProvider.getSigner()).getAddress();
-    const isPassport = params.browserProvider.ethereumProvider?.isPassport || false;
+    const browserProvider = 'request' in params.browserProvider
+      ? new WrappedBrowserProvider(params.browserProvider)
+      : params.browserProvider;
+
+    const walletAddress = await (await browserProvider.getSigner()).getAddress();
+    const isPassport = browserProvider.ethereumProvider?.isPassport || false;
 
     if (isPassport && params.passport) {
       const userInfo = await params.passport.getUserInfo();

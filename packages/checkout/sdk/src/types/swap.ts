@@ -1,5 +1,5 @@
 import { Quote, TransactionDetails } from '@imtbl/dex-sdk';
-import { TransactionReceipt } from 'ethers';
+import { TransactionReceipt, Eip1193Provider } from 'ethers';
 import { TokenInfo } from './tokenInfo';
 import { WrappedBrowserProvider } from './provider';
 
@@ -16,7 +16,7 @@ import { WrappedBrowserProvider } from './provider';
  */
 
 export interface SwapParams {
-  provider: WrappedBrowserProvider;
+  provider: WrappedBrowserProvider | Eip1193Provider;
   fromToken: TokenInfo,
   toToken: TokenInfo,
   fromAmount?: string,

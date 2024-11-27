@@ -1,3 +1,4 @@
+import { Eip1193Provider } from 'ethers';
 import { WrappedBrowserProvider } from './provider';
 
 /**
@@ -6,7 +7,7 @@ import { WrappedBrowserProvider } from './provider';
  * @property {boolean | undefined} requestWalletPermissions - A boolean that will trigger a permission request for wallet connection.
  */
 export interface ConnectParams {
-  provider: WrappedBrowserProvider
+  provider: WrappedBrowserProvider | Eip1193Provider
   requestWalletPermissions?: boolean
 }
 
@@ -23,7 +24,7 @@ export interface ConnectResult {
  * @property {BrowserProvider} provider - The provider used to connect to the network.
  */
 export interface CheckConnectionParams {
-  provider: WrappedBrowserProvider
+  provider: WrappedBrowserProvider | Eip1193Provider
 }
 
 /**
