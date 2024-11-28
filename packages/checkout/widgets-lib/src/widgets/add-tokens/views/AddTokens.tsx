@@ -327,6 +327,22 @@ export function AddTokens({
   }, [routes]);
 
   useEffect(() => {
+    if (fetchingRoutes === true) return;
+    if (insufficientBalance === false) return; // No routes available
+    track({
+      userJourney: UserJourney.ADD_TOKENS,
+      screen: 'InputScreen',
+      control: 'RoutesMenu',
+      controlType: 'MenuItem',
+      extras: {
+        contextId: id,
+        routesAvailable: routes.length > 0,
+        geoBlocked: !isSwapAvailable,
+      },
+    });
+  }, [fetchingRoutes, insufficientBalance]);
+
+  useEffect(() => {
     if (!checkout) return;
 
     const fetchOnRampTokens = async () => {
