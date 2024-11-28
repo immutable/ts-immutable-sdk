@@ -313,6 +313,19 @@ export function AddTokens({
         );
         setFetchingRoutes(false);
 
+        track({
+          userJourney: UserJourney.ADD_TOKENS,
+          screen: 'InputScreen',
+          control: 'RoutesMenu',
+          controlType: 'MenuItem',
+          action: 'Request',
+          extras: {
+            contextId: id,
+            routesAvailable: availableRoutes.length,
+            geoBlocked: !isSwapAvailable,
+          },
+        });
+
         if (availableRoutes.length === 0) {
           setInsufficientBalance(true);
         }
@@ -325,22 +338,6 @@ export function AddTokens({
       setSelectedRouteData(routes[0]);
     }
   }, [routes]);
-
-  useEffect(() => {
-    if (fetchingRoutes === true) return;
-    if (insufficientBalance === false) return; // No routes available
-    track({
-      userJourney: UserJourney.ADD_TOKENS,
-      screen: 'InputScreen',
-      control: 'RoutesMenu',
-      controlType: 'MenuItem',
-      extras: {
-        contextId: id,
-        routesAvailable: routes.length > 0,
-        geoBlocked: !isSwapAvailable,
-      },
-    });
-  }, [fetchingRoutes, insufficientBalance]);
 
   useEffect(() => {
     if (!checkout) return;
