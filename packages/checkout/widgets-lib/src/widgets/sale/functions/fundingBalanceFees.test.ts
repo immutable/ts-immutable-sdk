@@ -150,7 +150,7 @@ describe('getFundingBalanceFeeBreakDown', () => {
   it('should return fee breakdowns', () => {
     const expected = [
       {
-        amount: '0.000200',
+        amount: '0.00020',
         fiatAmount: '≈ drawers.feesBreakdown.fees.fiatPricePrefix-.--',
         label: 'drawers.feesBreakdown.fees.swapGasFee.label',
         prefix: '~ ',
@@ -162,7 +162,7 @@ describe('getFundingBalanceFeeBreakDown', () => {
         },
       },
       {
-        amount: '0.000010',
+        amount: '0.00001',
         fiatAmount: '≈ drawers.feesBreakdown.fees.fiatPricePrefix-.--',
         label: 'drawers.feesBreakdown.fees.approvalFee.label',
         prefix: '~ ',
@@ -174,7 +174,7 @@ describe('getFundingBalanceFeeBreakDown', () => {
         },
       },
       {
-        amount: '0.600000',
+        amount: '0.60000',
         fiatAmount: '≈ drawers.feesBreakdown.fees.fiatPricePrefix-.--',
         label: 'drawers.feesBreakdown.fees.swapSecondaryFee.label',
         prefix: '',
