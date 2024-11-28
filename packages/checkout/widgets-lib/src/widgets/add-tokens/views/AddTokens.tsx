@@ -65,10 +65,10 @@ import { validateToAmount } from '../functions/amountValidation';
 import { OnboardingDrawer } from '../components/OnboardingDrawer';
 import { useError } from '../hooks/useError';
 import { SquidFooter } from '../components/SquidFooter';
-import { getFormattedNumberWithDecimalPlaces } from '../functions/getFormattedNumber';
 import { TokenDrawerMenu } from '../components/TokenDrawerMenu';
 import { PULSE_SHADOW } from '../utils/animation';
 import { checkSanctionedAddresses } from '../functions/checkSanctionedAddresses';
+import { getFormattedAmounts } from '../functions/getFormattedNumber';
 
 interface AddTokensProps {
   checkout: Checkout;
@@ -607,7 +607,7 @@ export function AddTokens({
 
               <HeroFormControl.Caption>
                 {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} 
-                $${getFormattedNumberWithDecimalPlaces(selectedAmountUsd)}`}
+                $${getFormattedAmounts(selectedAmountUsd)}`}
               </HeroFormControl.Caption>
             </HeroFormControl>
           )}

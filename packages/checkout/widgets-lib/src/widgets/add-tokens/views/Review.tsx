@@ -64,7 +64,6 @@ import { getRouteChains } from '../functions/getRouteChains';
 import {
   getFormattedAmounts,
   getFormattedNumber,
-  getFormattedNumberWithDecimalPlaces,
 } from '../functions/getFormattedNumber';
 import { SquidFooter } from '../components/SquidFooter';
 import { useError } from '../hooks/useError';
@@ -729,7 +728,7 @@ export function Review({
                 >
                   <PriceDisplay.Caption size="small">
                     {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${
-                      getFormattedNumberWithDecimalPlaces(route?.route.estimate.fromAmountUSD ?? '')
+                      getFormattedAmounts(route?.route.estimate.fromAmountUSD ?? '')
                     }`}
                   </PriceDisplay.Caption>
                 </PriceDisplay>
@@ -788,7 +787,7 @@ export function Review({
                     {' '}
                     =
                     {' '}
-                    {getFormattedNumberWithDecimalPlaces(
+                    {getFormattedAmounts(
                       route.route.estimate.exchangeRate,
                     )}
                     {' '}
@@ -869,7 +868,7 @@ export function Review({
                 >
                   <PriceDisplay.Caption size="small">
                     {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${
-                      getFormattedNumberWithDecimalPlaces(route?.route.estimate.toAmountUSD ?? '')
+                      getFormattedAmounts(route?.route.estimate.toAmountUSD ?? '')
                     }`}
                   </PriceDisplay.Caption>
                 </PriceDisplay>

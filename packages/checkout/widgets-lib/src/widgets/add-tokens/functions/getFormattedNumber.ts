@@ -1,6 +1,7 @@
 import { BigNumber, utils } from 'ethers';
 
 import { tokenValueFormat } from '../../../lib/utils';
+import { DEFAULT_TOKEN_FORMATTING_DECIMALS } from '../../../lib/constants';
 
 /**
  * Formats a number to a string with a maximum number of decimals
@@ -8,9 +9,13 @@ import { tokenValueFormat } from '../../../lib/utils';
  */
 export const getFormattedAmounts = (
   value: string | number,
-  maxDecimals = 5,
+  maxDecimals = DEFAULT_TOKEN_FORMATTING_DECIMALS,
 ) => {
   const amount = typeof value === 'number' ? value : parseFloat(value);
+
+  if (Number.isNaN(amount)) {
+    return '-.--';
+  }
 
   if (amount > 0 && amount < 1) {
     return tokenValueFormat(value, maxDecimals).replace(/\.?0+$/, '');
@@ -43,16 +48,4 @@ export function getFormattedNumber(
   }
 
   return getFormattedAmounts(formattedValue, maxDecimals);
-}
-
-export function getFormattedNumberWithDecimalPlaces(value: string | number, decimals = 5) : string {
-  const amount = typeof value === 'number' ? value : parseFloat(value);
-
-  if (amount) {
-    return amount.toLocaleString('en-US', {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals,
-    });
-  }
-  return '-.--';
 }
