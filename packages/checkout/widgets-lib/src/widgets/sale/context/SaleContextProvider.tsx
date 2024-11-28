@@ -168,7 +168,7 @@ export function SaleContextProvider(props: {
       preferredCurrency,
       customOrderData,
       waitFulfillmentSettlements,
-      hideExcludedPaymentTypes,
+      hideExcludedPaymentTypes: defaultHideExcludedPaymentTypes,
     },
   } = props;
 
@@ -202,6 +202,9 @@ export function SaleContextProvider(props: {
   const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<
   SalePaymentTypes[]
   >([]);
+  const [hideExcludedPaymentTypes, setHideExcludedPaymentTypes] = useState<
+  boolean
+  >(defaultHideExcludedPaymentTypes);
 
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
@@ -232,6 +235,30 @@ export function SaleContextProvider(props: {
     },
     [],
   );
+
+  useEffect(() => {
+    if (!checkout) {
+      return;
+    }
+
+    (async () => {
+      const isOnRampAvailable = await checkout.isOnRampAvailable();
+
+      if (!isOnRampAvailable) {
+        setDisabledPaymentTypes([
+          ...new Set([...excludePaymentTypes, SalePaymentTypes.DEBIT, SalePaymentTypes.CREDIT]),
+        ]);
+
+        setHideExcludedPaymentTypes(true);
+
+        return;
+      }
+
+      if (excludePaymentTypes?.length > 0) {
+        setDisabledPaymentTypes(excludePaymentTypes);
+      }
+    })();
+  }, [checkout, excludePaymentTypes]);
 
   useEffect(() => {
     const getUserInfo = async () => {
@@ -369,11 +396,6 @@ export function SaleContextProvider(props: {
       setInvalidParameters(true);
     }
   }, [items, collectionName, environmentId]);
-
-  useEffect(() => {
-    if (excludePaymentTypes?.length <= 0) return;
-    setDisabledPaymentTypes(excludePaymentTypes);
-  }, [excludePaymentTypes]);
 
   const values = useMemo(
     () => ({

@@ -115,6 +115,7 @@ export function AddTokens({
     selectedRouteData,
     selectedToken,
     isSwapAvailable,
+    isOnRampAvailable,
   } = addTokensState;
 
   const { viewDispatch } = useContext(ViewContext);
@@ -488,14 +489,14 @@ export function AddTokens({
   };
 
   const shouldShowOnRampOption = useMemo(() => {
-    if (showOnrampOption && selectedToken) {
+    if (showOnrampOption && isOnRampAvailable && selectedToken) {
       const isAllowedToken = onRampAllowedTokens.find(
         (token) => token.address?.toLowerCase() === selectedToken.address?.toLowerCase(),
       );
       return !!isAllowedToken;
     }
     return false;
-  }, [selectedToken, onRampAllowedTokens, showOnrampOption]);
+  }, [selectedToken, onRampAllowedTokens, showOnrampOption, isOnRampAvailable]);
 
   const showInitialEmptyState = !selectedToken;
 
@@ -619,7 +620,7 @@ export function AddTokens({
               />
 
               <HeroFormControl.Caption>
-                {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} 
+                {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')}
                 $${getFormattedAmounts(selectedAmountUsd)}`}
               </HeroFormControl.Caption>
             </HeroFormControl>

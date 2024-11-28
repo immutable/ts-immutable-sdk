@@ -768,6 +768,14 @@ export class Checkout {
   }
 
   /**
+   * Fetches OnRamp widget availability.
+   * @returns {Promise<boolean>} - A promise that resolves to a boolean.
+   */
+  public async isOnRampAvailable(): Promise<boolean> {
+    return this.availability.checkOnRampAvailability();
+  }
+
+  /**
    * Fetches a quote and then performs the approval and swap transaction.
    * @param {SwapParams} params - The parameters for the swap.
    * @returns {Promise<SwapResult>} - A promise that resolves to the swap result (swap tx, swap tx receipt, quote used in the swap).

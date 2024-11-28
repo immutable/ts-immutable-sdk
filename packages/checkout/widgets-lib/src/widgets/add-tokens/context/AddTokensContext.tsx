@@ -16,6 +16,7 @@ export interface AddTokensState {
   selectedToken: TokenInfo | undefined;
   selectedAmount: string;
   isSwapAvailable: boolean | undefined;
+  isOnRampAvailable: boolean | undefined;
 }
 
 export const initialAddTokensState: AddTokensState = {
@@ -30,6 +31,7 @@ export const initialAddTokensState: AddTokensState = {
   selectedToken: undefined,
   selectedAmount: '',
   isSwapAvailable: undefined,
+  isOnRampAvailable: undefined,
 };
 
 export interface AddTokensContextState {
@@ -52,7 +54,8 @@ type ActionPayload =
   | SetSelectedRouteData
   | SetSelectedToken
   | SetSelectedAmount
-  | SetIsSwapAvailable;
+  | SetIsSwapAvailable
+  | SetIsOnRampAvailable;
 
 export enum AddTokensActions {
   SET_ID = 'SET_ID',
@@ -66,6 +69,7 @@ export enum AddTokensActions {
   SET_SELECTED_TOKEN = 'SET_SELECTED_TOKEN',
   SET_SELECTED_AMOUNT = 'SET_SELECTED_AMOUNT',
   SET_IS_SWAP_AVAILABLE = 'SET_IS_SWAP_AVAILABLE',
+  SET_IS_ONRAMP_AVAILABLE = 'SET_IS_ONRAMP_AVAILABLE',
 }
 
 export interface SetId {
@@ -121,6 +125,10 @@ export interface SetSelectedAmount {
 export interface SetIsSwapAvailable {
   type: AddTokensActions.SET_IS_SWAP_AVAILABLE;
   isSwapAvailable: boolean;
+}
+export interface SetIsOnRampAvailable {
+  type: AddTokensActions.SET_IS_ONRAMP_AVAILABLE;
+  isOnRampAvailable: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -192,6 +200,11 @@ export const addTokensReducer: Reducer<AddTokensState, AddTokensAction> = (
       return {
         ...state,
         isSwapAvailable: action.payload.isSwapAvailable,
+      };
+    case AddTokensActions.SET_IS_ONRAMP_AVAILABLE:
+      return {
+        ...state,
+        isOnRampAvailable: action.payload.isOnRampAvailable,
       };
     default:
       return state;

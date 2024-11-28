@@ -5,6 +5,7 @@ import { ENV_DEVELOPMENT, IMMUTABLE_API_BASE_URL } from '../env';
 
 export type AvailabilityService = {
   checkDexAvailability: () => Promise<boolean>
+  checkOnRampAvailability: () => Promise<boolean>
 };
 
 export const availabilityService = (
@@ -18,11 +19,11 @@ export const availabilityService = (
     return IMMUTABLE_API_BASE_URL[Environment.SANDBOX];
   };
 
-  const checkDexAvailability = async (): Promise<boolean> => {
+  const checkAvailability = async (endpoint: string): Promise<boolean> => {
     let response;
 
     try {
-      response = await axios.post(`${postEndpoint()}/v1/availability/checkout/swap`);
+      response = await axios.post(endpoint);
     } catch (err: any) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
@@ -41,7 +42,14 @@ export const availabilityService = (
     return true;
   };
 
+  // eslint-disable-next-line max-len
+  const checkDexAvailability = async (): Promise<boolean> => checkAvailability(`${postEndpoint()}/v1/availability/checkout/swap`);
+
+  // eslint-disable-next-line max-len
+  const checkOnRampAvailability = async (): Promise<boolean> => checkAvailability(`${postEndpoint()}/v1/availability/checkout/onramp`);
+
   return {
     checkDexAvailability,
+    checkOnRampAvailability,
   };
 };

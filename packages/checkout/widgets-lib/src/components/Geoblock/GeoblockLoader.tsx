@@ -10,12 +10,14 @@ type GeoblockLoaderParams = {
   widget: React.ReactNode;
   serviceUnavailableView: React.ReactNode;
   checkout: Checkout,
+  checkAvailability: () => Promise<boolean>,
 };
 
 export function GeoblockLoader({
   widget,
   serviceUnavailableView,
   checkout,
+  checkAvailability,
 }: GeoblockLoaderParams) {
   const { t } = useTranslation();
   const { showLoader, hideLoader, isLoading } = useHandover();
@@ -27,7 +29,7 @@ export function GeoblockLoader({
       try {
         showLoader({ text: t('views.LOADING_VIEW.text') });
         setRequested(true);
-        setAvailable(await checkout.isSwapAvailable());
+        setAvailable(await checkAvailability());
         hideLoader();
       } catch {
         hideLoader();
