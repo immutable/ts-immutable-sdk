@@ -122,6 +122,15 @@ export function TopUpView({
     }
   }, [checkout]);
 
+  const isOnRampAvailable = useAsyncMemo<boolean | undefined>(async () => {
+    if (!checkout) return undefined;
+    try {
+      return checkout.isOnRampAvailable();
+    } catch (error) {
+      return false;
+    }
+  }, [checkout]);
+
   useMount(() => {
     page({ userJourney, screen: 'TopUp' });
   });
@@ -298,8 +307,8 @@ export function TopUpView({
             'views.TOP_UP_VIEW.topUpOptions.debit.subcaption',
           )} ≈ ${onRampFeesPercentage}%`,
         ),
-        isAvailable: true,
-        isEnabled: showOnrampOption,
+        isAvailable: !!isOnRampAvailable,
+        isEnabled: showOnrampOption && !!isOnRampAvailable,
       },
       {
         testId: 'onramp',
@@ -311,8 +320,8 @@ export function TopUpView({
             'views.TOP_UP_VIEW.topUpOptions.credit.subcaption',
           )} ≈ ${onRampFeesPercentage}%`,
         ),
-        isAvailable: true,
-        isEnabled: showOnrampOption,
+        isAvailable: !!isOnRampAvailable,
+        isEnabled: showOnrampOption && !!isOnRampAvailable,
       },
       {
         testId: 'advanced',
@@ -348,7 +357,7 @@ export function TopUpView({
         isEnabled: showBridgeOption,
       },
     ],
-    [showBridgeOption, showOnrampOption, showSwapOption],
+    [showBridgeOption, showOnrampOption, showSwapOption, isOnRampAvailable],
   );
 
   return (
