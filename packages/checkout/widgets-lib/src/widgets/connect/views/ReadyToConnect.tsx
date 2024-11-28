@@ -36,7 +36,9 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
   const isPassport = isPassportProvider(provider);
   const isMetaMask = isMetaMaskProvider(provider);
 
-  const { page, identify, track } = useAnalytics();
+  const {
+    page, identify, track, user,
+  } = useAnalytics();
 
   useEffect(() => {
     page({
@@ -145,7 +147,9 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
       // Set up EIP-1193 provider event listeners for widget root instances
       addProviderListenersForWidgetRoot(connectResult.provider);
 
-      await identifyUser(identify, connectResult.provider);
+      const userData = user ? await user() : undefined;
+      const anonymousId = userData?.anonymousId();
+      await identifyUser(identify, connectResult.provider, { anonymousId });
 
       connectDispatch({
         payload: {
