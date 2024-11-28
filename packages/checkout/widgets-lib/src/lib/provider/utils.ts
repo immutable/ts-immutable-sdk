@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { EIP6963ProviderDetail, WalletProviderName } from '@imtbl/checkout-sdk';
+import { EIP6963ProviderDetail, WalletProviderName, WalletProviderRdns } from '@imtbl/checkout-sdk';
 
 export function isPassportProvider(provider?: Web3Provider | null) {
   return (provider?.provider as any)?.isPassport === true;
@@ -16,9 +16,12 @@ export function isWalletConnectProvider(provider?: Web3Provider | null) {
 export const getProviderDetailByProvider = (
   web3Provider: Web3Provider,
   providers?: EIP6963ProviderDetail[],
-) => providers?.find(
-  (providerDetail) => providerDetail.provider === web3Provider.provider,
-);
+) => providers?.find((providerDetail) => {
+  if (isPassportProvider(web3Provider)) {
+    return providerDetail.info.rdns === WalletProviderRdns.PASSPORT;
+  }
+  return providerDetail.provider === web3Provider.provider;
+});
 
 export function getWalletProviderNameByProvider(
   web3Provider: Web3Provider | undefined,

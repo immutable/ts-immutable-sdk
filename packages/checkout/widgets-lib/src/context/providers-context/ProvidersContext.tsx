@@ -168,9 +168,12 @@ export function ProvidersContextProvider({
 
     (async () => {
       const injectedProviders = checkout.getInjectedProviders();
+
+      console.log('===== injectedProviders', injectedProviders);
       const providerDetail = getProviderDetailByProvider(toProvider, [
         ...injectedProviders,
       ]);
+      console.log('===== providerDetail', providerDetail);
 
       if (!providerDetail) return;
 
@@ -191,7 +194,8 @@ export function ProvidersContextProvider({
             lockedToProvider: true,
           },
         });
-      } catch {
+      } catch (err) {
+        console.log('===== err', err);
         /** TODO: handle error */
       }
     })();

@@ -77,10 +77,6 @@ function AddTokensUI() {
   };
 
   useEffect(() => {
-    passport.connectEvm();
-  }, []);
-
-  useEffect(() => {
     if (!checkout || !factory) return;
     if (!presetToProvider) {
       toProvider && addTokens.unmount();
@@ -89,18 +85,26 @@ function AddTokensUI() {
     }
 
     (async () => {
-      const { provider } = await checkout.createProvider({
-        walletProviderName: WalletProviderName.METAMASK,
-      });
+      // const { provider } = await checkout.createProvider({
+      //   walletProviderName: WalletProviderName.METAMASK,
+      // });
+      await passport.login()
+      const zkEvmProvider = new Web3Provider(passport.connectEvm());
+      console.log("zkEvmProvider", zkEvmProvider);
+      // await checkout.connect({ provider, requestWalletPermissions: false });
 
-      await checkout.connect({ provider, requestWalletPermissions: false });
+      const { provider } =  await checkout.createProvider({
+          walletProviderName: WalletProviderName.PASSPORT,
+        });
+      console.log("checkoutProvider", provider);
 
       const { isConnected } = await checkout.checkIsWalletConnected({
-        provider,
+        provider: zkEvmProvider,
       });
+      console.log("isConnected", isConnected);
 
       if (isConnected) {
-        setToProvider(provider);
+        setToProvider(zkEvmProvider);
       }
     })();
   }, [checkout, factory, presetToProvider]);
