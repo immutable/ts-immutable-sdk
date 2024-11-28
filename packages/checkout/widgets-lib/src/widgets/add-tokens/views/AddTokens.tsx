@@ -313,6 +313,19 @@ export function AddTokens({
         );
         setFetchingRoutes(false);
 
+        track({
+          userJourney: UserJourney.ADD_TOKENS,
+          screen: 'InputScreen',
+          control: 'RoutesMenu',
+          controlType: 'MenuItem',
+          action: 'Request',
+          extras: {
+            contextId: id,
+            routesAvailable: availableRoutes.length,
+            geoBlocked: !isSwapAvailable,
+          },
+        });
+
         if (availableRoutes.length === 0) {
           setInsufficientBalance(true);
         }
