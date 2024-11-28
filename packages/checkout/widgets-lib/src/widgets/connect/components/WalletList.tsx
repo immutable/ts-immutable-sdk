@@ -73,7 +73,7 @@ export function WalletList(props: WalletListProps) {
     connectState: { checkout },
   } = useContext(ConnectContext);
   const { viewDispatch } = useContext(ViewContext);
-  const { track, identify } = useAnalytics();
+  const { track, identify, user } = useAnalytics();
   const { providers } = useInjectedProviders({ checkout });
   const [showWalletDrawer, setShowWalletDrawer] = useState(false);
   const { isWalletConnectEnabled, openWalletConnectModal } = useWalletConnect();
@@ -180,7 +180,10 @@ export function WalletList(props: WalletListProps) {
 
           // Set up EIP-1193 provider event listeners for widget root instances
           addProviderListenersForWidgetRoot(connectResult.provider);
-          await identifyUser(identify, connectResult.provider);
+
+          const userData = user ? await user() : undefined;
+          const anonymousId = userData?.anonymousId();
+          await identifyUser(identify, connectResult.provider, { anonymousId });
 
           selectWeb3Provider(
             web3Provider,
