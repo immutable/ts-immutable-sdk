@@ -45,6 +45,10 @@ import {
   AddTokensConnectSuccess,
   AddTokensSuccess,
   AddTokensFailed,
+  PurchaseConnectSuccess,
+  PurchaseEventType,
+  PurchaseFailed,
+  PurchaseSuccess,
 } from './events';
 import {
   BridgeWidgetParams,
@@ -54,8 +58,9 @@ import {
   OnRampWidgetParams,
   CommerceWidgetParams,
   AddTokensWidgetParams,
+  SaleWidgetParams,
+  PurchaseWidgetParams,
 } from './parameters';
-import { SaleWidgetParams } from './parameters/sale';
 import {
   BridgeWidgetConfiguration,
   ConnectWidgetConfiguration,
@@ -65,8 +70,9 @@ import {
   WalletWidgetConfiguration,
   CommerceWidgetConfiguration,
   AddTokensWidgetConfiguration,
+  WidgetTheme,
+  PurchaseWidgetConfiguration,
 } from './configurations';
-import { WidgetTheme } from './configurations/theme';
 
 /**
  * Enum representing the list of widget types.
@@ -80,6 +86,7 @@ export enum WidgetType {
   SALE = 'sale',
   IMMUTABLE_COMMERCE = 'immutableCommerce',
   ADD_TOKENS = 'addTokens',
+  PURCHASE = 'purchase',
 }
 
 /**
@@ -98,6 +105,7 @@ export type WidgetConfigurations = {
   [WidgetType.ONRAMP]: OnrampWidgetConfiguration;
   [WidgetType.SALE]: SaleWidgetConfiguration;
   [WidgetType.ADD_TOKENS]: AddTokensWidgetConfiguration;
+  [WidgetType.PURCHASE]: PurchaseWidgetConfiguration;
   [WidgetType.IMMUTABLE_COMMERCE]: CommerceWidgetConfiguration;
 };
 
@@ -110,6 +118,7 @@ export type WidgetParameters = {
   [WidgetType.ONRAMP]: OnRampWidgetParams;
   [WidgetType.SALE]: SaleWidgetParams;
   [WidgetType.ADD_TOKENS]: AddTokensWidgetParams;
+  [WidgetType.PURCHASE]: PurchaseWidgetParams;
   [WidgetType.IMMUTABLE_COMMERCE]: CommerceWidgetParams;
 };
 
@@ -125,6 +134,7 @@ export type WidgetEventTypes = {
   [WidgetType.SALE]: SaleEventType | OrchestrationEventType;
   [WidgetType.IMMUTABLE_COMMERCE]: CommerceEventType | OrchestrationEventType;
   [WidgetType.ADD_TOKENS]: AddTokensEventType | OrchestrationEventType;
+  [WidgetType.PURCHASE]: PurchaseEventType | OrchestrationEventType;
 };
 
 // Mapping of Orchestration events to their payloads
@@ -143,9 +153,9 @@ type ProviderEventMapping = {
 };
 
 /**
- * Mapping of widget type, to each of it's events and then each event's payload
+ * Mapping of widget type, to each of its events and then each event's payload
  * Update this whenever a new event is created and used by a widget
- * Each widget also has all of the orchestration events
+ * Each widget also has all the orchestration events
  */
 export type WidgetEventData = {
   [WidgetType.CONNECT]: {
@@ -216,6 +226,14 @@ export type WidgetEventData = {
     [AddTokensEventType.CONNECT_SUCCESS]: AddTokensConnectSuccess;
     [AddTokensEventType.SUCCESS]: AddTokensSuccess;
     [AddTokensEventType.FAILURE]: AddTokensFailed;
+  } & OrchestrationMapping &
+  ProviderEventMapping;
+
+  [WidgetType.PURCHASE]: {
+    [PurchaseEventType.CLOSE_WIDGET]: {};
+    [PurchaseEventType.CONNECT_SUCCESS]: PurchaseConnectSuccess;
+    [PurchaseEventType.SUCCESS]: PurchaseSuccess;
+    [PurchaseEventType.FAILURE]: PurchaseFailed;
   } & OrchestrationMapping &
   ProviderEventMapping;
 };
