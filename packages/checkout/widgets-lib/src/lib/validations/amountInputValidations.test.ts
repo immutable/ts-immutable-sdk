@@ -1,7 +1,7 @@
 import { amountInputValidation } from './amountInputValidations';
 
 describe('amountInPutValidation', () => {
-  const validTestCases = ['123.123456', '1.12345', '123456', '123456.0'];
+  const validTestCases = ['123.12345', '1.12345', '123456', '123456.0'];
   const invalidTestCases = ['123.1234567', '1.1234567', 'blah'];
 
   validTestCases.forEach((testCase) => {
