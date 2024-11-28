@@ -1,17 +1,10 @@
 import { createContext } from 'react';
 import { TokenInfo } from '@imtbl/checkout-sdk';
-import { Squid } from '@0xsquid/sdk';
-import { TokenBalance } from '@0xsquid/sdk/dist/types';
-import { Chain, RouteData, Token } from '../types';
+import { RouteData } from '../../../lib/squid/types';
 
 export interface AddTokensState {
   id: string;
   allowedTokens: TokenInfo[] | null;
-  squid: Squid | null;
-  chains: Chain[] | null;
-  balances: TokenBalance[] | null;
-  tokens: Token[] | null;
-  routes: RouteData[];
   selectedRouteData: RouteData | undefined;
   selectedToken: TokenInfo | undefined;
   selectedAmount: string;
@@ -21,11 +14,6 @@ export interface AddTokensState {
 export const initialAddTokensState: AddTokensState = {
   id: '',
   allowedTokens: null,
-  squid: null,
-  chains: null,
-  balances: null,
-  tokens: null,
-  routes: [],
   selectedRouteData: undefined,
   selectedToken: undefined,
   selectedAmount: '',
@@ -44,11 +32,6 @@ export interface AddTokensAction {
 type ActionPayload =
   | SetId
   | SetAllowedTokensPayload
-  | SetSquid
-  | SetChains
-  | SetBalances
-  | SetTokens
-  | SetRoutes
   | SetSelectedRouteData
   | SetSelectedToken
   | SetSelectedAmount
@@ -57,11 +40,6 @@ type ActionPayload =
 export enum AddTokensActions {
   SET_ID = 'SET_ID',
   SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
-  SET_SQUID = 'SET_SQUID',
-  SET_CHAINS = 'SET_CHAINS',
-  SET_BALANCES = 'SET_BALANCES',
-  SET_TOKENS = 'SET_TOKENS',
-  SET_ROUTES = 'SET_ROUTES',
   SET_SELECTED_ROUTE_DATA = 'SET_SELECTED_ROUTE_DATA',
   SET_SELECTED_TOKEN = 'SET_SELECTED_TOKEN',
   SET_SELECTED_AMOUNT = 'SET_SELECTED_AMOUNT',
@@ -76,31 +54,6 @@ export interface SetId {
 export interface SetAllowedTokensPayload {
   type: AddTokensActions.SET_ALLOWED_TOKENS;
   allowedTokens: TokenInfo[];
-}
-
-export interface SetSquid {
-  type: AddTokensActions.SET_SQUID;
-  squid: Squid;
-}
-
-export interface SetChains {
-  type: AddTokensActions.SET_CHAINS;
-  chains: Chain[];
-}
-
-export interface SetBalances {
-  type: AddTokensActions.SET_BALANCES;
-  balances: TokenBalance[];
-}
-
-export interface SetTokens {
-  type: AddTokensActions.SET_TOKENS;
-  tokens: Token[];
-}
-
-export interface SetRoutes {
-  type: AddTokensActions.SET_ROUTES;
-  routes: RouteData[];
 }
 
 export interface SetSelectedRouteData {
@@ -147,31 +100,6 @@ export const addTokensReducer: Reducer<AddTokensState, AddTokensAction> = (
       return {
         ...state,
         allowedTokens: action.payload.allowedTokens,
-      };
-    case AddTokensActions.SET_SQUID:
-      return {
-        ...state,
-        squid: action.payload.squid,
-      };
-    case AddTokensActions.SET_CHAINS:
-      return {
-        ...state,
-        chains: action.payload.chains,
-      };
-    case AddTokensActions.SET_BALANCES:
-      return {
-        ...state,
-        balances: action.payload.balances,
-      };
-    case AddTokensActions.SET_TOKENS:
-      return {
-        ...state,
-        tokens: action.payload.tokens,
-      };
-    case AddTokensActions.SET_ROUTES:
-      return {
-        ...state,
-        routes: action.payload.routes,
       };
     case AddTokensActions.SET_SELECTED_ROUTE_DATA:
       return {

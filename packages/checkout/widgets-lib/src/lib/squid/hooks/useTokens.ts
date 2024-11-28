@@ -1,10 +1,10 @@
-import { Squid } from '@0xsquid/sdk';
 import { Checkout, SquidConfig } from '@imtbl/checkout-sdk';
 import { useCallback, useEffect, useState } from 'react';
-import { SQUID_SDK_BASE_URL } from '../utils/config';
+import { fetchTokens } from '../fetchTokens';
+import { Token } from '../types';
 
-export const useSquid = (checkout: Checkout) => {
-  const [squid, setSquid] = useState<Squid | null>(null);
+export const useTokens = (checkout: Checkout) => {
+  const [tokens, setTokens] = useState<Token[] | null>(null);
 
   const squidConfig = useCallback(async (): Promise<
   SquidConfig | undefined
@@ -19,27 +19,24 @@ export const useSquid = (checkout: Checkout) => {
   }, [checkout]);
 
   useEffect(() => {
-    if (squid) {
+    if (tokens) {
       return;
     }
 
-    const initialiseSquid = async () => {
+    const getTokens = async () => {
       const config = await squidConfig();
 
       if (!config?.integratorId) return;
-
-      const squidSDK = new Squid({
-        baseUrl: SQUID_SDK_BASE_URL,
-        integratorId: config.integratorId,
-      });
-
-      await squidSDK.init();
-
-      setSquid(squidSDK);
+      try {
+        const tokensResponse = await fetchTokens(config.integratorId);
+        setTokens(tokensResponse);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error('Error fetching tokens', e);
+      }
     };
-
-    initialiseSquid();
+    getTokens();
   }, [squidConfig]);
 
-  return squid;
+  return tokens;
 };

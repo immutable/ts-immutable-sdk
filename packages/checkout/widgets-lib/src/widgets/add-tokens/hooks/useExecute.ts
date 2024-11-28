@@ -8,7 +8,7 @@ import { Environment } from '@imtbl/config';
 import { StatusResponse } from '@0xsquid/sdk/dist/types';
 import { Flow } from '@imtbl/metrics';
 import { EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
-import { isSquidNativeToken } from '../functions/isSquidNativeToken';
+import { isSquidNativeToken } from '../../../lib/squid/isSquidNativeToken';
 import { useError } from './useError';
 import { AddTokensError, AddTokensErrorTypes } from '../types';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';

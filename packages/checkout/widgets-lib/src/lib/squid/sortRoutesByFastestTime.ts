@@ -1,4 +1,4 @@
-import { RouteData } from '../types';
+import { RouteData } from './types';
 
 export const sortRoutesByFastestTime = (routes: RouteData[]): RouteData[] => {
   if (!routes) return [];

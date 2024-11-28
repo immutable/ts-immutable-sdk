@@ -24,16 +24,16 @@ import {
 } from '../../context/view-context/ViewContext';
 import { AddTokens } from './views/AddTokens';
 import { ErrorView } from '../../views/error/ErrorView';
-import { useSquid } from './hooks/useSquid';
+import { useSquid } from '../../lib/squid/hooks/useSquid';
 import {
   useAnalytics,
   UserJourney,
 } from '../../context/analytics-provider/SegmentAnalyticsProvider';
-import { fetchChains } from './functions/fetchChains';
+import { fetchChains } from '../../lib/squid/fetchChains';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { Review } from './views/Review';
-import { fetchBalances } from './functions/fetchBalances';
-import { useTokens } from './hooks/useTokens';
+import { fetchBalances } from '../../lib/squid/fetchBalances';
+import { useTokens } from '../../lib/squid/hooks/useTokens';
 import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { getRemoteImage } from '../../lib/utils';
@@ -42,6 +42,9 @@ import { amountInputValidation } from '../../lib/validations/amountInputValidati
 import { useError } from './hooks/useError';
 import { AddTokensErrorTypes } from './types';
 import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
+import {
+  initialSquidState, SquidActions, SquidContext, squidReducer,
+} from '../../context/squid-provider/SquidContext';
 
 export type AddTokensWidgetInputs = Omit<AddTokensWidgetParams, 'toProvider'> & {
   config: StrongCheckoutWidgetsConfig;
@@ -66,6 +69,17 @@ export default function AddTokensWidget({
   const { t } = useTranslation();
   const { page } = useAnalytics();
 
+  const [squidState, squidDispatch] = useReducer(squidReducer, initialSquidState);
+  const squidReducerValues = useMemo(
+    () => ({
+      squidState,
+      squidDispatch,
+    }),
+    [squidState, squidDispatch],
+  );
+
+  const { squid, chains } = squidState;
+
   const viewReducerValues = useMemo(
     () => ({
       viewState,
@@ -83,7 +97,7 @@ export default function AddTokensWidget({
     providersState: { checkout, fromProvider },
   } = useProvidersContext();
 
-  const { id, squid, chains } = addTokensState;
+  const { id } = addTokensState;
 
   const addTokensReducerValues = useMemo(
     () => ({
@@ -136,9 +150,9 @@ export default function AddTokensWidget({
   useEffect(() => {
     if (!squid) return;
 
-    addTokensDispatch({
+    squidDispatch({
       payload: {
-        type: AddTokensActions.SET_CHAINS,
+        type: SquidActions.SET_CHAINS,
         chains: fetchChains(squid),
       },
     });
@@ -153,9 +167,9 @@ export default function AddTokensWidget({
         const evmChains = chains.filter((chain) => chain.type === 'evm');
         const balances = await fetchBalances(squid, evmChains, fromProvider);
 
-        addTokensDispatch({
+        squidDispatch({
           payload: {
-            type: AddTokensActions.SET_BALANCES,
+            type: SquidActions.SET_BALANCES,
             balances,
           },
         });
@@ -168,9 +182,9 @@ export default function AddTokensWidget({
   useEffect(() => {
     if (!squidSdk) return;
 
-    addTokensDispatch({
+    squidDispatch({
       payload: {
-        type: AddTokensActions.SET_SQUID,
+        type: SquidActions.SET_SQUID,
         squid: squidSdk,
       },
     });
@@ -178,9 +192,9 @@ export default function AddTokensWidget({
 
   useEffect(() => {
     if (!tokensResponse) return;
-    addTokensDispatch({
+    squidDispatch({
       payload: {
-        type: AddTokensActions.SET_TOKENS,
+        type: SquidActions.SET_TOKENS,
         tokens: tokensResponse,
       },
     });
@@ -200,92 +214,94 @@ export default function AddTokensWidget({
   };
 
   return (
-    <ViewContext.Provider value={viewReducerValues}>
-      <AddTokensContext.Provider value={addTokensReducerValues}>
-        <Stack sx={{ pos: 'relative' }}>
-          <CloudImage
-            use={(
-              <img
-                src={getRemoteImage(
-                  config.environment,
-                  `/add-tokens-bg-texture-${colorMode}.webp`,
-                )}
-                alt="blurry bg texture"
+    <SquidContext.Provider value={squidReducerValues}>
+      <ViewContext.Provider value={viewReducerValues}>
+        <AddTokensContext.Provider value={addTokensReducerValues}>
+          <Stack sx={{ pos: 'relative' }}>
+            <CloudImage
+              use={(
+                <img
+                  src={getRemoteImage(
+                    config.environment,
+                    `/add-tokens-bg-texture-${colorMode}.webp`,
+                  )}
+                  alt="blurry bg texture"
+                />
+              )}
+              sx={{
+                pos: 'absolute',
+                h: '100%',
+                w: '100%',
+                objectFit: 'cover',
+                objectPosition: 'center',
+              }}
+            />
+            {viewState.view.type === AddTokensWidgetViews.ADD_TOKENS && (
+              <AddTokens
+                config={config}
+                checkout={checkout}
+                toTokenAddress={toTokenAddress}
+                toAmount={toAmount}
+                showBackButton={showBackButton}
+                showOnrampOption={showOnrampOption}
+                showSwapOption={showSwapOption}
+                showBridgeOption={showBridgeOption}
+                onCloseButtonClick={() => sendAddTokensCloseEvent(eventTarget)}
+                onBackButtonClick={() => {
+                  orchestrationEvents.sendRequestGoBackEvent(
+                    eventTarget,
+                    IMTBLWidgetEvents.IMTBL_ADD_TOKENS_WIDGET_EVENT,
+                    {},
+                  );
+                }}
               />
             )}
-            sx={{
-              pos: 'absolute',
-              h: '100%',
-              w: '100%',
-              objectFit: 'cover',
-              objectPosition: 'center',
-            }}
-          />
-          {viewState.view.type === AddTokensWidgetViews.ADD_TOKENS && (
-            <AddTokens
-              config={config}
-              checkout={checkout}
-              toTokenAddress={toTokenAddress}
-              toAmount={toAmount}
-              showBackButton={showBackButton}
-              showOnrampOption={showOnrampOption}
-              showSwapOption={showSwapOption}
-              showBridgeOption={showBridgeOption}
-              onCloseButtonClick={() => sendAddTokensCloseEvent(eventTarget)}
-              onBackButtonClick={() => {
-                orchestrationEvents.sendRequestGoBackEvent(
-                  eventTarget,
-                  IMTBLWidgetEvents.IMTBL_ADD_TOKENS_WIDGET_EVENT,
-                  {},
-                );
-              }}
-            />
-          )}
-          {viewState.view.type === AddTokensWidgetViews.REVIEW && (
-            <Review
-              data={viewState.view.data}
-              onCloseButtonClick={() => sendAddTokensCloseEvent(eventTarget)}
-              onBackButtonClick={() => {
-                viewDispatch({
-                  payload: {
-                    type: ViewActions.GO_BACK,
-                  },
-                });
-              }}
-              showBackButton
-            />
-          )}
-          {viewState.view.type === SharedViews.ERROR_VIEW && (
-            <ErrorView
-              actionText={t('views.ERROR_VIEW.actionText')}
-              onActionClick={errorAction}
-              onCloseClick={() => sendAddTokensCloseEvent(eventTarget)}
-              errorEventAction={() => {
-                page({
-                  userJourney: UserJourney.ADD_TOKENS,
-                  screen: 'Error',
-                  extras: {
-                    contextId: id,
-                  },
-                });
-              }}
-            />
-          )}
-          {viewState.view.type
-            === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
-            <ServiceUnavailableErrorView
-              onCloseClick={() => sendAddTokensCloseEvent(eventTarget)}
-              onBackButtonClick={() => {
-                viewDispatch({
-                  payload: {
-                    type: ViewActions.GO_BACK,
-                  },
-                });
-              }}
-            />
-          )}
-        </Stack>
-      </AddTokensContext.Provider>
-    </ViewContext.Provider>
+            {viewState.view.type === AddTokensWidgetViews.REVIEW && (
+              <Review
+                data={viewState.view.data}
+                onCloseButtonClick={() => sendAddTokensCloseEvent(eventTarget)}
+                onBackButtonClick={() => {
+                  viewDispatch({
+                    payload: {
+                      type: ViewActions.GO_BACK,
+                    },
+                  });
+                }}
+                showBackButton
+              />
+            )}
+            {viewState.view.type === SharedViews.ERROR_VIEW && (
+              <ErrorView
+                actionText={t('views.ERROR_VIEW.actionText')}
+                onActionClick={errorAction}
+                onCloseClick={() => sendAddTokensCloseEvent(eventTarget)}
+                errorEventAction={() => {
+                  page({
+                    userJourney: UserJourney.ADD_TOKENS,
+                    screen: 'Error',
+                    extras: {
+                      contextId: id,
+                    },
+                  });
+                }}
+              />
+            )}
+            {viewState.view.type
+              === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
+              <ServiceUnavailableErrorView
+                onCloseClick={() => sendAddTokensCloseEvent(eventTarget)}
+                onBackButtonClick={() => {
+                  viewDispatch({
+                    payload: {
+                      type: ViewActions.GO_BACK,
+                    },
+                  });
+                }}
+              />
+            )}
+          </Stack>
+        </AddTokensContext.Provider>
+      </ViewContext.Provider>
+    </SquidContext.Provider>
   );
 }

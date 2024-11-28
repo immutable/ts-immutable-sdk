@@ -1,5 +1,5 @@
-import { RouteData } from '../types';
-import { getFormattedAmounts, getFormattedNumber } from './getFormattedNumber';
+import { RouteData } from './types';
+import { getFormattedAmounts, getFormattedNumber } from '../getFormattedNumber';
 
 export type RouteBalance = {
   routeBalance: string;

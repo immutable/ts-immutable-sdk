@@ -28,7 +28,7 @@ import { Trans } from 'react-i18next';
 import { Environment } from '@imtbl/config';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { AddTokensContext } from '../context/AddTokensContext';
-import { useRoutes } from '../hooks/useRoutes';
+import { useRoutes } from '../../../lib/squid/hooks/useRoutes';
 import {
   AddTokensReviewData,
   AddTokensWidgetViews,
@@ -48,7 +48,6 @@ import {
   APPROVE_TXN_ANIMATION,
   EXECUTE_TXN_ANIMATION,
   FIXED_HANDOVER_DURATION,
-  SQUID_NATIVE_TOKEN,
 } from '../utils/config';
 import {
   useAnalytics,
@@ -56,16 +55,13 @@ import {
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
-import { getDurationFormatted } from '../functions/getDurationFormatted';
 import { RouteFees } from '../components/RouteFees';
 import { AddressMissmatchDrawer } from '../components/AddressMissmatchDrawer';
-import { getTotalRouteFees } from '../functions/getTotalRouteFees';
-import { getRouteChains } from '../functions/getRouteChains';
 import {
   getFormattedAmounts,
   getFormattedNumber,
   getFormattedNumberWithDecimalPlaces,
-} from '../functions/getFormattedNumber';
+} from '../../../lib/getFormattedNumber';
 import { SquidFooter } from '../components/SquidFooter';
 import { useError } from '../hooks/useError';
 import {
@@ -74,6 +70,11 @@ import {
 } from '../AddTokensWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { convertToNetworkChangeableProvider } from '../functions/convertToNetworkChangeableProvider';
+import { SQUID_NATIVE_TOKEN } from '../../../lib/squid/config';
+import { getDurationFormatted } from '../../../lib/squid/getDurationFormatted';
+import { getRouteChains } from '../../../lib/squid/getRouteChains';
+import { getTotalRouteFees } from '../../../lib/squid/getTotalRouteFees';
+import { SquidContext } from '../../../context/squid-provider/SquidContext';
 
 interface ReviewProps {
   data: AddTokensReviewData;
@@ -101,10 +102,14 @@ export function Review({
   const { track, page } = useAnalytics();
 
   const {
-    addTokensState: {
-      id, squid, chains, tokens,
-    },
+    addTokensState: { id },
   } = useContext(AddTokensContext);
+
+  const {
+    squidState: {
+      squid, chains, tokens,
+    },
+  } = useContext(SquidContext);
 
   const {
     providersState: {
@@ -162,7 +167,10 @@ export function Review({
     if (!amountData) return;
 
     const routeResponse = await getRoute(
-      squid,
+      {
+        id,
+        userJourney: UserJourney.ADD_TOKENS,
+      },
       amountData?.fromToken,
       amountData?.toToken,
       toAddress,

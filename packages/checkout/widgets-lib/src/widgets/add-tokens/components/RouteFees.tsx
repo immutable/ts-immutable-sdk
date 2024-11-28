@@ -4,10 +4,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FeesBreakdown } from '../../../components/FeesBreakdown/FeesBreakdown';
 import { FormattedFee } from '../../swap/functions/swapFees';
-import {
-  getFormattedNumber,
-  getFormattedAmounts,
-} from '../functions/getFormattedNumber';
+import { getFormattedAmounts, getFormattedNumber } from '../../../lib/getFormattedNumber';
 
 export type RouteFeesProps = {
   visible: boolean;

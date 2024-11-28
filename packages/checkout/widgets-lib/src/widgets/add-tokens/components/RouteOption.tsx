@@ -11,11 +11,11 @@ import {
 } from '@biom3/react';
 import { ReactElement, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Chain, RouteData } from '../types';
-import { getDurationFormatted } from '../functions/getDurationFormatted';
-import { getTotalRouteFees } from '../functions/getTotalRouteFees';
-import { getFormattedAmounts } from '../functions/getFormattedNumber';
-import { getRouteAndTokenBalances } from '../functions/getRouteAndTokenBalances';
+import { Chain, RouteData } from '../../../lib/squid/types';
+import { getDurationFormatted } from '../../../lib/squid/getDurationFormatted';
+import { getTotalRouteFees } from '../../../lib/squid/getTotalRouteFees';
+import { getFormattedAmounts } from '../../../lib/getFormattedNumber';
+import { getRouteAndTokenBalances } from '../../../lib/squid/getRouteAndTokenBalances';
 
 export interface RouteOptionProps<
   RC extends ReactElement | undefined = undefined,
@@ -144,7 +144,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
               />
             )}
             {
-              `${t('views.ADD_TOKENS.fees.fee')} ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} 
+              `${t('views.ADD_TOKENS.fees.fee')} ${t('views.ADD_TOKENS.fees.fiatPricePrefix')}
               $${getFormattedAmounts(totalFeesUsd)}`
             }
           </Body>

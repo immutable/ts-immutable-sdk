@@ -1,7 +1,6 @@
 import { BigNumber, utils } from 'ethers';
-
-import { tokenValueFormat } from '../../../lib/utils';
-import { DEFAULT_TOKEN_FORMATTING_DECIMALS } from '../../../lib/constants';
+import { DEFAULT_TOKEN_FORMATTING_DECIMALS } from './constants';
+import { tokenValueFormat } from './utils';
 
 /**
  * Formats a number to a string with a maximum number of decimals

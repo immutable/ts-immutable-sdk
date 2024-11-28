@@ -1,25 +1,26 @@
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
-import { RouteResponse, ActionType } from '@0xsquid/squid-types';
-import { Squid } from '@0xsquid/sdk';
+import { RouteResponse, ActionType, Hook } from '@0xsquid/squid-types';
 import { BigNumber, utils } from 'ethers';
 import { useContext, useRef } from 'react';
-import { delay } from '../functions/delay';
+import { delay } from '../../delay';
 import {
   AmountData, RouteData, RouteResponseData, Token,
 } from '../types';
-import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
-import { AddTokensActions, AddTokensContext } from '../context/AddTokensContext';
-import { retry } from '../../../lib/retry';
+import { sortRoutesByFastestTime } from '../sortRoutesByFastestTime';
+import { retry } from '../../retry';
 import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
-import { isPassportProvider } from '../../../lib/provider';
+import { isPassportProvider } from '../../provider';
+import { SquidActions, SquidContext } from '../../../context/squid-provider/SquidContext';
 
 const BASE_SLIPPAGE = 0.02;
+
+type SquidPostHook = Omit<Hook, 'fundAmount' | 'fundToken'>;
 
 export const useRoutes = () => {
   const latestRequestIdRef = useRef<number>(0);
 
-  const { addTokensState: { id }, addTokensDispatch } = useContext(AddTokensContext);
+  const { squidDispatch } = useContext(SquidContext);
 
   const {
     providersState: {
@@ -27,12 +28,14 @@ export const useRoutes = () => {
     },
   } = useProvidersContext();
 
+  const { squidState: { squid } } = useContext(SquidContext);
+
   const { track } = useAnalytics();
 
   const setRoutes = (routes: RouteData[]) => {
-    addTokensDispatch({
+    squidDispatch({
       payload: {
-        type: AddTokensActions.SET_ROUTES,
+        type: SquidActions.SET_ROUTES,
         routes,
       },
     });
@@ -148,15 +151,15 @@ export const useRoutes = () => {
   };
 
   const getRouteWithRetry = async (
-    squid: Squid,
     fromToken: Token,
     toToken: Token,
     toAddress: string,
     fromAmount: string,
     fromAddress?: string,
     quoteOnly = true,
+    postHook?: SquidPostHook,
   ): Promise<RouteResponse | undefined> => await retry(
-    () => squid.getRoute({
+    () => squid?.getRoute({
       fromChain: fromToken.chainId,
       fromToken: fromToken.address,
       fromAmount: convertToFormattedAmount(fromAmount, fromToken.decimals),
@@ -167,6 +170,7 @@ export const useRoutes = () => {
       quoteOnly,
       enableBoost: true,
       receiveGasOnDestination: !isPassportProvider(toProvider),
+      postHook,
     }),
     {
       retryIntervalMs: 1000,
@@ -189,7 +193,10 @@ export const useRoutes = () => {
   };
 
   const getRoute = async (
-    squid: Squid,
+    context: {
+      id: string,
+      userJourney: UserJourney,
+    },
     fromToken: Token,
     toToken: Token,
     toAddress: string,
@@ -197,16 +204,17 @@ export const useRoutes = () => {
     toAmount: string,
     fromAddress?: string,
     quoteOnly = true,
+    postHook?: SquidPostHook,
   ): Promise<RouteResponseData> => {
     try {
       const routeResponse = await getRouteWithRetry(
-        squid,
         fromToken,
         toToken,
         toAddress,
         fromAmount,
         fromAddress,
         quoteOnly,
+        postHook,
       );
 
       if (!routeResponse?.route) {
@@ -223,13 +231,13 @@ export const useRoutes = () => {
       );
 
       const newRoute = await getRouteWithRetry(
-        squid,
         fromToken,
         toToken,
         toAddress,
         newFromAmount,
         fromAddress,
         quoteOnly,
+        postHook,
       );
 
       if (!newRoute?.route) {
@@ -241,11 +249,11 @@ export const useRoutes = () => {
       }
 
       track({
-        userJourney: UserJourney.ADD_TOKENS,
+        userJourney: context.userJourney,
         screen: 'Routes',
         action: 'Failed',
         extras: {
-          contextId: id,
+          contextId: context.id,
           fromToken: fromToken.symbol,
           toToken: toToken.symbol,
           fromChain: fromToken.chainId,
@@ -273,12 +281,15 @@ export const useRoutes = () => {
   };
 
   const getRoutes = async (
-    squid: Squid,
+    context: {
+      id: string,
+      userJourney: UserJourney,
+    },
     amountDataArray: AmountData[],
     toTokenAddress: string,
   ): Promise<RouteData[]> => {
     const routePromises = amountDataArray.map((data) => getRoute(
-      squid,
+      context,
       data.fromToken,
       data.toToken,
       toTokenAddress,
@@ -297,7 +308,10 @@ export const useRoutes = () => {
   };
 
   const fetchRoutesWithRateLimit = async (
-    squid: Squid,
+    context: {
+      id: string,
+      userJourney: UserJourney,
+    },
     tokens: Token[],
     balances: TokenBalance[],
     toChanId: string,
@@ -334,7 +348,7 @@ export const useRoutes = () => {
         }, [] as (typeof amountDataArray)[])
         .map(async (slicedAmountDataArray) => {
           allRoutes.push(
-            ...(await getRoutes(squid, slicedAmountDataArray, toTokenAddress)),
+            ...(await getRoutes(context, slicedAmountDataArray, toTokenAddress)),
           );
           await delay(delayMs);
         }),

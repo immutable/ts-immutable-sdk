@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Squid } from '@0xsquid/sdk';
 import { CosmosBalance, TokenBalance } from '@0xsquid/sdk/dist/types';
-import { Chain } from '../types';
+import { Chain } from './types';
 
 export const fetchBalances = async (
   squid: Squid,

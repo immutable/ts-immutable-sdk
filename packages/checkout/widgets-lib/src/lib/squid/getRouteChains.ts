@@ -1,5 +1,5 @@
 import { RouteResponse } from '@0xsquid/squid-types';
-import { Chain } from '../types';
+import { Chain } from './types';
 
 /**
  * Find a chain by its id

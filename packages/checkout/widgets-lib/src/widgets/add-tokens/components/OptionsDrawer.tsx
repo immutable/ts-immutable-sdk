@@ -6,9 +6,10 @@ import { Checkout } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { listVariants } from '../../../lib/animation/listAnimation';
 import { Options } from './Options';
-import { FiatOptionType, RouteData } from '../types';
-import { AddTokensContext } from '../context/AddTokensContext';
+import { FiatOptionType } from '../types';
+import { RouteData } from '../../../lib/squid/types';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
+import { SquidContext } from '../../../context/squid-provider/SquidContext';
 
 type OptionsDrawerProps = {
   checkout: Checkout;
@@ -39,8 +40,8 @@ export function OptionsDrawer({
 }: OptionsDrawerProps) {
   const { t } = useTranslation();
   const {
-    addTokensState: { chains },
-  } = useContext(AddTokensContext);
+    squidState: { chains },
+  } = useContext(SquidContext);
 
   const {
     providersState: { fromProviderInfo, fromAddress },

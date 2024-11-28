@@ -40,10 +40,12 @@ import { AddTokensErrorTypes } from '../types';
 import { TokenImage } from '../../../components/TokenImage/TokenImage';
 import { TOKEN_PRIORITY_ORDER } from '../utils/config';
 import { PULSE_SHADOW } from '../utils/animation';
+import { Token } from '../../../lib/squid/types';
 
 export interface TokenDrawerMenuProps {
   checkout: Checkout;
   config: StrongCheckoutWidgetsConfig;
+  tokens: Token[] | null;
   toTokenAddress?: string;
   addTokensState: AddTokensState;
   addTokensDispatch: Dispatch<AddTokensAction>;
@@ -52,6 +54,7 @@ export interface TokenDrawerMenuProps {
 export function TokenDrawerMenu({
   checkout,
   config,
+  tokens,
   toTokenAddress,
   addTokensState,
   addTokensDispatch,
@@ -106,7 +109,7 @@ export function TokenDrawerMenu({
     }),
     [
       addTokensState.allowedTokens,
-      addTokensState.tokens,
+      tokens,
       handleTokenChange,
       isSelected,
       defaultTokenImage,
@@ -126,7 +129,7 @@ export function TokenDrawerMenu({
   }, [setVisible, setSearchValue]);
 
   useEffect(() => {
-    if (!checkout || addTokensState.tokens != null) return;
+    if (!checkout || tokens != null) return;
 
     (async () => {
       try {
@@ -191,7 +194,7 @@ export function TokenDrawerMenu({
         showErrorHandover(AddTokensErrorTypes.SERVICE_BREAKDOWN, { contextId: addTokensState.id, error });
       }
     })();
-  }, [addTokensState.tokens, checkout, toTokenAddress]);
+  }, [tokens, checkout, toTokenAddress]);
 
   return (
     <Drawer

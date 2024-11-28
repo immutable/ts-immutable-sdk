@@ -1,5 +1,5 @@
 import { Squid } from '@0xsquid/sdk';
-import { Chain } from '../types';
+import { Chain } from '../../widgets/add-tokens/types';
 
 type SquidChain = {
   chainId: string;

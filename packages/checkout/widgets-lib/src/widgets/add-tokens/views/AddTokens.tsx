@@ -44,10 +44,9 @@ import {
   AddTokensContext,
 } from '../context/AddTokensContext';
 import type { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
-import { useRoutes } from '../hooks/useRoutes';
-import { SQUID_NATIVE_TOKEN } from '../utils/config';
+import { useRoutes } from '../../../lib/squid/hooks/useRoutes';
 import { AddTokensWidgetViews } from '../../../context/view-context/AddTokensViewContextTypes';
-import { AddTokensErrorTypes, type RouteData } from '../types';
+import { AddTokensErrorTypes } from '../types';
 import { SelectedRouteOption } from '../components/SelectedRouteOption';
 import { SelectedWallet } from '../components/SelectedWallet';
 import { DeliverToWalletDrawer } from '../../../components/WalletDrawer/DeliverToWalletDrawer';
@@ -56,7 +55,7 @@ import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
 import { getProviderSlugFromRdns } from '../../../lib/provider';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { sendConnectProviderSuccessEvent } from '../AddTokensWidgetEvents';
-import { convertToUsd } from '../functions/convertToUsd';
+import { convertToUsd } from '../../../lib/squid/convertToUsd';
 import {
   useAnalytics,
   UserJourney,
@@ -65,10 +64,13 @@ import { validateToAmount } from '../functions/amountValidation';
 import { OnboardingDrawer } from '../components/OnboardingDrawer';
 import { useError } from '../hooks/useError';
 import { SquidFooter } from '../components/SquidFooter';
-import { getFormattedNumberWithDecimalPlaces } from '../functions/getFormattedNumber';
+import { getFormattedNumberWithDecimalPlaces } from '../../../lib/getFormattedNumber';
 import { TokenDrawerMenu } from '../components/TokenDrawerMenu';
 import { PULSE_SHADOW } from '../utils/animation';
 import { checkSanctionedAddresses } from '../functions/checkSanctionedAddresses';
+import { type RouteData } from '../../../lib/squid/types';
+import { SQUID_NATIVE_TOKEN } from '../../../lib/squid/config';
+import { SquidContext } from '../../../context/squid-provider/SquidContext';
 
 interface AddTokensProps {
   checkout: Checkout;
@@ -100,18 +102,22 @@ export function AddTokens({
   const { fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
   const { showErrorHandover } = useError(config.environment);
 
+  const { squidState } = useContext(SquidContext);
+  const {
+    squid,
+    chains,
+    balances,
+    tokens,
+    routes,
+  } = squidState;
+
   const {
     addTokensState,
     addTokensDispatch,
   } = useContext(AddTokensContext);
   const {
     id,
-    squid,
-    chains,
-    balances,
-    tokens,
     selectedAmount,
-    routes,
     selectedRouteData,
     selectedToken,
     isSwapAvailable,
@@ -299,7 +305,10 @@ export function AddTokens({
       ) {
         setFetchingRoutes(true);
         const availableRoutes = await fetchRoutesWithRateLimit(
-          squid,
+          {
+            id,
+            userJourney: UserJourney.ADD_TOKENS,
+          },
           tokens,
           balances,
           ChainId.IMTBL_ZKEVM_MAINNET.toString(),
@@ -580,6 +589,7 @@ export function AddTokens({
           <TokenDrawerMenu
             checkout={checkout}
             config={config}
+            tokens={tokens}
             toTokenAddress={toTokenAddress}
             addTokensState={addTokensState}
             addTokensDispatch={addTokensDispatch}
@@ -606,7 +616,7 @@ export function AddTokens({
               />
 
               <HeroFormControl.Caption>
-                {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} 
+                {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')}
                 $${getFormattedNumberWithDecimalPlaces(selectedAmountUsd)}`}
               </HeroFormControl.Caption>
             </HeroFormControl>
