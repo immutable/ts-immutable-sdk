@@ -26,6 +26,7 @@ import { RouteResponse } from '@0xsquid/squid-types';
 import { t } from 'i18next';
 import { Trans } from 'react-i18next';
 import { Environment } from '@imtbl/config';
+import { ChainId } from '@imtbl/checkout-sdk';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { AddTokensContext } from '../context/AddTokensContext';
 import { useRoutes } from '../hooks/useRoutes';
@@ -381,7 +382,10 @@ export function Review({
         action: 'Succeeded',
         extras: {
           contextId: id,
-          txHash: executeTxnReceipt.transactionHash,
+          ...(route.route.params.fromChain !== ChainId.IMTBL_ZKEVM_MAINNET.toString()
+            && { txHash: executeTxnReceipt.transactionHash }),
+          ...(route.route.params.fromChain === ChainId.IMTBL_ZKEVM_MAINNET.toString()
+            && { immutableZkEVMTxHash: executeTxnReceipt.transactionHash }),
         },
       });
 
