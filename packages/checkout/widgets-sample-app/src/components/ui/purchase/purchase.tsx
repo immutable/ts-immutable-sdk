@@ -1,4 +1,4 @@
-import { Checkout, WidgetLanguage, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { Checkout, PurchaseEventType, WidgetLanguage, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { useEffect, useMemo } from 'react';
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
 
@@ -11,6 +11,20 @@ export default function PurchaseUI() {
 
   useEffect(() => {
     purchase.mount(PURCHASE_WIDGET_ID, {});
+
+    purchase.addListener(PurchaseEventType.CLOSE_WIDGET, (data: any) => {
+      console.log("CLOSE_WIDGET", data);
+      purchase.unmount();
+    });
+
+    purchase.addListener(PurchaseEventType.CONNECT_SUCCESS, (data: any) => {
+      console.log("CONNECT_SUCCESS", data);
+    });
+
+    return () => {
+      purchase.removeListener(PurchaseEventType.CLOSE_WIDGET);
+      purchase.removeListener(PurchaseEventType.CONNECT_SUCCESS);
+    }
   }, [purchase]);
 
   return (

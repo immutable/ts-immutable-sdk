@@ -7,6 +7,9 @@ export type PurchaseWidgetParams = {
   /** Environment id from Immutable Hub */
   environmentId?: string;
 
+  /** Whether to show a back button on the first screen, on click triggers REQUEST_GO_BACK event */
+  showBackButton?: boolean;
+
   /** The list of products to be purchased */
   items?: PurchaseItem[];
 };

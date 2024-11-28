@@ -19,6 +19,7 @@ export type PurchaseSuccess = {};
  */
 export type PurchaseFailed = {
   reason: string;
+  timestamp: number;
 };
 
 /**
