@@ -123,7 +123,9 @@ export class ZkEvmProvider implements Provider {
           this.#callSessionActivity(user.zkEvm.ethAddress);
         }
       }
-    }).catch(); // User does not exist, don't initialise an eth signer
+    }).catch(() => {
+      // User does not exist, don't initialise an eth signer
+    });
 
     passportEventEmitter.on(PassportEvents.LOGGED_IN, (user: User) => {
       this.#initialiseEthSigner(user);

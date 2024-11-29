@@ -110,7 +110,7 @@ export default function ConnectWidget({
     [viewState, viewDispatch],
   );
 
-  const { identify, page } = useAnalytics();
+  const { identify, page, user } = useAnalytics();
 
   let targetChain = targetChainId;
   if (!targetChain) {
@@ -186,7 +186,11 @@ export default function ConnectWidget({
     });
     // Set up EIP-1193 provider event listeners for widget root instances
     addProviderListenersForWidgetRoot(provider);
-    await identifyUser(identify, provider);
+
+    const userData = user ? await user() : undefined;
+    const anonymousId = userData?.anonymousId();
+
+    await identifyUser(identify, provider, { anonymousId });
     sendProviderUpdatedEvent({ provider });
 
     // Find the wallet provider info via injected with Passport and MetaMask fallbacks

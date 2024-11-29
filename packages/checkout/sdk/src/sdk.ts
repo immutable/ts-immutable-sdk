@@ -143,7 +143,8 @@ export class Checkout {
     // Determine the version of the widgets to load
     const validatedBuildVersion = validateAndBuildVersion(init.version);
     const initVersionProvided = init.version !== undefined;
-    const widgetsVersion = determineWidgetsVersion(
+
+    const widgetsVersion = await determineWidgetsVersion(
       validatedBuildVersion,
       initVersionProvided,
       versionConfig,

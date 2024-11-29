@@ -3,7 +3,9 @@ import { Box } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
-import { ExchangeType, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
+import {
+  ExchangeType, fetchRiskAssessment, IMTBLWidgetEvents, isAddressSanctioned,
+} from '@imtbl/checkout-sdk';
 import url from 'url';
 import { useTranslation } from 'react-i18next';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -131,6 +133,7 @@ export function OnRampMain({
       default:
     }
   };
+
   const transakEventHandler = (event: TransakEventData) => {
     if (eventTimer.current) clearTimeout(eventTimer.current);
 
@@ -219,6 +222,24 @@ export function OnRampMain({
     let userWalletAddress = '';
 
     (async () => {
+      const walletAddress = await provider.getSigner().getAddress();
+
+      const assessment = await fetchRiskAssessment([walletAddress], checkout.config);
+
+      if (isAddressSanctioned(assessment)) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
+              error: new Error('Sanctioned address'),
+            },
+          },
+        });
+
+        return;
+      }
+
       const params = {
         exchangeType: ExchangeType.ONRAMP,
         web3Provider: provider,

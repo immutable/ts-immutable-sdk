@@ -28,9 +28,11 @@ import {
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
+import { ActionType } from '@0xsquid/squid-types';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
+  SharedViews,
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
@@ -63,9 +65,10 @@ import { validateToAmount } from '../functions/amountValidation';
 import { OnboardingDrawer } from '../components/OnboardingDrawer';
 import { useError } from '../hooks/useError';
 import { SquidFooter } from '../components/SquidFooter';
-import { getFormattedNumberWithDecimalPlaces } from '../functions/getFormattedNumber';
 import { TokenDrawerMenu } from '../components/TokenDrawerMenu';
 import { PULSE_SHADOW } from '../utils/animation';
+import { checkSanctionedAddresses } from '../functions/checkSanctionedAddresses';
+import { getFormattedAmounts } from '../functions/getFormattedNumber';
 
 interface AddTokensProps {
   checkout: Checkout;
@@ -98,19 +101,21 @@ export function AddTokens({
   const { showErrorHandover } = useError(config.environment);
 
   const {
-    addTokensState: {
-      squid,
-      chains,
-      balances,
-      tokens,
-      selectedAmount,
-      routes,
-      selectedRouteData,
-      selectedToken,
-      isSwapAvailable,
-    },
+    addTokensState,
     addTokensDispatch,
   } = useContext(AddTokensContext);
+  const {
+    id,
+    squid,
+    chains,
+    balances,
+    tokens,
+    selectedAmount,
+    routes,
+    selectedRouteData,
+    selectedToken,
+    isSwapAvailable,
+  } = addTokensState;
 
   const { viewDispatch } = useContext(ViewContext);
   const { track, page } = useAnalytics();
@@ -132,24 +137,10 @@ export function AddTokens({
   );
   const [fetchingRoutes, setFetchingRoutes] = useState(false);
   const [insufficientBalance, setInsufficientBalance] = useState(false);
+  const [isAmountInputSynced, setIsAmountInputSynced] = useState(false);
 
-  const selectedAmountUsd = useMemo(
-    () => convertToUsd(tokens, inputValue, selectedToken),
-    [tokens, inputValue, selectedToken],
-  );
-
-  const setSelectedAmount = useMemo(
-    () => debounce((value: string) => {
-      track({
-        userJourney: UserJourney.ADD_TOKENS,
-        screen: 'InputScreen',
-        control: 'AmountInput',
-        controlType: 'TextInput',
-        extras: {
-          toAmount: value,
-        },
-      });
-
+  const debouncedSetSelectedAmount = useRef(
+    debounce((value: string) => {
       addTokensDispatch({
         payload: {
           type: AddTokensActions.SET_SELECTED_AMOUNT,
@@ -157,8 +148,23 @@ export function AddTokens({
         },
       });
     }, 2500),
-    [],
   );
+
+  const selectedAmountUsd = useMemo(
+    () => convertToUsd(tokens, inputValue, selectedToken),
+    [tokens, inputValue, selectedToken],
+  );
+
+  const setSelectedAmount = (value: string) => {
+    setIsAmountInputSynced(false);
+    debouncedSetSelectedAmount.current(value);
+  };
+
+  useEffect(() => {
+    if (selectedAmount === inputValue) {
+      setIsAmountInputSynced(true);
+    }
+  }, [selectedAmount, inputValue]);
 
   const setSelectedRouteData = (route: RouteData | undefined) => {
     if (route) {
@@ -168,16 +174,23 @@ export function AddTokens({
         control: 'RoutesMenu',
         controlType: 'MenuItem',
         extras: {
+          contextId: id,
           toTokenAddress: route.amountData.toToken.address,
           toTokenChainId: route.amountData.toToken.chainId,
+          toTokenSymbol: route.amountData.toToken.symbol,
           fromTokenAddress: route.amountData.fromToken.address,
           fromTokenChainId: route.amountData.fromToken.chainId,
+          fromTokenSymbol: route.amountData.fromToken.symbol,
           toAmount: route.amountData.toAmount,
           fromAmount: route.amountData.fromAmount,
+          isBridge: route.amountData.toToken.chainId !== route.amountData.fromToken.chainId,
+          isSwap: route.amountData.toToken.chainId === route.amountData.fromToken.chainId,
+          hasEmbeddedSwap: !!route.route.route.estimate.actions.find(
+            (action) => action.type === ActionType.SWAP,
+          ),
         },
       });
     }
-
     addTokensDispatch({
       payload: {
         type: AddTokensActions.SET_SELECTED_ROUTE_DATA,
@@ -189,12 +202,26 @@ export function AddTokens({
   const handleOnAmountInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value, amount, isValid } = validateToAmount(event.target.value);
 
-    if (!isValid && amount < 0) {
-      return;
-    }
+    if (isValid || amount === 0 || value === '') {
+      setInputValue(value);
 
-    setInputValue(value);
-    setSelectedAmount(value);
+      if (amount > 0) {
+        setSelectedAmount(value);
+
+        track({
+          userJourney: UserJourney.ADD_TOKENS,
+          screen: 'InputScreen',
+          control: 'AmountInput',
+          controlType: 'TextInput',
+          extras: {
+            contextId: id,
+            toAmount: value,
+          },
+        });
+      } else {
+        setSelectedAmount('');
+      }
+    }
   };
 
   const {
@@ -231,15 +258,19 @@ export function AddTokens({
   );
 
   useEffect(() => {
+    if (!id || isSwapAvailable === undefined) { return; }
+
     page({
       userJourney: UserJourney.ADD_TOKENS,
       screen: 'InputScreen',
       extras: {
+        contextId: id,
         toAmount,
         toTokenAddress,
+        geoBlocked: !isSwapAvailable,
       },
     });
-  }, []);
+  }, [id, isSwapAvailable]);
 
   useEffect(() => {
     if (!toAmount) return;
@@ -282,6 +313,19 @@ export function AddTokens({
         );
         setFetchingRoutes(false);
 
+        track({
+          userJourney: UserJourney.ADD_TOKENS,
+          screen: 'InputScreen',
+          control: 'RoutesMenu',
+          controlType: 'MenuItem',
+          action: 'Request',
+          extras: {
+            contextId: id,
+            routesAvailable: availableRoutes.length,
+            geoBlocked: !isSwapAvailable,
+          },
+        });
+
         if (availableRoutes.length === 0) {
           setInsufficientBalance(true);
         }
@@ -309,19 +353,37 @@ export function AddTokens({
           setOnRampAllowedTokens(tokenResponse.tokens);
         }
       } catch (error) {
-        showErrorHandover(AddTokensErrorTypes.SERVICE_BREAKDOWN, { error });
+        showErrorHandover(AddTokensErrorTypes.SERVICE_BREAKDOWN, { contextId: id, error });
       }
     };
     fetchOnRampTokens();
-  }, [checkout]);
+  }, [checkout, id]);
 
-  const sendRequestOnRampEvent = () => {
+  const sendRequestOnRampEvent = async () => {
+    if (
+      toAddress
+      && (await checkSanctionedAddresses([toAddress], checkout.config))
+    ) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
+            error: new Error('Sanctioned address'),
+          },
+        },
+      });
+
+      return;
+    }
+
     track({
       userJourney: UserJourney.ADD_TOKENS,
       screen: 'InputScreen',
       control: 'PayWithCardMenu',
       controlType: 'MenuItem',
       extras: {
+        contextId: id,
         tokenAddress: selectedToken?.address ?? '',
         amount: selectedAmount ?? '',
       },
@@ -352,7 +414,7 @@ export function AddTokens({
     if (toProvider && payWithCardClicked) {
       sendRequestOnRampEvent();
     }
-  }, [toProvider]);
+  }, [toProvider, payWithCardClicked]);
 
   const handleRouteClick = (route: RouteData) => {
     setShowOptionsDrawer(false);
@@ -368,15 +430,37 @@ export function AddTokens({
     setShowDeliverToDrawer(false);
   };
 
-  const handleReviewClick = () => {
+  const handleReviewClick = async () => {
     if (!selectedRouteData || !selectedToken?.address) return;
+
+    if (
+      fromAddress
+      && toAddress
+      && (await checkSanctionedAddresses(
+        [fromAddress, toAddress],
+        checkout.config,
+      ))
+    ) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
+            error: new Error('Sanctioned address'),
+          },
+        },
+      });
+
+      return;
+    }
 
     track({
       userJourney: UserJourney.ADD_TOKENS,
       screen: 'InputScreen',
-      control: 'RoutesMenu',
-      controlType: 'MenuItem',
+      control: 'Review',
+      controlType: 'Button',
       extras: {
+        contextId: id,
         toTokenAddress: selectedRouteData.amountData.toToken.address,
         toTokenChainId: selectedRouteData.amountData.toToken.chainId,
         fromTokenAddress: selectedRouteData.amountData.fromToken.address,
@@ -422,10 +506,12 @@ export function AddTokens({
   }, [showInitialEmptyState]);
 
   const shouldShowBackButton = showBackButton && onBackButtonClick;
+
   const routeInputsReady = !!selectedToken
     && !!fromAddress
     && validateToAmount(selectedAmount).isValid
-    && validateToAmount(inputValue).isValid;
+    && validateToAmount(inputValue).isValid
+    && isAmountInputSynced;
 
   const loading = (routeInputsReady || fetchingRoutes)
     && !(selectedRouteData || insufficientBalance);
@@ -443,6 +529,7 @@ export function AddTokens({
       control: 'WalletsMenu',
       controlType: 'MenuItem',
       extras: {
+        contextId: id,
         providerType,
         providerName: providerInfo.name,
         providerRdns: providerInfo.rdns,
@@ -507,31 +594,33 @@ export function AddTokens({
             checkout={checkout}
             config={config}
             toTokenAddress={toTokenAddress}
+            addTokensState={addTokensState}
+            addTokensDispatch={addTokensDispatch}
           />
           {showInitialEmptyState ? (
-            <Body>Add Token</Body>
+            <Body>{t('views.ADD_TOKENS.tokenSelection.buttonText')}</Body>
           ) : (
             <HeroFormControl
-              validationStatus={inputValue === '0' ? 'error' : 'success'}
+              validationStatus={validateToAmount(inputValue).isValid || inputValue === '' ? 'success' : 'error'}
             >
               <HeroFormControl.Label>
-                Add
+                {t('views.ADD_TOKENS.tokenSelection.tokenLabel')}
                 {' '}
                 {selectedToken.symbol}
               </HeroFormControl.Label>
               <HeroTextInput
                 inputRef={inputRef}
                 testId="add-tokens-amount-input"
-                type="number"
+                type="text"
                 value={inputValue}
-                onChange={(value) => handleOnAmountInputChange(value)}
+                onChange={(event) => handleOnAmountInputChange(event)}
                 placeholder="0"
                 maxTextSize="xLarge"
               />
 
               <HeroFormControl.Caption>
                 {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} 
-                $${getFormattedNumberWithDecimalPlaces(selectedAmountUsd)}`}
+                $${getFormattedAmounts(selectedAmountUsd)}`}
               </HeroFormControl.Caption>
             </HeroFormControl>
           )}
@@ -552,10 +641,10 @@ export function AddTokens({
             <SelectedWallet
               sx={selectedToken
                 && !fromAddress
-                && inputValue
+                && selectedAmount
                 ? { animation: `${PULSE_SHADOW} 2s infinite ease-in-out` }
                 : {}}
-              label="Send from"
+              label={t('views.ADD_TOKENS.walletSelection.fromText')}
               providerInfo={{
                 ...fromProviderInfo,
                 address: fromAddress,
@@ -565,7 +654,7 @@ export function AddTokens({
                 setShowPayWithDrawer(true);
               }}
             >
-              {selectedToken && fromAddress && inputValue && (
+              {selectedToken && fromAddress && selectedAmount && isAmountInputSynced && (
               <>
                 <MenuItem.BottomSlot.Divider
                   sx={fromAddress ? { ml: 'base.spacing.x4' } : undefined}
@@ -602,10 +691,10 @@ export function AddTokens({
               sx={selectedToken
                 && fromAddress
                 && !toAddress
-                && inputValue
+                && selectedAmount
                 ? { animation: `${PULSE_SHADOW} 2s infinite ease-in-out` }
                 : {}}
-              label="Deliver to"
+              label={t('views.ADD_TOKENS.walletSelection.toText')}
               providerInfo={{
                 ...toProviderInfo,
                 address: toAddress,
@@ -623,7 +712,7 @@ export function AddTokens({
             onClick={handleReviewClick}
             sx={{ opacity: readyToReview ? 1 : 0.5 }}
           >
-            Review
+            {t('views.ADD_TOKENS.review.buttonText')}
           </Button>
 
           <SquidFooter />
@@ -635,7 +724,7 @@ export function AddTokens({
             onPayWithCard={handleCardClick}
             onConnect={handleWalletConnected}
             insufficientBalance={insufficientBalance}
-            showOnRampOption={shouldShowOnRampOption}
+            showOnRampOption={shouldShowOnRampOption || !selectedToken}
           />
           <OptionsDrawer
             checkout={checkout}
@@ -653,6 +742,7 @@ export function AddTokens({
             visible={showDeliverToDrawer}
             walletOptions={walletOptions}
             onClose={handleDeliverToClose}
+            onConnect={handleWalletConnected}
           />
           <OnboardingDrawer environment={checkout?.config.environment!} />
         </Stack>

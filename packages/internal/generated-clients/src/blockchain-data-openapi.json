@@ -5664,6 +5664,48 @@
           "amount"
         ]
       },
+      "Bid": {
+        "type": "object",
+        "properties": {
+          "bid_id": {
+            "type": "string",
+            "description": "Global Order identifier",
+            "example": "018792C9-4AD7-8EC4-4038-9E05C598534A"
+          },
+          "price_details": {
+            "$ref": "#/components/schemas/MarketPriceDetails"
+          },
+          "token_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Token ID. Null for collection bids that can be fulfilled by any asset in the collection",
+            "example": "1"
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "ETH Address of collection that the asset belongs to",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          "creator": {
+            "type": "string",
+            "description": "ETH Address of listing creator",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Amount of token included in the listing",
+            "example": "1"
+          }
+        },
+        "required": [
+          "bid_id",
+          "price_details",
+          "creator",
+          "token_id",
+          "contract_address",
+          "amount"
+        ]
+      },
       "LastTrade": {
         "type": "object",
         "nullable": true,
@@ -5726,11 +5768,21 @@
               }
             ]
           },
+          "top_bid": {
+            "description": "Highest active big",
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Bid"
+              }
+            ]
+          },
           "last_trade": {
             "$ref": "#/components/schemas/LastTrade"
           }
         },
         "required": [
+          "top_bid",
           "floor_listing",
           "last_trade"
         ]
@@ -5752,17 +5804,26 @@
           },
           "listings": {
             "type": "array",
-            "description": "List of open listings for the stack.",
+            "description": "List of open listings for the NFT.",
             "maxItems": 10,
             "items": {
               "$ref": "#/components/schemas/Listing"
+            }
+          },
+          "bids": {
+            "type": "array",
+            "description": "List of open bids for the NFT.",
+            "maxItems": 10,
+            "items": {
+              "$ref": "#/components/schemas/Bid"
             }
           }
         },
         "required": [
           "nft_with_stack",
           "market",
-          "listings"
+          "listings",
+          "bids"
         ]
       },
       "SearchNFTsResult": {
@@ -5904,13 +5965,22 @@
             "items": {
               "$ref": "#/components/schemas/Listing"
             }
+          },
+          "bids": {
+            "type": "array",
+            "description": "List of open bids for the stack.",
+            "maxItems": 10,
+            "items": {
+              "$ref": "#/components/schemas/Bid"
+            }
           }
         },
         "required": [
           "stack",
           "stack_count",
           "market",
-          "listings"
+          "listings",
+          "bids"
         ]
       },
       "SearchStacksResult": {

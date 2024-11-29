@@ -24,6 +24,7 @@ import { OnRamp } from './widgets/on-ramp/OnRampWidgetRoot';
 import { Sale } from './widgets/sale/SaleWidgetRoot';
 import { Swap } from './widgets/swap/SwapWidgetRoot';
 import { Wallet } from './widgets/wallet/WalletWidgetRoot';
+import { Purchase } from './widgets/purchase/PurchaseWidgetRoot';
 
 export class WidgetsFactory implements IWidgetsFactory {
   private sdk: Checkout;
@@ -106,6 +107,12 @@ export class WidgetsFactory implements IWidgetsFactory {
           config: { ...this.widgetConfig, ...(config) },
           provider,
         }) as Widget<WidgetType.ADD_TOKENS> as Widget<T>;
+      }
+      case WidgetType.PURCHASE: {
+        return new Purchase(this.sdk, {
+          config: { ...this.widgetConfig, ...(config) },
+          provider,
+        }) as Widget<WidgetType.PURCHASE> as Widget<T>;
       }
       default:
         throw new Error('widget type not supported');

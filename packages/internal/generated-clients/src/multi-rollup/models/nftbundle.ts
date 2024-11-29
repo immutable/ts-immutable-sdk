@@ -15,6 +15,9 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import { Bid } from './bid';
+// May contain unused imports in some cases
+// @ts-ignore
 import { Listing } from './listing';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -42,10 +45,16 @@ export interface NFTBundle {
      */
     'market': Market | null;
     /**
-     * List of open listings for the stack.
+     * List of open listings for the NFT.
      * @type {Array<Listing>}
      * @memberof NFTBundle
      */
     'listings': Array<Listing>;
+    /**
+     * List of open bids for the NFT.
+     * @type {Array<Bid>}
+     * @memberof NFTBundle
+     */
+    'bids': Array<Bid>;
 }
 

@@ -25,6 +25,7 @@ import {
   ConnectEIP6963ProviderError,
 } from '../../lib/connectEIP6963Provider';
 import { EOAWarningDrawer } from '../EOAWarningDrawer/EOAWarningDrawer';
+import { removeSpace } from '../../lib/utils';
 
 type ConnectWalletDrawerProps = {
   heading: string;
@@ -44,6 +45,7 @@ type ConnectWalletDrawerProps = {
     rdns: string;
   }[];
   getShouldRequestWalletPermissions?: (providerInfo: EIP6963ProviderInfo) => boolean | undefined;
+  shouldIdentifyUser?: boolean;
 };
 
 export function ConnectWalletDrawer({
@@ -58,13 +60,14 @@ export function ConnectWalletDrawer({
   menuItemSize = 'small',
   disabledOptions = [],
   getShouldRequestWalletPermissions,
+  shouldIdentifyUser = true,
 }: ConnectWalletDrawerProps) {
   const {
-    providersState: { checkout, fromProvider },
+    providersState: { checkout, fromProvider, lockedToProvider },
     providersDispatch,
   } = useProvidersContext();
 
-  const { identify, track } = useAnalytics();
+  const { identify, track, user } = useAnalytics();
 
   const prevWalletChangeEvent = useRef<WalletChangeEvent | undefined>();
 
@@ -110,7 +113,7 @@ export function ConnectWalletDrawer({
     track({
       userJourney: UserJourney.CONNECT,
       screen: 'ConnectWallet',
-      control: info.name,
+      control: removeSpace(info.name),
       controlType: 'MenuItem',
       extras: {
         providerType,
@@ -125,7 +128,8 @@ export function ConnectWalletDrawer({
       });
 
       if (isConnected) {
-        if (providerType === 'from' || (providerType === 'to' && !isPassportProvider(fromProvider))) {
+        if ((providerType === 'from' && !lockedToProvider)
+         || (providerType === 'to' && !isPassportProvider(fromProvider))) {
           await checkout.passport?.logout();
         }
       }
@@ -142,8 +146,14 @@ export function ConnectWalletDrawer({
         checkout,
         shouldRequestWalletPermissions,
       );
-      // Identify connected wallet
-      await identifyUser(identify, provider);
+
+      // Identify connected wallet, retaining current anonymousId
+      if (shouldIdentifyUser) {
+        const userData = user ? await user() : undefined;
+        const anonymousId = userData?.anonymousId();
+
+        await identifyUser(identify, provider, { anonymousId });
+      }
 
       // Store selected provider as fromProvider in context
       address = await setProviderInContext(provider, providerDetail.info);
@@ -153,7 +163,6 @@ export function ConnectWalletDrawer({
     } catch (error: ConnectEIP6963ProviderError | any) {
       let errorType = error.message;
       switch (error.message) {
-        case ConnectEIP6963ProviderError.SANCTIONED_ADDRESS:
         case ConnectEIP6963ProviderError.CONNECT_ERROR:
           setShowUnableToConnectDrawer(true);
           break;

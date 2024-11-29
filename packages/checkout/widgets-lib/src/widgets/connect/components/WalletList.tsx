@@ -4,8 +4,6 @@ import {
   ChainId,
   CheckoutErrorType,
   EIP6963ProviderDetail,
-  fetchRiskAssessment,
-  isAddressSanctioned,
   WalletProviderName,
   WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
@@ -26,7 +24,6 @@ import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewCon
 import { ConnectActions, ConnectContext } from '../context/ConnectContext';
 import { WalletItem } from './WalletItem';
 import {
-  SharedViews,
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
@@ -52,6 +49,7 @@ import { WalletConnectItem } from './WalletConnectItem';
 import { BrowserWalletItem } from './BrowserWalletItem';
 import { identifyUser } from '../../../lib/analytics/identifyUser';
 import { NonPassportWarningDrawer } from './NonPassportWarningDrawer';
+import { removeSpace } from '../../../lib/utils';
 
 export interface WalletListProps {
   targetWalletRdns?: string;
@@ -75,7 +73,7 @@ export function WalletList(props: WalletListProps) {
     connectState: { checkout },
   } = useContext(ConnectContext);
   const { viewDispatch } = useContext(ViewContext);
-  const { track, identify } = useAnalytics();
+  const { track, identify, user } = useAnalytics();
   const { providers } = useInjectedProviders({ checkout });
   const [showWalletDrawer, setShowWalletDrawer] = useState(false);
   const { isWalletConnectEnabled, openWalletConnectModal } = useWalletConnect();
@@ -180,25 +178,12 @@ export function WalletList(props: WalletListProps) {
             requestWalletPermissions: changeAccount,
           });
 
-          // CM-793 Check for sanctioned address
-          const address = await connectResult.provider.getSigner().getAddress();
-          const sanctions = await fetchRiskAssessment([address], checkout.config);
-          if (isAddressSanctioned(sanctions, address)) {
-            viewDispatch({
-              payload: {
-                type: ViewActions.UPDATE_VIEW,
-                view: {
-                  type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
-                  error: new Error('Sanctioned address'),
-                },
-              },
-            });
-            return;
-          }
-
           // Set up EIP-1193 provider event listeners for widget root instances
           addProviderListenersForWidgetRoot(connectResult.provider);
-          await identifyUser(identify, connectResult.provider);
+
+          const userData = user ? await user() : undefined;
+          const anonymousId = userData?.anonymousId();
+          await identifyUser(identify, connectResult.provider, { anonymousId });
 
           selectWeb3Provider(
             web3Provider,
@@ -277,7 +262,7 @@ export function WalletList(props: WalletListProps) {
     track({
       userJourney: UserJourney.CONNECT,
       screen: 'ConnectWallet',
-      control: providerDetail.info.name,
+      control: removeSpace(providerDetail.info.name),
       controlType: 'MenuItem',
       extras: {
         wallet: getProviderSlugFromRdns(providerDetail.info.rdns),
@@ -308,7 +293,7 @@ export function WalletList(props: WalletListProps) {
       track({
         userJourney: UserJourney.CONNECT,
         screen: 'ConnectWallet',
-        control: providerDetail.info.name,
+        control: removeSpace(providerDetail.info.name),
         controlType: 'MenuItem',
         extras: {
           wallet: getProviderSlugFromRdns(providerDetail.info.rdns),

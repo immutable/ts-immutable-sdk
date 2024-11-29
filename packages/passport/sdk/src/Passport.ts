@@ -192,7 +192,7 @@ export class Passport {
       try {
         user = await this.authManager.getUser();
       } catch (error) {
-        if (error instanceof Error) {
+        if (error instanceof Error && !error.message.includes('Unknown or invalid refresh token')) {
           trackError('passport', 'login', error);
         }
         if (useCachedSession) {

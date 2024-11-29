@@ -166,6 +166,19 @@ export default class ConfirmationScreen {
     });
   }
 
+  showServiceUnavailable(): Promise<void> {
+    return new Promise((_, reject) => {
+      this.showConfirmationScreen(
+        this.getHref('unavailable'),
+        () => {},
+        () => {
+          this.closeWindow();
+          reject(new Error('Service unavailable'));
+        },
+      );
+    });
+  }
+
   loading(popupOptions?: { width: number; height: number }) {
     if (this.config.crossSdkBridgeEnabled) {
       // There is no need to open a confirmation window if cross-sdk bridge is enabled

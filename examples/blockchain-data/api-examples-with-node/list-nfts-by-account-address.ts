@@ -5,10 +5,10 @@ export async function listNFTsByAccountAddress(
   chainName: string,
   contractAddress: string,
   accountAddress: string,
-): Promise<blockchainData.Types.ListNFTsResult> {
+): Promise<blockchainData.Types.ListNFTsByOwnerResult> {
   return await client.listNFTsByAccountAddress({
     chainName,
     contractAddress,
     accountAddress,
   });
-};
+}

@@ -223,4 +223,27 @@ describe('confirmation', () => {
       });
     });
   });
+
+  describe('showServiceUnavailable', () => {
+    it('should reject with "Service unavailable" when the unavailable flow is triggered', async () => {
+      const showConfirmationScreenMock = jest.spyOn(confirmationScreen, 'showConfirmationScreen')
+        .mockImplementation((href, messageHandler, resolve) => {
+          resolve();
+        });
+
+      const expectedHref = 'mocked-unavailable-href';
+      // biome-ignore lint/suspicious/noExplicitAny: test
+      jest.spyOn(confirmationScreen as any, 'getHref').mockReturnValue(expectedHref);
+
+      await expect(confirmationScreen.showServiceUnavailable()).rejects.toThrow('Service unavailable');
+
+      expect(showConfirmationScreenMock).toHaveBeenCalledWith(
+        expectedHref,
+        expect.any(Function),
+        expect.any(Function),
+      );
+
+      showConfirmationScreenMock.mockRestore();
+    });
+  });
 });
