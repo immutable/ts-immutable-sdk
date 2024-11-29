@@ -28,127 +28,123 @@
     ".": {
       "development": {
         "types": "./src/index.ts",
-        "import": "./dist/index.js",
-        "main": "./dist/index.js",
-        "require": "./dist/index.cjs"
+        "browser": "./dist/index.browser.js",
+        "require": "./dist/index.cjs",
+        "default": "./dist/index.js"
       },
       "default": {
         "types": "./dist/index.d.ts",
-        "import": "./dist/index.js",
-        "main": "./dist/index.js",
-        "require": "./dist/index.cjs"
+        "browser": "./dist/index.browser.js",
+        "require": "./dist/index.cjs",
+        "default": "./dist/index.js"
       }
     },
     "./config": {
       "development": {
         "types": "./src/config.ts",
-        "import": "./dist/config.js",
-        "main": "./dist/config.js",
-        "require": "./dist/config.cjs"
+        "browser": "./dist/config.browser.js",
+        "require": "./dist/config.cjs",
+        "default": "./dist/config.js"
       },
       "default": {
         "types": "./dist/config.d.ts",
-        "import": "./dist/config.js",
-        "main": "./dist/config.js",
-        "require": "./dist/config.cjs"
+        "browser": "./dist/config.browser.js",
+        "require": "./dist/config.cjs",
+        "default": "./dist/config.js"
       }
     },
     "./blockchain_data": {
       "development": {
         "types": "./src/blockchain_data.ts",
-        "import": "./dist/blockchain_data.js",
-        "main": "./dist/blockchain_data.js",
-        "require": "./dist/blockchain_data.cjs"
+        "browser": "./dist/blockchain_data.browser.js",
+        "require": "./dist/blockchain_data.cjs",
+        "default": "./dist/blockchain_data.js"
       },
       "default": {
         "types": "./dist/blockchain_data.d.ts",
-        "import": "./dist/blockchain_data.js",
-        "main": "./dist/blockchain_data.js",
-        "require": "./dist/blockchain_data.cjs"
+        "browser": "./dist/blockchain_data.browser.js",
+        "require": "./dist/blockchain_data.cjs",
+        "default": "./dist/blockchain_data.js"
       }
     },
     "./passport": {
       "development": {
         "types": "./src/passport.ts",
-        "import": "./dist/passport.js",
-        "main": "./dist/passport.js",
-        "require": "./dist/passport.cjs"
+        "browser": "./dist/passport.browser.js",
+        "require": "./dist/passport.cjs",
+        "default": "./dist/passport.js"
       },
       "default": {
         "types": "./dist/passport.d.ts",
-        "import": "./dist/passport.js",
-        "main": "./dist/passport.js",
-        "require": "./dist/passport.cjs"
+        "browser": "./dist/passport.browser.js",
+        "require": "./dist/passport.cjs",
+        "default": "./dist/passport.js"
       }
     },
     "./orderbook": {
       "development": {
         "types": "./src/orderbook.ts",
-        "import": "./dist/orderbook.js",
-        "main": "./dist/orderbook.js",
-        "require": "./dist/orderbook.cjs"
+        "browser": "./dist/orderbook.browser.js",
+        "require": "./dist/orderbook.cjs",
+        "default": "./dist/orderbook.js"
       },
       "default": {
         "types": "./dist/orderbook.d.ts",
-        "import": "./dist/orderbook.js",
-        "main": "./dist/orderbook.js",
-        "require": "./dist/orderbook.cjs"
+        "browser": "./dist/orderbook.browser.js",
+        "require": "./dist/orderbook.cjs",
+        "default": "./dist/orderbook.js"
       }
     },
     "./checkout": {
       "development": {
         "types": "./src/checkout.ts",
-        "import": "./dist/checkout.js",
-        "main": "./dist/checkout.js",
-        "require": "./dist/checkout.cjs"
+        "browser": "./dist/checkout.browser.js",
+        "require": "./dist/checkout.cjs",
+        "default": "./dist/checkout.js"
       },
       "default": {
         "types": "./dist/checkout.d.ts",
-        "import": "./dist/checkout.js",
-        "main": "./dist/checkout.js",
-        "require": "./dist/checkout.cjs"
+        "browser": "./dist/checkout.browser.js",
+        "require": "./dist/checkout.cjs",
+        "default": "./dist/checkout.js"
       }
     },
     "./x": {
       "development": {
         "types": "./src/x.ts",
-        "import": "./dist/x.js",
-        "main": "./dist/x.js",
-        "require": "./dist/x.cjs"
+        "browser": "./dist/x.browser.js",
+        "require": "./dist/x.cjs",
+        "default": "./dist/x.js"
       },
       "default": {
         "types": "./dist/x.d.ts",
-        "import": "./dist/x.js",
-        "main": "./dist/x.js",
-        "require": "./dist/x.cjs"
+        "browser": "./dist/x.browser.js",
+        "require": "./dist/x.cjs",
+        "default": "./dist/x.js"
       }
     },
     "./webhook": {
       "development": {
         "types": "./src/webhook.ts",
-        "import": "./dist/webhook.js",
-        "main": "./dist/webhook.js",
-        "require": "./dist/webhook.cjs"
+        "require": "./dist/webhook.cjs",
+        "default": "./dist/webhook.js"
       },
       "default": {
         "types": "./dist/webhook.d.ts",
-        "import": "./dist/webhook.js",
-        "main": "./dist/webhook.js",
-        "require": "./dist/webhook.cjs"
+        "require": "./dist/webhook.cjs",
+        "default": "./dist/webhook.js"
       }
     },
     "./minting_backend": {
       "development": {
         "types": "./src/minting_backend.ts",
-        "import": "./dist/minting_backend.js",
-        "main": "./dist/minting_backend.js",
-        "require": "./dist/minting_backend.cjs"
+        "require": "./dist/minting_backend.cjs",
+        "default": "./dist/minting_backend.js"
       },
       "default": {
         "types": "./dist/minting_backend.d.ts",
-        "import": "./dist/minting_backend.js",
-        "main": "./dist/minting_backend.js",
-        "require": "./dist/minting_backend.cjs"
+        "require": "./dist/minting_backend.cjs",
+        "default": "./dist/minting_backend.js"
       }
     }
   },
@@ -161,8 +157,8 @@
   "module": "./dist/index.js",
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "tsup src --config ../tsup.base.js && tsc --customConditions default --emitDeclarationOnly",
-    "d": "tsup src --config ../tsup.base.js",
+    "build": "tsup --config ./tsup.base.js && tsup --config ./tsup.browser.js && tsc --customConditions default --emitDeclarationOnly",
+    "d": "tsup --config ./tsup.base.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "typecheck": "tsc --customConditions default --noEmit --jsx preserve"
   },

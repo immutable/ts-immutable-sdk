@@ -24,14 +24,12 @@
     "development": {
       "types": "./src/index.ts",
       "require": "./dist/index.cjs",
-      "main": "./dist/index.js",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "default": {
       "types": "./dist/index.d.ts",
       "require": "./dist/index.cjs",
-      "main": "./dist/index.js",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     }
   },
   "files": [
@@ -39,7 +37,8 @@
   ],
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "license": "Apache-2.0",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "tsup --config ../../../tsup.base.js && tsc --customConditions default --emitDeclarationOnly",
@@ -49,5 +48,6 @@
     "test:watch": "jest --watch",
     "typecheck": "tsc --customConditions default --noEmit --jsx preserve"
   },
-  "type": "module"
+  "type": "module",
+  "types": "./dist/index.d.ts"
 }

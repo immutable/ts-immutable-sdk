@@ -19,7 +19,8 @@ const config: Config = {
     '^.+\\.(t|j)sx?$': '@swc/jest',
   },
   transformIgnorePatterns: [],
-  restoreMocks: true
+  restoreMocks: true,
+  setupFiles: ['<rootDir>/jest.setup.js'],
 };
 
 export default config;

@@ -1,6 +1,5 @@
 import { BigNumber, ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
-import assert from 'assert';
 import { DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError } from './errors';
 import { calculateGasFee, fetchGasPrice } from './lib/transactionUtils/gas';
 import { getApproval, prepareApproval } from './lib/transactionUtils/approval';
@@ -117,14 +116,16 @@ export class Exchange {
     slippagePercent: number,
     fromAddress: string,
   ) {
-    assert(isValidNonZeroAddress(fromAddress), new InvalidAddressError('invalid from address'));
-    assert(isValidTokenLiteral(tokenInAddress), new InvalidAddressError('invalid token in address'));
-    assert(isValidTokenLiteral(tokenOutAddress), new InvalidAddressError('invalid token out address'));
-    assert(tokenInAddress.toLocaleLowerCase() !== tokenOutAddress.toLocaleLowerCase(), new DuplicateAddressesError());
-    assert(maxHops <= MAX_MAX_HOPS, new InvalidMaxHopsError('max hops must be less than or equal to 10'));
-    assert(maxHops >= MIN_MAX_HOPS, new InvalidMaxHopsError('max hops must be greater than or equal to 1'));
-    assert(slippagePercent <= 50, new InvalidSlippageError('slippage percent must be less than or equal to 50'));
-    assert(slippagePercent >= 0, new InvalidSlippageError('slippage percent must be greater than or equal to 0'));
+    if (!isValidNonZeroAddress(fromAddress)) throw new InvalidAddressError('Error: invalid from address');
+    if (!isValidTokenLiteral(tokenInAddress)) throw new InvalidAddressError('Error: invalid token in address');
+    if (!isValidTokenLiteral(tokenOutAddress)) throw new InvalidAddressError('Error: invalid token out address');
+    if (tokenInAddress.toLocaleLowerCase() === tokenOutAddress.toLocaleLowerCase()) throw new DuplicateAddressesError();
+    if (maxHops > MAX_MAX_HOPS) throw new InvalidMaxHopsError('Error: max hops must be less than or equal to 10');
+    if (maxHops < MIN_MAX_HOPS) throw new InvalidMaxHopsError('Error: max hops must be greater than or equal to 1');
+    // eslint-disable-next-line max-len
+    if (slippagePercent > 50) throw new InvalidSlippageError('Error: slippage percent must be less than or equal to 50');
+    // eslint-disable-next-line max-len
+    if (slippagePercent < 0) throw new InvalidSlippageError('Error: slippage percent must be greater than or equal to 0');
   }
 
   private async getSecondaryFees(provider: ethers.providers.JsonRpcBatchProvider) {
