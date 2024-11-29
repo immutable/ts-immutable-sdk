@@ -7,13 +7,13 @@ import { nodeModulesPolyfillPlugin } from 'esbuild-plugins-node-modules-polyfill
 export default defineConfig((options) => ({
   entry: ['src/index.ts'],
   outDir: 'dist',
-  format: !options.watch ? ['esm', 'cjs'] : 'esm',
+  outExtension: () => ({js: '.browser.js'}),
   platform: 'browser',
-  target: 'es2022',
+  format: 'esm',
   bundle: true,
   clean: true,
-  minify: !options.watch,
   splitting: false,
+  minify: !options.watch,
   skipNodeModulesBundle: !!options.watch,
   noExternal: !options.watch ? [/.*/] : [],
   esbuildPlugins: [

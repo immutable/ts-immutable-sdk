@@ -3,16 +3,18 @@ import { defineConfig } from 'tsup'
 import { replace } from 'esbuild-plugin-replace';
 import pkg from './package.json' assert { type: 'json' };
 
-export default defineConfig((options) => ({
+export default defineConfig(() => ({
   entry: ['src/index.ts'],
+  outExtension: () => ({ js: '.browser.js' }),
   outDir: 'dist',
-  format: !options.watch ? ['esm', 'cjs'] : 'esm',
+  platform: 'browser',
+  format: 'esm',
   target: 'es2022',
   bundle: true,
-  clean: !options.watch,
+  skipNodeModulesBundle: false,
   //only minify identifiers, other settings cause: Critical dependency: the request of a dependency is an expression
-  minifyIdentifiers: !options.watch,
-  skipNodeModulesBundle: true,
+  minifyIdentifiers: true,
+  noExternal: [/.*/],
   esbuildPlugins: [
     replace({ 
       '__SDK_VERSION__': pkg.version, 
@@ -22,4 +24,4 @@ export default defineConfig((options) => ({
       'process.versions': JSON.stringify(process.versions || {}),
     })
   ]
-}));
+}))
