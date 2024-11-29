@@ -1,6 +1,6 @@
 import { Drawer, EllipsizedText, MenuItem } from '@biom3/react';
 import { motion } from 'framer-motion';
-import { useContext, useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 
 import { Checkout } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,7 @@ import { Options } from './Options';
 import { FiatOptionType, RouteData } from '../types';
 import { AddTokensContext } from '../context/AddTokensContext';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
+import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 type OptionsDrawerProps = {
   checkout: Checkout;
@@ -38,8 +39,10 @@ export function OptionsDrawer({
   insufficientBalance,
 }: OptionsDrawerProps) {
   const { t } = useTranslation();
+  const { track } = useAnalytics();
+
   const {
-    addTokensState: { chains },
+    addTokensState: { id, chains },
   } = useContext(AddTokensContext);
 
   const {
@@ -52,6 +55,27 @@ export function OptionsDrawer({
     selectedRouteIndex.current = index;
     onRouteClick(route);
   };
+
+  useEffect(() => {
+    if (!visible) {
+      return;
+    }
+
+    track({
+      userJourney: UserJourney.ADD_TOKENS,
+      screen: 'InputScreen',
+      control: 'RoutesMenu',
+      controlType: 'MenuItem',
+      action: 'Opened',
+      extras: {
+        contextId: id,
+        showOnrampOption: Boolean(showOnrampOption),
+        showSwapOption: Boolean(showSwapOption),
+        insufficientBalance: Boolean(insufficientBalance),
+        routesAvailable: routes?.length ?? 0,
+      },
+    });
+  }, [visible]);
 
   return (
     <Drawer

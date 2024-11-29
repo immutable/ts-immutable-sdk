@@ -34,7 +34,7 @@ import {
   AddTokensReviewData,
   AddTokensWidgetViews,
 } from '../../../context/view-context/AddTokensViewContextTypes';
-import { AddTokensErrorTypes, RiveStateMachineInput } from '../types';
+import { AddTokensErrorTypes, AmountData, RiveStateMachineInput } from '../types';
 import { useExecute } from '../hooks/useExecute';
 import {
   ViewActions,
@@ -117,6 +117,7 @@ export function Review({
   } = useContext(EventTargetContext);
 
   const [route, setRoute] = useState<RouteResponse | undefined>();
+  const [amountData, setAmountData] = useState<AmountData | undefined>();
   const [proceedDisabled, setProceedDisabled] = useState(true);
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
   const [showAddressMissmatchDrawer, setShowAddressMissmatchDrawer] = useState(false);
@@ -149,7 +150,7 @@ export function Review({
 
     if (!fromAddress || !toAddress) return;
 
-    const amountData = getAmountData(
+    const updatedAmountData = getAmountData(
       tokens,
       data.balance,
       data.toAmount,
@@ -159,20 +160,21 @@ export function Review({
         : data.toTokenAddress,
       data.additionalBuffer,
     );
-    if (!amountData) return;
+    if (!updatedAmountData) return;
 
     const routeResponse = await getRoute(
       squid,
-      amountData?.fromToken,
-      amountData?.toToken,
+      updatedAmountData?.fromToken,
+      updatedAmountData?.toToken,
       toAddress,
-      amountData.fromAmount,
-      amountData.toAmount,
+      updatedAmountData.fromAmount,
+      updatedAmountData.toAmount,
       fromAddress,
       false,
     );
 
     setRoute(routeResponse.route);
+    setAmountData(updatedAmountData);
     setProceedDisabled(false);
   };
 
@@ -385,6 +387,16 @@ export function Review({
             && { txHash: executeTxnReceipt.transactionHash }),
           ...(route.route.params.fromChain === ChainId.IMTBL_ZKEVM_MAINNET.toString()
             && { immutableZkEVMTxHash: executeTxnReceipt.transactionHash }),
+          toTokenAddress: route.route.params.toToken,
+          toTokenChainId: route.route.params.toChain,
+          fromTokenAddress: route.route.params.fromToken,
+          fromTokenChainId: route.route.params.fromChain,
+          fromAmount: route.route.params.fromAmount,
+          fromAddress: route.route.params.fromAddress,
+          toAddress: route.route.params.toAddress,
+          toAmount: data.toAmount,
+          fromTokenSymbol: amountData?.fromToken.symbol,
+          toTokenSymbol: amountData?.toToken.symbol,
         },
       });
 
