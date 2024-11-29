@@ -2,9 +2,11 @@ import { Box, MenuItemSize } from '@biom3/react';
 
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { motion } from 'framer-motion';
-import { useEffect, useMemo } from 'react';
+import { useContext, useEffect, useMemo } from 'react';
 import { listItemVariants, listVariants } from '../../../lib/animation/listAnimation';
 import { PaymentOption } from './PaymentOption';
+import { ViewContext, SharedViews, ViewActions } from '../../../context/view-context/ViewContext';
+import { useSaleEvent } from '../hooks/useSaleEvents';
 
 const defaultPaymentOptions: SalePaymentTypes[] = [
   SalePaymentTypes.CRYPTO,
@@ -36,6 +38,26 @@ export function PaymentOptions(props: PaymentOptionsProps) {
     ),
     [paymentOptions, disabledOptions, hideDisabledOptions],
   );
+
+  const { viewDispatch } = useContext(ViewContext);
+  const { sendFailedEvent } = useSaleEvent();
+
+  useEffect(() => {
+    if (options.length === 0) {
+      const error = new Error('No payment options available');
+      sendFailedEvent(error.message, {}, [], undefined);
+
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
+            error,
+          },
+        },
+      });
+    }
+  }, [options]);
 
   useEffect(() => {
     if (options.length === 1) {
