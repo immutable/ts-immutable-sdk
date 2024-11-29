@@ -272,8 +272,7 @@ export interface ZkevmOrderUpdated {
     id: string;
     buy: {
       item_type: string;
-      end_amount: string;
-      start_amount: string;
+      amount: string;
       contract_address: string;
     }[];
     hash: string;
@@ -281,8 +280,7 @@ export interface ZkevmOrderUpdated {
     sell: {
       token_id: string;
       item_type: string;
-      end_amount: string;
-      start_amount: string;
+      amount: string;
       contract_address: string;
     }[];
     status: string;
