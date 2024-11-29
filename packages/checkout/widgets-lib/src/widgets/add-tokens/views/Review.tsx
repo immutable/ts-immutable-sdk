@@ -26,6 +26,7 @@ import { RouteResponse } from '@0xsquid/squid-types';
 import { t } from 'i18next';
 import { Trans } from 'react-i18next';
 import { Environment } from '@imtbl/config';
+import { ChainId } from '@imtbl/checkout-sdk';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { AddTokensContext } from '../context/AddTokensContext';
 import { useRoutes } from '../hooks/useRoutes';
@@ -64,7 +65,6 @@ import { getRouteChains } from '../functions/getRouteChains';
 import {
   getFormattedAmounts,
   getFormattedNumber,
-  getFormattedNumberWithDecimalPlaces,
 } from '../functions/getFormattedNumber';
 import { SquidFooter } from '../components/SquidFooter';
 import { useError } from '../hooks/useError';
@@ -381,7 +381,10 @@ export function Review({
         action: 'Succeeded',
         extras: {
           contextId: id,
-          txHash: executeTxnReceipt.transactionHash,
+          ...(route.route.params.fromChain !== ChainId.IMTBL_ZKEVM_MAINNET.toString()
+            && { txHash: executeTxnReceipt.transactionHash }),
+          ...(route.route.params.fromChain === ChainId.IMTBL_ZKEVM_MAINNET.toString()
+            && { immutableZkEVMTxHash: executeTxnReceipt.transactionHash }),
         },
       });
 
@@ -729,7 +732,7 @@ export function Review({
                 >
                   <PriceDisplay.Caption size="small">
                     {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${
-                      route?.route.estimate.fromAmountUSD ?? ''
+                      getFormattedAmounts(route?.route.estimate.fromAmountUSD ?? '')
                     }`}
                   </PriceDisplay.Caption>
                 </PriceDisplay>
@@ -788,7 +791,7 @@ export function Review({
                     {' '}
                     =
                     {' '}
-                    {getFormattedNumberWithDecimalPlaces(
+                    {getFormattedAmounts(
                       route.route.estimate.exchangeRate,
                     )}
                     {' '}
@@ -869,7 +872,7 @@ export function Review({
                 >
                   <PriceDisplay.Caption size="small">
                     {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${
-                      route?.route.estimate.toAmountUSD ?? ''
+                      getFormattedAmounts(route?.route.estimate.toAmountUSD ?? '')
                     }`}
                   </PriceDisplay.Caption>
                 </PriceDisplay>

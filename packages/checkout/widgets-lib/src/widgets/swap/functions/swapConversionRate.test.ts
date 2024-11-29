@@ -196,7 +196,7 @@ describe('formatQuoteConversionRate', () => {
     expect(mockTranslate).toHaveBeenCalledWith(labelKey, {
       fromSymbol: 'ETH',
       toSymbol: 'DAI',
-      rate: '0.499750',
+      rate: '0.49975',
       fee: 1,
     });
   });

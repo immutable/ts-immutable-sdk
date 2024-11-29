@@ -77,7 +77,7 @@ export function ConnectLoader({
     connectionStatus, deepLink, provider,
   } = connectLoaderState;
 
-  const { identify } = useAnalytics();
+  const { identify, user } = useAnalytics();
 
   const hasNoWalletProviderNameAndNoWeb3Provider = (localProvider?: Web3Provider): boolean => {
     if (!walletProviderName && !localProvider) {
@@ -212,7 +212,9 @@ export function ConnectLoader({
         try {
           // WT-1698 Analytics - Identify user here then progress to widget
           // TODO: Identify user should be separated out into a use Effect with only the provider (from connect loader state) as dependency
-          await identifyUser(identify, web3Provider!);
+          const userData = user ? await user() : undefined;
+          const anonymousId = userData?.anonymousId();
+          await identifyUser(identify, web3Provider!, { anonymousId });
         } catch (err) {
           return;
         }
