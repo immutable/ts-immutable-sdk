@@ -3,7 +3,6 @@
   "extends": ["airbnb", "airbnb-typescript"],
   "ignorePatterns": [
     "jest.config.*",
-    "rollup.config.*",
     "node_modules/",
     "dist/",
     "**sample-app**/",

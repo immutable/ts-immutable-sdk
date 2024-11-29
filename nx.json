@@ -38,7 +38,7 @@
   },
   "release": {
     "projectsRelationship": "fixed",
-    "projects": ["sdk/**", "packages/**", "!packages/**/*sample-app/**", "!packages/game-bridge"],
+    "projects": ["sdk/**", "packages/**", "!packages/**/*sample-app/**", "!packages/game-bridge", "!@imtbl-alpha/**"],
     "releaseTagPattern": "{version}",
     "changelog": {
         "workspaceChangelog": {
