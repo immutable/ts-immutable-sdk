@@ -1,10 +1,8 @@
 // @ts-check
 import { defineConfig } from 'tsup';
-import { replace } from 'esbuild-plugin-replace';
-import pkg from './sdk/package.json' assert { type: 'json' };
 
 export default defineConfig((options) => ({
-  entry: ['src/index.ts'],
+  entry: ['src', '!src/index.browser.ts'],
   outDir: 'dist',
   format: !options.watch ? ['esm', 'cjs'] : 'esm',
   target: 'es2022',
@@ -12,5 +10,4 @@ export default defineConfig((options) => ({
   clean: !options.watch,
   minify: !options.watch,
   skipNodeModulesBundle: true,
-  esbuildPlugins: [replace({ '__SDK_VERSION__': pkg.version })]
 }));

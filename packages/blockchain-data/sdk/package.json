@@ -22,15 +22,15 @@
   "exports": {
     "development": {
       "types": "./src/index.ts",
+      "browser": "./dist/index.browser.js",
       "require": "./dist/index.cjs",
-      "main": "./dist/index.js",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "default": {
       "types": "./dist/index.d.ts",
+      "browser": "./dist/index.browser.js",
       "require": "./dist/index.cjs",
-      "main": "./dist/index.js",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     }
   },
   "files": [
@@ -38,10 +38,12 @@
   ],
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "license": "Apache-2.0",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "browser": "dist/index.browser.js",
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "tsup --config ../../../tsup.base.js && tsc --customConditions default --emitDeclarationOnly",
+    "build": "tsup --config ../../../tsup.base.js && tsup --config ../../../tsup.browser.js && tsc --customConditions default --emitDeclarationOnly",
     "d": "tsup --config ../../../tsup.base.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest",
