@@ -387,9 +387,9 @@ export function Review({
         extras: {
           contextId: id,
           ...(route.route.params.fromChain !== ChainId.IMTBL_ZKEVM_MAINNET.toString()
-            && { txHash: executeTxnReceipt.transactionHash }),
+            && { txHash: executeTxnReceipt.hash }),
           ...(route.route.params.fromChain === ChainId.IMTBL_ZKEVM_MAINNET.toString()
-            && { immutableZkEVMTxHash: executeTxnReceipt.transactionHash }),
+            && { immutableZkEVMTxHash: executeTxnReceipt.hash }),
           toTokenAddress: route.route.params.toToken,
           toTokenChainId: route.route.params.toChain,
           fromTokenAddress: route.route.params.fromToken,

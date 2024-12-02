@@ -34,7 +34,7 @@ import GuardianClient from './guardian';
 import logger from './utils/logger';
 import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
 import { isAPIError, PassportError, PassportErrorType } from './errors/passportError';
-import { withMetrics, withMetricsAsync } from './utils/metrics';
+import { withMetricsAsync } from './utils/metrics';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
   if (passportModuleConfiguration.overrides) {
