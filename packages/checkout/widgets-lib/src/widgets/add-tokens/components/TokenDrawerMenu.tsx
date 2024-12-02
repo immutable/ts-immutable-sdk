@@ -247,7 +247,13 @@ export function TokenDrawerMenu({
           </Box>
         )}
       </Drawer.Target>
-      <Drawer.Content sx={{ paddingX: 'base.spacing.x2' }}>
+      <Drawer.Content sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        overflowY: 'hidden',
+      }}
+      >
         <TextInput
           sx={{ marginBottom: 'base.spacing.x2' }}
           placeholder={t('views.ADD_TOKENS.tokenSelection.searchPlaceholder')}
@@ -258,7 +264,11 @@ export function TokenDrawerMenu({
         >
           <TextInput.Icon icon="Search" />
         </TextInput>
-        <VerticalMenu sx={{ maxHeight: '100%' }}>
+        <VerticalMenu sx={{
+          maxHeight: '100%',
+          overflowY: 'auto',
+        }}
+        >
           {tokenChoiceOptions
             && tokenChoiceOptions.length > 0
             && tokenChoiceOptions.map((token) => (
