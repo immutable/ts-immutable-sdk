@@ -632,7 +632,7 @@
     },
     "ADD_TOKENS": {
       "tokenSelection": {
-        "buttonText": "토큰 추가",
+        "buttonText": "토큰을 선택하세요",
         "tokenLabel": "추가",
         "drawerHeading": "토큰 추가",
         "searchPlaceholder": "토큰 검색"

@@ -652,7 +652,7 @@
     },
     "ADD_TOKENS": {
       "tokenSelection": {
-        "buttonText": "Add Token",
+        "buttonText": "Choose a token",
         "tokenLabel": "Add",
         "drawerHeading": "Add Token",
         "searchPlaceholder": "Search tokens"

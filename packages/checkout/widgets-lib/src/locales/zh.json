@@ -632,7 +632,7 @@
     },
     "ADD_TOKENS": {
       "tokenSelection": {
-        "buttonText": "添加代币",
+        "buttonText": "选择一个代币",
         "tokenLabel": "添加",
         "drawerHeading": "添加代币",
         "searchPlaceholder": "搜索代币"
