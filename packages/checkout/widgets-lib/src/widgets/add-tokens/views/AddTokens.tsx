@@ -29,7 +29,7 @@ import {
 import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
 import { ActionType } from '@0xsquid/squid-types';
-import { trackError } from '@imtbl/metrics';
+import { trackFlow } from '@imtbl/metrics';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
@@ -270,8 +270,8 @@ export function AddTokens({
         toTokenAddress,
         geoBlocked: !isSwapAvailable,
       },
-    }).catch((err) => {
-      trackError('commerce', 'addTokensLoaded', err);
+    }).then((ctx) => {
+      trackFlow('commerce', `addTokensLoaded_${ctx.event.messageId}`);
     });
   }, [id, isSwapAvailable]);
 
