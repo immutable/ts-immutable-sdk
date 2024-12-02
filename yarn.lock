@@ -4667,7 +4667,7 @@ __metadata:
     "@imtbl/cryptofiat": 0.0.0
     "@imtbl/dex-sdk": 0.0.0
     "@imtbl/passport": 0.0.0
-    "@imtbl/react-analytics": 0.2.1-alpha
+    "@imtbl/react-analytics": 0.3.2-alpha
     "@jest/globals": ^29.5.0
     "@rive-app/react-canvas-lite": ^4.9.0
     "@rollup/plugin-commonjs": ^26.0.1
@@ -5057,6 +5057,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@imtbl/react-analytics@npm:0.3.2-alpha":
+  version: 0.3.2-alpha
+  resolution: "@imtbl/react-analytics@npm:0.3.2-alpha"
+  dependencies:
+    "@segment/analytics-next": ^1.53.2
+    react: ^18.3.0
+  checksum: 9d800d1848091a6e9606fe7511790cbc274895a9edb3ab0cf9e6dca3c5e158c058b81a075acb2a3040c081b2990e6fd565d7d9434f61f44c9efcbf62cf1144d5
+  languageName: node
+  linkType: hard
+
 "@imtbl/sdk@0.0.0, @imtbl/sdk@workspace:sdk":
   version: 0.0.0-use.local
   resolution: "@imtbl/sdk@workspace:sdk"
@@ -5091,7 +5101,7 @@ __metadata:
     "@imtbl/minting-backend": 0.0.0
     "@imtbl/orderbook": 0.0.0
     "@imtbl/passport": 0.0.0
-    "@imtbl/react-analytics": 0.2.1-alpha
+    "@imtbl/react-analytics": 0.3.2-alpha
     "@imtbl/webhook": 0.0.0
     "@imtbl/x-client": 0.0.0
     "@imtbl/x-provider": 0.0.0
@@ -34446,7 +34456,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^18":
+"react@npm:^18, react@npm:^18.3.0":
   version: 18.3.1
   resolution: "react@npm:18.3.1"
   dependencies:

@@ -432,11 +432,11 @@ describe('utils', () => {
     });
 
     it(`should format number to ${DEFAULT_TOKEN_FORMATTING_DECIMALS} decimal places`, () => {
-      expect(tokenValueFormat('0.0000012')).toEqual('0.000001');
+      expect(tokenValueFormat('0.0000012')).toEqual('0.00000');
     });
 
     it(`should format to default maximum of ${DEFAULT_TOKEN_FORMATTING_DECIMALS} decimal places`, () => {
-      expect(tokenValueFormat('0.00000012345')).toEqual('0.000000');
+      expect(tokenValueFormat('0.00000012345')).toEqual('0.00000');
     });
 
     it('should format to custom maximum decimal places of 3', () => {

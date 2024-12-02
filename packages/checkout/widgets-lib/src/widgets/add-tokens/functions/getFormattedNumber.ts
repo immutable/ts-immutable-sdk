@@ -13,8 +13,12 @@ export const getFormattedAmounts = (
 ) => {
   const amount = typeof value === 'number' ? value : parseFloat(value);
 
+  if (Number.isNaN(amount)) {
+    return '-.--';
+  }
+
   if (amount > 0 && amount < 1) {
-    return tokenValueFormat(amount, maxDecimals).replace(/\.?0+$/, '');
+    return tokenValueFormat(value, maxDecimals).replace(/\.?0+$/, '');
   }
 
   return tokenValueFormat(amount, maxDecimals);
@@ -26,7 +30,7 @@ export const getFormattedAmounts = (
 export function getFormattedNumber(
   value?: string | number,
   decimals?: number,
-  maxDecimals = DEFAULT_TOKEN_FORMATTING_DECIMALS,
+  maxDecimals = 5,
 ): string {
   const amount = String(value);
   let formattedValue = '';
@@ -44,13 +48,4 @@ export function getFormattedNumber(
   }
 
   return getFormattedAmounts(formattedValue, maxDecimals);
-}
-
-export function getFormattedNumberWithDecimalPlaces(value: string | number, decimals = 2) : string {
-  const amount = typeof value === 'number' ? value : parseFloat(value);
-
-  return amount.toLocaleString('en-US', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: decimals,
-  });
 }

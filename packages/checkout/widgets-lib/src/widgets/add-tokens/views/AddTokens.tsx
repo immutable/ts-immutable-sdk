@@ -65,10 +65,10 @@ import { validateToAmount } from '../functions/amountValidation';
 import { OnboardingDrawer } from '../components/OnboardingDrawer';
 import { useError } from '../hooks/useError';
 import { SquidFooter } from '../components/SquidFooter';
-import { getFormattedNumberWithDecimalPlaces } from '../functions/getFormattedNumber';
 import { TokenDrawerMenu } from '../components/TokenDrawerMenu';
 import { PULSE_SHADOW } from '../utils/animation';
 import { checkSanctionedAddresses } from '../functions/checkSanctionedAddresses';
+import { getFormattedAmounts } from '../functions/getFormattedNumber';
 
 interface AddTokensProps {
   checkout: Checkout;
@@ -312,6 +312,19 @@ export function AddTokens({
           isSwapAvailable,
         );
         setFetchingRoutes(false);
+
+        track({
+          userJourney: UserJourney.ADD_TOKENS,
+          screen: 'InputScreen',
+          control: 'RoutesMenu',
+          controlType: 'MenuItem',
+          action: 'Request',
+          extras: {
+            contextId: id,
+            routesAvailable: availableRoutes.length,
+            geoBlocked: !isSwapAvailable,
+          },
+        });
 
         if (availableRoutes.length === 0) {
           setInsufficientBalance(true);
@@ -607,7 +620,7 @@ export function AddTokens({
 
               <HeroFormControl.Caption>
                 {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} 
-                $${getFormattedNumberWithDecimalPlaces(selectedAmountUsd)}`}
+                $${getFormattedAmounts(selectedAmountUsd)}`}
               </HeroFormControl.Caption>
             </HeroFormControl>
           )}

@@ -30,18 +30,18 @@ describe('widget validators', () => {
   });
 
   describe('Amount Validator', () => {
-    const validCases = ['1', '1.0', '1.234567', '100000000', '']; // empty amount should pass as valid
+    const validCases = ['1', '1.0', '1.23456', '100000000', '']; // empty amount should pass as valid
     const invalidCases = ['acdas', '0.1234s', '1.2345678', undefined];
 
     validCases.forEach((testCase) => {
-      it(`should validate amount as a float with 6 decimal places for ${testCase}`, () => {
+      it(`should validate amount as a float with 5 decimal places for ${testCase}`, () => {
         const result = isValidAmount(testCase);
         expect(result).toBeTruthy();
       });
     });
 
     invalidCases.forEach((testCase) => {
-      it(`should return false for any amount not a float with 6 decimal places for ${testCase}`, () => {
+      it(`should return false for any amount not a float with 5 decimal places for ${testCase}`, () => {
         const result = isValidAmount(testCase);
         expect(result).toBeFalsy();
       });

@@ -7,7 +7,7 @@ export const ENV_DEVELOPMENT = 'development' as Environment;
 export const NATIVE = 'native';
 
 export const DEFAULT_TOKEN_DECIMALS = 18;
-export const DEFAULT_TOKEN_FORMATTING_DECIMALS = 6;
+export const DEFAULT_TOKEN_FORMATTING_DECIMALS = 5;
 // Used to enforce the number of decimals to show if the number is greater than 1
 export const DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS = 2;
 // Used to enforce the number of decimals in the input fields
