@@ -27,7 +27,7 @@ import { t } from 'i18next';
 import { Trans } from 'react-i18next';
 import { Environment } from '@imtbl/config';
 import { ChainId } from '@imtbl/checkout-sdk';
-import { trackError } from '@imtbl/metrics';
+import { trackFlow } from '@imtbl/metrics';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { AddTokensContext } from '../context/AddTokensContext';
 import { useRoutes } from '../hooks/useRoutes';
@@ -400,8 +400,8 @@ export function Review({
           fromTokenSymbol: amountData?.fromToken.symbol,
           toTokenSymbol: amountData?.toToken.symbol,
         },
-      }).catch((err) => {
-        trackError('commerce', 'addTokensFundsAdded', err);
+      }).then((ctx) => {
+        trackFlow('commerce', `addTokensFundsAdded_${ctx.event.messageId}`);
       });
 
       sendAddTokensSuccessEvent(eventTarget, executeTxnReceipt.transactionHash);
