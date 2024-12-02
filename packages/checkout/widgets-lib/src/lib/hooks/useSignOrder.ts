@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react';
 import { PurchaseItem } from '@imtbl/checkout-sdk';
 
 import { ChainType, EvmContractCall, SquidCallType } from '@0xsquid/squid-types';
-import { ethers } from 'ethers';
+import { Interface } from 'ethers';
 import {
   SignResponse,
   SignOrderInput,
@@ -146,8 +146,8 @@ export const useSignOrder = (input: SignOrderInput) => {
       gasLimit: number,
     ): Promise<[hash: string | undefined, error?: SignOrderError]> => {
       try {
-        const signer = provider?.getSigner();
-        const gasPrice = await provider?.getGasPrice();
+        const signer = await provider?.getSigner();
+        const gasPrice = (await provider?.getFeeData())?.gasPrice;
         const txnResponse = await signer?.sendTransaction({
           to,
           data,
@@ -329,7 +329,7 @@ export const useSignOrder = (input: SignOrderInput) => {
     }
 
     if (approvalTxn) {
-      const erc20Interface = new ethers.utils.Interface(['function transfer(address to, uint256 amount)']);
+      const erc20Interface = new Interface(['function transfer(address to, uint256 amount)']);
       const transferPendingTokensTx = erc20Interface.encodeFunctionData(
         'transfer',
         [signApiResponse.order.recipientAddress, 0],
