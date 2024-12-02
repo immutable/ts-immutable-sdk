@@ -15,13 +15,14 @@ import { EventTargetContext } from '../../../context/event-target-context/EventT
 import { sendAddTokensFailedEvent } from '../AddTokensWidgetEvents';
 import { retry } from '../../../lib/retry';
 import { withMetricsAsync } from '../../../lib/metrics';
-import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { isRejectedError } from '../functions/errorType';
 
 const TRANSACTION_NOT_COMPLETED = 'transaction not completed';
 
 export const useExecute = (contextId: string, environment: Environment) => {
   const { showErrorHandover } = useError(environment);
+  const { user } = useAnalytics();
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
@@ -202,6 +203,15 @@ export const useExecute = (contextId: string, environment: Environment) => {
     return await waitForReceipt(provider, tx.hash);
   };
 
+  const getAnonymousId = async () => {
+    try {
+      const userData = await user();
+      return userData?.anonymousId() ?? undefined;
+    } catch (error) {
+      return undefined;
+    }
+  };
+
   const approve = async (
     fromProviderInfo: EIP6963ProviderInfo,
     provider: Web3Provider,
@@ -212,6 +222,7 @@ export const useExecute = (contextId: string, environment: Environment) => {
         return await withMetricsAsync(
           (flow) => callApprove(flow, fromProviderInfo, provider, routeResponse),
           `${UserJourney.ADD_TOKENS}_Approve`,
+          await getAnonymousId(),
           (error) => (isRejectedError(error) ? 'rejected' : ''),
         );
       }
@@ -251,6 +262,7 @@ export const useExecute = (contextId: string, environment: Environment) => {
       return await withMetricsAsync(
         (flow) => callExecute(flow, squid, fromProviderInfo, provider, routeResponse),
         `${UserJourney.ADD_TOKENS}_Execute`,
+        await getAnonymousId(),
         (error) => (isRejectedError(error) ? 'rejected' : ''),
       );
     } catch (error) {

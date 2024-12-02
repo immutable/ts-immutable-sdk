@@ -22,10 +22,13 @@ export const withMetrics = <T>(
 export const withMetricsAsync = async <T>(
   fn: (flow: Flow) => Promise<T>,
   flowName: string,
+  anonymousId?: string,
   errorType?: (error:any)=>string,
 ): Promise<T> => {
   const flow: Flow = trackFlow('commerce', flowName);
-
+  if (anonymousId) {
+    flow.addEvent(`anonymousId_${anonymousId}`);
+  }
   try {
     return await fn(flow);
   } catch (error:any) {
