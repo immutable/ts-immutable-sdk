@@ -598,7 +598,7 @@ export function AddTokens({
             addTokensDispatch={addTokensDispatch}
           />
           {showInitialEmptyState ? (
-            <Body>{t('views.ADD_TOKENS.tokenSelection.buttonText')}</Body>
+            <Body weight="bold">{t('views.ADD_TOKENS.tokenSelection.buttonText')}</Body>
           ) : (
             <HeroFormControl
               validationStatus={validateToAmount(inputValue).isValid || inputValue === '' ? 'success' : 'error'}
