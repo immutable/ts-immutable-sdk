@@ -7,19 +7,17 @@ import { passportInstance } from '../utils/setupDefault';
 
 export default function LoginWithPassport() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [accountAddress, setAccountAddress] = useState<string | null>(null);
+
 
   const loginWithPassport = async () => {
     if (!passportInstance) return;
     try {
-      // Attempt to log in
-      const userProfile = await passportInstance.login({
-        useCachedSession: false, // Modify based on your requirement
-        useSilentLogin: false, // Modify based on your requirement
-        anonymousId: '', // Provide if needed
-      });
-
-      if (userProfile) {
+      const provider = passportInstance.connectEvm();
+      const accounts = await provider.request({ method: 'eth_requestAccounts' });
+      if (accounts) {
         setIsLoggedIn(true); // Set logged in state if login is successful
+        setAccountAddress(accounts[0] || null); 
       } else {
         setIsLoggedIn(false); // Ensure logged out state if necessary
       }
@@ -53,6 +51,10 @@ export default function LoginWithPassport() {
           <Table.Row>
             <Table.Cell><b>Is Logged In</b></Table.Cell>
             <Table.Cell>{isLoggedIn ? 'Yes' : 'No'}</Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell><b>Account Address</b></Table.Cell>
+            <Table.Cell>{accountAddress || 'N/A'}</Table.Cell>
           </Table.Row>
         </Table.Body>
       </Table>

@@ -9,7 +9,6 @@ import { passportInstance } from '../utils/setupDefault';
 export default function LoginWithPassport() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [accountAddress, setAccountAddress] = useState<string | null>(null);
-  const [connectionUrl, setConnectionUrl] = useState<string | null>(null);
 
   const loginWithEthersjs = useCallback(async () => {
     if (!passportInstance) return;
@@ -18,13 +17,9 @@ export default function LoginWithPassport() {
       const passportProvider = passportInstance.connectEvm();
       const web3Provider = new ethers.providers.Web3Provider(passportProvider);
       const accounts = await web3Provider.send('eth_requestAccounts', []);
-      const signer = await web3Provider.getSigner();
       if (accounts && accounts.length > 0) {
         setIsLoggedIn(true);
         setAccountAddress(accounts[0] || null); // Store the first account address
-        if (signer.provider && signer.provider.connection) {
-          setConnectionUrl(signer.provider.connection.url);
-        }
       } else {
         setIsLoggedIn(false);
       }
@@ -37,7 +32,7 @@ export default function LoginWithPassport() {
   return (
     <>
       <Heading size="medium" className="mb-1">
-        Login with Passport
+        Login with EtherJS
       </Heading>
       <Button
         className="mb-1"
@@ -62,10 +57,6 @@ export default function LoginWithPassport() {
           <Table.Row>
             <Table.Cell><b>Account Address</b></Table.Cell>
             <Table.Cell>{accountAddress || 'No Address'}</Table.Cell>
-          </Table.Row>
-          <Table.Row>
-            <Table.Cell><b>Connection URL</b></Table.Cell>
-            <Table.Cell>{connectionUrl || 'No URL'}</Table.Cell>
           </Table.Row>
         </Table.Body>
       </Table>
