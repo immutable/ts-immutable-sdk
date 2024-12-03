@@ -638,8 +638,14 @@
         "searchPlaceholder": "토큰 검색"
       },
       "walletSelection": {
-        "fromText": "보내는 곳",
-        "toText": "받는 곳"
+        "from": {
+          "label": "보내는 곳",
+          "caption": "브리지 또는 스왑할 지갑을 선택하세요"
+        },
+        "to": {
+          "label": "받는 곳",
+          "caption": "토큰을 보낼 위치를 선택하세요"
+        }
       },
       "routeSelection": {
         "loadingText": "최적의 결제 경로를 찾는 중...",

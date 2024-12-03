@@ -658,8 +658,14 @@
         "searchPlaceholder": "Search tokens"
       },
       "walletSelection": {
-        "fromText": "Send from",
-        "toText": "Deliver to"
+        "from":{
+          "label": "Send from",
+          "caption": "Choose a wallet to bridge or swap from"
+        }, 
+        "to": {
+          "label": "Deliver to",
+          "caption": "Choose where you want your tokens to go"
+        }
       },
       "routeSelection": {
         "loadingText": "Finding the best payment route...",
