@@ -12,7 +12,7 @@
     "@biom3/design-tokens": "^0.4.4",
     "@biom3/react": "^0.27.12",
     "@emotion/react": "^11.11.3",
-    "@imtbl/sdk": "latest",
+    "@imtbl/sdk": "workspace:*",
     "@twa-dev/sdk": "^7.8.0",
     "ethers": "^5.7.2",
     "next": "14.2.5",

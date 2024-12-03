@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "eslint": "^8.40.0",
-    "tsup": "^8.2.4",
+    "tsup": "^8.3.5",
     "typescript": "^5.6.2"
   },
   "engines": {
@@ -42,13 +42,13 @@
     "./config": {
       "development": {
         "types": "./src/config.ts",
-        "browser": "./dist/config.browser.js",
+        "browser": "./dist/config.js",
         "require": "./dist/config.cjs",
         "default": "./dist/config.js"
       },
       "default": {
         "types": "./dist/config.d.ts",
-        "browser": "./dist/config.browser.js",
+        "browser": "./dist/config.js",
         "require": "./dist/config.cjs",
         "default": "./dist/config.js"
       }
@@ -56,13 +56,13 @@
     "./blockchain_data": {
       "development": {
         "types": "./src/blockchain_data.ts",
-        "browser": "./dist/blockchain_data.browser.js",
+        "browser": "./dist/blockchain_data.js",
         "require": "./dist/blockchain_data.cjs",
         "default": "./dist/blockchain_data.js"
       },
       "default": {
         "types": "./dist/blockchain_data.d.ts",
-        "browser": "./dist/blockchain_data.browser.js",
+        "browser": "./dist/blockchain_data.js",
         "require": "./dist/blockchain_data.cjs",
         "default": "./dist/blockchain_data.js"
       }
@@ -70,13 +70,13 @@
     "./passport": {
       "development": {
         "types": "./src/passport.ts",
-        "browser": "./dist/passport.browser.js",
+        "browser": "./dist/passport.js",
         "require": "./dist/passport.cjs",
         "default": "./dist/passport.js"
       },
       "default": {
         "types": "./dist/passport.d.ts",
-        "browser": "./dist/passport.browser.js",
+        "browser": "./dist/passport.js",
         "require": "./dist/passport.cjs",
         "default": "./dist/passport.js"
       }
@@ -84,13 +84,13 @@
     "./orderbook": {
       "development": {
         "types": "./src/orderbook.ts",
-        "browser": "./dist/orderbook.browser.js",
+        "browser": "./dist/orderbook.js",
         "require": "./dist/orderbook.cjs",
         "default": "./dist/orderbook.js"
       },
       "default": {
         "types": "./dist/orderbook.d.ts",
-        "browser": "./dist/orderbook.browser.js",
+        "browser": "./dist/orderbook.js",
         "require": "./dist/orderbook.cjs",
         "default": "./dist/orderbook.js"
       }
@@ -98,13 +98,13 @@
     "./checkout": {
       "development": {
         "types": "./src/checkout.ts",
-        "browser": "./dist/checkout.browser.js",
+        "browser": "./dist/checkout.js",
         "require": "./dist/checkout.cjs",
         "default": "./dist/checkout.js"
       },
       "default": {
         "types": "./dist/checkout.d.ts",
-        "browser": "./dist/checkout.browser.js",
+        "browser": "./dist/checkout.js",
         "require": "./dist/checkout.cjs",
         "default": "./dist/checkout.js"
       }
@@ -112,13 +112,13 @@
     "./x": {
       "development": {
         "types": "./src/x.ts",
-        "browser": "./dist/x.browser.js",
+        "browser": "./dist/x.js",
         "require": "./dist/x.cjs",
         "default": "./dist/x.js"
       },
       "default": {
         "types": "./dist/x.d.ts",
-        "browser": "./dist/x.browser.js",
+        "browser": "./dist/x.js",
         "require": "./dist/x.cjs",
         "default": "./dist/x.js"
       }
@@ -157,8 +157,9 @@
   "module": "./dist/index.js",
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "tsup --config ./tsup.base.js && tsup --config ./tsup.browser.js && tsc --customConditions default --emitDeclarationOnly",
-    "d": "tsup --config ./tsup.base.js",
+    "build": "pnpm transpile && pnpm typegen",
+    "transpile": "tsup --config ./tsup.config.js",
+    "typegen": "tsc --customConditions default --emitDeclarationOnly",    
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "typecheck": "tsc --customConditions default --noEmit --jsx preserve"
   },
