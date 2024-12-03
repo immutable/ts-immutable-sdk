@@ -12,6 +12,7 @@ const disabledStyles = {
 export interface SelectedWalletProps {
   children?: ReactNode;
   label: string;
+  caption?: string;
   providerInfo?: Partial<EIP6963ProviderInfo & { address?: string }>;
   onClick: MouseEventHandler<HTMLSpanElement>;
   disabled?: boolean;
@@ -20,6 +21,7 @@ export interface SelectedWalletProps {
 
 export function SelectedWallet({
   label,
+  caption,
   children,
   onClick,
   providerInfo,
@@ -52,7 +54,7 @@ export function SelectedWallet({
         />
       )}
       <MenuItem.Label>{label}</MenuItem.Label>
-      {providerInfo?.name && (
+      {providerInfo?.name ? (
         <MenuItem.Caption>
           {providerInfo?.name}
           {' • '}
@@ -61,7 +63,12 @@ export function SelectedWallet({
             sx={{ c: 'inherit', fontSize: 'inherit' }}
           />
         </MenuItem.Caption>
+      ) : (
+        <MenuItem.Caption>
+          {caption}
+        </MenuItem.Caption>
       )}
+
       <MenuItem.BottomSlot>{children}</MenuItem.BottomSlot>
     </MenuItem>
   );
