@@ -635,7 +635,7 @@
     },
     "ADD_TOKENS": {
       "tokenSelection": {
-        "buttonText": "選択したいトークンをお選びください",
+        "buttonText": "選択したいトークンを選んでください",
         "tokenLabel": "追加",
         "drawerHeading": "トークンを追加",
         "searchPlaceholder": "トークンを検索"
