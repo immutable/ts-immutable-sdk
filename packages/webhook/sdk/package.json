@@ -17,7 +17,7 @@
     "eslint": "^8.40.0",
     "jest": "^29.4.3",
     "jest-environment-jsdom": "^29.4.3",
-    "tsup": "^8.2.4",
+    "tsup": "^8.3.5",
     "typescript": "^5.6.2"
   },
   "exports": {
@@ -27,7 +27,7 @@
       "default": "./dist/index.js"
     },
     "default": {
-      "types": "./dist/index.d.ts",
+      "types": "./dist/types/index.d.ts",
       "require": "./dist/index.cjs",
       "default": "./dist/index.js"
     }
@@ -41,13 +41,14 @@
   "module": "dist/index.js",
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "tsup --config ../../../tsup.base.js && tsc --customConditions default --emitDeclarationOnly",
-    "d": "tsup --config ../../../tsup.base.js",
+    "build": "pnpm transpile && pnpm typegen",
+    "transpile": "tsup src/index.ts --config ./tsup.config.js",
+    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",    
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "typecheck": "tsc --customConditions default --noEmit --jsx preserve"
   },
   "type": "module",
-  "types": "./dist/index.d.ts"
+  "types": "./dist/types/index.d.ts"
 }
