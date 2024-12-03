@@ -203,7 +203,7 @@ export function AddTokens({
   const handleOnAmountInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value, amount, isValid } = validateToAmount(event.target.value);
 
-    if (isValid || amount === 0 || value === '') {
+    if (isValid || amount === 0 || value === '' || value === '.') {
       setInputValue(value);
 
       if (amount > 0) {

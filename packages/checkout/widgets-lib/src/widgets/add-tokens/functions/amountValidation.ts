@@ -1,5 +1,4 @@
-const VALID_NUMBER_REGEX = /^(0|[1-9]\d*)(\.\d*)?$/;
-
+const VALID_NUMBER_REGEX = /^(0|[1-9]\d*|(?=\.))(\.\d*)?$/;
 /**
  * Validate the amount input
  * @param amount - The amount to validate
