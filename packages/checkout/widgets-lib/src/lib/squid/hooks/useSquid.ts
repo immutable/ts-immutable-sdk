@@ -1,7 +1,7 @@
 import { Squid } from '@0xsquid/sdk';
 import { Checkout, SquidConfig } from '@imtbl/checkout-sdk';
 import { useCallback, useEffect, useState } from 'react';
-import { SQUID_SDK_BASE_URL } from '../utils/config';
+import { SQUID_SDK_BASE_URL } from '../config';
 
 export const useSquid = (checkout: Checkout) => {
   const [squid, setSquid] = useState<Squid | null>(null);

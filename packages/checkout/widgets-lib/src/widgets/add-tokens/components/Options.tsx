@@ -6,9 +6,10 @@ import { Checkout } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { listItemVariants, listVariants } from '../../../lib/animation/listAnimation';
 import { FiatOption } from './FiatOption';
-import { Chain, FiatOptionType, RouteData } from '../types';
+import { FiatOptionType } from '../types';
 import { RouteOption } from './RouteOption';
 import { getRemoteVideo } from '../../../lib/utils';
+import { Chain, RouteData } from '../../../lib/squid/types';
 
 const defaultFiatOptions: FiatOptionType[] = [
   FiatOptionType.DEBIT,
