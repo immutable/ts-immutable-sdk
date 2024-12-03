@@ -6,6 +6,7 @@ import {
   FundingItem,
   SmartCheckoutResult,
 } from '@imtbl/checkout-sdk';
+import { EvmContractCall, Hook } from '@0xsquid/squid-types';
 
 export type SignedOrderProduct = {
   productId: string;
@@ -264,3 +265,7 @@ export type SignApiError = {
   message: string;
   trace_id: string;
 };
+
+export type SquidPostHook = Omit<Hook, 'fundAmount' | 'fundToken'>;
+
+export type SquidPostHookCall = EvmContractCall;

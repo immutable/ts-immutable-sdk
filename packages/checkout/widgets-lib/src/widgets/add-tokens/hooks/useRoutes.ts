@@ -13,6 +13,7 @@ import { retry } from '../../../lib/retry';
 import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { isPassportProvider } from '../../../lib/provider';
+import { SquidPostHook } from '../../../lib/primary-sales';
 
 const BASE_SLIPPAGE = 0.02;
 
@@ -155,6 +156,7 @@ export const useRoutes = () => {
     fromAmount: string,
     fromAddress?: string,
     quoteOnly = true,
+    postHook?: SquidPostHook,
   ): Promise<RouteResponse | undefined> => await retry(
     () => squid.getRoute({
       fromChain: fromToken.chainId,
@@ -167,6 +169,7 @@ export const useRoutes = () => {
       quoteOnly,
       enableBoost: true,
       receiveGasOnDestination: !isPassportProvider(toProvider),
+      postHook,
     }),
     {
       retryIntervalMs: 1000,
@@ -197,6 +200,7 @@ export const useRoutes = () => {
     toAmount: string,
     fromAddress?: string,
     quoteOnly = true,
+    postHook?: SquidPostHook,
   ): Promise<RouteResponseData> => {
     try {
       const routeResponse = await getRouteWithRetry(
@@ -207,6 +211,7 @@ export const useRoutes = () => {
         fromAmount,
         fromAddress,
         quoteOnly,
+        postHook,
       );
 
       if (!routeResponse?.route) {
@@ -276,6 +281,7 @@ export const useRoutes = () => {
     squid: Squid,
     amountDataArray: AmountData[],
     toTokenAddress: string,
+    postHook?: SquidPostHook,
   ): Promise<RouteData[]> => {
     const routePromises = amountDataArray.map((data) => getRoute(
       squid,
@@ -284,6 +290,9 @@ export const useRoutes = () => {
       toTokenAddress,
       data.fromAmount,
       data.toAmount,
+      undefined,
+      true,
+      postHook,
     ).then((route) => ({
       amountData: { ...data, additionalBuffer: route.additionalBuffer },
       route: route.route,
