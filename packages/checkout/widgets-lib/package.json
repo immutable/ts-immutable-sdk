@@ -67,22 +67,22 @@
     "rimraf": "^6.0.1",
     "terser": "^5.34.1",
     "ts-jest": "^29.1.0",
-    "tsup": "^8.2.4",
+    "tsup": "^8.3.5",
     "typescript": "^5.6.2",
     "web-vitals": "^2.1.4"
   },
   "exports": {
     "development": {
       "types": "./src/index.ts",
-      "browser": "./dist/index.browser.js",
-      "require": "./dist/index.cjs",
-      "default": "./dist/index.js"
+      "browser": "./dist/browser/index.js",
+      "require": "./dist/node/index.cjs",
+      "default": "./dist/node/index.js"
     },
     "default": {
-      "types": "./dist/index.d.ts",
-      "browser": "./dist/index.browser.js",
-      "require": "./dist/index.cjs",
-      "default": "./dist/index.js"
+      "types": "./dist/types/index.d.ts",
+      "browser": "./dist/browser/index.js",
+      "require": "./dist/node/index.cjs",
+      "default": "./dist/node/index.js"
     }
   },
   "files": [
@@ -96,9 +96,10 @@
   "main": "dist/main.js",
   "module": "dist/index.js",
   "scripts": {
-    "build": "tsup --config ./tsup.browser.js && tsc --customConditions default --emitDeclarationOnly",
+    "build": "pnpm transpile && pnpm typegen",
+    "transpile": "tsup src/index.ts --config ./tsup.config.js",
+    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",    
     "build:local": "pnpm build && mkdir -p ../widgets-sample-app/public/lib/js && cp dist/*.js ../widgets-sample-app/public/lib/js/",
-    "d": "tsup --config ./tsup.browser.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
     "prepare:examplewidgets": "pnpm --filter @examples/commerce-widget-nextjs exec mkdir -p tests/utils/local-widgets-js/ && cp $(pnpm --filter @imtbl/sdk exec pwd)/dist/browser/checkout/*.js $(pnpm --filter @examples/commerce-widget-nextjs exec pwd)/tests/utils/local-widgets-js/",
@@ -109,5 +110,5 @@
     "typecheck": "tsc --customConditions default --customConditions \"default\" --noEmit"
   },
   "type": "module",
-  "types": "./dist/index.d.ts"
+  "types": "./dist/types/index.d.ts"
 }

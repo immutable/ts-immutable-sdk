@@ -5,7 +5,7 @@
     "@biom3/design-tokens": "^0.4.4",
     "@biom3/react": "^0.27.12",
     "@ethersproject/providers": "^5.7.2",
-    "@imtbl/sdk": "latest",
+    "@imtbl/sdk": "workspace:*",
     "@tanstack/react-query": "^5.51.11",
     "ethers": "^5.7.2",
     "next": "14.2.5",

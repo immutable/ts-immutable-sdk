@@ -2,7 +2,7 @@
   "name": "@examples/identity-with-nextjs",
   "version": "0.1.0",
   "dependencies": {
-    "@imtbl/sdk": "latest",
+    "@imtbl/sdk": "workspace:*",
     "ethers": "^5.7.2",
     "next": "14.2.5",
     "react": "^18.2.0",
