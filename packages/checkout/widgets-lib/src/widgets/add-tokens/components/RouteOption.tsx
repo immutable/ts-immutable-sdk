@@ -11,11 +11,12 @@ import {
 } from '@biom3/react';
 import { ReactElement, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Chain, RouteData } from '../types';
+
 import { getDurationFormatted } from '../functions/getDurationFormatted';
-import { getTotalRouteFees } from '../functions/getTotalRouteFees';
+import { getTotalRouteFees } from '../../../lib/squid/functions/getTotalRouteFees';
 import { getFormattedAmounts } from '../functions/getFormattedNumber';
-import { getRouteAndTokenBalances } from '../functions/getRouteAndTokenBalances';
+import { getRouteAndTokenBalances } from '../../../lib/squid/functions/getRouteAndTokenBalances';
+import { Chain, RouteData } from '../../../lib/squid/types';
 
 export interface RouteOptionProps<
   RC extends ReactElement | undefined = undefined,
@@ -92,6 +93,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
             circularFrame
             use={<img src={fromToken.iconUrl} alt={fromToken.name} />}
           />
+          {/* <MenuItem.Caption>TEST!!!!</MenuItem.Caption> */}
         </Sticker>
       )}
 

@@ -1,5 +1,8 @@
 import {
-  AllDualVariantIconKeys, MenuItem, Stack, Sticker,
+  AllDualVariantIconKeys,
+  MenuItem,
+  Stack,
+  Sticker,
 } from '@biom3/react';
 import {
   MouseEvent,
@@ -11,9 +14,9 @@ import {
 
 import { Checkout } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
-import { Chain, RouteData } from '../types';
-import { getRouteAndTokenBalances } from '../functions/getRouteAndTokenBalances';
+import { getRouteAndTokenBalances } from '../../../lib/squid/functions/getRouteAndTokenBalances';
 import { getRemoteVideo } from '../../../lib/utils';
+import { Chain, RouteData } from '../../../lib/squid/types';
 
 export interface SelectedRouteOptionProps {
   checkout: Checkout;
@@ -169,7 +172,9 @@ export function SelectedRouteOption({
         <Stack gap="0px">
           <MenuItem.Label>{fromToken?.name}</MenuItem.Label>
           <MenuItem.Caption>
-            {`${t('views.ADD_TOKENS.fees.balance')} ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${routeBalanceUsd}`}
+            {`${t('views.ADD_TOKENS.fees.balance')} ${t(
+              'views.ADD_TOKENS.fees.fiatPricePrefix',
+            )} $${routeBalanceUsd}`}
           </MenuItem.Caption>
         </Stack>
         <MenuItem.PriceDisplay price={fromAmount}>

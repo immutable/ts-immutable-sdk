@@ -45,10 +45,9 @@ import {
   AddTokensContext,
 } from '../context/AddTokensContext';
 import type { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
-import { useRoutes } from '../hooks/useRoutes';
-import { SQUID_NATIVE_TOKEN } from '../utils/config';
+import { useRoutes } from '../../../lib/squid/hooks/useRoutes';
 import { AddTokensWidgetViews } from '../../../context/view-context/AddTokensViewContextTypes';
-import { AddTokensErrorTypes, type RouteData } from '../types';
+import { AddTokensErrorTypes } from '../types';
 import { SelectedRouteOption } from '../components/SelectedRouteOption';
 import { SelectedWallet } from '../components/SelectedWallet';
 import { DeliverToWalletDrawer } from '../../../components/WalletDrawer/DeliverToWalletDrawer';
@@ -57,7 +56,7 @@ import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
 import { getProviderSlugFromRdns } from '../../../lib/provider';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { sendConnectProviderSuccessEvent } from '../AddTokensWidgetEvents';
-import { convertToUsd } from '../functions/convertToUsd';
+import { convertToUsd } from '../../../lib/squid/functions/convertToUsd';
 import {
   useAnalytics,
   UserJourney,
@@ -65,11 +64,13 @@ import {
 import { validateToAmount } from '../functions/amountValidation';
 import { OnboardingDrawer } from '../components/OnboardingDrawer';
 import { useError } from '../hooks/useError';
-import { SquidFooter } from '../components/SquidFooter';
+import { SquidFooter } from '../../../lib/squid/components/SquidFooter';
 import { TokenDrawerMenu } from '../components/TokenDrawerMenu';
 import { PULSE_SHADOW } from '../utils/animation';
 import { checkSanctionedAddresses } from '../functions/checkSanctionedAddresses';
 import { getFormattedAmounts } from '../functions/getFormattedNumber';
+import { RouteData } from '../../../lib/squid/types';
+import { SQUID_NATIVE_TOKEN } from '../../../lib/squid/config';
 
 interface AddTokensProps {
   checkout: Checkout;

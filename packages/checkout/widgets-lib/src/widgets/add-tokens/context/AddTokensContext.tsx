@@ -2,7 +2,7 @@ import { createContext } from 'react';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { Squid } from '@0xsquid/sdk';
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
-import { Chain, RouteData, Token } from '../types';
+import { Chain, RouteData, Token } from '../../../lib/squid/types';
 
 export interface AddTokensState {
   id: string;
