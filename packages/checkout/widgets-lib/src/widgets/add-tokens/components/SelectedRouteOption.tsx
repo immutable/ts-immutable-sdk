@@ -1,5 +1,9 @@
 import {
-  AllDualVariantIconKeys, MenuItem, Stack, Sticker,
+  AllDualVariantIconKeys,
+  MenuItem,
+  Stack,
+  Sticker,
+  Tooltip,
 } from '@biom3/react';
 import {
   MouseEvent,
@@ -145,19 +149,26 @@ export function SelectedRouteOption({
       selected={withSelectedWallet}
     >
       {chain && (
-        <Sticker position={{ x: 'right', y: 'bottom' }}>
-          <Sticker.FramedImage
-            use={<img src={chain.iconUrl} alt={chain.name} />}
-            size="xSmall"
-            sx={{ bottom: 'base.spacing.x2', right: 'base.spacing.x2' }}
-          />
+        <Tooltip size="small">
+          <Tooltip.Target>
+            <Sticker position={{ x: 'right', y: 'bottom' }}>
+              <Sticker.FramedImage
+                use={<img src={chain.iconUrl} alt={chain.name} />}
+                size="xSmall"
+                sx={{ bottom: 'base.spacing.x2', right: 'base.spacing.x2' }}
+              />
 
-          <MenuItem.FramedImage
-            circularFrame
-            padded
-            use={<img src={fromToken?.iconUrl} alt={fromToken?.name} />}
-          />
-        </Sticker>
+              <MenuItem.FramedImage
+                circularFrame
+                padded
+                use={<img src={fromToken?.iconUrl} alt={fromToken?.name} />}
+              />
+            </Sticker>
+          </Tooltip.Target>
+          <Tooltip.Content id="route_tooltip_content">
+            {chain.name}
+          </Tooltip.Content>
+        </Tooltip>
       )}
 
       <Stack

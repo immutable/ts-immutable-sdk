@@ -1,6 +1,8 @@
-import { MouseEventHandler, ReactNode } from 'react';
 import {
-  EllipsizedText, MenuItem, MenuItemProps, SxProps,
+  MouseEventHandler, ReactElement, ReactNode,
+} from 'react';
+import {
+  EllipsizedText, MenuItem, MenuItemProps, Sticker, SxProps, Tooltip,
 } from '@biom3/react';
 import { EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
 
@@ -8,11 +10,16 @@ const disabledStyles = {
   cursor: 'not-allowed',
   bg: 'base.color.translucent.inverse.800',
 };
+export type ChainInfo = {
+  name: string;
+  iconUrl: string;
+};
 
 export interface SelectedWalletProps {
   children?: ReactNode;
   label: string;
   providerInfo?: Partial<EIP6963ProviderInfo & { address?: string }>;
+  chainInfo?: ChainInfo
   onClick: MouseEventHandler<HTMLSpanElement>;
   disabled?: boolean;
   sx?: SxProps;
@@ -23,11 +30,45 @@ export function SelectedWallet({
   children,
   onClick,
   providerInfo,
+  chainInfo,
   disabled,
   sx,
 }: SelectedWalletProps) {
   const selected = !!children && providerInfo?.rdns;
   const size: MenuItemProps['size'] = selected ? 'xSmall' : 'small';
+
+  const getMenuItemImage = () => {
+    const menuItemImage = !providerInfo?.icon
+      ? (<MenuItem.FramedIcon icon="Wallet" variant="bold" emphasized={false} />)
+      : (
+        <MenuItem.FramedImage
+          padded
+          sx={{ mx: selected ? 'base.spacing.x2' : undefined }}
+          use={<img src={providerInfo.icon} alt={providerInfo.name} />}
+        />
+      ) as ReactElement;
+
+    if (chainInfo && providerInfo?.rdns) {
+      return (
+        <Tooltip>
+          <Tooltip.Target>
+            <Sticker position={{ x: 'right', y: 'bottom' }}>
+              <Sticker.FramedImage
+                use={<img src={chainInfo.iconUrl} alt={chainInfo.name} />}
+                size="xSmall"
+                sx={{ bottom: 'base.spacing.x2', right: 'base.spacing.x2' }}
+              />
+              { menuItemImage }
+            </Sticker>
+          </Tooltip.Target>
+          <Tooltip.Content id="route_tooltip_content">
+            {chainInfo.name}
+          </Tooltip.Content>
+        </Tooltip>
+      );
+    }
+    return menuItemImage;
+  };
 
   return (
     <MenuItem
@@ -41,16 +82,7 @@ export function SelectedWallet({
         ...sx,
       }}
     >
-      {!providerInfo?.icon && (
-        <MenuItem.FramedIcon icon="Wallet" variant="bold" emphasized={false} />
-      )}
-      {providerInfo?.icon && (
-        <MenuItem.FramedImage
-          padded
-          sx={{ mx: selected ? 'base.spacing.x2' : undefined }}
-          use={<img src={providerInfo.icon} alt={providerInfo.name} />}
-        />
-      )}
+      {getMenuItemImage()}
       <MenuItem.Label>{label}</MenuItem.Label>
       {providerInfo?.name && (
         <MenuItem.Caption>

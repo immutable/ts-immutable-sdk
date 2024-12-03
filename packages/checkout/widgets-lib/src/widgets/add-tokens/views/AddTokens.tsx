@@ -258,6 +258,11 @@ export function AddTokens({
     [providers],
   );
 
+  const toChain = useMemo(
+    () => chains?.find((chain) => chain.id === ChainId.IMTBL_ZKEVM_MAINNET.toString()),
+    [chains],
+  );
+
   useEffect(() => {
     if (!id || isSwapAvailable === undefined) { return; }
 
@@ -547,6 +552,16 @@ export function AddTokens({
     );
   };
 
+  const getChainInfo = () => {
+    if (toChain) {
+      return {
+        iconUrl: toChain.iconUrl,
+        name: toChain.name,
+      };
+    }
+    return undefined;
+  };
+
   return (
     <SimpleLayout
       containerSx={{ bg: 'transparent' }}
@@ -702,6 +717,7 @@ export function AddTokens({
                 ...toProviderInfo,
                 address: toAddress,
               }}
+              chainInfo={getChainInfo()}
               onClick={() => setShowDeliverToDrawer(true)}
               disabled={lockedToProvider}
             />
