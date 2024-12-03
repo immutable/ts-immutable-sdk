@@ -648,7 +648,8 @@ export function AddTokens({
                 && selectedAmount
                 ? { animation: `${PULSE_SHADOW} 2s infinite ease-in-out` }
                 : {}}
-              label={t('views.ADD_TOKENS.walletSelection.fromText')}
+              label={t('views.ADD_TOKENS.walletSelection.from.label')}
+              caption={t('views.ADD_TOKENS.walletSelection.from.caption')}
               providerInfo={{
                 ...fromProviderInfo,
                 address: fromAddress,
@@ -698,7 +699,8 @@ export function AddTokens({
                 && selectedAmount
                 ? { animation: `${PULSE_SHADOW} 2s infinite ease-in-out` }
                 : {}}
-              label={t('views.ADD_TOKENS.walletSelection.toText')}
+              label={t('views.ADD_TOKENS.walletSelection.to.label')}
+              caption={t('views.ADD_TOKENS.walletSelection.to.caption')}
               providerInfo={{
                 ...toProviderInfo,
                 address: toAddress,

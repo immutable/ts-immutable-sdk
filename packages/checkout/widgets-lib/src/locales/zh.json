@@ -632,14 +632,20 @@
     },
     "ADD_TOKENS": {
       "tokenSelection": {
-        "buttonText": "请选择您想要的代币",
+        "buttonText": "选择您想要的代币",
         "tokenLabel": "添加",
         "drawerHeading": "添加代币",
         "searchPlaceholder": "搜索代币"
       },
       "walletSelection": {
-        "fromText": "从此发送",
-        "toText": "发送到"
+        "from": {
+          "label": "发送自",
+          "caption": "选择要桥接或交换的钱包"
+        },
+        "to": {
+          "label": "发送到",
+          "caption": "选择您想要发送代币的位置"
+        }
       },
       "routeSelection": {
         "loadingText": "寻找最佳支付路线中...",
