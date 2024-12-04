@@ -108,7 +108,10 @@ export function OnRampMain({
             screen: 'OrderInProgress',
             control: 'PaymentProcessing',
             controlType: 'IframeEvent',
-            extras: { ...miscProps },
+            extras: {
+              ...miscProps,
+              transactionHash: event.data.transactionHash,
+            },
           }); // checkoutOnRampOrderInProgress_PaymentProcessingIframeEvent
         }
         if (event.data.status === TransakStatuses.COMPLETED) {
@@ -117,7 +120,10 @@ export function OnRampMain({
             screen: 'Success',
             control: 'PaymentCompleted',
             controlType: 'IframeEvent',
-            extras: { ...miscProps },
+            extras: {
+              ...miscProps,
+              transactionHash: event.data.transactionHash,
+            },
           }); // checkoutOnRampSuccess_PaymentCompletedIframeEvent
         }
         break;
