@@ -2537,33 +2537,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:0.28.13, @biom3/react@npm:^0.28.13":
-  version: 0.28.13
-  resolution: "@biom3/react@npm:0.28.13"
-  dependencies:
-    "@biom3/design-tokens": ~0.4.6
-    "@imtbl/image-resizer-utils": ~0.0.3
-    csstype: ^3.1.3
-    hls.js: ^1.5.11
-    localforage: ^1.10.0
-    lodash.debounce: ^4.0.8
-    lodash.get: ^4.4.2
-    lodash.isequal: ^4.5.0
-    lodash.throttle: ^4.1.1
-    react-is: ^18.2.0
-    react-keyed-flatten-children: ^3.0.0
-    ts-deepmerge: ^7.0.2
-  peerDependencies:
-    "@emotion/react": ^11.11.4
-    "@rive-app/react-canvas-lite": ^4.9.0
-    embla-carousel-react: ^8.0.4
-    framer-motion: ^10.12.12
-    react: ^18.3.0
-    react-dom: ^18.3.0
-  checksum: dda1f2671e6877092c1fb3d19b2edc379f3fdc5d8d1f79105624ce1eaed0653feebfdbe0039ff0091a0f13ddd386b16108dcb1d9914320b4725704f53401886a
-  languageName: node
-  linkType: hard
-
 "@biom3/react@npm:^0.25.21":
   version: 0.25.21
   resolution: "@biom3/react@npm:0.25.21"
@@ -2669,6 +2642,33 @@ __metadata:
     react: ^18.3.0
     react-dom: ^18.3.0
   checksum: 72296b3ca583c96b1bd5bb08d8dc7c0ad0524e17479d62432a66f5a0e8c10a6d23056b01507324543099de8d939b2d124f49d3d1c2c4914bfe1e2389319fc32e
+  languageName: node
+  linkType: hard
+
+"@biom3/react@npm:^0.28.13":
+  version: 0.28.13
+  resolution: "@biom3/react@npm:0.28.13"
+  dependencies:
+    "@biom3/design-tokens": ~0.4.6
+    "@imtbl/image-resizer-utils": ~0.0.3
+    csstype: ^3.1.3
+    hls.js: ^1.5.11
+    localforage: ^1.10.0
+    lodash.debounce: ^4.0.8
+    lodash.get: ^4.4.2
+    lodash.isequal: ^4.5.0
+    lodash.throttle: ^4.1.1
+    react-is: ^18.2.0
+    react-keyed-flatten-children: ^3.0.0
+    ts-deepmerge: ^7.0.2
+  peerDependencies:
+    "@emotion/react": ^11.11.4
+    "@rive-app/react-canvas-lite": ^4.9.0
+    embla-carousel-react: ^8.0.4
+    framer-motion: ^10.12.12
+    react: ^18.3.0
+    react-dom: ^18.3.0
+  checksum: dda1f2671e6877092c1fb3d19b2edc379f3fdc5d8d1f79105624ce1eaed0653feebfdbe0039ff0091a0f13ddd386b16108dcb1d9914320b4725704f53401886a
   languageName: node
   linkType: hard
 
@@ -4658,7 +4658,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": 0.28.13
+    "@biom3/react": ^0.28.13
     "@ethersproject/providers": ^5.7.2
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
@@ -4694,7 +4694,7 @@ __metadata:
     "@0xsquid/sdk": ^2.8.25
     "@0xsquid/squid-types": ^0.1.108
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": 0.28.13
+    "@biom3/react": ^0.28.13
     "@ethersproject/bignumber": ^5.7.0
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
