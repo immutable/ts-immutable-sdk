@@ -19,6 +19,9 @@ import { HandoverProvider } from '../../context/handover-context/HandoverProvide
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
 import i18n from '../../i18n';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
+import { GeoblockLoader } from '../../components/Geoblock/GeoblockLoader';
+import { ServiceUnavailableToRegionErrorView } from '../../views/error/ServiceUnavailableToRegionErrorView';
+import { ServiceType } from '../../views/error/serviceTypes';
 
 const OnRampWidget = React.lazy(() => import('./OnRampWidget'));
 
@@ -90,22 +93,34 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="onramp-container" config={this.strongConfig()}>
             <HandoverProvider>
-              <ConnectLoader
-                widgetConfig={this.strongConfig()}
-                params={connectLoaderParams}
-                closeEvent={() => sendOnRampWidgetCloseEvent(window)}
-                goBackEvent={() => this.goBackEvent(window)}
-                showBackButton={this.parameters.showBackButton}
-              >
-                <Suspense fallback={<LoadingView loadingText={t('views.ONRAMP.initialLoadingText')} />}>
-                  <OnRampWidget
-                    tokenAddress={this.parameters.tokenAddress}
-                    amount={this.parameters.amount}
-                    config={this.strongConfig()}
+              <GeoblockLoader
+                checkout={this.checkout}
+                checkAvailability={() => this.checkout.isOnRampAvailable()}
+                widget={(
+                  <ConnectLoader
+                    widgetConfig={this.strongConfig()}
+                    params={connectLoaderParams}
+                    closeEvent={() => sendOnRampWidgetCloseEvent(window)}
+                    goBackEvent={() => this.goBackEvent(window)}
                     showBackButton={this.parameters.showBackButton}
+                  >
+                    <Suspense fallback={<LoadingView loadingText={t('views.ONRAMP.initialLoadingText')} />}>
+                      <OnRampWidget
+                        tokenAddress={this.parameters.tokenAddress}
+                        amount={this.parameters.amount}
+                        config={this.strongConfig()}
+                        showBackButton={this.parameters.showBackButton}
+                      />
+                    </Suspense>
+                  </ConnectLoader>
+                )}
+                serviceUnavailableView={(
+                  <ServiceUnavailableToRegionErrorView
+                    service={ServiceType.GENERIC}
+                    onCloseClick={() => sendOnRampWidgetCloseEvent(window)}
                   />
-                </Suspense>
-              </ConnectLoader>
+                )}
+              />
             </HandoverProvider>
           </ThemeProvider>
         </CustomAnalyticsProvider>

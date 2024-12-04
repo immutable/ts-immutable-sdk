@@ -121,6 +121,13 @@ export default function AddTokensWidget({
           isSwapAvailable: await checkout.isSwapAvailable(),
         },
       });
+
+      addTokensDispatch({
+        payload: {
+          type: AddTokensActions.SET_IS_ONRAMP_AVAILABLE,
+          isOnRampAvailable: await checkout.isOnRampAvailable(),
+        },
+      });
     })();
   }, [checkout]);
 

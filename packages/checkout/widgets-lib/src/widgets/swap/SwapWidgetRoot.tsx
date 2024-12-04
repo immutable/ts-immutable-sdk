@@ -24,7 +24,7 @@ import { HandoverProvider } from '../../context/handover-context/HandoverProvide
 import { topUpBridgeOption, topUpOnRampOption } from './helpers';
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
 import i18n from '../../i18n';
-import { GeoblockLoader } from './GeoblockLoader';
+import { GeoblockLoader } from '../../components/Geoblock/GeoblockLoader';
 
 const SwapWidget = React.lazy(() => import('./SwapWidget'));
 
@@ -123,6 +123,7 @@ export class Swap extends Base<WidgetType.SWAP> {
             <HandoverProvider>
               <GeoblockLoader
                 checkout={this.checkout}
+                checkAvailability={() => this.checkout.isSwapAvailable()}
                 widget={
                 (
                   <ConnectLoader

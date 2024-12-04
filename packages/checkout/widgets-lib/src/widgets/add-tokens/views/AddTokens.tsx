@@ -118,6 +118,7 @@ export function AddTokens({
     selectedRouteData,
     selectedToken,
     isSwapAvailable,
+    isOnRampAvailable,
   } = addTokensState;
 
   const {
@@ -514,14 +515,14 @@ export function AddTokens({
   };
 
   const shouldShowOnRampOption = useMemo(() => {
-    if (showOnrampOption && selectedToken) {
+    if (showOnrampOption && isOnRampAvailable && selectedToken) {
       const isAllowedToken = onRampAllowedTokens.find(
         (token) => token.address?.toLowerCase() === selectedToken.address?.toLowerCase(),
       );
       return !!isAllowedToken;
     }
     return false;
-  }, [selectedToken, onRampAllowedTokens, showOnrampOption]);
+  }, [selectedToken, onRampAllowedTokens, showOnrampOption, isOnRampAvailable]);
 
   const showInitialEmptyState = !selectedToken;
 
