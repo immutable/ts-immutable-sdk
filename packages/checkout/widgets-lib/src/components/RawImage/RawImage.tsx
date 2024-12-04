@@ -1,7 +1,6 @@
 import {
-  BiomeTheme, Box, BoxProps, useConvertSxToEmotionStyles,
+  Box, BoxProps, CloudImage,
 } from '@biom3/react';
-import { Interpolation } from '@emotion/react';
 import { imageStyles, rawImageStyles } from './RawImageStyles';
 
 export type RawImageProps = {
@@ -9,6 +8,7 @@ export type RawImageProps = {
   alt: string;
 } & BoxProps;
 
+// TODO replace to return biome FrameImage component instead
 export function RawImage({
   src,
   alt,
@@ -25,12 +25,16 @@ export function RawImage({
       rc={<span />}
       {...props}
     >
-      <img
-        src={src}
-        alt={alt}
-        className="CloudImage"
-        style={imageStyles}
-        loading="lazy"
+      <CloudImage
+        sx={imageStyles}
+        use={(
+          <img
+            src={src}
+            alt={alt}
+            className="CloudImage"
+            loading="lazy"
+          />
+      )}
       />
     </Box>
   );
