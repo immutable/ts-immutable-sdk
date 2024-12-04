@@ -71,6 +71,7 @@ import { checkSanctionedAddresses } from '../functions/checkSanctionedAddresses'
 import { getFormattedAmounts } from '../functions/getFormattedNumber';
 import { RouteData } from '../../../lib/squid/types';
 import { SQUID_NATIVE_TOKEN } from '../../../lib/squid/config';
+import { identifyUser } from '../../../lib/analytics/identifyUser';
 
 interface AddTokensProps {
   checkout: Checkout;
@@ -119,8 +120,13 @@ export function AddTokens({
     isSwapAvailable,
   } = addTokensState;
 
+  const {
+    track,
+    page,
+    identify,
+    user,
+  } = useAnalytics();
   const { viewDispatch } = useContext(ViewContext);
-  const { track, page } = useAnalytics();
   const { t } = useTranslation();
 
   const {
@@ -257,6 +263,22 @@ export function AddTokens({
         return detail;
       }),
     [providers],
+  );
+
+  useEffect(() => {
+    if (!lockedToProvider) { return; }
+
+    (async () => {
+      const userData = user ? await user() : undefined;
+      const anonymousId = userData?.anonymousId();
+
+      await identifyUser(identify, toProvider!, { anonymousId });
+    })();
+  }, [toProvider, lockedToProvider]);
+
+  const toChain = useMemo(
+    () => chains?.find((chain) => chain.id === ChainId.IMTBL_ZKEVM_MAINNET.toString()),
+    [chains],
   );
 
   useEffect(() => {
@@ -548,6 +570,16 @@ export function AddTokens({
     );
   };
 
+  const getChainInfo = () => {
+    if (toChain) {
+      return {
+        iconUrl: toChain.iconUrl,
+        name: toChain.name,
+      };
+    }
+    return undefined;
+  };
+
   return (
     <SimpleLayout
       containerSx={{ bg: 'transparent' }}
@@ -623,7 +655,7 @@ export function AddTokens({
               />
 
               <HeroFormControl.Caption>
-                {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} 
+                {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')}
                 $${getFormattedAmounts(selectedAmountUsd)}`}
               </HeroFormControl.Caption>
             </HeroFormControl>
@@ -705,6 +737,7 @@ export function AddTokens({
                 ...toProviderInfo,
                 address: toAddress,
               }}
+              chainInfo={getChainInfo()}
               onClick={() => setShowDeliverToDrawer(true)}
               disabled={lockedToProvider}
             />
