@@ -2537,7 +2537,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:0.28.13":
+"@biom3/react@npm:0.28.13, @biom3/react@npm:^0.28.13":
   version: 0.28.13
   resolution: "@biom3/react@npm:0.28.13"
   dependencies:
@@ -4571,7 +4571,7 @@ __metadata:
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.12
+    "@biom3/react": ^0.28.13
     "@ethersproject/providers": ^5.7.2
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
@@ -5008,7 +5008,7 @@ __metadata:
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": ^0.27.12
+    "@biom3/react": ^0.28.13
     "@imtbl/blockchain-data": 0.0.0
     "@imtbl/config": 0.0.0
     "@imtbl/generated-clients": 0.0.0
@@ -5123,7 +5123,7 @@ __metadata:
     "@babel/plugin-transform-class-properties": ^7.24.1
     "@babel/plugin-transform-private-methods": ^7.24.1
     "@biom3/design-tokens": ^0.4.4
-    "@biom3/react": 0.28.13
+    "@biom3/react": ^0.28.13
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-provider": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
@@ -41379,7 +41379,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "x-provider-sample-app@workspace:packages/x-provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.27.12
+    "@biom3/react": ^0.28.13
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
     "@testing-library/jest-dom": ^5.16.5
