@@ -26,7 +26,7 @@ export function RawImage({
         src={src}
         alt={alt}
         className="CloudImage"
-        style={useConvertSxToEmotionStyles(imageStyles)}
+        // style={useConvertSxToEmotionStyles(imageStyles)} TODO: fix this
         loading="lazy"
       />
     </Box>
