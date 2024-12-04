@@ -661,7 +661,7 @@
         "from":{
           "label": "Send from",
           "caption": "Choose a wallet to bridge or swap from"
-        }, 
+        },
         "to": {
           "label": "Deliver to",
           "caption": "Choose where you want your tokens to go"
@@ -839,7 +839,7 @@
         },
         "screen2": {
           "title": "You can deliver tokens to Passport\n& pay from any wallet",
-          "caption": "whats evolved",
+          "caption": "what's evolved",
           "buttonText": "Next"
         },
         "screen3": {
