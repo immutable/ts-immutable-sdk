@@ -30,18 +30,18 @@ import { ChainId } from '@imtbl/checkout-sdk';
 import { trackFlow } from '@imtbl/metrics';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { AddTokensContext } from '../context/AddTokensContext';
-import { useRoutes } from '../hooks/useRoutes';
+import { useRoutes } from '../../../lib/squid/hooks/useRoutes';
 import {
   AddTokensReviewData,
   AddTokensWidgetViews,
 } from '../../../context/view-context/AddTokensViewContextTypes';
-import { AddTokensErrorTypes, AmountData, RiveStateMachineInput } from '../types';
-import { useExecute } from '../hooks/useExecute';
+import { AddTokensErrorTypes, RiveStateMachineInput } from '../types';
+import { useExecute } from '../../../lib/squid/hooks/useExecute';
 import {
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
-import { SquidIcon } from '../components/SquidIcon';
+import { SquidIcon } from '../../../lib/squid/components/SquidIcon';
 import { useHandover } from '../../../lib/hooks/useHandover';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
@@ -50,7 +50,6 @@ import {
   APPROVE_TXN_ANIMATION,
   EXECUTE_TXN_ANIMATION,
   FIXED_HANDOVER_DURATION,
-  SQUID_NATIVE_TOKEN,
 } from '../utils/config';
 import {
   useAnalytics,
@@ -61,13 +60,13 @@ import { LoadingView } from '../../../views/loading/LoadingView';
 import { getDurationFormatted } from '../functions/getDurationFormatted';
 import { RouteFees } from '../components/RouteFees';
 import { AddressMissmatchDrawer } from '../components/AddressMissmatchDrawer';
-import { getTotalRouteFees } from '../functions/getTotalRouteFees';
-import { getRouteChains } from '../functions/getRouteChains';
+import { getTotalRouteFees } from '../../../lib/squid/functions/getTotalRouteFees';
+import { getRouteChains } from '../../../lib/squid/functions/getRouteChains';
 import {
   getFormattedAmounts,
   getFormattedNumber,
 } from '../functions/getFormattedNumber';
-import { SquidFooter } from '../components/SquidFooter';
+import { SquidFooter } from '../../../lib/squid/components/SquidFooter';
 import { useError } from '../hooks/useError';
 import {
   sendAddTokensCloseEvent,
@@ -75,6 +74,8 @@ import {
 } from '../AddTokensWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { convertToNetworkChangeableProvider } from '../functions/convertToNetworkChangeableProvider';
+import { AmountData } from '../../../lib/squid/types';
+import { SQUID_NATIVE_TOKEN } from '../../../lib/squid/config';
 
 interface ReviewProps {
   data: AddTokensReviewData;

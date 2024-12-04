@@ -641,8 +641,14 @@
         "searchPlaceholder": "トークンを検索"
       },
       "walletSelection": {
-        "fromText": "送金元",
-        "toText": "送金先"
+        "from": {
+          "label": "送信元",
+          "caption": "ブリッジまたはスワップするウォレットを選択してください"
+        },
+        "to": {
+          "label": "送信先",
+          "caption": "トークンを送信したい場所を選択してください"
+        }
       },
       "routeSelection": {
         "loadingText": "最適な支払いルートを検索中...",

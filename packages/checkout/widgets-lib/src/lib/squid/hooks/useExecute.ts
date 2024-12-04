@@ -9,14 +9,14 @@ import { StatusResponse } from '@0xsquid/sdk/dist/types';
 import { Flow } from '@imtbl/metrics';
 import { EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
 import { isSquidNativeToken } from '../functions/isSquidNativeToken';
-import { useError } from './useError';
-import { AddTokensError, AddTokensErrorTypes } from '../types';
+import { useError } from '../../../widgets/add-tokens/hooks/useError';
+import { AddTokensError, AddTokensErrorTypes } from '../../../widgets/add-tokens/types';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { sendAddTokensFailedEvent } from '../AddTokensWidgetEvents';
-import { retry } from '../../../lib/retry';
-import { withMetricsAsync } from '../../../lib/metrics';
+import { sendAddTokensFailedEvent } from '../../../widgets/add-tokens/AddTokensWidgetEvents';
+import { retry } from '../../retry';
+import { withMetricsAsync } from '../../metrics';
 import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
-import { isRejectedError } from '../functions/errorType';
+import { isRejectedError } from '../../../widgets/add-tokens/functions/errorType';
 
 const TRANSACTION_NOT_COMPLETED = 'transaction not completed';
 
@@ -156,11 +156,10 @@ export const useExecute = (contextId: string, environment: Environment) => {
           throw new Error('transactionRequest target is undefined');
         }
 
-        const allowance = await tokenContract.allowance(
+        return await tokenContract.allowance(
           ownerAddress,
           transactionRequestTarget,
         );
-        return allowance;
       }
 
       return ethers.constants.MaxUint256; // no approval is needed for native tokens

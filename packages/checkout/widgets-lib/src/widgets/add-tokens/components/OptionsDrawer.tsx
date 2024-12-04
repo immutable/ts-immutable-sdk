@@ -1,4 +1,6 @@
-import { Drawer, EllipsizedText, MenuItem } from '@biom3/react';
+import {
+  Drawer, EllipsizedText, MenuItem,
+} from '@biom3/react';
 import { motion } from 'framer-motion';
 import { useContext, useEffect, useRef } from 'react';
 
@@ -6,10 +8,11 @@ import { Checkout } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { listVariants } from '../../../lib/animation/listAnimation';
 import { Options } from './Options';
-import { FiatOptionType, RouteData } from '../types';
+import { FiatOptionType } from '../types';
 import { AddTokensContext } from '../context/AddTokensContext';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { RouteData } from '../../../lib/squid/types';
 
 type OptionsDrawerProps = {
   checkout: Checkout;
@@ -97,9 +100,9 @@ export function OptionsDrawer({
           <MenuItem.FramedImage
             padded
             emphasized
-            use={
+            use={(
               <img src={fromProviderInfo?.icon} alt={fromProviderInfo?.name} />
-            }
+            )}
             sx={{ mx: 'base.spacing.x2' }}
           />
           <MenuItem.Label>{t('views.ADD_TOKENS.drawer.options.heading')}</MenuItem.Label>

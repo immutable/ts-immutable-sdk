@@ -24,16 +24,16 @@ import {
 } from '../../context/view-context/ViewContext';
 import { AddTokens } from './views/AddTokens';
 import { ErrorView } from '../../views/error/ErrorView';
-import { useSquid } from './hooks/useSquid';
+import { useSquid } from '../../lib/squid/hooks/useSquid';
 import {
   useAnalytics,
   UserJourney,
 } from '../../context/analytics-provider/SegmentAnalyticsProvider';
-import { fetchChains } from './functions/fetchChains';
+import { fetchChains } from '../../lib/squid/functions/fetchChains';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { Review } from './views/Review';
-import { fetchBalances } from './functions/fetchBalances';
-import { useTokens } from './hooks/useTokens';
+import { fetchBalances } from '../../lib/squid/functions/fetchBalances';
+import { useTokens } from '../../lib/squid/hooks/useTokens';
 import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { getRemoteImage } from '../../lib/utils';
@@ -150,8 +150,7 @@ export default function AddTokensWidget({
     (async () => {
       try {
         fetchingBalances.current = true;
-        const evmChains = chains.filter((chain) => chain.type === 'evm');
-        const balances = await fetchBalances(squid, evmChains, fromProvider);
+        const balances = await fetchBalances(squid, chains, fromProvider);
 
         addTokensDispatch({
           payload: {

@@ -3,17 +3,17 @@ import { RouteResponse, ActionType } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
 import { BigNumber, utils } from 'ethers';
 import { useContext, useRef } from 'react';
-import { delay } from '../functions/delay';
+import { delay } from '../../../widgets/add-tokens/functions/delay';
+import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
+import { AddTokensActions, AddTokensContext } from '../../../widgets/add-tokens/context/AddTokensContext';
+import { retry } from '../../retry';
+import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
+import { isPassportProvider } from '../../provider';
 import {
   AmountData, RouteData, RouteResponseData, Token,
 } from '../types';
-import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
-import { AddTokensActions, AddTokensContext } from '../context/AddTokensContext';
-import { retry } from '../../../lib/retry';
-import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
-import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
-import { isPassportProvider } from '../../../lib/provider';
-import { SquidPostHook } from '../../../lib/primary-sales';
+import { SquidPostHook } from '../../primary-sales';
 
 const BASE_SLIPPAGE = 0.02;
 
