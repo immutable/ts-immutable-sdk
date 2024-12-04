@@ -5,6 +5,7 @@ import {
   MenuItemProps,
   Sticker,
   SxProps,
+  Tooltip,
 } from '@biom3/react';
 import { EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
 
@@ -56,12 +57,19 @@ export function SelectedWallet({
 
     if (chainInfo && providerInfo?.rdns) {
       return (
-        <Sticker position={{ x: 'right', y: 'bottom' }}>
-          <Sticker.FramedImage
-            use={<img src={chainInfo.iconUrl} alt={chainInfo.name} />}
-            size="xSmall"
-            sx={{ bottom: 'base.spacing.x2', right: 'base.spacing.x2' }}
-          />
+        <Sticker position={{ x: 'rightInside', y: 'bottomInside' }}>
+          <Tooltip size="small">
+            <Tooltip.Target>
+              <Sticker.FramedImage
+                use={<img src={chainInfo.iconUrl} alt={chainInfo.name} />}
+                size="xSmall"
+                sx={{ bottom: 'base.spacing.x2', right: 'base.spacing.x2' }}
+              />
+            </Tooltip.Target>
+            <Tooltip.Content id="route_tooltip_content">
+              {chainInfo.name}
+            </Tooltip.Content>
+          </Tooltip>
           {menuItemImage}
         </Sticker>
       );
