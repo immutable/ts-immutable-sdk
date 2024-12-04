@@ -1,3 +1,5 @@
+import type { Properties } from 'csstype';
+
 export const rawImageStyles = {
   minw: '16px',
   padding: '8px',
@@ -20,4 +22,4 @@ export const imageStyles = {
   height: '100%',
   objectFit: 'contain',
   objectPosition: '50% 50%',
-};
+} as Properties;

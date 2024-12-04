@@ -1,4 +1,7 @@
-import { Box, BoxProps, useConvertSxToEmotionStyles } from '@biom3/react';
+import {
+  BiomeTheme, Box, BoxProps, useConvertSxToEmotionStyles,
+} from '@biom3/react';
+import { Interpolation } from '@emotion/react';
 import { imageStyles, rawImageStyles } from './RawImageStyles';
 
 export type RawImageProps = {
@@ -26,7 +29,7 @@ export function RawImage({
         src={src}
         alt={alt}
         className="CloudImage"
-        // style={useConvertSxToEmotionStyles(imageStyles)} TODO: fix this
+        style={imageStyles}
         loading="lazy"
       />
     </Box>
