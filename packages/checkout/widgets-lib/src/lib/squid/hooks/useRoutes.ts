@@ -51,16 +51,6 @@ export const useRoutes = () => {
         && value.chainId === chainId,
   );
 
-  const calculateTotalFees = (routeEstimate: any) => {
-    const totalGasCosts = routeEstimate.gasCosts
-      .reduce((sum, gasCost) => sum + parseFloat(utils.formatUnits(gasCost.amount, gasCost.token.decimals)), 0);
-
-    const totalFeeCosts = routeEstimate.feeCosts
-      .reduce((sum, feeCost) => sum + parseFloat(utils.formatUnits(feeCost.amount, feeCost.token.decimals)), 0);
-
-    return totalGasCosts + totalFeeCosts;
-  };
-
   const calculateFromAmount = (
     fromToken: Token,
     toToken: Token,
@@ -301,19 +291,20 @@ export const useRoutes = () => {
 
       if (!routeResponse?.route) return null;
 
-      const totalFees = calculateTotalFees(routeResponse.route.route.estimate);
+      const fees = routeResponse.route.route.estimate.feeCosts
+        .reduce((sum, feeCost) => sum + parseFloat(utils.formatUnits(feeCost.amount, feeCost.token.decimals)), 0);
 
       const sourceGasCost = routeResponse.route.route.estimate.gasCosts
         .filter((gas) => gas.token.chainId === data.balance.chainId) // Ensure gas is for the source chain
         .reduce((sum, gas) => sum + parseFloat(utils.formatUnits(gas.amount, gas.token.decimals)), 0);
 
-      const totalCosts = parseFloat(data.fromAmount) + totalFees + sourceGasCost;
+      const totalCosts = parseFloat(data.fromAmount) + fees + sourceGasCost;
 
       // User's available balance on the source chain
       const userBalance = parseFloat(utils.formatUnits(data.balance.balance, data.balance.decimals));
 
       console.log('===routeResponse', routeResponse);
-      console.log('===totalFees', totalFees);
+      console.log('===fees', fees);
       console.log('===sourceGasCost', sourceGasCost);
       console.log('===userBalance', userBalance);
       console.log('===totalCosts', totalCosts);
