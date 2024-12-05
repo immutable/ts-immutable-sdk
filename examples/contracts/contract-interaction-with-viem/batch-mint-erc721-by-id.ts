@@ -75,5 +75,3 @@ export const batchMintERC721ByID = async (
   console.log(`txHash: ${txHash}`);
   return txHash;
 };
-
-batchMintERC721ByID(PRIVATE_KEY, CONTRACT_ADDRESS, REQUESTS);
