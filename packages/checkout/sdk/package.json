@@ -65,7 +65,7 @@
   "scripts": {
     "build": "pnpm transpile && pnpm typegen",
     "transpile": "tsup src/index.ts --config ./tsup.config.js",
-    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",    
+    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
     "build:dev": "CHECKOUT_DEV_MODE=true pnpm build",
     "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/index.ts",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
