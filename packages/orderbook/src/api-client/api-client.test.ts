@@ -2,9 +2,8 @@ import {
   anything, deepEqual, instance, mock, when,
 } from 'ts-mockito';
 import type { OrderComponents } from '../seaport/types';
-import { OrderType } from '../seaport/constants';
 import { ListingResult, OrdersService } from '../openapi/sdk';
-import { ItemType } from '../seaport';
+import { ItemType, OrderType } from '../seaport';
 import { ImmutableApiClient } from './api-client';
 
 const seaportAddress = '0x123';

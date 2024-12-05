@@ -25,7 +25,7 @@ export default defineConfig((options) => {
       target: 'es2022',
       minify: false,
       bundle: true,
-      splitting: true,
+      treeshake: true,
       esbuildPlugins: [
         nodeModulesPolyfillPlugin({
           globals: {
@@ -48,7 +48,7 @@ export default defineConfig((options) => {
       target: 'es2022',
       minify: false,
       bundle: true,
-      splitting: true,
+      treeshake: true,
       esbuildPlugins: [
         replace({ 
           '__SDK_VERSION__': pkg.version, 
