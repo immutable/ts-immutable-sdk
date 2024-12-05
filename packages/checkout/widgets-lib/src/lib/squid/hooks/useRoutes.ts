@@ -13,6 +13,7 @@ import { isPassportProvider } from '../../provider';
 import {
   AmountData, RouteData, RouteResponseData, Token,
 } from '../types';
+import { SQUID_NATIVE_TOKEN } from '../config';
 
 const BASE_SLIPPAGE = 0.02;
 
@@ -291,38 +292,51 @@ export const useRoutes = () => {
 
       if (!routeResponse?.route) return null;
 
-      const fees = routeResponse.route.route.estimate.feeCosts
+      const otherFees = routeResponse.route.route.estimate.feeCosts
         .reduce((sum, feeCost) => sum + parseFloat(utils.formatUnits(feeCost.amount, feeCost.token.decimals)), 0);
 
       const sourceGasCost = routeResponse.route.route.estimate.gasCosts
-        .filter((gas) => gas.token.chainId === data.balance.chainId) // Ensure gas is for the source chain
-        .reduce((sum, gas) => sum + parseFloat(utils.formatUnits(gas.amount, gas.token.decimals)), 0);
+        .filter((gasCost) => gasCost.token.chainId === data.balance.chainId) // Source chain gas cost
+        .reduce((sum, gasCost) => sum + parseFloat(utils.formatUnits(gasCost.amount, gasCost.token.decimals)), 0);
 
-      const totalCosts = parseFloat(data.fromAmount) + fees + sourceGasCost;
+      // Check if user has enough balance for the token being swapped/bridged
+      const userTokenBalance = parseFloat(utils.formatUnits(data.balance.balance, data.balance.decimals));
+      const totalTokenCost = parseFloat(data.fromAmount) + otherFees; // USDT required for the swap
 
-      // User's available balance on the source chain
-      const userBalance = parseFloat(utils.formatUnits(data.balance.balance, data.balance.decimals));
-
-      console.log('===routeResponse', routeResponse);
-      console.log('===fees', fees);
-      console.log('===sourceGasCost', sourceGasCost);
-      console.log('===userBalance', userBalance);
-      console.log('===totalCosts', totalCosts);
-
-      if (userBalance >= totalCosts) {
-        return {
-          amountData: data,
-          route: routeResponse.route,
-        } as RouteData;
+      if (userTokenBalance < totalTokenCost) {
+        console.log('Insufficient token balance for swap/bridge:', data.balance.symbol);
+        return null;
       }
-      return null;
+
+      console.log('=== fromAmountArray', fromAmountArray);
+
+      // Find native currency balance on the source chain
+      const userGasBalance = fromAmountArray.find(
+        (bal) => bal.balance.address === SQUID_NATIVE_TOKEN.toLowerCase()
+        && bal.balance.chainId === data.balance.chainId,
+      );
+
+      console.log('=== userGasBalance', userGasBalance);
+
+      // Check if user has enough native currency for gas fees on the source chain
+      const isEnoughSourceGas = userGasBalance
+      && parseFloat(utils.formatUnits(userGasBalance.balance.balance, userGasBalance.balance.decimals)) > sourceGasCost;
+
+      if (!userGasBalance || !isEnoughSourceGas) {
+        console.log('Insufficient native gas balance for transaction on source chain');
+        return null;
+      }
+
+      // Return the valid route
+      return {
+        amountData: data,
+        route: routeResponse.route,
+      } as RouteData;
     });
 
     const routesData = (await Promise.all(routePromises)).filter(
       (route): route is RouteData => route !== null && route !== undefined,
     );
-
-    console.log('===routesData', routesData);
 
     return routesData;
   };
