@@ -237,6 +237,7 @@ export type SignApiResponse = {
     currency_symbol: string;
     products: SignApiProduct[];
     total_amount: string;
+    recipient_address: string;
   };
   transactions: SignApiTransaction[];
 };

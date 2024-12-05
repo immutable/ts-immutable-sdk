@@ -2,7 +2,8 @@
 import { useCallback, useState } from 'react';
 import { SaleItem } from '@imtbl/checkout-sdk';
 
-import { ChainType, SquidCallType } from '@0xsquid/squid-types';
+import { ChainType, EvmContractCall, SquidCallType } from '@0xsquid/squid-types';
+import { ethers } from 'ethers';
 import {
   SignResponse,
   SignOrderInput,
@@ -74,6 +75,7 @@ const toSignResponse = (
           return acc;
         }, [] as SignedOrderProduct[]),
       totalAmount: Number(order.total_amount),
+      recipientAddress: order.recipient_address,
     },
     transactions: transactions.map((transaction) => ({
       tokenAddress: transaction.contract_address,
@@ -106,6 +108,9 @@ export const useSignOrder = (input: SignOrderInput) => {
     undefined,
   );
   const [signResponse, setSignResponse] = useState<SignResponse | undefined>(
+    undefined,
+  );
+  const [, setPostHooks] = useState<EvmContractCall[] | undefined>(
     undefined,
   );
   const [executeResponse, setExecuteResponse] = useState<ExecuteOrderResponse>({
@@ -288,10 +293,9 @@ export const useSignOrder = (input: SignOrderInput) => {
     [items, environmentId, environment, provider],
   );
 
-  const getPostHooks = (transactions: SignedTransaction[]): SquidPostHookCall[] => {
-    const approvalTxn = transactions.find((txn) => txn.methodCall.startsWith('approve'));
-    const transferTxn = transactions.find((txn) => txn.methodCall.startsWith('execute'));
-
+  const getPostHooks = (signApiResponse: SignResponse): SquidPostHookCall[] => {
+    const approvalTxn = signApiResponse.transactions.find((txn) => txn.methodCall.startsWith('approve'));
+    const transferTxn = signApiResponse.transactions.find((txn) => txn.methodCall.startsWith('execute'));
     const postHookCalls: SquidPostHookCall[] = [];
 
     if (approvalTxn) {
@@ -326,7 +330,10 @@ export const useSignOrder = (input: SignOrderInput) => {
 
     if (approvalTxn) {
       const erc20Interface = new ethers.utils.Interface(['function transfer(address to, uint256 amount)']);
-      const transferPendingTokensTx = erc20Interface.encodeFunctionData('transfer', [approvalTxn.params.spender, 0]);
+      const transferPendingTokensTx = erc20Interface.encodeFunctionData(
+        'transfer',
+        [signApiResponse.order.recipientAddress, 0],
+      );
 
       postHookCalls.push({
         chainType: ChainType.EVM,
@@ -374,12 +381,13 @@ export const useSignOrder = (input: SignOrderInput) => {
           .flat();
 
         const responseData = toSignResponse(apiResponse, items);
-        const postHooks = getPostHooks(responseData.transactions);
+        const squidPostHooks = getPostHooks(responseData);
 
+        setPostHooks(squidPostHooks);
         setTokenIds(apiTokenIds);
         setSignResponse(responseData);
 
-        return { signResponse: responseData, postHooks };
+        return { signResponse: responseData, postHooks: squidPostHooks };
       } catch (e: any) {
         setSignError({ type: SaleErrorTypes.DEFAULT, data: { error: e } });
       }
