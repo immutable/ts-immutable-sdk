@@ -276,67 +276,81 @@ export const useRoutes = () => {
   const getRoutesWithFeesValidation = async (
     squid: Squid,
     toTokenAddress: string,
-    fromAmountArray: AmountData[],
+    balances: TokenBalance[],
+    fromAmountArrayBatch: AmountData[],
   ): Promise<RouteData[]> => {
-    const routePromises = fromAmountArray.map(async (data) => {
-      const routeResponse = await getRoute(
-        squid,
-        data.fromToken,
-        data.toToken,
-        toTokenAddress,
-        data.fromAmount,
-        data.toAmount,
+    const calculateSourceGasCost = (
+      route: RouteResponseData,
+      chainId: string | number,
+    ) => route.route?.route.estimate.gasCosts
+      .filter((gasCost) => gasCost.token.chainId === chainId.toString())
+      .reduce(
+        (sum, gasCost) => sum + parseFloat(utils.formatUnits(gasCost.amount, gasCost.token.decimals)),
+        0,
       );
 
-      console.log('===routeResponse', routeResponse);
+    // Find user's native gas balance on a chain
+    const findUserGasBalance = (chainId: string | number) => balances.find(
+      (balance: TokenBalance) => balance.address === SQUID_NATIVE_TOKEN.toLowerCase()
+        && balance.chainId.toString() === chainId.toString(),
+    );
 
-      if (!routeResponse?.route) return null;
+    const hasSufficientGas = (
+      userGasBalance: TokenBalance | undefined,
+      sourceGasCost: number | undefined,
+    ) => userGasBalance
+    && sourceGasCost
+    && parseFloat(
+      utils.formatUnits(
+        userGasBalance.balance,
+        userGasBalance.decimals,
+      ),
+    ) > sourceGasCost;
 
-      const otherFees = routeResponse.route.route.estimate.feeCosts
-        .reduce((sum, feeCost) => sum + parseFloat(utils.formatUnits(feeCost.amount, feeCost.token.decimals)), 0);
+    const routePromises = fromAmountArrayBatch.map(async (data: AmountData) => {
+      try {
+        const routeResponse = await getRoute(
+          squid,
+          data.fromToken,
+          data.toToken,
+          toTokenAddress,
+          data.fromAmount,
+          data.toAmount,
+        );
 
-      const sourceGasCost = routeResponse.route.route.estimate.gasCosts
-        .filter((gasCost) => gasCost.token.chainId === data.balance.chainId) // Source chain gas cost
-        .reduce((sum, gasCost) => sum + parseFloat(utils.formatUnits(gasCost.amount, gasCost.token.decimals)), 0);
+        console.log('===routeResponse', routeResponse);
 
-      // Check if user has enough balance for the token being swapped/bridged
-      const userTokenBalance = parseFloat(utils.formatUnits(data.balance.balance, data.balance.decimals));
-      const totalTokenCost = parseFloat(data.fromAmount) + otherFees; // USDT required for the swap
+        if (!routeResponse?.route) return null;
 
-      if (userTokenBalance < totalTokenCost) {
-        console.log('Insufficient token balance for swap/bridge:', data.balance.symbol);
+        const sourceGasCost = calculateSourceGasCost(routeResponse, data.balance.chainId);
+        const userGasBalance = findUserGasBalance(data.balance.chainId);
+
+        console.log('=== userGasBalance', userGasBalance);
+        console.log('=== sourceGasCost', sourceGasCost);
+
+        if (!userGasBalance || !hasSufficientGas(userGasBalance, sourceGasCost)) {
+          console.warn('Insufficient native gas balance for transaction on source chain');
+          console.log('=== userGasBalance', userGasBalance);
+          console.log('=== sourceGasCost', sourceGasCost);
+          console.log('=== data.balance.chainId', data.balance.chainId);
+          return null;
+        }
+
+        return {
+          amountData: data,
+          route: routeResponse.route,
+        } as RouteData;
+      } catch (error) {
+        console.error('Error fetching route:', error);
         return null;
       }
-
-      console.log('=== fromAmountArray', fromAmountArray);
-
-      // Find native currency balance on the source chain
-      const userGasBalance = fromAmountArray.find(
-        (bal) => bal.balance.address === SQUID_NATIVE_TOKEN.toLowerCase()
-        && bal.balance.chainId === data.balance.chainId,
-      );
-
-      console.log('=== userGasBalance', userGasBalance);
-
-      // Check if user has enough native currency for gas fees on the source chain
-      const isEnoughSourceGas = userGasBalance
-      && parseFloat(utils.formatUnits(userGasBalance.balance.balance, userGasBalance.balance.decimals)) > sourceGasCost;
-
-      if (!userGasBalance || !isEnoughSourceGas) {
-        console.log('Insufficient native gas balance for transaction on source chain');
-        return null;
-      }
-
-      // Return the valid route
-      return {
-        amountData: data,
-        route: routeResponse.route,
-      } as RouteData;
     });
 
     const routesData = (await Promise.all(routePromises)).filter(
       (route): route is RouteData => route !== null && route !== undefined,
     );
+
+    console.log('!!!!!!!routesData', routesData);
 
     return routesData;
   };
@@ -378,13 +392,14 @@ export const useRoutes = () => {
           return acc;
         }, [] as (typeof fromAmountDataArray)[])
         .map(async (slicedFromAmountDataArray) => {
-          allRoutes.push(
-            ...(await getRoutesWithFeesValidation(
-              squid,
-              toTokenAddress,
-              slicedFromAmountDataArray,
-            )),
+          const validatedRoutes = await getRoutesWithFeesValidation(
+            squid,
+            toTokenAddress,
+            balances,
+            slicedFromAmountDataArray,
           );
+          console.log('Validated routes for batch:', validatedRoutes);
+          allRoutes.push(...validatedRoutes);
           await delay(delayMs);
         }),
     );
