@@ -56,7 +56,7 @@
   "scripts": {
     "build": "pnpm transpile && pnpm typegen",
     "transpile": "tsup src/index.ts --config ../../../../tsup.config.js",
-    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",    
+    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "lint:fix": "cd ../../../../ && pnpm wsrun -p @imtbl/bridge-sdk -c lint --fix",
     "test": "jest test -- --silent=false",

@@ -63,7 +63,7 @@
   "scripts": {
     "build": "pnpm transpile && pnpm typegen",
     "transpile": "tsup src/index.ts --config ../../../../tsup.config.js",
-    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",    
+    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
     "generate-types": "typechain --target ethers-v5 --out-dir ./src/contracts/types ./src/contracts/ABIs/*.json",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "lint:fix": "cd ../../../.. && pnpm wsrun -p @imtbl/dex-sdk -c lint --fix",

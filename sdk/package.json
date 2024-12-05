@@ -155,11 +155,12 @@
   "license": "Apache-2.0",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
+  "browser": "./dist/index.browser.js",
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "pnpm transpile && pnpm typegen",
     "transpile": "tsup --config ./tsup.config.js",
-    "typegen": "tsc --customConditions default --emitDeclarationOnly",    
+    "typegen": "tsc --customConditions default --emitDeclarationOnly",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "typecheck": "tsc --customConditions default --noEmit --jsx preserve"
   },
