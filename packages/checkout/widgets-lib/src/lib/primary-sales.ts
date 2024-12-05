@@ -28,6 +28,7 @@ export type SignedOrder = {
   };
   totalAmount: number;
   products: SignedOrderProduct[];
+  recipientAddress: string;
 };
 
 export type SignedTransaction = {
