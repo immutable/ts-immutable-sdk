@@ -24,8 +24,9 @@ export default defineConfig((options) => {
       outDir: 'dist',
       format: 'esm',
       target: 'es2022',
-      bundle: false,
+      bundle: true,
       treeshake: true,
+      splitting: false,
       minify: false,
     },
 
