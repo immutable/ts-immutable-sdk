@@ -285,9 +285,9 @@ export const useRoutes = () => {
   const getRoutesWithFeesValidation = async (
     squid: Squid,
     toTokenAddress: string,
-    batch: AmountData[],
+    fromAmountArray: AmountData[],
   ): Promise<RouteData[]> => {
-    const routePromises = batch.map(async (data) => {
+    const routePromises = fromAmountArray.map(async (data) => {
       const routeResponse = await getRoute(
         squid,
         data.fromToken,
