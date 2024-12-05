@@ -127,8 +127,11 @@ importers:
       '@biom3/react':
         specifier: ^0.25.21
 <<<<<<< HEAD
+<<<<<<< HEAD
         version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 =======
+=======
+>>>>>>> 16237e6d3 (update lockfile)
 <<<<<<< HEAD
         version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 >>>>>>> 7f259da62 (update lock)
@@ -138,6 +141,9 @@ importers:
 =======
         version: 0.25.21(@emotion/react@11.13.5(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 >>>>>>> 5d2567434 (update lock)
+=======
+        version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+>>>>>>> af8435080 (update lockfile)
       '@imtbl/sdk':
         specifier: workspace:*
         version: link:../../../sdk
@@ -178,8 +184,11 @@ importers:
       '@biom3/react':
         specifier: ^0.25.21
 <<<<<<< HEAD
+<<<<<<< HEAD
         version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 =======
+=======
+>>>>>>> 16237e6d3 (update lockfile)
 <<<<<<< HEAD
         version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@ethersproject/providers':
@@ -188,13 +197,23 @@ importers:
 =======
         version: 0.25.21(@emotion/react@11.13.5(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 >>>>>>> 5d2567434 (update lock)
+<<<<<<< HEAD
 >>>>>>> 7f259da62 (update lock)
+=======
+=======
+        version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
       '@imtbl/sdk':
         specifier: workspace:*
         version: link:../../../sdk
       ethers:
         specifier: ^6.13.4
+<<<<<<< HEAD
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+=======
+        version: 6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+>>>>>>> 16237e6d3 (update lockfile)
       next:
         specifier: 14.2.7
         version: 14.2.7(@babel/core@7.24.9)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -232,8 +251,11 @@ importers:
       '@biom3/react':
         specifier: ^0.25.21
 <<<<<<< HEAD
+<<<<<<< HEAD
         version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 =======
+=======
+>>>>>>> 16237e6d3 (update lockfile)
 <<<<<<< HEAD
         version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 >>>>>>> 7f259da62 (update lock)
@@ -243,9 +265,15 @@ importers:
 =======
         version: 0.25.21(@emotion/react@11.13.5(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 >>>>>>> 5d2567434 (update lock)
+=======
+        version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+>>>>>>> af8435080 (update lockfile)
       '@imtbl/sdk':
         specifier: workspace:*
         version: link:../../../sdk
+      ethers:
+        specifier: ^6.13.4
+        version: 6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.7
         version: 14.2.7(@babel/core@7.24.9)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -283,8 +311,11 @@ importers:
       '@biom3/react':
         specifier: ^0.25.21
 <<<<<<< HEAD
+<<<<<<< HEAD
         version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 =======
+=======
+>>>>>>> 16237e6d3 (update lockfile)
 <<<<<<< HEAD
         version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@ethersproject/providers':
@@ -293,13 +324,23 @@ importers:
 =======
         version: 0.25.21(@emotion/react@11.13.5(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 >>>>>>> 5d2567434 (update lock)
+<<<<<<< HEAD
 >>>>>>> 7f259da62 (update lock)
+=======
+=======
+        version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
       '@imtbl/sdk':
         specifier: workspace:*
         version: link:../../../sdk
       ethers:
         specifier: ^6.13.4
+<<<<<<< HEAD
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+=======
+        version: 6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+>>>>>>> 431c6e5e1 (update lockfile)
       next:
         specifier: 14.2.7
         version: 14.2.7(@babel/core@7.24.9)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -337,8 +378,11 @@ importers:
       '@biom3/react':
         specifier: ^0.25.21
 <<<<<<< HEAD
+<<<<<<< HEAD
         version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 =======
+=======
+>>>>>>> 16237e6d3 (update lockfile)
 <<<<<<< HEAD
         version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@ethersproject/providers':
@@ -347,13 +391,23 @@ importers:
 =======
         version: 0.25.21(@emotion/react@11.13.5(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 >>>>>>> 5d2567434 (update lock)
+<<<<<<< HEAD
 >>>>>>> 7f259da62 (update lock)
+=======
+=======
+        version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
       '@imtbl/sdk':
         specifier: workspace:*
         version: link:../../../sdk
       ethers:
         specifier: ^6.13.4
+<<<<<<< HEAD
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+=======
+        version: 6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+>>>>>>> 431c6e5e1 (update lockfile)
       next:
         specifier: 14.2.10
         version: 14.2.10(@babel/core@7.24.9)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -418,7 +472,18 @@ importers:
     dependencies:
       '@biom3/react':
         specifier: ^0.27.10
+<<<<<<< HEAD
         version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+=======
+<<<<<<< HEAD
+        version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@ethersproject/providers':
+        specifier: ^5.7.2
+        version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+=======
+        version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
       '@imtbl/sdk':
         specifier: workspace:*
         version: link:../../../sdk
@@ -462,8 +527,11 @@ importers:
       '@biom3/react':
         specifier: ^0.27.10
 <<<<<<< HEAD
+<<<<<<< HEAD
         version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 =======
+=======
+>>>>>>> 16237e6d3 (update lockfile)
 <<<<<<< HEAD
         version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 >>>>>>> 7f259da62 (update lock)
@@ -473,6 +541,9 @@ importers:
 =======
         version: 0.27.30(@emotion/react@11.13.5(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 >>>>>>> 5d2567434 (update lock)
+=======
+        version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+>>>>>>> af8435080 (update lockfile)
       '@imtbl/sdk':
         specifier: workspace:*
         version: link:../../../sdk
@@ -515,7 +586,18 @@ importers:
     dependencies:
       '@biom3/react':
         specifier: ^0.27.10
+<<<<<<< HEAD
         version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+=======
+<<<<<<< HEAD
+        version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@ethersproject/providers':
+        specifier: ^5.7.2
+        version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+=======
+        version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
       '@imtbl/sdk':
         specifier: workspace:*
         version: link:../../../sdk
@@ -559,14 +641,23 @@ importers:
       '@biom3/react':
         specifier: ^0.27.10
 <<<<<<< HEAD
+<<<<<<< HEAD
         version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 =======
+=======
+>>>>>>> 16237e6d3 (update lockfile)
 <<<<<<< HEAD
         version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 =======
         version: 0.27.30(@emotion/react@11.13.5(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 >>>>>>> 5d2567434 (update lock)
+<<<<<<< HEAD
 >>>>>>> 7f259da62 (update lock)
+=======
+=======
+        version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
       '@imtbl/sdk':
         specifier: workspace:*
         version: link:../../../sdk
@@ -610,14 +701,23 @@ importers:
       '@biom3/react':
         specifier: ^0.27.10
 <<<<<<< HEAD
+<<<<<<< HEAD
         version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 =======
+=======
+>>>>>>> 16237e6d3 (update lockfile)
 <<<<<<< HEAD
         version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 =======
         version: 0.27.30(@emotion/react@11.13.5(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 >>>>>>> 5d2567434 (update lock)
+<<<<<<< HEAD
 >>>>>>> 7f259da62 (update lock)
+=======
+=======
+        version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
       '@imtbl/sdk':
         specifier: workspace:*
         version: link:../../../sdk
@@ -661,14 +761,23 @@ importers:
       '@biom3/react':
         specifier: ^0.27.10
 <<<<<<< HEAD
+<<<<<<< HEAD
         version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 =======
+=======
+>>>>>>> 16237e6d3 (update lockfile)
 <<<<<<< HEAD
         version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 =======
         version: 0.27.30(@emotion/react@11.13.5(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 >>>>>>> 5d2567434 (update lock)
+<<<<<<< HEAD
 >>>>>>> 7f259da62 (update lock)
+=======
+=======
+        version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
       '@imtbl/sdk':
         specifier: workspace:*
         version: link:../../../sdk
@@ -846,7 +955,18 @@ importers:
     dependencies:
       '@biom3/react':
         specifier: ^0.27.12
+<<<<<<< HEAD
         version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+=======
+<<<<<<< HEAD
+        version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@ethersproject/providers':
+        specifier: ^5.7.2
+        version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+=======
+        version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
       '@imtbl/sdk':
         specifier: workspace:*
         version: link:../../../sdk
@@ -904,7 +1024,18 @@ importers:
         version: 0.4.6
       '@biom3/react':
         specifier: ^0.27.12
+<<<<<<< HEAD
         version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+=======
+<<<<<<< HEAD
+        version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@ethersproject/providers':
+        specifier: ^5.7.2
+        version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+=======
+        version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
       '@imtbl/sdk':
         specifier: workspace:*
         version: link:../../../sdk
@@ -1049,14 +1180,23 @@ importers:
       '@biom3/react':
         specifier: ^0.27.25
 <<<<<<< HEAD
+<<<<<<< HEAD
         version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 =======
+=======
+>>>>>>> 16237e6d3 (update lockfile)
 <<<<<<< HEAD
         version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 =======
         version: 0.27.30(@emotion/react@11.13.5(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 >>>>>>> 5d2567434 (update lock)
+<<<<<<< HEAD
 >>>>>>> 7f259da62 (update lock)
+=======
+=======
+        version: 0.27.30(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
       '@imtbl/sdk':
         specifier: workspace:*
         version: link:../../../sdk
@@ -1225,8 +1365,20 @@ importers:
         version: 0.4.5
 >>>>>>> 5d2567434 (update lock)
       '@biom3/react':
+<<<<<<< HEAD
         specifier: ^0.29.4
         version: 0.29.11(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+=======
+        specifier: ^0.28.13
+<<<<<<< HEAD
+        version: 0.28.14(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@ethersproject/providers':
+        specifier: ^5.7.2
+        version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+=======
+        version: 0.28.14(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
       '@imtbl/checkout-sdk':
         specifier: workspace:*
         version: link:../sdk
@@ -1296,7 +1448,7 @@ importers:
         version: 29.6.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       react-scripts:
         specifier: 5.0.1
-        version: 5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.22.5(@babel/core@7.24.9))(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/babel__core@7.20.5)(bufferutil@4.0.8)(esbuild@0.24.0)(eslint@9.16.0(jiti@1.21.0))(node-notifier@8.0.2)(react@18.3.1)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(utf-8-validate@5.0.10)
+        version: 5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.25.9(@babel/core@7.24.9))(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0))(bufferutil@4.0.8)(esbuild@0.24.0)(eslint@9.16.0(jiti@1.21.0))(node-notifier@8.0.2)(react@18.3.1)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(utf-8-validate@5.0.10)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -1313,8 +1465,23 @@ importers:
         specifier: ^0.4.4
         version: 0.4.6
       '@biom3/react':
+<<<<<<< HEAD
         specifier: ^0.29.4
         version: 0.29.11(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+=======
+        specifier: ^0.28.13
+<<<<<<< HEAD
+        version: 0.28.14(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@ethersproject/bignumber':
+        specifier: ^5.7.0
+        version: 5.7.0
+      '@ethersproject/providers':
+        specifier: ^5.7.2
+        version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+=======
+        version: 0.28.14(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
       '@imtbl/bridge-sdk':
         specifier: workspace:*
         version: link:../../internal/bridge/sdk
@@ -1444,7 +1611,11 @@ importers:
         version: 29.6.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       react-scripts:
         specifier: 5.0.1
+<<<<<<< HEAD
         version: 5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.22.5(@babel/core@7.24.9))(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/babel__core@7.20.5)(bufferutil@4.0.8)(esbuild@0.24.0)(eslint@8.57.0)(node-notifier@8.0.2)(react@18.3.1)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(utf-8-validate@5.0.10)
+=======
+        version: 5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.25.9(@babel/core@7.24.9))(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0))(bufferutil@4.0.8)(esbuild@0.24.0)(eslint@8.57.0)(node-notifier@8.0.2)(react@18.3.1)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(utf-8-validate@5.0.10)
+>>>>>>> af8435080 (update lockfile)
       rimraf:
         specifier: ^6.0.1
         version: 6.0.1
@@ -1475,8 +1646,20 @@ importers:
         version: 0.4.5
 >>>>>>> 5d2567434 (update lock)
       '@biom3/react':
+<<<<<<< HEAD
         specifier: ^0.29.4
         version: 0.29.11(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+=======
+        specifier: ^0.28.13
+<<<<<<< HEAD
+        version: 0.28.14(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@ethersproject/providers':
+        specifier: ^5.7.2
+        version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+=======
+        version: 0.28.14(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
       '@imtbl/checkout-sdk':
         specifier: workspace:*
         version: link:../sdk
@@ -1682,10 +1865,23 @@ importers:
         version: 1.9.3(@swc/helpers@0.5.13)
       '@swc/jest':
         specifier: ^0.2.24
+<<<<<<< HEAD
         version: 0.2.36(@swc/core@1.9.3(@swc/helpers@0.5.13))
+<<<<<<< HEAD
       '@typechain/ethers-v6':
         specifier: ^0.5.1
         version: 0.5.1(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)
+=======
+      '@typechain/ethers-v5':
+        specifier: ^10.2.0
+        version: 10.2.1(@ethersproject/abi@5.7.0)(@ethersproject/providers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)
+=======
+        version: 0.2.36(@swc/core@1.3.70(@swc/helpers@0.5.13))
+      '@typechain/ethers-v6':
+        specifier: ^0.5.1
+        version: 0.5.1(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
       '@types/jest':
         specifier: ^29.4.3
         version: 29.5.3
@@ -1774,12 +1970,30 @@ importers:
       '@imtbl/config':
         specifier: workspace:*
         version: link:../../../config
+<<<<<<< HEAD
       '@uniswap/sdk-core':
         specifier: ^3.0.1
         version: 3.2.3
       '@uniswap/swap-router-contracts':
         specifier: ^1.3.1
         version: 1.3.1(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+=======
+<<<<<<< HEAD
+      '@uniswap/router-sdk':
+        specifier: ^1.4.0
+        version: 1.6.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+      '@uniswap/sdk-core':
+        specifier: ^3.0.1
+        version: 3.2.3
+=======
+      '@uniswap/sdk-core':
+        specifier: ^3.0.1
+        version: 3.2.3
+      '@uniswap/swap-router-contracts':
+        specifier: ^1.3.1
+        version: 1.3.1(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
       '@uniswap/v3-sdk':
         specifier: ^3.9.0
         version: 3.10.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
@@ -1792,10 +2006,23 @@ importers:
         version: 1.9.3(@swc/helpers@0.5.13)
       '@swc/jest':
         specifier: ^0.2.24
+<<<<<<< HEAD
         version: 0.2.36(@swc/core@1.9.3(@swc/helpers@0.5.13))
+<<<<<<< HEAD
       '@typechain/ethers-v6':
         specifier: ^0.5.1
         version: 0.5.1(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)
+=======
+      '@typechain/ethers-v5':
+        specifier: ^10.2.0
+        version: 10.2.1(@ethersproject/abi@5.7.0)(@ethersproject/providers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)
+=======
+        version: 0.2.36(@swc/core@1.3.70(@swc/helpers@0.5.13))
+      '@typechain/ethers-v6':
+        specifier: ^0.5.1
+        version: 0.5.1(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
       '@types/jest':
         specifier: ^29.4.3
         version: 29.5.3
@@ -2119,10 +2346,23 @@ importers:
         version: 1.9.3(@swc/helpers@0.5.13)
       '@swc/jest':
         specifier: ^0.2.24
+<<<<<<< HEAD
         version: 0.2.36(@swc/core@1.9.3(@swc/helpers@0.5.13))
+<<<<<<< HEAD
       '@typechain/ethers-v6':
         specifier: ^0.5.1
         version: 0.5.1(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)
+=======
+      '@typechain/ethers-v5':
+        specifier: ^10.2.0
+        version: 10.2.1(@ethersproject/abi@5.7.0)(@ethersproject/providers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)
+=======
+        version: 0.2.36(@swc/core@1.3.70(@swc/helpers@0.5.13))
+      '@typechain/ethers-v6':
+        specifier: ^0.5.1
+        version: 0.5.1(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
       '@types/jest':
         specifier: ^29.4.3
         version: 29.5.3
@@ -2154,11 +2394,28 @@ importers:
   packages/passport/sdk:
     dependencies:
       '@0xsequence/abi':
+<<<<<<< HEAD
         specifier: ^2.0.25
+=======
+<<<<<<< HEAD
+        specifier: ^2.0.22
+>>>>>>> 431c6e5e1 (update lockfile)
         version: 2.2.8
       '@0xsequence/core':
         specifier: ^2.0.25
         version: 2.2.8(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+=======
+<<<<<<< HEAD
+        specifier: ^1.4.3
+        version: 1.4.3
+=======
+        specifier: ^2.0.25
+        version: 2.1.6
+>>>>>>> af8435080 (update lockfile)
+      '@0xsequence/core':
+        specifier: ^2.0.25
+        version: 2.1.6(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+>>>>>>> 16237e6d3 (update lockfile)
       '@imtbl/config':
         specifier: workspace:*
         version: link:../../config
@@ -2600,7 +2857,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-scripts:
         specifier: 5.0.1
-        version: 5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.22.5(@babel/core@7.24.9))(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/babel__core@7.20.5)(bufferutil@4.0.8)(esbuild@0.24.0)(eslint@9.16.0(jiti@1.21.0))(node-notifier@8.0.2)(react@18.3.1)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(utf-8-validate@5.0.10)
+        version: 5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.25.9(@babel/core@7.24.9))(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0))(bufferutil@4.0.8)(esbuild@0.24.0)(eslint@9.16.0(jiti@1.21.0))(node-notifier@8.0.2)(react@18.3.1)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(utf-8-validate@5.0.10)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -2657,8 +2914,11 @@ importers:
       '@biom3/react':
         specifier: ^0.25.21
 <<<<<<< HEAD
+<<<<<<< HEAD
         version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 =======
+=======
+>>>>>>> 431c6e5e1 (update lockfile)
 <<<<<<< HEAD
         version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 >>>>>>> 315501ca1 (update lock)
@@ -2670,7 +2930,28 @@ importers:
 >>>>>>> 5d2567434 (update lock)
       '@imtbl/sdk':
         specifier: 1.63.0
+<<<<<<< HEAD
         version: 1.63.0(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(bufferutil@4.0.8)(embla-carousel-react@8.1.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(utf-8-validate@5.0.10)
+=======
+<<<<<<< HEAD
+        version: 1.63.0(@emotion/is-prop-valid@0.8.8)(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(bufferutil@4.0.8)(embla-carousel-react@8.1.5(react@18.3.1))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(utf-8-validate@5.0.10)
+=======
+<<<<<<< HEAD
+        version: 1.63.0(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(bufferutil@4.0.8)(embla-carousel-react@8.1.5(react@18.3.1))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(utf-8-validate@5.0.10)
+=======
+        version: 1.63.0(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(bufferutil@4.0.8)(embla-carousel-react@8.1.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(utf-8-validate@5.0.10)
+=======
+        version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@imtbl/sdk':
+        specifier: workspace:*
+        version: link:../../../../sdk
+      ethers:
+        specifier: ^6.13.4
+        version: 6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
+>>>>>>> 431c6e5e1 (update lockfile)
+>>>>>>> 87277015d (update lockfile)
       next:
         specifier: 14.2.7
         version: 14.2.7(@babel/core@7.24.9)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2752,6 +3033,7 @@ importers:
         specifier: workspace:*
         version: link:../../../sdk
       '@nomicfoundation/hardhat-chai-matchers':
+<<<<<<< HEAD
         specifier: ^1.0.0
         version: 1.0.6(@nomiclabs/hardhat-ethers@2.2.3(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)))(chai@4.5.0)(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
       '@nomicfoundation/hardhat-toolbox':
@@ -2763,6 +3045,19 @@ importers:
       '@nomiclabs/hardhat-ethers':
         specifier: ^2.0.0
         version: 2.2.3(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+=======
+        specifier: ^2.0.8
+        version: 2.0.8(@nomicfoundation/hardhat-ethers@3.0.8(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)))(chai@4.5.0)(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+      '@nomicfoundation/hardhat-ethers':
+        specifier: ^3.0.8
+        version: 3.0.8(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+      '@nomicfoundation/hardhat-toolbox':
+        specifier: ^3.0.0
+        version: 3.0.0(lm772m6sofirygsa5g6tjwdzym)
+      '@nomicfoundation/hardhat-verify':
+        specifier: ^2.0.0
+        version: 2.0.8(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+>>>>>>> 431c6e5e1 (update lockfile)
       '@nomiclabs/hardhat-etherscan':
         specifier: ^3.0.0
         version: 3.1.8(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
@@ -2774,7 +3069,11 @@ importers:
         version: 0.5.1(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)
       '@typechain/hardhat':
         specifier: ^9.0.0
+<<<<<<< HEAD
         version: 9.1.0(@typechain/ethers-v6@0.5.1(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2))(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))
+=======
+        version: 9.1.0(@typechain/ethers-v6@0.5.1(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2))(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))
+>>>>>>> 431c6e5e1 (update lockfile)
       '@types/chai':
         specifier: ^4.2.0
         version: 4.3.16
@@ -2828,20 +3127,35 @@ importers:
 packages:
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   '@0xsequence/abi@1.4.3':
     resolution: {integrity: sha512-USmyD0rT3WesedkjyvDAadV+W6WApCqFrPklVAvwOMM+/HAFWpvg5eezs3PjSo+PNGb7YAyM/hn4SC/HW4MK7A==}
 =======
   '@0xsequence/abi@2.0.25':
     resolution: {integrity: sha512-T/TiWtu85WhK3M78MlIdJO66e46vBsgFQtzU8oMW5C8t08OUbkc2LqdA4bxEwJNXCLeqD6C0C7pxyvLZf/6X3Q==}
 >>>>>>> 5d2567434 (update lock)
+=======
+  '@0xsequence/abi@2.1.6':
+    resolution: {integrity: sha512-Um+xvEQZToRg34bJ2Jk3t9rk2beDmir/7aZpaNpE94kzcnw69/QyxLc1H/a1jKwOPr8vAhtlPEGMeCMWnBUn+g==}
+>>>>>>> af8435080 (update lockfile)
 
+<<<<<<< HEAD
   '@0xsequence/abi@2.2.8':
     resolution: {integrity: sha512-z5s46IzDb/2dv0n35CwcgZZ68bxg2dqy1nqkycxjujkhbWXZDnLbYGvfDRXG5QTGPFppTq+T1ymLcfpRuoWWjQ==}
 
   '@0xsequence/core@1.4.3':
     resolution: {integrity: sha512-qhcsRjjbshN1E5cjGPZJkRVdMS/+q7shGnzqEIjUpkbUaL1UQjloV36sSuQLD/aMlC1+S2a9tWDApv2FZ9+2sg==}
+=======
+  '@0xsequence/core@2.1.6':
+    resolution: {integrity: sha512-5dC5SvSC8rgP7n4qqsbIAnpk7X+gK5uPYQBFWuU6DvN3sFGaf+AXppY1bWMW9IeIwB3xLC1O4RA8acEzK0syQw==}
+>>>>>>> 16237e6d3 (update lockfile)
     peerDependencies:
-      ethers: '>=5.5'
+      ethers: '>=6'
+
+  '@0xsequence/utils@2.1.6':
+    resolution: {integrity: sha512-TA7oZILMioIvHg9LweWtjX0h7drc1Ze8AWXtegyYkduP0dQJiRNRkzfIbV2tF78spaYcaoXDO3oMjNyyYdUHOA==}
+    peerDependencies:
+      ethers: '>=6'
 
   '@0xsequence/core@2.2.8':
     resolution: {integrity: sha512-g3ZlUkKqeIzso3r5ablaCxf+pWW8yAGTAsBPiKpVAmaS+H8def8yy+P0gnv41w80W4sL7+e7qAcjh1y6Kk3ENw==}
@@ -4168,20 +4482,11 @@ packages:
   '@emotion/babel-plugin@11.11.0':
     resolution: {integrity: sha512-m4HEDZleaaCH+XgDDsPF15Ht6wTLsgDTeR3WYj9Q/k76JtWhrJjcP4+/XlG8LGT/Rol9qUfOIztXeA84ATpqPQ==}
 
-  '@emotion/babel-plugin@11.13.5':
-    resolution: {integrity: sha512-pxHCpT2ex+0q+HH91/zsdHkw/lXd468DIN2zvfvLtPKLLMo6gQj7oLObq8PhkrxOZb/gGCq03S3Z7PDhS8pduQ==}
-
   '@emotion/cache@11.11.0':
     resolution: {integrity: sha512-P34z9ssTCBi3e9EI1ZsWpNHcfY1r09ZO0rZbRO2ob3ZQMnFI35jB536qoXbkdesr5EUhYi22anuEJuyxifaqAQ==}
 
-  '@emotion/cache@11.13.5':
-    resolution: {integrity: sha512-Z3xbtJ+UcK76eWkagZ1onvn/wAVb1GOMuR15s30Fm2wrMgC7jzpnO2JZXr4eujTTqoQFUrZIw/rT0c6Zzjca1g==}
-
   '@emotion/hash@0.9.1':
     resolution: {integrity: sha512-gJB6HLm5rYwSLI6PQa+X1t5CFGrv1J1TWG+sOyMCeKz2ojaj6Fnl/rZEspogG+cvqbt4AE/2eIyD2QfLKTBNlQ==}
-
-  '@emotion/hash@0.9.2':
-    resolution: {integrity: sha512-MyqliTZGuOm3+5ZRSaaBGP3USLw6+EGykkwZns2EPC5g8jJ4z9OrdZY9apkl3+UP9+sdz76YYkwCKP5gh8iY3g==}
 
   '@emotion/is-prop-valid@0.8.8':
     resolution: {integrity: sha512-u5WtneEAr5IDG2Wv65yhunPSMLIpuKsbuOktRojfrEiEvRyC85LgPMZI63cr7NUqT8ZIGdSVg8ZKGxIug4lXcA==}
@@ -4192,20 +4497,8 @@ packages:
   '@emotion/memoize@0.8.1':
     resolution: {integrity: sha512-W2P2c/VRW1/1tLox0mVUalvnWXxavmv/Oum2aPsRcoDJuob75FC3Y8FbpfLwUegRcxINtGUMPq0tFCvYNTBXNA==}
 
-  '@emotion/memoize@0.9.0':
-    resolution: {integrity: sha512-30FAj7/EoJ5mwVPOWhAyCX+FPfMDrVecJAM+Iw9NRoSl4BBAQeqj4cApHHUXOVvIPgLVDsCFoz/hGD+5QQD1GQ==}
-
   '@emotion/react@11.11.3':
     resolution: {integrity: sha512-Cnn0kuq4DoONOMcnoVsTOR8E+AdnKFf//6kUWc4LCdnxj31pZWn7rIULd6Y7/Js1PiPHzn7SKCM9vB/jBni8eA==}
-    peerDependencies:
-      '@types/react': '*'
-      react: '>=16.8.0'
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-
-  '@emotion/react@11.13.5':
-    resolution: {integrity: sha512-6zeCUxUH+EPF1s+YF/2hPVODeV/7V07YU5x+2tfuRL8MdW6rv5vb2+CBEGTGwBdux0OIERcOS+RzxeK80k2DsQ==}
     peerDependencies:
       '@types/react': '*'
       react: '>=16.8.0'
@@ -4216,17 +4509,8 @@ packages:
   '@emotion/serialize@1.1.3':
     resolution: {integrity: sha512-iD4D6QVZFDhcbH0RAG1uVu1CwVLMWUkCvAqqlewO/rxf8+87yIBAlt4+AxMiiKPLs5hFc0owNk/sLLAOROw3cA==}
 
-  '@emotion/serialize@1.3.3':
-    resolution: {integrity: sha512-EISGqt7sSNWHGI76hC7x1CksiXPahbxEOrC5RjmFRJTqLyEK9/9hZvBbiYn70dw4wuwMKiEMCUlR6ZXTSWQqxA==}
-
   '@emotion/sheet@1.2.2':
     resolution: {integrity: sha512-0QBtGvaqtWi+nx6doRwDdBIzhNdZrXUppvTM4dtZZWEGTXL/XE/yJxLMGlDT1Gt+UHH5IX1n+jkXyytE/av7OA==}
-
-  '@emotion/sheet@1.4.0':
-    resolution: {integrity: sha512-fTBW9/8r2w3dXWYM4HCB1Rdp8NLibOw2+XELH5m5+AkWiL/KqYX6dc0kKYlaYyKjrQ6ds33MCdMPEwgs2z1rqg==}
-
-  '@emotion/unitless@0.10.0':
-    resolution: {integrity: sha512-dFoMUuQA20zvtVTuxZww6OHoJYgrzfKM1t52mVySDJnMSEa08ruEvdYQbhvyu6soU+NeLVd3yKfTfT0NeV6qGg==}
 
   '@emotion/unitless@0.8.1':
     resolution: {integrity: sha512-KOEGMu6dmJZtpadb476IsZBclKvILjopjUii3V+7MnXIQCYh8W3NgNcgwo21n9LXZX6EDIKvqfjYxXebDwxKmQ==}
@@ -4236,22 +4520,11 @@ packages:
     peerDependencies:
       react: '>=16.8.0'
 
-  '@emotion/use-insertion-effect-with-fallbacks@1.1.0':
-    resolution: {integrity: sha512-+wBOcIV5snwGgI2ya3u99D7/FJquOIniQT1IKyDsBmEgwvpxMNeS65Oib7OnE2d2aY+3BU4OiH+0Wchf8yk3Hw==}
-    peerDependencies:
-      react: '>=16.8.0'
-
   '@emotion/utils@1.2.1':
     resolution: {integrity: sha512-Y2tGf3I+XVnajdItskUCn6LX+VUDmP6lTL4fcqsXAv43dnlbZiuW4MWQW38rW/BVWSE7Q/7+XQocmpnRYILUmg==}
 
-  '@emotion/utils@1.4.2':
-    resolution: {integrity: sha512-3vLclRofFziIa3J2wDh9jjbkUz9qk5Vi3IZ/FSTKViB0k+ef0fPV7dYrUIugbgupYDx7v9ud/SjrtEP8Y4xLoA==}
-
   '@emotion/weak-memoize@0.3.1':
     resolution: {integrity: sha512-EsBwpc7hBUJWAsNPBmJy4hxWx12v6bshQsldrVmjxJoc3isbxhOrF2IcCpaXxfvq03NwkI7sbsOLXbYuqF/8Ww==}
-
-  '@emotion/weak-memoize@0.4.0':
-    resolution: {integrity: sha512-snKqtPW01tN0ui7yu9rGv69aJXr/a/Ywvl11sUjNtEcRc+ng/mQriFL0wLXMef74iHa/EkftbDzU9F8iFbH+zg==}
 
   '@esbuild/aix-ppc64@0.21.5':
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -4906,16 +5179,32 @@ packages:
   '@imtbl/contracts@2.2.6':
     resolution: {integrity: sha512-2cfE3Tojfp4GnxwVKSwoZY1CWd+/drCIbCKawyH9Nh2zASXd7VC71lo27aD5RnCweXHkZVhPzjqwQf/xrtnmIQ==}
 
+<<<<<<< HEAD
+=======
+  '@imtbl/image-resizer-utils@0.0.2':
+    resolution: {integrity: sha512-N79iStoXe1uvzo3qnDET4amDxL3ZE59lHJxwXHQLXNzWhlc6jAm8O6fszv8HjpHETTvWLUNCx4CgMW0LytzzSw==}
+
+>>>>>>> af8435080 (update lockfile)
   '@imtbl/image-resizer-utils@0.0.3':
     resolution: {integrity: sha512-/EOJKMJF4gD/Dv0qNhpUTpp2AgWeQ7XgYK9Xjl+xP2WWgaarNv1SHe1aeqSb8aZT5W7wSXdUGzn6TIxNsuCWGw==}
 
   '@imtbl/react-analytics@0.3.2-alpha':
     resolution: {integrity: sha512-HQuVby8XK3koyphtKmBVtezN86xhkshaP+VJgKxDgGhYzVkNbKOffLrtSapCqWB/0v5THmsahLVq0xIWQM67RA==}
 
+<<<<<<< HEAD
   '@imtbl/sdk@1.63.0':
     resolution: {integrity: sha512-qyv+tl28UTFRNKW2p5G0Zo5PJfas7k7UwsBqAXm7PenFUEt18HBMW/rBJgqc2jxFZqt0tmEVJHGWCc6nd7DxjQ==}
     engines: {node: '>=20.0.0'}
 
+<<<<<<< HEAD
+=======
+  '@imtbl/sdk@1.78.0':
+    resolution: {integrity: sha512-Xfmc4kF7mprkkpbO/u4Jh97Gn6cGCjIBoEt8GtS7FaxK1iYCcUkPdb4p+WqAwfgNoKwuS6+dy8HVx5BesKFyag==}
+    engines: {node: '>=20.0.0'}
+
+=======
+>>>>>>> 16237e6d3 (update lockfile)
+>>>>>>> af6355e78 (update lockfile)
   '@ioredis/commands@1.2.0':
     resolution: {integrity: sha512-Sx1pU8EM64o2BrqNpEO1CNLtKQwyhuXuqyfH7oGKCk+1a33d2r5saW8zNwm3j6BTExtjrv2BxTgzzkMwts6vGg==}
 
@@ -7812,6 +8101,9 @@ packages:
   '@types/dom-screen-wake-lock@1.0.3':
     resolution: {integrity: sha512-3Iten7X3Zgwvk6kh6/NRdwN7WbZ760YgFCsF5AxDifltUQzW1RaW+WRmcVtgwFzLjaNu64H+0MPJ13yRa8g3Dw==}
 
+  '@types/eslint-scope@3.7.4':
+    resolution: {integrity: sha512-9K4zoImiZc3HlIp6AVUDE4CWYx22a+lhSZMYNpbjW04+YF0KWj4pJXnEMjdnFTiQibFFmElcsasJXDbdI/EPhA==}
+
   '@types/eslint-scope@3.7.7':
     resolution: {integrity: sha512-MzMFlSLBqNF2gcHWO0G1vP/YQyfvrxZ0bF+u7mzUdZ1/xK4A4sru+nraZz5i3iEIk1l1uyicaDVTB4QbbEkAYg==}
 
@@ -8425,6 +8717,12 @@ packages:
 
   acorn-globals@7.0.1:
     resolution: {integrity: sha512-umOSDSDrfHbTNPuNpC2NSnnA3LUrqpevPb4T9jRx4MagXNS0rs+gwiTcAvqCRmsD6utzsrzNt+ebm00SNWiC3Q==}
+
+  acorn-import-assertions@1.9.0:
+    resolution: {integrity: sha512-cmMwop9x+8KFhxvKrKfPYmN6/pKTYYHBqLa0DfvVZcKMJWNyWLnaqND7dx/qn66R7ewM1UX5XMaDVP5wlVTaVA==}
+    deprecated: package has been renamed to acorn-import-attributes
+    peerDependencies:
+      acorn: ^8
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -16650,6 +16948,22 @@ packages:
       uglify-js:
         optional: true
 
+  terser-webpack-plugin@5.3.9:
+    resolution: {integrity: sha512-ZuXsqE07EcggTWQjXUj+Aot/OMcD0bMKGgF63f7UxYcu5/AJF53aIpK1YoP5xR9l6s/Hy2b+t1AM0bLNPRuhwA==}
+    engines: {node: '>= 10.13.0'}
+    peerDependencies:
+      '@swc/core': '*'
+      esbuild: '*'
+      uglify-js: '*'
+      webpack: ^5.1.0
+    peerDependenciesMeta:
+      '@swc/core':
+        optional: true
+      esbuild:
+        optional: true
+      uglify-js:
+        optional: true
+
   terser@5.34.1:
     resolution: {integrity: sha512-FsJZ7iZLd/BXkz+4xrRTGJ26o/6VTjQytUk8b8OxkwcD2I+79VPJlz7qss1+zE7h8GNIScFqXcDyJ/KqBYZFVA==}
     engines: {node: '>=10'}
@@ -17619,6 +17933,16 @@ packages:
     resolution: {integrity: sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==}
     engines: {node: '>=10.13.0'}
 
+  webpack@5.88.2:
+    resolution: {integrity: sha512-JmcgNZ1iKj+aiR0OvTYtWQqJwq37Pf683dY9bVORwVbUrDhLhdn/PlO2sHsFHPkj7sHNQF3JwaAkp49V+Sq1tQ==}
+    engines: {node: '>=10.13.0'}
+    hasBin: true
+    peerDependencies:
+      webpack-cli: '*'
+    peerDependenciesMeta:
+      webpack-cli:
+        optional: true
+
   webpack@5.96.1:
     resolution: {integrity: sha512-l2LlBSvVZGhL4ZrPwyr8+37AunkcYj5qh8o6u2/2rzoPc8gxFJkLj1WxNgooi9pnoc06jh0BjuXnamM4qlujZA==}
     engines: {node: '>=10.13.0'}
@@ -17996,14 +18320,24 @@ packages:
 
 snapshots:
 
-  '@0xsequence/abi@1.4.3': {}
+  '@0xsequence/abi@2.1.6': {}
 
+<<<<<<< HEAD
   '@0xsequence/abi@2.2.8': {}
 
   '@0xsequence/core@1.4.3(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))':
+=======
+  '@0xsequence/core@2.1.6(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))':
+>>>>>>> 16237e6d3 (update lockfile)
     dependencies:
-      '@0xsequence/abi': 1.4.3
-      ethers: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@0xsequence/abi': 2.1.6
+      '@0xsequence/utils': 2.1.6(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+      ethers: 6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+
+  '@0xsequence/utils@2.1.6(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))':
+    dependencies:
+      ethers: 6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      js-base64: 3.7.7
 
   '@0xsequence/core@2.2.8(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))':
     dependencies:
@@ -19541,7 +19875,7 @@ snapshots:
       '@babel/parser': 7.26.2
       '@babel/template': 7.25.9
       '@babel/types': 7.26.0
-      debug: 4.3.6(supports-color@8.1.1)
+      debug: 4.3.7
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -19579,11 +19913,11 @@ snapshots:
 =======
   '@biom3/react@0.25.21(@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@biom3/design-tokens': 0.4.4
-      '@emotion/react': 11.13.5(@types/react@18.3.7)(react@18.3.1)
-      '@imtbl/image-resizer-utils': 0.0.1
+      '@biom3/design-tokens': 0.4.6
+      '@emotion/react': 11.11.3(@types/react@18.3.7)(react@18.3.1)
+      '@imtbl/image-resizer-utils': 0.0.3
       '@rive-app/react-canvas-lite': 4.9.0(react@18.3.1)
-      csstype: 3.1.2
+      csstype: 3.1.3
       embla-carousel-react: 8.1.5(react@18.3.1)
       framer-motion: 11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       hls.js: 1.5.13
@@ -19682,6 +20016,7 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       react-is: 18.2.0
       react-keyed-flatten-children: 3.0.0(react@18.3.1)
+<<<<<<< HEAD
       ts-deepmerge: 6.2.0
 
 <<<<<<< HEAD
@@ -19717,6 +20052,8 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       react-is: 18.2.0
       react-keyed-flatten-children: 3.0.0(react@18.3.1)
+=======
+>>>>>>> 16237e6d3 (update lockfile)
       ts-deepmerge: 7.0.2
 
   '@cnakazawa/watch@1.0.4':
@@ -19970,6 +20307,7 @@ snapshots:
   '@csstools/normalize.css@12.0.0': {}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   '@csstools/postcss-cascade-layers@1.1.1(postcss@8.4.49)':
     dependencies:
       '@csstools/selector-specificity': 2.2.0(postcss-selector-parser@6.0.13)
@@ -20045,79 +20383,86 @@ snapshots:
       postcss: 8.4.49
 =======
   '@csstools/postcss-cascade-layers@1.1.1(postcss@8.4.47)':
+=======
+  '@csstools/postcss-cascade-layers@1.1.1(postcss@8.4.40)':
+>>>>>>> af8435080 (update lockfile)
     dependencies:
       '@csstools/selector-specificity': 2.2.0(postcss-selector-parser@6.0.13)
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-selector-parser: 6.0.13
 
-  '@csstools/postcss-color-function@1.1.1(postcss@8.4.47)':
+  '@csstools/postcss-color-function@1.1.1(postcss@8.4.40)':
     dependencies:
-      '@csstools/postcss-progressive-custom-properties': 1.3.0(postcss@8.4.47)
-      postcss: 8.4.47
+      '@csstools/postcss-progressive-custom-properties': 1.3.0(postcss@8.4.40)
+      postcss: 8.4.40
       postcss-value-parser: 4.2.0
 
-  '@csstools/postcss-font-format-keywords@1.0.1(postcss@8.4.47)':
+  '@csstools/postcss-font-format-keywords@1.0.1(postcss@8.4.40)':
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-value-parser: 4.2.0
 
-  '@csstools/postcss-hwb-function@1.0.2(postcss@8.4.47)':
+  '@csstools/postcss-hwb-function@1.0.2(postcss@8.4.40)':
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-value-parser: 4.2.0
 
-  '@csstools/postcss-ic-unit@1.0.1(postcss@8.4.47)':
+  '@csstools/postcss-ic-unit@1.0.1(postcss@8.4.40)':
     dependencies:
-      '@csstools/postcss-progressive-custom-properties': 1.3.0(postcss@8.4.47)
-      postcss: 8.4.47
+      '@csstools/postcss-progressive-custom-properties': 1.3.0(postcss@8.4.40)
+      postcss: 8.4.40
       postcss-value-parser: 4.2.0
 
-  '@csstools/postcss-is-pseudo-class@2.0.7(postcss@8.4.47)':
+  '@csstools/postcss-is-pseudo-class@2.0.7(postcss@8.4.40)':
     dependencies:
       '@csstools/selector-specificity': 2.2.0(postcss-selector-parser@6.0.13)
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-selector-parser: 6.0.13
 
-  '@csstools/postcss-nested-calc@1.0.0(postcss@8.4.47)':
+  '@csstools/postcss-nested-calc@1.0.0(postcss@8.4.40)':
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-value-parser: 4.2.0
 
-  '@csstools/postcss-normalize-display-values@1.0.1(postcss@8.4.47)':
+  '@csstools/postcss-normalize-display-values@1.0.1(postcss@8.4.40)':
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-value-parser: 4.2.0
 
-  '@csstools/postcss-oklab-function@1.1.1(postcss@8.4.47)':
+  '@csstools/postcss-oklab-function@1.1.1(postcss@8.4.40)':
     dependencies:
-      '@csstools/postcss-progressive-custom-properties': 1.3.0(postcss@8.4.47)
-      postcss: 8.4.47
+      '@csstools/postcss-progressive-custom-properties': 1.3.0(postcss@8.4.40)
+      postcss: 8.4.40
       postcss-value-parser: 4.2.0
 
-  '@csstools/postcss-progressive-custom-properties@1.3.0(postcss@8.4.47)':
+  '@csstools/postcss-progressive-custom-properties@1.3.0(postcss@8.4.40)':
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-value-parser: 4.2.0
 
-  '@csstools/postcss-stepped-value-functions@1.0.1(postcss@8.4.47)':
+  '@csstools/postcss-stepped-value-functions@1.0.1(postcss@8.4.40)':
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-value-parser: 4.2.0
 
-  '@csstools/postcss-text-decoration-shorthand@1.0.0(postcss@8.4.47)':
+  '@csstools/postcss-text-decoration-shorthand@1.0.0(postcss@8.4.40)':
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-value-parser: 4.2.0
 
-  '@csstools/postcss-trigonometric-functions@1.0.2(postcss@8.4.47)':
+  '@csstools/postcss-trigonometric-functions@1.0.2(postcss@8.4.40)':
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-value-parser: 4.2.0
 
-  '@csstools/postcss-unset-value@1.0.2(postcss@8.4.47)':
+  '@csstools/postcss-unset-value@1.0.2(postcss@8.4.40)':
     dependencies:
+<<<<<<< HEAD
       postcss: 8.4.47
 >>>>>>> 5d2567434 (update lock)
+=======
+      postcss: 8.4.40
+>>>>>>> af8435080 (update lockfile)
 
   '@csstools/selector-specificity@2.2.0(postcss-selector-parser@6.0.13)':
     dependencies:
@@ -20169,6 +20514,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+<<<<<<< HEAD
   '@emotion/babel-plugin@11.13.5':
     dependencies:
 <<<<<<< HEAD
@@ -20189,6 +20535,8 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+=======
+>>>>>>> af8435080 (update lockfile)
   '@emotion/cache@11.11.0':
     dependencies:
       '@emotion/memoize': 0.8.1
@@ -20197,17 +20545,7 @@ snapshots:
       '@emotion/weak-memoize': 0.3.1
       stylis: 4.2.0
 
-  '@emotion/cache@11.13.5':
-    dependencies:
-      '@emotion/memoize': 0.9.0
-      '@emotion/sheet': 1.4.0
-      '@emotion/utils': 1.4.2
-      '@emotion/weak-memoize': 0.4.0
-      stylis: 4.2.0
-
   '@emotion/hash@0.9.1': {}
-
-  '@emotion/hash@0.9.2': {}
 
   '@emotion/is-prop-valid@0.8.8':
     dependencies:
@@ -20220,10 +20558,13 @@ snapshots:
   '@emotion/memoize@0.8.1': {}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   '@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1)':
 =======
   '@emotion/memoize@0.9.0': {}
 
+=======
+>>>>>>> af8435080 (update lockfile)
   '@emotion/react@11.11.3(@types/react@18.3.7)(react@18.3.1)':
 >>>>>>> 5d2567434 (update lock)
     dependencies:
@@ -20271,19 +20612,7 @@ snapshots:
       '@emotion/utils': 1.4.2
       csstype: 3.1.2
 
-  '@emotion/serialize@1.3.3':
-    dependencies:
-      '@emotion/hash': 0.9.2
-      '@emotion/memoize': 0.9.0
-      '@emotion/unitless': 0.10.0
-      '@emotion/utils': 1.4.2
-      csstype: 3.1.2
-
   '@emotion/sheet@1.2.2': {}
-
-  '@emotion/sheet@1.4.0': {}
-
-  '@emotion/unitless@0.10.0': {}
 
   '@emotion/unitless@0.8.1': {}
 
@@ -20297,14 +20626,15 @@ snapshots:
 
   '@emotion/utils@1.2.1': {}
 
-  '@emotion/utils@1.4.2': {}
-
   '@emotion/weak-memoize@0.3.1': {}
 
+<<<<<<< HEAD
   '@emotion/weak-memoize@0.4.0': {}
 <<<<<<< HEAD
 =======
 
+=======
+>>>>>>> af8435080 (update lockfile)
   '@esbuild/aix-ppc64@0.21.5':
     optional: true
 >>>>>>> 5d2567434 (update lock)
@@ -20982,11 +21312,14 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@imtbl/image-resizer-utils@0.0.3':
+<<<<<<< HEAD
+=======
+  '@imtbl/image-resizer-utils@0.0.2':
     dependencies:
       buffer: 6.0.3
 
-  '@imtbl/react-analytics@0.2.1-alpha':
+>>>>>>> af8435080 (update lockfile)
+  '@imtbl/image-resizer-utils@0.0.3':
     dependencies:
       buffer: 6.0.3
 
@@ -20998,7 +21331,20 @@ snapshots:
       - encoding
       - supports-color
 
+<<<<<<< HEAD
   '@imtbl/sdk@1.63.0(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(bufferutil@4.0.8)(embla-carousel-react@8.1.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(utf-8-validate@5.0.10)':
+=======
+<<<<<<< HEAD
+  '@imtbl/sdk@1.63.0(@emotion/is-prop-valid@0.8.8)(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(bufferutil@4.0.8)(embla-carousel-react@8.1.5(react@18.3.1))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(utf-8-validate@5.0.10)':
+=======
+<<<<<<< HEAD
+  '@imtbl/sdk@1.63.0(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(bufferutil@4.0.8)(embla-carousel-react@8.1.5(react@18.3.1))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(utf-8-validate@5.0.10)':
+=======
+<<<<<<< HEAD
+  '@imtbl/sdk@1.63.0(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(bufferutil@4.0.8)(embla-carousel-react@8.1.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(utf-8-validate@5.0.10)':
+>>>>>>> 16237e6d3 (update lockfile)
+>>>>>>> 431c6e5e1 (update lockfile)
+>>>>>>> 87277015d (update lockfile)
     dependencies:
       '@0xsequence/abi': 1.4.3
       '@0xsequence/core': 1.4.3(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))
@@ -21095,6 +21441,115 @@ snapshots:
       - supports-color
       - utf-8-validate
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+  '@imtbl/sdk@1.78.0(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(bufferutil@4.0.8)(embla-carousel-react@8.1.5(react@18.3.1))(motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(utf-8-validate@5.0.10)':
+=======
+<<<<<<< HEAD
+  '@imtbl/sdk@1.78.0(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(bufferutil@4.0.8)(embla-carousel-react@8.1.5(react@18.3.1))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(utf-8-validate@5.0.10)':
+>>>>>>> 87277015d (update lockfile)
+    dependencies:
+      '@0xsequence/abi': 1.4.3
+      '@0xsequence/core': 1.4.3(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+      '@0xsquid/sdk': 2.8.25(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@biom3/design-tokens': 0.4.6
+      '@biom3/react': 0.29.11(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@ethersproject/abi': 5.7.0
+      '@ethersproject/abstract-provider': 5.7.0
+      '@ethersproject/abstract-signer': 5.7.0
+      '@ethersproject/address': 5.7.0
+      '@ethersproject/bignumber': 5.7.0
+      '@ethersproject/bytes': 5.7.0
+      '@ethersproject/contracts': 5.7.0
+      '@ethersproject/keccak256': 5.7.0
+      '@ethersproject/providers': 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@ethersproject/solidity': 5.7.0
+      '@ethersproject/strings': 5.7.0
+      '@ethersproject/units': 5.7.0
+      '@ethersproject/wallet': 5.7.0
+      '@imtbl/react-analytics': 0.3.2-alpha(encoding@0.1.13)
+      '@jest/globals': 29.7.0
+      '@magic-ext/oidc': 4.3.1
+      '@magic-sdk/provider': 21.2.0(localforage@1.10.0)
+      '@metamask/detect-provider': 2.0.0
+      '@opensea/seaport-js': 4.0.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@rive-app/react-canvas-lite': 4.9.0(react@18.3.1)
+      '@stdlib/number-float64-base-normalize': 0.0.8
+      '@uniswap/router-sdk': 1.6.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+      '@uniswap/sdk-core': 3.2.3
+      '@uniswap/v3-sdk': 3.10.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+      '@walletconnect/ethereum-provider': 2.13.0(@types/react@18.3.12)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.3.1)(utf-8-validate@5.0.10)
+      '@walletconnect/modal': 2.6.2(@types/react@18.3.12)(react@18.3.1)
+      assert: 2.0.0
+      axios: 1.7.7
+      bn.js: 5.2.1
+      buffer: 6.0.3
+      crypto-browserify: 3.12.0
+      elliptic: 6.5.7
+      enc-utils: 3.0.0
+      ethereumjs-wallet: 1.0.2
+      ethers: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ethers-v6: ethers@6.11.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      events: 3.3.0
+      form-data: 4.0.0
+      framer-motion: 11.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      global-const: 0.1.2
+      hash.js: 1.1.7
+      https-browserify: 1.0.0
+      i18next: 23.11.5
+      i18next-browser-languagedetector: 7.2.0
+      jwt-decode: 3.1.2
+      localforage: 1.10.0
+      lru-memorise: 0.3.0
+      magic-sdk: 21.2.0
+      merkletreejs: 0.3.11
+      oidc-client-ts: 2.4.0
+      os-browserify: 0.3.0
+      pako: 2.1.0
+      pino-pretty: 11.2.2
+      react-i18next: 13.5.0(i18next@23.11.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      sns-validator: 0.3.5
+      stream-browserify: 3.0.0
+      stream-http: 3.2.0
+      url: 0.11.1
+      uuid: 8.3.2
+    optionalDependencies:
+      pg: 8.11.5
+      prisma: 5.20.0
+    transitivePeerDependencies:
+      - '@azure/app-configuration'
+      - '@azure/cosmos'
+      - '@azure/data-tables'
+      - '@azure/identity'
+      - '@azure/keyvault-secrets'
+      - '@azure/storage-blob'
+      - '@capacitor/preferences'
+      - '@emotion/react'
+      - '@netlify/blobs'
+      - '@planetscale/database'
+      - '@react-native-async-storage/async-storage'
+      - '@types/react'
+      - '@upstash/redis'
+      - '@vercel/kv'
+      - bufferutil
+      - debug
+      - embla-carousel-react
+      - encoding
+      - hardhat
+      - motion
+      - pg-native
+      - react
+      - react-dom
+      - react-native
+      - supports-color
+      - utf-8-validate
+
+=======
+=======
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
+>>>>>>> af6355e78 (update lockfile)
   '@ioredis/commands@1.2.0': {}
 
   '@isaacs/cliui@8.0.2':
@@ -21230,6 +21685,120 @@ snapshots:
       - ts-node
       - utf-8-validate
 
+<<<<<<< HEAD
+=======
+  '@jest/core@29.7.0(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)':
+    dependencies:
+      '@jest/console': 29.7.0
+      '@jest/reporters': 29.7.0(node-notifier@8.0.2)
+      '@jest/test-result': 29.7.0
+      '@jest/transform': 29.7.0
+      '@jest/types': 29.6.3
+      '@types/node': 20.14.13
+      ansi-escapes: 4.3.2
+      chalk: 4.1.2
+      ci-info: 3.8.0
+      exit: 0.1.2
+      graceful-fs: 4.2.11
+      jest-changed-files: 29.7.0
+      jest-config: 29.7.0(@types/node@20.14.13)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))
+      jest-haste-map: 29.7.0
+      jest-message-util: 29.7.0
+      jest-regex-util: 29.6.3
+      jest-resolve: 29.7.0
+      jest-resolve-dependencies: 29.7.0
+      jest-runner: 29.7.0
+      jest-runtime: 29.7.0
+      jest-snapshot: 29.7.0
+      jest-util: 29.7.0
+      jest-validate: 29.7.0
+      jest-watcher: 29.7.0
+      micromatch: 4.0.5
+      pretty-format: 29.7.0
+      slash: 3.0.0
+      strip-ansi: 6.0.1
+    optionalDependencies:
+      node-notifier: 8.0.2
+    transitivePeerDependencies:
+      - babel-plugin-macros
+      - supports-color
+      - ts-node
+
+  '@jest/core@29.7.0(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))':
+    dependencies:
+      '@jest/console': 29.7.0
+      '@jest/reporters': 29.7.0(node-notifier@8.0.2)
+      '@jest/test-result': 29.7.0
+      '@jest/transform': 29.7.0
+      '@jest/types': 29.6.3
+      '@types/node': 20.14.13
+      ansi-escapes: 4.3.2
+      chalk: 4.1.2
+      ci-info: 3.8.0
+      exit: 0.1.2
+      graceful-fs: 4.2.11
+      jest-changed-files: 29.7.0
+      jest-config: 29.7.0(@types/node@20.14.13)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))
+      jest-haste-map: 29.7.0
+      jest-message-util: 29.7.0
+      jest-regex-util: 29.6.3
+      jest-resolve: 29.7.0
+      jest-resolve-dependencies: 29.7.0
+      jest-runner: 29.7.0
+      jest-runtime: 29.7.0
+      jest-snapshot: 29.7.0
+      jest-util: 29.7.0
+      jest-validate: 29.7.0
+      jest-watcher: 29.7.0
+      micromatch: 4.0.5
+      pretty-format: 29.7.0
+      slash: 3.0.0
+      strip-ansi: 6.0.1
+    optionalDependencies:
+      node-notifier: 8.0.2
+    transitivePeerDependencies:
+      - babel-plugin-macros
+      - supports-color
+      - ts-node
+
+  '@jest/core@29.7.0(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@22.7.5)(typescript@5.6.2))':
+    dependencies:
+      '@jest/console': 29.7.0
+      '@jest/reporters': 29.7.0(node-notifier@8.0.2)
+      '@jest/test-result': 29.7.0
+      '@jest/transform': 29.7.0
+      '@jest/types': 29.6.3
+      '@types/node': 20.14.13
+      ansi-escapes: 4.3.2
+      chalk: 4.1.2
+      ci-info: 3.8.0
+      exit: 0.1.2
+      graceful-fs: 4.2.11
+      jest-changed-files: 29.7.0
+      jest-config: 29.7.0(@types/node@20.14.13)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@22.7.5)(typescript@5.6.2))
+      jest-haste-map: 29.7.0
+      jest-message-util: 29.7.0
+      jest-regex-util: 29.6.3
+      jest-resolve: 29.7.0
+      jest-resolve-dependencies: 29.7.0
+      jest-runner: 29.7.0
+      jest-runtime: 29.7.0
+      jest-snapshot: 29.7.0
+      jest-util: 29.7.0
+      jest-validate: 29.7.0
+      jest-watcher: 29.7.0
+      micromatch: 4.0.5
+      pretty-format: 29.7.0
+      slash: 3.0.0
+      strip-ansi: 6.0.1
+    optionalDependencies:
+      node-notifier: 8.0.2
+    transitivePeerDependencies:
+      - babel-plugin-macros
+      - supports-color
+      - ts-node
+
+>>>>>>> af8435080 (update lockfile)
   '@jest/core@29.7.0(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))':
     dependencies:
       '@jest/console': 29.7.0
@@ -22296,23 +22865,41 @@ snapshots:
       '@nomicfoundation/ethereumjs-rlp': 5.0.4
       ethereum-cryptography: 0.1.3
 
+<<<<<<< HEAD
   '@nomicfoundation/hardhat-chai-matchers@1.0.6(@nomiclabs/hardhat-ethers@2.2.3(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)))(chai@4.5.0)(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
     dependencies:
       '@ethersproject/abi': 5.7.0
       '@nomiclabs/hardhat-ethers': 2.2.3(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+=======
+  '@nomicfoundation/hardhat-chai-matchers@2.0.8(@nomicfoundation/hardhat-ethers@3.0.8(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)))(chai@4.5.0)(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
+    dependencies:
+      '@nomicfoundation/hardhat-ethers': 3.0.8(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+>>>>>>> 431c6e5e1 (update lockfile)
       '@types/chai-as-promised': 7.1.8
       chai: 4.5.0
       chai-as-promised: 7.1.2(chai@4.5.0)
       deep-eql: 4.1.4
+<<<<<<< HEAD
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+=======
+      ethers: 6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+>>>>>>> 431c6e5e1 (update lockfile)
       hardhat: 2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
       ordinal: 1.0.3
 
+<<<<<<< HEAD
   '@nomicfoundation/hardhat-ethers@3.0.8(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@22.7.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
     dependencies:
       debug: 4.3.7(supports-color@8.1.1)
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       hardhat: 2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@22.7.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
+=======
+  '@nomicfoundation/hardhat-ethers@3.0.8(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
+    dependencies:
+      debug: 4.3.7
+      ethers: 6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      hardhat: 2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
+>>>>>>> 16237e6d3 (update lockfile)
       lodash.isequal: 4.5.0
     transitivePeerDependencies:
       - supports-color
@@ -22327,6 +22914,7 @@ snapshots:
       ethereumjs-util: 7.1.5
       hardhat: 2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@22.7.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
 
+<<<<<<< HEAD
   '@nomicfoundation/hardhat-toolbox@2.0.2(oorvzvbzegvt4pazfy5au67dqu)':
     dependencies:
       '@ethersproject/abi': 5.7.0
@@ -22337,11 +22925,25 @@ snapshots:
       '@nomiclabs/hardhat-etherscan': 3.1.8(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
       '@typechain/ethers-v5': 10.2.1(@ethersproject/abi@5.7.0)(@ethersproject/providers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)
       '@typechain/hardhat': 9.1.0(@typechain/ethers-v6@0.5.1(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2))(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))
+=======
+  '@nomicfoundation/hardhat-toolbox@3.0.0(lm772m6sofirygsa5g6tjwdzym)':
+    dependencies:
+      '@nomicfoundation/hardhat-chai-matchers': 2.0.8(@nomicfoundation/hardhat-ethers@3.0.8(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)))(chai@4.5.0)(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+      '@nomicfoundation/hardhat-ethers': 3.0.8(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+      '@nomicfoundation/hardhat-network-helpers': 1.0.11(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+      '@nomicfoundation/hardhat-verify': 2.0.8(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+      '@typechain/ethers-v6': 0.5.1(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)
+      '@typechain/hardhat': 9.1.0(@typechain/ethers-v6@0.5.1(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2))(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))
+>>>>>>> 431c6e5e1 (update lockfile)
       '@types/chai': 4.3.16
       '@types/mocha': 10.0.8
       '@types/node': 20.14.13
       chai: 4.5.0
+<<<<<<< HEAD
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+=======
+      ethers: 6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+>>>>>>> 431c6e5e1 (update lockfile)
       hardhat: 2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
       hardhat-gas-reporter: 1.0.10(bufferutil@4.0.8)(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(utf-8-validate@5.0.10)
       solidity-coverage: 0.8.12(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
@@ -22395,11 +22997,14 @@ snapshots:
       '@nomicfoundation/solidity-analyzer-linux-x64-musl': 0.1.2
       '@nomicfoundation/solidity-analyzer-win32-x64-msvc': 0.1.2
 
+<<<<<<< HEAD
   '@nomiclabs/hardhat-ethers@2.2.3(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
     dependencies:
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       hardhat: 2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
 
+=======
+>>>>>>> 431c6e5e1 (update lockfile)
   '@nomiclabs/hardhat-etherscan@3.1.8(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
     dependencies:
       '@ethersproject/abi': 5.7.0
@@ -22436,9 +23041,15 @@ snapshots:
     transitivePeerDependencies:
       - nx
 
+<<<<<<< HEAD
   '@nrwl/js@19.7.3(@babel/traverse@7.25.6)(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@22.7.5)(nx@19.7.2(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.9.3(@swc/helpers@0.5.13)))(typescript@5.6.2)':
     dependencies:
       '@nx/js': 19.7.3(@babel/traverse@7.25.6)(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@22.7.5)(nx@19.7.2(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.9.3(@swc/helpers@0.5.13)))(typescript@5.6.2)
+=======
+  '@nrwl/js@19.7.3(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.3.70(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@22.7.5)(nx@19.7.2(@swc-node/register@1.10.9(@swc/core@1.3.70(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.3.70(@swc/helpers@0.5.13)))(typescript@5.6.2)':
+    dependencies:
+      '@nx/js': 19.7.3(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.3.70(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@22.7.5)(nx@19.7.2(@swc-node/register@1.10.9(@swc/core@1.3.70(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.3.70(@swc/helpers@0.5.13)))(typescript@5.6.2)
+>>>>>>> af8435080 (update lockfile)
     transitivePeerDependencies:
       - '@babel/traverse'
       - '@swc-node/register'
@@ -22511,7 +23122,11 @@ snapshots:
       tslib: 2.6.3
       yargs-parser: 21.1.1
 
+<<<<<<< HEAD
   '@nx/js@19.7.3(@babel/traverse@7.25.6)(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@22.7.5)(nx@19.7.2(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.9.3(@swc/helpers@0.5.13)))(typescript@5.6.2)':
+=======
+  '@nx/js@19.7.3(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.3.70(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@22.7.5)(nx@19.7.2(@swc-node/register@1.10.9(@swc/core@1.3.70(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.3.70(@swc/helpers@0.5.13)))(typescript@5.6.2)':
+>>>>>>> af8435080 (update lockfile)
     dependencies:
       '@babel/core': 7.24.9
       '@babel/plugin-proposal-decorators': 7.22.7(@babel/core@7.24.9)
@@ -22520,9 +23135,15 @@ snapshots:
       '@babel/preset-env': 7.25.4(@babel/core@7.24.9)
       '@babel/preset-typescript': 7.26.0(@babel/core@7.24.9)
       '@babel/runtime': 7.25.0
+<<<<<<< HEAD
       '@nrwl/js': 19.7.3(@babel/traverse@7.25.6)(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@22.7.5)(nx@19.7.2(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.9.3(@swc/helpers@0.5.13)))(typescript@5.6.2)
       '@nx/devkit': 19.7.3(nx@19.7.2(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.9.3(@swc/helpers@0.5.13)))
       '@nx/workspace': 19.7.3(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.9.3(@swc/helpers@0.5.13))
+=======
+      '@nrwl/js': 19.7.3(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.3.70(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@22.7.5)(nx@19.7.2(@swc-node/register@1.10.9(@swc/core@1.3.70(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.3.70(@swc/helpers@0.5.13)))(typescript@5.6.2)
+      '@nx/devkit': 19.7.3(nx@19.7.2(@swc-node/register@1.10.9(@swc/core@1.3.70(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.3.70(@swc/helpers@0.5.13)))
+      '@nx/workspace': 19.7.3(@swc-node/register@1.10.9(@swc/core@1.3.70(@swc/helpers@0.5.13))(@swc/types@0.1.17)(typescript@5.6.2))(@swc/core@1.3.70(@swc/helpers@0.5.13))
+>>>>>>> af8435080 (update lockfile)
       babel-plugin-const-enum: 1.2.0(@babel/core@7.24.9)
       babel-plugin-macros: 2.8.0
       babel-plugin-transform-typescript-metadata: 0.3.2(@babel/core@7.24.9)(@babel/traverse@7.25.9)
@@ -23299,8 +23920,12 @@ snapshots:
       playwright: 1.45.3
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   '@pmmmwh/react-refresh-webpack-plugin@0.5.10(react-refresh@0.11.0)(type-fest@2.19.0)(webpack-dev-server@4.15.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)(webpack@5.88.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0)))(webpack@5.88.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0))':
+=======
+  '@pmmmwh/react-refresh-webpack-plugin@0.5.10(@types/webpack@5.28.5(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0))(react-refresh@0.11.0)(type-fest@2.19.0)(webpack-dev-server@4.15.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)(webpack@5.88.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0)))(webpack@5.88.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0))':
+>>>>>>> af8435080 (update lockfile)
     dependencies:
       ansi-html-community: 0.0.8
       common-path-prefix: 3.0.0
@@ -23314,12 +23939,16 @@ snapshots:
       source-map: 0.7.4
       webpack: 5.88.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0)
     optionalDependencies:
-      '@types/webpack': 5.28.5(@swc/core@1.3.70(@swc/helpers@0.5.5))(esbuild@0.23.1)
+      '@types/webpack': 5.28.5(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0)
       type-fest: 2.19.0
       webpack-dev-server: 4.15.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)(webpack@5.88.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0))
 
+<<<<<<< HEAD
 >>>>>>> 365a2c114 (Feat/ethers v6 migration moo (#2424))
   '@pmmmwh/react-refresh-webpack-plugin@0.5.10(react-refresh@0.11.0)(type-fest@2.19.0)(webpack-dev-server@4.15.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0)))(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0))':
+=======
+  '@pmmmwh/react-refresh-webpack-plugin@0.5.10(@types/webpack@5.28.5(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0))(react-refresh@0.11.0)(type-fest@2.19.0)(webpack-dev-server@4.15.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0)))(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0))':
+>>>>>>> af8435080 (update lockfile)
     dependencies:
       ansi-html-community: 0.0.8
       common-path-prefix: 3.0.0
@@ -23333,6 +23962,7 @@ snapshots:
       source-map: 0.7.4
       webpack: 5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0)
     optionalDependencies:
+      '@types/webpack': 5.28.5(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0)
       type-fest: 2.19.0
       webpack-dev-server: 4.15.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0))
 
@@ -23343,6 +23973,7 @@ snapshots:
   '@prisma/debug@5.13.0':
     optional: true
 
+<<<<<<< HEAD
 >>>>>>> 5d2567434 (update lock)
   '@prisma/debug@5.20.0':
     optional: true
@@ -23368,6 +23999,29 @@ snapshots:
   '@prisma/get-platform@5.20.0':
     dependencies:
       '@prisma/debug': 5.20.0
+=======
+  '@prisma/engines-version@5.13.0-23.b9a39a7ee606c28e3455d0fd60e78c3ba82b1a2b':
+    optional: true
+
+  '@prisma/engines@5.13.0':
+    dependencies:
+      '@prisma/debug': 5.13.0
+      '@prisma/engines-version': 5.13.0-23.b9a39a7ee606c28e3455d0fd60e78c3ba82b1a2b
+      '@prisma/fetch-engine': 5.13.0
+      '@prisma/get-platform': 5.13.0
+    optional: true
+
+  '@prisma/fetch-engine@5.13.0':
+    dependencies:
+      '@prisma/debug': 5.13.0
+      '@prisma/engines-version': 5.13.0-23.b9a39a7ee606c28e3455d0fd60e78c3ba82b1a2b
+      '@prisma/get-platform': 5.13.0
+    optional: true
+
+  '@prisma/get-platform@5.13.0':
+    dependencies:
+      '@prisma/debug': 5.13.0
+>>>>>>> af8435080 (update lockfile)
     optional: true
 
   '@protobufjs/aspromise@1.1.2': {}
@@ -24960,7 +25614,12 @@ snapshots:
 
   '@swc/helpers@0.5.13':
     dependencies:
+<<<<<<< HEAD
       tslib: 2.6.3
+=======
+      tslib: 2.7.0
+    optional: true
+>>>>>>> af8435080 (update lockfile)
 
   '@swc/helpers@0.5.5':
     dependencies:
@@ -25059,16 +25718,23 @@ snapshots:
     dependencies:
       tslib: 2.6.3
 
+<<<<<<< HEAD
   '@typechain/ethers-v5@10.2.1(@ethersproject/abi@5.7.0)(@ethersproject/providers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)':
     dependencies:
       '@ethersproject/abi': 5.7.0
       '@ethersproject/providers': 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+=======
+  '@typechain/ethers-v6@0.5.1(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)':
+    dependencies:
+      ethers: 6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+>>>>>>> 431c6e5e1 (update lockfile)
       lodash: 4.17.21
       ts-essentials: 7.0.3(typescript@5.6.2)
       typechain: 8.3.0(typescript@5.6.2)
       typescript: 5.6.2
 
+<<<<<<< HEAD
   '@typechain/ethers-v6@0.5.1(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)':
     dependencies:
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -25077,7 +25743,14 @@ snapshots:
       typechain: 8.3.0(typescript@5.6.2)
       typescript: 5.6.2
 
+<<<<<<< HEAD
   '@typechain/hardhat@9.1.0(@typechain/ethers-v6@0.5.1(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2))(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))':
+=======
+  '@typechain/hardhat@9.1.0(@typechain/ethers-v6@0.5.1(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2))(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))':
+=======
+  '@typechain/hardhat@9.1.0(@typechain/ethers-v6@0.5.1(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2))(ethers@6.13.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))':
+>>>>>>> 16237e6d3 (update lockfile)
+>>>>>>> 431c6e5e1 (update lockfile)
     dependencies:
       '@typechain/ethers-v6': 0.5.1(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -25185,6 +25858,7 @@ snapshots:
     dependencies:
       '@types/eslint': 8.44.0
       '@types/estree': 1.0.6
+    optional: true
 
   '@types/eslint@8.44.0':
     dependencies:
@@ -25434,11 +26108,23 @@ snapshots:
 
   '@types/warning@3.0.0': {}
 
-  '@types/webpack@5.28.5(@swc/core@1.3.70(@swc/helpers@0.5.5))(esbuild@0.23.1)':
+  '@types/webpack@5.28.5(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0)':
     dependencies:
       '@types/node': 20.14.13
       tapable: 2.2.1
-      webpack: 5.96.1(@swc/core@1.3.70(@swc/helpers@0.5.5))(esbuild@0.23.1)
+      webpack: 5.96.1(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0)
+    transitivePeerDependencies:
+      - '@swc/core'
+      - esbuild
+      - uglify-js
+      - webpack-cli
+    optional: true
+
+  '@types/webpack@5.28.5(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0)':
+    dependencies:
+      '@types/node': 20.14.13
+      tapable: 2.2.1
+      webpack: 5.96.1(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0)
     transitivePeerDependencies:
       - '@swc/core'
       - esbuild
@@ -25680,7 +26366,16 @@ snapshots:
 
   '@uniswap/lib@4.0.1-alpha': {}
 
+<<<<<<< HEAD
   '@uniswap/router-sdk@1.6.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
+=======
+<<<<<<< HEAD
+  '@uniswap/router-sdk@1.6.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
+=======
+<<<<<<< HEAD
+  '@uniswap/router-sdk@1.6.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
+>>>>>>> 16237e6d3 (update lockfile)
+>>>>>>> 87277015d (update lockfile)
     dependencies:
       '@ethersproject/abi': 5.7.0
       '@uniswap/sdk-core': 4.0.6
@@ -25690,6 +26385,8 @@ snapshots:
     transitivePeerDependencies:
       - hardhat
 
+=======
+>>>>>>> af8435080 (update lockfile)
   '@uniswap/sdk-core@3.2.3':
     dependencies:
       '@ethersproject/address': 5.7.0
@@ -25708,7 +26405,12 @@ snapshots:
       tiny-invariant: 1.3.1
       toformat: 2.0.0
 
+<<<<<<< HEAD
   '@uniswap/swap-router-contracts@1.1.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
+=======
+<<<<<<< HEAD
+  '@uniswap/swap-router-contracts@1.1.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
+>>>>>>> 16237e6d3 (update lockfile)
     dependencies:
       '@openzeppelin/contracts': 3.4.1-solc-0.7-2
       '@uniswap/v2-core': 1.0.1
@@ -25718,12 +26420,31 @@ snapshots:
     transitivePeerDependencies:
       - hardhat
 
+<<<<<<< HEAD
   '@uniswap/swap-router-contracts@1.3.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
+=======
+<<<<<<< HEAD
+  '@uniswap/swap-router-contracts@1.3.1(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
+=======
+  '@uniswap/swap-router-contracts@1.3.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
+=======
+  '@uniswap/swap-router-contracts@1.3.1(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
+>>>>>>> 87277015d (update lockfile)
     dependencies:
       '@openzeppelin/contracts': 3.4.2-solc-0.7
       '@uniswap/v2-core': 1.0.1
       '@uniswap/v3-core': 1.0.0
+<<<<<<< HEAD
       '@uniswap/v3-periphery': 1.4.4
+=======
+<<<<<<< HEAD
+      '@uniswap/v3-periphery': 1.4.1(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+=======
+      '@uniswap/v3-periphery': 1.4.4
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
       dotenv: 14.3.2
       hardhat-watcher: 2.5.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
     transitivePeerDependencies:
@@ -25733,7 +26454,12 @@ snapshots:
 
   '@uniswap/v3-core@1.0.0': {}
 
+<<<<<<< HEAD
   '@uniswap/v3-periphery@1.3.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
+=======
+<<<<<<< HEAD
+  '@uniswap/v3-periphery@1.3.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
+>>>>>>> 16237e6d3 (update lockfile)
     dependencies:
       '@openzeppelin/contracts': 3.4.1-solc-0.7-2
       '@uniswap/lib': 4.0.1-alpha
@@ -25744,13 +26470,33 @@ snapshots:
     transitivePeerDependencies:
       - hardhat
 
+<<<<<<< HEAD
   '@uniswap/v3-periphery@1.4.1(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
+=======
+<<<<<<< HEAD
+  '@uniswap/v3-periphery@1.4.3':
+=======
+  '@uniswap/v3-periphery@1.4.1(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
+=======
+  '@uniswap/v3-periphery@1.4.3':
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
+>>>>>>> 87277015d (update lockfile)
     dependencies:
       '@openzeppelin/contracts': 3.4.2-solc-0.7
       '@uniswap/lib': 4.0.1-alpha
       '@uniswap/v2-core': 1.0.1
       '@uniswap/v3-core': 1.0.0
       base64-sol: 1.0.1
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+      hardhat-watcher: 2.5.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+    transitivePeerDependencies:
+      - hardhat
+=======
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
 
   '@uniswap/v3-periphery@1.4.3':
     dependencies:
@@ -25765,6 +26511,7 @@ snapshots:
       '@ethersproject/abi': 5.7.0
       '@ethersproject/solidity': 5.7.0
       '@uniswap/sdk-core': 4.0.6
+<<<<<<< HEAD
       '@uniswap/swap-router-contracts': 1.3.1(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
       '@uniswap/v3-periphery': 1.4.3
       '@uniswap/v3-staker': 1.0.0
@@ -25779,6 +26526,13 @@ snapshots:
       '@ethersproject/solidity': 5.7.0
       '@uniswap/sdk-core': 4.0.6
       '@uniswap/swap-router-contracts': 1.3.1(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+=======
+<<<<<<< HEAD
+      '@uniswap/swap-router-contracts': 1.3.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+=======
+      '@uniswap/swap-router-contracts': 1.3.1(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
       '@uniswap/v3-periphery': 1.4.3
       '@uniswap/v3-staker': 1.0.0
       tiny-invariant: 1.3.1
@@ -26295,10 +27049,17 @@ snapshots:
       acorn-walk: 8.2.0
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   acorn-import-assertions@1.9.0(acorn@8.14.0):
     dependencies:
       acorn: 8.14.0
 =======
+=======
+  acorn-import-assertions@1.9.0(acorn@8.12.1):
+    dependencies:
+      acorn: 8.12.1
+
+>>>>>>> af8435080 (update lockfile)
   acorn-jsx@5.3.2(acorn@8.12.1):
     dependencies:
       acorn: 8.12.1
@@ -26690,16 +27451,6 @@ snapshots:
       normalize-range: 0.1.2
       picocolors: 1.1.1
       postcss: 8.4.49
-      postcss-value-parser: 4.2.0
-
-  autoprefixer@10.4.19(postcss@8.4.47):
-    dependencies:
-      browserslist: 4.23.2
-      caniuse-lite: 1.0.30001643
-      fraction.js: 4.3.7
-      normalize-range: 0.1.2
-      picocolors: 1.0.1
-      postcss: 8.4.47
       postcss-value-parser: 4.2.0
 
   available-typed-arrays@1.0.7:
@@ -27895,6 +28646,39 @@ snapshots:
       safe-buffer: 5.2.1
       sha.js: 2.4.11
 
+<<<<<<< HEAD
+=======
+  create-jest@29.7.0(@types/node@18.15.13)(babel-plugin-macros@3.1.0):
+    dependencies:
+      '@jest/types': 29.6.3
+      chalk: 4.1.2
+      exit: 0.1.2
+      graceful-fs: 4.2.11
+      jest-config: 29.7.0(@types/node@18.15.13)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))
+      jest-util: 29.7.0
+      prompts: 2.4.2
+    transitivePeerDependencies:
+      - '@types/node'
+      - babel-plugin-macros
+      - supports-color
+      - ts-node
+
+  create-jest@29.7.0(@types/node@18.15.13)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2)):
+    dependencies:
+      '@jest/types': 29.6.3
+      chalk: 4.1.2
+      exit: 0.1.2
+      graceful-fs: 4.2.11
+      jest-config: 29.7.0(@types/node@18.15.13)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))
+      jest-util: 29.7.0
+      prompts: 2.4.2
+    transitivePeerDependencies:
+      - '@types/node'
+      - babel-plugin-macros
+      - supports-color
+      - ts-node
+
+>>>>>>> af8435080 (update lockfile)
   create-jest@29.7.0(@types/node@18.15.13)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2)):
     dependencies:
       '@jest/types': 29.6.3
@@ -27925,6 +28709,39 @@ snapshots:
       - supports-color
       - ts-node
 
+<<<<<<< HEAD
+=======
+  create-jest@29.7.0(@types/node@22.7.5)(babel-plugin-macros@3.1.0):
+    dependencies:
+      '@jest/types': 29.6.3
+      chalk: 4.1.2
+      exit: 0.1.2
+      graceful-fs: 4.2.11
+      jest-config: 29.7.0(@types/node@22.7.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@22.7.5)(typescript@5.6.2))
+      jest-util: 29.7.0
+      prompts: 2.4.2
+    transitivePeerDependencies:
+      - '@types/node'
+      - babel-plugin-macros
+      - supports-color
+      - ts-node
+
+  create-jest@29.7.0(@types/node@22.7.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@22.7.5)(typescript@5.6.2)):
+    dependencies:
+      '@jest/types': 29.6.3
+      chalk: 4.1.2
+      exit: 0.1.2
+      graceful-fs: 4.2.11
+      jest-config: 29.7.0(@types/node@22.7.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@22.7.5)(typescript@5.6.2))
+      jest-util: 29.7.0
+      prompts: 2.4.2
+    transitivePeerDependencies:
+      - '@types/node'
+      - babel-plugin-macros
+      - supports-color
+      - ts-node
+
+>>>>>>> af8435080 (update lockfile)
   create-jest@29.7.0(@types/node@22.7.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@22.7.5)(typescript@5.6.2)):
     dependencies:
       '@jest/types': 29.6.3
@@ -27999,6 +28816,7 @@ snapshots:
   crypto@1.0.1: {}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   css-blank-pseudo@3.0.3(postcss@8.4.49):
     dependencies:
       postcss: 8.4.49
@@ -28007,12 +28825,18 @@ snapshots:
     dependencies:
       postcss: 8.4.47
 >>>>>>> 5d2567434 (update lock)
+=======
+  css-blank-pseudo@3.0.3(postcss@8.4.40):
+    dependencies:
+      postcss: 8.4.40
+>>>>>>> af8435080 (update lockfile)
       postcss-selector-parser: 6.0.13
 
   css-declaration-sorter@6.4.1(postcss@8.4.49):
     dependencies:
       postcss: 8.4.49
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   css-has-pseudo@3.0.4(postcss@8.4.49):
     dependencies:
@@ -28022,6 +28846,11 @@ snapshots:
     dependencies:
       postcss: 8.4.47
 >>>>>>> 5d2567434 (update lock)
+=======
+  css-has-pseudo@3.0.4(postcss@8.4.40):
+    dependencies:
+      postcss: 8.4.40
+>>>>>>> af8435080 (update lockfile)
       postcss-selector-parser: 6.0.13
 
   css-loader@6.8.1(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0)):
@@ -28049,6 +28878,7 @@ snapshots:
       esbuild: 0.24.0
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   css-prefers-color-scheme@6.0.3(postcss@8.4.49):
     dependencies:
       postcss: 8.4.49
@@ -28057,6 +28887,11 @@ snapshots:
     dependencies:
       postcss: 8.4.47
 >>>>>>> 5d2567434 (update lock)
+=======
+  css-prefers-color-scheme@6.0.3(postcss@8.4.40):
+    dependencies:
+      postcss: 8.4.40
+>>>>>>> af8435080 (update lockfile)
 
   css-select-base-adapter@0.1.1: {}
 
@@ -28692,6 +29527,7 @@ snapshots:
     dependencies:
       graceful-fs: 4.2.11
       tapable: 2.2.1
+    optional: true
 
   enquirer@2.3.6:
     dependencies:
@@ -29067,8 +29903,16 @@ snapshots:
       '@typescript-eslint/parser': 5.62.0(eslint@8.57.0)(typescript@5.6.2)
       eslint: 8.57.0
       eslint-import-resolver-node: 0.3.9
+<<<<<<< HEAD
       eslint-import-resolver-typescript: 3.5.5(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.0)
+<<<<<<< HEAD
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-typescript@3.5.5(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
+=======
+=======
+      eslint-import-resolver-typescript: 3.5.5(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.0)
+>>>>>>> af8435080 (update lockfile)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-typescript@3.5.5)(eslint@8.57.0)
+>>>>>>> 16237e6d3 (update lockfile)
       eslint-plugin-jsx-a11y: 6.9.0(eslint@8.57.0)
       eslint-plugin-react: 7.35.0(eslint@8.57.0)
       eslint-plugin-react-hooks: 5.0.0-canary-7118f5dd7-20230705(eslint@8.57.0)
@@ -29085,8 +29929,16 @@ snapshots:
       '@typescript-eslint/parser': 5.62.0(eslint@8.57.0)(typescript@5.6.2)
       eslint: 8.57.0
       eslint-import-resolver-node: 0.3.9
+<<<<<<< HEAD
       eslint-import-resolver-typescript: 3.5.5(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.0)
+<<<<<<< HEAD
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-typescript@3.5.5(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
+=======
+=======
+      eslint-import-resolver-typescript: 3.5.5(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.0)
+>>>>>>> af8435080 (update lockfile)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-typescript@3.5.5)(eslint@8.57.0)
+>>>>>>> 16237e6d3 (update lockfile)
       eslint-plugin-jsx-a11y: 6.9.0(eslint@8.57.0)
       eslint-plugin-react: 7.35.0(eslint@8.57.0)
       eslint-plugin-react-hooks: 5.0.0-canary-7118f5dd7-20230705(eslint@8.57.0)
@@ -29096,7 +29948,11 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
+<<<<<<< HEAD
   eslint-config-react-app@7.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.22.5(@babel/core@7.24.9))(eslint@8.57.0)(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2):
+=======
+  eslint-config-react-app@7.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.25.9(@babel/core@7.24.9))(eslint@8.57.0)(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2):
+>>>>>>> af8435080 (update lockfile)
     dependencies:
       '@babel/core': 7.24.9
       '@babel/eslint-parser': 7.22.9(@babel/core@7.24.9)(eslint@8.57.0)
@@ -29112,7 +29968,7 @@ snapshots:
       eslint-plugin-jest: 25.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0)(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2)
 =======
       eslint-plugin-flowtype: 8.0.3(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.25.9(@babel/core@7.24.9))(eslint@8.57.0)
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-typescript@3.5.5(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-typescript@3.5.5)(eslint@8.57.0)
       eslint-plugin-jest: 25.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0)(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2)
 >>>>>>> 365a2c114 (Feat/ethers v6 migration moo (#2424))
       eslint-plugin-jsx-a11y: 6.9.0(eslint@8.57.0)
@@ -29129,7 +29985,7 @@ snapshots:
       - jest
       - supports-color
 
-  eslint-config-react-app@7.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.22.5(@babel/core@7.24.9))(eslint@9.16.0(jiti@1.21.0))(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2):
+  eslint-config-react-app@7.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.25.9(@babel/core@7.24.9))(eslint@9.16.0(jiti@1.21.0))(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2):
     dependencies:
       '@babel/core': 7.24.9
       '@babel/eslint-parser': 7.22.9(@babel/core@7.24.9)(eslint@9.16.0(jiti@1.21.0))
@@ -29139,7 +29995,7 @@ snapshots:
       babel-preset-react-app: 10.0.1
       confusing-browser-globals: 1.0.11
       eslint: 9.16.0(jiti@1.21.0)
-      eslint-plugin-flowtype: 8.0.3(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.22.5(@babel/core@7.24.9))(eslint@9.16.0(jiti@1.21.0))
+      eslint-plugin-flowtype: 8.0.3(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.25.9(@babel/core@7.24.9))(eslint@9.16.0(jiti@1.21.0))
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))
       eslint-plugin-jest: 25.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2)
       eslint-plugin-jsx-a11y: 6.9.0(eslint@9.16.0(jiti@1.21.0))
@@ -29198,7 +30054,7 @@ snapshots:
       enhanced-resolve: 5.15.0
       eslint: 8.57.0
       eslint-module-utils: 2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.5.5)(eslint@8.57.0)
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-typescript@3.5.5(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-typescript@3.5.5)(eslint@8.57.0)
       get-tsconfig: 4.6.2
       globby: 13.2.2
       is-core-module: 2.15.0
@@ -29216,9 +30072,16 @@ snapshots:
       enhanced-resolve: 5.15.0
       eslint: 8.57.0
       eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.5.5)(eslint@8.57.0)
+<<<<<<< HEAD
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-typescript@3.5.5(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
 >>>>>>> 5d2567434 (update lock)
+<<<<<<< HEAD
 >>>>>>> 7f259da62 (update lock)
+=======
+=======
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-typescript@3.5.5)(eslint@8.57.0)
+>>>>>>> af8435080 (update lockfile)
+>>>>>>> 16237e6d3 (update lockfile)
       get-tsconfig: 4.6.2
       globby: 13.2.2
       is-core-module: 2.15.0
@@ -29285,10 +30148,10 @@ snapshots:
       lodash: 4.17.21
       string-natural-compare: 3.0.1
 
-  eslint-plugin-flowtype@8.0.3(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.22.5(@babel/core@7.24.9))(eslint@9.16.0(jiti@1.21.0)):
+  eslint-plugin-flowtype@8.0.3(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.25.9(@babel/core@7.24.9))(eslint@9.16.0(jiti@1.21.0)):
     dependencies:
       '@babel/plugin-syntax-flow': 7.24.7(@babel/core@7.24.9)
-      '@babel/plugin-transform-react-jsx': 7.22.5(@babel/core@7.24.9)
+      '@babel/plugin-transform-react-jsx': 7.25.9(@babel/core@7.24.9)
       eslint: 9.16.0(jiti@1.21.0)
       lodash: 4.17.21
       string-natural-compare: 3.0.1
@@ -30370,10 +31233,14 @@ snapshots:
   fork-ts-checker-webpack-plugin@6.5.3(eslint@8.57.0)(typescript@5.6.2)(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0)):
     dependencies:
 <<<<<<< HEAD
+<<<<<<< HEAD
       '@babel/code-frame': 7.24.7
       '@types/json-schema': 7.0.15
 =======
       '@babel/code-frame': 7.26.2
+=======
+      '@babel/code-frame': 7.24.7
+>>>>>>> af8435080 (update lockfile)
       '@types/json-schema': 7.0.12
 >>>>>>> 5d2567434 (update lock)
       chalk: 4.1.2
@@ -31906,11 +32773,15 @@ snapshots:
 
   jest-cli@29.7.0(@types/node@18.15.13)(babel-plugin-macros@3.1.0)(node-notifier@8.0.2):
     dependencies:
-      '@jest/core': 29.7.0(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))
+      '@jest/core': 29.7.0(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)
       '@jest/test-result': 29.7.0
       '@jest/types': 29.6.3
       chalk: 4.1.2
+<<<<<<< HEAD
       create-jest: 29.7.0(@types/node@18.15.13)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))
+=======
+      create-jest: 29.7.0(@types/node@18.15.13)(babel-plugin-macros@3.1.0)
+>>>>>>> af8435080 (update lockfile)
       exit: 0.1.2
       import-local: 3.1.0
       jest-config: 29.7.0(@types/node@18.15.13)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))
@@ -31969,11 +32840,15 @@ snapshots:
 
   jest-cli@29.7.0(@types/node@22.7.5)(babel-plugin-macros@3.1.0)(node-notifier@8.0.2):
     dependencies:
-      '@jest/core': 29.7.0(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))
+      '@jest/core': 29.7.0(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)
       '@jest/test-result': 29.7.0
       '@jest/types': 29.6.3
       chalk: 4.1.2
+<<<<<<< HEAD
       create-jest: 29.7.0(@types/node@22.7.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@22.7.5)(typescript@5.6.2))
+=======
+      create-jest: 29.7.0(@types/node@22.7.5)(babel-plugin-macros@3.1.0)
+>>>>>>> af8435080 (update lockfile)
       exit: 0.1.2
       import-local: 3.1.0
       jest-config: 29.7.0(@types/node@22.7.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@22.7.5)(typescript@5.6.2))
@@ -32452,7 +33327,11 @@ snapshots:
       pretty-format: 26.6.2
       throat: 5.0.0
     transitivePeerDependencies:
+      - bufferutil
+      - canvas
       - supports-color
+      - ts-node
+      - utf-8-validate
 
   jest-jasmine2@27.5.1:
     dependencies:
@@ -33088,7 +33967,7 @@ snapshots:
 
   jest@29.7.0(@types/node@18.15.13)(babel-plugin-macros@3.1.0)(node-notifier@8.0.2):
     dependencies:
-      '@jest/core': 29.7.0(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))
+      '@jest/core': 29.7.0(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)
       '@jest/types': 29.6.3
       import-local: 3.1.0
       jest-cli: 29.7.0(@types/node@18.15.13)(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)
@@ -33130,7 +34009,7 @@ snapshots:
 
   jest@29.7.0(@types/node@22.7.5)(babel-plugin-macros@3.1.0)(node-notifier@8.0.2):
     dependencies:
-      '@jest/core': 29.7.0(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))
+      '@jest/core': 29.7.0(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)
       '@jest/types': 29.6.3
       import-local: 3.1.0
       jest-cli: 29.7.0(@types/node@22.7.5)(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)
@@ -35276,6 +36155,7 @@ snapshots:
   possible-typed-array-names@1.0.0: {}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   postcss-attribute-case-insensitive@5.0.2(postcss@8.4.49):
     dependencies:
       postcss: 8.4.49
@@ -35287,15 +36167,23 @@ snapshots:
       postcss: 8.4.49
 =======
   postcss-attribute-case-insensitive@5.0.2(postcss@8.4.47):
+=======
+  postcss-attribute-case-insensitive@5.0.2(postcss@8.4.40):
+>>>>>>> af8435080 (update lockfile)
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-selector-parser: 6.0.13
 
-  postcss-browser-comments@4.0.0(browserslist@4.24.2)(postcss@8.4.47):
+  postcss-browser-comments@4.0.0(browserslist@4.23.2)(postcss@8.4.40):
     dependencies:
+<<<<<<< HEAD
       browserslist: 4.24.2
       postcss: 8.4.47
 >>>>>>> 5d2567434 (update lock)
+=======
+      browserslist: 4.23.2
+      postcss: 8.4.40
+>>>>>>> af8435080 (update lockfile)
 
   postcss-calc@8.2.4(postcss@8.4.49):
     dependencies:
@@ -35303,6 +36191,7 @@ snapshots:
       postcss-selector-parser: 6.0.13
       postcss-value-parser: 4.2.0
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   postcss-clamp@4.1.0(postcss@8.4.49):
     dependencies:
@@ -35324,24 +36213,31 @@ snapshots:
       postcss: 8.4.49
 =======
   postcss-clamp@4.1.0(postcss@8.4.47):
+=======
+  postcss-clamp@4.1.0(postcss@8.4.40):
+>>>>>>> af8435080 (update lockfile)
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-value-parser: 4.2.0
 
-  postcss-color-functional-notation@4.2.4(postcss@8.4.47):
+  postcss-color-functional-notation@4.2.4(postcss@8.4.40):
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-value-parser: 4.2.0
 
-  postcss-color-hex-alpha@8.0.4(postcss@8.4.47):
+  postcss-color-hex-alpha@8.0.4(postcss@8.4.40):
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-value-parser: 4.2.0
 
-  postcss-color-rebeccapurple@7.1.1(postcss@8.4.47):
+  postcss-color-rebeccapurple@7.1.1(postcss@8.4.40):
     dependencies:
+<<<<<<< HEAD
       postcss: 8.4.47
 >>>>>>> 5d2567434 (update lock)
+=======
+      postcss: 8.4.40
+>>>>>>> af8435080 (update lockfile)
       postcss-value-parser: 4.2.0
 
   postcss-colormin@5.3.1(postcss@8.4.49):
@@ -35386,25 +36282,29 @@ snapshots:
       postcss: 8.4.47
       postcss-value-parser: 4.2.0
 
-  postcss-custom-media@8.0.2(postcss@8.4.47):
+  postcss-custom-media@8.0.2(postcss@8.4.40):
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-value-parser: 4.2.0
 
-  postcss-custom-properties@12.1.11(postcss@8.4.47):
+  postcss-custom-properties@12.1.11(postcss@8.4.40):
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-value-parser: 4.2.0
 
-  postcss-custom-selectors@6.0.3(postcss@8.4.47):
+  postcss-custom-selectors@6.0.3(postcss@8.4.40):
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-selector-parser: 6.0.13
 
-  postcss-dir-pseudo-class@6.0.5(postcss@8.4.47):
+  postcss-dir-pseudo-class@6.0.5(postcss@8.4.40):
     dependencies:
+<<<<<<< HEAD
       postcss: 8.4.47
 >>>>>>> 5d2567434 (update lock)
+=======
+      postcss: 8.4.40
+>>>>>>> af8435080 (update lockfile)
       postcss-selector-parser: 6.0.13
 
   postcss-discard-comments@5.1.2(postcss@8.4.49):
@@ -35423,6 +36323,7 @@ snapshots:
     dependencies:
       postcss: 8.4.49
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   postcss-double-position-gradients@3.1.2(postcss@8.4.49):
     dependencies:
@@ -35462,42 +36363,49 @@ snapshots:
       postcss: 8.4.49
 =======
   postcss-double-position-gradients@3.1.2(postcss@8.4.47):
+=======
+  postcss-double-position-gradients@3.1.2(postcss@8.4.40):
+>>>>>>> af8435080 (update lockfile)
     dependencies:
-      '@csstools/postcss-progressive-custom-properties': 1.3.0(postcss@8.4.47)
-      postcss: 8.4.47
+      '@csstools/postcss-progressive-custom-properties': 1.3.0(postcss@8.4.40)
+      postcss: 8.4.40
       postcss-value-parser: 4.2.0
 
-  postcss-env-function@4.0.6(postcss@8.4.47):
+  postcss-env-function@4.0.6(postcss@8.4.40):
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-value-parser: 4.2.0
 
-  postcss-flexbugs-fixes@5.0.2(postcss@8.4.47):
+  postcss-flexbugs-fixes@5.0.2(postcss@8.4.40):
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
 
-  postcss-focus-visible@6.0.4(postcss@8.4.47):
+  postcss-focus-visible@6.0.4(postcss@8.4.40):
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-selector-parser: 6.0.13
 
-  postcss-focus-within@5.0.4(postcss@8.4.47):
+  postcss-focus-within@5.0.4(postcss@8.4.40):
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-selector-parser: 6.0.13
 
-  postcss-font-variant@5.0.0(postcss@8.4.47):
+  postcss-font-variant@5.0.0(postcss@8.4.40):
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
 
-  postcss-gap-properties@3.0.5(postcss@8.4.47):
+  postcss-gap-properties@3.0.5(postcss@8.4.40):
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
 
-  postcss-image-set-function@4.0.7(postcss@8.4.47):
+  postcss-image-set-function@4.0.7(postcss@8.4.40):
     dependencies:
+<<<<<<< HEAD
       postcss: 8.4.47
 >>>>>>> 5d2567434 (update lock)
+=======
+      postcss: 8.4.40
+>>>>>>> af8435080 (update lockfile)
       postcss-value-parser: 4.2.0
 
   postcss-import@15.1.0(postcss@8.4.49):
@@ -35508,6 +36416,7 @@ snapshots:
       resolve: 1.22.8
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   postcss-initial@4.0.1(postcss@8.4.49):
     dependencies:
       postcss: 8.4.49
@@ -35516,12 +36425,18 @@ snapshots:
     dependencies:
       postcss: 8.4.47
 >>>>>>> 5d2567434 (update lock)
+=======
+  postcss-initial@4.0.1(postcss@8.4.40):
+    dependencies:
+      postcss: 8.4.40
+>>>>>>> af8435080 (update lockfile)
 
   postcss-js@4.0.1(postcss@8.4.49):
     dependencies:
       camelcase-css: 2.0.1
       postcss: 8.4.49
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   postcss-lab-function@4.2.1(postcss@8.4.49):
     dependencies:
@@ -35533,6 +36448,12 @@ snapshots:
       '@csstools/postcss-progressive-custom-properties': 1.3.0(postcss@8.4.47)
       postcss: 8.4.47
 >>>>>>> 5d2567434 (update lock)
+=======
+  postcss-lab-function@4.2.1(postcss@8.4.40):
+    dependencies:
+      '@csstools/postcss-progressive-custom-properties': 1.3.0(postcss@8.4.40)
+      postcss: 8.4.40
+>>>>>>> af8435080 (update lockfile)
       postcss-value-parser: 4.2.0
 
   postcss-load-config@4.0.1(postcss@8.4.49)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2)):
@@ -35564,6 +36485,7 @@ snapshots:
       cosmiconfig: 7.1.0
       klona: 2.0.6
 <<<<<<< HEAD
+<<<<<<< HEAD
       postcss: 8.4.49
       semver: 7.6.3
       webpack: 5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0)
@@ -35577,6 +36499,9 @@ snapshots:
       postcss: 8.4.49
 =======
       postcss: 8.4.47
+=======
+      postcss: 8.4.40
+>>>>>>> af8435080 (update lockfile)
       semver: 7.6.3
       webpack: 5.88.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0)
 
@@ -35588,14 +36513,18 @@ snapshots:
       semver: 7.6.3
       webpack: 5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0)
 
-  postcss-logical@5.0.4(postcss@8.4.47):
+  postcss-logical@5.0.4(postcss@8.4.40):
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
 
-  postcss-media-minmax@5.0.0(postcss@8.4.47):
+  postcss-media-minmax@5.0.0(postcss@8.4.40):
     dependencies:
+<<<<<<< HEAD
       postcss: 8.4.47
 >>>>>>> 5d2567434 (update lock)
+=======
+      postcss: 8.4.40
+>>>>>>> af8435080 (update lockfile)
 
   postcss-merge-longhand@5.1.7(postcss@8.4.49):
     dependencies:
@@ -35672,6 +36601,7 @@ snapshots:
       postcss-selector-parser: 6.0.13
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   postcss-nesting@10.2.0(postcss@8.4.49):
     dependencies:
       '@csstools/selector-specificity': 2.2.0(postcss-selector-parser@6.0.13)
@@ -35682,6 +36612,12 @@ snapshots:
       '@csstools/selector-specificity': 2.2.0(postcss-selector-parser@6.0.13)
       postcss: 8.4.47
 >>>>>>> 5d2567434 (update lock)
+=======
+  postcss-nesting@10.2.0(postcss@8.4.40):
+    dependencies:
+      '@csstools/selector-specificity': 2.2.0(postcss-selector-parser@6.0.13)
+      postcss: 8.4.40
+>>>>>>> af8435080 (update lockfile)
       postcss-selector-parser: 6.0.13
 
   postcss-normalize-charset@5.1.0(postcss@8.4.49):
@@ -35736,6 +36672,7 @@ snapshots:
       postcss-value-parser: 4.2.0
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   postcss-normalize@10.0.1(browserslist@4.23.3)(postcss@8.4.49):
     dependencies:
       '@csstools/normalize.css': 12.0.0
@@ -35749,17 +36686,24 @@ snapshots:
       postcss: 8.4.49
 =======
   postcss-normalize@10.0.1(browserslist@4.24.2)(postcss@8.4.47):
+=======
+  postcss-normalize@10.0.1(browserslist@4.23.2)(postcss@8.4.40):
+>>>>>>> af8435080 (update lockfile)
     dependencies:
       '@csstools/normalize.css': 12.0.0
-      browserslist: 4.24.2
-      postcss: 8.4.47
-      postcss-browser-comments: 4.0.0(browserslist@4.24.2)(postcss@8.4.47)
+      browserslist: 4.23.2
+      postcss: 8.4.40
+      postcss-browser-comments: 4.0.0(browserslist@4.23.2)(postcss@8.4.40)
       sanitize.css: 13.0.0
 
-  postcss-opacity-percentage@1.1.3(postcss@8.4.47):
+  postcss-opacity-percentage@1.1.3(postcss@8.4.40):
     dependencies:
+<<<<<<< HEAD
       postcss: 8.4.47
 >>>>>>> 5d2567434 (update lock)
+=======
+      postcss: 8.4.40
+>>>>>>> af8435080 (update lockfile)
 
   postcss-ordered-values@5.1.3(postcss@8.4.49):
     dependencies:
@@ -35767,6 +36711,7 @@ snapshots:
       postcss: 8.4.49
       postcss-value-parser: 4.2.0
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   postcss-overflow-shorthand@3.0.4(postcss@8.4.49):
     dependencies:
@@ -35840,76 +36785,83 @@ snapshots:
       postcss: 8.4.49
 =======
   postcss-overflow-shorthand@3.0.4(postcss@8.4.47):
+=======
+  postcss-overflow-shorthand@3.0.4(postcss@8.4.40):
+>>>>>>> af8435080 (update lockfile)
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-value-parser: 4.2.0
 
-  postcss-page-break@3.0.4(postcss@8.4.47):
+  postcss-page-break@3.0.4(postcss@8.4.40):
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
 
-  postcss-place@7.0.5(postcss@8.4.47):
+  postcss-place@7.0.5(postcss@8.4.40):
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
       postcss-value-parser: 4.2.0
 
-  postcss-preset-env@7.8.3(postcss@8.4.47):
+  postcss-preset-env@7.8.3(postcss@8.4.40):
     dependencies:
-      '@csstools/postcss-cascade-layers': 1.1.1(postcss@8.4.47)
-      '@csstools/postcss-color-function': 1.1.1(postcss@8.4.47)
-      '@csstools/postcss-font-format-keywords': 1.0.1(postcss@8.4.47)
-      '@csstools/postcss-hwb-function': 1.0.2(postcss@8.4.47)
-      '@csstools/postcss-ic-unit': 1.0.1(postcss@8.4.47)
-      '@csstools/postcss-is-pseudo-class': 2.0.7(postcss@8.4.47)
-      '@csstools/postcss-nested-calc': 1.0.0(postcss@8.4.47)
-      '@csstools/postcss-normalize-display-values': 1.0.1(postcss@8.4.47)
-      '@csstools/postcss-oklab-function': 1.1.1(postcss@8.4.47)
-      '@csstools/postcss-progressive-custom-properties': 1.3.0(postcss@8.4.47)
-      '@csstools/postcss-stepped-value-functions': 1.0.1(postcss@8.4.47)
-      '@csstools/postcss-text-decoration-shorthand': 1.0.0(postcss@8.4.47)
-      '@csstools/postcss-trigonometric-functions': 1.0.2(postcss@8.4.47)
-      '@csstools/postcss-unset-value': 1.0.2(postcss@8.4.47)
-      autoprefixer: 10.4.19(postcss@8.4.47)
+      '@csstools/postcss-cascade-layers': 1.1.1(postcss@8.4.40)
+      '@csstools/postcss-color-function': 1.1.1(postcss@8.4.40)
+      '@csstools/postcss-font-format-keywords': 1.0.1(postcss@8.4.40)
+      '@csstools/postcss-hwb-function': 1.0.2(postcss@8.4.40)
+      '@csstools/postcss-ic-unit': 1.0.1(postcss@8.4.40)
+      '@csstools/postcss-is-pseudo-class': 2.0.7(postcss@8.4.40)
+      '@csstools/postcss-nested-calc': 1.0.0(postcss@8.4.40)
+      '@csstools/postcss-normalize-display-values': 1.0.1(postcss@8.4.40)
+      '@csstools/postcss-oklab-function': 1.1.1(postcss@8.4.40)
+      '@csstools/postcss-progressive-custom-properties': 1.3.0(postcss@8.4.40)
+      '@csstools/postcss-stepped-value-functions': 1.0.1(postcss@8.4.40)
+      '@csstools/postcss-text-decoration-shorthand': 1.0.0(postcss@8.4.40)
+      '@csstools/postcss-trigonometric-functions': 1.0.2(postcss@8.4.40)
+      '@csstools/postcss-unset-value': 1.0.2(postcss@8.4.40)
+      autoprefixer: 10.4.19(postcss@8.4.40)
       browserslist: 4.24.2
-      css-blank-pseudo: 3.0.3(postcss@8.4.47)
-      css-has-pseudo: 3.0.4(postcss@8.4.47)
-      css-prefers-color-scheme: 6.0.3(postcss@8.4.47)
+      css-blank-pseudo: 3.0.3(postcss@8.4.40)
+      css-has-pseudo: 3.0.4(postcss@8.4.40)
+      css-prefers-color-scheme: 6.0.3(postcss@8.4.40)
       cssdb: 7.6.0
-      postcss: 8.4.47
-      postcss-attribute-case-insensitive: 5.0.2(postcss@8.4.47)
-      postcss-clamp: 4.1.0(postcss@8.4.47)
-      postcss-color-functional-notation: 4.2.4(postcss@8.4.47)
-      postcss-color-hex-alpha: 8.0.4(postcss@8.4.47)
-      postcss-color-rebeccapurple: 7.1.1(postcss@8.4.47)
-      postcss-custom-media: 8.0.2(postcss@8.4.47)
-      postcss-custom-properties: 12.1.11(postcss@8.4.47)
-      postcss-custom-selectors: 6.0.3(postcss@8.4.47)
-      postcss-dir-pseudo-class: 6.0.5(postcss@8.4.47)
-      postcss-double-position-gradients: 3.1.2(postcss@8.4.47)
-      postcss-env-function: 4.0.6(postcss@8.4.47)
-      postcss-focus-visible: 6.0.4(postcss@8.4.47)
-      postcss-focus-within: 5.0.4(postcss@8.4.47)
-      postcss-font-variant: 5.0.0(postcss@8.4.47)
-      postcss-gap-properties: 3.0.5(postcss@8.4.47)
-      postcss-image-set-function: 4.0.7(postcss@8.4.47)
-      postcss-initial: 4.0.1(postcss@8.4.47)
-      postcss-lab-function: 4.2.1(postcss@8.4.47)
-      postcss-logical: 5.0.4(postcss@8.4.47)
-      postcss-media-minmax: 5.0.0(postcss@8.4.47)
-      postcss-nesting: 10.2.0(postcss@8.4.47)
-      postcss-opacity-percentage: 1.1.3(postcss@8.4.47)
-      postcss-overflow-shorthand: 3.0.4(postcss@8.4.47)
-      postcss-page-break: 3.0.4(postcss@8.4.47)
-      postcss-place: 7.0.5(postcss@8.4.47)
-      postcss-pseudo-class-any-link: 7.1.6(postcss@8.4.47)
-      postcss-replace-overflow-wrap: 4.0.0(postcss@8.4.47)
-      postcss-selector-not: 6.0.1(postcss@8.4.47)
+      postcss: 8.4.40
+      postcss-attribute-case-insensitive: 5.0.2(postcss@8.4.40)
+      postcss-clamp: 4.1.0(postcss@8.4.40)
+      postcss-color-functional-notation: 4.2.4(postcss@8.4.40)
+      postcss-color-hex-alpha: 8.0.4(postcss@8.4.40)
+      postcss-color-rebeccapurple: 7.1.1(postcss@8.4.40)
+      postcss-custom-media: 8.0.2(postcss@8.4.40)
+      postcss-custom-properties: 12.1.11(postcss@8.4.40)
+      postcss-custom-selectors: 6.0.3(postcss@8.4.40)
+      postcss-dir-pseudo-class: 6.0.5(postcss@8.4.40)
+      postcss-double-position-gradients: 3.1.2(postcss@8.4.40)
+      postcss-env-function: 4.0.6(postcss@8.4.40)
+      postcss-focus-visible: 6.0.4(postcss@8.4.40)
+      postcss-focus-within: 5.0.4(postcss@8.4.40)
+      postcss-font-variant: 5.0.0(postcss@8.4.40)
+      postcss-gap-properties: 3.0.5(postcss@8.4.40)
+      postcss-image-set-function: 4.0.7(postcss@8.4.40)
+      postcss-initial: 4.0.1(postcss@8.4.40)
+      postcss-lab-function: 4.2.1(postcss@8.4.40)
+      postcss-logical: 5.0.4(postcss@8.4.40)
+      postcss-media-minmax: 5.0.0(postcss@8.4.40)
+      postcss-nesting: 10.2.0(postcss@8.4.40)
+      postcss-opacity-percentage: 1.1.3(postcss@8.4.40)
+      postcss-overflow-shorthand: 3.0.4(postcss@8.4.40)
+      postcss-page-break: 3.0.4(postcss@8.4.40)
+      postcss-place: 7.0.5(postcss@8.4.40)
+      postcss-pseudo-class-any-link: 7.1.6(postcss@8.4.40)
+      postcss-replace-overflow-wrap: 4.0.0(postcss@8.4.40)
+      postcss-selector-not: 6.0.1(postcss@8.4.40)
       postcss-value-parser: 4.2.0
 
-  postcss-pseudo-class-any-link@7.1.6(postcss@8.4.47):
+  postcss-pseudo-class-any-link@7.1.6(postcss@8.4.40):
     dependencies:
+<<<<<<< HEAD
       postcss: 8.4.47
 >>>>>>> 5d2567434 (update lock)
+=======
+      postcss: 8.4.40
+>>>>>>> af8435080 (update lockfile)
       postcss-selector-parser: 6.0.13
 
   postcss-reduce-initial@5.1.2(postcss@8.4.49):
@@ -35928,6 +36880,7 @@ snapshots:
       postcss-value-parser: 4.2.0
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   postcss-replace-overflow-wrap@4.0.0(postcss@8.4.49):
     dependencies:
       postcss: 8.4.49
@@ -35937,13 +36890,20 @@ snapshots:
       postcss: 8.4.49
 =======
   postcss-replace-overflow-wrap@4.0.0(postcss@8.4.47):
+=======
+  postcss-replace-overflow-wrap@4.0.0(postcss@8.4.40):
+>>>>>>> af8435080 (update lockfile)
     dependencies:
-      postcss: 8.4.47
+      postcss: 8.4.40
 
-  postcss-selector-not@6.0.1(postcss@8.4.47):
+  postcss-selector-not@6.0.1(postcss@8.4.40):
     dependencies:
+<<<<<<< HEAD
       postcss: 8.4.47
 >>>>>>> 5d2567434 (update lock)
+=======
+      postcss: 8.4.40
+>>>>>>> af8435080 (update lockfile)
       postcss-selector-parser: 6.0.13
 
   postcss-selector-parser@6.0.13:
@@ -36061,11 +37021,17 @@ snapshots:
       ansi-styles: 5.2.0
       react-is: 18.2.0
 
+<<<<<<< HEAD
   prisma@5.20.0:
     dependencies:
       '@prisma/engines': 5.20.0
     optionalDependencies:
       fsevents: 2.3.3
+=======
+  prisma@5.13.0:
+    dependencies:
+      '@prisma/engines': 5.13.0
+>>>>>>> af8435080 (update lockfile)
     optional: true
 
   proc-log@3.0.0: {}
@@ -36301,13 +37267,17 @@ snapshots:
 
   react-dev-utils@12.0.1(eslint@8.57.0)(typescript@5.6.2)(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0)):
     dependencies:
-      '@babel/code-frame': 7.26.2
+      '@babel/code-frame': 7.24.7
       address: 1.2.2
+<<<<<<< HEAD
 <<<<<<< HEAD
       browserslist: 4.23.3
 =======
       browserslist: 4.24.2
 >>>>>>> 5d2567434 (update lock)
+=======
+      browserslist: 4.23.2
+>>>>>>> af8435080 (update lockfile)
       chalk: 4.1.2
       cross-spawn: 7.0.6
       detect-port-alt: 1.1.6
@@ -36489,10 +37459,17 @@ snapshots:
       '@remix-run/router': 1.7.2
       react: 18.3.1
 
+<<<<<<< HEAD
   react-scripts@5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.22.5(@babel/core@7.24.9))(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/babel__core@7.20.5)(bufferutil@4.0.8)(esbuild@0.24.0)(eslint@8.57.0)(node-notifier@8.0.2)(react@18.3.1)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(utf-8-validate@5.0.10):
     dependencies:
       '@babel/core': 7.24.9
       '@pmmmwh/react-refresh-webpack-plugin': 0.5.10(react-refresh@0.11.0)(type-fest@2.19.0)(webpack-dev-server@4.15.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0)))(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0))
+=======
+  react-scripts@5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.25.9(@babel/core@7.24.9))(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0))(bufferutil@4.0.8)(esbuild@0.24.0)(eslint@8.57.0)(node-notifier@8.0.2)(react@18.3.1)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(utf-8-validate@5.0.10):
+    dependencies:
+      '@babel/core': 7.24.9
+      '@pmmmwh/react-refresh-webpack-plugin': 0.5.10(@types/webpack@5.28.5(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0))(react-refresh@0.11.0)(type-fest@2.19.0)(webpack-dev-server@4.15.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)(webpack@5.88.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0)))(webpack@5.88.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0))
+>>>>>>> af8435080 (update lockfile)
       '@svgr/webpack': 5.5.0
       babel-jest: 27.5.1(@babel/core@7.24.9)
       babel-loader: 8.3.0(@babel/core@7.24.9)(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0))
@@ -36500,10 +37477,14 @@ snapshots:
       babel-preset-react-app: 10.0.1
       bfj: 7.0.2
 <<<<<<< HEAD
+<<<<<<< HEAD
       browserslist: 4.23.3
 =======
       browserslist: 4.24.2
 >>>>>>> 5d2567434 (update lock)
+=======
+      browserslist: 4.23.2
+>>>>>>> af8435080 (update lockfile)
       camelcase: 6.3.0
       case-sensitive-paths-webpack-plugin: 2.4.0
       css-loader: 6.8.1(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0))
@@ -36511,9 +37492,15 @@ snapshots:
       dotenv: 10.0.0
       dotenv-expand: 5.1.0
       eslint: 8.57.0
+<<<<<<< HEAD
       eslint-config-react-app: 7.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.22.5(@babel/core@7.24.9))(eslint@8.57.0)(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2)
       eslint-webpack-plugin: 3.2.0(eslint@8.57.0)(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0))
       file-loader: 6.2.0(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0))
+=======
+      eslint-config-react-app: 7.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.25.9(@babel/core@7.24.9))(eslint@8.57.0)(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2)
+      eslint-webpack-plugin: 3.2.0(eslint@8.57.0)(webpack@5.88.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0))
+      file-loader: 6.2.0(webpack@5.88.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0))
+>>>>>>> af8435080 (update lockfile)
       fs-extra: 10.1.0
       html-webpack-plugin: 5.5.3(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0))
       identity-obj-proxy: 3.0.0
@@ -36579,10 +37566,10 @@ snapshots:
       - webpack-hot-middleware
       - webpack-plugin-serve
 
-  react-scripts@5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.22.5(@babel/core@7.24.9))(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/babel__core@7.20.5)(bufferutil@4.0.8)(esbuild@0.24.0)(eslint@9.16.0(jiti@1.21.0))(node-notifier@8.0.2)(react@18.3.1)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(utf-8-validate@5.0.10):
+  react-scripts@5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.25.9(@babel/core@7.24.9))(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0))(bufferutil@4.0.8)(esbuild@0.24.0)(eslint@9.16.0(jiti@1.21.0))(node-notifier@8.0.2)(react@18.3.1)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(utf-8-validate@5.0.10):
     dependencies:
       '@babel/core': 7.24.9
-      '@pmmmwh/react-refresh-webpack-plugin': 0.5.10(react-refresh@0.11.0)(type-fest@2.19.0)(webpack-dev-server@4.15.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0)))(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0))
+      '@pmmmwh/react-refresh-webpack-plugin': 0.5.10(@types/webpack@5.28.5(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0))(react-refresh@0.11.0)(type-fest@2.19.0)(webpack-dev-server@4.15.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0)))(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0))
       '@svgr/webpack': 5.5.0
       babel-jest: 27.5.1(@babel/core@7.24.9)
       babel-loader: 8.3.0(@babel/core@7.24.9)(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0))
@@ -36597,7 +37584,7 @@ snapshots:
       dotenv: 10.0.0
       dotenv-expand: 5.1.0
       eslint: 9.16.0(jiti@1.21.0)
-      eslint-config-react-app: 7.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.22.5(@babel/core@7.24.9))(eslint@9.16.0(jiti@1.21.0))(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2)
+      eslint-config-react-app: 7.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.25.9(@babel/core@7.24.9))(eslint@9.16.0(jiti@1.21.0))(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2)
       eslint-webpack-plugin: 3.2.0(eslint@9.16.0(jiti@1.21.0))(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0))
       file-loader: 6.2.0(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0))
       fs-extra: 10.1.0
@@ -37175,26 +38162,6 @@ snapshots:
       ethers: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       ethers-eip712: 0.2.0(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))
       hardhat: 2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@22.7.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
-      merkletreejs: 0.3.11
-      seaport-core: https://codeload.github.com/immutable/seaport-core/tar.gz/0633350ec34f21fcede657ff812f11cf7d19144e
-      seaport-sol: 1.6.0
-      seaport-types: 0.0.1
-      solady: 0.0.84
-    transitivePeerDependencies:
-      - bufferutil
-      - c-kzg
-      - supports-color
-      - ts-node
-      - typescript
-      - utf-8-validate
-
-  seaport@https://codeload.github.com/immutable/seaport/tar.gz/ae061dc008105dd8d05937df9ad9a676f878cbf9(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.5))(@types/node@22.7.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10):
-    dependencies:
-      '@nomicfoundation/hardhat-network-helpers': 1.0.11(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.5))(@types/node@22.7.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
-      '@openzeppelin/contracts': 4.9.3
-      ethers: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      ethers-eip712: 0.2.0(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))
-      hardhat: 2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.3.70(@swc/helpers@0.5.5))(@types/node@22.7.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
       merkletreejs: 0.3.11
       seaport-core: https://codeload.github.com/immutable/seaport-core/tar.gz/0633350ec34f21fcede657ff812f11cf7d19144e
       seaport-sol: 1.6.0
@@ -38236,6 +39203,47 @@ snapshots:
       ansi-escapes: 4.3.2
       supports-hyperlinks: 2.3.0
 
+<<<<<<< HEAD
+=======
+  terser-webpack-plugin@5.3.10(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0)(webpack@5.96.1(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0)):
+    dependencies:
+      '@jridgewell/trace-mapping': 0.3.25
+      jest-worker: 27.5.1
+      schema-utils: 3.3.0
+      serialize-javascript: 6.0.2
+      terser: 5.34.1
+      webpack: 5.96.1(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0)
+    optionalDependencies:
+      '@swc/core': 1.3.70(@swc/helpers@0.5.13)
+      esbuild: 0.24.0
+    optional: true
+
+  terser-webpack-plugin@5.3.10(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0)(webpack@5.96.1(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0)):
+    dependencies:
+      '@jridgewell/trace-mapping': 0.3.25
+      jest-worker: 27.5.1
+      schema-utils: 3.3.0
+      serialize-javascript: 6.0.2
+      terser: 5.34.1
+      webpack: 5.96.1(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0)
+    optionalDependencies:
+      '@swc/core': 1.9.3(@swc/helpers@0.5.13)
+      esbuild: 0.24.0
+    optional: true
+
+  terser-webpack-plugin@5.3.9(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0)(webpack@5.88.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0)):
+    dependencies:
+      '@jridgewell/trace-mapping': 0.3.25
+      jest-worker: 27.5.1
+      schema-utils: 3.3.0
+      serialize-javascript: 6.0.2
+      terser: 5.34.1
+      webpack: 5.88.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0)
+    optionalDependencies:
+      '@swc/core': 1.3.70(@swc/helpers@0.5.13)
+      esbuild: 0.24.0
+
+>>>>>>> af8435080 (update lockfile)
   terser-webpack-plugin@5.3.9(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0)(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
@@ -39525,6 +40533,7 @@ snapshots:
 
   webpack-sources@3.2.3: {}
 
+<<<<<<< HEAD
   webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0):
     dependencies:
       '@types/eslint-scope': 3.7.4
@@ -39535,6 +40544,49 @@ snapshots:
       acorn: 8.14.0
       acorn-import-assertions: 1.9.0(acorn@8.14.0)
       browserslist: 4.23.3
+=======
+  webpack@5.88.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0):
+    dependencies:
+      '@types/eslint-scope': 3.7.4
+      '@types/estree': 1.0.5
+      '@webassemblyjs/ast': 1.14.1
+      '@webassemblyjs/wasm-edit': 1.14.1
+      '@webassemblyjs/wasm-parser': 1.14.1
+      acorn: 8.12.1
+      acorn-import-assertions: 1.9.0(acorn@8.12.1)
+      browserslist: 4.23.2
+      chrome-trace-event: 1.0.3
+      enhanced-resolve: 5.15.0
+      es-module-lexer: 1.3.0
+      eslint-scope: 5.1.1
+      events: 3.3.0
+      glob-to-regexp: 0.4.1
+      graceful-fs: 4.2.11
+      json-parse-even-better-errors: 2.3.1
+      loader-runner: 4.3.0
+      mime-types: 2.1.35
+      neo-async: 2.6.2
+      schema-utils: 3.3.0
+      tapable: 2.2.1
+      terser-webpack-plugin: 5.3.9(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0)(webpack@5.88.2(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0))
+      watchpack: 2.4.2
+      webpack-sources: 3.2.3
+    transitivePeerDependencies:
+      - '@swc/core'
+      - esbuild
+      - uglify-js
+
+  webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0):
+    dependencies:
+      '@types/eslint-scope': 3.7.4
+      '@types/estree': 1.0.5
+      '@webassemblyjs/ast': 1.14.1
+      '@webassemblyjs/wasm-edit': 1.14.1
+      '@webassemblyjs/wasm-parser': 1.14.1
+      acorn: 8.12.1
+      acorn-import-assertions: 1.9.0(acorn@8.12.1)
+      browserslist: 4.23.2
+>>>>>>> af8435080 (update lockfile)
       chrome-trace-event: 1.0.3
       enhanced-resolve: 5.15.0
       es-module-lexer: 1.3.0
@@ -39549,14 +40601,14 @@ snapshots:
       schema-utils: 3.3.0
       tapable: 2.2.1
       terser-webpack-plugin: 5.3.9(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0)(webpack@5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0))
-      watchpack: 2.4.0
+      watchpack: 2.4.2
       webpack-sources: 3.2.3
     transitivePeerDependencies:
       - '@swc/core'
       - esbuild
       - uglify-js
 
-  webpack@5.96.1(@swc/core@1.3.70(@swc/helpers@0.5.5)):
+  webpack@5.96.1(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0):
     dependencies:
       '@types/eslint-scope': 3.7.7
       '@types/estree': 1.0.6
@@ -39578,7 +40630,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 3.3.0
       tapable: 2.2.1
-      terser-webpack-plugin: 5.3.10(@swc/core@1.3.70(@swc/helpers@0.5.5))(webpack@5.96.1(@swc/core@1.3.70(@swc/helpers@0.5.5)))
+      terser-webpack-plugin: 5.3.10(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0)(webpack@5.96.1(@swc/core@1.3.70(@swc/helpers@0.5.13))(esbuild@0.24.0))
       watchpack: 2.4.2
       webpack-sources: 3.2.3
     transitivePeerDependencies:
@@ -39587,7 +40639,7 @@ snapshots:
       - uglify-js
     optional: true
 
-  webpack@5.96.1(@swc/core@1.3.70(@swc/helpers@0.5.5))(esbuild@0.23.1):
+  webpack@5.96.1(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0):
     dependencies:
       '@types/eslint-scope': 3.7.7
       '@types/estree': 1.0.6
@@ -39609,13 +40661,14 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 3.3.0
       tapable: 2.2.1
-      terser-webpack-plugin: 5.3.10(@swc/core@1.3.70(@swc/helpers@0.5.5))(esbuild@0.23.1)(webpack@5.96.1(@swc/core@1.3.70(@swc/helpers@0.5.5))(esbuild@0.23.1))
+      terser-webpack-plugin: 5.3.10(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0)(webpack@5.96.1(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.24.0))
       watchpack: 2.4.2
       webpack-sources: 3.2.3
     transitivePeerDependencies:
       - '@swc/core'
       - esbuild
       - uglify-js
+    optional: true
 
   websocket-driver@0.7.4:
     dependencies:
