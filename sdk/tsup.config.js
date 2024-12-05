@@ -18,43 +18,27 @@ export default defineConfig((options) => {
   }
   
   return [
-    // Node Bundle for CommonJS and ESM
+    // Node & Browser Bundle for ESM
+    {
+      entry: ['src'],
+      outDir: 'dist',
+      format: 'esm',
+      target: 'es2022',
+      bundle: false,
+      treeshake: true,
+      minify: false,
+    },
+
+    // Node Bundle for CJS
     {
       entry: ['src', '!src/index.browser.ts'],
       outDir: 'dist',
       platform: 'node',
-      format: ['esm', 'cjs'],
+      format: 'cjs',
       target: 'es2022',
-      bundle: false,
+      bundle: true,
+      treeshake: true,
       minify: false,
-      esbuildPlugins: [
-        replace({ 
-          '__SDK_VERSION__': pkg.version, 
-        })
-      ]
-    },
-
-    // Browser Bundle for ESM
-    {
-      entry: ['src/index.browser.ts'],
-      outDir: 'dist',
-      platform: 'browser',
-      format: 'esm',
-      target: 'es2022',
-      bundle: false,
-      minify: false,
-      esbuildPlugins: [
-        nodeModulesPolyfillPlugin({
-          globals: {
-            Buffer: true,
-            process: true,
-          },
-          modules: ['crypto', 'buffer', 'process', 'http']
-        }),
-        replace({ 
-          '__SDK_VERSION__': pkg.version, 
-        })
-      ]
     },
 
     // Browser Bundle for CDN

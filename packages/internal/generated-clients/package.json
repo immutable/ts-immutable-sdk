@@ -46,7 +46,7 @@
   "scripts": {
     "build": "pnpm transpile && pnpm typegen",
     "transpile": "tsup src/index.ts --config ../../../tsup.config.js",
-    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",    
+    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
     "test": "jest",
     "test:watch": "jest --watch",
     "typecheck": "tsc --customConditions default --noEmit --jsx preserve",
