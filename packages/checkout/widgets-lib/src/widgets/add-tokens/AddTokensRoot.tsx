@@ -93,6 +93,7 @@ export class AddTokens extends Base<WidgetType.ADD_TOKENS> {
                     showSwapOption={this.parameters.showSwapOption}
                     showOnrampOption={this.parameters.showOnrampOption}
                     showBackButton={this.parameters.showBackButton}
+                    experiments={this.parameters.experiments}
                   />
                 </Suspense>
               </ProvidersContextProvider>
