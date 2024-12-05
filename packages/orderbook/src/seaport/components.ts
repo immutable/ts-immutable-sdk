@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers';
+import { toBeHex } from 'ethers-v6';
 import type {
   ConsiderationItem,
   OfferItem,
@@ -55,7 +55,7 @@ export function getOrderComponentsFromMessage(
   return {
     ...message,
     orderType: orderTypeStringToEnum(message.orderType),
-    salt: BigNumber.from(message.salt).toHexString(),
+    salt: toBeHex(BigInt(message.salt)),
     offer: message.offer.map(
       (i): OfferItem => ({
         ...i,
@@ -85,7 +85,7 @@ export function getBulkOrderComponentsFromMessage(orderMessage: string): {
     .map((orderComponentMessage): OrderComponents => ({
       ...orderComponentMessage,
       orderType: orderTypeStringToEnum(orderComponentMessage.orderType),
-      salt: BigNumber.from(orderComponentMessage.salt).toHexString(),
+      salt: toBeHex(BigInt(orderComponentMessage.salt)),
       offer: orderComponentMessage.offer.map(
         (i): OfferItem => ({
           ...i,
