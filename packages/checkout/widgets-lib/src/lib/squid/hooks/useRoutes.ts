@@ -279,15 +279,26 @@ export const useRoutes = () => {
     balances: TokenBalance[],
     fromAmountArrayBatch: AmountData[],
   ): Promise<RouteData[]> => {
-    const calculateSourceGasCost = (
+    const getGasCost = (
       route: RouteResponseData,
       chainId: string | number,
-    ) => route.route?.route.estimate.gasCosts
-      .filter((gasCost) => gasCost.token.chainId === chainId.toString())
-      .reduce(
-        (sum, gasCost) => sum + parseFloat(utils.formatUnits(gasCost.amount, gasCost.token.decimals)),
-        0,
-      );
+    ) => {
+      const gasCosts = route.route?.route.estimate.gasCosts
+        .filter((gasCost) => gasCost.token.chainId === chainId.toString())
+        .reduce(
+          (sum, gasCost) => sum + parseFloat(utils.formatUnits(gasCost.amount, gasCost.token.decimals)),
+          0,
+        );
+
+      const receiverFee = route.route?.route.estimate.feeCosts
+        .filter((fee) => fee.token.chainId === chainId.toString() && fee.description === 'Gas receiver fee')
+        .reduce(
+          (sum, fee) => sum + parseFloat(utils.formatUnits(fee.amount, fee.token.decimals)),
+          0,
+        );
+
+      return (gasCosts || 0) + (receiverFee || 0);
+    };
 
     // Find user's native gas balance on a chain
     const findUserGasBalance = (chainId: string | number) => balances.find(
@@ -322,16 +333,16 @@ export const useRoutes = () => {
 
         if (!routeResponse?.route) return null;
 
-        const sourceGasCost = calculateSourceGasCost(routeResponse, data.balance.chainId);
+        const gasCost = getGasCost(routeResponse, data.balance.chainId);
         const userGasBalance = findUserGasBalance(data.balance.chainId);
 
         console.log('=== userGasBalance', userGasBalance);
-        console.log('=== sourceGasCost', sourceGasCost);
+        console.log('=== sourceGasCost', gasCost);
 
-        if (!userGasBalance || !hasSufficientGas(userGasBalance, sourceGasCost)) {
+        if (!userGasBalance || !hasSufficientGas(userGasBalance, gasCost)) {
           console.warn('Insufficient native gas balance for transaction on source chain');
           console.log('=== userGasBalance', userGasBalance);
-          console.log('=== sourceGasCost', sourceGasCost);
+          console.log('=== sourceGasCost', gasCost);
           console.log('=== data.balance.chainId', data.balance.chainId);
           return null;
         }
