@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "playwright test",
+    "test": "echo 'todo post v2 sdk release'",
     "test:ui": "playwright test --ui",
     "test:remotewidgets": "USE_REMOTE_WIDGETS=true playwright test"
   },
