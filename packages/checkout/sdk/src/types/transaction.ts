@@ -3,7 +3,7 @@ import { WrappedBrowserProvider } from './provider';
 
 /**
  * Interface representing the parameters for {@link Checkout.sendTransaction}.
- * @property {BrowserProvider} provider - The provider to connect to the network.
+ * @property {WrappedBrowserProvider | Eip1193Provider} provider - The provider to connect to the network.
  * @property {TransactionRequest} transaction - The transaction to send.
  */
 export interface SendTransactionParams {

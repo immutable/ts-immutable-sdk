@@ -14,7 +14,7 @@ export enum WalletEventType {
  * Represents an event that is triggered when the user switches the network in their wallet.
  * @property {string} network
  * @property {number} chainId
- * @property {BrowserProvider} provider
+ * @property {WrappedBrowserProvider} provider
  */
 export type WalletNetworkSwitch = {
   /**  The name of the network that the user switched to. */

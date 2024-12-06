@@ -358,7 +358,7 @@ export type ERC1155SellToken = {
 
 /**
  * Interface representing the parameters for {@link Checkout.smartCheckout}
- * @property {BrowserProvider} provider
+ * @property {WrappedBrowserProvider | Eip1193Provider} provider
  * @property {ItemRequirement[]} itemRequirements
  * @property {FulfillmentTransaction | GasAmount} transactionOrGasAmount
  */
@@ -438,7 +438,7 @@ export type ERC721ItemRequirement = {
  * @property {string} contractAddress
  * @property {string} id
  * @property {string} spenderAddress
- * @property {BigNumber} amount
+ * @property {bigint} amount
  */
 export type ERC1155ItemRequirement = {
   /** The type to indicate this is a ERC1155 item requirement. */
@@ -477,7 +477,7 @@ export enum ItemType {
 /**
  * Represents a native item.
  * @property {ItemType} type
- * @property {BigNumber} amount
+ * @property {bigint} amount
  */
 export type NativeItem = {
   /** The type indicate this is a native item. */
@@ -532,7 +532,7 @@ export type ERC721Item = {
  * @property {string} contractAddress
  * @property {string} id
  * @property {string} spenderAddress
- * @property {string} amount
+ * @property {bigint} amount
  */
 export type ERC1155Item = {
   /** The type to indicate this is a ERC1155 item requirement. */
@@ -601,7 +601,7 @@ export enum GasTokenType {
 /**
  * Represents a native gas token.
  * @property {GasTokenType} type
- * @property {BigNumber} limit
+ * @property {bigint} limit
  */
 export type NativeGas = {
   /** The type to indicate this is a native gas token. */
@@ -614,7 +614,7 @@ export type NativeGas = {
  * Represents an ERC20 gas token.
  * @property {GasTokenType} type
  * @property {string} tokenAddress
- * @property {BigNumber} limit
+ * @property {bigint} limit
  */
 export type ERC20Gas = {
   /** The type to indicate this is an ERC20 gas token. */
@@ -739,7 +739,7 @@ export type FundingRoute = {
 
 /**
  * Represents a fee
- * @property {BigNumber} amount
+ * @property {bigint} amount
  * @property {string} formatted
  * @property {TokenInfo | undefined} token
  */
@@ -893,7 +893,7 @@ export type FundingItem = {
 
 /**
  * Represents the funds required of a funding item
- * @property {BigNumber} amount
+ * @property {bigint} amount
  * @property {string} formattedAmount
  */
 export type FundsRequired = {
@@ -905,7 +905,7 @@ export type FundsRequired = {
 
 /**
  * Represents the user balance of a funding item
- * @property {BigNumber} balance
+ * @property {bigint} balance
  * @property {string} formattedBalance
  */
 export type UserBalance = {
@@ -941,7 +941,7 @@ export type TransactionRequirement = {
 /**
  * Represents the balance for either a native or ERC20 token.
  * @property {ItemType.NATIVE | ItemType.ERC20} type
- * @property {BigNumber} balance
+ * @property {bigint} balance
  * @property {string} formattedBalance
  * @property {TokenInfo} token
  */
@@ -959,7 +959,7 @@ export type TokenBalance = {
 /**
  * Represents the balance for an ERC721.
  * @property {ItemType.ERC721} type
- * @property {BigNumber} balance
+ * @property {bigint} balance
  * @property {string} formattedBalance
  * @property {string} contractAddress
  * @property {string} id
@@ -984,7 +984,7 @@ export type ItemBalance = ERC721Balance | TokenBalance;
 
 /**
  * Represents the delta between two balances.
- * @property {BigNumber} balance
+ * @property {bigint} balance
  * @property {string} formattedBalance
  */
 export type BalanceDelta = {

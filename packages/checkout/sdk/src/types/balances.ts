@@ -5,7 +5,7 @@ import { WrappedBrowserProvider } from './provider';
 
 /**
  * Interface representing the parameters for {@link Checkout.getBalance}.
- * @property {BrowserProvider} provider - The provider used to get the balance.
+ * @property {WrappedBrowserProvider} provider - The provider used to get the balance.
  * @property {string} walletAddress - The wallet address.
  * @property {string | undefined} tokenAddress - The contract address of the token.
  */
@@ -29,7 +29,8 @@ export interface GetBalanceResult {
 
 /**
  * Interface representing the parameters for {@link Checkout.getAllBalances}.
- * @property {BrowserProvider} provider - The provider used to get the balances, it is a required parameter if no walletAddress is provided.
+ * @property {WrappedBrowserProvider} provider - The provider used to get the balances, it is a required parameter
+ * if no walletAddress is provided.
  * @property {string} walletAddress - The wallet address, it is a required parameter if no provider is provided.
  * @property {ChainId} chainId - The ID of the network.
  */

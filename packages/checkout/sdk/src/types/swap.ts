@@ -5,7 +5,7 @@ import { WrappedBrowserProvider } from './provider';
 
 /**
  * Interface representing the parameters for {@link Checkout.swap}.
- * @property {BrowserProvider} provider - The provider used to get the wallet address.
+ * @property {WrappedBrowserProvider | Eip1193Provider} provider - The provider used to get the wallet address.
  * @property {TokenInfo} fromToken - The token to swap from.
  * @property {TokenInfo} toToken - The token to swap to.
  * @property {string | undefined} fromAmount - The amount to swap from.
@@ -42,7 +42,7 @@ export interface SwapQuoteResult {
  * Interface representing the result of {@link Checkout.swap}.
  * @property {TransactionDetails} swap - The swap transaction details.
  * @property {Quote} quote - The quote for the swap.
- * @property {TransactionReceipt} swapReceipt - The receipt of the swap transaction.
+ * @property {TransactionReceipt | null} swapReceipt - The receipt of the swap transaction.
  */
 export interface SwapResult {
   swap: TransactionDetails;

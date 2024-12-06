@@ -34,7 +34,6 @@ export const setTransactionGasLimits = async (
   const rawTx = transaction;
 
   const { chainId } = await browserProvider.getNetwork();
-
   if (!isZkEvmChainId(Number(chainId))) return rawTx;
   if (typeof rawTx.gasPrice !== 'undefined') return rawTx;
   if (isGasFree(browserProvider)) {

@@ -16,7 +16,7 @@ export interface AddNetworkParams {
 
 /**
  * Interface representing the parameters for {@link Checkout.switchNetwork}.
- * @property {BrowserProvider} provider - The provider to connect to the network.
+ * @property {WrappedBrowserProvider | Eip1193Provider} provider - The provider to connect to the network.
  * @property {ChainId} chainId - The ID of the network to switch to.
  */
 export interface SwitchNetworkParams {
@@ -28,7 +28,7 @@ export interface SwitchNetworkParams {
  * Represents the result of switching the network in a Web3 application {@link Checkout.switchNetwork}.
  * @interface SwitchNetworkResult
  * @property {NetworkInfo} network - The information about the switched network.
- * @property {BrowserProvider} provider - The Web3 provider for the switched network.
+ * @property {WrappedBrowserProvider} provider - The Web3 provider for the switched network.
  */
 export interface SwitchNetworkResult {
   network: NetworkInfo;

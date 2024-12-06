@@ -139,6 +139,7 @@ export function TransactionItemWithdrawPending({
             pr: 'base.spacing.x10',
           },
           borderTopRightRadius: '0',
+          borderTopLeftRadius: '0',
         }}
         onExpandChange={
           (expanded) => expanded
