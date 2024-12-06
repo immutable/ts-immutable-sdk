@@ -1,15 +1,13 @@
-import { Checkout } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
+import { Checkout, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
 import { Body, Box, FormControl, TextInput } from '@biom3/react';
 import { OrderStatusName, Orderbook } from '@imtbl/orderbook';
-import { Environment } from '@imtbl/config';
 
 interface ListingsProps {
   checkout: Checkout;
-  provider: Web3Provider | undefined;
+  provider: WrappedBrowserProvider | undefined;
 }
 
 export default function Listings({ checkout, provider }: ListingsProps) {
@@ -18,7 +16,7 @@ export default function Listings({ checkout, provider }: ListingsProps) {
 
   const [listingId, setListingId] = useState<string>('');
   const [listingIdError, setListingIdError] = useState<any>(null);
-  
+
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 

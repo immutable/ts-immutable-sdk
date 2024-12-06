@@ -109,7 +109,7 @@ export const useQuoteOrder = ({
         const products = items.map(({ productId: id, qty }) => ({ id, qty }));
         params.append('products', btoa(JSON.stringify(products)));
 
-        const signer = provider.getSigner();
+        const signer = await provider.getSigner();
         const address = await signer.getAddress();
         params.append('wallet_address', address);
 

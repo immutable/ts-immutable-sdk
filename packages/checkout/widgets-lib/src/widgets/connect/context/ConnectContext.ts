@@ -1,11 +1,12 @@
-import { Web3Provider } from '@ethersproject/providers';
 import { createContext } from 'react';
-import { Checkout, EIP6963ProviderInfo, WalletProviderName } from '@imtbl/checkout-sdk';
+import {
+  Checkout, EIP6963ProviderInfo, WrappedBrowserProvider, WalletProviderName,
+} from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 
 export interface ConnectState {
   checkout: Checkout | null;
-  provider: Web3Provider | null;
+  provider: WrappedBrowserProvider | null;
   passport: Passport | undefined;
   walletProviderName: WalletProviderName | null;
   walletProviderInfo: EIP6963ProviderInfo | null;
@@ -52,7 +53,7 @@ export interface SetCheckoutPayload {
 
 export interface SetProviderPayload {
   type: ConnectActions.SET_PROVIDER;
-  provider: Web3Provider;
+  provider: WrappedBrowserProvider;
 }
 
 export interface SetPassportPayload {

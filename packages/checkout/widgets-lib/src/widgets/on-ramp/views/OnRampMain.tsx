@@ -31,6 +31,7 @@ import { ConnectLoaderContext } from '../../../context/connect-loader-context/Co
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { TRANSAK_ORIGIN } from '../../../components/Transak/useTransakEvents';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
+import { isPassportProvider } from '../../../lib/provider';
 
 const transakIframeId = 'transak-iframe';
 const IN_PROGRESS_VIEW_DELAY_MS = 6000; // 6 second
@@ -60,12 +61,12 @@ export function OnRampMain({
 
   const eventTimer = useRef<number | undefined>();
 
-  const isPassport = !!passport && (provider?.provider as any)?.isPassport;
+  const isPassport = !!passport && isPassportProvider(provider);
 
   const openedFromTopUpView = useMemo(
     () => viewState.history.length > 2
       && viewState.history[viewState.history.length - 2].type
-        === SharedViews.TOP_UP_VIEW,
+       === SharedViews.TOP_UP_VIEW,
     [viewState.history],
   );
 
@@ -228,7 +229,7 @@ export function OnRampMain({
     let userWalletAddress = '';
 
     (async () => {
-      const walletAddress = await provider.getSigner().getAddress();
+      const walletAddress = await (await provider.getSigner()).getAddress();
 
       const assessment = await fetchRiskAssessment([walletAddress], checkout.config);
 
@@ -248,14 +249,14 @@ export function OnRampMain({
 
       const params = {
         exchangeType: ExchangeType.ONRAMP,
-        web3Provider: provider,
+        browserProvider: provider,
         tokenAddress,
         tokenAmount,
         passport,
       };
 
       setWidgetUrl(await checkout.createFiatRampUrl(params));
-      userWalletAddress = await provider!.getSigner().getAddress();
+      userWalletAddress = await (await provider!.getSigner()).getAddress();
     })();
 
     const domIframe: HTMLIFrameElement = document.getElementById(

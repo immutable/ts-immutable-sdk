@@ -6,10 +6,9 @@ import {
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { WalletProviderName } from '@imtbl/checkout-sdk';
-import { BigNumber } from 'ethers';
+import { getGasPriceInWei, WalletProviderName } from '@imtbl/checkout-sdk';
 import { FlowRateWithdrawResponse } from '@imtbl/bridge-sdk';
-import { FeeData } from '@ethersproject/providers';
+import { FeeData } from 'ethers';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { Transaction } from '../../../lib/clients';
 import { getChainNameById } from '../../../lib/chains';
@@ -87,7 +86,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
   }, [tokenBridge, transaction]);
 
   const handleWithdrawalClaimClick = useCallback(async ({ forceChangeAccount }: { forceChangeAccount: boolean }) => {
-    if (!checkout || !tokenBridge || !from?.web3Provider || !withdrawalResponse) return;
+    if (!checkout || !tokenBridge || !from?.browserProvider || !withdrawalResponse) return;
 
     if (!withdrawalResponse.pendingWithdrawal.canWithdraw || !withdrawalResponse.unsignedTx) {
       // eslint-disable-next-line max-len, no-console
@@ -95,12 +94,12 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
       return;
     }
 
-    let providerToUse = from?.web3Provider;
+    let providerToUse = from?.browserProvider;
     const l1ChainId = getL1ChainId(checkout.config);
 
     setTxProcessing(true);
 
-    if (isPassportProvider(from?.web3Provider) || forceChangeAccount) {
+    if (isPassportProvider(from?.browserProvider) || forceChangeAccount) {
       // user should switch to MetaMask
       try {
         const createProviderResult = await checkout.createProvider({ walletProviderName: WalletProviderName.METAMASK });
@@ -125,13 +124,13 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
      * don't block the transaction from being submitted.
      */
 
-    let gasEstimate: BigNumber;
-    let ethGasCostWei: BigNumber | null = null;
+    let gasEstimate: bigint;
+    let ethGasCostWei: bigint | null = null;
     try {
       try {
         gasEstimate = await providerToUse.estimateGas(withdrawalResponse.unsignedTx);
       } catch (err) {
-        gasEstimate = BigNumber.from(WITHDRAWAL_CLAIM_GAS_LIMIT);
+        gasEstimate = BigInt(WITHDRAWAL_CLAIM_GAS_LIMIT);
       }
 
       let feeData: FeeData | null = null;
@@ -142,14 +141,10 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
         console.log(err);
       }
 
-      let gasPriceInWei: BigNumber | null = null;
-      if (feeData && feeData.lastBaseFeePerGas && feeData.maxPriorityFeePerGas) {
-        gasPriceInWei = feeData.lastBaseFeePerGas.add(feeData.maxPriorityFeePerGas);
-      } else if (feeData && feeData.gasPrice) {
-        gasPriceInWei = feeData.gasPrice;
-      }
+      let gasPriceInWei: bigint | null = null;
+      if (feeData) gasPriceInWei = getGasPriceInWei(feeData);
       if (gasPriceInWei) {
-        ethGasCostWei = gasEstimate.mul(gasPriceInWei);
+        ethGasCostWei = gasEstimate * gasPriceInWei;
       }
     } catch (err) {
       // eslint-disable-next-line no-console
@@ -165,7 +160,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
 
       const ethBalance = balancesResult.balances.find((balance) => isNativeToken(balance.token.address));
 
-      if (!ethBalance || ethBalance.balance.lt(ethGasCostWei!)) {
+      if (!ethBalance || (ethBalance.balance < ethGasCostWei!)) {
         setShowNotEnoughEthDrawer(true);
         setTxProcessing(false);
         return;
@@ -178,7 +173,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
     // check that provider is connected to L1
     const network = await providerToUse.getNetwork();
 
-    if (network.chainId !== l1ChainId) {
+    if (Number(network.chainId) !== l1ChainId) {
       try {
         const switchNetworkResult = await checkout.switchNetwork({
           provider: providerToUse,

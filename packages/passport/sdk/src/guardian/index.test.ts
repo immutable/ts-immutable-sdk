@@ -1,6 +1,6 @@
 import * as GeneratedClients from '@imtbl/generated-clients';
-import { TransactionRequest } from '@ethersproject/providers';
 import { ImmutableConfiguration } from '@imtbl/config';
+import { TransactionRequest } from 'ethers';
 import { ConfirmationScreen } from '../confirmation';
 import AuthManager from '../authManager';
 import GuardianClient from './index';
@@ -176,7 +176,7 @@ describe('Guardian', () => {
       ).rejects.toThrow(
         new JsonRpcError(
           RpcErrorCode.PARSE_ERROR,
-          'Transaction failed to parsing: invalid BigNumber string (argument="value", value="0x", code=INVALID_ARGUMENT, version=bignumber/5.7.0)',
+          'Transaction failed to parsing: Cannot convert 0x to a BigInt',
         ),
       );
     });
@@ -422,7 +422,7 @@ describe('Guardian', () => {
       mockEvaluateErc191Message.mockRejectedValueOnce(new Error('401: Unauthorized'));
 
       await expect(getGuardianClient().evaluateERC191Message({
-        chainID: ChainId.IMTBL_ZKEVM_DEVNET,
+        chainID: BigInt(ChainId.IMTBL_ZKEVM_DEVNET),
         payload: 'payload',
       }))
         .rejects.toThrow('Message failed to validate with error: 401: Unauthorized');
@@ -433,7 +433,7 @@ describe('Guardian', () => {
       (mockConfirmationScreen.requestMessageConfirmation as jest.Mock).mockResolvedValueOnce({ confirmed: true });
 
       await getGuardianClient().evaluateERC191Message({
-        chainID: ChainId.IMTBL_ZKEVM_DEVNET,
+        chainID: BigInt(ChainId.IMTBL_ZKEVM_DEVNET),
         payload: 'payload',
       });
 
@@ -445,7 +445,7 @@ describe('Guardian', () => {
       (mockConfirmationScreen.requestMessageConfirmation as jest.Mock).mockResolvedValueOnce({ confirmed: false });
 
       await expect(getGuardianClient().evaluateERC191Message({
-        chainID: ChainId.IMTBL_ZKEVM_DEVNET,
+        chainID: BigInt(ChainId.IMTBL_ZKEVM_DEVNET),
         payload: 'payload',
       })).rejects.toEqual(new JsonRpcError(RpcErrorCode.TRANSACTION_REJECTED, 'Signature rejected by user'));
     });

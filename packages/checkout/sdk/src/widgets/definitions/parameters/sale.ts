@@ -18,7 +18,7 @@ export type SaleWidgetParams = {
   items?: SaleItem[];
   /** The name of the NFT collection on sale */
   collectionName?: string;
-  /** The wallet provider name to default to if no web3Provider is passed */
+  /** The wallet provider name to default to if no browserProvider is passed */
   walletProviderName?: WalletProviderName;
   /** The language to use for the sales widget */
   language?: WidgetLanguage;

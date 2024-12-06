@@ -13,10 +13,17 @@ export { Checkout } from './sdk';
 export { IMMUTABLE_API_BASE_URL } from './env';
 
 export {
+  passportProviderInfo,
   getPassportProviderDetail,
+  metaMaskProviderInfo,
   getMetaMaskProviderDetail,
   validateProvider,
+  getUnderlyingChainId,
 } from './provider';
+
+export {
+  getGasPriceInWei,
+} from './gasEstimate';
 
 export {
   ChainId,
@@ -28,6 +35,7 @@ export {
   GasEstimateType,
   GasTokenType,
   ItemType,
+  WrappedBrowserProvider,
   NetworkFilterTypes,
   RoutingOutcomeType,
   TokenFilterTypes,
@@ -73,7 +81,6 @@ export type {
   ConnectParams,
   ConnectResult,
   CreateProviderParams,
-  CreateProviderResult,
   DexConfig,
   ERC20ItemRequirement,
   ERC721Balance,

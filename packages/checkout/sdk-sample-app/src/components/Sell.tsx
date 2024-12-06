@@ -1,5 +1,4 @@
-import { BuyToken, Checkout, ItemType, SellOrder, SellToken } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
+import { BuyToken, Checkout, ItemType, WrappedBrowserProvider, SellOrder, SellToken } from '@imtbl/checkout-sdk';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
@@ -7,7 +6,7 @@ import { Box, FormControl, Select, TextInput, OptionKey, Body } from '@biom3/rea
 
 interface SellProps {
   checkout: Checkout;
-  provider: Web3Provider | undefined;
+  provider: WrappedBrowserProvider | undefined;
 }
 
 export default function Sell({ checkout, provider }: SellProps) {

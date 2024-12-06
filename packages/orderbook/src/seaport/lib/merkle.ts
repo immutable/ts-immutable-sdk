@@ -1,12 +1,8 @@
-import {
-  TypedDataEncoder,
-  AbiCoder,
-  keccak256,
-  toUtf8Bytes,
-  concat,
-} from 'ethers-v6';
 import { MerkleTree } from 'merkletreejs';
 
+import {
+  AbiCoder, concat, keccak256, toUtf8Bytes, TypedDataEncoder,
+} from 'ethers';
 import { DefaultGetter } from './defaults';
 import {
   bufferKeccak,

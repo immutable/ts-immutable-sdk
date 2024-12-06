@@ -1,56 +1,41 @@
 // this function needs to be in a separate file to prevent circular dependencies with ./network
-
-import { Web3Provider } from '@ethersproject/providers';
+import { JsonRpcProvider } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { WalletAction } from '../types';
-
-const parseChainId = (chainId: unknown): number => {
-  if (typeof chainId === 'number') {
-    return chainId;
-  }
-
-  if (typeof chainId === 'string' && !Number.isNaN(Number(chainId))) {
-    return chainId.startsWith('0x') ? parseInt(chainId, 16) : Number(chainId);
-  }
-
-  throw new CheckoutError(
-    'Invalid chainId',
-    CheckoutErrorType.WEB3_PROVIDER_ERROR,
-  );
-};
+import { WrappedBrowserProvider, WalletAction } from '../types';
 
 /**
  * Get chain id from RPC method
- * @param web3Provider
+ * @param provider
  * @returns chainId number
  */
-async function requestChainId(web3Provider: Web3Provider): Promise<number> {
-  if (!web3Provider.provider?.request) {
+async function requestChainId(provider: JsonRpcProvider | WrappedBrowserProvider): Promise<bigint> {
+  if (!provider.send) {
     throw new CheckoutError(
-      'Parsed provider is not a valid Web3Provider',
+      'Parsed provider is not a valid WrappedBrowserProvider',
       CheckoutErrorType.WEB3_PROVIDER_ERROR,
     );
   }
 
-  const chainId: string = await web3Provider.provider.request({
-    method: WalletAction.GET_CHAINID,
-    params: [],
-  });
+  const chainId = await provider.send(WalletAction.GET_CHAINID, []);
 
-  return parseChainId(chainId);
+  if (typeof chainId !== 'bigint') {
+    throw new CheckoutError('Invalid chainId', CheckoutErrorType.WEB3_PROVIDER_ERROR);
+  }
+
+  return chainId;
 }
 
 /**
  * Get the underlying chain id from the provider
- * @param web3Provider
+ * @param provider
  * @returns chainId number
  */
-export async function getUnderlyingChainId(web3Provider: Web3Provider): Promise<number> {
-  const chainId = (web3Provider.provider as any)?.chainId;
+export async function getUnderlyingChainId(provider: JsonRpcProvider | WrappedBrowserProvider): Promise<bigint> {
+  const network = await provider.getNetwork();
 
-  if (chainId) {
-    return parseChainId(chainId);
+  if (network.chainId && typeof network.chainId === 'bigint') {
+    return network.chainId;
   }
 
-  return requestChainId(web3Provider);
+  return requestChainId(provider);
 }

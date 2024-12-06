@@ -6,6 +6,7 @@ module.exports = {
     "tsconfigRootDir": __dirname
   },
   "rules": {
+    "no-underscore-dangle": "off",
     "@typescript-eslint/naming-convention": [
       "error",
       {

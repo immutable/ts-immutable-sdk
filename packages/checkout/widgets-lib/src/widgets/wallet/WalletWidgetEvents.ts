@@ -1,10 +1,10 @@
-import { Web3Provider } from '@ethersproject/providers';
 import {
   NetworkInfo,
   IMTBLWidgetEvents,
   WidgetEvent,
   WalletEventType,
   WidgetType,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 
 export function sendWalletWidgetCloseEvent(eventTarget: Window | EventTarget) {
@@ -25,7 +25,7 @@ export function sendWalletWidgetCloseEvent(eventTarget: Window | EventTarget) {
 
 export function sendNetworkSwitchEvent(
   eventTarget: Window | EventTarget,
-  provider: Web3Provider,
+  provider: WrappedBrowserProvider,
   network: NetworkInfo,
 ) {
   const walletWidgetSwitchNetworkEvent = new CustomEvent<
@@ -35,7 +35,7 @@ export function sendNetworkSwitchEvent(
       type: WalletEventType.NETWORK_SWITCH,
       data: {
         network: network.name,
-        chainId: network.chainId,
+        chainId: Number(network.chainId),
         provider,
       },
     },

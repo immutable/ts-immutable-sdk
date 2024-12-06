@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { TransactionRequest } from 'ethers';
 import { ModuleConfiguration } from '@imtbl/config';
 
 export type ExchangeContracts = {
@@ -54,11 +54,11 @@ export type Fee = {
 /**
  * Type representing an amount with the token information
  * @property {@link Coin} token - The coin for the amount, either a {@link Native} or {@link ERC20}
- * @property {ethers.BigNumber} value - The value of the amount in the token's smallest unit
+ * @property {BigInt} value - The value of the amount in the token's smallest unit
  */
 export type CoinAmount<T extends Coin> = {
   token: T;
-  value: ethers.BigNumber;
+  value: bigint;
 };
 
 /**
@@ -77,11 +77,11 @@ export type Quote = {
 
 /**
  * Type representing the details of a transaction
- * @property {@link ethers.providers.TransactionRequest} transaction - The unsigned transaction
+ * @property {@link TransactionRequest} transaction - The unsigned transaction
  * @property {@link Amount | null} gasFeeEstimate - The gas fee estimate or null if it is not available
  */
 export type TransactionDetails = {
-  transaction: ethers.providers.TransactionRequest;
+  transaction: TransactionRequest;
   gasFeeEstimate: Amount | null;
 };
 
@@ -155,11 +155,11 @@ export type Token = {
 /**
  * Interface representing a token amount
  * @property {@link Token} token - The token
- * @property {@link ethers.BigNumber} value - The amount
+ * @property {@link BigInt} value - The amount
  */
 export type Amount = {
   token: Token;
-  value: ethers.BigNumber;
+  value: bigint;
 };
 
 /**

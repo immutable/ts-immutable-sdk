@@ -1,10 +1,10 @@
-import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import {
   SaleItem,
   FundingStep,
   FundingItem,
   SmartCheckoutResult,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 
 export type SignedOrderProduct = {
@@ -48,7 +48,7 @@ export type SignResponse = {
 };
 
 export type SignOrderInput = {
-  provider: Web3Provider | undefined;
+  provider: WrappedBrowserProvider | undefined;
   items: SaleItem[];
   fromTokenAddress: string;
   recipientAddress: string;
@@ -190,7 +190,7 @@ export type UseQuoteOrderParams = {
   items: SaleItem[];
   environmentId: string;
   environment: Environment;
-  provider: Web3Provider | undefined;
+  provider: WrappedBrowserProvider | undefined;
   preferredCurrency?: string;
 };
 
