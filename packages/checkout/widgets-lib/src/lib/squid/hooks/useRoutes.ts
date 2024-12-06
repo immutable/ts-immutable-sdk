@@ -277,7 +277,7 @@ export const useRoutes = () => {
     squid: Squid,
     toTokenAddress: string,
     balances: TokenBalance[],
-    fromAmountArrayBatch: AmountData[],
+    fromAmountArray: AmountData[],
   ): Promise<RouteData[]> => {
     const getGasCost = (
       route: RouteResponseData,
@@ -300,25 +300,36 @@ export const useRoutes = () => {
       return (gasCosts || 0) + (receiverFee || 0);
     };
 
-    // Find user's native gas balance on a chain
     const findUserGasBalance = (chainId: string | number) => balances.find(
       (balance: TokenBalance) => balance.address === SQUID_NATIVE_TOKEN.toLowerCase()
         && balance.chainId.toString() === chainId.toString(),
     );
 
-    const hasSufficientGas = (
+    const hasSufficientNativeTokenBalance = (
       userGasBalance: TokenBalance | undefined,
-      sourceGasCost: number | undefined,
-    ) => userGasBalance
-    && sourceGasCost
-    && parseFloat(
-      utils.formatUnits(
-        userGasBalance.balance,
-        userGasBalance.decimals,
-      ),
-    ) > sourceGasCost;
+      fromAmount: string,
+      totalGasCost: number | undefined,
+      fromToken: Token,
+    ) => {
+      if (!userGasBalance || !totalGasCost) {
+        return false;
+      }
 
-    const routePromises = fromAmountArrayBatch.map(async (data: AmountData) => {
+      const userBalance = parseFloat(
+        utils.formatUnits(userGasBalance.balance, userGasBalance.decimals),
+      );
+
+      // If the fromToken is the native token, validate balance for both fromAmount and gas costs
+      if (fromToken.address.toLowerCase() === SQUID_NATIVE_TOKEN.toLowerCase()) {
+        const requiredAmount = parseFloat(fromAmount) + totalGasCost;
+        return userBalance >= requiredAmount;
+      }
+
+      // Otherwise, only validate balance for gas costs
+      return userBalance >= totalGasCost;
+    };
+
+    const routePromises = fromAmountArray.map(async (data: AmountData) => {
       try {
         const routeResponse = await getRoute(
           squid,
@@ -339,10 +350,11 @@ export const useRoutes = () => {
         console.log('=== userGasBalance', userGasBalance);
         console.log('=== sourceGasCost', gasCost);
 
-        if (!userGasBalance || !hasSufficientGas(userGasBalance, gasCost)) {
+        if (!hasSufficientNativeTokenBalance(userGasBalance, data.fromAmount, gasCost, data.fromToken)) {
           console.warn('Insufficient native gas balance for transaction on source chain');
           console.log('=== userGasBalance', userGasBalance);
-          console.log('=== sourceGasCost', gasCost);
+          console.log('=== totalGasCost', gasCost);
+          console.log('=== data.fromAmount', data.fromAmount);
           console.log('=== data.balance.chainId', data.balance.chainId);
           return null;
         }
@@ -352,7 +364,6 @@ export const useRoutes = () => {
           route: routeResponse.route,
         } as RouteData;
       } catch (error) {
-        console.error('Error fetching route:', error);
         return null;
       }
     });
@@ -403,14 +414,14 @@ export const useRoutes = () => {
           return acc;
         }, [] as (typeof fromAmountDataArray)[])
         .map(async (slicedFromAmountDataArray) => {
-          const validatedRoutes = await getRoutesWithFeesValidation(
-            squid,
-            toTokenAddress,
-            balances,
-            slicedFromAmountDataArray,
+          allRoutes.push(
+            ...(await getRoutesWithFeesValidation(
+              squid,
+              toTokenAddress,
+              balances,
+              slicedFromAmountDataArray,
+            )),
           );
-          console.log('Validated routes for batch:', validatedRoutes);
-          allRoutes.push(...validatedRoutes);
           await delay(delayMs);
         }),
     );
