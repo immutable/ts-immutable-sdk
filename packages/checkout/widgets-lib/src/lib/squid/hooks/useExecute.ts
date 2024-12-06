@@ -9,19 +9,20 @@ import { StatusResponse } from '@0xsquid/sdk/dist/types';
 import { Flow } from '@imtbl/metrics';
 import { EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
 import { isSquidNativeToken } from '../functions/isSquidNativeToken';
-import { useError } from './useError';
-import { AddTokensError, AddTokensErrorTypes } from '../types';
+import { useError } from '../../../widgets/add-tokens/hooks/useError';
+import { AddTokensError, AddTokensErrorTypes } from '../../../widgets/add-tokens/types';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { sendAddTokensFailedEvent } from '../AddTokensWidgetEvents';
-import { retry } from '../../../lib/retry';
-import { withMetricsAsync } from '../../../lib/metrics';
-import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
-import { isRejectedError } from '../functions/errorType';
+import { sendAddTokensFailedEvent } from '../../../widgets/add-tokens/AddTokensWidgetEvents';
+import { retry } from '../../retry';
+import { withMetricsAsync } from '../../metrics';
+import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { isRejectedError } from '../../../widgets/add-tokens/functions/errorType';
 
 const TRANSACTION_NOT_COMPLETED = 'transaction not completed';
 
 export const useExecute = (contextId: string, environment: Environment) => {
   const { showErrorHandover } = useError(environment);
+  const { user } = useAnalytics();
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
@@ -155,11 +156,10 @@ export const useExecute = (contextId: string, environment: Environment) => {
           throw new Error('transactionRequest target is undefined');
         }
 
-        const allowance = await tokenContract.allowance(
+        return await tokenContract.allowance(
           ownerAddress,
           transactionRequestTarget,
         );
-        return allowance;
       }
 
       return ethers.constants.MaxUint256; // no approval is needed for native tokens
@@ -202,6 +202,15 @@ export const useExecute = (contextId: string, environment: Environment) => {
     return await waitForReceipt(provider, tx.hash);
   };
 
+  const getAnonymousId = async () => {
+    try {
+      const userData = await user();
+      return userData?.anonymousId() ?? undefined;
+    } catch (error) {
+      return undefined;
+    }
+  };
+
   const approve = async (
     fromProviderInfo: EIP6963ProviderInfo,
     provider: Web3Provider,
@@ -212,6 +221,7 @@ export const useExecute = (contextId: string, environment: Environment) => {
         return await withMetricsAsync(
           (flow) => callApprove(flow, fromProviderInfo, provider, routeResponse),
           `${UserJourney.ADD_TOKENS}_Approve`,
+          await getAnonymousId(),
           (error) => (isRejectedError(error) ? 'rejected' : ''),
         );
       }
@@ -251,6 +261,7 @@ export const useExecute = (contextId: string, environment: Environment) => {
       return await withMetricsAsync(
         (flow) => callExecute(flow, squid, fromProviderInfo, provider, routeResponse),
         `${UserJourney.ADD_TOKENS}_Execute`,
+        await getAnonymousId(),
         (error) => (isRejectedError(error) ? 'rejected' : ''),
       );
     } catch (error) {

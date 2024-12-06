@@ -1,5 +1,5 @@
 import { Token } from '../types';
-import { SQUID_SDK_BASE_URL } from '../utils/config';
+import { SQUID_SDK_BASE_URL } from '../config';
 
 type SquidTokenResponse = {
   chainId: number;

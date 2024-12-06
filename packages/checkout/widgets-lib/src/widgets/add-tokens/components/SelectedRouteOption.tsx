@@ -1,5 +1,9 @@
 import {
-  AllDualVariantIconKeys, MenuItem, Stack, Sticker,
+  AllDualVariantIconKeys,
+  MenuItem,
+  Stack,
+  Sticker,
+  Tooltip,
 } from '@biom3/react';
 import {
   MouseEvent,
@@ -11,9 +15,9 @@ import {
 
 import { Checkout } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
-import { Chain, RouteData } from '../types';
-import { getRouteAndTokenBalances } from '../functions/getRouteAndTokenBalances';
+import { getRouteAndTokenBalances } from '../../../lib/squid/functions/getRouteAndTokenBalances';
 import { getRemoteVideo } from '../../../lib/utils';
+import { Chain, RouteData } from '../../../lib/squid/types';
 
 export interface SelectedRouteOptionProps {
   checkout: Checkout;
@@ -145,12 +149,18 @@ export function SelectedRouteOption({
       selected={withSelectedWallet}
     >
       {chain && (
-        <Sticker position={{ x: 'right', y: 'bottom' }}>
-          <Sticker.FramedImage
-            use={<img src={chain.iconUrl} alt={chain.name} />}
-            size="xSmall"
-            sx={{ bottom: 'base.spacing.x2', right: 'base.spacing.x2' }}
-          />
+        <Sticker position={{ x: 'rightInside', y: 'bottomInside' }}>
+          <Tooltip size="small">
+            <Tooltip.Target>
+              <Sticker.FramedImage
+                use={<img src={chain.iconUrl} alt={chain.name} />}
+                size="xSmall"
+              />
+            </Tooltip.Target>
+            <Tooltip.Content id="route_tooltip_content">
+              {chain.name}
+            </Tooltip.Content>
+          </Tooltip>
 
           <MenuItem.FramedImage
             circularFrame
@@ -169,7 +179,9 @@ export function SelectedRouteOption({
         <Stack gap="0px">
           <MenuItem.Label>{fromToken?.name}</MenuItem.Label>
           <MenuItem.Caption>
-            {`${t('views.ADD_TOKENS.fees.balance')} ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${routeBalanceUsd}`}
+            {`${t('views.ADD_TOKENS.fees.balance')} ${t(
+              'views.ADD_TOKENS.fees.fiatPricePrefix',
+            )} $${routeBalanceUsd}`}
           </MenuItem.Caption>
         </Stack>
         <MenuItem.PriceDisplay price={fromAmount}>

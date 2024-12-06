@@ -53,7 +53,6 @@ export function DeliverToWalletDrawer({
       getShouldRequestWalletPermissions={
         selectedSameFromWalletType
       }
-      shouldIdentifyUser={false}
     />
   );
 }

@@ -1,5 +1,5 @@
 import { Box, BoxProps } from '@biom3/react';
-import merge from 'ts-deepmerge';
+import { merge } from 'ts-deepmerge';
 import {
   simpleLayoutStyle,
   headerStyle,

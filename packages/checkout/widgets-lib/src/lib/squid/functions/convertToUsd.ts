@@ -1,6 +1,6 @@
 import { ChainId, type TokenInfo } from '@imtbl/checkout-sdk';
+import { SQUID_NATIVE_TOKEN } from '../config';
 import { Token } from '../types';
-import { SQUID_NATIVE_TOKEN } from '../utils/config';
 
 export function convertToUsd(
   tokens: Token[] | null,

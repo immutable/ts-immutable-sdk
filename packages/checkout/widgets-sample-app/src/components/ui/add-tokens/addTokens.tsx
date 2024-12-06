@@ -45,7 +45,8 @@ function AddTokensUI() {
     [checkout]
   );
 
-  const [presetToProvider, setPresetToProvider] = useState<boolean>(false);
+  const getPersistedToPresetProvider = () => localStorage.getItem('imtbl/addtokens_presetToProvider') === 'true';
+  const [presetToProvider, setPresetToProvider] = useState<boolean>(getPersistedToPresetProvider());
   const [toProvider, setToProvider] = useState<Web3Provider | undefined>(undefined);
 
   const [toTokenAddress, setToTokenAddress] = useState<string | undefined>(undefined);
@@ -81,6 +82,12 @@ function AddTokensUI() {
   }, []);
 
   useEffect(() => {
+    const presetToProviderValue = getPersistedToPresetProvider();
+
+    if (presetToProviderValue !== presetToProvider) {
+      localStorage.setItem('imtbl/addtokens_presetToProvider', presetToProvider.toString());
+    }
+
     if (!checkout || !factory) return;
     if (!presetToProvider) {
       toProvider && addTokens.unmount();

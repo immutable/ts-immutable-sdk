@@ -2,7 +2,7 @@ import { createContext } from 'react';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { Squid } from '@0xsquid/sdk';
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
-import { Chain, RouteData, Token } from '../types';
+import { Chain, RouteData, Token } from '../../../lib/squid/types';
 
 export interface AddTokensState {
   id: string;
@@ -15,7 +15,7 @@ export interface AddTokensState {
   selectedRouteData: RouteData | undefined;
   selectedToken: TokenInfo | undefined;
   selectedAmount: string;
-  isSwapAvailable: boolean;
+  isSwapAvailable: boolean | undefined;
 }
 
 export const initialAddTokensState: AddTokensState = {
@@ -29,7 +29,7 @@ export const initialAddTokensState: AddTokensState = {
   selectedRouteData: undefined,
   selectedToken: undefined,
   selectedAmount: '',
-  isSwapAvailable: false,
+  isSwapAvailable: undefined,
 };
 
 export interface AddTokensContextState {

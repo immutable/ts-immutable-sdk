@@ -1,5 +1,5 @@
 import { DeeplyNestedSx, SvgIcon } from '@biom3/react';
-import merge from 'ts-deepmerge';
+import { merge } from 'ts-deepmerge';
 
 export function SquidIcon({
   sx = {},

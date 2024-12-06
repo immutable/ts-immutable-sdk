@@ -6,7 +6,12 @@ const VALID_NUMBER_REGEX = /^(0|[1-9]\d*)(\.\d*)?$/;
  * @returns An object containing the sanitized value, the float amount, and a boolean indicating if the amount is valid
  */
 export const validateToAmount = (amount: string) => {
-  const value = amount || '';
+  let value = amount || '';
+
+  if (amount === '.') {
+    value = '0.';
+  }
+
   const sanitizedValue = value.replace(/^0+(?=\d)/, '');
   const isValid = VALID_NUMBER_REGEX.test(sanitizedValue);
   const floatAmount = isValid ? parseFloat(sanitizedValue) : NaN;

@@ -78,6 +78,7 @@ declare global {
     ue: any;
     // eslint-disable-next-line @typescript-eslint/naming-convention
     Unity: any;
+    uwb: any;
   }
 }
 
@@ -136,8 +137,10 @@ const callbackToGame = (data: CallbackData) => {
     blu_event('sendtogame', message);
   } else if (typeof UnityPostMessage !== 'undefined') {
     UnityPostMessage(message);
-  } else if (window.Unity !== 'undefined') {
+  } else if (typeof window.Unity !== 'undefined') {
     window.Unity.call(message);
+  } else if (typeof window.uwb !== 'undefined') {
+    window.uwb.ExecuteJsMethod('callback', message);
   } else {
     const gameBridgeError = 'No available game callbacks to call from ImmutableSDK game-bridge';
     console.error(gameBridgeError);

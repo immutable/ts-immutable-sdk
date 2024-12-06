@@ -26,20 +26,22 @@ import { RouteResponse } from '@0xsquid/squid-types';
 import { t } from 'i18next';
 import { Trans } from 'react-i18next';
 import { Environment } from '@imtbl/config';
+import { ChainId } from '@imtbl/checkout-sdk';
+import { trackFlow } from '@imtbl/metrics';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { AddTokensContext } from '../context/AddTokensContext';
-import { useRoutes } from '../hooks/useRoutes';
+import { useRoutes } from '../../../lib/squid/hooks/useRoutes';
 import {
   AddTokensReviewData,
   AddTokensWidgetViews,
 } from '../../../context/view-context/AddTokensViewContextTypes';
 import { AddTokensErrorTypes, RiveStateMachineInput } from '../types';
-import { useExecute } from '../hooks/useExecute';
+import { useExecute } from '../../../lib/squid/hooks/useExecute';
 import {
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
-import { SquidIcon } from '../components/SquidIcon';
+import { SquidIcon } from '../../../lib/squid/components/SquidIcon';
 import { useHandover } from '../../../lib/hooks/useHandover';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
@@ -48,7 +50,6 @@ import {
   APPROVE_TXN_ANIMATION,
   EXECUTE_TXN_ANIMATION,
   FIXED_HANDOVER_DURATION,
-  SQUID_NATIVE_TOKEN,
 } from '../utils/config';
 import {
   useAnalytics,
@@ -59,14 +60,13 @@ import { LoadingView } from '../../../views/loading/LoadingView';
 import { getDurationFormatted } from '../functions/getDurationFormatted';
 import { RouteFees } from '../components/RouteFees';
 import { AddressMissmatchDrawer } from '../components/AddressMissmatchDrawer';
-import { getTotalRouteFees } from '../functions/getTotalRouteFees';
-import { getRouteChains } from '../functions/getRouteChains';
+import { getTotalRouteFees } from '../../../lib/squid/functions/getTotalRouteFees';
+import { getRouteChains } from '../../../lib/squid/functions/getRouteChains';
 import {
   getFormattedAmounts,
   getFormattedNumber,
-  getFormattedNumberWithDecimalPlaces,
 } from '../functions/getFormattedNumber';
-import { SquidFooter } from '../components/SquidFooter';
+import { SquidFooter } from '../../../lib/squid/components/SquidFooter';
 import { useError } from '../hooks/useError';
 import {
   sendAddTokensCloseEvent,
@@ -74,6 +74,8 @@ import {
 } from '../AddTokensWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { convertToNetworkChangeableProvider } from '../functions/convertToNetworkChangeableProvider';
+import { AmountData } from '../../../lib/squid/types';
+import { SQUID_NATIVE_TOKEN } from '../../../lib/squid/config';
 
 interface ReviewProps {
   data: AddTokensReviewData;
@@ -117,6 +119,7 @@ export function Review({
   } = useContext(EventTargetContext);
 
   const [route, setRoute] = useState<RouteResponse | undefined>();
+  const [amountData, setAmountData] = useState<AmountData | undefined>();
   const [proceedDisabled, setProceedDisabled] = useState(true);
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
   const [showAddressMissmatchDrawer, setShowAddressMissmatchDrawer] = useState(false);
@@ -149,7 +152,7 @@ export function Review({
 
     if (!fromAddress || !toAddress) return;
 
-    const amountData = getAmountData(
+    const updatedAmountData = getAmountData(
       tokens,
       data.balance,
       data.toAmount,
@@ -159,20 +162,21 @@ export function Review({
         : data.toTokenAddress,
       data.additionalBuffer,
     );
-    if (!amountData) return;
+    if (!updatedAmountData) return;
 
     const routeResponse = await getRoute(
       squid,
-      amountData?.fromToken,
-      amountData?.toToken,
+      updatedAmountData?.fromToken,
+      updatedAmountData?.toToken,
       toAddress,
-      amountData.fromAmount,
-      amountData.toAmount,
+      updatedAmountData.fromAmount,
+      updatedAmountData.toAmount,
       fromAddress,
       false,
     );
 
     setRoute(routeResponse.route);
+    setAmountData(updatedAmountData);
     setProceedDisabled(false);
   };
 
@@ -294,10 +298,11 @@ export function Review({
         toTokenChainId: route.route.params.toChain,
         fromTokenAddress: route.route.params.fromToken,
         fromTokenChainId: route.route.params.fromChain,
-        fromAmount: route.route.params.fromAmount,
         fromAddress: route.route.params.fromAddress,
         toAddress: route.route.params.toAddress,
         estimatedRouteDuration: route.route.estimate.estimatedRouteDuration,
+        fromAmount: amountData?.fromAmount,
+        toAmount: amountData?.toAmount,
       },
     });
 
@@ -381,8 +386,23 @@ export function Review({
         action: 'Succeeded',
         extras: {
           contextId: id,
-          txHash: executeTxnReceipt.transactionHash,
+          ...(route.route.params.fromChain !== ChainId.IMTBL_ZKEVM_MAINNET.toString()
+            && { txHash: executeTxnReceipt.transactionHash }),
+          ...(route.route.params.fromChain === ChainId.IMTBL_ZKEVM_MAINNET.toString()
+            && { immutableZkEVMTxHash: executeTxnReceipt.transactionHash }),
+          toTokenAddress: route.route.params.toToken,
+          toTokenChainId: route.route.params.toChain,
+          fromTokenAddress: route.route.params.fromToken,
+          fromTokenChainId: route.route.params.fromChain,
+          fromAmount: amountData?.fromAmount,
+          fromAddress: route.route.params.fromAddress,
+          toAddress: route.route.params.toAddress,
+          toAmount: amountData?.toAmount,
+          fromTokenSymbol: amountData?.fromToken.symbol,
+          toTokenSymbol: amountData?.toToken.symbol,
         },
+      }).then((ctx) => {
+        trackFlow('commerce', `addTokensFundsAdded_${ctx.event.messageId}`);
       });
 
       sendAddTokensSuccessEvent(eventTarget, executeTxnReceipt.transactionHash);
@@ -729,7 +749,7 @@ export function Review({
                 >
                   <PriceDisplay.Caption size="small">
                     {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${
-                      route?.route.estimate.fromAmountUSD ?? ''
+                      getFormattedAmounts(route?.route.estimate.fromAmountUSD ?? '')
                     }`}
                   </PriceDisplay.Caption>
                 </PriceDisplay>
@@ -788,7 +808,7 @@ export function Review({
                     {' '}
                     =
                     {' '}
-                    {getFormattedNumberWithDecimalPlaces(
+                    {getFormattedAmounts(
                       route.route.estimate.exchangeRate,
                     )}
                     {' '}
@@ -869,7 +889,7 @@ export function Review({
                 >
                   <PriceDisplay.Caption size="small">
                     {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${
-                      route?.route.estimate.toAmountUSD ?? ''
+                      getFormattedAmounts(route?.route.estimate.toAmountUSD ?? '')
                     }`}
                   </PriceDisplay.Caption>
                 </PriceDisplay>
