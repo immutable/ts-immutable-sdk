@@ -17,7 +17,8 @@ describe('load', () => {
       expect(document.head.innerHTML).toBe(
         '<script id="immutable-checkout-widgets-bundle" '
         + 'data-version="__SDK_VERSION__" '
-        + `src="https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets@${SDK_VERSION}/dist/widgets.js"></script>`,
+        // eslint-disable-next-line max-len
+        + `src="https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets@${SDK_VERSION}/dist/browser/index.cdn.js"></script>`,
       );
     });
   });
@@ -25,13 +26,13 @@ describe('load', () => {
   describe('get widgets esm url', () => {
     it('should validate the versioning', () => {
       expect(getWidgetsEsmUrl(SDK_VERSION)).toEqual(
-        `https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets@${SDK_VERSION}/dist/index.js`,
+        `https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets@${SDK_VERSION}/dist/browser/index.js`,
       );
     });
 
     it('should change version', () => {
-      expect(getWidgetsEsmUrl('1.2.3')).toEqual(
-        'https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets@1.2.3/dist/index.js',
+      expect(getWidgetsEsmUrl('2.0.0')).toEqual(
+        'https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets@2.0.0/dist/browser/index.js',
       );
     });
   });
