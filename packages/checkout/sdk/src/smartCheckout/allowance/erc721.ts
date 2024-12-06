@@ -92,14 +92,6 @@ export const getERC721ApprovedAddress = async (
 };
 
 export const convertIdToNumber = (id: string, contractAddress: string): bigint => {
-  if (!id || !id.trim()) {
-    throw new CheckoutError(
-      'Invalid ERC721 ID',
-      CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR,
-      { id, contractAddress },
-    );
-  }
-
   try {
     return BigInt(id);
   } catch (err: any) {

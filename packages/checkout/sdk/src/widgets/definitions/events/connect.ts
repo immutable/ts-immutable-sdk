@@ -13,7 +13,7 @@ export enum ConnectEventType {
 
 /**
  * Represents a successful connection.
- * @property {BrowserProvider} provider
+ * @property {WrappedBrowserProvider} provider
  * @property {WalletProviderName | undefined} walletProviderName
  */
 
