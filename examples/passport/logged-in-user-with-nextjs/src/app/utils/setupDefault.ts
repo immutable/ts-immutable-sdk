@@ -1,9 +1,5 @@
-// SetupPassport.ts
-
-// Import the necessary modules from the Passport SDK package
 import { config, passport } from '@imtbl/sdk';
 
-// Instantiate the Passport SDK with the default configurations
 export const passportInstance = new passport.Passport({
     baseConfig: {
       environment: config.Environment.SANDBOX, // or config.Environment.SANDBOX

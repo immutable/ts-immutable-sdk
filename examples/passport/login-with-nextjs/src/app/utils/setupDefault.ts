@@ -1,9 +1,6 @@
-// SetupPassport.ts
-
-// Import the necessary modules from the Passport SDK package
 import { config, passport } from '@imtbl/sdk';
 
-// Instantiate the Passport SDK with the default configurations
+// #doc passport-instance
 export const passportInstance = new passport.Passport({
     baseConfig: {
       environment: config.Environment.SANDBOX, // or config.Environment.SANDBOX
@@ -16,4 +13,5 @@ export const passportInstance = new passport.Passport({
     audience: 'platform_api',
     scope: 'openid offline_access email transact',
   });
+// #enddoc passport-instance
 

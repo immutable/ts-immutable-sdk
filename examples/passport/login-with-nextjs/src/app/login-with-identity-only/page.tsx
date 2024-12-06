@@ -14,7 +14,9 @@ export default function UserProfileInfo() {
   const loginWithIdentiy = useCallback(async () => {
     if (!passportInstance) return;
     try {
+      // #doc passport-login-without-wallet
       const profile: passport.UserProfile | null = await passportInstance.login();
+      // #enddoc passport-login-without-wallet
       if (profile) {
         console.log(profile.email);
         console.log(profile.sub);

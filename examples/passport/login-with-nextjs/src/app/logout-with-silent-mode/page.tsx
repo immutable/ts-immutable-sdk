@@ -26,7 +26,9 @@ export default function SimplifiedLoginWithPassport() {
   const logout = async () => {
     if (!passportInstance || !isLoggedIn) return;
     try {
+      // #doc passport-silent-logout
       await passportInstance.logout();
+      // #enddoc passport-silent-logout
       setIsLoggedIn(false);
       setAccountAddress(null);
     } catch (error) {

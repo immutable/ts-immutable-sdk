@@ -14,9 +14,13 @@ export default function LoginWithPassport() {
     if (!passportInstance) return;
 
     try {
+      // #doc passport-login-with-ethersjs
       const passportProvider = passportInstance.connectEvm();
+      
       const web3Provider = new ethers.providers.Web3Provider(passportProvider);
+      
       const accounts = await web3Provider.send('eth_requestAccounts', []);
+      // #enddoc passport-login-with-ethersjs
       if (accounts && accounts.length > 0) {
         setIsLoggedIn(true);
         setAccountAddress(accounts[0] || null); // Store the first account address

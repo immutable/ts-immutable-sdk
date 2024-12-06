@@ -13,8 +13,10 @@ export default function LoginWithPassport() {
   const loginWithPassport = async () => {
     if (!passportInstance) return;
     try {
+      // #doc passport-evm-login
       const provider = passportInstance.connectEvm();
       const accounts = await provider.request({ method: 'eth_requestAccounts' });
+      // #enddoc passport-evm-login
       if (accounts) {
         setIsLoggedIn(true); // Set logged in state if login is successful
         setAccountAddress(accounts[0] || null); 

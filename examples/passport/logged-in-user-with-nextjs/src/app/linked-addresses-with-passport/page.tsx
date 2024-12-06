@@ -18,7 +18,9 @@ export default function LoginWithPassport() {
       if (accounts) {
         setIsLoggedIn(true);
         setAccountAddress(accounts[0] || null);
+        // #doc passport-get-linked-addresses
         const addresses = await passportInstance.getLinkedAddresses();
+        // #enddoc passport-get-linked-addresses
         setLinkedAddresses(addresses || []);
       } else {
         setIsLoggedIn(false);
