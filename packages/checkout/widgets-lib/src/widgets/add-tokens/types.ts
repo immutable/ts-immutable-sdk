@@ -31,5 +31,5 @@ export enum AddTokensErrorTypes {
 }
 
 export enum AddTokensExperiments {
-  PRESELECTED_TOKEN = 'add-tokens-preselected-token',
+  PRESELECTED_TOKEN = 'addTokensPreselectedToken',
 }

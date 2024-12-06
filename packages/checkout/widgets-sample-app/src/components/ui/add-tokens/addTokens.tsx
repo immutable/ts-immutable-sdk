@@ -17,7 +17,7 @@ import { passport } from "./passport";
 import { Web3Provider } from "@ethersproject/providers";
 
 const ADD_TOKENS_TARGET_ID = "add-tokens-widget-target";
-const FLAG_PRESELECTED_TOKEN = 'add-tokens-preselected-token';
+const FLAG_PRESELECTED_TOKEN = 'addTokensPreselectedToken';
 
 function AddTokensUI() {
   const checkout = useMemo(
