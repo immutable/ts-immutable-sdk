@@ -23,7 +23,8 @@ export default defineConfig((options) => {
       platform: 'browser',
       format: 'esm',
       target: 'es2022',
-      minify: false,
+      //only minify identifiers, other settings cause: Critical dependency: the request of a dependency is an expression
+      minifyIdentifiers: true,
       bundle: true,
       splitting: true,
       esbuildPlugins: [
@@ -50,7 +51,8 @@ export default defineConfig((options) => {
       platform: 'node',
       format: ['esm', 'cjs'],
       target: 'es2022',
-      minify: false,
+      //only minify identifiers, other settings cause: Critical dependency: the request of a dependency is an expression
+      minifyIdentifiers: true,
       bundle: true,
       splitting: true,
       esbuildPlugins: [
