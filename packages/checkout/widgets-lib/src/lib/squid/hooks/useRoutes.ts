@@ -2,6 +2,7 @@ import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import { RouteResponse, ActionType } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
 import { useContext, useRef } from 'react';
+import { formatUnits, parseUnits } from 'ethers';
 import { delay } from '../../../widgets/add-tokens/functions/delay';
 import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
 import { AddTokensActions, AddTokensContext } from '../../../widgets/add-tokens/context/AddTokensContext';
@@ -9,7 +10,6 @@ import { retry } from '../../retry';
 import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { isPassportProvider } from '../../provider';
-import { formatUnits, parseUnits } from 'ethers';
 import {
   AmountData, RouteData, RouteResponseData, Token,
 } from '../types';
