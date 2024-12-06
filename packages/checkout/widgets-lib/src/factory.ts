@@ -2,28 +2,28 @@ import {
   Checkout,
   IWidgetsFactory,
   IWidgetsFactoryCreate,
-  WrappedBrowserProvider,
   Widget,
   WidgetConfiguration,
   WidgetConfigurations,
   WidgetProperties,
   WidgetType,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import './i18n';
-import { Connect } from './widgets/connect/ConnectWidgetRoot';
-import { Swap } from './widgets/swap/SwapWidgetRoot';
-import { OnRamp } from './widgets/on-ramp/OnRampWidgetRoot';
-import { Wallet } from './widgets/wallet/WalletWidgetRoot';
-import { Sale } from './widgets/sale/SaleWidgetRoot';
-import { Bridge } from './widgets/bridge/BridgeWidgetRoot';
-import { WalletConnectManager } from './lib/walletConnect';
 import {
   addProviderListenersForWidgetRoot,
   DEFAULT_THEME,
   sendProviderUpdatedEvent,
 } from './lib';
+import { WalletConnectManager } from './lib/walletConnect';
 import { AddTokens } from './widgets/add-tokens/AddTokensRoot';
+import { Bridge } from './widgets/bridge/BridgeWidgetRoot';
+import { Connect } from './widgets/connect/ConnectWidgetRoot';
 import { CommerceWidgetRoot } from './widgets/immutable-commerce/CommerceWidgetRoot';
+import { OnRamp } from './widgets/on-ramp/OnRampWidgetRoot';
+import { Sale } from './widgets/sale/SaleWidgetRoot';
+import { Swap } from './widgets/swap/SwapWidgetRoot';
+import { Wallet } from './widgets/wallet/WalletWidgetRoot';
 import { Purchase } from './widgets/purchase/PurchaseWidgetRoot';
 
 export class WidgetsFactory implements IWidgetsFactory {

@@ -1,11 +1,11 @@
 /**
  * Enum representing different chain IDs.
- * @enum {bigint}
- * @property {bigint} IMTBL_ZKEVM_MAINNET - The chain ID for IMTBL ZKEVM Mainnet.
- * @property {bigint} IMTBL_ZKEVM_TESTNET - The chain ID for IMTBL ZKEVM Testnet.
- * @property {bigint} IMTBL_ZKEVM_DEVNET - The chain ID for IMTBL ZKEVM Devnet.
- * @property {bigint} ETHEREUM - The chain ID for Ethereum.
- * @property {bigint} SEPOLIA - The chain ID for Sepolia.
+ * @enum {number}
+ * @property {number} IMTBL_ZKEVM_MAINNET - The chain ID for IMTBL ZKEVM Mainnet.
+ * @property {number} IMTBL_ZKEVM_TESTNET - The chain ID for IMTBL ZKEVM Testnet.
+ * @property {number} IMTBL_ZKEVM_DEVNET - The chain ID for IMTBL ZKEVM Devnet.
+ * @property {number} ETHEREUM - The chain ID for Ethereum.
+ * @property {number} SEPOLIA - The chain ID for Sepolia.
  */
 export enum ChainId {
   IMTBL_ZKEVM_MAINNET = 13371,
