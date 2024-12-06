@@ -6,6 +6,7 @@ import {
   FundingItem,
   SmartCheckoutResult,
 } from '@imtbl/checkout-sdk';
+import { EvmContractCall, Hook } from '@0xsquid/squid-types';
 
 export type SignedOrderProduct = {
   productId: string;
@@ -27,6 +28,7 @@ export type SignedOrder = {
   };
   totalAmount: number;
   products: SignedOrderProduct[];
+  recipientAddress: string;
 };
 
 export type SignedTransaction = {
@@ -236,6 +238,7 @@ export type SignApiResponse = {
     currency_symbol: string;
     products: SignApiProduct[];
     total_amount: string;
+    recipient_address: string;
   };
   transactions: SignApiTransaction[];
 };
@@ -264,3 +267,7 @@ export type SignApiError = {
   message: string;
   trace_id: string;
 };
+
+export type SquidPostHook = Omit<Hook, 'fundAmount' | 'fundToken'>;
+
+export type SquidPostHookCall = EvmContractCall;
