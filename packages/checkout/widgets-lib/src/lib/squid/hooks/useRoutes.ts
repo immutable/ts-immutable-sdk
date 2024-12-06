@@ -300,7 +300,7 @@ export const useRoutes = () => {
       );
 
     const findUserGasBalance = (chainId: string | number) => balances.find(
-      (balance: TokenBalance) => balance.address === SQUID_NATIVE_TOKEN.toLowerCase()
+      (balance: TokenBalance) => balance.address.toLowerCase() === SQUID_NATIVE_TOKEN.toLowerCase()
         && balance.chainId.toString() === chainId.toString(),
     );
 
@@ -337,29 +337,22 @@ export const useRoutes = () => {
           data.toAmount,
         );
 
-        console.log('===routeResponse', routeResponse);
-
         if (!routeResponse?.route) return null;
 
         const gasCost = getGasCost(routeResponse, data.balance.chainId);
         const feeCost = getTotalFees(routeResponse, data.balance.chainId);
         const userGasBalance = findUserGasBalance(data.balance.chainId);
 
-        console.log('=== userGasBalance', userGasBalance);
-        console.log('=== sourceGasCost', gasCost);
-
-        if (!hasSufficientNativeTokenBalance(userGasBalance, data.fromAmount, data.fromToken, gasCost, feeCost)) {
-          console.warn('Insufficient native gas balance for transaction on source chain');
-          console.log('=== userGasBalance', userGasBalance);
-          console.log('=== totalGasCost', gasCost);
-          console.log('=== data.fromAmount', data.fromAmount);
-          console.log('=== data.balance.chainId', data.balance.chainId);
-          return null;
-        }
-
         return {
           amountData: data,
           route: routeResponse.route,
+          sufficientGas: hasSufficientNativeTokenBalance(
+            userGasBalance,
+            data.fromAmount,
+            data.fromToken,
+            gasCost,
+            feeCost,
+          ),
         } as RouteData;
       } catch (error) {
         return null;
