@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Passport SDK - Login with NextJS",
-  description: "Examples of different ways to login with NextJS",
+  description: "Examples of different ways to login and logout with NextJS",
 };
 
 export default function RootLayout({

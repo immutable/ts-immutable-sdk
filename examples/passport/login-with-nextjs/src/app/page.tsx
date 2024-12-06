@@ -27,5 +27,17 @@ export default function Home() {
       rc={<NextLink href="/login-with-identity-only" />}>
         Login with Identity only
       </Button> 
+      <Button       
+      className="mb-1"
+      size="medium" 
+      rc={<NextLink href="/logout-with-redirect-mode" />}>
+        Logout with Redirect Mode
+      </Button> 
+      <Button       
+      className="mb-1"
+      size="medium" 
+      rc={<NextLink href="/logout-with-silent-mode" />}>
+        Logout with Silent Mode
+      </Button> 
   </>);
 }

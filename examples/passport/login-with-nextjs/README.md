@@ -1,6 +1,6 @@
-# Checkout SDK Connect Example App
+# Passport SDK Login/Identity Example App
 
-This example app is designed to show you how to connect a wallet either with or without asking for permissions to interact with the wallet.
+This example app is designed to show you how to connect your account with passport in a number of ways, as well as the different options when logging out.
 
 This example app runs on Immutable Testnet. To use this code on Immutable zkEVM Mainnet make sure you instantiate the SDK with the Mainnet configuration.
 
