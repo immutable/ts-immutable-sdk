@@ -282,23 +282,22 @@ export const useRoutes = () => {
     const getGasCost = (
       route: RouteResponseData,
       chainId: string | number,
-    ) => {
-      const gasCosts = route.route?.route.estimate.gasCosts
-        .filter((gasCost) => gasCost.token.chainId === chainId.toString())
-        .reduce(
-          (sum, gasCost) => sum + parseFloat(utils.formatUnits(gasCost.amount, gasCost.token.decimals)),
-          0,
-        );
+    ) => (route.route?.route.estimate.gasCosts || [])
+      .filter((gasCost) => gasCost.token.chainId === chainId.toString())
+      .reduce(
+        (sum, gasCost) => sum + parseFloat(utils.formatUnits(gasCost.amount, gasCost.token.decimals)),
+        0,
+      );
 
-      const receiverFee = route.route?.route.estimate.feeCosts
-        .filter((fee) => fee.token.chainId === chainId.toString() && fee.description === 'Gas receiver fee')
-        .reduce(
-          (sum, fee) => sum + parseFloat(utils.formatUnits(fee.amount, fee.token.decimals)),
-          0,
-        );
-
-      return (gasCosts || 0) + (receiverFee || 0);
-    };
+    const getTotalFees = (
+      route: RouteResponseData,
+      chainId: string | number,
+    ) => (route.route?.route.estimate.feeCosts || [])
+      .filter((fee) => fee.token.chainId === chainId.toString())
+      .reduce(
+        (sum, fee) => sum + parseFloat(utils.formatUnits(fee.amount, fee.token.decimals)),
+        0,
+      );
 
     const findUserGasBalance = (chainId: string | number) => balances.find(
       (balance: TokenBalance) => balance.address === SQUID_NATIVE_TOKEN.toLowerCase()
@@ -308,25 +307,23 @@ export const useRoutes = () => {
     const hasSufficientNativeTokenBalance = (
       userGasBalance: TokenBalance | undefined,
       fromAmount: string,
-      totalGasCost: number | undefined,
       fromToken: Token,
+      totalGasCost: number,
+      totalFeeCost: number,
     ) => {
-      if (!userGasBalance || !totalGasCost) {
-        return false;
-      }
+      if (!userGasBalance) return false;
 
       const userBalance = parseFloat(
         utils.formatUnits(userGasBalance.balance, userGasBalance.decimals),
       );
 
-      // If the fromToken is the native token, validate balance for both fromAmount and gas costs
-      if (fromToken.address.toLowerCase() === SQUID_NATIVE_TOKEN.toLowerCase()) {
-        const requiredAmount = parseFloat(fromAmount) + totalGasCost;
-        return userBalance >= requiredAmount;
-      }
+      // If the fromToken is the native token, validate balance for both fromAmount and gas + fee costs
+      // Otherwise, only validate balance for gas + fee costs
+      const requiredAmount = fromToken.address.toLowerCase() === SQUID_NATIVE_TOKEN.toLowerCase()
+        ? parseFloat(fromAmount) + totalGasCost + totalFeeCost
+        : totalGasCost + totalFeeCost;
 
-      // Otherwise, only validate balance for gas costs
-      return userBalance >= totalGasCost;
+      return userBalance >= requiredAmount;
     };
 
     const routePromises = fromAmountArray.map(async (data: AmountData) => {
@@ -345,12 +342,13 @@ export const useRoutes = () => {
         if (!routeResponse?.route) return null;
 
         const gasCost = getGasCost(routeResponse, data.balance.chainId);
+        const feeCost = getTotalFees(routeResponse, data.balance.chainId);
         const userGasBalance = findUserGasBalance(data.balance.chainId);
 
         console.log('=== userGasBalance', userGasBalance);
         console.log('=== sourceGasCost', gasCost);
 
-        if (!hasSufficientNativeTokenBalance(userGasBalance, data.fromAmount, gasCost, data.fromToken)) {
+        if (!hasSufficientNativeTokenBalance(userGasBalance, data.fromAmount, data.fromToken, gasCost, feeCost)) {
           console.warn('Insufficient native gas balance for transaction on source chain');
           console.log('=== userGasBalance', userGasBalance);
           console.log('=== totalGasCost', gasCost);
@@ -369,7 +367,7 @@ export const useRoutes = () => {
     });
 
     const routesData = (await Promise.all(routePromises)).filter(
-      (route): route is RouteData => route !== null && route !== undefined,
+      (route): route is RouteData => route !== null,
     );
 
     console.log('!!!!!!!routesData', routesData);
