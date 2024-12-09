@@ -5,10 +5,11 @@ A sample backend service that listens for NFT transfers to a burn address on Imm
 ## Overview
 
 This service:
-1. Listens for transfer events via webhooks from Immutable X
-2. When an NFT is transferred to the burn address (0x0000000000000000000000000000000000000000) from a specified collection
-3. Creates a mint request for the same NFT on Immutable zkEVM
-4. Uses the minting-backend module to handle the minting process
+1. Registers migrations in a migrations table to track the migration process.
+2. Listens for transfer events via webhooks from Immutable X
+3. When an NFT is transferred to the burn address (0x0000000000000000000000000000000000000000) from a specified collection
+4. Creates a mint request for the same NFT on Immutable zkEVM
+5. Uses the minting-backend module to handle the minting process
 
 ## Getting Started
 
@@ -61,6 +62,7 @@ localhost:3001
 # Postgres
 localhost:5432
 ```
+
 ## Expose Local Port for Webhooks
 
 You can use services like below to expose ports locally.
@@ -110,10 +112,17 @@ The service uses:
 3. If transfer matches criteria:
    - Creates mint request for zkEVM
    - Submits mint request via minting backend
-4. Minting backend handles the actual minting process
-5. Service receives mint status updates via webhook
+4. Listens for burn events and verifies corresponding migration in the migrations table before minting.
+5. Minting backend handles the actual minting process
+6. Updates the migration record when a mint event occurs.
 
 ## Database
 
 The service uses PostgreSQL for persistence. Tables are automatically created on startup:
 - Uses `im_assets` tables for mint requests
+- Includes a `migrations` table to track migration registrations.
+
+## APIs
+
+- **POST /migrations**: API to register a new migration.
+- **GET /migrations**: API to retrieve all pending migrations.
