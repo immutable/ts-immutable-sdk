@@ -49,6 +49,9 @@
     "pg": "^8.11.5",
     "prisma": "^5.13.0"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "pnpm transpile && pnpm typegen",

@@ -93,6 +93,10 @@
   "license": "ISC",
   "main": "dist/main.js",
   "module": "dist/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "pnpm transpile && pnpm typegen",
     "transpile": "tsup src/index.ts --config ./tsup.config.js",
