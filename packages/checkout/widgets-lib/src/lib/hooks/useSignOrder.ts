@@ -2,6 +2,8 @@
 import { useCallback, useState } from 'react';
 import { SaleItem } from '@imtbl/checkout-sdk';
 
+import { ChainType, EvmContractCall, SquidCallType } from '@0xsquid/squid-types';
+import { ethers } from 'ethers';
 import {
   SignResponse,
   SignOrderInput,
@@ -19,6 +21,7 @@ import {
   SignApiRequest,
   SignApiError,
   SignCurrencyFilter,
+  SquidPostHookCall,
 } from '../primary-sales';
 import { filterAllowedTransactions, hexToText } from '../utils';
 
@@ -72,6 +75,7 @@ const toSignResponse = (
           return acc;
         }, [] as SignedOrderProduct[]),
       totalAmount: Number(order.total_amount),
+      recipientAddress: order.recipient_address,
     },
     transactions: transactions.map((transaction) => ({
       tokenAddress: transaction.contract_address,
@@ -104,6 +108,9 @@ export const useSignOrder = (input: SignOrderInput) => {
     undefined,
   );
   const [signResponse, setSignResponse] = useState<SignResponse | undefined>(
+    undefined,
+  );
+  const [, setPostHooks] = useState<EvmContractCall[] | undefined>(
     undefined,
   );
   const [executeResponse, setExecuteResponse] = useState<ExecuteOrderResponse>({
@@ -196,6 +203,46 @@ export const useSignOrder = (input: SignOrderInput) => {
     [provider, waitFulfillmentSettlements],
   );
 
+  const signAPI = useCallback(async (
+    baseUrl: string,
+    data: SignApiRequest,
+  ): Promise<SignApiResponse> => {
+    const response = await fetch(baseUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const { code } = (await response.json()) as SignApiError;
+      let errorType: SaleErrorTypes;
+      switch (response.status) {
+        case 400:
+          errorType = SaleErrorTypes.SERVICE_BREAKDOWN;
+          break;
+        case 404:
+          if (code === 'insufficient_stock') {
+            errorType = SaleErrorTypes.INSUFFICIENT_STOCK;
+          } else {
+            errorType = SaleErrorTypes.PRODUCT_NOT_FOUND;
+          }
+          break;
+        case 429:
+        case 500:
+          errorType = SaleErrorTypes.DEFAULT;
+          break;
+        default:
+          throw new Error('Unknown error');
+      }
+
+      throw new Error(errorType);
+    }
+
+    return response.json();
+  }, []);
+
   const sign = useCallback(
     async (
       paymentType: SignPaymentTypes,
@@ -218,42 +265,8 @@ export const useSignOrder = (input: SignOrderInput) => {
         };
 
         const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/order/sign`;
-        const response = await fetch(baseUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data),
-        });
+        const apiResponse = await signAPI(baseUrl, data);
 
-        const { ok, status } = response;
-        if (!ok) {
-          const { code } = (await response.json()) as SignApiError;
-          let errorType: SaleErrorTypes;
-          switch (status) {
-            case 400:
-              errorType = SaleErrorTypes.SERVICE_BREAKDOWN;
-              break;
-            case 404:
-              if (code === 'insufficient_stock') {
-                errorType = SaleErrorTypes.INSUFFICIENT_STOCK;
-              } else {
-                errorType = SaleErrorTypes.PRODUCT_NOT_FOUND;
-              }
-              break;
-            case 429:
-            case 500:
-              errorType = SaleErrorTypes.DEFAULT;
-              break;
-            default:
-              throw new Error('Unknown error');
-          }
-
-          setSignError({ type: errorType });
-          return undefined;
-        }
-
-        const apiResponse: SignApiResponse = await response.json();
         const apiTokenIds = apiResponse.order.products
           .map((product) => product.detail.map(({ token_id }) => token_id))
           .flat();
@@ -278,6 +291,109 @@ export const useSignOrder = (input: SignOrderInput) => {
       return undefined;
     },
     [items, environmentId, environment, provider],
+  );
+
+  const getPostHooks = (signApiResponse: SignResponse): SquidPostHookCall[] => {
+    const approvalTxn = signApiResponse.transactions.find((txn) => txn.methodCall.startsWith('approve'));
+    const transferTxn = signApiResponse.transactions.find((txn) => txn.methodCall.startsWith('execute'));
+    const postHookCalls: SquidPostHookCall[] = [];
+
+    if (approvalTxn) {
+      postHookCalls.push({
+        chainType: ChainType.EVM,
+        callType: SquidCallType.FULL_TOKEN_BALANCE,
+        target: approvalTxn.tokenAddress,
+        value: '0',
+        callData: approvalTxn.rawData,
+        payload: {
+          tokenAddress: approvalTxn.tokenAddress,
+          inputPos: 1,
+        },
+        estimatedGas: approvalTxn.gasEstimate.toString(),
+      });
+    }
+
+    if (transferTxn) {
+      postHookCalls.push({
+        chainType: ChainType.EVM,
+        callType: SquidCallType.DEFAULT,
+        value: '0',
+        payload: {
+          tokenAddress: transferTxn.tokenAddress,
+          inputPos: 0,
+        },
+        target: transferTxn.tokenAddress,
+        callData: transferTxn.rawData,
+        estimatedGas: transferTxn.gasEstimate.toString(),
+      });
+    }
+
+    if (approvalTxn) {
+      const erc20Interface = new ethers.utils.Interface(['function transfer(address to, uint256 amount)']);
+      const transferPendingTokensTx = erc20Interface.encodeFunctionData(
+        'transfer',
+        [signApiResponse.order.recipientAddress, 0],
+      );
+
+      postHookCalls.push({
+        chainType: ChainType.EVM,
+        callType: SquidCallType.FULL_TOKEN_BALANCE,
+        target: approvalTxn.tokenAddress,
+        value: '0',
+        callData: transferPendingTokensTx,
+        payload: {
+          tokenAddress: approvalTxn.tokenAddress,
+          inputPos: 1,
+        },
+        estimatedGas: '50000',
+      });
+    }
+
+    return postHookCalls;
+  };
+
+  const signWithPostHooks = useCallback(
+    async (
+      paymentType: SignPaymentTypes,
+      fromTokenAddress: string,
+    ): Promise<{ signResponse: SignResponse; postHooks: SquidPostHookCall[] } | undefined> => {
+      try {
+        const signer = provider?.getSigner();
+        const address = (await signer?.getAddress()) || '';
+
+        const data: SignApiRequest = {
+          recipient_address: address,
+          payment_type: paymentType,
+          currency_filter: SignCurrencyFilter.CONTRACT_ADDRESS,
+          currency_value: fromTokenAddress,
+          products: items.map((item) => ({
+            product_id: item.productId,
+            quantity: item.qty,
+          })),
+          custom_data: customOrderData,
+        };
+
+        const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/order/sign`;
+        const apiResponse = await signAPI(baseUrl, data);
+
+        const apiTokenIds = apiResponse.order.products
+          .map((product) => product.detail.map(({ token_id }) => token_id))
+          .flat();
+
+        const responseData = toSignResponse(apiResponse, items);
+        const squidPostHooks = getPostHooks(responseData);
+
+        setPostHooks(squidPostHooks);
+        setTokenIds(apiTokenIds);
+        setSignResponse(responseData);
+
+        return { signResponse: responseData, postHooks: squidPostHooks };
+      } catch (e: any) {
+        setSignError({ type: SaleErrorTypes.DEFAULT, data: { error: e } });
+      }
+      return undefined;
+    },
+    [items, environmentId, environment, provider, getPostHooks],
   );
 
   const executeTransaction = async (
@@ -406,6 +522,7 @@ export const useSignOrder = (input: SignOrderInput) => {
 
   return {
     sign,
+    signWithPostHooks,
     signResponse,
     signError,
     filteredTransactions,
@@ -414,5 +531,6 @@ export const useSignOrder = (input: SignOrderInput) => {
     executeResponse,
     tokenIds,
     executeNextTransaction,
+    getPostHooks,
   };
 };

@@ -172,8 +172,7 @@ export default function AddTokensWidget({
     (async () => {
       try {
         fetchingBalances.current = true;
-        const evmChains = chains.filter((chain) => chain.type === 'evm');
-        const balances = await fetchBalances(squid, evmChains, fromProvider);
+        const balances = await fetchBalances(squid, chains, fromProvider);
 
         addTokensDispatch({
           payload: {
