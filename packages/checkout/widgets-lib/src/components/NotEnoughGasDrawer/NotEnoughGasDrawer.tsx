@@ -21,7 +21,7 @@ export function NotEnoughGasDrawer({
   onToolkitClick: () => void;
 }) {
   const { t } = useTranslation();
-  const tokenName = routeData?.route.route.estimate.gasCosts[0].token.name;
+  const tokenName = routeData?.route.route.estimate.gasCosts[0].token.symbol ?? '';
 
   return (
     <Drawer

@@ -104,7 +104,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
           <span style={{ color: 'red' }}>
             {t('views.ADD_TOKENS.noGasRouteMessage', {
               token:
-              routeData.route.route.estimate.gasCosts[0].token.name,
+              routeData.route.route.estimate.gasCosts[0].token.symbol,
             })}
           </span>
         </>
