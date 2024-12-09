@@ -69,32 +69,32 @@ Then you can run each of the tests;
 
 ### Test tokenBridge.getFee
 
-`yarn run fees`
+`pnpm run fees`
 
 Console logs the fees for all the various transaction types.
 
 ### Test tokenBrige.getUnsignedApproveBridgeTx
 
-`yarn run approval`
+`pnpm run approval`
 
 Console logs the approval tansactions for all the various transaction types.
 
 ### Test tokenBrige.getUnsignedBridgeTx
 
-`yarn run bridge`
+`pnpm run bridge`
 
 Console logs the bridge tansactions for all the various transaction types.
 
 
 ### Test Deposit
 
-`yarn run deposit`
+`pnpm run deposit`
 
 @TODO should do the e2e test including getting fees, signing the approval and signing the deposit tx
 
 ### Test Withdraw
 
-`yarn run withdraw`
+`pnpm run withdraw`
 
 @TODO should do the e2e test including getting fees, signing the approval and signing the withdraw tx
 
@@ -105,6 +105,6 @@ Console logs the bridge tansactions for all the various transaction types.
 
 Fill out the optional params listed in the setup section under `MAP TOKEN` including the address of the root token you want to map on Sepolia.
 
-`yarn run mapToken`
+`pnpm run mapToken`
 
 This will console log out the token status and wait for the mapping to be completed on Layer 2. If you stop the process and run it again it will resume waiting for layer 2, or tell you if its completed on both chains.

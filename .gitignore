@@ -13,8 +13,6 @@ cache/
 *version.properties
 
 .pnp.*
-.yarn/cache
-.yarn/install-state.gz
 
 .yalc
 yalc.lock

@@ -13,11 +13,11 @@ The [contracts library](https://github.com/immutable/contracts) contains smart c
 Install dependencies:
 
 ```bash
-yarn install
+pnpm install
 ```
 
 Test the examples:
 
 ```bash
-yarn test
+pnpm test
 ```
