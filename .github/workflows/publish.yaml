@@ -103,7 +103,7 @@ jobs:
           subject-path: './sdk, !./sdk/node_modules'
 
       - name: Authenticate NPM
-        run: pnpm config set //registry.npmjs.org/:_authToken ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
+        run: pnpm config --location project set //registry.npmjs.org/:_authToken=${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
 
       - name: Generate version.json
         if: (env.DRY_RUN) == 'false'
