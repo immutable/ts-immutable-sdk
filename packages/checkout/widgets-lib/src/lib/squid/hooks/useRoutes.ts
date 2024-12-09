@@ -155,25 +155,46 @@ export const useRoutes = () => {
     fromAmount: string,
     fromAddress?: string,
     quoteOnly = true,
-  ): Promise<RouteResponse | undefined> => await retry(
-    () => squid.getRoute({
-      fromChain: fromToken.chainId,
-      fromToken: fromToken.address,
-      fromAmount: convertToFormattedAmount(fromAmount, fromToken.decimals),
-      toChain: toToken.chainId,
-      toToken: toToken.address,
-      fromAddress,
-      toAddress,
-      quoteOnly,
-      enableBoost: true,
-      receiveGasOnDestination: !isPassportProvider(toProvider),
-    }),
-    {
-      retryIntervalMs: 1000,
-      retries: 5,
-      nonRetryable: (err: any) => err.response.status !== 429,
-    },
-  );
+  ): Promise<RouteResponse | undefined> => {
+    try {
+      return await retry(
+        () => squid.getRoute({
+          fromChain: fromToken.chainId,
+          fromToken: fromToken.address,
+          fromAmount: convertToFormattedAmount(fromAmount, fromToken.decimals),
+          toChain: toToken.chainId,
+          toToken: toToken.address,
+          fromAddress,
+          toAddress,
+          quoteOnly,
+          enableBoost: true,
+          receiveGasOnDestination: !isPassportProvider(toProvider),
+        }),
+        {
+          retryIntervalMs: 1000,
+          retries: 5,
+          nonRetryable: (err: any) => err.response?.status !== 429,
+        },
+      );
+    } catch (error: any) {
+      track({
+        userJourney: UserJourney.ADD_TOKENS,
+        screen: 'Routes',
+        action: 'Failed',
+        extras: {
+          contextId: id,
+          fromToken: fromToken.symbol,
+          toToken: toToken.symbol,
+          fromChain: fromToken.chainId,
+          toChain: toToken.chainId,
+          errorStatus: error.response?.status,
+          errorMessage: error.response?.data?.message,
+          errorStack: error.stack,
+        },
+      });
+      throw error;
+    }
+  };
 
   const isRouteToAmountGreaterThanToAmount = (
     routeResponse: RouteResponse,

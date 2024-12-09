@@ -122,6 +122,7 @@ export function Review({
   const [amountData, setAmountData] = useState<AmountData | undefined>();
   const [proceedDisabled, setProceedDisabled] = useState(true);
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
+  const [showSecuringQuote, setShowSecuringQuote] = useState(false);
   const [showAddressMissmatchDrawer, setShowAddressMissmatchDrawer] = useState(false);
   const { getAmountData, getRoute } = useRoutes();
   const { addHandover, closeHandover } = useHandover({
@@ -152,6 +153,8 @@ export function Review({
 
     if (!fromAddress || !toAddress) return;
 
+    setShowSecuringQuote(true);
+
     const updatedAmountData = getAmountData(
       tokens,
       data.balance,
@@ -174,10 +177,16 @@ export function Review({
       fromAddress,
       false,
     );
-
     setRoute(routeResponse.route);
     setAmountData(updatedAmountData);
     setProceedDisabled(false);
+    setShowSecuringQuote(false);
+    if (routeResponse?.route === undefined) {
+      showErrorHandover(AddTokensErrorTypes.ROUTE_ERROR, {
+        contextId: id,
+        error: 'Failed to obtain final route',
+      });
+    }
   };
 
   const { fromChain, toChain } = useMemo(
@@ -975,7 +984,7 @@ export function Review({
           </>
         )}
 
-        {!route && !showAddressMissmatchDrawer && (
+        {!route && !showAddressMissmatchDrawer && showSecuringQuote && (
           <LoadingView
             loadingText={t('views.ADD_TOKENS.review.loadingText')}
             containerSx={{ bg: 'transparent' }}

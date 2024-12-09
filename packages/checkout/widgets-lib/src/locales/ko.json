@@ -749,6 +749,11 @@
           "heading": "앗! 결제 지갑이 변경되었습니다",
           "body": "이전에 선택한 지갑과 다시 연결하라는 메시지가 표시됩니다",
           "buttonText": "결제 지갑 재선택"
+        },
+        "routeError": {
+          "heading": "적절한 최종 견적을 찾을 수 없습니다",
+          "subHeading": "다시 시도해 주세요",
+          "secondaryButtonText": "돌아가기"
         }
       },
       "review": {

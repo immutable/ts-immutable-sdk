@@ -752,6 +752,11 @@
           "heading": "おっと！支払いウォレットが変更されました",
           "body": "以前に選択したウォレットと再接続するように求められます",
           "buttonText": "支払いウォレットを再選択"
+        },
+        "routeError": {
+          "heading": "適切な最終見積もりが見つかりませんでした",
+          "subHeading": "もう一度お試しください",
+          "secondaryButtonText": "戻る"
         }
       },
       "review": {
