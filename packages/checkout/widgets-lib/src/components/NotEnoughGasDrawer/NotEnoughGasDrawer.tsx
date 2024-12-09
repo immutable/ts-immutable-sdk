@@ -7,7 +7,7 @@ import {
 } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
 import { RouteData } from '../../lib/squid/types';
-import { NoGasHero } from '../Hero/NoGasHEro';
+import { NoGasHero } from '../Hero/NoGasHero';
 
 export function NotEnoughGasDrawer({
   visible,
@@ -36,8 +36,8 @@ export function NotEnoughGasDrawer({
         alignItems: 'center',
       }}
       >
-
         <NoGasHero />
+
         <Box sx={{
           display: 'flex',
           flexDirection: 'column',
