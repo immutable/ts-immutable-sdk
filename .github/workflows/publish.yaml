@@ -52,7 +52,7 @@ jobs:
           exit 1
 
       - name: Check User Permission
-        if: contains(env.RELEASE_TYPE, 'major')
+        if: ${{ env.RELEASE_TYPE == 'major' }}
         id: check_user_permission
         uses: actions-cool/check-user-permission@v2
         with:
@@ -62,16 +62,16 @@ jobs:
           check-bot: true
 
       - name: Log User Permission
-        if: contains(env.RELEASE_TYPE, 'major')
+        if: ${{ env.RELEASE_TYPE == 'major' }}
         run: |
           echo "Check user permissions for triggering actor - ${{ github.triggering_actor }}"
           echo "user-permission = ${{ steps.check_user_permission.outputs.user-permission }}"
           echo "require-result = ${{ steps.check_user_permission.outputs.require-result }}"
   
       - name: Major release Permission Check
-        if: contains(env.RELEASE_TYPE, 'major')
+        if: ${{ env.RELEASE_TYPE == 'major' }}
         run: |
-          if [[ ${{ steps.check_user_permission.outputs.require-result }} != 'true' || ! ${{ fromJson(env.SDK_PUBLISH_MAJOR_VERSION_ACTORS) }}.includes(${{ github.triggering_actor }}) ]]; then
+          if [[ ${{ steps.check_user_permission.outputs.require-result }} != 'true' || !${{ fromJson(env.SDK_PUBLISH_MAJOR_VERSION_ACTORS) }}.includes(${{ github.triggering_actor }}) ]]; then
             echo "User does not have permission to perform a major release."
             exit 1
           fi
