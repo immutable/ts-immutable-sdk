@@ -98,6 +98,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
 
       <MenuItem.Caption>
         {`${t('views.ADD_TOKENS.fees.balance')} ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${routeBalanceUsd}`}
+        {routeData.sufficientGas ? '' : ' *Insufficient gas*'}
       </MenuItem.Caption>
 
       <MenuItem.PriceDisplay price={fromAmount}>

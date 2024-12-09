@@ -38,6 +38,7 @@ export type AmountData = {
 export type RouteData = {
   amountData: AmountData;
   route: RouteResponse;
+  sufficientGas?: boolean;
 };
 
 export type RouteResponseData = {
