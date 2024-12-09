@@ -156,6 +156,9 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "browser": "./dist/index.browser.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "pnpm transpile && pnpm typegen",

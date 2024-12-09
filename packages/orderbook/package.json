@@ -48,6 +48,9 @@
   "main": "dist/node/index.cjs",
   "module": "dist/node/index.js",
   "browser": "dist/browser/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "pnpm transpile && pnpm typegen",
