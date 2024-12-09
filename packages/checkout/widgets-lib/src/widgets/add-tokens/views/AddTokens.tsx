@@ -72,6 +72,8 @@ import { getFormattedAmounts } from '../functions/getFormattedNumber';
 import { RouteData } from '../../../lib/squid/types';
 import { SQUID_NATIVE_TOKEN } from '../../../lib/squid/config';
 import { identifyUser } from '../../../lib/analytics/identifyUser';
+import { NotEnoughGasDrawer } from '../../../components/NotEnoughGasDrawer/NotEnoughGasDrawer';
+import { TOOLKIT_SQUID_URL } from '../utils/config';
 
 interface AddTokensProps {
   checkout: Checkout;
@@ -147,6 +149,7 @@ export function AddTokens({
   const [fetchingRoutes, setFetchingRoutes] = useState(false);
   const [insufficientBalance, setInsufficientBalance] = useState(false);
   const [isAmountInputSynced, setIsAmountInputSynced] = useState(false);
+  const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
 
   const debouncedSetSelectedAmount = useRef(
     debounce((value: string) => {
@@ -595,6 +598,19 @@ export function AddTokens({
     });
   }, [id, experiments]);
 
+  useEffect(() => {
+    if (selectedRouteData?.isInsufficientGas) {
+      setShowNotEnoughGasDrawer(true);
+    } else {
+      setShowNotEnoughGasDrawer(false);
+    }
+  }, [selectedRouteData]);
+
+  const handleToolkitClick = () => {
+    setShowNotEnoughGasDrawer(false);
+    window.open(TOOLKIT_SQUID_URL, '_blank');
+  };
+
   return (
     <SimpleLayout
       containerSx={{ bg: 'transparent' }}
@@ -801,6 +817,12 @@ export function AddTokens({
           <OnboardingDrawer environment={checkout?.config.environment!} />
         </Stack>
       </Stack>
+      <NotEnoughGasDrawer
+        visible={showNotEnoughGasDrawer}
+        routeData={selectedRouteData}
+        onTryAgainClick={() => setShowNotEnoughGasDrawer(false)}
+        onToolkitClick={handleToolkitClick}
+      />
     </SimpleLayout>
   );
 }

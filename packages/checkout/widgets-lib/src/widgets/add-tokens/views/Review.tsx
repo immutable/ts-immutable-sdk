@@ -50,6 +50,7 @@ import {
   APPROVE_TXN_ANIMATION,
   EXECUTE_TXN_ANIMATION,
   FIXED_HANDOVER_DURATION,
+  TOOLKIT_SQUID_URL,
 } from '../utils/config';
 import {
   useAnalytics,
@@ -563,7 +564,7 @@ export function Review({
                     rc={(
                       <a
                         target="_blank"
-                        href="https://toolkit.immutable.com/squid-bridge/"
+                        href={TOOLKIT_SQUID_URL}
                         rel="noreferrer"
                       />
                     )}
@@ -577,7 +578,7 @@ export function Review({
           ),
           onPrimaryButtonClick: () => {
             window.open(
-              'https://toolkit.immutable.com/squid-bridge/',
+              TOOLKIT_SQUID_URL,
               '_blank',
               'noreferrer',
             );
