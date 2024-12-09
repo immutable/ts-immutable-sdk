@@ -119,7 +119,7 @@ jobs:
         id: npm_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm nx release publish $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") --first-release
+        run: pnpm nx release publish $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") --first-release --verbose
 
       - name: Warm up CDN
         id: warm_up_cdn
