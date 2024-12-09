@@ -52,7 +52,7 @@ jobs:
           exit 1
 
       - name: Check User Permission
-        if: contains(env.RELEASE_TYPE, 'major')
+        if: env.RELEASE_TYPE == 'major'
         id: check_user_permission
         uses: actions-cool/check-user-permission@v2
         with:
@@ -62,14 +62,14 @@ jobs:
           check-bot: true
 
       - name: Log User Permission
-        if: contains(env.RELEASE_TYPE, 'major')
+        if: env.RELEASE_TYPE == 'major'
         run: |
           echo "Check user permissions for triggering actor - ${{ github.triggering_actor }}"
           echo "user-permission = ${{ steps.check_user_permission.outputs.user-permission }}"
           echo "require-result = ${{ steps.check_user_permission.outputs.require-result }}"
   
       - name: Major release Permission Check
-        if: contains(env.RELEASE_TYPE, 'major')
+        if: env.RELEASE_TYPE == 'major'
         run: |
           if [[ ${{ steps.check_user_permission.outputs.require-result }} != 'true' || ! ${{ fromJson(env.SDK_PUBLISH_MAJOR_VERSION_ACTORS) }}.includes(${{ github.triggering_actor }}) ]]; then
             echo "User does not have permission to perform a major release."
@@ -94,7 +94,7 @@ jobs:
         run: pnpm nx release version --specifier ${{ env.RELEASE_TYPE }} $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "")
 
       - name: Build SDK & Checkout Widgets
-        run: pnpm nx run-many -t build -p @imtbl/sdk,@imtbl/checkout-widgets
+        run: pnpm build
 
       # ! Do NOT remove - this will cause a Sev 0 incident !
       - name: Generate SDK attestations
@@ -112,6 +112,7 @@ jobs:
           cp ./sdk/version.json ./sdk/dist/
 
       - name: Publish Github Release
+        if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }}
         run: pnpm nx release changelog $(jq -r '.version' ./sdk/package.json) $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") 
 
       - name: Release to NPM
@@ -143,7 +144,7 @@ jobs:
         if: ${{ success() && (steps.npm_release.conclusion == 'success') && env.DRY_RUN == 'false' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
-          message: "✅ ${{ github.triggering_actor }} successfully published SDK version ${{steps.release.outputs.RELEASE_NAME}} to NPM.\n\nhttps://www.npmjs.com/package/@imtbl/sdk/v/${{steps.release.outputs.RELEASE_NAME}}"
+          message: "✅ ${{ github.triggering_actor }} successfully published SDK packages @ version ${{steps.release.outputs.RELEASE_NAME}} to NPM.\n\nhttps://www.npmjs.com/package/@imtbl/sdk/v/${{steps.release.outputs.RELEASE_NAME}}"
 
       - name: Notify SDK Slack Publish Failure
         if: ${{ failure() && (steps.npm_release.conclusion == 'failure') && env.DRY_RUN == 'false' }}
