@@ -200,6 +200,7 @@ export function AddTokens({
           hasEmbeddedSwap: !!route.route.route.estimate.actions.find(
             (action) => action.type === ActionType.SWAP,
           ),
+          isInsufficientGas: route.isInsufficientGas,
         },
       });
     }
