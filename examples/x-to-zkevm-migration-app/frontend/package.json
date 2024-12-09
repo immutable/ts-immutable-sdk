@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@biom3/react": "^0.27.25",
+    "@imtbl/imx-sdk": "^3.8.2",
     "@imtbl/sdk": "^1.52.0",
     "dotenv": "^16.4.5",
     "next": "14.2.10",
