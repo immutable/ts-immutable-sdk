@@ -346,7 +346,7 @@ export const useRoutes = () => {
         return {
           amountData: data,
           route: routeResponse.route,
-          sufficientGas: hasSufficientNativeTokenBalance(
+          isInsufficientGas: !hasSufficientNativeTokenBalance(
             userGasBalance,
             data.fromAmount,
             data.fromToken,
@@ -362,8 +362,6 @@ export const useRoutes = () => {
     const routesData = (await Promise.all(routePromises)).filter(
       (route): route is RouteData => route !== null,
     );
-
-    console.log('!!!!!!!routesData', routesData);
 
     return routesData;
   };
@@ -425,9 +423,7 @@ export const useRoutes = () => {
       );
     }
 
-    console.log('===allRoutes', allRoutes);
     const sortedRoutes = sortRoutesByFastestTime(allRoutes);
-
     // Only update routes if the request is the latest one
     if (currentRequestId === latestRequestIdRef.current) {
       setRoutes(sortedRoutes);
