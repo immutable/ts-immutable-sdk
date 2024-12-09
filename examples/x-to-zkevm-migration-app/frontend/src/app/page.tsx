@@ -239,9 +239,7 @@ export default function Home() {
     if (fetchStagedAssets) {
       try {
         const response = await fetchStagedAssets();
-        console.log('Staged assets (response):', response);
         const stagedAssets = originalIMXAssets.filter((asset: any) => response.some((stagedAsset: any) => stagedAsset.token_id === asset.token_id));
-        console.log('Staged assets (set):', stagedAssets);
         setStagedAssets(stagedAssets);
       } catch (error) {
         console.error('Error fetching staged assets:', error);
