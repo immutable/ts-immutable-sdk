@@ -1,13 +1,12 @@
 'use client';
 
-// import WalletConnectPopup from '@/components/WalletConnectPopup';
 import { useBackend } from '@/context/backend'; // Adjust the import path as necessary
 import { useIMX } from '@/context/imx';
 import { useLink } from '@/context/link';
 import { usePassport } from '@/context/passport';
 import { useZkEVM } from '@/context/zkevm';
 import { Box, Button, Grid, Heading, Stack } from '@biom3/react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function Home() {
   const { listAssets: listIMXAssets } = useIMX();
@@ -132,6 +131,18 @@ export default function Home() {
     }
   };
 
+  const handleListStagedAssets = useCallback(async () => {
+    if (fetchStagedAssets) {
+      try {
+        const response = await fetchStagedAssets();
+        const stagedAssets = originalIMXAssets.filter((asset: any) => response.some((stagedAsset: any) => stagedAsset.token_id === asset.token_id));
+        setStagedAssets(stagedAssets);
+      } catch (error) {
+        console.error('Error fetching staged assets:', error);
+      }
+    }
+  }, [fetchStagedAssets, originalIMXAssets]); // Add dependencies
+
   useEffect(() => {
     const fetchAssets = async () => {
       if (imxWalletAddress) {
@@ -145,7 +156,7 @@ export default function Home() {
     if (imxAssets.length > 0) { // Ensure imxAssets is loaded
       handleListStagedAssets(); // Call to fetch staged assets only after IMX assets are loaded
     }
-  }, [imxAssets]); // Add imxAssets as a dependency
+  }, [imxAssets.length]); // Change dependency to imxAssets.length
 
   useEffect(() => {
     if (zkevmWalletAddress) {
@@ -173,7 +184,7 @@ export default function Home() {
       setLoading(true);
       try {
         if (imxWalletAddress) {
-          await passportBurn(selectedAssets.map(asset => ({
+          await passportBurn(stagedAssets.map(asset => ({
             tokenId: asset.token_id,
             tokenAddress: asset.token_address,
           })));
@@ -182,6 +193,7 @@ export default function Home() {
           setSelectedAssets([]);
           await handleListIMXAssets();
           await handleListZKEVMAssets();
+          await handleListStagedAssets();
         } else {
           console.error('IMX wallet address is undefined');
         }
@@ -198,7 +210,7 @@ export default function Home() {
       setLoading(true);
       try {
         if (imxWalletAddress) {
-          await linkBurn(selectedAssets.map(asset => ({
+          await linkBurn(stagedAssets.map(asset => ({
             tokenId: asset.token_id,
             tokenAddress: asset.token_address,
           })));
@@ -207,6 +219,7 @@ export default function Home() {
           setSelectedAssets([]);
           await handleListIMXAssets();
           await handleListZKEVMAssets();
+          await handleListStagedAssets();
         } else {
           console.error('IMX wallet address is undefined');
         }
@@ -232,18 +245,6 @@ export default function Home() {
       await stageAssets(migrationReqs);
       await handleListStagedAssets();
       setSelectedAssets([]); // Clear selected assets
-    }
-  };
-
-  const handleListStagedAssets = async () => {
-    if (fetchStagedAssets) {
-      try {
-        const response = await fetchStagedAssets();
-        const stagedAssets = originalIMXAssets.filter((asset: any) => response.some((stagedAsset: any) => stagedAsset.token_id === asset.token_id));
-        setStagedAssets(stagedAssets);
-      } catch (error) {
-        console.error('Error fetching staged assets:', error);
-      }
     }
   };
 
