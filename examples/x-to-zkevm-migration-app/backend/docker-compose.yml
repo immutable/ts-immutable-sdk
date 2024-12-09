@@ -13,6 +13,7 @@ services:
       - 5432:5432
     volumes:
       - ../../../packages/minting-backend/sdk/src/persistence/pg/seed.sql:/docker-entrypoint-initdb.d/seed.sql
+      - ./persistence/migrations/seed.sql:/docker-entrypoint-initdb.d/migrations_seed.sql
   backend:
     image: node:20-alpine
     restart: always
