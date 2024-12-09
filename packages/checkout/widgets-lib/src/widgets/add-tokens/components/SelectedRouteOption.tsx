@@ -182,6 +182,17 @@ export function SelectedRouteOption({
             {`${t('views.ADD_TOKENS.fees.balance')} ${t(
               'views.ADD_TOKENS.fees.fiatPricePrefix',
             )} $${routeBalanceUsd}`}
+            {routeData?.isInsufficientGas && (
+            <>
+              <br />
+              <span style={{ color: 'red' }}>
+                {t('views.ADD_TOKENS.noGasRouteMessage', {
+                  token:
+              routeData.route.route.estimate.gasCosts[0].token.name,
+                })}
+              </span>
+            </>
+            )}
           </MenuItem.Caption>
         </Stack>
         <MenuItem.PriceDisplay price={fromAmount}>
