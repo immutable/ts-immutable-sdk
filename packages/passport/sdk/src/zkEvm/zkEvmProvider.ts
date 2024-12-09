@@ -138,6 +138,16 @@ export class ZkEvmProvider implements Provider {
       PassportEvents.ACCOUNTS_REQUESTED,
       trackSessionActivity,
     );
+    passportEventEmitter.on(PassportEvents.CHECK_IN, (clientId: string) => {
+      this.#authManager.getUser().then((user) => {
+        if (user) {
+          this.#initialiseEthSigner(user);
+          if (isZkEvmUser(user)) {
+            this.#callSessionActivity(user.zkEvm.ethAddress, clientId);
+          }
+        }
+      }).catch(); // User does not exist, no need to do anything.
+    });
   }
 
   #handleLogout = () => {
@@ -192,7 +202,7 @@ export class ZkEvmProvider implements Provider {
     return ethSigner;
   }
 
-  async #callSessionActivity(zkEvmAddress: string) {
+  async #callSessionActivity(zkEvmAddress: string, clientId?: string) {
     const sendTransactionClosure = async (params: Array<any>, flow: Flow) => {
       const ethSigner = await this.#getSigner();
       return await sendTransaction({
@@ -209,7 +219,7 @@ export class ZkEvmProvider implements Provider {
       environment: this.#config.baseConfig.environment,
       sendTransaction: sendTransactionClosure,
       walletAddress: zkEvmAddress,
-      passportClient: this.#config.oidcConfiguration.clientId,
+      passportClient: clientId || this.#config.oidcConfiguration.clientId,
     });
   }
 

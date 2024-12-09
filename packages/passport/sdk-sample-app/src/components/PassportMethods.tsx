@@ -17,6 +17,7 @@ function PassportMethods() {
     getUserInfo,
     getLinkedAddresses,
     linkWallet,
+    checkIn
   } = usePassportProvider();
 
   const handleLinkWalletClick = async () => {
@@ -27,6 +28,10 @@ function PassportMethods() {
       console.error('Error checking login status');
     }
   };
+
+  const handleCheckIn = () => {
+    checkIn();
+  }
 
   const handleLinkWalletSubmit = useCallback(async (
     type: string,
@@ -84,6 +89,12 @@ function PassportMethods() {
           onClick={handleLinkWalletClick}
         >
           Link Wallet
+        </WorkflowButton>
+        <WorkflowButton 
+          disabled={isLoading}
+          onClick={handleCheckIn}
+        >
+          Check In
         </WorkflowButton>
       </Stack>
       {showLinkWallet && (
