@@ -1,7 +1,6 @@
-import { EIP6963ProviderDetail, EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
+import { EIP6963ProviderDetail, EIP6963ProviderInfo, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { useMemo } from 'react';
 import { MenuItem } from '@biom3/react';
-import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
 import { ConnectWalletDrawer } from './ConnectWalletDrawer';
 import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
@@ -9,7 +8,7 @@ import { useProvidersContext } from '../../context/providers-context/ProvidersCo
 type PayWithWalletDrawerProps = {
   visible: boolean;
   onClose: (fromAddress?: string) => void;
-  onConnect: (providerType: 'from' | 'to', provider: Web3Provider, providerInfo: EIP6963ProviderInfo) => void;
+  onConnect: (providerType: 'from' | 'to', provider: WrappedBrowserProvider, providerInfo: EIP6963ProviderInfo) => void;
   onPayWithCard?: () => void;
   walletOptions: EIP6963ProviderDetail[];
   insufficientBalance?: boolean;
@@ -39,7 +38,7 @@ export function PayWithWalletDrawer({
     return [];
   }, [t, insufficientBalance, fromProviderInfo]);
 
-  const handleOnConnect = (provider: Web3Provider, providerInfo: EIP6963ProviderInfo) => {
+  const handleOnConnect = (provider: WrappedBrowserProvider, providerInfo: EIP6963ProviderInfo) => {
     onConnect('from', provider, providerInfo);
   };
 

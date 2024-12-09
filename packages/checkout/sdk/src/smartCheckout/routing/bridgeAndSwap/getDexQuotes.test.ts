@@ -1,5 +1,4 @@
 import { Environment } from '@imtbl/config';
-import { BigNumber } from 'ethers';
 import { CheckoutConfiguration } from '../../../config';
 import { getDexQuotes } from './getDexQuotes';
 import { BalanceNativeRequirement } from '../../balanceCheck/types';
@@ -24,7 +23,7 @@ describe('getDexQuotes', () => {
       '0xREQUIRED',
       {
         delta: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
         },
       } as BalanceNativeRequirement,
       [
@@ -50,7 +49,7 @@ describe('getDexQuotes', () => {
       '0xOWNER',
       {
         address: '0xREQUIRED',
-        amount: BigNumber.from(1),
+        amount: BigInt(1),
       },
       [
         '0xIMX',

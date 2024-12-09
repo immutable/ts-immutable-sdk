@@ -1,12 +1,13 @@
-import { BigNumber, ethers } from 'ethers';
-import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
+import { ErrorCode, TransactionRequest } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { SendTransactionResult } from '../types';
+import {
+  WrappedBrowserProvider, SendTransactionResult,
+} from '../types';
 import { IMMUTABLE_ZKVEM_GAS_OVERRIDES } from '../env';
 import { isZkEvmChainId } from '../utils/utils';
 
-export function isPassportProvider(provider?: Web3Provider | null) {
-  return (provider?.provider as any)?.isPassport === true;
+export function isPassportProvider(provider?: WrappedBrowserProvider | null) {
+  return provider?.ethereumProvider?.isPassport === true;
 }
 
 /**
@@ -22,21 +23,21 @@ export function isPassportProvider(provider?: Web3Provider | null) {
  * Refer to the docs for more details:
  * https://docs.immutable.com/docs/zkevm/architecture/gas-sponsorship-for-gamers/
  */
-export function isGasFree(provider?: Web3Provider | null) {
+export function isGasFree(provider?: WrappedBrowserProvider | null) {
   return isPassportProvider(provider);
 }
 
 export const setTransactionGasLimits = async (
-  web3Provider: Web3Provider,
+  browserProvider: WrappedBrowserProvider,
   transaction: TransactionRequest,
 ): Promise<TransactionRequest> => {
   const rawTx = transaction;
 
-  const { chainId } = await web3Provider.getNetwork();
-  if (!isZkEvmChainId(chainId)) return rawTx;
+  const { chainId } = await browserProvider.getNetwork();
+  if (!isZkEvmChainId(Number(chainId))) return rawTx;
   if (typeof rawTx.gasPrice !== 'undefined') return rawTx;
-  if (isGasFree(web3Provider)) {
-    rawTx.gasPrice = BigNumber.from(0);
+  if (isGasFree(browserProvider)) {
+    rawTx.gasPrice = BigInt(0);
   } else {
     rawTx.maxFeePerGas = IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxFeePerGas;
     rawTx.maxPriorityFeePerGas = IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxPriorityFeePerGas;
@@ -45,24 +46,17 @@ export const setTransactionGasLimits = async (
 };
 
 export const handleProviderError = (err: any) => {
-  if (err.code === ethers.errors.INSUFFICIENT_FUNDS) {
+  if (err.code === 'INSUFFICIENT_FUNDS' satisfies ErrorCode) {
     return new CheckoutError(
       err.message,
       CheckoutErrorType.INSUFFICIENT_FUNDS,
       { error: err },
     );
   }
-  if (err.code === ethers.errors.ACTION_REJECTED) {
+  if (err.code === 'ACTION_REJECTED' satisfies ErrorCode) {
     return new CheckoutError(
       err.message,
       CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
-      { error: err },
-    );
-  }
-  if (err.code === ethers.errors.UNPREDICTABLE_GAS_LIMIT) {
-    return new CheckoutError(
-      err.message,
-      CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT,
       { error: err },
     );
   }
@@ -74,13 +68,13 @@ export const handleProviderError = (err: any) => {
 };
 
 export const sendTransaction = async (
-  web3Provider: Web3Provider,
+  browserProvider: WrappedBrowserProvider,
   transaction: TransactionRequest,
 ): Promise<SendTransactionResult> => {
   try {
-    const signer = web3Provider.getSigner();
+    const signer = await browserProvider.getSigner();
 
-    const rawTx = await setTransactionGasLimits(web3Provider, transaction);
+    const rawTx = await setTransactionGasLimits(browserProvider, transaction);
     const transactionResponse = await signer.sendTransaction(rawTx);
 
     return {

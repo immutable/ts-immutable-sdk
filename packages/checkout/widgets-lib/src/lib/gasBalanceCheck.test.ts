@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { hasZeroBalance } from './gasBalanceCheck';
 
 describe('gasBalanceCheck', () => {
@@ -15,7 +14,7 @@ describe('gasBalanceCheck', () => {
             symbol: 'IMX',
             decimals: 18,
           },
-          balance: BigNumber.from('0'),
+          balance: BigInt('0'),
           formattedBalance: '0',
         },
       ], 'IMX')).toBeTruthy();
@@ -29,7 +28,7 @@ describe('gasBalanceCheck', () => {
             symbol: 'IMX',
             decimals: 18,
           },
-          balance: BigNumber.from('1'),
+          balance: BigInt('1'),
           formattedBalance: '1',
         },
       ], 'IMX')).toBeFalsy();

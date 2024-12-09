@@ -5,7 +5,6 @@
   "author": "immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "@ethersproject/providers": "^5.7.2",
     "@imtbl/blockchain-data": "workspace:*",
     "@imtbl/bridge-sdk": "workspace:*",
     "@imtbl/config": "workspace:*",
@@ -16,7 +15,7 @@
     "@imtbl/passport": "workspace:*",
     "@metamask/detect-provider": "^2.0.0",
     "axios": "^1.6.5",
-    "ethers": "^5.7.2",
+    "ethers": "^6.13.4",
     "semver": "^7.4.0",
     "uuid": "^8.3.2"
   },
@@ -61,6 +60,9 @@
   "main": "dist/node/index.cjs",
   "module": "dist/node/index.js",
   "browser": "dist/browser/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "pnpm transpile && pnpm typegen",
@@ -70,6 +72,8 @@
     "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/index.ts",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
+    "prepare:examplesdk": "pnpm --filter @examples/commerce-widget-nextjs exec mkdir -p tests/utils/local-widgets-js/ && cp ./dist/*.js $(pnpm --filter @examples/commerce-widget-nextjs exec pwd)/tests/utils/local-widgets-js/",
+    "prepare:testsdk": "pnpm --filter @tests/checkout-widgets-nextjs exec mkdir -p tests/utils/local-widgets-js/ && cp ./dist/*.js $(pnpm --filter @tests/checkout-widgets-nextjs exec pwd)/tests/utils/local-widgets-js/",
     "start": "tsup --config ./tsup.config.js --watch",
     "start:dev": "CHECKOUT_DEV_MODE=true pnpm start",
     "start:local": "CHECKOUT_LOCAL_MODE=true pnpm start",

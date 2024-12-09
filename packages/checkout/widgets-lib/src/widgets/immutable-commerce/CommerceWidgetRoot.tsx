@@ -263,7 +263,7 @@ export class CommerceWidgetRoot extends Base<WidgetType.IMMUTABLE_COMMERCE> {
             >
               <CommerceWidget
                 checkout={this.checkout}
-                web3Provider={this.web3Provider}
+                browserProvider={this.browserProvider}
                 flowParams={this.parameters}
                 flowConfig={this.properties.config || {}}
                 widgetsConfig={this.strongConfig()}

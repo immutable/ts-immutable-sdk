@@ -3,9 +3,9 @@ import {
   EIP6963ProviderDetail,
   EIP6963ProviderInfo,
   WalletProviderRdns,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 
-import { Web3Provider } from '@ethersproject/providers';
 import { MenuItemProps } from '@biom3/react';
 import { WalletDrawer } from './WalletDrawer';
 import { WalletChangeEvent } from './WalletDrawerEvents';
@@ -32,7 +32,7 @@ type ConnectWalletDrawerProps = {
   visible: boolean;
   onClose: (address?: string) => void;
   onConnect?: (
-    provider: Web3Provider,
+    provider: WrappedBrowserProvider,
     providerInfo: EIP6963ProviderInfo
   ) => void;
   onError?: (errorType: ConnectEIP6963ProviderError) => void;
@@ -75,10 +75,10 @@ export function ConnectWalletDrawer({
   const [showEOAWarningDrawer, setShowEOAWarningDrawer] = useState(false);
 
   const setProviderInContext = async (
-    provider: Web3Provider,
+    provider: WrappedBrowserProvider,
     providerInfo: EIP6963ProviderInfo,
   ) => {
-    const address = await provider.getSigner().getAddress();
+    const address = await (await provider.getSigner()).getAddress();
 
     if (providerType === 'from') {
       providersDispatch({
@@ -124,7 +124,7 @@ export function ConnectWalletDrawer({
 
     if (info.rdns === WalletProviderRdns.PASSPORT) {
       const { isConnected } = await checkout.checkIsWalletConnected({
-        provider: new Web3Provider(providerDetail.provider!),
+        provider: new WrappedBrowserProvider(providerDetail.provider!),
       });
 
       if (isConnected) {

@@ -1,5 +1,5 @@
 import { config } from 'dotenv';
-import { Wallet, providers } from 'ethers';
+import { JsonRpcProvider, Wallet } from 'ethers';
 import { deployERC20Token } from './erc20';
 
 config();
@@ -11,6 +11,6 @@ if (!deployerKey || !rpcUrl) {
   throw new Error('missing config');
 }
 
-const deployerWallet = new Wallet(deployerKey, new providers.JsonRpcProvider(rpcUrl));
+const deployerWallet = new Wallet(deployerKey, new JsonRpcProvider(rpcUrl));
 
 deployERC20Token(deployerWallet);

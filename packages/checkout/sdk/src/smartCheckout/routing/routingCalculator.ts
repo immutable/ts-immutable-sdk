@@ -1,4 +1,4 @@
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { JsonRpcProvider } from 'ethers';
 import { BalanceCheckResult, BalanceRequirement } from '../balanceCheck/types';
 import {
   AvailableRoutingOptions,

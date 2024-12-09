@@ -7,7 +7,7 @@ import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
-import { ethers } from 'ethers';
+import { isAddress } from 'ethers';
 import * as encUtils from 'enc-utils';
 
 function ShowGenericConfirmationScreen({ disabled, handleExampleSubmitted }: RequestExampleProps) {
@@ -48,7 +48,7 @@ function ShowGenericConfirmationScreen({ disabled, handleExampleSubmitted }: Req
 
   const handleToAddressChanged = ((newAddress: string) => {
     setToAddressTouched(true);
-    if (ethers.utils.isAddress(newAddress)) {
+    if (isAddress(newAddress)) {
       setToAddressError('');
       setToAddress(newAddress);
     } else {

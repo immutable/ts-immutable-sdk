@@ -1,4 +1,3 @@
-import { Web3Provider } from '@ethersproject/providers';
 import { Box, Button, Heading } from "@biom3/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
@@ -15,11 +14,12 @@ import {
   SwapEventType,
   WalletEventType,
   WalletNetworkSwitch,
-  WidgetTheme, WidgetType, ProviderEventType, ProviderUpdated, WidgetProperties, ChainId
+  WidgetTheme, WidgetType, WidgetProperties, ChainId
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { passport } from './passport';
 import { LanguageSelector } from './LanguageSelector';
+import { WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 
 // Create one instance of Checkout and inject Passport
 const checkout = new Checkout({
@@ -34,7 +34,7 @@ export const MainPage = () => {
   const [doneSwap, setDoneSwap] = useState<boolean>(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
   const [selectedTheme, setSelectedTheme] = useState<WidgetTheme>(WidgetTheme.DARK);
-  const [web3Provider, setWeb3Provider] = useState<Web3Provider | undefined>(undefined);
+  const [browserProvider, setBrowserProvider] = useState<WrappedBrowserProvider | undefined>(undefined);
 
   const widgetsFactory = useMemo(() => new WidgetsFactory(
     checkout,
@@ -64,16 +64,20 @@ export const MainPage = () => {
   onRampWidget.addListener(OnRampEventType.CLOSE_WIDGET, () => { onRampWidget.unmount() });
 
   useEffect(() => {
-    passport.connectEvm();
+    const connectPassport = async () => {
+      await passport.connectEvm();
+    }
+
+    connectPassport();
   }, []);
-  
+
   useEffect(() => {
     connectWidget.addListener(ConnectEventType.CLOSE_WIDGET, () => connectWidget.unmount());
     connectWidget.addListener(ConnectEventType.SUCCESS, (eventData: ConnectionSuccess) => {
-      setWeb3Provider(eventData.provider);
+      setBrowserProvider(eventData.provider);
     });
     walletWidget.addListener(WalletEventType.NETWORK_SWITCH, (eventData: WalletNetworkSwitch) => {
-      setWeb3Provider(eventData.provider)
+      setBrowserProvider(eventData.provider)
     });
   }, [connectWidget, walletWidget, swapWidget]);
 
@@ -134,7 +138,7 @@ export const MainPage = () => {
 
   const openOnRampWidget = useCallback(() => {
     onRampWidget.mount('onramp-target')
-  }, [onRampWidget, web3Provider])
+  }, [onRampWidget, browserProvider])
 
   const logout = useCallback(async () => {
     await passport.logout();
@@ -148,7 +152,7 @@ export const MainPage = () => {
     bridgeWidget.update(languageUpdate);
     swapWidget.update(languageUpdate);
     onRampWidget.update(languageUpdate);
-  }, [onRampWidget, web3Provider]);
+  }, [onRampWidget, browserProvider]);
 
   // When widgets are already mounted, the theme only changes once
   // When the widgets are mounted, the WalletConnect theme is fixed to the theme before widget is mounted
@@ -183,7 +187,7 @@ export const MainPage = () => {
           <Button onClick={toggleTheme}>Toggle theme</Button>
           <LanguageSelector onLanguageChange={(language: string) => updateLanguage(language)} language={selectedLanguage} />
         </Box>
-        {passport && web3Provider && (web3Provider.provider as any)?.isPassport && <Button onClick={logout}>Passport Logout</Button>}
+        {passport && browserProvider && browserProvider.ethereumProvider?.isPassport && <Button onClick={logout}>Passport Logout</Button>}
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', gap: 'base.spacing.x3', flexWrap: 'wrap' }}>
         <div id="connect-target"></div>
