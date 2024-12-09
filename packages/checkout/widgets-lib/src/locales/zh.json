@@ -841,7 +841,14 @@
         "fiatPricePrefix": "≈ 美元",
         "zeroFees": "零手续费",
         "includedFees": "费用"
-      }
+      },
+      "noGasDrawer": {
+        "heading": "您需要更多 {{token}} 用于燃料费",
+        "body": "添加更多燃料费后返回完成此交易，或者尝试其他选项，例如降低金额、使用其他钱包或使用银行卡购买。",
+        "primaryAction": "尝试其他选项",
+        "secondaryAction": "添加更多 {{token}}"
+      },
+      "noGasRouteMessage": "用于燃料费的 {{token}} 不足"
     }
   },
   "footers": {
