@@ -11,27 +11,27 @@ export function prepareTransaction(
   callerAddress: string,
 ): TransactionBuilder {
   return async () => {
-    const v6ContractTransaction = await transactionMethods.buildTransaction();
+    const contractTransaction = await transactionMethods.buildTransaction();
 
-    const v5PopulatedTransaction: PreparedTransactionRequest = {
-      to: v6ContractTransaction.to,
+    const preparedTransactionRequest: PreparedTransactionRequest = {
+      to: contractTransaction.to,
       from: callerAddress,
-      type: v6ContractTransaction.type,
-      maxFeePerGas: v6ContractTransaction.maxFeePerGas
-        ? BigInt(v6ContractTransaction.maxFeePerGas)
+      type: contractTransaction.type,
+      maxFeePerGas: contractTransaction.maxFeePerGas
+        ? BigInt(contractTransaction.maxFeePerGas)
         : undefined,
-      maxPriorityFeePerGas: v6ContractTransaction.maxPriorityFeePerGas
-        ? BigInt(v6ContractTransaction.maxPriorityFeePerGas)
+      maxPriorityFeePerGas: contractTransaction.maxPriorityFeePerGas
+        ? BigInt(contractTransaction.maxPriorityFeePerGas)
         : undefined,
-      value: v6ContractTransaction.value ? BigInt(v6ContractTransaction.value) : undefined,
-      data: v6ContractTransaction.data,
-      nonce: v6ContractTransaction.nonce,
+      value: contractTransaction.value ? BigInt(contractTransaction.value) : undefined,
+      data: contractTransaction.data,
+      nonce: contractTransaction.nonce,
       chainId,
     };
 
-    v5PopulatedTransaction.gasLimit = BigInt(await transactionMethods.estimateGas());
-    v5PopulatedTransaction.gasLimit += (v5PopulatedTransaction.gasLimit / BigInt(5));
+    preparedTransactionRequest.gasLimit = BigInt(await transactionMethods.estimateGas());
+    preparedTransactionRequest.gasLimit += (preparedTransactionRequest.gasLimit / BigInt(5));
 
-    return v5PopulatedTransaction;
+    return preparedTransactionRequest;
   };
 }
