@@ -47,7 +47,7 @@ import {
 import type { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { useRoutes } from '../../../lib/squid/hooks/useRoutes';
 import { AddTokensWidgetViews } from '../../../context/view-context/AddTokensViewContextTypes';
-import { AddTokensErrorTypes } from '../types';
+import { AddTokensErrorTypes, AddTokensExperiments } from '../types';
 import { SelectedRouteOption } from '../components/SelectedRouteOption';
 import { SelectedWallet } from '../components/SelectedWallet';
 import { DeliverToWalletDrawer } from '../../../components/WalletDrawer/DeliverToWalletDrawer';
@@ -118,6 +118,7 @@ export function AddTokens({
     selectedRouteData,
     selectedToken,
     isSwapAvailable,
+    experiments,
   } = addTokensState;
 
   const {
@@ -579,6 +580,20 @@ export function AddTokens({
     }
     return undefined;
   };
+
+  useEffect(() => {
+    if (!id || !experiments) return;
+
+    track({
+      userJourney: UserJourney.ADD_TOKENS,
+      screen: 'Experiments',
+      action: 'Started',
+      extras: {
+        contextId: id,
+        preselectedToken: experiments[AddTokensExperiments.PRESELECTED_TOKEN] || 'none',
+      },
+    });
+  }, [id, experiments]);
 
   return (
     <SimpleLayout

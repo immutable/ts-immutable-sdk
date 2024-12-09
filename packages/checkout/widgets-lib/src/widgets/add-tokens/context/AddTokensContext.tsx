@@ -16,6 +16,7 @@ export interface AddTokensState {
   selectedToken: TokenInfo | undefined;
   selectedAmount: string;
   isSwapAvailable: boolean | undefined;
+  experiments: Record<string, string> | undefined;
 }
 
 export const initialAddTokensState: AddTokensState = {
@@ -30,6 +31,7 @@ export const initialAddTokensState: AddTokensState = {
   selectedToken: undefined,
   selectedAmount: '',
   isSwapAvailable: undefined,
+  experiments: undefined,
 };
 
 export interface AddTokensContextState {
@@ -52,7 +54,8 @@ type ActionPayload =
   | SetSelectedRouteData
   | SetSelectedToken
   | SetSelectedAmount
-  | SetIsSwapAvailable;
+  | SetIsSwapAvailable
+  | SetExperiments;
 
 export enum AddTokensActions {
   SET_ID = 'SET_ID',
@@ -66,6 +69,7 @@ export enum AddTokensActions {
   SET_SELECTED_TOKEN = 'SET_SELECTED_TOKEN',
   SET_SELECTED_AMOUNT = 'SET_SELECTED_AMOUNT',
   SET_IS_SWAP_AVAILABLE = 'SET_IS_SWAP_AVAILABLE',
+  SET_EXPERIMENTS = 'SET_EXPERIMENTS',
 }
 
 export interface SetId {
@@ -121,6 +125,11 @@ export interface SetSelectedAmount {
 export interface SetIsSwapAvailable {
   type: AddTokensActions.SET_IS_SWAP_AVAILABLE;
   isSwapAvailable: boolean;
+}
+
+export interface SetExperiments {
+  type: AddTokensActions.SET_EXPERIMENTS;
+  experiments: Record<string, string>;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -192,6 +201,11 @@ export const addTokensReducer: Reducer<AddTokensState, AddTokensAction> = (
       return {
         ...state,
         isSwapAvailable: action.payload.isSwapAvailable,
+      };
+    case AddTokensActions.SET_EXPERIMENTS:
+      return {
+        ...state,
+        experiments: action.payload.experiments,
       };
     default:
       return state;
