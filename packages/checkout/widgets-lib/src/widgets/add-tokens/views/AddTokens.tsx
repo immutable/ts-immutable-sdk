@@ -547,7 +547,11 @@ export function AddTokens({
   const loading = (routeInputsReady || fetchingRoutes)
     && !(selectedRouteData || insufficientBalance);
 
-  const readyToReview = routeInputsReady && !!toAddress && !!selectedRouteData && !loading;
+  const readyToReview = routeInputsReady
+    && !!toAddress
+    && !!selectedRouteData
+    && !selectedRouteData.isInsufficientGas
+    && !loading;
 
   const handleWalletConnected = (
     providerType: 'from' | 'to',
