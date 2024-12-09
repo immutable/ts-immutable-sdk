@@ -204,11 +204,29 @@ export function Review({
     [route],
   );
 
+  const openFeeBreakdown = () => {
+    const feesToken = route?.route.estimate.feeCosts?.[0]?.token;
+    track({
+      userJourney: UserJourney.ADD_TOKENS,
+      screen: 'Review',
+      control: 'FeeBreakdown',
+      controlType: 'Button',
+      extras: {
+        contextId: id,
+        feesToken: feesToken?.symbol,
+        totalAmount: feesToken ? getFormattedNumber(totalFees, feesToken.decimals) : null,
+        totalFiatAmount: getFormattedAmounts(totalFeesUsd),
+      },
+    });
+
+    setShowFeeBreakdown(true);
+  };
+
   const routeFees = useMemo(() => {
     if (totalFeesUsd) {
       return (
         <Body
-          onClick={() => setShowFeeBreakdown(true)}
+          onClick={() => openFeeBreakdown()}
           size="small"
           sx={{
             ...hFlex,
