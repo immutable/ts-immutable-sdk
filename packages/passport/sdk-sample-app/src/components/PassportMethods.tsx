@@ -5,10 +5,12 @@ import { usePassportProvider } from '@/context/PassportProvider';
 import CardStack from '@/components/CardStack';
 import WorkflowButton from '@/components/WorkflowButton';
 import LinkWallet from '@/components/LinkWallet';
+import { useImmutableProvider } from '@/context/ImmutableProvider';
 
 function PassportMethods() {
   const [showLinkWallet, setShowLinkWallet] = useState<boolean>(false);
   const { isLoading } = useStatusProvider();
+  const { clientId } = useImmutableProvider();
   const {
     logout,
     login,
@@ -34,7 +36,7 @@ function PassportMethods() {
       console.error('zkEvmProvider not found');
       return;
     }
-    zkEvmProvider.request({method: "im_addSessionActivity", params: ['123'] });
+    zkEvmProvider.request({method: "im_addSessionActivity", params: [clientId] });
   }
 
   const handleLinkWalletSubmit = useCallback(async (

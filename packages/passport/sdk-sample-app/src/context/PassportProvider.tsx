@@ -41,7 +41,7 @@ export function PassportProvider({
   const [zkEvmProvider, setZkEvmProvider] = useState<Provider | undefined>();
 
   const { addMessage, setIsLoading } = useStatusProvider();
-  const { passportClient, clientId } = useImmutableProvider();
+  const { passportClient } = useImmutableProvider();
 
   const connectImx = useCallback(async () => {
     try {
