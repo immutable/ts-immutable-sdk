@@ -188,14 +188,12 @@ const ImmutableContext = createContext<{
   blockchainData: BlockchainData,
   environment: EnvironmentNames,
   setEnvironment?:(environment: EnvironmentNames) => void;
-  clientId: string;
 }>({
       sdkClient: new ImmutableX(getSdkConfig(EnvironmentNames.DEV)),
       orderbookClient: new Orderbook(getOrderbookConfig(EnvironmentNames.DEV)),
       passportClient: new Passport(getPassportConfig(EnvironmentNames.DEV)),
       environment: EnvironmentNames.DEV,
       blockchainData: new BlockchainData(getBlockchainDataConfig(EnvironmentNames.DEV)),
-      clientId: '',
     });
 
 export function ImmutableProvider({
@@ -231,8 +229,6 @@ export function ImmutableProvider({
     setBlockchainData(new BlockchainData(getBlockchainDataConfig(environment)));
   }, [environment]);
 
-  const { clientId } = getPassportConfig(environment);
-
   const providerValues = useMemo(() => ({
     sdkClient,
     orderbookClient,
@@ -240,8 +236,7 @@ export function ImmutableProvider({
     blockchainData,
     environment,
     setEnvironment,
-    clientId: getPassportConfig(environment).clientId,
-  }), [sdkClient, orderbookClient, passportClient, blockchainData, environment, setEnvironment, clientId]);
+  }), [sdkClient, orderbookClient, passportClient, blockchainData, environment, setEnvironment]);
 
   return (
     <ImmutableContext.Provider value={providerValues}>
@@ -258,7 +253,6 @@ export function useImmutableProvider() {
     blockchainData,
     environment,
     setEnvironment,
-    clientId,
   } = useContext(ImmutableContext);
   return {
     sdkClient,
@@ -267,6 +261,5 @@ export function useImmutableProvider() {
     blockchainData,
     environment,
     setEnvironment,
-    clientId,
   };
 }
