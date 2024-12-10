@@ -9,3 +9,5 @@ export const BLOCK_TXN_ANIMATION = '/blocked.riv';
 export const ERROR_TXN_ANIMATION = '/error.riv';
 
 export const TOKEN_PRIORITY_ORDER = ['IMX', 'USDC', 'ETH'];
+
+export const TOOLKIT_SQUID_URL = 'https://toolkit.immutable.com/squid-bridge/';

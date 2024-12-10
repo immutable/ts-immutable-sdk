@@ -846,7 +846,14 @@
         "fiatPricePrefix": "≈ USD",
         "zeroFees": "수수료 없음",
         "includedFees": "수수료"
-      }
+      },
+      "noGasDrawer": {
+        "heading": "가스에 {{token}}이(가) 더 필요합니다",
+        "body": "가스를 추가하고 이 거래를 완료하거나 금액을 줄이기, 다른 지갑 사용, 카드로 구매하기와 같은 다른 옵션을 시도해보세요.",
+        "primaryAction": "다른 옵션 시도하기",
+        "secondaryAction": "{{token}} 더 추가하기"
+      },
+      "noGasRouteMessage": "가스에 필요한 {{token}}이(가) 부족합니다"
     }
   },
   "footers": {

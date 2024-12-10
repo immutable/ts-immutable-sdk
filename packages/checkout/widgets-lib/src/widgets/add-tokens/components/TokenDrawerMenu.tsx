@@ -215,7 +215,7 @@ export function TokenDrawerMenu({
                 pos: 'relative',
                 cursor: 'pointer',
                 // eslint-disable-next-line @typescript-eslint/naming-convention
-                '&:hover > div:first-child': {
+                '&:hover > div:first-of-type': {
                   boxShadow: ({ base }) => `0 0 0 ${base.border.size[200]} ${base.color.text.body.primary}`,
                 },
               }}

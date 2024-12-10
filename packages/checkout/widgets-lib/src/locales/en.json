@@ -866,7 +866,14 @@
         "fiatPricePrefix": "≈ USD",
         "zeroFees": "Zero fees",
         "includedFees": "Fees"
-      }
+      },
+      "noGasDrawer": {
+        "heading": "You'll need more {{token}} for gas",
+        "body": "Add more gas and return to complete this transaction, or try another option such as lowering your amount, using another wallet, or buying with card.",
+        "primaryAction": "Try another option",
+        "secondaryAction": "Add more {{token}}"
+      },
+      "noGasRouteMessage": "Insufficient {{token}} for gas"
     }
   },
   "footers": {
