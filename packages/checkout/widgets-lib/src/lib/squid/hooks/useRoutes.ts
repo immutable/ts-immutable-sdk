@@ -13,6 +13,7 @@ import { isPassportProvider } from '../../provider';
 import {
   AmountData, RouteData, RouteResponseData, Token,
 } from '../types';
+import { SQUID_NATIVE_TOKEN } from '../config';
 
 const BASE_SLIPPAGE = 0.02;
 
@@ -155,25 +156,46 @@ export const useRoutes = () => {
     fromAmount: string,
     fromAddress?: string,
     quoteOnly = true,
-  ): Promise<RouteResponse | undefined> => await retry(
-    () => squid.getRoute({
-      fromChain: fromToken.chainId,
-      fromToken: fromToken.address,
-      fromAmount: convertToFormattedAmount(fromAmount, fromToken.decimals),
-      toChain: toToken.chainId,
-      toToken: toToken.address,
-      fromAddress,
-      toAddress,
-      quoteOnly,
-      enableBoost: true,
-      receiveGasOnDestination: !isPassportProvider(toProvider),
-    }),
-    {
-      retryIntervalMs: 1000,
-      retries: 5,
-      nonRetryable: (err: any) => err.response.status !== 429,
-    },
-  );
+  ): Promise<RouteResponse | undefined> => {
+    try {
+      return await retry(
+        () => squid.getRoute({
+          fromChain: fromToken.chainId,
+          fromToken: fromToken.address,
+          fromAmount: convertToFormattedAmount(fromAmount, fromToken.decimals),
+          toChain: toToken.chainId,
+          toToken: toToken.address,
+          fromAddress,
+          toAddress,
+          quoteOnly,
+          enableBoost: true,
+          receiveGasOnDestination: !isPassportProvider(toProvider),
+        }),
+        {
+          retryIntervalMs: 1000,
+          retries: 5,
+          nonRetryable: (err: any) => err.response?.status !== 429,
+        },
+      );
+    } catch (error: any) {
+      track({
+        userJourney: UserJourney.ADD_TOKENS,
+        screen: 'Routes',
+        action: 'Failed',
+        extras: {
+          contextId: id,
+          fromToken: fromToken.symbol,
+          toToken: toToken.symbol,
+          fromChain: fromToken.chainId,
+          toChain: toToken.chainId,
+          errorStatus: error.response?.status,
+          errorMessage: error.response?.data?.message,
+          errorStack: error.stack,
+        },
+      });
+      throw error;
+    }
+  };
 
   const isRouteToAmountGreaterThanToAmount = (
     routeResponse: RouteResponse,
@@ -272,28 +294,97 @@ export const useRoutes = () => {
     }
   };
 
-  const getRoutes = async (
+  const getRoutesWithFeesValidation = async (
     squid: Squid,
-    amountDataArray: AmountData[],
     toTokenAddress: string,
+    balances: TokenBalance[],
+    fromAmountArray: AmountData[],
   ): Promise<RouteData[]> => {
-    const routePromises = amountDataArray.map((data) => getRoute(
-      squid,
-      data.fromToken,
-      data.toToken,
-      toTokenAddress,
-      data.fromAmount,
-      data.toAmount,
-    ).then((route) => ({
-      amountData: { ...data, additionalBuffer: route.additionalBuffer },
-      route: route.route,
-    })));
+    const getGasCost = (
+      route: RouteResponseData,
+      chainId: string | number,
+    ) => (route.route?.route.estimate.gasCosts || [])
+      .filter((gasCost) => gasCost.token.chainId === chainId.toString())
+      .reduce(
+        (sum, gasCost) => sum + parseFloat(utils.formatUnits(gasCost.amount, gasCost.token.decimals)),
+        0,
+      );
 
-    const routesData = await Promise.all(routePromises);
+    const getTotalFees = (
+      route: RouteResponseData,
+      chainId: string | number,
+    ) => (route.route?.route.estimate.feeCosts || [])
+      .filter((fee) => fee.token.chainId === chainId.toString())
+      .reduce(
+        (sum, fee) => sum + parseFloat(utils.formatUnits(fee.amount, fee.token.decimals)),
+        0,
+      );
 
-    return routesData.filter(
-      (route): route is RouteData => route?.route !== undefined,
+    const findUserGasBalance = (chainId: string | number) => balances.find(
+      (balance: TokenBalance) => balance.address.toLowerCase() === SQUID_NATIVE_TOKEN.toLowerCase()
+        && balance.chainId.toString() === chainId.toString(),
     );
+
+    const hasSufficientNativeTokenBalance = (
+      userGasBalance: TokenBalance | undefined,
+      fromAmount: string,
+      fromToken: Token,
+      totalGasCost: number,
+      totalFeeCost: number,
+    ) => {
+      if (!userGasBalance) return false;
+
+      const userBalance = parseFloat(
+        utils.formatUnits(userGasBalance.balance, userGasBalance.decimals),
+      );
+
+      // If the fromToken is the native token, validate balance for both fromAmount and gas + fee costs
+      // Otherwise, only validate balance for gas + fee costs
+      const requiredAmount = fromToken.address.toLowerCase() === SQUID_NATIVE_TOKEN.toLowerCase()
+        ? parseFloat(fromAmount) + totalGasCost + totalFeeCost
+        : totalGasCost + totalFeeCost;
+
+      return userBalance >= requiredAmount;
+    };
+
+    const routePromises = fromAmountArray.map(async (data: AmountData) => {
+      try {
+        const routeResponse = await getRoute(
+          squid,
+          data.fromToken,
+          data.toToken,
+          toTokenAddress,
+          data.fromAmount,
+          data.toAmount,
+        );
+
+        if (!routeResponse?.route) return null;
+
+        const gasCost = getGasCost(routeResponse, data.balance.chainId);
+        const feeCost = getTotalFees(routeResponse, data.balance.chainId);
+        const userGasBalance = findUserGasBalance(data.balance.chainId);
+
+        return {
+          amountData: data,
+          route: routeResponse.route,
+          isInsufficientGas: !hasSufficientNativeTokenBalance(
+            userGasBalance,
+            data.fromAmount,
+            data.fromToken,
+            gasCost,
+            feeCost,
+          ),
+        } as RouteData;
+      } catch (error) {
+        return null;
+      }
+    });
+
+    const routesData = (await Promise.all(routePromises)).filter(
+      (route): route is RouteData => route !== null,
+    );
+
+    return routesData;
   };
 
   const fetchRoutesWithRateLimit = async (
@@ -309,7 +400,7 @@ export const useRoutes = () => {
   ): Promise<RouteData[]> => {
     const currentRequestId = ++latestRequestIdRef.current;
 
-    let amountDataArray = getSufficientFromAmounts(
+    let fromAmountDataArray = getSufficientFromAmounts(
       tokens,
       balances,
       toChanId,
@@ -318,23 +409,28 @@ export const useRoutes = () => {
     );
 
     if (!isSwapAllowed) {
-      amountDataArray = amountDataArray.filter(
+      fromAmountDataArray = fromAmountDataArray.filter(
         (amountData) => amountData.balance.chainId !== toChanId,
       );
     }
 
     let allRoutes: RouteData[] = [];
     await Promise.all(
-      amountDataArray
+      fromAmountDataArray
         .reduce((acc, _, i) => {
           if (i % bulkNumber === 0) {
-            acc.push(amountDataArray.slice(i, i + bulkNumber));
+            acc.push(fromAmountDataArray.slice(i, i + bulkNumber));
           }
           return acc;
-        }, [] as (typeof amountDataArray)[])
-        .map(async (slicedAmountDataArray) => {
+        }, [] as (typeof fromAmountDataArray)[])
+        .map(async (slicedFromAmountDataArray) => {
           allRoutes.push(
-            ...(await getRoutes(squid, slicedAmountDataArray, toTokenAddress)),
+            ...(await getRoutesWithFeesValidation(
+              squid,
+              toTokenAddress,
+              balances,
+              slicedFromAmountDataArray,
+            )),
           );
           await delay(delayMs);
         }),
@@ -349,7 +445,6 @@ export const useRoutes = () => {
     }
 
     const sortedRoutes = sortRoutesByFastestTime(allRoutes);
-
     // Only update routes if the request is the latest one
     if (currentRequestId === latestRequestIdRef.current) {
       setRoutes(sortedRoutes);

@@ -749,6 +749,11 @@
           "heading": "앗! 결제 지갑이 변경되었습니다",
           "body": "이전에 선택한 지갑과 다시 연결하라는 메시지가 표시됩니다",
           "buttonText": "결제 지갑 재선택"
+        },
+        "routeError": {
+          "heading": "적절한 최종 견적을 찾을 수 없습니다",
+          "subHeading": "다시 시도해 주세요",
+          "secondaryButtonText": "돌아가기"
         }
       },
       "review": {
@@ -841,7 +846,14 @@
         "fiatPricePrefix": "≈ USD",
         "zeroFees": "수수료 없음",
         "includedFees": "수수료"
-      }
+      },
+      "noGasDrawer": {
+        "heading": "가스에 {{token}}이(가) 더 필요합니다",
+        "body": "가스를 추가하고 이 거래를 완료하거나 금액을 줄이기, 다른 지갑 사용, 카드로 구매하기와 같은 다른 옵션을 시도해보세요.",
+        "primaryAction": "다른 옵션 시도하기",
+        "secondaryAction": "{{token}} 더 추가하기"
+      },
+      "noGasRouteMessage": "가스에 필요한 {{token}}이(가) 부족합니다"
     }
   },
   "footers": {
