@@ -195,7 +195,7 @@ const ImmutableContext = createContext<{
       passportClient: new Passport(getPassportConfig(EnvironmentNames.DEV)),
       environment: EnvironmentNames.DEV,
       blockchainData: new BlockchainData(getBlockchainDataConfig(EnvironmentNames.DEV)),
-      clientId: ''
+      clientId: '',
     });
 
 export function ImmutableProvider({
@@ -231,7 +231,7 @@ export function ImmutableProvider({
     setBlockchainData(new BlockchainData(getBlockchainDataConfig(environment)));
   }, [environment]);
 
-  const clientId = getPassportConfig(environment).clientId;
+  const { clientId } = getPassportConfig(environment);
 
   const providerValues = useMemo(() => ({
     sdkClient,

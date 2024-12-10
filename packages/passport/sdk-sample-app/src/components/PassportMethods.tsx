@@ -36,8 +36,8 @@ function PassportMethods() {
       console.error('zkEvmProvider not found');
       return;
     }
-    zkEvmProvider.request({method: "im_addSessionActivity", params: [clientId] });
-  }
+    zkEvmProvider.request({ method: 'im_addSessionActivity', params: [clientId] });
+  };
 
   const handleLinkWalletSubmit = useCallback(async (
     type: string,
@@ -96,7 +96,7 @@ function PassportMethods() {
         >
           Link Wallet
         </WorkflowButton>
-        <WorkflowButton 
+        <WorkflowButton
           disabled={isLoading}
           onClick={handleCheckIn}
         >
