@@ -102,10 +102,6 @@ jobs:
         with:
           subject-path: './sdk, !./sdk/node_modules'
 
-      # - name: Authenticate NPM
-      #   # run: pnpm config --location project set //registry.npmjs.org/:_authToken=${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
-      #   run: echo "//registry.npmjs.org/:_authToken=${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}" >> .npmrc
-
       - name: Generate version.json
         if: (env.DRY_RUN) == 'false'
         run: |
@@ -120,10 +116,9 @@ jobs:
         id: npm_release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
-          NPM_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm nx release publish $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") --first-release --verbose
+        run: pnpm nx release publish $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") $( ${{ startsWith(env.RELEASE_TYPE, 'pre') }} && echo "--tag alpha" || echo "")
 
       - name: Warm up CDN
         id: warm_up_cdn
