@@ -17,7 +17,7 @@ function PassportMethods() {
     getUserInfo,
     getLinkedAddresses,
     linkWallet,
-    checkIn
+    zkEvmProvider,
   } = usePassportProvider();
 
   const handleLinkWalletClick = async () => {
@@ -30,7 +30,11 @@ function PassportMethods() {
   };
 
   const handleCheckIn = () => {
-    checkIn();
+    if (!zkEvmProvider) {
+      console.error('zkEvmProvider not found');
+      return;
+    }
+    zkEvmProvider.request({method: "im_addSessionActivity", params: ['123'] });
   }
 
   const handleLinkWalletSubmit = useCallback(async (

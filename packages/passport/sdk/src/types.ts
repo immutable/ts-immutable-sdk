@@ -7,7 +7,6 @@ export enum PassportEvents {
   LOGGED_OUT = 'loggedOut',
   LOGGED_IN = 'loggedIn',
   ACCOUNTS_REQUESTED = 'accountsRequested',
-  CHECK_IN = 'checkIn',
 }
 
 export type AccountsRequestedEvent = {
@@ -22,7 +21,6 @@ export interface PassportEventMap extends Record<string, any> {
   [PassportEvents.LOGGED_OUT]: [];
   [PassportEvents.LOGGED_IN]: [User];
   [PassportEvents.ACCOUNTS_REQUESTED]: [AccountsRequestedEvent];
-  [PassportEvents.CHECK_IN]: [string];
 }
 
 export type UserProfile = {

@@ -20,7 +20,6 @@ const PassportContext = createContext<{
   getUserInfo: () => Promise<UserProfile | undefined>;
   getLinkedAddresses: () => Promise<string[] | undefined>;
   linkWallet: (params: LinkWalletParams) => Promise<LinkedWallet | undefined>;
-  checkIn: () => void;
 }>({
       imxProvider: undefined,
       zkEvmProvider: undefined,
@@ -33,7 +32,6 @@ const PassportContext = createContext<{
       getUserInfo: () => Promise.resolve(undefined),
       getLinkedAddresses: () => Promise.resolve(undefined),
       linkWallet: () => Promise.resolve(undefined),
-      checkIn: () => undefined,
     });
 
 export function PassportProvider({
@@ -150,16 +148,6 @@ export function PassportProvider({
     }
   }, [addMessage, passportClient, setIsLoading]);
 
-  const checkIn = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      await passportClient.checkIn(clientId);
-    } finally {
-      setIsLoading(false);
-    }
-      
-  }, [passportClient, setIsLoading]);
-
   const providerValues = useMemo(() => ({
     imxProvider,
     zkEvmProvider,
@@ -172,7 +160,6 @@ export function PassportProvider({
     getUserInfo,
     getLinkedAddresses,
     linkWallet,
-    checkIn
   }), [
     imxProvider,
     zkEvmProvider,
@@ -185,7 +172,6 @@ export function PassportProvider({
     getUserInfo,
     getLinkedAddresses,
     linkWallet,
-    checkIn
   ]);
 
   return (
@@ -208,7 +194,6 @@ export function usePassportProvider() {
     getUserInfo,
     getLinkedAddresses,
     linkWallet,
-    checkIn,
   } = useContext(PassportContext);
   return {
     imxProvider,
@@ -222,6 +207,5 @@ export function usePassportProvider() {
     getUserInfo,
     getLinkedAddresses,
     linkWallet,
-    checkIn
   };
 }

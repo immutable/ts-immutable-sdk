@@ -144,14 +144,6 @@ export class Passport {
     return withMetricsAsync(() => this.passportImxProviderFactory.getProvider(), 'connectImx');
   }
 
-  public async checkIn(clientId: string) {
-    return this.authManager.getUser().then((user) => {
-      if (user) {
-        this.passportEventEmitter.emit(PassportEvents.CHECK_IN, clientId);
-      }
-    });
-  }
-
   public connectEvm(options: {
     announceProvider: boolean
   } = {

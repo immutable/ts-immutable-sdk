@@ -138,16 +138,6 @@ export class ZkEvmProvider implements Provider {
       PassportEvents.ACCOUNTS_REQUESTED,
       trackSessionActivity,
     );
-    passportEventEmitter.on(PassportEvents.CHECK_IN, (clientId: string) => {
-      this.#authManager.getUser().then((user) => {
-        if (user) {
-          this.#initialiseEthSigner(user);
-          if (isZkEvmUser(user)) {
-            this.#callSessionActivity(user.zkEvm.ethAddress, clientId);
-          }
-        }
-      }).catch(); // User does not exist, no need to do anything.
-    });
   }
 
   #handleLogout = () => {
@@ -507,6 +497,14 @@ export class ZkEvmProvider implements Provider {
         } finally {
           flow.addEvent('End');
         }
+      }
+      case 'im_addSessionActivity': {
+        const [clientId] = request.params || [];
+        const zkEvmAddress = await this.#getZkEvmAddress();
+        if (zkEvmAddress) {
+          this.#callSessionActivity(zkEvmAddress, clientId);
+        }
+        return null;
       }
       default: {
         throw new JsonRpcError(
