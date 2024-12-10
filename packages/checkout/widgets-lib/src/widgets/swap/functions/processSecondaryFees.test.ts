@@ -5,7 +5,6 @@ import {
   TransactionDetails,
   TransactionResponse,
 } from '@imtbl/dex-sdk';
-import { BigNumber } from 'ethers';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { describe } from '@jest/globals';
 import { processSecondaryFees } from './processSecondaryFees';
@@ -20,7 +19,7 @@ describe('processSecondaryFees', () => {
         recipient: '0x123',
         basisPoints: 100,
         amount: {
-          value: BigNumber.from(100),
+          value: BigInt(100),
           token: {
             symbol: 'ETH',
             address: '0x123',
@@ -64,7 +63,7 @@ describe('processSecondaryFees', () => {
           recipient: '0x123',
           basisPoints: 100,
           amount: {
-            value: BigNumber.from(100),
+            value: BigInt(100),
             token: {
               address: '0x123',
               chainId: 1,
@@ -91,7 +90,7 @@ describe('processSecondaryFees', () => {
           recipient: '0x123',
           basisPoints: 100,
           amount: {
-            value: BigNumber.from(100),
+            value: BigInt(100),
             token: {
               address: '0x000',
               chainId: 1,
@@ -113,7 +112,7 @@ describe('processSecondaryFees', () => {
           recipient: '0x123',
           basisPoints: 100,
           amount: {
-            value: BigNumber.from(100),
+            value: BigInt(100),
             token: {
               address: '0x000',
               chainId: 1,
@@ -141,7 +140,7 @@ describe('processSecondaryFees', () => {
           recipient: '0x456',
           basisPoints: 100,
           amount: {
-            value: BigNumber.from(100),
+            value: BigInt(100),
             token: {
               address: '0x000',
               chainId: 1,
@@ -153,7 +152,7 @@ describe('processSecondaryFees', () => {
           recipient: '0x456',
           basisPoints: 100,
           amount: {
-            value: BigNumber.from(100),
+            value: BigInt(100),
             token: {
               address: '0x123',
               chainId: 1,
@@ -175,7 +174,7 @@ describe('processSecondaryFees', () => {
           recipient: '0x456',
           basisPoints: 100,
           amount: {
-            value: BigNumber.from(100),
+            value: BigInt(100),
             token: {
               symbol: undefined,
               address: '0x000',
@@ -188,7 +187,7 @@ describe('processSecondaryFees', () => {
           recipient: '0x456',
           basisPoints: 100,
           amount: {
-            value: BigNumber.from(100),
+            value: BigInt(100),
             token: {
               symbol: 'ETH',
               address: '0x123',

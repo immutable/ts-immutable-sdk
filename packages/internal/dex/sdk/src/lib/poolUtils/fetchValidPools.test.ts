@@ -1,7 +1,5 @@
-import {
-  BigNumber, Contract, providers, utils,
-} from 'ethers';
 import { TickMath } from '@uniswap/v3-sdk';
+import { Contract, JsonRpcProvider, AbiCoder } from 'ethers';
 import { ProviderCallError } from '../../errors';
 import { fetchValidPools } from './fetchValidPools';
 import { Multicall__factory } from '../../contracts/types';
@@ -14,7 +12,10 @@ import {
   WETH_TEST_TOKEN,
 } from '../../test/utils';
 
-jest.mock('@ethersproject/contracts');
+jest.mock('ethers', () => ({
+  ...jest.requireActual('ethers'),
+  Contract: jest.fn(),
+}));
 
 describe('fetchPools', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -24,14 +25,14 @@ describe('fetchPools', () => {
     it('should throw ProviderCallError', async () => {
       (Contract as unknown as jest.Mock).mockImplementationOnce(
         () => ({
-          callStatic: {
+          multicall: {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            multicall: jest.fn().mockRejectedValue(new ProviderCallError('an rpc error message')),
+            staticCall: jest.fn().mockRejectedValue(new ProviderCallError('an rpc error message')),
           },
         }),
       );
 
-      const provider = new providers.JsonRpcProvider(
+      const provider = new JsonRpcProvider(
         TEST_RPC_URL,
         TEST_CHAIN_ID,
       );
@@ -89,15 +90,15 @@ describe('fetchPools', () => {
       mockedMulticallContract = (
         Contract as unknown as jest.Mock
       ).mockImplementationOnce(() => ({
-        callStatic: {
-          multicall: jest
+        multicall: {
+          staticCall: jest
             .fn()
             .mockResolvedValueOnce(slot0MockResults)
             .mockResolvedValueOnce(liquiditiesMockResult),
         },
       }));
 
-      const provider = new providers.JsonRpcProvider(
+      const provider = new JsonRpcProvider(
         TEST_RPC_URL,
         TEST_CHAIN_ID,
       );
@@ -122,7 +123,7 @@ describe('fetchPools', () => {
       const slot0MockResults = {
         returnData: [
           {
-            returnData: utils.defaultAbiCoder.encode(
+            returnData: AbiCoder.defaultAbiCoder().encode(
               [
                 'uint160',
                 'int24',
@@ -132,11 +133,11 @@ describe('fetchPools', () => {
                 'uint8',
                 'bool',
               ],
-              [BigNumber.from(0), BigNumber.from(0), 0, 1, 1, 0, true],
+              [BigInt(0), BigInt(0), 0, 1, 1, 0, true],
             ),
           },
           {
-            returnData: utils.defaultAbiCoder.encode(
+            returnData: AbiCoder.defaultAbiCoder().encode(
               [
                 'uint160',
                 'int24',
@@ -146,11 +147,11 @@ describe('fetchPools', () => {
                 'uint8',
                 'bool',
               ],
-              [BigNumber.from(0), BigNumber.from(0), 0, 1, 1, 0, true],
+              [BigInt(0), BigInt(0), 0, 1, 1, 0, true],
             ),
           },
           {
-            returnData: utils.defaultAbiCoder.encode(
+            returnData: AbiCoder.defaultAbiCoder().encode(
               [
                 'uint160',
                 'int24',
@@ -160,11 +161,11 @@ describe('fetchPools', () => {
                 'uint8',
                 'bool',
               ],
-              [BigNumber.from(0), BigNumber.from(0), 0, 1, 1, 0, true],
+              [BigInt(0), BigInt(0), 0, 1, 1, 0, true],
             ),
           },
           {
-            returnData: utils.defaultAbiCoder.encode(
+            returnData: AbiCoder.defaultAbiCoder().encode(
               [
                 'uint160',
                 'int24',
@@ -174,7 +175,7 @@ describe('fetchPools', () => {
                 'uint8',
                 'bool',
               ],
-              [BigNumber.from(0), BigNumber.from(0), 0, 1, 1, 0, true],
+              [BigInt(0), BigInt(0), 0, 1, 1, 0, true],
             ),
           },
         ],
@@ -183,27 +184,27 @@ describe('fetchPools', () => {
       const liquiditiesMockResult = {
         returnData: [
           {
-            returnData: utils.defaultAbiCoder.encode(
+            returnData: AbiCoder.defaultAbiCoder().encode(
               ['uint128'],
-              [BigNumber.from(0)],
+              [BigInt(0)],
             ),
           },
           {
-            returnData: utils.defaultAbiCoder.encode(
+            returnData: AbiCoder.defaultAbiCoder().encode(
               ['uint128'],
-              [BigNumber.from(0)],
+              [BigInt(0)],
             ),
           },
           {
-            returnData: utils.defaultAbiCoder.encode(
+            returnData: AbiCoder.defaultAbiCoder().encode(
               ['uint128'],
-              [BigNumber.from(0)],
+              [BigInt(0)],
             ),
           },
           {
-            returnData: utils.defaultAbiCoder.encode(
+            returnData: AbiCoder.defaultAbiCoder().encode(
               ['uint128'],
-              [BigNumber.from(0)],
+              [BigInt(0)],
             ),
           },
         ],
@@ -213,15 +214,15 @@ describe('fetchPools', () => {
       mockedMulticallContract = (
         Contract as unknown as jest.Mock
       ).mockImplementationOnce(() => ({
-        callStatic: {
-          multicall: jest
+        multicall: {
+          staticCall: jest
             .fn()
             .mockResolvedValueOnce(slot0MockResults)
             .mockResolvedValueOnce(liquiditiesMockResult),
         },
       }));
 
-      const provider = new providers.JsonRpcProvider(
+      const provider = new JsonRpcProvider(
         TEST_RPC_URL,
         TEST_CHAIN_ID,
       );
@@ -249,7 +250,7 @@ describe('fetchPools', () => {
       const slot0MockResults = {
         returnData: [
           {
-            returnData: utils.defaultAbiCoder.encode(
+            returnData: AbiCoder.defaultAbiCoder().encode(
               [
                 'uint160',
                 'int24',
@@ -263,7 +264,7 @@ describe('fetchPools', () => {
             ),
           },
           {
-            returnData: utils.defaultAbiCoder.encode(
+            returnData: AbiCoder.defaultAbiCoder().encode(
               [
                 'uint160',
                 'int24',
@@ -277,7 +278,7 @@ describe('fetchPools', () => {
             ),
           },
           {
-            returnData: utils.defaultAbiCoder.encode(
+            returnData: AbiCoder.defaultAbiCoder().encode(
               [
                 'uint160',
                 'int24',
@@ -291,7 +292,7 @@ describe('fetchPools', () => {
             ),
           },
           {
-            returnData: utils.defaultAbiCoder.encode(
+            returnData: AbiCoder.defaultAbiCoder().encode(
               [
                 'uint160',
                 'int24',
@@ -310,27 +311,27 @@ describe('fetchPools', () => {
       const liquiditiesMockResult = {
         returnData: [
           {
-            returnData: utils.defaultAbiCoder.encode(
+            returnData: AbiCoder.defaultAbiCoder().encode(
               ['uint128'],
-              [BigNumber.from(1000000)],
+              [BigInt(1000000)],
             ),
           },
           {
-            returnData: utils.defaultAbiCoder.encode(
+            returnData: AbiCoder.defaultAbiCoder().encode(
               ['uint128'],
-              [BigNumber.from(1000000)],
+              [BigInt(1000000)],
             ),
           },
           {
-            returnData: utils.defaultAbiCoder.encode(
+            returnData: AbiCoder.defaultAbiCoder().encode(
               ['uint128'],
-              [BigNumber.from(1000000)],
+              [BigInt(1000000)],
             ),
           },
           {
-            returnData: utils.defaultAbiCoder.encode(
+            returnData: AbiCoder.defaultAbiCoder().encode(
               ['uint128'],
-              [BigNumber.from(1000000)],
+              [BigInt(1000000)],
             ),
           },
         ],
@@ -340,15 +341,15 @@ describe('fetchPools', () => {
       mockedMulticallContract = (
         Contract as unknown as jest.Mock
       ).mockImplementationOnce(() => ({
-        callStatic: {
-          multicall: jest
+        multicall: {
+          staticCall: jest
             .fn()
             .mockResolvedValueOnce(slot0MockResults)
             .mockResolvedValueOnce(liquiditiesMockResult),
         },
       }));
 
-      const provider = new providers.JsonRpcProvider(
+      const provider = new JsonRpcProvider(
         TEST_RPC_URL,
         TEST_CHAIN_ID,
       );

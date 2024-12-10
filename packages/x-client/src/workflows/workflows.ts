@@ -1,5 +1,5 @@
-import { Signer } from '@ethersproject/abstract-signer';
 import axios, { AxiosResponse } from 'axios';
+import { Signer } from 'ethers';
 import {
   CollectionsApi,
   ExchangesApi,
@@ -68,9 +68,9 @@ export class Workflows {
   }
 
   private async validateChain(signer: Signer) {
-    const chainID = await signer.getChainId();
+    const chainID = (await signer.provider?.getNetwork())?.chainId;
 
-    if (!this.isChainValid(chainID)) {
+    if (!this.isChainValid(Number(chainID))) {
       throw new Error(
         'The wallet used for this operation is not from the correct network.',
       );

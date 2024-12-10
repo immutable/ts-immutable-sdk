@@ -1,6 +1,6 @@
-import { BigNumber, ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
+import { formatEther, parseEther } from 'ethers';
 import { Fees } from '../fees';
 import {
   newAmountFromString,
@@ -21,28 +21,28 @@ const wimx = erc20ToUniswapToken(WIMX_TEST_TOKEN);
 const fun = erc20ToUniswapToken(FUN_TEST_TOKEN);
 const testPool = new Pool(wimx, fun, 10000, '79625275426524748796330556128', '10000000000000000', 100);
 const route = new Route([testPool], wimx, fun);
-const gasEstimate = BigNumber.from(0);
+const gasEstimate = BigInt(0);
 
 describe('applySlippage', () => {
   describe('when trade type is EXACT_INPUT', () => {
     it('should return a minimum expected amount out', () => {
-      const amountInWei = ethers.utils.parseEther('100');
+      const amountInWei = parseEther('100');
 
       const result = applySlippage(TradeType.EXACT_INPUT, amountInWei, DEFAULT_SLIPPAGE);
 
-      const formattedResult = ethers.utils.formatEther(result);
+      const formattedResult = formatEther(result);
 
       expect(formattedResult).toEqual('99.900099900099900099');
     });
 
     describe('AND slippage percent is 0', () => {
       it('should return the same amount', () => {
-        const amountInWei = ethers.utils.parseEther('100');
+        const amountInWei = parseEther('100');
         const ZERO_PERCENT = 0;
 
         const result = applySlippage(TradeType.EXACT_INPUT, amountInWei, ZERO_PERCENT);
 
-        const formattedResult = ethers.utils.formatEther(result);
+        const formattedResult = formatEther(result);
 
         expect(formattedResult).toEqual('100.0');
       });
@@ -51,23 +51,23 @@ describe('applySlippage', () => {
 
   describe('when trade type is EXACT_OUTPUT', () => {
     it('should return a maximum possible amount in', () => {
-      const amountOutWei = ethers.utils.parseEther('100');
+      const amountOutWei = parseEther('100');
 
       const result = applySlippage(TradeType.EXACT_OUTPUT, amountOutWei, DEFAULT_SLIPPAGE);
 
-      const formattedResult = ethers.utils.formatEther(result);
+      const formattedResult = formatEther(result);
 
       expect(formattedResult).toEqual('100.1');
     });
 
     describe('AND slippage percent is 0', () => {
       it('should return the same amount', () => {
-        const amountOutWei = ethers.utils.parseEther('100');
+        const amountOutWei = parseEther('100');
         const ZERO_PERCENT = 0;
 
         const result = applySlippage(TradeType.EXACT_OUTPUT, amountOutWei, ZERO_PERCENT);
 
-        const formattedResult = ethers.utils.formatEther(result);
+        const formattedResult = formatEther(result);
 
         expect(formattedResult).toEqual('100.0');
       });

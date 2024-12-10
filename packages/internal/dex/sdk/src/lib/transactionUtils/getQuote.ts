@@ -1,5 +1,4 @@
 import { TradeType } from '@uniswap/sdk-core';
-import { ethers } from 'ethers';
 import { Fees } from '../fees';
 import { QuoteResult } from '../getQuotesForRoutes';
 import { NativeTokenService, canUnwrapToken } from '../nativeTokenService';
@@ -15,12 +14,12 @@ export function getQuoteAmountFromTradeType(routerQuote: QuoteResult): CoinAmoun
   return routerQuote.amountIn;
 }
 
-export function applySlippage(tradeType: TradeType, amount: ethers.BigNumber, slippage: number): ethers.BigNumber {
+export function applySlippage(tradeType: TradeType, amount: bigint, slippage: number): bigint {
   const slippageTolerance = slippageToFraction(slippage);
   const slippagePlusOne = slippageTolerance.add(1);
   const maybeInverted = tradeType === TradeType.EXACT_INPUT ? slippagePlusOne.invert() : slippagePlusOne;
   const amountWithSlippage = maybeInverted.multiply(amount.toString()).quotient;
-  return ethers.BigNumber.from(amountWithSlippage.toString());
+  return BigInt(amountWithSlippage.toString());
 }
 
 export const prepareUserQuote = (

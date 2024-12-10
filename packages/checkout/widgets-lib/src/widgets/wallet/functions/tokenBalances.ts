@@ -1,5 +1,6 @@
-import { Web3Provider } from '@ethersproject/providers';
-import { Checkout, ChainId, GetBalanceResult } from '@imtbl/checkout-sdk';
+import {
+  Checkout, ChainId, GetBalanceResult, WrappedBrowserProvider,
+} from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import {
   calculateCryptoToFiat,
@@ -22,12 +23,12 @@ export type BalanceInfo = {
 
 export const getTokenBalances = async (
   checkout: Checkout,
-  provider: Web3Provider,
+  provider: WrappedBrowserProvider,
   chainId: ChainId,
 ): Promise<GetBalanceResult[]> => {
   if (!checkout || !provider || !chainId) return [];
 
-  const walletAddress = await provider.getSigner().getAddress();
+  const walletAddress = await (await provider.getSigner()).getAddress();
   // Do not catch the error so that the caller can decide
   // how to handle the experience.
   const getAllBalancesResult = await retry(

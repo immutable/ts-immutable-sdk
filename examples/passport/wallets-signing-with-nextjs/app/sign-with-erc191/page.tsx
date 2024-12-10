@@ -1,13 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-import { ethers, utils } from 'ethers';
+import { hashMessage } from 'ethers';
 import { passportInstance } from '../utils/passport';
 import { passport } from '@imtbl/sdk';
 import { isValidSignature } from '../utils/isValidSignature';
 import { Button, Heading, Link, Table } from '@biom3/react';
 import NextLink from 'next/link';
 import React from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { BrowserProvider } from 'ethers';
+import { Provider } from '@imtbl/sdk/passport';
 
 export default function ConnectWithEtherJS() {
   // setup the accounts state
@@ -32,20 +34,28 @@ export default function ConnectWithEtherJS() {
   // #doc passport-wallets-nextjs-sign-erc191-create
 
   // fetch the Passport provider from the Passport instance
-  const passportProvider = passportInstance.connectEvm();
+  const [passportProvider, setPassportProvider] = useState<Provider>();
 
-  // create the Web3Provider using the Passport provider
-  const web3Provider = new ethers.providers.Web3Provider(passportProvider);
+  useEffect(() => {
+    const fetchPassportProvider = async () => {
+      const passportProvider = await passportInstance.connectEvm();
+      setPassportProvider(passportProvider);
+    };
+    fetchPassportProvider();
+  }, []);
+
+  // create the BrowserProvider using the Passport provider
+  const web3Provider = useMemo(() => passportProvider ? new BrowserProvider(passportProvider) : undefined, [passportProvider]);
   // #enddoc passport-wallets-nextjs-sign-erc191-create
 
   const passportLogin = async () => {
-    if (web3Provider.provider.request) {
+    if (web3Provider?.send) {
       // disable button while loading
       setLoadingState(true);
 
       // #doc passport-wallets-nextjs-sign-erc191-request
       // calling eth_requestAccounts triggers the Passport login flow
-      const accounts = await web3Provider.provider.request({ method: 'eth_requestAccounts' });
+      const accounts = await web3Provider.send('eth_requestAccounts', []);
       // #enddoc passport-wallets-nextjs-sign-erc191-request
       
       // once logged in Passport is connected to the wallet and ready to transact
@@ -68,11 +78,13 @@ export default function ConnectWithEtherJS() {
 
   // #doc passport-wallets-nextjs-sign-erc191-signmessage
   const signMessage = async () => {
+    if (!web3Provider) return;
+
     // set signed state message to pending in the view
     setSignedMessageState('pending signature');
 
     // fetch the signer from the Web3provider
-    const signer = web3Provider.getSigner();
+    const signer = await web3Provider.getSigner();
 
     const address = await signer.getAddress();
     setAddress(address);
@@ -84,6 +96,10 @@ export default function ConnectWithEtherJS() {
     setPersonalMessage(message);
 
     try {
+      if (!signer) {
+        throw new Error('No signer found');
+      }
+
       // attempt to sign the message, this brings up the passport popup
       const signature = await signer.signMessage(message);
       setSignature(signature);
@@ -111,7 +127,7 @@ export default function ConnectWithEtherJS() {
     signature: string, // The signature
     zkEvmProvider: passport.Provider, // Can be any provider, Passport or not
   ) => {
-    const digest = utils.hashMessage(payload);
+    const digest = hashMessage(payload);
   
     return isValidSignature(address, digest, signature, zkEvmProvider);
   };
@@ -120,6 +136,9 @@ export default function ConnectWithEtherJS() {
     setVerifiedStateMessage("Pending Verification");
 
     try {
+      if (!passportProvider) {
+        throw new Error('Passport provider not found');
+      }
       // validate the signature
       const isValid = await isValidERC191Signature(address, personalMessage, msgSignature, passportProvider);
       isValid ? setVerifiedStateMessage("Signature verified") : setVerifiedStateMessage("Signature couldn't be verified");

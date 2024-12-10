@@ -1,13 +1,14 @@
-import { Checkout, CheckoutErrorType, WalletProviderName } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
+import {
+  Checkout, CheckoutErrorType, WrappedBrowserProvider, WalletProviderName,
+} from '@imtbl/checkout-sdk';
 
 export async function connectToProvider(
   checkout: Checkout,
-  provider: Web3Provider,
+  provider: WrappedBrowserProvider,
   changeAccount?: boolean,
-): Promise<Web3Provider> {
+): Promise<WrappedBrowserProvider> {
   let connected = false;
-  let web3Provider: Web3Provider = provider;
+  let browserProvider: WrappedBrowserProvider = provider;
   try {
     const { isConnected } = await checkout.checkIsWalletConnected({ provider });
     connected = isConnected;
@@ -23,7 +24,7 @@ export async function connectToProvider(
         provider,
         requestWalletPermissions: changeAccount,
       });
-      web3Provider = connectedProvider;
+      browserProvider = connectedProvider;
       connected = true;
     } catch (error: any) {
       if (error.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
@@ -36,15 +37,15 @@ export async function connectToProvider(
     }
   }
 
-  return web3Provider;
+  return browserProvider;
 }
 
 export async function createAndConnectToProvider(
   checkout: Checkout,
   walletProviderName: WalletProviderName,
   changeAccount?: boolean,
-): Promise<Web3Provider> {
-  let provider: Web3Provider;
+): Promise<WrappedBrowserProvider> {
+  let provider: WrappedBrowserProvider;
   try {
     const createResult = await checkout.createProvider({ walletProviderName });
     provider = createResult.provider;

@@ -1,22 +1,21 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-underscore-dangle */
-import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
-import { TypedDataDomain } from 'ethers';
+import { TransactionRequest, TypedDataDomain } from 'ethers';
 import { signApprovalTransactions, signFulfillmentTransactions, signMessage } from './signActions';
 import { CheckoutErrorType } from '../../errors';
 import { SignTransactionStatusType, UnsignedMessage } from './types';
 import { IMMUTABLE_ZKVEM_GAS_OVERRIDES } from '../../env';
-import { ChainId, NetworkInfo } from '../../types';
+import { ChainId, WrappedBrowserProvider, NetworkInfo } from '../../types';
 
 describe('signActions', () => {
-  let mockProvider: Web3Provider;
+  let mockProvider: WrappedBrowserProvider;
 
   describe('signApprovalTransactions', () => {
     it('should sign approval transactions', async () => {
       mockProvider = {
-        getNetwork: jest.fn().mockReturnValue({
+        getNetwork: jest.fn().mockResolvedValue({
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-        } as NetworkInfo),
+        } as unknown as NetworkInfo),
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: jest.fn().mockResolvedValue({
             wait: jest.fn().mockResolvedValue({
@@ -24,7 +23,7 @@ describe('signActions', () => {
             }),
           }),
         }),
-      } as unknown as Web3Provider;
+      } as unknown as WrappedBrowserProvider;
 
       const approvalTransactions: TransactionRequest[] = [
         {
@@ -41,14 +40,14 @@ describe('signActions', () => {
       expect(result).toEqual({
         type: SignTransactionStatusType.SUCCESS,
       });
-      expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledTimes(2);
-      expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledWith({
+      expect((await mockProvider.getSigner()).sendTransaction).toHaveBeenCalledTimes(2);
+      expect((await mockProvider.getSigner()).sendTransaction).toHaveBeenCalledWith({
         data: '0xAPPROVAL1',
         to: '0x123',
         maxFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxFeePerGas,
         maxPriorityFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxPriorityFeePerGas,
       });
-      expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledWith({
+      expect((await mockProvider.getSigner()).sendTransaction).toHaveBeenCalledWith({
         data: '0xAPPROVAL2',
         to: '0x123',
         maxFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxFeePerGas,
@@ -58,18 +57,18 @@ describe('signActions', () => {
 
     it('should return failed when approval transaction reverted', async () => {
       mockProvider = {
-        getNetwork: jest.fn().mockReturnValue({
+        getNetwork: jest.fn().mockResolvedValue({
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-        } as NetworkInfo),
+        } as unknown as NetworkInfo),
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: jest.fn().mockResolvedValue({
             wait: jest.fn().mockResolvedValue({
               status: 0,
-              transactionHash: '0xHASH',
+              hash: '0xHASH',
             }),
           }),
         }),
-      } as unknown as Web3Provider;
+      } as unknown as WrappedBrowserProvider;
 
       const approvalTransactions: TransactionRequest[] = [
         {
@@ -91,7 +90,7 @@ describe('signActions', () => {
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: jest.fn().mockRejectedValue(new Error('approval error')),
         }),
-      } as unknown as Web3Provider;
+      } as unknown as WrappedBrowserProvider;
 
       const approvalTransactions: TransactionRequest[] = [
         {
@@ -123,7 +122,7 @@ describe('signActions', () => {
       mockProvider = {
         getNetwork: jest.fn().mockReturnValue({
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-        } as NetworkInfo),
+        } as unknown as NetworkInfo),
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: jest.fn().mockResolvedValue({
             wait: jest.fn().mockResolvedValue({
@@ -131,7 +130,7 @@ describe('signActions', () => {
             }),
           }),
         }),
-      } as unknown as Web3Provider;
+      } as unknown as WrappedBrowserProvider;
 
       const approvalTransactions: TransactionRequest[] = [
         {
@@ -145,14 +144,14 @@ describe('signActions', () => {
       ];
 
       await signFulfillmentTransactions(mockProvider, approvalTransactions);
-      expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledTimes(2);
-      expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledWith({
+      expect((await mockProvider.getSigner()).sendTransaction).toHaveBeenCalledTimes(2);
+      expect((await mockProvider.getSigner()).sendTransaction).toHaveBeenCalledWith({
         data: '0xFULFILLMENT1',
         to: '0x123',
         maxFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxFeePerGas,
         maxPriorityFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxPriorityFeePerGas,
       });
-      expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledWith({
+      expect((await mockProvider.getSigner()).sendTransaction).toHaveBeenCalledWith({
         data: '0xFULFILLMENT2',
         to: '0x123',
         maxFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxFeePerGas,
@@ -164,16 +163,16 @@ describe('signActions', () => {
       mockProvider = {
         getNetwork: jest.fn().mockReturnValue({
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-        } as NetworkInfo),
+        } as unknown as NetworkInfo),
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: jest.fn().mockResolvedValue({
             wait: jest.fn().mockResolvedValue({
               status: 0,
-              transactionHash: '0xHASH',
+              hash: '0xHASH',
             }),
           }),
         }),
-      } as unknown as Web3Provider;
+      } as unknown as WrappedBrowserProvider;
 
       const fulfillmentTransactions: TransactionRequest[] = [
         {
@@ -195,7 +194,7 @@ describe('signActions', () => {
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: jest.fn().mockRejectedValue(new Error('fulfillment error')),
         }),
-      } as unknown as Web3Provider;
+      } as unknown as WrappedBrowserProvider;
 
       const approvalTransactions: TransactionRequest[] = [
         {
@@ -226,9 +225,9 @@ describe('signActions', () => {
     it('should sign the signable message', async () => {
       mockProvider = {
         getSigner: jest.fn().mockReturnValue({
-          _signTypedData: jest.fn().mockResolvedValue('0xSIGNATURE'),
+          signTypedData: jest.fn().mockResolvedValue('0xSIGNATURE'),
         }),
-      } as unknown as Web3Provider;
+      } as unknown as WrappedBrowserProvider;
 
       const unsignedMessage: UnsignedMessage = {
         orderHash: 'hash',
@@ -248,7 +247,7 @@ describe('signActions', () => {
         orderComponents: { orderComponents: {} },
         signedMessage: '0xSIGNATURE',
       });
-      expect(mockProvider.getSigner()._signTypedData).toHaveBeenCalledWith(
+      expect((await mockProvider.getSigner()).signTypedData).toHaveBeenCalledWith(
         {
           domain: 'domain',
         } as TypedDataDomain,
@@ -260,9 +259,9 @@ describe('signActions', () => {
     it('should throw error when sign message errors', async () => {
       mockProvider = {
         getSigner: jest.fn().mockReturnValue({
-          _signTypedData: jest.fn().mockRejectedValue(new Error('sign message error')),
+          signTypedData: jest.fn().mockRejectedValue(new Error('sign message error')),
         }),
-      } as unknown as Web3Provider;
+      } as unknown as WrappedBrowserProvider;
 
       const unsignedMessage: UnsignedMessage = {
         orderHash: 'hash',

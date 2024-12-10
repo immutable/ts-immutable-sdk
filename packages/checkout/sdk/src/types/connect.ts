@@ -1,29 +1,30 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { Eip1193Provider } from 'ethers';
+import { WrappedBrowserProvider } from './provider';
 
 /**
  * Interface representing the params of {@link Checkout.connect}.
- * @property {Web3Provider} provider - The provider used to connect to the network.
+ * @property {WrappedBrowserProvider | Eip1193Provider} provider - The provider used to connect to the network.
  * @property {boolean | undefined} requestWalletPermissions - A boolean that will trigger a permission request for wallet connection.
  */
 export interface ConnectParams {
-  provider: Web3Provider
+  provider: WrappedBrowserProvider | Eip1193Provider
   requestWalletPermissions?: boolean
 }
 
 /**
  * Interface representing the result of {@link Checkout.connect}.
- * @property {Web3Provider} provider - The provider used to connect to the network.
+ * @property {WrappedBrowserProvider} provider - The provider used to connect to the network.
  */
 export interface ConnectResult {
-  provider: Web3Provider;
+  provider: WrappedBrowserProvider;
 }
 
 /**
  * Interface representing the params of {@link Checkout.checkIsWalletConnected}.
- * @property {Web3Provider} provider - The provider used to connect to the network.
+ * @property {WrappedBrowserProvider | Eip1193Provider} provider - The provider used to connect to the network.
  */
 export interface CheckConnectionParams {
-  provider: Web3Provider
+  provider: WrappedBrowserProvider | Eip1193Provider
 }
 
 /**

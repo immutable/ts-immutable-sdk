@@ -1,14 +1,12 @@
-import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import { Signer } from '@ethersproject/abstract-signer';
-import { utils } from 'ethers';
 import {
   Flow, identify, trackError, trackFlow,
 } from '@imtbl/metrics';
 import {
-  JsonRpcRequestCallback,
-  JsonRpcRequestPayload,
-  JsonRpcResponsePayload,
+  JsonRpcProvider, Signer, toBeHex,
+  BrowserProvider,
+} from 'ethers';
+import {
   Provider,
   ProviderEvent,
   ProviderEventMap,
@@ -61,7 +59,7 @@ export class ZkEvmProvider implements Provider {
 
   readonly #guardianClient: GuardianClient;
 
-  readonly #rpcProvider: StaticJsonRpcProvider; // Used for read
+  readonly #rpcProvider: JsonRpcProvider; // Used for read
 
   readonly #magicAdapter: MagicAdapter;
 
@@ -98,12 +96,13 @@ export class ZkEvmProvider implements Provider {
     if (config.jsonRpcReferrer) {
       // StaticJsonRpcProvider by default sets the referrer as "client".
       // On Unreal 4 this errors as the browser used is expecting a valid URL.
-      this.#rpcProvider = new StaticJsonRpcProvider({
-        url: this.#config.zkEvmRpcUrl,
-        fetchOptions: { referrer: config.jsonRpcReferrer },
+      this.#rpcProvider = new JsonRpcProvider(this.#config.zkEvmRpcUrl, undefined, {
+        staticNetwork: true,
       });
     } else {
-      this.#rpcProvider = new StaticJsonRpcProvider(this.#config.zkEvmRpcUrl);
+      this.#rpcProvider = new JsonRpcProvider(this.#config.zkEvmRpcUrl, undefined, {
+        staticNetwork: true,
+      });
     }
 
     this.#relayerClient = new RelayerClient({
@@ -160,7 +159,7 @@ export class ZkEvmProvider implements Provider {
   #initialiseEthSigner(user: User) {
     const generateSigner = async (): Promise<Signer> => {
       const magicRpcProvider = await this.#magicAdapter.login(user.idToken!);
-      const web3Provider = new Web3Provider(magicRpcProvider);
+      const web3Provider = new BrowserProvider(magicRpcProvider);
 
       return web3Provider.getSigner();
     };
@@ -348,7 +347,7 @@ export class ZkEvmProvider implements Provider {
             if (this.#config.forceScwDeployBeforeMessageSignature) {
               // Check if the smart contract wallet has been deployed
               const nonce = await getNonce(this.#rpcProvider, zkEvmAddress);
-              if (!nonce.gt(0)) {
+              if (!(nonce > BigInt(0))) {
                 // If the smart contract wallet has not been deployed,
                 // submit a transaction before signing the message
                 return await sendDeployTransactionAndPersonalSign({
@@ -430,8 +429,8 @@ export class ZkEvmProvider implements Provider {
         // JsonRpcProvider, this function will still work as expected given
         // that detectNetwork call _uncachedDetectNetwork which will force
         // the provider to re-fetch the chainId from remote.
-        const { chainId } = await this.#rpcProvider.detectNetwork();
-        return utils.hexlify(chainId);
+        const { chainId } = await this.#rpcProvider.getNetwork();
+        return toBeHex(chainId);
       }
       // Pass through methods
       case 'eth_getBalance':
@@ -507,41 +506,6 @@ export class ZkEvmProvider implements Provider {
     }
   }
 
-  async #performJsonRpcRequest(
-    request: JsonRpcRequestPayload,
-  ): Promise<JsonRpcResponsePayload> {
-    const { id, jsonrpc } = request;
-    try {
-      const result = await this.#performRequest(request);
-      return {
-        id,
-        jsonrpc,
-        result,
-      };
-    } catch (error: unknown) {
-      let jsonRpcError: JsonRpcError;
-      if (error instanceof JsonRpcError) {
-        jsonRpcError = error;
-      } else if (error instanceof Error) {
-        jsonRpcError = new JsonRpcError(
-          RpcErrorCode.INTERNAL_ERROR,
-          error.message,
-        );
-      } else {
-        jsonRpcError = new JsonRpcError(
-          RpcErrorCode.INTERNAL_ERROR,
-          'Internal error',
-        );
-      }
-
-      return {
-        id,
-        jsonrpc,
-        error: jsonRpcError,
-      };
-    }
-  }
-
   public async request(request: RequestArguments): Promise<any> {
     try {
       return this.#performRequest(request);
@@ -555,78 +519,6 @@ export class ZkEvmProvider implements Provider {
 
       throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Internal error');
     }
-  }
-
-  public sendAsync(
-    request: JsonRpcRequestPayload | JsonRpcRequestPayload[],
-    callback?: JsonRpcRequestCallback,
-  ) {
-    if (!callback) {
-      throw new Error('No callback provided');
-    }
-
-    if (Array.isArray(request)) {
-      Promise.all(request.map(this.#performJsonRpcRequest))
-        .then((result) => {
-          callback(null, result);
-        })
-        .catch((error: JsonRpcError) => {
-          callback(error, []);
-        });
-    } else {
-      this.#performJsonRpcRequest(request)
-        .then((result) => {
-          callback(null, result);
-        })
-        .catch((error: JsonRpcError) => {
-          callback(error, null);
-        });
-    }
-  }
-
-  public async send(
-    request: string | JsonRpcRequestPayload | JsonRpcRequestPayload[],
-    callbackOrParams?: JsonRpcRequestCallback | Array<any>,
-    callback?: JsonRpcRequestCallback,
-  ) {
-    // Web3 >= 1.0.0-beta.38 calls `send` with method and parameters.
-    if (typeof request === 'string') {
-      if (typeof callbackOrParams === 'function') {
-        return this.sendAsync(
-          {
-            method: request,
-            params: [],
-          },
-          callbackOrParams,
-        );
-      }
-
-      if (callback) {
-        return this.sendAsync(
-          {
-            method: request,
-            params: Array.isArray(callbackOrParams) ? callbackOrParams : [],
-          },
-          callback,
-        );
-      }
-
-      return this.request({
-        method: request,
-        params: Array.isArray(callbackOrParams) ? callbackOrParams : [],
-      });
-    }
-
-    // Web3 <= 1.0.0-beta.37 uses `send` with a callback for async queries.
-    if (typeof callbackOrParams === 'function') {
-      return this.sendAsync(request, callbackOrParams);
-    }
-
-    if (!Array.isArray(request) && typeof request === 'object') {
-      return this.#performJsonRpcRequest(request);
-    }
-
-    throw new JsonRpcError(RpcErrorCode.INVALID_REQUEST, 'Invalid request');
   }
 
   public on(event: string, listener: (...args: any[]) => void): void {

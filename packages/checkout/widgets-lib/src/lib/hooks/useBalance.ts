@@ -1,6 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Checkout, GetBalanceResult } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
+import { Checkout, GetBalanceResult, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { getTokenBalances } from '../../widgets/wallet/functions/tokenBalances';
 import { DEFAULT_BALANCE_RETRY_POLICY } from '../constants';
 import { useInterval } from './useInterval';
@@ -9,7 +8,7 @@ const REFRESH_BALANCE_INTERVAL_MS = 30000; // 30 seconds -- keep app less chatty
 
 export interface UseBalanceParams {
   checkout: Checkout | undefined;
-  provider: Web3Provider | undefined,
+  provider: WrappedBrowserProvider | undefined,
   refreshCallback: (balance: GetBalanceResult[]) => void;
   errorCallback: (error: Error) => void;
 }
@@ -41,7 +40,7 @@ export const useBalance = ({
       if (!silent) {
         setBalancesLoading(true);
       }
-      const balances: GetBalanceResult[] = await getTokenBalances(checkout, provider, network.chainId);
+      const balances: GetBalanceResult[] = await getTokenBalances(checkout, provider, Number(network.chainId));
       if (!silent) {
         setBalancesLoading(false);
       }

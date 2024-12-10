@@ -139,8 +139,8 @@ export const useSignOrder = (input: SignOrderInput) => {
       gasLimit: number,
     ): Promise<[hash: string | undefined, error?: SignOrderError]> => {
       try {
-        const signer = provider?.getSigner();
-        const gasPrice = await provider?.getGasPrice();
+        const signer = await provider?.getSigner();
+        const gasPrice = (await provider?.getFeeData())?.gasPrice;
         const txnResponse = await signer?.sendTransaction({
           to,
           data,
@@ -202,7 +202,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       fromTokenAddress: string,
     ): Promise<SignResponse | undefined> => {
       try {
-        const signer = provider?.getSigner();
+        const signer = await provider?.getSigner();
         const address = (await signer?.getAddress()) || '';
 
         const data: SignApiRequest = {

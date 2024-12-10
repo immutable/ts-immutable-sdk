@@ -3,7 +3,6 @@ import {
   TokenBalance,
   TransactionRequirement,
 } from '@imtbl/checkout-sdk';
-import { BigNumber } from 'ethers';
 import { getTopUpViewData } from './getTopUpViewData';
 
 describe('getTopUpViewData', () => {
@@ -16,7 +15,7 @@ describe('getTopUpViewData', () => {
       decimals: 18,
       icon: 'ERC20Icon',
     },
-    balance: BigNumber.from(100),
+    balance: BigInt(100),
     formattedBalance: '100',
   };
 
@@ -29,7 +28,7 @@ describe('getTopUpViewData', () => {
       decimals: 18,
       icon: 'NATIVEIcon',
     },
-    balance: BigNumber.from(50),
+    balance: BigInt(50),
     formattedBalance: '50',
   };
 
@@ -39,12 +38,12 @@ describe('getTopUpViewData', () => {
     current: erc20Balance,
     required: {
       ...erc20Balance,
-      balance: BigNumber.from(50),
+      balance: BigInt(50),
       formattedBalance: '50',
     },
     delta: {
       ...erc20Balance,
-      balance: BigNumber.from(50),
+      balance: BigInt(50),
       formattedBalance: '50',
     },
     isFee: false,
@@ -56,12 +55,12 @@ describe('getTopUpViewData', () => {
     current: erc20Balance,
     required: {
       ...erc20Balance,
-      balance: BigNumber.from(200),
+      balance: BigInt(200),
       formattedBalance: '200',
     },
     delta: {
       ...erc20Balance,
-      balance: BigNumber.from(100),
+      balance: BigInt(100),
       formattedBalance: '100',
     },
     isFee: false,
@@ -73,12 +72,12 @@ describe('getTopUpViewData', () => {
     current: nativeBalance,
     required: {
       ...nativeBalance,
-      balance: BigNumber.from(20),
+      balance: BigInt(20),
       formattedBalance: '20',
     },
     delta: {
       ...nativeBalance,
-      balance: BigNumber.from(30),
+      balance: BigInt(30),
       formattedBalance: '30',
     },
     isFee: false,
@@ -90,12 +89,12 @@ describe('getTopUpViewData', () => {
     current: nativeBalance,
     required: {
       ...nativeBalance,
-      balance: BigNumber.from(70),
+      balance: BigInt(70),
       formattedBalance: '70',
     },
     delta: {
       ...nativeBalance,
-      balance: BigNumber.from(20),
+      balance: BigInt(20),
       formattedBalance: '20',
     },
     isFee: false,
@@ -176,17 +175,17 @@ describe('getTopUpViewData', () => {
         sufficient: true,
         current: {
           ...nativeBalance,
-          balance: BigNumber.from(0),
+          balance: BigInt(0),
           formattedBalance: '0',
         },
         required: {
           ...nativeBalance,
-          balance: BigNumber.from(30),
+          balance: BigInt(30),
           formattedBalance: '30',
         },
         delta: {
           ...nativeBalance,
-          balance: BigNumber.from(30),
+          balance: BigInt(30),
           formattedBalance: '30',
         },
         isFee: true,
@@ -196,17 +195,17 @@ describe('getTopUpViewData', () => {
         sufficient: true,
         current: {
           ...erc20Balance,
-          balance: BigNumber.from(0),
+          balance: BigInt(0),
           formattedBalance: '0',
         },
         required: {
           ...erc20Balance,
-          balance: BigNumber.from(50),
+          balance: BigInt(50),
           formattedBalance: '50',
         },
         delta: {
           ...erc20Balance,
-          balance: BigNumber.from(50),
+          balance: BigInt(50),
           formattedBalance: '50',
         },
         isFee: false,
