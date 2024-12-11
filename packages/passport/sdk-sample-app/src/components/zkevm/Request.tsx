@@ -147,7 +147,7 @@ const EthereumMethods: EthereumMethod[] = [
     params: [
       { name: 'clientId' },
     ],
-  }
+  },
 ];
 
 function Request({ showModal, setShowModal }: ModalProps) {
