@@ -13,6 +13,7 @@ import { isPassportProvider } from '../../provider';
 import {
   AmountData, RouteData, RouteResponseData, Token,
 } from '../types';
+import { SquidPostHook } from '../../primary-sales';
 import { SQUID_NATIVE_TOKEN } from '../config';
 
 const BASE_SLIPPAGE = 0.02;
@@ -156,6 +157,7 @@ export const useRoutes = () => {
     fromAmount: string,
     fromAddress?: string,
     quoteOnly = true,
+    postHook?: SquidPostHook,
   ): Promise<RouteResponse | undefined> => {
     try {
       return await retry(
@@ -170,6 +172,7 @@ export const useRoutes = () => {
           quoteOnly,
           enableBoost: true,
           receiveGasOnDestination: !isPassportProvider(toProvider),
+          postHook,
         }),
         {
           retryIntervalMs: 1000,
@@ -219,6 +222,7 @@ export const useRoutes = () => {
     toAmount: string,
     fromAddress?: string,
     quoteOnly = true,
+    postHook?: SquidPostHook,
   ): Promise<RouteResponseData> => {
     try {
       const routeResponse = await getRouteWithRetry(
@@ -229,6 +233,7 @@ export const useRoutes = () => {
         fromAmount,
         fromAddress,
         quoteOnly,
+        postHook,
       );
 
       if (!routeResponse?.route) {
@@ -252,6 +257,7 @@ export const useRoutes = () => {
         newFromAmount,
         fromAddress,
         quoteOnly,
+        postHook,
       );
 
       if (!newRoute?.route) {
@@ -299,6 +305,7 @@ export const useRoutes = () => {
     toTokenAddress: string,
     balances: TokenBalance[],
     fromAmountArray: AmountData[],
+    postHook?: SquidPostHook,
   ): Promise<RouteData[]> => {
     const getGasCost = (
       route: RouteResponseData,
@@ -356,6 +363,9 @@ export const useRoutes = () => {
           toTokenAddress,
           data.fromAmount,
           data.toAmount,
+          undefined,
+          true,
+          postHook,
         );
 
         if (!routeResponse?.route) return null;
