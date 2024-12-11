@@ -11,12 +11,11 @@ import {
 } from '@biom3/react';
 import { ReactElement, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-
-import { getDurationFormatted } from '../functions/getDurationFormatted';
-import { getTotalRouteFees } from '../../../lib/squid/functions/getTotalRouteFees';
-import { getFormattedAmounts } from '../functions/getFormattedNumber';
-import { getRouteAndTokenBalances } from '../../../lib/squid/functions/getRouteAndTokenBalances';
-import { Chain, RouteData } from '../../../lib/squid/types';
+import { getDurationFormatted } from '../../widgets/add-tokens/functions/getDurationFormatted';
+import { getRouteAndTokenBalances } from '../../lib/squid/functions/getRouteAndTokenBalances';
+import { getTotalRouteFees } from '../../lib/squid/functions/getTotalRouteFees';
+import { Chain, RouteData } from '../../lib/squid/types';
+import { getFormattedAmounts } from '../../widgets/add-tokens/functions/getFormattedNumber';
 
 export interface RouteOptionProps<
   RC extends ReactElement | undefined = undefined,

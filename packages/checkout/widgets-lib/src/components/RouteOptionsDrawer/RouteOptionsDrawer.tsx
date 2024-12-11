@@ -6,13 +6,13 @@ import { useContext, useEffect, useRef } from 'react';
 
 import { Checkout } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
-import { listVariants } from '../../../lib/animation/listAnimation';
-import { Options } from './Options';
-import { FiatOptionType } from '../types';
-import { AddTokensContext } from '../context/AddTokensContext';
-import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
-import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
-import { RouteData } from '../../../lib/squid/types';
+import { useAnalytics, UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
+import { listVariants } from '../../lib/animation/listAnimation';
+import { RouteData } from '../../lib/squid/types';
+import { AddTokensContext } from '../../widgets/add-tokens/context/AddTokensContext';
+import { FiatOptionType } from '../../widgets/add-tokens/types';
+import { RouteOptions } from './RouteOptions';
 
 type OptionsDrawerProps = {
   checkout: Checkout;
@@ -27,7 +27,7 @@ type OptionsDrawerProps = {
   insufficientBalance?: boolean;
 };
 
-export function OptionsDrawer({
+export function RouteOptionsDrawer({
   checkout,
   routes,
   visible,
@@ -116,7 +116,7 @@ export function OptionsDrawer({
           </MenuItem.Caption>
           <MenuItem.StatefulButtCon icon="ChevronExpand" onClick={onClose} />
         </MenuItem>
-        <Options
+        <RouteOptions
           size="small"
           checkout={checkout}
           routes={routes}

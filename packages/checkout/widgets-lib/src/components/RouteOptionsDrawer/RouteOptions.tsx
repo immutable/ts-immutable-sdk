@@ -4,12 +4,12 @@ import {
 import { motion } from 'framer-motion';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
-import { listItemVariants, listVariants } from '../../../lib/animation/listAnimation';
-import { FiatOption } from './FiatOption';
-import { FiatOptionType } from '../types';
+import { listVariants, listItemVariants } from '../../lib/animation/listAnimation';
+import { Chain, RouteData } from '../../lib/squid/types';
+import { getRemoteVideo } from '../../lib/utils';
+import { FiatOption } from '../../widgets/add-tokens/components/FiatOption';
+import { FiatOptionType } from '../../widgets/add-tokens/types';
 import { RouteOption } from './RouteOption';
-import { getRemoteVideo } from '../../../lib/utils';
-import { Chain, RouteData } from '../../../lib/squid/types';
 
 const defaultFiatOptions: FiatOptionType[] = [
   FiatOptionType.DEBIT,
@@ -28,7 +28,7 @@ export interface OptionsProps {
   selectedIndex: number;
 }
 
-export function Options({
+export function RouteOptions({
   checkout,
   routes,
   chains,

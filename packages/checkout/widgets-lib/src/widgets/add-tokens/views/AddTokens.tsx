@@ -39,7 +39,6 @@ import {
 } from '../../../context/view-context/ViewContext';
 import { getL2ChainId } from '../../../lib';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
-import { OptionsDrawer } from '../components/OptionsDrawer';
 import {
   AddTokensActions,
   AddTokensContext,
@@ -74,6 +73,7 @@ import { identifyUser } from '../../../lib/analytics/identifyUser';
 import { NotEnoughGasDrawer } from '../../../components/NotEnoughGasDrawer/NotEnoughGasDrawer';
 import { TOOLKIT_SQUID_URL } from '../utils/config';
 import { SelectedWallet } from '../../../components/SelectedWallet/SelectedWallet';
+import { RouteOptionsDrawer } from '../../../components/RouteOptionsDrawer/RouteOptionsDrawer';
 
 interface AddTokensProps {
   checkout: Checkout;
@@ -801,7 +801,7 @@ export function AddTokens({
             insufficientBalance={insufficientBalance}
             showOnRampOption={shouldShowOnRampOption || !selectedToken}
           />
-          <OptionsDrawer
+          <RouteOptionsDrawer
             checkout={checkout}
             routes={routes}
             showOnrampOption={shouldShowOnRampOption}
