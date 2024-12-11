@@ -10,19 +10,19 @@ const SESSION_ACTIVITY_COUNT_KEY = 'sessionActivitySendCount';
 const SESSION_ACTIVITY_DAY_KEY = 'sessionActivityDate';
 
 // Maintain a few local counters for session activity
-let checkCount = 0;
-let sendCount = 0;
-let currentSessionTrackCall = false;
+const checkCount: { [k: string]: number } = {};
+let sendCount: { [k: string]: number } = {};
+const currentSessionTrackCall: { [k: string]: boolean } = {};
 
 // Sync sendCount to localStorage
 const syncSendCount = () => {
-  sendCount = getItem(SESSION_ACTIVITY_COUNT_KEY) || 0;
+  sendCount = getItem(SESSION_ACTIVITY_COUNT_KEY) || {};
   const sendDay = getItem(SESSION_ACTIVITY_DAY_KEY);
 
   // If no day, set count to zero. If not today, reset sendCount to 0
   const today = new Date().toISOString().split('T')[0];
   if (!sendDay || sendDay !== today) {
-    sendCount = 0;
+    sendCount = {};
   }
 
   setItem(SESSION_ACTIVITY_DAY_KEY, today);
@@ -31,12 +31,12 @@ const syncSendCount = () => {
 // Run as soon as module initialised.
 syncSendCount();
 
-const incrementSendCount = () => {
+const incrementSendCount = (clientId: string) => {
   syncSendCount();
-  sendCount++;
+  sendCount[clientId]++;
   setItem(SESSION_ACTIVITY_COUNT_KEY, sendCount);
   // Reset checkCount to zero on sending
-  checkCount = 0;
+  checkCount[clientId] = 0;
 };
 
 // Fix no-promise-executor-return
@@ -47,12 +47,17 @@ const wait = async (seconds: number) => new Promise((resolve) => {
 const trackSessionActivityFn = async (args: AccountsRequestedEvent) => {
   // Use an existing flow if one is provided, or create a new one
   const flow = args.flow || trackFlow('passport', 'sendSessionActivity');
+  const clientId = args.passportClient;
+  if (!clientId) {
+    flow.addEvent('No Passport Client ID');
+    throw new Error('No Passport Client ID provided');
+  }
   // If there is already a tracking call in progress, do nothing
-  if (currentSessionTrackCall) {
+  if (currentSessionTrackCall[clientId]) {
     flow.addEvent('Existing Delay Early Exit');
     return;
   }
-  currentSessionTrackCall = true;
+  currentSessionTrackCall[clientId] = true;
 
   const { sendTransaction, environment } = args;
   if (!sendTransaction) {
@@ -63,12 +68,6 @@ const trackSessionActivityFn = async (args: AccountsRequestedEvent) => {
     throw new Error('No environment provided');
   }
   setupClient(environment);
-
-  const clientId = args.passportClient;
-  if (!clientId) {
-    flow.addEvent('No Passport Client ID');
-    throw new Error('No Passport Client ID provided');
-  }
 
   const from = args.walletAddress;
   if (!from) {
@@ -84,11 +83,11 @@ const trackSessionActivityFn = async (args: AccountsRequestedEvent) => {
     details = await get({
       clientId,
       wallet: from,
-      checkCount,
-      sendCount,
+      checkCount: checkCount[clientId] || 0,
+      sendCount: sendCount[clientId] || 0,
     });
-    checkCount++;
-    flow.addEvent('Fetched details', { checkCount });
+    checkCount[clientId]++;
+    flow.addEvent('Fetched details', { checkCount: checkCount[clientId] });
 
     if (!details) {
       flow.addEvent('No details found');
@@ -108,7 +107,7 @@ const trackSessionActivityFn = async (args: AccountsRequestedEvent) => {
     try {
       flow.addEvent('Start Sending Transaction');
       const tx = await args.sendTransaction([{ to, from, data }], flow);
-      incrementSendCount();
+      incrementSendCount(clientId);
       flow.addEvent('Transaction Sent', { tx });
     } catch (error) {
       flow.addEvent('Failed to send Transaction');
@@ -123,7 +122,7 @@ const trackSessionActivityFn = async (args: AccountsRequestedEvent) => {
     await wait(details.delay);
     setTimeout(() => {
       flow.addEvent('Retrying after Delay');
-      currentSessionTrackCall = false;
+      currentSessionTrackCall[clientId] = false;
       // eslint-disable-next-line
       trackSessionWrapper({ ...args, flow });
     }, 0);
@@ -132,7 +131,7 @@ const trackSessionActivityFn = async (args: AccountsRequestedEvent) => {
 
 // Wrapper design to ensure that after track function is called, current session Track call is false.
 const trackSessionWrapper = (args: AccountsRequestedEvent) => errorBoundary(trackSessionActivityFn)(args).then(() => {
-  currentSessionTrackCall = false;
+  currentSessionTrackCall[args.passportClient] = false;
 });
 
 export const trackSessionActivity = trackSessionWrapper;
