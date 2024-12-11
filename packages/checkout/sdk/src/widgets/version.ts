@@ -85,6 +85,33 @@ export async function getLatestVersionFromNpm(): Promise<string> {
 }
 
 /**
+ * Checks if the provided version is available on the CDN.
+ * @param {string} version - The version to check.
+ * @returns {Promise<boolean>} A promise resolving to a boolean indicating if the version is available on the CDN.
+ */
+async function isVersionAvailableOnCDN(version: string): Promise<boolean> {
+  const files = ['widgets-esm.js', 'widgets.js'];
+  const baseUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${version}/dist/browser/checkout/`;
+
+  try {
+    const checks = files.map(async (file) => {
+      const response = await fetch(`${baseUrl}${file}`, { method: 'HEAD' });
+      if (!response.ok) {
+        return false;
+      }
+      return true;
+    });
+
+    const results = await Promise.all(checks);
+    const allFilesAvailable = results.every((isAvailable) => isAvailable);
+
+    return allFilesAvailable;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Returns the latest compatible version based on the provided checkout version config.
  * If no compatible version markers are provided, it returns 'latest'.
  */
@@ -131,10 +158,14 @@ export async function determineWidgetsVersion(
     versionConfig.compatibleVersionMarkers,
   );
 
-  // If `latest` is returned, query NPM registry for the actual latest version
+  // If `latest` is returned, query NPM registry for the actual latest version and check if it's available on the CDN
   if (compatibleVersion === 'latest') {
     const latestVersion = await getLatestVersionFromNpm();
-    return latestVersion;
+    const isAvailable = await isVersionAvailableOnCDN(latestVersion);
+    if (isAvailable) {
+      return latestVersion;
+    }
+    return 'latest';
   }
 
   return compatibleVersion;
