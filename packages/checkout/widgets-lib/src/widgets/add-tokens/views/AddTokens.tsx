@@ -49,7 +49,6 @@ import { useRoutes } from '../../../lib/squid/hooks/useRoutes';
 import { AddTokensWidgetViews } from '../../../context/view-context/AddTokensViewContextTypes';
 import { AddTokensErrorTypes, AddTokensExperiments } from '../types';
 import { SelectedRouteOption } from '../components/SelectedRouteOption';
-import { SelectedWallet } from '../components/SelectedWallet';
 import { DeliverToWalletDrawer } from '../../../components/WalletDrawer/DeliverToWalletDrawer';
 import { PayWithWalletDrawer } from '../../../components/WalletDrawer/PayWithWalletDrawer';
 import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
@@ -74,6 +73,7 @@ import { SQUID_NATIVE_TOKEN } from '../../../lib/squid/config';
 import { identifyUser } from '../../../lib/analytics/identifyUser';
 import { NotEnoughGasDrawer } from '../../../components/NotEnoughGasDrawer/NotEnoughGasDrawer';
 import { TOOLKIT_SQUID_URL } from '../utils/config';
+import { SelectedWallet } from '../../../components/SelectedWallet/SelectedWallet';
 
 interface AddTokensProps {
   checkout: Checkout;
