@@ -2,12 +2,9 @@ import { RouteResponse } from '@0xsquid/squid-types';
 
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FeesBreakdown } from '../../../components/FeesBreakdown/FeesBreakdown';
-import { FormattedFee } from '../../swap/functions/swapFees';
-import {
-  getFormattedNumber,
-  getFormattedAmounts,
-} from '../functions/getFormattedNumber';
+import { FormattedFee } from '../../widgets/swap/functions/swapFees';
+import { FeesBreakdown } from '../FeesBreakdown/FeesBreakdown';
+import { getFormattedNumber, getFormattedAmounts } from '../../functions/getFormattedNumber';
 
 export type RouteFeesProps = {
   visible: boolean;
