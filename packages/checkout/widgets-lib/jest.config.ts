@@ -1,7 +1,16 @@
 import type { Config } from 'jest';
+import { execSync } from 'child_process';
+import { name } from './package.json';
+
+const rootDirs = execSync(`pnpm --filter ${name}... exec pwd`)
+  .toString()
+  .split('\n')
+  .filter(Boolean)
+  .map((dir) => `${dir}/dist`);
 
 const config: Config = {
   clearMocks: true,
+  roots: ['<rootDir>/src', ...rootDirs],
   coverageProvider: 'v8',
   moduleDirectories: ['node_modules', 'src'],
   moduleNameMapper: { '^@imtbl/(.*)$': '<rootDir>/../../../node_modules/@imtbl/$1/src' },
@@ -11,9 +20,8 @@ const config: Config = {
     '^.+\\.mjs?$': '@swc/jest',
   },
   transformIgnorePatterns: [
-    "node_modules/(?!axios|@biom3/design-tokens)",
+    "../../../node_modules/.pnpm/(?!axios|@biom3/design-tokens)",
   ],
-  modulePathIgnorePatterns: ['<rootDir>/.yalc'],
 };
 
 export default config;
