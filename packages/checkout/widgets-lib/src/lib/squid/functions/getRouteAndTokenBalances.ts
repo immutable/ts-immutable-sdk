@@ -1,4 +1,4 @@
-import { getFormattedAmounts, getFormattedNumber } from '../../../widgets/add-tokens/functions/getFormattedNumber';
+import { getFormattedAmounts, getFormattedNumber } from '../../../functions/getFormattedNumber';
 import { RouteData } from '../types';
 
 export type RouteBalance = {
