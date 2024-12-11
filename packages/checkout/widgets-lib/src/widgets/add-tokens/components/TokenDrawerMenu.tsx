@@ -26,7 +26,7 @@ import {
   AddTokensActions,
   AddTokensState,
 } from '../context/AddTokensContext';
-import { useError } from '../hooks/useError';
+import { useError } from '../../../lib/squid/hooks/useError';
 import {
   getDefaultTokenImage,
   getTokenImageByAddress,

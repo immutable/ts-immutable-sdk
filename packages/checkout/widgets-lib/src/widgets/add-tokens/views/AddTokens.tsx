@@ -47,7 +47,6 @@ import type { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidget
 import { useRoutes } from '../../../lib/squid/hooks/useRoutes';
 import { AddTokensWidgetViews } from '../../../context/view-context/AddTokensViewContextTypes';
 import { AddTokensErrorTypes, AddTokensExperiments } from '../types';
-import { SelectedRouteOption } from '../components/SelectedRouteOption';
 import { DeliverToWalletDrawer } from '../../../components/WalletDrawer/DeliverToWalletDrawer';
 import { PayWithWalletDrawer } from '../../../components/WalletDrawer/PayWithWalletDrawer';
 import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
@@ -61,12 +60,10 @@ import {
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { validateToAmount } from '../functions/amountValidation';
 import { OnboardingDrawer } from '../components/OnboardingDrawer';
-import { useError } from '../hooks/useError';
+import { useError } from '../../../lib/squid/hooks/useError';
 import { SquidFooter } from '../../../lib/squid/components/SquidFooter';
 import { TokenDrawerMenu } from '../components/TokenDrawerMenu';
 import { PULSE_SHADOW } from '../utils/animation';
-import { checkSanctionedAddresses } from '../functions/checkSanctionedAddresses';
-import { getFormattedAmounts } from '../functions/getFormattedNumber';
 import { RouteData } from '../../../lib/squid/types';
 import { SQUID_NATIVE_TOKEN } from '../../../lib/squid/config';
 import { identifyUser } from '../../../lib/analytics/identifyUser';
@@ -74,6 +71,9 @@ import { NotEnoughGasDrawer } from '../../../components/NotEnoughGasDrawer/NotEn
 import { TOOLKIT_SQUID_URL } from '../utils/config';
 import { SelectedWallet } from '../../../components/SelectedWallet/SelectedWallet';
 import { RouteOptionsDrawer } from '../../../components/RouteOptionsDrawer/RouteOptionsDrawer';
+import { SelectedRouteOption } from '../../../components/SelectedRouteOption/SelectedRouteOption';
+import { getFormattedAmounts } from '../../../functions/getFormattedNumber';
+import { checkSanctionedAddresses } from '../../../functions/checkSanctionedAddresses';
 
 interface AddTokensProps {
   checkout: Checkout;

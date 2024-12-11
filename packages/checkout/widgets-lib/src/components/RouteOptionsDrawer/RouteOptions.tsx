@@ -7,9 +7,9 @@ import { useTranslation } from 'react-i18next';
 import { listVariants, listItemVariants } from '../../lib/animation/listAnimation';
 import { Chain, RouteData } from '../../lib/squid/types';
 import { getRemoteVideo } from '../../lib/utils';
-import { FiatOption } from '../../widgets/add-tokens/components/FiatOption';
 import { FiatOptionType } from '../../widgets/add-tokens/types';
 import { RouteOption } from './RouteOption';
+import { FiatOption } from './FiatOption';
 
 const defaultFiatOptions: FiatOptionType[] = [
   FiatOptionType.DEBIT,
