@@ -25,4 +25,7 @@ export type AddTokensWidgetParams = {
 
   /** The destination wallet provider, when requiring to lock destination of funds */
   toProvider?: Web3Provider;
+
+  /** Flags to control experiments within the widget */
+  experiments?: Record<string, string>;
 };

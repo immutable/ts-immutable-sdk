@@ -40,7 +40,7 @@ import { getRemoteImage } from '../../lib/utils';
 import { isValidAddress } from '../../lib/validations/widgetValidators';
 import { amountInputValidation } from '../../lib/validations/amountInputValidations';
 import { useError } from './hooks/useError';
-import { AddTokensErrorTypes } from './types';
+import { AddTokensErrorTypes, AddTokensExperiments } from './types';
 import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 
 export type AddTokensWidgetInputs = Omit<AddTokensWidgetParams, 'toProvider'> & {
@@ -51,10 +51,11 @@ export default function AddTokensWidget({
   showOnrampOption = true,
   showSwapOption = true,
   showBridgeOption = true,
-  toTokenAddress,
+  toTokenAddress: toTokenAddressParameter,
   toAmount,
   showBackButton,
   config,
+  experiments,
 }: AddTokensWidgetInputs) {
   const fetchingBalances = useRef(false);
   const { base: { colorMode } } = useTheme();
@@ -104,7 +105,28 @@ export default function AddTokensWidget({
         id: uuidv4(),
       },
     });
+
+    if (experiments) {
+      addTokensDispatch({
+        payload: {
+          type: AddTokensActions.SET_EXPERIMENTS,
+          experiments,
+        },
+      });
+    }
   }, []);
+
+  const toTokenAddress = useMemo(() => {
+    if (toTokenAddressParameter) {
+      return toTokenAddressParameter;
+    }
+
+    if (experiments?.[AddTokensExperiments.PRESELECTED_TOKEN]) {
+      return experiments[AddTokensExperiments.PRESELECTED_TOKEN];
+    }
+
+    return undefined;
+  }, [experiments, toTokenAddressParameter]);
 
   useEffect(() => {
     if (config.environment !== Environment.PRODUCTION) {

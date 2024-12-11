@@ -50,6 +50,7 @@ import {
   APPROVE_TXN_ANIMATION,
   EXECUTE_TXN_ANIMATION,
   FIXED_HANDOVER_DURATION,
+  TOOLKIT_SQUID_URL,
 } from '../utils/config';
 import {
   useAnalytics,
@@ -122,6 +123,7 @@ export function Review({
   const [amountData, setAmountData] = useState<AmountData | undefined>();
   const [proceedDisabled, setProceedDisabled] = useState(true);
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
+  const [showSecuringQuote, setShowSecuringQuote] = useState(false);
   const [showAddressMissmatchDrawer, setShowAddressMissmatchDrawer] = useState(false);
   const { getAmountData, getRoute } = useRoutes();
   const { addHandover, closeHandover } = useHandover({
@@ -152,6 +154,8 @@ export function Review({
 
     if (!fromAddress || !toAddress) return;
 
+    setShowSecuringQuote(true);
+
     const updatedAmountData = getAmountData(
       tokens,
       data.balance,
@@ -174,10 +178,16 @@ export function Review({
       fromAddress,
       false,
     );
-
     setRoute(routeResponse.route);
     setAmountData(updatedAmountData);
     setProceedDisabled(false);
+    setShowSecuringQuote(false);
+    if (routeResponse?.route === undefined) {
+      showErrorHandover(AddTokensErrorTypes.ROUTE_ERROR, {
+        contextId: id,
+        error: 'Failed to obtain final route',
+      });
+    }
   };
 
   const { fromChain, toChain } = useMemo(
@@ -195,11 +205,29 @@ export function Review({
     [route],
   );
 
+  const openFeeBreakdown = () => {
+    const feesToken = route?.route.estimate.feeCosts?.[0]?.token;
+    track({
+      userJourney: UserJourney.ADD_TOKENS,
+      screen: 'Review',
+      control: 'FeeBreakdown',
+      controlType: 'Button',
+      extras: {
+        contextId: id,
+        feesToken: feesToken?.symbol,
+        totalAmount: feesToken ? getFormattedNumber(totalFees, feesToken.decimals) : null,
+        totalFiatAmount: getFormattedAmounts(totalFeesUsd),
+      },
+    });
+
+    setShowFeeBreakdown(true);
+  };
+
   const routeFees = useMemo(() => {
     if (totalFeesUsd) {
       return (
         <Body
-          onClick={() => setShowFeeBreakdown(true)}
+          onClick={() => openFeeBreakdown()}
           size="small"
           sx={{
             ...hFlex,
@@ -563,7 +591,7 @@ export function Review({
                     rc={(
                       <a
                         target="_blank"
-                        href="https://toolkit.immutable.com/squid-bridge/"
+                        href={TOOLKIT_SQUID_URL}
                         rel="noreferrer"
                       />
                     )}
@@ -577,7 +605,7 @@ export function Review({
           ),
           onPrimaryButtonClick: () => {
             window.open(
-              'https://toolkit.immutable.com/squid-bridge/',
+              TOOLKIT_SQUID_URL,
               '_blank',
               'noreferrer',
             );
@@ -957,7 +985,7 @@ export function Review({
           </>
         )}
 
-        {!route && !showAddressMissmatchDrawer && (
+        {!route && !showAddressMissmatchDrawer && showSecuringQuote && (
           <LoadingView
             loadingText={t('views.ADD_TOKENS.review.loadingText')}
             containerSx={{ bg: 'transparent' }}

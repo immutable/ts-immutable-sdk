@@ -28,4 +28,9 @@ export enum AddTokensErrorTypes {
   WALLET_REJECTED_NO_FUNDS = 'WALLET_REJECTED_NO_FUNDS',
   WALLET_POPUP_BLOCKED = 'WALLET_POPUP_BLOCKED',
   ENVIRONMENT_ERROR = 'ENVIRONMENT_ERROR',
+  ROUTE_ERROR = 'ROUTE_ERROR',
+}
+
+export enum AddTokensExperiments {
+  PRESELECTED_TOKEN = 'addTokensPreselectedToken',
 }

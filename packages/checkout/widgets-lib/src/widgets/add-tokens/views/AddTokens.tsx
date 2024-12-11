@@ -47,7 +47,7 @@ import {
 import type { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { useRoutes } from '../../../lib/squid/hooks/useRoutes';
 import { AddTokensWidgetViews } from '../../../context/view-context/AddTokensViewContextTypes';
-import { AddTokensErrorTypes } from '../types';
+import { AddTokensErrorTypes, AddTokensExperiments } from '../types';
 import { SelectedRouteOption } from '../components/SelectedRouteOption';
 import { SelectedWallet } from '../components/SelectedWallet';
 import { DeliverToWalletDrawer } from '../../../components/WalletDrawer/DeliverToWalletDrawer';
@@ -72,6 +72,8 @@ import { getFormattedAmounts } from '../functions/getFormattedNumber';
 import { RouteData } from '../../../lib/squid/types';
 import { SQUID_NATIVE_TOKEN } from '../../../lib/squid/config';
 import { identifyUser } from '../../../lib/analytics/identifyUser';
+import { NotEnoughGasDrawer } from '../../../components/NotEnoughGasDrawer/NotEnoughGasDrawer';
+import { TOOLKIT_SQUID_URL } from '../utils/config';
 
 interface AddTokensProps {
   checkout: Checkout;
@@ -118,6 +120,7 @@ export function AddTokens({
     selectedRouteData,
     selectedToken,
     isSwapAvailable,
+    experiments,
   } = addTokensState;
 
   const {
@@ -146,6 +149,7 @@ export function AddTokens({
   const [fetchingRoutes, setFetchingRoutes] = useState(false);
   const [insufficientBalance, setInsufficientBalance] = useState(false);
   const [isAmountInputSynced, setIsAmountInputSynced] = useState(false);
+  const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
 
   const debouncedSetSelectedAmount = useRef(
     debounce((value: string) => {
@@ -196,6 +200,7 @@ export function AddTokens({
           hasEmbeddedSwap: !!route.route.route.estimate.actions.find(
             (action) => action.type === ActionType.SWAP,
           ),
+          isInsufficientGas: route.isInsufficientGas,
         },
       });
     }
@@ -542,7 +547,11 @@ export function AddTokens({
   const loading = (routeInputsReady || fetchingRoutes)
     && !(selectedRouteData || insufficientBalance);
 
-  const readyToReview = routeInputsReady && !!toAddress && !!selectedRouteData && !loading;
+  const readyToReview = routeInputsReady
+    && !!toAddress
+    && !!selectedRouteData
+    && !selectedRouteData.isInsufficientGas
+    && !loading;
 
   const handleWalletConnected = (
     providerType: 'from' | 'to',
@@ -578,6 +587,33 @@ export function AddTokens({
       };
     }
     return undefined;
+  };
+
+  useEffect(() => {
+    if (!id || !experiments) return;
+
+    track({
+      userJourney: UserJourney.ADD_TOKENS,
+      screen: 'Experiments',
+      action: 'Started',
+      extras: {
+        contextId: id,
+        preselectedToken: experiments[AddTokensExperiments.PRESELECTED_TOKEN] || 'none',
+      },
+    });
+  }, [id, experiments]);
+
+  useEffect(() => {
+    if (selectedRouteData?.isInsufficientGas) {
+      setShowNotEnoughGasDrawer(true);
+    } else {
+      setShowNotEnoughGasDrawer(false);
+    }
+  }, [selectedRouteData]);
+
+  const handleToolkitClick = () => {
+    setShowNotEnoughGasDrawer(false);
+    window.open(TOOLKIT_SQUID_URL, '_blank');
   };
 
   return (
@@ -786,6 +822,12 @@ export function AddTokens({
           <OnboardingDrawer environment={checkout?.config.environment!} />
         </Stack>
       </Stack>
+      <NotEnoughGasDrawer
+        visible={showNotEnoughGasDrawer}
+        routeData={selectedRouteData}
+        onTryAgainClick={() => setShowNotEnoughGasDrawer(false)}
+        onToolkitClick={handleToolkitClick}
+      />
     </SimpleLayout>
   );
 }

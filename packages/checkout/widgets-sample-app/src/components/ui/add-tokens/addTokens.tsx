@@ -17,6 +17,7 @@ import { passport } from "./passport";
 import { Web3Provider } from "@ethersproject/providers";
 
 const ADD_TOKENS_TARGET_ID = "add-tokens-widget-target";
+const FLAG_PRESELECTED_TOKEN = 'addTokensPreselectedToken';
 
 function AddTokensUI() {
   const checkout = useMemo(
@@ -51,6 +52,7 @@ function AddTokensUI() {
 
   const [toTokenAddress, setToTokenAddress] = useState<string | undefined>(undefined);
   const [toAmount, setToAmount] = useState<string | undefined>(undefined);
+  const [experiments, setExperiments] = useState<Record<string, string> | undefined>(undefined);
 
   const addTokens = useMemo(
     () =>
@@ -74,6 +76,7 @@ function AddTokensUI() {
       toProvider,
       toTokenAddress,
       toAmount,
+      experiments,
     });
   };
 
@@ -213,7 +216,15 @@ function AddTokensUI() {
       <button onClick={() => setPresetToProvider(prev => !prev)}>
         {presetToProvider ? 'Disconnect destination wallet' : 'Connect destination wallet'}
       </button>
-
+      <br />
+      <br />
+      <b>Experiments</b><br />
+      Preselected token{' '}
+      <input type="text"
+        name={FLAG_PRESELECTED_TOKEN}
+        value={experiments?.[FLAG_PRESELECTED_TOKEN] ?? ''}
+        onChange={(e) => setExperiments({ ...experiments, [FLAG_PRESELECTED_TOKEN]: e.target.value })}
+        placeholder="0x1234" />
     </div>
   );
 }

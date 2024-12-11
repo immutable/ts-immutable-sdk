@@ -70,6 +70,12 @@ export const useError = (environment: Environment) => {
       secondaryButtonText: t('views.ADD_TOKENS.error.invalidParameters.secondaryButtonText'),
       onSecondaryButtonClick: closeWidget,
     },
+    [AddTokensErrorTypes.ROUTE_ERROR]: {
+      headingText: t('views.ADD_TOKENS.error.routeError.heading'),
+      subHeadingText: t('views.ADD_TOKENS.error.routeError.subHeading'),
+      secondaryButtonText: t('views.ADD_TOKENS.error.routeError.secondaryButtonText'),
+      onSecondaryButtonClick: goBackToAddTokensView,
+    },
     [AddTokensErrorTypes.SERVICE_BREAKDOWN]: {
       headingText: t('views.ADD_TOKENS.error.serviceBreakdown.heading'),
       subHeadingText: t('views.ADD_TOKENS.error.serviceBreakdown.subHeading'),

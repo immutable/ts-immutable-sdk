@@ -3,6 +3,7 @@ import {
   MenuItem,
   Stack,
   Sticker,
+  Tooltip,
 } from '@biom3/react';
 import {
   MouseEvent,
@@ -148,12 +149,18 @@ export function SelectedRouteOption({
       selected={withSelectedWallet}
     >
       {chain && (
-        <Sticker position={{ x: 'right', y: 'bottom' }}>
-          <Sticker.FramedImage
-            use={<img src={chain.iconUrl} alt={chain.name} />}
-            size="xSmall"
-            sx={{ bottom: 'base.spacing.x2', right: 'base.spacing.x2' }}
-          />
+        <Sticker position={{ x: 'rightInside', y: 'bottomInside' }}>
+          <Tooltip size="small">
+            <Tooltip.Target>
+              <Sticker.FramedImage
+                use={<img src={chain.iconUrl} alt={chain.name} />}
+                size="xSmall"
+              />
+            </Tooltip.Target>
+            <Tooltip.Content id="route_tooltip_content">
+              {chain.name}
+            </Tooltip.Content>
+          </Tooltip>
 
           <MenuItem.FramedImage
             circularFrame
@@ -175,6 +182,17 @@ export function SelectedRouteOption({
             {`${t('views.ADD_TOKENS.fees.balance')} ${t(
               'views.ADD_TOKENS.fees.fiatPricePrefix',
             )} $${routeBalanceUsd}`}
+            {routeData?.isInsufficientGas && (
+            <>
+              <br />
+              <span style={{ color: '#FF637F' }}>
+                {t('views.ADD_TOKENS.noGasRouteMessage', {
+                  token:
+              routeData.route.route.estimate.gasCosts[0].token.symbol,
+                })}
+              </span>
+            </>
+            )}
           </MenuItem.Caption>
         </Stack>
         <MenuItem.PriceDisplay price={fromAmount}>
