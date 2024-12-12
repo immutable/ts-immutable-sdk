@@ -38,7 +38,7 @@
   },
   "release": {
     "projectsRelationship": "fixed",
-    "projects": ["packages/**", "sdk/**", "!packages/**/*sample-app/**", "!packages/game-bridge", "!@imtbl-alpha/**"],
+    "projects": ["sdk/**", "packages/**", "!packages/**/*sample-app/**", "!packages/game-bridge", "!@imtbl-alpha/**"],
     "releaseTagPattern": "{version}",
     "changelog": {
         "workspaceChangelog": {
@@ -57,7 +57,7 @@
     "version": {
       "generatorOptions": {
         "skipLockFileUpdate": true,
-        "currentVersionResolver": "registry",
+        "currentVersionResolver": "disk",
         "preid": "alpha"
       },
       "git": {
