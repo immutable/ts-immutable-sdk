@@ -1,7 +1,7 @@
 import { AllDualVariantIconKeys, MenuItem, MenuItemSize } from '@biom3/react';
 import { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FiatOptionType } from '../types';
+import { FiatOptionType } from '../../widgets/add-tokens/types';
 
 export interface FiatOptionProps<
   RC extends ReactElement | undefined = undefined,

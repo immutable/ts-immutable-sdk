@@ -3,7 +3,7 @@ import { RouteResponse, ActionType } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
 import { BigNumber, utils } from 'ethers';
 import { useContext, useRef } from 'react';
-import { delay } from '../../../widgets/add-tokens/functions/delay';
+import { delay } from '../../../functions/delay';
 import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
 import { AddTokensActions, AddTokensContext } from '../../../widgets/add-tokens/context/AddTokensContext';
 import { retry } from '../../retry';

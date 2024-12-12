@@ -9,14 +9,14 @@ import { StatusResponse } from '@0xsquid/sdk/dist/types';
 import { Flow } from '@imtbl/metrics';
 import { EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
 import { isSquidNativeToken } from '../functions/isSquidNativeToken';
-import { useError } from '../../../widgets/add-tokens/hooks/useError';
+import { useError } from './useError';
 import { AddTokensError, AddTokensErrorTypes } from '../../../widgets/add-tokens/types';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { sendAddTokensFailedEvent } from '../../../widgets/add-tokens/AddTokensWidgetEvents';
 import { retry } from '../../retry';
 import { withMetricsAsync } from '../../metrics';
 import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
-import { isRejectedError } from '../../../widgets/add-tokens/functions/errorType';
+import { isRejectedError } from '../../../functions/errorType';
 
 const TRANSACTION_NOT_COMPLETED = 'transaction not completed';
 

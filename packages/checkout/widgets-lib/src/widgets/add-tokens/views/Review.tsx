@@ -35,7 +35,7 @@ import {
   AddTokensReviewData,
   AddTokensWidgetViews,
 } from '../../../context/view-context/AddTokensViewContextTypes';
-import { AddTokensErrorTypes, RiveStateMachineInput } from '../types';
+import { AddTokensErrorTypes } from '../types';
 import { useExecute } from '../../../lib/squid/hooks/useExecute';
 import {
   ViewActions,
@@ -58,25 +58,24 @@ import {
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
-import { getDurationFormatted } from '../functions/getDurationFormatted';
-import { RouteFees } from '../components/RouteFees';
-import { AddressMissmatchDrawer } from '../components/AddressMissmatchDrawer';
 import { getTotalRouteFees } from '../../../lib/squid/functions/getTotalRouteFees';
 import { getRouteChains } from '../../../lib/squid/functions/getRouteChains';
-import {
-  getFormattedAmounts,
-  getFormattedNumber,
-} from '../functions/getFormattedNumber';
+
 import { SquidFooter } from '../../../lib/squid/components/SquidFooter';
-import { useError } from '../hooks/useError';
+import { useError } from '../../../lib/squid/hooks/useError';
 import {
   sendAddTokensCloseEvent,
   sendAddTokensSuccessEvent,
 } from '../AddTokensWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { convertToNetworkChangeableProvider } from '../functions/convertToNetworkChangeableProvider';
+import { convertToNetworkChangeableProvider } from '../../../functions/convertToNetworkChangeableProvider';
 import { AmountData } from '../../../lib/squid/types';
 import { SQUID_NATIVE_TOKEN } from '../../../lib/squid/config';
+import { AddressMissmatchDrawer } from '../../../components/AddressMismatchDrawer/AddressMissmatchDrawer';
+import { RouteFees } from '../../../components/RouteFees/RouteFees';
+import { getDurationFormatted } from '../../../functions/getDurationFormatted';
+import { getFormattedNumber, getFormattedAmounts } from '../../../functions/getFormattedNumber';
+import { RiveStateMachineInput } from '../../../types/HandoverTypes';
 
 interface ReviewProps {
   data: AddTokensReviewData;

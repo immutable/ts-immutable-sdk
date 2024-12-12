@@ -2,7 +2,7 @@ import {
   Body, Box, Button, Drawer, Heading,
 } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
-import { WalletWarningHero } from '../../../components/Hero/WalletWarningHero';
+import { WalletWarningHero } from '../Hero/WalletWarningHero';
 
 export interface AddressMissmatchDrawerProps {
   visible: boolean;
