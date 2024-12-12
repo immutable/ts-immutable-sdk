@@ -53,8 +53,8 @@ prepare_deps() {
     fi
     
     # Get the packed dependency filename. For example, @imtbl/sdk -> imtbl-sdk-0.0.0.tgz
-    version=$(pnpm exec jq -r ".version" package.json)
-    packedDepFilename=$(echo "$dep" | sed "s/@imtbl\///" | sed "s/\//-/" | sed "s/^/imtbl-/" | sed "s/$/-$version.tgz/")
+    # version=$(pnpm exec jq -r ".version" package.json)
+    packedDepFilename=$(echo "$dep" | sed "s/@imtbl\///" | sed "s/\//-/" | sed "s/^/imtbl-/" | sed "s/$/-0.0.0.tgz/")
     # Check if the dependency is a dependency or a devDependency and replace the version with a local tarball version
     if echo "$deps" | grep -q "$dep"; then
       pnpm exec jq ".dependencies[\"$dep\"] = \"file:$(dirname $(pnpm root -w))/$packedDepFilename\"" package.json > package.tmp.json
