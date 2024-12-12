@@ -7,6 +7,7 @@ on:
         type: choice
         description: Release Type
         options:
+          - prerelease
           - prepatch
           - preminor
           - premajor
@@ -14,7 +15,7 @@ on:
           - minor
           - major
         required: true
-        default: prepatch
+        default: prerelease
       dry_run:
         type: boolean
         description: "(Optional) Dry run"
