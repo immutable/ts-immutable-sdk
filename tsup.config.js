@@ -25,6 +25,7 @@ export default defineConfig((options) => {
       target: 'es2022',
       minify: true,
       bundle: true,
+      noExternal: ['@uniswap/swap-router-contracts'],
       treeshake: true,
       esbuildPlugins: [
         nodeModulesPolyfillPlugin({
@@ -48,6 +49,7 @@ export default defineConfig((options) => {
       target: 'es2022',
       minify: true,
       bundle: true,
+      noExternal: ['@uniswap/swap-router-contracts'],
       treeshake: true,
       esbuildPlugins: [
         replace({ 
