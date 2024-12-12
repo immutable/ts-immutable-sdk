@@ -1,0 +1,30 @@
+name: Title Validation
+
+on:
+  pull_request:
+    branches:
+      - '**'
+    types:
+      - opened
+      - edited
+  merge_group:
+    branches:
+      - main
+
+permissions:
+  pull-requests: read
+
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NX_TOKEN }}
+
+jobs:
+  title-validation:
+    name: Validate PR title
+    if: ${{ github.event.action == 'opened' || github.event.changes.title.from }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          requireScope: true
