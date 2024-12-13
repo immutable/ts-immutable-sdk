@@ -39,7 +39,7 @@ export default function ConnectWithMetamask() {
     const providerRes = await checkoutSDK.createProvider({ walletProviderName });
     
     // Check if the provider if a BrowserProvider
-    const isProviderRes = checkout.Checkout.isBrowserProvider(providerRes.provider);
+    const isProviderRes = checkout.Checkout.isWrappedBrowserProvider(providerRes.provider);
 
     if(!isProviderRes) {
       console.error('Provider is not a valid BrowserProvider');

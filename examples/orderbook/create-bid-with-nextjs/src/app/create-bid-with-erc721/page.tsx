@@ -51,7 +51,7 @@ export default function CreateERC721BidWithPassport() {
   }, []);
 
   // create the BrowserProvider using the Passport provider
-  const web3Provider = useMemo(() => passportProvider ? new BrowserProvider(passportProvider) : undefined, [passportProvider]);
+  const browserProvider = useMemo(() => passportProvider ? new BrowserProvider(passportProvider) : undefined, [passportProvider]);
 
   // setup the state for the ERC721 bid creation form elements
 
@@ -82,13 +82,13 @@ export default function CreateERC721BidWithPassport() {
   const [bidError, setBidErrorState] = useState<string | null>(null);
 
   const passportLogin = async () => {
-    if (web3Provider?.send) {
+    if (browserProvider?.send) {
       // disable button while loading
       setLoadingState(true);
       setLoadingText("Connecting to Passport");
 
       // calling eth_requestAccounts triggers the Passport login flow
-      const accounts = await web3Provider.send("eth_requestAccounts", []);
+      const accounts = await browserProvider.send("eth_requestAccounts", []);
 
       // once logged in Passport is connected to the wallet and ready to transact
       setAccountsState(accounts);
@@ -177,7 +177,7 @@ export default function CreateERC721BidWithPassport() {
     setLoadingState(true);
     setLoadingText('Creating bid');
 
-    if (!web3Provider) {
+    if (!browserProvider) {
       setBidErrorState("Please connect to Passport");
       return;
     }
@@ -187,10 +187,10 @@ export default function CreateERC721BidWithPassport() {
       const preparedBid = await prepareERC721Bid();
 
       // sign and submit approval transaction
-      await signAndSubmitApproval(web3Provider, preparedBid);
+      await signAndSubmitApproval(browserProvider, preparedBid);
 
       // sign the bid
-      const orderSignature = await signBid(web3Provider, preparedBid);
+      const orderSignature = await signBid(browserProvider, preparedBid);
 
       // create the bid
       const bidID = await createBid(

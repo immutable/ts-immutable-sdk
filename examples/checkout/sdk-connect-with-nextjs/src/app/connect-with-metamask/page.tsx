@@ -43,7 +43,7 @@ const connectWithMetamask = async (connectWithPerms:boolean) => {
 
   // #doc check-is-valid-provider
   // Check if the provider if a BrowserProvider
-  const isProviderRes = checkout.Checkout.isBrowserProvider(providerRes.provider);
+  const isProviderRes = checkout.Checkout.isWrappedBrowserProvider(providerRes.provider);
   // #enddoc check-is-valid-provider
 
   setIsValidProvider(isProviderRes);

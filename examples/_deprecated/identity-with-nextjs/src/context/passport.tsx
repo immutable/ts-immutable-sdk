@@ -91,12 +91,12 @@ export function PassportProvider({ children }: { children: ReactNode }) {
     // #doc passport-login-with-ethersjs
     const passportProvider = await passportInstance.connectEvm();
 
-    const web3Provider = new BrowserProvider(passportProvider);
+    const browserProvider = new BrowserProvider(passportProvider);
 
-    const accounts = await web3Provider.send('eth_requestAccounts', []);
+    const accounts = await browserProvider.send('eth_requestAccounts', []);
     // #enddoc passport-login-with-ethersjs
 
-    const signer = await web3Provider.getSigner();
+    const signer = await browserProvider.getSigner();
 
     window.alert(
       `accounts: ${accounts} signer: ${JSON.stringify(signer)}`,

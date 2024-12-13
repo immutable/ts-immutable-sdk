@@ -5,6 +5,7 @@ import { Provider, ProviderEvent } from '@imtbl/sdk/passport';
 import { passportInstance } from '../utils/passport';
 import { Button, Heading, Link, Table } from '@biom3/react';
 import NextLink from 'next/link';
+import { Wallet } from 'ethers'
 
 export default function ConnectWithEtherJS() {
   // setup the accounts state

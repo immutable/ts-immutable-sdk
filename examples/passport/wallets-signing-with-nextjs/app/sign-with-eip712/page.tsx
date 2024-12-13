@@ -44,17 +44,17 @@ export default function ConnectWithEtherJS() {
   }, []);
 
   // create the BrowserProvider using the Passport provider
-  const web3Provider = useMemo(() => passportProvider ? new BrowserProvider(passportProvider) : undefined, [passportProvider]);
+  const browserProvider = useMemo(() => passportProvider ? new BrowserProvider(passportProvider) : undefined, [passportProvider]);
   // #enddoc passport-wallets-nextjs-sign-eip712-create
 
   const passportLogin = async () => {
-    if (web3Provider?.send) {
+    if (browserProvider?.send) {
       // disable button while loading
       setLoadingState(true);
 
       // #doc passport-wallets-nextjs-sign-eip712-request
       // calling eth_requestAccounts triggers the Passport login flow
-      const accounts = await web3Provider.send('eth_requestAccounts', []);
+      const accounts = await browserProvider.send('eth_requestAccounts', []);
       // #enddoc passport-wallets-nextjs-sign-eip712-request
 
       // once logged in Passport is connected to the wallet and ready to transact
@@ -84,13 +84,13 @@ export default function ConnectWithEtherJS() {
 
   // #doc passport-wallets-nextjs-sign-eip712-signmessage
   const signMessage = async () => {
-    if (!web3Provider) return;
+    if (!browserProvider) return;
 
     // set signed state message to pending in the view
     setSignedMessageState('pending signature');
 
     // fetch the signer from the Web3provider
-    const signer = await web3Provider.getSigner();
+    const signer = await browserProvider.getSigner();
 
     // set the chainId
     const chainId = 13473; // zkEVM testnet

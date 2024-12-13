@@ -17,7 +17,7 @@ describe('provider validation', () => {
     console.log(request);
   });
 
-  describe('isBrowserProvider', () => {
+  describe('isWrappedBrowserProvider', () => {
     it('should return true when provider is BrowserProvider shape and request method is present', () => {
       const browserProvider = new WrappedBrowserProvider({ request: mockRequestFunc });
       const result = isWrappedBrowserProvider(browserProvider);
