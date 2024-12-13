@@ -741,9 +741,9 @@ describe('Connect', () => {
     expect(smartCheckout).toBeCalledTimes(0);
   });
 
-  it('should call isBrowserProvider', async () => {
+  it('should call isWrappedBrowserProvider', async () => {
     (isWrappedBrowserProvider as jest.Mock).mockResolvedValue(true);
-    const result = Checkout.isBrowserProvider(
+    const result = Checkout.isWrappedBrowserProvider(
       new WrappedBrowserProvider(providerMock, ChainId.ETHEREUM),
     );
     expect(result).toBeTruthy();

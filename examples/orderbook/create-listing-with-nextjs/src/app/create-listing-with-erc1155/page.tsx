@@ -53,7 +53,7 @@ export default function CreateERC1155ListingWithPassport() {
   }, []);
 
   // create the BrowserProvider using the Passport provider
-  const web3Provider = useMemo(() => passportProvider ? new BrowserProvider(passportProvider) : undefined, [passportProvider]);
+  const browserProvider = useMemo(() => passportProvider ? new BrowserProvider(passportProvider) : undefined, [passportProvider]);
 
   // setup the state for the ERC1155 listing creation form elements
 
@@ -94,13 +94,13 @@ export default function CreateERC1155ListingWithPassport() {
   const [listingError, setListingErrorState] = useState<string | null>(null);
 
   const passportLogin = async () => {
-    if (web3Provider?.send) {
+    if (browserProvider?.send) {
       // disable button while loading
       setLoadingState(true);
       setLoadingText("Connecting to Passport");
 
       // calling eth_requestAccounts triggers the Passport login flow
-      const accounts = await web3Provider.send("eth_requestAccounts", []);
+      const accounts = await browserProvider.send("eth_requestAccounts", []);
 
       // once logged in Passport is connected to the wallet and ready to transact
       setAccountsState(accounts);
@@ -207,7 +207,7 @@ export default function CreateERC1155ListingWithPassport() {
     setLoadingState(true);
     setLoadingText('Creating listing');
 
-    if (!web3Provider) {
+    if (!browserProvider) {
       setListingErrorState("Please connect to Passport first");
       return;
     }
@@ -217,10 +217,10 @@ export default function CreateERC1155ListingWithPassport() {
       const preparedListing = await prepareERC1155Listing();
 
       // sign and submit approval transaction
-      await signAndSubmitApproval(web3Provider, preparedListing);
+      await signAndSubmitApproval(browserProvider, preparedListing);
 
       // sign the listing
-      const orderSignature = await signListing(web3Provider, preparedListing);
+      const orderSignature = await signListing(browserProvider, preparedListing);
 
       // create the listing
       const listingID = await createListing(

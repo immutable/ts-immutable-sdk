@@ -736,7 +736,7 @@ export class Checkout {
    * @param {BrowserProvider} browserProvider - The object to check.
    * @returns {boolean} - True if the object is a Web3 provider, false otherwise.
    */
-  static isBrowserProvider(browserProvider: WrappedBrowserProvider) {
+  static isWrappedBrowserProvider(browserProvider: WrappedBrowserProvider) {
     return provider.isWrappedBrowserProvider(browserProvider);
   }
 
