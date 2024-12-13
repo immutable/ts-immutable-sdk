@@ -2,7 +2,9 @@ import { passport } from '@imtbl/sdk';
 import { BrowserProvider, ethers } from 'ethers';
 
 export async function sendTransaction(passportInstance: passport.Passport) {
+  // #doc passport-evm-login-outside-component
   const provider = await passportInstance.connectEvm();
+  // #enddoc passport-evm-login-outside-component
   const web3Provider = new BrowserProvider(provider);
   const signer = await web3Provider.getSigner();
 
