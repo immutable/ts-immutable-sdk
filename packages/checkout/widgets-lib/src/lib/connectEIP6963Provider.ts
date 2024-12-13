@@ -23,13 +23,13 @@ export const connectEIP6963Provider = async (
   checkout: Checkout,
   shouldRequestWalletPermissions?: boolean,
 ): Promise<ConnectEIP6963ProviderResult> => {
-  const web3Provider = new WrappedBrowserProvider(providerDetail.provider);
+  const wrappedBrowserProvider = new WrappedBrowserProvider(providerDetail.provider);
 
   try {
     const requestWalletPermissions = shouldRequestWalletPermissions
       ?? providerDetail.info.rdns === WalletProviderRdns.METAMASK;
     const connectResult = await checkout.connect({
-      provider: web3Provider,
+      provider: wrappedBrowserProvider,
       requestWalletPermissions,
     });
 

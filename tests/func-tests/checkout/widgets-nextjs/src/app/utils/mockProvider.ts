@@ -61,7 +61,7 @@ export class MockProvider extends EventEmitter {
 
       default:
         console.log(
-          `[MockWeb3Provider] Unmocked method called: ${method}`,
+          `[MockBrowserProvider] Unmocked method called: ${method}`,
           params
         );
         return null;

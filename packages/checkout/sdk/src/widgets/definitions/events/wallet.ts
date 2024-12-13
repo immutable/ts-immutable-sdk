@@ -21,7 +21,7 @@ export type WalletNetworkSwitch = {
   network: string;
   /**  The chain ID of the network that the user switched to. */
   chainId: number;
-  /** The Web3 provider object for the switched network. */
+  /** The WrappedBrowserProvider object for the switched network. */
   provider: WrappedBrowserProvider;
 };
 

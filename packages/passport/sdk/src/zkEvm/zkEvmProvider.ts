@@ -159,9 +159,9 @@ export class ZkEvmProvider implements Provider {
   #initialiseEthSigner(user: User) {
     const generateSigner = async (): Promise<Signer> => {
       const magicRpcProvider = await this.#magicAdapter.login(user.idToken!);
-      const web3Provider = new BrowserProvider(magicRpcProvider);
+      const browserProvider = new BrowserProvider(magicRpcProvider);
 
-      return web3Provider.getSigner();
+      return browserProvider.getSigner();
     };
 
     this.#signerInitialisationError = undefined;
