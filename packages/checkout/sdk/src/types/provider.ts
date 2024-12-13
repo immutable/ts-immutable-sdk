@@ -31,7 +31,7 @@ export interface CreateProviderParams {
 }
 
 /**
- * Represents the result of creating a Web3 provider {@link Checkout.createProvider}.
+ * Represents the result of creating a WrappedBrowserProvider {@link Checkout.createProvider}.
  * @property {WrappedBrowserProvider} provider - The created Browser provider.
  * @property {WalletProviderName} walletProviderName - The wallet provider name of the provider that was created.
  */
