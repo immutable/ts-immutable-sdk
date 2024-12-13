@@ -695,8 +695,8 @@ window.callFunction = async (jsonData: string) => {
       case PASSPORT_FUNCTIONS.zkEvm.sendTransactionWithConfirmation: {
         const transaction = JSON.parse(data);
         const zkEvmProvider = getZkEvmProvider();
-        const web3Provider = new BrowserProvider(zkEvmProvider);
-        const signer = await web3Provider.getSigner();
+        const browserProvider = new BrowserProvider(zkEvmProvider);
+        const signer = await browserProvider.getSigner();
 
         const tx = await signer.sendTransaction(transaction);
         const response = await tx.wait();

@@ -89,7 +89,7 @@ export default function ConnectWithEtherJS() {
     // set signed state message to pending in the view
     setSignedMessageState('pending signature');
 
-    // fetch the signer from the Web3provider
+    // fetch the signer from the BrowserProvider
     const signer = await browserProvider.getSigner();
 
     // set the chainId

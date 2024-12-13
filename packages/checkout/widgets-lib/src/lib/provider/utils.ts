@@ -23,17 +23,17 @@ export const getProviderDetailByProvider = (
 );
 
 export function getWalletProviderNameByProvider(
-  web3Provider: WrappedBrowserProvider | undefined,
+  wrappedBrowserProvider: WrappedBrowserProvider | undefined,
   providers?: EIP6963ProviderDetail[],
 ) {
-  if (isMetaMaskProvider(web3Provider)) return WalletProviderName.METAMASK.toString();
-  if (isPassportProvider(web3Provider)) return WalletProviderName.PASSPORT.toString();
-  if (isWalletConnectProvider(web3Provider)) return WalletProviderName.WALLETCONNECT.toString();
+  if (isMetaMaskProvider(wrappedBrowserProvider)) return WalletProviderName.METAMASK.toString();
+  if (isPassportProvider(wrappedBrowserProvider)) return WalletProviderName.PASSPORT.toString();
+  if (isWalletConnectProvider(wrappedBrowserProvider)) return WalletProviderName.WALLETCONNECT.toString();
 
-  if (providers && web3Provider) {
+  if (providers && wrappedBrowserProvider) {
     // Find the matching provider in the providerDetail
     const matchedProviderDetail = getProviderDetailByProvider(
-      web3Provider,
+      wrappedBrowserProvider,
       providers,
     );
     if (matchedProviderDetail) {

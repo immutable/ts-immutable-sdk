@@ -28,7 +28,7 @@ export interface SwitchNetworkParams {
  * Represents the result of switching the network in a Web3 application {@link Checkout.switchNetwork}.
  * @interface SwitchNetworkResult
  * @property {NetworkInfo} network - The information about the switched network.
- * @property {WrappedBrowserProvider} provider - The Web3 provider for the switched network.
+ * @property {WrappedBrowserProvider} provider - The WrappedBrowserProvider for the switched network.
  */
 export interface SwitchNetworkResult {
   network: NetworkInfo;

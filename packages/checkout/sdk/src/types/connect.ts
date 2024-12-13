@@ -29,7 +29,7 @@ export interface CheckConnectionParams {
 
 /**
  * Interface representing the result of {@link Checkout.checkIsWalletConnected}.
- * @property {boolean} isConnected - A boolean indicating the connection status of the Web3 provider.
+ * @property {boolean} isConnected - A boolean indicating the connection status of the WrappedBrowserProvider.
  * @property {string} walletAddress - The wallet address used to check the connection.
  */
 export interface CheckConnectionResult {

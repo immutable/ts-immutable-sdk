@@ -105,9 +105,9 @@ export class PassportImxProvider implements IMXProvider {
       const user = await this.authManager.getUser();
       // The user will be present because the factory validates it
       const magicRpcProvider = await this.magicAdapter.login(user!.idToken!);
-      const web3Provider = new BrowserProvider(magicRpcProvider);
+      const browserProvider = new BrowserProvider(magicRpcProvider);
 
-      const ethSigner = await web3Provider.getSigner();
+      const ethSigner = await browserProvider.getSigner();
       const starkSigner = await getStarkSigner(ethSigner);
 
       return { ethSigner, starkSigner };

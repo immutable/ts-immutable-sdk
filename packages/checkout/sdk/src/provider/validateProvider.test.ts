@@ -66,7 +66,7 @@ describe('provider validation', () => {
       }, mockedHttpClient);
     });
 
-    it('should not throw an error when valid web3provider', async () => {
+    it('should not throw an error when valid WrappedBrowserProvider', async () => {
       requestMock.mockResolvedValue('0x1');
       const testBrowserProvider = new WrappedBrowserProvider(
         underlyingProviderMock,
