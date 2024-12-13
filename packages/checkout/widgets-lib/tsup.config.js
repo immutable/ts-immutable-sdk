@@ -8,11 +8,12 @@ export default defineConfig((options) => {
   if (options.watch) {
     // Watch mode
     return {
-      outDir: 'dist',
+      outDir: 'dist/browser',
       format: 'esm',
       target: 'es2022',
       platform: 'browser',
       bundle: true,
+      esbuildPlugins: [nodeModulesPolyfillPlugin({ modules: ['url']})]
     }
   }
   
