@@ -3,64 +3,53 @@
 /* eslint-disable */
 import type {
   BaseContract,
-  BigNumber,
   BigNumberish,
   BytesLike,
-  CallOverrides,
-  ContractTransaction,
-  Overrides,
-  PopulatedTransaction,
-  Signer,
-  utils,
+  FunctionFragment,
+  Result,
+  Interface,
+  AddressLike,
+  ContractRunner,
+  ContractMethod,
+  Listener,
 } from "ethers";
-import type { FunctionFragment, Result } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
 import type {
-  TypedEventFilter,
-  TypedEvent,
+  TypedContractEvent,
+  TypedDeferredTopicFilter,
+  TypedEventLog,
   TypedListener,
-  OnEvent,
-  PromiseOrValue,
+  TypedContractMethod,
 } from "./common";
 
 export declare namespace UniswapInterfaceMulticall {
   export type CallStruct = {
-    target: PromiseOrValue<string>;
-    gasLimit: PromiseOrValue<BigNumberish>;
-    callData: PromiseOrValue<BytesLike>;
+    target: AddressLike;
+    gasLimit: BigNumberish;
+    callData: BytesLike;
   };
 
-  export type CallStructOutput = [string, BigNumber, string] & {
-    target: string;
-    gasLimit: BigNumber;
-    callData: string;
-  };
+  export type CallStructOutput = [
+    target: string,
+    gasLimit: bigint,
+    callData: string
+  ] & { target: string; gasLimit: bigint; callData: string };
 
   export type ResultStruct = {
-    success: PromiseOrValue<boolean>;
-    gasUsed: PromiseOrValue<BigNumberish>;
-    returnData: PromiseOrValue<BytesLike>;
+    success: boolean;
+    gasUsed: BigNumberish;
+    returnData: BytesLike;
   };
 
-  export type ResultStructOutput = [boolean, BigNumber, string] & {
-    success: boolean;
-    gasUsed: BigNumber;
-    returnData: string;
-  };
+  export type ResultStructOutput = [
+    success: boolean,
+    gasUsed: bigint,
+    returnData: string
+  ] & { success: boolean; gasUsed: bigint; returnData: string };
 }
 
-export interface MulticallInterface extends utils.Interface {
-  functions: {
-    "getCurrentBlockTimestamp()": FunctionFragment;
-    "getEthBalance(address)": FunctionFragment;
-    "multicall((address,uint256,bytes)[])": FunctionFragment;
-  };
-
+export interface MulticallInterface extends Interface {
   getFunction(
-    nameOrSignatureOrTopic:
-      | "getCurrentBlockTimestamp"
-      | "getEthBalance"
-      | "multicall"
+    nameOrSignature: "getCurrentBlockTimestamp" | "getEthBalance" | "multicall"
   ): FunctionFragment;
 
   encodeFunctionData(
@@ -69,7 +58,7 @@ export interface MulticallInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getEthBalance",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "multicall",
@@ -85,112 +74,88 @@ export interface MulticallInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "multicall", data: BytesLike): Result;
-
-  events: {};
 }
 
 export interface Multicall extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(runner?: ContractRunner | null): Multicall;
+  waitForDeployment(): Promise<this>;
 
   interface: MulticallInterface;
 
-  queryFilter<TEvent extends TypedEvent>(
-    event: TypedEventFilter<TEvent>,
+  queryFilter<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TEvent>>;
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
+  queryFilter<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    fromBlockOrBlockhash?: string | number | undefined,
+    toBlock?: string | number | undefined
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
 
-  listeners<TEvent extends TypedEvent>(
-    eventFilter?: TypedEventFilter<TEvent>
-  ): Array<TypedListener<TEvent>>;
-  listeners(eventName?: string): Array<Listener>;
-  removeAllListeners<TEvent extends TypedEvent>(
-    eventFilter: TypedEventFilter<TEvent>
-  ): this;
-  removeAllListeners(eventName?: string): this;
-  off: OnEvent<this>;
-  on: OnEvent<this>;
-  once: OnEvent<this>;
-  removeListener: OnEvent<this>;
+  on<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  on<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-  functions: {
-    getCurrentBlockTimestamp(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { timestamp: BigNumber }>;
+  once<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  once<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-    getEthBalance(
-      addr: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { balance: BigNumber }>;
+  listeners<TCEvent extends TypedContractEvent>(
+    event: TCEvent
+  ): Promise<Array<TypedListener<TCEvent>>>;
+  listeners(eventName?: string): Promise<Array<Listener>>;
+  removeAllListeners<TCEvent extends TypedContractEvent>(
+    event?: TCEvent
+  ): Promise<this>;
 
-    multicall(
-      calls: UniswapInterfaceMulticall.CallStruct[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-  };
+  getCurrentBlockTimestamp: TypedContractMethod<[], [bigint], "view">;
 
-  getCurrentBlockTimestamp(overrides?: CallOverrides): Promise<BigNumber>;
+  getEthBalance: TypedContractMethod<[addr: AddressLike], [bigint], "view">;
 
-  getEthBalance(
-    addr: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  multicall(
-    calls: UniswapInterfaceMulticall.CallStruct[],
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  callStatic: {
-    getCurrentBlockTimestamp(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getEthBalance(
-      addr: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    multicall(
-      calls: UniswapInterfaceMulticall.CallStruct[],
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, UniswapInterfaceMulticall.ResultStructOutput[]] & {
-        blockNumber: BigNumber;
+  multicall: TypedContractMethod<
+    [calls: UniswapInterfaceMulticall.CallStruct[]],
+    [
+      [bigint, UniswapInterfaceMulticall.ResultStructOutput[]] & {
+        blockNumber: bigint;
         returnData: UniswapInterfaceMulticall.ResultStructOutput[];
       }
-    >;
-  };
+    ],
+    "nonpayable"
+  >;
+
+  getFunction<T extends ContractMethod = ContractMethod>(
+    key: string | FunctionFragment
+  ): T;
+
+  getFunction(
+    nameOrSignature: "getCurrentBlockTimestamp"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getEthBalance"
+  ): TypedContractMethod<[addr: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "multicall"
+  ): TypedContractMethod<
+    [calls: UniswapInterfaceMulticall.CallStruct[]],
+    [
+      [bigint, UniswapInterfaceMulticall.ResultStructOutput[]] & {
+        blockNumber: bigint;
+        returnData: UniswapInterfaceMulticall.ResultStructOutput[];
+      }
+    ],
+    "nonpayable"
+  >;
 
   filters: {};
-
-  estimateGas: {
-    getCurrentBlockTimestamp(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getEthBalance(
-      addr: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    multicall(
-      calls: UniswapInterfaceMulticall.CallStruct[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-  };
-
-  populateTransaction: {
-    getCurrentBlockTimestamp(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getEthBalance(
-      addr: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    multicall(
-      calls: UniswapInterfaceMulticall.CallStruct[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-  };
 }

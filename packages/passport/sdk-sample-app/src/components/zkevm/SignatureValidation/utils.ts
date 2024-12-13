@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { BrowserProvider, ethers } from 'ethers';
 import { Provider } from '@imtbl/passport';
 
 // https://eips.ethereum.org/EIPS/eip-1271#specification
@@ -14,7 +14,7 @@ export const isValidSignature = async (
   const contract = new ethers.Contract(
     address,
     ['function isValidSignature(bytes32, bytes) public view returns (bytes4)'],
-    new ethers.providers.Web3Provider(zkEvmProvider),
+    new BrowserProvider(zkEvmProvider),
   );
 
   const isValidSignatureHex = await contract.isValidSignature(digest, signature);

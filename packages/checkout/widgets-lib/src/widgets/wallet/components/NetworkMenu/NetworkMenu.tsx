@@ -50,7 +50,7 @@ export function NetworkMenu() {
 
   const switchNetwork = useCallback(
     async (chainId: ChainId) => {
-      if (!checkout || !provider || !network || network.chainId === chainId) return;
+      if (!checkout || !provider || !network || Number(network.chainId) === chainId) return;
       track({
         userJourney: UserJourney.WALLET,
         screen: 'WalletBalances',
@@ -116,13 +116,13 @@ export function NetworkMenu() {
                     : networkButtonStyle
                 }
                 size="small"
-                onClick={() => switchNetwork(networkItem.chainId)}
+                onClick={() => switchNetwork(Number(networkItem.chainId))}
               >
                 <HorizontalMenu.Button.FramedImage
                   sx={logoStyle(networkItem.chainId === network?.chainId)}
                   use={(
                     <img
-                      src={getChainImage(checkout?.config.environment, networkItem.chainId)}
+                      src={getChainImage(checkout?.config.environment, Number(networkItem.chainId))}
                       alt={networkItem.name}
                     />
                   )}

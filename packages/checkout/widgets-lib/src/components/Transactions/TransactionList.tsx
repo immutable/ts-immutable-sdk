@@ -8,8 +8,8 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { utils } from 'ethers';
 import { useTranslation } from 'react-i18next';
+import { formatUnits } from 'ethers';
 import { AXELAR_SCAN_URL } from '../../lib';
 import { Transaction, TransactionStatus } from '../../lib/clients';
 import { CryptoFiatContext } from '../../context/crypto-fiat-context/CryptoFiatContext';
@@ -81,7 +81,7 @@ export function TransactionList({
             const hash = transaction.blockchain_metadata.transaction_hash;
             const tokens = knownTokenMap[transaction.details.from_chain];
             const token = tokens[transaction.details.from_token_address.toLowerCase()];
-            const amount = utils.formatUnits(transaction.details.amount, token.decimals);
+            const amount = formatUnits(transaction.details.amount, token.decimals);
             const fiat = calculateCryptoToFiat(amount, token.symbol, cryptoFiatState.conversions);
 
             if (transaction.details.current_status.status === TransactionStatus.WITHDRAWAL_PENDING) {

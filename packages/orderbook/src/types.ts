@@ -1,5 +1,5 @@
 import type { OrderComponents } from '@opensea/seaport-js/lib/types';
-import { PopulatedTransaction, TypedDataDomain, TypedDataField } from 'ethers';
+import { PreparedTransactionRequest, TypedDataDomain, TypedDataField } from 'ethers';
 import { Fee as OpenapiFee, OrdersService, OrderStatus } from './openapi/sdk';
 
 // Strictly re-export only the OrderStatusName enum from the openapi types
@@ -429,7 +429,7 @@ export enum TransactionPurpose {
   CANCEL = 'CANCEL',
 }
 
-export type TransactionBuilder = () => Promise<PopulatedTransaction>;
+export type TransactionBuilder = () => Promise<PreparedTransactionRequest>;
 
 export interface SignableAction {
   type: ActionType.SIGNABLE;

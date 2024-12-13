@@ -1,5 +1,5 @@
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
-import { TransactionResponse } from '@ethersproject/providers';
+import { TransactionResponse } from 'ethers';
 import { Transaction } from '../../lib/clients';
 import { ViewType } from './ViewType';
 

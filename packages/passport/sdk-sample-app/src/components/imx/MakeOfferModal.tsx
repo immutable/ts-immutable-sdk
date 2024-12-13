@@ -4,12 +4,12 @@ import {
 } from 'react-bootstrap';
 import { MakeOfferModalProps } from '@/types';
 import React, { useState } from 'react';
-import { utils } from 'ethers';
 import WorkflowButton from '@/components/WorkflowButton';
 import { usePassportProvider } from '@/context/PassportProvider';
 import { UnsignedOrderRequest } from '@imtbl/x-client';
 import { useStatusProvider } from '@/context/StatusProvider';
 import { MARKETPLACE_FEE_PERCENTAGE, MARKETPLACE_FEE_RECIPIENT } from '@/config';
+import { formatEther, parseEther } from 'ethers';
 
 function MakeOfferModal({
   showModal, setShowModal, onClose, order,
@@ -36,7 +36,7 @@ function MakeOfferModal({
       const request: UnsignedOrderRequest = {
         sell: {
           type: 'ETH',
-          amount: utils.parseEther(offerAmount).toString(),
+          amount: parseEther(offerAmount).toString(),
         },
         buy: {
           type: 'ERC721',
@@ -92,7 +92,7 @@ function MakeOfferModal({
               <dt>Name</dt>
               <dd>{ order.sell.data.properties?.name || 'not found' }</dd>
               <dt>Listing Price</dt>
-              <dd>{ utils.formatEther(order.buy.data.quantity_with_fees).toString() }</dd>
+              <dd>{ formatEther(order.buy.data.quantity_with_fees).toString() }</dd>
             </dl>
             <Form.Group className="mb-3">
               <Form.Label>

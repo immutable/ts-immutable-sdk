@@ -6,22 +6,22 @@ import {
   GasAmount,
   GasTokenType,
   ItemType,
+  WrappedBrowserProvider,
   NativeItemRequirement,
   TransactionOrGasType,
 } from '@imtbl/checkout-sdk';
 import {
   Action, ActionType, TransactionPurpose, constants, Orderbook,
 } from '@imtbl/orderbook';
-import { Web3Provider } from '@ethersproject/providers';
 import { useEffect, useState } from 'react';
-import { BigNumber, utils } from 'ethers';
 import { Body, Box, Button, FormControl, Heading, Select, TextInput, OptionKey, Checkbox } from '@biom3/react';
 import LoadingButton from './LoadingButton';
 import { ErrorMessage, SuccessMessage } from './messages';
+import { parseUnits as parseUnitsEthers } from 'ethers';
 
 interface SmartCheckoutProps {
   checkout: Checkout;
-  provider: Web3Provider | undefined;
+  provider: WrappedBrowserProvider | undefined;
 }
 
 export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) => {
@@ -32,7 +32,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
       type: TransactionOrGasType.GAS,
       gasToken: {
         type: GasTokenType.NATIVE,
-        limit: BigNumber.from(400000),
+        limit: BigInt(400000),
       }
     }
   );
@@ -109,7 +109,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
         type: TransactionOrGasType.GAS,
         gasToken: {
           type: GasTokenType.NATIVE,
-          limit: BigNumber.from(gasLimit),
+          limit: BigInt(gasLimit),
         }
       });
     }
@@ -123,7 +123,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
         type: TransactionOrGasType.GAS,
         gasToken: {
           type: GasTokenType.ERC20,
-          limit: BigNumber.from(gasLimit),
+          limit: BigInt(gasLimit),
           tokenAddress: gasContractAddress,
         }
       });
@@ -163,8 +163,8 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
     setItemRequirements([...itemRequirements, itemRequirement]);
   }
 
-  const parseUnits = (amount: string): BigNumber => {
-    return utils.parseUnits(amount, 18);
+  const parseUnits = (amount: string): bigint => {
+    return parseUnitsEthers(amount, 18);
   }
 
   const addNativeRequirement = () => {

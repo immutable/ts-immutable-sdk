@@ -62,7 +62,7 @@ export function PassportProvider({
 
   const connectZkEvm = useCallback(async () => {
     setIsLoading(true);
-    const provider = passportClient.connectEvm();
+    const provider = await passportClient.connectEvm();
     if (provider) {
       setZkEvmProvider(provider);
       addMessage('ConnectZkEvm', 'Connected');

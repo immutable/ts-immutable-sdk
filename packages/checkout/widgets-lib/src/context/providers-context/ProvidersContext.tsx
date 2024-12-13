@@ -5,16 +5,15 @@ import {
   useReducer,
   useEffect,
 } from 'react';
-import { Web3Provider } from '@ethersproject/providers';
-import { Checkout, EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
+import { Checkout, EIP6963ProviderInfo, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { getProviderDetailByProvider } from '../../lib/provider/utils';
 import { connectEIP6963Provider } from '../../lib/connectEIP6963Provider';
 
 export interface ProvidersState {
-  fromProvider?: Web3Provider;
+  fromProvider?: WrappedBrowserProvider;
   fromProviderInfo?: EIP6963ProviderInfo;
   fromAddress?: string;
-  toProvider?: Web3Provider;
+  toProvider?: WrappedBrowserProvider;
   toProviderInfo?: EIP6963ProviderInfo;
   toAddress?: string;
   checkout: Checkout;
@@ -56,10 +55,10 @@ export enum ProvidersContextActions {
 
 export interface SetProviderPayload {
   type: ProvidersContextActions.SET_PROVIDER;
-  fromProvider?: Web3Provider;
+  fromProvider?: WrappedBrowserProvider;
   fromProviderInfo?: EIP6963ProviderInfo;
   fromAddress?: string;
-  toProvider?: Web3Provider;
+  toProvider?: WrappedBrowserProvider;
   toProviderInfo?: EIP6963ProviderInfo;
   toAddress?: string;
 }
@@ -71,8 +70,8 @@ export interface SetCheckoutPayload {
 
 export interface ResetStatePayload {
   type: ProvidersContextActions.RESET_STATE;
-  fromProvider?: Web3Provider;
-  toProvider?: Web3Provider;
+  fromProvider?: WrappedBrowserProvider;
+  toProvider?: WrappedBrowserProvider;
   checkout: Checkout;
 }
 
@@ -176,7 +175,7 @@ export function ProvidersContextProvider({
 
       try {
         await connectEIP6963Provider(providerDetail, checkout, false);
-        const toAddress = await toProvider.getSigner().getAddress();
+        const toAddress = await (await toProvider.getSigner()).getAddress();
         providersDispatch({
           payload: {
             type: ProvidersContextActions.SET_PROVIDER,

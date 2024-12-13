@@ -3,9 +3,9 @@ import {
   isDualVariantIcon,
   MenuItem, type SxProps,
 } from '@biom3/react';
-import type { Web3Provider } from '@ethersproject/providers';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import {
   UserJourney,
   useAnalytics,
@@ -28,7 +28,7 @@ export function WalletAddress({
   showL1Warning,
   setShowL1Warning,
 }: {
-  provider?: Web3Provider;
+  provider?: WrappedBrowserProvider;
   showL1Warning: boolean;
   setShowL1Warning: (show: boolean) => void;
 }) {
@@ -50,7 +50,7 @@ export function WalletAddress({
     if (!provider || walletAddress !== '') return;
 
     (async () => {
-      const address = await provider.getSigner().getAddress();
+      const address = await (await provider.getSigner()).getAddress();
       setWalletAddress(address);
     })();
   }, [provider, walletAddress]);
