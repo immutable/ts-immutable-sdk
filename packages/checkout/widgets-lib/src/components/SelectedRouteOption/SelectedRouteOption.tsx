@@ -15,9 +15,9 @@ import {
 
 import { Checkout } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
-import { getRouteAndTokenBalances } from '../../../lib/squid/functions/getRouteAndTokenBalances';
-import { getRemoteVideo } from '../../../lib/utils';
-import { Chain, RouteData } from '../../../lib/squid/types';
+import { getRouteAndTokenBalances } from '../../lib/squid/functions/getRouteAndTokenBalances';
+import { Chain, RouteData } from '../../lib/squid/types';
+import { getRemoteVideo } from '../../lib/utils';
 
 export interface SelectedRouteOptionProps {
   checkout: Checkout;
