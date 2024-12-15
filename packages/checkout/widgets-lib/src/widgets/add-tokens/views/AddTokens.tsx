@@ -102,7 +102,7 @@ export function AddTokens({
 }: AddTokensProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
+  const { fetchRoutesWithRateLimit, fetchRoutesForBalancesWithRateLimit, resetRoutes } = useRoutes();
   const { showErrorHandover } = useError(config.environment);
 
   const {
@@ -148,7 +148,7 @@ export function AddTokens({
   );
   const [fetchingRoutes, setFetchingRoutes] = useState(false);
   const [insufficientBalance, setInsufficientBalance] = useState(false);
-  const [isAmountInputSynced, setIsAmountInputSynced] = useState(false);
+  const [, setIsAmountInputSynced] = useState(false);
   const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
 
   const debouncedSetSelectedAmount = useRef(
@@ -365,6 +365,42 @@ export function AddTokens({
   }, [balances, squid, selectedToken, selectedAmount]);
 
   useEffect(() => {
+    resetRoutes();
+    setInsufficientBalance(false);
+    setSelectedRouteData(undefined);
+    if (!squid || !balances || !selectedToken || !tokens) return;
+    if (balances.length > 0) {
+      console.log('balances', balances);
+      (async () => {
+        if (
+          balances
+          && squid
+          && tokens
+          && selectedToken?.address
+        ) {
+          setFetchingRoutes(true);
+          const availableRoutes = await fetchRoutesForBalancesWithRateLimit(
+            squid,
+            tokens,
+            balances,
+            ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+            selectedToken.address === 'native'
+              ? SQUID_NATIVE_TOKEN
+              : selectedToken.address,
+            5,
+            1000,
+            isSwapAvailable,
+          );
+          setFetchingRoutes(false);
+          if (availableRoutes.length === 0) {
+            setInsufficientBalance(true);
+          }
+        }
+      })();
+    }
+  }, [balances, squid, selectedToken]);
+
+  useEffect(() => {
     if (!selectedRouteData && routes.length > 0) {
       setSelectedRouteData(routes[0]);
     }
@@ -539,10 +575,10 @@ export function AddTokens({
   const shouldShowBackButton = showBackButton && onBackButtonClick;
 
   const routeInputsReady = !!selectedToken
-    && !!fromAddress
-    && validateToAmount(selectedAmount).isValid
-    && validateToAmount(inputValue).isValid
-    && isAmountInputSynced;
+    && !!fromAddress;
+    // && validateToAmount(selectedAmount).isValid
+    // && validateToAmount(inputValue).isValid
+    // && isAmountInputSynced;
 
   const loading = (routeInputsReady || fetchingRoutes)
     && !(selectedRouteData || insufficientBalance);
@@ -727,7 +763,7 @@ export function AddTokens({
                 setShowPayWithDrawer(true);
               }}
             >
-              {selectedToken && fromAddress && selectedAmount && isAmountInputSynced && (
+              {selectedToken && fromAddress && (
               <>
                 <MenuItem.BottomSlot.Divider
                   sx={fromAddress ? { ml: 'base.spacing.x4' } : undefined}
