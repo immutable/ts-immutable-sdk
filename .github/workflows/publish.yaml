@@ -139,7 +139,7 @@ jobs:
       - name: Generate last_updated.json
         if: (env.DRY_RUN) == 'false'
         run: |
-          echo "{\"last_updated\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"}" > ./sdk/last_updated.json
+          echo "{\"timestamp\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"}" > ./sdk/last_updated.json
           cp ./sdk/last_updated.json ./sdk/dist/
 
       - name: Authenticate NPM
