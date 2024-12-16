@@ -106,6 +106,8 @@ function latestCompatibleVersion(
  * @returns {Promise<boolean>} A promise resolving to `true` if last_updated.json exists and is older than 15 minutes, `false` otherwise.
  */
 async function checkLastUpdatedTimestamp(version: string): Promise<boolean> {
+  const WAIT_TIME_IN_MINUTES = 15;
+
   const lastUpdatedJsonUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${version}/dist/last_updated.json`;
 
   try {
@@ -123,7 +125,7 @@ async function checkLastUpdatedTimestamp(version: string): Promise<boolean> {
       const diffInMs = now.getTime() - timestamp.getTime();
       const diffInMinutes = diffInMs / (1000 * 60);
 
-      return diffInMinutes > 15; // Return true if the timestamp is older than 15 minutes
+      return diffInMinutes > WAIT_TIME_IN_MINUTES;
     }
   } catch (error) {
     return false;
