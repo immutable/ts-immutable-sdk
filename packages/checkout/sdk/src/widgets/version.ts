@@ -85,33 +85,6 @@ export async function getLatestVersionFromNpm(): Promise<string> {
 }
 
 /**
- * Checks if the provided version is available on the CDN.
- * @param {string} version - The version to check.
- * @returns {Promise<boolean>} A promise resolving to a boolean indicating if the version is available on the CDN.
- */
-async function isVersionAvailableOnCDN(version: string): Promise<boolean> {
-  const files = ['widgets-esm.js', 'widgets.js'];
-  const baseUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${version}/dist/browser/checkout/`;
-
-  try {
-    const checks = files.map(async (file) => {
-      const response = await fetch(`${baseUrl}${file}`, { method: 'HEAD' });
-      if (!response.ok) {
-        return false;
-      }
-      return true;
-    });
-
-    const results = await Promise.all(checks);
-    const allFilesAvailable = results.every((isAvailable) => isAvailable);
-
-    return allFilesAvailable;
-  } catch {
-    return false;
-  }
-}
-
-/**
  * Returns the latest compatible version based on the provided checkout version config.
  * If no compatible version markers are provided, it returns 'latest'.
  */
@@ -125,6 +98,40 @@ function latestCompatibleVersion(
     }
   }
   return 'latest';
+}
+
+/**
+ * Checks if the last_updated.json file exists on the CDN and validates its timestamp.
+ * @param {string} version - The version to check.
+ * @returns {Promise<boolean>} A promise resolving to `true` if last_updated.json exists and is older than 15 minutes, `false` otherwise.
+ */
+async function checkLastUpdatedTimestamp(version: string): Promise<boolean> {
+  const WAIT_TIME_IN_MINUTES = 20;
+
+  const lastUpdatedJsonUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${version}/dist/last_updated.json`;
+
+  try {
+    const response = await fetch(lastUpdatedJsonUrl);
+
+    if (!response.ok) {
+      return false;
+    }
+
+    const lastUpdatedData = await response.json();
+
+    if (lastUpdatedData.timestamp) {
+      const timestamp = new Date(lastUpdatedData.timestamp);
+      const now = new Date();
+      const diffInMs = now.getTime() - timestamp.getTime();
+      const diffInMinutes = diffInMs / (1000 * 60);
+
+      return diffInMinutes > WAIT_TIME_IN_MINUTES;
+    }
+  } catch (error) {
+    return false;
+  }
+
+  return false;
 }
 
 /**
@@ -158,13 +165,14 @@ export async function determineWidgetsVersion(
     versionConfig.compatibleVersionMarkers,
   );
 
-  // If `latest` is returned, query NPM registry for the actual latest version and check if it's available on the CDN
+  // If `latest` is returned, query NPM registry for the actual latest version and check timestamp
   if (compatibleVersion === 'latest') {
     const latestVersion = await getLatestVersionFromNpm();
-    const isAvailable = await isVersionAvailableOnCDN(latestVersion);
-    if (isAvailable) {
+
+    if (await checkLastUpdatedTimestamp(latestVersion)) {
       return latestVersion;
     }
+
     return 'latest';
   }
 
