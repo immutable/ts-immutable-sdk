@@ -130,12 +130,6 @@ jobs:
           tag: ${{ contains(env.RELEASE_TYPE, 'alpha') && 'alpha' }}
           dry-run: ${{ env.DRY_RUN }}
 
-      - name: Generate last_updated.json
-        if: (env.DRY_RUN) == 'false'
-        run: |
-          echo "{\"timestamp\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"}" > ./sdk/last_updated.json
-          cp ./sdk/last_updated.json ./sdk/dist/
-
       # ! Do NOT remove - this will cause a Sev 0 incident !
       - name: Generate SDK attestation
         uses: actions/attest-build-provenance@v1
@@ -157,6 +151,13 @@ jobs:
         run: |
           wget https://cdn.jsdelivr.net/npm/@imtbl/sdk/dist/browser/checkout/widgets.js
           wget https://cdn.jsdelivr.net/npm/@imtbl/sdk/dist/browser/checkout/sdk.js
+
+      - name: Purge CDN Cache for @latest version
+        id: purge_cdn
+        if: contains(env.RELEASE_TYPE, 'release') && env.DRY_RUN == 'false'
+        run: |
+          curl -X GET https://purge.jsdelivr.net/npm/@imtbl/sdk@latest/dist/browser/checkout
+          echo "CDN cache purged for https://cdn.jsdelivr.net/npm/@imtbl/sdk@latest/dist/browser/checkout"
 
       # Wait for 30 seconds to make sure the tag is available on GitHub
       - uses: GuillaumeFalourd/wait-sleep-action@v1
