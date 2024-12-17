@@ -29,6 +29,7 @@ export interface RouteOptionProps<
   rc?: RC;
   selected?: boolean;
   displayPriceDetails?: boolean;
+  displayInsufficientGasWarning?: boolean;
 }
 
 export function RouteOption<RC extends ReactElement | undefined = undefined>({
@@ -41,6 +42,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
   rc = <span />,
   selected = false,
   displayPriceDetails = true,
+  displayInsufficientGasWarning = true,
 }: RouteOptionProps<RC>) {
   const { t } = useTranslation();
 
@@ -99,7 +101,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
 
       <MenuItem.Caption>
         {`${t('views.ADD_TOKENS.fees.balance')} ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${routeBalanceUsd}`}
-        {routeData.isInsufficientGas && (
+        {displayInsufficientGasWarning && routeData.isInsufficientGas && (
         <>
           <br />
           <span style={{ color: '#FF637F' }}>

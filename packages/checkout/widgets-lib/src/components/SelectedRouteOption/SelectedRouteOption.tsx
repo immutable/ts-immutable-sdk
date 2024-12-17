@@ -31,6 +31,7 @@ export interface SelectedRouteOptionProps {
   insufficientBalance?: boolean;
   showOnrampOption?: boolean;
   displayPriceDetails?: boolean;
+  displayInsufficientGasWarning?: boolean;
 }
 
 function SelectedRouteOptionContainer({
@@ -71,6 +72,7 @@ export function SelectedRouteOption({
   insufficientBalance = false,
   showOnrampOption = false,
   displayPriceDetails = true,
+  displayInsufficientGasWarning = true,
   onClick,
 }: SelectedRouteOptionProps) {
   const { t } = useTranslation();
@@ -186,7 +188,7 @@ export function SelectedRouteOption({
             {`${t('views.ADD_TOKENS.fees.balance')} ${t(
               'views.ADD_TOKENS.fees.fiatPricePrefix',
             )} $${routeBalanceUsd}`}
-            {routeData?.isInsufficientGas && (
+            {displayInsufficientGasWarning && routeData?.isInsufficientGas && (
             <>
               <br />
               <span style={{ color: '#FF637F' }}>
