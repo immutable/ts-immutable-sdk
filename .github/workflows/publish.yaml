@@ -186,9 +186,29 @@ jobs:
         with:
           message: "❌ Failed to publish SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM. ${{ github.triggering_actor }} please check the logs for more details."
 
-      - name: Purge CDN Cache for @latest version
+    - name: Wait for NPM @latest Update
+        id: wait_for_npm_update
+        if: contains(env.RELEASE_TYPE, 'release') && env.DRY_RUN == 'false'
+        run: |
+          VERSION="${{ steps.version.outputs.NEXT_VERSION }}"
+          echo "Waiting for NPM registry to reflect version: $VERSION"
+
+          for i in {1..20}; do
+            LATEST_VERSION=$(npm view @imtbl/sdk@latest version)
+            if [[ "$LATEST_VERSION" == "$VERSION" ]]; then
+              echo "NPM registry updated to version: $LATEST_VERSION"
+              exit 0
+            fi
+            echo "NPM registry not updated yet, retrying in 15 seconds..."
+            sleep 15
+          done
+
+          echo "NPM registry failed to update after 5 minutes."
+          exit 1
+
+      - name: Purge CDN Cache for version.json
         id: purge_cdn
         if: contains(env.RELEASE_TYPE, 'release') && env.DRY_RUN == 'false'
         run: |
-          curl -X GET https://purge.jsdelivr.net/npm/@imtbl/sdk@latest/dist/browser/checkout
-          echo "CDN cache purged for https://cdn.jsdelivr.net/npm/@imtbl/sdk@latest/dist/browser/checkout"
+          curl -X GET https://purge.jsdelivr.net/npm/@imtbl/sdk@latest/dist/version.json
+          echo "CDN cache purged for https://cdn.jsdelivr.net/npm/@imtbl/sdk@latest/dist/version.json"
