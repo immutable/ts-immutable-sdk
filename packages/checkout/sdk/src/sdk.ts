@@ -77,7 +77,7 @@ import { isMatchingAddress } from './utils/utils';
 import * as wallet from './wallet';
 import { WidgetConfiguration } from './widgets/definitions/configurations';
 import { getWidgetsEsmUrl, loadUnresolvedBundle } from './widgets/load';
-import { determineWidgetsVersion, getLatestVersionFromNpm, validateAndBuildVersion } from './widgets/version';
+import { determineWidgetsVersion, getLatestVersion, validateAndBuildVersion } from './widgets/version';
 import { globalPackageVersion } from './env';
 import { AssessmentResult, fetchRiskAssessment, isAddressSanctioned } from './riskAssessment';
 
@@ -274,9 +274,9 @@ export class Checkout {
     try {
       return await tryLoadEsModule(validVersion);
     } catch (err: any) {
-      const latestVersion = await getLatestVersionFromNpm();
+      const latestVersion = await getLatestVersion();
 
-      if (validVersion === latestVersion) {
+      if (validVersion === latestVersion && validVersion !== 'latest') {
         try {
           return await tryLoadEsModule('latest');
         } catch (retryErr: any) {
