@@ -37,7 +37,7 @@ const SLIPPAGE_TIERS = {
 
 const getSlippageTier = (usdAmount: number): number => {
   if (usdAmount >= SLIPPAGE_TIERS.high.threshold) {
-    return SLIPPAGE_TIERS.low.value;
+    return SLIPPAGE_TIERS.high.value;
   }
   if (usdAmount >= SLIPPAGE_TIERS.medium.threshold) {
     return SLIPPAGE_TIERS.medium.value;
