@@ -26,6 +26,7 @@ export interface OptionsProps {
   showOnrampOption?: boolean;
   insufficientBalance?: boolean;
   selectedIndex: number;
+  displayPriceDetails?: boolean;
 }
 
 export function RouteOptions({
@@ -38,6 +39,7 @@ export function RouteOptions({
   showOnrampOption,
   insufficientBalance,
   selectedIndex,
+  displayPriceDetails,
 }: OptionsProps) {
   const { t } = useTranslation();
 
@@ -94,6 +96,7 @@ export function RouteOptions({
           isFastest={index === 0}
           selected={index === selectedIndex}
           rc={<motion.div variants={listItemVariants} />}
+          displayPriceDetails={displayPriceDetails}
         />
       ))}
       {noRoutes && (

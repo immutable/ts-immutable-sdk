@@ -28,6 +28,7 @@ export interface RouteOptionProps<
   size?: MenuItemSize;
   rc?: RC;
   selected?: boolean;
+  displayPriceDetails?: boolean;
 }
 
 export function RouteOption<RC extends ReactElement | undefined = undefined>({
@@ -39,6 +40,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
   size = 'small',
   rc = <span />,
   selected = false,
+  displayPriceDetails = true,
 }: RouteOptionProps<RC>) {
   const { t } = useTranslation();
 
@@ -110,7 +112,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
         )}
       </MenuItem.Caption>
 
-      <MenuItem.PriceDisplay price={fromAmount}>
+      <MenuItem.PriceDisplay price={fromAmount} sx={{ visibility: displayPriceDetails ? 'visible' : 'hidden' }}>
         <MenuItem.PriceDisplay.Caption>
           {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${fromAmountUsd}`}
         </MenuItem.PriceDisplay.Caption>
@@ -155,7 +157,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
               />
             )}
             {
-              `${t('views.ADD_TOKENS.fees.fee')} ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} 
+              `${t('views.ADD_TOKENS.fees.fee')} ${t('views.ADD_TOKENS.fees.fiatPricePrefix')}
               $${getFormattedAmounts(totalFeesUsd)}`
             }
           </Body>
