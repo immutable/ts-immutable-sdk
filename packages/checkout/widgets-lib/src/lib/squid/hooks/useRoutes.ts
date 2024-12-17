@@ -16,7 +16,34 @@ import {
 import { SquidPostHook } from '../../primary-sales';
 import { SQUID_NATIVE_TOKEN } from '../config';
 
-const BASE_SLIPPAGE = 0.02;
+const BASE_SLIPPAGE_HIGH_TIER = 0.005;
+const BASE_SLIPPAGE_MEDIUM_TIER = 0.01;
+const BASE_SLIPPAGE_LOW_TIER = 0.015;
+
+const SLIPPAGE_TIERS = {
+  high: {
+    threshold: 999,
+    value: BASE_SLIPPAGE_HIGH_TIER,
+  },
+  medium: {
+    threshold: 99,
+    value: BASE_SLIPPAGE_MEDIUM_TIER,
+  },
+  low: {
+    threshold: 0,
+    value: BASE_SLIPPAGE_LOW_TIER,
+  },
+} as const;
+
+const getSlippageTier = (usdAmount: number): number => {
+  if (usdAmount >= SLIPPAGE_TIERS.high.threshold) {
+    return SLIPPAGE_TIERS.high.value;
+  }
+  if (usdAmount >= SLIPPAGE_TIERS.medium.threshold) {
+    return SLIPPAGE_TIERS.medium.value;
+  }
+  return SLIPPAGE_TIERS.low.value;
+};
 
 export const useRoutes = () => {
   const latestRequestIdRef = useRef<number>(0);
@@ -65,7 +92,7 @@ export const useRoutes = () => {
     // Calculate the amount of fromToken needed to match this USD value
     const baseFromAmount = toAmountInUsd / fromToken.usdPrice;
     // Add a buffer for price fluctuations and fees
-    const fromAmountWithBuffer = baseFromAmount * (1 + BASE_SLIPPAGE + additionalBuffer);
+    const fromAmountWithBuffer = baseFromAmount * (1 + getSlippageTier(toAmountInUsd) + additionalBuffer);
 
     return fromAmountWithBuffer.toString();
   };
@@ -73,9 +100,11 @@ export const useRoutes = () => {
   const calculateFromAmountFromRoute = (
     exchangeRate: string,
     toAmount: string,
+    toAmountUSD?: string,
   ) => {
+    const toAmountUSDNumber = toAmountUSD ? parseFloat(toAmountUSD) : 0;
     const fromAmount = parseFloat(toAmount) / parseFloat(exchangeRate);
-    const fromAmountWithBuffer = fromAmount * (1 + BASE_SLIPPAGE);
+    const fromAmountWithBuffer = fromAmount * (1 + getSlippageTier(toAmountUSDNumber));
     return fromAmountWithBuffer.toString();
   };
 
@@ -207,7 +236,6 @@ export const useRoutes = () => {
     if (!routeResponse?.route?.estimate?.toAmount || !routeResponse?.route?.estimate?.toToken?.decimals) {
       throw new Error('Invalid route response or token decimals');
     }
-
     const toAmountInBaseUnits = utils.parseUnits(toAmount, routeResponse?.route.estimate.toToken.decimals);
     const routeToAmountInBaseUnits = BigNumber.from(routeResponse.route.estimate.toAmount);
     return routeToAmountInBaseUnits.gt(toAmountInBaseUnits);
@@ -247,6 +275,7 @@ export const useRoutes = () => {
       const newFromAmount = calculateFromAmountFromRoute(
         routeResponse.route.estimate.exchangeRate,
         toAmount,
+        routeResponse.route.estimate.toAmountUSD,
       );
 
       const newRoute = await getRouteWithRetry(
