@@ -94,6 +94,11 @@ jobs:
         id: version
         run: |
           echo "NEXT_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+          
+      - name: Generate version.json
+        run: |
+          echo '{ "version": "${{ steps.version.outputs.NEXT_VERSION }}" }' > ./sdk/version.json
+          cp ./sdk/version.json ./sdk/dist/
 
       - name: Typecheck
         run: yarn typecheck
@@ -152,13 +157,6 @@ jobs:
           wget https://cdn.jsdelivr.net/npm/@imtbl/sdk/dist/browser/checkout/widgets.js
           wget https://cdn.jsdelivr.net/npm/@imtbl/sdk/dist/browser/checkout/sdk.js
 
-      - name: Purge CDN Cache for @latest version
-        id: purge_cdn
-        if: contains(env.RELEASE_TYPE, 'release') && env.DRY_RUN == 'false'
-        run: |
-          curl -X GET https://purge.jsdelivr.net/npm/@imtbl/sdk@latest/dist/browser/checkout
-          echo "CDN cache purged for https://cdn.jsdelivr.net/npm/@imtbl/sdk@latest/dist/browser/checkout"
-
       # Wait for 30 seconds to make sure the tag is available on GitHub
       - uses: GuillaumeFalourd/wait-sleep-action@v1
         with:
@@ -187,3 +185,10 @@ jobs:
         uses: ./.github/actions/notify-slack-publish-status
         with:
           message: "❌ Failed to publish SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM. ${{ github.triggering_actor }} please check the logs for more details."
+
+      - name: Purge CDN Cache for @latest version
+        id: purge_cdn
+        if: contains(env.RELEASE_TYPE, 'release') && env.DRY_RUN == 'false'
+        run: |
+          curl -X GET https://purge.jsdelivr.net/npm/@imtbl/sdk@latest/dist/browser/checkout
+          echo "CDN cache purged for https://cdn.jsdelivr.net/npm/@imtbl/sdk@latest/dist/browser/checkout"
