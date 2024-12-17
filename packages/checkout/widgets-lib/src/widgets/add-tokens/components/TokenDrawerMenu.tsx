@@ -3,6 +3,7 @@ import {
   Box,
   ButtCon,
   Drawer,
+  FramedIcon,
   FramedImage,
   MenuItem,
   SmartClone,
@@ -25,7 +26,7 @@ import {
   AddTokensActions,
   AddTokensState,
 } from '../context/AddTokensContext';
-import { useError } from '../hooks/useError';
+import { useError } from '../../../lib/squid/hooks/useError';
 import {
   getDefaultTokenImage,
   getTokenImageByAddress,
@@ -209,27 +210,44 @@ export function TokenDrawerMenu({
           <SmartClone
             onClick={handleTokenIconClick as MouseEventHandler<unknown>}
           >
-            <FramedImage
-              size="xLarge"
-              use={(
-                <TokenImage
-                  src={addTokensState.selectedToken?.icon}
-                  name={addTokensState.selectedToken?.name}
-                  defaultImage={defaultTokenImage}
-                />
-              )}
-              padded
-              emphasized
-              circularFrame
+            <Box
               sx={{
+                pos: 'relative',
                 cursor: 'pointer',
-                mb: 'base.spacing.x1',
                 // eslint-disable-next-line @typescript-eslint/naming-convention
-                '&:hover': {
+                '&:hover > div:first-of-type': {
                   boxShadow: ({ base }) => `0 0 0 ${base.border.size[200]} ${base.color.text.body.primary}`,
                 },
               }}
-            />
+            >
+              <FramedImage
+                size="xLarge"
+                use={(
+                  <TokenImage
+                    src={addTokensState.selectedToken?.icon}
+                    name={addTokensState.selectedToken?.name}
+                    defaultImage={defaultTokenImage}
+                  />
+                )}
+                padded
+                emphasized
+                circularFrame
+                sx={{
+                  mb: 'base.spacing.x1',
+                }}
+              />
+              <FramedIcon
+                icon="ChevronExpand"
+                circularFrame
+                padded
+                sx={{
+                  top: '50%',
+                  right: '0',
+                  pos: 'absolute',
+                  translate: '120% -50%',
+                }}
+              />
+            </Box>
           </SmartClone>
         ) : (
           <Box
@@ -247,7 +265,13 @@ export function TokenDrawerMenu({
           </Box>
         )}
       </Drawer.Target>
-      <Drawer.Content sx={{ paddingX: 'base.spacing.x2' }}>
+      <Drawer.Content sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        overflowY: 'hidden',
+      }}
+      >
         <TextInput
           sx={{ marginBottom: 'base.spacing.x2' }}
           placeholder={t('views.ADD_TOKENS.tokenSelection.searchPlaceholder')}
@@ -258,7 +282,11 @@ export function TokenDrawerMenu({
         >
           <TextInput.Icon icon="Search" />
         </TextInput>
-        <VerticalMenu sx={{ maxHeight: '100%' }}>
+        <VerticalMenu sx={{
+          maxHeight: '100%',
+          overflowY: 'auto',
+        }}
+        >
           {tokenChoiceOptions
             && tokenChoiceOptions.length > 0
             && tokenChoiceOptions.map((token) => (

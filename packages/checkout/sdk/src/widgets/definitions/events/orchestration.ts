@@ -10,6 +10,7 @@ export enum OrchestrationEventType {
   REQUEST_BRIDGE = 'request-bridge',
   REQUEST_ONRAMP = 'request-onramp',
   REQUEST_ADD_TOKENS = 'request-add-tokens',
+  REQUEST_PURCHASE = 'request-purchase',
   REQUEST_GO_BACK = 'request-go-back',
 }
 

@@ -632,14 +632,20 @@
     },
     "ADD_TOKENS": {
       "tokenSelection": {
-        "buttonText": "添加代币",
+        "buttonText": "选择您想要的代币",
         "tokenLabel": "添加",
         "drawerHeading": "添加代币",
         "searchPlaceholder": "搜索代币"
       },
       "walletSelection": {
-        "fromText": "从此发送",
-        "toText": "发送到"
+        "from": {
+          "label": "发送自",
+          "caption": "选择要桥接或交换的钱包"
+        },
+        "to": {
+          "label": "发送到",
+          "caption": "选择您想要发送代币的位置"
+        }
       },
       "routeSelection": {
         "loadingText": "寻找最佳支付路线中...",
@@ -743,6 +749,11 @@
           "heading": "抱歉！您的支付钱包似乎已更改",
           "body": "在继续之前，您需要重新连接之前选择的支付钱包。",
           "buttonText": "重新选择支付钱包"
+        },
+        "routeError": {
+          "heading": "我们无法找到合适的最终报价",
+          "subHeading": "请再试一次",
+          "secondaryButtonText": "返回"
         }
       },
       "review": {
@@ -835,7 +846,14 @@
         "fiatPricePrefix": "≈ 美元",
         "zeroFees": "零手续费",
         "includedFees": "费用"
-      }
+      },
+      "noGasDrawer": {
+        "heading": "您需要更多 {{token}} 用于燃料费",
+        "body": "添加更多燃料费后返回完成此交易，或者尝试其他选项，例如降低金额、使用其他钱包或使用银行卡购买。",
+        "primaryAction": "尝试其他选项",
+        "secondaryAction": "添加更多 {{token}}"
+      },
+      "noGasRouteMessage": "用于燃料费的 {{token}} 不足"
     }
   },
   "footers": {

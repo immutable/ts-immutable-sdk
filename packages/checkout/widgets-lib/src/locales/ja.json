@@ -635,14 +635,20 @@
     },
     "ADD_TOKENS": {
       "tokenSelection": {
-        "buttonText": "トークンを追加",
+        "buttonText": "選択したいトークンを選んでください",
         "tokenLabel": "追加",
         "drawerHeading": "トークンを追加",
         "searchPlaceholder": "トークンを検索"
       },
       "walletSelection": {
-        "fromText": "送金元",
-        "toText": "送金先"
+        "from": {
+          "label": "送信元",
+          "caption": "ブリッジまたはスワップするウォレットを選択してください"
+        },
+        "to": {
+          "label": "送信先",
+          "caption": "トークンを送信したい場所を選択してください"
+        }
       },
       "routeSelection": {
         "loadingText": "最適な支払いルートを検索中...",
@@ -746,6 +752,11 @@
           "heading": "おっと！支払いウォレットが変更されました",
           "body": "以前に選択したウォレットと再接続するように求められます",
           "buttonText": "支払いウォレットを再選択"
+        },
+        "routeError": {
+          "heading": "適切な最終見積もりが見つかりませんでした",
+          "subHeading": "もう一度お試しください",
+          "secondaryButtonText": "戻る"
         }
       },
       "review": {
@@ -838,7 +849,14 @@
         "fiatPricePrefix": "≈ USD",
         "zeroFees": "手数料無料",
         "includedFees": "手数料"
-      }
+      },
+      "noGasDrawer": {
+        "heading": "{{token}} がガスにもっと必要です",
+        "body": "ガスを追加してこの取引を完了するか、金額を減らす、別のウォレットを使用する、またはカードで購入するなど、他のオプションを試してください。",
+        "primaryAction": "別のオプションを試す",
+        "secondaryAction": "{{token}} をさらに追加する"
+      },
+      "noGasRouteMessage": "ガス用の {{token}} が不足しています"
     }
   },
   "footers": {

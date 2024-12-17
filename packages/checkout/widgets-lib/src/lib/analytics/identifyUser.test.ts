@@ -22,10 +22,12 @@ describe('identifyUser', () => {
     } as any as Web3Provider;
 
     await identifyUser(identify, provider);
-    expect(identify).toBeCalledWith('0xtest', { isMetaMask: true, isPassportWallet: false });
+    expect(identify).toBeCalledWith('0xtest', { isMetaMask: true, isPassportWallet: false }, undefined);
   });
 
   it('should correctly identify users wallet as Passport', async () => {
+    const options = { foo: 'bar' };
+
     provider = {
       getSigner: jest.fn().mockReturnValue({
         getAddress: jest.fn().mockResolvedValue('0xtest'),
@@ -35,7 +37,7 @@ describe('identifyUser', () => {
         request: jest.fn(),
       },
     } as any as Web3Provider;
-    await identifyUser(identify, provider);
-    expect(identify).toBeCalledWith('0xtest', { isMetaMask: false, isPassportWallet: true });
+    await identifyUser(identify, provider, options);
+    expect(identify).toBeCalledWith('0xtest', { isMetaMask: false, isPassportWallet: true }, options);
   });
 });
