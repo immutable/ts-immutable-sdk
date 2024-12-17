@@ -328,6 +328,7 @@ export function AddTokens({
         && isValidAmount
       ) {
         setFetchingRoutes(true);
+
         const availableRoutes = await fetchRoutesWithRateLimit(
           squid,
           tokens,
@@ -411,24 +412,27 @@ export function AddTokens({
     preloadRoutes();
   }, [balances, squid, selectedToken]);
 
+  const matchingRoute = useMemo(
+    () => routes.find(
+      (route) => route.amountData.fromToken.address === selectedRouteData?.amountData.fromToken.address
+        && route.amountData.fromToken.chainId === selectedRouteData?.amountData.fromToken.chainId,
+    ),
+    [routes, selectedRouteData],
+  );
+
   useEffect(() => {
     if (routes.length === 0) return;
 
     let routeToSelect = routes[0];
 
     if (selectedRouteData) {
-      const matchingRoute = routes.find(
-        (route) => route.amountData.fromToken.address === selectedRouteData.amountData.fromToken.address
-          && route.amountData.fromToken.chainId === selectedRouteData.amountData.fromToken.chainId,
-      );
-
       if (matchingRoute) {
         routeToSelect = matchingRoute;
       }
     }
 
     setSelectedRouteData(routeToSelect);
-  }, [routes]);
+  }, [routes, matchingRoute]);
 
   useEffect(() => {
     if (!checkout) return;
@@ -591,8 +595,13 @@ export function AddTokens({
   const showInitialEmptyState = !selectedToken;
 
   const shouldDisplayRoutePriceDetails = useMemo(
-    () => Boolean(selectedToken) && Boolean(fromAddress) && validateToAmount(selectedAmount).isValid,
+    () => (!!(selectedToken && fromAddress && validateToAmount(selectedAmount).isValid)),
     [selectedToken, fromAddress, selectedAmount],
+  );
+
+  const shouldDisplayInsufficientGasWarning = useMemo(
+    () => !!(selectedRouteData?.isInsufficientGas && shouldDisplayRoutePriceDetails && matchingRoute),
+    [selectedRouteData, shouldDisplayRoutePriceDetails, matchingRoute],
   );
 
   useEffect(() => {
@@ -665,12 +674,12 @@ export function AddTokens({
   }, [id, experiments]);
 
   useEffect(() => {
-    if (selectedRouteData?.isInsufficientGas) {
+    if (shouldDisplayInsufficientGasWarning) {
       setShowNotEnoughGasDrawer(true);
     } else {
       setShowNotEnoughGasDrawer(false);
     }
-  }, [selectedRouteData]);
+  }, [shouldDisplayInsufficientGasWarning]);
 
   const handleToolkitClick = () => {
     setShowNotEnoughGasDrawer(false);
@@ -803,6 +812,7 @@ export function AddTokens({
                   insufficientBalance={insufficientBalance}
                   showOnrampOption={shouldShowOnRampOption}
                   displayPriceDetails={shouldDisplayRoutePriceDetails}
+                  displayInsufficientGasWarning={shouldDisplayInsufficientGasWarning}
                 />
               </>
               )}
@@ -874,6 +884,7 @@ export function AddTokens({
             onRouteClick={handleRouteClick}
             insufficientBalance={insufficientBalance}
             displayPriceDetails={shouldDisplayRoutePriceDetails}
+            displayInsufficientGasWarning={shouldDisplayInsufficientGasWarning}
           />
           <DeliverToWalletDrawer
             visible={showDeliverToDrawer}
