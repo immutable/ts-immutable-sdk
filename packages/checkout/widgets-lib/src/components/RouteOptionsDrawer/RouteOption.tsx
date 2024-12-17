@@ -11,12 +11,11 @@ import {
 } from '@biom3/react';
 import { ReactElement, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-
-import { getDurationFormatted } from '../functions/getDurationFormatted';
-import { getTotalRouteFees } from '../../../lib/squid/functions/getTotalRouteFees';
-import { getFormattedAmounts } from '../functions/getFormattedNumber';
-import { getRouteAndTokenBalances } from '../../../lib/squid/functions/getRouteAndTokenBalances';
-import { Chain, RouteData } from '../../../lib/squid/types';
+import { getRouteAndTokenBalances } from '../../lib/squid/functions/getRouteAndTokenBalances';
+import { getTotalRouteFees } from '../../lib/squid/functions/getTotalRouteFees';
+import { Chain, RouteData } from '../../lib/squid/types';
+import { getDurationFormatted } from '../../functions/getDurationFormatted';
+import { getFormattedAmounts } from '../../functions/getFormattedNumber';
 
 export interface RouteOptionProps<
   RC extends ReactElement | undefined = undefined,
@@ -98,6 +97,17 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
 
       <MenuItem.Caption>
         {`${t('views.ADD_TOKENS.fees.balance')} ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${routeBalanceUsd}`}
+        {routeData.isInsufficientGas && (
+        <>
+          <br />
+          <span style={{ color: '#FF637F' }}>
+            {t('views.ADD_TOKENS.noGasRouteMessage', {
+              token:
+              routeData.route.route.estimate.gasCosts[0].token.symbol,
+            })}
+          </span>
+        </>
+        )}
       </MenuItem.Caption>
 
       <MenuItem.PriceDisplay price={fromAmount}>

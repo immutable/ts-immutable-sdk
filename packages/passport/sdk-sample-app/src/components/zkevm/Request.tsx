@@ -142,6 +142,12 @@ const EthereumMethods: EthereumMethod[] = [
       { name: 'blockNumber/tag', default: 'latest' },
     ],
   },
+  {
+    name: 'im_addSessionActivity',
+    params: [
+      { name: 'clientId' },
+    ],
+  },
 ];
 
 function Request({ showModal, setShowModal }: ModalProps) {

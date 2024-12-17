@@ -769,6 +769,11 @@
           "heading": "Oops! It seems your payment wallet has changed",
           "body": "You'll be ask to re-connect the same wallet you selected to pay with before proceeding",
           "buttonText": "Re-select payment wallet"
+        },
+        "routeError": {
+          "heading": "We couldn't find a suitable final quote",
+          "subHeading": "Please try again",
+          "secondaryButtonText": "Go back"
         }
       },
       "review": {
@@ -861,7 +866,14 @@
         "fiatPricePrefix": "≈ USD",
         "zeroFees": "Zero fees",
         "includedFees": "Fees"
-      }
+      },
+      "noGasDrawer": {
+        "heading": "You'll need more {{token}} for gas",
+        "body": "Add more gas and return to complete this transaction, or try another option such as lowering your amount, using another wallet, or buying with card.",
+        "primaryAction": "Try another option",
+        "secondaryAction": "Add more {{token}}"
+      },
+      "noGasRouteMessage": "Insufficient {{token}} for gas"
     }
   },
   "footers": {

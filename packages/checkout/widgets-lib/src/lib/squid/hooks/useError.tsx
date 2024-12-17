@@ -1,13 +1,13 @@
 import { Environment } from '@imtbl/config';
 import { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AddTokensErrorTypes, RiveStateMachineInput } from '../types';
-import { useHandover } from '../../../lib/hooks/useHandover';
+import { AddTokensErrorTypes } from '../../../widgets/add-tokens/types';
+import { useHandover } from '../../hooks/useHandover';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
-import { getRemoteRive } from '../../../lib/utils';
-import { APPROVE_TXN_ANIMATION } from '../utils/config';
+import { getRemoteRive } from '../../utils';
+import { APPROVE_TXN_ANIMATION } from '../../../widgets/add-tokens/utils/config';
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
-import { sendAddTokensCloseEvent } from '../AddTokensWidgetEvents';
+import { sendAddTokensCloseEvent } from '../../../widgets/add-tokens/AddTokensWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
   ViewActions,
@@ -18,6 +18,7 @@ import {
   useAnalytics,
   UserJourney,
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { RiveStateMachineInput } from '../../../types/HandoverTypes';
 
 interface ErrorConfig {
   headingText: string;
@@ -69,6 +70,12 @@ export const useError = (environment: Environment) => {
       subHeadingText: t('views.ADD_TOKENS.error.invalidParameters.subHeading'),
       secondaryButtonText: t('views.ADD_TOKENS.error.invalidParameters.secondaryButtonText'),
       onSecondaryButtonClick: closeWidget,
+    },
+    [AddTokensErrorTypes.ROUTE_ERROR]: {
+      headingText: t('views.ADD_TOKENS.error.routeError.heading'),
+      subHeadingText: t('views.ADD_TOKENS.error.routeError.subHeading'),
+      secondaryButtonText: t('views.ADD_TOKENS.error.routeError.secondaryButtonText'),
+      onSecondaryButtonClick: goBackToAddTokensView,
     },
     [AddTokensErrorTypes.SERVICE_BREAKDOWN]: {
       headingText: t('views.ADD_TOKENS.error.serviceBreakdown.heading'),

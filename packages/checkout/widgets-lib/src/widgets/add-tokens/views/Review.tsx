@@ -35,7 +35,7 @@ import {
   AddTokensReviewData,
   AddTokensWidgetViews,
 } from '../../../context/view-context/AddTokensViewContextTypes';
-import { AddTokensErrorTypes, RiveStateMachineInput } from '../types';
+import { AddTokensErrorTypes } from '../types';
 import { useExecute } from '../../../lib/squid/hooks/useExecute';
 import {
   ViewActions,
@@ -50,6 +50,7 @@ import {
   APPROVE_TXN_ANIMATION,
   EXECUTE_TXN_ANIMATION,
   FIXED_HANDOVER_DURATION,
+  TOOLKIT_SQUID_URL,
 } from '../utils/config';
 import {
   useAnalytics,
@@ -57,25 +58,24 @@ import {
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
-import { getDurationFormatted } from '../functions/getDurationFormatted';
-import { RouteFees } from '../components/RouteFees';
-import { AddressMissmatchDrawer } from '../components/AddressMissmatchDrawer';
 import { getTotalRouteFees } from '../../../lib/squid/functions/getTotalRouteFees';
 import { getRouteChains } from '../../../lib/squid/functions/getRouteChains';
-import {
-  getFormattedAmounts,
-  getFormattedNumber,
-} from '../functions/getFormattedNumber';
+
 import { SquidFooter } from '../../../lib/squid/components/SquidFooter';
-import { useError } from '../hooks/useError';
+import { useError } from '../../../lib/squid/hooks/useError';
 import {
   sendAddTokensCloseEvent,
   sendAddTokensSuccessEvent,
 } from '../AddTokensWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { convertToNetworkChangeableProvider } from '../functions/convertToNetworkChangeableProvider';
+import { convertToNetworkChangeableProvider } from '../../../functions/convertToNetworkChangeableProvider';
 import { AmountData } from '../../../lib/squid/types';
 import { SQUID_NATIVE_TOKEN } from '../../../lib/squid/config';
+import { AddressMissmatchDrawer } from '../../../components/AddressMismatchDrawer/AddressMissmatchDrawer';
+import { RouteFees } from '../../../components/RouteFees/RouteFees';
+import { getDurationFormatted } from '../../../functions/getDurationFormatted';
+import { getFormattedNumber, getFormattedAmounts } from '../../../functions/getFormattedNumber';
+import { RiveStateMachineInput } from '../../../types/HandoverTypes';
 
 interface ReviewProps {
   data: AddTokensReviewData;
@@ -122,6 +122,7 @@ export function Review({
   const [amountData, setAmountData] = useState<AmountData | undefined>();
   const [proceedDisabled, setProceedDisabled] = useState(true);
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
+  const [showSecuringQuote, setShowSecuringQuote] = useState(false);
   const [showAddressMissmatchDrawer, setShowAddressMissmatchDrawer] = useState(false);
   const { getAmountData, getRoute } = useRoutes();
   const { addHandover, closeHandover } = useHandover({
@@ -152,6 +153,8 @@ export function Review({
 
     if (!fromAddress || !toAddress) return;
 
+    setShowSecuringQuote(true);
+
     const updatedAmountData = getAmountData(
       tokens,
       data.balance,
@@ -174,10 +177,16 @@ export function Review({
       fromAddress,
       false,
     );
-
     setRoute(routeResponse.route);
     setAmountData(updatedAmountData);
     setProceedDisabled(false);
+    setShowSecuringQuote(false);
+    if (routeResponse?.route === undefined) {
+      showErrorHandover(AddTokensErrorTypes.ROUTE_ERROR, {
+        contextId: id,
+        error: 'Failed to obtain final route',
+      });
+    }
   };
 
   const { fromChain, toChain } = useMemo(
@@ -195,11 +204,29 @@ export function Review({
     [route],
   );
 
+  const openFeeBreakdown = () => {
+    const feesToken = route?.route.estimate.feeCosts?.[0]?.token;
+    track({
+      userJourney: UserJourney.ADD_TOKENS,
+      screen: 'Review',
+      control: 'FeeBreakdown',
+      controlType: 'Button',
+      extras: {
+        contextId: id,
+        feesToken: feesToken?.symbol,
+        totalAmount: feesToken ? getFormattedNumber(totalFees, feesToken.decimals) : null,
+        totalFiatAmount: getFormattedAmounts(totalFeesUsd),
+      },
+    });
+
+    setShowFeeBreakdown(true);
+  };
+
   const routeFees = useMemo(() => {
     if (totalFeesUsd) {
       return (
         <Body
-          onClick={() => setShowFeeBreakdown(true)}
+          onClick={() => openFeeBreakdown()}
           size="small"
           sx={{
             ...hFlex,
@@ -563,7 +590,7 @@ export function Review({
                     rc={(
                       <a
                         target="_blank"
-                        href="https://toolkit.immutable.com/squid-bridge/"
+                        href={TOOLKIT_SQUID_URL}
                         rel="noreferrer"
                       />
                     )}
@@ -577,7 +604,7 @@ export function Review({
           ),
           onPrimaryButtonClick: () => {
             window.open(
-              'https://toolkit.immutable.com/squid-bridge/',
+              TOOLKIT_SQUID_URL,
               '_blank',
               'noreferrer',
             );
@@ -957,7 +984,7 @@ export function Review({
           </>
         )}
 
-        {!route && !showAddressMissmatchDrawer && (
+        {!route && !showAddressMissmatchDrawer && showSecuringQuote && (
           <LoadingView
             loadingText={t('views.ADD_TOKENS.review.loadingText')}
             containerSx={{ bg: 'transparent' }}

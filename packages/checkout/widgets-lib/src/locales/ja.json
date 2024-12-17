@@ -752,6 +752,11 @@
           "heading": "おっと！支払いウォレットが変更されました",
           "body": "以前に選択したウォレットと再接続するように求められます",
           "buttonText": "支払いウォレットを再選択"
+        },
+        "routeError": {
+          "heading": "適切な最終見積もりが見つかりませんでした",
+          "subHeading": "もう一度お試しください",
+          "secondaryButtonText": "戻る"
         }
       },
       "review": {
@@ -844,7 +849,14 @@
         "fiatPricePrefix": "≈ USD",
         "zeroFees": "手数料無料",
         "includedFees": "手数料"
-      }
+      },
+      "noGasDrawer": {
+        "heading": "{{token}} がガスにもっと必要です",
+        "body": "ガスを追加してこの取引を完了するか、金額を減らす、別のウォレットを使用する、またはカードで購入するなど、他のオプションを試してください。",
+        "primaryAction": "別のオプションを試す",
+        "secondaryAction": "{{token}} をさらに追加する"
+      },
+      "noGasRouteMessage": "ガス用の {{token}} が不足しています"
     }
   },
   "footers": {
