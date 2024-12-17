@@ -77,7 +77,7 @@ import { isMatchingAddress } from './utils/utils';
 import * as wallet from './wallet';
 import { WidgetConfiguration } from './widgets/definitions/configurations';
 import { getWidgetsEsmUrl, loadUnresolvedBundle } from './widgets/load';
-import { determineWidgetsVersion, validateAndBuildVersion } from './widgets/version';
+import { determineWidgetsVersion, getLatestVersionFromNpm, validateAndBuildVersion } from './widgets/version';
 import { globalPackageVersion } from './env';
 import { AssessmentResult, fetchRiskAssessment, isAddressSanctioned } from './riskAssessment';
 
@@ -247,23 +247,51 @@ export class Checkout {
     validVersion: string,
   ) {
     const checkout = this;
-    try {
-      const cdnUrl = getWidgetsEsmUrl(validVersion);
 
-      // WebpackIgnore comment required to prevent webpack modifying the import statement and
-      // breaking the dynamic import in certain applications integrating checkout
-      const checkoutWidgetsModule = await import(
+    async function tryLoadEsModule(version: string): Promise<any> {
+      const cdnUrl = getWidgetsEsmUrl(version);
+
+      try {
+        // WebpackIgnore comment required to prevent webpack modifying the import statement and
+        // breaking the dynamic import in certain applications integrating checkout
+        const checkoutWidgetsModule = await import(
         /* webpackIgnore: true */ cdnUrl
-      );
+        );
 
-      if (checkoutWidgetsModule && checkoutWidgetsModule.WidgetsFactory) {
-        return new checkoutWidgetsModule.WidgetsFactory(checkout, config);
+        if (checkoutWidgetsModule && checkoutWidgetsModule.WidgetsFactory) {
+          return new checkoutWidgetsModule.WidgetsFactory(checkout, config);
+        }
+        throw new Error(`WidgetsFactory not found in loaded module for version: ${version}`);
+      } catch (err: any) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `Failed to load ESM bundle for version ${version}. Error: ${err.message}`,
+        );
+        throw err;
       }
+    }
+
+    try {
+      return await tryLoadEsModule(validVersion);
     } catch (err: any) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `Failed to resolve Commerce Widgets module, falling back to UMD bundle. Error: ${err.message}`,
-      );
+      const latestVersion = await getLatestVersionFromNpm();
+
+      if (validVersion === latestVersion) {
+        try {
+          return await tryLoadEsModule('latest');
+        } catch (retryErr: any) {
+          // eslint-disable-next-line no-console
+          console.warn(
+            `Failed to resolve Commerce Widgets module, falling back to UMD bundle. Error: ${retryErr.message}`,
+          );
+        }
+      } else {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `Failed to resolve Commerce Widgets module for version ${validVersion}, falling back to UMD bundle. 
+          Error: ${err.message}`,
+        );
+      }
     }
 
     // Fallback to UMD bundle if esm bundle fails to load
