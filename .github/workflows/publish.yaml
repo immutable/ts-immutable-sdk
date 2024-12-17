@@ -130,17 +130,17 @@ jobs:
           tag: ${{ contains(env.RELEASE_TYPE, 'alpha') && 'alpha' }}
           dry-run: ${{ env.DRY_RUN }}
 
+      - name: Generate last_updated.json
+        if: (env.DRY_RUN) == 'false'
+        run: |
+          echo "{\"timestamp\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"}" > ./sdk/last_updated.json
+          cp ./sdk/last_updated.json ./sdk/dist/
+
       # ! Do NOT remove - this will cause a Sev 0 incident !
       - name: Generate SDK attestation
         uses: actions/attest-build-provenance@v1
         with:
           subject-path: './sdk'
-
-      - name: Generate last_updated.json
-        if: (env.DRY_RUN) == 'false'
-        run: |
-          echo "{\"last_updated\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"}" > ./sdk/last_updated.json
-          cp ./sdk/last_updated.json ./sdk/dist/
 
       - name: Authenticate NPM
         if: contains(env.RELEASE_TYPE, 'release')
