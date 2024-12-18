@@ -453,6 +453,19 @@ describe('AuthManager', () => {
       expect(result).toEqual(mockUser);
     });
 
+    it('should reject with an error when signinSilent throws a string', async () => {
+      mockGetUser.mockReturnValue(mockOidcExpiredUser);
+      (isTokenExpired as jest.Mock).mockReturnValue(true);
+      mockSigninSilent.mockRejectedValue('oops');
+
+      await expect(() => authManager.getUser()).rejects.toThrow(
+        new PassportError(
+          'Failed to refresh token: oops',
+          PassportErrorType.AUTHENTICATION_ERROR,
+        ),
+      );
+    });
+
     it('should return null when the user token is expired without refresh token', async () => {
       mockGetUser.mockReturnValue(mockOidcExpiredNoRefreshTokenUser);
       (isTokenExpired as jest.Mock).mockReturnValue(true);

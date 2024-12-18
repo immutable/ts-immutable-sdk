@@ -489,6 +489,8 @@ export default class AuthManager {
           errorMessage = `${err.message}: ${err.error_description}`;
         } else if (err instanceof Error) {
           errorMessage = err.message;
+        } else if (typeof err === 'string') {
+          errorMessage = `${errorMessage}: ${err}`;
         }
 
         reject(new PassportError(errorMessage, passportErrorType));
