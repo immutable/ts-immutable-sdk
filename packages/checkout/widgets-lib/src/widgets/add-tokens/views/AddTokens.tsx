@@ -30,6 +30,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
 import { ActionType } from '@0xsquid/squid-types';
 import { trackFlow } from '@imtbl/metrics';
+import { BigNumber, utils } from 'ethers';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
@@ -150,6 +151,7 @@ export function AddTokens({
   const [insufficientBalance, setInsufficientBalance] = useState(false);
   const [, setIsAmountInputSynced] = useState(false);
   const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
+  const [showMaxAmount, setShowMaxAmount] = useState(false);
 
   const debouncedSetSelectedAmount = useRef(
     debounce((value: string) => {
@@ -686,6 +688,29 @@ export function AddTokens({
     window.open(TOOLKIT_SQUID_URL, '_blank');
   };
 
+  useEffect(() => {
+    if (!balances || !selectedToken) return;
+    if (balances.length > 0 && selectedToken && !fetchingRoutes) {
+      setShowMaxAmount(true);
+    } else {
+      setShowMaxAmount(false);
+    }
+  }, [balances, selectedToken, fetchingRoutes]);
+
+  const handleMaxAmountClick = () => {
+    if (selectedRouteData?.route?.route?.estimate?.toAmount && selectedToken?.decimals) {
+      try {
+        const rawAmount = BigNumber.from(selectedRouteData.route.route.estimate.toAmount);
+        const formattedAmount = utils.formatUnits(rawAmount, selectedToken.decimals);
+        const roundedAmount = Number(formattedAmount).toFixed(6);
+        setInputValue(roundedAmount);
+        setSelectedAmount(roundedAmount);
+      } catch (error) {
+        console.error('Error formatting max amount:', error);
+      }
+    }
+  };
+
   return (
     <SimpleLayout
       containerSx={{ bg: 'transparent' }}
@@ -759,12 +784,21 @@ export function AddTokens({
                 placeholder="0"
                 maxTextSize="xLarge"
               />
-
               <HeroFormControl.Caption>
                 {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')}
                 $${getFormattedAmounts(selectedAmountUsd)}`}
               </HeroFormControl.Caption>
             </HeroFormControl>
+          )}
+          {showMaxAmount && (
+            <Button
+              testId="max-amount-button"
+              variant="tertiary"
+              size="small"
+              onClick={handleMaxAmountClick}
+            >
+              {t('views.ADD_TOKENS.tokenSelection.maxAmountButton')}
+            </Button>
           )}
         </Stack>
         <Stack

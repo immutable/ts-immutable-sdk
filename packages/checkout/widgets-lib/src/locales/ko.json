@@ -635,7 +635,8 @@
         "buttonText": "원하는 토큰을 선택하세요",
         "tokenLabel": "추가",
         "drawerHeading": "토큰 추가",
-        "searchPlaceholder": "토큰 검색"
+        "searchPlaceholder": "토큰 검색",
+        "maxAmountButton": "최대"
       },
       "walletSelection": {
         "from": {

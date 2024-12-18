@@ -364,7 +364,7 @@
         "ready3": "資産を準備中",
         "processing1": "支払いを初期化中",
         "processing2": "資産を確保中",
-        "processing3": "支払いを完了中"
+        "processing3": "支払いを完���中"
       },
       "handover": {
         "initial": "注文を準備中",
@@ -638,7 +638,8 @@
         "buttonText": "選択したいトークンを選んでください",
         "tokenLabel": "追加",
         "drawerHeading": "トークンを追加",
-        "searchPlaceholder": "トークンを検索"
+        "searchPlaceholder": "トークンを検索",
+        "maxAmountButton": "最大"
       },
       "walletSelection": {
         "from": {
@@ -976,7 +977,7 @@
     "networkSwitch": {
       "heading": "あなたの{{wallet}}でネットワークを切り替える",
       "manualSwitch": {
-        "body": "続行するにはモバイルウォレットを開き、{{chain}}ネットワークに切り替える必要があります"
+        "body": "続行するにはモバイルウォレットを開き、{{chain}}ネットワ��クに切り替える必要があります"
       },
       "controlledSwitch": {
         "body": "{{chain}}ネットワークに切り替える必要があります"

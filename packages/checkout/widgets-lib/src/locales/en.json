@@ -655,7 +655,8 @@
         "buttonText": "Choose the token you want",
         "tokenLabel": "Add",
         "drawerHeading": "Add Token",
-        "searchPlaceholder": "Search tokens"
+        "searchPlaceholder": "Search tokens",
+        "maxAmountButton": "MAX"
       },
       "walletSelection": {
         "from":{
