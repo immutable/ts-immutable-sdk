@@ -187,7 +187,7 @@ export function SelectedRouteOption({
             {`${t('views.ADD_TOKENS.fees.balance')} ${t(
               'views.ADD_TOKENS.fees.fiatPricePrefix',
             )} $${routeBalanceUsd}`}
-            { routeData?.isInsufficientGas && (
+            { displayPriceDetails && routeData?.isInsufficientGas && (
               <>
                 <br />
                 <span style={{ color: '#FF637F' }}>
@@ -199,7 +199,7 @@ export function SelectedRouteOption({
               </>
             )}
 
-            { routeData?.isInsufficientBalance && (
+            { displayPriceDetails && routeData?.isInsufficientBalance && (
             <>
               <br />
               <span style={{ color: '#FF637F' }}>

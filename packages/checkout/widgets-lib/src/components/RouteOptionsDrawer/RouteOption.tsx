@@ -99,7 +99,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
 
       <MenuItem.Caption>
         {`${t('views.ADD_TOKENS.fees.balance')} ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${routeBalanceUsd}`}
-        { routeData.isInsufficientGas && (
+        { displayPriceDetails && routeData.isInsufficientGas && (
         <>
           <br />
           <span style={{ color: '#FF637F' }}>
@@ -111,7 +111,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
         </>
         )}
 
-        { routeData.isInsufficientBalance && (
+        { displayPriceDetails && routeData.isInsufficientBalance && (
         <>
           <br />
           <span style={{ color: '#FF637F' }}>
