@@ -489,6 +489,8 @@ export default class AuthManager {
           errorMessage = `${err.message}: ${err.error_description}`;
         } else if (err instanceof Error) {
           errorMessage = err.message;
+        } else if (typeof err === 'string') {
+          errorMessage = `${errorMessage}: ${err}`;
         }
 
         reject(new PassportError(errorMessage, passportErrorType));
@@ -525,7 +527,7 @@ export default class AuthManager {
       return null;
     }
 
-    const oidcUser = await this.userManager.getUser();
+    const oidcUser = await this.userManager.getUser(); // DOES THIS NOW TRIGGER TOKEN REFRESHES?
     if (!oidcUser) return null;
 
     if (!isTokenExpired(oidcUser)) {
