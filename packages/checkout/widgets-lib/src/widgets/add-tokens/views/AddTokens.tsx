@@ -672,7 +672,7 @@ export function AddTokens({
   }, [id, experiments]);
 
   useEffect(() => {
-    if (selectedRouteData?.isInsufficientGas) {
+    if (selectedRouteData?.isInsufficientGas && shouldDisplayRoutePriceDetails) {
       setShowNotEnoughGasDrawer(true);
     } else {
       setShowNotEnoughGasDrawer(false);
