@@ -149,7 +149,6 @@ export function AddTokens({
   );
   const [fetchingRoutes, setFetchingRoutes] = useState(false);
   const [insufficientBalance, setInsufficientBalance] = useState(false);
-  const [, setIsAmountInputSynced] = useState(false);
   const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
   const [showMaxAmount, setShowMaxAmount] = useState(false);
 
@@ -170,15 +169,8 @@ export function AddTokens({
   );
 
   const setSelectedAmount = (value: string) => {
-    setIsAmountInputSynced(false);
     debouncedSetSelectedAmount.current(value);
   };
-
-  useEffect(() => {
-    if (selectedAmount === inputValue) {
-      setIsAmountInputSynced(true);
-    }
-  }, [selectedAmount, inputValue]);
 
   const setSelectedRouteData = (route: RouteData | undefined) => {
     if (route) {
@@ -371,13 +363,11 @@ export function AddTokens({
     resetRoutes();
     setInsufficientBalance(false);
 
-    if (!squid || !balances || !tokens) return;
+    if (!squid || !balances || !tokens || selectedAmount) return;
 
-    if (balances.length === 0) {
-      return;
-    }
+    if (balances.length === 0) return;
 
-    const hasSelectedToken = Boolean(selectedToken?.address);
+    const hasSelectedToken = selectedToken?.address;
     const toToken = selectedToken?.address ?? DEFAULT_DESTINATION_TOKEN[ChainId.IMTBL_ZKEVM_MAINNET];
 
     const preloadRoutes = async () => {
@@ -388,6 +378,7 @@ export function AddTokens({
         && toToken
       ) {
         setFetchingRoutes(true);
+
         const availableRoutes = await fetchRoutesForBalancesWithRateLimit(
           squid,
           tokens,
@@ -412,8 +403,9 @@ export function AddTokens({
       }
     };
 
+    console.log('Preloading routes');
     preloadRoutes();
-  }, [balances, squid, selectedToken]);
+  }, [balances, squid, selectedToken, selectedAmount]);
 
   const matchingRoute = useMemo(() => {
     if (!selectedRouteData || routes.length === 0) return undefined;
@@ -598,7 +590,7 @@ export function AddTokens({
 
   const showInitialEmptyState = !selectedToken;
 
-  const shouldDisplayRoutePriceDetails = useMemo(
+  const shouldDisplayRoutesBasedOnBalances = useMemo(
     () => (!!(selectedToken && fromAddress && validateToAmount(selectedAmount).isValid)),
     [selectedToken, fromAddress, selectedAmount],
   );
@@ -620,7 +612,7 @@ export function AddTokens({
     && !!toAddress
     && !!selectedRouteData
     && !selectedRouteData.isInsufficientGas
-    && !insufficientBalance
+    && !selectedRouteData.isInsufficientBalance
     && !loading;
 
   const handleWalletConnected = (
@@ -674,7 +666,7 @@ export function AddTokens({
   }, [id, experiments]);
 
   useEffect(() => {
-    if (selectedRouteData?.isInsufficientGas && shouldDisplayRoutePriceDetails) {
+    if (selectedRouteData?.isInsufficientGas && shouldDisplayRoutesBasedOnBalances) {
       setShowNotEnoughGasDrawer(true);
     } else {
       setShowNotEnoughGasDrawer(false);
@@ -843,7 +835,7 @@ export function AddTokens({
                   withSelectedWallet={!!fromAddress}
                   insufficientBalance={insufficientBalance}
                   showOnrampOption={shouldShowOnRampOption}
-                  displayPriceDetails={shouldDisplayRoutePriceDetails}
+                  displayPriceDetails={shouldDisplayRoutesBasedOnBalances}
                 />
               </>
               )}
@@ -914,7 +906,7 @@ export function AddTokens({
             onCardClick={handleCardClick}
             onRouteClick={handleRouteClick}
             insufficientBalance={insufficientBalance}
-            displayPriceDetails={shouldDisplayRoutePriceDetails}
+            displayPriceDetails={shouldDisplayRoutesBasedOnBalances}
           />
           <DeliverToWalletDrawer
             visible={showDeliverToDrawer}
