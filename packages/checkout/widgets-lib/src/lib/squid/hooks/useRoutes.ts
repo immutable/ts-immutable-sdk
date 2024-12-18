@@ -16,8 +16,36 @@ import {
 import { SquidPostHook } from '../../primary-sales';
 import { SQUID_NATIVE_TOKEN } from '../config';
 
-const BASE_SLIPPAGE = 0.02;
 const MIN_BALANCE_FOR_ROUTES = 1;
+
+const BASE_SLIPPAGE_HIGH_TIER = 0.005;
+const BASE_SLIPPAGE_MEDIUM_TIER = 0.01;
+const BASE_SLIPPAGE_LOW_TIER = 0.015;
+
+const SLIPPAGE_TIERS = {
+  high: {
+    threshold: 999,
+    value: BASE_SLIPPAGE_HIGH_TIER,
+  },
+  medium: {
+    threshold: 99,
+    value: BASE_SLIPPAGE_MEDIUM_TIER,
+  },
+  low: {
+    threshold: 0,
+    value: BASE_SLIPPAGE_LOW_TIER,
+  },
+} as const;
+
+const getSlippageTier = (usdAmount: number): number => {
+  if (usdAmount >= SLIPPAGE_TIERS.high.threshold) {
+    return SLIPPAGE_TIERS.high.value;
+  }
+  if (usdAmount >= SLIPPAGE_TIERS.medium.threshold) {
+    return SLIPPAGE_TIERS.medium.value;
+  }
+  return SLIPPAGE_TIERS.low.value;
+};
 
 export const useRoutes = () => {
   const latestRequestIdRef = useRef<number>(0);
@@ -51,7 +79,7 @@ export const useRoutes = () => {
     chainId: string,
   ): Token | undefined => tokens.find(
     (value) => value.address.toLowerCase() === address.toLowerCase()
-        && value.chainId === chainId,
+      && value.chainId === chainId,
   );
 
   const calculateFromAmount = (
@@ -66,7 +94,7 @@ export const useRoutes = () => {
     // Calculate the amount of fromToken needed to match this USD value
     const baseFromAmount = toAmountInUsd / fromToken.usdPrice;
     // Add a buffer for price fluctuations and fees
-    const fromAmountWithBuffer = baseFromAmount * (1 + BASE_SLIPPAGE + additionalBuffer);
+    const fromAmountWithBuffer = baseFromAmount * (1 + getSlippageTier(toAmountInUsd) + additionalBuffer);
 
     return fromAmountWithBuffer.toString();
   };
@@ -74,9 +102,11 @@ export const useRoutes = () => {
   const calculateFromAmountFromRoute = (
     exchangeRate: string,
     toAmount: string,
+    toAmountUSD?: string,
   ) => {
+    const toAmountUSDNumber = toAmountUSD ? parseFloat(toAmountUSD) : 0;
     const fromAmount = parseFloat(toAmount) / parseFloat(exchangeRate);
-    const fromAmountWithBuffer = fromAmount * (1 + BASE_SLIPPAGE);
+    const fromAmountWithBuffer = fromAmount * (1 + getSlippageTier(toAmountUSDNumber));
     return fromAmountWithBuffer.toString();
   };
 
@@ -111,10 +141,12 @@ export const useRoutes = () => {
       toAmount,
       balance,
       additionalBuffer,
+      isInsufficientBalance: false,
+      isInsufficientGas: false,
     };
   };
 
-  const getSufficientFromAmounts = (
+  const getFromAmounts = (
     tokens: Token[],
     balances: TokenBalance[],
     toChainId: string,
@@ -124,24 +156,25 @@ export const useRoutes = () => {
     const filteredBalances = balances.filter(
       (balance) => !(
         balance.address.toLowerCase() === toTokenAddress.toLowerCase()
-          && balance.chainId === toChainId
+        && balance.chainId === toChainId
       ),
     );
 
-    const amountDataArray: AmountData[] = filteredBalances
-      .map((balance) => getAmountData(tokens, balance, toAmount, toChainId, toTokenAddress))
-      .filter((value) => value !== undefined);
+    return filteredBalances
+      .map((balance) => {
+        const amountData = getAmountData(tokens, balance, toAmount, toChainId, toTokenAddress);
+        if (!amountData) return null;
 
-    return amountDataArray.filter((data: AmountData) => {
-      const formattedBalance = utils.formatUnits(
-        data.balance.balance,
-        data.balance.decimals,
-      );
+        const formattedBalance = parseFloat(
+          utils.formatUnits(balance.balance, balance.decimals),
+        );
 
-      return (
-        parseFloat(formattedBalance.toString()) > parseFloat(data.fromAmount)
-      );
-    });
+        return {
+          ...amountData,
+          isInsufficientBalance: formattedBalance < parseFloat(amountData.fromAmount),
+        };
+      })
+      .filter((data) => data !== null);
   };
 
   const convertToFormattedAmount = (amount: string, decimals: number) => {
@@ -208,7 +241,6 @@ export const useRoutes = () => {
     if (!routeResponse?.route?.estimate?.toAmount || !routeResponse?.route?.estimate?.toToken?.decimals) {
       throw new Error('Invalid route response or token decimals');
     }
-
     const toAmountInBaseUnits = utils.parseUnits(toAmount, routeResponse?.route.estimate.toToken.decimals);
     const routeToAmountInBaseUnits = BigNumber.from(routeResponse.route.estimate.toAmount);
     return routeToAmountInBaseUnits.gt(toAmountInBaseUnits);
@@ -248,6 +280,7 @@ export const useRoutes = () => {
       const newFromAmount = calculateFromAmountFromRoute(
         routeResponse.route.estimate.exchangeRate,
         toAmount,
+        routeResponse.route.estimate.toAmountUSD,
       );
 
       const newRoute = await getRouteWithRetry(
@@ -375,16 +408,20 @@ export const useRoutes = () => {
         const feeCost = getTotalFees(routeResponse, data.balance.chainId);
         const userGasBalance = findUserGasBalance(data.balance.chainId);
 
-        return {
-          amountData: data,
-          route: routeResponse.route,
-          isInsufficientGas: !hasSufficientNativeTokenBalance(
+        const isInsufficientGas = !data.isInsufficientBalance
+          && !hasSufficientNativeTokenBalance(
             userGasBalance,
             data.fromAmount,
             data.fromToken,
             gasCost,
             feeCost,
-          ),
+          );
+
+        return {
+          amountData: data,
+          route: routeResponse.route,
+          isInsufficientGas,
+          isInsufficientBalance: data.isInsufficientBalance,
         } as RouteData;
       } catch (error) {
         return null;
@@ -411,7 +448,7 @@ export const useRoutes = () => {
   ): Promise<RouteData[]> => {
     const currentRequestId = ++latestRequestIdRef.current;
 
-    let fromAmountDataArray = getSufficientFromAmounts(
+    let fromAmountDataArray = getFromAmounts(
       tokens,
       balances,
       toChanId,
@@ -479,7 +516,7 @@ export const useRoutes = () => {
     let fromAmountDataArray = balances
       .filter((balance) => !(
         balance.address.toLowerCase() === toTokenAddress.toLowerCase()
-          && balance.chainId.toString() === toChainId
+        && balance.chainId.toString() === toChainId
       ))
       .map((balance) => {
         const fromToken = findToken(tokens, balance.address, balance.chainId.toString());

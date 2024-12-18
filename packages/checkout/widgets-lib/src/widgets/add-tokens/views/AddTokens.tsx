@@ -203,6 +203,7 @@ export function AddTokens({
             (action) => action.type === ActionType.SWAP,
           ),
           isInsufficientGas: route.isInsufficientGas,
+          isInsufficientBalance: route.isInsufficientBalance,
         },
       });
     }
@@ -414,13 +415,14 @@ export function AddTokens({
     preloadRoutes();
   }, [balances, squid, selectedToken]);
 
-  const matchingRoute = useMemo(
-    () => routes.find(
-      (route) => route.amountData.fromToken.address === selectedRouteData?.amountData.fromToken.address
-        && route.amountData.fromToken.chainId === selectedRouteData?.amountData.fromToken.chainId,
-    ),
-    [routes, selectedRouteData],
-  );
+  const matchingRoute = useMemo(() => {
+    if (!selectedRouteData || routes.length === 0) return undefined;
+
+    return routes.find(
+      (route) => route.amountData.fromToken.address === selectedRouteData.amountData.fromToken.address
+      && route.amountData.fromToken.chainId === selectedRouteData.amountData.fromToken.chainId,
+    );
+  }, [routes, selectedRouteData]);
 
   useEffect(() => {
     if (routes.length === 0) return;
@@ -601,11 +603,6 @@ export function AddTokens({
     [selectedToken, fromAddress, selectedAmount],
   );
 
-  const shouldDisplayInsufficientGasWarning = useMemo(
-    () => !!(selectedRouteData?.isInsufficientGas && shouldDisplayRoutePriceDetails && matchingRoute),
-    [selectedRouteData, shouldDisplayRoutePriceDetails, matchingRoute],
-  );
-
   useEffect(() => {
     if (inputRef.current && !showInitialEmptyState) {
       inputRef.current.focus();
@@ -623,6 +620,7 @@ export function AddTokens({
     && !!toAddress
     && !!selectedRouteData
     && !selectedRouteData.isInsufficientGas
+    && !insufficientBalance
     && !loading;
 
   const handleWalletConnected = (
@@ -676,12 +674,12 @@ export function AddTokens({
   }, [id, experiments]);
 
   useEffect(() => {
-    if (shouldDisplayInsufficientGasWarning) {
+    if (selectedRouteData?.isInsufficientGas && shouldDisplayRoutePriceDetails) {
       setShowNotEnoughGasDrawer(true);
     } else {
       setShowNotEnoughGasDrawer(false);
     }
-  }, [shouldDisplayInsufficientGasWarning]);
+  }, [selectedRouteData]);
 
   const handleToolkitClick = () => {
     setShowNotEnoughGasDrawer(false);
@@ -846,7 +844,6 @@ export function AddTokens({
                   insufficientBalance={insufficientBalance}
                   showOnrampOption={shouldShowOnRampOption}
                   displayPriceDetails={shouldDisplayRoutePriceDetails}
-                  displayInsufficientGasWarning={shouldDisplayInsufficientGasWarning}
                 />
               </>
               )}
@@ -918,7 +915,6 @@ export function AddTokens({
             onRouteClick={handleRouteClick}
             insufficientBalance={insufficientBalance}
             displayPriceDetails={shouldDisplayRoutePriceDetails}
-            displayInsufficientGasWarning={shouldDisplayInsufficientGasWarning}
           />
           <DeliverToWalletDrawer
             visible={showDeliverToDrawer}

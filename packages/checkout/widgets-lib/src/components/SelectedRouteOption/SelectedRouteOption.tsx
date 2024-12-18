@@ -31,7 +31,6 @@ export interface SelectedRouteOptionProps {
   insufficientBalance?: boolean;
   showOnrampOption?: boolean;
   displayPriceDetails?: boolean;
-  displayInsufficientGasWarning?: boolean;
 }
 
 function SelectedRouteOptionContainer({
@@ -72,9 +71,9 @@ export function SelectedRouteOption({
   insufficientBalance = false,
   showOnrampOption = false,
   displayPriceDetails = true,
-  displayInsufficientGasWarning = true,
   onClick,
 }: SelectedRouteOptionProps) {
+  console.log('SelectedRouteOption', routeData);
   const { t } = useTranslation();
 
   const { fromToken } = routeData?.amountData ?? {};
@@ -188,14 +187,27 @@ export function SelectedRouteOption({
             {`${t('views.ADD_TOKENS.fees.balance')} ${t(
               'views.ADD_TOKENS.fees.fiatPricePrefix',
             )} $${routeBalanceUsd}`}
-            {displayInsufficientGasWarning && routeData?.isInsufficientGas && (
+            { displayPriceDetails && routeData?.isInsufficientGas && (
+              <>
+                <br />
+                <span style={{ color: '#FF637F' }}>
+                  {t('views.ADD_TOKENS.noGasRouteMessage', {
+                    token:
+              routeData.route.route.estimate.gasCosts[0].token.symbol,
+                  })}
+                </span>
+              </>
+            )}
+
+            { displayPriceDetails && routeData?.isInsufficientBalance && (
             <>
               <br />
               <span style={{ color: '#FF637F' }}>
-                {t('views.ADD_TOKENS.noGasRouteMessage', {
-                  token:
-              routeData.route.route.estimate.gasCosts[0].token.symbol,
-                })}
+                {/* {t('views.ADD_TOKENS.noBalanceRouteMessage', {
+                  token: fromToken.symbol,
+                })} */}
+                {' '}
+                Insufficient balance
               </span>
             </>
             )}
