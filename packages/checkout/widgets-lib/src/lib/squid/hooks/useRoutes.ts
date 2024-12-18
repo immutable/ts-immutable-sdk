@@ -579,7 +579,6 @@ export const useRoutes = () => {
     const sortedRoutes = sortRoutesByFastestTime(allRoutes);
     // Only update routes if the request is the latest one
     if (currentRequestId === latestRequestIdRef.current) {
-      console.log('sortedRoutes', sortedRoutes);
       setRoutes(sortedRoutes);
     }
 
@@ -592,5 +591,6 @@ export const useRoutes = () => {
     getAmountData,
     getRoute,
     resetRoutes,
+    getSlippageTier,
   };
 };

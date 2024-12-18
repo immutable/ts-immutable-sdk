@@ -103,7 +103,9 @@ export function AddTokens({
 }: AddTokensProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { fetchRoutesWithRateLimit, fetchRoutesForBalancesWithRateLimit, resetRoutes } = useRoutes();
+  const {
+    fetchRoutesWithRateLimit, fetchRoutesForBalancesWithRateLimit, resetRoutes, getSlippageTier,
+  } = useRoutes();
   const { showErrorHandover } = useError(config.environment);
 
   const {
@@ -698,9 +700,14 @@ export function AddTokens({
   const handleMaxAmountClick = () => {
     if (selectedRouteData?.route?.route?.estimate?.toAmount && selectedToken?.decimals) {
       try {
+        const toAmountUSD = selectedRouteData.route.route.estimate.toAmountUSD
+          ? Number(selectedRouteData.route.route.estimate.toAmountUSD)
+          : 0;
+        const slippageTier = getSlippageTier(toAmountUSD);
         const rawAmount = BigNumber.from(selectedRouteData.route.route.estimate.toAmount);
         const formattedAmount = utils.formatUnits(rawAmount, selectedToken.decimals);
-        const roundedAmount = Number(formattedAmount).toFixed(6);
+        const toAmountLessBuffer = Number(formattedAmount) * (1 - slippageTier);
+        const roundedAmount = toAmountLessBuffer.toFixed(6);
         setInputValue(roundedAmount);
         setSelectedAmount(roundedAmount);
       } catch (error) {
