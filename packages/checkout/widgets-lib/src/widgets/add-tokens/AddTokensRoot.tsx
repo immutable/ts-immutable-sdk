@@ -70,37 +70,35 @@ export class AddTokens extends Base<WidgetType.ADD_TOKENS> {
     const { t } = i18n;
 
     this.reactRoot.render(
-      <React.StrictMode>
-        <CustomAnalyticsProvider checkout={this.checkout}>
-          <ThemeProvider id="add-tokens-container" config={this.strongConfig()}>
-            <HandoverProvider>
-              <ProvidersContextProvider
-                initialState={{
-                  checkout: this.checkout,
-                  toProvider: this.parameters.toProvider,
-                }}
-              >
-                <Suspense
-                  fallback={
-                    <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
+      <CustomAnalyticsProvider checkout={this.checkout}>
+        <ThemeProvider id="add-tokens-container" config={this.strongConfig()}>
+          <HandoverProvider>
+            <ProvidersContextProvider
+              initialState={{
+                checkout: this.checkout,
+                toProvider: this.parameters.toProvider,
+              }}
+            >
+              <Suspense
+                fallback={
+                  <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
                   }
-                >
-                  <AddTokensWidget
-                    config={this.strongConfig()}
-                    toTokenAddress={this.parameters.toTokenAddress}
-                    toAmount={this.parameters.toAmount}
-                    showBridgeOption={this.parameters.showBridgeOption}
-                    showSwapOption={this.parameters.showSwapOption}
-                    showOnrampOption={this.parameters.showOnrampOption}
-                    showBackButton={this.parameters.showBackButton}
-                    experiments={this.parameters.experiments}
-                  />
-                </Suspense>
-              </ProvidersContextProvider>
-            </HandoverProvider>
-          </ThemeProvider>
-        </CustomAnalyticsProvider>
-      </React.StrictMode>,
+              >
+                <AddTokensWidget
+                  config={this.strongConfig()}
+                  toTokenAddress={this.parameters.toTokenAddress}
+                  toAmount={this.parameters.toAmount}
+                  showBridgeOption={this.parameters.showBridgeOption}
+                  showSwapOption={this.parameters.showSwapOption}
+                  showOnrampOption={this.parameters.showOnrampOption}
+                  showBackButton={this.parameters.showBackButton}
+                  experiments={this.parameters.experiments}
+                />
+              </Suspense>
+            </ProvidersContextProvider>
+          </HandoverProvider>
+        </ThemeProvider>
+      </CustomAnalyticsProvider>,
     );
   }
 }
