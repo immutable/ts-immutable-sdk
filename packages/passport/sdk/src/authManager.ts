@@ -527,7 +527,7 @@ export default class AuthManager {
       return null;
     }
 
-    const oidcUser = await this.userManager.getUser(); // DOES THIS NOW TRIGGER TOKEN REFRESHES?
+    const oidcUser = await this.userManager.getUser();
     if (!oidcUser) return null;
 
     if (!isTokenExpired(oidcUser)) {
