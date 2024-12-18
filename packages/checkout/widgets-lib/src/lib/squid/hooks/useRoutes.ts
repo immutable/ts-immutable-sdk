@@ -111,10 +111,12 @@ export const useRoutes = () => {
       toAmount,
       balance,
       additionalBuffer,
+      isInsufficientBalance: false,
+      isInsufficientGas: false,
     };
   };
 
-  const getSufficientFromAmounts = (
+  const getFromAmounts = (
     tokens: Token[],
     balances: TokenBalance[],
     toChainId: string,
@@ -124,24 +126,25 @@ export const useRoutes = () => {
     const filteredBalances = balances.filter(
       (balance) => !(
         balance.address.toLowerCase() === toTokenAddress.toLowerCase()
-          && balance.chainId === toChainId
+        && balance.chainId === toChainId
       ),
     );
 
-    const amountDataArray: AmountData[] = filteredBalances
-      .map((balance) => getAmountData(tokens, balance, toAmount, toChainId, toTokenAddress))
-      .filter((value) => value !== undefined);
+    return filteredBalances
+      .map((balance) => {
+        const amountData = getAmountData(tokens, balance, toAmount, toChainId, toTokenAddress);
+        if (!amountData) return null;
 
-    return amountDataArray.filter((data: AmountData) => {
-      const formattedBalance = utils.formatUnits(
-        data.balance.balance,
-        data.balance.decimals,
-      );
+        const formattedBalance = parseFloat(
+          utils.formatUnits(balance.balance, balance.decimals),
+        );
 
-      return (
-        parseFloat(formattedBalance.toString()) > parseFloat(data.fromAmount)
-      );
-    });
+        return {
+          ...amountData,
+          isInsufficientBalance: formattedBalance < parseFloat(amountData.fromAmount),
+        };
+      })
+      .filter((data) => data !== null);
   };
 
   const convertToFormattedAmount = (amount: string, decimals: number) => {
@@ -375,16 +378,20 @@ export const useRoutes = () => {
         const feeCost = getTotalFees(routeResponse, data.balance.chainId);
         const userGasBalance = findUserGasBalance(data.balance.chainId);
 
-        return {
-          amountData: data,
-          route: routeResponse.route,
-          isInsufficientGas: !hasSufficientNativeTokenBalance(
+        const isInsufficientGas = !data.isInsufficientBalance
+          && !hasSufficientNativeTokenBalance(
             userGasBalance,
             data.fromAmount,
             data.fromToken,
             gasCost,
             feeCost,
-          ),
+          );
+
+        return {
+          amountData: data,
+          route: routeResponse.route,
+          isInsufficientGas,
+          isInsufficientBalance: data.isInsufficientBalance,
         } as RouteData;
       } catch (error) {
         return null;
@@ -411,7 +418,7 @@ export const useRoutes = () => {
   ): Promise<RouteData[]> => {
     const currentRequestId = ++latestRequestIdRef.current;
 
-    let fromAmountDataArray = getSufficientFromAmounts(
+    let fromAmountDataArray = getFromAmounts(
       tokens,
       balances,
       toChanId,

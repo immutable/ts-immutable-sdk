@@ -33,12 +33,15 @@ export type AmountData = {
   toAmount: string;
   balance: TokenBalance;
   additionalBuffer: number;
+  isInsufficientGas: boolean;
+  isInsufficientBalance: boolean;
 };
 
 export type RouteData = {
   amountData: AmountData;
   route: RouteResponse;
   isInsufficientGas: boolean;
+  isInsufficientBalance: boolean;
 };
 
 export type RouteResponseData = {
