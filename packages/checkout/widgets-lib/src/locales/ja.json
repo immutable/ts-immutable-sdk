@@ -857,7 +857,8 @@
         "primaryAction": "別のオプションを試す",
         "secondaryAction": "{{token}} をさらに追加する"
       },
-      "noGasRouteMessage": "ガス用の {{token}} が不足しています"
+      "noGasRouteMessage": "ガス用の {{token}} が不足しています",
+      "noBalanceRouteMessage": "残高不足"
     }
   },
   "footers": {

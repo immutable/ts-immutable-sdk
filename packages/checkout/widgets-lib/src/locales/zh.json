@@ -854,7 +854,8 @@
         "primaryAction": "尝试其他选项",
         "secondaryAction": "添加更多 {{token}}"
       },
-      "noGasRouteMessage": "用于燃料费的 {{token}} 不足"
+      "noGasRouteMessage": "用于燃料费的 {{token}} 不足",
+      "noBalanceRouteMessage": "余额不足"
     }
   },
   "footers": {
