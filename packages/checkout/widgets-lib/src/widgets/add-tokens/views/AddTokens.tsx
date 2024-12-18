@@ -692,13 +692,11 @@ export function AddTokens({
   const handleMaxAmountClick = () => {
     if (selectedRouteData?.route?.route?.estimate?.toAmount && selectedToken?.decimals) {
       try {
-        const toAmountUSD = selectedRouteData.route.route.estimate.toAmountUSD
-          ? Number(selectedRouteData.route.route.estimate.toAmountUSD)
-          : 0;
-        const slippageTier = getSlippageTier(toAmountUSD);
-        const rawAmount = BigNumber.from(selectedRouteData.route.route.estimate.toAmount);
-        const formattedAmount = utils.formatUnits(rawAmount, selectedToken.decimals);
-        const toAmountLessBuffer = Number(formattedAmount) * (1 - slippageTier);
+        const balance = BigNumber.from(selectedRouteData.amountData.balance.balance);
+        const formattedBalance = utils.formatUnits(balance, selectedRouteData.amountData.balance.decimals);
+        const balanceConverted = Number(formattedBalance) * Number(selectedRouteData.route.route.estimate.exchangeRate);
+        const slippageTier = getSlippageTier(0);
+        const toAmountLessBuffer = balanceConverted * (1 - slippageTier);
         const roundedAmount = toAmountLessBuffer.toFixed(6);
         setInputValue(roundedAmount);
         setSelectedAmount(roundedAmount);
