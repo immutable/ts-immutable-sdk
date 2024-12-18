@@ -27,7 +27,6 @@ export interface OptionsProps {
   insufficientBalance?: boolean;
   selectedIndex: number;
   displayPriceDetails?: boolean;
-  displayInsufficientGasWarning?: boolean;
 }
 
 export function RouteOptions({
@@ -41,7 +40,6 @@ export function RouteOptions({
   insufficientBalance,
   selectedIndex,
   displayPriceDetails,
-  displayInsufficientGasWarning,
 }: OptionsProps) {
   const { t } = useTranslation();
 
@@ -99,7 +97,6 @@ export function RouteOptions({
           selected={index === selectedIndex}
           rc={<motion.div variants={listItemVariants} />}
           displayPriceDetails={displayPriceDetails}
-          displayInsufficientGasWarning={displayInsufficientGasWarning}
         />
       ))}
       {noRoutes && (

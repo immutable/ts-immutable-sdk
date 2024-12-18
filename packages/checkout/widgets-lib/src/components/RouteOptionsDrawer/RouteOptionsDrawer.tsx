@@ -26,7 +26,6 @@ type OptionsDrawerProps = {
   showBridgeOption?: boolean;
   insufficientBalance?: boolean;
   displayPriceDetails?: boolean;
-  displayInsufficientGasWarning?: boolean;
 };
 
 export function RouteOptionsDrawer({
@@ -43,7 +42,6 @@ export function RouteOptionsDrawer({
   showBridgeOption,
   insufficientBalance,
   displayPriceDetails,
-  displayInsufficientGasWarning,
 }: OptionsDrawerProps) {
   const { t } = useTranslation();
   const { track } = useAnalytics();
@@ -131,7 +129,6 @@ export function RouteOptionsDrawer({
           insufficientBalance={insufficientBalance}
           selectedIndex={selectedRouteIndex.current}
           displayPriceDetails={displayPriceDetails}
-          displayInsufficientGasWarning={displayInsufficientGasWarning}
         />
       </Drawer.Content>
     </Drawer>
