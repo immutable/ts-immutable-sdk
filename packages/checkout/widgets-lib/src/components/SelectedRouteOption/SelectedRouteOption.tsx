@@ -73,7 +73,6 @@ export function SelectedRouteOption({
   displayPriceDetails = true,
   onClick,
 }: SelectedRouteOptionProps) {
-  console.log('SelectedRouteOption', routeData);
   const { t } = useTranslation();
 
   const { fromToken } = routeData?.amountData ?? {};

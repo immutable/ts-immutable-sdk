@@ -33,6 +33,9 @@ syncSendCount();
 
 const incrementSendCount = (clientId: string) => {
   syncSendCount();
+  if (!sendCount[clientId]) {
+    sendCount[clientId] = 0;
+  }
   sendCount[clientId]++;
   setItem(SESSION_ACTIVITY_COUNT_KEY, sendCount);
   // Reset checkCount to zero on sending
