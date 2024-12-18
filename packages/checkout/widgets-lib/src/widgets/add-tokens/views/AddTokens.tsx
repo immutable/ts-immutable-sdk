@@ -693,9 +693,16 @@ export function AddTokens({
     if (selectedRouteData?.route?.route?.estimate?.toAmount && selectedToken?.decimals) {
       try {
         const balance = BigNumber.from(selectedRouteData.amountData.balance.balance);
+        const balanceTokenInfo: TokenInfo = {
+          address: selectedRouteData.amountData.balance.address,
+          decimals: selectedRouteData.amountData.balance.decimals,
+          symbol: selectedRouteData.amountData.fromToken.symbol ?? '',
+          name: selectedRouteData.amountData.fromToken.name ?? '',
+        };
         const formattedBalance = utils.formatUnits(balance, selectedRouteData.amountData.balance.decimals);
+        const balanceUsd = convertToUsd(tokens, formattedBalance, balanceTokenInfo);
         const balanceConverted = Number(formattedBalance) * Number(selectedRouteData.route.route.estimate.exchangeRate);
-        const slippageTier = getSlippageTier(0);
+        const slippageTier = getSlippageTier(balanceUsd);
         const toAmountLessBuffer = balanceConverted * (1 - slippageTier);
         const roundedAmount = toAmountLessBuffer.toFixed(6);
         setInputValue(roundedAmount);
