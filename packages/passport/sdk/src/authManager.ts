@@ -481,16 +481,22 @@ export default class AuthManager {
       } catch (err) {
         let passportErrorType = PassportErrorType.AUTHENTICATION_ERROR;
         let errorMessage = 'Failed to refresh token';
+        let removeUser = true;
 
         if (err instanceof ErrorTimeout) {
           passportErrorType = PassportErrorType.SILENT_LOGIN_ERROR;
+          removeUser = false;
         } else if (err instanceof ErrorResponse) {
           passportErrorType = PassportErrorType.NOT_LOGGED_IN_ERROR;
-          errorMessage = `${err.message}: ${err.error_description}`;
+          errorMessage = `${errorMessage}: ${err.message || err.error_description}`;
         } else if (err instanceof Error) {
-          errorMessage = err.message;
+          errorMessage = `${errorMessage}: ${err.message}`;
         } else if (typeof err === 'string') {
           errorMessage = `${errorMessage}: ${err}`;
+        }
+
+        if (removeUser) {
+          await this.userManager.removeUser();
         }
 
         reject(new PassportError(errorMessage, passportErrorType));
