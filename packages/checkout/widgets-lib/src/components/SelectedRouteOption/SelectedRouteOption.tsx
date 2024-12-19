@@ -1,6 +1,8 @@
 import {
   AllDualVariantIconKeys,
+  Box,
   MenuItem,
+  ShimmerBox,
   Stack,
   Sticker,
   Tooltip,
@@ -28,6 +30,7 @@ export interface SelectedRouteOptionProps {
   withSelectedWallet?: boolean;
   insufficientBalance?: boolean;
   showOnrampOption?: boolean;
+  displayPriceDetails?: boolean;
 }
 
 function SelectedRouteOptionContainer({
@@ -67,6 +70,7 @@ export function SelectedRouteOption({
   withSelectedWallet = false,
   insufficientBalance = false,
   showOnrampOption = false,
+  displayPriceDetails = true,
   onClick,
 }: SelectedRouteOptionProps) {
   const { t } = useTranslation();
@@ -182,24 +186,58 @@ export function SelectedRouteOption({
             {`${t('views.ADD_TOKENS.fees.balance')} ${t(
               'views.ADD_TOKENS.fees.fiatPricePrefix',
             )} $${routeBalanceUsd}`}
-            {routeData?.isInsufficientGas && (
+            { displayPriceDetails && routeData?.isInsufficientGas && (
+              <>
+                <br />
+                <span style={{ color: '#FF637F' }}>
+                  {t('views.ADD_TOKENS.noGasRouteMessage', {
+                    token:
+              routeData.route.route.estimate.gasCosts[0].token.symbol,
+                  })}
+                </span>
+              </>
+            )}
+
+            { displayPriceDetails && routeData?.isInsufficientBalance && (
             <>
               <br />
               <span style={{ color: '#FF637F' }}>
-                {t('views.ADD_TOKENS.noGasRouteMessage', {
-                  token:
-              routeData.route.route.estimate.gasCosts[0].token.symbol,
-                })}
+                {t('views.ADD_TOKENS.noBalanceRouteMessage')}
               </span>
             </>
             )}
           </MenuItem.Caption>
         </Stack>
-        <MenuItem.PriceDisplay price={fromAmount}>
-          <MenuItem.PriceDisplay.Caption>
-            {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${fromAmountUsd}`}
-          </MenuItem.PriceDisplay.Caption>
-        </MenuItem.PriceDisplay>
+        {loading && displayPriceDetails ? (
+          <Box sx={{
+            display: 'inline-flex',
+            flexDirection: 'column',
+            alignItems: 'end',
+            gap: 'base.spacing.x2',
+          }}
+          >
+            <ShimmerBox
+              rc={<span />}
+              sx={{
+                w: '36px',
+                h: '16px',
+              }}
+            />
+            <ShimmerBox
+              rc={<span />}
+              sx={{
+                w: '72px',
+                h: '16px',
+              }}
+            />
+          </Box>
+        ) : (
+          <MenuItem.PriceDisplay price={fromAmount} sx={{ visibility: displayPriceDetails ? 'visible' : 'hidden' }}>
+            <MenuItem.PriceDisplay.Caption>
+              {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${fromAmountUsd}`}
+            </MenuItem.PriceDisplay.Caption>
+          </MenuItem.PriceDisplay>
+        )}
       </Stack>
     </SelectedRouteOptionContainer>
   );

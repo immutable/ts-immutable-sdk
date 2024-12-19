@@ -635,7 +635,8 @@
         "buttonText": "원하는 토큰을 선택하세요",
         "tokenLabel": "추가",
         "drawerHeading": "토큰 추가",
-        "searchPlaceholder": "토큰 검색"
+        "searchPlaceholder": "토큰 검색",
+        "maxAmountButton": "최대"
       },
       "walletSelection": {
         "from": {
@@ -853,7 +854,8 @@
         "primaryAction": "다른 옵션 시도하기",
         "secondaryAction": "{{token}} 더 추가하기"
       },
-      "noGasRouteMessage": "가스에 필요한 {{token}}이(가) 부족합니다"
+      "noGasRouteMessage": "가스에 필요한 {{token}}이(가) 부족합니다",
+      "noBalanceRouteMessage": "잔액 부족"
     }
   },
   "footers": {

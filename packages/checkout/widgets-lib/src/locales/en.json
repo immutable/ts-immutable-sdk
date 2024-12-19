@@ -655,7 +655,8 @@
         "buttonText": "Choose the token you want",
         "tokenLabel": "Add",
         "drawerHeading": "Add Token",
-        "searchPlaceholder": "Search tokens"
+        "searchPlaceholder": "Search tokens",
+        "maxAmountButton": "MAX"
       },
       "walletSelection": {
         "from":{
@@ -873,7 +874,8 @@
         "primaryAction": "Try another option",
         "secondaryAction": "Add more {{token}}"
       },
-      "noGasRouteMessage": "Insufficient {{token}} for gas"
+      "noGasRouteMessage": "Insufficient {{token}} for gas",
+      "noBalanceRouteMessage": "Insufficient balance"
     }
   },
   "footers": {

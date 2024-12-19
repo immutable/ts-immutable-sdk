@@ -30,6 +30,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
 import { ActionType } from '@0xsquid/squid-types';
 import { trackFlow } from '@imtbl/metrics';
+import { BigNumber, utils } from 'ethers';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
@@ -65,7 +66,7 @@ import { SquidFooter } from '../../../lib/squid/components/SquidFooter';
 import { TokenDrawerMenu } from '../components/TokenDrawerMenu';
 import { PULSE_SHADOW } from '../utils/animation';
 import { RouteData } from '../../../lib/squid/types';
-import { SQUID_NATIVE_TOKEN } from '../../../lib/squid/config';
+import { DEFAULT_DESTINATION_TOKEN, SQUID_NATIVE_TOKEN } from '../../../lib/squid/config';
 import { identifyUser } from '../../../lib/analytics/identifyUser';
 import { NotEnoughGasDrawer } from '../../../components/NotEnoughGasDrawer/NotEnoughGasDrawer';
 import { TOOLKIT_SQUID_URL } from '../utils/config';
@@ -102,7 +103,9 @@ export function AddTokens({
 }: AddTokensProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
+  const {
+    fetchRoutesWithRateLimit, fetchRoutesForBalancesWithRateLimit, resetRoutes, getSlippageTier,
+  } = useRoutes();
   const { showErrorHandover } = useError(config.environment);
 
   const {
@@ -148,8 +151,8 @@ export function AddTokens({
   );
   const [fetchingRoutes, setFetchingRoutes] = useState(false);
   const [insufficientBalance, setInsufficientBalance] = useState(false);
-  const [isAmountInputSynced, setIsAmountInputSynced] = useState(false);
   const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
+  const [showMaxAmount, setShowMaxAmount] = useState(false);
 
   const debouncedSetSelectedAmount = useRef(
     debounce((value: string) => {
@@ -168,15 +171,8 @@ export function AddTokens({
   );
 
   const setSelectedAmount = (value: string) => {
-    setIsAmountInputSynced(false);
     debouncedSetSelectedAmount.current(value);
   };
-
-  useEffect(() => {
-    if (selectedAmount === inputValue) {
-      setIsAmountInputSynced(true);
-    }
-  }, [selectedAmount, inputValue]);
 
   const setSelectedRouteData = (route: RouteData | undefined) => {
     if (route) {
@@ -201,6 +197,7 @@ export function AddTokens({
             (action) => action.type === ActionType.SWAP,
           ),
           isInsufficientGas: route.isInsufficientGas,
+          isInsufficientBalance: route.isInsufficientBalance,
         },
       });
     }
@@ -317,7 +314,6 @@ export function AddTokens({
   useEffect(() => {
     resetRoutes();
     setInsufficientBalance(false);
-    setSelectedRouteData(undefined);
 
     (async () => {
       const isValidAmount = validateToAmount(selectedAmount).isValid;
@@ -329,6 +325,7 @@ export function AddTokens({
         && isValidAmount
       ) {
         setFetchingRoutes(true);
+
         const availableRoutes = await fetchRoutesWithRateLimit(
           squid,
           tokens,
@@ -365,10 +362,75 @@ export function AddTokens({
   }, [balances, squid, selectedToken, selectedAmount]);
 
   useEffect(() => {
-    if (!selectedRouteData && routes.length > 0) {
-      setSelectedRouteData(routes[0]);
+    resetRoutes();
+    setInsufficientBalance(false);
+
+    if (!squid || !balances || !tokens || selectedAmount) return;
+
+    if (balances.length === 0) return;
+
+    const hasSelectedToken = selectedToken?.address;
+    const toToken = selectedToken?.address ?? DEFAULT_DESTINATION_TOKEN[ChainId.IMTBL_ZKEVM_MAINNET];
+
+    const preloadRoutes = async () => {
+      if (
+        balances
+        && squid
+        && tokens
+        && toToken
+      ) {
+        setFetchingRoutes(true);
+
+        const availableRoutes = await fetchRoutesForBalancesWithRateLimit(
+          squid,
+          tokens,
+          balances,
+          ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+          toToken === 'native'
+            ? SQUID_NATIVE_TOKEN
+            : toToken,
+          5,
+          1000,
+          isSwapAvailable,
+        );
+        setFetchingRoutes(false);
+
+        if (availableRoutes.length === 0) {
+          setInsufficientBalance(true);
+        }
+
+        if (!hasSelectedToken && availableRoutes.length > 1) {
+          setShowOptionsDrawer(true);
+        }
+      }
+    };
+
+    console.log('Preloading routes');
+    preloadRoutes();
+  }, [balances, squid, selectedToken, selectedAmount]);
+
+  const matchingRoute = useMemo(() => {
+    if (!selectedRouteData || routes.length === 0) return undefined;
+
+    return routes.find(
+      (route) => route.amountData.fromToken.address === selectedRouteData.amountData.fromToken.address
+      && route.amountData.fromToken.chainId === selectedRouteData.amountData.fromToken.chainId,
+    );
+  }, [routes, selectedRouteData]);
+
+  useEffect(() => {
+    if (routes.length === 0) return;
+
+    let routeToSelect = routes[0];
+
+    if (selectedRouteData) {
+      if (matchingRoute) {
+        routeToSelect = matchingRoute;
+      }
     }
-  }, [routes]);
+
+    setSelectedRouteData(routeToSelect);
+  }, [routes, matchingRoute]);
 
   useEffect(() => {
     if (!checkout) return;
@@ -530,6 +592,11 @@ export function AddTokens({
 
   const showInitialEmptyState = !selectedToken;
 
+  const shouldDisplayRoutesBasedOnBalances = useMemo(
+    () => (!!(selectedToken && fromAddress && validateToAmount(selectedAmount).isValid)),
+    [selectedToken, fromAddress, selectedAmount],
+  );
+
   useEffect(() => {
     if (inputRef.current && !showInitialEmptyState) {
       inputRef.current.focus();
@@ -538,11 +605,7 @@ export function AddTokens({
 
   const shouldShowBackButton = showBackButton && onBackButtonClick;
 
-  const routeInputsReady = !!selectedToken
-    && !!fromAddress
-    && validateToAmount(selectedAmount).isValid
-    && validateToAmount(inputValue).isValid
-    && isAmountInputSynced;
+  const routeInputsReady = Boolean(fromAddress);
 
   const loading = (routeInputsReady || fetchingRoutes)
     && !(selectedRouteData || insufficientBalance);
@@ -551,6 +614,7 @@ export function AddTokens({
     && !!toAddress
     && !!selectedRouteData
     && !selectedRouteData.isInsufficientGas
+    && !selectedRouteData.isInsufficientBalance
     && !loading;
 
   const handleWalletConnected = (
@@ -604,7 +668,7 @@ export function AddTokens({
   }, [id, experiments]);
 
   useEffect(() => {
-    if (selectedRouteData?.isInsufficientGas) {
+    if (selectedRouteData?.isInsufficientGas && shouldDisplayRoutesBasedOnBalances) {
       setShowNotEnoughGasDrawer(true);
     } else {
       setShowNotEnoughGasDrawer(false);
@@ -614,6 +678,32 @@ export function AddTokens({
   const handleToolkitClick = () => {
     setShowNotEnoughGasDrawer(false);
     window.open(TOOLKIT_SQUID_URL, '_blank');
+  };
+
+  useEffect(() => {
+    if (!balances || !selectedToken) return;
+    if (balances.length > 0 && selectedToken && !fetchingRoutes) {
+      setShowMaxAmount(true);
+    } else {
+      setShowMaxAmount(false);
+    }
+  }, [balances, selectedToken, fetchingRoutes]);
+
+  const handleMaxAmountClick = () => {
+    if (selectedRouteData?.route?.route?.estimate?.toAmount && selectedToken?.decimals) {
+      try {
+        const balance = BigNumber.from(selectedRouteData.amountData.balance.balance);
+        const formattedBalance = utils.formatUnits(balance, selectedRouteData.amountData.balance.decimals);
+        const balanceConverted = Number(formattedBalance) * Number(selectedRouteData.route.route.estimate.exchangeRate);
+        const slippageTier = getSlippageTier(0);
+        const toAmountLessBuffer = balanceConverted * (1 - slippageTier);
+        const roundedAmount = toAmountLessBuffer.toFixed(6);
+        setInputValue(roundedAmount);
+        setSelectedAmount(roundedAmount);
+      } catch (error) {
+        console.error('Error formatting max amount:', error);
+      }
+    }
   };
 
   return (
@@ -689,12 +779,21 @@ export function AddTokens({
                 placeholder="0"
                 maxTextSize="xLarge"
               />
-
               <HeroFormControl.Caption>
                 {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')}
                 $${getFormattedAmounts(selectedAmountUsd)}`}
               </HeroFormControl.Caption>
             </HeroFormControl>
+          )}
+          {showMaxAmount && (
+            <Button
+              testId="max-amount-button"
+              variant="tertiary"
+              size="small"
+              onClick={handleMaxAmountClick}
+            >
+              {t('views.ADD_TOKENS.tokenSelection.maxAmountButton')}
+            </Button>
           )}
         </Stack>
         <Stack
@@ -727,7 +826,7 @@ export function AddTokens({
                 setShowPayWithDrawer(true);
               }}
             >
-              {selectedToken && fromAddress && selectedAmount && isAmountInputSynced && (
+              {fromAddress && (
               <>
                 <MenuItem.BottomSlot.Divider
                   sx={fromAddress ? { ml: 'base.spacing.x4' } : undefined}
@@ -741,10 +840,10 @@ export function AddTokens({
                   withSelectedWallet={!!fromAddress}
                   insufficientBalance={insufficientBalance}
                   showOnrampOption={shouldShowOnRampOption}
+                  displayPriceDetails={shouldDisplayRoutesBasedOnBalances}
                 />
               </>
               )}
-
             </SelectedWallet>
             <Stack
               sx={{ pos: 'relative', h: 'base.spacing.x3' }}
@@ -812,6 +911,7 @@ export function AddTokens({
             onCardClick={handleCardClick}
             onRouteClick={handleRouteClick}
             insufficientBalance={insufficientBalance}
+            displayPriceDetails={shouldDisplayRoutesBasedOnBalances}
           />
           <DeliverToWalletDrawer
             visible={showDeliverToDrawer}

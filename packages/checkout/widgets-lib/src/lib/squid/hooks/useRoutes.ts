@@ -16,6 +16,8 @@ import {
 import { SquidPostHook } from '../../primary-sales';
 import { SQUID_NATIVE_TOKEN } from '../config';
 
+const MIN_BALANCE_FOR_ROUTES = 1;
+
 const BASE_SLIPPAGE_HIGH_TIER = 0.005;
 const BASE_SLIPPAGE_MEDIUM_TIER = 0.01;
 const BASE_SLIPPAGE_LOW_TIER = 0.015;
@@ -77,7 +79,7 @@ export const useRoutes = () => {
     chainId: string,
   ): Token | undefined => tokens.find(
     (value) => value.address.toLowerCase() === address.toLowerCase()
-        && value.chainId === chainId,
+      && value.chainId === chainId,
   );
 
   const calculateFromAmount = (
@@ -139,10 +141,12 @@ export const useRoutes = () => {
       toAmount,
       balance,
       additionalBuffer,
+      isInsufficientBalance: false,
+      isInsufficientGas: false,
     };
   };
 
-  const getSufficientFromAmounts = (
+  const getFromAmounts = (
     tokens: Token[],
     balances: TokenBalance[],
     toChainId: string,
@@ -152,24 +156,25 @@ export const useRoutes = () => {
     const filteredBalances = balances.filter(
       (balance) => !(
         balance.address.toLowerCase() === toTokenAddress.toLowerCase()
-          && balance.chainId === toChainId
+        && balance.chainId === toChainId
       ),
     );
 
-    const amountDataArray: AmountData[] = filteredBalances
-      .map((balance) => getAmountData(tokens, balance, toAmount, toChainId, toTokenAddress))
-      .filter((value) => value !== undefined);
+    return filteredBalances
+      .map((balance) => {
+        const amountData = getAmountData(tokens, balance, toAmount, toChainId, toTokenAddress);
+        if (!amountData) return null;
 
-    return amountDataArray.filter((data: AmountData) => {
-      const formattedBalance = utils.formatUnits(
-        data.balance.balance,
-        data.balance.decimals,
-      );
+        const formattedBalance = parseFloat(
+          utils.formatUnits(balance.balance, balance.decimals),
+        );
 
-      return (
-        parseFloat(formattedBalance.toString()) > parseFloat(data.fromAmount)
-      );
-    });
+        return {
+          ...amountData,
+          isInsufficientBalance: formattedBalance < parseFloat(amountData.fromAmount),
+        };
+      })
+      .filter((data) => data !== null);
   };
 
   const convertToFormattedAmount = (amount: string, decimals: number) => {
@@ -403,16 +408,20 @@ export const useRoutes = () => {
         const feeCost = getTotalFees(routeResponse, data.balance.chainId);
         const userGasBalance = findUserGasBalance(data.balance.chainId);
 
-        return {
-          amountData: data,
-          route: routeResponse.route,
-          isInsufficientGas: !hasSufficientNativeTokenBalance(
+        const isInsufficientGas = !data.isInsufficientBalance
+          && !hasSufficientNativeTokenBalance(
             userGasBalance,
             data.fromAmount,
             data.fromToken,
             gasCost,
             feeCost,
-          ),
+          );
+
+        return {
+          amountData: data,
+          route: routeResponse.route,
+          isInsufficientGas,
+          isInsufficientBalance: data.isInsufficientBalance,
         } as RouteData;
       } catch (error) {
         return null;
@@ -439,7 +448,7 @@ export const useRoutes = () => {
   ): Promise<RouteData[]> => {
     const currentRequestId = ++latestRequestIdRef.current;
 
-    let fromAmountDataArray = getSufficientFromAmounts(
+    let fromAmountDataArray = getFromAmounts(
       tokens,
       balances,
       toChanId,
@@ -492,10 +501,96 @@ export const useRoutes = () => {
     return sortedRoutes;
   };
 
+  const fetchRoutesForBalancesWithRateLimit = async (
+    squid: Squid,
+    tokens: Token[],
+    balances: TokenBalance[],
+    toChainId: string,
+    toTokenAddress: string,
+    bulkNumber = 5,
+    delayMs = 1000,
+    isSwapAllowed = true,
+  ): Promise<RouteData[]> => {
+    const currentRequestId = ++latestRequestIdRef.current;
+
+    let fromAmountDataArray = balances
+      .filter((balance) => !(
+        balance.address.toLowerCase() === toTokenAddress.toLowerCase()
+        && balance.chainId.toString() === toChainId
+      ))
+      .map((balance) => {
+        const fromToken = findToken(tokens, balance.address, balance.chainId.toString());
+        const toToken = findToken(tokens, toTokenAddress, toChainId);
+
+        if (!fromToken || !toToken) return undefined;
+
+        const fromAmount = utils.formatUnits(balance.balance, balance.decimals);
+        // Skip tokens with total USD value less than $1
+        const balanceUsdValue = parseFloat(fromAmount) * fromToken.usdPrice;
+        if (balanceUsdValue < MIN_BALANCE_FOR_ROUTES) return undefined;
+
+        return {
+          fromToken,
+          fromAmount,
+          toToken,
+          toAmount: '0', // This will be determined by the route
+          balance,
+          additionalBuffer: 0,
+        } as AmountData;
+      })
+      .filter((data): data is AmountData => data !== undefined);
+
+    if (!isSwapAllowed) {
+      fromAmountDataArray = fromAmountDataArray.filter(
+        (amountData) => amountData.balance.chainId !== toChainId,
+      );
+    }
+
+    let allRoutes: RouteData[] = [];
+    await Promise.all(
+      fromAmountDataArray
+        .reduce((acc, _, i) => {
+          if (i % bulkNumber === 0) {
+            acc.push(fromAmountDataArray.slice(i, i + bulkNumber));
+          }
+          return acc;
+        }, [] as (typeof fromAmountDataArray)[])
+        .map(async (slicedFromAmountDataArray) => {
+          allRoutes.push(
+            ...(await getRoutesWithFeesValidation(
+              squid,
+              toTokenAddress,
+              balances,
+              slicedFromAmountDataArray,
+            )),
+          );
+          await delay(delayMs);
+        }),
+    );
+
+    if (!isSwapAllowed) {
+      allRoutes = allRoutes.filter(
+        (routeData) => !routeData.route.route.estimate.actions.find(
+          (action) => action.type === ActionType.SWAP,
+        ),
+      );
+    }
+
+    const sortedRoutes = sortRoutesByFastestTime(allRoutes);
+    // Only update routes if the request is the latest one
+    if (currentRequestId === latestRequestIdRef.current) {
+      setRoutes(sortedRoutes);
+    }
+
+    return sortedRoutes;
+  };
+
   return {
     fetchRoutesWithRateLimit,
+    fetchRoutesForBalancesWithRateLimit,
     getAmountData,
     getRoute,
     resetRoutes,
+    getSlippageTier,
   };
 };

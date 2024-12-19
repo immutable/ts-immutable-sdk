@@ -635,7 +635,8 @@
         "buttonText": "选择您想要的代币",
         "tokenLabel": "添加",
         "drawerHeading": "添加代币",
-        "searchPlaceholder": "搜索代币"
+        "searchPlaceholder": "搜索代币",
+        "maxAmountButton": "最大"
       },
       "walletSelection": {
         "from": {
@@ -853,7 +854,8 @@
         "primaryAction": "尝试其他选项",
         "secondaryAction": "添加更多 {{token}}"
       },
-      "noGasRouteMessage": "用于燃料费的 {{token}} 不足"
+      "noGasRouteMessage": "用于燃料费的 {{token}} 不足",
+      "noBalanceRouteMessage": "余额不足"
     }
   },
   "footers": {
