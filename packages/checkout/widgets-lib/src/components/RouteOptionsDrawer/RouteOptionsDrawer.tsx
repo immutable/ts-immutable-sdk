@@ -25,6 +25,7 @@ type OptionsDrawerProps = {
   showSwapOption?: boolean;
   showBridgeOption?: boolean;
   insufficientBalance?: boolean;
+  displayPriceDetails?: boolean;
 };
 
 export function RouteOptionsDrawer({
@@ -40,6 +41,7 @@ export function RouteOptionsDrawer({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   showBridgeOption,
   insufficientBalance,
+  displayPriceDetails,
 }: OptionsDrawerProps) {
   const { t } = useTranslation();
   const { track } = useAnalytics();
@@ -126,6 +128,7 @@ export function RouteOptionsDrawer({
           showOnrampOption={showOnrampOption}
           insufficientBalance={insufficientBalance}
           selectedIndex={selectedRouteIndex.current}
+          displayPriceDetails={displayPriceDetails}
         />
       </Drawer.Content>
     </Drawer>
