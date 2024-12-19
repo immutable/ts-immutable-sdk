@@ -8,7 +8,7 @@ type PassportContextType = {
     passportInstance?: passport.Passport;
     passportSilentInstance?: passport.Passport;
     imxWalletAddress?: string;
-    login?: () => void;
+    login?: () => Promise<string | undefined>;
     logout?: () => void;
     getUserInfo?: () => Promise<passport.UserProfile | null>;
     getLinkedAddresses?: () => Promise<string[] | null>;
@@ -49,6 +49,8 @@ export function PassportProvider({ children }: { children: React.ReactNode }) {
         } catch (error) {
             console.error('login: Error connecting', error);
         }
+
+        return imxWalletAddress;
     }, [passportInstance]);
 
     const logout = useCallback(async () => {
@@ -95,7 +97,7 @@ export function PassportProvider({ children }: { children: React.ReactNode }) {
     }, [passportInstance]);
 
     const burn = useCallback(async (nfts: { tokenId: string; tokenAddress: string }[]): Promise<void> => {
-        if (!passportInstance || !imxWalletAddress) {
+        if (!passportInstance) {
             console.log('burn: No passport instance or wallet address available');
             return;
         }
@@ -117,7 +119,7 @@ export function PassportProvider({ children }: { children: React.ReactNode }) {
         } catch (error) {
             console.error('burn: Error burning tokens', error);
         }
-    }, [passportInstance, imxWalletAddress]);
+    }, [passportInstance]);
 
     const providerValue = useMemo(() => {
         console.log('PassportProvider: Creating provider value');
