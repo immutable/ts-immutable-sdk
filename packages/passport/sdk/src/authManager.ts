@@ -485,6 +485,7 @@ export default class AuthManager {
 
         if (err instanceof ErrorTimeout) {
           passportErrorType = PassportErrorType.SILENT_LOGIN_ERROR;
+          errorMessage = `${errorMessage}: ${err.message}`;
           removeUser = false;
         } else if (err instanceof ErrorResponse) {
           passportErrorType = PassportErrorType.NOT_LOGGED_IN_ERROR;
