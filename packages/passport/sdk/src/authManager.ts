@@ -496,7 +496,13 @@ export default class AuthManager {
         }
 
         if (removeUser) {
-          await this.userManager.removeUser();
+          try {
+            await this.userManager.removeUser();
+          } catch (removeUserError) {
+            if (removeUserError instanceof Error) {
+              errorMessage = `${errorMessage}: Failed to remove user: ${removeUserError.message}`;
+            }
+          }
         }
 
         reject(new PassportError(errorMessage, passportErrorType));
