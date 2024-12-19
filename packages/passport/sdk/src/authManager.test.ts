@@ -460,7 +460,7 @@ describe('AuthManager', () => {
 
       await expect(() => authManager.getUser()).rejects.toThrow(
         new PassportError(
-          'Failed to refresh token: oops',
+          'Failed to refresh token: oops: Failed to remove user: this.userManager.removeUser is not a function',
           PassportErrorType.AUTHENTICATION_ERROR,
         ),
       );
