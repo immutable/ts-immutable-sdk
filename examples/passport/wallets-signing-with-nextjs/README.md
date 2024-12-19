@@ -24,7 +24,7 @@ The `forceScwDeployBeforeMessageSignature` flag has no effect if you're using EI
 Install your dependencies:
 
 ```bash
-yarn install
+pnpm install
 ```
 
 Copy over the `.env.example` file to `.env` and fill in the required environment variables.

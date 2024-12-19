@@ -2,6 +2,9 @@
   "entryPoints": [
     "sdk/",
   ],
+  "compilerOptions": {
+    "customConditions": ["default"]
+  },
   "name": "ts-immutable-sdk",
   "entryPointStrategy": "packages",
   "excludeReferences": true,

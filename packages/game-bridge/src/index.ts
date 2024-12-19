@@ -373,7 +373,7 @@ window.callFunction = async (jsonData: string) => {
         break;
       }
       case PASSPORT_FUNCTIONS.getPKCEAuthUrl: {
-        const url = getPassportClient().loginWithPKCEFlow();
+        const url = await getPassportClient().loginWithPKCEFlow();
         trackDuration(moduleName, 'performedGetPkceAuthUrl', mt(markStart));
         callbackToGame({
           responseFor: fxName,
