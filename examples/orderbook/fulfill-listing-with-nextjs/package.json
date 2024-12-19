@@ -10,6 +10,8 @@
     "test": "playwright test"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.5",
+    "embla-carousel-react": "^8.5.1",
     "@biom3/react": "^0.27.10",
     "@imtbl/sdk": "latest",
     "ethers": "^5.7.2",
