@@ -19,8 +19,12 @@ const syncSendCount = () => {
   sendCount = getItem(SESSION_ACTIVITY_COUNT_KEY) || {};
   const sendDay = getItem(SESSION_ACTIVITY_DAY_KEY);
 
-  // If no day, set count to zero. If not today, reset sendCount to 0
-  const today = new Date().toISOString().split('T')[0];
+  // If no day, init sendCount. If not today, reset sendCount
+  const date = new Date();
+  const yyyy = date.getFullYear();
+  const mm = `${date.getMonth() + 1}`.padStart(2, '0');
+  const dd = `${date.getDate()}`.padStart(2, '0');
+  const today = `${yyyy}-${mm}-${dd}`;
   if (!sendDay || sendDay !== today) {
     sendCount = {};
   }
