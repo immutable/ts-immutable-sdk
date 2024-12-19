@@ -854,7 +854,8 @@
         "primaryAction": "다른 옵션 시도하기",
         "secondaryAction": "{{token}} 더 추가하기"
       },
-      "noGasRouteMessage": "가스에 필요한 {{token}}이(가) 부족합니다"
+      "noGasRouteMessage": "가스에 필요한 {{token}}이(가) 부족합니다",
+      "noBalanceRouteMessage": "잔액 부족"
     }
   },
   "footers": {

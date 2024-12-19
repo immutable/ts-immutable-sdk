@@ -115,11 +115,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
         <>
           <br />
           <span style={{ color: '#FF637F' }}>
-            {/* {t('views.ADD_TOKENS.noBalanceRouteMessage', {
-              token: fromToken.symbol,
-            })} */}
-            {' '}
-            Insufficient balance
+            {t('views.ADD_TOKENS.noBalanceRouteMessage')}
           </span>
         </>
         )}

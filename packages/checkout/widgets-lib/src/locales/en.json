@@ -874,7 +874,8 @@
         "primaryAction": "Try another option",
         "secondaryAction": "Add more {{token}}"
       },
-      "noGasRouteMessage": "Insufficient {{token}} for gas"
+      "noGasRouteMessage": "Insufficient {{token}} for gas",
+      "noBalanceRouteMessage": "Insufficient balance"
     }
   },
   "footers": {
