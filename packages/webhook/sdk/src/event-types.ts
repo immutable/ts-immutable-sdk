@@ -293,10 +293,10 @@ export interface ZkevmOrderUpdated {
     chain_id: string;
     end_time: number;
     signature: string;
-    buyer_fees: {
+    fees: {
       amount: string;
-      fee_type: string;
-      recipient: string;
+      type: string;
+      recipient_address: string;
     }[];
     created_at: number;
     start_time: number;
