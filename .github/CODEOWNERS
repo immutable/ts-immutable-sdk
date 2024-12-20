@@ -1,5 +1,5 @@
 * @immutable/sdk
-./github/CODEOWNERS @immutable/security @immutable/sdk
+./github @immutable/security @immutable/sdk
 /.husky @immutable/sdk
 /.nvmrc @immutable/sdk
 /sdk @immutable/sdk
