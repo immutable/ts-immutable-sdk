@@ -8,7 +8,6 @@ import {
   WebStorageStateStore,
 } from 'oidc-client-ts';
 import axios from 'axios';
-import * as crypto from 'crypto';
 import jwt_decode from 'jwt-decode';
 import { getDetail, Detail } from '@imtbl/metrics';
 import localForage from 'localforage';
@@ -93,15 +92,17 @@ function wait(ms: number) {
   });
 }
 
-function base64URLEncode(str: Buffer) {
-  return str.toString('base64')
+function base64URLEncode(str: ArrayBuffer) {
+  return btoa(String.fromCharCode(...new Uint8Array(str)))
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=/g, '');
 }
 
-function sha256(buffer: string) {
-  return crypto.createHash('sha256').update(buffer).digest();
+async function sha256(buffer: string) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(buffer);
+  return await window.crypto.subtle.digest('SHA-256', data);
 }
 
 export default class AuthManager {
@@ -355,12 +356,12 @@ export default class AuthManager {
     return response.data;
   }
 
-  public getPKCEAuthorizationUrl(): string {
-    const verifier = base64URLEncode(crypto.randomBytes(32));
-    const challenge = base64URLEncode(sha256(verifier));
+  public async getPKCEAuthorizationUrl(): Promise<string> {
+    const verifier = base64URLEncode(window.crypto.getRandomValues(new Uint8Array(32)));
+    const challenge = base64URLEncode(await sha256(verifier));
 
     // https://auth0.com/docs/secure/attack-protection/state-parameters
-    const state = base64URLEncode(crypto.randomBytes(32));
+    const state = base64URLEncode(window.crypto.getRandomValues(new Uint8Array(32)));
 
     const {
       redirectUri, scope, audience, clientId,

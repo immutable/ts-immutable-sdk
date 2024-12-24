@@ -13,7 +13,6 @@ import type {
   OrderComponents,
 } from '@opensea/seaport-js/lib/types';
 import { BigNumber, providers } from 'ethers';
-import { OrderType } from '@opensea/seaport-js/lib/constants';
 import {
   ActionType,
   TransactionAction,
@@ -27,6 +26,7 @@ import { ProtocolData, Order, OrderStatusName } from '../openapi/sdk';
 import {
   EIP_712_ORDER_TYPE,
   ItemType,
+  OrderType,
   SEAPORT_CONTRACT_NAME,
   SEAPORT_CONTRACT_VERSION_V1_5,
 } from './constants';

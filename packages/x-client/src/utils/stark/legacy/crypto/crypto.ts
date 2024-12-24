@@ -1,34 +1,22 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-plusplus */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import assert from 'assert';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
 // @ts-ignore
 import elliptic from 'elliptic';
 import * as encUtils from 'enc-utils';
-// import { hdkey } from 'ethereumjs-wallet';
-import * as ethereumJsWallet from 'ethereumjs-wallet';
+import { hdkey } from '@ethereumjs/wallet';
 import hashJS from 'hash.js';
 
 import {
-  MISSING_HEX_PREFIX,
   ORDER,
-  PRIME_BN,
   SECP_ORDER,
   starkEc,
-  ZERO_BN,
 } from './constants';
 
 export function isHexPrefixed(str: string): boolean {
   return str.substring(0, 2) === '0x';
-}
-
-export function checkHexValue(hex: string): void {
-  assert(isHexPrefixed(hex), MISSING_HEX_PREFIX);
-  const hexBn = new BN(encUtils.removeHexPrefix(hex), 16);
-  assert(hexBn.gte(ZERO_BN));
-  assert(hexBn.lt(PRIME_BN));
 }
 
 export function getIntFromBits(
@@ -88,17 +76,17 @@ export function getKeyPair(privateKey: string): elliptic.ec.KeyPair {
 }
 
 export function getPrivateKeyFromPath(seed: string, path: string): string {
-  return ethereumJsWallet.hdkey
-    .fromMasterSeed(Buffer.from(seed.slice(2), 'hex')) // assuming seed is '0x...'
+  const seedArrayIterable = seed.slice(2).match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16));
+  if (!seedArrayIterable) {
+    throw new Error('Seed is not a valid hex string');
+  }
+  const uint8ArrayFromHexString = Uint8Array.from(seedArrayIterable);
+
+  return hdkey.EthereumHDKey
+    .fromMasterSeed(uint8ArrayFromHexString) // assuming seed is '0x...'
     .derivePath(path)
     .getWallet()
     .getPrivateKeyString();
-}
-
-export function getKeyPairFromPath(seed: string, path: string): elliptic.ec.KeyPair {
-  assert(isHexPrefixed(seed), MISSING_HEX_PREFIX);
-  const privateKey = getPrivateKeyFromPath(seed, path);
-  return getKeyPair(grindKey(privateKey));
 }
 
 export function getPublic(keyPair: elliptic.ec.KeyPair, compressed = false): string {

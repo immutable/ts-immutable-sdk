@@ -1,7 +1,8 @@
 ### Hi👋, please prefix this PR's title with:
-<!-- This will give consistant Release changelog to the public -->
-- [ ] `breaking-change:` if you have introduced modification that necessitates immediate adjustments by this SDK's users to their applications, clients, or integrations to avert disruptions to existing features or functionalities.
-- [ ] `feat:`, `fix:`, `refactor:`, `docs:`, or `chore:`.
+<!-- This will allow for auto-generated changelog entries in Github releases -->
+<!-- Valid types: feat, fix, refactor, style, test, docs, build, ops, chore -->
+- [ ] PR is titled with conventional commit style naming: `type(scope): message`. For example: `feat(passport): my new feature`
+- [ ] If you have introduced modification that necessitates immediate adjustments by this SDK's users to their applications, clients, or integrations to avert disruptions to existing features or functionalities, add a `!` after the `type(scope)`, for example `feat(passport)!: my new breaking feature`
 
 # Summary
 <!-- Keep it short. This is publicly viewable as part of the Changelog / Releases. -->

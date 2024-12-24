@@ -13,7 +13,6 @@ const config: Config = {
   moduleNameMapper: {
     "@imtbl/sdk/config": "<rootDir>/../../../node_modules/@imtbl/sdk/dist/config",
     "@imtbl/sdk/x": "<rootDir>/../../../node_modules/@imtbl/sdk/dist/x",
-    "@imtbl/generated-clients": "<rootDir>/../../../node_modules/@imtbl/generated-clients/dist",
   },
   transform: {
     "^.+\\.(t|j)sx?$": "@swc/jest"
