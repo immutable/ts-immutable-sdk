@@ -15,7 +15,7 @@ The linter has been configured to ignore any folders called sample-app !!
 
 ### Linting pre-commit Workflow
 
-The repository has been setup with a pre-commit hook that will lint any files that have been staged. This will prevent pushing any unlinted files to GitHub.
+The repository has been set up with a pre-commit hook that will lint any files that have been staged. This will prevent pushing any unlinted files to GitHub.
 
 You will need to fix any linting issues locally before being allowed to commit anything. You can either fix the linting issues manually or use the lint:path command with the --fix argument and specify the path to the files you want to lint fix.
 
