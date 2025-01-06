@@ -4,10 +4,10 @@ This React application allows users to migrate their NFTs from Immutable X to Im
 
 ## Features
 
-- **Login with Passport**: Securely connect your wallet using Immutable Passport.
-- **View Immutable X Assets**: Display NFTs available for migration from Immutable X.
-- **View zkEVM Assets**: Display NFTs on zkEVM, including those migrated from Immutable X.
-- **Migrate NFTs**: Initiate a burn on Immutable X and mint the equivalent NFT on zkEVM.
+- **Login with Passport or Link for IMX**: Securely connect your wallet using Immutable Passport or Link for Immutable X.
+- **Login with Passport for zkEVM**: Connect your wallet using Immutable Passport for zkEVM.
+- **Stage Assets for Migration**: Stage your assets before initiating the migration process.
+- **Migrate All NFTs**: Click "Migrate All" to burn all staged assets on Immutable X and mint them on zkEVM.
 
 ## Prerequisites
 
@@ -34,6 +34,8 @@ This React application allows users to migrate their NFTs from Immutable X to Im
     NEXT_PUBLIC_PUBLISHABLE_KEY=
     NEXT_PUBLIC_CLIENT_ID=
     NEXT_PUBLIC_API_KEY=
+    NEXT_PUBLIC_IMX_COLLECTION_ADDRESS= # Add your IMX collection address
+    NEXT_PUBLIC_ZKEVM_COLLECTION_ADDRESS= # Add your zkEVM collection address
    ```
 
 3. **Start the development server**:
@@ -46,18 +48,19 @@ This React application allows users to migrate their NFTs from Immutable X to Im
 ## Usage
 
 1. **Connect Wallet**
-   - Click "Connect Wallet" to authenticate using Passport
+   - Click "Connect Wallet" to authenticate using Link or Passport for IMX
    - Approve the connection request
+   - For zkEVM, click "Connect Wallet" to authenticate using Passport only
 
 2. **View Your NFTs**
    - **IMX NFTs**: Shows your available NFTs for migration
    - **zkEVM NFTs**: Shows your NFTs on zkEVM network
 
 3. **Migrate NFTs**
-   - Select an NFT from your IMX collection
-   - Click "Migrate" to initiate the transfer to the burn address
-   - The backend will detect the burn and mint on zkEVM
-   - New NFT will appear in the zkEVM tab once minted
+   - Stage your NFTs for migration
+   - Click "Migrate All" to initiate the transfer to the burn address
+   - The backend will detect the burns and mint on zkEVM
+   - New NFTs will appear in the zkEVM tab once minted
 
 ## Development
 
