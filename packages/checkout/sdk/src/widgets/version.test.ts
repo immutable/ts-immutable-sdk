@@ -1,7 +1,7 @@
 import { SDK_VERSION_MARKER } from '../env';
 import { CheckoutWidgetsVersionConfig } from '../types';
 import { SemanticVersion } from './definitions/types';
-import { determineWidgetsVersion, getLatestVersionFromNpm, validateAndBuildVersion } from './version';
+import { determineWidgetsVersion, validateAndBuildVersion } from './version';
 
 describe('CheckoutWidgets', () => {
   const SDK_VERSION = SDK_VERSION_MARKER;
@@ -341,79 +341,6 @@ describe('CheckoutWidgets', () => {
         );
         expect(widgetVersion).toEqual(testCase.expectedVersion);
       });
-    });
-  });
-
-  describe('Get Latest Version from NPM', () => {
-    beforeEach(() => {
-      global.fetch = jest.fn();
-    });
-
-    afterEach(() => {
-      jest.restoreAllMocks();
-    });
-
-    it('should return the latest version when the fetch succeeds', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          version: '1.82.3',
-        }),
-      });
-
-      const version = await getLatestVersionFromNpm();
-      expect(version).toBe('1.82.3');
-    });
-
-    it('should return "latest" if the response is not ok', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: false,
-        json: async () => ({}),
-      });
-
-      const version = await getLatestVersionFromNpm();
-      expect(version).toBe('latest');
-    });
-
-    it('should return "latest" if the response has no "dist-tags"', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({}),
-      });
-
-      const version = await getLatestVersionFromNpm();
-      expect(version).toBe('latest');
-    });
-
-    it('should return "latest" if the "latest" tag is empty or missing', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          'dist-tags': { latest: '' },
-        }),
-      });
-
-      const version = await getLatestVersionFromNpm();
-      expect(version).toBe('latest');
-    });
-
-    it('should return "latest" if fetch throws a network error', async () => {
-      (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network Error'));
-
-      const version = await getLatestVersionFromNpm();
-      expect(version).toBe('latest');
-    });
-
-    it('should return "latest" if the JSON response is invalid', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => {
-          throw new Error('Invalid JSON');
-        },
-      });
-
-      const version = await getLatestVersionFromNpm();
-      expect(version).toBe('latest');
     });
   });
 });

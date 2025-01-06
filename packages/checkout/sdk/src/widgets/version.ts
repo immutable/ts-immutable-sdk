@@ -55,17 +55,16 @@ export function validateAndBuildVersion(
 }
 
 /**
- * Fetches the latest version of the package from the NPM registry.
- * Loads a specific latest version instead of relying on the latest tag helps with caching issues.
- * Falls back to 'latest' if an error occurs or if the response is invalid.
+ * Fetches the latest version of the package from the JSDelivr version.json file.
+ * Falls back to 'latest' if an error occurs or the response is invalid.
  * @returns {Promise<string>} A promise resolving to the latest version string or 'latest'.
  */
-export async function getLatestVersionFromNpm(): Promise<string> {
-  const npmRegistryUrl = 'https://registry.npmjs.org/@imtbl/sdk/latest';
+export async function getLatestVersion(): Promise<string> {
+  const cacheBustingUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@latest/dist/version.json?t=${Date.now()}`;
   const fallbackVersion = 'latest';
 
   try {
-    const response = await fetch(npmRegistryUrl);
+    const response = await fetch(cacheBustingUrl);
 
     if (!response.ok) {
       return fallbackVersion;
@@ -101,40 +100,6 @@ function latestCompatibleVersion(
 }
 
 /**
- * Checks if the last_updated.json file exists on the CDN and validates its timestamp.
- * @param {string} version - The version to check.
- * @returns {Promise<boolean>} A promise resolving to `true` if last_updated.json exists and is older than 15 minutes, `false` otherwise.
- */
-async function checkLastUpdatedTimestamp(version: string): Promise<boolean> {
-  const WAIT_TIME_IN_MINUTES = 45;
-
-  const lastUpdatedJsonUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${version}/dist/last_updated.json`;
-
-  try {
-    const response = await fetch(lastUpdatedJsonUrl);
-
-    if (!response.ok) {
-      return false;
-    }
-
-    const lastUpdatedData = await response.json();
-
-    if (lastUpdatedData.timestamp) {
-      const timestamp = new Date(lastUpdatedData.timestamp);
-      const now = new Date();
-      const diffInMs = now.getTime() - timestamp.getTime();
-      const diffInMinutes = diffInMs / (1000 * 60);
-
-      return diffInMinutes > WAIT_TIME_IN_MINUTES;
-    }
-  } catch (error) {
-    return false;
-  }
-
-  return false;
-}
-
-/**
  * Determines the version of the widgets to use based on the provided validated build version and checkout version config.
  * If a version is provided in the widget init parameters, it uses that version.
  * If the build version is an alpha, it uses that version.
@@ -165,15 +130,9 @@ export async function determineWidgetsVersion(
     versionConfig.compatibleVersionMarkers,
   );
 
-  // If `latest` is returned, query NPM registry for the actual latest version and check timestamp
+  // If `latest` is returned, query CDN for the actual latest version
   if (compatibleVersion === 'latest') {
-    const latestVersion = await getLatestVersionFromNpm();
-
-    if (await checkLastUpdatedTimestamp(latestVersion)) {
-      return latestVersion;
-    }
-
-    return 'latest';
+    return await getLatestVersion();
   }
 
   return compatibleVersion;
