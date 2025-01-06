@@ -94,12 +94,6 @@ jobs:
         id: version
         run: |
           echo "NEXT_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
-          
-      - name: Generate version.json
-        if: (env.DRY_RUN) == 'false'
-        run: |
-          echo '{ "version": "${{ steps.version.outputs.NEXT_VERSION }}" }' > ./sdk/version.json
-          cp ./sdk/version.json ./sdk/dist/
 
       - name: Typecheck
         run: yarn typecheck
@@ -118,6 +112,12 @@ jobs:
           export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ env.RELEASE_TYPE }} yarn build
           ls -l ./sdk/dist/browser/checkout || echo 1
           [ -d "./sdk/dist/browser/checkout" ] || { echo "Error: Directory does not exist." && exit 1; }
+
+      - name: Generate version.json
+        if: (env.DRY_RUN) == 'false'
+        run: |
+          echo '{ "version": "${{ steps.version.outputs.NEXT_VERSION }}" }' > ./sdk/version.json
+          cp ./sdk/version.json ./sdk/dist/
 
       - name: Push tags
         # Boolean inputs are not actually booleans, see https://github.com/actions/runner/issues/1483
