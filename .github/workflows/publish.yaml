@@ -128,7 +128,7 @@ jobs:
       - name: Pre Release Step
         if: contains(env.RELEASE_TYPE, 'alpha')
         id: pre_release
-        uses: JS-DevTools/npm-publish@v3
+        uses: JS-DevTools/npm-publish@19c28f1ef146469e409470805ea4279d47c3d35c
         with:
           token: ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
           access: public
