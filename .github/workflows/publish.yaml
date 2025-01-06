@@ -96,6 +96,7 @@ jobs:
           echo "NEXT_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
           
       - name: Generate version.json
+        if: (env.DRY_RUN) == 'false'
         run: |
           echo '{ "version": "${{ steps.version.outputs.NEXT_VERSION }}" }' > ./sdk/version.json
           cp ./sdk/version.json ./sdk/dist/
@@ -186,7 +187,7 @@ jobs:
         with:
           message: "❌ Failed to publish SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM. ${{ github.triggering_actor }} please check the logs for more details."
 
-    - name: Wait for NPM @latest Update
+      - name: Wait for NPM @latest Update
         id: wait_for_npm_update
         if: contains(env.RELEASE_TYPE, 'release') && env.DRY_RUN == 'false'
         run: |
