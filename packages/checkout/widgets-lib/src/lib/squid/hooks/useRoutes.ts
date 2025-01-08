@@ -5,7 +5,7 @@ import { utils } from 'ethers';
 import { useContext, useRef } from 'react';
 import { delay } from '../../../functions/delay';
 import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
-import { AddTokensActions, AddTokensContext } from '../../../widgets/add-tokens/context/AddTokensContext';
+import { AddTokensContext } from '../../../widgets/add-tokens/context/AddTokensContext';
 import { retry } from '../../retry';
 import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
@@ -22,7 +22,7 @@ import { useRouteCalculation } from './useRouteCalculation';
 export const useRoutes = () => {
   const latestRequestIdRef = useRef<number>(0);
 
-  const { addTokensState: { id }, addTokensDispatch } = useContext(AddTokensContext);
+  const { addTokensState: { id } } = useContext(AddTokensContext);
 
   const {
     providersState: {
@@ -33,19 +33,6 @@ export const useRoutes = () => {
   const { track } = useAnalytics();
 
   const { calculateFromAmount, calculateFromAmountFromRoute, convertToFormattedFromAmount } = useRouteCalculation();
-
-  const setRoutes = (routes: RouteData[]) => {
-    addTokensDispatch({
-      payload: {
-        type: AddTokensActions.SET_ROUTES,
-        routes,
-      },
-    });
-  };
-
-  const resetRoutes = () => {
-    setRoutes([]);
-  };
 
   const getFromAmountData = (
     tokens: Token[],
@@ -405,18 +392,18 @@ export const useRoutes = () => {
     }
 
     const sortedRoutes = sortRoutesByFastestTime(allRoutes);
-    // Only update routes if the request is the latest one
+
+    // Only return routes if the request is the latest one
     if (currentRequestId === latestRequestIdRef.current) {
-      setRoutes(sortedRoutes);
+      return sortedRoutes;
     }
 
-    return sortedRoutes;
+    return [];
   };
 
   return {
     fetchRoutes,
     getFromAmountData,
     getRoute,
-    resetRoutes,
   };
 };

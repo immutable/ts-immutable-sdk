@@ -101,7 +101,7 @@ export function AddTokens({
 }: AddTokensProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { fetchRoutes, resetRoutes } = useRoutes();
+  const { fetchRoutes } = useRoutes();
   const { showErrorHandover } = useError(config.environment);
 
   const {
@@ -169,6 +169,15 @@ export function AddTokens({
   const setSelectedAmount = (value: string) => {
     setIsAmountInputSynced(false);
     debouncedSetSelectedAmount.current(value);
+  };
+
+  const resetRoutes = () => {
+    addTokensDispatch({
+      payload: {
+        type: AddTokensActions.SET_ROUTES,
+        routes: [],
+      },
+    });
   };
 
   useEffect(() => {
@@ -328,6 +337,7 @@ export function AddTokens({
         && isValidAmount
       ) {
         setFetchingRoutes(true);
+
         const availableRoutes = await fetchRoutes(
           squid,
           tokens,
@@ -341,6 +351,14 @@ export function AddTokens({
           1000,
           isSwapAvailable,
         );
+
+        addTokensDispatch({
+          payload: {
+            type: AddTokensActions.SET_ROUTES,
+            routes: availableRoutes,
+          },
+        });
+
         setFetchingRoutes(false);
 
         track({
