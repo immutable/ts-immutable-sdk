@@ -17,35 +17,7 @@ import { SquidPostHook } from '../../primary-sales';
 import { SQUID_NATIVE_TOKEN } from '../config';
 import { findToken } from '../functions/findToken';
 import { isRouteToAmountGreaterThanToAmount } from '../functions/isRouteToAmountGreaterThanToAmount';
-
-const BASE_SLIPPAGE_HIGH_TIER = 0.005;
-const BASE_SLIPPAGE_MEDIUM_TIER = 0.01;
-const BASE_SLIPPAGE_LOW_TIER = 0.015;
-
-const SLIPPAGE_TIERS = {
-  high: {
-    threshold: 999,
-    value: BASE_SLIPPAGE_HIGH_TIER,
-  },
-  medium: {
-    threshold: 99,
-    value: BASE_SLIPPAGE_MEDIUM_TIER,
-  },
-  low: {
-    threshold: 0,
-    value: BASE_SLIPPAGE_LOW_TIER,
-  },
-} as const;
-
-const getSlippageTier = (usdAmount: number): number => {
-  if (usdAmount >= SLIPPAGE_TIERS.high.threshold) {
-    return SLIPPAGE_TIERS.high.value;
-  }
-  if (usdAmount >= SLIPPAGE_TIERS.medium.threshold) {
-    return SLIPPAGE_TIERS.medium.value;
-  }
-  return SLIPPAGE_TIERS.low.value;
-};
+import { useSlippage } from './useSlippage';
 
 export const useRoutes = () => {
   const latestRequestIdRef = useRef<number>(0);
@@ -59,6 +31,8 @@ export const useRoutes = () => {
   } = useProvidersContext();
 
   const { track } = useAnalytics();
+
+  const { calculateAdjustedAmount } = useSlippage();
 
   const setRoutes = (routes: RouteData[]) => {
     addTokensDispatch({
@@ -85,7 +59,7 @@ export const useRoutes = () => {
     // Calculate the amount of fromToken needed to match this USD value
     const baseFromAmount = toAmountInUsd / fromToken.usdPrice;
     // Add a buffer for price fluctuations and fees
-    const fromAmountWithBuffer = baseFromAmount * (1 + getSlippageTier(toAmountInUsd) + additionalBuffer);
+    const fromAmountWithBuffer = calculateAdjustedAmount(baseFromAmount, toAmountInUsd, additionalBuffer);
 
     return fromAmountWithBuffer.toString();
   };
@@ -97,7 +71,7 @@ export const useRoutes = () => {
   ) => {
     const toAmountUSDNumber = toAmountUSD ? parseFloat(toAmountUSD) : 0;
     const fromAmount = parseFloat(toAmount) / parseFloat(exchangeRate);
-    const fromAmountWithBuffer = fromAmount * (1 + getSlippageTier(toAmountUSDNumber));
+    const fromAmountWithBuffer = calculateAdjustedAmount(fromAmount, toAmountUSDNumber);
     return fromAmountWithBuffer.toString();
   };
 
