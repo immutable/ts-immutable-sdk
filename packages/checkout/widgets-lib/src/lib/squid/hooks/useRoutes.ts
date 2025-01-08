@@ -1,7 +1,7 @@
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import { RouteResponse, ActionType } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
-import { BigNumber, utils } from 'ethers';
+import { utils } from 'ethers';
 import { useContext, useRef } from 'react';
 import { delay } from '../../../functions/delay';
 import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
@@ -11,10 +11,12 @@ import { useAnalytics, UserJourney } from '../../../context/analytics-provider/S
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { isPassportProvider } from '../../provider';
 import {
-  AmountData, RouteData, RouteResponseData, Token,
+  FromAmountData, RouteData, RouteResponseData, Token,
 } from '../types';
 import { SquidPostHook } from '../../primary-sales';
 import { SQUID_NATIVE_TOKEN } from '../config';
+import { findToken } from '../functions/findToken';
+import { isRouteToAmountGreaterThanToAmount } from './isRouteToAmountGreaterThanToAmount';
 
 const BASE_SLIPPAGE_HIGH_TIER = 0.005;
 const BASE_SLIPPAGE_MEDIUM_TIER = 0.01;
@@ -71,15 +73,6 @@ export const useRoutes = () => {
     setRoutes([]);
   };
 
-  const findToken = (
-    tokens: Token[],
-    address: string,
-    chainId: string,
-  ): Token | undefined => tokens.find(
-    (value) => value.address.toLowerCase() === address.toLowerCase()
-        && value.chainId === chainId,
-  );
-
   const calculateFromAmount = (
     fromToken: Token,
     toToken: Token,
@@ -108,14 +101,14 @@ export const useRoutes = () => {
     return fromAmountWithBuffer.toString();
   };
 
-  const getAmountData = (
+  const getFromAmountData = (
     tokens: Token[],
     balance: TokenBalance,
     toAmount: string,
     toChainId: string,
     toTokenAddress: string,
     additionalBuffer: number = 0,
-  ): AmountData | undefined => {
+  ): FromAmountData | undefined => {
     const fromToken = findToken(
       tokens,
       balance.address,
@@ -148,7 +141,7 @@ export const useRoutes = () => {
     toChainId: string,
     toTokenAddress: string,
     toAmount: string,
-  ): AmountData[] => {
+  ): FromAmountData[] => {
     const filteredBalances = balances.filter(
       (balance) => !(
         balance.address.toLowerCase() === toTokenAddress.toLowerCase()
@@ -156,11 +149,11 @@ export const useRoutes = () => {
       ),
     );
 
-    const amountDataArray: AmountData[] = filteredBalances
-      .map((balance) => getAmountData(tokens, balance, toAmount, toChainId, toTokenAddress))
+    const fromAmountDataArray: FromAmountData[] = filteredBalances
+      .map((balance) => getFromAmountData(tokens, balance, toAmount, toChainId, toTokenAddress))
       .filter((value) => value !== undefined);
 
-    return amountDataArray.filter((data: AmountData) => {
+    return fromAmountDataArray.filter((data: FromAmountData) => {
       const formattedBalance = utils.formatUnits(
         data.balance.balance,
         data.balance.decimals,
@@ -172,7 +165,7 @@ export const useRoutes = () => {
     });
   };
 
-  const convertToFormattedAmount = (amount: string, decimals: number) => {
+  const convertToFormattedFromAmount = (amount: string, decimals: number) => {
     const parsedFromAmount = parseFloat(amount).toFixed(decimals);
     const formattedFromAmount = utils.parseUnits(parsedFromAmount, decimals);
     return formattedFromAmount.toString();
@@ -193,7 +186,7 @@ export const useRoutes = () => {
         () => squid.getRoute({
           fromChain: fromToken.chainId,
           fromToken: fromToken.address,
-          fromAmount: convertToFormattedAmount(fromAmount, fromToken.decimals),
+          fromAmount: convertToFormattedFromAmount(fromAmount, fromToken.decimals),
           toChain: toToken.chainId,
           toToken: toToken.address,
           fromAddress,
@@ -227,18 +220,6 @@ export const useRoutes = () => {
       });
       throw error;
     }
-  };
-
-  const isRouteToAmountGreaterThanToAmount = (
-    routeResponse: RouteResponse,
-    toAmount: string,
-  ) => {
-    if (!routeResponse?.route?.estimate?.toAmount || !routeResponse?.route?.estimate?.toToken?.decimals) {
-      throw new Error('Invalid route response or token decimals');
-    }
-    const toAmountInBaseUnits = utils.parseUnits(toAmount, routeResponse?.route.estimate.toToken.decimals);
-    const routeToAmountInBaseUnits = BigNumber.from(routeResponse.route.estimate.toAmount);
-    return routeToAmountInBaseUnits.gt(toAmountInBaseUnits);
   };
 
   const getRoute = async (
@@ -333,7 +314,7 @@ export const useRoutes = () => {
     squid: Squid,
     toTokenAddress: string,
     balances: TokenBalance[],
-    fromAmountArray: AmountData[],
+    fromAmountArray: FromAmountData[],
     postHook?: SquidPostHook,
   ): Promise<RouteData[]> => {
     const getGasCost = (
@@ -383,7 +364,7 @@ export const useRoutes = () => {
       return userBalance >= requiredAmount;
     };
 
-    const routePromises = fromAmountArray.map(async (data: AmountData) => {
+    const routePromises = fromAmountArray.map(async (data: FromAmountData) => {
       try {
         const routeResponse = await getRoute(
           squid,
@@ -494,7 +475,7 @@ export const useRoutes = () => {
 
   return {
     fetchRoutesWithRateLimit,
-    getAmountData,
+    getFromAmountData,
     getRoute,
     resetRoutes,
   };

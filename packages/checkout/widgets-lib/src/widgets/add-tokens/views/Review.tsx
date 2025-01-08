@@ -69,7 +69,7 @@ import {
 } from '../AddTokensWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { convertToNetworkChangeableProvider } from '../../../functions/convertToNetworkChangeableProvider';
-import { AmountData } from '../../../lib/squid/types';
+import { FromAmountData } from '../../../lib/squid/types';
 import { SQUID_NATIVE_TOKEN } from '../../../lib/squid/config';
 import { AddressMissmatchDrawer } from '../../../components/AddressMismatchDrawer/AddressMissmatchDrawer';
 import { RouteFees } from '../../../components/RouteFees/RouteFees';
@@ -119,12 +119,12 @@ export function Review({
   } = useContext(EventTargetContext);
 
   const [route, setRoute] = useState<RouteResponse | undefined>();
-  const [amountData, setAmountData] = useState<AmountData | undefined>();
+  const [amountData, setAmountData] = useState<FromAmountData | undefined>();
   const [proceedDisabled, setProceedDisabled] = useState(true);
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
   const [showSecuringQuote, setShowSecuringQuote] = useState(false);
   const [showAddressMissmatchDrawer, setShowAddressMissmatchDrawer] = useState(false);
-  const { getAmountData, getRoute } = useRoutes();
+  const { getFromAmountData, getRoute } = useRoutes();
   const { addHandover, closeHandover } = useHandover({
     id: HandoverTarget.GLOBAL,
   });
@@ -155,7 +155,7 @@ export function Review({
 
     setShowSecuringQuote(true);
 
-    const updatedAmountData = getAmountData(
+    const updatedAmountData = getFromAmountData(
       tokens,
       data.balance,
       data.toAmount,
@@ -165,6 +165,7 @@ export function Review({
         : data.toTokenAddress,
       data.additionalBuffer,
     );
+
     if (!updatedAmountData) return;
 
     const routeResponse = await getRoute(
