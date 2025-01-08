@@ -17,7 +17,7 @@ import { SquidPostHook } from '../../primary-sales';
 import { SQUID_NATIVE_TOKEN } from '../config';
 import { findToken } from '../functions/findToken';
 import { isRouteToAmountGreaterThanToAmount } from '../functions/isRouteToAmountGreaterThanToAmount';
-import { useSlippage } from './useSlippage';
+import { useRouteCalculation } from './useRouteCalculation';
 
 export const useRoutes = () => {
   const latestRequestIdRef = useRef<number>(0);
@@ -32,7 +32,7 @@ export const useRoutes = () => {
 
   const { track } = useAnalytics();
 
-  const { calculateAdjustedAmount } = useSlippage();
+  const { calculateFromAmount, calculateFromAmountFromRoute, convertToFormattedFromAmount } = useRouteCalculation();
 
   const setRoutes = (routes: RouteData[]) => {
     addTokensDispatch({
@@ -45,34 +45,6 @@ export const useRoutes = () => {
 
   const resetRoutes = () => {
     setRoutes([]);
-  };
-
-  const calculateFromAmount = (
-    fromToken: Token,
-    toToken: Token,
-    toAmount: string,
-    additionalBuffer: number = 0,
-  ) => {
-    const toAmountNumber = parseFloat(toAmount);
-    // Calculate the USD value of the toAmount
-    const toAmountInUsd = toAmountNumber * toToken.usdPrice;
-    // Calculate the amount of fromToken needed to match this USD value
-    const baseFromAmount = toAmountInUsd / fromToken.usdPrice;
-    // Add a buffer for price fluctuations and fees
-    const fromAmountWithBuffer = calculateAdjustedAmount(baseFromAmount, toAmountInUsd, additionalBuffer);
-
-    return fromAmountWithBuffer.toString();
-  };
-
-  const calculateFromAmountFromRoute = (
-    exchangeRate: string,
-    toAmount: string,
-    toAmountUSD?: string,
-  ) => {
-    const toAmountUSDNumber = toAmountUSD ? parseFloat(toAmountUSD) : 0;
-    const fromAmount = parseFloat(toAmount) / parseFloat(exchangeRate);
-    const fromAmountWithBuffer = calculateAdjustedAmount(fromAmount, toAmountUSDNumber);
-    return fromAmountWithBuffer.toString();
   };
 
   const getFromAmountData = (
@@ -137,12 +109,6 @@ export const useRoutes = () => {
         parseFloat(formattedBalance.toString()) > parseFloat(data.fromAmount)
       );
     });
-  };
-
-  const convertToFormattedFromAmount = (amount: string, decimals: number) => {
-    const parsedFromAmount = parseFloat(amount).toFixed(decimals);
-    const formattedFromAmount = utils.parseUnits(parsedFromAmount, decimals);
-    return formattedFromAmount.toString();
   };
 
   const getRouteWithRetry = async (

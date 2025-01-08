@@ -19,6 +19,9 @@ const SLIPPAGE_TIERS = {
   },
 } as const;
 
+/**
+ * Hook to calculate slippage based on thresholds
+ */
 export const useSlippage = () => {
   const getSlippageTier = (usdAmount: number): number => {
     if (usdAmount >= SLIPPAGE_TIERS.high.threshold) return SLIPPAGE_TIERS.high.value;
