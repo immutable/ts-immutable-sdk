@@ -407,7 +407,7 @@ export const useRoutes = () => {
     return routesData;
   };
 
-  const fetchRoutesWithRateLimit = async (
+  const fetchRoutes = async (
     squid: Squid,
     tokens: Token[],
     balances: TokenBalance[],
@@ -474,7 +474,7 @@ export const useRoutes = () => {
   };
 
   return {
-    fetchRoutesWithRateLimit,
+    fetchRoutes,
     getFromAmountData,
     getRoute,
     resetRoutes,

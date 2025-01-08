@@ -102,7 +102,7 @@ export function AddTokens({
 }: AddTokensProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
+  const { fetchRoutes, resetRoutes } = useRoutes();
   const { showErrorHandover } = useError(config.environment);
 
   const {
@@ -329,7 +329,7 @@ export function AddTokens({
         && isValidAmount
       ) {
         setFetchingRoutes(true);
-        const availableRoutes = await fetchRoutesWithRateLimit(
+        const availableRoutes = await fetchRoutes(
           squid,
           tokens,
           balances,
