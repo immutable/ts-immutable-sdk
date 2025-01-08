@@ -39,8 +39,8 @@ import {
 import { getL2ChainId } from '../../../lib';
 import { AddTokensErrorTypes } from '../types';
 import { TokenImage } from '../../../components/TokenImage/TokenImage';
-import { TOKEN_PRIORITY_ORDER } from '../utils/config';
 import { PULSE_SHADOW } from '../utils/animation';
+import { TOKEN_PRIORITY_ORDER } from '../../../lib/squid/config';
 
 export interface TokenDrawerMenuProps {
   checkout: Checkout;
