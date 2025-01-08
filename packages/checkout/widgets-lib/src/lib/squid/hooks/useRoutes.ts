@@ -16,7 +16,7 @@ import {
 import { SquidPostHook } from '../../primary-sales';
 import { SQUID_NATIVE_TOKEN } from '../config';
 import { findToken } from '../functions/findToken';
-import { isRouteToAmountGreaterThanToAmount } from './isRouteToAmountGreaterThanToAmount';
+import { isRouteToAmountGreaterThanToAmount } from '../functions/isRouteToAmountGreaterThanToAmount';
 
 const BASE_SLIPPAGE_HIGH_TIER = 0.005;
 const BASE_SLIPPAGE_MEDIUM_TIER = 0.01;
