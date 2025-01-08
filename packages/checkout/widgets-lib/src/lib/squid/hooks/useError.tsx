@@ -5,7 +5,6 @@ import { AddTokensErrorTypes } from '../../../widgets/add-tokens/types';
 import { useHandover } from '../../hooks/useHandover';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
 import { getRemoteRive } from '../../utils';
-import { APPROVE_TXN_ANIMATION } from '../../../widgets/add-tokens/utils/config';
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
 import { sendAddTokensCloseEvent } from '../../../widgets/add-tokens/AddTokensWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
@@ -19,6 +18,7 @@ import {
   UserJourney,
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { RiveStateMachineInput } from '../../../types/HandoverTypes';
+import { APPROVE_TXN_ANIMATION } from '../config';
 
 interface ErrorConfig {
   headingText: string;

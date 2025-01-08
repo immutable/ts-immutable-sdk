@@ -46,12 +46,7 @@ import { useHandover } from '../../../lib/hooks/useHandover';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
 import { getRemoteRive } from '../../../lib/utils';
-import {
-  APPROVE_TXN_ANIMATION,
-  EXECUTE_TXN_ANIMATION,
-  FIXED_HANDOVER_DURATION,
-  TOOLKIT_SQUID_URL,
-} from '../utils/config';
+
 import {
   useAnalytics,
   UserJourney,
@@ -70,7 +65,9 @@ import {
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { convertToNetworkChangeableProvider } from '../../../functions/convertToNetworkChangeableProvider';
 import { FromAmountData } from '../../../lib/squid/types';
-import { SQUID_NATIVE_TOKEN } from '../../../lib/squid/config';
+import {
+  APPROVE_TXN_ANIMATION, EXECUTE_TXN_ANIMATION, FIXED_HANDOVER_DURATION, SQUID_NATIVE_TOKEN, TOOLKIT_SQUID_URL,
+} from '../../../lib/squid/config';
 import { AddressMissmatchDrawer } from '../../../components/AddressMismatchDrawer/AddressMissmatchDrawer';
 import { RouteFees } from '../../../components/RouteFees/RouteFees';
 import { getDurationFormatted } from '../../../functions/getDurationFormatted';
