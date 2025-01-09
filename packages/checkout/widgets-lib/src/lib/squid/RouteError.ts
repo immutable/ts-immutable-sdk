@@ -1,11 +1,9 @@
-import { Token } from './types';
-
 export class RouteError extends Error {
   constructor(
     public message: string,
     public data?: {
-      fromToken?: Token;
-      toToken?: Token;
+      fromToken?: string;
+      toToken?: string;
       fromChain?: string | number;
       toChain?: string | number;
       errorStatus?: number;

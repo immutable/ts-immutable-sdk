@@ -73,6 +73,7 @@ import { RouteOptionsDrawer } from '../../../components/RouteOptionsDrawer/Route
 import { SelectedRouteOption } from '../../../components/SelectedRouteOption/SelectedRouteOption';
 import { getFormattedAmounts } from '../../../functions/getFormattedNumber';
 import { checkSanctionedAddresses } from '../../../functions/checkSanctionedAddresses';
+import { RouteError } from '../../../lib/squid/RouteError';
 
 interface AddTokensProps {
   checkout: Checkout;
@@ -338,45 +339,60 @@ export function AddTokens({
       ) {
         setFetchingRoutes(true);
 
-        const availableRoutes = await fetchRoutes(
-          squid,
-          tokens,
-          balances,
-          ChainId.IMTBL_ZKEVM_MAINNET.toString(),
-          selectedToken.address === 'native'
-            ? SQUID_NATIVE_TOKEN
-            : selectedToken.address,
-          selectedAmount,
-          5,
-          1000,
-          isSwapAvailable,
-        );
+        try {
+          const availableRoutes = await fetchRoutes(
+            squid,
+            tokens,
+            balances,
+            ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+            selectedToken.address === 'native'
+              ? SQUID_NATIVE_TOKEN
+              : selectedToken.address,
+            selectedAmount,
+            5,
+            1000,
+            isSwapAvailable,
+          );
 
-        addTokensDispatch({
-          payload: {
-            type: AddTokensActions.SET_ROUTES,
-            routes: availableRoutes,
-          },
-        });
+          addTokensDispatch({
+            payload: {
+              type: AddTokensActions.SET_ROUTES,
+              routes: availableRoutes,
+            },
+          });
+
+          if (availableRoutes.length === 0) {
+            setInsufficientBalance(true);
+          }
+
+          track({
+            userJourney: UserJourney.ADD_TOKENS,
+            screen: 'InputScreen',
+            control: 'RoutesMenu',
+            controlType: 'MenuItem',
+            action: 'Request',
+            extras: {
+              contextId: id,
+              routesAvailable: availableRoutes.length,
+              geoBlocked: !isSwapAvailable,
+            },
+          });
+        } catch (error) {
+          if (error instanceof RouteError && error.data) {
+            track({
+              userJourney: UserJourney.ADD_TOKENS,
+              screen: 'Routes',
+              action: 'Failed',
+              extras: {
+                contextId: id,
+                message: error.message,
+                ...error.data,
+              },
+            });
+          }
+        }
 
         setFetchingRoutes(false);
-
-        track({
-          userJourney: UserJourney.ADD_TOKENS,
-          screen: 'InputScreen',
-          control: 'RoutesMenu',
-          controlType: 'MenuItem',
-          action: 'Request',
-          extras: {
-            contextId: id,
-            routesAvailable: availableRoutes.length,
-            geoBlocked: !isSwapAvailable,
-          },
-        });
-
-        if (availableRoutes.length === 0) {
-          setInsufficientBalance(true);
-        }
       }
     })();
   }, [balances, squid, selectedToken, selectedAmount]);
