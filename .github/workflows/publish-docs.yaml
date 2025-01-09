@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: public-docs
+  cancel-in-progress: false
+
 jobs:
   AlphaCheck:
     name: Check if SDK version is alpha
