@@ -104,38 +104,6 @@ export const useExecute = (contextId: string, environment: Environment) => {
     showErrorHandover(errorType, { contextId, error });
   };
 
-  // @TODO: Move to util function
-  const checkProviderChain = async (
-    provider: Web3Provider,
-    chainId: string,
-  ): Promise<boolean> => {
-    if (!provider.provider.request) {
-      throw new Error('provider does not have request method');
-    }
-    try {
-      const fromChainHex = `0x${parseInt(chainId, 10).toString(16)}`;
-      const providerChainId = await provider.provider.request({
-        method: 'eth_chainId',
-      });
-
-      if (fromChainHex !== providerChainId) {
-        await provider.provider.request({
-          method: 'wallet_switchEthereumChain',
-          params: [
-            {
-              chainId: fromChainHex,
-            },
-          ],
-        });
-        return true;
-      }
-      return true;
-    } catch (error) {
-      handleTransactionError(error);
-      return false;
-    }
-  };
-
   const getAllowance = async (
     provider: Web3Provider,
     routeResponse: RouteResponse,
@@ -313,7 +281,6 @@ export const useExecute = (contextId: string, environment: Environment) => {
   };
 
   return {
-    checkProviderChain,
     getAllowance,
     approve,
     execute,

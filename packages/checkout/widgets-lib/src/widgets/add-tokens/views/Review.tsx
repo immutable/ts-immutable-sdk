@@ -73,6 +73,7 @@ import { RouteFees } from '../../../components/RouteFees/RouteFees';
 import { getDurationFormatted } from '../../../functions/getDurationFormatted';
 import { getFormattedNumber, getFormattedAmounts } from '../../../functions/getFormattedNumber';
 import { RiveStateMachineInput } from '../../../types/HandoverTypes';
+import { verifyAndSwitchChain } from '../../../lib/squid/functions/verifyAndSwitchChain';
 
 interface ReviewProps {
   data: AddTokensReviewData;
@@ -129,7 +130,7 @@ export function Review({
   const { showErrorHandover } = useError(checkout.config.environment);
 
   const {
-    checkProviderChain, getAllowance, approve, execute, getStatus,
+    getAllowance, approve, execute, getStatus,
   } = useExecute(id, checkout?.config.environment || Environment.SANDBOX);
 
   useEffect(() => {
@@ -358,12 +359,12 @@ export function Review({
       fromProvider,
     );
 
-    const isValidNetwork = await checkProviderChain(
+    const verifyChainResult = await verifyAndSwitchChain(
       changeableProvider,
       route.route.params.fromChain,
     );
 
-    if (!isValidNetwork) {
+    if (!verifyChainResult.isChainCorrect) {
       return;
     }
 
@@ -653,7 +654,6 @@ export function Review({
     getRouteIntervalIdRef,
     approve,
     showHandover,
-    checkProviderChain,
     getAllowance,
     execute,
     closeHandover,
