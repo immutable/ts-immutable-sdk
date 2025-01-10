@@ -73,6 +73,7 @@ import { RouteOptionsDrawer } from '../../../components/RouteOptionsDrawer/Route
 import { SelectedRouteOption } from '../../../components/SelectedRouteOption/SelectedRouteOption';
 import { getFormattedAmounts } from '../../../functions/getFormattedNumber';
 import { checkSanctionedAddresses } from '../../../functions/checkSanctionedAddresses';
+import { RouteError } from '../../../lib/squid/RouteError';
 
 interface AddTokensProps {
   checkout: Checkout;
@@ -101,7 +102,7 @@ export function AddTokens({
 }: AddTokensProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { fetchRoutesWithRateLimit, resetRoutes } = useRoutes();
+  const { fetchRoutes } = useRoutes();
   const { showErrorHandover } = useError(config.environment);
 
   const {
@@ -169,6 +170,15 @@ export function AddTokens({
   const setSelectedAmount = (value: string) => {
     setIsAmountInputSynced(false);
     debouncedSetSelectedAmount.current(value);
+  };
+
+  const resetRoutes = () => {
+    addTokensDispatch({
+      payload: {
+        type: AddTokensActions.SET_ROUTES,
+        routes: [],
+      },
+    });
   };
 
   useEffect(() => {
@@ -328,37 +338,61 @@ export function AddTokens({
         && isValidAmount
       ) {
         setFetchingRoutes(true);
-        const availableRoutes = await fetchRoutesWithRateLimit(
-          squid,
-          tokens,
-          balances,
-          ChainId.IMTBL_ZKEVM_MAINNET.toString(),
-          selectedToken.address === 'native'
-            ? SQUID_NATIVE_TOKEN
-            : selectedToken.address,
-          selectedAmount,
-          5,
-          1000,
-          isSwapAvailable,
-        );
-        setFetchingRoutes(false);
 
-        track({
-          userJourney: UserJourney.ADD_TOKENS,
-          screen: 'InputScreen',
-          control: 'RoutesMenu',
-          controlType: 'MenuItem',
-          action: 'Request',
-          extras: {
-            contextId: id,
-            routesAvailable: availableRoutes.length,
-            geoBlocked: !isSwapAvailable,
-          },
-        });
+        try {
+          const availableRoutes = await fetchRoutes(
+            squid,
+            tokens,
+            balances,
+            ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+            selectedToken.address === 'native'
+              ? SQUID_NATIVE_TOKEN
+              : selectedToken.address,
+            selectedAmount,
+            5,
+            1000,
+            isSwapAvailable,
+          );
 
-        if (availableRoutes.length === 0) {
-          setInsufficientBalance(true);
+          addTokensDispatch({
+            payload: {
+              type: AddTokensActions.SET_ROUTES,
+              routes: availableRoutes,
+            },
+          });
+
+          if (availableRoutes.length === 0) {
+            setInsufficientBalance(true);
+          }
+
+          track({
+            userJourney: UserJourney.ADD_TOKENS,
+            screen: 'InputScreen',
+            control: 'RoutesMenu',
+            controlType: 'MenuItem',
+            action: 'Request',
+            extras: {
+              contextId: id,
+              routesAvailable: availableRoutes.length,
+              geoBlocked: !isSwapAvailable,
+            },
+          });
+        } catch (error) {
+          if (error instanceof RouteError && error.data) {
+            track({
+              userJourney: UserJourney.ADD_TOKENS,
+              screen: 'Routes',
+              action: 'Failed',
+              extras: {
+                contextId: id,
+                message: error.message,
+                ...error.data,
+              },
+            });
+          }
         }
+
+        setFetchingRoutes(false);
       }
     })();
   }, [balances, squid, selectedToken, selectedAmount]);
