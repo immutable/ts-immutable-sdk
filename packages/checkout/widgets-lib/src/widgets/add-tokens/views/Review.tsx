@@ -25,7 +25,6 @@ import {
 import { RouteResponse } from '@0xsquid/squid-types';
 import { t } from 'i18next';
 import { Trans } from 'react-i18next';
-import { Environment } from '@imtbl/config';
 import { ChainId } from '@imtbl/checkout-sdk';
 import { trackFlow } from '@imtbl/metrics';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -57,7 +56,6 @@ import { getTotalRouteFees } from '../../../lib/squid/functions/getTotalRouteFee
 import { getRouteChains } from '../../../lib/squid/functions/getRouteChains';
 
 import { SquidFooter } from '../../../lib/squid/components/SquidFooter';
-import { useError } from '../../../lib/squid/hooks/useError';
 import {
   sendAddTokensCloseEvent,
   sendAddTokensSuccessEvent,
@@ -73,6 +71,9 @@ import { RouteFees } from '../../../components/RouteFees/RouteFees';
 import { getDurationFormatted } from '../../../functions/getDurationFormatted';
 import { getFormattedNumber, getFormattedAmounts } from '../../../functions/getFormattedNumber';
 import { RiveStateMachineInput } from '../../../types/HandoverTypes';
+import { verifyAndSwitchChain } from '../../../lib/squid/functions/verifyAndSwitchChain';
+import { useErrorHandler } from '../hooks/useErrorHandler';
+import { useError } from '../../../lib/squid/hooks/useError';
 
 interface ReviewProps {
   data: AddTokensReviewData;
@@ -111,6 +112,8 @@ export function Review({
     },
   } = useProvidersContext();
 
+  const { showErrorHandover } = useError(checkout.config.environment);
+
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
@@ -126,11 +129,11 @@ export function Review({
     id: HandoverTarget.GLOBAL,
   });
 
-  const { showErrorHandover } = useError(checkout.config.environment);
+  const { onTransactionError } = useErrorHandler();
 
   const {
-    checkProviderChain, getAllowance, approve, execute, getStatus,
-  } = useExecute(id, checkout?.config.environment || Environment.SANDBOX);
+    getAllowance, approve, execute, getStatus,
+  } = useExecute(UserJourney.ADD_TOKENS, onTransactionError);
 
   useEffect(() => {
     page({
@@ -359,12 +362,12 @@ export function Review({
       fromProvider,
     );
 
-    const isValidNetwork = await checkProviderChain(
+    const verifyChainResult = await verifyAndSwitchChain(
       changeableProvider,
       route.route.params.fromChain,
     );
 
-    if (!isValidNetwork) {
+    if (!verifyChainResult.isChainCorrect) {
       return;
     }
 
@@ -654,7 +657,6 @@ export function Review({
     getRouteIntervalIdRef,
     approve,
     showHandover,
-    checkProviderChain,
     getAllowance,
     execute,
     closeHandover,
