@@ -23,7 +23,7 @@ export const useErrorHandler = () => {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
 
-  const handleTransactionError = (err: unknown) => {
+  const onTransactionError = (err: unknown) => {
     const reason = `${(err as any)?.reason || (err as any)?.message || ''
     }`.toLowerCase();
 
@@ -64,5 +64,5 @@ export const useErrorHandler = () => {
     showErrorHandover(errorType, { contextId, error });
   };
 
-  return { handleTransactionError };
+  return { onTransactionError };
 };

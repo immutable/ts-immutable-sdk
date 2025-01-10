@@ -25,7 +25,6 @@ import {
 import { RouteResponse } from '@0xsquid/squid-types';
 import { t } from 'i18next';
 import { Trans } from 'react-i18next';
-import { Environment } from '@imtbl/config';
 import { ChainId } from '@imtbl/checkout-sdk';
 import { trackFlow } from '@imtbl/metrics';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -57,7 +56,6 @@ import { getTotalRouteFees } from '../../../lib/squid/functions/getTotalRouteFee
 import { getRouteChains } from '../../../lib/squid/functions/getRouteChains';
 
 import { SquidFooter } from '../../../lib/squid/components/SquidFooter';
-import { useError } from '../../../lib/squid/hooks/useError';
 import {
   sendAddTokensCloseEvent,
   sendAddTokensSuccessEvent,
@@ -74,6 +72,8 @@ import { getDurationFormatted } from '../../../functions/getDurationFormatted';
 import { getFormattedNumber, getFormattedAmounts } from '../../../functions/getFormattedNumber';
 import { RiveStateMachineInput } from '../../../types/HandoverTypes';
 import { verifyAndSwitchChain } from '../../../lib/squid/functions/verifyAndSwitchChain';
+import { useErrorHandler } from '../hooks/useErrorHandler';
+import { useError } from '../../../lib/squid/hooks/useError';
 
 interface ReviewProps {
   data: AddTokensReviewData;
@@ -112,6 +112,8 @@ export function Review({
     },
   } = useProvidersContext();
 
+  const { showErrorHandover } = useError(checkout.config.environment);
+
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
@@ -127,11 +129,11 @@ export function Review({
     id: HandoverTarget.GLOBAL,
   });
 
-  const { showErrorHandover } = useError(checkout.config.environment);
+  const { onTransactionError } = useErrorHandler();
 
   const {
     getAllowance, approve, execute, getStatus,
-  } = useExecute(id, checkout?.config.environment || Environment.SANDBOX);
+  } = useExecute(onTransactionError);
 
   useEffect(() => {
     page({

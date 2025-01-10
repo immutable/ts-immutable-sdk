@@ -1,18 +1,12 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { useContext } from 'react';
 import { RouteResponse } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
 import { ethers } from 'ethers';
-import { Environment } from '@imtbl/config';
 
 import { StatusResponse } from '@0xsquid/sdk/dist/types';
 import { Flow } from '@imtbl/metrics';
 import { EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
 import { isSquidNativeToken } from '../functions/isSquidNativeToken';
-import { useError } from './useError';
-import { AddTokensError, AddTokensErrorTypes } from '../../../widgets/add-tokens/types';
-import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { sendAddTokensFailedEvent } from '../../../widgets/add-tokens/AddTokensWidgetEvents';
 import { retry } from '../../retry';
 import { withMetricsAsync } from '../../metrics';
 import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
@@ -20,12 +14,10 @@ import { isRejectedError } from '../../../functions/errorType';
 
 const TRANSACTION_NOT_COMPLETED = 'transaction not completed';
 
-export const useExecute = (contextId: string, environment: Environment) => {
-  const { showErrorHandover } = useError(environment);
+export const useExecute = (
+  onTransactionError: (err: unknown) => void,
+) => {
   const { user } = useAnalytics();
-  const {
-    eventTargetState: { eventTarget },
-  } = useContext(EventTargetContext);
 
   const waitForReceipt = async (
     provider: Web3Provider,
@@ -59,51 +51,6 @@ export const useExecute = (contextId: string, environment: Environment) => {
     return result;
   };
 
-  const handleTransactionError = (err: unknown) => {
-    const reason = `${
-      (err as any)?.reason || (err as any)?.message || ''
-    }`.toLowerCase();
-
-    let errorType = AddTokensErrorTypes.WALLET_FAILED;
-
-    if (reason.includes('failed') && reason.includes('open confirmation')) {
-      errorType = AddTokensErrorTypes.WALLET_POPUP_BLOCKED;
-    }
-
-    if (reason.includes('rejected') && reason.includes('user')) {
-      errorType = AddTokensErrorTypes.WALLET_REJECTED;
-    }
-
-    if (
-      reason.includes('failed to submit')
-      && reason.includes('highest gas limit')
-    ) {
-      errorType = AddTokensErrorTypes.WALLET_REJECTED_NO_FUNDS;
-    }
-
-    if (
-      reason.includes('status failed')
-      || reason.includes('transaction failed')
-    ) {
-      errorType = AddTokensErrorTypes.TRANSACTION_FAILED;
-      sendAddTokensFailedEvent(eventTarget, errorType);
-    }
-
-    if (
-      reason.includes('unrecognized chain')
-      || reason.includes('unrecognized chain')
-    ) {
-      errorType = AddTokensErrorTypes.UNRECOGNISED_CHAIN;
-    }
-
-    const error: AddTokensError = {
-      type: errorType,
-      data: { error: err },
-    };
-
-    showErrorHandover(errorType, { contextId, error });
-  };
-
   const getAllowance = async (
     provider: Web3Provider,
     routeResponse: RouteResponse,
@@ -132,7 +79,7 @@ export const useExecute = (contextId: string, environment: Environment) => {
 
       return ethers.constants.MaxUint256; // no approval is needed for native tokens
     } catch (error) {
-      showErrorHandover(AddTokensErrorTypes.DEFAULT, { contextId, error });
+      onTransactionError(error);
       return undefined;
     }
   };
@@ -195,7 +142,7 @@ export const useExecute = (contextId: string, environment: Environment) => {
       }
       return undefined;
     } catch (error) {
-      handleTransactionError(error);
+      onTransactionError(error);
       return undefined;
     }
   };
@@ -233,7 +180,7 @@ export const useExecute = (contextId: string, environment: Environment) => {
         (error) => (isRejectedError(error) ? 'rejected' : ''),
       );
     } catch (error) {
-      handleTransactionError(error);
+      onTransactionError(error);
       return undefined;
     }
   };
@@ -275,7 +222,7 @@ export const useExecute = (contextId: string, environment: Environment) => {
         },
       );
     } catch (error) {
-      handleTransactionError(error);
+      onTransactionError(error);
       return undefined;
     }
   };
