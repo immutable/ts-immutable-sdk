@@ -15,7 +15,8 @@ import { isRejectedError } from '../../../functions/errorType';
 const TRANSACTION_NOT_COMPLETED = 'transaction not completed';
 
 export const useExecute = (
-  onTransactionError: (err: unknown) => void,
+  userJourney: UserJourney,
+  onTransactionError?: (err: unknown) => void,
 ) => {
   const { user } = useAnalytics();
 
@@ -79,7 +80,7 @@ export const useExecute = (
 
       return ethers.constants.MaxUint256; // no approval is needed for native tokens
     } catch (error) {
-      onTransactionError(error);
+      onTransactionError?.(error);
       return undefined;
     }
   };
@@ -135,14 +136,14 @@ export const useExecute = (
       if (!isSquidNativeToken(routeResponse?.route?.params.fromToken)) {
         return await withMetricsAsync(
           (flow) => callApprove(flow, fromProviderInfo, provider, routeResponse),
-          `${UserJourney.ADD_TOKENS}_Approve`,
+          `${userJourney}_Approve`,
           await getAnonymousId(),
           (error) => (isRejectedError(error) ? 'rejected' : ''),
         );
       }
       return undefined;
     } catch (error) {
-      onTransactionError(error);
+      onTransactionError?.(error);
       return undefined;
     }
   };
@@ -175,12 +176,12 @@ export const useExecute = (
     try {
       return await withMetricsAsync(
         (flow) => callExecute(flow, squid, fromProviderInfo, provider, routeResponse),
-        `${UserJourney.ADD_TOKENS}_Execute`,
+        `${userJourney}_Execute`,
         await getAnonymousId(),
         (error) => (isRejectedError(error) ? 'rejected' : ''),
       );
     } catch (error) {
-      onTransactionError(error);
+      onTransactionError?.(error);
       return undefined;
     }
   };
@@ -222,7 +223,7 @@ export const useExecute = (
         },
       );
     } catch (error) {
-      onTransactionError(error);
+      onTransactionError?.(error);
       return undefined;
     }
   };
