@@ -133,7 +133,7 @@ export function Review({
 
   const {
     getAllowance, approve, execute, getStatus,
-  } = useExecute(onTransactionError);
+  } = useExecute(UserJourney.ADD_TOKENS, onTransactionError);
 
   useEffect(() => {
     page({
