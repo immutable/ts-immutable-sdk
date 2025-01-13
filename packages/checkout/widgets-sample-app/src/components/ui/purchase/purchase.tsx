@@ -1,24 +1,45 @@
 import { Checkout, PurchaseEventType, WidgetLanguage, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { useEffect, useMemo } from 'react';
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
+import { Environment } from '@imtbl/config';
+import { passport } from './passport';
 
 const PURCHASE_WIDGET_ID = 'purchase';
 
 export default function PurchaseUI() {
-  const checkout = useMemo(() => new Checkout(), []);
+  const urlParams = new URLSearchParams(window.location.search);
+  const environmentId = urlParams.get('environmentId') as string;
+
+  const checkout = useMemo(
+    () =>
+      new Checkout({
+        baseConfig: {
+          environment: Environment.PRODUCTION,
+        },
+        passport,
+      }),
+    []
+  );
+
   const factory = useMemo(() => new WidgetsFactory(checkout, { theme: WidgetTheme.DARK }), [checkout]);
   const purchase = useMemo(() => factory.create(WidgetType.PURCHASE), [factory]);
 
   useEffect(() => {
-    purchase.mount(PURCHASE_WIDGET_ID, {});
+    passport.connectEvm();
+  }, []);
+
+  useEffect(() => {
+    purchase.mount(PURCHASE_WIDGET_ID, {
+      environmentId,
+    });
 
     purchase.addListener(PurchaseEventType.CLOSE_WIDGET, (data: any) => {
-      console.log("CLOSE_WIDGET", data);
+      console.log('CLOSE_WIDGET', data);
       purchase.unmount();
     });
 
     purchase.addListener(PurchaseEventType.CONNECT_SUCCESS, (data: any) => {
-      console.log("CONNECT_SUCCESS", data);
+      console.log('CONNECT_SUCCESS', data);
     });
 
     return () => {
@@ -32,7 +53,7 @@ export default function PurchaseUI() {
       <h1 className="sample-heading">Checkout Purchase</h1>
 
       <div id={PURCHASE_WIDGET_ID}></div>
-      <button onClick={() => purchase.mount(PURCHASE_WIDGET_ID, {})}>Mount</button>
+      <button onClick={() => purchase.mount(PURCHASE_WIDGET_ID, { environmentId })}>Mount</button>
       <button onClick={() => purchase.unmount()}>Unmount</button>
       <button onClick={() => purchase.update({ config: { theme: WidgetTheme.LIGHT } })}>Update Config Light</button>
       <button onClick={() => purchase.update({ config: { theme: WidgetTheme.DARK } })}>Update Config Dark</button>

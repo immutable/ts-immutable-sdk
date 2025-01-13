@@ -356,13 +356,13 @@ export const useSignOrder = (input: SignOrderInput) => {
     async (
       paymentType: SignPaymentTypes,
       fromTokenAddress: string,
+      spenderAddress: string,
+      recipientAddress: string,
     ): Promise<{ signResponse: SignResponse; postHooks: SquidPostHookCall[] } | undefined> => {
       try {
-        const signer = provider?.getSigner();
-        const address = (await signer?.getAddress()) || '';
-
         const data: SignApiRequest = {
-          recipient_address: address,
+          spender_address: spenderAddress,
+          recipient_address: recipientAddress,
           payment_type: paymentType,
           currency_filter: SignCurrencyFilter.CONTRACT_ADDRESS,
           currency_value: fromTokenAddress,
@@ -372,6 +372,8 @@ export const useSignOrder = (input: SignOrderInput) => {
           })),
           custom_data: customOrderData,
         };
+
+        console.log('data', data);
 
         const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/order/sign`;
         const apiResponse = await signAPI(baseUrl, data);

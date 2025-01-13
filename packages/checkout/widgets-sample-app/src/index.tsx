@@ -18,6 +18,8 @@ import AddTokensUI from "./components/ui/add-tokens/addTokens";
 import { AddTokensPassportLogin } from "./components/ui/add-tokens/login";
 import { AddTokensPassportLogout } from "./components/ui/add-tokens/logout";
 import PurchaseUI from './components/ui/purchase/purchase';
+import { PurchasePassportLogin } from "./components/ui/purchase/login";
+import { PurchasePassportLogout } from "./components/ui/purchase/logout";
 
 const router = createBrowserRouter([
   {
@@ -55,6 +57,14 @@ const router = createBrowserRouter([
   {
     path: "/purchase",
     element: <PurchaseUI />,
+  },
+  {
+    path: "/purchase/login",
+    element: <PurchasePassportLogin />,
+  },
+  {
+    path: "/purchase/logout",
+    element: <PurchasePassportLogout />,
   },
   {
     path: "/add-tokens",
