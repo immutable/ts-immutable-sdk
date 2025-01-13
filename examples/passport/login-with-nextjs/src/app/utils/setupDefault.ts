@@ -3,7 +3,7 @@ import { config, passport } from '@imtbl/sdk';
 // #doc passport-instance
 export const passportInstance = new passport.Passport({
     baseConfig: {
-      environment: config.Environment.SANDBOX, // or config.Environment.SANDBOX
+      environment: config.Environment.SANDBOX, // or config.Environment.PRODUCTION
       publishableKey:
         process.env.NEXT_PUBLIC_PUBLISHABLE_KEY || '<YOUR_PUBLISHABLE_KEY>', // replace with your publishable API key from Hub
     },
