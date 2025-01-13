@@ -18,6 +18,7 @@ import { sendPurchaseCloseEvent } from './PurchaseWidgetEvents';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { getRemoteImage } from '../../lib/utils';
+import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
 
 export type PurchaseWidgetInputs = PurchaseWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
@@ -26,6 +27,7 @@ export type PurchaseWidgetInputs = PurchaseWidgetParams & {
 
 export default function PurchaseWidget({
   config,
+  environmentId,
   items,
   showBackButton,
 }: PurchaseWidgetInputs) {
@@ -36,6 +38,10 @@ export default function PurchaseWidget({
     view: { type: PurchaseWidgetViews.PURCHASE },
     history: [{ type: PurchaseWidgetViews.PURCHASE }],
   });
+
+  const {
+    providersState: { checkout },
+  } = useProvidersContext();
 
   const viewReducerValues = useMemo(
     () => ({
@@ -100,6 +106,8 @@ export default function PurchaseWidget({
           />
           {viewState.view.type === PurchaseWidgetViews.PURCHASE && (
             <Purchase
+              checkout={checkout}
+              environmentId={environmentId!}
               showBackButton={showBackButton}
               onCloseButtonClick={() => sendPurchaseCloseEvent(eventTarget)}
               onBackButtonClick={() => {

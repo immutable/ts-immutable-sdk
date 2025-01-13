@@ -249,6 +249,7 @@ export enum SignCurrencyFilter {
 }
 
 export type SignApiRequest = {
+  spender_address: string;
   recipient_address: string;
   currency_filter: SignCurrencyFilter;
   currency_value: string;
