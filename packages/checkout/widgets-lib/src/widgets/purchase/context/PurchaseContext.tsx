@@ -1,5 +1,6 @@
 import { Squid } from '@0xsquid/sdk';
 import { createContext } from 'react';
+import { PurchaseItem } from '../types';
 
 export interface PurchaseState {
   squid: Squid | null;
@@ -19,15 +20,22 @@ export interface PurchaseAction {
 }
 
 type ActionPayload =
-  | SetSquid;
+  | SetSquid
+  | SetItems;
 
 export enum PurchaseActions {
   SET_SQUID = 'SET_SQUID',
+  SET_ITEMS = 'SET_ITEMS',
 }
 
 export interface SetSquid {
   type: PurchaseActions.SET_SQUID;
   squid: Squid;
+}
+
+export interface SetItems {
+  type: PurchaseActions.SET_ITEMS;
+  items: PurchaseItem[];
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention

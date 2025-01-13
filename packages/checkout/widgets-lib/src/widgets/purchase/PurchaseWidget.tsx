@@ -1,8 +1,12 @@
 import { IMTBLWidgetEvents, PurchaseWidgetParams } from '@imtbl/checkout-sdk';
 import { CloudImage, Stack, useTheme } from '@biom3/react';
-import { useContext, useMemo, useReducer } from 'react';
+import {
+  useContext, useEffect, useMemo, useReducer,
+} from 'react';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { initialPurchaseState, PurchaseContext, purchaseReducer } from './context/PurchaseContext';
+import {
+  initialPurchaseState, PurchaseActions, PurchaseContext, purchaseReducer,
+} from './context/PurchaseContext';
 import { PurchaseWidgetViews } from '../../context/view-context/PurchaseViewContextTypes';
 import {
   initialViewState,
@@ -14,13 +18,16 @@ import { sendPurchaseCloseEvent } from './PurchaseWidgetEvents';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { getRemoteImage } from '../../lib/utils';
+import { PurchaseItem } from './types';
 
 export type PurchaseWidgetInputs = PurchaseWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
+  items: PurchaseItem[];
 };
 
 export default function PurchaseWidget({
   config,
+  items,
   showBackButton,
 }: PurchaseWidgetInputs) {
   const { base: { colorMode } } = useTheme();
@@ -55,6 +62,18 @@ export default function PurchaseWidget({
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
+
+  useEffect(
+    () => {
+      purchaseDispatch({
+        payload: {
+          type: PurchaseActions.SET_ITEMS,
+          items,
+        },
+      });
+    },
+    [items],
+  );
 
   return (
     <ViewContext.Provider value={viewReducerValues}>
