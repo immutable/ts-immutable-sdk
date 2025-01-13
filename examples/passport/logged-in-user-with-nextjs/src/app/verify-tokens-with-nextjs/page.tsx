@@ -17,16 +17,16 @@ export default function LoginWithPassport() {
       const provider = passportInstance.connectEvm();
       const accounts = await provider.request({ method: 'eth_requestAccounts' });
       // #doc passport-get-id-token
-      const fetchedIdToken = await passportInstance.getIdToken();
+      const idToken = await passportInstance.getIdToken();
       // #enddoc passport-get-id-token
       // #doc passport-get-access-token
-      const fetchedAccessToken = await passportInstance.getAccessToken();
+      const accessToken = await passportInstance.getAccessToken();
       // #enddoc passport-get-access-token
       if (accounts) {
         setIsLoggedIn(true);
         setAccountAddress(accounts[0] || null);
-        setIdToken(fetchedIdToken || null);
-        setAccessToken(fetchedAccessToken || null);
+        setIdToken(idToken || null);
+        setAccessToken(accessToken || null);
       } else {
         setIsLoggedIn(false);
       }
