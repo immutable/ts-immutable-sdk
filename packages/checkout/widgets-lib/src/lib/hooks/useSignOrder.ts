@@ -373,6 +373,9 @@ export const useSignOrder = (input: SignOrderInput) => {
           custom_data: customOrderData,
         };
 
+        // eslint-disable-next-line no-console
+        console.log('data', data);
+
         const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/order/sign`;
         const apiResponse = await signAPI(baseUrl, data);
 
