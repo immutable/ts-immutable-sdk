@@ -26,7 +26,7 @@ export type NativeCurrency = {
   iconUrl: string;
 };
 
-export type AmountData = {
+export type FromAmountData = {
   fromToken: Token;
   fromAmount: string;
   toToken: Token;
@@ -36,7 +36,7 @@ export type AmountData = {
 };
 
 export type RouteData = {
-  amountData: AmountData;
+  amountData: FromAmountData;
   route: RouteResponse;
   isInsufficientGas: boolean;
 };

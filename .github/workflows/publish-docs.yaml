@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: public-docs
+  cancel-in-progress: false
+
 jobs:
   AlphaCheck:
     name: Check if SDK version is alpha
@@ -92,10 +96,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-build-cache-deps-docs-${{ hashFiles('yarn.lock') }}
 
       - name: Install dependencies
-        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true' 
+        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
       - name: Build

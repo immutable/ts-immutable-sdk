@@ -25,7 +25,6 @@ import {
 import { RouteResponse } from '@0xsquid/squid-types';
 import { t } from 'i18next';
 import { Trans } from 'react-i18next';
-import { Environment } from '@imtbl/config';
 import { ChainId } from '@imtbl/checkout-sdk';
 import { trackFlow } from '@imtbl/metrics';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -46,12 +45,7 @@ import { useHandover } from '../../../lib/hooks/useHandover';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
 import { getRemoteRive } from '../../../lib/utils';
-import {
-  APPROVE_TXN_ANIMATION,
-  EXECUTE_TXN_ANIMATION,
-  FIXED_HANDOVER_DURATION,
-  TOOLKIT_SQUID_URL,
-} from '../utils/config';
+
 import {
   useAnalytics,
   UserJourney,
@@ -62,20 +56,24 @@ import { getTotalRouteFees } from '../../../lib/squid/functions/getTotalRouteFee
 import { getRouteChains } from '../../../lib/squid/functions/getRouteChains';
 
 import { SquidFooter } from '../../../lib/squid/components/SquidFooter';
-import { useError } from '../../../lib/squid/hooks/useError';
 import {
   sendAddTokensCloseEvent,
   sendAddTokensSuccessEvent,
 } from '../AddTokensWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { convertToNetworkChangeableProvider } from '../../../functions/convertToNetworkChangeableProvider';
-import { AmountData } from '../../../lib/squid/types';
-import { SQUID_NATIVE_TOKEN } from '../../../lib/squid/config';
+import { FromAmountData } from '../../../lib/squid/types';
+import {
+  APPROVE_TXN_ANIMATION, EXECUTE_TXN_ANIMATION, FIXED_HANDOVER_DURATION, SQUID_NATIVE_TOKEN, TOOLKIT_SQUID_URL,
+} from '../../../lib/squid/config';
 import { AddressMissmatchDrawer } from '../../../components/AddressMismatchDrawer/AddressMissmatchDrawer';
 import { RouteFees } from '../../../components/RouteFees/RouteFees';
 import { getDurationFormatted } from '../../../functions/getDurationFormatted';
 import { getFormattedNumber, getFormattedAmounts } from '../../../functions/getFormattedNumber';
 import { RiveStateMachineInput } from '../../../types/HandoverTypes';
+import { verifyAndSwitchChain } from '../../../lib/squid/functions/verifyAndSwitchChain';
+import { useErrorHandler } from '../hooks/useErrorHandler';
+import { useError } from '../../../lib/squid/hooks/useError';
 
 interface ReviewProps {
   data: AddTokensReviewData;
@@ -114,26 +112,28 @@ export function Review({
     },
   } = useProvidersContext();
 
+  const { showErrorHandover } = useError(checkout.config.environment);
+
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
 
   const [route, setRoute] = useState<RouteResponse | undefined>();
-  const [amountData, setAmountData] = useState<AmountData | undefined>();
+  const [amountData, setAmountData] = useState<FromAmountData | undefined>();
   const [proceedDisabled, setProceedDisabled] = useState(true);
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
   const [showSecuringQuote, setShowSecuringQuote] = useState(false);
   const [showAddressMissmatchDrawer, setShowAddressMissmatchDrawer] = useState(false);
-  const { getAmountData, getRoute } = useRoutes();
+  const { getFromAmountData, getRoute } = useRoutes();
   const { addHandover, closeHandover } = useHandover({
     id: HandoverTarget.GLOBAL,
   });
 
-  const { showErrorHandover } = useError(checkout.config.environment);
+  const { onTransactionError } = useErrorHandler();
 
   const {
-    checkProviderChain, getAllowance, approve, execute, getStatus,
-  } = useExecute(id, checkout?.config.environment || Environment.SANDBOX);
+    getAllowance, approve, execute, getStatus,
+  } = useExecute(UserJourney.ADD_TOKENS, onTransactionError);
 
   useEffect(() => {
     page({
@@ -155,7 +155,7 @@ export function Review({
 
     setShowSecuringQuote(true);
 
-    const updatedAmountData = getAmountData(
+    const updatedAmountData = getFromAmountData(
       tokens,
       data.balance,
       data.toAmount,
@@ -165,6 +165,7 @@ export function Review({
         : data.toTokenAddress,
       data.additionalBuffer,
     );
+
     if (!updatedAmountData) return;
 
     const routeResponse = await getRoute(
@@ -361,12 +362,12 @@ export function Review({
       fromProvider,
     );
 
-    const isValidNetwork = await checkProviderChain(
+    const verifyChainResult = await verifyAndSwitchChain(
       changeableProvider,
       route.route.params.fromChain,
     );
 
-    if (!isValidNetwork) {
+    if (!verifyChainResult.isChainCorrect) {
       return;
     }
 
@@ -656,7 +657,6 @@ export function Review({
     getRouteIntervalIdRef,
     approve,
     showHandover,
-    checkProviderChain,
     getAllowance,
     execute,
     closeHandover,
