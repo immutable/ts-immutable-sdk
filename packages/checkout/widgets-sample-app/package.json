@@ -22,8 +22,8 @@
     "@imtbl/config": "0.0.0",
     "@imtbl/passport": "0.0.0",
     "embla-carousel-react": "^8.1.5",
-    "framer-motion": "^11.0.6",
     "jsbi": "^3.2.1",
+    "motion": "^11.17.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.11.0"

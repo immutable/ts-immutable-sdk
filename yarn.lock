@@ -4674,8 +4674,8 @@ __metadata:
     "@types/react-dom": ^18.0.11
     "@vitejs/plugin-react": ^4.2.0
     embla-carousel-react: ^8.1.5
-    framer-motion: ^11.0.6
     jsbi: ^3.2.1
+    motion: ^11.17.0
     react: ^18.2.0
     react-dom: ^18.2.0
     react-router-dom: ^6.11.0
@@ -5032,7 +5032,7 @@ __metadata:
     eslint: ^8.40.0
     eslint-config-next: 13.3.1
     ethers: ^5.7.2
-    framer-motion: ^11.0.6
+    motion: ^11.17.0
     next: 14.2.10
     react: ^18.2.0
     react-bootstrap: ^2.7.2
@@ -23230,6 +23230,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"framer-motion@npm:^11.17.0":
+  version: 11.17.0
+  resolution: "framer-motion@npm:11.17.0"
+  dependencies:
+    motion-dom: ^11.16.4
+    motion-utils: ^11.16.0
+    tslib: ^2.4.0
+  peerDependencies:
+    "@emotion/is-prop-valid": "*"
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  peerDependenciesMeta:
+    "@emotion/is-prop-valid":
+      optional: true
+    react:
+      optional: true
+    react-dom:
+      optional: true
+  checksum: df60a1686fb05d7c37a0ddca4d420987cff169460aad55c87fb399441e03dfb373b1c7498b2aa766e7da6ab5a70c997fca4025ec5d53f2b54e4007dc575b6f14
+  languageName: node
+  linkType: hard
+
 "fresh@npm:0.5.2":
   version: 0.5.2
   resolution: "fresh@npm:0.5.2"
@@ -30139,6 +30161,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"motion-dom@npm:^11.16.4":
+  version: 11.16.4
+  resolution: "motion-dom@npm:11.16.4"
+  dependencies:
+    motion-utils: ^11.16.0
+  checksum: 029f9924023e3b92428af8f1f3ef2fccc3f313ae58e2cb8669b774627a186a2ac8aacf9ad46fd9321e752c40254de6fd05a00003147ab8260622afe16060b491
+  languageName: node
+  linkType: hard
+
+"motion-utils@npm:^11.16.0":
+  version: 11.16.0
+  resolution: "motion-utils@npm:11.16.0"
+  checksum: 77063c4759b534dc0b13c290b3ef947d21f825782b5ff6329574e90c847ed46f8f948c1f842ed11907058595e575f82e7c850627e4d902eaca9479e24db900c1
+  languageName: node
+  linkType: hard
+
 "motion@npm:10.16.2":
   version: 10.16.2
   resolution: "motion@npm:10.16.2"
@@ -30150,6 +30188,27 @@ __metadata:
     "@motionone/utils": ^10.15.1
     "@motionone/vue": ^10.16.2
   checksum: 0b91256808c2374d8b7f4ac5e7ed513f2ca8df2b7d1be4fbc00ec5baece5162ada648aedaa5bc1d60be9ad2e6c9bc1d3bb160333051c20ab79e241b8e02e3c92
+  languageName: node
+  linkType: hard
+
+"motion@npm:^11.17.0":
+  version: 11.17.0
+  resolution: "motion@npm:11.17.0"
+  dependencies:
+    framer-motion: ^11.17.0
+    tslib: ^2.4.0
+  peerDependencies:
+    "@emotion/is-prop-valid": "*"
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  peerDependenciesMeta:
+    "@emotion/is-prop-valid":
+      optional: true
+    react:
+      optional: true
+    react-dom:
+      optional: true
+  checksum: f6dc78716bf1a99ebd4c228ea2096c66d8edc6975fa9ff6235935a12b7c3efc0396e9dc11905aeecd4ba7595ea01e9ba31d40dcb649fdd509f9a17b7ac01099d
   languageName: node
   linkType: hard
 
