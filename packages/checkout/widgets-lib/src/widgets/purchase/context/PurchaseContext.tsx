@@ -60,6 +60,11 @@ export const purchaseReducer: Reducer<PurchaseState, PurchaseAction> = (
         ...state,
         squid: action.payload.squid,
       };
+    case PurchaseActions.SET_ITEMS:
+      return {
+        ...state,
+        items: action.payload.items,
+      };
     default:
       return state;
   }
