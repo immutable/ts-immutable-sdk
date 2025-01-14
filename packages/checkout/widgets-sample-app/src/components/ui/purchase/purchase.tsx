@@ -78,7 +78,7 @@ export default function PurchaseUI() {
       <h1 className="sample-heading">Checkout Purchase</h1>
 
       <div id={PURCHASE_WIDGET_ID}></div>
-      <button onClick={() => purchase.mount(PURCHASE_WIDGET_ID, {})}>Mount</button>
+      <button onClick={() => purchase.mount(PURCHASE_WIDGET_ID, {items: defaultItems})}>Mount</button>
       <button onClick={() => purchase.unmount()}>Unmount</button>
       <button onClick={() => purchase.update({ config: { theme: WidgetTheme.LIGHT } })}>Update Config Light</button>
       <button onClick={() => purchase.update({ config: { theme: WidgetTheme.DARK } })}>Update Config Dark</button>
