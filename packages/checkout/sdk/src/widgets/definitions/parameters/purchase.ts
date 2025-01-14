@@ -11,7 +11,7 @@ export type PurchaseWidgetParams = {
   showBackButton?: boolean;
 
   /** The list of products to be purchased */
-  items?: PurchaseItem[];
+  items: PurchaseItem[];
 };
 
 export type PurchaseItem = {
