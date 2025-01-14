@@ -1,10 +1,11 @@
 import {
-  ButtCon, Button, MenuItem, Stack,
+  ButtCon, Button, Link, MenuItem, Stack,
 } from '@biom3/react';
 import {
   ChainId, Checkout, EIP6963ProviderInfo, WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 import {
+  ReactNode,
   useCallback,
   useContext, useEffect, useMemo, useState,
 } from 'react';
@@ -13,6 +14,7 @@ import { ChainType } from '@0xsquid/squid-types';
 import { Environment } from '@imtbl/config';
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import { useContext } from 'react';
+import { Trans } from 'react-i18next';
 import { Stack, ButtCon } from '@biom3/react';
 import { PurchaseItem } from '@imtbl/checkout-sdk';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -34,11 +36,17 @@ import { useSquid } from '../../../lib/squid/hooks/useSquid';
 import { useTokens } from '../../../lib/squid/hooks/useTokens';
 import { fetchChains } from '../../../lib/squid/functions/fetchChains';
 import { fetchBalances } from '../../../lib/squid/functions/fetchBalances';
+import { RiveStateMachineInput } from '../../../types/HandoverTypes';
 import { SelectedRouteOption } from '../../../components/SelectedRouteOption/SelectedRouteOption';
 import { convertToNetworkChangeableProvider } from '../../../functions/convertToNetworkChangeableProvider';
 import { useExecute } from '../../../lib/squid/hooks/useExecute';
 import { useSignOrder } from '../../../lib/hooks/useSignOrder';
 import { SignPaymentTypes } from '../../../lib/primary-sales';
+import { getRemoteRive } from '../../../lib/utils';
+import { HandoverContent } from '../../../components/Handover/HandoverContent';
+import { useHandover } from '../../../lib/hooks/useHandover';
+import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
+import { EXECUTE_TXN_ANIMATION } from '../../../lib/squid/config';
 
 interface PurchaseProps {
   checkout: Checkout;
@@ -56,6 +64,202 @@ export function Purchase({
   onBackButtonClick,
 }: PurchaseProps) {
   const { purchaseState: { items } } = useContext(PurchaseContext);
+
+  const {
+    fetchRoutesWithRateLimit, resetRoutes, getRoute, getAmountData,
+  } = useRoutes();
+
+  const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
+  const [showPayWithDrawer, setShowPayWithDrawer] = useState(false);
+  const [showDeliverToDrawer, setShowDeliverToDrawer] = useState(false);
+
+  const [selectedRouteData, setSelectedRouteData] = useState<RouteData | undefined>(undefined);
+  const [fetchingRoutes, setFetchingRoutes] = useState(false);
+  const [insufficientBalance, setInsufficientBalance] = useState(false);
+
+  // TODO: Move to context
+  const [balances, setBalances] = useState<TokenBalance[]>([]);
+  const [routes, setRoutes] = useState<RouteData[]>([]);
+  const [chains, setChains] = useState<Chain[]>([]);
+  const squid = useSquid(checkout);
+  const tokens = useTokens(checkout);
+
+  // TODO: Fetch from Primary Sales quote
+  const item = {
+    id: 'lootbox',
+    name: 'Lootbox',
+    price: '1',
+    token: 'USDC',
+    tokenAddress: '0x6de8aCC0D406837030CE4dd28e7c08C5a96a30d2',
+  };
+
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
+
+  const {
+    providersState: {
+      fromProviderInfo,
+      fromProvider,
+      toProviderInfo,
+      fromAddress,
+      toAddress,
+    },
+  } = useProvidersContext();
+  const { providers } = useInjectedProviders({ checkout });
+
+  const {
+    checkProviderChain, getAllowance, approve, execute, getStatus,
+  } = useExecute('purchase-test', checkout?.config.environment || Environment.SANDBOX);
+
+  const { addHandover } = useHandover({
+    id: HandoverTarget.GLOBAL,
+  });
+
+  const walletOptions = useMemo(
+    () => providers
+    // TODO: Check if must filter passport on L1
+      .map((detail) => {
+        if (detail.info.rdns === WalletProviderRdns.PASSPORT) {
+          return {
+            ...detail,
+            info: {
+              ...detail.info,
+              name: getProviderSlugFromRdns(detail.info.rdns).replace(
+                /^\w/,
+                (c) => c.toUpperCase(),
+              ),
+            },
+          };
+        }
+        return detail;
+      }),
+    [providers],
+  );
+
+  interface HandoverProps {
+    animationPath: string;
+    state: RiveStateMachineInput;
+    headingText: string;
+    subheadingText?: ReactNode;
+    primaryButtonText?: string;
+    onPrimaryButtonClick?: () => void;
+    secondaryButtonText?: string;
+    onSecondaryButtonClick?: () => void;
+    duration?: number;
+  }
+
+  const showHandover = useCallback(
+    ({
+      animationPath,
+      state,
+      headingText,
+      subheadingText,
+      primaryButtonText,
+      onPrimaryButtonClick,
+      secondaryButtonText,
+      onSecondaryButtonClick,
+      duration,
+    }: HandoverProps) => {
+      addHandover({
+        animationUrl: getRemoteRive(
+          checkout?.config.environment,
+          animationPath,
+        ),
+        inputValue: state,
+        duration,
+        children: (
+          <HandoverContent
+            headingText={headingText}
+            subheadingText={subheadingText}
+            primaryButtonText={primaryButtonText}
+            onPrimaryButtonClick={onPrimaryButtonClick}
+            secondaryButtonText={secondaryButtonText}
+            onSecondaryButtonClick={onSecondaryButtonClick}
+          />
+        ),
+      });
+    },
+    [addHandover, checkout],
+  );
+
+  const handleWalletConnected = (
+    providerType: 'from' | 'to',
+    provider: Web3Provider,
+    providerInfo: EIP6963ProviderInfo,
+  ) => {
+    sendConnectProviderSuccessEvent(
+      eventTarget,
+      providerType,
+      provider,
+      providerInfo,
+    );
+  };
+
+  const handleRouteClick = (route: RouteData) => {
+    setShowOptionsDrawer(false);
+    setShowPayWithDrawer(false);
+    setShowDeliverToDrawer(false);
+    setSelectedRouteData(route);
+  };
+
+  useEffect(() => {
+    resetRoutes();
+    setInsufficientBalance(false);
+    setSelectedRouteData(undefined);
+  }, [fromAddress]);
+
+  useEffect(() => {
+    resetRoutes();
+    setInsufficientBalance(false);
+    setSelectedRouteData(undefined);
+
+    (async () => {
+      if (
+        balances
+        && squid
+        && tokens
+      ) {
+        setFetchingRoutes(true);
+        const availableRoutes = await fetchRoutesWithRateLimit(
+          squid,
+          tokens,
+          balances,
+          ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+          item.tokenAddress,
+          item.price,
+          5,
+          1000,
+          true,
+        );
+        setFetchingRoutes(false);
+
+        if (availableRoutes.length === 0) {
+          setInsufficientBalance(true);
+        }
+
+        setRoutes(availableRoutes);
+      }
+    })();
+  }, [balances, squid]);
+
+  useEffect(() => {
+    if (!squid || !fromProvider) return;
+
+    (async () => {
+      const updatedChains = fetchChains(squid);
+      const updatedBalances = await fetchBalances(squid, updatedChains, fromProvider);
+
+      setChains(updatedChains);
+      setBalances(updatedBalances);
+    })();
+  }, [squid, fromProvider]);
+
+  useEffect(() => {
+    if (!selectedRouteData && routes.length > 0) {
+      setSelectedRouteData(routes[0]);
+    }
+  }, [routes]);
 
   const shouldShowBackButton = showBackButton && onBackButtonClick;
   const shouldShowOnRampOption = false;
@@ -84,15 +288,15 @@ export function Purchase({
     // eslint-disable-next-line max-len
     if (!squid || !tokens || !toAddress || !selectedRouteData || !fromAddress || !fromProvider || !fromProviderInfo) return;
 
-    const { signResponse, postHooks } = await signWithPostHooks(
+    const signResponse = await signWithPostHooks(
       SignPaymentTypes.CRYPTO,
       item.tokenAddress,
       squidMulticallAddress,
       toAddress,
     );
 
-    console.log('signResponse', signResponse);
-    console.log('postHooks', postHooks);
+    console.log('signResponse', signResponse?.signResponse);
+    console.log('postHooks', signResponse?.postHooks);
 
     const updatedAmountData = getAmountData(
       tokens,
@@ -104,6 +308,14 @@ export function Purchase({
     );
     if (!updatedAmountData) return;
 
+    const postHooks = signResponse?.postHooks ? {
+      chainType: ChainType.EVM,
+      calls: signResponse.postHooks,
+      provider: 'Immutable Primary Sales',
+      description: 'Perform Primary Sales NFT checkout',
+      logoURI: 'https://explorer.immutable.com/assets/configs/network_icon.svg',
+    } : undefined;
+
     const route = (await getRoute(
       squid,
       updatedAmountData?.fromToken,
@@ -113,13 +325,7 @@ export function Purchase({
       updatedAmountData.toAmount,
       fromAddress,
       false,
-      {
-        chainType: ChainType.EVM,
-        calls: postHooks,
-        provider: 'Immutable Primary Sales',
-        description: 'Perform Primary Sales NFT checkout',
-        logoURI: 'https://explorer.immutable.com/assets/configs/network_icon.svg',
-      },
+      postHooks,
     ))?.route;
 
     if (!route) return;
@@ -171,6 +377,35 @@ export function Purchase({
     console.log('axelarscanUrl', axelarscanUrl);
 
     console.log('proceed finished');
+
+    if (status?.squidTransactionStatus === 'success') {
+      showHandover({
+        animationPath: EXECUTE_TXN_ANIMATION,
+        state: RiveStateMachineInput.COMPLETED,
+        headingText: 'Purchase complete',
+        subheadingText: (
+          <Trans
+            i18nKey="Go to <axelarscanLink>Axelarscan</axelarscanLink> for transaction details"
+            components={{
+              axelarscanLink: (
+                <Link
+                  size="small"
+                  rc={(
+                    <a
+                      target="_blank"
+                      href={axelarscanUrl}
+                      rel="noreferrer"
+                    />
+                  )}
+                />
+              ),
+            }}
+          />
+        ),
+        primaryButtonText: 'Done',
+        onPrimaryButtonClick: () => {},
+      });
+    }
   }, [
     squid,
     tokens,
