@@ -20,10 +20,10 @@ export default function LoginWithPassport() {
     if (!passportInstance) return;
     try {
       const provider = passportInstance.connectEvm();
-      // #doc passport-get-user-info
       const accounts = await provider.request({ method: 'eth_requestAccounts' });
-      // #enddoc passport-get-user-info
+      // #doc passport-get-user-info
       const userProfileData = await passportInstance.getUserInfo();
+      // #enddoc passport-get-user-info
       if (accounts) {
         setIsLoggedIn(true);
         setAccountAddress(accounts[0] || null);
