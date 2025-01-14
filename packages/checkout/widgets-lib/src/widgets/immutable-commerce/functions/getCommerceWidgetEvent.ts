@@ -9,6 +9,7 @@ import {
   IMTBLWidgetEvents,
   OnRampEventType,
   ProviderEventType,
+  PurchaseEventType,
   SaleEventType,
   SwapEventType,
   WalletEventType,
@@ -315,6 +316,38 @@ function mapSaleWidgetEvent(
   }
 }
 
+function mapPurchaseWidgetEvent(
+  event: CustomEvent<{ type: PurchaseEventType; data: Record<string, unknown> }>,
+): CommerceEventDetail {
+  const { type, data } = event.detail;
+
+  switch (type) {
+    case PurchaseEventType.SUCCESS:
+      return {
+        type: CommerceEventType.SUCCESS,
+        data: {
+          type: CommerceSuccessEventType.SALE_SUCCESS,
+          data,
+        },
+      };
+    case PurchaseEventType.FAILURE:
+      return {
+        type: CommerceEventType.FAILURE,
+        data: {
+          type: CommerceFailureEventType.SALE_FAILED,
+          data,
+        },
+      };
+    case PurchaseEventType.CLOSE_WIDGET:
+      return {
+        type: CommerceEventType.CLOSE,
+        data: {},
+      };
+    default:
+      throw new Error(`Unknown purchase event type "${event.detail.type}"`);
+  }
+}
+
 /**
  * Map widget events to commerce widget event detail
  */
@@ -343,6 +376,8 @@ export function getCommerceWidgetEvent(
       return mapOnrampWidgetEvent(event);
     case IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT:
       return mapSaleWidgetEvent(event);
+    case IMTBLWidgetEvents.IMTBL_PURCHASE_WIDGET_EVENT:
+      return mapPurchaseWidgetEvent(event);
     default:
       throw new Error(`Unknown widget event type "${event.type}"`);
   }

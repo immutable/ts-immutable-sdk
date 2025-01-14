@@ -14,6 +14,8 @@ import {
   ConnectWidgetConfiguration,
   WalletWidgetParams,
   WalletWidgetConfiguration,
+  PurchaseWidgetConfiguration,
+  PurchaseWidgetParams,
 } from '@imtbl/checkout-sdk';
 import { ViewType } from './ViewType';
 
@@ -24,7 +26,8 @@ export type CheckoutWidgetView =
   | SaleView
   | SwapView
   | OnRampView
-  | BrdigeView;
+  | BridgeView
+  | PurchaseView;
 
 interface ConnectView extends ViewType {
   type: CommerceFlowType.CONNECT;
@@ -47,6 +50,14 @@ interface AddTokensView extends ViewType {
   data: {
     params: AddTokensWidgetParams;
     config: AddTokensWidgetConfiguration;
+  };
+}
+
+interface PurchaseView extends ViewType {
+  type: CommerceFlowType.PURCHASE;
+  data: {
+    params: PurchaseWidgetParams;
+    config: PurchaseWidgetConfiguration;
   };
 }
 
@@ -74,7 +85,7 @@ interface OnRampView extends ViewType {
   };
 }
 
-interface BrdigeView extends ViewType {
+interface BridgeView extends ViewType {
   type: CommerceFlowType.BRIDGE;
   data: {
     params: BridgeWidgetParams;
