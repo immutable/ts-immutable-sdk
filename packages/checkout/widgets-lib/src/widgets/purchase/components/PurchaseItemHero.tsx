@@ -1,5 +1,5 @@
 import { Sticker, Pile, FramedImage } from '@biom3/react';
-import { PurchaseItem } from '../types';
+import { PurchaseItem } from '@imtbl/checkout-sdk';
 
 interface StickerDisplayProps {
   items: PurchaseItem[];

@@ -1,8 +1,8 @@
 import { useContext } from 'react';
 import { Stack, ButtCon } from '@biom3/react';
+import { PurchaseItem } from '@imtbl/checkout-sdk';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { PurchaseContext } from '../context/PurchaseContext';
-import { PurchaseItem } from '../types';
 import { PurchaseItemHero } from '../components/PurchaseItemHero';
 
 interface PurchaseProps {

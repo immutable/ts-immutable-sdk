@@ -1,6 +1,6 @@
 import { Squid } from '@0xsquid/sdk';
+import { PurchaseItem } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
-import { PurchaseItem } from '../types';
 
 export interface PurchaseState {
   squid: Squid | null;

@@ -1,4 +1,4 @@
-import { IMTBLWidgetEvents, PurchaseWidgetParams } from '@imtbl/checkout-sdk';
+import { IMTBLWidgetEvents, PurchaseItem, PurchaseWidgetParams } from '@imtbl/checkout-sdk';
 import { CloudImage, Stack, useTheme } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useReducer,
@@ -18,7 +18,6 @@ import { sendPurchaseCloseEvent } from './PurchaseWidgetEvents';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { getRemoteImage } from '../../lib/utils';
-import { PurchaseItem } from './types';
 
 export type PurchaseWidgetInputs = PurchaseWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
