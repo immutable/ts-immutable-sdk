@@ -9,32 +9,7 @@ export interface PurchaseState {
 
 export const initialPurchaseState: PurchaseState = {
   squid: null,
-  items: [
-  //   {
-  //   productId: 'kookaburra',
-  //   qty: 1,
-  //   name: 'Kookaburra',
-  //   image:
-  //     'https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-4-1.png',
-  //   description: 'Kookaburra',
-  // },
-    {
-      productId: 'quokka',
-      qty: 2,
-      name: 'Quokka',
-      image:
-      'https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-8-1.png',
-      description: 'Quokka',
-    },
-    // {
-    //   productId: 'ibis',
-    //   qty: 1,
-    //   name: 'Ibis',
-    //   image:
-    //   'https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-1-1.png',
-    //   description: 'Ibis',
-    // }
-  ],
+  items: [],
 };
 
 export interface PurchaseContextState {
