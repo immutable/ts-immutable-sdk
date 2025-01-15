@@ -29,7 +29,7 @@ export default function LoginWithPassport() {
       console.error('Error connecting to Passport with Ethers.js:', error);
       setIsLoggedIn(false);
     }
-  }, [passportInstance]);
+  }, []);
 
   return (
     <>

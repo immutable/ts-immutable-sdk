@@ -30,7 +30,7 @@ export default function UserProfileInfo() {
       console.error('Error connecting to Passport', error);
       setIsLoggedIn(false);
     }
-  }, [passportInstance]);
+  }, []);
 
   return (
     <>
