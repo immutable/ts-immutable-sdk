@@ -59,7 +59,7 @@ export function Purchase({
   onBackButtonClick,
 }: PurchaseProps) {
   const {
-    fetchRoutesWithRateLimit, resetRoutes, getRoute, getAmountData,
+    fetchRoutesWithRateLimit, resetRoutes, getRoute, getAmountData, hasSufficientBalance,
   } = useRoutes();
 
   const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
@@ -68,6 +68,8 @@ export function Purchase({
 
   const [selectedRouteData, setSelectedRouteData] = useState<RouteData | undefined>(undefined);
   const [fetchingRoutes, setFetchingRoutes] = useState(false);
+  const [isFundingNeeded, setIsFundingNeeded] = useState<boolean | undefined>(undefined);
+
   const [insufficientBalance, setInsufficientBalance] = useState(false);
 
   // TODO: Move to context
@@ -102,7 +104,7 @@ export function Purchase({
   const { providers } = useInjectedProviders({ checkout });
 
   const {
-    checkProviderChain, getAllowance, approve, execute, getStatus,
+    checkProviderChain, getAllowance, approve, execute, getStatus, waitForReceipt,
   } = useExecute('purchase-test', checkout?.config.environment || Environment.SANDBOX);
 
   const { addHandover } = useHandover({
@@ -208,30 +210,35 @@ export function Purchase({
     setSelectedRouteData(undefined);
 
     (async () => {
-      if (
-        balances
-        && squid
-        && tokens
-      ) {
-        setFetchingRoutes(true);
-        const availableRoutes = await fetchRoutesWithRateLimit(
-          squid,
-          tokens,
+      if (balances && squid && tokens && balances.length > 0) {
+        console.log('balances', balances);
+        const isSufficientBalance = hasSufficientBalance(
           balances,
-          ChainId.IMTBL_ZKEVM_MAINNET.toString(),
           item.tokenAddress,
+          ChainId.IMTBL_ZKEVM_MAINNET.toString(),
           item.price,
-          5,
-          1000,
-          true,
         );
-        setFetchingRoutes(false);
+        console.log('isSufficientBalance', isSufficientBalance);
+        setIsFundingNeeded(!isSufficientBalance);
 
-        if (availableRoutes.length === 0) {
-          setInsufficientBalance(true);
+        if (!isSufficientBalance) {
+          setFetchingRoutes(true);
+
+          const availableRoutes = await fetchRoutesWithRateLimit(
+            squid,
+            tokens,
+            balances,
+            ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+            item.tokenAddress,
+            item.price,
+            5,
+            1000,
+            true,
+          );
+          setFetchingRoutes(false);
+          setRoutes(availableRoutes);
+          setInsufficientBalance(availableRoutes.length === 0);
         }
-
-        setRoutes(availableRoutes);
       }
     })();
   }, [balances, squid]);
@@ -277,116 +284,63 @@ export function Purchase({
 
   const squidMulticallAddress = '0xad6cea45f98444a922a2b4fe96b8c90f0862d2f4';
 
-  const handleProceedClick = useCallback(async () => {
-    // eslint-disable-next-line max-len
-    if (!squid || !tokens || !toAddress || !selectedRouteData || !fromAddress || !fromProvider || !fromProviderInfo) return;
-
+  const handleDirectCryptoPayment = async (
+    provider: Web3Provider,
+    spenderAddress: string,
+    recipientAddress: string,
+    tokenAddress: string,
+  ) => {
     const signResponse = await signWithPostHooks(
       SignPaymentTypes.CRYPTO,
-      item.tokenAddress,
-      squidMulticallAddress,
-      toAddress,
+      tokenAddress,
+      spenderAddress,
+      recipientAddress,
     );
+    if (!signResponse) return;
+    const signer = provider.getSigner();
+    if (!signer) return;
 
-    console.log('signResponse', signResponse?.signResponse);
-    console.log('postHooks', signResponse?.postHooks);
+    const gasPrice = await provider.getGasPrice();
 
-    const updatedAmountData = getAmountData(
-      tokens,
-      selectedRouteData.amountData.balance,
-      item.price,
-      ChainId.IMTBL_ZKEVM_MAINNET.toString(),
-      item.tokenAddress,
-      selectedRouteData.amountData.additionalBuffer,
+    const approveTxn = signResponse.signResponse.transactions.find(
+      (txn) => txn.methodCall.startsWith('approve'),
     );
-    if (!updatedAmountData) return;
+    if (!approveTxn) return;
+    const approveTxnResponse = await signer.sendTransaction({
+      to: approveTxn.tokenAddress,
+      data: approveTxn.rawData,
+      gasPrice,
+      gasLimit: approveTxn.gasEstimate,
+    });
+    await waitForReceipt(provider, approveTxnResponse.hash);
 
-    const postHooks = signResponse?.postHooks ? {
-      chainType: ChainType.EVM,
-      calls: signResponse.postHooks,
-      provider: 'Immutable Primary Sales',
-      description: 'Perform Primary Sales NFT checkout',
-      logoURI: 'https://explorer.immutable.com/assets/configs/network_icon.svg',
-    } : undefined;
-
-    const route = (await getRoute(
-      squid,
-      updatedAmountData?.fromToken,
-      updatedAmountData?.toToken,
-      toAddress,
-      updatedAmountData.fromAmount,
-      updatedAmountData.toAmount,
-      fromAddress,
-      false,
-      postHooks,
-    ))?.route;
-
-    if (!route) return;
-
-    const currentFromAddress = await fromProvider.getSigner().getAddress();
-
-    if (currentFromAddress !== fromAddress) {
-      return;
-    }
-
-    const changeableProvider = await convertToNetworkChangeableProvider(
-      fromProvider,
+    const executeTxn = signResponse.signResponse.transactions.find(
+      (txn) => txn.methodCall.startsWith('execute'),
     );
-
-    const isValidNetwork = await checkProviderChain(
-      changeableProvider,
-      route.route.params.fromChain,
-    );
-
-    if (!isValidNetwork) {
-      return;
-    }
-
-    const allowance = await getAllowance(changeableProvider, route);
-    const { fromAmount } = route.route.params;
-
-    console.log('allowance', allowance);
-
-    if (!allowance || allowance?.lt(fromAmount)) {
-      const approveTxnReceipt = await approve(fromProviderInfo, changeableProvider, route);
-
-      if (!approveTxnReceipt) {
-        return;
-      }
-    }
-
-    const executeTxnReceipt = await execute(squid, fromProviderInfo, changeableProvider, route);
-
-    console.log('executeTxnReceipt', executeTxnReceipt);
-
-    if (!executeTxnReceipt) {
-      return;
-    }
-
-    const status = await getStatus(squid, executeTxnReceipt.transactionHash);
-    const axelarscanUrl = `https://axelarscan.io/gmp/${executeTxnReceipt?.transactionHash}`;
-
-    console.log('status', status);
-    console.log('axelarscanUrl', axelarscanUrl);
-
-    console.log('proceed finished');
-
-    if (status?.squidTransactionStatus === 'success') {
+    if (!executeTxn) return;
+    const executeTxnResponse = await signer.sendTransaction({
+      to: executeTxn.tokenAddress,
+      data: executeTxn.rawData,
+      gasPrice,
+      gasLimit: executeTxn.gasEstimate,
+    });
+    const receipt = await waitForReceipt(provider, executeTxnResponse.hash);
+    if (receipt?.status === 1) {
       showHandover({
         animationPath: EXECUTE_TXN_ANIMATION,
         state: RiveStateMachineInput.COMPLETED,
         headingText: 'Purchase complete',
         subheadingText: (
           <Trans
-            i18nKey="Go to <axelarscanLink>Axelarscan</axelarscanLink> for transaction details"
+            i18nKey="Go to <explorerLink>Block explorer</explorerLink> for transaction details"
             components={{
-              axelarscanLink: (
+              explorerLink: (
                 <Link
                   size="small"
                   rc={(
                     <a
                       target="_blank"
-                      href={axelarscanUrl}
+                      href={`https://explorer.immutable.com/tx/${receipt.transactionHash}`}
                       rel="noreferrer"
                     />
                   )}
@@ -398,6 +352,137 @@ export function Purchase({
         primaryButtonText: 'Done',
         onPrimaryButtonClick: () => {},
       });
+    }
+  };
+
+  const handleProceedClick = useCallback(async () => {
+    // eslint-disable-next-line max-len
+    if (!squid || !tokens || !toAddress || !fromAddress || !fromProvider || !fromProviderInfo) return;
+    if (!selectedRouteData && isFundingNeeded) return;
+
+    if (isFundingNeeded === true) {
+      const signResponse = await signWithPostHooks(
+        SignPaymentTypes.CRYPTO,
+        item.tokenAddress,
+        squidMulticallAddress,
+        toAddress,
+      );
+
+      console.log('signResponse', signResponse?.signResponse);
+      console.log('postHooks', signResponse?.postHooks);
+
+      if (!selectedRouteData) return;
+      const updatedAmountData = getAmountData(
+        tokens,
+        selectedRouteData.amountData.balance,
+        item.price,
+        ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+        item.tokenAddress,
+        selectedRouteData.amountData.additionalBuffer,
+      );
+      if (!updatedAmountData) return;
+
+      const postHooks = signResponse?.postHooks ? {
+        chainType: ChainType.EVM,
+        calls: signResponse.postHooks,
+        provider: 'Immutable Primary Sales',
+        description: 'Perform Primary Sales NFT checkout',
+        logoURI: 'https://explorer.immutable.com/assets/configs/network_icon.svg',
+      } : undefined;
+
+      const route = (await getRoute(
+        squid,
+        updatedAmountData?.fromToken,
+        updatedAmountData?.toToken,
+        toAddress,
+        updatedAmountData.fromAmount,
+        updatedAmountData.toAmount,
+        fromAddress,
+        false,
+        postHooks,
+      ))?.route;
+
+      if (!route) return;
+
+      const currentFromAddress = await fromProvider.getSigner().getAddress();
+
+      if (currentFromAddress !== fromAddress) {
+        return;
+      }
+
+      const changeableProvider = await convertToNetworkChangeableProvider(
+        fromProvider,
+      );
+
+      const isValidNetwork = await checkProviderChain(
+        changeableProvider,
+        route.route.params.fromChain,
+      );
+
+      if (!isValidNetwork) {
+        return;
+      }
+
+      const allowance = await getAllowance(changeableProvider, route);
+      const { fromAmount } = route.route.params;
+
+      console.log('allowance', allowance);
+
+      if (!allowance || allowance?.lt(fromAmount)) {
+        const approveTxnReceipt = await approve(fromProviderInfo, changeableProvider, route);
+
+        if (!approveTxnReceipt) {
+          return;
+        }
+      }
+
+      const executeTxnReceipt = await execute(squid, fromProviderInfo, changeableProvider, route);
+
+      console.log('executeTxnReceipt', executeTxnReceipt);
+
+      if (!executeTxnReceipt) {
+        return;
+      }
+
+      const status = await getStatus(squid, executeTxnReceipt.transactionHash);
+      const axelarscanUrl = `https://axelarscan.io/gmp/${executeTxnReceipt?.transactionHash}`;
+
+      console.log('status', status);
+      console.log('axelarscanUrl', axelarscanUrl);
+
+      console.log('proceed finished');
+
+      if (status?.squidTransactionStatus === 'success') {
+        showHandover({
+          animationPath: EXECUTE_TXN_ANIMATION,
+          state: RiveStateMachineInput.COMPLETED,
+          headingText: 'Purchase complete',
+          subheadingText: (
+            <Trans
+              i18nKey="Go to <axelarscanLink>Axelarscan</axelarscanLink> for transaction details"
+              components={{
+                axelarscanLink: (
+                  <Link
+                    size="small"
+                    rc={(
+                      <a
+                        target="_blank"
+                        href={axelarscanUrl}
+                        rel="noreferrer"
+                      />
+                    )}
+                  />
+                ),
+              }}
+            />
+          ),
+          primaryButtonText: 'Done',
+          onPrimaryButtonClick: () => {},
+        });
+      }
+    } else {
+      // Paying directly with Crypto on Immutable zkEVM (Funded flow)
+      await handleDirectCryptoPayment(fromProvider, fromAddress, toAddress, item.tokenAddress);
     }
   }, [
     squid,
@@ -411,14 +496,14 @@ export function Purchase({
     execute,
   ]);
 
-  const loading = (!!fromAddress || fetchingRoutes)
-    && !(selectedRouteData || insufficientBalance);
+  const loading = (!!fromAddress || fetchingRoutes) && (
+    (!(selectedRouteData || insufficientBalance || isFundingNeeded === false))
+  );
 
   const readyToProceed = !!fromAddress
     && !!toAddress
-    && !!selectedRouteData
-    && !selectedRouteData.isInsufficientGas
-    && !loading;
+    && !loading
+    && ((!!selectedRouteData && !selectedRouteData.isInsufficientGas) || (isFundingNeeded === false));
 
   return (
     <SimpleLayout

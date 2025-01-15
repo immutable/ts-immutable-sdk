@@ -318,5 +318,6 @@ export const useExecute = (contextId: string, environment: Environment) => {
     approve,
     execute,
     getStatus,
+    waitForReceipt,
   };
 };
