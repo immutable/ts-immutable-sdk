@@ -1,12 +1,15 @@
 import { Squid } from '@0xsquid/sdk';
+import { PurchaseItem } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
 
 export interface PurchaseState {
   squid: Squid | null;
+  items: PurchaseItem[];
 }
 
 export const initialPurchaseState: PurchaseState = {
   squid: null,
+  items: [],
 };
 
 export interface PurchaseContextState {
@@ -19,15 +22,22 @@ export interface PurchaseAction {
 }
 
 type ActionPayload =
-  | SetSquid;
+  | SetSquid
+  | SetItems;
 
 export enum PurchaseActions {
   SET_SQUID = 'SET_SQUID',
+  SET_ITEMS = 'SET_ITEMS',
 }
 
 export interface SetSquid {
   type: PurchaseActions.SET_SQUID;
   squid: Squid;
+}
+
+export interface SetItems {
+  type: PurchaseActions.SET_ITEMS;
+  items: PurchaseItem[];
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -49,6 +59,11 @@ export const purchaseReducer: Reducer<PurchaseState, PurchaseAction> = (
       return {
         ...state,
         squid: action.payload.squid,
+      };
+    case PurchaseActions.SET_ITEMS:
+      return {
+        ...state,
+        items: action.payload.items,
       };
     default:
       return state;

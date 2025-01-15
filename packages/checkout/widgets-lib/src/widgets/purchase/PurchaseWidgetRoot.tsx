@@ -15,6 +15,8 @@ import { HandoverProvider } from '../../context/handover-context/HandoverProvide
 import { ProvidersContextProvider } from '../../context/providers-context/ProvidersContext';
 import { LoadingView } from '../../views/loading/LoadingView';
 import PurchaseWidget from './PurchaseWidget';
+import { deduplicateItems } from './functions/deduplicateItems';
+import { isValidArray } from './functions/isValidArray';
 
 export class Purchase extends Base<WidgetType.PURCHASE> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_PURCHASE_WIDGET_EVENT;
@@ -43,9 +45,18 @@ export class Purchase extends Base<WidgetType.PURCHASE> {
   ): PurchaseWidgetParams {
     const validatedParams = params;
 
-    // TODO
+    // TODO - add checks for config parameter
 
-    return validatedParams;
+    if (!isValidArray(params.items)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "items" widget input.');
+      validatedParams.items = [];
+    }
+
+    return {
+      ...validatedParams,
+      items: deduplicateItems(params.items),
+    };
   }
 
   protected render() {
@@ -70,6 +81,7 @@ export class Purchase extends Base<WidgetType.PURCHASE> {
                 >
                   <PurchaseWidget
                     config={this.strongConfig()}
+                    items={this.parameters.items!}
                   />
                 </Suspense>
               </ProvidersContextProvider>

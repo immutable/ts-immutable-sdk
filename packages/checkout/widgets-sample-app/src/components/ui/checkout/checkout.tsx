@@ -140,6 +140,7 @@ const flows: Array<CommerceFlowType> = [
   CommerceFlowType.BRIDGE,
   CommerceFlowType.SALE,
   CommerceFlowType.ADD_TOKENS,
+  CommerceFlowType.PURCHASE,
 ];
 
 function CheckoutUI() {
@@ -205,6 +206,11 @@ function CheckoutUI() {
       flow: CommerceFlowType.ADD_TOKENS,
       toAmount: "1",
       toTokenAddress: "native",
+    },
+    PURCHASE: {
+      flow: CommerceFlowType.PURCHASE,
+      items: itemsMock.slice(0, 1),
+      environmentId: "82a81049-8c41-4ae3-91ca-0bd82a283abc",
     },
   });
 
@@ -473,6 +479,26 @@ function CheckoutUI() {
               }}
             >
               <MenuItem.Label>Primary Sale</MenuItem.Label>
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setParams({
+                  flow: CommerceFlowType.PURCHASE,
+                  items: [
+                    {
+                      productId: "kangaroo",
+                      qty: 1,
+                      name: "Kangaroo",
+                      image:
+                        "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-10-1.png",
+                      description: "Pixel Art Kangaroo",
+                    },
+                  ],
+                  environmentId: "82a81049-8c41-4ae3-91ca-0bd82a283abc",
+                });
+              }}
+            >
+              <MenuItem.Label>Direct NFT Purchase</MenuItem.Label>
             </MenuItem>
           </AppHeaderBar.OverflowPopoverMenu>
           <AppHeaderBar.RightSlot gap="base.spacing.x4">

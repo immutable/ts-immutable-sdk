@@ -47,6 +47,7 @@ import {
   commerceReducer,
   initialCommerceState,
 } from './context/CommerceContext';
+import PurchaseWidget from '../purchase/PurchaseWidget';
 
 export type CommerceWidgetInputs = {
   checkout: Checkout;
@@ -82,7 +83,10 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
     [view, checkout, provider, web3Provider],
   );
 
-  const connectLoaderSuccessEvent = flowParams.flow === CommerceFlowType.ADD_TOKENS ? () => {} : undefined;
+  const connectLoaderSuccessEvent = (
+    flowParams.flow === CommerceFlowType.ADD_TOKENS
+    || flowParams.flow === CommerceFlowType.PURCHASE
+  ) ? () => {} : undefined;
 
   const goToPreviousView = useCallback(() => {
     const sharedViews = [
@@ -248,6 +252,16 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
         {shouldWrapWithProvidersContext && view.type === CommerceFlowType.ADD_TOKENS && (
           <ProvidersContextProvider initialState={{ checkout, toProvider: view.data.params.toProvider }}>
             <AddTokensWidget
+              config={widgetsConfig}
+              {...(view.data.params || {})}
+              {...(view.data.config || {})}
+              showBackButton={showBackButton}
+            />
+          </ProvidersContextProvider>
+        )}
+        {shouldWrapWithProvidersContext && view.type === CommerceFlowType.PURCHASE && (
+          <ProvidersContextProvider initialState={{ checkout }}>
+            <PurchaseWidget
               config={widgetsConfig}
               {...(view.data.params || {})}
               {...(view.data.config || {})}
