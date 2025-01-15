@@ -1,12 +1,12 @@
-* @immutable/sdk
-.github @immutable/security @immutable/sdk
-/.husky @immutable/sdk
-/.nvmrc @immutable/sdk
-/sdk @immutable/sdk
-/packages/x-client @immutable/sdk
-/packages/config @immutable/sdk
-/packages/internal/metrics @immutable/sdk
-/packages/internal/generated-clients @immutable/sdk
+* @immutable/passport
+.github @immutable/security @immutable/passport
+/.husky @immutable/passport
+/.nvmrc @immutable/passport
+/sdk @immutable/passport
+/packages/x-client @immutable/passport
+/packages/config @immutable/passport
+/packages/internal/metrics @immutable/passport
+/packages/internal/generated-clients @immutable/passport
 /packages/internal/generated-clients/src/blockchain-data @immutable/activation
 /packages/internal/toolkit @immutable/passport
 /packages/internal/cryptofiat @immutable/passport
@@ -20,6 +20,6 @@
 /packages/blockchain-data @immutable/activation
 /packages/minting-backend @shineli1984
 /packages/webhook @shineli1984
-/packages/game-bridge @immutable/sdk
-/examples @immutable/sdk
-**/package.json @immutable/sdk
+/packages/game-bridge @immutable/gamesdk
+/examples @immutable/passport
+**/package.json @immutable/passport
