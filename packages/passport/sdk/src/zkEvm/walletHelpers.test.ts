@@ -4,6 +4,7 @@ import {
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import {
   getNonce, signMetaTransactions, signAndPackTypedData, packSignatures,
+  coerceNonceSpace,
 } from './walletHelpers';
 import { TypedDataPayload } from './types';
 
@@ -121,6 +122,20 @@ describe('signAndPackTypedData', () => {
   });
 });
 
+describe('coerceNonceSpace', () => {
+  describe('with no space', () => {
+    it('should default to 0', () => {
+      expect(coerceNonceSpace()).toEqual(BigNumber.from(0));
+    });
+  });
+
+  describe('with space', () => {
+    it('should return the space', () => {
+      expect(coerceNonceSpace(BigNumber.from(12345))).toEqual(BigNumber.from(12345));
+    });
+  });
+});
+
 describe('getNonce', () => {
   const rpcProvider = {} as StaticJsonRpcProvider;
   const nonceMock = jest.fn();
@@ -129,6 +144,7 @@ describe('getNonce', () => {
     jest.resetAllMocks();
     (Contract as unknown as jest.Mock).mockImplementation(() => ({
       nonce: nonceMock,
+      readNonce: nonceMock,
     }));
   });
 

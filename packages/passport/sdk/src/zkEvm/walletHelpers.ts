@@ -55,9 +55,24 @@ export const encodedTransactions = (
   [normalisedTransactions],
 );
 
+/**
+ * This helper function is used to coerce the type <BigNumber | undefined> to BigNumber for the
+ * getNonce function above.
+ * @param {BigNumber} nonceSpace - An unsigned 256 bit value that can be used to encode a nonce into a distinct space.
+ * @returns {BigNumber} The passed in nonceSpace or instead initialises the nonce to 0.
+ */
+export const coerceNonceSpace = (nonceSpace?: BigNumber): BigNumber => nonceSpace || BigNumber.from(0);
+
+/**
+ * When we retrieve a nonce for a smart contract wallet we can retrieve the nonce in a given 256 bit space.
+ * Nonces in each 256 bit space need to be sequential per wallet address. Nonces across 256 bit spaces per
+ * wallet address do not. This function overload can be used to invoke transactions in parallel per smart
+ * contract wallet if required.
+ */
 export const getNonce = async (
   rpcProvider: StaticJsonRpcProvider,
   smartContractWalletAddress: string,
+  nonceSpace?: BigNumber,
 ): Promise<BigNumber> => {
   try {
     const contract = new Contract(
@@ -65,7 +80,8 @@ export const getNonce = async (
       walletContracts.mainModule.abi,
       rpcProvider,
     );
-    const result = await contract.nonce();
+    const space: BigNumber = coerceNonceSpace(nonceSpace); // Default nonce space is 0
+    const result = await contract.readNonce(space);
     if (result instanceof BigNumber) {
       return result;
     }
