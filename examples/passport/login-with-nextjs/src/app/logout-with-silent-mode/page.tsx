@@ -8,6 +8,7 @@ import { passportInstance } from '../utils/setupLogoutSilent';
 export default function SimplifiedLoginWithPassport() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [accountAddress, setAccountAddress] = useState<string | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
 
   const loginWithPassport = async () => {
     if (!passportInstance) return;
@@ -25,6 +26,7 @@ export default function SimplifiedLoginWithPassport() {
 
   const logout = async () => {
     if (!passportInstance || !isLoggedIn) return;
+    setIsLoggingOut(true);
     try {
       // #doc passport-silent-logout
       await passportInstance.logout();
@@ -33,6 +35,8 @@ export default function SimplifiedLoginWithPassport() {
       setAccountAddress(null);
     } catch (error) {
       console.error('Error disconnecting:', error);
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -45,8 +49,9 @@ export default function SimplifiedLoginWithPassport() {
         className="mb-1"
         size="medium"
         onClick={isLoggedIn ? logout : loginWithPassport}
+        disabled={isLoggingOut}
       >
-        {isLoggedIn ? 'Logout' : 'Login'}
+        {isLoggingOut ? 'Logging out...' : isLoggedIn ? 'Logout' : 'Login'}
       </Button>
       {isLoggedIn && accountAddress && (
         <div>Logged in as: {accountAddress}</div>
