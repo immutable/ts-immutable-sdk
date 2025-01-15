@@ -42,6 +42,8 @@ import { HandoverContent } from '../../../components/Handover/HandoverContent';
 import { useHandover } from '../../../lib/hooks/useHandover';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
 import { EXECUTE_TXN_ANIMATION } from '../../../lib/squid/config';
+import { verifyAndSwitchChain } from '../../../lib/squid/functions/verifyAndSwitchChain';
+import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 interface PurchaseProps {
   checkout: Checkout;
@@ -59,7 +61,7 @@ export function Purchase({
   onBackButtonClick,
 }: PurchaseProps) {
   const {
-    fetchRoutesWithRateLimit, resetRoutes, getRoute, getAmountData, hasSufficientBalance,
+    fetchRoutes, getRoute, getFromAmountData, hasSufficientBalance,
   } = useRoutes();
 
   const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
@@ -104,8 +106,10 @@ export function Purchase({
   const { providers } = useInjectedProviders({ checkout });
 
   const {
-    checkProviderChain, getAllowance, approve, execute, getStatus, waitForReceipt,
-  } = useExecute('purchase-test', checkout?.config.environment || Environment.SANDBOX);
+    getAllowance, approve, execute, getStatus, waitForReceipt,
+  } = useExecute(UserJourney.PURCHASE, (err) => {
+    console.log('useExecute err', err);
+  });
 
   const { addHandover } = useHandover({
     id: HandoverTarget.GLOBAL,
@@ -199,13 +203,13 @@ export function Purchase({
   };
 
   useEffect(() => {
-    resetRoutes();
+    setRoutes([]);
     setInsufficientBalance(false);
     setSelectedRouteData(undefined);
   }, [fromAddress]);
 
   useEffect(() => {
-    resetRoutes();
+    setRoutes([]);
     setInsufficientBalance(false);
     setSelectedRouteData(undefined);
 
@@ -224,7 +228,7 @@ export function Purchase({
         if (!isSufficientBalance) {
           setFetchingRoutes(true);
 
-          const availableRoutes = await fetchRoutesWithRateLimit(
+          const availableRoutes = await fetchRoutes(
             squid,
             tokens,
             balances,
@@ -372,7 +376,7 @@ export function Purchase({
       console.log('postHooks', signResponse?.postHooks);
 
       if (!selectedRouteData) return;
-      const updatedAmountData = getAmountData(
+      const updatedAmountData = getFromAmountData(
         tokens,
         selectedRouteData.amountData.balance,
         item.price,
@@ -414,15 +418,14 @@ export function Purchase({
         fromProvider,
       );
 
-      const isValidNetwork = await checkProviderChain(
+      const verifyChainResult = await verifyAndSwitchChain(
         changeableProvider,
         route.route.params.fromChain,
       );
 
-      if (!isValidNetwork) {
+      if (!verifyChainResult.isChainCorrect) {
         return;
       }
-
       const allowance = await getAllowance(changeableProvider, route);
       const { fromAmount } = route.route.params;
 

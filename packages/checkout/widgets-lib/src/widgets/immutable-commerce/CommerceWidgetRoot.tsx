@@ -13,6 +13,7 @@ import {
   CommerceWidgetOnRampFlowParams,
   CommerceWidgetSaleFlowParams,
   CommerceFlowType,
+  CommerceWidgetPurchaseFlowParams,
 } from '@imtbl/checkout-sdk';
 import React, { Suspense } from 'react';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
@@ -148,6 +149,27 @@ export class CommerceWidgetRoot extends Base<WidgetType.IMMUTABLE_COMMERCE> {
     return validatedParams;
   }
 
+  protected getValidPurchaseFlowParams(params: CommerceWidgetPurchaseFlowParams) {
+    const validatedParams = { ...params };
+
+    if (!Array.isArray(validatedParams.items)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "items" widget input.');
+      validatedParams.items = [];
+    }
+
+    if (!params.environmentId) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "environmentId" widget input');
+      validatedParams.environmentId = '';
+    }
+
+    return {
+      ...validatedParams,
+      items: deduplicateSaleItemsArray(params.items),
+    };
+  }
+
   protected getValidSwapFlowParams(params: CommerceWidgetSwapFlowParams) {
     const validatedParams = { ...params };
 
@@ -238,6 +260,8 @@ export class CommerceWidgetRoot extends Base<WidgetType.IMMUTABLE_COMMERCE> {
         return this.getValidOnRampFlowParams(params);
       case CommerceFlowType.ADD_TOKENS:
         return this.getValidAddTokensFlowParams(params);
+      case CommerceFlowType.PURCHASE:
+        return this.getValidPurchaseFlowParams(params);
       default:
         // eslint-disable-next-line no-console
         console.warn(
