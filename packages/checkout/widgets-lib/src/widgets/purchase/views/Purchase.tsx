@@ -7,7 +7,7 @@ import {
   EIP6963ProviderInfo,
   PurchaseItem,
   WalletProviderRdns,
-} from '@imtbl/sdk';
+} from '@imtbl/checkout-sdk';
 import {
   ReactNode,
   useCallback,
