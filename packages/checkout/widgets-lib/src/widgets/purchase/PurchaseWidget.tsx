@@ -21,7 +21,7 @@ import { getRemoteImage } from '../../lib/utils';
 
 export type PurchaseWidgetInputs = PurchaseWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
-  items: PurchaseItem[];
+  items?: PurchaseItem[];
 };
 
 export default function PurchaseWidget({
@@ -64,6 +64,8 @@ export default function PurchaseWidget({
 
   useEffect(
     () => {
+      if (!items) return;
+
       purchaseDispatch({
         payload: {
           type: PurchaseActions.SET_ITEMS,
