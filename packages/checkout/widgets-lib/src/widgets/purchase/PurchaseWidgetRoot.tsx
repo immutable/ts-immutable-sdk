@@ -81,7 +81,7 @@ export class Purchase extends Base<WidgetType.PURCHASE> {
                 >
                   <PurchaseWidget
                     config={this.strongConfig()}
-                    items={this.parameters.items}
+                    items={this.parameters.items!}
                   />
                 </Suspense>
               </ProvidersContextProvider>
