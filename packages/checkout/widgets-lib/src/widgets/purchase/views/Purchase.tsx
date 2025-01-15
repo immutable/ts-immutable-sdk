@@ -270,7 +270,7 @@ export function Purchase({
   const showSwapOption = true;
   const showBridgeOption = true;
 
-  const { signWithPostHooks } = useSignOrder({
+  const { signWithPostHooks, sign } = useSignOrder({
     environmentId,
     provider: fromProvider,
     items: [{
@@ -294,7 +294,7 @@ export function Purchase({
     recipientAddress: string,
     tokenAddress: string,
   ) => {
-    const signResponse = await signWithPostHooks(
+    const signResponse = await sign(
       SignPaymentTypes.CRYPTO,
       tokenAddress,
       spenderAddress,
@@ -306,7 +306,7 @@ export function Purchase({
 
     const gasPrice = await provider.getGasPrice();
 
-    const approveTxn = signResponse.signResponse.transactions.find(
+    const approveTxn = signResponse.transactions.find(
       (txn) => txn.methodCall.startsWith('approve'),
     );
     if (!approveTxn) return;
@@ -318,7 +318,7 @@ export function Purchase({
     });
     await waitForReceipt(provider, approveTxnResponse.hash);
 
-    const executeTxn = signResponse.signResponse.transactions.find(
+    const executeTxn = signResponse.transactions.find(
       (txn) => txn.methodCall.startsWith('execute'),
     );
     if (!executeTxn) return;
