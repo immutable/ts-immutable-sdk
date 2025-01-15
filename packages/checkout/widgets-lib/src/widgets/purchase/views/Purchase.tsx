@@ -2,21 +2,25 @@ import {
   ButtCon, Button, Link, MenuItem, Stack,
 } from '@biom3/react';
 import {
-  ChainId, Checkout, EIP6963ProviderInfo, WalletProviderRdns,
-} from '@imtbl/checkout-sdk';
+  ChainId,
+  Checkout,
+  EIP6963ProviderInfo,
+  PurchaseItem,
+  WalletProviderRdns,
+} from '@imtbl/sdk';
 import {
   ReactNode,
   useCallback,
-  useContext, useEffect, useMemo, useState,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { ChainType } from '@0xsquid/squid-types';
 import { Environment } from '@imtbl/config';
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
-import { useContext } from 'react';
 import { Trans } from 'react-i18next';
-import { Stack, ButtCon } from '@biom3/react';
-import { PurchaseItem } from '@imtbl/checkout-sdk';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { PurchaseContext } from '../context/PurchaseContext';
 import { PurchaseItemHero } from '../components/PurchaseItemHero';
@@ -113,6 +117,7 @@ export function Purchase({
   const {
     getAllowance, approve, execute, getStatus,
   } = useExecute(UserJourney.PURCHASE, (err) => {
+    // eslint-disable-next-line no-console
     console.log('useExecute err', err);
   });
 
@@ -299,7 +304,9 @@ export function Purchase({
       toAddress,
     );
 
+    // eslint-disable-next-line no-console
     console.log('signResponse', signResponse?.signResponse);
+    // eslint-disable-next-line no-console
     console.log('postHooks', signResponse?.postHooks);
 
     const updatedAmountData = getFromAmountData(
@@ -356,6 +363,7 @@ export function Purchase({
     const allowance = await getAllowance(changeableProvider, route);
     const { fromAmount } = route.route.params;
 
+    // eslint-disable-next-line no-console
     console.log('allowance', allowance);
 
     if (!allowance || allowance?.lt(fromAmount)) {
@@ -368,6 +376,7 @@ export function Purchase({
 
     const executeTxnReceipt = await execute(squid, fromProviderInfo, changeableProvider, route);
 
+    // eslint-disable-next-line no-console
     console.log('executeTxnReceipt', executeTxnReceipt);
 
     if (!executeTxnReceipt) {
@@ -377,9 +386,12 @@ export function Purchase({
     const status = await getStatus(squid, executeTxnReceipt.transactionHash);
     const axelarscanUrl = `https://axelarscan.io/gmp/${executeTxnReceipt?.transactionHash}`;
 
+    // eslint-disable-next-line no-console
     console.log('status', status);
+    // eslint-disable-next-line no-console
     console.log('axelarscanUrl', axelarscanUrl);
 
+    // eslint-disable-next-line no-console
     console.log('proceed finished');
 
     if (status?.squidTransactionStatus === 'success') {
@@ -431,7 +443,7 @@ export function Purchase({
     && !selectedRouteData.isInsufficientGas
     && !loading;
 
-  const totalQty = items?.reduce((sum, item: PurchaseItem) => sum + item.qty, 0) || 0;
+  const totalQty = items?.reduce((sum, purchaseItem: PurchaseItem) => sum + purchaseItem.qty, 0) || 0;
 
   return (
     <SimpleLayout
