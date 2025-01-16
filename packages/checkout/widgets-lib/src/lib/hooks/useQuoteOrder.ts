@@ -1,9 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useRef, useCallback } from 'react';
+import { PurchaseItem } from '@imtbl/checkout-sdk';
 import { compareStr } from '../utils';
 import {
   OrderQuote,
-  OrderQuoteCurrency,
-  SaleErrorTypes,
   OrderQuoteApiResponse,
   UseQuoteOrderParams,
   PRIMARY_SALES_API_BASE_URL,
@@ -16,11 +15,6 @@ export const defaultOrderQuote: OrderQuote = {
   currencies: [],
   products: {},
   totalAmount: {},
-};
-
-export type ConfigError = {
-  type: SaleErrorTypes;
-  data?: Record<string, unknown>;
 };
 
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -76,56 +70,34 @@ export const transformToOrderQuote = (
 });
 
 export const useQuoteOrder = ({
-  items,
   environment,
   environmentId,
-  provider,
   preferredCurrency,
 }: UseQuoteOrderParams) => {
-  const [selectedCurrency, setSelectedCurrency] = useState<
-  OrderQuoteCurrency | undefined
-  >();
   const fetching = useRef(false);
-  const [queryParams, setQueryParams] = useState<string>('');
-  const [orderQuote, setOrderQuote] = useState<OrderQuote>(defaultOrderQuote);
-  const [orderQuoteError, setOrderQuoteError] = useState<
-  ConfigError | undefined
-  >(undefined);
 
-  const setError = (error: unknown) => {
-    setOrderQuoteError({
-      type: SaleErrorTypes.SERVICE_BREAKDOWN,
-      data: { reason: 'Error fetching settlement currencies', error },
-    });
+  const buildQueryParams = (items: PurchaseItem[], walletAddress?: string): string | undefined => {
+    if (!items?.length) return undefined;
+
+    const params = new URLSearchParams();
+    const products = items.map(({ productId: id, qty }) => ({ id, qty }));
+    params.append('products', btoa(JSON.stringify(products)));
+
+    if (walletAddress) {
+      params.append('wallet_address', walletAddress);
+    }
+
+    return params.toString();
   };
 
-  useEffect(() => {
-    // Set request params
-    if (!items?.length || !provider) return;
+  const fetchOrderQuote = useCallback(
+    async (items: PurchaseItem[], walletAddress?: string): Promise<OrderQuote | undefined> => {
+      // Fetch order config
+      if (!environment || !environmentId) return undefined;
 
-    (async () => {
-      try {
-        const params = new URLSearchParams();
-        const products = items.map(({ productId: id, qty }) => ({ id, qty }));
-        params.append('products', btoa(JSON.stringify(products)));
+      const queryParams = buildQueryParams(items, walletAddress);
 
-        const signer = provider.getSigner();
-        const address = await signer.getAddress();
-        params.append('wallet_address', address);
-
-        setQueryParams(params.toString());
-      } catch (error) {
-        setError(error);
-      }
-    })();
-  }, [items, provider]);
-
-  useEffect(() => {
-    // Fetch order config
-    if (!environment || !environmentId || !queryParams) return;
-
-    (async () => {
-      if (fetching.current) return;
+      if (!queryParams || fetching.current) return undefined;
 
       try {
         fetching.current = true;
@@ -142,37 +114,31 @@ export const useQuoteOrder = ({
           throw new Error(`${response.status} - ${response.statusText}`);
         }
 
-        const config = transformToOrderQuote(
+        return transformToOrderQuote(
           await response.json(),
           preferredCurrency,
         );
-        setOrderQuote(config);
-      } catch (error) {
-        setError(error);
       } finally {
         fetching.current = false;
       }
-    })();
-  }, [environment, environmentId, queryParams]);
+    },
+    [environment, environmentId, fetching],
+  );
 
-  useEffect(() => {
-    // Set default currency
-    if (orderQuote.currencies.length === 0) return;
+  const getSelectedCurrency = useCallback((orderQuote: OrderQuote) => {
+    if (orderQuote.currencies.length === 0) return undefined;
 
     const baseCurrencyOverride = preferredCurrency
       ? orderQuote.currencies.find((c) => compareStr(c.name, preferredCurrency))
       : undefined;
 
-    const defaultSelectedCurrency = baseCurrencyOverride
+    return baseCurrencyOverride
       || orderQuote.currencies.find((c) => c.base)
       || orderQuote.currencies?.[0];
-
-    setSelectedCurrency(defaultSelectedCurrency);
-  }, [orderQuote]);
+  }, [preferredCurrency]);
 
   return {
-    orderQuote,
-    selectedCurrency,
-    orderQuoteError,
+    fetchOrderQuote,
+    getSelectedCurrency,
   };
 };
