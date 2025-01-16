@@ -4235,28 +4235,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@examples/identity-with-nextjs@workspace:examples/passport/identity-with-nextjs":
-  version: 0.0.0-use.local
-  resolution: "@examples/identity-with-nextjs@workspace:examples/passport/identity-with-nextjs"
-  dependencies:
-    "@imtbl/sdk": latest
-    "@playwright/test": ^1.45.3
-    "@types/node": ^20
-    "@types/react": ^18.0.28
-    "@types/react-dom": ^18.0.11
-    autoprefixer: ^10.4.19
-    eslint: ^8
-    eslint-config-next: 14.2.5
-    ethers: ^5.7.2
-    next: 14.2.5
-    postcss: ^8.4.39
-    react: ^18.2.0
-    react-dom: ^18.2.0
-    tailwindcss: ^3.4.6
-    typescript: ^5.6.2
-  languageName: unknown
-  linkType: soft
-
 "@examples/imx-to-zkevm-migrator@workspace:examples/x-to-zkevm-migration-app/frontend":
   version: 0.0.0-use.local
   resolution: "@examples/imx-to-zkevm-migrator@workspace:examples/x-to-zkevm-migration-app/frontend"
@@ -4274,6 +4252,46 @@ __metadata:
     react: ^18
     react-dom: ^18
     typescript: ^5
+  languageName: unknown
+  linkType: soft
+
+"@examples/logged-in-user-with-nextjs@workspace:examples/passport/logged-in-user-with-nextjs":
+  version: 0.0.0-use.local
+  resolution: "@examples/logged-in-user-with-nextjs@workspace:examples/passport/logged-in-user-with-nextjs"
+  dependencies:
+    "@biom3/react": ^0.25.21
+    "@ethersproject/providers": ^5.7.2
+    "@imtbl/sdk": latest
+    "@playwright/test": ^1.45.3
+    "@types/node": ^20
+    "@types/react": ^18.3.4
+    "@types/react-dom": ^18.3.0
+    eslint: ^8
+    eslint-config-next: 14.2.7
+    next: 14.2.7
+    react: ^18
+    react-dom: ^18
+    typescript: ^5.6.2
+  languageName: unknown
+  linkType: soft
+
+"@examples/login-with-nextjs@workspace:examples/passport/login-with-nextjs":
+  version: 0.0.0-use.local
+  resolution: "@examples/login-with-nextjs@workspace:examples/passport/login-with-nextjs"
+  dependencies:
+    "@biom3/react": ^0.25.21
+    "@ethersproject/providers": ^5.7.2
+    "@imtbl/sdk": latest
+    "@playwright/test": ^1.45.3
+    "@types/node": ^20
+    "@types/react": ^18.3.4
+    "@types/react-dom": ^18.3.0
+    eslint: ^8
+    eslint-config-next: 14.2.7
+    next: 14.2.7
+    react: ^18
+    react-dom: ^18
+    typescript: ^5.6.2
   languageName: unknown
   linkType: soft
 
