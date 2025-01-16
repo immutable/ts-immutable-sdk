@@ -5,6 +5,7 @@ import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import {
   getNonce, signMetaTransactions, signAndPackTypedData, packSignatures,
   coerceNonceSpace,
+  encodeNonce,
 } from './walletHelpers';
 import { TypedDataPayload } from './types';
 
@@ -132,6 +133,20 @@ describe('coerceNonceSpace', () => {
   describe('with space', () => {
     it('should return the space', () => {
       expect(coerceNonceSpace(BigNumber.from(12345))).toEqual(BigNumber.from(12345));
+    });
+  });
+});
+
+describe('encodeNonce', () => {
+  describe('with no space', () => {
+    it('should not left shift the nonce', () => {
+      expect(encodeNonce(BigNumber.from(0), BigNumber.from(1))).toEqual(BigNumber.from(1));
+    });
+  });
+
+  describe('with space', () => {
+    it('should left shift the nonce by 96 bits', () => {
+      expect(encodeNonce(BigNumber.from(1), BigNumber.from(0))).toEqual(BigNumber.from('0x01000000000000000000000000'));
     });
   });
 });
