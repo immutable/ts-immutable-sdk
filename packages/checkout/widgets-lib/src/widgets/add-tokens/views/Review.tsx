@@ -1,11 +1,4 @@
-import {
-  ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { RouteResponse } from '@0xsquid/squid-types';
 import {
   Body,
   ButtCon,
@@ -16,64 +9,63 @@ import {
   Heading,
   hFlex,
   Icon,
-  Link,
   PriceDisplay,
   Stack,
   Sticker,
   useInterval,
 } from '@biom3/react';
-import { RouteResponse } from '@0xsquid/squid-types';
-import { t } from 'i18next';
-import { Trans } from 'react-i18next';
 import { ChainId } from '@imtbl/checkout-sdk';
 import { trackFlow } from '@imtbl/metrics';
+import { t } from 'i18next';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { AddTokensContext } from '../context/AddTokensContext';
-import { useRoutes } from '../../../lib/squid/hooks/useRoutes';
 import {
   AddTokensReviewData,
   AddTokensWidgetViews,
 } from '../../../context/view-context/AddTokensViewContextTypes';
-import { AddTokensErrorTypes } from '../types';
-import { useExecute } from '../../../lib/squid/hooks/useExecute';
 import {
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
 import { SquidIcon } from '../../../lib/squid/components/SquidIcon';
-import { useHandover } from '../../../lib/hooks/useHandover';
-import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
-import { HandoverContent } from '../../../components/Handover/HandoverContent';
-import { getRemoteRive } from '../../../lib/utils';
+import { useExecute } from '../../../lib/squid/hooks/useExecute';
+import { useRoutes } from '../../../lib/squid/hooks/useRoutes';
+import { AddTokensContext } from '../context/AddTokensContext';
+import { AddTokensErrorTypes } from '../types';
 
 import {
   useAnalytics,
   UserJourney,
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
-import { LoadingView } from '../../../views/loading/LoadingView';
-import { getTotalRouteFees } from '../../../lib/squid/functions/getTotalRouteFees';
 import { getRouteChains } from '../../../lib/squid/functions/getRouteChains';
+import { getTotalRouteFees } from '../../../lib/squid/functions/getTotalRouteFees';
+import { LoadingView } from '../../../views/loading/LoadingView';
 
-import { SquidFooter } from '../../../lib/squid/components/SquidFooter';
-import {
-  sendAddTokensCloseEvent,
-  sendAddTokensSuccessEvent,
-} from '../AddTokensWidgetEvents';
-import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { convertToNetworkChangeableProvider } from '../../../functions/convertToNetworkChangeableProvider';
-import { FromAmountData } from '../../../lib/squid/types';
-import {
-  APPROVE_TXN_ANIMATION, EXECUTE_TXN_ANIMATION, FIXED_HANDOVER_DURATION, SQUID_NATIVE_TOKEN, TOOLKIT_SQUID_URL,
-} from '../../../lib/squid/config';
 import { AddressMissmatchDrawer } from '../../../components/AddressMismatchDrawer/AddressMissmatchDrawer';
 import { RouteFees } from '../../../components/RouteFees/RouteFees';
+import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { convertToNetworkChangeableProvider } from '../../../functions/convertToNetworkChangeableProvider';
 import { getDurationFormatted } from '../../../functions/getDurationFormatted';
-import { getFormattedNumber, getFormattedAmounts } from '../../../functions/getFormattedNumber';
-import { RiveStateMachineInput } from '../../../types/HandoverTypes';
+import { getFormattedAmounts, getFormattedNumber } from '../../../functions/getFormattedNumber';
+import { SquidFooter } from '../../../lib/squid/components/SquidFooter';
+import {
+  SQUID_NATIVE_TOKEN,
+} from '../../../lib/squid/config';
 import { verifyAndSwitchChain } from '../../../lib/squid/functions/verifyAndSwitchChain';
+import { useError } from '../hooks/useError';
+import { FromAmountData } from '../../../lib/squid/types';
+import {
+  sendAddTokensSuccessEvent,
+} from '../AddTokensWidgetEvents';
 import { useErrorHandler } from '../hooks/useErrorHandler';
-import { useError } from '../../../lib/squid/hooks/useError';
+import { AddTokensHandoverStep, useHandoverConfig } from '../hooks/useHandoverConfig';
 
 interface ReviewProps {
   data: AddTokensReviewData;
@@ -125,9 +117,7 @@ export function Review({
   const [showSecuringQuote, setShowSecuringQuote] = useState(false);
   const [showAddressMissmatchDrawer, setShowAddressMissmatchDrawer] = useState(false);
   const { getFromAmountData, getRoute } = useRoutes();
-  const { addHandover, closeHandover } = useHandover({
-    id: HandoverTarget.GLOBAL,
-  });
+  const { showHandover } = useHandoverConfig(checkout.config.environment);
 
   const { onTransactionError } = useErrorHandler();
 
@@ -262,51 +252,14 @@ export function Review({
     );
   }, [totalFeesUsd]);
 
-  interface HandoverProps {
-    animationPath: string;
-    state: RiveStateMachineInput;
-    headingText: string;
-    subheadingText?: ReactNode;
-    primaryButtonText?: string;
-    onPrimaryButtonClick?: () => void;
-    secondaryButtonText?: string;
-    onSecondaryButtonClick?: () => void;
-    duration?: number;
-  }
-
-  const showHandover = useCallback(
-    ({
-      animationPath,
-      state,
-      headingText,
-      subheadingText,
-      primaryButtonText,
-      onPrimaryButtonClick,
-      secondaryButtonText,
-      onSecondaryButtonClick,
-      duration,
-    }: HandoverProps) => {
-      addHandover({
-        animationUrl: getRemoteRive(
-          checkout?.config.environment,
-          animationPath,
-        ),
-        inputValue: state,
-        duration,
-        children: (
-          <HandoverContent
-            headingText={headingText}
-            subheadingText={subheadingText}
-            primaryButtonText={primaryButtonText}
-            onPrimaryButtonClick={onPrimaryButtonClick}
-            secondaryButtonText={secondaryButtonText}
-            onSecondaryButtonClick={onSecondaryButtonClick}
-          />
-        ),
-      });
-    },
-    [addHandover, checkout],
-  );
+  const formattedDuration = route
+    ? getDurationFormatted(
+      route.route.estimate.estimatedRouteDuration,
+      t('views.ADD_TOKENS.routeSelection.minutesText'),
+      t('views.ADD_TOKENS.routeSelection.minuteText'),
+      t('views.ADD_TOKENS.routeSelection.secondsText'),
+    )
+    : '';
 
   const handleTransaction = useCallback(async () => {
     if (!squid || !fromProvider || !route || !fromProviderInfo) {
@@ -314,7 +267,6 @@ export function Review({
     }
 
     let currentFromAddress = '';
-
     track({
       userJourney: UserJourney.ADD_TOKENS,
       screen: 'Review',
@@ -352,16 +304,11 @@ export function Review({
     clearInterval(getRouteIntervalIdRef.current);
     setProceedDisabled(true);
 
-    showHandover({
-      animationPath: APPROVE_TXN_ANIMATION,
-      state: RiveStateMachineInput.START,
-      headingText: t('views.ADD_TOKENS.handover.preparing.heading'),
-    });
+    showHandover(AddTokensHandoverStep.PREPARING, {});
 
     const changeableProvider = await convertToNetworkChangeableProvider(
       fromProvider,
     );
-
     const verifyChainResult = await verifyAndSwitchChain(
       changeableProvider,
       route.route.params.fromChain,
@@ -372,41 +319,23 @@ export function Review({
     }
 
     const allowance = await getAllowance(changeableProvider, route);
-
     const { fromAmount } = route.route.params;
+
     if (allowance?.lt(fromAmount)) {
-      showHandover({
-        animationPath: APPROVE_TXN_ANIMATION,
-        state: RiveStateMachineInput.WAITING,
-        headingText: t('views.ADD_TOKENS.handover.requestingApproval.heading'),
-        subheadingText: t(
-          'views.ADD_TOKENS.handover.requestingApproval.subHeading',
-        ),
-      });
+      showHandover(AddTokensHandoverStep.REQUEST_APPROVAL, {});
 
       const approveTxnReceipt = await approve(fromProviderInfo, changeableProvider, route);
-
       if (!approveTxnReceipt) {
         return;
       }
-      showHandover({
-        animationPath: APPROVE_TXN_ANIMATION,
-        state: RiveStateMachineInput.COMPLETED,
-        headingText: t('views.ADD_TOKENS.handover.approved.heading'),
-        duration: FIXED_HANDOVER_DURATION,
-      });
+
+      showHandover(AddTokensHandoverStep.APPROVAL_CONFIRMED, {});
     }
 
-    showHandover({
-      animationPath: EXECUTE_TXN_ANIMATION,
-      state: RiveStateMachineInput.WAITING,
-      headingText: t('views.ADD_TOKENS.handover.requestingExecution.heading'),
-      subheadingText: t(
-        'views.ADD_TOKENS.handover.requestingExecution.subHeading',
-      ),
-    });
+    showHandover(AddTokensHandoverStep.REQUEST_EXECUTION, {});
 
     const executeTxnReceipt = await execute(squid, fromProviderInfo, changeableProvider, route);
+
     if (executeTxnReceipt) {
       track({
         userJourney: UserJourney.ADD_TOKENS,
@@ -436,218 +365,26 @@ export function Review({
       sendAddTokensSuccessEvent(eventTarget, executeTxnReceipt.transactionHash);
 
       if (toChain === fromChain) {
-        showHandover({
-          animationPath: EXECUTE_TXN_ANIMATION,
-          state: RiveStateMachineInput.COMPLETED,
-          headingText: t('views.ADD_TOKENS.handover.executedZkEVM.heading'),
-          subheadingText: (
-            <Trans
-              i18nKey={t('views.ADD_TOKENS.handover.executedZkEVM.subHeading')}
-              components={{
-                explorerLink: (
-                  <Link
-                    size="small"
-                    rc={(
-                      <a
-                        target="_blank"
-                        href={`https://explorer.immutable.com/tx/${executeTxnReceipt.transactionHash}`}
-                        rel="noreferrer"
-                      />
-                    )}
-                  />
-                ),
-              }}
-            />
-          ),
-          primaryButtonText: t(
-            'views.ADD_TOKENS.handover.executed.primaryButtonText',
-          ),
-          onPrimaryButtonClick: () => {
-            sendAddTokensCloseEvent(eventTarget);
-          },
-        });
+        showHandover(AddTokensHandoverStep.SUCCESS_ZKEVM, { transactionHash: executeTxnReceipt.transactionHash });
         return;
       }
 
-      showHandover({
-        animationPath: EXECUTE_TXN_ANIMATION,
-        state: RiveStateMachineInput.PROCESSING,
-        headingText: t('views.ADD_TOKENS.handover.executing.heading'),
-        subheadingText: (
-          <>
-            {t('views.ADD_TOKENS.handover.executing.subHeadingDuration', {
-              duration: getDurationFormatted(
-                route.route.estimate.estimatedRouteDuration,
-                t('views.ADD_TOKENS.routeSelection.minutesText'),
-                t('views.ADD_TOKENS.routeSelection.minuteText'),
-                t('views.ADD_TOKENS.routeSelection.secondsText'),
-              ),
-            })}
-            <br />
-            <Trans
-              i18nKey={t('views.ADD_TOKENS.handover.executing.subHeading')}
-              components={{
-                axelarscanLink: (
-                  <Link
-                    size="small"
-                    rc={(
-                      <a
-                        target="_blank"
-                        href={`https://axelarscan.io/gmp/${executeTxnReceipt?.transactionHash}`}
-                        rel="noreferrer"
-                      />
-                    )}
-                  />
-                ),
-              }}
-            />
-          </>
-        ),
+      showHandover(AddTokensHandoverStep.EXECUTING, {
+        routeDuration: formattedDuration,
+        transactionHash: executeTxnReceipt.transactionHash,
       });
 
       const status = await getStatus(squid, executeTxnReceipt.transactionHash);
       const axelarscanUrl = `https://axelarscan.io/gmp/${executeTxnReceipt?.transactionHash}`;
 
       if (status?.squidTransactionStatus === 'success') {
-        showHandover({
-          animationPath: EXECUTE_TXN_ANIMATION,
-          state: RiveStateMachineInput.COMPLETED,
-          headingText: t('views.ADD_TOKENS.handover.executed.heading'),
-          subheadingText: (
-            <Trans
-              i18nKey={t('views.ADD_TOKENS.handover.executed.subHeading')}
-              components={{
-                axelarscanLink: (
-                  <Link
-                    size="small"
-                    rc={(
-                      <a
-                        target="_blank"
-                        href={axelarscanUrl}
-                        rel="noreferrer"
-                      />
-                    )}
-                  />
-                ),
-              }}
-            />
-          ),
-          primaryButtonText: t(
-            'views.ADD_TOKENS.handover.executed.primaryButtonText',
-          ),
-          onPrimaryButtonClick: () => {
-            sendAddTokensCloseEvent(eventTarget);
-          },
-        });
+        showHandover(AddTokensHandoverStep.SUCCESS, { axelarscanUrl });
       } else if (status?.squidTransactionStatus === 'needs_gas') {
-        showHandover({
-          animationPath: APPROVE_TXN_ANIMATION,
-          state: RiveStateMachineInput.COMPLETED,
-          headingText: t('views.ADD_TOKENS.handover.needsGas.heading'),
-          subheadingText: (
-            <Trans
-              i18nKey={t('views.ADD_TOKENS.handover.needsGas.subHeading')}
-              components={{
-                axelarscanLink: (
-                  <Link
-                    size="small"
-                    rc={(
-                      <a
-                        target="_blank"
-                        href={axelarscanUrl}
-                        rel="noreferrer"
-                      />
-                    )}
-                  />
-                ),
-              }}
-            />
-          ),
-          primaryButtonText: t(
-            'views.ADD_TOKENS.handover.needsGas.primaryButtonText',
-          ),
-          onPrimaryButtonClick: () => {
-            window.open(axelarscanUrl, '_blank', 'noreferrer');
-          },
-          secondaryButtonText: t(
-            'views.ADD_TOKENS.handover.needsGas.secondaryButtonText',
-          ),
-          onSecondaryButtonClick: () => {
-            sendAddTokensCloseEvent(eventTarget);
-          },
-        });
+        showHandover(AddTokensHandoverStep.NEEDS_GAS, { axelarscanUrl });
       } else if (status?.squidTransactionStatus === 'partial_success') {
-        showHandover({
-          animationPath: APPROVE_TXN_ANIMATION,
-          state: RiveStateMachineInput.COMPLETED,
-          headingText: t('views.ADD_TOKENS.handover.partialSuccess.heading'),
-          subheadingText: (
-            <Trans
-              i18nKey={t('views.ADD_TOKENS.handover.partialSuccess.subHeading')}
-              components={{
-                squidLink: (
-                  <Link
-                    size="small"
-                    rc={(
-                      <a
-                        target="_blank"
-                        href={TOOLKIT_SQUID_URL}
-                        rel="noreferrer"
-                      />
-                    )}
-                  />
-                ),
-              }}
-            />
-          ),
-          primaryButtonText: t(
-            'views.ADD_TOKENS.handover.partialSuccess.primaryButtonText',
-          ),
-          onPrimaryButtonClick: () => {
-            window.open(
-              TOOLKIT_SQUID_URL,
-              '_blank',
-              'noreferrer',
-            );
-          },
-          secondaryButtonText: t(
-            'views.ADD_TOKENS.handover.partialSuccess.secondaryButtonText',
-          ),
-          onSecondaryButtonClick: () => {
-            sendAddTokensCloseEvent(eventTarget);
-          },
-        });
+        showHandover(AddTokensHandoverStep.PARTIAL_SUCCESS, { axelarscanUrl });
       } else {
-        showHandover({
-          animationPath: APPROVE_TXN_ANIMATION,
-          state: RiveStateMachineInput.COMPLETED,
-          headingText: t('views.ADD_TOKENS.handover.statusFailed.heading'),
-          subheadingText: (
-            <Trans
-              i18nKey={t('views.ADD_TOKENS.handover.statusFailed.subHeading')}
-              components={{
-                axelarscanLink: (
-                  <Link
-                    size="small"
-                    rc={(
-                      <a
-                        target="_blank"
-                        href={axelarscanUrl}
-                        rel="noreferrer"
-                      />
-                    )}
-                  />
-                ),
-              }}
-            />
-          ),
-          secondaryButtonText: t(
-            'views.ADD_TOKENS.handover.statusFailed.secondaryButtonText',
-          ),
-          onSecondaryButtonClick: () => {
-            sendAddTokensCloseEvent(eventTarget);
-          },
-        });
+        showHandover(AddTokensHandoverStep.FAIL, { axelarscanUrl });
       }
     }
   }, [
@@ -659,18 +396,8 @@ export function Review({
     showHandover,
     getAllowance,
     execute,
-    closeHandover,
     viewDispatch,
   ]);
-
-  const formattedDuration = route
-    ? getDurationFormatted(
-      route.route.estimate.estimatedRouteDuration,
-      t('views.ADD_TOKENS.routeSelection.minutesText'),
-      t('views.ADD_TOKENS.routeSelection.minuteText'),
-      t('views.ADD_TOKENS.routeSelection.secondsText'),
-    )
-    : '';
 
   return (
     <SimpleLayout
