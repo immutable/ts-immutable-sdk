@@ -5,6 +5,7 @@ import {
   constants,
   utils,
   errors,
+  ethers,
 } from 'ethers';
 import { walletContracts } from '@0xsequence/abi';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
@@ -64,6 +65,18 @@ export const encodedTransactions = (
 export const coerceNonceSpace = (nonceSpace?: BigNumber): BigNumber => nonceSpace || BigNumber.from(0);
 
 /**
+ * This helper function is used to encode the nonce into a 256 bit value where the space is encoded into
+ * the first 160 bits, and the nonce the remaining 96 bits.
+ * @param {BigNumber} nonceSpace - An unsigned 256 bit value that can be used to encode a nonce into a distinct space.
+ * @param nonce {BigNumber} nonce - Sequential number starting at 0, and incrementing in single steps e.g. 0,1,2,...
+ * @returns {BigNumber} The encoded value where the space is left shifted 96 bits, and the nonce is in the first 96 bits.
+ */
+export const encodeNonce = (nonceSpace: BigNumber, nonce: BigNumber): BigNumber => {
+  const shiftedSpace = BigNumber.from(nonceSpace).mul(ethers.constants.Two.pow(96));
+  return BigNumber.from(nonce).add(shiftedSpace);
+};
+
+/**
  * When we retrieve a nonce for a smart contract wallet we can retrieve the nonce in a given 256 bit space.
  * Nonces in each 256 bit space need to be sequential per wallet address. Nonces across 256 bit spaces per
  * wallet address do not. This function overload can be used to invoke transactions in parallel per smart
@@ -83,7 +96,7 @@ export const getNonce = async (
     const space: BigNumber = coerceNonceSpace(nonceSpace); // Default nonce space is 0
     const result = await contract.readNonce(space);
     if (result instanceof BigNumber) {
-      return result;
+      return encodeNonce(space, result);
     }
   } catch (error) {
     if (error instanceof Error
