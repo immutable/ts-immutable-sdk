@@ -8,44 +8,11 @@ const PURCHASE_WIDGET_ID = 'purchase';
 
 const defaultItems: PurchaseItem[] = [
   {
-    productId: "kangaroo",
+    productId: "lootbox",
     qty: 1,
-    name: "Kangaroo",
-    image:
-      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-10-1.png",
-    description: "Kangaroo",
-  },
-  {
-    productId: "kookaburra",
-    qty: 3,
-    name: "Kookaburra",
-    image:
-      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-4-1.png",
-    description: "Kookaburra",
-  },
-  {
-    productId: "quokka",
-    qty: 2,
-    name: "Quokka",
-    image:
-      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-8-1.png",
-    description: "Quokka",
-  },
-  {
-    productId: "ibis",
-    qty: 1,
-    name: "Ibis",
-    image:
-      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-1-1.png",
-    description: "Ibis",
-  },
-  {
-    productId: "emu",
-    qty: 5,
-    name: "Emu",
-    image:
-      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-5-1.png",
-    description: "Emu",
+    name: "Lootbox",
+    image: "https://strong-alligator.static.domains/lootbox.png",
+    description: "A common lootbox",
   },
 ];
 

@@ -1,5 +1,5 @@
 import {
-  ButtCon, Button, Link, MenuItem, Stack,
+  ButtCon, Button, Caption, Link, MenuItem, Stack,
 } from '@biom3/react';
 import {
   ChainId,
@@ -45,7 +45,7 @@ import { SelectedRouteOption } from '../../../components/SelectedRouteOption/Sel
 import { convertToNetworkChangeableProvider } from '../../../functions/convertToNetworkChangeableProvider';
 import { useExecute } from '../../../lib/squid/hooks/useExecute';
 import { useSignOrder } from '../../../lib/hooks/useSignOrder';
-import { SignPaymentTypes } from '../../../lib/primary-sales';
+import { OrderQuoteCurrency, SignPaymentTypes } from '../../../lib/primary-sales';
 import { getRemoteRive } from '../../../lib/utils';
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
 import { useHandover } from '../../../lib/hooks/useHandover';
@@ -55,6 +55,7 @@ import { verifyAndSwitchChain } from '../../../lib/squid/functions/verifyAndSwit
 import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { sendPurchaseCloseEvent, sendPurchaseSuccessEvent } from '../PurchaseWidgetEvents';
 import { getRouteChains } from '../../../lib/squid/functions/getRouteChains';
+import { useQuoteOrder } from '../../../lib/hooks/useQuoteOrder';
 
 interface PurchaseProps {
   checkout: Checkout;
@@ -77,9 +78,17 @@ export function Purchase({
     fetchRoutes, getRoute, getFromAmountData,
   } = useRoutes();
 
+  const { fetchOrderQuote, getSelectedCurrency } = useQuoteOrder({
+    environment: checkout.config.environment,
+    environmentId,
+  });
+
   const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
   const [showPayWithDrawer, setShowPayWithDrawer] = useState(false);
   const [showDeliverToDrawer, setShowDeliverToDrawer] = useState(false);
+
+  const [selectedCurrency, setSelectedCurrency] = useState<OrderQuoteCurrency | undefined>(undefined);
+  const [selectedCurrencyAmount, setSelectedCurrencyAmount] = useState<number | undefined>(undefined);
 
   const [selectedRouteData, setSelectedRouteData] = useState<RouteData | undefined>(undefined);
   const [fetchingRoutes, setFetchingRoutes] = useState(false);
@@ -271,6 +280,28 @@ export function Purchase({
       setSelectedRouteData(routes[0]);
     }
   }, [routes]);
+
+  useEffect(() => {
+    if (!items || items.length === 0) return;
+
+    (async () => {
+      try {
+        const quote = await fetchOrderQuote(items, toAddress);
+
+        if (!quote) return;
+
+        const quoteCurrency = getSelectedCurrency(quote);
+
+        if (!quoteCurrency) return;
+
+        setSelectedCurrency(quoteCurrency);
+        setSelectedCurrencyAmount(quote.totalAmount[quoteCurrency.name].amount);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error fetching order quote', error);
+      }
+    })();
+  }, [items, toAddress]);
 
   const shouldShowBackButton = showBackButton && onBackButtonClick;
   const shouldShowOnRampOption = false;
@@ -590,16 +621,23 @@ export function Purchase({
           justifyContent="center"
           alignItems="center"
         >
-          <PurchaseItemHero items={items} totalQty={totalQty} />
+          {items && items.length > 0 && (
+            <>
+              <PurchaseItemHero items={items} totalQty={totalQty} />
 
-          <p>
-            <strong>{item.name}</strong>
-          </p>
-          <p>
-            {item.token}
-            {' '}
-            {item.price}
-          </p>
+              <Caption weight="bold">
+                {items[0].name}
+              </Caption>
+
+              {selectedCurrency && selectedCurrencyAmount && (
+                <Caption>
+                  {selectedCurrency.name}
+                  {' '}
+                  {selectedCurrencyAmount}
+                </Caption>
+              )}
+            </>
+          )}
         </Stack>
         <Stack
           testId="bottomSection"
