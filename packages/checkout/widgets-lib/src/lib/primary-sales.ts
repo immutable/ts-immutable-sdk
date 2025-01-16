@@ -189,10 +189,8 @@ export const PRIMARY_SALES_API_BASE_URL = {
 };
 
 export type UseQuoteOrderParams = {
-  items: SaleItem[];
   environmentId: string;
   environment: Environment;
-  provider: Web3Provider | undefined;
   preferredCurrency?: string;
 };
 
