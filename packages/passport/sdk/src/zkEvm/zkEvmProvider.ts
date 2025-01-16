@@ -1,7 +1,7 @@
 import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { Signer } from '@ethersproject/abstract-signer';
-import { utils } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import {
   Flow, identify, trackError, trackFlow,
 } from '@imtbl/metrics';
@@ -193,6 +193,11 @@ export class ZkEvmProvider implements Provider {
   }
 
   async #callSessionActivity(zkEvmAddress: string, clientId?: string) {
+    // SessionActivity requests are processed in nonce space 1, where as all
+    // other sendTransaction requests are processed in nonce space 0. This means
+    // we can submit a session activity request per SCW in parallel without a SCW
+    // INVALID_NONCE error.
+    const nonceSpace: BigNumber = BigNumber.from(1);
     const sendTransactionClosure = async (params: Array<any>, flow: Flow) => {
       const ethSigner = await this.#getSigner();
       return await sendTransaction({
@@ -203,6 +208,7 @@ export class ZkEvmProvider implements Provider {
         relayerClient: this.#relayerClient,
         zkEvmAddress,
         flow,
+        nonceSpace,
       });
     };
     this.#passportEventEmitter.emit(PassportEvents.ACCOUNTS_REQUESTED, {
