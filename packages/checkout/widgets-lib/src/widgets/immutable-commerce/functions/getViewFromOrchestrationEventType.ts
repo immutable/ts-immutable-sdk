@@ -19,6 +19,8 @@ export function getViewFromOrchestrationEventType(
       return CommerceFlowType.ONRAMP;
     case OrchestrationEventType.REQUEST_ADD_TOKENS:
       return CommerceFlowType.ADD_TOKENS;
+    case OrchestrationEventType.REQUEST_PURCHASE:
+      return CommerceFlowType.PURCHASE;
     default:
       return null;
   }

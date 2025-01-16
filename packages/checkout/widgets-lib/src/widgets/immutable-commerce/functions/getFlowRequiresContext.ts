@@ -15,6 +15,7 @@ const connectLoaderFlows = [
  */
 const providersContextFlows = [
   CommerceFlowType.ADD_TOKENS,
+  CommerceFlowType.PURCHASE,
 ] as unknown[];
 
 /**

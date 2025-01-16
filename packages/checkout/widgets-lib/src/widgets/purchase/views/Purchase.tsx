@@ -1,5 +1,9 @@
-import { ButtCon, Caption, Stack } from '@biom3/react';
+import { useContext } from 'react';
+import { Stack, ButtCon } from '@biom3/react';
+import { PurchaseItem } from '@imtbl/checkout-sdk';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
+import { PurchaseContext } from '../context/PurchaseContext';
+import { PurchaseItemHero } from '../components/PurchaseItemHero';
 
 interface PurchaseProps {
   showBackButton?: boolean;
@@ -12,7 +16,11 @@ export function Purchase({
   showBackButton,
   onBackButtonClick,
 }: PurchaseProps) {
+  const { purchaseState: { items } } = useContext(PurchaseContext);
+
   const shouldShowBackButton = showBackButton && onBackButtonClick;
+
+  const totalQty = items?.reduce((sum, item: PurchaseItem) => sum + item.qty, 0) || 0;
 
   return (
     <SimpleLayout
@@ -60,13 +68,7 @@ export function Purchase({
           justifyContent="center"
           alignItems="center"
         >
-          <Caption
-            sx={{
-              color: 'base.color.text.body.primary',
-            }}
-          >
-            Coming soon
-          </Caption>
+          <PurchaseItemHero items={items} totalQty={totalQty} />
         </Stack>
       </Stack>
     </SimpleLayout>

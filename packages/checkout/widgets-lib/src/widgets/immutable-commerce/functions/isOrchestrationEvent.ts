@@ -8,6 +8,7 @@ const orchestrationEvents = [
   OrchestrationEventType.REQUEST_BRIDGE,
   OrchestrationEventType.REQUEST_ONRAMP,
   OrchestrationEventType.REQUEST_ADD_TOKENS,
+  OrchestrationEventType.REQUEST_PURCHASE,
   OrchestrationEventType.REQUEST_GO_BACK,
 ];
 
