@@ -50,9 +50,11 @@ import { getRemoteRive } from '../../../lib/utils';
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
 import { useHandover } from '../../../lib/hooks/useHandover';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
-import { EXECUTE_TXN_ANIMATION } from '../../../lib/squid/config';
+import { APPROVE_TXN_ANIMATION, EXECUTE_TXN_ANIMATION, FIXED_HANDOVER_DURATION } from '../../../lib/squid/config';
 import { verifyAndSwitchChain } from '../../../lib/squid/functions/verifyAndSwitchChain';
 import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { sendPurchaseCloseEvent, sendPurchaseSuccessEvent } from '../PurchaseWidgetEvents';
+import { getRouteChains } from '../../../lib/squid/functions/getRouteChains';
 
 interface PurchaseProps {
   checkout: Checkout;
@@ -342,10 +344,17 @@ export function Purchase({
     if (!route) return;
 
     const currentFromAddress = await fromProvider.getSigner().getAddress();
+    const { fromChain, toChain } = getRouteChains(chains, route);
 
     if (currentFromAddress !== fromAddress) {
       return;
     }
+
+    showHandover({
+      animationPath: APPROVE_TXN_ANIMATION,
+      state: RiveStateMachineInput.START,
+      headingText: 'Preparing order',
+    });
 
     const changeableProvider = await convertToNetworkChangeableProvider(
       fromProvider,
@@ -367,12 +376,31 @@ export function Purchase({
     console.log('allowance', allowance);
 
     if (!allowance || allowance?.lt(fromAmount)) {
+      showHandover({
+        animationPath: APPROVE_TXN_ANIMATION,
+        state: RiveStateMachineInput.WAITING,
+        headingText: 'Waiting for wallet approval for token access',
+      });
+
       const approveTxnReceipt = await approve(fromProviderInfo, changeableProvider, route);
 
       if (!approveTxnReceipt) {
         return;
       }
+
+      showHandover({
+        animationPath: APPROVE_TXN_ANIMATION,
+        state: RiveStateMachineInput.COMPLETED,
+        headingText: 'Tokens ready for item purchase',
+        duration: FIXED_HANDOVER_DURATION,
+      });
     }
+
+    showHandover({
+      animationPath: EXECUTE_TXN_ANIMATION,
+      state: RiveStateMachineInput.WAITING,
+      headingText: 'Waiting for wallet approval for purchase',
+    });
 
     const executeTxnReceipt = await execute(squid, fromProviderInfo, changeableProvider, route);
 
@@ -383,6 +411,48 @@ export function Purchase({
       return;
     }
 
+    const fundingMethod = fromChain !== toChain ? 'squid' : 'direct';
+
+    sendPurchaseSuccessEvent(eventTarget, executeTxnReceipt.transactionHash, fundingMethod);
+
+    if (toChain === fromChain) {
+      showHandover({
+        animationPath: EXECUTE_TXN_ANIMATION,
+        state: RiveStateMachineInput.COMPLETED,
+        headingText: 'Purchase complete',
+        subheadingText: (
+          <Trans
+            i18nKey="Go to <explorerLink>Immutable zkEVM explorer</explorerLink> for transaction details"
+            components={{
+              explorerLink: (
+                <Link
+                  size="small"
+                  rc={(
+                    <a
+                      target="_blank"
+                      href={`https://explorer.immutable.com/tx/${executeTxnReceipt.transactionHash}`}
+                      rel="noreferrer"
+                    />
+                  )}
+                />
+              ),
+            }}
+          />
+        ),
+        primaryButtonText: 'Done',
+        onPrimaryButtonClick: () => {
+          sendPurchaseCloseEvent(eventTarget);
+        },
+      });
+      return;
+    }
+
+    showHandover({
+      animationPath: EXECUTE_TXN_ANIMATION,
+      state: RiveStateMachineInput.PROCESSING,
+      headingText: 'Processing purchase',
+    });
+
     const status = await getStatus(squid, executeTxnReceipt.transactionHash);
     const axelarscanUrl = `https://axelarscan.io/gmp/${executeTxnReceipt?.transactionHash}`;
 
@@ -390,9 +460,6 @@ export function Purchase({
     console.log('status', status);
     // eslint-disable-next-line no-console
     console.log('axelarscanUrl', axelarscanUrl);
-
-    // eslint-disable-next-line no-console
-    console.log('proceed finished');
 
     if (status?.squidTransactionStatus === 'success') {
       showHandover({
@@ -419,7 +486,39 @@ export function Purchase({
           />
         ),
         primaryButtonText: 'Done',
-        onPrimaryButtonClick: () => {},
+        onPrimaryButtonClick: () => {
+          sendPurchaseCloseEvent(eventTarget);
+        },
+      });
+    } else {
+      showHandover({
+        animationPath: APPROVE_TXN_ANIMATION,
+        state: RiveStateMachineInput.COMPLETED,
+        headingText: 'Unable to complete purchase',
+        subheadingText: (
+          <Trans
+            // eslint-disable-next-line max-len
+            i18nKey="Something went wrong, and we were unable to complete this transaction. Visit <axelarscanLink>Axelarscan</axelarscanLink> for details."
+            components={{
+              axelarscanLink: (
+                <Link
+                  size="small"
+                  rc={(
+                    <a
+                      target="_blank"
+                      href={axelarscanUrl}
+                      rel="noreferrer"
+                    />
+                  )}
+                />
+              ),
+            }}
+          />
+        ),
+        secondaryButtonText: 'Dismiss',
+        onSecondaryButtonClick: () => {
+          sendPurchaseCloseEvent(eventTarget);
+        },
       });
     }
   }, [
