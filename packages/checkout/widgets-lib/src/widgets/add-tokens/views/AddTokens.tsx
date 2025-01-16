@@ -60,7 +60,7 @@ import {
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { validateToAmount } from '../functions/amountValidation';
 import { OnboardingDrawer } from '../components/OnboardingDrawer';
-import { useError } from '../../../lib/squid/hooks/useError';
+import { useError } from '../hooks/useError';
 import { SquidFooter } from '../../../lib/squid/components/SquidFooter';
 import { TokenDrawerMenu } from '../components/TokenDrawerMenu';
 import { PULSE_SHADOW } from '../utils/animation';

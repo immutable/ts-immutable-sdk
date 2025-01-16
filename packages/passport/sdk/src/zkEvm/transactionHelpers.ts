@@ -28,6 +28,7 @@ export type TransactionParams = {
   relayerClient: RelayerClient;
   zkEvmAddress: string;
   flow: Flow;
+  nonceSpace?: BigNumber;
 };
 
 export type EjectionTransactionParams = Pick<TransactionParams, 'ethSigner' | 'zkEvmAddress' | 'flow'>;
@@ -64,13 +65,13 @@ const getFeeOption = async (
 /**
  * Prepares the meta transactions array to be signed by estimating the fee and
  * getting the nonce from the smart wallet.
- *
  */
 const buildMetaTransactions = async (
   transactionRequest: TransactionRequest,
   rpcProvider: StaticJsonRpcProvider,
   relayerClient: RelayerClient,
   zkevmAddress: string,
+  nonceSpace?: BigNumber,
 ): Promise<[MetaTransaction, ...MetaTransaction[]]> => {
   if (!transactionRequest.to) {
     throw new JsonRpcError(
@@ -89,7 +90,7 @@ const buildMetaTransactions = async (
 
   // Estimate the fee and get the nonce from the smart wallet
   const [nonce, feeOption] = await Promise.all([
-    getNonce(rpcProvider, zkevmAddress),
+    getNonce(rpcProvider, zkevmAddress, nonceSpace),
     getFeeOption(metaTransaction, zkevmAddress, relayerClient),
   ]);
 
@@ -166,6 +167,7 @@ export const prepareAndSignTransaction = async ({
   relayerClient,
   zkEvmAddress,
   flow,
+  nonceSpace,
 }: TransactionParams & { transactionRequest: TransactionRequest }) => {
   const { chainId } = await rpcProvider.detectNetwork();
   const chainIdBigNumber = BigNumber.from(chainId);
@@ -176,6 +178,7 @@ export const prepareAndSignTransaction = async ({
     rpcProvider,
     relayerClient,
     zkEvmAddress,
+    nonceSpace,
   );
   flow.addEvent('endBuildMetaTransactions');
 

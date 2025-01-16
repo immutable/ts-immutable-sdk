@@ -1,12 +1,10 @@
 import { Environment } from '@imtbl/config';
 import { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AddTokensErrorTypes } from '../../../widgets/add-tokens/types';
-import { useHandover } from '../../hooks/useHandover';
+import { AddTokensErrorTypes } from '../types';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
-import { getRemoteRive } from '../../utils';
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
-import { sendAddTokensCloseEvent } from '../../../widgets/add-tokens/AddTokensWidgetEvents';
+import { sendAddTokensCloseEvent } from '../AddTokensWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
   ViewActions,
@@ -18,7 +16,9 @@ import {
   UserJourney,
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { RiveStateMachineInput } from '../../../types/HandoverTypes';
-import { APPROVE_TXN_ANIMATION } from '../config';
+import { useHandover } from '../../../lib/hooks/useHandover';
+import { APPROVE_TXN_ANIMATION } from '../../../lib/squid/config';
+import { getRemoteRive } from '../../../lib/utils';
 
 interface ErrorConfig {
   headingText: string;

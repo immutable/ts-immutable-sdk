@@ -39,7 +39,7 @@ import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { getRemoteImage } from '../../lib/utils';
 import { isValidAddress } from '../../lib/validations/widgetValidators';
 import { amountInputValidation } from '../../lib/validations/amountInputValidations';
-import { useError } from '../../lib/squid/hooks/useError';
+import { useError } from './hooks/useError';
 import { AddTokensErrorTypes, AddTokensExperiments } from './types';
 import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 
