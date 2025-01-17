@@ -670,7 +670,6 @@
       "routeSelection": {
         "loadingText": "Finding the best payment route...",
         "noRoute": "No routes found, choose a different wallet, token or amount.",
-        "payWithCryptoImmutablezkEVM": "Pay with your balance on Immutable zkEVM",
         "payWithCard": "No routes found, pay with card available",
         "fastestBadge": "Fastest",
         "minutesText": "mins",

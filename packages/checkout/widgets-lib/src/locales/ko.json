@@ -651,7 +651,6 @@
         "loadingText": "최적의 결제 경로를 찾는 중...",
         "noRoute": "경로를 찾을 수 없습니다. 다른 지갑, 토큰 또는 금액을 선택하세요.",
         "payWithCard": "경로를 찾을 수 없습니다. 카드 결제가 가능합니다",
-        "payWithCryptoImmutablezkEVM": "Immutable zkEVM의 잔액으로 결제",
         "fastestBadge": "가장 빠름",
         "minutesText": "분",
         "minuteText": "분",
