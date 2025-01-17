@@ -13,8 +13,9 @@ import { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Chain } from '../../../../lib/squid/types';
 import { getDurationFormatted } from '../../../../functions/getDurationFormatted';
-import { getFormattedAmounts, getFormattedNumber } from '../../../../functions/getFormattedNumber';
+import { getFormattedAmounts } from '../../../../functions/getFormattedNumber';
 import { DirectCryptoPayData } from '../../types';
+import { getRouteAndTokenBalancesForDirectCryptoPay } from '../../functions/getRouteAndBalancesForDirectCryptoPay';
 
 export interface DirectCryptoPayOptionProps<
     RC extends ReactElement | undefined = undefined,
@@ -40,38 +41,23 @@ export function DirectCryptoPayOption<RC extends ReactElement | undefined = unde
   selected = false,
 }: DirectCryptoPayOptionProps<RC>) {
   const { t } = useTranslation();
-
-  console.log('routeData', routeData);
   const { fromToken } = routeData.amountData;
   const estimate = 0;
   const gasTokenSymbol = 'IMX';
   const totalFeesUsd = 0;
 
-  const { usdPrice } = routeData.amountData.fromToken;
-
-  const routeBalance = getFormattedNumber(
-    routeData.amountData.balance.balance,
-    routeData.amountData.balance.decimals,
-    routeData.amountData.balance.decimals, // preserve precision for usd conversion down below
-  );
-  const routeBalanceUsd = (parseFloat(routeBalance) * usdPrice).toString();
-
-  const { fromAmount } = routeData.amountData;
-  const fromAmountUsd = (parseFloat(fromAmount) * usdPrice).toString();
-
   const chain = chains?.find((c) => c.id === fromToken.chainId);
-  console.log('chains', chains);
-  console.log('chain', chain);
-  console.log('fromToken', fromToken);
-  console.log('usdPrice', usdPrice);
-  console.log('fromAmount', fromAmount);
-  console.log('fromAmountUsd', fromAmountUsd);
+
   const estimatedDurationFormatted = getDurationFormatted(
     estimate,
     t('views.ADD_TOKENS.routeSelection.minutesText'),
     t('views.ADD_TOKENS.routeSelection.minuteText'),
     t('views.ADD_TOKENS.routeSelection.secondsText'),
   );
+
+  const {
+    routeBalanceUsd, fromAmount, fromAmountUsd,
+  } = getRouteAndTokenBalancesForDirectCryptoPay(routeData);
 
   const handleClick = () => {
     onClick(routeData);

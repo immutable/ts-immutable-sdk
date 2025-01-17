@@ -18,10 +18,12 @@ import { useTranslation } from 'react-i18next';
 import { getRouteAndTokenBalances } from '../../../../lib/squid/functions/getRouteAndTokenBalances';
 import { Chain, RouteData } from '../../../../lib/squid/types';
 import { getRemoteVideo } from '../../../../lib/utils';
+import { DirectCryptoPayData } from '../../types';
+import { getRouteAndTokenBalancesForDirectCryptoPay } from '../../functions/getRouteAndBalancesForDirectCryptoPay';
 
 export interface SelectedRouteOptionProps {
   checkout: Checkout;
-  routeData?: RouteData;
+  routeData?: RouteData | DirectCryptoPayData;
   chains: Chain[] | null;
   onClick: MouseEventHandler<HTMLSpanElement>;
   loading?: boolean;
@@ -76,8 +78,19 @@ export function SelectedRouteOption({
   const { fromToken } = routeData?.amountData ?? {};
   const chain = chains?.find((c) => c.id === fromToken?.chainId);
 
+  let chainNativeCurrencySymbol = '';
   const { routeBalanceUsd, fromAmount, fromAmountUsd } = useMemo(
-    () => getRouteAndTokenBalances(routeData),
+    () => {
+      if (!routeData || !('route' in routeData)) {
+        if (directCryptoPay) {
+          chainNativeCurrencySymbol = chain?.nativeCurrency.symbol || '';
+          return getRouteAndTokenBalancesForDirectCryptoPay(routeData);
+        }
+        return { routeBalanceUsd: '0', fromAmount: '0', fromAmountUsd: '0' };
+      }
+      chainNativeCurrencySymbol = routeData.route.route.estimate.gasCosts[0].token.symbol;
+      return getRouteAndTokenBalances(routeData);
+    },
     [routeData],
   );
 
@@ -87,7 +100,7 @@ export function SelectedRouteOption({
     (event: MouseEvent<HTMLSpanElement>) => {
       event.stopPropagation();
 
-      if (!loading && !routeData && !insufficientBalancePayWithCard && !directCryptoPay) return false;
+      if (!loading && !routeData && !insufficientBalancePayWithCard) return false;
 
       onClick?.(event);
       return true;
@@ -127,11 +140,6 @@ export function SelectedRouteOption({
     if (insufficientBalancePayWithCard) {
       icon = 'BankCard';
       copy = t('views.ADD_TOKENS.routeSelection.payWithCard');
-    }
-
-    if (directCryptoPay) {
-      icon = 'InformationCircle';
-      copy = t('views.ADD_TOKENS.routeSelection.payWithCryptoImmutablezkEVM');
     }
 
     return (
@@ -194,8 +202,7 @@ export function SelectedRouteOption({
               <br />
               <span style={{ color: '#FF637F' }}>
                 {t('views.ADD_TOKENS.noGasRouteMessage', {
-                  token:
-              routeData.route.route.estimate.gasCosts[0].token.symbol,
+                  token: chainNativeCurrencySymbol,
                 })}
               </span>
             </>

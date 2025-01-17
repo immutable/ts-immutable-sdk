@@ -115,7 +115,7 @@ export function SelectedRouteOption({
 
   if ((!routeData && !loading) || insufficientBalance) {
     let icon: AllDualVariantIconKeys = 'Sparkle';
-    let copy = t('views.ADD_TOKENS.routeSelection.payWithCryptoImmutablezkEVM');
+    let copy = '';
 
     if (insufficientBalance) {
       icon = 'InformationCircle';

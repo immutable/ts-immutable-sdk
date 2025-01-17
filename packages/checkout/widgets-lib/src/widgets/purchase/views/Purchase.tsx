@@ -784,7 +784,7 @@ export function Purchase({
                   checkout={checkout}
                   loading={loading}
                   chains={chains}
-                  routeData={selectedRouteData}
+                  routeData={selectedRouteData || (directCryptoPayRoutes?.[0] || undefined)}
                   onClick={() => setShowOptionsDrawer(true)}
                   withSelectedWallet={!!fromAddress}
                   insufficientBalance={insufficientBalance}
