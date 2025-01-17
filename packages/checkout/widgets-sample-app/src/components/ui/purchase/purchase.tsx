@@ -1,10 +1,20 @@
-import { Checkout, PurchaseEventType, WidgetLanguage, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { Checkout, PurchaseEventType, PurchaseItem, WidgetLanguage, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { useEffect, useMemo } from 'react';
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
 import { Environment } from '@imtbl/config';
 import { passport } from './passport';
 
 const PURCHASE_WIDGET_ID = 'purchase';
+
+const defaultItems: PurchaseItem[] = [
+  {
+    productId: "lootbox",
+    qty: 1,
+    name: "Lootbox",
+    image: "https://strong-alligator.static.domains/lootbox.png",
+    description: "A common lootbox",
+  },
+];
 
 export default function PurchaseUI() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -31,6 +41,7 @@ export default function PurchaseUI() {
   useEffect(() => {
     purchase.mount(PURCHASE_WIDGET_ID, {
       environmentId,
+      items: defaultItems,
     });
 
     purchase.addListener(PurchaseEventType.CLOSE_WIDGET, (data: any) => {
@@ -53,7 +64,7 @@ export default function PurchaseUI() {
       <h1 className="sample-heading">Checkout Purchase</h1>
 
       <div id={PURCHASE_WIDGET_ID}></div>
-      <button onClick={() => purchase.mount(PURCHASE_WIDGET_ID, { environmentId })}>Mount</button>
+      <button onClick={() => purchase.mount(PURCHASE_WIDGET_ID, { environmentId, items: defaultItems })}>Mount</button>
       <button onClick={() => purchase.unmount()}>Unmount</button>
       <button onClick={() => purchase.update({ config: { theme: WidgetTheme.LIGHT } })}>Update Config Light</button>
       <button onClick={() => purchase.update({ config: { theme: WidgetTheme.DARK } })}>Update Config Dark</button>
