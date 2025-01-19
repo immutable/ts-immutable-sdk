@@ -380,5 +380,6 @@ export const useRoutes = () => {
     fetchRoutes,
     getFromAmountData,
     getRoute,
+    hasSufficientBalance,
   };
 };
