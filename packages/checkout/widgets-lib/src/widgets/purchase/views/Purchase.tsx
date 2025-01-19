@@ -27,7 +27,7 @@ import { PurchaseItemHero } from '../components/PurchaseItemHero';
 import { DeliverToWalletDrawer } from '../../../components/WalletDrawer/DeliverToWalletDrawer';
 import { SelectedWallet } from '../../../components/SelectedWallet/SelectedWallet';
 import { SquidFooter } from '../../../lib/squid/components/SquidFooter';
-import { RouteOptionsDrawer } from '../../../components/RouteOptionsDrawer/RouteOptionsDrawer';
+import { RouteOptionsDrawer } from '../components/RouteOptionsDrawer/RouteOptionsDrawer';
 import { PayWithWalletDrawer } from '../../../components/WalletDrawer/PayWithWalletDrawer';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
@@ -41,7 +41,7 @@ import { useTokens } from '../../../lib/squid/hooks/useTokens';
 import { fetchChains } from '../../../lib/squid/functions/fetchChains';
 import { fetchBalances } from '../../../lib/squid/functions/fetchBalances';
 import { RiveStateMachineInput } from '../../../types/HandoverTypes';
-import { SelectedRouteOption } from '../../../components/SelectedRouteOption/SelectedRouteOption';
+import { SelectedRouteOption } from '../components/SelectedRouteOption/SelectedRouteOption';
 import { convertToNetworkChangeableProvider } from '../../../functions/convertToNetworkChangeableProvider';
 import { useExecute } from '../../../lib/squid/hooks/useExecute';
 import { useSignOrder } from '../../../lib/hooks/useSignOrder';
@@ -56,6 +56,9 @@ import { UserJourney } from '../../../context/analytics-provider/SegmentAnalytic
 import { sendPurchaseCloseEvent, sendPurchaseSuccessEvent } from '../PurchaseWidgetEvents';
 import { getRouteChains } from '../../../lib/squid/functions/getRouteChains';
 import { useQuoteOrder } from '../../../lib/hooks/useQuoteOrder';
+import { DirectCryptoPayData } from '../types';
+import { findToken } from '../../../lib/squid/functions/findToken';
+import { findBalance } from '../../../lib/squid/functions/findBalance';
 
 interface PurchaseProps {
   checkout: Checkout;
@@ -75,7 +78,7 @@ export function Purchase({
   const { purchaseState: { items } } = useContext(PurchaseContext);
 
   const {
-    fetchRoutes, getRoute, getFromAmountData,
+    fetchRoutes, getRoute, getFromAmountData, hasSufficientBalance,
   } = useRoutes();
 
   const { fetchOrderQuote, getSelectedCurrency } = useQuoteOrder({
@@ -92,11 +95,14 @@ export function Purchase({
 
   const [selectedRouteData, setSelectedRouteData] = useState<RouteData | undefined>(undefined);
   const [fetchingRoutes, setFetchingRoutes] = useState(false);
+  const [isFundingNeeded, setIsFundingNeeded] = useState<boolean | undefined>(undefined);
+
   const [insufficientBalance, setInsufficientBalance] = useState(false);
 
   // TODO: Move to context
   const [balances, setBalances] = useState<TokenBalance[]>([]);
   const [routes, setRoutes] = useState<RouteData[]>([]);
+  const [directCryptoPayRoutes, setDirectCryptoPayRoutes] = useState<DirectCryptoPayData[]>([]);
   const [chains, setChains] = useState<Chain[]>([]);
   const squid = useSquid(checkout);
   const tokens = useTokens(checkout);
@@ -126,9 +132,8 @@ export function Purchase({
   const { providers } = useInjectedProviders({ checkout });
 
   const {
-    getAllowance, approve, execute, getStatus,
+    getAllowance, approve, execute, getStatus, waitForReceipt,
   } = useExecute(UserJourney.PURCHASE, (err) => {
-    // eslint-disable-next-line no-console
     console.log('useExecute err', err);
   });
 
@@ -223,6 +228,11 @@ export function Purchase({
     setSelectedRouteData(route);
   };
 
+  const handleDirectCryptoPayClick = (route: DirectCryptoPayData) => {
+    console.log('handleDirectCryptoPayClick', route);
+    setShowOptionsDrawer(false);
+  };
+
   useEffect(() => {
     setRoutes([]);
     setInsufficientBalance(false);
@@ -235,30 +245,53 @@ export function Purchase({
     setSelectedRouteData(undefined);
 
     (async () => {
-      if (
-        balances
-        && squid
-        && tokens
-      ) {
-        setFetchingRoutes(true);
-        const availableRoutes = await fetchRoutes(
-          squid,
-          tokens,
+      if (balances && squid && tokens && balances.length > 0) {
+        console.log('balances', balances);
+        const isSufficientBalance = hasSufficientBalance(
           balances,
-          ChainId.IMTBL_ZKEVM_MAINNET.toString(),
           item.tokenAddress,
+          ChainId.IMTBL_ZKEVM_MAINNET.toString(),
           item.price,
-          5,
-          1000,
-          true,
         );
-        setFetchingRoutes(false);
+        console.log('isSufficientBalance', isSufficientBalance);
+        setIsFundingNeeded(!isSufficientBalance);
 
-        if (availableRoutes.length === 0) {
-          setInsufficientBalance(true);
+        if (!isSufficientBalance) {
+          setFetchingRoutes(true);
+
+          const availableRoutes = await fetchRoutes(
+            squid,
+            tokens,
+            balances,
+            ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+            item.tokenAddress,
+            item.price,
+            5,
+            1000,
+            true,
+          );
+          setFetchingRoutes(false);
+          setRoutes(availableRoutes);
+          setInsufficientBalance(availableRoutes.length === 0);
+        } else {
+          const token = findToken(tokens, item.tokenAddress, ChainId.IMTBL_ZKEVM_MAINNET.toString());
+          const balance = findBalance(balances, item.tokenAddress, ChainId.IMTBL_ZKEVM_MAINNET.toString());
+          console.log('token', token);
+          console.log('balance', balance);
+          if (token && balance) {
+            setDirectCryptoPayRoutes([{
+              isInsufficientGas: true,
+              amountData: {
+                fromToken: token,
+                fromAmount: item.price,
+                toToken: token,
+                toAmount: item.price,
+                balance,
+                additionalBuffer: 0,
+              },
+            }]);
+          }
         }
-
-        setRoutes(availableRoutes);
       }
     })();
   }, [balances, squid]);
@@ -308,7 +341,7 @@ export function Purchase({
   const showSwapOption = true;
   const showBridgeOption = true;
 
-  const { signWithPostHooks } = useSignOrder({
+  const { signWithPostHooks, sign } = useSignOrder({
     environmentId,
     provider: fromProvider,
     items: [{
@@ -325,128 +358,48 @@ export function Purchase({
   });
 
   const squidMulticallAddress = '0xad6cea45f98444a922a2b4fe96b8c90f0862d2f4';
-
-  const handleProceedClick = useCallback(async () => {
-    // eslint-disable-next-line max-len
-    if (!squid || !tokens || !toAddress || !selectedRouteData || !fromAddress || !fromProvider || !fromProviderInfo) return;
-
-    const signResponse = await signWithPostHooks(
+  const handleDirectCryptoPayment = async (
+    provider: Web3Provider,
+    spenderAddress: string,
+    recipientAddress: string,
+    tokenAddress: string,
+  ) => {
+    const signResponse = await sign(
       SignPaymentTypes.CRYPTO,
-      item.tokenAddress,
-      squidMulticallAddress,
-      toAddress,
+      tokenAddress,
+      spenderAddress,
+      recipientAddress,
     );
+    if (!signResponse) return;
+    const signer = provider.getSigner();
+    if (!signer) return;
 
-    // eslint-disable-next-line no-console
-    console.log('signResponse', signResponse?.signResponse);
-    // eslint-disable-next-line no-console
-    console.log('postHooks', signResponse?.postHooks);
+    const gasPrice = await provider.getGasPrice();
 
-    const updatedAmountData = getFromAmountData(
-      tokens,
-      selectedRouteData.amountData.balance,
-      item.price,
-      ChainId.IMTBL_ZKEVM_MAINNET.toString(),
-      item.tokenAddress,
-      selectedRouteData.amountData.additionalBuffer,
+    const approveTxn = signResponse.transactions.find(
+      (txn) => txn.methodCall.startsWith('approve'),
     );
-    if (!updatedAmountData) return;
-
-    const postHooks = signResponse?.postHooks ? {
-      chainType: ChainType.EVM,
-      calls: signResponse.postHooks,
-      provider: 'Immutable Primary Sales',
-      description: 'Perform Primary Sales NFT checkout',
-      logoURI: 'https://explorer.immutable.com/assets/configs/network_icon.svg',
-    } : undefined;
-
-    const route = (await getRoute(
-      squid,
-      updatedAmountData?.fromToken,
-      updatedAmountData?.toToken,
-      toAddress,
-      updatedAmountData.fromAmount,
-      updatedAmountData.toAmount,
-      fromAddress,
-      false,
-      postHooks,
-    ))?.route;
-
-    if (!route) return;
-
-    const currentFromAddress = await fromProvider.getSigner().getAddress();
-    const { fromChain, toChain } = getRouteChains(chains, route);
-
-    if (currentFromAddress !== fromAddress) {
-      return;
-    }
-
-    showHandover({
-      animationPath: APPROVE_TXN_ANIMATION,
-      state: RiveStateMachineInput.START,
-      headingText: 'Preparing order',
+    if (!approveTxn) return;
+    const approveTxnResponse = await signer.sendTransaction({
+      to: approveTxn.tokenAddress,
+      data: approveTxn.rawData,
+      gasPrice,
+      gasLimit: approveTxn.gasEstimate,
     });
+    await waitForReceipt(provider, approveTxnResponse.hash);
 
-    const changeableProvider = await convertToNetworkChangeableProvider(
-      fromProvider,
+    const executeTxn = signResponse.transactions.find(
+      (txn) => txn.methodCall.startsWith('execute'),
     );
-
-    const verifyChainResult = await verifyAndSwitchChain(
-      changeableProvider,
-      route.route.params.fromChain,
-    );
-
-    if (!verifyChainResult.isChainCorrect) {
-      return;
-    }
-
-    const allowance = await getAllowance(changeableProvider, route);
-    const { fromAmount } = route.route.params;
-
-    // eslint-disable-next-line no-console
-    console.log('allowance', allowance);
-
-    if (!allowance || allowance?.lt(fromAmount)) {
-      showHandover({
-        animationPath: APPROVE_TXN_ANIMATION,
-        state: RiveStateMachineInput.WAITING,
-        headingText: 'Waiting for wallet approval for token access',
-      });
-
-      const approveTxnReceipt = await approve(fromProviderInfo, changeableProvider, route);
-
-      if (!approveTxnReceipt) {
-        return;
-      }
-
-      showHandover({
-        animationPath: APPROVE_TXN_ANIMATION,
-        state: RiveStateMachineInput.COMPLETED,
-        headingText: 'Tokens ready for item purchase',
-        duration: FIXED_HANDOVER_DURATION,
-      });
-    }
-
-    showHandover({
-      animationPath: EXECUTE_TXN_ANIMATION,
-      state: RiveStateMachineInput.WAITING,
-      headingText: 'Waiting for wallet approval for purchase',
+    if (!executeTxn) return;
+    const executeTxnResponse = await signer.sendTransaction({
+      to: executeTxn.tokenAddress,
+      data: executeTxn.rawData,
+      gasPrice,
+      gasLimit: executeTxn.gasEstimate,
     });
-
-    const executeTxnReceipt = await execute(squid, fromProviderInfo, changeableProvider, route);
-
-    // eslint-disable-next-line no-console
-    console.log('executeTxnReceipt', executeTxnReceipt);
-
-    if (!executeTxnReceipt) {
-      return;
-    }
-
-    const fundingMethod = fromChain !== toChain ? 'squid' : 'direct';
-
-    sendPurchaseSuccessEvent(eventTarget, executeTxnReceipt.transactionHash, fundingMethod);
-
-    if (toChain === fromChain) {
+    const receipt = await waitForReceipt(provider, executeTxnResponse.hash);
+    if (receipt?.status === 1) {
       showHandover({
         animationPath: EXECUTE_TXN_ANIMATION,
         state: RiveStateMachineInput.COMPLETED,
@@ -461,10 +414,10 @@ export function Purchase({
                   rc={(
                     <a
                       target="_blank"
-                      href={`https://explorer.immutable.com/tx/${executeTxnReceipt.transactionHash}`}
+                      href={`https://explorer.immutable.com/tx/${executeTxnResponse.hash}`}
                       rel="noreferrer"
                     />
-                  )}
+                )}
                 />
               ),
             }}
@@ -475,82 +428,241 @@ export function Purchase({
           sendPurchaseCloseEvent(eventTarget);
         },
       });
-      return;
     }
+  };
 
-    showHandover({
-      animationPath: EXECUTE_TXN_ANIMATION,
-      state: RiveStateMachineInput.PROCESSING,
-      headingText: 'Processing purchase',
-    });
+  const handleProceedClick = useCallback(async () => {
+    // eslint-disable-next-line max-len
+    if (!squid || !tokens || !toAddress || !fromAddress || !fromProvider || !fromProviderInfo) return;
+    if (!selectedRouteData && isFundingNeeded) return;
 
-    const status = await getStatus(squid, executeTxnReceipt.transactionHash);
-    const axelarscanUrl = `https://axelarscan.io/gmp/${executeTxnReceipt?.transactionHash}`;
+    if (isFundingNeeded === true) {
+      if (!selectedRouteData) return;
 
-    // eslint-disable-next-line no-console
-    console.log('status', status);
-    // eslint-disable-next-line no-console
-    console.log('axelarscanUrl', axelarscanUrl);
+      const signResponse = await signWithPostHooks(
+        SignPaymentTypes.CRYPTO,
+        item.tokenAddress,
+        squidMulticallAddress,
+        toAddress,
+      );
 
-    if (status?.squidTransactionStatus === 'success') {
-      showHandover({
-        animationPath: EXECUTE_TXN_ANIMATION,
-        state: RiveStateMachineInput.COMPLETED,
-        headingText: 'Purchase complete',
-        subheadingText: (
-          <Trans
-            i18nKey="Go to <axelarscanLink>Axelarscan</axelarscanLink> for transaction details"
-            components={{
-              axelarscanLink: (
-                <Link
-                  size="small"
-                  rc={(
-                    <a
-                      target="_blank"
-                      href={axelarscanUrl}
-                      rel="noreferrer"
-                    />
-                  )}
-                />
-              ),
-            }}
-          />
-        ),
-        primaryButtonText: 'Done',
-        onPrimaryButtonClick: () => {
-          sendPurchaseCloseEvent(eventTarget);
-        },
-      });
-    } else {
+      // eslint-disable-next-line no-console
+      console.log('signResponse', signResponse?.signResponse);
+      // eslint-disable-next-line no-console
+      console.log('postHooks', signResponse?.postHooks);
+
+      const updatedAmountData = getFromAmountData(
+        tokens,
+        selectedRouteData.amountData.balance,
+        item.price,
+        ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+        item.tokenAddress,
+        selectedRouteData.amountData.additionalBuffer,
+      );
+      if (!updatedAmountData) return;
+
+      const postHooks = signResponse?.postHooks ? {
+        chainType: ChainType.EVM,
+        calls: signResponse.postHooks,
+        provider: 'Immutable Primary Sales',
+        description: 'Perform Primary Sales NFT checkout',
+        logoURI: 'https://explorer.immutable.com/assets/configs/network_icon.svg',
+      } : undefined;
+
+      const route = (await getRoute(
+        squid,
+        updatedAmountData?.fromToken,
+        updatedAmountData?.toToken,
+        toAddress,
+        updatedAmountData.fromAmount,
+        updatedAmountData.toAmount,
+        fromAddress,
+        false,
+        postHooks,
+      ))?.route;
+
+      if (!route) return;
+
+      const currentFromAddress = await fromProvider.getSigner().getAddress();
+      const { fromChain, toChain } = getRouteChains(chains, route);
+
+      if (currentFromAddress !== fromAddress) {
+        return;
+      }
+
       showHandover({
         animationPath: APPROVE_TXN_ANIMATION,
-        state: RiveStateMachineInput.COMPLETED,
-        headingText: 'Unable to complete purchase',
-        subheadingText: (
-          <Trans
-            // eslint-disable-next-line max-len
-            i18nKey="Something went wrong, and we were unable to complete this transaction. Visit <axelarscanLink>Axelarscan</axelarscanLink> for details."
-            components={{
-              axelarscanLink: (
-                <Link
-                  size="small"
-                  rc={(
-                    <a
-                      target="_blank"
-                      href={axelarscanUrl}
-                      rel="noreferrer"
-                    />
-                  )}
-                />
-              ),
-            }}
-          />
-        ),
-        secondaryButtonText: 'Dismiss',
-        onSecondaryButtonClick: () => {
-          sendPurchaseCloseEvent(eventTarget);
-        },
+        state: RiveStateMachineInput.START,
+        headingText: 'Preparing order',
       });
+
+      const changeableProvider = await convertToNetworkChangeableProvider(
+        fromProvider,
+      );
+
+      const verifyChainResult = await verifyAndSwitchChain(
+        changeableProvider,
+        route.route.params.fromChain,
+      );
+
+      if (!verifyChainResult.isChainCorrect) {
+        return;
+      }
+
+      const allowance = await getAllowance(changeableProvider, route);
+      const { fromAmount } = route.route.params;
+
+      // eslint-disable-next-line no-console
+      console.log('allowance', allowance);
+
+      if (!allowance || allowance?.lt(fromAmount)) {
+        showHandover({
+          animationPath: APPROVE_TXN_ANIMATION,
+          state: RiveStateMachineInput.WAITING,
+          headingText: 'Waiting for wallet approval for token access',
+        });
+
+        const approveTxnReceipt = await approve(fromProviderInfo, changeableProvider, route);
+
+        if (!approveTxnReceipt) {
+          return;
+        }
+
+        showHandover({
+          animationPath: APPROVE_TXN_ANIMATION,
+          state: RiveStateMachineInput.COMPLETED,
+          headingText: 'Tokens ready for item purchase',
+          duration: FIXED_HANDOVER_DURATION,
+        });
+      }
+
+      showHandover({
+        animationPath: EXECUTE_TXN_ANIMATION,
+        state: RiveStateMachineInput.WAITING,
+        headingText: 'Waiting for wallet approval for purchase',
+      });
+
+      const executeTxnReceipt = await execute(squid, fromProviderInfo, changeableProvider, route);
+
+      // eslint-disable-next-line no-console
+      console.log('executeTxnReceipt', executeTxnReceipt);
+
+      if (!executeTxnReceipt) {
+        return;
+      }
+
+      const fundingMethod = fromChain !== toChain ? 'squid' : 'direct';
+
+      sendPurchaseSuccessEvent(eventTarget, executeTxnReceipt.transactionHash, fundingMethod);
+
+      if (toChain === fromChain) {
+        showHandover({
+          animationPath: EXECUTE_TXN_ANIMATION,
+          state: RiveStateMachineInput.COMPLETED,
+          headingText: 'Purchase complete',
+          subheadingText: (
+            <Trans
+              i18nKey="Go to <explorerLink>Immutable zkEVM explorer</explorerLink> for transaction details"
+              components={{
+                explorerLink: (
+                  <Link
+                    size="small"
+                    rc={(
+                      <a
+                        target="_blank"
+                        href={`https://explorer.immutable.com/tx/${executeTxnReceipt.transactionHash}`}
+                        rel="noreferrer"
+                      />
+                  )}
+                  />
+                ),
+              }}
+            />
+          ),
+          primaryButtonText: 'Done',
+          onPrimaryButtonClick: () => {
+            sendPurchaseCloseEvent(eventTarget);
+          },
+        });
+        return;
+      }
+
+      showHandover({
+        animationPath: EXECUTE_TXN_ANIMATION,
+        state: RiveStateMachineInput.PROCESSING,
+        headingText: 'Processing purchase',
+      });
+
+      const status = await getStatus(squid, executeTxnReceipt.transactionHash);
+      const axelarscanUrl = `https://axelarscan.io/gmp/${executeTxnReceipt?.transactionHash}`;
+
+      // eslint-disable-next-line no-console
+      console.log('status', status);
+      // eslint-disable-next-line no-console
+      console.log('axelarscanUrl', axelarscanUrl);
+
+      if (status?.squidTransactionStatus === 'success') {
+        showHandover({
+          animationPath: EXECUTE_TXN_ANIMATION,
+          state: RiveStateMachineInput.COMPLETED,
+          headingText: 'Purchase complete',
+          subheadingText: (
+            <Trans
+              i18nKey="Go to <axelarscanLink>Axelarscan</axelarscanLink> for transaction details"
+              components={{
+                axelarscanLink: (
+                  <Link
+                    size="small"
+                    rc={(
+                      <a
+                        target="_blank"
+                        href={axelarscanUrl}
+                        rel="noreferrer"
+                      />
+                  )}
+                  />
+                ),
+              }}
+            />
+          ),
+          primaryButtonText: 'Done',
+          onPrimaryButtonClick: () => {
+            sendPurchaseCloseEvent(eventTarget);
+          },
+        });
+      } else {
+        showHandover({
+          animationPath: APPROVE_TXN_ANIMATION,
+          state: RiveStateMachineInput.COMPLETED,
+          headingText: 'Unable to complete purchase',
+          subheadingText: (
+            <Trans
+            // eslint-disable-next-line max-len
+              i18nKey="Something went wrong, and we were unable to complete this transaction. Visit <axelarscanLink>Axelarscan</axelarscanLink> for details."
+              components={{
+                axelarscanLink: (
+                  <Link
+                    size="small"
+                    rc={(
+                      <a
+                        target="_blank"
+                        href={axelarscanUrl}
+                        rel="noreferrer"
+                      />
+                  )}
+                  />
+                ),
+              }}
+            />
+          ),
+          secondaryButtonText: 'Dismiss',
+          onSecondaryButtonClick: () => {
+            sendPurchaseCloseEvent(eventTarget);
+          },
+        });
+      }
+    } else {
+      handleDirectCryptoPayment(fromProvider, fromAddress, toAddress, item.tokenAddress);
     }
   }, [
     squid,
@@ -564,14 +676,14 @@ export function Purchase({
     execute,
   ]);
 
-  const loading = (!!fromAddress || fetchingRoutes)
-    && !(selectedRouteData || insufficientBalance);
+  const loading = (!!fromAddress || fetchingRoutes) && (
+    (!(selectedRouteData || insufficientBalance || isFundingNeeded === false))
+  );
 
   const readyToProceed = !!fromAddress
     && !!toAddress
-    && !!selectedRouteData
-    && !selectedRouteData.isInsufficientGas
-    && !loading;
+    && !loading
+    && ((!!selectedRouteData && !selectedRouteData.isInsufficientGas) || (isFundingNeeded === false));
 
   const totalQty = items?.reduce((sum, purchaseItem: PurchaseItem) => sum + purchaseItem.qty, 0) || 0;
 
@@ -672,10 +784,11 @@ export function Purchase({
                   checkout={checkout}
                   loading={loading}
                   chains={chains}
-                  routeData={selectedRouteData}
+                  routeData={selectedRouteData || (directCryptoPayRoutes?.[0] || undefined)}
                   onClick={() => setShowOptionsDrawer(true)}
                   withSelectedWallet={!!fromAddress}
                   insufficientBalance={insufficientBalance}
+                  directCryptoPay={!isFundingNeeded}
                   showOnrampOption={shouldShowOnRampOption}
                 />
               </>
@@ -717,14 +830,18 @@ export function Purchase({
           <RouteOptionsDrawer
             checkout={checkout}
             routes={routes}
-            showOnrampOption={shouldShowOnRampOption}
+            chains={chains}
             showSwapOption={showSwapOption}
             showBridgeOption={showBridgeOption}
+            showDirectCryptoPayOption
             visible={showOptionsDrawer}
             onClose={() => setShowOptionsDrawer(false)}
             onCardClick={() => false}
             onRouteClick={handleRouteClick}
+            onDirectCryptoPayClick={handleDirectCryptoPayClick}
             insufficientBalance={insufficientBalance}
+            directCryptoPay={!isFundingNeeded}
+            directCryptoPayRoutes={directCryptoPayRoutes}
           />
           <DeliverToWalletDrawer
             visible={showDeliverToDrawer}

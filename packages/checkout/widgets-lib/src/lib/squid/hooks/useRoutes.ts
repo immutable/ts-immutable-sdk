@@ -354,9 +354,31 @@ export const useRoutes = () => {
     }
   };
 
+  const hasSufficientBalance = (
+    balances: TokenBalance[],
+    toTokenAddress: string,
+    toChainId: string,
+    toAmount: string,
+  ): boolean => {
+    const matchingTokens = balances.filter(
+      (balance) => balance.address.toLowerCase() === toTokenAddress.toLowerCase()
+        && balance.chainId.toString() === toChainId.toString(),
+    );
+
+    if (matchingTokens.length > 0) {
+      return matchingTokens.some((balance) => {
+        const tokenAmount = parseFloat(utils.formatUnits(balance.balance, balance.decimals));
+        return tokenAmount >= parseFloat(toAmount);
+      });
+    }
+
+    return false;
+  };
+
   return {
     fetchRoutes,
     getFromAmountData,
     getRoute,
+    hasSufficientBalance,
   };
 };
