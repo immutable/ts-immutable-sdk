@@ -94,6 +94,19 @@ export function RouteOptions({
         <motion.div variants={listVariants} initial="hidden" animate="show" />
       }
     >
+      {directCryptoPayRoutes?.map((routeData: DirectCryptoPayData, index) => (
+        <DirectCryptoPayOption
+          // eslint-disable-next-line max-len
+          key={`direct-crypto-pay-option-${routeData.amountData.fromToken.chainId}-${routeData.amountData.fromToken.address}`}
+          size={size}
+          routeData={routeData}
+          chains={chains}
+          onClick={() => onDirectCryptoPayClick(routeData, index)}
+          isFastest={index === 0}
+          selected={index === selectedIndex}
+          rc={<motion.div variants={listItemVariants} />}
+        />
+      ))}
       {routes?.map((routeData: RouteData, index) => (
         <RouteOption
           key={`route-option-${routeData.amountData.fromToken.chainId}-${routeData.amountData.fromToken.address}`}
@@ -131,19 +144,6 @@ export function RouteOptions({
         ))}
       </>
       )}
-      {directCryptoPayRoutes?.map((routeData: DirectCryptoPayData, index) => (
-        <DirectCryptoPayOption
-          // eslint-disable-next-line max-len
-          key={`direct-crypto-pay-option-${routeData.amountData.fromToken.chainId}-${routeData.amountData.fromToken.address}`}
-          size={size}
-          routeData={routeData}
-          chains={chains}
-          onClick={() => onDirectCryptoPayClick(routeData, index)}
-          isFastest={index === 0}
-          selected={index === selectedIndex}
-          rc={<motion.div variants={listItemVariants} />}
-        />
-      ))}
     </Stack>
   );
 }
