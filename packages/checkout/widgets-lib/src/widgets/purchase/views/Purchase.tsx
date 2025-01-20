@@ -136,6 +136,7 @@ export function Purchase({
   const {
     getAllowance, approve, execute, getStatus, waitForReceipt,
   } = useExecute(UserJourney.PURCHASE, (err) => {
+    // eslint-disable-next-line no-console
     console.log('useExecute err', err);
   });
 
@@ -232,6 +233,8 @@ export function Purchase({
   };
 
   const handleDirectCryptoPayClick = (route: DirectCryptoPayData) => {
+    // eslint-disable-next-line no-console
+    console.log('handleDirectCryptoPayClick', route);
     setShowOptionsDrawer(false);
     setShowPayWithDrawer(false);
     setShowDeliverToDrawer(false);
@@ -252,6 +255,7 @@ export function Purchase({
 
     (async () => {
       if (balances && squid && tokens && balances.length > 0) {
+        // eslint-disable-next-line no-console
         console.log('balances', balances);
         const isSufficientBalance = hasSufficientBalance(
           balances,
@@ -259,12 +263,17 @@ export function Purchase({
           ChainId.IMTBL_ZKEVM_MAINNET.toString(),
           item.price,
         );
+        // eslint-disable-next-line no-console
         console.log('isSufficientBalance', isSufficientBalance);
         setIsFundingNeeded(!isSufficientBalance);
 
         if (isSufficientBalance) {
           const token = findToken(tokens, item.tokenAddress, ChainId.IMTBL_ZKEVM_MAINNET.toString());
           const balance = findBalance(balances, item.tokenAddress, ChainId.IMTBL_ZKEVM_MAINNET.toString());
+          // eslint-disable-next-line no-console
+          console.log('token', token);
+          // eslint-disable-next-line no-console
+          console.log('balance', balance);
           if (token && balance) {
             setDirectCryptoPayRoutes([{
               isInsufficientGas: true,
