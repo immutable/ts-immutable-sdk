@@ -1,7 +1,7 @@
 import {
   anything, deepEqual, instance, mock, when,
 } from 'ts-mockito';
-import type { TransactionMethods } from '@opensea/seaport-js/lib/utils/usecase';
+import type { TransactionMethods } from '@opensea/seaport-js/src/utils/usecase';
 import { ContractTransaction, ZeroHash, ZeroAddress } from 'ethers-v6';
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
 import type {
@@ -11,9 +11,9 @@ import type {
   ExchangeAction,
   OfferItem,
   OrderComponents,
-} from '@opensea/seaport-js/lib/types';
+} from '@opensea/seaport-js/src/types';
 import { BigNumber, providers } from 'ethers';
-import { OrderType } from '@opensea/seaport-js/lib/constants';
+import { OrderType } from '@opensea/seaport-js/src/constants';
 import {
   ActionType,
   TransactionAction,

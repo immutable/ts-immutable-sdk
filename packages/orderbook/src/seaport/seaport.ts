@@ -8,7 +8,7 @@ import type {
   InputCriteria,
   OrderComponents,
   OrderUseCase,
-} from '@opensea/seaport-js/lib/types';
+} from '@opensea/seaport-js/src/types';
 import { providers } from 'ethers';
 import { mapOrderFromOpenApiOrder } from '../openapi/mapper';
 import { Order as OpenApiOrder } from '../openapi/sdk';

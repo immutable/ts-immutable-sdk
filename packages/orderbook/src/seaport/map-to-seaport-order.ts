@@ -3,7 +3,7 @@ import {
   OfferItem,
   OrderComponents,
   TipInputItem,
-} from '@opensea/seaport-js/lib/types';
+} from '@opensea/seaport-js/src/types';
 import { constants } from 'ethers';
 import { Item, Order, ProtocolData } from '../openapi/sdk';
 import { exhaustiveSwitch } from '../utils';

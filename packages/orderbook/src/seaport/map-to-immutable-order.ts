@@ -1,5 +1,5 @@
-import { ConsiderationItem, OfferItem } from '@opensea/seaport-js/lib/types';
-import { ItemType, OrderType } from '@opensea/seaport-js/lib/constants';
+import { ConsiderationItem, OfferItem } from '@opensea/seaport-js/src/types';
+import { ItemType, OrderType } from '@opensea/seaport-js/src/constants';
 import {
   AssetCollectionItem, ERC20Item, Item, ProtocolData,
 } from '../openapi/sdk';

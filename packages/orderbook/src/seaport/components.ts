@@ -1,9 +1,9 @@
-import { ItemType, OrderType } from '@opensea/seaport-js/lib/constants';
+import { ItemType, OrderType } from '@opensea/seaport-js/src/constants';
 import type {
   ConsiderationItem,
   OfferItem,
   OrderComponents,
-} from '@opensea/seaport-js/lib/types';
+} from '@opensea/seaport-js/src/types';
 import { BigNumber } from 'ethers';
 import { getBulkOrderTree } from './lib/bulk-orders';
 

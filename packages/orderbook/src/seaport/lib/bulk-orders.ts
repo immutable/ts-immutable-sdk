@@ -1,4 +1,4 @@
-import type { OrderComponents } from '@opensea/seaport-js/lib/types';
+import type { OrderComponents } from '@opensea/seaport-js/src/types';
 import { TypedDataEncoder, keccak256, toUtf8Bytes } from 'ethers-v6';
 import { EIP_712_ORDER_TYPE } from '../constants';
 
