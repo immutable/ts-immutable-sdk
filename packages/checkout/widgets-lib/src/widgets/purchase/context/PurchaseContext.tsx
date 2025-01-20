@@ -1,17 +1,20 @@
 import { Squid } from '@0xsquid/sdk';
 import { PurchaseItem, TokenInfo } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
+import { Chain } from '../../../lib/squid/types';
 
 export interface PurchaseState {
   squid: Squid | null;
   items: PurchaseItem[];
   selectedToken: TokenInfo | undefined;
+  chains: Chain[] | null;
 }
 
 export const initialPurchaseState: PurchaseState = {
   squid: null,
   items: [],
   selectedToken: undefined,
+  chains: null,
 };
 
 export interface PurchaseContextState {
@@ -26,12 +29,14 @@ export interface PurchaseAction {
 type ActionPayload =
   | SetSquid
   | SetItems
-  | SetSelectedToken;
+  | SetSelectedToken
+  | SetChains;
 
 export enum PurchaseActions {
   SET_SQUID = 'SET_SQUID',
   SET_ITEMS = 'SET_ITEMS',
   SET_SELECTED_TOKEN = 'SET_SELECTED_TOKEN',
+  SET_CHAINS = 'SET_CHAINS',
 }
 
 export interface SetSquid {
@@ -47,6 +52,11 @@ export interface SetItems {
 export interface SetSelectedToken {
   type: PurchaseActions.SET_SELECTED_TOKEN;
   selectedToken: TokenInfo;
+}
+
+export interface SetChains {
+  type: PurchaseActions.SET_CHAINS;
+  chains: Chain[];
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -78,6 +88,11 @@ export const purchaseReducer: Reducer<PurchaseState, PurchaseAction> = (
       return {
         ...state,
         selectedToken: action.payload.selectedToken,
+      };
+    case PurchaseActions.SET_CHAINS:
+      return {
+        ...state,
+        chains: action.payload.chains,
       };
     default:
       return state;
