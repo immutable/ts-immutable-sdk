@@ -250,6 +250,7 @@ export enum SignCurrencyFilter {
 
 export type SignApiRequest = {
   recipient_address: string;
+  spender_address?: string;
   currency_filter: SignCurrencyFilter;
   currency_value: string;
   payment_type: string;

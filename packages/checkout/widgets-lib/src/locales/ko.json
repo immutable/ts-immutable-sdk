@@ -854,6 +854,231 @@
         "secondaryAction": "{{token}} 더 추가하기"
       },
       "noGasRouteMessage": "가스에 필요한 {{token}}이(가) 부족합니다"
+    },
+    "PURCHASE": {
+      "tokenSelection": {
+        "buttonText": "원하는 토큰을 선택하세요",
+        "tokenLabel": "추가",
+        "drawerHeading": "토큰 추가",
+        "searchPlaceholder": "토큰 검색"
+      },
+      "walletSelection": {
+        "from": {
+          "label": "보내는 곳",
+          "caption": "브리지 또는 스왑할 지갑을 선택하세요"
+        },
+        "to": {
+          "label": "받는 곳",
+          "caption": "토큰을 보낼 위치를 선택하세요"
+        }
+      },
+      "routeSelection": {
+        "loadingText": "최적의 결제 경로를 찾는 중...",
+        "noRoute": "경로를 찾을 수 없습니다. 다른 지갑, 토큰 또는 금액을 선택하세요.",
+        "payWithCard": "경로를 찾을 수 없습니다. 카드 결제가 가능합니다",
+        "fastestBadge": "가장 빠름",
+        "minutesText": "분",
+        "minuteText": "분",
+        "secondsText": "초"
+      },
+      "drawer": {
+        "options": {
+          "heading": "지불 방식",
+          "moreOptionsDividerText": "다른 결제 방법",
+          "loadingText1": "최적의 가치를 찾는 중",
+          "loadingText2": "모든 체인에서",
+          "noRoutes": {
+            "heading": "경로를 찾을 수 없음",
+            "caption": "다른 지갑, 토큰 또는 금액을 선택하고 다시 시도하세요."
+          },
+          "swap": {
+            "heading": "스왑",
+            "caption": "이 네트워크에서 토큰을 교환합니다.",
+            "disabledCaption": "현재 이용할 수 없습니다."
+          },
+          "debit": {
+            "heading": "직불 카드",
+            "caption": "",
+            "disabledCaption": "선택한 옵션으로 이용할 수 없습니다. 토큰 추가를 권장합니다."
+          },
+          "credit": {
+            "heading": "신용 카드",
+            "caption": "실패 및 추가 수수료가 발생할 수 있습니다.",
+            "disabledCaption": "선택한 옵션으로 이용할 수 없습니다. 토큰 추가를 권장합니다."
+          }
+        }
+      },
+      "error": {
+        "default": {
+          "heading": "죄송합니다, 문제가 발생했습니다. 나중에 다시 시도해 주세요.",
+          "secondaryButtonText": "닫기"
+        },
+        "invalidParameters": {
+          "heading": "잘못된 매개변수",
+          "subHeading": "제공된 위젯 매개변수가 잘못되었습니다. 다시 확인해 주세요.",
+          "secondaryButtonText": "닫기"
+        },
+        "serviceBreakdown": {
+          "heading": "시스템이 현재 중단되었습니다",
+          "subHeading": "현재 기술적인 문제가 발생했습니다. 나중에 다시 시도해 주세요.",
+          "secondaryButtonText": "닫기"
+        },
+        "transactionFailed": {
+          "heading": "거래 실패",
+          "subHeading": "거래가 실패했습니다. 다시 시도해 주세요.",
+          "primaryButtonText": "재시도",
+          "secondaryButtonText": "닫기"
+        },
+        "unrecognisedChain": {
+          "heading": "인식할 수 없는 체인",
+          "subHeading": "계정에 체인을 추가하고 다시 시도해 주세요.",
+          "primaryButtonText": "재시도",
+          "secondaryButtonText": "닫기"
+        },
+        "providerError": {
+          "heading": "지갑을 찾을 수 없습니다",
+          "subHeading": "지갑을 연결하고 다시 시도해 주세요.",
+          "primaryButtonText": "재시도",
+          "secondaryButtonText": "닫기"
+        },
+        "walletFailed": {
+          "heading": "거래 실패",
+          "subHeading": "거래가 실패했습니다. 다시 시도해 주세요.",
+          "primaryButtonText": "재시도",
+          "secondaryButtonText": "닫기"
+        },
+        "walletRejected": {
+          "heading": "거래 거부됨",
+          "subHeading": "진행하려면 지갑에서 거래를 승인해야 합니다.",
+          "primaryButtonText": "재시도",
+          "secondaryButtonText": "닫기"
+        },
+        "walletRejectedNoFunds": {
+          "heading": "잔액 부족",
+          "subHeading": "거래를 완료할 수 있는 충분한 자금이 없습니다.",
+          "primaryButtonText": "재시도",
+          "secondaryButtonText": "닫기"
+        },
+        "walletPopupBlocked": {
+          "heading": "브라우저의 팝업이 차단되었습니다",
+          "subHeading": "계속 진행하려면 브라우저에서 팝업을 허용해 주세요.",
+          "primaryButtonText": "재시도",
+          "secondaryButtonText": "닫기"
+        },
+        "environmentError": {
+          "heading": "지원되지 않는 환경",
+          "subHeading": "이것은 프로덕션 환경에서만 지원됩니다.",
+          "secondaryButtonText": "닫기"
+        },
+        "addressMismatch": {
+          "heading": "앗! 결제 지갑이 변경되었습니다",
+          "body": "이전에 선택한 지갑과 다시 연결하라는 메시지가 표시됩니다",
+          "buttonText": "결제 지갑 재선택"
+        },
+        "routeError": {
+          "heading": "적절한 최종 견적을 찾을 수 없습니다",
+          "subHeading": "다시 시도해 주세요",
+          "secondaryButtonText": "돌아가기"
+        }
+      },
+      "review": {
+        "buttonText": "검토",
+        "heading": "검토",
+        "send": "보내기",
+        "receive": "받기",
+        "swap": "스왑",
+        "to": "대상",
+        "loadingText": "견적 확보 중",
+        "processingButtonText": "처리 중",
+        "proceedButtonText": "진행",
+        "poweredBySquid": "Squid 제공"
+      },
+      "handover": {
+        "preparing": {
+          "heading": "준비 중"
+        },
+        "requestingApproval": {
+          "heading": "지갑에서 액세스 승인 대기 중",
+          "subHeading": "거래 요청을 승인하여 이 거래를 완료하세요"
+        },
+        "approved": {
+          "heading": "토큰에 대한 액세스가 승인되었습니다"
+        },
+        "requestingExecution": {
+          "heading": "지갑에서 거래 확인 대기 중",
+          "subHeading": "거래 요청을 확인하여 이 거래를 완료하세요"
+        },
+        "executing": {
+          "heading": "처리 중",
+          "subHeadingDuration": "이 작업은 {{duration}} 소요됩니다",
+          "subHeading": "트랜잭션 세부 정보는 <axelarscanLink>Axelarscan</axelarscanLink>에서 확인하세요"
+        },
+        "executed": {
+          "heading": "토큰이 추가되었습니다",
+          "subHeading": "트랜잭션 세부 정보는 <axelarscanLink>Axelarscan</axelarscanLink>에서 확인하세요",
+          "primaryButtonText": "완료"
+        },
+        "executedZkEVM": {
+          "heading": "토큰이 추가되었습니다",
+          "subHeading": "트랜잭션 세부 정보는 <explorerLink>Immutable zkEVM explorer</explorerLink>에서 확인하세요",
+          "primaryButtonText": "완료"
+        },
+        "needsGas": {
+          "heading": "가스 요금 급등",
+          "subHeading": "이 트랜잭션을 완료하려면 더 높은 가스 요금을 지불해야 합니다. <axelarscanLink>Axelarscan</axelarscanLink>에서 진행할 수 있습니다.",
+          "primaryButtonText": "Axelarscan으로 이동",
+          "secondaryButtonText": "닫기"
+        },
+        "partialSuccess": {
+          "heading": "axlUSDC를 받았습니다",
+          "subHeading": "트랜잭션이 슬리피지에 영향을 받아 axlUSDC를 받았습니다. 의도한 토큰을 받으려면 <squidLink>Squid</squidLink>에서 스왑을 완료해야 할 수 있습니다.",
+          "primaryButtonText": "Squid로 이동",
+          "secondaryButtonText": "닫기"
+        },
+        "statusFailed": {
+          "heading": "트랜잭션을 완료할 수 없습니다",
+          "subHeading": "문제가 발생하여 트랜잭션을 완료할 수 없습니다. 자세한 내용은 <axelarscanLink>Axelarscan</axelarscanLink>에서 확인하세요.",
+          "secondaryButtonText": "닫기"
+        }
+      },
+      "onboarding": {
+        "screen1": {
+          "title": "몇 가지를 변경하여\n더 쉽게 만들었습니다",
+          "caption": "잘 들어보세요",
+          "buttonText": "다음"
+        },
+        "screen2": {
+          "title": "토큰을 Passport로 전송하고\n어느 지갑에서든 결제할 수 있습니다",
+          "caption": "무엇이 바뀌었나요",
+          "buttonText": "다음"
+        },
+        "screen3": {
+          "title": "다른 체인에서 토큰을 사용하세요,\n최적의 옵션을 찾아드리겠습니다",
+          "caption": "진화",
+          "buttonText": "토큰 추가하기"
+        }
+      },
+      "footer": {
+        "body": "스왑 기능은 제3자 Squid에 의해 제공됩니다. Immutable은 <squidLink>Squid</squidLink>를 구축, 소유, 운영 또는 배포하지 않습니다."
+      },
+      "geoBlockError": {
+        "buyTokenButton": "토큰 구매",
+        "bridgeTokenButton": "토큰 브릿지"
+      },
+      "fees": {
+        "fee": "수수료",
+        "balance": "잔액",
+        "fiatPricePrefix": "≈ USD",
+        "zeroFees": "수수료 없음",
+        "includedFees": "수수료"
+      },
+      "noGasDrawer": {
+        "heading": "가스에 {{token}}이(가) 더 필요합니다",
+        "body": "가스를 추가하고 이 거래를 완료하거나 금액을 줄이기, 다른 지갑 사용, 카드로 구매하기와 같은 다른 옵션을 시도해보세요.",
+        "primaryAction": "다른 옵션 시도하기",
+        "secondaryAction": "{{token}} 더 추가하기"
+      },
+      "noGasRouteMessage": "가스에 필요한 {{token}}이(가) 부족합니다"
     }
   },
   "footers": {

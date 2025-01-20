@@ -247,13 +247,13 @@ export const useSignOrder = (input: SignOrderInput) => {
     async (
       paymentType: SignPaymentTypes,
       fromTokenAddress: string,
+      recipientAddress: string,
+      spenderAddress?: string,
     ): Promise<SignResponse | undefined> => {
       try {
-        const signer = provider?.getSigner();
-        const address = (await signer?.getAddress()) || '';
-
         const data: SignApiRequest = {
-          recipient_address: address,
+          recipient_address: recipientAddress,
+          spender_address: spenderAddress,
           payment_type: paymentType,
           currency_filter: SignCurrencyFilter.CONTRACT_ADDRESS,
           currency_value: fromTokenAddress,
@@ -356,13 +356,13 @@ export const useSignOrder = (input: SignOrderInput) => {
     async (
       paymentType: SignPaymentTypes,
       fromTokenAddress: string,
+      recipientAddress: string,
+      spenderAddress?: string,
     ): Promise<{ signResponse: SignResponse; postHooks: SquidPostHookCall[] } | undefined> => {
       try {
-        const signer = provider?.getSigner();
-        const address = (await signer?.getAddress()) || '';
-
         const data: SignApiRequest = {
-          recipient_address: address,
+          spender_address: spenderAddress,
+          recipient_address: recipientAddress,
           payment_type: paymentType,
           currency_filter: SignCurrencyFilter.CONTRACT_ADDRESS,
           currency_value: fromTokenAddress,
