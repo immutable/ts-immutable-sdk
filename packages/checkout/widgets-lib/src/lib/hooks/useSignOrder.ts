@@ -247,8 +247,8 @@ export const useSignOrder = (input: SignOrderInput) => {
     async (
       paymentType: SignPaymentTypes,
       fromTokenAddress: string,
-      spenderAddress: string,
       recipientAddress: string,
+      spenderAddress?: string,
     ): Promise<SignResponse | undefined> => {
       try {
         const data: SignApiRequest = {
@@ -356,8 +356,8 @@ export const useSignOrder = (input: SignOrderInput) => {
     async (
       paymentType: SignPaymentTypes,
       fromTokenAddress: string,
-      spenderAddress: string,
       recipientAddress: string,
+      spenderAddress?: string,
     ): Promise<{ signResponse: SignResponse; postHooks: SquidPostHookCall[] } | undefined> => {
       try {
         const data: SignApiRequest = {
