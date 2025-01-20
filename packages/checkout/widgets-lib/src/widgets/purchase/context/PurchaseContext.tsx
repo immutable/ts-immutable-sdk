@@ -1,13 +1,14 @@
 import { Squid } from '@0xsquid/sdk';
 import { PurchaseItem, TokenInfo } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
-import { Chain } from '../../../lib/squid/types';
+import { Chain, RouteData } from '../../../lib/squid/types';
 
 export interface PurchaseState {
   squid: Squid | null;
   items: PurchaseItem[];
   selectedToken: TokenInfo | undefined;
   chains: Chain[] | null;
+  selectedRouteData: RouteData | undefined;
 }
 
 export const initialPurchaseState: PurchaseState = {
@@ -15,6 +16,7 @@ export const initialPurchaseState: PurchaseState = {
   items: [],
   selectedToken: undefined,
   chains: null,
+  selectedRouteData: undefined,
 };
 
 export interface PurchaseContextState {
@@ -30,13 +32,15 @@ type ActionPayload =
   | SetSquid
   | SetItems
   | SetSelectedToken
-  | SetChains;
+  | SetChains
+  | SetSelectedRouteData;
 
 export enum PurchaseActions {
   SET_SQUID = 'SET_SQUID',
   SET_ITEMS = 'SET_ITEMS',
   SET_SELECTED_TOKEN = 'SET_SELECTED_TOKEN',
   SET_CHAINS = 'SET_CHAINS',
+  SET_SELECTED_ROUTE_DATA = 'SET_SELECTED_ROUTE_DATA',
 }
 
 export interface SetSquid {
@@ -57,6 +61,11 @@ export interface SetSelectedToken {
 export interface SetChains {
   type: PurchaseActions.SET_CHAINS;
   chains: Chain[];
+}
+
+export interface SetSelectedRouteData {
+  type: PurchaseActions.SET_SELECTED_ROUTE_DATA;
+  selectedRouteData: RouteData;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -93,6 +102,11 @@ export const purchaseReducer: Reducer<PurchaseState, PurchaseAction> = (
       return {
         ...state,
         chains: action.payload.chains,
+      };
+    case PurchaseActions.SET_SELECTED_ROUTE_DATA:
+      return {
+        ...state,
+        selectedRouteData: action.payload.selectedRouteData,
       };
     default:
       return state;
