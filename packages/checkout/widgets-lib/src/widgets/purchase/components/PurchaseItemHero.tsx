@@ -1,11 +1,11 @@
 import { Sticker, Pile, FramedImage } from '@biom3/react';
 import { PurchaseItem } from '@imtbl/checkout-sdk';
 
-interface StickerDisplayProps {
+interface PurchaseItemHeroProps {
   items: PurchaseItem[];
 }
 
-export function PurchaseItemHero({ items }: StickerDisplayProps) {
+export function PurchaseItemHero({ items }: PurchaseItemHeroProps) {
   if (items.length === 0) {
     return null;
   }
