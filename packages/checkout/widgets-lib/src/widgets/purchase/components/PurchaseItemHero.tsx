@@ -3,13 +3,14 @@ import { PurchaseItem } from '@imtbl/checkout-sdk';
 
 interface StickerDisplayProps {
   items: PurchaseItem[];
-  totalQty: number;
 }
 
-export function PurchaseItemHero({ items, totalQty }: StickerDisplayProps) {
+export function PurchaseItemHero({ items }: StickerDisplayProps) {
   if (items.length === 0) {
     return null;
   }
+
+  const totalQty = items?.reduce((sum, item: PurchaseItem) => sum + item.qty, 0) || 0;
 
   return (
     totalQty > 1 ? (
