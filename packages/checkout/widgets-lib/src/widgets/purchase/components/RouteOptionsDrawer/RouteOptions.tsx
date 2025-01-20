@@ -64,9 +64,9 @@ export function RouteOptions({
         <MenuItem shimmer="withBottomSlot" size="small" emphasized />
 
         <Body sx={{ textAlign: 'center', mt: 'base.spacing.x6' }} size="small">
-          {t('views.ADD_TOKENS.drawer.options.loadingText1')}
+          {t('views.PURCHASE.drawer.options.loadingText1')}
           <br />
-          {t('views.ADD_TOKENS.drawer.options.loadingText2')}
+          {t('views.PURCHASE.drawer.options.loadingText2')}
         </Body>
         <FramedVideo
           mimeType="video/mp4"
@@ -109,16 +109,16 @@ export function RouteOptions({
       {noRoutes && (
         <Banner>
           <Banner.Icon icon="InformationCircle" />
-          <Banner.Title>{t('views.ADD_TOKENS.drawer.options.noRoutes.heading')}</Banner.Title>
+          <Banner.Title>{t('views.PURCHASE.drawer.options.noRoutes.heading')}</Banner.Title>
           <Banner.Caption>
-            {t('views.ADD_TOKENS.drawer.options.noRoutes.caption')}
+            {t('views.PURCHASE.drawer.options.noRoutes.caption')}
           </Banner.Caption>
         </Banner>
       )}
       {showOnrampOption && (
       <>
         <Divider size="xSmall" sx={{ my: 'base.spacing.x2' }}>
-          {t('views.ADD_TOKENS.drawer.options.moreOptionsDividerText')}
+          {t('views.PURCHASE.drawer.options.moreOptionsDividerText')}
         </Divider>
         {defaultFiatOptions.map((type, idx) => (
           <FiatOption

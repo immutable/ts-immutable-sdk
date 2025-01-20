@@ -80,7 +80,7 @@ export function RouteOptionsDrawer({
     }
 
     track({
-      userJourney: UserJourney.ADD_TOKENS,
+      userJourney: UserJourney.PURCHASE,
       screen: 'InputScreen',
       control: 'RoutesMenu',
       controlType: 'MenuItem',
@@ -120,7 +120,7 @@ export function RouteOptionsDrawer({
             )}
             sx={{ mx: 'base.spacing.x2' }}
           />
-          <MenuItem.Label>{t('views.ADD_TOKENS.drawer.options.heading')}</MenuItem.Label>
+          <MenuItem.Label>{t('views.PURCHASE.drawer.options.heading')}</MenuItem.Label>
           <MenuItem.Caption>
             {fromProviderInfo?.name}
             {' • '}

@@ -123,7 +123,7 @@ export function SelectedRouteOption({
           mimeType="video/mp4"
           circularFrame
         />
-        <MenuItem.Caption>{t('views.ADD_TOKENS.routeSelection.loadingText')}</MenuItem.Caption>
+        <MenuItem.Caption>{t('views.PURCHASE.routeSelection.loadingText')}</MenuItem.Caption>
       </SelectedRouteOptionContainer>
     );
   }
@@ -134,12 +134,12 @@ export function SelectedRouteOption({
 
     if (insufficientBalance) {
       icon = 'InformationCircle';
-      copy = t('views.ADD_TOKENS.routeSelection.noRoute');
+      copy = t('views.PURCHASE.routeSelection.noRoute');
     }
 
     if (insufficientBalancePayWithCard) {
       icon = 'BankCard';
-      copy = t('views.ADD_TOKENS.routeSelection.payWithCard');
+      copy = t('views.PURCHASE.routeSelection.payWithCard');
     }
 
     return (
@@ -194,14 +194,14 @@ export function SelectedRouteOption({
         <Stack gap="0px">
           <MenuItem.Label>{fromToken?.name}</MenuItem.Label>
           <MenuItem.Caption>
-            {`${t('views.ADD_TOKENS.fees.balance')} ${t(
-              'views.ADD_TOKENS.fees.fiatPricePrefix',
+            {`${t('views.PURCHASE.fees.balance')} ${t(
+              'views.PURCHASE.fees.fiatPricePrefix',
             )} $${routeBalanceUsd}`}
             {routeData?.isInsufficientGas && (
             <>
               <br />
               <span style={{ color: '#FF637F' }}>
-                {t('views.ADD_TOKENS.noGasRouteMessage', {
+                {t('views.PURCHASE.noGasRouteMessage', {
                   token: chainNativeCurrencySymbol,
                 })}
               </span>
@@ -211,7 +211,7 @@ export function SelectedRouteOption({
         </Stack>
         <MenuItem.PriceDisplay price={fromAmount}>
           <MenuItem.PriceDisplay.Caption>
-            {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${fromAmountUsd}`}
+            {`${t('views.PURCHASE.fees.fiatPricePrefix')} $${fromAmountUsd}`}
           </MenuItem.PriceDisplay.Caption>
         </MenuItem.PriceDisplay>
       </Stack>

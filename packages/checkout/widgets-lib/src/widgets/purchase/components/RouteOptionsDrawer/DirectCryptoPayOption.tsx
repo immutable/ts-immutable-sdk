@@ -50,9 +50,9 @@ export function DirectCryptoPayOption<RC extends ReactElement | undefined = unde
 
   const estimatedDurationFormatted = getDurationFormatted(
     estimate,
-    t('views.ADD_TOKENS.routeSelection.minutesText'),
-    t('views.ADD_TOKENS.routeSelection.minuteText'),
-    t('views.ADD_TOKENS.routeSelection.secondsText'),
+    t('views.PURCHASE.routeSelection.minutesText'),
+    t('views.PURCHASE.routeSelection.minuteText'),
+    t('views.PURCHASE.routeSelection.secondsText'),
   );
 
   const {
@@ -91,12 +91,12 @@ export function DirectCryptoPayOption<RC extends ReactElement | undefined = unde
       )}
 
       <MenuItem.Caption>
-        {`${t('views.ADD_TOKENS.fees.balance')} ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${routeBalanceUsd}`}
+        {`${t('views.PURCHASE.fees.balance')} ${t('views.PURCHASE.fees.fiatPricePrefix')} $${routeBalanceUsd}`}
         {routeData.isInsufficientGas && (
           <>
             <br />
             <span style={{ color: '#FF637F' }}>
-              {t('views.ADD_TOKENS.noGasRouteMessage', {
+              {t('views.PURCHASE.noGasRouteMessage', {
                 token: gasTokenSymbol,
               })}
             </span>
@@ -106,7 +106,7 @@ export function DirectCryptoPayOption<RC extends ReactElement | undefined = unde
 
       <MenuItem.PriceDisplay price={fromAmount}>
         <MenuItem.PriceDisplay.Caption>
-          {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${fromAmountUsd}`}
+          {`${t('views.PURCHASE.fees.fiatPricePrefix')} $${fromAmountUsd}`}
         </MenuItem.PriceDisplay.Caption>
       </MenuItem.PriceDisplay>
 
@@ -143,13 +143,13 @@ export function DirectCryptoPayOption<RC extends ReactElement | undefined = unde
           <Body size="xSmall" sx={{ ...hFlex, ...centerFlexChildren }}>
             {isFastest && (
             <Badge
-              badgeContent={t('views.ADD_TOKENS.routeSelection.fastestBadge')}
+              badgeContent={t('views.PURCHASE.routeSelection.fastestBadge')}
               variant="emphasis"
               sx={{ mr: 'base.spacing.x2' }}
             />
             )}
             {
-                `${t('views.ADD_TOKENS.fees.fee')} ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} 
+                `${t('views.PURCHASE.fees.fee')} ${t('views.PURCHASE.fees.fiatPricePrefix')} 
                 $${getFormattedAmounts(totalFeesUsd)}`
               }
           </Body>

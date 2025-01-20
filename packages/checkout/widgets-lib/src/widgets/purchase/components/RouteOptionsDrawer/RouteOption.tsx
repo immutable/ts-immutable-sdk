@@ -49,9 +49,9 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
 
   const estimatedDurationFormatted = getDurationFormatted(
     estimate.estimatedRouteDuration,
-    t('views.ADD_TOKENS.routeSelection.minutesText'),
-    t('views.ADD_TOKENS.routeSelection.minuteText'),
-    t('views.ADD_TOKENS.routeSelection.secondsText'),
+    t('views.PURCHASE.routeSelection.minutesText'),
+    t('views.PURCHASE.routeSelection.minuteText'),
+    t('views.PURCHASE.routeSelection.secondsText'),
   );
 
   const { totalFeesUsd } = useMemo(
@@ -96,12 +96,12 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
       )}
 
       <MenuItem.Caption>
-        {`${t('views.ADD_TOKENS.fees.balance')} ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${routeBalanceUsd}`}
+        {`${t('views.PURCHASE.fees.balance')} ${t('views.PURCHASE.fees.fiatPricePrefix')} $${routeBalanceUsd}`}
         {routeData.isInsufficientGas && (
         <>
           <br />
           <span style={{ color: '#FF637F' }}>
-            {t('views.ADD_TOKENS.noGasRouteMessage', {
+            {t('views.PURCHASE.noGasRouteMessage', {
               token:
               routeData.route.route.estimate.gasCosts[0].token.symbol,
             })}
@@ -112,7 +112,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
 
       <MenuItem.PriceDisplay price={fromAmount}>
         <MenuItem.PriceDisplay.Caption>
-          {`${t('views.ADD_TOKENS.fees.fiatPricePrefix')} $${fromAmountUsd}`}
+          {`${t('views.PURCHASE.fees.fiatPricePrefix')} $${fromAmountUsd}`}
         </MenuItem.PriceDisplay.Caption>
       </MenuItem.PriceDisplay>
 
@@ -149,13 +149,13 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
           <Body size="xSmall" sx={{ ...hFlex, ...centerFlexChildren }}>
             {isFastest && (
               <Badge
-                badgeContent={t('views.ADD_TOKENS.routeSelection.fastestBadge')}
+                badgeContent={t('views.PURCHASE.routeSelection.fastestBadge')}
                 variant="emphasis"
                 sx={{ mr: 'base.spacing.x2' }}
               />
             )}
             {
-              `${t('views.ADD_TOKENS.fees.fee')} ${t('views.ADD_TOKENS.fees.fiatPricePrefix')} 
+              `${t('views.PURCHASE.fees.fee')} ${t('views.PURCHASE.fees.fiatPricePrefix')} 
               $${getFormattedAmounts(totalFeesUsd)}`
             }
           </Body>
