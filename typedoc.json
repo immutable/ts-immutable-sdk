@@ -9,8 +9,8 @@
   "excludeProtected": true,
   "includeVersion": true,
   "cleanOutputDir": true,
-  "out": "./docs",
   "readme": "./sdk/README.md",
+  "json": "./docs/typedoc_raw_export.json",  // Specify output path and filename for JSON
   // Potentially useful for debugging
   "logLevel": "Verbose",
   "titleLink": "https://docs.immutable.com/sdks/zkEVM/typescript",
