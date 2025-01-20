@@ -103,6 +103,8 @@ export function Purchase({
   const [balances, setBalances] = useState<TokenBalance[]>([]);
   const [routes, setRoutes] = useState<RouteData[]>([]);
   const [directCryptoPayRoutes, setDirectCryptoPayRoutes] = useState<DirectCryptoPayData[]>([]);
+  // eslint-disable-next-line max-len
+  const [selectedDirectCryptoPayRoute, setSelectedDirectCryptoPayRoute] = useState<DirectCryptoPayData | undefined>(undefined);
   const [chains, setChains] = useState<Chain[]>([]);
   const squid = useSquid(checkout);
   const tokens = useTokens(checkout);
@@ -226,11 +228,15 @@ export function Purchase({
     setShowPayWithDrawer(false);
     setShowDeliverToDrawer(false);
     setSelectedRouteData(route);
+    setSelectedDirectCryptoPayRoute(undefined);
   };
 
   const handleDirectCryptoPayClick = (route: DirectCryptoPayData) => {
-    console.log('handleDirectCryptoPayClick', route);
     setShowOptionsDrawer(false);
+    setShowPayWithDrawer(false);
+    setShowDeliverToDrawer(false);
+    setSelectedRouteData(undefined);
+    setSelectedDirectCryptoPayRoute(route);
   };
 
   useEffect(() => {
@@ -256,28 +262,9 @@ export function Purchase({
         console.log('isSufficientBalance', isSufficientBalance);
         setIsFundingNeeded(!isSufficientBalance);
 
-        if (!isSufficientBalance) {
-          setFetchingRoutes(true);
-
-          const availableRoutes = await fetchRoutes(
-            squid,
-            tokens,
-            balances,
-            ChainId.IMTBL_ZKEVM_MAINNET.toString(),
-            item.tokenAddress,
-            item.price,
-            5,
-            1000,
-            true,
-          );
-          setFetchingRoutes(false);
-          setRoutes(availableRoutes);
-          setInsufficientBalance(availableRoutes.length === 0);
-        } else {
+        if (isSufficientBalance) {
           const token = findToken(tokens, item.tokenAddress, ChainId.IMTBL_ZKEVM_MAINNET.toString());
           const balance = findBalance(balances, item.tokenAddress, ChainId.IMTBL_ZKEVM_MAINNET.toString());
-          console.log('token', token);
-          console.log('balance', balance);
           if (token && balance) {
             setDirectCryptoPayRoutes([{
               isInsufficientGas: true,
@@ -292,6 +279,22 @@ export function Purchase({
             }]);
           }
         }
+        setFetchingRoutes(true);
+        console.log('fetching routes');
+        const availableRoutes = await fetchRoutes(
+          squid,
+          tokens,
+          balances,
+          ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+          item.tokenAddress,
+          item.price,
+          5,
+          1000,
+          true,
+        );
+        setFetchingRoutes(false);
+        setRoutes(availableRoutes);
+        setInsufficientBalance(availableRoutes.length === 0);
       }
     })();
   }, [balances, squid]);
@@ -436,7 +439,7 @@ export function Purchase({
     if (!squid || !tokens || !toAddress || !fromAddress || !fromProvider || !fromProviderInfo) return;
     if (!selectedRouteData && isFundingNeeded) return;
 
-    if (isFundingNeeded === true) {
+    if (selectedDirectCryptoPayRoute === undefined) {
       if (!selectedRouteData) return;
 
       const signResponse = await signWithPostHooks(
@@ -784,7 +787,7 @@ export function Purchase({
                   checkout={checkout}
                   loading={loading}
                   chains={chains}
-                  routeData={selectedRouteData || (directCryptoPayRoutes?.[0] || undefined)}
+                  routeData={selectedRouteData || (selectedDirectCryptoPayRoute || undefined)}
                   onClick={() => setShowOptionsDrawer(true)}
                   withSelectedWallet={!!fromAddress}
                   insufficientBalance={insufficientBalance}
