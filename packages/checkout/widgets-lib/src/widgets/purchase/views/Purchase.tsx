@@ -34,11 +34,8 @@ import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
 import { getProviderSlugFromRdns } from '../../../lib/provider/utils';
 import { sendConnectProviderSuccessEvent } from '../../add-tokens/AddTokensWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { Chain, RouteData } from '../../../lib/squid/types';
+import { RouteData } from '../../../lib/squid/types';
 import { useRoutes } from '../../../lib/squid/hooks/useRoutes';
-import { useSquid } from '../../../lib/squid/hooks/useSquid';
-import { useTokens } from '../../../lib/squid/hooks/useTokens';
-import { fetchChains } from '../../../lib/squid/functions/fetchChains';
 import { fetchBalances } from '../../../lib/squid/functions/fetchBalances';
 import { RiveStateMachineInput } from '../../../types/HandoverTypes';
 import { SelectedRouteOption } from '../components/SelectedRouteOption/SelectedRouteOption';
@@ -75,7 +72,13 @@ export function Purchase({
   showBackButton,
   onBackButtonClick,
 }: PurchaseProps) {
-  const { purchaseState: { items, quote } } = useContext(PurchaseContext);
+  const {
+    purchaseState: {
+      squid: { squid, chains, tokens },
+      items,
+      quote,
+    },
+  } = useContext(PurchaseContext);
 
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
 
@@ -93,15 +96,11 @@ export function Purchase({
 
   const [insufficientBalance, setInsufficientBalance] = useState(false);
 
-  // TODO: Move to context
   const [balances, setBalances] = useState<TokenBalance[]>([]);
   const [routes, setRoutes] = useState<RouteData[]>([]);
   const [directCryptoPayRoutes, setDirectCryptoPayRoutes] = useState<DirectCryptoPayData[]>([]);
   // eslint-disable-next-line max-len
   const [selectedDirectCryptoPayRoute, setSelectedDirectCryptoPayRoute] = useState<DirectCryptoPayData | undefined>(undefined);
-  const [chains, setChains] = useState<Chain[]>([]);
-  const squid = useSquid(checkout);
-  const tokens = useTokens(checkout);
 
   // TODO: Fetch from Primary Sales quote
   const item = {
@@ -303,16 +302,13 @@ export function Purchase({
   }, [balances, squid]);
 
   useEffect(() => {
-    if (!squid || !fromProvider) return;
+    if (!squid || !chains || !fromProvider) return;
 
     (async () => {
-      const updatedChains = fetchChains(squid);
-      const updatedBalances = await fetchBalances(squid, updatedChains, fromProvider);
-
-      setChains(updatedChains);
+      const updatedBalances = await fetchBalances(squid, chains, fromProvider);
       setBalances(updatedBalances);
     })();
-  }, [squid, fromProvider]);
+  }, [squid, chains, fromProvider]);
 
   useEffect(() => {
     if (!selectedRouteData && routes.length > 0) {
