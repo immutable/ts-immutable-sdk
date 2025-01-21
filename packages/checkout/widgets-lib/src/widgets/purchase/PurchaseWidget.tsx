@@ -18,7 +18,10 @@ import { sendPurchaseCloseEvent } from './PurchaseWidgetEvents';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { getRemoteImage } from '../../lib/utils';
+import { useSquid } from '../../lib/squid/hooks/useSquid';
+import { useTokens } from '../../lib/squid/hooks/useTokens';
 import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
+import { fetchChains } from '../../lib/squid/functions/fetchChains';
 
 export type PurchaseWidgetInputs = PurchaseWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
@@ -39,10 +42,6 @@ export default function PurchaseWidget({
     view: { type: PurchaseWidgetViews.PURCHASE },
     history: [{ type: PurchaseWidgetViews.PURCHASE }],
   });
-
-  const {
-    providersState: { checkout },
-  } = useProvidersContext();
 
   const viewReducerValues = useMemo(
     () => ({
@@ -68,6 +67,47 @@ export default function PurchaseWidget({
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
+
+  const {
+    providersState: { checkout },
+  } = useProvidersContext();
+
+  const { squid: { squid } } = purchaseState;
+
+  const squidSdk = useSquid(checkout);
+  const tokensResponse = useTokens(checkout);
+
+  useEffect(() => {
+    if (!squidSdk) return;
+
+    purchaseDispatch({
+      payload: {
+        type: PurchaseActions.SET_SQUID,
+        squid: squidSdk,
+      },
+    });
+  }, [squidSdk]);
+
+  useEffect(() => {
+    if (!tokensResponse) return;
+    purchaseDispatch({
+      payload: {
+        type: PurchaseActions.SET_SQUID_TOKENS,
+        tokens: tokensResponse,
+      },
+    });
+  }, [tokensResponse]);
+
+  useEffect(() => {
+    if (!squid) return;
+
+    purchaseDispatch({
+      payload: {
+        type: PurchaseActions.SET_SQUID_CHAINS,
+        chains: fetchChains(squid),
+      },
+    });
+  }, [squid]);
 
   useEffect(
     () => {
