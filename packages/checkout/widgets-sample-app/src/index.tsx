@@ -15,8 +15,8 @@ import {
 } from "./components/ui/marketplace-orchestrator";
 import { SaleUI } from "./components/ui/sale/sale";
 import AddTokensUI from "./components/ui/add-tokens/addTokens";
-import { AddTokensPassportLogin } from "./components/ui/add-tokens/login";
-import { AddTokensPassportLogout } from "./components/ui/add-tokens/logout";
+import { AddTokensPassportLogin } from "./components/ui/login/login";
+import { AddTokensPassportLogout } from "./components/ui/logout/logout";
 import PurchaseUI from './components/ui/purchase/purchase';
 
 const router = createBrowserRouter([
@@ -61,11 +61,11 @@ const router = createBrowserRouter([
     element: <AddTokensUI />,
   },
   {
-    path: "/add-tokens/login",
+    path: "/login",
     element: <AddTokensPassportLogin />,
   },
   {
-    path: "/add-tokens/logout",
+    path: "/logout",
     element: <AddTokensPassportLogout />,
   },
   {
