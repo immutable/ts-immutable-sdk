@@ -88,8 +88,6 @@ export function PurchaseConnectWalletDrawer({
   };
 
   const handleWalletConnection = async (event: WalletChangeEvent) => {
-    console.log('@@@ handleWalletConnection');
-
     const { providerDetail } = event;
     const { info } = providerDetail;
 
