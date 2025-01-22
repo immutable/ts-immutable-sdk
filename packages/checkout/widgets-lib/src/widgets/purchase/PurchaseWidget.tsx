@@ -19,6 +19,8 @@ import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { getRemoteImage } from '../../lib/utils';
 import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
+import { fetchChains } from '../../lib/squid/functions/fetchChains';
+import { useSquid } from '../../lib/squid/hooks/useSquid';
 
 export type PurchaseWidgetInputs = PurchaseWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
@@ -67,6 +69,9 @@ export default function PurchaseWidget({
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
 
+  const { squid } = purchaseState;
+  const squidSdk = useSquid(checkout);
+
   useEffect(
     () => {
       if (!items) return;
@@ -80,6 +85,28 @@ export default function PurchaseWidget({
     },
     [items],
   );
+
+  useEffect(() => {
+    if (!squidSdk) return;
+
+    purchaseDispatch({
+      payload: {
+        type: PurchaseActions.SET_SQUID,
+        squid: squidSdk,
+      },
+    });
+  }, [squidSdk]);
+
+  useEffect(() => {
+    if (!squid) return;
+
+    purchaseDispatch({
+      payload: {
+        type: PurchaseActions.SET_CHAINS,
+        chains: fetchChains(squid),
+      },
+    });
+  }, [squid]);
 
   return (
     <ViewContext.Provider value={viewReducerValues}>
