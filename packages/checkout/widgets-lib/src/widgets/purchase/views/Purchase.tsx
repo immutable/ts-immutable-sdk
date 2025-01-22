@@ -1,5 +1,5 @@
 import {
-  ButtCon, Button, Caption, Link, MenuItem, Stack,
+  ButtCon, Button, Caption, MenuItem, Stack,
 } from '@biom3/react';
 import {
   ChainId,
@@ -9,7 +9,6 @@ import {
   WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 import {
-  ReactNode,
   useCallback,
   useContext,
   useEffect,
@@ -20,7 +19,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { ChainType } from '@0xsquid/squid-types';
 import { Environment } from '@imtbl/config';
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
-import { Trans } from 'react-i18next';
+import { t } from 'i18next';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { PurchaseContext } from '../context/PurchaseContext';
 import { PurchaseItemHero } from '../components/PurchaseItemHero';
@@ -37,25 +36,21 @@ import { EventTargetContext } from '../../../context/event-target-context/EventT
 import { RouteData } from '../../../lib/squid/types';
 import { useRoutes } from '../../../lib/squid/hooks/useRoutes';
 import { fetchBalances } from '../../../lib/squid/functions/fetchBalances';
-import { RiveStateMachineInput } from '../../../types/HandoverTypes';
 import { SelectedRouteOption } from '../components/SelectedRouteOption/SelectedRouteOption';
 import { convertToNetworkChangeableProvider } from '../../../functions/convertToNetworkChangeableProvider';
 import { useExecute } from '../../../lib/squid/hooks/useExecute';
 import { useSignOrder } from '../../../lib/hooks/useSignOrder';
 import { OrderQuoteCurrency, SignPaymentTypes } from '../../../lib/primary-sales';
-import { getRemoteRive } from '../../../lib/utils';
-import { HandoverContent } from '../../../components/Handover/HandoverContent';
-import { useHandover } from '../../../lib/hooks/useHandover';
-import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
-import { APPROVE_TXN_ANIMATION, EXECUTE_TXN_ANIMATION, FIXED_HANDOVER_DURATION } from '../../../lib/squid/config';
 import { verifyAndSwitchChain } from '../../../lib/squid/functions/verifyAndSwitchChain';
 import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
-import { sendPurchaseCloseEvent, sendPurchaseSuccessEvent } from '../PurchaseWidgetEvents';
+import { sendPurchaseSuccessEvent } from '../PurchaseWidgetEvents';
 import { getRouteChains } from '../../../lib/squid/functions/getRouteChains';
 import { useQuoteOrder } from '../../../lib/hooks/useQuoteOrder';
 import { DirectCryptoPayData } from '../types';
 import { findToken } from '../../../lib/squid/functions/findToken';
 import { findBalance } from '../../../lib/squid/functions/findBalance';
+import { PurchaseHandoverStep, useHandoverConfig } from '../hooks/useHandoverConfig';
+import { getDurationFormatted } from '../../../functions/getDurationFormatted';
 
 interface PurchaseProps {
   checkout: Checkout;
@@ -138,10 +133,6 @@ export function Purchase({
     console.log('useExecute err', err);
   });
 
-  const { addHandover } = useHandover({
-    id: HandoverTarget.GLOBAL,
-  });
-
   const walletOptions = useMemo(
     () => providers
     // TODO: Check if must filter passport on L1
@@ -163,51 +154,7 @@ export function Purchase({
     [providers],
   );
 
-  interface HandoverProps {
-    animationPath: string;
-    state: RiveStateMachineInput;
-    headingText: string;
-    subheadingText?: ReactNode;
-    primaryButtonText?: string;
-    onPrimaryButtonClick?: () => void;
-    secondaryButtonText?: string;
-    onSecondaryButtonClick?: () => void;
-    duration?: number;
-  }
-
-  const showHandover = useCallback(
-    ({
-      animationPath,
-      state,
-      headingText,
-      subheadingText,
-      primaryButtonText,
-      onPrimaryButtonClick,
-      secondaryButtonText,
-      onSecondaryButtonClick,
-      duration,
-    }: HandoverProps) => {
-      addHandover({
-        animationUrl: getRemoteRive(
-          checkout?.config.environment,
-          animationPath,
-        ),
-        inputValue: state,
-        duration,
-        children: (
-          <HandoverContent
-            headingText={headingText}
-            subheadingText={subheadingText}
-            primaryButtonText={primaryButtonText}
-            onPrimaryButtonClick={onPrimaryButtonClick}
-            secondaryButtonText={secondaryButtonText}
-            onSecondaryButtonClick={onSecondaryButtonClick}
-          />
-        ),
-      });
-    },
-    [addHandover, checkout],
-  );
+  const { showHandover } = useHandoverConfig(checkout.config.environment);
 
   const handleWalletConnected = (
     providerType: 'from' | 'to',
@@ -381,60 +328,43 @@ export function Purchase({
     const signer = provider.getSigner();
     if (!signer) return;
 
+    showHandover(PurchaseHandoverStep.PREPARING, {});
+
     const gasPrice = await provider.getGasPrice();
 
     const approveTxn = signResponse.transactions.find(
       (txn) => txn.methodCall.startsWith('approve'),
     );
     if (!approveTxn) return;
+    showHandover(PurchaseHandoverStep.REQUEST_APPROVAL, {});
+
     const approveTxnResponse = await signer.sendTransaction({
       to: approveTxn.tokenAddress,
       data: approveTxn.rawData,
       gasPrice,
       gasLimit: approveTxn.gasEstimate,
     });
-    await waitForReceipt(provider, approveTxnResponse.hash);
+    const approveReceipt = await waitForReceipt(provider, approveTxnResponse.hash);
+    if (!approveReceipt) {
+      return;
+    }
+    showHandover(PurchaseHandoverStep.APPROVAL_CONFIRMED, {});
 
     const executeTxn = signResponse.transactions.find(
       (txn) => txn.methodCall.startsWith('execute'),
     );
     if (!executeTxn) return;
+    showHandover(PurchaseHandoverStep.REQUEST_EXECUTION, {});
+
     const executeTxnResponse = await signer.sendTransaction({
       to: executeTxn.tokenAddress,
       data: executeTxn.rawData,
       gasPrice,
       gasLimit: executeTxn.gasEstimate,
     });
-    const receipt = await waitForReceipt(provider, executeTxnResponse.hash);
-    if (receipt?.status === 1) {
-      showHandover({
-        animationPath: EXECUTE_TXN_ANIMATION,
-        state: RiveStateMachineInput.COMPLETED,
-        headingText: 'Purchase complete',
-        subheadingText: (
-          <Trans
-            i18nKey="Go to <explorerLink>Immutable zkEVM explorer</explorerLink> for transaction details"
-            components={{
-              explorerLink: (
-                <Link
-                  size="small"
-                  rc={(
-                    <a
-                      target="_blank"
-                      href={`https://explorer.immutable.com/tx/${executeTxnResponse.hash}`}
-                      rel="noreferrer"
-                    />
-                )}
-                />
-              ),
-            }}
-          />
-        ),
-        primaryButtonText: 'Done',
-        onPrimaryButtonClick: () => {
-          sendPurchaseCloseEvent(eventTarget);
-        },
-      });
+    const executeReceipt = await waitForReceipt(provider, executeTxnResponse.hash);
+    if (executeReceipt?.status === 1) {
+      showHandover(PurchaseHandoverStep.SUCCESS_ZKEVM, { transactionHash: executeTxnResponse.hash });
     }
   };
 
@@ -497,11 +427,7 @@ export function Purchase({
         return;
       }
 
-      showHandover({
-        animationPath: APPROVE_TXN_ANIMATION,
-        state: RiveStateMachineInput.START,
-        headingText: 'Preparing order',
-      });
+      showHandover(PurchaseHandoverStep.PREPARING, {});
 
       const changeableProvider = await convertToNetworkChangeableProvider(
         fromProvider,
@@ -523,11 +449,7 @@ export function Purchase({
       console.log('allowance', allowance);
 
       if (!allowance || allowance?.lt(fromAmount)) {
-        showHandover({
-          animationPath: APPROVE_TXN_ANIMATION,
-          state: RiveStateMachineInput.WAITING,
-          headingText: 'Waiting for wallet approval for token access',
-        });
+        showHandover(PurchaseHandoverStep.REQUEST_APPROVAL, {});
 
         const approveTxnReceipt = await approve(fromProviderInfo, changeableProvider, route);
 
@@ -535,19 +457,10 @@ export function Purchase({
           return;
         }
 
-        showHandover({
-          animationPath: APPROVE_TXN_ANIMATION,
-          state: RiveStateMachineInput.COMPLETED,
-          headingText: 'Tokens ready for item purchase',
-          duration: FIXED_HANDOVER_DURATION,
-        });
+        showHandover(PurchaseHandoverStep.APPROVAL_CONFIRMED, {});
       }
 
-      showHandover({
-        animationPath: EXECUTE_TXN_ANIMATION,
-        state: RiveStateMachineInput.WAITING,
-        headingText: 'Waiting for wallet approval for purchase',
-      });
+      showHandover(PurchaseHandoverStep.REQUEST_EXECUTION, {});
 
       const executeTxnReceipt = await execute(squid, fromProviderInfo, changeableProvider, route);
 
@@ -563,41 +476,22 @@ export function Purchase({
       sendPurchaseSuccessEvent(eventTarget, executeTxnReceipt.transactionHash, fundingMethod);
 
       if (toChain === fromChain) {
-        showHandover({
-          animationPath: EXECUTE_TXN_ANIMATION,
-          state: RiveStateMachineInput.COMPLETED,
-          headingText: 'Purchase complete',
-          subheadingText: (
-            <Trans
-              i18nKey="Go to <explorerLink>Immutable zkEVM explorer</explorerLink> for transaction details"
-              components={{
-                explorerLink: (
-                  <Link
-                    size="small"
-                    rc={(
-                      <a
-                        target="_blank"
-                        href={`https://explorer.immutable.com/tx/${executeTxnReceipt.transactionHash}`}
-                        rel="noreferrer"
-                      />
-                  )}
-                  />
-                ),
-              }}
-            />
-          ),
-          primaryButtonText: 'Done',
-          onPrimaryButtonClick: () => {
-            sendPurchaseCloseEvent(eventTarget);
-          },
-        });
+        showHandover(PurchaseHandoverStep.SUCCESS_ZKEVM, { transactionHash: executeTxnReceipt.transactionHash });
         return;
       }
 
-      showHandover({
-        animationPath: EXECUTE_TXN_ANIMATION,
-        state: RiveStateMachineInput.PROCESSING,
-        headingText: 'Processing purchase',
+      const formattedDuration = selectedRouteData
+        ? getDurationFormatted(
+          selectedRouteData.route.route.estimate.estimatedRouteDuration,
+          t('views.PURCHASE.routeSelection.minutesText'),
+          t('views.PURCHASE.routeSelection.minuteText'),
+          t('views.PURCHASE.routeSelection.secondsText'),
+        )
+        : '';
+
+      showHandover(PurchaseHandoverStep.EXECUTING, {
+        routeDuration: formattedDuration,
+        transactionHash: executeTxnReceipt.transactionHash,
       });
 
       const status = await getStatus(squid, executeTxnReceipt.transactionHash);
@@ -609,64 +503,13 @@ export function Purchase({
       console.log('axelarscanUrl', axelarscanUrl);
 
       if (status?.squidTransactionStatus === 'success') {
-        showHandover({
-          animationPath: EXECUTE_TXN_ANIMATION,
-          state: RiveStateMachineInput.COMPLETED,
-          headingText: 'Purchase complete',
-          subheadingText: (
-            <Trans
-              i18nKey="Go to <axelarscanLink>Axelarscan</axelarscanLink> for transaction details"
-              components={{
-                axelarscanLink: (
-                  <Link
-                    size="small"
-                    rc={(
-                      <a
-                        target="_blank"
-                        href={axelarscanUrl}
-                        rel="noreferrer"
-                      />
-                  )}
-                  />
-                ),
-              }}
-            />
-          ),
-          primaryButtonText: 'Done',
-          onPrimaryButtonClick: () => {
-            sendPurchaseCloseEvent(eventTarget);
-          },
-        });
+        showHandover(PurchaseHandoverStep.SUCCESS, { axelarscanUrl });
+      } else if (status?.squidTransactionStatus === 'needs_gas') {
+        showHandover(PurchaseHandoverStep.NEEDS_GAS, { axelarscanUrl });
+      } else if (status?.squidTransactionStatus === 'partial_success') {
+        showHandover(PurchaseHandoverStep.PARTIAL_SUCCESS, { axelarscanUrl });
       } else {
-        showHandover({
-          animationPath: APPROVE_TXN_ANIMATION,
-          state: RiveStateMachineInput.COMPLETED,
-          headingText: 'Unable to complete purchase',
-          subheadingText: (
-            <Trans
-            // eslint-disable-next-line max-len
-              i18nKey="Something went wrong, and we were unable to complete this transaction. Visit <axelarscanLink>Axelarscan</axelarscanLink> for details."
-              components={{
-                axelarscanLink: (
-                  <Link
-                    size="small"
-                    rc={(
-                      <a
-                        target="_blank"
-                        href={axelarscanUrl}
-                        rel="noreferrer"
-                      />
-                  )}
-                  />
-                ),
-              }}
-            />
-          ),
-          secondaryButtonText: 'Dismiss',
-          onSecondaryButtonClick: () => {
-            sendPurchaseCloseEvent(eventTarget);
-          },
-        });
+        showHandover(PurchaseHandoverStep.FAIL, { axelarscanUrl });
       }
     } else {
       handleDirectCryptoPayment(fromProvider, fromAddress, toAddress, item.tokenAddress);
