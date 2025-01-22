@@ -1,14 +1,4 @@
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
-import type {
-  ConsiderationInputItem,
-  CreateBulkOrdersAction,
-  CreateInputItem,
-  CreateOrderAction,
-  ExchangeAction,
-  InputCriteria,
-  OrderComponents,
-  OrderUseCase,
-} from '@opensea/seaport-js/src/types';
 import { providers } from 'ethers';
 import { mapOrderFromOpenApiOrder } from '../openapi/mapper';
 import { Order as OpenApiOrder } from '../openapi/sdk';
@@ -43,8 +33,16 @@ import {
 import { mapImmutableOrderToSeaportOrderComponents } from './map-to-seaport-order';
 import { SeaportLibFactory } from './seaport-lib-factory';
 import { prepareTransaction } from './transaction';
-
-type FulfillmentOrderDetails = Parameters<SeaportLib['fulfillOrders']>[0]['fulfillOrderDetails'][0] & { extraData: string };
+import {
+  ApprovalAction, ConsiderationInputItem,
+  CreateBulkOrdersAction,
+  CreateBulkOrdersReturnType,
+  CreateInputItem, CreateOrderAction,
+  CreateOrderReturnType,
+  FulfillmentOrderDetails,
+  InputCriteria,
+  OrderComponents,
+} from './types';
 
 function mapImmutableSdkItemToSeaportSdkCreateInputItem(
   item: ERC20Item | ERC721Item | ERC1155Item,
@@ -163,7 +161,7 @@ export class Seaport {
       orderInputs,
     );
 
-    const approvalActions = seaportActions.filter(
+    const approvalActions: ApprovalAction[] | undefined = seaportActions.filter(
       (action) => action.type === 'approval',
     );
 
@@ -227,7 +225,7 @@ export class Seaport {
 
     const actions: Action[] = [];
 
-    const approvalAction = seaportActions.find(
+    const approvalAction: ApprovalAction | undefined = seaportActions.find(
       (action) => action.type === 'approval',
     );
 
@@ -283,7 +281,7 @@ export class Seaport {
         parameters: orderComponents,
         signature: order.signature,
       },
-      unitsToFill,
+      unitsToFill: unitsToFill || '',
       extraData,
       tips,
     };
@@ -297,7 +295,7 @@ export class Seaport {
 
     const fulfillmentActions: TransactionAction[] = [];
 
-    const approvalActions = seaportActions.filter(
+    const approvalActions: ApprovalAction[] = seaportActions.filter(
       (action) => action.type === 'approval',
     );
 
@@ -315,7 +313,7 @@ export class Seaport {
       });
     }
 
-    const fulfilOrderAction: ExchangeAction | undefined = seaportActions.find(
+    const fulfilOrderAction: ApprovalAction = seaportActions.find(
       (action) => action.type === 'exchange',
     );
 
@@ -360,7 +358,7 @@ export class Seaport {
           parameters: orderComponents,
           signature: o.order.signature,
         },
-        unitsToFill: o.unitsToFill,
+        unitsToFill: o.unitsToFill || '',
         extraData: o.extraData,
         tips,
       };
@@ -379,7 +377,7 @@ export class Seaport {
 
     const fulfillmentActions: TransactionAction[] = [];
 
-    const approvalActions = seaportActions.filter(
+    const approvalActions: ApprovalAction[] = seaportActions.filter(
       (action) => action.type === 'approval',
     );
 
@@ -399,7 +397,7 @@ export class Seaport {
       });
     }
 
-    const fulfilOrderAction: ExchangeAction | undefined = seaportActions.find(
+    const fulfilOrderAction = seaportActions.find(
       (action) => action.type === 'exchange',
     );
 
@@ -466,7 +464,7 @@ export class Seaport {
       orderStart: Date;
       orderExpiry: Date;
     }[],
-  ): Promise<OrderUseCase<CreateBulkOrdersAction>> {
+  ): CreateBulkOrdersReturnType {
     const seaportLib = this.getSeaportLib();
 
     return seaportLib.createBulkOrders(
@@ -511,7 +509,7 @@ export class Seaport {
     allowPartialFills: boolean,
     orderStart: Date,
     orderExpiry: Date,
-  ): Promise<OrderUseCase<CreateOrderAction>> {
+  ): CreateOrderReturnType {
     const seaportLib = this.getSeaportLib();
 
     return seaportLib.createOrder(

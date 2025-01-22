@@ -1,13 +1,13 @@
+import { constants } from 'ethers';
+import { Item, Order, ProtocolData } from '../openapi/sdk';
+import { exhaustiveSwitch } from '../utils';
+import { ItemType, OrderType } from './constants';
 import {
   ConsiderationItem,
   OfferItem,
   OrderComponents,
   TipInputItem,
-} from '@opensea/seaport-js/src/types';
-import { constants } from 'ethers';
-import { Item, Order, ProtocolData } from '../openapi/sdk';
-import { exhaustiveSwitch } from '../utils';
-import { ItemType, OrderType } from './constants';
+} from './types';
 
 function mapImmutableItemToSeaportOfferItem(item: Item): OfferItem {
   switch (item.type) {

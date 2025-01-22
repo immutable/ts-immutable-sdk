@@ -1,19 +1,11 @@
 import {
   anything, deepEqual, instance, mock, when,
 } from 'ts-mockito';
-import type { TransactionMethods } from '@opensea/seaport-js/src/utils/usecase';
+import type { TransactionMethods } from '@opensea/seaport-js/lib/utils/usecase';
 import { ContractTransaction, ZeroHash, ZeroAddress } from 'ethers-v6';
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
-import type {
-  ApprovalAction,
-  ConsiderationItem,
-  CreateOrderAction,
-  ExchangeAction,
-  OfferItem,
-  OrderComponents,
-} from '@opensea/seaport-js/src/types';
 import { BigNumber, providers } from 'ethers';
-import { OrderType } from '@opensea/seaport-js/src/constants';
+import { ExchangeAction } from '@opensea/seaport-js/lib/types';
 import {
   ActionType,
   TransactionAction,
@@ -26,12 +18,15 @@ import {
 import { ProtocolData, Order, OrderStatusName } from '../openapi/sdk';
 import {
   EIP_712_ORDER_TYPE,
-  ItemType,
+  ItemType, OrderType,
   SEAPORT_CONTRACT_NAME,
   SEAPORT_CONTRACT_VERSION_V1_5,
 } from './constants';
 import { Seaport } from './seaport';
 import { SeaportLibFactory } from './seaport-lib-factory';
+import {
+  ApprovalAction, ConsiderationItem, CreateOrderAction, OfferItem, OrderComponents,
+} from './types';
 
 const fakeExtraData = '0x0000000000000000000000000000000000000000000000000064ec2faca1186bef338313426612ad6ed494b50e5ddc65ad4e6067df53d6625f921b22156ac9435d4fd946bc5f07859ecd7aca94f87da703b9204f9c09f0089be18d5c268a5f36c80c779ed3cbf6ed54b7c7bf2991a4b11065b01c1a2594619f1a0d49f9';
 
