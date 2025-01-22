@@ -55,13 +55,13 @@ function mapImmutableSdkItemToSeaportSdkCreateInputItem(
       };
     case 'ERC721':
       return {
-        itemType: ItemType.ERC721,
+        itemType: ItemType.ERC721.valueOf(),
         token: item.contractAddress,
         identifier: item.tokenId,
       };
     case 'ERC1155':
       return {
-        itemType: ItemType.ERC1155,
+        itemType: ItemType.ERC1155.valueOf(),
         token: item.contractAddress,
         identifier: item.tokenId,
         amount: item.amount,
@@ -95,14 +95,14 @@ function mapImmutableSdkItemToSeaportSdkConsiderationInputItem(
       };
     case 'ERC721':
       return {
-        itemType: ItemType.ERC721,
+        itemType: ItemType.ERC721.valueOf(),
         token: item.contractAddress,
         identifier: item.tokenId,
         recipient,
       };
     case 'ERC1155':
       return {
-        itemType: ItemType.ERC1155,
+        itemType: ItemType.ERC1155.valueOf(),
         token: item.contractAddress,
         identifier: item.tokenId,
         amount: item.amount,
@@ -111,7 +111,7 @@ function mapImmutableSdkItemToSeaportSdkConsiderationInputItem(
     case 'ERC721_COLLECTION':
       return {
         // seaport will handle mapping an ERC721 item with no identifier to a criteria based item
-        itemType: ItemType.ERC721,
+        itemType: ItemType.ERC721.valueOf(),
         token: item.contractAddress,
         amount: item.amount,
         identifiers: [],
@@ -120,7 +120,7 @@ function mapImmutableSdkItemToSeaportSdkConsiderationInputItem(
     case 'ERC1155_COLLECTION':
       return {
         // seaport will handle mapping an ERC1155 item with no identifier to a criteria based item
-        itemType: ItemType.ERC1155,
+        itemType: ItemType.ERC1155.valueOf(),
         token: item.contractAddress,
         amount: item.amount,
         identifiers: [],
@@ -161,9 +161,9 @@ export class Seaport {
       orderInputs,
     );
 
-    const approvalActions: ApprovalAction[] | undefined = seaportActions.filter(
+    const approvalActions = seaportActions.filter(
       (action) => action.type === 'approval',
-    );
+    ) as ApprovalAction[];
 
     const network = await this.provider.getNetwork();
     const actions: Action[] = approvalActions.map((approvalAction) => ({
@@ -176,7 +176,7 @@ export class Seaport {
       ),
     }));
 
-    const createAction: CreateBulkOrdersAction | undefined = seaportActions.find((action) => action.type === 'createBulk');
+    const createAction = seaportActions.find((action) => action.type === 'createBulk') as CreateBulkOrdersAction | undefined;
 
     if (!createAction) {
       throw new Error('No create bulk order action found');
@@ -225,9 +225,9 @@ export class Seaport {
 
     const actions: Action[] = [];
 
-    const approvalAction: ApprovalAction | undefined = seaportActions.find(
+    const approvalAction = seaportActions.find(
       (action) => action.type === 'approval',
-    );
+    ) as ApprovalAction | undefined;
 
     if (approvalAction) {
       actions.push({
@@ -241,9 +241,9 @@ export class Seaport {
       });
     }
 
-    const createAction: CreateOrderAction | undefined = seaportActions.find(
+    const createAction = seaportActions.find(
       (action) => action.type === 'create',
-    );
+    ) as CreateOrderAction | undefined;
 
     if (!createAction) {
       throw new Error('No create order action found');
@@ -295,9 +295,9 @@ export class Seaport {
 
     const fulfillmentActions: TransactionAction[] = [];
 
-    const approvalActions: ApprovalAction[] = seaportActions.filter(
+    const approvalActions = seaportActions.filter(
       (action) => action.type === 'approval',
-    );
+    ) as ApprovalAction[];
 
     if (approvalActions.length > 0) {
       approvalActions.forEach((approvalAction) => {
@@ -313,9 +313,9 @@ export class Seaport {
       });
     }
 
-    const fulfilOrderAction: ApprovalAction = seaportActions.find(
+    const fulfilOrderAction = seaportActions.find(
       (action) => action.type === 'exchange',
-    );
+    ) as ApprovalAction | undefined;
 
     if (!fulfilOrderAction) {
       throw new Error('No exchange action found');
@@ -377,9 +377,9 @@ export class Seaport {
 
     const fulfillmentActions: TransactionAction[] = [];
 
-    const approvalActions: ApprovalAction[] = seaportActions.filter(
+    const approvalActions = seaportActions.filter(
       (action) => action.type === 'approval',
-    );
+    ) as ApprovalAction[];
 
     const chainID = (await this.provider.getNetwork()).chainId;
 
@@ -419,7 +419,7 @@ export class Seaport {
       actions: fulfillmentActions,
       // return the shortest expiration out of all extraData - they should be very close
       expiration: fulfillOrderDetails
-        .map((d) => Seaport.getExpirationISOTimeFromExtraData(d.extraData))
+        .map((d) => Seaport.getExpirationISOTimeFromExtraData(d.extraData!))
         .reduce((p, c) => (new Date(p) < new Date(c) ? p : c)),
     };
   }
@@ -464,7 +464,7 @@ export class Seaport {
       orderStart: Date;
       orderExpiry: Date;
     }[],
-  ): CreateBulkOrdersReturnType {
+  ): Promise<CreateBulkOrdersReturnType> {
     const seaportLib = this.getSeaportLib();
 
     return seaportLib.createBulkOrders(
@@ -509,7 +509,7 @@ export class Seaport {
     allowPartialFills: boolean,
     orderStart: Date,
     orderExpiry: Date,
-  ): CreateOrderReturnType {
+  ): Promise<CreateOrderReturnType> {
     const seaportLib = this.getSeaportLib();
 
     return seaportLib.createOrder(

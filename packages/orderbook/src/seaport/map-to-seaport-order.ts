@@ -15,7 +15,7 @@ function mapImmutableItemToSeaportOfferItem(item: Item): OfferItem {
       throw new Error('NATIVE items are not supported in the offer');
     case 'ERC20':
       return {
-        itemType: ItemType.ERC20,
+        itemType: ItemType.ERC20.valueOf(),
         token: item.contract_address,
         identifierOrCriteria: '0',
         startAmount: item.amount,
@@ -23,7 +23,7 @@ function mapImmutableItemToSeaportOfferItem(item: Item): OfferItem {
       };
     case 'ERC721':
       return {
-        itemType: ItemType.ERC721,
+        itemType: ItemType.ERC721.valueOf(),
         token: item.contract_address,
         identifierOrCriteria: item.token_id,
         startAmount: '1',
@@ -31,7 +31,7 @@ function mapImmutableItemToSeaportOfferItem(item: Item): OfferItem {
       };
     case 'ERC1155':
       return {
-        itemType: ItemType.ERC1155,
+        itemType: ItemType.ERC1155.valueOf(),
         token: item.contract_address,
         identifierOrCriteria: item.token_id,
         startAmount: item.amount,
@@ -53,7 +53,7 @@ function mapImmutableItemToSeaportConsiderationItem(
   switch (item.type) {
     case 'NATIVE':
       return {
-        itemType: ItemType.NATIVE,
+        itemType: ItemType.NATIVE.valueOf(),
         startAmount: item.amount,
         endAmount: item.amount,
         token: constants.AddressZero,
@@ -62,7 +62,7 @@ function mapImmutableItemToSeaportConsiderationItem(
       };
     case 'ERC20':
       return {
-        itemType: ItemType.ERC20,
+        itemType: ItemType.ERC20.valueOf(),
         startAmount: item.amount,
         endAmount: item.amount,
         token: item.contract_address,
@@ -71,7 +71,7 @@ function mapImmutableItemToSeaportConsiderationItem(
       };
     case 'ERC721':
       return {
-        itemType: ItemType.ERC721,
+        itemType: ItemType.ERC721.valueOf(),
         startAmount: '1',
         endAmount: '1',
         token: item.contract_address,
@@ -80,7 +80,7 @@ function mapImmutableItemToSeaportConsiderationItem(
       };
     case 'ERC1155':
       return {
-        itemType: ItemType.ERC1155,
+        itemType: ItemType.ERC1155.valueOf(),
         startAmount: item.amount,
         endAmount: item.amount,
         token: item.contract_address,
@@ -89,7 +89,7 @@ function mapImmutableItemToSeaportConsiderationItem(
       };
     case 'ERC721_COLLECTION':
       return {
-        itemType: ItemType.ERC721_WITH_CRITERIA,
+        itemType: ItemType.ERC721_WITH_CRITERIA.valueOf(),
         startAmount: item.amount,
         endAmount: item.amount,
         token: item.contract_address,
@@ -98,7 +98,7 @@ function mapImmutableItemToSeaportConsiderationItem(
       };
     case 'ERC1155_COLLECTION':
       return {
-        itemType: ItemType.ERC1155_WITH_CRITERIA,
+        itemType: ItemType.ERC1155_WITH_CRITERIA.valueOf(),
         startAmount: item.amount,
         endAmount: item.amount,
         token: item.contract_address,
@@ -156,7 +156,7 @@ export function mapImmutableOrderToSeaportOrderComponents(
       zone: order.protocol_data.zone_address,
       offer: offerItems,
       consideration: considerationItems,
-      orderType: seaportOrderType,
+      orderType: seaportOrderType.valueOf(),
       startTime: Math.round(
         new Date(order.start_at).getTime() / 1000,
       ).toString(),
