@@ -56,7 +56,9 @@ interface AddTokensView extends ViewType {
 interface PurchaseView extends ViewType {
   type: CommerceFlowType.PURCHASE;
   data: {
-    params: PurchaseWidgetParams;
+    params: PurchaseWidgetParams & {
+      environmentId: string;
+    };
     config: PurchaseWidgetConfiguration;
   };
 }

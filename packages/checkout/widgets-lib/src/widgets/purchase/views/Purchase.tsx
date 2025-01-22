@@ -6,7 +6,9 @@ import {
 import {
   Checkout, WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
-import { useContext, useMemo, useState } from 'react';
+import {
+  useContext, useEffect, useMemo, useState,
+} from 'react';
 import { RouteOptionsDrawer } from '../../../components/RouteOptionsDrawer/RouteOptionsDrawer';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
@@ -19,9 +21,11 @@ import { PurchasePayWithWalletDrawer } from '../components/PurchasePayWithWallet
 import { PurchaseSelectedRouteOption } from '../components/PurchaseSelectedRouteOption';
 import { PurchaseSelectedWallet } from '../components/PurchaseSelectedWallet';
 import { PurchaseContext } from '../context/PurchaseContext';
+import { CryptoFiatContext, CryptoFiatActions } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 
 interface PurchaseProps {
   checkout: Checkout;
+  environmentId: string;
   showBackButton?: boolean;
   onCloseButtonClick?: () => void;
   onBackButtonClick?: () => void;
@@ -29,6 +33,7 @@ interface PurchaseProps {
 
 export function Purchase({
   checkout,
+  environmentId,
   onCloseButtonClick,
   showBackButton,
   onBackButtonClick,
@@ -39,7 +44,7 @@ export function Purchase({
 
   const {
     purchaseState: {
-      items, selectedToken, chains,
+      items, selectedToken, chains, quote,
     },
   } = useContext(PurchaseContext);
   const { providers } = useInjectedProviders({ checkout });
@@ -52,6 +57,35 @@ export function Purchase({
       lockedToProvider,
     },
   } = useProvidersContext();
+
+  const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
+
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log({
+      checkout,
+      environmentId,
+    });
+  }, [checkout, environmentId]);
+
+  useEffect(() => {
+    if (!quote) return;
+    // eslint-disable-next-line no-console
+    console.log('Order quote fetched', {
+      quote,
+    });
+
+    const tokenSymbols = Object
+      .values(quote.quote.totalAmount)
+      .map((price) => price.currency);
+
+    cryptoFiatDispatch({
+      payload: {
+        type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
+        tokenSymbols,
+      },
+    });
+  }, [quote]);
 
   const shouldShowBackButton = showBackButton && onBackButtonClick;
 
