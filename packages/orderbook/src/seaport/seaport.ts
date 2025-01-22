@@ -281,7 +281,7 @@ export class Seaport {
         parameters: orderComponents,
         signature: order.signature,
       },
-      unitsToFill: unitsToFill || '',
+      unitsToFill: unitsToFill!,
       extraData,
       tips,
     };
@@ -358,7 +358,7 @@ export class Seaport {
           parameters: orderComponents,
           signature: o.order.signature,
         },
-        unitsToFill: o.unitsToFill || '',
+        unitsToFill: o.unitsToFill!,
         extraData: o.extraData,
         tips,
       };
