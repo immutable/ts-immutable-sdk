@@ -22,6 +22,7 @@ import { useSquid } from '../../lib/squid/hooks/useSquid';
 import { useTokens } from '../../lib/squid/hooks/useTokens';
 import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
 import { fetchChains } from '../../lib/squid/functions/fetchChains';
+import { useQuoteOrder } from '../../lib/hooks/useQuoteOrder';
 
 export type PurchaseWidgetInputs = PurchaseWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
@@ -69,7 +70,10 @@ export default function PurchaseWidget({
   } = useContext(EventTargetContext);
 
   const {
-    providersState: { checkout },
+    providersState: {
+      checkout,
+      toAddress,
+    },
   } = useProvidersContext();
 
   const { squid: { squid } } = purchaseState;
@@ -122,6 +126,33 @@ export default function PurchaseWidget({
     },
     [items],
   );
+
+  const { fetchOrderQuote } = useQuoteOrder({
+    environment: checkout.config.environment,
+    environmentId,
+  });
+
+  useEffect(() => {
+    if (!items || items.length === 0) return;
+
+    (async () => {
+      try {
+        const quoteResponse = await fetchOrderQuote(items, toAddress);
+
+        if (!quoteResponse) return;
+
+        purchaseDispatch({
+          payload: {
+            type: PurchaseActions.SET_QUOTE,
+            quote: quoteResponse,
+          },
+        });
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error fetching order quote', error);
+      }
+    })();
+  }, [items, toAddress]);
 
   return (
     <ViewContext.Provider value={viewReducerValues}>

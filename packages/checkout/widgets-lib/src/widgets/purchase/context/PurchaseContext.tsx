@@ -2,6 +2,7 @@ import { Squid } from '@0xsquid/sdk';
 import { PurchaseItem } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
 import { Chain, Token } from '../../../lib/squid/types';
+import { OrderQuoteResponse } from '../../../lib/primary-sales';
 
 export interface PurchaseState {
   squid: {
@@ -10,6 +11,7 @@ export interface PurchaseState {
     tokens: Token[] | null;
   };
   items: PurchaseItem[];
+  quote: OrderQuoteResponse | null;
 }
 
 export const initialPurchaseState: PurchaseState = {
@@ -19,6 +21,7 @@ export const initialPurchaseState: PurchaseState = {
     tokens: null,
   },
   items: [],
+  quote: null,
 };
 
 export interface PurchaseContextState {
@@ -34,13 +37,15 @@ type ActionPayload =
   | SetSquid
   | SetSquidChains
   | SetSquidTokens
-  | SetItems;
+  | SetItems
+  | SetQuote;
 
 export enum PurchaseActions {
   SET_SQUID = 'SET_SQUID',
   SET_SQUID_CHAINS = 'SET_SQUID_CHAINS',
   SET_SQUID_TOKENS = 'SET_SQUID_TOKENS',
   SET_ITEMS = 'SET_ITEMS',
+  SET_QUOTE = 'SET_QUOTE',
 }
 
 export interface SetSquid {
@@ -61,6 +66,11 @@ export interface SetSquidTokens {
 export interface SetItems {
   type: PurchaseActions.SET_ITEMS;
   items: PurchaseItem[];
+}
+
+export interface SetQuote {
+  type: PurchaseActions.SET_QUOTE;
+  quote: OrderQuoteResponse;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -106,6 +116,11 @@ export const purchaseReducer: Reducer<PurchaseState, PurchaseAction> = (
       return {
         ...state,
         items: action.payload.items,
+      };
+    case PurchaseActions.SET_QUOTE:
+      return {
+        ...state,
+        quote: action.payload.quote,
       };
     default:
       return state;

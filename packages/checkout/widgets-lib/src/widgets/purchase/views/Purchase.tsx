@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { Stack, ButtCon } from '@biom3/react';
 import { Checkout, PurchaseItem } from '@imtbl/checkout-sdk';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -20,13 +20,23 @@ export function Purchase({
   showBackButton,
   onBackButtonClick,
 }: PurchaseProps) {
-  const { purchaseState: { items } } = useContext(PurchaseContext);
+  const { purchaseState: { items, quote } } = useContext(PurchaseContext);
 
-  // eslint-disable-next-line no-console
-  console.log({
-    checkout,
-    environmentId,
-  });
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log({
+      checkout,
+      environmentId,
+    });
+  }, [checkout, environmentId]);
+
+  useEffect(() => {
+    if (!quote) return;
+    // eslint-disable-next-line no-console
+    console.log('Order quote fetched', {
+      quote,
+    });
+  }, [quote]);
 
   const shouldShowBackButton = showBackButton && onBackButtonClick;
 
