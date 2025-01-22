@@ -1,12 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useRef, useCallback } from 'react';
+import { PurchaseItem } from '@imtbl/checkout-sdk';
 import { compareStr } from '../utils';
 import {
   OrderQuote,
-  OrderQuoteCurrency,
-  SaleErrorTypes,
   OrderQuoteApiResponse,
   UseQuoteOrderParams,
   PRIMARY_SALES_API_BASE_URL,
+  OrderQuoteResponse,
 } from '../primary-sales';
 
 export const defaultOrderQuote: OrderQuote = {
@@ -16,11 +16,6 @@ export const defaultOrderQuote: OrderQuote = {
   currencies: [],
   products: {},
   totalAmount: {},
-};
-
-export type ConfigError = {
-  type: SaleErrorTypes;
-  data?: Record<string, unknown>;
 };
 
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -76,56 +71,44 @@ export const transformToOrderQuote = (
 });
 
 export const useQuoteOrder = ({
-  items,
   environment,
   environmentId,
-  provider,
   preferredCurrency,
 }: UseQuoteOrderParams) => {
-  const [selectedCurrency, setSelectedCurrency] = useState<
-  OrderQuoteCurrency | undefined
-  >();
   const fetching = useRef(false);
-  const [queryParams, setQueryParams] = useState<string>('');
-  const [orderQuote, setOrderQuote] = useState<OrderQuote>(defaultOrderQuote);
-  const [orderQuoteError, setOrderQuoteError] = useState<
-  ConfigError | undefined
-  >(undefined);
 
-  const setError = (error: unknown) => {
-    setOrderQuoteError({
-      type: SaleErrorTypes.SERVICE_BREAKDOWN,
-      data: { reason: 'Error fetching settlement currencies', error },
-    });
+  const buildQueryParams = (items: PurchaseItem[], walletAddress?: string): string | undefined => {
+    const params = new URLSearchParams();
+    const products = items.map(({ productId: id, qty }) => ({ id, qty }));
+    params.append('products', btoa(JSON.stringify(products)));
+
+    if (walletAddress) {
+      params.append('wallet_address', walletAddress);
+    }
+
+    return params.toString();
   };
 
-  useEffect(() => {
-    // Set request params
-    if (!items?.length || !provider) return;
+  const getSelectedCurrency = useCallback((orderQuote: OrderQuote) => {
+    if (orderQuote.currencies.length === 0) return undefined;
 
-    (async () => {
-      try {
-        const params = new URLSearchParams();
-        const products = items.map(({ productId: id, qty }) => ({ id, qty }));
-        params.append('products', btoa(JSON.stringify(products)));
+    const baseCurrencyOverride = preferredCurrency
+      ? orderQuote.currencies.find((c) => compareStr(c.name, preferredCurrency))
+      : undefined;
 
-        const signer = provider.getSigner();
-        const address = await signer.getAddress();
-        params.append('wallet_address', address);
+    return baseCurrencyOverride
+      || orderQuote.currencies.find((c) => c.base)
+      || orderQuote.currencies?.[0];
+  }, [preferredCurrency]);
 
-        setQueryParams(params.toString());
-      } catch (error) {
-        setError(error);
-      }
-    })();
-  }, [items, provider]);
+  const fetchOrderQuote = useCallback(
+    async (items: PurchaseItem[], walletAddress?: string): Promise<OrderQuoteResponse | undefined> => {
+      // Fetch order config
+      if (!environment || !environmentId || !items?.length) return undefined;
 
-  useEffect(() => {
-    // Fetch order config
-    if (!environment || !environmentId || !queryParams) return;
+      const queryParams = buildQueryParams(items, walletAddress);
 
-    (async () => {
-      if (fetching.current) return;
+      if (fetching.current) return undefined;
 
       try {
         fetching.current = true;
@@ -142,37 +125,29 @@ export const useQuoteOrder = ({
           throw new Error(`${response.status} - ${response.statusText}`);
         }
 
-        const config = transformToOrderQuote(
+        const quote = transformToOrderQuote(
           await response.json(),
           preferredCurrency,
         );
-        setOrderQuote(config);
-      } catch (error) {
-        setError(error);
+
+        const currency = getSelectedCurrency(quote);
+
+        if (!currency) return undefined;
+
+        return {
+          quote,
+          currency,
+          totalCurrencyAmount: quote.totalAmount[currency.name].amount,
+        };
       } finally {
         fetching.current = false;
       }
-    })();
-  }, [environment, environmentId, queryParams]);
-
-  useEffect(() => {
-    // Set default currency
-    if (orderQuote.currencies.length === 0) return;
-
-    const baseCurrencyOverride = preferredCurrency
-      ? orderQuote.currencies.find((c) => compareStr(c.name, preferredCurrency))
-      : undefined;
-
-    const defaultSelectedCurrency = baseCurrencyOverride
-      || orderQuote.currencies.find((c) => c.base)
-      || orderQuote.currencies?.[0];
-
-    setSelectedCurrency(defaultSelectedCurrency);
-  }, [orderQuote]);
+    },
+    [environment, environmentId, preferredCurrency, fetching],
+  );
 
   return {
-    orderQuote,
-    selectedCurrency,
-    orderQuoteError,
+    fetchOrderQuote,
+    getSelectedCurrency,
   };
 };

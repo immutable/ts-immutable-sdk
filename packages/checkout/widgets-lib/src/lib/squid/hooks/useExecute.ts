@@ -233,5 +233,6 @@ export const useExecute = (
     approve,
     execute,
     getStatus,
+    waitForReceipt,
   };
 };

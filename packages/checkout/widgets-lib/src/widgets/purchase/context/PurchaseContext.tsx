@@ -1,15 +1,27 @@
 import { Squid } from '@0xsquid/sdk';
 import { PurchaseItem } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
+import { Chain, Token } from '../../../lib/squid/types';
+import { OrderQuoteResponse } from '../../../lib/primary-sales';
 
 export interface PurchaseState {
-  squid: Squid | null;
+  squid: {
+    squid: Squid | null;
+    chains: Chain[] | null;
+    tokens: Token[] | null;
+  };
   items: PurchaseItem[];
+  quote: OrderQuoteResponse | null;
 }
 
 export const initialPurchaseState: PurchaseState = {
-  squid: null,
+  squid: {
+    squid: null,
+    chains: null,
+    tokens: null,
+  },
   items: [],
+  quote: null,
 };
 
 export interface PurchaseContextState {
@@ -23,11 +35,17 @@ export interface PurchaseAction {
 
 type ActionPayload =
   | SetSquid
-  | SetItems;
+  | SetSquidChains
+  | SetSquidTokens
+  | SetItems
+  | SetQuote;
 
 export enum PurchaseActions {
   SET_SQUID = 'SET_SQUID',
+  SET_SQUID_CHAINS = 'SET_SQUID_CHAINS',
+  SET_SQUID_TOKENS = 'SET_SQUID_TOKENS',
   SET_ITEMS = 'SET_ITEMS',
+  SET_QUOTE = 'SET_QUOTE',
 }
 
 export interface SetSquid {
@@ -35,9 +53,24 @@ export interface SetSquid {
   squid: Squid;
 }
 
+export interface SetSquidChains {
+  type: PurchaseActions.SET_SQUID_CHAINS;
+  chains: Chain[];
+}
+
+export interface SetSquidTokens {
+  type: PurchaseActions.SET_SQUID_TOKENS;
+  tokens: Token[];
+}
+
 export interface SetItems {
   type: PurchaseActions.SET_ITEMS;
   items: PurchaseItem[];
+}
+
+export interface SetQuote {
+  type: PurchaseActions.SET_QUOTE;
+  quote: OrderQuoteResponse;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -58,12 +91,36 @@ export const purchaseReducer: Reducer<PurchaseState, PurchaseAction> = (
     case PurchaseActions.SET_SQUID:
       return {
         ...state,
-        squid: action.payload.squid,
+        squid: {
+          ...state.squid,
+          squid: action.payload.squid,
+        },
+      };
+    case PurchaseActions.SET_SQUID_CHAINS:
+      return {
+        ...state,
+        squid: {
+          ...state.squid,
+          chains: action.payload.chains,
+        },
+      };
+    case PurchaseActions.SET_SQUID_TOKENS:
+      return {
+        ...state,
+        squid: {
+          ...state.squid,
+          tokens: action.payload.tokens,
+        },
       };
     case PurchaseActions.SET_ITEMS:
       return {
         ...state,
         items: action.payload.items,
+      };
+    case PurchaseActions.SET_QUOTE:
+      return {
+        ...state,
+        quote: action.payload.quote,
       };
     default:
       return state;

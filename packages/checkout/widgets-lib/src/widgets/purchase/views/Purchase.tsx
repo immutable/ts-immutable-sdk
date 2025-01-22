@@ -1,22 +1,56 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { Stack, ButtCon } from '@biom3/react';
-import { PurchaseItem } from '@imtbl/checkout-sdk';
+import { Checkout, PurchaseItem } from '@imtbl/checkout-sdk';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { PurchaseContext } from '../context/PurchaseContext';
 import { PurchaseItemHero } from '../components/PurchaseItemHero';
+import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 
 interface PurchaseProps {
+  checkout: Checkout;
+  environmentId: string;
   showBackButton?: boolean;
   onCloseButtonClick?: () => void;
   onBackButtonClick?: () => void;
 }
 
 export function Purchase({
+  checkout,
+  environmentId,
   onCloseButtonClick,
   showBackButton,
   onBackButtonClick,
 }: PurchaseProps) {
-  const { purchaseState: { items } } = useContext(PurchaseContext);
+  const { purchaseState: { items, quote } } = useContext(PurchaseContext);
+
+  const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
+
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log({
+      checkout,
+      environmentId,
+    });
+  }, [checkout, environmentId]);
+
+  useEffect(() => {
+    if (!quote) return;
+    // eslint-disable-next-line no-console
+    console.log('Order quote fetched', {
+      quote,
+    });
+
+    const tokenSymbols = Object
+      .values(quote.quote.totalAmount)
+      .map((price) => price.currency);
+
+    cryptoFiatDispatch({
+      payload: {
+        type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
+        tokenSymbols,
+      },
+    });
+  }, [quote]);
 
   const shouldShowBackButton = showBackButton && onBackButtonClick;
 
