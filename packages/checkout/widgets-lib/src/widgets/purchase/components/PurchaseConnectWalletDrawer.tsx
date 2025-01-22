@@ -17,7 +17,7 @@ import { ConnectEIP6963ProviderError, connectEIP6963Provider } from '../../../li
 import { getProviderSlugFromRdns } from '../../../lib/provider';
 import { removeSpace } from '../../../lib/utils';
 
-type ConnectWalletDrawerProps = {
+type PurchaseConnectWalletDrawerProps = {
   heading: string;
   visible: boolean;
   onClose: (address?: string) => void;
@@ -51,7 +51,7 @@ export function PurchaseConnectWalletDrawer({
   disabledOptions = [],
   getShouldRequestWalletPermissions,
   shouldIdentifyUser = true,
-}: ConnectWalletDrawerProps) {
+}: PurchaseConnectWalletDrawerProps) {
   const {
     providersState: { checkout },
     providersDispatch,
