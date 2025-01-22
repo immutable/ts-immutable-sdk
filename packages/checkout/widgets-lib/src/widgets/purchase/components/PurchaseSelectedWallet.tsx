@@ -1,13 +1,11 @@
-import { MouseEventHandler, ReactElement, ReactNode } from 'react';
 import {
   EllipsizedText,
   MenuItem,
   MenuItemProps,
-  Sticker,
   SxProps,
-  Tooltip,
 } from '@biom3/react';
 import { EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
+import { MouseEventHandler, ReactElement, ReactNode } from 'react';
 
 const disabledStyles = {
   cursor: 'not-allowed',
@@ -23,7 +21,6 @@ export interface PurchaseSelectedWalletProps {
   label: string;
   caption?: string;
   providerInfo?: Partial<EIP6963ProviderInfo & { address?: string }>;
-  chainInfo?: ChainInfo;
   onClick: MouseEventHandler<HTMLSpanElement>;
   disabled?: boolean;
   sx?: SxProps;
@@ -36,7 +33,6 @@ export function PurchaseSelectedWallet({
   children,
   onClick,
   providerInfo,
-  chainInfo,
   disabled,
   sx,
   size,
@@ -56,25 +52,6 @@ export function PurchaseSelectedWallet({
       ) as ReactElement)
     );
 
-    if (chainInfo && providerInfo?.rdns) {
-      return (
-        <Sticker position={{ x: 'rightInside', y: 'bottomInside' }}>
-          <Tooltip size="small">
-            <Tooltip.Target>
-              <Sticker.FramedImage
-                use={<img src={chainInfo.iconUrl} alt={chainInfo.name} />}
-                size="xSmall"
-                sx={{ bottom: 'base.spacing.x2', right: 'base.spacing.x2' }}
-              />
-            </Tooltip.Target>
-            <Tooltip.Content id="route_tooltip_content">
-              {chainInfo.name}
-            </Tooltip.Content>
-          </Tooltip>
-          {menuItemImage}
-        </Sticker>
-      );
-    }
     return menuItemImage;
   };
 
