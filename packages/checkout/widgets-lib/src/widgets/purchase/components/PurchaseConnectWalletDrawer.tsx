@@ -34,7 +34,6 @@ type PurchaseConnectWalletDrawerProps = {
     label: string;
     rdns: string;
   }[];
-  getShouldRequestWalletPermissions?: (providerInfo: EIP6963ProviderInfo) => boolean | undefined;
   shouldIdentifyUser?: boolean;
 };
 
@@ -49,7 +48,6 @@ export function PurchaseConnectWalletDrawer({
   bottomSlot,
   menuItemSize = 'small',
   disabledOptions = [],
-  getShouldRequestWalletPermissions,
   shouldIdentifyUser = true,
 }: PurchaseConnectWalletDrawerProps) {
   const {
@@ -90,6 +88,8 @@ export function PurchaseConnectWalletDrawer({
   };
 
   const handleWalletConnection = async (event: WalletChangeEvent) => {
+    console.log('@@@ handleWalletConnection');
+
     const { providerDetail } = event;
     const { info } = providerDetail;
 
@@ -118,14 +118,11 @@ export function PurchaseConnectWalletDrawer({
 
     let address: string | undefined;
 
-    // Proceed to connect selected provider
-    const shouldRequestWalletPermissions = getShouldRequestWalletPermissions?.(info);
-
     try {
       const { provider } = await connectEIP6963Provider(
         providerDetail,
         checkout,
-        shouldRequestWalletPermissions,
+        true,
       );
 
       // Identify connected wallet, retaining current anonymousId
