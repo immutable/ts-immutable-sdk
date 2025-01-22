@@ -41,6 +41,7 @@ import {
   CreateInputItem,
   CreateOrderAction,
   CreateOrderReturnType,
+  ExchangeAction,
   FulfillmentOrderDetails,
   InputCriteria,
   OrderComponents,
@@ -317,7 +318,7 @@ export class Seaport {
 
     const fulfilOrderAction = seaportActions.find(
       (action) => action.type === 'exchange',
-    ) as ApprovalAction | undefined;
+    ) as ExchangeAction | undefined;
 
     if (!fulfilOrderAction) {
       throw new Error('No exchange action found');
