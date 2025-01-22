@@ -1,22 +1,24 @@
-import { useContext, useMemo, useState } from 'react';
 import {
-  Stack, ButtCon, MenuItem,
+  ButtCon,
   Button,
+  Stack,
 } from '@biom3/react';
 import {
-  ChainId, Checkout, WalletProviderRdns,
+  Checkout, WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
+import { useContext, useMemo, useState } from 'react';
+import { RouteOptionsDrawer } from '../../../components/RouteOptionsDrawer/RouteOptionsDrawer';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { PurchaseContext } from '../context/PurchaseContext';
-import { PurchaseItemHero } from '../components/PurchaseItemHero';
-import { PayWithWalletDrawer } from '../../../components/WalletDrawer/PayWithWalletDrawer';
-import { getProviderSlugFromRdns } from '../../../lib/provider';
-import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
-import { SelectedWallet } from '../../../components/SelectedWallet/SelectedWallet';
-import { SelectedRouteOption } from '../../../components/SelectedRouteOption/SelectedRouteOption';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
-import { DeliverToWalletDrawer } from '../../../components/WalletDrawer/DeliverToWalletDrawer';
+import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
+import { getProviderSlugFromRdns } from '../../../lib/provider';
 import { SquidFooter } from '../../../lib/squid/components/SquidFooter';
+import { PurchaseDeliverToWalletDrawer } from '../components/PurchaseDeliverToWalletDrawer';
+import { PurchaseItemHero } from '../components/PurchaseItemHero';
+import { PurchasePayWithWalletDrawer } from '../components/PurchasePayWithWalletDrawer';
+import { PurchaseSelectedRouteOption } from '../components/PurchaseSelectedRouteOption';
+import { PurchaseSelectedWallet } from '../components/PurchaseSelectedWallet';
+import { PurchaseContext } from '../context/PurchaseContext';
 
 interface PurchaseProps {
   checkout: Checkout;
@@ -33,10 +35,11 @@ export function Purchase({
 }: PurchaseProps) {
   const [showPayWithWalletDrawer, setShowPayWithWalletDrawer] = useState(false);
   const [showDeliverToWalletDrawer, setShowDeliverToWalletDrawer] = useState(false);
+  const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
 
   const {
     purchaseState: {
-      items, selectedToken, chains, selectedRouteData,
+      items, selectedToken, chains,
     },
   } = useContext(PurchaseContext);
   const { providers } = useInjectedProviders({ checkout });
@@ -72,22 +75,13 @@ export function Purchase({
     [providers],
   );
 
-  const toChain = useMemo(
-    () => chains?.find((chain) => chain.id === ChainId.IMTBL_ZKEVM_MAINNET.toString()),
-    [chains],
-  );
-
-  const getChainInfo = () => {
-    if (toChain) {
-      return {
-        iconUrl: toChain.iconUrl,
-        name: toChain.name,
-      };
-    }
-    return undefined;
+  const handleDeliverToWalletClose = () => {
+    setShowDeliverToWalletDrawer(false);
   };
 
-  const handleDeliverToWalletClose = () => {
+  const handleRouteClick = () => {
+    setShowOptionsDrawer(false);
+    setShowPayWithWalletDrawer(false);
     setShowDeliverToWalletDrawer(false);
   };
 
@@ -155,49 +149,49 @@ export function Purchase({
           gap="base.spacing.x4"
         >
           <Stack gap="base.spacing.x3">
-            <SelectedWallet
+            {!fromProviderInfo && (
+            <PurchaseSelectedWallet
               label="Pay with"
               caption=""
-              providerInfo={{
-                ...fromProviderInfo,
-                address: fromAddress,
-              }}
+              size="small"
               onClick={(event) => {
                 event.stopPropagation();
                 setShowPayWithWalletDrawer(true);
               }}
-            >
-              {selectedToken && fromAddress && (
-              <>
-                <MenuItem.BottomSlot.Divider
-                  sx={fromAddress ? { ml: 'base.spacing.x4' } : undefined}
-                />
-                <SelectedRouteOption
-                  checkout={checkout}
-                  chains={chains}
-                  routeData={selectedRouteData}
-                  onClick={() => undefined}
-                  withSelectedWallet={!!fromAddress}
-                  insufficientBalance={false}
-                  showOnrampOption
-                />
-              </>
-              )}
+            />
+            )}
 
-            </SelectedWallet>
+            {fromAddress && (
+              <PurchaseSelectedRouteOption
+                checkout={checkout}
+                routeData={undefined} // TODO
+                chains={chains}
+                onClick={() => setShowOptionsDrawer(true)}
+                insufficientBalance={false} // TODO
+                showOnrampOption
+              />
+            )}
 
-            <SelectedWallet
-              label="Deliever to"
+            <PurchaseSelectedWallet
+              label="Deliver to"
               caption=""
+              size={toProviderInfo ? 'xSmall' : 'small'}
               providerInfo={{
                 ...toProviderInfo,
                 address: toAddress,
               }}
-              chainInfo={getChainInfo()}
               onClick={() => setShowDeliverToWalletDrawer(true)}
               disabled={lockedToProvider}
             />
           </Stack>
+          <RouteOptionsDrawer
+            checkout={checkout}
+            routes={[]}
+            visible={showOptionsDrawer}
+            onClose={() => setShowOptionsDrawer(false)}
+            onCardClick={() => undefined}
+            onRouteClick={handleRouteClick}
+          />
           <Button
             testId="add-tokens-button"
             size="large"
@@ -213,14 +207,15 @@ export function Purchase({
 
         </Stack>
       </Stack>
-      <PayWithWalletDrawer
+
+      <PurchasePayWithWalletDrawer
         visible={showPayWithWalletDrawer}
         walletOptions={walletOptions}
         onClose={() => setShowPayWithWalletDrawer(false)}
         onPayWithCard={() => undefined}
         onConnect={() => undefined}
       />
-      <DeliverToWalletDrawer
+      <PurchaseDeliverToWalletDrawer
         visible={showDeliverToWalletDrawer}
         walletOptions={walletOptions}
         onClose={handleDeliverToWalletClose}
