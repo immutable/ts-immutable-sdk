@@ -1,6 +1,9 @@
 import { Checkout, PurchaseEventType, PurchaseItem, WidgetLanguage, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { useEffect, useMemo } from 'react';
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
+import { passport } from "../../../utils/passport";
+import { Environment } from '@imtbl/config';
+
 
 const PURCHASE_WIDGET_ID = 'purchase';
 
@@ -48,7 +51,17 @@ const defaultItems: PurchaseItem[] = [
 ];
 
 export default function PurchaseUI() {
-  const checkout = useMemo(() => new Checkout(), []);
+   const checkout = useMemo(
+    () =>
+      new Checkout({
+        baseConfig: {
+          environment: Environment.PRODUCTION,
+        },
+        passport,
+      }),
+    []
+  );
+
   const factory = useMemo(() => new WidgetsFactory(checkout, { theme: WidgetTheme.DARK }), [checkout]);
   const purchase = useMemo(() => factory.create(WidgetType.PURCHASE), [factory]);
 
