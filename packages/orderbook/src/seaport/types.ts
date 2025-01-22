@@ -1,6 +1,10 @@
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
 import { ItemType } from './constants';
 
+// Importing types from seaport-js using a relative path (e.g. @opensea/seaport-js/lib/constants)
+// can cause issues for consumers of the SDK, e.g: https://github.com/immutable/ts-immutable-sdk/issues/2472.
+// To avoid this issue, we've extracted some of the accessible types below, and duplicated others.
+
 type ElementType<T> = T extends (infer U)[] ? U : never;
 
 export type DefaultReturnType<R> = R extends Array<any> ? R[0] : R;

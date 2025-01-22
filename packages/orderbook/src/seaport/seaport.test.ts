@@ -16,7 +16,8 @@ import {
 import { ProtocolData, Order, OrderStatusName } from '../openapi/sdk';
 import {
   EIP_712_ORDER_TYPE,
-  ItemType, OrderType,
+  ItemType,
+  OrderType,
   SEAPORT_CONTRACT_NAME,
   SEAPORT_CONTRACT_VERSION_V1_5,
 } from './constants';

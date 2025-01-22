@@ -34,10 +34,12 @@ import { mapImmutableOrderToSeaportOrderComponents } from './map-to-seaport-orde
 import { SeaportLibFactory } from './seaport-lib-factory';
 import { prepareTransaction } from './transaction';
 import {
-  ApprovalAction, ConsiderationInputItem,
+  ApprovalAction,
+  ConsiderationInputItem,
   CreateBulkOrdersAction,
   CreateBulkOrdersReturnType,
-  CreateInputItem, CreateOrderAction,
+  CreateInputItem,
+  CreateOrderAction,
   CreateOrderReturnType,
   FulfillmentOrderDetails,
   InputCriteria,
