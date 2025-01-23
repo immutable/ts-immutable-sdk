@@ -129,7 +129,7 @@ export default function PurchaseWidget({
         chains: fetchChains(squid.squid),
       },
     });
-  }, [squid]);
+  }, [squid.squid]);
 
   useEffect(() => {
     purchaseDispatch({
