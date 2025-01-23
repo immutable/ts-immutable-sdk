@@ -72,9 +72,10 @@ export function Purchase({
   const [selectedDirectCryptoPayRoute, setSelectedDirectCryptoPayRoute] = useState<DirectCryptoPayData | undefined>(undefined);
   const {
     purchaseState: {
-      squid: { squid, chains, tokens },
+      squid: { squid, tokens },
       items,
       quote,
+      chains,
     },
   } = useContext(PurchaseContext);
 

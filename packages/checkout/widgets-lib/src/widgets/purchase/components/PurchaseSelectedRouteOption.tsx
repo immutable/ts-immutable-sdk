@@ -15,10 +15,12 @@ import { useTranslation } from 'react-i18next';
 import { getRouteAndTokenBalances } from '../../../lib/squid/functions/getRouteAndTokenBalances';
 import { Chain, RouteData } from '../../../lib/squid/types';
 import { getRemoteVideo } from '../../../lib/utils';
+import { DirectCryptoPayData } from '../types';
+import { getRouteAndTokenBalancesForDirectCryptoPay } from '../functions/getRouteAndBalancesForDirectCryptoPay';
 
 interface PurchaseSelectedRouteOptionProps {
   checkout: Checkout;
-  routeData?: RouteData;
+  routeData?: RouteData | DirectCryptoPayData;
   chains: Chain[] | null;
   onClick: MouseEventHandler<HTMLSpanElement>;
   loading?: boolean;
@@ -40,8 +42,16 @@ export function PurchaseSelectedRouteOption({
   const { fromToken } = routeData?.amountData ?? {};
   const chain = chains?.find((c) => c.id === fromToken?.chainId);
 
+  let chainNativeCurrencySymbol = '';
   const { routeBalanceUsd } = useMemo(
-    () => getRouteAndTokenBalances(routeData),
+    () => {
+      if (!routeData || !('route' in routeData)) {
+        chainNativeCurrencySymbol = chain?.nativeCurrency.symbol || '';
+        return getRouteAndTokenBalancesForDirectCryptoPay(routeData);
+      }
+      chainNativeCurrencySymbol = routeData.route.route.estimate.gasCosts[0].token.symbol;
+      return getRouteAndTokenBalances(routeData);
+    },
     [routeData],
   );
 
@@ -159,8 +169,7 @@ export function PurchaseSelectedRouteOption({
           <br />
           <span style={{ color: '#FF637F' }}>
             {t('views.PURCHASE.noGasRouteMessage', {
-              token:
-              routeData.route.route.estimate.gasCosts[0].token.symbol,
+              token: chainNativeCurrencySymbol,
             })}
           </span>
         </>

@@ -123,7 +123,6 @@ export default function PurchaseWidget({
 
   useEffect(() => {
     if (!squid.squid) return;
-
     purchaseDispatch({
       payload: {
         type: PurchaseActions.SET_CHAINS,
