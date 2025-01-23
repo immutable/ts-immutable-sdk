@@ -112,7 +112,6 @@ export default function PurchaseWidget({
 
   useEffect(() => {
     if (!squidSdk) return;
-
     purchaseDispatch({
       payload: {
         type: PurchaseActions.SET_SQUID,
@@ -123,9 +122,10 @@ export default function PurchaseWidget({
 
   useEffect(() => {
     if (!squid.squid) return;
+
     purchaseDispatch({
       payload: {
-        type: PurchaseActions.SET_CHAINS,
+        type: PurchaseActions.SET_SQUID_CHAINS,
         chains: fetchChains(squid.squid),
       },
     });

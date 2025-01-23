@@ -44,7 +44,6 @@ type ActionPayload =
   | SetSquid
   | SetItems
   | SetSelectedToken
-  | SetChains
   | SetSelectedRouteData
   | SetSquidChains
   | SetSquidTokens
@@ -58,7 +57,6 @@ export enum PurchaseActions {
   SET_SQUID_TOKENS = 'SET_SQUID_TOKENS',
   SET_ITEMS = 'SET_ITEMS',
   SET_SELECTED_TOKEN = 'SET_SELECTED_TOKEN',
-  SET_CHAINS = 'SET_CHAINS',
   SET_SELECTED_ROUTE_DATA = 'SET_SELECTED_ROUTE_DATA',
   SET_QUOTE = 'SET_QUOTE',
 }
@@ -91,11 +89,6 @@ export interface SetItems {
 export interface SetSelectedToken {
   type: PurchaseActions.SET_SELECTED_TOKEN;
   selectedToken: TokenInfo;
-}
-
-export interface SetChains {
-  type: PurchaseActions.SET_CHAINS;
-  chains: Chain[];
 }
 
 export interface SetSelectedRouteData {
@@ -160,11 +153,6 @@ export const purchaseReducer: Reducer<PurchaseState, PurchaseAction> = (
       return {
         ...state,
         selectedToken: action.payload.selectedToken,
-      };
-    case PurchaseActions.SET_CHAINS:
-      return {
-        ...state,
-        chains: action.payload.chains,
       };
     case PurchaseActions.SET_SELECTED_ROUTE_DATA:
       return {
