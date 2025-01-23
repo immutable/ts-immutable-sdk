@@ -1,11 +1,11 @@
-import { ItemType, OrderType } from '@opensea/seaport-js/lib/constants';
+import { BigNumber } from 'ethers';
 import type {
   ConsiderationItem,
   OfferItem,
   OrderComponents,
-} from '@opensea/seaport-js/lib/types';
-import { BigNumber } from 'ethers';
+} from './types';
 import { getBulkOrderTree } from './lib/bulk-orders';
+import { ItemType, OrderType } from './constants';
 
 function orderTypeStringToEnum(orderTypeString: string): OrderType {
   if (

@@ -22,6 +22,8 @@ import { useSquid } from '../../lib/squid/hooks/useSquid';
 import { useTokens } from '../../lib/squid/hooks/useTokens';
 import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
 import { fetchChains } from '../../lib/squid/functions/fetchChains';
+import { useQuoteOrder } from '../../lib/hooks/useQuoteOrder';
+import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 
 export type PurchaseWidgetInputs = PurchaseWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
@@ -69,7 +71,10 @@ export default function PurchaseWidget({
   } = useContext(EventTargetContext);
 
   const {
-    providersState: { checkout },
+    providersState: {
+      checkout,
+      toAddress,
+    },
   } = useProvidersContext();
 
   const { squid: { squid } } = purchaseState;
@@ -123,44 +128,73 @@ export default function PurchaseWidget({
     [items],
   );
 
+  const { fetchOrderQuote } = useQuoteOrder({
+    environment: checkout.config.environment,
+    environmentId,
+  });
+
+  useEffect(() => {
+    if (!items || items.length === 0) return;
+
+    (async () => {
+      try {
+        const quoteResponse = await fetchOrderQuote(items, toAddress);
+
+        if (!quoteResponse) return;
+
+        purchaseDispatch({
+          payload: {
+            type: PurchaseActions.SET_QUOTE,
+            quote: quoteResponse,
+          },
+        });
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error fetching order quote', error);
+      }
+    })();
+  }, [items, toAddress]);
+
   return (
     <ViewContext.Provider value={viewReducerValues}>
       <PurchaseContext.Provider value={purchaseReducerValues}>
-        <Stack sx={{ pos: 'relative' }}>
-          <CloudImage
-            use={(
-              <img
-                src={getRemoteImage(
-                  config.environment,
-                  `/add-tokens-bg-texture-${colorMode}.webp`,
-                )}
-                alt="background texture"
-              />
-            )}
-            sx={{
-              pos: 'absolute',
-              h: '100%',
-              w: '100%',
-              objectFit: 'cover',
-              objectPosition: 'center',
-            }}
-          />
-          {viewState.view.type === PurchaseWidgetViews.PURCHASE && (
-            <Purchase
-              checkout={checkout}
-              environmentId={environmentId!}
-              showBackButton={showBackButton}
-              onCloseButtonClick={() => sendPurchaseCloseEvent(eventTarget)}
-              onBackButtonClick={() => {
-                orchestrationEvents.sendRequestGoBackEvent(
-                  eventTarget,
-                  IMTBLWidgetEvents.IMTBL_PURCHASE_WIDGET_EVENT,
-                  {},
-                );
+        <CryptoFiatProvider environment={checkout.config.environment}>
+          <Stack sx={{ pos: 'relative' }}>
+            <CloudImage
+              use={(
+                <img
+                  src={getRemoteImage(
+                    config.environment,
+                    `/add-tokens-bg-texture-${colorMode}.webp`,
+                  )}
+                  alt="background texture"
+                />
+              )}
+              sx={{
+                pos: 'absolute',
+                h: '100%',
+                w: '100%',
+                objectFit: 'cover',
+                objectPosition: 'center',
               }}
             />
-          )}
-        </Stack>
+            {viewState.view.type === PurchaseWidgetViews.PURCHASE && (
+              <Purchase
+                checkout={checkout}
+                environmentId={environmentId!}
+                showBackButton={showBackButton}
+                onCloseButtonClick={() => sendPurchaseCloseEvent(eventTarget)}
+                onBackButtonClick={() => {
+                  orchestrationEvents.sendRequestGoBackEvent(
+                    eventTarget,
+                    IMTBLWidgetEvents.IMTBL_PURCHASE_WIDGET_EVENT,
+                    {},
+                  );
+                }}
+              />
+            )}
+          </Stack>
+        </CryptoFiatProvider>
       </PurchaseContext.Provider>
     </ViewContext.Provider>
   );
