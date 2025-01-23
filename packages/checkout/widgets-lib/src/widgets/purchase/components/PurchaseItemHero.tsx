@@ -7,12 +7,11 @@ import { CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFi
 import { PurchaseContext } from '../context/PurchaseContext';
 import { calculateCryptoToFiat } from '../../../lib/utils';
 
-interface StickerDisplayProps {
+interface PurchaseItemHeroProps {
   items: PurchaseItem[];
-  totalQty: number;
 }
 
-export function PurchaseItemHero({ items, totalQty }: StickerDisplayProps) {
+export function PurchaseItemHero({ items }: PurchaseItemHeroProps) {
   const { purchaseState: { quote } } = useContext(PurchaseContext);
   const { cryptoFiatState: { conversions } } = useContext(CryptoFiatContext);
 
@@ -20,6 +19,8 @@ export function PurchaseItemHero({ items, totalQty }: StickerDisplayProps) {
   const [fiatPrice, setFiatPrice] = useState<string | undefined>(undefined);
 
   const item = items[0] ?? null;
+
+  const totalQty = items?.reduce((sum, purchaseItem: PurchaseItem) => sum + purchaseItem.qty, 0) || 0;
 
   useEffect(() => {
     if (!quote?.totalCurrencyAmount || !conversions) return;

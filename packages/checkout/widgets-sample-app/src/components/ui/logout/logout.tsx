@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { passport } from "./passport";
+import { passport } from "../../../utils/passport";
 
 
 export function AddTokensPassportLogout() {

@@ -884,7 +884,7 @@
       },
       "walletSelection": {
         "from":{
-          "label": "Send from",
+          "label": "Pay with",
           "caption": "Choose a wallet to bridge or swap from"
         },
         "to": {
@@ -1069,7 +1069,7 @@
       "fees": {
         "fee": "Fee",
         "balance": "Balance",
-        "fiatPricePrefix": "≈ USD",
+        "fiatPricePrefix": "$",
         "zeroFees": "Zero fees",
         "includedFees": "Fees"
       },

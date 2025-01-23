@@ -1,56 +1,47 @@
-import {
-  ButtCon, Button, MenuItem, Stack,
-} from '@biom3/react';
-import {
-  ChainId,
-  Checkout,
-  EIP6963ProviderInfo,
-  PurchaseItem,
-  WalletProviderRdns,
-} from '@imtbl/checkout-sdk';
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
-import { Web3Provider } from '@ethersproject/providers';
 import { ChainType } from '@0xsquid/squid-types';
+import {
+  Stack, ButtCon, Button,
+} from '@biom3/react';
+import { Web3Provider } from '@ethersproject/providers';
+import {
+  Checkout, WalletProviderRdns, EIP6963ProviderInfo, ChainId,
+} from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
-import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import { t } from 'i18next';
+import {
+  useContext, useState, useMemo, useEffect, useCallback,
+} from 'react';
+import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { PurchaseContext } from '../context/PurchaseContext';
-import { PurchaseItemHero } from '../components/PurchaseItemHero';
-import { DeliverToWalletDrawer } from '../../../components/WalletDrawer/DeliverToWalletDrawer';
-import { SelectedWallet } from '../../../components/SelectedWallet/SelectedWallet';
-import { SquidFooter } from '../../../lib/squid/components/SquidFooter';
-import { RouteOptionsDrawer } from '../components/RouteOptionsDrawer/RouteOptionsDrawer';
-import { PayWithWalletDrawer } from '../../../components/WalletDrawer/PayWithWalletDrawer';
-import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
-import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
-import { getProviderSlugFromRdns } from '../../../lib/provider/utils';
-import { sendConnectProviderSuccessEvent } from '../../add-tokens/AddTokensWidgetEvents';
+import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { CryptoFiatContext, CryptoFiatActions } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { RouteData } from '../../../lib/squid/types';
-import { useRoutes } from '../../../lib/squid/hooks/useRoutes';
-import { fetchBalances } from '../../../lib/squid/functions/fetchBalances';
-import { SelectedRouteOption } from '../components/SelectedRouteOption/SelectedRouteOption';
+import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { convertToNetworkChangeableProvider } from '../../../functions/convertToNetworkChangeableProvider';
+import { getDurationFormatted } from '../../../functions/getDurationFormatted';
+import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
+import { getProviderSlugFromRdns } from '../../../lib/provider';
+import { SquidFooter } from '../../../lib/squid/components/SquidFooter';
+import { fetchBalances } from '../../../lib/squid/functions/fetchBalances';
+import { findBalance } from '../../../lib/squid/functions/findBalance';
+import { findToken } from '../../../lib/squid/functions/findToken';
+import { getRouteChains } from '../../../lib/squid/functions/getRouteChains';
+import { verifyAndSwitchChain } from '../../../lib/squid/functions/verifyAndSwitchChain';
 import { useExecute } from '../../../lib/squid/hooks/useExecute';
+import { useRoutes } from '../../../lib/squid/hooks/useRoutes';
+import { RouteData } from '../../../lib/squid/types';
 import { useSignOrder } from '../../../lib/hooks/useSignOrder';
 import { SignPaymentTypes } from '../../../lib/primary-sales';
-import { verifyAndSwitchChain } from '../../../lib/squid/functions/verifyAndSwitchChain';
-import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
-import { sendPurchaseSuccessEvent } from '../PurchaseWidgetEvents';
-import { getRouteChains } from '../../../lib/squid/functions/getRouteChains';
-import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
+import { PurchaseDeliverToWalletDrawer } from '../components/PurchaseDeliverToWalletDrawer';
+import { PurchaseItemHero } from '../components/PurchaseItemHero';
+import { PurchasePayWithWalletDrawer } from '../components/PurchasePayWithWalletDrawer';
+import { RouteOptionsDrawer } from '../components/PurchaseRouteOptionsDrawer/RouteOptionsDrawer';
+import { PurchaseSelectedRouteOption } from '../components/PurchaseSelectedRouteOption';
+import { PurchaseSelectedWallet } from '../components/PurchaseSelectedWallet';
+import { PurchaseContext } from '../context/PurchaseContext';
+import { useHandoverConfig, PurchaseHandoverStep } from '../hooks/useHandoverConfig';
+import { sendConnectProviderSuccessEvent, sendPurchaseSuccessEvent } from '../PurchaseWidgetEvents';
 import { DirectCryptoPayData } from '../types';
-import { findToken } from '../../../lib/squid/functions/findToken';
-import { findBalance } from '../../../lib/squid/functions/findBalance';
-import { PurchaseHandoverStep, useHandoverConfig } from '../hooks/useHandoverConfig';
-import { getDurationFormatted } from '../../../functions/getDurationFormatted';
 
 interface PurchaseProps {
   checkout: Checkout;
@@ -67,6 +58,18 @@ export function Purchase({
   showBackButton,
   onBackButtonClick,
 }: PurchaseProps) {
+  const [showPayWithWalletDrawer, setShowPayWithWalletDrawer] = useState(false);
+  const [showDeliverToWalletDrawer, setShowDeliverToWalletDrawer] = useState(false);
+  const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
+  const [selectedRouteData, setSelectedRouteData] = useState<RouteData | undefined>(undefined);
+  const [fetchingRoutes, setFetchingRoutes] = useState(false);
+  const [isFundingNeeded, setIsFundingNeeded] = useState<boolean | undefined>(undefined);
+  const [insufficientBalance, setInsufficientBalance] = useState(false);
+  const [balances, setBalances] = useState<TokenBalance[]>([]);
+  const [routes, setRoutes] = useState<RouteData[]>([]);
+  const [directCryptoPayRoutes, setDirectCryptoPayRoutes] = useState<DirectCryptoPayData[]>([]);
+  // eslint-disable-next-line max-len
+  const [selectedDirectCryptoPayRoute, setSelectedDirectCryptoPayRoute] = useState<DirectCryptoPayData | undefined>(undefined);
   const {
     purchaseState: {
       squid: { squid, chains, tokens },
@@ -81,22 +84,6 @@ export function Purchase({
     fetchRoutes, getRoute, getFromAmountData, hasSufficientBalance,
   } = useRoutes();
 
-  const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
-  const [showPayWithDrawer, setShowPayWithDrawer] = useState(false);
-  const [showDeliverToDrawer, setShowDeliverToDrawer] = useState(false);
-
-  const [selectedRouteData, setSelectedRouteData] = useState<RouteData | undefined>(undefined);
-  const [fetchingRoutes, setFetchingRoutes] = useState(false);
-  const [isFundingNeeded, setIsFundingNeeded] = useState<boolean | undefined>(undefined);
-
-  const [insufficientBalance, setInsufficientBalance] = useState(false);
-
-  const [balances, setBalances] = useState<TokenBalance[]>([]);
-  const [routes, setRoutes] = useState<RouteData[]>([]);
-  const [directCryptoPayRoutes, setDirectCryptoPayRoutes] = useState<DirectCryptoPayData[]>([]);
-  // eslint-disable-next-line max-len
-  const [selectedDirectCryptoPayRoute, setSelectedDirectCryptoPayRoute] = useState<DirectCryptoPayData | undefined>(undefined);
-
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
@@ -108,6 +95,7 @@ export function Purchase({
       toProviderInfo,
       fromAddress,
       toAddress,
+      lockedToProvider,
     },
   } = useProvidersContext();
   const { providers } = useInjectedProviders({ checkout });
@@ -118,27 +106,6 @@ export function Purchase({
     // eslint-disable-next-line no-console
     console.log('useExecute err', err);
   });
-
-  const walletOptions = useMemo(
-    () => providers
-    // TODO: Check if must filter passport on L1
-      .map((detail) => {
-        if (detail.info.rdns === WalletProviderRdns.PASSPORT) {
-          return {
-            ...detail,
-            info: {
-              ...detail.info,
-              name: getProviderSlugFromRdns(detail.info.rdns).replace(
-                /^\w/,
-                (c) => c.toUpperCase(),
-              ),
-            },
-          };
-        }
-        return detail;
-      }),
-    [providers],
-  );
 
   const { showHandover } = useHandoverConfig(checkout.config.environment);
 
@@ -157,16 +124,16 @@ export function Purchase({
 
   const handleRouteClick = (route: RouteData) => {
     setShowOptionsDrawer(false);
-    setShowPayWithDrawer(false);
-    setShowDeliverToDrawer(false);
+    setShowPayWithWalletDrawer(false);
+    setShowDeliverToWalletDrawer(false);
     setSelectedRouteData(route);
     setSelectedDirectCryptoPayRoute(undefined);
   };
 
   const handleDirectCryptoPayClick = (route: DirectCryptoPayData) => {
     setShowOptionsDrawer(false);
-    setShowPayWithDrawer(false);
-    setShowDeliverToDrawer(false);
+    setShowPayWithWalletDrawer(false);
+    setShowDeliverToWalletDrawer(false);
     setSelectedRouteData(undefined);
     setSelectedDirectCryptoPayRoute(route);
   };
@@ -497,7 +464,29 @@ export function Purchase({
     && !loading
     && ((!!selectedRouteData && !selectedRouteData.isInsufficientGas) || (isFundingNeeded === false));
 
-  const totalQty = items?.reduce((sum, purchaseItem: PurchaseItem) => sum + purchaseItem.qty, 0) || 0;
+  const walletOptions = useMemo(
+    () => providers
+      .map((detail) => {
+        if (detail.info.rdns === WalletProviderRdns.PASSPORT) {
+          return {
+            ...detail,
+            info: {
+              ...detail.info,
+              name: getProviderSlugFromRdns(detail.info.rdns).replace(
+                /^\w/,
+                (c) => c.toUpperCase(),
+              ),
+            },
+          };
+        }
+        return detail;
+      }),
+    [providers],
+  );
+
+  const handleDeliverToWalletClose = () => {
+    setShowDeliverToWalletDrawer(false);
+  };
 
   return (
     <SimpleLayout
@@ -545,8 +534,9 @@ export function Purchase({
           justifyContent="center"
           alignItems="center"
         >
-          <PurchaseItemHero items={items} totalQty={totalQty} />
+          <PurchaseItemHero items={items} />
         </Stack>
+
         <Stack
           testId="bottomSection"
           sx={{
@@ -559,50 +549,43 @@ export function Purchase({
           }}
           gap="base.spacing.x4"
         >
-          <Stack gap="0px">
-            <SelectedWallet
-              label="Pay with"
-              providerInfo={{
-                ...fromProviderInfo,
-                address: fromAddress,
-              }}
+          <Stack gap="base.spacing.x3">
+            {!fromProviderInfo && (
+            <PurchaseSelectedWallet
+              label={t('views.PURCHASE.walletSelection.from.label')}
+              size="small"
               onClick={(event) => {
                 event.stopPropagation();
-                setShowPayWithDrawer(true);
+                setShowPayWithWalletDrawer(true);
               }}
-            >
-              {fromAddress && (
-              <>
-                <MenuItem.BottomSlot.Divider
-                  sx={fromAddress ? { ml: 'base.spacing.x4' } : undefined}
-                />
-                <SelectedRouteOption
-                  checkout={checkout}
-                  loading={loading}
-                  chains={chains}
-                  routeData={selectedRouteData || (selectedDirectCryptoPayRoute || undefined)}
-                  onClick={() => setShowOptionsDrawer(true)}
-                  withSelectedWallet={!!fromAddress}
-                  insufficientBalance={insufficientBalance}
-                  directCryptoPay={!isFundingNeeded}
-                  showOnrampOption={shouldShowOnRampOption}
-                />
-              </>
-              )}
-            </SelectedWallet>
+            />
+            )}
 
-            <SelectedWallet
-              label="Deliver to"
+            {fromAddress && (
+              <PurchaseSelectedRouteOption
+                checkout={checkout}
+                routeData={undefined} // TODO
+                chains={chains}
+                onClick={() => setShowOptionsDrawer(true)}
+                insufficientBalance={false} // TODO
+                showOnrampOption={shouldShowOnRampOption}
+              />
+            )}
+
+            <PurchaseSelectedWallet
+              label={t('views.PURCHASE.walletSelection.to.label')}
+              size={toProviderInfo ? 'xSmall' : 'small'}
               providerInfo={{
                 ...toProviderInfo,
                 address: toAddress,
               }}
-              onClick={() => setShowDeliverToDrawer(true)}
+              onClick={() => setShowDeliverToWalletDrawer(true)}
+              disabled={lockedToProvider}
             />
           </Stack>
 
           <Button
-            testId="add-tokens-button"
+            testId="purchase-proceed-button"
             size="large"
             variant={readyToProceed ? 'primary' : 'secondary'}
             disabled={!readyToProceed}
@@ -614,39 +597,40 @@ export function Purchase({
 
           <SquidFooter />
 
-          <PayWithWalletDrawer
-            visible={showPayWithDrawer}
-            walletOptions={walletOptions}
-            onClose={() => setShowPayWithDrawer(false)}
-            onPayWithCard={() => false}
-            onConnect={handleWalletConnected}
-            insufficientBalance={insufficientBalance}
-            showOnRampOption={shouldShowOnRampOption}
-          />
-          <RouteOptionsDrawer
-            checkout={checkout}
-            routes={routes}
-            chains={chains}
-            showSwapOption={showSwapOption}
-            showBridgeOption={showBridgeOption}
-            showDirectCryptoPayOption
-            visible={showOptionsDrawer}
-            onClose={() => setShowOptionsDrawer(false)}
-            onCardClick={() => false}
-            onRouteClick={handleRouteClick}
-            onDirectCryptoPayClick={handleDirectCryptoPayClick}
-            insufficientBalance={insufficientBalance}
-            directCryptoPay={!isFundingNeeded}
-            directCryptoPayRoutes={directCryptoPayRoutes}
-          />
-          <DeliverToWalletDrawer
-            visible={showDeliverToDrawer}
-            walletOptions={walletOptions}
-            onClose={() => setShowDeliverToDrawer(false)}
-            onConnect={handleWalletConnected}
-          />
         </Stack>
       </Stack>
+
+      <PurchasePayWithWalletDrawer
+        visible={showPayWithWalletDrawer}
+        walletOptions={walletOptions}
+        onClose={() => setShowPayWithWalletDrawer(false)}
+        onPayWithCard={() => false}
+        onConnect={handleWalletConnected}
+        insufficientBalance={insufficientBalance}
+        showOnRampOption={shouldShowOnRampOption}
+      />
+      <PurchaseDeliverToWalletDrawer
+        visible={showDeliverToWalletDrawer}
+        walletOptions={walletOptions}
+        onClose={handleDeliverToWalletClose}
+        onConnect={() => undefined}
+      />
+      <RouteOptionsDrawer
+        checkout={checkout}
+        routes={routes}
+        chains={chains}
+        showSwapOption={showSwapOption}
+        showBridgeOption={showBridgeOption}
+        showDirectCryptoPayOption
+        visible={showOptionsDrawer}
+        onClose={() => setShowOptionsDrawer(false)}
+        onCardClick={() => false}
+        onRouteClick={handleRouteClick}
+        onDirectCryptoPayClick={handleDirectCryptoPayClick}
+        insufficientBalance={insufficientBalance}
+        directCryptoPay={!isFundingNeeded}
+        directCryptoPayRoutes={directCryptoPayRoutes}
+      />
     </SimpleLayout>
   );
 }

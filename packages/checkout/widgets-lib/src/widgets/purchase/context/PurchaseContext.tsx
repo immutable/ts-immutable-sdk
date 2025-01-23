@@ -1,26 +1,34 @@
 import { Squid } from '@0xsquid/sdk';
-import { PurchaseItem } from '@imtbl/checkout-sdk';
+import { PurchaseItem, TokenInfo } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
-import { Chain, Token } from '../../../lib/squid/types';
+import { Chain, Token, RouteData } from '../../../lib/squid/types';
 import { OrderQuoteResponse } from '../../../lib/primary-sales';
 
 export interface PurchaseState {
+  id: string;
   squid: {
     squid: Squid | null;
     chains: Chain[] | null;
     tokens: Token[] | null;
   };
   items: PurchaseItem[];
+  selectedToken: TokenInfo | undefined;
+  chains: Chain[] | null;
+  selectedRouteData: RouteData | undefined;
   quote: OrderQuoteResponse | null;
 }
 
 export const initialPurchaseState: PurchaseState = {
+  id: '',
   squid: {
     squid: null,
     chains: null,
     tokens: null,
   },
   items: [],
+  selectedToken: undefined,
+  chains: null,
+  selectedRouteData: undefined,
   quote: null,
 };
 
@@ -34,18 +42,32 @@ export interface PurchaseAction {
 }
 
 type ActionPayload =
+  | SetId
   | SetSquid
+  | SetItems
+  | SetSelectedToken
+  | SetChains
+  | SetSelectedRouteData
   | SetSquidChains
   | SetSquidTokens
   | SetItems
   | SetQuote;
 
 export enum PurchaseActions {
+  SET_ID = 'SET_ID',
   SET_SQUID = 'SET_SQUID',
   SET_SQUID_CHAINS = 'SET_SQUID_CHAINS',
   SET_SQUID_TOKENS = 'SET_SQUID_TOKENS',
   SET_ITEMS = 'SET_ITEMS',
+  SET_SELECTED_TOKEN = 'SET_SELECTED_TOKEN',
+  SET_CHAINS = 'SET_CHAINS',
+  SET_SELECTED_ROUTE_DATA = 'SET_SELECTED_ROUTE_DATA',
   SET_QUOTE = 'SET_QUOTE',
+}
+
+export interface SetId {
+  type: PurchaseActions.SET_ID;
+  id: string;
 }
 
 export interface SetSquid {
@@ -68,6 +90,20 @@ export interface SetItems {
   items: PurchaseItem[];
 }
 
+export interface SetSelectedToken {
+  type: PurchaseActions.SET_SELECTED_TOKEN;
+  selectedToken: TokenInfo;
+}
+
+export interface SetChains {
+  type: PurchaseActions.SET_CHAINS;
+  chains: Chain[];
+}
+
+export interface SetSelectedRouteData {
+  type: PurchaseActions.SET_SELECTED_ROUTE_DATA;
+  selectedRouteData: RouteData;
+}
 export interface SetQuote {
   type: PurchaseActions.SET_QUOTE;
   quote: OrderQuoteResponse;
@@ -88,6 +124,11 @@ export const purchaseReducer: Reducer<PurchaseState, PurchaseAction> = (
   action: PurchaseAction,
 ) => {
   switch (action.payload.type) {
+    case PurchaseActions.SET_ID:
+      return {
+        ...state,
+        id: action.payload.id,
+      };
     case PurchaseActions.SET_SQUID:
       return {
         ...state,
@@ -116,6 +157,21 @@ export const purchaseReducer: Reducer<PurchaseState, PurchaseAction> = (
       return {
         ...state,
         items: action.payload.items,
+      };
+    case PurchaseActions.SET_SELECTED_TOKEN:
+      return {
+        ...state,
+        selectedToken: action.payload.selectedToken,
+      };
+    case PurchaseActions.SET_CHAINS:
+      return {
+        ...state,
+        chains: action.payload.chains,
+      };
+    case PurchaseActions.SET_SELECTED_ROUTE_DATA:
+      return {
+        ...state,
+        selectedRouteData: action.payload.selectedRouteData,
       };
     case PurchaseActions.SET_QUOTE:
       return {
