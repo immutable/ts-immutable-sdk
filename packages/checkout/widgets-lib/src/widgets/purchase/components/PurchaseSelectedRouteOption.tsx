@@ -151,9 +151,9 @@ export function PurchaseSelectedRouteOption({
         {fromToken?.name}
       </MenuItem.Label>
       <MenuItem.Caption>
-        {`${t('views.ADD_TOKENS.fees.balance')} ${t(
-          'views.ADD_TOKENS.fees.fiatPricePrefix',
-        )} $${routeBalanceUsd}`}
+        {`${t('views.PURCHASE.fees.balance')} ${t(
+          'views.PURCHASE.fees.fiatPricePrefix',
+        )}${routeBalanceUsd}`}
         {routeData?.isInsufficientGas && (
         <>
           <br />
