@@ -10,9 +10,9 @@ import { useAnalytics, UserJourney } from '../../../../context/analytics-provide
 import { useProvidersContext } from '../../../../context/providers-context/ProvidersContext';
 import { listVariants } from '../../../../lib/animation/listAnimation';
 import { Chain, RouteData } from '../../../../lib/squid/types';
-import { AddTokensContext } from '../../../add-tokens/context/AddTokensContext';
 import { DirectCryptoPayData, FiatOptionType } from '../../types';
 import { RouteOptions } from './RouteOptions';
+import { PurchaseContext } from '../../context/PurchaseContext';
 
 type OptionsDrawerProps = {
   checkout: Checkout;
@@ -55,8 +55,8 @@ export function RouteOptionsDrawer({
   const { track } = useAnalytics();
 
   const {
-    addTokensState: { id },
-  } = useContext(AddTokensContext);
+    purchaseState: { id },
+  } = useContext(PurchaseContext);
 
   const {
     providersState: { fromProviderInfo, fromAddress },

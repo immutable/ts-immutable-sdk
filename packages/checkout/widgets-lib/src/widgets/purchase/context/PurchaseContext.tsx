@@ -5,6 +5,7 @@ import { Chain, Token, RouteData } from '../../../lib/squid/types';
 import { OrderQuoteResponse } from '../../../lib/primary-sales';
 
 export interface PurchaseState {
+  id: string;
   squid: {
     squid: Squid | null;
     chains: Chain[] | null;
@@ -18,6 +19,7 @@ export interface PurchaseState {
 }
 
 export const initialPurchaseState: PurchaseState = {
+  id: '',
   squid: {
     squid: null,
     chains: null,
@@ -40,6 +42,7 @@ export interface PurchaseAction {
 }
 
 type ActionPayload =
+  | SetId
   | SetSquid
   | SetItems
   | SetSelectedToken
@@ -51,6 +54,7 @@ type ActionPayload =
   | SetQuote;
 
 export enum PurchaseActions {
+  SET_ID = 'SET_ID',
   SET_SQUID = 'SET_SQUID',
   SET_SQUID_CHAINS = 'SET_SQUID_CHAINS',
   SET_SQUID_TOKENS = 'SET_SQUID_TOKENS',
@@ -59,6 +63,11 @@ export enum PurchaseActions {
   SET_CHAINS = 'SET_CHAINS',
   SET_SELECTED_ROUTE_DATA = 'SET_SELECTED_ROUTE_DATA',
   SET_QUOTE = 'SET_QUOTE',
+}
+
+export interface SetId {
+  type: PurchaseActions.SET_ID;
+  id: string;
 }
 
 export interface SetSquid {
@@ -115,6 +124,11 @@ export const purchaseReducer: Reducer<PurchaseState, PurchaseAction> = (
   action: PurchaseAction,
 ) => {
   switch (action.payload.type) {
+    case PurchaseActions.SET_ID:
+      return {
+        ...state,
+        id: action.payload.id,
+      };
     case PurchaseActions.SET_SQUID:
       return {
         ...state,

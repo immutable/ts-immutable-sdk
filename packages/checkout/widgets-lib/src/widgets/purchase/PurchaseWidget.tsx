@@ -3,6 +3,7 @@ import { CloudImage, Stack, useTheme } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useReducer,
 } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
   initialPurchaseState, PurchaseActions, PurchaseContext, purchaseReducer,
@@ -130,6 +131,15 @@ export default function PurchaseWidget({
       },
     });
   }, [squid]);
+
+  useEffect(() => {
+    purchaseDispatch({
+      payload: {
+        type: PurchaseActions.SET_ID,
+        id: uuidv4(),
+      },
+    });
+  }, []);
 
   useEffect(() => {
     if (!items || items.length === 0) return;
