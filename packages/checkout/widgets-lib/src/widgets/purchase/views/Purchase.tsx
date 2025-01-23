@@ -564,10 +564,13 @@ export function Purchase({
             {fromAddress && (
               <PurchaseSelectedRouteOption
                 checkout={checkout}
-                routeData={undefined} // TODO
+                loading={loading}
                 chains={chains}
+                routeData={selectedRouteData || (selectedDirectCryptoPayRoute || undefined)}
                 onClick={() => setShowOptionsDrawer(true)}
-                insufficientBalance={false} // TODO
+                withSelectedWallet={!!fromAddress}
+                insufficientBalance={insufficientBalance}
+                directCryptoPay={!isFundingNeeded}
                 showOnrampOption={shouldShowOnRampOption}
               />
             )}
