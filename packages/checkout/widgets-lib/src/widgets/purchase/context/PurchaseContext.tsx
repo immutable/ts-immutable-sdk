@@ -13,7 +13,6 @@ export interface PurchaseState {
   };
   items: PurchaseItem[];
   selectedToken: TokenInfo | undefined;
-  chains: Chain[] | null;
   selectedRouteData: RouteData | undefined;
   quote: OrderQuoteResponse | null;
 }
@@ -27,7 +26,6 @@ export const initialPurchaseState: PurchaseState = {
   },
   items: [],
   selectedToken: undefined,
-  chains: null,
   selectedRouteData: undefined,
   quote: null,
 };
