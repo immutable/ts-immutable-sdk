@@ -15,8 +15,8 @@ import { useTranslation } from 'react-i18next';
 import { getRouteAndTokenBalances } from '../../../lib/squid/functions/getRouteAndTokenBalances';
 import { Chain, RouteData } from '../../../lib/squid/types';
 import { getRemoteVideo } from '../../../lib/utils';
-import { DirectCryptoPayData } from '../types';
 import { getRouteAndTokenBalancesForDirectCryptoPay } from '../functions/getRouteAndBalancesForDirectCryptoPay';
+import { DirectCryptoPayData } from '../types';
 
 interface PurchaseSelectedRouteOptionProps {
   checkout: Checkout;
@@ -25,6 +25,7 @@ interface PurchaseSelectedRouteOptionProps {
   onClick: MouseEventHandler<HTMLSpanElement>;
   loading?: boolean;
   insufficientBalance?: boolean;
+  directCryptoPay?: boolean;
   showOnrampOption?: boolean;
 }
 
@@ -34,6 +35,7 @@ export function PurchaseSelectedRouteOption({
   chains,
   loading = false,
   insufficientBalance = false,
+  directCryptoPay = false,
   showOnrampOption = false,
   onClick,
 }: PurchaseSelectedRouteOptionProps) {
@@ -43,11 +45,14 @@ export function PurchaseSelectedRouteOption({
   const chain = chains?.find((c) => c.id === fromToken?.chainId);
 
   let chainNativeCurrencySymbol = '';
-  const { routeBalanceUsd } = useMemo(
+  const { routeBalanceUsd, fromAmount, fromAmountUsd } = useMemo(
     () => {
       if (!routeData || !('route' in routeData)) {
-        chainNativeCurrencySymbol = chain?.nativeCurrency.symbol || '';
-        return getRouteAndTokenBalancesForDirectCryptoPay(routeData);
+        if (directCryptoPay) {
+          chainNativeCurrencySymbol = chain?.nativeCurrency.symbol || '';
+          return getRouteAndTokenBalancesForDirectCryptoPay(routeData);
+        }
+        return { routeBalanceUsd: '0', fromAmount: '0', fromAmountUsd: '0' };
       }
       chainNativeCurrencySymbol = routeData.route.route.estimate.gasCosts[0].token.symbol;
       return getRouteAndTokenBalances(routeData);
@@ -117,6 +122,7 @@ export function PurchaseSelectedRouteOption({
           py: 'base.spacing.x4',
         }}
         onClick={handleOnClick}
+        // selected={withSelectedWallet}
       >
         <MenuItem.FramedIcon
           icon={icon}
@@ -175,6 +181,11 @@ export function PurchaseSelectedRouteOption({
         </>
         )}
       </MenuItem.Caption>
+      <MenuItem.PriceDisplay price={fromAmount}>
+        <MenuItem.PriceDisplay.Caption>
+          {`${t('views.PURCHASE.fees.fiatPricePrefix')} $${fromAmountUsd}`}
+        </MenuItem.PriceDisplay.Caption>
+      </MenuItem.PriceDisplay>
     </MenuItem>
   );
 }

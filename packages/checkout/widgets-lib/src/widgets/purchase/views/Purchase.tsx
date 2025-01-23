@@ -569,7 +569,6 @@ export function Purchase({
                 chains={chains}
                 routeData={selectedRouteData || (selectedDirectCryptoPayRoute || undefined)}
                 onClick={() => setShowOptionsDrawer(true)}
-                withSelectedWallet={!!fromAddress}
                 insufficientBalance={insufficientBalance}
                 directCryptoPay={!isFundingNeeded}
                 showOnrampOption={shouldShowOnRampOption}
