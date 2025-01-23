@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { useCallback, useState } from 'react';
-import { SaleItem } from '@imtbl/checkout-sdk';
+import { PurchaseItem } from '@imtbl/checkout-sdk';
 
 import { ChainType, EvmContractCall, SquidCallType } from '@0xsquid/squid-types';
 import { ethers } from 'ethers';
@@ -28,7 +28,7 @@ import { filterAllowedTransactions, hexToText } from '../utils';
 const toSignedProduct = (
   product: SignApiProduct,
   currency: string,
-  item?: SaleItem,
+  item?: PurchaseItem,
 ): SignedOrderProduct => ({
   productId: product.product_id,
   image: item?.image || '',
@@ -44,7 +44,7 @@ const toSignedProduct = (
 
 const toSignResponse = (
   signApiResponse: SignApiResponse,
-  items: SaleItem[],
+  items: PurchaseItem[],
 ): SignResponse => {
   const { order, transactions } = signApiResponse;
 
@@ -372,9 +372,6 @@ export const useSignOrder = (input: SignOrderInput) => {
           })),
           custom_data: customOrderData,
         };
-
-        // eslint-disable-next-line no-console
-        console.log('data', data);
 
         const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/order/sign`;
         const apiResponse = await signAPI(baseUrl, data);

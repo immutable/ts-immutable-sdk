@@ -1015,31 +1015,29 @@
       },
       "handover": {
         "preparing": {
-          "heading": "Preparing"
+          "heading": "Preparing order"
         },
         "requestingApproval": {
-          "heading": "Waiting for access approval in your wallet",
-          "subHeading": "Approve the transaction request to complete this transaction"
+          "heading": "Waiting for wallet approval for token access"
         },
         "approved": {
-          "heading": "Granted access to your tokens"
+          "heading": "Tokens ready for item purchase"
         },
         "requestingExecution": {
-          "heading": "Waiting for transaction confirmation in your wallet",
-          "subHeading": "Confirm the transaction request to complete this transaction"
+          "heading": "Waiting for wallet approval for purchase"
         },
         "executing": {
-          "heading": "Processing",
+          "heading": "Processing purchase",
           "subHeadingDuration": "This should take {{duration}}",
           "subHeading": "Go to <axelarscanLink>Axelarscan</axelarscanLink> for transaction details"
         },
         "executed": {
-          "heading": "Tokens Added",
+          "heading": "Purchase complete",
           "subHeading": "Go to <axelarscanLink>Axelarscan</axelarscanLink> for transaction details",
           "primaryButtonText": "Done"
         },
         "executedZkEVM": {
-          "heading": "Tokens Added",
+          "heading": "Purchase complete",
           "subHeading": "Go to <explorerLink>Immutable zkEVM explorer</explorerLink> for transaction details",
           "primaryButtonText": "Done"
         },
@@ -1056,26 +1054,9 @@
           "secondaryButtonText": "Dismiss"
         },
         "statusFailed": {
-          "heading": "Unable to complete transaction",
-          "subHeading": "Something went wrong, and we were unable to complete this transaction. Visit <axelarscanLink>Axelarscan</axelarscanLink> for details.",
+          "heading": "Unable to complete purchase",
+          "subHeading": "Something went wrong, and we were unable to complete this purchase. Visit <axelarscanLink>Axelarscan</axelarscanLink> for details.",
           "secondaryButtonText": "Dismiss"
-        }
-      },
-      "onboarding": {
-        "screen1": {
-          "title": "We've changed a few things\nto make it easier",
-          "caption": "listen up",
-          "buttonText": "Next"
-        },
-        "screen2": {
-          "title": "You can deliver tokens to Passport\n& pay from any wallet",
-          "caption": "what's evolved",
-          "buttonText": "Next"
-        },
-        "screen3": {
-          "title": "Use tokens on other chains,\nwe'll find you the best option",
-          "caption": "evolution",
-          "buttonText": "Let's add some tokens"
         }
       },
       "footer": {
@@ -1094,7 +1075,7 @@
       },
       "noGasDrawer": {
         "heading": "You'll need more {{token}} for gas",
-        "body": "Add more gas and return to complete this transaction, or try another option such as lowering your amount, using another wallet, or buying with card.",
+        "body": "Add more gas and return to complete this purchase, or try another option such as lowering your amount, using another wallet, or buying with card.",
         "primaryAction": "Try another option",
         "secondaryAction": "Add more {{token}}"
       },

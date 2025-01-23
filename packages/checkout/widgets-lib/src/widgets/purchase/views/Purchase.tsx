@@ -97,15 +97,6 @@ export function Purchase({
   // eslint-disable-next-line max-len
   const [selectedDirectCryptoPayRoute, setSelectedDirectCryptoPayRoute] = useState<DirectCryptoPayData | undefined>(undefined);
 
-  // TODO: Fetch from Primary Sales quote
-  const item = {
-    id: 'lootbox',
-    name: 'Lootbox',
-    price: '1',
-    token: 'USDC',
-    tokenAddress: '0x6de8aCC0D406837030CE4dd28e7c08C5a96a30d2',
-  };
-
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
@@ -173,8 +164,6 @@ export function Purchase({
   };
 
   const handleDirectCryptoPayClick = (route: DirectCryptoPayData) => {
-    // eslint-disable-next-line no-console
-    console.log('handleDirectCryptoPayClick', route);
     setShowOptionsDrawer(false);
     setShowPayWithDrawer(false);
     setShowDeliverToDrawer(false);
@@ -193,60 +182,57 @@ export function Purchase({
     setInsufficientBalance(false);
     setSelectedRouteData(undefined);
 
-    (async () => {
-      if (balances && squid && tokens && balances.length > 0) {
-        // eslint-disable-next-line no-console
-        console.log('balances', balances);
-        const isSufficientBalance = hasSufficientBalance(
-          balances,
-          item.tokenAddress,
-          ChainId.IMTBL_ZKEVM_MAINNET.toString(),
-          item.price,
-        );
-        // eslint-disable-next-line no-console
-        console.log('isSufficientBalance', isSufficientBalance);
-        setIsFundingNeeded(!isSufficientBalance);
+    if (!squid || !quote || !tokens || balances?.length === 0) return;
 
-        if (isSufficientBalance) {
-          const token = findToken(tokens, item.tokenAddress, ChainId.IMTBL_ZKEVM_MAINNET.toString());
-          const balance = findBalance(balances, item.tokenAddress, ChainId.IMTBL_ZKEVM_MAINNET.toString());
-          // eslint-disable-next-line no-console
-          console.log('token', token);
-          // eslint-disable-next-line no-console
-          console.log('balance', balance);
-          if (token && balance) {
-            setDirectCryptoPayRoutes([{
-              isInsufficientGas: true,
-              amountData: {
-                fromToken: token,
-                fromAmount: item.price,
-                toToken: token,
-                toAmount: item.price,
-                balance,
-                additionalBuffer: 0,
-              },
-            }]);
-          }
+    (async () => {
+      const tokenAddress = quote.currency.address;
+      const tokenAmount = String(quote.totalCurrencyAmount);
+
+      const isSufficientBalance = hasSufficientBalance(
+        balances,
+        tokenAddress,
+        ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+        tokenAmount,
+      );
+      setIsFundingNeeded(!isSufficientBalance);
+
+      if (isSufficientBalance) {
+        const token = findToken(tokens, tokenAddress, ChainId.IMTBL_ZKEVM_MAINNET.toString());
+        const balance = findBalance(balances, tokenAddress, ChainId.IMTBL_ZKEVM_MAINNET.toString());
+
+        if (token && balance) {
+          setDirectCryptoPayRoutes([{
+            isInsufficientGas: true,
+            amountData: {
+              fromToken: token,
+              fromAmount: tokenAmount,
+              toToken: token,
+              toAmount: tokenAmount,
+              balance,
+              additionalBuffer: 0,
+            },
+          }]);
         }
-        setFetchingRoutes(true);
-        console.log('fetching routes');
-        const availableRoutes = await fetchRoutes(
-          squid,
-          tokens,
-          balances,
-          ChainId.IMTBL_ZKEVM_MAINNET.toString(),
-          item.tokenAddress,
-          item.price,
-          5,
-          1000,
-          true,
-        );
-        setFetchingRoutes(false);
-        setRoutes(availableRoutes);
-        setInsufficientBalance(availableRoutes.length === 0);
       }
-    })();
-  }, [balances, squid]);
+      setFetchingRoutes(true);
+
+      const availableRoutes = await fetchRoutes(
+        squid,
+        tokens,
+        balances,
+        ChainId.IMTBL_ZKEVM_MAINNET.toString(),
+        tokenAddress,
+        tokenAmount,
+        5,
+        1000,
+        true,
+      );
+      setFetchingRoutes(false);
+      setRoutes(availableRoutes);
+      setInsufficientBalance(availableRoutes.length === 0);
+    }
+    )();
+  }, [quote, balances, squid]);
 
   useEffect(() => {
     if (!squid || !chains || !fromProvider) return;
@@ -286,14 +272,7 @@ export function Purchase({
   const { signWithPostHooks, sign } = useSignOrder({
     environmentId,
     provider: fromProvider,
-    items: [{
-      productId: item.id,
-      name: item.name,
-      qty: 1,
-      image: 'https://i.ibb.co/pRh6PtM/lootbox.png',
-      description: 'A common lootbox',
-    }],
-    fromTokenAddress: item.tokenAddress,
+    items,
     recipientAddress: toAddress || '',
     environment: checkout?.config.environment || Environment.SANDBOX,
     waitFulfillmentSettlements: false,
@@ -358,7 +337,7 @@ export function Purchase({
 
   const handleProceedClick = useCallback(async () => {
     // eslint-disable-next-line max-len
-    if (!squid || !tokens || !toAddress || !fromAddress || !fromProvider || !fromProviderInfo) return;
+    if (!squid || !tokens || !toAddress || !fromAddress || !fromProvider || !fromProviderInfo || !quote) return;
     if (!selectedRouteData && isFundingNeeded) return;
 
     if (selectedDirectCryptoPayRoute === undefined) {
@@ -366,22 +345,17 @@ export function Purchase({
 
       const signResponse = await signWithPostHooks(
         SignPaymentTypes.CRYPTO,
-        item.tokenAddress,
+        quote.currency.address,
         squidMulticallAddress,
         toAddress,
       );
 
-      // eslint-disable-next-line no-console
-      console.log('signResponse', signResponse?.signResponse);
-      // eslint-disable-next-line no-console
-      console.log('postHooks', signResponse?.postHooks);
-
       const updatedAmountData = getFromAmountData(
         tokens,
         selectedRouteData.amountData.balance,
-        item.price,
+        String(quote.totalCurrencyAmount),
         ChainId.IMTBL_ZKEVM_MAINNET.toString(),
-        item.tokenAddress,
+        quote.currency.address,
         selectedRouteData.amountData.additionalBuffer,
       );
       if (!updatedAmountData) return;
@@ -500,7 +474,7 @@ export function Purchase({
         showHandover(PurchaseHandoverStep.FAIL, { axelarscanUrl });
       }
     } else {
-      handleDirectCryptoPayment(fromProvider, fromAddress, toAddress, item.tokenAddress);
+      handleDirectCryptoPayment(fromProvider, fromAddress, toAddress, quote.currency.address);
     }
   }, [
     squid,
