@@ -3,6 +3,7 @@ import { CloudImage, Stack, useTheme } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useReducer,
 } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
   initialPurchaseState, PurchaseActions, PurchaseContext, purchaseReducer,
@@ -18,12 +19,12 @@ import { sendPurchaseCloseEvent } from './PurchaseWidgetEvents';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { getRemoteImage } from '../../lib/utils';
-import { useSquid } from '../../lib/squid/hooks/useSquid';
-import { useTokens } from '../../lib/squid/hooks/useTokens';
+import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
 import { fetchChains } from '../../lib/squid/functions/fetchChains';
+import { useSquid } from '../../lib/squid/hooks/useSquid';
+import { useTokens } from '../../lib/squid/hooks/useTokens';
 import { useQuoteOrder } from '../../lib/hooks/useQuoteOrder';
-import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 
 export type PurchaseWidgetInputs = PurchaseWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
@@ -44,6 +45,10 @@ export default function PurchaseWidget({
     view: { type: PurchaseWidgetViews.PURCHASE },
     history: [{ type: PurchaseWidgetViews.PURCHASE }],
   });
+
+  const {
+    providersState: { checkout, toAddress },
+  } = useProvidersContext();
 
   const viewReducerValues = useMemo(
     () => ({
@@ -70,28 +75,16 @@ export default function PurchaseWidget({
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
 
-  const {
-    providersState: {
-      checkout,
-      toAddress,
-    },
-  } = useProvidersContext();
-
-  const { squid: { squid } } = purchaseState;
+  const { squid } = purchaseState;
 
   const squidSdk = useSquid(checkout);
+
   const tokensResponse = useTokens(checkout);
 
-  useEffect(() => {
-    if (!squidSdk) return;
-
-    purchaseDispatch({
-      payload: {
-        type: PurchaseActions.SET_SQUID,
-        squid: squidSdk,
-      },
-    });
-  }, [squidSdk]);
+  const { fetchOrderQuote } = useQuoteOrder({
+    environment: checkout.config.environment,
+    environmentId,
+  });
 
   useEffect(() => {
     if (!tokensResponse) return;
@@ -102,17 +95,6 @@ export default function PurchaseWidget({
       },
     });
   }, [tokensResponse]);
-
-  useEffect(() => {
-    if (!squid) return;
-
-    purchaseDispatch({
-      payload: {
-        type: PurchaseActions.SET_SQUID_CHAINS,
-        chains: fetchChains(squid),
-      },
-    });
-  }, [squid]);
 
   useEffect(
     () => {
@@ -128,10 +110,36 @@ export default function PurchaseWidget({
     [items],
   );
 
-  const { fetchOrderQuote } = useQuoteOrder({
-    environment: checkout.config.environment,
-    environmentId,
-  });
+  useEffect(() => {
+    if (!squidSdk) return;
+
+    purchaseDispatch({
+      payload: {
+        type: PurchaseActions.SET_SQUID,
+        squid: squidSdk,
+      },
+    });
+  }, [squidSdk]);
+
+  useEffect(() => {
+    if (!squid.squid) return;
+
+    purchaseDispatch({
+      payload: {
+        type: PurchaseActions.SET_CHAINS,
+        chains: fetchChains(squid.squid),
+      },
+    });
+  }, [squid]);
+
+  useEffect(() => {
+    purchaseDispatch({
+      payload: {
+        type: PurchaseActions.SET_ID,
+        id: uuidv4(),
+      },
+    });
+  }, []);
 
   useEffect(() => {
     if (!items || items.length === 0) return;

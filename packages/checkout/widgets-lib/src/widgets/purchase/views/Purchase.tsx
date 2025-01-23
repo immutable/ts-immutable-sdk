@@ -1,10 +1,28 @@
-import { useContext, useEffect } from 'react';
-import { Stack, ButtCon } from '@biom3/react';
-import { Checkout, PurchaseItem } from '@imtbl/checkout-sdk';
+import {
+  ButtCon,
+  Button,
+  Stack,
+} from '@biom3/react';
+import {
+  Checkout, WalletProviderRdns,
+} from '@imtbl/checkout-sdk';
+import {
+  useContext, useEffect, useMemo, useState,
+} from 'react';
+import { useTranslation } from 'react-i18next';
+import { RouteOptionsDrawer } from '../../../components/RouteOptionsDrawer/RouteOptionsDrawer';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { PurchaseContext } from '../context/PurchaseContext';
+import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
+import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
+import { getProviderSlugFromRdns } from '../../../lib/provider';
+import { SquidFooter } from '../../../lib/squid/components/SquidFooter';
+import { PurchaseDeliverToWalletDrawer } from '../components/PurchaseDeliverToWalletDrawer';
 import { PurchaseItemHero } from '../components/PurchaseItemHero';
-import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
+import { PurchasePayWithWalletDrawer } from '../components/PurchasePayWithWalletDrawer';
+import { PurchaseSelectedRouteOption } from '../components/PurchaseSelectedRouteOption';
+import { PurchaseSelectedWallet } from '../components/PurchaseSelectedWallet';
+import { PurchaseContext } from '../context/PurchaseContext';
+import { CryptoFiatContext, CryptoFiatActions } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 
 interface PurchaseProps {
   checkout: Checkout;
@@ -21,9 +39,29 @@ export function Purchase({
   showBackButton,
   onBackButtonClick,
 }: PurchaseProps) {
-  const { purchaseState: { items, quote } } = useContext(PurchaseContext);
+  const [showPayWithWalletDrawer, setShowPayWithWalletDrawer] = useState(false);
+  const [showDeliverToWalletDrawer, setShowDeliverToWalletDrawer] = useState(false);
+  const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
+
+  const {
+    purchaseState: {
+      items, selectedToken, chains, quote,
+    },
+  } = useContext(PurchaseContext);
+  const { providers } = useInjectedProviders({ checkout });
+  const {
+    providersState: {
+      fromProviderInfo,
+      toProviderInfo,
+      fromAddress,
+      toAddress,
+      lockedToProvider,
+    },
+  } = useProvidersContext();
 
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     // eslint-disable-next-line no-console
@@ -54,7 +92,37 @@ export function Purchase({
 
   const shouldShowBackButton = showBackButton && onBackButtonClick;
 
-  const totalQty = items?.reduce((sum, item: PurchaseItem) => sum + item.qty, 0) || 0;
+  const walletOptions = useMemo(
+    () => providers
+      .map((detail) => {
+        if (detail.info.rdns === WalletProviderRdns.PASSPORT) {
+          return {
+            ...detail,
+            info: {
+              ...detail.info,
+              name: getProviderSlugFromRdns(detail.info.rdns).replace(
+                /^\w/,
+                (c) => c.toUpperCase(),
+              ),
+            },
+          };
+        }
+        return detail;
+      }),
+    [providers],
+  );
+
+  const handleDeliverToWalletClose = () => {
+    setShowDeliverToWalletDrawer(false);
+  };
+
+  const handleRouteClick = () => {
+    setShowOptionsDrawer(false);
+    setShowPayWithWalletDrawer(false);
+    setShowDeliverToWalletDrawer(false);
+  };
+
+  const readyToPay = !!selectedToken && !!fromAddress && !!toAddress;
 
   return (
     <SimpleLayout
@@ -102,9 +170,92 @@ export function Purchase({
           justifyContent="center"
           alignItems="center"
         >
-          <PurchaseItemHero items={items} totalQty={totalQty} />
+          <PurchaseItemHero items={items} />
+        </Stack>
+
+        <Stack
+          testId="bottomSection"
+          sx={{
+            alignSelf: 'stretch',
+            p: 'base.spacing.x3',
+            pb: 'base.spacing.x5',
+            bg: 'base.color.neutral.800',
+            bradtl: 'base.borderRadius.x8',
+            bradtr: 'base.borderRadius.x8',
+          }}
+          gap="base.spacing.x4"
+        >
+          <Stack gap="base.spacing.x3">
+            {!fromProviderInfo && (
+            <PurchaseSelectedWallet
+              label={t('views.PURCHASE.walletSelection.from.label')}
+              size="small"
+              onClick={(event) => {
+                event.stopPropagation();
+                setShowPayWithWalletDrawer(true);
+              }}
+            />
+            )}
+
+            {fromAddress && (
+              <PurchaseSelectedRouteOption
+                checkout={checkout}
+                routeData={undefined} // TODO
+                chains={chains}
+                onClick={() => setShowOptionsDrawer(true)}
+                insufficientBalance={false} // TODO
+                showOnrampOption
+              />
+            )}
+
+            <PurchaseSelectedWallet
+              label={t('views.PURCHASE.walletSelection.to.label')}
+              size={toProviderInfo ? 'xSmall' : 'small'}
+              providerInfo={{
+                ...toProviderInfo,
+                address: toAddress,
+              }}
+              onClick={() => setShowDeliverToWalletDrawer(true)}
+              disabled={lockedToProvider}
+            />
+          </Stack>
+          <RouteOptionsDrawer
+            checkout={checkout}
+            routes={[]}
+            visible={showOptionsDrawer}
+            onClose={() => setShowOptionsDrawer(false)}
+            onCardClick={() => undefined}
+            onRouteClick={handleRouteClick}
+          />
+          <Button
+            testId="add-tokens-button"
+            size="large"
+            variant={readyToPay ? 'primary' : 'secondary'}
+            disabled={!readyToPay}
+            onClick={() => undefined}
+            sx={{ opacity: readyToPay ? 1 : 0.5 }}
+          >
+            Pay
+          </Button>
+
+          <SquidFooter />
+
         </Stack>
       </Stack>
+
+      <PurchasePayWithWalletDrawer
+        visible={showPayWithWalletDrawer}
+        walletOptions={walletOptions}
+        onClose={() => setShowPayWithWalletDrawer(false)}
+        onPayWithCard={() => undefined}
+        onConnect={() => undefined}
+      />
+      <PurchaseDeliverToWalletDrawer
+        visible={showDeliverToWalletDrawer}
+        walletOptions={walletOptions}
+        onClose={handleDeliverToWalletClose}
+        onConnect={() => undefined}
+      />
     </SimpleLayout>
   );
 }
