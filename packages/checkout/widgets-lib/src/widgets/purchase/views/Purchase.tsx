@@ -9,6 +9,7 @@ import {
 import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 import { RouteOptionsDrawer } from '../../../components/RouteOptionsDrawer/RouteOptionsDrawer';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
@@ -59,6 +60,8 @@ export function Purchase({
   } = useProvidersContext();
 
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     // eslint-disable-next-line no-console
@@ -185,8 +188,7 @@ export function Purchase({
           <Stack gap="base.spacing.x3">
             {!fromProviderInfo && (
             <PurchaseSelectedWallet
-              label="Pay with"
-              caption=""
+              label={t('views.PURCHASE.walletSelection.from.label')}
               size="small"
               onClick={(event) => {
                 event.stopPropagation();
@@ -207,8 +209,7 @@ export function Purchase({
             )}
 
             <PurchaseSelectedWallet
-              label="Deliver to"
-              caption=""
+              label={t('views.PURCHASE.walletSelection.to.label')}
               size={toProviderInfo ? 'xSmall' : 'small'}
               providerInfo={{
                 ...toProviderInfo,

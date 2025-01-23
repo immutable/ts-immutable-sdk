@@ -884,7 +884,7 @@
       },
       "walletSelection": {
         "from":{
-          "label": "Send from",
+          "label": "Pay with",
           "caption": "Choose a wallet to bridge or swap from"
         },
         "to": {
