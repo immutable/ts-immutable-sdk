@@ -56,7 +56,7 @@ export function DirectCryptoPayOption<RC extends ReactElement | undefined = unde
   );
 
   const {
-    routeBalanceUsd, fromAmount, fromAmountUsd,
+    routeBalanceUsd,
   } = getRouteAndTokenBalancesForDirectCryptoPay(routeData);
 
   const handleClick = () => {
@@ -103,12 +103,6 @@ export function DirectCryptoPayOption<RC extends ReactElement | undefined = unde
           </>
         )}
       </MenuItem.Caption>
-
-      <MenuItem.PriceDisplay price={fromAmount}>
-        <MenuItem.PriceDisplay.Caption>
-          {`${t('views.PURCHASE.fees.fiatPricePrefix')}${fromAmountUsd}`}
-        </MenuItem.PriceDisplay.Caption>
-      </MenuItem.PriceDisplay>
 
       <MenuItem.BottomSlot>
         <MenuItem.BottomSlot.Divider />

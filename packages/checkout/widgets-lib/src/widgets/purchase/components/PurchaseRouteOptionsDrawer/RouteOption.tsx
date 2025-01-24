@@ -59,7 +59,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
     [routeData],
   );
 
-  const { routeBalanceUsd, fromAmount, fromAmountUsd } = useMemo(
+  const { routeBalanceUsd } = useMemo(
     () => getRouteAndTokenBalances(routeData),
     [routeData],
   );
@@ -109,12 +109,6 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
         </>
         )}
       </MenuItem.Caption>
-
-      <MenuItem.PriceDisplay price={fromAmount}>
-        <MenuItem.PriceDisplay.Caption>
-          {`${t('views.PURCHASE.fees.fiatPricePrefix')}${fromAmountUsd}`}
-        </MenuItem.PriceDisplay.Caption>
-      </MenuItem.PriceDisplay>
 
       <MenuItem.BottomSlot>
         <MenuItem.BottomSlot.Divider />
