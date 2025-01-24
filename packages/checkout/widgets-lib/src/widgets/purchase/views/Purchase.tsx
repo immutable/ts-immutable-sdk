@@ -61,15 +61,19 @@ export function Purchase({
   const [showPayWithWalletDrawer, setShowPayWithWalletDrawer] = useState(false);
   const [showDeliverToWalletDrawer, setShowDeliverToWalletDrawer] = useState(false);
   const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
-  const [selectedRouteData, setSelectedRouteData] = useState<RouteData | undefined>(undefined);
-  const [fetchingRoutes, setFetchingRoutes] = useState(false);
-  const [insufficientBalance, setInsufficientBalance] = useState(false);
-  const [balances, setBalances] = useState<TokenBalance[]>([]);
+
   const [routes, setRoutes] = useState<RouteData[]>([]);
   const [directCryptoPayRoutes, setDirectCryptoPayRoutes] = useState<DirectCryptoPayData[]>([]);
+
+  const [selectedRouteData, setSelectedRouteData] = useState<RouteData | undefined>(undefined);
   const [selectedDirectCryptoPayRoute, setSelectedDirectCryptoPayRoute] = useState<
   DirectCryptoPayData | undefined
   >(undefined);
+
+  const [fetchingRoutes, setFetchingRoutes] = useState(false);
+  const [insufficientBalance, setInsufficientBalance] = useState(false);
+  const [balances, setBalances] = useState<TokenBalance[]>([]);
+
   const {
     purchaseState: {
       squid: { squid, tokens, chains },
