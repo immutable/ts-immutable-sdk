@@ -56,7 +56,7 @@ export function DirectCryptoPayOption<RC extends ReactElement | undefined = unde
   );
 
   const {
-    routeBalanceUsd, fromAmount, fromAmountUsd,
+    routeBalanceUsd,
   } = getRouteAndTokenBalancesForDirectCryptoPay(routeData);
 
   const handleClick = () => {
@@ -91,7 +91,7 @@ export function DirectCryptoPayOption<RC extends ReactElement | undefined = unde
       )}
 
       <MenuItem.Caption>
-        {`${t('views.PURCHASE.fees.balance')} ${t('views.PURCHASE.fees.fiatPricePrefix')} $${routeBalanceUsd}`}
+        {`${t('views.PURCHASE.fees.balance')} ${t('views.PURCHASE.fees.fiatPricePrefix')}${routeBalanceUsd}`}
         {routeData.isInsufficientGas && (
           <>
             <br />
@@ -103,12 +103,6 @@ export function DirectCryptoPayOption<RC extends ReactElement | undefined = unde
           </>
         )}
       </MenuItem.Caption>
-
-      <MenuItem.PriceDisplay price={fromAmount}>
-        <MenuItem.PriceDisplay.Caption>
-          {`${t('views.PURCHASE.fees.fiatPricePrefix')} $${fromAmountUsd}`}
-        </MenuItem.PriceDisplay.Caption>
-      </MenuItem.PriceDisplay>
 
       <MenuItem.BottomSlot>
         <MenuItem.BottomSlot.Divider />
@@ -149,8 +143,8 @@ export function DirectCryptoPayOption<RC extends ReactElement | undefined = unde
             />
             )}
             {
-                `${t('views.PURCHASE.fees.fee')} ${t('views.PURCHASE.fees.fiatPricePrefix')} 
-                $${getFormattedAmounts(totalFeesUsd)}`
+                `${t('views.PURCHASE.fees.fee')} 
+                ${t('views.PURCHASE.fees.fiatPricePrefix')}${getFormattedAmounts(totalFeesUsd)}`
               }
           </Body>
         </Stack>

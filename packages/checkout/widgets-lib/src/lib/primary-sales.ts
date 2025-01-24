@@ -1,10 +1,10 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import {
-  SaleItem,
   FundingStep,
   FundingItem,
   SmartCheckoutResult,
+  PurchaseItem,
 } from '@imtbl/checkout-sdk';
 import { EvmContractCall, Hook } from '@0xsquid/squid-types';
 
@@ -51,8 +51,7 @@ export type SignResponse = {
 
 export type SignOrderInput = {
   provider: Web3Provider | undefined;
-  items: SaleItem[];
-  fromTokenAddress: string;
+  items: PurchaseItem[];
   recipientAddress: string;
   environment: string;
   environmentId: string;
