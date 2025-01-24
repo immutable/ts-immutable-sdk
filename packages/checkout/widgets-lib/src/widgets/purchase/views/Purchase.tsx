@@ -63,7 +63,6 @@ export function Purchase({
   const [showOptionsDrawer, setShowOptionsDrawer] = useState(false);
   const [selectedRouteData, setSelectedRouteData] = useState<RouteData | undefined>(undefined);
   const [fetchingRoutes, setFetchingRoutes] = useState(false);
-  const [isFundingNeeded, setIsFundingNeeded] = useState<boolean | undefined>(undefined);
   const [insufficientBalance, setInsufficientBalance] = useState(false);
   const [balances, setBalances] = useState<TokenBalance[]>([]);
   const [routes, setRoutes] = useState<RouteData[]>([]);
@@ -164,7 +163,6 @@ export function Purchase({
         ChainId.IMTBL_ZKEVM_MAINNET.toString(),
         tokenAmount,
       );
-      setIsFundingNeeded(!isSufficientBalance);
 
       if (isSufficientBalance) {
         const token = findToken(tokens, tokenAddress, ChainId.IMTBL_ZKEVM_MAINNET.toString());
@@ -308,7 +306,7 @@ export function Purchase({
 
   const handleProceedClick = useCallback(async () => {
     if (!squid || !tokens || !toAddress || !fromAddress || !fromProvider || !fromProviderInfo || !quote) return;
-    if (!selectedRouteData && isFundingNeeded) return;
+    if (!selectedRouteData && !selectedRouteData) return;
 
     if (selectedDirectCryptoPayRoute === undefined) {
       if (!selectedRouteData) return;
@@ -465,7 +463,8 @@ export function Purchase({
   const readyToProceed = !!fromAddress
     && !!toAddress
     && !loading
-    && ((!!selectedRouteData && !selectedRouteData.isInsufficientGas) || (isFundingNeeded === false));
+    && ((!!selectedRouteData && !selectedRouteData.isInsufficientGas)
+    || (!!selectedDirectCryptoPayRoute && !selectedDirectCryptoPayRoute.isInsufficientGas));
 
   const walletOptions = useMemo(
     () => providers
@@ -572,7 +571,7 @@ export function Purchase({
                 routeData={selectedRouteData || (selectedDirectCryptoPayRoute || undefined)}
                 onClick={() => setShowOptionsDrawer(true)}
                 insufficientBalance={insufficientBalance}
-                directCryptoPay={!isFundingNeeded}
+                directCryptoPay={!!selectedDirectCryptoPayRoute}
                 showOnrampOption={shouldShowOnRampOption}
               />
             )}
