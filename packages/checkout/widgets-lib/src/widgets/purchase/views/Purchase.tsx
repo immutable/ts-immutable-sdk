@@ -85,10 +85,6 @@ export function Purchase({
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
 
   const {
-    fetchRoutes, getRoute, getFromAmountData, hasSufficientBalance,
-  } = useRoutes();
-
-  const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
 
@@ -102,6 +98,10 @@ export function Purchase({
       lockedToProvider,
     },
   } = useProvidersContext();
+
+  const {
+    fetchRoutes, getRoute, getFromAmountData, hasSufficientBalance,
+  } = useRoutes();
   const { providers } = useInjectedProviders({ checkout });
 
   const {
@@ -109,6 +109,15 @@ export function Purchase({
   } = useExecute(UserJourney.PURCHASE, (err) => {
     // eslint-disable-next-line no-console
     console.log('useExecute err', err);
+  });
+
+  const { signWithPostHooks, sign } = useSignOrder({
+    environmentId,
+    provider: fromProvider,
+    items,
+    recipientAddress: toAddress || '',
+    environment: checkout?.config.environment || Environment.SANDBOX,
+    waitFulfillmentSettlements: false,
   });
 
   const { showHandover } = useHandoverConfig(checkout.config.environment);
@@ -241,15 +250,6 @@ export function Purchase({
   const shouldShowOnRampOption = false;
   const showSwapOption = true;
   const showBridgeOption = true;
-
-  const { signWithPostHooks, sign } = useSignOrder({
-    environmentId,
-    provider: fromProvider,
-    items,
-    recipientAddress: toAddress || '',
-    environment: checkout?.config.environment || Environment.SANDBOX,
-    waitFulfillmentSettlements: false,
-  });
 
   const squidMulticallAddress = '0xad6cea45f98444a922a2b4fe96b8c90f0862d2f4';
   const handleDirectCryptoPayment = async (
