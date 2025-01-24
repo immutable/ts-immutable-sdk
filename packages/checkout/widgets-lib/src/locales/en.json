@@ -1002,7 +1002,7 @@
         }
       },
       "review": {
-        "buttonText": "Review",
+        "buttonText": "Proceed",
         "heading": "Review",
         "send": "Send",
         "receive": "Receive",

@@ -600,7 +600,7 @@ export function Purchase({
             sx={{ opacity: readyToProceed ? 1 : 0.5 }}
             onClick={handleProceedClick}
           >
-            Proceed
+            {t('views.PURCHASE.review.buttonText')}
           </Button>
 
           <SquidFooter />
