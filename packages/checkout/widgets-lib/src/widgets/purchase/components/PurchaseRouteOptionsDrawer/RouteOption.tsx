@@ -96,7 +96,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
       )}
 
       <MenuItem.Caption>
-        {`${t('views.PURCHASE.fees.balance')} ${t('views.PURCHASE.fees.fiatPricePrefix')} $${routeBalanceUsd}`}
+        {`${t('views.PURCHASE.fees.balance')} ${t('views.PURCHASE.fees.fiatPricePrefix')}${routeBalanceUsd}`}
         {routeData.isInsufficientGas && (
         <>
           <br />
@@ -112,7 +112,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
 
       <MenuItem.PriceDisplay price={fromAmount}>
         <MenuItem.PriceDisplay.Caption>
-          {`${t('views.PURCHASE.fees.fiatPricePrefix')} $${fromAmountUsd}`}
+          {`${t('views.PURCHASE.fees.fiatPricePrefix')}${fromAmountUsd}`}
         </MenuItem.PriceDisplay.Caption>
       </MenuItem.PriceDisplay>
 
@@ -155,8 +155,8 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
               />
             )}
             {
-              `${t('views.PURCHASE.fees.fee')} ${t('views.PURCHASE.fees.fiatPricePrefix')} 
-              $${getFormattedAmounts(totalFeesUsd)}`
+              `${t('views.PURCHASE.fees.fee')} 
+              ${t('views.PURCHASE.fees.fiatPricePrefix')}${getFormattedAmounts(totalFeesUsd)}`
             }
           </Body>
         </Stack>

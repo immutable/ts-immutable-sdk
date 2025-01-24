@@ -122,7 +122,6 @@ export function PurchaseSelectedRouteOption({
           py: 'base.spacing.x4',
         }}
         onClick={handleOnClick}
-        // selected={withSelectedWallet}
       >
         <MenuItem.FramedIcon
           icon={icon}
