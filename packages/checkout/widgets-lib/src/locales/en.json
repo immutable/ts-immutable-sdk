@@ -1069,7 +1069,7 @@
       "fees": {
         "fee": "Fee",
         "balance": "Balance",
-        "fiatPricePrefix": "$",
+        "fiatPricePrefix": "≈ USD",
         "zeroFees": "Zero fees",
         "includedFees": "Fees"
       },

@@ -45,7 +45,7 @@ export function PurchaseSelectedRouteOption({
   const chain = chains?.find((c) => c.id === fromToken?.chainId);
 
   let chainNativeCurrencySymbol = '';
-  const { routeBalanceUsd, fromAmount, fromAmountUsd } = useMemo(
+  const { routeBalanceUsd } = useMemo(
     () => {
       if (!routeData || !('route' in routeData)) {
         if (directCryptoPay) {
@@ -181,11 +181,6 @@ export function PurchaseSelectedRouteOption({
         </>
         )}
       </MenuItem.Caption>
-      <MenuItem.PriceDisplay price={fromAmount}>
-        <MenuItem.PriceDisplay.Caption>
-          {`${t('views.PURCHASE.fees.fiatPricePrefix')} $${fromAmountUsd}`}
-        </MenuItem.PriceDisplay.Caption>
-      </MenuItem.PriceDisplay>
     </MenuItem>
   );
 }
