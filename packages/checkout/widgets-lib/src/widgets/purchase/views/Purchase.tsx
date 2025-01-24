@@ -68,8 +68,9 @@ export function Purchase({
   const [balances, setBalances] = useState<TokenBalance[]>([]);
   const [routes, setRoutes] = useState<RouteData[]>([]);
   const [directCryptoPayRoutes, setDirectCryptoPayRoutes] = useState<DirectCryptoPayData[]>([]);
-  // eslint-disable-next-line max-len
-  const [selectedDirectCryptoPayRoute, setSelectedDirectCryptoPayRoute] = useState<DirectCryptoPayData | undefined>(undefined);
+  const [selectedDirectCryptoPayRoute, setSelectedDirectCryptoPayRoute] = useState<
+  DirectCryptoPayData | undefined
+  >(undefined);
   const {
     purchaseState: {
       squid: { squid, tokens, chains },
@@ -151,6 +152,8 @@ export function Purchase({
 
     if (!squid || !quote || !tokens || balances?.length === 0) return;
 
+    setFetchingRoutes(true);
+
     (async () => {
       const tokenAddress = quote.currency.address;
       const tokenAmount = String(quote.totalCurrencyAmount);
@@ -168,7 +171,7 @@ export function Purchase({
         const balance = findBalance(balances, tokenAddress, ChainId.IMTBL_ZKEVM_MAINNET.toString());
 
         if (token && balance) {
-          setDirectCryptoPayRoutes([{
+          const directCryptoRoute = {
             isInsufficientGas: true,
             amountData: {
               fromToken: token,
@@ -178,10 +181,12 @@ export function Purchase({
               balance,
               additionalBuffer: 0,
             },
-          }]);
+          };
+
+          setDirectCryptoPayRoutes([directCryptoRoute]);
+          setSelectedDirectCryptoPayRoute(directCryptoRoute);
         }
       }
-      setFetchingRoutes(true);
 
       const availableRoutes = await fetchRoutes(
         squid,
@@ -194,9 +199,14 @@ export function Purchase({
         1000,
         true,
       );
-      setFetchingRoutes(false);
+
       setRoutes(availableRoutes);
+      setFetchingRoutes(false);
       setInsufficientBalance(availableRoutes.length === 0);
+
+      if (availableRoutes && availableRoutes.length > 0 && !isSufficientBalance) {
+        setSelectedRouteData(availableRoutes[0]);
+      }
     }
     )();
   }, [quote, balances, squid]);
@@ -209,12 +219,6 @@ export function Purchase({
       setBalances(updatedBalances);
     })();
   }, [squid, chains, fromProvider]);
-
-  useEffect(() => {
-    if (!selectedRouteData && routes.length > 0) {
-      setSelectedRouteData(routes[0]);
-    }
-  }, [routes]);
 
   useEffect(() => {
     if (!quote) return;
@@ -303,7 +307,6 @@ export function Purchase({
   };
 
   const handleProceedClick = useCallback(async () => {
-    // eslint-disable-next-line max-len
     if (!squid || !tokens || !toAddress || !fromAddress || !fromProvider || !fromProviderInfo || !quote) return;
     if (!selectedRouteData && isFundingNeeded) return;
 
@@ -456,7 +459,7 @@ export function Purchase({
   ]);
 
   const loading = (!!fromAddress || fetchingRoutes) && (
-    (!(selectedRouteData || insufficientBalance || isFundingNeeded === false))
+    (!(selectedRouteData || insufficientBalance || selectedDirectCryptoPayRoute))
   );
 
   const readyToProceed = !!fromAddress
@@ -630,7 +633,6 @@ export function Purchase({
         onRouteClick={handleRouteClick}
         onDirectCryptoPayClick={handleDirectCryptoPayClick}
         insufficientBalance={insufficientBalance}
-        directCryptoPay={!isFundingNeeded}
         directCryptoPayRoutes={directCryptoPayRoutes}
       />
     </SimpleLayout>

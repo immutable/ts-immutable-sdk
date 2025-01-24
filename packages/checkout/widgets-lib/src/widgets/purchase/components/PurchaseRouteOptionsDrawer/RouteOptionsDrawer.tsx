@@ -31,7 +31,6 @@ type OptionsDrawerProps = {
   showSwapOption?: boolean;
   showBridgeOption?: boolean;
   insufficientBalance?: boolean;
-  directCryptoPay?: boolean;
   directCryptoPayRoutes?: DirectCryptoPayData[];
 };
 
@@ -51,7 +50,6 @@ export function RouteOptionsDrawer({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   showBridgeOption,
   insufficientBalance,
-  directCryptoPay,
   directCryptoPayRoutes,
 }: OptionsDrawerProps) {
   const { t } = useTranslation();
@@ -151,7 +149,6 @@ export function RouteOptionsDrawer({
           insufficientBalance={insufficientBalance}
           selectedIndex={selectedRouteIndex.current}
           selectedRouteType={selectedRouteType}
-          directCryptoPay={directCryptoPay}
           directCryptoPayRoutes={directCryptoPayRoutes}
         />
       </Drawer.Content>

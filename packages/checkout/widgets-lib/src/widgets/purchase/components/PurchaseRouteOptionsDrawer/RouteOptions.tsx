@@ -32,7 +32,6 @@ export interface OptionsProps {
   insufficientBalance?: boolean;
   selectedIndex: number;
   selectedRouteType: SquidRouteOptionType | DirectCryptoPayOptionType | undefined;
-  directCryptoPay?: boolean;
   directCryptoPayRoutes?: DirectCryptoPayData[];
 }
 
@@ -50,41 +49,37 @@ export function RouteOptions({
   insufficientBalance,
   selectedIndex,
   selectedRouteType,
-  directCryptoPay,
   directCryptoPayRoutes,
 }: OptionsProps) {
   const { t } = useTranslation();
 
-  // @NOTE: early exit with loading related UI, when the
-  // routes are not yet available
-  if (!routes?.length && !insufficientBalance && !directCryptoPay) {
-    return (
-      <Stack
-        sx={{ pt: 'base.spacing.x3' }}
-        alignItems="stretch"
-        gap="base.spacing.x1"
-      >
-        <MenuItem shimmer="withBottomSlot" size="small" emphasized />
-        <MenuItem shimmer="withBottomSlot" size="small" emphasized />
+  const renderLoading = () => (
+    <Stack
+      sx={{ pt: 'base.spacing.x3' }}
+      alignItems="stretch"
+      gap="base.spacing.x1"
+    >
+      <MenuItem shimmer="withBottomSlot" size="small" emphasized />
+      <MenuItem shimmer="withBottomSlot" size="small" emphasized />
 
-        <Body sx={{ textAlign: 'center', mt: 'base.spacing.x6' }} size="small">
-          {t('views.PURCHASE.drawer.options.loadingText1')}
-          <br />
-          {t('views.PURCHASE.drawer.options.loadingText2')}
-        </Body>
-        <FramedVideo
-          mimeType="video/mp4"
-          videoUrl={getRemoteVideo(
-            checkout.config.environment,
-            '/loading_bubble-small.mp4',
-          )}
-          sx={{ alignSelf: 'center', mt: 'base.spacing.x2' }}
-          size="large"
-          circularFrame
-        />
-      </Stack>
-    );
-  }
+      <Body sx={{ textAlign: 'center', mt: 'base.spacing.x6' }} size="small">
+        {t('views.PURCHASE.drawer.options.loadingText1')}
+        <br />
+        {t('views.PURCHASE.drawer.options.loadingText2')}
+      </Body>
+      <FramedVideo
+        mimeType="video/mp4"
+        videoUrl={getRemoteVideo(
+          checkout.config.environment,
+          '/loading_bubble-small.mp4',
+        )}
+        sx={{ alignSelf: 'center', mt: 'base.spacing.x2' }}
+        size="large"
+        circularFrame
+      />
+    </Stack>
+  );
+
   const noRoutes = !(!insufficientBalance || routes?.length);
 
   return (
@@ -98,7 +93,8 @@ export function RouteOptions({
         <motion.div variants={listVariants} initial="hidden" animate="show" />
       }
     >
-      {directCryptoPayRoutes?.map((routeData: DirectCryptoPayData, index) => (
+      {(directCryptoPayRoutes && directCryptoPayRoutes.length > 0)
+      && (directCryptoPayRoutes?.map((routeData: DirectCryptoPayData, index) => (
         <DirectCryptoPayOption
           // eslint-disable-next-line max-len
           key={`direct-crypto-pay-option-${routeData.amountData.fromToken.chainId}-${routeData.amountData.fromToken.address}`}
@@ -111,8 +107,10 @@ export function RouteOptions({
           selected={index === selectedIndex && (selectedRouteType === DirectCryptoPayOptionType.IMMUTABLE_ZKEVM || !selectedRouteType)}
           rc={<motion.div variants={listItemVariants} />}
         />
-      ))}
-      {routes?.map((routeData: RouteData, index) => (
+      )))}
+
+      {(routes && routes.length > 0)
+      && routes?.map((routeData: RouteData, index) => (
         <RouteOption
           key={`route-option-${routeData.amountData.fromToken.chainId}-${routeData.amountData.fromToken.address}`}
           size={size}
@@ -133,6 +131,9 @@ export function RouteOptions({
           </Banner.Caption>
         </Banner>
       )}
+
+      {!routes?.length && !insufficientBalance && renderLoading()}
+
       {showOnrampOption && (
       <>
         <Divider size="xSmall" sx={{ my: 'base.spacing.x2' }}>
