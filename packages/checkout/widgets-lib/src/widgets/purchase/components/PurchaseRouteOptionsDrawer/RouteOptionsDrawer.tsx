@@ -2,8 +2,9 @@ import {
   Drawer, EllipsizedText, MenuItem,
 } from '@biom3/react';
 import { motion } from 'framer-motion';
-import { useContext, useEffect, useRef } from 'react';
-
+import {
+  useContext, useEffect, useRef, useState,
+} from 'react';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { useAnalytics, UserJourney } from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
@@ -65,17 +66,18 @@ export function RouteOptionsDrawer({
   } = useProvidersContext();
 
   const selectedRouteIndex = useRef<number>(0);
-  const selectedRouteType = useRef<SquidRouteOptionType | DirectCryptoPayOptionType | undefined>(undefined);
+  // eslint-disable-next-line max-len
+  const [selectedRouteType, setSelectedRouteType] = useState<SquidRouteOptionType | DirectCryptoPayOptionType | undefined>(undefined);
 
   const handleOnRouteClick = (route: RouteData, index: number) => {
     selectedRouteIndex.current = index;
-    selectedRouteType.current = SquidRouteOptionType.SQUID_ROUTE;
+    setSelectedRouteType(SquidRouteOptionType.SQUID_ROUTE);
     onRouteClick(route);
   };
 
   const handleOnDirectCryptoPayClick = (route: DirectCryptoPayData, index: number) => {
     selectedRouteIndex.current = index;
-    selectedRouteType.current = DirectCryptoPayOptionType.IMMUTABLE_ZKEVM;
+    setSelectedRouteType(DirectCryptoPayOptionType.IMMUTABLE_ZKEVM);
     onDirectCryptoPayClick(route);
   };
 
@@ -148,7 +150,7 @@ export function RouteOptionsDrawer({
           showDirectCryptoPayOption={showDirectCryptoPayOption}
           insufficientBalance={insufficientBalance}
           selectedIndex={selectedRouteIndex.current}
-          selectedRouteType={selectedRouteType.current}
+          selectedRouteType={selectedRouteType}
           directCryptoPay={directCryptoPay}
           directCryptoPayRoutes={directCryptoPayRoutes}
         />
