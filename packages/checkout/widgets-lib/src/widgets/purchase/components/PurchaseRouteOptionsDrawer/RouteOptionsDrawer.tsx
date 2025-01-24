@@ -10,7 +10,9 @@ import { useAnalytics, UserJourney } from '../../../../context/analytics-provide
 import { useProvidersContext } from '../../../../context/providers-context/ProvidersContext';
 import { listVariants } from '../../../../lib/animation/listAnimation';
 import { Chain, RouteData } from '../../../../lib/squid/types';
-import { DirectCryptoPayData, FiatOptionType } from '../../types';
+import {
+  DirectCryptoPayData, DirectCryptoPayOptionType, FiatOptionType, SquidRouteOptionType,
+} from '../../types';
 import { RouteOptions } from './RouteOptions';
 import { PurchaseContext } from '../../context/PurchaseContext';
 
@@ -63,14 +65,17 @@ export function RouteOptionsDrawer({
   } = useProvidersContext();
 
   const selectedRouteIndex = useRef<number>(0);
+  const selectedRouteType = useRef<SquidRouteOptionType | DirectCryptoPayOptionType | undefined>(undefined);
 
   const handleOnRouteClick = (route: RouteData, index: number) => {
     selectedRouteIndex.current = index;
+    selectedRouteType.current = SquidRouteOptionType.SQUID_ROUTE;
     onRouteClick(route);
   };
 
   const handleOnDirectCryptoPayClick = (route: DirectCryptoPayData, index: number) => {
     selectedRouteIndex.current = index;
+    selectedRouteType.current = DirectCryptoPayOptionType.IMMUTABLE_ZKEVM;
     onDirectCryptoPayClick(route);
   };
 
@@ -143,6 +148,7 @@ export function RouteOptionsDrawer({
           showDirectCryptoPayOption={showDirectCryptoPayOption}
           insufficientBalance={insufficientBalance}
           selectedIndex={selectedRouteIndex.current}
+          selectedRouteType={selectedRouteType.current}
           directCryptoPay={directCryptoPay}
           directCryptoPayRoutes={directCryptoPayRoutes}
         />

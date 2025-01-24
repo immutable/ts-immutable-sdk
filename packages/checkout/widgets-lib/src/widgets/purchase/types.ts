@@ -13,3 +13,7 @@ export type DirectCryptoPayData = {
   amountData: FromAmountData;
   isInsufficientGas: boolean;
 };
+
+export enum SquidRouteOptionType {
+  SQUID_ROUTE = 'squid-route',
+}

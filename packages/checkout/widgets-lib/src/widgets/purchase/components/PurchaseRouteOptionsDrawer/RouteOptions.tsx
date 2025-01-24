@@ -7,7 +7,9 @@ import { useTranslation } from 'react-i18next';
 import { listVariants, listItemVariants } from '../../../../lib/animation/listAnimation';
 import { Chain, RouteData } from '../../../../lib/squid/types';
 import { getRemoteVideo } from '../../../../lib/utils';
-import { DirectCryptoPayData, FiatOptionType } from '../../types';
+import {
+  DirectCryptoPayData, DirectCryptoPayOptionType, FiatOptionType, SquidRouteOptionType,
+} from '../../types';
 import { RouteOption } from './RouteOption';
 import { FiatOption } from './FiatOption';
 import { DirectCryptoPayOption } from './DirectCryptoPayOption';
@@ -29,6 +31,7 @@ export interface OptionsProps {
   showDirectCryptoPayOption?: boolean;
   insufficientBalance?: boolean;
   selectedIndex: number;
+  selectedRouteType: SquidRouteOptionType | DirectCryptoPayOptionType | undefined;
   directCryptoPay?: boolean;
   directCryptoPayRoutes?: DirectCryptoPayData[];
 }
@@ -46,6 +49,7 @@ export function RouteOptions({
   showDirectCryptoPayOption,
   insufficientBalance,
   selectedIndex,
+  selectedRouteType,
   directCryptoPay,
   directCryptoPayRoutes,
 }: OptionsProps) {
@@ -103,7 +107,8 @@ export function RouteOptions({
           chains={chains}
           onClick={() => onDirectCryptoPayClick(routeData, index)}
           isFastest={index === 0}
-          selected={index === selectedIndex}
+          // eslint-disable-next-line max-len
+          selected={index === selectedIndex && (selectedRouteType === DirectCryptoPayOptionType.IMMUTABLE_ZKEVM || !selectedRouteType)}
           rc={<motion.div variants={listItemVariants} />}
         />
       ))}
@@ -115,7 +120,7 @@ export function RouteOptions({
           chains={chains}
           onClick={() => onRouteClick(routeData, index)}
           isFastest={index === 0}
-          selected={index === selectedIndex}
+          selected={index === selectedIndex && selectedRouteType === SquidRouteOptionType.SQUID_ROUTE}
           rc={<motion.div variants={listItemVariants} />}
         />
       ))}
