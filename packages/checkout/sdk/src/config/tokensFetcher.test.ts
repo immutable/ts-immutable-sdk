@@ -54,6 +54,7 @@ describe('TokensFetcher', () => {
                     '0xfe9df9ebe5fbd94b00247613b6cf7629891954e2',
                   symbol: 'GOG',
                   verification_status: 'verified',
+                  bridge_used: 'native',
                 },
                 {
                   chain: {
@@ -71,6 +72,7 @@ describe('TokensFetcher', () => {
                     '0x0000000000000000000000000000000000000eee',
                   symbol: 'ETH',
                   verification_status: 'verified',
+                  bridge_used: 'native',
                 },
                 {
                   chain: {
@@ -87,6 +89,7 @@ describe('TokensFetcher', () => {
                   root_contract_address: null,
                   symbol: 'USDZ',
                   verification_status: 'verified',
+                  bridge_used: 'axelar-its',
                 },
                 {
                   chain: {
@@ -96,6 +99,7 @@ describe('TokensFetcher', () => {
                   contract_address: '0xinvalid',
                   symbol: null,
                   decimals: null,
+                  bridge_used: null,
                 },
               ],
             },
@@ -136,6 +140,7 @@ describe('TokensFetcher', () => {
             icon: 'https://example.com/gog.svg',
             name: 'Guild of Guardians',
             symbol: 'GOG',
+            bridge: 'native',
           });
 
           // Tokens with invalid info are ignored

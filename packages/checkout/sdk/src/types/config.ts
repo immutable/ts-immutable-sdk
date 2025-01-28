@@ -1,7 +1,7 @@
 import { Environment, ModuleConfiguration } from '@imtbl/config';
 import { ExchangeOverrides, SecondaryFee } from '@imtbl/dex-sdk';
 import { Passport } from '@imtbl/passport';
-import { TokenInfo } from './tokenInfo';
+import { TokenBridgeInfo, TokenInfo } from './tokenInfo';
 import { ChainId } from './chains';
 
 export interface CheckoutOverrides {
@@ -274,7 +274,7 @@ export type GasEstimateSwapTokenConfig = {
  * A type that represents the tokens configuration for chain.
  */
 export type ChainTokensConfig = {
-  [key in ChainId]?: TokenInfo[];
+  [key in ChainId]?: TokenBridgeInfo[];
 };
 
 export type CheckoutWidgetsVersionConfig = {
