@@ -2,7 +2,7 @@
 
 These examples demonstrate ways of interacting with the [Immutable preset contracts](https://docs.immutable.com/products/zkEVM/contracts).
 
-Immutable provides a set of preset contracts than can be used by customers to deploy known, battle-tested contracts to the zkEVM.
+Immutable provides a set of preset contracts that can be used by customers to deploy known, battle-tested contracts to the zkEVM.
 
 Immutable's preset contracts are equipped with features purpose-built for Web3 gaming, simplifying the integration process with Immutable's zkEVM platform.
 
