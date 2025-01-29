@@ -140,7 +140,6 @@ export function PurchaseSelectedRouteOption({
       size="small"
       emphasized
       sx={{
-        cursor: 'pointer',
         py: 'base.spacing.x4',
       }}
     >
