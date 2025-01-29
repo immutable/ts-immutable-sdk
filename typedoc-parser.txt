@@ -1,5 +1,6 @@
 /* eslint-disable eol-last */
 const fs = require('fs');
+const path = require('path');
 
 // Paths for input and output files
 const inputFilePath = 'docs/typedoc_raw_export.json';
@@ -9,6 +10,11 @@ let typeToString;
 let extractClassDetails;
 let extractInterfaceDetails;
 
+/**
+ * Converts a reflection type to a string representation by examining its children properties.
+ * @param {Object} type - Reflection type object from TypeDoc.
+ * @returns {string} - A string representation of the reflection type.
+ */
 function reflectionToString(type) {
   if (!type.declaration || !Array.isArray(type.declaration.children)) {
     return 'unknown';
@@ -22,11 +28,19 @@ function reflectionToString(type) {
   return `{ ${childrenStr} }`;
 }
 
+/**
+ * Converts a TypeDoc type object into a human-readable string format.
+ * Handles various type kinds like intrinsic, literal, reference, union, array, and reflection.
+ * @param {Object} type - TypeDoc type object.
+ * @returns {string} - Readable string representation of the type.
+ */
 typeToString = function typeToStringImpl(type) {
   if (!type) return '';
   switch (type.type) {
     case 'intrinsic':
       return type.name;
+    case 'literal':
+      return JSON.stringify(type.value);
     case 'reference':
       return type.name + (type.typeArguments ? `<${type.typeArguments.map(typeToString).join(', ')}>` : '');
     case 'union':
@@ -36,10 +50,15 @@ typeToString = function typeToStringImpl(type) {
     case 'reflection':
       return reflectionToString(type);
     default:
-      return JSON.stringify(type);
+      return 'unknown';
   }
 };
 
+/**
+ * Extracts main type information and its arguments (if any) from a TypeDoc type object.
+ * @param {Object} type - TypeDoc type object.
+ * @returns {Object} - An object containing main type and its stringified arguments.
+ */
 function extractTypeInfo(type) {
   let mainType = '';
   let typeArguments = [];
@@ -55,6 +74,11 @@ function extractTypeInfo(type) {
   return { mainType, typeArguments };
 }
 
+/**
+ * Extracts the return description from the comments of a method or function.
+ * @param {Object} comment - Comment object from TypeDoc structure.
+ * @returns {string} - Description of the return value if available.
+ */
 function extractReturnDescription(comment) {
   if (comment && comment.blockTags) {
     const returnsTag = comment.blockTags.find((tag) => tag.tag === '@returns');
@@ -65,6 +89,11 @@ function extractReturnDescription(comment) {
   return '';
 }
 
+/**
+ * Extracts the source file information and line numbers from type source nodes.
+ * @param {Array} sources - Array of source objects from TypeDoc.
+ * @returns {Array} - Array of formatted source details including file name and position.
+ */
 function extractSources(sources) {
   if (!sources) return [];
   return sources.map((source) => ({
@@ -74,19 +103,38 @@ function extractSources(sources) {
   }));
 }
 
+/**
+ * Extracts detailed information about methods, including name, description, parameters, return types,
+ * and whether it's deprecated.
+ * @param {Object} node - The method node from TypeDoc.
+ * @returns {Object|null} - An object with details of the method, or null if no signatures exist.
+ */
 function extractMethodDetails(node) {
   if (node.signatures && node.signatures.length > 0) {
     const signature = node.signatures[0];
     const { mainType, typeArguments } = extractTypeInfo(signature.type);
 
+    // Extract deprecation details
+    let deprecated = false;
+    let deprecatedMessage = '';
+    if (signature.comment && signature.comment.blockTags) {
+      const deprecatedTag = signature.comment.blockTags.find(tag => tag.tag === '@deprecated');
+      if (deprecatedTag) {
+        deprecated = true;
+        deprecatedMessage = deprecatedTag.content.map(c => c.text || '').join(' ');
+      }
+    }
+
     return {
       kind: 'Method',
       name: node.name,
-      description: signature.comment ? signature.comment.summary.map((s) => s.text).join(' ') : '',
-      parameters: signature.parameters ? signature.parameters.map((param) => ({
+      description: signature.comment ? signature.comment.summary.map(s => s.text).join(' ') : '',
+      deprecated,
+      deprecatedMessage,
+      parameters: signature.parameters ? signature.parameters.map(param => ({
         name: param.name,
         type: param.type ? typeToString(param.type) : '',
-        description: param.comment ? param.comment.summary.map((s) => s.text).join(' ') : '',
+        description: param.comment ? param.comment.summary.map(s => s.text).join(' ') : '',
         isOptional: param.flags?.isOptional || false,
       })) : [],
       returnType: mainType,
@@ -98,10 +146,22 @@ function extractMethodDetails(node) {
   return null;
 }
 
+/**
+ * Extracts function details mimicking method detail extraction due to similar structure.
+ * @param {Object} node - The function node from TypeDoc.
+ * @returns {Object|null} - An object with details of the function, or null if none exist.
+ */
 function extractFunctionDetails(node) {
-  return extractMethodDetails(node); // Functions are processed similarly to methods
+  return extractMethodDetails(node);
 }
 
+/**
+ * Extracts detailed information from a collection of nodes.
+ * Iterates over various TypeDoc node kinds to collect relevant details.
+ * @param {Array} nodes - Array of TypeDoc nodes.
+ * @param {string|null} currentPackage - The package name associated with the nodes.
+ * @returns {Array} - Array of extracted details for each node.
+ */
 function extractDetails(nodes, currentPackage = null) {
   const details = [];
   nodes.forEach((node) => {
@@ -133,6 +193,11 @@ function extractDetails(nodes, currentPackage = null) {
   return details;
 }
 
+/**
+ * Extracts class details from a TypeDoc node and recursively gathers information about its children.
+ * @param {Object} node - The class node from TypeDoc.
+ * @returns {Object} - An object containing class details and its child elements.
+ */
 extractClassDetails = function extractClassDetailsImpl(node) {
   return {
     kind: 'Class',
@@ -143,6 +208,11 @@ extractClassDetails = function extractClassDetailsImpl(node) {
   };
 };
 
+/**
+ * Extracts interface details from a TypeDoc node and recursively gathers information about its children.
+ * @param {Object} node - The interface node from TypeDoc.
+ * @returns {Object} - An object containing interface details and its child elements.
+ */
 extractInterfaceDetails = function extractInterfaceDetailsImpl(node) {
   return {
     kind: 'Interface',
@@ -153,10 +223,17 @@ extractInterfaceDetails = function extractInterfaceDetailsImpl(node) {
   };
 };
 
+/**
+ * Organizes nodes by their package groupings and extracts relevant details.
+ * Handles package-specific logic for TypeDoc structures.
+ * @param {Array} nodes - Array of TypeDoc nodes.
+ * @param {string|null} currentPackage - The package name currently being processed.
+ * @returns {Object} - An object with packages as keys and corresponding extracted details.
+ */
 function extractByPackage(nodes, currentPackage = null) {
   const packages = {};
   nodes.forEach((node) => {
-    let packageName = currentPackage; // Create local variable
+    let packageName = currentPackage;
     if (node.kind === 2 || node.kind === 4) {
       packageName = node.name;
     }
@@ -173,12 +250,20 @@ function extractByPackage(nodes, currentPackage = null) {
 }
 
 /**
- * Main function to read, extract details, and write JSON
+ * Main function to read TypeDoc JSON, extract structured details, and write to output files.
+ * Reads input JSON data, processes it by package, and creates respective output JSON files.
  */
 function main() {
   const rawData = fs.readFileSync(inputFilePath, 'utf-8');
   const typeDocData = JSON.parse(rawData);
   const categorizedData = extractByPackage(typeDocData.children || []);
+
+  // Ensure the 'parsed' directory exists
+  const parsedDirectory = path.dirname(outputFilePath.replace('{package_name}', 'dummy')); // Example to get directory name
+  if (!fs.existsSync(parsedDirectory)) {
+    fs.mkdirSync(parsedDirectory, { recursive: true });
+  }
+
   for (const [packageName, data] of Object.entries(categorizedData)) {
     const packageOutputFilePath = outputFilePath.replace('{package_name}', packageName);
     fs.writeFileSync(packageOutputFilePath, JSON.stringify(data, null, 2), 'utf-8');
