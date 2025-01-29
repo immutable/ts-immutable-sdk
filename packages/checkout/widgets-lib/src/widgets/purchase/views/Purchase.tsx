@@ -316,6 +316,7 @@ export function Purchase({
 
   const handleProceedClick = useCallback(async () => {
     if (!squid || !tokens || !toAddress || !fromAddress || !fromProvider || !fromProviderInfo || !quote) return;
+    if (!selectedRouteData && !selectedDirectCryptoPayRoute) return;
 
     if (selectedDirectCryptoPayRoute === undefined) {
       if (!selectedRouteData) return;
