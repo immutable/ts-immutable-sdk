@@ -896,7 +896,7 @@
         "loadingText": "Finding the best payment route...",
         "noRoute": "No routes found, choose a different wallet, token or amount.",
         "payWithCard": "No routes found, pay with card available",
-        "fastestBadge": "Fastest",
+        "fastestBadge": "Cheapest & fastest",
         "minutesText": "mins",
         "minuteText": "min",
         "secondsText": "s"
@@ -1067,7 +1067,7 @@
         "bridgeTokenButton": "Bridge tokens"
       },
       "fees": {
-        "fee": "Fee",
+        "fee": "Fees",
         "balance": "Balance",
         "fiatPricePrefix": "$",
         "zeroFees": "Zero fees",

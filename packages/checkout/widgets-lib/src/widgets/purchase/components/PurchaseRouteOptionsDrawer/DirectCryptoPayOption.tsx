@@ -132,6 +132,13 @@ export function DirectCryptoPayOption<RC extends ReactElement | undefined = unde
               variant="bold"
             />
             {estimatedDurationFormatted}
+            {' '}
+            |
+            {' '}
+            {
+              `${t('views.PURCHASE.fees.fee')} 
+              ${t('views.PURCHASE.fees.fiatPricePrefix')}${getFormattedAmounts(totalFeesUsd)}`
+            }
           </Body>
 
           <Body size="xSmall" sx={{ ...hFlex, ...centerFlexChildren }}>
@@ -142,10 +149,6 @@ export function DirectCryptoPayOption<RC extends ReactElement | undefined = unde
               sx={{ mr: 'base.spacing.x2' }}
             />
             )}
-            {
-                `${t('views.PURCHASE.fees.fee')} 
-                ${t('views.PURCHASE.fees.fiatPricePrefix')}${getFormattedAmounts(totalFeesUsd)}`
-              }
           </Body>
         </Stack>
       </MenuItem.BottomSlot>
