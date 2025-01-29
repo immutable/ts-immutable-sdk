@@ -257,6 +257,7 @@ export function Purchase({
   const showBridgeOption = true;
 
   const squidMulticallAddress = '0xad6cea45f98444a922a2b4fe96b8c90f0862d2f4';
+
   const handleDirectCryptoPayment = async (
     provider: Web3Provider,
     spenderAddress: string,
@@ -315,7 +316,6 @@ export function Purchase({
 
   const handleProceedClick = useCallback(async () => {
     if (!squid || !tokens || !toAddress || !fromAddress || !fromProvider || !fromProviderInfo || !quote) return;
-    if (!selectedRouteData && !selectedRouteData) return;
 
     if (selectedDirectCryptoPayRoute === undefined) {
       if (!selectedRouteData) return;
