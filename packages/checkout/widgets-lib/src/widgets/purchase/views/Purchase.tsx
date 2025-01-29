@@ -100,7 +100,7 @@ export function Purchase({
   } = useProvidersContext();
 
   const {
-    fetchRoutes, getRoute, getFromAmountData, hasSufficientBalance,
+    fetchRoutes, getRoute, getFromAmountData, hasSufficientBalance, hasSufficientGas,
   } = useRoutes();
   const { providers } = useInjectedProviders({ checkout });
 
@@ -188,7 +188,7 @@ export function Purchase({
 
         if (token && balance) {
           const directCryptoRoute = {
-            isInsufficientGas: true,
+            isInsufficientGas: !hasSufficientGas(balances, ChainId.IMTBL_ZKEVM_MAINNET.toString(), fromProvider),
             amountData: {
               fromToken: token,
               fromAmount: tokenAmount,
