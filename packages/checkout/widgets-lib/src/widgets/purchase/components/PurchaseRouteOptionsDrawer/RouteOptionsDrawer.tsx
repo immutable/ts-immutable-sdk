@@ -1,7 +1,5 @@
 import {
-  ButtCon,
   Drawer, EllipsizedText, MenuItem,
-  Stack,
 } from '@biom3/react';
 import { motion } from 'framer-motion';
 import {
@@ -24,7 +22,6 @@ type OptionsDrawerProps = {
   chains: Chain[] | null;
   visible: boolean;
   onClose: () => void;
-  onWalletChangeClick: () => void;
   onRouteClick: (route: RouteData) => void;
   onCardClick: (type: FiatOptionType) => void;
   onDirectCryptoPayClick: (route: DirectCryptoPayData) => void;
@@ -42,7 +39,6 @@ export function RouteOptionsDrawer({
   chains,
   visible,
   onClose,
-  onWalletChangeClick,
   onRouteClick,
   onCardClick,
   onDirectCryptoPayClick,
@@ -127,26 +123,16 @@ export function RouteOptionsDrawer({
             )}
             sx={{ mx: 'base.spacing.x2' }}
           />
-          <Stack sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-            <Stack sx={{ gap: '0', pr: 'base.spacing.x2' }}>
-              <MenuItem.Label>
-                {fromProviderInfo?.name}
-              </MenuItem.Label>
-              <MenuItem.Caption>
-                <EllipsizedText
-                  text={fromAddress ?? ''}
-                  sx={{ c: 'inherit', fontSize: 'inherit' }}
-                />
-              </MenuItem.Caption>
-
-            </Stack>
-            <ButtCon
-              icon="Edit"
-              size="small"
-              variant="tertiary"
-              onClick={onWalletChangeClick}
+          <MenuItem.Label>
+            {fromProviderInfo?.name}
+          </MenuItem.Label>
+          <MenuItem.Caption>
+            <EllipsizedText
+              text={fromAddress ?? ''}
+              sx={{ c: 'inherit', fontSize: 'inherit' }}
             />
-          </Stack>
+          </MenuItem.Caption>
+
           <MenuItem.StatefulButtCon icon="ChevronExpand" onClick={onClose} />
         </MenuItem>
         <RouteOptions

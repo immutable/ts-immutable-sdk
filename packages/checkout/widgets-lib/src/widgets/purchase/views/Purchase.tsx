@@ -135,11 +135,6 @@ export function Purchase({
     );
   };
 
-  const handleWalletChangeClick = () => {
-    setShowOptionsDrawer(false);
-    setShowPayWithWalletDrawer(true);
-  };
-
   const handleRouteClick = (route: RouteData) => {
     setShowOptionsDrawer(false);
     setShowPayWithWalletDrawer(false);
@@ -638,7 +633,6 @@ export function Purchase({
         showDirectCryptoPayOption
         visible={showOptionsDrawer}
         onClose={() => setShowOptionsDrawer(false)}
-        onWalletChangeClick={handleWalletChangeClick}
         onCardClick={() => false}
         onRouteClick={handleRouteClick}
         onDirectCryptoPayClick={handleDirectCryptoPayClick}

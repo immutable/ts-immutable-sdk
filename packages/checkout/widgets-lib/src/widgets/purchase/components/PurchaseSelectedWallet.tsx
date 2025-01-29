@@ -36,7 +36,7 @@ export function PurchaseSelectedWallet({
   providerInfo,
   disabled,
   sx,
-  size,
+  size = 'small',
 }: PurchaseSelectedWalletProps) {
   const selected = !!children && providerInfo?.rdns;
 
