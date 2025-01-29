@@ -16,7 +16,9 @@ import { getRouteAndTokenBalances } from '../../../lib/squid/functions/getRouteA
 import { Chain, RouteData } from '../../../lib/squid/types';
 import { getRemoteVideo } from '../../../lib/utils';
 import { getRouteAndTokenBalancesForDirectCryptoPay } from '../functions/getRouteAndBalancesForDirectCryptoPay';
-import { DirectCryptoPayData } from '../types';
+import {
+  DirectCryptoPayData, SquidRouteOptionType, DirectCryptoPayOptionType, FiatOptionType,
+} from '../types';
 
 interface PurchaseSelectedRouteOptionProps {
   checkout: Checkout;
@@ -27,6 +29,7 @@ interface PurchaseSelectedRouteOptionProps {
   insufficientBalance?: boolean;
   directCryptoPay?: boolean;
   showOnrampOption?: boolean;
+  selectedRouteType?: SquidRouteOptionType | DirectCryptoPayOptionType | FiatOptionType | undefined;
 }
 
 export function PurchaseSelectedRouteOption({
@@ -38,6 +41,7 @@ export function PurchaseSelectedRouteOption({
   directCryptoPay = false,
   showOnrampOption = false,
   onClick,
+  selectedRouteType,
 }: PurchaseSelectedRouteOptionProps) {
   const { t } = useTranslation();
 
@@ -99,9 +103,13 @@ export function PurchaseSelectedRouteOption({
     );
   }
 
-  if ((!routeData && !loading) || insufficientBalance) {
+  if ((!routeData && !loading) || insufficientBalance || selectedRouteType === FiatOptionType.CREDIT) {
     let icon: AllDualVariantIconKeys = 'Sparkle';
     let copy = '';
+    if (selectedRouteType === FiatOptionType.CREDIT) {
+      icon = 'BankCard';
+      copy = t('views.PURCHASE.routeSelection.payWithCard');
+    }
 
     if (insufficientBalance) {
       icon = 'InformationCircle';
@@ -110,7 +118,7 @@ export function PurchaseSelectedRouteOption({
 
     if (insufficientBalancePayWithCard) {
       icon = 'BankCard';
-      copy = t('views.PURCHASE.routeSelection.payWithCard');
+      copy = t('views.PURCHASE.routeSelection.noRoutePayWithCard');
     }
 
     return (

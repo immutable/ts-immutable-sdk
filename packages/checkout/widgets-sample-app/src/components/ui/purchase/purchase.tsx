@@ -25,7 +25,7 @@ export default function PurchaseUI() {
     () =>
       new Checkout({
         baseConfig: {
-          environment: Environment.PRODUCTION,
+          environment: Environment.SANDBOX,
         },
         passport,
       }),

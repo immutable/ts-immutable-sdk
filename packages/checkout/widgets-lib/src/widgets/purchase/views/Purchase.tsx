@@ -38,10 +38,14 @@ import { PurchasePayWithWalletDrawer } from '../components/PurchasePayWithWallet
 import { RouteOptionsDrawer } from '../components/PurchaseRouteOptionsDrawer/RouteOptionsDrawer';
 import { PurchaseSelectedRouteOption } from '../components/PurchaseSelectedRouteOption';
 import { PurchaseSelectedWallet } from '../components/PurchaseSelectedWallet';
-import { PurchaseContext } from '../context/PurchaseContext';
+import { PurchaseActions, PurchaseContext } from '../context/PurchaseContext';
 import { useHandoverConfig, PurchaseHandoverStep } from '../hooks/useHandoverConfig';
 import { sendConnectProviderSuccessEvent, sendPurchaseSuccessEvent } from '../PurchaseWidgetEvents';
-import { DirectCryptoPayData } from '../types';
+import {
+  DirectCryptoPayData, DirectCryptoPayOptionType, FiatOptionType, SquidRouteOptionType,
+} from '../types';
+import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { PurchaseWidgetViews } from '../../../context/view-context/PurchaseViewContextTypes';
 
 interface PurchaseProps {
   checkout: Checkout;
@@ -69,6 +73,8 @@ export function Purchase({
   const [selectedDirectCryptoPayRoute, setSelectedDirectCryptoPayRoute] = useState<
   DirectCryptoPayData | undefined
   >(undefined);
+  // eslint-disable-next-line max-len
+  const [selectedRouteType, setSelectedRouteType] = useState<SquidRouteOptionType | DirectCryptoPayOptionType | FiatOptionType | undefined>(undefined);
 
   const [fetchingRoutes, setFetchingRoutes] = useState(false);
   const [insufficientBalance, setInsufficientBalance] = useState(false);
@@ -82,7 +88,11 @@ export function Purchase({
     },
   } = useContext(PurchaseContext);
 
+  const { viewDispatch } = useContext(ViewContext);
+
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
+
+  const { purchaseDispatch } = useContext(PurchaseContext);
 
   const {
     eventTargetState: { eventTarget },
@@ -141,6 +151,7 @@ export function Purchase({
     setShowDeliverToWalletDrawer(false);
     setSelectedRouteData(route);
     setSelectedDirectCryptoPayRoute(undefined);
+    setSelectedRouteType(SquidRouteOptionType.SQUID_ROUTE);
   };
 
   const handleDirectCryptoPayClick = (route: DirectCryptoPayData) => {
@@ -149,6 +160,16 @@ export function Purchase({
     setShowDeliverToWalletDrawer(false);
     setSelectedRouteData(undefined);
     setSelectedDirectCryptoPayRoute(route);
+    setSelectedRouteType(DirectCryptoPayOptionType.IMMUTABLE_ZKEVM);
+  };
+
+  const handlePayWithCardClick = () => {
+    setShowOptionsDrawer(false);
+    setShowPayWithWalletDrawer(false);
+    setShowDeliverToWalletDrawer(false);
+    setSelectedRouteData(undefined);
+    setSelectedDirectCryptoPayRoute(undefined);
+    setSelectedRouteType(FiatOptionType.CREDIT);
   };
 
   useEffect(() => {
@@ -247,11 +268,36 @@ export function Purchase({
   }, [quote]);
 
   const shouldShowBackButton = showBackButton && onBackButtonClick;
-  const shouldShowOnRampOption = false;
+  const shouldShowOnRampOption = true;
   const showSwapOption = true;
   const showBridgeOption = true;
 
   const squidMulticallAddress = '0xad6cea45f98444a922a2b4fe96b8c90f0862d2f4';
+
+  const handleFiatPayment = async (
+    recipientAddress: string,
+    tokenAddress: string,
+  ) => {
+    const signResponse = await sign(
+      SignPaymentTypes.FIAT,
+      tokenAddress,
+      recipientAddress,
+    );
+    if (!signResponse) return;
+    purchaseDispatch({
+      payload: {
+        type: PurchaseActions.SET_SIGN_RESPONSE,
+        signResponse,
+      },
+    });
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: { type: PurchaseWidgetViews.PAY_WITH_CARD },
+      },
+    });
+  };
+
   const handleDirectCryptoPayment = async (
     provider: Web3Provider,
     spenderAddress: string,
@@ -309,6 +355,12 @@ export function Purchase({
   };
 
   const handleProceedClick = useCallback(async () => {
+    if (!quote || !toAddress) return;
+    if (selectedRouteType === FiatOptionType.CREDIT) {
+      handleFiatPayment(toAddress, quote.currency.address);
+      return;
+    }
+
     if (!squid || !tokens || !toAddress || !fromAddress || !fromProvider || !fromProviderInfo || !quote) return;
     if (!selectedRouteData && !selectedRouteData) return;
 
@@ -321,6 +373,13 @@ export function Purchase({
         squidMulticallAddress,
         toAddress,
       );
+      if (!signResponse) return;
+      purchaseDispatch({
+        payload: {
+          type: PurchaseActions.SET_SIGN_RESPONSE,
+          signResponse: signResponse.signResponse,
+        },
+      });
 
       const updatedAmountData = getFromAmountData(
         tokens,
@@ -464,11 +523,12 @@ export function Purchase({
     (!(selectedRouteData || insufficientBalance || selectedDirectCryptoPayRoute))
   );
 
-  const readyToProceed = !!fromAddress
+  const readyToProceed = (!!fromAddress || selectedRouteType === FiatOptionType.CREDIT)
     && !!toAddress
     && !loading
     && ((!!selectedRouteData && !selectedRouteData.isInsufficientGas)
-    || (!!selectedDirectCryptoPayRoute && !selectedDirectCryptoPayRoute.isInsufficientGas));
+    || (!!selectedDirectCryptoPayRoute && !selectedDirectCryptoPayRoute.isInsufficientGas)
+    || (selectedRouteType === FiatOptionType.CREDIT));
 
   const walletOptions = useMemo(
     () => providers
@@ -567,7 +627,7 @@ export function Purchase({
             />
             )}
 
-            {fromAddress && (
+            {(fromAddress || selectedRouteType === FiatOptionType.CREDIT) && (
               <PurchaseSelectedRouteOption
                 checkout={checkout}
                 loading={loading}
@@ -576,6 +636,7 @@ export function Purchase({
                 onClick={() => setShowOptionsDrawer(true)}
                 insufficientBalance={insufficientBalance}
                 directCryptoPay={!!selectedDirectCryptoPayRoute}
+                selectedRouteType={selectedRouteType}
                 showOnrampOption={shouldShowOnRampOption}
               />
             )}
@@ -612,7 +673,7 @@ export function Purchase({
         visible={showPayWithWalletDrawer}
         walletOptions={walletOptions}
         onClose={() => setShowPayWithWalletDrawer(false)}
-        onPayWithCard={() => false}
+        onPayWithCard={handlePayWithCardClick}
         onConnect={handleWalletConnected}
         insufficientBalance={insufficientBalance}
         showOnRampOption={shouldShowOnRampOption}
@@ -632,7 +693,7 @@ export function Purchase({
         showDirectCryptoPayOption
         visible={showOptionsDrawer}
         onClose={() => setShowOptionsDrawer(false)}
-        onCardClick={() => false}
+        onCardClick={handlePayWithCardClick}
         onRouteClick={handleRouteClick}
         onDirectCryptoPayClick={handleDirectCryptoPayClick}
         insufficientBalance={insufficientBalance}

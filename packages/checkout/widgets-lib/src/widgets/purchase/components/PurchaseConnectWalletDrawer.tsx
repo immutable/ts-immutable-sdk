@@ -66,14 +66,14 @@ export function PurchaseConnectWalletDrawer({
     providerInfo: EIP6963ProviderInfo,
   ) => {
     const address = await provider.getSigner().getAddress();
-    providersDispatch({
-      payload: {
-        type: ProvidersContextActions.SET_PROVIDER,
-        fromAddress: address,
-        fromProvider: provider,
-        fromProviderInfo: providerInfo,
-      },
-    });
+    // providersDispatch({
+    //   payload: {
+    //     type: ProvidersContextActions.SET_PROVIDER,
+    //     fromAddress: address,
+    //     fromProvider: provider,
+    //     fromProviderInfo: providerInfo,
+    //   },
+    // });
 
     providersDispatch({
       payload: {
