@@ -11,7 +11,8 @@ import {
   ChainId,
   OnRampConfig,
   OnRampProvider,
-  OnRampProviderConfig, TokenInfo,
+  OnRampProviderConfig,
+  TokenBridgeInfo,
 } from '../../types';
 import { TokenBalanceResult } from '../routing/types';
 import { RemoteConfigFetcher } from '../../config/remoteConfigFetcher';
@@ -23,8 +24,8 @@ jest.mock('../../config/tokensFetcher');
 
 describe('allowListCheck', () => {
   let config: CheckoutConfiguration;
-  let tokensL1: TokenInfo[];
-  let tokensL2: TokenInfo[];
+  let tokensL1: TokenBridgeInfo[];
+  let tokensL2: TokenBridgeInfo[];
   let onRampConfig: OnRampConfig;
   let balances: Map<ChainId, TokenBalanceResult>;
   let mockedHttpClient: jest.Mocked<HttpClient>;
@@ -64,12 +65,14 @@ describe('allowListCheck', () => {
         symbol: 'ETH',
         name: 'Ethereum',
         address: 'native',
+        bridge: 'native',
       },
       {
         decimals: 18,
         symbol: 'IMX',
         name: 'IMX',
         address: '0xe9E96d1aad82562b7588F03f49aD34186f996478',
+        bridge: null,
       },
     ];
 
@@ -79,12 +82,14 @@ describe('allowListCheck', () => {
         symbol: 'ETH',
         name: 'Ethereum',
         address: '0x52A6c53869Ce09a731CD772f245b97A4401d3348',
+        bridge: 'native',
       },
       {
         decimals: 18,
         symbol: 'IMX',
         name: 'IMX',
         address: 'native',
+        bridge: null,
       },
     ];
 
@@ -156,12 +161,14 @@ describe('allowListCheck', () => {
             symbol: 'ETH',
             decimals: 18,
             address: '0x52A6c53869Ce09a731CD772f245b97A4401d3348',
+            bridge: 'native',
           },
           {
             decimals: 18,
             symbol: 'IMX',
             name: 'IMX',
             address: 'native',
+            bridge: null,
           },
         ],
         bridge: [
@@ -170,6 +177,7 @@ describe('allowListCheck', () => {
             symbol: 'ETH',
             decimals: 18,
             address: 'native',
+            bridge: 'native',
           },
         ],
         onRamp: [
@@ -192,6 +200,7 @@ describe('allowListCheck', () => {
           symbol: 'ETH',
           decimals: 18,
           address: 'native',
+          bridge: 'native',
         }],
         onRamp: [],
         swap: [],
@@ -211,12 +220,14 @@ describe('allowListCheck', () => {
             symbol: 'ETH',
             name: 'Ethereum',
             address: '0x52A6c53869Ce09a731CD772f245b97A4401d3348',
+            bridge: 'native',
           },
           {
             decimals: 18,
             symbol: 'IMX',
             name: 'IMX',
             address: 'native',
+            bridge: null,
           },
         ],
       });
@@ -259,6 +270,7 @@ describe('allowListCheck', () => {
         symbol: 'ETH',
         name: 'Ethereum',
         address: 'native',
+        bridge: 'native',
       }]);
     });
 
@@ -297,12 +309,14 @@ describe('allowListCheck', () => {
           decimals: 18,
           symbol: 'MEGA',
           name: 'Mega',
+          bridge: 'native',
         },
         {
           decimals: 18,
           symbol: 'ETH',
           name: 'Ethereum',
           address: 'native',
+          bridge: 'native',
         },
       ];
 
@@ -312,12 +326,14 @@ describe('allowListCheck', () => {
         decimals: 18,
         symbol: 'MEGA',
         name: 'Mega',
+        bridge: 'native',
       },
       {
         decimals: 18,
         symbol: 'ETH',
         name: 'Ethereum',
         address: 'native',
+        bridge: 'native',
       }]);
     });
 
@@ -344,6 +360,7 @@ describe('allowListCheck', () => {
         decimals: 18,
         symbol: 'MEGA',
         name: 'Mega',
+        bridge: 'native',
       }];
 
       const result = await allowListCheckForBridge(config, balances, { bridge: true });
@@ -360,12 +377,14 @@ describe('allowListCheck', () => {
           symbol: 'ETH',
           name: 'Ethereum',
           address: '0x52A6c53869Ce09a731CD772f245b97A4401d3348',
+          bridge: 'native',
         },
         {
           decimals: 18,
           symbol: 'IMX',
           name: 'IMX',
           address: 'native',
+          bridge: null,
         },
       ]);
     });
@@ -393,6 +412,7 @@ describe('allowListCheck', () => {
         decimals: 18,
         symbol: 'MEGA',
         name: 'Mega',
+        bridge: 'native',
       }];
 
       const result = await allowListCheckForSwap(config, balances, { swap: true });
