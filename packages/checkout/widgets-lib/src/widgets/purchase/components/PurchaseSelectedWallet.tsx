@@ -1,4 +1,5 @@
 import {
+  ButtCon,
   EllipsizedText,
   MenuItem,
   MenuItemProps,
@@ -35,7 +36,7 @@ export function PurchaseSelectedWallet({
   providerInfo,
   disabled,
   sx,
-  size,
+  size = 'small',
 }: PurchaseSelectedWalletProps) {
   const selected = !!children && providerInfo?.rdns;
 
@@ -60,7 +61,7 @@ export function PurchaseSelectedWallet({
       size={size}
       disabled={disabled}
       emphasized={!disabled}
-      onClick={disabled ? undefined : onClick}
+      onClick={(providerInfo?.address || disabled) ? undefined : onClick}
       sx={{
         py: selected ? 'base.spacing.x1' : undefined,
         ...(disabled ? disabledStyles : {}),
@@ -83,6 +84,14 @@ export function PurchaseSelectedWallet({
       )}
 
       {children && (<MenuItem.BottomSlot>{children}</MenuItem.BottomSlot>
+      )}
+      {providerInfo?.address && (
+      <ButtCon
+        icon="Edit"
+        size="small"
+        variant="tertiary"
+        onClick={onClick}
+      />
       )}
     </MenuItem>
   );

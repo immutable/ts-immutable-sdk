@@ -7,7 +7,9 @@ import { useTranslation } from 'react-i18next';
 import { listVariants, listItemVariants } from '../../../../lib/animation/listAnimation';
 import { Chain, RouteData } from '../../../../lib/squid/types';
 import { getRemoteVideo } from '../../../../lib/utils';
-import { DirectCryptoPayData, FiatOptionType } from '../../types';
+import {
+  DirectCryptoPayData, DirectCryptoPayOptionType, FiatOptionType, SquidRouteOptionType,
+} from '../../types';
 import { RouteOption } from './RouteOption';
 import { FiatOption } from './FiatOption';
 import { DirectCryptoPayOption } from './DirectCryptoPayOption';
@@ -29,7 +31,7 @@ export interface OptionsProps {
   showDirectCryptoPayOption?: boolean;
   insufficientBalance?: boolean;
   selectedIndex: number;
-  directCryptoPay?: boolean;
+  selectedRouteType: SquidRouteOptionType | DirectCryptoPayOptionType | undefined;
   directCryptoPayRoutes?: DirectCryptoPayData[];
 }
 
@@ -46,41 +48,38 @@ export function RouteOptions({
   showDirectCryptoPayOption,
   insufficientBalance,
   selectedIndex,
-  directCryptoPay,
+  selectedRouteType,
   directCryptoPayRoutes,
 }: OptionsProps) {
   const { t } = useTranslation();
 
-  // @NOTE: early exit with loading related UI, when the
-  // routes are not yet available
-  if (!routes?.length && !insufficientBalance && !directCryptoPay) {
-    return (
-      <Stack
-        sx={{ pt: 'base.spacing.x3' }}
-        alignItems="stretch"
-        gap="base.spacing.x1"
-      >
-        <MenuItem shimmer="withBottomSlot" size="small" emphasized />
-        <MenuItem shimmer="withBottomSlot" size="small" emphasized />
+  const renderLoading = () => (
+    <Stack
+      sx={{ pt: 'base.spacing.x3' }}
+      alignItems="stretch"
+      gap="base.spacing.x1"
+    >
+      <MenuItem shimmer="withBottomSlot" size="small" emphasized />
+      <MenuItem shimmer="withBottomSlot" size="small" emphasized />
 
-        <Body sx={{ textAlign: 'center', mt: 'base.spacing.x6' }} size="small">
-          {t('views.PURCHASE.drawer.options.loadingText1')}
-          <br />
-          {t('views.PURCHASE.drawer.options.loadingText2')}
-        </Body>
-        <FramedVideo
-          mimeType="video/mp4"
-          videoUrl={getRemoteVideo(
-            checkout.config.environment,
-            '/loading_bubble-small.mp4',
-          )}
-          sx={{ alignSelf: 'center', mt: 'base.spacing.x2' }}
-          size="large"
-          circularFrame
-        />
-      </Stack>
-    );
-  }
+      <Body sx={{ textAlign: 'center', mt: 'base.spacing.x6' }} size="small">
+        {t('views.PURCHASE.drawer.options.loadingText1')}
+        <br />
+        {t('views.PURCHASE.drawer.options.loadingText2')}
+      </Body>
+      <FramedVideo
+        mimeType="video/mp4"
+        videoUrl={getRemoteVideo(
+          checkout.config.environment,
+          '/loading_bubble-small.mp4',
+        )}
+        sx={{ alignSelf: 'center', mt: 'base.spacing.x2' }}
+        size="large"
+        circularFrame
+      />
+    </Stack>
+  );
+
   const noRoutes = !(!insufficientBalance || routes?.length);
 
   return (
@@ -94,18 +93,38 @@ export function RouteOptions({
         <motion.div variants={listVariants} initial="hidden" animate="show" />
       }
     >
-      {routes?.map((routeData: RouteData, index) => (
+      {(directCryptoPayRoutes && directCryptoPayRoutes.length > 0)
+      && (directCryptoPayRoutes?.map((routeData: DirectCryptoPayData, index) => (
+        <DirectCryptoPayOption
+          key={`direct-crypto-pay-option-${routeData.amountData.fromToken.chainId}-`
+               + `${routeData.amountData.fromToken.address}`}
+          size={size}
+          routeData={routeData}
+          chains={chains}
+          onClick={() => onDirectCryptoPayClick(routeData, index)}
+          isFastest={index === 0}
+          selected={
+            index === selectedIndex
+            && (selectedRouteType === DirectCryptoPayOptionType.IMMUTABLE_ZKEVM || !selectedRouteType)
+          }
+          rc={<motion.div variants={listItemVariants} />}
+        />
+      )))}
+
+      {(routes && routes.length > 0)
+      && routes?.map((routeData: RouteData, index) => (
         <RouteOption
           key={`route-option-${routeData.amountData.fromToken.chainId}-${routeData.amountData.fromToken.address}`}
           size={size}
           routeData={routeData}
           chains={chains}
           onClick={() => onRouteClick(routeData, index)}
-          isFastest={index === 0}
-          selected={index === selectedIndex}
+          isFastest={directCryptoPayRoutes && directCryptoPayRoutes.length > 0 ? false : index === 0}
+          selected={index === selectedIndex && selectedRouteType === SquidRouteOptionType.SQUID_ROUTE}
           rc={<motion.div variants={listItemVariants} />}
         />
       ))}
+
       {noRoutes && (
         <Banner>
           <Banner.Icon icon="InformationCircle" />
@@ -115,6 +134,9 @@ export function RouteOptions({
           </Banner.Caption>
         </Banner>
       )}
+
+      {!routes?.length && !insufficientBalance && renderLoading()}
+
       {showOnrampOption && (
       <>
         <Divider size="xSmall" sx={{ my: 'base.spacing.x2' }}>
@@ -131,19 +153,6 @@ export function RouteOptions({
         ))}
       </>
       )}
-      {directCryptoPayRoutes?.map((routeData: DirectCryptoPayData, index) => (
-        <DirectCryptoPayOption
-          // eslint-disable-next-line max-len
-          key={`direct-crypto-pay-option-${routeData.amountData.fromToken.chainId}-${routeData.amountData.fromToken.address}`}
-          size={size}
-          routeData={routeData}
-          chains={chains}
-          onClick={() => onDirectCryptoPayClick(routeData, index)}
-          isFastest={index === 0}
-          selected={index === selectedIndex}
-          rc={<motion.div variants={listItemVariants} />}
-        />
-      ))}
     </Stack>
   );
 }

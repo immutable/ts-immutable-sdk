@@ -56,7 +56,7 @@ export function DirectCryptoPayOption<RC extends ReactElement | undefined = unde
   );
 
   const {
-    routeBalanceUsd, fromAmount, fromAmountUsd,
+    routeBalanceUsd,
   } = getRouteAndTokenBalancesForDirectCryptoPay(routeData);
 
   const handleClick = () => {
@@ -74,7 +74,14 @@ export function DirectCryptoPayOption<RC extends ReactElement | undefined = unde
 
   return (
     <MenuItem {...menuItemProps}>
-      <MenuItem.Label>{fromToken.name}</MenuItem.Label>
+      <MenuItem.Label>
+        {' '}
+        {fromToken.name}
+        {' '}
+        {t('views.PURCHASE.routeOption.on')}
+        {' '}
+        {chain?.name}
+      </MenuItem.Label>
 
       {chain && (
       <Sticker position={{ x: 'right', y: 'bottom' }}>
@@ -91,7 +98,7 @@ export function DirectCryptoPayOption<RC extends ReactElement | undefined = unde
       )}
 
       <MenuItem.Caption>
-        {`${t('views.PURCHASE.fees.balance')} ${t('views.PURCHASE.fees.fiatPricePrefix')} $${routeBalanceUsd}`}
+        {`${t('views.PURCHASE.fees.balance')} ${t('views.PURCHASE.fees.fiatPricePrefix')}${routeBalanceUsd}`}
         {routeData.isInsufficientGas && (
           <>
             <br />
@@ -103,12 +110,6 @@ export function DirectCryptoPayOption<RC extends ReactElement | undefined = unde
           </>
         )}
       </MenuItem.Caption>
-
-      <MenuItem.PriceDisplay price={fromAmount}>
-        <MenuItem.PriceDisplay.Caption>
-          {`${t('views.PURCHASE.fees.fiatPricePrefix')} $${fromAmountUsd}`}
-        </MenuItem.PriceDisplay.Caption>
-      </MenuItem.PriceDisplay>
 
       <MenuItem.BottomSlot>
         <MenuItem.BottomSlot.Divider />
@@ -138,6 +139,13 @@ export function DirectCryptoPayOption<RC extends ReactElement | undefined = unde
               variant="bold"
             />
             {estimatedDurationFormatted}
+            {' '}
+            |
+            {' '}
+            {
+              `${t('views.PURCHASE.fees.fee')} 
+              ${t('views.PURCHASE.fees.fiatPricePrefix')}${getFormattedAmounts(totalFeesUsd)}`
+            }
           </Body>
 
           <Body size="xSmall" sx={{ ...hFlex, ...centerFlexChildren }}>
@@ -148,10 +156,6 @@ export function DirectCryptoPayOption<RC extends ReactElement | undefined = unde
               sx={{ mr: 'base.spacing.x2' }}
             />
             )}
-            {
-                `${t('views.PURCHASE.fees.fee')} ${t('views.PURCHASE.fees.fiatPricePrefix')} 
-                $${getFormattedAmounts(totalFeesUsd)}`
-              }
           </Body>
         </Stack>
       </MenuItem.BottomSlot>

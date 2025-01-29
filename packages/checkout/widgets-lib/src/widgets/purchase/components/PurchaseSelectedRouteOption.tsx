@@ -1,5 +1,6 @@
 import {
   AllDualVariantIconKeys,
+  Button,
   MenuItem,
   Sticker,
 } from '@biom3/react';
@@ -15,14 +16,17 @@ import { useTranslation } from 'react-i18next';
 import { getRouteAndTokenBalances } from '../../../lib/squid/functions/getRouteAndTokenBalances';
 import { Chain, RouteData } from '../../../lib/squid/types';
 import { getRemoteVideo } from '../../../lib/utils';
+import { getRouteAndTokenBalancesForDirectCryptoPay } from '../functions/getRouteAndBalancesForDirectCryptoPay';
+import { DirectCryptoPayData } from '../types';
 
 interface PurchaseSelectedRouteOptionProps {
   checkout: Checkout;
-  routeData?: RouteData;
+  routeData?: RouteData | DirectCryptoPayData;
   chains: Chain[] | null;
   onClick: MouseEventHandler<HTMLSpanElement>;
   loading?: boolean;
   insufficientBalance?: boolean;
+  directCryptoPay?: boolean;
   showOnrampOption?: boolean;
 }
 
@@ -32,6 +36,7 @@ export function PurchaseSelectedRouteOption({
   chains,
   loading = false,
   insufficientBalance = false,
+  directCryptoPay = false,
   showOnrampOption = false,
   onClick,
 }: PurchaseSelectedRouteOptionProps) {
@@ -40,8 +45,19 @@ export function PurchaseSelectedRouteOption({
   const { fromToken } = routeData?.amountData ?? {};
   const chain = chains?.find((c) => c.id === fromToken?.chainId);
 
+  let chainNativeCurrencySymbol = '';
   const { routeBalanceUsd } = useMemo(
-    () => getRouteAndTokenBalances(routeData),
+    () => {
+      if (!routeData || !('route' in routeData)) {
+        if (directCryptoPay) {
+          chainNativeCurrencySymbol = chain?.nativeCurrency.symbol || '';
+          return getRouteAndTokenBalancesForDirectCryptoPay(routeData);
+        }
+        return { routeBalanceUsd: '0', fromAmount: '0', fromAmountUsd: '0' };
+      }
+      chainNativeCurrencySymbol = routeData.route.route.estimate.gasCosts[0].token.symbol;
+      return getRouteAndTokenBalances(routeData);
+    },
     [routeData],
   );
 
@@ -124,10 +140,8 @@ export function PurchaseSelectedRouteOption({
       size="small"
       emphasized
       sx={{
-        cursor: 'pointer',
         py: 'base.spacing.x4',
       }}
-      onClick={handleOnClick}
     >
 
       {chain && (
@@ -159,13 +173,19 @@ export function PurchaseSelectedRouteOption({
           <br />
           <span style={{ color: '#FF637F' }}>
             {t('views.PURCHASE.noGasRouteMessage', {
-              token:
-              routeData.route.route.estimate.gasCosts[0].token.symbol,
+              token: chainNativeCurrencySymbol,
             })}
           </span>
         </>
         )}
       </MenuItem.Caption>
+      <Button
+        size="small"
+        variant="tertiary"
+        onClick={onClick}
+      >
+        {t('views.PURCHASE.routeSelection.changeLabel')}
+      </Button>
     </MenuItem>
   );
 }
