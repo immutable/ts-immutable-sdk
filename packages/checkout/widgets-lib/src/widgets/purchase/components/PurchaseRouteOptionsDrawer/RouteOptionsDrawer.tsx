@@ -1,12 +1,13 @@
 import {
+  ButtCon,
   Drawer, EllipsizedText, MenuItem,
+  Stack,
 } from '@biom3/react';
 import { motion } from 'framer-motion';
 import {
   useContext, useEffect, useRef, useState,
 } from 'react';
 import { Checkout } from '@imtbl/checkout-sdk';
-import { useTranslation } from 'react-i18next';
 import { useAnalytics, UserJourney } from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { useProvidersContext } from '../../../../context/providers-context/ProvidersContext';
 import { listVariants } from '../../../../lib/animation/listAnimation';
@@ -23,6 +24,7 @@ type OptionsDrawerProps = {
   chains: Chain[] | null;
   visible: boolean;
   onClose: () => void;
+  onWalletChangeClick: () => void;
   onRouteClick: (route: RouteData) => void;
   onCardClick: (type: FiatOptionType) => void;
   onDirectCryptoPayClick: (route: DirectCryptoPayData) => void;
@@ -40,6 +42,7 @@ export function RouteOptionsDrawer({
   chains,
   visible,
   onClose,
+  onWalletChangeClick,
   onRouteClick,
   onCardClick,
   onDirectCryptoPayClick,
@@ -52,7 +55,6 @@ export function RouteOptionsDrawer({
   insufficientBalance,
   directCryptoPayRoutes,
 }: OptionsDrawerProps) {
-  const { t } = useTranslation();
   const { track } = useAnalytics();
 
   const {
@@ -125,15 +127,26 @@ export function RouteOptionsDrawer({
             )}
             sx={{ mx: 'base.spacing.x2' }}
           />
-          <MenuItem.Label>{t('views.PURCHASE.drawer.options.heading')}</MenuItem.Label>
-          <MenuItem.Caption>
-            {fromProviderInfo?.name}
-            {' • '}
-            <EllipsizedText
-              text={fromAddress ?? ''}
-              sx={{ c: 'inherit', fontSize: 'inherit' }}
+          <Stack sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <Stack sx={{ gap: '0', pr: 'base.spacing.x2' }}>
+              <MenuItem.Label>
+                {fromProviderInfo?.name}
+              </MenuItem.Label>
+              <MenuItem.Caption>
+                <EllipsizedText
+                  text={fromAddress ?? ''}
+                  sx={{ c: 'inherit', fontSize: 'inherit' }}
+                />
+              </MenuItem.Caption>
+
+            </Stack>
+            <ButtCon
+              icon="Edit"
+              size="small"
+              variant="tertiary"
+              onClick={onWalletChangeClick}
             />
-          </MenuItem.Caption>
+          </Stack>
           <MenuItem.StatefulButtCon icon="ChevronExpand" onClick={onClose} />
         </MenuItem>
         <RouteOptions
