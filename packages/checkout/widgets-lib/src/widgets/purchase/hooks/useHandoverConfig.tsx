@@ -76,7 +76,6 @@ export const useHandoverConfig = (environment: Environment) => {
       animationPath: EXECUTE_TXN_ANIMATION,
       state: RiveStateMachineInput.WAITING,
       headingText: t('views.PURCHASE.handover.requestingExecution.heading'),
-      subheadingText: t('views.PURCHASE.handover.requestingExecution.subHeading'),
     }),
     [PurchaseHandoverStep.SUCCESS_ZKEVM]: ({ transactionHash }) => ({
       animationPath: EXECUTE_TXN_ANIMATION,

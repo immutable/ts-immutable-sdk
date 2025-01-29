@@ -879,7 +879,11 @@
         "fastestBadge": "가장 빠름",
         "minutesText": "분",
         "minuteText": "분",
-        "secondsText": "초"
+        "secondsText": "초",
+        "changeLabel": "변경"
+      },
+      "routeOption": {
+        "on": "켜기"
       },
       "drawer": {
         "options": {

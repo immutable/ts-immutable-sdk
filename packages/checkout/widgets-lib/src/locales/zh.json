@@ -656,6 +656,9 @@
         "minuteText": "分钟",
         "secondsText": "秒"
       },
+      "routeOption": {
+        "on": "开启"
+      },
       "drawer": {
         "options": {
           "heading": "支付来源",
@@ -879,7 +882,8 @@
         "fastestBadge": "最快",
         "minutesText": "分钟",
         "minuteText": "分钟",
-        "secondsText": "秒"
+        "secondsText": "秒",
+        "changeLabel": "更改"
       },
       "drawer": {
         "options": {

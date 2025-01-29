@@ -18,6 +18,15 @@ export interface TokenInfo {
 }
 
 /**
+ * A type representing the token info with bridge details.
+ * @extends {TokenInfo}
+ * @property {string | null} bridge - The bridge used to bridge the token.
+ */
+export interface TokenBridgeInfo extends TokenInfo {
+  bridge: string | null;
+}
+
+/**
  * Interface representing the parameters for {@link Checkout.getTokenInfo}.
  * @property {Web3Provider | JsonRpcProvider} provider - The provider used to get the balance.
  * @property {string} tokenAddress - The contract address of the token.

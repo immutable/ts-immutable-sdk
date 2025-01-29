@@ -882,7 +882,11 @@
         "fastestBadge": "最速",
         "minutesText": "分",
         "minuteText": "分",
-        "secondsText": "秒"
+        "secondsText": "秒",
+        "changeLabel": "変更"
+      },
+      "routeOption": {
+        "on": "オン"
       },
       "drawer": {
         "options": {

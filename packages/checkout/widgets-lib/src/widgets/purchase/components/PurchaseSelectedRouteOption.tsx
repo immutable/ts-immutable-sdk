@@ -1,5 +1,6 @@
 import {
   AllDualVariantIconKeys,
+  Button,
   MenuItem,
   Sticker,
 } from '@biom3/react';
@@ -147,10 +148,8 @@ export function PurchaseSelectedRouteOption({
       size="small"
       emphasized
       sx={{
-        cursor: 'pointer',
         py: 'base.spacing.x4',
       }}
-      onClick={handleOnClick}
     >
 
       {chain && (
@@ -188,6 +187,13 @@ export function PurchaseSelectedRouteOption({
         </>
         )}
       </MenuItem.Caption>
+      <Button
+        size="small"
+        variant="tertiary"
+        onClick={onClick}
+      >
+        {t('views.PURCHASE.routeSelection.changeLabel')}
+      </Button>
     </MenuItem>
   );
 }

@@ -96,15 +96,17 @@ export function RouteOptions({
       {(directCryptoPayRoutes && directCryptoPayRoutes.length > 0)
       && (directCryptoPayRoutes?.map((routeData: DirectCryptoPayData, index) => (
         <DirectCryptoPayOption
-          // eslint-disable-next-line max-len
-          key={`direct-crypto-pay-option-${routeData.amountData.fromToken.chainId}-${routeData.amountData.fromToken.address}`}
+          key={`direct-crypto-pay-option-${routeData.amountData.fromToken.chainId}-`
+               + `${routeData.amountData.fromToken.address}`}
           size={size}
           routeData={routeData}
           chains={chains}
           onClick={() => onDirectCryptoPayClick(routeData, index)}
           isFastest={index === 0}
-          // eslint-disable-next-line max-len
-          selected={index === selectedIndex && (selectedRouteType === DirectCryptoPayOptionType.IMMUTABLE_ZKEVM || !selectedRouteType)}
+          selected={
+            index === selectedIndex
+            && (selectedRouteType === DirectCryptoPayOptionType.IMMUTABLE_ZKEVM || !selectedRouteType)
+          }
           rc={<motion.div variants={listItemVariants} />}
         />
       )))}
@@ -117,11 +119,12 @@ export function RouteOptions({
           routeData={routeData}
           chains={chains}
           onClick={() => onRouteClick(routeData, index)}
-          isFastest={index === 0}
+          isFastest={directCryptoPayRoutes && directCryptoPayRoutes.length > 0 ? false : index === 0}
           selected={index === selectedIndex && selectedRouteType === SquidRouteOptionType.SQUID_ROUTE}
           rc={<motion.div variants={listItemVariants} />}
         />
       ))}
+
       {noRoutes && (
         <Banner>
           <Banner.Icon icon="InformationCircle" />

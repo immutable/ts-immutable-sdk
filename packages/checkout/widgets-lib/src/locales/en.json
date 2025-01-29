@@ -897,10 +897,14 @@
         "noRoute": "No routes found, choose a different wallet, token or amount.",
         "payWithCard": "Pay with card",
         "noRoutePayWithCard": "No routes found, pay with card available",
-        "fastestBadge": "Fastest",
+        "fastestBadge": "Cheapest & fastest",
         "minutesText": "mins",
         "minuteText": "min",
-        "secondsText": "s"
+        "secondsText": "s",
+        "changeLabel": "Change" 
+      },
+      "routeOption": {
+        "on": "on"
       },
       "drawer": {
         "options": {
@@ -1068,7 +1072,7 @@
         "bridgeTokenButton": "Bridge tokens"
       },
       "fees": {
-        "fee": "Fee",
+        "fee": "Fees",
         "balance": "Balance",
         "fiatPricePrefix": "$",
         "zeroFees": "Zero fees",

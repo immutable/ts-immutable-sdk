@@ -3,6 +3,7 @@ import { RouteResponse, ActionType } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
 import { utils } from 'ethers';
 import { useRef } from 'react';
+import { Web3Provider } from '@ethersproject/providers';
 import { delay } from '../../../functions/delay';
 import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
 import { retry } from '../../retry';
@@ -17,6 +18,8 @@ import { findToken } from '../functions/findToken';
 import { isRouteToAmountGreaterThanToAmount } from '../functions/isRouteToAmountGreaterThanToAmount';
 import { useRouteCalculation } from './useRouteCalculation';
 import { RouteError } from '../RouteError';
+
+const INSUFFICIENT_GAS_THRESHOLD = 0.1;
 
 export const useRoutes = () => {
   const latestRequestIdRef = useRef<number>(0);
@@ -375,8 +378,30 @@ export const useRoutes = () => {
     return false;
   };
 
+  const hasSufficientGas = (
+    balances: TokenBalance[],
+    selectedChainId: string | number,
+    provider: Web3Provider | undefined,
+  ): boolean => {
+    if (!provider) return false;
+    if (isPassportProvider(provider)) return true;
+
+    const nativeCurrencyBalance = balances.find(
+      (balance) => balance.address.toLowerCase() === SQUID_NATIVE_TOKEN.toLowerCase()
+        && balance.chainId.toString() === selectedChainId.toString(),
+    );
+    if (!nativeCurrencyBalance) return false;
+
+    const nativeCurrencyBalanceAmount = parseFloat(
+      utils.formatUnits(nativeCurrencyBalance.balance, nativeCurrencyBalance.decimals),
+    );
+    if (nativeCurrencyBalanceAmount < INSUFFICIENT_GAS_THRESHOLD) return false;
+    return true;
+  };
+
   return {
     hasSufficientBalance,
+    hasSufficientGas,
     fetchRoutes,
     getFromAmountData,
     getRoute,

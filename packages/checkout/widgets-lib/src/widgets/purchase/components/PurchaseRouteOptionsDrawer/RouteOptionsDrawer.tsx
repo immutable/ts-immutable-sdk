@@ -6,7 +6,6 @@ import {
   useContext, useEffect, useRef, useState,
 } from 'react';
 import { Checkout } from '@imtbl/checkout-sdk';
-import { useTranslation } from 'react-i18next';
 import { useAnalytics, UserJourney } from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { useProvidersContext } from '../../../../context/providers-context/ProvidersContext';
 import { listVariants } from '../../../../lib/animation/listAnimation';
@@ -52,7 +51,6 @@ export function RouteOptionsDrawer({
   insufficientBalance,
   directCryptoPayRoutes,
 }: OptionsDrawerProps) {
-  const { t } = useTranslation();
   const { track } = useAnalytics();
 
   const {
@@ -125,15 +123,16 @@ export function RouteOptionsDrawer({
             )}
             sx={{ mx: 'base.spacing.x2' }}
           />
-          <MenuItem.Label>{t('views.PURCHASE.drawer.options.heading')}</MenuItem.Label>
-          <MenuItem.Caption>
+          <MenuItem.Label>
             {fromProviderInfo?.name}
-            {' • '}
+          </MenuItem.Label>
+          <MenuItem.Caption>
             <EllipsizedText
               text={fromAddress ?? ''}
               sx={{ c: 'inherit', fontSize: 'inherit' }}
             />
           </MenuItem.Caption>
+
           <MenuItem.StatefulButtCon icon="ChevronExpand" onClick={onClose} />
         </MenuItem>
         <RouteOptions
