@@ -74,7 +74,14 @@ export function DirectCryptoPayOption<RC extends ReactElement | undefined = unde
 
   return (
     <MenuItem {...menuItemProps}>
-      <MenuItem.Label>{fromToken.name}</MenuItem.Label>
+      <MenuItem.Label>
+        {' '}
+        {fromToken.name}
+        {' '}
+        {t('views.PURCHASE.routeOption.on')}
+        {' '}
+        {chain?.name}
+      </MenuItem.Label>
 
       {chain && (
       <Sticker position={{ x: 'right', y: 'bottom' }}>

@@ -184,7 +184,7 @@ export function PurchaseSelectedRouteOption({
         variant="tertiary"
         onClick={onClick}
       >
-        Change
+        {t('views.PURCHASE.routeSelection.changeLabel')}
       </Button>
     </MenuItem>
   );

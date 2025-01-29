@@ -82,7 +82,7 @@ export function RouteOption<RC extends ReactElement | undefined = undefined>({
       <MenuItem.Label>
         {fromToken.name}
         {' '}
-        on
+        {t('views.PURCHASE.routeOption.on')}
         {' '}
         {chain?.name}
       </MenuItem.Label>

@@ -899,7 +899,11 @@
         "fastestBadge": "Cheapest & fastest",
         "minutesText": "mins",
         "minuteText": "min",
-        "secondsText": "s"
+        "secondsText": "s",
+        "changeLabel": "Change" 
+      },
+      "routeOption": {
+        "on": "on"
       },
       "drawer": {
         "options": {
