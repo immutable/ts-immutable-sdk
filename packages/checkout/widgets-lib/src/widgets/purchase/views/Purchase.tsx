@@ -42,6 +42,7 @@ import { PurchaseContext } from '../context/PurchaseContext';
 import { useHandoverConfig, PurchaseHandoverStep } from '../hooks/useHandoverConfig';
 import { sendConnectProviderSuccessEvent, sendPurchaseSuccessEvent } from '../PurchaseWidgetEvents';
 import { DirectCryptoPayData } from '../types';
+import { useErrorHandler } from '../hooks/useErrorHandler';
 
 interface PurchaseProps {
   checkout: Checkout;
@@ -104,12 +105,11 @@ export function Purchase({
   } = useRoutes();
   const { providers } = useInjectedProviders({ checkout });
 
+  const { onTransactionError } = useErrorHandler();
+
   const {
     getAllowance, approve, execute, getStatus, waitForReceipt,
-  } = useExecute(UserJourney.PURCHASE, (err) => {
-    // eslint-disable-next-line no-console
-    console.log('useExecute err', err);
-  });
+  } = useExecute(UserJourney.PURCHASE, onTransactionError);
 
   const { signWithPostHooks, sign } = useSignOrder({
     environmentId,
@@ -322,6 +322,7 @@ export function Purchase({
         squidMulticallAddress,
         toAddress,
       );
+      // TODO ERROR TRANSAK_FAILED PRODUCT_NOT_FOUND INSUFFICIENT_STOCK
 
       const updatedAmountData = getFromAmountData(
         tokens,
@@ -332,6 +333,7 @@ export function Purchase({
         selectedRouteData.amountData.additionalBuffer,
       );
       if (!updatedAmountData) return;
+      // TODO ERROR NOT LIKELY just use ROUTE_ERROR
 
       const postHooks = signResponse?.postHooks ? {
         chainType: ChainType.EVM,
@@ -354,6 +356,7 @@ export function Purchase({
       ))?.route;
 
       if (!route) return;
+      // TODO ERROR ROUTE_ERROR
 
       const currentFromAddress = await fromProvider.getSigner().getAddress();
       const { fromChain, toChain } = getRouteChains(chains, route);
