@@ -42,10 +42,11 @@ import { PurchaseActions, PurchaseContext } from '../context/PurchaseContext';
 import { useHandoverConfig, PurchaseHandoverStep } from '../hooks/useHandoverConfig';
 import { sendConnectProviderSuccessEvent, sendPurchaseSuccessEvent } from '../PurchaseWidgetEvents';
 import {
-  DirectCryptoPayData,
+  DirectCryptoPayData, PurchaseErrorTypes,
 } from '../types';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { PurchaseWidgetViews } from '../../../context/view-context/PurchaseViewContextTypes';
+import { useError } from '../hooks/useError';
 import { useErrorHandler } from '../hooks/useErrorHandler';
 
 interface PurchaseProps {
@@ -129,6 +130,7 @@ export function Purchase({
   });
 
   const { showHandover } = useHandoverConfig(checkout.config.environment);
+  const { showErrorHandover } = useError(checkout.config.environment);
 
   const handleWalletConnected = (
     providerType: 'from' | 'to',
@@ -374,7 +376,10 @@ export function Purchase({
         squidMulticallAddress,
         toAddress,
       );
-      if (!signResponse) return;
+      if (!signResponse) {
+        showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
+        return;
+      }
       purchaseDispatch({
         payload: {
           type: PurchaseActions.SET_SIGN_RESPONSE,
@@ -390,7 +395,10 @@ export function Purchase({
         quote.currency.address,
         selectedRouteData.amountData.additionalBuffer,
       );
-      if (!updatedAmountData) return;
+      if (!updatedAmountData) {
+        showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
+        return;
+      }
 
       const postHooks = signResponse?.postHooks ? {
         chainType: ChainType.EVM,
@@ -412,12 +420,16 @@ export function Purchase({
         postHooks,
       ))?.route;
 
-      if (!route) return;
+      if (!route) {
+        showErrorHandover(PurchaseErrorTypes.ROUTE_ERROR, {});
+        return;
+      }
 
       const currentFromAddress = await fromProvider.getSigner().getAddress();
       const { fromChain, toChain } = getRouteChains(chains, route);
 
       if (currentFromAddress !== fromAddress) {
+        showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
         return;
       }
 
@@ -433,6 +445,7 @@ export function Purchase({
       );
 
       if (!verifyChainResult.isChainCorrect) {
+        showErrorHandover(PurchaseErrorTypes.UNRECOGNISED_CHAIN, {});
         return;
       }
 
@@ -445,7 +458,11 @@ export function Purchase({
       if (!allowance || allowance?.lt(fromAmount)) {
         showHandover(PurchaseHandoverStep.REQUEST_APPROVAL, {});
 
-        const approveTxnReceipt = await approve(fromProviderInfo, changeableProvider, route);
+        const approveTxnReceipt = await approve(
+          fromProviderInfo,
+          changeableProvider,
+          route,
+        );
 
         if (!approveTxnReceipt) {
           return;
@@ -456,7 +473,12 @@ export function Purchase({
 
       showHandover(PurchaseHandoverStep.REQUEST_EXECUTION, {});
 
-      const executeTxnReceipt = await execute(squid, fromProviderInfo, changeableProvider, route);
+      const executeTxnReceipt = await execute(
+        squid,
+        fromProviderInfo,
+        changeableProvider,
+        route,
+      );
 
       // eslint-disable-next-line no-console
       console.log('executeTxnReceipt', executeTxnReceipt);
@@ -467,10 +489,16 @@ export function Purchase({
 
       const fundingMethod = fromChain !== toChain ? 'squid' : 'direct';
 
-      sendPurchaseSuccessEvent(eventTarget, executeTxnReceipt.transactionHash, fundingMethod);
+      sendPurchaseSuccessEvent(
+        eventTarget,
+        executeTxnReceipt.transactionHash,
+        fundingMethod,
+      );
 
       if (toChain === fromChain) {
-        showHandover(PurchaseHandoverStep.SUCCESS_ZKEVM, { transactionHash: executeTxnReceipt.transactionHash });
+        showHandover(PurchaseHandoverStep.SUCCESS_ZKEVM, {
+          transactionHash: executeTxnReceipt.transactionHash,
+        });
         return;
       }
 
