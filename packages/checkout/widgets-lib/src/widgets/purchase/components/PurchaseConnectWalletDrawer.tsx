@@ -1,4 +1,6 @@
-import { ReactNode, useRef, useState } from 'react';
+import {
+  ReactNode, useContext, useRef, useState,
+} from 'react';
 import {
   EIP6963ProviderDetail,
   EIP6963ProviderInfo,
@@ -16,6 +18,8 @@ import { identifyUser } from '../../../lib/analytics/identifyUser';
 import { ConnectEIP6963ProviderError, connectEIP6963Provider } from '../../../lib/connectEIP6963Provider';
 import { getProviderSlugFromRdns } from '../../../lib/provider';
 import { removeSpace } from '../../../lib/utils';
+import { PurchaseContext } from '../context/PurchaseContext';
+import { FiatOptionType } from '../types';
 
 type PurchaseConnectWalletDrawerProps = {
   heading: string;
@@ -61,19 +65,24 @@ export function PurchaseConnectWalletDrawer({
 
   const [showUnableToConnectDrawer, setShowUnableToConnectDrawer] = useState(false);
 
+  const { purchaseState: { selectedRouteType } } = useContext(PurchaseContext);
+
   const setProviderInContext = async (
     provider: Web3Provider,
     providerInfo: EIP6963ProviderInfo,
   ) => {
     const address = await provider.getSigner().getAddress();
-    // providersDispatch({
-    //   payload: {
-    //     type: ProvidersContextActions.SET_PROVIDER,
-    //     fromAddress: address,
-    //     fromProvider: provider,
-    //     fromProviderInfo: providerInfo,
-    //   },
-    // });
+
+    if (selectedRouteType !== FiatOptionType.CREDIT) {
+      providersDispatch({
+        payload: {
+          type: ProvidersContextActions.SET_PROVIDER,
+          fromAddress: address,
+          fromProvider: provider,
+          fromProviderInfo: providerInfo,
+        },
+      });
+    }
 
     providersDispatch({
       payload: {

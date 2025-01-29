@@ -145,6 +145,15 @@ export function Purchase({
     );
   };
 
+  const updateSelectedRouteType = (routeType: SquidRouteOptionType | DirectCryptoPayOptionType | FiatOptionType) => {
+    purchaseDispatch({
+      payload: {
+        type: PurchaseActions.SET_SELECTED_ROUTE_TYPE,
+        selectedRouteType: routeType,
+      },
+    });
+  };
+
   const handleRouteClick = (route: RouteData) => {
     setShowOptionsDrawer(false);
     setShowPayWithWalletDrawer(false);
@@ -152,6 +161,7 @@ export function Purchase({
     setSelectedRouteData(route);
     setSelectedDirectCryptoPayRoute(undefined);
     setSelectedRouteType(SquidRouteOptionType.SQUID_ROUTE);
+    updateSelectedRouteType(SquidRouteOptionType.SQUID_ROUTE);
   };
 
   const handleDirectCryptoPayClick = (route: DirectCryptoPayData) => {
@@ -161,6 +171,7 @@ export function Purchase({
     setSelectedRouteData(undefined);
     setSelectedDirectCryptoPayRoute(route);
     setSelectedRouteType(DirectCryptoPayOptionType.IMMUTABLE_ZKEVM);
+    updateSelectedRouteType(DirectCryptoPayOptionType.IMMUTABLE_ZKEVM);
   };
 
   const handlePayWithCardClick = () => {
@@ -170,6 +181,7 @@ export function Purchase({
     setSelectedRouteData(undefined);
     setSelectedDirectCryptoPayRoute(undefined);
     setSelectedRouteType(FiatOptionType.CREDIT);
+    updateSelectedRouteType(FiatOptionType.CREDIT);
   };
 
   useEffect(() => {
@@ -290,6 +302,7 @@ export function Purchase({
         signResponse,
       },
     });
+
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
