@@ -549,7 +549,7 @@ export function Purchase({
     (!(selectedRouteData || insufficientBalance || selectedDirectCryptoPayRoute))
   ) && !isPayWithCard;
 
-  const readyToProceed = !!fromAddress
+  const readyToProceed = (!!fromAddress || isPayWithCard)
     && !!toAddress
     && !loading
     && ((!!selectedRouteData && !selectedRouteData.isInsufficientGas)

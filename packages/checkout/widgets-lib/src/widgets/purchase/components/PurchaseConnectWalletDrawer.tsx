@@ -71,7 +71,7 @@ export function PurchaseConnectWalletDrawer({
   ) => {
     const address = await provider.getSigner().getAddress();
 
-    if (isPayWithCard) {
+    if (!isPayWithCard) {
       providersDispatch({
         payload: {
           type: ProvidersContextActions.SET_PROVIDER,
