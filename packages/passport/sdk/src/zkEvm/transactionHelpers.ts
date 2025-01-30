@@ -26,7 +26,7 @@ export type TransactionParams = {
   relayerClient: RelayerClient;
   zkEvmAddress: string;
   flow: Flow;
-  nonceSpace?: BigNumber;
+  nonceSpace?: bigint;
 };
 
 export type EjectionTransactionParams = Pick<TransactionParams, 'ethSigner' | 'zkEvmAddress' | 'flow'>;
@@ -69,7 +69,7 @@ const buildMetaTransactions = async (
   rpcProvider: JsonRpcProvider,
   relayerClient: RelayerClient,
   zkevmAddress: string,
-  nonceSpace?: BigNumber,
+  nonceSpace?: bigint,
 ): Promise<[MetaTransaction, ...MetaTransaction[]]> => {
   if (!transactionRequest.to) {
     throw new JsonRpcError(

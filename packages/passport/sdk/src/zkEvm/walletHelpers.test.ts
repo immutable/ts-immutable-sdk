@@ -125,13 +125,13 @@ describe('signAndPackTypedData', () => {
 describe('coerceNonceSpace', () => {
   describe('with no space', () => {
     it('should default to 0', () => {
-      expect(coerceNonceSpace()).toEqual(BigNumber.from(0));
+      expect(coerceNonceSpace()).toEqual(BigInt(0));
     });
   });
 
   describe('with space', () => {
     it('should return the space', () => {
-      expect(coerceNonceSpace(BigNumber.from(12345))).toEqual(BigNumber.from(12345));
+      expect(coerceNonceSpace(BigInt(12345))).toEqual(BigInt(12345));
     });
   });
 });
@@ -139,13 +139,13 @@ describe('coerceNonceSpace', () => {
 describe('encodeNonce', () => {
   describe('with no space', () => {
     it('should not left shift the nonce', () => {
-      expect(encodeNonce(BigNumber.from(0), BigNumber.from(1))).toEqual(BigNumber.from(1));
+      expect(encodeNonce(BigInt(0), BigInt(1))).toEqual(BigInt(1));
     });
   });
 
   describe('with space', () => {
     it('should left shift the nonce by 96 bits', () => {
-      expect(encodeNonce(BigNumber.from(1), BigNumber.from(0))).toEqual(BigNumber.from('0x01000000000000000000000000'));
+      expect(encodeNonce(BigInt(1), BigInt(0))).toEqual(BigInt('0x01000000000000000000000000'));
     });
   });
 });
