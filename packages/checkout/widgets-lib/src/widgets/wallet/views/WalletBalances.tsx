@@ -58,16 +58,30 @@ export function WalletBalances({
     supportedTopUps,
     tokenBalances,
   } = walletState;
-  const { conversions } = cryptoFiatState;
   const isPassport = isPassportProvider(provider);
   const enableNetworkMenu = !isPassport && showNetworkMenu;
 
   const { track, page } = useAnalytics();
 
-  const balanceInfos: BalanceInfo[] = useMemo(
-    () => mapTokenBalancesWithConversions(network?.chainId!, tokenBalances, conversions),
-    [tokenBalances, conversions, network?.chainId],
-  );
+  const [balanceInfos, setBalanceInfos] = useState<BalanceInfo[]>([]);
+
+  useEffect(() => {
+    async function fetchBalanceInfos() {
+      if (!network?.chainId || !tokenBalances.length || !cryptoFiatState.cryptoFiat) {
+        setBalanceInfos([]);
+        return;
+      }
+
+      const infos = await mapTokenBalancesWithConversions(
+        network.chainId,
+        tokenBalances,
+        cryptoFiatState.cryptoFiat,
+      );
+      setBalanceInfos(infos);
+    }
+
+    fetchBalanceInfos();
+  }, [tokenBalances, cryptoFiatState.cryptoFiat, network?.chainId]);
 
   useEffect(() => {
     page({

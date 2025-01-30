@@ -7,6 +7,7 @@ import {
 import { BigNumber } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
+import { CryptoFiat, CryptoFiatConfiguration } from '@imtbl/cryptofiat';
 import { getTokenBalances, mapTokenBalancesWithConversions } from './tokenBalances';
 
 describe('token balance tests', () => {
@@ -24,33 +25,21 @@ describe('token balance tests', () => {
       },
     ];
 
-    const conversions = new Map<string, number>([
-      ['aaa', 10.1234],
-      ['qqq', 5.125],
-    ]);
+    const mockCryptoFiat = new CryptoFiat(new CryptoFiatConfiguration({
+      baseConfig: { environment: Environment.SANDBOX },
+    }));
 
-    const mockProvider = {
-      getSigner: jest.fn().mockReturnValue({
-        getAddress: jest.fn().mockResolvedValue('0xaddress'),
-      }),
-    };
-    const checkout = new Checkout({
-      baseConfig: { environment: Environment.PRODUCTION },
+    jest.spyOn(mockCryptoFiat, 'convert').mockResolvedValue({
+      aaa: { usd: 10.1234 },
+      qqq: { usd: 5.125 },
     });
-    const chainId = ChainId.SEPOLIA;
-    jest.spyOn(checkout, 'getAllBalances').mockResolvedValue({ balances });
 
-    const actualResult = mapTokenBalancesWithConversions(
-      chainId,
-      await getTokenBalances(
-        checkout,
-        mockProvider as unknown as Web3Provider,
-        chainId,
-      ),
-      conversions,
+    const actualResult = await mapTokenBalancesWithConversions(
+      ChainId.SEPOLIA,
+      balances,
+      mockCryptoFiat,
     );
 
-    expect(actualResult.length).toBe(2);
     expect(actualResult).toEqual([
       {
         id: '11155111-aaa',
@@ -74,20 +63,22 @@ describe('token balance tests', () => {
 
   it('should return empty array when any argument is missing', async () => {
     const checkout = new Checkout({
-      baseConfig: { environment: Environment.PRODUCTION },
+      baseConfig: { environment: Environment.SANDBOX },
     });
     const chainId = ChainId.SEPOLIA;
 
-    const conversions = new Map<string, number>([]);
+    const mockCryptoFiat = new CryptoFiat(new CryptoFiatConfiguration({
+      baseConfig: { environment: Environment.SANDBOX },
+    }));
 
-    const actualResult = mapTokenBalancesWithConversions(
+    const actualResult = await mapTokenBalancesWithConversions(
       chainId,
       await getTokenBalances(
         checkout,
         null as unknown as Web3Provider,
         chainId,
       ),
-      conversions,
+      mockCryptoFiat,
     );
 
     expect(actualResult.length).toBe(0);
