@@ -1,8 +1,8 @@
 import { Squid } from '@0xsquid/sdk';
 import { PurchaseItem, TokenInfo } from '@imtbl/checkout-sdk';
-import { createContext } from 'react';
+import { createContext, useContext } from 'react';
 import { Chain, Token, RouteData } from '../../../lib/squid/types';
-import { OrderQuoteResponse } from '../../../lib/primary-sales';
+import { OrderQuoteResponse, SignResponse } from '../../../lib/primary-sales';
 
 export interface PurchaseState {
   id: string;
@@ -15,6 +15,7 @@ export interface PurchaseState {
   selectedToken: TokenInfo | undefined;
   selectedRouteData: RouteData | undefined;
   quote: OrderQuoteResponse | null;
+  signResponse: SignResponse | undefined;
 }
 
 export const initialPurchaseState: PurchaseState = {
@@ -28,6 +29,7 @@ export const initialPurchaseState: PurchaseState = {
   selectedToken: undefined,
   selectedRouteData: undefined,
   quote: null,
+  signResponse: undefined,
 };
 
 export interface PurchaseContextState {
@@ -48,7 +50,8 @@ type ActionPayload =
   | SetSquidChains
   | SetSquidTokens
   | SetItems
-  | SetQuote;
+  | SetQuote
+  | SetSignResponse;
 
 export enum PurchaseActions {
   SET_ID = 'SET_ID',
@@ -59,6 +62,7 @@ export enum PurchaseActions {
   SET_SELECTED_TOKEN = 'SET_SELECTED_TOKEN',
   SET_SELECTED_ROUTE_DATA = 'SET_SELECTED_ROUTE_DATA',
   SET_QUOTE = 'SET_QUOTE',
+  SET_SIGN_RESPONSE = 'SET_SIGN_RESPONSE',
 }
 
 export interface SetId {
@@ -86,6 +90,11 @@ export interface SetItems {
   items: PurchaseItem[];
 }
 
+export interface SetSignResponse {
+  type: PurchaseActions.SET_SIGN_RESPONSE;
+  signResponse: SignResponse;
+}
+
 export interface SetSelectedToken {
   type: PurchaseActions.SET_SELECTED_TOKEN;
   selectedToken: TokenInfo;
@@ -95,6 +104,7 @@ export interface SetSelectedRouteData {
   type: PurchaseActions.SET_SELECTED_ROUTE_DATA;
   selectedRouteData: RouteData;
 }
+
 export interface SetQuote {
   type: PurchaseActions.SET_QUOTE;
   quote: OrderQuoteResponse;
@@ -164,7 +174,16 @@ export const purchaseReducer: Reducer<PurchaseState, PurchaseAction> = (
         ...state,
         quote: action.payload.quote,
       };
+    case PurchaseActions.SET_SIGN_RESPONSE:
+      return {
+        ...state,
+        signResponse: action.payload.signResponse,
+      };
     default:
       return state;
   }
 };
+
+export function usePurchaseContext() {
+  return useContext(PurchaseContext);
+}
