@@ -73,9 +73,6 @@ export function Purchase({
   const [selectedDirectCryptoPayRoute, setSelectedDirectCryptoPayRoute] = useState<
   DirectCryptoPayData | undefined
   >(undefined);
-  // eslint-disable-next-line max-len
-  // const [isPayWithCard, setSelectedRouteType] = useState<SquidRouteOptionType | DirectCryptoPayOptionType | FiatOptionType | undefined>(undefined);
-
   const [fetchingRoutes, setFetchingRoutes] = useState(false);
   const [insufficientBalance, setInsufficientBalance] = useState(false);
   const [balances, setBalances] = useState<TokenBalance[]>([]);
@@ -134,15 +131,6 @@ export function Purchase({
 
   const { showHandover } = useHandoverConfig(checkout.config.environment);
 
-  // const updateSelectedRouteType = (routeType: SquidRouteOptionType | DirectCryptoPayOptionType | FiatOptionType) => {
-  //   purchaseDispatch({
-  //     payload: {
-  //       type: PurchaseActions.SET_SELECTED_ROUTE_TYPE,
-  //       selectedRouteType: routeType,
-  //     },
-  //   });
-  // };
-
   const handleWalletConnected = (
     providerType: 'from' | 'to',
     provider: Web3Provider,
@@ -164,8 +152,6 @@ export function Purchase({
     setShowDeliverToWalletDrawer(false);
     setSelectedRouteData(route);
     setSelectedDirectCryptoPayRoute(undefined);
-    // setSelectedRouteType(SquidRouteOptionType.SQUID_ROUTE);
-    // updateSelectedRouteType(SquidRouteOptionType.SQUID_ROUTE);
   };
 
   const handleDirectCryptoPayClick = (route: DirectCryptoPayData) => {
@@ -174,20 +160,15 @@ export function Purchase({
     setShowDeliverToWalletDrawer(false);
     setSelectedRouteData(undefined);
     setSelectedDirectCryptoPayRoute(route);
-    // setSelectedRouteType(DirectCryptoPayOptionType.IMMUTABLE_ZKEVM);
-    // updateSelectedRouteType(DirectCryptoPayOptionType.IMMUTABLE_ZKEVM);
   };
 
   const handlePayWithCardClick = () => {
     setIsPayWithCard(true);
-    // setSelectedRouteType(FiatOptionType.CREDIT);
     setShowOptionsDrawer(false);
     setShowPayWithWalletDrawer(false);
     setShowDeliverToWalletDrawer(false);
     setSelectedRouteData(undefined);
     setSelectedDirectCryptoPayRoute(undefined);
-    // setSelectedRouteType(FiatOptionType.CREDIT);
-    // updateSelectedRouteType(FiatOptionType.CREDIT);
   };
 
   useEffect(() => {
@@ -376,10 +357,6 @@ export function Purchase({
   };
 
   const handleProceedClick = useCallback(async () => {
-    console.log('isPayWithCard', isPayWithCard);
-    console.log('quote', quote);
-    console.log('toAddress', toAddress);
-
     if (!quote || !toAddress) return;
 
     if (isPayWithCard) {
