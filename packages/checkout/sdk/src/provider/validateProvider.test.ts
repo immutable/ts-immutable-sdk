@@ -88,7 +88,7 @@ describe('provider validation', () => {
         validateProvider(testCheckoutConfig, testBrowserProvider),
       ).rejects.toThrowError(
         // eslint-disable-next-line max-len
-        '[WEB3_PROVIDER_ERROR] Cause:network changed: 13473 => 1  (event="changed", code=NETWORK_ERROR, version=6.13.4)',
+        '[WEB3_PROVIDER_ERROR] Cause:network changed: 13473 => 1  (event="changed", code=NETWORK_ERROR, version=6.13.5)',
       );
     });
 
@@ -130,7 +130,7 @@ describe('provider validation', () => {
         ),
       ).rejects.toThrowError(
         // eslint-disable-next-line max-len
-        '[WEB3_PROVIDER_ERROR] Cause:network changed: 1 => 250  (event="changed", code=NETWORK_ERROR, version=6.13.4)',
+        '[WEB3_PROVIDER_ERROR] Cause:network changed: 1 => 250  (event="changed", code=NETWORK_ERROR, version=6.13.5)',
       );
     });
 

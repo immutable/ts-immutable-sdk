@@ -1,6 +1,6 @@
-import type { TransactionMethods } from '@opensea/seaport-js/lib/utils/usecase';
 import { PreparedTransactionRequest } from 'ethers';
 import { TransactionBuilder } from '../types';
+import { TransactionMethods } from './types';
 
 // Add 20% more gas than estimate to prevent out of gas errors
 // This can always be overwritten by the user signing the transaction
