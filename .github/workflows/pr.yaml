@@ -44,6 +44,9 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
+      - name: reset nx
+        run: pnpm nx reset
+
       - name: Build, Lint & Test
         run: pnpm nx run-many -t build,lint,test -p @imtbl/sdk,@imtbl/checkout-widgets
 
