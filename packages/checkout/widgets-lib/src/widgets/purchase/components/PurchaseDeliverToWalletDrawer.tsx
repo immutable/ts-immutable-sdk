@@ -15,7 +15,6 @@ type PurchaseDeliverToWalletDrawerProps = {
     provider: Web3Provider,
     providerInfo: EIP6963ProviderInfo
   ) => void;
-  isPayWithCard?: boolean;
 };
 
 export function PurchaseDeliverToWalletDrawer({
@@ -23,7 +22,6 @@ export function PurchaseDeliverToWalletDrawer({
   onClose,
   onConnect,
   walletOptions,
-  isPayWithCard = false,
 }: PurchaseDeliverToWalletDrawerProps) {
   const handleOnConnect = (
     provider: Web3Provider,
@@ -41,7 +39,6 @@ export function PurchaseDeliverToWalletDrawer({
       providerType="to"
       walletOptions={walletOptions}
       onConnect={handleOnConnect}
-      isPayWithCard={isPayWithCard}
     />
   );
 }

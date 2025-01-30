@@ -686,7 +686,6 @@ export function Purchase({
         walletOptions={walletOptions}
         onClose={handleDeliverToWalletClose}
         onConnect={() => undefined}
-        isPayWithCard={isPayWithCard}
       />
       <RouteOptionsDrawer
         checkout={checkout}
