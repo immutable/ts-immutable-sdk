@@ -183,6 +183,7 @@ export function Purchase({
     setSelectedRouteData(undefined);
 
     if (!squid || !quote || !tokens || balances?.length === 0) return;
+    if (isPayWithCard) return;
 
     setFetchingRoutes(true);
 
