@@ -38,10 +38,14 @@ import { PurchasePayWithWalletDrawer } from '../components/PurchasePayWithWallet
 import { RouteOptionsDrawer } from '../components/PurchaseRouteOptionsDrawer/RouteOptionsDrawer';
 import { PurchaseSelectedRouteOption } from '../components/PurchaseSelectedRouteOption';
 import { PurchaseSelectedWallet } from '../components/PurchaseSelectedWallet';
-import { PurchaseContext } from '../context/PurchaseContext';
+import { PurchaseActions, PurchaseContext } from '../context/PurchaseContext';
 import { useHandoverConfig, PurchaseHandoverStep } from '../hooks/useHandoverConfig';
 import { sendConnectProviderSuccessEvent, sendPurchaseSuccessEvent } from '../PurchaseWidgetEvents';
-import { DirectCryptoPayData } from '../types';
+import {
+  DirectCryptoPayData,
+} from '../types';
+import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { PurchaseWidgetViews } from '../../../context/view-context/PurchaseViewContextTypes';
 import { useErrorHandler } from '../hooks/useErrorHandler';
 
 interface PurchaseProps {
@@ -70,10 +74,11 @@ export function Purchase({
   const [selectedDirectCryptoPayRoute, setSelectedDirectCryptoPayRoute] = useState<
   DirectCryptoPayData | undefined
   >(undefined);
-
   const [fetchingRoutes, setFetchingRoutes] = useState(false);
   const [insufficientBalance, setInsufficientBalance] = useState(false);
   const [balances, setBalances] = useState<TokenBalance[]>([]);
+
+  const [isPayWithCard, setIsPayWithCard] = useState(false);
 
   const {
     purchaseState: {
@@ -83,7 +88,11 @@ export function Purchase({
     },
   } = useContext(PurchaseContext);
 
+  const { viewDispatch } = useContext(ViewContext);
+
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
+
+  const { purchaseDispatch } = useContext(PurchaseContext);
 
   const {
     eventTargetState: { eventTarget },
@@ -104,7 +113,6 @@ export function Purchase({
     fetchRoutes, getRoute, getFromAmountData, hasSufficientBalance, hasSufficientGas,
   } = useRoutes();
   const { providers } = useInjectedProviders({ checkout });
-
   const { onTransactionError } = useErrorHandler();
 
   const {
@@ -127,6 +135,8 @@ export function Purchase({
     provider: Web3Provider,
     providerInfo: EIP6963ProviderInfo,
   ) => {
+    setIsPayWithCard(false);
+
     sendConnectProviderSuccessEvent(
       eventTarget,
       providerType,
@@ -151,6 +161,15 @@ export function Purchase({
     setSelectedDirectCryptoPayRoute(route);
   };
 
+  const handlePayWithCardClick = () => {
+    setIsPayWithCard(true);
+    setShowOptionsDrawer(false);
+    setShowPayWithWalletDrawer(false);
+    setShowDeliverToWalletDrawer(false);
+    setSelectedRouteData(undefined);
+    setSelectedDirectCryptoPayRoute(undefined);
+  };
+
   useEffect(() => {
     setRoutes([]);
     setInsufficientBalance(false);
@@ -163,6 +182,7 @@ export function Purchase({
     setSelectedRouteData(undefined);
 
     if (!squid || !quote || !tokens || balances?.length === 0) return;
+    if (isPayWithCard) return;
 
     setFetchingRoutes(true);
 
@@ -247,11 +267,36 @@ export function Purchase({
   }, [quote]);
 
   const shouldShowBackButton = showBackButton && onBackButtonClick;
-  const shouldShowOnRampOption = false;
+  const shouldShowOnRampOption = true;
   const showSwapOption = true;
   const showBridgeOption = true;
 
   const squidMulticallAddress = '0xad6cea45f98444a922a2b4fe96b8c90f0862d2f4';
+
+  const handleFiatPayment = async (
+    recipientAddress: string,
+    tokenAddress: string,
+  ) => {
+    const signResponse = await sign(
+      SignPaymentTypes.FIAT,
+      tokenAddress,
+      recipientAddress,
+    );
+    if (!signResponse) return;
+    purchaseDispatch({
+      payload: {
+        type: PurchaseActions.SET_SIGN_RESPONSE,
+        signResponse,
+      },
+    });
+
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: { type: PurchaseWidgetViews.PAY_WITH_CARD },
+      },
+    });
+  };
 
   const handleDirectCryptoPayment = async (
     provider: Web3Provider,
@@ -310,6 +355,13 @@ export function Purchase({
   };
 
   const handleProceedClick = useCallback(async () => {
+    if (!quote || !toAddress) return;
+
+    if (isPayWithCard) {
+      handleFiatPayment(toAddress, quote.currency.address);
+      return;
+    }
+
     if (!squid || !tokens || !toAddress || !fromAddress || !fromProvider || !fromProviderInfo || !quote) return;
     if (!selectedRouteData && !selectedDirectCryptoPayRoute) return;
 
@@ -322,7 +374,13 @@ export function Purchase({
         squidMulticallAddress,
         toAddress,
       );
-      // TODO ERROR TRANSAK_FAILED PRODUCT_NOT_FOUND INSUFFICIENT_STOCK
+      if (!signResponse) return;
+      purchaseDispatch({
+        payload: {
+          type: PurchaseActions.SET_SIGN_RESPONSE,
+          signResponse: signResponse.signResponse,
+        },
+      });
 
       const updatedAmountData = getFromAmountData(
         tokens,
@@ -333,7 +391,6 @@ export function Purchase({
         selectedRouteData.amountData.additionalBuffer,
       );
       if (!updatedAmountData) return;
-      // TODO ERROR NOT LIKELY just use ROUTE_ERROR
 
       const postHooks = signResponse?.postHooks ? {
         chainType: ChainType.EVM,
@@ -356,7 +413,6 @@ export function Purchase({
       ))?.route;
 
       if (!route) return;
-      // TODO ERROR ROUTE_ERROR
 
       const currentFromAddress = await fromProvider.getSigner().getAddress();
       const { fromChain, toChain } = getRouteChains(chains, route);
@@ -466,13 +522,13 @@ export function Purchase({
 
   const loading = (!!fromAddress || fetchingRoutes) && (
     (!(selectedRouteData || insufficientBalance || selectedDirectCryptoPayRoute))
-  );
+  ) && !isPayWithCard;
 
-  const readyToProceed = !!fromAddress
+  const readyToProceed = (!!fromAddress || isPayWithCard)
     && !!toAddress
     && !loading
     && ((!!selectedRouteData && !selectedRouteData.isInsufficientGas)
-    || (!!selectedDirectCryptoPayRoute && !selectedDirectCryptoPayRoute.isInsufficientGas));
+    || (!!selectedDirectCryptoPayRoute && !selectedDirectCryptoPayRoute.isInsufficientGas) || isPayWithCard);
 
   const walletOptions = useMemo(
     () => providers
@@ -560,9 +616,10 @@ export function Purchase({
           gap="base.spacing.x4"
         >
           <Stack gap="base.spacing.x3">
-            {!fromProviderInfo && (
+            {(!fromProviderInfo || isPayWithCard) && (
             <PurchaseSelectedWallet
-              label={t('views.PURCHASE.walletSelection.from.label')}
+              label={isPayWithCard ? 'Pay with card'
+                : t('views.PURCHASE.walletSelection.from.label')}
               size="small"
               onClick={(event) => {
                 event.stopPropagation();
@@ -571,7 +628,7 @@ export function Purchase({
             />
             )}
 
-            {fromAddress && (
+            {fromAddress && !isPayWithCard && (
               <PurchaseSelectedRouteOption
                 checkout={checkout}
                 loading={loading}
@@ -615,8 +672,10 @@ export function Purchase({
       <PurchasePayWithWalletDrawer
         visible={showPayWithWalletDrawer}
         walletOptions={walletOptions}
-        onClose={() => setShowPayWithWalletDrawer(false)}
-        onPayWithCard={() => false}
+        onClose={() => {
+          setShowPayWithWalletDrawer(false);
+        }}
+        onPayWithCard={handlePayWithCardClick}
         onConnect={handleWalletConnected}
         insufficientBalance={insufficientBalance}
         showOnRampOption={shouldShowOnRampOption}
@@ -636,7 +695,7 @@ export function Purchase({
         showDirectCryptoPayOption
         visible={showOptionsDrawer}
         onClose={() => setShowOptionsDrawer(false)}
-        onCardClick={() => false}
+        onCardClick={handlePayWithCardClick}
         onRouteClick={handleRouteClick}
         onDirectCryptoPayClick={handleDirectCryptoPayClick}
         insufficientBalance={insufficientBalance}

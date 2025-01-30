@@ -1,4 +1,6 @@
-import { ReactNode, useRef, useState } from 'react';
+import {
+  ReactNode, useRef, useState,
+} from 'react';
 import {
   EIP6963ProviderDetail,
   EIP6963ProviderInfo,
@@ -66,6 +68,7 @@ export function PurchaseConnectWalletDrawer({
     providerInfo: EIP6963ProviderInfo,
   ) => {
     const address = await provider.getSigner().getAddress();
+
     providersDispatch({
       payload: {
         type: ProvidersContextActions.SET_PROVIDER,

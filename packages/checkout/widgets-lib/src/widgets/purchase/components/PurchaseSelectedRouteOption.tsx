@@ -17,7 +17,9 @@ import { getRouteAndTokenBalances } from '../../../lib/squid/functions/getRouteA
 import { Chain, RouteData } from '../../../lib/squid/types';
 import { getRemoteVideo } from '../../../lib/utils';
 import { getRouteAndTokenBalancesForDirectCryptoPay } from '../functions/getRouteAndBalancesForDirectCryptoPay';
-import { DirectCryptoPayData } from '../types';
+import {
+  DirectCryptoPayData,
+} from '../types';
 
 interface PurchaseSelectedRouteOptionProps {
   checkout: Checkout;
@@ -111,7 +113,7 @@ export function PurchaseSelectedRouteOption({
 
     if (insufficientBalancePayWithCard) {
       icon = 'BankCard';
-      copy = t('views.PURCHASE.routeSelection.payWithCard');
+      copy = t('views.PURCHASE.routeSelection.noRoutePayWithCard');
     }
 
     return (

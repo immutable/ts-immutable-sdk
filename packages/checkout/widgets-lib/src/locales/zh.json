@@ -650,7 +650,7 @@
       "routeSelection": {
         "loadingText": "寻找最佳支付路线中...",
         "noRoute": "未找到路线，请选择其他钱包、代币或金额。",
-        "payWithCard": "未找到路线，可选择用卡支付",
+        "payWithCard": "用卡支付",
         "fastestBadge": "最快",
         "minutesText": "分钟",
         "minuteText": "分钟",
@@ -878,7 +878,8 @@
       "routeSelection": {
         "loadingText": "寻找最佳支付路线中...",
         "noRoute": "未找到路线，请选择其他钱包、代币或金额。",
-        "payWithCard": "未找到路线，可选择用卡支付",
+        "payWithCard": "用卡支付",
+        "noRoutePayWithCard": "未找到路线，可选择用卡支付",
         "fastestBadge": "最快",
         "minutesText": "分钟",
         "minuteText": "分钟",
