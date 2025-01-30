@@ -277,8 +277,6 @@ export function Purchase({
     recipientAddress: string,
     tokenAddress: string,
   ) => {
-    console.log('handleFiatPayment');
-
     const signResponse = await sign(
       SignPaymentTypes.FIAT,
       tokenAddress,

@@ -3,7 +3,6 @@ import { PurchaseItem, TokenInfo } from '@imtbl/checkout-sdk';
 import { createContext, useContext } from 'react';
 import { Chain, Token, RouteData } from '../../../lib/squid/types';
 import { OrderQuoteResponse, SignResponse } from '../../../lib/primary-sales';
-import { SquidRouteOptionType, DirectCryptoPayOptionType, FiatOptionType } from '../types';
 
 export interface PurchaseState {
   id: string;
@@ -15,7 +14,6 @@ export interface PurchaseState {
   items: PurchaseItem[];
   selectedToken: TokenInfo | undefined;
   selectedRouteData: RouteData | undefined;
-  selectedRouteType: SquidRouteOptionType | DirectCryptoPayOptionType | FiatOptionType | undefined;
   quote: OrderQuoteResponse | null;
   signResponse: SignResponse | undefined;
 }
@@ -30,7 +28,6 @@ export const initialPurchaseState: PurchaseState = {
   items: [],
   selectedToken: undefined,
   selectedRouteData: undefined,
-  selectedRouteType: undefined,
   quote: null,
   signResponse: undefined,
 };
@@ -54,8 +51,7 @@ type ActionPayload =
   | SetSquidTokens
   | SetItems
   | SetQuote
-  | SetSignResponse
-  | SetSelectedRouteType;
+  | SetSignResponse;
 
 export enum PurchaseActions {
   SET_ID = 'SET_ID',
@@ -67,12 +63,6 @@ export enum PurchaseActions {
   SET_SELECTED_ROUTE_DATA = 'SET_SELECTED_ROUTE_DATA',
   SET_QUOTE = 'SET_QUOTE',
   SET_SIGN_RESPONSE = 'SET_SIGN_RESPONSE',
-  SET_SELECTED_ROUTE_TYPE = 'SET_SELECTED_ROUTE_TYPE',
-}
-
-export interface SetSelectedRouteType {
-  type: PurchaseActions.SET_SELECTED_ROUTE_TYPE;
-  selectedRouteType: SquidRouteOptionType | DirectCryptoPayOptionType | FiatOptionType;
 }
 
 export interface SetId {
@@ -188,11 +178,6 @@ export const purchaseReducer: Reducer<PurchaseState, PurchaseAction> = (
       return {
         ...state,
         signResponse: action.payload.signResponse,
-      };
-    case PurchaseActions.SET_SELECTED_ROUTE_TYPE:
-      return {
-        ...state,
-        selectedRouteType: action.payload.selectedRouteType,
       };
     default:
       return state;
