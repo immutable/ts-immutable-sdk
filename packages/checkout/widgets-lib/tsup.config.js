@@ -27,6 +27,7 @@ export default defineConfig((options) => {
       minify: true,
       bundle: true,
       treeshake: true,
+      noExternal: [/.*/],
       esbuildPlugins: [
         nodeModulesPolyfillPlugin({
           globals: {

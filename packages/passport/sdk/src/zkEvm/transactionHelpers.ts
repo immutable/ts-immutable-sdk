@@ -30,7 +30,7 @@ export type TransactionParams = {
   relayerClient: RelayerClient;
   zkEvmAddress: string;
   flow: Flow;
-  nonceSpace?: BigNumber;
+  nonceSpace?: bigint;
   isBackgroundTransaction?: boolean;
 };
 
@@ -74,7 +74,7 @@ const buildMetaTransactions = async (
   rpcProvider: JsonRpcProvider,
   relayerClient: RelayerClient,
   zkevmAddress: string,
-  nonceSpace?: BigNumber,
+  nonceSpace?: bigint,
 ): Promise<[MetaTransaction, ...MetaTransaction[]]> => {
   if (!transactionRequest.to) {
     throw new JsonRpcError(
