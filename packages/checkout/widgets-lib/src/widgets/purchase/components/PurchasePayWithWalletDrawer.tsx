@@ -14,6 +14,7 @@ type PurchasePayWithWalletDrawerProps = {
   walletOptions: EIP6963ProviderDetail[];
   insufficientBalance?: boolean;
   showOnRampOption?: boolean;
+  isPayWithCard?: boolean;
 };
 
 export function PurchasePayWithWalletDrawer({
@@ -24,6 +25,7 @@ export function PurchasePayWithWalletDrawer({
   walletOptions,
   insufficientBalance,
   showOnRampOption = true,
+  isPayWithCard = false,
 }: PurchasePayWithWalletDrawerProps) {
   const { t } = useTranslation();
   const { providersState: { fromProviderInfo } } = useProvidersContext();
@@ -80,6 +82,7 @@ export function PurchasePayWithWalletDrawer({
       bottomSlot={payWithCardItem}
       onConnect={handleOnConnect}
       shouldIdentifyUser={false}
+      isPayWithCard={isPayWithCard}
     />
   );
 }
