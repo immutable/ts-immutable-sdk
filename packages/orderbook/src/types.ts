@@ -1,6 +1,6 @@
-import type { OrderComponents } from '@opensea/seaport-js/lib/types';
 import { PreparedTransactionRequest, TypedDataDomain, TypedDataField } from 'ethers';
 import { Fee as OpenapiFee, OrdersService, OrderStatus } from './openapi/sdk';
+import { OrderComponents } from './seaport/types';
 
 // Strictly re-export only the OrderStatusName enum from the openapi types
 export { OrderStatusName } from './openapi/sdk';
