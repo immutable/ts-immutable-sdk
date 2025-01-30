@@ -18,7 +18,7 @@ import { Chain, RouteData } from '../../../lib/squid/types';
 import { getRemoteVideo } from '../../../lib/utils';
 import { getRouteAndTokenBalancesForDirectCryptoPay } from '../functions/getRouteAndBalancesForDirectCryptoPay';
 import {
-  DirectCryptoPayData, SquidRouteOptionType, DirectCryptoPayOptionType, FiatOptionType,
+  DirectCryptoPayData,
 } from '../types';
 
 interface PurchaseSelectedRouteOptionProps {
@@ -30,7 +30,6 @@ interface PurchaseSelectedRouteOptionProps {
   insufficientBalance?: boolean;
   directCryptoPay?: boolean;
   showOnrampOption?: boolean;
-  selectedRouteType?: SquidRouteOptionType | DirectCryptoPayOptionType | FiatOptionType | undefined;
 }
 
 export function PurchaseSelectedRouteOption({
@@ -42,7 +41,6 @@ export function PurchaseSelectedRouteOption({
   directCryptoPay = false,
   showOnrampOption = false,
   onClick,
-  selectedRouteType,
 }: PurchaseSelectedRouteOptionProps) {
   const { t } = useTranslation();
 
@@ -104,13 +102,9 @@ export function PurchaseSelectedRouteOption({
     );
   }
 
-  if ((!routeData && !loading) || insufficientBalance || selectedRouteType === FiatOptionType.CREDIT) {
+  if ((!routeData && !loading) || insufficientBalance) {
     let icon: AllDualVariantIconKeys = 'Sparkle';
     let copy = '';
-    if (selectedRouteType === FiatOptionType.CREDIT) {
-      icon = 'BankCard';
-      copy = t('views.PURCHASE.routeSelection.payWithCard');
-    }
 
     if (insufficientBalance) {
       icon = 'InformationCircle';
