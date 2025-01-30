@@ -45,7 +45,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Build, Lint & Test
-        run: pnpm --if-present nx affected -t build,lint,test 
+        run: pnpm nx run-many -t build,lint,test -p @imtbl/sdk,@imtbl/checkout-widgets
 
   build-lint-test-examples:
     name: Build, Lint & Test Examples
