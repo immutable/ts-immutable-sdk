@@ -679,7 +679,6 @@ export function Purchase({
         onConnect={handleWalletConnected}
         insufficientBalance={insufficientBalance}
         showOnRampOption={shouldShowOnRampOption}
-        isPayWithCard={isPayWithCard}
       />
       <PurchaseDeliverToWalletDrawer
         visible={showDeliverToWalletDrawer}

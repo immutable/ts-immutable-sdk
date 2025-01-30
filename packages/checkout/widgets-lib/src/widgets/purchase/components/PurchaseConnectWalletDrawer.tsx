@@ -37,7 +37,6 @@ type PurchaseConnectWalletDrawerProps = {
     rdns: string;
   }[];
   shouldIdentifyUser?: boolean;
-  isPayWithCard?: boolean;
 };
 
 export function PurchaseConnectWalletDrawer({
@@ -52,7 +51,6 @@ export function PurchaseConnectWalletDrawer({
   menuItemSize = 'small',
   disabledOptions = [],
   shouldIdentifyUser = true,
-  isPayWithCard = false,
 }: PurchaseConnectWalletDrawerProps) {
   const {
     providersState: { checkout },
@@ -71,16 +69,14 @@ export function PurchaseConnectWalletDrawer({
   ) => {
     const address = await provider.getSigner().getAddress();
 
-    if (!isPayWithCard) {
-      providersDispatch({
-        payload: {
-          type: ProvidersContextActions.SET_PROVIDER,
-          fromAddress: address,
-          fromProvider: provider,
-          fromProviderInfo: providerInfo,
-        },
-      });
-    }
+    providersDispatch({
+      payload: {
+        type: ProvidersContextActions.SET_PROVIDER,
+        fromAddress: address,
+        fromProvider: provider,
+        fromProviderInfo: providerInfo,
+      },
+    });
 
     providersDispatch({
       payload: {
