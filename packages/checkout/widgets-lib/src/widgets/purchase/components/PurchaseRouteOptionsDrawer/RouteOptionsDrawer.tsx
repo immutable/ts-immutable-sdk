@@ -25,6 +25,7 @@ type OptionsDrawerProps = {
   onRouteClick: (route: RouteData) => void;
   onCardClick: (type: FiatOptionType) => void;
   onDirectCryptoPayClick: (route: DirectCryptoPayData) => void;
+  onChangeWalletClick: () => void;
   showOnrampOption?: boolean;
   showDirectCryptoPayOption?: boolean;
   showSwapOption?: boolean;
@@ -42,6 +43,7 @@ export function RouteOptionsDrawer({
   onRouteClick,
   onCardClick,
   onDirectCryptoPayClick,
+  onChangeWalletClick,
   showOnrampOption,
   showDirectCryptoPayOption,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -75,6 +77,11 @@ export function RouteOptionsDrawer({
     selectedRouteIndex.current = index;
     setSelectedRouteType(DirectCryptoPayOptionType.IMMUTABLE_ZKEVM);
     onDirectCryptoPayClick(route);
+  };
+
+  const handleOnChangeWalletClick = () => {
+    onClose();
+    onChangeWalletClick();
   };
 
   useEffect(() => {
@@ -132,7 +139,6 @@ export function RouteOptionsDrawer({
               sx={{ c: 'inherit', fontSize: 'inherit' }}
             />
           </MenuItem.Caption>
-
           <MenuItem.StatefulButtCon icon="ChevronExpand" onClick={onClose} />
         </MenuItem>
         <RouteOptions
@@ -143,6 +149,7 @@ export function RouteOptionsDrawer({
           onCardClick={onCardClick}
           onRouteClick={handleOnRouteClick}
           onDirectCryptoPayClick={handleOnDirectCryptoPayClick}
+          onChangeWalletClick={handleOnChangeWalletClick}
           showOnrampOption={showOnrampOption}
           showDirectCryptoPayOption={showDirectCryptoPayOption}
           insufficientBalance={insufficientBalance}

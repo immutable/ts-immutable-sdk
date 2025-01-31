@@ -693,12 +693,14 @@ export function Purchase({
         chains={chains}
         showSwapOption={showSwapOption}
         showBridgeOption={showBridgeOption}
+        showOnrampOption={shouldShowOnRampOption}
         showDirectCryptoPayOption
         visible={showOptionsDrawer}
         onClose={() => setShowOptionsDrawer(false)}
         onCardClick={handlePayWithCardClick}
         onRouteClick={handleRouteClick}
         onDirectCryptoPayClick={handleDirectCryptoPayClick}
+        onChangeWalletClick={() => setShowPayWithWalletDrawer(true)}
         insufficientBalance={insufficientBalance}
         directCryptoPayRoutes={directCryptoPayRoutes}
       />

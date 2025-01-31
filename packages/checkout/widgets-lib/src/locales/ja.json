@@ -892,7 +892,7 @@
       "drawer": {
         "options": {
           "heading": "支払い元",
-          "moreOptionsDividerText": "支払い方法の追加",
+          "moreOptionsDividerText": "その他の支払い方法",
           "loadingText1": "最適な価値を検索中",
           "loadingText2": "すべてのチェーンを横断",
           "noRoutes": {
@@ -904,6 +904,7 @@
             "caption": "このネットワークでトークンを交換します。",
             "disabledCaption": "現在利用できません。"
           },
+          "changeWallet": "別のウォレットを選択",
           "debit": {
             "heading": "デビットカード",
             "caption": "",
