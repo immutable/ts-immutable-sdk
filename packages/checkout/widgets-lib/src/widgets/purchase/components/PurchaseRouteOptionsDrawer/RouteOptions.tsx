@@ -25,6 +25,7 @@ export interface OptionsProps {
   onCardClick: (type: FiatOptionType) => void;
   onRouteClick: (route: RouteData, index: number) => void;
   onDirectCryptoPayClick: (route: DirectCryptoPayData, index: number) => void;
+  onChangeWalletClick: () => void;
   routes?: RouteData[];
   size?: MenuItemSize;
   showOnrampOption?: boolean;
@@ -42,6 +43,7 @@ export function RouteOptions({
   onCardClick,
   onRouteClick,
   onDirectCryptoPayClick,
+  onChangeWalletClick,
   size,
   showOnrampOption,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -137,11 +139,26 @@ export function RouteOptions({
 
       {!routes?.length && !insufficientBalance && renderLoading()}
 
-      {showOnrampOption && (
+      {showOnrampOption && (routes?.length || insufficientBalance) && (
       <>
         <Divider size="xSmall" sx={{ my: 'base.spacing.x2' }}>
           {t('views.PURCHASE.drawer.options.moreOptionsDividerText')}
         </Divider>
+        <MenuItem
+          emphasized
+          onClick={onChangeWalletClick}
+          size="small"
+        >
+          <MenuItem.FramedIcon
+            icon="Wallet"
+            variant="bold"
+            emphasized={false}
+          />
+          <MenuItem.Label>
+            {t('views.PURCHASE.drawer.options.changeWallet')}
+          </MenuItem.Label>
+        </MenuItem>
+
         {defaultFiatOptions.map((type, idx) => (
           <FiatOption
             key={`fiat-option-${type}`}
