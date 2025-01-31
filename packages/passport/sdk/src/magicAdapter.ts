@@ -7,6 +7,7 @@ import { PassportErrorType, withPassportError } from './errors/passportError';
 import { PassportConfiguration } from './config';
 import { lazyDocumentReady } from './utils/lazyLoad';
 import { withMetricsAsync } from './utils/metrics';
+import { MagicProviderProxyFactory } from './magicProviderProxyFactory';
 
 type MagicClient = InstanceWithExtensions<SDKBase, [OpenIdExtension]>;
 
@@ -15,10 +16,14 @@ const MAINNET = 'mainnet';
 export default class MagicAdapter {
   private readonly config: PassportConfiguration;
 
+  private readonly magicProviderProxyFactory: MagicProviderProxyFactory;
+
   private readonly lazyMagicClient?: Promise<MagicClient>;
 
-  constructor(config: PassportConfiguration) {
+  constructor(config: PassportConfiguration, magicProviderProxyFactory: MagicProviderProxyFactory) {
     this.config = config;
+    this.magicProviderProxyFactory = magicProviderProxyFactory;
+
     if (typeof window !== 'undefined') {
       this.lazyMagicClient = lazyDocumentReady<MagicClient>(() => {
         const client = new Magic(this.config.magicPublishableApiKey, {
@@ -60,7 +65,7 @@ export default class MagicAdapter {
           Math.round(performance.now() - startTime),
         );
 
-        return magicClient.rpcProvider as unknown as ethers.providers.ExternalProvider;
+        return this.magicProviderProxyFactory.createProxy(magicClient);
       }, 'magicLogin')
     ), PassportErrorType.WALLET_CONNECTION_ERROR);
   }
