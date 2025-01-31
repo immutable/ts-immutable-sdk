@@ -306,66 +306,70 @@ export function Purchase({
     recipientAddress: string,
     tokenAddress: string,
   ) => {
-    const signResponse = await sign(
-      SignPaymentTypes.CRYPTO,
-      tokenAddress,
-      spenderAddress,
-      recipientAddress,
-    );
-    if (!signResponse) {
+    try {
+      const signResponse = await sign(
+        SignPaymentTypes.CRYPTO,
+        tokenAddress,
+        spenderAddress,
+        recipientAddress,
+      );
+      if (!signResponse) {
+        showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
+        return;
+      }
+      const signer = provider.getSigner();
+      if (!signer) {
+        showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
+        return;
+      }
+
+      showHandover(PurchaseHandoverStep.PREPARING, {});
+
+      const gasPrice = await provider.getGasPrice();
+
+      const approveTxn = signResponse.transactions.find(
+        (txn) => txn.methodCall.startsWith('approve'),
+      );
+      if (!approveTxn) {
+        showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
+        return;
+      }
+      showHandover(PurchaseHandoverStep.REQUEST_APPROVAL, {});
+
+      const approveTxnResponse = await signer.sendTransaction({
+        to: approveTxn.tokenAddress,
+        data: approveTxn.rawData,
+        gasPrice,
+        gasLimit: approveTxn.gasEstimate,
+      });
+      const approveReceipt = await waitForReceipt(provider, approveTxnResponse.hash);
+      if (!approveReceipt) {
+        showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
+        return;
+      }
+      showHandover(PurchaseHandoverStep.APPROVAL_CONFIRMED, {});
+
+      const executeTxn = signResponse.transactions.find(
+        (txn) => txn.methodCall.startsWith('execute'),
+      );
+      if (!executeTxn) {
+        showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
+        return;
+      }
+      showHandover(PurchaseHandoverStep.REQUEST_EXECUTION, {});
+
+      const executeTxnResponse = await signer.sendTransaction({
+        to: executeTxn.tokenAddress,
+        data: executeTxn.rawData,
+        gasPrice,
+        gasLimit: executeTxn.gasEstimate,
+      });
+      const executeReceipt = await waitForReceipt(provider, executeTxnResponse.hash);
+      if (executeReceipt?.status === 1) {
+        showHandover(PurchaseHandoverStep.SUCCESS_ZKEVM, { transactionHash: executeTxnResponse.hash });
+      }
+    } catch (e) {
       showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
-      return;
-    }
-    const signer = provider.getSigner();
-    if (!signer) {
-      showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
-      return;
-    }
-
-    showHandover(PurchaseHandoverStep.PREPARING, {});
-
-    const gasPrice = await provider.getGasPrice();
-
-    const approveTxn = signResponse.transactions.find(
-      (txn) => txn.methodCall.startsWith('approve'),
-    );
-    if (!approveTxn) {
-      showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
-      return;
-    }
-    showHandover(PurchaseHandoverStep.REQUEST_APPROVAL, {});
-
-    const approveTxnResponse = await signer.sendTransaction({
-      to: approveTxn.tokenAddress,
-      data: approveTxn.rawData,
-      gasPrice,
-      gasLimit: approveTxn.gasEstimate,
-    });
-    const approveReceipt = await waitForReceipt(provider, approveTxnResponse.hash);
-    if (!approveReceipt) {
-      showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
-      return;
-    }
-    showHandover(PurchaseHandoverStep.APPROVAL_CONFIRMED, {});
-
-    const executeTxn = signResponse.transactions.find(
-      (txn) => txn.methodCall.startsWith('execute'),
-    );
-    if (!executeTxn) {
-      showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
-      return;
-    }
-    showHandover(PurchaseHandoverStep.REQUEST_EXECUTION, {});
-
-    const executeTxnResponse = await signer.sendTransaction({
-      to: executeTxn.tokenAddress,
-      data: executeTxn.rawData,
-      gasPrice,
-      gasLimit: executeTxn.gasEstimate,
-    });
-    const executeReceipt = await waitForReceipt(provider, executeTxnResponse.hash);
-    if (executeReceipt?.status === 1) {
-      showHandover(PurchaseHandoverStep.SUCCESS_ZKEVM, { transactionHash: executeTxnResponse.hash });
     }
   };
 
