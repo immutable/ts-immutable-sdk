@@ -27,6 +27,8 @@ export class MagicProviderProxyFactory {
 
     const proxyHandler: ProxyHandler<ethers.providers.ExternalProvider> = {
       get: (target: ethers.providers.ExternalProvider, property: string, receiver: any) => {
+        // TODO: What happens if no args are passed to request, or additional params?
+        // We should dynamically get the args, use optional chaining to check the method, and then use the dynamic args to call the original request method
         if (property === 'request') {
           return async (args: { method: string; params?: any[] }) => {
             try {
