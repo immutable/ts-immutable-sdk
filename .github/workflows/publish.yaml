@@ -163,7 +163,7 @@ jobs:
           echo "Waiting for NPM registry to reflect version: $VERSION"
 
           for i in {1..20}; do
-            LATEST_VERSION=$(npm view @imtbl/sdk@latest version)
+            LATEST_VERSION=$(if [[ "${{ startsWith(env.RELEASE_TYPE, 'pre') }}" == "true" ]]; then npm view @imtbl/sdk@alpha version; else npm view @imtbl/sdk@latest version; fi)
             if [[ "$LATEST_VERSION" == "$VERSION" ]]; then
               echo "NPM registry updated to version: $LATEST_VERSION"
               exit 0
