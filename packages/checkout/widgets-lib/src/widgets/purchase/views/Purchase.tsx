@@ -312,9 +312,15 @@ export function Purchase({
       spenderAddress,
       recipientAddress,
     );
-    if (!signResponse) return;
+    if (!signResponse) {
+      showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
+      return;
+    }
     const signer = provider.getSigner();
-    if (!signer) return;
+    if (!signer) {
+      showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
+      return;
+    }
 
     showHandover(PurchaseHandoverStep.PREPARING, {});
 
@@ -323,7 +329,10 @@ export function Purchase({
     const approveTxn = signResponse.transactions.find(
       (txn) => txn.methodCall.startsWith('approve'),
     );
-    if (!approveTxn) return;
+    if (!approveTxn) {
+      showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
+      return;
+    }
     showHandover(PurchaseHandoverStep.REQUEST_APPROVAL, {});
 
     const approveTxnResponse = await signer.sendTransaction({
@@ -334,6 +343,7 @@ export function Purchase({
     });
     const approveReceipt = await waitForReceipt(provider, approveTxnResponse.hash);
     if (!approveReceipt) {
+      showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
       return;
     }
     showHandover(PurchaseHandoverStep.APPROVAL_CONFIRMED, {});
@@ -341,7 +351,10 @@ export function Purchase({
     const executeTxn = signResponse.transactions.find(
       (txn) => txn.methodCall.startsWith('execute'),
     );
-    if (!executeTxn) return;
+    if (!executeTxn) {
+      showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
+      return;
+    }
     showHandover(PurchaseHandoverStep.REQUEST_EXECUTION, {});
 
     const executeTxnResponse = await signer.sendTransaction({
