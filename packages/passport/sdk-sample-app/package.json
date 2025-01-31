@@ -2,7 +2,7 @@
   "name": "@imtbl/passport-sdk-sample-app",
   "version": "0.1.0",
   "dependencies": {
-    "@biom3/design-tokens": "^0.4.4",
+    "@biom3/design-tokens": "^0.4.5",
     "@biom3/react": "^0.29.4",
     "@imtbl/blockchain-data": "workspace:*",
     "@imtbl/config": "workspace:*",
@@ -16,7 +16,7 @@
     "bootstrap-icons": "^1.10.3",
     "embla-carousel-react": "^8.1.5",
     "enc-utils": "^3.0.0",
-    "ethers": "^5.7.2",
+    "ethers": "^6.13.4",
     "motion": "^11.17.0",
     "next": "14.2.10",
     "react": "^18.2.0",

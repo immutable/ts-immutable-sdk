@@ -1,11 +1,11 @@
-import { ethers } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 
 function delay(ms: number): Promise<undefined> {
   // eslint-disable-next-line no-promise-executor-return
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export class RetryProvider extends ethers.providers.JsonRpcProvider {
+export class RetryProvider extends JsonRpcProvider {
   private retryCount: number;
 
   private retryDelay: number;

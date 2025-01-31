@@ -5,9 +5,7 @@ import {
   EthSigner,
   ImmutableXConfiguration,
 } from '@imtbl/x-client';
-import { parseUnits } from '@ethersproject/units';
-import { BigNumber } from '@ethersproject/bignumber';
-import { TransactionResponse } from '@ethersproject/providers';
+import { parseUnits, TransactionResponse } from 'ethers';
 import { validateChain } from '../helpers';
 import { Signers } from '../types';
 import { ProviderConfiguration } from '../../config';
@@ -24,7 +22,7 @@ type DepositEthParams = {
 
 async function executeDepositEth(
   ethSigner: EthSigner,
-  amount: BigNumber,
+  amount: bigint,
   assetType: string,
   starkPublicKey: string,
   vaultId: number,
@@ -35,9 +33,11 @@ async function executeDepositEth(
     ethSigner,
   );
 
-  const populatedTransaction = await coreContract.populateTransaction[
-    'deposit(uint256,uint256,uint256)'
-  ](starkPublicKey, assetType, vaultId);
+  const populatedTransaction = await coreContract['deposit(uint256,uint256,uint256)'].populateTransaction(
+    starkPublicKey,
+    assetType,
+    vaultId,
+  );
 
   return ethSigner.sendTransaction({ ...populatedTransaction, value: amount });
 }

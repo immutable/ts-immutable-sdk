@@ -1,7 +1,6 @@
 import {
   useCallback, useContext, useEffect, useState,
 } from 'react';
-import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
 import { isWalletConnectProvider } from '../../../lib/provider';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
@@ -34,14 +33,14 @@ export function SwitchNetworkZkEVM() {
     if (!provider || !checkout) return;
 
     const checkCorrectNetwork = async () => {
-      const currentChainId = await provider.provider.request!({ method: 'eth_chainId', params: [] });
+      const currentChainId = await provider.send('eth_chainId', []);
       // eslint-disable-next-line radix
-      const parsedChainId = parseInt(currentChainId.toString());
+      const parsedChainId = Number(currentChainId.toString());
       if (parsedChainId === getL2ChainId(checkout.config)) {
         connectDispatch({
           payload: {
             type: ConnectActions.SET_PROVIDER,
-            provider: new Web3Provider(provider.provider as any),
+            provider,
           },
         });
 
@@ -74,11 +73,11 @@ export function SwitchNetworkZkEVM() {
       controlType: 'Button',
     });
 
-    if (!provider.provider.request) return;
+    if (!provider.send) return;
 
-    const currentChainId = provider.provider.request({ method: 'eth_chainId', params: [] });
+    const currentChainId = await provider.send('eth_chainId', []);
     // eslint-disable-next-line radix
-    const parsedChainId = parseInt(currentChainId.toString());
+    const parsedChainId = Number(currentChainId.toString());
 
     if (parsedChainId === getL2ChainId(checkout.config)) {
       connectDispatch({

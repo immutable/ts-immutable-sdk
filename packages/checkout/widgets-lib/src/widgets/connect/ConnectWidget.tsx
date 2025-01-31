@@ -1,13 +1,13 @@
 /* eslint-disable react/jsx-no-constructed-context-values */
-import { Web3Provider } from '@ethersproject/providers';
 import {
   ChainId,
   Checkout,
   ConnectWidgetParams,
-  EIP1193Provider,
   EIP6963ProviderInfo,
-  getMetaMaskProviderDetail,
-  getPassportProviderDetail, WalletConnectManager as IWalletConnectManager,
+  WalletConnectManager as IWalletConnectManager,
+  metaMaskProviderInfo,
+  WrappedBrowserProvider,
+  passportProviderInfo,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback,
@@ -33,7 +33,9 @@ import {
 import { addProviderListenersForWidgetRoot, sendProviderUpdatedEvent } from '../../lib';
 import { identifyUser } from '../../lib/analytics/identifyUser';
 import { useWalletConnect } from '../../lib/hooks/useWalletConnect';
-import { isMetaMaskProvider, isPassportProvider, isWalletConnectProvider } from '../../lib/provider';
+import {
+  isMetaMaskProvider, isPassportProvider, isWalletConnectProvider,
+} from '../../lib/provider';
 import { isL1EthChainId, isZkEvmChainId } from '../../lib/utils';
 import { WalletConnectManager, walletConnectProviderInfo } from '../../lib/walletConnect';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
@@ -63,7 +65,7 @@ export type ConnectWidgetInputs = ConnectWidgetParams & {
   sendCloseEventOverride?: () => void;
   allowedChains?: ChainId[];
   checkout: Checkout;
-  web3Provider?: Web3Provider;
+  browserProvider?: WrappedBrowserProvider;
   isCheckNetworkEnabled?: boolean;
   sendGoBackEventOverride?: () => void;
   showBackButton?: boolean;
@@ -73,7 +75,7 @@ export default function ConnectWidget({
   config,
   sendSuccessEventOverride,
   sendCloseEventOverride,
-  web3Provider,
+  browserProvider,
   checkout,
   targetWalletRdns,
   targetChainId,
@@ -120,14 +122,14 @@ export default function ConnectWidget({
   }
 
   useEffect(() => {
-    if (!web3Provider) return;
+    if (!browserProvider) return;
     connectDispatch({
       payload: {
         type: ConnectActions.SET_PROVIDER,
-        provider: web3Provider,
+        provider: browserProvider,
       },
     });
-  }, [web3Provider]);
+  }, [browserProvider]);
 
   useEffect(() => {
     connectDispatch({
@@ -197,22 +199,10 @@ export default function ConnectWidget({
     let walletProviderInfo: EIP6963ProviderInfo | undefined;
     if (isWalletConnectProvider(provider)) {
       walletProviderInfo = walletConnectProviderInfo;
-    } else {
-      const injectedProviderDetails = checkout.getInjectedProviders();
-      const walletProviderDetail = injectedProviderDetails.find((providerDetail) => (
-        providerDetail.provider === provider.provider
-      ));
-      if (walletProviderDetail) {
-        walletProviderInfo = walletProviderDetail.info;
-      }
-      if (!walletProviderInfo) {
-        if (isPassportProvider(provider)) {
-          walletProviderInfo = getPassportProviderDetail(provider.provider as EIP1193Provider).info;
-        }
-        if (isMetaMaskProvider(provider)) {
-          walletProviderInfo = getMetaMaskProviderDetail(provider.provider as EIP1193Provider).info;
-        }
-      }
+    } else if (isPassportProvider(provider)) {
+      walletProviderInfo = passportProviderInfo;
+    } else if (isMetaMaskProvider(provider)) {
+      walletProviderInfo = metaMaskProviderInfo;
     }
 
     if (sendSuccessEventOverride) {

@@ -1,8 +1,8 @@
 import {
   EIP6963ProviderDetail,
   EIP6963ProviderInfo,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
 import { ConnectWalletDrawer } from './ConnectWalletDrawer';
 import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
@@ -13,7 +13,7 @@ type DeliverToWalletDrawerProps = {
   walletOptions: EIP6963ProviderDetail[];
   onConnect?: (
     providerType: 'from' | 'to',
-    provider: Web3Provider,
+    provider: WrappedBrowserProvider,
     providerInfo: EIP6963ProviderInfo
   ) => void;
 };
@@ -29,7 +29,7 @@ export function DeliverToWalletDrawer({
   } = useProvidersContext();
 
   const handleOnConnect = (
-    provider: Web3Provider,
+    provider: WrappedBrowserProvider,
     providerInfo: EIP6963ProviderInfo,
   ) => {
     onConnect?.('to', provider, providerInfo);

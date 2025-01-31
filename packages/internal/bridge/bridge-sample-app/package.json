@@ -5,7 +5,7 @@
     "@imtbl/bridge-sdk": "workspace:*",
     "@imtbl/config": "workspace:*",
     "dotenv": "^16.0.3",
-    "ethers": "^5.7.2"
+    "ethers": "^6.13.4"
   },
   "devDependencies": {
     "@types/node": "^18.14.2",

@@ -1,7 +1,5 @@
-import { Web3Provider } from '@ethersproject/providers';
-import { BigNumber } from 'ethers';
 import {
-  GasTokenType, ItemType, TransactionOrGasType,
+  GasTokenType, ItemType, WrappedBrowserProvider, TransactionOrGasType,
 } from '../../types';
 import { estimateGas, gasCalculator, getGasItemRequirement } from './gasCalculator';
 import { CheckoutErrorType } from '../..';
@@ -10,8 +8,8 @@ describe('gasCalculator', () => {
   describe('gasCalculator', () => {
     it('should return gas for transaction', async () => {
       const mockProvider = {
-        estimateGas: jest.fn().mockResolvedValue(100000),
-      } as unknown as Web3Provider;
+        estimateGas: jest.fn().mockResolvedValue(100000n),
+      } as unknown as WrappedBrowserProvider;
 
       const item = await gasCalculator(
         mockProvider,
@@ -26,15 +24,15 @@ describe('gasCalculator', () => {
 
       expect(item).toEqual({
         type: ItemType.NATIVE,
-        amount: BigNumber.from(100000),
+        amount: BigInt(100000),
         isFee: true,
       });
     });
 
     it('should return the total gas required for approvals and transaction', async () => {
       const mockProvider = {
-        estimateGas: jest.fn().mockResolvedValue(100000),
-      } as unknown as Web3Provider;
+        estimateGas: jest.fn().mockResolvedValue(100000n),
+      } as unknown as WrappedBrowserProvider;
 
       const item = await gasCalculator(
         mockProvider,
@@ -42,11 +40,11 @@ describe('gasCalculator', () => {
           {
             sufficient: false,
             type: ItemType.ERC20,
-            delta: BigNumber.from(100000),
+            delta: BigInt(100000),
             itemRequirement: {
               type: ItemType.ERC20,
               tokenAddress: '0xERC20',
-              amount: BigNumber.from(100000),
+              amount: BigInt(100000),
               spenderAddress: '0xSEAPORT',
               isFee: false,
             },
@@ -74,21 +72,20 @@ describe('gasCalculator', () => {
 
       expect(item).toEqual({
         type: ItemType.NATIVE,
-        amount: BigNumber.from(300000),
+        amount: BigInt(300000),
         isFee: true,
       });
     });
 
     it('should use gas limit if transactionOrGas is GasAmount', async () => {
       const mockProvider = {
-        estimateGas: jest.fn().mockResolvedValue(100000),
+        estimateGas: jest.fn().mockResolvedValue(100000n),
         getFeeData: jest.fn().mockResolvedValue({
-          maxFeePerGas: '0x1',
-          lastBaseFeePerGas: '0x1',
-          maxPriorityFeePerGas: '0x1',
+          maxFeePerGas: 1n,
+          maxPriorityFeePerGas: 1n,
           gasPrice: null,
         }),
-      } as unknown as Web3Provider;
+      } as unknown as WrappedBrowserProvider;
 
       const item = await gasCalculator(
         mockProvider,
@@ -96,11 +93,11 @@ describe('gasCalculator', () => {
           {
             sufficient: false,
             type: ItemType.ERC20,
-            delta: BigNumber.from(100000),
+            delta: BigInt(100000),
             itemRequirement: {
               type: ItemType.ERC20,
               tokenAddress: '0xERC20',
-              amount: BigNumber.from(100000),
+              amount: BigInt(100000),
               spenderAddress: '0xSEAPORT',
               isFee: false,
             },
@@ -122,28 +119,27 @@ describe('gasCalculator', () => {
           type: TransactionOrGasType.GAS,
           gasToken: {
             type: GasTokenType.NATIVE,
-            limit: BigNumber.from('100000'),
+            limit: BigInt('100000'),
           },
         },
       );
 
       expect(item).toEqual({
         type: ItemType.NATIVE,
-        amount: BigNumber.from(400000),
+        amount: BigInt(300000),
         isFee: true,
       });
     });
 
     it('should use ERC20 for gas if GasAmount in ERC20', async () => {
       const mockProvider = {
-        estimateGas: jest.fn().mockResolvedValue(100000),
+        estimateGas: jest.fn().mockResolvedValue(100000n),
         getFeeData: jest.fn().mockResolvedValue({
-          maxFeePerGas: '0x1',
-          lastBaseFeePerGas: '0x1',
-          maxPriorityFeePerGas: '0x1',
+          maxFeePerGas: 1n,
+          maxPriorityFeePerGas: 1n,
           gasPrice: null,
         }),
-      } as unknown as Web3Provider;
+      } as unknown as WrappedBrowserProvider;
 
       const items = await gasCalculator(
         mockProvider,
@@ -151,11 +147,11 @@ describe('gasCalculator', () => {
           {
             sufficient: false,
             type: ItemType.ERC20,
-            delta: BigNumber.from(100000),
+            delta: BigInt(100000),
             itemRequirement: {
               type: ItemType.ERC20,
               tokenAddress: '0xERC20',
-              amount: BigNumber.from(100000),
+              amount: BigInt(100000),
               spenderAddress: '0xSEAPORT',
               isFee: false,
             },
@@ -177,7 +173,7 @@ describe('gasCalculator', () => {
           type: TransactionOrGasType.GAS,
           gasToken: {
             type: GasTokenType.ERC20,
-            limit: BigNumber.from('100000'),
+            limit: BigInt('100000'),
             tokenAddress: '0xERC20',
           },
         },
@@ -186,7 +182,7 @@ describe('gasCalculator', () => {
       expect(items).toEqual({
         type: ItemType.ERC20,
         tokenAddress: '0xERC20',
-        amount: BigNumber.from(400000),
+        amount: BigInt(300000),
         spenderAddress: '',
         isFee: true,
       });
@@ -194,8 +190,8 @@ describe('gasCalculator', () => {
 
     it('should return null if no gas required', async () => {
       const mockProvider = {
-        estimateGas: jest.fn().mockResolvedValue(0),
-      } as unknown as Web3Provider;
+        estimateGas: jest.fn().mockResolvedValue(0n),
+      } as unknown as WrappedBrowserProvider;
 
       const item = await gasCalculator(
         mockProvider,
@@ -215,8 +211,8 @@ describe('gasCalculator', () => {
   describe('estimateGas', () => {
     it('should return gas for transaction', async () => {
       const mockProvider = {
-        estimateGas: jest.fn().mockResolvedValue(BigNumber.from(100000)),
-      } as unknown as Web3Provider;
+        estimateGas: jest.fn().mockResolvedValue(BigInt(100000)),
+      } as unknown as WrappedBrowserProvider;
 
       const item = await estimateGas(
         mockProvider,
@@ -225,13 +221,13 @@ describe('gasCalculator', () => {
         },
       );
 
-      expect(item).toEqual(BigNumber.from(100000));
+      expect(item).toEqual(BigInt(100000));
     });
 
     it('should throw error if estimate gas fails', async () => {
       const mockProvider = {
         estimateGas: jest.fn().mockRejectedValue(new Error('Failed to estimate gas')),
-      } as unknown as Web3Provider;
+      } as unknown as WrappedBrowserProvider;
 
       let message = '';
       let type = '';
@@ -256,7 +252,7 @@ describe('gasCalculator', () => {
   describe('getGasItemRequirement', () => {
     it('should return native gas item requirement', () => {
       const item = getGasItemRequirement(
-        BigNumber.from(100000),
+        BigInt(100000),
         {
           type: TransactionOrGasType.TRANSACTION,
           transaction: {
@@ -267,38 +263,38 @@ describe('gasCalculator', () => {
 
       expect(item).toEqual({
         type: ItemType.NATIVE,
-        amount: BigNumber.from(100000),
+        amount: BigInt(100000),
         isFee: true,
       });
     });
 
     it('should return native item when gas amount native', () => {
       const item = getGasItemRequirement(
-        BigNumber.from(100000),
+        BigInt(100000),
         {
           type: TransactionOrGasType.GAS,
           gasToken: {
             type: GasTokenType.NATIVE,
-            limit: BigNumber.from(100000),
+            limit: BigInt(100000),
           },
         },
       );
 
       expect(item).toEqual({
         type: ItemType.NATIVE,
-        amount: BigNumber.from(100000),
+        amount: BigInt(100000),
         isFee: true,
       });
     });
 
     it('should return ERC20 item when gas amount erc20', () => {
       const item = getGasItemRequirement(
-        BigNumber.from(100000),
+        BigInt(100000),
         {
           type: TransactionOrGasType.GAS,
           gasToken: {
             type: GasTokenType.ERC20,
-            limit: BigNumber.from(100000),
+            limit: BigInt(100000),
             tokenAddress: '0xERC20',
           },
         },
@@ -306,7 +302,7 @@ describe('gasCalculator', () => {
 
       expect(item).toEqual({
         type: ItemType.ERC20,
-        amount: BigNumber.from(100000),
+        amount: BigInt(100000),
         tokenAddress: '0xERC20',
         spenderAddress: '',
         isFee: true,

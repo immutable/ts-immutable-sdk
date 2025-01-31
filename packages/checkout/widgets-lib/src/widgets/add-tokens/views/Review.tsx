@@ -287,7 +287,7 @@ export function Review({
     });
 
     try {
-      currentFromAddress = await fromProvider.getSigner().getAddress();
+      currentFromAddress = await (await fromProvider.getSigner()).getAddress();
     } catch (error) {
       showErrorHandover(AddTokensErrorTypes.PROVIDER_ERROR, {
         contextId: id,
@@ -321,7 +321,7 @@ export function Review({
     const allowance = await getAllowance(changeableProvider, route);
     const { fromAmount } = route.route.params;
 
-    if (allowance?.lt(fromAmount)) {
+    if (allowance && allowance < BigInt(fromAmount)) {
       showHandover(AddTokensHandoverStep.REQUEST_APPROVAL, {});
 
       const approveTxnReceipt = await approve(fromProviderInfo, changeableProvider, route);
@@ -344,9 +344,9 @@ export function Review({
         extras: {
           contextId: id,
           ...(route.route.params.fromChain !== ChainId.IMTBL_ZKEVM_MAINNET.toString()
-            && { txHash: executeTxnReceipt.transactionHash }),
+            && { txHash: executeTxnReceipt.hash }),
           ...(route.route.params.fromChain === ChainId.IMTBL_ZKEVM_MAINNET.toString()
-            && { immutableZkEVMTxHash: executeTxnReceipt.transactionHash }),
+            && { immutableZkEVMTxHash: executeTxnReceipt.hash }),
           toTokenAddress: route.route.params.toToken,
           toTokenChainId: route.route.params.toChain,
           fromTokenAddress: route.route.params.fromToken,
@@ -362,20 +362,20 @@ export function Review({
         trackFlow('commerce', `addTokensFundsAdded_${ctx.event.messageId}`);
       });
 
-      sendAddTokensSuccessEvent(eventTarget, executeTxnReceipt.transactionHash);
+      sendAddTokensSuccessEvent(eventTarget, executeTxnReceipt.hash);
 
       if (toChain === fromChain) {
-        showHandover(AddTokensHandoverStep.SUCCESS_ZKEVM, { transactionHash: executeTxnReceipt.transactionHash });
+        showHandover(AddTokensHandoverStep.SUCCESS_ZKEVM, { transactionHash: executeTxnReceipt.hash });
         return;
       }
 
       showHandover(AddTokensHandoverStep.EXECUTING, {
         routeDuration: formattedDuration,
-        transactionHash: executeTxnReceipt.transactionHash,
+        transactionHash: executeTxnReceipt.hash,
       });
 
-      const status = await getStatus(squid, executeTxnReceipt.transactionHash);
-      const axelarscanUrl = `https://axelarscan.io/gmp/${executeTxnReceipt?.transactionHash}`;
+      const status = await getStatus(squid, executeTxnReceipt.hash);
+      const axelarscanUrl = `https://axelarscan.io/gmp/${executeTxnReceipt?.hash}`;
 
       if (status?.squidTransactionStatus === 'success') {
         showHandover(AddTokensHandoverStep.SUCCESS, { axelarscanUrl });

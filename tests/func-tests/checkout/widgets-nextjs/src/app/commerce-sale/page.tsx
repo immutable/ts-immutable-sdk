@@ -1,15 +1,14 @@
 "use client";
 import { Box } from '@biom3/react';
-import { Web3Provider } from '@ethersproject/providers';
 import { checkout } from '@imtbl/sdk';
-import { CommerceFlowType } from '@imtbl/sdk/checkout';
+import { CommerceFlowType, WrappedBrowserProvider } from '@imtbl/sdk/checkout';
 import { useEffect, useMemo } from 'react';
 import { useCommerceWidget } from '../../hooks/useCommerceWidget';
 import { MockProvider } from '../utils/mockProvider';
 
 function CommerceSale() {
   const { widget, factory } = useCommerceWidget();
-  const provider = useMemo(() => new Web3Provider(new MockProvider()), []);
+  const provider = useMemo(() => new WrappedBrowserProvider(new MockProvider()), []);
 
   useEffect(() => {
     if (!widget || !factory) return;

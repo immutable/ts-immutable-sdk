@@ -1,5 +1,5 @@
-import { BigNumber, utils } from 'ethers';
 import { GasEstimateBridgeToL2Result } from '@imtbl/checkout-sdk';
+import { formatUnits } from 'ethers';
 import { calculateCryptoToFiat, tokenValueFormat } from '../../../lib/utils';
 import { FormattedFee } from '../../swap/functions/swapFees';
 import { CryptoFiatState } from '../../../context/crypto-fiat-context/CryptoFiatContext';
@@ -13,25 +13,25 @@ export const formatBridgeFees = (
   const fees: FormattedFee[] = [];
   if (!estimates?.fees || !estimates.token) return fees;
 
-  let serviceFee = BigNumber.from(0);
-  if (estimates.fees.bridgeFee) serviceFee = serviceFee.add(estimates.fees.bridgeFee);
-  if (estimates.fees.imtblFee) serviceFee = serviceFee.add(estimates.fees.imtblFee);
-  if (serviceFee.gt(0)) {
+  let serviceFee = BigInt(0);
+  if (estimates.fees.bridgeFee) serviceFee += estimates.fees.bridgeFee;
+  if (estimates.fees.imtblFee) serviceFee += estimates.fees.imtblFee;
+  if (serviceFee > 0) {
     fees.push({
       label: isDeposit
         ? t('drawers.feesBreakdown.fees.serviceFee.depositLabel')
         : t('drawers.feesBreakdown.fees.serviceFee.withdrawLabel'),
       fiatAmount: `≈ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${calculateCryptoToFiat(
-        utils.formatUnits(serviceFee, estimates.token.decimals),
+        formatUnits(serviceFee, estimates.token.decimals),
         estimates.token.symbol,
         cryptoFiatState.conversions,
       )}`,
-      amount: tokenValueFormat(utils.formatUnits(serviceFee, estimates.token.decimals)),
+      amount: tokenValueFormat(formatUnits(serviceFee, estimates.token.decimals)),
       token: estimates.token,
     } as FormattedFee);
   }
-  if (estimates.fees.sourceChainGas?.gt(0)) {
-    const formattedGas = utils.formatUnits(estimates.fees.sourceChainGas, estimates.token.decimals);
+  if (estimates.fees.sourceChainGas > 0) {
+    const formattedGas = formatUnits(estimates.fees.sourceChainGas, estimates.token.decimals);
     fees.push({
       label: t('drawers.feesBreakdown.fees.gasFeeMove.label'),
       fiatAmount: `≈ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${calculateCryptoToFiat(
@@ -44,8 +44,8 @@ export const formatBridgeFees = (
       token: estimates.token,
     } as FormattedFee);
   }
-  if (estimates.fees.approvalFee?.gt(0)) {
-    const formattedApprovalGas = utils.formatUnits(estimates.fees.approvalFee, estimates.token.decimals);
+  if (estimates.fees.approvalFee > 0) {
+    const formattedApprovalGas = formatUnits(estimates.fees.approvalFee, estimates.token.decimals);
     fees.push({
       label: t('drawers.feesBreakdown.fees.approvalFee.label'),
       fiatAmount: `≈ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${calculateCryptoToFiat(

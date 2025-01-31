@@ -1,11 +1,14 @@
-import { constants, providers } from 'ethers';
+import { TransactionRequest, ZeroAddress } from 'ethers';
 import { TEST_FROM_ADDRESS, USDC_TEST_TOKEN, nativeTokenService } from '../test/utils';
 import { decimalsFunctionSig, getTokenDecimals, isValidNonZeroAddress } from './utils';
 
-jest.mock('@ethersproject/contracts');
+jest.mock('ethers', () => ({
+  ...jest.requireActual('ethers'),
+  Contract: jest.fn(),
+}));
 
 const provider = {
-  call: jest.fn().mockImplementation(async (payload: providers.TransactionRequest) => {
+  call: jest.fn().mockImplementation(async (payload: TransactionRequest) => {
     if (payload.data === decimalsFunctionSig) {
       if (payload.to === USDC_TEST_TOKEN.address) {
         return USDC_TEST_TOKEN.decimals.toString(16);
@@ -19,7 +22,7 @@ const provider = {
 describe('utils', () => {
   describe('isValidNonZeroAddress', () => {
     it('should return false for zero address', () => {
-      expect(isValidNonZeroAddress(constants.AddressZero)).toBe(false);
+      expect(isValidNonZeroAddress(ZeroAddress)).toBe(false);
     });
 
     it('should return false for invalid address', () => {

@@ -1,25 +1,26 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { Eip1193Provider } from 'ethers';
 import { ChainId } from './chains';
 import { NetworkInfo } from './networkInfo';
 import { TokenInfo } from './tokenInfo';
+import { WrappedBrowserProvider } from './provider';
 
 /**
  * Interface representing the parameters for {@link Checkout.addNetwork}.
- * @property {Web3Provider} provider - The provider to connect to the network.
+ * @property {WrappedBrowserProvider} provider - The provider to connect to the network.
  * @property {ChainId} chainId - The ID of the network to add. We only support adding Immutable zkEVM and Immutable zkEVM Testnet.
  */
 export interface AddNetworkParams {
-  provider: Web3Provider;
+  provider: WrappedBrowserProvider | Eip1193Provider
   chainId: ChainId;
 }
 
 /**
  * Interface representing the parameters for {@link Checkout.switchNetwork}.
- * @property {Web3Provider} provider - The provider to connect to the network.
+ * @property {WrappedBrowserProvider | Eip1193Provider} provider - The provider to connect to the network.
  * @property {ChainId} chainId - The ID of the network to switch to.
  */
 export interface SwitchNetworkParams {
-  provider: Web3Provider;
+  provider: WrappedBrowserProvider | Eip1193Provider;
   chainId: ChainId;
 }
 
@@ -27,19 +28,19 @@ export interface SwitchNetworkParams {
  * Represents the result of switching the network in a Web3 application {@link Checkout.switchNetwork}.
  * @interface SwitchNetworkResult
  * @property {NetworkInfo} network - The information about the switched network.
- * @property {Web3Provider} provider - The Web3 provider for the switched network.
+ * @property {WrappedBrowserProvider} provider - The WrappedBrowserProvider for the switched network.
  */
 export interface SwitchNetworkResult {
   network: NetworkInfo;
-  provider: Web3Provider;
+  provider: WrappedBrowserProvider;
 }
 
 /**
  * * Interface representing the parameters for {@link Checkout.getNetworkInfo}.
- * @property {Web3Provider} provider - The provider to connect to the network.
+ * @property {BrowserProvider} provider - The provider to connect to the network.
  */
 export interface GetNetworkParams {
-  provider: Web3Provider;
+  provider: WrappedBrowserProvider | Eip1193Provider;
 }
 
 /**

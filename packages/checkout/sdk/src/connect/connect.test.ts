@@ -3,9 +3,8 @@
  */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Web3Provider } from '@ethersproject/providers';
 import { checkIsWalletConnected, connectSite, requestPermissions } from './connect';
-import { WalletAction, WalletProviderName } from '../types';
+import { WrappedBrowserProvider, WalletAction, WalletProviderName } from '../types';
 import { CheckoutErrorType } from '../errors';
 import { createProvider } from '../provider';
 
@@ -19,6 +18,9 @@ describe('connect', () => {
     windowSpy.mockImplementation(() => ({
       ethereum: {
         request: providerRequestMock,
+        isMetaMask: true,
+        on: jest.fn(),
+        removeListener: jest.fn(),
       },
       dispatchEvent: jest.fn(),
       addEventListener: jest.fn(),
@@ -62,9 +64,9 @@ describe('connect', () => {
       expect(walletProviderName).toEqual(WalletProviderName.METAMASK);
     });
 
-    it('should throw an error if provider missing from web3provider', async () => {
+    it('should throw an error if provider missing from BrowserProvider', async () => {
       try {
-        await checkIsWalletConnected({} as Web3Provider);
+        await checkIsWalletConnected({} as WrappedBrowserProvider);
       } catch (err: any) {
         expect(err.message).toEqual('Check wallet connection request failed');
         expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_FAILED_ERROR);
@@ -73,7 +75,7 @@ describe('connect', () => {
 
     it('should throw an error if provider.request is not found', async () => {
       try {
-        await checkIsWalletConnected({ provider: {} } as Web3Provider);
+        await checkIsWalletConnected({ provider: {} } as WrappedBrowserProvider);
       } catch (err: any) {
         expect(err.message).toEqual('Check wallet connection request failed');
         expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_FAILED_ERROR);
@@ -84,9 +86,9 @@ describe('connect', () => {
       try {
         await checkIsWalletConnected({
           provider: {
-            request: () => { throw new Error(''); },
+            send: () => { throw new Error(''); },
           },
-        } as unknown as Web3Provider);
+        } as unknown as WrappedBrowserProvider);
       } catch (err: any) {
         expect(err.message).toEqual('Check wallet connection request failed');
         expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_FAILED_ERROR);
@@ -95,21 +97,20 @@ describe('connect', () => {
   });
 
   describe('connectWalletProvider', () => {
-    it('should call the connect function with metamask and return a Web3Provider', async () => {
+    it('should call the connect function with metamask and return a BrowserProvider', async () => {
+      jest.spyOn(WrappedBrowserProvider.prototype, 'send');
+
       const { provider } = await createProvider(WalletProviderName.METAMASK);
       const connRes = await connectSite(provider);
 
-      expect(connRes).toBeInstanceOf(Web3Provider);
-      expect(connRes?.provider).not.toBe(null);
-      expect(connRes?.provider.request).toBeCalledWith({
-        method: WalletAction.CONNECT,
-        params: [],
-      });
+      expect(connRes).toBeInstanceOf(WrappedBrowserProvider);
+      expect(connRes).not.toBe(null);
+      expect(connRes?.send).toBeCalledWith(WalletAction.CONNECT, []);
     });
 
-    it('should throw an error if provider missing from web3provider', async () => {
+    it('should throw an error if provider missing from BrowserProvider', async () => {
       try {
-        await connectSite({} as Web3Provider);
+        await connectSite({} as WrappedBrowserProvider);
       } catch (err: any) {
         expect(err.message).toEqual('Incompatible provider');
         expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR);
@@ -119,7 +120,7 @@ describe('connect', () => {
 
     it('should throw an error if provider.request is not found', async () => {
       try {
-        await connectSite({ provider: {} } as Web3Provider);
+        await connectSite({ provider: {} } as WrappedBrowserProvider);
       } catch (err: any) {
         expect(err.message).toEqual('Incompatible provider');
         expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR);
@@ -134,7 +135,9 @@ describe('connect', () => {
             .fn()
             .mockRejectedValue(new Error('User rejected request')),
         },
-        removeEventListener: () => {},
+        removeEventListener: jest.fn(),
+        addEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
       }));
 
       const { provider } = await createProvider(WalletProviderName.METAMASK);
@@ -149,22 +152,18 @@ describe('connect', () => {
   });
 
   describe('requestPermissions', () => {
-    it('should call the requestPermissions function with metamask and return a Web3Provider', async () => {
+    it('should call the requestPermissions function with metamask and return a BrowserProvider', async () => {
       const { provider } = await createProvider(WalletProviderName.METAMASK);
       const reqRes = await requestPermissions(provider);
 
-      expect(reqRes).toBeInstanceOf(Web3Provider);
+      expect(reqRes).toBeInstanceOf(WrappedBrowserProvider);
       expect(reqRes?.provider).not.toBe(null);
-      expect(reqRes?.provider.request).toBeCalledWith({
-        method: WalletAction.REQUEST_PERMISSIONS,
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        params: [{ eth_accounts: {} }],
-      });
+      expect(reqRes?.send).toBeCalledWith(WalletAction.REQUEST_PERMISSIONS, [{ eth_accounts: {} }]);
     });
 
-    it('should throw an error if provider missing from web3provider', async () => {
+    it('should throw an error if provider missing from BrowserProvider', async () => {
       try {
-        await requestPermissions({} as Web3Provider);
+        await requestPermissions({} as WrappedBrowserProvider);
       } catch (err: any) {
         expect(err.message).toEqual('Incompatible provider');
         expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR);
@@ -174,7 +173,7 @@ describe('connect', () => {
 
     it('should throw an error if provider.request is not found', async () => {
       try {
-        await requestPermissions({ provider: {} } as Web3Provider);
+        await requestPermissions({ provider: {} } as WrappedBrowserProvider);
       } catch (err: any) {
         expect(err.message).toEqual('Incompatible provider');
         expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR);

@@ -1,6 +1,5 @@
-import { Web3Provider } from '@ethersproject/providers';
 import {
-  Checkout, ItemBalance, TokenBalance, TransactionRequirement,
+  Checkout, ItemBalance, WrappedBrowserProvider, TokenBalance, TransactionRequirement,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { compareStr } from '../../../lib/utils';
@@ -22,7 +21,7 @@ import {
 const isTokenFee = (balance: ItemBalance): balance is TokenBalance => 'token' in balance && balance.token !== undefined;
 
 export type FundingBalanceParams = {
-  provider: Web3Provider;
+  provider: WrappedBrowserProvider;
   checkout: Checkout;
   currencies: OrderQuoteCurrency[];
   baseCurrency: OrderQuoteCurrency;
@@ -53,7 +52,7 @@ export const fetchFundingBalances = async (
     onUpdateGasFees,
   } = params;
 
-  const signer = provider?.getSigner();
+  const signer = await provider?.getSigner();
   const spenderAddress = (await signer?.getAddress()) || '';
   const environment = checkout.config.environment as Environment;
 

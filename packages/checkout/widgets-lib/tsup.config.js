@@ -8,11 +8,12 @@ export default defineConfig((options) => {
   if (options.watch) {
     // Watch mode
     return {
-      outDir: 'dist',
+      outDir: 'dist/browser',
       format: 'esm',
       target: 'es2022',
       platform: 'browser',
       bundle: true,
+      esbuildPlugins: [nodeModulesPolyfillPlugin({ modules: ['url']})]
     }
   }
   
@@ -26,32 +27,6 @@ export default defineConfig((options) => {
       minify: true,
       bundle: true,
       treeshake: true,
-      esbuildPlugins: [
-        nodeModulesPolyfillPlugin({
-          globals: {
-            Buffer: true,
-            process: true,
-          },
-          modules: ['crypto', 'buffer', 'process', 'url', 'fs', 'path']
-        }),
-        replace({ 
-          '__SDK_VERSION__': pkg.version, 
-          'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production')
-        })
-      ]
-    },
-
-    // Browser Bundle for CDN
-    {
-      outDir: 'dist/browser',
-      outExtension: () => ({ js: '.cdn.js' }),
-      platform: 'browser',
-      format: 'esm',
-      target: 'es2022',
-      bundle: true,
-      splitting: false,
-      skipNodeModulesBundle: false,
-      minify: true,
       noExternal: [/.*/],
       esbuildPlugins: [
         nodeModulesPolyfillPlugin({

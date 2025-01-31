@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { CheckoutConfiguration } from '../../../config';
 import {
@@ -41,7 +40,7 @@ describe('onRampRoute', () => {
     const balanceRequirement: BalanceERC20Requirement = {
       type: ItemType.ERC20,
       required: {
-        balance: BigNumber.from(10),
+        balance: BigInt(10),
         formattedBalance: '10',
         token: {
           address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
@@ -52,7 +51,7 @@ describe('onRampRoute', () => {
       },
       sufficient: false,
       current: {
-        balance: BigNumber.from(4),
+        balance: BigInt(4),
         formattedBalance: '4',
         token: {
           address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
@@ -62,7 +61,7 @@ describe('onRampRoute', () => {
         },
       },
       delta: {
-        balance: BigNumber.from(6),
+        balance: BigInt(6),
         formattedBalance: '6',
       },
     } as BalanceERC20Requirement;
@@ -82,11 +81,11 @@ describe('onRampRoute', () => {
         fundingItem: {
           type: ItemType.ERC20,
           fundsRequired: {
-            amount: BigNumber.from(6),
+            amount: BigInt(6),
             formattedAmount: '6',
           },
           userBalance: {
-            balance: BigNumber.from(4),
+            balance: BigInt(4),
             formattedBalance: '4',
           },
           token: {
@@ -103,7 +102,7 @@ describe('onRampRoute', () => {
     const balanceRequirement: BalanceERC20Requirement = {
       type: ItemType.ERC20,
       required: {
-        balance: BigNumber.from(10),
+        balance: BigInt(10),
         formattedBalance: '10',
         token: {
           name: 'IMX',
@@ -113,7 +112,7 @@ describe('onRampRoute', () => {
       },
       sufficient: false,
       current: {
-        balance: BigNumber.from(4),
+        balance: BigInt(4),
         formattedBalance: '4',
         token: {
           name: 'IMX',
@@ -122,7 +121,7 @@ describe('onRampRoute', () => {
         },
       },
       delta: {
-        balance: BigNumber.from(6),
+        balance: BigInt(6),
         formattedBalance: '6',
       },
     } as BalanceERC20Requirement;
@@ -142,11 +141,11 @@ describe('onRampRoute', () => {
         fundingItem: {
           type: ItemType.NATIVE,
           fundsRequired: {
-            amount: BigNumber.from(6),
+            amount: BigInt(6),
             formattedAmount: '6',
           },
           userBalance: {
-            balance: BigNumber.from(4),
+            balance: BigInt(4),
             formattedBalance: '4',
           },
           token: {
@@ -162,7 +161,7 @@ describe('onRampRoute', () => {
     const balanceRequirement: BalanceERC20Requirement = {
       type: ItemType.ERC20,
       required: {
-        balance: BigNumber.from(10),
+        balance: BigInt(10),
         formattedBalance: '10',
         token: {
           address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
@@ -173,7 +172,7 @@ describe('onRampRoute', () => {
       },
       sufficient: false,
       current: {
-        balance: BigNumber.from(0),
+        balance: BigInt(0),
         formattedBalance: '0',
         token: {
           address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
@@ -183,7 +182,7 @@ describe('onRampRoute', () => {
         },
       },
       delta: {
-        balance: BigNumber.from(10),
+        balance: BigInt(10),
         formattedBalance: '10',
       },
     } as BalanceERC20Requirement;
@@ -206,7 +205,7 @@ describe('onRampRoute', () => {
       type: ItemType.ERC721,
       required: {
         type: ItemType.ERC721,
-        balance: BigNumber.from(1),
+        balance: BigInt(1),
         formattedBalance: '1',
         id: '1',
         contractAddress: '0xADDRESS',
@@ -214,13 +213,13 @@ describe('onRampRoute', () => {
       sufficient: false,
       current: {
         type: ItemType.ERC721,
-        balance: BigNumber.from(0),
+        balance: BigInt(0),
         formattedBalance: '0',
         id: '1',
         contractAddress: '0xADDRESS',
       },
       delta: {
-        balance: BigNumber.from(1),
+        balance: BigInt(1),
         formattedBalance: '1',
       },
     } as BalanceERC721Requirement;
