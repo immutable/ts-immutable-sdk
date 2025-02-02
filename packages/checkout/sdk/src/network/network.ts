@@ -80,7 +80,7 @@ export async function getNetworkAllowList(
     if (newNetwork) {
       allowedNetworks.push({
         name: newNetwork.chainName,
-        chainId: BigInt(parseInt(newNetwork.chainIdHex, 16)),
+        chainId: parseInt(newNetwork.chainIdHex, 16),
         nativeCurrency: newNetwork.nativeCurrency,
         isSupported: true,
       });
@@ -107,13 +107,13 @@ export async function getNetworkInfo(
           const chainIdNetworkInfo = networkMap.get(Number(network.chainId));
           return {
             name: chainIdNetworkInfo!.chainName,
-            chainId: BigInt(parseInt(chainIdNetworkInfo!.chainIdHex, 16)),
+            chainId: parseInt(chainIdNetworkInfo!.chainIdHex, 16),
             nativeCurrency: chainIdNetworkInfo!.nativeCurrency,
             isSupported: true,
           };
         }
         return {
-          chainId: network.chainId,
+          chainId: Number(network.chainId),
           name: network.name,
           isSupported: false,
         } as NetworkInfo;
@@ -121,7 +121,7 @@ export async function getNetworkInfo(
         const chainId = await getUnderlyingChainId(provider);
         const isSupported = Array.from(networkMap.keys()).includes(Number(chainId));
         return {
-          chainId,
+          chainId: Number(chainId),
           isSupported,
         } as NetworkInfo;
       }

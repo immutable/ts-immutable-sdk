@@ -168,7 +168,7 @@ describe('network functions', () => {
       ]);
       const copyZkevmNetworkInfo = zkevmNetworkInfo as unknown as NetworkInfo;
       copyZkevmNetworkInfo.isSupported = true;
-      copyZkevmNetworkInfo.chainId = BigInt(zkevmNetworkInfo.chainId);
+      copyZkevmNetworkInfo.chainId = zkevmNetworkInfo.chainId;
       expect(switchNetworkResult.network).toEqual(copyZkevmNetworkInfo);
     });
 
