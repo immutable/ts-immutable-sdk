@@ -16,7 +16,7 @@ describe('WalletContext', () => {
       type: WalletActions.SET_NETWORK,
       network: {
         name: 'Ethereum',
-        chainId: BigInt(ChainId.ETHEREUM),
+        chainId: ChainId.ETHEREUM,
         nativeCurrency: {
           symbol: 'ETH',
           decimals: 18,

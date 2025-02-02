@@ -23,7 +23,7 @@ describe('read only providers', () => {
     const getNetworkAllListMock = jest.fn().mockResolvedValue({
       networks: [
         {
-          chainId: BigInt(ChainId.IMTBL_ZKEVM_TESTNET),
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
           name: ChainName.IMTBL_ZKEVM_TESTNET,
           isSupported: true,
           nativeCurrency: {},

@@ -66,7 +66,7 @@ export async function validateProvider(
         type: NetworkFilterTypes.ALL,
       });
 
-      const isAllowed = allowedNetworks.networks.some((network) => network.chainId === underlyingChainId);
+      const isAllowed = allowedNetworks.networks.some((network) => network.chainId === Number(underlyingChainId));
 
       if (!isAllowed && !options.allowUnsupportedProvider) {
         throw new CheckoutError(
