@@ -27900,7 +27900,7 @@ snapshots:
       eslint: 9.16.0(jiti@1.21.0)
       eslint-plugin-flowtype: 8.0.3(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.22.5(@babel/core@7.24.9))(eslint@9.16.0(jiti@1.21.0))
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))
-      eslint-plugin-jest: 25.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0)(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2)
+      eslint-plugin-jest: 25.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2)
       eslint-plugin-jsx-a11y: 6.9.0(eslint@9.16.0(jiti@1.21.0))
       eslint-plugin-react: 7.35.0(eslint@9.16.0(jiti@1.21.0))
       eslint-plugin-react-hooks: 4.6.0(eslint@9.16.0(jiti@1.21.0))
@@ -28072,12 +28072,12 @@ snapshots:
       - supports-color
       - typescript
 
-  eslint-plugin-jest@25.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0)(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2):
+  eslint-plugin-jest@25.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2):
     dependencies:
       '@typescript-eslint/experimental-utils': 5.62.0(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2)
       eslint: 9.16.0(jiti@1.21.0)
     optionalDependencies:
-      '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0)(typescript@5.6.2)
+      '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2)
       jest: 27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - supports-color
