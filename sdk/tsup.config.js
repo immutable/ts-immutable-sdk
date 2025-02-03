@@ -54,7 +54,7 @@ export default defineConfig((options) => {
       bundle: true,
       splitting: false,
       skipNodeModulesBundle: false,
-      minify: true,
+      minify: false,
       noExternal: [/.*/],
       esbuildPlugins: [
         nodeModulesPolyfillPlugin({
