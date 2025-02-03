@@ -32,7 +32,7 @@ export default defineConfig((options) => {
         nodeModulesPolyfillPlugin({
           globals: {
             // Buffer: true,
-            process: true,
+            // process: true,
           },
           modules: ['crypto', 'buffer', 'process', 'url', 'fs', 'path']
         }),
