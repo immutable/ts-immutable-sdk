@@ -124,7 +124,7 @@ describe('network functions', () => {
       ]);
       expect(switchNetworkResult.network).toEqual({
         name: ChainName.ETHEREUM,
-        chainId: BigInt(ChainId.ETHEREUM),
+        chainId: ChainId.ETHEREUM,
         isSupported: true,
         nativeCurrency: {
           name: ChainName.ETHEREUM,
@@ -377,11 +377,11 @@ describe('network functions', () => {
           SANDBOX_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.chainName,
         );
         expect(result.chainId).toBe(
-          BigInt(parseInt(
+          parseInt(
             SANDBOX_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.chainIdHex
               ?? '',
             16,
-          )),
+          ),
         );
         expect(result.nativeCurrency).toEqual(
           SANDBOX_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.nativeCurrency,
@@ -453,7 +453,7 @@ describe('network functions', () => {
         networks: [
           {
             name: ChainName.SEPOLIA,
-            chainId: BigInt(ChainId.SEPOLIA),
+            chainId: ChainId.SEPOLIA,
             isSupported: true,
             nativeCurrency: {
               name: 'Sep Eth',
@@ -463,7 +463,7 @@ describe('network functions', () => {
           },
           {
             name: ChainName.IMTBL_ZKEVM_TESTNET,
-            chainId: BigInt(ChainId.IMTBL_ZKEVM_TESTNET),
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
             isSupported: true,
             nativeCurrency: ZKEVM_NATIVE_SANDBOX_TOKEN,
           },
@@ -480,7 +480,7 @@ describe('network functions', () => {
         networks: [
           {
             name: ChainName.SEPOLIA,
-            chainId: BigInt(ChainId.SEPOLIA),
+            chainId: ChainId.SEPOLIA,
             isSupported: true,
             nativeCurrency: {
               name: 'Sep Eth',
