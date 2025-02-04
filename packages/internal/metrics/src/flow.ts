@@ -52,7 +52,9 @@ const getEventName = (flowName: string, eventName: string) => `${flowName}_${cle
 const trackFlowFn = (
   moduleName: string,
   flowName: string,
-  properties?: AllowedTrackProperties,
+  properties: AllowedTrackProperties = {
+    trackStartEvent: true,
+  },
 ): Flow => {
   // Track the start of the flow
   const flowId = generateFlowId();
@@ -100,8 +102,10 @@ const trackFlowFn = (
     previousStepTime = currentTime;
   };
 
-  // Trigger a Start Event as a record of creating the flow
-  addEvent('Start');
+  if (properties.trackStartEvent) {
+    // Trigger a Start Event as a record of creating the flow
+    addEvent('Start');
+  }
 
   return {
     details: {

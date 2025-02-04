@@ -25,6 +25,8 @@ string | number | boolean | undefined
 // List of properties that are allowed to be sent with the track request
 // As these are used by other types of tracking
 export type AllowedTrackProperties = TrackProperties & {
+  // Start event
+  trackStartEvent?: boolean;
   // Performance
   duration?: never;
   // Flow

@@ -61,7 +61,6 @@ const trackSessionActivityFn = async (args: AccountsRequestedEvent) => {
   }
   // If there is already a tracking call in progress, do nothing
   if (currentSessionTrackCall[clientId]) {
-    flow.addEvent('Existing Delay Early Exit');
     return;
   }
   currentSessionTrackCall[clientId] = true;
@@ -94,14 +93,11 @@ const trackSessionActivityFn = async (args: AccountsRequestedEvent) => {
       sendCount: sendCount[clientId] || 0,
     });
     checkCount[clientId]++;
-    flow.addEvent('Fetched details', { checkCount: checkCount[clientId] });
 
     if (!details) {
-      flow.addEvent('No details found');
       return;
     }
   } catch (error) {
-    flow.addEvent('Failed to fetch details');
     throw new Error('Failed to get details', { cause: error });
   }
 

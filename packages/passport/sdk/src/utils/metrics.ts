@@ -3,8 +3,14 @@ import { Flow, trackError, trackFlow } from '@imtbl/metrics';
 export const withMetrics = <T>(
   fn: (flow: Flow) => T,
   flowName: string,
+  trackStartEvent: boolean = true,
+  trackEndEvent: boolean = true,
 ): T => {
-  const flow: Flow = trackFlow('passport', flowName);
+  const flow: Flow = trackFlow(
+    'passport',
+    flowName,
+    { trackStartEvent },
+  );
 
   try {
     return fn(flow);
@@ -15,25 +21,36 @@ export const withMetrics = <T>(
     flow.addEvent('errored');
     throw error;
   } finally {
-    flow.addEvent('End');
+    if (trackEndEvent) {
+      flow.addEvent('End');
+    }
   }
 };
 
 export const withMetricsAsync = async <T>(
   fn: (flow: Flow) => Promise<T>,
   flowName: string,
+  trackStartEvent: boolean = true,
+  trackEndEvent: boolean = true,
 ): Promise<T> => {
-  const flow: Flow = trackFlow('passport', flowName);
+  const flow: Flow = trackFlow(
+    'passport',
+    flowName,
+    { trackStartEvent },
+  );
 
   try {
     return await fn(flow);
   } catch (error) {
     if (error instanceof Error) {
       trackError('passport', flowName, error);
+    } else {
+      flow.addEvent('errored');
     }
-    flow.addEvent('errored');
     throw error;
   } finally {
-    flow.addEvent('End');
+    if (trackEndEvent) {
+      flow.addEvent('End');
+    }
   }
 };
