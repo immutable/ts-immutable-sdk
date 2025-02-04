@@ -80,15 +80,11 @@
   "exports": {
     "development": {
       "types": "./src/index.ts",
-      "browser": "./dist/browser/index.js",
-      "require": "./dist/node/index.cjs",
-      "default": "./dist/node/index.js"
+      "default": "./dist/browser/index.js"
     },
     "default": {
       "types": "./dist/types/index.d.ts",
-      "browser": "./dist/browser/index.js",
-      "require": "./dist/node/index.cjs",
-      "default": "./dist/node/index.js"
+      "default": "./dist/browser/index.js"
     }
   },
   "files": [
@@ -106,15 +102,14 @@
   },
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "pnpm transpile && pnpm build:cdn && pnpm typegen",
-    "build:cdn": "NODE_ENV=production pnpm rollup --config rollup.config.js",
+    "build": "NODE_ENV=production pnpm rollup --config rollup.config.js && pnpm typegen",
     "transpile": "tsup src/index.ts --config ./tsup.config.js",
     "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
-    "build:local": "pnpm build && mkdir -p ../widgets-sample-app/public/lib/js && cp dist/*.js ../widgets-sample-app/public/lib/js/",
+    "build:local": "pnpm build && mkdir -p ../widgets-sample-app/public/lib/js && cp dist/browser/*.js ../widgets-sample-app/public/lib/js/",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
-    "prepare:examplewidgets": "pnpm --filter @examples/commerce-widget-nextjs exec mkdir -p tests/utils/local-widgets-js/ && cp ./dist/*.js $(pnpm --filter @examples/commerce-widget-nextjs exec pwd)/tests/utils/local-widgets-js/",
-    "prepare:testwidgets": "pnpm --filter @tests/checkout-widgets-nextjs exec mkdir -p tests/utils/local-widgets-js/ && cp ./dist/*.js $(pnpm --filter @tests/checkout-widgets-nextjs exec pwd)/tests/utils/local-widgets-js/",
+    "prepare:examplewidgets": "pnpm --filter @examples/commerce-widget-nextjs exec mkdir -p tests/utils/local-widgets-js/ && cp ./dist/browser/*.js $(pnpm --filter @examples/commerce-widget-nextjs exec pwd)/tests/utils/local-widgets-js/",
+    "prepare:testwidgets": "pnpm --filter @tests/checkout-widgets-nextjs exec mkdir -p tests/utils/local-widgets-js/ && cp ./dist/browser/*.js $(pnpm --filter @tests/checkout-widgets-nextjs exec pwd)/tests/utils/local-widgets-js/",
     "start": "NODE_ENV=development tsup --config ./tsup.config.js --watch",
     "test": "jest test --passWithNoTests",
     "test:watch": "jest test --passWithNoTests --watch",
