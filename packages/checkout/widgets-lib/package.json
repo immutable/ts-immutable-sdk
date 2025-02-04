@@ -80,16 +80,15 @@
   "exports": {
     "development": {
       "types": "./src/index.ts",
+      "browser": "./dist/browser/index.js",
       "default": "./dist/browser/index.js"
     },
     "default": {
       "types": "./dist/types/index.d.ts",
+      "browser": "./dist/browser/index.js",
       "default": "./dist/browser/index.js"
     }
   },
-  "files": [
-    "dist"
-  ],
   "homepage": "https://github.com/immutable/ts-immutable-sdk",
   "keywords": [
     "immutable"
