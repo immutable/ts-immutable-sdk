@@ -1,3 +1,4 @@
+// @ts-check
 import typescript from '@rollup/plugin-typescript';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
@@ -8,25 +9,14 @@ import terser from '@rollup/plugin-terser';
 
 const PRODUCTION = 'production';
 
-/**
- * @type {import('rollup').RollupOptions}
- */
-export default {
-  input: 'src/index.ts',
-  output: {
-    file: 'dist/browser/index.cdn.js',
-    format: 'umd',
-    name: 'ImmutableCheckoutWidgets',
-    inlineDynamicImports: true
-  },
-  context: 'window',
-  plugins: [
+const getPlugins = () => {
+  return [
     json(),
     replace({
       preventAssignment: true,
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || PRODUCTION),
     }),
-    typescript({customConditions: ["default"], declaration: false}),
+    typescript({customConditions: ["default"], declaration: false, outDir: 'dist/browser'}),
     resolve({
       browser: true,
       dedupe: ['react', 'react-dom'],
@@ -34,6 +24,34 @@ export default {
     }),
     nodePolyfills(),
     commonjs(),
-    terser()
-  ]
+  ];
 }
+
+/**
+ * @type {import('rollup').RollupOptions[]}
+ */
+export default [
+  {
+    input: 'src/index.ts',
+    output: {
+      dir: 'dist/browser',
+      format: 'es',
+    },
+    plugins: [
+      ...getPlugins(),
+    ]
+  },
+  {
+    input: 'src/index.ts',
+    output: {
+      file: 'dist/browser/index.cdn.js',
+      format: 'umd',
+      name: 'ImmutableCheckoutWidgets',
+      inlineDynamicImports: true
+    },
+    context: 'window',
+    plugins: [
+      ...getPlugins(),
+    ]
+  }
+]
