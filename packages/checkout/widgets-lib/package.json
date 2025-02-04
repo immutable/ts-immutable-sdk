@@ -99,7 +99,7 @@
   },
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "pnpm rollup --config rollup.config.js && pnpm typegen",
+    "build": "rollup --config rollup.config.js && pnpm typegen",
     "transpile": "tsup src/index.ts --config ./tsup.config.js",
     "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
     "build:local": "pnpm build && mkdir -p ../widgets-sample-app/public/lib/js && cp dist/browser/*.js ../widgets-sample-app/public/lib/js/",
