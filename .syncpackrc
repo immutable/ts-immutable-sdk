@@ -1,3 +1,11 @@
 {
-  "source": ["packages/**/package.json", "sdk/package.json"]
+  "source": ["packages/**/package.json", "sdk/package.json"],
+  "versionGroups": [
+    {
+      "label": "Use workspace protocol when developing local packages",
+      "dependencies": ["$LOCAL"],
+      "dependencyTypes": ["prod", "dev"],
+      "pinVersion": "workspace:*"
+    }
+  ]
 }

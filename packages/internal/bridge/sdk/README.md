@@ -1,10 +1,3 @@
-# Immutable Bridge SDK
+# About
 
-## Build
-
-`yarn install`
-`yarn build`
-
-## Test
-
-`yarn run test`
+This internal package is used by the Typescript Immutable SDK package `@imtbl/sdk` and its children SDK packages.
