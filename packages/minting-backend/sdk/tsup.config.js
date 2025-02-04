@@ -22,7 +22,7 @@ export default defineConfig((options) => {
       platform: 'node',
       format: ['esm', 'cjs'],
       target: 'es2022',
-      minify: false,
+      minify: true,
       bundle: true,
       splitting: true,
       esbuildPlugins: [
