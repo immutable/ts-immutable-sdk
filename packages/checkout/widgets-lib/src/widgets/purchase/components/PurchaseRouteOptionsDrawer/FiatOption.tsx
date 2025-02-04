@@ -56,7 +56,6 @@ export function FiatOption<RC extends ReactElement | undefined = undefined>({
           }`,
         )}
       </MenuItem.Caption>
-      {!disabled && <MenuItem.IntentIcon />}
     </MenuItem>
   );
 }

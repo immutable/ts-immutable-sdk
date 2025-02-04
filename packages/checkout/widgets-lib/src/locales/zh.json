@@ -889,7 +889,7 @@
       "drawer": {
         "options": {
           "heading": "支付来源",
-          "moreOptionsDividerText": "更多支付方式",
+          "moreOptionsDividerText": "其他支付方式",
           "loadingText1": "寻找最佳价值",
           "loadingText2": "跨所有链",
           "noRoutes": {
@@ -901,6 +901,7 @@
             "caption": "在此网络上交换代币。",
             "disabledCaption": "当前不可用。"
           },
+          "changeWallet": "选择另一个钱包",
           "debit": {
             "heading": "借记卡",
             "caption": "",
