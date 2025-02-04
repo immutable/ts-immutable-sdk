@@ -80,12 +80,10 @@
   "exports": {
     "development": {
       "types": "./src/index.ts",
-      "browser": "./dist/browser/index.js",
       "default": "./dist/browser/index.js"
     },
     "default": {
       "types": "./dist/types/index.d.ts",
-      "browser": "./dist/browser/index.js",
       "default": "./dist/browser/index.js"
     }
   },
@@ -94,8 +92,8 @@
     "immutable"
   ],
   "license": "ISC",
-  "main": "dist/main.js",
-  "module": "dist/index.js",
+  "main": "./dist/browser/index.js",
+  "module": "./dist/browser/index.js",
   "publishConfig": {
     "access": "public"
   },
