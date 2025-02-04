@@ -24,16 +24,11 @@ export default defineConfig((options) => {
       platform: 'browser',
       format: 'esm',
       target: 'es2022',
-      minify: false,
+      minify: true,
       bundle: true,
       treeshake: true,
-      noExternal: [/.*/],
       esbuildPlugins: [
         nodeModulesPolyfillPlugin({
-          globals: {
-            // Buffer: true,
-            // process: true,
-          },
           modules: ['crypto', 'buffer', 'process', 'url', 'fs', 'path']
         }),
         replace({ 
@@ -49,7 +44,7 @@ export default defineConfig((options) => {
       platform: 'node',
       format: ['esm', 'cjs'],
       target: 'es2022',
-      minify: false,
+      minify: true,
       bundle: true,
       splitting: true,
       esbuildPlugins: [
