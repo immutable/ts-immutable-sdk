@@ -11,7 +11,7 @@ import {
 } from '@imtbl/metrics';
 import { isAxiosError } from 'axios';
 import AuthManager from './authManager';
-import MagicAdapter from './magicAdapter';
+import MagicAdapter from './magic/magicAdapter';
 import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
@@ -35,6 +35,7 @@ import logger from './utils/logger';
 import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
 import { isAPIError, PassportError, PassportErrorType } from './errors/passportError';
 import { withMetrics, withMetricsAsync } from './utils/metrics';
+import { MagicProviderProxyFactory } from './magic/magicProviderProxyFactory';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
   if (passportModuleConfiguration.overrides) {
@@ -56,7 +57,8 @@ const buildImxApiClients = (passportModuleConfiguration: PassportModuleConfigura
 export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConfiguration) => {
   const config = new PassportConfiguration(passportModuleConfiguration);
   const authManager = new AuthManager(config);
-  const magicAdapter = new MagicAdapter(config);
+  const magicProviderProxyFactory = new MagicProviderProxyFactory(authManager, config);
+  const magicAdapter = new MagicAdapter(config, magicProviderProxyFactory);
   const confirmationScreen = new ConfirmationScreen(config);
   const multiRollupApiClients = new MultiRollupApiClients(config.multiRollupConfig);
   const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
