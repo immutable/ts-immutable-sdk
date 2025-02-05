@@ -128,7 +128,7 @@ export class TokensFetcher {
         decimals: 18,
         name: 'IMX',
         symbol: 'IMX',
-        bridge: null,
+        bridge: 'native',
       });
     });
 

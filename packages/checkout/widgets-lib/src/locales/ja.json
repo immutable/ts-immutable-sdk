@@ -878,7 +878,8 @@
       "routeSelection": {
         "loadingText": "最適な支払いルートを検索中...",
         "noRoute": "ルートが見つかりません。他のウォレット、トークン、または金額を選択してください。",
-        "payWithCard": "ルートが見つかりません。カードでの支払いが利用可能です",
+        "payWithCard": "カードで支払う",
+        "noRoutePayWithCard": "ルートが見つかりません。カードでの支払いが利用可能です",
         "fastestBadge": "最速",
         "minutesText": "分",
         "minuteText": "分",

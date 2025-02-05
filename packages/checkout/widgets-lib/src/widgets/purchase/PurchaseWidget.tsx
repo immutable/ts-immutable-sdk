@@ -25,6 +25,7 @@ import { fetchChains } from '../../lib/squid/functions/fetchChains';
 import { useSquid } from '../../lib/squid/hooks/useSquid';
 import { useTokens } from '../../lib/squid/hooks/useTokens';
 import { useQuoteOrder } from '../../lib/hooks/useQuoteOrder';
+import { PayWithCard } from './views/PayWithCard';
 
 export type PurchaseWidgetInputs = PurchaseWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
@@ -198,6 +199,18 @@ export default function PurchaseWidget({
                     {},
                   );
                 }}
+              />
+            )}
+            {viewState.view.type === PurchaseWidgetViews.PAY_WITH_CARD && (
+              <PayWithCard
+                onCloseButtonClick={() => {
+                  orchestrationEvents.sendRequestGoBackEvent(
+                    eventTarget,
+                    IMTBLWidgetEvents.IMTBL_PURCHASE_WIDGET_EVENT,
+                    {},
+                  );
+                }}
+                onError={() => {}}
               />
             )}
           </Stack>
