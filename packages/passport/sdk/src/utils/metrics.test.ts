@@ -7,6 +7,9 @@ describe('passport metrics', () => {
   beforeEach(() => {
     (trackFlow as unknown as jest.Mock).mockImplementation(() => ({
       addEvent: jest.fn(),
+      details: {
+        flowId: '123',
+      },
     }));
   });
 
@@ -36,6 +39,7 @@ describe('passport metrics', () => {
           'passport',
           'myFlow',
           error,
+          { flowId: '123' },
         );
       }
     });
@@ -66,6 +70,7 @@ describe('passport metrics', () => {
           'passport',
           'myFlow',
           error,
+          { flowId: '123' },
         );
       }
     });

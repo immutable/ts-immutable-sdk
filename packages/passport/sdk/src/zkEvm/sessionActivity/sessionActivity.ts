@@ -61,7 +61,6 @@ const trackSessionActivityFn = async (args: AccountsRequestedEvent) => {
   }
   // If there is already a tracking call in progress, do nothing
   if (currentSessionTrackCall[clientId]) {
-    flow.addEvent('Existing Delay Early Exit');
     return;
   }
   currentSessionTrackCall[clientId] = true;
@@ -86,7 +85,6 @@ const trackSessionActivityFn = async (args: AccountsRequestedEvent) => {
 
   // Make the API call
   try {
-    flow.addEvent('Fetching details');
     details = await get({
       clientId,
       wallet: from,
@@ -94,10 +92,8 @@ const trackSessionActivityFn = async (args: AccountsRequestedEvent) => {
       sendCount: sendCount[clientId] || 0,
     });
     checkCount[clientId]++;
-    flow.addEvent('Fetched details', { checkCount: checkCount[clientId] });
 
     if (!details) {
-      flow.addEvent('No details found');
       return;
     }
   } catch (error) {
@@ -119,7 +115,7 @@ const trackSessionActivityFn = async (args: AccountsRequestedEvent) => {
     } catch (error) {
       flow.addEvent('Failed to send Transaction');
       const err = new Error('Failed to send transaction', { cause: error });
-      trackError('passport', 'sessionActivityError', err);
+      trackError('passport', 'sessionActivityError', err, { flowId: flow.details.flowId });
     }
   }
 

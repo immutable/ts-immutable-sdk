@@ -10,9 +10,10 @@ export const withMetrics = <T>(
     return fn(flow);
   } catch (error) {
     if (error instanceof Error) {
-      trackError('commerce', flowName, error);
+      trackError('commerce', flowName, error, { flowId: flow.details.flowId });
+    } else {
+      flow.addEvent('errored');
     }
-    flow.addEvent('errored');
     throw error;
   } finally {
     flow.addEvent('End');
@@ -33,7 +34,7 @@ export const withMetricsAsync = async <T>(
     return await fn(flow);
   } catch (error:any) {
     if (error instanceof Error) {
-      trackError('commerce', flowName, error);
+      trackError('commerce', flowName, error, { flowId: flow.details.flowId });
     }
     if (errorType && errorType(error)) {
       flow.addEvent(`errored_${errorType(error)}`);

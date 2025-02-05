@@ -1,6 +1,5 @@
 import { BytesLike } from 'ethers';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
-import { trackDuration } from '@imtbl/metrics';
 import AuthManager from '../authManager';
 import { PassportConfiguration } from '../config';
 import { FeeOption, RelayerTransaction, TypedDataPayload } from './types';
@@ -113,7 +112,6 @@ export class RelayerClient {
 
     const user = await this.authManager.getUserZkEvm();
 
-    const startTime = performance.now();
     const response = await fetch(`${this.config.relayerUrl}/v1/transactions`, {
       method: 'POST',
       headers: {
@@ -122,13 +120,6 @@ export class RelayerClient {
       },
       body: JSON.stringify(body),
     });
-
-    trackDuration(
-      'passport',
-      'postToRelayer',
-      Math.round(performance.now() - startTime),
-      { rpcMethod: request.method },
-    );
 
     const jsonResponse = await response.json();
     if (jsonResponse.error) {
