@@ -137,11 +137,11 @@ export class Passport {
    * `connectImx` instead.
    */
   public async connectImxSilent(): Promise<IMXProvider | null> {
-    return withMetricsAsync(() => this.passportImxProviderFactory.getProviderSilent(), 'connectImxSilent');
+    return withMetricsAsync(() => this.passportImxProviderFactory.getProviderSilent(), 'connectImxSilent', false);
   }
 
   public async connectImx(): Promise<IMXProvider> {
-    return withMetricsAsync(() => this.passportImxProviderFactory.getProvider(), 'connectImx');
+    return withMetricsAsync(() => this.passportImxProviderFactory.getProvider(), 'connectImx', false);
   }
 
   public connectEvm(options: {
@@ -167,7 +167,7 @@ export class Passport {
       }
 
       return provider;
-    }, 'connectEvm', false, false);
+    }, 'connectEvm', false);
   }
 
   /**
@@ -331,7 +331,7 @@ export class Passport {
       const headers = { Authorization: `Bearer ${user.accessToken}` };
       const getUserInfoResult = await this.multiRollupApiClients.passportProfileApi.getUserInfo({ headers });
       return getUserInfoResult.data.linked_addresses;
-    }, 'getLinkedAddresses', false, false);
+    }, 'getLinkedAddresses', false);
   }
 
   public async linkExternalWallet(params: LinkWalletParams): Promise<LinkedWallet> {

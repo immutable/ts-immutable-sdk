@@ -98,6 +98,7 @@ const trackSessionActivityFn = async (args: AccountsRequestedEvent) => {
       return;
     }
   } catch (error) {
+    flow.addEvent('Failed to fetch details');
     throw new Error('Failed to get details', { cause: error });
   }
 
