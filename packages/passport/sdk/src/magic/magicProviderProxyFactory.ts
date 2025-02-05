@@ -49,7 +49,7 @@ export class MagicProviderProxyFactory {
                 }
               }
 
-              // Invoke the request method with the provided arguments
+              // @ts-ignore - Invoke the request method with the provided arguments
               return target.request!(...args);
             } catch (error: unknown) {
               if (error instanceof Error) {
