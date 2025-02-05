@@ -5,7 +5,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import json from '@rollup/plugin-json';
 import replace from '@rollup/plugin-replace';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
-import terser from '@rollup/plugin-terser';
+import { minify } from 'rollup-plugin-esbuild'
 
 const getPlugins = () => {
   return [
@@ -22,6 +22,7 @@ const getPlugins = () => {
     }),
     nodePolyfills(),
     commonjs(),
+    minify()
   ];
 }
 
