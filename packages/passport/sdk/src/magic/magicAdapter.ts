@@ -3,10 +3,10 @@ import { Magic } from 'magic-sdk';
 import { OpenIdExtension } from '@magic-ext/oidc';
 import { ethers } from 'ethers';
 import { Flow, trackDuration } from '@imtbl/metrics';
-import { PassportErrorType, withPassportError } from './errors/passportError';
-import { PassportConfiguration } from './config';
-import { lazyDocumentReady } from './utils/lazyLoad';
-import { withMetricsAsync } from './utils/metrics';
+import { PassportErrorType, withPassportError } from '../errors/passportError';
+import { PassportConfiguration } from '../config';
+import { lazyDocumentReady } from '../utils/lazyLoad';
+import { withMetricsAsync } from '../utils/metrics';
 import { MagicProviderProxyFactory } from './magicProviderProxyFactory';
 
 type MagicClient = InstanceWithExtensions<SDKBase, [OpenIdExtension]>;
