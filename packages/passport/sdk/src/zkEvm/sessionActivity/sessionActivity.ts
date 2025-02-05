@@ -85,7 +85,6 @@ const trackSessionActivityFn = async (args: AccountsRequestedEvent) => {
 
   // Make the API call
   try {
-    flow.addEvent('Fetching details');
     details = await get({
       clientId,
       wallet: from,
@@ -116,7 +115,7 @@ const trackSessionActivityFn = async (args: AccountsRequestedEvent) => {
     } catch (error) {
       flow.addEvent('Failed to send Transaction');
       const err = new Error('Failed to send transaction', { cause: error });
-      trackError('passport', 'sessionActivityError', err);
+      trackError('passport', 'sessionActivityError', err, { flowId: flow.details.flowId });
     }
   }
 

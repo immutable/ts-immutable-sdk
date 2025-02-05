@@ -16,9 +16,10 @@ export const withMetrics = <T>(
     return fn(flow);
   } catch (error) {
     if (error instanceof Error) {
-      trackError('passport', flowName, error);
+      trackError('passport', flowName, error, { flowId: flow.details.flowId });
+    } else {
+      flow.addEvent('errored');
     }
-    flow.addEvent('errored');
     throw error;
   } finally {
     if (trackEndEvent) {
@@ -43,7 +44,7 @@ export const withMetricsAsync = async <T>(
     return await fn(flow);
   } catch (error) {
     if (error instanceof Error) {
-      trackError('passport', flowName, error);
+      trackError('passport', flowName, error, { flowId: flow.details.flowId });
     } else {
       flow.addEvent('errored');
     }
