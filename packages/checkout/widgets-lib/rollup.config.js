@@ -12,6 +12,7 @@ const getPlugins = () => {
     json(),
     replace({
       preventAssignment: true,
+      'process.env.NODE_ENV': "'production'",
     }),
     typescript({customConditions: ["default"], declaration: false, outDir: 'dist/browser'}),
     resolve({
