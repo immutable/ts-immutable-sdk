@@ -7,14 +7,11 @@ import replace from '@rollup/plugin-replace';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
 import terser from '@rollup/plugin-terser';
 
-const PRODUCTION = 'production';
-
 const getPlugins = () => {
   return [
     json(),
     replace({
       preventAssignment: true,
-      'process.env.NODE_ENV': PRODUCTION,
     }),
     typescript({customConditions: ["default"], declaration: false, outDir: 'dist/browser'}),
     resolve({
