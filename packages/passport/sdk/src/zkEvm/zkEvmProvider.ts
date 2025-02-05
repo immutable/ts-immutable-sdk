@@ -15,7 +15,7 @@ import {
   RequestArguments,
 } from './types';
 import AuthManager from '../authManager';
-import MagicAdapter from '../magicAdapter';
+import MagicAdapter from '../magic/magicAdapter';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportConfiguration } from '../config';
 import {

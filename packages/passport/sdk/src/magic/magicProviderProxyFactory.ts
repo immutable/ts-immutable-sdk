@@ -1,17 +1,24 @@
 import { InstanceWithExtensions, SDKBase } from '@magic-sdk/provider';
 import { OpenIdExtension } from '@magic-ext/oidc';
 import { ethers } from 'ethers';
-import AuthManager from './authManager';
-import { PassportConfiguration } from './config';
+import AuthManager from '../authManager';
+import { PassportConfiguration } from '../config';
 
 type MagicClient = InstanceWithExtensions<SDKBase, [OpenIdExtension]>;
 
+const shouldCheckMagicSession = (args: any[]): boolean => (
+  args?.length > 0
+  && typeof args[0] === 'object'
+    && 'method' in args[0]
+    && typeof args[0].method === 'string'
+    && ['personal_sign', 'eth_accounts'].includes(args[0].method)
+);
+
 /**
- * Factory class for creating proxied Magic providers that handle automatic re-authentication.
- * This proxy wraps the Magic RPC provider to intercept certain RPC methods (currently just personal_sign)
+ * Factory class for creating a Magic provider that automatically handles re-authentication.
+ * This proxy wraps the Magic RPC provider to intercept certain RPC methods (`personal_sign`, `eth_accounts`)
  * and ensures the user is properly authenticated before executing them.
  */
-
 export class MagicProviderProxyFactory {
   private authManager: AuthManager;
 
@@ -27,12 +34,10 @@ export class MagicProviderProxyFactory {
 
     const proxyHandler: ProxyHandler<ethers.providers.ExternalProvider> = {
       get: (target: ethers.providers.ExternalProvider, property: string, receiver: any) => {
-        // TODO: What happens if no args are passed to request, or additional params?
-        // We should dynamically get the args, use optional chaining to check the method, and then use the dynamic args to call the original request method
         if (property === 'request') {
-          return async (args: { method: string; params?: any[] }) => {
+          return async (...args: any[]) => {
             try {
-              if (args.method === 'personal_sign') {
+              if (shouldCheckMagicSession(args)) {
                 const isUserLoggedIn = await magicClient.user.isLoggedIn();
                 if (!isUserLoggedIn) {
                   const user = await this.authManager.getUser();
@@ -47,7 +52,8 @@ export class MagicProviderProxyFactory {
                 }
               }
 
-              return target.request!(args);
+              // Invoke the request method with the provided arguments
+              return target.request!(...args);
             } catch (error: unknown) {
               if (error instanceof Error) {
                 throw new Error(`ProviderProxy: ${error.message}`);
@@ -57,6 +63,7 @@ export class MagicProviderProxyFactory {
           };
         }
 
+        // Return the property from the target
         return Reflect.get(target, property, receiver);
       },
     };

@@ -1,8 +1,8 @@
 import { LoginWithOpenIdParams, OpenIdExtension } from '@magic-ext/oidc';
 import { Magic } from 'magic-sdk';
 import MagicAdapter from './magicAdapter';
-import { PassportConfiguration } from './config';
-import { PassportError, PassportErrorType } from './errors/passportError';
+import { PassportConfiguration } from '../config';
+import { PassportError, PassportErrorType } from '../errors/passportError';
 
 const loginWithOIDCMock:jest.MockedFunction<(args: LoginWithOpenIdParams) => Promise<void>> = jest.fn();
 
