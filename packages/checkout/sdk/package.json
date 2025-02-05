@@ -65,7 +65,7 @@
   },
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "pnpm transpile && pnpm typegen",
+    "build": "NODE_ENV=production pnpm transpile && pnpm typegen",
     "transpile": "tsup src/index.ts --config ./tsup.config.js",
     "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
     "build:dev": "CHECKOUT_DEV_MODE=true pnpm build",

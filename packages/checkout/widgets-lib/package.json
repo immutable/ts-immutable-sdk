@@ -17,6 +17,7 @@
     "@0xsquid/sdk": "^2.8.25",
     "@biom3/design-tokens": "^0.4.5",
     "@biom3/react": "^0.29.4",
+    "@emotion/react": "^11.11.3",
     "@imtbl/bridge-sdk": "workspace:*",
     "@imtbl/checkout-sdk": "workspace:*",
     "@imtbl/config": "workspace:*",
@@ -99,7 +100,7 @@
   },
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "rollup --config rollup.config.js && pnpm typegen",
+    "build": "NODE_ENV=production rollup --config rollup.config.js && pnpm typegen",
     "transpile": "tsup src/index.ts --config ./tsup.config.js",
     "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
     "build:local": "pnpm build && mkdir -p ../widgets-sample-app/public/lib/js && cp dist/browser/*.js ../widgets-sample-app/public/lib/js/",
