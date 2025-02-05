@@ -1,21 +1,24 @@
-import { InstanceWithExtensions, SDKBase } from '@magic-sdk/provider';
-import { OpenIdExtension } from '@magic-ext/oidc';
 import { ethers } from 'ethers';
 import { MagicProviderProxyFactory } from './magicProviderProxyFactory';
 import AuthManager from '../authManager';
 import { PassportConfiguration } from '../config';
+import { MagicClient } from './types';
 
 describe('MagicProviderProxyFactory', () => {
   let mockAuthManager: jest.Mocked<AuthManager>;
-  let mockMagicClient: jest.Mocked<InstanceWithExtensions<SDKBase, [OpenIdExtension]>>;
+  let mockConfig: PassportConfiguration;
+  let mockMagicClient: jest.Mocked<MagicClient>;
   let mockRpcProvider: jest.Mocked<ethers.providers.ExternalProvider>;
-  let config: PassportConfiguration;
   let factory: MagicProviderProxyFactory;
 
   beforeEach(() => {
     mockAuthManager = {
       getUser: jest.fn(),
     } as any;
+
+    mockConfig = {
+      magicProviderId: 'test-provider-id',
+    } as PassportConfiguration;
 
     mockRpcProvider = {
       request: jest.fn(),
@@ -31,81 +34,78 @@ describe('MagicProviderProxyFactory', () => {
       },
     } as any;
 
-    config = {
-      magicProviderId: 'test-provider-id',
-    } as PassportConfiguration;
-
-    factory = new MagicProviderProxyFactory(mockAuthManager as AuthManager, config);
+    factory = new MagicProviderProxyFactory(mockAuthManager, mockConfig);
   });
 
   describe('createProxy', () => {
-    it('should pass through non-authenticated requests', async () => {
+    it('should create a proxy that passes through non-authenticated requests', async () => {
       const proxy = factory.createProxy(mockMagicClient);
-      const expectedResult = { success: true };
-      (mockRpcProvider.request as jest.Mock).mockResolvedValue(expectedResult);
+      const params = { method: 'eth_blockNumber' };
 
-      const result = await proxy.request!({
-        method: 'eth_blockNumber',
-      });
+      await proxy.request!(params);
 
-      expect(result).toBe(expectedResult);
+      expect(mockRpcProvider.request).toHaveBeenCalledWith(params);
       expect(mockMagicClient.user.isLoggedIn).not.toHaveBeenCalled();
     });
 
     it('should check authentication for personal_sign requests', async () => {
       const proxy = factory.createProxy(mockMagicClient);
+      const params = { method: 'personal_sign', params: ['message', 'address'] };
       (mockMagicClient.user.isLoggedIn as jest.Mock).mockResolvedValue(true);
-      const expectedResult = { success: true };
-      (mockRpcProvider.request as jest.Mock).mockResolvedValue(expectedResult);
 
-      const result = await proxy.request!({
-        method: 'personal_sign',
-        params: ['message', 'address'],
-      });
+      await proxy.request!(params);
 
-      expect(result).toBe(expectedResult);
       expect(mockMagicClient.user.isLoggedIn).toHaveBeenCalled();
+      expect(mockRpcProvider.request).toHaveBeenCalledWith(params);
     });
 
-    it('should re-authenticate if user is not logged in', async () => {
+    it('should check authentication for eth_accounts requests', async () => {
       const proxy = factory.createProxy(mockMagicClient);
+      const params = { method: 'eth_accounts' };
+      (mockMagicClient.user.isLoggedIn as jest.Mock).mockResolvedValue(true);
+
+      await proxy.request!(params);
+
+      expect(mockMagicClient.user.isLoggedIn).toHaveBeenCalled();
+      expect(mockRpcProvider.request).toHaveBeenCalledWith(params);
+    });
+
+    it('should re-authenticate when user is not logged in', async () => {
+      const proxy = factory.createProxy(mockMagicClient);
+      const params = { method: 'personal_sign', params: ['message', 'address'] };
+      const mockIdToken = 'mock-id-token';
+
       (mockMagicClient.user.isLoggedIn as jest.Mock).mockResolvedValue(false);
-      (mockAuthManager.getUser as jest.Mock).mockResolvedValue({ idToken: 'test-token' });
-      const expectedResult = { success: true };
-      (mockRpcProvider.request as jest.Mock).mockResolvedValue(expectedResult);
+      (mockAuthManager.getUser as jest.Mock).mockResolvedValue({ idToken: mockIdToken });
 
-      const result = await proxy.request!({
-        method: 'eth_accounts',
-      });
+      await proxy.request!(params);
 
-      expect(result).toBe(expectedResult);
       expect(mockMagicClient.user.isLoggedIn).toHaveBeenCalled();
       expect(mockAuthManager.getUser).toHaveBeenCalled();
       expect(mockMagicClient.openid.loginWithOIDC).toHaveBeenCalledWith({
-        jwt: 'test-token',
-        providerId: 'test-provider-id',
+        jwt: mockIdToken,
+        providerId: mockConfig.magicProviderId,
       });
+      expect(mockRpcProvider.request).toHaveBeenCalledWith(params);
     });
 
-    it('should throw error if unable to obtain ID token during re-authentication', async () => {
+    it('should throw error when re-authentication fails due to missing ID token', async () => {
       const proxy = factory.createProxy(mockMagicClient);
-      (mockMagicClient.user.isLoggedIn as jest.Mock).mockResolvedValue(false);
-      (mockAuthManager.getUser as jest.Mock).mockResolvedValue({ idToken: null });
+      const params = { method: 'personal_sign', params: ['message', 'address'] };
 
-      await expect(proxy.request!({
-        method: 'personal_sign',
-        params: ['message', 'address'],
-      })).rejects.toThrow('ProviderProxy: failed to obtain ID token');
+      (mockMagicClient.user.isLoggedIn as jest.Mock).mockResolvedValue(false);
+      (mockAuthManager.getUser as jest.Mock).mockResolvedValue(null);
+
+      await expect(proxy.request!(params)).rejects.toThrow('ProviderProxy: failed to obtain ID token');
     });
 
     it('should wrap errors with ProviderProxy prefix', async () => {
       const proxy = factory.createProxy(mockMagicClient);
-      (mockMagicClient.user.isLoggedIn as jest.Mock).mockRejectedValue(new Error('test error'));
+      const params = { method: 'personal_sign', params: ['message', 'address'] };
 
-      await expect(proxy.request!({
-        method: 'personal_sign',
-        params: ['message', 'address'],
-      })).rejects.toThrow('ProviderProxy: test error');
+      (mockMagicClient.user.isLoggedIn as jest.Mock).mockRejectedValue(new Error('Test error'));
+
+      await expect(proxy.request!(params)).rejects.toThrow('ProviderProxy: Test error');
     });
   });
 });

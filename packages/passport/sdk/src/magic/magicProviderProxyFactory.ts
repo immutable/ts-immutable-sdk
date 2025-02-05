@@ -1,10 +1,7 @@
-import { InstanceWithExtensions, SDKBase } from '@magic-sdk/provider';
-import { OpenIdExtension } from '@magic-ext/oidc';
 import { ethers } from 'ethers';
 import AuthManager from '../authManager';
 import { PassportConfiguration } from '../config';
-
-type MagicClient = InstanceWithExtensions<SDKBase, [OpenIdExtension]>;
+import { MagicClient } from './types';
 
 const shouldCheckMagicSession = (args: any[]): boolean => (
   args?.length > 0
