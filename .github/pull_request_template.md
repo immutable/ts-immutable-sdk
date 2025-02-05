@@ -1,6 +1,7 @@
-### Hi👋, please prefix this PR's title with:
+### Hi👋, please ensure the PR title follows the below standards:
 <!-- This will allow for auto-generated changelog entries in Github releases -->
 <!-- Valid types: feat, fix, refactor, style, test, docs, build, ops, chore -->
+<!-- refactor, style, test, docs, build, ops, chore types won't be included in changelogs -->
 - [ ] PR is titled with conventional commit style naming: `type(scope): message`. For example: `feat(passport): my new feature`
 - [ ] If you have introduced modification that necessitates immediate adjustments by this SDK's users to their applications, clients, or integrations to avert disruptions to existing features or functionalities, add a `!` after the `type(scope)`, for example `feat(passport)!: my new breaking feature`
 

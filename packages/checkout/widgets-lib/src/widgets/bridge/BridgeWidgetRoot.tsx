@@ -72,7 +72,7 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
                 <BridgeWidget
                   checkout={this.checkout}
                   config={this.strongConfig()}
-                  web3Provider={this.web3Provider}
+                  browserProvider={this.browserProvider}
                   tokenAddress={this.parameters.tokenAddress}
                   amount={this.parameters.amount}
                   walletProviderName={this.parameters.walletProviderName}

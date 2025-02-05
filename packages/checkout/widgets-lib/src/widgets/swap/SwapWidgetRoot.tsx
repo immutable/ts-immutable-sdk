@@ -79,7 +79,7 @@ export class Swap extends Base<WidgetType.SWAP> {
     return validatedParams;
   }
 
-  private isNotPassport = !isPassportProvider(this.web3Provider)
+  private isNotPassport = !isPassportProvider(this.browserProvider)
     || this.parameters?.walletProviderName !== WalletProviderName.PASSPORT;
 
   private topUpOptions(): { textKey: string; action: () => void }[] | undefined {
@@ -109,7 +109,7 @@ export class Swap extends Base<WidgetType.SWAP> {
         ? ChainId.IMTBL_ZKEVM_MAINNET
         : ChainId.IMTBL_ZKEVM_TESTNET,
       walletProviderName: this.parameters.walletProviderName,
-      web3Provider: this.web3Provider,
+      browserProvider: this.browserProvider,
       checkout: this.checkout,
       allowedChains: [getL2ChainId(this.checkout!.config)],
     };

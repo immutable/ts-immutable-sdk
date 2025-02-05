@@ -1,4 +1,3 @@
-import { Web3Provider } from '@ethersproject/providers';
 import {
   AvailableRoutingOptions,
   FulfillmentTransaction,
@@ -20,6 +19,7 @@ import { routingCalculator } from './routing/routingCalculator';
 import { Allowance } from './allowance/types';
 import { BalanceCheckResult, BalanceRequirement } from './balanceCheck/types';
 import { measureAsyncExecution } from '../logger/debugLogger';
+import { WrappedBrowserProvider } from '../types';
 
 export const overrideBalanceCheckResult = (
   balanceCheckResult: BalanceCheckResult,
@@ -87,7 +87,7 @@ const processRoutes = async (
 
 export const smartCheckout = async (
   config: CheckoutConfiguration,
-  provider: Web3Provider,
+  provider: WrappedBrowserProvider,
   itemRequirements: ItemRequirement[],
   transactionOrGasAmount?: FulfillmentTransaction | GasAmount,
   routingOptions?: AvailableRoutingOptions,
@@ -95,7 +95,7 @@ export const smartCheckout = async (
   onFundingRoute?: (fundingRoute: FundingRoute) => void,
   fundingRouteFullAmount: boolean = false,
 ): Promise<SmartCheckoutResult> => {
-  const ownerAddress = await provider.getSigner().getAddress();
+  const ownerAddress = await (await provider.getSigner()).getAddress();
 
   let aggregatedItems = itemAggregator(itemRequirements);
 

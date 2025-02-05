@@ -11,8 +11,7 @@ import {
   useCallback, useMemo, useEffect,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Web3Provider } from '@ethersproject/providers';
-import { ChainId, Checkout } from '@imtbl/checkout-sdk';
+import { ChainId, Checkout, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { FooterLogo } from '../Footer/FooterLogo';
 import { getL1ChainId } from '../../lib';
@@ -26,10 +25,10 @@ import { getRemoteImage } from '../../lib/utils';
 export interface NetworkSwitchDrawerProps {
   visible: boolean;
   targetChainId: ChainId;
-  provider: Web3Provider;
+  provider: WrappedBrowserProvider;
   checkout: Checkout;
   onCloseDrawer: () => void;
-  onNetworkSwitch?: (provider: Web3Provider) => void;
+  onNetworkSwitch?: (provider: WrappedBrowserProvider) => void;
 }
 export function NetworkSwitchDrawer({
   visible,

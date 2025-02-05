@@ -7,7 +7,7 @@ import path from 'path';
 
 export const interceptWidgets = async (page: Page, widgetsVersion: string | 'latest' | '*' = 'latest') => {
 
-  return page.route(`https://cdn.jsdelivr.net/npm/@imtbl/sdk@${widgetsVersion}/dist/browser/checkout/**`, async route => {
+  return page.route(`https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets@${widgetsVersion}/dist/browser/**`, async route => {
     const url = new URL(route.request().url());
     const fileName = path.basename(url.pathname);
     let filePath = path.join(__dirname, 'local-widgets-js', fileName);

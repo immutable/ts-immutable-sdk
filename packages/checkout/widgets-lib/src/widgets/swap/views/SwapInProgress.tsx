@@ -1,6 +1,6 @@
-import { TransactionResponse } from '@ethersproject/providers';
 import { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { TransactionResponse } from 'ethers';
 import {
   ViewActions,
   ViewContext,
@@ -41,7 +41,7 @@ export function SwapInProgress({
       try {
         const receipt = await transactionResponse.wait();
 
-        if (receipt.status === 1) {
+        if (receipt?.status === 1) {
           viewDispatch({
             payload: {
               type: ViewActions.UPDATE_VIEW,
@@ -52,7 +52,7 @@ export function SwapInProgress({
                   fromAmount: swapForm.fromAmount,
                   toTokenAddress: swapForm.toTokenAddress,
                   toAmount: swapForm.toAmount || '',
-                  transactionHash: receipt.transactionHash,
+                  transactionHash: receipt?.hash,
                 },
               },
             },

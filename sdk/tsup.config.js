@@ -27,7 +27,6 @@ export default defineConfig((options) => {
       bundle: true,
       treeshake: true,
       splitting: false,
-      minify: false,
     },
 
     // Node Bundle for CJS
@@ -39,7 +38,6 @@ export default defineConfig((options) => {
       target: 'es2022',
       bundle: true,
       treeshake: true,
-      minify: false,
     },
 
     // Browser Bundle for CDN
@@ -48,12 +46,12 @@ export default defineConfig((options) => {
       outExtension: () => ({ js: '.cdn.js' }),
       outDir: 'dist',
       platform: 'browser',
-      format: 'esm',
+      format: 'iife',
       target: 'es2022',
+      globalName: 'immutable',
       bundle: true,
       splitting: false,
       skipNodeModulesBundle: false,
-      minify: true,
       noExternal: [/.*/],
       esbuildPlugins: [
         nodeModulesPolyfillPlugin({

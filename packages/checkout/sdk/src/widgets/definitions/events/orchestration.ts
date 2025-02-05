@@ -1,4 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { WrappedBrowserProvider } from '../../../types';
 
 /**
  * Enum representing different types of orchestration events.
@@ -70,7 +70,7 @@ export type RequestOnrampEvent = {
   /** The amount of tokens to onramp. */
   amount: string;
   /** The connected provider. */
-  provider?: Web3Provider;
+  provider?: WrappedBrowserProvider;
 };
 
 /**

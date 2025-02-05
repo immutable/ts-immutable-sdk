@@ -1,14 +1,14 @@
-import { BigNumber, ethers } from 'ethers';
-import { Web3Provider } from '@ethersproject/providers';
+import { Contract } from 'ethers';
 
+import { WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { SignedTransaction } from '../types';
 
 export const filterAllowedTransactions = async (
   transactions: SignedTransaction[],
-  provider: Web3Provider,
+  provider: WrappedBrowserProvider,
 ): Promise<SignedTransaction[]> => {
   try {
-    const signer = provider.getSigner();
+    const signer = await provider.getSigner();
     const signerAddress = await signer.getAddress();
     const approveTxn = transactions.find((txn) => txn.methodCall.startsWith('approve'));
 
@@ -16,7 +16,7 @@ export const filterAllowedTransactions = async (
       return transactions;
     }
 
-    const contract = new ethers.Contract(
+    const contract = new Contract(
       approveTxn.tokenAddress,
       ['function allowance(address,address) view returns (uint256)'],
       signer,
@@ -30,10 +30,10 @@ export const filterAllowedTransactions = async (
       ]),
     });
 
-    const currentAmount = BigNumber.from(allowance);
-    const desiredAmount = approveTxn.params.amount ? BigNumber.from(approveTxn.params.amount) : BigNumber.from(0);
+    const currentAmount = BigInt(allowance);
+    const desiredAmount = approveTxn.params.amount ? BigInt(approveTxn.params.amount) : BigInt(0);
 
-    const isAllowed = currentAmount.gte(BigNumber.from('0')) && currentAmount.gte(desiredAmount);
+    const isAllowed = currentAmount >= BigInt('0') && currentAmount >= (desiredAmount);
 
     if (isAllowed) {
       return transactions.filter((txn) => txn.methodCall !== approveTxn.methodCall);

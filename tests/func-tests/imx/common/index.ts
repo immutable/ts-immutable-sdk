@@ -1,9 +1,4 @@
-import {
-  AlchemyProvider,
-  JsonRpcProvider,
-  TransactionReceipt,
-  TransactionResponse,
-} from '@ethersproject/providers';
+import { AlchemyProvider, JsonRpcProvider, TransactionReceipt, TransactionResponse } from "ethers";
 
 export function getEnv(name: string, defaultValue?: string): string {
   const value = process.env[name];
@@ -38,7 +33,7 @@ export const env = {
 
 export const waitForTransactionResponse = async (
   response: TransactionResponse,
-): Promise<TransactionReceipt> => {
+): Promise<TransactionReceipt | null> => {
   const txId = response.hash;
   console.log('Waiting for transaction', {
     txId,
@@ -46,10 +41,10 @@ export const waitForTransactionResponse = async (
     alchemyLink: `https://dashboard.alchemyapi.io/mempool/eth-goerli/tx/${txId}`,
   });
   const receipt = await response.wait();
-  if (receipt.status === 0) {
+  if (receipt?.status === 0) {
     throw new Error(JSON.stringify(receipt));
   }
-  console.log(`Transaction Mined: ${receipt.blockNumber}`);
+  console.log(`Transaction Mined: ${receipt?.blockNumber}`);
   return receipt;
 };
 

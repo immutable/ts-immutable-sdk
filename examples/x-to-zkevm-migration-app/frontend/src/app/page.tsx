@@ -5,7 +5,7 @@ import { usePassport } from '@/context/passport';
 import { useZkEVM } from '@/context/zkevm';
 import { Box, Button, Grid, Heading, Stack } from '@biom3/react';
 import { passport } from "@imtbl/sdk";
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function Home() {
   const { listAssets: listIMXAssets } = useIMX();
@@ -36,7 +36,7 @@ export default function Home() {
     }
   };
 
-  const handleListIMXAssets = async () => {
+  const handleListIMXAssets = useCallback(async () => {
     if (listIMXAssets) {
       setLoading(true);
       try {
@@ -52,9 +52,9 @@ export default function Home() {
         setLoading(false);
       }
     }
-  };
+  }, [imxWalletAddress, listIMXAssets]);
 
-  const handleListZKEVMAssets = async () => {
+  const handleListZKEVMAssets = useCallback(async () => {
     if (listZKEVMAssets) {
       setLoading(true);
       try {
@@ -71,14 +71,14 @@ export default function Home() {
         setLoading(false);
       }
     }
-  };
+  }, [imxWalletAddress, listZKEVMAssets]);
 
   useEffect(() => {
     if (userProfile) {
       handleListIMXAssets();
       handleListZKEVMAssets();
     }
-  }, [userProfile]);
+  }, [userProfile, handleListIMXAssets, handleListZKEVMAssets]);
 
   const handleAssetSelection = (asset: any) => {
     setSelectedAssets(prev => 

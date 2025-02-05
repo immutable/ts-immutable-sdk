@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { ChainId } from '../../../types';
 import { getBalancesByChain } from './getBalancesByChain';
@@ -15,7 +14,7 @@ describe('getBalancesByChain', () => {
     success: true,
     balances: [
       {
-        balance: BigNumber.from(1),
+        balance: BigInt(1),
         formattedBalance: '1',
         token: {
           decimals: 18,
@@ -24,7 +23,7 @@ describe('getBalancesByChain', () => {
         },
       },
       {
-        balance: BigNumber.from(2),
+        balance: BigInt(2),
         formattedBalance: '2',
         token: {
           address: '0xIMX',
@@ -40,7 +39,7 @@ describe('getBalancesByChain', () => {
     success: true,
     balances: [
       {
-        balance: BigNumber.from(3),
+        balance: BigInt(3),
         formattedBalance: '3',
         token: {
           address: '0xIMX',
@@ -50,7 +49,7 @@ describe('getBalancesByChain', () => {
         },
       },
       {
-        balance: BigNumber.from(4),
+        balance: BigInt(4),
         formattedBalance: '4',
         token: {
           address: '0xYEET',
@@ -73,7 +72,7 @@ describe('getBalancesByChain', () => {
       {
         l1balances: [
           {
-            balance: BigNumber.from(1),
+            balance: BigInt(1),
             formattedBalance: '1',
             token: {
               decimals: 18,
@@ -82,7 +81,7 @@ describe('getBalancesByChain', () => {
             },
           },
           {
-            balance: BigNumber.from(2),
+            balance: BigInt(2),
             formattedBalance: '2',
             token: {
               address: '0xIMX',
@@ -94,7 +93,7 @@ describe('getBalancesByChain', () => {
         ],
         l2balances: [
           {
-            balance: BigNumber.from(3),
+            balance: BigInt(3),
             formattedBalance: '3',
             token: {
               address: '0xIMX',
@@ -104,7 +103,7 @@ describe('getBalancesByChain', () => {
             },
           },
           {
-            balance: BigNumber.from(4),
+            balance: BigInt(4),
             formattedBalance: '4',
             token: {
               address: '0xYEET',

@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { JsonRpcProvider } from 'ethers';
 import { ChainId, ChainName, GetNetworkAllowListResult } from '../types';
 import { createReadOnlyProviders } from './readOnlyProvider';
 import { CheckoutConfiguration } from '../config';
@@ -7,8 +7,8 @@ import * as network from '../network';
 import { HttpClient } from '../api/http';
 
 jest.mock('../network');
-jest.mock('@ethersproject/providers', () => ({
-  // eslint-disable-next-line @typescript-eslint/naming-convention
+jest.mock('ethers', () => ({
+  ...jest.requireActual('ethers'),
   JsonRpcProvider: jest.fn(),
 }));
 
@@ -29,7 +29,7 @@ describe('read only providers', () => {
           nativeCurrency: {},
         },
         {
-          chainId: ChainId.SEPOLIA,
+          chainId: BigInt(ChainId.SEPOLIA),
           name: ChainName.SEPOLIA,
           isSupported: true,
           nativeCurrency: {},

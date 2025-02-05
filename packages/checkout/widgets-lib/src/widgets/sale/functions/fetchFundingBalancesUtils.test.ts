@@ -241,7 +241,7 @@ describe('Smart checkout item requirements', () => {
       type: 'GAS',
       gasToken: {
         type: 'NATIVE',
-        limit: expect.any(Object),
+        limit: expect.any(BigInt),
       },
     });
   });

@@ -1,15 +1,15 @@
-import { Web3Provider } from '@ethersproject/providers';
 import { Squid } from '@0xsquid/sdk';
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
+import { WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { Chain } from '../types';
 
 export const fetchBalances = async (
   squid: Squid,
   chains: Chain[],
-  provider: Web3Provider,
+  provider: WrappedBrowserProvider,
 ): Promise<TokenBalance[]> => {
   const chainIds = chains.map((chain) => chain.id);
-  const address = await provider?.getSigner().getAddress();
+  const address = await (await provider.getSigner()).getAddress();
 
   const promises: Promise<TokenBalance[]>[] = [];
 

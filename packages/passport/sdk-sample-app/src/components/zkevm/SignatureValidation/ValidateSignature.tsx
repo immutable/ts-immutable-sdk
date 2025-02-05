@@ -57,7 +57,7 @@ function ValidateSignature({ disabled, handleSignatureValidation }: ValidateSign
     } finally {
       setIsLoading(false);
     }
-  }, [address, payload, signature, zkEvmProvider]);
+  }, [address, payload, signature, zkEvmProvider, handleSignatureValidation]);
 
   return (
     <Accordion.Item eventKey="0">

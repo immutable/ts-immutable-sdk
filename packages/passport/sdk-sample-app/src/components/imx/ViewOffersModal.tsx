@@ -1,4 +1,3 @@
-import { utils } from 'ethers';
 import {
   Alert,
   Button, Modal, Spinner, Table,
@@ -11,6 +10,7 @@ import { useStatusProvider } from '@/context/StatusProvider';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { ViewOffersModalProps } from '@/types';
 import { MARKETPLACE_FEE_PERCENTAGE, MARKETPLACE_FEE_RECIPIENT } from '@/config';
+import { formatUnits } from 'ethers';
 
 function ViewOffersModal({
   showModal, setShowModal, buyTokenAddress, buyTokenId, onClose,
@@ -109,7 +109,7 @@ function ViewOffersModal({
             offers.map((offer) => (
               <tr key={offer.order_id}>
                 <td>{ offer.sell.data.symbol || 'ETH' }</td>
-                <td>{ utils.formatUnits(offer.sell.data.quantity, offer.sell.data.decimals) }</td>
+                <td>{ formatUnits(offer.sell.data.quantity, offer.sell.data.decimals) }</td>
                 <td>
                   <Button
                     size="sm"

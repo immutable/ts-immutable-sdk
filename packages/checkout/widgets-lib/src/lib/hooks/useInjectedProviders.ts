@@ -5,9 +5,9 @@ import {
   EIP6963ProviderDetail,
   getMetaMaskProviderDetail,
   getPassportProviderDetail,
+  WrappedBrowserProvider,
   WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
 
 const DEFAULT_PRIORITY_INDEX = 999;
 
@@ -28,8 +28,8 @@ declare global {
   }
 }
 
-let passportWeb3Provider: Web3Provider;
-const processProviders = (
+let passportBrowserProvider: WrappedBrowserProvider;
+const processProviders = async (
   checkout: Checkout | null,
   injectedProviders: EIP6963ProviderDetail[],
   priorityWalletRdns: WalletProviderRdns | string[] = [],
@@ -53,10 +53,12 @@ const processProviders = (
   if (checkout?.passport
     && priorityWalletRdns.includes(WalletProviderRdns.PASSPORT)
     && !filteredProviders.some((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT)) {
-    if (!passportWeb3Provider) {
-      passportWeb3Provider = new Web3Provider(checkout.passport.connectEvm());
+    if (!passportBrowserProvider) {
+      // eslint-disable-next-line max-len
+      passportBrowserProvider = new WrappedBrowserProvider(await checkout.passport.connectEvm());
     }
-    filteredProviders.unshift(getPassportProviderDetail(passportWeb3Provider.provider as EIP1193Provider));
+    // eslint-disable-next-line max-len
+    filteredProviders.unshift(getPassportProviderDetail(passportBrowserProvider.provider as unknown as EIP1193Provider));
   }
 
   // Filter & sort providers
@@ -81,7 +83,7 @@ export const useInjectedProviders = ({ checkout }: UseInjectedProvidersParams) =
     const connectConfig = await checkout?.config.remote.getConfig('connect') as ConnectConfig;
     const priorityWalletRdns = connectConfig.injected?.priorityWalletRdns ?? [];
     const blocklistWalletRdns = connectConfig.injected?.blocklistWalletRdns ?? [];
-    const filteredProviders = processProviders(
+    const filteredProviders = await processProviders(
       checkout,
       injectedProviders,
       priorityWalletRdns,

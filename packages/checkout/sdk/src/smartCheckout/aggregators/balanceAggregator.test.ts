@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { ItemRequirement, ItemType } from '../../types';
 import { balanceAggregator, erc20BalanceAggregator, erc721BalanceAggregator } from './balanceAggregator';
 import { nativeAggregator } from './itemAggregator';
@@ -9,29 +8,29 @@ describe('balanceAggregator', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: true,
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
           isFee: false,
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
           isFee: false,
@@ -54,17 +53,17 @@ describe('balanceAggregator', () => {
       expect(aggregatedItems).toEqual([
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: true,
         },
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(2),
+          amount: BigInt(2),
           isFee: false,
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(2),
+          amount: BigInt(2),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
           isFee: false,
@@ -84,24 +83,24 @@ describe('balanceAggregator', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(2),
+          amount: BigInt(2),
           isFee: false,
         },
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: true,
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
           isFee: false,
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
           isFee: false,
@@ -112,17 +111,17 @@ describe('balanceAggregator', () => {
       expect(aggregatedItems).toEqual([
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(2),
+          amount: BigInt(2),
           isFee: false,
         },
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: true,
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(2),
+          amount: BigInt(2),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
           isFee: false,
@@ -134,24 +133,24 @@ describe('balanceAggregator', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(2),
+          amount: BigInt(2),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
           isFee: false,
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
           isFee: true,
@@ -162,24 +161,24 @@ describe('balanceAggregator', () => {
       expect(aggregatedItems).toEqual([
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
           isFee: true,
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(2),
+          amount: BigInt(2),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
           isFee: false,
@@ -191,14 +190,14 @@ describe('balanceAggregator', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           tokenAddress: '0xERC20_1',
           spenderAddress: '0xSEAPORT',
           isFee: false,
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           tokenAddress: '0xERC20_2',
           spenderAddress: '0xSEAPORT',
           isFee: false,
@@ -209,14 +208,14 @@ describe('balanceAggregator', () => {
       expect(aggregatedItems).toEqual([
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           tokenAddress: '0xERC20_1',
           spenderAddress: '0xSEAPORT',
           isFee: false,
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           tokenAddress: '0xERC20_2',
           spenderAddress: '0xSEAPORT',
           isFee: false,
@@ -235,24 +234,24 @@ describe('balanceAggregator', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(2),
+          amount: BigInt(2),
           isFee: false,
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
           isFee: false,
         },
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: true,
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
           isFee: false,
@@ -264,17 +263,17 @@ describe('balanceAggregator', () => {
         expect.arrayContaining([
           {
             type: ItemType.NATIVE,
-            amount: BigNumber.from(2),
+            amount: BigInt(2),
             isFee: false,
           },
           {
             type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
+            amount: BigInt(1),
             isFee: true,
           },
           {
             type: ItemType.ERC20,
-            amount: BigNumber.from(2),
+            amount: BigInt(2),
             tokenAddress: '0xERC20',
             spenderAddress: '0xSEAPORT',
             isFee: false,
@@ -287,24 +286,24 @@ describe('balanceAggregator', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(2),
+          amount: BigInt(2),
           isFee: true,
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
           isFee: false,
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
           isFee: false,
@@ -326,17 +325,17 @@ describe('balanceAggregator', () => {
         expect.arrayContaining([
           {
             type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
+            amount: BigInt(1),
             isFee: false,
           },
           {
             type: ItemType.NATIVE,
-            amount: BigNumber.from(2),
+            amount: BigInt(2),
             isFee: true,
           },
           {
             type: ItemType.ERC20,
-            amount: BigNumber.from(2),
+            amount: BigInt(2),
             tokenAddress: '0xERC20',
             spenderAddress: '0xSEAPORT',
             isFee: false,
@@ -361,12 +360,12 @@ describe('balanceAggregator', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: true,
         },
         {
@@ -387,12 +386,12 @@ describe('balanceAggregator', () => {
       expect(aggregatedItems).toEqual([
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: true,
         },
         {
@@ -408,7 +407,7 @@ describe('balanceAggregator', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
         {
@@ -429,7 +428,7 @@ describe('balanceAggregator', () => {
       expect(aggregatedItems).toEqual([
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
         {
@@ -458,7 +457,7 @@ describe('balanceAggregator', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
         {
@@ -469,7 +468,7 @@ describe('balanceAggregator', () => {
         },
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: true,
         },
         {
@@ -485,12 +484,12 @@ describe('balanceAggregator', () => {
         expect.arrayContaining([
           {
             type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
+            amount: BigInt(1),
             isFee: false,
           },
           {
             type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
+            amount: BigInt(1),
             isFee: true,
           },
           {
@@ -507,12 +506,12 @@ describe('balanceAggregator', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(2),
+          amount: BigInt(2),
           isFee: false,
         },
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: true,
         },
         {
@@ -544,12 +543,12 @@ describe('balanceAggregator', () => {
         expect.arrayContaining([
           {
             type: ItemType.NATIVE,
-            amount: BigNumber.from(2),
+            amount: BigInt(2),
             isFee: false,
           },
           {
             type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
+            amount: BigInt(1),
             isFee: true,
           },
           {
@@ -578,24 +577,24 @@ describe('balanceAggregator', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
           isFee: false,
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
           isFee: false,
@@ -606,21 +605,21 @@ describe('balanceAggregator', () => {
       expect(aggregatedItems).toEqual([
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
           isFee: false,
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
           isFee: false,
         },
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(2),
+          amount: BigInt(2),
           isFee: false,
         },
       ]);
@@ -630,17 +629,17 @@ describe('balanceAggregator', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(2),
+          amount: BigInt(2),
           isFee: false,
         },
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: true,
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
           isFee: false,
@@ -651,19 +650,19 @@ describe('balanceAggregator', () => {
       expect(aggregatedItems).toEqual([
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: true,
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
           isFee: false,
         },
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(2),
+          amount: BigInt(2),
           isFee: false,
         },
       ]);

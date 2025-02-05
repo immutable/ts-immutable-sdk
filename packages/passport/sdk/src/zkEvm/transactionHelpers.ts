@@ -1,10 +1,8 @@
-import { BigNumber, BigNumberish } from 'ethers';
-import {
-  StaticJsonRpcProvider,
-  TransactionRequest,
-} from '@ethersproject/providers';
 import { Flow } from '@imtbl/metrics';
-import { Signer } from '@ethersproject/abstract-signer';
+import {
+  Signer, TransactionRequest, JsonRpcProvider,
+  BigNumberish,
+} from 'ethers';
 import {
   getEip155ChainId,
   signMetaTransactions,
@@ -23,12 +21,12 @@ const TRANSACTION_HASH_RETRIEVAL_WAIT = 1000;
 
 export type TransactionParams = {
   ethSigner: Signer;
-  rpcProvider: StaticJsonRpcProvider;
+  rpcProvider: JsonRpcProvider;
   guardianClient: GuardianClient;
   relayerClient: RelayerClient;
   zkEvmAddress: string;
   flow: Flow;
-  nonceSpace?: BigNumber;
+  nonceSpace?: bigint;
 };
 
 export type EjectionTransactionParams = Pick<TransactionParams, 'ethSigner' | 'zkEvmAddress' | 'flow'>;
@@ -68,10 +66,10 @@ const getFeeOption = async (
  */
 const buildMetaTransactions = async (
   transactionRequest: TransactionRequest,
-  rpcProvider: StaticJsonRpcProvider,
+  rpcProvider: JsonRpcProvider,
   relayerClient: RelayerClient,
   zkevmAddress: string,
-  nonceSpace?: BigNumber,
+  nonceSpace?: bigint,
 ): Promise<[MetaTransaction, ...MetaTransaction[]]> => {
   if (!transactionRequest.to) {
     throw new JsonRpcError(
@@ -81,9 +79,9 @@ const buildMetaTransactions = async (
   }
 
   const metaTransaction: MetaTransaction = {
-    to: transactionRequest.to,
+    to: transactionRequest.to.toString(),
     data: transactionRequest.data,
-    nonce: BigNumber.from(0), // NOTE: We don't need a valid nonce to estimate the fee
+    nonce: BigInt(0), // NOTE: We don't need a valid nonce to estimate the fee
     value: transactionRequest.value,
     revertOnError: true,
   };
@@ -103,8 +101,8 @@ const buildMetaTransactions = async (
   ];
 
   // Add a fee transaction if the fee is non-zero
-  const feeValue = BigNumber.from(feeOption.tokenPrice);
-  if (!feeValue.isZero()) {
+  const feeValue = BigInt(feeOption.tokenPrice);
+  if (feeValue !== BigInt(0)) {
     metaTransactions.push({
       nonce,
       to: feeOption.recipientAddress,
@@ -169,8 +167,8 @@ export const prepareAndSignTransaction = async ({
   flow,
   nonceSpace,
 }: TransactionParams & { transactionRequest: TransactionRequest }) => {
-  const { chainId } = await rpcProvider.detectNetwork();
-  const chainIdBigNumber = BigNumber.from(chainId);
+  const { chainId } = await rpcProvider.getNetwork();
+  const chainIdBigNumber = BigInt(chainId);
   flow.addEvent('endDetectNetwork');
 
   const metaTransactions = await buildMetaTransactions(
@@ -191,7 +189,7 @@ export const prepareAndSignTransaction = async ({
   // without waiting for the validation to complete
   const validateTransaction = async () => {
     await guardianClient.validateEVMTransaction({
-      chainId: getEip155ChainId(chainId),
+      chainId: getEip155ChainId(Number(chainId)),
       nonce: convertBigNumberishToString(nonce),
       metaTransactions,
     });
@@ -248,7 +246,7 @@ const buildMetaTransactionForEjection = async (
   }
 
   const metaTransaction: MetaTransaction = {
-    to: transactionRequest.to,
+    to: transactionRequest.to.toString(),
     data: transactionRequest.data,
     nonce: transactionRequest.nonce,
     value: transactionRequest.value,
@@ -272,7 +270,7 @@ export const prepareAndSignEjectionTransaction = async ({
   const signedTransaction = await signMetaTransactions(
     metaTransaction,
     transactionRequest.nonce as BigNumberish,
-    BigNumber.from(transactionRequest.chainId),
+    BigInt(transactionRequest.chainId ?? 0),
     zkEvmAddress,
     ethSigner,
   );
@@ -281,6 +279,6 @@ export const prepareAndSignEjectionTransaction = async ({
   return {
     to: zkEvmAddress,
     data: signedTransaction,
-    chainId: getEip155ChainId(transactionRequest.chainId as number),
+    chainId: getEip155ChainId(Number(transactionRequest.chainId ?? 0)),
   };
 };

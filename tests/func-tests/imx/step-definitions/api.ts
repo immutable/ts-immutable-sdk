@@ -1,5 +1,4 @@
 import { strict as assert } from 'assert';
-import { parseEther } from '@ethersproject/units';
 import {
   IMXClient,
   ImxModuleConfiguration,
@@ -7,6 +6,7 @@ import {
 } from '@imtbl/sdk/x';
 import { configuration, StepSharedState } from './stepSharedState';
 import { env, getProvider, repeatCheck20 } from '../common';
+import { parseEther } from 'ethers';
 
 // @binding([StepSharedState])
 export class Trading {

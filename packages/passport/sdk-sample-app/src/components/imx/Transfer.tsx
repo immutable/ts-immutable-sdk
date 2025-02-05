@@ -1,4 +1,3 @@
-import { utils } from 'ethers';
 import React, { useEffect, useState } from 'react';
 import {
   Alert, Button, Form, Image, Offcanvas, Spinner, Stack, Table,
@@ -11,6 +10,7 @@ import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
 import EthBalance from '@/components/imx/EthBalance';
+import { parseEther } from 'ethers';
 
 enum TokenType {
   ERC721Token = 'ERC721',
@@ -105,7 +105,7 @@ function Transfer({ showModal, setShowModal }: ModalProps) {
           case TokenType.ETHToken: {
             request = {
               type: TokenType.ETHToken,
-              amount: utils.parseEther(amount).toString(),
+              amount: parseEther(amount).toString(),
               receiver,
             };
             break;

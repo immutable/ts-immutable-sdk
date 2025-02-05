@@ -6,7 +6,7 @@ import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps, EnvironmentNames } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
-import { utils } from 'ethers';
+import { Interface } from 'ethers';
 
 const getErc20DefaultContractAddress = (environment: EnvironmentNames) => {
   switch (environment) {
@@ -27,7 +27,7 @@ function SpendingCapApproval({ disabled, handleExampleSubmitted }: RequestExampl
     const abi = [
       'function approve(address spender, uint256 amount)',
     ];
-    return new utils.Interface(abi);
+    return new Interface(abi);
   }, []);
   const [fromAddress, setFromAddress] = useState<string>('');
   const [erc20ContractAddress, setErc20ContractAddress] = useState<string>(getErc20DefaultContractAddress(environment));

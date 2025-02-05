@@ -1,6 +1,6 @@
-import { BigNumber, utils } from 'ethers';
-import { DEFAULT_TOKEN_FORMATTING_DECIMALS } from '../lib';
+import { formatUnits } from 'ethers';
 import { tokenValueFormat } from '../lib/utils';
+import { DEFAULT_TOKEN_FORMATTING_DECIMALS } from '../lib/constants';
 
 /**
  * Formats a number to a string with a maximum number of decimals
@@ -39,9 +39,7 @@ export function getFormattedNumber(
       throw new Error('Invalid amount or decimals');
     }
 
-    formattedValue = utils
-      .formatUnits(BigNumber.from(amount), decimals)
-      .toString();
+    formattedValue = formatUnits(BigInt(amount), decimals).toString();
   } catch {
     return '-.--';
   }

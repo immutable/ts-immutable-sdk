@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { orderbook } from '@imtbl/sdk';
 import dotenv from 'dotenv';
-import { providers } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 
 dotenv.config();
 
@@ -21,6 +21,6 @@ export function getConfigFromEnv(): orderbook.OrderbookModuleConfiguration {
     chainName: process.env.ZKEVM_CHAIN_NAME,
     seaportContractAddress: process.env.SEAPORT_CONTRACT_ADDRESS,
     zoneContractAddress: process.env.ZONE_CONTRACT_ADDRESS,
-    provider: new providers.JsonRpcProvider(process.env.ZKEVM_RPC_ENDPOINT),
+    provider: new JsonRpcProvider(process.env.ZKEVM_RPC_ENDPOINT),
   };
 }

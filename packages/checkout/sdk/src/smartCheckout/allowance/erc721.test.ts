@@ -1,5 +1,4 @@
-import { BigNumber, Contract } from 'ethers';
-import { Web3Provider } from '@ethersproject/providers';
+import { Contract } from 'ethers';
 import {
   convertIdToNumber,
   getApproveTransaction,
@@ -8,16 +7,15 @@ import {
   hasERC721Allowances,
 } from './erc721';
 import { CheckoutErrorType } from '../../errors';
-import { ItemRequirement, ItemType } from '../../types';
+import { ItemRequirement, ItemType, WrappedBrowserProvider } from '../../types';
 
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   Contract: jest.fn(),
 }));
 
 describe('erc721', () => {
-  const mockProvider = {} as unknown as Web3Provider;
+  const mockProvider = {} as unknown as WrappedBrowserProvider;
 
   describe('getERC721ApprovedAddress', () => {
     it('should get the allowance from the contract', async () => {
@@ -29,10 +27,10 @@ describe('erc721', () => {
       const address = await getERC721ApprovedAddress(
         mockProvider,
         '0xERC721',
-        BigNumber.from(0),
+        BigInt(0),
       );
       expect(address).toEqual('0xSEAPORT');
-      expect(getApprovedMock).toBeCalledWith(BigNumber.from(0));
+      expect(getApprovedMock).toBeCalledWith(BigInt(0));
     });
 
     it('should throw checkout error when getApproved call errors', async () => {
@@ -49,7 +47,7 @@ describe('erc721', () => {
         await getERC721ApprovedAddress(
           mockProvider,
           '0xERC721',
-          BigNumber.from(0),
+          BigInt(0),
         );
       } catch (err: any) {
         message = err.message;
@@ -64,7 +62,7 @@ describe('erc721', () => {
         error: {},
         contractAddress: '0xERC721',
       });
-      expect(getApprovedMock).toBeCalledWith(BigNumber.from(0));
+      expect(getApprovedMock).toBeCalledWith(BigInt(0));
     });
   });
 
@@ -72,8 +70,8 @@ describe('erc721', () => {
     it('should get the approval transaction from the contract with the from added', async () => {
       const approveMock = jest.fn().mockResolvedValue({ data: '0xDATA' });
       (Contract as unknown as jest.Mock).mockReturnValue({
-        populateTransaction: {
-          approve: approveMock,
+        approve: {
+          populateTransaction: approveMock,
         },
       });
 
@@ -82,17 +80,17 @@ describe('erc721', () => {
         '0xADDRESS',
         '0xERC721',
         '0xSEAPORT',
-        BigNumber.from(0),
+        BigInt(0),
       );
       expect(approvalTransaction).toEqual({ from: '0xADDRESS', data: '0xDATA' });
-      expect(approveMock).toBeCalledWith('0xSEAPORT', BigNumber.from(0));
+      expect(approveMock).toBeCalledWith('0xSEAPORT', BigInt(0));
     });
 
     it('should throw checkout error if call to approve fails', async () => {
       const approveMock = jest.fn().mockRejectedValue({ from: '0xADDRESS' });
       (Contract as unknown as jest.Mock).mockReturnValue({
-        populateTransaction: {
-          approve: approveMock,
+        approve: {
+          populateTransaction: approveMock,
         },
       });
 
@@ -106,7 +104,7 @@ describe('erc721', () => {
           '0xADDRESS',
           '0xERC721',
           '0xSEAPORT',
-          BigNumber.from(0),
+          BigInt(0),
         );
       } catch (err: any) {
         message = err.message;
@@ -125,7 +123,7 @@ describe('erc721', () => {
         spenderAddress: '0xSEAPORT',
         ownerAddress: '0xADDRESS',
       });
-      expect(approveMock).toBeCalledWith('0xSEAPORT', BigNumber.from(0));
+      expect(approveMock).toBeCalledWith('0xSEAPORT', BigInt(0));
     });
   });
 
@@ -188,15 +186,15 @@ describe('erc721', () => {
         (Contract as unknown as jest.Mock).mockReturnValue({
           getApproved: getApprovedMock,
           isApprovedForAll: isApprovedForAllMock,
-          populateTransaction: {
-            approve: approveMock,
+          approve: {
+            populateTransaction: approveMock,
           },
         });
 
         const itemRequirements: ItemRequirement[] = [
           {
             type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
+            amount: BigInt(1),
             isFee: false,
           },
           {
@@ -231,7 +229,7 @@ describe('erc721', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
         {
@@ -259,15 +257,15 @@ describe('erc721', () => {
       (Contract as unknown as jest.Mock).mockReturnValue({
         getApproved: getApprovedMock,
         isApprovedForAll: isApprovedForAllMock,
-        populateTransaction: {
-          approve: approveMock,
+        approve: {
+          populateTransaction: approveMock,
         },
       });
 
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: false,
         },
         {
@@ -366,8 +364,8 @@ describe('erc721', () => {
       (Contract as unknown as jest.Mock).mockReturnValue({
         getApproved: getApprovedMock,
         isApprovedForAll: isApprovedForAllMock,
-        populateTransaction: {
-          approve: approveMock,
+        approve: {
+          populateTransaction: approveMock,
         },
       });
 
@@ -425,8 +423,8 @@ describe('erc721', () => {
         (Contract as unknown as jest.Mock).mockReturnValue({
           getApproved: getApprovedMock,
           isApprovedForAll: isApprovedForAllMock,
-          populateTransaction: {
-            approve: approveMock,
+          approve: {
+            populateTransaction: approveMock,
           },
         });
 
@@ -481,7 +479,7 @@ describe('erc721', () => {
     it('should converts a valid string ID to a number', () => {
       const id = '123';
       const result = convertIdToNumber(id, '0xERC721');
-      expect(result.toNumber()).toBe(123);
+      expect(result.toString()).toBe('123');
     });
 
     it('should throw checkout error an error for invalid string ID', () => {

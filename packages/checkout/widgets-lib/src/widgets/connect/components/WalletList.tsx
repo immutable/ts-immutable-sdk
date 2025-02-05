@@ -4,6 +4,7 @@ import {
   ChainId,
   CheckoutErrorType,
   EIP6963ProviderDetail,
+  WrappedBrowserProvider,
   WalletProviderName,
   WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
@@ -17,7 +18,6 @@ import {
 } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Web3Provider } from '@ethersproject/providers';
 import { UnableToConnectDrawer } from '../../../components/UnableToConnectDrawer/UnableToConnectDrawer';
 import { ChangedYourMindDrawer } from '../../../components/ChangedYourMindDrawer/ChangedYourMindDrawer';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
@@ -103,12 +103,12 @@ export function WalletList(props: WalletListProps) {
     [providers, checkout],
   );
 
-  const selectWeb3Provider = useCallback(
-    (web3Provider: Web3Provider, providerName: string) => {
+  const selectBrowserProvider = useCallback(
+    (browserProvider: WrappedBrowserProvider, providerName: string) => {
       connectDispatch({
         payload: {
           type: ConnectActions.SET_PROVIDER,
-          provider: web3Provider,
+          provider: browserProvider,
         },
       });
       connectDispatch({
@@ -121,12 +121,9 @@ export function WalletList(props: WalletListProps) {
     [],
   );
 
-  const handleConnectViewUpdate = async (provider: Web3Provider) => {
+  const handleConnectViewUpdate = async (provider: WrappedBrowserProvider) => {
     const isPassport = isPassportProvider(provider);
-    const chainId = await provider.provider.request!({
-      method: 'eth_chainId',
-      params: [],
-    });
+    const chainId = await provider.send!('eth_chainId', []);
     // eslint-disable-next-line radix
     const parsedChainId = parseInt(chainId.toString());
     if (
@@ -168,13 +165,16 @@ export function WalletList(props: WalletListProps) {
 
       try {
         const isMetaMask = providerDetail.info.rdns === WalletProviderRdns.METAMASK;
-        const web3Provider = new Web3Provider(providerDetail.provider as any);
+
+        const browserProvider = new WrappedBrowserProvider(
+          providerDetail.provider,
+        );
 
         try {
           // TODO: Find a nice way to detect if the wallet supports switching accounts via requestPermissions
           const changeAccount = isMetaMask;
           const connectResult = await checkout.connect({
-            provider: web3Provider,
+            provider: browserProvider,
             requestWalletPermissions: changeAccount,
           });
 
@@ -185,11 +185,11 @@ export function WalletList(props: WalletListProps) {
           const anonymousId = userData?.anonymousId();
           await identifyUser(identify, connectResult.provider, { anonymousId });
 
-          selectWeb3Provider(
-            web3Provider,
+          selectBrowserProvider(
+            browserProvider,
             getProviderSlugFromRdns(providerDetail.info.rdns),
           );
-          await handleConnectViewUpdate(web3Provider);
+          await handleConnectViewUpdate(browserProvider);
         } catch (err: CheckoutErrorType | any) {
           if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
             // eslint-disable-next-line no-console
@@ -215,17 +215,17 @@ export function WalletList(props: WalletListProps) {
 
   const connectCallback = async (ethereumProvider: EthereumProvider) => {
     if (ethereumProvider.connected && ethereumProvider.session) {
-      const web3Provider = new Web3Provider(ethereumProvider);
-      selectWeb3Provider(web3Provider, 'walletconnect');
+      const browserProvider = new WrappedBrowserProvider(ethereumProvider);
+      selectBrowserProvider(browserProvider, 'walletconnect');
 
-      const chainId = await web3Provider.getSigner().getChainId();
+      const { chainId } = await ((await browserProvider.getSigner()).provider.getNetwork());
 
       if (ethereumProvider.chainId !== targetChainId) {
         // @ts-ignore allow protected method `switchEthereumChain` to be called
         await ethereumProvider.switchEthereumChain(targetChainId);
       }
 
-      if (chainId !== targetChainId) {
+      if (chainId as unknown as ChainId !== targetChainId) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
