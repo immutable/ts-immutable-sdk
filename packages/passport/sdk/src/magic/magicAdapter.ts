@@ -1,4 +1,3 @@
-import { SDKBase, InstanceWithExtensions } from '@magic-sdk/provider';
 import { Magic } from 'magic-sdk';
 import { OpenIdExtension } from '@magic-ext/oidc';
 import { ethers } from 'ethers';
@@ -8,8 +7,7 @@ import { PassportConfiguration } from '../config';
 import { lazyDocumentReady } from '../utils/lazyLoad';
 import { withMetricsAsync } from '../utils/metrics';
 import { MagicProviderProxyFactory } from './magicProviderProxyFactory';
-
-type MagicClient = InstanceWithExtensions<SDKBase, [OpenIdExtension]>;
+import { MagicClient } from './types';
 
 const MAINNET = 'mainnet';
 
