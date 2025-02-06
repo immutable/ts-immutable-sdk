@@ -408,7 +408,7 @@ describe('PassportImxProvider', () => {
         expect(trackFlow).toHaveBeenCalledWith(
           'passport',
           eventName,
-          expect.any(Object),
+          true,
         );
         expect(trackError).toHaveBeenCalledWith(
           'passport',
@@ -452,7 +452,7 @@ describe('PassportImxProvider', () => {
         expect(trackFlow).toHaveBeenCalledWith(
           'passport',
           eventName,
-          expect.any(Object),
+          true,
         );
         expect(trackError).toHaveBeenCalledWith(
           'passport',
