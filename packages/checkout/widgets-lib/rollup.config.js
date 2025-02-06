@@ -5,24 +5,42 @@ import resolve from '@rollup/plugin-node-resolve';
 import json from '@rollup/plugin-json';
 import replace from '@rollup/plugin-replace';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
+import swc from 'unplugin-swc'
 
-// TODO FIX WATCH MODE
+const PRODUCTION = 'production';
+
+const isProduction = process.env.NODE_ENV === PRODUCTION
+
+const defaultPlugins = [
+  json(),
+  replace({
+    preventAssignment: true,
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || PRODUCTION),
+  }),
+  isProduction ? typescript({customConditions: ["default"], declaration: false, outDir: 'dist/browser'}) 
+    : swc.rollup({ jsc: { 
+      transform: { react: { development: true, runtime: 'automatic' }},
+    } }),
+]
+
+const productionPlugins = [
+  resolve({
+    browser: true,
+    dedupe: ['react', 'react-dom'],
+    exportConditions: ['default']
+  }),
+  nodePolyfills(),
+  commonjs(),
+]
 
 const getPlugins = () => {
+  if (process.env.NODE_ENV !== PRODUCTION) {
+    return defaultPlugins;
+  }
+
   return [
-    json(),
-    replace({
-      preventAssignment: true,
-      'process.env.NODE_ENV': "'production'",
-    }),
-    typescript({customConditions: ["default"], declaration: false, outDir: 'dist/browser'}),
-    resolve({
-      browser: true,
-      dedupe: ['react', 'react-dom'],
-      exportConditions: ['default']
-    }),
-    nodePolyfills(),
-    commonjs(),
+    ...defaultPlugins,
+    ...productionPlugins
   ];
 }
 
@@ -35,12 +53,13 @@ export default [
     output: {
       dir: 'dist/browser',
       format: 'es',
+      inlineDynamicImports: !isProduction
     },
     plugins: [
       ...getPlugins(),
     ]
   },
-  {
+   {
     input: 'src/index.ts',
     output: {
       file: 'dist/browser/index.cdn.js',
