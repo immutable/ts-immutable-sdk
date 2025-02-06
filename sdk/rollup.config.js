@@ -84,7 +84,7 @@ const getTypesBuild = (inputFilename) => [
         respectExternal: true,
       }),
     ],
-    external: ['pg'] 
+    external: ['pg', 'localforage'] 
   },
 ];
 
