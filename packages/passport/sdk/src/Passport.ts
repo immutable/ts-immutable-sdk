@@ -335,7 +335,7 @@ export class Passport {
   }
 
   public async linkExternalWallet(params: LinkWalletParams): Promise<LinkedWallet> {
-    const flow = trackFlow('passport', 'linkExternalWallet', { trackStartEvent: false });
+    const flow = trackFlow('passport', 'linkExternalWallet', false);
 
     const user = await this.authManager.getUser();
     if (!user) {

@@ -9,7 +9,7 @@ export const withMetrics = <T>(
   const flow: Flow = trackFlow(
     'passport',
     flowName,
-    { trackStartEvent },
+    trackStartEvent,
   );
 
   try {
@@ -37,7 +37,7 @@ export const withMetricsAsync = async <T>(
   const flow: Flow = trackFlow(
     'passport',
     flowName,
-    { trackStartEvent },
+    trackStartEvent,
   );
 
   try {
