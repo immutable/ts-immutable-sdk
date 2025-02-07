@@ -88,6 +88,9 @@ describe('PassportImxProvider', () => {
     // Metrics
     (trackFlow as unknown as jest.Mock).mockImplementation(() => ({
       addEvent: jest.fn(),
+      details: {
+        flowId: '123',
+      },
     }));
 
     // Signers
@@ -135,6 +138,9 @@ describe('PassportImxProvider', () => {
       // Metrics
       (trackFlow as unknown as jest.Mock).mockImplementation(() => ({
         addEvent: jest.fn(),
+        details: {
+          flowId: '123',
+        },
       }));
 
       const pp = new PassportImxProvider({
@@ -402,11 +408,13 @@ describe('PassportImxProvider', () => {
         expect(trackFlow).toHaveBeenCalledWith(
           'passport',
           eventName,
+          true,
         );
         expect(trackError).toHaveBeenCalledWith(
           'passport',
           eventName,
           error,
+          { flowId: '123' },
         );
       }
     });
@@ -444,11 +452,13 @@ describe('PassportImxProvider', () => {
         expect(trackFlow).toHaveBeenCalledWith(
           'passport',
           eventName,
+          true,
         );
         expect(trackError).toHaveBeenCalledWith(
           'passport',
           eventName,
           error,
+          { flowId: '123' },
         );
       }
     });
