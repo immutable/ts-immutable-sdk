@@ -139,11 +139,11 @@ export class Passport {
    * `connectImx` instead.
    */
   public async connectImxSilent(): Promise<IMXProvider | null> {
-    return withMetricsAsync(() => this.passportImxProviderFactory.getProviderSilent(), 'connectImxSilent');
+    return withMetricsAsync(() => this.passportImxProviderFactory.getProviderSilent(), 'connectImxSilent', false);
   }
 
   public async connectImx(): Promise<IMXProvider> {
-    return withMetricsAsync(() => this.passportImxProviderFactory.getProvider(), 'connectImx');
+    return withMetricsAsync(() => this.passportImxProviderFactory.getProvider(), 'connectImx', false);
   }
 
   public connectEvm(options: {
@@ -169,7 +169,7 @@ export class Passport {
       }
 
       return provider;
-    }, 'connectEvm');
+    }, 'connectEvm', false);
   }
 
   /**
@@ -307,21 +307,21 @@ export class Passport {
     return withMetricsAsync(async () => {
       const user = await this.authManager.getUser();
       return user?.profile;
-    }, 'getUserInfo');
+    }, 'getUserInfo', false);
   }
 
   public async getIdToken(): Promise<string | undefined> {
     return withMetricsAsync(async () => {
       const user = await this.authManager.getUser();
       return user?.idToken;
-    }, 'getIdToken');
+    }, 'getIdToken', false);
   }
 
   public async getAccessToken(): Promise<string | undefined> {
     return withMetricsAsync(async () => {
       const user = await this.authManager.getUser();
       return user?.accessToken;
-    }, 'getAccessToken');
+    }, 'getAccessToken', false, false);
   }
 
   public async getLinkedAddresses(): Promise<string[]> {
@@ -333,11 +333,11 @@ export class Passport {
       const headers = { Authorization: `Bearer ${user.accessToken}` };
       const getUserInfoResult = await this.multiRollupApiClients.passportProfileApi.getUserInfo({ headers });
       return getUserInfoResult.data.linked_addresses;
-    }, 'getLinkedAddresses');
+    }, 'getLinkedAddresses', false);
   }
 
   public async linkExternalWallet(params: LinkWalletParams): Promise<LinkedWallet> {
-    const flow = trackFlow('passport', 'linkExternalWallet');
+    const flow = trackFlow('passport', 'linkExternalWallet', false);
 
     const user = await this.authManager.getUser();
     if (!user) {
@@ -365,8 +365,9 @@ export class Passport {
     } catch (error) {
       if (error instanceof Error) {
         trackError('passport', 'linkExternalWallet', error);
+      } else {
+        flow.addEvent('errored');
       }
-      flow.addEvent('errored');
 
       if (isAxiosError(error) && error.response) {
         if (error.response.data && isAPIError(error.response.data)) {
