@@ -13,42 +13,17 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { DomainWithNumericChainId } from './domain-with-numeric-chain-id';
+// May contain unused imports in some cases
+// @ts-ignore
+import { DomainWithStringChainId } from './domain-with-string-chain-id';
 
 /**
- * 
+ * @type EIP712MessageDomain
  * @export
- * @interface EIP712MessageDomain
  */
-export interface EIP712MessageDomain {
-    /**
-     * 
-     * @type {string}
-     * @memberof EIP712MessageDomain
-     */
-    'name'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof EIP712MessageDomain
-     */
-    'version'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof EIP712MessageDomain
-     */
-    'chainId'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof EIP712MessageDomain
-     */
-    'verifyingContract'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof EIP712MessageDomain
-     */
-    'salt'?: string;
-}
+export type EIP712MessageDomain = DomainWithNumericChainId | DomainWithStringChainId;
+
 

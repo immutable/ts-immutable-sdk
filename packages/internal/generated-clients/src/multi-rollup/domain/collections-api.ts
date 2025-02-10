@@ -224,6 +224,10 @@ export const CollectionsApiAxiosParamCreator = function (configuration?: Configu
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
+            // authentication BearerAuthWithClient required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
             // authentication ImmutableApiKey required
             await setApiKeyToObject(localVarHeaderParameter, "x-immutable-api-key", configuration)
 

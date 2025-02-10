@@ -73,6 +73,8 @@ models/create-listing-request-body.ts
 models/create-mint-request-request.ts
 models/create-mint-request-result.ts
 models/deposit.ts
+models/domain-with-numeric-chain-id.ts
+models/domain-with-string-chain-id.ts
 models/eip712-message-domain.ts
 models/eip712-message-types-eip712-domain-inner.ts
 models/eip712-message-types.ts
@@ -111,6 +113,8 @@ models/get-linked-addresses-res.ts
 models/get-metadata-result.ts
 models/get-mint-request-result.ts
 models/get-nftresult.ts
+models/get-passport-metadata-res-passport-metadata-inner.ts
+models/get-passport-metadata-res.ts
 models/get-token-result.ts
 models/get-transaction-metadata-request.ts
 models/get-transaction-metadata-res.ts
