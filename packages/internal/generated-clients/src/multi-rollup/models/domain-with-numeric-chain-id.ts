@@ -13,44 +13,41 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import { DomainTypeChainId } from './domain-type-chain-id';
 
 /**
- * @type EIP712MessageDomain
+ * 
  * @export
- * @interface DomainType
+ * @interface DomainWithNumericChainId
  */
-export interface DomainType {
+export interface DomainWithNumericChainId {
     /**
      * 
      * @type {string}
-     * @memberof DomainType
+     * @memberof DomainWithNumericChainId
      */
     'name'?: string;
     /**
      * 
      * @type {string}
-     * @memberof DomainType
+     * @memberof DomainWithNumericChainId
      */
     'version'?: string;
     /**
      * 
-     * @type {DomainTypeChainId}
-     * @memberof DomainType
+     * @type {number}
+     * @memberof DomainWithNumericChainId
      */
-    'chainId'?: DomainTypeChainId;
+    'chainId'?: number;
     /**
      * 
      * @type {string}
-     * @memberof DomainType
+     * @memberof DomainWithNumericChainId
      */
     'verifyingContract'?: string;
     /**
      * 
      * @type {string}
-     * @memberof DomainType
+     * @memberof DomainWithNumericChainId
      */
     'salt'?: string;
 }
