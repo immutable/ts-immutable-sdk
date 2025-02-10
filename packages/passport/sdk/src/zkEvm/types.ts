@@ -57,6 +57,12 @@ export interface TypedDataPayload {
     chainId?: number | string;
     verifyingContract?: string;
     salt?: string;
+  } | {
+    name?: string;
+    version?: string;
+    chainId?: number;
+    verifyingContract?: string;
+    salt?: string;
   };
   primaryType: string;
   message: Record<string, any>;
