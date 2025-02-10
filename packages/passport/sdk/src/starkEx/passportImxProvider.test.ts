@@ -23,7 +23,7 @@ import {
 import { PassportEventMap, PassportEvents } from '../types';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import AuthManager from '../authManager';
-import MagicAdapter from '../magicAdapter';
+import MagicAdapter from '../magic/magicAdapter';
 import { getStarkSigner } from './getStarkSigner';
 import GuardianClient from '../guardian';
 

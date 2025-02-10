@@ -3,7 +3,7 @@ import { IMXClient } from '@imtbl/x-client';
 import { ImxApiClients, imxApiConfig, MultiRollupApiClients } from '@imtbl/generated-clients';
 import { trackError, trackFlow } from '@imtbl/metrics';
 import AuthManager from './authManager';
-import MagicAdapter from './magicAdapter';
+import MagicAdapter from './magic/magicAdapter';
 import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
 import { OidcConfiguration, UserProfile } from './types';
@@ -21,7 +21,7 @@ import { ZkEvmProvider } from './zkEvm';
 import { PassportError, PassportErrorType } from './errors/passportError';
 
 jest.mock('./authManager');
-jest.mock('./magicAdapter');
+jest.mock('./magic/magicAdapter');
 jest.mock('./starkEx');
 jest.mock('./confirmation');
 jest.mock('./zkEvm');
