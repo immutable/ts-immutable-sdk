@@ -44,6 +44,8 @@ import { GetLinkedAddressesRes } from '../models';
 // @ts-ignore
 import { GetLinkedAddressesResDeprecated } from '../models';
 // @ts-ignore
+import { GetPassportMetadataRes } from '../models';
+// @ts-ignore
 import { GetTransactionMetadataRequest } from '../models';
 // @ts-ignore
 import { GetTransactionMetadataRes } from '../models';
@@ -271,6 +273,43 @@ export const PassportApiAxiosParamCreator = function (configuration?: Configurat
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Get passport metadata related to a user
+         * @summary Get passport metadata related to a user
+         * @param {string} userId The user\&#39;s userId
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserMetadata: async (userId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('getUserMetadata', 'userId', userId)
+            const localVarPath = `/passport-mr/v1/users/{user_id}/metadata`
+                .replace(`{${"user_id"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ImmutableApiKey required
+            await setApiKeyToObject(localVarHeaderParameter, "x-immutable-api-key", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -342,6 +381,17 @@ export const PassportApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getTypedDataMetadata(chainName, getTypedDataMetadataRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * Get passport metadata related to a user
+         * @summary Get passport metadata related to a user
+         * @param {string} userId The user\&#39;s userId
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getUserMetadata(userId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetPassportMetadataRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getUserMetadata(userId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -403,6 +453,16 @@ export const PassportApiFactory = function (configuration?: Configuration, baseP
          */
         getTypedDataMetadata(requestParameters: PassportApiGetTypedDataMetadataRequest, options?: AxiosRequestConfig): AxiosPromise<GetTypedDataMetadataRes> {
             return localVarFp.getTypedDataMetadata(requestParameters.chainName, requestParameters.getTypedDataMetadataRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get passport metadata related to a user
+         * @summary Get passport metadata related to a user
+         * @param {PassportApiGetUserMetadataRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserMetadata(requestParameters: PassportApiGetUserMetadataRequest, options?: AxiosRequestConfig): AxiosPromise<GetPassportMetadataRes> {
+            return localVarFp.getUserMetadata(requestParameters.userId, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -506,6 +566,20 @@ export interface PassportApiGetTypedDataMetadataRequest {
 }
 
 /**
+ * Request parameters for getUserMetadata operation in PassportApi.
+ * @export
+ * @interface PassportApiGetUserMetadataRequest
+ */
+export interface PassportApiGetUserMetadataRequest {
+    /**
+     * The user\&#39;s userId
+     * @type {string}
+     * @memberof PassportApiGetUserMetadata
+     */
+    readonly userId: string
+}
+
+/**
  * PassportApi - object-oriented interface
  * @export
  * @class PassportApi
@@ -572,6 +646,18 @@ export class PassportApi extends BaseAPI {
      */
     public getTypedDataMetadata(requestParameters: PassportApiGetTypedDataMetadataRequest, options?: AxiosRequestConfig) {
         return PassportApiFp(this.configuration).getTypedDataMetadata(requestParameters.chainName, requestParameters.getTypedDataMetadataRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get passport metadata related to a user
+     * @summary Get passport metadata related to a user
+     * @param {PassportApiGetUserMetadataRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PassportApi
+     */
+    public getUserMetadata(requestParameters: PassportApiGetUserMetadataRequest, options?: AxiosRequestConfig) {
+        return PassportApiFp(this.configuration).getUserMetadata(requestParameters.userId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

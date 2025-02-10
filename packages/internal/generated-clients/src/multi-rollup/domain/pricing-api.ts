@@ -49,11 +49,12 @@ export const PricingApiAxiosParamCreator = function (configuration?: Configurati
          * @param {string} chainName The name of chain
          * @param {string} contractAddress Contract address for collection that these token ids are on
          * @param {Array<string>} tokenId List of token ids to get pricing data for
+         * @param {string} [paymentToken] Filters the active listings, bids, floor listing and top bid by the specified payment token, either the address of the payment token contract or \&#39;NATIVE\&#39;.
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        quotesForNFTs: async (chainName: string, contractAddress: string, tokenId: Array<string>, pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        quotesForNFTs: async (chainName: string, contractAddress: string, tokenId: Array<string>, paymentToken?: string, pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chainName' is not null or undefined
             assertParamExists('quotesForNFTs', 'chainName', chainName)
             // verify required parameter 'contractAddress' is not null or undefined
@@ -78,6 +79,10 @@ export const PricingApiAxiosParamCreator = function (configuration?: Configurati
                 localVarQueryParameter['token_id'] = tokenId;
             }
 
+            if (paymentToken !== undefined) {
+                localVarQueryParameter['payment_token'] = paymentToken;
+            }
+
             if (pageCursor !== undefined) {
                 localVarQueryParameter['page_cursor'] = pageCursor;
             }
@@ -99,11 +104,12 @@ export const PricingApiAxiosParamCreator = function (configuration?: Configurati
          * @param {string} chainName The name of chain
          * @param {string} contractAddress Contract address for collection that these stacks are on
          * @param {Array<string>} stackId List of stack ids to get pricing data for
+         * @param {string} [paymentToken] Filters the active listings, bids, floor listing and top bid by the specified payment token, either the address of the payment token contract or \&#39;NATIVE\&#39;.
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        quotesForStacks: async (chainName: string, contractAddress: string, stackId: Array<string>, pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        quotesForStacks: async (chainName: string, contractAddress: string, stackId: Array<string>, paymentToken?: string, pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chainName' is not null or undefined
             assertParamExists('quotesForStacks', 'chainName', chainName)
             // verify required parameter 'contractAddress' is not null or undefined
@@ -126,6 +132,10 @@ export const PricingApiAxiosParamCreator = function (configuration?: Configurati
 
             if (stackId) {
                 localVarQueryParameter['stack_id'] = stackId;
+            }
+
+            if (paymentToken !== undefined) {
+                localVarQueryParameter['payment_token'] = paymentToken;
             }
 
             if (pageCursor !== undefined) {
@@ -159,12 +169,13 @@ export const PricingApiFp = function(configuration?: Configuration) {
          * @param {string} chainName The name of chain
          * @param {string} contractAddress Contract address for collection that these token ids are on
          * @param {Array<string>} tokenId List of token ids to get pricing data for
+         * @param {string} [paymentToken] Filters the active listings, bids, floor listing and top bid by the specified payment token, either the address of the payment token contract or \&#39;NATIVE\&#39;.
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async quotesForNFTs(chainName: string, contractAddress: string, tokenId: Array<string>, pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QuotesForNFTsResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.quotesForNFTs(chainName, contractAddress, tokenId, pageCursor, options);
+        async quotesForNFTs(chainName: string, contractAddress: string, tokenId: Array<string>, paymentToken?: string, pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QuotesForNFTsResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.quotesForNFTs(chainName, contractAddress, tokenId, paymentToken, pageCursor, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -173,12 +184,13 @@ export const PricingApiFp = function(configuration?: Configuration) {
          * @param {string} chainName The name of chain
          * @param {string} contractAddress Contract address for collection that these stacks are on
          * @param {Array<string>} stackId List of stack ids to get pricing data for
+         * @param {string} [paymentToken] Filters the active listings, bids, floor listing and top bid by the specified payment token, either the address of the payment token contract or \&#39;NATIVE\&#39;.
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async quotesForStacks(chainName: string, contractAddress: string, stackId: Array<string>, pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QuotesForStacksResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.quotesForStacks(chainName, contractAddress, stackId, pageCursor, options);
+        async quotesForStacks(chainName: string, contractAddress: string, stackId: Array<string>, paymentToken?: string, pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QuotesForStacksResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.quotesForStacks(chainName, contractAddress, stackId, paymentToken, pageCursor, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -199,7 +211,7 @@ export const PricingApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         quotesForNFTs(requestParameters: PricingApiQuotesForNFTsRequest, options?: AxiosRequestConfig): AxiosPromise<QuotesForNFTsResult> {
-            return localVarFp.quotesForNFTs(requestParameters.chainName, requestParameters.contractAddress, requestParameters.tokenId, requestParameters.pageCursor, options).then((request) => request(axios, basePath));
+            return localVarFp.quotesForNFTs(requestParameters.chainName, requestParameters.contractAddress, requestParameters.tokenId, requestParameters.paymentToken, requestParameters.pageCursor, options).then((request) => request(axios, basePath));
         },
         /**
          * Get pricing data for a list of stack ids
@@ -209,7 +221,7 @@ export const PricingApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         quotesForStacks(requestParameters: PricingApiQuotesForStacksRequest, options?: AxiosRequestConfig): AxiosPromise<QuotesForStacksResult> {
-            return localVarFp.quotesForStacks(requestParameters.chainName, requestParameters.contractAddress, requestParameters.stackId, requestParameters.pageCursor, options).then((request) => request(axios, basePath));
+            return localVarFp.quotesForStacks(requestParameters.chainName, requestParameters.contractAddress, requestParameters.stackId, requestParameters.paymentToken, requestParameters.pageCursor, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -240,6 +252,13 @@ export interface PricingApiQuotesForNFTsRequest {
      * @memberof PricingApiQuotesForNFTs
      */
     readonly tokenId: Array<string>
+
+    /**
+     * Filters the active listings, bids, floor listing and top bid by the specified payment token, either the address of the payment token contract or \&#39;NATIVE\&#39;.
+     * @type {string}
+     * @memberof PricingApiQuotesForNFTs
+     */
+    readonly paymentToken?: string
 
     /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
@@ -277,6 +296,13 @@ export interface PricingApiQuotesForStacksRequest {
     readonly stackId: Array<string>
 
     /**
+     * Filters the active listings, bids, floor listing and top bid by the specified payment token, either the address of the payment token contract or \&#39;NATIVE\&#39;.
+     * @type {string}
+     * @memberof PricingApiQuotesForStacks
+     */
+    readonly paymentToken?: string
+
+    /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
      * @memberof PricingApiQuotesForStacks
@@ -300,7 +326,7 @@ export class PricingApi extends BaseAPI {
      * @memberof PricingApi
      */
     public quotesForNFTs(requestParameters: PricingApiQuotesForNFTsRequest, options?: AxiosRequestConfig) {
-        return PricingApiFp(this.configuration).quotesForNFTs(requestParameters.chainName, requestParameters.contractAddress, requestParameters.tokenId, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
+        return PricingApiFp(this.configuration).quotesForNFTs(requestParameters.chainName, requestParameters.contractAddress, requestParameters.tokenId, requestParameters.paymentToken, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -312,7 +338,7 @@ export class PricingApi extends BaseAPI {
      * @memberof PricingApi
      */
     public quotesForStacks(requestParameters: PricingApiQuotesForStacksRequest, options?: AxiosRequestConfig) {
-        return PricingApiFp(this.configuration).quotesForStacks(requestParameters.chainName, requestParameters.contractAddress, requestParameters.stackId, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
+        return PricingApiFp(this.configuration).quotesForStacks(requestParameters.chainName, requestParameters.contractAddress, requestParameters.stackId, requestParameters.paymentToken, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

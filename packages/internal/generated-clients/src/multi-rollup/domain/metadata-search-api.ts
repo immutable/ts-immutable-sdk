@@ -159,13 +159,14 @@ export const MetadataSearchApiAxiosParamCreator = function (configuration?: Conf
          * @param {boolean} [onlyIfHasActiveListings] Filters results to include only stacks that have a current active listing. False and \&#39;null\&#39; return all unfiltered stacks.
          * @param {string} [traits] JSON encoded traits to filter by. e.g. encodeURIComponent(JSON.stringify({\&quot;rarity\&quot;: {\&quot;values\&quot;: [\&quot;common\&quot;, \&quot;rare\&quot;], \&quot;condition\&quot;: \&quot;eq\&quot;}}))
          * @param {string} [keyword] Keyword to search NFT name and description. Alphanumeric characters only.
+         * @param {string} [paymentToken] Filters the active listings, bids, floor listing and top bid by the specified payment token, either the address of the payment token contract or \&#39;NATIVE\&#39;
          * @param {SearchStacksSortByEnum} [sortBy] Sort results in a specific order
          * @param {number} [pageSize] Number of results to return per page
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        searchStacks: async (chainName: string, contractAddress: Array<string>, accountAddress?: string, onlyIncludeOwnerListings?: boolean, onlyIfHasActiveListings?: boolean, traits?: string, keyword?: string, sortBy?: SearchStacksSortByEnum, pageSize?: number, pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        searchStacks: async (chainName: string, contractAddress: Array<string>, accountAddress?: string, onlyIncludeOwnerListings?: boolean, onlyIfHasActiveListings?: boolean, traits?: string, keyword?: string, paymentToken?: string, sortBy?: SearchStacksSortByEnum, pageSize?: number, pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chainName' is not null or undefined
             assertParamExists('searchStacks', 'chainName', chainName)
             // verify required parameter 'contractAddress' is not null or undefined
@@ -205,6 +206,10 @@ export const MetadataSearchApiAxiosParamCreator = function (configuration?: Conf
 
             if (keyword !== undefined) {
                 localVarQueryParameter['keyword'] = keyword;
+            }
+
+            if (paymentToken !== undefined) {
+                localVarQueryParameter['payment_token'] = paymentToken;
             }
 
             if (sortBy !== undefined) {
@@ -279,14 +284,15 @@ export const MetadataSearchApiFp = function(configuration?: Configuration) {
          * @param {boolean} [onlyIfHasActiveListings] Filters results to include only stacks that have a current active listing. False and \&#39;null\&#39; return all unfiltered stacks.
          * @param {string} [traits] JSON encoded traits to filter by. e.g. encodeURIComponent(JSON.stringify({\&quot;rarity\&quot;: {\&quot;values\&quot;: [\&quot;common\&quot;, \&quot;rare\&quot;], \&quot;condition\&quot;: \&quot;eq\&quot;}}))
          * @param {string} [keyword] Keyword to search NFT name and description. Alphanumeric characters only.
+         * @param {string} [paymentToken] Filters the active listings, bids, floor listing and top bid by the specified payment token, either the address of the payment token contract or \&#39;NATIVE\&#39;
          * @param {SearchStacksSortByEnum} [sortBy] Sort results in a specific order
          * @param {number} [pageSize] Number of results to return per page
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async searchStacks(chainName: string, contractAddress: Array<string>, accountAddress?: string, onlyIncludeOwnerListings?: boolean, onlyIfHasActiveListings?: boolean, traits?: string, keyword?: string, sortBy?: SearchStacksSortByEnum, pageSize?: number, pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SearchStacksResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.searchStacks(chainName, contractAddress, accountAddress, onlyIncludeOwnerListings, onlyIfHasActiveListings, traits, keyword, sortBy, pageSize, pageCursor, options);
+        async searchStacks(chainName: string, contractAddress: Array<string>, accountAddress?: string, onlyIncludeOwnerListings?: boolean, onlyIfHasActiveListings?: boolean, traits?: string, keyword?: string, paymentToken?: string, sortBy?: SearchStacksSortByEnum, pageSize?: number, pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SearchStacksResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.searchStacks(chainName, contractAddress, accountAddress, onlyIncludeOwnerListings, onlyIfHasActiveListings, traits, keyword, paymentToken, sortBy, pageSize, pageCursor, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -327,7 +333,7 @@ export const MetadataSearchApiFactory = function (configuration?: Configuration,
          * @throws {RequiredError}
          */
         searchStacks(requestParameters: MetadataSearchApiSearchStacksRequest, options?: AxiosRequestConfig): AxiosPromise<SearchStacksResult> {
-            return localVarFp.searchStacks(requestParameters.chainName, requestParameters.contractAddress, requestParameters.accountAddress, requestParameters.onlyIncludeOwnerListings, requestParameters.onlyIfHasActiveListings, requestParameters.traits, requestParameters.keyword, requestParameters.sortBy, requestParameters.pageSize, requestParameters.pageCursor, options).then((request) => request(axios, basePath));
+            return localVarFp.searchStacks(requestParameters.chainName, requestParameters.contractAddress, requestParameters.accountAddress, requestParameters.onlyIncludeOwnerListings, requestParameters.onlyIfHasActiveListings, requestParameters.traits, requestParameters.keyword, requestParameters.paymentToken, requestParameters.sortBy, requestParameters.pageSize, requestParameters.pageCursor, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -465,6 +471,13 @@ export interface MetadataSearchApiSearchStacksRequest {
     readonly keyword?: string
 
     /**
+     * Filters the active listings, bids, floor listing and top bid by the specified payment token, either the address of the payment token contract or \&#39;NATIVE\&#39;
+     * @type {string}
+     * @memberof MetadataSearchApiSearchStacks
+     */
+    readonly paymentToken?: string
+
+    /**
      * Sort results in a specific order
      * @type {'cheapest_first'}
      * @memberof MetadataSearchApiSearchStacks
@@ -526,7 +539,7 @@ export class MetadataSearchApi extends BaseAPI {
      * @memberof MetadataSearchApi
      */
     public searchStacks(requestParameters: MetadataSearchApiSearchStacksRequest, options?: AxiosRequestConfig) {
-        return MetadataSearchApiFp(this.configuration).searchStacks(requestParameters.chainName, requestParameters.contractAddress, requestParameters.accountAddress, requestParameters.onlyIncludeOwnerListings, requestParameters.onlyIfHasActiveListings, requestParameters.traits, requestParameters.keyword, requestParameters.sortBy, requestParameters.pageSize, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
+        return MetadataSearchApiFp(this.configuration).searchStacks(requestParameters.chainName, requestParameters.contractAddress, requestParameters.accountAddress, requestParameters.onlyIncludeOwnerListings, requestParameters.onlyIfHasActiveListings, requestParameters.traits, requestParameters.keyword, requestParameters.paymentToken, requestParameters.sortBy, requestParameters.pageSize, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
