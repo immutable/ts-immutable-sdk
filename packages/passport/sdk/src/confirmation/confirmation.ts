@@ -72,6 +72,10 @@ export default class ConfirmationScreen {
           return;
         }
 
+        while (!this.overlay) {
+          console.warn('Overlay was not initialized yet.');
+        }
+
         switch (data.messageType as ReceiveMessage) {
           case ReceiveMessage.CONFIRMATION_WINDOW_READY: {
             this.confirmationWindow?.postMessage({
@@ -81,21 +85,25 @@ export default class ConfirmationScreen {
             break;
           }
           case ReceiveMessage.TRANSACTION_CONFIRMED: {
+            console.log('TRANSACTION_CONFIRMED');
             this.closeWindow();
             resolve({ confirmed: true });
             break;
           }
           case ReceiveMessage.TRANSACTION_REJECTED: {
+            console.log('TRANSACTION_REJECTED');
             this.closeWindow();
             resolve({ confirmed: false });
             break;
           }
           case ReceiveMessage.TRANSACTION_ERROR: {
+            console.log('TRANSACTION_ERROR');
             this.closeWindow();
             reject(new Error('Error during transaction confirmation'));
             break;
           }
           default:
+            console.log('Unsupported message type');
             this.closeWindow();
             reject(new Error('Unsupported message type'));
         }
@@ -215,6 +223,7 @@ export default class ConfirmationScreen {
         } catch { /* Empty */ }
       },
       () => {
+        console.log('Callback appended to overlay being called...');
         this.overlayClosed = true;
         this.closeWindow();
       },
@@ -224,6 +233,7 @@ export default class ConfirmationScreen {
   closeWindow() {
     this.confirmationWindow?.close();
     this.overlay?.remove();
+    console.log('Setting overlay to undefined...');
     this.overlay = undefined;
   }
 
@@ -236,13 +246,16 @@ export default class ConfirmationScreen {
     // This indicates the user closed the overlay so the transaction should be rejected
     if (!this.overlay) {
       this.overlayClosed = false;
+      console.log('no overlay - user closed the overlay');
       resolve({ confirmed: false });
       return;
     }
 
     // https://stackoverflow.com/questions/9388380/capture-the-close-event-of-popup-window-in-javascript/48240128#48240128
     const timerCallback = () => {
+      console.log(`timerCallback ${this.confirmationWindow?.closed} ${this.overlayClosed}`);
       if (this.confirmationWindow?.closed || this.overlayClosed) {
+        console.log('clearInterval');
         clearInterval(this.timer);
         window.removeEventListener('message', messageHandler);
         resolve({ confirmed: false });
@@ -258,6 +271,7 @@ export default class ConfirmationScreen {
   }
 
   private recreateConfirmationWindow(href: string, timerCallback: () => void) {
+    console.log('recreateConfirmationWindow');
     try {
       // Clears and recreates the timer to ensure when the confirmation window
       // is closed and recreated the transaction is not rejected.
