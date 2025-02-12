@@ -234,10 +234,13 @@ export default class ConfirmationScreen {
     this.confirmationWindow?.close();
     this.overlay?.remove();
     console.log('Setting overlay to undefined...');
+    console.log('overlay removed 4');
     this.overlay = undefined;
   }
 
   showConfirmationScreen(href: string, messageHandler: MessageHandler, resolve: Function) {
+    console.log('show confirmation screen');
+    
     // If popup blocked, the confirmation window will not exist
     if (this.confirmationWindow) {
       this.confirmationWindow.location.href = href;
@@ -257,6 +260,7 @@ export default class ConfirmationScreen {
       if (this.confirmationWindow?.closed || this.overlayClosed) {
         console.log('clearInterval');
         clearInterval(this.timer);
+        console.log('timerCallback - confirmation window closed');
         window.removeEventListener('message', messageHandler);
         resolve({ confirmed: false });
         this.overlayClosed = false;
