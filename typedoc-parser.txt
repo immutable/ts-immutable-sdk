@@ -8,7 +8,7 @@ const outputFilePath = 'docs/parsed/{package_name}.json';
 
 let typeToString;
 let extractClassDetails;
-let extractInterfaceDetails;
+// let extractInterfaceDetails;
 
 /**
  * Converts a reflection type to a string representation by examining its children properties.
@@ -176,9 +176,9 @@ function extractDetails(nodes, currentPackage = null) {
       case 128: // Class
         detail = extractClassDetails(node);
         break;
-      case 256: // Interface
+      /*case 256: // Interface
         detail = extractInterfaceDetails(node);
-        break;
+        break; */
       default:
         break;
     }
