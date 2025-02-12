@@ -160,7 +160,7 @@ export default class GuardianClient {
         );
 
         if (!confirmationResult.confirmed) {
-          throw new Error('asd');
+          throw new Error('Transaction rejected by user');
         }
       } else {
         this.confirmationScreen.closeWindow();
