@@ -1,7 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
-import { track } from '@imtbl/metrics';
 import { Passport } from '@imtbl/passport';
 import { ethers } from 'ethers';
 import { HttpClient } from './api/http';
@@ -78,7 +77,6 @@ import * as wallet from './wallet';
 import { WidgetConfiguration } from './widgets/definitions/configurations';
 import { getWidgetsEsmUrl, loadUnresolvedBundle } from './widgets/load';
 import { determineWidgetsVersion, getLatestVersion, validateAndBuildVersion } from './widgets/version';
-import { globalPackageVersion } from './env';
 import { AssessmentResult, fetchRiskAssessment, isAddressSanctioned } from './riskAssessment';
 
 const SANDBOX_CONFIGURATION = {
@@ -122,8 +120,6 @@ export class Checkout {
 
     // Initialise injected providers via EIP-6963
     InjectedProvidersManager.getInstance().initialise();
-
-    track('checkout_sdk', 'initialised');
   }
 
   /**
@@ -149,12 +145,6 @@ export class Checkout {
       initVersionProvided,
       versionConfig,
     );
-
-    track('checkout_sdk', 'widgets', {
-      sdkVersion: globalPackageVersion(),
-      validatedSdkVersion: validatedBuildVersion,
-      widgetsVersion,
-    });
 
     try {
       const factory = await this.loadEsModules(init.config, widgetsVersion);

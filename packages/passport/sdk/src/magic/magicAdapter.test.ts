@@ -1,8 +1,9 @@
 import { LoginWithOpenIdParams, OpenIdExtension } from '@magic-ext/oidc';
 import { Magic } from 'magic-sdk';
 import MagicAdapter from './magicAdapter';
-import { PassportConfiguration } from './config';
-import { PassportError, PassportErrorType } from './errors/passportError';
+import { PassportConfiguration } from '../config';
+import { PassportError, PassportErrorType } from '../errors/passportError';
+import { MagicProviderProxyFactory } from './magicProviderProxyFactory';
 
 const loginWithOIDCMock:jest.MockedFunction<(args: LoginWithOpenIdParams) => Promise<void>> = jest.fn();
 
@@ -18,10 +19,13 @@ jest.mock('@magic-ext/oidc', () => ({
 describe('MagicWallet', () => {
   const apiKey = 'pk_live_A7D9211D7547A338';
   const providerId = 'mPGZAvZsFkyfT6OWfML1HgTKjPqYOPkhhOj-8qCGeqI=';
-  const config: PassportConfiguration = {
+  const config = {
     magicPublishableApiKey: apiKey,
     magicProviderId: providerId,
   } as PassportConfiguration;
+  const magicProviderProxyFactory = {
+    createProxy: jest.fn(),
+  } as unknown as MagicProviderProxyFactory;
   const idToken = 'e30=.e30=.e30=';
 
   beforeEach(() => {
@@ -35,6 +39,7 @@ describe('MagicWallet', () => {
       },
       rpcProvider,
     }));
+    (magicProviderProxyFactory.createProxy as jest.Mock).mockImplementation(() => rpcProvider);
   });
 
   describe('constructor', () => {
@@ -54,7 +59,7 @@ describe('MagicWallet', () => {
       });
       it('starts initialising the magicClient', () => {
         jest.spyOn(window.document, 'readyState', 'get').mockReturnValue('complete');
-        const magicAdapter = new MagicAdapter(config);
+        const magicAdapter = new MagicAdapter(config, magicProviderProxyFactory);
         // @ts-ignore
         expect(magicAdapter.lazyMagicClient).toBeDefined();
       });
@@ -71,7 +76,7 @@ describe('MagicWallet', () => {
       });
 
       it('does nothing', () => {
-        const magicAdapter = new MagicAdapter(config);
+        const magicAdapter = new MagicAdapter(config, magicProviderProxyFactory);
         // @ts-ignore
         expect(magicAdapter.magicClientPromise).toBeUndefined();
       });
@@ -80,7 +85,7 @@ describe('MagicWallet', () => {
 
   describe('login', () => {
     it('should call loginWithOIDC and initialise the provider with the correct arguments', async () => {
-      const magicAdapter = new MagicAdapter(config);
+      const magicAdapter = new MagicAdapter(config, magicProviderProxyFactory);
       const magicProvider = await magicAdapter.login(idToken);
 
       expect(Magic).toHaveBeenCalledWith(apiKey, {
@@ -93,11 +98,12 @@ describe('MagicWallet', () => {
         providerId,
       });
 
+      expect(magicProviderProxyFactory.createProxy).toHaveBeenCalled();
       expect(magicProvider).toEqual(rpcProvider);
     });
 
     it('should throw a PassportError when an error is thrown', async () => {
-      const magicAdapter = new MagicAdapter(config);
+      const magicAdapter = new MagicAdapter(config, magicProviderProxyFactory);
 
       loginWithOIDCMock.mockImplementation(() => {
         throw new Error('oops');
@@ -116,7 +122,7 @@ describe('MagicWallet', () => {
 
   describe('logout', () => {
     it('calls the logout function', async () => {
-      const magicAdapter = new MagicAdapter(config);
+      const magicAdapter = new MagicAdapter(config, magicProviderProxyFactory);
       await magicAdapter.login(idToken);
       await magicAdapter.logout();
 

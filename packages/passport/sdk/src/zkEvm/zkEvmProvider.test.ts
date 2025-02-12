@@ -12,7 +12,7 @@ import { PassportEventMap, PassportEvents } from '../types';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import { mockUser, mockUserZkEvm, testConfig } from '../test/mocks';
 import { signTypedDataV4 } from './signTypedDataV4';
-import MagicAdapter from '../magicAdapter';
+import MagicAdapter from '../magic/magicAdapter';
 import { signEjectionTransaction } from './signEjectionTransaction';
 
 jest.mock('@ethersproject/providers');
@@ -47,6 +47,9 @@ describe('ZkEvmProvider', () => {
     (trackFlow as unknown as jest.Mock).mockImplementation(() => ({
       addEvent: jest.fn(),
       end: jest.fn(),
+      details: {
+        flowId: '123',
+      },
     }));
     (guardianClient.withConfirmationScreen as jest.Mock)
       .mockImplementation(() => (task: () => void) => task());

@@ -11,7 +11,7 @@ import {
 } from '@imtbl/metrics';
 import { isAxiosError } from 'axios';
 import AuthManager from './authManager';
-import MagicAdapter from './magicAdapter';
+import MagicAdapter from './magic/magicAdapter';
 import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
@@ -35,6 +35,7 @@ import logger from './utils/logger';
 import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
 import { isAPIError, PassportError, PassportErrorType } from './errors/passportError';
 import { withMetrics, withMetricsAsync } from './utils/metrics';
+import { MagicProviderProxyFactory } from './magic/magicProviderProxyFactory';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
   if (passportModuleConfiguration.overrides) {
@@ -56,7 +57,8 @@ const buildImxApiClients = (passportModuleConfiguration: PassportModuleConfigura
 export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConfiguration) => {
   const config = new PassportConfiguration(passportModuleConfiguration);
   const authManager = new AuthManager(config);
-  const magicAdapter = new MagicAdapter(config);
+  const magicProviderProxyFactory = new MagicProviderProxyFactory(authManager, config);
+  const magicAdapter = new MagicAdapter(config, magicProviderProxyFactory);
   const confirmationScreen = new ConfirmationScreen(config);
   const multiRollupApiClients = new MultiRollupApiClients(config.multiRollupConfig);
   const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
@@ -137,11 +139,11 @@ export class Passport {
    * `connectImx` instead.
    */
   public async connectImxSilent(): Promise<IMXProvider | null> {
-    return withMetricsAsync(() => this.passportImxProviderFactory.getProviderSilent(), 'connectImxSilent');
+    return withMetricsAsync(() => this.passportImxProviderFactory.getProviderSilent(), 'connectImxSilent', false);
   }
 
   public async connectImx(): Promise<IMXProvider> {
-    return withMetricsAsync(() => this.passportImxProviderFactory.getProvider(), 'connectImx');
+    return withMetricsAsync(() => this.passportImxProviderFactory.getProvider(), 'connectImx', false);
   }
 
   public connectEvm(options: {
@@ -167,7 +169,7 @@ export class Passport {
       }
 
       return provider;
-    }, 'connectEvm');
+    }, 'connectEvm', false);
   }
 
   /**
@@ -305,21 +307,21 @@ export class Passport {
     return withMetricsAsync(async () => {
       const user = await this.authManager.getUser();
       return user?.profile;
-    }, 'getUserInfo');
+    }, 'getUserInfo', false);
   }
 
   public async getIdToken(): Promise<string | undefined> {
     return withMetricsAsync(async () => {
       const user = await this.authManager.getUser();
       return user?.idToken;
-    }, 'getIdToken');
+    }, 'getIdToken', false);
   }
 
   public async getAccessToken(): Promise<string | undefined> {
     return withMetricsAsync(async () => {
       const user = await this.authManager.getUser();
       return user?.accessToken;
-    }, 'getAccessToken');
+    }, 'getAccessToken', false, false);
   }
 
   public async getLinkedAddresses(): Promise<string[]> {
@@ -331,11 +333,11 @@ export class Passport {
       const headers = { Authorization: `Bearer ${user.accessToken}` };
       const getUserInfoResult = await this.multiRollupApiClients.passportProfileApi.getUserInfo({ headers });
       return getUserInfoResult.data.linked_addresses;
-    }, 'getLinkedAddresses');
+    }, 'getLinkedAddresses', false);
   }
 
   public async linkExternalWallet(params: LinkWalletParams): Promise<LinkedWallet> {
-    const flow = trackFlow('passport', 'linkExternalWallet');
+    const flow = trackFlow('passport', 'linkExternalWallet', false);
 
     const user = await this.authManager.getUser();
     if (!user) {
@@ -363,8 +365,9 @@ export class Passport {
     } catch (error) {
       if (error instanceof Error) {
         trackError('passport', 'linkExternalWallet', error);
+      } else {
+        flow.addEvent('errored');
       }
-      flow.addEvent('errored');
 
       if (isAxiosError(error) && error.response) {
         if (error.response.data && isAPIError(error.response.data)) {
