@@ -200,7 +200,7 @@ export class ZkEvmProvider implements Provider {
     // we can submit a session activity request per SCW in parallel without a SCW
     // INVALID_NONCE error.
     console.log('callSessionActivity');
-    const nonceSpace: bigint = BigInt(1);
+    const nonceSpace: BigNumber = BigNumber.from(1);
     const sendTransactionClosure = async (params: Array<any>, flow: Flow) => {
       const ethSigner = await this.#getSigner();
       return await sendTransaction({
