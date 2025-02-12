@@ -93,17 +93,9 @@ export class ZkEvmProvider implements Provider {
     this.#guardianClient = guardianClient;
     this.#passportEventEmitter = passportEventEmitter;
 
-    if (config.jsonRpcReferrer) {
-      // StaticJsonRpcProvider by default sets the referrer as "client".
-      // On Unreal 4 this errors as the browser used is expecting a valid URL.
-      this.#rpcProvider = new JsonRpcProvider(this.#config.zkEvmRpcUrl, undefined, {
-        staticNetwork: true,
-      });
-    } else {
-      this.#rpcProvider = new JsonRpcProvider(this.#config.zkEvmRpcUrl, undefined, {
-        staticNetwork: true,
-      });
-    }
+    this.#rpcProvider = new JsonRpcProvider(this.#config.zkEvmRpcUrl, undefined, {
+      staticNetwork: true,
+    });
 
     this.#relayerClient = new RelayerClient({
       config: this.#config,
