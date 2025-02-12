@@ -26,6 +26,7 @@ The need for a Typescript SDK arises from the challenges developers face when ma
     - [Building](#building)
     - [Linting](#linting)
     - [Installing to a local project](#installing-to-a-local-project)
+    - [Alpha Packages](#alpha-packages)
 - [Technical Architecture](#technical-architecture)
 - [Contribution Guides](#contribution-guides)
 - [Examples](#examples)
@@ -130,6 +131,12 @@ If you need to test changes to any SDK package in the specific context of your o
 3. In your external local project, such as a separate nextjs app, install the SDK using the `file:` protocol as the version pointing to the sdk tarball file, for eg `"@imtbl/sdk": "file:../ts-immutable-sdk/imtbl-sdk-0.0.0.tgz",`
 
 This will allow you to emulate an external consumer of the SDK, and test your changes in the context of your own application, using a local version of the SDK that you can modify and test as needed.
+
+### Alpha Packages
+
+Alpha packages are packages that are still in development and are not yet ready for production use. When releasing packages via nx release, alpha packages will not be published to npm. 
+
+Alpha packages are excluded from release by the `!@imtbl-alpha/**` exclusion in the `nx.json` file, and so any package with the name starting with `@imtbl-alpha/` will be considered an alpha package.
 
 # Technical Architecture
 The Typescript SDK is designed as a Pnpm Workspace monorepo that contains all the packages from different Immutable products. Each product area has its own package within the monorepo, and these packages are imported and re-exported by one root-level package.
