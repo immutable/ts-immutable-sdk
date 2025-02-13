@@ -19,7 +19,7 @@ To install this package, run the following command:
 ```sh
 npm add @imtbl/config
 # or
-yarn add @imtbl/config
+pnpm add @imtbl/config
 # or
 pnpm add @imtbl/config
 ```

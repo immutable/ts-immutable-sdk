@@ -39,7 +39,7 @@ To install this package, run the following command:
 ```sh
 npm add @imtbl/orderbook
 # or
-yarn add @imtbl/orderbook
+pnpm add @imtbl/orderbook
 # or
 pnpm add @imtbl/orderbook
 ```

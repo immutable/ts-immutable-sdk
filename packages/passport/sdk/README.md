@@ -28,7 +28,7 @@ To install this package, run the following command:
 ```sh
 npm add @imtbl/passport
 # or
-yarn add @imtbl/passport
+pnpm add @imtbl/passport
 # or
 pnpm add @imtbl/passport
 ```

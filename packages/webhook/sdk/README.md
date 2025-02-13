@@ -21,7 +21,7 @@ To install this package, run the following command:
 ```sh
 npm add @imtbl/webhook
 # or
-yarn add @imtbl/webhook
+pnpm add @imtbl/webhook
 # or
 pnpm add @imtbl/webhook
 ```

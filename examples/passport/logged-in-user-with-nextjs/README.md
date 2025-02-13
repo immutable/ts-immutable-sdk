@@ -9,7 +9,7 @@ This example app runs on Immutable Testnet. To use this code on Immutable zkEVM 
 Install your dependencies:
 
 ```bash
-yarn install
+pnpm install
 ```
 
 Copy over the `.env.example` file to `.env` and fill in the required environment variables.
@@ -21,7 +21,7 @@ Copy over the `.env.example` file to `.env` and fill in the required environment
 Run the app locally:
 
 ```bash
-yarn dev
+pnpm dev
 ```
 
 Then open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

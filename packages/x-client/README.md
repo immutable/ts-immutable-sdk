@@ -21,7 +21,7 @@ To install this package, run the following command:
 ```sh
 npm add @imtbl/x-client
 # or
-yarn add @imtbl/x-client
+pnpm add @imtbl/x-client
 # or
 pnpm add @imtbl/x-client
 ```

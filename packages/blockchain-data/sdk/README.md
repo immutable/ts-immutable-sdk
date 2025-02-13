@@ -26,7 +26,7 @@ To install this package, run the following command:
 ```sh
 npm add @imtbl/blockchain-data
 # or
-yarn add @imtbl/blockchain-data
+pnpm add @imtbl/blockchain-data
 # or
 pnpm add @imtbl/blockchain-data
 ```

@@ -12,7 +12,7 @@ This example app shows how to use the Commerce Widget, loaded from the Checkout 
 Install your dependencies:
 
 ```bash
-yarn install
+pnpm install
 ```
 
 Copy over the `.env.example` file to `.env` and fill in the required environment variables.
@@ -24,7 +24,7 @@ Copy over the `.env.example` file to `.env` and fill in the required environment
 ## Running locally
 
 ```bash
-yarn dev
+pnpm dev
 ```
 
 ## E2E Testing
@@ -34,29 +34,29 @@ There are tests covering the auto updating of the Commerce Widget.
 Build the app:
 
 ```bash
-yarn build
+pnpm build
 ```
 
 Run tests with latest compatible remote bundle of the widgets:
 
 ```bash
-yarn test:remotewidgets
+pnpm test:remotewidgets
 ```
 
 To run these tests using a local bundle of the widgets, first build the entire Checkout SDK from the root of `ts-immutable-sdk`:
 
 ```bash
-yarn build
+pnpm build
 ```
 
 Copy over the created widgets bundle to use for testing:
 
 ```bash
-yarn workspace @examples/commerce-widget-nextjs prepare:widgets
+pnpm --filter @examples/commerce-widget-nextjs prepare:widgets
 ```
 
 Run tests against the local bundle:
 
 ```bash
-yarn test
+pnpm test
 ```

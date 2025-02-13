@@ -23,7 +23,7 @@ This React application allows users to migrate their NFTs from Immutable X to Im
 1. **Install dependencies**:
    At the root of the repo, run the following if you haven't already.
    ```bash
-   yarn install
+   pnpm install
    ```
 
 2. **Set up environment variables**:
