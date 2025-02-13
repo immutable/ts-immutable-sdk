@@ -20,7 +20,7 @@ Checkout our API references for more information.
 ```sh
 npm add @imtbl/sdk
 # or
-yarn add @imtbl/sdk
+pnpm add @imtbl/sdk
 # or
 pnpm add @imtbl/sdk
 ```
