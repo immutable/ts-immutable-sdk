@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { EIP712MessageDomain } from './eip712-message-domain';
+import { DomainType } from './domain-type';
 // May contain unused imports in some cases
 // @ts-ignore
 import { EIP712MessageTypes } from './eip712-message-types';
@@ -40,10 +40,10 @@ export interface EIP712Message {
     'primaryType': string;
     /**
      * 
-     * @type {EIP712MessageDomain}
+     * @type {DomainType}
      * @memberof EIP712Message
      */
-    'domain': EIP712MessageDomain;
+    'domain': DomainType;
     /**
      * 
      * @type {object}
