@@ -17,7 +17,7 @@
     "@imtbl/generated-clients": "workspace:*",
     "axios": "^1.6.5",
     "bn.js": "^5.2.1",
-    "elliptic": "^6.5.7",
+    "elliptic": "^6.6.1",
     "enc-utils": "^3.0.0",
     "ethers": "^5.7.2",
     "hash.js": "^1.1.7"
