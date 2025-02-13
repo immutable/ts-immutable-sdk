@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { Eip1193Provider } from 'ethers';
 import { MagicProviderProxyFactory } from './magicProviderProxyFactory';
 import AuthManager from '../authManager';
 import { PassportConfiguration } from '../config';
@@ -8,7 +8,7 @@ describe('MagicProviderProxyFactory', () => {
   let mockAuthManager: jest.Mocked<AuthManager>;
   let mockConfig: PassportConfiguration;
   let mockMagicClient: jest.Mocked<MagicClient>;
-  let mockRpcProvider: jest.Mocked<ethers.providers.ExternalProvider>;
+  let mockRpcProvider: jest.Mocked<Eip1193Provider>;
   let factory: MagicProviderProxyFactory;
 
   beforeEach(() => {
