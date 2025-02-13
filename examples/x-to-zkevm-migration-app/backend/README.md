@@ -28,7 +28,7 @@ This service:
 
 At the root of the repo, run the following if you haven't already.
 ```bash
-yarn install
+pnpm install
 ```
 
 2. **Set up environment variables:**

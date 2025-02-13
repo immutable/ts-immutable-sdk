@@ -14,8 +14,7 @@ const config: Config = {
   moduleNameMapper: {
     "@imtbl/sdk/provider": "<rootDir>/../../../node_modules/@imtbl/sdk/dist/provider",
     "@imtbl/sdk/config": "<rootDir>/../../../node_modules/@imtbl/sdk/dist/config",
-    "@imtbl/sdk/x_client": "<rootDir>/../../../node_modules/@imtbl/sdk/dist/x_client",
-    "@imtbl/generated-clients": "<rootDir>/../../../node_modules/@imtbl/generated-clients/dist"
+    "@imtbl/sdk/x_client": "<rootDir>/../../../node_modules/@imtbl/sdk/dist/x_client"
   },
   transform: {
     "^.+\\.(t|j)sx?$": "@swc/jest"
@@ -25,7 +24,6 @@ const config: Config = {
     "^.+\\.module\\.(css|sass|scss)$",
   ],
   setupFilesAfterEnv: ['./jest.setup.ts'],
-  modulePathIgnorePatterns: ['<rootDir>/.yalc'],
 };
 
 export default config;

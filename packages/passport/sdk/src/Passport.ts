@@ -246,8 +246,8 @@ export class Passport {
     }, 'loginWithDeviceFlowCallback');
   }
 
-  public loginWithPKCEFlow(): string {
-    return withMetrics(() => this.authManager.getPKCEAuthorizationUrl(), 'loginWithPKCEFlow');
+  public loginWithPKCEFlow(): Promise<string> {
+    return withMetricsAsync(async () => await this.authManager.getPKCEAuthorizationUrl(), 'loginWithPKCEFlow');
   }
 
   public async loginWithPKCEFlowCallback(
