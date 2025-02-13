@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { Eip1193Provider } from 'ethers';
 import AuthManager from '../authManager';
 import { PassportConfiguration } from '../config';
 import { MagicClient } from './types';
@@ -26,11 +26,11 @@ export class MagicProviderProxyFactory {
     this.config = config;
   }
 
-  createProxy(magicClient: MagicClient): ethers.providers.ExternalProvider {
-    const magicRpcProvider = magicClient.rpcProvider as unknown as ethers.providers.ExternalProvider;
+  createProxy(magicClient: MagicClient): Eip1193Provider {
+    const magicRpcProvider = magicClient.rpcProvider as unknown as Eip1193Provider;
 
-    const proxyHandler: ProxyHandler<ethers.providers.ExternalProvider> = {
-      get: (target: ethers.providers.ExternalProvider, property: string, receiver: any) => {
+    const proxyHandler: ProxyHandler<Eip1193Provider> = {
+      get: (target: Eip1193Provider, property: string, receiver: any) => {
         if (property === 'request') {
           return async (...args: any[]) => {
             try {

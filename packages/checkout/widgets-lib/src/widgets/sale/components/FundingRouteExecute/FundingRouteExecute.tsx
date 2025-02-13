@@ -142,7 +142,7 @@ export function FundingRouteExecute({
           tokenAddress: step.fundingItem.token.address,
           amount: step.fundingItem.fundsRequired.formattedAmount,
         });
-        if (network.chainId === getL1ChainId(checkout!.config)) {
+        if (Number(network.chainId) === getL1ChainId(checkout!.config)) {
           setView(FundingRouteExecuteViews.EXECUTE_BRIDGE);
           return;
         }
@@ -158,7 +158,7 @@ export function FundingRouteExecute({
           toTokenAddress: requiredTokenAddress,
           autoProceed: true,
         });
-        if (network.chainId === getL2ChainId(checkout!.config)) {
+        if (Number(network.chainId) === getL2ChainId(checkout!.config)) {
           setView(FundingRouteExecuteViews.EXECUTE_SWAP);
           return;
         }
@@ -331,7 +331,7 @@ export function FundingRouteExecute({
           targetChainId={
             checkout!.config.isProduction ? ChainId.ETHEREUM : ChainId.SEPOLIA
           }
-          web3Provider={provider}
+          browserProvider={provider}
           checkout={checkout!}
           deepLink={ConnectWidgetViews.SWITCH_NETWORK}
         />
@@ -344,7 +344,7 @@ export function FundingRouteExecute({
               ? ChainId.IMTBL_ZKEVM_MAINNET
               : ChainId.IMTBL_ZKEVM_TESTNET
           }
-          web3Provider={provider}
+          browserProvider={provider}
           checkout={checkout!}
           deepLink={ConnectWidgetViews.SWITCH_NETWORK}
         />

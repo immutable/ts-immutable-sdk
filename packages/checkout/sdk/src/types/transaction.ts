@@ -1,16 +1,13 @@
-import {
-  TransactionRequest,
-  TransactionResponse,
-  Web3Provider,
-} from '@ethersproject/providers';
+import { TransactionRequest, TransactionResponse, Eip1193Provider } from 'ethers';
+import { WrappedBrowserProvider } from './provider';
 
 /**
  * Interface representing the parameters for {@link Checkout.sendTransaction}.
- * @property {Web3Provider} provider - The provider to connect to the network.
+ * @property {WrappedBrowserProvider | Eip1193Provider} provider - The provider to connect to the network.
  * @property {TransactionRequest} transaction - The transaction to send.
  */
 export interface SendTransactionParams {
-  provider: Web3Provider;
+  provider: WrappedBrowserProvider | Eip1193Provider;
   transaction: TransactionRequest;
 }
 

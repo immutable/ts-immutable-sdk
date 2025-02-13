@@ -1,7 +1,6 @@
 import {
   ChainId, Checkout, GetBalanceResult, TokenInfo,
 } from '@imtbl/checkout-sdk';
-import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import {
   calculateCryptoToFiat,
@@ -27,7 +26,7 @@ describe('utils', () => {
     it('should sort tokens by amount', () => {
       const tokens: GetBalanceResult[] = [
         {
-          balance: BigNumber.from('100000000000000000000'),
+          balance: BigInt('100000000000000000000'),
           formattedBalance: '100.0',
           token: {
             name: 'Matic',
@@ -35,7 +34,7 @@ describe('utils', () => {
           } as unknown as TokenInfo,
         },
         {
-          balance: BigNumber.from('50000000000000000000'),
+          balance: BigInt('50000000000000000000'),
           formattedBalance: '50.0',
           token: {
             name: 'Gods Unchained',
@@ -43,7 +42,7 @@ describe('utils', () => {
           } as unknown as TokenInfo,
         },
         {
-          balance: BigNumber.from('50000000000000000001'),
+          balance: BigInt('50000000000000000001'),
           formattedBalance: '50.0',
           token: {
             name: 'Ethereum',
@@ -56,7 +55,7 @@ describe('utils', () => {
         sortTokensByAmount(checkout.config, tokens, ChainId.ETHEREUM),
       ).toEqual([
         {
-          balance: BigNumber.from('100000000000000000000'),
+          balance: BigInt('100000000000000000000'),
           formattedBalance: '100.0',
           token: {
             name: 'Matic',
@@ -64,7 +63,7 @@ describe('utils', () => {
           } as unknown as TokenInfo,
         },
         {
-          balance: BigNumber.from('50000000000000000001'),
+          balance: BigInt('50000000000000000001'),
           formattedBalance: '50.0',
           token: {
             name: 'Ethereum',
@@ -72,7 +71,7 @@ describe('utils', () => {
           } as unknown as TokenInfo,
         },
         {
-          balance: BigNumber.from('50000000000000000000'),
+          balance: BigInt('50000000000000000000'),
           formattedBalance: '50.0',
           token: {
             name: 'Gods Unchained',
@@ -87,7 +86,7 @@ describe('utils', () => {
         text: 'IMX is first in list',
         tokens: [
           {
-            balance: BigNumber.from('0'),
+            balance: BigInt('0'),
             formattedBalance: '0.0',
             token: {
               name: 'IMX',
@@ -95,7 +94,7 @@ describe('utils', () => {
             } as unknown as TokenInfo,
           },
           {
-            balance: BigNumber.from('100000000000000000000'),
+            balance: BigInt('100000000000000000000'),
             formattedBalance: '100.0',
             token: {
               name: 'Matic',
@@ -103,7 +102,7 @@ describe('utils', () => {
             } as unknown as TokenInfo,
           },
           {
-            balance: BigNumber.from('50000000000000000000'),
+            balance: BigInt('50000000000000000000'),
             formattedBalance: '50.0',
             token: {
               name: 'Gods Unchained',
@@ -111,7 +110,7 @@ describe('utils', () => {
             } as unknown as TokenInfo,
           },
           {
-            balance: BigNumber.from('50000000000000000001'),
+            balance: BigInt('50000000000000000001'),
             formattedBalance: '50.0',
             token: {
               name: 'Ethereum',
@@ -119,7 +118,7 @@ describe('utils', () => {
             } as unknown as TokenInfo,
           },
           {
-            balance: BigNumber.from('0'),
+            balance: BigInt('0'),
             formattedBalance: '0.0',
             token: {
               name: 'AAA',
@@ -132,7 +131,7 @@ describe('utils', () => {
         text: 'IMX is NOT first in list',
         tokens: [
           {
-            balance: BigNumber.from('100000000000000000000'),
+            balance: BigInt('100000000000000000000'),
             formattedBalance: '100.0',
             token: {
               name: 'Matic',
@@ -140,7 +139,7 @@ describe('utils', () => {
             } as unknown as TokenInfo,
           },
           {
-            balance: BigNumber.from('50000000000000000000'),
+            balance: BigInt('50000000000000000000'),
             formattedBalance: '50.0',
             token: {
               name: 'Gods Unchained',
@@ -148,7 +147,7 @@ describe('utils', () => {
             } as unknown as TokenInfo,
           },
           {
-            balance: BigNumber.from('0'),
+            balance: BigInt('0'),
             formattedBalance: '0.0',
             token: {
               name: 'IMX',
@@ -156,7 +155,7 @@ describe('utils', () => {
             } as unknown as TokenInfo,
           },
           {
-            balance: BigNumber.from('50000000000000000001'),
+            balance: BigInt('50000000000000000001'),
             formattedBalance: '50.0',
             token: {
               name: 'Ethereum',
@@ -164,7 +163,7 @@ describe('utils', () => {
             } as unknown as TokenInfo,
           },
           {
-            balance: BigNumber.from('0'),
+            balance: BigInt('0'),
             formattedBalance: '0.0',
             token: {
               name: 'AAA',
@@ -184,7 +183,7 @@ describe('utils', () => {
           ),
         ).toEqual([
           {
-            balance: BigNumber.from('0'),
+            balance: BigInt('0'),
             formattedBalance: '0.0',
             token: {
               name: 'IMX',
@@ -192,7 +191,7 @@ describe('utils', () => {
             } as unknown as TokenInfo,
           },
           {
-            balance: BigNumber.from('100000000000000000000'),
+            balance: BigInt('100000000000000000000'),
             formattedBalance: '100.0',
             token: {
               name: 'Matic',
@@ -200,7 +199,7 @@ describe('utils', () => {
             } as unknown as TokenInfo,
           },
           {
-            balance: BigNumber.from('50000000000000000001'),
+            balance: BigInt('50000000000000000001'),
             formattedBalance: '50.0',
             token: {
               name: 'Ethereum',
@@ -208,7 +207,7 @@ describe('utils', () => {
             } as unknown as TokenInfo,
           },
           {
-            balance: BigNumber.from('50000000000000000000'),
+            balance: BigInt('50000000000000000000'),
             formattedBalance: '50.0',
             token: {
               name: 'Gods Unchained',
@@ -216,7 +215,7 @@ describe('utils', () => {
             } as unknown as TokenInfo,
           },
           {
-            balance: BigNumber.from('0'),
+            balance: BigInt('0'),
             formattedBalance: '0.0',
             token: {
               name: 'AAA',
@@ -230,7 +229,7 @@ describe('utils', () => {
     it('should sort tokens by amount and not put imx at top when not zkEVM', () => {
       const tokens: GetBalanceResult[] = [
         {
-          balance: BigNumber.from('100000000000000000000'),
+          balance: BigInt('100000000000000000000'),
           formattedBalance: '100.0',
           token: {
             name: 'Matic',
@@ -238,7 +237,7 @@ describe('utils', () => {
           } as unknown as TokenInfo,
         },
         {
-          balance: BigNumber.from('50000000000000000000'),
+          balance: BigInt('50000000000000000000'),
           formattedBalance: '50.0',
           token: {
             name: 'Gods Unchained',
@@ -246,7 +245,7 @@ describe('utils', () => {
           } as unknown as TokenInfo,
         },
         {
-          balance: BigNumber.from('0'),
+          balance: BigInt('0'),
           formattedBalance: '0.0',
           token: {
             name: 'ImmutableX',
@@ -254,7 +253,7 @@ describe('utils', () => {
           } as unknown as TokenInfo,
         },
         {
-          balance: BigNumber.from('50000000000000000001'),
+          balance: BigInt('50000000000000000001'),
           formattedBalance: '50.0',
           token: {
             name: 'Ethereum',
@@ -267,7 +266,7 @@ describe('utils', () => {
         sortTokensByAmount(checkout.config, tokens, ChainId.ETHEREUM),
       ).toEqual([
         {
-          balance: BigNumber.from('100000000000000000000'),
+          balance: BigInt('100000000000000000000'),
           formattedBalance: '100.0',
           token: {
             name: 'Matic',
@@ -275,7 +274,7 @@ describe('utils', () => {
           } as unknown as TokenInfo,
         },
         {
-          balance: BigNumber.from('50000000000000000001'),
+          balance: BigInt('50000000000000000001'),
           formattedBalance: '50.0',
           token: {
             name: 'Ethereum',
@@ -283,7 +282,7 @@ describe('utils', () => {
           } as unknown as TokenInfo,
         },
         {
-          balance: BigNumber.from('50000000000000000000'),
+          balance: BigInt('50000000000000000000'),
           formattedBalance: '50.0',
           token: {
             name: 'Gods Unchained',
@@ -291,7 +290,7 @@ describe('utils', () => {
           } as unknown as TokenInfo,
         },
         {
-          balance: BigNumber.from('0'),
+          balance: BigInt('0'),
           formattedBalance: '0.0',
           token: {
             name: 'ImmutableX',

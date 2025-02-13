@@ -8,7 +8,7 @@ export default defineConfig((options) => {
   if (options.watch) {
     // Watch mode
     return {
-      outDir: 'dist',
+      outDir: 'dist/browser',
       format: 'esm',
       target: 'es2022',
       platform: 'browser',
@@ -25,6 +25,7 @@ export default defineConfig((options) => {
       target: 'es2022',
       minify: true,
       bundle: true,
+      noExternal: ['@uniswap/swap-router-contracts'],
       treeshake: true,
       esbuildPlugins: [
         nodeModulesPolyfillPlugin({
@@ -48,6 +49,7 @@ export default defineConfig((options) => {
       target: 'es2022',
       minify: true,
       bundle: true,
+      noExternal: ['@uniswap/swap-router-contracts'],
       treeshake: true,
       esbuildPlugins: [
         replace({ 

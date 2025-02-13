@@ -1,7 +1,7 @@
 // #doc passport-wallets-nextjs-sign-isvalidsignature
-
-import { ethers } from 'ethers';
 import { Provider } from '@imtbl/passport';
+import { BrowserProvider } from 'ethers';
+import { Contract } from 'ethers';
 
 // https://eips.ethereum.org/EIPS/eip-1271#specification
 // EIP-1271 states that `isValidSignature` must return the following value if the signature is valid
@@ -13,10 +13,10 @@ export const isValidSignature = async (
   signature: string,
   zkEvmProvider: Provider, // can be any provider, Passport or not
 ) => {
-  const contract = new ethers.Contract(
+  const contract = new Contract(
     address,
     ['function isValidSignature(bytes32, bytes) public view returns (bytes4)'],
-    new ethers.providers.Web3Provider(zkEvmProvider),
+    new BrowserProvider(zkEvmProvider),
   );
 
   const isValidSignatureHex = await contract.isValidSignature(digest, signature);

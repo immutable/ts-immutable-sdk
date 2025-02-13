@@ -1,9 +1,9 @@
 import { Magic } from 'magic-sdk';
 import { UserManager } from 'oidc-client-ts';
-import { TransactionRequest } from '@ethersproject/providers';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { IMXClient } from '@imtbl/x-client';
 import encode from 'jwt-encode';
+import { TransactionRequest } from 'ethers';
 import { OidcConfiguration } from './types';
 import { mockValidIdToken } from './utils/token.test';
 import { buildPrivateVars, Passport } from './Passport';
@@ -56,7 +56,7 @@ const oidcConfiguration: OidcConfiguration = {
   logoutRedirectUri,
 };
 
-const getZkEvmProvider = () => {
+const getZkEvmProvider = async () => {
   const passport = new Passport({
     baseConfig: new ImmutableConfiguration({
       environment: Environment.SANDBOX,
@@ -68,7 +68,7 @@ const getZkEvmProvider = () => {
     scope: 'openid offline_access profile email transact',
   });
 
-  return passport.connectEvm();
+  return await passport.connectEvm();
 };
 
 describe('Passport', () => {
@@ -174,7 +174,7 @@ describe('Passport', () => {
             mswHandlers.rpcProvider.success,
           ]);
 
-          const zkEvmProvider = getZkEvmProvider();
+          const zkEvmProvider = await getZkEvmProvider();
 
           const accounts = await zkEvmProvider.request({
             method: 'eth_requestAccounts',
@@ -187,17 +187,18 @@ describe('Passport', () => {
 
       describe('when the user is logging in for the first time', () => {
         beforeEach(() => {
-          mockMagicRequest.mockImplementationOnce(({ method }: RequestArguments) => {
-            expect(method).toEqual('eth_accounts');
-            return Promise.resolve([magicWalletAddress]);
-          });
-          mockMagicRequest.mockImplementationOnce(({ method }: RequestArguments) => {
-            expect(method).toEqual('eth_accounts');
-            return Promise.resolve([magicWalletAddress]);
-          });
-          mockMagicRequest.mockImplementationOnce(({ method }: RequestArguments) => {
-            expect(method).toEqual('personal_sign');
-            return Promise.resolve('0x05107ba1d76d8a5ba3415df36eb5af65f4c670778eed257f5704edcb03802cfc662f66b76e5aa032c2305e61ce77ed858bc9850f8c945ab6c3cb6fec796aae421c');
+          mockMagicRequest.mockImplementation(({ method }: RequestArguments) => {
+            switch (method) {
+              case 'eth_accounts': {
+                return Promise.resolve([magicWalletAddress]);
+              }
+              case 'personal_sign': {
+                return Promise.resolve('0x05107ba1d76d8a5ba3415df36eb5af65f4c670778eed257f5704edcb03802cfc662f66b76e5aa032c2305e61ce77ed858bc9850f8c945ab6c3cb6fec796aae421c');
+              }
+              default: {
+                throw new Error(`unexpected RPC method: ${method}`);
+              }
+            }
           });
         });
 
@@ -210,7 +211,7 @@ describe('Passport', () => {
             mswHandlers.api.chains.success,
           ]);
 
-          const zkEvmProvider = getZkEvmProvider();
+          const zkEvmProvider = await getZkEvmProvider();
 
           const accounts = await zkEvmProvider.request({
             method: 'eth_requestAccounts',
@@ -231,7 +232,7 @@ describe('Passport', () => {
               mswHandlers.api.chains.success,
             ]);
 
-            const zkEvmProvider = getZkEvmProvider();
+            const zkEvmProvider = await getZkEvmProvider();
 
             await expect(async () => zkEvmProvider.request({
               method: 'eth_requestAccounts',
@@ -269,7 +270,7 @@ describe('Passport', () => {
         });
         mockGetUser.mockResolvedValue(mockOidcUserZkevm);
 
-        const zkEvmProvider = getZkEvmProvider();
+        const zkEvmProvider = await getZkEvmProvider();
 
         await zkEvmProvider.request({
           method: 'eth_requestAccounts',
@@ -330,7 +331,7 @@ describe('Passport', () => {
 
         // user isn't logged in, so wont set signer when provider is instantiated
         // #doc request-accounts
-        const provider = passport.connectEvm();
+        const provider = await passport.connectEvm();
         const accounts = await provider.request({
           method: 'eth_requestAccounts',
         });
@@ -359,7 +360,7 @@ describe('Passport', () => {
 
     describe('eth_accounts', () => {
       it('returns no addresses if the user is not logged in', async () => {
-        const zkEvmProvider = getZkEvmProvider();
+        const zkEvmProvider = await getZkEvmProvider();
         const accounts = await zkEvmProvider.request({
           method: 'eth_accounts',
         });
@@ -372,7 +373,7 @@ describe('Passport', () => {
           mswHandlers.rpcProvider.success,
         ]);
 
-        const zkEvmProvider = getZkEvmProvider();
+        const zkEvmProvider = await getZkEvmProvider();
 
         const loggedInAccounts = await zkEvmProvider.request({
           method: 'eth_requestAccounts',

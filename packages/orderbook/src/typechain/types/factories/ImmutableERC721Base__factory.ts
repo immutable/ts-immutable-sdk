@@ -2,8 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer, utils } from "ethers";
-import type { Provider } from "@ethersproject/providers";
+import { Contract, Interface, type ContractRunner } from "ethers";
 import type {
   ImmutableERC721Base,
   ImmutableERC721BaseInterface,
@@ -901,12 +900,16 @@ const _abi = [
 export class ImmutableERC721Base__factory {
   static readonly abi = _abi;
   static createInterface(): ImmutableERC721BaseInterface {
-    return new utils.Interface(_abi) as ImmutableERC721BaseInterface;
+    return new Interface(_abi) as ImmutableERC721BaseInterface;
   }
   static connect(
     address: string,
-    signerOrProvider: Signer | Provider
+    runner?: ContractRunner | null
   ): ImmutableERC721Base {
-    return new Contract(address, _abi, signerOrProvider) as ImmutableERC721Base;
+    return new Contract(
+      address,
+      _abi,
+      runner
+    ) as unknown as ImmutableERC721Base;
   }
 }

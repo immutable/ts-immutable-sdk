@@ -149,7 +149,7 @@ export function OrderReview({
       return;
     }
 
-    if (!gasFees || gasFees.balance.lte(0)) {
+    if (!gasFees || gasFees.balance <= 0) {
       return;
     }
 

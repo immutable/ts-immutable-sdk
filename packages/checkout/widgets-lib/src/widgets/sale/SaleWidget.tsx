@@ -96,7 +96,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
 
     (async () => {
       const network = await checkout.getNetworkInfo({ provider });
-      chainId.current = network.chainId;
+      chainId.current = Number(network.chainId);
     })();
   }, [checkout, provider]);
 

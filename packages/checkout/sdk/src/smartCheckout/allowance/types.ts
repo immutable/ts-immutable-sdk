@@ -1,5 +1,4 @@
-import { TransactionRequest } from '@ethersproject/providers';
-import { BigNumber } from 'ethers';
+import { TransactionRequest } from 'ethers';
 import {
   ERC20Item, ERC721Item, ERC1155Item, ItemRequirement, ItemType,
 } from '../../types';
@@ -19,7 +18,7 @@ export type SufficientAllowance = {
 export type InsufficientERC20 = {
   type: ItemType.ERC20,
   sufficient: false,
-  delta: BigNumber,
+  delta: bigint,
   itemRequirement: ERC20Item,
   approvalTransaction: TransactionRequest | undefined,
 };

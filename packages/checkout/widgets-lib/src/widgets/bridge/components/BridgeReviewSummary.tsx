@@ -8,11 +8,11 @@ import {
   GasEstimateBridgeToL2Result,
   GasEstimateType,
   isAddressSanctioned,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
-import { BigNumber, utils } from 'ethers';
 import { useTranslation } from 'react-i18next';
-import { Web3Provider } from '@ethersproject/providers';
+import { formatUnits, parseUnits } from 'ethers';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import { abbreviateAddress } from '../../../lib/addressUtils';
 import { CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
@@ -129,14 +129,14 @@ export function BridgeReviewSummary() {
     const nativeTokenBalance = tokenBalances
       .find((balance) => isNativeToken(balance.token.address));
 
-    let requiredAmount = BigNumber.from(estimates.fees.totalFees);
+    let requiredAmount = BigInt(estimates.fees.totalFees);
     if (isNativeToken(token.address)) {
       // add native move amount to required amount as they need to cover
       // the gas + move amount
-      requiredAmount = requiredAmount.add(utils.parseUnits(amount, token.decimals));
+      requiredAmount += (parseUnits(amount, token.decimals));
     }
 
-    return !nativeTokenBalance || nativeTokenBalance.balance.lt(requiredAmount);
+    return !nativeTokenBalance || nativeTokenBalance.balance < requiredAmount;
   }, [tokenBalances, estimates, token, amount]);
 
   const displayAmount = useMemo(
@@ -174,23 +174,25 @@ export function BridgeReviewSummary() {
       fees: {},
       token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
     } as GasEstimateBridgeToL2Result;
-    let estimatePromise: Promise<BigNumber>;
+    let estimatePromise: Promise<bigint>;
     if (tokenToTransfer === NATIVE.toLowerCase()) {
-      estimatePromise = checkout.providerCall(from.web3Provider, async (provider) => await provider.estimateGas({
+      estimatePromise = checkout.providerCall(from.browserProvider, async (provider) => await provider.estimateGas({
         to: toAddress,
         // If 'from' not provided it assumes the transaction is being sent from the zero address.
         // Estimation will fail unless the amount is within the zero addresses balance.
         from: fromAddress,
-        value: utils.parseUnits(amount, token.decimals),
+        value: parseUnits(amount, token.decimals),
       }));
     } else {
-      const erc20 = getErc20Contract(tokenToTransfer, from.web3Provider.getSigner());
-      estimatePromise = erc20.estimateGas.transfer(toAddress, utils.parseUnits(amount, token.decimals));
+      const erc20 = getErc20Contract(tokenToTransfer, await from.browserProvider.getSigner());
+      estimatePromise = erc20.transfer.estimateGas(toAddress, parseUnits(amount, token.decimals));
     }
     try {
-      const [estimate, gasPrice] = await Promise.all([estimatePromise, from.web3Provider.getGasPrice()]);
-      const gas = estimate.mul(gasPrice);
-      const formattedEstimate = utils.formatUnits(gas, DEFAULT_TOKEN_DECIMALS);
+      const [estimate, gasPrice] = await Promise.all([
+        estimatePromise, (await from.browserProvider.getFeeData()).gasPrice,
+      ]);
+      const gas = estimate * (gasPrice ?? 0n);
+      const formattedEstimate = formatUnits(gas, DEFAULT_TOKEN_DECIMALS);
       gasEstimateResult.fees.sourceChainGas = gas;
       gasEstimateResult.fees.totalFees = gas;
       setEstimates(gasEstimateResult);
@@ -209,7 +211,7 @@ export function BridgeReviewSummary() {
       senderAddress: fromAddress,
       recipientAddress: toAddress,
       token: token.address ?? NATIVE.toUpperCase(),
-      amount: utils.parseUnits(amount, token.decimals),
+      amount: parseUnits(amount, token.decimals),
       sourceChainId: from?.network.toString(),
       destinationChainId: to?.network.toString(),
       gasMultiplier: 'auto',
@@ -221,7 +223,7 @@ export function BridgeReviewSummary() {
         warningType: WithdrawalQueueWarningType.TYPE_ACTIVE_QUEUE,
       });
     } else if (bundledTxn.delayWithdrawalLargeAmount && bundledTxn.largeTransferThresholds) {
-      const threshold = utils.formatUnits(bundledTxn.largeTransferThresholds, token.decimals);
+      const threshold = formatUnits(bundledTxn.largeTransferThresholds, token.decimals);
 
       setWithdrawalQueueWarning({
         visible: true,
@@ -251,8 +253,8 @@ export function BridgeReviewSummary() {
 
     let rawTotalFees = totalFees;
     if (!unsignedApproveTransaction.unsignedTx) {
-      rawTotalFees = totalFees.sub(approvalFee);
-      transactionFeeData.approvalFee = BigNumber.from(0);
+      rawTotalFees = totalFees - approvalFee;
+      transactionFeeData.approvalFee = BigInt(0);
     }
 
     const gasEstimateResult = {
@@ -264,7 +266,7 @@ export function BridgeReviewSummary() {
       token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
     } as GasEstimateBridgeToL2Result;
     setEstimates(gasEstimateResult);
-    const estimatedAmount = utils.formatUnits(
+    const estimatedAmount = formatUnits(
       gasEstimateResult?.fees.totalFees || 0,
       DEFAULT_TOKEN_DECIMALS,
     );
@@ -303,46 +305,45 @@ export function BridgeReviewSummary() {
     })();
   }, []);
 
-  const handleNetworkSwitch = useCallback((provider: Web3Provider) => {
+  const handleNetworkSwitch = useCallback((provider: WrappedBrowserProvider) => {
     bridgeDispatch({
       payload: {
         type: BridgeActions.SET_WALLETS_AND_NETWORKS,
         from: {
-          web3Provider: provider,
+          browserProvider: provider,
           walletAddress: from?.walletAddress!,
           walletProviderInfo: from?.walletProviderInfo!,
           network: from?.network!,
         },
         to: {
-          web3Provider: to?.web3Provider!,
+          browserProvider: to?.browserProvider!,
           walletAddress: to?.walletAddress!,
           walletProviderInfo: to?.walletProviderInfo!,
           network: to?.network!,
         },
       },
     });
-  }, [from?.web3Provider, from?.network, to?.web3Provider, to?.network]);
+  }, [from?.browserProvider, from?.network, to?.browserProvider, to?.network]);
 
   useEffect(() => {
-    if (!from?.web3Provider) return;
+    if (!from?.browserProvider) return;
 
     const handleChainChanged = () => {
-      const newProvider = new Web3Provider(from?.web3Provider.provider);
-      handleNetworkSwitch(newProvider);
+      handleNetworkSwitch(from.browserProvider);
       setShowSwitchNetworkDrawer(false);
     };
-    addChainChangedListener(from?.web3Provider, handleChainChanged);
+    addChainChangedListener(from.browserProvider, handleChainChanged);
 
     // eslint-disable-next-line consistent-return
     return () => {
-      removeChainChangedListener(from?.web3Provider, handleChainChanged);
+      removeChainChangedListener(from.browserProvider, handleChainChanged);
     };
-  }, [from?.web3Provider]);
+  }, [from?.browserProvider]);
 
   useEffect(() => {
     if (isWalletConnectEnabled) {
-      const isFromProviderWalletConnect = isWalletConnectProvider(from?.web3Provider);
-      const isToProviderWalletConnect = isWalletConnectProvider(to?.web3Provider);
+      const isFromProviderWalletConnect = isWalletConnectProvider(from?.browserProvider);
+      const isToProviderWalletConnect = isWalletConnectProvider(to?.browserProvider);
       setFromWalletIsWalletConnect(isFromProviderWalletConnect);
       setToWalletIsWalletConnect(isToProviderWalletConnect);
       (async () => {
@@ -354,7 +355,7 @@ export function BridgeReviewSummary() {
         }
       })();
     }
-  }, [isWalletConnectEnabled, from?.web3Provider, to?.web3Provider]);
+  }, [isWalletConnectEnabled, from?.browserProvider, to?.browserProvider]);
 
   useEffect(() => {
     if (insufficientFundsForGas) {
@@ -384,7 +385,8 @@ export function BridgeReviewSummary() {
     }
 
     try {
-      const currentChainId = await (from?.web3Provider.provider as any).request({ method: 'eth_chainId', params: [] });
+      // eslint-disable-next-line max-len
+      const currentChainId = await (from?.browserProvider.provider as any).send('eth_chainId', []);
       // eslint-disable-next-line radix
       const parsedChainId = parseInt(currentChainId.toString());
       if (parsedChainId !== from?.network) {
@@ -408,8 +410,8 @@ export function BridgeReviewSummary() {
           address: fromAddress,
           rdns: from?.walletProviderInfo?.rdns,
           uuid: from?.walletProviderInfo?.uuid,
-          isPassportWallet: isPassportProvider(from?.web3Provider),
-          isMetaMask: isMetaMaskProvider(from?.web3Provider),
+          isPassportWallet: isPassportProvider(from?.browserProvider),
+          isMetaMask: isMetaMaskProvider(from?.browserProvider),
         },
         toWalletAddress: toAddress,
         toNetwork,
@@ -417,8 +419,8 @@ export function BridgeReviewSummary() {
           address: toAddress,
           rdns: to?.walletProviderInfo?.rdns,
           uuid: to?.walletProviderInfo?.uuid,
-          isPassportWallet: isPassportProvider(to?.web3Provider),
-          isMetaMask: isMetaMaskProvider(to?.web3Provider),
+          isPassportWallet: isPassportProvider(to?.browserProvider),
+          isMetaMask: isMetaMaskProvider(to?.browserProvider),
         },
         amount,
         fiatAmount: fromFiatAmount,
@@ -441,10 +443,10 @@ export function BridgeReviewSummary() {
     viewDispatch,
     approveTransaction,
     transaction,
-    from?.web3Provider,
+    from?.browserProvider,
     from?.network,
     from?.walletProviderInfo,
-    to?.web3Provider,
+    to?.browserProvider,
     to?.network,
     to?.walletProviderInfo,
   ]);
@@ -624,7 +626,7 @@ export function BridgeReviewSummary() {
       <NetworkSwitchDrawer
         visible={showSwitchNetworkDrawer}
         targetChainId={from?.network!}
-        provider={from?.web3Provider!}
+        provider={from?.browserProvider!}
         checkout={checkout}
         onCloseDrawer={() => setShowSwitchNetworkDrawer(false)}
         onNetworkSwitch={handleNetworkSwitch}

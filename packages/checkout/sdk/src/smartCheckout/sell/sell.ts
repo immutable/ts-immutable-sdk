@@ -1,4 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { Contract, parseUnits } from 'ethers';
 import {
   CreateListingParams,
   ERC20Item,
@@ -9,7 +9,6 @@ import {
   ERC721Item as OrderbookERC721Item,
   ERC1155Item as OrderbookERC1155Item,
 } from '@imtbl/orderbook';
-import { BigNumber, Contract, utils } from 'ethers';
 import { track } from '@imtbl/metrics';
 import {
   ERC721Item,
@@ -23,6 +22,7 @@ import {
   CheckoutStatus,
   SmartCheckoutResult,
   SmartCheckoutSufficient,
+  WrappedBrowserProvider,
 } from '../../types';
 import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
@@ -38,6 +38,7 @@ import { SignTransactionStatusType } from '../actions/types';
 import { calculateFees } from '../fees/fees';
 import { ERC20ABI } from '../../env';
 import { measureAsyncExecution } from '../../logger/debugLogger';
+import { isPassportProvider } from '../routing';
 
 export const getERC721Requirement = (
   id: string,
@@ -60,14 +61,14 @@ export const getERC1155Requirement = (
   id,
   contractAddress,
   spenderAddress,
-  amount: BigNumber.from(amount),
+  amount: BigInt(amount),
 });
 
 export const getBuyToken = (
   buyToken: BuyToken,
   decimals: number = 18,
 ): ERC20Item | NativeItem => {
-  const bnAmount = utils.parseUnits(buyToken.amount, decimals);
+  const bnAmount = parseUnits(buyToken.amount, decimals);
 
   if (buyToken.type === ItemType.NATIVE) {
     return {
@@ -85,7 +86,7 @@ export const getBuyToken = (
 
 export const sell = async (
   config: CheckoutConfiguration,
-  provider: Web3Provider,
+  provider: WrappedBrowserProvider,
   orders: Array<SellOrder>,
 ): Promise<SellResult> => {
   let orderbook: Orderbook;
@@ -131,7 +132,7 @@ export const sell = async (
     const walletAddress = await measureAsyncExecution<string>(
       config,
       'Time to get the address from the provider',
-      provider.getSigner().getAddress(),
+      (await provider.getSigner()).getAddress(),
     );
     orderbook = instance.createOrderbookInstance(config);
     const { seaportContractAddress } = orderbook.config();
@@ -187,8 +188,7 @@ export const sell = async (
   }
 
   let smartCheckoutResult;
-  const isPassport = (provider.provider as any)?.isPassport;
-  if (!isPassport) {
+  if (!isPassportProvider(provider)) {
     smartCheckoutResult = await measureAsyncExecution<SmartCheckoutResult>(
       config,
       'Total time running smart checkout',
@@ -200,7 +200,7 @@ export const sell = async (
           type: TransactionOrGasType.GAS,
           gasToken: {
             type: GasTokenType.NATIVE,
-            limit: BigNumber.from(constants.estimatedFulfillmentGasGwei),
+            limit: BigInt(constants.estimatedFulfillmentGasGwei),
           },
         },
       ),
@@ -253,10 +253,10 @@ export const sell = async (
     };
 
     if (makerFees !== undefined) {
-      let tokenQuantity = BigNumber.from(1);
+      let tokenQuantity = BigInt(1);
 
       // if type exists in sellToken then it is valid ERC721 or ERC1155 and not deprecated type
-      if (sellTokenHasType && sellToken.type === ItemType.ERC1155) tokenQuantity = BigNumber.from(sellToken.amount);
+      if (sellTokenHasType && sellToken.type === ItemType.ERC1155) tokenQuantity = BigInt(sellToken.amount);
 
       const orderBookFees = calculateFees(makerFees, buyTokenOrNative.amount, decimals, tokenQuantity);
       if (orderBookFees.length !== makerFees.length) {

@@ -5,15 +5,14 @@ import { Orderbook } from '../orderbook';
 import { getLocalhostProvider } from './helpers/provider';
 import { getOffererWallet } from './helpers/signers';
 import { deployTestToken } from './helpers/erc721';
-import { TestToken } from './helpers/test-token';
 import { waitForOrderToBeOfStatus } from './helpers/order';
-import { getConfigFromEnv } from './helpers';
+import { getConfigFromEnv, getRandomTokenId, TestERC721Token } from './helpers';
 import { actionAll } from './helpers/actions';
 import { Order } from '../types';
 
 async function createListing(
   sdk: Orderbook,
-  token: TestToken,
+  token: TestERC721Token,
   tokenId: string,
   considerationAmount: string,
   offerer: Wallet,
@@ -25,7 +24,7 @@ async function createListing(
       type: 'NATIVE',
     },
     sell: {
-      contractAddress: token.address,
+      contractAddress: await token.getAddress(),
       tokenId,
       type: 'ERC721',
     },
@@ -67,13 +66,13 @@ describe('listListings e2e', () => {
 
   beforeAll(async () => {
     const { contract } = await deployTestToken(offerer);
-    await contract.safeMint(offerer.address);
-    await contract.safeMint(offerer.address);
-    token1ContractAddress = contract.address;
+    await contract.safeMint(offerer.address, getRandomTokenId());
+    await contract.safeMint(offerer.address, getRandomTokenId());
+    token1ContractAddress = await contract.getAddress();
 
     const { contract: contract2 } = await deployTestToken(offerer);
-    await contract2.safeMint(offerer.address);
-    token2ContractAddress = contract2.address;
+    await contract2.safeMint(offerer.address, getRandomTokenId());
+    token2ContractAddress = await contract2.getAddress();
 
     token1Order1 = await createListing(
       sdk,

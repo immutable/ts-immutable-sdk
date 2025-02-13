@@ -1,5 +1,6 @@
-import { Provider } from '@ethersproject/providers';
-import { ethers, utils } from 'ethers';
+import {
+  keccak256, AbiCoder, Provider, Contract,
+} from 'ethers';
 import { Address } from '../types';
 import { WITHDRAW_SIG, NATIVE } from '../constants/bridges';
 import { CHILD_ERC20 } from '../contracts/ABIs/ChildERC20';
@@ -15,8 +16,8 @@ import { isWrappedIMX, getRootIMX } from './utils';
  * @returns hash of payload and current time.
  */
 export function genUniqueAxelarCommandId(payload: string) {
-  return utils.keccak256(
-    utils.defaultAbiCoder.encode(['bytes', 'uint256'], [payload, new Date().getTime()]),
+  return keccak256(
+    AbiCoder.defaultAbiCoder().encode(['bytes', 'uint256'], [payload, new Date().getTime()]),
   );
 }
 
@@ -30,7 +31,7 @@ export function genAxelarWithdrawPayload(
   recipient: string,
   amount: string,
 ) {
-  return utils.defaultAbiCoder.encode(
+  return AbiCoder.defaultAbiCoder().encode(
     ['bytes32', 'address', 'address', 'address', 'uint256'],
     [WITHDRAW_SIG, rootToken, sender, recipient, amount],
   );
@@ -39,7 +40,7 @@ export function genAxelarWithdrawPayload(
 export async function createChildErc20Contract(
   token: string,
   childProvider: Provider,
-): Promise<ethers.Contract> {
+): Promise<Contract> {
   return createContract(token, CHILD_ERC20, childProvider);
 }
 
@@ -50,14 +51,14 @@ export async function createChildErc20Contract(
 export async function getWithdrawRootToken(
   childToken: string,
   destinationChainId: string,
-  childProvider: ethers.providers.Provider,
+  childProvider: Provider,
 ): Promise<string> {
   if (childToken.toUpperCase() === NATIVE
     || isWrappedIMX(childToken, destinationChainId)) {
     return getRootIMX(destinationChainId);
   }
   // Find root token
-  const erc20Contract: ethers.Contract = await createChildErc20Contract(childToken, childProvider);
+  const erc20Contract: Contract = await createChildErc20Contract(childToken, childProvider);
 
   return withBridgeError<Address>(() => erc20Contract.rootToken(), BridgeErrorType.PROVIDER_ERROR);
 }
