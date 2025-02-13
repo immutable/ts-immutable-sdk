@@ -21,7 +21,7 @@ To install this package, run the following command:
 ```sh
 npm add @imtbl/minting-backend
 # or
-yarn add @imtbl/minting-backend
+pnpm add @imtbl/minting-backend
 # or
 pnpm add @imtbl/minting-backend
 ```

@@ -26,7 +26,7 @@ To install this package, run the following command:
 ```sh
 npm add @imtbl/checkout-sdk
 # or
-yarn add @imtbl/checkout-sdk
+pnpm add @imtbl/checkout-sdk
 # or
 pnpm add @imtbl/checkout-sdk
 ```

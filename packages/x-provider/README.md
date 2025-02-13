@@ -21,7 +21,7 @@ To install this package, run the following command:
 ```sh
 npm add @imtbl/x-provider
 # or
-yarn add @imtbl/x-provider
+pnpm add @imtbl/x-provider
 # or
 pnpm add @imtbl/x-provider
 ```
