@@ -18,7 +18,7 @@
 import { DomainTypeChainId } from './domain-type-chain-id';
 
 /**
- * @type EIP712MessageDomain
+ * 
  * @export
  * @interface DomainType
  */

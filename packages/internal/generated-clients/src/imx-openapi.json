@@ -11,9 +11,9 @@
       "url": "https://support.immutable.com",
       "email": "support@immutable.com"
     },
-    "version": "3.0"
+    "version": "3.0.0"
   },
-  "host": "api.sandbox.immutable.com",
+  "host": "api.sandbox.x.immutable.com",
   "basePath": "/",
   "paths": {
     "/v1/assets": {
@@ -851,10 +851,6 @@
             "in": "query"
           },
           {
-            "enum": [
-              "success",
-              "failure"
-            ],
             "type": "string",
             "description": "Status of this deposit",
             "name": "status",
@@ -873,11 +869,6 @@
             "in": "query"
           },
           {
-            "enum": [
-              "erc721",
-              "erc20",
-              "eth"
-            ],
             "type": "string",
             "description": "Token type of the deposited asset",
             "name": "token_type",
@@ -1492,11 +1483,6 @@
             "in": "query"
           },
           {
-            "enum": [
-              "erc721",
-              "erc20",
-              "eth"
-            ],
             "type": "string",
             "description": "Token type of the minted asset",
             "name": "token_type",
@@ -2456,10 +2442,6 @@
             "in": "query"
           },
           {
-            "enum": [
-              "success",
-              "failure"
-            ],
             "type": "string",
             "description": "Status of this withdrawal",
             "name": "status",
@@ -2478,11 +2460,6 @@
             "in": "query"
           },
           {
-            "enum": [
-              "erc721",
-              "erc20",
-              "eth"
-            ],
             "type": "string",
             "description": "Token type of the withdrawn asset",
             "name": "token_type",
@@ -9310,6 +9287,8 @@
       "in": "header"
     }
   },
+  "tags": [
+  ],
   "x-components": {
     "responses": {}
   }
