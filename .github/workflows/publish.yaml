@@ -104,87 +104,87 @@ jobs:
       - name: Generate SDK attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: './sdk, !./sdk/node_modules'
+          subject-path: './sdk, !./sdk/node_modules, !./sdk/src'
 
       - name: Generate Config attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: './packages/config, !./packages/config/node_modules'
+          subject-path: './packages/config, !./packages/config/node_modules, !./packages/config/src'
 
       - name: Generate X Client attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: './packages/x-client, !./packages/x-client/node_modules'
+          subject-path: './packages/x-client, !./packages/x-client/node_modules, !./packages/x-client/src'
 
       - name: Generate X Provider attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: './packages/x-provider, !./packages/x-provider/node_modules'
+          subject-path: './packages/x-provider, !./packages/x-provider/node_modules, !./packages/x-provider/src'
 
       - name: Generate Passport SDK attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: './packages/passport/sdk, !./packages/passport/sdk/node_modules'
+          subject-path: './packages/passport/sdk, !./packages/passport/sdk/node_modules, !./packages/passport/sdk/src'
 
       - name: Generate Orderbook attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: './packages/orderbook, !./packages/orderbook/node_modules'
+          subject-path: './packages/orderbook, !./packages/orderbook/node_modules, !./packages/orderbook/src'
 
       - name: Generate Metrics attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: './packages/internal/metrics, !./packages/internal/metrics/node_modules'
+          subject-path: './packages/internal/metrics, !./packages/internal/metrics/node_modules, !./packages/internal/metrics/src'
 
       - name: Generate Toolkit attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: './packages/internal/toolkit, !./packages/internal/toolkit/node_modules'
+          subject-path: './packages/internal/toolkit, !./packages/internal/toolkit/node_modules, !./packages/internal/toolkit/src'
 
       - name: Generate Cryptofiat attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: './packages/internal/cryptofiat, !./packages/internal/cryptofiat/node_modules'
+          subject-path: './packages/internal/cryptofiat, !./packages/internal/cryptofiat/node_modules, !./packages/internal/cryptofiat/src'
 
       - name: Generate DEX SDK attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: './packages/internal/dex/sdk, !./packages/internal/dex/sdk/node_modules'
+          subject-path: './packages/internal/dex/sdk, !./packages/internal/dex/sdk/node_modules, !./packages/internal/dex/sdk/src'
 
       - name: Generate Bridge SDK attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: './packages/internal/bridge/sdk, !./packages/internal/bridge/sdk/node_modules'
+          subject-path: './packages/internal/bridge/sdk, !./packages/internal/bridge/sdk/node_modules, !./packages/internal/bridge/sdk/src'
 
       - name: Generate Generated Clients attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: './packages/internal/generated-clients, !./packages/internal/generated-clients/node_modules'
+          subject-path: './packages/internal/generated-clients, !./packages/internal/generated-clients/node_modules, !./packages/internal/generated-clients/src'
 
       - name: Generate Checkout SDK attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: './packages/checkout/sdk, !./packages/checkout/sdk/node_modules'
+          subject-path: './packages/checkout/sdk, !./packages/checkout/sdk/node_modules, !./packages/checkout/sdk/src'
 
       - name: Generate Checkout Widgets attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: './packages/checkout/widgets-lib, !./packages/checkout/widgets-lib/node_modules'
+          subject-path: './packages/checkout/widgets-lib, !./packages/checkout/widgets-lib/node_modules, !./packages/checkout/widgets-lib/src'
 
       - name: Generate Blockchain Data SDK attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: './packages/blockchain-data/sdk, !./packages/blockchain-data/sdk/node_modules'
+          subject-path: './packages/blockchain-data/sdk, !./packages/blockchain-data/sdk/node_modules, !./packages/blockchain-data/sdk/src'
 
       - name: Generate Webhook SDK attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: './packages/webhook/sdk, !./packages/webhook/sdk/node_modules'
+          subject-path: './packages/webhook/sdk, !./packages/webhook/sdk/node_modules, !./packages/webhook/sdk/src'
 
       - name: Generate Minting Backend SDK attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: './packages/minting-backend/sdk, !./packages/minting-backend/sdk/node_modules'
+          subject-path: './packages/minting-backend/sdk, !./packages/minting-backend/sdk/node_modules, !./packages/minting-backend/sdk/src'
 
       - name: Generate version.json
         if: (env.DRY_RUN) == 'false'
