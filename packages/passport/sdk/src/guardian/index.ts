@@ -231,10 +231,7 @@ export default class GuardianClient {
       );
     }
 
-    console.log('transactionEvaluationResponse', transactionEvaluationResponse);
-
     if (confirmationRequired && !!transactionId) {
-      console.log('confirmationRequired !!transactionId', confirmationRequired, transactionId);
       const user = await this.authManager.getUserZkEvm();
       const confirmationResult = await this.confirmationScreen.requestConfirmation(
         transactionId,
@@ -250,8 +247,7 @@ export default class GuardianClient {
         );
       }
     } else {
-      console.log('closeWindow() - else in guardian > index.ts', transactionId);
-      this.confirmationScreen.closeWindow();
+        this.confirmationScreen.closeWindow();
     }
   }
 
