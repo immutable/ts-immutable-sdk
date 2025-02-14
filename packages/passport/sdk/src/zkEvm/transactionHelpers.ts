@@ -14,7 +14,12 @@ import {
 } from './walletHelpers';
 import { RelayerClient } from './relayerClient';
 import GuardianClient, { convertBigNumberishToString } from '../guardian';
-import { FeeOption, MetaTransaction, RelayerTransactionStatus } from './types';
+import {
+  FeeOption,
+  MetaTransaction,
+  RelayerTransactionStatus,
+  ZkEvmTransaction,
+} from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { retryWithDelay } from '../network/retry';
 
