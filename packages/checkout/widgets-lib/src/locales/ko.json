@@ -901,6 +901,7 @@
             "caption": "이 네트워크에서 토큰을 교환합니다.",
             "disabledCaption": "현재 이용할 수 없습니다."
           },
+          "changeWallet": "다른 지갑 선택",
           "debit": {
             "heading": "직불 카드",
             "caption": "",

@@ -59,7 +59,7 @@ export interface TypedDataPayload {
   domain: {
     name?: string;
     version?: string;
-    chainId?: number;
+    chainId?: number | string;
     verifyingContract?: string;
     salt?: string;
   };
