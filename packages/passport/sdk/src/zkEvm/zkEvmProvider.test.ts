@@ -272,6 +272,7 @@ describe('ZkEvmProvider', () => {
         relayerClient: expect.any(RelayerClient),
         zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
         flow: expect.any(Object),
+        transactionName: expect.any(String),
       });
     });
   });
