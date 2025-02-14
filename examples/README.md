@@ -207,7 +207,7 @@ Update the readme with any instructions required to run the app, and include wha
 
 Delete the any unused imports in `app/page.tsx`
 
-Delete the contents of the return statement in `app/page.tsx` and replace with `<h1>My Example<h1/>` or whatever you like, just render something to the screen so you can tell its working when you run the app.
+Delete the contents of the return statement in `app/page.tsx` and replace with `<h1>My Example<h1/>` or whatever you like, just render something to the screen so you can tell it's working when you run the app.
 
 Start the project with hot reloading by running;
 
@@ -363,7 +363,7 @@ Or if you want to display the whole file just don't include a `#` label at the e
 ```
 ````
 
-Just like regular code snippets, you can set language for syntax highlighting by adding it's alias directly after the opening backticks. In the above example we are setting the syntax highlighting to be for `tsx`. For more information on syntax highlighting, visit the [GitHub Documentation](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks).
+Just like regular code snippets, you can set language for syntax highlighting by adding its alias directly after the opening backticks. In the above example we are setting the syntax highlighting to be for `tsx`. For more information on syntax highlighting, visit the [GitHub Documentation](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks).
 
 Some popular syntaxes you are likely to want to use syntax highlighting for are;
 
