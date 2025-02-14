@@ -5,7 +5,7 @@ import AuthManager from '../authManager';
 import { ConfirmationScreen } from '../confirmation';
 import { retryWithDelay } from '../network/retry';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from '../zkEvm/JsonRpcError';
-import { MetaTransaction, TypedDataPayload, ZkEvmTransaction } from '../zkEvm/types';
+import { MetaTransaction, TypedDataPayload } from '../zkEvm/types';
 import { PassportConfiguration } from '../config';
 import { getEip155ChainId } from '../zkEvm/walletHelpers';
 import { PassportError, PassportErrorType } from '../errors/passportError';
@@ -25,7 +25,7 @@ type GuardianEVMTxnEvaluationParams = {
   chainId: string;
   nonce: string;
   metaTransactions: MetaTransaction[];
-  transactionName?: ZkEvmTransaction;
+  nonceSpace?: BigNumber;
 };
 
 type GuardianEIP712MessageEvaluationParams = {
@@ -216,7 +216,7 @@ export default class GuardianClient {
     chainId,
     nonce,
     metaTransactions,
-    transactionName,
+    nonceSpace,
   }: GuardianEVMTxnEvaluationParams): Promise<void> {
     const transactionEvaluationResponse = await this.evaluateEVMTransaction({
       chainId,
@@ -247,7 +247,9 @@ export default class GuardianClient {
           'Transaction rejected by user',
         );
       }
-    } else if (transactionName !== ZkEvmTransaction.SESSION_ACTIVITY) {
+      // This verification is meant to ensure that it originates from zkEvmProvider#callSessionActivity
+      // and since it's a background transaction should not close the confirmation screen window.
+    } else if (BigNumber.from(1).eq(nonceSpace ?? 0)) {
       this.confirmationScreen.closeWindow();
     }
   }

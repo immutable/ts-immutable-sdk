@@ -13,7 +13,6 @@ import {
   ProviderEvent,
   ProviderEventMap,
   RequestArguments,
-  ZkEvmTransaction,
 } from './types';
 import AuthManager from '../authManager';
 import MagicAdapter from '../magic/magicAdapter';
@@ -210,7 +209,6 @@ export class ZkEvmProvider implements Provider {
         zkEvmAddress,
         flow,
         nonceSpace,
-        transactionName: ZkEvmTransaction.SESSION_ACTIVITY,
       });
     };
     this.#passportEventEmitter.emit(PassportEvents.ACCOUNTS_REQUESTED, {
@@ -319,7 +317,6 @@ export class ZkEvmProvider implements Provider {
               relayerClient: this.#relayerClient,
               zkEvmAddress,
               flow,
-              transactionName: ZkEvmTransaction.ETH_SEND_TRANSACTION,
             });
           });
         } catch (error) {
