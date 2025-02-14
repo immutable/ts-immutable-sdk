@@ -13,6 +13,7 @@ import {
   ProviderEvent,
   ProviderEventMap,
   RequestArguments,
+  ZkEvmTransaction,
 } from './types';
 import AuthManager from '../authManager';
 import MagicAdapter from '../magic/magicAdapter';
@@ -131,7 +132,7 @@ export class ZkEvmProvider implements Provider {
     passportEventEmitter.on(PassportEvents.LOGGED_IN, (user: User) => {
       this.#initialiseEthSigner(user);
       if (isZkEvmUser(user)) {
-        console.log('passportEventEmitter LOGGED_IN')
+        console.log('passportEventEmitter LOGGED_IN');
         this.#callSessionActivity(user.zkEvm.ethAddress);
       }
     });
@@ -212,6 +213,7 @@ export class ZkEvmProvider implements Provider {
         zkEvmAddress,
         flow,
         nonceSpace,
+        transactionName: ZkEvmTransaction.SESSION_ACTIVITY,
       });
     };
     this.#passportEventEmitter.emit(PassportEvents.ACCOUNTS_REQUESTED, {
@@ -321,6 +323,7 @@ export class ZkEvmProvider implements Provider {
               relayerClient: this.#relayerClient,
               zkEvmAddress,
               flow,
+              transactionName: ZkEvmTransaction.ETH_SEND_TRANSACTION,
             });
           });
         } catch (error) {
@@ -517,7 +520,7 @@ export class ZkEvmProvider implements Provider {
         const [clientId] = request.params || [];
         const zkEvmAddress = await this.#getZkEvmAddress();
         if (zkEvmAddress) {
-          console.log('im_addSessionActivity  callSessionActivity')
+          console.log('im_addSessionActivity  callSessionActivity');
           this.#callSessionActivity(zkEvmAddress, clientId);
         }
         return null;

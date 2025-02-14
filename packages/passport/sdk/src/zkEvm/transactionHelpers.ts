@@ -29,6 +29,7 @@ export type TransactionParams = {
   zkEvmAddress: string;
   flow: Flow;
   nonceSpace?: BigNumber;
+  transactionName?: ZkEvmTransaction;
 };
 
 export type EjectionTransactionParams = Pick<TransactionParams, 'ethSigner' | 'zkEvmAddress' | 'flow'>;
@@ -168,6 +169,7 @@ export const prepareAndSignTransaction = async ({
   zkEvmAddress,
   flow,
   nonceSpace,
+  transactionName,
 }: TransactionParams & { transactionRequest: TransactionRequest }) => {
   const { chainId } = await rpcProvider.detectNetwork();
   const chainIdBigNumber = BigNumber.from(chainId);
@@ -194,6 +196,7 @@ export const prepareAndSignTransaction = async ({
       chainId: getEip155ChainId(chainId),
       nonce: convertBigNumberishToString(nonce),
       metaTransactions,
+      transactionName,
     });
     flow.addEvent('endValidateEVMTransaction');
   };

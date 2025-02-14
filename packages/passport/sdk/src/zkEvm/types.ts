@@ -10,6 +10,11 @@ export enum RelayerTransactionStatus {
   CANCELLED = 'CANCELLED',
 }
 
+export enum ZkEvmTransaction {
+  SESSION_ACTIVITY = 'callSessionActivity',
+  ETH_SEND_TRANSACTION = 'eth_sendTransaction',
+}
+
 export interface RelayerTransaction {
   status: RelayerTransactionStatus;
   chainId: string;
