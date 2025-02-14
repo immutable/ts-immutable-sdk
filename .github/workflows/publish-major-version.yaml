@@ -30,6 +30,7 @@ on:
 jobs:
   PublishMajorVersion:
     name: Publish Workflow
+    environment: prod
     runs-on: ubuntu-latest-4-cores
     env:
       GH_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
@@ -108,7 +109,7 @@ jobs:
           key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
 
       - name: Install dependencies
-        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true' 
+        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
       - name: Lint
