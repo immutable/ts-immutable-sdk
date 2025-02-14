@@ -121,7 +121,6 @@ export class ZkEvmProvider implements Provider {
       if (user) {
         this.#initialiseEthSigner(user);
         if (isZkEvmUser(user)) {
-          console.log('this.#authManager.getUser()');
           this.#callSessionActivity(user.zkEvm.ethAddress);
         }
       }
@@ -132,7 +131,6 @@ export class ZkEvmProvider implements Provider {
     passportEventEmitter.on(PassportEvents.LOGGED_IN, (user: User) => {
       this.#initialiseEthSigner(user);
       if (isZkEvmUser(user)) {
-        console.log('passportEventEmitter LOGGED_IN');
         this.#callSessionActivity(user.zkEvm.ethAddress);
       }
     });
@@ -200,7 +198,6 @@ export class ZkEvmProvider implements Provider {
     // other sendTransaction requests are processed in nonce space 0. This means
     // we can submit a session activity request per SCW in parallel without a SCW
     // INVALID_NONCE error.
-    console.log('callSessionActivity');
     const nonceSpace: BigNumber = BigNumber.from(1);
     const sendTransactionClosure = async (params: Array<any>, flow: Flow) => {
       const ethSigner = await this.#getSigner();
@@ -282,7 +279,6 @@ export class ZkEvmProvider implements Provider {
           identify({
             passportId: user.profile.sub,
           });
-          console.log('eth_requestAccounts callSessionActivity');
           this.#callSessionActivity(userZkEvmEthAddress);
           return [userZkEvmEthAddress];
         } catch (error) {
@@ -520,7 +516,6 @@ export class ZkEvmProvider implements Provider {
         const [clientId] = request.params || [];
         const zkEvmAddress = await this.#getZkEvmAddress();
         if (zkEvmAddress) {
-          console.log('im_addSessionActivity  callSessionActivity');
           this.#callSessionActivity(zkEvmAddress, clientId);
         }
         return null;

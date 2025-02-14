@@ -110,7 +110,6 @@ export default class GuardianClient {
           throw err;
         }
 
-        console.log('Error in withConfirmationScreenTask', err);
         this.confirmationScreen.closeWindow();
         throw err;
       }

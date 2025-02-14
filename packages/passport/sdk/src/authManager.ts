@@ -226,7 +226,6 @@ export default class AuthManager {
                     popupHasBeenOpened = true;
                     const oidcUser = await signinPopup();
                     overlay.remove();
-                    console.log('removing overlay 1');
                     resolve(AuthManager.mapOidcUserToDomainModel(oidcUser));
                   } else {
                     // The popup has already been opened. By calling `window.open` with the same target as the
@@ -239,13 +238,11 @@ export default class AuthManager {
                   }
                 } catch (retryError: unknown) {
                   overlay.remove();
-                  console.log('removing overlay 2');
                   reject(retryError);
                 }
               },
               () => {
                 overlay.remove();
-                console.log('removing overlay 3');
                 reject(new Error('Popup closed by user'));
               },
             );
