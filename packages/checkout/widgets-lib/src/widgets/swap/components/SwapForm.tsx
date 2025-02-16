@@ -215,6 +215,17 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     network,
   ]);
 
+  const openUnableToSwapDrawer = () => {
+    setShowNotEnoughImxDrawer(false);
+    setShowUnableToSwapDrawer(true);
+    track({
+      userJourney: UserJourney.SWAP,
+      screen: 'SwapCoins',
+      control: 'UnableToSwapDrawer',
+      controlType: 'Button',
+    });
+  };
+
   const tokensOptionsTo = useMemo(() => allowedTokens
     .map(
       (token) => ({
@@ -329,8 +340,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         console.error('Error fetching quote.', error);
 
         resetQuote();
-        setShowNotEnoughImxDrawer(false);
-        setShowUnableToSwapDrawer(true);
+        openUnableToSwapDrawer();
       }
     }
 
@@ -406,8 +416,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     } catch (error: any) {
       if (!error.cancelled) {
         resetQuote();
-        setShowNotEnoughImxDrawer(false);
-        setShowUnableToSwapDrawer(true);
+        openUnableToSwapDrawer();
       }
     }
 
