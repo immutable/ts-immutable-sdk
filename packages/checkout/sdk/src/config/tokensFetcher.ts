@@ -5,7 +5,7 @@ import {
   ChainSlug,
   ChainTokensConfig,
   ImxAddressConfig,
-  TokenInfo,
+  TokenBridgeInfo,
 } from '../types';
 import { ENV_DEVELOPMENT, IMMUTABLE_API_BASE_URL } from '../env';
 import { HttpClient } from '../api/http';
@@ -27,6 +27,7 @@ type TokensEndpointResult = {
   symbol: string;
   root_chain_id: string | null;
   root_contract_address: string | null;
+  bridge_used: string | null;
 };
 
 type TokensEndpointResponse = {
@@ -104,7 +105,7 @@ export class TokensFetcher {
     return config ?? {};
   }
 
-  public async getTokensConfig(chainId: ChainId): Promise<TokenInfo[]> {
+  public async getTokensConfig(chainId: ChainId): Promise<TokenBridgeInfo[]> {
     const config = await this.loadTokens();
     if (!config || !config[chainId]) return [];
 
@@ -127,6 +128,7 @@ export class TokensFetcher {
         decimals: 18,
         name: 'IMX',
         symbol: 'IMX',
+        bridge: 'native',
       });
     });
 
@@ -144,12 +146,13 @@ export class TokensFetcher {
         tokens[chainId] = [];
       }
 
-      const tokenInfo: TokenInfo = {
+      const tokenInfo: TokenBridgeInfo = {
         address: token.contract_address.toLowerCase(),
         decimals: token.decimals,
         name: token.name,
         symbol: token.symbol,
         icon: token.image_url ?? undefined,
+        bridge: token.bridge_used ?? null,
       };
 
       tokens[chainId]?.push(tokenInfo);

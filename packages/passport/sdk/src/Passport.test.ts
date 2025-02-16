@@ -3,7 +3,7 @@ import { IMXClient } from '@imtbl/x-client';
 import { ImxApiClients, imxApiConfig, MultiRollupApiClients } from '@imtbl/generated-clients';
 import { trackError, trackFlow } from '@imtbl/metrics';
 import AuthManager from './authManager';
-import MagicAdapter from './magicAdapter';
+import MagicAdapter from './magic/magicAdapter';
 import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
 import { OidcConfiguration, UserProfile } from './types';
@@ -21,7 +21,7 @@ import { ZkEvmProvider } from './zkEvm';
 import { PassportError, PassportErrorType } from './errors/passportError';
 
 jest.mock('./authManager');
-jest.mock('./magicAdapter');
+jest.mock('./magic/magicAdapter');
 jest.mock('./starkEx');
 jest.mock('./confirmation');
 jest.mock('./zkEvm');
@@ -95,6 +95,9 @@ describe('Passport', () => {
     });
     (trackFlow as unknown as jest.Mock).mockImplementation(() => ({
       addEvent: jest.fn(),
+      details: {
+        flowId: '123',
+      },
     }));
     passport = new Passport({
       baseConfig: new ImmutableConfiguration({
@@ -160,6 +163,7 @@ describe('Passport', () => {
           'passport',
           'connectImx',
           e,
+          { flowId: '123' },
         );
       }
     });
@@ -199,6 +203,7 @@ describe('Passport', () => {
           'passport',
           'connectImxSilent',
           e,
+          { flowId: '123' },
         );
       }
     });
@@ -249,6 +254,7 @@ describe('Passport', () => {
           'passport',
           'connectEvm',
           e,
+          { flowId: '123' },
         );
       }
     });
@@ -272,6 +278,7 @@ describe('Passport', () => {
           'passport',
           'loginCallback',
           e,
+          { flowId: '123' },
         );
       }
     });
@@ -311,6 +318,7 @@ describe('Passport', () => {
           'passport',
           'logout',
           e,
+          { flowId: '123' },
         );
       }
     });
@@ -340,6 +348,7 @@ describe('Passport', () => {
           'passport',
           'logoutDeviceFlow',
           e,
+          { flowId: '123' },
         );
       }
     });
@@ -373,6 +382,7 @@ describe('Passport', () => {
           'passport',
           'getUserInfo',
           e,
+          { flowId: '123' },
         );
       }
     });
@@ -406,6 +416,7 @@ describe('Passport', () => {
           'passport',
           'getIdToken',
           e,
+          { flowId: '123' },
         );
       }
     });
@@ -439,6 +450,7 @@ describe('Passport', () => {
           'passport',
           'getAccessToken',
           e,
+          { flowId: '123' },
         );
       }
     });
@@ -479,6 +491,7 @@ describe('Passport', () => {
           'passport',
           'getLinkedAddresses',
           e,
+          { flowId: '123' },
         );
       }
     });
@@ -547,6 +560,7 @@ describe('Passport', () => {
           'passport',
           'login',
           e,
+          { flowId: '123' },
         );
       }
     });

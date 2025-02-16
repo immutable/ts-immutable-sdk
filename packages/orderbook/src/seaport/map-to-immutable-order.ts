@@ -1,7 +1,10 @@
-import { ConsiderationItem, OfferItem } from '@opensea/seaport-js/lib/types';
-import { ItemType, OrderType } from '@opensea/seaport-js/lib/constants';
+import { ItemType, OrderType } from './constants';
+import { ConsiderationItem, OfferItem } from './types';
 import {
-  AssetCollectionItem, ERC20Item, Item, ProtocolData,
+  AssetCollectionItem,
+  ERC20Item,
+  Item,
+  ProtocolData,
 } from '../openapi/sdk';
 import { exhaustiveSwitch } from '../utils';
 

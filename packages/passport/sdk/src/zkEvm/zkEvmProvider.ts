@@ -15,7 +15,7 @@ import {
   RequestArguments,
 } from './types';
 import AuthManager from '../authManager';
-import MagicAdapter from '../magicAdapter';
+import MagicAdapter from '../magic/magicAdapter';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportConfiguration } from '../config';
 import {
@@ -281,9 +281,10 @@ export class ZkEvmProvider implements Provider {
           return [userZkEvmEthAddress];
         } catch (error) {
           if (error instanceof Error) {
-            trackError('passport', 'ethRequestAccounts', error);
+            trackError('passport', 'ethRequestAccounts', error, { flowId: flow.details.flowId });
+          } else {
+            flow.addEvent('errored');
           }
-          flow.addEvent('errored');
           throw error;
         } finally {
           flow.addEvent('End');
@@ -320,9 +321,10 @@ export class ZkEvmProvider implements Provider {
           });
         } catch (error) {
           if (error instanceof Error) {
-            trackError('passport', 'eth_sendTransaction', error);
+            trackError('passport', 'eth_sendTransaction', error, { flowId: flow.details.flowId });
+          } else {
+            flow.addEvent('errored');
           }
-          flow.addEvent('errored');
           throw error;
         } finally {
           flow.addEvent('End');
@@ -381,9 +383,10 @@ export class ZkEvmProvider implements Provider {
           });
         } catch (error) {
           if (error instanceof Error) {
-            trackError('passport', 'personal_sign', error);
+            trackError('passport', 'personal_sign', error, { flowId: flow.details.flowId });
+          } else {
+            flow.addEvent('errored');
           }
-          flow.addEvent('errored');
           throw error;
         } finally {
           flow.addEvent('End');
@@ -421,9 +424,10 @@ export class ZkEvmProvider implements Provider {
           });
         } catch (error) {
           if (error instanceof Error) {
-            trackError('passport', 'eth_signTypedData', error);
+            trackError('passport', 'eth_signTypedData', error, { flowId: flow.details.flowId });
+          } else {
+            flow.addEvent('errored');
           }
-          flow.addEvent('errored');
           throw error;
         } finally {
           flow.addEvent('End');
@@ -496,9 +500,10 @@ export class ZkEvmProvider implements Provider {
           });
         } catch (error) {
           if (error instanceof Error) {
-            trackError('passport', 'imSignEjectionTransaction', error);
+            trackError('passport', 'imSignEjectionTransaction', error, { flowId: flow.details.flowId });
+          } else {
+            flow.addEvent('errored');
           }
-          flow.addEvent('errored');
           throw error;
         } finally {
           flow.addEvent('End');

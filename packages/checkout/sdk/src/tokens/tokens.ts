@@ -14,6 +14,8 @@ import { ERC20ABI, NATIVE } from '../env';
 import { CheckoutErrorType, withCheckoutError } from '../errors';
 import { isMatchingAddress } from '../utils/utils';
 
+const NATIVE_BRIDGE = 'native';
+
 type TokenAllowListParams = {
   type: TokenFilterTypes;
   chainId?: ChainId;
@@ -56,6 +58,10 @@ export const getTokenAllowList = async (
       tokens = onRampConfig[OnRampProvider.TRANSAK]?.tokens || [];
       break;
     case TokenFilterTypes.BRIDGE:
+      // Filter out tokens that are bridged through Axelar ITS, as they can't be bridged through the native bridge.
+      tokens = (await config.tokens.getTokensConfig(targetChainId))
+        .filter((token) => token.bridge === NATIVE_BRIDGE);
+      break;
     case TokenFilterTypes.ALL:
     default:
       tokens = (await config.tokens.getTokensConfig(targetChainId));

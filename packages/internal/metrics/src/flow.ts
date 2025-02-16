@@ -52,6 +52,7 @@ const getEventName = (flowName: string, eventName: string) => `${flowName}_${cle
 const trackFlowFn = (
   moduleName: string,
   flowName: string,
+  trackStartEvent: boolean = true,
   properties?: AllowedTrackProperties,
 ): Flow => {
   // Track the start of the flow
@@ -100,8 +101,10 @@ const trackFlowFn = (
     previousStepTime = currentTime;
   };
 
-  // Trigger a Start Event as a record of creating the flow
-  addEvent('Start');
+  if (trackStartEvent) {
+    // Trigger a Start Event as a record of creating the flow
+    addEvent('Start');
+  }
 
   return {
     details: {
@@ -119,11 +122,12 @@ const trackFlowFn = (
  * Works similarly to `track`
  * @param moduleName Name of the module being tracked (for namespacing purposes), e.g. `passport`
  * @param flowName Name of the flow, e.g. `performTransaction`
+ * @param trackStartEvent Whether to track the start event in the flow
  * @param properties Other properties to be sent with the event, other than duration
  *
  * @example
  * ```ts
- * const flow = trackFlow("passport", "performTransaction", { transationType: "transfer" });
+ * const flow = trackFlow("passport", "performTransaction", true, { transationType: "transfer" });
  * // Do something...
  * flow.addEvent("clickItem");
  * // Do something...

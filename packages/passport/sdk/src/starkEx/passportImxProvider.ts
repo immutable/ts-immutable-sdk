@@ -27,7 +27,7 @@ import {
   batchNftTransfer, cancelOrder, createOrder, createTrade, exchangeTransfer, transfer,
 } from './workflows';
 import registerOffchain from './workflows/registerOffchain';
-import MagicAdapter from '../magicAdapter';
+import MagicAdapter from '../magic/magicAdapter';
 import { getStarkSigner } from './getStarkSigner';
 import { withMetricsAsync } from '../utils/metrics';
 

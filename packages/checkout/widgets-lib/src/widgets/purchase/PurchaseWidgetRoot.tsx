@@ -45,7 +45,11 @@ export class Purchase extends Base<WidgetType.PURCHASE> {
   ): PurchaseWidgetParams {
     const validatedParams = params;
 
-    // TODO - add checks for config parameter
+    if (!params.environmentId) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "environmentId" widget input');
+      validatedParams.environmentId = '';
+    }
 
     if (!isValidArray(params.items)) {
       // eslint-disable-next-line no-console
@@ -81,6 +85,7 @@ export class Purchase extends Base<WidgetType.PURCHASE> {
                 >
                   <PurchaseWidget
                     config={this.strongConfig()}
+                    environmentId={this.parameters.environmentId!}
                     items={this.parameters.items!}
                   />
                 </Suspense>

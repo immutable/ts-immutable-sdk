@@ -5,9 +5,9 @@ export const passport = new Passport({
   baseConfig: {
     environment: Environment.PRODUCTION,
   },
-  clientId: "gYT9Cj8xE7to2mWp4ztBTxBlXCTzAebU",
-  redirectUri: "http://localhost:3000/add-tokens/login",
-  logoutRedirectUri: "http://localhost:3000/add-tokens/logout",
+  clientId: "jM8e8Qxn5KfYNcy2RqPWWRHxzmDjCRcI",
+  redirectUri: "http://localhost:3000/purchase/login",
+  logoutRedirectUri: "http://localhost:3000/purchase/logout",
   logoutMode: "silent",
   audience: "platform_api",
   scope: "openid offline_access email transact",

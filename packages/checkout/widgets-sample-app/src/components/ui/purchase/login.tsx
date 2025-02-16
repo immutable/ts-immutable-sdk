@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { passport } from "./passport";
 
 
-export function AddTokensPassportLogin() {
+export function PurchasePassportLogin() {
   useEffect(() => {
     passport.loginCallback();
   }, []);

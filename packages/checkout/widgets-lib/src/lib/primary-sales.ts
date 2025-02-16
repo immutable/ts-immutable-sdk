@@ -1,10 +1,10 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import {
-  SaleItem,
   FundingStep,
   FundingItem,
   SmartCheckoutResult,
+  PurchaseItem,
 } from '@imtbl/checkout-sdk';
 import { EvmContractCall, Hook } from '@0xsquid/squid-types';
 
@@ -51,8 +51,7 @@ export type SignResponse = {
 
 export type SignOrderInput = {
   provider: Web3Provider | undefined;
-  items: SaleItem[];
-  fromTokenAddress: string;
+  items: PurchaseItem[];
   recipientAddress: string;
   environment: string;
   environmentId: string;
@@ -117,6 +116,12 @@ export type OrderQuote = {
   currencies: Array<OrderQuoteCurrency>;
   products: Record<string, OrderQuoteProduct>;
   totalAmount: Record<string, OrderQuotePricing>;
+};
+
+export type OrderQuoteResponse = {
+  quote: OrderQuote;
+  currency: OrderQuoteCurrency;
+  totalCurrencyAmount: number;
 };
 
 export enum SignPaymentTypes {
@@ -189,10 +194,8 @@ export const PRIMARY_SALES_API_BASE_URL = {
 };
 
 export type UseQuoteOrderParams = {
-  items: SaleItem[];
   environmentId: string;
   environment: Environment;
-  provider: Web3Provider | undefined;
   preferredCurrency?: string;
 };
 
@@ -250,6 +253,7 @@ export enum SignCurrencyFilter {
 
 export type SignApiRequest = {
   recipient_address: string;
+  spender_address?: string;
   currency_filter: SignCurrencyFilter;
   currency_value: string;
   payment_type: string;

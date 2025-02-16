@@ -77,10 +77,12 @@ describe('Passport', () => {
   const mockGetUser = jest.fn();
   const mockLoginWithOidc = jest.fn();
   const mockMagicRequest = jest.fn();
+  const mockMagicUserIsLoggedIn = jest.fn();
 
   beforeEach(() => {
     jest.resetAllMocks();
 
+    mockMagicUserIsLoggedIn.mockResolvedValue(true);
     (UserManager as jest.Mock).mockImplementation(() => ({
       signinPopup: mockSigninPopup,
       signinSilent: mockSigninSilent,
@@ -93,6 +95,7 @@ describe('Passport', () => {
     (Magic as jest.Mock).mockImplementation(() => ({
       openid: { loginWithOIDC: mockLoginWithOidc },
       rpcProvider: { request: mockMagicRequest },
+      user: { isLoggedIn: mockMagicUserIsLoggedIn },
     }));
   });
 

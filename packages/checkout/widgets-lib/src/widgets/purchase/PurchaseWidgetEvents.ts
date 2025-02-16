@@ -50,7 +50,11 @@ export function sendConnectProviderSuccessEvent(
   if (eventTarget !== undefined) eventTarget.dispatchEvent(successEvent);
 }
 
-export const sendPurchaseSuccessEvent = (eventTarget: Window | EventTarget, transactionHash: string) => {
+export const sendPurchaseSuccessEvent = (
+  eventTarget: Window | EventTarget,
+  transactionHash: string,
+  fundingMethod?: string,
+) => {
   const successEvent = new CustomEvent<WidgetEvent<WidgetType.PURCHASE, PurchaseEventType.SUCCESS>>(
     IMTBLWidgetEvents.IMTBL_PURCHASE_WIDGET_EVENT,
     {
@@ -58,6 +62,7 @@ export const sendPurchaseSuccessEvent = (eventTarget: Window | EventTarget, tran
         type: PurchaseEventType.SUCCESS,
         data: {
           transactionHash,
+          fundingMethod,
         },
       },
     },

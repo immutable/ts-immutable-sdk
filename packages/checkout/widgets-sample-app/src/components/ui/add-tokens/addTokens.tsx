@@ -13,7 +13,7 @@ import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import { Environment } from "@imtbl/config";
 import { useMemo, useEffect, useState } from "react";
 
-import { passport } from "./passport";
+import { passport } from "../../../utils/passport";
 import { Web3Provider } from "@ethersproject/providers";
 
 const ADD_TOKENS_TARGET_ID = "add-tokens-widget-target";

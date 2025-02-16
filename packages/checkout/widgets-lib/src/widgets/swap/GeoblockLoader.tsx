@@ -9,7 +9,7 @@ import { useHandover } from '../../lib/hooks/useHandover';
 type GeoblockLoaderParams = {
   widget: React.ReactNode;
   serviceUnavailableView: React.ReactNode;
-  checkout: Checkout,
+  checkout?: Checkout,
 };
 
 export function GeoblockLoader({
@@ -23,6 +23,8 @@ export function GeoblockLoader({
   const [available, setAvailable] = useState(false);
 
   useEffect(() => {
+    if (!checkout) return;
+
     (async () => {
       try {
         showLoader({ text: t('views.LOADING_VIEW.text') });
