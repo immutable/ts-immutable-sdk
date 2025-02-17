@@ -61,6 +61,7 @@
     "lint": "nx affected -t lint",
     "lint:examples": "pnpm --recursive --filter '@examples/**' lint",
     "nx": "nx",
+    "pack-npm-packages": "pnpm -r pack:root",
     "postinstall": "husky install",
     "prepare:sdk": "./prepare-deps.sh sdk",
     "prepare:examples": "./prepare-deps.sh examples",

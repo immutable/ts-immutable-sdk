@@ -100,34 +100,20 @@ jobs:
       - name: Build SDK & Checkout Widgets
         run: pnpm build
 
-      # ! Do NOT remove any of these attestation subject paths - this will cause a Sev 0 incident !
-      - name: Generate SDK Package Attestations
-        uses: actions/attest-build-provenance@v1
-        with:
-          subject-path: |
-            ./sdk, !./sdk/node_modules, !./sdk/src
-            ./packages/config, !./packages/config/node_modules, !./packages/config/src
-            ./packages/x-client, !./packages/x-client/node_modules, !./packages/x-client/src
-            ./packages/x-provider, !./packages/x-provider/node_modules, !./packages/x-provider/src
-            ./packages/passport/sdk, !./packages/passport/sdk/node_modules, !./packages/passport/sdk/src
-            ./packages/orderbook, !./packages/orderbook/node_modules, !./packages/orderbook/src
-            ./packages/internal/metrics, !./packages/internal/metrics/node_modules, !./packages/internal/metrics/src
-            ./packages/internal/toolkit, !./packages/internal/toolkit/node_modules, !./packages/internal/toolkit/src
-            ./packages/internal/cryptofiat, !./packages/internal/cryptofiat/node_modules, !./packages/internal/cryptofiat/src
-            ./packages/internal/dex/sdk, !./packages/internal/dex/sdk/node_modules, !./packages/internal/dex/sdk/src
-            ./packages/internal/bridge/sdk, !./packages/internal/bridge/sdk/node_modules, !./packages/internal/bridge/sdk/src
-            ./packages/internal/generated-clients, !./packages/internal/generated-clients/node_modules, !./packages/internal/generated-clients/src
-            ./packages/checkout/sdk, !./packages/checkout/sdk/node_modules, !./packages/checkout/sdk/src
-            ./packages/checkout/widgets-lib, !./packages/checkout/widgets-lib/node_modules, !./packages/checkout/widgets-lib/src
-            ./packages/blockchain-data/sdk, !./packages/blockchain-data/sdk/node_modules, !./packages/blockchain-data/sdk/src
-            ./packages/webhook/sdk, !./packages/webhook/sdk/node_modules, !./packages/webhook/sdk/src
-            ./packages/minting-backend/sdk, !./packages/minting-backend/sdk/node_modules, !./packages/minting-backend/sdk/src
-
       - name: Generate version.json
         if: (env.DRY_RUN) == 'false'
         run: |
           echo '{ "version": "$(jq -r '.version' ./sdk/package.json)" }' > ./sdk/version.json
           cp ./sdk/version.json ./sdk/dist/
+      
+      - name: Pack SDK & Checkout Widgets packages and dependencies
+        run: pnpm pack-npm-packages
+
+      # ! Do NOT remove any of these attestation subject paths - this will cause a Sev 0 incident !
+      - name: Generate SDK Package Attestations
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: ./imtbl-*.tgz
 
       - name: Publish Github Release
         if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }}
