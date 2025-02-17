@@ -228,7 +228,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         toToken,
         fromAmount,
         toAmount,
-        error,
+        error: error.message,
       },
     });
   }, [track, fromToken, toToken, fromAmount, toAmount]);
