@@ -1,4 +1,3 @@
-// @ts-check
 import typescript from '@rollup/plugin-typescript';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
@@ -31,6 +30,7 @@ const productionPlugins = [
   }),
   nodePolyfills(),
   commonjs(),
+
 ]
 
 const getPlugins = () => {
@@ -59,17 +59,18 @@ export default [
       ...getPlugins(),
     ]
   },
-   {
-    input: 'src/index.ts',
-    output: {
-      file: 'dist/browser/index.cdn.js',
-      format: 'umd',
-      name: 'ImmutableCheckoutWidgets',
-      inlineDynamicImports: true
+  ...(process.env.NODE_ENV === PRODUCTION ? [
+    {
+      input: 'src/index.ts',
+      output: {
+        file: 'dist/browser/index.cdn.js',
+        format: 'umd',
+        name: 'ImmutableCheckoutWidgets',
+        inlineDynamicImports: true
     },
     context: 'window',
     plugins: [
       ...getPlugins(),
     ]
-  }
+  }] : []),
 ]

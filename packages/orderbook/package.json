@@ -53,7 +53,7 @@
   },
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "pnpm transpile && pnpm typegen",
+    "build": "pnpm transpile & pnpm typegen",
     "transpile": "tsup src/index.ts --config ../../tsup.config.js",
     "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
     "generate-types": "typechain --target=ethers-v6 --out-dir=src/typechain/types 'abi/*.json'",
