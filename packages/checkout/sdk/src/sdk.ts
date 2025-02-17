@@ -125,6 +125,7 @@ export class Checkout {
   /**
    * Loads the widgets bundle and initiate the widgets factory.
    * @param {WidgetsInit} init - The initialisation parameters for loading the widgets bundle and applying configuration
+   * @returns {Promise<ImmutableCheckoutWidgets.WidgetsFactory>} A promise that resolves to the widgets factory instance
    */
   public async widgets(
     init: WidgetsInit,
@@ -330,6 +331,10 @@ export class Checkout {
     return InjectedProvidersManager.getInstance().subscribe(listener);
   }
 
+  /**
+   * Clears all registered injected providers and their subscriptions.
+   * @returns {void} This method doesn't return a value
+   */
   public clearInjectedProviders() {
     return InjectedProvidersManager.getInstance().clear();
   }
@@ -589,6 +594,7 @@ export class Checkout {
   /**
    * Determines the requirements for performing a buy.
    * @param {BuyParams} params - The parameters for the buy.
+   * @returns {Promise<BuyResult>} A promise that resolves to the buy transaction requirements
    * @deprecated Please use orderbook.fulfillOrder or orderbook.fulfillBulkOrders instead. The smartCheckout
    * method can still be used to ensure the transaction requirements are met before preparing the order fulfillment
    */
@@ -616,6 +622,7 @@ export class Checkout {
   /**
    * Determines the requirements for performing a sell.
    * @param {SellParams} params - The parameters for the sell.
+   * @returns {Promise<SellResult>} A promise that resolves to the sell transaction requirements
    * Only currently actions the first order in the array until we support batch processing.
    * Only currently actions the first fee in the fees array of each order until we support multiple fees.
    * @deprecated Please use orderbook.prepareListing or orderbook.prepareBulkListing instead. The smartCheckout
@@ -640,6 +647,7 @@ export class Checkout {
   /**
    * Cancels a sell.
    * @param {CancelParams} params - The parameters for the cancel.
+   * @returns {Promise<CancelResult>} A promise that resolves to the cancel transaction result
    * @deprecated Please use orderbook.prepareOrderCancellations instead.
    */
   public async cancel(params: CancelParams): Promise<CancelResult> {
@@ -663,7 +671,8 @@ export class Checkout {
 
   /**
    * Determines the transaction requirements to complete a purchase.
-   * @params {SmartCheckoutParams} params - The parameters for smart checkout.
+   * @param {SmartCheckoutParams} params - The parameters for smart checkout.
+   * @returns {Promise<SmartCheckoutResult>} A promise that resolves to the transaction requirements for completing the purchase
    */
   public async smartCheckout(
     params: SmartCheckoutParams,
