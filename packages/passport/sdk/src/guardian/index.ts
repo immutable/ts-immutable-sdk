@@ -25,7 +25,7 @@ type GuardianEVMTxnEvaluationParams = {
   chainId: string;
   nonce: string;
   metaTransactions: MetaTransaction[];
-  nonceSpace?: BigNumber;
+  isBackgroundTransaction?: boolean;
 };
 
 type GuardianEIP712MessageEvaluationParams = {
@@ -216,7 +216,7 @@ export default class GuardianClient {
     chainId,
     nonce,
     metaTransactions,
-    nonceSpace,
+    isBackgroundTransaction,
   }: GuardianEVMTxnEvaluationParams): Promise<void> {
     const transactionEvaluationResponse = await this.evaluateEVMTransaction({
       chainId,
@@ -249,7 +249,7 @@ export default class GuardianClient {
       }
       // This verification is meant to ensure that it originates from zkEvmProvider#callSessionActivity
       // and since it's a background transaction should not close the confirmation screen window.
-    } else if (BigNumber.from(1).eq(nonceSpace ?? 0)) {
+    } else if (!isBackgroundTransaction) {
       this.confirmationScreen.closeWindow();
     }
   }

@@ -1,7 +1,6 @@
 import * as GeneratedClients from '@imtbl/generated-clients';
 import { TransactionRequest } from '@ethersproject/providers';
 import { ImmutableConfiguration } from '@imtbl/config';
-import { BigNumber } from 'ethers';
 import { ConfirmationScreen } from '../confirmation';
 import AuthManager from '../authManager';
 import GuardianClient from './index';
@@ -232,7 +231,7 @@ describe('Guardian', () => {
       });
     });
 
-    it('should not close confirmation window when nonceSpace is not defined', async () => {
+    it('should not close confirmation window when is a background transaction', async () => {
       const transactionRequest: TransactionRequest = {
         to: mockUserZkEvm.zkEvm.ethAddress,
         data: '0x456',
@@ -253,6 +252,7 @@ describe('Guardian', () => {
             nonce: 5,
           },
         ],
+        isBackgroundTransaction: true,
       });
 
       expect(mockConfirmationScreen.requestConfirmation).toBeCalledTimes(0);
@@ -283,7 +283,7 @@ describe('Guardian', () => {
       });
     });
 
-    it('should close confirmation window when nonceSpace is BigNumber.from(1)', async () => {
+    it('should close confirmation window when is not a background transaction', async () => {
       const transactionRequest: TransactionRequest = {
         to: mockUserZkEvm.zkEvm.ethAddress,
         data: '0x456',
@@ -304,7 +304,7 @@ describe('Guardian', () => {
             nonce: 1,
           },
         ],
-        nonceSpace: BigNumber.from(1),
+        isBackgroundTransaction: false, // not passing this parameter should result in the same behavior cause default value is false
       });
 
       expect(mockConfirmationScreen.requestConfirmation).toBeCalledTimes(0);
