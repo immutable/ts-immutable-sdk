@@ -304,7 +304,58 @@ describe('Guardian', () => {
             nonce: 1,
           },
         ],
-        isBackgroundTransaction: false, // not passing this parameter should result in the same behavior cause default value is false
+        isBackgroundTransaction: false,
+      });
+
+      expect(mockConfirmationScreen.requestConfirmation).toBeCalledTimes(0);
+      expect(mockConfirmationScreen.closeWindow).toBeCalledTimes(1);
+
+      expect(mockEvaluateTransaction).toBeCalledWith({
+        id: 'evm',
+        transactionEvaluationRequest: {
+          chainId: 'epi123',
+          chainType: 'evm',
+          transactionData: {
+            nonce: '5',
+            userAddress: mockUserZkEvm.zkEvm.ethAddress,
+            metaTransactions: [
+              {
+                data: transactionRequest.data,
+                delegateCall: false,
+                gasLimit: '0',
+                revertOnError: true,
+                target: mockUserZkEvm.zkEvm.ethAddress,
+                value: '0',
+              },
+            ],
+          },
+        },
+      }, {
+        headers: { Authorization: `Bearer ${mockUser.accessToken}` },
+      });
+    });
+
+    it('should close confirmation window to validate background transaction falsy default value', async () => {
+      const transactionRequest: TransactionRequest = {
+        to: mockUserZkEvm.zkEvm.ethAddress,
+        data: '0x456',
+        value: '0x',
+      };
+
+      mockEvaluateTransaction.mockResolvedValue({ data: { confirmationRequired: true } });
+
+      await getGuardianClient().validateEVMTransaction({
+        chainId: 'epi123',
+        nonce: '5',
+        metaTransactions: [
+          {
+            data: transactionRequest.data,
+            revertOnError: true,
+            to: mockUserZkEvm.zkEvm.ethAddress,
+            value: '0x00',
+            nonce: 1,
+          },
+        ],
       });
 
       expect(mockConfirmationScreen.requestConfirmation).toBeCalledTimes(0);
