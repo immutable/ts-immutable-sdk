@@ -209,6 +209,7 @@ export class ZkEvmProvider implements Provider {
         zkEvmAddress,
         flow,
         nonceSpace,
+        isBackgroundTransaction: true,
       });
     };
     this.#passportEventEmitter.emit(PassportEvents.ACCOUNTS_REQUESTED, {

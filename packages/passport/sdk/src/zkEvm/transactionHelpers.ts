@@ -14,7 +14,11 @@ import {
 } from './walletHelpers';
 import { RelayerClient } from './relayerClient';
 import GuardianClient, { convertBigNumberishToString } from '../guardian';
-import { FeeOption, MetaTransaction, RelayerTransactionStatus } from './types';
+import {
+  FeeOption,
+  MetaTransaction,
+  RelayerTransactionStatus,
+} from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { retryWithDelay } from '../network/retry';
 
@@ -29,6 +33,7 @@ export type TransactionParams = {
   zkEvmAddress: string;
   flow: Flow;
   nonceSpace?: BigNumber;
+  isBackgroundTransaction?: boolean;
 };
 
 export type EjectionTransactionParams = Pick<TransactionParams, 'ethSigner' | 'zkEvmAddress' | 'flow'>;
@@ -168,6 +173,7 @@ export const prepareAndSignTransaction = async ({
   zkEvmAddress,
   flow,
   nonceSpace,
+  isBackgroundTransaction,
 }: TransactionParams & { transactionRequest: TransactionRequest }) => {
   const { chainId } = await rpcProvider.detectNetwork();
   const chainIdBigNumber = BigNumber.from(chainId);
@@ -194,6 +200,7 @@ export const prepareAndSignTransaction = async ({
       chainId: getEip155ChainId(chainId),
       nonce: convertBigNumberishToString(nonce),
       metaTransactions,
+      isBackgroundTransaction,
     });
     flow.addEvent('endValidateEVMTransaction');
   };

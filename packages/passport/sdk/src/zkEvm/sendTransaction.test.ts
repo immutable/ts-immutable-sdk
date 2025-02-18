@@ -72,6 +72,7 @@ describe('sendTransaction', () => {
       guardianClient: guardianClient as unknown as GuardianClient,
       zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
       flow: flow as unknown as Flow,
+      isBackgroundTransaction: false,
     });
   });
 
