@@ -231,6 +231,161 @@ describe('Guardian', () => {
       });
     });
 
+    it('should not close confirmation window when is a background transaction', async () => {
+      const transactionRequest: TransactionRequest = {
+        to: mockUserZkEvm.zkEvm.ethAddress,
+        data: '0x456',
+        value: '0x',
+      };
+
+      mockEvaluateTransaction.mockResolvedValue({ data: { confirmationRequired: true } });
+
+      await getGuardianClient().validateEVMTransaction({
+        chainId: 'epi123',
+        nonce: '5',
+        metaTransactions: [
+          {
+            data: transactionRequest.data,
+            revertOnError: true,
+            to: mockUserZkEvm.zkEvm.ethAddress,
+            value: '0x00',
+            nonce: 5,
+          },
+        ],
+        isBackgroundTransaction: true,
+      });
+
+      expect(mockConfirmationScreen.requestConfirmation).toBeCalledTimes(0);
+      expect(mockConfirmationScreen.closeWindow).toBeCalledTimes(0);
+
+      expect(mockEvaluateTransaction).toBeCalledWith({
+        id: 'evm',
+        transactionEvaluationRequest: {
+          chainId: 'epi123',
+          chainType: 'evm',
+          transactionData: {
+            nonce: '5',
+            userAddress: mockUserZkEvm.zkEvm.ethAddress,
+            metaTransactions: [
+              {
+                data: transactionRequest.data,
+                delegateCall: false,
+                gasLimit: '0',
+                revertOnError: true,
+                target: mockUserZkEvm.zkEvm.ethAddress,
+                value: '0',
+              },
+            ],
+          },
+        },
+      }, {
+        headers: { Authorization: `Bearer ${mockUser.accessToken}` },
+      });
+    });
+
+    it('should close confirmation window when is not a background transaction', async () => {
+      const transactionRequest: TransactionRequest = {
+        to: mockUserZkEvm.zkEvm.ethAddress,
+        data: '0x456',
+        value: '0x',
+      };
+
+      mockEvaluateTransaction.mockResolvedValue({ data: { confirmationRequired: true } });
+
+      await getGuardianClient().validateEVMTransaction({
+        chainId: 'epi123',
+        nonce: '5',
+        metaTransactions: [
+          {
+            data: transactionRequest.data,
+            revertOnError: true,
+            to: mockUserZkEvm.zkEvm.ethAddress,
+            value: '0x00',
+            nonce: 1,
+          },
+        ],
+        isBackgroundTransaction: false,
+      });
+
+      expect(mockConfirmationScreen.requestConfirmation).toBeCalledTimes(0);
+      expect(mockConfirmationScreen.closeWindow).toBeCalledTimes(1);
+
+      expect(mockEvaluateTransaction).toBeCalledWith({
+        id: 'evm',
+        transactionEvaluationRequest: {
+          chainId: 'epi123',
+          chainType: 'evm',
+          transactionData: {
+            nonce: '5',
+            userAddress: mockUserZkEvm.zkEvm.ethAddress,
+            metaTransactions: [
+              {
+                data: transactionRequest.data,
+                delegateCall: false,
+                gasLimit: '0',
+                revertOnError: true,
+                target: mockUserZkEvm.zkEvm.ethAddress,
+                value: '0',
+              },
+            ],
+          },
+        },
+      }, {
+        headers: { Authorization: `Bearer ${mockUser.accessToken}` },
+      });
+    });
+
+    it('should close confirmation window to validate background transaction falsy default value', async () => {
+      const transactionRequest: TransactionRequest = {
+        to: mockUserZkEvm.zkEvm.ethAddress,
+        data: '0x456',
+        value: '0x',
+      };
+
+      mockEvaluateTransaction.mockResolvedValue({ data: { confirmationRequired: true } });
+
+      await getGuardianClient().validateEVMTransaction({
+        chainId: 'epi123',
+        nonce: '5',
+        metaTransactions: [
+          {
+            data: transactionRequest.data,
+            revertOnError: true,
+            to: mockUserZkEvm.zkEvm.ethAddress,
+            value: '0x00',
+            nonce: 1,
+          },
+        ],
+      });
+
+      expect(mockConfirmationScreen.requestConfirmation).toBeCalledTimes(0);
+      expect(mockConfirmationScreen.closeWindow).toBeCalledTimes(1);
+
+      expect(mockEvaluateTransaction).toBeCalledWith({
+        id: 'evm',
+        transactionEvaluationRequest: {
+          chainId: 'epi123',
+          chainType: 'evm',
+          transactionData: {
+            nonce: '5',
+            userAddress: mockUserZkEvm.zkEvm.ethAddress,
+            metaTransactions: [
+              {
+                data: transactionRequest.data,
+                delegateCall: false,
+                gasLimit: '0',
+                revertOnError: true,
+                target: mockUserZkEvm.zkEvm.ethAddress,
+                value: '0',
+              },
+            ],
+          },
+        },
+      }, {
+        headers: { Authorization: `Bearer ${mockUser.accessToken}` },
+      });
+    });
+
     it('should throw PassportError with SERVICE_UNAVAILABLE_ERROR when evaluateTransaction returns 403', async () => {
       mockEvaluateTransaction.mockRejectedValueOnce({
         isAxiosError: true,
