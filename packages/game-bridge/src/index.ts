@@ -703,7 +703,7 @@ window.callFunction = async (jsonData: string) => {
         trackDuration(moduleName, 'performedZkevmSendTransactionWithConfirmation', mt(markStart), {
           requestId,
           transactionRequest: JSON.stringify(transaction),
-          transactionResponse: JSON.stringify(response),
+          transactionResponse: JSON.stringify(response?.toJSON()),
         });
         callbackToGame({
           ...{
@@ -712,7 +712,7 @@ window.callFunction = async (jsonData: string) => {
             success: true,
             error: null,
           },
-          ...response,
+          ...response?.toJSON(),
         });
         break;
       }
