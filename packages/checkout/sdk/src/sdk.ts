@@ -327,7 +327,7 @@ export class Checkout {
   /**
    * Subscribes to changes in the injected providers.
    * @param {(providers: EIP6963ProviderDetail[]) => void} listener - The listener to be called when the injected providers change.
-   * @returns {void} - A function to unsubscribe the listener.
+   * @returns {() => void} - A function to unsubscribe the listener.
    */
   public onInjectedProvidersChange(
     listener: (providers: EIP6963ProviderDetail[]) => void,
