@@ -5,7 +5,7 @@ import {
   ProviderConfiguration,
 } from '@imtbl/sdk/x';
 import { parseUnits } from '@ethersproject/units';
-import { repeatCheck30, repeatCheck300 } from '../common';
+import { repeatCheck30, repeatCheck300 } from 'common';
 import { strict as assert } from 'assert';
 import { configuration, StepSharedState } from './stepSharedState';
 
