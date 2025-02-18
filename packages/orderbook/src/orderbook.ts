@@ -785,13 +785,16 @@ export class Orderbook {
    * {@linkcode cancelOrdersOnChain}. Orders cancelled this way cannot be fulfilled and
    * will be removed from the orderbook. If there is pending fulfillment data outstanding
    * for the order, its cancellation will be pending until the fulfillment window has passed.
-   * {@linkcode prepareOrderCancellations} can be used to get the signable action that is signed
-   * to get the signature required for this call.
-   * @param {string[]} orderIds - The orderIds to attempt to cancel.
-   * @param {string} accountAddress - The address of the account cancelling the orders.
-   * @param {string} signature - The signature obtained by signing the
-   * message obtained from {@linkcode prepareOrderCancellations}.
-   * @return {CancelOrdersResult} The result of the off-chain cancellation request
+   * @param {string[]} orderIds - The orderIds to attempt to cancel
+   * @param {string} accountAddress - The address of the account cancelling the orders
+   * @param {string} signature - The EIP-712 signature obtained by signing the message from
+   *                             {@linkcode prepareOrderCancellations}
+   * @return {CancelOrdersResult} The result of the off-chain cancellation request containing:
+   *  - cancelled_orders: Array of successfully cancelled order IDs
+   *  - pending_orders: Array of order IDs pending
+   *    cancellation
+   * @throws {Error} If the signature is invalid or the account is not
+   *                 authorized to cancel the orders
    */
   async cancelOrders(
     orderIds: string[],

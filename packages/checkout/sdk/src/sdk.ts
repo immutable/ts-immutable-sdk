@@ -123,9 +123,11 @@ export class Checkout {
   }
 
   /**
-   * Loads the widgets bundle and initiate the widgets factory.
+   * Loads the widgets bundle and initiates the widgets factory.
    * @param {WidgetsInit} init - The initialisation parameters for loading the widgets bundle and applying configuration
    * @returns {Promise<ImmutableCheckoutWidgets.WidgetsFactory>} A promise that resolves to the widgets factory instance
+   *                                                             that can be used to create and manage widgets
+   * @throws {CheckoutError} When the widgets script fails to load
    */
   public async widgets(
     init: WidgetsInit,
@@ -409,6 +411,7 @@ export class Checkout {
    * Adds the network for the current wallet provider.
    * @param {AddNetworkParams} params - The parameters for adding the network.
    * @returns {Promise<any>} - A promise that resolves to the result of adding the network.
+   * @throws {CheckoutError} When the network cannot be added to the wallet
    */
   public async addNetwork(params: AddNetworkParams): Promise<any> {
     const addNetworkRes = await network.addNetworkToWallet(
@@ -671,8 +674,15 @@ export class Checkout {
 
   /**
    * Determines the transaction requirements to complete a purchase.
+   * This includes checking token approvals, native currency balance,
+   * and calculating the optimal route for completing the transaction.
    * @param {SmartCheckoutParams} params - The parameters for smart checkout.
-   * @returns {Promise<SmartCheckoutResult>} A promise that resolves to the transaction requirements for completing the purchase
+   * @returns {Promise<SmartCheckoutResult>} A promise that resolves to the transaction requirements including:
+   * - Required token approvals
+   * - Required native currency balance
+   * - Suggested transaction route
+   * - Estimated gas costs
+   * @throws {CheckoutError} When item requirements cannot be mapped or checkout validation fails
    */
   public async smartCheckout(
     params: SmartCheckoutParams,
