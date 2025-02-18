@@ -559,6 +559,11 @@
             ]
           },
           {
+            "BearerAuthWithClient": [
+              "refresh:metadata"
+            ]
+          },
+          {
             "BearerAuth": [
               "refresh:metadata"
             ]
@@ -3479,6 +3484,107 @@
         }
       }
     },
+    "/passport-mr/v1/users/{user_id}/metadata": {
+      "get": {
+        "x-internal": true,
+        "summary": "Get passport metadata related to a user",
+        "description": "Get passport metadata related to a user",
+        "tags": [
+          "passport"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "The user's userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "getUserMetadata",
+        "security": [
+          {
+            "ImmutableApiKey": [
+              "read:passport-metadata"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User's passport metadata response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetPassportMetadataRes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "TooManyRequestsError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError429"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v2/chains/{chain_name}/passport/counterfactual-address": {
       "post": {
         "x-internal": true,
@@ -5149,6 +5255,16 @@
             }
           },
           {
+            "name": "payment_token",
+            "in": "query",
+            "required": false,
+            "description": "Filters the active listings, bids, floor listing and top bid by the specified payment token, either the address of the payment token contract or 'NATIVE'",
+            "schema": {
+              "type": "string",
+              "example": "NATIVE"
+            }
+          },
+          {
             "name": "sort_by",
             "in": "query",
             "required": false,
@@ -5340,6 +5456,16 @@
             }
           },
           {
+            "name": "payment_token",
+            "in": "query",
+            "required": false,
+            "description": "Filters the active listings, bids, floor listing and top bid by the specified payment token, either the address of the payment token contract or 'NATIVE'.",
+            "schema": {
+              "type": "string",
+              "example": "NATIVE"
+            }
+          },
+          {
             "name": "page_cursor",
             "in": "query",
             "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
@@ -5424,10 +5550,21 @@
               "type": "array",
               "items": {
                 "type": "string",
+                "pattern": "^\\d+$",
                 "example": "1337"
               },
               "minItems": 1,
               "maxItems": 20
+            }
+          },
+          {
+            "name": "payment_token",
+            "in": "query",
+            "required": false,
+            "description": "Filters the active listings, bids, floor listing and top bid by the specified payment token, either the address of the payment token contract or 'NATIVE'.",
+            "schema": {
+              "type": "string",
+              "example": "NATIVE"
             }
           },
           {
@@ -5475,6 +5612,11 @@
   },
   "components": {
     "securitySchemes": {
+      "BearerAuthWithClient": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
       "BearerAuth": {
         "type": "http",
         "scheme": "bearer",
@@ -5485,11 +5627,6 @@
         "type": "apiKey",
         "in": "header",
         "name": "x-immutable-api-key"
-      },
-      "BearerAuthWithClient": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
       }
     },
     "parameters": {
@@ -10349,6 +10486,41 @@
           }
         }
       },
+      "GetPassportMetadataRes": {
+        "type": "object",
+        "required": [
+          "passport_metadata"
+        ],
+        "properties": {
+          "passport_metadata": {
+            "type": "array",
+            "minItems": 0,
+            "description": "The user's passport metadata",
+            "items": {
+              "description": "The user's passport metadata",
+              "type": "object",
+              "properties": {
+                "chain_id": {
+                  "type": "string",
+                  "description": "The chain id (eg: eip155:1)"
+                },
+                "chain_key": {
+                  "type": "string",
+                  "description": "The chain key"
+                },
+                "user_admin_key": {
+                  "type": "string",
+                  "description": "The user admin key"
+                },
+                "counterfactual_address": {
+                  "type": "string",
+                  "description": "The counterfactual address"
+                }
+              }
+            }
+          }
+        }
+      },
       "GetLinkedAddressesRes": {
         "type": "object",
         "required": [
@@ -11417,6 +11589,33 @@
           }
         }
       },
+      "DomainType": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "chainId": {
+            "oneOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "verifyingContract": {
+            "type": "string"
+          },
+          "salt": {
+            "type": "string"
+          }
+        }
+      },
       "EIP712Message": {
         "type": "object",
         "properties": {
@@ -11468,24 +11667,7 @@
             "type": "string"
           },
           "domain": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "string"
-              },
-              "version": {
-                "type": "string"
-              },
-              "chainId": {
-                "type": "integer"
-              },
-              "verifyingContract": {
-                "type": "string"
-              },
-              "salt": {
-                "type": "string"
-              }
-            }
+            "$ref": "#/components/schemas/DomainType"
           },
           "message": {
             "type": "object"

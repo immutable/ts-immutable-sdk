@@ -215,6 +215,24 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     network,
   ]);
 
+  const openUnableToSwapDrawer = useCallback((error: any) => {
+    setShowNotEnoughImxDrawer(false);
+    setShowUnableToSwapDrawer(true);
+    track({
+      userJourney: UserJourney.SWAP,
+      screen: 'SwapCoins',
+      control: 'UnableToSwapDrawer',
+      controlType: 'Button',
+      extras: {
+        fromToken,
+        toToken,
+        fromAmount,
+        toAmount,
+        error: 'message' in error ? error.message : error,
+      },
+    });
+  }, [track, fromToken, toToken, fromAmount, toAmount]);
+
   const tokensOptionsTo = useMemo(() => allowedTokens
     .map(
       (token) => ({
@@ -329,8 +347,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         console.error('Error fetching quote.', error);
 
         resetQuote();
-        setShowNotEnoughImxDrawer(false);
-        setShowUnableToSwapDrawer(true);
+        openUnableToSwapDrawer(error);
       }
     }
 
@@ -406,8 +423,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     } catch (error: any) {
       if (!error.cancelled) {
         resetQuote();
-        setShowNotEnoughImxDrawer(false);
-        setShowUnableToSwapDrawer(true);
+        openUnableToSwapDrawer(error);
       }
     }
 
@@ -542,6 +558,18 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     setFromToken(selected.token);
     setFromBalance(selected.formattedBalance);
     setFromTokenError('');
+
+    track({
+      userJourney: UserJourney.SWAP,
+      screen: 'SwapCoins',
+      control: 'SelectFrom',
+      controlType: 'Select',
+      extras: {
+        fromBalance: selected.formattedBalance,
+        fromToken: selected.token,
+        fromAmount,
+      },
+    });
   }, [toToken]);
 
   const onFromTextInputFocus = () => {
@@ -559,6 +587,18 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       setLoading(true);
     }
     setFromAmount(value);
+
+    track({
+      userJourney: UserJourney.SWAP,
+      screen: 'SwapCoins',
+      control: 'InputFrom',
+      controlType: 'TextInput',
+      extras: {
+        fromBalance,
+        fromToken,
+        fromAmount: value,
+      },
+    });
   };
 
   const textInputMaxButtonClick = () => {
@@ -602,6 +642,17 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
 
     setToToken(selected);
     setToTokenError('');
+
+    track({
+      userJourney: UserJourney.SWAP,
+      screen: 'SwapCoins',
+      control: 'SelectTo',
+      controlType: 'Select',
+      extras: {
+        toToken: selected,
+        toAmount,
+      },
+    });
   }, [fromToken]);
 
   const onToTextInputFocus = () => {
@@ -620,6 +671,17 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       setLoading(true);
     }
     setToAmount(value);
+
+    track({
+      userJourney: UserJourney.SWAP,
+      screen: 'SwapCoins',
+      control: 'InputTo',
+      controlType: 'TextInput',
+      extras: {
+        toToken,
+        toAmount: value,
+      },
+    });
   };
 
   const openNotEnoughImxDrawer = () => {
