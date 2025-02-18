@@ -157,7 +157,11 @@ export class Passport {
    * @param {boolean} options.announceProvider - Whether to announce the provider via EIP-6963 for wallet discovery (defaults to true)
    * @returns {Provider} The EVM provider instance
    */
-  public connectEvm(options: { announceProvider: boolean }): Provider {
+  public connectEvm(options: {
+    announceProvider: boolean
+  } = {
+    announceProvider: true,
+  }): Provider {
     return withMetrics(() => {
       const provider = new ZkEvmProvider({
         passportEventEmitter: this.passportEventEmitter,
@@ -317,6 +321,21 @@ export class Passport {
       }
       this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
     }, 'logout');
+  }
+
+  /**
+     * Logs the user out of Passport when using device flow authentication.
+     *
+     * @returns {Promise<string>} The device flow end session endpoint. Consumers are responsible for
+     * opening this URL in the same browser that was used to log the user in.
+     */
+  public async logoutDeviceFlow(): Promise<string> {
+    return withMetricsAsync(async () => {
+      await this.authManager.removeUser();
+      await this.magicAdapter.logout();
+      this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
+      return await this.authManager.getDeviceFlowEndSessionEndpoint();
+    }, 'logoutDeviceFlow');
   }
 
   /**

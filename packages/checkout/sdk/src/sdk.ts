@@ -307,6 +307,7 @@ export class Checkout {
 
   /**
    * Returns a list of EIP-6963 injected providers and their metadata.
+   * @returns {readonly EIP6963ProviderDetail[]} A readonly array of injected providers and their metadata.
    */
   public getInjectedProviders(): readonly EIP6963ProviderDetail[] {
     return InjectedProvidersManager.getInstance().getProviders();
@@ -314,7 +315,7 @@ export class Checkout {
 
   /**
    * Finds an injected provider by its RDNS.
-   * @param {rdns: string} args - The parameters for finding the injected provider.
+   * @param {{rdns: string}} args - The parameters for finding the injected provider.
    * @returns {EIP6963ProviderDetail | undefined} - The found provider and metadata or undefined.
    */
   public findInjectedProvider(args: {
@@ -325,7 +326,8 @@ export class Checkout {
 
   /**
    * Subscribes to changes in the injected providers.
-   * @param listener - The listener to be called when the injected providers change.
+   * @param {(providers: EIP6963ProviderDetail[]) => void} listener - The listener to be called when the injected providers change.
+   * @returns {void} - A function to unsubscribe the listener.
    */
   public onInjectedProvidersChange(
     listener: (providers: EIP6963ProviderDetail[]) => void,
@@ -372,7 +374,7 @@ export class Checkout {
   /**
    * Helper method that checks if given risk assessment results contain sanctioned addresses.
    * @param {AssessmentResult} assessment - Risk assessment to analyse.
-   * @param {string | undefined} address - If defined, only sanctions for the given address will be checked.
+   * @param {string} [address] - If defined, only sanctions for the given address will be checked.
    * @returns {boolean} - Result of the check.
    */
   public checkIsAddressSanctioned(assessment: AssessmentResult, address?: string): boolean {
