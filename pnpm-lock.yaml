@@ -5,6 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
+  elliptic: ^6.6.1
   responselike: ^2.0.0
 
 importers:
@@ -9867,9 +9868,6 @@ packages:
   electron-to-chromium@1.5.24:
     resolution: {integrity: sha512-0x0wLCmpdKFCi9ulhvYZebgcPmHTkFVUfU2wzDykadkslKwT4oAmDTHEKLnlrDsMGZe4B+ksn8quZfZjYsBetA==}
 
-  elliptic@6.5.4:
-    resolution: {integrity: sha512-iLhC6ULemrljPZb+QutR5TQGB+pdW6KGD5RSegS+8sorOZT+rdQFbsQFJgvN3eRqNALqJer4oQ16YvJHlU8hzQ==}
-
   elliptic@6.6.1:
     resolution: {integrity: sha512-RaddvvMatK2LJHqFJ+YA4WysVN5Ita9E35botqIYspQ4TkRAlCicdzKOjlyv/1Za5RyTNn7di//eEV0uTAfe3g==}
 
@@ -19565,7 +19563,7 @@ snapshots:
       '@ethersproject/logger': 5.7.0
       '@ethersproject/properties': 5.7.0
       bn.js: 5.2.1
-      elliptic: 6.5.4
+      elliptic: 6.6.1
       hash.js: 1.1.7
 
   '@ethersproject/solidity@5.7.0':
@@ -25123,7 +25121,7 @@ snapshots:
 
   ast-types@0.15.2:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   astral-regex@1.0.0: {}
 
@@ -25135,7 +25133,7 @@ snapshots:
 
   async-mutex@0.2.6:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   async@1.5.2: {}
 
@@ -27030,16 +27028,6 @@ snapshots:
       jake: 10.8.7
 
   electron-to-chromium@1.5.24: {}
-
-  elliptic@6.5.4:
-    dependencies:
-      bn.js: 4.12.0
-      brorand: 1.1.0
-      hash.js: 1.1.7
-      hmac-drbg: 1.0.1
-      inherits: 2.0.4
-      minimalistic-assert: 1.0.1
-      minimalistic-crypto-utils: 1.0.1
 
   elliptic@6.6.1:
     dependencies:
@@ -34747,7 +34735,7 @@ snapshots:
       ast-types: 0.15.2
       esprima: 4.0.1
       source-map: 0.6.1
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   rechoir@0.6.2:
     dependencies:

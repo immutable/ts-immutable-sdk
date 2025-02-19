@@ -48,6 +48,7 @@
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
+    "elliptic": "^6.6.1",
     "responselike": "^2.0.0"
   },
   "scripts": {
