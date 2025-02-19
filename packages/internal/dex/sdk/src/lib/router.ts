@@ -7,6 +7,7 @@ import { erc20ToUniswapToken, poolEquals, uniswapTokenToERC20 } from './utils';
 import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
 import { ERC20Pair } from './poolUtils/generateERC20Pairs';
+import { DEFAULT_MAX_HOPS } from '../constants/router';
 import type { Multicall } from '../contracts/types';
 
 export type RoutingContracts = {
@@ -32,7 +33,7 @@ export class Router {
     amountSpecified: CoinAmount<ERC20>,
     otherToken: ERC20,
     tradeType: TradeType,
-    maxHops: number = 2,
+    maxHops: number = DEFAULT_MAX_HOPS,
   ): Promise<QuoteResult> {
     const [tokenIn, tokenOut] = this.determineERC20InAndERC20Out(tradeType, amountSpecified, otherToken);
 
