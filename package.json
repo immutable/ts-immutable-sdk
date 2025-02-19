@@ -48,7 +48,7 @@
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
-    "@openzeppelin/contracts": "^3.4.2-solc-0.7-2",
+    "@openzeppelin/contracts@3.4.1-solc-0.7-2": "^3.4.2-solc-0.7-2",
     "elliptic": "^6.6.1",
     "responselike": "^2.0.0"
   },
