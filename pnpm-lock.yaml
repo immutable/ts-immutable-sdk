@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  '@openzeppelin/contracts@3.4.1-solc-0.7-2': ^3.4.2
+  '@openzeppelin/contracts@3.4.1-solc-0.7-2': 3.4.2
   elliptic: ^6.6.1
   responselike: ^2.0.0
 
