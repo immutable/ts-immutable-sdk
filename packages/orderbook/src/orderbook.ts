@@ -743,7 +743,7 @@ export class Orderbook {
     const network = await this.orderbookConfig.provider.getNetwork();
     const domain = {
       name: 'imtbl-order-book',
-      chainId: network.chainId,
+      chainId: network.chainId.toString(),
       verifyingContract: this.orderbookConfig.seaportContractAddress,
     };
 

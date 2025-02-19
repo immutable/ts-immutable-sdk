@@ -8,7 +8,7 @@ import {
 import { CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
 import { useTranslation } from 'react-i18next';
-import { utils } from 'ethers';
+import { parseUnits } from 'ethers';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -132,7 +132,7 @@ export function ApproveTransaction({ bridgeTransaction }: ApproveTransactionProp
   };
 
   const handleApproveTransferClick = useCallback(async () => {
-    if (!checkout || !from?.web3Provider) {
+    if (!checkout || !from?.browserProvider) {
       showErrorView();
       return;
     }
@@ -146,18 +146,18 @@ export function ApproveTransaction({ bridgeTransaction }: ApproveTransactionProp
       if (tokenToTransfer === NATIVE.toLowerCase()) {
         const request = {
           to: to?.walletAddress,
-          value: utils.parseUnits(amount, token?.decimals),
+          value: parseUnits(amount, token?.decimals),
         };
         const result = await checkout.sendTransaction({
-          provider: from.web3Provider,
+          provider: from.browserProvider,
           transaction: request,
         });
         txHash = result.transactionResponse.hash;
       } else {
-        const erc20 = getErc20Contract(tokenToTransfer, from.web3Provider.getSigner());
-        const parsedAmount = utils.parseUnits(amount, token?.decimals);
+        const erc20 = getErc20Contract(tokenToTransfer, await from.browserProvider.getSigner());
+        const parsedAmount = parseUnits(amount, token?.decimals);
         const response = await checkout.providerCall(
-          from.web3Provider,
+          from.browserProvider,
           async () => await erc20.transfer(to?.walletAddress, parsedAmount),
         );
         txHash = response.hash;
@@ -194,7 +194,7 @@ export function ApproveTransaction({ bridgeTransaction }: ApproveTransactionProp
     let bridgeRejected = false;
     // Force unwrap as bridgeTransaction being defined is a requirement for this callback to be invoked
     const { approveTransaction, transaction } = bridgeTransaction!;
-    if (!checkout || !from?.web3Provider || !transaction) {
+    if (!checkout || !from?.browserProvider || !transaction) {
       showErrorView();
       return;
     }
@@ -206,11 +206,11 @@ export function ApproveTransaction({ bridgeTransaction }: ApproveTransactionProp
       try {
         setTxProcessing(true);
         const approveSpendingResult = await checkout.sendTransaction({
-          provider: from.web3Provider,
+          provider: from.browserProvider,
           transaction: approveTransaction.unsignedTx,
         });
         const approvalReceipt = await approveSpendingResult.transactionResponse.wait();
-        if (approvalReceipt.status !== 1) {
+        if (approvalReceipt?.status !== 1) {
           viewDispatch({
             payload: {
               type: ViewActions.UPDATE_VIEW,
@@ -239,7 +239,7 @@ export function ApproveTransaction({ bridgeTransaction }: ApproveTransactionProp
       if (bridgeRejected) return;
       setTxProcessing(true);
       const sendResult = await checkout.sendTransaction({
-        provider: from.web3Provider,
+        provider: from.browserProvider,
         transaction: transaction.unsignedTx,
       });
       viewDispatch({
@@ -254,7 +254,7 @@ export function ApproveTransaction({ bridgeTransaction }: ApproveTransactionProp
       });
 
       const receipt = await sendResult.transactionResponse.wait();
-      if (receipt.status === 0) {
+      if (receipt?.status === 0) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,

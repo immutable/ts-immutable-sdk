@@ -1,6 +1,6 @@
 import { orderbook } from '@imtbl/sdk';
 import { DefineStepFunction } from 'jest-cucumber';
-import { BigNumber, Wallet } from 'ethers';
+import { Wallet } from 'ethers';
 import {
   bulkFulfillListings,
   connectToTestERC1155Token,
@@ -344,25 +344,25 @@ export const andAnyRemainingFundsAreReturnedToBanker = (
 ) => {
   and(/^any remaining funds are returned to the banker$/, async () => {
     await withBankerRetry(async () => {
-      const fulfillerBalance = await fulfiller.getBalance();
-      const offererBalance = await offerer.getBalance();
+      const fulfillerBalance = await fulfiller.provider?.getBalance(fulfiller.address) ?? 0n
+      const offererBalance = await offerer.provider?.getBalance(offerer.address) ?? 0n
 
-      if (fulfillerBalance.gt(BigNumber.from(transferTxnFee))) {
+      if (fulfillerBalance > BigInt(transferTxnFee)) {
         // fulfiller returns funds
         const fulfillerReturnTxn = await fulfiller.sendTransaction({
           to: banker.address,
-          value: `${fulfillerBalance.sub(BigNumber.from(transferTxnFee)).toString()}`,
+          value: `${(fulfillerBalance - BigInt(transferTxnFee)).toString()}`,
           ...GAS_OVERRIDES,
         });
 
         await fulfillerReturnTxn.wait(1);
       }
 
-      if (offererBalance.gt(BigNumber.from(transferTxnFee))) {
+      if (offererBalance > BigInt(transferTxnFee)) {
         // offerer returns funds
         const offererReturnTxn = await offerer.sendTransaction({
           to: banker.address,
-          value: `${offererBalance.sub(BigNumber.from(transferTxnFee)).toString()}`,
+          value: `${(offererBalance - BigInt(transferTxnFee)).toString()}`,
           ...GAS_OVERRIDES,
         });
 

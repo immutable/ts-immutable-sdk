@@ -1,4 +1,3 @@
-import { utils } from 'ethers';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   Alert, Button, Form, Image, InputGroup, Offcanvas, Spinner, Stack, Table,
@@ -12,6 +11,7 @@ import { useStatusProvider } from '@/context/StatusProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
 import ViewOffersModal from '@/components/imx/ViewOffersModal';
 import { MARKETPLACE_FEE_PERCENTAGE, MARKETPLACE_FEE_RECIPIENT } from '@/config';
+import { formatEther, parseEther } from 'ethers';
 
 type OrderType = imx.Order;
 type AssetWithSellOrder = { asset: imx.Asset; sellOrder?: OrderType; };
@@ -97,7 +97,7 @@ function Order({ showModal, setShowModal }: ModalProps) {
     const request: UnsignedOrderRequest = {
       buy: {
         type: 'ETH',
-        amount: utils.parseEther(sellingPrice).toString(),
+        amount: parseEther(sellingPrice).toString(),
       },
       sell: {
         type: 'ERC721',
@@ -159,7 +159,7 @@ function Order({ showModal, setShowModal }: ModalProps) {
                   </td>
                   <td>
                     {userAsset.sellOrder?.buy.data.quantity_with_fees
-                      ? utils.formatEther(userAsset.sellOrder?.buy.data.quantity_with_fees)
+                      ? formatEther(userAsset.sellOrder?.buy.data.quantity_with_fees)
                       : (
                         <InputGroup size="sm" className="mb-3">
                           <Stack>
@@ -250,7 +250,7 @@ function Order({ showModal, setShowModal }: ModalProps) {
                   </td>
                   <td>
                     {o.offerOrder?.buy.data.quantity_with_fees
-                      ? utils.formatEther(o.offerOrder?.buy?.data.quantity_with_fees)
+                      ? formatEther(o.offerOrder?.buy?.data.quantity_with_fees)
                       : (
                         <InputGroup size="sm" className="mb-3">
                           <Stack>

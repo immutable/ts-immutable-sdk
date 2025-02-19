@@ -1,5 +1,5 @@
 import { WalletProviderName } from '@imtbl/checkout-sdk';
-import { utils } from 'ethers';
+import { isAddress } from 'ethers';
 import { amountInputValidation } from './amountInputValidations';
 import { isNativeToken } from '../utils';
 
@@ -20,5 +20,5 @@ export function isValidAmount(amount: string | undefined) {
 
 export function isValidAddress(address: string | undefined) {
   if (isNativeToken(address)) return true;
-  return utils.isAddress(address!);
+  return isAddress(address!);
 }

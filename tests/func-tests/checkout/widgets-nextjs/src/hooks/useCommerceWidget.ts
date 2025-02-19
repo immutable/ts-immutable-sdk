@@ -1,8 +1,6 @@
-import { Web3Provider } from '@ethersproject/providers';
 import { checkout } from '@imtbl/sdk';
 import { Widget, WidgetType } from '@imtbl/sdk/checkout';
-import { useState, useEffect, useMemo } from 'react';
-import { MockProvider } from '../app/utils/mockProvider';
+import { useState, useEffect } from 'react';
 
 const checkoutSDK = new checkout.Checkout();
 

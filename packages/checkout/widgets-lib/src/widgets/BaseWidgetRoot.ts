@@ -11,8 +11,8 @@ import {
   ProviderUpdated,
   WidgetParameters,
   WalletEventType,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
 import i18next from 'i18next';
 import {
   StrongCheckoutWidgetsConfig,
@@ -36,7 +36,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
   protected parameters: WidgetParameters[T];
 
-  protected web3Provider: Web3Provider | undefined;
+  protected browserProvider: WrappedBrowserProvider | undefined;
 
   protected eventHandlers: Map<keyof WidgetEventData[T], Function> = new Map<
   keyof WidgetEventData[T],
@@ -53,10 +53,10 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
     this.checkout = sdk;
     this.properties = validatedProps;
-    this.web3Provider = props?.provider;
+    this.browserProvider = props?.provider;
 
-    if (this.web3Provider) {
-      addProviderListenersForWidgetRoot(this.web3Provider);
+    if (this.browserProvider) {
+      addProviderListenersForWidgetRoot(this.browserProvider);
     }
     this.setupProviderUpdatedListener();
     this.setupDisconnectProviderListener();
@@ -225,19 +225,19 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   }
 
   private handleEIP1193ProviderEvents(widgetRoot: Base<T>) {
-    if (widgetRoot.web3Provider) {
+    if (widgetRoot.browserProvider?.ethereumProvider) {
       // eslint-disable-next-line no-param-reassign
-      widgetRoot.web3Provider = new Web3Provider(
-        widgetRoot.web3Provider!.provider,
+      widgetRoot.browserProvider = new WrappedBrowserProvider(
+        widgetRoot.browserProvider.ethereumProvider,
       );
     }
     widgetRoot.render();
   }
 
   /**
-   * Handles the PROVIDER_UPDATED event by and sets web3Provider on widgetRoot
+   * Handles the PROVIDER_UPDATED event by and sets browserProvider on widgetRoot
    * This must unsubscribe and re-subscribe to EIP-1193 events on the underlying provider
-   * After setting the new web3Provider, render the widget again.
+   * After setting the new browserProvider, render the widget again.
    */
   private handleProviderUpdatedEvent = ((event: CustomEvent) => {
     const widgetRoot = this;
@@ -245,7 +245,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     switch (event.detail.type) {
       case ProviderEventType.PROVIDER_UPDATED: {
         const eventData = event.detail.data as ProviderUpdated;
-        widgetRoot.web3Provider = eventData.provider;
+        widgetRoot.browserProvider = eventData.provider;
         this.render();
         break;
       }
@@ -261,7 +261,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
     switch (event.detail.type) {
       case WalletEventType.DISCONNECT_WALLET: {
-        widgetRoot.web3Provider = undefined;
+        widgetRoot.browserProvider = undefined;
         this.render();
         break;
       }

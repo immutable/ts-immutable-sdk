@@ -1,4 +1,4 @@
-export const getEtherMailTypedPayload = (chainId: number, verifyingContract: string) => ({
+export const getEtherMailTypedPayload = (chainId: string, verifyingContract: string) => ({
   domain: {
     name: 'Ether Mail',
     version: '1',

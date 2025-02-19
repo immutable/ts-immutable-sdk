@@ -1,6 +1,6 @@
-import { TransactionResponse } from '@ethersproject/providers';
 import { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { TransactionResponse } from 'ethers';
 import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { ViewActions, ViewContext } from '../../context/view-context/ViewContext';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
@@ -30,13 +30,13 @@ export function ClaimWithdrawalInProgress({ transactionResponse }: ClaimWithdraw
       try {
         const receipt = await transactionResponse.wait();
 
-        if (receipt.status === 1) {
+        if (receipt?.status === 1) {
           viewDispatch({
             payload: {
               type: ViewActions.UPDATE_VIEW,
               view: {
                 type: BridgeWidgetViews.CLAIM_WITHDRAWAL_SUCCESS,
-                transactionHash: receipt.transactionHash,
+                transactionHash: receipt.hash,
               },
             },
           });
@@ -48,7 +48,7 @@ export function ClaimWithdrawalInProgress({ transactionResponse }: ClaimWithdraw
             type: ViewActions.UPDATE_VIEW,
             view: {
               type: BridgeWidgetViews.CLAIM_WITHDRAWAL_FAILURE,
-              transactionHash: receipt.transactionHash,
+              transactionHash: receipt?.hash ?? '',
               reason: 'Transaction failed',
             },
           },

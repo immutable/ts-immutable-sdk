@@ -1,27 +1,27 @@
 import {
   Checkout,
   WalletProviderName,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
 import { useEffect, useMemo, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
 import { Box, Select, Stack } from '@biom3/react';
 import { passport } from '../passport';
 
 // Connect Passport EVM
-passport.connectEvm();
+await passport.connectEvm();
 
 interface ProviderProps {
   checkout: Checkout;
-  provider: Web3Provider | undefined;
-  setProvider: (provider: Web3Provider) => void;
+  provider: WrappedBrowserProvider | undefined;
+  setProvider: (provider: WrappedBrowserProvider) => void;
 }
 
 export default function Provider(props: ProviderProps) {
   const { setProvider, checkout, provider } = props;
   const injectedProviders = useMemo(() => checkout && checkout.getInjectedProviders(), [checkout])
 
-  const [result1, setResult1] = useState<Web3Provider>();
+  const [result1, setResult1] = useState<WrappedBrowserProvider>();
 
   const [error1, setError1] = useState<any>(null);
 
@@ -49,9 +49,9 @@ export default function Provider(props: ProviderProps) {
 
   const handleSelectChange = (providerRdns: any) => {
     const selectedProvider = injectedProviders.find((providerDetail) => providerDetail.info.rdns === providerRdns);
-    const web3Provider = new Web3Provider(selectedProvider?.provider as any);
-    setProvider(web3Provider);
-    setResult1(web3Provider);
+    const browserProvider = new WrappedBrowserProvider(selectedProvider?.provider!);
+    setProvider(browserProvider);
+    setResult1(browserProvider);
     setLoading(false);
   }
 
@@ -81,7 +81,7 @@ export default function Provider(props: ProviderProps) {
           </Select>
         </Stack>
         {result1 && !error1 && (
-          <SuccessMessage>Web3Provider Created.</SuccessMessage>
+          <SuccessMessage>BrowserProvider Created.</SuccessMessage>
         )}
         {error1 && (
           <ErrorMessage>

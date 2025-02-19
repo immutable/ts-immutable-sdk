@@ -57,7 +57,7 @@
     "version": {
       "generatorOptions": {
         "skipLockFileUpdate": true,
-        "currentVersionResolver": "registry",
+        "currentVersionResolver": "disk",
         "preid": "alpha"
       },
       "git": {
@@ -68,7 +68,25 @@
     },
     "conventionalCommits": {
       "types": {
-        "internal": {
+        "refactor": {
+          "changelog": false
+        },
+        "style": {
+          "changelog": false
+        },
+        "test": {
+          "changelog": false
+        },
+        "docs": {
+          "changelog": false
+        },
+        "build": {
+          "changelog": false
+        },
+        "ops": {
+          "changelog": false
+        },
+        "chore": {
           "changelog": false
         }
       }

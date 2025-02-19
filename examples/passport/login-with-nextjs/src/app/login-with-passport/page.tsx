@@ -14,7 +14,7 @@ export default function LoginWithPassport() {
     if (!passportInstance) return;
     try {
       // #doc passport-evm-login
-      const provider = passportInstance.connectEvm();
+      const provider = await passportInstance.connectEvm();
       const accounts = await provider.request({ method: 'eth_requestAccounts' });
       // #enddoc passport-evm-login
       if (accounts) {

@@ -7,6 +7,7 @@ on:
         type: choice
         description: Release Type
         options:
+          - prerelease
           - prepatch
           - preminor
           - premajor
@@ -14,7 +15,7 @@ on:
           - minor
           - major
         required: true
-        default: prepatch
+        default: prerelease
       dry_run:
         type: boolean
         description: "(Optional) Dry run"
@@ -89,6 +90,9 @@ jobs:
         run: |
           git config user.name "platform-sa"
           git config user.email "platform-sa@users.noreply.github.com"
+        
+      - name: Initialize current versions
+        run: pnpm --filter @imtbl/sdk... --filter @imtbl/checkout-widgets... exec sh -c "jq --arg version \"$(npm view @imtbl/metrics versions --json | jq -r '.[-1]')\" '.version = \$version' package.json > package.tmp.json && mv package.tmp.json package.json"
 
       - name: Setup new package versions
         run: pnpm nx release version --specifier ${{ env.RELEASE_TYPE }} $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "")
@@ -96,20 +100,20 @@ jobs:
       - name: Build SDK & Checkout Widgets
         run: pnpm build
 
-      # ! Do NOT remove - this will cause a Sev 0 incident !
-      - name: Generate SDK attestations
-        uses: actions/attest-build-provenance@v1
-        with:
-          subject-path: './sdk, !./sdk/node_modules'
-
-      - name: Authenticate NPM
-        run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
-
       - name: Generate version.json
         if: (env.DRY_RUN) == 'false'
         run: |
           echo '{ "version": "$(jq -r '.version' ./sdk/package.json)" }' > ./sdk/version.json
           cp ./sdk/version.json ./sdk/dist/
+      
+      - name: Pack SDK & Checkout Widgets packages and dependencies
+        run: pnpm pack-npm-packages
+
+      # ! Do NOT remove any of these attestation subject paths - this will cause a Sev 0 incident !
+      - name: Generate SDK Package Attestations
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: ./imtbl-*.tgz
 
       - name: Publish Github Release
         if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }}
@@ -118,8 +122,10 @@ jobs:
       - name: Release to NPM
         id: npm_release
         env:
+          NODE_AUTH_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm nx release publish $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "")
+        run: pnpm nx release publish $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") $( ${{ startsWith(env.RELEASE_TYPE, 'pre') }} && echo "--tag alpha" || echo "")
 
       - name: Warm up CDN
         id: warm_up_cdn
@@ -160,7 +166,7 @@ jobs:
           echo "Waiting for NPM registry to reflect version: $VERSION"
 
           for i in {1..20}; do
-            LATEST_VERSION=$(npm view @imtbl/sdk@latest version)
+            LATEST_VERSION=$(if [[ "${{ startsWith(env.RELEASE_TYPE, 'pre') }}" == "true" ]]; then npm view @imtbl/sdk@alpha version; else npm view @imtbl/sdk@latest version; fi)
             if [[ "$LATEST_VERSION" == "$VERSION" ]]; then
               echo "NPM registry updated to version: $LATEST_VERSION"
               exit 0

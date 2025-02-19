@@ -1,14 +1,12 @@
-import { Web3Provider } from '@ethersproject/providers';
 import {
-  ChainId, Checkout, GetBalanceResult, NetworkInfo, TokenFilterTypes, TokenInfo,
+  ChainId, Checkout, GetBalanceResult, WrappedBrowserProvider, NetworkInfo, TokenFilterTypes, TokenInfo,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
-import { BigNumber } from 'ethers';
 import { getAllowedBalances } from './balance';
 
 describe('getAllowedBalances', () => {
   const tokenInfo = {
-    balance: BigNumber.from(1),
+    balance: BigInt(1),
     token: {
       symbol: 'QQQ',
       name: 'QQQ',
@@ -19,7 +17,7 @@ describe('getAllowedBalances', () => {
   };
 
   const nativeTokenInfo = {
-    balance: BigNumber.from(2),
+    balance: BigInt(2),
     token: {
       symbol: 'AAA',
       name: 'AAA',
@@ -31,22 +29,22 @@ describe('getAllowedBalances', () => {
   const balances: GetBalanceResult[] = [
     tokenInfo,
     {
-      balance: BigNumber.from(2),
+      balance: BigInt(2),
       token: { symbol: 'AAA', name: 'AAA' } as TokenInfo,
       formattedBalance: '6.34',
     },
     {
-      balance: BigNumber.from(0), // <<< zero balance
+      balance: BigInt(0), // <<< zero balance
       token: { symbol: 'BBB', name: 'BBB', address: '0xA' } as TokenInfo,
       formattedBalance: '25.34',
     },
     {
-      balance: BigNumber.from(1),
+      balance: BigInt(1),
       token: { symbol: 'CCC', name: 'CCC', address: '0xC' } as TokenInfo,
       formattedBalance: '36.34',
     },
     {
-      balance: BigNumber.from(1),
+      balance: BigInt(1),
       token: { symbol: 'DDD', name: 'DDD', address: '0xd' } as TokenInfo,
       formattedBalance: '36.34',
     },
@@ -80,7 +78,7 @@ describe('getAllowedBalances', () => {
 
     const resp = await getAllowedBalances({
       checkout,
-      provider: mockProvider as unknown as Web3Provider,
+      provider: mockProvider as unknown as WrappedBrowserProvider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
     });
 
@@ -123,7 +121,7 @@ describe('getAllowedBalances', () => {
 
     await getAllowedBalances({
       checkout,
-      provider: mockProvider as unknown as Web3Provider,
+      provider: mockProvider as unknown as WrappedBrowserProvider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
     });
 
@@ -134,7 +132,7 @@ describe('getAllowedBalances', () => {
     getTokenAllowListMock.mockClear();
     await getAllowedBalances({
       checkout,
-      provider: mockProvider as unknown as Web3Provider,
+      provider: mockProvider as unknown as WrappedBrowserProvider,
       allowTokenListType: TokenFilterTypes.SWAP,
     });
 
@@ -161,7 +159,7 @@ describe('getAllowedBalances', () => {
 
     await getAllowedBalances({
       checkout,
-      provider: mockProvider as unknown as Web3Provider,
+      provider: mockProvider as unknown as WrappedBrowserProvider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
       chainId: ChainId.IMTBL_ZKEVM_DEVNET,
     });
@@ -202,7 +200,7 @@ describe('getAllowedBalances', () => {
 
     const resp = await getAllowedBalances({
       checkout,
-      provider: mockProvider as unknown as Web3Provider,
+      provider: mockProvider as unknown as WrappedBrowserProvider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
     });
 
@@ -246,7 +244,7 @@ describe('getAllowedBalances', () => {
     try {
       await getAllowedBalances({
         checkout,
-        provider: mockProvider as unknown as Web3Provider,
+        provider: mockProvider as unknown as WrappedBrowserProvider,
         allowTokenListType: TokenFilterTypes.BRIDGE,
         retryPolicy: {
           retryIntervalMs: 0,
@@ -290,7 +288,7 @@ describe('getAllowedBalances', () => {
 
     const resp = await getAllowedBalances({
       checkout,
-      provider: mockProvider as unknown as Web3Provider,
+      provider: mockProvider as unknown as WrappedBrowserProvider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
     });
 
@@ -333,7 +331,7 @@ describe('getAllowedBalances', () => {
 
     const resp = await getAllowedBalances({
       checkout,
-      provider: mockProvider as unknown as Web3Provider,
+      provider: mockProvider as unknown as WrappedBrowserProvider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
     });
 
@@ -372,7 +370,7 @@ describe('getAllowedBalances', () => {
 
     const resp = await getAllowedBalances({
       checkout,
-      provider: mockProvider as unknown as Web3Provider,
+      provider: mockProvider as unknown as WrappedBrowserProvider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
     });
 
@@ -384,7 +382,7 @@ describe('getAllowedBalances', () => {
         }],
       },
       allowedBalances: [{
-        balance: BigNumber.from(1),
+        balance: BigInt(1),
         token: {
           symbol: 'DDD',
           name: 'DDD',
@@ -420,7 +418,7 @@ describe('getAllowedBalances', () => {
 
     const resp = await getAllowedBalances({
       checkout,
-      provider: mockProvider as unknown as Web3Provider,
+      provider: mockProvider as unknown as WrappedBrowserProvider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
     });
 

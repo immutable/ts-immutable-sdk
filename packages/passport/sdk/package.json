@@ -5,11 +5,8 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "@0xsequence/abi": "^1.4.3",
-    "@0xsequence/core": "^1.4.3",
-    "@ethersproject/abstract-provider": "^5.7.0",
-    "@ethersproject/abstract-signer": "^5.7.0",
-    "@ethersproject/providers": "^5.7.2",
+    "@0xsequence/abi": "^2.0.25",
+    "@0xsequence/core": "^2.0.25",
     "@imtbl/config": "workspace:*",
     "@imtbl/generated-clients": "workspace:*",
     "@imtbl/metrics": "workspace:*",
@@ -20,7 +17,7 @@
     "@magic-sdk/provider": "^21.2.0",
     "@metamask/detect-provider": "^2.0.0",
     "axios": "^1.6.5",
-    "ethers": "^5.7.2",
+    "ethers": "^6.13.4",
     "events": "^3.3.0",
     "jwt-decode": "^3.1.2",
     "localforage": "^1.10.0",
@@ -47,7 +44,7 @@
     "msw": "^1.2.2",
     "prettier": "^2.8.7",
     "ts-node": "^10.9.1",
-    "tsup": "^8.3.5",
+    "tsup": "8.3.0",
     "typescript": "^5.6.2"
   },
   "engines": {
@@ -75,11 +72,15 @@
   "main": "dist/node/index.cjs",
   "module": "dist/node/index.js",
   "browser": "dist/browser/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "pnpm transpile && pnpm typegen",
     "transpile": "tsup src/index.ts --config ../../../tsup.config.js",
     "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
+    "pack:root": "pnpm pack --pack-destination $(dirname $(pnpm root -w))",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest",
     "test:watch": "jest --watch",

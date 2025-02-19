@@ -1,5 +1,5 @@
-import { TransactionRequest, TransactionResponse } from '@ethersproject/providers';
 import { Quote } from '@imtbl/dex-sdk';
+import { TransactionRequest, TransactionResponse } from 'ethers';
 import { ViewType } from './ViewType';
 
 export enum SwapWidgetViews {

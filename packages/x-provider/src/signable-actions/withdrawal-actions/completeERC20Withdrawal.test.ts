@@ -1,5 +1,4 @@
 import { Contracts } from '@imtbl/x-client';
-import { BigNumber } from '@ethersproject/bignumber';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import {
   getSignableRegistrationOnchain,
@@ -30,11 +29,11 @@ describe('completeERC20Withdrawal action', () => {
       (getEncodeAssetInfo as jest.Mock).mockResolvedValue(encodeAssetResponse);
       (isRegisteredOnChain as jest.Mock).mockResolvedValue(true);
       (Contracts.CoreV4.connect as jest.Mock).mockReturnValue({
-        getWithdrawalBalance: jest.fn().mockReturnValue(BigNumber.from('1000000000000000000')),
+        getWithdrawalBalance: jest.fn().mockReturnValue(BigInt('1000000000000000000')),
       });
       (Contracts.RegistrationV4.connect as jest.Mock).mockReturnValue({
-        populateTransaction: {
-          withdrawAll: jest.fn().mockResolvedValue(transactionResponse),
+        withdrawAll: {
+          populateTransaction: jest.fn().mockResolvedValue(transactionResponse),
         },
       });
     });
@@ -64,11 +63,11 @@ describe('completeERC20Withdrawal action', () => {
         payload_hash: 'payload hash',
       });
       (Contracts.CoreV4.connect as jest.Mock).mockReturnValue({
-        getWithdrawalBalance: jest.fn().mockReturnValue(BigNumber.from('1000000000000000000')),
+        getWithdrawalBalance: jest.fn().mockReturnValue(BigInt('1000000000000000000')),
       });
       (Contracts.RegistrationV4.connect as jest.Mock).mockReturnValue({
-        populateTransaction: {
-          registerAndWithdrawAll: jest.fn().mockResolvedValue(transactionResponse),
+        registerAndWithdrawAll: {
+          populateTransaction: jest.fn().mockResolvedValue(transactionResponse),
         },
       });
     });

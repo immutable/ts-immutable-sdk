@@ -1,6 +1,6 @@
-import { Signer } from '@ethersproject/abstract-signer';
 import { ImmutableXConfiguration, StarkSigner } from '@imtbl/x-client';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { Signer } from 'ethers';
 import { Signers } from '../signable-actions/types';
 import { ProviderConfiguration } from '../config';
 
@@ -80,7 +80,9 @@ export const generateSigners = async (privateKey: string): Promise<Signers> => {
   const ethSigner = {
     signMessage: async (message: string) => message + ethKey,
     getAddress: async () => ethKey,
-    getChainId: async () => testChainId,
+    provider: {
+      getNetwork: async () => ({ chainId: testChainId }),
+    },
     sendTransaction: async () => transactionResponse,
   } as unknown as Signer;
 

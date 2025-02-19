@@ -34,7 +34,7 @@ import GuardianClient from './guardian';
 import logger from './utils/logger';
 import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
 import { isAPIError, PassportError, PassportErrorType } from './errors/passportError';
-import { withMetrics, withMetricsAsync } from './utils/metrics';
+import { withMetricsAsync } from './utils/metrics';
 import { MagicProviderProxyFactory } from './magic/magicProviderProxyFactory';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
@@ -150,8 +150,8 @@ export class Passport {
     announceProvider: boolean
   } = {
     announceProvider: true,
-  }): Provider {
-    return withMetrics(() => {
+  }): Promise<Provider> {
+    return withMetricsAsync(async () => {
       const provider = new ZkEvmProvider({
         passportEventEmitter: this.passportEventEmitter,
         authManager: this.authManager,

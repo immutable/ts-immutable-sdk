@@ -7,7 +7,7 @@ import { getLocalhostProvider } from './helpers/provider';
 import { getOffererWallet } from './helpers/signers';
 import { deployTestToken } from './helpers/erc721';
 import { waitForOrderToBeOfStatus } from './helpers/order';
-import { getConfigFromEnv } from './helpers';
+import { getConfigFromEnv, getRandomTokenId } from './helpers';
 import { actionAll } from './helpers/actions';
 import { PrepareBulkListingsParams } from '../types';
 import { GAS_OVERRIDES } from './helpers/gas';
@@ -36,7 +36,7 @@ describe('prepareListing and createOrder bulk e2e', () => {
     const orderParams: PrepareBulkListingsParams['listingParams'] = [];
     let i = 0;
     while (i < numberOfListings) {
-      await contract.safeMint(offerer.address, GAS_OVERRIDES);
+      await contract.safeMint(offerer.address, getRandomTokenId(), GAS_OVERRIDES);
 
       orderParams.push({
         buy: {
@@ -44,7 +44,7 @@ describe('prepareListing and createOrder bulk e2e', () => {
           type: 'NATIVE',
         },
         sell: {
-          contractAddress: contract.address,
+          contractAddress: await contract.getAddress(),
           tokenId: `${i}`,
           type: 'ERC721',
         },
@@ -57,7 +57,7 @@ describe('prepareListing and createOrder bulk e2e', () => {
       i++;
     }
 
-    await contract.safeMint(offerer.address, GAS_OVERRIDES);
+    await contract.safeMint(offerer.address, getRandomTokenId(), GAS_OVERRIDES);
 
     const { actions, completeListings } = await sdk.prepareBulkListings({
       makerAddress: offerer.address,
@@ -96,7 +96,7 @@ describe('prepareListing and createOrder bulk e2e', () => {
     let i = 0;
     const tooManyListings = 21;
     while (i < tooManyListings) {
-      await contract.safeMint(offerer.address, GAS_OVERRIDES);
+      await contract.safeMint(offerer.address, getRandomTokenId(), GAS_OVERRIDES);
 
       orderParams.push({
         buy: {
@@ -104,7 +104,7 @@ describe('prepareListing and createOrder bulk e2e', () => {
           type: 'NATIVE',
         },
         sell: {
-          contractAddress: contract.address,
+          contractAddress: await contract.getAddress(),
           tokenId: `${i}`,
           type: 'ERC721',
         },
@@ -114,7 +114,7 @@ describe('prepareListing and createOrder bulk e2e', () => {
       i++;
     }
 
-    await contract.safeMint(offerer.address, GAS_OVERRIDES);
+    await contract.safeMint(offerer.address, getRandomTokenId(), GAS_OVERRIDES);
 
     await expect(sdk.prepareBulkListings({
       makerAddress: offerer.address,

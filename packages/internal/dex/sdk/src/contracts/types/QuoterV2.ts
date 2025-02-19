@@ -3,85 +3,73 @@
 /* eslint-disable */
 import type {
   BaseContract,
-  BigNumber,
   BigNumberish,
   BytesLike,
-  CallOverrides,
-  ContractTransaction,
-  Overrides,
-  PopulatedTransaction,
-  Signer,
-  utils,
+  FunctionFragment,
+  Result,
+  Interface,
+  AddressLike,
+  ContractRunner,
+  ContractMethod,
+  Listener,
 } from "ethers";
-import type { FunctionFragment, Result } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
 import type {
-  TypedEventFilter,
-  TypedEvent,
+  TypedContractEvent,
+  TypedDeferredTopicFilter,
+  TypedEventLog,
   TypedListener,
-  OnEvent,
-  PromiseOrValue,
+  TypedContractMethod,
 } from "./common";
 
 export declare namespace IQuoterV2 {
   export type QuoteExactInputSingleParamsStruct = {
-    tokenIn: PromiseOrValue<string>;
-    tokenOut: PromiseOrValue<string>;
-    amountIn: PromiseOrValue<BigNumberish>;
-    fee: PromiseOrValue<BigNumberish>;
-    sqrtPriceLimitX96: PromiseOrValue<BigNumberish>;
+    tokenIn: AddressLike;
+    tokenOut: AddressLike;
+    amountIn: BigNumberish;
+    fee: BigNumberish;
+    sqrtPriceLimitX96: BigNumberish;
   };
 
   export type QuoteExactInputSingleParamsStructOutput = [
-    string,
-    string,
-    BigNumber,
-    number,
-    BigNumber
+    tokenIn: string,
+    tokenOut: string,
+    amountIn: bigint,
+    fee: bigint,
+    sqrtPriceLimitX96: bigint
   ] & {
     tokenIn: string;
     tokenOut: string;
-    amountIn: BigNumber;
-    fee: number;
-    sqrtPriceLimitX96: BigNumber;
+    amountIn: bigint;
+    fee: bigint;
+    sqrtPriceLimitX96: bigint;
   };
 
   export type QuoteExactOutputSingleParamsStruct = {
-    tokenIn: PromiseOrValue<string>;
-    tokenOut: PromiseOrValue<string>;
-    amount: PromiseOrValue<BigNumberish>;
-    fee: PromiseOrValue<BigNumberish>;
-    sqrtPriceLimitX96: PromiseOrValue<BigNumberish>;
+    tokenIn: AddressLike;
+    tokenOut: AddressLike;
+    amount: BigNumberish;
+    fee: BigNumberish;
+    sqrtPriceLimitX96: BigNumberish;
   };
 
   export type QuoteExactOutputSingleParamsStructOutput = [
-    string,
-    string,
-    BigNumber,
-    number,
-    BigNumber
+    tokenIn: string,
+    tokenOut: string,
+    amount: bigint,
+    fee: bigint,
+    sqrtPriceLimitX96: bigint
   ] & {
     tokenIn: string;
     tokenOut: string;
-    amount: BigNumber;
-    fee: number;
-    sqrtPriceLimitX96: BigNumber;
+    amount: bigint;
+    fee: bigint;
+    sqrtPriceLimitX96: bigint;
   };
 }
 
-export interface QuoterV2Interface extends utils.Interface {
-  functions: {
-    "WETH9()": FunctionFragment;
-    "factory()": FunctionFragment;
-    "quoteExactInput(bytes,uint256)": FunctionFragment;
-    "quoteExactInputSingle((address,address,uint256,uint24,uint160))": FunctionFragment;
-    "quoteExactOutput(bytes,uint256)": FunctionFragment;
-    "quoteExactOutputSingle((address,address,uint256,uint24,uint160))": FunctionFragment;
-    "uniswapV3SwapCallback(int256,int256,bytes)": FunctionFragment;
-  };
-
+export interface QuoterV2Interface extends Interface {
   getFunction(
-    nameOrSignatureOrTopic:
+    nameOrSignature:
       | "WETH9"
       | "factory"
       | "quoteExactInput"
@@ -95,7 +83,7 @@ export interface QuoterV2Interface extends utils.Interface {
   encodeFunctionData(functionFragment: "factory", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "quoteExactInput",
-    values: [PromiseOrValue<BytesLike>, PromiseOrValue<BigNumberish>]
+    values: [BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "quoteExactInputSingle",
@@ -103,7 +91,7 @@ export interface QuoterV2Interface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "quoteExactOutput",
-    values: [PromiseOrValue<BytesLike>, PromiseOrValue<BigNumberish>]
+    values: [BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "quoteExactOutputSingle",
@@ -111,11 +99,7 @@ export interface QuoterV2Interface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "uniswapV3SwapCallback",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>
-    ]
+    values: [BigNumberish, BigNumberish, BytesLike]
   ): string;
 
   decodeFunctionResult(functionFragment: "WETH9", data: BytesLike): Result;
@@ -140,236 +124,186 @@ export interface QuoterV2Interface extends utils.Interface {
     functionFragment: "uniswapV3SwapCallback",
     data: BytesLike
   ): Result;
-
-  events: {};
 }
 
 export interface QuoterV2 extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(runner?: ContractRunner | null): QuoterV2;
+  waitForDeployment(): Promise<this>;
 
   interface: QuoterV2Interface;
 
-  queryFilter<TEvent extends TypedEvent>(
-    event: TypedEventFilter<TEvent>,
+  queryFilter<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TEvent>>;
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
+  queryFilter<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    fromBlockOrBlockhash?: string | number | undefined,
+    toBlock?: string | number | undefined
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
 
-  listeners<TEvent extends TypedEvent>(
-    eventFilter?: TypedEventFilter<TEvent>
-  ): Array<TypedListener<TEvent>>;
-  listeners(eventName?: string): Array<Listener>;
-  removeAllListeners<TEvent extends TypedEvent>(
-    eventFilter: TypedEventFilter<TEvent>
-  ): this;
-  removeAllListeners(eventName?: string): this;
-  off: OnEvent<this>;
-  on: OnEvent<this>;
-  once: OnEvent<this>;
-  removeListener: OnEvent<this>;
+  on<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  on<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-  functions: {
-    WETH9(overrides?: CallOverrides): Promise<[string]>;
+  once<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  once<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-    factory(overrides?: CallOverrides): Promise<[string]>;
+  listeners<TCEvent extends TypedContractEvent>(
+    event: TCEvent
+  ): Promise<Array<TypedListener<TCEvent>>>;
+  listeners(eventName?: string): Promise<Array<Listener>>;
+  removeAllListeners<TCEvent extends TypedContractEvent>(
+    event?: TCEvent
+  ): Promise<this>;
 
-    quoteExactInput(
-      path: PromiseOrValue<BytesLike>,
-      amountIn: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  WETH9: TypedContractMethod<[], [string], "view">;
 
-    quoteExactInputSingle(
-      params: IQuoterV2.QuoteExactInputSingleParamsStruct,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  factory: TypedContractMethod<[], [string], "view">;
 
-    quoteExactOutput(
-      path: PromiseOrValue<BytesLike>,
-      amountOut: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    quoteExactOutputSingle(
-      params: IQuoterV2.QuoteExactOutputSingleParamsStruct,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    uniswapV3SwapCallback(
-      amount0Delta: PromiseOrValue<BigNumberish>,
-      amount1Delta: PromiseOrValue<BigNumberish>,
-      path: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-  };
-
-  WETH9(overrides?: CallOverrides): Promise<string>;
-
-  factory(overrides?: CallOverrides): Promise<string>;
-
-  quoteExactInput(
-    path: PromiseOrValue<BytesLike>,
-    amountIn: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  quoteExactInputSingle(
-    params: IQuoterV2.QuoteExactInputSingleParamsStruct,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  quoteExactOutput(
-    path: PromiseOrValue<BytesLike>,
-    amountOut: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  quoteExactOutputSingle(
-    params: IQuoterV2.QuoteExactOutputSingleParamsStruct,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  uniswapV3SwapCallback(
-    amount0Delta: PromiseOrValue<BigNumberish>,
-    amount1Delta: PromiseOrValue<BigNumberish>,
-    path: PromiseOrValue<BytesLike>,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  callStatic: {
-    WETH9(overrides?: CallOverrides): Promise<string>;
-
-    factory(overrides?: CallOverrides): Promise<string>;
-
-    quoteExactInput(
-      path: PromiseOrValue<BytesLike>,
-      amountIn: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber[], number[], BigNumber] & {
-        amountOut: BigNumber;
-        sqrtPriceX96AfterList: BigNumber[];
-        initializedTicksCrossedList: number[];
-        gasEstimate: BigNumber;
+  quoteExactInput: TypedContractMethod<
+    [path: BytesLike, amountIn: BigNumberish],
+    [
+      [bigint, bigint[], bigint[], bigint] & {
+        amountOut: bigint;
+        sqrtPriceX96AfterList: bigint[];
+        initializedTicksCrossedList: bigint[];
+        gasEstimate: bigint;
       }
-    >;
+    ],
+    "nonpayable"
+  >;
 
-    quoteExactInputSingle(
-      params: IQuoterV2.QuoteExactInputSingleParamsStruct,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, number, BigNumber] & {
-        amountOut: BigNumber;
-        sqrtPriceX96After: BigNumber;
-        initializedTicksCrossed: number;
-        gasEstimate: BigNumber;
+  quoteExactInputSingle: TypedContractMethod<
+    [params: IQuoterV2.QuoteExactInputSingleParamsStruct],
+    [
+      [bigint, bigint, bigint, bigint] & {
+        amountOut: bigint;
+        sqrtPriceX96After: bigint;
+        initializedTicksCrossed: bigint;
+        gasEstimate: bigint;
       }
-    >;
+    ],
+    "nonpayable"
+  >;
 
-    quoteExactOutput(
-      path: PromiseOrValue<BytesLike>,
-      amountOut: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber[], number[], BigNumber] & {
-        amountIn: BigNumber;
-        sqrtPriceX96AfterList: BigNumber[];
-        initializedTicksCrossedList: number[];
-        gasEstimate: BigNumber;
+  quoteExactOutput: TypedContractMethod<
+    [path: BytesLike, amountOut: BigNumberish],
+    [
+      [bigint, bigint[], bigint[], bigint] & {
+        amountIn: bigint;
+        sqrtPriceX96AfterList: bigint[];
+        initializedTicksCrossedList: bigint[];
+        gasEstimate: bigint;
       }
-    >;
+    ],
+    "nonpayable"
+  >;
 
-    quoteExactOutputSingle(
-      params: IQuoterV2.QuoteExactOutputSingleParamsStruct,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, number, BigNumber] & {
-        amountIn: BigNumber;
-        sqrtPriceX96After: BigNumber;
-        initializedTicksCrossed: number;
-        gasEstimate: BigNumber;
+  quoteExactOutputSingle: TypedContractMethod<
+    [params: IQuoterV2.QuoteExactOutputSingleParamsStruct],
+    [
+      [bigint, bigint, bigint, bigint] & {
+        amountIn: bigint;
+        sqrtPriceX96After: bigint;
+        initializedTicksCrossed: bigint;
+        gasEstimate: bigint;
       }
-    >;
+    ],
+    "nonpayable"
+  >;
 
-    uniswapV3SwapCallback(
-      amount0Delta: PromiseOrValue<BigNumberish>,
-      amount1Delta: PromiseOrValue<BigNumberish>,
-      path: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-  };
+  uniswapV3SwapCallback: TypedContractMethod<
+    [amount0Delta: BigNumberish, amount1Delta: BigNumberish, path: BytesLike],
+    [void],
+    "view"
+  >;
+
+  getFunction<T extends ContractMethod = ContractMethod>(
+    key: string | FunctionFragment
+  ): T;
+
+  getFunction(
+    nameOrSignature: "WETH9"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "factory"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "quoteExactInput"
+  ): TypedContractMethod<
+    [path: BytesLike, amountIn: BigNumberish],
+    [
+      [bigint, bigint[], bigint[], bigint] & {
+        amountOut: bigint;
+        sqrtPriceX96AfterList: bigint[];
+        initializedTicksCrossedList: bigint[];
+        gasEstimate: bigint;
+      }
+    ],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "quoteExactInputSingle"
+  ): TypedContractMethod<
+    [params: IQuoterV2.QuoteExactInputSingleParamsStruct],
+    [
+      [bigint, bigint, bigint, bigint] & {
+        amountOut: bigint;
+        sqrtPriceX96After: bigint;
+        initializedTicksCrossed: bigint;
+        gasEstimate: bigint;
+      }
+    ],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "quoteExactOutput"
+  ): TypedContractMethod<
+    [path: BytesLike, amountOut: BigNumberish],
+    [
+      [bigint, bigint[], bigint[], bigint] & {
+        amountIn: bigint;
+        sqrtPriceX96AfterList: bigint[];
+        initializedTicksCrossedList: bigint[];
+        gasEstimate: bigint;
+      }
+    ],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "quoteExactOutputSingle"
+  ): TypedContractMethod<
+    [params: IQuoterV2.QuoteExactOutputSingleParamsStruct],
+    [
+      [bigint, bigint, bigint, bigint] & {
+        amountIn: bigint;
+        sqrtPriceX96After: bigint;
+        initializedTicksCrossed: bigint;
+        gasEstimate: bigint;
+      }
+    ],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "uniswapV3SwapCallback"
+  ): TypedContractMethod<
+    [amount0Delta: BigNumberish, amount1Delta: BigNumberish, path: BytesLike],
+    [void],
+    "view"
+  >;
 
   filters: {};
-
-  estimateGas: {
-    WETH9(overrides?: CallOverrides): Promise<BigNumber>;
-
-    factory(overrides?: CallOverrides): Promise<BigNumber>;
-
-    quoteExactInput(
-      path: PromiseOrValue<BytesLike>,
-      amountIn: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    quoteExactInputSingle(
-      params: IQuoterV2.QuoteExactInputSingleParamsStruct,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    quoteExactOutput(
-      path: PromiseOrValue<BytesLike>,
-      amountOut: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    quoteExactOutputSingle(
-      params: IQuoterV2.QuoteExactOutputSingleParamsStruct,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    uniswapV3SwapCallback(
-      amount0Delta: PromiseOrValue<BigNumberish>,
-      amount1Delta: PromiseOrValue<BigNumberish>,
-      path: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-  };
-
-  populateTransaction: {
-    WETH9(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    factory(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    quoteExactInput(
-      path: PromiseOrValue<BytesLike>,
-      amountIn: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    quoteExactInputSingle(
-      params: IQuoterV2.QuoteExactInputSingleParamsStruct,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    quoteExactOutput(
-      path: PromiseOrValue<BytesLike>,
-      amountOut: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    quoteExactOutputSingle(
-      params: IQuoterV2.QuoteExactOutputSingleParamsStruct,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    uniswapV3SwapCallback(
-      amount0Delta: PromiseOrValue<BigNumberish>,
-      amount1Delta: PromiseOrValue<BigNumberish>,
-      path: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-  };
 }

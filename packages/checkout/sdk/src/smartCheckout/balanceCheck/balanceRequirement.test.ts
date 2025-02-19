@@ -1,5 +1,4 @@
-import { BigNumber, Contract } from 'ethers';
-import { Web3Provider } from '@ethersproject/providers';
+import { Contract } from 'ethers';
 import {
   ChainId,
   ERC20Item,
@@ -7,6 +6,7 @@ import {
   ItemBalance,
   ItemRequirement,
   ItemType,
+  WrappedBrowserProvider,
   NativeItem,
   TokenInfo,
 } from '../../types';
@@ -29,13 +29,13 @@ describe('balanceRequirement', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from('1000000000000000000'),
+          amount: BigInt('1000000000000000000'),
           isFee: false,
         },
         {
           type: ItemType.ERC20,
           tokenAddress: '0xERC20',
-          amount: BigNumber.from('1000000000000000000'),
+          amount: BigInt('1000000000000000000'),
           spenderAddress: '0xSEAPORT',
           isFee: false,
         },
@@ -72,7 +72,7 @@ describe('balanceRequirement', () => {
       const balances: ItemBalance[] = [
         {
           type: ItemType.ERC721,
-          balance: BigNumber.from('1'),
+          balance: BigInt('1'),
           formattedBalance: '1',
           contractAddress: '0xERC721',
           id: '0',
@@ -83,19 +83,19 @@ describe('balanceRequirement', () => {
         sufficient: true,
         type: ItemType.ERC721,
         delta: {
-          balance: BigNumber.from(0),
+          balance: BigInt(0),
           formattedBalance: '0',
         },
         required: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           contractAddress: '0xERC721',
           id: '0',
         },
         current: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           contractAddress: '0xERC721',
           id: '0',
@@ -114,7 +114,7 @@ describe('balanceRequirement', () => {
       const balances: ItemBalance[] = [
         {
           type: ItemType.NATIVE,
-          balance: BigNumber.from('1000000000000000000'),
+          balance: BigInt('1000000000000000000'),
           formattedBalance: '1.0',
           token: {
             name: 'NATIVE',
@@ -129,19 +129,19 @@ describe('balanceRequirement', () => {
         sufficient: false,
         type: ItemType.ERC721,
         delta: {
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
         },
         required: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(1),
+          balance: BigInt(1),
           formattedBalance: '1',
           contractAddress: '0xERC721',
           id: '0',
         },
         current: {
           type: ItemType.ERC721,
-          balance: BigNumber.from(0),
+          balance: BigInt(0),
           formattedBalance: '0',
           contractAddress: '0xERC721',
           id: '0',
@@ -152,7 +152,7 @@ describe('balanceRequirement', () => {
   });
 
   describe('getTokensInfo', () => {
-    let mockProvider: Web3Provider;
+    let mockProvider: WrappedBrowserProvider;
 
     beforeEach(() => {
       jest.resetAllMocks();
@@ -161,24 +161,24 @@ describe('balanceRequirement', () => {
         getSigner: jest.fn().mockReturnValue({
           getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
         }),
-        network: {
+        getNetwork: jest.fn().mockResolvedValue({
           chainId: ChainId.ETHEREUM,
-        },
-      } as unknown as Web3Provider;
+        }),
+      } as unknown as WrappedBrowserProvider;
     });
 
     it('should return native token data if type is native', async () => {
       const itemRequirements: NativeItem[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from('1000000000000000000'),
+          amount: BigInt('1000000000000000000'),
           isFee: true,
         },
       ];
       const balances: ItemBalance[] = [
         {
           type: ItemType.NATIVE,
-          balance: BigNumber.from('1000000000000000000'),
+          balance: BigInt('1000000000000000000'),
           formattedBalance: '1.0',
           token: {
             name: 'IMX',
@@ -198,7 +198,7 @@ describe('balanceRequirement', () => {
         {
           type: ItemType.ERC20,
           tokenAddress: '0xERC20',
-          amount: BigNumber.from('1000000000000000000'),
+          amount: BigInt('1000000000000000000'),
           spenderAddress: '0xSEAPORT',
           isFee: true,
         },
@@ -206,7 +206,7 @@ describe('balanceRequirement', () => {
       const balances: ItemBalance[] = [
         {
           type: ItemType.ERC20,
-          balance: BigNumber.from('1000000000000000000'),
+          balance: BigInt('1000000000000000000'),
           formattedBalance: '1.0',
           token: {
             name: 'ERC20',
@@ -232,7 +232,7 @@ describe('balanceRequirement', () => {
         {
           type: ItemType.ERC20,
           tokenAddress: '0xERC20',
-          amount: BigNumber.from('1000000000000000000'),
+          amount: BigInt('1000000000000000000'),
           spenderAddress: '0xSEAPORT',
           isFee: true,
         },
@@ -260,13 +260,13 @@ describe('balanceRequirement', () => {
     it('should return sufficient true if meets requirements for NATIVE', () => {
       const itemRequirement: NativeItem = {
         type: ItemType.NATIVE,
-        amount: BigNumber.from('1000000000000000000'),
+        amount: BigInt('1000000000000000000'),
         isFee: true,
       };
       const balances: ItemBalance[] = [
         {
           type: ItemType.NATIVE,
-          balance: BigNumber.from('1000000000000000000'),
+          balance: BigInt('1000000000000000000'),
           formattedBalance: '1.0',
           token: {
             name: 'IMX',
@@ -286,18 +286,18 @@ describe('balanceRequirement', () => {
         sufficient: true,
         type: ItemType.NATIVE,
         delta: {
-          balance: BigNumber.from(0),
+          balance: BigInt(0),
           formattedBalance: '0.0',
         },
         required: {
           type: ItemType.NATIVE,
-          balance: BigNumber.from('1000000000000000000'),
+          balance: BigInt('1000000000000000000'),
           formattedBalance: '1.0',
           token: tokenInfo,
         },
         current: {
           type: ItemType.NATIVE,
-          balance: BigNumber.from('1000000000000000000'),
+          balance: BigInt('1000000000000000000'),
           formattedBalance: '1.0',
           token: tokenInfo,
         },
@@ -309,14 +309,14 @@ describe('balanceRequirement', () => {
       const itemRequirement: ERC20Item = {
         type: ItemType.ERC20,
         tokenAddress: '0xERC20',
-        amount: BigNumber.from('1000000000000000000'),
+        amount: BigInt('1000000000000000000'),
         spenderAddress: '0xSEAPORT',
         isFee: true,
       };
       const balances: ItemBalance[] = [
         {
           type: ItemType.ERC20,
-          balance: BigNumber.from('1000000000000000000'),
+          balance: BigInt('1000000000000000000'),
           formattedBalance: '1.0',
           token: {
             name: 'ERC20',
@@ -342,18 +342,18 @@ describe('balanceRequirement', () => {
         sufficient: true,
         type: ItemType.ERC20,
         delta: {
-          balance: BigNumber.from(0),
+          balance: BigInt(0),
           formattedBalance: '0.0',
         },
         required: {
           type: ItemType.ERC20,
-          balance: BigNumber.from('1000000000000000000'),
+          balance: BigInt('1000000000000000000'),
           formattedBalance: '1.0',
           token: tokenInfo,
         },
         current: {
           type: ItemType.ERC20,
-          balance: BigNumber.from('1000000000000000000'),
+          balance: BigInt('1000000000000000000'),
           formattedBalance: '1.0',
           token: tokenInfo,
         },
@@ -364,13 +364,13 @@ describe('balanceRequirement', () => {
     it('should return sufficient false if requirements not met for NATIVE', () => {
       const itemRequirement: NativeItem = {
         type: ItemType.NATIVE,
-        amount: BigNumber.from('1000000000000000000'),
+        amount: BigInt('1000000000000000000'),
         isFee: false,
       };
       const balances: ItemBalance[] = [
         {
           type: ItemType.NATIVE,
-          balance: BigNumber.from('10000000000'),
+          balance: BigInt('10000000000'),
           formattedBalance: '0.000001',
           token: {
             name: 'IMX',
@@ -380,7 +380,7 @@ describe('balanceRequirement', () => {
         },
         {
           type: ItemType.ERC20,
-          balance: BigNumber.from('100000'),
+          balance: BigInt('100000'),
           formattedBalance: '0.000000001',
           token: {
             name: 'ERC20',
@@ -402,18 +402,18 @@ describe('balanceRequirement', () => {
         sufficient: false,
         type: ItemType.NATIVE,
         delta: {
-          balance: BigNumber.from('999999990000000000'),
+          balance: BigInt('999999990000000000'),
           formattedBalance: '0.99999999',
         },
         required: {
           type: ItemType.NATIVE,
-          balance: BigNumber.from('1000000000000000000'),
+          balance: BigInt('1000000000000000000'),
           formattedBalance: '1.0',
           token: tokenInfo,
         },
         current: {
           type: ItemType.NATIVE,
-          balance: BigNumber.from('10000000000'),
+          balance: BigInt('10000000000'),
           formattedBalance: '0.000001',
           token: tokenInfo,
         },
@@ -425,14 +425,14 @@ describe('balanceRequirement', () => {
       const itemRequirement: ERC20Item = {
         type: ItemType.ERC20,
         tokenAddress: '0xERC20',
-        amount: BigNumber.from('1000000000000000000'),
+        amount: BigInt('1000000000000000000'),
         spenderAddress: '0xSEAPORT',
         isFee: false,
       };
       const balances: ItemBalance[] = [
         {
           type: ItemType.NATIVE,
-          balance: BigNumber.from('100000'),
+          balance: BigInt('100000'),
           formattedBalance: '0.000000001',
           token: {
             name: 'ETH',
@@ -442,7 +442,7 @@ describe('balanceRequirement', () => {
         },
         {
           type: ItemType.ERC20,
-          balance: BigNumber.from('10000000000'),
+          balance: BigInt('10000000000'),
           formattedBalance: '0.000001',
           token: {
             name: 'ERC20',
@@ -468,18 +468,18 @@ describe('balanceRequirement', () => {
         sufficient: false,
         type: ItemType.ERC20,
         delta: {
-          balance: BigNumber.from('999999990000000000'),
+          balance: BigInt('999999990000000000'),
           formattedBalance: '0.99999999',
         },
         required: {
           type: ItemType.ERC20,
-          balance: BigNumber.from('1000000000000000000'),
+          balance: BigInt('1000000000000000000'),
           formattedBalance: '1.0',
           token: tokenInfo,
         },
         current: {
           type: ItemType.ERC20,
-          balance: BigNumber.from('10000000000'),
+          balance: BigInt('10000000000'),
           formattedBalance: '0.000001',
           token: tokenInfo,
         },

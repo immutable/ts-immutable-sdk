@@ -1,7 +1,5 @@
-import { TransactionRequest } from '@ethersproject/providers';
-import { Signer } from '@ethersproject/abstract-signer';
 import { Flow } from '@imtbl/metrics';
-import { BigNumber } from 'ethers';
+import { Signer, TransactionRequest } from 'ethers';
 import { mockUserZkEvm } from '../test/mocks';
 import * as transactionHelpers from './transactionHelpers';
 import { signEjectionTransaction } from './signEjectionTransaction';
@@ -19,9 +17,9 @@ describe('im_signEjectionTransaction', () => {
 
   const transactionRequest: TransactionRequest = {
     to: mockUserZkEvm.zkEvm.ethAddress,
-    nonce: BigNumber.from(5),
+    nonce: 5,
     chainId: 1,
-    value: BigNumber.from('5'),
+    value: BigInt('5'),
   };
   const ethSigner = {
     getAddress: jest.fn(),

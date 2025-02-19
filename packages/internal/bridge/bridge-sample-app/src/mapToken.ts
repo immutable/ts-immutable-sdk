@@ -1,11 +1,11 @@
 /* eslint-disable no-console */
 import 'dotenv/config';
-import { ethers } from "ethers";
 
 // @ts-ignore
 import { setupForBridge } from './lib/utils.ts';
 // @ts-ignore
 import {delay, getContract, waitForReceipt, waitUntilSucceed} from './lib/helpers.ts';
+import { Contract, parseEther, ZeroAddress } from 'ethers';
 
 async function mapToken() {
 
@@ -21,14 +21,14 @@ async function mapToken() {
 
   let axelarAPI: string = process.env.AXELAR_API_URL;
   let rootCustomTokenAddress: string = process.env.ROOT_TOKEN_TO_MAP;
-  let childCustomToken: ethers.Contract;
+  let childCustomToken: Contract;
 
-  const rootBridge: ethers.Contract = getContract("RootERC20BridgeFlowRate", params.rootBridgeAddress, params.rootProvider);
-  const childBridge: ethers.Contract = getContract("ChildERC20Bridge", params.childBridgeAddress, params.childProvider);
+  const rootBridge: Contract = getContract("RootERC20BridgeFlowRate", params.rootBridgeAddress, params.rootProvider);
+  const childBridge: Contract = getContract("ChildERC20Bridge", params.childBridgeAddress, params.childProvider);
 
   let childTokenAddress = await childBridge.rootTokenToChildToken(rootCustomTokenAddress);
 
-  if (childTokenAddress != ethers.constants.AddressZero) {
+  if (childTokenAddress != ZeroAddress) {
       console.log("Custom token has already been mapped to child, skip.");
       console.log("childTokenAddress", childTokenAddress);
       return;
@@ -38,19 +38,19 @@ async function mapToken() {
 
   let expectedChildTokenAddr;
 
-  if (rootTokenChildAddress != ethers.constants.AddressZero) {
+  if (rootTokenChildAddress != ZeroAddress) {
       console.log("Custom token has already been mapped on root, wait for child mapping.");
       console.log("rootTokenChildAddress", rootTokenChildAddress);
       expectedChildTokenAddr = rootTokenChildAddress;
   } else {
     // Map token
     console.log("mapping token", );
-    let bridgeFee = ethers.utils.parseEther("0.001");
-    expectedChildTokenAddr = await rootBridge.callStatic.mapToken(rootCustomTokenAddress, {
+    let bridgeFee = parseEther("0.001");
+    expectedChildTokenAddr = await rootBridge.mapToken.staticCall(rootCustomTokenAddress, {
         value: bridgeFee,
     });
     
-    let resp = await rootBridge.connect(params.rootWallet).mapToken(rootCustomTokenAddress, {
+    let resp = await (rootBridge.connect(params.rootWallet) as Contract).mapToken(rootCustomTokenAddress, {
         value: bridgeFee,
     })
     await waitForReceipt(resp.hash, params.rootProvider);
@@ -61,11 +61,11 @@ async function mapToken() {
   }
 
   let attempts = 0;
-  while (childTokenAddress == ethers.constants.AddressZero) {
+  while (childTokenAddress == ZeroAddress) {
     attempts++;
     childTokenAddress = await childBridge.rootTokenToChildToken(rootCustomTokenAddress);
       console.log(`waiting for mapping to complete on childBridge attempt: ${attempts}`);
-      if (childTokenAddress == ethers.constants.AddressZero) {
+      if (childTokenAddress == ZeroAddress) {
         await delay(10000);
       }
   }

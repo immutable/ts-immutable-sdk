@@ -189,7 +189,7 @@ Install `@imtbl/sdk` and any other dependencies your example needs e.g.
 ```bash
 pnpm add @imtbl/sdk
 pnpm add @biom3/react
-pnpm add @ethersproject/providers@^5.7.2
+pnpm add ethers@^6.13.4
 ```
 
 You should use `@biom3/react` to style your app so it matches the immutable branding. A good example of how to use Biome can be found in the [Checkout SDK Connect](/examples/checkout/sdk-connect-with-nextjs) example.

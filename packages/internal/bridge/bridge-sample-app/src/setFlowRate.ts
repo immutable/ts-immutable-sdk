@@ -14,7 +14,7 @@ import {
 // @ts-ignore
 import { setupForBridge } from './lib/utils.ts';
 import { getContract } from './lib/helpers.js';
-import { ethers } from 'ethers';
+import { Contract, parseUnits, TransactionRequest } from 'ethers';
 
 async function getFlowRateInfo() {
 
@@ -48,11 +48,11 @@ async function getFlowRateInfo() {
       childProvider: params.childProvider,
     });
 
-    const rootBridge: ethers.Contract = getContract("RootERC20BridgeFlowRate", params.rootBridgeAddress, params.rootProvider);
+    const rootBridge: Contract = getContract("RootERC20BridgeFlowRate", params.rootBridgeAddress, params.rootProvider);
 
-    const capacity = ethers.utils.parseUnits(process.env.FLOW_RATE_CAPACITY, process.env.FLOW_RATE_TOKEN_DECIMALS);
-    const refillRate = ethers.utils.parseUnits(process.env.FLOW_RATE_REFILL_RATE, process.env.FLOW_RATE_TOKEN_DECIMALS);
-    const largeTransferThreshold = ethers.utils.parseUnits(process.env.FLOW_RATE_LARGE_TRANSFER_THRESHOLD, process.env.FLOW_RATE_TOKEN_DECIMALS);
+    const capacity = parseUnits(process.env.FLOW_RATE_CAPACITY, process.env.FLOW_RATE_TOKEN_DECIMALS);
+    const refillRate = parseUnits(process.env.FLOW_RATE_REFILL_RATE, process.env.FLOW_RATE_TOKEN_DECIMALS);
+    const largeTransferThreshold = parseUnits(process.env.FLOW_RATE_LARGE_TRANSFER_THRESHOLD, process.env.FLOW_RATE_TOKEN_DECIMALS);
 
     try {
 
@@ -64,7 +64,7 @@ async function getFlowRateInfo() {
         largeTransferThreshold,
       ]);
 
-      const unsignedTx: ethers.providers.TransactionRequest = {
+      const unsignedTx: TransactionRequest = {
         data,
         to: params.rootBridgeAddress,
         value: 0,

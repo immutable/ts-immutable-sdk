@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "eslint": "^8.40.0",
-    "tsup": "^8.3.5",
+    "tsup": "8.3.0",
     "typescript": "^5.6.2"
   },
   "engines": {
@@ -156,11 +156,15 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "browser": "./dist/index.browser.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "pnpm transpile && pnpm typegen",
     "transpile": "tsup --config ./tsup.config.js",
     "typegen": "tsc --customConditions default --emitDeclarationOnly",
+    "pack:root": "pnpm pack --pack-destination $(dirname $(pnpm root -w))",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "typecheck": "tsc --customConditions default --noEmit --jsx preserve"
   },
