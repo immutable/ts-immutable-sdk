@@ -114,29 +114,50 @@ function extractMethodDetails(node) {
     const signature = node.signatures[0];
     const { mainType, typeArguments } = extractTypeInfo(signature.type);
 
-    // Extract deprecation details
     let deprecated = false;
     let deprecatedMessage = '';
     if (signature.comment && signature.comment.blockTags) {
-      const deprecatedTag = signature.comment.blockTags.find(tag => tag.tag === '@deprecated');
+      const deprecatedTag = signature.comment.blockTags.find((tag) => tag.tag === '@deprecated');
       if (deprecatedTag) {
         deprecated = true;
-        deprecatedMessage = deprecatedTag.content.map(c => c.text || '').join(' ');
+        deprecatedMessage = deprecatedTag.content.map((c) => c.text || '').join(' ');
       }
     }
 
     return {
       kind: 'Method',
       name: node.name,
-      description: signature.comment ? signature.comment.summary.map(s => s.text).join(' ') : '',
+      description: signature.comment ? signature.comment.summary.map((s) => s.text).join(' ') : '',
       deprecated,
       deprecatedMessage,
-      parameters: signature.parameters ? signature.parameters.map(param => ({
-        name: param.name,
-        type: param.type ? typeToString(param.type) : '',
-        description: param.comment ? param.comment.summary.map(s => s.text).join(' ') : '',
-        isOptional: param.flags?.isOptional || false,
-      })) : [],
+      parameters: signature.parameters ? signature.parameters.map((param) => {
+        const parameterInfo = {
+          name: param.name,
+          type: param.type ? typeToString(param.type) : '',
+          description: '',
+          isOptional: param.flags?.isOptional || false,
+          properties: [],
+        };
+
+        // Handle reflection type parameters (objects with properties)
+        if (param.type && 
+            param.type.type === 'reflection' && 
+            param.type.declaration && 
+            param.type.declaration.children
+        ) {
+          parameterInfo.properties = param.type.declaration.children.map((child) => ({
+            name: child.name,
+            type: child.type ? typeToString(child.type) : 'unknown',
+            description: child.comment?.summary?.map((s) => s.text).join(' ') || '',
+            isOptional: child.flags?.isOptional || false,
+          }));
+        } else if (param.comment) {
+          // Handle simple parameters
+          parameterInfo.description = param.comment.summary.map((s) => s.text).join(' ');
+        }
+
+        return parameterInfo;
+      }) : [],
       returnType: mainType,
       returnTypeArguments: typeArguments,
       returnDescription: extractReturnDescription(signature.comment),
@@ -176,9 +197,6 @@ function extractDetails(nodes, currentPackage = null) {
       case 128: // Class
         detail = extractClassDetails(node);
         break;
-      /*case 256: // Interface
-        detail = extractInterfaceDetails(node);
-        break; */
       default:
         break;
     }
