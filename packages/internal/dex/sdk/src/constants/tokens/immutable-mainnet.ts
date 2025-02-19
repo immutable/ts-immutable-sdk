@@ -29,10 +29,19 @@ export const ETH_IMMUTABLE_MAINNET: ERC20 = {
 
 export const USDC_IMMUTABLE_MAINNET: ERC20 = {
   chainId: IMMUTABLE_MAINNET_CHAIN_ID,
-  address: '0x3B2d8A1931736Fc321C24864BceEe981B11c3c57',
+  address: '0x6de8aCC0D406837030CE4dd28e7c08C5a96a30d2',
   decimals: 6,
   symbol: 'USDC',
   name: 'USDC',
+  type: 'erc20',
+};
+
+export const USDT_IMMUTABLE_MAINNET: ERC20 = {
+  chainId: IMMUTABLE_MAINNET_CHAIN_ID,
+  address: '0x68bcc7F1190AF20e7b572BCfb431c3Ac10A936Ab',
+  decimals: 6,
+  symbol: 'USDT',
+  name: 'USDT',
   type: 'erc20',
 };
 
@@ -40,4 +49,5 @@ export const IMMUTABLE_MAINNET_COMMON_ROUTING_TOKENS: ERC20[] = [
   WIMX_IMMUTABLE_MAINNET,
   ETH_IMMUTABLE_MAINNET,
   USDC_IMMUTABLE_MAINNET,
+  USDT_IMMUTABLE_MAINNET,
 ];
