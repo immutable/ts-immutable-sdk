@@ -4,8 +4,8 @@ export const DEFAULT_SLIPPAGE = 0.1;
 // 15 minutes from the time the transaction was prepared
 export const DEFAULT_DEADLINE_SECONDS: number = 60 * 15;
 
-// most swaps will be able to resolve with 2 hops
-export const DEFAULT_MAX_HOPS: number = 2;
+// most swaps will be able to resolve with 3 hops
+export const DEFAULT_MAX_HOPS: number = 3;
 
 // after 10 hops, it is very unlikely a route will be available
 export const MAX_MAX_HOPS: number = 10;
