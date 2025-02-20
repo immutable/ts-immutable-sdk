@@ -72,7 +72,7 @@ jobs:
       - name: Major release Permission Check
         if: ${{ env.RELEASE_TYPE == 'major' }}
         run: |
-          if [[ ${{ steps.check_user_permission.outputs.require-result }} != 'true' || !${{ fromJson(env.SDK_PUBLISH_MAJOR_VERSION_ACTORS) }}.includes(${{ github.triggering_actor }}) ]]; then
+          if [ "${{ steps.check_user_permission.outputs.require-result }}" != 'true' ] || ! ${{ fromJson(env.SDK_PUBLISH_MAJOR_VERSION_ACTORS) }}.includes("${{ github.triggering_actor }}"); then
             echo "User does not have permission to perform a major release."
             exit 1
           fi
@@ -131,8 +131,7 @@ jobs:
         id: warm_up_cdn
         if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }}
         run: |
-          wget https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets/dist/widgets.js
-          wget https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets/dist/index.js
+          wget https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets/dist/browser/index.js
 
       # Wait for 30 seconds to make sure the tag is available on GitHub
       - uses: GuillaumeFalourd/wait-sleep-action@175a644657d8de245e4c6059d014941646186a84
