@@ -89,13 +89,13 @@ jobs:
         uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a
         with:
           node-version-file: .nvmrc
-          cache: "pnpm"
+          cache: "yarn"
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: yarn install --frozen-lockfile
 
       - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && pnpm build
+        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
 
       - name: Update SDK package.json version
         run: |
@@ -104,7 +104,7 @@ jobs:
         shell: bash
 
       - name: Build SDK Docs
-        run: pnpm docs:build
+        run: yarn docs:build
 
       - name: Update version link
         run: ./.github/scripts/update-docs-link.sh
