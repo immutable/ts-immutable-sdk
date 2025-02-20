@@ -58,11 +58,11 @@ export function Bridge({
   // has been loaded so that processing transfers will be eventually
   // reflected.
   const refreshBalances = useCallback(async () => {
-    if (!checkout || !from?.web3Provider) return;
+    if (!checkout || !from?.browserProvider) return;
     try {
       const tokensAndBalances = await getAllowedBalances({
         checkout,
-        provider: from.web3Provider,
+        provider: from.browserProvider,
         chainId: from?.network,
         allowTokenListType: TokenFilterTypes.BRIDGE,
         // Skip retry given that in this case it is not needed;
@@ -94,14 +94,14 @@ export function Bridge({
       // eslint-disable-next-line no-console
       console.debug(e);
     }
-  }, [checkout, from?.web3Provider, from?.network]);
+  }, [checkout, from?.browserProvider, from?.network]);
   useInterval(refreshBalances, REFRESH_TOKENS_INTERVAL_MS);
 
   useEffect(() => {
-    if (!checkout || !from?.web3Provider) return;
+    if (!checkout || !from?.browserProvider) return;
     setIsTokenBalancesLoading(true);
     refreshBalances().finally(() => setIsTokenBalancesLoading(false));
-  }, [checkout, from?.web3Provider]);
+  }, [checkout, from?.browserProvider]);
 
   return (
     <SimpleLayout

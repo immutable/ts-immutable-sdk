@@ -1,11 +1,12 @@
-import { Web3Provider } from '@ethersproject/providers';
 import { RouteResponse } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
-import { ethers } from 'ethers';
+import {
+  ethers, MaxUint256, TransactionReceipt, TransactionResponse,
+} from 'ethers';
 
-import { StatusResponse } from '@0xsquid/sdk/dist/types';
+import { StatusResponse, EvmWallet } from '@0xsquid/sdk/dist/types';
 import { Flow } from '@imtbl/metrics';
-import { EIP6963ProviderInfo } from '@imtbl/checkout-sdk';
+import { EIP6963ProviderInfo, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { isSquidNativeToken } from '../functions/isSquidNativeToken';
 import { retry } from '../../retry';
 import { withMetricsAsync } from '../../metrics';
@@ -21,7 +22,7 @@ export const useExecute = (
   const { user } = useAnalytics();
 
   const waitForReceipt = async (
-    provider: Web3Provider,
+    provider: WrappedBrowserProvider,
     txHash: string,
     maxAttempts = 120,
   ) => {
@@ -53,16 +54,16 @@ export const useExecute = (
   };
 
   const getAllowance = async (
-    provider: Web3Provider,
+    provider: WrappedBrowserProvider,
     routeResponse: RouteResponse,
-  ): Promise<ethers.BigNumber | undefined> => {
+  ): Promise<bigint | undefined> => {
     try {
       if (!isSquidNativeToken(routeResponse?.route?.params.fromToken)) {
         const erc20Abi = [
           'function allowance(address owner, address spender) public view returns (uint256)',
         ];
         const fromToken = routeResponse?.route.params.fromToken;
-        const signer = provider.getSigner();
+        const signer = await provider.getSigner();
         const tokenContract = new ethers.Contract(fromToken, erc20Abi, signer);
 
         const ownerAddress = await signer.getAddress();
@@ -78,7 +79,7 @@ export const useExecute = (
         );
       }
 
-      return ethers.constants.MaxUint256; // no approval is needed for native tokens
+      return MaxUint256; // no approval is needed for native tokens
     } catch (error) {
       onTransactionError?.(error);
       return undefined;
@@ -88,15 +89,15 @@ export const useExecute = (
   const callApprove = async (
     flow:Flow,
     fromProviderInfo: EIP6963ProviderInfo,
-    provider: Web3Provider,
+    provider: WrappedBrowserProvider,
     routeResponse: RouteResponse,
-  ): Promise<ethers.providers.TransactionReceipt> => {
+  ): Promise<TransactionReceipt> => {
     flow.addEvent(`provider_${fromProviderInfo.name}`);
     const erc20Abi = [
       'function approve(address spender, uint256 amount) public returns (bool)',
     ];
     const fromToken = routeResponse?.route.params.fromToken;
-    const signer = provider.getSigner();
+    const signer = await provider.getSigner();
     const tokenContract = new ethers.Contract(fromToken, erc20Abi, signer);
 
     const fromAmount = routeResponse?.route.params.fromAmount;
@@ -129,9 +130,9 @@ export const useExecute = (
 
   const approve = async (
     fromProviderInfo: EIP6963ProviderInfo,
-    provider: Web3Provider,
+    provider: WrappedBrowserProvider,
     routeResponse: RouteResponse,
-  ): Promise<ethers.providers.TransactionReceipt | undefined> => {
+  ): Promise<TransactionReceipt | undefined> => {
     try {
       if (!isSquidNativeToken(routeResponse?.route?.params.fromToken)) {
         return await withMetricsAsync(
@@ -152,14 +153,14 @@ export const useExecute = (
     flow: Flow,
     squid: Squid,
     fromProviderInfo: EIP6963ProviderInfo,
-    provider: Web3Provider,
+    provider: WrappedBrowserProvider,
     routeResponse: RouteResponse,
-  ): Promise<ethers.providers.TransactionReceipt> => {
+  ): Promise<TransactionReceipt> => {
     flow.addEvent(`provider_${fromProviderInfo.name}`);
     const tx = (await squid.executeRoute({
-      signer: provider.getSigner(),
+      signer: await provider.getSigner() as unknown as EvmWallet,
       route: routeResponse.route,
-    })) as unknown as ethers.providers.TransactionResponse;
+    })) as unknown as TransactionResponse;
     flow.addEvent('transactionSent');
     return await waitForReceipt(provider, tx.hash);
   };
@@ -167,11 +168,11 @@ export const useExecute = (
   const execute = async (
     squid: Squid,
     fromProviderInfo: EIP6963ProviderInfo,
-    provider: Web3Provider,
+    provider: WrappedBrowserProvider,
     routeResponse: RouteResponse,
-  ): Promise<ethers.providers.TransactionReceipt | undefined> => {
-    if (!provider.provider.request) {
-      throw new Error('provider does not have request method');
+  ): Promise<TransactionReceipt | undefined> => {
+    if (!provider.send) {
+      throw new Error('provider does not have send method');
     }
     try {
       return await withMetricsAsync(

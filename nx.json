@@ -36,6 +36,62 @@
       "cache": true
     }
   },
+  "release": {
+    "projectsRelationship": "fixed",
+    "projects": ["sdk/**", "packages/**", "!packages/**/*sample-app/**", "!packages/game-bridge", "!@imtbl-alpha/**"],
+    "releaseTagPattern": "{version}",
+    "changelog": {
+        "workspaceChangelog": {
+          "file": false,
+          "createRelease": "github",
+          "renderOptions": {
+            "authors": false
+          }
+        },
+        "git": {
+          "commit": false,
+          "tag": false,
+          "stageChanges": false
+        }
+    },
+    "version": {
+      "generatorOptions": {
+        "skipLockFileUpdate": true,
+        "currentVersionResolver": "disk",
+        "preid": "alpha"
+      },
+      "git": {
+        "commit": false,
+        "tag": false,
+        "stageChanges": false
+      }
+    },
+    "conventionalCommits": {
+      "types": {
+        "refactor": {
+          "changelog": false
+        },
+        "style": {
+          "changelog": false
+        },
+        "test": {
+          "changelog": false
+        },
+        "docs": {
+          "changelog": false
+        },
+        "build": {
+          "changelog": false
+        },
+        "ops": {
+          "changelog": false
+        },
+        "chore": {
+          "changelog": false
+        }
+      }
+    }
+  },
   "defaultBase": "main",
   "parallel": 8,
   "nxCloudAccessToken": "Mzg3ZGY1MWUtYmYyNy00ZmE4LTkyNDAtYjYxZmJmYmE4NWQ3fHJlYWQ="

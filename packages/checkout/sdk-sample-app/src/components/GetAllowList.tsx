@@ -1,11 +1,11 @@
 import {
   ChainId,
   Checkout,
+  WrappedBrowserProvider,
   NetworkFilterTypes,
   TokenFilterTypes,
   WalletFilterTypes,
 } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
 import LoadingButton from './LoadingButton';
@@ -16,7 +16,7 @@ import { TokenInfo } from '@imtbl/checkout-sdk';
 
 export interface AllowListProps {
   checkout: Checkout | undefined;
-  provider: Web3Provider | undefined;
+  provider: WrappedBrowserProvider | undefined;
 }
 
 export default function GetAllowList(props: AllowListProps) {
@@ -155,7 +155,7 @@ export default function GetAllowList(props: AllowListProps) {
           {resultNetwork?.map((network) => (
             <div key={network.chainId}>
               <Box>
-                ({network.chainId}) - {network.name} -
+                ({network.chainId.toString()}) - {network.name} -
                 {network.nativeCurrency.symbol}
               </Box>
             </div>

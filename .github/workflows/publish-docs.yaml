@@ -20,7 +20,7 @@ jobs:
       is_alpha: ${{ steps.alpha_check.outputs.is_alpha }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
 
@@ -58,12 +58,12 @@ jobs:
         run: failure("SDK reference docs should be only published from main branch, current branch ${{ github.ref }}")
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
 
       - name: Checkout Docs Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           repository: immutable/docs
           token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
@@ -86,24 +86,16 @@ jobs:
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a
         with:
           node-version-file: .nvmrc
-          cache: "yarn"
-
-      - name: Restore cached node_modules
-        id: restore-cache-node_modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-build-cache-deps-docs-${{ hashFiles('yarn.lock') }}
+          cache: "pnpm"
 
       - name: Install dependencies
-        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true'
-        run: yarn install --immutable
+        run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
+        run: export NODE_OPTIONS=--max-old-space-size=6144 && pnpm build
 
       - name: Update SDK package.json version
         run: |
@@ -112,7 +104,7 @@ jobs:
         shell: bash
 
       - name: Build SDK Docs
-        run: yarn docs:build
+        run: pnpm docs:build
 
       - name: Update version link
         run: ./.github/scripts/update-docs-link.sh

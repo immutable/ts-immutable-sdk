@@ -1,6 +1,9 @@
 {
   "$schema": "https://typedoc.org/schema.json",
   "includeVersion": false,
+  "compilerOptions": {
+    "customConditions": ["default"]
+  },
   "readme": "none",
   "sort": [
     "kind"

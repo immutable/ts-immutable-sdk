@@ -1,7 +1,7 @@
 import { Magic } from 'magic-sdk';
 import { OpenIdExtension } from '@magic-ext/oidc';
-import { ethers } from 'ethers';
 import { Flow, trackDuration } from '@imtbl/metrics';
+import { Eip1193Provider } from 'ethers';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { PassportConfiguration } from '../config';
 import { lazyDocumentReady } from '../utils/lazyLoad';
@@ -43,8 +43,8 @@ export default class MagicAdapter {
 
   async login(
     idToken: string,
-  ): Promise<ethers.providers.ExternalProvider> {
-    return withPassportError<ethers.providers.ExternalProvider>(async () => (
+  ): Promise<Eip1193Provider> {
+    return withPassportError<Eip1193Provider>(async () => (
       withMetricsAsync(async (flow: Flow) => {
         const startTime = performance.now();
 

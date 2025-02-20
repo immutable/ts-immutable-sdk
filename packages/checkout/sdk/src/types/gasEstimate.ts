@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { BridgeFeeResponse } from '@imtbl/bridge-sdk';
 import { TokenInfo } from './tokenInfo';
 
@@ -62,11 +61,11 @@ export interface GasEstimateBridgeToL2Result {
 }
 /**
  * An interface representing the estimated fees.
- * @property {BigNumber | undefined} totalFees - The estimated fees for the transaction.
+ * @property {bigint} totalFees - The estimated fees for the transaction.
  * @property {TokenInfo | undefined} token - The gas token information.
  */
 
 export interface TokenAmountEstimate {
-  totalFees?: BigNumber;
+  totalFees?: bigint;
   token?: TokenInfo;
 }

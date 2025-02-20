@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 import 'dotenv/config';
-import { ethers } from "ethers";
 import util from 'util';
 import { ImmutableConfiguration, Environment } from '@imtbl/config';
 import { 
@@ -19,6 +18,7 @@ import {
 // @ts-ignore
 import { setupForBridge } from './lib/utils.ts';
 import { delay, getContract, waitForReceipt } from './lib/helpers.js';
+import { Contract, ZeroAddress } from 'ethers';
 
 export async function withdraw() {
 
@@ -35,18 +35,18 @@ export async function withdraw() {
 
   const tokenBridge = new TokenBridge(bridgeConfig);
 
-  const rootBridge: ethers.Contract = getContract("RootERC20BridgeFlowRate", params.rootBridgeAddress, params.rootProvider);
-  const childBridge: ethers.Contract = getContract("ChildERC20Bridge", params.childBridgeAddress, params.childProvider);
+  const rootBridge: Contract = getContract("RootERC20BridgeFlowRate", params.rootBridgeAddress, params.rootProvider);
+  const childBridge: Contract = getContract("ChildERC20Bridge", params.childBridgeAddress, params.childProvider);
 
   if (params.childToken.toUpperCase() !== 'NATIVE' && params.rootToken.toUpperCase() !== 'NATIVE') {
     let rootBridgeChildAddress = await rootBridge.rootTokenToChildToken(params.rootToken);
     let childBridgeChildAddress = await childBridge.rootTokenToChildToken(params.rootToken);
   
-    if (rootBridgeChildAddress === ethers.constants.AddressZero) {
+    if (rootBridgeChildAddress === ZeroAddress) {
       throw new Error('token not mapped, please map token before withdrawing');
     }
   
-    if (childBridgeChildAddress === ethers.constants.AddressZero) {
+    if (childBridgeChildAddress === ZeroAddress) {
       throw new Error('token mapping incomplete, please wait for token to map to childBridge before withdrawing');
     }
   
@@ -75,15 +75,15 @@ export async function withdraw() {
   }
 
   if (approvalRes!.unsignedTx) {
-    const approvalNonce = await params.childWallet.getTransactionCount();
-    const approvalGasPrice = await params.childProvider.getGasPrice();
+    const approvalNonce = await params.childWallet.provider?.getTransactionCount(params.childWallet.address);
+    const approvalGasPrice = (await params.childProvider.getFeeData()).gasPrice ?? BigInt(0);
 
     console.log('approvalNonce', approvalNonce);
     console.log('approvalGasPrice', approvalGasPrice);
 
     approvalRes!.unsignedTx.gasLimit = BridgeMethodsGasLimit.WITHDRAW_SOURCE;
     approvalRes!.unsignedTx.nonce = approvalNonce;
-    approvalRes!.unsignedTx.gasPrice = approvalGasPrice.mul(2);
+    approvalRes!.unsignedTx.gasPrice = approvalGasPrice * BigInt(2);
 
     console.log('approvalRes.unsignedTx');
     console.log(approvalRes!.unsignedTx);
@@ -92,10 +92,10 @@ export async function withdraw() {
     const approvalTxSig = await params.childWallet.signTransaction(approvalRes!.unsignedTx);
     console.log('approvalTxSig', approvalTxSig);
 
-    const sendApprovalRes = await params.childWallet.provider.sendTransaction(approvalTxSig);
+    const sendApprovalRes = await params.childWallet.provider?.broadcastTransaction(approvalTxSig);
     console.log('sendApprovalRes', sendApprovalRes);
 
-    await waitForReceipt(sendApprovalRes.hash, params.childProvider);
+    await waitForReceipt(sendApprovalRes?.hash, params.childProvider);
   } else {
     console.log('no approval required');
   }
@@ -125,14 +125,14 @@ export async function withdraw() {
     return
   }
 
-  const withdrawNonce = await params.childWallet.getTransactionCount();
-  const withdrawGasPrice = await params.childProvider.getGasPrice();
+  const withdrawNonce = await params.childWallet.provider?.getTransactionCount(params.childWallet.address)
+  const withdrawGasPrice = (await params.childProvider.getFeeData()).gasPrice ?? BigInt(0);
 
   withdrawRes!.unsignedTx.gasLimit = BridgeMethodsGasLimit.WITHDRAW_SOURCE;
   withdrawRes!.unsignedTx.nonce = withdrawNonce;
-  withdrawRes!.unsignedTx.gasPrice = withdrawGasPrice.mul(2);
+  withdrawRes!.unsignedTx.gasPrice = withdrawGasPrice * BigInt(2);
 
-  withdrawRes!.unsignedTx.value = ethers.BigNumber.from(withdrawRes!.unsignedTx.value);
+  withdrawRes!.unsignedTx.value = BigInt(withdrawRes!.unsignedTx.value ?? 0);
 
   console.log('withdrawRes.unsignedTx');
   console.log(withdrawRes!.unsignedTx);
@@ -144,17 +144,17 @@ export async function withdraw() {
   const withdrawTxSig = await params.childWallet.signTransaction(withdrawRes!.unsignedTx);
   console.log('withdrawTxSig', withdrawTxSig);
 
-  const sendWithdrawtRes = await params.childWallet.provider.sendTransaction(withdrawTxSig);
+  const sendWithdrawtRes = await params.childWallet.provider?.broadcastTransaction(withdrawTxSig);
   console.log('sendWithdrawtRes', sendWithdrawtRes);
 
-  await waitForReceipt(sendWithdrawtRes.hash, params.childProvider);
+  await waitForReceipt(sendWithdrawtRes?.hash, params.childProvider);
   
-  console.log('Withdraw submitted txHash:',sendWithdrawtRes.hash);
+  console.log('Withdraw submitted txHash:',sendWithdrawtRes?.hash);
 
   const txStatusReq:TxStatusRequest = {
     sourceChainId: bridgeConfig.bridgeInstance.childChainID,
     transactions: [{
-      txHash: sendWithdrawtRes.hash
+      txHash: sendWithdrawtRes?.hash
     }]
   }
 

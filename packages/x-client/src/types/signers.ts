@@ -1,6 +1,6 @@
-import { Signer as EthSigner } from '@ethersproject/abstract-signer';
+import { Signer as EthSigner } from 'ethers';
 
-export { EthSigner };
+export type { EthSigner };
 
 /**
  * An abstraction of a Stark account, which can be used to sign messages and transactions on StarkEx to execute state changing operations

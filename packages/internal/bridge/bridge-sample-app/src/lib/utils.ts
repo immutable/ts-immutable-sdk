@@ -3,7 +3,7 @@ import {
   ETH_SEPOLIA_TO_ZKEVM_DEVNET, 
   ETH_SEPOLIA_TO_ZKEVM_TESTNET 
 } from '@imtbl/bridge-sdk';
-import { ethers } from 'ethers';
+import { JsonRpcProvider, parseUnits, Wallet } from 'ethers';
 
 export async function setupForBridge() {
   if (!process.env.ENVIRONMENT) {
@@ -46,27 +46,27 @@ export async function setupForBridge() {
     throw new Error('CHILD_BRIDGE_ADDRESS not set');
   }
   // Parse deposit amount from environment variable
-  const amount = ethers.utils.parseUnits(
+  const amount = parseUnits(
     process.env.SEND_AMOUNT,
     process.env.SEND_DECIMALS,
   );
 
   // Create providers for root and child chains
-  const rootProvider = new ethers.providers.JsonRpcProvider(
+  const rootProvider = new JsonRpcProvider(
     process.env.ROOT_PROVIDER_RPC,
   );
-  const childProvider = new ethers.providers.JsonRpcProvider(
+  const childProvider = new JsonRpcProvider(
     process.env.CHILD_PROVIDER_RPC,
   );
 
   // Create a wallet instance to simulate the user's wallet
-  const rootWallet = new ethers.Wallet(
+  const rootWallet = new Wallet(
     process.env.PRIVATE_KEY,
     rootProvider,
   );
 
   // Create a wallet instance to simulate the user's wallet
-  const childWallet = new ethers.Wallet(
+  const childWallet = new Wallet(
     process.env.PRIVATE_KEY,
     childProvider,
   );

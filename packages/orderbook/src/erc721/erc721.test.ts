@@ -1,5 +1,4 @@
 import { mock, when, instance } from 'ts-mockito';
-import { BigNumber } from 'ethers';
 import { ImmutableERC721Base } from '../typechain/types';
 import { ERC721 } from './erc721';
 
@@ -12,7 +11,7 @@ describe('ERC721', () => {
       const salePrice = '400000';
 
       when(mockedContract.royaltyInfo(tokenId, salePrice))
-        .thenReturn(Promise.resolve(['0x123', BigNumber.from(100)]));
+        .thenReturn(Promise.resolve(['0x123', BigInt(100)]));
 
       const royaltyInfo = await new ERC721(instance(mockedContract))
         .royaltyInfo(tokenId, salePrice);

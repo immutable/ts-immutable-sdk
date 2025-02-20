@@ -1,5 +1,4 @@
 import { Environment } from '@imtbl/config';
-import { BigNumber } from 'ethers';
 import { CheckoutConfiguration } from '../../config';
 import {
   allowListCheck,
@@ -110,7 +109,7 @@ describe('allowListCheck', () => {
         success: true,
         balances: [
           {
-            balance: BigNumber.from(10),
+            balance: BigInt(10),
             formattedBalance: '10',
             token: {
               decimals: 18,
@@ -120,7 +119,7 @@ describe('allowListCheck', () => {
             },
           },
           {
-            balance: BigNumber.from(10),
+            balance: BigInt(10),
             formattedBalance: '10',
             token: {
               name: 'Ethereum',
@@ -135,7 +134,7 @@ describe('allowListCheck', () => {
         success: true,
         balances: [
           {
-            balance: BigNumber.from(10),
+            balance: BigInt(10),
             formattedBalance: '10',
             token: {
               name: 'Ethereum',
@@ -280,7 +279,7 @@ describe('allowListCheck', () => {
           success: true,
           balances: [
             {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
               token: {
                 address: '0x0000000',
@@ -290,7 +289,7 @@ describe('allowListCheck', () => {
               },
             },
             {
-              balance: BigNumber.from(10),
+              balance: BigInt(10),
               formattedBalance: '10',
               token: {
                 name: 'Ethereum',

@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { Token as DexTokenInfo } from '@imtbl/dex-sdk';
 import { DexQuote } from '../types';
 import {
@@ -30,18 +29,18 @@ describe('constructBridgeRequirements', () => {
       swap: null,
       quote: {
         amount: {
-          value: BigNumber.from(quoteAmount),
+          value: BigInt(quoteAmount),
           token: swapTokenInfo,
         },
         amountWithMaxSlippage: {
-          value: BigNumber.from(slippageQuoteAmount),
+          value: BigInt(slippageQuoteAmount),
           token: swapTokenInfo,
         },
         slippage: 1,
         fees: [
           {
             amount: {
-              value: BigNumber.from(feeAmount),
+              value: BigInt(feeAmount),
               token: feesTokenInfo,
             },
             recipient: '',
@@ -53,14 +52,14 @@ describe('constructBridgeRequirements', () => {
 
     if (swap) {
       dexQuote.swap = {
-        value: BigNumber.from(swap),
+        value: BigInt(swap),
         token: swapTokenInfo,
       };
     }
 
     if (approval) {
       dexQuote.approval = {
-        value: BigNumber.from(approval),
+        value: BigInt(approval),
         token: feesTokenInfo,
       };
     }
@@ -124,7 +123,7 @@ describe('constructBridgeRequirements', () => {
           address: 'ERC20AL1',
           decimals: 18,
         } as TokenInfo,
-        balance: BigNumber.from(5000000000000000),
+        balance: BigInt(5000000000000000),
         formattedBalance: '5',
       },
       {
@@ -132,7 +131,7 @@ describe('constructBridgeRequirements', () => {
           address: 'ERC20BL1',
           decimals: 18,
         } as TokenInfo,
-        balance: BigNumber.from(6000000000000000),
+        balance: BigInt(6000000000000000),
         formattedBalance: '6',
       },
     ];
@@ -161,7 +160,7 @@ describe('constructBridgeRequirements', () => {
             sufficient: false,
             required: {
               type: ItemType.ERC20,
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1',
               token: {
                 address: '0xERC20C',
@@ -175,12 +174,12 @@ describe('constructBridgeRequirements', () => {
     expect(requirements).toEqual(
       [
         {
-          amount: BigNumber.from(200000000000000),
+          amount: BigInt(200000000000000),
           formattedAmount: '0.0002',
           l2address: '0xERC20A',
         },
         {
-          amount: BigNumber.from(700000000000000),
+          amount: BigInt(700000000000000),
           formattedAmount: '0.0007',
           l2address: '0xERC20B',
         },
@@ -224,7 +223,7 @@ describe('constructBridgeRequirements', () => {
         token: {
           decimals: 18,
         } as TokenInfo,
-        balance: BigNumber.from(300000000000000),
+        balance: BigInt(300000000000000),
         formattedBalance: '3',
       },
     ];
@@ -249,7 +248,7 @@ describe('constructBridgeRequirements', () => {
             sufficient: false,
             required: {
               type: ItemType.ERC20,
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1',
               token: {
                 address: '0xERC',
@@ -263,7 +262,7 @@ describe('constructBridgeRequirements', () => {
     expect(requirements).toEqual(
       [
         {
-          amount: BigNumber.from(200000000000000),
+          amount: BigInt(200000000000000),
           formattedAmount: '0.0002',
           l2address: '0xETH',
         },
@@ -327,7 +326,7 @@ describe('constructBridgeRequirements', () => {
           address: 'ERC20AL1',
           decimals: 18,
         } as TokenInfo,
-        balance: BigNumber.from(500000000000000),
+        balance: BigInt(500000000000000),
         formattedBalance: '1',
       },
       {
@@ -336,7 +335,7 @@ describe('constructBridgeRequirements', () => {
           decimals: 18,
         } as TokenInfo,
         // Not enough balance to bridge this ERC20
-        balance: BigNumber.from(100000000000000),
+        balance: BigInt(100000000000000),
         formattedBalance: '1',
       },
     ];
@@ -365,7 +364,7 @@ describe('constructBridgeRequirements', () => {
             sufficient: false,
             required: {
               type: ItemType.ERC20,
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1',
               token: {
                 address: '0xERC20C',
@@ -379,7 +378,7 @@ describe('constructBridgeRequirements', () => {
     expect(requirements).toEqual(
       [
         {
-          amount: BigNumber.from(200000000000000),
+          amount: BigInt(200000000000000),
           formattedAmount: '0.0002',
           l2address: '0xERC20A',
         },
@@ -424,7 +423,7 @@ describe('constructBridgeRequirements', () => {
           address: '0xIMXL1',
           decimals: 18,
         } as TokenInfo,
-        balance: BigNumber.from(5000000000000000),
+        balance: BigInt(5000000000000000),
         formattedBalance: '5',
       },
     ];
@@ -435,7 +434,7 @@ describe('constructBridgeRequirements', () => {
           address: '0xIMX',
           decimals: 18,
         } as TokenInfo,
-        balance: BigNumber.from(10000000000000),
+        balance: BigInt(10000000000000),
         formattedBalance: '0.1',
       },
     ];
@@ -458,7 +457,7 @@ describe('constructBridgeRequirements', () => {
             sufficient: false,
             required: {
               type: ItemType.NATIVE,
-              balance: BigNumber.from(120000000000000),
+              balance: BigInt(120000000000000),
               formattedBalance: '1',
               token: {
                 address: '0xIMX',
@@ -472,7 +471,7 @@ describe('constructBridgeRequirements', () => {
     expect(requirements).toEqual(
       [
         {
-          amount: BigNumber.from(1110000000000000),
+          amount: BigInt(1110000000000000),
           formattedAmount: '0.00111',
           l2address: '0xIMX',
         },
@@ -517,7 +516,7 @@ describe('constructBridgeRequirements', () => {
           address: '0xL1',
           decimals: 18,
         } as TokenInfo,
-        balance: BigNumber.from(100000000000000),
+        balance: BigInt(100000000000000),
         formattedBalance: '1',
       },
     ];
@@ -528,7 +527,7 @@ describe('constructBridgeRequirements', () => {
           address: '0xL2',
           decimals: 18,
         } as TokenInfo,
-        balance: BigNumber.from(9000000000000000),
+        balance: BigInt(9000000000000000),
         formattedBalance: '1',
       },
     ];
@@ -562,7 +561,7 @@ describe('constructBridgeRequirements', () => {
             sufficient: false,
             required: {
               type: ItemType.ERC20,
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1',
               token: {
                 address: '0xERC20',
@@ -573,7 +572,7 @@ describe('constructBridgeRequirements', () => {
       };
 
       const amount = getAmountFromBalanceRequirement(balanceRequirements, '0xERC20');
-      expect(amount).toEqual(BigNumber.from(1));
+      expect(amount).toEqual(BigInt(1));
     });
 
     it('should return 0 if quoted token is not a balance requirement', () => {
@@ -585,7 +584,7 @@ describe('constructBridgeRequirements', () => {
             sufficient: false,
             required: {
               type: ItemType.ERC20,
-              balance: BigNumber.from(1),
+              balance: BigInt(1),
               formattedBalance: '1',
               token: {
                 address: '0xERC20',
@@ -596,105 +595,105 @@ describe('constructBridgeRequirements', () => {
       };
 
       const amount = getAmountFromBalanceRequirement(balanceRequirements, '0xIMX');
-      expect(amount).toEqual(BigNumber.from(0));
+      expect(amount).toEqual(BigInt(0));
     });
   });
 
   describe('getAmountToBridge', () => {
     it('should return 0 if balance is sufficient on L2', () => {
-      const quotedAmountWithFees = BigNumber.from(10);
-      const amountFromBalanceRequirement = BigNumber.from(10);
+      const quotedAmountWithFees = BigInt(10);
+      const amountFromBalanceRequirement = BigInt(10);
       const l2balance = {
-        balance: BigNumber.from(20),
+        balance: BigInt(20),
       } as GetBalanceResult;
       const amountToBridge = getAmountToBridge(
         quotedAmountWithFees,
         amountFromBalanceRequirement,
         l2balance,
       );
-      expect(amountToBridge).toEqual(BigNumber.from(0));
+      expect(amountToBridge).toEqual(BigInt(0));
     });
 
     it('should return 0 if balance is sufficient on L2 and there is no balance requirement', () => {
-      const quotedAmountWithFees = BigNumber.from(10);
-      const amountFromBalanceRequirement = BigNumber.from(0);
+      const quotedAmountWithFees = BigInt(10);
+      const amountFromBalanceRequirement = BigInt(0);
       const l2balance = {
-        balance: BigNumber.from(10),
+        balance: BigInt(10),
       } as GetBalanceResult;
       const amountToBridge = getAmountToBridge(
         quotedAmountWithFees,
         amountFromBalanceRequirement,
         l2balance,
       );
-      expect(amountToBridge).toEqual(BigNumber.from(0));
+      expect(amountToBridge).toEqual(BigInt(0));
     });
 
     it('should return quoted amount and balance requirement in full if no L2 balance', () => {
-      const quotedAmountWithFees = BigNumber.from(10);
-      const amountFromBalanceRequirement = BigNumber.from(10);
+      const quotedAmountWithFees = BigInt(10);
+      const amountFromBalanceRequirement = BigInt(10);
       const l2balance = {
-        balance: BigNumber.from(0),
+        balance: BigInt(0),
       } as GetBalanceResult;
       const amountToBridge = getAmountToBridge(
         quotedAmountWithFees,
         amountFromBalanceRequirement,
         l2balance,
       );
-      expect(amountToBridge).toEqual(BigNumber.from(20));
+      expect(amountToBridge).toEqual(BigInt(20));
     });
 
     it('should return quoted amount and balance requirement in full if L2 balance undefined', () => {
-      const quotedAmountWithFees = BigNumber.from(10);
-      const amountFromBalanceRequirement = BigNumber.from(10);
+      const quotedAmountWithFees = BigInt(10);
+      const amountFromBalanceRequirement = BigInt(10);
       const l2balance = undefined;
       const amountToBridge = getAmountToBridge(
         quotedAmountWithFees,
         amountFromBalanceRequirement,
         l2balance,
       );
-      expect(amountToBridge).toEqual(BigNumber.from(20));
+      expect(amountToBridge).toEqual(BigInt(20));
     });
 
     it('should return quoted amount minus remaining balance after balance requirement subtracted', () => {
-      const quotedAmountWithFees = BigNumber.from(10);
-      const amountFromBalanceRequirement = BigNumber.from(20);
+      const quotedAmountWithFees = BigInt(10);
+      const amountFromBalanceRequirement = BigInt(20);
       const l2balance = {
-        balance: BigNumber.from(25),
+        balance: BigInt(25),
       } as GetBalanceResult;
       const amountToBridge = getAmountToBridge(
         quotedAmountWithFees,
         amountFromBalanceRequirement,
         l2balance,
       );
-      expect(amountToBridge).toEqual(BigNumber.from(5));
+      expect(amountToBridge).toEqual(BigInt(5));
     });
 
     it('should return exactly quoted amount if remainder 0', () => {
-      const quotedAmountWithFees = BigNumber.from(10);
-      const amountFromBalanceRequirement = BigNumber.from(20);
+      const quotedAmountWithFees = BigInt(10);
+      const amountFromBalanceRequirement = BigInt(20);
       const l2balance = {
-        balance: BigNumber.from(20),
+        balance: BigInt(20),
       } as GetBalanceResult;
       const amountToBridge = getAmountToBridge(
         quotedAmountWithFees,
         amountFromBalanceRequirement,
         l2balance,
       );
-      expect(amountToBridge).toEqual(BigNumber.from(10));
+      expect(amountToBridge).toEqual(BigInt(10));
     });
 
     it('should return quoted amount and some of the remaining balance if negative remainder', () => {
-      const quotedAmountWithFees = BigNumber.from(10);
-      const amountFromBalanceRequirement = BigNumber.from(20);
+      const quotedAmountWithFees = BigInt(10);
+      const amountFromBalanceRequirement = BigInt(20);
       const l2balance = {
-        balance: BigNumber.from(15),
+        balance: BigInt(15),
       } as GetBalanceResult;
       const amountToBridge = getAmountToBridge(
         quotedAmountWithFees,
         amountFromBalanceRequirement,
         l2balance,
       );
-      expect(amountToBridge).toEqual(BigNumber.from(15));
+      expect(amountToBridge).toEqual(BigInt(15));
     });
   });
 });
