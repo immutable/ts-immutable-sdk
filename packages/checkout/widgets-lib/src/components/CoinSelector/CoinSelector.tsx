@@ -3,8 +3,10 @@ import {
   Drawer,
   Box,
   MenuItem,
+  TextInput,
 } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
+import { useCallback, useState } from 'react';
 import { CoinSelectorOption, CoinSelectorOptionProps } from './CoinSelectorOption';
 import { selectOptionsContainerStyles, selectOptionsLoadingIconStyles } from './CoinSelectorStyles';
 
@@ -22,8 +24,31 @@ export function CoinSelector({
   heading, options, defaultTokenImage, optionsLoading, children, onCloseDrawer, visible,
 }: CoinSelectorProps) {
   const { t } = useTranslation();
+
+  const [searchValue, setSearchValue] = useState<string>('');
+
+  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(event.target.value);
+  };
+
+  const filterOptions = useCallback((filterBy: string) => {
+    const filterByLower = filterBy.toLowerCase();
+    return options.filter((option) => option.name.toLowerCase().includes(filterByLower)
+        || option.symbol.toLowerCase().includes(filterByLower)
+        || option.id.toLowerCase().endsWith(filterByLower));
+  }, [options]);
+
+  const filteredOptions = !searchValue
+    ? options
+    : filterOptions(searchValue);
+
+  const handleCloseDrawer = () => {
+    setSearchValue('');
+    onCloseDrawer?.();
+  };
+
   return (
-    <Drawer headerBarTitle={heading} size="full" onCloseDrawer={onCloseDrawer} visible={visible}>
+    <Drawer headerBarTitle={heading} size="full" onCloseDrawer={handleCloseDrawer} visible={visible}>
       <Drawer.Target>
         {children}
       </Drawer.Target>
@@ -41,21 +66,40 @@ export function CoinSelector({
               {t('drawers.coinSelector.noCoins')}
             </Body>
           )}
-          {!optionsLoading && options.map(({
-            onClick, icon, name, symbol, balance, id, testId,
-          }) => (
-            <CoinSelectorOption
-              id={id}
-              testId={testId}
-              key={`${symbol}-${name}`}
-              onClick={onClick}
-              icon={icon}
-              name={name}
-              symbol={symbol}
-              balance={balance}
-              defaultTokenImage={defaultTokenImage}
-            />
-          ))}
+          {/* Add a search box when !optionsLoading */}
+          {!optionsLoading ? (
+            <>
+              <TextInput
+                sx={{ marginBottom: 'base.spacing.x4', minWidth: '100%' }}
+                testId="search-text"
+                onChange={(event) => handleOnChange(event)}
+                sizeVariant="large"
+                value={searchValue}
+                inputMode="search"
+                placeholder="name/symbol/contract address"
+                onClearValue={() => setSearchValue('')}
+                hideClearValueButton={false}
+                autoFocus
+              >
+                <TextInput.Icon icon="Search" />
+              </TextInput>
+              {filteredOptions.map(({
+                onClick, icon, name, symbol, balance, id, testId,
+              }) => (
+                <CoinSelectorOption
+                  id={id}
+                  testId={testId}
+                  key={`${symbol}-${name}`}
+                  onClick={onClick}
+                  icon={icon}
+                  name={name}
+                  symbol={symbol}
+                  balance={balance}
+                  defaultTokenImage={defaultTokenImage}
+                />
+              ))}
+            </>
+          ) : null}
         </Box>
       </Drawer.Content>
     </Drawer>
