@@ -85,11 +85,11 @@ jobs:
           echo upgrade_type=$upgrade_type
           echo revision_upgrade=$revision_upgrade
           
-          # Get the latest v1 tag
-          LATEST_V1_TAG=$(git tag -l "v1.*" | sort -V | tail -n1)
+          # Get the latest 1.x.x tag
+          LATEST_V1_TAG=$(git tag -l "1.*" | sort -V | tail -n1)
           if [ -z "$LATEST_V1_TAG" ]; then
-            echo "No v1 tags found. Using v1.0.0 as base"
-            LATEST_V1_TAG="v1.0.0"
+            echo "No v1 tags found. Using 1.0.0 as base"
+            LATEST_V1_TAG="1.0.0"
           fi
           
           # Force use of latest v1 tag as base for version calculation
@@ -230,3 +230,9 @@ jobs:
           cd packages/minting-backend/sdk
           npm version patch
           npm update --save
+
+      - name: Get latest version
+        id: get_version
+        run: |
+          VERSION=$(npm show @gitcoinco/passport-sdk-types version)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
