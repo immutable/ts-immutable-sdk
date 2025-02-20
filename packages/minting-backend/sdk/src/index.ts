@@ -51,10 +51,23 @@ export class MintingBackendModule {
     }
   }
 
+  /**
+   * Records a mint request in the persistence layer.
+   * @param {CreateMintRequest} mintRequest - The mint request to be recorded
+   * @returns {Promise<void>} A promise that resolves when the mint request is recorded
+   */
   async recordMint(mintRequest: CreateMintRequest) {
     await recordMint(this.persistence, mintRequest);
   }
 
+  /**
+   * Submits minting requests for processing.
+   * @param {Object} config - Configuration options for submitting minting requests
+   * @param {number} [config.defaultBatchSize] - The number of minting requests to process in a batch
+   * @param {string} [config.chainName] - The blockchain network to process mints for
+   * @param {number} [config.maxNumberOfTries] - Maximum number of retry attempts for failed requests
+   * @returns {Promise<void>} A promise that resolves when the minting requests are submitted
+   */
   async submitMintingRequests(config: {
     defaultBatchSize?: number;
     chainName?: string;
@@ -67,6 +80,12 @@ export class MintingBackendModule {
     );
   }
 
+  /**
+   * Processes a mint webhook event.
+   * @param {string | Record<string, unknown>} body - The webhook event payload
+   * @param {Object} [otherHandlers=noopHandlers] - Additional handlers for the webhook event
+   * @returns {Promise<void>} A promise that resolves when the mint is processed
+   */
   async processMint(body: string | Record<string, unknown>, otherHandlers = noopHandlers) {
     await handle(body, this.baseConfig.environment, {
       zkevmMintRequestUpdated: async (event: ZkevmMintRequestUpdated) => {

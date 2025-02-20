@@ -118,7 +118,10 @@ export class Orderbook {
     );
   }
 
-  // Default order expiry to 2 years from now
+  /**
+   * Returns the default expiry date for orders, set to 2 years from the current time.
+   * @returns {Date} A Date object set to 2 years from now
+   */
   static defaultOrderExpiry(): Date {
     return new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2);
   }
@@ -567,12 +570,14 @@ export class Orderbook {
    * Get unsigned transactions that can be submitted to fulfil an open order. If the approval
    * transaction exists it must be signed and submitted to the chain before the fulfilment
    * transaction can be submitted or it will be reverted.
-   * @param {string} orderId - The orderId to fulfil.
-   * @param {string} takerAddress - The address of the account fulfilling the order.
-   * @param {FeeValue[]} takerFees - Taker ecosystem fees to be paid.
-   * @param {string} amountToFill - Amount of the order to fill, defaults to sell item amount.
-   *                                Only applies to ERC1155 orders
-   * @return {FulfillOrderResponse} Approval and fulfilment transactions.
+   * @param {string} orderId - The orderId to fulfil
+   * @param {string} takerAddress - The address of the account fulfilling the order
+   * @param {FeeValue[]} takerFees - Taker ecosystem fees to be paid
+   * @param {string} [amountToFill] - Amount of the order to fill, defaults to sell item amount.
+   *                                  Only applies to ERC1155 orders
+   * @param {string} [tokenId] - The token ID to fulfill for criteria-based orders
+   * @returns {Promise<FulfillOrderResponse>} A promise that resolves to the approval and fulfilment
+   *                                         transactions
    */
   async fulfillOrder(
     orderId: string,
@@ -780,13 +785,16 @@ export class Orderbook {
    * {@linkcode cancelOrdersOnChain}. Orders cancelled this way cannot be fulfilled and
    * will be removed from the orderbook. If there is pending fulfillment data outstanding
    * for the order, its cancellation will be pending until the fulfillment window has passed.
-   * {@linkcode prepareOrderCancellations} can be used to get the signable action that is signed
-   * to get the signature required for this call.
-   * @param {string[]} orderIds - The orderIds to attempt to cancel.
-   * @param {string} accountAddress - The address of the account cancelling the orders.
-   * @param {string} signature - The signature obtained by signing the
-   * message obtained from {@linkcode prepareOrderCancellations}.
-   * @return {CancelOrdersResult} The result of the off-chain cancellation request
+   * @param {string[]} orderIds - The orderIds to attempt to cancel
+   * @param {string} accountAddress - The address of the account cancelling the orders
+   * @param {string} signature - The EIP-712 signature obtained by signing the message from
+   *                             {@linkcode prepareOrderCancellations}
+   * @return {CancelOrdersResult} The result of the off-chain cancellation request containing:
+   *  - cancelled_orders: Array of successfully cancelled order IDs
+   *  - pending_orders: Array of order IDs pending
+   *    cancellation
+   * @throws {Error} If the signature is invalid or the account is not
+   *                 authorized to cancel the orders
    */
   async cancelOrders(
     orderIds: string[],

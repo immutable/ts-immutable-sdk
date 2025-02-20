@@ -122,8 +122,11 @@ export class Checkout {
   }
 
   /**
-   * Loads the widgets bundle and initiate the widgets factory.
+   * Loads the widgets bundle and initiates the widgets factory.
    * @param {WidgetsInit} init - The initialisation parameters for loading the widgets bundle and applying configuration
+   * @returns {Promise<ImmutableCheckoutWidgets.WidgetsFactory>} A promise that resolves to the widgets factory instance
+   *                                                             that can be used to create and manage widgets
+   * @throws {CheckoutError} When the widgets script fails to load
    */
   public async widgets(
     init: WidgetsInit,
@@ -303,6 +306,7 @@ export class Checkout {
 
   /**
    * Returns a list of EIP-6963 injected providers and their metadata.
+   * @returns {readonly EIP6963ProviderDetail[]} A readonly array of injected providers and their metadata.
    */
   public getInjectedProviders(): readonly EIP6963ProviderDetail[] {
     return InjectedProvidersManager.getInstance().getProviders();
@@ -310,7 +314,7 @@ export class Checkout {
 
   /**
    * Finds an injected provider by its RDNS.
-   * @param {rdns: string} args - The parameters for finding the injected provider.
+   * @param {{rdns: string}} args - The parameters for finding the injected provider.
    * @returns {EIP6963ProviderDetail | undefined} - The found provider and metadata or undefined.
    */
   public findInjectedProvider(args: {
@@ -321,7 +325,8 @@ export class Checkout {
 
   /**
    * Subscribes to changes in the injected providers.
-   * @param listener - The listener to be called when the injected providers change.
+   * @param {(providers: EIP6963ProviderDetail[]) => void} listener - The listener to be called when the injected providers change.
+   * @returns {() => void} - A function to unsubscribe the listener.
    */
   public onInjectedProvidersChange(
     listener: (providers: EIP6963ProviderDetail[]) => void,
@@ -329,6 +334,10 @@ export class Checkout {
     return InjectedProvidersManager.getInstance().subscribe(listener);
   }
 
+  /**
+   * Clears all registered injected providers and their subscriptions.
+   * @returns {void} This method doesn't return a value
+   */
   public clearInjectedProviders() {
     return InjectedProvidersManager.getInstance().clear();
   }
@@ -364,7 +373,7 @@ export class Checkout {
   /**
    * Helper method that checks if given risk assessment results contain sanctioned addresses.
    * @param {AssessmentResult} assessment - Risk assessment to analyse.
-   * @param {string | undefined} address - If defined, only sanctions for the given address will be checked.
+   * @param {string} [address] - If defined, only sanctions for the given address will be checked.
    * @returns {boolean} - Result of the check.
    */
   public checkIsAddressSanctioned(assessment: AssessmentResult, address?: string): boolean {
@@ -403,6 +412,7 @@ export class Checkout {
    * Adds the network for the current wallet provider.
    * @param {AddNetworkParams} params - The parameters for adding the network.
    * @returns {Promise<any>} - A promise that resolves to the result of adding the network.
+   * @throws {CheckoutError} When the network cannot be added to the wallet
    */
   public async addNetwork(params: AddNetworkParams): Promise<any> {
     const browserProvider = await provider.validateProvider(
@@ -611,6 +621,7 @@ export class Checkout {
   /**
    * Determines the requirements for performing a buy.
    * @param {BuyParams} params - The parameters for the buy.
+   * @returns {Promise<BuyResult>} A promise that resolves to the buy transaction requirements
    * @deprecated Please use orderbook.fulfillOrder or orderbook.fulfillBulkOrders instead. The smartCheckout
    * method can still be used to ensure the transaction requirements are met before preparing the order fulfillment
    */
@@ -638,6 +649,7 @@ export class Checkout {
   /**
    * Determines the requirements for performing a sell.
    * @param {SellParams} params - The parameters for the sell.
+   * @returns {Promise<SellResult>} A promise that resolves to the sell transaction requirements
    * Only currently actions the first order in the array until we support batch processing.
    * Only currently actions the first fee in the fees array of each order until we support multiple fees.
    * @deprecated Please use orderbook.prepareListing or orderbook.prepareBulkListing instead. The smartCheckout
@@ -662,6 +674,7 @@ export class Checkout {
   /**
    * Cancels a sell.
    * @param {CancelParams} params - The parameters for the cancel.
+   * @returns {Promise<CancelResult>} A promise that resolves to the cancel transaction result
    * @deprecated Please use orderbook.prepareOrderCancellations instead.
    */
   public async cancel(params: CancelParams): Promise<CancelResult> {
@@ -685,7 +698,15 @@ export class Checkout {
 
   /**
    * Determines the transaction requirements to complete a purchase.
-   * @params {SmartCheckoutParams} params - The parameters for smart checkout.
+   * This includes checking token approvals, native currency balance,
+   * and calculating the optimal route for completing the transaction.
+   * @param {SmartCheckoutParams} params - The parameters for smart checkout.
+   * @returns {Promise<SmartCheckoutResult>} A promise that resolves to the transaction requirements including:
+   * - Required token approvals
+   * - Required native currency balance
+   * - Suggested transaction route
+   * - Estimated gas costs
+   * @throws {CheckoutError} When item requirements cannot be mapped or checkout validation fails
    */
   public async smartCheckout(
     params: SmartCheckoutParams,
