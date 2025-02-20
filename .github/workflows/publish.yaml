@@ -55,7 +55,7 @@ jobs:
       - name: Check User Permission
         if: ${{ env.RELEASE_TYPE == 'major' }}
         id: check_user_permission
-        uses: actions-cool/check-user-permission@v2
+        uses: actions-cool/check-user-permission@7b90a27f92f3961b368376107661682c441f6103
         with:
           token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
           require: admin
@@ -78,7 +78,7 @@ jobs:
           fi
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
           token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
@@ -111,7 +111,7 @@ jobs:
 
       # ! Do NOT remove any of these attestation subject paths - this will cause a Sev 0 incident !
       - name: Generate SDK Package Attestations
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@ef244123eb79f2f7a7e75d99086184180e6d0018
         with:
           subject-path: ./imtbl-*.tgz
 
@@ -135,7 +135,7 @@ jobs:
           wget https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets/dist/index.js
 
       # Wait for 30 seconds to make sure the tag is available on GitHub
-      - uses: GuillaumeFalourd/wait-sleep-action@v1
+      - uses: GuillaumeFalourd/wait-sleep-action@175a644657d8de245e4c6059d014941646186a84
         with:
           time: "30"
 

@@ -42,7 +42,7 @@ jobs:
     steps:
       - name: Checkout SDK Repository
         id: checkout-sdk
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           ref: "${{ env.TS_SDK_TAG }}"
           fetch-depth: 0
@@ -101,13 +101,13 @@ jobs:
           echo "Unreal version string updated successfully"
 
       - name: Cache build artifacts
-        uses: actions/cache@v4
+        uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f
         with:
           path: ./packages/game-bridge/dist
           key: "${{ runner.os }}-game-bridge-build-${{ env.TS_SDK_TAG }}"
 
       - name: Upload Game Bridge Build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
         with:
           path: ./packages/game-bridge/dist
 
@@ -118,7 +118,7 @@ jobs:
     runs-on: ubuntu-latest-4-cores
     steps:
       - name: Checkout SDK Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           token: ${{ env.GH_TOKEN }}
           ref: "${{ env.TS_SDK_TAG }}"
@@ -130,7 +130,7 @@ jobs:
 
       - name: Restore Cached Build Artifacts
         id: restore-cache-game-bridge-build
-        uses: actions/cache@v4
+        uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f
         with:
           path: ./packages/game-bridge/dist
           key: ${{ runner.os }}-game-bridge-build-${{ env.TS_SDK_TAG }}
@@ -140,7 +140,7 @@ jobs:
         run: echo "Game Bridge build cache not restored, exiting" && exit 1
 
       - name: Checkout Unity SDK Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           repository: immutable/unity-immutable-sdk
           token: ${{ env.GH_TOKEN }}
@@ -193,7 +193,7 @@ jobs:
     runs-on: ubuntu-latest-4-cores
     steps:
       - name: Checkout SDK Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           token: ${{ env.GH_TOKEN }}
           ref: "${{ env.TS_SDK_TAG }}"
@@ -205,7 +205,7 @@ jobs:
 
       - name: Restore Cached Build Artifacts
         id: restore-cache-game-bridge-build
-        uses: actions/cache@v4
+        uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f
         with:
           path: ./packages/game-bridge/dist
           key: ${{ runner.os }}-game-bridge-build-${{ env.TS_SDK_TAG }}
@@ -215,7 +215,7 @@ jobs:
         run: echo "Game Bridge build cache not restored, exiting" && exit 1
 
       - name: Checkout Unreal SDK Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           repository: immutable/unreal-immutable-sdk
           token: ${{ env.GH_TOKEN }}
