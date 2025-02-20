@@ -125,7 +125,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm nx release publish $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") $( ${{ github.event_name == 'push' }} && echo "--tag alpha" || ${{ startsWith(env.RELEASE_TYPE, 'pre') }} && echo "--tag alpha" || echo "")
+        run: pnpm nx release publish $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") $( ${{ github.event_name == 'push' || startsWith(env.RELEASE_TYPE, 'pre') }} && echo "--tag alpha" || echo "")
 
       - name: Warm up CDN
         id: warm_up_cdn
