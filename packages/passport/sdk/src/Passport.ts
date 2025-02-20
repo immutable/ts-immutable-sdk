@@ -34,7 +34,7 @@ import GuardianClient from './guardian';
 import logger from './utils/logger';
 import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
 import { isAPIError, PassportError, PassportErrorType } from './errors/passportError';
-import { withMetricsAsync } from './utils/metrics';
+import { withMetrics, withMetricsAsync } from './utils/metrics';
 import { MagicProviderProxyFactory } from './magic/magicProviderProxyFactory';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
@@ -198,6 +198,7 @@ export class Passport {
     useCachedSession?: boolean;
     anonymousId?: string;
     useSilentLogin?: boolean;
+    enableRedirectFlow?: boolean;
   }): Promise<UserProfile | null> {
     return withMetricsAsync(async () => {
       const { useCachedSession = false, useSilentLogin } = options || {};
@@ -218,7 +219,11 @@ export class Passport {
       if (!user && useSilentLogin) {
         user = await this.authManager.forceUserRefresh();
       } else if (!user && !useCachedSession) {
-        user = await this.authManager.login(options?.anonymousId);
+        if (!options?.enableRedirectFlow) {
+          await this.authManager.loginWithRedirect(options?.anonymousId);
+        } else {
+          user = await this.authManager.login(options?.anonymousId);
+        }
       }
 
       if (user) {
@@ -236,16 +241,27 @@ export class Passport {
    * Handles the login callback.
    * @returns {Promise<void>} A promise that resolves when the callback is processed
    */
-  public async loginCallback(): Promise<void> {
-    return withMetricsAsync(() => this.authManager.loginCallback(), 'loginCallback');
+  public async loginCallback(enableRedirectFlow?: boolean): Promise<void> {
+    console.log('enableRedirectFlow', enableRedirectFlow);
+    if (!enableRedirectFlow) {
+      return withMetricsAsync(() => this.authManager.loginCallback(), 'loginCallback');
+    }
+
+    const user = await withMetricsAsync(() => this.authManager.loginRedirectCallback(), 'loginRedirectCallback');
+    if (user) {
+      identify({
+        passportId: user.profile.sub,
+      });
+      this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
+    }
   }
 
-  /**
-   * Initiates a device flow login.
-   * @param {Object} options - Login options
-   * @param {string} [options.anonymousId] - ID used to enrich Passport internal metrics
-   * @returns {Promise<DeviceConnectResponse>} A promise that resolves to the device connection response
-   */
+    /**
+     * Initiates a device flow login.
+     * @param {Object} options - Login options
+     * @param {string} [options.anonymousId] - ID used to enrich Passport internal metrics
+     * @returns {Promise<DeviceConnectResponse>} A promise that resolves to the device connection response
+     */
   public async loginWithDeviceFlow(options?: {
     anonymousId?: string;
   }): Promise<DeviceConnectResponse> {

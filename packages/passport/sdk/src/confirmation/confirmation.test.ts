@@ -54,6 +54,7 @@ describe('confirmation', () => {
           clientId: 'client123',
           logoutRedirectUri: 'http://localhost:3000/logout',
           redirectUri: 'http://localhost:3000/callback',
+          loginRedirectUri: 'http://localhost:3000/callback2',
           crossSdkBridgeEnabled: true,
         });
         const confirmation = new ConfirmationScreen(config);

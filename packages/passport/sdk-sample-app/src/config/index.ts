@@ -1,6 +1,7 @@
 export const SCOPE = 'openid offline_access profile email transact';
 export const AUDIENCE = 'platform_api';
 export const REDIRECT_URI = process.env.NEXT_PUBLIC_REDIRECT_URI || '';
+export const LOGIN_REDIRECT_URI = process.env.NEXT_PUBLIC_LOGIN_REDIRECT_URI || '';
 export const LOGOUT_REDIRECT_URI = process.env.NEXT_PUBLIC_LOGOUT_REDIRECT_URI || '';
 export const LOGOUT_MODE = process.env.NEXT_PUBLIC_LOGOUT_MODE as 'redirect' | 'silent' | undefined;
 export const SILENT_LOGOUT_REDIRECT_URI = process.env.NEXT_PUBLIC_SILENT_LOGOUT_REDIRECT_URI || '';

@@ -180,6 +180,20 @@ export default class AuthManager {
     });
   };
 
+  public async loginWithRedirect(anonymousId?: string): Promise<void> {
+    console.log('authority1: ', this.userManager.settings.authority);
+    //await this.userManager.clearStaleState();
+    return withPassportError<void>(async () => {
+      return await this.userManager.signinRedirect({
+        extraQueryParams: {
+          ...(this.userManager.settings?.extraQueryParams ?? {}),
+          rid: getDetail(Detail.RUNTIME_ID) || '',
+          third_party_a_id: anonymousId || '',
+        },
+      });
+    }, PassportErrorType.AUTHENTICATION_ERROR);
+  }
+
   /**
    * login
    * @param anonymousId Caller can pass an anonymousId if they want to associate their user's identity with immutable's internal instrumentation.
@@ -265,8 +279,24 @@ export default class AuthManager {
 
   public async loginCallback(): Promise<void> {
     return withPassportError<void>(
-      async () => { await this.userManager.signinCallback(); },
-      PassportErrorType.AUTHENTICATION_ERROR,
+        async () => { await this.userManager.signinCallback(); },
+        PassportErrorType.AUTHENTICATION_ERROR,
+    );
+  }
+
+  public async loginRedirectCallback(): Promise<User> {
+    return withPassportError<User>(
+        async () => {
+          console.log('signinRedirectCallback');
+          console.log('authority2: ', this.userManager.settings.authority);
+          const urlParams = new URLSearchParams(window.location.search);
+          console.log('code: ', urlParams.get('code'));
+          console.log('state: ', urlParams.get('state'));
+          const oidcUser = await this.userManager.signinRedirectCallback();
+          console.log('oidcUser', oidcUser);
+          return AuthManager.mapOidcUserToDomainModel(oidcUser);
+        },
+        PassportErrorType.AUTHENTICATION_ERROR,
     );
   }
 
