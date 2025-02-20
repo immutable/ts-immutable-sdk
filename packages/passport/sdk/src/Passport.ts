@@ -117,8 +117,6 @@ export class Passport {
 
   private readonly guardianClient: GuardianClient;
 
-  private provider?: ZkEvmProvider;
-
   constructor(passportModuleConfiguration: PassportModuleConfiguration) {
     const privateVars = buildPrivateVars(passportModuleConfiguration);
 
@@ -154,25 +152,23 @@ export class Passport {
     announceProvider: true,
   }): Provider {
     return withMetrics(() => {
-      if (!this.provider) {
-        this.provider = new ZkEvmProvider({
-          passportEventEmitter: this.passportEventEmitter,
-          authManager: this.authManager,
-          magicAdapter: this.magicAdapter,
-          config: this.config,
-          multiRollupApiClients: this.multiRollupApiClients,
-          guardianClient: this.guardianClient,
-        });
-      }
+      const provider = new ZkEvmProvider({
+        passportEventEmitter: this.passportEventEmitter,
+        authManager: this.authManager,
+        magicAdapter: this.magicAdapter,
+        config: this.config,
+        multiRollupApiClients: this.multiRollupApiClients,
+        guardianClient: this.guardianClient,
+      });
 
       if (options?.announceProvider) {
         announceProvider({
           info: passportProviderInfo,
-          provider: this.provider,
+          provider,
         });
       }
 
-      return this.provider;
+      return provider;
     }, 'connectEvm', false);
   }
 
