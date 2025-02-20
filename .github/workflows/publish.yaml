@@ -52,7 +52,7 @@ jobs:
       attestations: write # ! Required for GitHub Attestations, removing will create a Sev 0 incident !
     steps:
       - name: Check Public Release Branch
-        if: contains(env.RELEASE_TYPE , 'release') && (github.ref != 'refs/heads/main')
+        if: contains(env.RELEASE_TYPE , 'release') && (github.ref != 'refs/heads/legacy-v1')
         run: failure("Public releases should be only done from main branch, current branch ${{ github.ref }}")
 
       - name: Checkout
