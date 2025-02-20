@@ -193,7 +193,7 @@ function compose(){
 }
 
 # initial version used for repository without tags
-INIT_VERSION=0.0.0-alpha
+INIT_VERSION=1.0.0-alpha
 
 # do GIT data extracting
 TAG=$(latest_tag)
@@ -202,6 +202,14 @@ BRANCH=$(current_branch)
 TOP_TAG=$(highest_tag)
 TAG_HASH=$(tag_hash $TAG)
 HEAD_HASH=$(head_hash)
+
+# Enforce v1 versioning - if the highest tag starts with v2 or higher, use the highest v1 tag instead
+if [[ "$TOP_TAG" =~ ^[2-9]\. ]]; then
+  TOP_TAG=$(git tag --list "1.*" 2>/dev/null | sort -V | tail -n1 2>/dev/null)
+  if [[ -z "$TOP_TAG" ]]; then
+    TOP_TAG="1.0.0"  # Fallback to 1.0.0 if no v1 tags exist
+  fi
+fi
 
 # do we have any GIT tag for parsing?!
 echo ""

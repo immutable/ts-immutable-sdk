@@ -84,18 +84,7 @@ jobs:
           fi
           echo upgrade_type=$upgrade_type
           echo revision_upgrade=$revision_upgrade
-          
-          # Get the latest 1.x.x tag
-          LATEST_V1_TAG=$(git tag -l "1.*" | sort -V | tail -n1)
-          if [ -z "$LATEST_V1_TAG" ]; then
-            echo "No v1 tags found. Using 1.0.0 as base"
-            LATEST_V1_TAG="1.0.0"
-          fi
-          
-          # Force use of latest v1 tag as base for version calculation
-          git tag -f base_version $LATEST_V1_TAG
           ./.github/scripts/version-up.sh --${{ env.RELEASE_TYPE }} $upgrade_type --apply $revision_upgrade
-          git tag -d base_version
         shell: bash
 
       - name: Lint
@@ -105,6 +94,15 @@ jobs:
         id: version
         run: |
           echo "NEXT_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+
+      # Validate that we're only publishing v1 versions
+      - name: Validate version
+        run: |
+          VERSION="${{steps.version.outputs.NEXT_VERSION}}"
+          if [[ ! "$VERSION" =~ ^1\. ]]; then
+            echo "Error: Only v1.x.x versions are allowed on this branch. Got version: $VERSION"
+            exit 1
+          fi
 
       - name: Typecheck
         run: yarn typecheck
@@ -224,15 +222,3 @@ jobs:
         run: |
           curl -X GET https://purge.jsdelivr.net/npm/@imtbl/sdk@latest/dist/version.json
           echo "CDN cache purged for https://cdn.jsdelivr.net/npm/@imtbl/sdk@latest/dist/version.json"
-
-      - name: Update dependencies
-        run: |
-          cd packages/minting-backend/sdk
-          npm version patch
-          npm update --save
-
-      - name: Get latest version
-        id: get_version
-        run: |
-          VERSION=$(npm show @gitcoinco/passport-sdk-types version)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
