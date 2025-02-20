@@ -22,6 +22,7 @@ jest.mock('./overlay');
 const authenticationDomain = 'auth.immutable.com';
 const clientId = '11111';
 const redirectUri = 'https://test.com';
+const loginRedirectUri = `${redirectUri}.login/callback`;
 const logoutEndpoint = '/v2/logout';
 const logoutRedirectUri = `${redirectUri}logout/callback`;
 
@@ -31,6 +32,7 @@ const getConfig = (values?: Partial<PassportModuleConfiguration>) => new Passpor
   }),
   clientId,
   redirectUri,
+  loginRedirectUri,
   scope: 'email profile',
   ...values,
 });

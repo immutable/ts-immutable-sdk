@@ -32,6 +32,7 @@ jest.mock('@imtbl/metrics');
 const oidcConfiguration: OidcConfiguration = {
   clientId: '11111',
   redirectUri: 'https://test.com',
+  loginRedirectUri: 'https://test.com',
   logoutRedirectUri: 'https://test.com',
 };
 

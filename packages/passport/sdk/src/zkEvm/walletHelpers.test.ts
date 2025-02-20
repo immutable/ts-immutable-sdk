@@ -184,6 +184,22 @@ describe('getNonce', () => {
         await expect(() => getNonce(rpcProvider, walletAddress)).rejects.toThrow(error);
       });
     });
+
+    /*describe('and the error is could not decode result data', () => {
+      it('should throw the error', async () => {
+        const error = new Error('could not decode result data (value="0x", info={ "method": "readNonce", "signature": "readNonce(uint256)" }, code=BAD_DATA, version=6.13.5)');
+        Object.defineProperty(error, 'value', { value: '0x' });
+        Object.defineProperty(error, 'info', { value: {method: 'readNonce', signature: "readNonce(uint256)" }});
+        Object.defineProperty(error, 'code', { value: 'BAD_DATA' });
+        Object.defineProperty(error, 'version', { value: '6.13.5' });
+
+        nonceMock.mockRejectedValue(error);
+
+        const result = await getNonce(rpcProvider, walletAddress);
+
+        expect(result).toEqual(BigNumber.from(0));
+      });
+    });*/
   });
 
   describe('when a BigNumber is returned', () => {
