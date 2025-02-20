@@ -42,10 +42,12 @@ import { PurchaseActions, PurchaseContext } from '../context/PurchaseContext';
 import { useHandoverConfig, PurchaseHandoverStep } from '../hooks/useHandoverConfig';
 import { sendConnectProviderSuccessEvent, sendPurchaseSuccessEvent } from '../PurchaseWidgetEvents';
 import {
-  DirectCryptoPayData,
+  DirectCryptoPayData, PurchaseErrorTypes,
 } from '../types';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { PurchaseWidgetViews } from '../../../context/view-context/PurchaseViewContextTypes';
+import { useError } from '../hooks/useError';
+import { useErrorHandler } from '../hooks/useErrorHandler';
 
 interface PurchaseProps {
   checkout: Checkout;
@@ -112,13 +114,11 @@ export function Purchase({
     fetchRoutes, getRoute, getFromAmountData, hasSufficientBalance, hasSufficientGas,
   } = useRoutes();
   const { providers } = useInjectedProviders({ checkout });
+  const { onTransactionError } = useErrorHandler();
 
   const {
     getAllowance, approve, execute, getStatus, waitForReceipt,
-  } = useExecute(UserJourney.PURCHASE, (err) => {
-    // eslint-disable-next-line no-console
-    console.log('useExecute err', err);
-  });
+  } = useExecute(UserJourney.PURCHASE, onTransactionError);
 
   const { signWithPostHooks, sign } = useSignOrder({
     environmentId,
@@ -130,6 +130,7 @@ export function Purchase({
   });
 
   const { showHandover } = useHandoverConfig(checkout.config.environment);
+  const { showErrorHandover } = useError(checkout.config.environment);
 
   const handleWalletConnected = (
     providerType: 'from' | 'to',
@@ -305,53 +306,70 @@ export function Purchase({
     recipientAddress: string,
     tokenAddress: string,
   ) => {
-    const signResponse = await sign(
-      SignPaymentTypes.CRYPTO,
-      tokenAddress,
-      spenderAddress,
-      recipientAddress,
-    );
-    if (!signResponse) return;
-    const signer = provider.getSigner();
-    if (!signer) return;
+    try {
+      const signResponse = await sign(
+        SignPaymentTypes.CRYPTO,
+        tokenAddress,
+        spenderAddress,
+        recipientAddress,
+      );
+      if (!signResponse) {
+        showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
+        return;
+      }
+      const signer = provider.getSigner();
+      if (!signer) {
+        showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
+        return;
+      }
 
-    showHandover(PurchaseHandoverStep.PREPARING, {});
+      showHandover(PurchaseHandoverStep.PREPARING, {});
 
-    const gasPrice = await provider.getGasPrice();
+      const gasPrice = await provider.getGasPrice();
 
-    const approveTxn = signResponse.transactions.find(
-      (txn) => txn.methodCall.startsWith('approve'),
-    );
-    if (!approveTxn) return;
-    showHandover(PurchaseHandoverStep.REQUEST_APPROVAL, {});
+      const approveTxn = signResponse.transactions.find(
+        (txn) => txn.methodCall.startsWith('approve'),
+      );
+      if (!approveTxn) {
+        showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
+        return;
+      }
+      showHandover(PurchaseHandoverStep.REQUEST_APPROVAL, {});
 
-    const approveTxnResponse = await signer.sendTransaction({
-      to: approveTxn.tokenAddress,
-      data: approveTxn.rawData,
-      gasPrice,
-      gasLimit: approveTxn.gasEstimate,
-    });
-    const approveReceipt = await waitForReceipt(provider, approveTxnResponse.hash);
-    if (!approveReceipt) {
-      return;
-    }
-    showHandover(PurchaseHandoverStep.APPROVAL_CONFIRMED, {});
+      const approveTxnResponse = await signer.sendTransaction({
+        to: approveTxn.tokenAddress,
+        data: approveTxn.rawData,
+        gasPrice,
+        gasLimit: approveTxn.gasEstimate,
+      });
+      const approveReceipt = await waitForReceipt(provider, approveTxnResponse.hash);
+      if (!approveReceipt) {
+        showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
+        return;
+      }
+      showHandover(PurchaseHandoverStep.APPROVAL_CONFIRMED, {});
 
-    const executeTxn = signResponse.transactions.find(
-      (txn) => txn.methodCall.startsWith('execute'),
-    );
-    if (!executeTxn) return;
-    showHandover(PurchaseHandoverStep.REQUEST_EXECUTION, {});
+      const executeTxn = signResponse.transactions.find(
+        (txn) => txn.methodCall.startsWith('execute'),
+      );
+      if (!executeTxn) {
+        showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
+        return;
+      }
+      showHandover(PurchaseHandoverStep.REQUEST_EXECUTION, {});
 
-    const executeTxnResponse = await signer.sendTransaction({
-      to: executeTxn.tokenAddress,
-      data: executeTxn.rawData,
-      gasPrice,
-      gasLimit: executeTxn.gasEstimate,
-    });
-    const executeReceipt = await waitForReceipt(provider, executeTxnResponse.hash);
-    if (executeReceipt?.status === 1) {
-      showHandover(PurchaseHandoverStep.SUCCESS_ZKEVM, { transactionHash: executeTxnResponse.hash });
+      const executeTxnResponse = await signer.sendTransaction({
+        to: executeTxn.tokenAddress,
+        data: executeTxn.rawData,
+        gasPrice,
+        gasLimit: executeTxn.gasEstimate,
+      });
+      const executeReceipt = await waitForReceipt(provider, executeTxnResponse.hash);
+      if (executeReceipt?.status === 1) {
+        showHandover(PurchaseHandoverStep.SUCCESS_ZKEVM, { transactionHash: executeTxnResponse.hash });
+      }
+    } catch (e) {
+      showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
     }
   };
 
@@ -375,7 +393,10 @@ export function Purchase({
         squidMulticallAddress,
         toAddress,
       );
-      if (!signResponse) return;
+      if (!signResponse) {
+        showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
+        return;
+      }
       purchaseDispatch({
         payload: {
           type: PurchaseActions.SET_SIGN_RESPONSE,
@@ -391,7 +412,10 @@ export function Purchase({
         quote.currency.address,
         selectedRouteData.amountData.additionalBuffer,
       );
-      if (!updatedAmountData) return;
+      if (!updatedAmountData) {
+        showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
+        return;
+      }
 
       const postHooks = signResponse?.postHooks ? {
         chainType: ChainType.EVM,
@@ -413,12 +437,16 @@ export function Purchase({
         postHooks,
       ))?.route;
 
-      if (!route) return;
+      if (!route) {
+        showErrorHandover(PurchaseErrorTypes.ROUTE_ERROR, {});
+        return;
+      }
 
       const currentFromAddress = await fromProvider.getSigner().getAddress();
       const { fromChain, toChain } = getRouteChains(chains, route);
 
       if (currentFromAddress !== fromAddress) {
+        showErrorHandover(PurchaseErrorTypes.DEFAULT, {});
         return;
       }
 
@@ -434,6 +462,7 @@ export function Purchase({
       );
 
       if (!verifyChainResult.isChainCorrect) {
+        showErrorHandover(PurchaseErrorTypes.UNRECOGNISED_CHAIN, {});
         return;
       }
 
@@ -446,7 +475,11 @@ export function Purchase({
       if (!allowance || allowance?.lt(fromAmount)) {
         showHandover(PurchaseHandoverStep.REQUEST_APPROVAL, {});
 
-        const approveTxnReceipt = await approve(fromProviderInfo, changeableProvider, route);
+        const approveTxnReceipt = await approve(
+          fromProviderInfo,
+          changeableProvider,
+          route,
+        );
 
         if (!approveTxnReceipt) {
           return;
@@ -457,7 +490,12 @@ export function Purchase({
 
       showHandover(PurchaseHandoverStep.REQUEST_EXECUTION, {});
 
-      const executeTxnReceipt = await execute(squid, fromProviderInfo, changeableProvider, route);
+      const executeTxnReceipt = await execute(
+        squid,
+        fromProviderInfo,
+        changeableProvider,
+        route,
+      );
 
       // eslint-disable-next-line no-console
       console.log('executeTxnReceipt', executeTxnReceipt);
@@ -468,10 +506,16 @@ export function Purchase({
 
       const fundingMethod = fromChain !== toChain ? 'squid' : 'direct';
 
-      sendPurchaseSuccessEvent(eventTarget, executeTxnReceipt.transactionHash, fundingMethod);
+      sendPurchaseSuccessEvent(
+        eventTarget,
+        executeTxnReceipt.transactionHash,
+        fundingMethod,
+      );
 
       if (toChain === fromChain) {
-        showHandover(PurchaseHandoverStep.SUCCESS_ZKEVM, { transactionHash: executeTxnReceipt.transactionHash });
+        showHandover(PurchaseHandoverStep.SUCCESS_ZKEVM, {
+          transactionHash: executeTxnReceipt.transactionHash,
+        });
         return;
       }
 
