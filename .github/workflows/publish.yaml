@@ -72,7 +72,7 @@ jobs:
       - name: Major release Permission Check
         if: ${{ env.RELEASE_TYPE == 'major' }}
         run: |
-          if [[ ${{ steps.check_user_permission.outputs.require-result }} != 'true' || !${{ fromJson(env.SDK_PUBLISH_MAJOR_VERSION_ACTORS) }}.includes(${{ github.triggering_actor }}) ]]; then
+          if [ "${{ steps.check_user_permission.outputs.require-result }}" != 'true' ] || ! ${{ fromJson(env.SDK_PUBLISH_MAJOR_VERSION_ACTORS) }}.includes("${{ github.triggering_actor }}"); then
             echo "User does not have permission to perform a major release."
             exit 1
           fi
@@ -125,14 +125,13 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm nx release publish $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") $( ${{ startsWith(env.RELEASE_TYPE, 'pre') }} && echo "--tag alpha" || echo "")
+        run: pnpm nx release publish $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") $( ${{ github.event_name == 'push' }} && echo "--tag alpha" || ${{ startsWith(env.RELEASE_TYPE, 'pre') }} && echo "--tag alpha" || echo "")
 
       - name: Warm up CDN
         id: warm_up_cdn
         if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }}
         run: |
-          wget https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets/dist/widgets.js
-          wget https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets/dist/index.js
+          wget https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets/dist/browser/index.js
 
       # Wait for 30 seconds to make sure the tag is available on GitHub
       - uses: GuillaumeFalourd/wait-sleep-action@175a644657d8de245e4c6059d014941646186a84
@@ -160,7 +159,7 @@ jobs:
           
       - name: Wait for NPM @latest Update
         id: wait_for_npm_update
-        if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }} && env.DRY_RUN == 'false'
+        if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') && github.event_name != 'push' }} && env.DRY_RUN == 'false'
         run: |
           VERSION="$(jq -r '.version' ./sdk/package.json)"
           echo "Waiting for NPM registry to reflect version: $VERSION"
