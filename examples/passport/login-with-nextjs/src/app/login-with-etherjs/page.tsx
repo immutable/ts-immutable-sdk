@@ -5,6 +5,7 @@ import { ethers } from 'ethers'; // Make sure ethers.js is installed
 import { Button, Heading, Table, Link } from '@biom3/react';
 import NextLink from 'next/link';
 import { passportInstance } from '../utils/setupDefault';
+import { BrowserProvider } from 'ethers';
 
 export default function LoginWithPassport() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -15,8 +16,8 @@ export default function LoginWithPassport() {
 
     try {
       // #doc passport-login-with-ethersjs
-      const passportProvider = passportInstance.connectEvm();
-      const web3Provider = new ethers.providers.Web3Provider(passportProvider);
+      const passportProvider = await passportInstance.connectEvm();
+      const web3Provider = new BrowserProvider(passportProvider);
       const accounts = await web3Provider.send('eth_requestAccounts', []);
       // #enddoc passport-login-with-ethersjs
       if (accounts && accounts.length > 0) {

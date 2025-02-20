@@ -2,9 +2,9 @@ import { ChainType } from '@0xsquid/squid-types';
 import {
   Stack, ButtCon, Button,
 } from '@biom3/react';
-import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout, WalletProviderRdns, EIP6963ProviderInfo, ChainId,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { t } from 'i18next';
@@ -133,7 +133,7 @@ export function Purchase({
 
   const handleWalletConnected = (
     providerType: 'from' | 'to',
-    provider: Web3Provider,
+    provider: WrappedBrowserProvider,
     providerInfo: EIP6963ProviderInfo,
   ) => {
     setIsPayWithCard(false);
@@ -300,7 +300,7 @@ export function Purchase({
   };
 
   const handleDirectCryptoPayment = async (
-    provider: Web3Provider,
+    provider: WrappedBrowserProvider,
     spenderAddress: string,
     recipientAddress: string,
     tokenAddress: string,
@@ -317,7 +317,7 @@ export function Purchase({
 
     showHandover(PurchaseHandoverStep.PREPARING, {});
 
-    const gasPrice = await provider.getGasPrice();
+    const { gasPrice } = await provider.getFeeData();
 
     const approveTxn = signResponse.transactions.find(
       (txn) => txn.methodCall.startsWith('approve'),
@@ -325,7 +325,7 @@ export function Purchase({
     if (!approveTxn) return;
     showHandover(PurchaseHandoverStep.REQUEST_APPROVAL, {});
 
-    const approveTxnResponse = await signer.sendTransaction({
+    const approveTxnResponse = await (await signer).sendTransaction({
       to: approveTxn.tokenAddress,
       data: approveTxn.rawData,
       gasPrice,
@@ -343,7 +343,7 @@ export function Purchase({
     if (!executeTxn) return;
     showHandover(PurchaseHandoverStep.REQUEST_EXECUTION, {});
 
-    const executeTxnResponse = await signer.sendTransaction({
+    const executeTxnResponse = await (await signer).sendTransaction({
       to: executeTxn.tokenAddress,
       data: executeTxn.rawData,
       gasPrice,
@@ -415,7 +415,7 @@ export function Purchase({
 
       if (!route) return;
 
-      const currentFromAddress = await fromProvider.getSigner().getAddress();
+      const currentFromAddress = await (await fromProvider.getSigner()).getAddress();
       const { fromChain, toChain } = getRouteChains(chains, route);
 
       if (currentFromAddress !== fromAddress) {
@@ -443,7 +443,7 @@ export function Purchase({
       // eslint-disable-next-line no-console
       console.log('allowance', allowance);
 
-      if (!allowance || allowance?.lt(fromAmount)) {
+      if (!allowance || allowance < BigInt(fromAmount)) {
         showHandover(PurchaseHandoverStep.REQUEST_APPROVAL, {});
 
         const approveTxnReceipt = await approve(fromProviderInfo, changeableProvider, route);
@@ -468,10 +468,10 @@ export function Purchase({
 
       const fundingMethod = fromChain !== toChain ? 'squid' : 'direct';
 
-      sendPurchaseSuccessEvent(eventTarget, executeTxnReceipt.transactionHash, fundingMethod);
+      sendPurchaseSuccessEvent(eventTarget, executeTxnReceipt.hash, fundingMethod);
 
       if (toChain === fromChain) {
-        showHandover(PurchaseHandoverStep.SUCCESS_ZKEVM, { transactionHash: executeTxnReceipt.transactionHash });
+        showHandover(PurchaseHandoverStep.SUCCESS_ZKEVM, { transactionHash: executeTxnReceipt.hash });
         return;
       }
 
@@ -486,11 +486,11 @@ export function Purchase({
 
       showHandover(PurchaseHandoverStep.EXECUTING, {
         routeDuration: formattedDuration,
-        transactionHash: executeTxnReceipt.transactionHash,
+        transactionHash: executeTxnReceipt.hash,
       });
 
-      const status = await getStatus(squid, executeTxnReceipt.transactionHash);
-      const axelarscanUrl = `https://axelarscan.io/gmp/${executeTxnReceipt?.transactionHash}`;
+      const status = await getStatus(squid, executeTxnReceipt.hash);
+      const axelarscanUrl = `https://axelarscan.io/gmp/${executeTxnReceipt?.hash}`;
 
       // eslint-disable-next-line no-console
       console.log('status', status);

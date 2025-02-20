@@ -1,4 +1,5 @@
 import { Body, Box, Button, FormControl, Heading } from "@biom3/react";
+import { BrowserProvider } from "ethers";
 import { ethers } from "ethers";
 import { useState } from "react";
 
@@ -7,7 +8,7 @@ export const TransferAsset = ({
 	zkEvmProvider,
 }: {
 	walletAddress: string;
-	zkEvmProvider: ethers.providers.Web3Provider | null;
+	zkEvmProvider: BrowserProvider | null;
 }) => {
 	const [collectionAddress, setCollectionAddress] = useState<string>("");
 	const [collectionAddressError, setCollectionAddressError] =
@@ -45,7 +46,7 @@ export const TransferAsset = ({
 		];
 
 		// Get the signer from the provider that was initialised in the Connect flow and create a contract instance
-		const signer = zkEvmProvider.getSigner();
+		const signer = await zkEvmProvider.getSigner();
 		const contract = new ethers.Contract(collectionAddress, abi, signer);
 		try {
 			// Call the transfer function on the contract

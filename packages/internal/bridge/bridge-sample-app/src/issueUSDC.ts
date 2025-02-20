@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 import 'dotenv/config';
-import { ethers } from "ethers";
 
 // @ts-ignore
 import { setupForBridge } from './lib/utils.ts';
@@ -8,6 +7,7 @@ import { setupForBridge } from './lib/utils.ts';
 import { waitForReceipt } from './lib/helpers.ts';
 // @ts-ignore
 import { USDC } from './lib/USDC.js';
+import { Contract } from 'ethers';
 
 async function issueUSDC() {
 
@@ -24,13 +24,13 @@ async function issueUSDC() {
   let sepoliaUSDCAddress: string = process.env.SEPOLIA_USDC;
   let numberOfIssuances: number = parseInt(process.env.AMOUNT_10000);
 
-  const usdcContract: ethers.Contract = new ethers.Contract(sepoliaUSDCAddress, USDC, params.rootProvider);
+  const usdcContract: Contract = new Contract(sepoliaUSDCAddress, USDC, params.rootProvider);
 
   let issuances = 0;
   while (issuances < numberOfIssuances) {
     issuances++;
     console.log('issuances: ',issuances);
-    let resp = await usdcContract.connect(params.rootWallet).issueToken();
+    let resp = await (usdcContract.connect(params.rootWallet) as Contract).issueToken();
     console.log('resp: ',resp);
     await waitForReceipt(resp.hash, params.rootProvider);
   }

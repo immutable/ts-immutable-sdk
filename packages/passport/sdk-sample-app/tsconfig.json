@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "customConditions": ["development"],
+    "customConditions": ["development", "browser"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,

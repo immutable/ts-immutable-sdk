@@ -122,7 +122,7 @@ export class Sale extends Base<WidgetType.SALE> {
       targetChainId: this.checkout.config.isProduction
         ? ChainId.IMTBL_ZKEVM_MAINNET
         : ChainId.IMTBL_ZKEVM_TESTNET,
-      web3Provider: this.web3Provider,
+      browserProvider: this.browserProvider,
       checkout: this.checkout,
       allowedChains: [getL2ChainId(this.checkout!.config)],
     };

@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@imtbl/sdk": "1.70.0"
+    "@imtbl/sdk": "workspace:*"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

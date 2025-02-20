@@ -1,5 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
-import { EIP6963ProviderInfo } from '../../../types';
+import { EIP6963ProviderInfo, WrappedBrowserProvider } from '../../../types';
 
 /**
  * Enum of possible Add Tokens Widget event types.
@@ -35,12 +34,12 @@ export type AddTokensFailed = {
 
 /**
  * Type representing a successful provider connection
- * @property {Web3Provider} provider
+ * @property {WrappedBrowserProvider} provider
  * @property {EIP6963ProviderInfo} providerInfo
  * @property {'from' | 'to'} providerType
  */
 export type AddTokensConnectSuccess = {
-  provider: Web3Provider;
+  provider: WrappedBrowserProvider;
   providerInfo: EIP6963ProviderInfo;
   providerType: 'from' | 'to';
 };

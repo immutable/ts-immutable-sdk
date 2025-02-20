@@ -1,5 +1,7 @@
-import { BigNumber, ethers } from 'ethers';
 import { ImmutableConfiguration, Environment } from '@imtbl/config';
+import {
+  BrowserProvider, Contract, ethers, JsonRpcProvider, parseUnits,
+} from 'ethers';
 import { BridgeConfiguration } from '../config';
 import { ETH_SEPOLIA_TO_ZKEVM_TESTNET, NATIVE, childETHs } from '../constants/bridges';
 import { BridgeError, BridgeErrorType } from '../errors';
@@ -17,10 +19,10 @@ describe('Validation', () => {
     it('does not throw an error when everything setup correctly', async () => {
       const mockRootProvider = {
         getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID }),
-      } as unknown as ethers.providers.Web3Provider;
+      } as unknown as BrowserProvider;
       const mockChildProvider = {
         getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID }),
-      } as unknown as ethers.providers.Web3Provider;
+      } as unknown as BrowserProvider;
 
       const bridgeConfig = new BridgeConfiguration({
         baseConfig: new ImmutableConfiguration({
@@ -40,10 +42,10 @@ describe('Validation', () => {
     it('throws an error when the rootProvider chainId is not the one set in the config', async () => {
       const mockRootProvider = {
         getNetwork: jest.fn().mockReturnValue({ chainId: 100 }),
-      } as unknown as ethers.providers.Web3Provider;
+      } as unknown as BrowserProvider;
       const mockChildProvider = {
         getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID }),
-      } as unknown as ethers.providers.Web3Provider;
+      } as unknown as BrowserProvider;
 
       const bridgeConfig = new BridgeConfiguration({
         baseConfig: new ImmutableConfiguration({
@@ -66,10 +68,10 @@ describe('Validation', () => {
     it('throws an error when the childProvider chainId is not the one set in the config', async () => {
       const mockRootProvider = {
         getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID }),
-      } as unknown as ethers.providers.Web3Provider;
+      } as unknown as BrowserProvider;
       const mockChildProvider = {
         getNetwork: jest.fn().mockReturnValue({ chainId: '100' }),
-      } as unknown as ethers.providers.Web3Provider;
+      } as unknown as BrowserProvider;
 
       const bridgeConfig = new BridgeConfiguration({
         baseConfig: new ImmutableConfiguration({
@@ -97,8 +99,8 @@ describe('Validation', () => {
           environment: Environment.SANDBOX,
         }),
         bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
-        rootProvider: {} as ethers.providers.Web3Provider,
-        childProvider: {} as ethers.providers.Web3Provider,
+        rootProvider: {} as BrowserProvider,
+        childProvider: {} as BrowserProvider,
       });
       const tokenSent = '0x123';
       const destinationChainId = ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID;
@@ -115,8 +117,8 @@ describe('Validation', () => {
           environment: Environment.SANDBOX,
         }),
         bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
-        rootProvider: {} as ethers.providers.Web3Provider,
-        childProvider: {} as ethers.providers.Web3Provider,
+        rootProvider: {} as BrowserProvider,
+        childProvider: {} as BrowserProvider,
       });
       const tokenSent = '0x123';
       const destinationChainId = ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID;
@@ -130,7 +132,7 @@ describe('Validation', () => {
     it('Does not throw error when address is not a contract', async () => {
       const mockProvider = {
         getCode: jest.fn().mockReturnValue('0x'),
-      } as unknown as ethers.providers.Web3Provider;
+      } as unknown as BrowserProvider;
       const config = new BridgeConfiguration({
         baseConfig: new ImmutableConfiguration({
           environment: Environment.SANDBOX,
@@ -154,12 +156,12 @@ describe('Validation', () => {
       async () => {
         const mockProvider = {
           getCode: jest.fn().mockReturnValue('0x123'),
-        } as unknown as ethers.providers.Web3Provider;
+        } as unknown as BrowserProvider;
         const mockContract = {
           estimateGas: {
             receive: jest.fn().mockRejectedValue(new Error('Function does not exist')),
           },
-        } as unknown as ethers.Contract;
+        } as unknown as Contract;
         jest.spyOn(ethers, 'Contract').mockReturnValue(mockContract);
         const config = new BridgeConfiguration({
           baseConfig: new ImmutableConfiguration({
@@ -188,8 +190,8 @@ describe('Validation', () => {
   describe('validateChainIds', () => {
     let bridgeConfig: BridgeConfiguration;
     beforeEach(() => {
-      const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
-      const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+      const voidRootProvider = new JsonRpcProvider('x');
+      const voidChildProvider = new JsonRpcProvider('x');
       bridgeConfig = new BridgeConfiguration({
         baseConfig: new ImmutableConfiguration({
           environment: Environment.SANDBOX,
@@ -261,8 +263,8 @@ describe('Validation', () => {
     let bridgeConfig: BridgeConfiguration;
 
     beforeEach(() => {
-      const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
-      const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+      const voidRootProvider = new JsonRpcProvider('x');
+      const voidChildProvider = new JsonRpcProvider('x');
       bridgeConfig = new BridgeConfiguration({
         baseConfig: new ImmutableConfiguration({
           environment: Environment.SANDBOX,
@@ -284,7 +286,7 @@ describe('Validation', () => {
             senderAddress: '0x1234567890123456789012345678901234567890',
             recipientAddress: '0x1234567890123456789012345678901234567890',
             token: '0x1234567890123456789012345678901234567890',
-            amount: ethers.utils.parseUnits('0.01', 18),
+            amount: parseUnits('0.01', 18),
             sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
             destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
             gasMultiplier: 1.1,
@@ -304,7 +306,7 @@ describe('Validation', () => {
             senderAddress: '0x1234567890123456789012345678901234567890',
             recipientAddress: 'invalidAddress',
             token: '0x1234567890123456789012345678901234567890',
-            amount: ethers.utils.parseUnits('0.01', 18),
+            amount: parseUnits('0.01', 18),
             sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
             destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
             gasMultiplier: 1.1,
@@ -321,7 +323,7 @@ describe('Validation', () => {
             senderAddress: 'invalidAddress',
             recipientAddress: '0x1234567890123456789012345678901234567890',
             token: '0x1234567890123456789012345678901234567890',
-            amount: ethers.utils.parseUnits('0.01', 18),
+            amount: parseUnits('0.01', 18),
             sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
             destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
             gasMultiplier: 1.1,
@@ -341,7 +343,7 @@ describe('Validation', () => {
             senderAddress: '0x1234567890123456789012345678901234567890',
             recipientAddress: 'invalidAddress',
             token: NATIVE,
-            amount: ethers.utils.parseUnits('0.01', 18),
+            amount: parseUnits('0.01', 18),
             sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
             destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
             gasMultiplier: 1.1,
@@ -358,7 +360,7 @@ describe('Validation', () => {
             senderAddress: 'invalidAddress',
             recipientAddress: '0x1234567890123456789012345678901234567890',
             token: NATIVE,
-            amount: ethers.utils.parseUnits('0.01', 18),
+            amount: parseUnits('0.01', 18),
             sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
             destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
             gasMultiplier: 1.1,
@@ -378,7 +380,7 @@ describe('Validation', () => {
             senderAddress: '0x1234567890123456789012345678901234567890',
             recipientAddress: '0x1234567890123456789012345678901234567890',
             token: 'invalidAddress',
-            amount: ethers.utils.parseUnits('0.01', 18),
+            amount: parseUnits('0.01', 18),
             sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
             destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
             gasMultiplier: 1.1,
@@ -398,7 +400,7 @@ describe('Validation', () => {
             senderAddress: '0x1234567890123456789012345678901234567890',
             recipientAddress: '0x1234567890123456789012345678901234567890',
             token: '0x1234567890123456789012345678901234567890',
-            amount: BigNumber.from(0),
+            amount: BigInt(0),
             sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
             destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
             gasMultiplier: 1.1,
@@ -418,7 +420,7 @@ describe('Validation', () => {
             senderAddress: '0x1234567890123456789012345678901234567890',
             recipientAddress: '0x1234567890123456789012345678901234567890',
             token: NATIVE,
-            amount: BigNumber.from(0),
+            amount: BigInt(0),
             sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
             destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
             gasMultiplier: 1.1,
@@ -436,8 +438,8 @@ describe('Validation', () => {
     let bridgeConfig: BridgeConfiguration;
 
     beforeEach(() => {
-      const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
-      const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+      const voidRootProvider = new JsonRpcProvider('x');
+      const voidChildProvider = new JsonRpcProvider('x');
       bridgeConfig = new BridgeConfiguration({
         baseConfig: new ImmutableConfiguration({
           environment: Environment.SANDBOX,

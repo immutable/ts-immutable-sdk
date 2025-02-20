@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { CheckoutConfiguration } from '../../../config';
 import * as instance from '../../../instance';
@@ -12,7 +11,7 @@ export const quoteFetcher = async (
   walletAddress: string,
   requiredToken: {
     address: string,
-    amount: BigNumber,
+    amount: bigint,
   },
   swappableTokens: string[],
 ): Promise<DexQuotes> => {
