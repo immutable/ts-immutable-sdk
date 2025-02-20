@@ -69,13 +69,19 @@ jobs:
           echo "user-permission = ${{ steps.check_user_permission.outputs.user-permission }}"
           echo "require-result = ${{ steps.check_user_permission.outputs.require-result }}"
   
-      - name: Major release Permission Check
-        if: ${{ env.RELEASE_TYPE == 'major' }}
-        run: |
-          if [ "${{ steps.check_user_permission.outputs.require-result }}" != 'true' ] || ! ${{ fromJson(env.SDK_PUBLISH_MAJOR_VERSION_ACTORS) }}.includes("${{ github.triggering_actor }}"); then
-            echo "User does not have permission to perform a major release."
-            exit 1
-          fi
+      - name: Admin Permission Check
+        if: ${{ steps.check_user_permission.outputs.require-result != 'true' }}
+        run: exit 1
+  
+      - name: Allowed Actors Check
+        id: allowed_actors_check
+        # only allow certain SDK team members to run this workflow
+        if: ${{ contains(fromJson(env.SDK_PUBLISH_MAJOR_VERSION_ACTORS), github.triggering_actor) }}
+        run: echo "ALLOWED_ACTOR=true" >> $GITHUB_OUTPUT
+  
+      - name: Allowed Actors Filter
+        if: ${{ steps.allowed_actors_check.outputs.ALLOWED_ACTOR != 'true' }}
+        run: exit 1
 
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
