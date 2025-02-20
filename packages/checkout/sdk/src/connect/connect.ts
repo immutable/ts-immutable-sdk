@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Web3Provider } from '@ethersproject/providers';
 import {
   WalletAction, CheckConnectionResult,
+  WrappedBrowserProvider,
 } from '../types';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 
 export async function checkIsWalletConnected(
-  web3Provider: Web3Provider,
+  browserProvider: WrappedBrowserProvider,
 ): Promise<CheckConnectionResult> {
-  if (!web3Provider?.provider?.request) {
+  if (!browserProvider?.send) {
     throw new CheckoutError(
       'Check wallet connection request failed',
       CheckoutErrorType.PROVIDER_REQUEST_FAILED_ERROR,
@@ -19,10 +19,7 @@ export async function checkIsWalletConnected(
   }
   let accounts = [];
   try {
-    accounts = await web3Provider.provider.request({
-      method: WalletAction.CHECK_CONNECTION,
-      params: [],
-    });
+    accounts = await browserProvider.send(WalletAction.CHECK_CONNECTION, []);
   } catch (err: any) {
     throw new CheckoutError(
       'Check wallet connection request failed',
@@ -41,8 +38,8 @@ export async function checkIsWalletConnected(
   };
 }
 
-export async function connectSite(web3Provider: Web3Provider): Promise<Web3Provider> {
-  if (!web3Provider || !web3Provider.provider?.request) {
+export async function connectSite(browserProvider: WrappedBrowserProvider): Promise<WrappedBrowserProvider> {
+  if (!browserProvider || !browserProvider.send) {
     throw new CheckoutError(
       'Incompatible provider',
       CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
@@ -52,21 +49,18 @@ export async function connectSite(web3Provider: Web3Provider): Promise<Web3Provi
 
   await withCheckoutError<void>(
     async () => {
-      if (!web3Provider.provider.request) return;
+      if (!browserProvider.send) return;
       // this makes the request to the wallet to connect i.e request eth accounts ('eth_requestAccounts')
-      await web3Provider.provider.request({
-        method: WalletAction.CONNECT,
-        params: [],
-      });
+      await browserProvider.send(WalletAction.CONNECT, []);
     },
     { type: CheckoutErrorType.USER_REJECTED_REQUEST_ERROR },
   );
 
-  return web3Provider;
+  return browserProvider;
 }
 
-export async function requestPermissions(web3Provider: Web3Provider): Promise<Web3Provider> {
-  if (!web3Provider || !web3Provider.provider?.request) {
+export async function requestPermissions(browserProvider: WrappedBrowserProvider): Promise<WrappedBrowserProvider> {
+  if (!browserProvider || !browserProvider.send) {
     throw new CheckoutError(
       'Incompatible provider',
       CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
@@ -76,16 +70,12 @@ export async function requestPermissions(web3Provider: Web3Provider): Promise<We
 
   await withCheckoutError<void>(
     async () => {
-      if (!web3Provider.provider.request) return;
+      if (!browserProvider.send) return;
 
-      await web3Provider.provider.request({
-        method: WalletAction.REQUEST_PERMISSIONS,
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        params: [{ eth_accounts: {} }],
-      });
+      await browserProvider.send(WalletAction.REQUEST_PERMISSIONS, [{ eth_accounts: {} }]);
     },
     { type: CheckoutErrorType.USER_REJECTED_REQUEST_ERROR },
   );
 
-  return web3Provider;
+  return browserProvider;
 }

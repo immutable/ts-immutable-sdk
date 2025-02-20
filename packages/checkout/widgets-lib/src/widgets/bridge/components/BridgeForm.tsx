@@ -107,7 +107,7 @@ export function BridgeForm(props: BridgeFormProps) {
     // WT-1350 removing ETH as possible bridge option from being selected
     // balance > 0 AND token is not ETH
     const options = tokenBalances
-      .filter((tokenBalance) => tokenBalance.balance.gt(0))
+      .filter((tokenBalance) => tokenBalance.balance > 0)
       .map(
         (tokenBalance) => ({
           id: formatTokenOptionsId(tokenBalance.token.symbol, tokenBalance.token.address),
@@ -268,7 +268,7 @@ export function BridgeForm(props: BridgeFormProps) {
 
   const submitBridgeValues = useCallback(async () => {
     if (!bridgeFormValidator()) return;
-    if (!checkout || !from?.web3Provider || !formToken) return;
+    if (!checkout || !from?.browserProvider || !formToken) return;
 
     track({
       userJourney: UserJourney.BRIDGE,
@@ -299,7 +299,7 @@ export function BridgeForm(props: BridgeFormProps) {
     });
   }, [
     checkout,
-    from?.web3Provider,
+    from?.browserProvider,
     bridgeFormValidator,
     formToken,
   ]);

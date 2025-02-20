@@ -1,8 +1,7 @@
-import { BigNumber, Contract } from 'ethers';
-import { Web3Provider } from '@ethersproject/providers';
+import { Contract } from 'ethers';
 import { getERC20Allowance, getERC20ApprovalTransaction, hasERC20Allowances } from './erc20';
 import { CheckoutErrorType } from '../../errors';
-import { ItemRequirement, ItemType } from '../../types';
+import { ItemRequirement, ItemType, WrappedBrowserProvider } from '../../types';
 
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
@@ -11,11 +10,11 @@ jest.mock('ethers', () => ({
 }));
 
 describe('allowance', () => {
-  const mockProvider = {} as unknown as Web3Provider;
+  const mockProvider = {} as unknown as WrappedBrowserProvider;
 
   describe('getERC20Allowance', () => {
     it('should get the allowance from the contract', async () => {
-      const allowanceMock = jest.fn().mockResolvedValue(BigNumber.from(1));
+      const allowanceMock = jest.fn().mockResolvedValue(BigInt(1));
       (Contract as unknown as jest.Mock).mockReturnValue({
         allowance: allowanceMock,
       });
@@ -26,7 +25,7 @@ describe('allowance', () => {
         'OxERC20',
         '0xSEAPORT',
       );
-      expect(allowance).toEqual(BigNumber.from(1));
+      expect(allowance).toEqual(BigInt(1));
       expect(allowanceMock).toBeCalledWith('0xADDRESS', '0xSEAPORT');
     });
 
@@ -64,8 +63,8 @@ describe('allowance', () => {
     it('should get the approval transaction from the contract with the from added', async () => {
       const approveMock = jest.fn().mockResolvedValue({ data: '0xDATA' });
       (Contract as unknown as jest.Mock).mockReturnValue({
-        populateTransaction: {
-          approve: approveMock,
+        approve: {
+          populateTransaction: approveMock,
         },
       });
 
@@ -74,17 +73,17 @@ describe('allowance', () => {
         '0xADDRESS',
         'OxERC20',
         '0xSEAPORT',
-        BigNumber.from(1),
+        BigInt(1),
       );
       expect(approvalTransaction).toEqual({ from: '0xADDRESS', data: '0xDATA' });
-      expect(approveMock).toBeCalledWith('0xSEAPORT', BigNumber.from(1));
+      expect(approveMock).toBeCalledWith('0xSEAPORT', BigInt(1));
     });
 
     it('should error is call to approve fails', async () => {
       const approveMock = jest.fn().mockRejectedValue({ from: '0xADDRESS' });
       (Contract as unknown as jest.Mock).mockReturnValue({
-        populateTransaction: {
-          approve: approveMock,
+        approve: {
+          populateTransaction: approveMock,
         },
       });
 
@@ -98,7 +97,7 @@ describe('allowance', () => {
           '0xADDRESS',
           'OxERC20',
           '0xSEAPORT',
-          BigNumber.from(1),
+          BigInt(1),
         );
       } catch (err: any) {
         message = err.message;
@@ -110,31 +109,31 @@ describe('allowance', () => {
       expect(type).toEqual(CheckoutErrorType.GET_ERC20_ALLOWANCE_ERROR);
       expect(data.error).toBeDefined();
       expect(data.contractAddress).toEqual('OxERC20');
-      expect(approveMock).toBeCalledWith('0xSEAPORT', BigNumber.from(1));
+      expect(approveMock).toBeCalledWith('0xSEAPORT', BigInt(1));
     });
   });
 
   describe('hasERC20Allowances', () => {
     it('should return allowances with sufficient false if allowance not sufficient', async () => {
       const approveMock = jest.fn().mockResolvedValue({ from: '0xADDRESS' });
-      const allowanceMock = jest.fn().mockResolvedValue(BigNumber.from(1));
+      const allowanceMock = jest.fn().mockResolvedValue(BigInt(1));
       (Contract as unknown as jest.Mock).mockReturnValue({
         allowance: allowanceMock,
-        populateTransaction: {
-          approve: approveMock,
+        approve: {
+          populateTransaction: approveMock,
         },
       });
 
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: true,
         },
         {
           type: ItemType.ERC20,
           tokenAddress: '0xERC20',
-          amount: BigNumber.from(2),
+          amount: BigInt(2),
           spenderAddress: '0xSEAPORT',
           isFee: false,
         },
@@ -146,7 +145,7 @@ describe('allowance', () => {
         {
           type: ItemType.ERC20,
           sufficient: false,
-          delta: BigNumber.from(1),
+          delta: BigInt(1),
           itemRequirement: itemRequirements[1],
           approvalTransaction: { from: '0xADDRESS' },
         },
@@ -155,24 +154,24 @@ describe('allowance', () => {
 
     it('should return sufficient true if all allowances are sufficient', async () => {
       const approveMock = jest.fn().mockResolvedValue({});
-      const allowanceMock = jest.fn().mockResolvedValue(BigNumber.from(1));
+      const allowanceMock = jest.fn().mockResolvedValue(BigInt(1));
       (Contract as unknown as jest.Mock).mockReturnValue({
         allowance: allowanceMock,
-        populateTransaction: {
-          approve: approveMock,
+        approve: {
+          populateTransaction: approveMock,
         },
       });
 
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: true,
         },
         {
           type: ItemType.ERC20,
           tokenAddress: '0xERC20',
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           spenderAddress: '0xSEAPORT',
           isFee: false,
         },
@@ -190,38 +189,38 @@ describe('allowance', () => {
 
     it('should handle multiple ERC20 requirements', async () => {
       const approveMock = jest.fn().mockResolvedValue({ from: '0xADDRESS' });
-      const allowanceMock = jest.fn().mockResolvedValue(BigNumber.from(1));
+      const allowanceMock = jest.fn().mockResolvedValue(BigInt(1));
       (Contract as unknown as jest.Mock).mockReturnValue({
         allowance: allowanceMock,
-        populateTransaction: {
-          approve: approveMock,
+        approve: {
+          populateTransaction: approveMock,
         },
       });
 
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           isFee: true,
         },
         {
           type: ItemType.ERC20,
           tokenAddress: '0xERC20a',
-          amount: BigNumber.from(2),
+          amount: BigInt(2),
           spenderAddress: '0xSEAPORT',
           isFee: false,
         },
         {
           type: ItemType.ERC20,
           tokenAddress: '0xERC20b',
-          amount: BigNumber.from(1),
+          amount: BigInt(1),
           spenderAddress: '0xSEAPORT',
           isFee: false,
         },
         {
           type: ItemType.ERC20,
           tokenAddress: '0xERC20c',
-          amount: BigNumber.from(2),
+          amount: BigInt(2),
           spenderAddress: '0xSEAPORT',
           isFee: false,
         },
@@ -237,14 +236,14 @@ describe('allowance', () => {
         {
           type: ItemType.ERC20,
           sufficient: false,
-          delta: BigNumber.from(1),
+          delta: BigInt(1),
           itemRequirement: itemRequirements[1],
           approvalTransaction: { from: '0xADDRESS' },
         },
         {
           type: ItemType.ERC20,
           sufficient: false,
-          delta: BigNumber.from(1),
+          delta: BigInt(1),
           itemRequirement: itemRequirements[3],
           approvalTransaction: { from: '0xADDRESS' },
         },

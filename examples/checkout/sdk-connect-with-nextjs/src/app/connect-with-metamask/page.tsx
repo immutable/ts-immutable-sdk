@@ -2,17 +2,17 @@
 import { checkout } from '@imtbl/sdk';
 import { checkoutSDK } from '../utils/setupDefault';
 import { useState } from 'react';
-import { Web3Provider } from '@ethersproject/providers';
 import { WalletInfo, WalletProviderName } from '@imtbl/sdk/checkout';
-import { Button, Heading, Body, Link, Table } from '@biom3/react';
+import { Button, Heading, Link, Table } from '@biom3/react';
 import NextLink from 'next/link';
+import { BrowserProvider } from 'ethers';
 
 export default function ConnectWithMetamask() {
 
-const [provider, setProvider] = useState<Web3Provider>();
+const [provider, setProvider] = useState<BrowserProvider>();
 const [walletProviderName, setWalletProviderName] = useState<WalletProviderName>();
 const [supportedWallets, setSupportedWallets] = useState<WalletInfo[]>();
-const [connectedProvider, setConnectedProvider] = useState<Web3Provider>();
+const [connectedProvider, setConnectedProvider] = useState<BrowserProvider>();
 const [isValidProvider, setIsValidProvider] = useState<boolean>();
 const [isConnected, setIsConnected] = useState<boolean>();
 const [walletAddress, setWalletAddress] = useState<string>();
@@ -42,8 +42,8 @@ const connectWithMetamask = async (connectWithPerms:boolean) => {
   setWalletProviderName(providerRes.walletProviderName);
 
   // #doc check-is-valid-provider
-  // Check if the provider if a Web3Provider
-  const isProviderRes = await checkout.Checkout.isWeb3Provider(providerRes.provider);
+  // Check if the provider if a BrowserProvider
+  const isProviderRes = checkout.Checkout.isWrappedBrowserProvider(providerRes.provider);
   // #enddoc check-is-valid-provider
 
   setIsValidProvider(isProviderRes);
@@ -71,7 +71,7 @@ const connectWithMetamask = async (connectWithPerms:boolean) => {
   }
   
   // #doc check-is-connected
-  // Check if the provider if a Web3Provider
+  // Check if the provider if a BrowserProvider
   const isConnectedRes = await checkoutSDK.checkIsWalletConnected({
     provider: providerRes.provider
   });

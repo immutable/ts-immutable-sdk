@@ -1,4 +1,3 @@
-import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
   IWidgetsFactory,
@@ -8,6 +7,7 @@ import {
   WidgetConfigurations,
   WidgetProperties,
   WidgetType,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import './i18n';
 import {
@@ -50,7 +50,7 @@ export class WidgetsFactory implements IWidgetsFactory {
     }
   }
 
-  updateProvider(provider: Web3Provider) {
+  updateProvider(provider: WrappedBrowserProvider) {
     addProviderListenersForWidgetRoot(provider);
     sendProviderUpdatedEvent({ provider });
   }

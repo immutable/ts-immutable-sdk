@@ -4,8 +4,8 @@ To run this example you can
 
 ```
 cd examples/passport/wallets-connect-with-nextjs
-yarn install
-yarn dev
+pnpm install
+pnpm dev
 ```
 
 browse to `http://localhost:3000` to see the full list of examples.

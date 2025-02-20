@@ -1,7 +1,7 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "customConditions": ["default"],
+    "customConditions": ["development"],
     "outDir": "./dist",
     "rootDirs": ["src"],
   },

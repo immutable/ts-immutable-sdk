@@ -8,9 +8,9 @@ export async function validateChain(
   signer: EthSigner,
   config: ImmutableXConfiguration,
 ) {
-  const chainID = await signer.getChainId();
+  const chainID = (await signer.provider?.getNetwork())?.chainId;
 
-  if (!isChainValid(chainID, config)) {
+  if (!isChainValid(Number(chainID), config)) {
     throw new Error(
       'The wallet used for this operation is not connected to the correct network.',
     );

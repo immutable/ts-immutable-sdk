@@ -31,7 +31,7 @@ NEXT_PUBLIC_CHAIN_ID=
 Run the development server:
 
 ```bash
-yarn dev # this also watches & builds changes in @imtbl/dex package.
+pnpm dev # this also watches & builds changes in @imtbl/dex package.
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

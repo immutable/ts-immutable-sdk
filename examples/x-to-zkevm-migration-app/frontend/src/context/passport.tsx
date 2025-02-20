@@ -20,7 +20,7 @@ const PassportContext = createContext<PassportContextType>({});
 export function PassportProvider({ children }: { children: React.ReactNode }) {
     const [imxWalletAddress, setImxWalletAddress] = useState<string | undefined>();
     const [imxProvider, setImxProvider] = useState<IMXProvider | undefined>();
-    const passportInstance = new passport.Passport({
+    const passportInstance = useMemo(() => new passport.Passport({
         baseConfig: {
           environment: config.Environment.SANDBOX,
         },
@@ -29,7 +29,7 @@ export function PassportProvider({ children }: { children: React.ReactNode }) {
         logoutRedirectUri: 'http://localhost:3000/logout', // replace with one of your logout URIs from Hub
         audience: 'platform_api',
         scope: 'openid offline_access email transact',
-      });
+      }), []);
 
     const login = useCallback(async () => {
         if (!passportInstance) {
@@ -117,7 +117,7 @@ export function PassportProvider({ children }: { children: React.ReactNode }) {
         } catch (error) {
             console.error('burn: Error burning tokens', error);
         }
-    }, [passportInstance, imxWalletAddress]);
+    }, [passportInstance, imxWalletAddress, imxProvider]);
 
     const providerValue = useMemo(() => {
         console.log('PassportProvider: Creating provider value');

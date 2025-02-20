@@ -71,5 +71,3 @@ export const batchMintERC721ByQuantity = async (
   console.log(`txHash: ${txHash}`);
   return txHash;
 };
-
-batchMintERC721ByQuantity(PRIVATE_KEY, CONTRACT_ADDRESS, MINTS);

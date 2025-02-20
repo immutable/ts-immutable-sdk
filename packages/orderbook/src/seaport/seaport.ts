@@ -1,5 +1,5 @@
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
-import { providers } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 import { mapOrderFromOpenApiOrder } from '../openapi/mapper';
 import { Order as OpenApiOrder } from '../openapi/sdk';
 import {
@@ -137,7 +137,7 @@ function mapImmutableSdkItemToSeaportSdkConsiderationInputItem(
 export class Seaport {
   constructor(
     private seaportLibFactory: SeaportLibFactory,
-    private provider: providers.JsonRpcProvider,
+    private provider: JsonRpcProvider,
     private seaportContractAddress: string,
     private zoneContractAddress: string,
     private rateLimitingKey?: string,
@@ -580,7 +580,7 @@ export class Seaport {
 
   private getSeaportLib(order?: OpenApiOrder): SeaportLib {
     const seaportAddress = order?.protocol_data?.seaport_address ?? this.seaportContractAddress;
-    return this.seaportLibFactory.create(seaportAddress, this.rateLimitingKey);
+    return this.seaportLibFactory.create(seaportAddress);
   }
 
   private static getExpirationISOTimeFromExtraData(extraData: string): string {

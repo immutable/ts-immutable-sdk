@@ -5,22 +5,19 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "@0xsequence/abi": "^1.4.3",
-    "@0xsequence/core": "^1.4.3",
-    "@ethersproject/abstract-provider": "^5.7.0",
-    "@ethersproject/abstract-signer": "^5.7.0",
-    "@ethersproject/providers": "^5.7.2",
-    "@imtbl/config": "0.0.0",
-    "@imtbl/generated-clients": "0.0.0",
-    "@imtbl/metrics": "0.0.0",
-    "@imtbl/toolkit": "0.0.0",
-    "@imtbl/x-client": "0.0.0",
-    "@imtbl/x-provider": "0.0.0",
+    "@0xsequence/abi": "^2.0.25",
+    "@0xsequence/core": "^2.0.25",
+    "@imtbl/config": "workspace:*",
+    "@imtbl/generated-clients": "workspace:*",
+    "@imtbl/metrics": "workspace:*",
+    "@imtbl/toolkit": "workspace:*",
+    "@imtbl/x-client": "workspace:*",
+    "@imtbl/x-provider": "workspace:*",
     "@magic-ext/oidc": "4.3.1",
     "@magic-sdk/provider": "^21.2.0",
     "@metamask/detect-provider": "^2.0.0",
     "axios": "^1.6.5",
-    "ethers": "^5.7.2",
+    "ethers": "^6.13.4",
     "events": "^3.3.0",
     "jwt-decode": "^3.1.2",
     "localforage": "^1.10.0",
@@ -29,14 +26,13 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@rollup/plugin-typescript": "^11.1.6",
     "@swc/core": "^1.3.36",
     "@swc/jest": "^0.2.24",
     "@types/axios": "^0.14.0",
     "@types/jest": "^29.4.3",
     "@types/jwt-encode": "^1.0.1",
-    "@types/react": "^18.0.28",
-    "@types/react-dom": "^18.0.11",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
@@ -47,10 +43,9 @@
     "jwt-encode": "^1.0.1",
     "msw": "^1.2.2",
     "prettier": "^2.8.7",
-    "rollup": "^4.22.4",
     "ts-node": "^10.9.1",
-    "typescript": "^5.6.2",
-    "unplugin-swc": "^1.5.1"
+    "tsup": "8.3.0",
+    "typescript": "^5.6.2"
   },
   "engines": {
     "node": ">=20.11.0"
@@ -58,13 +53,15 @@
   "exports": {
     "development": {
       "types": "./src/index.ts",
-      "main": "./dist/index.js",
-      "import": "./dist/index.js"
+      "browser": "./dist/browser/index.js",
+      "require": "./dist/node/index.cjs",
+      "default": "./dist/node/index.js"
     },
     "default": {
-      "types": "./dist/index.d.ts",
-      "main": "./dist/index.js",
-      "import": "./dist/index.js"
+      "types": "./dist/types/index.d.ts",
+      "browser": "./dist/browser/index.js",
+      "require": "./dist/node/index.cjs",
+      "default": "./dist/node/index.js"
     }
   },
   "files": [
@@ -72,16 +69,23 @@
   ],
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "license": "Apache-2.0",
-  "main": "dist/index.js",
-  "private": true,
+  "main": "dist/node/index.cjs",
+  "module": "dist/node/index.js",
+  "browser": "dist/browser/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "NODE_ENV=production rollup --config rollup.config.js",
-    "d": "rollup --config rollup.config.js",
+    "build": "pnpm transpile && pnpm typegen",
+    "transpile": "tsup src/index.ts --config ../../../tsup.config.js",
+    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
+    "pack:root": "pnpm pack --pack-destination $(dirname $(pnpm root -w))",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest",
     "test:watch": "jest --watch",
     "typecheck": "tsc --customConditions default --noEmit --jsx preserve"
   },
-  "type": "module"
+  "type": "module",
+  "types": "./dist/types/index.d.ts"
 }

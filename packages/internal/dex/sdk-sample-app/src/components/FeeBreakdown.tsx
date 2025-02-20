@@ -1,5 +1,5 @@
 import { Fee } from "@imtbl/dex-sdk"
-import { ethers } from "ethers"
+import { formatEther } from "ethers";
 
 type mapping = {
     [address: string]: string;
@@ -12,7 +12,7 @@ export const FeeBreakdown = ({fees, addressMap}: {fees: Fee[], addressMap: mappi
                 return (<div key={index}>
                     <div>Recipient: {fee.recipient}</div>
                     <div>Basis Points: {fee.basisPoints}</div>
-                    <div>Amount: {ethers.utils.formatEther(fee.amount.value.toString())} {addressMap[fee.amount.token.address]}</div>
+                    <div>Amount: {formatEther(fee.amount.value.toString())} {addressMap[fee.amount.token.address]}</div>
                 </div>)
             })}
         </>

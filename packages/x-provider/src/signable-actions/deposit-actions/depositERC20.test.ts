@@ -66,15 +66,17 @@ describe('Deposit ERC20', () => {
       });
 
       (Contracts.IERC20.connect as jest.Mock).mockReturnValue({
-        populateTransaction: {
-          approve: async () => 'test',
+        approve: {
+          populateTransaction: async () => 'test',
         },
       });
 
       (Contracts.CoreV4.connect as jest.Mock).mockReturnValue({
-        populateTransaction: {
-          depositERC20: async () => 'test',
-          registerAndDepositERC20: async () => 'test',
+        registerAndDepositERC20: {
+          populateTransaction: async () => 'test',
+        },
+        depositERC20: {
+          populateTransaction: async () => 'test',
         },
       });
     });

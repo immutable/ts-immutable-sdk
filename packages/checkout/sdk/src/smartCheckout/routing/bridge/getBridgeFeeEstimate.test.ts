@@ -1,5 +1,5 @@
-import { BigNumber, ethers } from 'ethers';
 import { Environment } from '@imtbl/config';
+import { JsonRpcProvider } from 'ethers';
 import { ChainId } from '../../../types';
 import { getBridgeFeeEstimate } from './getBridgeFeeEstimate';
 import { CheckoutConfiguration } from '../../../config';
@@ -11,7 +11,7 @@ jest.mock('../../../gasEstimate');
 jest.mock('../../../instance');
 
 describe('getBridgeFeeEstimate', () => {
-  const readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>([]);
+  const readOnlyProviders = new Map<ChainId, JsonRpcProvider>([]);
   const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
@@ -21,10 +21,10 @@ describe('getBridgeFeeEstimate', () => {
     (createBridgeInstance as jest.Mock).mockReturnValue({
       getFee: jest.fn().mockResolvedValue(
         {
-          sourceChainGas: BigNumber.from(1),
-          bridgeFee: BigNumber.from(2),
-          imtblFee: BigNumber.from(3),
-          totalFees: BigNumber.from(4),
+          sourceChainGas: BigInt(1),
+          bridgeFee: BigInt(2),
+          imtblFee: BigInt(3),
+          totalFees: BigInt(4),
         },
       ),
     });
@@ -38,11 +38,11 @@ describe('getBridgeFeeEstimate', () => {
 
     expect(bridgeFee).toEqual(
       {
-        sourceChainGas: BigNumber.from(1),
-        approvalGas: BigNumber.from(0),
-        bridgeFee: BigNumber.from(2),
-        imtblFee: BigNumber.from(3),
-        totalFees: BigNumber.from(4),
+        sourceChainGas: BigInt(1),
+        approvalGas: BigInt(0),
+        bridgeFee: BigInt(2),
+        imtblFee: BigInt(3),
+        totalFees: BigInt(4),
       },
     );
   });

@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import {
   ETH_MAINNET_TO_ZKEVM_MAINNET, ETH_SEPOLIA_CHAIN_ID, ETH_SEPOLIA_TO_ZKEVM_TESTNET, childWIMXs, rootIMXs,
 } from '../constants/bridges';
@@ -100,7 +99,7 @@ describe('utils', () => {
         sourceChainId: bridgeInstance.childChainID,
         destinationChainId: bridgeInstance.rootChainID,
         gasMultiplier: 1,
-        amount: BigNumber.from('10000'),
+        amount: BigInt('10000'),
         token,
       };
 
@@ -120,7 +119,7 @@ describe('utils', () => {
         sourceChainId: bridgeInstance.childChainID,
         destinationChainId: bridgeInstance.rootChainID,
         gasMultiplier: 1,
-        amount: BigNumber.from('10000'),
+        amount: BigInt('10000'),
         token,
       };
 
