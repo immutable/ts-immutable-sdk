@@ -6,7 +6,7 @@ import {
   TextInput,
 } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
-import { useCallback, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { CoinSelectorOption, CoinSelectorOptionProps } from './CoinSelectorOption';
 import { selectOptionsContainerStyles, selectOptionsLoadingIconStyles } from './CoinSelectorStyles';
 
@@ -20,6 +20,13 @@ type CoinSelectorProps = {
   visible?: boolean;
 };
 
+const filterOptions = (filterBy: string, options: CoinSelectorOptionProps[]) => {
+  const filterByLower = filterBy.toLowerCase();
+  return options.filter((option) => option.name.toLowerCase().includes(filterByLower)
+      || option.symbol.toLowerCase().includes(filterByLower)
+      || option.id.toLowerCase().endsWith(filterByLower));
+};
+
 export function CoinSelector({
   heading, options, defaultTokenImage, optionsLoading, children, onCloseDrawer, visible,
 }: CoinSelectorProps) {
@@ -31,16 +38,12 @@ export function CoinSelector({
     setSearchValue(event.target.value);
   };
 
-  const filterOptions = useCallback((filterBy: string) => {
-    const filterByLower = filterBy.toLowerCase();
-    return options.filter((option) => option.name.toLowerCase().includes(filterByLower)
-        || option.symbol.toLowerCase().includes(filterByLower)
-        || option.id.toLowerCase().endsWith(filterByLower));
-  }, [options]);
-
-  const filteredOptions = !searchValue
-    ? options
-    : filterOptions(searchValue);
+  const filteredOptions = useMemo(() => {
+    if (!searchValue) {
+      return options;
+    }
+    return filterOptions(searchValue, options);
+  }, [options, searchValue, filterOptions]);
 
   const handleCloseDrawer = () => {
     setSearchValue('');
