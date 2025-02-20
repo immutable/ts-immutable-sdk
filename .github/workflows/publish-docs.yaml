@@ -7,6 +7,7 @@ on:
       - completed
     branches:
       - main
+  workflow_dispatch:
 
 concurrency:
   group: public-docs
@@ -84,6 +85,12 @@ jobs:
         run: |
           git config --global user.name "${GITHUB_ACTOR}"
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+      # set the packageManager field in package.json to yarn
+      - name: Set packageManager
+        run: |
+          jq '.packageManager = "yarn@1.22.22"' ./package.json > ./package.json.tmp && mv ./package.json.tmp ./package.json
+        shell: bash
 
       - name: Setup Node
         uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a
