@@ -26,7 +26,7 @@ on:
       - main
 
 env:
-  RELEASE_TYPE: ${{ github.event.inputs.release_type }}
+  RELEASE_TYPE: ${{ github.event.inputs.release_type || 'prerelease' }}
   DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
 
 concurrency:
