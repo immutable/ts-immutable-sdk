@@ -153,7 +153,7 @@ export function PassportProvider({
   const loginRedirect = useCallback(async () => {
     try {
       setIsLoading(true);
-      const userProfile = await passportClient.login({enableRedirectFlow: true});
+      const userProfile = await passportClient.login({ enableRedirectFlow: true });
       addMessage('Login Redirect', userProfile);
     } catch (err) {
       addMessage('Login Redirect', err);

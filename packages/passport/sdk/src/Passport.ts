@@ -250,15 +250,15 @@ export class Passport {
           });
           this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
         }
-    });
+      });
   }
 
-    /**
-     * Initiates a device flow login.
-     * @param {Object} options - Login options
-     * @param {string} [options.anonymousId] - ID used to enrich Passport internal metrics
-     * @returns {Promise<DeviceConnectResponse>} A promise that resolves to the device connection response
-     */
+  /**
+   * Initiates a device flow login.
+   * @param {Object} options - Login options
+   * @param {string} [options.anonymousId] - ID used to enrich Passport internal metrics
+   * @returns {Promise<DeviceConnectResponse>} A promise that resolves to the device connection response
+   */
   public async loginWithDeviceFlow(options?: {
     anonymousId?: string;
   }): Promise<DeviceConnectResponse> {

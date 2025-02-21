@@ -183,7 +183,7 @@ export default class AuthManager {
   public async loginWithRedirect(anonymousId?: string): Promise<void> {
     await this.userManager.clearStaleState();
     return withPassportError<void>(async () => {
-      return await this.userManager.signinRedirect({
+      await this.userManager.signinRedirect({
         extraQueryParams: {
           ...(this.userManager.settings?.extraQueryParams ?? {}),
           rid: getDetail(Detail.RUNTIME_ID) || '',
@@ -288,7 +288,7 @@ export default class AuthManager {
         if (!oidcUser) {
           throw new Error('Failed to obtain user');
         }
-        return AuthManager.mapOidcUserToDomainModel(oidcUser);
+        AuthManager.mapOidcUserToDomainModel(oidcUser);
       },
       PassportErrorType.AUTHENTICATION_ERROR,
     );
