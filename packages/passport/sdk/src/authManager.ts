@@ -63,7 +63,7 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
 
   const baseConfiguration: UserManagerSettings = {
     authority: authenticationDomain,
-    redirect_uri: oidcConfiguration.redirectUri,
+    redirect_uri: oidcConfiguration.loginRedirectUri || '',
     popup_redirect_uri: oidcConfiguration.redirectUri,
     client_id: oidcConfiguration.clientId,
     metadata: {
@@ -181,8 +181,7 @@ export default class AuthManager {
   };
 
   public async loginWithRedirect(anonymousId?: string): Promise<void> {
-    console.log('authority1: ', this.userManager.settings.authority);
-    //await this.userManager.clearStaleState();
+    await this.userManager.clearStaleState();
     return withPassportError<void>(async () => {
       return await this.userManager.signinRedirect({
         extraQueryParams: {
@@ -277,26 +276,21 @@ export default class AuthManager {
     return user || this.login();
   }
 
-  public async loginCallback(): Promise<void> {
-    return withPassportError<void>(
-        async () => { await this.userManager.signinCallback(); },
-        PassportErrorType.AUTHENTICATION_ERROR,
-    );
-  }
+  public async loginCallback(enableRedirectFlow?: boolean): Promise<void | User> {
+    return withPassportError<void | User>(
+      async () => {
+        if (!enableRedirectFlow) {
+          await this.userManager.signinCallback();
+          return;
+        }
 
-  public async loginRedirectCallback(): Promise<User> {
-    return withPassportError<User>(
-        async () => {
-          console.log('signinRedirectCallback');
-          console.log('authority2: ', this.userManager.settings.authority);
-          const urlParams = new URLSearchParams(window.location.search);
-          console.log('code: ', urlParams.get('code'));
-          console.log('state: ', urlParams.get('state'));
-          const oidcUser = await this.userManager.signinRedirectCallback();
-          console.log('oidcUser', oidcUser);
-          return AuthManager.mapOidcUserToDomainModel(oidcUser);
-        },
-        PassportErrorType.AUTHENTICATION_ERROR,
+        const oidcUser = await this.userManager.signinRedirectCallback();
+        if (!oidcUser) {
+          throw new Error('Failed to obtain user');
+        }
+        return AuthManager.mapOidcUserToDomainModel(oidcUser);
+      },
+      PassportErrorType.AUTHENTICATION_ERROR,
     );
   }
 
@@ -607,5 +601,9 @@ export default class AuthManager {
     }
 
     return user;
+  }
+
+  public getUserManager(): UserManager {
+    return this.userManager;
   }
 }

@@ -15,6 +15,7 @@ const PassportContext = createContext<{
   connectZkEvm: () => void;
   logout: () => void;
   login: () => void;
+  loginRedirect: () => void;
   getIdToken: () => Promise<string | undefined>;
   getAccessToken: () => Promise<string | undefined>;
   getUserInfo: () => Promise<UserProfile | undefined>;
@@ -27,6 +28,7 @@ const PassportContext = createContext<{
       connectZkEvm: () => undefined,
       logout: () => undefined,
       login: () => Promise.resolve(undefined),
+      loginRedirect: () => Promise.resolve(undefined),
       getIdToken: () => Promise.resolve(undefined),
       getAccessToken: () => Promise.resolve(undefined),
       getUserInfo: () => Promise.resolve(undefined),
@@ -148,6 +150,19 @@ export function PassportProvider({
     }
   }, [addMessage, passportClient, setIsLoading]);
 
+  const loginRedirect = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const userProfile = await passportClient.login({enableRedirectFlow: true});
+      addMessage('Login Redirect', userProfile);
+    } catch (err) {
+      addMessage('Login Redirect', err);
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [addMessage, passportClient, setIsLoading]);
+
   const providerValues = useMemo(() => ({
     imxProvider,
     zkEvmProvider,
@@ -155,6 +170,7 @@ export function PassportProvider({
     connectZkEvm,
     logout,
     login,
+    loginRedirect,
     getIdToken,
     getAccessToken,
     getUserInfo,
@@ -167,6 +183,7 @@ export function PassportProvider({
     connectZkEvm,
     logout,
     login,
+    loginRedirect,
     getIdToken,
     getAccessToken,
     getUserInfo,
@@ -188,6 +205,7 @@ export function usePassportProvider() {
     connectImx,
     connectZkEvm,
     login,
+    loginRedirect,
     logout,
     getIdToken,
     getAccessToken,
@@ -201,6 +219,7 @@ export function usePassportProvider() {
     connectImx,
     connectZkEvm,
     login,
+    loginRedirect,
     logout,
     getIdToken,
     getAccessToken,

@@ -34,7 +34,7 @@ import GuardianClient from './guardian';
 import logger from './utils/logger';
 import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
 import { isAPIError, PassportError, PassportErrorType } from './errors/passportError';
-import { withMetrics, withMetricsAsync } from './utils/metrics';
+import { withMetricsAsync } from './utils/metrics';
 import { MagicProviderProxyFactory } from './magic/magicProviderProxyFactory';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
@@ -219,7 +219,7 @@ export class Passport {
       if (!user && useSilentLogin) {
         user = await this.authManager.forceUserRefresh();
       } else if (!user && !useCachedSession) {
-        if (!options?.enableRedirectFlow) {
+        if (options?.enableRedirectFlow) {
           await this.authManager.loginWithRedirect(options?.anonymousId);
         } else {
           user = await this.authManager.login(options?.anonymousId);
@@ -242,18 +242,15 @@ export class Passport {
    * @returns {Promise<void>} A promise that resolves when the callback is processed
    */
   public async loginCallback(enableRedirectFlow?: boolean): Promise<void> {
-    console.log('enableRedirectFlow', enableRedirectFlow);
-    if (!enableRedirectFlow) {
-      return withMetricsAsync(() => this.authManager.loginCallback(), 'loginCallback');
-    }
-
-    const user = await withMetricsAsync(() => this.authManager.loginRedirectCallback(), 'loginRedirectCallback');
-    if (user) {
-      identify({
-        passportId: user.profile.sub,
-      });
-      this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
-    }
+    await withMetricsAsync(() => this.authManager.loginCallback(enableRedirectFlow), 'loginCallback')
+      .then((user) => {
+        if (user) {
+          identify({
+            passportId: user.profile.sub,
+          });
+          this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
+        }
+    });
   }
 
     /**
@@ -495,5 +492,9 @@ export class Passport {
     } finally {
       flow.addEvent('End');
     }
+  }
+
+  public getAuthManager(): AuthManager {
+    return this.authManager;
   }
 }

@@ -12,6 +12,7 @@ function PassportMethods() {
   const {
     logout,
     login,
+    loginRedirect,
     getIdToken,
     getAccessToken,
     getUserInfo,
@@ -48,6 +49,12 @@ function PassportMethods() {
           onClick={login}
         >
           Login
+        </WorkflowButton>
+        <WorkflowButton
+          disabled={isLoading}
+          onClick={loginRedirect}
+        >
+          LoginRedirect
         </WorkflowButton>
         <WorkflowButton
           disabled={isLoading}
