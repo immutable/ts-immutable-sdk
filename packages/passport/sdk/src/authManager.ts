@@ -63,7 +63,7 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
 
   const baseConfiguration: UserManagerSettings = {
     authority: authenticationDomain,
-    redirect_uri: oidcConfiguration.redirectUri,
+    redirect_uri: oidcConfiguration.loginRedirectUri || '',
     popup_redirect_uri: oidcConfiguration.redirectUri,
     client_id: oidcConfiguration.clientId,
     metadata: {
@@ -180,6 +180,19 @@ export default class AuthManager {
     });
   };
 
+  public async loginWithRedirect(anonymousId?: string): Promise<void> {
+    await this.userManager.clearStaleState();
+    return withPassportError<void>(async () => {
+      await this.userManager.signinRedirect({
+        extraQueryParams: {
+          ...(this.userManager.settings?.extraQueryParams ?? {}),
+          rid: getDetail(Detail.RUNTIME_ID) || '',
+          third_party_a_id: anonymousId || '',
+        },
+      });
+    }, PassportErrorType.AUTHENTICATION_ERROR);
+  }
+
   /**
    * login
    * @param anonymousId Caller can pass an anonymousId if they want to associate their user's identity with immutable's internal instrumentation.
@@ -263,11 +276,19 @@ export default class AuthManager {
     return user || this.login();
   }
 
-  public async loginCallback(): Promise<void> {
-    return withPassportError<void>(
-      async () => { await this.userManager.signinCallback(); },
-      PassportErrorType.AUTHENTICATION_ERROR,
-    );
+  public async loginCallback(enableRedirectFlow?: boolean): Promise<void | User> {
+    return withPassportError<void | User>(async () => {
+      if (!enableRedirectFlow) {
+        await this.userManager.signinCallback();
+        return undefined;
+      }
+
+      const oidcUser = await this.userManager.signinRedirectCallback();
+      if (!oidcUser) {
+        throw new Error('Failed to obtain user');
+      }
+      return AuthManager.mapOidcUserToDomainModel(oidcUser);
+    }, PassportErrorType.AUTHENTICATION_ERROR);
   }
 
   /**
@@ -577,5 +598,9 @@ export default class AuthManager {
     }
 
     return user;
+  }
+
+  public getUserManager(): UserManager {
+    return this.userManager;
   }
 }

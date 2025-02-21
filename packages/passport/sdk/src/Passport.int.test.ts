@@ -26,6 +26,7 @@ jest.mock('@imtbl/x-client');
 
 const authenticationDomain = 'example.com';
 const redirectUri = 'example.com';
+const loginRedirectUri = 'example.com';
 const logoutRedirectUri = 'example.com';
 const clientId = 'clientId123';
 const mockOidcUser = {
@@ -53,6 +54,7 @@ const mockOidcUserZkevm = {
 const oidcConfiguration: OidcConfiguration = {
   clientId,
   redirectUri,
+  loginRedirectUri,
   logoutRedirectUri,
 };
 
@@ -64,6 +66,7 @@ const getZkEvmProvider = async () => {
     audience: 'platform_api',
     clientId,
     redirectUri,
+    loginRedirectUri,
     logoutRedirectUri,
     scope: 'openid offline_access profile email transact',
   });
@@ -325,6 +328,7 @@ describe('Passport', () => {
           audience: 'platform_api',
           clientId,
           redirectUri,
+          loginRedirectUri,
           logoutRedirectUri,
           scope: 'openid offline_access profile email transact',
         });
