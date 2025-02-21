@@ -138,7 +138,7 @@ describe('AuthManager', () => {
             + `?client_id=${config.oidcConfiguration.clientId}`,
         },
         popup_redirect_uri: config.oidcConfiguration.redirectUri,
-        redirect_uri: config.oidcConfiguration.redirectUri,
+        redirect_uri: config.oidcConfiguration.loginRedirectUri,
         scope: config.oidcConfiguration.scope,
         userStore: expect.any(WebStorageStateStore),
       });
