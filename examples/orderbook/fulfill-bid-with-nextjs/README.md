@@ -13,7 +13,7 @@ In order to fill a bid, valid ERC721 or ERC1155 bids should exist in the system.
 1. Install the dependencies:
 
 ```bash
-pnpm
+pnpm i
 ```
 
 2. Copy the `.env.example` file to `.env`:

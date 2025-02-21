@@ -46,7 +46,7 @@ Pnpm is the package manager used in this monorepo. If you do not have pnpm insta
 To get started with the SDK, you need to install the dependencies and build the project:
 
 ```bash
-pnpm
+pnpm i
 pnpm build
 ```
 

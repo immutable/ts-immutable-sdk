@@ -13,7 +13,7 @@ In order to create a bid, a valid ERC721 or ERC1155 token must be provided. The 
 1. Install the dependencies:
 
 ```bash
-pnpm
+pnpm i
 ```
 
 2. Copy the `.env.example` file to `.env`:
