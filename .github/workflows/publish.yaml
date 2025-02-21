@@ -70,17 +70,17 @@ jobs:
           echo "require-result = ${{ steps.check_user_permission.outputs.require-result }}"
   
       - name: Admin Permission Check
-        if: ${{ steps.check_user_permission.outputs.require-result != 'true' }}
+        if: ${{ steps.check_user_permission.outputs.require-result != 'true' && env.RELEASE_TYPE == 'major' }}
         run: exit 1
   
       - name: Allowed Actors Check
         id: allowed_actors_check
         # only allow certain SDK team members to run this workflow
-        if: ${{ contains(fromJson(env.SDK_PUBLISH_MAJOR_VERSION_ACTORS), github.triggering_actor) }}
+        if: ${{ contains(fromJson(env.SDK_PUBLISH_MAJOR_VERSION_ACTORS), github.triggering_actor) && env.RELEASE_TYPE == 'major' }}
         run: echo "ALLOWED_ACTOR=true" >> $GITHUB_OUTPUT
   
       - name: Allowed Actors Filter
-        if: ${{ steps.allowed_actors_check.outputs.ALLOWED_ACTOR != 'true' }}
+        if: ${{ steps.allowed_actors_check.outputs.ALLOWED_ACTOR != 'true' && env.RELEASE_TYPE == 'major' }}
         run: exit 1
 
       - name: Checkout
@@ -124,6 +124,11 @@ jobs:
       - name: Publish Github Release
         if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }}
         run: pnpm nx release changelog $(jq -r '.version' ./sdk/package.json) $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") 
+
+      - name: Tag Git Release
+        run: |
+          git tag -a $(jq -r '.version' ./sdk/package.json) -m "$(jq -r '.version' ./sdk/package.json)"
+          git push origin $(jq -r '.version' ./sdk/package.json)
 
       - name: Release to NPM
         id: npm_release

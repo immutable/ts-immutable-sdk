@@ -7,6 +7,7 @@ on:
       - completed
     branches:
       - main
+  workflow_dispatch:
 
 concurrency:
   group: public-docs
@@ -85,17 +86,11 @@ jobs:
           git config --global user.name "${GITHUB_ACTOR}"
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
-      - name: Setup Node
-        uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a
-        with:
-          node-version-file: .nvmrc
-          cache: "yarn"
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
+      - name: setup
+        uses: ./.github/actions/setup
 
       - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
+        run: export NODE_OPTIONS=--max-old-space-size=6144 && pnpm build
 
       - name: Update SDK package.json version
         run: |
@@ -104,7 +99,7 @@ jobs:
         shell: bash
 
       - name: Build SDK Docs
-        run: yarn docs:build
+        run: pnpm docs:build
 
       - name: Update version link
         run: ./.github/scripts/update-docs-link.sh
