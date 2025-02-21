@@ -277,21 +277,18 @@ export default class AuthManager {
   }
 
   public async loginCallback(enableRedirectFlow?: boolean): Promise<void | User> {
-    return withPassportError<void | User>(
-      async () => {
-        if (!enableRedirectFlow) {
-          await this.userManager.signinCallback();
-          return;
-        }
+    return withPassportError<void | User>(async () => {
+      if (!enableRedirectFlow) {
+        await this.userManager.signinCallback();
+        return undefined;
+      }
 
-        const oidcUser = await this.userManager.signinRedirectCallback();
-        if (!oidcUser) {
-          throw new Error('Failed to obtain user');
-        }
-        AuthManager.mapOidcUserToDomainModel(oidcUser);
-      },
-      PassportErrorType.AUTHENTICATION_ERROR,
-    );
+      const oidcUser = await this.userManager.signinRedirectCallback();
+      if (!oidcUser) {
+        throw new Error('Failed to obtain user');
+      }
+      return AuthManager.mapOidcUserToDomainModel(oidcUser);
+    }, PassportErrorType.AUTHENTICATION_ERROR);
   }
 
   /**
