@@ -125,6 +125,11 @@ jobs:
         if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }}
         run: pnpm nx release changelog $(jq -r '.version' ./sdk/package.json) $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") 
 
+      - name: Tag Git Release
+        run: |
+          git tag -a $(jq -r '.version' ./sdk/package.json) -m "$(jq -r '.version' ./sdk/package.json)"
+          git push origin $(jq -r '.version' ./sdk/package.json)
+
       - name: Release to NPM
         id: npm_release
         env:
