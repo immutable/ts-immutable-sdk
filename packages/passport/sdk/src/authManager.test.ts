@@ -86,6 +86,7 @@ describe('AuthManager', () => {
   let authManager: AuthManager;
   let mockSigninPopup: jest.Mock;
   let mockSigninCallback: jest.Mock;
+  let mockSigninRedirectCallback: jest.Mock;
   let mockSignoutRedirect: jest.Mock;
   let mockGetUser: jest.Mock;
   let mockSigninSilent: jest.Mock;
@@ -97,6 +98,7 @@ describe('AuthManager', () => {
   beforeEach(() => {
     mockSigninPopup = jest.fn();
     mockSigninCallback = jest.fn();
+    mockSigninRedirectCallback = jest.fn();
     mockSignoutRedirect = jest.fn();
     mockGetUser = jest.fn();
     mockSigninSilent = jest.fn();
@@ -107,6 +109,7 @@ describe('AuthManager', () => {
     (UserManager as jest.Mock).mockReturnValue({
       signinPopup: mockSigninPopup,
       signinCallback: mockSigninCallback,
+      signinRedirectCallback: mockSigninRedirectCallback,
       signoutRedirect: mockSignoutRedirect,
       signoutSilent: mockSignoutSilent,
       getUser: mockGetUser,
@@ -368,6 +371,21 @@ describe('AuthManager', () => {
       await authManager.loginCallback();
 
       expect(mockSigninCallback).toBeCalled();
+    });
+
+    it('should call login redirect callback and map to domain model', async () => {
+      mockSigninRedirectCallback.mockReturnValue(mockOidcUser);
+      const user = await authManager.loginCallback(true);
+      expect(mockSigninRedirectCallback).toBeCalled();
+      expect(user).toEqual(mockUser);
+    });
+
+    it('should call login redirect callback and throw error', async () => {
+      try {
+        await authManager.loginCallback(true);
+      } catch (e) {
+        expect(mockSigninRedirectCallback).toBeCalled();
+      }
     });
   });
 
