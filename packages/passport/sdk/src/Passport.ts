@@ -493,8 +493,4 @@ export class Passport {
       flow.addEvent('End');
     }
   }
-
-  public getAuthManager(): AuthManager {
-    return this.authManager;
-  }
 }

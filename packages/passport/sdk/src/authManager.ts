@@ -599,8 +599,4 @@ export default class AuthManager {
 
     return user;
   }
-
-  public getUserManager(): UserManager {
-    return this.userManager;
-  }
 }
