@@ -5,12 +5,12 @@ import {
 import {
   Box, Heading, Icon, OptionKey, Tooltip,
 } from '@biom3/react';
-import { BigNumber, utils } from 'ethers';
 import { isAddressSanctioned, TokenInfo, WidgetTheme } from '@imtbl/checkout-sdk';
 
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { useTranslation } from 'react-i18next';
 import { Environment } from '@imtbl/config';
+import { formatUnits, parseEther, parseUnits } from 'ethers';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { NetworkSwitchDrawer } from '../../../components/NetworkSwitchDrawer/NetworkSwitchDrawer';
 import { amountInputValidation as textInputValidator } from '../../../lib/validations/amountInputValidations';
@@ -155,7 +155,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     if (tokenBalances.length === 0) return;
     if (!network) return;
     const fromOptions = tokenBalances
-      .filter((b) => b.balance.gt(0))
+      .filter((b) => b.balance > 0)
       .map(
         (tokenBalance) => ({
           id: formatTokenOptionsId(tokenBalance.token.symbol, tokenBalance.token.address),
@@ -181,7 +181,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         allowedTokens.find((token) => (isNativeToken(token.address)
             && data?.fromTokenAddress?.toLowerCase() === NATIVE)
             || token.address?.toLowerCase()
-            === data?.fromTokenAddress?.toLowerCase()),
+           === data?.fromTokenAddress?.toLowerCase()),
       );
       setFromBalance(
         tokenBalances.find(
@@ -214,6 +214,24 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     formatZeroAmount,
     network,
   ]);
+
+  const openUnableToSwapDrawer = useCallback((error: any) => {
+    setShowNotEnoughImxDrawer(false);
+    setShowUnableToSwapDrawer(true);
+    track({
+      userJourney: UserJourney.SWAP,
+      screen: 'SwapCoins',
+      control: 'UnableToSwapDrawer',
+      controlType: 'Button',
+      extras: {
+        fromToken,
+        toToken,
+        fromAmount,
+        toAmount,
+        error: 'message' in error ? error.message : error,
+      },
+    });
+  }, [track, fromToken, toToken, fromAmount, toAmount]);
 
   const tokensOptionsTo = useMemo(() => allowedTokens
     .map(
@@ -280,11 +298,11 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       quoteResult = processQuoteToken(toToken, quoteResult);
 
       const estimate = quoteResult.swap.gasFeeEstimate;
-      let gasFeeTotal = BigNumber.from(estimate?.value || 0);
+      let gasFeeTotal = BigInt(estimate?.value || 0);
       if (quoteResult.approval?.gasFeeEstimate) {
-        gasFeeTotal = gasFeeTotal.add(quoteResult.approval.gasFeeEstimate.value);
+        gasFeeTotal += quoteResult.approval.gasFeeEstimate.value;
       }
-      const gasFee = utils.formatUnits(
+      const gasFee = formatUnits(
         gasFeeTotal,
         DEFAULT_TOKEN_DECIMALS,
       );
@@ -313,7 +331,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       setToAmount(
         formatZeroAmount(
           tokenValueFormat(
-            utils.formatUnits(
+            formatUnits(
               quoteResult.quote.amount.value,
               quoteResult.quote.amount.token.decimals,
             ),
@@ -329,8 +347,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         console.error('Error fetching quote.', error);
 
         resetQuote();
-        setShowNotEnoughImxDrawer(false);
-        setShowUnableToSwapDrawer(true);
+        openUnableToSwapDrawer(error);
       }
     }
 
@@ -364,11 +381,11 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       quoteResult = processSecondaryFees(fromToken, quoteResult);
 
       const estimate = quoteResult.swap.gasFeeEstimate;
-      let gasFeeTotal = BigNumber.from(estimate?.value || 0);
+      let gasFeeTotal = BigInt(estimate?.value || 0);
       if (quoteResult.approval?.gasFeeEstimate) {
-        gasFeeTotal = gasFeeTotal.add(quoteResult.approval.gasFeeEstimate.value);
+        gasFeeTotal += quoteResult.approval.gasFeeEstimate.value;
       }
-      const gasFee = utils.formatUnits(
+      const gasFee = formatUnits(
         gasFeeTotal,
         DEFAULT_TOKEN_DECIMALS,
       );
@@ -395,7 +412,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
 
       setFromAmount(
         formatZeroAmount(
-          tokenValueFormat(utils.formatUnits(
+          tokenValueFormat(formatUnits(
             quoteResult.quote.amount.value,
             quoteResult.quote.amount.token.decimals,
           )),
@@ -406,8 +423,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     } catch (error: any) {
       if (!error.cancelled) {
         resetQuote();
-        setShowNotEnoughImxDrawer(false);
-        setShowUnableToSwapDrawer(true);
+        openUnableToSwapDrawer(error);
       }
     }
 
@@ -509,12 +525,12 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     if (!imxBalance) return true;
 
     const fromTokenIsImx = fromToken?.address?.toLowerCase() === NATIVE;
-    const gasAmount = utils.parseEther(gasFeeValue.length !== 0 ? gasFeeValue : '0');
+    const gasAmount = parseEther(gasFeeValue.length !== 0 ? gasFeeValue : '0');
     const additionalAmount = fromTokenIsImx && !Number.isNaN(parseFloat(fromAmount))
-      ? utils.parseUnits(fromAmount, fromToken?.decimals || 18)
-      : BigNumber.from('0');
+      ? parseUnits(fromAmount, fromToken?.decimals || 18)
+      : BigInt('0');
 
-    return gasAmount.add(additionalAmount).gt(imxBalance.balance);
+    return (gasAmount + additionalAmount) > imxBalance.balance;
   }, [gasFeeValue, tokenBalances, fromToken, fromAmount, provider]);
 
   // -------------//
@@ -542,6 +558,18 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     setFromToken(selected.token);
     setFromBalance(selected.formattedBalance);
     setFromTokenError('');
+
+    track({
+      userJourney: UserJourney.SWAP,
+      screen: 'SwapCoins',
+      control: 'SelectFrom',
+      controlType: 'Select',
+      extras: {
+        fromBalance: selected.formattedBalance,
+        fromToken: selected.token,
+        fromAmount,
+      },
+    });
   }, [toToken]);
 
   const onFromTextInputFocus = () => {
@@ -559,6 +587,18 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       setLoading(true);
     }
     setFromAmount(value);
+
+    track({
+      userJourney: UserJourney.SWAP,
+      screen: 'SwapCoins',
+      control: 'InputFrom',
+      controlType: 'TextInput',
+      extras: {
+        fromBalance,
+        fromToken,
+        fromAmount: value,
+      },
+    });
   };
 
   const textInputMaxButtonClick = () => {
@@ -602,6 +642,17 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
 
     setToToken(selected);
     setToTokenError('');
+
+    track({
+      userJourney: UserJourney.SWAP,
+      screen: 'SwapCoins',
+      control: 'SelectTo',
+      controlType: 'Select',
+      extras: {
+        toToken: selected,
+        toAmount,
+      },
+    });
   }, [fromToken]);
 
   const onToTextInputFocus = () => {
@@ -620,6 +671,17 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       setLoading(true);
     }
     setToAmount(value);
+
+    track({
+      userJourney: UserJourney.SWAP,
+      screen: 'SwapCoins',
+      control: 'InputTo',
+      controlType: 'TextInput',
+      extras: {
+        toToken,
+        toAmount: value,
+      },
+    });
   };
 
   const openNotEnoughImxDrawer = () => {
@@ -738,7 +800,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
 
     try {
     // check for switch network here
-      const currentChainId = await (provider.provider as any).request({ method: 'eth_chainId', params: [] });
+      const currentChainId = await (provider.provider as any).send('eth_chainId', []);
       // eslint-disable-next-line radix
       const parsedChainId = parseInt(currentChainId.toString());
       if (parsedChainId !== getL2ChainId(checkout.config)) {

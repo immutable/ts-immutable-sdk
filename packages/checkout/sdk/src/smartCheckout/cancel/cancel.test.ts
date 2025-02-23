@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import { OrderStatusName } from '@imtbl/orderbook';
-import { PopulatedTransaction, TypedDataDomain } from 'ethers';
+import { TypedDataDomain, PreparedTransactionRequest } from 'ethers';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutErrorType } from '../../errors';
 import { cancel } from './cancel';
 import { createOrderbookInstance } from '../../instance';
 import { signFulfillmentTransactions } from '../actions';
-import { CheckoutStatus } from '../../types';
+import { CheckoutStatus, WrappedBrowserProvider } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
 import { HttpClient } from '../../api/http';
 import { sendTransaction } from '../../transaction';
@@ -19,15 +18,15 @@ jest.mock('../../transaction');
 
 describe('cancel', () => {
   let config: CheckoutConfiguration;
-  let mockProvider: Web3Provider;
+  let mockProvider: WrappedBrowserProvider;
 
   beforeEach(() => {
     mockProvider = {
       getSigner: jest.fn().mockReturnValue({
         getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
-        _signTypedData: jest.fn().mockResolvedValue('0xSIGNED'),
+        signTypedData: jest.fn().mockResolvedValue('0xSIGNED'),
       }),
-    } as unknown as Web3Provider;
+    } as unknown as WrappedBrowserProvider;
 
     const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     config = new CheckoutConfiguration({
@@ -53,7 +52,7 @@ describe('cancel', () => {
               to: '0xTO',
               from: '0xFROM',
               nonce: 1,
-            }) as PopulatedTransaction,
+            }) as PreparedTransactionRequest,
           },
         }),
       });
@@ -92,7 +91,7 @@ describe('cancel', () => {
               to: '0xTO',
               from: '0xFROM',
               nonce: 1,
-            }) as PopulatedTransaction,
+            }) as PreparedTransactionRequest,
           },
         }),
       });
@@ -127,7 +126,7 @@ describe('cancel', () => {
               to: '0xTO',
               from: '0xFROM',
               nonce: 1,
-            }) as PopulatedTransaction,
+            }) as PreparedTransactionRequest,
           },
         }),
       });
@@ -170,7 +169,7 @@ describe('cancel', () => {
               to: '0xTO',
               from: '0xFROM',
               nonce: 1,
-            }) as PopulatedTransaction,
+            }) as PreparedTransactionRequest,
           },
         }),
       });

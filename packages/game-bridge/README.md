@@ -5,7 +5,7 @@
 Install dependencies for the workspace
 
 ```bash
-yarn install
+pnpm install
 ```
 
 ### Quick Start Guide
@@ -16,7 +16,7 @@ Building the Game Bridge for Unity and Unreal:
 
 ```bash
 # at root
-yarn nx run @imtbl/game-bridge:build
+pnpm nx run @imtbl/game-bridge:build
 ```
 
 Note: The above build will bundle the index files in the following locations (relative to this README):
@@ -54,7 +54,7 @@ Game bridge should now have the correct latest version when packaged into the Ga
 ### Linting:
 
 ```bash
-yarn lint
+pnpm lint
 ```
 
 ### About

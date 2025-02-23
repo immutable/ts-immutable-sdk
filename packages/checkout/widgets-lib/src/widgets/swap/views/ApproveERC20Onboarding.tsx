@@ -4,7 +4,6 @@ import {
 } from 'react';
 import { CheckoutErrorType, TokenInfo } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
-import { BigNumber } from 'ethers';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendSwapWidgetCloseEvent } from '../SwapWidgetEvents';
@@ -137,7 +136,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
 
   const prepareTransaction = (transaction, isGasFree = false) => ({
     ...transaction,
-    gasPrice: (isGasFree ? BigNumber.from(0) : undefined),
+    gasPrice: (isGasFree ? BigInt(0) : undefined),
   });
 
   /* --------------------- */
@@ -173,7 +172,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
       setApprovalTxnLoading(true);
       const approvalReceipt = await txnResult.transactionResponse.wait();
 
-      if (approvalReceipt.status !== 1) {
+      if (approvalReceipt?.status !== 1) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,

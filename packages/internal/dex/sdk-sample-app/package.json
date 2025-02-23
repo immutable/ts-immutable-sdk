@@ -2,14 +2,14 @@
   "name": "dex-sample-app",
   "version": "0.1.0",
   "devDependencies": {
-    "@imtbl/dex-sdk": "0.0.0",
+    "@imtbl/dex-sdk": "workspace:*",
     "@types/node": "^18.14.2",
-    "@types/react": "^18.0.28",
-    "@types/react-dom": "^18.0.11",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
     "autoprefixer": "10.4.14",
     "concurrently": "^8.2.2",
     "eslint": "^8.40.0",
-    "ethers": "^5.7.2",
+    "ethers": "^6.13.4",
     "next": "14.2.10",
     "postcss": "8.4.31",
     "react": "^18.2.0",
@@ -19,7 +19,7 @@
   },
   "private": true,
   "scripts": {
-    "dev": "concurrently 'next dev' 'yarn run --top-level dev @imtbl/dex-sdk'",
+    "dev": "concurrently 'next dev' 'pnpm run -w dev'",
     "lint": "eslint ./src --ext .ts --max-warnings=0 --no-error-on-unmatched-pattern",
     "start": "next start"
   }

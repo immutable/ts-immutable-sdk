@@ -6,7 +6,7 @@ import { getLocalhostProvider } from './helpers/provider';
 import { getOffererWallet } from './helpers/signers';
 import { deployTestToken } from './helpers/erc721';
 import { waitForOrderToBeOfStatus } from './helpers/order';
-import { getConfigFromEnv } from './helpers';
+import { getConfigFromEnv, getRandomTokenId } from './helpers';
 import { actionAll } from './helpers/actions';
 import { GAS_OVERRIDES } from './helpers/gas';
 
@@ -62,13 +62,13 @@ describe('cancel order', () => {
 
     const { contract } = await deployTestToken(offerer);
 
-    const receipt = await contract.safeMint(offerer.address, GAS_OVERRIDES);
+    const receipt = await contract.safeMint(offerer.address, getRandomTokenId(), GAS_OVERRIDES);
     await receipt.wait();
-    const orderId1 = await createOrder(sdk, offerer, contract.address, '0');
+    const orderId1 = await createOrder(sdk, offerer, await contract.getAddress(), '0');
 
-    const receipt2 = await contract.safeMint(offerer.address, GAS_OVERRIDES);
+    const receipt2 = await contract.safeMint(offerer.address, getRandomTokenId(), GAS_OVERRIDES);
     await receipt2.wait();
-    const orderId2 = await createOrder(sdk, offerer, contract.address, '1');
+    const orderId2 = await createOrder(sdk, offerer, await contract.getAddress(), '1');
 
     const { cancellationAction } = await sdk.cancelOrdersOnChain(
       [orderId1, orderId2],
@@ -96,13 +96,13 @@ describe('cancel order', () => {
 
     const { contract } = await deployTestToken(offerer);
 
-    const receipt = await contract.safeMint(offerer.address, GAS_OVERRIDES);
+    const receipt = await contract.safeMint(offerer.address, getRandomTokenId(), GAS_OVERRIDES);
     await receipt.wait();
-    const orderId1 = await createOrder(sdk, offerer, contract.address, '0');
+    const orderId1 = await createOrder(sdk, offerer, await contract.getAddress(), '0');
 
-    const receipt2 = await contract.safeMint(offerer.address, GAS_OVERRIDES);
+    const receipt2 = await contract.safeMint(offerer.address, getRandomTokenId(), GAS_OVERRIDES);
     await receipt2.wait();
-    const orderId2 = await createOrder(sdk, offerer, contract.address, '1');
+    const orderId2 = await createOrder(sdk, offerer, await contract.getAddress(), '1');
 
     const { signableAction } = await sdk.prepareOrderCancellations(
       [orderId1, orderId2],

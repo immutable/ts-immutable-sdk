@@ -1,6 +1,6 @@
 import * as GeneratedClients from '@imtbl/generated-clients';
-import { TransactionRequest } from '@ethersproject/providers';
 import { ImmutableConfiguration } from '@imtbl/config';
+import { TransactionRequest } from 'ethers';
 import { ConfirmationScreen } from '../confirmation';
 import AuthManager from '../authManager';
 import GuardianClient from './index';
@@ -176,7 +176,7 @@ describe('Guardian', () => {
       ).rejects.toThrow(
         new JsonRpcError(
           RpcErrorCode.PARSE_ERROR,
-          'Transaction failed to parsing: invalid BigNumber string (argument="value", value="0x", code=INVALID_ARGUMENT, version=bignumber/5.7.0)',
+          'Transaction failed to parsing: Cannot convert 0x to a BigInt',
         ),
       );
     });
@@ -205,6 +205,161 @@ describe('Guardian', () => {
       });
 
       expect(mockConfirmationScreen.requestConfirmation).toBeCalledTimes(0);
+
+      expect(mockEvaluateTransaction).toBeCalledWith({
+        id: 'evm',
+        transactionEvaluationRequest: {
+          chainId: 'epi123',
+          chainType: 'evm',
+          transactionData: {
+            nonce: '5',
+            userAddress: mockUserZkEvm.zkEvm.ethAddress,
+            metaTransactions: [
+              {
+                data: transactionRequest.data,
+                delegateCall: false,
+                gasLimit: '0',
+                revertOnError: true,
+                target: mockUserZkEvm.zkEvm.ethAddress,
+                value: '0',
+              },
+            ],
+          },
+        },
+      }, {
+        headers: { Authorization: `Bearer ${mockUser.accessToken}` },
+      });
+    });
+
+    it('should not close confirmation window when is a background transaction', async () => {
+      const transactionRequest: TransactionRequest = {
+        to: mockUserZkEvm.zkEvm.ethAddress,
+        data: '0x456',
+        value: '0x',
+      };
+
+      mockEvaluateTransaction.mockResolvedValue({ data: { confirmationRequired: true } });
+
+      await getGuardianClient().validateEVMTransaction({
+        chainId: 'epi123',
+        nonce: '5',
+        metaTransactions: [
+          {
+            data: transactionRequest.data,
+            revertOnError: true,
+            to: mockUserZkEvm.zkEvm.ethAddress,
+            value: '0x00',
+            nonce: 5,
+          },
+        ],
+        isBackgroundTransaction: true,
+      });
+
+      expect(mockConfirmationScreen.requestConfirmation).toBeCalledTimes(0);
+      expect(mockConfirmationScreen.closeWindow).toBeCalledTimes(0);
+
+      expect(mockEvaluateTransaction).toBeCalledWith({
+        id: 'evm',
+        transactionEvaluationRequest: {
+          chainId: 'epi123',
+          chainType: 'evm',
+          transactionData: {
+            nonce: '5',
+            userAddress: mockUserZkEvm.zkEvm.ethAddress,
+            metaTransactions: [
+              {
+                data: transactionRequest.data,
+                delegateCall: false,
+                gasLimit: '0',
+                revertOnError: true,
+                target: mockUserZkEvm.zkEvm.ethAddress,
+                value: '0',
+              },
+            ],
+          },
+        },
+      }, {
+        headers: { Authorization: `Bearer ${mockUser.accessToken}` },
+      });
+    });
+
+    it('should close confirmation window when is not a background transaction', async () => {
+      const transactionRequest: TransactionRequest = {
+        to: mockUserZkEvm.zkEvm.ethAddress,
+        data: '0x456',
+        value: '0x',
+      };
+
+      mockEvaluateTransaction.mockResolvedValue({ data: { confirmationRequired: true } });
+
+      await getGuardianClient().validateEVMTransaction({
+        chainId: 'epi123',
+        nonce: '5',
+        metaTransactions: [
+          {
+            data: transactionRequest.data,
+            revertOnError: true,
+            to: mockUserZkEvm.zkEvm.ethAddress,
+            value: '0x00',
+            nonce: 1,
+          },
+        ],
+        isBackgroundTransaction: false,
+      });
+
+      expect(mockConfirmationScreen.requestConfirmation).toBeCalledTimes(0);
+      expect(mockConfirmationScreen.closeWindow).toBeCalledTimes(1);
+
+      expect(mockEvaluateTransaction).toBeCalledWith({
+        id: 'evm',
+        transactionEvaluationRequest: {
+          chainId: 'epi123',
+          chainType: 'evm',
+          transactionData: {
+            nonce: '5',
+            userAddress: mockUserZkEvm.zkEvm.ethAddress,
+            metaTransactions: [
+              {
+                data: transactionRequest.data,
+                delegateCall: false,
+                gasLimit: '0',
+                revertOnError: true,
+                target: mockUserZkEvm.zkEvm.ethAddress,
+                value: '0',
+              },
+            ],
+          },
+        },
+      }, {
+        headers: { Authorization: `Bearer ${mockUser.accessToken}` },
+      });
+    });
+
+    it('should close confirmation window to validate background transaction falsy default value', async () => {
+      const transactionRequest: TransactionRequest = {
+        to: mockUserZkEvm.zkEvm.ethAddress,
+        data: '0x456',
+        value: '0x',
+      };
+
+      mockEvaluateTransaction.mockResolvedValue({ data: { confirmationRequired: true } });
+
+      await getGuardianClient().validateEVMTransaction({
+        chainId: 'epi123',
+        nonce: '5',
+        metaTransactions: [
+          {
+            data: transactionRequest.data,
+            revertOnError: true,
+            to: mockUserZkEvm.zkEvm.ethAddress,
+            value: '0x00',
+            nonce: 1,
+          },
+        ],
+      });
+
+      expect(mockConfirmationScreen.requestConfirmation).toBeCalledTimes(0);
+      expect(mockConfirmationScreen.closeWindow).toBeCalledTimes(1);
 
       expect(mockEvaluateTransaction).toBeCalledWith({
         id: 'evm',
@@ -422,7 +577,7 @@ describe('Guardian', () => {
       mockEvaluateErc191Message.mockRejectedValueOnce(new Error('401: Unauthorized'));
 
       await expect(getGuardianClient().evaluateERC191Message({
-        chainID: ChainId.IMTBL_ZKEVM_DEVNET,
+        chainID: BigInt(ChainId.IMTBL_ZKEVM_DEVNET),
         payload: 'payload',
       }))
         .rejects.toThrow('Message failed to validate with error: 401: Unauthorized');
@@ -433,7 +588,7 @@ describe('Guardian', () => {
       (mockConfirmationScreen.requestMessageConfirmation as jest.Mock).mockResolvedValueOnce({ confirmed: true });
 
       await getGuardianClient().evaluateERC191Message({
-        chainID: ChainId.IMTBL_ZKEVM_DEVNET,
+        chainID: BigInt(ChainId.IMTBL_ZKEVM_DEVNET),
         payload: 'payload',
       });
 
@@ -445,7 +600,7 @@ describe('Guardian', () => {
       (mockConfirmationScreen.requestMessageConfirmation as jest.Mock).mockResolvedValueOnce({ confirmed: false });
 
       await expect(getGuardianClient().evaluateERC191Message({
-        chainID: ChainId.IMTBL_ZKEVM_DEVNET,
+        chainID: BigInt(ChainId.IMTBL_ZKEVM_DEVNET),
         payload: 'payload',
       })).rejects.toEqual(new JsonRpcError(RpcErrorCode.TRANSACTION_REJECTED, 'Signature rejected by user'));
     });

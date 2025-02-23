@@ -37,8 +37,8 @@ export async function deployERC721Token(deployer: Wallet, allowlistAddress: stri
     GAS_OVERRIDES
   );
 
-  await testTokenContract.deployed();
-  console.log(`Test ERC721 token contract deployed: ${testTokenContract.address}`)
+  await testTokenContract.waitForDeployment();
+  console.log(`Test ERC721 token contract deployed: ${await testTokenContract.getAddress()}`)
 
   const minterRoleTx = await testTokenContract.grantMinterRole(deployerAddress, GAS_OVERRIDES);
   await minterRoleTx.wait()

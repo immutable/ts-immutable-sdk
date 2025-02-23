@@ -1,6 +1,5 @@
 import { createContext, useReducer } from 'react';
-import { Checkout } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
+import { Checkout, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { ConnectWidgetViews } from '../view-context/ConnectViewContextTypes';
 
 export enum ConnectionStatus {
@@ -16,7 +15,7 @@ export interface ConnectLoaderState {
   connectionStatus: ConnectionStatus;
   deepLink?: ConnectWidgetViews;
   checkout?: Checkout,
-  provider?: Web3Provider,
+  provider?: WrappedBrowserProvider,
 }
 
 export const initialConnectLoaderState: ConnectLoaderState = {
@@ -55,7 +54,7 @@ export interface SetCheckoutPayload {
 
 export interface SetProviderPayload {
   type: ConnectLoaderActions.SET_PROVIDER;
-  provider: Web3Provider;
+  provider: WrappedBrowserProvider;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention

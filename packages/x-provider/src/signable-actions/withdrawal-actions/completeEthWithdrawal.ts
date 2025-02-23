@@ -1,8 +1,7 @@
-import { Signer } from '@ethersproject/abstract-signer';
-import { TransactionResponse } from '@ethersproject/providers';
 import {
   StarkSigner,
 } from '@imtbl/x-client';
+import { Signer, TransactionResponse } from 'ethers';
 import { ProviderConfiguration } from '../../config';
 import { isRegisteredOnChain } from '../registration';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
@@ -45,7 +44,7 @@ export async function completeEthWithdrawalAction({
 
   const assetType = await getEncodeAssetInfo('asset', EthTokenType, config.immutableXConfig);
 
-  if (!v3Balance.isZero() && !v3Balance.isNegative()) {
+  if (v3Balance > 0) {
     const isRegistered = await isRegisteredOnChain(
       starkPublicKey,
       ethSigner,
@@ -62,7 +61,7 @@ export async function completeEthWithdrawalAction({
       config.immutableXConfig,
     );
   }
-  if (!v4Balance.isZero() && !v4Balance.isNegative()) {
+  if (v4Balance > 0) {
     return executeWithdrawFungible(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
   }
   throw new Error('No balance to withdraw');

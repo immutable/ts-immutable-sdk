@@ -2,7 +2,7 @@ import {
   FeeAmount, Pool, Route, TickMath,
 } from '@uniswap/v3-sdk';
 import { TradeType } from '@uniswap/sdk-core';
-import { BigNumber, utils } from 'ethers';
+import { formatEther, parseEther, AbiCoder } from 'ethers';
 import { ProviderCallError } from '../errors';
 import { getQuotesForRoutes, Provider } from './getQuotesForRoutes';
 import {
@@ -39,10 +39,10 @@ const buildProvider = (send: jest.Mock): Provider => ({ send });
 
 describe('getQuotesForRoutes', () => {
   it('makes an eth_call against the provider', async () => {
-    const expectedAmountOut = utils.parseEther('1000');
+    const expectedAmountOut = parseEther('1000');
     const expectedGasEstimate = '100000';
 
-    const returnData = utils.defaultAbiCoder.encode(types, [
+    const returnData = AbiCoder.defaultAbiCoder().encode(types, [
       expectedAmountOut,
       '100',
       '1',
@@ -73,7 +73,7 @@ describe('getQuotesForRoutes', () => {
         jest.fn().mockRejectedValue(new ProviderCallError('an rpc error message')),
       );
 
-      const amount = newAmount(BigNumber.from('123123'), WETH_TEST_TOKEN);
+      const amount = newAmount(BigInt('123123'), WETH_TEST_TOKEN);
 
       const quoteResults = await getQuotesForRoutes(
         provider,
@@ -88,10 +88,10 @@ describe('getQuotesForRoutes', () => {
 
   describe('when one call of two in the batch fail', () => {
     it('returns one quote results', async () => {
-      const expectedAmountOut = utils.parseEther('1000');
+      const expectedAmountOut = parseEther('1000');
       const expectedGasEstimate = '100000';
 
-      const returnData = utils.defaultAbiCoder.encode(types, [
+      const returnData = AbiCoder.defaultAbiCoder().encode(types, [
         expectedAmountOut,
         '100',
         '1',
@@ -104,7 +104,7 @@ describe('getQuotesForRoutes', () => {
           .mockResolvedValueOnce(returnData),
       );
 
-      const amount = newAmount(BigNumber.from('123123'), WETH_TEST_TOKEN);
+      const amount = newAmount(BigInt('123123'), WETH_TEST_TOKEN);
 
       const quoteResults = await getQuotesForRoutes(
         provider,
@@ -119,10 +119,10 @@ describe('getQuotesForRoutes', () => {
 
   describe('with one quote', () => {
     it('returns the only quote', async () => {
-      const expectedAmountOut = utils.parseEther('1000');
+      const expectedAmountOut = parseEther('1000');
       const expectedGasEstimate = '100000';
 
-      const returnData = utils.defaultAbiCoder.encode(types, [
+      const returnData = AbiCoder.defaultAbiCoder().encode(types, [
         expectedAmountOut,
         '100',
         '1',
@@ -133,7 +133,7 @@ describe('getQuotesForRoutes', () => {
         jest.fn().mockResolvedValue(returnData),
       );
 
-      const amount = newAmount(BigNumber.from('123123'), WETH_TEST_TOKEN);
+      const amount = newAmount(BigInt('123123'), WETH_TEST_TOKEN);
       const amountOutReceived = await getQuotesForRoutes(
         provider,
         TEST_QUOTER_ADDRESS,
@@ -142,7 +142,7 @@ describe('getQuotesForRoutes', () => {
         TradeType.EXACT_INPUT,
       );
       expect(amountOutReceived.length).toEqual(1);
-      expect(formatAmount(amountOutReceived[0].amountOut)).toEqual(utils.formatEther(expectedAmountOut));
+      expect(formatAmount(amountOutReceived[0].amountOut)).toEqual(formatEther(expectedAmountOut));
       expect(formatAmount(amountOutReceived[0].amountIn)).toEqual('0.000000000000123123');
       expect(amountOutReceived[0].gasEstimate.toString()).toEqual(expectedGasEstimate);
     });
@@ -150,18 +150,18 @@ describe('getQuotesForRoutes', () => {
 
   describe('with multiple quotes', () => {
     it('returns all quotes', async () => {
-      const expectedAmountOut1 = utils.parseEther('1000');
-      const expectedAmountOut2 = utils.parseEther('2000');
+      const expectedAmountOut1 = parseEther('1000');
+      const expectedAmountOut2 = parseEther('2000');
       const expectedGasEstimate1 = '100000';
       const expectedGasEstimate2 = '200000';
 
-      const returnData1 = utils.defaultAbiCoder.encode(types, [
+      const returnData1 = AbiCoder.defaultAbiCoder().encode(types, [
         expectedAmountOut1,
         '100',
         '1',
         expectedGasEstimate1,
       ]);
-      const returnData2 = utils.defaultAbiCoder.encode(types, [
+      const returnData2 = AbiCoder.defaultAbiCoder().encode(types, [
         expectedAmountOut2,
         '100',
         '1',
@@ -172,7 +172,7 @@ describe('getQuotesForRoutes', () => {
         jest.fn().mockResolvedValueOnce(returnData1).mockResolvedValueOnce(returnData2),
       );
 
-      const amount = newAmount(BigNumber.from('123123'), WETH_TEST_TOKEN);
+      const amount = newAmount(BigInt('123123'), WETH_TEST_TOKEN);
       const amountOutReceived = await getQuotesForRoutes(
         provider,
         TEST_QUOTER_ADDRESS,
@@ -182,11 +182,11 @@ describe('getQuotesForRoutes', () => {
       );
       expect(amountOutReceived.length).toBe(2);
       expect(formatAmount(amountOutReceived[0].amountOut)).toBe(
-        utils.formatEther(expectedAmountOut1),
+        formatEther(expectedAmountOut1),
       );
       expect(amountOutReceived[0].gasEstimate.toString()).toEqual(expectedGasEstimate1);
       expect(formatAmount(amountOutReceived[1].amountOut)).toBe(
-        utils.formatEther(expectedAmountOut2),
+        formatEther(expectedAmountOut2),
       );
       expect(amountOutReceived[1].gasEstimate.toString()).toEqual(expectedGasEstimate2);
     });

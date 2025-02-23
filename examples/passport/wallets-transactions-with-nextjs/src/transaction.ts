@@ -1,10 +1,12 @@
 import { passport } from '@imtbl/sdk';
-import { ethers, providers } from 'ethers';
+import { BrowserProvider, ethers } from 'ethers';
 
 export async function sendTransaction(passportInstance: passport.Passport) {
-  const provider = passportInstance.connectEvm();
-  const web3Provider = new providers.Web3Provider(provider);
-  const signer = web3Provider.getSigner();
+  // #doc passport-evm-login-outside-component
+  const provider = await passportInstance.connectEvm();
+  // #enddoc passport-evm-login-outside-component
+  const browserProvider = new BrowserProvider(provider);
+  const signer = await browserProvider.getSigner();
 
   const [userAddress] = await provider.request({ method: 'eth_requestAccounts' });
   const toAddress = process.env.NEXT_PUBLIC_TO_ADDRESS ?? '0x000';

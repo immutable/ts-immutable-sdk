@@ -6,7 +6,6 @@ import replace from '@rollup/plugin-replace';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
 import swc from 'unplugin-swc'
 
-const DEVELOPMENT = 'development';
 const PRODUCTION = 'production';
 
 const isProduction = process.env.NODE_ENV === PRODUCTION
@@ -17,9 +16,10 @@ const defaultPlugins = [
     preventAssignment: true,
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || PRODUCTION),
   }),
-  isProduction ? typescript({customConditions: ["default"]}) : swc.rollup({ jsc: { 
-    transform: { react: { development: true, runtime: 'automatic' }},
-  } }),
+  isProduction ? typescript({customConditions: ["default"], declaration: false, outDir: 'dist/browser'}) 
+    : swc.rollup({ jsc: { 
+      transform: { react: { development: true, runtime: 'automatic' }},
+    } }),
 ]
 
 const productionPlugins = [
@@ -30,10 +30,11 @@ const productionPlugins = [
   }),
   nodePolyfills(),
   commonjs(),
+
 ]
 
 const getPlugins = () => {
-  if (process.env.NODE_ENV === DEVELOPMENT) {
+  if (process.env.NODE_ENV !== PRODUCTION) {
     return defaultPlugins;
   }
 
@@ -43,33 +44,33 @@ const getPlugins = () => {
   ];
 }
 
-const isDevelopment = () => process.env.NODE_ENV === DEVELOPMENT;
-
+/**
+ * @type {import('rollup').RollupOptions[]}
+ */
 export default [
   {
-    watch: isDevelopment(),
     input: 'src/index.ts',
     output: {
-      dir: 'dist',
+      dir: 'dist/browser',
       format: 'es',
-      inlineDynamicImports: isDevelopment()
+      inlineDynamicImports: !isProduction
     },
     plugins: [
       ...getPlugins(),
     ]
   },
-  {
-    watch: false,
-    input: 'src/index.ts',
-    output: {
-      file: 'dist/widgets.js',
-      format: 'umd',
-      name: 'ImmutableCheckoutWidgets',
-      inlineDynamicImports: true
+  ...(process.env.NODE_ENV === PRODUCTION ? [
+    {
+      input: 'src/index.ts',
+      output: {
+        file: 'dist/browser/index.cdn.js',
+        format: 'umd',
+        name: 'ImmutableCheckoutWidgets',
+        inlineDynamicImports: true
     },
     context: 'window',
     plugins: [
       ...getPlugins(),
     ]
-  }
+  }] : []),
 ]

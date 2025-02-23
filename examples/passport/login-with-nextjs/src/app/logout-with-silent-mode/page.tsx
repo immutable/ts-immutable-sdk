@@ -13,7 +13,7 @@ export default function SimplifiedLoginWithPassport() {
   const loginWithPassport = async () => {
     if (!passportInstance) return;
     try {
-      const provider = passportInstance.connectEvm();
+      const provider = await passportInstance.connectEvm();
       const accounts = await provider.request({ method: 'eth_requestAccounts' });
       if (accounts && accounts.length > 0) {
         setIsLoggedIn(true);
