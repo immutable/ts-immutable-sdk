@@ -221,7 +221,7 @@ describe('Passport', () => {
 
     it('should announce the provider by default', async () => {
       passportProviderInfo.uuid = 'mock123';
-      const provider = passport.connectEvm();
+      const provider = await passport.connectEvm();
 
       expect(announceProvider).toHaveBeenCalledWith({
         info: passportProviderInfo,
@@ -237,18 +237,18 @@ describe('Passport', () => {
         ...oidcConfiguration,
       });
 
-      passportInstance.connectEvm({ announceProvider: false });
+      await passportInstance.connectEvm({ announceProvider: false });
 
       expect(announceProvider).not.toHaveBeenCalled();
     });
 
-    it('should call track error function if an error occurs', () => {
+    it('should call track error function if an error occurs', async () => {
       (ZkEvmProvider as jest.Mock).mockImplementation(() => {
         throw new Error('Error');
       });
 
       try {
-        passport.connectEvm();
+        await passport.connectEvm();
       } catch (e) {
         expect(trackError).toHaveBeenCalledWith(
           'passport',

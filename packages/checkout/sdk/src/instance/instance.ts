@@ -6,7 +6,7 @@ import {
   TokenBridge,
 } from '@imtbl/bridge-sdk';
 import { ImmutableConfiguration } from '@imtbl/config';
-import { ethers } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 import { Exchange } from '@imtbl/dex-sdk';
 import { Orderbook } from '@imtbl/orderbook';
 import { BlockchainData } from '@imtbl/blockchain-data';
@@ -17,7 +17,7 @@ import { CheckoutConfiguration } from '../config';
 export function createBridgeInstance(
   fromChainId: ChainId,
   toChainId: ChainId,
-  readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
+  readOnlyProviders: Map<ChainId, JsonRpcProvider>,
   config: CheckoutConfiguration,
 ): TokenBridge {
   const rootChainProvider = readOnlyProviders.get(fromChainId);

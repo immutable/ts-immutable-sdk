@@ -7,6 +7,7 @@ on:
       - completed
     branches:
       - main
+  workflow_dispatch:
 
 concurrency:
   group: public-docs
@@ -20,7 +21,7 @@ jobs:
       is_alpha: ${{ steps.alpha_check.outputs.is_alpha }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
 
@@ -58,12 +59,12 @@ jobs:
         run: failure("SDK reference docs should be only published from main branch, current branch ${{ github.ref }}")
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
 
       - name: Checkout Docs Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           repository: immutable/docs
           token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
@@ -85,25 +86,11 @@ jobs:
           git config --global user.name "${GITHUB_ACTOR}"
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: "yarn"
-
-      - name: Restore cached node_modules
-        id: restore-cache-node_modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-build-cache-deps-docs-${{ hashFiles('yarn.lock') }}
-
-      - name: Install dependencies
-        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true'
-        run: yarn install --immutable
+      - name: setup
+        uses: ./.github/actions/setup
 
       - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
+        run: export NODE_OPTIONS=--max-old-space-size=6144 && pnpm build
 
       - name: Update SDK package.json version
         run: |
@@ -112,7 +99,7 @@ jobs:
         shell: bash
 
       - name: Build SDK Docs
-        run: yarn docs:build
+        run: pnpm docs:build
 
       - name: Update version link
         run: ./.github/scripts/update-docs-link.sh

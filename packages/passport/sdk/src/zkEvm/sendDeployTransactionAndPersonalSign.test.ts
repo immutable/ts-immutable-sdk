@@ -1,7 +1,5 @@
-import { StaticJsonRpcProvider } from '@ethersproject/providers';
-import { Signer } from '@ethersproject/abstract-signer';
 import { Flow } from '@imtbl/metrics';
-import { BigNumber } from 'ethers';
+import { Signer, JsonRpcProvider } from 'ethers';
 import { sendDeployTransactionAndPersonalSign } from './sendDeployTransactionAndPersonalSign';
 import { mockUserZkEvm } from '../test/mocks';
 import { RelayerClient } from './relayerClient';
@@ -18,7 +16,7 @@ describe('sendDeployTransactionAndPersonalSign', () => {
   const transactionHash = 'transactionHash123';
   const signedMessage = 'signedMessage123';
 
-  const nonce = BigNumber.from(5);
+  const nonce = BigInt(5);
 
   const params = ['message to sign'];
   const rpcProvider = {
@@ -59,7 +57,7 @@ describe('sendDeployTransactionAndPersonalSign', () => {
     await sendDeployTransactionAndPersonalSign({
       params,
       ethSigner,
-      rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+      rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
       zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
       guardianClient: guardianClient as unknown as GuardianClient,
@@ -69,7 +67,7 @@ describe('sendDeployTransactionAndPersonalSign', () => {
     expect(transactionHelpers.prepareAndSignTransaction).toHaveBeenCalledWith({
       transactionRequest: { to: mockUserZkEvm.zkEvm.ethAddress, value: 0 },
       ethSigner,
-      rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+      rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
       guardianClient: guardianClient as unknown as GuardianClient,
       zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
@@ -81,7 +79,7 @@ describe('sendDeployTransactionAndPersonalSign', () => {
     await sendDeployTransactionAndPersonalSign({
       params,
       ethSigner,
-      rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+      rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
       zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
       guardianClient: guardianClient as unknown as GuardianClient,
@@ -92,7 +90,7 @@ describe('sendDeployTransactionAndPersonalSign', () => {
       params,
       ethSigner,
       zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
-      rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+      rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       guardianClient: guardianClient as unknown as GuardianClient,
       relayerClient: relayerClient as unknown as RelayerClient,
       flow: flow as unknown as Flow,
@@ -103,7 +101,7 @@ describe('sendDeployTransactionAndPersonalSign', () => {
     await sendDeployTransactionAndPersonalSign({
       params,
       ethSigner,
-      rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+      rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
       zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
       guardianClient: guardianClient as unknown as GuardianClient,
@@ -121,7 +119,7 @@ describe('sendDeployTransactionAndPersonalSign', () => {
     const result = await sendDeployTransactionAndPersonalSign({
       params,
       ethSigner,
-      rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+      rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
       zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
       guardianClient: guardianClient as unknown as GuardianClient,
@@ -135,7 +133,7 @@ describe('sendDeployTransactionAndPersonalSign', () => {
     await sendDeployTransactionAndPersonalSign({
       params,
       ethSigner,
-      rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+      rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
       zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
       guardianClient: guardianClient as unknown as GuardianClient,
@@ -153,7 +151,7 @@ describe('sendDeployTransactionAndPersonalSign', () => {
       sendDeployTransactionAndPersonalSign({
         params,
         ethSigner,
-        rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+        rpcProvider: rpcProvider as unknown as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
         zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
         guardianClient: guardianClient as unknown as GuardianClient,

@@ -1,4 +1,7 @@
-import { Web3Provider } from '@ethersproject/providers';
+import {
+  BrowserProvider, BrowserProviderOptions, Eip1193Provider as EthersEip1193Provider, Networkish,
+} from 'ethers';
+import { EIP1193Provider } from './eip1193';
 
 /**
  * Enum representing the names of different wallet providers.
@@ -28,12 +31,12 @@ export interface CreateProviderParams {
 }
 
 /**
- * Represents the result of creating a Web3 provider {@link Checkout.createProvider}.
- * @property {Web3Provider} provider - The created Web3 provider.
+ * Represents the result of creating a WrappedBrowserProvider {@link Checkout.createProvider}.
+ * @property {WrappedBrowserProvider} provider - The created Browser provider.
  * @property {WalletProviderName} walletProviderName - The wallet provider name of the provider that was created.
  */
 export type CreateProviderResult = {
-  provider: Web3Provider,
+  provider: WrappedBrowserProvider,
   walletProviderName: WalletProviderName
 };
 
@@ -46,3 +49,22 @@ export const validateProviderDefaults: ValidateProviderOptions = {
   allowMistmatchedChainId: false,
   allowUnsupportedProvider: false,
 };
+
+export class WrappedBrowserProvider extends BrowserProvider {
+  ethereumProvider: EIP1193Provider | undefined;
+
+  // eslint-disable-next-line max-len
+  constructor(ethereum: EthersEip1193Provider, network?: Networkish, _options?: BrowserProviderOptions) {
+    super(ethereum, network, _options);
+
+    this.#setEthereumProvider(ethereum);
+  }
+
+  #setEthereumProvider(ethereum: EthersEip1193Provider) {
+    if (!('request' in ethereum) || typeof ethereum.request !== 'function') {
+      return;
+    }
+
+    this.ethereumProvider = ethereum as unknown as EIP1193Provider;
+  }
+}

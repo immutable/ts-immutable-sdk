@@ -1,13 +1,12 @@
 import Connect from '../components/Connect';
 import { useMemo, useState } from 'react';
 import SwitchNetwork from '../components/SwitchNetwork';
-import { Web3Provider } from '@ethersproject/providers';
 import GetAllBalances from '../components/GetAllBalances';
 import CheckConnection from '../components/CheckConnection';
 import GetAllowList from '../components/GetAllowList';
 import { Body, Box, Checkbox, Divider, Heading } from '@biom3/react';
 import GetBalance from '../components/GetBalance';
-import { Checkout } from '@imtbl/checkout-sdk';
+import { Checkout, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import Provider from '../components/Provider';
 import SendTransaction from '../components/SendTransaction';
@@ -19,7 +18,7 @@ export default function ConnectWidget() {
   const checkout = useMemo(() => {
     return new Checkout({ baseConfig: { environment: environment } });
   }, [environment]);
-  const [provider, setProvider] = useState<Web3Provider>();
+  const [provider, setProvider] = useState<WrappedBrowserProvider>();
 
   function toggleEnvironment() {
     if (environment === Environment.PRODUCTION) {
@@ -28,6 +27,9 @@ export default function ConnectWidget() {
       setEnvironment(Environment.PRODUCTION);
     }
   }
+
+  console.log('qwerqewrqwer')
+  console.log(checkout.getInjectedProviders())
 
   return (
     <div>

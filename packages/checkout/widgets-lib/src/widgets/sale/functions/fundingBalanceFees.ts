@@ -1,6 +1,6 @@
-import { utils } from 'ethers';
 import { Fee, FundingStepType, TokenInfo } from '@imtbl/checkout-sdk';
 import { TFunction } from 'i18next';
+import { formatUnits } from 'ethers';
 import {
   calculateCryptoToFiat,
   abbreviateWalletAddress,
@@ -15,7 +15,7 @@ const getTotalFeesBySymbol = (
   fees: Fee[],
   tokenInfo?: TokenInfo,
 ): FeesBySymbol => fees
-  .filter((fee) => fee.amount.gt(0) && fee.token)
+  .filter((fee) => fee.amount > 0 && fee.token)
   .reduce((acc, fee) => {
     if (!fee.token) return acc;
 
@@ -33,13 +33,13 @@ const getTotalFeesBySymbol = (
     if (!key) return acc;
 
     if (acc[key]) {
-      const newAmount = acc[key].amount.add(fee.amount);
+      const newAmount = acc[key].amount + fee.amount;
       return {
         ...acc,
         [key]: {
           ...acc[key],
           amount: newAmount,
-          formattedAmount: utils.formatUnits(newAmount, token.decimals),
+          formattedAmount: formatUnits(newAmount, token.decimals),
         },
       };
     }
@@ -50,7 +50,7 @@ const getTotalFeesBySymbol = (
         [key]: {
           ...fee,
           token,
-          formattedAmount: utils.formatUnits(fee.amount, token.decimals),
+          formattedAmount: formatUnits(fee.amount, token.decimals),
         },
       };
     }
@@ -87,8 +87,8 @@ export const getFundingBalanceFeeBreakDown = (
   }
 
   const addFee = (fee: Fee, label: string, prefix: string = '~ ') => {
-    if (fee.amount.gt(0)) {
-      const formattedFee = utils.formatUnits(fee.amount, fee?.token?.decimals);
+    if (fee.amount > 0) {
+      const formattedFee = formatUnits(fee.amount, fee?.token?.decimals);
 
       feesBreakdown.push({
         label,

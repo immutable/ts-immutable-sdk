@@ -5,7 +5,7 @@ import { getLocalhostProvider } from './helpers/provider';
 import { getFulfillerWallet, getOffererWallet } from './helpers/signers';
 import { deployTestToken } from './helpers/erc721';
 import { waitForOrderToBeOfStatus } from './helpers/order';
-import { getConfigFromEnv } from './helpers';
+import { getConfigFromEnv, getRandomTokenId } from './helpers';
 import { actionAll } from './helpers/actions';
 
 describe('fulfil order', () => {
@@ -25,7 +25,7 @@ describe('fulfil order', () => {
     });
 
     const { contract } = await deployTestToken(offerer);
-    await contract.safeMint(offerer.address);
+    await contract.safeMint(offerer.address, getRandomTokenId());
 
     const listing = await sdk.prepareListing({
       makerAddress: offerer.address,
@@ -34,7 +34,7 @@ describe('fulfil order', () => {
         type: 'NATIVE',
       },
       sell: {
-        contractAddress: contract.address,
+        contractAddress: await contract.getAddress(),
         tokenId: '0',
         type: 'ERC721',
       },

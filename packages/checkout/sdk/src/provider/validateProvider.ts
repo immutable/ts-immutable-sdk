@@ -1,39 +1,35 @@
 // this function needs to be in a separate file to prevent circular dependencies with ./network
 
-import { Web3Provider } from '@ethersproject/providers';
+import { Eip1193Provider } from 'ethers';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { CheckoutConfiguration } from '../config';
 import {
+  WrappedBrowserProvider,
   NetworkFilterTypes, ValidateProviderOptions, validateProviderDefaults,
 } from '../types';
 import { getNetworkAllowList } from '../network';
 import { getUnderlyingChainId } from './getUnderlyingProvider';
 
-export function isWeb3Provider(
-  web3Provider: Web3Provider,
+export function isWrappedBrowserProvider(
+  browserProvider: WrappedBrowserProvider | Eip1193Provider,
 ): boolean {
-  if (web3Provider && web3Provider.provider?.request && typeof web3Provider.provider.request === 'function') {
-    return true;
-  }
-  return false;
+  return browserProvider && 'send' in browserProvider && typeof browserProvider.send === 'function';
 }
 
 export async function validateProvider(
   config: CheckoutConfiguration,
-  web3Provider: Web3Provider,
+  browserProvider: WrappedBrowserProvider | Eip1193Provider,
   validateProviderOptions?: ValidateProviderOptions,
-): Promise<Web3Provider> {
+): Promise<WrappedBrowserProvider> {
   return withCheckoutError(
     async () => {
-      if ((web3Provider.provider as any)?.isPassport) {
-        // if Passport skip the validation checks
-        return web3Provider;
+      if ('request' in browserProvider) {
+        return new WrappedBrowserProvider(browserProvider);
       }
-      if (!isWeb3Provider(web3Provider)) {
-        throw new CheckoutError(
-          'Parsed provider is not a valid Web3Provider',
-          CheckoutErrorType.WEB3_PROVIDER_ERROR,
-        );
+
+      if (browserProvider.ethereumProvider?.isPassport) {
+        // if Passport skip the validation checks
+        return browserProvider;
       }
 
       // this sets the default options and overrides them with any parsed options
@@ -42,23 +38,22 @@ export async function validateProvider(
         ...validateProviderOptions,
       };
 
-      const underlyingChainId = await getUnderlyingChainId(web3Provider);
-      let web3ChainId:number = web3Provider.network?.chainId;
+      const underlyingChainId = await getUnderlyingChainId(browserProvider);
+      let web3ChainId = (await browserProvider.getNetwork()).chainId;
 
       try {
-        web3ChainId = web3Provider.network?.chainId;
         if (!web3ChainId) {
-          web3ChainId = (await web3Provider.getNetwork()).chainId;
+          web3ChainId = (await browserProvider.getNetwork()).chainId;
         }
       } catch (err) {
         throw new CheckoutError(
-          'Unable to detect the web3Provider network',
+          'Unable to detect the browserProvider network',
           CheckoutErrorType.WEB3_PROVIDER_ERROR,
           { error: err },
         );
       }
 
-      if (web3ChainId !== underlyingChainId && !options.allowMistmatchedChainId) {
+      if (web3ChainId !== BigInt(underlyingChainId) && !options.allowMistmatchedChainId) {
         // eslint-disable-next-line no-console
         console.error('web3ChainId', web3ChainId, 'underlyingChainId', underlyingChainId, options);
         throw new CheckoutError(
@@ -71,7 +66,7 @@ export async function validateProvider(
         type: NetworkFilterTypes.ALL,
       });
 
-      const isAllowed = allowedNetworks.networks.some((network) => network.chainId === underlyingChainId);
+      const isAllowed = allowedNetworks.networks.some((network) => network.chainId === Number(underlyingChainId));
 
       if (!isAllowed && !options.allowUnsupportedProvider) {
         throw new CheckoutError(
@@ -79,7 +74,7 @@ export async function validateProvider(
           CheckoutErrorType.WEB3_PROVIDER_ERROR,
         );
       }
-      return web3Provider;
+      return browserProvider;
     },
     {
       type: CheckoutErrorType.WEB3_PROVIDER_ERROR,

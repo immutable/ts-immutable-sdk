@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { utils } from 'ethers';
+import { parseUnits } from 'ethers';
 import { useSlippage } from './useSlippage';
 import { Token } from '../types';
 
@@ -48,7 +48,7 @@ export const useRouteCalculation = () => {
      */
   const convertToFormattedFromAmount = (amount: string, decimals: number) => {
     const parsedFromAmount = parseFloat(amount).toFixed(decimals);
-    const formattedFromAmount = utils.parseUnits(parsedFromAmount, decimals);
+    const formattedFromAmount = parseUnits(parsedFromAmount, decimals);
     return formattedFromAmount.toString();
   };
 

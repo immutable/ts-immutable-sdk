@@ -33,8 +33,8 @@ export async function deployERC1155Token(deployer: Wallet, allowlistAddress: str
       GAS_OVERRIDES
   );
 
-  await testTokenContract.deployed();
-  console.log(`Test ERC1155 token contract deployed: ${testTokenContract.address}`)
+  await testTokenContract.waitForDeployment();
+  console.log(`Test ERC1155 token contract deployed: ${await testTokenContract.getAddress()}`)
 
   const minterRoleTx = await testTokenContract.grantMinterRole(deployerAddress, GAS_OVERRIDES);
   await minterRoleTx.wait()

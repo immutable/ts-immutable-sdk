@@ -3,40 +3,27 @@
 /* eslint-disable */
 import type {
   BaseContract,
-  BigNumber,
   BigNumberish,
   BytesLike,
-  CallOverrides,
-  ContractTransaction,
-  Overrides,
-  PopulatedTransaction,
-  Signer,
-  utils,
+  FunctionFragment,
+  Result,
+  Interface,
+  AddressLike,
+  ContractRunner,
+  ContractMethod,
+  Listener,
 } from "ethers";
-import type { FunctionFragment, Result } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
 import type {
-  TypedEventFilter,
-  TypedEvent,
+  TypedContractEvent,
+  TypedDeferredTopicFilter,
+  TypedEventLog,
   TypedListener,
-  OnEvent,
-  PromiseOrValue,
+  TypedContractMethod,
 } from "../../common";
 
-export interface RegistrationInterface extends utils.Interface {
-  functions: {
-    "imx()": FunctionFragment;
-    "isRegistered(uint256)": FunctionFragment;
-    "registerAndDepositNft(address,uint256,bytes,uint256,uint256,uint256)": FunctionFragment;
-    "registerAndWithdraw(address,uint256,bytes,uint256)": FunctionFragment;
-    "registerAndWithdrawNft(address,uint256,bytes,uint256,uint256)": FunctionFragment;
-    "registerAndWithdrawNftTo(address,uint256,bytes,uint256,uint256,address)": FunctionFragment;
-    "registerAndWithdrawTo(address,uint256,bytes,uint256,address)": FunctionFragment;
-    "regsiterAndWithdrawAndMint(address,uint256,bytes,uint256,bytes)": FunctionFragment;
-  };
-
+export interface RegistrationInterface extends Interface {
   getFunction(
-    nameOrSignatureOrTopic:
+    nameOrSignature:
       | "imx"
       | "isRegistered"
       | "registerAndDepositNft"
@@ -50,68 +37,45 @@ export interface RegistrationInterface extends utils.Interface {
   encodeFunctionData(functionFragment: "imx", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "isRegistered",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "registerAndDepositNft",
     values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
+      AddressLike,
+      BigNumberish,
+      BytesLike,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish
     ]
   ): string;
   encodeFunctionData(
     functionFragment: "registerAndWithdraw",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [AddressLike, BigNumberish, BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "registerAndWithdrawNft",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [AddressLike, BigNumberish, BytesLike, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "registerAndWithdrawNftTo",
     values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<string>
+      AddressLike,
+      BigNumberish,
+      BytesLike,
+      BigNumberish,
+      BigNumberish,
+      AddressLike
     ]
   ): string;
   encodeFunctionData(
     functionFragment: "registerAndWithdrawTo",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<string>
-    ]
+    values: [AddressLike, BigNumberish, BytesLike, BigNumberish, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "regsiterAndWithdrawAndMint",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>
-    ]
+    values: [AddressLike, BigNumberish, BytesLike, BigNumberish, BytesLike]
   ): string;
 
   decodeFunctionResult(functionFragment: "imx", data: BytesLike): Result;
@@ -143,353 +107,221 @@ export interface RegistrationInterface extends utils.Interface {
     functionFragment: "regsiterAndWithdrawAndMint",
     data: BytesLike
   ): Result;
-
-  events: {};
 }
 
 export interface Registration extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(runner?: ContractRunner | null): Registration;
+  waitForDeployment(): Promise<this>;
 
   interface: RegistrationInterface;
 
-  queryFilter<TEvent extends TypedEvent>(
-    event: TypedEventFilter<TEvent>,
+  queryFilter<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TEvent>>;
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
+  queryFilter<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    fromBlockOrBlockhash?: string | number | undefined,
+    toBlock?: string | number | undefined
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
 
-  listeners<TEvent extends TypedEvent>(
-    eventFilter?: TypedEventFilter<TEvent>
-  ): Array<TypedListener<TEvent>>;
-  listeners(eventName?: string): Array<Listener>;
-  removeAllListeners<TEvent extends TypedEvent>(
-    eventFilter: TypedEventFilter<TEvent>
-  ): this;
-  removeAllListeners(eventName?: string): this;
-  off: OnEvent<this>;
-  on: OnEvent<this>;
-  once: OnEvent<this>;
-  removeListener: OnEvent<this>;
+  on<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  on<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-  functions: {
-    imx(overrides?: CallOverrides): Promise<[string]>;
+  once<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  once<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-    isRegistered(
-      starkKey: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
+  listeners<TCEvent extends TypedContractEvent>(
+    event: TCEvent
+  ): Promise<Array<TypedListener<TCEvent>>>;
+  listeners(eventName?: string): Promise<Array<Listener>>;
+  removeAllListeners<TCEvent extends TypedContractEvent>(
+    event?: TCEvent
+  ): Promise<this>;
 
-    registerAndDepositNft(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  imx: TypedContractMethod<[], [string], "view">;
 
-    registerAndWithdraw(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  isRegistered: TypedContractMethod<
+    [starkKey: BigNumberish],
+    [boolean],
+    "view"
+  >;
 
-    registerAndWithdrawNft(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  registerAndDepositNft: TypedContractMethod<
+    [
+      ethKey: AddressLike,
+      starkKey: BigNumberish,
+      signature: BytesLike,
+      assetType: BigNumberish,
+      vaultId: BigNumberish,
+      tokenId: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
 
-    registerAndWithdrawNftTo(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      recipient: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  registerAndWithdraw: TypedContractMethod<
+    [
+      ethKey: AddressLike,
+      starkKey: BigNumberish,
+      signature: BytesLike,
+      assetType: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
 
-    registerAndWithdrawTo(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      recipient: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  registerAndWithdrawNft: TypedContractMethod<
+    [
+      ethKey: AddressLike,
+      starkKey: BigNumberish,
+      signature: BytesLike,
+      assetType: BigNumberish,
+      tokenId: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
 
-    regsiterAndWithdrawAndMint(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      mintingBlob: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-  };
+  registerAndWithdrawNftTo: TypedContractMethod<
+    [
+      ethKey: AddressLike,
+      starkKey: BigNumberish,
+      signature: BytesLike,
+      assetType: BigNumberish,
+      tokenId: BigNumberish,
+      recipient: AddressLike
+    ],
+    [void],
+    "nonpayable"
+  >;
 
-  imx(overrides?: CallOverrides): Promise<string>;
+  registerAndWithdrawTo: TypedContractMethod<
+    [
+      ethKey: AddressLike,
+      starkKey: BigNumberish,
+      signature: BytesLike,
+      assetType: BigNumberish,
+      recipient: AddressLike
+    ],
+    [void],
+    "nonpayable"
+  >;
 
-  isRegistered(
-    starkKey: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
+  regsiterAndWithdrawAndMint: TypedContractMethod<
+    [
+      ethKey: AddressLike,
+      starkKey: BigNumberish,
+      signature: BytesLike,
+      assetType: BigNumberish,
+      mintingBlob: BytesLike
+    ],
+    [void],
+    "nonpayable"
+  >;
 
-  registerAndDepositNft(
-    ethKey: PromiseOrValue<string>,
-    starkKey: PromiseOrValue<BigNumberish>,
-    signature: PromiseOrValue<BytesLike>,
-    assetType: PromiseOrValue<BigNumberish>,
-    vaultId: PromiseOrValue<BigNumberish>,
-    tokenId: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
+  getFunction<T extends ContractMethod = ContractMethod>(
+    key: string | FunctionFragment
+  ): T;
 
-  registerAndWithdraw(
-    ethKey: PromiseOrValue<string>,
-    starkKey: PromiseOrValue<BigNumberish>,
-    signature: PromiseOrValue<BytesLike>,
-    assetType: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  registerAndWithdrawNft(
-    ethKey: PromiseOrValue<string>,
-    starkKey: PromiseOrValue<BigNumberish>,
-    signature: PromiseOrValue<BytesLike>,
-    assetType: PromiseOrValue<BigNumberish>,
-    tokenId: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  registerAndWithdrawNftTo(
-    ethKey: PromiseOrValue<string>,
-    starkKey: PromiseOrValue<BigNumberish>,
-    signature: PromiseOrValue<BytesLike>,
-    assetType: PromiseOrValue<BigNumberish>,
-    tokenId: PromiseOrValue<BigNumberish>,
-    recipient: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  registerAndWithdrawTo(
-    ethKey: PromiseOrValue<string>,
-    starkKey: PromiseOrValue<BigNumberish>,
-    signature: PromiseOrValue<BytesLike>,
-    assetType: PromiseOrValue<BigNumberish>,
-    recipient: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  regsiterAndWithdrawAndMint(
-    ethKey: PromiseOrValue<string>,
-    starkKey: PromiseOrValue<BigNumberish>,
-    signature: PromiseOrValue<BytesLike>,
-    assetType: PromiseOrValue<BigNumberish>,
-    mintingBlob: PromiseOrValue<BytesLike>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  callStatic: {
-    imx(overrides?: CallOverrides): Promise<string>;
-
-    isRegistered(
-      starkKey: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    registerAndDepositNft(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    registerAndWithdraw(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    registerAndWithdrawNft(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    registerAndWithdrawNftTo(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      recipient: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    registerAndWithdrawTo(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      recipient: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    regsiterAndWithdrawAndMint(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      mintingBlob: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-  };
+  getFunction(
+    nameOrSignature: "imx"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "isRegistered"
+  ): TypedContractMethod<[starkKey: BigNumberish], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "registerAndDepositNft"
+  ): TypedContractMethod<
+    [
+      ethKey: AddressLike,
+      starkKey: BigNumberish,
+      signature: BytesLike,
+      assetType: BigNumberish,
+      vaultId: BigNumberish,
+      tokenId: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "registerAndWithdraw"
+  ): TypedContractMethod<
+    [
+      ethKey: AddressLike,
+      starkKey: BigNumberish,
+      signature: BytesLike,
+      assetType: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "registerAndWithdrawNft"
+  ): TypedContractMethod<
+    [
+      ethKey: AddressLike,
+      starkKey: BigNumberish,
+      signature: BytesLike,
+      assetType: BigNumberish,
+      tokenId: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "registerAndWithdrawNftTo"
+  ): TypedContractMethod<
+    [
+      ethKey: AddressLike,
+      starkKey: BigNumberish,
+      signature: BytesLike,
+      assetType: BigNumberish,
+      tokenId: BigNumberish,
+      recipient: AddressLike
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "registerAndWithdrawTo"
+  ): TypedContractMethod<
+    [
+      ethKey: AddressLike,
+      starkKey: BigNumberish,
+      signature: BytesLike,
+      assetType: BigNumberish,
+      recipient: AddressLike
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "regsiterAndWithdrawAndMint"
+  ): TypedContractMethod<
+    [
+      ethKey: AddressLike,
+      starkKey: BigNumberish,
+      signature: BytesLike,
+      assetType: BigNumberish,
+      mintingBlob: BytesLike
+    ],
+    [void],
+    "nonpayable"
+  >;
 
   filters: {};
-
-  estimateGas: {
-    imx(overrides?: CallOverrides): Promise<BigNumber>;
-
-    isRegistered(
-      starkKey: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    registerAndDepositNft(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    registerAndWithdraw(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    registerAndWithdrawNft(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    registerAndWithdrawNftTo(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      recipient: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    registerAndWithdrawTo(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      recipient: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    regsiterAndWithdrawAndMint(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      mintingBlob: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-  };
-
-  populateTransaction: {
-    imx(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    isRegistered(
-      starkKey: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    registerAndDepositNft(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      vaultId: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    registerAndWithdraw(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    registerAndWithdrawNft(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    registerAndWithdrawNftTo(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      recipient: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    registerAndWithdrawTo(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      recipient: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    regsiterAndWithdrawAndMint(
-      ethKey: PromiseOrValue<string>,
-      starkKey: PromiseOrValue<BigNumberish>,
-      signature: PromiseOrValue<BytesLike>,
-      assetType: PromiseOrValue<BigNumberish>,
-      mintingBlob: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-  };
 }

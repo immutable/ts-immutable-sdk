@@ -29,7 +29,7 @@ export class MetaMaskIMXProvider extends GenericIMXProvider {
         );
         return new MetaMaskIMXProvider(
           config,
-          metaMaskProvider.getSigner(),
+          await metaMaskProvider.getSigner(),
           this.imxSigner,
         );
       },

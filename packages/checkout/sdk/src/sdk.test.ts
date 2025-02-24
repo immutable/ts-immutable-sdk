@@ -1,10 +1,11 @@
 /*
  * @jest-environment jsdom
  */
-import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
-import { BigNumber, ethers } from 'ethers';
 import { Passport, UserProfile } from '@imtbl/passport';
+import {
+  Eip1193Provider, JsonRpcProvider, TransactionReceipt,
+} from 'ethers';
 import {
   getNetworkAllowList,
   getNetworkInfo,
@@ -32,6 +33,7 @@ import {
   TokenInfo,
   BuyToken,
   ERC721SellToken,
+  WrappedBrowserProvider,
 } from './types';
 import { getAllBalances, getBalance, getERC20Balance } from './balances';
 import { sendTransaction } from './transaction';
@@ -43,7 +45,7 @@ import {
   requestPermissions,
 } from './connect';
 import * as network from './network';
-import { createProvider, isWeb3Provider, validateProvider } from './provider';
+import { createProvider, isWrappedBrowserProvider, validateProvider } from './provider';
 import { getERC20TokenInfo, getTokenAllowList } from './tokens';
 import { getWalletAllowList } from './wallet';
 import { buy } from './smartCheckout/buy';
@@ -58,10 +60,13 @@ import { availabilityService } from './availability';
 import * as swap from './swap';
 import { SwapParams, SwapResult } from './types/swap';
 
+jest.mock('./transaction', () => ({
+  ...jest.requireActual('./transaction'),
+  sendTransaction: jest.fn(),
+}));
 jest.mock('./connect');
 jest.mock('./network');
 jest.mock('./balances');
-jest.mock('./transaction');
 jest.mock('./gasEstimate/gasEstimator');
 jest.mock('./readOnlyProviders/readOnlyProvider');
 jest.mock('./provider');
@@ -77,7 +82,7 @@ jest.mock('./availability');
 jest.mock('./swap');
 
 describe('Connect', () => {
-  let providerMock: ExternalProvider;
+  let providerMock: Eip1193Provider;
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -110,20 +115,22 @@ describe('Connect', () => {
       baseConfig: { environment: Environment.PRODUCTION },
     });
 
+    const provider = new WrappedBrowserProvider(providerMock);
+
     await checkout.connect({
-      provider: new Web3Provider(providerMock, ChainId.ETHEREUM),
+      provider,
     });
 
     expect(connectSite).toBeCalledTimes(1);
   });
 
-  it(`should call the requestPermissions function if requestWalletPermissions is
-  true and provider is not Passport`, async () => {
+  // eslint-disable-next-line max-len
+  it('should call the requestPermissions function if requestWalletPermissions is true and provider is not Passport', async () => {
     const checkout = new Checkout({
       baseConfig: { environment: Environment.PRODUCTION },
     });
 
-    const provider = new Web3Provider(providerMock, ChainId.ETHEREUM);
+    const provider = new WrappedBrowserProvider(providerMock);
     (validateProvider as jest.Mock).mockResolvedValue(provider);
 
     await checkout.connect({
@@ -135,20 +142,21 @@ describe('Connect', () => {
     expect(requestPermissions).toBeCalledWith(provider);
   });
 
-  it(`should call the connectSite function if requestWalletPermissions is
-  true and provider is Passport`, async () => {
+  it('should call the connectSite function if requestWalletPermissions is true and provider is Passport', async () => {
     const checkout = new Checkout({
       baseConfig: { environment: Environment.PRODUCTION },
     });
 
     const requestMock = jest.fn();
     providerMock = {
-      isPassport: true,
       request: requestMock,
-    } as unknown as ExternalProvider;
+      isPassport: true,
+      on: jest.fn(),
+      removeListener: jest.fn(),
+    } as Eip1193Provider;
     requestMock.mockResolvedValue('0x1');
 
-    const provider = new Web3Provider(providerMock, ChainId.ETHEREUM);
+    const provider = new WrappedBrowserProvider(providerMock);
     (validateProvider as jest.Mock).mockResolvedValue(provider);
 
     await checkout.connect({
@@ -161,7 +169,7 @@ describe('Connect', () => {
   });
 
   it('should call getBalance when no contract address provided', async () => {
-    const provider = new Web3Provider(providerMock, ChainId.ETHEREUM);
+    const provider = new WrappedBrowserProvider(providerMock);
 
     (getBalance as jest.Mock).mockResolvedValue({});
     (validateProvider as jest.Mock).mockResolvedValue(provider);
@@ -185,7 +193,7 @@ describe('Connect', () => {
       baseConfig: { environment: Environment.PRODUCTION },
     });
 
-    const provider = new Web3Provider(providerMock, ChainId.ETHEREUM);
+    const provider = new WrappedBrowserProvider(providerMock, ChainId.ETHEREUM);
     (getBalance as jest.Mock).mockResolvedValue({});
     (validateProvider as jest.Mock).mockResolvedValue(provider);
 
@@ -205,7 +213,7 @@ describe('Connect', () => {
       baseConfig: { environment: Environment.PRODUCTION },
     });
 
-    const provider = new Web3Provider(providerMock, ChainId.ETHEREUM);
+    const provider = new WrappedBrowserProvider(providerMock, ChainId.ETHEREUM);
     (getERC20TokenInfo as jest.Mock).mockResolvedValue({});
 
     await checkout.getTokenInfo({
@@ -218,7 +226,7 @@ describe('Connect', () => {
   });
 
   it('should call the switchWalletNetwork function', async () => {
-    const provider = new Web3Provider(providerMock, ChainId.ETHEREUM);
+    const provider = new WrappedBrowserProvider(providerMock);
     const switchWalletNetworkResult = {
       network: {
         name: ChainName.ETHEREUM,
@@ -265,11 +273,11 @@ describe('Connect', () => {
       baseConfig: { environment: Environment.PRODUCTION },
     });
 
-    const provider = new Web3Provider(providerMock, ChainId.ETHEREUM);
+    const provider = new WrappedBrowserProvider(providerMock);
     (validateProvider as jest.Mock).mockResolvedValue(provider);
 
     const transaction = {
-      nonce: '',
+      nonce: 0,
       gasPrice: '',
       gasLimit: '',
       to: '',
@@ -290,7 +298,7 @@ describe('Connect', () => {
 
   it('should call gasEstimate function', async () => {
     (createReadOnlyProviders as jest.Mock).mockResolvedValue(
-      {} as Map<ChainId, ethers.providers.JsonRpcProvider>,
+      {} as Map<ChainId, JsonRpcProvider>,
     );
     (gasEstimator as jest.Mock).mockResolvedValue({} as GasEstimateSwapResult);
 
@@ -314,7 +322,7 @@ describe('Connect', () => {
 
   it('should call createProvider function', async () => {
     const createProviderResult = {
-      provider: {} as Web3Provider,
+      provider: {} as WrappedBrowserProvider,
       walletProviderName: WalletProviderName.METAMASK,
     };
     (createProvider as jest.Mock).mockResolvedValue(createProviderResult);
@@ -355,7 +363,7 @@ describe('Connect', () => {
   });
 
   it('should call checkIsWalletConnected function', async () => {
-    const provider = new Web3Provider(providerMock, ChainId.ETHEREUM);
+    const provider = new WrappedBrowserProvider(providerMock);
     const checkIsWalletConnectedResult = {
       isConnected: true,
       walletAddress: '0x123',
@@ -380,11 +388,11 @@ describe('Connect', () => {
   });
 
   it('should call getAllBalances function', async () => {
-    const provider = new Web3Provider(providerMock, ChainId.ETHEREUM);
+    const provider = new WrappedBrowserProvider(providerMock);
     const getAllBalancesResult = {
       balances: [
         {
-          balance: BigNumber.from('1'),
+          balance: BigInt('1'),
           formattedBalance: '1',
           token: {
             name: 'Ethereum',
@@ -506,7 +514,7 @@ describe('Connect', () => {
   });
 
   it('should call getNetworkInfo function', async () => {
-    const provider = new Web3Provider(providerMock, ChainId.ETHEREUM);
+    const provider = new WrappedBrowserProvider(providerMock);
     const networkInfoResult = {
       name: ChainName.ETHEREUM,
       chainId: ChainId.ETHEREUM,
@@ -535,17 +543,20 @@ describe('Connect', () => {
   });
 
   it('should call buy function', async () => {
-    const provider = new Web3Provider(providerMock, ChainId.SEPOLIA);
+    const provider = new WrappedBrowserProvider(
+      providerMock,
+      ChainId.SEPOLIA,
+    );
     const buyResult = {
       requirements: [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from('1'),
+          amount: BigInt('1'),
         },
       ],
       gas: {
         type: GasTokenType.NATIVE,
-        limit: BigNumber.from('1'),
+        limit: BigInt('1'),
       },
     };
 
@@ -571,7 +582,10 @@ describe('Connect', () => {
   });
 
   it('should call sell function', async () => {
-    const provider = new Web3Provider(providerMock, ChainId.SEPOLIA);
+    const provider = new WrappedBrowserProvider(
+      providerMock,
+      ChainId.SEPOLIA,
+    );
     const sellResult = {};
 
     (validateProvider as jest.Mock).mockResolvedValue(provider);
@@ -611,7 +625,10 @@ describe('Connect', () => {
   });
 
   it('should call cancel function', async () => {
-    const provider = new Web3Provider(providerMock, ChainId.SEPOLIA);
+    const provider = new WrappedBrowserProvider(
+      providerMock,
+      ChainId.SEPOLIA,
+    );
 
     (validateProvider as jest.Mock).mockResolvedValue(provider);
     (cancel as jest.Mock).mockResolvedValue({});
@@ -635,7 +652,10 @@ describe('Connect', () => {
   });
 
   it('should call smartCheckout function', async () => {
-    const provider = new Web3Provider(providerMock, ChainId.SEPOLIA);
+    const provider = new WrappedBrowserProvider(
+      providerMock,
+      ChainId.SEPOLIA,
+    );
     const smartCheckoutResult = {};
 
     (validateProvider as jest.Mock).mockResolvedValue(provider);
@@ -653,7 +673,7 @@ describe('Connect', () => {
         type: TransactionOrGasType.GAS,
         gasToken: {
           type: GasTokenType.NATIVE,
-          limit: BigNumber.from('1'),
+          limit: BigInt('1'),
         },
       },
     };
@@ -673,7 +693,7 @@ describe('Connect', () => {
   });
 
   it('should throw error for smartCheckout function if cannot get itemRequirements', async () => {
-    const provider = new Web3Provider(
+    const provider = new WrappedBrowserProvider(
       providerMock,
       ChainId.IMTBL_ZKEVM_TESTNET,
     );
@@ -703,7 +723,7 @@ describe('Connect', () => {
         type: TransactionOrGasType.GAS,
         gasToken: {
           type: GasTokenType.NATIVE,
-          limit: BigNumber.from('1'),
+          limit: BigInt('1'),
         },
       },
     };
@@ -721,10 +741,10 @@ describe('Connect', () => {
     expect(smartCheckout).toBeCalledTimes(0);
   });
 
-  it('should call isWeb3Provider', async () => {
-    (isWeb3Provider as jest.Mock).mockResolvedValue(true);
-    const result = await Checkout.isWeb3Provider(
-      new Web3Provider(providerMock, ChainId.ETHEREUM),
+  it('should call isWrappedBrowserProvider', async () => {
+    (isWrappedBrowserProvider as jest.Mock).mockResolvedValue(true);
+    const result = Checkout.isWrappedBrowserProvider(
+      new WrappedBrowserProvider(providerMock, ChainId.ETHEREUM),
     );
     expect(result).toBeTruthy();
   });
@@ -732,7 +752,7 @@ describe('Connect', () => {
   describe('createFiatRampUrl', () => {
     let createWidgetUrlMock: jest.Mock;
     let checkout: Checkout;
-    let mockProvider: Web3Provider;
+    let mockProvider: WrappedBrowserProvider;
     let networkInfoResult: NetworkInfo;
     let getTokenAllowListResult: GetTokenAllowListResult;
 
@@ -764,7 +784,7 @@ describe('Connect', () => {
         network: {
           chainId: ChainId.ETHEREUM,
         },
-      } as unknown as Web3Provider;
+      } as unknown as WrappedBrowserProvider;
 
       networkInfoResult = {
         name: ChainName.ETHEREUM,
@@ -791,10 +811,10 @@ describe('Connect', () => {
     });
 
     it(`should call FiatRampService.createWidgetUrl with correct params
-      when only onRampProvider, exchangeType and web3Provider are provided`, async () => {
+      when only onRampProvider, exchangeType and browserProvider are provided`, async () => {
       const params: FiatRampParams = {
         exchangeType: ExchangeType.ONRAMP,
-        web3Provider: mockProvider,
+        browserProvider: mockProvider,
       };
 
       await checkout.createFiatRampUrl(params);
@@ -839,7 +859,7 @@ describe('Connect', () => {
 
       const params: FiatRampParams = {
         exchangeType: ExchangeType.ONRAMP,
-        web3Provider: mockProvider,
+        browserProvider: mockProvider,
         tokenAmount: '10',
         tokenAddress: '0xethAddr',
       };
@@ -886,7 +906,7 @@ describe('Connect', () => {
 
       const params: FiatRampParams = {
         exchangeType: ExchangeType.ONRAMP,
-        web3Provider: mockProvider,
+        browserProvider: mockProvider,
         tokenAmount: '10',
       };
 
@@ -910,13 +930,13 @@ describe('Connect', () => {
         getSigner: jest.fn().mockReturnValue({
           getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
         }),
-        network: {
+        getNetwork: jest.fn().mockResolvedValue({
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-        },
-        provider: {
+        }),
+        ethereumProvider: {
           isPassport: true,
         },
-      } as unknown as Web3Provider;
+      } as unknown as WrappedBrowserProvider;
       const mockUser: UserProfile = {
         sub: 'email|123',
         email: 'passport.user@immutable.com',
@@ -928,7 +948,7 @@ describe('Connect', () => {
 
       const params: FiatRampParams = {
         exchangeType: ExchangeType.ONRAMP,
-        web3Provider: mockProvider,
+        browserProvider: mockProvider,
         passport: mockPassport,
       };
 
@@ -995,16 +1015,19 @@ describe('Connect', () => {
 
   describe('Swap', () => {
     let checkout: Checkout;
-    let web3Provider: Web3Provider;
+    let browserProvider: WrappedBrowserProvider;
 
     beforeEach(() => {
       jest.resetAllMocks();
 
       providerMock.request = jest.fn().mockResolvedValue('0x1');
 
-      web3Provider = new Web3Provider(providerMock, ChainId.ETHEREUM);
+      browserProvider = new WrappedBrowserProvider(
+        providerMock,
+        ChainId.ETHEREUM,
+      );
 
-      (validateProvider as jest.Mock).mockResolvedValue(web3Provider);
+      (validateProvider as jest.Mock).mockResolvedValue(browserProvider);
 
       checkout = new Checkout({
         baseConfig: { environment: Environment.PRODUCTION },
@@ -1013,7 +1036,7 @@ describe('Connect', () => {
 
     it('should call swap function with correct parameters', async () => {
       const swapParams: SwapParams = {
-        provider: web3Provider,
+        provider: browserProvider,
         fromToken: { address: '0xFromTokenAddress', decimals: 18 } as TokenInfo,
         toToken: { address: '0xToTokenAddress', decimals: 18 } as TokenInfo,
         fromAmount: '1000000000000000000', // 1 ETH in wei
@@ -1038,7 +1061,7 @@ describe('Connect', () => {
               symbol: undefined,
               name: undefined,
             },
-            value: BigNumber.from('1000000000000000000'),
+            value: BigInt('1000000000000000000'),
           },
         },
         quote: {
@@ -1052,7 +1075,7 @@ describe('Connect', () => {
               symbol: undefined,
               name: undefined,
             },
-            value: BigNumber.from('1000000000000000000'),
+            value: BigInt('1000000000000000000'),
           },
           amountWithMaxSlippage: {
             token: {
@@ -1062,37 +1085,36 @@ describe('Connect', () => {
               symbol: undefined,
               name: undefined,
             },
-            value: BigNumber.from('1050000000000000000'), // Example value with 5% max slippage
+            value: BigInt('1050000000000000000'), // Example value with 5% max slippage
           },
         },
         swapReceipt: {
           to: '0xRecipientAddress',
           from: '0xSenderAddress',
           contractAddress: '0xContractAddress',
-          transactionIndex: 1,
-          gasUsed: BigNumber.from('21000'),
+          index: 1,
+          gasUsed: BigInt('21000'),
           logsBloom: '0x',
           blockHash: '0xBlockHash',
-          transactionHash: '0xTransactionHash',
+          hash: '0xTransactionHash',
           logs: [],
           blockNumber: 12345,
-          confirmations: 2,
-          cumulativeGasUsed: BigNumber.from('100000'),
-          effectiveGasPrice: BigNumber.from('20000000000'),
+          confirmations: () => Promise.resolve(2),
+          cumulativeGasUsed: BigInt('100000'),
+          gasPrice: BigInt('20000000000'),
           status: 1,
           type: 2,
-          byzantium: true,
-        },
+        } as unknown as TransactionReceipt,
       };
 
       (swap.swap as jest.Mock).mockResolvedValue(mockSwapResult);
 
       const result = await checkout.swap(swapParams);
 
-      expect(validateProvider).toHaveBeenCalledWith(checkout.config, web3Provider);
+      expect(validateProvider).toHaveBeenCalledWith(checkout.config, browserProvider);
       expect(swap.swap).toHaveBeenCalledWith(
         checkout.config,
-        web3Provider,
+        browserProvider,
         swapParams.fromToken,
         swapParams.toToken,
         swapParams.fromAmount,
@@ -1109,7 +1131,7 @@ describe('Connect', () => {
       (validateProvider as jest.Mock).mockRejectedValue(error);
 
       const swapParams: SwapParams = {
-        provider: web3Provider,
+        provider: browserProvider,
         fromToken: { address: '0xFromTokenAddress', decimals: 18 } as TokenInfo,
         toToken: { address: '0xToTokenAddress', decimals: 18 } as TokenInfo,
         fromAmount: '1000000000000000000',

@@ -1,4 +1,4 @@
-import { BigNumber, Contract, utils } from 'ethers';
+import { Contract, getAddress } from 'ethers';
 import { NATIVE } from '../constants/bridges';
 import { withBridgeError, BridgeErrorType } from '../errors';
 
@@ -14,7 +14,7 @@ import { withBridgeError, BridgeErrorType } from '../errors';
 export async function getBridgeTxCalldata(
   sender: string,
   recipient: string,
-  amount: BigNumber,
+  amount: bigint,
   token: string,
   currentBridgeMethods: Record<string, string>,
   bridgeContract: Contract,
@@ -38,7 +38,7 @@ export async function getBridgeTxCalldata(
     /**
      * Handle bridge transaction for ERC20
      */
-    const erc20Token = utils.getAddress(token);
+    const erc20Token = getAddress(token);
     if (sender === recipient) {
       // Deposit or withdraw ERC20
       functionName = currentBridgeMethods.token;

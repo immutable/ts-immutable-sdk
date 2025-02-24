@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import 'dotenv/config';
-import { ethers } from "ethers";
+import { ethers, ZeroAddress } from "ethers";
 import util from 'util';
 import { ImmutableConfiguration, Environment } from '@imtbl/config';
 import { 
@@ -42,11 +42,11 @@ async function deposit() {
     let rootBridgeChildAddress = await rootBridge.rootTokenToChildToken(params.rootToken);
     let childBridgeChildAddress = await childBridge.rootTokenToChildToken(params.rootToken);
     
-    if (rootBridgeChildAddress === ethers.constants.AddressZero) {
+    if (rootBridgeChildAddress === ZeroAddress) {
       throw new Error('token not mapped, please map token before depositing');
     }
   
-    if (childBridgeChildAddress === ethers.constants.AddressZero) {
+    if (childBridgeChildAddress === ZeroAddress) {
       throw new Error('token mapping incomplete, please wait for token to map to childBridge before depositing');
     }
   
@@ -75,15 +75,15 @@ async function deposit() {
   }
 
   if (approvalRes!.unsignedTx) {
-    const approvalNonce = await params.rootWallet.getTransactionCount();
-    const approvalGasPrice = await params.rootProvider.getGasPrice();
+    const approvalNonce = await params.rootWallet.provider?.getTransactionCount(params.rootWallet.address);
+    const approvalGasPrice = (await params.rootProvider.getFeeData()).gasPrice ?? BigInt(0);
 
     console.log('approvalNonce', approvalNonce);
     console.log('approvalGasPrice', approvalGasPrice);
 
     approvalRes!.unsignedTx.gasLimit = BridgeMethodsGasLimit.DEPOSIT_SOURCE;
     approvalRes!.unsignedTx.nonce = approvalNonce;
-    approvalRes!.unsignedTx.gasPrice = approvalGasPrice.mul(2);
+    approvalRes!.unsignedTx.gasPrice = approvalGasPrice * BigInt(2);
 
     console.log('approvalRes.unsignedTx');
     console.log(approvalRes!.unsignedTx);
@@ -92,10 +92,10 @@ async function deposit() {
     const approvalTxSig = await params.rootWallet.signTransaction(approvalRes!.unsignedTx);
     console.log('approvalTxSig', approvalTxSig);
 
-    const sendApprovalRes = await params.rootWallet.provider.sendTransaction(approvalTxSig);
+    const sendApprovalRes = await params.rootWallet.provider?.broadcastTransaction(approvalTxSig);
     console.log('sendApprovalRes', sendApprovalRes);
 
-    await waitForReceipt(sendApprovalRes.hash, params.rootProvider);
+    await waitForReceipt(sendApprovalRes?.hash, params.rootProvider);
   } else {
     console.log('no approval required');
   }
@@ -125,14 +125,14 @@ async function deposit() {
     return
   }
 
-  const depositNonce = await params.rootWallet.getTransactionCount();
-  const depositGasPrice = await params.rootProvider.getGasPrice();
+  const depositNonce = await params.rootWallet.provider?.getTransactionCount(params.rootWallet.address);
+  const depositGasPrice = (await params.rootProvider.getFeeData()).gasPrice ?? BigInt(0);
 
   depositRes!.unsignedTx.gasLimit = BridgeMethodsGasLimit.DEPOSIT_SOURCE*2;
   depositRes!.unsignedTx.nonce = depositNonce;
-  depositRes!.unsignedTx.gasPrice = depositGasPrice.mul(2);
+  depositRes!.unsignedTx.gasPrice = depositGasPrice * BigInt(2);
 
-  depositRes!.unsignedTx.value = ethers.BigNumber.from(depositRes!.unsignedTx.value);
+  depositRes!.unsignedTx.value = BigInt(depositRes!.unsignedTx.value ?? 0);
 
   console.log('depositRes.unsignedTx');
   console.log(depositRes!.unsignedTx);
@@ -141,17 +141,17 @@ async function deposit() {
   const depositTxSig = await params.rootWallet.signTransaction(depositRes!.unsignedTx);
   console.log('depositTxSig', depositTxSig);
 
-  const sendDepositRes = await params.rootWallet.provider.sendTransaction(depositTxSig);
+  const sendDepositRes = await params.rootWallet.provider?.broadcastTransaction(depositTxSig);
   console.log('sendDepositRes', sendDepositRes);
 
-  await waitForReceipt(sendDepositRes.hash, params.rootProvider);
+  await waitForReceipt(sendDepositRes?.hash, params.rootProvider);
   
-  console.log('Deposit submitted txHash:',sendDepositRes.hash);
+  console.log('Deposit submitted txHash:', sendDepositRes?.hash);
 
-  const txStatusReq:TxStatusRequest = {
+  const txStatusReq: TxStatusRequest = {
     sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
     transactions: [{
-      txHash: sendDepositRes.hash
+      txHash: sendDepositRes?.hash
     }]
   }
 

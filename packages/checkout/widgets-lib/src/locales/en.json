@@ -145,14 +145,14 @@
       },
       "swapForm": {
         "from": {
-          "label": "From",
+          "label": "Sell",
           "inputPlaceholder": "0",
-          "selectorTitle": "What are you swapping from?"
+          "selectorTitle": "What are you selling?"
         },
         "to": {
-          "label": "To",
+          "label": "Buy",
           "inputPlaceholder": "0",
-          "selectorTitle": "What are you swapping to?"
+          "selectorTitle": "What are you buying?"
         },
         "buttonText": "Swap",
         "conversionRate": "1 {{fromSymbol}} ≈ {{rate}} {{toSymbol}}, inclusive of {{fee}}% fee"
@@ -163,8 +163,8 @@
       "validation": {
         "noAmountInputted": "Please input amount",
         "insufficientBalance": "Insufficient balance",
-        "noFromTokenSelected": "Select a token to swap",
-        "noToTokenSelected": "Select a token to receive"
+        "noFromTokenSelected": "Select a token to sell",
+        "noToTokenSelected": "Select a token to buy"
       },
       "success": {
         "text": "Success",
