@@ -163,8 +163,8 @@
       "validation": {
         "noAmountInputted": "Please input amount",
         "insufficientBalance": "Insufficient balance",
-        "noFromTokenSelected": "Select a token to swap",
-        "noToTokenSelected": "Select a token to receive"
+        "noFromTokenSelected": "Select a token to sell",
+        "noToTokenSelected": "Select a token to buy"
       },
       "success": {
         "text": "Success",
