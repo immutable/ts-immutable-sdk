@@ -14,7 +14,7 @@ export default function HandleCallback() {
     }
 
     const handleCallback = async () => {
-      await passportClient.loginCallback(true);
+      await passportClient.loginCallback();
       window.location.href = window.location.origin;
     };
 
