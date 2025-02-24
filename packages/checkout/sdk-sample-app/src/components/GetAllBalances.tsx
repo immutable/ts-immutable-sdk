@@ -1,5 +1,4 @@
-import { ChainId, Checkout, GetBalanceResult } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
+import { ChainId, Checkout, GetBalanceResult, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
@@ -7,7 +6,7 @@ import { Box } from '@biom3/react';
 
 interface BalanceProps {
   checkout: Checkout | undefined;
-  provider: Web3Provider | undefined;
+  provider: WrappedBrowserProvider | undefined;
 }
 
 export default function GetAllBalances(props: BalanceProps) {
@@ -29,12 +28,12 @@ export default function GetAllBalances(props: BalanceProps) {
     setError(null);
     setLoading(true);
 
-    const walletAddress = await provider.getSigner().getAddress();
+    const walletAddress = await (await provider.getSigner()).getAddress();
     try {
       const resp = await checkout.getAllBalances({
         provider,
         walletAddress,
-        chainId: (await provider.getNetwork()).chainId,
+        chainId: Number((await provider.getNetwork()).chainId),
       });
       setResult(resp.balances);
       setLoading(false);

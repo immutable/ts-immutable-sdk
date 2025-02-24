@@ -1,19 +1,18 @@
-import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
-import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
+import { Checkout, WalletProviderName, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { createAndConnectToProvider } from './providers';
 
 describe('providerUtils', () => {
-  const mockPassportWeb3Provider = { provider: { isPassport: true } as ExternalProvider } as Web3Provider;
+  const mockPassportBrowserProvider = { ethereumProvider: { isPassport: true } } as WrappedBrowserProvider;
 
   describe('createAndConnectToProvider', () => {
     it('should return provider', () => {
       const mockCheckout = {
-        createProvider: jest.fn().mockResolvedValue({ provider: mockPassportWeb3Provider }),
+        createProvider: jest.fn().mockResolvedValue({ provider: mockPassportBrowserProvider }),
         checkIsWalletConnected: jest.fn().mockResolvedValue({ isConnected: true }),
-        connect: jest.fn().mockResolvedValue({ provider: mockPassportWeb3Provider }),
+        connect: jest.fn().mockResolvedValue({ provider: mockPassportBrowserProvider }),
       } as unknown as Checkout;
       const result = createAndConnectToProvider(mockCheckout, WalletProviderName.PASSPORT);
-      expect(result).resolves.toBe(mockPassportWeb3Provider);
+      expect(result).resolves.toBe(mockPassportBrowserProvider);
     });
 
     it('should throw error when createProvider fails', () => {
@@ -26,7 +25,7 @@ describe('providerUtils', () => {
 
     it('should throw error when checkIsWalletConnected fails', () => {
       const mockCheckout = {
-        createProvider: jest.fn().mockResolvedValue({ provider: mockPassportWeb3Provider }),
+        createProvider: jest.fn().mockResolvedValue({ provider: mockPassportBrowserProvider }),
         checkIsWalletConnected: jest.fn().mockRejectedValue(new Error('Failed to checkIsWalletConnected')),
       } as unknown as Checkout;
       const result = createAndConnectToProvider(mockCheckout, WalletProviderName.PASSPORT);
@@ -35,7 +34,7 @@ describe('providerUtils', () => {
 
     it('should throw error when connect fails', () => {
       const mockCheckout = {
-        createProvider: jest.fn().mockResolvedValue({ provider: mockPassportWeb3Provider }),
+        createProvider: jest.fn().mockResolvedValue({ provider: mockPassportBrowserProvider }),
         checkIsWalletConnected: jest.fn().mockResolvedValue({ isConnected: false }),
         connect: jest.fn().mockRejectedValue(new Error('Failed to connect')),
       } as unknown as Checkout;

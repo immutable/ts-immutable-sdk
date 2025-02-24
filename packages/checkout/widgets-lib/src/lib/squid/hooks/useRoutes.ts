@@ -1,8 +1,9 @@
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import { RouteResponse, ActionType } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
-import { utils } from 'ethers';
 import { useRef } from 'react';
+import { formatUnits } from 'ethers';
+import { WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { delay } from '../../../functions/delay';
 import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
 import { retry } from '../../retry';
@@ -17,6 +18,8 @@ import { findToken } from '../functions/findToken';
 import { isRouteToAmountGreaterThanToAmount } from '../functions/isRouteToAmountGreaterThanToAmount';
 import { useRouteCalculation } from './useRouteCalculation';
 import { RouteError } from '../RouteError';
+
+const INSUFFICIENT_GAS_THRESHOLD = 0.1;
 
 export const useRoutes = () => {
   const latestRequestIdRef = useRef<number>(0);
@@ -82,7 +85,7 @@ export const useRoutes = () => {
       .filter((value) => value !== undefined);
 
     return fromAmountDataArray.filter((data: FromAmountData) => {
-      const formattedBalance = utils.formatUnits(
+      const formattedBalance = formatUnits(
         data.balance.balance,
         data.balance.decimals,
       );
@@ -193,7 +196,7 @@ export const useRoutes = () => {
     ) => (route.route?.route.estimate.gasCosts || [])
       .filter((gasCost) => gasCost.token.chainId === chainId.toString())
       .reduce(
-        (sum, gasCost) => sum + parseFloat(utils.formatUnits(gasCost.amount, gasCost.token.decimals)),
+        (sum, gasCost) => sum + parseFloat(formatUnits(gasCost.amount, gasCost.token.decimals)),
         0,
       );
 
@@ -203,7 +206,7 @@ export const useRoutes = () => {
     ) => (route.route?.route.estimate.feeCosts || [])
       .filter((fee) => fee.token.chainId === chainId.toString())
       .reduce(
-        (sum, fee) => sum + parseFloat(utils.formatUnits(fee.amount, fee.token.decimals)),
+        (sum, fee) => sum + parseFloat(formatUnits(fee.amount, fee.token.decimals)),
         0,
       );
 
@@ -222,7 +225,7 @@ export const useRoutes = () => {
       if (!userGasBalance) return false;
 
       const userBalance = parseFloat(
-        utils.formatUnits(userGasBalance.balance, userGasBalance.decimals),
+        formatUnits(userGasBalance.balance, userGasBalance.decimals),
       );
 
       // If the fromToken is the native token, validate balance for both fromAmount and gas + fee costs
@@ -354,7 +357,51 @@ export const useRoutes = () => {
     }
   };
 
+  const hasSufficientBalance = (
+    balances: TokenBalance[],
+    toTokenAddress: string,
+    toChainId: string,
+    toAmount: string,
+  ): boolean => {
+    const matchingTokens = balances.filter(
+      (balance) => balance.address.toLowerCase() === toTokenAddress.toLowerCase()
+        && balance.chainId.toString() === toChainId.toString(),
+    );
+
+    if (matchingTokens.length > 0) {
+      return matchingTokens.some((balance) => {
+        const tokenAmount = parseFloat(formatUnits(balance.balance, balance.decimals));
+        return tokenAmount >= parseFloat(toAmount);
+      });
+    }
+
+    return false;
+  };
+
+  const hasSufficientGas = (
+    balances: TokenBalance[],
+    selectedChainId: string | number,
+    provider: WrappedBrowserProvider | undefined,
+  ): boolean => {
+    if (!provider) return false;
+    if (isPassportProvider(provider)) return true;
+
+    const nativeCurrencyBalance = balances.find(
+      (balance) => balance.address.toLowerCase() === SQUID_NATIVE_TOKEN.toLowerCase()
+        && balance.chainId.toString() === selectedChainId.toString(),
+    );
+    if (!nativeCurrencyBalance) return false;
+
+    const nativeCurrencyBalanceAmount = parseFloat(
+      formatUnits(nativeCurrencyBalance.balance, nativeCurrencyBalance.decimals),
+    );
+    if (nativeCurrencyBalanceAmount < INSUFFICIENT_GAS_THRESHOLD) return false;
+    return true;
+  };
+
   return {
+    hasSufficientBalance,
+    hasSufficientGas,
     fetchRoutes,
     getFromAmountData,
     getRoute,

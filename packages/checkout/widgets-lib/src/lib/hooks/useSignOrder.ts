@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { useCallback, useState } from 'react';
-import { SaleItem } from '@imtbl/checkout-sdk';
+import { PurchaseItem } from '@imtbl/checkout-sdk';
 
 import { ChainType, EvmContractCall, SquidCallType } from '@0xsquid/squid-types';
-import { ethers } from 'ethers';
+import { Interface } from 'ethers';
 import {
   SignResponse,
   SignOrderInput,
@@ -28,7 +28,7 @@ import { filterAllowedTransactions, hexToText } from '../utils';
 const toSignedProduct = (
   product: SignApiProduct,
   currency: string,
-  item?: SaleItem,
+  item?: PurchaseItem,
 ): SignedOrderProduct => ({
   productId: product.product_id,
   image: item?.image || '',
@@ -44,7 +44,7 @@ const toSignedProduct = (
 
 const toSignResponse = (
   signApiResponse: SignApiResponse,
-  items: SaleItem[],
+  items: PurchaseItem[],
 ): SignResponse => {
   const { order, transactions } = signApiResponse;
 
@@ -146,8 +146,8 @@ export const useSignOrder = (input: SignOrderInput) => {
       gasLimit: number,
     ): Promise<[hash: string | undefined, error?: SignOrderError]> => {
       try {
-        const signer = provider?.getSigner();
-        const gasPrice = await provider?.getGasPrice();
+        const signer = await provider?.getSigner();
+        const gasPrice = (await provider?.getFeeData())?.gasPrice;
         const txnResponse = await signer?.sendTransaction({
           to,
           data,
@@ -247,13 +247,13 @@ export const useSignOrder = (input: SignOrderInput) => {
     async (
       paymentType: SignPaymentTypes,
       fromTokenAddress: string,
+      recipientAddress: string,
+      spenderAddress?: string,
     ): Promise<SignResponse | undefined> => {
       try {
-        const signer = provider?.getSigner();
-        const address = (await signer?.getAddress()) || '';
-
         const data: SignApiRequest = {
-          recipient_address: address,
+          recipient_address: recipientAddress,
+          spender_address: spenderAddress,
           payment_type: paymentType,
           currency_filter: SignCurrencyFilter.CONTRACT_ADDRESS,
           currency_value: fromTokenAddress,
@@ -329,7 +329,7 @@ export const useSignOrder = (input: SignOrderInput) => {
     }
 
     if (approvalTxn) {
-      const erc20Interface = new ethers.utils.Interface(['function transfer(address to, uint256 amount)']);
+      const erc20Interface = new Interface(['function transfer(address to, uint256 amount)']);
       const transferPendingTokensTx = erc20Interface.encodeFunctionData(
         'transfer',
         [signApiResponse.order.recipientAddress, 0],
@@ -356,13 +356,13 @@ export const useSignOrder = (input: SignOrderInput) => {
     async (
       paymentType: SignPaymentTypes,
       fromTokenAddress: string,
+      recipientAddress: string,
+      spenderAddress?: string,
     ): Promise<{ signResponse: SignResponse; postHooks: SquidPostHookCall[] } | undefined> => {
       try {
-        const signer = provider?.getSigner();
-        const address = (await signer?.getAddress()) || '';
-
         const data: SignApiRequest = {
-          recipient_address: address,
+          spender_address: spenderAddress,
+          recipient_address: recipientAddress,
           payment_type: paymentType,
           currency_filter: SignCurrencyFilter.CONTRACT_ADDRESS,
           currency_value: fromTokenAddress,

@@ -1,38 +1,37 @@
-import type { TransactionMethods } from '@opensea/seaport-js/lib/utils/usecase';
-import { PopulatedTransaction, BigNumber } from 'ethers';
+import { PreparedTransactionRequest } from 'ethers';
 import { TransactionBuilder } from '../types';
+import { TransactionMethods } from './types';
 
 // Add 20% more gas than estimate to prevent out of gas errors
 // This can always be overwritten by the user signing the transaction
 export function prepareTransaction(
   transactionMethods: TransactionMethods,
   // chainId is required for EIP155
-  chainId: number,
+  chainId: bigint,
   callerAddress: string,
 ): TransactionBuilder {
   return async () => {
-    const v6ContractTransaction = await transactionMethods.buildTransaction();
+    const contractTransaction = await transactionMethods.buildTransaction();
 
-    const v5PopulatedTransaction: PopulatedTransaction = {
-      to: v6ContractTransaction.to,
+    const preparedTransactionRequest: PreparedTransactionRequest = {
+      to: contractTransaction.to,
       from: callerAddress,
-      type: v6ContractTransaction.type,
-      maxFeePerGas: v6ContractTransaction.maxFeePerGas
-        ? BigNumber.from(v6ContractTransaction.maxFeePerGas)
+      type: contractTransaction.type,
+      maxFeePerGas: contractTransaction.maxFeePerGas
+        ? BigInt(contractTransaction.maxFeePerGas)
         : undefined,
-      maxPriorityFeePerGas: v6ContractTransaction.maxPriorityFeePerGas
-        ? BigNumber.from(v6ContractTransaction.maxPriorityFeePerGas)
+      maxPriorityFeePerGas: contractTransaction.maxPriorityFeePerGas
+        ? BigInt(contractTransaction.maxPriorityFeePerGas)
         : undefined,
-      value: v6ContractTransaction.value ? BigNumber.from(v6ContractTransaction.value) : undefined,
-      data: v6ContractTransaction.data,
-      nonce: v6ContractTransaction.nonce,
+      value: contractTransaction.value ? BigInt(contractTransaction.value) : undefined,
+      data: contractTransaction.data,
+      nonce: contractTransaction.nonce,
       chainId,
     };
 
-    v5PopulatedTransaction.gasLimit = BigNumber.from(await transactionMethods.estimateGas());
-    v5PopulatedTransaction.gasLimit = v5PopulatedTransaction.gasLimit
-      .add(v5PopulatedTransaction.gasLimit.div(5));
+    preparedTransactionRequest.gasLimit = BigInt(await transactionMethods.estimateGas());
+    preparedTransactionRequest.gasLimit += (preparedTransactionRequest.gasLimit / BigInt(5));
 
-    return v5PopulatedTransaction;
+    return preparedTransactionRequest;
   };
 }

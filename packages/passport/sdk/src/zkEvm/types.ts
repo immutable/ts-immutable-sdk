@@ -1,4 +1,4 @@
-import { BigNumberish, BytesLike } from 'ethers';
+import { BigNumberish } from 'ethers';
 import { JsonRpcError } from './JsonRpcError';
 
 export enum RelayerTransactionStatus {
@@ -28,9 +28,9 @@ export interface FeeOption {
 
 export interface MetaTransaction {
   to: string;
-  value?: BigNumberish;
-  data?: BytesLike;
-  nonce?: BigNumberish;
+  value?: BigNumberish | null;
+  data?: string | null;
+  nonce?: BigNumberish | null;
   gasLimit?: BigNumberish;
   delegateCall?: boolean;
   revertOnError?: boolean;
@@ -42,7 +42,7 @@ export interface MetaTransactionNormalised {
   gasLimit: BigNumberish;
   target: string;
   value: BigNumberish;
-  data: BytesLike;
+  data: string;
 }
 
 // https://eips.ethereum.org/EIPS/eip-712
@@ -52,6 +52,12 @@ export interface TypedDataPayload {
     [key: string]: Array<{ name: string; type: string }>;
   };
   domain: {
+    name?: string;
+    version?: string;
+    chainId?: number | string;
+    verifyingContract?: string;
+    salt?: string;
+  } | {
     name?: string;
     version?: string;
     chainId?: number;
@@ -88,15 +94,6 @@ export interface JsonRpcResponsePayload {
 
 export type Provider = {
   request: (request: RequestArguments) => Promise<any>;
-  sendAsync: (
-    request: JsonRpcRequestPayload | JsonRpcRequestPayload[],
-    callback: JsonRpcRequestCallback
-  ) => void;
-  send: (
-    request: string | JsonRpcRequestPayload | JsonRpcRequestPayload[],
-    callbackOrParams?: JsonRpcRequestCallback | Array<any>,
-    callback?: JsonRpcRequestCallback
-  ) => void;
   on: (event: string, listener: (...args: any[]) => void) => void;
   removeListener: (event: string, listener: (...args: any[]) => void) => void;
   isPassport: boolean;

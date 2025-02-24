@@ -8,14 +8,15 @@ import {
   getFulfillerWallet,
   getLocalhostProvider,
   getOffererWallet,
-  TestToken,
+  getRandomTokenId,
+  TestERC721Token,
   waitForOrderToBeOfStatus,
 } from './helpers';
 import { actionAll } from './helpers/actions';
 
-async function deployAndMintNftContract(wallet: Wallet): Promise<TestToken> {
+async function deployAndMintNftContract(wallet: Wallet): Promise<TestERC721Token> {
   const { contract } = await deployTestToken(wallet);
-  const receipt = await contract.safeMint(wallet.address);
+  const receipt = await contract.safeMint(wallet.address, getRandomTokenId());
   await receipt.wait();
   return contract;
 }
@@ -49,8 +50,10 @@ describe('', () => {
       },
     });
 
+    const nftAddress = await nftContract.getAddress();
+
     log(
-      `Preparing soon-to-expire listing for user ${offerer.address} for NFT collection ${nftContract.address}, TokenID 0`,
+      `Preparing soon-to-expire listing for user ${offerer.address} for NFT collection ${nftAddress}, TokenID 0`,
     );
 
     // Prepare the listing details
@@ -61,7 +64,7 @@ describe('', () => {
         type: 'NATIVE',
       },
       sell: {
-        contractAddress: nftContract.address,
+        contractAddress: nftAddress,
         tokenId: '0',
         type: 'ERC721',
       },
@@ -107,10 +110,10 @@ describe('', () => {
     log('Listing all orders for the NFT collection');
 
     const listOfOrders = await sdk.listListings({
-      sellItemContractAddress: nftContract.address,
+      sellItemContractAddress: nftAddress,
     });
 
-    log(`List of orders for contract ${nftContract.address}:`);
+    log(`List of orders for contract ${nftAddress}:`);
     log(JSON.stringify(listOfOrders, null, 2));
   }, 200_000);
 });

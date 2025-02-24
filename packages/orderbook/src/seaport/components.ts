@@ -1,11 +1,11 @@
-import { ItemType, OrderType } from '@opensea/seaport-js/lib/constants';
+import { toBeHex } from 'ethers';
 import type {
   ConsiderationItem,
   OfferItem,
   OrderComponents,
-} from '@opensea/seaport-js/lib/types';
-import { BigNumber } from 'ethers';
+} from './types';
 import { getBulkOrderTree } from './lib/bulk-orders';
+import { ItemType, OrderType } from './constants';
 
 function orderTypeStringToEnum(orderTypeString: string): OrderType {
   if (
@@ -55,7 +55,7 @@ export function getOrderComponentsFromMessage(
   return {
     ...message,
     orderType: orderTypeStringToEnum(message.orderType),
-    salt: BigNumber.from(message.salt).toHexString(),
+    salt: toBeHex(BigInt(message.salt)),
     offer: message.offer.map(
       (i): OfferItem => ({
         ...i,
@@ -85,7 +85,7 @@ export function getBulkOrderComponentsFromMessage(orderMessage: string): {
     .map((orderComponentMessage): OrderComponents => ({
       ...orderComponentMessage,
       orderType: orderTypeStringToEnum(orderComponentMessage.orderType),
-      salt: BigNumber.from(orderComponentMessage.salt).toHexString(),
+      salt: toBeHex(BigInt(orderComponentMessage.salt)),
       offer: orderComponentMessage.offer.map(
         (i): OfferItem => ({
           ...i,

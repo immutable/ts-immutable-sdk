@@ -1,10 +1,10 @@
-import { Web3Provider } from '@ethersproject/providers';
 import {
   WidgetEvent,
   WidgetType,
   PurchaseEventType,
   IMTBLWidgetEvents,
   EIP6963ProviderInfo,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -26,7 +26,7 @@ export function sendPurchaseCloseEvent(eventTarget: Window | EventTarget) {
 export function sendConnectProviderSuccessEvent(
   eventTarget: Window | EventTarget,
   providerType: 'from' | 'to',
-  provider: Web3Provider,
+  provider: WrappedBrowserProvider,
   providerInfo: EIP6963ProviderInfo,
 ) {
   const successEvent = new CustomEvent<
@@ -50,7 +50,11 @@ export function sendConnectProviderSuccessEvent(
   if (eventTarget !== undefined) eventTarget.dispatchEvent(successEvent);
 }
 
-export const sendPurchaseSuccessEvent = (eventTarget: Window | EventTarget, transactionHash: string) => {
+export const sendPurchaseSuccessEvent = (
+  eventTarget: Window | EventTarget,
+  transactionHash: string,
+  fundingMethod?: string,
+) => {
   const successEvent = new CustomEvent<WidgetEvent<WidgetType.PURCHASE, PurchaseEventType.SUCCESS>>(
     IMTBLWidgetEvents.IMTBL_PURCHASE_WIDGET_EVENT,
     {
@@ -58,6 +62,7 @@ export const sendPurchaseSuccessEvent = (eventTarget: Window | EventTarget, tran
         type: PurchaseEventType.SUCCESS,
         data: {
           transactionHash,
+          fundingMethod,
         },
       },
     },

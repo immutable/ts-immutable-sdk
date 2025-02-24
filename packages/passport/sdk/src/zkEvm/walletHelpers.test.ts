@@ -1,13 +1,12 @@
 import {
-  BigNumber, Wallet, Contract, errors,
+  Contract, Wallet, JsonRpcProvider, ErrorCode, CallExceptionError,
 } from 'ethers';
-import { StaticJsonRpcProvider } from '@ethersproject/providers';
+import { TypedDataPayload } from './types';
 import {
   getNonce, signMetaTransactions, signAndPackTypedData, packSignatures,
   coerceNonceSpace,
   encodeNonce,
 } from './walletHelpers';
-import { TypedDataPayload } from './types';
 
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
@@ -38,7 +37,7 @@ describe('signMetaTransactions', () => {
     const signature = await signMetaTransactions(
       transactions,
       nonce,
-      BigNumber.from(chainId),
+      BigInt(chainId),
       walletAddress,
       signer,
     );
@@ -61,7 +60,7 @@ describe('signAndPackTypedData', () => {
     const signature = await signAndPackTypedData(
       typedDataPayload,
       relayerSignature,
-      BigNumber.from(chainId),
+      BigInt(chainId),
       walletAddress,
       signer,
     );
@@ -79,7 +78,7 @@ describe('signAndPackTypedData', () => {
       const result = await signAndPackTypedData(
         typedDataPayload,
         relayerSignature,
-        BigNumber.from(chainId),
+        BigInt(chainId),
         walletAddress,
         lowAddressSigner,
       );
@@ -105,7 +104,7 @@ describe('signAndPackTypedData', () => {
       const result = await signAndPackTypedData(
         typedDataPayload,
         relayerSignature,
-        BigNumber.from(chainId),
+        BigInt(chainId),
         walletAddress,
         signer,
       );
@@ -126,13 +125,13 @@ describe('signAndPackTypedData', () => {
 describe('coerceNonceSpace', () => {
   describe('with no space', () => {
     it('should default to 0', () => {
-      expect(coerceNonceSpace()).toEqual(BigNumber.from(0));
+      expect(coerceNonceSpace()).toEqual(BigInt(0));
     });
   });
 
   describe('with space', () => {
     it('should return the space', () => {
-      expect(coerceNonceSpace(BigNumber.from(12345))).toEqual(BigNumber.from(12345));
+      expect(coerceNonceSpace(BigInt(12345))).toEqual(BigInt(12345));
     });
   });
 });
@@ -140,19 +139,19 @@ describe('coerceNonceSpace', () => {
 describe('encodeNonce', () => {
   describe('with no space', () => {
     it('should not left shift the nonce', () => {
-      expect(encodeNonce(BigNumber.from(0), BigNumber.from(1))).toEqual(BigNumber.from(1));
+      expect(encodeNonce(BigInt(0), BigInt(1))).toEqual(BigInt(1));
     });
   });
 
   describe('with space', () => {
     it('should left shift the nonce by 96 bits', () => {
-      expect(encodeNonce(BigNumber.from(1), BigNumber.from(0))).toEqual(BigNumber.from('0x01000000000000000000000000'));
+      expect(encodeNonce(BigInt(1), BigInt(0))).toEqual(BigInt('0x01000000000000000000000000'));
     });
   });
 });
 
 describe('getNonce', () => {
-  const rpcProvider = {} as StaticJsonRpcProvider;
+  const rpcProvider = {} as JsonRpcProvider;
   const nonceMock = jest.fn();
 
   beforeEach(() => {
@@ -166,21 +165,20 @@ describe('getNonce', () => {
   describe('when an error is thrown', () => {
     describe('and the error is a call_exception', () => {
       it('should return 0', async () => {
-        const error = new Error('call revert exception');
-        Object.defineProperty(error, 'code', { value: errors.CALL_EXCEPTION });
+        const error = { code: 'CALL_EXCEPTION' } as CallExceptionError;
 
         nonceMock.mockRejectedValue(error);
 
         const result = await getNonce(rpcProvider, walletAddress);
 
-        expect(result).toEqual(BigNumber.from(0));
+        expect(result).toEqual(BigInt(0));
       });
     });
 
     describe('and the error is NOT a call_exception', () => {
       it('should throw the error', async () => {
         const error = new Error('call revert exception');
-        Object.defineProperty(error, 'code', { value: errors.NETWORK_ERROR });
+        Object.defineProperty(error, 'code', { value: 'NETWORK_ERROR' satisfies ErrorCode });
         nonceMock.mockRejectedValue(error);
 
         await expect(() => getNonce(rpcProvider, walletAddress)).rejects.toThrow(error);
@@ -190,11 +188,11 @@ describe('getNonce', () => {
 
   describe('when a BigNumber is returned', () => {
     it('should return a number', async () => {
-      nonceMock.mockResolvedValue(BigNumber.from(20));
+      nonceMock.mockResolvedValue(BigInt(20));
 
       const result = await getNonce(rpcProvider, walletAddress);
 
-      expect(result).toEqual(BigNumber.from(20));
+      expect(result).toEqual(BigInt(20));
     });
   });
 });

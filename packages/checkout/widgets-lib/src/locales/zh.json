@@ -650,11 +650,14 @@
       "routeSelection": {
         "loadingText": "寻找最佳支付路线中...",
         "noRoute": "未找到路线，请选择其他钱包、代币或金额。",
-        "payWithCard": "未找到路线，可选择用卡支付",
+        "payWithCard": "用卡支付",
         "fastestBadge": "最快",
         "minutesText": "分钟",
         "minuteText": "分钟",
         "secondsText": "秒"
+      },
+      "routeOption": {
+        "on": "开启"
       },
       "drawer": {
         "options": {
@@ -671,6 +674,234 @@
             "caption": "在此网络上交换代币。",
             "disabledCaption": "当前不可用。"
           },
+          "debit": {
+            "heading": "借记卡",
+            "caption": "",
+            "disabledCaption": "当前选择不可用，建议添加代币。"
+          },
+          "credit": {
+            "heading": "信用卡",
+            "caption": "可能会有失败或额外费用。",
+            "disabledCaption": "当前选择不可用，建议添加代币。"
+          }
+        }
+      },
+      "error": {
+        "default": {
+          "heading": "抱歉，出现了问题。请稍后再试。",
+          "secondaryButtonText": "关闭"
+        },
+        "invalidParameters": {
+          "heading": "参数无效",
+          "subHeading": "提供的小部件参数无效，请重新检查。",
+          "secondaryButtonText": "关闭"
+        },
+        "serviceBreakdown": {
+          "heading": "系统目前无法使用",
+          "subHeading": "我们正在经历技术问题，请稍后再试。",
+          "secondaryButtonText": "关闭"
+        },
+        "transactionFailed": {
+          "heading": "交易失败",
+          "subHeading": "交易失败，请重试。",
+          "primaryButtonText": "重试",
+          "secondaryButtonText": "关闭"
+        },
+        "unrecognisedChain": {
+          "heading": "未识别的链",
+          "subHeading": "请将该链添加到您的账户并重试。",
+          "primaryButtonText": "重试",
+          "secondaryButtonText": "关闭"
+        },
+        "providerError": {
+          "heading": "无法找到钱包",
+          "subHeading": "请尝试连接您的钱包后重试。",
+          "primaryButtonText": "重试",
+          "secondaryButtonText": "关闭"
+        },
+        "walletFailed": {
+          "heading": "交易失败",
+          "subHeading": "交易失败，请重试。",
+          "primaryButtonText": "重试",
+          "secondaryButtonText": "关闭"
+        },
+        "walletRejected": {
+          "heading": "交易被拒绝",
+          "subHeading": "您需要在钱包中批准交易以继续。",
+          "primaryButtonText": "重试",
+          "secondaryButtonText": "关闭"
+        },
+        "walletRejectedNoFunds": {
+          "heading": "资金不足",
+          "subHeading": "您的资金不足以完成交易。",
+          "primaryButtonText": "重试",
+          "secondaryButtonText": "关闭"
+        },
+        "walletPopupBlocked": {
+          "heading": "浏览器弹窗被拦截",
+          "subHeading": "请允许浏览器弹窗以继续。",
+          "primaryButtonText": "重试",
+          "secondaryButtonText": "关闭"
+        },
+        "environmentError": {
+          "heading": "不支持的环境",
+          "subHeading": "此功能仅在生产环境中支持。",
+          "secondaryButtonText": "关闭"
+        },
+        "addressMismatch": {
+          "heading": "抱歉！您的支付钱包似乎已更改",
+          "body": "在继续之前，您需要重新连接之前选择的支付钱包。",
+          "buttonText": "重新选择支付钱包"
+        },
+        "routeError": {
+          "heading": "我们无法找到合适的最终报价",
+          "subHeading": "请再试一次",
+          "secondaryButtonText": "返回"
+        }
+      },
+      "review": {
+        "buttonText": "审查",
+        "heading": "审查",
+        "send": "发送",
+        "receive": "接收",
+        "swap": "交换",
+        "to": "至",
+        "loadingText": "正在获取报价",
+        "processingButtonText": "处理中",
+        "proceedButtonText": "继续",
+        "poweredBySquid": "由Squid提供"
+      },
+      "handover": {
+        "preparing": {
+          "heading": "准备中"
+        },
+        "requestingApproval": {
+          "heading": "正在等待您的钱包授权访问",
+          "subHeading": "批准交易请求以完成此交易"
+        },
+        "approved": {
+          "heading": "已授予访问您的代币的权限"
+        },
+        "requestingExecution": {
+          "heading": "正在等待您的钱包确认交易",
+          "subHeading": "确认交易请求以完成此交易"
+        },
+        "executing": {
+          "heading": "处理中",
+          "subHeadingDuration": "预计耗时{{duration}}",
+          "subHeading": "您可以前往<axelarscanLink>Axelarscan</axelarscanLink>查看交易详情"
+        },
+        "executed": {
+          "heading": "代币已添加",
+          "subHeading": "您可以前往<axelarscanLink>Axelarscan</axelarscanLink>查看交易详情",
+          "primaryButtonText": "完成"
+        },
+        "executedZkEVM": {
+          "heading": "代币已添加",
+          "subHeading": "您可以前往<explorerLink>Immutable zkEVM explorer</explorerLink>查看交易详情",
+          "primaryButtonText": "完成"
+        },
+        "needsGas": {
+          "heading": "Gas费用激增",
+          "subHeading": "完成此交易需要支付更高的Gas费用。您可以通过<axelarscanLink>Axelarscan</axelarscanLink>完成。",
+          "primaryButtonText": "前往Axelarscan",
+          "secondaryButtonText": "关闭"
+        },
+        "partialSuccess": {
+          "heading": "您已收到axlUSDC",
+          "subHeading": "交易受到滑点影响，您已收到axlUSDC。如需获得目标代币，可能需要通过<squidLink>Squid</squidLink>完成兑换。",
+          "primaryButtonText": "前往Squid",
+          "secondaryButtonText": "关闭"
+        },
+        "statusFailed": {
+          "heading": "交易未能完成",
+          "subHeading": "交易发生错误，未能完成。详情请前往<axelarscanLink>Axelarscan</axelarscanLink>查看。",
+          "secondaryButtonText": "关闭"
+        }
+      },
+      "onboarding": {
+        "screen1": {
+          "title": "我们做了一些改动，\n让它变得更简单",
+          "caption": "请注意",
+          "buttonText": "下一步"
+        },
+        "screen2": {
+          "title": "您可以将代币发送到Passport，\n并从任何钱包付款",
+          "caption": "有哪些改进",
+          "buttonText": "下一步"
+        },
+        "screen3": {
+          "title": "在其他链上使用代币，\n我们会为您找到最佳选项",
+          "caption": "进化",
+          "buttonText": "让我们添加一些代币"
+        }
+      },
+      "footer": {
+        "body": "交换功能由第三方Squid提供支持。Immutable不构建、不拥有、不运营或不部署<squidLink>Squid</squidLink>。"
+      },
+      "geoBlockError": {
+        "buyTokenButton": "购买代币",
+        "bridgeTokenButton": "桥接代币"
+      },
+      "fees": {
+        "fee": "费用",
+        "balance": "余额",
+        "fiatPricePrefix": "≈ 美元",
+        "zeroFees": "零手续费",
+        "includedFees": "费用"
+      },
+      "noGasDrawer": {
+        "heading": "您需要更多 {{token}} 用于燃料费",
+        "body": "添加更多燃料费后返回完成此交易，或者尝试其他选项，例如降低金额、使用其他钱包或使用银行卡购买。",
+        "primaryAction": "尝试其他选项",
+        "secondaryAction": "添加更多 {{token}}"
+      },
+      "noGasRouteMessage": "用于燃料费的 {{token}} 不足"
+    },
+    "PURCHASE": {
+      "tokenSelection": {
+        "buttonText": "选择您想要的代币",
+        "tokenLabel": "添加",
+        "drawerHeading": "添加代币",
+        "searchPlaceholder": "搜索代币"
+      },
+      "walletSelection": {
+        "from": {
+          "label": "发送自",
+          "caption": "选择要桥接或交换的钱包"
+        },
+        "to": {
+          "label": "发送到",
+          "caption": "选择您想要发送代币的位置"
+        }
+      },
+      "routeSelection": {
+        "loadingText": "寻找最佳支付路线中...",
+        "noRoute": "未找到路线，请选择其他钱包、代币或金额。",
+        "payWithCard": "用卡支付",
+        "noRoutePayWithCard": "未找到路线，可选择用卡支付",
+        "fastestBadge": "最快",
+        "minutesText": "分钟",
+        "minuteText": "分钟",
+        "secondsText": "秒",
+        "changeLabel": "更改"
+      },
+      "drawer": {
+        "options": {
+          "heading": "支付来源",
+          "moreOptionsDividerText": "其他支付方式",
+          "loadingText1": "寻找最佳价值",
+          "loadingText2": "跨所有链",
+          "noRoutes": {
+            "heading": "未找到路线",
+            "caption": "请选择其他钱包、代币或金额并重试。"
+          },
+          "swap": {
+            "heading": "交换",
+            "caption": "在此网络上交换代币。",
+            "disabledCaption": "当前不可用。"
+          },
+          "changeWallet": "选择另一个钱包",
           "debit": {
             "heading": "借记卡",
             "caption": "",

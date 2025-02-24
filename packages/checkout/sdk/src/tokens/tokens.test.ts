@@ -1,6 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { Contract } from 'ethers';
-import { Web3Provider } from '@ethersproject/providers';
+import { Contract, BrowserProvider } from 'ethers';
 import { ChainId, ChainName, TokenFilterTypes } from '../types';
 import { getERC20TokenInfo, getTokenAllowList, isNativeToken } from './tokens';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
@@ -20,7 +19,7 @@ jest.mock('ethers', () => ({
 
 describe('token related functions', () => {
   let config: CheckoutConfiguration;
-  const mockProvider = jest.fn().mockImplementation(() => ({} as unknown as Web3Provider));
+  const mockProvider = jest.fn().mockImplementation(() => ({} as unknown as BrowserProvider));
   const mockedHttpClient: jest.Mocked<HttpClient> = new HttpClient() as jest.Mocked<HttpClient>;
 
   describe('when tokens are not configured', () => {
@@ -66,18 +65,21 @@ describe('token related functions', () => {
           decimals: 18,
           name: 'token-aa-testnet',
           symbol: 'AA',
+          bridge: 'native',
         },
         {
           address: '0x2',
           decimals: 18,
           name: 'token-bb-testnet',
           symbol: 'BB',
+          bridge: 'native',
         },
         {
           address: '',
           decimals: 18,
           name: 'token-cc-testnet',
           symbol: 'CC',
+          bridge: null,
         },
       ]),
     };
@@ -94,18 +96,21 @@ describe('token related functions', () => {
             decimals: 18,
             name: 'token-aa-testnet',
             symbol: 'AA',
+            bridge: 'native',
           },
           {
             address: '0x2',
             decimals: 18,
             name: 'token-bb-testnet',
             symbol: 'BB',
+            bridge: 'native',
           },
           {
             address: '',
             decimals: 18,
             name: 'token-cc-testnet',
             symbol: 'CC',
+            bridge: null,
           },
         ],
         remoteConfigMockReturn,
@@ -122,12 +127,14 @@ describe('token related functions', () => {
             decimals: 18,
             name: 'token-aa-testnet',
             symbol: 'AA',
+            bridge: 'native',
           },
           {
             address: '',
             decimals: 18,
             name: 'token-cc-testnet',
             symbol: 'CC',
+            bridge: null,
           },
         ],
         remoteConfigMockReturn,
@@ -144,12 +151,14 @@ describe('token related functions', () => {
             decimals: 18,
             name: 'token-aa-testnet',
             symbol: 'AA',
+            bridge: 'native',
           },
           {
             address: '0x2',
             decimals: 18,
             name: 'token-bb-testnet',
             symbol: 'BB',
+            bridge: 'native',
           },
         ],
         remoteConfigMockReturn,
@@ -165,6 +174,7 @@ describe('token related functions', () => {
             decimals: 18,
             name: 'token-bb-testnet',
             symbol: 'BB',
+            bridge: 'native',
           },
         ],
         remoteConfigMockReturn: {
@@ -195,18 +205,14 @@ describe('token related functions', () => {
             decimals: 18,
             name: 'token-aa-testnet',
             symbol: 'AA',
+            bridge: 'native',
           },
           {
             address: '0x2',
             decimals: 18,
             name: 'token-bb-testnet',
             symbol: 'BB',
-          },
-          {
-            address: '',
-            decimals: 18,
-            name: 'token-cc-testnet',
-            symbol: 'CC',
+            bridge: 'native',
           },
         ],
         remoteConfigMockReturn,

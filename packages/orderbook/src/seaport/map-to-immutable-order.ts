@@ -1,7 +1,10 @@
-import { ConsiderationItem, OfferItem } from '@opensea/seaport-js/lib/types';
-import { ItemType, OrderType } from '@opensea/seaport-js/lib/constants';
+import { ItemType, OrderType } from './constants';
+import { ConsiderationItem, OfferItem } from './types';
 import {
-  AssetCollectionItem, ERC20Item, Item, ProtocolData,
+  AssetCollectionItem,
+  ERC20Item,
+  Item,
+  ProtocolData,
 } from '../openapi/sdk';
 import { exhaustiveSwitch } from '../utils';
 
@@ -44,7 +47,7 @@ export function mapSeaportItemToImmutableItem(item: OfferItem | ConsiderationIte
         amount: item.startAmount,
       };
     default:
-      return exhaustiveSwitch(item.itemType);
+      return exhaustiveSwitch(item.itemType as never);
   }
 }
 
@@ -81,7 +84,7 @@ export function mapSeaportItemToImmutableAssetCollectionItem(
     case ItemType.ERC1155:
       throw new Error(`Unsupported item type ${item.itemType}`);
     default:
-      return exhaustiveSwitch(item.itemType);
+      return exhaustiveSwitch(item.itemType as never);
   }
 }
 

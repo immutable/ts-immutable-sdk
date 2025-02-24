@@ -61,6 +61,16 @@ module.exports = {
         "format": ["camelCase","snake_case"]
       }
     ],
-    "import/prefer-default-export": ["off"]
+    "import/prefer-default-export": ["off"],
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [],
+        // Importing types from seaport-js using a relative path (e.g. @opensea/seaport-js/lib/constants)
+        // can cause issues for consumers of the SDK, e.g: https://github.com/immutable/ts-immutable-sdk/issues/2472.
+        // Instead, alias or duplicate the types in src/seaport/types.ts and import from there.
+        "patterns": ["@opensea/seaport-js/*"]
+      }
+    ]
   }
 }

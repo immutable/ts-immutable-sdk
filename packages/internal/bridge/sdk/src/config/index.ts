@@ -1,5 +1,5 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { ethers } from 'ethers';
+import { Provider } from 'ethers';
 import {
   ETH_MAINNET_TO_ZKEVM_MAINNET,
   ETH_SEPOLIA_TO_ZKEVM_DEVNET,
@@ -71,8 +71,8 @@ export class BridgeConfiguration {
    * @property {ImmutableConfiguration} baseConfig - The base configuration for the module.
    * @property {BridgeInstance} bridgeInstance - The bridge instance configuration for the root and child chains.
    * @property {BridgeContracts} bridgeContracts - The configuration of the contracts associated with the bridge.
-   * @property {ethers.providers.Provider} rootProvider - The Ethereum provider for the root chain.
-   * @property {ethers.providers.Provider} childProvider - The Ethereum provider for the child chain.
+   * @property {Provider} rootProvider - The Ethereum provider for the root chain.
+   * @property {Provider} childProvider - The Ethereum provider for the child chain.
   */
   public baseConfig: ImmutableConfiguration;
 
@@ -80,9 +80,9 @@ export class BridgeConfiguration {
 
   public bridgeContracts: BridgeContracts;
 
-  public rootProvider: ethers.providers.Provider;
+  public rootProvider: Provider;
 
-  public childProvider: ethers.providers.Provider;
+  public childProvider: Provider;
 
   /**
    * Constructs a BridgeConfiguration instance.

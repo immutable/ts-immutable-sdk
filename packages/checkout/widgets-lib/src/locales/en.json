@@ -874,6 +874,218 @@
         "secondaryAction": "Add more {{token}}"
       },
       "noGasRouteMessage": "Insufficient {{token}} for gas"
+    },
+    "PURCHASE": {
+      "tokenSelection": {
+        "buttonText": "Choose the token you want",
+        "tokenLabel": "Add",
+        "drawerHeading": "Add Token",
+        "searchPlaceholder": "Search tokens"
+      },
+      "walletSelection": {
+        "from":{
+          "label": "Pay with",
+          "caption": "Choose a wallet to bridge or swap from"
+        },
+        "to": {
+          "label": "Deliver to",
+          "caption": "Choose where you want your tokens to go"
+        }
+      },
+      "routeSelection": {
+        "loadingText": "Finding the best payment route...",
+        "noRoute": "No routes found, choose a different wallet, token or amount.",
+        "payWithCard": "Pay with card",
+        "noRoutePayWithCard": "No routes found, pay with card available",
+        "fastestBadge": "Cheapest & fastest",
+        "minutesText": "mins",
+        "minuteText": "min",
+        "secondsText": "s",
+        "changeLabel": "Change" 
+      },
+      "routeOption": {
+        "on": "on"
+      },
+      "drawer": {
+        "options": {
+          "heading": "Pay from",
+          "moreOptionsDividerText": "Other ways to Pay",
+          "loadingText1": "Finding the best value",
+          "loadingText2": "across all chains",
+          "noRoutes": {
+            "heading": "No routes found",
+            "caption": "Choose a different wallet, token or amount and try again."
+          },
+          "swap": {
+            "heading": "Swap",
+            "caption": "Swap tokens on this network.",
+            "disabledCaption": "Currently not available."
+          },
+          "changeWallet": "Choose another wallet",
+          "debit": {
+            "heading": "Debit Card",
+            "caption": "",
+            "disabledCaption": "Unavailable for your selection. We recommend adding tokens."
+          },
+          "credit": {
+            "heading": "Credit Card",
+            "caption": "Failures and extra fees may occur.",
+            "disabledCaption": "Unavailable for your selection. We recommend adding tokens."
+          }
+        }
+      },
+      "error": {
+        "default": {
+          "heading": "Sorry, something went wrong. Please try again later.",
+          "secondaryButtonText": "Close"
+        },
+        "invalidParameters": {
+          "heading": "Invalid parameters",
+          "subHeading": "The widget parameters provided are invalid. Please check again.",
+          "secondaryButtonText": "Close"
+        },
+        "serviceBreakdown": {
+          "heading": "Our system is currently down",
+          "subHeading": "We are currently experiencing technical difficulties. Please try again later.",
+          "secondaryButtonText": "Close"
+        },
+        "transactionFailed": {
+          "heading": "Transaction failed",
+          "subHeading": "The transaction failed. Please try again.",
+          "primaryButtonText": "Retry",
+          "secondaryButtonText": "Close"
+        },
+        "unrecognisedChain": {
+          "heading": "Unrecognised chain",
+          "subHeading": "Please add the chain to your account and try again.",
+          "primaryButtonText": "Retry",
+          "secondaryButtonText": "Close"
+        },
+        "providerError": {
+          "heading": "Wallet cannot be found",
+          "subHeading": "Please try to connect your wallet and try again.",
+          "primaryButtonText": "Retry",
+          "secondaryButtonText": "Close"
+        },
+        "walletFailed": {
+          "heading": "Transaction failed",
+          "subHeading": "The transaction failed. Please try again.",
+          "primaryButtonText": "Retry",
+          "secondaryButtonText": "Close"
+        },
+        "walletRejected": {
+          "heading": "Transaction rejected",
+          "subHeading": "You'll need to approve the transaction in your wallet to proceed.",
+          "primaryButtonText": "Retry",
+          "secondaryButtonText": "Close"
+        },
+        "walletRejectedNoFunds": {
+          "heading": "Insufficient funds",
+          "subHeading": "You do not have enough funds to complete the transaction.",
+          "primaryButtonText": "Retry",
+          "secondaryButtonText": "Close"
+        },
+        "walletPopupBlocked": {
+          "heading": "Browser's popup blocked",
+          "subHeading": "Please allow pop-ups in your browser to proceed.",
+          "primaryButtonText": "Retry",
+          "secondaryButtonText": "Close"
+        },
+        "environmentError": {
+          "heading": "Unsupported environment",
+          "subHeading": "This is only supported in production environment.",
+          "secondaryButtonText": "Close"
+        },
+        "addressMismatch": {
+          "heading": "Oops! It seems your payment wallet has changed",
+          "body": "You'll be ask to re-connect the same wallet you selected to pay with before proceeding",
+          "buttonText": "Re-select payment wallet"
+        },
+        "routeError": {
+          "heading": "We couldn't find a suitable final quote",
+          "subHeading": "Please try again",
+          "secondaryButtonText": "Go back"
+        }
+      },
+      "review": {
+        "buttonText": "Proceed",
+        "heading": "Review",
+        "send": "Send",
+        "receive": "Receive",
+        "swap": "Swap",
+        "to": "to",
+        "loadingText": "Securing quote",
+        "processingButtonText": "Processing",
+        "proceedButtonText": "Proceed",
+        "poweredBySquid": "Powered by Squid"
+      },
+      "handover": {
+        "preparing": {
+          "heading": "Preparing order"
+        },
+        "requestingApproval": {
+          "heading": "Waiting for wallet approval for token access"
+        },
+        "approved": {
+          "heading": "Tokens ready for item purchase"
+        },
+        "requestingExecution": {
+          "heading": "Waiting for wallet approval for purchase"
+        },
+        "executing": {
+          "heading": "Processing purchase",
+          "subHeadingDuration": "This should take {{duration}}",
+          "subHeading": "Go to <axelarscanLink>Axelarscan</axelarscanLink> for transaction details"
+        },
+        "executed": {
+          "heading": "Purchase complete",
+          "subHeading": "Go to <axelarscanLink>Axelarscan</axelarscanLink> for transaction details",
+          "primaryButtonText": "Done"
+        },
+        "executedZkEVM": {
+          "heading": "Purchase complete",
+          "subHeading": "Go to <explorerLink>Immutable zkEVM explorer</explorerLink> for transaction details",
+          "primaryButtonText": "Done"
+        },
+        "needsGas": {
+          "heading": "Gas has surged",
+          "subHeading": "You’ll need to pay more gas to complete this transaction. You can do this via <axelarscanLink>Axelarscan</axelarscanLink>.",
+          "primaryButtonText": "Go to Axelarscan",
+          "secondaryButtonText": "Dismiss"
+        },
+        "partialSuccess": {
+          "heading": "You’ve received axlUSDC",
+          "subHeading": "Your transaction was subject to slippage and you’ve received axlUSDC. To receive the token you intended to add, you may need to complete a swap via <squidLink>Squid</squidLink>. ",
+          "primaryButtonText": "Go to Squid",
+          "secondaryButtonText": "Dismiss"
+        },
+        "statusFailed": {
+          "heading": "Unable to complete purchase",
+          "subHeading": "Something went wrong, and we were unable to complete this purchase. Visit <axelarscanLink>Axelarscan</axelarscanLink> for details.",
+          "secondaryButtonText": "Dismiss"
+        }
+      },
+      "footer": {
+        "body": "Swap functionality is powered by a third party, Squid. Immutable neither builds, owns, operates or deploys <squidLink>Squid</squidLink>."
+      },
+      "geoBlockError": {
+        "buyTokenButton": "Buy tokens",
+        "bridgeTokenButton": "Bridge tokens"
+      },
+      "fees": {
+        "fee": "Fees",
+        "balance": "Balance",
+        "fiatPricePrefix": "$",
+        "zeroFees": "Zero fees",
+        "includedFees": "Fees"
+      },
+      "noGasDrawer": {
+        "heading": "You'll need more {{token}} for gas",
+        "body": "Add more gas and return to complete this purchase, or try another option such as lowering your amount, using another wallet, or buying with card.",
+        "primaryAction": "Try another option",
+        "secondaryAction": "Add more {{token}}"
+      },
+      "noGasRouteMessage": "Insufficient {{token}} for gas"
     }
   },
   "footers": {

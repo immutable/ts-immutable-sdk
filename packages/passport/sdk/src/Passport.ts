@@ -11,7 +11,7 @@ import {
 } from '@imtbl/metrics';
 import { isAxiosError } from 'axios';
 import AuthManager from './authManager';
-import MagicAdapter from './magicAdapter';
+import MagicAdapter from './magic/magicAdapter';
 import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
@@ -34,7 +34,8 @@ import GuardianClient from './guardian';
 import logger from './utils/logger';
 import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
 import { isAPIError, PassportError, PassportErrorType } from './errors/passportError';
-import { withMetrics, withMetricsAsync } from './utils/metrics';
+import { withMetricsAsync } from './utils/metrics';
+import { MagicProviderProxyFactory } from './magic/magicProviderProxyFactory';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
   if (passportModuleConfiguration.overrides) {
@@ -56,7 +57,8 @@ const buildImxApiClients = (passportModuleConfiguration: PassportModuleConfigura
 export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConfiguration) => {
   const config = new PassportConfiguration(passportModuleConfiguration);
   const authManager = new AuthManager(config);
-  const magicAdapter = new MagicAdapter(config);
+  const magicProviderProxyFactory = new MagicProviderProxyFactory(authManager, config);
+  const magicAdapter = new MagicAdapter(config, magicProviderProxyFactory);
   const confirmationScreen = new ConfirmationScreen(config);
   const multiRollupApiClients = new MultiRollupApiClients(config.multiRollupConfig);
   const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
@@ -133,23 +135,34 @@ export class Passport {
   }
 
   /**
-   * @deprecated The method `login` with an argument of `{ useCachedSession: true }` should be used in conjunction with
-   * `connectImx` instead.
+   * Attempts to connect to IMX silently without user interaction.
+   * @returns {Promise<IMXProvider | null>} A promise that resolves to an IMX provider if successful, or null if no cached session exists
+   * @deprecated The method `login` with an argument of `{ useCachedSession: true }` should be used in conjunction with `connectImx` instead
    */
   public async connectImxSilent(): Promise<IMXProvider | null> {
-    return withMetricsAsync(() => this.passportImxProviderFactory.getProviderSilent(), 'connectImxSilent');
+    return withMetricsAsync(() => this.passportImxProviderFactory.getProviderSilent(), 'connectImxSilent', false);
   }
 
+  /**
+   * Connects to IMX, prompting user interaction if necessary.
+   * @returns {Promise<IMXProvider>} A promise that resolves to an IMX provider
+   */
   public async connectImx(): Promise<IMXProvider> {
-    return withMetricsAsync(() => this.passportImxProviderFactory.getProvider(), 'connectImx');
+    return withMetricsAsync(() => this.passportImxProviderFactory.getProvider(), 'connectImx', false);
   }
 
+  /**
+   * Connects to EVM and optionally announces the provider.
+   * @param {Object} options - Configuration options
+   * @param {boolean} options.announceProvider - Whether to announce the provider via EIP-6963 for wallet discovery (defaults to true)
+   * @returns {Provider} The EVM provider instance
+   */
   public connectEvm(options: {
     announceProvider: boolean
   } = {
     announceProvider: true,
-  }): Provider {
-    return withMetrics(() => {
+  }): Promise<Provider> {
+    return withMetricsAsync(async () => {
       const provider = new ZkEvmProvider({
         passportEventEmitter: this.passportEventEmitter,
         authManager: this.authManager,
@@ -167,18 +180,19 @@ export class Passport {
       }
 
       return provider;
-    }, 'connectEvm');
+    }, 'connectEvm', false);
   }
 
   /**
-   *
-   * Initiates the authorisation flow.
-   *
-   * @param options.useCachedSession = false - If true, and no active session exists, then the user will not be
-   * prompted to log in and the Promise will resolve with a null value.
-   * @param options.anonymousId - If provided, Passport internal metrics will be enriched with this value.
-   * @param options.useSilentLogin - If true, and no active session exists, then the user will not be prompted to log in. Instead, we will attempt to authenticate the user silently. This approach will fail if the user does not have an active session with the authentication server, or if user input is required (for example, consent is required).
-   * @returns {Promise<UserProfile | null>} the user profile if the user is logged in, otherwise null
+   * Initiates the login process.
+   * @param {Object} options - Login options
+   * @param {boolean} [options.useCachedSession] - If true, and no active session exists, the user won't be prompted to log in
+   * @param {string} [options.anonymousId] - ID used to enrich Passport internal metrics
+   * @param {boolean} [options.useSilentLogin] - If true, attempts silent authentication without user interaction.
+   *                                            Note: This takes precedence over useCachedSession if both are true
+   * @returns {Promise<UserProfile | null>} A promise that resolves to the user profile if logged in, null otherwise
+   * @throws {Error} If retrieving the cached user session fails (except for "Unknown or invalid refresh token" errors)
+   *                and useCachedSession is true
    */
   public async login(options?: {
     useCachedSession?: boolean;
@@ -218,16 +232,33 @@ export class Passport {
     }, 'login');
   }
 
+  /**
+   * Handles the login callback.
+   * @returns {Promise<void>} A promise that resolves when the callback is processed
+   */
   public async loginCallback(): Promise<void> {
     return withMetricsAsync(() => this.authManager.loginCallback(), 'loginCallback');
   }
 
+  /**
+   * Initiates a device flow login.
+   * @param {Object} options - Login options
+   * @param {string} [options.anonymousId] - ID used to enrich Passport internal metrics
+   * @returns {Promise<DeviceConnectResponse>} A promise that resolves to the device connection response
+   */
   public async loginWithDeviceFlow(options?: {
     anonymousId?: string;
   }): Promise<DeviceConnectResponse> {
     return withMetricsAsync(() => this.authManager.loginWithDeviceFlow(options?.anonymousId), 'loginWithDeviceFlow');
   }
 
+  /**
+   * Handles the device flow login callback.
+   * @param {string} deviceCode - The device code received from the initial request
+   * @param {number} interval - Polling interval in seconds
+   * @param {number} [timeoutMs] - Optional timeout in milliseconds
+   * @returns {Promise<UserProfile>} A promise that resolves to the user profile
+   */
   public async loginWithDeviceFlowCallback(
     deviceCode: string,
     interval: number,
@@ -244,10 +275,20 @@ export class Passport {
     }, 'loginWithDeviceFlowCallback');
   }
 
-  public loginWithPKCEFlow(): string {
-    return withMetrics(() => this.authManager.getPKCEAuthorizationUrl(), 'loginWithPKCEFlow');
+  /**
+   * Initiates a PKCE flow login.
+   * @returns {string} The authorization URL for the PKCE flow
+   */
+  public loginWithPKCEFlow(): Promise<string> {
+    return withMetricsAsync(async () => await this.authManager.getPKCEAuthorizationUrl(), 'loginWithPKCEFlow');
   }
 
+  /**
+   * Handles the PKCE flow login callback.
+   * @param {string} authorizationCode - The authorization code received from the OAuth provider
+   * @param {string} state - The state parameter for CSRF protection
+   * @returns {Promise<UserProfile>} A promise that resolves to the user profile
+   */
   public async loginWithPKCEFlowCallback(
     authorizationCode: string,
     state: string,
@@ -262,6 +303,10 @@ export class Passport {
     }, 'loginWithPKCEFlowCallback');
   }
 
+  /**
+   * Logs out the current user.
+   * @returns {Promise<void>} A promise that resolves when the logout is complete
+   */
   public async logout(): Promise<void> {
     return withMetricsAsync(async () => {
       if (this.config.oidcConfiguration.logoutMode === 'silent') {
@@ -279,11 +324,11 @@ export class Passport {
   }
 
   /**
-   * Logs the user out of Passport when using device flow authentication.
-   *
-   * @returns {Promise<string>} The device flow end session endpoint. Consumers are responsible for
-   * opening this URL in the same browser that was used to log the user in.
-   */
+     * Logs the user out of Passport when using device flow authentication.
+     *
+     * @returns {Promise<string>} The device flow end session endpoint. Consumers are responsible for
+     * opening this URL in the same browser that was used to log the user in.
+     */
   public async logoutDeviceFlow(): Promise<string> {
     return withMetricsAsync(async () => {
       await this.authManager.removeUser();
@@ -294,34 +339,51 @@ export class Passport {
   }
 
   /**
-   * This method should only be called from the logout redirect uri
-   * when logout mode is 'silent'.
+   * Handles the silent logout callback.
+   * @param {string} url - The callback URL to process
+   * @returns {Promise<void>} A promise that resolves when the silent logout is complete
    */
   public async logoutSilentCallback(url: string): Promise<void> {
     return withMetricsAsync(() => this.authManager.logoutSilentCallback(url), 'logoutSilentCallback');
   }
 
+  /**
+   * Retrieves the current user's information.
+   * @returns {Promise<UserProfile | undefined>} A promise that resolves to the user profile if logged in, undefined otherwise
+   */
   public async getUserInfo(): Promise<UserProfile | undefined> {
     return withMetricsAsync(async () => {
       const user = await this.authManager.getUser();
       return user?.profile;
-    }, 'getUserInfo');
+    }, 'getUserInfo', false);
   }
 
+  /**
+   * Retrieves the current user's ID token.
+   * @returns {Promise<string | undefined>} A promise that resolves to the ID token if available, undefined otherwise
+   */
   public async getIdToken(): Promise<string | undefined> {
     return withMetricsAsync(async () => {
       const user = await this.authManager.getUser();
       return user?.idToken;
-    }, 'getIdToken');
+    }, 'getIdToken', false);
   }
 
+  /**
+   * Retrieves the current user's access token.
+   * @returns {Promise<string | undefined>} A promise that resolves to the access token if available, undefined otherwise
+   */
   public async getAccessToken(): Promise<string | undefined> {
     return withMetricsAsync(async () => {
       const user = await this.authManager.getUser();
       return user?.accessToken;
-    }, 'getAccessToken');
+    }, 'getAccessToken', false, false);
   }
 
+  /**
+   * Retrieves the addresses linked to the current user's account.
+   * @returns {Promise<string[]>} A promise that resolves to an array of linked addresses
+   */
   public async getLinkedAddresses(): Promise<string[]> {
     return withMetricsAsync(async () => {
       const user = await this.authManager.getUser();
@@ -331,11 +393,24 @@ export class Passport {
       const headers = { Authorization: `Bearer ${user.accessToken}` };
       const getUserInfoResult = await this.multiRollupApiClients.passportProfileApi.getUserInfo({ headers });
       return getUserInfoResult.data.linked_addresses;
-    }, 'getLinkedAddresses');
+    }, 'getLinkedAddresses', false);
   }
 
+  /**
+   * Links an external wallet to the current user's account.
+   * @param {LinkWalletParams} params - Parameters for linking the wallet
+   * @returns {Promise<LinkedWallet>} A promise that resolves to the linked wallet information
+   * @throws {PassportError} When:
+   *  - User is not logged in (NOT_LOGGED_IN_ERROR)
+   *  - User is not registered (USER_NOT_REGISTERED_ERROR)
+   *  - Wallet is already linked (LINK_WALLET_ALREADY_LINKED_ERROR)
+   *  - Maximum number of wallets reached (LINK_WALLET_MAX_WALLETS_LINKED_ERROR)
+   *  - Duplicate nonce used (LINK_WALLET_DUPLICATE_NONCE_ERROR)
+   *  - Validation fails (LINK_WALLET_VALIDATION_ERROR)
+   *  - Other generic errors (LINK_WALLET_GENERIC_ERROR)
+   */
   public async linkExternalWallet(params: LinkWalletParams): Promise<LinkedWallet> {
-    const flow = trackFlow('passport', 'linkExternalWallet');
+    const flow = trackFlow('passport', 'linkExternalWallet', false);
 
     const user = await this.authManager.getUser();
     if (!user) {
@@ -363,8 +438,9 @@ export class Passport {
     } catch (error) {
       if (error instanceof Error) {
         trackError('passport', 'linkExternalWallet', error);
+      } else {
+        flow.addEvent('errored');
       }
-      flow.addEvent('errored');
 
       if (isAxiosError(error) && error.response) {
         if (error.response.data && isAPIError(error.response.data)) {

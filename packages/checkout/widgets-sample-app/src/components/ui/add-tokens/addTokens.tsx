@@ -13,8 +13,8 @@ import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import { Environment } from "@imtbl/config";
 import { useMemo, useEffect, useState } from "react";
 
-import { passport } from "./passport";
-import { Web3Provider } from "@ethersproject/providers";
+import { passport } from "../../../utils/passport";
+import { WrappedBrowserProvider } from "@imtbl/checkout-sdk";
 
 const ADD_TOKENS_TARGET_ID = "add-tokens-widget-target";
 const FLAG_PRESELECTED_TOKEN = 'addTokensPreselectedToken';
@@ -48,7 +48,7 @@ function AddTokensUI() {
 
   const getPersistedToPresetProvider = () => localStorage.getItem('imtbl/addtokens_presetToProvider') === 'true';
   const [presetToProvider, setPresetToProvider] = useState<boolean>(getPersistedToPresetProvider());
-  const [toProvider, setToProvider] = useState<Web3Provider | undefined>(undefined);
+  const [toProvider, setToProvider] = useState<WrappedBrowserProvider | undefined>(undefined);
 
   const [toTokenAddress, setToTokenAddress] = useState<string | undefined>(undefined);
   const [toAmount, setToAmount] = useState<string | undefined>(undefined);
@@ -81,7 +81,9 @@ function AddTokensUI() {
   };
 
   useEffect(() => {
-    passport.connectEvm();
+    const connectEvm = async () => await passport.connectEvm()
+
+    connectEvm();
   }, []);
 
   useEffect(() => {

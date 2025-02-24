@@ -1,9 +1,9 @@
-import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
   CheckoutErrorType,
   EIP6963ProviderDetail,
   WalletProviderRdns,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import { addProviderListenersForWidgetRoot } from './eip1193Events';
 import { getProviderSlugFromRdns } from './provider';
@@ -14,7 +14,7 @@ export enum ConnectEIP6963ProviderError {
 }
 
 export type ConnectEIP6963ProviderResult = {
-  provider: Web3Provider;
+  provider: WrappedBrowserProvider;
   providerName: string;
 };
 
@@ -23,13 +23,13 @@ export const connectEIP6963Provider = async (
   checkout: Checkout,
   shouldRequestWalletPermissions?: boolean,
 ): Promise<ConnectEIP6963ProviderResult> => {
-  const web3Provider = new Web3Provider(providerDetail.provider as any);
+  const wrappedBrowserProvider = new WrappedBrowserProvider(providerDetail.provider);
 
   try {
     const requestWalletPermissions = shouldRequestWalletPermissions
       ?? providerDetail.info.rdns === WalletProviderRdns.METAMASK;
     const connectResult = await checkout.connect({
-      provider: web3Provider,
+      provider: wrappedBrowserProvider,
       requestWalletPermissions,
     });
 

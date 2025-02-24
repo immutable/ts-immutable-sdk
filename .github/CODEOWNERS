@@ -1,4 +1,5 @@
 * @immutable/passport
+package.json @immutable/passport
 .github @immutable/security @immutable/passport
 /.husky @immutable/passport
 /.nvmrc @immutable/passport
@@ -15,8 +16,8 @@
 /packages/orderbook @immutable/traders
 /packages/passport @immutable/passport
 /packages/x-provider @immutable/passport
-/packages/checkout @immutable/commerce
-/packages/checkout/widgets-lib @immutable/commerce
+/packages/checkout @immutable/passport
+/packages/checkout/widgets-lib @immutable/passport
 /packages/blockchain-data @immutable/activation
 /packages/minting-backend @shineli1984
 /packages/webhook @shineli1984

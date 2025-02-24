@@ -1,5 +1,4 @@
-import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
-import { Contract } from 'ethers';
+import { Contract, JsonRpcProvider, BrowserProvider } from 'ethers';
 import {
   ChainId,
   DexConfig,
@@ -13,6 +12,8 @@ import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../config';
 import { ERC20ABI, NATIVE } from '../env';
 import { CheckoutErrorType, withCheckoutError } from '../errors';
 import { isMatchingAddress } from '../utils/utils';
+
+const NATIVE_BRIDGE = 'native';
 
 type TokenAllowListParams = {
   type: TokenFilterTypes;
@@ -56,6 +57,10 @@ export const getTokenAllowList = async (
       tokens = onRampConfig[OnRampProvider.TRANSAK]?.tokens || [];
       break;
     case TokenFilterTypes.BRIDGE:
+      // Filter out tokens that are bridged through Axelar ITS, as they can't be bridged through the native bridge.
+      tokens = (await config.tokens.getTokensConfig(targetChainId))
+        .filter((token) => token.bridge === NATIVE_BRIDGE);
+      break;
     case TokenFilterTypes.ALL:
     default:
       tokens = (await config.tokens.getTokensConfig(targetChainId));
@@ -73,12 +78,12 @@ export const isNativeToken = (
 ): boolean => !address || isMatchingAddress(address, NATIVE);
 
 export async function getERC20TokenInfo(
-  web3Provider: Web3Provider | JsonRpcProvider,
+  browserProvider: BrowserProvider | JsonRpcProvider,
   tokenAddress: string,
 ) {
   return await withCheckoutError<TokenInfo>(
     async () => {
-      const contract = new Contract(tokenAddress, JSON.stringify(ERC20ABI), web3Provider);
+      const contract = new Contract(tokenAddress, JSON.stringify(ERC20ABI), browserProvider);
 
       const [name, symbol, decimals] = await Promise.all([
         contract.name(),

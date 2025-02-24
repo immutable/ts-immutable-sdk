@@ -1,9 +1,7 @@
 /* eslint-disable class-methods-use-this */
-import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
-import { track } from '@imtbl/metrics';
 import { Passport } from '@imtbl/passport';
-import { ethers } from 'ethers';
+import { JsonRpcProvider, Eip1193Provider } from 'ethers';
 import { HttpClient } from './api/http';
 import { AvailabilityService, availabilityService } from './availability';
 import * as balances from './balances';
@@ -38,7 +36,6 @@ import {
   ConnectParams,
   ConnectResult,
   CreateProviderParams,
-  CreateProviderResult,
   EIP6963ProviderDetail,
   FiatRampParams,
   GasEstimateBridgeToL2Result,
@@ -56,6 +53,7 @@ import {
   GetTokenInfoParams,
   GetWalletAllowListParams,
   GetWalletAllowListResult,
+  WrappedBrowserProvider,
   NetworkInfo,
   OnRampProviderFees,
   SellResult,
@@ -67,7 +65,7 @@ import {
   SwitchNetworkResult,
   TokenFilterTypes,
   TokenInfo,
-  ValidateProviderOptions,
+  ValidateProviderOptions, CreateProviderResult,
 } from './types';
 import { CancelParams } from './types/cancel';
 import { SellParams } from './types/sell';
@@ -78,7 +76,6 @@ import * as wallet from './wallet';
 import { WidgetConfiguration } from './widgets/definitions/configurations';
 import { getWidgetsEsmUrl, loadUnresolvedBundle } from './widgets/load';
 import { determineWidgetsVersion, getLatestVersion, validateAndBuildVersion } from './widgets/version';
-import { globalPackageVersion } from './env';
 import { AssessmentResult, fetchRiskAssessment, isAddressSanctioned } from './riskAssessment';
 
 const SANDBOX_CONFIGURATION = {
@@ -90,7 +87,7 @@ const SANDBOX_CONFIGURATION = {
 
 // Checkout SDK
 export class Checkout {
-  private readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
+  private readOnlyProviders: Map<ChainId, JsonRpcProvider>;
 
   private httpClient: HttpClient;
 
@@ -112,7 +109,7 @@ export class Checkout {
     this.fiatRampService = new FiatRampService(this.config);
     this.readOnlyProviders = new Map<
     ChainId,
-    ethers.providers.JsonRpcProvider
+    JsonRpcProvider
     >();
     this.availability = availabilityService(
       this.config.isDevelopment,
@@ -122,13 +119,14 @@ export class Checkout {
 
     // Initialise injected providers via EIP-6963
     InjectedProvidersManager.getInstance().initialise();
-
-    track('checkout_sdk', 'initialised');
   }
 
   /**
-   * Loads the widgets bundle and initiate the widgets factory.
+   * Loads the widgets bundle and initiates the widgets factory.
    * @param {WidgetsInit} init - The initialisation parameters for loading the widgets bundle and applying configuration
+   * @returns {Promise<ImmutableCheckoutWidgets.WidgetsFactory>} A promise that resolves to the widgets factory instance
+   *                                                             that can be used to create and manage widgets
+   * @throws {CheckoutError} When the widgets script fails to load
    */
   public async widgets(
     init: WidgetsInit,
@@ -149,12 +147,6 @@ export class Checkout {
       initVersionProvided,
       versionConfig,
     );
-
-    track('checkout_sdk', 'widgets', {
-      sdkVersion: globalPackageVersion(),
-      validatedSdkVersion: validatedBuildVersion,
-      widgetsVersion,
-    });
 
     try {
       const factory = await this.loadEsModules(init.config, widgetsVersion);
@@ -314,6 +306,7 @@ export class Checkout {
 
   /**
    * Returns a list of EIP-6963 injected providers and their metadata.
+   * @returns {readonly EIP6963ProviderDetail[]} A readonly array of injected providers and their metadata.
    */
   public getInjectedProviders(): readonly EIP6963ProviderDetail[] {
     return InjectedProvidersManager.getInstance().getProviders();
@@ -321,7 +314,7 @@ export class Checkout {
 
   /**
    * Finds an injected provider by its RDNS.
-   * @param {rdns: string} args - The parameters for finding the injected provider.
+   * @param {{rdns: string}} args - The parameters for finding the injected provider.
    * @returns {EIP6963ProviderDetail | undefined} - The found provider and metadata or undefined.
    */
   public findInjectedProvider(args: {
@@ -332,7 +325,8 @@ export class Checkout {
 
   /**
    * Subscribes to changes in the injected providers.
-   * @param listener - The listener to be called when the injected providers change.
+   * @param {(providers: EIP6963ProviderDetail[]) => void} listener - The listener to be called when the injected providers change.
+   * @returns {() => void} - A function to unsubscribe the listener.
    */
   public onInjectedProvidersChange(
     listener: (providers: EIP6963ProviderDetail[]) => void,
@@ -340,6 +334,10 @@ export class Checkout {
     return InjectedProvidersManager.getInstance().subscribe(listener);
   }
 
+  /**
+   * Clears all registered injected providers and their subscriptions.
+   * @returns {void} This method doesn't return a value
+   */
   public clearInjectedProviders() {
     return InjectedProvidersManager.getInstance().clear();
   }
@@ -352,7 +350,7 @@ export class Checkout {
   public async checkIsWalletConnected(
     params: CheckConnectionParams,
   ): Promise<CheckConnectionResult> {
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
       {
@@ -360,7 +358,7 @@ export class Checkout {
         allowUnsupportedProvider: true,
       } as ValidateProviderOptions,
     );
-    return connect.checkIsWalletConnected(web3Provider);
+    return connect.checkIsWalletConnected(browserProvider);
   }
 
   /**
@@ -375,7 +373,7 @@ export class Checkout {
   /**
    * Helper method that checks if given risk assessment results contain sanctioned addresses.
    * @param {AssessmentResult} assessment - Risk assessment to analyse.
-   * @param {string | undefined} address - If defined, only sanctions for the given address will be checked.
+   * @param {string} [address] - If defined, only sanctions for the given address will be checked.
    * @returns {boolean} - Result of the check.
    */
   public checkIsAddressSanctioned(assessment: AssessmentResult, address?: string): boolean {
@@ -389,7 +387,7 @@ export class Checkout {
    * @throws {Error} If the provider is not valid or if there is an error connecting to the network.
    */
   public async connect(params: ConnectParams): Promise<ConnectResult> {
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
       {
@@ -400,25 +398,35 @@ export class Checkout {
 
     if (
       params.requestWalletPermissions
-      && !(web3Provider.provider as any)?.isPassport
+      && !transaction.isPassportProvider(browserProvider)
     ) {
-      await connect.requestPermissions(web3Provider);
+      await connect.requestPermissions(browserProvider);
     } else {
-      await connect.connectSite(web3Provider);
+      await connect.connectSite(browserProvider);
     }
 
-    return { provider: web3Provider };
+    return browserProvider;
   }
 
   /**
    * Adds the network for the current wallet provider.
    * @param {AddNetworkParams} params - The parameters for adding the network.
    * @returns {Promise<any>} - A promise that resolves to the result of adding the network.
+   * @throws {CheckoutError} When the network cannot be added to the wallet
    */
   public async addNetwork(params: AddNetworkParams): Promise<any> {
+    const browserProvider = await provider.validateProvider(
+      this.config,
+      params.provider,
+      {
+        allowUnsupportedProvider: true,
+        allowMistmatchedChainId: true,
+      } as ValidateProviderOptions,
+    );
+
     const addNetworkRes = await network.addNetworkToWallet(
       this.config.networkMap,
-      params.provider,
+      browserProvider,
       params.chainId,
     );
 
@@ -433,7 +441,7 @@ export class Checkout {
   public async switchNetwork(
     params: SwitchNetworkParams,
   ): Promise<SwitchNetworkResult> {
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
       {
@@ -444,7 +452,7 @@ export class Checkout {
 
     const switchNetworkRes = await network.switchWalletNetwork(
       this.config,
-      web3Provider,
+      browserProvider,
       params.chainId,
     );
 
@@ -467,7 +475,7 @@ export class Checkout {
    * @returns {Promise<GetBalanceResult>} - A promise that resolves to the balance result.
    */
   public async getBalance(params: GetBalanceParams): Promise<GetBalanceResult> {
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
     );
@@ -475,12 +483,12 @@ export class Checkout {
     if (!params.tokenAddress || params.tokenAddress === '') {
       return await balances.getBalance(
         this.config,
-        web3Provider,
+        browserProvider,
         params.walletAddress,
       );
     }
     return await balances.getERC20Balance(
-      web3Provider,
+      browserProvider,
       params.walletAddress,
       params.tokenAddress,
     );
@@ -494,9 +502,23 @@ export class Checkout {
   public async getAllBalances(
     params: GetAllBalancesParams,
   ): Promise<GetAllBalancesResult> {
-    return balances.getAllBalances(
+    if (!params.provider) {
+      return balances.getAllBalances(
+        this.config,
+        params.provider,
+        params.walletAddress,
+        params.chainId,
+      );
+    }
+
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
+    );
+
+    return balances.getAllBalances(
+      this.config,
+      browserProvider,
       params.walletAddress,
       params.chainId,
     );
@@ -543,7 +565,7 @@ export class Checkout {
   public async sendTransaction(
     params: SendTransactionParams,
   ): Promise<SendTransactionResult> {
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
       {
@@ -551,22 +573,22 @@ export class Checkout {
         allowMistmatchedChainId: true,
       } as ValidateProviderOptions,
     );
-    return await transaction.sendTransaction(web3Provider, params.transaction);
+    return await transaction.sendTransaction(browserProvider, params.transaction);
   }
 
   /**
-   * Wraps a Web3Provider call to validate the provider and handle errors.
-   * @param {Web3Provider} web3Provider - The provider to connect to the network.
-   * @param {(web3Provider: Web3Provider) => Promise<T>)} block - The block executing the provider call.
+   * Wraps a WrappedBrowserProvider call to validate the provider and handle errors.
+   * @param {BrowserProvider} browserProvider - The provider to connect to the network.
+   * @param {(browserProvider: WrappedBrowserProvider) => Promise<T>)} block - The block executing the provider call.
    * @returns {Promise<T>} Returns the result of the provided block param.
    */
   public async providerCall<T>(
-    web3Provider: Web3Provider,
-    block: (web3Provider: Web3Provider) => Promise<T>,
+    browserProvider: WrappedBrowserProvider | Eip1193Provider,
+    block: (browserProvider: WrappedBrowserProvider) => Promise<T>,
   ): Promise<T> {
     const validatedProvider = await provider.validateProvider(
       this.config,
-      web3Provider,
+      browserProvider,
       {
         allowUnsupportedProvider: true,
         allowMistmatchedChainId: true,
@@ -585,7 +607,7 @@ export class Checkout {
    * @returns {Promise<NetworkInfo>} A promise that resolves to the network information.
    */
   public async getNetworkInfo(params: GetNetworkParams): Promise<NetworkInfo> {
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
       {
@@ -593,12 +615,13 @@ export class Checkout {
         allowMistmatchedChainId: true,
       } as ValidateProviderOptions,
     );
-    return await network.getNetworkInfo(this.config, web3Provider);
+    return await network.getNetworkInfo(this.config, browserProvider);
   }
 
   /**
    * Determines the requirements for performing a buy.
    * @param {BuyParams} params - The parameters for the buy.
+   * @returns {Promise<BuyResult>} A promise that resolves to the buy transaction requirements
    * @deprecated Please use orderbook.fulfillOrder or orderbook.fulfillBulkOrders instead. The smartCheckout
    * method can still be used to ensure the transaction requirements are met before preparing the order fulfillment
    */
@@ -610,14 +633,14 @@ export class Checkout {
       );
     }
 
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
     );
 
     return await buy.buy(
       this.config,
-      web3Provider,
+      browserProvider,
       params.orders,
       params.overrides,
     );
@@ -626,6 +649,7 @@ export class Checkout {
   /**
    * Determines the requirements for performing a sell.
    * @param {SellParams} params - The parameters for the sell.
+   * @returns {Promise<SellResult>} A promise that resolves to the sell transaction requirements
    * Only currently actions the first order in the array until we support batch processing.
    * Only currently actions the first fee in the fees array of each order until we support multiple fees.
    * @deprecated Please use orderbook.prepareListing or orderbook.prepareBulkListing instead. The smartCheckout
@@ -639,17 +663,18 @@ export class Checkout {
       );
     }
 
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
     );
 
-    return await sell.sell(this.config, web3Provider, params.orders);
+    return await sell.sell(this.config, browserProvider, params.orders);
   }
 
   /**
    * Cancels a sell.
    * @param {CancelParams} params - The parameters for the cancel.
+   * @returns {Promise<CancelResult>} A promise that resolves to the cancel transaction result
    * @deprecated Please use orderbook.prepareOrderCancellations instead.
    */
   public async cancel(params: CancelParams): Promise<CancelResult> {
@@ -658,14 +683,14 @@ export class Checkout {
       'This endpoint currently only processes the first order in the array.',
     );
 
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
     );
 
     return await cancel.cancel(
       this.config,
-      web3Provider,
+      browserProvider,
       params.orderIds,
       params.overrides,
     );
@@ -673,12 +698,20 @@ export class Checkout {
 
   /**
    * Determines the transaction requirements to complete a purchase.
-   * @params {SmartCheckoutParams} params - The parameters for smart checkout.
+   * This includes checking token approvals, native currency balance,
+   * and calculating the optimal route for completing the transaction.
+   * @param {SmartCheckoutParams} params - The parameters for smart checkout.
+   * @returns {Promise<SmartCheckoutResult>} A promise that resolves to the transaction requirements including:
+   * - Required token approvals
+   * - Required native currency balance
+   * - Suggested transaction route
+   * - Estimated gas costs
+   * @throws {CheckoutError} When item requirements cannot be mapped or checkout validation fails
    */
   public async smartCheckout(
     params: SmartCheckoutParams,
   ): Promise<SmartCheckoutResult> {
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
     );
@@ -686,7 +719,7 @@ export class Checkout {
     let itemRequirements = [];
     try {
       itemRequirements = await getItemRequirementsFromRequirements(
-        web3Provider,
+        browserProvider,
         params.itemRequirements,
       );
     } catch (err: any) {
@@ -699,7 +732,7 @@ export class Checkout {
 
     return await smartCheckout.smartCheckout(
       this.config,
-      web3Provider,
+      browserProvider,
       itemRequirements,
       params.transactionOrGasAmount,
       params.routingOptions,
@@ -710,12 +743,12 @@ export class Checkout {
   }
 
   /**
-   * Checks if the given object is a Web3 provider.
-   * @param {Web3Provider} web3Provider - The object to check.
-   * @returns {boolean} - True if the object is a Web3 provider, false otherwise.
+   * Checks if the given object is a WrappedBrowserProvider.
+   * @param {BrowserProvider} browserProvider - The object to check.
+   * @returns {boolean} - True if the object is a WrappedBrowserProvider, false otherwise.
    */
-  static isWeb3Provider(web3Provider: Web3Provider) {
-    return provider.isWeb3Provider(web3Provider);
+  static isWrappedBrowserProvider(browserProvider: WrappedBrowserProvider) {
+    return provider.isWrappedBrowserProvider(browserProvider);
   }
 
   /**
@@ -748,8 +781,12 @@ export class Checkout {
     let tokenSymbol = 'IMX';
     let email;
 
-    const walletAddress = await params.web3Provider.getSigner().getAddress();
-    const isPassport = (params.web3Provider.provider as any)?.isPassport || false;
+    const browserProvider = 'request' in params.browserProvider
+      ? new WrappedBrowserProvider(params.browserProvider)
+      : params.browserProvider;
+
+    const walletAddress = await (await browserProvider.getSigner()).getAddress();
+    const isPassport = browserProvider.ethereumProvider?.isPassport || false;
 
     if (isPassport && params.passport) {
       const userInfo = await params.passport.getUserInfo();
@@ -801,13 +838,13 @@ export class Checkout {
    * @returns {Promise<SwapResult>} - A promise that resolves to the swap result (swap tx, swap tx receipt, quote used in the swap).
    */
   public async swap(params: SwapParams): Promise<SwapResult> {
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
     );
     return swap.swap(
       this.config,
-      web3Provider,
+      browserProvider,
       params.fromToken,
       params.toToken,
       params.fromAmount,
@@ -824,13 +861,13 @@ export class Checkout {
    * @returns {Promise<SwapQuoteResult>} - A promise that resolves to the swap quote result.
    */
   public async swapQuote(params: SwapParams): Promise<SwapQuoteResult> {
-    const web3Provider = await provider.validateProvider(
+    const browserProvider = await provider.validateProvider(
       this.config,
       params.provider,
     );
     return swap.swapQuote(
       this.config,
-      web3Provider,
+      browserProvider,
       params.fromToken,
       params.toToken,
       params.fromAmount,

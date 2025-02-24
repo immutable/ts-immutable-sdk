@@ -1,5 +1,5 @@
 import * as GeneratedClients from '@imtbl/generated-clients';
-import { BigNumber, ethers } from 'ethers';
+import { BigNumberish, ZeroAddress } from 'ethers';
 import axios from 'axios';
 import AuthManager from '../authManager';
 import { ConfirmationScreen } from '../confirmation';
@@ -25,6 +25,7 @@ type GuardianEVMTxnEvaluationParams = {
   chainId: string;
   nonce: string;
   metaTransactions: MetaTransaction[];
+  isBackgroundTransaction?: boolean;
 };
 
 type GuardianEIP712MessageEvaluationParams = {
@@ -33,7 +34,7 @@ type GuardianEIP712MessageEvaluationParams = {
 };
 
 type GuardianERC191MessageEvaluationParams = {
-  chainID: number;
+  chainID: bigint;
   payload: string;
 };
 
@@ -41,8 +42,8 @@ const transactionRejectedCrossSdkBridgeError = 'Transaction requires confirmatio
   + ' supported in this environment. Please contact Immutable support if you need to enable this feature.';
 
 export const convertBigNumberishToString = (
-  value: ethers.BigNumberish,
-): string => BigNumber.from(value).toString();
+  value: BigNumberish,
+): string => BigInt(value).toString();
 
 const transformGuardianTransactions = (
   txs: MetaTransaction[],
@@ -52,7 +53,7 @@ const transformGuardianTransactions = (
       delegateCall: t.delegateCall === true,
       revertOnError: t.revertOnError === true,
       gasLimit: t.gasLimit ? convertBigNumberishToString(t.gasLimit) : '0',
-      target: t.to ?? ethers.constants.AddressZero,
+      target: t.to ?? ZeroAddress,
       value: t.value ? convertBigNumberishToString(t.value) : '0',
       data: t.data ? t.data.toString() : '0x',
     }));
@@ -215,6 +216,7 @@ export default class GuardianClient {
     chainId,
     nonce,
     metaTransactions,
+    isBackgroundTransaction,
   }: GuardianEVMTxnEvaluationParams): Promise<void> {
     const transactionEvaluationResponse = await this.evaluateEVMTransaction({
       chainId,
@@ -245,7 +247,9 @@ export default class GuardianClient {
           'Transaction rejected by user',
         );
       }
-    } else {
+      // This verification is meant to ensure that it originates from zkEvmProvider#callSessionActivity
+      // and since it's a background transaction should not close the confirmation screen window.
+    } else if (!isBackgroundTransaction) {
       this.confirmationScreen.closeWindow();
     }
   }
@@ -313,7 +317,7 @@ export default class GuardianClient {
       const messageEvalResponse = await this.guardianApi.evaluateErc191Message(
         {
           eRC191MessageEvaluationRequest: {
-            chainID: getEip155ChainId(chainID),
+            chainID: getEip155ChainId(Number(chainID)),
             payload,
           },
         },
