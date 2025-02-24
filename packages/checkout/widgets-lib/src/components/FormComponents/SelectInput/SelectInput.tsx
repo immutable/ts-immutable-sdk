@@ -9,8 +9,10 @@ import {
 import { SelectForm } from '../SelectForm/SelectForm';
 import { InputMode, TextInputForm, TextInputType } from '../TextInputForm/TextInputForm';
 import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
+import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 interface SelectInputProps {
+
   testId: string;
   options: CoinSelectorOptionProps[];
   selectTextAlign?: 'left' | 'right';
@@ -34,6 +36,9 @@ interface SelectInputProps {
   onSelectChange: (value: OptionKey) => void;
   selectedOption?: OptionKey;
   defaultTokenImage: string;
+  userJourney: UserJourney;
+  screen: string;
+  control: string;
   environment?: Environment;
   theme?: WidgetTheme;
 }
@@ -62,6 +67,9 @@ export function SelectInput({
   selectedOption,
   coinSelectorHeading,
   defaultTokenImage,
+  userJourney,
+  screen,
+  control,
   environment,
   theme,
 }: SelectInputProps) {
@@ -79,6 +87,9 @@ export function SelectInput({
           selectedOption={selectedOption}
           coinSelectorHeading={coinSelectorHeading}
           defaultTokenImage={defaultTokenImage}
+          control={control}
+          userJourney={userJourney}
+          screen={screen}
           environment={environment}
           theme={theme}
         />

@@ -1,13 +1,14 @@
 import {
   Select, Box, OptionKey,
 } from '@biom3/react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Environment } from '@imtbl/config';
 import { WidgetTheme } from '@imtbl/checkout-sdk';
 import { TokenImage } from '../../TokenImage/TokenImage';
 import { FormControlWrapper } from '../FormControlWrapper/FormControlWrapper';
 import { CoinSelector } from '../../CoinSelector/CoinSelector';
 import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
+import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 interface SelectFormProps {
   testId: string;
@@ -21,6 +22,9 @@ interface SelectFormProps {
   onSelectChange: (value: string) => void;
   coinSelectorHeading: string;
   defaultTokenImage: string;
+  userJourney: UserJourney;
+  screen: string;
+  control: string;
   environment?: Environment;
   theme?: WidgetTheme,
 }
@@ -37,9 +41,13 @@ export function SelectForm({
   selectedOption,
   coinSelectorHeading,
   defaultTokenImage,
+  userJourney,
+  screen,
+  control,
   environment = Environment.PRODUCTION,
   theme = WidgetTheme.DARK,
 }: SelectFormProps) {
+  const { track } = useAnalytics();
   const [coinSelectorOpen, setCoinSelectorOpen] = useState<boolean>(false);
   const coinSelectorOptions = useMemo(() => options.map((option) => ({
     ...option,
@@ -57,7 +65,18 @@ export function SelectForm({
     return selectedOption;
   };
 
-  const filteredOption = options?.find((o) => o.id === selectedOption) as CoinSelectorOptionProps ?? selectedOption;
+  const filteredOption = options.find((o) => o.id === selectedOption) as CoinSelectorOptionProps ?? selectedOption;
+
+  const openCoinSelector = useCallback(() => {
+    setCoinSelectorOpen(true);
+    track({
+      userJourney,
+      screen,
+      control,
+      controlType: 'Select',
+      action: 'Opened',
+    });
+  }, [setCoinSelectorOpen, track]);
 
   return (
     <Box>
@@ -80,7 +99,7 @@ export function SelectForm({
           testId={`${testId}-select`}
           size="large"
           defaultLabel="Select token"
-          targetClickOveride={() => setCoinSelectorOpen(true)}
+          targetClickOveride={openCoinSelector}
           selectedOption={getSelectedOption()}
           sx={{ minw: '170px' }}
         >
