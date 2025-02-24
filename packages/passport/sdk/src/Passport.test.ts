@@ -578,7 +578,7 @@ describe('Passport', () => {
 
     it('should call loginWithRedirect', async () => {
       getUserMock.mockReturnValue(null);
-      await passport.login({ enableRedirectFlow: true });
+      await passport.login({ useRedirectFlow: true });
 
       expect(getUserMock).toBeCalledTimes(1);
       expect(authLoginMock).toBeCalledTimes(1);

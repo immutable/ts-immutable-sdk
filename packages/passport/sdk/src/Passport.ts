@@ -198,7 +198,7 @@ export class Passport {
     useCachedSession?: boolean;
     anonymousId?: string;
     useSilentLogin?: boolean;
-    enableRedirectFlow?: boolean;
+    useRedirectFlow?: boolean;
   }): Promise<UserProfile | null> {
     return withMetricsAsync(async () => {
       const { useCachedSession = false, useSilentLogin } = options || {};
@@ -219,7 +219,7 @@ export class Passport {
       if (!user && useSilentLogin) {
         user = await this.authManager.forceUserRefresh();
       } else if (!user && !useCachedSession) {
-        if (options?.enableRedirectFlow) {
+        if (options?.useRedirectFlow) {
           await this.authManager.loginWithRedirect(options?.anonymousId);
         } else {
           user = await this.authManager.login(options?.anonymousId);
