@@ -276,8 +276,8 @@ export default class AuthManager {
     return user || this.login();
   }
 
-  public async loginCallback(): Promise<void | User> {
-    return withPassportError<void | User>(async () => {
+  public async loginCallback(): Promise<undefined | User> {
+    return withPassportError<undefined | User>(async () => {
       const oidcUser = await this.userManager.signinCallback();
       if (!oidcUser) {
         return undefined;
