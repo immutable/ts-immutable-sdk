@@ -11,7 +11,6 @@ import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
 import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 interface SelectFormProps {
-
   testId: string;
   options: CoinSelectorOptionProps[];
   optionsLoading?: boolean;
