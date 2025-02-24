@@ -1,15 +1,17 @@
 import {
   Select, Box, OptionKey,
 } from '@biom3/react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Environment } from '@imtbl/config';
 import { WidgetTheme } from '@imtbl/checkout-sdk';
 import { TokenImage } from '../../TokenImage/TokenImage';
 import { FormControlWrapper } from '../FormControlWrapper/FormControlWrapper';
 import { CoinSelector } from '../../CoinSelector/CoinSelector';
 import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
+import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 interface SelectFormProps {
+  control: string;
   testId: string;
   options: CoinSelectorOptionProps[];
   optionsLoading?: boolean;
@@ -26,6 +28,7 @@ interface SelectFormProps {
 }
 
 export function SelectForm({
+  control,
   testId,
   options,
   optionsLoading,
@@ -40,6 +43,7 @@ export function SelectForm({
   environment = Environment.PRODUCTION,
   theme = WidgetTheme.DARK,
 }: SelectFormProps) {
+  const { track } = useAnalytics();
   const [coinSelectorOpen, setCoinSelectorOpen] = useState<boolean>(false);
   const coinSelectorOptions = useMemo(() => options.map((option) => ({
     ...option,
@@ -57,7 +61,18 @@ export function SelectForm({
     return selectedOption;
   };
 
-  const filteredOption = options?.find((o) => o.id === selectedOption) as CoinSelectorOptionProps ?? selectedOption;
+  const filteredOption = options.find((o) => o.id === selectedOption) as CoinSelectorOptionProps ?? selectedOption;
+
+  const openCoinSelector = useCallback(() => {
+    setCoinSelectorOpen(true);
+    track({
+      userJourney: UserJourney.SWAP,
+      screen: 'SwapCoins',
+      control,
+      controlType: 'Select',
+      action: 'Opened',
+    });
+  }, [setCoinSelectorOpen, track]);
 
   return (
     <Box>
@@ -80,7 +95,7 @@ export function SelectForm({
           testId={`${testId}-select`}
           size="large"
           defaultLabel="Select token"
-          targetClickOveride={() => setCoinSelectorOpen(true)}
+          targetClickOveride={openCoinSelector}
           selectedOption={getSelectedOption()}
           sx={{ minw: '170px' }}
         >

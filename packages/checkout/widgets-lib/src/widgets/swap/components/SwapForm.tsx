@@ -888,6 +888,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
               {t('views.SWAP.swapForm.from.label')}
             </Heading>
             <SelectInput
+              control="FromToken"
               testId="fromTokenInputs"
               options={tokensOptionsFrom}
               selectSubtext={
@@ -952,6 +953,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
               )}
             </Box>
             <SelectInput
+              control="ToToken"
               testId="toTokenInputs"
               options={tokensOptionsTo}
               selectTextAlign="left"

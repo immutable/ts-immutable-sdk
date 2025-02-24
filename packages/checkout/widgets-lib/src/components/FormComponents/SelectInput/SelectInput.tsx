@@ -11,6 +11,7 @@ import { InputMode, TextInputForm, TextInputType } from '../TextInputForm/TextIn
 import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
 
 interface SelectInputProps {
+  control: string;
   testId: string;
   options: CoinSelectorOptionProps[];
   selectTextAlign?: 'left' | 'right';
@@ -39,6 +40,7 @@ interface SelectInputProps {
 }
 
 export function SelectInput({
+  control,
   testId,
   options,
   textInputValue,
@@ -69,6 +71,7 @@ export function SelectInput({
     <Box sx={selectInputBoxStyle}>
       <Box sx={selectStyle}>
         <SelectForm
+          control={control}
           testId={`${testId}-select-form`}
           options={options}
           subtext={selectSubtext}
