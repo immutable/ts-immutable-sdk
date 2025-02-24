@@ -64,7 +64,7 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
   const baseConfiguration: UserManagerSettings = {
     authority: authenticationDomain,
     redirect_uri: oidcConfiguration.redirectUri,
-    popup_redirect_uri: oidcConfiguration.popupRedirectUri,
+    popup_redirect_uri: oidcConfiguration.popupRedirectUri || oidcConfiguration.redirectUri,
     client_id: oidcConfiguration.clientId,
     metadata: {
       authorization_endpoint: `${authenticationDomain}/authorize`,
