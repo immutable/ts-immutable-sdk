@@ -12,7 +12,7 @@ describe('Config', () => {
   const oidcConfiguration = {
     clientId: 'client123',
     redirectUri: 'redirect123',
-    loginRedirectUri: 'loginRedirect123',
+    popupRedirectUri: 'popupRedirect123',
     logoutRedirectUri: 'logout123',
     scope: 'email profile',
     audience: 'xxx_api',

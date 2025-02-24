@@ -15,7 +15,7 @@ const PassportContext = createContext<{
   connectZkEvm: () => void;
   logout: () => void;
   login: () => void;
-  loginRedirect: () => void;
+  popupRedirect: () => void;
   getIdToken: () => Promise<string | undefined>;
   getAccessToken: () => Promise<string | undefined>;
   getUserInfo: () => Promise<UserProfile | undefined>;
@@ -28,7 +28,7 @@ const PassportContext = createContext<{
       connectZkEvm: () => undefined,
       logout: () => undefined,
       login: () => Promise.resolve(undefined),
-      loginRedirect: () => Promise.resolve(undefined),
+      popupRedirect: () => Promise.resolve(undefined),
       getIdToken: () => Promise.resolve(undefined),
       getAccessToken: () => Promise.resolve(undefined),
       getUserInfo: () => Promise.resolve(undefined),
@@ -137,7 +137,7 @@ export function PassportProvider({
     }
   }, [addMessage, passportClient, setIsLoading]);
 
-  const login = useCallback(async () => {
+  const popupRedirect = useCallback(async () => {
     try {
       setIsLoading(true);
       const userProfile = await passportClient.login();
@@ -150,7 +150,7 @@ export function PassportProvider({
     }
   }, [addMessage, passportClient, setIsLoading]);
 
-  const loginRedirect = useCallback(async () => {
+  const login = useCallback(async () => {
     try {
       setIsLoading(true);
       const userProfile = await passportClient.login({ enableRedirectFlow: true });
@@ -170,7 +170,7 @@ export function PassportProvider({
     connectZkEvm,
     logout,
     login,
-    loginRedirect,
+    popupRedirect,
     getIdToken,
     getAccessToken,
     getUserInfo,
@@ -183,7 +183,7 @@ export function PassportProvider({
     connectZkEvm,
     logout,
     login,
-    loginRedirect,
+    popupRedirect,
     getIdToken,
     getAccessToken,
     getUserInfo,
@@ -205,7 +205,7 @@ export function usePassportProvider() {
     connectImx,
     connectZkEvm,
     login,
-    loginRedirect,
+    popupRedirect,
     logout,
     getIdToken,
     getAccessToken,
@@ -219,7 +219,7 @@ export function usePassportProvider() {
     connectImx,
     connectZkEvm,
     login,
-    loginRedirect,
+    popupRedirect,
     logout,
     getIdToken,
     getAccessToken,

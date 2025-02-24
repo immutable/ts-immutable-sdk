@@ -38,7 +38,7 @@ describe('Guardian', () => {
         clientId: 'client123',
         logoutRedirectUri: 'http://localhost:3000/logout',
         redirectUri: 'http://localhost:3000/redirect',
-        loginRedirectUri: 'http://localhost:3000/redirect2',
+        popupRedirectUri: 'http://localhost:3000/redirect2',
         crossSdkBridgeEnabled,
       }),
       authManager: {

@@ -12,9 +12,9 @@ import { Passport, PassportModuleConfiguration } from '@imtbl/passport';
 import { Environment, ImmutableConfiguration, ModuleConfiguration } from '@imtbl/config';
 import {
   AUDIENCE,
-  LOGIN_REDIRECT_URI,
-  LOGOUT_REDIRECT_URI,
+  POPUP_REDIRECT_URI,
   REDIRECT_URI,
+  LOGOUT_REDIRECT_URI,
   SILENT_LOGOUT_REDIRECT_URI,
   LOGOUT_MODE,
   SCOPE,
@@ -90,9 +90,9 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
   const sharedConfigurationValues = {
     scope: SCOPE,
     audience: AUDIENCE,
+    popupRedirectUri: POPUP_REDIRECT_URI,
     redirectUri: REDIRECT_URI,
     logoutMode: LOGOUT_MODE,
-    loginRedirectUri: LOGIN_REDIRECT_URI,
     logoutRedirectUri: LOGOUT_MODE === 'silent'
       ? SILENT_LOGOUT_REDIRECT_URI
       : LOGOUT_REDIRECT_URI,

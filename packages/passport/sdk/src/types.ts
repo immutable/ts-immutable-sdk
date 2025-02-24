@@ -59,7 +59,7 @@ export interface OidcConfiguration {
   logoutRedirectUri?: string;
   logoutMode?: 'redirect' | 'silent';
   redirectUri: string;
-  loginRedirectUri?: string;
+  popupRedirectUri?: string;
   scope?: string;
   audience?: string;
 }

@@ -22,7 +22,7 @@ jest.mock('./overlay');
 const authenticationDomain = 'auth.immutable.com';
 const clientId = '11111';
 const redirectUri = 'https://test.com';
-const loginRedirectUri = `${redirectUri}.login/callback`;
+const popupRedirectUri = `${redirectUri}-popup`;
 const logoutEndpoint = '/v2/logout';
 const logoutRedirectUri = `${redirectUri}logout/callback`;
 
@@ -32,7 +32,7 @@ const getConfig = (values?: Partial<PassportModuleConfiguration>) => new Passpor
   }),
   clientId,
   redirectUri,
-  loginRedirectUri,
+  popupRedirectUri,
   scope: 'email profile',
   ...values,
 });
@@ -140,8 +140,8 @@ describe('AuthManager', () => {
           end_session_endpoint: `${config.authenticationDomain}${logoutEndpoint}`
             + `?client_id=${config.oidcConfiguration.clientId}`,
         },
-        popup_redirect_uri: config.oidcConfiguration.redirectUri,
-        redirect_uri: config.oidcConfiguration.loginRedirectUri,
+        popup_redirect_uri: config.oidcConfiguration.popupRedirectUri,
+        redirect_uri: config.oidcConfiguration.redirectUri,
         scope: config.oidcConfiguration.scope,
         userStore: expect.any(WebStorageStateStore),
       });
