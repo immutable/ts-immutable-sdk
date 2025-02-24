@@ -374,18 +374,10 @@ describe('AuthManager', () => {
     });
 
     it('should call login redirect callback and map to domain model', async () => {
-      mockSigninRedirectCallback.mockReturnValue(mockOidcUser);
-      const user = await authManager.loginCallback(true);
-      expect(mockSigninRedirectCallback).toBeCalled();
+      mockSigninCallback.mockReturnValue(mockOidcUser);
+      const user = await authManager.loginCallback();
+      expect(mockSigninCallback).toBeCalled();
       expect(user).toEqual(mockUser);
-    });
-
-    it('should call login redirect callback and throw error', async () => {
-      try {
-        await authManager.loginCallback(true);
-      } catch (e) {
-        expect(mockSigninRedirectCallback).toBeCalled();
-      }
     });
   });
 

@@ -242,9 +242,9 @@ export class Passport {
    * @returns {Promise<void>} A promise that resolves when the callback is processed
    */
   public async loginCallback(enableRedirectFlow?: boolean): Promise<void> {
-    await withMetricsAsync(() => this.authManager.loginCallback(enableRedirectFlow), 'loginCallback')
+    await withMetricsAsync(() => this.authManager.loginCallback(), 'loginCallback')
       .then((user) => {
-        if (user) {
+        if (user && enableRedirectFlow) {
           identify({
             passportId: user.profile.sub,
           });
