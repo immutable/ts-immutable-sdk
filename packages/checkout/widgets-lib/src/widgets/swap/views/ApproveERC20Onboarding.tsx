@@ -52,12 +52,12 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   useEffect(() => {
     page({
       userJourney: UserJourney.SWAP,
-      screen: 'ApproveERC20',
+      screen: noApprovalTransaction ? 'ApproveSwap' : 'ApproveSpending',
       extras: {
         swapFormInfo: data.swapFormInfo,
       },
     });
-  }, []);
+  }, [noApprovalTransaction]);
 
   // Get symbol from swap info for approve amount text
   const fromToken = useMemo(
