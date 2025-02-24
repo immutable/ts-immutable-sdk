@@ -920,6 +920,9 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
                 : undefined}
               coinSelectorHeading={t('views.SWAP.swapForm.from.selectorTitle')}
               defaultTokenImage={defaultTokenImage}
+              control="FromToken"
+              userJourney={UserJourney.SWAP}
+              screen="SwapCoins"
               environment={checkout?.config.environment}
               theme={theme}
             />
@@ -971,6 +974,9 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
                 : undefined}
               coinSelectorHeading={t('views.SWAP.swapForm.to.selectorTitle')}
               defaultTokenImage={defaultTokenImage}
+              control="ToToken"
+              userJourney={UserJourney.SWAP}
+              screen="SwapCoins"
               environment={checkout?.config.environment}
               theme={theme}
             />
