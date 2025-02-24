@@ -9,9 +9,10 @@ import {
 import { SelectForm } from '../SelectForm/SelectForm';
 import { InputMode, TextInputForm, TextInputType } from '../TextInputForm/TextInputForm';
 import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
+import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 interface SelectInputProps {
-  control: string;
+
   testId: string;
   options: CoinSelectorOptionProps[];
   selectTextAlign?: 'left' | 'right';
@@ -35,12 +36,14 @@ interface SelectInputProps {
   onSelectChange: (value: OptionKey) => void;
   selectedOption?: OptionKey;
   defaultTokenImage: string;
+  userJourney: UserJourney;
+  screen: string;
+  control: string;
   environment?: Environment;
   theme?: WidgetTheme;
 }
 
 export function SelectInput({
-  control,
   testId,
   options,
   textInputValue,
@@ -64,6 +67,9 @@ export function SelectInput({
   selectedOption,
   coinSelectorHeading,
   defaultTokenImage,
+  userJourney,
+  screen,
+  control,
   environment,
   theme,
 }: SelectInputProps) {
@@ -71,7 +77,6 @@ export function SelectInput({
     <Box sx={selectInputBoxStyle}>
       <Box sx={selectStyle}>
         <SelectForm
-          control={control}
           testId={`${testId}-select-form`}
           options={options}
           subtext={selectSubtext}
@@ -82,6 +87,9 @@ export function SelectInput({
           selectedOption={selectedOption}
           coinSelectorHeading={coinSelectorHeading}
           defaultTokenImage={defaultTokenImage}
+          control={control}
+          userJourney={userJourney}
+          screen={screen}
           environment={environment}
           theme={theme}
         />

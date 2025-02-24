@@ -888,7 +888,6 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
               {t('views.SWAP.swapForm.from.label')}
             </Heading>
             <SelectInput
-              control="FromToken"
               testId="fromTokenInputs"
               options={tokensOptionsFrom}
               selectSubtext={
@@ -921,6 +920,9 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
                 : undefined}
               coinSelectorHeading={t('views.SWAP.swapForm.from.selectorTitle')}
               defaultTokenImage={defaultTokenImage}
+              control="FromToken"
+              userJourney={UserJourney.SWAP}
+              screen="SwapCoins"
               environment={checkout?.config.environment}
               theme={theme}
             />
@@ -953,7 +955,6 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
               )}
             </Box>
             <SelectInput
-              control="ToToken"
               testId="toTokenInputs"
               options={tokensOptionsTo}
               selectTextAlign="left"
@@ -973,6 +974,9 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
                 : undefined}
               coinSelectorHeading={t('views.SWAP.swapForm.to.selectorTitle')}
               defaultTokenImage={defaultTokenImage}
+              control="ToToken"
+              userJourney={UserJourney.SWAP}
+              screen="SwapCoins"
               environment={checkout?.config.environment}
               theme={theme}
             />

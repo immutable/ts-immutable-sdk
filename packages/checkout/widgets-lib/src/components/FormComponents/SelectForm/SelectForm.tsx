@@ -11,7 +11,7 @@ import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
 import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 interface SelectFormProps {
-  control: string;
+
   testId: string;
   options: CoinSelectorOptionProps[];
   optionsLoading?: boolean;
@@ -23,12 +23,14 @@ interface SelectFormProps {
   onSelectChange: (value: string) => void;
   coinSelectorHeading: string;
   defaultTokenImage: string;
+  userJourney: UserJourney;
+  screen: string;
+  control: string;
   environment?: Environment;
   theme?: WidgetTheme,
 }
 
 export function SelectForm({
-  control,
   testId,
   options,
   optionsLoading,
@@ -40,6 +42,9 @@ export function SelectForm({
   selectedOption,
   coinSelectorHeading,
   defaultTokenImage,
+  userJourney,
+  screen,
+  control,
   environment = Environment.PRODUCTION,
   theme = WidgetTheme.DARK,
 }: SelectFormProps) {
@@ -66,8 +71,8 @@ export function SelectForm({
   const openCoinSelector = useCallback(() => {
     setCoinSelectorOpen(true);
     track({
-      userJourney: UserJourney.SWAP,
-      screen: 'SwapCoins',
+      userJourney,
+      screen,
       control,
       controlType: 'Select',
       action: 'Opened',
