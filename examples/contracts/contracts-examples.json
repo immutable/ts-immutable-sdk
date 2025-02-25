@@ -1,0 +1,34 @@
+{
+  ".gitignore": {
+    "tutorial": "",
+    "metadata": {}
+  },
+  "README.md": {
+    "tutorial": "",
+    "metadata": {}
+  },
+  "contract-interaction-with-viem": {
+    "tutorial": "",
+    "metadata": {}
+  },
+  "jest.config.js": {
+    "tutorial": "",
+    "metadata": {}
+  },
+  "node_modules": {
+    "tutorial": "",
+    "metadata": {}
+  },
+  "package.json": {
+    "tutorial": "",
+    "metadata": {}
+  },
+  "test": {
+    "tutorial": "",
+    "metadata": {}
+  },
+  "tsconfig.json": {
+    "tutorial": "",
+    "metadata": {}
+  }
+}
