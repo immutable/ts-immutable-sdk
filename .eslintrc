@@ -41,6 +41,12 @@
         "@typescript-eslint/no-unused-vars": "warn",
         "no-underscore-dangle": "warn"
       }
+    },
+    {
+      "files": ["./packages/internal/generated-clients/**"],
+      "rules": {
+        "import/export": "off"
+      }
     }
   ]
 }

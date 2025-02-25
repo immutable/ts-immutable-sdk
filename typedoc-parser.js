@@ -107,16 +107,43 @@ function extractMethodDetails(node) {
   if (node.signatures && node.signatures.length > 0) {
     const signature = node.signatures[0];
 
+    // Add deprecated tag extraction
+    let deprecated = false;
+    let deprecatedMessage = '';
+    if (signature.comment && signature.comment.blockTags) {
+      const deprecatedTag = signature.comment.blockTags.find((tag) => tag.tag === '@deprecated');
+      if (deprecatedTag) {
+        deprecated = true;
+        deprecatedMessage = deprecatedTag.content.map((c) => c.text || '').join(' ');
+      }
+    }
+
     return {
       kind: 'Method',
       name: node.name,
       description: signature.comment ? signature.comment.summary.map((s) => s.text).join(' ') : '',
-      parameters: signature.parameters ? signature.parameters.map((param) => ({
-        name: param.name,
-        type: param.type ? typeToString(param.type) : '',
-        description: param.comment ? param.comment.summary.map((s) => s.text).join(' ') : '',
-        isOptional: param.flags?.isOptional || false,
-      })) : [],
+      deprecated,
+      deprecatedMessage,
+      parameters: signature.parameters ? signature.parameters.map((param) => {
+        // Extract parameter details
+        const paramDetails = {
+          name: param.name,
+          type: param.type ? typeToString(param.type) : '',
+          description: param.comment ? param.comment.summary.map((s) => s.text).join(' ') : '',
+          isOptional: param.flags?.isOptional || false,
+        };
+        // If this is an object type parameter, extract property comments
+        if (param.type && param.type.type === 'reflection' && param.type.declaration
+            && param.type.declaration.children && param.type.declaration.children.length > 0) {
+          paramDetails.properties = param.type.declaration.children.map((prop) => ({
+            name: prop.name,
+            type: prop.type ? typeToString(prop.type) : '',
+            description: prop.comment ? prop.comment.summary.map((s) => s.text).join(' ') : '',
+            isOptional: prop.flags?.isOptional || false,
+          }));
+        }
+        return paramDetails;
+      }) : [],
       returnType: typeToString(signature.type),
       returnDescription: extractReturnDescription(signature.comment),
     };
@@ -140,11 +167,23 @@ function extractClassDetails(node) {
         if (['prepareStackTrace', 'stackTraceLimit', 'name', 'message', 'stack', 'cause'].includes(child.name)) {
           return;
         }
+        // Add deprecated tag extraction for properties
+        let deprecated = false;
+        let deprecatedMessage = '';
+        if (child.comment && child.comment.blockTags) {
+          const deprecatedTag = child.comment.blockTags.find((tag) => tag.tag === '@deprecated');
+          if (deprecatedTag) {
+            deprecated = true;
+            deprecatedMessage = deprecatedTag.content.map((c) => c.text || '').join(' ');
+          }
+        }
         properties.push({
           name: child.name,
           type: child.type ? typeToString(child.type) : '',
           description: child.comment ? child.comment.summary.map((s) => s.text).join(' ') : '',
           isOptional: child.flags?.isOptional || false,
+          deprecated,
+          deprecatedMessage,
         });
       } else if (child.kind === 2048 && !child.inheritedFrom) { // Method
         const methodDetail = extractMethodDetails(child);

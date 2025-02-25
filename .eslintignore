@@ -16,4 +16,10 @@ jest.*.js
 **playground**/
 examples/**/*
 
+# Typedoc parser
+typedoc-parser.js
+
+# generated clients
+packages/internal/generated-clients/
+
 # put module specific ignore paths here
