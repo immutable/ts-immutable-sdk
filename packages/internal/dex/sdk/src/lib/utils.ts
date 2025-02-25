@@ -134,7 +134,7 @@ export const addAmount = <T extends Coin>(a: CoinAmount<T>, b: CoinAmount<T>) =>
   throw new Error('Token mismatch: token types must be the same');
 };
 
-export const subtractERC20Amount = (a: CoinAmount<ERC20>, b: CoinAmount<ERC20>) => {
+const subtractERC20Amount = (a: CoinAmount<ERC20>, b: CoinAmount<ERC20>) => {
   // Make sure the ERC20s have the same address
   if (a.token.address.toLowerCase() !== b.token.address.toLowerCase()) {
     throw new Error('Token mismatch: token addresses must be the same');
