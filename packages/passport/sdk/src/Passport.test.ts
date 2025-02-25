@@ -32,6 +32,7 @@ jest.mock('@imtbl/metrics');
 const oidcConfiguration: OidcConfiguration = {
   clientId: '11111',
   redirectUri: 'https://test.com',
+  popupRedirectUri: 'https://test.com',
   logoutRedirectUri: 'https://test.com',
 };
 
@@ -71,6 +72,7 @@ describe('Passport', () => {
     forceUserRefreshMock = jest.fn();
     (AuthManager as unknown as jest.Mock).mockReturnValue({
       login: authLoginMock,
+      loginWithRedirect: authLoginMock,
       loginCallback: loginCallbackMock,
       logout: logoutMock,
       removeUser: removeUserMock,
@@ -572,6 +574,14 @@ describe('Passport', () => {
 
       expect(forceUserRefreshMock).toBeCalledTimes(1);
       expect(authLoginMock).toBeCalledTimes(0);
+    });
+
+    it('should call loginWithRedirect', async () => {
+      getUserMock.mockReturnValue(null);
+      await passport.login({ useRedirectFlow: true });
+
+      expect(getUserMock).toBeCalledTimes(1);
+      expect(authLoginMock).toBeCalledTimes(1);
     });
   });
 
