@@ -109,9 +109,11 @@ export const isNativeAmount = (amount: CoinAmount<Coin>): amount is CoinAmount<N
 
 export const isNative = (token: Coin): token is Native => token.type === 'native';
 
-export const addERC20Amount = (a: CoinAmount<ERC20>, b: CoinAmount<ERC20>) => {
+const addERC20Amount = (a: CoinAmount<ERC20>, b: CoinAmount<ERC20>) => {
   // Make sure the ERC20s have the same address
-  if (a.token.address !== b.token.address) throw new Error('Token mismatch: token addresses must be the same');
+  if (a.token.address.toLowerCase() !== b.token.address.toLowerCase()) {
+    throw new Error('Token mismatch: token addresses must be the same');
+  }
   return { value: a.value + b.value, token: a.token };
 };
 
@@ -134,7 +136,9 @@ export const addAmount = <T extends Coin>(a: CoinAmount<T>, b: CoinAmount<T>) =>
 
 export const subtractERC20Amount = (a: CoinAmount<ERC20>, b: CoinAmount<ERC20>) => {
   // Make sure the ERC20s have the same address
-  if (a.token.address !== b.token.address) throw new Error('Token mismatch: token addresses must be the same');
+  if (a.token.address.toLowerCase() !== b.token.address.toLowerCase()) {
+    throw new Error('Token mismatch: token addresses must be the same');
+  }
   return { value: a.value - b.value, token: a.token };
 };
 
