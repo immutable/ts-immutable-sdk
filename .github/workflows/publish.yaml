@@ -142,7 +142,7 @@ jobs:
           token: ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
           access: public
           package: ./sdk/package.json
-          tag: ${{ contains(env.RELEASE_TYPE, 'alpha') && 'alpha' }}
+          tag: ${{ contains(env.RELEASE_TYPE, 'alpha') && 'alpha-legacy' }}
           dry-run: ${{ env.DRY_RUN }}
 
       # ! Do NOT remove - this will cause a Sev 0 incident !
@@ -158,7 +158,7 @@ jobs:
       - name: Release
         id: npm_release
         if: contains(env.RELEASE_TYPE, 'release')
-        run: yarn release --ci --no-increment -c .release-it.json $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
+        run: yarn release --ci --no-increment -c .release-it.json $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }} --tag=legacy
 
       - name: Warm up CDN
         id: warm_up_cdn
