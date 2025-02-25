@@ -1,0 +1,8 @@
+{
+  "title": "Passport Login with Next.js",
+  "description": "Example demonstrating different ways to implement login and logout flows with Immutable Passport in a Next.js application",
+  "keywords": ["Passport", "Next.js", "Authentication", "Login", "Logout", "EtherJS", "Web3"],
+  "tech_stack": ["TypeScript", "Next.js", "React", "Immutable SDK", "EtherJS"],
+  "category": "Passport",
+  "programming_language": "TypeScript"
+} 

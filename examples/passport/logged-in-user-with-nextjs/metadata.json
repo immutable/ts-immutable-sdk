@@ -1,0 +1,8 @@
+{
+  "title": "Logged-in User Data with Next.js",
+  "description": "Example demonstrating how to retrieve and display user information, linked addresses, and verify tokens after login with Immutable Passport in a Next.js application",
+  "keywords": ["Passport", "Next.js", "Authentication", "User Data", "Linked Addresses", "Token Verification", "Web3"],
+  "tech_stack": ["TypeScript", "Next.js", "React", "Immutable SDK"],
+  "category": "Passport",
+  "programming_language": "TypeScript"
+} 
