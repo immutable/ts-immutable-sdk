@@ -1,0 +1,54 @@
+Can you review all the example apps inside the /examples directory and make sure you understand the code and the purpose of each example?
+Each example app contains a series of features that are implemented into routes in the /src/app directory.
+
+For example, the features implemented in the /examples/passport/login-with-passport app are:
+
+- Login with EtherJS /examples/passport/login-with-passport/src/app/login-with-etherjs
+- Login with Identity-only /examples/passport/login-with-passport/src/app/login-with-identity-only
+- Login with Passport /examples/passport/login-with-passport/src/app/login-with-passport
+- Silent Logout /examples/passport/login-with-passport/src/app/logout-with-silent-mode
+- Logout with Redirect /examples/passport/login-with-passport/src/app/logout-with-redirect-mode
+
+Can you create a new React example app inside the /examples/passport directory that showcases the new feature of Silent Authentication?
+
+The new example app should be named login-with-passport-{feature-name}.
+
+For example, if the new feature is login with email, the new example app should be named login-with-passport-email.
+
+IMPORTANT: When creating the new example app:
+1. Start with a clean Next.js app structure or copy only the essential files from login-with-nextjs:
+   - package.json (update the name)
+   - next.config.mjs
+   - tsconfig.json
+   - .env.example
+   - src/app/utils/setupDefault.ts
+   - src/app/layout.tsx
+   - src/app/globals.css
+
+2. DO NOT copy any route directories from the existing examples. Create only the new route(s) needed for your feature.
+
+3. The new example should have a minimal structure:
+   /src/app/
+   ├── page.tsx                    # Main landing page
+   ├── {feature-name}/page.tsx     # Your feature implementation
+   ├── utils/                      # Shared utilities
+   └── layout.tsx                  # App layout
+
+For example, if the new feature is login with email, create only:
+- /src/app/page.tsx               # Landing page with link to email login
+- /src/app/login-with-email/     # Email login implementation
+
+Make sure you use the Biom3 React components for the UI. This includes using the BiomeCombinedProviders and Stack components. 
+If you need to just copy the utils/wrapper.tsx file from the login-with-nextjs example app and make sure to use it in the layout.tsx file.
+
+Make sure all files you create are inside that new example app directory.
+
+Can you also ensure to add a README.md file to the new example app directory that describes the feature implemented in the example app?
+And any steps that need to be taken to run the example app?
+
+When you create the new example app, make sure to follow the same structure and naming conventions as the other example apps.
+
+Can you not use any abstracted components or state providers. Ideally all the code should be self contained 
+in the page.tsx file that inside the example app which showcases the new feature?
+
+Can you make sure you use the Biom3 React components for the UI?
