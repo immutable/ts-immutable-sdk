@@ -51,10 +51,13 @@ export default class MagicAdapter {
         const magicClient = await this.magicClient;
         flow.addEvent('endMagicClientInit');
 
-        await magicClient.openid.loginWithOIDC({
-          jwt: idToken,
-          providerId: this.config.magicProviderId,
-        });
+        const isUserLoggedIn = await magicClient.user.isLoggedIn();
+        if (!isUserLoggedIn) {
+          await magicClient.openid.loginWithOIDC({
+            jwt: idToken,
+            providerId: this.config.magicProviderId,
+          });
+        }
         flow.addEvent('endLoginWithOIDC');
 
         trackDuration(
