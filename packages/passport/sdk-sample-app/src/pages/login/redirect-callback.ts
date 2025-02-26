@@ -16,7 +16,7 @@ export default function HandleCallback() {
     const handleCallback = async () => {
       await passportClient.loginCallback();
       const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
-      window.location.href = `${window.location.origin}/${basePath}`;
+      window.location.href = window.location.origin + basePath;
     };
 
     handleCallback().catch(console.error);
