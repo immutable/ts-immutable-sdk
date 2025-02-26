@@ -53,7 +53,7 @@
   },
   "private": true,
   "scripts": {
-    "build": "react-app-rewired build",
+    "build": "node --max-old-space-size=8192 ../../../node_modules/.bin/react-app-rewired build",
     "eject": "react-app-rewired eject",
     "start": "GENERATE_SOURCEMAP=false react-app-rewired start",
     "test": "react-app-rewired test --passWithNoTests"
