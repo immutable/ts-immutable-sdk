@@ -158,7 +158,7 @@ jobs:
       - name: Release
         id: npm_release
         if: contains(env.RELEASE_TYPE, 'release')
-        run: yarn release --ci --no-increment -c .release-it.json $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }} --tag=legacy
+        run: yarn release --ci --no-increment -c .release-it.json $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
 
       - name: Warm up CDN
         id: warm_up_cdn
