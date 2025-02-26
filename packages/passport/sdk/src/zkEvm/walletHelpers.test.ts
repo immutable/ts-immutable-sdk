@@ -1,5 +1,5 @@
 import {
-  Contract, Wallet, JsonRpcProvider, ErrorCode, CallExceptionError,
+  Contract, Wallet, JsonRpcProvider, ErrorCode,
 } from 'ethers';
 import { TypedDataPayload } from './types';
 import {
@@ -165,7 +165,7 @@ describe('getNonce', () => {
   describe('when an error is thrown', () => {
     describe('and the error is BAD_DATA', () => {
       it('should return 0', async () => {
-        const error = { code: 'BAD_DATA' } as CallExceptionError;
+        const error = { code: 'UNKNOWN_ERROR', error: { code: 'BAD_DATA' } };
 
         nonceMock.mockRejectedValue(error);
 

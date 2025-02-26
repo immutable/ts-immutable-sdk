@@ -94,7 +94,7 @@ export const getNonce = async (
       return encodeNonce(space, result);
     }
   } catch (error) {
-    if (isError(error, 'BAD_DATA')) {
+    if (isError(error, 'UNKNOWN_ERROR') && isError(error.error, 'BAD_DATA')) {
       // The most likely reason for a BAD_DATA error is that the smart contract wallet
       // has not been deployed yet, so we should default to a nonce of 0.
       return BigInt(0);
