@@ -163,9 +163,9 @@ describe('getNonce', () => {
   });
 
   describe('when an error is thrown', () => {
-    describe('and the error is a call_exception', () => {
+    describe('and the error is BAD_DATA', () => {
       it('should return 0', async () => {
-        const error = { code: 'CALL_EXCEPTION' } as CallExceptionError;
+        const error = { code: 'BAD_DATA' } as CallExceptionError;
 
         nonceMock.mockRejectedValue(error);
 
@@ -175,10 +175,10 @@ describe('getNonce', () => {
       });
     });
 
-    describe('and the error is NOT a call_exception', () => {
+    describe('and the error is NOT BAD_DATA', () => {
       it('should throw the error', async () => {
         const error = new Error('call revert exception');
-        Object.defineProperty(error, 'code', { value: 'NETWORK_ERROR' satisfies ErrorCode });
+        Object.defineProperty(error, 'code', { value: 'CALL_EXCEPTION' satisfies ErrorCode });
         nonceMock.mockRejectedValue(error);
 
         await expect(() => getNonce(rpcProvider, walletAddress)).rejects.toThrow(error);
