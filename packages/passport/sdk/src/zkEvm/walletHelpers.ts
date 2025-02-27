@@ -89,7 +89,7 @@ export const getNonce = async (
       rpcProvider,
     );
     const space: bigint = coerceNonceSpace(nonceSpace); // Default nonce space is 0
-    const result = await contract.readNonce.staticCall(space);
+    const result = await contract.readNonce(space);
     if (typeof result === 'bigint') {
       return encodeNonce(space, result);
     }
