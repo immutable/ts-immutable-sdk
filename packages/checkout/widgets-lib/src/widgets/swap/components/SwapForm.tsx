@@ -696,23 +696,29 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     resetQuote();
 
     // check if currentToToken is available in current list of wallet tokens
-    const isCurrentToTokenAvailableToSell = currentToToken
+    const isCurrentToTokenInSellList = currentToToken
       ? tokensOptionsFrom.some(
         (token) => token.id === formatTokenOptionsId(currentToToken.symbol, currentToToken.address),
       )
       : false;
-    if (!isCurrentToTokenAvailableToSell) {
+
+    if (isCurrentToTokenInSellList) {
+      // find the token in from balances
+      const selected = tokenBalances
+        .find((tokenBalance) => tokenBalance.token.address?.toLowerCase() === currentToToken!.address?.toLowerCase());
+
+      setDirection(SwapDirection.FROM);
+      setFromToken(currentToToken);
+      setFromAmount(currentToAmount);
+      setFromBalance(selected?.formattedBalance || '');
+      setToToken(currentFromToken);
+      setToAmount(''); // it will automatically trigger a quote and set this value
+    } else {
       setDirection(SwapDirection.TO);
       setFromToken(undefined);
       setFromAmount('');
       setToToken(currentFromToken);
       setToAmount(fromAmount);
-    } else {
-      setDirection(SwapDirection.FROM);
-      setFromToken(currentToToken);
-      setFromAmount(currentToAmount);
-      setToToken(currentFromToken);
-      setToAmount(''); // it will automatically trigger a quote and set this value
     }
 
     track({
@@ -725,7 +731,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         fromAmount: currentFromAmount,
         toToken: currentToToken,
         toAmount: currentToAmount,
-        isCurrentToTokenAvailableToSell,
+        isCurrentToTokenInSellList,
       },
     });
   };
