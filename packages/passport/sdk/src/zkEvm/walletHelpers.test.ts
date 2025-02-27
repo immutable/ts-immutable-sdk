@@ -29,14 +29,15 @@ describe('signMetaTransactions', () => {
         to: '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC',
         value: '500000000000000000',
         data: '0x',
-        nonce: 0,
       },
     ];
-    const chainId = 1779;
+    const nonce = 0n;
+    const chainId = 1779n;
 
     const signature = await signMetaTransactions(
       transactions,
-      BigInt(chainId),
+      nonce,
+      chainId,
       walletAddress,
       signer,
     );

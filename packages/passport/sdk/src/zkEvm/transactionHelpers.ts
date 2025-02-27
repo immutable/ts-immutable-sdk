@@ -10,7 +10,7 @@ import {
   getNonce,
 } from './walletHelpers';
 import { RelayerClient } from './relayerClient';
-import GuardianClient, { convertBigNumberishToString } from '../guardian';
+import GuardianClient from '../guardian';
 import {
   FeeOption,
   MetaTransaction,
@@ -181,7 +181,7 @@ export const prepareAndSignTransaction = async ({
   const validateTransaction = async () => {
     await guardianClient.validateEVMTransaction({
       chainId: getEip155ChainId(Number(chainId)),
-      nonce: convertBigNumberishToString(nonce),
+      nonce: nonce.toString(),
       metaTransactions,
       isBackgroundTransaction,
     });
@@ -193,6 +193,7 @@ export const prepareAndSignTransaction = async ({
   const signTransaction = async () => {
     const signed = await signMetaTransactions(
       metaTransactions,
+      nonce,
       chainId,
       zkEvmAddress,
       ethSigner,
@@ -246,12 +247,34 @@ const buildMetaTransactionForEjection = async (
   return metaTransaction;
 };
 
+const parseNonce = (transactionRequest: TransactionRequest): bigint => {
+  if (typeof transactionRequest.nonce === 'undefined' || transactionRequest.nonce === null) {
+    throw new JsonRpcError(
+      RpcErrorCode.INVALID_PARAMS,
+      'im_signEjectionTransaction requires a "nonce" field',
+    );
+  }
+  return BigInt(transactionRequest.nonce);
+};
+
+const parseChainId = (transactionRequest: TransactionRequest): bigint => {
+  if (typeof transactionRequest.chainId === 'undefined' || transactionRequest.chainId === null) {
+    throw new JsonRpcError(
+      RpcErrorCode.INVALID_PARAMS,
+      'im_signEjectionTransaction requires a "chainId" field',
+    );
+  }
+  return BigInt(transactionRequest.chainId);
+};
+
 export const prepareAndSignEjectionTransaction = async ({
   transactionRequest,
   ethSigner,
   zkEvmAddress,
   flow,
 }: EjectionTransactionParams & { transactionRequest: TransactionRequest }): Promise<EjectionTransactionResponse> => {
+  const nonce = parseNonce(transactionRequest);
+  const chainId = parseChainId(transactionRequest);
   const metaTransaction = await buildMetaTransactionForEjection(
     transactionRequest,
   );
@@ -259,7 +282,8 @@ export const prepareAndSignEjectionTransaction = async ({
 
   const signedTransaction = await signMetaTransactions(
     [metaTransaction],
-    BigInt(transactionRequest.chainId ?? 0),
+    nonce,
+    chainId,
     zkEvmAddress,
     ethSigner,
   );
