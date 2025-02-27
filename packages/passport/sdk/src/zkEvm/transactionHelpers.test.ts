@@ -4,11 +4,14 @@ import { RelayerClient } from './relayerClient';
 import GuardianClient from '../guardian';
 import { FeeOption, MetaTransaction, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
-import { pollRelayerTransaction, prepareAndSignTransaction } from './transactionHelpers';
+import { pollRelayerTransaction, prepareAndSignEjectionTransaction, prepareAndSignTransaction } from './transactionHelpers';
 import * as walletHelpers from './walletHelpers';
 import { retryWithDelay } from '../network/retry';
 
-jest.mock('./walletHelpers');
+jest.mock('./walletHelpers', () => ({
+  __esModule: true,
+  ...jest.requireActual('./walletHelpers'),
+}));
 jest.mock('../network/retry');
 
 describe('transactionHelpers', () => {
@@ -61,7 +64,7 @@ describe('transactionHelpers', () => {
   });
 
   describe('prepareAndSignTransaction', () => {
-    const chainId = 123;
+    const chainId = 123n;
     const nonce = BigInt(5);
     const zkEvmAddress = '0x1234567890123456789012345678901234567890';
     const transactionRequest = {
@@ -108,15 +111,15 @@ describe('transactionHelpers', () => {
 
     beforeEach(() => {
       jest.resetAllMocks();
-      (walletHelpers.getEip155ChainId as jest.Mock).mockReturnValue(`eip155:${chainId}`);
-      (walletHelpers.signMetaTransactions as jest.Mock).mockResolvedValue(signedTransactions);
-      (walletHelpers.getNonce as jest.Mock).mockResolvedValue(nonce);
-      (walletHelpers.getNormalisedTransactions as jest.Mock).mockReturnValue(metaTransactions);
-      (walletHelpers.encodedTransactions as jest.Mock).mockReturnValue('encodedTransactions123');
-      (rpcProvider.getNetwork as jest.Mock).mockResolvedValue({ chainId });
-      (relayerClient.imGetFeeOptions as jest.Mock).mockResolvedValue([imxFeeOption]);
-      (relayerClient.ethSendTransaction as jest.Mock).mockResolvedValue(relayerId);
-      (guardianClient.validateEVMTransaction as jest.Mock).mockResolvedValue(undefined);
+      jest.spyOn(walletHelpers, 'getEip155ChainId').mockReturnValue(`eip155:${chainId}`);
+      jest.spyOn(walletHelpers, 'signMetaTransactions').mockResolvedValue(signedTransactions);
+      jest.spyOn(walletHelpers, 'getNonce').mockResolvedValue(nonce);
+      jest.spyOn(walletHelpers, 'getNormalisedTransactions').mockReturnValue(metaTransactions as any);
+      jest.spyOn(walletHelpers, 'encodedTransactions').mockReturnValue('encodedTransactions123');
+      jest.spyOn(rpcProvider, 'getNetwork').mockResolvedValue({ chainId } as any);
+      jest.spyOn(relayerClient, 'imGetFeeOptions').mockResolvedValue([imxFeeOption]);
+      jest.spyOn(relayerClient, 'ethSendTransaction').mockResolvedValue(relayerId);
+      jest.spyOn(guardianClient, 'validateEVMTransaction').mockResolvedValue(undefined);
     });
 
     it('prepares and signs transaction correctly', async () => {
@@ -284,26 +287,43 @@ describe('transactionHelpers', () => {
         flow,
       })).rejects.toThrow('Transaction send failed');
     });
+  });
+
+  describe('prepareAndSignEjectionTransaction', () => {
+    const chainId = 123;
+
+    const transactionRequest = {
+      to: '0x1234567890123456789012345678901234567890',
+      data: '0x456',
+      value: '0x00',
+      chainId,
+    };
+
+    const zkEvmAddress = '0x1234567890123456789012345678901234567890';
+    const ethSigner = {} as Signer;
+    const signedTransactions = 'signedTransactions123';
+
+    beforeEach(() => {
+      jest.resetAllMocks();
+      jest.spyOn(walletHelpers, 'signMetaTransactions').mockResolvedValue(signedTransactions);
+    });
 
     describe('when the nonce is 0', () => {
       it('prepares and signs transaction correctly', async () => {
-        const result = await prepareAndSignTransaction({
+        const result = await prepareAndSignEjectionTransaction({
           transactionRequest: {
             ...transactionRequest,
             nonce: 0,
           },
           ethSigner,
-          rpcProvider,
-          guardianClient,
-          relayerClient,
           zkEvmAddress,
           flow,
         });
 
         expect(result).toEqual({
-          signedTransactions,
-          relayerId,
-          nonce,
+          chainId: 'eip155:123',
+          data: signedTransactions,
+          to: zkEvmAddress,
         });
       });
     });

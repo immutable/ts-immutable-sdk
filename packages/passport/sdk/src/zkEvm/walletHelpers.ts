@@ -89,12 +89,13 @@ export const getNonce = async (
       rpcProvider,
     );
     const space: bigint = coerceNonceSpace(nonceSpace); // Default nonce space is 0
-    const result = await contract.readNonce(space);
+    const result = await contract.readNonce.staticCall(space);
     if (typeof result === 'bigint') {
       return encodeNonce(space, result);
     }
+    throw new Error('Unexpected result from contract.nonce() call.');
   } catch (error) {
-    if (isError(error, 'UNKNOWN_ERROR') && isError(error.error, 'BAD_DATA')) {
+    if (isError(error, 'BAD_DATA')) {
       // The most likely reason for a BAD_DATA error is that the smart contract wallet
       // has not been deployed yet, so we should default to a nonce of 0.
       return BigInt(0);
@@ -102,8 +103,6 @@ export const getNonce = async (
 
     throw error;
   }
-
-  throw new Error('Unexpected result from contract.nonce() call.');
 };
 
 export const encodeMessageSubDigest = (chainId: bigint, walletAddress: string, digest: string): string => (
