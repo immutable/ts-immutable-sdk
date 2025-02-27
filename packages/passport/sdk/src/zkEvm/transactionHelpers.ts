@@ -74,7 +74,7 @@ const buildMetaTransactions = async (
   relayerClient: RelayerClient,
   zkevmAddress: string,
   nonceSpace?: bigint,
-): Promise<[MetaTransaction, ...MetaTransaction[]]> => {
+): Promise<MetaTransaction[]> => {
   if (!transactionRequest.to) {
     throw new JsonRpcError(
       RpcErrorCode.INVALID_PARAMS,
@@ -97,7 +97,7 @@ const buildMetaTransactions = async (
   ]);
 
   // Build the meta transactions array with a valid nonce and fee transaction
-  const metaTransactions: [MetaTransaction, ...MetaTransaction[]] = [
+  const metaTransactions: MetaTransaction[] = [
     {
       ...metaTransaction,
       nonce,
