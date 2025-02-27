@@ -3,6 +3,7 @@ import { TextEncoder } from 'util';
 global.TextEncoder = TextEncoder;
 
 /**
+ * Required for ethers v6
  * @see https://github.com/ethers-io/ethers.js/issues/4365
  */
 Object.defineProperty(Uint8Array, Symbol.hasInstance, {
