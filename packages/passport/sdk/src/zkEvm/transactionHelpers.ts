@@ -72,6 +72,7 @@ const buildMetaTransactions = async (
   transactionRequest: TransactionRequest,
   relayerClient: RelayerClient,
   zkevmAddress: string,
+  flow: Flow,
 ): Promise<MetaTransaction[]> => {
   if (!transactionRequest.to) {
     throw new JsonRpcError(
@@ -100,6 +101,7 @@ const buildMetaTransactions = async (
     });
   }
 
+  flow.addEvent('endBuildMetaTransactions');
   return metaTransactions;
 };
 
@@ -146,6 +148,12 @@ export const pollRelayerTransaction = async (
   return relayerTransaction;
 };
 
+const detectNetwork = async (rpcProvider: JsonRpcProvider, flow: Flow) => {
+  const network = await rpcProvider.getNetwork();
+  flow.addEvent('endDetectNetwork');
+  return network;
+};
+
 export const prepareAndSignTransaction = async ({
   transactionRequest,
   ethSigner,
@@ -157,19 +165,16 @@ export const prepareAndSignTransaction = async ({
   nonceSpace,
   isBackgroundTransaction,
 }: TransactionParams & { transactionRequest: TransactionRequest }) => {
-  flow.addEvent('endDetectNetwork');
-
   const [metaTransactions, nonce, network] = await Promise.all([
-    await buildMetaTransactions(
+    buildMetaTransactions(
       transactionRequest,
       relayerClient,
       zkEvmAddress,
+      flow,
     ),
     getNonce(rpcProvider, zkEvmAddress, nonceSpace),
-    rpcProvider.getNetwork(),
+    detectNetwork(rpcProvider, flow),
   ]);
-
-  flow.addEvent('endBuildMetaTransactions');
 
   // Parallelize the validation and signing of the transaction
   // without waiting for the validation to complete
