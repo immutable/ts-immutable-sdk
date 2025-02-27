@@ -41,7 +41,7 @@ type GuardianERC191MessageEvaluationParams = {
 const transactionRejectedCrossSdkBridgeError = 'Transaction requires confirmation but this functionality is not'
   + ' supported in this environment. Please contact Immutable support if you need to enable this feature.';
 
-export const convertBigNumberishToString = (
+const convertBigNumberishToString = (
   value: BigNumberish,
 ): string => BigInt(value).toString();
 
