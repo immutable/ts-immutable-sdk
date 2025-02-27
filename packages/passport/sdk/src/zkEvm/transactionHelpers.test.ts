@@ -111,7 +111,6 @@ describe('transactionHelpers', () => {
 
     beforeEach(() => {
       jest.resetAllMocks();
-      jest.spyOn(walletHelpers, 'getEip155ChainId').mockReturnValue(`eip155:${chainId}`);
       jest.spyOn(walletHelpers, 'signMetaTransactions').mockResolvedValue(signedTransactions);
       jest.spyOn(walletHelpers, 'getNonce').mockResolvedValue(nonce);
       jest.spyOn(walletHelpers, 'getNormalisedTransactions').mockReturnValue(metaTransactions as any);
@@ -240,6 +239,26 @@ describe('transactionHelpers', () => {
         zkEvmAddress,
         ethSigner,
       );
+    });
+
+    it('signs the transaction when the nonce is zero', async () => {
+      jest.spyOn(walletHelpers, 'getNonce').mockResolvedValue(0n);
+
+      const result = await prepareAndSignTransaction({
+        transactionRequest,
+        ethSigner,
+        rpcProvider,
+        guardianClient,
+        relayerClient,
+        zkEvmAddress,
+        flow,
+      });
+
+      expect(result).toEqual({
+        signedTransactions,
+        relayerId,
+        nonce: 0n,
+      });
     });
 
     it('throws an error when validateEVMTransaction fails', async () => {

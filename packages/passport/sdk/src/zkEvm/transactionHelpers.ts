@@ -187,7 +187,7 @@ export const prepareAndSignTransaction = async ({
   flow.addEvent('endBuildMetaTransactions');
 
   const { nonce } = metaTransactions[0];
-  if (!nonce) {
+  if (typeof nonce === 'undefined') {
     throw new Error('Failed to retrieve nonce from the smart wallet');
   }
 
@@ -255,7 +255,7 @@ const buildMetaTransactionForEjection = async (
   const metaTransaction: MetaTransaction = {
     to: transactionRequest.to.toString(),
     data: transactionRequest.data,
-    nonce: transactionRequest.nonce,
+    nonce: transactionRequest.nonce ?? undefined,
     value: transactionRequest.value,
     revertOnError: true,
   };
