@@ -11,6 +11,7 @@ import { TransactionResponse } from '@imtbl/dex-sdk';
 import { useTranslation } from 'react-i18next';
 import { Environment } from '@imtbl/config';
 import { formatUnits, parseEther, parseUnits } from 'ethers';
+import { motion } from 'framer-motion';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { NetworkSwitchDrawer } from '../../../components/NetworkSwitchDrawer/NetworkSwitchDrawer';
 import { amountInputValidation as textInputValidator } from '../../../lib/validations/amountInputValidations';
@@ -117,6 +118,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
   const [toTokenError, setToTokenError] = useState<string>('');
   const [fromFiatValue, setFromFiatValue] = useState('');
   const [loadedToAndFromTokens, setLoadedToAndFromTokens] = useState(false);
+  const [reverseRotation, setReverseRotation] = useState(0);
 
   // Quote
   const [quote, setQuote] = useState<TransactionResponse | null>(null);
@@ -692,6 +694,8 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     const currentFromAmount = fromAmount;
     const currentToAmount = toAmount;
 
+    setReverseRotation((prev) => (prev === 0 ? 180 : 0));
+
     resetFormErrors();
     resetQuote();
 
@@ -986,7 +990,23 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
             alignItems: 'center',
           }}
           >
-            <ButtCon icon="Flip" variant="secondary" onClick={reverseTokens} />
+            <ButtCon
+              icon="Flip"
+              variant="secondary"
+              rc={(
+                <motion.button
+                  onClick={reverseTokens}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 260,
+                    damping: 20,
+                    mass: 1,
+                  }}
+                  initial={false}
+                  animate={{ rotate: reverseRotation }}
+                />
+              )}
+            />
           </Box>
           {/* TO */}
           <Box>
