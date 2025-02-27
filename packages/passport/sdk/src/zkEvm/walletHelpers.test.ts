@@ -157,7 +157,6 @@ describe('getNonce', () => {
   beforeEach(() => {
     jest.resetAllMocks();
     (Contract as unknown as jest.Mock).mockImplementation(() => ({
-      nonce: nonceMock,
       readNonce: nonceMock,
     }));
   });
@@ -165,7 +164,7 @@ describe('getNonce', () => {
   describe('when an error is thrown', () => {
     describe('and the error is BAD_DATA', () => {
       it('should return 0', async () => {
-        const error = { code: 'UNKNOWN_ERROR', error: { code: 'BAD_DATA' } };
+        const error = { code: 'BAD_DATA' };
 
         nonceMock.mockRejectedValue(error);
 
