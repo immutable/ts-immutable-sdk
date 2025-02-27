@@ -114,7 +114,7 @@ export const encodeMessageSubDigest = (chainId: bigint, walletAddress: string, d
 
 export const signMetaTransactions = async (
   metaTransactions: MetaTransaction[],
-  nonce: BigNumberish,
+  nonce: bigint,
   chainId: bigint,
   walletAddress: string,
   signer: Signer,
