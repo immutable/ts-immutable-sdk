@@ -173,7 +173,6 @@ export const prepareAndSignTransaction = async ({
   isBackgroundTransaction,
 }: TransactionParams & { transactionRequest: TransactionRequest }) => {
   const { chainId } = await rpcProvider.getNetwork();
-  const chainIdBigNumber = BigInt(chainId);
   flow.addEvent('endDetectNetwork');
 
   const metaTransactions = await buildMetaTransactions(
@@ -204,7 +203,7 @@ export const prepareAndSignTransaction = async ({
   const signTransaction = async () => {
     const signed = await signMetaTransactions(
       metaTransactions,
-      chainIdBigNumber,
+      chainId,
       zkEvmAddress,
       ethSigner,
     );
