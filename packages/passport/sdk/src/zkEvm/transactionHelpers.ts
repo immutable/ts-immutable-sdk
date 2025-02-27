@@ -80,22 +80,15 @@ const buildMetaTransactions = async (
     );
   }
 
-  const metaTransaction: MetaTransaction = {
+  const metaTransactions: MetaTransaction[] = [{
     to: transactionRequest.to.toString(),
     data: transactionRequest.data,
     value: transactionRequest.value,
     revertOnError: true,
-  };
+  }];
 
   // Estimate the fee and get the nonce from the smart wallet
-  const [feeOption] = await Promise.all([
-    getFeeOption(metaTransaction, zkevmAddress, relayerClient),
-  ]);
-
-  // Build the meta transactions array with a valid nonce and fee transaction
-  const metaTransactions: MetaTransaction[] = [
-    metaTransaction,
-  ];
+  const feeOption = await getFeeOption(metaTransactions[0], zkevmAddress, relayerClient);
 
   // Add a fee transaction if the fee is non-zero
   const feeValue = BigInt(feeOption.tokenPrice);
@@ -164,23 +157,25 @@ export const prepareAndSignTransaction = async ({
   nonceSpace,
   isBackgroundTransaction,
 }: TransactionParams & { transactionRequest: TransactionRequest }) => {
-  const { chainId } = await rpcProvider.getNetwork();
   flow.addEvent('endDetectNetwork');
 
-  const metaTransactions = await buildMetaTransactions(
-    transactionRequest,
-    relayerClient,
-    zkEvmAddress,
-  );
-  flow.addEvent('endBuildMetaTransactions');
+  const [metaTransactions, nonce, network] = await Promise.all([
+    await buildMetaTransactions(
+      transactionRequest,
+      relayerClient,
+      zkEvmAddress,
+    ),
+    getNonce(rpcProvider, zkEvmAddress, nonceSpace),
+    rpcProvider.getNetwork(),
+  ]);
 
-  const nonce = await getNonce(rpcProvider, zkEvmAddress, nonceSpace);
+  flow.addEvent('endBuildMetaTransactions');
 
   // Parallelize the validation and signing of the transaction
   // without waiting for the validation to complete
   const validateTransaction = async () => {
     await guardianClient.validateEVMTransaction({
-      chainId: getEip155ChainId(Number(chainId)),
+      chainId: getEip155ChainId(Number(network.chainId)),
       nonce: nonce.toString(),
       metaTransactions,
       isBackgroundTransaction,
@@ -194,7 +189,7 @@ export const prepareAndSignTransaction = async ({
     const signed = await signMetaTransactions(
       metaTransactions,
       nonce,
-      chainId,
+      network.chainId,
       zkEvmAddress,
       ethSigner,
     );
