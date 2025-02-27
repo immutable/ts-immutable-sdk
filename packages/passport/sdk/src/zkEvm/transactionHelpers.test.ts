@@ -77,7 +77,6 @@ describe('transactionHelpers', () => {
       {
         to: transactionRequest.to,
         data: transactionRequest.data,
-        nonce,
         value: transactionRequest.value,
         revertOnError: true,
       },

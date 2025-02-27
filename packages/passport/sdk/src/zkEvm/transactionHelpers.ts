@@ -70,10 +70,8 @@ const getFeeOption = async (
  */
 const buildMetaTransactions = async (
   transactionRequest: TransactionRequest,
-  rpcProvider: JsonRpcProvider,
   relayerClient: RelayerClient,
   zkevmAddress: string,
-  nonceSpace?: bigint,
 ): Promise<MetaTransaction[]> => {
   if (!transactionRequest.to) {
     throw new JsonRpcError(
@@ -85,30 +83,24 @@ const buildMetaTransactions = async (
   const metaTransaction: MetaTransaction = {
     to: transactionRequest.to.toString(),
     data: transactionRequest.data,
-    nonce: BigInt(0), // NOTE: We don't need a valid nonce to estimate the fee
     value: transactionRequest.value,
     revertOnError: true,
   };
 
   // Estimate the fee and get the nonce from the smart wallet
-  const [nonce, feeOption] = await Promise.all([
-    getNonce(rpcProvider, zkevmAddress, nonceSpace),
+  const [feeOption] = await Promise.all([
     getFeeOption(metaTransaction, zkevmAddress, relayerClient),
   ]);
 
   // Build the meta transactions array with a valid nonce and fee transaction
   const metaTransactions: MetaTransaction[] = [
-    {
-      ...metaTransaction,
-      nonce,
-    },
+    metaTransaction,
   ];
 
   // Add a fee transaction if the fee is non-zero
   const feeValue = BigInt(feeOption.tokenPrice);
   if (feeValue !== BigInt(0)) {
     metaTransactions.push({
-      nonce,
       to: feeOption.recipientAddress,
       value: feeValue,
       revertOnError: true,
@@ -177,14 +169,12 @@ export const prepareAndSignTransaction = async ({
 
   const metaTransactions = await buildMetaTransactions(
     transactionRequest,
-    rpcProvider,
     relayerClient,
     zkEvmAddress,
-    nonceSpace,
   );
   flow.addEvent('endBuildMetaTransactions');
 
-  const { nonce } = metaTransactions[0];
+  const nonce = await getNonce(rpcProvider, zkEvmAddress, nonceSpace);
 
   // Parallelize the validation and signing of the transaction
   // without waiting for the validation to complete
@@ -249,7 +239,6 @@ const buildMetaTransactionForEjection = async (
   const metaTransaction: MetaTransaction = {
     to: transactionRequest.to.toString(),
     data: transactionRequest.data,
-    nonce: transactionRequest.nonce,
     value: transactionRequest.value,
     revertOnError: true,
   };
