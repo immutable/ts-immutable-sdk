@@ -38,8 +38,8 @@ For example, if the new feature is login with email, create only:
 - /src/app/page.tsx               # Landing page with link to email login
 - /src/app/login-with-email/     # Email login implementation
 
-Make sure you use the Biom3 React components for the UI. This includes using the BiomeCombinedProviders and Stack components. 
-If you need to just copy the utils/wrapper.tsx file from the login-with-nextjs example app and make sure to use it in the layout.tsx file.
+Please copy the utils/wrapper.tsx file from the login-with-nextjs example app and make sure to use it in the layout.tsx file the same way 
+it is used in the login-with-nextjs example app. e.g. wrap the children of <body> in the layout.tsx file with the AppWrapper component.
 
 Make sure all files you create are inside that new example app directory.
 
