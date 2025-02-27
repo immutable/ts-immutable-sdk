@@ -223,20 +223,6 @@ const buildMetaTransactionForEjection = async (
     );
   }
 
-  if (typeof transactionRequest.nonce === 'undefined' || transactionRequest.nonce === null) {
-    throw new JsonRpcError(
-      RpcErrorCode.INVALID_PARAMS,
-      'im_signEjectionTransaction requires a "nonce" field',
-    );
-  }
-
-  if (!transactionRequest.chainId) {
-    throw new JsonRpcError(
-      RpcErrorCode.INVALID_PARAMS,
-      'im_signEjectionTransaction requires a "chainId" field',
-    );
-  }
-
   const metaTransaction: MetaTransaction = {
     to: transactionRequest.to.toString(),
     data: transactionRequest.data,
