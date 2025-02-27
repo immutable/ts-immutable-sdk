@@ -114,12 +114,12 @@ export const encodeMessageSubDigest = (chainId: bigint, walletAddress: string, d
 
 export const signMetaTransactions = async (
   metaTransactions: MetaTransaction[],
-  nonce: BigNumberish,
   chainId: bigint,
   walletAddress: string,
   signer: Signer,
 ): Promise<string> => {
   const normalisedMetaTransactions = getNormalisedTransactions(metaTransactions);
+  const { nonce } = metaTransactions[0];
 
   // Get the hash
   const digest = digestOfTransactionsAndNonce(nonce, normalisedMetaTransactions);

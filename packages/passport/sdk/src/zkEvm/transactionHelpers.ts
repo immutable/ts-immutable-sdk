@@ -1,7 +1,6 @@
 import { Flow } from '@imtbl/metrics';
 import {
   Signer, TransactionRequest, JsonRpcProvider,
-  BigNumberish,
 } from 'ethers';
 import {
   getEip155ChainId,
@@ -187,9 +186,6 @@ export const prepareAndSignTransaction = async ({
   flow.addEvent('endBuildMetaTransactions');
 
   const { nonce } = metaTransactions[0];
-  if (typeof nonce === 'undefined') {
-    throw new Error('Failed to retrieve nonce from the smart wallet');
-  }
 
   // Parallelize the validation and signing of the transaction
   // without waiting for the validation to complete
@@ -208,7 +204,6 @@ export const prepareAndSignTransaction = async ({
   const signTransaction = async () => {
     const signed = await signMetaTransactions(
       metaTransactions,
-      nonce,
       chainIdBigNumber,
       zkEvmAddress,
       ethSigner,
@@ -230,7 +225,7 @@ export const prepareAndSignTransaction = async ({
 
 const buildMetaTransactionForEjection = async (
   transactionRequest: TransactionRequest,
-): Promise<[MetaTransaction, ...MetaTransaction[]]> => {
+): Promise<MetaTransaction> => {
   if (!transactionRequest.to) {
     throw new JsonRpcError(
       RpcErrorCode.INVALID_PARAMS,
@@ -238,7 +233,7 @@ const buildMetaTransactionForEjection = async (
     );
   }
 
-  if (typeof transactionRequest.nonce === 'undefined') {
+  if (typeof transactionRequest.nonce === 'undefined' || transactionRequest.nonce === null) {
     throw new JsonRpcError(
       RpcErrorCode.INVALID_PARAMS,
       'im_signEjectionTransaction requires a "nonce" field',
@@ -255,12 +250,12 @@ const buildMetaTransactionForEjection = async (
   const metaTransaction: MetaTransaction = {
     to: transactionRequest.to.toString(),
     data: transactionRequest.data,
-    nonce: transactionRequest.nonce ?? undefined,
+    nonce: transactionRequest.nonce,
     value: transactionRequest.value,
     revertOnError: true,
   };
 
-  return [metaTransaction];
+  return metaTransaction;
 };
 
 export const prepareAndSignEjectionTransaction = async ({
@@ -275,8 +270,7 @@ export const prepareAndSignEjectionTransaction = async ({
   flow.addEvent('endBuildMetaTransactions');
 
   const signedTransaction = await signMetaTransactions(
-    metaTransaction,
-    transactionRequest.nonce as BigNumberish,
+    [metaTransaction],
     BigInt(transactionRequest.chainId ?? 0),
     zkEvmAddress,
     ethSigner,
