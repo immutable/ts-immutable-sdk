@@ -234,8 +234,7 @@ describe('transactionHelpers', () => {
             nonce: expect.any(BigInt),
           }),
         ]),
-        expect.any(BigInt),
-        expect.any(BigInt),
+        chainId,
         zkEvmAddress,
         ethSigner,
       );
