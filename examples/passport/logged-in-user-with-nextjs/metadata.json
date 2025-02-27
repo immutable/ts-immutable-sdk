@@ -1,8 +1,68 @@
 {
-  "title": "Logged-in User Data with Next.js",
-  "description": "Example demonstrating how to retrieve and display user information, linked addresses, and verify tokens after login with Immutable Passport in a Next.js application",
-  "keywords": ["Passport", "Next.js", "Authentication", "User Data", "Linked Addresses", "Token Verification", "Web3"],
-  "tech_stack": ["TypeScript", "Next.js", "React", "Immutable SDK"],
-  "category": "Passport",
-  "programming_language": "TypeScript"
+  "title": "Passport Logged-in User Features with Next.js",
+  "description": "A comprehensive example demonstrating how to access and manage logged-in user information using Immutable Passport in a Next.js application. Features include retrieving user profile data, linked addresses, and token verification. This example shows how to implement post-authentication functionality in a secure and user-friendly way.",
+  "keywords": [
+    "authentication",
+    "passport",
+    "web3",
+    "user profile",
+    "linked addresses",
+    "token verification",
+    "Next.js",
+    "React",
+    "Immutable SDK",
+    "identity management",
+    "JWT tokens",
+    "OAuth2",
+    "OpenID Connect",
+    "wallet connection"
+  ],
+  "programmingLanguage": "TypeScript",
+  "techStack": [
+    "Next.js",
+    "React",
+    "TypeScript",
+    "Immutable SDK",
+    "Passport",
+    "Biom3 UI",
+    "OAuth2",
+    "OpenID Connect"
+  ],
+  "category": "User Management & Identity",
+  "difficulty": "Beginner",
+  "prerequisites": [
+    "Node.js",
+    "Basic understanding of React/Next.js",
+    "Immutable Hub account",
+    "Understanding of JWT tokens",
+    "Familiarity with OAuth2/OpenID Connect concepts"
+  ],
+  "environmentVariables": {
+    "NEXT_PUBLIC_PUBLISHABLE_KEY": "Your Immutable Hub publishable API key",
+    "NEXT_PUBLIC_CLIENT_ID": "Your Immutable Hub client ID"
+  },
+  "estimatedTime": "20 minutes",
+  "features": [
+    "User profile information retrieval",
+    "Linked addresses management",
+    "ID token verification",
+    "Access token management",
+    "User authentication state",
+    "Account address display",
+    "OAuth2/OpenID Connect integration",
+    "Secure token handling",
+    "Error handling and user feedback"
+  ],
+  "relatedResources": [
+    "Immutable Passport Documentation",
+    "Next.js Documentation",
+    "JWT Documentation",
+    "OAuth2 Documentation",
+    "OpenID Connect Documentation",
+    "React State Management Guide"
+  ],
+  "version": "1.0.0",
+  "sdkVersion": {
+    "@imtbl/sdk": "^0.0.1"
+  }
 } 

@@ -1,13 +1,10 @@
 FIRT PROMPT
 
-I want you to go through the example app in this directory. Here are the steps that you have to follow
+I want you to go through the example app in the /examples/passport/logged-in-user-with-nextjs directory. Here are the steps that you have to follow
 
-1. Read the whole directory of the example app and get a very solid understanding of what the example app does and its detailed functionality, which includes the functionality of all code blocks.
+1. Read the whole directory of the example app in /examples/passport/logged-in-user-with-nextjs and get a very solid understanding of what the example app does and its detailed functionality, which includes the functionality of all code blocks.
 2. Once you fully understand the example app, you must generate an MD file in the example app's root called tutorial.md. In this MD file, you must generate a code walkthrough of the example app with code snippets. Ensure that there is no ambiguity and all users will have a solid understanding of the implementation after reading the tutorial. Ensure that the MD file is formatted in a way where it can be rendered in the documentations website. The Code Snippets MUST be in the MD file.
 3. Once you've completed the tutorial, in the example app's root, produce a JSON file called metadata.json which will include the metadata of the example app, including: title, description, keywords, Programming Language / Tech Stack, App Category, etc. This metadata JSON will also be a useful information to ensure that users are informed about the key characteristics of the example app. The JSON metadata content will also be surfaced in the documentations website.
-
-
-
 
 SECOND PROMPT
 

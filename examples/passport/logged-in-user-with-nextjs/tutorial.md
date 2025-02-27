@@ -1,62 +1,79 @@
-# Logged-in User Data with Next.js
+# Managing Logged-in User Data with Immutable Passport
 
-This tutorial demonstrates how to retrieve and display user information, linked addresses, and verify tokens after login with Immutable Passport in a Next.js application.
+This tutorial demonstrates how to manage and access logged-in user data using Immutable Passport in a Next.js application. You'll learn how to retrieve user profile information, manage linked addresses, and handle authentication tokens in a secure and efficient way.
 
-## Introduction
+## Overview
 
-The Logged-in User Data with Next.js example app showcases how to work with user data after successful authentication with Immutable Passport. The app demonstrates three key post-login features:
+This example app showcases three main features:
+1. **User Profile Management**: Retrieve and display user information like email and nickname
+2. **Linked Addresses**: View and manage blockchain addresses associated with the user's account
+3. **Token Verification**: Handle ID and access tokens for authentication and API access
 
-- Retrieving and displaying user profile information
-- Getting a list of linked wallet addresses
-- Retrieving and verifying ID and access tokens
-
-This example serves as a reference implementation for developers who need to access user data after authentication in their Next.js applications.
+Each feature is implemented as a separate page with its own functionality while sharing common authentication logic.
 
 ## Prerequisites
 
-To run this example, you'll need:
+Before starting this tutorial, ensure you have:
 
-- Node.js (v18 or later)
-- npm, yarn, or pnpm for package management
-- An Immutable Developer Hub account
-- A registered application with Client ID and Publishable Key from the Immutable Developer Hub
-- Basic familiarity with Next.js and React
+- Node.js installed on your system
+- An Immutable Hub account
+- Basic understanding of React and Next.js
+- Your Immutable Hub publishable API key and client ID
+- Understanding of JWT tokens and authentication flows
+- Familiarity with OAuth2/OpenID Connect concepts
+
+## Project Setup
+
+1. Create a new Next.js project with TypeScript:
+
+```bash
+pnpm create next-app@latest passport-logged-in-example --typescript
+cd passport-logged-in-example
+```
+
+2. Install the required dependencies:
+
+```bash
+pnpm add @imtbl/sdk @biom3/react
+```
+
+3. Create a `.env` file in your project root:
+
+```env
+NEXT_PUBLIC_PUBLISHABLE_KEY=your_publishable_key_here
+NEXT_PUBLIC_CLIENT_ID=your_client_id_here
+```
 
 ## Project Structure
 
+The application is organized as follows:
+
 ```
-logged-in-user-with-nextjs/
-├── src/
-│   ├── app/
-│   │   ├── user-info-with-passport/     # User profile info implementation
-│   │   ├── linked-addresses-with-passport/ # Linked addresses implementation
-│   │   ├── verify-tokens-with-nextjs/   # Token verification implementation
-│   │   ├── redirect/                    # Redirect handler for authentication flow
-│   │   ├── utils/                       # Setup utilities and configurations
-│   │   │   └── setupDefault.ts          # Default Passport configuration
-│   │   ├── page.tsx                     # Main navigation page
-│   │   └── layout.tsx                   # App layout with providers
-├── .env.example                         # Example environment variables
-├── package.json                         # Project dependencies
-└── tsconfig.json                        # TypeScript configuration
+src/
+├── app/
+│   ├── linked-addresses-with-passport/  # Linked addresses management
+│   │   └── page.tsx
+│   ├── user-info-with-passport/        # User profile information
+│   │   └── page.tsx
+│   ├── verify-tokens-with-nextjs/      # Token verification
+│   │   └── page.tsx
+│   ├── utils/
+│   │   └── setupDefault.ts             # Passport configuration
+│   ├── layout.tsx                      # App layout
+│   └── page.tsx                        # Navigation page
 ```
 
-## Code Walkthrough
+## Setting up Passport
 
-### SDK Integration Walkthrough
-
-#### Initializing the Passport SDK
-
-The Immutable Passport SDK is initialized in the `src/app/utils/setupDefault.ts` file:
+First, let's configure the Passport instance. Create `src/app/utils/setupDefault.ts`:
 
 ```typescript
 import { config, passport } from '@imtbl/sdk';
 
 export const passportInstance = new passport.Passport({
     baseConfig: {
-      environment: config.Environment.SANDBOX, // or config.Environment.PRODUCTION
-      publishableKey:
-        process.env.NEXT_PUBLIC_PUBLISHABLE_KEY || '<YOUR_PUBLISHABLE_KEY>',
+      environment: config.Environment.SANDBOX,
+      publishableKey: process.env.NEXT_PUBLIC_PUBLISHABLE_KEY || '<YOUR_PUBLISHABLE_KEY>',
     },
     clientId: process.env.NEXT_PUBLIC_CLIENT_ID || '<YOUR_CLIENT_ID>',
     redirectUri: 'http://localhost:3000/redirect',
@@ -66,176 +83,483 @@ export const passportInstance = new passport.Passport({
 });
 ```
 
-This configuration initializes the Passport instance with the necessary parameters for authentication and user data access.
+Key configuration points:
+- `environment`: Set to SANDBOX for testing, change to PRODUCTION for live apps
+- `scope`: Includes necessary permissions for user data access
+- `audience`: Set to 'platform_api' for Immutable API access
+- `redirectUri`: Must match the URI configured in your Immutable Hub application
 
-#### Retrieving User Profile Information
+## Creating the Home Page
 
-The user profile information retrieval is implemented in `src/app/user-info-with-passport/page.tsx`. After successful login, you can retrieve the user's profile information:
-
-```typescript
-const loginWithPassport = async () => {
-  if (!passportInstance) return;
-  try {
-    const provider = await passportInstance.connectEvm();
-    const accounts = await provider.request({ method: 'eth_requestAccounts' });
-    
-    // Retrieve user profile information
-    const userProfileData = await passportInstance.getUserInfo();
-    
-    if (accounts) {
-      setIsLoggedIn(true);
-      setAccountAddress(accounts[0] || null);
-      setUserProfile(userProfileData || null);
-    }
-  } catch (error) {
-    console.error('Error connecting to Passport:', error);
-    setIsLoggedIn(false);
-  }
-};
-```
-
-The `getUserInfo()` method returns an object containing user information such as email, nickname, and subject identifier (sub). This information is displayed in a table format to show the user's profile details.
-
-#### Getting Linked Addresses
-
-The linked addresses retrieval is demonstrated in `src/app/linked-addresses-with-passport/page.tsx`. After authentication, you can get a list of wallet addresses linked to the user's Immutable Passport account:
+The home page (`src/app/page.tsx`) provides navigation to different user data management features:
 
 ```typescript
-const loginWithPassport = async () => {
-  if (!passportInstance) return;
-  try {
-    const provider = await passportInstance.connectEvm();
-    const accounts = await provider.request({ method: 'eth_requestAccounts' });
-    if (accounts) {
-      setIsLoggedIn(true);
-      setAccountAddress(accounts[0] || null);
-      
-      // Retrieve linked addresses
-      const addresses = await passportInstance.getLinkedAddresses();
-      
-      setLinkedAddresses(addresses || []);
-    }
-  } catch (error) {
-    console.error('Error connecting to Passport:', error);
-    setIsLoggedIn(false);
-  }
-};
-```
+'use client';
+import { Button, Heading } from '@biom3/react';
+import NextLink from 'next/link';
 
-The `getLinkedAddresses()` method returns an array of addresses associated with the user's account. This is useful for applications that need to verify wallet ownership or provide wallet-specific functionality.
-
-#### Retrieving and Verifying Tokens
-
-The token verification feature is implemented in `src/app/verify-tokens-with-nextjs/page.tsx`. This component demonstrates how to retrieve the ID token and access token:
-
-```typescript
-const loginWithPassport = async () => {
-  if (!passportInstance) return;
-  try {
-    const provider = await passportInstance.connectEvm();
-    const accounts = await provider.request({ method: 'eth_requestAccounts' });
-    
-    // Retrieve ID token
-    const idToken = await passportInstance.getIdToken();
-    
-    // Retrieve access token
-    const accessToken = await passportInstance.getAccessToken();
-    
-    if (accounts) {
-      setIsLoggedIn(true);
-      setAccountAddress(accounts[0] || null);
-      setIdToken(idToken || null);
-      setAccessToken(accessToken || null);
-    }
-  } catch (error) {
-    console.error('Error connecting to Passport:', error);
-    setIsLoggedIn(false);
-  }
-};
-```
-
-These tokens are important for:
-- **ID Token**: Contains user identity information and can be verified for authentication purposes
-- **Access Token**: Used for making authorized API requests to Immutable services
-
-The tokens can be displayed for debugging purposes or used in API calls requiring authentication.
-
-### Navigation Structure
-
-The main page (`src/app/page.tsx`) provides navigation buttons to the three different examples:
-
-```typescript
 export default function Home() {
   return (<>
-      <Heading size="medium" className="mb-1">
+      <Heading 
+      size="medium" 
+      className="mb-1">
         User Information after Logging In with NextJS
       </Heading>
-      <Button className="mb-1" size="medium" 
-        rc={<NextLink href="/linked-addresses-with-passport" />}>
+      <Button       
+      className="mb-1"
+      size="medium" 
+      rc={<NextLink href="/linked-addresses-with-passport" />}>
         Linked Addresses with Passport
       </Button> 
-      <Button className="mb-1" size="medium" 
-        rc={<NextLink href="/user-info-with-passport" />}>
+      <Button       
+      className="mb-1"
+      size="medium" 
+      rc={<NextLink href="/user-info-with-passport" />}>
         User Info with Passport
       </Button> 
-      <Button className="mb-1" size="medium" 
-        rc={<NextLink href="/verify-tokens-with-nextjs" />}>
+      <Button       
+      className="mb-1"
+      size="medium" 
+      rc={<NextLink href="/verify-tokens-with-nextjs" />}>
         Verify Tokens with NextJS
       </Button> 
   </>);
 }
 ```
 
-This structure allows users to navigate between different user data retrieval examples easily.
+## Implementing User Profile Information
 
-### Environment Configuration
+Create `src/app/user-info-with-passport/page.tsx`:
 
-The application uses environment variables for configuration. Required variables are defined in `.env.example`:
+```typescript
+'use client';
 
+import { useState } from 'react';
+import { Button, Heading, Table, Link } from '@biom3/react';
+import NextLink from 'next/link';
+import { passportInstance } from '../utils/setupDefault';
+
+type UserProfile = {
+  email?: string;
+  nickname?: string;
+  sub: string;
+};
+
+export default function LoginWithPassport() {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [accountAddress, setAccountAddress] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  const loginWithPassport = async () => {
+    if (!passportInstance) return;
+    try {
+      const provider = await passportInstance.connectEvm();
+      const accounts = await provider.request({ method: 'eth_requestAccounts' });
+      const userProfileData = await passportInstance.getUserInfo();
+      
+      if (accounts) {
+        setIsLoggedIn(true);
+        setAccountAddress(accounts[0] || null);
+        setUserProfile(userProfileData || null);
+      } else {
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('Error connecting to Passport:', error);
+      setIsLoggedIn(false);
+    }
+  };
+
+  return (
+    <>
+      <Heading size="medium" className="mb-1">
+        User Info with Passport
+      </Heading>
+      <Button
+        className="mb-1"
+        size="medium"
+        onClick={loginWithPassport}
+        disabled={isLoggedIn}>
+        {isLoggedIn ? 'Logged In' : 'Login'}
+      </Button>
+
+      <Table>
+        <Table.Head>
+          <Table.Row>
+            <Table.Cell>Attribute</Table.Cell>
+            <Table.Cell>Value</Table.Cell>
+          </Table.Row>
+        </Table.Head>
+        <Table.Body>
+          <Table.Row>
+            <Table.Cell><b>Is Logged In</b></Table.Cell>
+            <Table.Cell>{isLoggedIn ? 'Yes' : 'No'}</Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell><b>Account Address</b></Table.Cell>
+            <Table.Cell>{accountAddress || 'N/A'}</Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell><b>User Profile</b></Table.Cell>
+            <Table.Cell>
+              {userProfile ? (
+                <>
+                  {userProfile.email ? <div>Email: {userProfile.email}</div> : null}
+                  {userProfile.nickname ? <div>Nickname: {userProfile.nickname}</div> : null}
+                  <div>Sub: {userProfile.sub}</div>
+                </>
+              ) : 'N/A'}
+            </Table.Cell>
+          </Table.Row>
+        </Table.Body>
+      </Table>
+      <br />
+      <Link rc={<NextLink href="/" />}>Return to Examples</Link>
+    </>
+  );
+}
 ```
-NEXT_PUBLIC_CLIENT_ID="your-client-id"
-NEXT_PUBLIC_PUBLISHABLE_KEY="your-publishable-key"
+
+## Managing Linked Addresses
+
+Create `src/app/linked-addresses-with-passport/page.tsx`:
+
+```typescript
+'use client';
+
+import { useState } from 'react';
+import { Button, Heading, Table, Link } from '@biom3/react';
+import NextLink from 'next/link';
+import { passportInstance } from '../utils/setupDefault';
+
+export default function LoginWithPassport() {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [accountAddress, setAccountAddress] = useState<string | null>(null);
+  const [linkedAddresses, setLinkedAddresses] = useState<string[]>([]);
+
+  const loginWithPassport = async () => {
+    if (!passportInstance) return;
+    try {
+      const provider = await passportInstance.connectEvm();
+      const accounts = await provider.request({ method: 'eth_requestAccounts' });
+      if (accounts) {
+        setIsLoggedIn(true);
+        setAccountAddress(accounts[0] || null);
+        const addresses = await passportInstance.getLinkedAddresses();
+        setLinkedAddresses(addresses || []);
+      } else {
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('Error connecting to Passport:', error);
+      setIsLoggedIn(false);
+    }
+  };
+
+  return (
+    <>
+      <Heading size="medium" className="mb-1">
+        Linked Addresses with Passport
+      </Heading>
+      <Button
+        className="mb-1"
+        size="medium"
+        onClick={loginWithPassport}
+        disabled={isLoggedIn}>
+        {isLoggedIn ? 'Logged In' : 'Login'}
+      </Button>
+
+      <Table>
+        <Table.Head>
+          <Table.Row>
+            <Table.Cell>Attribute</Table.Cell>
+            <Table.Cell>Value</Table.Cell>
+          </Table.Row>
+        </Table.Head>
+        <Table.Body>
+          <Table.Row>
+            <Table.Cell><b>Is Logged In</b></Table.Cell>
+            <Table.Cell>{isLoggedIn ? 'Yes' : 'No'}</Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell><b>Account Address</b></Table.Cell>
+            <Table.Cell>{accountAddress || 'N/A'}</Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell><b>Linked Addresses</b></Table.Cell>
+            <Table.Cell>{linkedAddresses.length ? linkedAddresses.join(', ') : 'N/A'}</Table.Cell>
+          </Table.Row>
+        </Table.Body>
+      </Table>
+      <br />
+      <Link rc={<NextLink href="/" />}>Return to Examples</Link>
+    </>
+  );
+}
 ```
 
-To run the application, you need to:
-1. Copy `.env.example` to `.env.local`
-2. Replace placeholder values with your actual Client ID and Publishable Key from the Immutable Developer Hub
+## Implementing Token Verification
 
-## Running the App
+Create `src/app/verify-tokens-with-nextjs/page.tsx`:
 
-Follow these steps to run the example locally:
+```typescript
+'use client';
 
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   npm install
-   # or
-   yarn install
-   # or
-   pnpm install
+import { useState } from 'react';
+import { Button, Heading, Table, Link } from '@biom3/react';
+import NextLink from 'next/link';
+import { passportInstance } from '../utils/setupDefault';
+
+export default function LoginWithPassport() {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [accountAddress, setAccountAddress] = useState<string | null>(null);
+  const [idToken, setIdToken] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+
+  const loginWithPassport = async () => {
+    if (!passportInstance) return;
+    try {
+      const provider = await passportInstance.connectEvm();
+      const accounts = await provider.request({ method: 'eth_requestAccounts' });
+      const idToken = await passportInstance.getIdToken();
+      const accessToken = await passportInstance.getAccessToken();
+      
+      if (accounts) {
+        setIsLoggedIn(true);
+        setAccountAddress(accounts[0] || null);
+        setIdToken(idToken || null);
+        setAccessToken(accessToken || null);
+      } else {
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('Error connecting to Passport:', error);
+      setIsLoggedIn(false);
+    }
+  };
+
+  return (
+    <>
+      <Heading size="medium" className="mb-1">
+        Verify Tokens with NextJS
+      </Heading>
+      <Button
+        className="mb-1"
+        size="medium"
+        onClick={loginWithPassport}
+        disabled={isLoggedIn}>
+        {isLoggedIn ? 'Logged In' : 'Login'}
+      </Button>
+
+      <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+        <Table>
+          <Table.Head>
+            <Table.Row>
+              <Table.Cell>Attribute</Table.Cell>
+              <Table.Cell>Value</Table.Cell>
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>
+            <Table.Row>
+              <Table.Cell><b>Is Logged In</b></Table.Cell>
+              <Table.Cell>{isLoggedIn ? 'Yes' : 'No'}</Table.Cell>
+            </Table.Row>
+            <Table.Row>
+              <Table.Cell><b>Account Address</b></Table.Cell>
+              <Table.Cell>{accountAddress || 'N/A'}</Table.Cell>
+            </Table.Row>
+            <Table.Row>
+              <Table.Cell><b>ID Token</b></Table.Cell>
+              <Table.Cell style={{ wordBreak: 'break-word' }}>{idToken || 'N/A'}</Table.Cell>
+            </Table.Row>
+            <Table.Row>
+              <Table.Cell><b>Access Token</b></Table.Cell>
+              <Table.Cell style={{ wordBreak: 'break-word' }}>{accessToken || 'N/A'}</Table.Cell>
+            </Table.Row>
+          </Table.Body>
+        </Table>
+      </div>
+      <br />
+      <Link rc={<NextLink href="/" />}>Return to Examples</Link>
+    </>
+  );
+}
+```
+
+## Key Concepts
+
+### 1. User Profile Information
+
+The `getUserInfo()` method provides access to the user's profile information:
+- Email address (if available)
+- Nickname (if available)
+- Subject identifier (sub)
+- Other OIDC standard claims
+
+### 2. Linked Addresses
+
+The `getLinkedAddresses()` method returns an array of blockchain addresses that are linked to the user's Passport account. This is useful for:
+- Displaying all addresses associated with the user
+- Managing multiple wallets
+- Cross-chain functionality
+
+### 3. Token Management
+
+Two types of tokens are available:
+- **ID Token**: Contains user identity information
+- **Access Token**: Used for API authentication
+
+Methods:
+- `getIdToken()`: Retrieves the ID token
+- `getAccessToken()`: Retrieves the access token
+
+### 4. State Management
+
+The application uses React's useState hook to manage:
+- Login status
+- User profile data
+- Linked addresses
+- Authentication tokens
+- Account addresses
+
+## Security Best Practices
+
+### Token Handling
+1. **Never Store Sensitive Data in Local Storage**
+   ```typescript
+   // ❌ Don't do this
+   localStorage.setItem('accessToken', token);
+   
+   // ✅ Instead, use state management or secure storage solutions
+   const [accessToken, setAccessToken] = useState<string | null>(null);
    ```
-3. Create a `.env.local` file with your credentials:
+
+2. **Implement Token Refresh Logic**
+   ```typescript
+   // Example token refresh implementation
+   const refreshTokens = async () => {
+     try {
+       await passportInstance.refreshTokens();
+     } catch (error) {
+       // Handle refresh error, possibly redirect to login
+       console.error('Token refresh failed:', error);
+     }
+   };
    ```
-   NEXT_PUBLIC_CLIENT_ID="your-client-id"
-   NEXT_PUBLIC_PUBLISHABLE_KEY="your-publishable-key"
+
+3. **Secure API Calls**
+   ```typescript
+   // Example of secure API call with access token
+   const makeSecureApiCall = async () => {
+     const accessToken = await passportInstance.getAccessToken();
+     const response = await fetch('your-api-endpoint', {
+       headers: {
+         Authorization: `Bearer ${accessToken}`,
+       },
+     });
+     return response.json();
+   };
    ```
-4. Start the development server:
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   # or
-   pnpm dev
-   ```
-5. Open [http://localhost:3000](http://localhost:3000) in your browser
-6. Try the different examples using the navigation buttons
 
-## Summary
+### Error Handling
+Implement comprehensive error handling for all authentication operations:
 
-This example demonstrates how to work with user data after authentication with Immutable Passport in a Next.js application:
+```typescript
+const handleAuthOperation = async () => {
+  try {
+    // Attempt authentication operation
+    await passportInstance.someOperation();
+  } catch (error) {
+    if (error instanceof passport.PassportError) {
+      switch (error.code) {
+        case 'token_expired':
+          await refreshTokens();
+          break;
+        case 'user_cancelled':
+          // Handle user cancellation
+          break;
+        default:
+          // Handle other errors
+          console.error('Authentication error:', error);
+      }
+    }
+  }
+};
+```
 
-- **User Profile Information**: Retrieve and display user details such as email and nickname
-- **Linked Addresses**: Get a list of wallet addresses associated with the user's account
-- **Token Verification**: Retrieve and display ID and access tokens for authentication and API calls
+## Advanced Usage
 
-The example provides a foundation for implementing user-related features in your Immutable-powered applications. By understanding these patterns, you can enhance your application with user-specific functionality while ensuring proper authentication and authorization. 
+### Custom Hook for Authentication State
+Create a reusable hook for managing authentication state:
+
+```typescript
+function usePassportAuth() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userProfile, setUserProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        const profile = await passportInstance.getUserInfo();
+        setIsLoggedIn(!!profile);
+        setUserProfile(profile);
+      } catch (error) {
+        setIsLoggedIn(false);
+        setUserProfile(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuthStatus();
+  }, []);
+
+  return { isLoggedIn, userProfile, loading };
+}
+```
+
+### Protected Route Component
+Implement a higher-order component for protected routes:
+
+```typescript
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isLoggedIn, loading } = usePassportAuth();
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isLoggedIn) {
+    return <redirect to="/login" />;
+  }
+
+  return children;
+}
+```
+
+## Troubleshooting Guide
+
+### Common Issues
+
+1. **Token Expiration**
+   - Symptom: API calls fail with 401 errors
+   - Solution: Implement token refresh logic
+   - Prevention: Monitor token expiration and refresh proactively
+
+2. **Scope Issues**
+   - Symptom: Unable to access certain user data
+   - Solution: Verify scope includes all required permissions
+   - Example: `scope: 'openid offline_access email transact'`
+
+3. **Redirect URI Mismatch**
+   - Symptom: Authentication fails after login attempt
+   - Solution: Ensure redirect URI matches Immutable Hub configuration
+   - Verification: Check console for redirect-related errors
+
+## Resources
+
+- [Immutable Passport Documentation](https://docs.immutable.com/docs/zkEVM/products/passport)
+- [Next.js Documentation](https://nextjs.org/docs)
+- [OpenID Connect Documentation](https://openid.net/connect/)
+- [OAuth2 Best Practices](https://oauth.net/2/) 

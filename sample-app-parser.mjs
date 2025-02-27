@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -50,7 +51,7 @@ const main = (product) => {
   console.log(`Created ${product}-examples.json with data for ${Object.keys(allApps).length} apps`);
 };
 
-const products = ['passport', 'checkout', 'orderbook', 'contracts', 'checkout'];
+const products = ['passport']; // 'checkout', 'orderbook', 'contracts' etc
 products.forEach((product) => {
   main(product);
 });
