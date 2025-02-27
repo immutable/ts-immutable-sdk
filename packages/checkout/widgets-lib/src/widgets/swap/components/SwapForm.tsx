@@ -3,7 +3,7 @@ import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
 import {
-  Box, Heading, Icon, OptionKey, Tooltip,
+  Box, ButtCon, Heading, Icon, OptionKey, Tooltip,
 } from '@biom3/react';
 import { isAddressSanctioned, TokenInfo, WidgetTheme } from '@imtbl/checkout-sdk';
 
@@ -498,6 +498,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         resetQuote();
         return;
       }
+
       (async () => await fetchQuote())();
     }
   }, [debouncedFromAmount, fromToken, toToken, fromMaxTrigger]);
@@ -509,6 +510,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         resetQuote();
         return;
       }
+
       (async () => await fetchQuote())();
     }
   }, [debouncedToAmount, toToken, fromToken]);
@@ -680,6 +682,50 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       extras: {
         toToken,
         toAmount: value,
+      },
+    });
+  };
+
+  const reverseTokens = () => {
+    const currentFromToken = fromToken;
+    const currentToToken = toToken;
+    const currentFromAmount = fromAmount;
+    const currentToAmount = toAmount;
+
+    resetFormErrors();
+    resetQuote();
+
+    // check if currentToToken is available in current list of wallet tokens
+    const isCurrentToTokenAvailableToSell = currentToToken
+      ? tokensOptionsFrom.some(
+        (token) => token.id === formatTokenOptionsId(currentToToken.symbol, currentToToken.address),
+      )
+      : false;
+    if (!isCurrentToTokenAvailableToSell) {
+      setDirection(SwapDirection.TO);
+      setFromToken(undefined);
+      setFromAmount('');
+      setToToken(currentFromToken);
+      setToAmount(fromAmount);
+    } else {
+      setDirection(SwapDirection.FROM);
+      setFromToken(currentToToken);
+      setFromAmount(currentToAmount);
+      setToToken(currentFromToken);
+      setToAmount(''); // it will automatically trigger a quote and set this value
+    }
+
+    track({
+      userJourney: UserJourney.SWAP,
+      screen: 'SwapCoins',
+      control: 'Flip',
+      controlType: 'Button',
+      extras: {
+        fromToken: currentFromToken,
+        fromAmount: currentFromAmount,
+        toToken: currentToToken,
+        toAmount: currentToAmount,
+        isCurrentToTokenAvailableToSell,
       },
     });
   };
@@ -870,7 +916,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            rowGap: 'base.spacing.x6',
+            rowGap: 'base.spacing.x1',
             paddingBottom: 'base.spacing.x2',
           }}
         >
@@ -928,6 +974,14 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
             />
           </Box>
 
+          <Box sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          >
+            <ButtCon icon="Flip" variant="secondary" onClick={reverseTokens} />
+          </Box>
           {/* TO */}
           <Box>
             <Box
