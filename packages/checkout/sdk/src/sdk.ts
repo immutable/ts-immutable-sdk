@@ -134,7 +134,7 @@ export class Checkout {
     const version = globalPackageVersion();
 
     try {
-      const cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets@${version}/dist/browser/index.js`;
+      const cdnUrl = 'https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets@2.0.3/dist/browser/index.cdn.js';
 
       // WebpackIgnore comment required to prevent webpack modifying the import statement and
       // breaking the dynamic import in certain applications integrating checkout
