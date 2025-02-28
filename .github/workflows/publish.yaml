@@ -105,12 +105,6 @@ jobs:
 
       - name: Build SDK & Checkout Widgets
         run: pnpm build
-
-      - name: Generate version.json
-        if: (env.DRY_RUN) == 'false'
-        run: |
-          echo '{ "version": "$(jq -r '.version' ./sdk/package.json)" }' > ./sdk/version.json
-          cp ./sdk/version.json ./sdk/dist/
       
       - name: Pack SDK & Checkout Widgets packages and dependencies
         run: pnpm pack-npm-packages
@@ -168,30 +162,3 @@ jobs:
         uses: ./.github/actions/notify-slack-publish-status
         with:
           message: "❌ Failed to publish SDK version ${{steps.release.outputs.RELEASE_NAME}} to NPM. ${{ github.triggering_actor }} please check the logs for more details."
-          
-      - name: Wait for NPM @latest Update
-        id: wait_for_npm_update
-        if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') && github.event_name != 'push' }} && env.DRY_RUN == 'false'
-        run: |
-          VERSION="$(jq -r '.version' ./sdk/package.json)"
-          echo "Waiting for NPM registry to reflect version: $VERSION"
-
-          for i in {1..20}; do
-            LATEST_VERSION=$(if [[ "${{ startsWith(env.RELEASE_TYPE, 'pre') }}" == "true" ]]; then npm view @imtbl/sdk@alpha version; else npm view @imtbl/sdk@latest version; fi)
-            if [[ "$LATEST_VERSION" == "$VERSION" ]]; then
-              echo "NPM registry updated to version: $LATEST_VERSION"
-              exit 0
-            fi
-            echo "NPM registry not updated yet, retrying in 15 seconds..."
-            sleep 15
-          done
-
-          echo "NPM registry failed to update after 5 minutes."
-          exit 1
-
-      - name: Purge CDN Cache for version.json
-        id: purge_cdn
-        if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }}  && env.DRY_RUN == 'false'
-        run: |
-          curl -X GET https://purge.jsdelivr.net/npm/@imtbl/sdk@latest/dist/version.json
-          echo "CDN cache purged for https://cdn.jsdelivr.net/npm/@imtbl/sdk@latest/dist/version.json"

@@ -387,8 +387,6 @@ export type CheckoutWidgetsConfig = {
   theme?: WidgetTheme;
   /** The environment configuration (default: "SANDBOX") */
   environment?: Environment;
-  /** The version of the Checkout Widgets js file to use (default: "0.1.x") */
-  version?: SemanticVersion;
   /** Enable on-ramp top-up method (default: "true") */
   isOnRampEnabled?: boolean;
   /** Enable swap top-up method (default: "true") */

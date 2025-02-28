@@ -7,6 +7,7 @@
   "dependencies": {
     "@imtbl/blockchain-data": "workspace:*",
     "@imtbl/checkout-sdk": "workspace:*",
+    "@imtbl/checkout-widgets": "workspace:*",
     "@imtbl/config": "workspace:*",
     "@imtbl/minting-backend": "workspace:*",
     "@imtbl/orderbook": "workspace:*",
