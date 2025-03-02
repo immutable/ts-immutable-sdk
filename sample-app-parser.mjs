@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 
 const FILENAME = fileURLToPath(import.meta.url);
 const DIRNAME = path.dirname(FILENAME);
-
+const examplesDir = path.join(DIRNAME, 'examples', '_parsed');
 const main = (product) => {
   const sampleAppDir = path.join(DIRNAME, 'examples', product);
 
@@ -24,7 +24,7 @@ const main = (product) => {
     try {
       metadataContent = fs.readFileSync(path.join(appDir, 'metadata.json'), 'utf8');
     } catch (error) {
-      console.log(`No metadata.json found for ${app}, using empty object`);
+      console.log(`No metadata.json found for ${app}`);
     }
 
     // Handle missing tutorial.md
@@ -32,19 +32,25 @@ const main = (product) => {
     try {
       tutorial = fs.readFileSync(path.join(appDir, 'tutorial.md'), 'utf8');
     } catch (error) {
-      console.log(`No tutorial.md found for ${app}, using empty string`);
+      console.log(`No tutorial.md found for ${app}`);
     }
 
     // Add this app's data to the allApps object
-    allApps[app] = {
-      tutorial,
-      metadata: JSON.parse(metadataContent),
-    };
+    if (tutorial && metadataContent) {
+      allApps[app] = {
+        tutorial,
+        metadata: JSON.parse(metadataContent),
+      };
+    }
   });
+
+  if (!fs.existsSync(examplesDir)) {
+    fs.mkdirSync(examplesDir, { recursive: true });
+  }
 
   // Write a single JSON file in the product directory
   fs.writeFileSync(
-    path.join(sampleAppDir, `${product}-examples.json`),
+    path.join(examplesDir, `${product}-examples.json`),
     JSON.stringify(allApps, null, 2),
   );
 
