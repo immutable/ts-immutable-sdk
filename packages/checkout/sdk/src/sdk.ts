@@ -133,7 +133,7 @@ export class Checkout {
 
     try {
       // eslint-disable-next-line max-len
-      const cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets@${globalPackageVersion()}/dist/browser/index.cdn.js`;
+      const cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets@${globalPackageVersion()}/dist/browser/index.js`;
 
       // WebpackIgnore comment required to prevent webpack modifying the import statement and
       // breaking the dynamic import in certain applications integrating checkout
