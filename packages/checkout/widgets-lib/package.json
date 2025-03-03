@@ -78,15 +78,11 @@
   "exports": {
     "development": {
       "types": "./src/index.ts",
-      "browser": "./dist/browser/index.js",
-      "require": "./dist/node/index.cjs",
-      "default": "./dist/node/index.js"
+      "default": "./dist/browser/index.js",
     },
     "default": {
       "types": "./dist/types/index.d.ts",
-      "browser": "./dist/browser/index.js",
-      "require": "./dist/node/index.cjs",
-      "default": "./dist/node/index.js"
+      "default": "./dist/browser/index.js",
     }
   },
   "homepage": "https://github.com/immutable/ts-immutable-sdk",
