@@ -75,7 +75,6 @@
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
     "start": "tsup --config ./tsup.config.js --watch",
     "start:dev": "CHECKOUT_DEV_MODE=true pnpm start",
-    "start:local": "CHECKOUT_LOCAL_MODE=true pnpm start",
     "test": "jest test",
     "test:watch": "jest test --watch",
     "typecheck": "tsc --customConditions default --noEmit"

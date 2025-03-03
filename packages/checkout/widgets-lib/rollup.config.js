@@ -47,7 +47,7 @@ const getPlugins = () => {
 /**
  * @type {import('rollup').RollupOptions[]}
  */
-export default [
+export default 
   {
     input: 'src/index.ts',
     output: {
@@ -58,19 +58,4 @@ export default [
     plugins: [
       ...getPlugins(),
     ]
-  },
-  ...(process.env.NODE_ENV === PRODUCTION ? [
-    {
-      input: 'src/index.ts',
-      output: {
-        file: 'dist/browser/index.cdn.js',
-        format: 'umd',
-        name: 'ImmutableCheckoutWidgets',
-        inlineDynamicImports: true
-    },
-    context: 'window',
-    plugins: [
-      ...getPlugins(),
-    ]
-  }] : []),
-]
+  }

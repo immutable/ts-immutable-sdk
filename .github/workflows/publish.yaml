@@ -162,3 +162,30 @@ jobs:
         uses: ./.github/actions/notify-slack-publish-status
         with:
           message: "❌ Failed to publish SDK version ${{steps.release.outputs.RELEASE_NAME}} to NPM. ${{ github.triggering_actor }} please check the logs for more details."
+          
+      - name: Wait for NPM @latest Update
+        id: wait_for_npm_update
+        if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') && github.event_name != 'push' }} && env.DRY_RUN == 'false'
+        run: |
+          VERSION="$(jq -r '.version' ./sdk/package.json)"
+          echo "Waiting for NPM registry to reflect version: $VERSION"
+
+          for i in {1..20}; do
+            LATEST_VERSION=$(if [[ "${{ startsWith(env.RELEASE_TYPE, 'pre') }}" == "true" ]]; then npm view @imtbl/sdk@alpha version; else npm view @imtbl/checkout-widgets@latest version; fi)
+            if [[ "$LATEST_VERSION" == "$VERSION" ]]; then
+              echo "NPM registry updated to version: $LATEST_VERSION"
+              exit 0
+            fi
+            echo "NPM registry not updated yet, retrying in 15 seconds..."
+            sleep 15
+          done
+
+          echo "NPM registry failed to update after 5 minutes."
+          exit 1
+
+      - name: Purge CDN Cache for Checkout Widgets
+        id: purge_cdn
+        if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }}  && env.DRY_RUN == 'false'
+        run: |
+          curl -X GET https://purge.jsdelivr.net/npm/@imtbl/checkout-widgets@latest
+          echo "CDN cache purged for https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets@latest"

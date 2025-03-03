@@ -71,7 +71,6 @@
     "rollup": "^4.22.4",
     "rollup-plugin-polyfill-node": "^0.13.0",
     "ts-jest": "^29.1.0",
-    "tsup": "8.3.0",
     "typescript": "^5.6.2",
     "unplugin-swc": "^1.5.1",
     "web-vitals": "^2.1.4"
@@ -98,8 +97,8 @@
   },
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "NODE_ENV=production tsup --config ./tsup.config.js && pnpm typegen",
-    "transpile": "tsup --config ./tsup.config.js",
+    "build": "NODE_ENV=production rollup --config rollup.config.js && pnpm typegen",
+    "transpile": "rollup --config rollup.config.js",
     "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
     "pack:root": "pnpm pack --pack-destination $(dirname $(pnpm root -w))",
     "build:local": "pnpm build && mkdir -p ../widgets-sample-app/public/lib/js && cp dist/browser/*.js ../widgets-sample-app/public/lib/js/",
