@@ -16,21 +16,10 @@ const defaultPlugins = [
     preventAssignment: true,
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || PRODUCTION),
   }),
-  isProduction ? typescript({customConditions: ["default"], declaration: false, outDir: 'dist/browser'}) 
-    : swc.rollup({ jsc: { 
-      transform: { react: { development: true, runtime: 'automatic' }},
-    } }),
 ]
 
 const productionPlugins = [
-  resolve({
-    browser: true,
-    dedupe: ['react', 'react-dom'],
-    exportConditions: ['default']
-  }),
-  nodePolyfills(),
   commonjs(),
-
 ]
 
 const getPlugins = () => {
@@ -47,15 +36,70 @@ const getPlugins = () => {
 /**
  * @type {import('rollup').RollupOptions[]}
  */
-export default 
+export default [
+  // browser bundle
   {
     input: 'src/index.ts',
+    treeshake: 'smallest',
     output: {
       dir: 'dist/browser',
       format: 'es',
-      inlineDynamicImports: !isProduction
+      inlineDynamicImports: !isProduction,
     },
     plugins: [
+       isProduction ? typescript({customConditions: ["default"], declaration: false, outDir: 'dist/browser'}) 
+         : swc.rollup({ jsc: { 
+         transform: { react: { development: true, runtime: 'automatic' }},
+       } }),
+      resolve({
+        browser: true,
+        dedupe: ['react', 'react-dom'],
+        exportConditions: ['default', 'browser'],
+      }),
+      nodePolyfills(),
+      ...getPlugins(),
+    ],
+  },
+  // node esm bundle
+  {
+    input: 'src/index.ts',
+    treeshake: 'smallest',
+    output: {
+      dir: 'dist/node',
+      format: 'es',
+      inlineDynamicImports: !isProduction,
+    },
+    plugins: [
+      isProduction ? typescript({customConditions: ["default"], declaration: false, outDir: 'dist/node'}) 
+        : swc.rollup({ jsc: { 
+        transform: { react: { development: true, runtime: 'automatic' }},
+      } }),
+      resolve({
+        dedupe: ['react', 'react-dom'],
+        exportConditions: ['default', 'node']
+      }),
+      ...getPlugins(),
+    ]
+  },
+  // node cjs bundle
+  {
+    input: 'src/index.ts',
+    treeshake: 'smallest',
+    output: {
+      dir: 'dist/node',
+      format: 'cjs',
+      inlineDynamicImports: !isProduction,
+    },
+    plugins: [
+      isProduction ? typescript({customConditions: ["default"], declaration: false, outDir: 'dist/node'}) 
+        : swc.rollup({ jsc: { 
+        transform: { react: { development: true, runtime: 'automatic' }},
+      } }),
+      resolve({
+        dedupe: ['react', 'react-dom'],
+        exportConditions: ['default', 'node']
+      }),
       ...getPlugins(),
     ]
   }
+]
