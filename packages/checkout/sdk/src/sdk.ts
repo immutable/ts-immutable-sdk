@@ -119,8 +119,6 @@ export class Checkout {
   }
 
   /**
-   * @deprecated Use `import { WidgetsFactory } from '@imtbl/checkout-widgets'` instead.
-   *             This method will be removed in the next major release (v3)
    * Loads the widgets bundle and initiates the widgets factory.
    * @param {WidgetsInit} init - The initialisation parameters for loading the widgets bundle and applying configuration
    * @returns {Promise<ImmutableCheckoutWidgets.WidgetsFactory>} A promise that resolves to the widgets factory instance
@@ -135,7 +133,7 @@ export class Checkout {
 
     try {
       // eslint-disable-next-line max-len
-      const cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets@${globalPackageVersion()}/dist/browser/index.js`;
+      const cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets@${globalPackageVersion()}/dist/browser/index.cdn.js`;
 
       // WebpackIgnore comment required to prevent webpack modifying the import statement and
       // breaking the dynamic import in certain applications integrating checkout
