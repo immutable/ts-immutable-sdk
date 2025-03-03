@@ -1329,9 +1329,6 @@ importers:
       ts-jest:
         specifier: ^29.1.0
         version: 29.2.5(@babel/core@7.24.9)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.24.9))(esbuild@0.24.0)(jest@29.7.0(@types/node@18.15.13)(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2)))(typescript@5.6.2)
-      tsup:
-        specifier: 8.3.0
-        version: 8.3.0(@swc/core@1.9.3(@swc/helpers@0.5.13))(jiti@1.21.0)(postcss@8.4.49)(typescript@5.6.2)(yaml@2.5.0)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -2485,9 +2482,6 @@ importers:
       '@imtbl/checkout-sdk':
         specifier: workspace:*
         version: link:../packages/checkout/sdk
-      '@imtbl/checkout-widgets':
-        specifier: workspace:*
-        version: link:../packages/checkout/widgets-lib
       '@imtbl/config':
         specifier: workspace:*
         version: link:../packages/config
