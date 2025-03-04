@@ -17,12 +17,14 @@ export interface UnableToConnectDrawerProps {
   checkout: Checkout;
   onCloseDrawer: () => void;
   onTryAgain?: () => void;
+  message?: string;
 }
 export function UnableToConnectDrawer({
   visible,
   checkout,
   onCloseDrawer,
   onTryAgain,
+  message,
 }: UnableToConnectDrawerProps) {
   const { t } = useTranslation();
 
@@ -102,7 +104,7 @@ export function UnableToConnectDrawer({
                 paddingX: 'base.spacing.x6',
               }}
             >
-              {t('drawers.walletConnectionError.unableToConnect.body')}
+              {message ?? t('drawers.walletConnectionError.unableToConnect.body')}
             </Body>
           </Box>
         </Box>
