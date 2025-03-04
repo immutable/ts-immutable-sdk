@@ -122,8 +122,8 @@ jobs:
       - name: Tag Git Pre-Release
         if: ${{ startsWith(env.RELEASE_TYPE, 'pre') }}
         run: |
-          git tag -a $(jq -r '.version' ./sdk/package.json) -m "$(jq -r '.version' ./sdk/package.json)"
-          git push origin $(jq -r '.version' ./sdk/package.json)
+          git tag -a "alpha-$(jq -r '.version' ./sdk/package.json)" -m "$(jq -r '.version' ./sdk/package.json)"
+          git push origin "alpha-$(jq -r '.version' ./sdk/package.json)"
 
       - name: Release to NPM
         id: npm_release
