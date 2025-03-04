@@ -65,6 +65,7 @@
     "lint:examples": "pnpm --recursive --filter '@examples/**' lint",
     "nx": "nx",
     "pack-npm-packages": "pnpm -r pack:root",
+    "parse:examples": "node sample-app-parser.mjs",
     "postinstall": "husky install",
     "prepare:sdk": "./prepare-deps.sh sdk",
     "prepare:examples": "./prepare-deps.sh examples",
@@ -75,6 +76,6 @@
     "test": "nx affected -t test",
     "test:examples": "pnpm --recursive --sequential --filter '@examples/**' test",
     "test:vpn": "RUN_VPN_TESTS=1 wsrun --exclude-missing -e test",
-    "typecheck": "nx affected -t typecheck"
+    "typecheck": "nx affected -t typecheck"    
   }
 }
