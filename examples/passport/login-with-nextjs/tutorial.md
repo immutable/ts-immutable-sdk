@@ -1,454 +1,333 @@
-# Implementing Authentication with Immutable Passport in Next.js
+# Login with Next.js Tutorial
 
-This tutorial walks you through implementing various authentication methods using Immutable Passport in a Next.js application. You'll learn how to implement different login approaches, handle logout scenarios, and manage authentication state.
+## Introduction
+
+This example application demonstrates different ways to implement authentication with Immutable Passport in a Next.js application. The app showcases multiple authentication approaches:
+
+1. Login with Passport (standard EVM connection)
+2. Login with EtherJS (using Passport provider with EtherJS)
+3. Login with Identity Only (without wallet connection)
+4. Logout with Redirect Mode (redirects to a logout page)
+5. Logout with Silent Mode (logs out without page redirection)
+
+This tutorial will walk you through the implementation details and show you how to integrate Immutable Passport authentication into your Next.js applications.
 
 ## Prerequisites
 
-Before starting this tutorial, ensure you have:
+Before you begin, make sure you have the following:
 
-- Node.js installed on your system
-- An Immutable Hub account
-- Basic understanding of React and Next.js
-- Your Immutable Hub publishable API key and client ID
-
-## Project Setup
-
-1. Create a new Next.js project with TypeScript:
-
-```bash
-pnpm create next-app@latest passport-login-example --typescript
-cd passport-login-example
-```
-
-2. Install the required dependencies:
-
-```bash
-pnpm add @imtbl/sdk @biom3/react ethers
-```
-
-3. Create a `.env` file in your project root:
-
-```env
-NEXT_PUBLIC_PUBLISHABLE_KEY=your_publishable_key_here
-NEXT_PUBLIC_CLIENT_ID=your_client_id_here
-```
+- Node.js (v18 or later)
+- pnpm package manager
+- An Immutable Hub account with:
+  - A registered application
+  - A publishable API key
+  - A client ID
+  - Configured redirect URIs
 
 ## Project Structure
 
-The application is organized as follows:
+The project follows a standard Next.js application structure:
 
 ```
-src/
-├── app/
-│   ├── login-with-passport/
-│   │   └── page.tsx
-│   ├── login-with-etherjs/
-│   │   └── page.tsx
-│   ├── login-with-identity-only/
-│   │   └── page.tsx
-│   ├── logout-with-redirect-mode/
-│   │   └── page.tsx
-│   ├── logout-with-silent-mode/
-│   │   └── page.tsx
-│   ├── utils/
-│   │   └── setupDefault.ts
-│   ├── layout.tsx
-│   └── page.tsx
+login-with-nextjs/
+├── .env.example        # Example environment variables
+├── package.json        # Project dependencies and scripts
+├── src/
+│   ├── app/
+│   │   ├── globals.css                 # Global styles
+│   │   ├── layout.tsx                  # Root layout component
+│   │   ├── page.tsx                    # Home page with navigation
+│   │   ├── login-with-passport/        # Standard Passport login
+│   │   ├── login-with-etherjs/         # Login using EtherJS
+│   │   ├── login-with-identity-only/   # Login without wallet
+│   │   ├── logout-with-redirect-mode/  # Logout with redirect
+│   │   ├── logout-with-silent-mode/    # Logout without redirect
+│   │   ├── redirect/                   # OAuth redirect handler
+│   │   ├── logout/                     # Logout redirect page
+│   │   ├── silent-logout/              # Silent logout handler
+│   │   └── utils/
+│   │       ├── setupDefault.ts         # Default Passport setup
+│   │       ├── setupLogoutRedirect.ts  # Redirect logout setup
+│   │       ├── setupLogoutSilent.ts    # Silent logout setup
+│   │       └── wrapper.tsx             # App wrapper component
 ```
 
-## Setting up Passport
+## Code Walkthrough
 
-First, let's configure the Passport instance. Create `src/app/utils/setupDefault.ts`:
+### SDK Integration Walkthrough
+
+#### Initializing the Passport SDK
+
+The Passport SDK is initialized in the `src/app/utils/setupDefault.ts` file:
 
 ```typescript
 import { config, passport } from '@imtbl/sdk';
 
 export const passportInstance = new passport.Passport({
-    baseConfig: {
-      environment: config.Environment.SANDBOX,
-      publishableKey: process.env.NEXT_PUBLIC_PUBLISHABLE_KEY || '<YOUR_PUBLISHABLE_KEY>',
-    },
-    clientId: process.env.NEXT_PUBLIC_CLIENT_ID || '<YOUR_CLIENT_ID>',
-    redirectUri: 'http://localhost:3000/redirect',
-    logoutRedirectUri: 'http://localhost:3000/logout',
-    audience: 'platform_api',
-    scope: 'openid offline_access email transact',
+  baseConfig: {
+    environment: config.Environment.SANDBOX,
+    publishableKey: process.env.NEXT_PUBLIC_PUBLISHABLE_KEY || '<YOUR_PUBLISHABLE_KEY>',
+  },
+  clientId: process.env.NEXT_PUBLIC_CLIENT_ID || '<YOUR_CLIENT_ID>',
+  redirectUri: 'http://localhost:3000/redirect',
+  logoutRedirectUri: 'http://localhost:3000/logout',
+  audience: 'platform_api',
+  scope: 'openid offline_access email transact',
 });
 ```
 
-## Creating the Home Page
+This code creates a new instance of the Passport SDK with the following configuration:
+- Environment: SANDBOX (for testing) or PRODUCTION (for live applications)
+- Publishable Key: Your API key from Immutable Hub
+- Client ID: Your application's client ID from Immutable Hub
+- Redirect URI: The URL where users will be redirected after login
+- Logout Redirect URI: The URL where users will be redirected after logout
+- Audience: The API audience (platform_api)
+- Scope: The requested permissions (openid, offline_access, email, transact)
 
-The home page (`src/app/page.tsx`) provides navigation to different authentication examples:
+#### Handling OAuth Redirects
+
+After a user logs in with Passport, they are redirected to the specified redirect URI. The `src/app/redirect/page.tsx` component handles this redirect:
 
 ```typescript
 'use client';
-import { Button, Heading } from '@biom3/react';
-import NextLink from 'next/link';
 
-export default function Home() {
-  return (<>
-      <Heading 
-      size="medium" 
-      className="mb-1">
-        Login with NextJS
-      </Heading>
-      <Button       
-      className="mb-1"
-      size="medium" 
-      rc={<NextLink href="/login-with-passport" />}>
-        Login with Passport
-      </Button> 
-      <Button       
-      className="mb-1"
-      size="medium" 
-      rc={<NextLink href="/login-with-etherjs" />}>
-        Login with EtherJS
-      </Button> 
-      <Button       
-      className="mb-1"
-      size="medium" 
-      rc={<NextLink href="/login-with-identity-only" />}>
-        Login with Identity only
-      </Button> 
-      <Button       
-      className="mb-1"
-      size="medium" 
-      rc={<NextLink href="/logout-with-redirect-mode" />}>
-        Logout with Redirect Mode
-      </Button> 
-      <Button       
-      className="mb-1"
-      size="medium" 
-      rc={<NextLink href="/logout-with-silent-mode" />}>
-        Logout with Silent Mode
-      </Button> 
-  </>);
+import { useEffect } from 'react';
+import { passportInstance } from '../utils/setupDefault';
+
+export default function Redirect() {
+  useEffect(() => {
+    if (passportInstance) {
+      passportInstance.loginCallback()
+        .then(() => {
+          console.log('Login callback successful');
+          if (window.opener) {
+            window.opener.postMessage('authComplete', window.origin);
+            window.close();
+          }
+        })
+        .catch((error) => {
+          console.error('Error in login callback:', error);
+        });
+    }
+  }, []);
+  
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen p-8">
+      <h1 className="text-3xl font-bold mb-8">Logged in</h1>
+    </div>
+  );
 }
 ```
 
-## Implementing Standard Passport Login
+The `loginCallback()` method processes the authentication response and stores the necessary tokens. If the login is successful, it sends a message to the opener window and closes the popup.
 
-Create `src/app/login-with-passport/page.tsx`:
+### Feature 1: Login with Passport
+
+The `src/app/login-with-passport/page.tsx` component demonstrates the standard way to login with Passport:
 
 ```typescript
-'use client';
-
-import { useState } from 'react';
-import { Button, Heading, Table, Link } from '@biom3/react';
-import NextLink from 'next/link';
-import { passportInstance } from '../utils/setupDefault';
-
-export default function LoginWithPassport() {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [accountAddress, setAccountAddress] = useState<string | null>(null);
-
-  const loginWithPassport = async () => {
-    if (!passportInstance) return;
-    try {
-      const provider = await passportInstance.connectEvm();
-      const accounts = await provider.request({ method: 'eth_requestAccounts' });
-      
-      if (accounts) {
-        setIsLoggedIn(true);
-        setAccountAddress(accounts[0] || null);
-      } else {
-        setIsLoggedIn(false);
-      }
-    } catch (error) {
-      console.error('Error connecting to Passport:', error);
+const loginWithPassport = async () => {
+  if (!passportInstance) return;
+  try {
+    const provider = await passportInstance.connectEvm();
+    const accounts = await provider.request({ method: 'eth_requestAccounts' });
+    if (accounts) {
+      setIsLoggedIn(true);
+      setAccountAddress(accounts[0] || null);
+    } else {
       setIsLoggedIn(false);
     }
-  };
-
-  return (
-    <>
-      <Heading size="medium" className="mb-1">
-        Login with Passport
-      </Heading>
-      <Button
-        className="mb-1"
-        size="medium"
-        onClick={loginWithPassport}
-        disabled={isLoggedIn}>
-        {isLoggedIn ? 'Logged In' : 'Login'}
-      </Button>
-
-      <Table>
-        <Table.Head>
-          <Table.Row>
-            <Table.Cell>Attribute</Table.Cell>
-            <Table.Cell>Value</Table.Cell>
-          </Table.Row>
-        </Table.Head>
-        <Table.Body>
-          <Table.Row>
-            <Table.Cell><b>Is Logged In</b></Table.Cell>
-            <Table.Cell>{isLoggedIn ? 'Yes' : 'No'}</Table.Cell>
-          </Table.Row>
-          <Table.Row>
-            <Table.Cell><b>Account Address</b></Table.Cell>
-            <Table.Cell>{accountAddress || 'N/A'}</Table.Cell>
-          </Table.Row>
-        </Table.Body>
-      </Table>
-      <br />
-      <Link rc={<NextLink href="/" />}>Return to Examples</Link>
-    </>
-  );
-}
+  } catch (error) {
+    console.error('Error connecting to Passport:', error);
+    setIsLoggedIn(false);
+  }
+};
 ```
 
-## Implementing Identity-Only Login
+This approach:
+1. Calls `connectEvm()` to get a provider
+2. Requests accounts using the provider
+3. Updates the UI state based on the login result
 
-Create `src/app/login-with-identity-only/page.tsx`:
+### Feature 2: Login with EtherJS
+
+The `src/app/login-with-etherjs/page.tsx` component shows how to use Passport with EtherJS:
 
 ```typescript
-'use client';
+const loginWithEthersjs = useCallback(async () => {
+  if (!passportInstance) return;
 
-import { useState } from 'react';
-import { Button, Heading, Table, Link } from '@biom3/react';
-import NextLink from 'next/link';
-import { passportInstance } from '../utils/setupDefault';
-
-export default function LoginWithIdentityOnly() {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [userInfo, setUserInfo] = useState<any>(null);
-
-  const loginWithIdentity = async () => {
-    if (!passportInstance) return;
-    try {
-      const userProfile = await passportInstance.connectIdentity();
-      if (userProfile) {
-        setIsLoggedIn(true);
-        setUserInfo(userProfile);
-      } else {
-        setIsLoggedIn(false);
-      }
-    } catch (error) {
-      console.error('Error connecting to Passport:', error);
+  try {
+    const passportProvider = await passportInstance.connectEvm();
+    const web3Provider = new BrowserProvider(passportProvider);
+    const accounts = await web3Provider.send('eth_requestAccounts', []);
+    if (accounts && accounts.length > 0) {
+      setIsLoggedIn(true);
+      setAccountAddress(accounts[0] || null);
+    } else {
       setIsLoggedIn(false);
     }
-  };
-
-  return (
-    <>
-      <Heading size="medium" className="mb-1">
-        Login with Identity Only
-      </Heading>
-      <Button
-        className="mb-1"
-        size="medium"
-        onClick={loginWithIdentity}
-        disabled={isLoggedIn}>
-        {isLoggedIn ? 'Logged In' : 'Login'}
-      </Button>
-
-      <Table>
-        <Table.Head>
-          <Table.Row>
-            <Table.Cell>Attribute</Table.Cell>
-            <Table.Cell>Value</Table.Cell>
-          </Table.Row>
-        </Table.Head>
-        <Table.Body>
-          <Table.Row>
-            <Table.Cell><b>Is Logged In</b></Table.Cell>
-            <Table.Cell>{isLoggedIn ? 'Yes' : 'No'}</Table.Cell>
-          </Table.Row>
-          {userInfo && (
-            <>
-              <Table.Row>
-                <Table.Cell><b>Email</b></Table.Cell>
-                <Table.Cell>{userInfo.email}</Table.Cell>
-              </Table.Row>
-              <Table.Row>
-                <Table.Cell><b>User ID</b></Table.Cell>
-                <Table.Cell>{userInfo.sub}</Table.Cell>
-              </Table.Row>
-            </>
-          )}
-        </Table.Body>
-      </Table>
-      <br />
-      <Link rc={<NextLink href="/" />}>Return to Examples</Link>
-    </>
-  );
-}
+  } catch (error) {
+    console.error('Error connecting to Passport with Ethers.js:', error);
+    setIsLoggedIn(false);
+  }
+}, []);
 ```
 
-## Implementing Logout Modes
+This approach:
+1. Gets the Passport provider
+2. Wraps it with EtherJS's BrowserProvider
+3. Uses EtherJS to request accounts
+4. Updates the UI state based on the login result
 
-### Redirect Mode Logout
+### Feature 3: Login with Identity Only
 
-Create `src/app/logout-with-redirect-mode/page.tsx`:
+The `src/app/login-with-identity-only/page.tsx` component demonstrates how to login without connecting a wallet:
 
 ```typescript
-'use client';
-
-import { Button, Heading, Link } from '@biom3/react';
-import NextLink from 'next/link';
-import { passportInstance } from '../utils/setupDefault';
-
-export default function LogoutWithRedirectMode() {
-  const logout = async () => {
-    if (!passportInstance) return;
-    try {
-      await passportInstance.logout({
-        redirectMode: true
-      });
-    } catch (error) {
-      console.error('Error during logout:', error);
+const loginWithIdentiy = useCallback(async () => {
+  if (!passportInstance) return;
+  try {
+    const profile: passport.UserProfile | null = await passportInstance.login();
+    if (profile) {
+      console.log(profile.email);
+      console.log(profile.sub);
+      setIsLoggedIn(true);
+      setEmail(profile.email || 'No Email');
+      setSub(profile.sub || 'No Subject');
+    } else {
+      setIsLoggedIn(false);
     }
-  };
-
-  return (
-    <>
-      <Heading size="medium" className="mb-1">
-        Logout with Redirect Mode
-      </Heading>
-      <Button
-        className="mb-1"
-        size="medium"
-        onClick={logout}>
-        Logout
-      </Button>
-      <br />
-      <Link rc={<NextLink href="/" />}>Return to Examples</Link>
-    </>
-  );
-}
+  } catch (error) {
+    console.error('Error connecting to Passport', error);
+    setIsLoggedIn(false);
+  }
+}, []);
 ```
 
-### Silent Mode Logout
+This approach:
+1. Calls `login()` instead of `connectEvm()`
+2. Receives a UserProfile object with user information
+3. Updates the UI with the user's email and subject identifier
 
-Create `src/app/logout-with-silent-mode/page.tsx`:
+### Feature 4: Logout with Redirect Mode
+
+The `src/app/logout-with-redirect-mode/page.tsx` component shows how to implement logout with redirection:
 
 ```typescript
-'use client';
+// In setupLogoutRedirect.ts
+export const passportInstance = new passport.Passport({
+  // ... other config
+  logoutMode: 'redirect',
+  logoutRedirectUri: 'http://localhost:3000/logout',
+  // ... other config
+});
 
-import { useState } from 'react';
-import { Button, Heading, Table, Link } from '@biom3/react';
-import NextLink from 'next/link';
-import { passportInstance } from '../utils/setupDefault';
+// In the component
+const logout = async () => {
+  if (!passportInstance || !isLoggedIn) return;
+  try {
+    await passportInstance.logout();
+    setIsLoggedIn(false);
+    setAccountAddress(null);
+  } catch (error) {
+    console.error('Error disconnecting:', error);
+  }
+};
+```
 
-export default function LogoutWithSilentMode() {
-  const [logoutStatus, setLogoutStatus] = useState<string>('');
+This approach:
+1. Configures Passport with `logoutMode: 'redirect'`
+2. Specifies a `logoutRedirectUri` where the user will be redirected after logout
+3. Calls `logout()` to initiate the logout process
+4. Updates the UI state
 
-  const logout = async () => {
-    if (!passportInstance) return;
-    try {
-      await passportInstance.logout({
-        redirectMode: false
-      });
-      setLogoutStatus('Logout successful');
-    } catch (error) {
-      console.error('Error during logout:', error);
-      setLogoutStatus('Logout failed');
-    }
-  };
+### Feature 5: Logout with Silent Mode
+
+The `src/app/logout-with-silent-mode/page.tsx` component demonstrates how to implement silent logout:
+
+```typescript
+// In setupLogoutSilent.ts
+export const passportInstance = new passport.Passport({
+  // ... other config
+  logoutMode: 'silent',
+  logoutRedirectUri: 'http://localhost:3000/silent-logout',
+  // ... other config
+});
+
+// In the component
+const logout = async () => {
+  if (!passportInstance || !isLoggedIn) return;
+  setIsLoggingOut(true);
+  try {
+    await passportInstance.logout();
+    setIsLoggedIn(false);
+    setAccountAddress(null);
+  } catch (error) {
+    console.error('Error disconnecting:', error);
+  } finally {
+    setIsLoggingOut(false);
+  }
+};
+```
+
+This approach:
+1. Configures Passport with `logoutMode: 'silent'`
+2. Specifies a `logoutRedirectUri` for the silent logout process
+3. Calls `logout()` to initiate the logout process
+4. Updates the UI state without redirecting the user
+
+The silent logout process is handled in `src/app/silent-logout/page.tsx`:
+
+```typescript
+export default function SilentLogout() {
+  useEffect(() => {
+    (async () => {
+      try {
+        await passportInstance.logoutSilentCallback(SILENT_LOGOUT_INITIATOR_URL);
+      } catch (error) {
+        console.error('Silent logout error:', error);
+      }
+    })();
+  }, []);
 
   return (
-    <>
-      <Heading size="medium" className="mb-1">
-        Logout with Silent Mode
-      </Heading>
-      <Button
-        className="mb-1"
-        size="medium"
-        onClick={logout}>
-        Logout
-      </Button>
-
-      {logoutStatus && (
-        <Table>
-          <Table.Body>
-            <Table.Row>
-              <Table.Cell><b>Status</b></Table.Cell>
-              <Table.Cell>{logoutStatus}</Table.Cell>
-            </Table.Row>
-          </Table.Body>
-        </Table>
-      )}
-      <br />
-      <Link rc={<NextLink href="/" />}>Return to Examples</Link>
-    </>
+    <div>
+      <p>Logging out...</p>
+    </div>
   );
 }
 ```
 
-## Key Concepts
+## Running the App
 
-### 1. Passport Configuration
+To run the example app locally:
 
-The Passport instance is configured with your Immutable Hub credentials and environment settings. Key configuration options include:
-- Environment (SANDBOX/PRODUCTION)
-- Client ID and Publishable Key
-- Redirect URIs for login and logout
-- Scope for authentication
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+3. Copy `.env.example` to `.env` and fill in your Immutable Hub credentials:
+   ```
+   NEXT_PUBLIC_PUBLISHABLE_KEY=your_publishable_key
+   NEXT_PUBLIC_CLIENT_ID=your_client_id
+   ```
+4. Start the development server:
+   ```bash
+   pnpm dev
+   ```
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-### 2. Authentication Methods
+## Summary
 
-The example demonstrates three authentication approaches:
-- **Standard Passport Login**: Full wallet connection with EVM provider
-- **Identity-Only Login**: Authentication without wallet connection
-- **EtherJS Integration**: Custom integration with EtherJS
+This example application demonstrates multiple ways to implement authentication with Immutable Passport in a Next.js application. The key features include:
 
-### 3. Logout Modes
+1. Standard login with Passport's EVM connection
+2. Integration with EtherJS for more advanced blockchain interactions
+3. Identity-only login without wallet connection
+4. Two logout modes: redirect and silent
+5. Proper handling of OAuth redirects and callbacks
 
-Two logout modes are demonstrated:
-- **Redirect Mode**: Redirects to a specified URL after logout
-- **Silent Mode**: Performs logout without redirection
-
-### 4. State Management
-
-The application uses React's useState hook to manage:
-- Login status
-- User information
-- Account addresses
-- Logout status
-
-## Testing the Application
-
-1. Start the development server:
-
-```bash
-pnpm dev
-```
-
-2. Open http://localhost:3000 in your browser
-
-3. Test different authentication methods:
-   - Try standard Passport login to connect your wallet
-   - Test identity-only login for basic authentication
-   - Experiment with both logout modes
-
-## Common Issues and Solutions
-
-1. **Connection Fails**
-   - Verify your Immutable Hub credentials
-   - Check that you're using the correct environment
-   - Ensure redirect URIs match your Hub configuration
-
-2. **Logout Issues**
-   - For redirect mode, verify the logout redirect URI
-   - For silent mode, ensure proper error handling
-   - Check browser console for detailed error messages
-
-3. **State Management**
-   - Verify state updates after login/logout
-   - Check for proper error handling
-   - Monitor console for state-related issues
-
-## Next Steps
-
-1. Add persistent authentication state
-2. Implement protected routes
-3. Add user profile management
-4. Integrate with smart contracts
-5. Add transaction signing capabilities
-
-## Resources
-
-- [Immutable Passport Documentation](https://docs.immutable.com/docs/zkEVM/products/passport)
-- [Next.js Documentation](https://nextjs.org/docs)
-- [EtherJS Documentation](https://docs.ethers.org/) 
+By following this tutorial, you can implement similar authentication flows in your own Next.js applications using Immutable Passport, choosing the approach that best fits your application's needs. 
