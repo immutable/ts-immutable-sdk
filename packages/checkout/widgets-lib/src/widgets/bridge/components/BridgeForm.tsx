@@ -326,6 +326,9 @@ export function BridgeForm(props: BridgeFormProps) {
         {(!defaultTokenAddress || !isTokenBalancesLoading) && (
           <Box sx={formInputsContainerStyles}>
             <SelectForm
+              userJourney={UserJourney.BRIDGE}
+              screen="TokenAmount"
+              control="FromToken"
               testId="bridge-token"
               options={tokensOptions}
               optionsLoading={isTokenBalancesLoading}

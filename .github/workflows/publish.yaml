@@ -105,12 +105,6 @@ jobs:
 
       - name: Build SDK & Checkout Widgets
         run: pnpm build
-
-      - name: Generate version.json
-        if: (env.DRY_RUN) == 'false'
-        run: |
-          echo '{ "version": "$(jq -r '.version' ./sdk/package.json)" }' > ./sdk/version.json
-          cp ./sdk/version.json ./sdk/dist/
       
       - name: Pack SDK & Checkout Widgets packages and dependencies
         run: pnpm pack-npm-packages
@@ -125,10 +119,11 @@ jobs:
         if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }}
         run: pnpm nx release changelog $(jq -r '.version' ./sdk/package.json) $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") 
 
-      - name: Tag Git Release
+      - name: Tag Git Pre-Release
+        if: ${{ startsWith(env.RELEASE_TYPE, 'pre') }}
         run: |
-          git tag -a $(jq -r '.version' ./sdk/package.json) -m "$(jq -r '.version' ./sdk/package.json)"
-          git push origin $(jq -r '.version' ./sdk/package.json)
+          git tag -a "prelease-$(jq -r '.version' ./sdk/package.json)" -m "$(jq -r '.version' ./sdk/package.json)"
+          git push origin "prelease-$(jq -r '.version' ./sdk/package.json)"
 
       - name: Release to NPM
         id: npm_release
@@ -176,7 +171,7 @@ jobs:
           echo "Waiting for NPM registry to reflect version: $VERSION"
 
           for i in {1..20}; do
-            LATEST_VERSION=$(if [[ "${{ startsWith(env.RELEASE_TYPE, 'pre') }}" == "true" ]]; then npm view @imtbl/sdk@alpha version; else npm view @imtbl/sdk@latest version; fi)
+            LATEST_VERSION=$(if [[ "${{ startsWith(env.RELEASE_TYPE, 'pre') }}" == "true" ]]; then npm view @imtbl/sdk@alpha version; else npm view @imtbl/checkout-widgets@latest version; fi)
             if [[ "$LATEST_VERSION" == "$VERSION" ]]; then
               echo "NPM registry updated to version: $LATEST_VERSION"
               exit 0
@@ -188,9 +183,9 @@ jobs:
           echo "NPM registry failed to update after 5 minutes."
           exit 1
 
-      - name: Purge CDN Cache for version.json
+      - name: Purge CDN Cache for Checkout Widgets
         id: purge_cdn
         if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }}  && env.DRY_RUN == 'false'
         run: |
-          curl -X GET https://purge.jsdelivr.net/npm/@imtbl/sdk@latest/dist/version.json
-          echo "CDN cache purged for https://cdn.jsdelivr.net/npm/@imtbl/sdk@latest/dist/version.json"
+          curl -X GET https://purge.jsdelivr.net/npm/@imtbl/checkout-widgets@latest
+          echo "CDN cache purged for https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets@latest"

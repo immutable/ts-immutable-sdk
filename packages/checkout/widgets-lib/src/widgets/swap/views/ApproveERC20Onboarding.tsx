@@ -27,6 +27,10 @@ import { isPassportProvider } from '../../../lib/provider';
 export interface ApproveERC20Props {
   data: ApproveERC20SwapData;
 }
+
+const APPROVE_SPENDING = 'ApproveSpending';
+const APPROVE_SWAP = 'ApproveSwap';
+
 export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   const { t } = useTranslation();
   const { swapState: { allowedTokens } } = useContext(SwapContext);
@@ -52,7 +56,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   useEffect(() => {
     page({
       userJourney: UserJourney.SWAP,
-      screen: 'ApproveERC20',
+      screen: noApprovalTransaction ? APPROVE_SWAP : APPROVE_SPENDING,
       extras: {
         swapFormInfo: data.swapFormInfo,
       },
@@ -147,8 +151,8 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     if (loading) return;
     track({
       userJourney: UserJourney.SWAP,
-      screen: 'ApproveERC20',
-      control: 'ApproveSpending',
+      screen: APPROVE_SPENDING,
+      control: APPROVE_SPENDING,
       controlType: 'Button',
       extras: {
         autoProceed: data.autoProceed,
@@ -251,8 +255,8 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     if (loading) return;
     track({
       userJourney: UserJourney.SWAP,
-      screen: 'ApproveERC20',
-      control: 'ApproveSwap',
+      screen: APPROVE_SWAP,
+      control: APPROVE_SWAP,
       controlType: 'Button',
       extras: {
         autoProceed: data.autoProceed,

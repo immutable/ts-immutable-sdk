@@ -12,6 +12,7 @@ function PassportMethods() {
   const {
     logout,
     login,
+    popupRedirect,
     getIdToken,
     getAccessToken,
     getUserInfo,
@@ -43,6 +44,12 @@ function PassportMethods() {
   return (
     <CardStack title="Passport Methods">
       <Stack direction="horizontal" style={{ flexWrap: 'wrap' }} gap={3}>
+        <WorkflowButton
+          disabled={isLoading}
+          onClick={popupRedirect}
+        >
+          Popup Login
+        </WorkflowButton>
         <WorkflowButton
           disabled={isLoading}
           onClick={login}

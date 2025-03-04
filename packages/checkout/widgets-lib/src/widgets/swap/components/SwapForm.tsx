@@ -3,7 +3,7 @@ import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
 import {
-  Box, Heading, Icon, OptionKey, Tooltip,
+  Box, ButtCon, Heading, Icon, OptionKey, Tooltip,
 } from '@biom3/react';
 import { isAddressSanctioned, TokenInfo, WidgetTheme } from '@imtbl/checkout-sdk';
 
@@ -11,6 +11,7 @@ import { TransactionResponse } from '@imtbl/dex-sdk';
 import { useTranslation } from 'react-i18next';
 import { Environment } from '@imtbl/config';
 import { formatUnits, parseEther, parseUnits } from 'ethers';
+import { motion } from 'framer-motion';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { NetworkSwitchDrawer } from '../../../components/NetworkSwitchDrawer/NetworkSwitchDrawer';
 import { amountInputValidation as textInputValidator } from '../../../lib/validations/amountInputValidations';
@@ -117,6 +118,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
   const [toTokenError, setToTokenError] = useState<string>('');
   const [fromFiatValue, setFromFiatValue] = useState('');
   const [loadedToAndFromTokens, setLoadedToAndFromTokens] = useState(false);
+  const [reverseRotation, setReverseRotation] = useState(0);
 
   // Quote
   const [quote, setQuote] = useState<TransactionResponse | null>(null);
@@ -498,6 +500,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         resetQuote();
         return;
       }
+
       (async () => await fetchQuote())();
     }
   }, [debouncedFromAmount, fromToken, toToken, fromMaxTrigger]);
@@ -509,6 +512,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         resetQuote();
         return;
       }
+
       (async () => await fetchQuote())();
     }
   }, [debouncedToAmount, toToken, fromToken]);
@@ -680,6 +684,58 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       extras: {
         toToken,
         toAmount: value,
+      },
+    });
+  };
+
+  const reverseTokens = () => {
+    const currentFromToken = fromToken;
+    const currentToToken = toToken;
+    const currentFromAmount = fromAmount;
+    const currentToAmount = toAmount;
+
+    setReverseRotation((prev) => (prev === 0 ? 180 : 0));
+
+    resetFormErrors();
+    resetQuote();
+
+    // check if currentToToken is available in current list of wallet tokens
+    const isCurrentToTokenInSellList = currentToToken
+      ? tokensOptionsFrom.some(
+        (token) => token.id === formatTokenOptionsId(currentToToken.symbol, currentToToken.address),
+      )
+      : false;
+
+    if (isCurrentToTokenInSellList) {
+      // find the token in from balances
+      const selected = tokenBalances
+        .find((tokenBalance) => tokenBalance.token.address?.toLowerCase() === currentToToken!.address?.toLowerCase());
+
+      setDirection(SwapDirection.FROM);
+      setFromToken(currentToToken);
+      setFromAmount(currentToAmount);
+      setFromBalance(selected?.formattedBalance || '');
+      setToToken(currentFromToken);
+      setToAmount(''); // it will automatically trigger a quote and set this value
+    } else {
+      setDirection(SwapDirection.TO);
+      setFromToken(undefined);
+      setFromAmount('');
+      setToToken(currentFromToken);
+      setToAmount(fromAmount);
+    }
+
+    track({
+      userJourney: UserJourney.SWAP,
+      screen: 'SwapCoins',
+      control: 'Flip',
+      controlType: 'Button',
+      extras: {
+        fromToken: currentFromToken,
+        fromAmount: currentFromAmount,
+        toToken: currentToToken,
+        toAmount: currentToAmount,
+        isCurrentToTokenInSellList,
       },
     });
   };
@@ -870,7 +926,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            rowGap: 'base.spacing.x6',
+            rowGap: 'base.spacing.x1',
             paddingBottom: 'base.spacing.x2',
           }}
         >
@@ -920,11 +976,38 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
                 : undefined}
               coinSelectorHeading={t('views.SWAP.swapForm.from.selectorTitle')}
               defaultTokenImage={defaultTokenImage}
+              control="FromToken"
+              userJourney={UserJourney.SWAP}
+              screen="SwapCoins"
               environment={checkout?.config.environment}
               theme={theme}
             />
           </Box>
 
+          <Box sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          >
+            <ButtCon
+              icon="Flip"
+              variant="secondary"
+              rc={(
+                <motion.button
+                  onClick={reverseTokens}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 260,
+                    damping: 20,
+                    mass: 1,
+                  }}
+                  initial={false}
+                  animate={{ rotate: reverseRotation }}
+                />
+              )}
+            />
+          </Box>
           {/* TO */}
           <Box>
             <Box
@@ -971,6 +1054,9 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
                 : undefined}
               coinSelectorHeading={t('views.SWAP.swapForm.to.selectorTitle')}
               defaultTokenImage={defaultTokenImage}
+              control="ToToken"
+              userJourney={UserJourney.SWAP}
+              screen="SwapCoins"
               environment={checkout?.config.environment}
               theme={theme}
             />

@@ -12,6 +12,9 @@
 - [Creating Pull Requests](#creating-pull-requests)
   - [Title](#title)
   - [Description](#description)
+- [Publishing](#publishing)
+  - [v2](#v2)
+  - [v1 (legacy)](#v1-legacy)
 
 ## Setting Up Your Environment
 
@@ -149,3 +152,68 @@ When creating PR descriptions, start it with a section on one-line Customer Impa
 * `Removed` for now removed features.
 * `Fixed` for any bug fixes.
 * `Security` in case of vulnerabilities.
+
+## Publishing
+
+### v2
+
+To publish a new version of the v2 SDK:
+
+1. **Ensure your changes are merged into the `main` branch**
+   - All v2 SDK changes must be merged into the main branch
+
+2. **Run the publish GitHub Action**
+   - Go to Actions tab in the repository
+   - Select the "Publish to NPM" workflow
+   - Click "Run workflow"
+   - Select the `main` branch
+   - Choose the appropriate release type:
+     - `prerelease`: Increments the prerelease version (e.g., 2.0.0-alpha.1 → 2.0.0-alpha.2)
+     - `prepatch`: Increments the patch version and adds prerelease suffix (e.g., 2.0.0 → 2.0.1-alpha.0)
+     - `preminor`: Increments the minor version and adds prerelease suffix (e.g., 2.0.0 → 2.1.0-alpha.0)
+     - `premajor`: Increments the major version and adds prerelease suffix (e.g., 2.0.0 → 3.0.0-alpha.0)
+     - `patch`: Increments the patch version (e.g., 2.0.0 → 2.0.1)
+     - `minor`: Increments the minor version (e.g., 2.0.0 → 2.1.0)
+     - `major`: Increments the major version (e.g., 2.0.0 → 3.0.0)
+       - Note: Major version releases can only be performed by administrators or authorized SDK team members
+   - Optionally check "Dry run" to simulate the publishing process without actually publishing
+   - Click "Run workflow"
+
+3. **Monitor the workflow execution**
+   - The workflow will build the SDK, generate version files, create a GitHub release (for non-prerelease versions), and publish to npm
+   - If successful, Slack notifications will be sent to the SDK team
+   - The CDN cache will be purged for non-prerelease versions to ensure the latest version is available
+
+Note: Prerelease versions are published with the `alpha` tag on npm, while regular releases are published with the `latest` tag.
+
+### v1 (legacy)
+
+The v1 SDK is maintained in the `legacy-v1` branch and uses a different publishing process.
+
+To publish a new version of the v1 SDK:
+
+1. **Ensure your changes are merged into the `legacy-v1` branch**
+   - All v1 SDK changes must be merged into the legacy-v1 branch
+
+2. **Run the publish GitHub Action**
+   - Go to Actions tab in the repository
+   - Select the "Publish to NPM" workflow
+   - Click "Run workflow"
+   - Select the `legacy-v1` branch
+   - Choose the appropriate release type:
+     - `alpha`: Publishes a prerelease version with the "alpha-legacy" tag
+     - `release`: Publishes a stable release with the "legacy" tag
+   - Choose the appropriate upgrade type:
+     - `none`: Only increments the revision for alpha releases, no change for stable releases
+     - `patch`: Increments the patch version (e.g., 1.0.0 → 1.0.1)
+     - `minor`: Increments the minor version (e.g., 1.0.0 → 1.1.0)
+   - Optionally check "Dry run" to simulate the publishing process without actually publishing
+   - Click "Run workflow"
+
+3. **Monitor the workflow execution**
+   - The workflow will validate the version (ensuring it starts with "1."), run tests, build the SDK, and publish to npm
+   - For stable releases, it will also create a GitHub release and purge the CDN cache
+   - If successful, Slack notifications will be sent to the SDK team
+
+Note: The v1 SDK publish workflow will only accept version numbers that start with "1." to ensure it publishes legacy versions. 
+

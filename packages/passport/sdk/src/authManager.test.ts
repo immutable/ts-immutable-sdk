@@ -22,6 +22,7 @@ jest.mock('./overlay');
 const authenticationDomain = 'auth.immutable.com';
 const clientId = '11111';
 const redirectUri = 'https://test.com';
+const popupRedirectUri = `${redirectUri}-popup`;
 const logoutEndpoint = '/v2/logout';
 const logoutRedirectUri = `${redirectUri}logout/callback`;
 
@@ -31,6 +32,7 @@ const getConfig = (values?: Partial<PassportModuleConfiguration>) => new Passpor
   }),
   clientId,
   redirectUri,
+  popupRedirectUri,
   scope: 'email profile',
   ...values,
 });
@@ -84,6 +86,7 @@ describe('AuthManager', () => {
   let authManager: AuthManager;
   let mockSigninPopup: jest.Mock;
   let mockSigninCallback: jest.Mock;
+  let mockSigninRedirectCallback: jest.Mock;
   let mockSignoutRedirect: jest.Mock;
   let mockGetUser: jest.Mock;
   let mockSigninSilent: jest.Mock;
@@ -95,6 +98,7 @@ describe('AuthManager', () => {
   beforeEach(() => {
     mockSigninPopup = jest.fn();
     mockSigninCallback = jest.fn();
+    mockSigninRedirectCallback = jest.fn();
     mockSignoutRedirect = jest.fn();
     mockGetUser = jest.fn();
     mockSigninSilent = jest.fn();
@@ -105,6 +109,7 @@ describe('AuthManager', () => {
     (UserManager as jest.Mock).mockReturnValue({
       signinPopup: mockSigninPopup,
       signinCallback: mockSigninCallback,
+      signinRedirectCallback: mockSigninRedirectCallback,
       signoutRedirect: mockSignoutRedirect,
       signoutSilent: mockSignoutSilent,
       getUser: mockGetUser,
@@ -135,7 +140,7 @@ describe('AuthManager', () => {
           end_session_endpoint: `${config.authenticationDomain}${logoutEndpoint}`
             + `?client_id=${config.oidcConfiguration.clientId}`,
         },
-        popup_redirect_uri: config.oidcConfiguration.redirectUri,
+        popup_redirect_uri: config.oidcConfiguration.popupRedirectUri,
         redirect_uri: config.oidcConfiguration.redirectUri,
         scope: config.oidcConfiguration.scope,
         userStore: expect.any(WebStorageStateStore),
@@ -366,6 +371,13 @@ describe('AuthManager', () => {
       await authManager.loginCallback();
 
       expect(mockSigninCallback).toBeCalled();
+    });
+
+    it('should call login redirect callback and map to domain model', async () => {
+      mockSigninCallback.mockReturnValue(mockOidcUser);
+      const user = await authManager.loginCallback();
+      expect(mockSigninCallback).toBeCalled();
+      expect(user).toEqual(mockUser);
     });
   });
 
