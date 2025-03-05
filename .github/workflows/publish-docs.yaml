@@ -6,7 +6,7 @@ on:
     types:
       - completed
     branches:
-      - main
+      - DVR-236-fix-ts-sdk-version-pipeline
   workflow_dispatch:
 
 concurrency:
@@ -69,7 +69,7 @@ jobs:
           repository: immutable/docs
           token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
           path: imx-docs
-          ref: main
+          ref: DVR-236-fix-ts-sdk-version-pipeline
 
       - name: Setup environment variables
         run: |
