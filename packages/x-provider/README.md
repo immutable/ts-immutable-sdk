@@ -23,7 +23,7 @@ npm add @imtbl/x-provider
 # or
 pnpm add @imtbl/x-provider
 # or
-pnpm add @imtbl/x-provider
+yarn add @imtbl/x-provider
 ```
 
 ## SDK Installation

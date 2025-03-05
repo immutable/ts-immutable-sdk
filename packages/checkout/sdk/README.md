@@ -28,7 +28,7 @@ npm add @imtbl/checkout-sdk
 # or
 pnpm add @imtbl/checkout-sdk
 # or
-pnpm add @imtbl/checkout-sdk
+yarn add @imtbl/checkout-sdk
 ```
 
 ## SDK Installation

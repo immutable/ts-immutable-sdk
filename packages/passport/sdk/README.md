@@ -30,7 +30,7 @@ npm add @imtbl/passport
 # or
 pnpm add @imtbl/passport
 # or
-pnpm add @imtbl/passport
+yarn add @imtbl/passport
 ```
 
 ## SDK Installation

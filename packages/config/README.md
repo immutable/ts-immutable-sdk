@@ -21,7 +21,7 @@ npm add @imtbl/config
 # or
 pnpm add @imtbl/config
 # or
-pnpm add @imtbl/config
+yarn add @imtbl/config
 ```
 
 ## SDK Installation

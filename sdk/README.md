@@ -22,7 +22,7 @@ npm add @imtbl/sdk
 # or
 pnpm add @imtbl/sdk
 # or
-pnpm add @imtbl/sdk
+yarn add @imtbl/sdk
 ```
 # Disclaimer for Alpha Releases
 
