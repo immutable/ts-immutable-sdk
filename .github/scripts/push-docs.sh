@@ -15,12 +15,13 @@ then
   exit 1
 fi
 
-# Do not remove the trailing period!!!
-# https://dev.to/ackshaey/macos-vs-linux-the-cp-command-will-trip-you-up-2p00
+# Extract major version only - handle both regular and prelease tags
+MAJOR_VERSION=$(echo $VERSION | sed -E 's/^(prelease-)?([0-9]+)\..*/\2/')
+# Use v{MAJOR} format for the folder
 INPUT_SOURCE_FOLDER="./docs/."
 INPUT_DESTINATION_REPO="immutable/docs"
 INPUT_DESTINATION_HEAD_BRANCH="ts-immutable-sdk-docs-$VERSION"
-INPUT_DESTINATION_FOLDER="$CLONE_DIR/api-docs/sdk-references/ts-immutable-sdk/$VERSION"
+INPUT_DESTINATION_FOLDER="$CLONE_DIR/api-docs/sdk-references/ts-immutable-sdk/v$MAJOR_VERSION"
 
 if [ -z "$INPUT_PULL_REQUEST_REVIEWERS" ]
 then
@@ -30,6 +31,12 @@ else
 fi
 
 echo "Copying contents to git repo"
+# Clear existing vX folder if it exists
+if [ -d "$INPUT_DESTINATION_FOLDER" ]; then
+  echo "Cleaning existing v$MAJOR_VERSION folder..."
+  rm -rf "$INPUT_DESTINATION_FOLDER"/*
+fi
+
 mkdir -p $INPUT_DESTINATION_FOLDER
 
 if [ -d "$INPUT_DESTINATION_FOLDER" ]; then
