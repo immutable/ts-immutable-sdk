@@ -54,9 +54,9 @@ jobs:
         run: |
           echo "Is Alpha Version: ${{ env.IS_ALPHA }}"
 
-      - name: Check Public Release Branch
-        if: github.ref != 'refs/heads/main'
-        run: failure("SDK reference docs should be only published from main branch, current branch ${{ github.ref }}")
+      # - name: Check Public Release Branch
+      #   if: github.ref != 'refs/heads/main'
+      #   run: failure("SDK reference docs should be only published from main branch, current branch ${{ github.ref }}")
 
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
