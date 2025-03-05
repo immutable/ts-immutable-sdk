@@ -2048,11 +2048,11 @@ importers:
         specifier: workspace:*
         version: link:../../x-provider
       '@magic-ext/oidc':
-        specifier: 4.3.1
-        version: 4.3.1
+        specifier: 12.0.0
+        version: 12.0.0
       '@magic-sdk/provider':
-        specifier: ^21.2.0
-        version: 21.2.0(localforage@1.10.0)
+        specifier: ^29.0.0
+        version: 29.0.0(localforage@1.10.0)
       '@metamask/detect-provider':
         specifier: ^2.0.0
         version: 2.0.0
@@ -4704,6 +4704,9 @@ packages:
   '@lukeed/uuid@2.0.1':
     resolution: {integrity: sha512-qC72D4+CDdjGqJvkFMMEAtancHUQ7/d/tAiHf64z8MopFDmcrtbcJuerDtFceuAfQJ2pDSfCKCtbqoGBNnwg0w==}
     engines: {node: '>=8'}
+
+  '@magic-ext/oidc@12.0.0':
+    resolution: {integrity: sha512-IeycCoW8BUqcdJoggynq63bj8XyRxZfiX5cBdxq7LEr4gWWpTz1zexEkWrJoP76XDr6Yn/wYQXiL4/AvJ6wcjw==}
 
   '@magic-ext/oidc@4.3.1':
     resolution: {integrity: sha512-HjriTgPxECC37z4UPbomuL0sFd5Fe0aC8BEDSShD5Ltbi0oMjamEW7avYdZi14S5F4UHfcol0M3xTc+0FTNwrw==}
@@ -9757,8 +9760,8 @@ packages:
     resolution: {integrity: sha512-M3NhsLbV1i6HuGzBUH8vXrtxOk+tWmzWKDMbAVSUp3Zsjm7ywFeuwrUXhmhQyRK1q5B5GGy7hcXPbj3bnfZg2g==}
     engines: {node: '>=6'}
 
-  ds-test@git+https://git@github.com:dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0:
-    resolution: {commit: e282159d5170298eb2455a6c05280ab5a73a4ef0, repo: git@github.com:dapphub/ds-test.git, type: git}
+  ds-test@https://codeload.github.com/dapphub/ds-test/tar.gz/e282159d5170298eb2455a6c05280ab5a73a4ef0:
+    resolution: {tarball: https://codeload.github.com/dapphub/ds-test/tar.gz/e282159d5170298eb2455a6c05280ab5a73a4ef0}
     version: 1.0.0
 
   dset@3.1.2:
@@ -20387,6 +20390,8 @@ snapshots:
     dependencies:
       '@lukeed/csprng': 1.1.0
 
+  '@magic-ext/oidc@12.0.0': {}
+
   '@magic-ext/oidc@4.3.1': {}
 
   '@magic-sdk/commons@17.2.0(@magic-sdk/provider@21.2.0(localforage@1.10.0))(@magic-sdk/types@17.2.0)':
@@ -23521,7 +23526,7 @@ snapshots:
 
   '@swc/helpers@0.5.13':
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@swc/helpers@0.5.5':
     dependencies:
@@ -25745,7 +25750,7 @@ snapshots:
   camel-case@4.1.2:
     dependencies:
       pascal-case: 3.1.2
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   camelcase-css@2.0.1: {}
 
@@ -26937,7 +26942,7 @@ snapshots:
 
   dotenv@7.0.0: {}
 
-  ds-test@git+https://git@github.com:dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0: {}
+  ds-test@https://codeload.github.com/dapphub/ds-test/tar.gz/e282159d5170298eb2455a6c05280ab5a73a4ef0: {}
 
   dset@3.1.2: {}
 
@@ -33180,7 +33185,7 @@ snapshots:
   param-case@3.0.4:
     dependencies:
       dot-case: 3.0.4
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   parcel@2.9.3(@swc/helpers@0.5.13)(postcss@8.4.49)(relateurl@0.2.7)(srcset@4.0.0)(terser@5.34.1)(typescript@5.6.2):
     dependencies:
@@ -35427,7 +35432,7 @@ snapshots:
 
   solidity-bytes-utils@0.8.2:
     dependencies:
-      ds-test: git+https://git@github.com:dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0
+      ds-test: https://codeload.github.com/dapphub/ds-test/tar.gz/e282159d5170298eb2455a6c05280ab5a73a4ef0
       forge-std: 1.1.2
 
   solidity-coverage@0.8.12(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)):
