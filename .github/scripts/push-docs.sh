@@ -15,12 +15,13 @@ then
   exit 1
 fi
 
-# Do not remove the trailing period!!!
-# https://dev.to/ackshaey/macos-vs-linux-the-cp-command-will-trip-you-up-2p00
+# Extract major version only
+MAJOR_VERSION=$(echo $VERSION | cut -d. -f1)
+# Use v{MAJOR} format for the folder
 INPUT_SOURCE_FOLDER="./docs/."
 INPUT_DESTINATION_REPO="immutable/docs"
 INPUT_DESTINATION_HEAD_BRANCH="ts-immutable-sdk-docs-$VERSION"
-INPUT_DESTINATION_FOLDER="$CLONE_DIR/api-docs/sdk-references/ts-immutable-sdk/$VERSION"
+INPUT_DESTINATION_FOLDER="$CLONE_DIR/api-docs/sdk-references/ts-immutable-sdk/v$MAJOR_VERSION"
 
 if [ -z "$INPUT_PULL_REQUEST_REVIEWERS" ]
 then
@@ -30,6 +31,12 @@ else
 fi
 
 echo "Copying contents to git repo"
+# Clear existing vX folder if it exists
+if [ -d "$INPUT_DESTINATION_FOLDER" ]; then
+  echo "Cleaning existing v$MAJOR_VERSION folder..."
+  rm -rf "$INPUT_DESTINATION_FOLDER"/*
+fi
+
 mkdir -p $INPUT_DESTINATION_FOLDER
 
 if [ -d "$INPUT_DESTINATION_FOLDER" ]; then
@@ -49,7 +56,7 @@ if git status | grep -q "Changes to be committed"
 then
   git commit --message "SDK reference docs update from https://github.com/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
   echo "Pushing git commit"
-  git push -u origin main
+  git push -u origin DVR-236-fix-ts-sdk-version-pipeline
 
   # Without this sleep, the checks on the imx-docs repo fail
   # but pass on a re-run from within Netlify
