@@ -209,7 +209,12 @@ export function WalletList(props: WalletListProps) {
           isError(err, 'INVALID_ARGUMENT')
           && err.message.includes('value={ "ethereumProvider": { "isPassport": true } }')) {
           // eslint-disable-next-line no-console
-          console.error('Invalid type', 'Unable to connect to the Passport provider');
+          console.error(
+            'Invalid type',
+            'Unable to connect to the Passport provider.',
+            // eslint-disable-next-line max-len
+            '`await {passportInstance}.connectEvm()` must be called to initialize the provider before initalizing the Checkout SDK.',
+          );
         }
 
         // eslint-disable-next-line no-console
