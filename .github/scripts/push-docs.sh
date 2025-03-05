@@ -15,8 +15,8 @@ then
   exit 1
 fi
 
-# Extract major version only
-MAJOR_VERSION=$(echo $VERSION | cut -d. -f1)
+# Extract major version only - handle both regular and prelease tags
+MAJOR_VERSION=$(echo $VERSION | sed -E 's/^(prelease-)?([0-9]+)\..*/\2/')
 # Use v{MAJOR} format for the folder
 INPUT_SOURCE_FOLDER="./docs/."
 INPUT_DESTINATION_REPO="immutable/docs"

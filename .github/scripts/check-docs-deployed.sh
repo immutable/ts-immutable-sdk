@@ -8,7 +8,7 @@ then
   echo "VERSION is not set"
   exit 1
 fi
-MAJOR_VERSION=$(echo $VERSION | cut -d. -f1)
+MAJOR_VERSION=$(echo $VERSION | sed -E 's/^(prelease-)?([0-9]+)\..*/\2/')
 # this command will send a GET request to the docs site, the -s option silences the output,
 # the -o option redirects the output to /dev/null, and the -w option formats the output to only return the HTTP status code
 HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://docs.immutable.com/sdk-references/ts-immutable-sdk/v$MAJOR_VERSION/)
