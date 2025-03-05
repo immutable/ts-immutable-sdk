@@ -16,6 +16,8 @@ import {
   WalletWidgetConfiguration,
   PurchaseWidgetConfiguration,
   PurchaseWidgetParams,
+  TransferWidgetParams,
+  TransferWidgetConfiguration,
 } from '@imtbl/checkout-sdk';
 import { ViewType } from './ViewType';
 
@@ -27,7 +29,8 @@ export type CheckoutWidgetView =
   | SwapView
   | OnRampView
   | BridgeView
-  | PurchaseView;
+  | PurchaseView
+  | TransferView;
 
 interface ConnectView extends ViewType {
   type: CommerceFlowType.CONNECT;
@@ -92,5 +95,13 @@ interface BridgeView extends ViewType {
   data: {
     params: BridgeWidgetParams;
     config: BridgeWidgetConfiguration;
+  };
+}
+
+interface TransferView extends ViewType {
+  type: CommerceFlowType.TRANSFER;
+  data: {
+    params: TransferWidgetParams;
+    config: TransferWidgetConfiguration;
   };
 }
