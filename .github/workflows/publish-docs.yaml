@@ -6,7 +6,7 @@ on:
     types:
       - completed
     branches:
-      - DVR-236-fix-ts-sdk-version-pipeline
+      - main
   workflow_dispatch:
 
 concurrency:
@@ -18,7 +18,7 @@ jobs:
     name: Check if SDK version is alpha
     runs-on: ubuntu-latest
     outputs:
-      is_alpha: 'false'
+      is_alpha: ${{ steps.alpha_check.outputs.is_alpha }}
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -28,15 +28,15 @@ jobs:
       - name: Check alpha version
         id: alpha_check
         run: |
-          # VERSION=$(git describe --tags --abbrev=0)
-          # if echo "$VERSION" | grep -q "alpha"; then
-          #   echo "Skipping docs generation for alpha version"
-          #   echo "is_alpha=true" >> $GITHUB_OUTPUT
-          #   exit 0
-          # else
-          #   echo "Generating docs for non-alpha version"
-          #   echo "is_alpha=false" >> $GITHUB_OUTPUT
-          # fi
+          VERSION=$(git describe --tags --abbrev=0)
+          if echo "$VERSION" | grep -q "alpha"; then
+            echo "Skipping docs generation for alpha version"
+            echo "is_alpha=true" >> $GITHUB_OUTPUT
+            exit 0
+          else
+            echo "Generating docs for non-alpha version"
+            echo "is_alpha=false" >> $GITHUB_OUTPUT
+          fi
         shell: bash
 
   PublishDocs:
@@ -54,9 +54,9 @@ jobs:
         run: |
           echo "Is Alpha Version: ${{ env.IS_ALPHA }}"
 
-      # - name: Check Public Release Branch
-      #   if: github.ref != 'refs/heads/main'
-      #   run: failure("SDK reference docs should be only published from main branch, current branch ${{ github.ref }}")
+      - name: Check Public Release Branch
+        if: github.ref != 'refs/heads/main'
+        run: failure("SDK reference docs should be only published from main branch, current branch ${{ github.ref }}")
 
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -69,7 +69,7 @@ jobs:
           repository: immutable/docs
           token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
           path: imx-docs
-          ref: DVR-236-fix-ts-sdk-version-pipeline
+          ref: main
 
       - name: Setup environment variables
         run: |

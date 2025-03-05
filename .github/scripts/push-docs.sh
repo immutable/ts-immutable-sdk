@@ -56,7 +56,7 @@ if git status | grep -q "Changes to be committed"
 then
   git commit --message "SDK reference docs update from https://github.com/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
   echo "Pushing git commit"
-  git push -u origin DVR-236-fix-ts-sdk-version-pipeline
+  git push -u origin main
 
   # Without this sleep, the checks on the imx-docs repo fail
   # but pass on a re-run from within Netlify
