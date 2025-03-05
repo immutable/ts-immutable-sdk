@@ -1085,6 +1085,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       {quoteError && (
         <Box sx={{
           paddingX: 'base.spacing.x4',
+          pt: 'base.spacing.x3',
         }}
         >
           <Body
