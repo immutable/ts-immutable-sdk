@@ -80,10 +80,7 @@ export function WalletList(props: WalletListProps) {
   const { isWalletConnectEnabled, openWalletConnectModal } = useWalletConnect();
   const walletConnectItemRef = useRef(null);
   const [showChangedYourMindDrawer, setShowChangedYourMindDrawer] = useState(false);
-  const [unableToConnectDrawerState, setUnableToConnectDrawerState] = useState({
-    visible: false,
-    message: undefined as string | undefined,
-  });
+  const [showUnableToConnectDrawer, setShowUnableToConnectDrawer] = useState(false);
   const [showNonPassportWarning, setShowNonPassportWarning] = useState(false);
   const [chosenProviderDetail, setChosenProviderDetail] = useState<EIP6963ProviderDetail>();
 
@@ -204,22 +201,21 @@ export function WalletList(props: WalletListProps) {
             // eslint-disable-next-line no-console
             console.error('Connect error', err);
 
-            setUnableToConnectDrawerState({ visible: true, message: undefined });
+            setShowUnableToConnectDrawer(true);
           }
         }
       } catch (err: any) {
         if (
           isError(err, 'INVALID_ARGUMENT')
           && err.message.includes('value={ "ethereumProvider": { "isPassport": true } }')) {
-          setUnableToConnectDrawerState({
-            visible: true,
-            message: t('drawers.walletConnectionError.passportProviderError.body'),
-          });
-          return;
+          // eslint-disable-next-line no-console
+          console.error('Invalid type', 'Unable to connect to the Passport provider');
         }
+
         // eslint-disable-next-line no-console
         console.error('Connect unknown error', err);
-        setUnableToConnectDrawerState({ visible: true, message: undefined });
+
+        setShowUnableToConnectDrawer(true);
       }
     },
     [checkout],
@@ -300,7 +296,7 @@ export function WalletList(props: WalletListProps) {
       }
 
       setShowChangedYourMindDrawer(false);
-      setUnableToConnectDrawerState({ visible: false, message: undefined });
+      setShowUnableToConnectDrawer(false);
       setChosenProviderDetail(providerDetail);
       track({
         userJourney: UserJourney.CONNECT,
@@ -456,15 +452,10 @@ export function WalletList(props: WalletListProps) {
       />
 
       <UnableToConnectDrawer
-        visible={unableToConnectDrawerState.visible}
+        visible={showUnableToConnectDrawer}
         checkout={checkout!}
-        onCloseDrawer={() => {
-          setUnableToConnectDrawerState({ visible: false, message: undefined });
-        }}
-        onTryAgain={() => {
-          setUnableToConnectDrawerState({ visible: false, message: undefined });
-        }}
-        message={unableToConnectDrawerState.message}
+        onCloseDrawer={() => setShowUnableToConnectDrawer(false)}
+        onTryAgain={() => setShowUnableToConnectDrawer(false)}
       />
 
       <NonPassportWarningDrawer

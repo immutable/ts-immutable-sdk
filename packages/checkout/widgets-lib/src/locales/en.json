@@ -1218,11 +1218,6 @@
         "body": "Check your wallet and try again, or close and try a different option",
         "actionButtonText": "Try again"
       },
-      "passportProviderError": {
-        "heading": "Unable to connect",
-        "body": "Have you called `await passport.connectEvm()` to initialize the passport provider?",
-        "actionButtonText": "Try again"
-      },
       "changedYourMind": {
         "heading": "Changed your mind?",
         "body": "Make sure pop ups are enabled and follow the prompts in your wallet to connect",
