@@ -2072,8 +2072,8 @@ importers:
         specifier: ^1.10.0
         version: 1.10.0
       magic-sdk:
-        specifier: ^21.2.0
-        version: 21.2.0
+        specifier: ^29.0.0
+        version: 29.0.0
       oidc-client-ts:
         specifier: 2.4.0
         version: 2.4.0
@@ -4714,13 +4714,27 @@ packages:
       '@magic-sdk/provider': '>=18.6.0'
       '@magic-sdk/types': '>=15.8.0'
 
+  '@magic-sdk/commons@25.0.0':
+    resolution: {integrity: sha512-EYrbFGw/4R899IccGgkmVp/ia50ELNK7H1uDfM66Nh+YnH05LsLWlfrtFbbKxBazquVnu89bAHmJcFPsmSnHQQ==}
+    peerDependencies:
+      '@magic-sdk/provider': '>=18.6.0'
+      '@magic-sdk/types': '>=15.8.0'
+
   '@magic-sdk/provider@21.2.0':
     resolution: {integrity: sha512-zrQKYXra9eCfdRagA7hoXs99gYV/OmtdXm1PNy1dkq8iVY+Hltlk4zCkkFr2qMcroRrMId4Ajbtuar65xxb+GA==}
     peerDependencies:
       localforage: ^1.7.4
 
+  '@magic-sdk/provider@29.0.0':
+    resolution: {integrity: sha512-Ukfd5Is4xruJr9U8BJzoOF8JmIqGMbUObO4lEIHg5CNaha5ZcfZwl/FRs/eqNadcpJjcvSRc5DPXaWzjcFJzKA==}
+    peerDependencies:
+      localforage: ^1.7.4
+
   '@magic-sdk/types@17.2.0':
     resolution: {integrity: sha512-VJmGP+DwMnuIuMLb+IDHNAkYLcHH+XqPwHb6mcLNI9e30CDMXoFN60hmdhDRZLjI9JF/NPS3eEsd40Xz6Iih2A==}
+
+  '@magic-sdk/types@24.18.0':
+    resolution: {integrity: sha512-6HS9WMgzLNCkvkJeDZW8+/maP8JInDYqnfudp/SgPWMosm9l6zH3X+x+ntDjRIUm5Qdugsg+L1fxMBj48r616Q==}
 
   '@metamask/detect-provider@2.0.0':
     resolution: {integrity: sha512-sFpN+TX13E9fdBDh9lvQeZdJn4qYoRb/6QF2oZZK/Pn559IhCFacPMU1rMuqyXoFQF3JSJfii2l98B87QDPeCQ==}
@@ -9743,8 +9757,8 @@ packages:
     resolution: {integrity: sha512-M3NhsLbV1i6HuGzBUH8vXrtxOk+tWmzWKDMbAVSUp3Zsjm7ywFeuwrUXhmhQyRK1q5B5GGy7hcXPbj3bnfZg2g==}
     engines: {node: '>=6'}
 
-  ds-test@https://codeload.github.com/dapphub/ds-test/tar.gz/e282159d5170298eb2455a6c05280ab5a73a4ef0:
-    resolution: {tarball: https://codeload.github.com/dapphub/ds-test/tar.gz/e282159d5170298eb2455a6c05280ab5a73a4ef0}
+  ds-test@git+https://git@github.com:dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0:
+    resolution: {commit: e282159d5170298eb2455a6c05280ab5a73a4ef0, repo: git@github.com:dapphub/ds-test.git, type: git}
     version: 1.0.0
 
   dset@3.1.2:
@@ -12770,6 +12784,9 @@ packages:
 
   magic-sdk@21.2.0:
     resolution: {integrity: sha512-Sb9aj7CZAjJpUHMFGLGxq+0lAo+NydpQ68/8ZRUILzswKdg0Q0B/slo3F9WH2F1zakaIdjsUusCekg1LqiNALg==}
+
+  magic-sdk@29.0.0:
+    resolution: {integrity: sha512-8awpk21HJizU3XftRJNkV7f68ckOKJ2j4jCtagIemHA9Q4vd1QKgt5xZWDak/djXpWch2xOvNiSDtMCZDwEAhw==}
 
   magic-string@0.25.9:
     resolution: {integrity: sha512-RmF0AsMzgt25qzqqLc1+MbHmhdx0ojF2Fvs4XnOqz2ZOBXzzkEwc/dJQZCYHAn7v1jbVOjAZfK8msRn4BxO4VQ==}
@@ -20377,6 +20394,11 @@ snapshots:
       '@magic-sdk/provider': 21.2.0(localforage@1.10.0)
       '@magic-sdk/types': 17.2.0
 
+  '@magic-sdk/commons@25.0.0(@magic-sdk/provider@29.0.0(localforage@1.10.0))(@magic-sdk/types@24.18.0)':
+    dependencies:
+      '@magic-sdk/provider': 29.0.0(localforage@1.10.0)
+      '@magic-sdk/types': 24.18.0
+
   '@magic-sdk/provider@21.2.0(localforage@1.10.0)':
     dependencies:
       '@magic-sdk/types': 17.2.0
@@ -20386,7 +20408,18 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@magic-sdk/provider@29.0.0(localforage@1.10.0)':
+    dependencies:
+      '@magic-sdk/types': 24.18.0
+      eventemitter3: 4.0.7
+      localforage: 1.10.0
+      web3-core: 1.5.2
+    transitivePeerDependencies:
+      - supports-color
+
   '@magic-sdk/types@17.2.0': {}
+
+  '@magic-sdk/types@24.18.0': {}
 
   '@metamask/detect-provider@2.0.0': {}
 
@@ -26904,7 +26937,7 @@ snapshots:
 
   dotenv@7.0.0: {}
 
-  ds-test@https://codeload.github.com/dapphub/ds-test/tar.gz/e282159d5170298eb2455a6c05280ab5a73a4ef0: {}
+  ds-test@git+https://git@github.com:dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0: {}
 
   dset@3.1.2: {}
 
@@ -31936,6 +31969,15 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  magic-sdk@29.0.0:
+    dependencies:
+      '@magic-sdk/commons': 25.0.0(@magic-sdk/provider@29.0.0(localforage@1.10.0))(@magic-sdk/types@24.18.0)
+      '@magic-sdk/provider': 29.0.0(localforage@1.10.0)
+      '@magic-sdk/types': 24.18.0
+      localforage: 1.10.0
+    transitivePeerDependencies:
+      - supports-color
+
   magic-string@0.25.9:
     dependencies:
       sourcemap-codec: 1.4.8
@@ -35385,7 +35427,7 @@ snapshots:
 
   solidity-bytes-utils@0.8.2:
     dependencies:
-      ds-test: https://codeload.github.com/dapphub/ds-test/tar.gz/e282159d5170298eb2455a6c05280ab5a73a4ef0
+      ds-test: git+https://git@github.com:dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0
       forge-std: 1.1.2
 
   solidity-coverage@0.8.12(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)):
