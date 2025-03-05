@@ -1,79 +1,99 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { BrowserProvider } from 'ethers';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { passportInstance } from '../utils/setupDefault';
 import { orderbookSDK } from '../utils/setupOrderbook';
 import { OrderStatusName } from '@imtbl/orderbook';
-import { Button, Table, Body } from '@biom3/react';
+import { Button, Heading, Body, Card } from '@biom3/react';
 import Link from 'next/link';
-import CreateListing from '../../component/CreateListing';
-import MyListings from '../../component/MyListings';
+import { SUPPORTED_CHAINS, DISPLAY_SETTINGS, calculateBuyerCost } from '../utils/marketplaceConfig';
 
 // Define the types based on the SDK structure
+interface NFTListing {
+  id: string;
+  contractAddress: string;
+  tokenId: string;
+  name?: string;
+  description?: string;
+  imageUrl?: string;
+  collectionName?: string;
+  price: string;
+  sellerAddress: string;
+  createdAt: string;
+}
+
+interface Collection {
+  name: string;
+  contractAddress: string;
+  description?: string;
+  imageUrl?: string;
+  totalItems?: number;
+}
+
+// Define the Order interface based on the SDK structure
 interface Order {
   id: string;
-  sell: Array<{
+  accountAddress: string;
+  createdAt: string;
+  sell: {
     contractAddress: string;
     tokenId: string;
     metadata?: {
       name?: string;
+      description?: string;
+      image_url?: string;
     };
-  }>;
-  buy: Array<{
+  }[];
+  buy: {
     amount: string;
-  }>;
+  }[];
 }
 
-interface ListOrdersResponse {
-  result: Order[];
-  page: {
-    nextCursor: string;
-    previousCursor: string;
-  };
-}
+// Format wallet balances
+const formatBalance = (balance: string) => {
+  try {
+    // Convert to a number with 4 decimal places
+    const num = parseFloat(balance);
+    return num.toFixed(4);
+  } catch (e) {
+    return "0.0000";
+  }
+};
 
 export default function Marketplace() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  
+  // Get URL parameters
+  const collectionParam = searchParams.get('collection');
+  const tabParam = searchParams.get('tab') || 'listings';
+  
   // User state
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [accountAddress, setAccountAddress] = useState<string | null>(null);
-  const [walletBalance, setWalletBalance] = useState<string>("0");
   const [provider, setProvider] = useState<any>(null);
+  const [walletBalance, setWalletBalance] = useState<string>("0");
   const [signer, setSigner] = useState<any>(null);
   
   // Marketplace data
-  const [marketplaceItems, setMarketplaceItems] = useState<Order[]>([]);
-  const [filteredItems, setFilteredItems] = useState<Order[]>([]);
-  const [loadingItems, setLoadingItems] = useState<boolean>(true);
-  const [purchasingItem, setPurchasingItem] = useState<string | null>(null);
-  const [purchaseError, setPurchaseError] = useState<string | null>(null);
-  const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
+  const [listings, setListings] = useState<NFTListing[]>([]);
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [userListings, setUserListings] = useState<NFTListing[]>([]);
+  const [loadingListings, setLoadingListings] = useState<boolean>(true);
+  const [loadingCollections, setLoadingCollections] = useState<boolean>(true);
+  const [loadingUserListings, setLoadingUserListings] = useState<boolean>(true);
   
-  // Pagination
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(1);
-  const itemsPerPage = 20;
-  
-  // Filters
-  const [listingIdFilter, setListingIdFilter] = useState<string>("");
-  const [contractAddressFilter, setContractAddressFilter] = useState<string>("");
-  const [tokenIdFilter, setTokenIdFilter] = useState<string>("");
+  // Filters and pagination
+  const [activeTab, setActiveTab] = useState<string>(tabParam);
+  const [selectedCollection, setSelectedCollection] = useState<string | null>(collectionParam);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [priceRangeMin, setPriceRangeMin] = useState<string>("");
   const [priceRangeMax, setPriceRangeMax] = useState<string>("");
   const [sortOption, setSortOption] = useState<string>("price_asc");
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  
-  // Collections derived from marketplace items
-  const [collections, setCollections] = useState<string[]>([]);
-
-  // UI state
-  const [activeTab, setActiveTab] = useState<'buy' | 'sell' | 'my-listings'>('buy');
-
-  // Format date for display
-  const formatDate = (timestamp: number) => {
-    return new Date(timestamp).toLocaleDateString();
-  };
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
   
   // Format address for display
   const formatAddress = (address: string) => {
@@ -85,586 +105,948 @@ export default function Marketplace() {
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        // Check if user is already authenticated
-        const isAuthenticated = await passportInstance.isAuthenticated();
+        // Check if user is authenticated with Passport
+        const { isAuthenticated, accounts, provider } = await passportInstance.getUserInfo();
         
-        if (isAuthenticated) {
-          // Connect provider and get account
-          const passportProvider = await passportInstance.connectEvm();
-          setProvider(passportProvider);
+        setIsLoggedIn(isAuthenticated);
+        
+        if (isAuthenticated && accounts && accounts.length > 0) {
+          // Set user account address
+          const address = accounts[0];
+          setAccountAddress(address);
           
-          if (passportProvider) {
-            const accounts = await passportProvider.request({ method: "eth_accounts" });
-            if (accounts && accounts.length > 0) {
-              setAccountAddress(accounts[0]);
-              setIsLoggedIn(true);
-              
-              // Get wallet balance
-              const ethProvider = new BrowserProvider(passportProvider);
-              const balanceInWei = await ethProvider.getBalance(accounts[0]);
-              const balanceInEth = parseFloat(balanceInWei.toString()) / 1e18;
-              setWalletBalance(balanceInEth.toFixed(4));
-              
-              // Set up signer
-              const signer = await ethProvider.getSigner();
+          // Store provider and create signer
+          setProvider(provider);
+          if (provider) {
+            try {
+              const signer = provider.getSigner();
               setSigner(signer);
+              
+              // Get wallet balance using formatBalance helper
+              try {
+                const balance = await provider.getBalance(address);
+                // Convert balance from wei to ETH (1 ETH = 10^18 wei)
+                const balanceInEth = parseFloat(balance.toString()) / 1e18;
+                setWalletBalance(formatBalance(balanceInEth.toString()));
+              } catch (balanceError) {
+                console.error("Error getting balance:", balanceError);
+                setWalletBalance("0.0000");
+              }
+            } catch (signerError) {
+              console.error("Error getting signer:", signerError);
             }
           }
         }
-      } catch (error) {
-        console.error("Failed to check login status:", error);
-      } finally {
+        
         setIsLoading(false);
-        // Fetch marketplace listings even if not logged in
-        fetchListings();
+      } catch (error) {
+        console.error("Error checking login status:", error);
+        setIsLoading(false);
       }
     };
     
     checkLoginStatus();
-  }, []);
-
-  // Fetch listings from Orderbook SDK
-  const fetchListings = async () => {
-    try {
-      setLoadingItems(true);
-      
-      // Calculate pagination parameters
-      const offset = (currentPage - 1) * itemsPerPage;
-      
-      // Call the Orderbook SDK to get actual listings
-      const response: ListOrdersResponse = await orderbookSDK.listListings({
-        status: OrderStatusName.ACTIVE,
-        offset: offset,
-        limit: itemsPerPage,
-        sellTokenType: "ERC721" // Filter for NFTs
-      });
-      
-      // Get unique collections for filter dropdown
-      const collectionsSet = new Set<string>();
-      response.result.forEach((order: Order) => {
-        if (order.sell[0]?.metadata?.name) {
-          collectionsSet.add(order.sell[0].metadata.name);
+  }, []); // No dependencies to prevent re-runs
+  
+  // Separate useEffect for data fetching that depends on authentication state
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch marketplace data regardless of login status
+        if (!isLoading) {
+          fetchMarketplaceListings();
         }
+        
+        // If logged in, fetch user's listings
+        if (isLoggedIn && accountAddress && !isLoading) {
+          fetchUserListings(accountAddress);
+        }
+      } catch (error) {
+        console.error("Error in data fetching useEffect:", error);
+      }
+    };
+    
+    fetchData();
+  }, [isLoggedIn, accountAddress, isLoading]); // Only re-run when these values change
+  
+  // Update active tab when URL parameter changes
+  useEffect(() => {
+    setActiveTab(tabParam);
+  }, [tabParam]);
+  
+  // Update selected collection when URL parameter changes
+  useEffect(() => {
+    setSelectedCollection(collectionParam);
+    
+    // If collection is selected, fetch listings for that collection
+    if (collectionParam) {
+      fetchListingsByCollection(collectionParam);
+    }
+  }, [collectionParam]);
+  
+  // Fetch all marketplace listings
+  const fetchMarketplaceListings = async () => {
+    try {
+      setLoadingListings(true);
+      console.log("Fetching marketplace listings");
+      
+      // Set a safety timeout to prevent infinite loading
+      const safetyTimeout = setTimeout(() => {
+        if (loadingListings) {
+          console.log("Safety timeout triggered for marketplace listings");
+          setLoadingListings(false);
+        }
+      }, 15000); // 15 seconds timeout
+      
+      // Use the orderbook SDK to fetch active listings
+      const response = await orderbookSDK.listOrders({
+        status: OrderStatusName.ACTIVE,
+        type: 'LISTING',
+        chainName: SUPPORTED_CHAINS.DEFAULT,
+        cursor: '',
+        pageSize: DISPLAY_SETTINGS.ITEMS_PER_PAGE
       });
-      setCollections(Array.from(collectionsSet));
-      console.log(response.result);
-      // Set listings and pagination info
-      setMarketplaceItems(response.result);
-      setFilteredItems(response.result);
       
-      // Calculate total pages based on available results
-      // Since we don't have a total count, we'll estimate based on current results
-      const totalItems = response.result.length;
-      const hasMore = response.page.nextCursor !== null && response.page.nextCursor !== '';
-      setTotalPages(hasMore ? currentPage + 1 : currentPage);
+      // Clear the safety timeout since we got a response
+      clearTimeout(safetyTimeout);
       
+      console.log("List orders response:", response);
+      
+      if (response && response.result) {
+        // Process the listings to extract NFT details
+        const listingsData: NFTListing[] = await Promise.all(
+          response.result.map(async (order: Order) => {
+            const nftItem = order.sell[0]; // Assuming the first sell item is the NFT
+            let nftMetadata: any = { name: `NFT #${nftItem.tokenId}`, image_url: null };
+            let collectionName = 'Unknown Collection';
+            
+            // Try to fetch additional NFT details
+            try {
+              const { blockchainData } = orderbookSDK.getAllClients();
+              
+              // Try to get NFT metadata using getNFT method first (fallback to getToken if it fails)
+              try {
+                const nftResponse = await blockchainData.getNFT({
+                  chainName: SUPPORTED_CHAINS.DEFAULT,
+                  contractAddress: nftItem.contractAddress,
+                  tokenId: nftItem.tokenId
+                });
+                
+                if (nftResponse && nftResponse.result) {
+                  nftMetadata = nftResponse.result.metadata || nftMetadata;
+                  collectionName = nftResponse.result.collection?.name || collectionName;
+                }
+              } catch (nftError) {
+                console.log("getNFT not available, trying getToken...", nftError);
+                
+                try {
+                  const tokenDetails = await blockchainData.getToken({
+                    chainName: SUPPORTED_CHAINS.DEFAULT,
+                    contractAddress: nftItem.contractAddress,
+                    tokenId: nftItem.tokenId
+                  });
+                  
+                  if (tokenDetails) {
+                    nftMetadata = tokenDetails.metadata || nftMetadata;
+                  }
+                } catch (tokenError) {
+                  console.error("Error fetching token details:", tokenError);
+                }
+              }
+              
+              // Try to fetch collection details
+              try {
+                const collectionResponse = await blockchainData.getCollection({
+                  chainName: SUPPORTED_CHAINS.DEFAULT,
+                  contractAddress: nftItem.contractAddress
+                });
+                
+                if (collectionResponse) {
+                  collectionName = collectionResponse.name || collectionName;
+                }
+              } catch (collectionError) {
+                console.error("Error fetching collection details:", collectionError);
+              }
+            } catch (error) {
+              console.error("Error with blockchainData client:", error);
+            }
+            
+            return {
+              id: order.id,
+              contractAddress: nftItem.contractAddress,
+              tokenId: nftItem.tokenId,
+              name: nftMetadata.name || `NFT #${nftItem.tokenId}`,
+              description: nftMetadata.description,
+              imageUrl: nftMetadata.image_url || '/placeholder-image.png',
+              collectionName,
+              price: order.buy[0].amount,
+              sellerAddress: order.accountAddress,
+              createdAt: order.createdAt
+            };
+          })
+        );
+        
+        console.log("Processed listings data:", listingsData);
+        setListings(listingsData);
+        
+        // Set pagination info
+        if (response.page) {
+          setTotalPages(Math.ceil(response.result.length / DISPLAY_SETTINGS.ITEMS_PER_PAGE));
+        }
+        
+        // Now that we have listings, fetch collections
+        fetchCollections();
+      } else {
+        console.log("No listings found or invalid response format");
+        setListings([]);
+        setTotalPages(1);
+      }
+      
+      setLoadingListings(false);
     } catch (error) {
-      console.error("Failed to fetch listings:", error);
-    } finally {
-      setLoadingItems(false);
+      console.error("Error fetching marketplace listings:", error);
+      setListings([]);
+      setLoadingListings(false);
     }
   };
-
-  // Apply filters
+  
+  // Fetch listings by collection
+  const fetchListingsByCollection = async (collectionAddress: string) => {
+    try {
+      setLoadingListings(true);
+      console.log("Fetching listings for collection:", collectionAddress);
+      
+      // Set a safety timeout to prevent infinite loading
+      const safetyTimeout = setTimeout(() => {
+        if (loadingListings) {
+          console.log("Safety timeout triggered for collection listings");
+          setLoadingListings(false);
+        }
+      }, 15000); // 15 seconds timeout
+      
+      // Use the orderbook SDK to fetch active listings for a specific collection
+      const response = await orderbookSDK.listOrders({
+        status: OrderStatusName.ACTIVE,
+        type: 'LISTING',
+        chainName: SUPPORTED_CHAINS.DEFAULT,
+        sellToken: {
+          type: 'ERC721',
+          contractAddress: collectionAddress
+        },
+        cursor: '',
+        pageSize: DISPLAY_SETTINGS.ITEMS_PER_PAGE
+      });
+      
+      // Clear the safety timeout since we got a response
+      clearTimeout(safetyTimeout);
+      
+      console.log("Collection listings response:", response);
+      
+      if (response && response.result) {
+        // Process the listings to extract NFT details
+        const listingsData: NFTListing[] = await Promise.all(
+          response.result.map(async (order: Order) => {
+            const nftItem = order.sell[0]; // Assuming the first sell item is the NFT
+            let nftMetadata: any = { name: `NFT #${nftItem.tokenId}`, image_url: null };
+            let collectionName = 'Unknown Collection';
+            
+            // Try to fetch additional NFT details
+            try {
+              const { blockchainData } = orderbookSDK.getAllClients();
+              
+              // Try to get NFT metadata using getNFT method first (fallback to getToken if it fails)
+              try {
+                const nftResponse = await blockchainData.getNFT({
+                  chainName: SUPPORTED_CHAINS.DEFAULT,
+                  contractAddress: nftItem.contractAddress,
+                  tokenId: nftItem.tokenId
+                });
+                
+                if (nftResponse && nftResponse.result) {
+                  nftMetadata = nftResponse.result.metadata || nftMetadata;
+                  collectionName = nftResponse.result.collection?.name || collectionName;
+                }
+              } catch (nftError) {
+                console.log("getNFT not available, trying getToken...", nftError);
+                
+                try {
+                  const tokenDetails = await blockchainData.getToken({
+                    chainName: SUPPORTED_CHAINS.DEFAULT,
+                    contractAddress: nftItem.contractAddress,
+                    tokenId: nftItem.tokenId
+                  });
+                  
+                  if (tokenDetails) {
+                    nftMetadata = tokenDetails.metadata || nftMetadata;
+                  }
+                } catch (tokenError) {
+                  console.error("Error fetching token details:", tokenError);
+                }
+              }
+              
+              // Try to fetch collection details
+              try {
+                const collectionResponse = await blockchainData.getCollection({
+                  chainName: SUPPORTED_CHAINS.DEFAULT,
+                  contractAddress: nftItem.contractAddress
+                });
+                
+                if (collectionResponse) {
+                  collectionName = collectionResponse.name || collectionName;
+                }
+              } catch (collectionError) {
+                console.error("Error fetching collection details:", collectionError);
+              }
+            } catch (error) {
+              console.error("Error with blockchainData client:", error);
+            }
+            
+            return {
+              id: order.id,
+              contractAddress: nftItem.contractAddress,
+              tokenId: nftItem.tokenId,
+              name: nftMetadata.name || `NFT #${nftItem.tokenId}`,
+              description: nftMetadata.description,
+              imageUrl: nftMetadata.image_url || '/placeholder-image.png',
+              collectionName,
+              price: order.buy[0].amount,
+              sellerAddress: order.accountAddress,
+              createdAt: order.createdAt
+            };
+          })
+        );
+        
+        console.log("Processed collection listings data:", listingsData);
+        setListings(listingsData);
+        
+        // Set pagination info
+        if (response.page) {
+          setTotalPages(Math.ceil(response.result.length / DISPLAY_SETTINGS.ITEMS_PER_PAGE));
+        }
+      } else {
+        console.log("No collection listings found or invalid response format");
+        setListings([]);
+        setTotalPages(1);
+      }
+      
+      setLoadingListings(false);
+    } catch (error) {
+      console.error("Error fetching collection listings:", error);
+      setListings([]);
+      setLoadingListings(false);
+    }
+  };
+  
+  // Fetch all collections
+  const fetchCollections = async () => {
+    try {
+      setLoadingCollections(true);
+      console.log("Fetching collections based on listings");
+      
+      // Set a safety timeout to prevent infinite loading
+      const safetyTimeout = setTimeout(() => {
+        if (loadingCollections) {
+          console.log("Safety timeout triggered for collections");
+          setLoadingCollections(false);
+        }
+      }, 10000); // 10 seconds timeout
+      
+      // Extract collections from the listings we already have
+      if (listings.length > 0) {
+        const uniqueCollections = new Map<string, Collection>();
+        
+        await Promise.all(
+          listings.map(async (item) => {
+            if (!uniqueCollections.has(item.contractAddress)) {
+              try {
+                const { blockchainData } = orderbookSDK.getAllClients();
+                
+                // Try different methods to get collection info
+                try {
+                  const collectionDetails = await blockchainData.getCollection({
+                    chainName: SUPPORTED_CHAINS.DEFAULT,
+                    contractAddress: item.contractAddress
+                  });
+                  
+                  if (collectionDetails) {
+                    uniqueCollections.set(item.contractAddress, {
+                      name: collectionDetails.name || 'Unknown Collection',
+                      contractAddress: item.contractAddress,
+                      description: collectionDetails.description,
+                      imageUrl: collectionDetails.image_url || '/placeholder-collection.png',
+                      totalItems: collectionDetails.total_supply_raw 
+                        ? parseInt(collectionDetails.total_supply_raw)
+                        : undefined
+                    });
+                  }
+                } catch (error) {
+                  console.log("Error with getCollection, using listing data as fallback", error);
+                  uniqueCollections.set(item.contractAddress, {
+                    name: item.collectionName || 'Unknown Collection',
+                    contractAddress: item.contractAddress,
+                    imageUrl: '/placeholder-collection.png'
+                  });
+                }
+              } catch (error) {
+                console.error("Error fetching collection details:", error);
+                uniqueCollections.set(item.contractAddress, {
+                  name: item.collectionName || 'Unknown Collection',
+                  contractAddress: item.contractAddress,
+                  imageUrl: '/placeholder-collection.png'
+                });
+              }
+            }
+          })
+        );
+        
+        console.log("Processed collections:", Array.from(uniqueCollections.values()));
+        setCollections(Array.from(uniqueCollections.values()));
+      } else {
+        console.log("No listings available to extract collections from");
+        setCollections([]);
+      }
+      
+      // Clear the safety timeout since we processed the data
+      clearTimeout(safetyTimeout);
+      
+      setLoadingCollections(false);
+    } catch (error) {
+      console.error("Error in fetchCollections:", error);
+      setCollections([]);
+      setLoadingCollections(false);
+    }
+  };
+  
+  // Fetch user's listings
+  const fetchUserListings = async (address: string) => {
+    try {
+      setLoadingUserListings(true);
+      console.log("Fetching user listings for address:", address);
+      
+      // Set a safety timeout to prevent infinite loading
+      const safetyTimeout = setTimeout(() => {
+        if (loadingUserListings) {
+          console.log("Safety timeout triggered for user listings");
+          setLoadingUserListings(false);
+        }
+      }, 15000); // 15 seconds timeout
+      
+      // Use the orderbook SDK to fetch user's active listings
+      const response = await orderbookSDK.listOrders({
+        status: OrderStatusName.ACTIVE,
+        type: 'LISTING',
+        chainName: SUPPORTED_CHAINS.DEFAULT,
+        accountAddress: address,
+        cursor: '',
+        pageSize: DISPLAY_SETTINGS.ITEMS_PER_PAGE
+      });
+      
+      // Clear the safety timeout since we got a response
+      clearTimeout(safetyTimeout);
+      
+      console.log("User listings response:", response);
+      
+      if (response && response.result) {
+        // Process the listings to extract NFT details
+        const listingsData: NFTListing[] = await Promise.all(
+          response.result.map(async (order: Order) => {
+            const nftItem = order.sell[0]; // Assuming the first sell item is the NFT
+            let nftMetadata: any = { name: `NFT #${nftItem.tokenId}`, image_url: null };
+            let collectionName = 'Unknown Collection';
+            
+            // Try to fetch additional NFT details
+            try {
+              const { blockchainData } = orderbookSDK.getAllClients();
+              
+              // Try to get NFT metadata using getNFT method first (fallback to getToken if it fails)
+              try {
+                const nftResponse = await blockchainData.getNFT({
+                  chainName: SUPPORTED_CHAINS.DEFAULT,
+                  contractAddress: nftItem.contractAddress,
+                  tokenId: nftItem.tokenId
+                });
+                
+                if (nftResponse && nftResponse.result) {
+                  nftMetadata = nftResponse.result.metadata || nftMetadata;
+                  collectionName = nftResponse.result.collection?.name || collectionName;
+                }
+              } catch (nftError) {
+                console.log("getNFT not available, trying getToken...", nftError);
+                
+                try {
+                  const tokenDetails = await blockchainData.getToken({
+                    chainName: SUPPORTED_CHAINS.DEFAULT,
+                    contractAddress: nftItem.contractAddress,
+                    tokenId: nftItem.tokenId
+                  });
+                  
+                  if (tokenDetails) {
+                    nftMetadata = tokenDetails.metadata || nftMetadata;
+                  }
+                } catch (tokenError) {
+                  console.error("Error fetching token details:", tokenError);
+                }
+              }
+              
+              // Try to fetch collection details
+              try {
+                const collectionResponse = await blockchainData.getCollection({
+                  chainName: SUPPORTED_CHAINS.DEFAULT,
+                  contractAddress: nftItem.contractAddress
+                });
+                
+                if (collectionResponse) {
+                  collectionName = collectionResponse.name || collectionName;
+                }
+              } catch (collectionError) {
+                console.error("Error fetching collection details:", collectionError);
+              }
+            } catch (error) {
+              console.error("Error with blockchainData client:", error);
+            }
+            
+            return {
+              id: order.id,
+              contractAddress: nftItem.contractAddress,
+              tokenId: nftItem.tokenId,
+              name: nftMetadata.name || `NFT #${nftItem.tokenId}`,
+              description: nftMetadata.description,
+              imageUrl: nftMetadata.image_url || '/placeholder-image.png',
+              collectionName,
+              price: order.buy[0].amount,
+              sellerAddress: order.accountAddress,
+              createdAt: order.createdAt
+            };
+          })
+        );
+        
+        console.log("Processed user listings data:", listingsData);
+        setUserListings(listingsData);
+      } else {
+        console.log("No user listings found or invalid response format");
+        setUserListings([]);
+      }
+      
+      setLoadingUserListings(false);
+    } catch (error) {
+      console.error("Error fetching user listings:", error);
+      setUserListings([]);
+      setLoadingUserListings(false);
+    }
+  };
+  
+  // Handle tab change
+  const handleTabChange = (id: string) => {
+    setActiveTab(id);
+    router.push(`/marketplace?tab=${id}`);
+    
+    // Reset collection filter when changing tabs
+    if (selectedCollection && id !== 'collections') {
+      setSelectedCollection(null);
+    }
+  };
+  
+  // Handle collection selection
+  const handleCollectionSelect = (collectionAddress: string) => {
+    setSelectedCollection(collectionAddress);
+    router.push(`/marketplace?collection=${collectionAddress}`);
+    setActiveTab('listings');
+  };
+  
+  // Apply filters to listings
   const applyFilters = () => {
-    if (!marketplaceItems.length) return;
+    let filtered = [...listings];
     
-    let filtered = [...marketplaceItems];
-    
-    // Search query filter (searches in name, token ID, and contract address)
+    // Apply search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(order => {
-        const name = order.sell[0]?.metadata?.name?.toLowerCase() || '';
-        const tokenId = order.sell[0]?.tokenId?.toLowerCase() || '';
-        const contractAddress = order.sell[0]?.contractAddress?.toLowerCase() || '';
-        
-        return name.includes(query) || 
-               tokenId.includes(query) || 
-               contractAddress.includes(query);
-      });
-    }
-    
-    // Filter by Listing ID
-    if (listingIdFilter) {
-      filtered = filtered.filter(order => 
-        order.id.toLowerCase().includes(listingIdFilter.toLowerCase())
+      filtered = filtered.filter(item => 
+        (item.name?.toLowerCase().includes(query) || false) || 
+        item.tokenId.toLowerCase().includes(query) ||
+        (item.collectionName?.toLowerCase().includes(query) || false)
       );
     }
     
-    // Filter by Contract Address
-    if (contractAddressFilter) {
-      filtered = filtered.filter(order => 
-        order.sell[0]?.contractAddress?.toLowerCase().includes(contractAddressFilter.toLowerCase())
-      );
+    // Apply price range filter
+    if (priceRangeMin) {
+      filtered = filtered.filter(item => parseFloat(item.price) >= parseFloat(priceRangeMin));
     }
     
-    // Filter by Token ID
-    if (tokenIdFilter) {
-      filtered = filtered.filter(order => 
-        order.sell[0]?.tokenId?.toString().includes(tokenIdFilter)
-      );
-    }
-    
-    // Filter by Price (min)
-    if (priceRangeMin !== "") {
-      filtered = filtered.filter(order => {
-        const price = parseFloat(order.buy[0]?.amount || "0");
-        return price >= parseFloat(priceRangeMin);
-      });
-    }
-    
-    // Filter by Price (max)
-    if (priceRangeMax !== "") {
-      filtered = filtered.filter(order => {
-        console.log(priceRangeMax);
-        const price = parseFloat(order.buy[0]?.amount || "0");
-        return price <= parseFloat(priceRangeMax);
-      });
+    if (priceRangeMax) {
+      filtered = filtered.filter(item => parseFloat(item.price) <= parseFloat(priceRangeMax));
     }
     
     // Apply sorting
-    if (sortOption === "price_asc") {
-      filtered.sort((a, b) => {
-        const priceA = parseFloat(a.buy[0]?.amount || "0");
-        const priceB = parseFloat(b.buy[0]?.amount || "0");
-        return priceA - priceB;
-      });
-    } else if (sortOption === "price_desc") {
-      filtered.sort((a, b) => {
-        const priceA = parseFloat(a.buy[0]?.amount || "0");
-        const priceB = parseFloat(b.buy[0]?.amount || "0");
-        return priceB - priceA;
-      });
+    switch (sortOption) {
+      case 'price_asc':
+        filtered.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+        break;
+      case 'price_desc':
+        filtered.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+        break;
+      case 'newest':
+        filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        break;
+      case 'oldest':
+        filtered.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+        break;
+      default:
+        break;
     }
     
-    setFilteredItems(filtered);
-  };
-
-  // Handle page changes
-  const changePage = (newPage: number) => {
-    setCurrentPage(newPage);
-    // Refetch with new page
-    fetchListings();
+    return filtered;
   };
   
-  // Update filters when filter state changes
-  useEffect(() => {
-    applyFilters();
-  }, [listingIdFilter, contractAddressFilter, tokenIdFilter, priceRangeMin, priceRangeMax, sortOption, searchQuery, marketplaceItems]);
-
   // Login with Passport
   const loginWithPassport = async () => {
-    if (!passportInstance) return;
     try {
-      setIsLoading(true);
-      
-      const passportProvider = await passportInstance.connectEvm();
-      setProvider(passportProvider);
-      
-      const accounts = await passportProvider.request({ method: 'eth_requestAccounts' });
-      
-      if (accounts && accounts.length > 0) {
-        setIsLoggedIn(true);
-        setAccountAddress(accounts[0]);
-        
-        // Get wallet balance
-        const ethProvider = new BrowserProvider(passportProvider);
-        const balanceInWei = await ethProvider.getBalance(accounts[0]);
-        const balanceInEth = parseFloat(balanceInWei.toString()) / 1e18;
-        setWalletBalance(balanceInEth.toFixed(4));
-        
-        // Set up signer
-        const signer = await ethProvider.getSigner();
-        setSigner(signer);
-      }
+      await passportInstance.login();
     } catch (error) {
-      console.error("Login failed:", error);
-    } finally {
-      setIsLoading(false);
+      console.error("Error logging in with Passport:", error);
     }
   };
-
-  // Purchase an item
-  const purchaseItem = async (order: Order) => {
-    if (!isLoggedIn) {
-      loginWithPassport();
-      return;
-    }
-    
-    if (!signer || !order.id) {
-      setPurchaseError("Cannot complete purchase. Please try again later.");
-      return;
-    }
-    
-    try {
-      setPurchasingItem(order.id);
-      setPurchaseError(null);
-      setPurchaseSuccess(null);
-      
-      // Prepare purchase parameters
-      const takerFeeRecipient = "0x0000000000000000000000000000000000000000";
-      const takerFeePercentage = 0;
-      
-      // Call the fulfill method to purchase the item
-      const result = await orderbookSDK.fulfillOrder({
-        orderId: order.id,
-        signer: signer,
-        takerFeeRecipient,
-        takerFeePercentage
-      });
-      
-      setPurchaseSuccess(`Successfully purchased ${order.sell[0]?.metadata?.name || 'NFT'}!`);
-      
-      // Refresh listings after purchase
-      await fetchListings();
-      
-    } catch (error) {
-      console.error("Purchase failed:", error);
-      setPurchaseError("Failed to complete purchase. Please try again.");
-    } finally {
-      setPurchasingItem(null);
-    }
-  };
-
-  // Function to clear all filters
-  const clearFilters = () => {
-    setListingIdFilter("");
-    setContractAddressFilter("");
-    setTokenIdFilter("");
-    setPriceRangeMin("");
-    setPriceRangeMax("");
-    setSortOption("price_asc");
-    setSearchQuery("");
-  };
-
-  // Handle listing creation
-  const handleListingCreated = () => {
-    // Refresh listings after a new listing is created
-    fetchListings();
-    // Switch to my-listings tab to show the user their new listing
-    setActiveTab('my-listings');
-  };
-
-  // Handle listing cancellation
-  const handleListingCancelled = () => {
-    // Refresh listings after a listing is cancelled
-    fetchListings();
-  };
-
+  
+  // If loading
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <p className="text-xl">Loading...</p>
+      </div>
+    );
+  }
+  
   return (
-    <div className="min-h-screen w-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        {/* Purchase notifications */}
-        {purchaseError && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-100 text-red-700 rounded-xl">
-            {purchaseError}
+    <div className="container mx-auto p-6 max-w-7xl">
+      <div className="mb-8">
+        <Heading>NFT Marketplace</Heading>
+        <Body className="mt-2">Discover, buy, and sell unique digital assets</Body>
+      </div>
+      
+      <div className="mb-8">
+        <div className="flex space-x-4 border-b border-gray-200">
+          <button 
+            className={`py-2 px-4 text-base font-medium ${activeTab === 'listings' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+            onClick={() => handleTabChange('listings')}
+          >
+            All Listings
+          </button>
+          <button 
+            className={`py-2 px-4 text-base font-medium ${activeTab === 'collections' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+            onClick={() => handleTabChange('collections')}
+          >
+            Collections
+          </button>
+          {isLoggedIn && (
             <button 
-              onClick={() => setPurchaseError(null)}
-              className="ml-2 text-red-700 hover:text-red-900"
+              className={`py-2 px-4 text-base font-medium ${activeTab === 'my-listings' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              onClick={() => handleTabChange('my-listings')}
             >
-              ✕
+              My Listings
             </button>
+          )}
+        </div>
+      </div>
+      
+      {/* Filters */}
+      {activeTab === 'listings' && (
+        <div className="mb-8 bg-gray-50 p-4 rounded-lg">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search by name, token ID..."
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Min Price</label>
+              <input
+                type="number"
+                value={priceRangeMin}
+                onChange={(e) => setPriceRangeMin(e.target.value)}
+                placeholder="Min ETH"
+                min="0"
+                step="0.001"
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Max Price</label>
+              <input
+                type="number"
+                value={priceRangeMax}
+                onChange={(e) => setPriceRangeMax(e.target.value)}
+                placeholder="Max ETH"
+                min="0"
+                step="0.001"
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+              <select
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              >
+                <option value="price_asc">Price: Low to High</option>
+                <option value="price_desc">Price: High to Low</option>
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+              </select>
+            </div>
           </div>
-        )}
-        
-        {purchaseSuccess && (
-          <div className="mb-4 p-4 bg-green-50 border border-green-100 text-green-700 rounded-xl">
-            {purchaseSuccess}
-            <button 
-              onClick={() => setPurchaseSuccess(null)}
-              className="ml-2 text-green-700 hover:text-green-900"
-            >
-              ✕
-            </button>
-          </div>
-        )}
-
-        {/* User info and login button */}
-        <div className="mb-6 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">NFT Marketplace</h1>
-          
-          {isLoggedIn ? (
-            <div className="flex items-center space-x-4">
-              <div className="text-sm">
-                <span className="text-gray-500">Address:</span> {formatAddress(accountAddress || '')}
+        </div>
+      )}
+      
+      {/* Selected Collection Info */}
+      {selectedCollection && (
+        <div className="mb-8">
+          {collections.filter(c => c.contractAddress === selectedCollection).map((collection, index) => (
+            <div key={index} className="bg-gray-50 p-4 rounded-lg flex items-center justify-between">
+              <div>
+                <Heading size="medium">{collection.name}</Heading>
+                <Body className="mt-1">{collection.description || 'No description available'}</Body>
+                <Body className="text-sm text-gray-500 mt-1">
+                  {collection.totalItems || 0} items • Contract: {formatAddress(collection.contractAddress)}
+                </Body>
               </div>
-              <div className="text-sm">
-                <span className="text-gray-500">Balance:</span> {walletBalance} ETH
+              <Button 
+                variant="secondary"
+                onClick={() => {
+                  setSelectedCollection(null);
+                  router.push('/marketplace');
+                }}
+              >
+                Clear Filter
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+      
+      {/* Content based on active tab */}
+      {activeTab === 'listings' && (
+        <div>
+          {loadingListings ? (
+            <div className="text-center py-10">
+              <p>Loading listings...</p>
+            </div>
+          ) : applyFilters().length === 0 ? (
+            <div className="text-center py-10 border border-gray-200 rounded-lg">
+              <Body size="large">No listings found</Body>
+              {!isLoggedIn ? (
+                <div className="mt-4">
+                  <Button onClick={loginWithPassport}>Connect Wallet to Sell</Button>
+                </div>
+              ) : (
+                <div className="mt-4">
+                  <Link href="/dashboard">
+                    <Button>Go to Dashboard to Sell</Button>
+                  </Link>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {applyFilters().map((listing, index) => (
+                <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow">
+                  <div className="h-48 bg-gray-200 relative">
+                    {listing.imageUrl ? (
+                      <img 
+                        src={listing.imageUrl} 
+                        alt={listing.name || 'NFT'} 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <Body>No image available</Body>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <Heading size="small" className="line-clamp-1">{listing.name}</Heading>
+                        <Body className="text-gray-600 text-sm mt-1">
+                          {listing.collectionName || 'Unknown Collection'}
+                        </Body>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold">{parseFloat(listing.price).toFixed(6)} ETH</div>
+                        <div className="text-xs text-gray-500">
+                          ~{calculateBuyerCost(listing.price)} ETH with fees
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex justify-between items-center">
+                      <Body className="text-xs text-gray-500">
+                        Seller: {formatAddress(listing.sellerAddress)}
+                      </Body>
+                      <Link href={`/marketplace/details?id=${listing.id}`}>
+                        <Button size="small">View</Button>
+                      </Link>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+          
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="mt-8 flex justify-center">
+              <div className="flex space-x-2">
+                <Button
+                  variant="secondary"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                >
+                  Previous
+                </Button>
+                <div className="flex items-center px-4">
+                  Page {currentPage} of {totalPages}
+                </div>
+                <Button
+                  variant="secondary"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      
+      {activeTab === 'collections' && (
+        <div>
+          {loadingCollections ? (
+            <div className="text-center py-10">
+              <p>Loading collections...</p>
+            </div>
+          ) : collections.length === 0 ? (
+            <div className="text-center py-10 border border-gray-200 rounded-lg">
+              <Body size="large">No collections found</Body>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {collections.map((collection, index) => (
+                <div 
+                  key={index} 
+                  className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                  onClick={() => handleCollectionSelect(collection.contractAddress)}
+                >
+                  <div className="h-48 bg-gray-200 relative">
+                    {collection.imageUrl ? (
+                      <img 
+                        src={collection.imageUrl} 
+                        alt={collection.name} 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <Body>No image available</Body>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <Heading size="small">{collection.name}</Heading>
+                    <Body className="text-gray-600 mt-2 line-clamp-2">
+                      {collection.description || 'No description available'}
+                    </Body>
+                    <div className="mt-4 flex justify-between items-center">
+                      <Body className="text-gray-500">
+                        {collection.totalItems || 0} NFTs
+                      </Body>
+                      <Button 
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCollectionSelect(collection.contractAddress);
+                        }}
+                      >
+                        View Listings
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+      
+      {activeTab === 'my-listings' && (
+        <div>
+          {!isLoggedIn ? (
+            <div className="text-center py-10 border border-gray-200 rounded-lg">
+              <Body size="large">Please connect your wallet to view your listings</Body>
+              <div className="mt-4">
+                <Button onClick={loginWithPassport}>Connect Wallet</Button>
+              </div>
+            </div>
+          ) : loadingUserListings ? (
+            <div className="text-center py-10">
+              <p>Loading your listings...</p>
+            </div>
+          ) : userListings.length === 0 ? (
+            <div className="text-center py-10 border border-gray-200 rounded-lg">
+              <Body size="large">You don't have any active listings</Body>
+              <div className="mt-4">
+                <Link href="/dashboard">
+                  <Button>Go to Dashboard to Sell</Button>
+                </Link>
               </div>
             </div>
           ) : (
-            <Button
-              variant="primary"
-              onClick={loginWithPassport}
-              disabled={isLoading}
-            >
-              {isLoading ? 'Connecting...' : 'Connect Wallet'}
-            </Button>
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {userListings.map((listing, index) => (
+                <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow">
+                  <div className="h-48 bg-gray-200 relative">
+                    {listing.imageUrl ? (
+                      <img 
+                        src={listing.imageUrl} 
+                        alt={listing.name || 'NFT'} 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <Body>No image available</Body>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <Heading size="small" className="line-clamp-1">{listing.name}</Heading>
+                        <Body className="text-gray-600 text-sm mt-1">
+                          {listing.collectionName || 'Unknown Collection'}
+                        </Body>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold">{parseFloat(listing.price).toFixed(6)} ETH</div>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex justify-between items-center">
+                      <Body className="text-xs text-gray-500">
+                        Listed: {new Date(listing.createdAt).toLocaleDateString()}
+                      </Body>
+                      <Link href={`/marketplace/details?id=${listing.id}`}>
+                        <Button size="small">Manage</Button>
+                      </Link>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
           )}
         </div>
-        
-        {/* Tabs */}
-        <div className="mb-6">
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8">
-              <button
-                onClick={() => setActiveTab('buy')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'buy'
-                    ? 'border-black text-black'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Buy NFTs
-              </button>
-              <button
-                onClick={() => setActiveTab('sell')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'sell'
-                    ? 'border-black text-black'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Sell NFTs
-              </button>
-              <button
-                onClick={() => setActiveTab('my-listings')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'my-listings'
-                    ? 'border-black text-black'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                My Listings
-              </button>
-            </nav>
-          </div>
-        </div>
-        
-        {activeTab === 'sell' ? (
-          <CreateListing
-            isLoggedIn={isLoggedIn}
-            signer={signer}
-            accountAddress={accountAddress}
-            onListingCreated={handleListingCreated}
-            onLoginRequired={loginWithPassport}
-          />
-        ) : activeTab === 'my-listings' ? (
-          <MyListings
-            isLoggedIn={isLoggedIn}
-            signer={signer}
-            accountAddress={accountAddress}
-            onLoginRequired={loginWithPassport}
-            onListingCancelled={handleListingCancelled}
-          />
-        ) : (
-          <div className="space-y-6">
-            {/* Filters */}
-            <div className="bg-white shadow rounded-xl p-6">
-              <h2 className="text-xl font-semibold mb-4">Filters</h2>
-              
-              {/* Search bar */}
-              <div className="mb-6">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search by name, token ID, or contract address"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                  />
-                  <div className="absolute left-3 top-3 text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* Listing ID */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Listing ID</label>
-                  <input
-                    type="text"
-                    placeholder="Filter by listing ID"
-                    value={listingIdFilter}
-                    onChange={(e) => setListingIdFilter(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                  />
-                </div>
-                
-                {/* Contract Address */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Contract Address</label>
-                  <input
-                    type="text"
-                    placeholder="Filter by contract address"
-                    value={contractAddressFilter}
-                    onChange={(e) => setContractAddressFilter(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                  />
-                </div>
-                
-                {/* Token ID */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Token ID</label>
-                  <input
-                    type="text"
-                    placeholder="Filter by token ID"
-                    value={tokenIdFilter}
-                    onChange={(e) => setTokenIdFilter(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                  />
-                </div>
-                
-                {/* Price Range */}
-                <div className="flex space-x-2">
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Min Price</label>
-                    <input
-                      type="number"
-                      placeholder="Min"
-                      min="0"
-                      step="0.01"
-                      value={priceRangeMin}
-                      onChange={(e) => setPriceRangeMin(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Max Price</label>
-                    <input
-                      type="number"
-                      placeholder="Max"
-                      min="0"
-                      step="0.01"
-                      value={priceRangeMax}
-                      onChange={(e) => setPriceRangeMax(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                    />
-                  </div>
-                </div>
-                
-                {/* Sort */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
-                  <select
-                    value={sortOption}
-                    onChange={(e) => setSortOption(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                  >
-                    <option value="price_asc">Price: Low to High</option>
-                    <option value="price_desc">Price: High to Low</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-            
-            {/* Listings */}
-            <div className="bg-white shadow rounded-xl p-6 w-full mx-auto">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold">Marketplace Listings</h2>
-                <div className="text-sm text-gray-500">
-                  {filteredItems.length} {filteredItems.length === 1 ? 'item' : 'items'} available
-                </div>
-              </div>
-              
-              {loadingItems ? (
-                <div className="flex justify-center py-16">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
-                </div>
-              ) : filteredItems.length === 0 ? (
-                <div className="text-center py-16 bg-gray-50 rounded-xl">
-                  <p className="text-gray-500 mb-4">No items found matching your criteria</p>
-                  <button 
-                    onClick={clearFilters}
-                    className="bg-black text-white px-6 py-2 rounded-full hover:bg-gray-800 transition-colors"
-                  >
-                    Clear Filters
-                  </button>
-                </div>
-              ) : (
-                <Table sx={{ maxWidth: "2000px", width: "100%", maxHeight: "800px", overflowY: "auto", marginBottom: "base.spacing.x5", justifySelf: "center"}}>
-                  <Table.Head>
-                    <Table.Row>
-                      <Table.Cell sx={{ padding: "base.spacing.x2" }}>SNO</Table.Cell>
-                      <Table.Cell sx={{ padding: "base.spacing.x2" }}>Listing ID</Table.Cell>
-                      <Table.Cell sx={{ padding: "base.spacing.x2" }}>Contract Address</Table.Cell>
-                      <Table.Cell sx={{ padding: "base.spacing.x2" }}>Token ID</Table.Cell>
-                      <Table.Cell sx={{ padding: "base.spacing.x2" }}>Name</Table.Cell>
-                      <Table.Cell sx={{ padding: "base.spacing.x2" }}>Price</Table.Cell>
-                      <Table.Cell sx={{ padding: "base.spacing.x2" }}></Table.Cell>
-                    </Table.Row>
-                  </Table.Head>
-                  <Table.Body>
-                    {filteredItems.map((listing: Order, index: number) => {
-                      return (
-                        <Table.Row key={index}>
-                          <Table.Cell sx={{ paddingLeft: "base.spacing.x5", paddingRight: "base.spacing.x2", paddingY: "base.spacing.x5" }}>
-                            <Body mono={true} size="small">{index + 1}</Body>
-                          </Table.Cell>
-                          <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}>
-                            <Body mono={true} size="small">{listing.id.substring(0, 8)}...</Body>
-                          </Table.Cell>
-                          <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}>
-                            <Body mono={true} size="small">{(listing.sell[0].contractAddress)}</Body>
-                          </Table.Cell>
-                          <Table.Cell sx={{ paddingX: "base.spacing.x2", paddingY: "base.spacing.x5" }}>
-                            <Body mono={true} size="small">{listing.sell[0].tokenId}</Body>
-                          </Table.Cell>
-                          <Table.Cell sx={{ paddingLeft: "base.spacing.x2", paddingRight: "base.spacing.x5", paddingY: "base.spacing.x2" }}>
-                            <Body mono={true} size="small">{listing.buy[0].amount} ETH</Body>
-                          </Table.Cell>
-                          <Table.Cell sx={{ paddingLeft: "base.spacing.x2", paddingRight: "base.spacing.x5", paddingY: "base.spacing.x2" }}>
-                            <Button
-                              size="small"
-                              variant="primary"
-                              disabled={loadingItems || purchasingItem === listing.id}
-                              onClick={() => purchaseItem(listing)}
-                            >
-                              {purchasingItem === listing.id ? 'Purchasing...' : 'Purchase'}
-                            </Button>
-                          </Table.Cell>
-                        </Table.Row>
-                      );
-                    })}
-                  </Table.Body>
-                </Table>
-              )}
-              
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex justify-center mt-8">
-                  <nav className="flex items-center space-x-2">
-                    <button
-                      onClick={() => changePage(Math.max(1, currentPage - 1))}
-                      disabled={currentPage === 1}
-                      className="px-3 py-1 rounded-full border border-gray-300 text-sm disabled:opacity-50"
-                    >
-                      Previous
-                    </button>
-                    
-                    <div className="text-sm text-gray-700">
-                      Page {currentPage} of {totalPages}
-                    </div>
-                    
-                    <button
-                      onClick={() => changePage(Math.min(totalPages, currentPage + 1))}
-                      disabled={currentPage === totalPages}
-                      className="px-3 py-1 rounded-full border border-gray-300 text-sm disabled:opacity-50"
-                    >
-                      Next
-                    </button>
-                  </nav>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }
