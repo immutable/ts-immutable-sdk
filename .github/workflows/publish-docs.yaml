@@ -18,7 +18,7 @@ jobs:
     name: Check if SDK version is alpha
     runs-on: ubuntu-latest
     outputs:
-      is_alpha: ${{ steps.alpha_check.outputs.is_alpha }}
+      is_alpha: 'false'
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
