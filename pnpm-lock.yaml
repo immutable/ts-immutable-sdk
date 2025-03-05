@@ -1819,8 +1819,8 @@ importers:
         specifier: workspace:*
         version: link:../../x-client
       '@magic-ext/oidc':
-        specifier: 4.3.1
-        version: 4.3.1
+        specifier: 12.0.0
+        version: 12.0.0
       '@metamask/detect-provider':
         specifier: ^2.0.0
         version: 2.0.0
@@ -4707,9 +4707,6 @@ packages:
 
   '@magic-ext/oidc@12.0.0':
     resolution: {integrity: sha512-IeycCoW8BUqcdJoggynq63bj8XyRxZfiX5cBdxq7LEr4gWWpTz1zexEkWrJoP76XDr6Yn/wYQXiL4/AvJ6wcjw==}
-
-  '@magic-ext/oidc@4.3.1':
-    resolution: {integrity: sha512-HjriTgPxECC37z4UPbomuL0sFd5Fe0aC8BEDSShD5Ltbi0oMjamEW7avYdZi14S5F4UHfcol0M3xTc+0FTNwrw==}
 
   '@magic-sdk/commons@25.0.0':
     resolution: {integrity: sha512-EYrbFGw/4R899IccGgkmVp/ia50ELNK7H1uDfM66Nh+YnH05LsLWlfrtFbbKxBazquVnu89bAHmJcFPsmSnHQQ==}
@@ -20375,8 +20372,6 @@ snapshots:
 
   '@magic-ext/oidc@12.0.0': {}
 
-  '@magic-ext/oidc@4.3.1': {}
-
   '@magic-sdk/commons@25.0.0(@magic-sdk/provider@29.0.0(localforage@1.10.0))(@magic-sdk/types@24.18.0)':
     dependencies:
       '@magic-sdk/provider': 29.0.0(localforage@1.10.0)
@@ -20594,7 +20589,7 @@ snapshots:
       '@motionone/easing': 10.17.0
       '@motionone/types': 10.17.0
       '@motionone/utils': 10.17.0
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@motionone/dom@10.17.0':
     dependencies:
@@ -20603,7 +20598,7 @@ snapshots:
       '@motionone/types': 10.17.0
       '@motionone/utils': 10.17.0
       hey-listen: 1.0.8
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@motionone/easing@10.17.0':
     dependencies:
@@ -20619,7 +20614,7 @@ snapshots:
   '@motionone/svelte@10.16.4':
     dependencies:
       '@motionone/dom': 10.17.0
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@motionone/types@10.17.0': {}
 
@@ -20627,12 +20622,12 @@ snapshots:
     dependencies:
       '@motionone/types': 10.17.0
       hey-listen: 1.0.8
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@motionone/vue@10.16.4':
     dependencies:
       '@motionone/dom': 10.17.0
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.2':
     optional: true
@@ -21821,7 +21816,7 @@ snapshots:
       is-glob: 4.0.3
       open: 9.1.0
       picocolors: 1.1.1
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@playwright/test@1.45.3':
     dependencies:
@@ -26893,7 +26888,7 @@ snapshots:
   dot-case@3.0.4:
     dependencies:
       no-case: 3.0.4
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   dotenv-expand@11.0.6:
     dependencies:
