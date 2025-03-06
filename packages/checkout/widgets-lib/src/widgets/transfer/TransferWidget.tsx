@@ -85,11 +85,11 @@ export type TransferWidgetInputs = TransferWidgetParams & {
 const TRANSACTION_CANCELLED_ERROR_CODE = -32003;
 
 function SendingTokens({ config }: { config: StrongCheckoutWidgetsConfig }) {
+  const { t } = useTranslation();
   const { RiveComponent } = useRive({
     src: getRemoteRive(config.environment, '/swapping_coins.riv'),
     stateMachines: 'State',
     autoplay: true,
-    // layout: new Layout({ fit: Fit.Fill }),
   });
 
   return (
@@ -105,7 +105,7 @@ function SendingTokens({ config }: { config: StrongCheckoutWidgetsConfig }) {
         <Box>
           <Box sx={{ height: '240px' }} rc={<RiveComponent />} />
           <Heading sx={{ mb: 'base.spacing.x4', mx: 'base.spacing.x4' }}>
-            Sending Tokens
+            {t('views.TRANSFER.content.sendingTokens')}
           </Heading>
         </Box>
       </Stack>
@@ -122,11 +122,11 @@ function TransferComplete({
   onContinue: () => void;
   txHash: string;
 }) {
+  const { t } = useTranslation();
   const { RiveComponent } = useRive({
     src: getRemoteRive(config.environment, '/swapping_coins.riv'),
     stateMachines: 'State',
     autoplay: true,
-    // layout: new Layout({ fit: Fit.Fill }),
   });
 
   return (
@@ -142,7 +142,7 @@ function TransferComplete({
         <Box>
           <Box sx={{ height: '240px' }} rc={<RiveComponent />} />
           <Heading sx={{ mb: 'base.spacing.x4', mx: 'base.spacing.x4' }}>
-            Tokens Sent Successfully
+            {t('views.TRANSFER.content.tokensSentSuccessfully')}
           </Heading>
           <Link
             rc={(
@@ -153,12 +153,14 @@ function TransferComplete({
               />
             )}
           >
-            <Body size="medium">See transaction on Immutable zkEVM</Body>
+            <Body size="medium">{t('views.TRANSFER.content.seeTransactionOnImmutableZkEVM')}</Body>
           </Link>
         </Box>
-        <Button onClick={onContinue} size="large">
-          Continue
-        </Button>
+        <Box sx={{ mx: 'base.spacing.x4' }}>
+          <Button sx={{ width: '100%' }} onClick={onContinue} size="large">
+            {t('views.TRANSFER.form.continueButtonText')}
+          </Button>
+        </Box>
       </Stack>
     </SimpleLayout>
   );
@@ -279,7 +281,7 @@ function TransferForm({
 
   const selectSubtext = useMemo(() => {
     if (!token) return '';
-    return `${t('views.SWAP.content.availableBalancePrefix')} ${
+    return `${t('views.TRANSFER.content.availableBalancePrefix')} ${
       token.balance?.formattedAmount
     }`;
   }, [token]);
@@ -400,20 +402,20 @@ function TransferForm({
       >
         <Stack gap="base.spacing.x9">
           <Stack gap="base.spacing.x1">
-            <Heading size="xSmall">Send</Heading>
+            <Heading size="xSmall">{t('views.TRANSFER.form.coinAmountHeading')}</Heading>
             <SelectInput
               testId="transfer-token-select"
               options={tokenOptions}
               textInputValue={amount}
               textInputPlaceholder="0"
               textInputTextAlign="right"
-              coinSelectorHeading="Select a token"
+              coinSelectorHeading={t('views.TRANSFER.form.coinSelectorHeading')}
               textInputMaxButtonClick={token ? handleMaxButtonClick : undefined}
               textInputValidator={amountInputValidation}
               textInputErrorMessage={amountError}
               selectSubtext={selectSubtext}
               textInputSubtext={`${t(
-                'views.SWAP.content.fiatPricePrefix',
+                'views.TRANSFER.content.fiatPricePrefix',
               )} $${formatZeroAmount(fromFiatValue, true)}`}
               onTextInputChange={handleAmountChange}
               onSelectChange={handleTokenChange}
@@ -425,7 +427,7 @@ function TransferForm({
             />
           </Stack>
           <Stack gap="base.spacing.x1">
-            <Heading size="xSmall">To Address</Heading>
+            <Heading size="xSmall">{t('views.TRANSFER.form.toAddressHeading')}</Heading>
             <TextInputForm
               testId="transfer-to-address-input"
               value={recipientAddress}
@@ -443,7 +445,7 @@ function TransferForm({
             weight="bold"
             sx={{ color: 'base.color.text.status.fatal.primary' }}
           >
-            Not all Exchanges Support Immutable zkEVM!
+            {t('views.TRANSFER.content.notAllExchangesSupportImmutableZkEVM')}
           </Body>
           <Body
             rc={<div />}
@@ -451,10 +453,7 @@ function TransferForm({
             weight="regular"
             sx={{ mb: 'base.spacing.x4' }}
           >
-            You can only send tokens within the Immutable zkEVM network. Some
-            exchanges do not support Immutable zkEVM, so ensure your destination
-            is compatible before sending, as retrieving funds can be difficult
-            to impossible.
+            {t('views.TRANSFER.content.notAllExchangesSupportImmutableZkEVMDescription')}
           </Body>
           <Button
             sx={{ width: '100%' }}
@@ -463,7 +462,7 @@ function TransferForm({
             disabled={isButtonDisabled}
             onClick={sendTokensCb}
           >
-            Send
+            {t('views.TRANSFER.form.buttonText')}
           </Button>
         </Box>
       </Stack>
