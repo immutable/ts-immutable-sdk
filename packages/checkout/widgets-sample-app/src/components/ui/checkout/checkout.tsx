@@ -212,6 +212,12 @@ function CheckoutUI() {
       items: itemsMock.slice(0, 1),
       environmentId: "82a81049-8c41-4ae3-91ca-0bd82a283abc",
     },
+    TRANSFER: {
+      flow: CommerceFlowType.TRANSFER,
+      amount: "1",
+      tokenAddress: "native",
+      toAddress: "0x0000000000000000000000000000000000000000",
+    },
   });
 
   // set a state to keep widget event results
@@ -687,8 +693,9 @@ function CheckoutUI() {
                   defaultLabel="Select a Flow"
                   onSelectChange={(value) => {
                     const flow = value as CommerceFlowType;
+                    const params = flowParams[flow] ?? {};
                     setParams({
-                      ...(flowParams[flow as keyof typeof flowParams] || {}),
+                      ...params,
                       flow,
                       // spread rest of params for given flow
                     });

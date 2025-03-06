@@ -9,6 +9,8 @@ import { CryptoFiatState } from '../../context/crypto-fiat-context/CryptoFiatCon
 import { formatZeroAmount, calculateCryptoToFiat } from '../../lib/utils';
 import { getAllowedBalances } from '../../lib/balance';
 
+const erc20Abi = ['function transfer(address to, uint amount)'];
+
 export const validatePartialAddress = (value: string) => {
   const regex = /^(0(x[0-9a-fA-F]{0,40})?)?$/;
   return regex.test(value);
@@ -28,8 +30,6 @@ export const getFiatAmount = (
     cryptoFiatState.conversions,
   );
 };
-
-const erc20Abi = ['function transfer(address to, uint amount)'];
 
 const sendErc20Tokens = async (
   signer: JsonRpcSigner,

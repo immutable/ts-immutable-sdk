@@ -68,14 +68,20 @@ export type TransferWidgetInputs = TransferWidgetParams & {
 
 const TRANSACTION_CANCELLED_ERROR_CODE = -32003;
 
-function FirstScreen({
+function TransferForm({
   theme,
   checkout,
   provider,
+  initialAmount = '',
+  initialTokenAddress = '',
+  initialToAddress = '',
 }: {
   theme: WidgetTheme;
   checkout: Checkout;
   provider: WrappedBrowserProvider;
+  initialAmount?: string;
+  initialTokenAddress?: `0x${string}` | 'native' | '';
+  initialToAddress?: `0x${string}` | '';
 }) {
   const { t } = useTranslation();
   const {
@@ -83,27 +89,6 @@ function FirstScreen({
   } = useContext(EventTargetContext);
   const { transferState } = useTransferContext();
   const { cryptoFiatState } = useContext(CryptoFiatContext);
-  const [token, setToken] = useState<CoinSelectorOptionProps>();
-  const [amount, setAmount] = useState<string>('');
-  const [recipientAddress, setRecipientAddress] = useState<string>('');
-  const [localTransferState, setLocalTransferState] = useState<
-  | { isTransferring: false; receipt?: TransactionReceipt }
-  | { isTransferring: true }
-  >({ isTransferring: false });
-  const defaultTokenImage = useMemo(
-    () => getDefaultTokenImage(checkout.config.environment, theme),
-    [checkout.config.environment, theme],
-  );
-
-  const fromFiatValue = useMemo(
-    () =>
-      calculateCryptoToFiat(
-        amount,
-        token?.symbol || '',
-        cryptoFiatState.conversions,
-      ),
-    [amount, token, cryptoFiatState.conversions],
-  );
 
   const tokenOptions = useMemo(
     () =>
@@ -120,6 +105,31 @@ function FirstScreen({
         }),
       ),
     [transferState.tokenBalances],
+  );
+
+  const [token, setToken] = useState<CoinSelectorOptionProps | undefined>(() =>
+    tokenOptions.find((option) => option.id === initialTokenAddress));
+
+  const [amount, setAmount] = useState<string>(initialAmount);
+  const [recipientAddress, setRecipientAddress] = useState<string>(initialToAddress);
+  const [localTransferState, setLocalTransferState] = useState<
+  | { isTransferring: false; receipt?: TransactionReceipt }
+  | { isTransferring: true }
+  >({ isTransferring: false });
+
+  const defaultTokenImage = useMemo(
+    () => getDefaultTokenImage(checkout.config.environment, theme),
+    [checkout.config.environment, theme],
+  );
+
+  const fromFiatValue = useMemo(
+    () =>
+      calculateCryptoToFiat(
+        amount,
+        token?.symbol || '',
+        cryptoFiatState.conversions,
+      ),
+    [amount, token, cryptoFiatState.conversions],
   );
 
   const handleSelectChange = useCallback(
@@ -276,7 +286,12 @@ function FirstScreen({
   );
 }
 
-export default function TransferWidget({ config }: TransferWidgetInputs) {
+export default function TransferWidget({
+  amount,
+  tokenAddress,
+  toAddress,
+  config,
+}: TransferWidgetInputs) {
   const { t } = useTranslation();
   const [viewState, viewDispatch] = useReducer(viewReducer, {
     ...initialViewState,
@@ -327,10 +342,13 @@ export default function TransferWidget({ config }: TransferWidgetInputs) {
       <TransferContextProvider value={{ transferState, transferDispatch }}>
         <CryptoFiatProvider environment={config.environment}>
           {viewState.view.type === TransferWidgetViews.TRANSFER && (
-            <FirstScreen
+            <TransferForm
               theme={config.theme}
               checkout={checkout!}
               provider={provider!}
+              initialAmount={amount}
+              initialTokenAddress={tokenAddress}
+              initialToAddress={toAddress}
             />
           )}
         </CryptoFiatProvider>
