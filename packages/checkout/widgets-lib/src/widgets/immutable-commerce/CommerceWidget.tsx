@@ -48,6 +48,7 @@ import {
   initialCommerceState,
 } from './context/CommerceContext';
 import PurchaseWidget from '../purchase/PurchaseWidget';
+import TransferWidget from '../transfer/TransferWidget';
 
 export type CommerceWidgetInputs = {
   checkout: Checkout;
@@ -204,6 +205,8 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
    */
   const showBackButton = !!view.data?.showBackButton;
 
+  console.log({ vt: view.type, shouldWrapWithConnectLoader });
+
   return (
     <ViewContextProvider>
       <CommerceContext.Provider value={commerceReducerValues}>
@@ -325,6 +328,13 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
                   {...(view.data.params || {})}
                   {...(view.data.config || {})}
                   showBackButton={showBackButton}
+                />
+              )}
+              {view.type === CommerceFlowType.TRANSFER && (
+                <TransferWidget
+                  config={widgetsConfig}
+                  {...(view.data.params || {})}
+                  {...(view.data.config || {})}
                 />
               )}
             </Suspense>

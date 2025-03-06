@@ -11,6 +11,7 @@ import { OnRampWidgetView } from './OnRampViewContextTypes';
 import { AddTokensWidgetView } from './AddTokensViewContextTypes';
 import { CheckoutWidgetView } from './CheckoutWidgetViewContextTypes';
 import { PurchaseWidgetView } from './PurchaseViewContextTypes';
+import { TransferWidgetView } from './TransferViewContextTypes';
 
 export enum SharedViews {
   LOADING_VIEW = 'LOADING_VIEW',
@@ -56,7 +57,8 @@ export type View =
   | BridgeWidgetView
   | AddTokensWidgetView
   | CheckoutWidgetView
-  | PurchaseWidgetView;
+  | PurchaseWidgetView
+  | TransferWidgetView;
 
 export interface ViewState {
   view: View;

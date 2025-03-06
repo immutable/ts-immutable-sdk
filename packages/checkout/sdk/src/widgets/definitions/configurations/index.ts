@@ -9,3 +9,4 @@ export * from './widget';
 export * from './addTokens';
 export * from './commerce';
 export * from './purchase';
+export * from './transfer';

@@ -160,7 +160,7 @@ export function ConnectLoader({
   };
 
   useEffect(() => {
-    if (window === undefined) {
+    if (typeof window === 'undefined') {
       // eslint-disable-next-line no-console
       console.error('missing window object: please run Checkout client side');
       return;
@@ -240,6 +240,8 @@ export function ConnectLoader({
       }
     })();
   }, [checkout, walletProviderName, browserProvider]);
+
+  console.log({ connectionStatus });
 
   return (
     <>

@@ -34,7 +34,6 @@ import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import { Environment, ImmutableConfiguration } from "@imtbl/config";
 
 import { useAsyncMemo, usePrevState } from "../../../hooks";
-import { Message } from "./components/messages";
 import { Legend } from "./components/legend";
 import { itemsMock } from "./items.mock";
 import { WrappedBrowserProvider } from "@imtbl/checkout-sdk";
@@ -141,6 +140,7 @@ const flows: Array<CommerceFlowType> = [
   CommerceFlowType.SALE,
   CommerceFlowType.ADD_TOKENS,
   CommerceFlowType.PURCHASE,
+  CommerceFlowType.TRANSFER,
 ];
 
 function CheckoutUI() {
@@ -493,6 +493,15 @@ function CheckoutUI() {
                     },
                   ],
                   environmentId: "82a81049-8c41-4ae3-91ca-0bd82a283abc",
+                });
+              }}
+            >
+              <MenuItem.Label>Direct NFT Purchase</MenuItem.Label>
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setParams({
+                  flow: CommerceFlowType.TRANSFER,
                 });
               }}
             >

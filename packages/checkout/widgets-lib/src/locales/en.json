@@ -134,6 +134,11 @@
         "linkText": "Visit our FAQs"
       }
     },
+    "TRANSFER": {
+      "header": {
+        "title": "Send Token"
+      }
+    },
     "SWAP": {
       "header": {
         "title": "Swap tokens"
