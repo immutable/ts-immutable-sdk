@@ -34,7 +34,10 @@ import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { SelectInput } from '../../components/FormComponents/SelectInput/SelectInput';
-import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import {
+  useAnalytics,
+  UserJourney,
+} from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { CoinSelectorOptionProps } from '../../components/CoinSelector/CoinSelectorOption';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import {
@@ -84,9 +87,8 @@ function TransferForm({
   initialToAddress?: `0x${string}` | '';
 }) {
   const { t } = useTranslation();
-  const {
-    eventTargetState: { eventTarget },
-  } = useContext(EventTargetContext);
+  const { track } = useAnalytics();
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const { transferState } = useTransferContext();
   const { cryptoFiatState } = useContext(CryptoFiatContext);
 
@@ -112,6 +114,7 @@ function TransferForm({
 
   const [amount, setAmount] = useState<string>(initialAmount);
   const [recipientAddress, setRecipientAddress] = useState<string>(initialToAddress);
+
   const [localTransferState, setLocalTransferState] = useState<
   | { isTransferring: false; receipt?: TransactionReceipt }
   | { isTransferring: true }
@@ -134,6 +137,13 @@ function TransferForm({
 
   const handleSelectChange = useCallback(
     (optionKey: OptionKey) => {
+      track({
+        screen: 'TransferToken',
+        userJourney: UserJourney.TRANSFER,
+        control: 'SelectToken',
+        controlType: 'Select',
+        extras: { token: optionKey },
+      });
       const result = tokenOptions.find((option) => option.id === optionKey);
       if (!result) throw new Error('Token not found');
       setToken(result);
@@ -142,12 +152,20 @@ function TransferForm({
   );
 
   const handleMaxButtonClick = useCallback(() => {
-    if (!token) return;
+    if (!token) throw new Error('Token not found');
 
     const result = tokenOptions.find((option) => option.id === token.id);
     if (!result) throw new Error('Token not found');
-
     if (!result.balance?.formattedAmount) throw new Error('Token balance not found');
+
+    track({
+      screen: 'TransferToken',
+      userJourney: UserJourney.TRANSFER,
+      control: 'Max',
+      controlType: 'Button',
+      extras: { token: token.id, amount: result.balance.formattedAmount },
+    });
+
     setAmount(result.balance.formattedAmount);
   }, [tokenOptions, token]);
 
@@ -165,6 +183,14 @@ function TransferForm({
 
   const sendTokensCb = useCallback(async () => {
     if (!token) throw new Error('Token not found');
+
+    track({
+      screen: 'TransferToken',
+      userJourney: UserJourney.TRANSFER,
+      control: 'Send',
+      controlType: 'Button',
+      extras: { token: token.id, amount, recipientAddress },
+    });
 
     const tokenInfo = transferState.tokenBalances.find(
       (tb) => tb.token.address === token.id,
@@ -192,9 +218,15 @@ function TransferForm({
         && 'code' in e.error
         && e.error.code === TRANSACTION_CANCELLED_ERROR_CODE
       ) {
-        console.log('Transaction cancelled');
+        track({
+          screen: 'TransferToken',
+          userJourney: UserJourney.TRANSFER,
+          control: 'TranactionCancel',
+          controlType: 'Event',
+          extras: { token: token.id, amount, recipientAddress },
+        });
       } else {
-        console.error(e);
+        console.error(e); // TODO: where can we send these?
       }
     }
   }, [transferState.tokenBalances, amount, recipientAddress, token, provider]);
