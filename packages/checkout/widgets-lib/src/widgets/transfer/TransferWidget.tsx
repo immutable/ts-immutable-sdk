@@ -58,8 +58,9 @@ import {
   getFiatAmount,
   sendTokens,
   loadBalances,
-  validate,
+  validatePartialAddress,
 } from './functions';
+import { amountInputValidation } from '../../lib/validations/amountInputValidations';
 
 export type TransferWidgetInputs = TransferWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
@@ -235,7 +236,7 @@ function FirstScreen({
               textInputTextAlign="right"
               coinSelectorHeading="Select a token"
               textInputMaxButtonClick={token ? handleMaxButtonClick : undefined}
-              textInputValidator={validate}
+              textInputValidator={amountInputValidation}
               selectSubtext={selectSubtext}
               textInputSubtext={`${t(
                 'views.SWAP.content.fiatPricePrefix',
@@ -257,7 +258,7 @@ function FirstScreen({
               testId="transfer-to-address-input"
               value={recipientAddress}
               placeholder="0x"
-              validator={validate}
+              validator={validatePartialAddress}
               onTextInputChange={setRecipientAddress}
             />
           </Box>

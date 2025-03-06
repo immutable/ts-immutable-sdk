@@ -9,7 +9,10 @@ import { CryptoFiatState } from '../../context/crypto-fiat-context/CryptoFiatCon
 import { formatZeroAmount, calculateCryptoToFiat } from '../../lib/utils';
 import { getAllowedBalances } from '../../lib/balance';
 
-export const validate = () => true;
+export const validatePartialAddress = (value: string) => {
+  const regex = /^(0(x[0-9a-fA-F]{0,40})?)?$/;
+  return regex.test(value);
+};
 
 export const getOptionKey = (token: TokenInfo) => token.address ?? 'native';
 
