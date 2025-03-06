@@ -1,8 +1,8 @@
+/* eslint-disable max-len */
 import {
   Checkout,
   IMTBLWidgetEvents,
   TransferWidgetParams,
-  WidgetTheme,
   WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import {
@@ -15,10 +15,19 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Box, Button, Heading, OptionKey, Stack,
+  Body,
+  Box,
+  Button,
+  CloudImage,
+  Heading,
+  Link,
+  OptionKey,
+  Stack,
+  useTheme,
 } from '@biom3/react';
 
 import { isError, TransactionReceipt } from 'ethers';
+import { useRive } from '@rive-app/react-canvas-lite';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
   initialViewState,
@@ -51,6 +60,8 @@ import {
   calculateCryptoToFiat,
   formatZeroAmount,
   getDefaultTokenImage,
+  getRemoteImage,
+  getRemoteRive,
   tokenValueFormat,
 } from '../../lib/utils';
 import { TextInputForm } from '../../components/FormComponents/TextInputForm/TextInputForm';
@@ -71,15 +82,75 @@ export type TransferWidgetInputs = TransferWidgetParams & {
 
 const TRANSACTION_CANCELLED_ERROR_CODE = -32003;
 
+function SendingTokens({ config }: { config: StrongCheckoutWidgetsConfig }) {
+  const { RiveComponent } = useRive({
+    src: getRemoteRive(config.environment, '/swapping_coins.riv'),
+    stateMachines: 'State',
+    autoplay: true,
+    // layout: new Layout({ fit: Fit.Fill }),
+  });
+
+  return (
+    <SimpleLayout containerSx={{ bg: 'transparent' }}>
+      <Stack
+        justifyContent="space-between"
+        sx={{
+          height: '100%', mb: 'base.spacing.x10', textAlign: 'center',
+        }}
+      >
+        <Box>
+          <Box sx={{ height: '240px' }} rc={<RiveComponent />} />
+          <Heading sx={{ mb: 'base.spacing.x4', mx: 'base.spacing.x4' }}>
+            Sending Tokens
+          </Heading>
+        </Box>
+      </Stack>
+    </SimpleLayout>
+  );
+}
+
+function TransferComplete({ config, onContinue, txHash }: { config: StrongCheckoutWidgetsConfig, onContinue: () => void, txHash: string }) {
+  const { RiveComponent } = useRive({
+    src: getRemoteRive(config.environment, '/swapping_coins.riv'),
+    stateMachines: 'State',
+    autoplay: true,
+    // layout: new Layout({ fit: Fit.Fill }),
+  });
+
+  return (
+    <SimpleLayout containerSx={{ bg: 'transparent' }}>
+      <Stack
+        justifyContent="space-between"
+        sx={{
+          height: '100%', mb: 'base.spacing.x10', textAlign: 'center',
+        }}
+      >
+        <Box>
+          <Box sx={{ height: '240px' }} rc={<RiveComponent />} />
+          <Heading sx={{ mb: 'base.spacing.x4', mx: 'base.spacing.x4' }}>
+            Tokens Sent Successfully
+          </Heading>
+          <Link rc={<a target="_blank" href={`https://explorer.testnet.immutable.com/tx/${txHash}`} rel="noreferrer" />}>
+            <Body size="medium">
+              See transaction on Immutable zkEVM
+            </Body>
+          </Link>
+        </Box>
+        <Button onClick={onContinue} size="large">Continue</Button>
+      </Stack>
+    </SimpleLayout>
+  );
+}
+
 function TransferForm({
-  theme,
+  config,
   checkout,
   provider,
   initialAmount = '',
   initialTokenAddress = '',
   initialToAddress = '',
 }: {
-  theme: WidgetTheme;
+  config: StrongCheckoutWidgetsConfig;
   checkout: Checkout;
   provider: WrappedBrowserProvider;
   initialAmount?: string;
@@ -88,7 +159,9 @@ function TransferForm({
 }) {
   const { t } = useTranslation();
   const { track } = useAnalytics();
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
   const { transferState } = useTransferContext();
   const { cryptoFiatState } = useContext(CryptoFiatContext);
 
@@ -121,8 +194,8 @@ function TransferForm({
   >({ isTransferring: false });
 
   const defaultTokenImage = useMemo(
-    () => getDefaultTokenImage(checkout.config.environment, theme),
-    [checkout.config.environment, theme],
+    () => getDefaultTokenImage(checkout.config.environment, config.theme),
+    [checkout.config.environment, config.theme],
   );
 
   const fromFiatValue = useMemo(
@@ -181,6 +254,13 @@ function TransferForm({
     [amount, recipientAddress, token],
   );
 
+  const resetForm = useCallback(() => {
+    setLocalTransferState({ isTransferring: false });
+    setToken(undefined);
+    setAmount('');
+    setRecipientAddress('');
+  }, []);
+
   const sendTokensCb = useCallback(async () => {
     if (!token) throw new Error('Token not found');
 
@@ -232,11 +312,11 @@ function TransferForm({
   }, [transferState.tokenBalances, amount, recipientAddress, token, provider]);
 
   if (localTransferState.isTransferring) {
-    return <Heading>Transferring...</Heading>;
+    return <SendingTokens config={config} />;
   }
 
   if (localTransferState.receipt) {
-    return <Heading>Transfer complete</Heading>;
+    return <TransferComplete config={config} onContinue={resetForm} txHash={localTransferState.receipt.hash} />;
   }
 
   return (
@@ -325,6 +405,9 @@ export default function TransferWidget({
   config,
 }: TransferWidgetInputs) {
   const { t } = useTranslation();
+  const {
+    base: { colorMode },
+  } = useTheme();
   const [viewState, viewDispatch] = useReducer(viewReducer, {
     ...initialViewState,
     history: [],
@@ -373,16 +456,36 @@ export default function TransferWidget({
       )}
       <TransferContextProvider value={{ transferState, transferDispatch }}>
         <CryptoFiatProvider environment={config.environment}>
-          {viewState.view.type === TransferWidgetViews.TRANSFER && (
-            <TransferForm
-              theme={config.theme}
-              checkout={checkout!}
-              provider={provider!}
-              initialAmount={amount}
-              initialTokenAddress={tokenAddress}
-              initialToAddress={toAddress}
+          <Stack sx={{ pos: 'relative' }}>
+            <CloudImage
+              use={(
+                <img
+                  src={getRemoteImage(
+                    config.environment,
+                    `/add-tokens-bg-texture-${colorMode}.webp`,
+                  )}
+                  alt="blurry bg texture"
+                />
+              )}
+              sx={{
+                pos: 'absolute',
+                h: '100%',
+                w: '100%',
+                objectFit: 'cover',
+                objectPosition: 'center',
+              }}
             />
-          )}
+            {viewState.view.type === TransferWidgetViews.TRANSFER && (
+              <TransferForm
+                config={config}
+                checkout={checkout!}
+                provider={provider!}
+                initialAmount={amount}
+                initialTokenAddress={tokenAddress}
+                initialToAddress={toAddress}
+              />
+            )}
+          </Stack>
         </CryptoFiatProvider>
       </TransferContextProvider>
     </ViewContext.Provider>

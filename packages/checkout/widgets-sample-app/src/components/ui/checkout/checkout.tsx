@@ -214,9 +214,9 @@ function CheckoutUI() {
     },
     TRANSFER: {
       flow: CommerceFlowType.TRANSFER,
-      amount: "1",
-      tokenAddress: "native",
-      toAddress: "0x0000000000000000000000000000000000000000",
+      // amount: "1",
+      // tokenAddress: "native",
+      // toAddress: "0x0000000000000000000000000000000000000000",
     },
   });
 
