@@ -95,7 +95,9 @@ function SendingTokens({ config }: { config: StrongCheckoutWidgetsConfig }) {
       <Stack
         justifyContent="space-between"
         sx={{
-          height: '100%', mb: 'base.spacing.x10', textAlign: 'center',
+          height: '100%',
+          mb: 'base.spacing.x10',
+          textAlign: 'center',
         }}
       >
         <Box>
@@ -109,7 +111,15 @@ function SendingTokens({ config }: { config: StrongCheckoutWidgetsConfig }) {
   );
 }
 
-function TransferComplete({ config, onContinue, txHash }: { config: StrongCheckoutWidgetsConfig, onContinue: () => void, txHash: string }) {
+function TransferComplete({
+  config,
+  onContinue,
+  txHash,
+}: {
+  config: StrongCheckoutWidgetsConfig;
+  onContinue: () => void;
+  txHash: string;
+}) {
   const { RiveComponent } = useRive({
     src: getRemoteRive(config.environment, '/swapping_coins.riv'),
     stateMachines: 'State',
@@ -122,7 +132,9 @@ function TransferComplete({ config, onContinue, txHash }: { config: StrongChecko
       <Stack
         justifyContent="space-between"
         sx={{
-          height: '100%', mb: 'base.spacing.x10', textAlign: 'center',
+          height: '100%',
+          mb: 'base.spacing.x10',
+          textAlign: 'center',
         }}
       >
         <Box>
@@ -130,13 +142,21 @@ function TransferComplete({ config, onContinue, txHash }: { config: StrongChecko
           <Heading sx={{ mb: 'base.spacing.x4', mx: 'base.spacing.x4' }}>
             Tokens Sent Successfully
           </Heading>
-          <Link rc={<a target="_blank" href={`https://explorer.testnet.immutable.com/tx/${txHash}`} rel="noreferrer" />}>
-            <Body size="medium">
-              See transaction on Immutable zkEVM
-            </Body>
+          <Link
+            rc={(
+              <a
+                target="_blank"
+                href={`https://explorer.testnet.immutable.com/tx/${txHash}`}
+                rel="noreferrer"
+              />
+            )}
+          >
+            <Body size="medium">See transaction on Immutable zkEVM</Body>
           </Link>
         </Box>
-        <Button onClick={onContinue} size="large">Continue</Button>
+        <Button onClick={onContinue} size="large">
+          Continue
+        </Button>
       </Stack>
     </SimpleLayout>
   );
@@ -316,7 +336,13 @@ function TransferForm({
   }
 
   if (localTransferState.receipt) {
-    return <TransferComplete config={config} onContinue={resetForm} txHash={localTransferState.receipt.hash} />;
+    return (
+      <TransferComplete
+        config={config}
+        onContinue={resetForm}
+        txHash={localTransferState.receipt.hash}
+      />
+    );
   }
 
   return (
@@ -385,14 +411,26 @@ function TransferForm({
             />
           </Box>
         </Stack>
-        <Button
-          variant="primary"
-          size="large"
-          disabled={isButtonDisabled}
-          onClick={sendTokensCb}
-        >
-          Send
-        </Button>
+        <Box>
+          <Body rc={<div />} size="xSmall" weight="bold" sx={{ color: 'base.color.text.status.fatal.primary' }}>
+            Not all Exchanges Support Immutable zkEVM!
+          </Body>
+          <Body rc={<div />} size="xxSmall" weight="regular" sx={{ mb: 'base.spacing.x4' }}>
+            You can only send tokens within the Immutable zkEVM network. Some
+            exchanges do not support Immutable zkEVM, so ensure your destination
+            is compatible before sending, as retrieving funds can be difficult
+            to impossible.
+          </Body>
+          <Button
+            sx={{ width: '100%' }}
+            variant="primary"
+            size="large"
+            disabled={isButtonDisabled}
+            onClick={sendTokensCb}
+          >
+            Send
+          </Button>
+        </Box>
       </Stack>
     </SimpleLayout>
   );
