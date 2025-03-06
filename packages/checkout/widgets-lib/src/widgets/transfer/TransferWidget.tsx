@@ -26,7 +26,9 @@ import {
   useTheme,
 } from '@biom3/react';
 
-import { isError, TransactionReceipt } from 'ethers';
+import {
+  isAddress, isError, parseUnits, TransactionReceipt,
+} from 'ethers';
 import { useRive } from '@rive-app/react-canvas-lite';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
@@ -207,6 +209,8 @@ function TransferForm({
 
   const [amount, setAmount] = useState<string>(initialAmount);
   const [recipientAddress, setRecipientAddress] = useState<string>(initialToAddress);
+  const [recipientAddressError, setRecipientAddressError] = useState<string>('');
+  const [amountError, setAmountError] = useState<string>('');
 
   const [localTransferState, setLocalTransferState] = useState<
   | { isTransferring: false; receipt?: TransactionReceipt }
@@ -228,7 +232,7 @@ function TransferForm({
     [amount, token, cryptoFiatState.conversions],
   );
 
-  const handleSelectChange = useCallback(
+  const handleTokenChange = useCallback(
     (optionKey: OptionKey) => {
       track({
         screen: 'TransferToken',
@@ -240,6 +244,7 @@ function TransferForm({
       const result = tokenOptions.find((option) => option.id === optionKey);
       if (!result) throw new Error('Token not found');
       setToken(result);
+      setAmountError('');
     },
     [tokenOptions, token],
   );
@@ -262,6 +267,16 @@ function TransferForm({
     setAmount(result.balance.formattedAmount);
   }, [tokenOptions, token]);
 
+  const handleRecipientAddressChange = useCallback((value: string) => {
+    setRecipientAddress(value);
+    setRecipientAddressError('');
+  }, []);
+
+  const handleAmountChange = useCallback((value: string) => {
+    setAmount(value);
+    setAmountError('');
+  }, []);
+
   const selectSubtext = useMemo(() => {
     if (!token) return '';
     return `${t('views.SWAP.content.availableBalancePrefix')} ${
@@ -278,7 +293,9 @@ function TransferForm({
     setLocalTransferState({ isTransferring: false });
     setToken(undefined);
     setAmount('');
+    setAmountError('');
     setRecipientAddress('');
+    setRecipientAddressError('');
   }, []);
 
   const sendTokensCb = useCallback(async () => {
@@ -289,13 +306,23 @@ function TransferForm({
       userJourney: UserJourney.TRANSFER,
       control: 'Send',
       controlType: 'Button',
-      extras: { token: token.id, amount, recipientAddress },
+      extras: { token: token.id, amount },
     });
+
+    if (!isAddress(recipientAddress)) {
+      setRecipientAddressError('Invalid wallet address');
+      return;
+    }
 
     const tokenInfo = transferState.tokenBalances.find(
       (tb) => tb.token.address === token.id,
     );
     if (!tokenInfo) throw new Error('Token not found');
+
+    if (tokenInfo.balance < parseUnits(amount, tokenInfo.token.decimals)) {
+      setAmountError('Insufficient balance');
+      return;
+    }
 
     setLocalTransferState({ isTransferring: true });
 
@@ -323,7 +350,7 @@ function TransferForm({
           userJourney: UserJourney.TRANSFER,
           control: 'TranactionCancel',
           controlType: 'Event',
-          extras: { token: token.id, amount, recipientAddress },
+          extras: { token: token.id, amount },
         });
       } else {
         console.error(e); // TODO: where can we send these?
@@ -372,10 +399,8 @@ function TransferForm({
         }}
       >
         <Stack gap="base.spacing.x9">
-          <Box>
-            <Heading sx={{ my: 'base.spacing.x1' }} size="xSmall">
-              Send
-            </Heading>
+          <Stack gap="base.spacing.x1">
+            <Heading size="xSmall">Send</Heading>
             <SelectInput
               testId="transfer-token-select"
               options={tokenOptions}
@@ -385,37 +410,47 @@ function TransferForm({
               coinSelectorHeading="Select a token"
               textInputMaxButtonClick={token ? handleMaxButtonClick : undefined}
               textInputValidator={amountInputValidation}
+              textInputErrorMessage={amountError}
               selectSubtext={selectSubtext}
               textInputSubtext={`${t(
                 'views.SWAP.content.fiatPricePrefix',
               )} $${formatZeroAmount(fromFiatValue, true)}`}
-              onTextInputChange={setAmount}
-              onSelectChange={handleSelectChange}
+              onTextInputChange={handleAmountChange}
+              onSelectChange={handleTokenChange}
               selectedOption={token?.id}
               defaultTokenImage={defaultTokenImage}
               userJourney={UserJourney.TRANSFER}
               screen="TransferToken"
               control="Token"
             />
-          </Box>
-          <Box>
-            <Heading sx={{ my: 'base.spacing.x1' }} size="xSmall">
-              To Address
-            </Heading>
+          </Stack>
+          <Stack gap="base.spacing.x1">
+            <Heading size="xSmall">To Address</Heading>
             <TextInputForm
               testId="transfer-to-address-input"
               value={recipientAddress}
               placeholder="0x"
               validator={validatePartialAddress}
-              onTextInputChange={setRecipientAddress}
+              onTextInputChange={handleRecipientAddressChange}
+              errorMessage={recipientAddressError}
             />
-          </Box>
+          </Stack>
         </Stack>
         <Box>
-          <Body rc={<div />} size="xSmall" weight="bold" sx={{ color: 'base.color.text.status.fatal.primary' }}>
+          <Body
+            rc={<div />}
+            size="xSmall"
+            weight="bold"
+            sx={{ color: 'base.color.text.status.fatal.primary' }}
+          >
             Not all Exchanges Support Immutable zkEVM!
           </Body>
-          <Body rc={<div />} size="xxSmall" weight="regular" sx={{ mb: 'base.spacing.x4' }}>
+          <Body
+            rc={<div />}
+            size="xxSmall"
+            weight="regular"
+            sx={{ mb: 'base.spacing.x4' }}
+          >
             You can only send tokens within the Immutable zkEVM network. Some
             exchanges do not support Immutable zkEVM, so ensure your destination
             is compatible before sending, as retrieving funds can be difficult
