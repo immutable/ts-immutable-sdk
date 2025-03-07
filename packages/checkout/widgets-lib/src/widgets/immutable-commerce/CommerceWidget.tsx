@@ -205,8 +205,6 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
    */
   const showBackButton = !!view.data?.showBackButton;
 
-  console.log({ vt: view.type, shouldWrapWithConnectLoader });
-
   return (
     <ViewContextProvider>
       <CommerceContext.Provider value={commerceReducerValues}>
