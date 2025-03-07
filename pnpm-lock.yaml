@@ -1819,8 +1819,8 @@ importers:
         specifier: workspace:*
         version: link:../../x-client
       '@magic-ext/oidc':
-        specifier: 4.3.1
-        version: 4.3.1
+        specifier: 12.0.0
+        version: 12.0.0
       '@metamask/detect-provider':
         specifier: ^2.0.0
         version: 2.0.0
@@ -1837,8 +1837,8 @@ importers:
         specifier: ^6.13.4
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       magic-sdk:
-        specifier: ^21.2.0
-        version: 21.2.0
+        specifier: ^29.0.0
+        version: 29.0.0
       oidc-client-ts:
         specifier: 2.4.0
         version: 2.4.0
@@ -2048,8 +2048,8 @@ importers:
         specifier: workspace:*
         version: link:../../x-provider
       '@magic-ext/oidc':
-        specifier: 4.3.1
-        version: 4.3.1
+        specifier: 12.0.0
+        version: 12.0.0
       '@magic-sdk/provider':
         specifier: 29.0.1-canary.860.13689524404.0
         version: 29.0.1-canary.860.13689524404.0(localforage@1.10.0)
@@ -2355,8 +2355,8 @@ importers:
         specifier: workspace:*
         version: link:../x-client
       '@magic-ext/oidc':
-        specifier: 4.3.1
-        version: 4.3.1
+        specifier: 12.0.0
+        version: 12.0.0
       '@metamask/detect-provider':
         specifier: ^2.0.0
         version: 2.0.0
@@ -2370,8 +2370,8 @@ importers:
         specifier: ^6.13.4
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       magic-sdk:
-        specifier: ^21.2.0
-        version: 21.2.0
+        specifier: ^29.0.0
+        version: 29.0.0
       oidc-client-ts:
         specifier: 2.4.0
         version: 2.4.0
@@ -4716,11 +4716,11 @@ packages:
     resolution: {integrity: sha512-qC72D4+CDdjGqJvkFMMEAtancHUQ7/d/tAiHf64z8MopFDmcrtbcJuerDtFceuAfQJ2pDSfCKCtbqoGBNnwg0w==}
     engines: {node: '>=8'}
 
-  '@magic-ext/oidc@4.3.1':
-    resolution: {integrity: sha512-HjriTgPxECC37z4UPbomuL0sFd5Fe0aC8BEDSShD5Ltbi0oMjamEW7avYdZi14S5F4UHfcol0M3xTc+0FTNwrw==}
+  '@magic-ext/oidc@12.0.0':
+    resolution: {integrity: sha512-IeycCoW8BUqcdJoggynq63bj8XyRxZfiX5cBdxq7LEr4gWWpTz1zexEkWrJoP76XDr6Yn/wYQXiL4/AvJ6wcjw==}
 
-  '@magic-sdk/commons@17.2.0':
-    resolution: {integrity: sha512-+NkPL9r1twzgaPp94+ykF0T3pU2GHVCJup4YjdOiGWMngqqJ50aLKi0dgaNjV77VA9svxWI5NnKgaiwWkNSUyQ==}
+  '@magic-sdk/commons@25.0.0':
+    resolution: {integrity: sha512-EYrbFGw/4R899IccGgkmVp/ia50ELNK7H1uDfM66Nh+YnH05LsLWlfrtFbbKxBazquVnu89bAHmJcFPsmSnHQQ==}
     peerDependencies:
       '@magic-sdk/provider': '>=18.6.0'
       '@magic-sdk/types': '>=15.8.0'
@@ -12793,8 +12793,8 @@ packages:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
     hasBin: true
 
-  magic-sdk@21.2.0:
-    resolution: {integrity: sha512-Sb9aj7CZAjJpUHMFGLGxq+0lAo+NydpQ68/8ZRUILzswKdg0Q0B/slo3F9WH2F1zakaIdjsUusCekg1LqiNALg==}
+  magic-sdk@29.0.0:
+    resolution: {integrity: sha512-8awpk21HJizU3XftRJNkV7f68ckOKJ2j4jCtagIemHA9Q4vd1QKgt5xZWDak/djXpWch2xOvNiSDtMCZDwEAhw==}
 
   magic-sdk@29.0.1-canary.860.13689524404.0:
     resolution: {integrity: sha512-oP8qVy+DqoaEWsdfYVJWFC890oApmlkZ4RqjtT6iMsK8YR6BR1BKmZOO5o7oD1t35n7TjC/V8yDH7uwjlkb6rw==}
@@ -20405,12 +20405,12 @@ snapshots:
     dependencies:
       '@lukeed/csprng': 1.1.0
 
-  '@magic-ext/oidc@4.3.1': {}
+  '@magic-ext/oidc@12.0.0': {}
 
-  '@magic-sdk/commons@17.2.0(@magic-sdk/provider@21.2.0(localforage@1.10.0))(@magic-sdk/types@17.2.0)':
+  '@magic-sdk/commons@25.0.0(@magic-sdk/provider@29.0.0(localforage@1.10.0))(@magic-sdk/types@24.18.0)':
     dependencies:
-      '@magic-sdk/provider': 21.2.0(localforage@1.10.0)
-      '@magic-sdk/types': 17.2.0
+      '@magic-sdk/provider': 29.0.0(localforage@1.10.0)
+      '@magic-sdk/types': 24.18.0
 
   '@magic-sdk/commons@25.0.1-canary.860.13689524404.0(@magic-sdk/provider@29.0.1-canary.860.13689524404.0(localforage@1.10.0))(@magic-sdk/types@24.18.0)':
     dependencies:
@@ -20419,7 +20419,7 @@ snapshots:
 
   '@magic-sdk/provider@21.2.0(localforage@1.10.0)':
     dependencies:
-      '@magic-sdk/types': 17.2.0
+      '@magic-sdk/types': 24.18.0
       eventemitter3: 4.0.7
       localforage: 1.10.0
       web3-core: 1.5.2
@@ -21869,7 +21869,7 @@ snapshots:
       is-glob: 4.0.3
       open: 9.1.0
       picocolors: 1.1.1
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@playwright/test@1.45.3':
     dependencies:
@@ -25765,7 +25765,7 @@ snapshots:
   camel-case@4.1.2:
     dependencies:
       pascal-case: 3.1.2
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   camelcase-css@2.0.1: {}
 
@@ -26941,7 +26941,7 @@ snapshots:
   dot-case@3.0.4:
     dependencies:
       no-case: 3.0.4
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   dotenv-expand@11.0.6:
     dependencies:
@@ -31980,11 +31980,11 @@ snapshots:
 
   lz-string@1.5.0: {}
 
-  magic-sdk@21.2.0:
+  magic-sdk@29.0.0:
     dependencies:
-      '@magic-sdk/commons': 17.2.0(@magic-sdk/provider@21.2.0(localforage@1.10.0))(@magic-sdk/types@17.2.0)
-      '@magic-sdk/provider': 21.2.0(localforage@1.10.0)
-      '@magic-sdk/types': 17.2.0
+      '@magic-sdk/commons': 25.0.0(@magic-sdk/provider@29.0.0(localforage@1.10.0))(@magic-sdk/types@24.18.0)
+      '@magic-sdk/provider': 29.0.0(localforage@1.10.0)
+      '@magic-sdk/types': 24.18.0
       localforage: 1.10.0
     transitivePeerDependencies:
       - supports-color
@@ -33201,7 +33201,7 @@ snapshots:
   param-case@3.0.4:
     dependencies:
       dot-case: 3.0.4
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   parcel@2.9.3(@swc/helpers@0.5.13)(postcss@8.4.49)(relateurl@0.2.7)(srcset@4.0.0)(terser@5.34.1)(typescript@5.6.2):
     dependencies:
