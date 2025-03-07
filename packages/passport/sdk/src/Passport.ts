@@ -151,6 +151,8 @@ export class Passport {
     return withMetricsAsync(() => this.passportImxProviderFactory.getProvider(), 'connectImx', false);
   }
 
+  private zkEvmProvider: ZkEvmProvider;
+
   /**
    * Connects to EVM and optionally announces the provider.
    * @param {Object} options - Configuration options
@@ -163,7 +165,8 @@ export class Passport {
     announceProvider: true,
   }): Promise<Provider> {
     return withMetricsAsync(async () => {
-      const provider = new ZkEvmProvider({
+      if (this.zkEvmProvider) return this.zkEvmProvider;
+      this.zkEvmProvider = new ZkEvmProvider({
         passportEventEmitter: this.passportEventEmitter,
         authManager: this.authManager,
         magicAdapter: this.magicAdapter,
