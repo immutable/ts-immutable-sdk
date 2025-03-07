@@ -50,7 +50,6 @@ export default defineConfig((options) => {
       target: 'es2022',
       globalName: 'immutable',
       bundle: true,
-      minify: true,
       splitting: false,
       skipNodeModulesBundle: false,
       noExternal: [/.*/],
@@ -60,7 +59,7 @@ export default defineConfig((options) => {
             Buffer: true,
             process: true,
           },
-          modules: ['crypto', 'buffer', 'process', 'path', 'fs']
+          modules: ['crypto', 'buffer', 'process']
         }),
         replace({ 
           '__SDK_VERSION__': pkg.version, 
