@@ -1,5 +1,7 @@
 /* eslint-disable max-len */
 import {
+  BlockExplorerService,
+  ChainId,
   Checkout,
   IMTBLWidgetEvents,
   TransferWidgetParams,
@@ -77,6 +79,7 @@ import {
   validatePartialAddress,
 } from './functions';
 import { amountInputValidation } from '../../lib/validations/amountInputValidations';
+import { getL2ChainId } from '../../lib';
 
 export type TransferWidgetInputs = TransferWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
@@ -115,10 +118,12 @@ function SendingTokens({ config }: { config: StrongCheckoutWidgetsConfig }) {
 
 function TransferComplete({
   config,
+  chainId,
   onContinue,
   txHash,
 }: {
   config: StrongCheckoutWidgetsConfig;
+  chainId: ChainId;
   onContinue: () => void;
   txHash: string;
 }) {
@@ -128,6 +133,8 @@ function TransferComplete({
     stateMachines: 'State',
     autoplay: true,
   });
+
+  const explorerLink = useMemo(() => BlockExplorerService.getTransactionLink(chainId, txHash), [chainId, txHash]);
 
   return (
     <SimpleLayout containerSx={{ bg: 'transparent' }}>
@@ -148,7 +155,7 @@ function TransferComplete({
             rc={(
               <a
                 target="_blank"
-                href={`https://explorer.testnet.immutable.com/tx/${txHash}`}
+                href={explorerLink}
                 rel="noreferrer"
               />
             )}
@@ -218,6 +225,8 @@ function TransferForm({
   | { isTransferring: false; receipt?: TransactionReceipt }
   | { isTransferring: true }
   >({ isTransferring: false });
+
+  const chainId = useMemo(() => getL2ChainId(checkout.config), [checkout.config]);
 
   const defaultTokenImage = useMemo(
     () => getDefaultTokenImage(checkout.config.environment, config.theme),
@@ -368,6 +377,7 @@ function TransferForm({
     return (
       <TransferComplete
         config={config}
+        chainId={chainId}
         onContinue={resetForm}
         txHash={localTransferState.receipt.hash}
       />
