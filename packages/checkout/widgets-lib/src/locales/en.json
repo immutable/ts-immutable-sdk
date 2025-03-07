@@ -145,7 +145,9 @@
         "notAllExchangesSupportImmutableZkEVMDescription": "You can only send tokens within the Immutable zkEVM network. Some exchanges do not support Immutable zkEVM, so ensure your destination is compatible before sending, as retrieving funds can be difficult to impossible.",
         "tokensSentSuccessfully": "Tokens Sent Successfully",
         "seeTransactionOnImmutableZkEVM": "See transaction on Immutable zkEVM",
-        "sendingTokens": "Sending Tokens"
+        "sendingTokens": "Sending Tokens",
+        "waitingForYouToApproveTxn": "Waiting for you to Approve Transaction",
+        "waitingForYouToApproveTxnDescription": "Approve the transaction request to complete this transaction"
       },
       "form": {
         "buttonText": "Send",

@@ -1,7 +1,5 @@
 /* eslint-disable max-len */
 import {
-  BlockExplorerService,
-  ChainId,
   Checkout,
   IMTBLWidgetEvents,
   TransferWidgetParams,
@@ -22,7 +20,6 @@ import {
   Button,
   CloudImage,
   Heading,
-  Link,
   OptionKey,
   Stack,
   useTheme,
@@ -31,7 +28,6 @@ import {
 import {
   isAddress, isError, parseUnits, TransactionReceipt,
 } from 'ethers';
-import { useRive } from '@rive-app/react-canvas-lite';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
   initialViewState,
@@ -65,7 +61,6 @@ import {
   formatZeroAmount,
   getDefaultTokenImage,
   getRemoteImage,
-  getRemoteRive,
   tokenValueFormat,
 } from '../../lib/utils';
 import { TextInputForm } from '../../components/FormComponents/TextInputForm/TextInputForm';
@@ -80,98 +75,15 @@ import {
 } from './functions';
 import { amountInputValidation } from '../../lib/validations/amountInputValidations';
 import { getL2ChainId } from '../../lib';
+import { TransferComplete } from './TransferComplete';
+import { SendingTokens } from './SendingTokens';
+import { AwaitingApproval } from './AwaitingApproval';
 
 export type TransferWidgetInputs = TransferWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
 };
 
 const TRANSACTION_CANCELLED_ERROR_CODE = -32003;
-
-function SendingTokens({ config }: { config: StrongCheckoutWidgetsConfig }) {
-  const { t } = useTranslation();
-  const { RiveComponent } = useRive({
-    src: getRemoteRive(config.environment, '/swapping_coins.riv'),
-    stateMachines: 'State',
-    autoplay: true,
-  });
-
-  return (
-    <SimpleLayout containerSx={{ bg: 'transparent' }}>
-      <Stack
-        justifyContent="space-between"
-        sx={{
-          height: '100%',
-          mb: 'base.spacing.x10',
-          textAlign: 'center',
-        }}
-      >
-        <Box>
-          <Box sx={{ height: '240px' }} rc={<RiveComponent />} />
-          <Heading sx={{ mb: 'base.spacing.x4', mx: 'base.spacing.x4' }}>
-            {t('views.TRANSFER.content.sendingTokens')}
-          </Heading>
-        </Box>
-      </Stack>
-    </SimpleLayout>
-  );
-}
-
-function TransferComplete({
-  config,
-  chainId,
-  onContinue,
-  txHash,
-}: {
-  config: StrongCheckoutWidgetsConfig;
-  chainId: ChainId;
-  onContinue: () => void;
-  txHash: string;
-}) {
-  const { t } = useTranslation();
-  const { RiveComponent } = useRive({
-    src: getRemoteRive(config.environment, '/swapping_coins.riv'),
-    stateMachines: 'State',
-    autoplay: true,
-  });
-
-  const explorerLink = useMemo(() => BlockExplorerService.getTransactionLink(chainId, txHash), [chainId, txHash]);
-
-  return (
-    <SimpleLayout containerSx={{ bg: 'transparent' }}>
-      <Stack
-        justifyContent="space-between"
-        sx={{
-          height: '100%',
-          mb: 'base.spacing.x10',
-          textAlign: 'center',
-        }}
-      >
-        <Box>
-          <Box sx={{ height: '240px' }} rc={<RiveComponent />} />
-          <Heading sx={{ mb: 'base.spacing.x4', mx: 'base.spacing.x4' }}>
-            {t('views.TRANSFER.content.tokensSentSuccessfully')}
-          </Heading>
-          <Link
-            rc={(
-              <a
-                target="_blank"
-                href={explorerLink}
-                rel="noreferrer"
-              />
-            )}
-          >
-            <Body size="medium">{t('views.TRANSFER.content.seeTransactionOnImmutableZkEVM')}</Body>
-          </Link>
-        </Box>
-        <Box sx={{ mx: 'base.spacing.x4' }}>
-          <Button sx={{ width: '100%' }} onClick={onContinue} size="large">
-            {t('views.TRANSFER.form.continueButtonText')}
-          </Button>
-        </Box>
-      </Stack>
-    </SimpleLayout>
-  );
-}
 
 function TransferForm({
   config,
@@ -222,9 +134,11 @@ function TransferForm({
   const [amountError, setAmountError] = useState<string>('');
 
   const [localTransferState, setLocalTransferState] = useState<
-  | { isTransferring: false; receipt?: TransactionReceipt }
-  | { isTransferring: true }
-  >({ isTransferring: false });
+  | { state: 'FORM' }
+  | { state: 'AWAITING_APPROVAL' }
+  | { state: 'TRANSFERRING' }
+  | { state: 'COMPLETE', receipt: TransactionReceipt }
+  >({ state: 'FORM' });
 
   const chainId = useMemo(() => getL2ChainId(checkout.config), [checkout.config]);
 
@@ -301,7 +215,7 @@ function TransferForm({
   );
 
   const resetForm = useCallback(() => {
-    setLocalTransferState({ isTransferring: false });
+    setLocalTransferState({ state: 'FORM' });
     setToken(undefined);
     setAmount('');
     setAmountError('');
@@ -335,7 +249,7 @@ function TransferForm({
       return;
     }
 
-    setLocalTransferState({ isTransferring: true });
+    setLocalTransferState({ state: 'AWAITING_APPROVAL' });
 
     try {
       const txResponse = await sendTokens(
@@ -344,12 +258,15 @@ function TransferForm({
         recipientAddress,
         amount,
       );
+
+      setLocalTransferState({ state: 'TRANSFERRING' });
+
       const receipt = await txResponse.wait();
       if (!receipt) throw new Error('Transaction failed');
 
-      setLocalTransferState({ isTransferring: false, receipt });
+      setLocalTransferState({ state: 'COMPLETE', receipt });
     } catch (e) {
-      setLocalTransferState({ isTransferring: false });
+      setLocalTransferState({ state: 'FORM' });
       if (
         isError(e, 'UNKNOWN_ERROR')
         && e.error
@@ -370,11 +287,15 @@ function TransferForm({
     }
   }, [transferState.tokenBalances, amount, recipientAddress, token, provider]);
 
-  if (localTransferState.isTransferring) {
+  if (localTransferState.state === 'AWAITING_APPROVAL') {
+    return <AwaitingApproval config={config} />;
+  }
+
+  if (localTransferState.state === 'TRANSFERRING') {
     return <SendingTokens config={config} />;
   }
 
-  if (localTransferState.receipt) {
+  if (localTransferState.state === 'COMPLETE') {
     return (
       <TransferComplete
         config={config}
