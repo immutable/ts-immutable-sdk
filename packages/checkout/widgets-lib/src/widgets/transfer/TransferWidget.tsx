@@ -364,6 +364,7 @@ function TransferForm({
           extras: { token: token.id, amount },
         });
       } else {
+        // eslint-disable-next-line no-console
         console.error(e); // TODO: where can we send these?
       }
     }

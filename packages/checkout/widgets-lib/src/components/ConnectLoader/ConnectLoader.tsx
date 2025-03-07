@@ -241,8 +241,6 @@ export function ConnectLoader({
     })();
   }, [checkout, walletProviderName, browserProvider]);
 
-  console.log({ connectionStatus });
-
   return (
     <>
       {(connectionStatus === ConnectionStatus.LOADING) && (
