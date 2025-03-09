@@ -10,10 +10,33 @@ const PRODUCTION = 'production';
 
 const isProduction = process.env.NODE_ENV === PRODUCTION
 
+const defaultPlugins = [
+  json(),
+  replace({
+    preventAssignment: true,
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || PRODUCTION),
+  }),
+]
+
+const productionPlugins = [
+  commonjs(),
+]
+
+const getPlugins = () => {
+  if (process.env.NODE_ENV !== PRODUCTION) {
+    return defaultPlugins;
+  }
+
+  return [
+    ...defaultPlugins,
+    ...productionPlugins
+  ];
+}
+
 /**
- * @type {import('rollup').RollupOptions}
+ * @type {import('rollup').RollupOptions[]}
  */
-export default 
+export default [
   // browser bundle
   {
     input: 'src/index.ts',
@@ -21,26 +44,20 @@ export default
     output: {
       dir: 'dist/browser',
       format: 'es',
-      inlineDynamicImports: true,
+      inlineDynamicImports: !isProduction,
     },
     plugins: [
        isProduction ? typescript({customConditions: ["default"], declaration: false, outDir: 'dist/browser'}) 
          : swc.rollup({ jsc: { 
          transform: { react: { development: true, runtime: 'automatic' }},
        } }),
-      ...(isProduction ? [
-        resolve({
-          browser: true,
-          dedupe: ['react', 'react-dom'],
-          exportConditions: ['default', 'browser'],
-        })
-      ] : []),
-      nodePolyfills(),
-      json(),
-      replace({
-        preventAssignment: true,
-        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || PRODUCTION),
+      resolve({
+        browser: true,
+        dedupe: ['react', 'react-dom'],
+        exportConditions: ['default', 'browser'],
       }),
-      commonjs(),
+      nodePolyfills(),
+      ...getPlugins(),
     ],
-  }
+  },
+]
