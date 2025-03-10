@@ -15,24 +15,26 @@ then
   exit 1
 fi
 
+# Extract major version for folder paths
+MAJOR_VERSION=$(echo $VERSION | cut -d. -f1)
+
 (
   cd $CLONE_DIR;
   FILE=src/components/UnifiedSDKLink/index.tsx
   if [ "$(uname)" == "Darwin" ]; then
       # On Mac OS, sed requires an empty string as an argument to -i to avoid creating a backup file
-      sed -i '' -E "s/SDK_VERSION = '.*'/SDK_VERSION = '$VERSION'/g;" $FILE
+      sed -i '' -E "s/SDK_VERSION = '.*'/SDK_VERSION = 'v$MAJOR_VERSION'/g;" $FILE
   else
-      sed -i -E "s/SDK_VERSION = '.*'/SDK_VERSION = '$VERSION'/g;" $FILE
+      sed -i -E "s/SDK_VERSION = '.*'/SDK_VERSION = 'v$MAJOR_VERSION'/g;" $FILE
   fi
 
   FILE2=sidebars/sidebars-docs.js
   if [ "$(uname)" == "Darwin" ]; then
       # On Mac OS, sed requires an empty string as an argument to -i to avoid creating a backup file
-      sed -i '' -E "s/SDK_VERSION = '.*'/SDK_VERSION = '$VERSION'/g;" $FILE2
+      sed -i '' -E "s/SDK_VERSION = '.*'/SDK_VERSION = 'v$MAJOR_VERSION'/g;" $FILE2
   else
-      sed -i -E "s/SDK_VERSION = '.*'/SDK_VERSION = '$VERSION'/g;" $FILE2
+      sed -i -E "s/SDK_VERSION = '.*'/SDK_VERSION = 'v$MAJOR_VERSION'/g;" $FILE2
   fi
-
 
   major=$(echo $VERSION | awk '{ 
     split($0, a, ".");
