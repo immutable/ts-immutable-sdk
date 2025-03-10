@@ -21,7 +21,7 @@ export default
     output: {
       dir: 'dist/browser',
       format: 'es',
-      inlineDynamicImports: true,
+      inlineDynamicImports: !isProduction,
     },
     plugins: [
        isProduction ? typescript({customConditions: ["default"], declaration: false, outDir: 'dist/browser'}) 
