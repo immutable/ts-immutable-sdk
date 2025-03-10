@@ -8,7 +8,15 @@ const shouldCheckMagicSession = (args: any[]): boolean => (
   && typeof args[0] === 'object'
     && 'method' in args[0]
     && typeof args[0].method === 'string'
-    && ['personal_sign', 'eth_accounts'].includes(args[0].method)
+    && ['personal_sign', 'eth_accounts', 'eth_requestAccounts'].includes(args[0].method)
+);
+
+const isEthRequestAccountsCall = (args: any[]): boolean => (
+  args?.length > 0
+  && typeof args[0] === 'object'
+  && 'method' in args[0]
+  && typeof args[0].method === 'string'
+  && args[0].method === 'eth_requestAccounts'
 );
 
 /**
@@ -46,6 +54,12 @@ export class MagicProviderProxyFactory {
                     jwt: idToken,
                     providerId: this.config.magicProviderId,
                   });
+                }
+
+                if (isEthRequestAccountsCall(args)) {
+                  // @ts-ignore - Calling eth_requestAccounts on the Magic RPC provider displays an overlay, so this
+                  // should be avoided - call eth_accounts instead.
+                  return target.request!({ method: 'eth_accounts' });
                 }
               }
 

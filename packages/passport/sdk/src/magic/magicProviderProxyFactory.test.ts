@@ -107,5 +107,17 @@ describe('MagicProviderProxyFactory', () => {
 
       await expect(proxy.request!(params)).rejects.toThrow('ProviderProxy: Test error');
     });
+
+    it('should convert eth_requestAccounts to eth_accounts to avoid Magic overlay', async () => {
+      const proxy = factory.createProxy(mockMagicClient);
+      const params = { method: 'eth_requestAccounts' };
+      (mockMagicClient.user.isLoggedIn as jest.Mock).mockResolvedValue(true);
+
+      await proxy.request!(params);
+
+      expect(mockMagicClient.user.isLoggedIn).toHaveBeenCalled();
+      expect(mockRpcProvider.request).toHaveBeenCalledWith({ method: 'eth_accounts' });
+      expect(mockRpcProvider.request).not.toHaveBeenCalledWith(params);
+    });
   });
 });
