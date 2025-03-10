@@ -97,6 +97,12 @@ describe('Blockscout', () => {
       expect(resp.items[0].value).toEqual('3000000000000000000');
       expect(resp.items[0].token.address).toEqual('0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF');
 
+      if (!('holders' in resp.items[0].token)) {
+        throw new Error('Native token data found');
+      }
+
+      expect(resp.items[0].token.holders).toEqual('71451');
+
       expect(mockedHttpClient.get).toHaveBeenNthCalledWith(
         1,
         `${client.url}/api/v2/addresses/0x1234567890/tokens?type=${token}`,

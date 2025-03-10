@@ -16,7 +16,6 @@ import { CheckoutConfiguration } from '../config';
 import {
   Blockscout,
   BlockscoutToken,
-  BlockscoutTokenData,
   BlockscoutTokens,
   BlockscoutTokenType,
 } from '../api/blockscout';
@@ -106,7 +105,7 @@ export const getBlockscoutBalance = async (
   // Shuffle the mapping of the tokens configuration so it is a hashmap
   // for faster access to tokens config objects.
   const shouldFilter = filterTokens !== undefined;
-  const mapFilterTokens = Object.assign(
+  const mapFilterTokens: Record<string, TokenInfo> = Object.assign(
     {},
     ...((filterTokens ?? []).map((t) => ({ [t.address?.toLowerCase() || NATIVE]: t }))),
   );
@@ -187,18 +186,19 @@ export const getBlockscoutBalance = async (
 
   const balances: GetBalanceResult[] = [];
   items.forEach((item) => {
+    if (item.value == null) return;
+
     const allowlistedToken = mapFilterTokens[item.token.address.toLowerCase()];
     if (shouldFilter && !allowlistedToken) return;
 
     const tokenData = item.token || {};
 
-    if (item.value == null) return;
     const balance = BigInt(item.value);
 
     let decimals = parseInt(tokenData.decimals, 10);
     if (Number.isNaN(decimals)) decimals = DEFAULT_TOKEN_DECIMALS;
 
-    const icon = (tokenData as BlockscoutTokenData).icon_url ?? allowlistedToken.icon;
+    const icon = 'icon_url' in tokenData ? tokenData.icon_url : allowlistedToken.icon;
 
     const token = {
       ...tokenData,
@@ -208,7 +208,7 @@ export const getBlockscoutBalance = async (
 
     const formattedBalance = formatUnits(item.value, token.decimals);
 
-    balances.push({ balance, formattedBalance, token } as GetBalanceResult);
+    balances.push({ balance, formattedBalance, token });
   });
 
   return { balances };

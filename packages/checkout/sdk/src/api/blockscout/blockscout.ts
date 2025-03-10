@@ -4,6 +4,7 @@ import axios, {
 } from 'axios';
 import { ChainId } from '../../types';
 import {
+  BlockscoutNativeToken,
   BlockscoutNativeTokenData,
   BlockscoutToken,
   BlockscoutTokenPagination,
@@ -137,7 +138,7 @@ export class Blockscout {
    * @param walletAddress wallet address
    * @returns list of tokens given the wallet address and the token types
    */
-  public async getNativeTokenByWalletAddress(params: { walletAddress: string, }): Promise<BlockscoutToken> {
+  public async getNativeTokenByWalletAddress(params: { walletAddress: string, }): Promise<BlockscoutNativeToken> {
     try {
       const url = `${this.url}/api/v2/addresses/${params.walletAddress}`;
 
