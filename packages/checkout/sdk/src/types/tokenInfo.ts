@@ -16,6 +16,7 @@ export interface TokenInfo {
   decimals: number;
   address?: string;
   icon?: string;
+  holders?: number;
 }
 
 /**

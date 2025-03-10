@@ -96,6 +96,11 @@ const blockscoutClientMap: Map<ChainId, Blockscout> = new Map();
 // blockscout map and therefore clear all the cache.
 export const resetBlockscoutClientMap = () => blockscoutClientMap.clear();
 
+const parseIntWithDefault = (value: string, defaultValue: number) => {
+  const parsed = parseInt(value, 10);
+  return Number.isNaN(parsed) ? defaultValue : parsed;
+};
+
 export const getBlockscoutBalance = async (
   config: CheckoutConfiguration,
   walletAddress: string,
@@ -195,8 +200,8 @@ export const getBlockscoutBalance = async (
 
     const balance = BigInt(item.value);
 
-    let decimals = parseInt(tokenData.decimals, 10);
-    if (Number.isNaN(decimals)) decimals = DEFAULT_TOKEN_DECIMALS;
+    const decimals = parseIntWithDefault(tokenData.decimals, DEFAULT_TOKEN_DECIMALS);
+    const holders = 'holders' in tokenData ? parseIntWithDefault(tokenData.holders, 0) : allowlistedToken.holders;
 
     const icon = 'icon_url' in tokenData ? tokenData.icon_url : allowlistedToken.icon;
 
@@ -204,6 +209,7 @@ export const getBlockscoutBalance = async (
       ...tokenData,
       decimals,
       icon,
+      holders,
     };
 
     const formattedBalance = formatUnits(item.value, token.decimals);
