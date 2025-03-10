@@ -2048,8 +2048,8 @@ importers:
         specifier: workspace:*
         version: link:../../x-provider
       '@magic-ext/oidc':
-        specifier: 4.3.1
-        version: 4.3.1
+        specifier: 12.0.0
+        version: 12.0.0
       '@magic-sdk/provider':
         specifier: 29.0.1-canary.860.13689524404.0
         version: 29.0.1-canary.860.13689524404.0(localforage@1.10.0)
@@ -4718,9 +4718,6 @@ packages:
 
   '@magic-ext/oidc@12.0.0':
     resolution: {integrity: sha512-IeycCoW8BUqcdJoggynq63bj8XyRxZfiX5cBdxq7LEr4gWWpTz1zexEkWrJoP76XDr6Yn/wYQXiL4/AvJ6wcjw==}
-
-  '@magic-ext/oidc@4.3.1':
-    resolution: {integrity: sha512-HjriTgPxECC37z4UPbomuL0sFd5Fe0aC8BEDSShD5Ltbi0oMjamEW7avYdZi14S5F4UHfcol0M3xTc+0FTNwrw==}
 
   '@magic-sdk/commons@25.0.0':
     resolution: {integrity: sha512-EYrbFGw/4R899IccGgkmVp/ia50ELNK7H1uDfM66Nh+YnH05LsLWlfrtFbbKxBazquVnu89bAHmJcFPsmSnHQQ==}
@@ -20406,8 +20403,6 @@ snapshots:
       '@lukeed/csprng': 1.1.0
 
   '@magic-ext/oidc@12.0.0': {}
-
-  '@magic-ext/oidc@4.3.1': {}
 
   '@magic-sdk/commons@25.0.0(@magic-sdk/provider@29.0.1(localforage@1.10.0))(@magic-sdk/types@24.18.0)':
     dependencies:
