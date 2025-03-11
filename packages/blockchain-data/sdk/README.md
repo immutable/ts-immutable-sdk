@@ -28,7 +28,7 @@ npm add @imtbl/blockchain-data
 # or
 pnpm add @imtbl/blockchain-data
 # or
-pnpm add @imtbl/blockchain-data
+yarn add @imtbl/blockchain-data
 ```
 
 ## SDK Installation

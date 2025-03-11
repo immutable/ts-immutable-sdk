@@ -23,7 +23,7 @@ npm add @imtbl/x-client
 # or
 pnpm add @imtbl/x-client
 # or
-pnpm add @imtbl/x-client
+yarn add @imtbl/x-client
 ```
 
 ## SDK Installation
