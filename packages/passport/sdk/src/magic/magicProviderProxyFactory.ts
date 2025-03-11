@@ -50,6 +50,7 @@ export class MagicProviderProxyFactory {
                   if (!idToken) {
                     throw new Error('failed to obtain ID token');
                   }
+                  /** @ts-ignore */
                   await magicClient.openid.loginWithOIDC({
                     jwt: idToken,
                     providerId: this.config.magicProviderId,
