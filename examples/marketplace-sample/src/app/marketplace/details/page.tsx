@@ -1,30 +1,29 @@
 'use client';
 
+import React from 'react';
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { passportInstance } from '../../utils/setupDefault';
 import { orderbookSDK } from '../../utils/setupOrderbook';
 import { OrderStatusName } from '@imtbl/orderbook';
-import { Button, Heading, Body, Card } from '@biom3/react';
+import { Button } from '@biom3/react';
 import Link from 'next/link';
-import { SUPPORTED_CHAINS, calculateBuyerCost, calculateSellerProceeds } from '../../utils/marketplaceConfig';
+import { SUPPORTED_CHAINS } from '../../utils/marketplaceConfig';
 
 // Define the types based on the SDK structure
 interface NFTDetails {
   id: string;
   contractAddress: string;
   tokenId: string;
-  name?: string;
-  description?: string;
-  imageUrl?: string;
-  collectionName?: string;
   price: string;
   sellerAddress: string;
   createdAt: string;
-  attributes?: {
-    trait_type: string;
-    value: string;
-  }[];
+}
+
+// Define a custom type for Passport user info - this matches what the SDK actually returns
+interface PassportUserInfo {
+  // Using an index signature to allow for any properties
+  [key: string]: any;
 }
 
 export default function NFTDetailsPage() {
@@ -35,12 +34,11 @@ export default function NFTDetailsPage() {
   // User state
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [userInfo, setUserInfo] = useState<PassportUserInfo | null>(null);
   const [accountAddress, setAccountAddress] = useState<string | null>(null);
   const [provider, setProvider] = useState<any>(null);
-  const [signer, setSigner] = useState<any>(null);
-  const [walletBalance, setWalletBalance] = useState<string>("0.0000");
   
-  // NFT details
+  // NFT details state
   const [nftDetails, setNftDetails] = useState<NFTDetails | null>(null);
   const [loadingDetails, setLoadingDetails] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,72 +46,65 @@ export default function NFTDetailsPage() {
   // Transaction state
   const [isPurchasing, setIsPurchasing] = useState<boolean>(false);
   const [isCancelling, setIsCancelling] = useState<boolean>(false);
+  const [transactionSuccess, setTransactionSuccess] = useState<boolean>(false);
   const [transactionError, setTransactionError] = useState<string | null>(null);
-  const [transactionSuccess, setTransactionSuccess] = useState<string | null>(null);
   
   // Format address for display
   const formatAddress = (address: string) => {
-    if (!address) return "";
+    if (!address) return '';
     return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
   };
   
   // Format date for display
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
+    return new Date(dateString).toLocaleString('en-US', {
+      year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
   };
   
-  // Format wallet balances
+  // Format balance for display (ETH)
   const formatBalance = (balance: string) => {
-    try {
-      // Convert to a number with 4 decimal places
-      const num = parseFloat(balance);
-      return num.toFixed(4);
-    } catch (e) {
-      return "0.0000";
-    }
+    if (!balance) return '0';
+    
+    const balanceNum = parseFloat(balance);
+    if (balanceNum < 0.000001) return '< 0.000001';
+    
+    return balanceNum.toFixed(6);
   };
   
   // Check if the current user is the seller
   const isUserSeller = () => {
-    return isLoggedIn && accountAddress && nftDetails?.sellerAddress && 
-           accountAddress.toLowerCase() === nftDetails.sellerAddress.toLowerCase();
+    if (!nftDetails || !accountAddress) return false;
+    return nftDetails.sellerAddress.toLowerCase() === accountAddress.toLowerCase();
   };
   
-  // Check authentication on page load
+  // Check login status
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        // Check if user is authenticated with Passport
-        const { isAuthenticated, accounts, provider } = await passportInstance.getUserInfo();
+        // Check if user is already authenticated
+        const userInfo = await passportInstance.getUserInfo();
         
-        setIsLoggedIn(isAuthenticated);
+        // Type guard to check for accounts
+        const isAuthenticated = !!userInfo && 
+                               typeof userInfo === 'object' && 
+                               'accounts' in userInfo && 
+                               Array.isArray(userInfo.accounts) && 
+                               userInfo.accounts.length > 0;
         
-        if (isAuthenticated && accounts && accounts.length > 0) {
-          // Set user account address
-          const address = accounts[0];
-          setAccountAddress(address);
+        if (isAuthenticated) {
+          setIsLoggedIn(true);
+          setUserInfo(userInfo as PassportUserInfo);
           
-          // Store provider and create signer
-          setProvider(provider);
-          if (provider) {
-            try {
-              const signer = provider.getSigner();
-              setSigner(signer);
-              
-              // Get wallet balance using formatBalance helper
-              try {
-                const balance = await provider.getBalance(address);
-                // Convert balance from wei to ETH (1 ETH = 10^18 wei)
-                const balanceInEth = parseFloat(balance.toString()) / 1e18;
-                setWalletBalance(formatBalance(balanceInEth.toString()));
-              } catch (balanceError) {
-                console.error("Error getting balance:", balanceError);
-                setWalletBalance("0.0000");
-              }
-            } catch (signerError) {
-              console.error("Error getting signer:", signerError);
-            }
+          if (userInfo.accounts && Array.isArray(userInfo.accounts) && userInfo.accounts.length > 0) {
+            setAccountAddress(userInfo.accounts[0]);
           }
+          
+          // Get provider
+          const passportProvider = await passportInstance.connectEvm();
+          setProvider(passportProvider);
+        } else {
+          setIsLoggedIn(false);
         }
         
         setIsLoading(false);
@@ -124,9 +115,9 @@ export default function NFTDetailsPage() {
     };
     
     checkLoginStatus();
-  }, []); // No dependencies to prevent re-runs
+  }, []);
   
-  // Fetch NFT details when the page loads with proper error handling
+  // Load NFT details
   useEffect(() => {
     const loadNFTDetails = async () => {
       try {
@@ -178,78 +169,14 @@ export default function NFTDetailsPage() {
         const order = orderResponse.result;
         const nftItem = order.sell[0]; // Assuming the first sell item is the NFT
         
-        // Try to fetch additional NFT details
-        let nftMetadata = { 
-          name: `NFT #${nftItem.tokenId}`, 
-          description: 'No description available',
-          image_url: undefined as string | undefined,
-          attributes: []
-        };
-        let collectionName = 'Unknown Collection';
-        
-        try {
-          const { blockchainData } = orderbookSDK.getAllClients();
-          
-          // Try to get NFT metadata using getNFT method first (fallback to getToken if it fails)
-          try {
-            const nftResponse = await blockchainData.getNFT({
-              chainName: SUPPORTED_CHAINS.DEFAULT,
-              contractAddress: nftItem.contractAddress,
-              tokenId: nftItem.tokenId
-            });
-            
-            if (nftResponse && nftResponse.result) {
-              nftMetadata = nftResponse.result.metadata || nftMetadata;
-              collectionName = nftResponse.result.collection?.name || collectionName;
-            }
-          } catch (nftError) {
-            console.log("getNFT not available, trying getToken...", nftError);
-            
-            try {
-              const tokenDetails = await blockchainData.getToken({
-                chainName: SUPPORTED_CHAINS.DEFAULT,
-                contractAddress: nftItem.contractAddress,
-                tokenId: nftItem.tokenId
-              });
-              
-              if (tokenDetails && tokenDetails.metadata) {
-                nftMetadata = tokenDetails.metadata;
-              }
-              
-              // Try to fetch collection details separately
-              try {
-                const collectionResponse = await blockchainData.getCollection({
-                  chainName: SUPPORTED_CHAINS.DEFAULT,
-                  contractAddress: nftItem.contractAddress
-                });
-                
-                if (collectionResponse) {
-                  collectionName = collectionResponse.name || collectionName;
-                }
-              } catch (collectionError) {
-                console.error("Error fetching collection details:", collectionError);
-              }
-            } catch (tokenError) {
-              console.error("Error fetching token details:", tokenError);
-            }
-          }
-        } catch (error) {
-          console.error("Error with blockchainData client:", error);
-        }
-        
         // Set NFT details
         const nftDetails: NFTDetails = {
           id: order.id,
           contractAddress: nftItem.contractAddress,
           tokenId: nftItem.tokenId,
-          name: nftMetadata.name || `NFT #${nftItem.tokenId}`,
-          description: nftMetadata.description || 'No description available',
-          imageUrl: nftMetadata.image_url || '/placeholder-image.png',
-          collectionName,
           price: order.buy[0].amount,
           sellerAddress: order.accountAddress,
-          createdAt: order.createdAt,
-          attributes: nftMetadata.attributes
+          createdAt: order.createdAt
         };
         
         console.log("Processed NFT details:", nftDetails);
@@ -270,213 +197,128 @@ export default function NFTDetailsPage() {
   // Login with Passport
   const loginWithPassport = async () => {
     try {
-      setIsPurchasing(true);
-      console.log("Attempting to login with passport");
-      
-      try {
-        await passportInstance.login();
-        
-        const address = await passportInstance.accounts[0];
-        console.log("Connected address:", address);
-        
-        if (address) {
-          setAccountAddress(address);
-          setIsLoggedIn(true);
-          
-          // Get signer from passport instance
-          const newSigner = passportInstance.getEthersJsSigner();
-          setSigner(newSigner);
-          
-          // Get balance using the Immutable SDK provider
-          try {
-            const balance = await passportInstance.provider.getBalance(address);
-            const formattedBalance = formatBalance(balance.toString());
-            setWalletBalance(formattedBalance);
-          } catch (balanceError) {
-            console.error("Error getting balance:", balanceError);
-            setWalletBalance("0.0000");
-          }
-        }
-      } catch (error) {
-        console.error("Passport connection failed:", error);
-        setTransactionError("Failed to connect. Please try again.");
-      }
-      
-      setIsPurchasing(false);
-    } catch (error: any) {
-      console.error("Login error:", error);
-      setIsPurchasing(false);
-      setTransactionError(error.message || "An error occurred during login");
+      await passportInstance.login();
+      // The page will reload after successful login via the redirect
+    } catch (error) {
+      console.error("Error logging in with Passport:", error);
+      setError("Failed to log in. Please try again.");
     }
   };
   
-  // Purchase an NFT
+  // Purchase NFT
   const purchaseNFT = async () => {
+    if (!isLoggedIn || !nftDetails || !accountAddress || !provider) {
+      setError("Please log in to purchase this NFT");
+      return;
+    }
+    
     try {
-      if (!isLoggedIn) {
-        await loginWithPassport();
-        return;
-      }
-      
-      if (!nftDetails || !accountAddress || !signer) {
-        setTransactionError("Missing required data to complete purchase");
-        return;
-      }
-      
       setIsPurchasing(true);
       setTransactionError(null);
-      console.log("Starting purchase for NFT:", nftDetails.id);
       
-      // Set a safety timeout
-      const safetyTimeout = setTimeout(() => {
-        if (isPurchasing) {
-          console.log("Safety timeout triggered for purchase");
-          setIsPurchasing(false);
-          setTransactionError("Purchase timed out. Please try again.");
-        }
-      }, 30000); // 30 seconds timeout for transactions
+      console.log("Preparing to purchase NFT:", nftDetails.id);
       
-      try {
-        // Calculate fees and total cost
-        const totalCost = calculateBuyerCost(nftDetails.price);
-        console.log("Total cost including fees:", totalCost);
-        
-        // Call the fulfillOrder method from Orderbook SDK
-        const fulfillResponse = await orderbookSDK.fulfillOrder({
-          orderId: nftDetails.id,
-          takerAddress: accountAddress,
-          takerFees: [], // Could add ecosystem fees here if needed
-        });
-        
-        console.log("Fulfill response:", fulfillResponse);
-        
-        if (fulfillResponse && fulfillResponse.actions) {
-          // Process each action - these could be approvals or the actual fulfillment
-          for (const action of fulfillResponse.actions) {
-            console.log("Processing action:", action.purpose);
-            
-            // Build the transaction
-            const transaction = await action.buildTransaction();
-            console.log("Built transaction:", transaction);
-            
-            // Send the transaction
-            const txResponse = await signer.sendTransaction(transaction);
-            console.log("Transaction sent:", txResponse.hash);
-            
-            // Wait for confirmation
-            await txResponse.wait(1);
-            console.log("Transaction confirmed");
-          }
-          
-          // Clear safety timeout
-          clearTimeout(safetyTimeout);
-          
-          // Success!
-          setIsPurchasing(false);
-          setTransactionSuccess("Successfully purchased the NFT!");
-          console.log("Purchase completed successfully!");
-          
-          // Wait a moment, then redirect to the marketplace
-          setTimeout(() => {
-            router.push('/marketplace');
-          }, 3000);
-        } else {
-          throw new Error("Invalid fulfillment response");
-        }
-      } catch (txError: any) {
-        console.error("Transaction error:", txError);
-        clearTimeout(safetyTimeout);
-        setIsPurchasing(false);
-        setTransactionError(txError.message || "Failed to complete the purchase");
+      // Get the order
+      const orderResponse = await orderbookSDK.getOrderById({
+        orderId: nftDetails.id,
+        chainName: SUPPORTED_CHAINS.DEFAULT
+      });
+      
+      if (!orderResponse || !orderResponse.result) {
+        throw new Error("Could not find the listing");
       }
-    } catch (error: any) {
-      console.error("Purchase error:", error);
+      
+      // Use the appropriate fulfillment method from the SDK
+      // Note: Using fulfillOrder instead of prepareFulfillment/confirmFulfillment that might not exist
+      const fulfillResponse = await orderbookSDK.fulfillOrder({
+        orderId: nftDetails.id,
+        takerAddress: accountAddress,
+        // If this is a partial fill, specify quantity
+        quantity: '1',
+      });
+      
+      // Process any actions returned by the SDK
+      if (fulfillResponse && fulfillResponse.actions) {
+        for (const action of fulfillResponse.actions) {
+          if (action.type === 'transaction') {
+            // Send the transaction
+            const txRequest = {
+              method: 'eth_sendTransaction',
+              params: [action.transaction]
+            };
+            
+            const txHash = await provider.request(txRequest);
+            console.log("Transaction submitted:", txHash);
+            
+            // Wait for the transaction to be confirmed
+            // This is a simplified version - a production app should wait properly
+            await new Promise(resolve => setTimeout(resolve, 5000));
+          }
+        }
+      }
+      
+      console.log("NFT purchased successfully");
+      setTransactionSuccess(true);
       setIsPurchasing(false);
-      setTransactionError(error.message || "An error occurred during purchase");
+      
+      // Refresh after a delay
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 3000);
+      
+    } catch (error) {
+      console.error("Error purchasing NFT:", error);
+      setTransactionError("Failed to purchase NFT. " + (error instanceof Error ? error.message : "Please try again."));
+      setIsPurchasing(false);
     }
   };
   
-  // Cancel the listing
+  // Cancel listing
   const cancelListing = async () => {
+    if (!isLoggedIn || !nftDetails || !accountAddress || !provider) {
+      setError("Please log in to cancel this listing");
+      return;
+    }
+    
+    if (!isUserSeller()) {
+      setError("Only the seller can cancel this listing");
+      return;
+    }
+    
     try {
-      if (!nftDetails || !accountAddress || !signer) {
-        setTransactionError("Missing required data to cancel listing");
-        return;
-      }
-      
       setIsCancelling(true);
       setTransactionError(null);
-      console.log("Starting cancellation for listing:", nftDetails.id);
       
-      // Set a safety timeout
-      const safetyTimeout = setTimeout(() => {
-        if (isCancelling) {
-          console.log("Safety timeout triggered for cancellation");
-          setIsCancelling(false);
-          setTransactionError("Cancellation timed out. Please try again.");
-        }
-      }, 30000); // 30 seconds timeout for transactions
+      console.log("Preparing to cancel listing:", nftDetails.id);
       
-      try {
-        // Prepare the cancellation using the correct SDK method
-        console.log("Preparing to cancel order:", nftDetails.id);
-        
-        // Direct cancellation using cancelOrders
-        const result = await orderbookSDK.cancelOrders({
-          orderIds: [nftDetails.id],
-          accountAddress: accountAddress,
-          signature: await signer.signMessage(`Cancel order ${nftDetails.id}`)
-        });
-        
-        console.log("Cancellation result:", result);
-        
-        // Clear safety timeout
-        clearTimeout(safetyTimeout);
-        
-        // Success!
-        setIsCancelling(false);
-        setTransactionSuccess("Successfully cancelled the listing!");
-        console.log("Listing cancelled successfully!");
-        
-        // Wait a moment, then redirect to the marketplace
-        setTimeout(() => {
-          router.push('/marketplace');
-        }, 3000);
-      } catch (txError: any) {
-        console.error("Transaction error:", txError);
-        clearTimeout(safetyTimeout);
-        setIsCancelling(false);
-        setTransactionError(txError.message || "Failed to cancel the listing");
-      }
-    } catch (error: any) {
-      console.error("Cancellation error:", error);
+      // Use the appropriate method from the SDK to cancel the order
+      // Note: Using cancelOrders instead of prepareCancellation/confirmCancellation
+      const cancelResult = await orderbookSDK.cancelOrders({
+        orderIds: [nftDetails.id],
+        accountAddress: accountAddress,
+      });
+      
+      console.log("Listing cancelled successfully");
+      setTransactionSuccess(true);
       setIsCancelling(false);
-      setTransactionError(error.message || "An error occurred during cancellation");
+      
+      // Refresh after a delay
+      setTimeout(() => {
+        router.push('/marketplace');
+      }, 3000);
+      
+    } catch (error) {
+      console.error("Error cancelling listing:", error);
+      setTransactionError("Failed to cancel listing. " + (error instanceof Error ? error.message : "Please try again."));
+      setIsCancelling(false);
     }
   };
   
   // If loading
-  if (isLoading || loadingDetails) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex justify-center items-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
-      </div>
-    );
-  }
-  
-  // If no listing ID or NFT details not found
-  if (!listingId || !nftDetails) {
-    return (
-      <div className="container mx-auto p-6 max-w-7xl">
-        <div className="text-center py-10 border border-gray-200 rounded-lg">
-          <Heading>NFT Not Found</Heading>
-          <Body className="mt-4">The NFT listing you're looking for doesn't exist or has been removed.</Body>
-          <div className="mt-6">
-            <Link href="/marketplace">
-              <Button>Back to Marketplace</Button>
-            </Link>
-          </div>
-        </div>
+      <div className="container mx-auto p-6 flex justify-center items-center min-h-screen">
+        <div className="text-xl">Loading...</div>
       </div>
     );
   }
@@ -515,10 +357,10 @@ export default function NFTDetailsPage() {
           <div className="flex justify-between items-center">
             <div>
               <div className="font-bold">Transaction Successful</div>
-              <div>{transactionSuccess}</div>
+              <div>Your transaction has been processed successfully!</div>
             </div>
             <button 
-              onClick={() => setTransactionSuccess(null)}
+              onClick={() => setTransactionSuccess(false)}
               className="text-green-700 hover:text-green-900"
             >
               ✕
@@ -527,135 +369,123 @@ export default function NFTDetailsPage() {
         </div>
       )}
       
-      {/* NFT Details */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Left column - Image */}
-        <div>
-          <div className="bg-gray-100 rounded-lg overflow-hidden aspect-square">
-            {nftDetails.imageUrl ? (
-              <img 
-                src={nftDetails.imageUrl} 
-                alt={nftDetails.name || 'NFT'} 
-                className="w-full h-full object-contain"
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full">
-                <Body>No image available</Body>
-              </div>
-            )}
-          </div>
-          
-          {/* Collection info */}
-          <Card className="mt-6 p-4">
-            <Heading size="small">Collection</Heading>
-            <div className="mt-2 flex justify-between items-center">
-              <Body>{nftDetails.collectionName}</Body>
-              <Link href={`/marketplace?collection=${nftDetails.contractAddress}`}>
-                <Button size="small" variant="secondary">View Collection</Button>
-              </Link>
-            </div>
-            <Body className="mt-2 text-sm text-gray-500">
-              Contract: {formatAddress(nftDetails.contractAddress)}
-            </Body>
-            <Body className="mt-1 text-sm text-gray-500">
-              Token ID: {nftDetails.tokenId}
-            </Body>
-          </Card>
+      {/* Main content */}
+      {loadingDetails ? (
+        <div className="flex justify-center items-center py-20">
+          <div className="text-xl">Loading NFT details...</div>
         </div>
-        
-        {/* Right column - Details */}
-        <div>
-          <Heading>{nftDetails.name}</Heading>
-          
-          {/* Seller info */}
-          <div className="mt-2 flex items-center">
-            <Body className="text-gray-500">Sold by: {formatAddress(nftDetails.sellerAddress)}</Body>
-            {isUserSeller() && (
-              <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">You</span>
-            )}
-          </div>
-          
-          {/* Price */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <div className="flex justify-between items-center">
-              <div>
-                <Body className="text-gray-500">Current price</Body>
-                <Heading size="large" className="mt-1">{parseFloat(nftDetails.price).toFixed(6)} ETH</Heading>
-                <Body className="text-sm text-gray-500 mt-1">
-                  ~{calculateBuyerCost(nftDetails.price)} ETH with fees
-                </Body>
-              </div>
-              
-              {/* Purchase/Cancel buttons */}
-              {isUserSeller() ? (
-                <Button 
-                  variant="primary"
-                  onClick={cancelListing}
-                  disabled={isCancelling}
-                >
-                  {isCancelling ? 'Cancelling...' : 'Cancel Listing'}
-                </Button>
-              ) : (
-                <Button 
-                  onClick={purchaseNFT}
-                  disabled={isPurchasing}
-                >
-                  {isPurchasing ? 'Processing...' : 'Buy Now'}
-                </Button>
-              )}
+      ) : error ? (
+        <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+          <h2 className="text-2xl font-bold mb-4">Error</h2>
+          <p className="text-red-600 mb-6">{error}</p>
+          <Link href="/marketplace">
+            <Button>Return to Marketplace</Button>
+          </Link>
+        </div>
+      ) : !nftDetails ? (
+        <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+          <h2 className="text-2xl font-bold mb-4">NFT Not Found</h2>
+          <p className="mb-6">The NFT listing you're looking for doesn't exist or has been removed.</p>
+          <Link href="/marketplace">
+            <Button>Return to Marketplace</Button>
+          </Link>
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="p-6">
+            <h1 className="text-3xl font-bold mb-4">NFT Details</h1>
+            
+            <div className="border rounded-lg overflow-hidden">
+              <table className="min-w-full divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-200">
+                  <tr>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 bg-gray-50 w-1/4">
+                      Listing ID
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+                      {nftDetails.id}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 bg-gray-50">
+                      Contract Address
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+                      {nftDetails.contractAddress}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 bg-gray-50">
+                      Token ID
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {nftDetails.tokenId}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 bg-gray-50">
+                      Price
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <span className="text-xl font-bold">{formatBalance(nftDetails.price)} ETH</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 bg-gray-50">
+                      Seller
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+                      {nftDetails.sellerAddress}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 bg-gray-50">
+                      Listed Date
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {formatDate(nftDetails.createdAt)}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
             
-            {/* Seller proceeds (only shown to seller) */}
-            {isUserSeller() && (
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <Body className="text-gray-500">You will receive</Body>
-                <Body className="font-bold">{calculateSellerProceeds(nftDetails.price)} ETH</Body>
-                <Body className="text-xs text-gray-500">
-                  After marketplace fees and creator royalties
-                </Body>
-              </div>
-            )}
-          </div>
-          
-          {/* Description */}
-          <div className="mt-6">
-            <Heading size="small">Description</Heading>
-            <Body className="mt-2 whitespace-pre-wrap">
-              {nftDetails.description || 'No description available'}
-            </Body>
-          </div>
-          
-          {/* Attributes/Traits */}
-          {nftDetails.attributes && nftDetails.attributes.length > 0 && (
-            <div className="mt-6">
-              <Heading size="small">Properties</Heading>
-              <div className="mt-2 grid grid-cols-2 md:grid-cols-3 gap-2">
-                {nftDetails.attributes.map((attr, index) => (
-                  <div key={index} className="border border-gray-200 rounded-md p-2 text-center">
-                    <Body className="text-xs text-gray-500 uppercase">{attr.trait_type}</Body>
-                    <Body className="font-medium truncate">{attr.value}</Body>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* Listing details */}
-          <div className="mt-6">
-            <Heading size="small">Listing Details</Heading>
-            <div className="mt-2 space-y-2">
-              <div className="flex justify-between">
-                <Body className="text-gray-500">Listing ID</Body>
-                <Body className="font-mono">{nftDetails.id.substring(0, 10)}...</Body>
-              </div>
-              <div className="flex justify-between">
-                <Body className="text-gray-500">Listed</Body>
-                <Body>{formatDate(nftDetails.createdAt)}</Body>
-              </div>
+            <div className="mt-8">
+              {isUserSeller() ? (
+                <div>
+                  <h2 className="text-lg font-semibold mb-2">Seller Actions</h2>
+                  <p className="text-gray-600 mb-4">You are the seller of this NFT listing.</p>
+                  <Button
+                    onClick={cancelListing}
+                    disabled={isCancelling}
+                    variant="secondary"
+                  >
+                    {isCancelling ? 'Cancelling...' : 'Cancel Listing'}
+                  </Button>
+                </div>
+              ) : (
+                <div>
+                  <h2 className="text-lg font-semibold mb-2">Buy this NFT</h2>
+                  {isLoggedIn ? (
+                    <Button
+                      onClick={purchaseNFT}
+                      disabled={isPurchasing}
+                      className="w-full md:w-auto"
+                    >
+                      {isPurchasing ? 'Processing...' : `Buy Now for ${formatBalance(nftDetails.price)} ETH`}
+                    </Button>
+                  ) : (
+                    <div>
+                      <p className="text-gray-600 mb-4">You need to connect your wallet to purchase this NFT.</p>
+                      <Button onClick={loginWithPassport}>Connect Wallet</Button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 } 

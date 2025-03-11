@@ -1,0 +1,776 @@
+Task: Create a Marketplace Sample App for Immutable SDK
+
+Follow these steps to create a new React example app inside the /examples directory (NOT in /examples/passport) that showcases the Immutable Marketplace functionality.
+
+Step 1: Review Existing Code & Documentation
+- Review all example apps in the /examples directory. Ensure you understand the code and the purpose of each example.
+- Example app features are implemented as routes inside the /src/app directory.
+- Review the Biom3 React components documentation to fully understand all components and their usage.
+- DO NOT assume the existence of any components that are not documented. If unsure, do not assume and use tailwindCSS instead.
+- Review the current version of the Passport SDK and Marketplace SDK documentation. Only use the methods and options that are present in the documentation of the current version of the SDK.
+- IMPORTANT: isAuthenticated() is not a method of the Passport SDK.
+
+Step 2: Create a New Example App
+Name the new app:
+- Directory: examples/marketplace-sample
+
+Set up the project:
+- Copy these essential files from examples/passport/login-with-nextjs:
+  - package.json (update the name to "@examples/marketplace-sample" but keep ALL other dependency versions exactly the same)
+  - next.config.mjs
+  - tsconfig.json
+  - .env.example
+  - src/app/utils/setupDefault.ts
+  - src/app/layout.tsx
+  - src/app/globals.css
+
+- Add the following new dependency to package.json:
+  ```json
+  "@imtbl/marketplace-sdk": "workspace:*"
+  ```
+
+- DO NOT copy route directories from existing examples. Create only the new routes required for the marketplace feature.
+
+Folder structure should be:
+```
+/examples/marketplace-sample/
+├── package.json
+├── next.config.mjs
+├── tsconfig.json
+├── .env.example
+├── jest.config.js
+├── babel.config.jest.js
+├── README.md
+└── src/
+    └── app/
+        ├── page.tsx                    # Main landing page with links to different marketplace features
+        ├── marketplace/page.tsx        # Marketplace implementation
+        ├── item-details/[id]/page.tsx  # Item details page
+        ├── redirect/page.tsx           # Redirect page for authentication
+        ├── logout/page.tsx             # Logout page
+        ├── utils/                      # Shared utilities
+        │   ├── setupDefault.ts         # Passport setup utility
+        │   ├── wrapper.tsx             # App wrapper component
+        │   └── marketplaceConfig.ts    # Marketplace configuration
+        ├── tests/                      # Tests directory
+        ├── layout.tsx                  # App layout
+        └── globals.css                 # Global styles
+```
+
+Step 3: Implement the New Example App
+
+Here's a template for the key files:
+
+1. **src/app/utils/marketplaceConfig.ts**:
+```typescript
+// Marketplace configuration
+import { Environment } from '@imtbl/sdk';
+
+export const marketplaceConfig = {
+  baseConfig: {
+    environment: Environment.SANDBOX,
+    publishableKey: process.env.NEXT_PUBLIC_IMMUTABLE_PUBLISHABLE_KEY || '',
+  },
+  marketplaceConfig: {
+    collectionFilters: [], // Leave empty to show all collections
+    orderByOptions: [
+      { 
+        field: 'price', 
+        direction: 'asc',
+        label: 'Price: Low to High'
+      },
+      { 
+        field: 'price', 
+        direction: 'desc',
+        label: 'Price: High to Low'
+      },
+      { 
+        field: 'createdAt', 
+        direction: 'desc',
+        label: 'Recently Listed'
+      }
+    ],
+  }
+};
+```
+
+2. **src/app/utils/wrapper.tsx**:
+- Copy exactly from login-with-nextjs.
+- This component should wrap the children in the layout.tsx file.
+
+3. **src/app/page.tsx**:
+```typescript
+"use client";
+
+import { Button, Card } from '@biom3/react';
+import Link from 'next/link';
+
+export default function Home() {
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center p-24">
+      <h1 className="text-4xl font-bold mb-8">Immutable Marketplace Sample</h1>
+      
+      <div className="grid grid-cols-1 gap-6 max-w-4xl w-full">
+        <Card>
+          <div className="p-6">
+            <h2 className="text-2xl font-semibold mb-4">Browse Marketplace</h2>
+            <p className="mb-4">View and browse NFTs available in the marketplace</p>
+            <Link href="/marketplace">
+              <Button>Go to Marketplace</Button>
+            </Link>
+          </div>
+        </Card>
+      </div>
+    </main>
+  );
+}
+```
+
+4. **src/app/marketplace/page.tsx**:
+```typescript
+"use client";
+
+import { useEffect, useState } from 'react';
+import { Button, Card, Loader } from '@biom3/react';
+import { config } from '@imtbl/sdk';
+import { MarketplaceClient } from '@imtbl/marketplace-sdk';
+import Link from 'next/link';
+import { setupDefault } from '../utils/setupDefault';
+import { marketplaceConfig } from '../utils/marketplaceConfig';
+
+export default function Marketplace() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [listings, setListings] = useState([]);
+  const [error, setError] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [marketplaceClient, setMarketplaceClient] = useState(null);
+
+  useEffect(() => {
+    async function initializeSDK() {
+      try {
+        // Initialize Passport
+        const passport = setupDefault();
+        
+        // Check login status
+        const user = await passport.getUserInfo();
+        setIsLoggedIn(!!user);
+        
+        // Initialize Marketplace client
+        const client = new MarketplaceClient(marketplaceConfig.baseConfig);
+        setMarketplaceClient(client);
+        
+        // Get listings
+        fetchListings(client);
+      } catch (err) {
+        console.error('Error initializing:', err);
+        setError('Failed to initialize. Please try again.');
+        setIsLoading(false);
+      }
+    }
+    
+    initializeSDK();
+    
+    return () => {
+      // Cleanup if needed
+    };
+  }, []);
+  
+  async function fetchListings(client) {
+    try {
+      setIsLoading(true);
+      const response = await client.listListings({
+        pageSize: 20,
+        orderBy: {
+          field: 'createdAt',
+          direction: 'desc'
+        }
+      });
+      
+      setListings(response.result || []);
+      setIsLoading(false);
+    } catch (err) {
+      console.error('Error fetching listings:', err);
+      setError('Failed to fetch listings. Please try again.');
+      setIsLoading(false);
+    }
+  }
+  
+  async function handleLogin() {
+    try {
+      const passport = setupDefault();
+      await passport.login();
+      setIsLoggedIn(true);
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('Failed to login. Please try again.');
+    }
+  }
+  
+  async function handleLogout() {
+    try {
+      const passport = setupDefault();
+      await passport.logout();
+      setIsLoggedIn(false);
+    } catch (err) {
+      console.error('Logout error:', err);
+      setError('Failed to logout. Please try again.');
+    }
+  }
+
+  return (
+    <main className="flex min-h-screen flex-col items-center p-6">
+      <div className="w-full max-w-6xl">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold">Marketplace</h1>
+          <div>
+            {isLoggedIn ? (
+              <Button onClick={handleLogout}>Logout</Button>
+            ) : (
+              <Button onClick={handleLogin}>Login</Button>
+            )}
+          </div>
+        </div>
+        
+        {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
+        
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <Loader />
+          </div>
+        ) : (
+          <>
+            {listings.length === 0 ? (
+              <div className="text-center p-8">
+                <h2 className="text-xl">No listings found</h2>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {listings.map((listing) => (
+                  <Card key={listing.id} className="overflow-hidden">
+                    <Link href={`/item-details/${listing.id}`}>
+                      <div className="aspect-square overflow-hidden">
+                        {listing.asset?.image ? (
+                          <img 
+                            src={listing.asset.image} 
+                            alt={listing.asset.name || 'NFT'}
+                            className="w-full h-full object-cover" 
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                            <p>No Image</p>
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-4">
+                        <h3 className="font-semibold text-lg">{listing.asset?.name || 'Unnamed NFT'}</h3>
+                        <p className="text-sm text-gray-600">Collection: {listing.asset?.collection?.name || 'Unknown'}</p>
+                        <p className="mt-2 font-bold">{listing.buyNow?.price || 'Price not available'} {listing.buyNow?.currencySymbol || 'ETH'}</p>
+                      </div>
+                    </Link>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </main>
+  );
+}
+```
+
+5. **src/app/item-details/[id]/page.tsx**:
+```typescript
+"use client";
+
+import { useEffect, useState } from 'react';
+import { Button, Card, Loader } from '@biom3/react';
+import { MarketplaceClient } from '@imtbl/marketplace-sdk';
+import { setupDefault } from '../../utils/setupDefault';
+import { marketplaceConfig } from '../../utils/marketplaceConfig';
+import Link from 'next/link';
+
+export default function ItemDetails({ params }) {
+  const { id } = params;
+  const [isLoading, setIsLoading] = useState(true);
+  const [listing, setListing] = useState(null);
+  const [error, setError] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isPurchasing, setIsPurchasing] = useState(false);
+
+  useEffect(() => {
+    async function fetchListing() {
+      try {
+        // Initialize Passport
+        const passport = setupDefault();
+        
+        // Check login status
+        const user = await passport.getUserInfo();
+        setIsLoggedIn(!!user);
+        
+        // Initialize Marketplace client
+        const client = new MarketplaceClient(marketplaceConfig.baseConfig);
+        
+        // Get listing details
+        const response = await client.getListing(id);
+        setListing(response);
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Error fetching listing:', err);
+        setError('Failed to fetch listing details. Please try again.');
+        setIsLoading(false);
+      }
+    }
+    
+    fetchListing();
+  }, [id]);
+  
+  async function handleLogin() {
+    try {
+      const passport = setupDefault();
+      await passport.login();
+      setIsLoggedIn(true);
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('Failed to login. Please try again.');
+    }
+  }
+  
+  async function handlePurchase() {
+    if (!isLoggedIn) {
+      setError('Please login to purchase this item');
+      return;
+    }
+    
+    try {
+      setIsPurchasing(true);
+      
+      // Initialize SDK
+      const passport = setupDefault();
+      const client = new MarketplaceClient(marketplaceConfig.baseConfig);
+      
+      // Create checkout session
+      // Note: In a real implementation, this would need proper error handling and confirmation
+      // This is a simplified example
+      const checkoutResponse = await client.prepareCheckout({
+        listingId: id,
+        quantity: 1
+      });
+      
+      // Redirect to checkout
+      window.location.href = checkoutResponse.checkoutLink;
+    } catch (err) {
+      console.error('Purchase error:', err);
+      setError('Failed to initiate purchase. Please try again.');
+      setIsPurchasing(false);
+    }
+  }
+
+  return (
+    <main className="flex min-h-screen flex-col items-center p-6">
+      <div className="w-full max-w-6xl">
+        <div className="mb-6">
+          <Link href="/marketplace">
+            <Button variant="secondary">← Back to Marketplace</Button>
+          </Link>
+        </div>
+        
+        {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
+        
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <Loader />
+          </div>
+        ) : (
+          <>
+            {!listing ? (
+              <div className="text-center p-8">
+                <h2 className="text-xl">Listing not found</h2>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <div className="overflow-hidden rounded-lg">
+                    {listing.asset?.image ? (
+                      <img 
+                        src={listing.asset.image} 
+                        alt={listing.asset.name || 'NFT'}
+                        className="w-full h-auto" 
+                      />
+                    ) : (
+                      <div className="w-full aspect-square bg-gray-200 flex items-center justify-center">
+                        <p>No Image</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <div>
+                  <Card className="p-6">
+                    <h1 className="text-3xl font-bold mb-2">{listing.asset?.name || 'Unnamed NFT'}</h1>
+                    <p className="text-gray-600 mb-4">Collection: {listing.asset?.collection?.name || 'Unknown'}</p>
+                    
+                    {listing.asset?.description && (
+                      <div className="mb-6">
+                        <h2 className="text-xl font-semibold mb-2">Description</h2>
+                        <p>{listing.asset.description}</p>
+                      </div>
+                    )}
+                    
+                    <div className="mb-6">
+                      <h2 className="text-xl font-semibold mb-2">Price</h2>
+                      <p className="text-2xl font-bold">{listing.buyNow?.price || 'Price not available'} {listing.buyNow?.currencySymbol || 'ETH'}</p>
+                    </div>
+                    
+                    {isLoggedIn ? (
+                      <Button 
+                        onClick={handlePurchase} 
+                        isLoading={isPurchasing} 
+                        disabled={isPurchasing || !listing.buyNow}
+                        className="w-full"
+                      >
+                        {isPurchasing ? 'Processing...' : 'Buy Now'}
+                      </Button>
+                    ) : (
+                      <Button onClick={handleLogin} className="w-full">
+                        Login to Purchase
+                      </Button>
+                    )}
+                  </Card>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </main>
+  );
+}
+```
+
+6. **src/app/redirect/page.tsx**:
+```typescript
+"use client";
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { setupDefault } from '../utils/setupDefault';
+
+export default function Redirect() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const handleRedirect = async () => {
+      try {
+        // Get the passport instance
+        const passport = setupDefault();
+        
+        // Handle redirect - this completes the login flow
+        await passport.loginCallback();
+        
+        // Redirect back to the marketplace
+        router.push('/marketplace');
+      } catch (error) {
+        console.error('Error handling redirect:', error);
+        // Redirect to home page on error
+        router.push('/');
+      }
+    };
+
+    handleRedirect();
+  }, [router]);
+
+  return (
+    <div className="flex justify-center items-center min-h-screen">
+      <h1>Processing authentication, please wait...</h1>
+    </div>
+  );
+}
+```
+
+7. **src/app/logout/page.tsx**:
+```typescript
+"use client";
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { setupDefault } from '../utils/setupDefault';
+
+export default function Logout() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const handleLogout = async () => {
+      try {
+        // Get the passport instance
+        const passport = setupDefault();
+        
+        // Logout
+        await passport.logout();
+        
+        // Redirect to home page
+        router.push('/');
+      } catch (error) {
+        console.error('Error during logout:', error);
+        // Redirect to home page on error
+        router.push('/');
+      }
+    };
+
+    handleLogout();
+  }, [router]);
+
+  return (
+    <div className="flex justify-center items-center min-h-screen">
+      <h1>Logging out, please wait...</h1>
+    </div>
+  );
+}
+```
+
+8. **.env.example**:
+```
+NEXT_PUBLIC_IMMUTABLE_PUBLISHABLE_KEY=your_publishable_key_here
+```
+
+Ensure the new app is self-contained:
+- Do NOT use abstracted components or state providers outside of what's provided in the examples above.
+- All logic should be inside the feature's page.tsx files as shown.
+- Use Biom3 React components for UI as shown in the examples, BUT:
+  - IMPORTANT: DO NOT use the Text component from @biom3/react. Instead, use standard HTML heading tags (h1, h2, h3, p) for all text content as shown in the examples.
+  - DO NOT assume components exist if they are not in the Biom3 documentation.
+- Wrap layout in AppWrapper:
+  - Copy utils/wrapper.tsx from login-with-nextjs.
+  - Use it inside layout.tsx, wrapping <body>'s children.
+
+IMPORTANT: For the layout.tsx file, DO NOT use next/font. This can cause conflicts with custom Babel configurations.
+
+Step 4: Testing
+Important Testing Setup Instructions:
+
+1. Create a proper Jest configuration file (jest.config.js) with the following settings:
+```javascript
+module.exports = {
+  testEnvironment: 'jsdom',
+  transform: {
+    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { configFile: './babel.config.jest.js' }],
+  },
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+  },
+  testPathIgnorePatterns: ['/node_modules/', '/.next/'],
+  transformIgnorePatterns: [
+    '/node_modules/(?!(@biom3|@imtbl)/)',
+  ],
+};
+```
+
+2. Create a Babel configuration specifically for Jest (babel.config.jest.js):
+```javascript
+module.exports = {
+  presets: [
+    ['@babel/preset-env', { targets: { node: 'current' } }],
+    '@babel/preset-typescript',
+    ['@babel/preset-react', { runtime: 'automatic' }],
+  ],
+};
+```
+
+3. Update package.json to include test script:
+```json
+"scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "lint": "next lint",
+  "test": "jest"
+},
+"devDependencies": {
+  // Existing dependencies...
+  "@babel/preset-env": "^7.22.5",
+  "@babel/preset-react": "^7.22.5",
+  "@babel/preset-typescript": "^7.22.5",
+  "@testing-library/jest-dom": "^5.16.5",
+  "@testing-library/react": "^14.0.0",
+  "babel-jest": "^29.5.0",
+  "jest": "^29.5.0",
+  "jest-environment-jsdom": "^29.5.0"
+}
+```
+
+4. Create the test file at src/app/tests/marketplace.test.js:
+```javascript
+const React = require('react');
+const { render, screen, waitFor } = require('@testing-library/react');
+const { act } = require('react-dom/test-utils');
+
+// Mock Next.js router
+jest.mock('next/navigation', () => ({
+  useRouter() {
+    return {
+      push: jest.fn(),
+      replace: jest.fn(),
+    };
+  },
+}));
+
+// Mock setupDefault 
+const mockSetupDefault = {
+  login: jest.fn(),
+  logout: jest.fn(),
+  getUserInfo: jest.fn().mockResolvedValue(null)
+};
+
+jest.mock('../utils/setupDefault', () => ({
+  setupDefault: () => mockSetupDefault
+}));
+
+// Mock MarketplaceClient
+const mockListings = [
+  {
+    id: '1',
+    asset: {
+      name: 'Test NFT',
+      collection: { name: 'Test Collection' },
+      image: 'test-image.jpg'
+    },
+    buyNow: { price: '0.1', currencySymbol: 'ETH' }
+  }
+];
+
+const mockMarketplaceClient = {
+  listListings: jest.fn().mockResolvedValue({ result: mockListings }),
+  getListing: jest.fn().mockResolvedValue(mockListings[0])
+};
+
+jest.mock('@imtbl/marketplace-sdk', () => ({
+  MarketplaceClient: jest.fn().mockImplementation(() => mockMarketplaceClient)
+}));
+
+// Wait for component to load and settle
+const waitForComponentToLoad = async () => {
+  await act(async () => {
+    await new Promise(resolve => setTimeout(resolve, 0));
+  });
+};
+
+describe('Marketplace App Tests', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('Marketplace page renders correctly', async () => {
+    // Import the component dynamically to avoid ESM issues
+    const MarketplacePage = require('../marketplace/page').default;
+    
+    // Render the component
+    render(<MarketplacePage />);
+    
+    // Wait for component to load
+    await waitForComponentToLoad();
+    
+    // Verify marketplace client was initialized
+    expect(require('@imtbl/marketplace-sdk').MarketplaceClient).toHaveBeenCalled();
+    
+    // Verify listings were fetched
+    expect(mockMarketplaceClient.listListings).toHaveBeenCalled();
+  });
+
+  test('Item details page renders correctly', async () => {
+    // Import the component dynamically to avoid ESM issues
+    const ItemDetailsPage = require('../item-details/[id]/page').default;
+    
+    // Render the component with params
+    render(<ItemDetailsPage params={{ id: '1' }} />);
+    
+    // Wait for component to load
+    await waitForComponentToLoad();
+    
+    // Verify listing was fetched
+    expect(mockMarketplaceClient.getListing).toHaveBeenCalledWith('1');
+  });
+});
+```
+
+Marketplace SDK Feature Implementation Verification Checklist:
+✓ Check if the functionality is available through documented public API methods
+✓ Properly handle authentication with Passport SDK
+✓ For events, implement proper cleanup in useEffect hooks
+✓ Use local type definitions rather than assuming types can be imported from the SDK
+✓ Test the implementation with both authentication and marketplace functionality
+✓ Document the implementation approach in the README
+
+Step 5: Documentation
+Create a README.md file:
+
+```markdown
+# Immutable Marketplace Sample
+
+This example demonstrates how to integrate the Immutable Marketplace SDK into a Next.js application. It showcases:
+
+- Browsing listings in a marketplace
+- Viewing individual item details
+- Authentication with Passport SDK
+- Initiating purchases
+
+## Getting Started
+
+1. Copy the `.env.example` file to `.env.local` and fill in your Immutable Publishable Key:
+
+```
+NEXT_PUBLIC_IMMUTABLE_PUBLISHABLE_KEY=your_publishable_key_here
+```
+
+2. Install dependencies:
+
+```bash
+pnpm install
+```
+
+3. Run the development server:
+
+```bash
+pnpm dev
+```
+
+4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
+
+## Features
+
+- **Marketplace Browsing**: View available NFTs with filtering and sorting options
+- **Item Details**: View detailed information about individual NFTs
+- **Authentication**: Login/logout functionality using Passport SDK
+- **Purchase Flow**: Initiate purchases for available NFTs
+
+## Implementation Notes
+
+- This example uses the Immutable Marketplace SDK to interact with the marketplace
+- Authentication is handled through the Passport SDK
+- The application is built with Next.js and uses Biom3 React components for UI
+- For testing, Jest is used with React Testing Library
+
+## Common Issues & Solutions
+
+- If you encounter CORS issues, ensure your domain is properly allowlisted in the Immutable Developer Hub
+- For authentication issues, check that your Publishable Key is correct and properly configured
+- If listings don't appear, verify that you're connected to the correct environment (SANDBOX vs PRODUCTION)
+```
+
+Final Checks
+✔️ Code follows existing structure and naming conventions.
+✔️ Uses Biom3 React components correctly (except Text component - use standard HTML tags instead).
+✔️ Dependencies match exactly with the login-with-nextjs example with the addition of marketplace SDK.
+✔️ README.md provides clear setup instructions.
+✔️ Tests are implemented with CommonJS and should run successfully with "pnpm test".
+✔️ The example app demonstrates marketplace functionality.
+
+Common Marketplace SDK Integration Pitfalls:
+
+1. DO NOT directly call methods that don't exist on the MarketplaceClient instance
+2. DO NOT try to import types or enums that aren't explicitly exported
+3. DO NOT forget to clean up event listeners when components unmount
+4. DO explicitly handle errors for API calls and provide fallback UI
+5. DO create local type definitions when necessary instead of importing non-exported types
+6. DO ensure proper authentication before attempting to initiate purchases
+
+Please make sure to run "pnpm test" after implementation to verify the tests pass. If they fail, troubleshoot until they pass successfully.
