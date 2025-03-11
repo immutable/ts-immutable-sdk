@@ -73,10 +73,6 @@ Since passport will be accessed in the pop-up, you can't use the playwright e2e 
 Otherwise, if you're not building a new passport example app THAT OPENS A POP-UP, you can use the playwright e2e tests.
 
 
-
-
-
-
 ## Second Prompt
 
 
@@ -94,7 +90,8 @@ IMPORTANT: isAuthenticated() is not a method of the Passport SDK.
 
 Step 2: Create a New Example App
 Name the new app:
-Format: login-with-passport-{feature-name}
+Format: {feature-name}-with-{framework-name}
+
 Set up the project:
 Copy only these essential files from login-with-nextjs:
 package.json (update the name but keep ALL other dependency versions exactly the same)
@@ -102,8 +99,11 @@ next.config.mjs
 tsconfig.json
 .env.example
 src/app/utils/setupDefault.ts
+src/app/utils/wrapper.ts
 src/app/layout.tsx
 src/app/globals.css
+.gitignore
+
 Do NOT copy route directories from existing examples. Create only the new routes required for your feature.
 Folder structure should be minimal:
  /src/app/
@@ -123,13 +123,13 @@ All logic should be inside the feature's page.tsx.
 Use Biom3 React components for UI, BUT:
 IMPORTANT: DO NOT use the Text component from @biom3/react. Instead, use standard HTML heading tags (h1, h2, h3, p) for all text content.
 DO NOT assume components exist if they are not in the Biom3 documentation.
-Wrap layout in AppWrapper:
-Copy utils/wrapper.tsx from login-with-nextjs.
+Wrap layout in AppWrapper from src/app/utils/wrapper.tsx:
 Use it inside layout.tsx, wrapping <body>'s children.
 
 IMPORTANT: For the layout.tsx file, DO NOT use next/font. This can cause conflicts with custom Babel configurations.
 
 Step 4: Documentation & Setup
+
 Add a README.md inside the new example app directory:
 Explain the {feature-name} feature.
 Provide steps to run the example.
@@ -198,7 +198,6 @@ Final Checks
 
 Feature-Specific Implementation Guidelines
 When implementing any new feature for Passport SDK examples:
-
 1. Focus on demonstrating the specific feature clearly and concisely
 2. Implement the feature using the appropriate options in the Passport SDK
 3. Show proper initialization and usage patterns on page load
@@ -221,3 +220,14 @@ DO NOT try to import types or enums that aren't explicitly exported (e.g., Passp
 3. DO NOT forget to clean up event listeners when components unmount
 DO explicitly document when you're using internal properties or methods with type assertions
 DO create local type definitions when necessary instead of importing non-exported types
+
+## Chat Prompt
+
+Can you run the attached prompt to create an new example app to show how to implement Event Handling in Passport. 
+
+Make sure you follow all of the instructions in the attached prompt.
+
+The naming convention should use the following variables;
+
+feature-name: event-handling
+framework: nextjs
