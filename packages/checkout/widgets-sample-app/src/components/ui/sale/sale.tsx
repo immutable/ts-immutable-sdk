@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Environment, ImmutableConfiguration } from "@imtbl/config";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import {
@@ -77,8 +77,8 @@ const useParams = () => {
     .get("excludePaymentTypes")
     ?.split(",") as SalePaymentTypes[];
 
-  const preferredCurrency = (urlParams.get("preferredCurrency") as string) ?? undefined;
-  const excludeFiatCurrencies = (urlParams.get("excludeFiatCurrencies") as string) ?? undefined;
+  const preferredCurrency = urlParams.get("preferredCurrency") ?? undefined;
+  const excludeFiatCurrencies = urlParams.get("excludeFiatCurrencies") ?? undefined;
   const hideExcludedPaymentTypes = Boolean(
     urlParams.get("hideExcludedPaymentTypes")
   );
@@ -105,7 +105,7 @@ const usePassportInstance = (passportConfig: any) => {
   } = passportConfig;
 
   if (!clientId || !redirectUri || !logoutRedirectUri || !audience || !scope) {
-    return undefined;
+    throw new Error("Invalid passport config");
   }
 
   const passportInstance = new Passport({
@@ -123,6 +123,41 @@ const usePassportInstance = (passportConfig: any) => {
 };
 
 export function SaleUI() {
+  const [passportInstance, setPassportInstance] = useState<
+    Passport | undefined
+  >(undefined);
+
+  const [passportConfig, setPassportConfig] = useState(
+    JSON.stringify(defaultPassportConfig, null, 2)
+  );
+
+  useEffect(() => {
+    const pp = usePassportInstance(JSON.parse(passportConfig));
+    pp.connectEvm().then(() => setPassportInstance(pp));
+  }, []);
+
+  if (!passportInstance) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <SaleUIInner
+      passportInstance={passportInstance}
+      passportConfig={passportConfig}
+      setPassportConfig={setPassportConfig}
+    />
+  );
+}
+
+function SaleUIInner({
+  passportInstance,
+  passportConfig,
+  setPassportConfig,
+}: {
+  passportInstance: Passport;
+  passportConfig: string;
+  setPassportConfig: (config: string) => void;
+}) {
   const params = useParams();
   const {
     login,
@@ -133,23 +168,18 @@ export function SaleUI() {
     hideExcludedPaymentTypes,
     excludeFiatCurrencies,
   } = params;
-  const [passportConfig, setPassportConfig] = useState(
-    JSON.stringify(defaultPassportConfig, null, 2)
-  );
+
   const [items, setItems] = useState(JSON.stringify(defaultItems, null, 2));
 
-  const passportInstance = useMemo(
-    () => usePassportInstance(JSON.parse(passportConfig)),
-    []
-  );
   const checkout = useMemo(
     () =>
       new Checkout({
         baseConfig: { environment: Environment.SANDBOX },
-        passport: passportInstance as unknown as Passport,
+        passport: passportInstance,
       }),
     [passportInstance]
   );
+
   const factory = useMemo(
     () =>
       new WidgetsFactory(checkout, {

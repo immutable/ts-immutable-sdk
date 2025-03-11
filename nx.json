@@ -77,9 +77,6 @@
         "test": {
           "changelog": false
         },
-        "docs": {
-          "changelog": false
-        },
         "build": {
           "changelog": false
         },
