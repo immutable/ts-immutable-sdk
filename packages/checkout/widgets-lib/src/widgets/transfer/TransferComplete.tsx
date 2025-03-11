@@ -1,5 +1,5 @@
 import {
-  Stack, Box, Heading, Link, Body, Button,
+  Stack, Box, Heading, Link, Button,
 } from '@biom3/react';
 import { ChainId, BlockExplorerService } from '@imtbl/checkout-sdk';
 import { useRive } from '@rive-app/react-canvas-lite';
@@ -53,7 +53,7 @@ export function TransferComplete({
               />
             )}
           >
-            <Body size="medium">{t('views.TRANSFER.content.seeTransactionOnImmutableZkEVM')}</Body>
+            {t('views.TRANSFER.content.seeTransactionOnImmutableZkEVM')}
           </Link>
         </Box>
         <Box sx={{ mx: 'base.spacing.x4' }}>
