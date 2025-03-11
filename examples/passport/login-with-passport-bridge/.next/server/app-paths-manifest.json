@@ -1,0 +1,5 @@
+{
+  "/redirect/page": "app/redirect/page.js",
+  "/login-with-bridge/page": "app/login-with-bridge/page.js",
+  "/page": "app/page.js"
+}

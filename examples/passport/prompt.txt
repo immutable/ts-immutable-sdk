@@ -1,5 +1,10 @@
+## First Prompt
+
+
 Can you review all the example apps inside the /examples directory and make sure you understand the code and the purpose of each example?
 Each example app contains a series of features that are implemented into routes in the /src/app directory.
+
+Can you review the Biom3 React components documentation and make sure you understand ALL OF the components and how to use them?
 
 For example, the features implemented in the /examples/passport/login-with-passport app are:
 
@@ -38,6 +43,8 @@ For example, if the new feature is login with email, create only:
 - /src/app/page.tsx               # Landing page with link to email login
 - /src/app/login-with-email/     # Email login implementation
 
+4. Don't copy directories like .next, etc.
+
 Please copy the utils/wrapper.tsx file from the login-with-nextjs example app and make sure to use it in the layout.tsx file the same way 
 it is used in the login-with-nextjs example app. e.g. wrap the children of <body> in the layout.tsx file with the AppWrapper component.
 
@@ -52,3 +59,165 @@ Can you not use any abstracted components or state providers. Ideally all the co
 in the page.tsx file that inside the example app which showcases the new feature?
 
 Can you make sure you use the Biom3 React components for the UI?
+IMPORTANT: MAKE SURE YOU DON'T ASSUME THE EXISTENCE OF ANY COMPONENTS THAT AREN'T PRESENT IN THE BIOM3 REACT COMPONENTS DOCUMENTATION. IF YOU ARE NOT SURE, DON'T ASSUME. Text is not a component.
+
+Can you make sure that you've installed all of the dependencies for the new example app?
+
+Run the install command pnpm install in the new example app directory to install all of the dependencies.
+
+Can you make sure that you've added all of the new dependencies to the package.json file?
+
+Can you please ensure that you've created unit tests for the new example app? 
+
+Since passport will be accessed in the pop-up, you can't use the playwright e2e tests. 
+Otherwise, if you're not building a new passport example app THAT OPENS A POP-UP, you can use the playwright e2e tests.
+
+
+
+
+
+
+## Second Prompt
+
+
+Task: Create a {feature-name} Example App for Immutable Passport SDK
+Follow these steps to create a new React example app inside the /examples/passport directory that showcases the new feature of {feature-name}.
+
+Step 1: Review Existing Code & Documentation
+Review all example apps in the /examples directory. Ensure you understand the code and the purpose of each example.
+Example app features are implemented as routes inside the /src/app directory.
+Review the Biom3 React components documentation to fully understand all components and their usage.
+DO NOT assume the existence of any components that are not documented. If unsure, do not assume.
+
+Review the current version of the Passport SDK documentation. Only use the methods and options that are present in the documentation of the current version of the Passport SDK.
+IMPORTANT: isAuthenticated() is not a method of the Passport SDK.
+
+Step 2: Create a New Example App
+Name the new app:
+Format: login-with-passport-{feature-name}
+Set up the project:
+Copy only these essential files from login-with-nextjs:
+package.json (update the name but keep ALL other dependency versions exactly the same)
+next.config.mjs
+tsconfig.json
+.env.example
+src/app/utils/setupDefault.ts
+src/app/layout.tsx
+src/app/globals.css
+Do NOT copy route directories from existing examples. Create only the new routes required for your feature.
+Folder structure should be minimal:
+ /src/app/
+├── page.tsx                    # Main landing page  
+├── {feature-name}/page.tsx  # Feature implementation  
+├── redirect/page.tsx              # Redirect page  
+├── logout/page.tsx              # Logout page
+├── utils/                      # Shared utilities  
+├── tests/                      # Tests  
+└── layout.tsx                  # App layout  
+
+
+Step 3: Implement the New Example App
+Ensure the new app is self-contained:
+Do NOT use abstracted components or state providers.
+All logic should be inside the feature's page.tsx.
+Use Biom3 React components for UI, BUT:
+IMPORTANT: DO NOT use the Text component from @biom3/react. Instead, use standard HTML heading tags (h1, h2, h3, p) for all text content.
+DO NOT assume components exist if they are not in the Biom3 documentation.
+Wrap layout in AppWrapper:
+Copy utils/wrapper.tsx from login-with-nextjs.
+Use it inside layout.tsx, wrapping <body>'s children.
+
+IMPORTANT: For the layout.tsx file, DO NOT use next/font. This can cause conflicts with custom Babel configurations.
+
+Step 4: Documentation & Setup
+Add a README.md inside the new example app directory:
+Explain the {feature-name} feature.
+Provide steps to run the example.
+Install dependencies:
+Run pnpm install inside the new example app directory.
+IMPORTANT: Do not modify any package.json dependency versions from what was copied. Use the exact same versions as in the login-with-nextjs example.
+
+Step 5: Testing
+Important Testing Setup Instructions:
+Create a proper Jest configuration file (jest.config.js) with the following settings:
+   module.exports = {
+     testEnvironment: 'jsdom',
+     transform: {
+       '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { configFile: './babel.config.jest.js' }],
+     },
+     moduleNameMapper: {
+       '^@/(.*)$': '<rootDir>/src/$1',
+     },
+     testPathIgnorePatterns: ['/node_modules/', '/.next/'],
+     transformIgnorePatterns: [
+       '/node_modules/(?!(@biom3|@imtbl)/)',
+     ],
+   };
+
+Create a Babel configuration specifically for Jest (babel.config.jest.js):
+   module.exports = {
+     presets: [
+       ['@babel/preset-env', { targets: { node: 'current' } }],
+       '@babel/preset-typescript',
+       ['@babel/preset-react', { runtime: 'automatic' }],
+     ],
+   };
+
+For the test implementation:
+1. Create tests/unit/passport.test.js as a plain JavaScript file (not TypeScript)
+2. Use CommonJS syntax (require instead of import) in test files
+3. Make sure to run "pnpm test" after implementation to verify tests are working
+4. If tests fail with ESM errors or module resolution errors, update your Jest configuration:
+   - Add "type: 'commonjs'" to your package.json file
+   - Update transformIgnorePatterns in jest.config.js to include any problematic packages
+   - Use appropriate mocking techniques that work with CommonJS
+5. If the test is still failing, try the following:
+   - Change your test file to not directly import from @imtbl/sdk
+   - Use manual mock objects instead of jest.mock for external dependencies
+   - Mock only the necessary methods you're testing
+   - Continue iterating until "pnpm test" successfully runs without errors while maintaining the test cases which validates that the core functionality of the example app is working
+
+Since Passport authentication opens a pop-up, DO NOT use Playwright E2E tests.
+
+SDK Feature Implementation Verification Checklist:
+Before implementing any feature that interacts with the Passport SDK, verify:
+✓ Check if the functionality is available through a documented public API method
+✓ If accessing internal properties/methods is necessary, use type assertions and document this clearly
+✓ For events, always implement proper cleanup in useEffect hooks
+✓ Use local type definitions rather than assuming types can be imported from the SDK
+✓ Test your implementation with both the login and logout flows
+6. ✓ Document any non-standard approaches in the README
+
+Final Checks
+✔️ Code follows existing structure and naming conventions.
+✔️ Uses Biom3 React components correctly (except Text component - use standard HTML tags instead).
+✔️ Dependencies match exactly with the login-with-nextjs example.
+✔️ README.md provides clear setup instructions.
+✔️ Tests are implemented with CommonJS and run successfully with "pnpm test".
+✔️ The example app demonstrates {feature-name}.
+
+Feature-Specific Implementation Guidelines
+When implementing any new feature for Passport SDK examples:
+
+1. Focus on demonstrating the specific feature clearly and concisely
+2. Implement the feature using the appropriate options in the Passport SDK
+3. Show proper initialization and usage patterns on page load
+4. Include appropriate fallback mechanisms if the primary authentication method fails
+5. Display authentication status and user information using standard HTML tags (h1, h2, h3) not custom Text components
+6. Always include logout functionality where appropriate
+7. Keep the implementation self-contained within the feature's page.tsx file
+8. Document any environment variables or configuration needed
+
+By following these guidelines, you'll create well-structured, tested example apps that demonstrate specific Passport SDK features while maintaining flexibility for future example apps.
+
+Please make sure you don't miss any steps. Always run pnpm test after creating the tests, and make sure they pass.
+If not, please fix the issues and run the tests again until they pass.
+
+Common Passport SDK Integration Pitfalls:
+
+Avoid these common issues when creating Passport SDK examples:
+DO NOT directly call methods that don't exist on the Passport instance (e.g., on(), removeListener())
+DO NOT try to import types or enums that aren't explicitly exported (e.g., PassportEvents)
+3. DO NOT forget to clean up event listeners when components unmount
+DO explicitly document when you're using internal properties or methods with type assertions
+DO create local type definitions when necessary instead of importing non-exported types
