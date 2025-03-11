@@ -82,6 +82,7 @@ describe('MagicProviderProxyFactory', () => {
 
       expect(mockMagicClient.user.isLoggedIn).toHaveBeenCalled();
       expect(mockAuthManager.getUser).toHaveBeenCalled();
+      /** @ts-ignore */
       expect(mockMagicClient.openid.loginWithOIDC).toHaveBeenCalledWith({
         jwt: mockIdToken,
         providerId: mockConfig.magicProviderId,
