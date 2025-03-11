@@ -41,7 +41,7 @@ npm add @imtbl/orderbook
 # or
 pnpm add @imtbl/orderbook
 # or
-pnpm add @imtbl/orderbook
+yarn add @imtbl/orderbook
 ```
 
 ## SDK Installation
