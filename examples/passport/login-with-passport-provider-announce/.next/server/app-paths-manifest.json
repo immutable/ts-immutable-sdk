@@ -1,6 +1,0 @@
-{
-  "/page": "app/page.js",
-  "/redirect/page": "app/redirect/page.js",
-  "/provider-announce/page": "app/provider-announce/page.js",
-  "/logout/page": "app/logout/page.js"
-}

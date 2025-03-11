@@ -1,5 +1,0 @@
-{
-  "/redirect/page": "app/redirect/page.js",
-  "/silent-auth/page": "app/silent-auth/page.js",
-  "/page": "app/page.js"
-}

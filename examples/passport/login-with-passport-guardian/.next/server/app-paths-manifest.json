@@ -1,6 +1,0 @@
-{
-  "/page": "app/page.js",
-  "/guardian-messages/page": "app/guardian-messages/page.js",
-  "/logout/page": "app/logout/page.js",
-  "/guardian-transactions/page": "app/guardian-transactions/page.js"
-}

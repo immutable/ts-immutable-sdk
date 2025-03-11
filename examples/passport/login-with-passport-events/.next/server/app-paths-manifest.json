@@ -1,5 +1,0 @@
-{
-  "/events/page": "app/events/page.js",
-  "/logout/page": "app/logout/page.js",
-  "/page": "app/page.js"
-}
