@@ -5,9 +5,9 @@ import { fileURLToPath } from 'url';
 
 const FILENAME = fileURLToPath(import.meta.url);
 const DIRNAME = path.dirname(FILENAME);
-const examplesDir = path.join(DIRNAME, 'examples', '_parsed');
+const examplesDir = path.join(DIRNAME, '..', '_parsed');
 const main = (product) => {
-  const sampleAppDir = path.join(DIRNAME, 'examples', product);
+  const sampleAppDir = path.join(DIRNAME, '..', product);
 
   // Create an object to hold all app data
   const allApps = {};
@@ -49,15 +49,16 @@ const main = (product) => {
   }
 
   // Write a single JSON file in the product directory
-  fs.writeFileSync(
-    path.join(examplesDir, `${product}-examples.json`),
-    JSON.stringify(allApps, null, 2),
-  );
-
-  console.log(`Created ${product}-examples.json with data for ${Object.keys(allApps).length} apps`);
+  if (Object.keys(allApps).length > 0) {
+    fs.writeFileSync(
+      path.join(examplesDir, `${product}-examples.json`),
+      JSON.stringify(allApps, null, 2),
+    );
+    console.log(`Created ${product}-examples.json with data for ${Object.keys(allApps).length} apps`);
+  }
 };
 
-const products = ['passport']; // 'checkout', 'orderbook', 'contracts' etc
+const products = ['passport', 'checkout', 'orderbook', 'contracts']; 
 products.forEach((product) => {
   main(product);
 });

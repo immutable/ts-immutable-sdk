@@ -1,8 +1,0 @@
-{
-  "title": "Logged-in User with Next.js",
-  "description": "A Next.js application demonstrating how to access user information after logging in with Immutable Passport",
-  "keywords": ["Passport", "Next.js", "Authentication", "User Info", "Linked Addresses", "Tokens"],
-  "tech_stack": ["TypeScript", "Next.js", "React", "Biome UI"],
-  "category": "Passport",
-  "programming_language": "TypeScript"
-} 

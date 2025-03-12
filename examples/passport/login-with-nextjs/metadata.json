@@ -1,8 +1,0 @@
-{
-  "title": "Login with Next.js",
-  "description": "A Next.js application demonstrating different ways to login and logout with Immutable Passport",
-  "keywords": ["Passport", "Next.js", "Authentication", "Login", "Logout", "EtherJS", "Identity"],
-  "tech_stack": ["TypeScript", "Next.js", "React", "Biome UI", "EtherJS"],
-  "category": "Passport",
-  "programming_language": "TypeScript"
-} 
