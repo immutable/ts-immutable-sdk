@@ -66,10 +66,10 @@ export default function NFTDetailsPage() {
   const formatBalance = (balance: string) => {
     if (!balance) return '0';
     
-    const balanceNum = parseFloat(balance);
+    const balanceNum = parseFloat(balance) / 10**18;
     if (balanceNum < 0.000001) return '< 0.000001';
     
-    return balanceNum.toFixed(6);
+    return balanceNum;
   };
   
   // Check if the current user is the seller
@@ -145,7 +145,7 @@ export default function NFTDetailsPage() {
       setLoadingDetails(true);
       console.log("Fetching NFT details for ID:", id);
       
-      // Set a safety timeout to prevent infinite loading
+      // Set a safety timeout to prevent infinite loading  
       const safetyTimeout = setTimeout(() => {
         if (loadingDetails) {
           console.log("Safety timeout triggered for NFT details");
@@ -157,7 +157,7 @@ export default function NFTDetailsPage() {
       // Get the order details
       const orderResponse = await orderbookSDK.getOrderById({
         orderId: id,
-        chainName: SUPPORTED_CHAINS.DEFAULT
+        chainName: SUPPORTED_CHAINS.IMTBL_ZKEVM_TESTNET
       });
       
       // Clear the safety timeout since we got a response
@@ -198,6 +198,15 @@ export default function NFTDetailsPage() {
   const loginWithPassport = async () => {
     try {
       await passportInstance.login();
+      const passportProvider = await passportInstance.connectEvm();
+        setProvider(passportProvider);
+        if (passportProvider) {
+            const accounts = await passportProvider.request({ method: "eth_accounts" });
+            if (accounts && accounts.length > 0) {
+              setAccountAddress(accounts[0]);
+              setIsLoggedIn(true);
+            }
+        }
       // The page will reload after successful login via the redirect
     } catch (error) {
       console.error("Error logging in with Passport:", error);
@@ -221,7 +230,7 @@ export default function NFTDetailsPage() {
       // Get the order
       const orderResponse = await orderbookSDK.getOrderById({
         orderId: nftDetails.id,
-        chainName: SUPPORTED_CHAINS.DEFAULT
+        chainName: SUPPORTED_CHAINS.IMTBL_ZKEVM_TESTNET
       });
       
       if (!orderResponse || !orderResponse.result) {
@@ -250,9 +259,34 @@ export default function NFTDetailsPage() {
             const txHash = await provider.request(txRequest);
             console.log("Transaction submitted:", txHash);
             
-            // Wait for the transaction to be confirmed
-            // This is a simplified version - a production app should wait properly
-            await new Promise(resolve => setTimeout(resolve, 5000));
+            // Wait for transaction confirmation
+            let confirmed = false;
+            const maxAttempts = 10;
+            let attempts = 0;
+            
+            while (!confirmed && attempts < maxAttempts) {
+              try {
+                // Get transaction receipt
+                const receipt = await provider.request({
+                  method: 'eth_getTransactionReceipt',
+                  params: [txHash]
+                });
+                
+                if (receipt && receipt.blockNumber) {
+                  console.log("Transaction confirmed:", receipt);
+                  confirmed = true;
+                } else {
+                  attempts++;
+                  console.log(`Waiting for confirmation... Attempt ${attempts}/${maxAttempts}`);
+                  // Wait 5 seconds between attempts
+                  await new Promise(resolve => setTimeout(resolve, 5000));
+                }
+              } catch (error) {
+                console.error("Error checking transaction:", error);
+                attempts++;
+                await new Promise(resolve => setTimeout(resolve, 5000));
+              }
+            }
           }
         }
       }
@@ -263,7 +297,7 @@ export default function NFTDetailsPage() {
       
       // Refresh after a delay
       setTimeout(() => {
-        router.push('/dashboard');
+        router.push('/');
       }, 3000);
       
     } catch (error) {

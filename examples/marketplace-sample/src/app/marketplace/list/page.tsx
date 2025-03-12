@@ -110,12 +110,13 @@ export default function ListNFT() {
       
       // Use the blockchain data SDK to fetch NFT details
       const blockchainData = orderbookSDK.getAllClients().blockchainData;
+      console.log("blockchainData", blockchainData);
       const response = await blockchainData.getNFT({
         chainName: 'imtbl-zkevm-testnet', // Use appropriate chain
         contractAddress: contractAddress,
         tokenId: tokenId
       });
-      
+      console.log("response", response);
       if (response && response.result) {
         // Use type assertion to match SDK response structure
         const result = response.result as unknown as NFTResponse;

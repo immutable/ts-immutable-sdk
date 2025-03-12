@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { Provider } from '@imtbl/sdk/passport';
 import { Orderbook } from '@imtbl/orderbook';
 import { blockchainData } from '@imtbl/sdk';
+import { SUPPORTED_CHAINS } from '../utils/marketplaceConfig';
 
 export default function Home() {
   // User and wallet state
@@ -37,12 +38,11 @@ export default function Home() {
       try {
         setLoading(true);
         
-        // Check if user is already authenticated
-        const isAuthenticated = await passportInstance.isAuthenticated();
-        
-        if (isAuthenticated) {
-          // Get user profile
+        // Check if user is already authenticated - use getUserInfo to check authentication
+        try {
           const profile = await passportInstance.getUserInfo();
+          
+          // If we get here without an error, user is authenticated
           setUserProfile(profile);
           
           // Connect provider and get account
@@ -65,6 +65,9 @@ export default function Home() {
               await fetchTransactionHistory(accounts[0]);
             }
           }
+        } catch (authError) {
+          // If getUserInfo fails, user is not authenticated
+          console.log("User is not authenticated:", authError);
         }
       } catch (error) {
         console.error("Failed to initialize user data:", error);
@@ -111,16 +114,34 @@ export default function Home() {
   const fetchUserNFTs = async (address: string) => {
     try {
       // Get the blockchain data provider from orderbook SDK
-      const blockchainData = orderbookSDK.blockchainData;
+      const blockchainData = orderbookSDK.getAllClients().blockchainData;
+      console.log("blockchainData", blockchainData);
       
-      // Fetch NFTs owned by the user
-      const response = await blockchainData.listNFTsByAccountAddress({
-        accountAddress: address,
-        chainName: blockchainData.ChainName.IMTBL_ZKEVM_TESTNET
-      });
+      // Log the user address for debugging
+      console.log("Fetching NFTs for address:", address);
       
-      if (response && response.result) {
-        setUserNFTs(response.result);
+      // Try with expanded parameters
+      try {
+        // Use the listNFTsByAccountAddress method with supported parameters
+        const response = await blockchainData.listNFTsByAccountAddress({
+          accountAddress: address,
+          chainName: SUPPORTED_CHAINS.IMTBL_ZKEVM_TESTNET,
+          pageSize: 100  // Request more NFTs per page
+        });
+        
+        console.log("NFT response:", response);
+        console.log("User address:", address);
+        
+        if (response && response.result && response.result.length > 0) {
+          setUserNFTs(response.result);
+        } else {
+          // Check the console logs to see what's coming back
+          console.log("No NFTs found or empty result array received");
+          setUserNFTs([]);
+        }
+      } catch (error) {
+        console.error("Error fetching NFTs:", error);
+        setUserNFTs([]);
       }
     } catch (error) {
       console.error("Failed to fetch NFTs:", error);
@@ -131,57 +152,79 @@ export default function Home() {
   // Fetch transaction history using Immutable's SDK
   const fetchTransactionHistory = async (address: string) => {
     try {
-      // Get the blockchain data provider from orderbook SDK
-      const blockchainData = orderbookSDK.blockchainData;
+      // For now, focus on orderbook trades since they're most likely to be available
+      console.log("Fetching transaction history from orderbook for address:", address);
       
-      // Fetch transaction history for the user
-      const response = await blockchainData.listTransactionsByAccountAddress({
-        accountAddress: address,
-        chainName: blockchainData.ChainName.IMTBL_ZKEVM_TESTNET,
-        limit: 20
-      });
-      
-      if (response && response.result) {
-        // Transform transaction data into a more usable format
-        const formattedTransactions = response.result.map(tx => {
-          // Determine transaction type based on data
-          let type = 'Transaction';
-          if (tx.transfers && tx.transfers.length > 0) {
-            if (tx.transfers[0].from.toLowerCase() === address.toLowerCase()) {
-              type = 'Sale';
-            } else if (tx.transfers[0].to.toLowerCase() === address.toLowerCase()) {
-              type = 'Purchase';
-            }
-          }
-          
-          // Extract asset name if available
-          let assetName = 'Unknown Asset';
-          if (tx.transfers && tx.transfers.length > 0 && tx.transfers[0].token_id) {
-            assetName = `#${tx.transfers[0].token_id}`;
-          }
-          
-          // Extract value if available
-          let value = 'N/A';
-          if (tx.transfers && tx.transfers.length > 0 && tx.transfers[0].value) {
-            value = `${parseFloat(tx.transfers[0].value) / 1e18} ETH`;
-          }
-          
-          return {
-            id: tx.transaction_hash,
-            hash: tx.transaction_hash,
-            type,
-            assetName,
-            value,
-            timestamp: tx.timestamp * 1000, // Convert to milliseconds
-          };
+      try {
+        // Use the orderbook SDK directly to fetch trade history
+        const orderbookResponse = await orderbookSDK.listTrades({
+          chainName: SUPPORTED_CHAINS.IMTBL_ZKEVM_TESTNET,
+          walletAddress: address,
+          limit: 20
         });
         
-        setTransactions(formattedTransactions);
+        console.log("Orderbook transaction history:", orderbookResponse);
+        
+        if (orderbookResponse && orderbookResponse.result) {
+          // Process trades into our transaction format
+          const tradeTransactions = orderbookResponse.result.map((trade: any) => ({
+            id: trade.id || `trade-${Math.random().toString(36).substr(2, 9)}`,
+            hash: trade.transactionHash || '',
+            type: trade.makerAddress?.toLowerCase() === address.toLowerCase() ? 'Sale' : 'Purchase',
+            assetName: trade.nft?.tokenId || `NFT #${trade.nft?.tokenId || 'Unknown'}`,
+            value: `${parseFloat(trade.takerAmount || '0') / 1e18} ETH`,
+            timestamp: new Date(trade.timestamp || Date.now()).getTime()
+          }));
+          
+          setTransactions(tradeTransactions);
+        } else {
+          console.log("No trade history found");
+          setTransactions([]);
+        }
+      } catch (error) {
+        console.error("Error fetching trade history:", error);
+        setTransactions([]);
       }
     } catch (error) {
       console.error("Failed to fetch transaction history:", error);
       setTransactions([]);
     }
+  };
+
+  // Helper function to process transaction data
+  const processTransactionData = (txData: any[], userAddress: string) => {
+    return txData.map(tx => {
+      // Determine transaction type based on data
+      let type = 'Transaction';
+      if (tx.transfers && tx.transfers.length > 0) {
+        if (tx.transfers[0].from.toLowerCase() === userAddress.toLowerCase()) {
+          type = 'Sale';
+        } else if (tx.transfers[0].to.toLowerCase() === userAddress.toLowerCase()) {
+          type = 'Purchase';
+        }
+      }
+      
+      // Extract asset name if available
+      let assetName = 'Unknown Asset';
+      if (tx.transfers && tx.transfers.length > 0 && tx.transfers[0].token_id) {
+        assetName = `#${tx.transfers[0].token_id}`;
+      }
+      
+      // Extract value if available
+      let value = 'N/A';
+      if (tx.transfers && tx.transfers.length > 0 && tx.transfers[0].value) {
+        value = `${parseFloat(tx.transfers[0].value) / 1e18} ETH`;
+      }
+      
+      return {
+        id: tx.transaction_hash || tx.id || `tx-${Math.random().toString(36).substr(2, 9)}`,
+        hash: tx.transaction_hash || tx.hash || '',
+        type,
+        assetName,
+        value,
+        timestamp: (tx.timestamp ? tx.timestamp * 1000 : Date.now()), // Convert to milliseconds
+      };
+    });
   };
 
   return (

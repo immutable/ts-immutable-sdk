@@ -26,9 +26,8 @@ interface NFTListing {
 }
 
 interface Collection {
-  name: string;
+  tokenId: string;
   contractAddress: string;
-  description?: string;
   imageUrl?: string;
   totalItems?: number;
 }
@@ -233,8 +232,7 @@ export default function Marketplace() {
       
       console.log("List orders response:", response);
       
-      if (response && response.result) {
-        // Process the listings to extract NFT details
+      if (response.result) {
         const listingsData: NFTListing[] = response.result.map((order: Order) => {
           const nftItem = order.sell[0]; // Assuming the first sell item is the NFT
           
@@ -244,7 +242,6 @@ export default function Marketplace() {
             contractAddress: nftItem.contractAddress,
             tokenId: nftItem.tokenId,
             name: `NFT #${nftItem.tokenId}`, // Default name based on token ID
-            collectionName: 'Unknown Collection',
             price: order.buy[0].amount,
             sellerAddress: order.accountAddress,
             createdAt: order.createdAt
@@ -254,25 +251,41 @@ export default function Marketplace() {
         console.log("Processed listings data:", listingsData);
         setListings(listingsData);
         
-        // Set pagination info
-        if (response.page) {
-          setTotalPages(Math.ceil(response.result.length / DISPLAY_SETTINGS.ITEMS_PER_PAGE));
-        }
-        
-        // Now that we have listings, fetch collections
-        fetchCollections();
-      } else {
-        console.log("No listings found or invalid response format");
-        setListings([]);
-        setTotalPages(1);
+        // Extract collection data from listings
+        const uniqueCollections = extractCollectionsFromListings(listingsData);
+        console.log("uniqueCollections", uniqueCollections);
+        setCollections(uniqueCollections);
+        setLoadingCollections(false);
       }
       
       setLoadingListings(false);
     } catch (error) {
       console.error("Error fetching marketplace listings:", error);
-      setListings([]);
       setLoadingListings(false);
+      setLoadingCollections(false);
     }
+  };
+  
+  // Helper function to extract unique collections from listings
+  const extractCollectionsFromListings = (listings: NFTListing[]) => {
+    const collectionsMap = new Map();
+    
+    listings.forEach(listing => {
+      if (!collectionsMap.has(listing.contractAddress)) {
+        collectionsMap.set(listing.contractAddress, {
+          tokenId: listing.tokenId,
+          contractAddress: listing.contractAddress,
+          totalItems: 1
+        });
+      } else {
+        // Increment count for existing collection
+        const collection = collectionsMap.get(listing.contractAddress);
+        collection.totalItems += 1;
+        collectionsMap.set(listing.contractAddress, collection);
+      }
+    });
+    
+    return Array.from(collectionsMap.values());
   };
   
   // Fetch listings by collection
@@ -293,7 +306,7 @@ export default function Marketplace() {
       const response = await orderbookSDK.listOrders({
         status: OrderStatusName.ACTIVE,
         type: 'LISTING',
-        chainName: SUPPORTED_CHAINS.DEFAULT,
+        chainName: SUPPORTED_CHAINS.IMTBL_ZKEVM_TESTNET,
         sellToken: {
           type: 'ERC721',
           contractAddress: collectionAddress
@@ -318,7 +331,6 @@ export default function Marketplace() {
             contractAddress: nftItem.contractAddress,
             tokenId: nftItem.tokenId,
             name: `NFT #${nftItem.tokenId}`, // Default name based on token ID
-            collectionName: 'Unknown Collection',
             price: order.buy[0].amount,
             sellerAddress: order.accountAddress,
             createdAt: order.createdAt
@@ -373,25 +385,20 @@ export default function Marketplace() {
                 // Try different methods to get collection info
                 try {
                   const collectionDetails = await blockchainData.getCollection({
-                    chainName: SUPPORTED_CHAINS.DEFAULT,
+                    chainName: SUPPORTED_CHAINS.IMTBL_ZKEVM_TESTNET,
                     contractAddress: item.contractAddress
                   });
                   
                   if (collectionDetails) {
                     uniqueCollections.set(item.contractAddress, {
-                      name: collectionDetails.name || 'Unknown Collection',
+                      tokenId: item.tokenId,
                       contractAddress: item.contractAddress,
-                      description: collectionDetails.description,
-                      imageUrl: collectionDetails.image_url || '/placeholder-collection.png',
-                      totalItems: collectionDetails.total_supply_raw 
-                        ? parseInt(collectionDetails.total_supply_raw)
-                        : undefined
                     });
                   }
                 } catch (error) {
                   console.log("Error with getCollection, using listing data as fallback", error);
                   uniqueCollections.set(item.contractAddress, {
-                    name: item.collectionName || 'Unknown Collection',
+                    tokenId: item.tokenId,
                     contractAddress: item.contractAddress,
                     imageUrl: '/placeholder-collection.png'
                   });
@@ -399,7 +406,7 @@ export default function Marketplace() {
               } catch (error) {
                 console.error("Error fetching collection details:", error);
                 uniqueCollections.set(item.contractAddress, {
-                  name: item.collectionName || 'Unknown Collection',
+                  tokenId: item.tokenId,
                   contractAddress: item.contractAddress,
                   imageUrl: '/placeholder-collection.png'
                 });
@@ -411,6 +418,7 @@ export default function Marketplace() {
         console.log("Processed collections:", Array.from(uniqueCollections.values()));
         setCollections(Array.from(uniqueCollections.values()));
       } else {
+        console.log("listings", listings);
         console.log("No listings available to extract collections from");
         setCollections([]);
       }
@@ -444,7 +452,7 @@ export default function Marketplace() {
       const response = await orderbookSDK.listOrders({
         status: OrderStatusName.ACTIVE,
         type: 'LISTING',
-        chainName: SUPPORTED_CHAINS.DEFAULT,
+        chainName: SUPPORTED_CHAINS.IMTBL_ZKEVM_TESTNET,
         accountAddress: address,
         cursor: '',
         pageSize: DISPLAY_SETTINGS.ITEMS_PER_PAGE
@@ -466,7 +474,6 @@ export default function Marketplace() {
             contractAddress: nftItem.contractAddress,
             tokenId: nftItem.tokenId,
             name: `NFT #${nftItem.tokenId}`, // Default name based on token ID
-            collectionName: 'Unknown Collection',
             price: order.buy[0].amount,
             sellerAddress: order.accountAddress,
             createdAt: order.createdAt
@@ -554,8 +561,19 @@ export default function Marketplace() {
   const loginWithPassport = async () => {
     try {
       await passportInstance.login();
+      const passportProvider = await passportInstance.connectEvm();
+        setProvider(passportProvider);
+        if (passportProvider) {
+            const accounts = await passportProvider.request({ method: "eth_accounts" });
+            if (accounts && accounts.length > 0) {
+              setAccountAddress(accounts[0]);
+              setIsLoggedIn(true);
+            }
+        }
+      // The page will reload after successful login via the redirect
     } catch (error) {
       console.error("Error logging in with Passport:", error);
+      // setError("Failed to log in. Please try again.");
     }
   };
   
@@ -661,8 +679,7 @@ export default function Marketplace() {
           {collections.filter(c => c.contractAddress === selectedCollection).map((collection, index) => (
             <div key={index} className="bg-gray-50 p-4 rounded-lg flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold">{collection.name}</h2>
-                <p className="mt-1">{collection.description || 'No description available'}</p>
+                <h2 className="text-xl font-semibold">{collection.tokenId}</h2>
                 <p className="text-sm text-gray-500 mt-1">
                   {collection.totalItems || 0} items • Contract: {formatAddress(collection.contractAddress)}
                 </p>
@@ -721,7 +738,7 @@ export default function Marketplace() {
                     <tr key={index} className="hover:bg-gray-50">
                       <td className="py-3 px-4 text-sm">{listing.tokenId}</td>
                       <td className="py-3 px-4 text-sm font-mono">{formatAddress(listing.contractAddress)}</td>
-                      <td className="py-3 px-4 text-sm font-semibold">{parseFloat(listing.price).toFixed(6)}</td>
+                      <td className="py-3 px-4 text-sm font-semibold">{parseFloat(listing.price) / 10**18}</td>
                       <td className="py-3 px-4 text-sm font-mono">{formatAddress(listing.sellerAddress)}</td>
                       <td className="py-3 px-4 text-sm">{formatDate(listing.createdAt)}</td>
                       <td className="py-3 px-4 text-sm">
@@ -778,7 +795,7 @@ export default function Marketplace() {
               <table className="min-w-full bg-white border border-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Collection Name</th>
+                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Token ID</th>
                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contract Address</th>
                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -787,7 +804,7 @@ export default function Marketplace() {
                 <tbody className="divide-y divide-gray-200">
                   {collections.map((collection, index) => (
                     <tr key={index} className="hover:bg-gray-50">
-                      <td className="py-3 px-4 text-sm font-medium">{collection.name}</td>
+                      <td className="py-3 px-4 text-sm font-medium">{collection.tokenId}</td>
                       <td className="py-3 px-4 text-sm font-mono">{formatAddress(collection.contractAddress)}</td>
                       <td className="py-3 px-4 text-sm">{collection.totalItems || 0}</td>
                       <td className="py-3 px-4 text-sm">
