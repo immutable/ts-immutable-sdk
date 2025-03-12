@@ -12,29 +12,37 @@ I want you to go through the example app in the /examples/passport/login-with-ne
 SECOND PROMPT
 
 I want you to analyze the example app in this directory. If this example app has no tutorial.md and metadata.json file, follow these steps:
+IMPORTANT: BEFORE YOU START, MAKE SURE TO READ AND GO THROUGH ALL OF THE SDK'S DOCUMENTATION AND GET A FULL UNDERSTANDING OF THE SDK'S FEATURES AND FUNCTIONALITY (UNDER sdk and packages folder)
 
-1. Analyze the current directory and understand the app's functionality, covering key components, logic, and interactions.
-
+1. Analyze the current EXAMPLE APP directory and ensure that you deeply understand the app's functionality, covering key components, logic, and interactions.
 Read and understand all relevant files in the example app directory.
-Ensure a deep understanding of the app’s functionality, covering key components, logic, and interactions.
 Identify core dependencies, frameworks, and technologies used.
-2. Generate a Comprehensive Code Walkthrough (tutorial.md)
 
-Create a tutorial.md file in the root of the example app.
+IMPORTANT: EACH EXAMPLE APP IS A GROUP OF RELATED FEATURES AND WE'RE SHOWING OPTIONS FOR EACH GRATURE WHERE APPLICABLE. THIS IS NOT A STEP BY STEP TUTORIAL. DON'T INCLUDE THE GUIDES TO INITIALIZE THE SDK, JUST FOCUS ON THE EXAMPLE APP.
+
+2. Generate a Comprehensive Code Walkthrough (tutorial.md)
+Create a tutorial.md file in the root of the current example app.
 The tutorial must be structured as follows:
-Introduction: Overview of the app and its purpose.
-Prerequisites: Dependencies and installation steps.
-Project Structure: Brief breakdown of directories and key files.
-Code Walkthrough:
-SDK Integration Walkthrough:
-How the SDK is initialized 
-Explain core functionality with code snippets.
-Highlight key files, their roles, and critical logic.
-Ensure explanations are clear for both beginners and advanced users.
-Running the App: Steps to execute the app locally.
-Summary: A concise recap of the main points covered in the tutorial.
+1. Introduction: Overview of the app and its purpose (include a link to the example app's Github repository).
+
+2. SDK Integration Walkthrough (THIS WILL BE A SECTION WITH MULTIPLE SUBSECTIONS OF THE FEATURES COVERED IN THE EXAMPLE APP):
+FIRST, START OFF BY SHOWING A LIST OF FEATURES COVERED IN THE EXAMPLE APP.(NOT NUMBERED)
+IN THE SUBSECTIONS (IMPORTANT: DON'T INCLUDE THE GUIDES TO INITIALIZE THE SDK, JUST FOCUS ON THE EXAMPLE APP'S FEATURES):
+- Show the feature of the SDK that are demonstrated in the example app (REMEMBER THIS IS NOT A STEP BY STEP TUTORIAL, SO DON'T MAKE IT A NUMBERED LIST OF STEPS).
+- LINK THE CURRENT FEATURE TO THE EXAMPLE APP FEATURES ON GITHUB.
+- DESCRIPTION OF WHAT THE FEATURE DOES.
+- CODE SNIPPETS.
+- EXPLANATION OF THE CODE.
+
+3. Running the App: Steps to execute the app locally.
+- Link to the example app's Github repository.
+- Include pre-requisites to run the app locally (INCLUDE LINK TO IMMUTABLE HUB FOR USERS TO SETUP THEIR ENVIRONMENT).
+- Include steps to run the app locally.
+
+4. Summary: A concise recap of the main points covered in the tutorial.
 Ensure proper Markdown syntax, with consistent use of headings, code block formatting, bullet points, and other common Markdown elements to support readability on a documentation website.
-3. Generate Metadata (metadata.json)
+
+5. Generate Metadata (metadata.json)
 
 Create a metadata.json file in the root of the example app.
 The JSON must include:
@@ -43,7 +51,7 @@ The JSON must include:
   "description": "<Brief overview of the app>",
   "keywords": ["<Keyword1>", "<Keyword2>", "..."],
   "tech_stack": ["<Language1>", "<Framework1>", "..."],
-  "category": "<Type of SDK used by the example app (e.g., Passport, Checkout, Orderbook, etc.)>",
+  "product": "<Type of SDK used by the example app (e.g., Passport, Checkout, Orderbook, etc.)>",
   "programming_language": "<Programming Language used by the example app (e.g., TypeScript, JavaScript, etc.)>"
 }
 
@@ -51,13 +59,15 @@ Title: A short, descriptive title of the app.
 Description: A brief but clear overview of the app's purpose and functionality.
 Keywords: A list of relevant keywords that describe the app or its use cases.
 Tech Stack: A list of major technologies, programming languages, and frameworks used in the app.
-Category: The type of app (e.g., Web App, API, Mobile App, etc.).
+Product: The type of product used by the example app (e.g., Passport, Checkout, Orderbook, etc.).
 Programming Language: The programming language used by the example app (e.g., TypeScript, JavaScript, etc.).
 If tutorial.md or metadata.json exist but are incomplete, update them rather than creating new versions.
 
 Notes on Edge Cases:
 If an app has external dependencies or complex interactions (e.g., external APIs, cloud integrations), ensure the tutorial provides enough detail for users to understand and set these up.
 For larger or more complex apps, consider breaking the tutorial into smaller, more manageable sections, such as separate tutorial files for different components of the app.
+
+
 
 
 THIRD PROMPT

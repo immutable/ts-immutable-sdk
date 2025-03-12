@@ -1,8 +1,8 @@
 {
-  "title": "Logged-in User with Next.js",
-  "description": "A Next.js application demonstrating how to access user information after logging in with Immutable Passport",
-  "keywords": ["Passport", "Next.js", "Authentication", "User Info", "Linked Addresses", "Tokens"],
-  "tech_stack": ["TypeScript", "Next.js", "React", "Biome UI"],
-  "category": "Passport",
+  "title": "Passport User Information with Next.js",
+  "description": "An example app demonstrating how to retrieve user information after logging in with Passport SDK in a Next.js application",
+  "keywords": ["Passport", "Next.js", "Authentication", "Identity", "User Profile", "Linked Addresses", "Tokens"],
+  "tech_stack": ["Next.js", "React", "TypeScript", "Passport SDK", "Biom3"],
+  "product": "Passport",
   "programming_language": "TypeScript"
 } 

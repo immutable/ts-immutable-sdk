@@ -1,140 +1,49 @@
-# Login with Next.js Tutorial
+# Passport Login with Next.js
 
 ## Introduction
 
-This example application demonstrates different ways to implement authentication with Immutable Passport in a Next.js application. The app showcases multiple authentication approaches:
+This example application demonstrates how to implement different authentication flows using Immutable's Passport SDK in a Next.js application. The app showcases various login methods and logout strategies, providing a comprehensive overview of Passport's authentication capabilities.
 
-1. Login with Passport (standard EVM connection)
-2. Login with EtherJS (using Passport provider with EtherJS)
-3. Login with Identity Only (without wallet connection)
-4. Logout with Redirect Mode (redirects to a logout page)
-5. Logout with Silent Mode (logs out without page redirection)
+You can find the source code for this example on [GitHub](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/login-with-nextjs).
 
-This tutorial will walk you through the implementation details and show you how to integrate Immutable Passport authentication into your Next.js applications.
+## SDK Integration Walkthrough
 
-## Prerequisites
+This example app covers the following features:
 
-Before you begin, make sure you have the following:
+* Login with Passport (wallet connection)
+* Login with EthersJS (third-party provider integration)
+* Login with Identity only (without wallet connection)
+* Logout with Redirect Mode
+* Logout with Silent Mode
 
-- Node.js (v18 or later)
-- pnpm package manager
-- An Immutable Hub account with:
-  - A registered application
-  - A publishable API key
-  - A client ID
-  - Configured redirect URIs
+### Login with Passport
 
-## Project Structure
+The Passport SDK provides a simple way to authenticate users with their crypto wallet. This feature establishes a connection to the user's wallet through Passport.
 
-The project follows a standard Next.js application structure:
+**[View on GitHub](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/login-with-nextjs/src/app/login-with-passport)**
 
-```
-login-with-nextjs/
-├── .env.example        # Example environment variables
-├── package.json        # Project dependencies and scripts
-├── src/
-│   ├── app/
-│   │   ├── globals.css                 # Global styles
-│   │   ├── layout.tsx                  # Root layout component
-│   │   ├── page.tsx                    # Home page with navigation
-│   │   ├── login-with-passport/        # Standard Passport login
-│   │   ├── login-with-etherjs/         # Login using EtherJS
-│   │   ├── login-with-identity-only/   # Login without wallet
-│   │   ├── logout-with-redirect-mode/  # Logout with redirect
-│   │   ├── logout-with-silent-mode/    # Logout without redirect
-│   │   ├── redirect/                   # OAuth redirect handler
-│   │   ├── logout/                     # Logout redirect page
-│   │   ├── silent-logout/              # Silent logout handler
-│   │   └── utils/
-│   │       ├── setupDefault.ts         # Default Passport setup
-│   │       ├── setupLogoutRedirect.ts  # Redirect logout setup
-│   │       ├── setupLogoutSilent.ts    # Silent logout setup
-│   │       └── wrapper.tsx             # App wrapper component
-```
+This implementation:
+- Connects to a user's wallet using Passport
+- Requests account access
+- Displays the connected wallet address
 
-## Code Walkthrough
-
-### SDK Integration Walkthrough
-
-#### Initializing the Passport SDK
-
-The Passport SDK is initialized in the `src/app/utils/setupDefault.ts` file:
-
-```typescript
-import { config, passport } from '@imtbl/sdk';
-
-export const passportInstance = new passport.Passport({
-  baseConfig: {
-    environment: config.Environment.SANDBOX,
-    publishableKey: process.env.NEXT_PUBLIC_PUBLISHABLE_KEY || '<YOUR_PUBLISHABLE_KEY>',
-  },
-  clientId: process.env.NEXT_PUBLIC_CLIENT_ID || '<YOUR_CLIENT_ID>',
-  redirectUri: 'http://localhost:3000/redirect',
-  logoutRedirectUri: 'http://localhost:3000/logout',
-  audience: 'platform_api',
-  scope: 'openid offline_access email transact',
-});
-```
-
-This code creates a new instance of the Passport SDK with the following configuration:
-- Environment: SANDBOX (for testing) or PRODUCTION (for live applications)
-- Publishable Key: Your API key from Immutable Hub
-- Client ID: Your application's client ID from Immutable Hub
-- Redirect URI: The URL where users will be redirected after login
-- Logout Redirect URI: The URL where users will be redirected after logout
-- Audience: The API audience (platform_api)
-- Scope: The requested permissions (openid, offline_access, email, transact)
-
-#### Handling OAuth Redirects
-
-After a user logs in with Passport, they are redirected to the specified redirect URI. The `src/app/redirect/page.tsx` component handles this redirect:
-
-```typescript
-'use client';
-
-import { useEffect } from 'react';
+```tsx
+// Import the Passport instance
 import { passportInstance } from '../utils/setupDefault';
 
-export default function Redirect() {
-  useEffect(() => {
-    if (passportInstance) {
-      passportInstance.loginCallback()
-        .then(() => {
-          console.log('Login callback successful');
-          if (window.opener) {
-            window.opener.postMessage('authComplete', window.origin);
-            window.close();
-          }
-        })
-        .catch((error) => {
-          console.error('Error in login callback:', error);
-        });
-    }
-  }, []);
-  
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-8">
-      <h1 className="text-3xl font-bold mb-8">Logged in</h1>
-    </div>
-  );
-}
-```
-
-The `loginCallback()` method processes the authentication response and stores the necessary tokens. If the login is successful, it sends a message to the opener window and closes the popup.
-
-### Feature 1: Login with Passport
-
-The `src/app/login-with-passport/page.tsx` component demonstrates the standard way to login with Passport:
-
-```typescript
+// In your component
 const loginWithPassport = async () => {
   if (!passportInstance) return;
   try {
+    // Connect to the EVM provider through Passport
     const provider = await passportInstance.connectEvm();
+    
+    // Request access to the user's accounts
     const accounts = await provider.request({ method: 'eth_requestAccounts' });
+    
     if (accounts) {
       setIsLoggedIn(true);
-      setAccountAddress(accounts[0] || null);
+      setAccountAddress(accounts[0] || null); 
     } else {
       setIsLoggedIn(false);
     }
@@ -145,23 +54,37 @@ const loginWithPassport = async () => {
 };
 ```
 
-This approach:
-1. Calls `connectEvm()` to get a provider
-2. Requests accounts using the provider
-3. Updates the UI state based on the login result
+The code above initiates a connection to the user's wallet using Passport's `connectEvm()` method, which returns a provider compatible with the EIP-1193 standard. Then, it requests access to the user's accounts using the `eth_requestAccounts` method, which prompts the user to approve the connection.
 
-### Feature 2: Login with EtherJS
+### Login with EthersJS
 
-The `src/app/login-with-etherjs/page.tsx` component shows how to use Passport with EtherJS:
+This feature demonstrates how to integrate the Passport SDK with the EthersJS library, allowing you to use EthersJS functions with Passport authentication.
 
-```typescript
-const loginWithEthersjs = useCallback(async () => {
+**[View on GitHub](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/login-with-nextjs/src/app/login-with-etherjs)**
+
+This implementation:
+- Connects to Passport
+- Creates an EthersJS provider using the Passport connection
+- Uses EthersJS to request accounts
+
+```tsx
+import { ethers } from 'ethers';
+import { BrowserProvider } from 'ethers';
+import { passportInstance } from '../utils/setupDefault';
+
+const loginWithEthersjs = async () => {
   if (!passportInstance) return;
 
   try {
+    // Get the Passport provider
     const passportProvider = await passportInstance.connectEvm();
+    
+    // Create an EthersJS provider using the Passport provider
     const web3Provider = new BrowserProvider(passportProvider);
+    
+    // Request accounts using EthersJS
     const accounts = await web3Provider.send('eth_requestAccounts', []);
+    
     if (accounts && accounts.length > 0) {
       setIsLoggedIn(true);
       setAccountAddress(accounts[0] || null);
@@ -172,27 +95,32 @@ const loginWithEthersjs = useCallback(async () => {
     console.error('Error connecting to Passport with Ethers.js:', error);
     setIsLoggedIn(false);
   }
-}, []);
+};
 ```
 
-This approach:
-1. Gets the Passport provider
-2. Wraps it with EtherJS's BrowserProvider
-3. Uses EtherJS to request accounts
-4. Updates the UI state based on the login result
+This approach is useful when you need to use EthersJS features like sending transactions or interacting with smart contracts while maintaining Passport authentication.
 
-### Feature 3: Login with Identity Only
+### Login with Identity Only
 
-The `src/app/login-with-identity-only/page.tsx` component demonstrates how to login without connecting a wallet:
+This feature demonstrates how to authenticate users with Passport without requiring a wallet connection, focusing solely on user identity.
 
-```typescript
-const loginWithIdentiy = useCallback(async () => {
+**[View on GitHub](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/login-with-nextjs/src/app/login-with-identity-only)**
+
+This implementation:
+- Authenticates users without requiring a wallet
+- Retrieves user profile information (email, subject ID)
+
+```tsx
+import { passportInstance } from '../utils/setupDefault';
+import { passport } from '@imtbl/sdk';
+
+const loginWithIdentity = async () => {
   if (!passportInstance) return;
   try {
+    // Login with Passport without connecting a wallet
     const profile: passport.UserProfile | null = await passportInstance.login();
+    
     if (profile) {
-      console.log(profile.email);
-      console.log(profile.sub);
       setIsLoggedIn(true);
       setEmail(profile.email || 'No Email');
       setSub(profile.sub || 'No Subject');
@@ -203,32 +131,45 @@ const loginWithIdentiy = useCallback(async () => {
     console.error('Error connecting to Passport', error);
     setIsLoggedIn(false);
   }
-}, []);
+};
 ```
 
-This approach:
-1. Calls `login()` instead of `connectEvm()`
-2. Receives a UserProfile object with user information
-3. Updates the UI with the user's email and subject identifier
+This method is ideal for applications that need to identify users but don't require wallet interactions or blockchain transactions.
 
-### Feature 4: Logout with Redirect Mode
+### Logout with Redirect Mode
 
-The `src/app/logout-with-redirect-mode/page.tsx` component shows how to implement logout with redirection:
+This feature demonstrates how to implement logout functionality with the redirect mode, which redirects users to a specified URI after logout.
 
-```typescript
+**[View on GitHub](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/login-with-nextjs/src/app/logout-with-redirect-mode)**
+
+This implementation:
+- Configures Passport to use redirect mode for logout
+- Logs out the user and redirects to a specified URI
+
+```tsx
 // In setupLogoutRedirect.ts
+import { config, passport } from '@imtbl/sdk';
+
 export const passportInstance = new passport.Passport({
-  // ... other config
-  logoutMode: 'redirect',
-  logoutRedirectUri: 'http://localhost:3000/logout',
-  // ... other config
+  baseConfig: {
+    environment: config.Environment.SANDBOX,
+    publishableKey: process.env.NEXT_PUBLIC_PUBLISHABLE_KEY || '<YOUR_PUBLISHABLE_KEY>',
+  },
+  clientId: process.env.NEXT_PUBLIC_CLIENT_ID || '<YOUR_CLIENT_ID>',
+  redirectUri: 'http://localhost:3000/redirect',
+  logoutMode: 'redirect', // Specify redirect mode for logout
+  logoutRedirectUri: 'http://localhost:3000/logout', // URI to redirect to after logout
+  audience: 'platform_api',
+  scope: 'openid offline_access email transact',
 });
 
-// In the component
+// In your component
 const logout = async () => {
   if (!passportInstance || !isLoggedIn) return;
   try {
+    // Logout will redirect to the specified logoutRedirectUri
     await passportInstance.logout();
+    
     setIsLoggedIn(false);
     setAccountAddress(null);
   } catch (error) {
@@ -237,31 +178,43 @@ const logout = async () => {
 };
 ```
 
-This approach:
-1. Configures Passport with `logoutMode: 'redirect'`
-2. Specifies a `logoutRedirectUri` where the user will be redirected after logout
-3. Calls `logout()` to initiate the logout process
-4. Updates the UI state
+With redirect mode, users are redirected to the specified `logoutRedirectUri` after logout, which is useful for applications that need to maintain a specific flow or redirect users to a login page after logout.
 
-### Feature 5: Logout with Silent Mode
+### Logout with Silent Mode
 
-The `src/app/logout-with-silent-mode/page.tsx` component demonstrates how to implement silent logout:
+This feature demonstrates how to implement logout functionality with the silent mode, which logs out the user without redirecting.
 
-```typescript
+**[View on GitHub](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/login-with-nextjs/src/app/logout-with-silent-mode)**
+
+This implementation:
+- Configures Passport to use silent mode for logout
+- Logs out the user without redirecting
+
+```tsx
 // In setupLogoutSilent.ts
+import { config, passport } from '@imtbl/sdk';
+
 export const passportInstance = new passport.Passport({
-  // ... other config
-  logoutMode: 'silent',
+  baseConfig: {
+    environment: config.Environment.SANDBOX,
+    publishableKey: process.env.NEXT_PUBLIC_PUBLISHABLE_KEY || '<YOUR_PUBLISHABLE_KEY>',
+  },
+  clientId: process.env.NEXT_PUBLIC_CLIENT_ID || '<YOUR_CLIENT_ID>',
+  redirectUri: 'http://localhost:3000/redirect',
+  logoutMode: 'silent', // Specify silent mode for logout
   logoutRedirectUri: 'http://localhost:3000/silent-logout',
-  // ... other config
+  audience: 'platform_api',
+  scope: 'openid offline_access email transact',
 });
 
-// In the component
+// In your component
 const logout = async () => {
   if (!passportInstance || !isLoggedIn) return;
   setIsLoggingOut(true);
   try {
+    // Logout will not redirect; it happens silently
     await passportInstance.logout();
+    
     setIsLoggedIn(false);
     setAccountAddress(null);
   } catch (error) {
@@ -272,62 +225,51 @@ const logout = async () => {
 };
 ```
 
-This approach:
-1. Configures Passport with `logoutMode: 'silent'`
-2. Specifies a `logoutRedirectUri` for the silent logout process
-3. Calls `logout()` to initiate the logout process
-4. Updates the UI state without redirecting the user
-
-The silent logout process is handled in `src/app/silent-logout/page.tsx`:
-
-```typescript
-export default function SilentLogout() {
-  useEffect(() => {
-    (async () => {
-      try {
-        await passportInstance.logoutSilentCallback(SILENT_LOGOUT_INITIATOR_URL);
-      } catch (error) {
-        console.error('Silent logout error:', error);
-      }
-    })();
-  }, []);
-
-  return (
-    <div>
-      <p>Logging out...</p>
-    </div>
-  );
-}
-```
+Silent mode is useful for applications that want to handle the logout flow within the application without redirecting the user away from the current view.
 
 ## Running the App
 
-To run the example app locally:
+Follow these steps to run the example application locally:
 
-1. Clone the repository
-2. Install dependencies:
+### Prerequisites
+
+1. You need to have Node.js and pnpm installed on your machine.
+2. You need to set up your environment with Immutable Hub. Visit [Immutable Hub](https://hub.immutable.com/) to create an account and set up your application.
+
+### Setup
+
+1. Clone the repository from [GitHub](https://github.com/immutable/ts-immutable-sdk).
+2. Navigate to the example directory:
+   ```bash
+   cd examples/passport/login-with-nextjs
+   ```
+3. Install dependencies:
    ```bash
    pnpm install
    ```
-3. Copy `.env.example` to `.env` and fill in your Immutable Hub credentials:
+4. Copy the `.env.example` file to `.env` and fill in the required environment variables:
+   ```bash
+   cp .env.example .env
    ```
-   NEXT_PUBLIC_PUBLISHABLE_KEY=your_publishable_key
-   NEXT_PUBLIC_CLIENT_ID=your_client_id
-   ```
-4. Start the development server:
+   
+   Required environment variables:
+   - `NEXT_PUBLIC_PUBLISHABLE_KEY`: Your publishable API key from Immutable Hub
+   - `NEXT_PUBLIC_CLIENT_ID`: Your client ID from Immutable Hub
+
+5. Start the development server:
    ```bash
    pnpm dev
    ```
-5. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+6. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
 ## Summary
 
-This example application demonstrates multiple ways to implement authentication with Immutable Passport in a Next.js application. The key features include:
+This example demonstrates multiple ways to implement authentication using the Immutable Passport SDK in a Next.js application:
 
-1. Standard login with Passport's EVM connection
-2. Integration with EtherJS for more advanced blockchain interactions
-3. Identity-only login without wallet connection
-4. Two logout modes: redirect and silent
-5. Proper handling of OAuth redirects and callbacks
+- **Wallet-based authentication** using `connectEvm()` for direct Passport integration
+- **EthersJS integration** for using Passport with the popular Ethereum library
+- **Identity-only login** for applications that don't require wallet access
+- **Two logout modes** (redirect and silent) for different user flow needs
 
-By following this tutorial, you can implement similar authentication flows in your own Next.js applications using Immutable Passport, choosing the approach that best fits your application's needs. 
+By combining these features, developers can implement comprehensive authentication flows that match their application requirements while leveraging the security and convenience of Immutable's Passport SDK. 
