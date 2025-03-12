@@ -65,7 +65,7 @@
     "lint:examples": "pnpm --recursive --filter '@examples/**' lint",
     "nx": "nx",
     "pack-npm-packages": "pnpm -r pack:root",
-    "parse:examples": "node sample-app-parser.mjs",
+    "parse:examples": "node examples/_scripts/sample-app-parser.mjs",
     "postinstall": "husky install",
     "prepare:sdk": "./prepare-deps.sh sdk",
     "prepare:examples": "./prepare-deps.sh examples",

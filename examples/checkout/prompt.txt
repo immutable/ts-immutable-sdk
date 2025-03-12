@@ -1,0 +1,83 @@
+FIRST PROMPT
+# Example Apps Documentation Generator
+
+## Task Overview
+Analyze all example apps in the /examples/checkout/ directory and create documentation files for each example app that doesn't already have them. For each example app, you will create:
+1. A comprehensive tutorial.md file
+2. A metadata.json file
+
+## Preparation
+Before starting:
+- Read through all SDK documentation (in the /sdk and /packages folders)
+- Understand the SDK's key features, functionality, and integration patterns
+
+## Process for Each Example App
+For each subdirectory in /examples/checkout/ that doesn't already have both tutorial.md and metadata.json:
+
+### 1. Analysis Phase
+- Read all code files in the example app directory
+- Identify which SDK features are being demonstrated
+- Understand the app's architecture, components, and data flow
+- Note all frameworks, libraries, and dependencies used
+
+### 2. Create tutorial.md
+Create a tutorial.md file in the example app's root with the following structure:
+
+#### Introduction
+- Brief overview of the app's purpose
+- Which specific SDK capabilities it demonstrates
+- Link to the example app's GitHub repository
+
+#### Features Overview (REMEMBER THAT INITIALIZING THE ORDERBOOK/CHECKOUT/CONTRACTS/PASSPORT SDK IS NOT A FEATURE)
+- Bulleted list of all SDK features demonstrated in this example app
+
+> IMPORTANT: Focus on how the example app uses each feature. Do NOT include Orderbook/Checkout/Contracts/Passport SDK initialization and Orderbook/Checkout/Contracts/Passport Provider Creation instructions - focus only on the example-specific implementation details.
+#### SDK Integration Details
+For each SDK feature shown in the example:
+- **Link**: Reference to the specific file in the GitHub repository
+- **Feature Name**: Brief description of what the feature does
+- **Implementation**: Code snippets showing how the feature is implemented
+- **Explanation**: Clear explanation of how the code works
+
+
+#### Running the App
+- Link to the example app's GitHub repository
+- Prerequisites (including a link to Immutable Hub for environment setup)
+- Step-by-step instructions to run the app locally(use pnpm not npm)
+
+#### Summary
+- Concise recap of what was demonstrated
+- Any key takeaways for developers
+
+#### Formatting Requirements
+- Use proper Markdown syntax throughout
+- Use heading levels (H1, H2, H3) appropriately
+- Format all code with proper syntax highlighting
+- Use bulleted lists for features and steps
+
+### 3. Create metadata.json
+Create a metadata.json file in the example app's root with the following structure:
+{
+"title": "[Descriptive title of the example app]",
+"description": "[Concise overview of what the example app demonstrates]",
+"keywords": ["Immutable", "SDK", "[Feature1]", "[Feature2]", "..."],
+"tech_stack": ["[Framework]", "[Library]", "..."],
+"product": "[Passport/Checkout/Orderbook/etc]",
+"programming_language": "[TypeScript/JavaScript/etc]"
+}
+
+
+### 4. Handling Existing Files
+If either tutorial.md or metadata.json already exists but is incomplete:
+- Enhance the content while preserving any accurate existing information
+- Ensure it meets all the format requirements specified above
+
+## Final Verification for Each Example App
+Before moving to the next example app, verify:
+- All SDK features in the example app are documented in tutorial.md
+- The tutorial is free of generic SDK initialization boilerplate
+- All links to GitHub repositories are correct
+- metadata.json contains accurate and comprehensive information
+- Both files are properly formatted
+
+

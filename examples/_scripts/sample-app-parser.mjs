@@ -5,9 +5,9 @@ import { fileURLToPath } from 'url';
 
 const FILENAME = fileURLToPath(import.meta.url);
 const DIRNAME = path.dirname(FILENAME);
-const examplesDir = path.join(DIRNAME, 'examples', '_parsed');
+const examplesDir = path.join(DIRNAME, '..', '_parsed');
 const main = (product) => {
-  const sampleAppDir = path.join(DIRNAME, 'examples', product);
+  const sampleAppDir = path.join(DIRNAME, '..', product);
 
   // Create an object to hold all app data
   const allApps = {};
@@ -57,7 +57,7 @@ const main = (product) => {
   console.log(`Created ${product}-examples.json with data for ${Object.keys(allApps).length} apps`);
 };
 
-const products = ['passport']; // 'checkout', 'orderbook', 'contracts' etc
+const products = ['passport', 'checkout', 'orderbook', 'contracts']; // 'checkout', 'orderbook', 'contracts' etc
 products.forEach((product) => {
   main(product);
 });
