@@ -49,15 +49,17 @@ const main = (product) => {
   }
 
   // Write a single JSON file in the product directory
-  fs.writeFileSync(
-    path.join(examplesDir, `${product}-examples.json`),
-    JSON.stringify(allApps, null, 2),
-  );
+  if (Object.keys(allApps).length > 0) {
+    fs.writeFileSync(
+      path.join(examplesDir, `${product}-examples.json`),
+      JSON.stringify(allApps, null, 2),
+    );
+    console.log(`Created ${product}-examples.json with data for ${Object.keys(allApps).length} apps`);
+  }
 
-  console.log(`Created ${product}-examples.json with data for ${Object.keys(allApps).length} apps`);
 };
 
-const products = ['passport', 'checkout', 'orderbook', 'contracts']; // 'checkout', 'orderbook', 'contracts' etc
+const products = ['passport', 'checkout', 'orderbook', 'contracts'];
 products.forEach((product) => {
   main(product);
 });
