@@ -970,7 +970,7 @@ importers:
         specifier: ^1.3.36
         version: 1.9.3(@swc/helpers@0.5.13)
       '@swc/jest':
-        specifier: ^0.2.24
+        specifier: 0.2.36
         version: 0.2.36(@swc/core@1.9.3(@swc/helpers@0.5.13))
       '@types/jest':
         specifier: ^29.4.3
@@ -1037,8 +1037,8 @@ importers:
         specifier: ^1.3.36
         version: 1.9.3(@swc/helpers@0.5.13)
       '@swc/jest':
-        specifier: 0.2.36
-        version: 0.2.36(@swc/core@1.9.3(@swc/helpers@0.5.13))
+        specifier: ^0.2.37
+        version: 0.2.37(@swc/core@1.9.3(@swc/helpers@0.5.13))
       '@types/jest':
         specifier: ^29.4.3
         version: 29.5.3
@@ -1437,7 +1437,7 @@ importers:
         specifier: ^1.3.36
         version: 1.9.3(@swc/helpers@0.5.13)
       '@swc/jest':
-        specifier: ^0.2.24
+        specifier: 0.2.36
         version: 0.2.36(@swc/core@1.9.3(@swc/helpers@0.5.13))
       '@types/jest':
         specifier: ^29.4.3
@@ -1554,7 +1554,7 @@ importers:
         specifier: ^1.3.36
         version: 1.9.3(@swc/helpers@0.5.13)
       '@swc/jest':
-        specifier: ^0.2.24
+        specifier: 0.2.36
         version: 0.2.36(@swc/core@1.9.3(@swc/helpers@0.5.13))
       '@typechain/ethers-v6':
         specifier: ^0.5.1
@@ -1600,7 +1600,7 @@ importers:
         specifier: ^1.3.36
         version: 1.9.3(@swc/helpers@0.5.13)
       '@swc/jest':
-        specifier: ^0.2.24
+        specifier: 0.2.36
         version: 0.2.36(@swc/core@1.9.3(@swc/helpers@0.5.13))
       '@types/jest':
         specifier: ^29.4.3
@@ -1664,7 +1664,7 @@ importers:
         specifier: ^1.3.36
         version: 1.9.3(@swc/helpers@0.5.13)
       '@swc/jest':
-        specifier: ^0.2.24
+        specifier: 0.2.36
         version: 0.2.36(@swc/core@1.9.3(@swc/helpers@0.5.13))
       '@typechain/ethers-v6':
         specifier: ^0.5.1
@@ -1789,7 +1789,7 @@ importers:
         specifier: ^1.3.36
         version: 1.9.3(@swc/helpers@0.5.13)
       '@swc/jest':
-        specifier: ^0.2.24
+        specifier: 0.2.36
         version: 0.2.36(@swc/core@1.9.3(@swc/helpers@0.5.13))
       '@types/jest':
         specifier: ^29.4.3
@@ -1850,7 +1850,7 @@ importers:
         specifier: ^1.3.36
         version: 1.9.3(@swc/helpers@0.5.13)
       '@swc/jest':
-        specifier: ^0.2.24
+        specifier: 0.2.36
         version: 0.2.36(@swc/core@1.9.3(@swc/helpers@0.5.13))
       '@types/axios':
         specifier: ^0.14.0
@@ -1930,7 +1930,7 @@ importers:
         specifier: ^1.3.36
         version: 1.9.3(@swc/helpers@0.5.13)
       '@swc/jest':
-        specifier: ^0.2.24
+        specifier: 0.2.36
         version: 0.2.36(@swc/core@1.9.3(@swc/helpers@0.5.13))
       '@testcontainers/postgresql':
         specifier: ^10.9.0
@@ -1991,7 +1991,7 @@ importers:
         specifier: ^1.3.36
         version: 1.9.3(@swc/helpers@0.5.13)
       '@swc/jest':
-        specifier: ^0.2.24
+        specifier: 0.2.36
         version: 0.2.36(@swc/core@1.9.3(@swc/helpers@0.5.13))
       '@typechain/ethers-v6':
         specifier: ^0.5.1
@@ -2088,7 +2088,7 @@ importers:
         specifier: ^1.3.36
         version: 1.9.3(@swc/helpers@0.5.13)
       '@swc/jest':
-        specifier: ^0.2.24
+        specifier: 0.2.36
         version: 0.2.36(@swc/core@1.9.3(@swc/helpers@0.5.13))
       '@types/axios':
         specifier: ^0.14.0
@@ -2258,7 +2258,7 @@ importers:
         specifier: ^1.3.36
         version: 1.9.3(@swc/helpers@0.5.13)
       '@swc/jest':
-        specifier: ^0.2.24
+        specifier: 0.2.36
         version: 0.2.36(@swc/core@1.9.3(@swc/helpers@0.5.13))
       '@types/jest':
         specifier: ^29.4.3
@@ -2316,7 +2316,7 @@ importers:
         specifier: ^1.3.36
         version: 1.9.3(@swc/helpers@0.5.13)
       '@swc/jest':
-        specifier: ^0.2.24
+        specifier: 0.2.36
         version: 0.2.36(@swc/core@1.9.3(@swc/helpers@0.5.13))
       '@types/bn.js':
         specifier: ^5.1.6
@@ -2383,7 +2383,7 @@ importers:
         specifier: ^1.3.36
         version: 1.9.3(@swc/helpers@0.5.13)
       '@swc/jest':
-        specifier: ^0.2.24
+        specifier: 0.2.36
         version: 0.2.36(@swc/core@1.9.3(@swc/helpers@0.5.13))
       '@types/axios':
         specifier: ^0.14.0
@@ -7122,6 +7122,12 @@ packages:
 
   '@swc/jest@0.2.36':
     resolution: {integrity: sha512-8X80dp81ugxs4a11z1ka43FPhP+/e+mJNXJSxiNYk8gIX/jPBtY4gQTrKu/KIoco8bzKuPI5lUxjfLiGsfvnlw==}
+    engines: {npm: '>= 7.0.0'}
+    peerDependencies:
+      '@swc/core': '*'
+
+  '@swc/jest@0.2.37':
+    resolution: {integrity: sha512-CR2BHhmXKGxTiFr21DYPRHQunLkX3mNIFGFkxBGji6r9uyIR5zftTOVYj1e0sFNMV2H7mf/+vpaglqaryBtqfQ==}
     engines: {npm: '>= 7.0.0'}
     peerDependencies:
       '@swc/core': '*'
@@ -23505,6 +23511,13 @@ snapshots:
       '@swc/counter': 0.1.3
       jsonc-parser: 3.3.1
 
+  '@swc/jest@0.2.37(@swc/core@1.9.3(@swc/helpers@0.5.13))':
+    dependencies:
+      '@jest/create-cache-key-function': 29.7.0
+      '@swc/core': 1.9.3(@swc/helpers@0.5.13)
+      '@swc/counter': 0.1.3
+      jsonc-parser: 3.3.1
+
   '@swc/types@0.1.17':
     dependencies:
       '@swc/counter': 0.1.3
@@ -27463,7 +27476,7 @@ snapshots:
       eslint: 9.16.0(jiti@1.21.0)
       eslint-plugin-flowtype: 8.0.3(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.22.5(@babel/core@7.24.9))(eslint@9.16.0(jiti@1.21.0))
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))
-      eslint-plugin-jest: 25.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0)(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2)
+      eslint-plugin-jest: 25.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2)
       eslint-plugin-jsx-a11y: 6.9.0(eslint@9.16.0(jiti@1.21.0))
       eslint-plugin-react: 7.35.0(eslint@9.16.0(jiti@1.21.0))
       eslint-plugin-react-hooks: 4.6.0(eslint@9.16.0(jiti@1.21.0))
@@ -27635,12 +27648,12 @@ snapshots:
       - supports-color
       - typescript
 
-  eslint-plugin-jest@25.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0)(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2):
+  eslint-plugin-jest@25.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2):
     dependencies:
       '@typescript-eslint/experimental-utils': 5.62.0(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2)
       eslint: 9.16.0(jiti@1.21.0)
     optionalDependencies:
-      '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0)(typescript@5.6.2)
+      '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2)
       jest: 27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - supports-color
