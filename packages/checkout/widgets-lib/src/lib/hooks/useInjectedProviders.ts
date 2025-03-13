@@ -5,7 +5,6 @@ import {
   EIP6963ProviderDetail,
   getMetaMaskProviderDetail,
   getPassportProviderDetail,
-  WrappedBrowserProvider,
   WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 
@@ -27,8 +26,6 @@ declare global {
     ethereum: any;
   }
 }
-
-let passportBrowserProvider: WrappedBrowserProvider | undefined;
 
 const processProviders = async (
   checkout: Checkout | null,
@@ -53,11 +50,9 @@ const processProviders = async (
   if (checkout?.passport
     && priorityWalletRdns.includes(WalletProviderRdns.PASSPORT)
     && !filteredProviders.some((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT)
-    && !passportBrowserProvider
   ) {
-    const provider = await checkout.passport.connectEvm();
-    passportBrowserProvider = new WrappedBrowserProvider(provider);
-    filteredProviders.unshift(getPassportProviderDetail(provider));
+    const passportProvider = await checkout.passport.connectEvm();
+    filteredProviders.unshift(getPassportProviderDetail(passportProvider));
   }
 
   // Filter & sort providers
