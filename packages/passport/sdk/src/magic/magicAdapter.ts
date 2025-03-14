@@ -23,8 +23,10 @@ export default class MagicAdapter {
     this.magicProviderProxyFactory = magicProviderProxyFactory;
 
     if (typeof window !== 'undefined') {
+      /** @ts-ignore - HACK - Magic canary release has type issues */
       this.lazyMagicClient = lazyDocumentReady<MagicClient>(() => {
         const client = new Magic(this.config.magicPublishableApiKey, {
+          /** @ts-ignore */
           extensions: [new OpenIdExtension()],
           network: MAINNET, // We always connect to mainnet to ensure addresses are the same across envs
         });
@@ -52,7 +54,9 @@ export default class MagicAdapter {
         flow.addEvent('endMagicClientInit');
 
         const isUserLoggedIn = await magicClient.user.isLoggedIn();
+        flow.addEvent('endMagicIsLoggedIn');
         if (!isUserLoggedIn) {
+          /** @ts-ignore */
           await magicClient.openid.loginWithOIDC({
             jwt: idToken,
             providerId: this.config.magicProviderId,
