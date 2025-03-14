@@ -16,7 +16,7 @@ package.json @immutable/passport
 /packages/orderbook @immutable/traders
 /packages/passport @immutable/passport
 /packages/x-provider @immutable/passport
-/packages/checkout @immutable/passport
+/packages/checkout @immutable/gamefi
 /packages/checkout/widgets-lib @immutable/gamefi
 /packages/blockchain-data @immutable/activation
 /packages/minting-backend @shineli1984
