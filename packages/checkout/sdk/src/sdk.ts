@@ -366,19 +366,14 @@ export class Checkout {
   public async getAllBalances(
     params: GetAllBalancesParams,
   ): Promise<GetAllBalancesResult> {
-    if (!params.provider) {
-      return balances.getAllBalances(
-        this.config,
-        params.provider,
-        params.walletAddress,
-        params.chainId,
-      );
-    }
+    console.log('getAllBalances');
+    console.log({ pp: params.provider });
+    console.log({ io: params.provider instanceof WrappedBrowserProvider });
+    console.log({ epi: params.provider && 'ethereumProvider' in params.provider });
 
-    const browserProvider = await provider.validateProvider(
-      this.config,
-      params.provider,
-    );
+    const browserProvider = (!params.provider || ('ethereumProvider' in params.provider))
+      ? params.provider
+      : new WrappedBrowserProvider(params.provider);
 
     return balances.getAllBalances(
       this.config,

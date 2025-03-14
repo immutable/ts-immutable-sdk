@@ -55,6 +55,8 @@ export class WrappedBrowserProvider extends BrowserProvider {
 
   // eslint-disable-next-line max-len
   constructor(ethereum: EthersEip1193Provider, network?: Networkish, _options?: BrowserProviderOptions) {
+    console.log('creating WBP');
+    console.log({ ethereum });
     super(ethereum, network, _options);
 
     this.#setEthereumProvider(ethereum);
