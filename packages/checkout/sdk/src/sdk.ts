@@ -366,7 +366,7 @@ export class Checkout {
   public async getAllBalances(
     params: GetAllBalancesParams,
   ): Promise<GetAllBalancesResult> {
-    const browserProvider = !params.provider || (params.provider instanceof WrappedBrowserProvider)
+    const browserProvider = (!params.provider || ('ethereumProvider' in params.provider))
       ? params.provider
       : new WrappedBrowserProvider(params.provider);
 
