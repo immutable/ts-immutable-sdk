@@ -43,6 +43,9 @@ const processProviders = async (
   // Injected providers
   const filteredProviders = [...injectedProviders];
 
+  console.log({ windowEthInstWrapped: window.ethereum instanceof WrappedBrowserProvider });
+  console.log({ requestInWindowEth: 'request' in window.ethereum });
+
   // Attempt to fallback to window.ethereum if no EIP-6963 providers are found
   // Assuming this is MetaMask on mobile
   if (filteredProviders.length === 0 && window.ethereum) {
