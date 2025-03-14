@@ -7,6 +7,7 @@ import {
   getPassportProviderDetail,
   WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
+import { Passport, Provider } from '@imtbl/passport';
 
 const DEFAULT_PRIORITY_INDEX = 999;
 
@@ -26,6 +27,13 @@ declare global {
     ethereum: any;
   }
 }
+
+let cachedPassportProvider: Provider | undefined;
+
+const getPassportProvider = async (passport: Passport) => {
+  if (!cachedPassportProvider) cachedPassportProvider = await passport.connectEvm();
+  return cachedPassportProvider;
+};
 
 const processProviders = async (
   checkout: Checkout | null,
@@ -51,7 +59,7 @@ const processProviders = async (
     && priorityWalletRdns.includes(WalletProviderRdns.PASSPORT)
     && !filteredProviders.some((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT)
   ) {
-    const passportProvider = await checkout.passport.connectEvm();
+    const passportProvider = await getPassportProvider(checkout.passport);
     filteredProviders.unshift(getPassportProviderDetail(passportProvider));
   }
 
