@@ -54,6 +54,7 @@ export default class MagicAdapter {
         flow.addEvent('endMagicClientInit');
 
         const isUserLoggedIn = await magicClient.user.isLoggedIn();
+        flow.addEvent('endMagicIsLoggedIn');
         if (!isUserLoggedIn) {
           /** @ts-ignore */
           await magicClient.openid.loginWithOIDC({
