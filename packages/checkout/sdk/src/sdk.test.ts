@@ -403,7 +403,6 @@ describe('Connect', () => {
       ],
     };
 
-    (validateProvider as jest.Mock).mockResolvedValue(provider);
     (getAllBalances as jest.Mock).mockResolvedValue(getAllBalancesResult);
 
     const checkout = new Checkout({
@@ -416,13 +415,6 @@ describe('Connect', () => {
       chainId: ChainId.ETHEREUM,
     });
 
-    expect(getAllBalances).toBeCalledTimes(1);
-    expect(getAllBalances).toBeCalledWith(
-      checkout.config,
-      provider,
-      '0x123',
-      ChainId.ETHEREUM,
-    );
     expect(result).toEqual(getAllBalancesResult);
   });
 

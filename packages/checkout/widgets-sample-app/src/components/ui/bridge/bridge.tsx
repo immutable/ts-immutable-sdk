@@ -1,14 +1,28 @@
-import { BridgeEventType, Checkout, WidgetTheme, WidgetType, WidgetLanguage } from '@imtbl/checkout-sdk';
+import { BridgeEventType, Checkout, WidgetTheme, WidgetType, WidgetLanguage, Widget } from '@imtbl/checkout-sdk';
 import { WidgetsFactory } from '@imtbl/checkout-widgets'
-import { useEffect, useMemo } from 'react';
+import { useEffect, useState } from 'react';
+import { passport } from "../../../utils/passport";
+import { Environment } from '@imtbl/config';
 
 const BRIDGE_TARGET_ID = 'bridge-widget-target';
 function BridgeUI() {
-  const checkout = useMemo(() => new Checkout(), []);
-  const factory = useMemo(() => new WidgetsFactory(checkout, { theme: WidgetTheme.DARK }), [checkout]);
-  const bridge = useMemo(() => factory.create(WidgetType.BRIDGE), [factory]);
+  const [bridge, setBridge] = useState<Widget<WidgetType.BRIDGE> | null>(null);
 
   useEffect(() => {
+    passport.connectEvm().then(() => {
+      const checkout = new Checkout({
+        baseConfig: {
+          environment: Environment.SANDBOX,
+        },
+        passport,
+      });
+      const factory = new WidgetsFactory(checkout, { theme: WidgetTheme.DARK });
+      setBridge(factory.create(WidgetType.BRIDGE));
+    })
+  }, []);
+
+  useEffect(() => {
+    if (!bridge) return;
     bridge.mount(BRIDGE_TARGET_ID, { amount: '0.1', tokenAddress: 'NATIVE' });
     bridge.addListener(BridgeEventType.TRANSACTION_SENT, (data: any) => {
       console.log('SUCCESS', data);
@@ -21,6 +35,8 @@ function BridgeUI() {
       bridge.unmount();
     });
   }, [bridge])
+
+  if (!bridge) return null;
 
   return (
     <div>

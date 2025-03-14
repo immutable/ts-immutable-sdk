@@ -5,9 +5,9 @@ import {
   EIP6963ProviderDetail,
   getMetaMaskProviderDetail,
   getPassportProviderDetail,
-  WrappedBrowserProvider,
   WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
+import { Passport, Provider } from '@imtbl/passport';
 
 const DEFAULT_PRIORITY_INDEX = 999;
 
@@ -28,10 +28,16 @@ declare global {
   }
 }
 
-let passportBrowserProvider: WrappedBrowserProvider;
+let cachedPassportProvider: Provider | undefined;
+
+const getPassportProvider = async (passport: Passport) => {
+  if (!cachedPassportProvider) cachedPassportProvider = await passport.connectEvm();
+  return cachedPassportProvider;
+};
+
 const processProviders = async (
   checkout: Checkout | null,
-  injectedProviders: EIP6963ProviderDetail[],
+  injectedProviders: readonly EIP6963ProviderDetail[],
   priorityWalletRdns: WalletProviderRdns | string[] = [],
   blocklistWalletRdns: WalletProviderRdns | string[] = [],
 ) => {
@@ -42,7 +48,6 @@ const processProviders = async (
 
   // Injected providers
   const filteredProviders = [...injectedProviders];
-
   // Attempt to fallback to window.ethereum if no EIP-6963 providers are found
   // Assuming this is MetaMask on mobile
   if (filteredProviders.length === 0 && window.ethereum) {
@@ -52,13 +57,10 @@ const processProviders = async (
   // Add passport from checkout config if not from injected providers
   if (checkout?.passport
     && priorityWalletRdns.includes(WalletProviderRdns.PASSPORT)
-    && !filteredProviders.some((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT)) {
-    if (!passportBrowserProvider) {
-      // eslint-disable-next-line max-len
-      passportBrowserProvider = new WrappedBrowserProvider(await checkout.passport.connectEvm());
-    }
-    // eslint-disable-next-line max-len
-    filteredProviders.unshift(getPassportProviderDetail(passportBrowserProvider.provider as unknown as EIP1193Provider));
+    && !filteredProviders.some((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT)
+  ) {
+    const passportProvider = await getPassportProvider(checkout.passport);
+    filteredProviders.unshift(getPassportProviderDetail(passportProvider));
   }
 
   // Filter & sort providers
@@ -79,7 +81,7 @@ export const useInjectedProviders = ({ checkout }: UseInjectedProvidersParams) =
     providers.find((provider) => provider.info.rdns === rdns)
   ), [providers]);
 
-  const filterAndProcessProviders = useCallback(async (injectedProviders: EIP6963ProviderDetail[]) => {
+  const filterAndProcessProviders = useCallback(async (injectedProviders: readonly EIP6963ProviderDetail[]) => {
     const connectConfig = await checkout?.config.remote.getConfig('connect') as ConnectConfig;
     const priorityWalletRdns = connectConfig.injected?.priorityWalletRdns ?? [];
     const blocklistWalletRdns = connectConfig.injected?.blocklistWalletRdns ?? [];
@@ -94,13 +96,11 @@ export const useInjectedProviders = ({ checkout }: UseInjectedProvidersParams) =
 
   useEffect(() => {
     if (!checkout) return () => {};
-    const cancelSubscription = checkout.onInjectedProvidersChange(
-      async (injectedProviders: EIP6963ProviderDetail[]) => {
-        await filterAndProcessProviders(injectedProviders);
-      },
-    );
 
-    filterAndProcessProviders([...checkout.getInjectedProviders()]);
+    const cancelSubscription = () => checkout.onInjectedProvidersChange(filterAndProcessProviders);
+    const injectedProviders = checkout.getInjectedProviders();
+
+    filterAndProcessProviders(injectedProviders);
     return () => cancelSubscription();
   }, [checkout]);
 
