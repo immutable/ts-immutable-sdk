@@ -8,6 +8,7 @@ const connectLoaderFlows = [
   CommerceFlowType.SWAP,
   CommerceFlowType.WALLET,
   CommerceFlowType.ONRAMP,
+  CommerceFlowType.TRANSFER,
 ] as unknown[];
 
 /**

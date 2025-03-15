@@ -34,7 +34,6 @@ import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import { Environment, ImmutableConfiguration } from "@imtbl/config";
 
 import { useAsyncMemo, usePrevState } from "../../../hooks";
-import { Message } from "./components/messages";
 import { Legend } from "./components/legend";
 import { itemsMock } from "./items.mock";
 import { WrappedBrowserProvider } from "@imtbl/checkout-sdk";
@@ -141,6 +140,7 @@ const flows: Array<CommerceFlowType> = [
   CommerceFlowType.SALE,
   CommerceFlowType.ADD_TOKENS,
   CommerceFlowType.PURCHASE,
+  CommerceFlowType.TRANSFER,
 ];
 
 function CheckoutUI() {
@@ -211,6 +211,12 @@ function CheckoutUI() {
       flow: CommerceFlowType.PURCHASE,
       items: itemsMock.slice(0, 1),
       environmentId: "82a81049-8c41-4ae3-91ca-0bd82a283abc",
+    },
+    TRANSFER: {
+      flow: CommerceFlowType.TRANSFER,
+      // amount: "1",
+      // tokenAddress: "native",
+      // toAddress: "0x0000000000000000000000000000000000000000",
     },
   });
 
@@ -498,6 +504,15 @@ function CheckoutUI() {
             >
               <MenuItem.Label>Direct NFT Purchase</MenuItem.Label>
             </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setParams({
+                  flow: CommerceFlowType.TRANSFER,
+                });
+              }}
+            >
+              <MenuItem.Label>Direct NFT Purchase</MenuItem.Label>
+            </MenuItem>
           </AppHeaderBar.OverflowPopoverMenu>
           <AppHeaderBar.RightSlot gap="base.spacing.x4">
             <Box
@@ -678,8 +693,9 @@ function CheckoutUI() {
                   defaultLabel="Select a Flow"
                   onSelectChange={(value) => {
                     const flow = value as CommerceFlowType;
+                    const params = flowParams[flow] ?? {};
                     setParams({
-                      ...(flowParams[flow as keyof typeof flowParams] || {}),
+                      ...params,
                       flow,
                       // spread rest of params for given flow
                     });

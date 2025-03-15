@@ -1,4 +1,5 @@
 export type { AddTokensWidgetParams } from './addTokens';
+export type { TransferWidgetParams } from './transfer';
 
 export * from './connect';
 export * from './bridge';

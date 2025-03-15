@@ -10,6 +10,7 @@ export const commerceFlows = [
   CommerceFlowType.ONRAMP,
   CommerceFlowType.ADD_TOKENS,
   CommerceFlowType.PURCHASE,
+  CommerceFlowType.TRANSFER,
 ];
 
 /**
