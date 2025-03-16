@@ -21,7 +21,7 @@ const isValidTypedDataPayload = (typedData: object): typedData is TypedDataPaylo
   REQUIRED_TYPED_DATA_PROPERTIES.every((key) => key in typedData)
 );
 
-const transformTypedData = (typedData: string | object, chainId: string): TypedDataPayload => {
+const transformTypedData = (typedData: string | object, chainId: bigint): TypedDataPayload => {
   let transformedTypedData: object | TypedDataPayload;
 
   if (typeof typedData === 'string') {
@@ -43,18 +43,21 @@ const transformTypedData = (typedData: string | object, chainId: string): TypedD
     );
   }
 
-  const providedChainId: number | string | undefined = (transformedTypedData as any).domain?.chainId;
-  if (providedChainId) {
-    // domain.chainId (if defined) can be a number, string, or hex value, but the relayer & guardian only accept a number.
-    if (typeof providedChainId === 'string') {
-      if (providedChainId.startsWith('0x')) {
-        transformedTypedData.domain.chainId = parseInt(providedChainId, 16).toString();
-      } else {
-        transformedTypedData.domain.chainId = parseInt(providedChainId, 10).toString();
-      }
+  const providedChainId = transformedTypedData.domain?.chainId;
+
+  if (!providedChainId) {
+    throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `No chainId found, expected ${chainId}`);
+  }
+
+  // domain.chainId (if defined) can be a number, string, or hex value, but the relayer & guardian only accept a number.
+  if (typeof providedChainId === 'string') {
+    if (providedChainId.startsWith('0x')) {
+      transformedTypedData.domain.chainId = parseInt(providedChainId, 16).toString();
+    } else {
+      transformedTypedData.domain.chainId = parseInt(providedChainId, 10).toString();
     }
 
-    if (transformedTypedData.domain.chainId !== chainId) {
+    if (BigInt(transformedTypedData.domain.chainId) !== chainId) {
       throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `Invalid chainId, expected ${chainId}`);
     }
   }
@@ -79,7 +82,7 @@ export const signTypedDataV4 = async ({
   }
 
   const { chainId } = await rpcProvider.getNetwork();
-  const typedData = transformTypedData(typedDataParam, chainId.toString());
+  const typedData = transformTypedData(typedDataParam, chainId);
   flow.addEvent('endDetectNetwork');
 
   await guardianClient.evaluateEIP712Message({ chainID: String(chainId), payload: typedData });
