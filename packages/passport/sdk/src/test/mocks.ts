@@ -19,6 +19,7 @@ export const testConfig = new PassportConfiguration({
   clientId: 'client123',
   logoutRedirectUri: 'http://localhost:3000/logout',
   redirectUri: 'http://localhost:3000/callback',
+  popupRedirectUri: 'http://localhost:3000/callback2',
 });
 
 export const mockUser: User = {

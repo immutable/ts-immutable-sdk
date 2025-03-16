@@ -23,7 +23,7 @@ npm add @imtbl/webhook
 # or
 pnpm add @imtbl/webhook
 # or
-pnpm add @imtbl/webhook
+yarn add @imtbl/webhook
 ```
 
 ## SDK Installation

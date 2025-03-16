@@ -198,6 +198,7 @@ export class Passport {
     useCachedSession?: boolean;
     anonymousId?: string;
     useSilentLogin?: boolean;
+    useRedirectFlow?: boolean;
   }): Promise<UserProfile | null> {
     return withMetricsAsync(async () => {
       const { useCachedSession = false, useSilentLogin } = options || {};
@@ -218,7 +219,11 @@ export class Passport {
       if (!user && useSilentLogin) {
         user = await this.authManager.forceUserRefresh();
       } else if (!user && !useCachedSession) {
-        user = await this.authManager.login(options?.anonymousId);
+        if (options?.useRedirectFlow) {
+          await this.authManager.loginWithRedirect(options?.anonymousId);
+        } else {
+          user = await this.authManager.login(options?.anonymousId);
+        }
       }
 
       if (user) {
@@ -237,7 +242,15 @@ export class Passport {
    * @returns {Promise<void>} A promise that resolves when the callback is processed
    */
   public async loginCallback(): Promise<void> {
-    return withMetricsAsync(() => this.authManager.loginCallback(), 'loginCallback');
+    await withMetricsAsync(() => this.authManager.loginCallback(), 'loginCallback')
+      .then((user) => {
+        if (user) {
+          identify({
+            passportId: user.profile.sub,
+          });
+          this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
+        }
+      });
   }
 
   /**

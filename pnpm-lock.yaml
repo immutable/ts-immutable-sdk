@@ -125,46 +125,6 @@ importers:
         specifier: ^5
         version: 5.6.2
 
-  examples/checkout/commerce-widget-nextjs:
-    dependencies:
-      '@biom3/react':
-        specifier: ^0.25.21
-        version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@imtbl/sdk':
-        specifier: workspace:*
-        version: link:../../../sdk
-      next:
-        specifier: 14.2.7
-        version: 14.2.7(@babel/core@7.24.9)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react:
-        specifier: ^18
-        version: 18.3.1
-      react-dom:
-        specifier: ^18
-        version: 18.3.1(react@18.3.1)
-    devDependencies:
-      '@playwright/test':
-        specifier: ^1.45.3
-        version: 1.45.3
-      '@types/node':
-        specifier: ^20
-        version: 20.14.13
-      '@types/react':
-        specifier: ^18.3.4
-        version: 18.3.12
-      '@types/react-dom':
-        specifier: ^18.3.0
-        version: 18.3.0
-      eslint:
-        specifier: ^8
-        version: 8.57.0
-      eslint-config-next:
-        specifier: 14.2.7
-        version: 14.2.7(eslint@8.57.0)(typescript@5.6.2)
-      typescript:
-        specifier: ^5.6.2
-        version: 5.6.2
-
   examples/checkout/sdk-connect-with-nextjs:
     dependencies:
       '@biom3/react':
@@ -1859,8 +1819,8 @@ importers:
         specifier: workspace:*
         version: link:../../x-client
       '@magic-ext/oidc':
-        specifier: 4.3.1
-        version: 4.3.1
+        specifier: 12.0.0
+        version: 12.0.0
       '@metamask/detect-provider':
         specifier: ^2.0.0
         version: 2.0.0
@@ -1877,8 +1837,8 @@ importers:
         specifier: ^6.13.4
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       magic-sdk:
-        specifier: ^21.2.0
-        version: 21.2.0
+        specifier: ^29.0.0
+        version: 29.0.0
       oidc-client-ts:
         specifier: 2.4.0
         version: 2.4.0
@@ -2088,11 +2048,11 @@ importers:
         specifier: workspace:*
         version: link:../../x-provider
       '@magic-ext/oidc':
-        specifier: 4.3.1
-        version: 4.3.1
+        specifier: 12.0.0
+        version: 12.0.0
       '@magic-sdk/provider':
-        specifier: ^21.2.0
-        version: 21.2.0(localforage@1.10.0)
+        specifier: ^29.0.0
+        version: 29.0.0(localforage@1.10.0)
       '@metamask/detect-provider':
         specifier: ^2.0.0
         version: 2.0.0
@@ -2112,8 +2072,8 @@ importers:
         specifier: ^1.10.0
         version: 1.10.0
       magic-sdk:
-        specifier: ^21.2.0
-        version: 21.2.0
+        specifier: ^29.0.0
+        version: 29.0.0
       oidc-client-ts:
         specifier: 2.4.0
         version: 2.4.0
@@ -2395,8 +2355,8 @@ importers:
         specifier: workspace:*
         version: link:../x-client
       '@magic-ext/oidc':
-        specifier: 4.3.1
-        version: 4.3.1
+        specifier: 12.0.0
+        version: 12.0.0
       '@metamask/detect-provider':
         specifier: ^2.0.0
         version: 2.0.0
@@ -2410,8 +2370,8 @@ importers:
         specifier: ^6.13.4
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       magic-sdk:
-        specifier: ^21.2.0
-        version: 21.2.0
+        specifier: ^29.0.0
+        version: 29.0.0
       oidc-client-ts:
         specifier: 2.4.0
         version: 2.4.0
@@ -2550,49 +2510,6 @@ importers:
       tsup:
         specifier: 8.3.0
         version: 8.3.0(@swc/core@1.9.3(@swc/helpers@0.5.13))(jiti@1.21.0)(postcss@8.4.49)(typescript@5.6.2)(yaml@2.5.0)
-      typescript:
-        specifier: ^5.6.2
-        version: 5.6.2
-
-  tests/func-tests/checkout/widgets-nextjs:
-    dependencies:
-      '@biom3/react':
-        specifier: ^0.25.21
-        version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@imtbl/sdk':
-        specifier: workspace:*
-        version: link:../../../../sdk
-      ethers:
-        specifier: ^6.13.4
-        version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      next:
-        specifier: 14.2.7
-        version: 14.2.7(@babel/core@7.24.9)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react:
-        specifier: ^18
-        version: 18.3.1
-      react-dom:
-        specifier: ^18
-        version: 18.3.1(react@18.3.1)
-    devDependencies:
-      '@playwright/test':
-        specifier: ^1.45.3
-        version: 1.45.3
-      '@types/node':
-        specifier: ^20
-        version: 20.14.13
-      '@types/react':
-        specifier: ^18.3.4
-        version: 18.3.12
-      '@types/react-dom':
-        specifier: ^18.3.0
-        version: 18.3.0
-      eslint:
-        specifier: ^8
-        version: 8.57.0
-      eslint-config-next:
-        specifier: 14.2.7
-        version: 14.2.7(eslint@8.57.0)(typescript@5.6.2)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -4788,22 +4705,22 @@ packages:
     resolution: {integrity: sha512-qC72D4+CDdjGqJvkFMMEAtancHUQ7/d/tAiHf64z8MopFDmcrtbcJuerDtFceuAfQJ2pDSfCKCtbqoGBNnwg0w==}
     engines: {node: '>=8'}
 
-  '@magic-ext/oidc@4.3.1':
-    resolution: {integrity: sha512-HjriTgPxECC37z4UPbomuL0sFd5Fe0aC8BEDSShD5Ltbi0oMjamEW7avYdZi14S5F4UHfcol0M3xTc+0FTNwrw==}
+  '@magic-ext/oidc@12.0.0':
+    resolution: {integrity: sha512-IeycCoW8BUqcdJoggynq63bj8XyRxZfiX5cBdxq7LEr4gWWpTz1zexEkWrJoP76XDr6Yn/wYQXiL4/AvJ6wcjw==}
 
-  '@magic-sdk/commons@17.2.0':
-    resolution: {integrity: sha512-+NkPL9r1twzgaPp94+ykF0T3pU2GHVCJup4YjdOiGWMngqqJ50aLKi0dgaNjV77VA9svxWI5NnKgaiwWkNSUyQ==}
+  '@magic-sdk/commons@25.0.0':
+    resolution: {integrity: sha512-EYrbFGw/4R899IccGgkmVp/ia50ELNK7H1uDfM66Nh+YnH05LsLWlfrtFbbKxBazquVnu89bAHmJcFPsmSnHQQ==}
     peerDependencies:
       '@magic-sdk/provider': '>=18.6.0'
       '@magic-sdk/types': '>=15.8.0'
 
-  '@magic-sdk/provider@21.2.0':
-    resolution: {integrity: sha512-zrQKYXra9eCfdRagA7hoXs99gYV/OmtdXm1PNy1dkq8iVY+Hltlk4zCkkFr2qMcroRrMId4Ajbtuar65xxb+GA==}
+  '@magic-sdk/provider@29.0.0':
+    resolution: {integrity: sha512-Ukfd5Is4xruJr9U8BJzoOF8JmIqGMbUObO4lEIHg5CNaha5ZcfZwl/FRs/eqNadcpJjcvSRc5DPXaWzjcFJzKA==}
     peerDependencies:
       localforage: ^1.7.4
 
-  '@magic-sdk/types@17.2.0':
-    resolution: {integrity: sha512-VJmGP+DwMnuIuMLb+IDHNAkYLcHH+XqPwHb6mcLNI9e30CDMXoFN60hmdhDRZLjI9JF/NPS3eEsd40Xz6Iih2A==}
+  '@magic-sdk/types@24.18.0':
+    resolution: {integrity: sha512-6HS9WMgzLNCkvkJeDZW8+/maP8JInDYqnfudp/SgPWMosm9l6zH3X+x+ntDjRIUm5Qdugsg+L1fxMBj48r616Q==}
 
   '@metamask/detect-provider@2.0.0':
     resolution: {integrity: sha512-sFpN+TX13E9fdBDh9lvQeZdJn4qYoRb/6QF2oZZK/Pn559IhCFacPMU1rMuqyXoFQF3JSJfii2l98B87QDPeCQ==}
@@ -12851,8 +12768,8 @@ packages:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
     hasBin: true
 
-  magic-sdk@21.2.0:
-    resolution: {integrity: sha512-Sb9aj7CZAjJpUHMFGLGxq+0lAo+NydpQ68/8ZRUILzswKdg0Q0B/slo3F9WH2F1zakaIdjsUusCekg1LqiNALg==}
+  magic-sdk@29.0.0:
+    resolution: {integrity: sha512-8awpk21HJizU3XftRJNkV7f68ckOKJ2j4jCtagIemHA9Q4vd1QKgt5xZWDak/djXpWch2xOvNiSDtMCZDwEAhw==}
 
   magic-string@0.25.9:
     resolution: {integrity: sha512-RmF0AsMzgt25qzqqLc1+MbHmhdx0ojF2Fvs4XnOqz2ZOBXzzkEwc/dJQZCYHAn7v1jbVOjAZfK8msRn4BxO4VQ==}
@@ -18972,7 +18889,7 @@ snapshots:
 
   '@emnapi/wasi-threads@1.0.1':
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@emotion/babel-plugin@11.11.0':
     dependencies:
@@ -20453,23 +20370,23 @@ snapshots:
     dependencies:
       '@lukeed/csprng': 1.1.0
 
-  '@magic-ext/oidc@4.3.1': {}
+  '@magic-ext/oidc@12.0.0': {}
 
-  '@magic-sdk/commons@17.2.0(@magic-sdk/provider@21.2.0(localforage@1.10.0))(@magic-sdk/types@17.2.0)':
+  '@magic-sdk/commons@25.0.0(@magic-sdk/provider@29.0.0(localforage@1.10.0))(@magic-sdk/types@24.18.0)':
     dependencies:
-      '@magic-sdk/provider': 21.2.0(localforage@1.10.0)
-      '@magic-sdk/types': 17.2.0
+      '@magic-sdk/provider': 29.0.0(localforage@1.10.0)
+      '@magic-sdk/types': 24.18.0
 
-  '@magic-sdk/provider@21.2.0(localforage@1.10.0)':
+  '@magic-sdk/provider@29.0.0(localforage@1.10.0)':
     dependencies:
-      '@magic-sdk/types': 17.2.0
+      '@magic-sdk/types': 24.18.0
       eventemitter3: 4.0.7
       localforage: 1.10.0
       web3-core: 1.5.2
     transitivePeerDependencies:
       - supports-color
 
-  '@magic-sdk/types@17.2.0': {}
+  '@magic-sdk/types@24.18.0': {}
 
   '@metamask/detect-provider@2.0.0': {}
 
@@ -20672,7 +20589,7 @@ snapshots:
       '@motionone/easing': 10.17.0
       '@motionone/types': 10.17.0
       '@motionone/utils': 10.17.0
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@motionone/dom@10.17.0':
     dependencies:
@@ -20681,23 +20598,23 @@ snapshots:
       '@motionone/types': 10.17.0
       '@motionone/utils': 10.17.0
       hey-listen: 1.0.8
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@motionone/easing@10.17.0':
     dependencies:
       '@motionone/utils': 10.17.0
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@motionone/generators@10.17.0':
     dependencies:
       '@motionone/types': 10.17.0
       '@motionone/utils': 10.17.0
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@motionone/svelte@10.16.4':
     dependencies:
       '@motionone/dom': 10.17.0
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@motionone/types@10.17.0': {}
 
@@ -20705,12 +20622,12 @@ snapshots:
     dependencies:
       '@motionone/types': 10.17.0
       hey-listen: 1.0.8
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@motionone/vue@10.16.4':
     dependencies:
       '@motionone/dom': 10.17.0
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.2':
     optional: true
@@ -21899,7 +21816,7 @@ snapshots:
       is-glob: 4.0.3
       open: 9.1.0
       picocolors: 1.1.1
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@playwright/test@1.45.3':
     dependencies:
@@ -23571,7 +23488,7 @@ snapshots:
 
   '@swc/helpers@0.5.13':
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@swc/helpers@0.5.5':
     dependencies:
@@ -25795,7 +25712,7 @@ snapshots:
   camel-case@4.1.2:
     dependencies:
       pascal-case: 3.1.2
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   camelcase-css@2.0.1: {}
 
@@ -26971,7 +26888,7 @@ snapshots:
   dot-case@3.0.4:
     dependencies:
       no-case: 3.0.4
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   dotenv-expand@11.0.6:
     dependencies:
@@ -27543,7 +27460,7 @@ snapshots:
       eslint: 9.16.0(jiti@1.21.0)
       eslint-plugin-flowtype: 8.0.3(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.9))(@babel/plugin-transform-react-jsx@7.22.5(@babel/core@7.24.9))(eslint@9.16.0(jiti@1.21.0))
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))
-      eslint-plugin-jest: 25.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0)(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2)
+      eslint-plugin-jest: 25.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2)
       eslint-plugin-jsx-a11y: 6.9.0(eslint@9.16.0(jiti@1.21.0))
       eslint-plugin-react: 7.35.0(eslint@9.16.0(jiti@1.21.0))
       eslint-plugin-react-hooks: 4.6.0(eslint@9.16.0(jiti@1.21.0))
@@ -27715,12 +27632,12 @@ snapshots:
       - supports-color
       - typescript
 
-  eslint-plugin-jest@25.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0)(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2):
+  eslint-plugin-jest@25.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(jest@27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10))(typescript@5.6.2):
     dependencies:
       '@typescript-eslint/experimental-utils': 5.62.0(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2)
       eslint: 9.16.0(jiti@1.21.0)
     optionalDependencies:
-      '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0)(typescript@5.6.2)
+      '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2))(eslint@9.16.0(jiti@1.21.0))(typescript@5.6.2)
       jest: 27.5.1(bufferutil@4.0.8)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - supports-color
@@ -31981,7 +31898,7 @@ snapshots:
 
   lower-case@2.0.2:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   lowercase-keys@2.0.0: {}
 
@@ -32010,11 +31927,11 @@ snapshots:
 
   lz-string@1.5.0: {}
 
-  magic-sdk@21.2.0:
+  magic-sdk@29.0.0:
     dependencies:
-      '@magic-sdk/commons': 17.2.0(@magic-sdk/provider@21.2.0(localforage@1.10.0))(@magic-sdk/types@17.2.0)
-      '@magic-sdk/provider': 21.2.0(localforage@1.10.0)
-      '@magic-sdk/types': 17.2.0
+      '@magic-sdk/commons': 25.0.0(@magic-sdk/provider@29.0.0(localforage@1.10.0))(@magic-sdk/types@24.18.0)
+      '@magic-sdk/provider': 29.0.0(localforage@1.10.0)
+      '@magic-sdk/types': 24.18.0
       localforage: 1.10.0
     transitivePeerDependencies:
       - supports-color
@@ -32698,7 +32615,7 @@ snapshots:
   no-case@3.0.4:
     dependencies:
       lower-case: 2.0.2
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   nocache@3.0.4: {}
 
@@ -33221,7 +33138,7 @@ snapshots:
   param-case@3.0.4:
     dependencies:
       dot-case: 3.0.4
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   parcel@2.9.3(@swc/helpers@0.5.13)(postcss@8.4.49)(relateurl@0.2.7)(srcset@4.0.0)(terser@5.34.1)(typescript@5.6.2):
     dependencies:
@@ -33289,7 +33206,7 @@ snapshots:
   pascal-case@3.1.2:
     dependencies:
       no-case: 3.0.4
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   pascalcase@0.1.1: {}
 

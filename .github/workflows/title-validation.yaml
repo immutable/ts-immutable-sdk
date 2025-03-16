@@ -7,9 +7,6 @@ on:
     types:
       - opened
       - edited
-  merge_group:
-    branches:
-      - main
 
 permissions:
   pull-requests: read
@@ -20,7 +17,6 @@ env:
 jobs:
   title-validation:
     name: Validate PR title
-    if: ${{ github.event.action == 'opened' || github.event.changes.title.from }}
     runs-on: ubuntu-latest
     steps:
       - uses: amannn/action-semantic-pull-request@40166f00814508ec3201fc8595b393d451c8cd80
