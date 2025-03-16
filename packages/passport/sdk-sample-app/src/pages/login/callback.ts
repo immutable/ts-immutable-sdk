@@ -5,6 +5,6 @@ export default function HandleCallback() {
   const { passportClient } = useImmutableProvider();
 
   useEffect(() => {
-    passportClient.loginCallback();
+    passportClient.loginCallback().catch(console.error);
   }, [passportClient]);
 }

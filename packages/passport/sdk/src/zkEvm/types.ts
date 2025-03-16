@@ -30,7 +30,7 @@ export interface MetaTransaction {
   to: string;
   value?: BigNumberish | null;
   data?: string | null;
-  nonce?: BigNumberish | null;
+  nonce?: BigNumberish;
   gasLimit?: BigNumberish;
   delegateCall?: boolean;
   revertOnError?: boolean;
