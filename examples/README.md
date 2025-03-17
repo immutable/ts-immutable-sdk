@@ -426,6 +426,7 @@ These prompts are designed to be used with Cursor IDE Composer Agent mode.
 
 Follow these steps to generate the tutorials and metadata for the example apps:
 
+1. Delete the existing tutorial.md and metadata.json files in the example app you are wanting to generate the tutorials and metadata for.
 1. Open the Composer window in Cursor IDE.
 1. Press the `+` button clear the context of the composer window.
 1. Open the `prompt.txt` file in the examples/product folder you are wanting to generate the tutorials and metadata for e.g. `examples/passport/prompt.txt`.
