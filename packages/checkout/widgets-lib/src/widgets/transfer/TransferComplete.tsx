@@ -1,24 +1,23 @@
 import {
   Stack, Box, Heading, Link, Button,
 } from '@biom3/react';
-import { ChainId, BlockExplorerService } from '@imtbl/checkout-sdk';
+import { BlockExplorerService } from '@imtbl/checkout-sdk';
 import { useRive } from '@rive-app/react-canvas-lite';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import { getRemoteRive } from '../../lib/utils';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { TransferCompleteState } from './context';
 
 export function TransferComplete({
   config,
-  chainId,
+  viewState,
   onContinue,
-  txHash,
 }: {
   config: StrongCheckoutWidgetsConfig;
-  chainId: ChainId;
+  viewState: TransferCompleteState;
   onContinue: () => void;
-  txHash: string;
 }) {
   const { t } = useTranslation();
   const { RiveComponent } = useRive({
@@ -27,7 +26,14 @@ export function TransferComplete({
     autoplay: true,
   });
 
-  const explorerLink = useMemo(() => BlockExplorerService.getTransactionLink(chainId, txHash), [chainId, txHash]);
+  const explorerLink = useMemo(
+    () =>
+      BlockExplorerService.getTransactionLink(
+        viewState.chainId,
+        viewState.receipt.hash,
+      ),
+    [viewState.chainId, viewState.receipt.hash],
+  );
 
   return (
     <SimpleLayout containerSx={{ bg: 'transparent' }}>
@@ -44,15 +50,7 @@ export function TransferComplete({
           <Heading sx={{ mb: 'base.spacing.x4', mx: 'base.spacing.x4' }}>
             {t('views.TRANSFER.content.tokensSentSuccessfully')}
           </Heading>
-          <Link
-            rc={(
-              <a
-                target="_blank"
-                href={explorerLink}
-                rel="noreferrer"
-              />
-            )}
-          >
+          <Link rc={<a target="_blank" href={explorerLink} rel="noreferrer" />}>
             {t('views.TRANSFER.content.seeTransactionOnImmutableZkEVM')}
           </Link>
         </Box>

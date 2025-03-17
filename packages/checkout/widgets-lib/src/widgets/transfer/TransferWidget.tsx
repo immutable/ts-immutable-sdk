@@ -1,17 +1,13 @@
+/* eslint-disable react/destructuring-assignment */
 /* eslint-disable max-len */
 import {
-  Checkout,
   IMTBLWidgetEvents,
   TransferWidgetParams,
-  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useReducer,
-  useState,
+  Dispatch,
+  SetStateAction,
+  useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -26,17 +22,9 @@ import {
 } from '@biom3/react';
 
 import {
-  isAddress, isError, parseUnits, TransactionReceipt,
+  isAddress, isError, parseUnits,
 } from 'ethers';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import {
-  initialViewState,
-  SharedViews,
-  ViewActions,
-  ViewContext,
-  viewReducer,
-} from '../../context/view-context/ViewContext';
-import { TransferWidgetViews } from '../../context/view-context/TransferViewContextTypes';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
@@ -50,13 +38,6 @@ import {
 import { CoinSelectorOptionProps } from '../../components/CoinSelector/CoinSelectorOption';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import {
-  initialTransferState,
-  TransferActions,
-  transferReducer,
-  useTransferContext,
-  TransferContextProvider,
-} from './TransferContext';
-import {
   calculateCryptoToFiat,
   formatZeroAmount,
   getDefaultTokenImage,
@@ -64,7 +45,7 @@ import {
   tokenValueFormat,
 } from '../../lib/utils';
 import { TextInputForm } from '../../components/FormComponents/TextInputForm/TextInputForm';
-import { CryptoFiatContext } from '../../context/crypto-fiat-context/CryptoFiatContext';
+import { CryptoFiatActions, CryptoFiatContext } from '../../context/crypto-fiat-context/CryptoFiatContext';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import {
   getOptionKey,
@@ -78,6 +59,7 @@ import { getL2ChainId } from '../../lib';
 import { TransferComplete } from './TransferComplete';
 import { SendingTokens } from './SendingTokens';
 import { AwaitingApproval } from './AwaitingApproval';
+import { TransferFormState, TransferState } from './context';
 
 export type TransferWidgetInputs = TransferWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
@@ -87,30 +69,25 @@ const TRANSACTION_CANCELLED_ERROR_CODE = -32003;
 
 function TransferForm({
   config,
-  checkout,
-  provider,
-  initialAmount = '',
-  initialTokenAddress = '',
-  initialToAddress = '',
+  viewState,
+  setViewState,
+  onSend,
 }: {
   config: StrongCheckoutWidgetsConfig;
-  checkout: Checkout;
-  provider: WrappedBrowserProvider;
-  initialAmount?: string;
-  initialTokenAddress?: `0x${string}` | 'native' | '';
-  initialToAddress?: `0x${string}` | '';
+  viewState: TransferFormState;
+  setViewState: Dispatch<SetStateAction<TransferState>>;
+  onSend: () => void;
 }) {
   const { t } = useTranslation();
   const { track } = useAnalytics();
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
-  const { transferState } = useTransferContext();
   const { cryptoFiatState } = useContext(CryptoFiatContext);
 
   const tokenOptions = useMemo(
     () =>
-      transferState.tokenBalances.map<CoinSelectorOptionProps>(
+      viewState.allowedBalances.map<CoinSelectorOptionProps>(
         (tokenBalance) => ({
           id: getOptionKey(tokenBalance.token),
           name: tokenBalance.token.name,
@@ -122,39 +99,26 @@ function TransferForm({
           },
         }),
       ),
-    [transferState.tokenBalances],
+    [viewState.allowedBalances, cryptoFiatState],
   );
 
   const [token, setToken] = useState<CoinSelectorOptionProps | undefined>(() =>
-    tokenOptions.find((option) => option.id === initialTokenAddress));
-
-  const [amount, setAmount] = useState<string>(initialAmount);
-  const [recipientAddress, setRecipientAddress] = useState<string>(initialToAddress);
-  const [recipientAddressError, setRecipientAddressError] = useState<string>('');
-  const [amountError, setAmountError] = useState<string>('');
-
-  const [localTransferState, setLocalTransferState] = useState<
-  | { state: 'FORM' }
-  | { state: 'AWAITING_APPROVAL' }
-  | { state: 'TRANSFERRING' }
-  | { state: 'COMPLETE', receipt: TransactionReceipt }
-  >({ state: 'FORM' });
-
-  const chainId = useMemo(() => getL2ChainId(checkout.config), [checkout.config]);
+    tokenOptions.find((option) => option.id === viewState.tokenAddress));
 
   const defaultTokenImage = useMemo(
-    () => getDefaultTokenImage(checkout.config.environment, config.theme),
-    [checkout.config.environment, config.theme],
+    () =>
+      getDefaultTokenImage(viewState.checkout.config.environment, config.theme),
+    [viewState.checkout.config.environment, config.theme],
   );
 
   const fromFiatValue = useMemo(
     () =>
       calculateCryptoToFiat(
-        amount,
+        viewState.amount,
         token?.symbol || '',
         cryptoFiatState.conversions,
       ),
-    [amount, token, cryptoFiatState.conversions],
+    [viewState.amount, token, cryptoFiatState.conversions],
   );
 
   const handleTokenChange = useCallback(
@@ -166,10 +130,11 @@ function TransferForm({
         controlType: 'Select',
         extras: { token: optionKey },
       });
+      console.log({ tokenOptions, optionKey });
       const result = tokenOptions.find((option) => option.id === optionKey);
       if (!result) throw new Error('Token not found');
       setToken(result);
-      setAmountError('');
+      setViewState((s) => ({ ...s, tokenAddress: result.id, amountError: '' }));
     },
     [tokenOptions, token],
   );
@@ -189,17 +154,18 @@ function TransferForm({
       extras: { token: token.id, amount: result.balance.formattedAmount },
     });
 
-    setAmount(result.balance.formattedAmount);
+    setViewState((s) => {
+      if (!result.balance) throw new Error('Token balance not found');
+      return { ...s, amount: result.balance.formattedAmount };
+    });
   }, [tokenOptions, token]);
 
   const handleRecipientAddressChange = useCallback((value: string) => {
-    setRecipientAddress(value);
-    setRecipientAddressError('');
+    setViewState((s) => ({ ...s, toAddress: value, toAddressError: '' }));
   }, []);
 
   const handleAmountChange = useCallback((value: string) => {
-    setAmount(value);
-    setAmountError('');
+    setViewState((s) => ({ ...s, amount: value, amountError: '' }));
   }, []);
 
   const selectSubtext = useMemo(() => {
@@ -210,101 +176,9 @@ function TransferForm({
   }, [token]);
 
   const isButtonDisabled = useMemo(
-    () => !amount || !recipientAddress || !token,
-    [amount, recipientAddress, token],
+    () => !viewState.amount || !viewState.toAddress || !token,
+    [viewState.amount, viewState.toAddress, token],
   );
-
-  const resetForm = useCallback(() => {
-    setLocalTransferState({ state: 'FORM' });
-    setToken(undefined);
-    setAmount('');
-    setAmountError('');
-    setRecipientAddress('');
-    setRecipientAddressError('');
-  }, []);
-
-  const sendTokensCb = useCallback(async () => {
-    if (!token) throw new Error('Token not found');
-
-    track({
-      screen: 'TransferToken',
-      userJourney: UserJourney.TRANSFER,
-      control: 'Send',
-      controlType: 'Button',
-      extras: { token: token.id, amount },
-    });
-
-    if (!isAddress(recipientAddress)) {
-      setRecipientAddressError('Invalid wallet address');
-      return;
-    }
-
-    const tokenInfo = transferState.tokenBalances.find(
-      (tb) => tb.token.address === token.id,
-    );
-    if (!tokenInfo) throw new Error('Token not found');
-
-    if (tokenInfo.balance < parseUnits(amount, tokenInfo.token.decimals)) {
-      setAmountError('Insufficient balance');
-      return;
-    }
-
-    setLocalTransferState({ state: 'AWAITING_APPROVAL' });
-
-    try {
-      const txResponse = await sendTokens(
-        provider,
-        tokenInfo,
-        recipientAddress,
-        amount,
-      );
-
-      setLocalTransferState({ state: 'TRANSFERRING' });
-
-      const receipt = await txResponse.wait();
-      if (!receipt) throw new Error('Transaction failed');
-
-      setLocalTransferState({ state: 'COMPLETE', receipt });
-    } catch (e) {
-      setLocalTransferState({ state: 'FORM' });
-      if (
-        isError(e, 'UNKNOWN_ERROR')
-        && e.error
-        && 'code' in e.error
-        && e.error.code === TRANSACTION_CANCELLED_ERROR_CODE
-      ) {
-        track({
-          screen: 'TransferToken',
-          userJourney: UserJourney.TRANSFER,
-          control: 'TranactionCancel',
-          controlType: 'Event',
-          extras: { token: token.id, amount },
-        });
-      } else {
-        // eslint-disable-next-line no-console
-        console.error(e); // TODO: where can we send these?
-      }
-    }
-  }, [transferState.tokenBalances, amount, recipientAddress, token, provider]);
-
-  if (localTransferState.state === 'AWAITING_APPROVAL') {
-    return <AwaitingApproval config={config} />;
-  }
-
-  if (localTransferState.state === 'TRANSFERRING') {
-    return <SendingTokens config={config} />;
-  }
-
-  if (localTransferState.state === 'COMPLETE') {
-    return (
-      <TransferComplete
-        config={config}
-        chainId={chainId}
-        onContinue={resetForm}
-        txHash={localTransferState.receipt.hash}
-      />
-    );
-  }
 
   return (
     <SimpleLayout
@@ -334,17 +208,19 @@ function TransferForm({
       >
         <Stack gap="base.spacing.x9">
           <Stack gap="base.spacing.x1">
-            <Heading size="xSmall">{t('views.TRANSFER.form.coinAmountHeading')}</Heading>
+            <Heading size="xSmall">
+              {t('views.TRANSFER.form.coinAmountHeading')}
+            </Heading>
             <SelectInput
               testId="transfer-token-select"
               options={tokenOptions}
-              textInputValue={amount}
+              textInputValue={viewState.amount}
               textInputPlaceholder="0"
               textInputTextAlign="right"
               coinSelectorHeading={t('views.TRANSFER.form.coinSelectorHeading')}
               textInputMaxButtonClick={token ? handleMaxButtonClick : undefined}
               textInputValidator={amountInputValidation}
-              textInputErrorMessage={amountError}
+              textInputErrorMessage={viewState.amountError}
               selectSubtext={selectSubtext}
               textInputSubtext={`${t(
                 'views.TRANSFER.content.fiatPricePrefix',
@@ -359,14 +235,16 @@ function TransferForm({
             />
           </Stack>
           <Stack gap="base.spacing.x1">
-            <Heading size="xSmall">{t('views.TRANSFER.form.toAddressHeading')}</Heading>
+            <Heading size="xSmall">
+              {t('views.TRANSFER.form.toAddressHeading')}
+            </Heading>
             <TextInputForm
               testId="transfer-to-address-input"
-              value={recipientAddress}
+              value={viewState.toAddress}
               placeholder="0x"
               validator={validatePartialAddress}
               onTextInputChange={handleRecipientAddressChange}
-              errorMessage={recipientAddressError}
+              errorMessage={viewState.toAddressError}
             />
           </Stack>
         </Stack>
@@ -385,14 +263,16 @@ function TransferForm({
             weight="regular"
             sx={{ mb: 'base.spacing.x4' }}
           >
-            {t('views.TRANSFER.content.notAllExchangesSupportImmutableZkEVMDescription')}
+            {t(
+              'views.TRANSFER.content.notAllExchangesSupportImmutableZkEVMDescription',
+            )}
           </Body>
           <Button
             sx={{ width: '100%' }}
             variant="primary"
             size="large"
             disabled={isButtonDisabled}
-            onClick={sendTokensCb}
+            onClick={onSend}
           >
             {t('views.TRANSFER.form.buttonText')}
           </Button>
@@ -402,96 +282,206 @@ function TransferForm({
   );
 }
 
-export default function TransferWidget({
-  amount,
-  tokenAddress,
-  toAddress,
-  config,
-}: TransferWidgetInputs) {
+function TransferWidgetInner(props: TransferWidgetInputs) {
   const { t } = useTranslation();
-  const {
-    base: { colorMode },
-  } = useTheme();
-  const [viewState, viewDispatch] = useReducer(viewReducer, {
-    ...initialViewState,
-    history: [],
-  });
-  const viewReducerValues = useMemo(
-    () => ({ viewState, viewDispatch }),
-    [viewState, viewDispatch],
-  );
-  const [transferState, transferDispatch] = useReducer(
-    transferReducer,
-    initialTransferState,
-  );
+  const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
+  const { track } = useAnalytics();
+
   const {
     connectLoaderState: { checkout, provider },
   } = useContext(ConnectLoaderContext);
 
+  const [viewState, setViewState] = useState<TransferState>({
+    type: 'INITIALISING',
+  });
+
   useEffect(() => {
     const x = async () => {
-      if (viewState.view.type !== SharedViews.LOADING_VIEW) return;
+      if (viewState.type !== 'INITIALISING') return;
       if (!checkout || !provider) return;
 
       const tokensAndBalances = await loadBalances(checkout, provider);
 
-      transferDispatch({
+      cryptoFiatDispatch({
         payload: {
-          type: TransferActions.SET_TOKEN_BALANCES,
-          tokenBalances: tokensAndBalances.allowedBalances,
+          type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
+          tokenSymbols: tokensAndBalances.allowedBalances.map((tb) => tb.token.symbol),
         },
       });
 
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: { type: TransferWidgetViews.TRANSFER },
-        },
+      setViewState({
+        type: 'FORM',
+        allowedBalances: tokensAndBalances.allowedBalances,
+        checkout,
+        provider,
+        amount: props.amount || '',
+        amountError: '',
+        tokenAddress: props.tokenAddress || '',
+        toAddress: props.toAddress || '',
+        toAddressError: '',
       });
     };
 
     x();
   }, [checkout]);
 
+  const resetForm = useCallback(() => {
+    if (viewState.type === 'INITIALISING') return;
+
+    setViewState({
+      type: 'FORM',
+      allowedBalances: viewState.allowedBalances,
+      checkout: viewState.checkout,
+      provider: viewState.provider,
+      amount: '',
+      amountError: '',
+      tokenAddress: '',
+      toAddress: '',
+      toAddressError: '',
+    });
+  }, [checkout, provider, viewState]);
+
+  const onSend = useCallback(async () => {
+    if (viewState.type !== 'FORM') throw new Error('Unexpected state');
+
+    track({
+      screen: 'TransferToken',
+      userJourney: UserJourney.TRANSFER,
+      control: 'Send',
+      controlType: 'Button',
+      extras: { token: viewState.tokenAddress, amount: viewState.amount },
+    });
+
+    if (!isAddress(viewState.toAddress)) {
+      setViewState((s) => ({ ...s, toAddressError: 'Invalid wallet address' }));
+      return;
+    }
+
+    console.log({ viewState });
+    const tokenInfo = viewState.allowedBalances.find((tb) => tb.token.address === viewState.tokenAddress);
+    if (!tokenInfo) throw new Error('Token not found');
+
+    if (tokenInfo.balance < parseUnits(viewState.amount, tokenInfo.token.decimals)) {
+      setViewState((s) => ({ ...s, amountError: 'Insufficient balance' }));
+      return;
+    }
+
+    setViewState({
+      type: 'AWAITING_APPROVAL', checkout: viewState.checkout, provider: viewState.provider, allowedBalances: viewState.allowedBalances,
+    });
+
+    try {
+      const txResponse = await sendTokens(
+        viewState.provider,
+        tokenInfo,
+        viewState.toAddress,
+        viewState.amount,
+      );
+
+      setViewState({
+        type: 'TRANSFERRING', checkout: viewState.checkout, provider: viewState.provider, allowedBalances: viewState.allowedBalances,
+      });
+
+      const receipt = await txResponse.wait();
+      if (!receipt) throw new Error('Transaction failed');
+
+      setViewState({
+        type: 'COMPLETE',
+        receipt,
+        chainId: getL2ChainId(viewState.checkout.config),
+        checkout: viewState.checkout,
+        provider: viewState.provider,
+        allowedBalances: viewState.allowedBalances,
+      });
+    } catch (e) {
+      setViewState({
+        type: 'FORM',
+        allowedBalances: viewState.allowedBalances,
+        checkout: viewState.checkout,
+        provider: viewState.provider,
+        amount: viewState.amount,
+        amountError: viewState.amountError,
+        tokenAddress: viewState.tokenAddress,
+        toAddress: viewState.toAddress,
+        toAddressError: viewState.toAddressError,
+      });
+      if (
+        isError(e, 'UNKNOWN_ERROR')
+        && e.error
+        && 'code' in e.error
+        && e.error.code === TRANSACTION_CANCELLED_ERROR_CODE
+      ) {
+        track({
+          screen: 'TransferToken',
+          userJourney: UserJourney.TRANSFER,
+          control: 'TranactionCancel',
+          controlType: 'Event',
+          extras: { token: viewState.tokenAddress, amount: viewState.amount },
+        });
+      } else {
+        // eslint-disable-next-line no-console
+        console.error(e); // TODO: where can we send these?
+      }
+    }
+  }, [viewState]);
+
+  switch (viewState.type) {
+    case 'INITIALISING':
+      return <LoadingView loadingText={t('views.LOADING_VIEW.text')} />;
+    case 'FORM':
+      return (
+        <TransferForm
+          config={props.config}
+          viewState={viewState}
+          setViewState={setViewState}
+          onSend={onSend}
+        />
+      );
+    case 'AWAITING_APPROVAL':
+      return <AwaitingApproval config={props.config} />;
+    case 'TRANSFERRING':
+      return <SendingTokens config={props.config} />;
+    case 'COMPLETE':
+      return (
+        <TransferComplete
+          config={props.config}
+          viewState={viewState}
+          onContinue={resetForm}
+        />
+      );
+    default:
+      throw new Error('Invalid view state');
+  }
+}
+
+export default function TransferWidget(props: TransferWidgetInputs) {
+  const {
+    base: { colorMode },
+  } = useTheme();
+
   return (
-    <ViewContext.Provider value={viewReducerValues}>
-      {viewState.view.type === SharedViews.LOADING_VIEW && (
-        <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
-      )}
-      <TransferContextProvider value={{ transferState, transferDispatch }}>
-        <CryptoFiatProvider environment={config.environment}>
-          <Stack sx={{ pos: 'relative' }}>
-            <CloudImage
-              use={(
-                <img
-                  src={getRemoteImage(
-                    config.environment,
-                    `/add-tokens-bg-texture-${colorMode}.webp`,
-                  )}
-                  alt="blurry bg texture"
-                />
+    <CryptoFiatProvider environment={props.config.environment}>
+      <Stack sx={{ pos: 'relative' }}>
+        <CloudImage
+          use={(
+            <img
+              src={getRemoteImage(
+                props.config.environment,
+                `/add-tokens-bg-texture-${colorMode}.webp`,
               )}
-              sx={{
-                pos: 'absolute',
-                h: '100%',
-                w: '100%',
-                objectFit: 'cover',
-                objectPosition: 'center',
-              }}
+              alt="blurry bg texture"
             />
-            {viewState.view.type === TransferWidgetViews.TRANSFER && (
-              <TransferForm
-                config={config}
-                checkout={checkout!}
-                provider={provider!}
-                initialAmount={amount}
-                initialTokenAddress={tokenAddress}
-                initialToAddress={toAddress}
-              />
-            )}
-          </Stack>
-        </CryptoFiatProvider>
-      </TransferContextProvider>
-    </ViewContext.Provider>
+          )}
+          sx={{
+            pos: 'absolute',
+            h: '100%',
+            w: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center',
+          }}
+        />
+        <TransferWidgetInner {...props} />
+      </Stack>
+    </CryptoFiatProvider>
   );
 }
