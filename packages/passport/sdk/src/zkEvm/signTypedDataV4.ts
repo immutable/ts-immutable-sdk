@@ -45,19 +45,17 @@ const transformTypedData = (typedData: string | object, chainId: bigint): TypedD
 
   const providedChainId = transformedTypedData.domain?.chainId;
 
-  if (!providedChainId) {
-    throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `No chainId found, expected ${chainId}`);
-  }
-
-  // domain.chainId (if defined) can be a number, string, or hex value, but the relayer & guardian only accept a number.
-  if (typeof providedChainId === 'string') {
-    if (providedChainId.startsWith('0x')) {
-      transformedTypedData.domain.chainId = parseInt(providedChainId, 16).toString();
-    } else {
-      transformedTypedData.domain.chainId = parseInt(providedChainId, 10).toString();
+  if (providedChainId) {
+    // domain.chainId (if defined) can be a number, string, or hex value, but the relayer & guardian only accept a number.
+    if (typeof providedChainId === 'string') {
+      if (providedChainId.startsWith('0x')) {
+        transformedTypedData.domain.chainId = parseInt(providedChainId, 16).toString();
+      } else {
+        transformedTypedData.domain.chainId = parseInt(providedChainId, 10).toString();
+      }
     }
 
-    if (BigInt(transformedTypedData.domain.chainId) !== chainId) {
+    if (BigInt(transformedTypedData.domain.chainId ?? 0) !== chainId) {
       throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `Invalid chainId, expected ${chainId}`);
     }
   }
