@@ -413,3 +413,20 @@ You can now double check the code snippets in your `docs` branch are all pulling
 Once your `docs` PR is merged, Netlify should automatically build and deploy the docs site. If your updates are not reflected on the docs site within 10 minutes of the PR being merged, it's likely the build has failed in Netlify. Because we are now pulling in content dynamically for the code snippets, the GET requests to fetch the code examples can sometimes randomly timeout which fails the build. 
 
 If this happens you will need to log into the Netlify site, check the error and retry the build. Usually this will fix the deployment issue, otherwise follow up on the error message shown by Netlify.
+
+## Generating Tutorials and Metadata for the example apps
+
+To generate tutorials and metadata for the example apps, you can use the prompts in the `prompt.txt` files in each examples/product folder.
+
+These prompts are designed to be used with Cursor IDE Composer Agent mode.
+
+Follow these steps to generate the tutorials and metadata for the example apps:
+
+1. Open the `prompt.txt` file for the product you want to generate tutorials and metadata for.
+2. Copy the contents of the file. If you want to generate the content for a Passport example app, copy the contents of the `passport/prompt.txt` file, for a Checkout example app, copy the contents of the `checkout/prompt.txt` file, etc.
+3. Paste the contents into the chat in Cursor IDE Composer Agent mode.
+4. After pasting the prompt, in the chat window, type `app name: <name of the example app>`. For example, `app name: login-with-nextjs`. (Note: the app name is the name of the example app folder in the examples/product folder, e.g. `examples/passport/login-with-nextjs`)
+5. Press enter and let the AI generate the tutorials and metadata.
+6. Review the generated tutorials and metadata.
+7. If you're happy with the generated tutorials and metadata, you can commit and push the changes to your branch in the `ts-immutable-sdk` repo.
+

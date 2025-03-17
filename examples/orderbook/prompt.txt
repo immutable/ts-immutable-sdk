@@ -1,6 +1,4 @@
-FIRST PROMPT
 # Example Apps Documentation Generator
-
 ## Task Overview
 Analyze all example apps in the /examples/orderbook/ directory and create documentation files for each example app that doesn't already have them. For each example app, you will create:
 1. A comprehensive tutorial.md file
