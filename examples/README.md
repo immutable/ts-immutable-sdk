@@ -414,19 +414,25 @@ Once your `docs` PR is merged, Netlify should automatically build and deploy the
 
 If this happens you will need to log into the Netlify site, check the error and retry the build. Usually this will fix the deployment issue, otherwise follow up on the error message shown by Netlify.
 
-## Generating Tutorials and Metadata for the example apps
+## Generating Tutorials and Metadata for the example apps with AI
 
-To generate tutorials and metadata for the example apps, you can use the prompts in the `prompt.txt` files in each examples/product folder.
+Whenever you add a new example app, or update an existing example app, you can use the prompts in the `prompt.txt` files in each `examples/product` folder to generate the tutorials and metadata for the example apps.
+
+These AI generated tutorials and metadata files are piped through to the docs site in the CI/CD pipeline, where they are used to display the example apps and their code walkthroughs. If you don't follow these steps, your example app will not be displayed on the docs site.
+
+There is a single prompt for each product as we expect the examples to follow a similar structure and format, therefore the prompt to generate the tutorials and metadata is the same for each product. You can specify which example app you want the prompt to generate the tutorials and metadata for by adding the app name to the prompt as shown below.
 
 These prompts are designed to be used with Cursor IDE Composer Agent mode.
 
 Follow these steps to generate the tutorials and metadata for the example apps:
 
-1. Open the `prompt.txt` file for the product you want to generate tutorials and metadata for.
-2. Copy the contents of the file. If you want to generate the content for a Passport example app, copy the contents of the `passport/prompt.txt` file, for a Checkout example app, copy the contents of the `checkout/prompt.txt` file, etc.
-3. Paste the contents into the chat in Cursor IDE Composer Agent mode.
-4. After pasting the prompt, in the chat window, type `app name: <name of the example app>`. For example, `app name: login-with-nextjs`. (Note: the app name is the name of the example app folder in the examples/product folder, e.g. `examples/passport/login-with-nextjs`)
-5. Press enter and let the AI generate the tutorials and metadata.
-6. Review the generated tutorials and metadata.
-7. If you're happy with the generated tutorials and metadata, you can commit and push the changes to your branch in the `ts-immutable-sdk` repo.
+1. Open the Composer window in Cursor IDE.
+1. Press the `+` button clear the context of the composer window.
+1. Open the `prompt.txt` file in the examples/product folder you are wanting to generate the tutorials and metadata for e.g. `examples/passport/prompt.txt`.
+1. Copy and pate the prompt into the composer window, or attach it as a file.
+1. After adding the prompt, in the composer window, type `app name: <name of the example app>` e.g. `app name: login-with-nextjs` where the app name is the folder name of the example app in the examples/product folder you are wanting to generate the tutorials and metadata for.
+1. Press enter and let the AI generate the tutorials and metadata.
+1. Review the generated tutorials and metadata.
+1. If you're happy with the generated tutorials and metadata, you can commit and push the changes to your branch in the `ts-immutable-sdk` repo.
 
+Once you have merged your branch into main, the tutorials and metadata will be automatically piped to the docs site and displayed in the example apps section.
