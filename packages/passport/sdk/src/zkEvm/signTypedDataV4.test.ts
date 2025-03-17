@@ -43,7 +43,7 @@ describe('signTypedDataV4', () => {
     (signAndPackTypedData as jest.Mock).mockResolvedValueOnce(
       combinedSignature,
     );
-    rpcProvider.getNetwork.mockResolvedValue({ chainId });
+    rpcProvider.getNetwork.mockResolvedValue({ chainId: BigInt(chainId) });
   });
 
   describe('when a valid address and json are provided', () => {
