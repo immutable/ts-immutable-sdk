@@ -3,7 +3,7 @@ import {
 } from '@biom3/react';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 import {
-  Dispatch, SetStateAction, useContext, useMemo, useState, useCallback,
+  Dispatch, SetStateAction, useContext, useMemo, useCallback,
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CoinSelectorOptionProps } from '../../components/CoinSelector/CoinSelectorOption';
@@ -58,8 +58,10 @@ export function TransferForm({
     [viewState.allowedBalances, cryptoFiatState],
   );
 
-  const [token, setToken] = useState<CoinSelectorOptionProps | undefined>(() =>
-    tokenOptions.find((option) => option.id === viewState.tokenAddress));
+  const token = useMemo(
+    () => tokenOptions.find((option) => option.id === viewState.tokenAddress),
+    [tokenOptions, viewState.tokenAddress],
+  );
 
   const defaultTokenImage = useMemo(
     () =>
@@ -86,32 +88,27 @@ export function TransferForm({
         controlType: 'Select',
         extras: { token: optionKey },
       });
-      const result = tokenOptions.find((option) => option.id === optionKey);
-      if (!result) throw new Error('Token not found');
-      setToken(result);
-      setViewState((s) => ({ ...s, tokenAddress: result.id, amountError: '' }));
+      if (typeof optionKey !== 'string') throw new Error('Invalid token address');
+      setViewState((s) => ({ ...s, tokenAddress: optionKey, amountError: '' }));
     },
     [tokenOptions, token],
   );
 
   const handleMaxButtonClick = useCallback(() => {
     if (!token) throw new Error('Token not found');
-
-    const result = tokenOptions.find((option) => option.id === token.id);
-    if (!result) throw new Error('Token not found');
-    if (!result.balance?.formattedAmount) throw new Error('Token balance not found');
+    if (!token.balance) throw new Error('Token balance not found');
 
     track({
       screen: 'TransferToken',
       userJourney: UserJourney.TRANSFER,
       control: 'Max',
       controlType: 'Button',
-      extras: { token: token.id, amount: result.balance.formattedAmount },
+      extras: { token: token.id, amount: token.balance.formattedAmount },
     });
 
     setViewState((s) => {
-      if (!result.balance) throw new Error('Token balance not found');
-      return { ...s, amount: result.balance.formattedAmount };
+      if (!token.balance) throw new Error('Token balance not found');
+      return { ...s, amount: token.balance.formattedAmount };
     });
   }, [tokenOptions, token]);
 
