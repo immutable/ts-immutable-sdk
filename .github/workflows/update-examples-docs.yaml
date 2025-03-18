@@ -26,6 +26,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup
+        uses: ./.github/actions/setup
+
       - name: Checkout Docs Repo
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
@@ -43,23 +46,8 @@ jobs:
           git config --global user.name "${GITHUB_ACTOR}"
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-
-      - name: Install dependencies
-        run: |
-          # Install only the necessary dependencies for example parser
-          pnpm install --filter="examples" --filter="./examples/_scripts/**" --no-frozen-lockfile
-
       - name: Run example apps parser
-        run: pnpm parse:examples
+        run: node examples/_scripts/sample-app-parser.mjs
 
       - name: Copy parsed examples to docs repo
         run: |
@@ -107,19 +95,4 @@ jobs:
             echo "Examples documentation updated successfully"
           else
             echo "No changes detected"
-          fi
-
-      # - name: Trigger Netlify Build and Deploy
-      #   run: curl -X POST -d '{}' ${{ secrets.NETLIFY_BUILD_HOOK }}
-        
-      # - name: Notify Success
-      #   if: success()
-      #   uses: ./.github/actions/notify-slack-publish-status
-      #   with:
-      #     message: "✅ SDK examples documentation updated successfully."
-          
-      # - name: Notify Failure
-      #   if: failure()
-      #   uses: ./.github/actions/notify-slack-publish-status
-      #   with:
-      #     message: "❌ Failed to update SDK examples documentation. Please check the logs for more details." 
+          fi 
