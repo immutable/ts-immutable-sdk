@@ -3,7 +3,7 @@ name: Update Examples Documentation
 on:
   push:
     branches:
-      - DVR-332-example-app-content-workflow-pipeline
+      - main
     paths:
       - 'examples/**/metadata.json'
       - 'examples/**/tutorial.md'
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_USER: ${{ github.actor }}
-      DOCS_BRANCH: DVR-332-example-app-content-pipeline
+      DOCS_BRANCH: main
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
