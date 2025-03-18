@@ -17,6 +17,7 @@ import {
   CommerceWidgetTransferFlowParams,
 } from '@imtbl/checkout-sdk';
 import React, { Suspense } from 'react';
+import { isAddress } from 'ethers';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { HandoverProvider } from '../../context/handover-context/HandoverProvider';
@@ -173,6 +174,24 @@ export class CommerceWidgetRoot extends Base<WidgetType.IMMUTABLE_COMMERCE> {
 
   protected getValidTransferFlowParams(params: CommerceWidgetTransferFlowParams) {
     const validatedParams = { ...params };
+
+    if (params.amount && !isValidAmount(params.amount)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "amount" widget input');
+      validatedParams.amount = undefined;
+    }
+
+    if (params.tokenAddress && !isValidAddress(params.tokenAddress)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "fromTokenAddress" widget input');
+      validatedParams.tokenAddress = undefined;
+    }
+
+    if (params.toAddress && !isAddress(params.toAddress)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "toAddress" widget input');
+      validatedParams.toAddress = undefined;
+    }
 
     return validatedParams;
   }
