@@ -11,12 +11,12 @@ package.json @immutable/passport
 /packages/internal/generated-clients/src/blockchain-data @immutable/activation
 /packages/internal/toolkit @immutable/passport
 /packages/internal/cryptofiat @immutable/passport
-/packages/internal/dex @immutable/passport
+/packages/internal/dex @immutable/gamefi
 /packages/internal/bridge @immutable/rollups
 /packages/orderbook @immutable/traders
 /packages/passport @immutable/passport
 /packages/x-provider @immutable/passport
-/packages/checkout @immutable/passport
+/packages/checkout @immutable/gamefi
 /packages/checkout/widgets-lib @immutable/gamefi
 /packages/blockchain-data @immutable/activation
 /packages/minting-backend @shineli1984
