@@ -511,7 +511,7 @@ function CheckoutUI() {
                 });
               }}
             >
-              <MenuItem.Label>Direct NFT Purchase</MenuItem.Label>
+              <MenuItem.Label>Transfer</MenuItem.Label>
             </MenuItem>
           </AppHeaderBar.OverflowPopoverMenu>
           <AppHeaderBar.RightSlot gap="base.spacing.x4">
