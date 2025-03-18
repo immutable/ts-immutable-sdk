@@ -207,7 +207,10 @@ export function WalletAndNetworkSelector() {
       if (event.providerDetail.info.rdns === WalletProviderRdns.METAMASK) {
         changeAccount = true;
       }
-      const wrappedBrowserProvider = new WrappedBrowserProvider(event.provider);
+
+      // Pass 'any' here so that if the user switches networks, they are still prompted to switch
+      // to the chosen network at the end of the bridging process.
+      const wrappedBrowserProvider = new WrappedBrowserProvider(event.provider, 'any');
       const connectedProvider = await connectToProvider(checkout, wrappedBrowserProvider, changeAccount);
 
       await handleFromWalletConnectionSuccess(connectedProvider);
