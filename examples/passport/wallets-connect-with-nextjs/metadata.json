@@ -1,0 +1,8 @@
+{
+  "title": "Connect Wallets with Immutable Passport in Next.js",
+  "description": "Demonstrates three different approaches to connecting wallets using Immutable Passport in a Next.js application: EIP-1193, EtherJS, and Wagmi.",
+  "keywords": ["Immutable", "SDK", "Passport", "Wallet", "EIP-1193", "EtherJS", "Wagmi", "Web3", "Next.js"],
+  "tech_stack": ["Next.js", "TypeScript", "EtherJS", "Wagmi", "Tailwind CSS", "React"],
+  "product": "Passport",
+  "programming_language": "TypeScript"
+} 

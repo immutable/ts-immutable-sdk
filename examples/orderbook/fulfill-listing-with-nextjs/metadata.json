@@ -1,0 +1,8 @@
+{
+  "title": "Fulfill Listing with NextJS",
+  "description": "A NextJS application that demonstrates how to fulfill NFT listings (both ERC721 and ERC1155) using the Immutable Orderbook SDK.",
+  "keywords": ["Immutable", "SDK", "Orderbook", "Fulfill Listing", "ERC721", "ERC1155", "NFT", "Marketplace"],
+  "tech_stack": ["NextJS", "React", "TypeScript", "Immutable SDK", "Biom3"],
+  "product": "Orderbook",
+  "programming_language": "TypeScript"
+} 

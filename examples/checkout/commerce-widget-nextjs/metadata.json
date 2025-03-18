@@ -1,8 +1,0 @@
-{
-  "title": "Commerce Widget Integration with Next.js",
-  "description": "A Next.js example that demonstrates how to integrate, mount, and handle events from the Immutable Checkout SDK's Commerce Widget for wallet connection flows.",
-  "keywords": ["Immutable", "SDK", "Commerce Widget", "Checkout SDK", "Next.js", "Wallet Connection", "Widget Integration", "Event Handling"],
-  "tech_stack": ["Next.js", "React", "TypeScript", "Biom3 UI", "Immutable SDK"],
-  "product": "Checkout",
-  "programming_language": "TypeScript"
-} 

@@ -1,8 +1,8 @@
 {
   "title": "Contract Interaction with Viem",
-  "description": "Example demonstrating how to interact with Immutable ERC721 contracts using Viem for batch minting operations on Immutable zkEVM",
-  "keywords": ["Immutable", "SDK", "ERC721", "Viem", "BatchMint", "zkEVM", "Contracts"],
-  "tech_stack": ["TypeScript", "Viem", "@imtbl/contracts"],
+  "description": "Example demonstrating how to interact with Immutable ERC721 contracts using Viem, focusing on batch minting capabilities by token ID and quantity.",
+  "keywords": ["Immutable", "SDK", "Contracts", "ERC721", "Batch Minting", "Viem", "zkEVM"],
+  "tech_stack": ["TypeScript", "Viem", "Immutable Contracts"],
   "product": "Contracts",
   "programming_language": "TypeScript"
 } 

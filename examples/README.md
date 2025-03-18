@@ -427,13 +427,13 @@ These prompts are designed to be used with Cursor IDE Composer Agent mode.
 Follow these steps to generate the tutorials and metadata for the example apps:
 
 1. Delete the existing tutorial.md and metadata.json files in the example app you are wanting to generate the tutorials and metadata for.
-1. Open the Composer window in Cursor IDE.
-1. Press the `+` button clear the context of the composer window.
-1. Open the `prompt.txt` file in the examples/product folder you are wanting to generate the tutorials and metadata for e.g. `examples/passport/prompt.txt`.
-1. Copy and pate the prompt into the composer window, or attach it as a file.
-1. After adding the prompt, in the composer window, type `app name: <name of the example app>` e.g. `app name: login-with-nextjs` where the app name is the folder name of the example app in the examples/product folder you are wanting to generate the tutorials and metadata for.
-1. Press enter and let the AI generate the tutorials and metadata.
-1. Review the generated tutorials and metadata.
-1. If you're happy with the generated tutorials and metadata, you can commit and push the changes to your branch in the `ts-immutable-sdk` repo.
+2. Open the Composer window in Cursor IDE (Claude 3.7-sonnet-thinking).
+3. Press the `+` button clear the context of the composer window.
+4. Open the `prompt.txt` file in the examples/product folder you are wanting to generate the tutorials and metadata for e.g. `examples/passport/prompt.txt`.
+5. Copy and pate the prompt into the composer window, or attach it as a file.
+6. After adding the prompt, in the composer window, type `app name: <name of the example app>` e.g. `app name: login-with-nextjs` where the app name is the folder name of the example app in the examples/product folder you are wanting to generate the tutorials and metadata for.
+7. Press enter and let the AI generate the tutorials and metadata.
+8. Review the generated tutorials and metadata.
+9. If you're happy with the generated tutorials and metadata, you can commit and push the changes to your branch in the `ts-immutable-sdk` repo.
 
 Once you have merged your branch into main, the tutorials and metadata will be automatically piped to the docs site and displayed in the example apps section.
