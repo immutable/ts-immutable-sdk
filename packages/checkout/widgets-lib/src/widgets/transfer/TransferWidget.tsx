@@ -28,6 +28,8 @@ import { SendingTokens } from './SendingTokens';
 import { AwaitingApproval } from './AwaitingApproval';
 import { TransferState } from './context';
 import { TransferForm } from './TransferForm';
+import { sendFailedEvent, sendRejectedEvent, sendSuccessEvent } from './events';
+import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 
 export type TransferWidgetInputs = TransferWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
@@ -38,6 +40,7 @@ const TRANSACTION_CANCELLED_ERROR_CODE = -32003;
 function TransferWidgetInner(props: TransferWidgetInputs) {
   const { t } = useTranslation();
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const { track } = useAnalytics();
 
   const {
@@ -147,7 +150,13 @@ function TransferWidgetInner(props: TransferWidgetInputs) {
       });
 
       const receipt = await txResponse.wait();
-      if (!receipt) throw new Error('Transaction failed');
+      if (!receipt) {
+        sendFailedEvent(eventTarget, 'Transaction failed');
+        setViewState({ ...viewState, type: 'FORM' }); // TODO: We should be showing a failed view here
+        return;
+      }
+
+      sendSuccessEvent(eventTarget, receipt.hash);
 
       setViewState({
         type: 'COMPLETE',
@@ -182,12 +191,15 @@ function TransferWidgetInner(props: TransferWidgetInputs) {
           controlType: 'Event',
           extras: { token: viewState.tokenAddress, amount: viewState.amount },
         });
+        sendRejectedEvent(eventTarget, 'Transaction cancelled');
       } else {
         // eslint-disable-next-line no-console
         console.error(e); // TODO: where can we send these?
+        sendFailedEvent(eventTarget, 'Transaction failed');
+        setViewState({ ...viewState, type: 'FORM' }); // TODO: We should be showing a failed view here
       }
     }
-  }, [viewState]);
+  }, [viewState, eventTarget]);
 
   switch (viewState.type) {
     case 'INITIALISING':
@@ -199,6 +211,7 @@ function TransferWidgetInner(props: TransferWidgetInputs) {
           viewState={viewState}
           setViewState={setViewState}
           onSend={onSend}
+          showBackButton={props.showBackButton}
         />
       );
     case 'AWAITING_APPROVAL':

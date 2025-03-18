@@ -1,6 +1,6 @@
 export enum TransferEventType {
   CLOSE_WIDGET = 'close-widget',
-  CONNECT_SUCCESS = 'connect-success',
+  REJECTED = 'rejected',
   SUCCESS = 'success',
   FAILURE = 'failure',
 }
@@ -8,7 +8,9 @@ export enum TransferEventType {
 /**
  * Represents a successful transfer.
  */
-export type TransferSuccess = {};
+export type TransferSuccess = {
+  transactionHash: string;
+};
 
 /**
  * Type representing a transfer failure
@@ -17,4 +19,11 @@ export type TransferSuccess = {};
 export type TransferFailed = {
   reason: string;
   timestamp: number;
+};
+
+/**
+ * Type representing a transfer rejected
+ * @property {string} reason
+ */
+export type TransferRejected = {
 };

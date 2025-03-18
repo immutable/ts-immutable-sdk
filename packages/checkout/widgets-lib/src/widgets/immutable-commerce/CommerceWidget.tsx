@@ -333,6 +333,7 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
                   config={widgetsConfig}
                   {...(view.data.params || {})}
                   {...(view.data.config || {})}
+                  showBackButton={showBackButton}
                 />
               )}
             </Suspense>

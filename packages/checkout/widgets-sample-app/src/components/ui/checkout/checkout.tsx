@@ -264,6 +264,7 @@ function CheckoutUI() {
   const mount = () => {
     unmount();
     mounted.current = true;
+    console.log({params});
     widget?.mount("widget-root", params);
   };
 
@@ -276,9 +277,6 @@ function CheckoutUI() {
 
   // create the widget once factory is available
   // ignore language or theme changes
-  const prevWidget = useRef<Widget<typeof WidgetType.IMMUTABLE_COMMERCE> | undefined>(
-    undefined
-  );
   const widget = useAsyncMemo(async () => {
     if (widgetsFactory === undefined) return undefined;
     if (renderAfterConnect && !browserProvider) return undefined;
@@ -342,6 +340,7 @@ function CheckoutUI() {
       setEventResults((prev) => [...prev, { failure: true, ...data }]);
     });
     widget.addListener(CommerceEventType.CLOSE, () => {
+      console.log("CLOSED");
       setEventResults((prev) => [...prev, { closed: true }]);
       widget.unmount();
     });

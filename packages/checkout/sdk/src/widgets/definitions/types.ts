@@ -75,7 +75,9 @@ import {
   TransferWidgetConfiguration,
 } from './configurations';
 import { WrappedBrowserProvider } from '../../types';
-import { TransferEventType, TransferFailed, TransferSuccess } from './events/transfer';
+import {
+  TransferEventType, TransferFailed, TransferRejected, TransferSuccess,
+} from './events/transfer';
 
 /**
  * Enum representing the list of widget types.
@@ -247,6 +249,7 @@ export type WidgetEventData = {
     [TransferEventType.CLOSE_WIDGET]: {};
     [TransferEventType.SUCCESS]: TransferSuccess;
     [TransferEventType.FAILURE]: TransferFailed;
+    [TransferEventType.REJECTED]: TransferRejected;
   } & OrchestrationMapping &
   ProviderEventMapping;
 };

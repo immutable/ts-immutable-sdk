@@ -12,4 +12,7 @@ export type TransferWidgetParams = {
 
   /** The to address to transfer to */
   toAddress?: `0x${string}`;
+
+  /** Whether to show the back button */
+  showBackButton?: boolean;
 };

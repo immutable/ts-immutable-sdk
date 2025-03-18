@@ -22,23 +22,24 @@ import { amountInputValidation } from '../../lib/validations/amountInputValidati
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { TransferFormState, TransferState } from './context';
 import { getOptionKey, getFiatAmount, validatePartialAddress } from './functions';
+import { sendCloseWidgetEvent } from '../connect/connectWidgetEvents';
 
 export function TransferForm({
   config,
   viewState,
   setViewState,
   onSend,
+  showBackButton,
 }: {
   config: StrongCheckoutWidgetsConfig;
   viewState: TransferFormState;
   setViewState: Dispatch<SetStateAction<TransferState>>;
   onSend: () => void;
+  showBackButton: boolean | undefined;
 }) {
   const { t } = useTranslation();
   const { track } = useAnalytics();
-  const {
-    eventTargetState: { eventTarget },
-  } = useContext(EventTargetContext);
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const { cryptoFiatState } = useContext(CryptoFiatContext);
 
   const tokenOptions = useMemo(
@@ -137,12 +138,12 @@ export function TransferForm({
       header={(
         <HeaderNavigation
           title={t('views.TRANSFER.header.title')}
-          onCloseButtonClick={() => {}}
-          showBack
+          onCloseButtonClick={() => sendCloseWidgetEvent(eventTarget)}
+          showBack={showBackButton}
           onBackButtonClick={() => {
             orchestrationEvents.sendRequestGoBackEvent(
               eventTarget,
-              IMTBLWidgetEvents.IMBTL_TRANSFER_WIDGET_EVENT,
+              IMTBLWidgetEvents.IMTBL_TRANSFER_WIDGET_EVENT,
               {},
             );
           }}
