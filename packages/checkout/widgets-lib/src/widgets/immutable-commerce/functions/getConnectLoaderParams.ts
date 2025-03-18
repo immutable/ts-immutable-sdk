@@ -46,6 +46,7 @@ export function getConnectLoaderParams(
       };
     case CommerceFlowType.SALE:
     case CommerceFlowType.SWAP:
+    case CommerceFlowType.TRANSFER:
       return {
         checkout,
         browserProvider,

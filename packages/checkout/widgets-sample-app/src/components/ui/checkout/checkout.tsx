@@ -34,7 +34,6 @@ import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import { Environment, ImmutableConfiguration } from "@imtbl/config";
 
 import { useAsyncMemo, usePrevState } from "../../../hooks";
-import { Message } from "./components/messages";
 import { Legend } from "./components/legend";
 import { itemsMock } from "./items.mock";
 import { WrappedBrowserProvider } from "@imtbl/checkout-sdk";
@@ -141,6 +140,7 @@ const flows: Array<CommerceFlowType> = [
   CommerceFlowType.SALE,
   CommerceFlowType.ADD_TOKENS,
   CommerceFlowType.PURCHASE,
+  CommerceFlowType.TRANSFER,
 ];
 
 function CheckoutUI() {
@@ -212,6 +212,12 @@ function CheckoutUI() {
       items: itemsMock.slice(0, 1),
       environmentId: "82a81049-8c41-4ae3-91ca-0bd82a283abc",
     },
+    TRANSFER: {
+      flow: CommerceFlowType.TRANSFER,
+      // amount: "1",
+      // tokenAddress: "native",
+      // toAddress: "0x0000000000000000000000000000000000000000",
+    },
   });
 
   // set a state to keep widget event results
@@ -258,6 +264,7 @@ function CheckoutUI() {
   const mount = () => {
     unmount();
     mounted.current = true;
+    console.log({params});
     widget?.mount("widget-root", params);
   };
 
@@ -270,9 +277,6 @@ function CheckoutUI() {
 
   // create the widget once factory is available
   // ignore language or theme changes
-  const prevWidget = useRef<Widget<typeof WidgetType.IMMUTABLE_COMMERCE> | undefined>(
-    undefined
-  );
   const widget = useAsyncMemo(async () => {
     if (widgetsFactory === undefined) return undefined;
     if (renderAfterConnect && !browserProvider) return undefined;
@@ -336,6 +340,7 @@ function CheckoutUI() {
       setEventResults((prev) => [...prev, { failure: true, ...data }]);
     });
     widget.addListener(CommerceEventType.CLOSE, () => {
+      console.log("CLOSED");
       setEventResults((prev) => [...prev, { closed: true }]);
       widget.unmount();
     });
@@ -497,6 +502,15 @@ function CheckoutUI() {
               }}
             >
               <MenuItem.Label>Direct NFT Purchase</MenuItem.Label>
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setParams({
+                  flow: CommerceFlowType.TRANSFER,
+                });
+              }}
+            >
+              <MenuItem.Label>Transfer</MenuItem.Label>
             </MenuItem>
           </AppHeaderBar.OverflowPopoverMenu>
           <AppHeaderBar.RightSlot gap="base.spacing.x4">
@@ -678,8 +692,9 @@ function CheckoutUI() {
                   defaultLabel="Select a Flow"
                   onSelectChange={(value) => {
                     const flow = value as CommerceFlowType;
+                    const params = flowParams[flow] ?? {};
                     setParams({
-                      ...(flowParams[flow as keyof typeof flowParams] || {}),
+                      ...params,
                       flow,
                       // spread rest of params for given flow
                     });
