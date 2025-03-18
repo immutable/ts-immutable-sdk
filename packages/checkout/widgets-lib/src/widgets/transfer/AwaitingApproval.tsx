@@ -1,19 +1,28 @@
 import {
   Stack, Box, Heading, Body,
 } from '@biom3/react';
-import { useRive } from '@rive-app/react-canvas-lite';
+import { useRive, useStateMachineInput } from '@rive-app/react-canvas-lite';
 import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import { getRemoteRive } from '../../lib/utils';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 
 export function AwaitingApproval({ config }: { config: StrongCheckoutWidgetsConfig }) {
   const { t } = useTranslation();
-  const { RiveComponent } = useRive({
-    src: getRemoteRive(config.environment, '/swapping_coins.riv'),
+
+  const { RiveComponent, rive } = useRive({
+    src: getRemoteRive(config.environment, '/purchasing_items.riv'),
     stateMachines: 'State',
     autoplay: true,
   });
+
+  const input = useStateMachineInput(rive, 'State', 'mode');
+
+  useEffect(() => {
+    if (!input) return;
+    input.value = 2;
+  }, [input]);
 
   return (
     <SimpleLayout containerSx={{ bg: 'transparent' }}>
@@ -27,7 +36,7 @@ export function AwaitingApproval({ config }: { config: StrongCheckoutWidgetsConf
       >
         <Box>
           <Box sx={{ height: '240px' }} rc={<RiveComponent />} />
-          <Heading sx={{ mb: 'base.spacing.x4', mx: 'base.spacing.x4' }}>
+          <Heading sx={{ my: 'base.spacing.x4', mx: 'base.spacing.x4' }}>
             {t('views.TRANSFER.content.waitingForYouToApproveTxn')}
           </Heading>
           <Body rc={<div />}>

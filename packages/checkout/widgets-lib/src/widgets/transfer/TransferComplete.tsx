@@ -2,8 +2,8 @@ import {
   Stack, Box, Heading, Link, Button,
 } from '@biom3/react';
 import { BlockExplorerService } from '@imtbl/checkout-sdk';
-import { useRive } from '@rive-app/react-canvas-lite';
-import { useMemo } from 'react';
+import { useRive, useStateMachineInput } from '@rive-app/react-canvas-lite';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import { getRemoteRive } from '../../lib/utils';
@@ -20,11 +20,19 @@ export function TransferComplete({
   onContinue: () => void;
 }) {
   const { t } = useTranslation();
-  const { RiveComponent } = useRive({
-    src: getRemoteRive(config.environment, '/swapping_coins.riv'),
+
+  const { RiveComponent, rive } = useRive({
+    src: getRemoteRive(config.environment, '/purchasing_items.riv'),
     stateMachines: 'State',
     autoplay: true,
   });
+
+  const input = useStateMachineInput(rive, 'State', 'mode');
+
+  useEffect(() => {
+    if (!input) return;
+    input.value = 3;
+  }, [input]);
 
   const explorerLink = useMemo(
     () =>
@@ -47,7 +55,7 @@ export function TransferComplete({
       >
         <Box>
           <Box sx={{ height: '240px' }} rc={<RiveComponent />} />
-          <Heading sx={{ mb: 'base.spacing.x4', mx: 'base.spacing.x4' }}>
+          <Heading sx={{ my: 'base.spacing.x4', mx: 'base.spacing.x4' }}>
             {t('views.TRANSFER.content.tokensSentSuccessfully')}
           </Heading>
           <Link rc={<a target="_blank" href={explorerLink} rel="noreferrer" />}>
