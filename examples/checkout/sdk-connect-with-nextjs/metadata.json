@@ -1,0 +1,8 @@
+{
+  "title": "Connect with MetaMask in Next.js",
+  "description": "A Next.js example showing how to connect to MetaMask using the Immutable Checkout SDK with and without permission requests",
+  "keywords": ["Immutable", "SDK", "Checkout", "MetaMask", "Wallet Connect", "Next.js", "Web3"],
+  "tech_stack": ["Next.js", "TypeScript", "MetaMask", "Biome UI", "Ethers.js"],
+  "product": "Checkout",
+  "programming_language": "TypeScript"
+} 

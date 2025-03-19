@@ -1,0 +1,8 @@
+{
+  "title": "Fulfill Collection Bid with Next.js",
+  "description": "An example application demonstrating how to fulfill collection bids for both ERC721 and ERC1155 tokens using the Immutable Orderbook SDK with Next.js",
+  "keywords": ["Immutable", "SDK", "Orderbook", "Collection Bid", "Fulfillment", "ERC721", "ERC1155", "Next.js"],
+  "tech_stack": ["Next.js", "React", "TypeScript", "Immutable SDK", "Passport", "Orderbook SDK", "ethers.js"],
+  "product": "Orderbook",
+  "programming_language": "TypeScript"
+} 

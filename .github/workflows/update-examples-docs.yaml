@@ -1,0 +1,98 @@
+name: Update Examples Documentation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'examples/**/metadata.json'
+      - 'examples/**/tutorial.md'
+  workflow_dispatch:
+
+concurrency:
+  group: examples-docs
+  cancel-in-progress: false
+
+jobs:
+  UpdateExamplesDocs:
+    name: Update Examples Documentation
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_USER: ${{ github.actor }}
+      DOCS_BRANCH: main
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Checkout Docs Repo
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          repository: immutable/docs
+          token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
+          path: imx-docs
+          ref: ${{ env.DOCS_BRANCH }}
+
+      - name: Setup environment variables
+        run: |
+          echo "CLONE_DIR=./imx-docs" >> $GITHUB_ENV
+
+      - name: Setup Github
+        run: |
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+      - name: Run example apps parser
+        run: node examples/_scripts/sample-app-parser.mjs
+
+      - name: Copy parsed examples to docs repo
+        run: |
+          # Get list of all product example files
+          PRODUCT_FILES=$(find ./examples/_parsed -name "*-examples.json")
+          
+          # Process each product file
+          for FILE in $PRODUCT_FILES; do
+            # Extract product name from filename (remove -examples.json)
+            PRODUCT=$(basename $FILE | sed 's/-examples.json//')
+            
+            # Define target directory and file
+            TARGET_DIR="$CLONE_DIR/docs/main/example/zkEVM/$PRODUCT-examples"
+            TARGET_FILE="$TARGET_DIR/$(basename $FILE)"
+            
+            # Check if target directory exists
+            if [ -d "$TARGET_DIR" ]; then
+              echo "Directory $TARGET_DIR exists."
+              
+              # Check if target file exists
+              if [ -f "$TARGET_FILE" ]; then
+                echo "File $TARGET_FILE exists. Replacing with new version."
+                cp $FILE $TARGET_FILE
+              else
+                echo "File $TARGET_FILE does not exist. Copying new file."
+                cp $FILE $TARGET_FILE
+              fi
+            else
+              echo "Directory $TARGET_DIR does not exist. Creating directory and copying file."
+              mkdir -p $TARGET_DIR
+              cp $FILE $TARGET_FILE
+            fi
+            
+            echo "Processed $FILE to $TARGET_FILE"
+          done
+          
+      - name: Commit and push changes to docs repo
+        working-directory: ${{ env.CLONE_DIR }}
+        run: |
+          git add .
+          if git status | grep -q "Changes to be committed"; then
+            git commit --message "Update SDK examples documentation from https://github.com/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
+            echo "Pushing git commit"
+            git push -u origin ${{ env.DOCS_BRANCH }}
+            echo "Examples documentation updated successfully"
+          else
+            echo "No changes detected"
+          fi 
