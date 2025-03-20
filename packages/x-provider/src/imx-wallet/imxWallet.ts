@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { BrowserProvider } from 'ethers';
+import { BrowserProvider, toUtf8Bytes } from 'ethers';
 import {
   ConnectRequest,
   ConnectResponse,
@@ -25,7 +25,7 @@ export async function connect(
 ): Promise<ImxSigner> {
   const l1Signer = await l1Provider.getSigner();
   const address = await l1Signer.getAddress();
-  const signature = await l1Signer.signMessage(DEFAULT_CONNECTION_MESSAGE);
+  const signature = await l1Signer.signMessage(toUtf8Bytes(DEFAULT_CONNECTION_MESSAGE));
   const iframe = await getOrSetupIFrame(env);
 
   return new Promise((resolve, reject) => {
