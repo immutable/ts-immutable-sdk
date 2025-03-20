@@ -33,8 +33,7 @@ export function SwitchNetworkZkEVM() {
     if (!provider || !checkout) return;
 
     const checkCorrectNetwork = async () => {
-      const currentChainId = await provider.send('eth_chainId', []);
-      // eslint-disable-next-line radix
+      const currentChainId = await provider.getNetwork().then((n) => n.chainId);
       const parsedChainId = Number(currentChainId.toString());
       if (parsedChainId === getL2ChainId(checkout.config)) {
         connectDispatch({
@@ -76,7 +75,6 @@ export function SwitchNetworkZkEVM() {
     if (!provider.send) return;
 
     const currentChainId = await provider.send('eth_chainId', []);
-    // eslint-disable-next-line radix
     const parsedChainId = Number(currentChainId.toString());
 
     if (parsedChainId === getL2ChainId(checkout.config)) {
@@ -102,7 +100,7 @@ export function SwitchNetworkZkEVM() {
     try {
       let walletName = '';
       if (isWalletConnectProvider(provider)) {
-        walletName = (provider.provider as any)?.session?.peer?.metadata?.name.toLowerCase();
+        walletName = (provider.ethereumProvider as any)?.session?.peer?.metadata?.name.toLowerCase();
       }
       if (walletName.includes('metamask')) {
         try {
@@ -152,6 +150,8 @@ export function SwitchNetworkZkEVM() {
         },
       });
     } catch (err: any) {
+      // eslint-disable-next-line no-console
+      console.error(err);
       setButtonTextKey(t('views.SWITCH_NETWORK.zkEVM.button.retryText'));
     }
   }, [provider, checkout]);
