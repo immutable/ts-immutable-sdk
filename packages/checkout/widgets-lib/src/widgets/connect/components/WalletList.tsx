@@ -220,6 +220,7 @@ export function WalletList(props: WalletListProps) {
 
       const { chainId } = await ((await browserProvider.getSigner()).provider.getNetwork());
 
+      // eslint-disable-next-line no-console
       console.log({ checkoutChainId: chainId, targetChainId, walletConnectChainId: ethereumProvider.chainId });
 
       if (ethereumProvider.chainId !== targetChainId) {
@@ -227,6 +228,7 @@ export function WalletList(props: WalletListProps) {
         await ethereumProvider.switchEthereumChain(targetChainId);
       }
 
+      // eslint-disable-next-line no-console
       console.log({ checkoutChainId: chainId, targetChainId, walletConnectChainId: ethereumProvider.chainId });
 
       if (chainId as unknown as ChainId !== targetChainId) {
