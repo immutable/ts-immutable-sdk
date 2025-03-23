@@ -22,6 +22,8 @@
 - [Adding examples](#adding-examples)
 - [End to end testing](#end-to-end-testing)
 - [Using code examples in the docs site](#using-code-examples-in-the-docs-site)
+- [Generating Tutorials and Metadata](#generating-tutorials-and-metadata)
+
 <hr />
 
 # Introduction
@@ -414,11 +416,11 @@ Once your `docs` PR is merged, Netlify should automatically build and deploy the
 
 If this happens you will need to log into the Netlify site, check the error and retry the build. Usually this will fix the deployment issue, otherwise follow up on the error message shown by Netlify.
 
-## Generating Tutorials and Metadata for the example apps with AI
+# Generating Tutorials and Metadata
 
-Whenever you add a new example app, or update an existing example app, you can use the prompts in the `prompt.txt` files in each `examples/product` folder to generate the tutorials and metadata for the example apps.
+Whenever you add a new example app, or update an existing example app, you can use the prompts in the `prompt.txt` files in each `examples/product` folder to generate the tutorials and metadata for the example apps using Cursor AI.
 
-These AI generated tutorials and metadata files are piped through to the docs site in the CI/CD pipeline, where they are used to display the example apps and their code walkthroughs. If you don't follow these steps, your example app will not be displayed on the docs site.
+These AI generated tutorials and metadata files are then piped through to the docs site in the CI/CD pipeline, where they are used to display the example apps and their code walkthroughs. If you don't follow these steps, your example app will not be displayed on the docs site.
 
 There is a single prompt for each product as we expect the examples to follow a similar structure and format, therefore the prompt to generate the tutorials and metadata is the same for each product. You can specify which example app you want the prompt to generate the tutorials and metadata for by adding the app name to the prompt as shown below.
 
