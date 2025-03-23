@@ -1,0 +1,85 @@
+Do not answer yet. This is just another part of the text I want to send you. Just receive and acknowledge as "Part 3/4 received" and wait for the next part.
+[START PART 3/4]
+UI rendering for all states (loading, error, success)
+- Test all event handling and cleanup
+- Explicitly validate that components render without errors
+- Use act() for all asynchronous operations
+- Aim for >90% code coverage (not just 80%)
+- Verify tests pass with "pnpm test"
+
+# Step 5: Implementation Guidelines
+
+## SDK Usage Best Practices
+- Use only documented public API methods
+- If using internal properties, document with comments and type assertions
+- Always implement proper cleanup in useEffect hooks
+- Use local type definitions instead of importing non-exported types
+- Test with both login and logout flows
+- Add robust error handling for all async operations
+- Log important state changes
+- Add TypeScript type guards for any SDK properties that might be undefined
+
+## UI Best Practices
+- Use standard HTML elements (h1, h2, h3, p) for text content, NOT Text component
+- Use Biom3 Button and other UI components as documented
+- Show clear loading/error states
+- Provide user feedback for actions
+- Keep UI simple and focused on demonstrating the feature
+- Ensure all UI components handle edge cases (empty states, loading states, error states)
+
+## Critical Error Prevention
+- Always check if objects exist before accessing their properties or methods
+- Use optional chaining when accessing potentially undefined properties: obj?.prop?.method?.()
+- Wrap all event listener setup and teardown in try/catch blocks
+- Verify that all promised-based operations are properly awaited
+- Test all pages with the network tab open to catch 404s on resources
+- Test component mounting/unmounting thoroughly to catch cleanup issues
+
+## Common Pitfalls to Avoid
+- DO NOT call methods that don't exist on the SDK instances
+- DO NOT try to import types that aren't explicitly exported
+- DO NOT forget to clean up event listeners, subscriptions, intervals
+- DO NOT use custom components or providers unless necessary
+- DO NOT modify dependency versions in package.json
+- DO NOT use inconsistent import methods (mixing default and named imports)
+- DO NOT forget to include 'use client' directive in client components
+- DO NOT assume any property or method exists without checking first
+
+# Step 6: Validation Checklist
+Before completing the implementation, verify ALL of these items:
+
+- [ ] Code follows existing structure and naming conventions
+- [ ] All routes and pages are implemented correctly
+- [ ] ALL imports are valid and components are properly exported
+- [ ] No circular dependencies exist between components
+- [ ] Error handling is implemented for ALL asynchronous operations
+- [ ] Environment variables are documented in .env.example
+- [ ] Tests run without failures using `pnpm test`
+- [ ] Test coverage exceeds 90% for all files
+- [ ] README.md provides clear setup and usage instructions
+- [ ] Dependencies match existing examples exactly
+- [ ] No console errors or warnings during normal operation
+- [ ] Event listeners and subscriptions are properly cleaned up
+- [ ] Components render without errors in all possible states
+
+# Step 7: Manual Testing Requirements
+After generating the example, manually test these scenarios:
+
+- [ ] Complete login flow works without errors
+- [ ] Redirect handling works correctly
+- [ ] Logout flow completes successfully
+- [ ] All event handlers function as expected
+- [ ] UI correctly reflects all state changes
+- [ ] No error messages appear in the console during normal operation
+- [ ] Run the application with React DevTools to check for unexpected re-renders
+- [ ] Test all features in both development and production mode
+- [ ] All tests pass with high coverage
+
+# Final Testing Steps
+1. Run `pnpm install` in the new example app directory to install dependencies.
+2. Run `pnpm test` to verify ALL tests pass.
+3. Run `pnpm dev` to start the development server.
+4. Manually test the complete authentication flow including login, redirect, and logout.
+5. Check the browser
+[END PART 3/4]
+Remember not answering yet. Just acknowledge you received this part with the message "Part 3/4 received" and wait for the next part.

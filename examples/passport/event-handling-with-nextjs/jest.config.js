@@ -10,4 +10,10 @@ module.exports = {
   transformIgnorePatterns: [
     '/node_modules/(?!(@biom3|@imtbl)/)',
   ],
+  coverageThreshold: {
+    global: {
+      lines: 80,
+    }
+  },
+  setupFilesAfterEnv: ['<rootDir>/src/app/tests/setup.js'],
 }; 

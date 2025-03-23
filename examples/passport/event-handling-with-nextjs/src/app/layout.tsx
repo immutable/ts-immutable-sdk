@@ -1,21 +1,26 @@
-import { AppWrapper } from './utils/wrapper';
-import './globals.css';
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import AppWrapper from "./utils/wrapper";
+const inter = Inter({ subsets: ["latin"] });
 
-export const metadata = {
-  title: 'Passport Event Handling Example',
-  description: 'Example app demonstrating Passport event handling',
+export const metadata: Metadata = {
+  title: "Passport SDK - Event Handling with NextJS",
+  description: "Example of event handling with Immutable Passport SDK in Next.js",
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="en">
-      <body>
-        <AppWrapper>{children}</AppWrapper>
-      </body>
+      <body className={inter.className}>
+        <AppWrapper>
+          {children}
+        </AppWrapper>
+        </body>
     </html>
   );
 } 

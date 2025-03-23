@@ -1,100 +1,213 @@
-import { useEffect, useState } from 'react';
-import { usePassport } from '@imtbl/sdk/passport';
-import { Button } from '@biom3/react';
+'use client';
+import React, { useEffect, useState } from 'react';
+import { Button, Heading, Stack, Text } from '@biom3/react';
+import { passportInstance } from '../utils/setupDefault';
+import Link from 'next/link';
 
 export default function EventHandlingPage() {
-  const passport = usePassport();
-  const [events, setEvents] = useState<string[]>([]);
   const [isConnected, setIsConnected] = useState(false);
+  const [eventLogs, setEventLogs] = useState<{ type: string, data: string, timestamp: number }[]>([]);
+  const [currentAccount, setCurrentAccount] = useState<string | null>(null);
+  const [currentChainId, setCurrentChainId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const handleConnect = () => {
-      setIsConnected(true);
-      setEvents(prev => [...prev, 'Connected to wallet']);
-    };
-
-    const handleDisconnect = () => {
-      setIsConnected(false);
-      setEvents(prev => [...prev, 'Disconnected from wallet']);
-    };
-
-    const handleAccountChange = (accounts: string[]) => {
-      setEvents(prev => [...prev, `Account changed to: ${accounts[0]}`]);
-    };
-
-    const handleNetworkChange = (chainId: string) => {
-      setEvents(prev => [...prev, `Network changed to chain ID: ${chainId}`]);
-    };
-
-    // Add event listeners
-    passport.provider?.on('connect', handleConnect);
-    passport.provider?.on('disconnect', handleDisconnect);
-    passport.provider?.on('accountsChanged', handleAccountChange);
-    passport.provider?.on('chainChanged', handleNetworkChange);
-
-    // Cleanup event listeners
-    return () => {
-      passport.provider?.removeListener('connect', handleConnect);
-      passport.provider?.removeListener('disconnect', handleDisconnect);
-      passport.provider?.removeListener('accountsChanged', handleAccountChange);
-      passport.provider?.removeListener('chainChanged', handleNetworkChange);
-    };
-  }, [passport.provider]);
-
+  const addEventLog = (type: string, data: string) => {
+    setEventLogs(prevLogs => [
+      { type, data, timestamp: Date.now() },
+      ...prevLogs.slice(0, 19) // Keep only the 20 most recent logs
+    ]);
+  };
+  
+  // Function to handle connection
   const handleConnect = async () => {
     try {
-      await passport.connect();
+      setLoading(true);
+      // Use the login method to connect to Passport
+      await passportInstance.login();
+      setLoading(false);
     } catch (error) {
-      setEvents(prev => [...prev, `Connection error: ${error.message}`]);
+      console.error('Connection error:', error);
+      addEventLog('error', `Connection error: ${error}`);
+      setLoading(false);
     }
   };
 
+  // Function to handle disconnection
   const handleDisconnect = async () => {
     try {
-      await passport.disconnect();
+      setLoading(true);
+      // Use the logout method to disconnect from Passport
+      await passportInstance.logout();
+      setLoading(false);
     } catch (error) {
-      setEvents(prev => [...prev, `Disconnection error: ${error.message}`]);
+      console.error('Disconnection error:', error);
+      addEventLog('error', `Disconnection error: ${error}`);
+      setLoading(false);
     }
   };
 
-  return (
-    <main className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Passport Event Handling Example</h1>
-      
-      <div className="space-x-4 mb-8">
-        <Button
-          onClick={handleConnect}
-          disabled={isConnected}
-          variant="primary"
-        >
-          Connect Passport
-        </Button>
-        
-        <Button
-          onClick={handleDisconnect}
-          disabled={!isConnected}
-          variant="secondary"
-        >
-          Disconnect
-        </Button>
-      </div>
+  // Setup event listeners when the component mounts
+  useEffect(() => {
+    // Check if provider exists before setting up event listeners
+    if (!passportInstance.provider) {
+      console.warn('Provider not available');
+      return;
+    }
 
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">Event Log</h2>
-        <div className="bg-gray-100 p-4 rounded-lg">
-          {events.length === 0 ? (
-            <p>No events recorded yet. Try connecting your wallet!</p>
-          ) : (
-            <ul className="space-y-2">
-              {events.map((event, index) => (
-                <li key={index} className="border-b border-gray-200 pb-2">
-                  {event}
-                </li>
-              ))}
-            </ul>
+    // Setup listener for connection changes
+    const handleConnectEvent = () => {
+      setIsConnected(true);
+      addEventLog('connect', 'Connected to Passport');
+    };
+
+    // Setup listener for disconnection
+    const handleDisconnectEvent = () => {
+      setIsConnected(false);
+      setCurrentAccount(null);
+      setCurrentChainId(null);
+      addEventLog('disconnect', 'Disconnected from Passport');
+    };
+
+    // Setup listener for account changes
+    const handleAccountsChanged = (accounts: string[]) => {
+      const account = accounts.length > 0 ? accounts[0] : null;
+      setCurrentAccount(account);
+      addEventLog('accountsChanged', `Accounts changed: ${accounts.join(', ')}`);
+    };
+
+    // Setup listener for chain changes
+    const handleChainChanged = (chainId: string) => {
+      setCurrentChainId(chainId);
+      addEventLog('chainChanged', `Chain changed: ${chainId}`);
+    };
+
+    // Get initial connection state if provider exists
+    if (passportInstance.provider.connected) {
+      setIsConnected(true);
+      
+      // Try to get the current account and chain ID
+      passportInstance.provider.request({ method: 'eth_accounts' })
+        .then((accounts: string[]) => {
+          if (accounts.length > 0) {
+            setCurrentAccount(accounts[0]);
+          }
+        })
+        .catch(error => {
+          console.error('Failed to get accounts:', error);
+        });
+        
+      passportInstance.provider.request({ method: 'eth_chainId' })
+        .then((chainId: string) => {
+          setCurrentChainId(chainId);
+        })
+        .catch(error => {
+          console.error('Failed to get chain ID:', error);
+        });
+    }
+
+    // Add event listeners
+    try {
+      passportInstance.provider.on('connect', handleConnectEvent);
+      passportInstance.provider.on('disconnect', handleDisconnectEvent);
+      passportInstance.provider.on('accountsChanged', handleAccountsChanged);
+      passportInstance.provider.on('chainChanged', handleChainChanged);
+      
+      addEventLog('setup', 'Event listeners registered');
+    } catch (error) {
+      console.error('Error setting up event listeners:', error);
+      addEventLog('error', `Error setting up event listeners: ${error}`);
+    }
+
+    // Clean up event listeners when component unmounts
+    return () => {
+      try {
+        if (passportInstance.provider) {
+          passportInstance.provider.removeListener('connect', handleConnectEvent);
+          passportInstance.provider.removeListener('disconnect', handleDisconnectEvent);
+          passportInstance.provider.removeListener('accountsChanged', handleAccountsChanged);
+          passportInstance.provider.removeListener('chainChanged', handleChainChanged);
+          
+          addEventLog('cleanup', 'Event listeners removed');
+        }
+      } catch (error) {
+        console.error('Error cleaning up event listeners:', error);
+      }
+    };
+  }, []);
+
+  return (
+    <div className="event-container">
+      <Stack direction="column" gap="large">
+        <Link href="/" passHref>
+          <Button variant="secondary" size="small">Back to Home</Button>
+        </Link>
+        
+        <Heading size="large">Immutable Passport Event Handling</Heading>
+        
+        <Stack direction="column" gap="medium">
+          <Text variant="body1">
+            This example demonstrates how to properly handle Passport events and manage connection state.
+          </Text>
+          
+          <Stack direction="row" gap="small">
+            <Text variant="body1">Connection Status:</Text>
+            <Text variant="body1" style={{ fontWeight: 'bold', color: isConnected ? 'green' : 'red' }}>
+              {isConnected ? 'Connected' : 'Disconnected'}
+            </Text>
+          </Stack>
+          
+          {currentAccount && (
+            <Stack direction="row" gap="small">
+              <Text variant="body1">Current Account:</Text>
+              <Text variant="body1" style={{ fontWeight: 'bold' }}>
+                {currentAccount.slice(0, 6)}...{currentAccount.slice(-4)}
+              </Text>
+            </Stack>
           )}
-        </div>
-      </div>
-    </main>
+          
+          {currentChainId && (
+            <Stack direction="row" gap="small">
+              <Text variant="body1">Current Chain ID:</Text>
+              <Text variant="body1" style={{ fontWeight: 'bold' }}>
+                {currentChainId}
+              </Text>
+            </Stack>
+          )}
+          
+          <Stack direction="row" gap="medium">
+            <Button 
+              variant="primary" 
+              onClick={handleConnect} 
+              disabled={isConnected || loading}
+            >
+              {loading ? 'Connecting...' : 'Connect to Passport'}
+            </Button>
+            
+            <Button 
+              variant="secondary" 
+              onClick={handleDisconnect} 
+              disabled={!isConnected || loading}
+            >
+              {loading ? 'Disconnecting...' : 'Disconnect'}
+            </Button>
+          </Stack>
+          
+          <Heading size="medium">Event Log</Heading>
+          <div className="event-log">
+            {eventLogs.length === 0 ? (
+              <Text variant="body2">No events logged yet</Text>
+            ) : (
+              eventLogs.map((log, index) => (
+                <div key={index} className="event-item">
+                  <Text variant="body2">
+                    [{new Date(log.timestamp).toLocaleTimeString()}] {log.type}: {log.data}
+                  </Text>
+                </div>
+              ))
+            )}
+          </div>
+        </Stack>
+      </Stack>
+    </div>
   );
 } 

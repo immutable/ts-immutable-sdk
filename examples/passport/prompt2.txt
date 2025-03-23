@@ -1,0 +1,146 @@
+Do not answer yet. This is just another part of the text I want to send you. Just receive and acknowledge as "Part 2/4 received" and wait for the next part.
+[START PART 2/4]
+e pages with both successful and failed authentication flows
+
+# Step 3: Documentation
+Create a comprehensive README.md including:
+- Feature description and purpose
+- Setup instructions including environment variables
+- Usage instructions with code examples
+- Common issues and troubleshooting
+- References to official documentation
+- Any non-standard approaches used
+
+# Step 4: Testing
+
+## Jest Configuration
+Create jest.config.js:
+```javascript
+module.exports = {
+  testEnvironment: 'jsdom',
+  transform: {
+    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { configFile: './babel.config.jest.js' }],
+  },
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+  },
+  testPathIgnorePatterns: ['/node_modules/', '/.next/'],
+  transformIgnorePatterns: [
+    '/node_modules/(?!(@biom3|@imtbl)/)',
+  ],
+  coverageThreshold: {
+    global: {
+      lines: 80,
+    }
+  },
+  setupFilesAfterEnv: ['<rootDir>/src/app/tests/setup.js'],
+};
+```
+
+## Test Setup File
+Create src/app/tests/setup.js:
+```javascript
+// Add custom jest matchers from testing-library
+require('@testing-library/jest-dom');
+
+// Mock Next.js navigation
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    prefetch: jest.fn(),
+  }),
+  usePathname: () => '/',
+  useSearchParams: () => new URLSearchParams(),
+}));
+
+// Suppress specific console errors during tests
+const originalConsoleError = console.error;
+console.error = (...args) => {
+  if (
+    typeof args[0] === 'string' && 
+    (args[0].includes('Warning: ReactDOM.render') || 
+     args[0].includes('Error: Uncaught [Error'))
+  ) {
+    return;
+  }
+  originalConsoleError(...args);
+};
+
+// Setup global mocks that might be needed across tests
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
+  observe: jest.fn(),
+  unobserve: jest.fn(),
+  disconnect: jest.fn(),
+}));
+```
+
+## Babel Configuration
+Create babel.config.jest.js:
+```javascript
+module.exports = {
+  presets: [
+    ['@babel/preset-env', { targets: { node: 'current' } }],
+    '@babel/preset-typescript',
+    ['@babel/preset-react', { runtime: 'automatic' }],
+  ],
+};
+```
+
+## Unit Tests
+Create comprehensive tests in src/app/tests/unit/passport.test.js:
+- Use CommonJS syntax (require instead of import)
+- Mock ALL external dependencies thoroughly:
+  ```javascript
+  // Example of complete component mocking
+  jest.mock('@biom3/react', () => ({
+    Button: ({ children, onClick, disabled }) => (
+      <button onClick={onClick} disabled={disabled} data-testid="biom3-button">
+        {children}
+      </button>
+    ),
+    // Include ALL components you use from the library
+    Heading: ({ children, size, className }) => (
+      <h2 className={className} data-testid={`biom3-heading-${size}`}>
+        {children}
+      </h2>
+    ),
+    Stack: ({ children, alignItems, gap, direction }) => (
+      <div data-testid="biom3-stack" data-align={alignItems} data-gap={gap} data-direction={direction}>
+        {children}
+      </div>
+    ),
+    Text: ({ children, variant }) => (
+      <span data-testid="biom3-text" data-variant={variant}>
+        {children}
+      </span>
+    ),
+    Spinner: ({ size }) => <div data-testid="biom3-spinner" data-size={size}></div>,
+    BiomeCombinedProviders: ({ children }) => <div data-testid="biom3-providers">{children}</div>,
+  }));
+  ```
+- Create detailed mocks for the SDK:
+  ```javascript
+  const mockProvider = {
+    on: jest.fn(),
+    removeListener: jest.fn(),
+    disconnect: jest.fn(),
+    connected: false,
+  };
+  
+  const mockPassportInstance = {
+    isAuthenticated: jest.fn(),
+    login: jest.fn(),
+    loginCallback: jest.fn(),
+    logout: jest.fn(),
+    provider: mockProvider,
+  };
+  
+  jest.mock('../../../app/utils/setupDefault', () => ({
+    passportInstance: mockPassportInstance,
+  }));
+  ```
+- Test feature functionality thoroughly with all possible scenarios
+- Test 
+[END PART 2/4]
+Remember not answering yet. Just acknowledge you received this part with the message "Part 2/4 received" and wait for the next part.

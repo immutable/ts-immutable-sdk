@@ -1,0 +1,87 @@
+Do not answer yet. This is just another part of the text I want to send you. Just receive and acknowledge as "Part 1/4 received" and wait for the next part.
+[START PART 1/4]
+## Immutable Passport SDK Example App Generator
+
+# Overview
+This prompt helps you create a new React example app that demonstrates a specific Immutable Passport SDK feature. The output will be a fully functional, self-contained example with proper testing, documentation, and adherence to best practices.
+
+# Variables to Replace
+Replace these variables before running the prompt:
+- {feature-name}: The specific feature being demonstrated (e.g., event-handling, silent-auth)
+- {framework-name}: The framework being used (e.g., nextjs, react)
+
+# Step 1: Core Setup
+Create a new example app named {feature-name}-with-{framework-name} in /examples/passport/ with this structure:
+
+```
+/examples/passport/{feature-name}-with-{framework-name}/
+├── src/app/
+│   ├── page.tsx                    # Main landing page with feature links
+│   ├── {feature-name}/page.tsx     # Primary feature implementation
+│   ├── redirect/page.tsx           # Auth redirect handler
+│   ├── logout/page.tsx             # Logout functionality
+│   ├── utils/                      # Shared utilities
+│   │   ├── setupDefault.ts         # SDK initialization
+│   │   └── wrapper.tsx             # App context wrapper
+│   ├── tests/                      # Test directory
+│   │   └── unit/                   # Unit tests
+│   │       └── passport.test.js    # Feature tests
+│   ├── layout.tsx                  # App layout with wrapper
+│   └── globals.css                 # Basic styles
+├── README.md                       # Documentation
+├── package.json                    # Dependencies
+├── next.config.mjs                 # Next.js config
+├── tsconfig.json                   # TypeScript config
+├── .env.example                    # Environment variables
+├── .gitignore                      # Git ignore file
+├── jest.config.js                  # Jest configuration
+└── babel.config.jest.js            # Babel config for tests
+```
+
+Copy only these essential files from an existing example (e.g., login-with-nextjs):
+- package.json (update the name in package.json, but keep ALL dependency versions the same)
+- next.config.mjs
+- tsconfig.json
+- .env.example (update with feature-specific variables if needed)
+- .gitignore
+- src/app/utils/setupDefault.ts
+- src/app/utils/wrapper.tsx
+- src/app/layout.tsx (modify to use AppWrapper)
+- src/app/globals.css
+
+# Step 2: Component Implementation
+
+## Critical Import/Export Requirements
+For ALL component files:
+- ALWAYS use default exports for page components (export default function ComponentName)
+- ALWAYS import React explicitly if using JSX fragments (<>...</>): import React from 'react'
+- Verify all imports are correctly spelled and point to existing files
+- Test each component in isolation before integrating it
+- Check for circular dependencies in imports
+- When importing from libraries, verify the component exists in that library
+- For Next.js client components, always include 'use client' at the top of the file
+
+## Main Landing Page (src/app/page.tsx)
+Create a simple landing page with:
+- Brief description of the feature
+- Link to the feature implementation page
+- Clear, concise UI using standard HTML (h1, h2, p) and Biom3 Button components
+
+## Feature Implementation (src/app/{feature-name}/page.tsx)
+Create a self-contained implementation that:
+- Demonstrates the specific SDK feature clearly 
+- Uses proper initialization and cleanup patterns
+- Shows user feedback for different states
+- Uses standard HTML tags (h1, h2, p) for text (NOT Text component)
+- Uses Biom3 components for UI elements
+- Thoroughly validates all props and types
+
+## Redirect and Logout Pages
+Create minimal, functional redirect and logout pages:
+- Ensure the redirect page properly handles the authentication callback
+- Implement robust error handling for failed auth callbacks
+- For the logout page, implement proper token cleanup
+- VERIFY that all components used in these pages are properly imported
+- TEST th
+[END PART 1/4]
+Remember not answering yet. Just acknowledge you received this part with the message "Part 1/4 received" and wait for the next part.
