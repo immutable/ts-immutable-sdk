@@ -1,0 +1,101 @@
+name: Publish Example App Tutorials
+
+on:
+  # Run when changes are pushed to example tutorials or metadata
+  push:
+    paths:
+      - 'examples/*/*/tutorial.md'
+      - 'examples/*/*/metadata.json'
+      - 'examples/_scripts/sample-app-parser.mjs'
+  # Allow manual triggering
+  workflow_dispatch:
+
+concurrency:
+  group: example-tutorials
+  cancel-in-progress: true
+
+jobs:
+  PublishExampleTutorials:
+    name: Process and Publish Example Tutorials
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout SDK Repo
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          # For testing, use the SDK development branch
+          ref: DVR-330-example-apps-content-autogeneration
+
+      - name: Checkout Docs Repo
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          repository: immutable/docs
+          token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
+          path: imx-docs
+          # For testing, use the docs development branch
+          ref: DVR-331-example-app-layout
+
+      - name: Setup environment variables
+        run: |
+          echo "CLONE_DIR=./imx-docs" >> $GITHUB_ENV
+
+      - name: Setup Github
+        run: |
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8
+        with:
+          node-version: 18
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@a3252b78c470c02df07e9d59298aecedc3ccdd6d
+        with:
+          version: 8.6.10
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Process Example App Tutorials
+        run: |
+          # Generate example app JSON files
+          pnpm parse:examples
+          
+          # Process tutorials and copy to docs repo
+          ./.github/scripts/process-tutorials.sh
+        shell: bash
+
+      - name: Commit and Push Changes to Docs Repo
+        run: |
+          cd "$CLONE_DIR"
+          # Check if there are changes to commit
+          if git status --porcelain | grep -q .; then
+            # Add all changes
+            git add .
+            
+            # Commit the changes
+            git commit -m "Update example app tutorials from SDK repo"
+            
+            # Push to the target branch
+            git push -u origin DVR-331-example-app-layout
+            echo "Successfully pushed example app tutorial changes to docs repo"
+          else
+            echo "No changes to commit"
+          fi
+        shell: bash 
