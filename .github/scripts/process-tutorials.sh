@@ -17,7 +17,7 @@ for PRODUCT in "${PRODUCTS[@]}"; do
   echo "Processing tutorials for $PRODUCT..."
   
   # Create _tutorials directory in docs repo if it doesn't exist
-  TUTORIALS_DIR="$DOCS_REPO_DIR/api-docs/sdk-references/$PRODUCT-examples/_tutorials"
+  TUTORIALS_DIR="$DOCS_REPO_DIR/docs/main/example/zkEVM/$PRODUCT-examples/_tutorials"
   mkdir -p "$TUTORIALS_DIR"
   
   # Get all example apps for this product
@@ -42,7 +42,7 @@ for PRODUCT in "${PRODUCTS[@]}"; do
   JSON_FILE="$EXAMPLES_ROOT/_parsed/${PRODUCT}-examples.json"
   if [ -f "$JSON_FILE" ]; then
     # Create directory for JSON file if it doesn't exist
-    JSON_DIR="$DOCS_REPO_DIR/api-docs/sdk-references/$PRODUCT-examples"
+    JSON_DIR="$DOCS_REPO_DIR/docs/main/example/zkEVM/$PRODUCT-examples"
     mkdir -p "$JSON_DIR"
     
     # Copy JSON file
