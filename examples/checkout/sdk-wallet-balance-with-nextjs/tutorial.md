@@ -5,7 +5,7 @@ This example app demonstrates how to use the Immutable Checkout SDK to connect a
 
 [View app on GitHub](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-wallet-balance-with-nextjs)
 
-## Features Overview
+## Features Overview - test
 - Wallet Balance with MetaMask: Connect a MetaMask wallet and retrieve various token balances
 
 ## SDK Integration Details
