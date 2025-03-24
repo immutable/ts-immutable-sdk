@@ -1,5 +1,6 @@
 {
     "features": [
        "switch-network-with-metamask"
-    ]
+    ],
+    "order": 3
 }

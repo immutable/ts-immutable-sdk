@@ -1,22 +1,36 @@
-# Passport Message Signing Example App
+<div class="display-none">
 
-## Introduction
-This example app demonstrates how to implement message signing and verification using Immutable Passport in a Next.js application. It showcases two different signing methods: EIP-712 typed data signing and ERC-191 personal message signing. The app lets users connect their wallet, sign messages, and verify the signatures on-chain, demonstrating the security and verification capabilities of Immutable Passport.
+# Passport Wallet Message Signing with Next.js
+
+This example demonstrates how to use the Passport SDK to sign messages using two different standards:
+- EIP-712 Typed Data Signing
+- ERC-191 Personal Signing
+
+</div>
+
+<div class="button-component">
 
 [View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/wallets-signing-with-nextjs)
 
+</div>
+
 ## Features Overview
-- **Message Signing with EIP-712**: Sign structured typed data messages following the EIP-712 standard
-- **Message Signing with ERC-191**: Sign personal messages following the ERC-191 standard
-- **Signature Verification**: On-chain verification of signed messages using ERC-1271 standard
+
+- **Sign with EIP-712**: Sign structured, typed data according to the EIP-712 standard with Passport wallets
+- **Sign with ERC-191**: Sign personal messages according to the ERC-191 standard with Passport wallets
 
 ## SDK Integration Details
 
-### Message Signing with EIP-712
+### Sign with EIP-712
 
-**Feature Name**: [Creating a Provider for EIP-712 Signing](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-signing-with-nextjs/app/sign-with-eip712/page.tsx#L39-L46)
+**Feature Name**: EIP-712 Typed Data Signing allows users to sign structured, typed data in a readable format.
+
+**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-signing-with-nextjs/app/sign-with-eip712/page.tsx)
 
 **Implementation**:
+
+First, we need to create a Passport provider and connect it to the browser's Ethereum provider:
+
 ```typescript
 // fetch the Passport provider from the Passport instance
 const [passportProvider, setPassportProvider] = useState<Provider>();
@@ -30,24 +44,16 @@ useEffect(() => {
 }, []);
 
 // create the BrowserProvider using the Passport provider
-const browserProvider = useMemo(() => passportProvider ? new BrowserProvider(passportProvider) : undefined, [passportProvider]);
+const browserProvider = useMemo(() => passportProvider ? 
+  new BrowserProvider(passportProvider) : undefined, 
+  [passportProvider]);
 ```
 
-**Explanation**: This code initializes the Passport provider, which is essential for EIP-712 message signing. It creates a connection to the Ethereum environment using `connectEvm()` and then wraps the Passport provider with Ethers.js `BrowserProvider` to enable easy interaction with the blockchain.
+To sign a typed data message, the app:
 
-**Feature Name**: [Requesting User Accounts](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-signing-with-nextjs/app/sign-with-eip712/page.tsx#L55-L57)
+1. Creates a structured typed data payload using the EIP-712 format
+2. Uses the Passport provider to sign the message
 
-**Implementation**:
-```typescript
-// calling eth_requestAccounts triggers the Passport login flow
-const accounts = await browserProvider.send('eth_requestAccounts', []);
-```
-
-**Explanation**: This triggers the Passport login flow, allowing users to connect their wallet. Upon successful authentication, the user's wallet address is returned, which is necessary for signing messages.
-
-**Feature Name**: [Signing a Typed Message with EIP-712](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-signing-with-nextjs/app/sign-with-eip712/page.tsx#L86-L125)
-
-**Implementation**:
 ```typescript
 const signMessage = async () => {
   if (!browserProvider) return;
@@ -85,8 +91,10 @@ const signMessage = async () => {
   } catch (error: any) {
     // Handle user denying signature
     if (error.code === 4001) {
+      // if the user declined update the signed message to declined in the view
       setSignedMessageState('user declined to sign');
     } else {
+      // if something else went wrong, update the generic error with message in the view
       setSignedMessageState(`something went wrong - ${error.message}`);
       console.log(error);
     }
@@ -94,11 +102,8 @@ const signMessage = async () => {
 };
 ```
 
-**Explanation**: This function handles the EIP-712 typed data signing process. It creates a structured typed data payload following the EIP-712 standard, which includes domain data, message data, and type definitions. When invoked, it opens the Passport signing popup for the user to approve, and upon approval, returns a cryptographic signature that can be verified on-chain.
+To verify the signature:
 
-**Feature Name**: [Verifying EIP-712 Signatures](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-signing-with-nextjs/app/sign-with-eip712/page.tsx#L136-L154)
-
-**Implementation**:
 ```typescript
 const isValidTypedDataSignature = async (
   address: string, //The Passport wallet address returned from eth_requestAccounts
@@ -108,7 +113,6 @@ const isValidTypedDataSignature = async (
 ) => {
   const typedPayload: passport.TypedDataPayload = JSON.parse(payload);
   const types = { ...typedPayload.types };
-  // @ts-ignore
   // Ethers auto-generates the EIP712Domain type in the TypedDataEncoder, and so it needs to be removed
   delete types.EIP712Domain;
 
@@ -122,13 +126,16 @@ const isValidTypedDataSignature = async (
 };
 ```
 
-**Explanation**: This function verifies EIP-712 signatures by computing the hash of the typed data payload using `TypedDataEncoder.hash()` and then checking if the signature is valid by calling the `isValidSignature` helper function. The verification happens on-chain using the ERC-1271 standard, which is implemented in Immutable's smart contract wallets.
+### Sign with ERC-191
 
-### Message Signing with ERC-191
+**Feature Name**: ERC-191 Personal Signing allows users to sign simple text messages.
 
-**Feature Name**: [Creating a Provider for ERC-191 Signing](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-signing-with-nextjs/app/sign-with-erc191/page.tsx#L36-L43)
+**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-signing-with-nextjs/app/sign-with-erc191/page.tsx)
 
 **Implementation**:
+
+Similar to the EIP-712 implementation, we first set up the Passport provider:
+
 ```typescript
 // fetch the Passport provider from the Passport instance
 const [passportProvider, setPassportProvider] = useState<Provider>();
@@ -140,13 +147,15 @@ useEffect(() => {
   };
   fetchPassportProvider();
 }, []);
+
+// create the BrowserProvider using the Passport provider
+const browserProvider = useMemo(() => passportProvider ? 
+  new BrowserProvider(passportProvider) : undefined, 
+  [passportProvider]);
 ```
 
-**Explanation**: Similar to the EIP-712 implementation, this code establishes a connection to the Ethereum environment through Passport, which is necessary for ERC-191 personal message signing.
+To sign a personal message:
 
-**Feature Name**: [Signing a Personal Message with ERC-191](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-signing-with-nextjs/app/sign-with-erc191/page.tsx#L80-L117)
-
-**Implementation**:
 ```typescript
 const signMessage = async () => {
   if (!browserProvider) return;
@@ -180,8 +189,10 @@ const signMessage = async () => {
   } catch (error: any) {
     // Handle user denying signature
     if (error.code === -32003) {
+      // if the user declined update the signed message to declined in the view
       setSignedMessageState('user declined to sign');
     } else {
+      // if something else went wrong, update the generic error with message in the view
       setSignedMessageState(`something went wrong - ${error.message}`);
       console.log(error)
     }
@@ -189,11 +200,8 @@ const signMessage = async () => {
 };
 ```
 
-**Explanation**: This function handles personal message signing using the ERC-191 standard. Unlike EIP-712, this method signs a simple text message. When invoked, it opens the Passport signing popup for the user to approve, and upon approval, returns a cryptographic signature that can be verified on-chain.
+To verify the signature:
 
-**Feature Name**: [Verifying ERC-191 Signatures](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-signing-with-nextjs/app/sign-with-erc191/page.tsx#L124-L132)
-
-**Implementation**:
 ```typescript
 const isValidERC191Signature = async (
   address: string, // The wallet address returned from eth_requestAccounts
@@ -207,89 +215,48 @@ const isValidERC191Signature = async (
 };
 ```
 
-**Explanation**: This function verifies ERC-191 signatures by hashing the message using `hashMessage()` from ethers.js and then checking if the signature is valid by calling the `isValidSignature` helper function. As with EIP-712, the verification happens on-chain using the ERC-1271 standard.
-
-### Signature Verification Helper
-
-**Feature Name**: [On-Chain Signature Verification](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-signing-with-nextjs/app/utils/isValidSignature.ts#L10-L24)
-
-**Implementation**:
-```typescript
-export const isValidSignature = async (
-  address: string, // The Passport wallet address returned from eth_requestAccounts
-  digest: string | Uint8Array,
-  signature: string,
-  zkEvmProvider: Provider, // can be any provider, Passport or not
-) => {
-  const contract = new Contract(
-    address,
-    ['function isValidSignature(bytes32, bytes) public view returns (bytes4)'],
-    new BrowserProvider(zkEvmProvider),
-  );
-
-  const isValidSignatureHex = await contract.isValidSignature(digest, signature);
-  return isValidSignatureHex === ERC_1271_MAGIC_VALUE;
-};
-```
-
-**Explanation**: This helper function is used by both EIP-712 and ERC-191 verification to validate signatures on-chain. It uses the ERC-1271 standard interface implemented on Immutable smart contract wallets to verify if a signature is valid for a given message digest. The function returns true if the signature is valid, as indicated by the wallet returning the `ERC_1271_MAGIC_VALUE` constant.
-
 ## Running the App
 
 ### Prerequisites
-- Node.js v16 or later
-- pnpm v8 or later
-- Immutable Hub account for API keys ([Get started with Immutable Hub](https://hub.immutable.com/))
-- A modern web browser
 
-### Setup and Installation
+1. Node.js (v18 or later)
+2. pnpm installed globally
+3. Immutable Hub account for environment setup. [Visit Immutable Hub](https://hub.immutable.com/)
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/immutable/ts-immutable-sdk.git
-   cd ts-immutable-sdk/examples/passport/wallets-signing-with-nextjs
-   ```
+### Setting up the Environment
 
-2. Install dependencies:
-   ```bash
-   pnpm install
-   ```
-
-3. Create a `.env` file in the project root by copying `.env.example`:
-   ```bash
-   cp .env.example .env
-   ```
-
-4. Add your Immutable API keys to the `.env` file:
+1. Copy `.env.example` to `.env.local` and fill in:
    ```
    NEXT_PUBLIC_PUBLISHABLE_KEY=your_publishable_key
    NEXT_PUBLIC_CLIENT_ID=your_client_id
    ```
 
-5. Start the development server:
+2. Configure your Hub application:
+   - Add `http://localhost:3000/redirect` as a redirect URI
+   - Add `http://localhost:3000/logout` as a logout URI
+
+### Running Locally
+
+1. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+
+2. Start the development server:
    ```bash
    pnpm dev
    ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser to see the app in action.
-
-### Using the App
-
-1. Click the "Passport Login" button to connect your wallet through Passport.
-2. Once connected, choose either "Sign message with EIP-712" or "Sign message with ERC-191".
-3. Click the "Sign Message" button to initiate the signing process.
-4. Approve the signature request in the Passport popup.
-5. After signing, click "Verify Signature" to validate that the signature is legitimate.
-6. Use the "Passport Logout" button to disconnect your wallet when finished.
+3. Open your browser to http://localhost:3000
 
 ## Summary
 
-This example app demonstrates how to implement secure message signing and verification using Immutable Passport in a Next.js application. It showcases two different signing standards (EIP-712 and ERC-191) and demonstrates how to verify signatures on-chain using the ERC-1271 standard.
+This example demonstrates how to implement both EIP-712 typed data signing and ERC-191 personal message signing with the Passport SDK in a Next.js application. The implementation showcases:
 
-The key takeaways from this example are:
-- Passport provides a secure and user-friendly way to handle message signing
-- Both structured data (EIP-712) and simple text (ERC-191) messages can be signed
-- Signatures can be cryptographically verified on-chain
-- Smart contract wallets used by Passport implement the ERC-1271 interface for signature verification
+- How to initialize and connect the Passport provider
+- How to request user accounts
+- How to sign structured typed data (EIP-712)
+- How to sign personal messages (ERC-191)
+- How to verify signatures for both standards
 
-These features provide a foundation for implementing secure, non-custodial authentication, authorizations, and user interactions in your decentralized applications. 
+These implementations can be adapted for various use cases such as user authentication, transaction signing, and other scenarios requiring cryptographic proof of user intent. 

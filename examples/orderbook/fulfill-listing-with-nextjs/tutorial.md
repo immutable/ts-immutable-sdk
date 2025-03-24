@@ -1,20 +1,31 @@
-# Fulfill Listing Example with Next.js
+<div class="display-none">
 
-## Introduction
-This example app demonstrates how to fulfill active NFT listings (both ERC721 and ERC1155) using the Immutable Orderbook SDK with Next.js. This allows users to purchase NFTs from existing marketplace listings. The app showcases how to fetch active listings and process purchases for complete fulfillment of ERC721 listings and partial fulfillment of ERC1155 listings.
+# Fulfill Listing with Next.js
+
+This tutorial demonstrates how to implement NFT listing fulfillment using the Immutable Orderbook SDK with Next.js. The application showcases how to fulfill both ERC721 and ERC1155 listings, providing a complete workflow from listing discovery to transaction execution.
+
+</div>
+
+<div class="button-component">
 
 [View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-listing-with-nextjs)
 
+</div>
+
 ## Features Overview
-- **Fulfill listings for ERC721 tokens**: Complete purchase of ERC721 NFTs from active listings
-- **Fulfill listings for ERC1155 tokens**: Partial or complete purchase of ERC1155 NFTs with specified quantity
+
+- Fulfill ERC721 listings using the Orderbook SDK
+- Fulfill ERC1155 listings with specific unit amounts using the Orderbook SDK
+- Filter active listings by contract address and currency type
+- Apply taker ecosystem fees during fulfillment
 
 ## SDK Integration Details
 
-### Fulfill Listings for ERC721 Tokens
-**Feature Name**: Fulfill listings for ERC721 tokens allows users to purchase ERC721 NFTs from active listings in the marketplace.
+### Fulfill ERC721 Listing
 
-**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-listing-with-nextjs/src/app/fulfill-listing-with-erc721/page.tsx)
+**Feature Name**: Fulfill an active ERC721 listing on the Immutable orderbook.
+
+**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/fulfill-listing-with-nextjs/src/app/fulfill-listing-with-erc721/page.tsx)
 
 **Implementation**:
 ```typescript
@@ -37,17 +48,13 @@ const fulfillERC721Listing = async (listingID: string) => {
 };
 ```
 
-**Explanation**: 
-The code fulfills an ERC721 listing by:
-1. Calling the `fulfillOrder` method on the orderbookSDK with the listing ID and the buyer's address
-2. Optionally adding taker ecosystem fees (marketplace fees) if specified
-3. Processing the returned actions by building and sending the transaction using the Passport provider's signer
-4. Since ERC721 tokens are non-fungible and unique, they can only be purchased in their entirety (there's no partial fulfillment)
+**Explanation**: The code first calls the `fulfillOrder` method from the Orderbook SDK, passing the listing ID, the buyer's wallet address, and optional taker ecosystem fees. The method returns a set of actions that need to be executed to complete the fulfillment. The code then iterates through these actions, builds transactions for actions of type `TRANSACTION`, and sends them using the connected wallet's signer. This process handles all the necessary on-chain interactions to complete the purchase of the NFT.
 
-### Fulfill Listings for ERC1155 Tokens
-**Feature Name**: Fulfill listings for ERC1155 tokens allows users to purchase ERC1155 NFTs from active listings, with the ability to specify the quantity to purchase.
+### Fulfill ERC1155 Listing
 
-**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-listing-with-nextjs/src/app/fulfill-listing-with-erc1155/page.tsx)
+**Feature Name**: Fulfill an active ERC1155 listing with specific unit amounts on the Immutable orderbook.
+
+**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/fulfill-listing-with-nextjs/src/app/fulfill-listing-with-erc1155/page.tsx)
 
 **Implementation**:
 ```typescript
@@ -74,62 +81,54 @@ const fulfillERC1155Listing = async (
 };
 ```
 
-**Explanation**: 
-The code fulfills an ERC1155 listing by:
-1. Calling the `fulfillOrder` method on the orderbookSDK with the listing ID and the buyer's address
-2. Optionally adding taker ecosystem fees (marketplace fees) if specified
-3. Including an optional `unitsToFill` parameter that specifies how many units of the ERC1155 token to purchase
-4. Processing the returned actions by building and sending the transaction using the Passport provider's signer
-5. Unlike ERC721 tokens, ERC1155 tokens can be partially fulfilled because they are semi-fungible tokens that can have multiple instances
+**Explanation**: Similar to the ERC721 fulfillment, this function calls the `fulfillOrder` method but includes an additional parameter for the number of units to fulfill. This is particularly important for ERC1155 tokens where a single listing might offer multiple units of the same NFT. The function processes the returned actions in the same way, building and sending transactions to complete the purchase. The implementation also waits for one confirmation of the transaction to ensure it's properly included in the blockchain.
 
 ## Running the App
 
 ### Prerequisites
-- Node.js 18+
-- A modern web browser
-- [Immutable Hub](https://hub.immutable.com/) account for environment setup
-- Client ID and Publishable API key from Immutable Hub
+- Node.js
+- A [publishable API key and client ID from Immutable Hub](https://hub.immutable.com/)
 
-### Steps to Run Locally
+### Setup Instructions
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/immutable/ts-immutable-sdk.git
-   cd ts-immutable-sdk
-   ```
+```bash
+git clone https://github.com/immutable/ts-immutable-sdk.git
+cd ts-immutable-sdk/examples/orderbook/fulfill-listing-with-nextjs
+```
 
 2. Install dependencies:
-   ```bash
-   pnpm install
-   ```
+```bash
+pnpm i
+```
 
-3. Create a `.env` file in the project root or copy from the example:
-   ```bash
-   cp .env.example .env
-   ```
+3. Set up environment variables:
+```bash
+cp .env.example .env
+```
 
-4. Add your Immutable Hub credentials to the `.env` file:
-   ```
-   NEXT_PUBLIC_CLIENT_ID=your_client_id
-   NEXT_PUBLIC_PUBLISHABLE_KEY=your_publishable_key
-   ```
+4. Edit the `.env` file to add your Immutable Hub credentials:
+```
+NEXT_PUBLIC_PUBLISHABLE_KEY=your_publishable_key
+NEXT_PUBLIC_CLIENT_ID=your_client_id
+```
 
 5. Start the development server:
-   ```bash
-   pnpm dev
-   ```
+```bash
+pnpm dev
+```
 
-6. Open your browser and navigate to:
-   ```
-   http://localhost:3000
-   ```
+6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Using the Application
+1. From the home page, select either "Fulfill listing - Complete fulfillment with ERC721" or "Fulfill listing - Complete fulfillment with ERC1155"
+2. Connect your Passport wallet by clicking the "Login" button
+3. Filter the available listings using:
+   - NFT Contract Address: Optional filter for specific NFT collections
+   - Currency Type: Choose between NATIVE or ERC20 currencies
+4. For ERC1155 listings, specify the number of units you want to purchase
+5. Click "Submit" on a listing to fulfill it
+6. Approve any required wallet interactions to complete the transaction
 
 ## Summary
-This example demonstrates how to implement the fulfillment of NFT listings using Immutable's Orderbook SDK in a Next.js application. The app shows how to:
 
-1. Connect to users' wallets using Immutable Passport for authentication
-2. Fetch and display active NFT listings from the marketplace
-3. Process the purchase of ERC721 tokens (complete fulfillment only)
-4. Process the purchase of ERC1155 tokens (complete or partial fulfillment)
-5. Include optional taker ecosystem fees (marketplace fees) in the transaction
-
-These components provide the fundamental building blocks for creating a marketplace where users can purchase NFTs from sellers' listings. 
+This example demonstrates how to implement NFT marketplace functionality for fulfilling both ERC721 and ERC1155 listings using the Immutable Orderbook SDK. The application showcases filtering active listings, user wallet integration via Passport, and executing fulfillment transactions with optional ecosystem fees. By following this example, developers can implement a complete purchasing flow for NFT marketplaces on Immutable. 

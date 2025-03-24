@@ -1,8 +1,9 @@
 {
   "title": "Create Bid with Next.js",
-  "description": "An example Next.js application that demonstrates how to create bids for ERC721 and ERC1155 tokens using the Immutable Orderbook SDK",
+  "description": "An example demonstrating how to create bids for ERC721 and ERC1155 tokens using the Immutable Orderbook SDK with Next.js",
   "keywords": ["Immutable", "SDK", "Orderbook", "Create Bid", "ERC721", "ERC1155", "Next.js"],
-  "tech_stack": ["Next.js", "TypeScript", "Passport SDK", "Orderbook SDK", "Biom3 UI"],
+  "tech_stack": ["Next.js", "TypeScript", "React", "Immutable SDK", "Passport SDK", "Orderbook SDK"],
   "product": "Orderbook",
-  "programming_language": "TypeScript"
+  "programming_language": "TypeScript",
+  "sidebar_order": 1
 } 

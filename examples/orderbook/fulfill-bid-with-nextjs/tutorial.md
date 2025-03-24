@@ -1,22 +1,32 @@
-# Fulfill Bid with Next.js Tutorial
+<div class="display-none">
 
-## Introduction
-This example application demonstrates how to fulfill bids for NFTs using the Immutable Orderbook SDK within a Next.js application. It showcases the process of fulfilling both ERC721 and ERC1155 bids, allowing users to sell their NFTs to buyers who have placed bids on them.
+# Fulfill Bid with Next.js
+
+This example app demonstrates how to fulfill a bid using the Immutable Orderbook SDK with a Next.js frontend. It shows the process of fulfilling bids for both ERC721 and ERC1155 tokens.
+
+</div>
+
+<div class="button-component">
 
 [View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-bid-with-nextjs)
 
+</div>
+
 ## Features Overview
-- Fulfill ERC721 bids
-- Fulfill ERC1155 bids
+
+- **Fulfill Bid for ERC721**: Fulfill a bid for an ERC721 token 
+- **Fulfill Bid for ERC1155**: Fulfill a bid for an ERC1155 token, including partial fulfillment
 
 ## SDK Integration Details
 
-### Fulfill ERC721 Bid
-**Feature Name**: A feature that allows sellers to fulfill existing bids for ERC721 tokens from buyers.
+### Fulfill Bid for ERC721
 
-**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/fulfill-bid-with-nextjs/src/app/fulfill-bid-with-erc721/page.tsx)
+**Feature Name**: Fulfill bid for ERC721 tokens.
+
+**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-bid-with-nextjs/src/app/fulfill-bid-with-erc721/page.tsx)
 
 **Implementation**:
+
 ```typescript
 const fulfillERC721Bid = async (bidID: string) => {
   const { actions } = await orderbookSDK.fulfillOrder(
@@ -37,14 +47,30 @@ const fulfillERC721Bid = async (bidID: string) => {
 };
 ```
 
-**Explanation**: This code fulfills an ERC721 bid by calling the `fulfillOrder` method from the Orderbook SDK. It passes the bid ID, the seller's account address, and optional taker ecosystem fees. The resulting actions (typically blockchain transactions) are then executed sequentially. For each transaction action, the code builds the transaction with the necessary parameters and sends it using the signer connected to the user's wallet. The function waits for one confirmation for each transaction to ensure it's processed.
+**Explanation**: 
 
-### Fulfill ERC1155 Bid
-**Feature Name**: A feature that allows sellers to fulfill existing bids for ERC1155 tokens, with the option to specify the number of units to sell.
+The code demonstrates how to fulfill a bid for an ERC721 token. The process involves:
 
-**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/fulfill-bid-with-nextjs/src/app/fulfill-bid-with-erc1155/page.tsx)
+1. Calling the `fulfillOrder` method from the Orderbook SDK, passing:
+   - The bid ID to fulfill
+   - The account address of the fulfiller (seller)
+   - Optional ecosystem fee configuration to collect marketplace fees
+   
+2. The method returns an array of actions that need to be performed to complete the bid fulfillment
+   
+3. For each transaction action, the code:
+   - Builds the transaction using `buildTransaction()`
+   - Sends the transaction using the signer from the connected wallet
+   - Waits for one confirmation before proceeding
+
+### Fulfill Bid for ERC1155
+
+**Feature Name**: Fulfill bid for ERC1155 tokens, including partial fulfillment.
+
+**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-bid-with-nextjs/src/app/fulfill-bid-with-erc1155/page.tsx)
 
 **Implementation**:
+
 ```typescript
 const fulfillERC1155Bid = async (
   bidID: string,
@@ -69,51 +95,66 @@ const fulfillERC1155Bid = async (
 };
 ```
 
-**Explanation**: This code fulfills an ERC1155 bid similarly to the ERC721 version, but with an additional parameter for the number of units to fill. This allows sellers to partially fulfill bids for fungible tokens by specifying how many units they want to sell. For ERC1155 tokens, which can have multiple copies, this flexibility is crucial to allow selling specific quantities. The function follows the same pattern of building and executing transactions as the ERC721 bid fulfillment.
+**Explanation**: 
+
+The code demonstrates how to fulfill a bid for an ERC1155 token, with additional support for partial fulfillment. The process involves:
+
+1. Calling the `fulfillOrder` method from the Orderbook SDK, passing:
+   - The bid ID to fulfill
+   - The account address of the fulfiller (seller)
+   - Optional ecosystem fee configuration to collect marketplace fees
+   - Optional `unitsToFill` parameter that allows for partial fulfillment of the bid (for ERC1155 tokens only)
+   
+2. The method returns an array of actions that need to be performed to complete the bid fulfillment
+   
+3. For each transaction action, the code:
+   - Builds the transaction using `buildTransaction()`
+   - Sends the transaction using the signer from the connected wallet
+   - Waits for one confirmation before proceeding
 
 ## Running the App
 
 ### Prerequisites
-- Node.js
-- pnpm
-- [Immutable Hub account](https://hub.immutable.com/) for environment setup
 
-### Step-by-step Instructions
-1. Clone the repository:
-```bash
-git clone https://github.com/immutable/ts-immutable-sdk.git
-cd ts-immutable-sdk/examples/orderbook/fulfill-bid-with-nextjs
-```
+- Node.js (version 16 or later recommended)
+- pnpm (version 6 or later)
+- An Immutable Hub account to get your API keys and set up your environment. [Sign up for Immutable Hub](https://hub.immutable.com/)
 
-2. Install the dependencies:
-```bash
-pnpm i
-```
+### Steps to Run the App Locally
 
-3. Copy the `.env.example` file to `.env`:
-```bash
-cp .env.example .env
-```
+1. Clone the repository and navigate to the example directory:
+   ```bash
+   git clone https://github.com/immutable/ts-immutable-sdk.git
+   cd ts-immutable-sdk/examples/orderbook/fulfill-bid-with-nextjs
+   ```
 
-4. Replace the environment variables in the `.env` file:
-- `NEXT_PUBLIC_PUBLISHABLE_KEY`: Your publishable API key from Immutable Hub
-- `NEXT_PUBLIC_CLIENT_ID`: Your client ID from Immutable Hub
+2. Install dependencies:
+   ```bash
+   pnpm install
+   ```
 
-5. Run the development server:
-```bash
-pnpm dev
-```
+3. Create a `.env` file in the root of the project and add your Immutable Hub credentials:
+   ```
+   NEXT_PUBLIC_PUBLISHABLE_KEY=<your-publishable-key>
+   NEXT_PUBLIC_CLIENT_ID=<your-client-id>
+   ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser
+4. Start the development server:
+   ```bash
+   pnpm dev
+   ```
 
-### Using the Application
-1. Connect your Passport wallet by clicking the "Connect Wallet" button
-2. Navigate to either the ERC721 or ERC1155 fulfillment page
-3. Optionally filter bids by entering an NFT contract address
-4. For ERC1155 bids, specify the number of units you want to fulfill
-5. Click the "Submit" button to fulfill the bid
-6. Approve any transactions in your wallet when prompted
-7. If successful, you'll see a success message confirming the bid has been fulfilled
+5. Open your browser and navigate to `http://localhost:3000`
+
+6. Connect your wallet using Passport login
+
+7. Explore the ERC721 and ERC1155 bid fulfillment pages to see how to fulfill bids for different token types
 
 ## Summary
-This example demonstrates how to implement bid fulfillment functionality in a Next.js application using the Immutable Orderbook SDK. It shows how to connect to a user's wallet using Passport, retrieve available bids for NFTs, and fulfill those bids for both ERC721 and ERC1155 tokens. The application handles the entire workflow including wallet connection, bid filtering, and transaction execution, providing a complete reference implementation for developers building NFT marketplaces with Immutable. 
+
+This example demonstrates how to use the Immutable Orderbook SDK to fulfill bids for both ERC721 and ERC1155 tokens. It showcases the complete flow from connecting a wallet via Passport to executing the bid fulfillment transaction. 
+
+The app includes support for:
+- Fulfilling bids for ERC721 tokens
+- Fulfilling bids for ERC1155 tokens with support for partial fulfillment
+- Adding marketplace fees during the fulfillment process 

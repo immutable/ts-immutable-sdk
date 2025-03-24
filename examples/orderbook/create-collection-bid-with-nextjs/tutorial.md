@@ -1,188 +1,269 @@
+<div class="display-none">
+
 # Create Collection Bid with Next.js
 
-## Introduction
-This example app demonstrates how to create collection bids using the Immutable Orderbook SDK in a Next.js application. Collection bids allow users to make offers on an entire NFT collection rather than specific tokens, enabling collectors to easily acquire NFTs from a desired collection. This example shows how to create collection bids for both ERC721 and ERC1155 token types.
+This tutorial demonstrates how to create collection bids for both ERC721 and ERC1155 tokens using the Immutable Orderbook SDK with a Next.js application. A collection bid allows users to place bids on any NFT within a specific collection rather than a specific token.
+
+</div>
+
+<div class="button-component">
 
 [View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-collection-bid-with-nextjs)
 
+</div>
+
 ## Features Overview
-- Creating ERC721 collection bids
-- Creating ERC1155 collection bids
-- Handling token approvals
-- Signing Orderbook actions
-- Managing maker marketplace fees
+
+- Create a collection bid for an ERC721 collection
+- Create a collection bid for an ERC1155 collection
 
 ## SDK Integration Details
 
-### Creating Collection Bids
-The application demonstrates the complete workflow for creating collection bids using the Orderbook SDK:
+### Create a Collection Bid for an ERC721 Collection
 
-#### **Preparing Collection Bids**: [Implementation in page.tsx](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-collection-bid-with-nextjs/src/app/create-collection-bid-with-erc721/page.tsx)
+**Feature Name**: Create a bid for any NFT in an ERC721 collection.
+
+**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/create-collection-bid-with-nextjs/src/app/create-collection-bid-with-erc721/page.tsx)
+
+**Implementation**:
+
+First, the application prepares the collection bid by defining the buy and sell items:
+
 ```typescript
-const prepareERC721CollectionBid = async (): Promise<orderbook.PrepareCollectionBidResponse> => {
-  const buyItem: ERC20Item = {
-    type: "ERC20",
-    contractAddress: buyItemContractAddress,
-    amount: buyItemTokenAmount,
-  };
+const prepareERC721CollectionBid =
+  async (): Promise<orderbook.PrepareCollectionBidResponse> => {
+    // build the sell item
+    const sell: ERC20Item = {
+      type: "ERC20",
+      contractAddress: sellItemContractAddress,
+      amount: sellItemAmount,
+    };
 
-  const sellItem: ERC721CollectionItem = {
-    type: "ERC721_COLLECTION",
-    contractAddress: sellItemContractAddress,
-    amount: sellItemAmount,
-  };
+    // build the buy item
+    const buy: ERC721CollectionItem = {
+      type: "ERC721_COLLECTION",
+      contractAddress: buyItemContractAddress,
+      amount: buyItemTokenAmount,
+    };
 
-  // Prepare the collection bid parameters
-  const params: PrepareCollectionBidParams = {
-    sellItem,
-    buyItem,
-  };
+    // build the prepare collection bid parameters
+    const prepareCollectionBidParams: PrepareCollectionBidParams = {
+      makerAddress: accountsState[0],
+      buy,
+      sell,
+    };
 
-  return await orderbookSDK.prepareBid(params);
-};
+    // invoke the orderbook SDK to prepare the collection bid
+    return await orderbookSDK.prepareCollectionBid(prepareCollectionBidParams);
+  };
 ```
 
-The code prepares a collection bid by specifying the buy item (ERC20 token) and sell item (ERC721 collection). It then calls the Orderbook SDK's `prepareBid` method with these parameters.
+Then it handles approvals, signing, and submitting the collection bid:
 
-#### **Approving Token Transfers**: [Implementation in collectionBid.ts](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-collection-bid-with-nextjs/src/app/utils/collectionBid.ts)
 ```typescript
-export const signAndSubmitApproval = async (
-  provider: BrowserProvider,
-  collectionBid: orderbook.PrepareBidResponse,
-): Promise<void> => {
-  const signer = await provider.getSigner();
+const createER721CollectionBid = async () => {
+  setCollectionBidErrorState(null);
+  setLoadingState(true);
+  setLoadingText('Creating collection bid');
 
-  // Filter for approval transaction actions
-  const approvalActions = collectionBid.actions.filter(
-    (action): action is orderbook.TransactionAction =>
-      action.type === orderbook.ActionType.TRANSACTION,
-  );
-
-  for (const approvalAction of approvalActions) {
-    const unsignedTx = await approvalAction.buildTransaction();
-    const receipt = await signer.sendTransaction(unsignedTx);
-    await receipt.wait();
+  if (!browserProvider) {
+    setCollectionBidErrorState("Please connect to Passport");
+    return;
   }
 
-  return;
-};
-```
+  try {
+    // prepare the collection bid
+    const preparedCollectionBid = await prepareERC721CollectionBid();
 
-This function handles the approval process, which is necessary before creating a collection bid. It processes all transaction actions returned by the `prepareBid` method, allowing the Immutable Seaport contract to transfer tokens on behalf of the user.
+    // sign and submit approval transaction
+    await signAndSubmitApproval(browserProvider, preparedCollectionBid);
 
-#### **Signing Collection Bids**: [Implementation in collectionBid.ts](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-collection-bid-with-nextjs/src/app/utils/collectionBid.ts)
-```typescript
-export const signCollectionBid = async (
-  provider: BrowserProvider,
-  bid: orderbook.PrepareBidResponse,
-): Promise<string> => {
-  const signer = await provider.getSigner();
+    // sign the collection bid
+    const orderSignature = await signCollectionBid(browserProvider, preparedCollectionBid);
 
-  // Find the signable action
-  const signableAction = bid.actions.find(
-    (action): action is orderbook.SignableAction =>
-      action.type === orderbook.ActionType.SIGNABLE,
-  )!;
+    // create the collection bid
+    const collectionBidID = await createCollectionBid(
+      orderbookSDK,
+      preparedCollectionBid,
+      orderSignature,
+      makerEcosystemFeeRecipient != "" ? {
+        recipientAddress: makerEcosystemFeeRecipient,
+        amount: makerEcosystemFeeAmount,
+      } : undefined
+    );
 
-  // Sign the order with EIP-712
-  const signature = await signer.signTypedData(
-    signableAction.message.domain,
-    signableAction.message.types,
-    signableAction.message.value,
-  );
-
-  return signature;
-};
-```
-
-This function signs the collection bid using EIP-712 typed data signatures. This signature validates the order and allows it to be fulfilled by other users.
-
-#### **Creating Collection Bids**: [Implementation in collectionBid.ts](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-collection-bid-with-nextjs/src/app/utils/collectionBid.ts)
-```typescript
-export const createCollectionBid = async (
-  client: orderbook.Orderbook,
-  preparedBid: orderbook.PrepareBidResponse,
-  orderSignature: string,
-  makerEcosystemFee?: {
-    recipientAddress: string;
-    amount: string;
-  },
-): Promise<string> => {
-  const order = await client.createCollectionBid({
-    orderComponents: preparedBid.orderComponents,
-    orderHash: preparedBid.orderHash,
-    orderSignature,
-    // Optional maker marketplace fee
-    makerFees: makerEcosystemFee ? [
-      {
-        recipientAddress: makerEcosystemFee.recipientAddress,
-        amount: makerEcosystemFee.amount,
-      },
-    ] : [],
-  });
-  return order.result.id;
-};
-```
-
-This function submits the prepared and signed collection bid to the Orderbook service. It also demonstrates how to include optional maker marketplace fees.
-
-### Integration with Passport for Authentication
-The example also demonstrates integration with Immutable Passport for authentication and wallet connection:
-
-```typescript
-const passportLogin = async () => {
-  if (browserProvider?.send) {
-    setLoadingState(true);
-    setLoadingText("Connecting to Passport");
-
-    // Trigger Passport login flow
-    const accounts = await browserProvider.send("eth_requestAccounts", []);
-
-    setAccountsState(accounts);
-    setLoadingState(false);
+    handleSuccessfulCollectionBidCreation(collectionBidID);
+  } catch (error: any) {
+    console.error(error);
+    setSuccessMessageState(null);
+    setCollectionBidErrorState(`Something went wrong - ${error.message}`);
   }
+
+  setLoadingState(false);
 };
 ```
 
-The Passport integration provides a seamless authentication experience for users.
+**Explanation**:
+
+The code creates a collection bid for any NFT in an ERC721 collection by:
+1. Defining what the user is selling (ERC20 tokens) and what they want to buy (NFTs from an ERC721 collection)
+2. Calling the `prepareCollectionBid` method to get approval actions and order components
+3. Handling token approvals by signing and submitting approval transactions
+4. Signing the order using a typed data signature
+5. Creating the collection bid by submitting the order components, hash, and signature to the Orderbook service
+
+### Create a Collection Bid for an ERC1155 Collection
+
+**Feature Name**: Create a bid for any NFT in an ERC1155 collection.
+
+**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/create-collection-bid-with-nextjs/src/app/create-collection-bid-with-erc1155/page.tsx)
+
+**Implementation**:
+
+First, the application prepares the collection bid by defining the buy and sell items:
+
+```typescript
+const prepareERC1155CollectionBid =
+  async (): Promise<orderbook.PrepareCollectionBidResponse> => {
+    // build the sell item
+    const sell: ERC20Item = {
+      type: "ERC20",
+      contractAddress: sellItemContractAddress,
+      amount: sellItemAmount,
+    };
+
+    // build the buy item
+    const buy: ERC1155CollectionItem = {
+      type: "ERC1155_COLLECTION",
+      contractAddress: buyItemContractAddress,
+      amount: buyItemQty
+    };
+
+    // build the prepare collection bid parameters
+    const prepareCollectionBidParams: PrepareCollectionBidParams = {
+      makerAddress: accountsState[0],
+      buy,
+      sell,
+    };
+
+    // invoke the orderbook SDK to prepare the collection bid
+    return await orderbookSDK.prepareCollectionBid(prepareCollectionBidParams);
+  };
+```
+
+The creation process for ERC1155 collection bids follows the same pattern as ERC721:
+
+```typescript
+const createER1155CollectionBid = async () => {
+  setCollectionBidErrorState(null);
+  setLoadingState(true);
+  setLoadingText('Creating collection bid');
+
+  if (!browserProvider) {
+    setCollectionBidErrorState("Please connect to Passport");
+    return;
+  }
+
+  try {
+    // prepare the collection bid
+    const preparedCollectionBid = await prepareERC1155CollectionBid();
+
+    // sign and submit approval transaction
+    await signAndSubmitApproval(browserProvider, preparedCollectionBid);
+
+    // sign the collection bid
+    const orderSignature = await signCollectionBid(browserProvider, preparedCollectionBid);
+
+    // create the collection bid
+    const collectionBidID = await createCollectionBid(
+      orderbookSDK,
+      preparedCollectionBid,
+      orderSignature,
+      makerEcosystemFeeRecipient != "" ? {
+        recipientAddress: makerEcosystemFeeRecipient,
+        amount: makerEcosystemFeeAmount,
+      } : undefined
+    );
+
+    handleSuccessfulCollectionBidCreation(collectionBidID);
+  } catch (error: any) {
+    console.error(error);
+    setSuccessMessageState(null);
+    setCollectionBidErrorState(`Something went wrong - ${error.message}`);
+  }
+
+  setLoadingState(false);
+};
+```
+
+**Explanation**:
+
+The code creates a collection bid for any NFT in an ERC1155 collection by:
+1. Defining what the user is selling (ERC20 tokens) and what they want to buy (NFTs from an ERC1155 collection)
+2. Specifying the desired quantity of NFTs to buy from the collection
+3. Calling the `prepareCollectionBid` method to get approval actions and order components
+4. Handling token approvals by signing and submitting approval transactions
+5. Signing the order using a typed data signature
+6. Creating the collection bid by submitting the order components, hash, and signature to the Orderbook service
 
 ## Running the App
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) (v18 or later)
-- [pnpm](https://pnpm.io/installation)
-- [Immutable Hub Account](https://hub.immutable.com/) for environment setup
+- Node.js
+- Valid client ID and publishable API key from [Immutable Hub](https://hub.immutable.com/)
 
-### Setup Instructions
-1. Clone the repository
+### Steps to Run Locally
+
+1. Install dependencies:
 ```bash
-git clone https://github.com/immutable/ts-immutable-sdk.git
-cd ts-immutable-sdk/examples/orderbook/create-collection-bid-with-nextjs
+pnpm i
 ```
 
-2. Install dependencies
+2. Copy the environment variables template:
 ```bash
-pnpm install
+cp .env.example .env
 ```
 
-3. Create a `.env` file based on `.env.example` and add your Immutable Hub credentials
+3. Update the `.env` file with your Immutable Hub credentials:
 ```
-NEXT_PUBLIC_PUBLISHABLE_KEY=<Your publishable key from Immutable Hub>
-NEXT_PUBLIC_CLIENT_ID=<Your client ID from Immutable Hub>
+NEXT_PUBLIC_PUBLISHABLE_KEY=<your-publishable-key>
+NEXT_PUBLIC_CLIENT_ID=<your-client-id>
 ```
 
-4. Start the development server
+4. Start the development server:
 ```bash
 pnpm dev
 ```
 
-5. Open your browser and navigate to [http://localhost:3000](http://localhost:3000)
+5. Open http://localhost:3000 in your browser
+
+### Using the Application
+
+#### To Create a Collection Bid for ERC721:
+1. Navigate to the ERC721 Collection Bid page
+2. Connect your Passport wallet
+3. Enter the NFT contract address, token amount, currency contract address, and currency amount
+4. Click "Create Collection Bid"
+5. Approve the ERC20 token for trading (if prompted)
+6. Sign the collection bid message
+7. Wait for confirmation that the bid was created successfully
+
+#### To Create a Collection Bid for ERC1155:
+1. Navigate to the ERC1155 Collection Bid page
+2. Connect your Passport wallet
+3. Enter the NFT contract address, token quantity, currency contract address, and currency amount
+4. Click "Create Collection Bid"
+5. Approve the ERC20 token for trading (if prompted)
+6. Sign the collection bid message
+7. Wait for confirmation that the bid was created successfully
 
 ## Summary
-This example demonstrates how to implement collection bids using the Immutable Orderbook SDK in a Next.js application. It covers the complete workflow from preparing collection bids to handling approvals, signing orders, and finally submitting the collection bids. The application also showcases integration with Immutable Passport for user authentication and wallet connection.
 
-Key takeaways:
-- Creating collection bids requires preparing the bid parameters, handling approvals, signing the order data, and submitting the bid
-- Collection bids can include optional maker marketplace fees
-- Immutable Passport provides a seamless authentication experience
-- The Orderbook SDK handles the complexity of interacting with the underlying blockchain protocols 
+This example demonstrates how to implement collection bids for both ERC721 and ERC1155 NFTs using the Immutable Orderbook SDK. Collection bids allow users to place offers on any NFT within a specific collection, rather than a specific token.
+
+Key concepts demonstrated include:
+- Preparing collection bids with appropriate parameters
+- Handling token approvals
+- Signing collection bid orders
+- Creating collection bids with optional marketplace fees
+- Differentiating between ERC721 and ERC1155 collection bids 

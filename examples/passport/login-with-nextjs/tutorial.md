@@ -1,29 +1,41 @@
+<div class="display-none">
+
 # Login with Next.js
 
-## Introduction
-This example app demonstrates how to integrate user authentication into a Next.js application using Immutable's Passport SDK. It showcases different login methods including wallet connection via Passport, integration with Ethers.js, and identity-only login without wallet connection.
+This example app demonstrates different methods to implement user authentication using Immutable Passport in a Next.js application. It showcases three different login approaches: standard Passport login, login with EtherJS integration, and identity-only login without wallet connection.
+
+</div>
+
+<div class="button-component">
 
 [View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/login-with-nextjs)
 
+</div>
+
 ## Features Overview
-- Login with Passport (wallet connection)
-- Login with Ethers.js
-- Login with identity only (without wallet)
+
+- **Login with Passport**: Basic wallet connection using Passport's `connectEvm` method.
+- **Login with EtherJS**: Integration with EtherJS library for wallet connection.
+- **Login with Identity Only**: Authentication without wallet connection, retrieving only user profile information.
 
 ## SDK Integration Details
 
 ### Login with Passport
-**Feature Name**: Login with Passport allows users to connect their wallets directly using the Passport SDK.
 
-**Source Code**: [login-with-passport/page.tsx](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/login-with-nextjs/src/app/login-with-passport/page.tsx)
+**Feature Name**: Standard Passport wallet connection for authentication.
+
+**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/login-with-nextjs/src/app/login-with-passport/page.tsx)
 
 **Implementation**:
+
 ```typescript
 const loginWithPassport = async () => {
   if (!passportInstance) return;
   try {
+    // Connect to user's wallet
     const provider = await passportInstance.connectEvm();
     const accounts = await provider.request({ method: 'eth_requestAccounts' });
+    
     if (accounts) {
       setIsLoggedIn(true);
       setAccountAddress(accounts[0] || null); 
@@ -37,22 +49,27 @@ const loginWithPassport = async () => {
 };
 ```
 
-**Explanation**: This implementation uses `passportInstance.connectEvm()` to connect to the user's Ethereum wallet through Passport. When the user clicks the login button, it initiates the connection flow and requests access to their Ethereum accounts. Upon successful connection, it displays the connected account address and updates the login state.
+**Explanation**: This implementation uses Passport's `connectEvm` method to establish a connection to the user's wallet. It then requests access to the user's accounts using the `eth_requestAccounts` method on the provider. If successful, it stores the connected account address and updates the login state.
 
-### Login with Ethers.js
-**Feature Name**: Login with Ethers.js demonstrates how to combine Passport with the popular Ethers.js library for Ethereum interactions.
+### Login with EtherJS
 
-**Source Code**: [login-with-etherjs/page.tsx](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/login-with-nextjs/src/app/login-with-etherjs/page.tsx)
+**Feature Name**: Integration with EtherJS for enhanced wallet interaction.
+
+**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/login-with-nextjs/src/app/login-with-etherjs/page.tsx)
 
 **Implementation**:
-```typescript
-const loginWithEthersjs = useCallback(async () => {
-  if (!passportInstance) return;
 
+```typescript
+const loginWithEthersjs = async () => {
+  if (!passportInstance) return;
   try {
+    // Get the Passport provider
     const passportProvider = await passportInstance.connectEvm();
+    // Wrap with EtherJS provider
     const web3Provider = new BrowserProvider(passportProvider);
+    // Request accounts
     const accounts = await web3Provider.send('eth_requestAccounts', []);
+    
     if (accounts && accounts.length > 0) {
       setIsLoggedIn(true);
       setAccountAddress(accounts[0] || null);
@@ -63,22 +80,26 @@ const loginWithEthersjs = useCallback(async () => {
     console.error('Error connecting to Passport with Ethers.js:', error);
     setIsLoggedIn(false);
   }
-}, []);
+};
 ```
 
-**Explanation**: This implementation shows how to use the Passport's EVM provider with Ethers.js. It first obtains the provider from Passport via `connectEvm()`, then wraps it with Ethers.js's BrowserProvider. This allows developers to leverage Ethers.js features while using Passport for authentication and wallet connection.
+**Explanation**: This approach demonstrates how to integrate EtherJS with Passport. It first obtains the Passport provider via `connectEvm()`, then wraps it with EtherJS's `BrowserProvider` to enable using EtherJS functionality with Passport's authentication. This allows developers to leverage EtherJS methods while maintaining Passport's authentication flow.
 
 ### Login with Identity Only
-**Feature Name**: Login with identity only enables users to authenticate with their Immutable identity without connecting a wallet.
 
-**Source Code**: [login-with-identity-only/page.tsx](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/login-with-nextjs/src/app/login-with-identity-only/page.tsx)
+**Feature Name**: Authentication without wallet connection, focusing on user identity.
+
+**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/login-with-nextjs/src/app/login-with-identity-only/page.tsx)
 
 **Implementation**:
+
 ```typescript
-const loginWithIdentiy = useCallback(async () => {
+const loginWithIdentiy = async () => {
   if (!passportInstance) return;
   try {
+    // Login without connecting wallet
     const profile: passport.UserProfile | null = await passportInstance.login();
+    
     if (profile) {
       console.log(profile.email);
       console.log(profile.sub);
@@ -92,19 +113,20 @@ const loginWithIdentiy = useCallback(async () => {
     console.error('Error connecting to Passport', error);
     setIsLoggedIn(false);
   }
-}, []);
+};
 ```
 
-**Explanation**: This implementation demonstrates how to authenticate users with just their Immutable identity using `passportInstance.login()`. This method returns a UserProfile object containing user information like email and a unique subject identifier (sub). This approach is useful for applications that need user authentication but don't require wallet functionality immediately.
+**Explanation**: This method demonstrates how to authenticate users without requiring a wallet connection. It uses Passport's `login()` method which returns a user profile with identity information like email and subject ID (sub). This approach is useful for applications that need user authentication but don't require wallet functionality immediately.
 
 ## Running the App
 
 ### Prerequisites
-- Node.js (v18 or later recommended)
-- pnpm
-- An account on [Immutable Hub](https://hub.immutable.com/) for obtaining the necessary API credentials
 
-### Steps to Run Locally
+1. Node.js (v16 or higher)
+2. pnpm package manager
+3. Immutable Hub account for API keys - [Set up on Immutable Hub](https://hub.immutable.com/)
+
+### Setup and Installation
 
 1. Clone the repository:
    ```bash
@@ -117,13 +139,11 @@ const loginWithIdentiy = useCallback(async () => {
    pnpm install
    ```
 
-3. Set up environment variables:
-   - Copy `.env.example` to `.env.local`
-   - Fill in the required values:
-     ```
-     NEXT_PUBLIC_PUBLISHABLE_KEY=<Your publishable key from Immutable Hub>
-     NEXT_PUBLIC_CLIENT_ID=<Your client ID from Immutable Hub>
-     ```
+3. Create a `.env.local` file based on `.env.example` and add your Immutable Passport credentials:
+   ```
+   NEXT_PUBLIC_CLIENT_ID=<YOUR_CLIENT_ID>
+   NEXT_PUBLIC_PUBLISHABLE_KEY=<YOUR_PUBLISHABLE_KEY>
+   ```
 
 4. Start the development server:
    ```bash
@@ -133,9 +153,11 @@ const loginWithIdentiy = useCallback(async () => {
 5. Open your browser and navigate to `http://localhost:3000`
 
 ## Summary
-This example demonstrates three different methods of integrating Immutable Passport authentication into a Next.js application:
-1. Direct wallet connection using Passport's native methods
-2. Integration with Ethers.js for developers who prefer or need that library
-3. Identity-only login for applications that need user authentication without wallet connection
 
-These implementation patterns can be adapted for various authentication flows in web3 applications built with Next.js and the Immutable SDK. 
+This example demonstrates three different approaches to implementing authentication with Immutable Passport in a Next.js application:
+
+1. Standard Passport login that connects to the user's wallet
+2. Integration with EtherJS for enhanced wallet interaction
+3. Identity-only login that retrieves user profile information without wallet connection
+
+Each approach has its own use cases, allowing developers to choose the best authentication method for their specific application needs. This flexibility makes Immutable Passport adaptable to different user experience requirements. 

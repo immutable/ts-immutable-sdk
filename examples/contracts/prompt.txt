@@ -27,6 +27,9 @@ Create a tutorial.md file in the example app's root with the following structure
 - Which specific SDK capabilities it demonstrates
 - Link to the example app's GitHub repository. (The Github repository MUST BE linked to this message: "View app on Github")
 
+IMPORTANT: Everything that comes before the "View app on Github" link must be wrapped in a <div class="display-none"> tag. Ensure that there's a newline before and after the content that's wrapped in the <div class="display-none"> tag.
+IMPORTANT: The "View app on Github" link must be wrapped in a <div class="button-component"> tag. Ensure that there's a newline before and after the content that's wrapped in the <div class="button-component"> tag.
+
 #### Features Overview (REMEMBER THAT INITIALIZING THE ORDERBOOK/CHECKOUT/CONTRACTS/PASSPORT SDK IS NOT A FEATURE)
 - Bulleted list of all Contracts features demonstrated in this example app
 

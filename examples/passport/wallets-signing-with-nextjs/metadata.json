@@ -1,8 +1,9 @@
 {
-  "title": "Passport Message Signing with Next.js",
-  "description": "Example demonstrating how to implement and verify message signing using EIP-712 and ERC-191 standards with Immutable Passport in a Next.js application",
-  "keywords": ["Immutable", "SDK", "Passport", "Message Signing", "EIP-712", "ERC-191", "ERC-1271", "Next.js", "TypeScript"],
-  "tech_stack": ["Next.js", "React", "TypeScript", "ethers.js", "Biom3 UI", "Tailwind CSS"],
+  "title": "Passport Wallet Message Signing with Next.js",
+  "description": "Demonstrates how to use Passport SDK for message signing with EIP-712 and ERC-191 standards in a Next.js application",
+  "keywords": ["Immutable", "SDK", "Passport", "Sign Message", "EIP-712", "ERC-191", "Next.js"],
+  "tech_stack": ["Next.js", "TypeScript", "Ethers.js", "Biome UI"],
   "product": "Passport",
-  "programming_language": "TypeScript"
+  "programming_language": "TypeScript",
+  "sidebar_order": 5
 } 

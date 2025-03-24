@@ -1,8 +1,9 @@
 {
-  "title": "Connect with MetaMask using the Checkout SDK",
-  "description": "Learn how to connect a MetaMask wallet to your application using Immutable's Checkout SDK, with options for connecting with or without permissions.",
+  "title": "Connect with MetaMask in Next.js",
+  "description": "A Next.js example that demonstrates how to integrate the Immutable Checkout SDK to connect with MetaMask wallets, with and without explicit permissions",
   "keywords": ["Immutable", "SDK", "Checkout", "Wallet", "MetaMask", "Connect", "Next.js"],
-  "tech_stack": ["Next.js", "TypeScript", "Ethers.js", "Biom3", "React"],
+  "tech_stack": ["Next.js", "TypeScript", "React", "ethers.js", "Biom3"],
   "product": "Checkout",
-  "programming_language": "TypeScript"
+  "programming_language": "TypeScript",
+  "sidebar_order": 1
 } 

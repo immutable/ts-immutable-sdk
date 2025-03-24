@@ -1,8 +1,9 @@
 {
   "title": "Create Collection Bid with Next.js",
-  "description": "Example application demonstrating how to create collection bids for ERC721 and ERC1155 assets using the Immutable Orderbook SDK in a Next.js application",
-  "keywords": ["Immutable", "SDK", "Orderbook", "Collection Bid", "NFT", "Next.js", "ERC721", "ERC1155"],
-  "tech_stack": ["Next.js", "TypeScript", "Immutable SDK", "ethers.js", "Biom3"],
+  "description": "Learn how to create collection bids for ERC721 and ERC1155 tokens using the Immutable Orderbook SDK and Next.js",
+  "keywords": ["Immutable", "SDK", "Orderbook", "Collection Bid", "ERC721", "ERC1155", "Next.js"],
+  "tech_stack": ["Next.js", "React", "TypeScript", "Immutable SDK", "Passport"],
   "product": "Orderbook",
-  "programming_language": "TypeScript"
+  "programming_language": "TypeScript",
+  "sidebar_order": 2
 } 

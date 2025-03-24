@@ -3,5 +3,6 @@
         "login-with-etherjs",
         "login-with-identity-only",
         "login-with-passport"
-    ]
+    ],
+    "order": 2
 }

@@ -2,5 +2,6 @@
     "features": [
         "create-bid-for-erc721",
         "create-bid-for-erc1155"
-    ]
+    ],
+    "order": 1
 }

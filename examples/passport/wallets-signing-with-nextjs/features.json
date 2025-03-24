@@ -2,5 +2,6 @@
     "features": [
         "sign-with-eip712",
         "sign-with-erc191"
-    ]
+    ],
+    "order": 5
 }

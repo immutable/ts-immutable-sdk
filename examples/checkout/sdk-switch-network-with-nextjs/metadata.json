@@ -1,8 +1,9 @@
 {
-  "title": "Switch Network with MetaMask using Immutable SDK",
-  "description": "An example app demonstrating how to switch between Sepolia Testnet and Immutable zkEVM Testnet networks using Immutable Checkout SDK and MetaMask",
-  "keywords": ["Immutable", "SDK", "Checkout", "MetaMask", "Network Switching", "zkEVM", "Sepolia", "NextJS"],
-  "tech_stack": ["NextJS", "TypeScript", "Biom3 UI", "React", "Ethers.js", "Immutable SDK"],
+  "title": "Switch Network with MetaMask using Next.js",
+  "description": "An example app demonstrating how to connect to MetaMask and switch between Ethereum networks using the Immutable Checkout SDK",
+  "keywords": ["Immutable", "SDK", "MetaMask", "Network Switching", "Checkout", "Wallet Connection"],
+  "tech_stack": ["Next.js", "TypeScript", "React", "Biom3", "Ethers.js"],
   "product": "Checkout",
-  "programming_language": "TypeScript"
+  "programming_language": "TypeScript",
+  "sidebar_order": 3
 } 

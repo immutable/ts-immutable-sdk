@@ -1,8 +1,9 @@
 {
-  "title": "Telegram Mini App with Passport Authentication",
-  "description": "An example showing how to integrate Immutable Passport into a Telegram Mini App using device flow authentication and enabling NFT transfers",
-  "keywords": ["Immutable", "SDK", "Passport", "Telegram", "Mini App", "Device Flow", "NFT Transfer"],
-  "tech_stack": ["Next.js", "TypeScript", "React", "Telegram SDK", "Ethers.js", "Biom3 UI"],
+  "title": "Telegram Mini App with Immutable Passport",
+  "description": "Demonstrates device flow authentication and NFT transfers in a Telegram Mini App using Immutable Passport",
+  "keywords": ["Immutable", "SDK", "Passport", "Telegram", "Mini App", "Device Flow Authentication", "NFT Transfers"],
+  "tech_stack": ["Next.js", "TypeScript", "Telegram SDK", "Ethers.js", "Biome React"],
   "product": "Passport",
-  "programming_language": "TypeScript"
+  "programming_language": "TypeScript",
+  "sidebar_order": 3
 } 

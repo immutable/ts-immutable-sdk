@@ -1,22 +1,32 @@
+<div class="display-none">
+
 # Fulfill Collection Bid with Next.js
 
-## Introduction
-This example application demonstrates how to fulfill collection bids using the Immutable Orderbook SDK in a Next.js application. It showcases how to fulfill both ERC721 (complete) and ERC1155 (partial) collection bids using the Passport SDK for authentication and wallet connection.
+This example app demonstrates how to fulfill collection bids for both ERC721 and ERC1155 tokens using the Immutable Orderbook SDK with Next.js. The app shows how sellers can view active collection bids and fulfill them with specific tokens they own.
+
+</div>
+
+<div class="button-component">
 
 [View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-collection-bid-with-nextjs)
 
+</div>
+
 ## Features Overview
-- Fulfill collection bids for ERC721 tokens
-- Fulfill collection bids for ERC1155 tokens
+
+- **Fulfill Collection Bid for ERC721**: Demonstrates how to fulfill a collection bid for an ERC721 token by specifying a token ID.
+- **Fulfill Collection Bid for ERC1155**: Shows how to fulfill a collection bid for an ERC1155 token by specifying a token ID and the amount of units to fulfill.
 
 ## SDK Integration Details
 
-### Fulfill Collection Bid for ERC721
-**Feature Name**: Complete fulfillment of a collection bid for an ERC721 token.
+### Feature: Fulfill Collection Bid for ERC721
 
-**Source Code**: [Source Code](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-collection-bid-with-nextjs/src/app/fulfill-collection-bid-with-erc721/page.tsx)
+**Feature Name**: Allow sellers to fulfill ERC721 collection bids by providing a specific token ID that matches the collection.
+
+**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/fulfill-collection-bid-with-nextjs/src/app/fulfill-collection-bid-with-erc721/page.tsx)
 
 **Implementation**:
+
 ```typescript
 const fulfillERC721CollectionBid = async (
   collectionBidID: string,
@@ -43,18 +53,22 @@ const fulfillERC721CollectionBid = async (
 ```
 
 **Explanation**:
-This function fulfills a collection bid for an ERC721 token. The implementation follows these key steps:
-1. Call the Orderbook SDK's `fulfillOrder` method with the collection bid ID, user's wallet address, optional taker ecosystem fees, the amount (which is always '1' for ERC721), and the specific token ID to fulfill.
-2. The SDK returns a set of actions that need to be performed to complete the trade.
-3. For each action that requires a blockchain transaction, it builds the transaction using the `buildTransaction` method and sends it using the wallet's signer.
-4. The transaction is then awaited to ensure it completes successfully.
 
-### Fulfill Collection Bid for ERC1155
-**Feature Name**: Partial fulfillment of a collection bid for an ERC1155 token.
+The code above fulfills an ERC721 collection bid by:
 
-**Source Code**: [Source Code](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-collection-bid-with-nextjs/src/app/fulfill-collection-bid-with-erc1155/page.tsx)
+1. Calling the `fulfillOrder` method from the Orderbook SDK with the collection bid ID, the seller's wallet address, any taker ecosystem fees (marketplace fees), the amount (always '1' for ERC721), and the token ID to fulfill.
+2. The method returns a set of actions that need to be executed.
+3. For each transaction action, the code builds the transaction and sends it using the signer obtained through Passport.
+4. The transaction is confirmed by waiting for 1 block confirmation.
+
+### Feature: Fulfill Collection Bid for ERC1155
+
+**Feature Name**: Allow sellers to fulfill ERC1155 collection bids by providing a specific token ID and amount of units.
+
+**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/fulfill-collection-bid-with-nextjs/src/app/fulfill-collection-bid-with-erc1155/page.tsx)
 
 **Implementation**:
+
 ```typescript
 const fulfillERC1155CollectionBid = async (
   collectionBidID: string,
@@ -82,20 +96,24 @@ const fulfillERC1155CollectionBid = async (
 ```
 
 **Explanation**:
-This function fulfills a collection bid for an ERC1155 token. The key difference from ERC721 is that ERC1155 tokens are fungible and can be partially fulfilled. The implementation follows these steps:
-1. Call the Orderbook SDK's `fulfillOrder` method with the collection bid ID, user's wallet address, optional taker ecosystem fees, the amount of tokens to fulfill (which can be any quantity for ERC1155), and the specific token ID.
-2. Similar to the ERC721 flow, the SDK returns a set of actions.
-3. For transaction actions, it builds and sends the transaction using the wallet's signer, then waits for confirmation.
-4. The user can specify how many units they want to fulfill, making this ideal for partial fulfillments of collection bids.
+
+The code for fulfilling an ERC1155 collection bid is similar to the ERC721 version but with a key difference:
+
+1. It accepts an additional `amount` parameter which specifies how many units of the token to fulfill.
+2. The implementation calls the same `fulfillOrder` method but passes the specified amount instead of always using '1'.
+3. This allows partial fulfillment of ERC1155 collection bids, where the seller can choose to sell only some of the requested units.
+4. Like with ERC721, the resulting actions are processed and the transactions are submitted and confirmed.
 
 ## Running the App
 
 ### Prerequisites
-- Node.js (version 16 or higher)
-- pnpm
-- An [Immutable Hub account](https://hub.immutable.com) for environment setup
 
-### Steps to Run Locally
+1. Node.js and pnpm installed on your system
+2. Immutable Hub Account — [Set up your environment on Immutable Hub](https://hub.immutable.com/)
+3. Configure your publishable key, client ID, and redirect URIs in the Hub Developer Dashboard
+
+### Step-by-step Instructions
+
 1. Clone the repository:
    ```bash
    git clone https://github.com/immutable/ts-immutable-sdk.git
@@ -111,10 +129,10 @@ This function fulfills a collection bid for an ERC1155 token. The key difference
    pnpm install
    ```
 
-4. Create a `.env.local` file in the root directory with your environment variables:
+4. Set up environment variables by creating a `.env.local` file with:
    ```
-   NEXT_PUBLIC_PASSPORT_CLIENT_ID=your-passport-client-id
-   NEXT_PUBLIC_ORDERBOOK_API_URL=your-orderbook-api-url
+   NEXT_PUBLIC_PUBLISHABLE_KEY=your_publishable_key
+   NEXT_PUBLIC_CLIENT_ID=your_client_id
    ```
 
 5. Start the development server:
@@ -127,13 +145,23 @@ This function fulfills a collection bid for an ERC1155 token. The key difference
    http://localhost:3000
    ```
 
+7. To view the ERC721 collection bid fulfillment example, go to:
+   ```
+   http://localhost:3000/fulfill-collection-bid-with-erc721
+   ```
+
+8. To view the ERC1155 collection bid fulfillment example, go to:
+   ```
+   http://localhost:3000/fulfill-collection-bid-with-erc1155
+   ```
+
 ## Summary
-This example demonstrates how to integrate the Immutable Orderbook SDK into a Next.js application to fulfill collection bids for both ERC721 and ERC1155 tokens. Key features include:
 
-- Using Passport SDK for wallet authentication
-- Fetching active collection bids from the Orderbook
-- Fulfilling collection bids for ERC721 tokens (complete fulfillment)
-- Fulfilling collection bids for ERC1155 tokens (partial fulfillment)
-- Optional marketplace/ecosystem fees integration
+This example demonstrates how to fulfill collection bids for both ERC721 and ERC1155 tokens using the Immutable Orderbook SDK. Collection bids enable buyers to place bids for any token within a collection, and sellers can fulfill these bids with specific tokens they own.
 
-By following this example, developers can understand how to implement collection bid fulfillment in their own applications, providing a seamless trading experience for users. 
+Key takeaways:
+- Collection bids allow buyers to bid on collections rather than specific tokens
+- Fulfilling a collection bid requires specifying the exact token ID to sell
+- For ERC1155 tokens, sellers can specify the quantity to fulfill
+- The Orderbook SDK handles generating the necessary blockchain transactions
+- Passport integration provides a seamless wallet connection experience 
