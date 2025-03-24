@@ -1,4 +1,5 @@
 import { StarkSigner } from '@imtbl/x-client';
+import { toUtf8Bytes } from 'ethers';
 import {
   COMMUNICATION_TYPE,
   ResponseEventType,
@@ -28,6 +29,9 @@ export class ImxSigner implements StarkSigner {
   }
 
   public signMessage(rawMessage: string): Promise<string> {
+    console.log('signMessage.rawMessage', { rawMessage });
+    console.log('signMessage.toUtf8Bytes.toString()', { toUtf8Bytes: toUtf8Bytes(rawMessage).toString() });
+
     return new Promise((resolve, reject) => {
       const listener = (event: MessageEvent) => {
         messageResponseListener<SignMessageResponse>(

@@ -27,9 +27,15 @@ export class MetaMaskIMXProvider extends GenericIMXProvider {
           metaMaskProvider,
           config.baseConfig.environment,
         );
+
+        const signer = await metaMaskProvider.getSigner();
+
+        console.log('metaMaskProvider.getSigner().getAddress()', await signer.getAddress());
+        console.log('imxSigner.getAddress()', this.imxSigner.getAddress());
+
         return new MetaMaskIMXProvider(
           config,
-          await metaMaskProvider.getSigner(),
+          signer,
           this.imxSigner,
         );
       },
