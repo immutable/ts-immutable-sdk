@@ -2091,11 +2091,14 @@ importers:
         specifier: workspace:*
         version: link:../../x-provider
       '@magic-ext/oidc':
-        specifier: 12.0.0
-        version: 12.0.0
+        specifier: 12.0.2
+        version: 12.0.2
+      '@magic-sdk/commons':
+        specifier: 25.0.2
+        version: 25.0.2(@magic-sdk/provider@29.0.2(localforage@1.10.0))(@magic-sdk/types@24.18.1)
       '@magic-sdk/provider':
-        specifier: ^29.0.0
-        version: 29.0.0(localforage@1.10.0)
+        specifier: ^29.0.2
+        version: 29.0.2(localforage@1.10.0)
       '@metamask/detect-provider':
         specifier: ^2.0.0
         version: 2.0.0
@@ -2115,8 +2118,8 @@ importers:
         specifier: ^1.10.0
         version: 1.10.0
       magic-sdk:
-        specifier: ^29.0.0
-        version: 29.0.0
+        specifier: ^29.0.2
+        version: 29.0.2
       oidc-client-ts:
         specifier: 2.4.0
         version: 2.4.0
@@ -4806,8 +4809,17 @@ packages:
   '@magic-ext/oidc@12.0.0':
     resolution: {integrity: sha512-IeycCoW8BUqcdJoggynq63bj8XyRxZfiX5cBdxq7LEr4gWWpTz1zexEkWrJoP76XDr6Yn/wYQXiL4/AvJ6wcjw==}
 
+  '@magic-ext/oidc@12.0.2':
+    resolution: {integrity: sha512-k7KdSprnOFQjyjO24qJX4qnrhZJjZBva2f32REpvo5sb37AbWaYcmA4F+FfhWhMXxwdHlzFwSkeWHgFvzInEgw==}
+
   '@magic-sdk/commons@25.0.0':
     resolution: {integrity: sha512-EYrbFGw/4R899IccGgkmVp/ia50ELNK7H1uDfM66Nh+YnH05LsLWlfrtFbbKxBazquVnu89bAHmJcFPsmSnHQQ==}
+    peerDependencies:
+      '@magic-sdk/provider': '>=18.6.0'
+      '@magic-sdk/types': '>=15.8.0'
+
+  '@magic-sdk/commons@25.0.2':
+    resolution: {integrity: sha512-ZyCREjNafxWuxpvBoYWgLZTBoZh47sYckItLwbI0JHoQxzkoGYwlUg33DLauQyVuTOMJMc+aGgLM7qZ1xXHkeg==}
     peerDependencies:
       '@magic-sdk/provider': '>=18.6.0'
       '@magic-sdk/types': '>=15.8.0'
@@ -4817,8 +4829,16 @@ packages:
     peerDependencies:
       localforage: ^1.7.4
 
+  '@magic-sdk/provider@29.0.2':
+    resolution: {integrity: sha512-4KUufnITFyfbHBfTYswfU4SLhYXSMMMR/Hct2PJb8NKYJwn405jWIEh19xKUNYpg04B9m8RY0WG2lurwLOQx/Q==}
+    peerDependencies:
+      localforage: ^1.7.4
+
   '@magic-sdk/types@24.18.0':
     resolution: {integrity: sha512-6HS9WMgzLNCkvkJeDZW8+/maP8JInDYqnfudp/SgPWMosm9l6zH3X+x+ntDjRIUm5Qdugsg+L1fxMBj48r616Q==}
+
+  '@magic-sdk/types@24.18.1':
+    resolution: {integrity: sha512-r/06vHruERropfAIF1pZlYAqMLpGJeSy0YjJJ/8L3kA2EKy+Di0+r0DFJjXs58LUZtDN0GgSCOYTt7r49W6/Ug==}
 
   '@metamask/detect-provider@2.0.0':
     resolution: {integrity: sha512-sFpN+TX13E9fdBDh9lvQeZdJn4qYoRb/6QF2oZZK/Pn559IhCFacPMU1rMuqyXoFQF3JSJfii2l98B87QDPeCQ==}
@@ -12761,6 +12781,9 @@ packages:
   magic-sdk@29.0.0:
     resolution: {integrity: sha512-8awpk21HJizU3XftRJNkV7f68ckOKJ2j4jCtagIemHA9Q4vd1QKgt5xZWDak/djXpWch2xOvNiSDtMCZDwEAhw==}
 
+  magic-sdk@29.0.2:
+    resolution: {integrity: sha512-qVSPx5esiUe1FKv1wwSO//Q3E+i119mBj6RYZLf9/EbsqGpmMNFPN9N4yJ+Rhu4BmRQpYv/nuy8Josue3cTOHA==}
+
   magic-string@0.25.9:
     resolution: {integrity: sha512-RmF0AsMzgt25qzqqLc1+MbHmhdx0ojF2Fvs4XnOqz2ZOBXzzkEwc/dJQZCYHAn7v1jbVOjAZfK8msRn4BxO4VQ==}
 
@@ -17235,6 +17258,7 @@ packages:
   yaeti@0.0.6:
     resolution: {integrity: sha512-MvQa//+KcZCUkBTIC9blM+CU9J2GzuTytsOUwf2lidtvkx/6gnEp1QvJv34t9vdjhFmha/mUiNDbN0D0mJWdug==}
     engines: {node: '>=0.10.32'}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   yallist@2.1.2:
     resolution: {integrity: sha512-ncTzHV7NvsQZkYe1DW7cbDLm0YpzHmZF5r/iyP3ZnQtMiJ+pjzisCiMNI+Sj+xQF5pXhSHxSB3uDbsBTzY/c2A==}
@@ -19719,14 +19743,14 @@ snapshots:
       '@imtbl/x-client': 2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@imtbl/x-provider': 2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@magic-ext/oidc': 12.0.0
-      '@magic-sdk/provider': 29.0.0(localforage@1.10.0)
+      '@magic-sdk/provider': 29.0.2(localforage@1.10.0)
       '@metamask/detect-provider': 2.0.0
       axios: 1.7.7
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       events: 3.3.0
       jwt-decode: 3.1.2
       localforage: 1.10.0
-      magic-sdk: 29.0.0
+      magic-sdk: 29.0.2
       oidc-client-ts: 2.4.0
       uuid: 8.3.2
     transitivePeerDependencies:
@@ -19771,7 +19795,7 @@ snapshots:
       bn.js: 5.2.1
       enc-utils: 3.0.0
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      magic-sdk: 29.0.0
+      magic-sdk: 29.0.2
       oidc-client-ts: 2.4.0
     transitivePeerDependencies:
       - bufferutil
@@ -19814,7 +19838,7 @@ snapshots:
       axios: 1.7.7
       enc-utils: 3.0.0
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      magic-sdk: 29.0.0
+      magic-sdk: 29.0.2
       oidc-client-ts: 2.4.0
     transitivePeerDependencies:
       - bufferutil
@@ -20499,10 +20523,17 @@ snapshots:
 
   '@magic-ext/oidc@12.0.0': {}
 
+  '@magic-ext/oidc@12.0.2': {}
+
   '@magic-sdk/commons@25.0.0(@magic-sdk/provider@29.0.0(localforage@1.10.0))(@magic-sdk/types@24.18.0)':
     dependencies:
       '@magic-sdk/provider': 29.0.0(localforage@1.10.0)
       '@magic-sdk/types': 24.18.0
+
+  '@magic-sdk/commons@25.0.2(@magic-sdk/provider@29.0.2(localforage@1.10.0))(@magic-sdk/types@24.18.1)':
+    dependencies:
+      '@magic-sdk/provider': 29.0.2(localforage@1.10.0)
+      '@magic-sdk/types': 24.18.1
 
   '@magic-sdk/provider@29.0.0(localforage@1.10.0)':
     dependencies:
@@ -20513,7 +20544,18 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@magic-sdk/provider@29.0.2(localforage@1.10.0)':
+    dependencies:
+      '@magic-sdk/types': 24.18.1
+      eventemitter3: 4.0.7
+      localforage: 1.10.0
+      web3-core: 1.5.2
+    transitivePeerDependencies:
+      - supports-color
+
   '@magic-sdk/types@24.18.0': {}
+
+  '@magic-sdk/types@24.18.1': {}
 
   '@metamask/detect-provider@2.0.0': {}
 
@@ -31978,6 +32020,15 @@ snapshots:
       '@magic-sdk/commons': 25.0.0(@magic-sdk/provider@29.0.0(localforage@1.10.0))(@magic-sdk/types@24.18.0)
       '@magic-sdk/provider': 29.0.0(localforage@1.10.0)
       '@magic-sdk/types': 24.18.0
+      localforage: 1.10.0
+    transitivePeerDependencies:
+      - supports-color
+
+  magic-sdk@29.0.2:
+    dependencies:
+      '@magic-sdk/commons': 25.0.2(@magic-sdk/provider@29.0.2(localforage@1.10.0))(@magic-sdk/types@24.18.1)
+      '@magic-sdk/provider': 29.0.2(localforage@1.10.0)
+      '@magic-sdk/types': 24.18.1
       localforage: 1.10.0
     transitivePeerDependencies:
       - supports-color
