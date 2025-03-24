@@ -8,7 +8,7 @@ This tutorial demonstrates how to create collection bids for both ERC721 and ERC
 
 <div class="button-component">
 
-[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-collection-bid-with-nextjs)
+[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-collection-bid-with-nextjs) <span class="button-component-arrow">→</span>
 
 </div>
 

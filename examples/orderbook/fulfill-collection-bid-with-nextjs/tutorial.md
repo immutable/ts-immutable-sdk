@@ -8,7 +8,7 @@ This example app demonstrates how to fulfill collection bids for both ERC721 and
 
 <div class="button-component">
 
-[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-collection-bid-with-nextjs)
+[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-collection-bid-with-nextjs) <span class="button-component-arrow">→</span>
 
 </div>
 

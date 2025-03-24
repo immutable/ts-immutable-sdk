@@ -8,7 +8,7 @@ This tutorial demonstrates how to implement NFT listing fulfillment using the Im
 
 <div class="button-component">
 
-[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-listing-with-nextjs)
+[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-listing-with-nextjs) <span class="button-component-arrow">→</span>
 
 </div>
 

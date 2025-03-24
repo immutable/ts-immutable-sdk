@@ -8,7 +8,7 @@ This example demonstrates how to interact with Immutable ERC721 contracts using 
 
 <div class="button-component">
 
-[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/contracts/contract-interaction-with-viem)
+[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/contracts/contract-interaction-with-viem) <span class="button-component-arrow">→</span>
 
 </div>
 

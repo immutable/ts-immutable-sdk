@@ -10,7 +10,7 @@ This example demonstrates how to use the Passport SDK to sign messages using two
 
 <div class="button-component">
 
-[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/wallets-signing-with-nextjs)
+[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/wallets-signing-with-nextjs) <span class="button-component-arrow">→</span>
 
 </div>
 

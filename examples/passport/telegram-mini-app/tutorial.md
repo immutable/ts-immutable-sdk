@@ -8,7 +8,7 @@ This tutorial demonstrates how to integrate Immutable Passport into a Telegram M
 
 <div class="button-component">
 
-[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/telegram-mini-app)
+[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/telegram-mini-app) <span class="button-component-arrow">→</span>
 
 </div>
 

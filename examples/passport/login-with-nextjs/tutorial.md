@@ -8,7 +8,7 @@ This example app demonstrates different methods to implement user authentication
 
 <div class="button-component">
 
-[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/login-with-nextjs)
+[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/login-with-nextjs) <span class="button-component-arrow">→</span>
 
 </div>
 

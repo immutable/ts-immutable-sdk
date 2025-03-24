@@ -8,7 +8,7 @@ This tutorial demonstrates how to integrate the Immutable Checkout SDK into a Ne
 
 <div class="button-component">
 
-[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-connect-with-nextjs)
+[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-connect-with-nextjs) <span class="button-component-arrow">→</span>
 
 </div>
 

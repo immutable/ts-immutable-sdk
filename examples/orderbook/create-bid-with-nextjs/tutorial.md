@@ -8,7 +8,7 @@ This example demonstrates how to create bids for ERC721 and ERC1155 tokens using
 
 <div class="button-component">
 
-[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-bid-with-nextjs)
+[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-bid-with-nextjs) <span class="button-component-arrow">→</span>
 
 </div>
 

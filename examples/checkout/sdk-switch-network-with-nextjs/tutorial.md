@@ -8,7 +8,7 @@ This example demonstrates how to use the Immutable Checkout SDK to connect to Me
 
 <div class="button-component">
 
-[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-switch-network-with-nextjs)
+[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-switch-network-with-nextjs) <span class="button-component-arrow">→</span>
 
 </div>
 

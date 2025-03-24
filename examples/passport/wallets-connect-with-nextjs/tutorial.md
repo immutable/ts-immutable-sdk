@@ -8,7 +8,7 @@ This example app demonstrates how to integrate Immutable Passport with different
 
 <div class="button-component">
 
-[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/wallets-connect-with-nextjs)
+[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/wallets-connect-with-nextjs) <span class="button-component-arrow">→</span>
 
 </div>
 

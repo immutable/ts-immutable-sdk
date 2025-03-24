@@ -8,7 +8,7 @@ This tutorial demonstrates how to integrate Immutable Passport's wallet connecti
 
 <div class="button-component">
 
-[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/wallets-transactions-with-nextjs)
+[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/wallets-transactions-with-nextjs) <span class="button-component-arrow">→</span>
 
 </div>
 

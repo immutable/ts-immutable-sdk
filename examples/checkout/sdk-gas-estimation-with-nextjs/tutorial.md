@@ -8,7 +8,7 @@ This example app demonstrates how to use the Immutable Checkout SDK to estimate 
 
 <div class="button-component">
 
-[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-gas-estimation-with-nextjs)
+[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-gas-estimation-with-nextjs) <span class="button-component-arrow">→</span>
 
 </div>
 

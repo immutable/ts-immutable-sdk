@@ -8,7 +8,7 @@ This example application demonstrates how to use the Immutable Checkout SDK to c
 
 <div class="button-component">
 
-[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-wallet-balance-with-nextjs)
+[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-wallet-balance-with-nextjs) <span class="button-component-arrow">→</span>
 
 </div>
 

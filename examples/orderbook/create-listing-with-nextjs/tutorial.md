@@ -8,7 +8,7 @@ This example app demonstrates how to create NFT listings using the Immutable Ord
 
 <div class="button-component">
 
-[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-listing-with-nextjs)
+[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-listing-with-nextjs) <span class="button-component-arrow">→</span>
 
 </div>
 
