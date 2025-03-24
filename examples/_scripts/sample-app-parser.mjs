@@ -27,18 +27,21 @@ const main = (product) => {
       console.log(`No metadata.json found for ${app}`);
     }
 
-    // Handle missing tutorial.md
-    let tutorial = '';
+    // Check if tutorial.md exists but don't read its content
+    let tutorialExists = false;
     try {
-      tutorial = fs.readFileSync(path.join(appDir, 'tutorial.md'), 'utf8');
+      tutorialExists = fs.existsSync(path.join(appDir, 'tutorial.md'));
+      if (!tutorialExists) {
+        console.log(`No tutorial.md found for ${app}`);
+      }
     } catch (error) {
-      console.log(`No tutorial.md found for ${app}`);
+      console.log(`Error checking tutorial.md for ${app}: ${error.message}`);
     }
 
     // Add this app's data to the allApps object
-    if (tutorial && metadataContent) {
+    if (tutorialExists && metadataContent) {
       allApps[app] = {
-        tutorial,
+        tutorial: `${app}.md`, // Use the app name instead of tutorial content
         metadata: JSON.parse(metadataContent),
       };
     }
