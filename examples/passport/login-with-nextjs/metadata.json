@@ -1,8 +1,8 @@
 {
   "title": "Login with Next.js",
-  "description": "A comprehensive demonstration of Immutable Passport authentication flows in a Next.js application, including various login methods and logout strategies.",
-  "keywords": ["Immutable", "SDK", "Passport", "Authentication", "NextJS", "EVM", "Identity", "EtherJS", "Login", "Logout"],
-  "tech_stack": ["Next.js", "TypeScript", "React", "EtherJS", "Biom3 UI"],
+  "description": "Example app demonstrating multiple authentication methods using Immutable Passport with Next.js, including wallet login, Ethers.js integration, and identity-only login.",
+  "keywords": ["Immutable", "SDK", "Passport", "Next.js", "Authentication", "Login", "Wallet", "EVM", "Ethers.js"],
+  "tech_stack": ["Next.js", "TypeScript", "React", "Ethers.js", "@biom3/react"],
   "product": "Passport",
   "programming_language": "TypeScript"
 } 

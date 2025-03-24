@@ -15,9 +15,10 @@ For each subdirectory in /examples/passport/ that doesn't already have both tuto
 
 ### 1. Analysis Phase
 - Read all code files in the example app directory
-- Identify which Passport features are being demonstrated
+- Identify which Passport features are being demonstrated. ONLY include the features that are demonstrated in the features.json file if there's one.
 - Understand the app's architecture, components, and data flow
 - Note all frameworks, libraries, and dependencies used
+- IMPORTANT: If the example app is a login example, it should focus on the login feature not the logout feature, etc.
 
 ### 2. Create tutorial.md
 Create a tutorial.md file in the example app's root with the following structure:
@@ -33,7 +34,8 @@ Create a tutorial.md file in the example app's root with the following structure
 > IMPORTANT: Focus on how the example app uses each feature. Do NOT include Orderbook/Checkout/Contracts/Passport SDK initialization and Orderbook/Checkout/Contracts/Passport Provider Creation instructions - focus only on the example-specific implementation details.
 #### SDK Integration Details
 For each Passport feature demonstrated in this example app (Note: This section should match the feature mentioned in the features overview section):
-- **Feature Name**: Brief description of what the feature does. The given brief description MUST BE linked to the specific file in the GitHub repository.
+- **Feature Name**: Brief description of what the feature does. 
+- **Source Code**: Link to the source code file in the GitHub repository. Structure: "Source Code: [source code file](source code file link)"
 - **Implementation**: Code snippets showing how the feature is implemented
 - **Explanation**: Clear explanation of how the code works
 

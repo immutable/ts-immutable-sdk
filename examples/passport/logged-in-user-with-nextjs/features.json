@@ -1,0 +1,7 @@
+{
+    "features": [
+        "linked-addresses-with-passport",
+        "user-info-with-passport",
+        "verify-tokens-with-nextjs"
+    ]
+}

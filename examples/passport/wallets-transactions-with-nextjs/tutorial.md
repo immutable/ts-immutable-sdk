@@ -1,133 +1,96 @@
-# Wallet Transactions with Next.js
+# Wallet Transaction Example with Next.js
 
 ## Introduction
-This example app demonstrates how to send transactions using Immutable Passport with a Next.js application. It shows how to connect to a user's wallet and send NFT transfers on the Immutable zkEVM network.
+This example demonstrates how to integrate the Immutable Passport SDK with a Next.js application to connect a wallet and execute ERC-721 token transfer transactions on the Immutable zkEVM network. The application showcases a simple but powerful implementation that allows users to connect their wallet and send transactions with minimal UI complexity.
 
 [View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/wallets-transactions-with-nextjs)
 
 ## Features Overview
-- **Connecting to Ethereum wallets** - Establishing a connection to a user's Ethereum wallet using Passport
-- **Sending NFT transactions** - Transferring NFT ownership using smart contract interactions
-- **Transaction feedback** - Handling transaction responses and errors
+- **Wallet Connection**: Connect to Immutable Passport wallet
+- **Transaction Execution**: Send ERC-721 token transfer transactions on Immutable zkEVM
 
 ## SDK Integration Details
 
-### **Connecting to Ethereum wallets**: A feature that allows users to connect their wallet through Passport.
-[Source Code](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-transactions-with-nextjs/src/transaction.ts#L4-L7)
+### Wallet Connection
+**Feature Name**: Wallet Connection enables users to connect their blockchain wallet to your application, giving them access to their digital assets.
 
-**Implementation:**
+**Source Code**: [src/transaction.ts](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-transactions-with-nextjs/src/transaction.ts)
+
+**Implementation**:
 ```typescript
 const provider = await passportInstance.connectEvm();
-```
-
-**Explanation:**
-The application uses the `connectEvm()` method from the Passport SDK to establish a connection to the user's Ethereum wallet. This method returns a provider that adheres to the EIP-1193 standard, which can be used to interact with the Ethereum blockchain.
-
-### **Sending NFT transactions**: A feature that demonstrates how to transfer an NFT using a smart contract.
-[Source Code](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-transactions-with-nextjs/src/transaction.ts#L8-L40)
-
-**Implementation:**
-```typescript
 const browserProvider = new BrowserProvider(provider);
 const signer = await browserProvider.getSigner();
+```
 
+**Explanation**: 
+This implementation uses the Passport SDK to connect to the user's Ethereum wallet. The `connectEvm()` method returns a provider that conforms to the EIP-1193 interface. This provider is then wrapped with ethers.js `BrowserProvider` to create a more feature-rich interface for interacting with the blockchain. Finally, a signer is obtained from the provider, which is required to sign transactions.
+
+### Transaction Execution
+**Feature Name**: Transaction Execution allows users to send blockchain transactions, such as transferring tokens.
+
+**Source Code**: [src/transaction.ts](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-transactions-with-nextjs/src/transaction.ts)
+
+**Implementation**:
+```typescript
 const [userAddress] = await provider.request({ method: 'eth_requestAccounts' });
 const toAddress = process.env.NEXT_PUBLIC_TO_ADDRESS ?? '0x000';
 const erc721Address = process.env.NEXT_PUBLIC_ERC721_ADDRESS ?? '0x000';
 const tokenId = process.env.NEXT_PUBLIC_TOKEN_ID ?? '0';
 
-// The Application Binary Interface (ABI) of a contract
 const abi = ['function safeTransferFrom(address from, address to, uint256 tokenId)'];
-
-// Create contract instance
 const contract = new ethers.Contract(erc721Address, abi, signer);
-let tx;
-// Send the transaction
+
 try {
   tx = await contract.safeTransferFrom(userAddress, toAddress, tokenId);
+  const receipt = await tx.wait();
 } catch (error: any) {
-  // Handle user denying signature
-  if (error.code === 4001) {
-    console.error('user denied signature');
-  } else {
-    console.error('something went wrong: ', error.message);
-  }
+  // Error handling
 }
 ```
 
-**Explanation:**
-After connecting to the user's wallet, the application:
-1. Creates an ethers.js BrowserProvider from the EIP-1193 provider
-2. Gets a signer from the provider to create signed transactions
-3. Retrieves the user's Ethereum address
-4. Defines the contract ABI (function interface) for the ERC-721 NFT standard
-5. Creates a contract instance using ethers.js
-6. Calls the `safeTransferFrom` function to transfer the NFT from the user's address to the destination address
-7. Implements error handling for user rejection and other potential issues
-
-### **Transaction feedback**: A feature that handles transaction completion and status.
-[Source Code](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-transactions-with-nextjs/src/transaction.ts#L42-L52)
-
-**Implementation:**
-```typescript
-// Wait for the transaction to complete
-// On Immutable zkEVM, this takes 1-8 seconds in 99.9% of cases
-const receipt = await tx.wait();
-
-switch (receipt.status) {
-  // Failure
-  case 0:
-    break;
-  // Success
-  case 1:
-    break;
-  default:
-    break;
-}
-```
-
-**Explanation:**
-The application waits for the transaction to be mined using the `wait()` method, which returns a transaction receipt. It then checks the status of the transaction (0 for failure, 1 for success) and can perform different actions based on the outcome. This pattern allows developers to provide feedback to users about their transaction status.
+**Explanation**: 
+This code demonstrates how to execute an ERC-721 token transfer on the Immutable zkEVM. It first gets the user's address and sets up the recipient address, contract address, and token ID (from environment variables). It then defines a minimal ABI for the ERC-721 contract's `safeTransferFrom` function, creates a contract instance with ethers.js, and calls the function to transfer the token. The code also includes error handling for transaction failures and waits for transaction confirmation, which typically takes only 1-8 seconds on Immutable zkEVM.
 
 ## Running the App
 
 ### Prerequisites
-- Node.js 18.x or later
-- An Immutable Hub account for obtaining your API keys
-- Set up your environment variables (see below)
-- A testnet NFT collection created on [Immutable Hub](https://hub.immutable.com)
+- Node.js (v16 or higher)
+- pnpm
+- Environment variables (obtain from [Immutable Hub](https://hub.immutable.com/))
 
-### Environment Setup
-1. Copy `.env.example` to `.env.local` and fill in the following details:
-   ```
-   NEXT_PUBLIC_PUBLISHABLE_KEY=<your publishable key from Hub>
-   NEXT_PUBLIC_CLIENT_ID=<your client ID from Hub>
-   NEXT_PUBLIC_TO_ADDRESS=<recipient address for the NFT>
-   NEXT_PUBLIC_ERC721_ADDRESS=<your ERC721 contract address>
-   NEXT_PUBLIC_TOKEN_ID=<token ID to transfer>
+### Steps
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/immutable/ts-immutable-sdk.git
+   cd ts-immutable-sdk
    ```
 
-### Running Locally
-1. Install dependencies:
+2. Install dependencies:
    ```bash
    pnpm install
    ```
 
-2. Start the development server:
+3. Create a `.env.local` file based on `.env.example` and add your environment variables:
+   ```
+   NEXT_PUBLIC_PUBLISHABLE_KEY=your_publishable_key
+   NEXT_PUBLIC_CLIENT_ID=your_client_id
+   NEXT_PUBLIC_TO_ADDRESS=recipient_address
+   NEXT_PUBLIC_ERC721_ADDRESS=erc721_contract_address
+   NEXT_PUBLIC_TOKEN_ID=token_id_to_transfer
+   ```
+
+4. Start the development server:
    ```bash
    pnpm dev
    ```
 
-3. Open your browser and navigate to [http://localhost:3000](http://localhost:3000)
-
-4. Click the "Send Transaction" button to initiate an NFT transfer
+5. Open your browser and navigate to http://localhost:3000
 
 ## Summary
-This example demonstrates how to integrate Immutable Passport's wallet connection and transaction capabilities in a Next.js application. You've learned how to:
+This example demonstrates how to integrate Immutable Passport into a Next.js application to connect to a user's wallet and execute ERC-721 token transfers on the Immutable zkEVM network. The implementation showcases how to connect to wallets using the Passport SDK and use ethers.js to interact with smart contracts for transaction execution.
 
-- Connect to a user's Ethereum wallet using Passport
-- Create and send NFT transfer transactions using ethers.js and the Passport provider
-- Handle transaction responses and error conditions
-- Wait for transactions to complete and process their status
-
-This pattern can be extended to support various other transaction types on Immutable zkEVM, such as minting NFTs, trading assets, or interacting with any smart contract. 
+Key takeaways:
+- The Passport SDK provides a simple interface for connecting to user wallets
+- Transaction execution on Immutable zkEVM is fast (1-8 seconds in most cases)
+- Combining the Passport SDK with ethers.js creates a powerful toolkit for blockchain interactions 

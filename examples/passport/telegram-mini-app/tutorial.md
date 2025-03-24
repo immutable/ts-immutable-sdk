@@ -1,26 +1,23 @@
-# Passport Telegram Mini App Tutorial
+# Telegram Mini App with Passport SDK
 
 ## Introduction
-
-This example app demonstrates how to integrate the Immutable Passport SDK within a Telegram Mini App environment. It showcases the authentication flow using Passport's device flow mechanism and basic transaction capabilities for transferring NFT assets, all within Telegram's Mini App context.
+This example demonstrates how to integrate Immutable Passport into a Telegram Mini App using the device flow authentication method. It showcases a simple NFT transfer application that allows users to authenticate with Passport and transfer NFTs between addresses, all within a Telegram Mini App context.
 
 [View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/telegram-mini-app)
 
 ## Features Overview
-
-- **Device Flow Authentication** - Demonstrates how to authenticate users using Passport's device flow method, which is optimized for Telegram Mini Apps
-- **Wallet Integration** - Shows how to connect to a user's wallet and retrieve their wallet address
-- **NFT Transfers** - Demonstrates how to perform NFT transfers using the connected wallet
+- Device Flow Authentication with Passport in a Telegram Mini App
+- NFT Transfers with Passport wallet
 
 ## SDK Integration Details
 
 ### Device Flow Authentication
+**Feature Name**: Device flow authentication allows users to authenticate with Passport in environments where redirects are not supported, such as Telegram Mini Apps.
 
-**[Device Flow Authentication](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/telegram-mini-app/app/components/Connect.tsx)**
+**Source Code**: [Connect.tsx](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/telegram-mini-app/app/components/Connect.tsx)
 
-The example implements a specialized authentication flow for Telegram Mini Apps using the device flow method:
-
-```typescript
+**Implementation**:
+```tsx
 // Use loginWithDeviceFlow as the login method for Telegram Mini App to ensure support for all devices
 const deviceFlowParams = await passportInstance.loginWithDeviceFlow();
 // Open the device flow url using the openLink function on the telegram sdk
@@ -40,15 +37,16 @@ const [userAddress] = await provider.request({
 setWalletAddress(userAddress);
 ```
 
-**Explanation**: The code initiates a device flow authentication process using Passport's `loginWithDeviceFlow` method. It then utilizes Telegram's WebApp SDK to open the authentication URL. After the user completes the authentication in the external browser, the app uses the `loginWithDeviceFlowCallback` to wait for the authentication to complete, then connects to the EVM and retrieves the user's wallet address.
+**Explanation**: 
+This implementation uses the device flow authentication method from Passport SDK for authentication within a Telegram Mini App. When a user clicks the "Sign in with Passport" button, the `loginWithDeviceFlow` method is called, which returns parameters including a URL that the user needs to visit. The Telegram SDK's `openLink` function is used to open this URL, where the user completes their authentication. The application then polls for completion using `loginWithDeviceFlowCallback` with the device code and interval. Once authenticated, the app connects to the EVM provider and retrieves the user's wallet address.
 
 ### NFT Transfers
+**Feature Name**: NFT transfers allow users to transfer their NFTs to other addresses directly from within a Telegram Mini App.
 
-**[NFT Transfer Implementation](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/telegram-mini-app/app/components/TransferAsset.tsx)**
+**Source Code**: [TransferAsset.tsx](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/telegram-mini-app/app/components/TransferAsset.tsx)
 
-The example shows how to transfer NFTs using the connected wallet:
-
-```typescript
+**Implementation**:
+```tsx
 // Setup the contract ABI with the safeTransferFrom function for transferring assets
 const abi = [
   "function safeTransferFrom(address from, address to, uint256 token_id)",
@@ -66,79 +64,41 @@ try {
 }
 ```
 
-**Explanation**: This code demonstrates how to perform an NFT transfer by using ethers.js to interact with the NFT contract. It creates a contract instance with the minimal ABI needed for the `safeTransferFrom` function, then calls this function with the user's wallet address, recipient address, and token ID to transfer the NFT.
-
-### Passport Configuration
-
-**[Passport SDK Configuration](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/telegram-mini-app/app/utils.ts)**
-
-The example configures Passport for use in a Telegram Mini App:
-
-```typescript
-export const passportInstance = new passport.Passport({
-  baseConfig: new ImmutableConfiguration({ environment: Environment.SANDBOX }),
-  // The client ID of the application created in Hub
-  clientId: process.env.NEXT_PUBLIC_CLIENT_ID || "<CLIENT_ID>",
-  // The redirect URI set in the application created in Hub
-  redirectUri: process.env.NEXT_PUBLIC_REDIRECT_URI || "<REDIRECT_URI>",
-  // The logout redirect URI set in the application created in Hub
-  logoutRedirectUri: process.env.NEXT_PUBLIC_LOGOUT_REDIRECT_URI || "<LOGOUT_REDIRECT_URI>",
-  audience: "platform_api",
-  scope: "openid offline_access email transact",
-  // Set crossSdkBridgeEnabled to enable pre-approved transactions
-  crossSdkBridgeEnabled: true,
-});
-```
-
-**Explanation**: This configuration sets up the Passport instance with the necessary parameters for operating within a Telegram Mini App environment. It includes client credentials, redirect URIs, and enables the cross-SDK bridge for pre-approved transactions.
+**Explanation**:
+This implementation handles NFT transfers using the Ethereum contract interaction pattern. After authenticating with Passport, users can input a collection address, token ID, and recipient address to transfer an NFT. The application uses ethers.js to create a contract instance with the `safeTransferFrom` method, which is the standard ERC-721 method for NFT transfers. The signer, obtained from the provider initialized during authentication, signs the transaction. Upon successful transfer, the UI updates to show a success message.
 
 ## Running the App
 
 ### Prerequisites
-
-- Node.js and pnpm installed on your machine
-- An Immutable Hub account and application set up (for client credentials)
-- Basic understanding of Next.js and React
+- Node.js (v18 or higher)
+- pnpm installed
 - [Immutable Hub](https://hub.immutable.com/) account for environment setup
 
-### Steps to Run the App Locally
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/immutable/ts-immutable-sdk.git
-   cd ts-immutable-sdk/examples/passport/telegram-mini-app
-   ```
-
-2. Install dependencies:
-   ```bash
-   pnpm install
-   ```
-
-3. Copy the environment file and fill in your credentials:
-   ```bash
-   cp .env.example .env
-   ```
-   
-4. Update the .env file with your Immutable Hub application credentials:
+### Environment Setup
+1. Create an application in [Immutable Hub](https://hub.immutable.com/)
+2. Configure the application with appropriate redirect URIs
+3. Copy the `.env.example` file to `.env.local` and fill in the following variables:
    ```
    NEXT_PUBLIC_CLIENT_ID=your_client_id
    NEXT_PUBLIC_REDIRECT_URI=your_redirect_uri
    NEXT_PUBLIC_LOGOUT_REDIRECT_URI=your_logout_redirect_uri
    ```
 
-5. Start the development server:
+### Steps to Run Locally
+1. Clone the repository
+2. Navigate to the example directory:
+   ```bash
+   cd examples/passport/telegram-mini-app
+   ```
+3. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+4. Run the development server:
    ```bash
    pnpm dev
    ```
-
-6. The app will be available at http://localhost:3000
+5. The application will be available at `http://localhost:3000`
 
 ## Summary
-
-This example demonstrates how to integrate Immutable Passport into a Telegram Mini App, enabling users to authenticate using the device flow method and perform NFT transfers. The integration showcases how blockchain functionality can be brought to Telegram's Mini App platform, combining the reach of Telegram with the power of Immutable's blockchain infrastructure.
-
-Key takeaways for developers:
-- Use the device flow authentication method for the best compatibility with Telegram Mini Apps
-- Leverage Telegram's WebApp SDK to handle authentication redirects
-- Configure Passport with appropriate credentials and scopes for your application
-- Implement NFT transfers using ethers.js and the connected wallet provider 
+This example demonstrates how to integrate Immutable Passport into a Telegram Mini App environment using the device flow authentication method. It showcases how to authenticate users and enable NFT transfers within the Telegram platform, providing a streamlined Web3 experience without requiring users to leave the Telegram app. The device flow authentication is particularly important for Telegram Mini Apps as it supports environments where traditional redirect-based authentication methods are not feasible. 

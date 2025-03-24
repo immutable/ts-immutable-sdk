@@ -1,0 +1,6 @@
+{
+    "features": [
+        "sign-with-eip712",
+        "sign-with-erc191"
+    ]
+}

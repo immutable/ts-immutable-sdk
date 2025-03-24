@@ -1,8 +1,8 @@
 {
-  "title": "Wallet Transactions with Next.js",
-  "description": "A Next.js application demonstrating how to connect to wallets and send NFT transactions using Immutable Passport",
-  "keywords": ["Immutable", "SDK", "Passport", "Wallet", "Transactions", "NFT", "Transfer", "Next.js"],
-  "tech_stack": ["Next.js", "TypeScript", "Ethers.js", "TailwindCSS"],
+  "title": "Passport Wallet Connection and Transaction Execution with Next.js",
+  "description": "Example demonstrating how to connect wallets and execute ERC-721 token transfer transactions using Immutable Passport in a Next.js application",
+  "keywords": ["Immutable", "SDK", "Passport", "Wallet Connection", "Transaction Execution", "NextJS", "ERC-721"],
+  "tech_stack": ["Next.js", "React", "TypeScript", "ethers.js", "Tailwind CSS"],
   "product": "Passport",
   "programming_language": "TypeScript"
 } 
