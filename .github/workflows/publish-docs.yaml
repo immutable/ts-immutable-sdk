@@ -24,6 +24,8 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
+          # For testing, use the SDK development branch
+          ref: DVR-330-example-apps-content-autogeneration
 
       - name: Check alpha version
         id: alpha_check
@@ -62,6 +64,8 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
+          # For testing, use the SDK development branch
+          ref: DVR-330-example-apps-content-autogeneration
 
       - name: Checkout Docs Repo
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -69,7 +73,8 @@ jobs:
           repository: immutable/docs
           token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
           path: imx-docs
-          ref: main
+          # For testing, use the docs development branch
+          ref: DVR-331-example-app-layout
 
       - name: Setup environment variables
         run: |
@@ -104,32 +109,44 @@ jobs:
       - name: Update version link
         run: ./.github/scripts/update-docs-link.sh
 
+      - name: Process Example App Tutorials
+        run: |
+          # Generate example app JSON files
+          pnpm parse:examples
+          
+          # Process tutorials and copy to docs repo
+          ./.github/scripts/process-tutorials.sh
+        shell: bash
+
       - name: Push SDK Docs to docs
         id: docs_push
-        run: ./.github/scripts/push-docs.sh
+        run: |
+          # Modify push-docs.sh to push to the testing branch
+          cd "$CLONE_DIR"
+          git push -u origin DVR-331-example-app-layout
         shell: bash
 
-      - name: Trigger Netlify Build and Deploy
-        id: netlify_build
-        run: curl -X POST -d '{}' ${{ env.NETLIFY_BUILD_HOOK }}
+      # - name: Trigger Netlify Build and Deploy
+      #   id: netlify_build
+      #   run: curl -X POST -d '{}' ${{ env.NETLIFY_BUILD_HOOK }}
 
-      - name: Wait for 10 minutes
-        # allow Netlify time to build and deploy
-        run: sleep 600
+      # - name: Wait for 10 minutes
+      #   # allow Netlify time to build and deploy
+      #   run: sleep 600
 
-      - name: Check Netlify Site Deployed
-        id: netlify_deploy
-        run: ./.github/scripts/check-docs-deployed.sh
-        shell: bash
+      # - name: Check Netlify Site Deployed
+      #   id: netlify_deploy
+      #   run: ./.github/scripts/check-docs-deployed.sh
+      #   shell: bash
 
-      - name: Notify SDK Slack Docs Publish Success
-        if: ${{ success() && steps.docs_push.conclusion == 'success' && steps.netlify_build.conclusion == 'success' && steps.netlify_deploy.conclusion == 'success' }}
-        uses: ./.github/actions/notify-slack-publish-status
-        with:
-          message: "✅ SDK reference documents published successfully - https://docs.immutable.com/sdk-references/ts-immutable-sdk/${{ env.VERSION }}/\n\n>*`${{ env.GITHUB_USER }}` Please ensure you and the team updated all Sample Code + Guides on the <https://docs.immutable.com|imx-docs site> to reflect the change.*"
+      # - name: Notify SDK Slack Docs Publish Success
+      #   if: ${{ success() && steps.docs_push.conclusion == 'success' && steps.netlify_build.conclusion == 'success' && steps.netlify_deploy.conclusion == 'success' }}
+      #   uses: ./.github/actions/notify-slack-publish-status
+      #   with:
+      #     message: "✅ SDK reference documents published successfully - https://docs.immutable.com/sdk-references/ts-immutable-sdk/${{ env.VERSION }}/\n\n>*`${{ env.GITHUB_USER }}` Please ensure you and the team updated all Sample Code + Guides on the <https://docs.immutable.com|imx-docs site> to reflect the change.*"
 
-      - name: Notify SDK Slack Docs Publish Failure
-        if: ${{ failure() && steps.docs_version_check.conclusion == 'success' }}
-        uses: ./.github/actions/notify-slack-publish-status
-        with:
-          message: "❌ Failed to publish SDK reference documents. Please check the logs for more details."
+      # - name: Notify SDK Slack Docs Publish Failure
+      #   if: ${{ failure() && steps.docs_version_check.conclusion == 'success' }}
+      #   uses: ./.github/actions/notify-slack-publish-status
+      #   with:
+      #     message: "❌ Failed to publish SDK reference documents. Please check the logs for more details."
