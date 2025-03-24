@@ -6,7 +6,6 @@ import { PassportError, PassportErrorType } from '../errors/passportError';
 import { MagicProviderProxyFactory } from './magicProviderProxyFactory';
 
 const loginWithOIDCMock:jest.MockedFunction<(args: LoginWithOpenIdParams) => Promise<void>> = jest.fn();
-const isLoggedInMock:jest.MockedFunction<() => Promise<boolean>> = jest.fn();
 
 const rpcProvider = {};
 
@@ -37,7 +36,6 @@ describe('MagicWallet', () => {
       },
       user: {
         logout: logoutMock,
-        isLoggedIn: isLoggedInMock,
       },
       rpcProvider,
     }));
@@ -87,7 +85,6 @@ describe('MagicWallet', () => {
 
   describe('login', () => {
     it('should call loginWithOIDC and initialise the provider with the correct arguments', async () => {
-      isLoggedInMock.mockImplementation(() => Promise.resolve(false));
       const magicAdapter = new MagicAdapter(config, magicProviderProxyFactory);
       const magicProvider = await magicAdapter.login(idToken);
 
@@ -100,22 +97,6 @@ describe('MagicWallet', () => {
         jwt: idToken,
         providerId,
       });
-
-      expect(magicProviderProxyFactory.createProxy).toHaveBeenCalled();
-      expect(magicProvider).toEqual(rpcProvider);
-    });
-
-    it('should not call loginWithOIDC if isLoggedIn is true', async () => {
-      isLoggedInMock.mockImplementation(() => Promise.resolve(true));
-      const magicAdapter = new MagicAdapter(config, magicProviderProxyFactory);
-      const magicProvider = await magicAdapter.login(idToken);
-
-      expect(Magic).toHaveBeenCalledWith(apiKey, {
-        network: 'mainnet',
-        extensions: [new OpenIdExtension()],
-      });
-
-      expect(loginWithOIDCMock).toBeCalledTimes(0);
 
       expect(magicProviderProxyFactory.createProxy).toHaveBeenCalled();
       expect(magicProvider).toEqual(rpcProvider);
