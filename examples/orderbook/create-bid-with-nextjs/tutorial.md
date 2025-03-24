@@ -1,284 +1,192 @@
-# Create a Bid with Next.js
+# Create Bid with Next.js
 
 ## Introduction
-This tutorial demonstrates how to create bids for NFTs using the Immutable Orderbook SDK in a Next.js application. It covers how to create bids for both ERC721 and ERC1155 tokens, integrating Passport for wallet connection and handling the bid creation process.
+This example demonstrates how to create bids for both ERC721 and ERC1155 tokens using the Immutable Orderbook SDK. It leverages Next.js for the frontend and Passport for authentication and wallet interactions. This app allows users to specify the details of their bids, including token addresses, token IDs, and amounts.
 
 [View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-bid-with-nextjs)
 
 ## Features Overview
 - Creating bids for ERC721 tokens
 - Creating bids for ERC1155 tokens
-- Setting custom marketplace fees for bids
 
 ## SDK Integration Details
 
-### **Creating a Bid for ERC721 Tokens**: [Prepares, signs, and creates a bid for an ERC721 token](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/create-bid-with-nextjs/src/app/create-bid-with-erc721/page.tsx)
-#### Implementation
-The application provides a form where users can enter the required details for creating a bid for an ERC721 token:
+### Creating Bids for ERC721 Tokens
+**Feature Name**: Create a bid for an ERC721 token.
 
+**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/create-bid-with-nextjs/src/app/create-bid-with-erc721/page.tsx)
+
+**Implementation**:
+
+Preparing the ERC721 bid:
 ```typescript
-// Prepare an ERC721 bid
 const prepareERC721Bid = async (): Promise<orderbook.PrepareBidResponse> => {
-  const sellItem: ERC20Item = {
-    type: 'ERC20',
+  // build the sell item
+  const sell: ERC20Item = {
+    type: "ERC20",
     contractAddress: sellItemContractAddress,
     amount: sellItemAmount,
   };
 
-  const buyItem: ERC721Item = {
-    type: 'ERC721',
+  // build the buy item
+  const buy: ERC721Item = {
+    type: "ERC721",
     contractAddress: buyItemContractAddress,
     tokenId: buyItemTokenID,
   };
 
+  // build the prepare bid parameters
   const prepareBidParams: PrepareBidParams = {
-    sellItem,
-    buyItem,
-    maker: accountsState[0],
+    makerAddress: accountsState[0],
+    buy,
+    sell,
   };
 
-  return orderbookSDK.prepareBid(prepareBidParams);
+  // invoke the orderbook SDK to prepare the bid
+  return await orderbookSDK.prepareBid(prepareBidParams);
 };
+```
 
-// Create an ERC721 bid
+Creating the ERC721 bid:
+```typescript
 const createER721Bid = async () => {
+  setBidErrorState(null);
+  setLoadingState(true);
+  setLoadingText('Creating bid');
+
+  if (!browserProvider) {
+    setBidErrorState("Please connect to Passport");
+    return;
+  }
+
   try {
-    setLoadingState(true);
-    setLoadingText("Preparing ERC721 bid");
+    // prepare the bid
     const preparedBid = await prepareERC721Bid();
-    
-    setLoadingText("Approving token");
-    await signAndSubmitApproval(browserProvider!, preparedBid);
-    
-    setLoadingText("Signing bid");
-    const orderSignature = await signBid(browserProvider!, preparedBid);
-    
-    setLoadingText("Creating bid");
+
+    // sign and submit approval transaction
+    await signAndSubmitApproval(browserProvider, preparedBid);
+
+    // sign the bid
+    const orderSignature = await signBid(browserProvider, preparedBid);
+
+    // create the bid
     const bidID = await createBid(
       orderbookSDK,
       preparedBid,
       orderSignature,
-      makerEcosystemFeeRecipient && makerEcosystemFeeAmount ? {
+      makerEcosystemFeeRecipient != "" ? {
         recipientAddress: makerEcosystemFeeRecipient,
         amount: makerEcosystemFeeAmount,
       } : undefined
     );
-    
+
     handleSuccessfulBidCreation(bidID);
-    setLoadingState(false);
-  } catch (error) {
-    // Error handling
+  } catch (error: any) {
+    console.error(error);
+    setSuccessMessageState(null);
+    setBidErrorState(`Something went wrong - ${error.message}`);
   }
+
+  setLoadingState(false);
 };
 ```
 
-#### Explanation
-The code works by:
-1. Preparing the bid by defining the sell item (ERC20 token used for payment) and buy item (ERC721 token the user wants to purchase)
-2. Approving the ERC20 token for trading by calling the `signAndSubmitApproval` function
-3. Signing the bid using the `signBid` function, which creates a signature for the order
-4. Creating the bid by submitting the order components, order hash, and signature to the Orderbook API
-5. Optionally adding marketplace fees for the maker
+**Explanation**:
+The code creates a bid for an ERC721 token by:
+1. Preparing a bid using the `prepareBid` method from the Orderbook SDK
+2. Defining a sell item (ERC20 token that the buyer is offering)
+3. Defining a buy item (ERC721 token that the buyer wants to purchase)
+4. Handling approval for the token transfer
+5. Signing the bid with the user's wallet
+6. Finally, creating the bid via the Orderbook SDK
 
-### **Creating a Bid for ERC1155 Tokens**: [Prepares, signs, and creates a bid for an ERC1155 token](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/create-bid-with-erc1155/page.tsx)
-#### Implementation
-The application provides a form where users can enter the required details for creating a bid for an ERC1155 token, including the quantity:
+### Creating Bids for ERC1155 Tokens
+**Feature Name**: Create a bid for an ERC1155 token.
 
+**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/create-bid-with-nextjs/src/app/create-bid-with-erc1155/page.tsx)
+
+**Implementation**:
+
+Preparing the ERC1155 bid:
 ```typescript
-// Prepare an ERC1155 bid
 const prepareERC1155Bid = async (): Promise<orderbook.PrepareBidResponse> => {
-  const sellItem: ERC20Item = {
-    type: 'ERC20',
+  // build the sell item
+  const sell: ERC20Item = {
+    type: "ERC20",
     contractAddress: sellItemContractAddress,
     amount: sellItemAmount,
   };
 
-  const buyItem: ERC1155Item = {
-    type: 'ERC1155',
+  // build the buy item
+  const buy: ERC1155Item = {
+    type: "ERC1155",
     contractAddress: buyItemContractAddress,
     tokenId: buyItemTokenID,
-    amount: buyItemQty,
+    amount: buyItemQty
   };
 
+  // build the prepare bid parameters
   const prepareBidParams: PrepareBidParams = {
-    sellItem,
-    buyItem,
-    maker: accountsState[0],
+    makerAddress: accountsState[0],
+    buy,
+    sell,
   };
 
-  return orderbookSDK.prepareBid(prepareBidParams);
+  // invoke the orderbook SDK to prepare the bid
+  return await orderbookSDK.prepareBid(prepareBidParams);
 };
 ```
 
-#### Explanation
-The process for creating an ERC1155 bid is similar to creating an ERC721 bid, with the main difference being that an ERC1155 bid includes an additional `amount` parameter, which specifies the quantity of tokens to bid for. This is because ERC1155 tokens are semi-fungible and can have multiple copies of the same token ID.
+**Explanation**:
+The code for creating ERC1155 bids is similar to ERC721, with the key difference being that ERC1155 tokens have a quantity parameter (`amount`) in addition to the token ID. This allows bidding for multiple copies of the same token type.
 
-### **Signing and Submitting Approvals**: [Handles token approvals for trading](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/create-bid-with-nextjs/src/app/utils/bid.ts)
-#### Implementation
-```typescript
-export const signAndSubmitApproval = async (
-  provider: BrowserProvider,
-  bid: orderbook.PrepareBidResponse,
-): Promise<void> => {
-  // get your user's Web3 wallet, e.g. MetaMask, Passport, etc
-  const signer = await provider.getSigner();
-
-  // If the user hasn't yet approved the Immutable Seaport contract to transfer assets from this
-  // collection on their behalf they'll need to do so before they create an order
-  const approvalActions = bid.actions.filter(
-    (action): action is orderbook.TransactionAction =>
-      action.type === orderbook.ActionType.TRANSACTION,
-  );
-
-  for (const approvalAction of approvalActions) {
-    const unsignedTx = await approvalAction.buildTransaction();
-    const receipt = await signer.sendTransaction(unsignedTx);
-    await receipt.wait();
-  }
-
-  return;
-};
-```
-
-#### Explanation
-Before creating a bid, the user must approve the Immutable Seaport contract to transfer tokens on their behalf. This function:
-1. Gets the user's Web3 wallet
-2. Filters for transaction actions in the prepared bid response
-3. Builds and sends the approval transaction for each action
-4. Waits for the transaction receipt, confirming that the approval was successful
-
-### **Signing Bids**: [Creates cryptographic signatures for order data](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/create-bid-with-nextjs/src/app/utils/bid.ts)
-#### Implementation
-```typescript
-export const signBid = async (
-  provider: BrowserProvider,
-  bid: orderbook.PrepareBidResponse,
-): Promise<string> => {
-  // get your user's Web3 wallet, e.g. MetaMask, Passport, etc
-  const signer = await provider.getSigner();
-
-  // For an order to be created (and subsequently filled), Immutable needs a valid signature for the order data.
-  // This signature is stored off-chain and is later provided to any user wishing to fulfil the open order.
-  // The signature only allows the order to be fulfilled if it meets the conditions specified by the user that created the bid.
-  const signableAction = bid.actions.find(
-    (action): action is orderbook.SignableAction =>
-      action.type === orderbook.ActionType.SIGNABLE,
-  )!;
-
-  const signature = await signer.signTypedData(
-    signableAction.message.domain,
-    signableAction.message.types,
-    signableAction.message.value,
-  );
-
-  return signature;
-};
-```
-
-#### Explanation
-For an order to be created and subsequently filled, Immutable needs a valid signature for the order data. This function:
-1. Gets the user's Web3 wallet
-2. Finds the signable action in the prepared bid response
-3. Signs the typed data using EIP-712 standard
-4. Returns the signature, which will be used when creating the bid
-
-### **Creating Bids**: [Submits the bid to the Orderbook API](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/create-bid-with-nextjs/src/app/utils/bid.ts)
-#### Implementation
-```typescript
-export const createBid = async (
-  client: orderbook.Orderbook,
-  preparedBid: orderbook.PrepareBidResponse,
-  orderSignature: string,
-  makerEcosystemFee?: {
-    recipientAddress: string;
-    amount: string;
-  },
-): Promise<string> => {
-  const order = await client.createBid({
-    orderComponents: preparedBid.orderComponents,
-    orderHash: preparedBid.orderHash,
-    orderSignature,
-    // Optional maker marketplace fee
-    makerFees: makerEcosystemFee ? [
-      {
-        recipientAddress: makerEcosystemFee.recipientAddress,
-        amount: makerEcosystemFee.amount,
-      },
-    ] : [],
-  });
-  return order.result.id;
-};
-```
-
-#### Explanation
-This function creates a bid by submitting the prepared bid, signature, and optional marketplace fees to the Orderbook API. It:
-1. Takes the Orderbook client, prepared bid, order signature, and optional maker ecosystem fee
-2. Calls the `createBid` method on the Orderbook client with the order components, order hash, and signature
-3. Includes optional maker marketplace fees if specified
-4. Returns the created bid's ID
+The bid creation process includes:
+1. Preparing a bid for an ERC1155 token, which includes a quantity
+2. Handling approval for the token transfer
+3. Signing the bid
+4. Creating the bid with optional marketplace fees
 
 ## Running the App
 
 ### Prerequisites
-- Node.js
-- A valid client ID and publishable API key from [Immutable Hub](https://hub.immutable.com)
+- Node.js (v16 or higher)
+- pnpm
+- [Immutable Hub](https://hub.immutable.com/) account for environment setup
 
-### Steps
-1. Install the dependencies:
-   ```bash
-   pnpm i
-   ```
+### Steps to Run the App Locally
 
-2. Copy the `.env.example` file to `.env`:
-   ```bash
-   cp .env.example .env
-   ```
+1. Clone the repository:
+```bash
+git clone https://github.com/immutable/ts-immutable-sdk.git
+```
 
-3. Replace the `NEXT_PUBLIC_PUBLISHABLE_KEY` and `NEXT_PUBLIC_CLIENT_ID` in the `.env` file with your own values from the Immutable Hub.
+2. Navigate to the example app directory:
+```bash
+cd ts-immutable-sdk/examples/orderbook/create-bid-with-nextjs
+```
 
-4. Run the development server:
-   ```bash
-   pnpm dev
-   ```
+3. Install dependencies:
+```bash
+pnpm install
+```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser to access the application.
+4. Create a `.env` file with your credentials:
+```
+PASSPORT_BASE_URL=https://passport.sandbox.immutable.com
+```
 
-### Creating an ERC721 Bid
-1. Click on the "Create ERC721 Bid" button
-2. Connect your Passport wallet
-3. Enter the following details:
-   - NFT Contract Address: The contract address of the ERC721 token
-   - NFT Token ID: The Token ID of the ERC721 token
-   - ERC20 Currency Contract Address: The contract address of ERC20 you'd like to use to make payment for the item
-   - Currency Amount: The amount of currency you'd like to use
-   - (Optional) Maker Ecosystem Fee Recipient: Address to receive the marketplace fee
-   - (Optional) Maker Ecosystem Fee Amount: Amount of the marketplace fee
-4. Click on the "Create Bid" button
-5. Approve the ERC20 token balance for trading
-6. Sign the bid
-7. If successful, the bid will be created, and the order ID will be displayed
+5. Start the development server:
+```bash
+pnpm dev
+```
 
-### Creating an ERC1155 Bid
-1. Click on the "Create ERC1155 Bid" button
-2. Connect your Passport wallet
-3. Enter the following details:
-   - NFT Contract Address: The contract address of the ERC1155 token
-   - NFT Token ID: The Token ID of the ERC1155 token
-   - NFT Token Quantity: The amount of ERC1155 tokens you'd like to bid for
-   - ERC20 Currency Contract Address: The contract address of ERC20 you'd like to use to make payment for the item
-   - Currency Amount: The amount of currency you'd like to use
-   - (Optional) Maker Ecosystem Fee Recipient: Address to receive the marketplace fee
-   - (Optional) Maker Ecosystem Fee Amount: Amount of the marketplace fee
-4. Click on the "Create Bid" button
-5. Approve the ERC20 token balance for trading
-6. Sign the bid
-7. If successful, the bid will be created, and the order ID will be displayed
+6. Open your browser and navigate to http://localhost:3000
 
 ## Summary
-This example demonstrates how to create bids for both ERC721 and ERC1155 tokens using the Immutable Orderbook SDK in a Next.js application. It covers the full process from preparing the bid, approving the tokens, signing the order, and creating the bid. The application also shows how to include marketplace fees in the bid creation process, providing a complete foundation for building a marketplace on Immutable.
+This example demonstrates how to integrate the Immutable Orderbook SDK with a Next.js application to create bids for both ERC721 and ERC1155 tokens. The app uses Passport for authentication and wallet interactions, allowing users to create bids by specifying the tokens and amounts involved in the transaction.
 
 Key takeaways:
-- The Orderbook SDK provides a simple interface for creating bids
-- The bid creation process involves three main steps: preparing the bid, approving tokens, and signing the order
-- You can create bids for both ERC721 and ERC1155 tokens with different parameters
-- Marketplace fees can be added to bids to generate revenue for your marketplace 
+- The Orderbook SDK provides methods to prepare and create bids for different token types
+- Wallet integration through Passport simplifies the authentication and signing process
+- The bid creation process involves multiple steps: preparing the bid, getting approvals, signing the order, and submitting it
+- Optional marketplace fees can be included when creating bids 

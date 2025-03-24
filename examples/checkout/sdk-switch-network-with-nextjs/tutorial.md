@@ -1,115 +1,137 @@
-# Switch Network with Next.js
+# Network Switching with Immutable SDK and MetaMask
 
 ## Introduction
-This example app demonstrates how to use the Immutable Checkout SDK to connect to a wallet provider (MetaMask) and switch between different blockchain networks. It showcases the network switching capabilities of the SDK in a simple Next.js application.
+This example app demonstrates how to use the Immutable Checkout SDK to switch between different networks (Sepolia Testnet and Immutable zkEVM Testnet) with a connected MetaMask wallet in a Next.js application. This is a crucial feature for blockchain applications that need to operate across multiple networks or guide users to switch to the correct network for specific operations.
 
-[View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-switch-network-with-nextjs)
+[View app on GitHub](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-switch-network-with-nextjs)
 
 ## Features Overview
-- Connect to a wallet using MetaMask
-- Get network information
-- Get supported networks list
-- Switch between different blockchain networks (Sepolia, Immutable zkEVM Testnet)
+- Switch network with MetaMask between Sepolia Testnet and Immutable zkEVM Testnet
 
 ## SDK Integration Details
 
-### **Get Network Information**: [Get information about the currently connected network](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/checkout/sdk-switch-network-with-nextjs/src/app/switch-with-metamask/page.tsx#L20-L37)
-#### Implementation
+### Switch Network with MetaMask
+**Feature Name**: Network switching allows users to seamlessly switch between different blockchain networks directly from your application.
+
+**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/checkout/sdk-switch-network-with-nextjs/src/app/switch-with-metamask/page.tsx)
+
+**Implementation**:
+
+1. First, connect to MetaMask:
 ```typescript
-// Get the network details
-const info = await checkoutSDK.getNetworkInfo({ provider });
+const connectWithMetamask = async () => {
+  // Create a provider given one of the default wallet provider names
+  const walletProviderName = checkout.WalletProviderName.METAMASK;
+  const providerRes = await checkoutSDK.createProvider({
+    walletProviderName,
+  });
+
+  // Connect and request wallet permissions
+  const connectRes = await checkoutSDK.connect({
+    provider: providerRes.provider,
+    requestWalletPermissions: true,
+  });
+
+  setConnectedProvider(connectRes.provider);
+}
 ```
-#### Explanation
-The `getNetworkInfo` method is used to retrieve details about the currently connected network, including the chain name, chain ID, and native currency. This information is then displayed in the UI to give users visibility into which network they are currently connected to.
 
-### **Create and Connect MetaMask Provider**: [Connect to MetaMask wallet with permissions](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/checkout/sdk-switch-network-with-nextjs/src/app/switch-with-metamask/page.tsx#L39-L62)
-#### Implementation
+2. Get the network information and supported networks:
 ```typescript
-// Create a provider given one of the default wallet provider names
-const walletProviderName = checkout.WalletProviderName.METAMASK;
-const providerRes = await checkoutSDK.createProvider({
-  walletProviderName,
-});
+const updateNetworkInfo = async (provider: WrappedBrowserProvider) => {
+  // Get the network details
+  const info = await checkoutSDK.getNetworkInfo({ provider });
+  setChainName(info.name);
+  setChainId(info.chainId.toString());
+  setNativeCurrency(info.nativeCurrency?.symbol || 'N/A');
+  setIsConnected(true);
+};
 
-// Get the current network information
-// Pass through requestWalletPermissions to request the user's wallet permissions
-const connectRes = await checkoutSDK.connect({
-  provider: providerRes.provider,
-  requestWalletPermissions: true,
-});
-```
-#### Explanation
-This code creates a MetaMask provider using the Checkout SDK and then connects to it with permission requests. The `requestWalletPermissions` flag ensures the user is prompted to grant the necessary permissions for the application to interact with their wallet.
-
-### **Check Wallet Connection**: [Verify if the wallet is connected](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/checkout/sdk-switch-network-with-nextjs/src/app/switch-with-metamask/page.tsx#L64-L68)
-#### Implementation
-```typescript
-// Check if the provider if a BrowserProvider
-const isConnectedRes = await checkoutSDK.checkIsWalletConnected({
-  provider: providerRes.provider,
-});
-```
-#### Explanation
-The `checkIsWalletConnected` method checks if the wallet is connected to the application. This is useful for determining whether to show the connection UI or the network switching UI.
-
-### **Get Supported Networks**: [Retrieve all supported networks](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/checkout/sdk-switch-network-with-nextjs/src/app/switch-with-metamask/page.tsx#L70-L74)
-#### Implementation
-```typescript
 // Get the list of default supported networks
 const type = checkout.NetworkFilterTypes.ALL;
 const supportedNetworks = await checkoutSDK.getNetworkAllowList({ type });
+setSupportedNetworks(supportedNetworks.networks.map(network => network.name));
 ```
-#### Explanation
-This code retrieves a list of all networks supported by the Immutable SDK. The `NetworkFilterTypes.ALL` parameter ensures that all networks (both mainnet and testnet) are included in the results.
 
-### **Switch Network**: [Change to a different blockchain network](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/checkout/sdk-switch-network-with-nextjs/src/app/switch-with-metamask/page.tsx#L82-L93)
-#### Implementation
+3. Switch to Immutable zkEVM Testnet:
 ```typescript
-// Switch to Immutable zkEVM Testnet and update the provider
-const chainId = checkout.ChainId.IMTBL_ZKEVM_TESTNET;
-const switchResponse = await checkoutSDK.switchNetwork({ provider: connectedProvider, chainId });
-
-// Update the provider
-setConnectedProvider(switchResponse.provider);
+const switchToImmutableZkEVMTestnet = async () => {
+  // Switch to Immutable zkEVM Testnet and update the provider
+  const chainId = checkout.ChainId.IMTBL_ZKEVM_TESTNET;
+  const switchResponse = await checkoutSDK.switchNetwork({ 
+    provider: connectedProvider, 
+    chainId 
+  });
+  
+  // Update the provider
+  setConnectedProvider(switchResponse.provider);
+  await updateNetworkInfo(switchResponse.provider);
+};
 ```
-#### Explanation
-The `switchNetwork` method is used to change the connected network to a different blockchain. In this example, it's switching to the Immutable zkEVM Testnet. After switching, it's important to update the provider reference as returned by the switchNetwork method.
+
+4. Switch to Sepolia Testnet:
+```typescript
+const switchToSepoliaTestnet = async () => {
+  const chainId = checkout.ChainId.SEPOLIA;
+  const switchResponse = await checkoutSDK.switchNetwork({ 
+    provider: connectedProvider, 
+    chainId 
+  });
+  setConnectedProvider(switchResponse.provider);
+  await updateNetworkInfo(switchResponse.provider);
+}
+```
+
+**Explanation**:
+
+The app provides a straightforward implementation of network switching:
+
+1. Users first connect their MetaMask wallet using the Checkout SDK's `createProvider` and `connect` methods.
+2. The app retrieves and displays the current network information using `getNetworkInfo` to show users which network they're currently on.
+3. The app also fetches and displays a list of supported networks using `getNetworkAllowList`.
+4. Two buttons are provided to switch between networks - one for Sepolia Testnet and one for Immutable zkEVM Testnet.
+5. When a user clicks either button, the app uses the `switchNetwork` method with the appropriate `chainId` to initiate the network switch.
+6. After switching, the UI updates to reflect the new network information.
+
+This implementation demonstrates how to seamlessly integrate network switching in your dApp to ensure users are on the correct network for specific operations.
 
 ## Running the App
 
 ### Prerequisites
-- Node.js (v16 or later)
-- pnpm installed
-- MetaMask browser extension
+- Node.js (v18 or later)
+- pnpm package manager
+- MetaMask browser extension installed
 - [Immutable Hub account](https://hub.immutable.com/) for environment setup
 
-### Steps to Run Locally
-1. Clone the repository
-   ```bash
-   git clone https://github.com/immutable/ts-immutable-sdk.git
-   cd ts-immutable-sdk
-   ```
+### Setup
+1. Clone the repository and navigate to the example app directory:
+```bash
+git clone https://github.com/immutable/ts-immutable-sdk.git
+cd ts-immutable-sdk/examples/checkout/sdk-switch-network-with-nextjs
+```
 
-2. Install dependencies
-   ```bash
-   pnpm install
-   ```
+2. Install dependencies:
+```bash
+pnpm install
+```
 
-3. Navigate to the example directory
-   ```bash
-   cd examples/checkout/sdk-switch-network-with-nextjs
-   ```
+3. Create an environment file:
+```bash
+cp .env.example .env
+```
 
-4. Start the development server
-   ```bash
-   pnpm dev
-   ```
+4. Add your publishable API key from Immutable Hub to the `.env` file:
+```
+NEXT_PUBLIC_PUBLISHABLE_KEY=your_publishable_key_here
+```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser
+### Running Locally
+Run the development server:
+```bash
+pnpm dev
+```
 
-6. Click "Connect MetaMask" to connect your wallet
-
-7. After connecting, you can use the buttons to switch between Sepolia and Immutable zkEVM Testnet networks
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
 ## Summary
-This example demonstrates how to integrate the Immutable Checkout SDK into a Next.js application to connect to MetaMask and switch between different blockchain networks. It shows how to get network information, check connection status, list supported networks, and switch between networks using the SDK's methods. This functionality is essential for dApps that need to ensure users are on the correct network for their application's functionality. 
+This example demonstrates how to implement network switching between Sepolia Testnet and Immutable zkEVM Testnet using the Immutable Checkout SDK. The implementation is straightforward, requiring just a few API calls to enable users to seamlessly switch networks directly from your application's UI. This functionality is essential for blockchain applications that need to guide users to the correct network for specific operations. 

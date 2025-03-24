@@ -1,43 +1,22 @@
 # Contract Interaction with Viem
 
 ## Introduction
-This example application demonstrates how to interact with Immutable ERC721 smart contracts using Viem, a TypeScript library for Ethereum. The app showcases batch minting functionality for ERC721 tokens using two different approaches: minting by specific token IDs and minting by quantity.
+This example demonstrates how to interact with Immutable ERC721 contracts using Viem, a TypeScript library for Ethereum. The example focuses on batch minting capabilities, allowing developers to efficiently mint multiple NFTs in a single transaction either by specific token IDs or by quantity. This approach leverages Viem's modern API to communicate directly with smart contracts on Immutable's zkEVM.
 
 [View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/contracts/contract-interaction-with-viem)
 
 ## Features Overview
-- Batch mint ERC721 tokens by specifying token IDs
-- Batch mint ERC721 tokens by specifying quantity
-- Role-based permission verification before minting
-- Integration with Immutable zkEVM network
+- Batch mint ERC721 tokens by specified token IDs
+- Batch mint ERC721 tokens by quantity
 
 ## SDK Integration Details
 
-### Role Verification
-**[Permission Checking](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/contracts/contract-interaction-with-viem/batch-mint-erc721-by-id.ts#L52-L63)**: The example demonstrates how to verify if an account has the required minter role before attempting to mint tokens.
+### Batch Mint ERC721 Tokens by ID
+**Feature Name**: Batch mint ERC721 tokens by specifying exact token IDs.
 
-```typescript
-// We can use the read function hasRole to check if the intended signer
-// has sufficient permissions to mint before we send the transaction
-const minterRole = await contract.read.MINTER_ROLE();
+**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/contracts/contract-interaction-with-viem/batch-mint-erc721-by-id.ts)
 
-const hasMinterRole = await contract.read.hasRole([
-  minterRole,
-  walletClient.account.address,
-]);
-
-if (!hasMinterRole) {
-  // Handle scenario without permissions...
-  console.log('Account doesnt have permissions to mint.');
-  return Promise.reject(
-    new Error('Account doesnt have permissions to mint.'),
-  );
-}
-```
-
-### Batch Minting by Token ID
-**[Batch Mint By ID](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/contracts/contract-interaction-with-viem/batch-mint-erc721-by-id.ts#L24-L73)**: This functionality allows minting multiple tokens with specific token IDs to different recipients in a single transaction.
-
+**Implementation**:
 ```typescript
 export const batchMintERC721ByID = async (
   privateKey: `0x${string}`,
@@ -71,18 +50,39 @@ export const batchMintERC721ByID = async (
     client: walletClient,
   });
 
-  // Permission verification code...
+  // Check if the intended signer has permissions to mint
+  const minterRole = await contract.read.MINTER_ROLE();
+  const hasMinterRole = await contract.read.hasRole([
+    minterRole,
+    walletClient.account.address,
+  ]);
+
+  if (!hasMinterRole) {
+    console.log('Account doesnt have permissions to mint.');
+    return Promise.reject(
+      new Error('Account doesnt have permissions to mint.'),
+    );
+  }
 
   const txHash = await contract.write.mintBatch([requests]);
-
-  console.log(`txHash: ${txHash}`);
   return txHash;
 };
 ```
 
-### Batch Minting by Quantity
-**[Batch Mint By Quantity](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/contracts/contract-interaction-with-viem/batch-mint-erc721-by-quantity.ts#L20-L70)**: This functionality enables minting a specified quantity of tokens to different recipients in a single transaction, with the contract automatically assigning token IDs.
+**Explanation**:
+This function enables batch minting of ERC721 tokens with specific token IDs. It works by:
+1. Defining the Immutable zkEVM testnet chain configuration
+2. Creating a wallet client using the provided private key
+3. Creating a contract instance using the Immutable ERC721 ABI
+4. Checking if the signer has the MINTER_ROLE permission
+5. Calling the `mintBatch` function on the contract with an array of mint requests, where each request specifies a recipient address and an array of token IDs to mint
 
+### Batch Mint ERC721 Tokens by Quantity
+**Feature Name**: Batch mint ERC721 tokens by specifying quantities.
+
+**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/contracts/contract-interaction-with-viem/batch-mint-erc721-by-quantity.ts)
+
+**Implementation**:
 ```typescript
 export const batchMintERC721ByQuantity = async (
   privateKey: `0x${string}`,
@@ -116,74 +116,67 @@ export const batchMintERC721ByQuantity = async (
     client: walletClient,
   });
 
-  // Permission verification code...
+  // Check if the intended signer has permissions to mint
+  const minterRole = await contract.read.MINTER_ROLE();
+  const hasMinterRole = await contract.read.hasRole([
+    minterRole,
+    walletClient.account.address,
+  ]);
+
+  if (!hasMinterRole) {
+    console.log('Account doesnt have permissions to mint.');
+    return Promise.reject(
+      new Error('Account doesnt have permissions to mint.'),
+    );
+  }
 
   const txHash = await contract.write.mintBatchByQuantity([mints]);
-
-  console.log(`txHash: ${txHash}`);
   return txHash;
 };
 ```
 
+**Explanation**:
+This function enables batch minting of ERC721 tokens by quantity. It works by:
+1. Defining the Immutable zkEVM testnet chain configuration
+2. Creating a wallet client using the provided private key
+3. Creating a contract instance using the Immutable ERC721 ABI
+4. Checking if the signer has the MINTER_ROLE permission
+5. Calling the `mintBatchByQuantity` function on the contract with an array of mint requests, where each request specifies a recipient address and the quantity of tokens to mint
+
 ## Running the App
 
 ### Prerequisites
-- Node.js installed on your machine
-- A private key with minter role permissions
-- An ERC721 contract deployed on Immutable zkEVM
-- [Immutable Hub account](https://hub.immutable.com/) for environment setup
+- Node.js (v16 or higher)
+- pnpm package manager
+- An Immutable account with zkEVM testnet IMX for gas fees
+- [Immutable Hub](https://hub.immutable.com/) for environment setup
 
-### Setup Instructions
-1. Clone the repository and navigate to the example app directory:
-   ```bash
-   git clone https://github.com/immutable/ts-immutable-sdk.git
-   cd ts-immutable-sdk/examples/contracts/contract-interaction-with-viem
-   ```
+### Installation
+1. Clone the repository:
+```bash
+git clone https://github.com/immutable/ts-immutable-sdk.git
+```
 
-2. Install the dependencies:
-   ```bash
-   pnpm i
-   ```
+2. Navigate to the examples directory:
+```bash
+cd ts-immutable-sdk/examples/contracts
+```
 
-3. Modify the example code to include your own private key and contract address:
+3. Install dependencies:
+```bash
+pnpm install
+```
+
+### Running the Example
+1. Update the environment variables in the example files with your own values:
    - Replace `PRIVATE_KEY` with your wallet's private key
    - Replace `CONTRACT_ADDRESS` with your deployed ERC721 contract address
    - Replace `ACCOUNT_ADDRESS_1` and `ACCOUNT_ADDRESS_2` with recipient addresses
 
-4. Create a simple test script (e.g., `test.ts`) to run one of the minting functions:
-   ```typescript
-   import { batchMintERC721ByID, batchMintERC721ByQuantity } from './index';
-
-   const main = async () => {
-     try {
-       // Example of minting by ID
-       const result = await batchMintERC721ByID(
-         '0xYOUR_PRIVATE_KEY',
-         '0xYOUR_CONTRACT_ADDRESS',
-         [
-           {
-             to: '0xRECIPIENT_ADDRESS_1',
-             tokenIds: [BigInt(1), BigInt(2)],
-           },
-           {
-             to: '0xRECIPIENT_ADDRESS_2',
-             tokenIds: [BigInt(3), BigInt(4)],
-           },
-         ]
-       );
-       console.log('Transaction hash:', result);
-     } catch (error) {
-       console.error('Error:', error);
-     }
-   };
-
-   main();
-   ```
-
-5. Compile and run the test script:
-   ```bash
-   npx ts-node test.ts
-   ```
+2. Run the example using Node.js or ts-node:
+```bash
+npx ts-node contract-interaction-with-viem/batch-mint-erc721-by-id.ts
+```
 
 ## Summary
-This example demonstrates how to interact with Immutable ERC721 contracts using Viem, focusing on batch minting capabilities. The application showcases two different approaches to minting multiple tokens: by specifying exact token IDs or by quantity. It also demonstrates the importance of verifying role-based permissions before attempting to execute contract functions. Developers can use this example as a foundation to build more complex minting functionality for their NFT projects on Immutable zkEVM. 
+This example demonstrates how to interact with Immutable ERC721 contracts using Viem, focusing on batch minting capabilities. By leveraging Viem's modern API and type-safe approach, developers can efficiently mint multiple NFTs in a single transaction, either by specifying exact token IDs or by quantity. This approach is particularly useful for gaming applications where multiple NFTs need to be minted efficiently. 
