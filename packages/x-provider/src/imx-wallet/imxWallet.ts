@@ -1,5 +1,10 @@
 import { Environment } from '@imtbl/config';
-import { BrowserProvider, toUtf8Bytes } from 'ethers';
+import {
+  BrowserProvider,
+  getBytes,
+  toUtf8Bytes,
+  toUtf8String,
+} from 'ethers';
 import {
   ConnectRequest,
   ConnectResponse,
@@ -25,6 +30,13 @@ export async function connect(
 ): Promise<ImxSigner> {
   const l1Signer = await l1Provider.getSigner();
   const address = await l1Signer.getAddress();
+
+  console.log('DEFAULT_CONNECTION_MESSAGE', { message: DEFAULT_CONNECTION_MESSAGE });
+  console.log('toUtf8Bytes.toString()', { toUtf8Bytes: toUtf8Bytes(DEFAULT_CONNECTION_MESSAGE).toString() });
+
+  console.log('toUtf8String 1', { toUtf8String: toUtf8String(toUtf8Bytes(DEFAULT_CONNECTION_MESSAGE)) });
+  console.log('toUtf8String 2', { toUtf8String: toUtf8String(getBytes(toUtf8Bytes(DEFAULT_CONNECTION_MESSAGE))) });
+
   const signature = await l1Signer.signMessage(toUtf8Bytes(DEFAULT_CONNECTION_MESSAGE));
   const iframe = await getOrSetupIFrame(env);
 
