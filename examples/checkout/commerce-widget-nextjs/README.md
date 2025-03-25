@@ -37,26 +37,8 @@ Build the app:
 pnpm build
 ```
 
-Run tests with latest compatible remote bundle of the widgets:
+Run tests with remote bundle of the widgets:
 
 ```bash
-pnpm test:remotewidgets
-```
-
-To run these tests using a local bundle of the widgets, first build the entire Checkout SDK from the root of `ts-immutable-sdk`:
-
-```bash
-pnpm build
-```
-
-Copy over the created widgets bundle to use for testing:
-
-```bash
-pnpm --filter @examples/commerce-widget-nextjs prepare:widgets
-```
-
-Run tests against the local bundle:
-
-```bash
-pnpm test
+pnpm test:remote
 ```

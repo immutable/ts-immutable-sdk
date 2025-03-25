@@ -3,8 +3,9 @@ import { v1 as sequenceCoreV1 } from '@0xsequence/core';
 import { trackDuration } from '@imtbl/metrics';
 import {
   BigNumberish, Contract, getBytes, hashMessage,
-  Interface, isCallException, keccak256, Signer, solidityPacked, ZeroAddress,
+  Interface, keccak256, Signer, solidityPacked, ZeroAddress,
   TypedDataEncoder, JsonRpcProvider, AbiCoder,
+  isError,
 } from 'ethers';
 import { MetaTransaction, MetaTransactionNormalised, TypedDataPayload } from './types';
 
@@ -92,17 +93,16 @@ export const getNonce = async (
     if (typeof result === 'bigint') {
       return encodeNonce(space, result);
     }
+    throw new Error('Unexpected result from contract.nonce() call.');
   } catch (error) {
-    if (isCallException(error)) {
-      // The most likely reason for a CALL_EXCEPTION is that the smart contract wallet
+    if (isError(error, 'BAD_DATA')) {
+      // The most likely reason for a BAD_DATA error is that the smart contract wallet
       // has not been deployed yet, so we should default to a nonce of 0.
       return BigInt(0);
     }
 
     throw error;
   }
-
-  throw new Error('Unexpected result from contract.nonce() call.');
 };
 
 export const encodeMessageSubDigest = (chainId: bigint, walletAddress: string, digest: string): string => (

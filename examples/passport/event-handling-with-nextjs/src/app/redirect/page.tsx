@@ -1,76 +1,93 @@
 'use client';
+
 import React, { useEffect, useState } from 'react';
-import { Button, Heading, Stack, Text, Spinner } from '@biom3/react';
-import { passportInstance } from '../utils/setupDefault';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Button, Heading, Stack } from '@biom3/react';
+import { passportInstance } from '../utils/setupDefault';
+
+// Simple loading indicator component to replace Spinner
+const LoadingIndicator = ({ size = 'medium' }) => {
+  const style = {
+    display: 'inline-block',
+    width: size === 'large' ? '40px' : size === 'medium' ? '30px' : '20px',
+    height: size === 'large' ? '40px' : size === 'medium' ? '30px' : '20px',
+    border: '3px solid rgba(0, 0, 0, 0.1)',
+    borderTopColor: '#3498db',
+    borderRadius: '50%',
+    animation: 'spin 1s linear infinite',
+  };
+  
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `
+      }} />
+      <div style={style} data-testid="loading-indicator" data-size={size}></div>
+    </>
+  );
+};
 
 export default function RedirectPage() {
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [processing, setProcessing] = useState(true);
 
   useEffect(() => {
-    // Handle the authentication callback
-    const handleCallback = async () => {
+    async function handleCallback() {
       try {
-        // Process the callback from Passport
-        await passportInstance.loginCallback();
-        setStatus('success');
-        
-        // Redirect back to the event-handling page after successful login
-        setTimeout(() => {
-          router.push('/event-handling');
-        }, 2000);
-      } catch (error) {
-        console.error('Authentication callback error:', error);
-        setStatus('error');
-        setErrorMessage(error instanceof Error ? error.message : String(error));
-      }
-    };
+        if (!passportInstance) {
+          throw new Error('Passport not initialized');
+        }
 
-    // Call the callback handler
+        // Use type assertion to tell TypeScript that passportInstance has a loginCallback method
+        const passport = passportInstance as any;
+        // Handle the callback from the Passport auth flow
+        await passport.loginCallback();
+        
+        // Redirect to the main event handling page
+        router.push('/event-handling');
+      } catch (err) {
+        console.error('Authentication error:', err);
+        setError(`Authentication failed: ${err instanceof Error ? err.message : String(err)}`);
+        setProcessing(false);
+      }
+    }
+
     handleCallback();
   }, [router]);
 
   return (
-    <Stack direction="column" alignItems="center" gap="large">
-      <Heading size="large">Authentication Callback</Heading>
+    <Stack direction="column" gap="large" alignItems="center" style={{ padding: '2rem' }}>
+      <Heading size="xxLarge">Authentication</Heading>
       
-      {status === 'loading' && (
-        <Stack direction="column" alignItems="center" gap="medium">
-          <Spinner size="large" />
-          <Text variant="body1">Processing authentication...</Text>
+      {processing && !error && (
+        <Stack direction="column" gap="medium" alignItems="center">
+          <LoadingIndicator size="large" />
+          <p>Processing your authentication, please wait...</p>
         </Stack>
       )}
       
-      {status === 'success' && (
-        <Stack direction="column" alignItems="center" gap="medium">
-          <Text variant="body1" style={{ color: 'green' }}>
-            Authentication successful!
-          </Text>
-          <Text variant="body2">
-            Redirecting you to the event handling page...
-          </Text>
-        </Stack>
-      )}
-      
-      {status === 'error' && (
-        <Stack direction="column" alignItems="center" gap="medium">
-          <Text variant="body1" style={{ color: 'red' }}>
-            Authentication failed!
-          </Text>
-          {errorMessage && (
-            <Text variant="body2">
-              Error: {errorMessage}
-            </Text>
-          )}
-          <Link href="/event-handling" passHref>
-            <Button variant="primary">
-              Return to Event Handling
-            </Button>
-          </Link>
-        </Stack>
+      {error && (
+        <div style={{ 
+          backgroundColor: '#FFEBEE', 
+          color: '#B71C1C', 
+          padding: '1rem', 
+          borderRadius: '4px',
+          maxWidth: '600px',
+          width: '100%'
+        }}>
+          <h3>Authentication Error</h3>
+          <p>{error}</p>
+          <p>
+            Please try to <a href="/" style={{ color: '#0D47A1', textDecoration: 'underline' }}>
+              return to the home page
+            </a> and connect again.
+          </p>
+        </div>
       )}
     </Stack>
   );

@@ -46,6 +46,7 @@ Copy these essential files from an existing example (e.g., login-with-nextjs):
 - src/app/layout.tsx (modify to use AppWrapper)
 - src/app/globals.css
 
+IMPORTANT: Ensure that you've gone through the Passport SDK Documentation and have a very deep understanding of the SDK before you start.
 # Step 2: Component Implementation
 
 ## Critical Import/Export Requirements
@@ -55,6 +56,8 @@ For ALL component files:
 - Verify all imports are correctly spelled and point to existing files
 - When importing from libraries, verify the component exists in that library
 - For Next.js client components, always include 'use client' at the top of the file
+
+IMPORTANT: MAKE SURE THAT THE PASSPORT SDK IS INITIALIZED CORRECTLY IN THE SETUPDEFAULT.TS FILE. REFER TO OTHER EXAMPLE APPS LIKE LOGIN-WITH-NEXTJS FOR THE CORRECT SETUP.
 
 ## Main Landing Page (src/app/page.tsx)
 Create a simple landing page with:

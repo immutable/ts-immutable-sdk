@@ -5,8 +5,8 @@ import AppWrapper from "./utils/wrapper";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Passport SDK - Event Handling with NextJS",
-  description: "Example of event handling with Immutable Passport SDK in Next.js",
+  title: "Passport SDK - Login with NextJS",
+  description: "Examples of different ways to login and logout with NextJS",
 };
 
 export default function RootLayout({
@@ -23,4 +23,4 @@ export default function RootLayout({
         </body>
     </html>
   );
-} 
+}

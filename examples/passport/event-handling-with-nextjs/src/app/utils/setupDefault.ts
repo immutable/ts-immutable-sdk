@@ -12,4 +12,6 @@ export const passportInstance = new passport.Passport({
     logoutRedirectUri: 'http://localhost:3000/logout', // replace with one of your logout URIs from Hub
     audience: 'platform_api',
     scope: 'openid offline_access email transact',
-}); 
+  });
+// #enddoc passport-instance
+

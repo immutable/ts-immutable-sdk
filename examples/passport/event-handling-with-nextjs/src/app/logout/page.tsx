@@ -1,59 +1,102 @@
 'use client';
+
 import React, { useEffect, useState } from 'react';
-import { Button, Heading, Stack, Text } from '@biom3/react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Button, Heading, Stack } from '@biom3/react';
+import { passportInstance } from '../utils/setupDefault';
+
+// Simple loading indicator component to replace Spinner
+const LoadingIndicator = ({ size = 'medium' }) => {
+  const style = {
+    display: 'inline-block',
+    width: size === 'large' ? '40px' : size === 'medium' ? '30px' : '20px',
+    height: size === 'large' ? '40px' : size === 'medium' ? '30px' : '20px',
+    border: '3px solid rgba(0, 0, 0, 0.1)',
+    borderTopColor: '#3498db',
+    borderRadius: '50%',
+    animation: 'spin 1s linear infinite',
+  };
+  
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `
+      }} />
+      <div style={style} data-testid="loading-indicator" data-size={size}></div>
+    </>
+  );
+};
 
 export default function LogoutPage() {
-  const [message, setMessage] = useState<string>('You have been logged out successfully.');
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [logoutComplete, setLogoutComplete] = useState(false);
 
-  // Add a useEffect that runs once on component mount to confirm logout was complete
   useEffect(() => {
-    try {
-      // Check if there's any error in the URL
-      const urlSearchParams = new URLSearchParams(window.location.search);
-      const params = Object.fromEntries(urlSearchParams.entries());
-      
-      if (params.error) {
-        setMessage(`Logout error: ${params.error_description || params.error}`);
-      } else {
-        // Successful logout
-        setMessage('You have been logged out successfully.');
+    async function completeLogout() {
+      try {
+        if (!passportInstance) {
+          throw new Error('Passport not initialized');
+        }
+
+        // Use type assertion to tell TypeScript that passportInstance has a logoutCallback method
+        const passport = passportInstance as any;
+        // This handles any cleanup required after redirecting from the logout endpoint
+        await passport.logoutCallback();
+        setLogoutComplete(true);
+      } catch (err) {
+        console.error('Logout error:', err);
+        setError(`Logout failed: ${err instanceof Error ? err.message : String(err)}`);
       }
-      
-      // Log the logout for demonstration purposes
-      console.log('Logout complete, all event listeners have been removed');
-      
-    } catch (error) {
-      console.error('Error during logout processing:', error);
-      setMessage('There was an error processing your logout.');
     }
+
+    completeLogout();
   }, []);
 
+  const handleReturnHome = () => {
+    router.push('/');
+  };
+
   return (
-    <Stack direction="column" alignItems="center" gap="large">
-      <Heading size="large">Logged Out</Heading>
+    <Stack direction="column" gap="large" alignItems="center" style={{ padding: '2rem' }}>
+      <Heading size="xxLarge">Logout</Heading>
       
-      <Stack direction="column" alignItems="center" gap="medium">
-        <Text variant="body1">{message}</Text>
-        
-        <Text variant="body2">
-          All event listeners have been cleaned up automatically.
-        </Text>
-      </Stack>
+      {!logoutComplete && !error && (
+        <Stack direction="column" gap="medium" alignItems="center">
+          <LoadingIndicator size="large" />
+          <p>Completing logout process...</p>
+        </Stack>
+      )}
       
-      <Stack direction="column" alignItems="center" gap="medium">
-        <Link href="/" passHref>
-          <Button variant="primary">
+      {logoutComplete && (
+        <Stack direction="column" gap="medium" alignItems="center">
+          <p>You have been successfully logged out.</p>
+          <Button variant="primary" onClick={handleReturnHome}>
             Return to Home
           </Button>
-        </Link>
-        
-        <Link href="/event-handling" passHref>
-          <Button variant="secondary">
-            Back to Event Handling Example
+        </Stack>
+      )}
+      
+      {error && (
+        <div style={{ 
+          backgroundColor: '#FFEBEE', 
+          color: '#B71C1C', 
+          padding: '1rem', 
+          borderRadius: '4px',
+          maxWidth: '600px',
+          width: '100%'
+        }}>
+          <h3>Logout Error</h3>
+          <p>{error}</p>
+          <Button variant="primary" onClick={handleReturnHome}>
+            Return to Home
           </Button>
-        </Link>
-      </Stack>
+        </div>
+      )}
     </Stack>
   );
 } 

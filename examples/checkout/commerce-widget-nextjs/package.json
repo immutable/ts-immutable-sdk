@@ -7,14 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "echo 'todo post v2 sdk release'",
-    "test:ui": "playwright test --ui",
-    "test:remotewidgets": "USE_REMOTE_WIDGETS=true playwright test"
+    "test:remote": "playwright test"
   },
   "dependencies": {
     "@biom3/react": "^0.25.21",
-    "@imtbl/sdk": "workspace:*",
-    "next": "14.2.7",
+    "@imtbl/sdk": "latest",
+    "next": "14.2.25",
     "react": "^18",
     "react-dom": "^18"
   },

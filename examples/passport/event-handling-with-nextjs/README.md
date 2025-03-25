@@ -1,152 +1,146 @@
-# Immutable Passport Event Handling Example (Next.js)
+# Immutable Passport Event Handling Example
 
-This example demonstrates how to implement proper event handling with the Immutable Passport SDK in a Next.js application. It covers connecting to Passport, setting up event listeners, handling different types of events, and properly cleaning up listeners when components unmount.
+This example demonstrates how to handle various events from the Immutable Passport SDK in a Next.js application. Learn how to properly set up event listeners, respond to different event types, and maintain proper cleanup.
 
 ## Features
 
-- Connection state handling and UI updates
-- Event listener registration and cleanup
-- Support for all standard Passport events:
-  - `connect` - Triggered when connection is established
-  - `disconnect` - Triggered when disconnected
-  - `accountsChanged` - Triggered when the current account changes
-  - `chainChanged` - Triggered when the blockchain network changes
-- Event logging with UI display
+- Real-time event monitoring for Passport provider events
+- Complete event lifecycle management (setup and cleanup)
+- Responsive UI that displays event information
+- Chain switching functionality demonstration
 - Comprehensive error handling
-- Complete authentication flow with login, callback, and logout
 
-## Setup Instructions
+## Events Demonstrated
 
-1. **Clone the repository**
+- `connect`: Triggered when the provider connects to the network
+- `disconnect`: Triggered when the provider disconnects
+- `accountsChanged`: Triggered when the user switches accounts or permissions change
+- `chainChanged`: Triggered when the user switches networks
+- `message`: Triggered when the provider receives a message
+
+## Prerequisites
+
+Before running this example, you'll need:
+
+1. Node.js (v18 or higher)
+2. An Immutable Hub account with:
+   - A registered application with Client ID
+   - A publishable API key
+
+## Environment Setup
+
+1. Create a `.env.local` file in the root directory with the following variables:
+
+```
+NEXT_PUBLIC_PUBLISHABLE_KEY=your_publishable_key
+NEXT_PUBLIC_CLIENT_ID=your_client_id
+```
+
+Replace the placeholder values with your actual credentials from Immutable Hub.
+
+## Installation
+
+Install the dependencies:
 
 ```bash
-git clone <repository-url>
-cd examples/passport/event-handling-with-nextjs
+pnpm install
 ```
 
-2. **Install dependencies**
+## Running the Example
+
+Start the development server:
 
 ```bash
-npm install
+pnpm run dev
 ```
 
-3. **Set environment variables**
+The application will be available at [http://localhost:3000](http://localhost:3000).
 
-Create a `.env.local` file in the root directory and add your Immutable Hub credentials:
+## Usage Instructions
 
-```
-NEXT_PUBLIC_PUBLISHABLE_KEY=your_publishable_key_from_hub
-NEXT_PUBLIC_CLIENT_ID=your_client_id_from_hub
-```
+1. **Connect Your Wallet**:
+   - Click "Connect with Passport" to initiate authentication
+   - Approve the connection in the Passport popup
 
-4. **Run the development server**
+2. **Observe Events**:
+   - After connecting, the "Event History" section will display real-time events
+   - Each event shows a timestamp and relevant data
 
-```bash
-npm run dev
-```
+3. **Trigger Events**:
+   - Use "Switch Chain" to toggle between chains (triggers chainChanged event)
+   - Disconnect to trigger the disconnect event
+   - Switch accounts in Passport to trigger accountsChanged event
 
-5. **Access the application**
+4. **Error Handling**:
+   - Try various error scenarios to see how the app handles them
+   - Error messages are displayed prominently for user feedback
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+## Project Structure
 
-## Implementation Details
+- `/src/app/page.tsx` - Main landing page
+- `/src/app/event-handling/page.tsx` - Core event handling implementation
+- `/src/app/redirect/page.tsx` - OAuth2 redirect handler
+- `/src/app/logout/page.tsx` - Logout functionality
+- `/src/app/utils/setupDefault.ts` - Passport SDK initialization
+- `/src/app/utils/wrapper.tsx` - App context wrapper
+- `/src/app/tests/unit/passport.test.js` - Unit tests
 
-### Event Handling
+## Best Practices Demonstrated
 
-The example demonstrates proper event handling techniques:
+### Event Listener Setup
 
 ```typescript
-// Setup event listeners when the component mounts
-useEffect(() => {
-  // Check if provider exists before setting up event listeners
-  if (!passportInstance.provider) {
-    console.warn('Provider not available');
-    return;
-  }
-
-  // Setup event handlers
-  const handleConnectEvent = () => {
-    setIsConnected(true);
-    addEventLog('connect', 'Connected to Passport');
-  };
-
-  const handleDisconnectEvent = () => {
-    setIsConnected(false);
-    setCurrentAccount(null);
-    setCurrentChainId(null);
-    addEventLog('disconnect', 'Disconnected from Passport');
-  };
-
-  // Register event listeners
-  try {
-    passportInstance.provider.on('connect', handleConnectEvent);
-    passportInstance.provider.on('disconnect', handleDisconnectEvent);
-    passportInstance.provider.on('accountsChanged', handleAccountsChanged);
-    passportInstance.provider.on('chainChanged', handleChainChanged);
-  } catch (error) {
-    console.error('Error setting up event listeners:', error);
-  }
-
-  // Critical: Clean up event listeners when component unmounts
-  return () => {
-    try {
-      if (passportInstance.provider) {
-        passportInstance.provider.removeListener('connect', handleConnectEvent);
-        passportInstance.provider.removeListener('disconnect', handleDisconnectEvent);
-        passportInstance.provider.removeListener('accountsChanged', handleAccountsChanged);
-        passportInstance.provider.removeListener('chainChanged', handleChainChanged);
-      }
-    } catch (error) {
-      console.error('Error cleaning up event listeners:', error);
-    }
-  };
-}, []);
+// Add event listeners
+provider.on('connect', handleConnect);
+provider.on('disconnect', handleDisconnect);
+provider.on('accountsChanged', handleAccountsChanged);
+provider.on('chainChanged', handleChainChanged);
+provider.on('message', handleMessage);
 ```
 
-### Best Practices Demonstrated
+### Proper Cleanup
 
-1. **Safety checks before adding event listeners**
-   - Always check if provider exists before adding listeners
-   - Use try/catch blocks for error handling
+```typescript
+// Cleanup function to remove event listeners
+return () => {
+  provider.removeListener('connect', handleConnect);
+  provider.removeListener('disconnect', handleDisconnect);
+  provider.removeListener('accountsChanged', handleAccountsChanged);
+  provider.removeListener('chainChanged', handleChainChanged);
+  provider.removeListener('message', handleMessage);
+};
+```
 
-2. **Proper cleanup in `useEffect` return function**
-   - Remove all event listeners when component unmounts
-   - Check if provider still exists before attempting to remove listeners
-   - Use the same handler references for both adding and removing listeners
+### Error Handling
 
-3. **Handling connection state**
-   - Track and display connection state in UI
-   - Handle disconnection gracefully
-
-4. **Event logging**
-   - Log events with timestamps
-   - Display in the UI for user feedback
+```typescript
+try {
+  // SDK operations here
+} catch (error) {
+  console.error('Error:', error);
+  setErrorMessage(`Error: ${error instanceof Error ? error.message : String(error)}`);
+}
+```
 
 ## Common Issues and Troubleshooting
 
-### "Provider not available" warning
-- This occurs when trying to access the provider before it's initialized
-- Solution: Add appropriate checks before accessing the provider
+- **Provider Not Available**: If the Passport provider is not available, ensure you've correctly initialized the SDK in `setupDefault.ts`.
+- **Event Listeners Not Working**: Make sure you're adding listeners after confirming the provider exists.
+- **Authentication Issues**: Verify your Client ID and redirect URIs in the Immutable Hub dashboard.
+- **Chain Switching Errors**: Some networks might not be supported by the user's wallet.
 
-### Events not firing
-- Verify that you're using the correct event names
-- Check that the provider is properly connected
-- Ensure event handlers have the correct signature
+## Additional Resources
 
-### Memory leaks
-- Always clean up event listeners in the `useEffect` return function
-- Use the same handler reference for both adding and removing listeners
+- [Immutable SDK Documentation](https://docs.immutable.com/docs/zkEVM/sdks)
+- [Immutable Passport Guide](https://docs.immutable.com/docs/zkEVM/products/passport)
+- [EIP-1193 Provider Events](https://eips.ethereum.org/EIPS/eip-1193)
 
 ## Testing
 
-This example includes comprehensive tests for the event handling functionality:
+Run the tests with:
 
 ```bash
-npm test
+pnpm run test
 ```
 
-## References
-
-- [Immutable Passport Documentation](https://docs.immutable.com/docs/zkEVM/tools/passport/)
-- [Immutable Passport Events Reference](https://docs.immutable.com/docs/zkEVM/tools/passport/events/)
-- [Next.js Documentation](https://nextjs.org/docs) 
+The test suite covers all major components and event handling functionality. 

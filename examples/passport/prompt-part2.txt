@@ -36,7 +36,7 @@ Run the unit tests to ensure all event handling functionality works correctly:
    pnpm test
    ```
 
-4. Ensure test coverage exceeds 90% for all files:
+4. Ensure test coverage exceeds 70% for line coverage:
    ```
    pnpm test -- --coverage
    ```

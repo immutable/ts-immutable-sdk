@@ -59,6 +59,7 @@ import {
   AddTokensWidgetParams,
   SaleWidgetParams,
   PurchaseWidgetParams,
+  TransferWidgetParams,
 } from './parameters';
 import {
   BridgeWidgetConfiguration,
@@ -71,8 +72,12 @@ import {
   AddTokensWidgetConfiguration,
   WidgetTheme,
   PurchaseWidgetConfiguration,
+  TransferWidgetConfiguration,
 } from './configurations';
 import { WrappedBrowserProvider } from '../../types';
+import {
+  TransferEventType, TransferFailed, TransferRejected, TransferSuccess,
+} from './events/transfer';
 
 /**
  * Enum representing the list of widget types.
@@ -87,6 +92,7 @@ export enum WidgetType {
   IMMUTABLE_COMMERCE = 'immutableCommerce',
   ADD_TOKENS = 'addTokens',
   PURCHASE = 'purchase',
+  TRANSFER = 'transfer',
 }
 
 /**
@@ -107,6 +113,7 @@ export type WidgetConfigurations = {
   [WidgetType.ADD_TOKENS]: AddTokensWidgetConfiguration;
   [WidgetType.PURCHASE]: PurchaseWidgetConfiguration;
   [WidgetType.IMMUTABLE_COMMERCE]: CommerceWidgetConfiguration;
+  [WidgetType.TRANSFER]: TransferWidgetConfiguration;
 };
 
 // Mapping each widget type to their parameters
@@ -120,6 +127,7 @@ export type WidgetParameters = {
   [WidgetType.ADD_TOKENS]: AddTokensWidgetParams;
   [WidgetType.PURCHASE]: PurchaseWidgetParams;
   [WidgetType.IMMUTABLE_COMMERCE]: CommerceWidgetParams;
+  [WidgetType.TRANSFER]: TransferWidgetParams;
 };
 
 /**
@@ -234,6 +242,14 @@ export type WidgetEventData = {
     [PurchaseEventType.CONNECT_SUCCESS]: PurchaseConnectSuccess;
     [PurchaseEventType.SUCCESS]: PurchaseSuccess;
     [PurchaseEventType.FAILURE]: PurchaseFailed;
+  } & OrchestrationMapping &
+  ProviderEventMapping;
+
+  [WidgetType.TRANSFER]: {
+    [TransferEventType.CLOSE_WIDGET]: {};
+    [TransferEventType.SUCCESS]: TransferSuccess;
+    [TransferEventType.FAILURE]: TransferFailed;
+    [TransferEventType.REJECTED]: TransferRejected;
   } & OrchestrationMapping &
   ProviderEventMapping;
 };

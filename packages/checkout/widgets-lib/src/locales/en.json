@@ -134,6 +134,29 @@
         "linkText": "Visit our FAQs"
       }
     },
+    "TRANSFER": {
+      "header": {
+        "title": "Send tokens"
+      },
+      "content": {
+        "fiatPricePrefix": "≈ USD",
+        "availableBalancePrefix": "Available",
+        "notAllExchangesSupportImmutableZkEVM": "Not all Exchanges Support Immutable zkEVM!",
+        "notAllExchangesSupportImmutableZkEVMDescription": "You can only send tokens within the Immutable zkEVM network. Some exchanges do not support Immutable zkEVM, so ensure your destination is compatible before sending, as retrieving funds can be difficult to impossible.",
+        "tokensSentSuccessfully": "Tokens Sent Successfully",
+        "seeTransactionOnImmutableZkEVM": "See transaction on Immutable zkEVM",
+        "sendingTokens": "Sending Tokens",
+        "waitingForYouToApproveTxn": "Waiting for you to Approve Transaction",
+        "waitingForYouToApproveTxnDescription": "Approve the transaction request to complete this transaction"
+      },
+      "form": {
+        "buttonText": "Send",
+        "coinSelectorHeading": "Select a token",
+        "coinAmountHeading": "Send",
+        "toAddressHeading": "To address",
+        "continueButtonText": "Continue"
+      }
+    },
     "SWAP": {
       "header": {
         "title": "Swap tokens"
@@ -145,14 +168,14 @@
       },
       "swapForm": {
         "from": {
-          "label": "From",
+          "label": "Sell",
           "inputPlaceholder": "0",
-          "selectorTitle": "What are you swapping from?"
+          "selectorTitle": "What are you selling?"
         },
         "to": {
-          "label": "To",
+          "label": "Buy",
           "inputPlaceholder": "0",
-          "selectorTitle": "What are you swapping to?"
+          "selectorTitle": "What are you buying?"
         },
         "buttonText": "Swap",
         "conversionRate": "1 {{fromSymbol}} ≈ {{rate}} {{toSymbol}}, inclusive of {{fee}}% fee"
@@ -163,8 +186,8 @@
       "validation": {
         "noAmountInputted": "Please input amount",
         "insufficientBalance": "Insufficient balance",
-        "noFromTokenSelected": "Select a token to swap",
-        "noToTokenSelected": "Select a token to receive"
+        "noFromTokenSelected": "Select a token to sell",
+        "noToTokenSelected": "Select a token to buy"
       },
       "success": {
         "text": "Success",
