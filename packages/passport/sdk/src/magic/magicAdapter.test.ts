@@ -61,7 +61,7 @@ describe('MagicWallet', () => {
         jest.spyOn(window.document, 'readyState', 'get').mockReturnValue('complete');
         const magicAdapter = new MagicAdapter(config, magicProviderProxyFactory);
         // @ts-ignore
-        expect(magicAdapter.lazyMagicClient).toBeDefined();
+        expect(magicAdapter.magicClient).toBeDefined();
       });
     });
 
