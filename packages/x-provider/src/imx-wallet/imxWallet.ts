@@ -1,8 +1,6 @@
 import { Environment } from '@imtbl/config';
 import {
   BrowserProvider,
-  getBytes,
-  toUtf8Bytes,
   toUtf8String,
 } from 'ethers';
 import {
@@ -21,7 +19,14 @@ import { messageResponseListener } from './messageResponseListener';
 import { ImxSigner } from './ImxSigner';
 import { getOrSetupIFrame } from './imxWalletIFrame';
 
-const DEFAULT_CONNECTION_MESSAGE = 'Only sign this request if you’ve initiated an action with Immutable X.';
+// "Only sign this request if you've initiated an action with Immutable X."
+const DEFAULT_CONNECTION_BYTES = new Uint8Array([
+  79, 110, 108, 121, 32, 115, 105, 103, 110, 32, 116, 104, 105, 115, 32, 114,
+  101, 113, 117, 101, 115, 116, 32, 105, 102, 32, 121, 111, 117, 226, 128, 153,
+  118, 101, 32, 105, 110, 105, 116, 105, 97, 116, 101, 100, 32, 97, 110, 32,
+  97, 99, 116, 105, 111, 110, 32, 119, 105, 116, 104, 32, 73, 109, 109, 117,
+  116, 97, 98, 108, 101, 32, 88, 46,
+]);
 const CONNECTION_FAILED_ERROR = 'The L2 IMX Wallet connection has failed';
 
 export async function connect(
@@ -31,13 +36,11 @@ export async function connect(
   const l1Signer = await l1Provider.getSigner();
   const address = await l1Signer.getAddress();
 
-  console.log('DEFAULT_CONNECTION_MESSAGE', { message: DEFAULT_CONNECTION_MESSAGE });
-  console.log('toUtf8Bytes.toString()', { toUtf8Bytes: toUtf8Bytes(DEFAULT_CONNECTION_MESSAGE).toString() });
+  // log read message here
+  console.log('DEFAULT_CONNECTION_BYTES.toString()', { bytes: DEFAULT_CONNECTION_BYTES.toString() });
+  console.log('DEFAULT_CONNECTION_BYTES.toUtf8String()', { bytes: toUtf8String(DEFAULT_CONNECTION_BYTES) });
 
-  console.log('toUtf8String 1', { toUtf8String: toUtf8String(toUtf8Bytes(DEFAULT_CONNECTION_MESSAGE)) });
-  console.log('toUtf8String 2', { toUtf8String: toUtf8String(getBytes(toUtf8Bytes(DEFAULT_CONNECTION_MESSAGE))) });
-
-  const signature = await l1Signer.signMessage(toUtf8Bytes(DEFAULT_CONNECTION_MESSAGE));
+  const signature = await l1Signer.signMessage(DEFAULT_CONNECTION_BYTES);
   const iframe = await getOrSetupIFrame(env);
 
   return new Promise((resolve, reject) => {
