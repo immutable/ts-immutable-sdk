@@ -1,18 +1,17 @@
 {
-  "name": "sdk-wallet-balance-with-nextjs",
+  "name": "@examples/commerce-widget-nextjs",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
-    "test": "playwright test"
+    "lint": "next lint",
+    "test:remote": "playwright test"
   },
   "dependencies": {
     "@biom3/react": "^0.25.21",
-    "@imtbl/sdk": "workspace:*",
-    "ethers": "^6.13.4",
+    "@imtbl/sdk": "latest",
     "next": "14.2.25",
     "react": "^18",
     "react-dom": "^18"
