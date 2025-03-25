@@ -2,9 +2,9 @@
 
 # Create Bid with Next.js
 
-This example demonstrates how to create bids for ERC721 and ERC1155 tokens using the Immutable Orderbook SDK with Next.js. It showcases how to integrate the Orderbook SDK with Immutable Passport for authentication and transaction signing.
-
 </div>
+
+This example demonstrates how to create bids for ERC721 and ERC1155 tokens using the Immutable Orderbook SDK with Next.js. It showcases how to integrate the Orderbook SDK with Immutable Passport for authentication and transaction signing.
 
 <div class="button-component">
 

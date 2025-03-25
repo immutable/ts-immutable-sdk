@@ -2,9 +2,9 @@
 
 # Create Listing with Next.js
 
-This example app demonstrates how to create NFT listings using the Immutable Orderbook SDK with Next.js. It shows how to create listings for both ERC721 and ERC1155 tokens, enabling users to list their NFTs for sale in exchange for either native currency or ERC20 tokens.
-
 </div>
+
+This example app demonstrates how to create NFT listings using the Immutable Orderbook SDK with Next.js. It shows how to create listings for both ERC721 and ERC1155 tokens, enabling users to list their NFTs for sale in exchange for either native currency or ERC20 tokens.
 
 <div class="button-component">
 

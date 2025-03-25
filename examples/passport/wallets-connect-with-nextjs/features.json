@@ -4,5 +4,5 @@
         "connect-with-ethersjs",
         "connect-with-wagmi"
     ],
-    "order": 4
+    "order": 3
 }

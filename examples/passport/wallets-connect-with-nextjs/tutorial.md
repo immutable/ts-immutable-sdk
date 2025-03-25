@@ -2,9 +2,9 @@
 
 # Wallets Connect with Next.js
 
-This example app demonstrates how to integrate Immutable Passport with different wallet connection methods in a Next.js application. It showcases three different approaches to connect with Passport: using EIP-1193, using ethers.js, and using Wagmi.
-
 </div>
+
+This example app demonstrates how to integrate Immutable Passport with different wallet connection methods in a Next.js application. It showcases three different approaches to connect with Passport: using EIP-1193, using ethers.js, and using Wagmi.
 
 <div class="button-component">
 

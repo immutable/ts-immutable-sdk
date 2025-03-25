@@ -2,9 +2,9 @@
 
 # User Information after Logging In with NextJS
 
-This example app demonstrates how to retrieve and display user information after a successful login using Immutable Passport in a NextJS application. It showcases several key Passport features for accessing user data.
-
 </div>
+
+This example app demonstrates how to retrieve and display user information after a successful login using Immutable Passport in a NextJS application. It showcases several key Passport features for accessing user data.
 
 <div class="button-component">
 

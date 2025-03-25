@@ -3,16 +3,17 @@ name: Publish Example App Tutorials
 on:
   # Run when changes are pushed to example tutorials or metadata
   push:
+    branches:
+      - main
     paths:
       - 'examples/*/*/tutorial.md'
       - 'examples/*/*/metadata.json'
-      - 'examples/_scripts/sample-app-parser.mjs'
   # Allow manual triggering
   workflow_dispatch:
 
 concurrency:
   group: example-tutorials
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   PublishExampleTutorials:
@@ -23,8 +24,7 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
-          # For testing, use the SDK development branch
-          ref: DVR-330-example-apps-content-autogeneration
+          ref: main
 
       - name: Checkout Docs Repo
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -32,8 +32,7 @@ jobs:
           repository: immutable/docs
           token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
           path: imx-docs
-          # For testing, use the docs development branch
-          ref: DVR-331-example-app-layout
+          ref: main
 
       - name: Setup environment variables
         run: |
@@ -71,7 +70,7 @@ jobs:
             git commit -m "Update example app tutorials from SDK repo"
             
             # Push to the target branch
-            git push -u origin DVR-331-example-app-layout
+            git push -u origin main
             echo "Successfully pushed example app tutorial changes to docs repo"
           else
             echo "No changes to commit"

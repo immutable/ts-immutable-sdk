@@ -2,11 +2,11 @@
 
 # Passport Wallet Message Signing with Next.js
 
+</div>
+
 This example demonstrates how to use the Passport SDK to sign messages using two different standards:
 - EIP-712 Typed Data Signing
 - ERC-191 Personal Signing
-
-</div>
 
 <div class="button-component">
 

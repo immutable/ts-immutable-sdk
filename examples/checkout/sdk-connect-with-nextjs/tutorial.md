@@ -2,9 +2,9 @@
 
 # Checkout SDK Connect with NextJS
 
-This tutorial demonstrates how to integrate the Immutable Checkout SDK into a Next.js application to connect with MetaMask wallets. The example shows how to retrieve a list of supported wallets, create a provider for MetaMask, connect to the wallet (with or without permissions), and check connection status.
-
 </div>
+
+This tutorial demonstrates how to integrate the Immutable Checkout SDK into a Next.js application to connect with MetaMask wallets. The example shows how to retrieve a list of supported wallets, create a provider for MetaMask, connect to the wallet (with or without permissions), and check connection status.
 
 <div class="button-component">
 

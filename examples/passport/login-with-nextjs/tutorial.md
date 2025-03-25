@@ -2,9 +2,9 @@
 
 # Login with Next.js
 
-This example app demonstrates different methods to implement user authentication using Immutable Passport in a Next.js application. It showcases three different login approaches: standard Passport login, login with EtherJS integration, and identity-only login without wallet connection.
-
 </div>
+
+This example app demonstrates different methods to implement user authentication using Immutable Passport in a Next.js application. It showcases three different login approaches: standard Passport login, login with EtherJS integration, and identity-only login without wallet connection.
 
 <div class="button-component">
 

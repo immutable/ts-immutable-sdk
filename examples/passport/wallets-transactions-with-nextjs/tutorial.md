@@ -2,9 +2,9 @@
 
 # Wallet Connection and Transaction Execution with Next.js
 
-This tutorial demonstrates how to integrate Immutable Passport's wallet connection and transaction execution capabilities within a Next.js application. It showcases how to establish a connection to the user's wallet and execute transactions on the Immutable zkEVM network.
-
 </div>
+
+This tutorial demonstrates how to integrate Immutable Passport's wallet connection and transaction execution capabilities within a Next.js application. It showcases how to establish a connection to the user's wallet and execute transactions on the Immutable zkEVM network.
 
 <div class="button-component">
 

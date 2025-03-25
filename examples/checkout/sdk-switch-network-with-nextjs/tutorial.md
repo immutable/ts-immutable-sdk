@@ -2,9 +2,9 @@
 
 # Switch Network with MetaMask using Next.js
 
-This example demonstrates how to use the Immutable Checkout SDK to connect to MetaMask and switch between different blockchain networks. The app allows users to connect their MetaMask wallet and switch between Sepolia Testnet and Immutable zkEVM Testnet.
-
 </div>
+
+This example demonstrates how to use the Immutable Checkout SDK to connect to MetaMask and switch between different blockchain networks. The app allows users to connect their MetaMask wallet and switch between Sepolia Testnet and Immutable zkEVM Testnet.
 
 <div class="button-component">
 

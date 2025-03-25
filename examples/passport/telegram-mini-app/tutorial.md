@@ -2,9 +2,9 @@
 
 # Telegram Mini App with Immutable Passport
 
-This tutorial demonstrates how to integrate Immutable Passport into a Telegram Mini App, enabling authentication and NFT transfers within the Telegram ecosystem.
-
 </div>
+
+This tutorial demonstrates how to integrate Immutable Passport into a Telegram Mini App, enabling authentication and NFT transfers within the Telegram ecosystem.
 
 <div class="button-component">
 

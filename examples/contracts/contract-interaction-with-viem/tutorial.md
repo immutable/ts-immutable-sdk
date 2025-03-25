@@ -2,9 +2,9 @@
 
 # Contract Interaction with Viem
 
-This example demonstrates how to interact with Immutable ERC721 contracts using Viem, a TypeScript library for Ethereum. The app showcases batch minting functionality for ERC721 tokens in two different ways: by specific token IDs and by quantity.
-
 </div>
+
+This example demonstrates how to interact with Immutable ERC721 contracts using Viem, a TypeScript library for Ethereum. The app showcases batch minting functionality for ERC721 tokens in two different ways: by specific token IDs and by quantity.
 
 <div class="button-component">
 

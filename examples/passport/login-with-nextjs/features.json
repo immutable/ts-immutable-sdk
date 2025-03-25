@@ -4,5 +4,5 @@
         "login-with-identity-only",
         "login-with-passport"
     ],
-    "order": 2
+    "order": 1
 }

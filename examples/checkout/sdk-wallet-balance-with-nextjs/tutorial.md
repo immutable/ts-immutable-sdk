@@ -1,10 +1,10 @@
 <div class="display-none">
 
-# Wallet Balance with MetaMask - Next.js Example
-
-This example application demonstrates how to use the Immutable Checkout SDK to connect to a MetaMask wallet and retrieve token balances. The app showcases how to fetch token information, check individual token balances, and list all token balances for a connected wallet.
+# Wallet Balance with MetaMask using Next.js
 
 </div>
+
+This example app demonstrates how to display wallet token balances using the Immutable Checkout SDK with a Next.js application. The app shows how to fetch wallet balances for native tokens, specific ERC-20 tokens, as well as retrieve token information like name, symbol, and decimals.
 
 <div class="button-component">
 
@@ -12,127 +12,90 @@ This example application demonstrates how to use the Immutable Checkout SDK to c
 
 </div>
 
-## Features Overview
+#### Features Overview
+- Retrieving wallet balance of connected MetaMask account
+- Fetching all token balances for a user's wallet
+- Getting token information (name, symbol, decimals)
+- Fetching balance for a specific token
+- Fetching native token balance
 
-- Fetching the list of supported tokens (token allow list)
-- Retrieving all token balances for a connected wallet
-- Getting specific token information by token address
-- Checking balance of a specific token
-- Retrieving native token balance
+#### SDK Integration Details
 
-## SDK Integration Details
-
-### Fetching Supported Tokens (Token Allow List)
-**Feature Name**: Retrieving the list of supported tokens to display in the UI.
-
-**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-wallet-balance-with-nextjs/src/app/wallet-balance-with-metamask/page.tsx)
-
+**Feature Name**: Wallet Balance with MetaMask
+**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/checkout/sdk-wallet-balance-with-nextjs/src/app/wallet-balance-with-metamask/page.tsx)
 **Implementation**:
+
+1. **Getting Token Allow List**:
 ```typescript
-// Get the list of supported tokens
 const tokenType = await checkout.TokenFilterTypes.ALL;
 const chainId = Number((await connectRes.provider.getNetwork()).chainId) as checkout.ChainId ?? checkout.ChainId.IMTBL_ZKEVM_TESTNET
 const tokenAllowList = await checkoutSDK.getTokenAllowList({ type: tokenType, chainId });
 ```
 
-**Explanation**: This code retrieves all supported tokens on the current chain. The `TokenFilterTypes.ALL` parameter indicates that all types of tokens should be included in the results. The chainId is determined from the connected provider's network, with a fallback to the Immutable zkEVM Testnet if not available.
-
-### Retrieving All Token Balances
-**Feature Name**: Fetching all token balances for a connected wallet address.
-
-**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-wallet-balance-with-nextjs/src/app/wallet-balance-with-metamask/page.tsx)
-
-**Implementation**:
+2. **Getting All Token Balances**:
 ```typescript
-// Get all token balances of the wallet
 const chainId = Number((await connectedProvider.provider.getNetwork()).chainId) as checkout.ChainId ?? checkout.ChainId.IMTBL_ZKEVM_TESTNET
 const allBalancesResponse = await checkoutSDK.getAllBalances({ provider: connectedProvider, walletAddress, chainId });
 ```
 
-**Explanation**: This code gets all token balances for the connected wallet address on the current chain. It uses the `getAllBalances` method from the Checkout SDK, which requires a provider, wallet address, and chain ID. The response includes both the raw balance value and a formatted balance value for each token.
-
-### Getting Token Information
-**Feature Name**: Retrieving detailed information about a specific token.
-
-**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-wallet-balance-with-nextjs/src/app/wallet-balance-with-metamask/page.tsx)
-
-**Implementation**:
+3. **Getting Token Information**:
 ```typescript
-// Get the details of a particular token
 const tokenAddress = "0xD61ffaece032CA6E0C469820707d677Feb4BEDD5";
 const tokenInfo = await checkoutSDK.getTokenInfo({ provider: connectedProvider, tokenAddress });
 ```
 
-**Explanation**: This code fetches detailed information about a specific token using its contract address. The `getTokenInfo` method returns token details including name, symbol, decimals, and icon URL if available.
-
-### Checking Specific Token Balance
-**Feature Name**: Retrieving the balance of a specific token for a connected wallet.
-
-**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-wallet-balance-with-nextjs/src/app/wallet-balance-with-metamask/page.tsx)
-
-**Implementation**:
+4. **Getting Specific Token Balance**:
 ```typescript
-// Get the balance of a particular token
 const tokenAddress = '0xD61ffaece032CA6E0C469820707d677Feb4BEDD5'
 const balanceResponse = await checkoutSDK.getBalance({ provider: connectedProvider, walletAddress, tokenAddress });
 ```
 
-**Explanation**: This code checks the balance of a specific ERC20 token using its contract address. The method requires the provider, wallet address, and token address. The response includes both the raw balance and a formatted balance that accounts for the token's decimal places.
-
-### Retrieving Native Token Balance
-**Feature Name**: Checking the native token (e.g., ETH) balance for a connected wallet.
-
-**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-wallet-balance-with-nextjs/src/app/wallet-balance-with-metamask/page.tsx)
-
-**Implementation**:
+5. **Getting Native Token Balance**:
 ```typescript
-// Get the balance of the native token
 const balanceResponse = await checkoutSDK.getBalance({ provider: connectedProvider, walletAddress });
 ```
 
-**Explanation**: This code retrieves the balance of the native token (such as ETH) for the connected wallet. Note that no token address is provided, which tells the SDK to fetch the native token balance. As with the ERC20 token balance, both raw and formatted balances are returned.
+**Explanation**:
 
-## Running the App
+This example app first connects to MetaMask, then demonstrates several ways to retrieve token balances:
 
-### Prerequisites
-- Node.js and pnpm installed
+1. The `getTokenAllowList` method returns a list of supported tokens on the current chain, including their name, symbol, address, and decimals.
+2. `getAllBalances` retrieves balances for all tokens in the user's wallet on the specified chain.
+3. `getTokenInfo` fetches detailed information for a specific token using its address.
+4. `getBalance` can be used to get the balance of a specific token by providing its address.
+5. When no token address is provided to `getBalance`, it returns the native token balance.
+
+The app displays all these balances in a user-friendly table format, showing both the raw hex values and the formatted balances.
+
+#### Running the App
+
+Prerequisites:
+- Node.js installed
 - MetaMask browser extension
-- An Immutable Hub account for environment setup ([Immutable Hub](https://hub.immutable.com/))
+- [Immutable Hub](https://hub.immutable.com/) account for environment setup
 
-### Steps to Run Locally
+Steps to run the app locally:
 
-1. Clone the repository:
+1. Clone the repository
+2. Navigate to the example directory:
    ```bash
-   git clone https://github.com/immutable/ts-immutable-sdk.git
-   cd ts-immutable-sdk/examples/checkout/sdk-wallet-balance-with-nextjs
+   cd examples/checkout/sdk-wallet-balance-with-nextjs
    ```
-
-2. Install dependencies:
+3. Install dependencies:
    ```bash
    pnpm install
    ```
-
-3. Create a `.env` file by copying the example:
-   ```bash
-   cp .env.example .env
+4. Copy `.env.example` to `.env` and add your Immutable Hub publishable key:
    ```
-
-4. Add your Immutable publishable key to the `.env` file:
+   NEXT_PUBLIC_PUBLISHABLE_KEY=<your-publishable-key>
    ```
-   NEXT_PUBLIC_PUBLISHABLE_KEY=your_publishable_key_from_hub
-   ```
-
 5. Start the development server:
    ```bash
    pnpm dev
    ```
+6. Open [http://localhost:3000](http://localhost:3000) in your browser
+7. Click the "Connect MetaMask" button to connect your wallet and view your token balances
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser with MetaMask installed
+#### Summary
 
-7. Click on "Wallet Balance with MetaMask" and then "Connect MetaMask" to interact with the app
-
-## Summary
-
-This example demonstrates how to use the Immutable Checkout SDK to interact with a user's wallet and retrieve token balances. Key functionality includes connecting to MetaMask, fetching supported tokens, retrieving token information, and checking token balances.
-
-The application showcases proper error handling and provides a clean UI for displaying token details and balances, making it a great starting point for developers who need to implement wallet balance functionality in their applications. 
+This example demonstrates how the Immutable Checkout SDK can be used to fetch wallet balances for both native and ERC-20 tokens. It shows developers how to retrieve token information, display formatted balances, and work with multiple tokens. This functionality is essential for any dApp that needs to display a user's token holdings or verify balances before transactions. 

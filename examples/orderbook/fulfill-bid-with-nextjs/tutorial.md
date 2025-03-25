@@ -2,9 +2,9 @@
 
 # Fulfill Bid with Next.js
 
-This example app demonstrates how to fulfill a bid using the Immutable Orderbook SDK with a Next.js frontend. It shows the process of fulfilling bids for both ERC721 and ERC1155 tokens.
-
 </div>
+
+This example app demonstrates how to fulfill a bid using the Immutable Orderbook SDK with a Next.js frontend. It shows the process of fulfilling bids for both ERC721 and ERC1155 tokens.
 
 <div class="button-component">
 

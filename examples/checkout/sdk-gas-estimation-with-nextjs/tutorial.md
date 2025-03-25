@@ -2,9 +2,9 @@
 
 # Gas Estimation with Checkout SDK and Next.js
 
-This example app demonstrates how to use the Immutable Checkout SDK to estimate gas fees for different types of transactions such as swaps and bridging to Layer 2.
-
 </div>
+
+This example app demonstrates how to use the Immutable Checkout SDK to estimate gas fees for different types of transactions such as swaps and bridging to Layer 2.
 
 <div class="button-component">
 

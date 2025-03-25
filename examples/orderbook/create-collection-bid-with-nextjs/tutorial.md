@@ -2,9 +2,9 @@
 
 # Create Collection Bid with Next.js
 
-This tutorial demonstrates how to create collection bids for both ERC721 and ERC1155 tokens using the Immutable Orderbook SDK with a Next.js application. A collection bid allows users to place bids on any NFT within a specific collection rather than a specific token.
-
 </div>
+
+This tutorial demonstrates how to create collection bids for both ERC721 and ERC1155 tokens using the Immutable Orderbook SDK with a Next.js application. A collection bid allows users to place bids on any NFT within a specific collection rather than a specific token.
 
 <div class="button-component">
 
