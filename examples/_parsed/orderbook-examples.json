@@ -3,7 +3,7 @@
     "tutorial": "create-bid-with-nextjs.md",
     "metadata": {
       "title": "Create Bid with Next.js",
-      "description": "An example Next.js application that demonstrates how to create bids for ERC721 and ERC1155 tokens using the Immutable Orderbook SDK",
+      "description": "An example demonstrating how to create bids for ERC721 and ERC1155 tokens using the Immutable Orderbook SDK with Next.js",
       "keywords": [
         "Immutable",
         "SDK",
@@ -16,71 +16,72 @@
       "tech_stack": [
         "Next.js",
         "TypeScript",
+        "React",
+        "Immutable SDK",
         "Passport SDK",
-        "Orderbook SDK",
-        "Biom3 UI"
+        "Orderbook SDK"
       ],
       "product": "Orderbook",
-      "programming_language": "TypeScript"
+      "programming_language": "TypeScript",
+      "sidebar_order": 1
     }
   },
   "create-collection-bid-with-nextjs": {
     "tutorial": "create-collection-bid-with-nextjs.md",
     "metadata": {
       "title": "Create Collection Bid with Next.js",
-      "description": "Example application demonstrating how to create collection bids for ERC721 and ERC1155 assets using the Immutable Orderbook SDK in a Next.js application",
+      "description": "Learn how to create collection bids for ERC721 and ERC1155 tokens using the Immutable Orderbook SDK and Next.js",
       "keywords": [
         "Immutable",
         "SDK",
         "Orderbook",
         "Collection Bid",
-        "NFT",
-        "Next.js",
         "ERC721",
-        "ERC1155"
+        "ERC1155",
+        "Next.js"
       ],
       "tech_stack": [
         "Next.js",
+        "React",
         "TypeScript",
         "Immutable SDK",
-        "ethers.js",
-        "Biom3"
+        "Passport"
       ],
       "product": "Orderbook",
-      "programming_language": "TypeScript"
+      "programming_language": "TypeScript",
+      "sidebar_order": 2
     }
   },
   "create-listing-with-nextjs": {
     "tutorial": "create-listing-with-nextjs.md",
     "metadata": {
-      "title": "Create Listing with NextJS",
-      "description": "A NextJS application that demonstrates how to create on-chain listings for ERC721 and ERC1155 tokens using the Immutable Orderbook SDK",
+      "title": "Create Listing with Next.js",
+      "description": "Learn how to create listings for ERC721 and ERC1155 tokens using the Immutable Orderbook SDK with Next.js",
       "keywords": [
         "Immutable",
         "SDK",
         "Orderbook",
-        "Listing",
+        "Create Listing",
         "ERC721",
         "ERC1155",
-        "NFT",
-        "NextJS"
+        "Next.js"
       ],
       "tech_stack": [
-        "NextJS",
+        "Next.js",
         "TypeScript",
         "Immutable SDK",
-        "ethers.js",
-        "Biome UI"
+        "ethers.js"
       ],
       "product": "Orderbook",
-      "programming_language": "TypeScript"
+      "programming_language": "TypeScript",
+      "sidebar_order": 3
     }
   },
   "fulfill-bid-with-nextjs": {
     "tutorial": "fulfill-bid-with-nextjs.md",
     "metadata": {
       "title": "Fulfill Bid with Next.js",
-      "description": "Example application demonstrating how to fulfill ERC721 and ERC1155 bids using the Immutable Orderbook SDK in a Next.js application",
+      "description": "Example app demonstrating how to fulfill bids for ERC721 and ERC1155 tokens using the Immutable Orderbook SDK with Next.js",
       "keywords": [
         "Immutable",
         "SDK",
@@ -92,50 +93,51 @@
       ],
       "tech_stack": [
         "Next.js",
-        "React",
         "TypeScript",
-        "ethers",
-        "@biom3/react"
+        "Immutable SDK",
+        "Ethers.js"
       ],
       "product": "Orderbook",
-      "programming_language": "TypeScript"
+      "programming_language": "TypeScript",
+      "sidebar_order": 4
     }
   },
   "fulfill-collection-bid-with-nextjs": {
     "tutorial": "fulfill-collection-bid-with-nextjs.md",
     "metadata": {
       "title": "Fulfill Collection Bid with Next.js",
-      "description": "A Next.js application demonstrating how to fulfill collection bids for both ERC721 and ERC1155 tokens using the Immutable Orderbook SDK and Passport for authentication",
+      "description": "Learn how to fulfill collection bids for both ERC721 and ERC1155 tokens using the Immutable Orderbook SDK with Next.js",
       "keywords": [
         "Immutable",
         "SDK",
         "Orderbook",
         "Collection Bid",
+        "Fulfill",
         "ERC721",
         "ERC1155",
-        "Passport"
+        "Next.js"
       ],
       "tech_stack": [
         "Next.js",
+        "React",
         "TypeScript",
-        "Biom3",
-        "Ethers.js"
+        "Immutable SDK"
       ],
       "product": "Orderbook",
-      "programming_language": "TypeScript"
+      "programming_language": "TypeScript",
+      "sidebar_order": 5
     }
   },
   "fulfill-listing-with-nextjs": {
     "tutorial": "fulfill-listing-with-nextjs.md",
     "metadata": {
-      "title": "Fulfill Listing with Next.js",
-      "description": "Example app demonstrating how to fulfill NFT listings for both ERC721 and ERC1155 tokens using the Immutable Orderbook SDK with Next.js",
+      "title": "Fulfill Listings with Next.js",
+      "description": "A Next.js application that demonstrates how to fulfill ERC721 and ERC1155 listings using the Immutable Orderbook SDK",
       "keywords": [
         "Immutable",
         "SDK",
         "Orderbook",
         "Fulfill Listing",
-        "NFT",
         "ERC721",
         "ERC1155",
         "Next.js"
@@ -144,12 +146,11 @@
         "Next.js",
         "TypeScript",
         "Immutable SDK",
-        "Immutable Passport",
-        "Orderbook SDK",
-        "Biom3 UI"
+        "Ethers.js"
       ],
       "product": "Orderbook",
-      "programming_language": "TypeScript"
+      "programming_language": "TypeScript",
+      "sidebar_order": 6
     }
   }
 }

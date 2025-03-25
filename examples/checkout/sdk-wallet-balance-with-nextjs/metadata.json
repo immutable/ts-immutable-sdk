@@ -1,9 +1,9 @@
 {
-    "title": "Wallet Balance with MetaMask using Next.js",
-    "description": "Learn how to retrieve and display wallet token balances (native and ERC-20) using the Immutable Checkout SDK with a Next.js application.",
-    "keywords": ["Immutable", "SDK", "Wallet Balance", "MetaMask", "Token Balance", "Next.js"],
-    "tech_stack": ["Next.js", "TypeScript", "React", "Biom3", "ethers"],
-    "product": "Checkout",
-    "programming_language": "TypeScript",
-    "sidebar_order": 2
+  "title": "Wallet Balance with NextJS",
+  "description": "Example app demonstrating how to check wallet balances using the Immutable Checkout SDK with NextJS",
+  "keywords": ["Immutable", "SDK", "Checkout", "Wallet Balance", "MetaMask"],
+  "tech_stack": ["NextJS", "TypeScript", "React"],
+  "product": "Checkout",
+  "programming_language": "TypeScript",
+  "sidebar_order": 2
 } 

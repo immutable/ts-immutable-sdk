@@ -2,8 +2,8 @@
   "sdk-connect-with-nextjs": {
     "tutorial": "sdk-connect-with-nextjs.md",
     "metadata": {
-      "title": "Connect with MetaMask using the Checkout SDK",
-      "description": "Learn how to connect a MetaMask wallet to your application using Immutable's Checkout SDK, with options for connecting with or without permissions.",
+      "title": "Connect with MetaMask in Next.js",
+      "description": "A Next.js example that demonstrates how to integrate the Immutable Checkout SDK to connect with MetaMask wallets, with and without explicit permissions",
       "keywords": [
         "Immutable",
         "SDK",
@@ -16,88 +16,83 @@
       "tech_stack": [
         "Next.js",
         "TypeScript",
-        "Ethers.js",
-        "Biom3",
-        "React"
+        "React",
+        "ethers.js"
       ],
       "product": "Checkout",
-      "programming_language": "TypeScript"
+      "programming_language": "TypeScript",
+      "sidebar_order": 1
     }
   },
   "sdk-gas-estimation-with-nextjs": {
     "tutorial": "sdk-gas-estimation-with-nextjs.md",
     "metadata": {
-      "title": "Gas Estimation with Next.js",
-      "description": "A Next.js application demonstrating how to use the Immutable Checkout SDK to estimate gas fees for swap and bridge to L2 transactions on Immutable zkEVM",
+      "title": "Gas Estimation with Checkout SDK and Next.js",
+      "description": "Example app demonstrating how to estimate gas fees for swap and bridge transactions using the Immutable Checkout SDK",
       "keywords": [
         "Immutable",
         "SDK",
         "Gas Estimation",
-        "MetaMask",
-        "Checkout",
         "Swap",
         "Bridge",
-        "zkEVM"
+        "Layer 2",
+        "MetaMask"
       ],
       "tech_stack": [
         "Next.js",
         "React",
         "TypeScript",
-        "MetaMask",
-        "Biom3"
+        "Ethers.js"
       ],
       "product": "Checkout",
-      "programming_language": "TypeScript"
+      "programming_language": "TypeScript",
+      "sidebar_order": 2
     }
   },
   "sdk-switch-network-with-nextjs": {
     "tutorial": "sdk-switch-network-with-nextjs.md",
     "metadata": {
-      "title": "Switch Network with MetaMask using Immutable SDK",
-      "description": "An example app demonstrating how to switch between Sepolia Testnet and Immutable zkEVM Testnet networks using Immutable Checkout SDK and MetaMask",
+      "title": "Switch Network with MetaMask using Next.js",
+      "description": "An example app demonstrating how to connect to MetaMask and switch between Ethereum networks using the Immutable Checkout SDK",
       "keywords": [
         "Immutable",
         "SDK",
-        "Checkout",
         "MetaMask",
         "Network Switching",
-        "zkEVM",
-        "Sepolia",
-        "NextJS"
+        "Checkout",
+        "Wallet Connection"
       ],
       "tech_stack": [
-        "NextJS",
+        "Next.js",
         "TypeScript",
-        "Biom3 UI",
         "React",
-        "Ethers.js",
-        "Immutable SDK"
+        "Ethers.js"
       ],
       "product": "Checkout",
-      "programming_language": "TypeScript"
+      "programming_language": "TypeScript",
+      "sidebar_order": 3
     }
   },
   "sdk-wallet-balance-with-nextjs": {
     "tutorial": "sdk-wallet-balance-with-nextjs.md",
     "metadata": {
-      "title": "Wallet Balance with Next.js",
-      "description": "A Next.js example app demonstrating how to use Immutable Checkout SDK to check wallet balances",
+      "title": "Wallet Balance with NextJS",
+      "description": "Example app demonstrating how to check wallet balances using the Immutable Checkout SDK with NextJS",
       "keywords": [
         "Immutable",
         "SDK",
         "Checkout",
         "Wallet Balance",
-        "MetaMask",
-        "Next.js"
+        "MetaMask"
       ],
       "tech_stack": [
-        "Next.js",
-        "React",
+        "NextJS",
         "TypeScript",
-        "Biom3"
+        "React"
       ],
       "product": "Checkout",
-      "programming_language": "TypeScript"
+      "programming_language": "TypeScript",
+      "sidebar_order": 2
     }
   }
 }

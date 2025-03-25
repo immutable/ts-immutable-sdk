@@ -71,6 +71,7 @@ For each Passport feature demonstrated in this example app (Note: This section s
 - Use bulleted lists for features and steps
 
 ### 3. Create metadata.json
+IMPORTANT: UI LIBRARY IS NOT A FEATURE OR TECH STACK.. IN GENERAL, NEVER INCLUDE UI LIBRARY IN THE METADATA.JSON FILE.
 Create a metadata.json file in the example app's root with the following structure:
 {
 "title": "[Descriptive title of the example app]",
