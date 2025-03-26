@@ -1,7 +1,7 @@
-import { TextEncoder } from 'util';
+import { TextEncoder, TextDecoder } from 'util';
 
 global.TextEncoder = TextEncoder;
-
+global.TextDecoder = TextDecoder;
 /**
  * Required for ethers v6
  * @see https://github.com/ethers-io/ethers.js/issues/4365
