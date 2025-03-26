@@ -4,6 +4,5 @@
   "keywords": ["Immutable", "SDK", "Orderbook", "Create Listing", "ERC721", "ERC1155", "Next.js"],
   "tech_stack": ["Next.js", "TypeScript", "Immutable SDK", "ethers.js"],
   "product": "Orderbook",
-  "programming_language": "TypeScript",
-  "sidebar_order": 3
+  "programming_language": "TypeScript"
 } 

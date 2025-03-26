@@ -23,7 +23,7 @@
       ],
       "product": "Orderbook",
       "programming_language": "TypeScript",
-      "sidebar_order": 1
+      "sidebar_order": 2
     }
   },
   "create-collection-bid-with-nextjs": {
@@ -49,7 +49,7 @@
       ],
       "product": "Orderbook",
       "programming_language": "TypeScript",
-      "sidebar_order": 2
+      "sidebar_order": 3
     }
   },
   "create-listing-with-nextjs": {
@@ -74,7 +74,7 @@
       ],
       "product": "Orderbook",
       "programming_language": "TypeScript",
-      "sidebar_order": 3
+      "sidebar_order": 1
     }
   },
   "fulfill-bid-with-nextjs": {
@@ -99,7 +99,7 @@
       ],
       "product": "Orderbook",
       "programming_language": "TypeScript",
-      "sidebar_order": 4
+      "sidebar_order": 5
     }
   },
   "fulfill-collection-bid-with-nextjs": {
@@ -125,19 +125,20 @@
       ],
       "product": "Orderbook",
       "programming_language": "TypeScript",
-      "sidebar_order": 5
+      "sidebar_order": 6
     }
   },
   "fulfill-listing-with-nextjs": {
     "tutorial": "fulfill-listing-with-nextjs.md",
     "metadata": {
-      "title": "Fulfill Listings with Next.js",
-      "description": "A Next.js application that demonstrates how to fulfill ERC721 and ERC1155 listings using the Immutable Orderbook SDK",
+      "title": "Fulfill Listing with Next.js",
+      "description": "Demonstrates how to fulfill ERC721 and ERC1155 listings using the Immutable Orderbook SDK with Next.js",
       "keywords": [
         "Immutable",
         "SDK",
         "Orderbook",
-        "Fulfill Listing",
+        "Listing",
+        "Fulfill",
         "ERC721",
         "ERC1155",
         "Next.js"
@@ -145,12 +146,11 @@
       "tech_stack": [
         "Next.js",
         "TypeScript",
-        "Immutable SDK",
-        "Ethers.js"
+        "ethers"
       ],
       "product": "Orderbook",
       "programming_language": "TypeScript",
-      "sidebar_order": 6
+      "sidebar_order": 4
     }
   }
 }

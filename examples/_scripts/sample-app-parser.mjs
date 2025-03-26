@@ -23,10 +23,18 @@ const main = (product) => {
     let metadataContent = '{}';
     try {
       metadataContent = fs.readFileSync(path.join(appDir, 'metadata.json'), 'utf8');
+      // add sidebar_order to metadata.json by using the features.json file
+      const featuresContent = fs.readFileSync(path.join(appDir, 'features.json'), 'utf8');
+      const features = JSON.parse(featuresContent);
+
+      const metadataObject = JSON.parse(metadataContent);
+      metadataObject.sidebar_order = features.order;
+      metadataContent = JSON.stringify(metadataObject, null, 2);
+      
     } catch (error) {
       console.log(`No metadata.json found for ${app}`);
     }
-
+    
     // Check if tutorial.md exists but don't read its content
     let tutorialExists = false;
     try {
