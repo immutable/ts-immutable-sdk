@@ -127,13 +127,14 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
   const [gasFeeToken, setGasFeeToken] = useState<TokenInfo | undefined>(undefined);
 
   const feeFiatValue = useMemo(() => {
-    console.log({ gasFeeToken, quote, fromToken });
     if (!gasFeeToken || !quote || !fromToken) return null;
 
     const gasFeeEstimateFiat = calculateCryptoToFiat(
       gasFeeValue,
       gasFeeToken.symbol,
       cryptoFiatState.conversions,
+      '0.00',
+      10,
     );
 
     const secondaryFeesTotal = quote.quote.fees?.reduce((acc, fee) => acc + fee.amount.value, 0n);
@@ -143,8 +144,9 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       cryptoFiatState.conversions,
     );
 
-    return Number(gasFeeEstimateFiat) + Number(secondaryFeesFiat);
-  }, [quote, cryptoFiatState.conversions]);
+    const res = Number(gasFeeEstimateFiat) + Number(secondaryFeesFiat);
+    return res;
+  }, [quote, cryptoFiatState.conversions, gasFeeToken, gasFeeValue, fromToken]);
 
   const [tokensOptionsFrom, setTokensOptionsForm] = useState<CoinSelectorOptionProps[]>([]);
   const formattedFees = useMemo(

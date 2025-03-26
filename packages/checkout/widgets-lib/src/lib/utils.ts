@@ -81,7 +81,10 @@ export const calculateCryptoToFiat = (
 
   const name = tokenSymbolNameOverrides[symbol.toLowerCase()] || symbol.toLowerCase();
   const conversion = conversions.get(name);
-  if (!conversion) return zeroString;
+  if (!conversion) {
+    console.log('no conversion', name);
+    return zeroString;
+  }
 
   const parsedAmount = parseFloat(amount);
   if (parseFloat(amount) === 0 || Number.isNaN(parsedAmount)) return zeroString;

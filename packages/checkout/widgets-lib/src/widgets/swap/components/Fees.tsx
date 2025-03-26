@@ -26,9 +26,6 @@ export function Fees({
 }: FeesProps) {
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
   const { t } = useTranslation();
-  if (!loading) return null;
-
-  const gasTokenSymbol = gasFeeToken?.symbol;
 
   const viewFees = () => {
     setShowFeeBreakdown(true);
@@ -83,7 +80,7 @@ export function Fees({
         </Accordion.TargetRightSlot>
       </Accordion>
       <FeesBreakdown
-        tokenSymbol={gasTokenSymbol ?? ''}
+        tokenSymbol={gasFeeToken?.symbol ?? ''}
         fees={fees}
         visible={showFeeBreakdown}
         loading={loading}
