@@ -1,174 +1,90 @@
-## Immutable Passport SDK Example App Generator - Part 2: Testing and Validation
+## Immutable Passport SDK Example App Generator - Part 2: Adding or Updating {feature name}
 
-# Overview
-This prompt helps you test, build, and validate the event-handling example app for the Immutable Passport SDK. It provides a comprehensive testing checklist and validation steps to ensure the app is fully functional.
+### Usage Instructions
+This prompt helps you:
+1. Add a new feature implementation to an existing example app
+2. Update an existing feature implementation
+3. Safely handle manually edited code
 
-# Step 1: Validation Checklist
-Before proceeding with testing, verify ALL of these items:
+**IMPORTANT**: Before running this prompt:
+- If the feature file contains the comment `/* MANUALLY EDITED - DO NOT OVERWRITE */`, the prompt will alert you before making changes
+- To add a new feature, specify the feature name that doesn't exist yet
+- To update a feature, specify the existing feature name to be updated
 
-- [ ] Code follows existing structure and naming conventions
-- [ ] All routes and pages are implemented correctly
-- [ ] ALL imports are valid and components are properly exported
-- [ ] No circular dependencies exist between components
-- [ ] Error handling is implemented for ALL asynchronous operations and events
-- [ ] Environment variables are documented in .env.example
-- [ ] Events are properly defined and handled
-- [ ] Event listeners and subscriptions are properly cleaned up
-- [ ] Components render without errors in all possible states
+### Initial Analysis
+1. Check if `src/app/{feature name}/page.tsx` already exists:
+   - If it exists, look for the `/* MANUALLY EDITED - DO NOT OVERWRITE */` comment
+   - If manually edited, alert the engineer and request confirmation before proceeding
+   - If not manually edited or if confirmation received, proceed with update
+   - If it doesn't exist, prepare to create a new implementation
 
-# Step 2: Testing Process
+2. Identify integration points with the existing app:
+   - Check for navigation components that need updating
+   - Verify any shared state or context requirements
+   - Identify any dependencies in the existing codebase
 
-## Unit Tests
-Run the unit tests to ensure all event handling functionality works correctly:
+3. Read the complete Passport SDK documentation for the {feature name} feature at https://docs.immutable.com/docs/zkEVM/products/passport.
 
-1. Navigate to the event-handling-with-nextjs directory:
-   ```
-   cd examples/passport/event-handling-with-nextjs
-   ```
+### Implementation Strategy
+1. For NEW feature implementation:
+   - Create `src/app/{feature name}/page.tsx` with the 'use client' directive
+   - Import all necessary components and SDK elements
+   - Implement the feature with proper error handling, loading states, and UI
+   - Update any navigation components to include the new feature (if applicable)
 
-2. Install dependencies:
-   ```
-   pnpm install
-   ```
+2. For UPDATING existing implementation:
+   - Preserve any custom imports or components specific to the app
+   - Update SDK-related code with the latest implementation
+   - Maintain the existing UI structure while updating functionality
+   - Preserve any custom logic that extends beyond the standard implementation
 
-3. Run the tests:
-   ```
-   pnpm test
-   ```
+3. For any implementation:
+   - Verify all SDK objects before use: `if (!passportInstance) return;`
+   - Use optional chaining: `instance?.method?.()`
+   - Wrap SDK calls in try/catch with appropriate error handling
+   - Display meaningful error messages to users
+   - Track and display loading states
 
-4. Ensure test coverage exceeds 70% for line coverage:
-   ```
-   pnpm test -- --coverage
-   ```
+### Feature Implementation Requirements
+1. Use only documented methods and properties that exist on the SDK
+2. Follow exact method signatures for all calls
+3. Type all variables properly with TypeScript
+4. Properly handle component lifecycle and cleanup
+5. Implement event listeners with proper typing and cleanup (when applicable)
+6. Structure UI with semantic HTML and Biom3 components
+7. Implement clear loading, success, and error states
 
-5. Verify that all tests pass without failures
+### Code Quality Checklist
+- [ ] All SDK objects checked for existence before use
+- [ ] All async operations wrapped in try/catch
+- [ ] Event listeners properly removed in cleanup functions
+- [ ] No references to unmounted components
+- [ ] Integration with existing app navigation/state (if applicable)
+- [ ] Proper TypeScript typing on all variables and functions
 
-6. Check that all event-related tests are checking:
-   - Event listener setup
-   - Event listener cleanup
-   - Event data handling
-   - UI updates in response to events
+### Readme Instructions
+Add the following to the project README.md under a "Feature Management" section:
 
-## Development Testing
-Start the development server and test the app functionality:
+```markdown
+## Feature Management
 
-1. Start the server:
-   ```
-   pnpm dev
-   ```
+### Adding New Features
+To add a new feature implementation to this example app:
+1. Run the {feature name} generator prompt
+2. Specify the new feature name when prompted
+3. The generator will create a new feature implementation at `src/app/{feature name}/page.tsx`
+4. Update any navigation components to include the new feature
 
-2. Manually test these scenarios:
-   - Complete login flow works without errors
-   - Redirect handling works correctly
-   - Logout flow completes successfully
-   - All event handlers function as expected (connect, disconnect, chainChanged, accountsChanged)
-   - UI correctly reflects all event state changes
-   - No error messages appear in the console during normal operation
-   - Event listeners are properly cleaned up (check with React DevTools)
+### Updating Features
+To update an existing feature implementation:
+1. Run the {feature name} generator prompt
+2. Specify the existing feature name to update
+3. The generator will update the implementation while preserving app-specific customizations
 
-3. Check the browser console for any errors during the entire process
+### Protecting Manual Edits
+If you've made manual edits to a feature implementation that you want to protect:
+1. Add the comment `/* MANUALLY EDITED - DO NOT OVERWRITE */` at the top of the file
+2. The generator will alert you before overwriting manually edited files
+```
 
-4. Verify all events are handled and displayed correctly
-
-5. Check React DevTools for any component errors or unexpected re-renders
-
-## Production Build Testing
-Test the production build of the application:
-
-1. Build the app:
-   ```
-   pnpm build
-   ```
-
-2. Start the production server:
-   ```
-   pnpm start
-   ```
-
-3. Verify that the production build works correctly:
-   - All pages load without errors
-   - Events are properly handled
-   - UI reflects event state changes
-   - No console errors appear
-
-# Step 3: Event-Specific Testing
-
-## Connect Event
-- [ ] Test that the connect event is properly captured and displayed
-- [ ] Verify connection state changes are shown in the UI
-- [ ] Confirm cleanup of connect event listeners
-
-## Disconnect Event
-- [ ] Test that the disconnect event is properly captured and displayed
-- [ ] Verify UI updates when disconnection occurs
-- [ ] Confirm cleanup of disconnect event listeners
-
-## Chain Changed Event
-- [ ] Test that chain changes are properly captured and displayed
-- [ ] Verify UI updates with chain information
-- [ ] Confirm cleanup of chainChanged event listeners
-
-## Accounts Changed Event
-- [ ] Test that account changes are properly captured and displayed
-- [ ] Verify UI updates with account information
-- [ ] Confirm cleanup of accountsChanged event listeners
-
-## Other Events
-- [ ] Test any other events implemented in the app
-- [ ] Verify proper event handling and UI updates
-- [ ] Confirm cleanup of all other event listeners
-
-# Step 4: Error Handling Testing
-
-## Edge Cases
-Test these edge cases to ensure proper error handling:
-
-- [ ] Provider not connected when attempting to add event listeners
-- [ ] Events firing with unexpected or missing data
-- [ ] Multiple rapid events firing in succession
-- [ ] Component unmounting while events are firing
-- [ ] Network disconnection during event handling
-
-## Error Recovery
-Verify that the app properly recovers from errors:
-
-- [ ] App doesn't crash when events fail
-- [ ] Error states are displayed to the user
-- [ ] User can retry after errors
-- [ ] Event listeners are still properly cleaned up after errors
-
-# Step 5: Performance Testing
-
-## Event Handling Performance
-Check that event handling performs efficiently:
-
-- [ ] Events are processed without noticeable delay
-- [ ] UI updates quickly in response to events
-- [ ] No memory leaks from event listeners (check with Chrome DevTools Memory tab)
-- [ ] No excessive re-renders when events fire (check with React DevTools Profiler)
-
-# Step 6: Documentation Validation
-
-## README Verification
-Ensure the README.md includes:
-
-- [ ] Clear description of the event handling features
-- [ ] Complete setup instructions
-- [ ] Detailed usage examples for each event type
-- [ ] Troubleshooting information for common issues
-- [ ] Best practices for event handling and cleanup
-
-# Step 7: Final Checklist
-
-Before considering the app complete, confirm ALL of these items:
-
-- [ ] All tests pass with >90% coverage
-- [ ] App builds successfully for production
-- [ ] All pages and routes work correctly
-- [ ] Event handling works properly in both development and production builds
-- [ ] Error handling is robust and user-friendly
-- [ ] Event listeners are properly cleaned up in all scenarios
-- [ ] Documentation is complete and accurate
-- [ ] Code follows best practices and standards
-- [ ] UI is clean, intuitive, and demonstrates the event handling clearly
-- [ ] No console errors or warnings during normal operation 
+This comprehensive guide will help you safely add or update feature implementations while respecting existing code and manual edits.

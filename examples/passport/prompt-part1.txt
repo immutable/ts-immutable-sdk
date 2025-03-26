@@ -1,20 +1,20 @@
 ## Immutable Passport SDK Example App Generator - Part 1: Create the App
 
 # Overview
-This prompt helps you create a new React example app that demonstrates the event-handling feature of the Immutable Passport SDK. The output will be a fully functional, self-contained example with proper documentation and adherence to best practices.
+This prompt helps you create a new React example app that demonstrates the {feature name} feature of the Immutable Passport SDK. The output will be a fully functional, self-contained example with proper documentation and adherence to best practices.
 
 # App Information
-- Feature name: event-handling
+- Feature name: {feature name}
 - Framework: nextjs
 
 # Step 1: Core Setup
-Create a new example app named event-handling-with-nextjs in /examples/passport/ with this structure:
+Create a new example app named {feature name}-with-nextjs in /examples/passport/ with this structure:
 
 ```
-/examples/passport/event-handling-with-nextjs/
+/examples/passport/{feature name}-with-nextjs/
 ├── src/app/
 │   ├── page.tsx                    # Main landing page with feature links
-│   ├── event-handling/page.tsx     # Primary feature implementation
+│   ├── {feature name}/page.tsx     # Primary feature implementation
 │   ├── redirect/page.tsx           # Auth redirect handler
 │   ├── logout/page.tsx             # Logout functionality
 │   ├── utils/                      # Shared utilities
@@ -36,7 +36,7 @@ Create a new example app named event-handling-with-nextjs in /examples/passport/
 ```
 
 Copy these essential files from an existing example (e.g., login-with-nextjs):
-- package.json (update the name to "event-handling-with-nextjs", but keep ALL dependency versions the same)
+- package.json (update the name to "{feature name}-with-nextjs", but keep ALL dependency versions the same)
 - next.config.mjs
 - tsconfig.json
 - .env.example
@@ -58,30 +58,13 @@ For ALL component files:
 - For Next.js client components, always include 'use client' at the top of the file
 
 IMPORTANT: MAKE SURE THAT THE PASSPORT SDK IS INITIALIZED CORRECTLY IN THE SETUPDEFAULT.TS FILE. REFER TO OTHER EXAMPLE APPS LIKE LOGIN-WITH-NEXTJS FOR THE CORRECT SETUP.
+IMPORTANT: DON'T IMPLEMENT THE {feature name} AT ALL. JUST SETUP THE PROJECT STRUCTURE AND DOCUMENTATION.
 
 ## Main Landing Page (src/app/page.tsx)
 Create a simple landing page with:
-- Brief description of the Passport event handling features
-- Link to the event-handling implementation page
+- Brief description of the Passport {feature name} features
+- Link to the {feature name} implementation page
 - Clear, concise UI using standard HTML (h1, h2, p) and Biom3 Button components
-
-## Feature Implementation (src/app/event-handling/page.tsx)
-Create a self-contained implementation that:
-- Demonstrates all available Passport events 
-- Uses proper initialization and cleanup patterns
-- Shows user feedback for different event states
-- Uses standard HTML tags (h1, h2, p) for text (NOT Text component)
-- Uses Biom3 components for UI elements
-- Displays event data in the UI for user feedback
-- Thoroughly validates all props and types
-- Shows how to properly handle connection state changes
-
-Include examples of handling these events:
-- connect
-- disconnect
-- chainChanged
-- accountsChanged
-- any other relevant Passport events
 
 ## Redirect and Logout Pages
 Create minimal, functional redirect and logout pages:
@@ -90,14 +73,17 @@ Create minimal, functional redirect and logout pages:
 - For the logout page, implement proper token cleanup
 - VERIFY that all components used in these pages are properly imported
 
+## Feature Implementation (src/app/{feature name}/page.tsx)
+- THIS PAGE SHOULD JUST BE A PLACEHOLDER FOR NOW. IT SHOULD NOT IMPLEMENT ANY FUNCTIONALITY.
+
 # Step 3: Documentation
 Create a comprehensive README.md including:
-- Event handling feature description and purpose
+- {feature name} feature description and purpose
 - Setup instructions including environment variables
-- Usage instructions with code examples for all event types
+- Usage instructions with code examples for all {feature name} types
 - Common issues and troubleshooting
 - References to official documentation
-- Event cleanup best practices
+- {feature name} cleanup best practices
 
 # Step 4: Testing Files
 
@@ -228,51 +214,38 @@ Create comprehensive tests in src/app/tests/unit/passport.test.js:
     passportInstance: mockPassportInstance,
   }));
   ```
-- Test event handling functionality thoroughly with all possible scenarios
-- Test UI rendering for all event states
-- Test all event handling and cleanup
+- Test {feature name} functionality thoroughly with all possible scenarios
+- Test all {feature name} handling and cleanup
 - Explicitly validate that components render without errors
 - Use act() for all asynchronous operations
 - Aim for >90% code coverage
 
 # Step 5: Implementation Guidelines
-
+IMPORTANT: MAKE SURE THAT THE PASSPORT SDK IS INITIALIZED CORRECTLY IN THE SETUPDEFAULT.TS FILE. REFER TO OTHER EXAMPLE APPS LIKE LOGIN-WITH-NEXTJS FOR THE CORRECT SETUP.
 ## SDK Usage Best Practices
-- Use only documented public API methods
+- Use only documented public SDK methods
 - If using internal properties, document with comments and type assertions
 - Always implement proper cleanup in useEffect hooks
 - Use local type definitions instead of importing non-exported types
-- Add robust error handling for all events and operations
-- Log important event changes
+- Add robust error handling for all {feature name} and operations
 - Add TypeScript type guards for any SDK properties that might be undefined
-
-## Event Handling Best Practices
-- Demonstrate proper event listener setup and cleanup
-- Show different types of events (connect, disconnect, chainChanged, etc.)
-- Display event data in UI for user feedback
-- Include comprehensive error handling
-- ALWAYS check if the provider exists before adding event listeners
-- Use try/catch blocks around all event handler operations
-- Implement robust cleanup of all event listeners in useEffect return functions
-- Verify connection state changes are properly tracked and displayed
 
 ## UI Best Practices
 - Use standard HTML elements (h1, h2, h3, p) for text content, NOT Text component
 - Use Biom3 Button and other UI components as documented
 - Show clear loading/error states
-- Provide user feedback for events
-- Keep UI simple and focused on demonstrating the event handling
+- Keep UI simple and focused on demonstrating the {feature name}
 
 ## Critical Error Prevention
 - Always check if objects exist before accessing their properties or methods
 - Use optional chaining when accessing potentially undefined properties: obj?.prop?.method?.()
-- Wrap all event listener setup and teardown in try/catch blocks
+- Wrap all {feature name} setup and teardown in try/catch blocks
 - Test component mounting/unmounting thoroughly to catch cleanup issues
 
 ## Common Pitfalls to Avoid
 - DO NOT call methods that don't exist on the SDK instances
 - DO NOT try to import types that aren't explicitly exported
-- DO NOT forget to clean up event listeners, subscriptions, intervals
+- DO NOT forget to clean up {feature name} setup and teardown
 - DO NOT use custom components or providers unless necessary
 - DO NOT modify dependency versions in package.json
 - DO NOT use inconsistent import methods (mixing default and named imports)
