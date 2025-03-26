@@ -1,6 +1,7 @@
 import { Environment } from '@imtbl/config';
 import {
   BrowserProvider,
+  toUtf8Bytes,
   toUtf8String,
 } from 'ethers';
 import {
@@ -27,6 +28,37 @@ const DEFAULT_CONNECTION_BYTES = new Uint8Array([
   97, 99, 116, 105, 111, 110, 32, 119, 105, 116, 104, 32, 73, 109, 109, 117,
   116, 97, 98, 108, 101, 32, 88, 46,
 ]);
+const DEFAULT_CONNECTION_STRING_1 = 'Only sign this request if you’ve initiated an action with Immutable X.';
+const DEFAULT_CONNECTION_STRING_2 = Buffer.from(DEFAULT_CONNECTION_STRING_1, 'utf8').toString('utf8');
+console.log('DEFAULT_CONNECTION_STRING_2', { string: DEFAULT_CONNECTION_STRING_2 });
+
+// log utf8 bytes
+console.log('DEFAULT_CONNECTION_BYTES.toString()', { bytes: DEFAULT_CONNECTION_BYTES.toString() });
+console.log('DEFAULT_CONNECTION_STRING_1', { bytes: toUtf8Bytes(DEFAULT_CONNECTION_STRING_1).toString() });
+console.log('DEFAULT_CONNECTION_STRING_2', { bytes: toUtf8Bytes(DEFAULT_CONNECTION_STRING_2).toString() });
+console.log(
+  'DEFAULT_CONNECTION_STRING_1.normalize()',
+  { bytes: toUtf8Bytes(DEFAULT_CONNECTION_STRING_1.normalize()).toString() },
+);
+console.log(
+  'DEFAULT_CONNECTION_STRING_2.normalize()',
+  { bytes: toUtf8Bytes(DEFAULT_CONNECTION_STRING_2.normalize()).toString() },
+);
+console.log(
+  'Buffer.from(DEFAULT_CONNECTION_STRING_1, utf8).toString()',
+  { bytes: Buffer.from(DEFAULT_CONNECTION_STRING_1, 'utf8').toString() },
+);
+
+// console.log if the bytes of DEFAULT_CONNECTION_STRING_1 and DEFAULT_CONNECTION_STRING_2 are the same as DEFAULT_CONNECTION_BYTES
+console.log(
+  'DEFAULT_CONNECTION_BYTES === toUtf8Bytes(DEFAULT_CONNECTION_STRING_1)',
+  { bytes: DEFAULT_CONNECTION_BYTES.toString() === toUtf8Bytes(DEFAULT_CONNECTION_STRING_1).toString() },
+);
+console.log(
+  'DEFAULT_CONNECTION_BYTES === toUtf8Bytes(DEFAULT_CONNECTION_STRING_2)',
+  { bytes: DEFAULT_CONNECTION_BYTES.toString() === toUtf8Bytes(DEFAULT_CONNECTION_STRING_2).toString() },
+);
+
 const CONNECTION_FAILED_ERROR = 'The L2 IMX Wallet connection has failed';
 
 export async function connect(
