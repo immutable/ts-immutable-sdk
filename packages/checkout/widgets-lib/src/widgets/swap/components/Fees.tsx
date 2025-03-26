@@ -16,8 +16,8 @@ interface FeesProps {
   gasFeeToken?: TokenInfo;
   feeFiatValue: number | null;
   fees: FormattedFee[];
-  onFeesClick?: () => void;
-  loading?: boolean;
+  onFeesClick: () => void;
+  loading: boolean;
   sx?: SxProps;
 }
 
@@ -26,6 +26,8 @@ export function Fees({
 }: FeesProps) {
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
   const { t } = useTranslation();
+
+  if (!loading && !feeFiatValue) return null;
 
   const viewFees = () => {
     setShowFeeBreakdown(true);

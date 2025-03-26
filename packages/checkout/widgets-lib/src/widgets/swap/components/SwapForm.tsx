@@ -144,8 +144,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       cryptoFiatState.conversions,
     );
 
-    const res = Number(gasFeeEstimateFiat) + Number(secondaryFeesFiat);
-    return res;
+    return Number(gasFeeEstimateFiat) + Number(secondaryFeesFiat);
   }, [quote, cryptoFiatState.conversions, gasFeeToken, gasFeeValue, fromToken]);
 
   const [tokensOptionsFrom, setTokensOptionsForm] = useState<CoinSelectorOptionProps[]>([]);
@@ -1072,7 +1071,6 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
             />
           </Box>
         </Box>
-        {!isPassportProvider(provider) && (
         <Fees
           feeFiatValue={feeFiatValue}
           gasFeeToken={gasFeeToken}
@@ -1090,7 +1088,6 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
           }}
           loading={loading}
         />
-        )}
       </Box>
       {quoteError && (
         <Box sx={{
