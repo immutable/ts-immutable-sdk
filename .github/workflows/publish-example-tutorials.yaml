@@ -8,6 +8,7 @@ on:
     paths:
       - 'examples/*/*/tutorial.md'
       - 'examples/*/*/metadata.json'
+      - 'examples/*/*/features.json'
   # Allow manual triggering
   workflow_dispatch:
 
