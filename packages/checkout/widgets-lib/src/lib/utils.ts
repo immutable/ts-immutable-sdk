@@ -1,9 +1,9 @@
 import {
-  ChainId, CheckoutConfiguration, GetBalanceResult, NetworkInfo, WidgetTheme,
+  ChainId, CheckoutConfiguration, GetBalanceResult, NetworkInfo, TokenInfo, WidgetTheme,
   WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
-import { Contract } from 'ethers';
+import { Contract, formatUnits } from 'ethers';
 import { getL1ChainId, getL2ChainId } from './networkUtils';
 import {
   CHECKOUT_CDN_BASE_URL,
@@ -86,6 +86,15 @@ export const calculateCryptoToFiat = (
   const parsedAmount = parseFloat(amount);
   if (parseFloat(amount) === 0 || Number.isNaN(parsedAmount)) return zeroString;
   return formatFiatString(parsedAmount * conversion, maxDecimals);
+};
+
+export const calculateCryptoToFiatBigInt = (
+  amount: bigint,
+  token: TokenInfo,
+  conversions: Map<string, number>,
+) => {
+  const formattedAmount = formatUnits(amount, token.decimals);
+  return calculateCryptoToFiat(formattedAmount, token.symbol, conversions, '0.00', 10);
 };
 
 export const formatZeroAmount = (

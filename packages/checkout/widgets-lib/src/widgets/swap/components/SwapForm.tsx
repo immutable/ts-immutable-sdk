@@ -18,7 +18,8 @@ import { amountInputValidation as textInputValidator } from '../../../lib/valida
 import { SwapContext } from '../context/SwapContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import {
-  calculateCryptoToFiat, formatZeroAmount, getDefaultTokenImage, isNativeToken, tokenValueFormat,
+  calculateCryptoToFiat, calculateCryptoToFiatBigInt, formatZeroAmount,
+  getDefaultTokenImage, isNativeToken, tokenValueFormat,
 } from '../../../lib/utils';
 import {
   DEFAULT_TOKEN_DECIMALS,
@@ -35,7 +36,6 @@ import {
   validateToAmount,
   validateToToken,
 } from '../functions/SwapValidator';
-import { Fees } from '../../../components/Fees/Fees';
 import { SwapButton } from './SwapButton';
 import { SwapFormData } from './swapFormTypes';
 import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
@@ -53,6 +53,7 @@ import { processQuoteToken } from '../functions/processQuoteToken';
 import { formatQuoteConversionRate } from '../functions/swapConversionRate';
 import { PrefilledSwapForm, SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
+import { Fees } from './Fees';
 
 enum SwapDirection {
   FROM = 'FROM',
@@ -124,7 +125,27 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
   const [quoteError, setQuoteError] = useState<string>('');
   const [gasFeeValue, setGasFeeValue] = useState<string>('');
   const [gasFeeToken, setGasFeeToken] = useState<TokenInfo | undefined>(undefined);
-  const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
+
+  const feeFiatValue = useMemo(() => {
+    console.log({ gasFeeToken, quote, fromToken });
+    if (!gasFeeToken || !quote || !fromToken) return null;
+
+    const gasFeeEstimateFiat = calculateCryptoToFiat(
+      gasFeeValue,
+      gasFeeToken.symbol,
+      cryptoFiatState.conversions,
+    );
+
+    const secondaryFeesTotal = quote.quote.fees?.reduce((acc, fee) => acc + fee.amount.value, 0n);
+    const secondaryFeesFiat = calculateCryptoToFiatBigInt(
+      secondaryFeesTotal,
+      fromToken,
+      cryptoFiatState.conversions,
+    );
+
+    return Number(gasFeeEstimateFiat) + Number(secondaryFeesFiat);
+  }, [quote, cryptoFiatState.conversions]);
+
   const [tokensOptionsFrom, setTokensOptionsForm] = useState<CoinSelectorOptionProps[]>([]);
   const formattedFees = useMemo(
     () => (quote ? formatSwapFees(quote, cryptoFiatState, t) : []),
@@ -269,7 +290,6 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     }
     setConversionAmount('');
     setConversionToken(null);
-    setGasFeeFiatValue('');
     setQuote(null);
   };
 
@@ -323,11 +343,6 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         address: gasToken?.address,
         icon: gasToken?.icon,
       });
-      setGasFeeFiatValue(calculateCryptoToFiat(
-        gasFee,
-        gasToken?.symbol || '',
-        cryptoFiatState.conversions,
-      ));
 
       setToAmount(
         formatZeroAmount(
@@ -404,12 +419,6 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         address: gasToken?.address,
         icon: gasToken?.icon,
       });
-
-      setGasFeeFiatValue(calculateCryptoToFiat(
-        gasFee,
-        gasToken?.symbol || '',
-        cryptoFiatState.conversions,
-      ));
 
       setFromAmount(
         formatZeroAmount(
@@ -1063,9 +1072,8 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         </Box>
         {!isPassportProvider(provider) && (
         <Fees
-          gasFeeFiatValue={gasFeeFiatValue}
+          feeFiatValue={feeFiatValue}
           gasFeeToken={gasFeeToken}
-          gasFeeValue={gasFeeValue}
           fees={formattedFees}
           onFeesClick={() => {
             track({
