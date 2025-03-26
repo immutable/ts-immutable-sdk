@@ -127,6 +127,11 @@ function TransferWidgetInner(props: TransferWidgetInputs) {
       return;
     }
 
+    if (Number(viewState.amount) <= 0) {
+      setViewState((s) => ({ ...s, amountError: 'Amount must be positive' }));
+      return;
+    }
+
     setViewState({
       type: 'AWAITING_APPROVAL',
       checkout: viewState.checkout,
