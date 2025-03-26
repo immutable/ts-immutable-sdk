@@ -8,7 +8,7 @@ import {
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import { gasAmountAccordionStyles, gasAmountHeadingStyles } from '../../../components/Fees/FeeStyles';
+import { gasAmountAccordionStyles } from '../../../components/Fees/FeeStyles';
 import { FormattedFee } from '../functions/swapFees';
 import { FeesBreakdown } from '../../../components/FeesBreakdown/FeesBreakdown';
 
@@ -41,7 +41,7 @@ export function Fees({
         sx={{ ...gasAmountAccordionStyles, paddingBottom: 'base.spacing.x2', ...sx }}
       >
         <Accordion.TargetLeftSlot>
-          <Body size="medium" sx={gasAmountHeadingStyles}>
+          <Body size="medium">
             {t('drawers.feesBreakdown.heading')}
           </Body>
         </Accordion.TargetLeftSlot>
@@ -75,8 +75,8 @@ export function Fees({
           {!loading && (
             <PriceDisplay
               testId="fees-gas-fee__priceDisplay"
-              fiatAmount={`≈ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${feeFiatValue}`}
-              price=""
+              price={`≈ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${feeFiatValue}`}
+              sx={{ mt: 'base.spacing.x1' }}
             />
           )}
         </Accordion.TargetRightSlot>
