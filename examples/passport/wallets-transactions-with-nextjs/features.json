@@ -1,0 +1,7 @@
+{
+    "features": [
+        "wallet-connection",
+        "transaction-execution"
+    ],
+    "order": 4
+}

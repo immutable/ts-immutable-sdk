@@ -1,0 +1,9 @@
+{
+  "title": "Gas Estimation with Checkout SDK and Next.js",
+  "description": "Example app demonstrating how to estimate gas fees for swap and bridge transactions using the Immutable Checkout SDK",
+  "keywords": ["Immutable", "SDK", "Gas Estimation", "Swap", "Bridge", "Layer 2", "MetaMask"],
+  "tech_stack": ["Next.js", "React", "TypeScript", "Ethers.js"],
+  "product": "Checkout",
+  "programming_language": "TypeScript",
+  "sidebar_order": 2
+} 

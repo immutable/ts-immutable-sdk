@@ -1,0 +1,98 @@
+{
+  "sdk-connect-with-nextjs": {
+    "tutorial": "sdk-connect-with-nextjs.md",
+    "metadata": {
+      "title": "Connect with MetaMask in Next.js",
+      "description": "A Next.js example that demonstrates how to integrate the Immutable Checkout SDK to connect with MetaMask wallets, with and without explicit permissions",
+      "keywords": [
+        "Immutable",
+        "SDK",
+        "Checkout",
+        "Wallet",
+        "MetaMask",
+        "Connect",
+        "Next.js"
+      ],
+      "tech_stack": [
+        "Next.js",
+        "TypeScript",
+        "React",
+        "ethers.js"
+      ],
+      "product": "Checkout",
+      "programming_language": "TypeScript",
+      "sidebar_order": 1
+    }
+  },
+  "sdk-gas-estimation-with-nextjs": {
+    "tutorial": "sdk-gas-estimation-with-nextjs.md",
+    "metadata": {
+      "title": "Gas Estimation with Checkout SDK and Next.js",
+      "description": "Example app demonstrating how to estimate gas fees for swap and bridge transactions using the Immutable Checkout SDK",
+      "keywords": [
+        "Immutable",
+        "SDK",
+        "Gas Estimation",
+        "Swap",
+        "Bridge",
+        "Layer 2",
+        "MetaMask"
+      ],
+      "tech_stack": [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "Ethers.js"
+      ],
+      "product": "Checkout",
+      "programming_language": "TypeScript",
+      "sidebar_order": 2
+    }
+  },
+  "sdk-switch-network-with-nextjs": {
+    "tutorial": "sdk-switch-network-with-nextjs.md",
+    "metadata": {
+      "title": "Switch Network with MetaMask using Next.js",
+      "description": "An example app demonstrating how to connect to MetaMask and switch between Ethereum networks using the Immutable Checkout SDK",
+      "keywords": [
+        "Immutable",
+        "SDK",
+        "MetaMask",
+        "Network Switching",
+        "Checkout",
+        "Wallet Connection"
+      ],
+      "tech_stack": [
+        "Next.js",
+        "TypeScript",
+        "React",
+        "Ethers.js"
+      ],
+      "product": "Checkout",
+      "programming_language": "TypeScript",
+      "sidebar_order": 3
+    }
+  },
+  "sdk-wallet-balance-with-nextjs": {
+    "tutorial": "sdk-wallet-balance-with-nextjs.md",
+    "metadata": {
+      "title": "Wallet Balance with NextJS",
+      "description": "Example app demonstrating how to check wallet balances using the Immutable Checkout SDK with NextJS",
+      "keywords": [
+        "Immutable",
+        "SDK",
+        "Checkout",
+        "Wallet Balance",
+        "MetaMask"
+      ],
+      "tech_stack": [
+        "NextJS",
+        "TypeScript",
+        "React"
+      ],
+      "product": "Checkout",
+      "programming_language": "TypeScript",
+      "sidebar_order": 2
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "title": "Switch Network with MetaMask using Next.js",
+  "description": "An example app demonstrating how to connect to MetaMask and switch between Ethereum networks using the Immutable Checkout SDK",
+  "keywords": ["Immutable", "SDK", "MetaMask", "Network Switching", "Checkout", "Wallet Connection"],
+  "tech_stack": ["Next.js", "TypeScript", "React", "Ethers.js"],
+  "product": "Checkout",
+  "programming_language": "TypeScript",
+  "sidebar_order": 3
+} 

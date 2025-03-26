@@ -1,0 +1,8 @@
+{
+    "features": [
+        "connect-with-eip1193",
+        "connect-with-ethersjs",
+        "connect-with-wagmi"
+    ],
+    "order": 3
+}

@@ -1,0 +1,78 @@
+name: Publish Example App Tutorials
+
+on:
+  # Run when changes are pushed to example tutorials or metadata
+  push:
+    branches:
+      - main
+    paths:
+      - 'examples/*/*/tutorial.md'
+      - 'examples/*/*/metadata.json'
+  # Allow manual triggering
+  workflow_dispatch:
+
+concurrency:
+  group: example-tutorials
+  cancel-in-progress: false
+
+jobs:
+  PublishExampleTutorials:
+    name: Process and Publish Example Tutorials
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout SDK Repo
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Checkout Docs Repo
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          repository: immutable/docs
+          token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
+          path: imx-docs
+          ref: main
+
+      - name: Setup environment variables
+        run: |
+          echo "CLONE_DIR=./imx-docs" >> $GITHUB_ENV
+
+      - name: Setup Github
+        run: |
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+      - name: setup
+        uses: ./.github/actions/setup
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Process Example App Tutorials
+        run: |
+          # Generate example app JSON files
+          pnpm parse:examples
+          
+          # Process tutorials and copy to docs repo
+          ./.github/scripts/process-tutorials.sh
+        shell: bash
+
+      - name: Commit and Push Changes to Docs Repo
+        run: |
+          cd "$CLONE_DIR"
+          # Check if there are changes to commit
+          if git status --porcelain | grep -q .; then
+            # Add all changes
+            git add .
+            
+            # Commit the changes
+            git commit -m "Update example app tutorials from SDK repo"
+            
+            # Push to the target branch
+            git push -u origin main
+            echo "Successfully pushed example app tutorial changes to docs repo"
+          else
+            echo "No changes to commit"
+          fi
+        shell: bash 

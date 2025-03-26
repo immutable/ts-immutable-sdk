@@ -1,0 +1,9 @@
+{
+  "title": "User Information after Logging In with NextJS",
+  "description": "Example of retrieving and displaying user data after authentication with Immutable Passport in a NextJS application",
+  "keywords": ["Immutable", "SDK", "Passport", "NextJS", "User Info", "Linked Addresses", "Tokens"],
+  "tech_stack": ["NextJS", "TypeScript", "React"],
+  "product": "Passport",
+  "programming_language": "TypeScript",
+  "sidebar_order": 1
+} 

@@ -1,0 +1,7 @@
+{
+    "features": [
+        "create-collection-bid-for-erc721",
+        "create-collection-bid-for-erc1155"
+    ],
+    "order": 3
+}

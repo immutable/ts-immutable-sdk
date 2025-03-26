@@ -1,0 +1,154 @@
+{
+  "logged-in-user-with-nextjs": {
+    "tutorial": "logged-in-user-with-nextjs.md",
+    "metadata": {
+      "title": "User Information after Logging In with NextJS",
+      "description": "Example of retrieving and displaying user data after authentication with Immutable Passport in a NextJS application",
+      "keywords": [
+        "Immutable",
+        "SDK",
+        "Passport",
+        "NextJS",
+        "User Info",
+        "Linked Addresses",
+        "Tokens"
+      ],
+      "tech_stack": [
+        "NextJS",
+        "TypeScript",
+        "React"
+      ],
+      "product": "Passport",
+      "programming_language": "TypeScript",
+      "sidebar_order": 1
+    }
+  },
+  "login-with-nextjs": {
+    "tutorial": "login-with-nextjs.md",
+    "metadata": {
+      "title": "Login with NextJS",
+      "description": "A comprehensive example demonstrating various Passport login and logout implementations in a Next.js application.",
+      "keywords": [
+        "Immutable",
+        "SDK",
+        "Passport",
+        "Login",
+        "Logout",
+        "Authentication",
+        "Identity",
+        "Silent Logout",
+        "Redirect Logout"
+      ],
+      "tech_stack": [
+        "NextJS",
+        "TypeScript",
+        "React"
+      ],
+      "product": "Passport",
+      "programming_language": "TypeScript",
+      "sidebar_order": 1
+    }
+  },
+  "telegram-mini-app": {
+    "tutorial": "telegram-mini-app.md",
+    "metadata": {
+      "title": "Telegram Mini App with Immutable Passport",
+      "description": "Demonstrates device flow authentication and NFT transfers in a Telegram Mini App using Immutable Passport",
+      "keywords": [
+        "Immutable",
+        "SDK",
+        "Passport",
+        "Telegram",
+        "Mini App",
+        "Device Flow Authentication",
+        "NFT Transfers"
+      ],
+      "tech_stack": [
+        "Next.js",
+        "TypeScript",
+        "Telegram SDK",
+        "Ethers.js"
+      ],
+      "product": "Passport",
+      "programming_language": "TypeScript",
+      "sidebar_order": 3
+    }
+  },
+  "wallets-connect-with-nextjs": {
+    "tutorial": "wallets-connect-with-nextjs.md",
+    "metadata": {
+      "title": "Wallets Connect with Next.js",
+      "description": "Demonstrates how to connect Immutable Passport to web3 wallets using EIP-1193, ethers.js, and Wagmi in a Next.js application",
+      "keywords": [
+        "Immutable",
+        "SDK",
+        "Passport",
+        "EIP-1193",
+        "ethers.js",
+        "Wagmi",
+        "Wallet Connect",
+        "Next.js"
+      ],
+      "tech_stack": [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "ethers.js",
+        "Wagmi",
+        "Tailwind CSS"
+      ],
+      "product": "Passport",
+      "programming_language": "TypeScript",
+      "sidebar_order": 4
+    }
+  },
+  "wallets-signing-with-nextjs": {
+    "tutorial": "wallets-signing-with-nextjs.md",
+    "metadata": {
+      "title": "Passport Wallet Message Signing with Next.js",
+      "description": "Demonstrates how to use Passport SDK for message signing with EIP-712 and ERC-191 standards in a Next.js application",
+      "keywords": [
+        "Immutable",
+        "SDK",
+        "Passport",
+        "Sign Message",
+        "EIP-712",
+        "ERC-191",
+        "Next.js"
+      ],
+      "tech_stack": [
+        "Next.js",
+        "TypeScript",
+        "Ethers.js"
+      ],
+      "product": "Passport",
+      "programming_language": "TypeScript",
+      "sidebar_order": 5
+    }
+  },
+  "wallets-transactions-with-nextjs": {
+    "tutorial": "wallets-transactions-with-nextjs.md",
+    "metadata": {
+      "title": "Wallet Connection and Transaction Execution with Next.js",
+      "description": "A Next.js application that demonstrates how to connect to users' wallets and execute transactions using Immutable Passport",
+      "keywords": [
+        "Immutable",
+        "SDK",
+        "Passport",
+        "Wallet Connection",
+        "Transaction Execution",
+        "Next.js",
+        "ERC-721"
+      ],
+      "tech_stack": [
+        "Next.js",
+        "TypeScript",
+        "Ethers.js",
+        "Tailwind CSS"
+      ],
+      "product": "Passport",
+      "programming_language": "TypeScript",
+      "sidebar_order": 6
+    }
+  }
+}
