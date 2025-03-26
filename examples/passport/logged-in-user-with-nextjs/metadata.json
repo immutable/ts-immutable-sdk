@@ -4,6 +4,5 @@
   "keywords": ["Immutable", "SDK", "Passport", "NextJS", "User Info", "Linked Addresses", "Tokens"],
   "tech_stack": ["NextJS", "TypeScript", "React"],
   "product": "Passport",
-  "programming_language": "TypeScript",
-  "sidebar_order": 1
+  "programming_language": "TypeScript"
 } 

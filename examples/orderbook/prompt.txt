@@ -79,8 +79,7 @@ Create a metadata.json file in the example app's root with the following structu
 "keywords": ["Immutable", "SDK", "[Feature1]", "[Feature2]", "..."],
 "tech_stack": ["[Framework]", "[Library]", "..."],
 "product": "[Passport/Checkout/Orderbook/etc]",
-"programming_language": "[TypeScript/JavaScript/etc]",
-"sidebar_order": [number] // This value will be grepped from the features.json file
+"programming_language": "[TypeScript/JavaScript/etc]"
 }
 
 

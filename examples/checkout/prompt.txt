@@ -79,7 +79,6 @@ Create a metadata.json file in the example app's root with the following structu
 "tech_stack": ["[Framework]", "[Library]", "..."],
 "product": "[Passport/Checkout/Orderbook/etc]",
 "programming_language": "[TypeScript/JavaScript/etc]",
-"sidebar_order": [number] // This value will be grepped from the features.json file
 }
 
 

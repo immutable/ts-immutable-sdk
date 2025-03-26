@@ -4,6 +4,5 @@
   "keywords": ["Immutable", "SDK", "Passport", "Login", "Logout", "Authentication", "Identity", "Silent Logout", "Redirect Logout"],
   "tech_stack": ["NextJS", "TypeScript", "React"],
   "product": "Passport",
-  "programming_language": "TypeScript",
-  "sidebar_order": 1
+  "programming_language": "TypeScript"
 } 

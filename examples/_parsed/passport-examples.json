@@ -20,7 +20,7 @@
       ],
       "product": "Passport",
       "programming_language": "TypeScript",
-      "sidebar_order": 1
+      "sidebar_order": 2
     }
   },
   "login-with-nextjs": {
@@ -71,7 +71,7 @@
       ],
       "product": "Passport",
       "programming_language": "TypeScript",
-      "sidebar_order": 3
+      "sidebar_order": 6
     }
   },
   "wallets-connect-with-nextjs": {
@@ -99,7 +99,7 @@
       ],
       "product": "Passport",
       "programming_language": "TypeScript",
-      "sidebar_order": 4
+      "sidebar_order": 3
     }
   },
   "wallets-signing-with-nextjs": {
@@ -130,25 +130,23 @@
     "tutorial": "wallets-transactions-with-nextjs.md",
     "metadata": {
       "title": "Wallet Connection and Transaction Execution with Next.js",
-      "description": "A Next.js application that demonstrates how to connect to users' wallets and execute transactions using Immutable Passport",
+      "description": "This example demonstrates how to establish a connection to the user's wallet and execute transactions on the Immutable zkEVM network using Passport.",
       "keywords": [
         "Immutable",
         "SDK",
         "Passport",
         "Wallet Connection",
         "Transaction Execution",
-        "Next.js",
-        "ERC-721"
+        "zkEVM"
       ],
       "tech_stack": [
         "Next.js",
         "TypeScript",
-        "Ethers.js",
-        "Tailwind CSS"
+        "ethers.js"
       ],
       "product": "Passport",
       "programming_language": "TypeScript",
-      "sidebar_order": 6
+      "sidebar_order": 4
     }
   }
 }

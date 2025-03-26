@@ -1,9 +1,8 @@
 {
   "title": "Wallet Connection and Transaction Execution with Next.js",
-  "description": "A Next.js application that demonstrates how to connect to users' wallets and execute transactions using Immutable Passport",
-  "keywords": ["Immutable", "SDK", "Passport", "Wallet Connection", "Transaction Execution", "Next.js", "ERC-721"],
-  "tech_stack": ["Next.js", "TypeScript", "Ethers.js", "Tailwind CSS"],
+  "description": "This example demonstrates how to establish a connection to the user's wallet and execute transactions on the Immutable zkEVM network using Passport.",
+  "keywords": ["Immutable", "SDK", "Passport", "Wallet Connection", "Transaction Execution", "zkEVM"],
+  "tech_stack": ["Next.js", "TypeScript", "ethers.js"],
   "product": "Passport",
-  "programming_language": "TypeScript",
-  "sidebar_order": 6
+  "programming_language": "TypeScript"
 } 

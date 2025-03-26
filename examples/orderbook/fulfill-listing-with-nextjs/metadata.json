@@ -1,9 +1,8 @@
 {
-  "title": "Fulfill Listings with Next.js",
-  "description": "A Next.js application that demonstrates how to fulfill ERC721 and ERC1155 listings using the Immutable Orderbook SDK",
-  "keywords": ["Immutable", "SDK", "Orderbook", "Fulfill Listing", "ERC721", "ERC1155", "Next.js"],
-  "tech_stack": ["Next.js", "TypeScript", "Immutable SDK", "Ethers.js"],
+  "title": "Fulfill Listing with Next.js",
+  "description": "Demonstrates how to fulfill ERC721 and ERC1155 listings using the Immutable Orderbook SDK with Next.js",
+  "keywords": ["Immutable", "SDK", "Orderbook", "Listing", "Fulfill", "ERC721", "ERC1155", "Next.js"],
+  "tech_stack": ["Next.js", "TypeScript", "ethers"],
   "product": "Orderbook",
-  "programming_language": "TypeScript",
-  "sidebar_order": 6
+  "programming_language": "TypeScript"
 } 
