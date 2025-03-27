@@ -1,6 +1,7 @@
 import BN from 'bn.js';
 import * as encUtils from 'enc-utils';
 import { Signer, toUtf8Bytes } from 'ethers';
+import { track } from '@imtbl/metrics';
 
 type SignatureOptions = {
   r: BN;
@@ -42,9 +43,16 @@ export async function signRaw(
   payload: string,
   signer: Signer,
 ): Promise<string> {
-  console.log('signRaw.payload', { payload });
-  console.log('signRaw.toUtf8Bytes', { bytes: toUtf8Bytes(payload).toString() });
-  console.log('signRaw.payload.normalize() === payload', { result: payload === payload.normalize() });
+  track('internal.crypto', 'log', { param: 'signRaw.payload', val: payload });
+  track('internal.crypto', 'log', { param: 'signRaw.toUtf8Bytes', val: toUtf8Bytes(payload).toString() });
+  track(
+    'internal.crypto',
+    'log',
+    {
+      param: 'signRaw.payload.normalize() === payload',
+      val: payload === payload.normalize(),
+    },
+  );
 
   // prevent utf-8 encoding issues
   const encoder = new TextEncoder();
@@ -56,21 +64,47 @@ export async function signRaw(
   const message2 = new TextDecoder('utf-8').decode(buffer2);
 
   // compare message utf8 bytes with payload.normalize()
-  console.log('signRaw.message === payload.normalize()', { result: message === payload.normalize() });
-  console.log('signRaw.message2 === payload.normalize()', { result: message2 === payload.normalize() });
+  track(
+    'internal.crypto',
+    'log',
+    {
+      param: 'signRaw.message === payload.normalize()',
+      val: message === payload.normalize(),
+    },
+  );
+  track(
+    'internal.crypto',
+    'log',
+    { param: 'signRaw.message2 === payload.normalize()', val: message2 === payload.normalize() },
+  );
 
   // output utf8 bytes
-  console.log('signRaw.message', { message, bytes: toUtf8Bytes(message).toString() });
-  console.log('signRaw.message2', { message2, bytes: toUtf8Bytes(message2).toString() });
-
-  // compare utf8 bytes output
-  console.log(
-    'signRaw.toUtf8Bytes === toUtf8Bytes(message)',
-    { result: toUtf8Bytes(payload).toString() === toUtf8Bytes(message).toString() },
+  track(
+    'internal.crypto',
+    'log',
+    { param: 'signRaw.message', val: message, bytes: toUtf8Bytes(message).toString() },
   );
-  console.log(
-    'signRaw.toUtf8Bytes === toUtf8Bytes(message2)',
-    { result: toUtf8Bytes(payload).toString() === toUtf8Bytes(message2).toString() },
+  track(
+    'internal.crypto',
+    'log',
+    { param: 'signRaw.message2', val: message2, bytes: toUtf8Bytes(message2).toString() },
+  );
+  // compare utf8 bytes output
+  track(
+    'internal.crypto',
+    'log',
+    {
+      param: 'signRaw.toUtf8Bytes === toUtf8Bytes(message)',
+      val: toUtf8Bytes(payload).toString() === toUtf8Bytes(message).toString(),
+    },
+  );
+  track(
+    'internal.crypto',
+    'log',
+    {
+      param: 'signRaw.toUtf8Bytes === toUtf8Bytes(message2)',
+      val: toUtf8Bytes(payload).toString() === toUtf8Bytes(message2).toString(),
+    },
   );
 
   const signature = deserializeSignature(await signer.signMessage(toUtf8Bytes(message)));

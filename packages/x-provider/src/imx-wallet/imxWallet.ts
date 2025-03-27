@@ -4,6 +4,7 @@ import {
   toUtf8Bytes,
   toUtf8String,
 } from 'ethers';
+import { track } from '@imtbl/metrics';
 import {
   ConnectRequest,
   ConnectResponse,
@@ -30,34 +31,46 @@ const DEFAULT_CONNECTION_BYTES = new Uint8Array([
 ]);
 const DEFAULT_CONNECTION_STRING_1 = 'Only sign this request if you’ve initiated an action with Immutable X.';
 const DEFAULT_CONNECTION_STRING_2 = Buffer.from(DEFAULT_CONNECTION_STRING_1, 'utf8').toString('utf8');
-console.log('DEFAULT_CONNECTION_STRING_2', { string: DEFAULT_CONNECTION_STRING_2 });
 
-// log utf8 bytes
-console.log('DEFAULT_CONNECTION_BYTES.toString()', { bytes: DEFAULT_CONNECTION_BYTES.toString() });
-console.log('DEFAULT_CONNECTION_STRING_1', { bytes: toUtf8Bytes(DEFAULT_CONNECTION_STRING_1).toString() });
-console.log('DEFAULT_CONNECTION_STRING_2', { bytes: toUtf8Bytes(DEFAULT_CONNECTION_STRING_2).toString() });
-console.log(
-  'DEFAULT_CONNECTION_STRING_1.normalize()',
-  { bytes: toUtf8Bytes(DEFAULT_CONNECTION_STRING_1.normalize()).toString() },
+// track language and charset
+track('xProvider', 'log', { param: 'navigator.language', val: navigator?.language });
+track('xProvider', 'log', { param: 'navigator.languages', val: navigator?.languages?.join(',') });
+track('xProvider', 'log', { param: 'document.characterSet', val: document?.characterSet });
+
+track('xProvider', 'log', { param: 'DEFAULT_CONNECTION_STRING_2', val: DEFAULT_CONNECTION_STRING_2 });
+track('xProvider', 'log', { param: 'DEFAULT_CONNECTION_BYTES', val: DEFAULT_CONNECTION_BYTES.toString() });
+track(
+  'xProvider',
+  'log',
+  { param: 'DEFAULT_CONNECTION_STRING_1', val: toUtf8Bytes(DEFAULT_CONNECTION_STRING_1).toString() },
 );
-console.log(
-  'DEFAULT_CONNECTION_STRING_2.normalize()',
-  { bytes: toUtf8Bytes(DEFAULT_CONNECTION_STRING_2.normalize()).toString() },
-);
-console.log(
-  'Buffer.from(DEFAULT_CONNECTION_STRING_1, utf8).toString()',
-  { bytes: Buffer.from(DEFAULT_CONNECTION_STRING_1, 'utf8').toString() },
+track(
+  'xProvider',
+  'log',
+  { param: 'DEFAULT_CONNECTION_STRING_2', val: toUtf8Bytes(DEFAULT_CONNECTION_STRING_2).toString() },
 );
 
-// console.log if the bytes of DEFAULT_CONNECTION_STRING_1 and DEFAULT_CONNECTION_STRING_2 are the same as DEFAULT_CONNECTION_BYTES
-console.log(
-  'DEFAULT_CONNECTION_BYTES === toUtf8Bytes(DEFAULT_CONNECTION_STRING_1)',
-  { bytes: DEFAULT_CONNECTION_BYTES.toString() === toUtf8Bytes(DEFAULT_CONNECTION_STRING_1).toString() },
-);
-console.log(
-  'DEFAULT_CONNECTION_BYTES === toUtf8Bytes(DEFAULT_CONNECTION_STRING_2)',
-  { bytes: DEFAULT_CONNECTION_BYTES.toString() === toUtf8Bytes(DEFAULT_CONNECTION_STRING_2).toString() },
-);
+track('xProvider', 'log', {
+  param: 'DEFAULT_CONNECTION_STRING_1.normalize()',
+  val: toUtf8Bytes(DEFAULT_CONNECTION_STRING_1.normalize()).toString(),
+});
+track('xProvider', 'log', {
+  param: 'DEFAULT_CONNECTION_STRING_2.normalize()',
+  val: toUtf8Bytes(DEFAULT_CONNECTION_STRING_2.normalize()).toString(),
+});
+track('xProvider', 'log', {
+  param: 'Buffer.from(DEFAULT_CONNECTION_STRING_1, utf8).toString()',
+  val: Buffer.from(DEFAULT_CONNECTION_STRING_1, 'utf8').toString(),
+});
+
+track('xProvider', 'log', {
+  param: 'DEFAULT_CONNECTION_BYTES === toUtf8Bytes(DEFAULT_CONNECTION_STRING_1)',
+  val: DEFAULT_CONNECTION_BYTES.toString() === toUtf8Bytes(DEFAULT_CONNECTION_STRING_1).toString(),
+});
+track('xProvider', 'log', {
+  param: 'DEFAULT_CONNECTION_BYTES === toUtf8Bytes(DEFAULT_CONNECTION_STRING_2)',
+  val: DEFAULT_CONNECTION_BYTES.toString() === toUtf8Bytes(DEFAULT_CONNECTION_STRING_2).toString(),
+});
 
 const CONNECTION_FAILED_ERROR = 'The L2 IMX Wallet connection has failed';
 
@@ -68,9 +81,11 @@ export async function connect(
   const l1Signer = await l1Provider.getSigner();
   const address = await l1Signer.getAddress();
 
-  // log read message here
-  console.log('DEFAULT_CONNECTION_BYTES.toString()', { bytes: DEFAULT_CONNECTION_BYTES.toString() });
-  console.log('DEFAULT_CONNECTION_BYTES.toUtf8String()', { bytes: toUtf8String(DEFAULT_CONNECTION_BYTES) });
+  track('xProvider', 'log', { param: 'DEFAULT_CONNECTION_BYTES', val: DEFAULT_CONNECTION_BYTES.toString() });
+  track('xProvider', 'log', {
+    param: 'DEFAULT_CONNECTION_BYTES.toUtf8String()',
+    val: toUtf8String(DEFAULT_CONNECTION_BYTES),
+  });
 
   const signature = await l1Signer.signMessage(DEFAULT_CONNECTION_BYTES);
   const iframe = await getOrSetupIFrame(env);
