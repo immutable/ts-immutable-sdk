@@ -33,47 +33,65 @@ const DEFAULT_CONNECTION_STRING_1 = 'Only sign this request if you’ve initiate
 const DEFAULT_CONNECTION_STRING_2 = Buffer.from(DEFAULT_CONNECTION_STRING_1, 'utf8').toString('utf8');
 const CONNECTION_FAILED_ERROR = 'The L2 IMX Wallet connection has failed';
 
-function trackConnectionDetails() {
+function trackConnectionDetails(address: string) {
   // track language and charset
-  track('xProvider', 'log', { param: 'navigator.language', val: navigator?.language });
-  track('xProvider', 'log', { param: 'navigator.languages', val: navigator?.languages?.join(',') });
-  track('xProvider', 'log', { param: 'document.characterSet', val: document?.characterSet });
+  track('xProvider', 'log', { address, param: 'navigator.language', val: navigator?.language });
+  track('xProvider', 'log', { address, param: 'navigator.languages', val: navigator?.languages?.join(',') });
+  track('xProvider', 'log', { address, param: 'document.characterSet', val: document?.characterSet });
 
   // track connection encoding details
-  track('xProvider', 'log', { param: 'DEFAULT_CONNECTION_STRING_2', val: DEFAULT_CONNECTION_STRING_2 });
-  track('xProvider', 'log', { param: 'DEFAULT_CONNECTION_BYTES', val: DEFAULT_CONNECTION_BYTES.toString() });
-  track(
-    'xProvider',
-    'log',
-    { param: 'DEFAULT_CONNECTION_STRING_1', val: toUtf8Bytes(DEFAULT_CONNECTION_STRING_1).toString() },
-  );
-  track(
-    'xProvider',
-    'log',
-    { param: 'DEFAULT_CONNECTION_STRING_2', val: toUtf8Bytes(DEFAULT_CONNECTION_STRING_2).toString() },
-  );
   track('xProvider', 'log', {
+    address,
+    param: 'DEFAULT_CONNECTION_STRING_2',
+    val: DEFAULT_CONNECTION_STRING_2,
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'DEFAULT_CONNECTION_BYTES',
+    val: DEFAULT_CONNECTION_BYTES.toString(),
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'DEFAULT_CONNECTION_STRING_1',
+    val: toUtf8Bytes(DEFAULT_CONNECTION_STRING_1).toString(),
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'DEFAULT_CONNECTION_STRING_2',
+    val: toUtf8Bytes(DEFAULT_CONNECTION_STRING_2).toString(),
+  });
+  track('xProvider', 'log', {
+    address,
     param: 'DEFAULT_CONNECTION_STRING_1.normalize()',
     val: toUtf8Bytes(DEFAULT_CONNECTION_STRING_1.normalize()).toString(),
   });
   track('xProvider', 'log', {
+    address,
     param: 'DEFAULT_CONNECTION_STRING_2.normalize()',
     val: toUtf8Bytes(DEFAULT_CONNECTION_STRING_2.normalize()).toString(),
   });
   track('xProvider', 'log', {
+    address,
     param: 'Buffer.from(DEFAULT_CONNECTION_STRING_1, utf8).toString()',
     val: Buffer.from(DEFAULT_CONNECTION_STRING_1, 'utf8').toString(),
   });
   track('xProvider', 'log', {
+    address,
     param: 'DEFAULT_CONNECTION_BYTES === toUtf8Bytes(DEFAULT_CONNECTION_STRING_1)',
     val: DEFAULT_CONNECTION_BYTES.toString() === toUtf8Bytes(DEFAULT_CONNECTION_STRING_1).toString(),
   });
   track('xProvider', 'log', {
+    address,
     param: 'DEFAULT_CONNECTION_BYTES === toUtf8Bytes(DEFAULT_CONNECTION_STRING_2)',
     val: DEFAULT_CONNECTION_BYTES.toString() === toUtf8Bytes(DEFAULT_CONNECTION_STRING_2).toString(),
   });
-  track('xProvider', 'log', { param: 'DEFAULT_CONNECTION_BYTES', val: DEFAULT_CONNECTION_BYTES.toString() });
   track('xProvider', 'log', {
+    address,
+    param: 'DEFAULT_CONNECTION_BYTES',
+    val: DEFAULT_CONNECTION_BYTES.toString(),
+  });
+  track('xProvider', 'log', {
+    address,
     param: 'DEFAULT_CONNECTION_BYTES.toUtf8String()',
     val: toUtf8String(DEFAULT_CONNECTION_BYTES),
   });
@@ -86,7 +104,7 @@ export async function connect(
   const l1Signer = await l1Provider.getSigner();
   const address = await l1Signer.getAddress();
 
-  trackConnectionDetails();
+  trackConnectionDetails(address);
 
   const signature = await l1Signer.signMessage(DEFAULT_CONNECTION_BYTES);
   const iframe = await getOrSetupIFrame(env);

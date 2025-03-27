@@ -43,16 +43,22 @@ export async function signRaw(
   payload: string,
   signer: Signer,
 ): Promise<string> {
-  track('xProvider', 'log', { param: 'signRaw.payload', val: payload });
-  track('xProvider', 'log', { param: 'signRaw.toUtf8Bytes', val: toUtf8Bytes(payload).toString() });
-  track(
-    'xProvider',
-    'log',
-    {
-      param: 'signRaw.payload.normalize() === payload',
-      val: payload === payload.normalize(),
-    },
-  );
+  const address = await signer.getAddress();
+  track('xProvider', 'log', {
+    address,
+    param: 'signRaw.payload',
+    val: payload,
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'signRaw.toUtf8Bytes',
+    val: toUtf8Bytes(payload).toString(),
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'signRaw.payload.normalize() === payload',
+    val: payload === payload.normalize(),
+  });
 
   // prevent utf-8 encoding issues
   const encoder = new TextEncoder();
@@ -64,48 +70,41 @@ export async function signRaw(
   const message2 = new TextDecoder('utf-8').decode(buffer2);
 
   // compare message utf8 bytes with payload.normalize()
-  track(
-    'xProvider',
-    'log',
-    {
-      param: 'signRaw.message === payload.normalize()',
-      val: message === payload.normalize(),
-    },
-  );
-  track(
-    'xProvider',
-    'log',
-    { param: 'signRaw.message2 === payload.normalize()', val: message2 === payload.normalize() },
-  );
+  track('xProvider', 'log', {
+    address,
+    param: 'signRaw.message === payload.normalize()',
+    val: message === payload.normalize(),
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'signRaw.message2 === payload.normalize()',
+    val: message2 === payload.normalize(),
+  });
 
   // output utf8 bytes
-  track(
-    'xProvider',
-    'log',
-    { param: 'signRaw.message', val: message, bytes: toUtf8Bytes(message).toString() },
-  );
-  track(
-    'xProvider',
-    'log',
-    { param: 'signRaw.message2', val: message2, bytes: toUtf8Bytes(message2).toString() },
-  );
+  track('xProvider', 'log', {
+    address,
+    param: 'signRaw.message',
+    val: message,
+    bytes: toUtf8Bytes(message).toString(),
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'signRaw.message2',
+    val: message2,
+    bytes: toUtf8Bytes(message2).toString(),
+  });
   // compare utf8 bytes output
-  track(
-    'xProvider',
-    'log',
-    {
-      param: 'signRaw.toUtf8Bytes === toUtf8Bytes(message)',
-      val: toUtf8Bytes(payload).toString() === toUtf8Bytes(message).toString(),
-    },
-  );
-  track(
-    'xProvider',
-    'log',
-    {
-      param: 'signRaw.toUtf8Bytes === toUtf8Bytes(message2)',
-      val: toUtf8Bytes(payload).toString() === toUtf8Bytes(message2).toString(),
-    },
-  );
+  track('xProvider', 'log', {
+    address,
+    param: 'signRaw.toUtf8Bytes === toUtf8Bytes(message)',
+    val: toUtf8Bytes(payload).toString() === toUtf8Bytes(message).toString(),
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'signRaw.toUtf8Bytes === toUtf8Bytes(message2)',
+    val: toUtf8Bytes(payload).toString() === toUtf8Bytes(message2).toString(),
+  });
 
   const signature = deserializeSignature(await signer.signMessage(toUtf8Bytes(message)));
   return serializeEthSignature(signature);
