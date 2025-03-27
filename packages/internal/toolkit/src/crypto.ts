@@ -43,10 +43,10 @@ export async function signRaw(
   payload: string,
   signer: Signer,
 ): Promise<string> {
-  track('internal.crypto', 'log', { param: 'signRaw.payload', val: payload });
-  track('internal.crypto', 'log', { param: 'signRaw.toUtf8Bytes', val: toUtf8Bytes(payload).toString() });
+  track('xProvider', 'log', { param: 'signRaw.payload', val: payload });
+  track('xProvider', 'log', { param: 'signRaw.toUtf8Bytes', val: toUtf8Bytes(payload).toString() });
   track(
-    'internal.crypto',
+    'xProvider',
     'log',
     {
       param: 'signRaw.payload.normalize() === payload',
@@ -65,7 +65,7 @@ export async function signRaw(
 
   // compare message utf8 bytes with payload.normalize()
   track(
-    'internal.crypto',
+    'xProvider',
     'log',
     {
       param: 'signRaw.message === payload.normalize()',
@@ -73,25 +73,25 @@ export async function signRaw(
     },
   );
   track(
-    'internal.crypto',
+    'xProvider',
     'log',
     { param: 'signRaw.message2 === payload.normalize()', val: message2 === payload.normalize() },
   );
 
   // output utf8 bytes
   track(
-    'internal.crypto',
+    'xProvider',
     'log',
     { param: 'signRaw.message', val: message, bytes: toUtf8Bytes(message).toString() },
   );
   track(
-    'internal.crypto',
+    'xProvider',
     'log',
     { param: 'signRaw.message2', val: message2, bytes: toUtf8Bytes(message2).toString() },
   );
   // compare utf8 bytes output
   track(
-    'internal.crypto',
+    'xProvider',
     'log',
     {
       param: 'signRaw.toUtf8Bytes === toUtf8Bytes(message)',
@@ -99,7 +99,7 @@ export async function signRaw(
     },
   );
   track(
-    'internal.crypto',
+    'xProvider',
     'log',
     {
       param: 'signRaw.toUtf8Bytes === toUtf8Bytes(message2)',
