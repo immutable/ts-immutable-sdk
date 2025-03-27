@@ -1,0 +1,33 @@
+{
+  "name": "@examples/login-with-passport-bridge-with-nextjs",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "playwright test",
+    "test:coverage": "nyc --reporter=html --reporter=text --reporter=lcov playwright test"
+  },
+  "dependencies": {
+    "@biom3/react": "^0.25.21",
+    "@imtbl/sdk": "workspace:*",
+    "ethers": "^6.13.4",
+    "next": "14.2.25",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.45.3",
+    "@types/node": "^20",
+    "@types/react": "^18.3.4",
+    "@types/react-dom": "^18.3.0",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.7",
+    "typescript": "^5.6.2",
+    "istanbul-lib-coverage": "^3.2.2",
+    "nyc": "^15.1.0",
+    "@istanbuljs/nyc-config-typescript": "^1.0.2"
+  }
+} 

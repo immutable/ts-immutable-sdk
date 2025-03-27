@@ -13,28 +13,28 @@ Create a new example app named {feature name}-with-nextjs in /examples/passport/
 ```
 /examples/passport/{feature name}-with-nextjs/
 ├── src/app/
-│   ├── page.tsx                    # Main landing page with feature links
-│   ├── {feature name}/page.tsx     # Primary feature implementation
-│   ├── redirect/page.tsx           # Auth redirect handler
-│   ├── logout/page.tsx             # Logout functionality
-│   ├── utils/                      # Shared utilities
-│   │   ├── setupDefault.ts         # SDK initialization
-│   │   └── wrapper.tsx             # App context wrapper
-│   ├── tests/                      # Test directory
-│   │   └── unit/                   # Unit tests
-│   │       └── passport.test.js    # Feature tests
-│   ├── layout.tsx                  # App layout with wrapper
-│   └── globals.css                 # Basic styles
-├── README.md                       # Documentation
-├── package.json                    # Dependencies
-├── next.config.mjs                 # Next.js config
-├── tsconfig.json                   # TypeScript config
-├── .env.example                    # Environment variables
-├── .gitignore                      # Git ignore file
-├── jest.config.js                  # Jest configuration
+│ ├── page.tsx # Main landing page with feature links
+│ ├── {feature name}/page.tsx # Primary feature implementation
+│ ├── redirect/page.tsx # Auth redirect handler
+│ ├── logout/page.tsx # Logout functionality
+│ ├── utils/ # Shared utilities
+│ │ ├── setupDefault.ts # SDK initialization
+│ │ └── wrapper.tsx # App context wrapper
+│ ├── tests/ # Test directory
+│ │ └── base.spec.js # E2E Feature tests
+│ ├── layout.tsx # App layout with wrapper
+│ └── globals.css # Basic styles
+├── README.md # Documentation
+├── package.json # Dependencies
+├── next.config.mjs # Next.js config
+├── tsconfig.json # TypeScript config
+├── .env.example # Environment variables
+├── .gitignore # Git ignore file
+├── playwright.config.ts # Playwright configuration
+├── coverage/ # Coverage output directory
+└── eslintrc.json                   # ESLint configuration
 └── babel.config.jest.js            # Babel config for tests
 ```
-
 Copy these essential files from an existing example (e.g., login-with-nextjs):
 - package.json (update the name to "{feature name}-with-nextjs", but keep ALL dependency versions the same)
 - next.config.mjs
@@ -45,8 +45,13 @@ Copy these essential files from an existing example (e.g., login-with-nextjs):
 - src/app/utils/wrapper.tsx
 - src/app/layout.tsx (modify to use AppWrapper)
 - src/app/globals.css
+- playwright.config.ts
+- .eslintrc.json
 
 IMPORTANT: Ensure that you've gone through the Passport SDK Documentation and have a very deep understanding of the SDK before you start.
+IMPORTANT: We have an internal UI Library called Biom3. Make sure that you thoroughly understand all of the components. DON'T ASSUME that a component exists. ALWAYS DOUBLE CHECK BEFORE YOU IMPORT OR USE ANYTHING
+IF THE COMPONENT THAT YOU WANT DOESN'T EXIST IN BIOM3, ALWAYS USE NORMAL CSS/HTML AND NEVER ASSUME. (https://github.com/immutable/biom3 | https://immutable.atlassian.net/wiki/spaces/DS/pages/2335965298/BIOME+Docs)
+
 # Step 2: Component Implementation
 
 ## Critical Import/Export Requirements
@@ -77,6 +82,7 @@ Create minimal, functional redirect and logout pages:
 - THIS PAGE SHOULD JUST BE A PLACEHOLDER FOR NOW. IT SHOULD NOT IMPLEMENT ANY FUNCTIONALITY.
 
 # Step 3: Documentation
+IMPORTANT: Ensure that the command for installation, etc uses pnpm not npm.
 Create a comprehensive README.md including:
 - {feature name} feature description and purpose
 - Setup instructions including environment variables
@@ -85,140 +91,86 @@ Create a comprehensive README.md including:
 - References to official documentation
 - {feature name} cleanup best practices
 
-# Step 4: Testing Files
+# Step 4: Testing Files and Coverage Setup
+COPY OVER THE RELEVANT E2E TEST FILES (INCLUDING SETUP, ETC) FROM OTHER EXAMPLE APPS SUCH AS LOGIN-WITH-NEXTJS
 
-## Jest Configuration
-Create jest.config.js:
-```javascript
-module.exports = {
-  testEnvironment: 'jsdom',
-  transform: {
-    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { configFile: './babel.config.jest.js' }],
-  },
-  moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
-  },
-  testPathIgnorePatterns: ['/node_modules/', '/.next/'],
-  transformIgnorePatterns: [
-    '/node_modules/(?!(@biom3|@imtbl)/)',
-  ],
-  coverageThreshold: {
-    global: {
-      lines: 80,
-    }
-  },
-  setupFilesAfterEnv: ['<rootDir>/src/app/tests/setup.js'],
-};
-```
+## Test Coverage Configuration
+- Update the playwright.config.ts to enable test coverage collection:
+  - Configure the coverage reporter in playwright.config.ts
+  - Enable JavaScript coverage collection with contextOptions
+  - Set proper coverage output directories
+  - Add coverage thresholds (aim for >90% code coverage)
 
-## Test Setup File
-Create src/app/tests/setup.js:
-```javascript
-// Add custom jest matchers from testing-library
-require('@testing-library/jest-dom');
+- Add the following dependencies to package.json:
+  - @playwright/test
+  - istanbul-lib-coverage
+  - nyc
+  - @istanbuljs/nyc-config-typescript (for TypeScript projects)
 
-// Mock Next.js navigation
-jest.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    prefetch: jest.fn(),
-  }),
-  usePathname: () => '/',
-  useSearchParams: () => new URLSearchParams(),
-}));
-
-// Suppress specific console errors during tests
-const originalConsoleError = console.error;
-console.error = (...args) => {
-  if (
-    typeof args[0] === 'string' && 
-    (args[0].includes('Warning: ReactDOM.render') || 
-     args[0].includes('Error: Uncaught [Error'))
-  ) {
-    return;
+- Create coverage collection script in package.json:
+  ```json
+  "scripts": {
+    "test": "playwright test",
+    "test:coverage": "nyc --reporter=html --reporter=text --reporter=lcov playwright test"
   }
-  originalConsoleError(...args);
-};
-
-// Setup global mocks that might be needed across tests
-global.ResizeObserver = jest.fn().mockImplementation(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
-}));
-```
-
-## Babel Configuration
-Create babel.config.jest.js:
-```javascript
-module.exports = {
-  presets: [
-    ['@babel/preset-env', { targets: { node: 'current' } }],
-    '@babel/preset-typescript',
-    ['@babel/preset-react', { runtime: 'automatic' }],
-  ],
-};
-```
-
-## Unit Tests
-Create comprehensive tests in src/app/tests/unit/passport.test.js:
-- Use CommonJS syntax (require instead of import)
-- Mock ALL external dependencies thoroughly:
-  ```javascript
-  // Example of complete component mocking
-  jest.mock('@biom3/react', () => ({
-    Button: ({ children, onClick, disabled }) => (
-      <button onClick={onClick} disabled={disabled} data-testid="biom3-button">
-        {children}
-      </button>
-    ),
-    // Include ALL components you use from the library
-    Heading: ({ children, size, className }) => (
-      <h2 className={className} data-testid={`biom3-heading-${size}`}>
-        {children}
-      </h2>
-    ),
-    Stack: ({ children, alignItems, gap, direction }) => (
-      <div data-testid="biom3-stack" data-align={alignItems} data-gap={gap} data-direction={direction}>
-        {children}
-      </div>
-    ),
-    Text: ({ children, variant }) => (
-      <span data-testid="biom3-text" data-variant={variant}>
-        {children}
-      </span>
-    ),
-    Spinner: ({ size }) => <div data-testid="biom3-spinner" data-size={size}></div>,
-    BiomeCombinedProviders: ({ children }) => <div data-testid="biom3-providers">{children}</div>,
-  }));
   ```
-- Create detailed mocks for the SDK:
-  ```javascript
-  const mockProvider = {
-    on: jest.fn(),
-    removeListener: jest.fn(),
-    disconnect: jest.fn(),
-    connected: false,
-  };
-  
-  const mockPassportInstance = {
-    isAuthenticated: jest.fn(),
-    login: jest.fn(),
-    loginCallback: jest.fn(),
-    logout: jest.fn(),
-    provider: mockProvider,
-  };
-  
-  jest.mock('../../../app/utils/setupDefault', () => ({
-    passportInstance: mockPassportInstance,
-  }));
+
+- Add a coverage helper file in tests/coverage-helper.ts:
+  ```typescript
+  import * as fs from 'fs';
+  import * as path from 'path';
+
+  export async function saveCoverage(page, testInfo) {
+    const coverage = await page.evaluate(() => JSON.stringify(window.__coverage__));
+    if (!coverage) return;
+    
+    const coverageDir = path.join(process.cwd(), '.nyc_output');
+    if (!fs.existsSync(coverageDir)) {
+      fs.mkdirSync(coverageDir, { recursive: true });
+    }
+    
+    const id = testInfo.testId || Date.now();
+    fs.writeFileSync(path.join(coverageDir, `coverage-${id}.json`), coverage);
+  }
   ```
-- Test {feature name} functionality thoroughly with all possible scenarios
+
+- Update your test files to collect coverage:
+  ```typescript
+  import { test, expect } from '@playwright/test';
+  import { saveCoverage } from './coverage-helper';
+
+  test('feature functionality', async ({ page }, testInfo) => {
+    // Test implementation...
+    
+    // Save coverage at the end of the test
+    await saveCoverage(page, testInfo);
+  });
+  ```
+
+- Add .nyc_output and coverage/ to .gitignore file
+
+- Document in README.md how to run tests with coverage and interpret results
+
+- Create a .nycrc file for coverage configuration:
+  ```json
+  {
+    "extends": "@istanbuljs/nyc-config-typescript",
+    "all": true,
+    "check-coverage": true,
+    "include": ["src/app/{feature name}/**/*.tsx", "src/app/{feature name}/**/*.ts"],
+    "exclude": ["**/*.spec.ts", "**/*.test.ts"],
+    "branches": 70,
+    "lines": 70,
+    "functions": 70,
+    "statements": 70
+  }
+  ```
+- Test all pages renders perfectly
+- Test {feature name} functionality thoroughly with all possible scenarios. (If it's Passport specific, this is not required)
 - Test all {feature name} handling and cleanup
 - Explicitly validate that components render without errors
 - Use act() for all asynchronous operations
-- Aim for >90% code coverage
+- Write tests that exercise all code paths to achieve high coverage
 
 # Step 5: Implementation Guidelines
 IMPORTANT: MAKE SURE THAT THE PASSPORT SDK IS INITIALIZED CORRECTLY IN THE SETUPDEFAULT.TS FILE. REFER TO OTHER EXAMPLE APPS LIKE LOGIN-WITH-NEXTJS FOR THE CORRECT SETUP.
@@ -230,8 +182,15 @@ IMPORTANT: MAKE SURE THAT THE PASSPORT SDK IS INITIALIZED CORRECTLY IN THE SETUP
 - Add robust error handling for all {feature name} and operations
 - Add TypeScript type guards for any SDK properties that might be undefined
 
+# Step 6: Final Checks
+- Ensure that the app can build.
+- Ensure that all of the components, etc are used appropriately.
+- run `pnpm build` and ensure that the setup is perfect.
+- Ensure that there's no problem in all files. Make sure that when using a component, you use the available properties and values.
+
 ## UI Best Practices
-- Use standard HTML elements (h1, h2, h3, p) for text content, NOT Text component
+- Always ensure that you ONLY use available Biom3 Components without assuming they exist. (Text and Spinner DOES NOT exist in the Biom3 UI Library)
+- Use standard HTML elements (h1, h2, h3, p) for text content. 
 - Use Biom3 Button and other UI components as documented
 - Show clear loading/error states
 - Keep UI simple and focused on demonstrating the {feature name}

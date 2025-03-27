@@ -38,16 +38,20 @@ Create a new example app named {feature-name}-with-{framework-name} in /examples
 └── babel.config.jest.js            # Babel config for tests
 ```
 
-Copy only these essential files from an existing example (e.g., login-with-nextjs):
-- package.json (update the name in package.json, but keep ALL dependency versions the same)
+Copy these essential files from an existing example (e.g., login-with-nextjs):
+- package.json (update the name to "{feature-name}-with-nextjs", but keep ALL dependency versions the same)
 - next.config.mjs
 - tsconfig.json
-- .env.example (update with feature-specific variables if needed)
+- .env.example
 - .gitignore
 - src/app/utils/setupDefault.ts
 - src/app/utils/wrapper.tsx
 - src/app/layout.tsx (modify to use AppWrapper)
 - src/app/globals.css
+- playwright.config.ts
+- .eslintrc.json
+
+IMPORTANT: Ensure that you've gone through the Passport SDK Documentation and have a very deep understanding of the SDK before you start.
 
 # Step 2: Component Implementation
 
@@ -56,25 +60,17 @@ For ALL component files:
 - ALWAYS use default exports for page components (export default function ComponentName)
 - ALWAYS import React explicitly if using JSX fragments (<>...</>): import React from 'react'
 - Verify all imports are correctly spelled and point to existing files
-- Test each component in isolation before integrating it
-- Check for circular dependencies in imports
 - When importing from libraries, verify the component exists in that library
 - For Next.js client components, always include 'use client' at the top of the file
 
+IMPORTANT: MAKE SURE THAT THE PASSPORT SDK IS INITIALIZED CORRECTLY IN THE SETUPDEFAULT.TS FILE. REFER TO OTHER EXAMPLE APPS LIKE LOGIN-WITH-NEXTJS FOR THE CORRECT SETUP.
+IMPORTANT: DON'T IMPLEMENT THE {feature-name} AT ALL. JUST SETUP THE PROJECT STRUCTURE AND DOCUMENTATION.
+
 ## Main Landing Page (src/app/page.tsx)
 Create a simple landing page with:
-- Brief description of the feature
-- Link to the feature implementation page
+- Brief description of the Passport {feature-name} features
+- Link to the {feature-name} implementation page
 - Clear, concise UI using standard HTML (h1, h2, p) and Biom3 Button components
-
-## Feature Implementation (src/app/{feature-name}/page.tsx)
-Create a self-contained implementation that:
-- Demonstrates the specific SDK feature clearly 
-- Uses proper initialization and cleanup patterns
-- Shows user feedback for different states
-- Uses standard HTML tags (h1, h2, p) for text (NOT Text component)
-- Uses Biom3 components for UI elements
-- Thoroughly validates all props and types
 
 ## Redirect and Logout Pages
 Create minimal, functional redirect and logout pages:
@@ -82,6 +78,131 @@ Create minimal, functional redirect and logout pages:
 - Implement robust error handling for failed auth callbacks
 - For the logout page, implement proper token cleanup
 - VERIFY that all components used in these pages are properly imported
-- TEST th
+
+## Feature Implementation (src/app/{feature-name}/page.tsx)
+- THIS PAGE SHOULD JUST BE A PLACEHOLDER FOR NOW. IT SHOULD NOT IMPLEMENT ANY FUNCTIONALITY.
+
+# Step 3: Documentation
+Create a comprehensive README.md including:
+- {feature-name} feature description and purpose
+- Setup instructions including environment variables
+- Usage instructions with code examples for all {feature-name} types
+- Common issues and troubleshooting
+- References to official documentation
+- {feature-name} cleanup best practices
+
+# Step 4: Testing Files and Coverage Setup
+COPY OVER THE RELEVANT E2E TEST FILES (INCLUDING SETUP, ETC) FROM OTHER EXAMPLE APPS SUCH AS LOGIN-WITH-NEXTJS
+
+## Test Coverage Configuration
+- Update the playwright.config.ts to enable test coverage collection:
+  - Configure the coverage reporter in playwright.config.ts
+  - Enable JavaScript coverage collection with contextOptions
+  - Set proper coverage output directories
+  - Add coverage thresholds (aim for >90% code coverage)
+
+- Add the following dependencies to package.json:
+  - @playwright/test
+  - istanbul-lib-coverage
+  - nyc
+  - @istanbuljs/nyc-config-typescript (for TypeScript projects)
+
+- Create coverage collection script in package.json:
+  ```json
+  "scripts": {
+    "test": "playwright test",
+    "test:coverage": "nyc --reporter=html --reporter=text --reporter=lcov playwright test"
+  }
+  ```
+
+- Add a coverage helper file in tests/coverage-helper.ts:
+  ```typescript
+  import * as fs from 'fs';
+  import * as path from 'path';
+
+  export async function saveCoverage(page, testInfo) {
+    const coverage = await page.evaluate(() => JSON.stringify(window.__coverage__));
+    if (!coverage) return;
+    
+    const coverageDir = path.join(process.cwd(), '.nyc_output');
+    if (!fs.existsSync(coverageDir)) {
+      fs.mkdirSync(coverageDir, { recursive: true });
+    }
+    
+    const id = testInfo.testId || Date.now();
+    fs.writeFileSync(path.join(coverageDir, `coverage-${id}.json`), coverage);
+  }
+  ```
+
+- Update your test files to collect coverage:
+  ```typescript
+  import { test, expect } from '@playwright/test';
+  import { saveCoverage } from './coverage-helper';
+
+  test('feature functionality', async ({ page }, testInfo) => {
+    // Test implementation...
+    
+    // Save coverage at the end of the test
+    await saveCoverage(page, testInfo);
+  });
+  ```
+
+- Add .nyc_output and coverage/ to .gitignore file
+
+- Document in README.md how to run tests with coverage and interpret results
+
+- Create a .nycrc file for coverage configuration:
+  ```json
+  {
+    "extends": "@istanbuljs/nyc-config-typescript",
+    "all": true,
+    "check-coverage": true,
+    "include": ["src/**/*.tsx", "src/**/*.ts"],
+    "exclude": ["**/*.spec.ts", "**/*.test.ts"],
+    "branches": 80,
+    "lines": 90,
+    "functions": 90,
+    "statements": 90
+  }
+  ```
+
+- Test {feature-name} functionality thoroughly with all possible scenarios
+- Test all {feature-name} handling and cleanup
+- Explicitly validate that components render without errors
+- Use act() for all asynchronous operations
+- Write tests that exercise all code paths to achieve high coverage
+
+# Step 5: Implementation Guidelines
+IMPORTANT: MAKE SURE THAT THE PASSPORT SDK IS INITIALIZED CORRECTLY IN THE SETUPDEFAULT.TS FILE. REFER TO OTHER EXAMPLE APPS LIKE LOGIN-WITH-NEXTJS FOR THE CORRECT SETUP.
+## SDK Usage Best Practices
+- Use only documented public SDK methods
+- If using internal properties, document with comments and type assertions
+- Always implement proper cleanup in useEffect hooks
+- Use local type definitions instead of importing non-exported types
+- Add robust error handling for all {feature-name} and operations
+- Add TypeScript type guards for any SDK properties that might be undefined
+
+## UI Best Practices
+- Always ensure that you ONLY use available Biom3 Components without assuming they exist. (Text and Spinner DOES NOT exist in the Biom3 UI Library)
+- Use standard HTML elements (h1, h2, h3, p) for text content. 
+- Use Biom3 Button and other UI components as documented
+- Show clear loading/error states
+- Keep UI simple and focused on demonstrating the {feature-name}
+
+## Critical Error Prevention
+- Always check if objects exist before accessing their properties or methods
+- Use optional chaining when accessing potentially undefined properties: obj?.prop?.method?.()
+- Wrap all {feature-name} setup and teardown in try/catch blocks
+- Test component mounting/unmounting thoroughly to catch cleanup issues
+
+## Common Pitfalls to Avoid
+- DO NOT call methods that don't exist on the SDK instances
+- DO NOT try to import types that aren't explicitly exported
+- DO NOT forget to clean up {feature-name} setup and teardown
+- DO NOT use custom components or providers unless necessary
+- DO NOT modify dependency versions in package.json
+- DO NOT use inconsistent import methods (mixing default and named imports)
+- DO NOT forget to include 'use client' directive in client components
+- DO NOT assume any property or method exists without checking first 
 [END PART 1/4]
 Remember not answering yet. Just acknowledge you received this part with the message "Part 1/4 received" and wait for the next part.

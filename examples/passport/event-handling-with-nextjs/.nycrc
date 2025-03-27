@@ -1,0 +1,15 @@
+{
+  "extends": "@istanbuljs/nyc-config-typescript",
+  "all": true,
+  "check-coverage": true,
+  "include": ["src/app/event-handling/**/*.tsx", "src/app/event-handling/**/*.ts"],
+  "exclude": ["**/*.spec.ts", "**/*.test.ts", "node_modules/**", ".next/**"],
+  "branches": 70,
+  "lines": 70,
+  "functions": 70,
+  "statements": 70,
+  "report-dir": "./coverage",
+  "temp-dir": "./.nyc_output",
+  "instrument": true,
+  "sourceMap": true
+} 
