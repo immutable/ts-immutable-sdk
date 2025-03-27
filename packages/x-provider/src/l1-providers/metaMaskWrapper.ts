@@ -30,12 +30,15 @@ export class MetaMaskIMXProvider extends GenericIMXProvider {
         );
 
         const signer = await metaMaskProvider.getSigner();
+        const address = await signer.getAddress();
 
         track('xProvider', 'log', {
+          address,
           param: 'metaMaskProvider.getSigner().getAddress()',
-          val: await signer.getAddress(),
+          val: address,
         });
         track('xProvider', 'log', {
+          address,
           param: 'imxSigner.getAddress()',
           val: this.imxSigner.getAddress(),
         });
