@@ -4,7 +4,6 @@ import { ethers } from 'ethers';
 import { Flow, trackDuration } from '@imtbl/metrics';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { PassportConfiguration } from '../config';
-import { lazyDocumentReady } from '../utils/lazyLoad';
 import { withMetricsAsync } from '../utils/metrics';
 import { MagicProviderProxyFactory } from './magicProviderProxyFactory';
 import { MagicClient } from './types';
@@ -16,29 +15,26 @@ export default class MagicAdapter {
 
   private readonly magicProviderProxyFactory: MagicProviderProxyFactory;
 
-  private readonly lazyMagicClient?: Promise<MagicClient>;
+  private readonly magicClient?: MagicClient;
 
   constructor(config: PassportConfiguration, magicProviderProxyFactory: MagicProviderProxyFactory) {
     this.config = config;
     this.magicProviderProxyFactory = magicProviderProxyFactory;
 
     if (typeof window !== 'undefined') {
-      this.lazyMagicClient = lazyDocumentReady<MagicClient>(() => {
-        const client = new Magic(this.config.magicPublishableApiKey, {
-          extensions: [new OpenIdExtension()],
-          network: MAINNET, // We always connect to mainnet to ensure addresses are the same across envs
-        });
-        return client;
+      this.magicClient = new Magic(this.config.magicPublishableApiKey, {
+        extensions: [new OpenIdExtension()],
+        network: MAINNET, // We always connect to mainnet to ensure addresses are the same across envs
       });
     }
   }
 
-  private get magicClient(): Promise<MagicClient> {
-    if (!this.lazyMagicClient) {
+  private getMagicClient(): MagicClient {
+    if (!this.magicClient) {
       throw new Error('Cannot perform this action outside of the browser');
     }
 
-    return this.lazyMagicClient;
+    return this.magicClient;
   }
 
   async login(
@@ -48,16 +44,13 @@ export default class MagicAdapter {
       withMetricsAsync(async (flow: Flow) => {
         const startTime = performance.now();
 
-        const magicClient = await this.magicClient;
+        const magicClient = this.getMagicClient();
         flow.addEvent('endMagicClientInit');
 
-        const isUserLoggedIn = await magicClient.user.isLoggedIn();
-        if (!isUserLoggedIn) {
-          await magicClient.openid.loginWithOIDC({
-            jwt: idToken,
-            providerId: this.config.magicProviderId,
-          });
-        }
+        await magicClient.openid.loginWithOIDC({
+          jwt: idToken,
+          providerId: this.config.magicProviderId,
+        });
         flow.addEvent('endLoginWithOIDC');
 
         trackDuration(
@@ -72,7 +65,7 @@ export default class MagicAdapter {
   }
 
   async logout() {
-    const magicClient = await this.magicClient;
+    const magicClient = this.getMagicClient();
     if (magicClient.user) {
       await magicClient.user.logout();
     }
