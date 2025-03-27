@@ -1,3 +1,4 @@
+import { track } from '@imtbl/metrics';
 import { ProviderConfiguration } from '../config';
 import { connect } from './metaMask';
 import {
@@ -30,8 +31,14 @@ export class MetaMaskIMXProvider extends GenericIMXProvider {
 
         const signer = await metaMaskProvider.getSigner();
 
-        console.log('metaMaskProvider.getSigner().getAddress()', await signer.getAddress());
-        console.log('imxSigner.getAddress()', this.imxSigner.getAddress());
+        track('xProvider', 'log', {
+          param: 'metaMaskProvider.getSigner().getAddress()',
+          val: await signer.getAddress(),
+        });
+        track('xProvider', 'log', {
+          param: 'imxSigner.getAddress()',
+          val: this.imxSigner.getAddress(),
+        });
 
         return new MetaMaskIMXProvider(
           config,
