@@ -2,8 +2,10 @@ import {
   ChainId, Checkout, GetBalanceResult, TokenInfo,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
+import { parseUnits } from 'ethers';
 import {
   calculateCryptoToFiat,
+  calculateFeesFiat,
   formatFiatString,
   formatZeroAmount,
   isNativeToken,
@@ -21,7 +23,27 @@ const checkout = new Checkout({
   },
 });
 
+const fromToken = { name: 'Guild of Guardians', symbol: 'GOG', decimals: 18 } as TokenInfo;
+const gasFeeToken = { name: 'Immutable', symbol: 'IMX', decimals: 18 } as TokenInfo;
+const conversions = new Map<string, number>([['imx', 0.6441], ['gog', 0.01684]]);
+
 describe('utils', () => {
+  describe('calculateFeesFiat', () => {
+    it('includes the USD equivalent of the secondary fees', () => {
+      const quoteWithSecondaryFees = { quote: { fees: [{ amount: { value: parseUnits('0.123', 18) } }] } } as any;
+      const gasFeeValue = '0';
+      const feesInFiat = calculateFeesFiat(quoteWithSecondaryFees, fromToken, gasFeeToken, conversions, gasFeeValue);
+      expect(feesInFiat).toBe(0.00207132);
+    });
+
+    it('includes the USD equivalent of the gas fees', () => {
+      const quoteWithoutSecondaryFees = { quote: { fees: [] } } as any;
+      const gasFeeValue = '0.123';
+      const feesInFiat = calculateFeesFiat(quoteWithoutSecondaryFees, fromToken, gasFeeToken, conversions, gasFeeValue);
+      expect(feesInFiat).toBe(0.0792243);
+    });
+  });
+
   describe('sortTokensByAmount', () => {
     it('should sort tokens by amount', () => {
       const tokens: GetBalanceResult[] = [

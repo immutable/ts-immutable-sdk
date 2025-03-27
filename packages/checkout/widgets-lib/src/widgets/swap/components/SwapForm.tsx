@@ -18,7 +18,7 @@ import { amountInputValidation as textInputValidator } from '../../../lib/valida
 import { SwapContext } from '../context/SwapContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import {
-  calculateCryptoToFiat, calculateCryptoToFiatBigInt, formatZeroAmount,
+  calculateCryptoToFiat, calculateFeesFiat, formatZeroAmount,
   getDefaultTokenImage, isNativeToken, tokenValueFormat,
 } from '../../../lib/utils';
 import {
@@ -128,23 +128,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
 
   const feeFiatValue = useMemo(() => {
     if (!gasFeeToken || !quote || !fromToken) return null;
-
-    const gasFeeEstimateFiat = calculateCryptoToFiat(
-      gasFeeValue,
-      gasFeeToken.symbol,
-      cryptoFiatState.conversions,
-      '0.00',
-      10,
-    );
-
-    const secondaryFeesTotal = quote.quote.fees?.reduce((acc, fee) => acc + fee.amount.value, 0n);
-    const secondaryFeesFiat = calculateCryptoToFiatBigInt(
-      secondaryFeesTotal,
-      fromToken,
-      cryptoFiatState.conversions,
-    );
-
-    return Number(gasFeeEstimateFiat) + Number(secondaryFeesFiat);
+    return calculateFeesFiat(quote, fromToken, gasFeeToken, cryptoFiatState.conversions, gasFeeValue);
   }, [quote, cryptoFiatState.conversions, gasFeeToken, gasFeeValue, fromToken]);
 
   const [tokensOptionsFrom, setTokensOptionsForm] = useState<CoinSelectorOptionProps[]>([]);

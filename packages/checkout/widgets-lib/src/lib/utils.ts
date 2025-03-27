@@ -4,6 +4,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { Contract, formatUnits } from 'ethers';
+import { TransactionResponse } from '@imtbl/dex-sdk';
 import { getL1ChainId, getL2ChainId } from './networkUtils';
 import {
   CHECKOUT_CDN_BASE_URL,
@@ -88,13 +89,38 @@ export const calculateCryptoToFiat = (
   return formatFiatString(parsedAmount * conversion, maxDecimals);
 };
 
-export const calculateCryptoToFiatBigInt = (
+const calculateCryptoToFiatBigInt = (
   amount: bigint,
   token: TokenInfo,
   conversions: Map<string, number>,
 ) => {
   const formattedAmount = formatUnits(amount, token.decimals);
   return calculateCryptoToFiat(formattedAmount, token.symbol, conversions, '0.00', 10);
+};
+
+export const calculateFeesFiat = (
+  quote: TransactionResponse,
+  fromToken: TokenInfo,
+  gasFeeToken: TokenInfo,
+  conversions: Map<string, number>,
+  gasFeeValue: string,
+) => {
+  const gasFeeEstimateFiat = calculateCryptoToFiat(
+    gasFeeValue,
+    gasFeeToken.symbol,
+    conversions,
+    '0.00',
+    10,
+  );
+
+  const secondaryFeesTotal = quote.quote.fees?.reduce((acc, fee) => acc + fee.amount.value, 0n);
+  const secondaryFeesFiat = calculateCryptoToFiatBigInt(
+    secondaryFeesTotal,
+    fromToken,
+    conversions,
+  );
+
+  return Number(gasFeeEstimateFiat) + Number(secondaryFeesFiat);
 };
 
 export const formatZeroAmount = (
