@@ -39,6 +39,7 @@ describe('utils', () => {
           }],
         },
       } as any;
+
       const feesInFiat = calculateFeesFiat(
         quoteWithSecondaryFees,
         fromToken,
@@ -46,12 +47,14 @@ describe('utils', () => {
         conversions,
         gasFeeInIMX.toString(),
       );
+
       expect(feesInFiat).toBe(0.00767904); // secondaryFeeInGOG * conversions.get('gog'));
     });
 
     it('includes the USD equivalent of the gas fees', () => {
       const gasFeeInIMX = 0.123;
       const quoteWithoutSecondaryFees = { quote: { fees: [] } } as any;
+
       const feesInFiat = calculateFeesFiat(
         quoteWithoutSecondaryFees,
         fromToken,
@@ -59,7 +62,30 @@ describe('utils', () => {
         conversions,
         gasFeeInIMX.toString(),
       );
+
       expect(feesInFiat).toBe(0.0792243); // gasFeeInIMX * conversions.get('imx'));
+    });
+
+    it('includes both types of fees when present', () => {
+      const gasFeeInIMX = 0.123;
+      const secondaryFeeInGOG = 0.456;
+      const quoteWithSecondaryFees = {
+        quote: {
+          fees: [{
+            amount: { value: parseUnits(secondaryFeeInGOG.toString(), 18) },
+          }],
+        },
+      } as any;
+
+      const feesInFiat = calculateFeesFiat(
+        quoteWithSecondaryFees,
+        fromToken,
+        gasFeeToken,
+        conversions,
+        gasFeeInIMX.toString(),
+      );
+
+      expect(feesInFiat).toBe(0.08690334); // both values above summed.
     });
   });
 
