@@ -210,4 +210,3 @@ IMPORTANT: MAKE SURE THAT THE PASSPORT SDK IS INITIALIZED CORRECTLY IN THE SETUP
 - DO NOT use inconsistent import methods (mixing default and named imports)
 - DO NOT forget to include 'use client' directive in client components
 - DO NOT assume any property or method exists without checking first 
-- NEVER ADD `"ignoreDuringBuilds": true` TO .eslintrc.json 

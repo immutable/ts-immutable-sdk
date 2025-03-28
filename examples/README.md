@@ -21,6 +21,7 @@
 - [Contribution guidelines](#contribution-guidelines)
 - [Adding examples](#adding-examples)
 - [End to end testing](#end-to-end-testing)
+- [Generating OR Updating a new feature in an existing example app using Cursor](#generating-or-updating-a-new-feature-in-an-existing-example-app-using-cursor)
 - [Using code examples in the docs site](#using-code-examples-in-the-docs-site)
 <hr />
 
@@ -28,7 +29,7 @@
 
 The example apps in this examples directory are compiled and tested as part of our CI CD pipeline. The goal of this is to ensure the examples found here are always able to run against the latest version of the Immutable Typescript SDK. 
 
-Selected portions of code from these example apps are then displayed as code snippets in our docs site, which means our code snippets in the docs are inherently always accurate as well. How to include the code from here in the docs site is explained below. 
+Selected portions of code from these example apps are then displayed as code snippets in our docs site, which means our code snippets in the docs are inherently always accurate as well. How to include the code from here in the docs site is explained below.
 
 These example apps can also be used directly as a reference and run locally to test and develop with.
 
@@ -323,6 +324,73 @@ Run your tests
 ```bash
 pnpm test
 ```
+
+# Generating OR Updating a new feature in an existing example app using Cursor
+
+1) Open the product folder under /examples/{product}
+
+2) Under the {product} directory, open the prompt-part2.txt file.
+
+3) Copy all of the content in the prompt-part2.txt file.
+
+4) Paste it on to Cursor. Make sure that you're using Agent mode and the model to be used is Claude 3.7
+
+5) After pasting the prompt, in the chat window you can type: 
+app name: <app name(if exists)>
+feature name: <name of the feature>
+and cursor will generate the feature page in the given app.
+
+6) To update an existing feature, the prompt will identify if the given <feature name> exists in the <app name> directory. If it does, it will check if 
+`/* MANUALLY EDITED - DO NOT OVERWRITE */` exists in the file.
+
+7) If the flag above exists, it will ask for a confirmation, otherwise, it will use best practices to update the existing feature page.
+
+8) Once the feature page is completed, under the same directory as prompt-part2.txt, open prompt-part3.txt and copy all of its contents.
+
+9) Paste it on to a new Cursor window and in the chat window you can type: 
+app name: <app name(if exists)>
+feature name: <name of the feature>
+
+10) Cursor will then run tests and build until everything passes and renders properly.
+
+11) When the prompt is done running, make sure to double check if the tests are comprehensive enough and also check if the feature page was built properly using best practices.
+
+## If an App Doesn't Exist Yet
+
+You must create the app first by going to the prompt-part1.txt file and paste it on to Cursor's chat window and use Agent Mode + Claude 3.7 Sonnet Thinking.
+
+In the chat window, type in:
+feature name: <name>
+
+Then Cursor will build out the example app's setup, etc.
+
+## Understanding the Prompt Files
+
+The example generation process uses three different prompt files, each with a specific purpose:
+
+### prompt-part1.txt
+- **Purpose**: Creates the initial app structure and boilerplate
+- **When to use**: Only when you need to create a completely new example app
+- **What it does**: Sets up the project structure, configuration files, basic components, and placeholder pages
+- **Output**: A functioning but minimal app with no implemented features
+
+### prompt-part2.txt
+- **Purpose**: Implements or updates a specific feature within an existing app
+- **When to use**: After creating an app with prompt-part1.txt, or when adding/updating features
+- **What it does**: Creates or modifies the feature implementation with proper error handling, UI states, and best practices
+- **Output**: A fully implemented feature page within the app structure
+
+### prompt-part3.txt
+- **Purpose**: Tests, validates, and fixes issues in the implementation
+- **When to use**: After running prompt-part2.txt to implement a feature
+- **What it does**: Runs tests, checks coverage, builds the app, and fixes any detected issues
+- **Output**: A tested, validated feature ready for use
+
+**Typical Workflow:**
+1. Use prompt-part1.txt to create a new app (only once per app)
+2. Use prompt-part2.txt to implement each feature in the app
+3. Use prompt-part3.txt after each feature implementation to test and validate
+
 # Using code examples in the docs site
 
 Creating and using code snippets is relatively straight forward. You can pull in a whole file or by adding some comments you can pull in just a particular few lines of a file as necessary.
@@ -366,7 +434,6 @@ It's very simple to use the code snippet in the docs site, you just add a code b
 
 ````md
 ```tsx reference=examples/checkout/sdk-connect-with-nextjs/src/app/connect-with-metamask/page.tsx#get-wallet-allow-list title="Get the wallet allow list"
-```
 ```
 ````
 Or if you want to display the whole file just don't include a `#` label at the end of the file reference e.g.

@@ -1,17 +1,17 @@
-## Immutable Passport SDK Example App Generator - Part 1: Create the App
+## Immutable Checkout SDK Example App Generator - Part 1: Create the App
 
 # Overview
-This prompt helps you create a new React example app that demonstrates the {feature name} feature of the Immutable Passport SDK. The output will be a fully functional, self-contained example with proper documentation and adherence to best practices.
+This prompt helps you create a new React example app that demonstrates the {feature name} feature of the Immutable Checkout SDK. The output will be a fully functional, self-contained example with proper documentation and adherence to best practices.
 
 # App Information
 - Feature name: {feature name}
 - Framework: nextjs
 
 # Step 1: Core Setup
-Create a new example app named {feature name}-with-nextjs in /examples/passport/ with this structure:
+Create a new example app named {feature name}-with-nextjs in /examples/checkout/ with this structure:
 
 ```
-/examples/passport/{feature name}-with-nextjs/
+/examples/checkout/{feature name}-with-nextjs/
 ├── src/app/
 │ ├── page.tsx # Main landing page with feature links
 │ ├── {feature name}/page.tsx # Primary feature implementation
@@ -48,7 +48,7 @@ Copy these essential files from an existing example (e.g., login-with-nextjs):
 - playwright.config.ts
 - .eslintrc.json
 
-IMPORTANT: Ensure that you've gone through the Passport SDK Documentation and have a very deep understanding of the SDK before you start.
+IMPORTANT: Ensure that you've gone through the checkout SDK Documentation and have a very deep understanding of the SDK before you start.
 IMPORTANT: We have an internal UI Library called Biom3. Make sure that you thoroughly understand all of the components. DON'T ASSUME that a component exists. ALWAYS DOUBLE CHECK BEFORE YOU IMPORT OR USE ANYTHING
 IF THE COMPONENT THAT YOU WANT DOESN'T EXIST IN BIOM3, ALWAYS USE NORMAL CSS/HTML AND NEVER ASSUME. (https://github.com/immutable/biom3 | https://immutable.atlassian.net/wiki/spaces/DS/pages/2335965298/BIOME+Docs)
 
@@ -62,12 +62,12 @@ For ALL component files:
 - When importing from libraries, verify the component exists in that library
 - For Next.js client components, always include 'use client' at the top of the file
 
-IMPORTANT: MAKE SURE THAT THE PASSPORT SDK IS INITIALIZED CORRECTLY IN THE SETUPDEFAULT.TS FILE. REFER TO OTHER EXAMPLE APPS LIKE LOGIN-WITH-NEXTJS FOR THE CORRECT SETUP.
+IMPORTANT: MAKE SURE THAT THE checkout SDK IS INITIALIZED CORRECTLY IN THE SETUPDEFAULT.TS FILE. REFER TO OTHER EXAMPLE APPS LIKE LOGIN-WITH-NEXTJS FOR THE CORRECT SETUP.
 IMPORTANT: DON'T IMPLEMENT THE {feature name} AT ALL. JUST SETUP THE PROJECT STRUCTURE AND DOCUMENTATION.
 
 ## Main Landing Page (src/app/page.tsx)
 Create a simple landing page with:
-- Brief description of the Passport {feature name} features
+- Brief description of the checkout {feature name} features
 - Link to the {feature name} implementation page
 - Clear, concise UI using standard HTML (h1, h2, p) and Biom3 Button components
 
@@ -166,14 +166,14 @@ COPY OVER THE RELEVANT E2E TEST FILES (INCLUDING SETUP, ETC) FROM OTHER EXAMPLE 
   }
   ```
 - Test all pages renders perfectly
-- Test {feature name} functionality thoroughly with all possible scenarios. (If it's Passport specific, this is not required)
+- Test {feature name} functionality thoroughly with all possible scenarios. (If it's checkout specific, this is not required)
 - Test all {feature name} handling and cleanup
 - Explicitly validate that components render without errors
 - Use act() for all asynchronous operations
 - Write tests that exercise all code paths to achieve high coverage
 
 # Step 5: Implementation Guidelines
-IMPORTANT: MAKE SURE THAT THE PASSPORT SDK IS INITIALIZED CORRECTLY IN THE SETUPDEFAULT.TS FILE. REFER TO OTHER EXAMPLE APPS LIKE LOGIN-WITH-NEXTJS FOR THE CORRECT SETUP.
+IMPORTANT: MAKE SURE THAT THE checkout SDK IS INITIALIZED CORRECTLY IN THE SETUPDEFAULT.TS FILE. REFER TO OTHER EXAMPLE APPS LIKE LOGIN-WITH-NEXTJS FOR THE CORRECT SETUP.
 ## SDK Usage Best Practices
 - Use only documented public SDK methods
 - If using internal properties, document with comments and type assertions
@@ -210,4 +210,3 @@ IMPORTANT: MAKE SURE THAT THE PASSPORT SDK IS INITIALIZED CORRECTLY IN THE SETUP
 - DO NOT use inconsistent import methods (mixing default and named imports)
 - DO NOT forget to include 'use client' directive in client components
 - DO NOT assume any property or method exists without checking first 
-- NEVER ADD `"ignoreDuringBuilds": true` TO .eslintrc.json 

@@ -1,0 +1,96 @@
+## Immutable Checkout SDK Example App Generator - Part 2: Adding or Updating {feature name}
+
+### Usage Instructions
+This prompt helps you:
+1. Add a new feature implementation to an existing example app
+2. Update an existing feature implementation
+3. Safely handle manually edited code
+
+**IMPORTANT**: Before running this prompt:
+- If the feature file contains the comment `/* MANUALLY EDITED - DO NOT OVERWRITE */`, the prompt will alert you before making changes
+- To add a new feature, specify the feature name that doesn't exist yet
+- To update a feature, specify the existing feature name to be updated
+
+### Initial Analysis
+1. Check if `src/app/{feature name}/page.tsx` already exists:
+   - If it exists, look for the `/* MANUALLY EDITED - DO NOT OVERWRITE */` comment
+   - If manually edited, alert the engineer and request confirmation before proceeding
+   - If not manually edited or if confirmation received, proceed with update
+   - If it doesn't exist, prepare to create a new implementation
+
+2. Identify integration points with the existing app:
+   - Check for navigation components that need updating
+   - Verify any shared state or context requirements
+   - Identify any dependencies in the existing codebase
+
+3. Read the complete Checkout SDK documentation for the {feature name} feature at https://docs.immutable.com/docs/zkEVM/products/checkout.
+
+IMPORTANT: We have an internal UI Library called Biom3. Make sure that you thoroughly understand all of the components. DON'T ASSUME that a component exists. ALWAYS DOUBLE CHECK BEFORE YOU IMPORT OR USE ANYTHING
+IF THE COMPONENT THAT YOU WANT DOESN'T EXIST IN BIOM3, ALWAYS USE NORMAL CSS/HTML AND NEVER ASSUME. (https://github.com/immutable/biom3 | https://immutable.atlassian.net/wiki/spaces/DS/pages/2335965298/BIOME+Docs)
+
+### Implementation Strategy
+1. For NEW feature implementation:
+   - Create `src/app/{feature name}/page.tsx` with the 'use client' directive
+   - Import all necessary components and SDK elements
+   - Implement the feature with proper error handling, loading states, and UI
+   - Update any navigation components to include the new feature (if applicable)
+   - Listen to additional {feature name} specific requirements given by the user via the chat window
+   - Ensure that checkout login/wallet connect is implemented properly. If not sure, refer to other checkout example apps for reference.
+
+2. For UPDATING existing implementation:
+   - Preserve any custom imports or components specific to the app
+   - Update SDK-related code with the latest implementation
+   - Maintain the existing UI structure while updating functionality
+   - Preserve any custom logic that extends beyond the standard implementation
+
+3. For any implementation:
+   - Verify all SDK objects before use: `if (!checkoutSDK) return;` or `if (!passportInstance) return;`
+   - Use optional chaining: `instance?.method?.()`
+   - Wrap SDK calls in try/catch with appropriate error handling
+   - Display meaningful error messages to users
+   - Track and display loading states
+
+### Feature Implementation Requirements
+1. Use only documented methods and properties that exist on the SDK
+2. Follow exact method signatures for all calls
+3. Type all variables properly with TypeScript
+4. Properly handle component lifecycle and cleanup
+5. Implement event listeners with proper typing and cleanup (when applicable)
+6. Structure UI with semantic HTML and Biom3 components
+7. Implement clear loading, success, and error states
+
+### Code Quality Checklist
+- [ ] All SDK objects checked for existence before use
+- [ ] All async operations wrapped in try/catch
+- [ ] Event listeners properly removed in cleanup functions
+- [ ] No references to unmounted components
+- [ ] Integration with existing app navigation/state (if applicable)
+- [ ] Proper TypeScript typing on all variables and functions
+- [ ] React State hooks must be used appropriately, e.g. state updates must be handled correctly. e.g. on successful logins, loading must be set to false.
+
+### Readme Instructions
+Add the following to the project README.md under a "Feature Management" section:
+
+```markdown
+## Feature Management
+
+### Adding New Features
+To add a new feature implementation to this example app:
+1. Run the {feature name} generator prompt
+2. Specify the new feature name when prompted
+3. The generator will create a new feature implementation at `src/app/{feature name}/page.tsx`
+4. Update any navigation components to include the new feature
+
+### Updating Features
+To update an existing feature implementation:
+1. Run the {feature name} generator prompt
+2. Specify the existing feature name to update
+3. The generator will update the implementation while preserving app-specific customizations
+
+### Protecting Manual Edits
+If you've made manual edits to a feature implementation that you want to protect:
+1. Add the comment `/* MANUALLY EDITED - DO NOT OVERWRITE */` at the top of the file
+2. The generator will alert you before overwriting manually edited files
+```
+
+This comprehensive guide will help you safely add or update feature implementations while respecting existing code and manual edits.

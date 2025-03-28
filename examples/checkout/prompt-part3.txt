@@ -1,4 +1,4 @@
-## Immutable Passport SDK Example App Generator - Part 3: Testing and Validation
+## Immutable Checkout SDK Example App Generator - Part 3: Testing and Validation
 
 # Step 1: Validation Checklist
 Before proceeding with testing and running the rest of the prompt, verify ALL of these items:
@@ -16,13 +16,13 @@ Before proceeding with testing and running the rest of the prompt, verify ALL of
 
 # Step 2: Testing Process
 IMPORTANT: TESTS MUST PASS WITH SUFFICIENT COVERAGE BEFORE PROCEEDING. DO NOT SKIP THIS STEP UNDER ANY CIRCUMSTANCES.
-IMPORTANT: REMOVE ALL TESTS THAT WOULD BE TOO COMPLICATED TO BE TESTED IN AN E2E TESTING SCENARIO(REMOVE PASSPORT SPECIFIC TEST THAT REQUIRES AUTHENTICATION THROUGH PASSPORT POP-UPS). FOCUS ON ENSURING THAT ALL PAGES CAN RENDER PROPERLY.
+IMPORTANT: REMOVE ALL TESTS THAT WOULD BE TOO COMPLICATED TO BE TESTED IN AN E2E TESTING SCENARIO(REMOVE CHECKOUT SPECIFIC TEST THAT REQUIRES AUTHENTICATION THROUGH CHECKOUT POP-UPS). FOCUS ON ENSURING THAT ALL PAGES CAN RENDER PROPERLY.
 ## Unit Tests and Coverage Validation
 Run the unit tests to ensure all {feature name} functionality works correctly:
 
 1. Navigate to the {feature name}-with-nextjs directory:
    ```
-   cd examples/passport/{feature name}-with-nextjs
+   cd examples/checkout/{feature name}-with-nextjs
    ```
 
 2. Install dependencies:
