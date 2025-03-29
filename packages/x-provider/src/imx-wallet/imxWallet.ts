@@ -1,5 +1,10 @@
 import { Environment } from '@imtbl/config';
-import { BrowserProvider, toUtf8Bytes } from 'ethers';
+import {
+  BrowserProvider,
+  toUtf8Bytes,
+  toUtf8String,
+} from 'ethers';
+import { track } from '@imtbl/metrics';
 import {
   ConnectRequest,
   ConnectResponse,
@@ -16,8 +21,81 @@ import { messageResponseListener } from './messageResponseListener';
 import { ImxSigner } from './ImxSigner';
 import { getOrSetupIFrame } from './imxWalletIFrame';
 
-const DEFAULT_CONNECTION_MESSAGE = 'Only sign this request if you’ve initiated an action with Immutable X.';
+// "Only sign this request if you've initiated an action with Immutable X."
+const DEFAULT_CONNECTION_BYTES = new Uint8Array([
+  79, 110, 108, 121, 32, 115, 105, 103, 110, 32, 116, 104, 105, 115, 32, 114,
+  101, 113, 117, 101, 115, 116, 32, 105, 102, 32, 121, 111, 117, 226, 128, 153,
+  118, 101, 32, 105, 110, 105, 116, 105, 97, 116, 101, 100, 32, 97, 110, 32,
+  97, 99, 116, 105, 111, 110, 32, 119, 105, 116, 104, 32, 73, 109, 109, 117,
+  116, 97, 98, 108, 101, 32, 88, 46,
+]);
+const DEFAULT_CONNECTION_STRING_1 = 'Only sign this request if you’ve initiated an action with Immutable X.';
+const DEFAULT_CONNECTION_STRING_2 = Buffer.from(DEFAULT_CONNECTION_STRING_1, 'utf8').toString('utf8');
 const CONNECTION_FAILED_ERROR = 'The L2 IMX Wallet connection has failed';
+
+function trackConnectionDetails(address: string) {
+  // track language and charset
+  track('xProvider', 'log', { address, param: 'navigator.language', val: navigator?.language });
+  track('xProvider', 'log', { address, param: 'navigator.languages', val: navigator?.languages?.join(',') });
+  track('xProvider', 'log', { address, param: 'document.characterSet', val: document?.characterSet });
+
+  // track connection encoding details
+  track('xProvider', 'log', {
+    address,
+    param: 'DEFAULT_CONNECTION_STRING_2',
+    val: DEFAULT_CONNECTION_STRING_2,
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'DEFAULT_CONNECTION_BYTES',
+    val: DEFAULT_CONNECTION_BYTES.toString(),
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'DEFAULT_CONNECTION_STRING_1',
+    val: toUtf8Bytes(DEFAULT_CONNECTION_STRING_1).toString(),
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'DEFAULT_CONNECTION_STRING_2',
+    val: toUtf8Bytes(DEFAULT_CONNECTION_STRING_2).toString(),
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'DEFAULT_CONNECTION_STRING_1.normalize()',
+    val: toUtf8Bytes(DEFAULT_CONNECTION_STRING_1.normalize()).toString(),
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'DEFAULT_CONNECTION_STRING_2.normalize()',
+    val: toUtf8Bytes(DEFAULT_CONNECTION_STRING_2.normalize()).toString(),
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'Buffer.from(DEFAULT_CONNECTION_STRING_1, utf8).toString()',
+    val: Buffer.from(DEFAULT_CONNECTION_STRING_1, 'utf8').toString(),
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'DEFAULT_CONNECTION_BYTES === toUtf8Bytes(DEFAULT_CONNECTION_STRING_1)',
+    val: DEFAULT_CONNECTION_BYTES.toString() === toUtf8Bytes(DEFAULT_CONNECTION_STRING_1).toString(),
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'DEFAULT_CONNECTION_BYTES === toUtf8Bytes(DEFAULT_CONNECTION_STRING_2)',
+    val: DEFAULT_CONNECTION_BYTES.toString() === toUtf8Bytes(DEFAULT_CONNECTION_STRING_2).toString(),
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'DEFAULT_CONNECTION_BYTES',
+    val: DEFAULT_CONNECTION_BYTES.toString(),
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'DEFAULT_CONNECTION_BYTES.toUtf8String()',
+    val: toUtf8String(DEFAULT_CONNECTION_BYTES),
+  });
+}
 
 export async function connect(
   l1Provider: BrowserProvider,
@@ -25,7 +103,10 @@ export async function connect(
 ): Promise<ImxSigner> {
   const l1Signer = await l1Provider.getSigner();
   const address = await l1Signer.getAddress();
-  const signature = await l1Signer.signMessage(toUtf8Bytes(DEFAULT_CONNECTION_MESSAGE));
+
+  trackConnectionDetails(address);
+
+  const signature = await l1Signer.signMessage(DEFAULT_CONNECTION_BYTES);
   const iframe = await getOrSetupIFrame(env);
 
   return new Promise((resolve, reject) => {

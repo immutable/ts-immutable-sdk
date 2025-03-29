@@ -42,8 +42,13 @@ describe('metaMetaWrapper', () => {
 
   describe('connect', () => {
     it('should create a metamask imx provider with a eth signer and imx signer when calling connect', async () => {
-      const ethSigner = {};
-      const imxSigner = {};
+      const ethSigner = {
+        getAddress: jest.fn().mockResolvedValue('0x123'),
+      };
+      const imxSigner = {
+        getAddress: jest.fn().mockResolvedValue('0x456'),
+        signMessage: jest.fn().mockResolvedValue('signed-message'),
+      };
 
       const getSignerMock = jest.fn().mockReturnValue(ethSigner);
       (connect as jest.Mock).mockResolvedValue({
@@ -95,40 +100,51 @@ describe('metaMetaWrapper', () => {
 
   describe('signMessage', () => {
     it('should call sign message on imx signer and return a string', async () => {
-      const getSignerMock = jest.fn().mockReturnValue({});
+      const ethSigner = {
+        getAddress: jest.fn().mockResolvedValue('0x123'),
+      };
+      const imxSigner = {
+        getAddress: jest.fn().mockResolvedValue('0x456'),
+        signMessage: jest.fn().mockResolvedValue('signed-message'),
+      };
+
+      const getSignerMock = jest.fn().mockReturnValue(ethSigner);
       (connect as jest.Mock).mockResolvedValue({
         getSigner: getSignerMock,
       });
-      const signMessageMock = jest.fn().mockReturnValue('Signed message');
-      (buildImxSigner as jest.Mock).mockResolvedValue({
-        signMessage: signMessageMock,
-      });
+      (buildImxSigner as jest.Mock).mockResolvedValue(imxSigner);
 
       await MetaMaskIMXProvider.connect(config);
       const signedMessage = await MetaMaskIMXProvider.signMessage(
         'Message to sign',
       );
 
-      expect(signMessageMock).toBeCalledTimes(1);
-      expect(signMessageMock).toBeCalledWith('Message to sign');
-      expect(signedMessage).toEqual('Signed message');
+      expect(imxSigner.signMessage).toBeCalledTimes(1);
+      expect(imxSigner.signMessage).toBeCalledWith('Message to sign');
+      expect(signedMessage).toEqual('signed-message');
     });
 
     it('should throw provider error when error calling sign message', async () => {
+      const ethSigner = {
+        getAddress: jest.fn().mockResolvedValue('0x123'),
+      };
+      const imxSigner = {
+        getAddress: jest.fn().mockResolvedValue('0x456'),
+        signMessage: jest.fn().mockRejectedValue(new Error('Sign message failed')),
+      };
+
+      const getSignerMock = jest.fn().mockReturnValue(ethSigner);
       (connect as jest.Mock).mockResolvedValue({
-        getSigner: jest.fn().mockReturnValue({}),
+        getSigner: getSignerMock,
       });
-      (buildImxSigner as jest.Mock).mockResolvedValue({
-        signMessage: jest
-          .fn()
-          .mockRejectedValue(new Error('Error signing the message')),
-      });
+      (buildImxSigner as jest.Mock).mockResolvedValue(imxSigner);
+
       await MetaMaskIMXProvider.connect(config);
       await expect(
         MetaMaskIMXProvider.signMessage('Message to sign'),
       ).rejects.toThrow(
         new ProviderError(
-          'Error signing the message',
+          'Sign message failed',
           ProviderErrorType.PROVIDER_CONNECTION_ERROR,
         ),
       );
@@ -137,10 +153,19 @@ describe('metaMetaWrapper', () => {
 
   describe('disconnect', () => {
     it('should call disconnect with the imx signer', async () => {
+      const ethSigner = {
+        getAddress: jest.fn().mockResolvedValue('0x123'),
+      };
+      const imxSigner = {
+        getAddress: jest.fn().mockResolvedValue('0x456'),
+        signMessage: jest.fn().mockResolvedValue('signed-message'),
+      };
+
+      const getSignerMock = jest.fn().mockReturnValue(ethSigner);
       (connect as jest.Mock).mockResolvedValue({
-        getSigner: jest.fn(),
+        getSigner: getSignerMock,
       });
-      (buildImxSigner as jest.Mock).mockResolvedValue({});
+      (buildImxSigner as jest.Mock).mockResolvedValue(imxSigner);
       (disconnectImxSigner as jest.Mock).mockResolvedValue({});
       await MetaMaskIMXProvider.connect(config);
       await MetaMaskIMXProvider.disconnect();
@@ -148,10 +173,19 @@ describe('metaMetaWrapper', () => {
     });
 
     it('should throw provider error when error calling disconnect', async () => {
+      const ethSigner = {
+        getAddress: jest.fn().mockResolvedValue('0x123'),
+      };
+      const imxSigner = {
+        getAddress: jest.fn().mockResolvedValue('0x456'),
+        signMessage: jest.fn().mockResolvedValue('signed-message'),
+      };
+
+      const getSignerMock = jest.fn().mockReturnValue(ethSigner);
       (connect as jest.Mock).mockResolvedValue({
-        getSigner: jest.fn().mockReturnValue({}),
+        getSigner: getSignerMock,
       });
-      (buildImxSigner as jest.Mock).mockResolvedValue({});
+      (buildImxSigner as jest.Mock).mockResolvedValue(imxSigner);
       (disconnectImxSigner as jest.Mock).mockRejectedValue(
         new Error('Error disconnecting'),
       );

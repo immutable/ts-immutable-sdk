@@ -6,6 +6,7 @@
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
     "@imtbl/x-client": "workspace:*",
+    "@imtbl/metrics": "workspace:*",
     "@magic-ext/oidc": "12.0.2",
     "@metamask/detect-provider": "^2.0.0",
     "axios": "^1.6.5",
