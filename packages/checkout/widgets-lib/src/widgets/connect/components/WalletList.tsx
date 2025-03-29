@@ -215,15 +215,21 @@ export function WalletList(props: WalletListProps) {
 
   const connectCallback = async (ethereumProvider: EthereumProvider) => {
     if (ethereumProvider.connected && ethereumProvider.session) {
-      const browserProvider = new WrappedBrowserProvider(ethereumProvider);
+      const browserProvider = new WrappedBrowserProvider(ethereumProvider, 'any');
       selectBrowserProvider(browserProvider, 'walletconnect');
 
       const { chainId } = await ((await browserProvider.getSigner()).provider.getNetwork());
+
+      // eslint-disable-next-line no-console
+      console.log({ checkoutChainId: chainId, targetChainId, walletConnectChainId: ethereumProvider.chainId });
 
       if (ethereumProvider.chainId !== targetChainId) {
         // @ts-ignore allow protected method `switchEthereumChain` to be called
         await ethereumProvider.switchEthereumChain(targetChainId);
       }
+
+      // eslint-disable-next-line no-console
+      console.log({ checkoutChainId: chainId, targetChainId, walletConnectChainId: ethereumProvider.chainId });
 
       if (chainId as unknown as ChainId !== targetChainId) {
         viewDispatch({

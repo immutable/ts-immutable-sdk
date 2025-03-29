@@ -207,6 +207,8 @@ export function ConnectLoader({
             return;
           }
         } catch (err) {
+          // eslint-disable-next-line no-console
+          console.error(err);
           return;
         }
 
@@ -217,6 +219,8 @@ export function ConnectLoader({
           const anonymousId = userData?.anonymousId();
           await identifyUser(identify, browserProvider!, { anonymousId });
         } catch (err) {
+          // eslint-disable-next-line no-console
+          console.error(err);
           return;
         }
 
