@@ -1,6 +1,6 @@
 # Example Apps Documentation Generator
 ## Task Overview
-Analyze all example apps in the /examples/passport/ directory and create documentation files for each example app that doesn't already have them. For each example app, you will create:
+Analyze the example app in the /examples/passport/{app name} directory and create documentation files for the specified example app. For each example app, you will create:
 1. A comprehensive tutorial.md file
 2. A metadata.json file
 
@@ -10,8 +10,8 @@ Before starting:
 - Understand the SDK's key features, functionality, and integration patterns
 - Focus on the Passport SDK the most. That's your area of specialty.
 
-## Process for Each Example App
-For each subdirectory in /examples/passport/ that doesn't already have both tutorial.md and metadata.json:
+## Process for the specified example app
+For the specified example app in the /examples/passport/{app name} directory:
 
 ### 1. Analysis Phase
 - Read all code files in the example app directory
