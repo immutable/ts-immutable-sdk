@@ -3,9 +3,11 @@ import { ExchangeOverrides, SecondaryFee } from '@imtbl/dex-sdk';
 import { Passport } from '@imtbl/passport';
 import { TokenBridgeInfo, TokenInfo } from './tokenInfo';
 import { ChainId } from './chains';
+import { NetworkMap } from './network';
 
 export interface CheckoutOverrides {
   environment?: Environment;
+  networkMap?: NetworkMap;
   [key: string]: unknown;
 }
 
