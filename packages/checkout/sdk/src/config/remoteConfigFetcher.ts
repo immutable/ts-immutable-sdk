@@ -1,37 +1,21 @@
-import { Environment } from '@imtbl/config';
 import { AxiosResponse } from 'axios';
 import { RemoteConfiguration } from '../types';
-import { CHECKOUT_CDN_BASE_URL, ENV_DEVELOPMENT } from '../env';
 import { HttpClient } from '../api/http';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-
-export type RemoteConfigParams = {
-  isDevelopment: boolean;
-  isProduction: boolean;
-};
 
 export class RemoteConfigFetcher {
   private httpClient: HttpClient;
 
-  private isDevelopment: boolean;
-
-  private isProduction: boolean;
+  private endpoint: string;
 
   private configCache: RemoteConfiguration | undefined;
 
   private version: string = 'v1';
 
-  constructor(httpClient: HttpClient, params: RemoteConfigParams) {
-    this.isDevelopment = params.isDevelopment;
-    this.isProduction = params.isProduction;
+  constructor(httpClient: HttpClient, endpoint: string) {
     this.httpClient = httpClient;
+    this.endpoint = endpoint;
   }
-
-  private getEndpoint = () => {
-    if (this.isDevelopment) return CHECKOUT_CDN_BASE_URL[ENV_DEVELOPMENT];
-    if (this.isProduction) return CHECKOUT_CDN_BASE_URL[Environment.PRODUCTION];
-    return CHECKOUT_CDN_BASE_URL[Environment.SANDBOX];
-  };
 
   // eslint-disable-next-line class-methods-use-this
   private parseResponse<T>(response: AxiosResponse<any, any>): T {
@@ -56,7 +40,7 @@ export class RemoteConfigFetcher {
     let response: AxiosResponse;
     try {
       response = await this.httpClient.get(
-        `${this.getEndpoint()}/${this.version}/config`,
+        `${this.endpoint}/${this.version}/config`,
       );
     } catch (err: any) {
       throw new CheckoutError(

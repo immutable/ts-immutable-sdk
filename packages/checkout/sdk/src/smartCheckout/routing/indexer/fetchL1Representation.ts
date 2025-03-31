@@ -1,4 +1,4 @@
-import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../../config';
+import { CheckoutConfiguration } from '../../../config';
 import { createBlockchainDataInstance } from '../../../instance';
 import { NATIVE } from '../../../env';
 import { ChainId, ChainSlug, ImxAddressConfig } from '../../../types';
@@ -35,12 +35,12 @@ export const fetchL1Representation = async (
 ): Promise<L1ToL2TokenAddressMapping | undefined> => {
   if (isNativeToken(l2address)) {
     return {
-      l1address: await getImxL1Representation(getL1ChainId(config), config),
+      l1address: await getImxL1Representation(config.l1ChainId, config),
       l2address: NATIVE,
     };
   }
 
-  const chainName = getIndexerChainName(getL2ChainId(config));
+  const chainName = getIndexerChainName(config.l2ChainId);
   const blockchainData = createBlockchainDataInstance(config);
   const tokenData = await blockchainData.getToken({
     chainName,

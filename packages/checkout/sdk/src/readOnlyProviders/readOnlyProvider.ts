@@ -1,4 +1,5 @@
 import { JsonRpcProvider } from 'ethers';
+import { Environment } from '@imtbl/config';
 import * as network from '../network';
 import { ChainId, NetworkFilterTypes } from '../types';
 import { CheckoutConfiguration } from '../config';
@@ -7,7 +8,11 @@ export async function createReadOnlyProviders(
   config: CheckoutConfiguration,
   existingReadOnlyProviders?: Map<ChainId, JsonRpcProvider>,
 ): Promise<Map<ChainId, JsonRpcProvider>> {
-  if (config.isProduction && existingReadOnlyProviders?.has(ChainId.ETHEREUM)) return existingReadOnlyProviders;
+  if (
+    config.environment === Environment.PRODUCTION
+    && existingReadOnlyProviders?.has(ChainId.ETHEREUM)
+  ) return existingReadOnlyProviders;
+
   if (existingReadOnlyProviders?.has(ChainId.SEPOLIA)) return existingReadOnlyProviders;
 
   const readOnlyProviders = new Map<ChainId, JsonRpcProvider>();

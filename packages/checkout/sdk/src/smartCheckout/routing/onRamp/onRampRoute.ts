@@ -1,4 +1,4 @@
-import { CheckoutConfiguration, getL2ChainId } from '../../../config';
+import { CheckoutConfiguration } from '../../../config';
 import {
   AvailableRoutingOptions,
   FundingStepType,
@@ -37,7 +37,7 @@ export const onRampRoute = async (
 
   return {
     type: FundingStepType.ONRAMP,
-    chainId: getL2ChainId(config),
+    chainId: config.l2ChainId,
     fundingItem: {
       type: isNativeToken(required.token.address) ? ItemType.NATIVE : ItemType.ERC20,
       fundsRequired: {

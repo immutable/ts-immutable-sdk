@@ -2,7 +2,7 @@ import { BrowserProvider, parseUnits } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { WrappedBrowserProvider, TokenInfo } from '../types';
 import { createExchangeInstance } from '../instance';
-import { CheckoutConfiguration, getL2ChainId } from '../config';
+import { CheckoutConfiguration } from '../config';
 import { SwapQuoteResult, SwapResult } from '../types/swap';
 import { sendTransaction } from '../transaction/transaction';
 
@@ -41,7 +41,7 @@ const swapQuote = async (
       CheckoutErrorType.MISSING_PARAMS,
     );
   }
-  const chainId = getL2ChainId(config);
+  const chainId = config.l2ChainId;
   const exchange = await createExchangeInstance(chainId, config);
 
   const address = await (await provider.getSigner()).getAddress();

@@ -12,7 +12,7 @@ import {
   TokenInfo,
 } from '../../types';
 import { getAllBalances } from '../../balances';
-import { CheckoutConfiguration, getL2ChainId } from '../../config';
+import { CheckoutConfiguration } from '../../config';
 import { BalanceCheckResult, BalanceRequirement } from './types';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { balanceAggregator } from '../aggregators/balanceAggregator';
@@ -43,7 +43,7 @@ const getTokenBalances = async (
         tokenMap.set(item.address.toLocaleLowerCase(), item);
       },
     );
-    const { balances } = await getAllBalances(config, provider, ownerAddress, getL2ChainId(config), forceFetch);
+    const { balances } = await getAllBalances(config, provider, ownerAddress, config.l2ChainId, forceFetch);
     return balances.filter(
       (balance) => tokenMap.get((balance.token.address || NATIVE).toLocaleLowerCase()),
     ) as TokenBalance[];

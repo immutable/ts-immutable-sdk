@@ -1,4 +1,4 @@
-import { CheckoutConfiguration, getL2ChainId } from '../../../config';
+import { CheckoutConfiguration } from '../../../config';
 import { DexQuotes } from '../types';
 import { BalanceNativeRequirement, BalanceERC20Requirement } from '../../balanceCheck/types';
 import { TokenInfo } from '../../../types';
@@ -20,7 +20,7 @@ export const getDexQuotes = async (
 
   const dexQuotes = await quoteFetcher(
     config,
-    getL2ChainId(config),
+    config.l2ChainId,
     ownerAddress,
     {
       address: requiredTokenAddress as string,

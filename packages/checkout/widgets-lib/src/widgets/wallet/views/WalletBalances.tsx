@@ -21,7 +21,6 @@ import {
   walletBalanceLoadingIconStyles,
   walletBalanceListContainerStyles,
 } from './WalletBalancesStyles';
-import { getL2ChainId } from '../../../lib/networkUtils';
 import { WalletWidgetViews } from '../../../context/view-context/WalletViewContextTypes';
 import {
   ViewActions,
@@ -111,7 +110,7 @@ export function WalletBalances({
   const showAddCoins = useMemo(() => {
     if (!checkout || !network) return false;
     return (
-      Number(network.chainId) === getL2ChainId(checkout.config)
+      network.chainId === checkout.config.l2ChainId
       && Boolean(
         supportedTopUps?.isBridgeEnabled
         || supportedTopUps?.isSwapEnabled

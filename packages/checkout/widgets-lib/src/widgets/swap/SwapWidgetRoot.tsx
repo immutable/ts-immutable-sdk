@@ -1,6 +1,5 @@
 import React, { Suspense } from 'react';
 import {
-  ChainId,
   IMTBLWidgetEvents,
   SwapDirection,
   SwapWidgetParams,
@@ -11,7 +10,6 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Base } from '../BaseWidgetRoot';
 import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
-import { getL2ChainId } from '../../lib';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/validations/widgetValidators';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
@@ -78,13 +76,11 @@ export class Swap extends Base<WidgetType.SWAP> {
 
     const { t } = i18n;
     const connectLoaderParams: ConnectLoaderParams = {
-      targetChainId: this.checkout.config.isProduction
-        ? ChainId.IMTBL_ZKEVM_MAINNET
-        : ChainId.IMTBL_ZKEVM_TESTNET,
+      targetChainId: this.checkout.config.l2ChainId,
       walletProviderName: this.parameters.walletProviderName,
       browserProvider: this.browserProvider,
       checkout: this.checkout,
-      allowedChains: [getL2ChainId(this.checkout!.config)],
+      allowedChains: [this.checkout.config.l2ChainId],
     };
 
     this.reactRoot!.render(

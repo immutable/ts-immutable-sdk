@@ -22,8 +22,6 @@ import {
 } from '../../lib/provider';
 import {
   DEFAULT_TRANSACTIONS_RETRY_POLICY,
-  getL1ChainId,
-  getL2ChainId,
 } from '../../lib';
 import { CheckoutApi, Transaction, TransactionType } from '../../lib/clients';
 import { retry } from '../../lib/retry';
@@ -94,7 +92,7 @@ export function Transactions({
   const rootChainTokensHashmap = useCallback(async () => {
     if (!checkout) return {};
 
-    const rootChainId = getL1ChainId(checkout.config);
+    const rootChainId = checkout.config.l1ChainId;
     try {
       const tokens = (
         await checkout.getTokenAllowList({
@@ -123,7 +121,7 @@ export function Transactions({
 
     if (!from?.walletAddress) return {};
 
-    const childChainId = getL2ChainId(checkout.config);
+    const childChainId = checkout.config.l2ChainId;
 
     try {
       const data = await checkout.getAllBalances({
@@ -146,8 +144,8 @@ export function Transactions({
   const getTokensDetails = async (tokensWithChainSlug: {
     [p: string]: string;
   }) => {
-    const rootChainName = getChainSlugById(getL1ChainId(checkout.config));
-    const childChainName = getChainSlugById(getL2ChainId(checkout.config));
+    const rootChainName = getChainSlugById(checkout.config.l1ChainId);
+    const childChainName = getChainSlugById(checkout.config.l2ChainId);
 
     const [rootData, childData] = await Promise.all([
       rootChainTokensHashmap(),
@@ -164,12 +162,12 @@ export function Transactions({
     });
     // Root provider is always L1
     const rootProvider = new JsonRpcProvider(
-      checkout.config.networkMap.get(getL1ChainId(checkout.config))?.rpcUrls[0],
+      checkout.config.networkMap.get(checkout.config.l1ChainId)?.rpcUrls[0],
     );
 
     // Child provider is always L2
     const childProvider = new JsonRpcProvider(
-      checkout.config.networkMap.get(getL2ChainId(checkout.config))?.rpcUrls[0],
+      checkout.config.networkMap.get(checkout.config.l2ChainId)?.rpcUrls[0],
     );
 
     const rootTokenInfoPromises: Promise<TokenInfo | undefined>[] = [];

@@ -39,6 +39,7 @@ import { calculateFees } from '../fees/fees';
 import { ERC20ABI } from '../../env';
 import { measureAsyncExecution } from '../../logger/debugLogger';
 import { isPassportProvider } from '../routing';
+import { AvailabilityService } from '../../availability';
 
 export const getERC721Requirement = (
   id: string,
@@ -87,6 +88,7 @@ export const getBuyToken = (
 export const sell = async (
   config: CheckoutConfiguration,
   provider: WrappedBrowserProvider,
+  availability: AvailabilityService,
   orders: Array<SellOrder>,
 ): Promise<SellResult> => {
   let orderbook: Orderbook;
@@ -195,6 +197,7 @@ export const sell = async (
       smartCheckout(
         config,
         provider,
+        availability,
         itemRequirements,
         {
           type: TransactionOrGasType.GAS,

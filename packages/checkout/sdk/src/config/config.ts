@@ -1,12 +1,16 @@
 import { Environment } from '@imtbl/config';
-import { CheckoutModuleConfiguration, ChainId, NetworkMap } from '../types';
+import { BridgeInstance, ETH_MAINNET_TO_ZKEVM_MAINNET, ETH_SEPOLIA_TO_ZKEVM_TESTNET } from '@imtbl/bridge-sdk';
+import {
+  CheckoutModuleConfiguration, ChainId, NetworkMap, ChainSlug,
+} from '../types';
 import { RemoteConfigFetcher } from './remoteConfigFetcher';
 import {
+  CHECKOUT_CDN_BASE_URL,
   DEFAULT_BRIDGE_ENABLED,
   DEFAULT_ON_RAMP_ENABLED,
   DEFAULT_SWAP_ENABLED,
-  DEV_CHAIN_ID_NETWORK_MAP,
   globalPackageVersion,
+  IMMUTABLE_API_BASE_URL,
   PRODUCTION_CHAIN_ID_NETWORK_MAP,
   SANDBOX_CHAIN_ID_NETWORK_MAP,
 } from '../env';
@@ -22,41 +26,7 @@ export class CheckoutConfigurationError extends Error {
   }
 }
 
-const networkMap = (prod: boolean, dev: boolean) => {
-  if (dev) return DEV_CHAIN_ID_NETWORK_MAP;
-  if (prod) return PRODUCTION_CHAIN_ID_NETWORK_MAP;
-  return SANDBOX_CHAIN_ID_NETWORK_MAP;
-};
-
-// **************************************************** //
-// This is duplicated in the widget-lib project.        //
-// We are not exposing these functions given that this  //
-// to keep the Checkout SDK interface as minimal as     //
-// possible.                                            //
-// **************************************************** //
-export const getL1ChainId = (config: CheckoutConfiguration): ChainId => {
-  // DevMode and Sandbox will both use Sepolia.
-  if (!config.isProduction) return ChainId.SEPOLIA;
-  return ChainId.ETHEREUM;
-};
-
-export const getL2ChainId = (config: CheckoutConfiguration): ChainId => {
-  if (config.isDevelopment) return ChainId.IMTBL_ZKEVM_DEVNET;
-  if (config.isProduction) return ChainId.IMTBL_ZKEVM_MAINNET;
-  return ChainId.IMTBL_ZKEVM_TESTNET;
-};
-// **************************************************** //
-// **************************************************** //
-
 export class CheckoutConfiguration {
-  // This is a hidden feature that is only available
-  // when building the project from source code.
-  // This will be used to get around the lack of
-  // Environment.DEVELOPMENT
-  readonly isDevelopment: boolean = process.env.CHECKOUT_DEV_MODE === 'true';
-
-  readonly isProduction: boolean;
-
   readonly isOnRampEnabled: boolean;
 
   readonly isSwapEnabled: boolean;
@@ -68,8 +38,6 @@ export class CheckoutConfiguration {
   readonly tokens: TokensFetcher;
 
   readonly environment: Environment;
-
-  readonly networkMap: NetworkMap;
 
   readonly publishableKey: string;
 
@@ -83,25 +51,14 @@ export class CheckoutConfiguration {
     }
 
     this.environment = config.baseConfig.environment;
-
-    // Developer mode will super set any environment configuration
-    this.isProduction = !this.isDevelopment && this.environment === Environment.PRODUCTION;
     this.isOnRampEnabled = config.onRamp?.enable ?? DEFAULT_ON_RAMP_ENABLED;
     this.isSwapEnabled = config.swap?.enable ?? DEFAULT_SWAP_ENABLED;
     this.isBridgeEnabled = config.bridge?.enable ?? DEFAULT_BRIDGE_ENABLED;
     this.publishableKey = config.publishableKey ?? '<no-publishable-key>';
 
-    this.networkMap = networkMap(this.isProduction, this.isDevelopment);
+    this.remote = new RemoteConfigFetcher(httpClient, this.remoteEndpoint);
 
-    this.remote = new RemoteConfigFetcher(httpClient, {
-      isDevelopment: this.isDevelopment,
-      isProduction: this.isProduction,
-    });
-
-    this.tokens = new TokensFetcher(httpClient, this.remote, {
-      isDevelopment: this.isDevelopment,
-      isProduction: this.isProduction,
-    });
+    this.tokens = new TokensFetcher(httpClient, this.remote, this.baseUrl, this.chainSlug);
 
     this.overrides = config.overrides ?? {};
   }
@@ -109,5 +66,42 @@ export class CheckoutConfiguration {
   // eslint-disable-next-line class-methods-use-this
   get sdkVersion(): string {
     return globalPackageVersion();
+  }
+
+  get remoteEndpoint(): string {
+    return this.overrides?.remoteEndpoint ?? CHECKOUT_CDN_BASE_URL[this.environment];
+  }
+
+  get baseUrl(): string {
+    return this.overrides?.baseUrl ?? IMMUTABLE_API_BASE_URL[this.environment];
+  }
+
+  get chainSlug(): ChainSlug {
+    if (this.overrides?.chainSlug) return this.overrides.chainSlug;
+    if (this.environment === Environment.PRODUCTION) return ChainSlug.IMTBL_ZKEVM_MAINNET;
+    return ChainSlug.IMTBL_ZKEVM_TESTNET;
+  }
+
+  get bridgeInstance(): BridgeInstance {
+    if (this.overrides?.bridgeInstance) return this.overrides.bridgeInstance;
+    if (this.environment === Environment.PRODUCTION) return ETH_MAINNET_TO_ZKEVM_MAINNET;
+    return ETH_SEPOLIA_TO_ZKEVM_TESTNET;
+  }
+
+  get l1ChainId(): ChainId {
+    if (this.overrides?.l1ChainId) return this.overrides.l1ChainId;
+    if (this.environment === Environment.PRODUCTION) return ChainId.ETHEREUM;
+    return ChainId.SEPOLIA;
+  }
+
+  get l2ChainId(): ChainId {
+    if (this.overrides?.l2ChainId) return this.overrides.l2ChainId;
+    if (this.environment === Environment.PRODUCTION) return ChainId.IMTBL_ZKEVM_MAINNET;
+    return ChainId.IMTBL_ZKEVM_TESTNET;
+  }
+
+  get networkMap(): NetworkMap {
+    if (this.overrides?.networkMap) return this.overrides.networkMap;
+    return this.environment === Environment.PRODUCTION ? PRODUCTION_CHAIN_ID_NETWORK_MAP : SANDBOX_CHAIN_ID_NETWORK_MAP;
   }
 }

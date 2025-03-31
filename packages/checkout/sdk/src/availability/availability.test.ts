@@ -14,7 +14,7 @@ describe('availabilityService', () => {
     it('should return true when status is 2xx', async () => {
       const mockResponse = {};
       mockedAxios.post.mockResolvedValueOnce(mockResponse);
-      const response = await availabilityService(true, false).checkDexAvailability();
+      const response = await availabilityService('testEndpoint').checkDexAvailability();
 
       expect(mockedAxios.post).toHaveBeenCalledTimes(1);
       expect(response).toEqual(true);
@@ -25,7 +25,7 @@ describe('availabilityService', () => {
         status: 403,
       };
       mockedAxios.post.mockRejectedValueOnce({ response: mockResponse });
-      const response = await availabilityService(true, false).checkDexAvailability();
+      const response = await availabilityService('testEndpoint').checkDexAvailability();
 
       expect(mockedAxios.post).toHaveBeenCalledTimes(1);
       expect(response).toEqual(false);
@@ -38,7 +38,7 @@ describe('availabilityService', () => {
       };
       mockedAxios.post.mockRejectedValueOnce({ response: mockResponse });
 
-      await expect(availabilityService(true, false).checkDexAvailability())
+      await expect(availabilityService('testEndpoint').checkDexAvailability())
         .rejects
         .toThrow(
           new CheckoutError(

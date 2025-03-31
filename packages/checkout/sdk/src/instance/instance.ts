@@ -1,8 +1,5 @@
 import {
   BridgeConfiguration,
-  ETH_MAINNET_TO_ZKEVM_MAINNET,
-  ETH_SEPOLIA_TO_ZKEVM_DEVNET,
-  ETH_SEPOLIA_TO_ZKEVM_TESTNET,
   TokenBridge,
 } from '@imtbl/bridge-sdk';
 import { ImmutableConfiguration } from '@imtbl/config';
@@ -36,13 +33,9 @@ export function createBridgeInstance(
     );
   }
 
-  let bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_TESTNET;
-  if (config.isDevelopment) bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_DEVNET;
-  if (config.isProduction) bridgeInstance = ETH_MAINNET_TO_ZKEVM_MAINNET;
-
   const bridgeConfig = new BridgeConfiguration({
     baseConfig: new ImmutableConfiguration({ environment: config.environment }),
-    bridgeInstance,
+    bridgeInstance: config.bridgeInstance,
     rootProvider: rootChainProvider,
     childProvider: childChainProvider,
   });

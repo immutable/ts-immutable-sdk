@@ -10,7 +10,7 @@ import {
   TokenInfo,
   FeeType,
 } from '../../../types';
-import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../../config';
+import { CheckoutConfiguration } from '../../../config';
 import {
   TokenBalanceResult,
 } from '../types';
@@ -121,16 +121,14 @@ export const bridgeRoute = async (
   tokenBalanceResults: Map<ChainId, TokenBalanceResult>,
 ): Promise<BridgeFundingStep | undefined> => {
   if (!availableRoutingOptions.bridge) return undefined;
-  const l1ChainId = getL1ChainId(config);
-  const l2ChainId = getL2ChainId(config);
-  const nativeToken = config.networkMap.get(l1ChainId)?.nativeCurrency;
-  const tokenBalanceResult = tokenBalanceResults.get(l1ChainId);
-  const l1provider = readOnlyProviders.get(l1ChainId);
+  const nativeToken = config.networkMap.get(config.l1ChainId)?.nativeCurrency;
+  const tokenBalanceResult = tokenBalanceResults.get(config.l1ChainId);
+  const l1provider = readOnlyProviders.get(config.l1ChainId);
   if (!l1provider) {
     throw new CheckoutError(
       'No L1 provider available',
       CheckoutErrorType.PROVIDER_ERROR,
-      { chainId: l1ChainId.toString() },
+      { chainId: config.l1ChainId.toString() },
     );
   }
 
@@ -155,8 +153,8 @@ export const bridgeRoute = async (
   const feesFromBridge = await getBridgeFeeEstimate(
     config,
     readOnlyProviders,
-    l1ChainId,
-    l2ChainId,
+    config.l1ChainId,
+    config.l2ChainId,
   );
 
   const {
@@ -185,7 +183,13 @@ export const bridgeRoute = async (
         approvalGas,
         nativeToken,
       );
-      return constructBridgeFundingRoute(l1ChainId, nativeETHBalance, bridgeRequirement, ItemType.NATIVE, bridgeFees);
+      return constructBridgeFundingRoute(
+        config.l1ChainId,
+        nativeETHBalance,
+        bridgeRequirement,
+        ItemType.NATIVE,
+        bridgeFees,
+      );
     }
 
     return undefined;
@@ -204,7 +208,7 @@ export const bridgeRoute = async (
       approvalGas,
       nativeToken,
     );
-    return constructBridgeFundingRoute(l1ChainId, erc20balance, bridgeRequirement, ItemType.ERC20, bridgeFees);
+    return constructBridgeFundingRoute(config.l1ChainId, erc20balance, bridgeRequirement, ItemType.ERC20, bridgeFees);
   }
 
   return undefined;

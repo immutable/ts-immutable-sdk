@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { CheckoutConfigurationError, getL1ChainId, getL2ChainId } from './config';
+import { CheckoutConfigurationError } from './config';
 import { Checkout } from '../sdk';
 import {
   ChainId,
@@ -9,10 +9,6 @@ import { PRODUCTION_CHAIN_ID_NETWORK_MAP, SANDBOX_CHAIN_ID_NETWORK_MAP } from '.
 
 describe('config', () => {
   describe('CheckoutConfiguration class', () => {
-    beforeEach(() => {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      process.env = { CHECKOUT_DEV_MODE: undefined };
-    });
     it('should set the environment in the constructor to SANDBOX or PRODUCTION', () => {
       const envs = [Environment.SANDBOX, Environment.PRODUCTION];
       envs.forEach((env) => {
@@ -24,17 +20,6 @@ describe('config', () => {
         expect(checkout).toBeInstanceOf(Checkout);
         expect(checkout.config.environment).toBe(env);
       });
-    });
-
-    it('should set is development', () => {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      process.env = { CHECKOUT_DEV_MODE: 'true' };
-      const testCheckoutConfig = {
-        baseConfig: { environment: Environment.SANDBOX },
-      } as CheckoutModuleConfiguration;
-
-      const checkout = new Checkout(testCheckoutConfig);
-      expect(checkout.config.isDevelopment).toBeTruthy();
     });
 
     it('should correctly set the networkMap for sandbox', () => {
@@ -76,10 +61,6 @@ describe('config', () => {
   });
 
   describe('get layer chain id', () => {
-    beforeEach(() => {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      process.env = { CHECKOUT_DEV_MODE: undefined };
-    });
     it('should get the L1 chain id for environment', () => {
       const envs = [
         {
@@ -97,7 +78,7 @@ describe('config', () => {
         } as CheckoutModuleConfiguration;
 
         const checkout = new Checkout(testCheckoutConfig);
-        expect(getL1ChainId(checkout.config)).toEqual(chainId);
+        expect(checkout.config.l1ChainId).toEqual(chainId);
       });
     });
 
@@ -114,19 +95,18 @@ describe('config', () => {
         {
           env: Environment.SANDBOX,
           chainId: ChainId.IMTBL_ZKEVM_DEVNET,
-          overrideDev: true,
         },
       ];
-      envs.forEach(({ env, chainId, overrideDev }) => {
+      envs.forEach(({ env, chainId }) => {
         const testCheckoutConfig = {
           baseConfig: { environment: env },
+          overrides: {
+            l2ChainId: chainId,
+          },
         } as CheckoutModuleConfiguration;
 
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        if (overrideDev) process.env = { CHECKOUT_DEV_MODE: 'true' };
-
         const checkout = new Checkout(testCheckoutConfig);
-        expect(getL2ChainId(checkout.config)).toEqual(chainId);
+        expect(checkout.config.l2ChainId).toEqual(chainId);
       });
     });
   });

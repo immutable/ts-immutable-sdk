@@ -36,7 +36,6 @@ import {
   useAnalytics,
   UserJourney,
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
-import { getL2ChainId } from '../../../lib';
 import { AddTokensErrorTypes } from '../types';
 import { TokenImage } from '../../../components/TokenImage/TokenImage';
 import { PULSE_SHADOW } from '../utils/animation';
@@ -133,7 +132,7 @@ export function TokenDrawerMenu({
       try {
         const tokenResponse = await checkout.getTokenAllowList({
           type: TokenFilterTypes.SWAP,
-          chainId: getL2ChainId(checkout.config),
+          chainId: checkout.config.l2ChainId,
         });
 
         if (tokenResponse?.tokens.length > 0) {

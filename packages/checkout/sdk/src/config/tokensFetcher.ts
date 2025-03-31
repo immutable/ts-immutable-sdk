@@ -1,4 +1,3 @@
-import { Environment } from '@imtbl/config';
 import { AxiosResponse } from 'axios';
 import {
   ChainId,
@@ -7,7 +6,6 @@ import {
   ImxAddressConfig,
   TokenBridgeInfo,
 } from '../types';
-import { ENV_DEVELOPMENT, IMMUTABLE_API_BASE_URL } from '../env';
 import { HttpClient } from '../api/http';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { RemoteConfigFetcher } from './remoteConfigFetcher';
@@ -34,44 +32,28 @@ type TokensEndpointResponse = {
   result: TokensEndpointResult[];
 };
 
-export type RemoteConfigParams = {
-  isDevelopment: boolean;
-  isProduction: boolean;
-};
-
 export class TokensFetcher {
   private httpClient: HttpClient;
 
   private remoteConfig: RemoteConfigFetcher;
 
-  private readonly isDevelopment: boolean;
-
-  private readonly isProduction: boolean;
-
   private tokensCache: ChainTokensConfig | undefined;
+
+  private baseUrl: string;
+
+  private chainSlug: ChainSlug;
 
   constructor(
     httpClient: HttpClient,
     remoteConfig: RemoteConfigFetcher,
-    params: RemoteConfigParams,
+    baseUrl: string,
+    chainSlug: ChainSlug,
   ) {
-    this.isDevelopment = params.isDevelopment;
-    this.isProduction = params.isProduction;
     this.httpClient = httpClient;
     this.remoteConfig = remoteConfig;
+    this.baseUrl = baseUrl;
+    this.chainSlug = chainSlug;
   }
-
-  private getBaseUrl = () => {
-    if (this.isDevelopment) return IMMUTABLE_API_BASE_URL[ENV_DEVELOPMENT];
-    if (this.isProduction) return IMMUTABLE_API_BASE_URL[Environment.PRODUCTION];
-    return IMMUTABLE_API_BASE_URL[Environment.SANDBOX];
-  };
-
-  private getChainSlug = () => {
-    if (this.isDevelopment) return ChainSlug.IMTBL_ZKEVM_DEVNET;
-    if (this.isProduction) return ChainSlug.IMTBL_ZKEVM_MAINNET;
-    return ChainSlug.IMTBL_ZKEVM_TESTNET;
-  };
 
   private async loadTokens(): Promise<ChainTokensConfig | undefined> {
     if (this.tokensCache) {
@@ -81,7 +63,7 @@ export class TokensFetcher {
     let response: AxiosResponse;
     try {
       response = await this.httpClient.get(
-        `${this.getBaseUrl()}/v1/chains/${this.getChainSlug()}/tokens?verification_status=verified&is_canonical=true`,
+        `${this.baseUrl}/v1/chains/${this.chainSlug}/tokens?verification_status=verified&is_canonical=true`,
       );
     } catch (err: any) {
       throw new CheckoutError(
