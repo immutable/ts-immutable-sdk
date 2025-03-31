@@ -568,6 +568,7 @@ describe('Connect', () => {
     expect(buy).toBeCalledWith(
       checkout.config,
       provider,
+      checkout.availability,
       [{ id: '1', takerFees: [] }],
       undefined,
     );
@@ -613,7 +614,7 @@ describe('Connect', () => {
     });
 
     expect(sell).toBeCalledTimes(1);
-    expect(sell).toBeCalledWith(checkout.config, provider, orders);
+    expect(sell).toBeCalledWith(checkout.config, provider, checkout.availability, orders);
   });
 
   it('should call cancel function', async () => {
@@ -675,6 +676,7 @@ describe('Connect', () => {
     expect(smartCheckout).toBeCalledWith(
       checkout.config,
       params.provider,
+      checkout.availability,
       params.itemRequirements,
       params.transactionOrGasAmount,
       undefined,

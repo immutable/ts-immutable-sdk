@@ -10,7 +10,7 @@ jest.mock('../instance', () => ({
 
 describe('swapQuote', () => {
   const mockChainId = 13473;
-  const mockConfig = {} as unknown as CheckoutConfiguration;
+  const mockConfig = { l2ChainId: mockChainId } as unknown as CheckoutConfiguration;
   const mockProvider = {
     getSigner: jest.fn().mockReturnValue({
       getAddress: jest.fn().mockResolvedValue('0xmockaddress'),
@@ -112,7 +112,7 @@ describe('swapQuote', () => {
 
 describe('swap', () => {
   const mockChainId = 13473;
-  const mockConfig = {} as unknown as CheckoutConfiguration;
+  const mockConfig = { l2ChainId: mockChainId } as unknown as CheckoutConfiguration;
   const mockSigner = {
     getAddress: jest.fn().mockResolvedValue('0xmockaddress'),
     sendTransaction: jest.fn().mockResolvedValue({ hash: '0xtxhash' }),
