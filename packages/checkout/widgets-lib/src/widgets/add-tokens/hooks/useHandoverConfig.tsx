@@ -257,6 +257,7 @@ export const useHandoverConfig = (environment: Environment) => {
         ),
       });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [environment, handoverConfigs],
   );
 

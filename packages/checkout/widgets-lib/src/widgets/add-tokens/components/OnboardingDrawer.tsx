@@ -63,6 +63,7 @@ export function OnboardingDrawer({ environment }: OnboardingDrawerProps) {
 
   const src = useMemo(
     () => getRemoteImage(environment, HERO_IMAGES[screenIndex - 1]),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [screenIndex],
   );
 

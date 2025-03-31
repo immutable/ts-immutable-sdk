@@ -194,6 +194,7 @@ export function ProvidersContextProvider({
         /** TODO: handle error */
       }
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toProvider, providersState.lockedToProvider]);
 
   return (

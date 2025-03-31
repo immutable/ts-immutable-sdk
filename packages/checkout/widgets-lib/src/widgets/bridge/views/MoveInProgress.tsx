@@ -57,6 +57,7 @@ export function MoveInProgress({ transactionHash, isTransfer }: MoveInProgressPr
         moveType: isTransfer ? 'transfer' : 'bridge',
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

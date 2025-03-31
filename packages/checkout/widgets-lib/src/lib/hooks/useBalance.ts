@@ -56,6 +56,7 @@ export const useBalance = ({
         setBalancesLoading(false);
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout, provider]);
 
   useInterval(() => refreshBalances(true), REFRESH_BALANCE_INTERVAL_MS);

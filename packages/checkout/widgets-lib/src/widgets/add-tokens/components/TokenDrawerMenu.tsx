@@ -92,6 +92,7 @@ export function TokenDrawerMenu({
       setVisible(false);
       setSearchValue('');
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [addTokensState.id],
   );
 
@@ -105,6 +106,7 @@ export function TokenDrawerMenu({
       if (!searchValue) return true;
       return token.symbol.toLowerCase().startsWith(searchValue.toLowerCase());
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       addTokensState.allowedTokens,
       addTokensState.tokens,
@@ -192,6 +194,7 @@ export function TokenDrawerMenu({
         showErrorHandover(AddTokensErrorTypes.SERVICE_BREAKDOWN, { contextId: addTokensState.id, error });
       }
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addTokensState.tokens, checkout, toTokenAddress]);
 
   return (

@@ -52,6 +52,7 @@ export function Bridge({
         },
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // This is used to refresh the balances after the Bridge widget
@@ -94,6 +95,7 @@ export function Bridge({
       // eslint-disable-next-line no-console
       console.debug(e);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout, from?.browserProvider, from?.network]);
   useInterval(refreshBalances, REFRESH_TOKENS_INTERVAL_MS);
 
@@ -101,6 +103,7 @@ export function Bridge({
     if (!checkout || !from?.browserProvider) return;
     setIsTokenBalancesLoading(true);
     refreshBalances().finally(() => setIsTokenBalancesLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout, from?.browserProvider]);
 
   return (

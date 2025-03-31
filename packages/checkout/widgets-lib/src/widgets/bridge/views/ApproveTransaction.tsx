@@ -60,6 +60,7 @@ export function ApproveTransaction({ bridgeTransaction }: ApproveTransactionProp
         moveType: bridgeTransaction ? 'bridge' : 'transfer',
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Local state
@@ -182,6 +183,7 @@ export function ApproveTransaction({ bridgeTransaction }: ApproveTransactionProp
     } finally {
       setActionDisabled(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     checkout,
     from,
@@ -276,6 +278,7 @@ export function ApproveTransaction({ bridgeTransaction }: ApproveTransactionProp
       setTxProcessing(false);
       setActionDisabled(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     checkout,
     from,

@@ -41,5 +41,6 @@ export const useSlippage = () => {
   return useMemo(() => ({
     getSlippageTier,
     calculateAdjustedAmount,
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }), []);
 };

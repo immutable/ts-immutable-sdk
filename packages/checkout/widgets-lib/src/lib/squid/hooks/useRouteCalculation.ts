@@ -56,5 +56,6 @@ export const useRouteCalculation = () => {
     calculateFromAmount,
     calculateFromAmountFromRoute,
     convertToFormattedFromAmount,
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }), []);
 };

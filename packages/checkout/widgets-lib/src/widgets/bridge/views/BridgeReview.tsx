@@ -19,6 +19,7 @@ export function BridgeReview() {
       userJourney: UserJourney.BRIDGE,
       screen: 'Review',
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

@@ -104,6 +104,7 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
     [handoverQueue, handoverBusy, handovers, closeHandover],
   );
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const addHandover = (
     handoverContent: HandoverContent,
     handoverId: HandoverTarget = HandoverTarget.GLOBAL,

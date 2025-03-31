@@ -78,6 +78,7 @@ export function RouteOptionsDrawer({
         routesAvailable: routes?.length ?? 0,
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
   return (

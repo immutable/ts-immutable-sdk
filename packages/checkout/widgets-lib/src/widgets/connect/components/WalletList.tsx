@@ -91,6 +91,7 @@ export function WalletList(props: WalletListProps) {
       .filter(
         (provider) => !blocklistWalletRdns.includes(provider.info.rdns),
       ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [providers],
   );
 
@@ -100,6 +101,7 @@ export function WalletList(props: WalletListProps) {
       && providers
         .filter((provider) => !blocklistWalletRdns.includes(provider.info.rdns))
         .find((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [providers, checkout],
   );
 
@@ -118,6 +120,7 @@ export function WalletList(props: WalletListProps) {
         },
       });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 
@@ -210,6 +213,7 @@ export function WalletList(props: WalletListProps) {
         setShowUnableToConnectDrawer(true);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [checkout],
   );
 
@@ -303,12 +307,14 @@ export function WalletList(props: WalletListProps) {
       });
       await selectProviderDetail(providerDetail);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [track, checkout],
   );
 
   const onChosenProviderDetailChange = useCallback(() => {
     if (!chosenProviderDetail) return;
     handleWalletItemClick(chosenProviderDetail!);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chosenProviderDetail]);
 
   const onBrowserWalletsClick = useCallback(() => {
@@ -343,6 +349,7 @@ export function WalletList(props: WalletListProps) {
         }
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filteredProviders, targetWalletRdns]);
 
   const handleNonPassportWarningDrawerButtonClick = async () => {

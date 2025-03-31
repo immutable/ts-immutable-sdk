@@ -120,7 +120,7 @@ export function BridgeReviewSummary() {
   const isTransfer = useMemo(() => from?.network === to?.network, [from, to]);
   const isDeposit = useMemo(
     () => (getL2ChainId(checkout.config) === to?.network),
-    [from, to, checkout],
+    [to, checkout],
   );
   const insufficientFundsForGas = useMemo(() => {
     if (!estimates) return false;
@@ -150,6 +150,7 @@ export function BridgeReviewSummary() {
       token.symbol,
       cryptoFiatState.conversions,
     );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, amount]);
   const fromAddress = useMemo(() => {
     if (!from) return '-';
@@ -202,6 +203,7 @@ export function BridgeReviewSummary() {
       // eslint-disable-next-line no-console
       console.error('Unable to fetch gas estimate', e);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout, from, to, token, amount]);
 
   const fetchBridgeGasEstimate = useCallback(async () => {
@@ -279,6 +281,7 @@ export function BridgeReviewSummary() {
         cryptoFiatState.conversions,
       ),
     );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout, tokenBridge]);
   useInterval(() => {
     if (isTransfer) {
@@ -290,6 +293,7 @@ export function BridgeReviewSummary() {
 
   const formatFeeBreakdown = useCallback(
     () => formatBridgeFees(estimates, isDeposit, cryptoFiatState, t),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [estimates, isDeposit],
   );
 
@@ -303,6 +307,7 @@ export function BridgeReviewSummary() {
       }
       setLoading(false);
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleNetworkSwitch = useCallback((provider: WrappedBrowserProvider) => {
@@ -323,6 +328,7 @@ export function BridgeReviewSummary() {
         },
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [from?.browserProvider, from?.network, to?.browserProvider, to?.network]);
 
   useEffect(() => {
@@ -338,6 +344,7 @@ export function BridgeReviewSummary() {
     return () => {
       removeChainChangedListener(from.browserProvider, handleChainChanged);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [from?.browserProvider]);
 
   useEffect(() => {
@@ -355,6 +362,7 @@ export function BridgeReviewSummary() {
         }
       })();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isWalletConnectEnabled, from?.browserProvider, to?.browserProvider]);
 
   useEffect(() => {
@@ -439,6 +447,7 @@ export function BridgeReviewSummary() {
         },
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     viewDispatch,
     approveTransaction,
