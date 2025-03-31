@@ -102,6 +102,7 @@ export class CheckoutConfiguration {
 
   get networkMap(): NetworkMap {
     if (this.overrides?.networkMap) return this.overrides.networkMap;
-    return this.environment === Environment.PRODUCTION ? PRODUCTION_CHAIN_ID_NETWORK_MAP : SANDBOX_CHAIN_ID_NETWORK_MAP;
+    if (this.environment === Environment.PRODUCTION) return PRODUCTION_CHAIN_ID_NETWORK_MAP;
+    return SANDBOX_CHAIN_ID_NETWORK_MAP;
   }
 }

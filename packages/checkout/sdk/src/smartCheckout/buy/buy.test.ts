@@ -26,6 +26,7 @@ import { SignTransactionStatusType } from '../actions/types';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../routing/indexer/fetchL1Representation';
 import { HttpClient } from '../../api/http';
 import { sendTransaction } from '../../transaction';
+import { AvailabilityService } from '../../availability';
 
 jest.mock('../../instance');
 jest.mock('../smartCheckout');
@@ -45,6 +46,7 @@ describe('buy', () => {
   describe('buy', () => {
     let config: CheckoutConfiguration;
     let mockProvider: WrappedBrowserProvider;
+    let availabilityService: AvailabilityService;
 
     beforeEach(() => {
       mockProvider = {
@@ -52,6 +54,10 @@ describe('buy', () => {
           getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
         }),
       } as unknown as WrappedBrowserProvider;
+
+      availabilityService = {
+        checkDexAvailability: jest.fn().mockResolvedValue(true),
+      } as unknown as AvailabilityService;
 
       config = new CheckoutConfiguration({
         baseConfig: { environment: Environment.SANDBOX },
@@ -160,7 +166,7 @@ describe('buy', () => {
         transaction: { from: '0xTRANSACTION' },
       };
 
-      const buyResult = await buy(config, mockProvider, [order]);
+      const buyResult = await buy(config, mockProvider, availabilityService, [order]);
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
@@ -340,7 +346,7 @@ describe('buy', () => {
         },
       };
 
-      const buyResult = await buy(config, mockProvider, [order]);
+      const buyResult = await buy(config, mockProvider, availabilityService, [order]);
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
@@ -471,7 +477,7 @@ describe('buy', () => {
         transaction: { from: '0xTRANSACTION' },
       };
 
-      const buyResult = await buy(config, mockProvider, [order]);
+      const buyResult = await buy(config, mockProvider, availabilityService, [order]);
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
@@ -604,7 +610,7 @@ describe('buy', () => {
         transaction: { from: '0xTRANSACTION' },
       };
 
-      const buyResult = await buy(config, mockProvider, [order]);
+      const buyResult = await buy(config, mockProvider, availabilityService, [order]);
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
@@ -786,6 +792,7 @@ describe('buy', () => {
       const buyResult = await buy(
         config,
         mockProvider,
+        availabilityService,
         [order],
         { waitFulfillmentSettlements: false },
       );
@@ -970,7 +977,7 @@ describe('buy', () => {
         let errorType;
         let errorData;
         try {
-          await buy(config, mockProvider, [order]);
+          await buy(config, mockProvider, availabilityService, [order]);
         } catch (err: any) {
           errorType = err.type;
           errorData = err.data;
@@ -1047,7 +1054,7 @@ describe('buy', () => {
           },
         };
 
-        await buy(config, mockProvider, [order]);
+        await buy(config, mockProvider, availabilityService, [order]);
         expect(smartCheckout).toBeCalledWith(
           config,
           mockProvider,
@@ -1156,7 +1163,7 @@ describe('buy', () => {
         },
       };
 
-      await buy(config, mockProvider, [order]);
+      await buy(config, mockProvider, availabilityService, [order]);
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
@@ -1262,7 +1269,7 @@ describe('buy', () => {
         transaction: { from: '0xTRANSACTION' },
       };
 
-      const buyResult = await buy(config, mockProvider, [order]);
+      const buyResult = await buy(config, mockProvider, availabilityService, [order]);
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
@@ -1381,7 +1388,7 @@ describe('buy', () => {
         transaction: { from: '0xTRANSACTION' },
       };
 
-      const buyResult = await buy(config, mockProvider, [order]);
+      const buyResult = await buy(config, mockProvider, availabilityService, [order]);
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
@@ -1505,7 +1512,7 @@ describe('buy', () => {
         transaction: { from: '0xTRANSACTION' },
       };
 
-      const buyResult = await buy(config, mockProvider, [order]);
+      const buyResult = await buy(config, mockProvider, availabilityService, [order]);
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
@@ -1564,7 +1571,7 @@ describe('buy', () => {
       let type;
       let data;
       try {
-        await buy(config, mockProvider, [order]);
+        await buy(config, mockProvider, availabilityService, [order]);
       } catch (err: any) {
         message = err.message;
         type = err.type;
@@ -1615,7 +1622,7 @@ describe('buy', () => {
       let type;
       let data;
       try {
-        await buy(config, mockProvider, [order]);
+        await buy(config, mockProvider, availabilityService, [order]);
       } catch (err: any) {
         message = err.message;
         type = err.type;
@@ -1668,7 +1675,7 @@ describe('buy', () => {
       let data;
 
       try {
-        await buy(config, mockProvider, [order]);
+        await buy(config, mockProvider, availabilityService, [order]);
       } catch (err: any) {
         message = err.message;
         type = err.type;
@@ -1723,7 +1730,7 @@ describe('buy', () => {
       let data;
 
       try {
-        await buy(config, mockProvider, [order]);
+        await buy(config, mockProvider, availabilityService, [order]);
       } catch (err: any) {
         message = err.message;
         type = err.type;
@@ -1740,6 +1747,7 @@ describe('buy', () => {
   describe('taker fees', () => {
     let config: CheckoutConfiguration;
     let mockProvider: WrappedBrowserProvider;
+    let availabilityService: AvailabilityService;
 
     beforeEach(() => {
       mockProvider = {
@@ -1747,6 +1755,10 @@ describe('buy', () => {
           getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
         }),
       } as unknown as WrappedBrowserProvider;
+
+      availabilityService = {
+        checkDexAvailability: jest.fn().mockResolvedValue(true),
+      } as unknown as AvailabilityService;
 
       config = new CheckoutConfiguration({
         baseConfig: { environment: Environment.SANDBOX },
@@ -1932,7 +1944,7 @@ describe('buy', () => {
           transaction: { from: '0xTRANSACTION' },
         };
 
-        const buyResult = await buy(config, mockProvider, testCase.orders);
+        const buyResult = await buy(config, mockProvider, availabilityService, testCase.orders);
         expect(smartCheckout).toBeCalledWith(
           config,
           mockProvider,
@@ -2151,7 +2163,7 @@ describe('buy', () => {
           transaction: { from: '0xTRANSACTION' },
         };
 
-        const buyResult = await buy(config, mockProvider, testCase.orders);
+        const buyResult = await buy(config, mockProvider, availabilityService, testCase.orders);
         expect(smartCheckout).toBeCalledWith(
           config,
           mockProvider,

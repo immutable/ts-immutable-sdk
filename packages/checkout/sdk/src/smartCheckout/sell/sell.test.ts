@@ -26,6 +26,7 @@ import {
 } from '../actions';
 import { SignTransactionStatusType } from '../actions/types';
 import { HttpClient } from '../../api/http';
+import { AvailabilityService } from '../../availability';
 
 jest.mock('../../instance');
 jest.mock('../smartCheckout');
@@ -36,6 +37,7 @@ describe('sell', () => {
   const walletAddress = '0xADDRESS';
   let config: CheckoutConfiguration;
   let mockProvider: WrappedBrowserProvider;
+  let availabilityService: AvailabilityService;
 
   beforeEach(() => {
     mockProvider = {
@@ -43,6 +45,10 @@ describe('sell', () => {
         getAddress: jest.fn().mockResolvedValue(walletAddress),
       }),
     } as unknown as WrappedBrowserProvider;
+
+    availabilityService = {
+      checkDexAvailability: jest.fn().mockResolvedValue(true),
+    } as unknown as AvailabilityService;
 
     const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     config = new CheckoutConfiguration({
@@ -165,6 +171,7 @@ describe('sell', () => {
       const result = await sell(
         config,
         mockProvider,
+        availabilityService,
         [order],
       );
 
@@ -344,6 +351,7 @@ describe('sell', () => {
       const result = await sell(
         config,
         mockProvider,
+        availabilityService,
         [order],
       );
 
@@ -526,6 +534,7 @@ describe('sell', () => {
       const result = await sell(
         config,
         mockProvider,
+        availabilityService,
         [order],
       );
 
@@ -693,6 +702,7 @@ describe('sell', () => {
       const result = await sell(
         config,
         mockProvider,
+        availabilityService,
         orders,
       );
 
@@ -820,6 +830,7 @@ describe('sell', () => {
       const result = await sell(
         config,
         mockProvider,
+        availabilityService,
         orders,
       );
 
@@ -888,6 +899,7 @@ describe('sell', () => {
         await sell(
           config,
           mockProvider,
+          availabilityService,
           orders,
         );
       } catch (err: any) {
@@ -958,6 +970,7 @@ describe('sell', () => {
         await sell(
           config,
           rejectedProvider,
+          availabilityService,
           orders,
         );
       } catch (err: any) {
@@ -1066,6 +1079,7 @@ describe('sell', () => {
         sell(
           config,
           mockProvider,
+          availabilityService,
           orders,
         ),
       ).rejects.toThrowError('error from sign message');
@@ -1159,6 +1173,7 @@ describe('sell', () => {
         sell(
           config,
           mockProvider,
+          availabilityService,
           orders,
         ),
       ).rejects.toThrowError('error from get unsigned transactions');
@@ -1250,6 +1265,7 @@ describe('sell', () => {
         sell(
           config,
           mockProvider,
+          availabilityService,
           orders,
         ),
       ).rejects.toThrowError('error from sign approval transactions');
@@ -1335,6 +1351,7 @@ describe('sell', () => {
         await sell(
           config,
           mockProvider,
+          availabilityService,
           orders,
         );
       } catch (err: any) {
@@ -1454,6 +1471,7 @@ describe('sell', () => {
         await sell(
           config,
           mockProvider,
+          availabilityService,
           orders,
         );
       } catch (err: any) {
