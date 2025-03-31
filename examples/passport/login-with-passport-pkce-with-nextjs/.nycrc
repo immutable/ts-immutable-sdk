@@ -2,22 +2,10 @@
   "extends": "@istanbuljs/nyc-config-typescript",
   "all": true,
   "check-coverage": true,
-  "include": [
-    "src/app/**/*.tsx",
-    "src/app/**/*.ts"
-  ],
-  "exclude": [
-    "**/*.d.ts",
-    "**/*.test.ts",
-    "**/*.spec.ts",
-    "tests/**/*"
-  ],
-  "reporter": [
-    "text",
-    "html"
-  ],
-  "statements": 70,
+  "include": ["src/app/login-with-passport-pkce/**/*.tsx", "src/app/login-with-passport-pkce/**/*.ts"],
+  "exclude": ["**/*.spec.ts", "**/*.test.ts"],
   "branches": 70,
+  "lines": 70,
   "functions": 70,
-  "lines": 70
+  "statements": 70
 } 

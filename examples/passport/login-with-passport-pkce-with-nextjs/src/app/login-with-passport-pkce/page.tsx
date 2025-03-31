@@ -1,97 +1,118 @@
 'use client';
-
-import React, { useState, useEffect } from 'react';
-import { Button, Heading, Link } from '@biom3/react';
+import React, { useEffect, useState } from 'react';
+import { Button, Heading, Table, Link } from '@biom3/react';
 import NextLink from 'next/link';
+import { useRouter } from 'next/navigation';
 import { passportInstance } from '../utils/setupDefault';
 
 export default function LoginWithPassportPKCE() {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [address, setAddress] = useState<string>('');
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [userInfo, setUserInfo] = useState<any>(null);
 
   useEffect(() => {
-    async function checkLoginStatus() {
+    const checkLoginStatus = async () => {
       try {
-        if (!passportInstance) return;
-        
-        // Use getUserInfo to check if the user is authenticated
-        const userInfo = await passportInstance.getUserInfo();
-        const isUserLoggedIn = !!userInfo;
-        setIsLoggedIn(isUserLoggedIn);
-        
-        if (isUserLoggedIn) {
-          try {
-            // Get wallet address using connectEvm
-            const provider = await passportInstance.connectEvm();
-            const accounts = await provider.request({ method: 'eth_requestAccounts' });
-            if (accounts && accounts.length > 0) {
-              setAddress(accounts[0]);
-            }
-          } catch (walletError) {
-            console.error('Error retrieving wallet address:', walletError);
-          }
+        // Check authentication status by trying to get the id token
+        // If it succeeds, the user is logged in
+        const accessToken = await passportInstance.getAccessToken();
+        setIsLoggedIn(!!accessToken);
+
+        if (accessToken) {
+          const userProfile = await passportInstance.getUserInfo();
+          setUserInfo(userProfile);
         }
-      } catch (error) {
-        console.error('Error checking login status:', error);
-        setError('Failed to check login status');
+      } catch (err) {
+        console.error('Error checking login status:', err);
+        setIsLoggedIn(false);
       }
-    }
-    
+    };
+
     checkLoginStatus();
   }, []);
 
   const handleLogin = async () => {
-    if (!passportInstance) return;
-    
     try {
       setIsLoading(true);
-      setError('');
       
-      // Initiate the PKCE login flow
-      // This will redirect the user to the Immutable Passport login page
+      // The PKCE flow is handled automatically by the SDK when usePKCE is set to true
+      // in the passport configuration. The SDK will:
+      // 1. Generate a code verifier (random string)
+      // 2. Derive a code challenge from the verifier using SHA-256
+      // 3. Include the code challenge in the authorization request
+      // 4. Store the code verifier to be used during token exchange
       await passportInstance.login();
       
-      // Note: The code execution won't reach here immediately as the login flow involves a redirect
-      // The redirect callback handler in the redirect page will complete the authentication process
-    } catch (error) {
-      console.error('Login error:', error);
-      setError('Failed to login. Please try again.');
+      // Note: After successful authentication, the user will be redirected
+      // to the redirect URI, where loginCallback() will exchange the
+      // authorization code for tokens using the stored code verifier
+    } catch (err) {
+      console.error('Login error:', err);
       setIsLoading(false);
     }
   };
 
+  const handleLogout = () => {
+    router.push('/logout');
+  };
+
+  if (isLoggedIn && userInfo) {
+    return (
+      <>
+        <Heading size="medium" className="mb-1">
+          Successfully logged in with PKCE flow
+        </Heading>
+        
+        <Table className="mb-1">
+          <Table.Head>
+            <Table.Row>
+              <Table.Cell>Attribute</Table.Cell>
+              <Table.Cell>Value</Table.Cell>
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>
+            <Table.Row>
+              <Table.Cell><b>Email</b></Table.Cell>
+              <Table.Cell>{userInfo.email || 'N/A'}</Table.Cell>
+            </Table.Row>
+            <Table.Row>
+              <Table.Cell><b>Nickname</b></Table.Cell>
+              <Table.Cell>{userInfo.nickname || 'N/A'}</Table.Cell>
+            </Table.Row>
+            <Table.Row>
+              <Table.Cell><b>Sub</b></Table.Cell>
+              <Table.Cell>{userInfo.sub || 'N/A'}</Table.Cell>
+            </Table.Row>
+          </Table.Body>
+        </Table>
+        
+        <Button size="medium" onClick={handleLogout} className="mb-1">Logout</Button>
+        <br />
+        <Link rc={<NextLink href="/" />}>Return to Home</Link>
+      </>
+    );
+  }
+
   return (
     <>
       <Heading size="medium" className="mb-1">
-        Login with Passport PKCE
+        Login with Passport PKCE Authentication
       </Heading>
-      <div className="flex flex-col items-center gap-4">
-        <Button 
-          onClick={handleLogin} 
-          disabled={isLoggedIn || isLoading}
-        >
-          {isLoggedIn ? 'Logged In' : isLoading ? 'Loading...' : 'Login with Passport'}
-        </Button>
-        
-        {error && <div style={{ color: 'red' }}>{error}</div>}
-        
-        <table>
-          <tbody>
-            <tr>
-              <td><b>Is Logged In</b></td>
-              <td>{isLoggedIn ? 'Yes' : 'No'}</td>
-            </tr>
-            <tr>
-              <td><b>Account Address</b></td>
-              <td>{address || 'Not logged in'}</td>
-            </tr>
-          </tbody>
-        </table>
-        
-        <Link rc={<NextLink href="/" />}>Return to Examples</Link>
-      </div>
+      <p className="mb-1">
+        This example demonstrates the PKCE (Proof Key for Code Exchange) login flow.
+        PKCE adds an extra layer of security by using a code verifier and challenge
+        to prevent authorization code interception attacks.
+      </p>
+      <Button 
+        size="medium" 
+        onClick={handleLogin} 
+        disabled={isLoading}
+        className="mb-1">
+        {isLoading ? 'Loading...' : 'Login with Passport'}
+      </Button>
+      <br />
+      <Link rc={<NextLink href="/" />}>Return to Home</Link>
     </>
   );
 } 

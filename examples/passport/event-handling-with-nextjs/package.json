@@ -8,8 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "playwright test",
-    "test:coverage": "NODE_ENV=test NEXT_PUBLIC_INSTRUMENTATION_ENABLED=true nyc --reporter=html --reporter=text --reporter=lcov playwright test",
-    "clean:coverage": "rm -rf .nyc_output coverage"
+    "test:coverage": "nyc --reporter=html --reporter=text --reporter=lcov playwright test"
   },
   "dependencies": {
     "@biom3/react": "^0.25.21",
@@ -27,9 +26,8 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.7",
     "typescript": "^5.6.2",
-    "istanbul-lib-coverage": "^3.2.0",
+    "istanbul-lib-coverage": "^3.2.2",
     "nyc": "^15.1.0",
-    "@istanbuljs/nyc-config-typescript": "^1.0.2",
-    "babel-plugin-istanbul": "^6.1.1"
+    "@istanbuljs/nyc-config-typescript": "^1.0.2"
   }
 } 

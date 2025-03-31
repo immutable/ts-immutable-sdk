@@ -364,6 +364,8 @@ feature name: <name>
 
 Then Cursor will build out the example app's setup, etc.
 
+IMPORTANT: For any prompts, if cursor is not done with its operations but it has reached 25 tool calls, you will need to manually type "continue" on the chat window for cursor to continue building.
+
 ## Understanding the Prompt Files
 
 The example generation process uses three different prompt files, each with a specific purpose:
@@ -381,6 +383,12 @@ The example generation process uses three different prompt files, each with a sp
 - **Output**: A fully implemented feature page within the app structure
 
 ### prompt-part3.txt
+- **Purpose**: Apply styling changes to the given example app if possible to ensure styling consistency with other example apps
+- **When to use**: After running prompt-part2.txt to implement a feature
+- **What it does**: Modifies the example app's UI/UX to ensure that the app looks consistent with other example apps
+- **Output**: A fully implemented feature page within the app structure with consistent UI/UX looks.
+
+### prompt-part4.txt
 - **Purpose**: Tests, validates, and fixes issues in the implementation
 - **When to use**: After running prompt-part2.txt to implement a feature
 - **What it does**: Runs tests, checks coverage, builds the app, and fixes any detected issues
@@ -389,7 +397,8 @@ The example generation process uses three different prompt files, each with a sp
 **Typical Workflow:**
 1. Use prompt-part1.txt to create a new app (only once per app)
 2. Use prompt-part2.txt to implement each feature in the app
-3. Use prompt-part3.txt after each feature implementation to test and validate
+3. Use prompt-part3.txt to fix the app's UI/UX styling and make it look consistent to other example apps.
+4. Use prompt-part4.txt after each feature implementation to test and validate
 
 # Using code examples in the docs site
 

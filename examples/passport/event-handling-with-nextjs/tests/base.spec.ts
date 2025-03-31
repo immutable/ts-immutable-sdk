@@ -1,69 +1,52 @@
-import { test, expect } from '@playwright/test';
-import { saveCoverage } from '../tests/coverage-helper';
+import { test, expect } from "@playwright/test";
+import { saveCoverage } from "./coverage-helper";
 
-// Test specifically focused on event-handling feature
-test('event-handling feature page loads and shows components correctly', async ({ page }, testInfo) => {
-  await page.goto('/event-handling');
-  
-  // Verify the event-handling page title
-  const heading = page.getByRole('heading', { name: 'Passport Authentication Events Demo' });
-  await expect(heading).toBeVisible();
-  
-  // Verify the event log section
-  const eventLogHeading = page.getByRole('heading', { name: 'Authentication Event Log:' });
-  await expect(eventLogHeading).toBeVisible();
-  
-  // Check if the login button exists
-  const loginButton = page.getByRole('button', { name: 'Login with Passport' });
-  await expect(loginButton).toBeVisible();
-  
-  // Check if the clear event log button exists
-  const clearButton = page.getByRole('button', { name: 'Clear Event Log' });
-  await expect(clearButton).toBeVisible();
-  
-  // Tests event log's empty state displays correctly
-  const emptyLogText = page.getByText(/No events logged yet/);
-  await expect(emptyLogText).toBeVisible();
-  
-  // Interact with buttons to trigger event handlers
-  await loginButton.click({ force: true }).catch(() => {
-    console.log('Login button click expected to fail in test environment');
-  });
-  
-  await clearButton.click({ force: true }).catch(() => {
-    console.log('Clear button click expected to fail in test environment');
-  });
-  
-  // Evaluate page JavaScript to test event handling functions
-  await page.evaluate(() => {
-    // Find all buttons to interact with them
-    document.querySelectorAll('button').forEach(button => {
-      button.click();
-    });
-    
-    // Simulate events for the event handling system to process
-    const mockEvent = new CustomEvent('test-event', { 
-      detail: { message: 'Test event for coverage' } 
-    });
-    document.dispatchEvent(mockEvent);
-  });
-  
-  // Save coverage data
-  await saveCoverage(page, testInfo);
+test.beforeEach(async ({ page }) => {
+  await page.goto("/");
 });
 
-// Test navigation to the event-handling page
-test('navigate from home to event-handling page', async ({ page }, testInfo) => {
-  await page.goto('/');
-  
-  // Find and click the link to the event-handling page
-  const eventHandlingLink = page.getByText('Try Event Handling');
-  await expect(eventHandlingLink).toBeVisible();
-  await eventHandlingLink.click();
-  
-  // Verify we're on the event-handling page
-  await expect(page).toHaveURL(/\/event-handling/);
-  
-  // Save coverage data
-  await saveCoverage(page, testInfo);
-}); 
+test.describe("home page", () => {
+  test("has title, heading, and buttons", async ({ page }, testInfo) => {
+    await expect(page).toHaveTitle("Passport SDK - Event Handling with NextJS");
+    await expect(page.getByRole("heading", { name: "Event Handling with NextJS" })).toBeVisible();
+    await expect(page.getByText("This example demonstrates how to handle events in the Immutable Passport SDK.")).toBeVisible();
+    await expect(page.getByText("Event Handling Example")).toBeVisible();
+    await expect(page.getByText("Logout Example")).toBeVisible();
+    
+    await saveCoverage(page, testInfo);
+  });
+});
+
+test.describe("sub-pages navigation", () => {
+  test("navigates to Event Handling page", async ({ page }, testInfo) => {
+    await page.getByText("Event Handling Example").click();
+    await expect(page).toHaveURL(/.*\/event-handling/);
+    await expect(page.getByRole("heading", { name: "Event Handling Example" })).toBeVisible();
+    
+    await saveCoverage(page, testInfo);
+  });
+
+  test("navigates to Logout page", async ({ page }, testInfo) => {
+    await page.getByText("Logout Example").click();
+    await expect(page).toHaveURL(/.*\/logout/);
+    await expect(page.getByRole("heading", { name: "Successfully Logged Out" })).toBeVisible();
+    
+    await saveCoverage(page, testInfo);
+  });
+});
+
+// Add more thorough tests for the event handling page
+test.describe("event handling page functionality", () => {
+  test("shows proper UI elements", async ({ page }, testInfo) => {
+    await page.goto("/event-handling");
+    
+    // Check key UI elements
+    await expect(page.getByRole("heading", { name: "Event Handling Example" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Connection Status" })).toBeVisible();
+    // Connection status is dynamically rendered, so we don't check for specific text
+    await expect(page.getByText("Connect Wallet")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Event Log" })).toBeVisible();
+    
+    await saveCoverage(page, testInfo);
+  });
+});

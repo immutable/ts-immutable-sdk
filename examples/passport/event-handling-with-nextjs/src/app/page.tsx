@@ -1,25 +1,27 @@
 'use client';
 import React from 'react';
-import { Button, Heading } from '@biom3/react';
+import { Button, Heading, Stack } from '@biom3/react';
 import NextLink from 'next/link';
 
 export default function Home() {
   return (
-    <>
-      <Heading 
-        size="medium" 
-        className="mb-1">
+    <Stack gap="md" alignItems="flex-start" className="w-full max-w-3xl mx-auto">
+      <Heading size="medium" className="mb-1">
         Event Handling with NextJS
       </Heading>
-      <p className="mb-1">
-        This example demonstrates how to handle events with the Immutable Passport SDK.
-      </p>
-      <Button       
+      <Button
         className="mb-1"
-        size="medium" 
+        size="medium"
         rc={<NextLink href="/event-handling" />}>
-        Try Event Handling
-      </Button> 
-    </>
+        Event Handling Example
+      </Button>
+      <Button
+        className="mb-1"
+        size="medium"
+        variant="secondary"
+        rc={<NextLink href="/logout" />}>
+        Logout Example
+      </Button>
+    </Stack>
   );
 } 

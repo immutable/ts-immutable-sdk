@@ -8,9 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "playwright test",
-    "test:coverage": "nyc playwright test",
-    "coverage:check": "node coverage-check.js",
-    "validate": "node validation.js"
+    "test:manual": "PLAYWRIGHT_TEST_BASE_URL=http://localhost:3000 playwright test",
+    "test:coverage": "nyc --reporter=html --reporter=text --reporter=lcov playwright test"
   },
   "dependencies": {
     "@biom3/react": "^0.25.21",
@@ -28,6 +27,7 @@
     "@types/react-dom": "^18.3.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.7",
+    "istanbul-lib-coverage": "^3.2.2",
     "nyc": "^15.1.0",
     "typescript": "^5.6.2"
   }

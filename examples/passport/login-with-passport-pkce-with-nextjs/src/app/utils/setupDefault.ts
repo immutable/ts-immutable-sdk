@@ -1,6 +1,8 @@
 import { config, passport } from '@imtbl/sdk';
 
 // #doc passport-instance
+// This sets up the Passport instance with PKCE flow enabled
+// PKCE (Proof Key for Code Exchange) provides additional security for public clients
 export const passportInstance = new passport.Passport({
     baseConfig: {
       environment: config.Environment.SANDBOX, // or config.Environment.PRODUCTION
@@ -13,4 +15,5 @@ export const passportInstance = new passport.Passport({
     audience: 'platform_api',
     scope: 'openid offline_access email transact',
   });
-// #enddoc passport-instance 
+// #enddoc passport-instance
+

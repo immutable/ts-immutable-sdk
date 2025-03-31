@@ -13,4 +13,5 @@ export const passportInstance = new passport.Passport({
     audience: 'platform_api',
     scope: 'openid offline_access email transact',
   });
-// #enddoc passport-instance 
+// #enddoc passport-instance
+

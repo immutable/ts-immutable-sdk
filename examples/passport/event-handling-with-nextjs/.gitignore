@@ -8,9 +8,6 @@
 
 # testing
 /coverage
-.nyc_output
-/playwright-report
-/test-results
 
 # next.js
 /.next/
@@ -30,11 +27,10 @@ yarn-error.log*
 
 # local env files
 .env*.local
-.env
 
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts 
+next-env.d.ts

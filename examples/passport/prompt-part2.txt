@@ -59,6 +59,24 @@ IF THE COMPONENT THAT YOU WANT DOESN'T EXIST IN BIOM3, ALWAYS USE NORMAL CSS/HTM
 6. Structure UI with semantic HTML and Biom3 components
 7. Implement clear loading, success, and error states
 
+IF the requested {feature name} is related to event handling (IGNORE THIS IF {feature name} IS UNRELATED TO EVENT HANDLING):
+- Include examples of handling these events:
+ - connect
+ - disconnect
+ - chainChanged
+ - accountsChanged
+ - any other relevant Passport events
+
+ ## Event Handling Best Practices
+ - Demonstrate proper event listener setup and cleanup
+ - Show different types of events (connect, disconnect, chainChanged, etc.)
+ - Display event data in UI for user feedback
+ - Include comprehensive error handling
+ - ALWAYS check if the provider exists before adding event listeners
+ - Use try/catch blocks around all event handler operations
+ - Implement robust cleanup of all event listeners in useEffect return functions
+ - Verify connection state changes are properly tracked and displayed
+
 ### Code Quality Checklist
 - [ ] All SDK objects checked for existence before use
 - [ ] All async operations wrapped in try/catch
@@ -92,5 +110,7 @@ If you've made manual edits to a feature implementation that you want to protect
 1. Add the comment `/* MANUALLY EDITED - DO NOT OVERWRITE */` at the top of the file
 2. The generator will alert you before overwriting manually edited files
 ```
+
+
 
 This comprehensive guide will help you safely add or update feature implementations while respecting existing code and manual edits.

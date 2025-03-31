@@ -1,55 +1,51 @@
-# Event Handling with Immutable Passport and Next.js
+# Event Handling with NextJS
 
-This example demonstrates how to implement and use event handling functionality with the Immutable Passport SDK in a Next.js application.
+This example demonstrates how to handle events in the Immutable Passport SDK using Next.js.
 
-## Overview
+## Features
 
-The Immutable Passport SDK provides event handling capabilities that allow developers to respond to various events during the authentication lifecycle and user interactions. This example shows how to:
+- Event handling for Passport authentication
+- Example of listening to and responding to Passport events
+- Implementation of event cleanup practices
+- Modern UI design using Biom3 components
 
-- Set up event listeners for Passport SDK events
-- Handle login and logout events
-- Respond to token refresh events
-- Manage authentication state changes
-- Implement clean-up practices for event listeners
+## Prerequisites
+
+- Node.js (v18 or later)
+- pnpm
+- An Immutable Hub account with:
+  - A registered application
+  - Client ID
+  - Publishable API key
 
 ## Setup
 
-### Prerequisites
-
-- Node.js 18 or higher
-- pnpm
-
-### Installation
-
-1. Clone the repository and navigate to this example:
+1. Clone the repository and navigate to the example directory:
 
 ```bash
-git clone https://github.com/immutable/ts-immutable-sdk.git
-cd ts-immutable-sdk/examples/passport/event-handling-with-nextjs
+cd examples/passport/event-handling-with-nextjs
 ```
 
-2. Install dependencies:
+2. Install dependencies using pnpm:
 
 ```bash
 pnpm install
 ```
 
-3. Create a `.env.local` file based on the `.env.example` file:
+3. Copy the `.env.example` file to a new file called `.env.local`:
 
 ```bash
 cp .env.example .env.local
 ```
 
-4. Add your credentials to the `.env.local` file:
+4. Edit `.env.local` and add your credentials:
 
 ```
-NEXT_PUBLIC_PUBLISHABLE_KEY=<your-publishable-key>
-NEXT_PUBLIC_CLIENT_ID=<your-client-id>
+NEXT_PUBLIC_PUBLISHABLE_KEY=your_publishable_key
+NEXT_PUBLIC_CLIENT_ID=your_client_id
 ```
 
-You can obtain these credentials from the [Immutable Developer Hub](https://hub.immutable.com).
-
-### Running the Example
+## Running the Application
 
 Start the development server:
 
@@ -57,132 +53,45 @@ Start the development server:
 pnpm dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) to see the application in action.
+The application will be available at http://localhost:3000.
 
-## Usage
+## User Interface
 
-### Event Handling Types
+This application uses the Biom3 UI library to create a consistent and professional user experience. The UI includes:
 
-The Passport SDK provides several events that you can listen to:
+- Modern card-based layout
+- Responsive design that works on mobile and desktop
+- Consistent styling across all pages
+- Real-time event logging display
 
-1. **Authentication Events**
-   - `auth.login.success`: Fired when a user successfully logs in
-   - `auth.login.error`: Fired when a login attempt fails
-   - `auth.logout.success`: Fired when a user successfully logs out
-   - `auth.logout.error`: Fired when a logout attempt fails
+## Event Handling Best Practices
 
-2. **Token Events**
-   - `auth.token.refresh.success`: Fired when tokens are successfully refreshed
-   - `auth.token.refresh.error`: Fired when token refresh fails
+- Always clean up event listeners in useEffect cleanup functions
+- Use proper error handling for event callbacks
+- Verify that an event exists before attempting to listen to it
+- Avoid memory leaks by removing listeners when components unmount
 
-3. **State Events**
-   - `auth.state.change`: Fired when the authentication state changes
+## UI Components
 
-### Code Examples
+This example uses several Biom3 components including:
 
-Below are examples of how to use the event handling functionality:
-
-```typescript
-import { passportInstance } from '../utils/setupDefault';
-
-// Basic event listener
-passportInstance.on('auth.login.success', (data) => {
-  console.log('Login successful:', data);
-});
-
-// Handling authentication errors
-passportInstance.on('auth.login.error', (error) => {
-  console.error('Login failed:', error);
-});
-
-// Cleaning up event listeners (important for preventing memory leaks)
-const loginSuccessHandler = (data) => {
-  console.log('Login successful:', data);
-};
-
-passportInstance.on('auth.login.success', loginSuccessHandler);
-
-// When no longer needed:
-passportInstance.off('auth.login.success', loginSuccessHandler);
-
-// Using once for one-time event handling
-passportInstance.once('auth.token.refresh.success', (data) => {
-  console.log('Token refreshed once:', data);
-});
-```
-
-## Event Cleanup Best Practices
-
-It's important to clean up event listeners when they're no longer needed to prevent memory leaks, especially in React components:
-
-1. **Use Component Lifecycle Methods**: Always remove event listeners in `useEffect` cleanup functions:
-
-```typescript
-useEffect(() => {
-  const loginHandler = (data) => {
-    setIsLoggedIn(true);
-  };
-  
-  passportInstance.on('auth.login.success', loginHandler);
-  
-  // Return cleanup function
-  return () => {
-    passportInstance.off('auth.login.success', loginHandler);
-  };
-}, []);
-```
-
-2. **Store Handlers in References**: For complex handlers, store them in refs to ensure the same function reference is used:
-
-```typescript
-const loginHandlerRef = useRef((data) => {
-  setLoginData(data);
-});
-
-useEffect(() => {
-  passportInstance.on('auth.login.success', loginHandlerRef.current);
-  
-  return () => {
-    passportInstance.off('auth.login.success', loginHandlerRef.current);
-  };
-}, []);
-```
-
-3. **Batch Event Registration**: Register and unregister related events together:
-
-```typescript
-useEffect(() => {
-  const handlers = {
-    loginSuccess: (data) => setIsLoggedIn(true),
-    loginError: (error) => setLoginError(error)
-  };
-  
-  passportInstance.on('auth.login.success', handlers.loginSuccess);
-  passportInstance.on('auth.login.error', handlers.loginError);
-  
-  return () => {
-    passportInstance.off('auth.login.success', handlers.loginSuccess);
-    passportInstance.off('auth.login.error', handlers.loginError);
-  };
-}, []);
-```
-
-## Common Issues and Troubleshooting
-
-- **Event Not Firing**: Ensure the Passport SDK is properly initialized before setting up event listeners.
-- **Memory Leaks**: Always clean up event listeners in component unmount phases.
-- **Multiple Event Registrations**: Be careful not to register the same event handler multiple times.
-- **Event Handler Context**: Use proper binding or arrow functions to maintain the correct `this` context.
+- `Stack` - For layout management
+- `Card` - For containing content in visually distinct boxes
+- `Button` - For interactive elements
+- `Heading` - For section titles
+- `Body` - For regular text content
+- `Badge` - For status indicators
+- `Divider` - For visual separation of content
 
 ## Testing
 
-Run the test suite to verify the event handling implementation:
+Run the tests:
 
 ```bash
 pnpm test
 ```
 
-For test coverage:
+Generate test coverage:
 
 ```bash
 pnpm test:coverage
@@ -190,5 +99,6 @@ pnpm test:coverage
 
 ## References
 
-- [Immutable Passport SDK Documentation](https://docs.immutable.com/docs/passport/)
-- [Next.js Documentation](https://nextjs.org/docs) 
+- [Immutable Passport Documentation](https://docs.immutable.com/docs/zkEVM/products/passport)
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Biom3 UI Components](https://github.com/immutable/biom3) 

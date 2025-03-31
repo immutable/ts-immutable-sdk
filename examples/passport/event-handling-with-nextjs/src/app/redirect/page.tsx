@@ -2,13 +2,12 @@
 
 import React, { useEffect } from 'react';
 import { passportInstance } from '../utils/setupDefault';
+import { Heading, Card, Stack, Body } from '@biom3/react';
 
 export default function Redirect() {
   useEffect(() => {
     if (passportInstance) {
-      // #doc passport-login-callback
       passportInstance.loginCallback()
-      // #enddoc passport-login-callback
         .then(() => {
           console.log('Login callback successful');
           if (window.opener) {
@@ -23,8 +22,14 @@ export default function Redirect() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-8">
-      <h1 className="text-3xl font-bold mb-8">Logged in</h1>
-    </div>
+    <Stack gap="xl" alignItems="center" justifyContent="center" className="w-full max-w-4xl min-h-screen">
+      <Card className="w-full p-6">
+        <Stack gap="md" alignItems="center">
+          <Heading size="medium">Processing Login</Heading>
+          <div className="w-8 h-8 border-4 border-t-blue-500 border-r-blue-500 border-b-blue-200 border-l-blue-200 rounded-full animate-spin"></div>
+          <Body>Completing authentication process...</Body>
+        </Stack>
+      </Card>
+    </Stack>
   );
 } 

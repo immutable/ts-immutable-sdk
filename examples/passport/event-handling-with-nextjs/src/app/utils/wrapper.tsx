@@ -7,12 +7,15 @@ export default function AppWrapper({
     children: React.ReactNode;
   }>) {
     return (
-      <div className="flex-container">
+      <div className="min-h-screen bg-gray-50 flex-container">
           <BiomeCombinedProviders>
-          <Stack alignItems="center">
+          <Stack
+            alignItems="center"
+            className="w-full p-4 md:p-8"
+          >
           { children }
            </Stack>
           </BiomeCombinedProviders>
     </div>
     );
-} 
+}

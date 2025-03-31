@@ -1,194 +1,287 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Button, Heading, Link } from '@biom3/react';
+import { Heading, Link, Button, Card, Stack, Body, Divider, Badge, Table } from '@biom3/react';
 import NextLink from 'next/link';
 import { passportInstance } from '../utils/setupDefault';
 
 export default function EventHandlingPage() {
-  const [authEvents, setAuthEvents] = useState<{type: string, timestamp: string, data?: any}[]>([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userInfo, setUserInfo] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState('Not connected');
+  const [eventLogs, setEventLogs] = useState<string[]>([]);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [userAddress, setUserAddress] = useState<string | null>(null);
+  const [chainId, setChainId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Function to add an event to our log with timestamp
-  const logEvent = (type: string, data?: any) => {
-    const timestamp = new Date().toISOString();
-    console.log(`${type} at ${timestamp}`, data);
-    setAuthEvents(prev => [...prev, { type, timestamp, data }]);
+  // Log event helper function
+  const logEvent = (eventName: string, data?: any) => {
+    const timestamp = new Date().toLocaleTimeString();
+    let message = `${timestamp}: ${eventName}`;
+    if (data) message += ` - ${JSON.stringify(data)}`;
+    
+    setEventLogs(prevLogs => [message, ...prevLogs.slice(0, 9)]); // Keep last 10 events
   };
 
-  // Check if user is already logged in on component mount
+  // Check initial connection status
   useEffect(() => {
-    if (!passportInstance) return;
+    const checkConnection = async () => {
+      if (!passportInstance) {
+        setError('Passport instance not initialized');
+        return;
+      }
 
-    const checkLoginStatus = async () => {
       try {
-        const userProfile = await passportInstance.getUserInfo();
-        if (userProfile) {
-          setIsLoggedIn(true);
-          setUserInfo(userProfile);
-          logEvent('CHECKED_LOGIN_STATUS', { status: 'logged_in', userProfile });
-        } else {
-          logEvent('CHECKED_LOGIN_STATUS', { status: 'not_logged_in' });
+        // Check if user is logged in
+        try {
+          const provider = await passportInstance.connectEvm();
+          if (provider) {
+            const accounts = await provider.request({ method: 'eth_accounts' });
+            if (accounts && accounts.length > 0) {
+              setUserAddress(accounts[0]);
+              setConnectionStatus('Connected');
+              
+              const chainIdResult = await provider.request({ method: 'eth_chainId' });
+              setChainId(chainIdResult);
+            } else {
+              setConnectionStatus('Not connected');
+            }
+          }
+        } catch (e) {
+          console.error('Error getting user info:', e);
+          setConnectionStatus('Not connected');
         }
-      } catch (error) {
-        console.error('Error checking login status:', error);
-        logEvent('LOGIN_STATUS_ERROR', { error: String(error) });
+      } catch (e) {
+        console.error('Error checking authentication:', e);
+        setError(`Authentication check failed: ${e instanceof Error ? e.message : String(e)}`);
       }
     };
 
-    checkLoginStatus();
+    checkConnection();
   }, []);
 
-  // Handle login
-  const handleLogin = async () => {
+  // Setup event listeners
+  useEffect(() => {
     if (!passportInstance) return;
-    
-    try {
-      setLoading(true);
-      setError(null);
-      logEvent('LOGIN_INITIATED');
 
-      await passportInstance.loginCallback();
-      
-      // After login attempt, check if we're actually logged in
-      const userProfile = await passportInstance.getUserInfo();
-      if (userProfile) {
-        setIsLoggedIn(true);
-        setUserInfo(userProfile);
-        logEvent('LOGIN_SUCCESS', userProfile);
-      } else {
-        logEvent('LOGIN_FAILED', { reason: 'No user profile returned' });
-        setError('Login failed: No user profile returned');
+    const setupEventListeners = async () => {
+      try {
+        const provider = await passportInstance.connectEvm();
+        if (!provider) {
+          console.error('Provider not available');
+          return;
+        }
+
+        // Handle connect events
+        const handleConnect = (connectInfo: any) => {
+          logEvent('connect', connectInfo);
+          setConnectionStatus('Connected');
+        };
+
+        // Handle disconnect events
+        const handleDisconnect = (error: any) => {
+          logEvent('disconnect', error);
+          setConnectionStatus('Disconnected');
+          setUserAddress(null);
+          setChainId(null);
+        };
+
+        // Handle chainChanged events
+        const handleChainChanged = (chainId: string) => {
+          logEvent('chainChanged', { chainId });
+          setChainId(chainId);
+          // Best practice is to reload the page on chain change
+          // window.location.reload();
+        };
+
+        // Handle accountsChanged events
+        const handleAccountsChanged = (accounts: string[]) => {
+          logEvent('accountsChanged', { accounts });
+          if (accounts.length === 0) {
+            setUserAddress(null);
+            setConnectionStatus('Disconnected');
+          } else {
+            setUserAddress(accounts[0]);
+          }
+        };
+
+        // Handle message events
+        const handleMessage = (message: any) => {
+          logEvent('message', message);
+        };
+
+        // Register event listeners
+        provider.on('connect', handleConnect);
+        provider.on('disconnect', handleDisconnect);
+        provider.on('chainChanged', handleChainChanged);
+        provider.on('accountsChanged', handleAccountsChanged);
+        provider.on('message', handleMessage);
+
+        logEvent('Event listeners registered');
+
+        // Cleanup function to remove event listeners
+        return () => {
+          if (provider) {
+            provider.removeListener('connect', handleConnect);
+            provider.removeListener('disconnect', handleDisconnect);
+            provider.removeListener('chainChanged', handleChainChanged);
+            provider.removeListener('accountsChanged', handleAccountsChanged);
+            provider.removeListener('message', handleMessage);
+            logEvent('Event listeners removed');
+          }
+        };
+      } catch (e) {
+        console.error('Error setting up event listeners:', e);
+        setError(`Failed to setup event listeners: ${e instanceof Error ? e.message : String(e)}`);
       }
-    } catch (error) {
-      console.error('Login error:', error);
-      logEvent('LOGIN_ERROR', { error: String(error) });
-      setError(`Failed to login: ${String(error)}`);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  // Handle logout
-  const handleLogout = async () => {
-    if (!passportInstance) return;
-    
+    setupEventListeners();
+  }, []);
+
+  // Connect to passport
+  const handleConnect = async () => {
+    if (!passportInstance) {
+      setError('Passport instance not initialized');
+      return;
+    }
+
+    setIsConnecting(true);
+    setError(null);
+
     try {
-      setLoading(true);
-      setError(null);
-      logEvent('LOGOUT_INITIATED');
-
-      await passportInstance.logout();
+      // Login to Passport
+      logEvent('Initiating Passport login');
+      await passportInstance.login();
       
-      setIsLoggedIn(false);
-      setUserInfo(null);
-      logEvent('LOGOUT_SUCCESS');
-    } catch (error) {
-      console.error('Logout error:', error);
-      logEvent('LOGOUT_ERROR', { error: String(error) });
-      setError(`Failed to logout: ${String(error)}`);
+      // Connect to the EVM provider
+      logEvent('Connecting to EVM provider');
+      const provider = await passportInstance.connectEvm();
+      
+      if (provider) {
+        // Request accounts
+        const accounts = await provider.request({ method: 'eth_requestAccounts' });
+        setUserAddress(accounts[0]);
+        
+        // Get chain ID
+        const chainId = await provider.request({ method: 'eth_chainId' });
+        setChainId(chainId);
+        
+        setConnectionStatus('Connected');
+        logEvent('Connected successfully', { address: accounts[0], chainId });
+      }
+    } catch (e) {
+      console.error('Connection error:', e);
+      setError(`Connection failed: ${e instanceof Error ? e.message : String(e)}`);
+      logEvent('Connection error', { error: e instanceof Error ? e.message : String(e) });
     } finally {
-      setLoading(false);
+      setIsConnecting(false);
     }
   };
 
-  // Clear event log
-  const clearEvents = () => {
-    setAuthEvents([]);
+  // Disconnect from passport
+  const handleDisconnect = async () => {
+    if (!passportInstance) {
+      setError('Passport instance not initialized');
+      return;
+    }
+
+    try {
+      logEvent('Initiating logout');
+      await passportInstance.logout();
+      setConnectionStatus('Disconnected');
+      setUserAddress(null);
+      setChainId(null);
+      logEvent('Disconnected successfully');
+    } catch (e) {
+      console.error('Disconnect error:', e);
+      setError(`Disconnect failed: ${e instanceof Error ? e.message : String(e)}`);
+      logEvent('Disconnect error', { error: e instanceof Error ? e.message : String(e) });
+    }
   };
 
   return (
-    <>
-      <Heading 
-        size="medium" 
-        className="mb-1">
-        Passport Authentication Events Demo
-      </Heading>
+    <Stack gap="xl" alignItems="stretch" className="max-w-3xl mx-auto w-full">
+      <Stack direction="row" justifyContent="space-between" alignItems="center" className="w-full mb-4">
+        <Heading size="medium">Event Handling Example</Heading>
+        <Link rc={<NextLink href="/" />}>Return Home</Link>
+      </Stack>
       
-      <p className="mb-1">
-        This demo shows authentication events captured from interactions with the Immutable Passport SDK.
-      </p>
+      <Card className="p-6 w-full mb-4">
+        <Stack gap="md" className="w-full">
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Heading size="small">Connection Status</Heading>
+            <Badge 
+              className={connectionStatus === 'Connected' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
+            >
+              {connectionStatus}
+            </Badge>
+          </Stack>
+          
+          <Divider className="my-2" />
+          
+          <Table>
+            <Table.Head>
+              <Table.Row>
+                <Table.Cell>Attribute</Table.Cell>
+                <Table.Cell>Value</Table.Cell>
+              </Table.Row>
+            </Table.Head>
+            <Table.Body>
+              <Table.Row>
+                <Table.Cell><Body weight="bold">Wallet Address</Body></Table.Cell>
+                <Table.Cell><Body size="small" className="font-mono break-all">{userAddress || 'Not connected'}</Body></Table.Cell>
+              </Table.Row>
+              <Table.Row>
+                <Table.Cell><Body weight="bold">Chain ID</Body></Table.Cell>
+                <Table.Cell><Body size="small" className="font-mono">{chainId || 'Not available'}</Body></Table.Cell>
+              </Table.Row>
+            </Table.Body>
+          </Table>
+          
+          <Stack direction="row" gap="md" className="mt-2">
+            {connectionStatus !== 'Connected' ? (
+              <Button 
+                onClick={handleConnect} 
+                disabled={isConnecting}
+                variant="primary"
+                size="medium"
+              >
+                {isConnecting ? 'Connecting...' : 'Connect Wallet'}
+              </Button>
+            ) : (
+              <Button 
+                onClick={handleDisconnect} 
+                variant="secondary"
+                size="medium"
+              >
+                Disconnect
+              </Button>
+            )}
+          </Stack>
+
+          {error && (
+            <Body size="small" className="text-red-500 mt-2">{error}</Body>
+          )}
+        </Stack>
+      </Card>
       
-      {error && (
-        <div className="mb-1 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-          <strong>Error:</strong> {error}
-          <button 
-            className="ml-2 text-red-700"
-            onClick={() => setError(null)}
-          >
-            ×
-          </button>
-        </div>
-      )}
-      
-      <div className="mb-1">
-        {!isLoggedIn ? (
-          <Button 
-            size="medium" 
-            onClick={handleLogin} 
-            disabled={loading}
-            variant={loading ? "tertiary" : "primary"}
-          >
-            {loading ? "Logging in..." : "Login with Passport"}
-          </Button>
-        ) : (
-          <Button 
-            size="medium" 
-            variant="tertiary"
-            onClick={handleLogout} 
-            disabled={loading}
-          >
-            {loading ? "Logging out..." : "Logout"}
-          </Button>
-        )}
-      </div>
-      
-      {userInfo && (
-        <div className="mb-1 p-3 bg-green-50 border border-green-200 rounded">
-          <Heading size="small" className="mb-1">User Info:</Heading>
-          <pre className="text-xs overflow-auto max-h-40">
-            {JSON.stringify(userInfo, null, 2)}
-          </pre>
-        </div>
-      )}
-      
-      <div className="mb-1">
-        <Button 
-          size="small" 
-          variant="secondary"
-          onClick={clearEvents}
-          disabled={authEvents.length === 0}
-        >
-          Clear Event Log
-        </Button>
-      </div>
-      
-      <div className="mb-1">
-        <Heading size="small" className="mb-1">Authentication Event Log:</Heading>
-        {authEvents.length === 0 ? (
-          <p>No events logged yet. Login or logout to generate events.</p>
-        ) : (
-          <div className="border p-1 rounded overflow-auto max-h-80">
-            {authEvents.map((event, index) => (
-              <div key={index} className="mb-1 pb-1 border-b">
-                <div className="flex justify-between">
-                  <strong>{event.type}</strong>
-                  <span className="text-gray-500 text-xs">{new Date(event.timestamp).toLocaleTimeString()}</span>
+      <Card className="p-6 w-full">
+        <Stack gap="md" className="w-full">
+          <Heading size="small">Event Log</Heading>
+          <Divider className="my-2" />
+          
+          {eventLogs.length > 0 ? (
+            <div className="max-h-80 overflow-y-auto border border-gray-200 rounded-md p-3 bg-gray-50">
+              {eventLogs.map((log, index) => (
+                <div key={index} className="py-1 font-mono text-sm break-all">
+                  {log}
                 </div>
-                {event.data && (
-                  <pre className="text-xs overflow-auto mt-1">
-                    {JSON.stringify(event.data, null, 2)}
-                  </pre>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-      
-      <Link rc={<NextLink href="/" />} className="mb-1">Return to Home</Link>
-    </>
+              ))}
+            </div>
+          ) : (
+            <Body size="small" className="text-gray-500">No events recorded yet.</Body>
+          )}
+        </Stack>
+      </Card>
+    </Stack>
   );
 } 
