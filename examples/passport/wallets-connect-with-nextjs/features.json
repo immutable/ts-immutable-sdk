@@ -1,8 +1,23 @@
 {
     "features": [
-        "connect-with-eip1193",
-        "connect-with-ethersjs",
-        "connect-with-wagmi"
+        {
+            "feature": "connect-with-eip1193",
+            "manually-edited": true,
+            "silent-login": true,
+            "silent-logout": true
+        },
+        {
+            "feature": "connect-with-ethersjs",
+            "manually-edited": true,
+            "silent-login": true,
+            "silent-logout": true
+        },
+        {
+            "feature": "connect-with-wagmi",
+            "manually-edited": true,
+            "silent-login": true,
+            "silent-logout": true
+        }  
     ],
     "order": 3
 }
