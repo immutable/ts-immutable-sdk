@@ -15,6 +15,7 @@ import { balanceCheck } from './balanceCheck';
 import { routingCalculator } from './routing/routingCalculator';
 import { getAvailableRoutingOptions } from './routing';
 import { BalanceCheckResult } from './balanceCheck/types';
+import { AvailabilityService } from '../availability';
 
 jest.mock('./routing');
 jest.mock('./allowance');
@@ -24,6 +25,7 @@ jest.mock('./routing/routingCalculator');
 
 describe('smartCheckout', () => {
   let mockProvider: WrappedBrowserProvider;
+  let availabilityService: AvailabilityService;
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -33,6 +35,10 @@ describe('smartCheckout', () => {
         getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
       }),
     } as unknown as WrappedBrowserProvider;
+
+    availabilityService = {
+      checkDexAvailability: jest.fn().mockResolvedValue(true),
+    } as unknown as AvailabilityService;
 
     (routingCalculator as jest.Mock).mockResolvedValue({
       type: RoutingOutcomeType.NO_ROUTES_FOUND,
@@ -171,6 +177,7 @@ describe('smartCheckout', () => {
       const result = await smartCheckout(
         {} as CheckoutConfiguration,
         mockProvider,
+        availabilityService,
         itemRequirements,
         transactionOrGasAmount,
       );
@@ -376,6 +383,7 @@ describe('smartCheckout', () => {
       const result = await smartCheckout(
         {} as CheckoutConfiguration,
         mockProvider,
+        availabilityService,
         itemRequirements,
         transactionOrGasAmount,
       );
@@ -664,6 +672,7 @@ describe('smartCheckout', () => {
       smartCheckout(
         {} as CheckoutConfiguration,
         mockProvider,
+        availabilityService,
         itemRequirements,
         transactionOrGasAmount,
         undefined,
@@ -793,6 +802,7 @@ describe('smartCheckout', () => {
       const result = await smartCheckout(
         {} as CheckoutConfiguration,
         mockProvider,
+        availabilityService,
         itemRequirements,
         transactionOrGasAmount,
       );
@@ -1019,6 +1029,7 @@ describe('smartCheckout', () => {
       const result = await smartCheckout(
         {} as CheckoutConfiguration,
         passportMockProvider,
+        availabilityService,
         itemRequirements,
         transactionOrGasAmount,
       );
@@ -1180,6 +1191,7 @@ describe('smartCheckout', () => {
       const result = await smartCheckout(
         {} as CheckoutConfiguration,
         mockProvider,
+        availabilityService,
         itemRequirements,
         undefined,
       );
@@ -1301,6 +1313,7 @@ describe('smartCheckout', () => {
       const result = await smartCheckout(
         {} as CheckoutConfiguration,
         mockProvider,
+        availabilityService,
         itemRequirements,
         undefined,
         {
@@ -1496,6 +1509,7 @@ describe('smartCheckout', () => {
         smartCheckout(
           {} as CheckoutConfiguration,
           mockProvider,
+          availabilityService,
           itemRequirements,
           undefined,
           undefined,
