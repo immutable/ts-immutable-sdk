@@ -3,7 +3,7 @@ import { Environment } from "@imtbl/config";
 
 export const passport = new Passport({
   baseConfig: {
-    environment: Environment.PRODUCTION,
+    environment: Environment.SANDBOX,
   },
   clientId: "gYT9Cj8xE7to2mWp4ztBTxBlXCTzAebU",
   redirectUri: "http://localhost:3000/login",

@@ -1,0 +1,8 @@
+{
+  "title": "Checkout SDK Connect with NextJS",
+  "description": "Example app demonstrating integration of the Immutable Checkout SDK with Next.js for connecting with MetaMask wallets.",
+  "keywords": ["Immutable", "SDK", "Checkout", "MetaMask", "Web3", "Connect Wallet"],
+  "tech_stack": ["Next.js", "TypeScript", "Ethers.js"],
+  "product": "Checkout",
+  "programming_language": "TypeScript"
+} 

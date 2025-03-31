@@ -1,347 +1,97 @@
-## Immutable Passport SDK Example App Generator
+# Example Apps Documentation Generator
+## Task Overview
+Analyze all example apps in the /examples/passport/ directory and create documentation files for each example app that doesn't already have them. For each example app, you will create:
+1. A comprehensive tutorial.md file
+2. A metadata.json file
 
-# Overview
-This prompt helps you create a new React example app that demonstrates a specific Immutable Passport SDK feature. The output will be a fully functional, self-contained example with proper testing, documentation, and adherence to best practices.
+## Preparation
+Before starting:
+- Read through all SDK documentation (in the /sdk and /packages folders)
+- Understand the SDK's key features, functionality, and integration patterns
+- Focus on the Passport SDK the most. That's your area of specialty.
 
-# Variables to Replace
-Replace these variables before running the prompt:
-- {feature-name}: The specific feature being demonstrated (e.g., event-handling, silent-auth)
-- {framework-name}: The framework being used (e.g., nextjs, react)
+## Process for Each Example App
+For each subdirectory in /examples/passport/ that doesn't already have both tutorial.md and metadata.json:
 
-# Step 1: Core Setup
-Create a new example app named {feature-name}-with-{framework-name} in /examples/passport/ with this structure:
+### 1. Analysis Phase
+- Read all code files in the example app directory
+- Identify which Passport features are being demonstrated. ONLY include the features that are demonstrated in the features.json file if there's one.
+- Understand the app's architecture, components, and data flow
+- Note all frameworks, libraries, and dependencies used
+- IMPORTANT: If the example app is a login example, it should focus on the login feature not the logout feature, etc.
 
-```
-/examples/passport/{feature-name}-with-{framework-name}/
-├── src/app/
-│   ├── page.tsx                    # Main landing page with feature links
-│   ├── {feature-name}/page.tsx     # Primary feature implementation
-│   ├── redirect/page.tsx           # Auth redirect handler
-│   ├── logout/page.tsx             # Logout functionality
-│   ├── utils/                      # Shared utilities
-│   │   ├── setupDefault.ts         # SDK initialization
-│   │   └── wrapper.tsx             # App context wrapper
-│   ├── tests/                      # Test directory
-│   │   └── unit/                   # Unit tests
-│   │       └── passport.test.js    # Feature tests
-│   ├── layout.tsx                  # App layout with wrapper
-│   └── globals.css                 # Basic styles
-├── README.md                       # Documentation
-├── package.json                    # Dependencies
-├── next.config.mjs                 # Next.js config
-├── tsconfig.json                   # TypeScript config
-├── .env.example                    # Environment variables
-├── .gitignore                      # Git ignore file
-├── jest.config.js                  # Jest configuration
-└── babel.config.jest.js            # Babel config for tests
-```
+### 2. Create tutorial.md
+Create a tutorial.md file in the example app's root with the following structure:
 
-Copy only these essential files from an existing example (e.g., login-with-nextjs):
-- package.json (update the name in package.json, but keep ALL dependency versions the same)
-- next.config.mjs
-- tsconfig.json
-- .env.example (update with feature-specific variables if needed)
-- .gitignore
-- src/app/utils/setupDefault.ts
-- src/app/utils/wrapper.tsx
-- src/app/layout.tsx (modify to use AppWrapper)
-- src/app/globals.css
+#### Introduction
+- Brief overview of the app's purpose
+- Which specific SDK capabilities it demonstrates
+- Link to the example app's GitHub repository. (The Github repository MUST BE linked to this message: "View app on Github")
 
-# Step 2: Component Implementation
+IMPORTANT: The TITLE(the text that starts with #) of the example app that comes before the "View app on Github" link must be wrapped in a <div class="display-none"> tag. Ensure that the format looks like this:
+<div class="display-none">
 
-## Critical Import/Export Requirements
-For ALL component files:
-- ALWAYS use default exports for page components (export default function ComponentName)
-- ALWAYS import React explicitly if using JSX fragments (<>...</>): import React from 'react'
-- Verify all imports are correctly spelled and point to existing files
-- Test each component in isolation before integrating it
-- Check for circular dependencies in imports
-- When importing from libraries, verify the component exists in that library
-- For Next.js client components, always include 'use client' at the top of the file
+# Title
 
-## Main Landing Page (src/app/page.tsx)
-Create a simple landing page with:
-- Brief description of the feature
-- Link to the feature implementation page
-- Clear, concise UI using standard HTML (h1, h2, p) and Biom3 Button components
+</div>
 
-## Feature Implementation (src/app/{feature-name}/page.tsx)
-Create a self-contained implementation that:
-- Demonstrates the specific SDK feature clearly 
-- Uses proper initialization and cleanup patterns
-- Shows user feedback for different states
-- Uses standard HTML tags (h1, h2, p) for text (NOT Text component)
-- Uses Biom3 components for UI elements
-- Thoroughly validates all props and types
+IMPORTANT: The "View app on Github" link must be wrapped in a <div class="button-component"> tag. Ensure that the format looks like this:
+<div class="button-component">
 
-## Redirect and Logout Pages
-Create minimal, functional redirect and logout pages:
-- Ensure the redirect page properly handles the authentication callback
-- Implement robust error handling for failed auth callbacks
-- For the logout page, implement proper token cleanup
-- VERIFY that all components used in these pages are properly imported
-- TEST the pages with both successful and failed authentication flows
+[View app on Github](<link to the github repo>) <span class="button-component-arrow">→</span>
 
-# Step 3: Documentation
-Create a comprehensive README.md including:
-- Feature description and purpose
-- Setup instructions including environment variables
-- Usage instructions with code examples
-- Common issues and troubleshooting
-- References to official documentation
-- Any non-standard approaches used
+</div>
 
-# Step 4: Testing
+IMPORTANT: The app's description will come before the "View app on Github" link.
 
-## Jest Configuration
-Create jest.config.js:
-```javascript
-module.exports = {
-  testEnvironment: 'jsdom',
-  transform: {
-    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { configFile: './babel.config.jest.js' }],
-  },
-  moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
-  },
-  testPathIgnorePatterns: ['/node_modules/', '/.next/'],
-  transformIgnorePatterns: [
-    '/node_modules/(?!(@biom3|@imtbl)/)',
-  ],
-  coverageThreshold: {
-    global: {
-      lines: 80,
-    }
-  },
-  setupFilesAfterEnv: ['<rootDir>/src/app/tests/setup.js'],
-};
-```
+#### Features Overview (REMEMBER THAT INITIALIZING THE ORDERBOOK/CHECKOUT/CONTRACTS/PASSPORT SDK IS NOT A FEATURE)
+- Bulleted list of all Passport features demonstrated in this example app
 
-## Test Setup File
-Create src/app/tests/setup.js:
-```javascript
-// Add custom jest matchers from testing-library
-require('@testing-library/jest-dom');
+> IMPORTANT: Focus on how the example app uses each feature. Do NOT include Orderbook/Checkout/Contracts/Passport SDK initialization and Orderbook/Checkout/Contracts/Passport Provider Creation instructions - focus only on the example-specific implementation details.
+#### SDK Integration Details
+For each Passport feature demonstrated in this example app (Note: This section should match the feature mentioned in the features overview section):
+- **Feature Name**: Brief description of what the feature does. 
+- **Source Code**: Link to the source code file in the GitHub repository. Structure: "Source Code: [source code file](source code file link)"
+- **Implementation**: Code snippets showing how the feature is implemented
+- **Explanation**: Clear explanation of how the code works
 
-// Mock Next.js navigation
-jest.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    prefetch: jest.fn(),
-  }),
-  usePathname: () => '/',
-  useSearchParams: () => new URLSearchParams(),
-}));
 
-// Suppress specific console errors during tests
-const originalConsoleError = console.error;
-console.error = (...args) => {
-  if (
-    typeof args[0] === 'string' && 
-    (args[0].includes('Warning: ReactDOM.render') || 
-     args[0].includes('Error: Uncaught [Error'))
-  ) {
-    return;
-  }
-  originalConsoleError(...args);
-};
+#### Running the App
+- Prerequisites (including a link to Immutable Hub for environment setup)
+- Step-by-step instructions to run the app locally(use pnpm not npm)
 
-// Setup global mocks that might be needed across tests
-global.ResizeObserver = jest.fn().mockImplementation(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
-}));
-```
+#### Summary
+- Concise recap of what was demonstrated
+- Any key takeaways for developers
 
-## Babel Configuration
-Create babel.config.jest.js:
-```javascript
-module.exports = {
-  presets: [
-    ['@babel/preset-env', { targets: { node: 'current' } }],
-    '@babel/preset-typescript',
-    ['@babel/preset-react', { runtime: 'automatic' }],
-  ],
-};
-```
+#### Formatting Requirements
+- Use proper Markdown syntax throughout
+- Use heading levels (H1, H2, H3) appropriately
+- Format all code with proper syntax highlighting
+- Use bulleted lists for features and steps
 
-## Unit Tests
-Create comprehensive tests in src/app/tests/unit/passport.test.js:
-- Use CommonJS syntax (require instead of import)
-- Mock ALL external dependencies thoroughly:
-  ```javascript
-  // Example of complete component mocking
-  jest.mock('@biom3/react', () => ({
-    Button: ({ children, onClick, disabled }) => (
-      <button onClick={onClick} disabled={disabled} data-testid="biom3-button">
-        {children}
-      </button>
-    ),
-    // Include ALL components you use from the library
-    Heading: ({ children, size, className }) => (
-      <h2 className={className} data-testid={`biom3-heading-${size}`}>
-        {children}
-      </h2>
-    ),
-    Stack: ({ children, alignItems, gap, direction }) => (
-      <div data-testid="biom3-stack" data-align={alignItems} data-gap={gap} data-direction={direction}>
-        {children}
-      </div>
-    ),
-    Text: ({ children, variant }) => (
-      <span data-testid="biom3-text" data-variant={variant}>
-        {children}
-      </span>
-    ),
-    Spinner: ({ size }) => <div data-testid="biom3-spinner" data-size={size}></div>,
-    BiomeCombinedProviders: ({ children }) => <div data-testid="biom3-providers">{children}</div>,
-  }));
-  ```
-- Create detailed mocks for the SDK:
-  ```javascript
-  const mockProvider = {
-    on: jest.fn(),
-    removeListener: jest.fn(),
-    disconnect: jest.fn(),
-    connected: false,
-  };
-  
-  const mockPassportInstance = {
-    isAuthenticated: jest.fn(),
-    login: jest.fn(),
-    loginCallback: jest.fn(),
-    logout: jest.fn(),
-    provider: mockProvider,
-  };
-  
-  jest.mock('../../../app/utils/setupDefault', () => ({
-    passportInstance: mockPassportInstance,
-  }));
-  ```
-- Test feature functionality thoroughly with all possible scenarios
-- Test UI rendering for all states (loading, error, success)
-- Test all event handling and cleanup
-- Explicitly validate that components render without errors
-- Use act() for all asynchronous operations
-- Aim for >90% code coverage (not just 80%)
-- Verify tests pass with "pnpm test"
+### 3. Create metadata.json
+IMPORTANT: UI LIBRARY IS NOT A FEATURE OR TECH STACK.. IN GENERAL, NEVER INCLUDE UI LIBRARY IN THE METADATA.JSON FILE.
+Create a metadata.json file in the example app's root with the following structure:
+{
+"title": "[Descriptive title of the example app]",
+"description": "[Concise overview of what the example app demonstrates]",
+"keywords": ["Immutable", "SDK", "[Feature1]", "[Feature2]", "..."],
+"tech_stack": ["[Framework]", "[Library]", "..."],
+"product": "[Passport/Checkout/Orderbook/etc]",
+"programming_language": "[TypeScript/JavaScript/etc]"
+}
 
-# Step 5: Implementation Guidelines
 
-## SDK Usage Best Practices
-- Use only documented public API methods
-- If using internal properties, document with comments and type assertions
-- Always implement proper cleanup in useEffect hooks
-- Use local type definitions instead of importing non-exported types
-- Test with both login and logout flows
-- Add robust error handling for all async operations
-- Log important state changes
-- Add TypeScript type guards for any SDK properties that might be undefined
+### 4. Handling Existing Files
+If either tutorial.md or metadata.json already exists but is incomplete:
+- Enhance the content while preserving any accurate existing information
+- Ensure it meets all the format requirements specified above
 
-## UI Best Practices
-- Use standard HTML elements (h1, h2, h3, p) for text content, NOT Text component
-- Use Biom3 Button and other UI components as documented
-- Show clear loading/error states
-- Provide user feedback for actions
-- Keep UI simple and focused on demonstrating the feature
-- Ensure all UI components handle edge cases (empty states, loading states, error states)
-
-## Critical Error Prevention
-- Always check if objects exist before accessing their properties or methods
-- Use optional chaining when accessing potentially undefined properties: obj?.prop?.method?.()
-- Wrap all event listener setup and teardown in try/catch blocks
-- Verify that all promised-based operations are properly awaited
-- Test all pages with the network tab open to catch 404s on resources
-- Test component mounting/unmounting thoroughly to catch cleanup issues
-
-## Common Pitfalls to Avoid
-- DO NOT call methods that don't exist on the SDK instances
-- DO NOT try to import types that aren't explicitly exported
-- DO NOT forget to clean up event listeners, subscriptions, intervals
-- DO NOT use custom components or providers unless necessary
-- DO NOT modify dependency versions in package.json
-- DO NOT use inconsistent import methods (mixing default and named imports)
-- DO NOT forget to include 'use client' directive in client components
-- DO NOT assume any property or method exists without checking first
-
-# Step 6: Validation Checklist
-Before completing the implementation, verify ALL of these items:
-
-- [ ] Code follows existing structure and naming conventions
-- [ ] All routes and pages are implemented correctly
-- [ ] ALL imports are valid and components are properly exported
-- [ ] No circular dependencies exist between components
-- [ ] Error handling is implemented for ALL asynchronous operations
-- [ ] Environment variables are documented in .env.example
-- [ ] Tests run without failures using `pnpm test`
-- [ ] Test coverage exceeds 90% for all files
-- [ ] README.md provides clear setup and usage instructions
-- [ ] Dependencies match existing examples exactly
-- [ ] No console errors or warnings during normal operation
-- [ ] Event listeners and subscriptions are properly cleaned up
-- [ ] Components render without errors in all possible states
-
-# Step 7: Manual Testing Requirements
-After generating the example, manually test these scenarios:
-
-- [ ] Complete login flow works without errors
-- [ ] Redirect handling works correctly
-- [ ] Logout flow completes successfully
-- [ ] All event handlers function as expected
-- [ ] UI correctly reflects all state changes
-- [ ] No error messages appear in the console during normal operation
-- [ ] Run the application with React DevTools to check for unexpected re-renders
-- [ ] Test all features in both development and production mode
-- [ ] All tests pass with high coverage
-
-# Final Testing Steps
-1. Run `pnpm install` in the new example app directory to install dependencies.
-2. Run `pnpm test` to verify ALL tests pass.
-3. Run `pnpm dev` to start the development server.
-4. Manually test the complete authentication flow including login, redirect, and logout.
-5. Check the browser console for any errors during the entire process.
-6. Verify all events are handled and displayed correctly.
-7. Check React DevTools for any component errors or unexpected re-renders.
-8. Build the app with `pnpm build` to check for production build issues.
-
-# Feature-Specific Implementation Guidelines
-
-## Event Handling
-For event handling examples:
-- Demonstrate proper event listener setup and cleanup
-- Show different types of events (connect, disconnect, chainChanged, etc.)
-- Display event data in UI for user feedback
-- Include comprehensive error handling
-- ALWAYS check if the provider exists before adding event listeners
-- Use try/catch blocks around all event handler operations
-- Implement robust cleanup of all event listeners in useEffect return functions
-- Test all event handling with both success and error cases
-- Verify connection state changes are properly tracked and displayed
-
-## Authentication
-For authentication examples:
-- Show the complete authentication flow
-- Handle redirect and silent authentication appropriately
-- Display user information after successful login
-- Implement proper logout functionality
-
-## Wallet Integration
-For wallet examples:
-- Demonstrate connection to supported wallets
-- Show wallet selection interface if applicable
-- Display wallet state and changes
-- Include transaction examples if relevant
-
-## Chat window
-Please create a new example app that demonstrates event-handling with nextjs following the Immutable Passport SDK Example App Generator prompt.
-
-Feature name: event-handling
-Framework: nextjs
-
-Additional requirements:
-- Focus on demonstrating all available Passport events
-- Include examples of how to properly clean up event listeners
-- Show how to handle connection state changes
+## Final Verification for Each Example App
+- All SDK features in the example app are documented in tutorial.md
+- The tutorial is free of generic SDK initialization boilerplate
+- All links to GitHub repositories are correct
+- metadata.json contains accurate and comprehensive information
+- Both files are properly formatted
 

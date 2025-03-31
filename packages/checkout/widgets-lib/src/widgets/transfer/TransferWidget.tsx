@@ -81,23 +81,11 @@ function TransferWidgetInner(props: TransferWidgetInputs) {
     };
 
     x();
-  }, [checkout]);
+  }, [checkout, provider, cryptoFiatDispatch, props.amount, props.tokenAddress, props.toAddress, viewState.type]);
 
   const resetForm = useCallback(() => {
-    if (viewState.type === 'INITIALISING') return;
-
-    setViewState({
-      type: 'FORM',
-      allowedBalances: viewState.allowedBalances,
-      checkout: viewState.checkout,
-      provider: viewState.provider,
-      amount: '',
-      amountError: '',
-      tokenAddress: '',
-      toAddress: '',
-      toAddressError: '',
-    });
-  }, [checkout, provider, viewState]);
+    setViewState({ type: 'INITIALISING' });
+  }, []);
 
   const onSend = useCallback(async () => {
     if (viewState.type !== 'FORM') throw new Error('Unexpected state');
@@ -124,6 +112,11 @@ function TransferWidgetInner(props: TransferWidgetInputs) {
       tokenInfo.balance < parseUnits(viewState.amount, tokenInfo.token.decimals)
     ) {
       setViewState((s) => ({ ...s, amountError: 'Insufficient balance' }));
+      return;
+    }
+
+    if (Number(viewState.amount) <= 0) {
+      setViewState((s) => ({ ...s, amountError: 'Amount must be positive' }));
       return;
     }
 

@@ -1,23 +1,37 @@
-import { Checkout, SwapDirection, SwapEventType, SwapSuccess, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { Checkout, SwapEventType, SwapSuccess, Widget, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { passport } from '../../../utils/passport';
+import { Environment } from '@imtbl/config';
 
 const SWAP_TARGET_ID = 'swap-target'
 function SwapUI() {
   const urlParams = new URLSearchParams(window.location.search);
 
-  const checkout = useMemo(() => new Checkout(), []);
-  const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout]);
-  const swap = useMemo(() => factory.create(WidgetType.SWAP),[factory]);
+  const [swap, setSwap] = useState<Widget<WidgetType.SWAP> | null>(null);
   const [isAutoProceed, setIsAutoProceed] = useState(urlParams.get('isAutoProceed') == 'true');
 
-  const updateTheme = (theme: WidgetTheme) => swap.update({config: {theme}});
+  const updateTheme = useCallback((theme: WidgetTheme) => swap?.update({config: {theme}}), [swap]);
 
   useEffect(() => {
+    passport.connectEvm().then(() => {
+      const checkout = new Checkout({
+        baseConfig: {
+          environment: Environment.SANDBOX,
+        },
+        passport,
+      });
+      const factory = new WidgetsFactory(checkout, { theme: WidgetTheme.DARK });
+      setSwap(factory.create(WidgetType.SWAP));
+    })
+  }, []);
+
+  useEffect(() => {
+    if (!swap) return;
     swap.mount(SWAP_TARGET_ID,{
-      amount: '5',
-      fromTokenAddress: '0x3B2d8A1931736Fc321C24864BceEe981B11c3c57',
-      toTokenAddress: "0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439",
+      // amount: '5',
+      // fromTokenAddress: '0x3B2d8A1931736Fc321C24864BceEe981B11c3c57',
+      // toTokenAddress: "0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439",
       autoProceed: isAutoProceed,
     });
     swap.addListener(SwapEventType.SUCCESS, (data: SwapSuccess) => {
@@ -38,8 +52,8 @@ function SwapUI() {
     <div>
       <h1 className="sample-heading">Checkout Swap</h1>
       <div id={SWAP_TARGET_ID}></div>
-      <button onClick={() => swap.mount(SWAP_TARGET_ID)}>Mount</button>
-      <button onClick={() => swap.unmount()}>Unmount</button>
+      <button onClick={() => swap?.mount(SWAP_TARGET_ID)}>Mount</button>
+      <button onClick={() => swap?.unmount()}>Unmount</button>
       <button onClick={() => updateTheme(WidgetTheme.LIGHT)}>Light theme</button>
       <button onClick={() => updateTheme(WidgetTheme.DARK)}>Dark theme</button>
       Auto Proceed:

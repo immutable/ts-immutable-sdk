@@ -1,0 +1,7 @@
+{
+    "features": [
+        "device-flow-authentication",
+        "nft-transfers"
+    ],
+    "order": 6
+}
