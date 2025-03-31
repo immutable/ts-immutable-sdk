@@ -94,6 +94,7 @@ export function useWidgetEvents(
       const eventDetail = getCommerceWidgetEvent(customEvent);
       sendCheckoutEvent(eventTarget, eventDetail);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventTarget]);
 
   useEffect(() => {

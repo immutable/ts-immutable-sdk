@@ -57,6 +57,7 @@ export function PurchaseSelectedRouteOption({
         }
         return { routeBalanceUsd: '0', fromAmount: '0', fromAmountUsd: '0' };
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       chainNativeCurrencySymbol = routeData.route.route.estimate.gasCosts[0].token.symbol;
       return getRouteAndTokenBalances(routeData);
     },
@@ -74,6 +75,7 @@ export function PurchaseSelectedRouteOption({
       onClick?.(event);
       return true;
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [onClick, loading, routeData],
   );
 

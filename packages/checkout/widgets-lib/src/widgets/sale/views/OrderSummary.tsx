@@ -153,6 +153,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
   useEffect(() => {
     if (subView !== OrderSummarySubViews.INIT || !fromTokenAddress) return;
     queryFundingBalances();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subView, fromTokenAddress]);
 
   // If one or more balances found, go to Order Review
@@ -169,6 +170,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
         },
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fundingBalances]);
 
   // If no balances, Go to Top Up View
@@ -205,6 +207,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     } catch (error: any) {
       goToErrorView(SaleErrorTypes.SERVICE_BREAKDOWN, error);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fundingBalances, loadingBalances, fundingBalancesResult]);
 
   // Refresh conversion rates, once all balances are loaded

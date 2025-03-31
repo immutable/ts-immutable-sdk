@@ -241,6 +241,7 @@ export function Purchase({
       }
     }
     )();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quote, balances, squid]);
 
   useEffect(() => {
@@ -265,6 +266,7 @@ export function Purchase({
         tokenSymbols,
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quote]);
 
   const shouldShowBackButton = showBackButton && onBackButtonClick;
@@ -509,6 +511,7 @@ export function Purchase({
     } else {
       handleDirectCryptoPayment(fromProvider, fromAddress, toAddress, quote.currency.address);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     squid,
     tokens,

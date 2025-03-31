@@ -107,6 +107,7 @@ export const useQuoteOrder = ({
         fetching.current = false;
       }
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [environment, environmentId, queryParams]);
 
   useEffect(() => {
@@ -122,6 +123,7 @@ export const useQuoteOrder = ({
       || orderQuote.currencies?.[0];
 
     setSelectedCurrency(defaultSelectedCurrency);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderQuote]);
 
   return {

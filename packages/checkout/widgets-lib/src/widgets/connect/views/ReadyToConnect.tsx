@@ -45,6 +45,7 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
       userJourney: UserJourney.CONNECT,
       screen: 'ReadyToConnect',
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // make sure wallet provider name is set if coming directly to this screen
@@ -66,6 +67,7 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
         },
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPassport, isMetaMask]);
 
   const textView = () => `views.READY_TO_CONNECT.${isPassport ? 'passport' : 'metamask'}`;
@@ -164,6 +166,7 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
       setLoading(false);
       setFooterButtonTextKey(`${textView()}.footer.buttonText2`);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout, provider, connectDispatch, viewDispatch, identify]);
 
   return (

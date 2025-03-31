@@ -31,6 +31,7 @@ export function SwitchNetworkEth() {
       userJourney: UserJourney.CONNECT,
       screen: 'SwitchNetworkEth',
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const switchNetwork = useCallback(async () => {
@@ -66,6 +67,7 @@ export function SwitchNetworkEth() {
     } catch (err: any) {
       setButtonTextKey(t('views.SWITCH_NETWORK.eth.button.retryText'));
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [provider, checkout, track]);
 
   return (

@@ -279,6 +279,7 @@ export function OnRampMain({
       }
     };
     window.addEventListener('message', handleTransakEvents);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout, provider, tokenAmount, tokenAddress, passport]);
 
   return (
