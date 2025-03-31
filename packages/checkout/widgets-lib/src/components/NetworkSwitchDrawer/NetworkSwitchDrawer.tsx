@@ -91,6 +91,7 @@ export function NetworkSwitchDrawer({
     switchNetworkEthImage.src = ethImageUrl;
     const switchNetworkzkEVMImage = new Image();
     switchNetworkzkEVMImage.src = zkevmImageUrl;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

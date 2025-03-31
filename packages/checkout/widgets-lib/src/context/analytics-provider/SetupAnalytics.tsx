@@ -28,6 +28,7 @@ export function SetupAnalytics(
       if (!config) return;
       updateWriteKey(config.segmentPublishableKey);
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [telemetry]);
 
   // eslint-disable-next-line react/jsx-no-useless-fragment

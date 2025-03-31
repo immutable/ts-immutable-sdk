@@ -239,6 +239,7 @@ export function ConnectLoader({
         });
       }
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout, walletProviderName, browserProvider]);
 
   return (

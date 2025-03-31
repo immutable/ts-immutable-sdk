@@ -90,6 +90,7 @@ export function SelectedRouteOption({
       onClick?.(event);
       return true;
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [onClick, loading, routeData],
   );
 

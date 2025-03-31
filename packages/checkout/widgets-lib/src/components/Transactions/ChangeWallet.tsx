@@ -54,6 +54,7 @@ export function ChangeWallet({ onChangeWalletClick }: ChangeWalletProps) {
         })();
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isWalletConnectEnabled, from]);
 
   return (

@@ -40,6 +40,7 @@ export function StatusView({
       firstRender.current = false;
       onRenderEvent();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firstRender.current, onRenderEvent]);
 
   const onStatusActionClick = () => {

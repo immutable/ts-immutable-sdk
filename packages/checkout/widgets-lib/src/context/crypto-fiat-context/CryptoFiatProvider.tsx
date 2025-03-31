@@ -35,6 +35,7 @@ export function CryptoFiatProvider({ environment, children }: CryptoFiatProvider
         })),
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

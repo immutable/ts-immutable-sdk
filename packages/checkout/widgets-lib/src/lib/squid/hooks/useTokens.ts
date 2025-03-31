@@ -36,6 +36,7 @@ export const useTokens = (checkout: Checkout) => {
       }
     };
     getTokens();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [squidConfig]);
 
   return tokens;

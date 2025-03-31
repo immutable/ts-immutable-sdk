@@ -38,6 +38,7 @@ export function NoTransactions(
       userJourney: UserJourney.BRIDGE,
       screen: 'NoTransactions',
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
