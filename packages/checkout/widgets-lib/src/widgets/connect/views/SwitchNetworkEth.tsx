@@ -10,7 +10,6 @@ import { EthereumPlanetHero } from '../../../components/Hero/EthereumPlanetHero'
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { ConnectActions, ConnectContext } from '../context/ConnectContext';
-import { getL1ChainId } from '../../../lib/networkUtils';
 import {
   ViewContext,
   ViewActions,
@@ -45,7 +44,7 @@ export function SwitchNetworkEth() {
     try {
       const switchRes = await checkout.switchNetwork({
         provider,
-        chainId: getL1ChainId(checkout.config),
+        chainId: checkout.config.l1ChainId,
       });
 
       connectDispatch({
@@ -88,7 +87,7 @@ export function SwitchNetworkEth() {
     >
       <SimpleTextBody
         heading={t('views.SWITCH_NETWORK.eth.heading', {
-          networkName: getChainNameById(getL1ChainId(checkout!.config)),
+          networkName: getChainNameById(checkout!.config.l1ChainId),
         })}
       >
         {t('views.SWITCH_NETWORK.eth.body')}
