@@ -178,7 +178,7 @@ export const MainPage = () => {
         <Heading>Immutable Checkout Marketplace</Heading>
         <Box sx={{ padding: 'base.spacing.x4', display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', gap: 'base.spacing.x6', alignItems: 'center', flexWrap: 'wrap' }}>
           <Button onClick={() => openConnectWidget()}>Connect</Button>
-          <Button onClick={() => openConnectWidget(checkout.config.isProduction ? ChainId.ETHEREUM : ChainId.SEPOLIA)}>Connect (Layer 1)</Button>
+          <Button onClick={() => openConnectWidget(checkout.config.l1ChainId)}>Connect (Layer 1)</Button>
           <Button onClick={() => openConnectWidget(undefined, true)}>Connect (Blocked)</Button>
           <Button onClick={openWalletWidget}>Wallet</Button>
           <Button onClick={openSwapWidget}>Swap</Button>
