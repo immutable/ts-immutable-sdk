@@ -24,7 +24,8 @@ Systematically review the {feature name} example app against these specific crit
    - Spacing between sections and components (margin/padding)
    - Alignment of elements (left/center/right)
    - Overall page structure and component organization
-
+   - Buttons are center-aligned
+   - There are no gray card backgrounds. Always use Biom3 if applicable, otherwise, if not available, use normal HTML/TailwindCSS but ensure that it has the same look as Biom3 UI
 2. **Typography**
    - Font families, sizes, and weights
    - Text colors and contrast
@@ -75,6 +76,9 @@ Systematically review the {feature name} example app against these specific crit
    - Compare side-by-side with other example apps
    - Verify responsive behavior across different screen sizes
    - Ensure accessibility standards are maintained
+   - Check if the spacing, padding, margins all look good (as the best UI/UX designer, you be the judge). If not, fix it.
+   - Check if the Button is center aligned under its container.
 
 ### Final Check
 Go through the entire {feature name} example app one more time and compare with other example apps for consistency. If inconsistencies remain, revisit the audit checklist and address each item until the styling is fully aligned with other examples.
+Check if the spacing, padding, margins all look good. If not, fix it.

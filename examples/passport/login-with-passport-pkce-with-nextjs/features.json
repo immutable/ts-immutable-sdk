@@ -1,0 +1,11 @@
+{
+    "features": [
+        {
+            "feature": "login-with-passport-pkce",
+            "manually-edited": false,
+            "silent-login": false,
+            "silent-logout": false
+        }
+    ],
+    "order": 7
+} 

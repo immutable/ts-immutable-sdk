@@ -1,6 +1,6 @@
-# Passport SDK Login/Identity Example App
+# Passport SDK Login with PKCE Example App
 
-This example app is designed to show options after a user has logged in via Passport. 
+This example app demonstrates how to implement login with Passport using the PKCE (Proof Key for Code Exchange) flow in a Next.js application.
 
 This example app runs on Immutable Testnet. To use this code on Immutable zkEVM Mainnet make sure you instantiate the SDK with the Mainnet configuration.
 
@@ -16,7 +16,8 @@ Copy over the `.env.example` file to `.env` and fill in the required environment
 
 ## Required Environment Variables
 
-- NEXT_PUBLIC_PUBLISHABLE_KEY // replace with your publishable API key from Hub
+- NEXT_PUBLIC_PUBLISHABLE_KEY - Replace with your publishable API key from Hub
+- NEXT_PUBLIC_CLIENT_ID - Replace with your client ID from Hub
 
 Run the app locally:
 
@@ -26,23 +27,15 @@ pnpm dev
 
 Then open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Available Features
+## PKCE Flow
 
-### Linked Addresses with Passport
-View wallet addresses linked to a user's Passport account.
+The PKCE flow is an OAuth 2.0 extension that provides additional security for public clients and is recommended for single-page applications or mobile apps. 
 
-### User Info with Passport
-View user profile information after logging in.
-
-### Verify Tokens with NextJS
-View and verify ID token and access token information.
-
-### Link External Wallet
-This feature demonstrates how to link an external wallet address to a user's Passport account. The feature provides:
-- Secure wallet address linking via EIP-712 signatures
-- Verification that the linking wallet is owned by the user
-- Adding multiple wallet types (MetaMask, External, WalletConnect)
-- Secure nonce handling for request validation
+This example demonstrates:
+1. Initiating the PKCE login flow
+2. Handling the callback from Passport
+3. Retrieving user information
+4. Logging out the user 
 
 ## Feature Management
 
@@ -57,4 +50,4 @@ To add a new feature implementation to this example app:
 To update an existing feature implementation:
 1. Run the {feature name} generator prompt
 2. Specify the existing feature name to update
-3. The generator will update the implementation while preserving app-specific customizations
+3. The generator will update the implementation while preserving app-specific customizations 

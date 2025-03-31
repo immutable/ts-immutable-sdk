@@ -7,13 +7,13 @@ This prompt helps you:
 3. Safely handle manually edited code
 
 **IMPORTANT**: Before running this prompt:
-- If the feature file contains the comment `/* MANUALLY EDITED - DO NOT OVERWRITE */`, the prompt will alert you before making changes
+- If the {feature name} in the features.json file has the field of 'manually-edited' as true, the prompt will alert you before making changes
 - To add a new feature, specify the feature name that doesn't exist yet
 - To update a feature, specify the existing feature name to be updated
 
 ### Initial Analysis
 1. Check if `src/app/{feature name}/page.tsx` already exists:
-   - If it exists, look for the `/* MANUALLY EDITED - DO NOT OVERWRITE */` comment
+   - If it exists, in the features.json file, check if it has the field of 'manually-edited' as true
    - If manually edited, alert the engineer and request confirmation before proceeding
    - If not manually edited or if confirmation received, proceed with update
    - If it doesn't exist, prepare to create a new implementation
@@ -36,6 +36,10 @@ IF THE COMPONENT THAT YOU WANT DOESN'T EXIST IN BIOM3, ALWAYS USE NORMAL CSS/HTM
    - Update any navigation components to include the new feature (if applicable)
    - Listen to additional {feature name} specific requirements given by the user via the chat window
    - Ensure that Passport login/wallet connect is implemented properly. If not sure, refer to other Passport example apps for reference.
+
+## Silent Login mode (If Applicable)
+- Go to the features.json file and check for the silent login field.
+- If {feature name} has the silent login field as true, go through all of the pages in the app and change all login modes to silent login.
 
 2. For UPDATING existing implementation:
    - Preserve any custom imports or components specific to the app
@@ -104,13 +108,6 @@ To update an existing feature implementation:
 1. Run the {feature name} generator prompt
 2. Specify the existing feature name to update
 3. The generator will update the implementation while preserving app-specific customizations
-
-### Protecting Manual Edits
-If you've made manual edits to a feature implementation that you want to protect:
-1. Add the comment `/* MANUALLY EDITED - DO NOT OVERWRITE */` at the top of the file
-2. The generator will alert you before overwriting manually edited files
-```
-
 
 
 This comprehensive guide will help you safely add or update feature implementations while respecting existing code and manual edits.

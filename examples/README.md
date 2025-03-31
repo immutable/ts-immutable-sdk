@@ -335,7 +335,7 @@ pnpm test
 
 3) Copy all of the content in the prompt-part2.txt file.
 
-4) Paste it on to Cursor. Make sure that you're using Agent mode and the model to be used is Claude 3.7
+4) Paste it on to Cursor. Make sure that you're using Agent mode and the model to be used is Claude 3.7 (Thinking)
 
 5) After pasting the prompt, in the chat window you can type: 
 app name: <app name(if exists)>
@@ -343,11 +343,19 @@ feature name: <name of the feature>
 and cursor will generate the feature page in the given app.
 
 6) To update an existing feature, the prompt will identify if the given <feature name> exists in the <app name> directory. If it does, it will check if 
-`/* MANUALLY EDITED - DO NOT OVERWRITE */` exists in the file.
+the <feature name> has the manually-edited field value as true in the feature.json file.
 
 7) If the flag above exists, it will ask for a confirmation, otherwise, it will use best practices to update the existing feature page.
 
 8) Once the feature page is completed, under the same directory as prompt-part2.txt, open prompt-part3.txt and copy all of its contents.
+
+9) Paste it on to a new Cursor window and in the chat window you can type: 
+
+feature name: <name of the feature>
+
+Here, cursor will check and fix pages with styling issues to ensure that it looks consistent with other example apps.
+
+10) Once the styling changes have been made, under the same directory as prompt-part2.txt, open prompt-part4.txt and copy all of its contents.
 
 9) Paste it on to a new Cursor window and in the chat window you can type: 
 app name: <app name(if exists)>
@@ -357,6 +365,8 @@ feature name: <name of the feature>
 
 11) When the prompt is done running, make sure to double check if the tests are comprehensive enough and also check if the feature page was built properly using best practices.
 
+12) Run `pnpm dev` and check every page's styling. If something looks off, you can manually fix it.
+
 ## If an App Doesn't Exist Yet
 
 You must create the app first by going to the prompt-part1.txt file and paste it on to Cursor's chat window and use Agent Mode + Claude 3.7 Sonnet Thinking.
@@ -365,6 +375,9 @@ In the chat window, type in:
 feature name: <name>
 
 Then Cursor will build out the example app's setup, etc.
+IF Cursor doesn't run build at the end, manually type on the chat window 'run build'.
+
+
 
 IMPORTANT: For any prompts, if cursor is not done with its operations but it has reached 25 tool calls, you will need to manually type "continue" on the chat window for cursor to continue building.
 

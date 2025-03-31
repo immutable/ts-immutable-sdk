@@ -55,6 +55,7 @@ After tests pass and all page can render, verify that the app builds correctly:
 2. If the build fails, fix the issues and rebuild.
    - Repeat the testing process if significant changes were made
    - DO NOT PROCEED until the build succeeds
+   - If there's any lint issues, never turn off linting in the ESLINT CONFIG FILE. Instead, fix the issues.
 
 ## Development Testing
 ONLY PROCEED TO THIS STEP IF:

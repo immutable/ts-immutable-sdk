@@ -3,31 +3,31 @@
         {
             "feature": "login-with-etherjs",
             "manually-edited": true,
-            "silent-login": true,
-            "silent-logout": true
+            "silent-login": false,
+            "silent-logout": false
         },
         {
             "feature": "login-with-identity-only",
             "manually-edited": true,
-            "silent-login": true,
-            "silent-logout": true
+            "silent-login": false,
+            "silent-logout": false
         },
         {
             "feature": "logout",
             "manually-edited": true,
-            "silent-login": true,
-            "silent-logout": true
+            "silent-login": false,
+            "silent-logout": false
         },
         {
             "feature": "logout-with-redirect-mode",
             "manually-edited": true,
-            "silent-login": true,
-            "silent-logout": true
+            "silent-login": false,
+            "silent-logout": false
         },
         {
             "feature": "logout-with-silent-mode",
             "manually-edited": true,
-            "silent-login": true,
+            "silent-login": false,
             "silent-logout": true
         }
     ],

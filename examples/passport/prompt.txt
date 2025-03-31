@@ -45,7 +45,7 @@ IMPORTANT: The "View app on Github" link must be wrapped in a <div class="button
 IMPORTANT: The app's description will come before the "View app on Github" link.
 
 #### Features Overview (REMEMBER THAT INITIALIZING THE ORDERBOOK/CHECKOUT/CONTRACTS/PASSPORT SDK IS NOT A FEATURE)
-- Bulleted list of all Passport features demonstrated in this example app
+- Bulleted list of all Passport features demonstrated in this example app (Each feature is each element in the features array in the features.json file)
 
 > IMPORTANT: Focus on how the example app uses each feature. Do NOT include Orderbook/Checkout/Contracts/Passport SDK initialization and Orderbook/Checkout/Contracts/Passport Provider Creation instructions - focus only on the example-specific implementation details.
 #### SDK Integration Details
