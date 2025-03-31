@@ -143,6 +143,7 @@ export const useQuoteOrder = ({
         fetching.current = false;
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [environment, environmentId, preferredCurrency, fetching],
   );
 

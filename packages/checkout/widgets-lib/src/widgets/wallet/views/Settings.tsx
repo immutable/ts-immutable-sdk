@@ -46,6 +46,7 @@ export function Settings({ showDisconnectButton }: SettingsProps) {
       userJourney: UserJourney.WALLET,
       screen: 'Settings',
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // disconnect all Wallet Connect pairings and disconnect the provider

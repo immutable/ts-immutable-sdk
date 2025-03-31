@@ -119,6 +119,7 @@ export function BalanceItem({
     );
 
     return canBuy || canAdd;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isOnRampEnabled,
     onRampAllowedTokens,

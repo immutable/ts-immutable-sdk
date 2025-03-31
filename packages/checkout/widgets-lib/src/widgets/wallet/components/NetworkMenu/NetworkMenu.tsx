@@ -81,6 +81,7 @@ export function NetworkMenu() {
         }
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [checkout, provider, network, walletDispatch, viewDispatch],
   );
 

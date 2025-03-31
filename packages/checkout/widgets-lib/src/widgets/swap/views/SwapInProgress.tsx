@@ -34,6 +34,7 @@ export function SwapInProgress({
         swapFormInfo: swapForm,
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -83,6 +84,7 @@ export function SwapInProgress({
         });
       }
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transactionResponse]);
 
   return (

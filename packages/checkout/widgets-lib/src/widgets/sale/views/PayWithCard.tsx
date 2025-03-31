@@ -105,6 +105,7 @@ export function PayWithCard() {
     }); // checkoutPrimarySalePayWithCard_OrderCreatedEvent
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_CARD), []); // checkoutPrimarySalePayWithCardViewed
 
   return (
