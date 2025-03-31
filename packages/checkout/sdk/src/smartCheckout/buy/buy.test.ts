@@ -170,6 +170,7 @@ describe('buy', () => {
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
+        availabilityService,
         itemRequirements,
         fulfillmentTransaction,
       );
@@ -350,6 +351,7 @@ describe('buy', () => {
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
+        availabilityService,
         itemRequirements,
         gasTransaction,
       );
@@ -481,6 +483,7 @@ describe('buy', () => {
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
+        availabilityService,
         itemRequirements,
         fulfillmentTransaction,
       );
@@ -614,6 +617,7 @@ describe('buy', () => {
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
+        availabilityService,
         itemRequirements,
         fulfillmentTransaction,
       );
@@ -799,6 +803,7 @@ describe('buy', () => {
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
+        availabilityService,
         itemRequirements,
         gasTransaction,
       );
@@ -989,6 +994,7 @@ describe('buy', () => {
         expect(smartCheckout).toBeCalledWith(
           config,
           mockProvider,
+          availabilityService,
           itemRequirements,
           gasTransaction,
         );
@@ -1058,6 +1064,7 @@ describe('buy', () => {
         expect(smartCheckout).toBeCalledWith(
           config,
           mockProvider,
+          availabilityService,
           itemRequirements,
           gasAmount,
         );
@@ -1167,6 +1174,7 @@ describe('buy', () => {
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
+        availabilityService,
         itemRequirements,
         gasAmount,
       );
@@ -1273,6 +1281,7 @@ describe('buy', () => {
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
+        availabilityService,
         itemRequirements,
         fulfillmentTransaction,
       );
@@ -1392,6 +1401,7 @@ describe('buy', () => {
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
+        availabilityService,
         itemRequirements,
         fulfillmentTransaction,
       );
@@ -1516,6 +1526,7 @@ describe('buy', () => {
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
+        availabilityService,
         itemRequirements,
         fulfillmentTransaction,
       );
@@ -1948,6 +1959,7 @@ describe('buy', () => {
         expect(smartCheckout).toBeCalledWith(
           config,
           mockProvider,
+          availabilityService,
           itemRequirements,
           fulfillmentTransaction,
         );
@@ -2167,6 +2179,7 @@ describe('buy', () => {
         expect(smartCheckout).toBeCalledWith(
           config,
           mockProvider,
+          availabilityService,
           itemRequirements,
           fulfillmentTransaction,
         );

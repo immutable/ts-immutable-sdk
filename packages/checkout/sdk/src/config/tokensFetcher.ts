@@ -49,6 +49,7 @@ export class TokensFetcher {
     baseUrl: string,
     chainSlug: ChainSlug,
   ) {
+    console.log({ baseUrl, chainSlug });
     this.httpClient = httpClient;
     this.remoteConfig = remoteConfig;
     this.baseUrl = baseUrl;
