@@ -9,7 +9,6 @@ import { TokenBalanceResult } from './types';
 import { HttpClient } from '../../api/http';
 
 jest.mock('../../balances');
-jest.mock('../../config');
 
 describe('tokenBalances', () => {
   let mockConfig: CheckoutConfiguration;
