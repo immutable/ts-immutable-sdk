@@ -7,6 +7,7 @@ import {
   zeroPadValue,
   AbiCoder,
   ZeroAddress,
+  parseUnits,
 } from 'ethers';
 import { ROOT_AXELAR_ADAPTOR } from './contracts/ABIs/RootAxelarBridgeAdaptor';
 import {
@@ -1005,6 +1006,7 @@ export class TokenBridge {
       symbol: sourceAxelar.symbol,
       gasLimit: destinationChainGaslimit,
       gasMultiplier,
+      minGasPrice: parseUnits('1', 'gwei'),
     };
 
     let axiosResponse: AxiosResponse;
