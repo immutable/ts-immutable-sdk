@@ -40,7 +40,7 @@ export default function OnRampWidget({
     ...initialViewState,
     history: [],
   });
-  const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewReducer]);
+  const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
@@ -72,6 +72,7 @@ export default function OnRampWidget({
 
       setTknAddr(address);
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout, provider, viewDispatch]);
 
   return (

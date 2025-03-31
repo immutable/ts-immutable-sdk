@@ -207,6 +207,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     }
 
     setLoadedToAndFromTokens(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     tokenBalances,
     allowedTokens,
@@ -247,6 +248,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         symbol: token.symbol,
         icon: token.icon,
       } as CoinSelectorOptionProps),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     ), [allowedTokens, fromToken]);
 
   useEffect(() => {
@@ -496,6 +498,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
 
       (async () => await fetchQuote())();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedFromAmount, fromToken, toToken, fromMaxTrigger]);
 
   useEffect(() => {
@@ -508,6 +511,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
 
       (async () => await fetchQuote())();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedToAmount, toToken, fromToken]);
 
   // during swaps, having enough IMX to cover the gas fee means (only relevant for non-Passport wallets)
@@ -567,6 +571,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         fromAmount,
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toToken]);
 
   const onFromTextInputFocus = () => {
@@ -650,6 +655,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         toAmount,
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fromToken]);
 
   const onToTextInputFocus = () => {
@@ -803,6 +809,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     }
 
     return true;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFormValidForAutoProceed]);
 
   const sendTransaction = async () => {
@@ -898,6 +905,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
   useEffect(() => {
     if (shouldSendTransaction === undefined) return;
     sendTransaction();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldSendTransaction]);
 
   return (

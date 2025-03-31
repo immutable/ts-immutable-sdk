@@ -72,7 +72,7 @@ export default function AddTokensWidget({
       viewState,
       viewDispatch,
     }),
-    [viewState, viewReducer],
+    [viewState, viewDispatch],
   );
 
   const [addTokensState, addTokensDispatch] = useReducer(
@@ -114,6 +114,7 @@ export default function AddTokensWidget({
         },
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toTokenAddress = useMemo(() => {
@@ -132,6 +133,7 @@ export default function AddTokensWidget({
     if (config.environment !== Environment.PRODUCTION) {
       showErrorHandover(AddTokensErrorTypes.ENVIRONMENT_ERROR, { contextId: id });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config, id]);
 
   useEffect(() => {
@@ -153,6 +155,7 @@ export default function AddTokensWidget({
     if (isInvalidToTokenAddress || isInvalidToAmount) {
       showErrorHandover(AddTokensErrorTypes.INVALID_PARAMETERS, { contextId: id });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toTokenAddress, toAmount, id]);
 
   useEffect(() => {

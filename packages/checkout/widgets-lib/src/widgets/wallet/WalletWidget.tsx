@@ -133,6 +133,7 @@ export default function WalletWidget(props: WalletWidgetInputs) {
         },
       });
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isBridgeEnabled, isSwapEnabled, isOnRampEnabled, environment]);
 
   const initialiseWallet = async () => {
@@ -183,6 +184,7 @@ export default function WalletWidget(props: WalletWidgetInputs) {
   useEffect(() => {
     if (!checkout || !provider) return;
     initialiseWallet();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout, provider]);
 
   const errorAction = async () => {

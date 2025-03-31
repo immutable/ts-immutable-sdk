@@ -119,6 +119,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
     if (!checkout || !provider) return;
 
     onMount();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout, provider]);
 
   return (

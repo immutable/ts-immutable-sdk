@@ -56,7 +56,7 @@ export default function PurchaseWidget({
       viewState,
       viewDispatch,
     }),
-    [viewState, viewReducer],
+    [viewState, viewDispatch],
   );
 
   const [purchaseState, purchaseDispatch] = useReducer(
@@ -69,7 +69,7 @@ export default function PurchaseWidget({
       purchaseState,
       purchaseDispatch,
     }),
-    [purchaseState, purchaseReducer],
+    [purchaseState, purchaseDispatch],
   );
 
   const {
@@ -161,6 +161,7 @@ export default function PurchaseWidget({
         console.error('Error fetching order quote', error);
       }
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, toAddress]);
 
   return (
