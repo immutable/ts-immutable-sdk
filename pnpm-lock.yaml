@@ -59,7 +59,7 @@ importers:
         version: 8.57.0
       eslint-config-airbnb:
         specifier: ^19.0.4
-        version: 19.0.4(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0))(eslint-plugin-jsx-a11y@6.9.0(eslint@8.57.0))(eslint-plugin-react-hooks@5.0.0(eslint@8.57.0))(eslint-plugin-react@7.35.0(eslint@8.57.0))(eslint@8.57.0)
+        version: 19.0.4(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0))(eslint-plugin-jsx-a11y@6.9.0(eslint@8.57.0))(eslint-plugin-react-hooks@5.2.0(eslint@8.57.0))(eslint-plugin-react@7.35.0(eslint@8.57.0))(eslint@8.57.0)
       eslint-config-airbnb-typescript:
         specifier: ^17.0.0
         version: 17.1.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0)(typescript@5.6.2))(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0))(eslint@8.57.0)
@@ -132,7 +132,7 @@ importers:
         version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@imtbl/sdk':
         specifier: latest
-        version: 2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 2.1.9
       next:
         specifier: 14.2.25
         version: 14.2.25(@babel/core@7.24.9)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1354,6 +1354,9 @@ importers:
       eslint:
         specifier: ^8.40.0
         version: 8.57.0
+      eslint-plugin-react-hooks:
+        specifier: ^5.2.0
+        version: 5.2.0(eslint@8.57.0)
       jest:
         specifier: ^29.4.3
         version: 29.7.0(@types/node@18.15.13)(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))
@@ -10599,17 +10602,17 @@ packages:
     peerDependencies:
       eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0
 
-  eslint-plugin-react-hooks@5.0.0:
-    resolution: {integrity: sha512-hIOwI+5hYGpJEc4uPRmz2ulCjAGD/N13Lukkh8cLV0i2IRk/bdZDYjgLVHj+U9Z704kLIdIO6iueGvxNur0sgw==}
-    engines: {node: '>=10'}
-    peerDependencies:
-      eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0
-
   eslint-plugin-react-hooks@5.0.0-canary-7118f5dd7-20230705:
     resolution: {integrity: sha512-AZYbMo/NW9chdL7vk6HQzQhT+PvTAEVqWk9ziruUoW2kAOcN5qNyelv70e0F1VNQAbvutOC9oc+xfWycI9FxDw==}
     engines: {node: '>=10'}
     peerDependencies:
       eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0
+
+  eslint-plugin-react-hooks@5.2.0:
+    resolution: {integrity: sha512-+f15FfK64YQwZdJNELETdn5ibXEUQmW1DZL6KXhNnc2heoy/sg9VJJeT7n8TlMWouzWqSWavFkIhHyIbIAEapg==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0
 
   eslint-plugin-react-refresh@0.4.19:
     resolution: {integrity: sha512-eyy8pcr/YxSYjBoqIFSrlbn9i/xvxUFa8CjzAYo9cFjgGXqq1hyjihcpZvxRLalpaWmueWR81xn7vuKmAFijDQ==}
@@ -21501,7 +21504,7 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@imtbl/bridge-sdk@2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/bridge-sdk@2.1.9':
     dependencies:
       '@imtbl/config': 2.1.9
       '@jest/globals': 29.7.0
@@ -21513,16 +21516,16 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@imtbl/checkout-sdk@2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/checkout-sdk@2.1.9':
     dependencies:
       '@imtbl/blockchain-data': 2.1.9
-      '@imtbl/bridge-sdk': 2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/bridge-sdk': 2.1.9
       '@imtbl/config': 2.1.9
-      '@imtbl/dex-sdk': 2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/dex-sdk': 2.1.9
       '@imtbl/generated-clients': 2.1.9
       '@imtbl/metrics': 2.1.9
-      '@imtbl/orderbook': 2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/passport': 2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/orderbook': 2.1.9
+      '@imtbl/passport': 2.1.9
       '@metamask/detect-provider': 2.0.0
       axios: 1.7.7
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -21584,7 +21587,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@imtbl/dex-sdk@2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/dex-sdk@2.1.9':
     dependencies:
       '@imtbl/config': 2.1.9
       '@uniswap/sdk-core': 3.2.3
@@ -21630,7 +21633,7 @@ snapshots:
       - debug
       - pg-native
 
-  '@imtbl/orderbook@2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/orderbook@2.1.9':
     dependencies:
       '@imtbl/config': 2.1.9
       '@imtbl/metrics': 2.1.9
@@ -21644,16 +21647,16 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@imtbl/passport@2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/passport@2.1.9':
     dependencies:
       '@0xsequence/abi': 2.2.13
       '@0xsequence/core': 2.2.13(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))
       '@imtbl/config': 2.1.9
       '@imtbl/generated-clients': 2.1.9
       '@imtbl/metrics': 2.1.9
-      '@imtbl/toolkit': 2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/x-client': 2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/x-provider': 2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/toolkit': 2.1.9
+      '@imtbl/x-client': 2.1.9
+      '@imtbl/x-provider': 2.1.9
       '@magic-ext/oidc': 12.0.0
       '@magic-sdk/provider': 29.0.2(localforage@1.10.0)
       '@metamask/detect-provider': 2.0.0
@@ -21679,17 +21682,17 @@ snapshots:
       - encoding
       - supports-color
 
-  '@imtbl/sdk@2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/sdk@2.1.9':
     dependencies:
       '@imtbl/blockchain-data': 2.1.9
-      '@imtbl/checkout-sdk': 2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/checkout-sdk': 2.1.9
       '@imtbl/config': 2.1.9
       '@imtbl/minting-backend': 2.1.9
-      '@imtbl/orderbook': 2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/passport': 2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/orderbook': 2.1.9
+      '@imtbl/passport': 2.1.9
       '@imtbl/webhook': 2.1.9
-      '@imtbl/x-client': 2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/x-provider': 2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/x-client': 2.1.9
+      '@imtbl/x-provider': 2.1.9
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -21698,9 +21701,9 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@imtbl/toolkit@2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/toolkit@2.1.9':
     dependencies:
-      '@imtbl/x-client': 2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/x-client': 2.1.9
       '@magic-ext/oidc': 12.0.0
       '@metamask/detect-provider': 2.0.0
       axios: 1.7.7
@@ -21723,7 +21726,7 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@imtbl/x-client@2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/x-client@2.1.9':
     dependencies:
       '@ethereumjs/wallet': 2.0.4
       '@imtbl/config': 2.1.9
@@ -21739,12 +21742,12 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@imtbl/x-provider@2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/x-provider@2.1.9':
     dependencies:
       '@imtbl/config': 2.1.9
       '@imtbl/generated-clients': 2.1.9
-      '@imtbl/toolkit': 2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/x-client': 2.1.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/toolkit': 2.1.9
+      '@imtbl/x-client': 2.1.9
       '@magic-ext/oidc': 12.0.0
       '@metamask/detect-provider': 2.0.0
       axios: 1.7.7
@@ -29496,14 +29499,14 @@ snapshots:
       eslint-config-airbnb-base: 15.0.0(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0))(eslint@8.57.0)
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-typescript@3.5.5(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
 
-  eslint-config-airbnb@19.0.4(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0))(eslint-plugin-jsx-a11y@6.9.0(eslint@8.57.0))(eslint-plugin-react-hooks@5.0.0(eslint@8.57.0))(eslint-plugin-react@7.35.0(eslint@8.57.0))(eslint@8.57.0):
+  eslint-config-airbnb@19.0.4(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0))(eslint-plugin-jsx-a11y@6.9.0(eslint@8.57.0))(eslint-plugin-react-hooks@5.2.0(eslint@8.57.0))(eslint-plugin-react@7.35.0(eslint@8.57.0))(eslint@8.57.0):
     dependencies:
       eslint: 8.57.0
       eslint-config-airbnb-base: 15.0.0(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0))(eslint@8.57.0)
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-typescript@3.5.5(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
       eslint-plugin-jsx-a11y: 6.9.0(eslint@8.57.0)
       eslint-plugin-react: 7.35.0(eslint@8.57.0)
-      eslint-plugin-react-hooks: 5.0.0(eslint@8.57.0)
+      eslint-plugin-react-hooks: 5.2.0(eslint@8.57.0)
       object.assign: 4.1.5
       object.entries: 1.1.8
 
@@ -29959,11 +29962,11 @@ snapshots:
     dependencies:
       eslint: 9.16.0(jiti@1.21.0)
 
-  eslint-plugin-react-hooks@5.0.0(eslint@8.57.0):
+  eslint-plugin-react-hooks@5.0.0-canary-7118f5dd7-20230705(eslint@8.57.0):
     dependencies:
       eslint: 8.57.0
 
-  eslint-plugin-react-hooks@5.0.0-canary-7118f5dd7-20230705(eslint@8.57.0):
+  eslint-plugin-react-hooks@5.2.0(eslint@8.57.0):
     dependencies:
       eslint: 8.57.0
 

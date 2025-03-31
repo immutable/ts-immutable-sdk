@@ -192,7 +192,7 @@ function TransferWidgetInner(props: TransferWidgetInputs) {
         setViewState({ ...viewState, type: 'FORM' }); // TODO: We should be showing a failed view here
       }
     }
-  }, [viewState, eventTarget]);
+  }, [viewState, track, eventTarget]);
 
   switch (viewState.type) {
     case 'INITIALISING':

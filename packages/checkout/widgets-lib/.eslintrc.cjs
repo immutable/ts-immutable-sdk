@@ -1,5 +1,8 @@
 module.exports = {
-  "extends": ["../../../.eslintrc"],
+  "extends": [
+    "../../../.eslintrc",
+    "plugin:react-hooks/recommended-legacy"
+  ],
   "ignorePatterns": ["jest.config.*", "rollup.config.*"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
