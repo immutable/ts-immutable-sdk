@@ -51,7 +51,7 @@ export const useFundingBalances = () => {
             const pricing = getPricingBySymbol(currency.name, orderQuote.totalAmount, cryptoFiatState.conversions);
             return pricing ? pricing.amount.toString() : '';
           },
-          getIsGasless: () => (provider.provider as any)?.isPassport || false,
+          getIsGasless: () => provider.ethereumProvider?.isPassport || false,
           onFundingBalance: (foundBalances) => {
             setFundingBalances([...foundBalances]);
           },

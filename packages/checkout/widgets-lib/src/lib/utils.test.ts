@@ -2,8 +2,10 @@ import {
   ChainId, Checkout, GetBalanceResult, TokenInfo,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
+import { parseUnits } from 'ethers';
 import {
   calculateCryptoToFiat,
+  calculateFeesFiat,
   formatFiatString,
   formatZeroAmount,
   isNativeToken,
@@ -21,7 +23,72 @@ const checkout = new Checkout({
   },
 });
 
+const fromToken = { name: 'Guild of Guardians', symbol: 'GOG', decimals: 18 } as TokenInfo;
+const gasFeeToken = { name: 'Immutable', symbol: 'IMX', decimals: 18 } as TokenInfo;
+const conversions = new Map<string, number>([['imx', 0.6441], ['gog', 0.01684]]);
+
 describe('utils', () => {
+  describe('calculateFeesFiat', () => {
+    it('includes the USD equivalent of the secondary fees', () => {
+      const gasFeeInIMX = 0;
+      const secondaryFeeInGOG = 0.456;
+      const quoteWithSecondaryFees = {
+        quote: {
+          fees: [{
+            amount: { value: parseUnits(secondaryFeeInGOG.toString(), 18) },
+          }],
+        },
+      } as any;
+
+      const feesInFiat = calculateFeesFiat(
+        quoteWithSecondaryFees,
+        fromToken,
+        gasFeeToken,
+        conversions,
+        gasFeeInIMX.toString(),
+      );
+
+      expect(feesInFiat).toBe(0.00767904); // secondaryFeeInGOG * conversions.get('gog'));
+    });
+
+    it('includes the USD equivalent of the gas fees', () => {
+      const gasFeeInIMX = 0.123;
+      const quoteWithoutSecondaryFees = { quote: { fees: [] } } as any;
+
+      const feesInFiat = calculateFeesFiat(
+        quoteWithoutSecondaryFees,
+        fromToken,
+        gasFeeToken,
+        conversions,
+        gasFeeInIMX.toString(),
+      );
+
+      expect(feesInFiat).toBe(0.0792243); // gasFeeInIMX * conversions.get('imx'));
+    });
+
+    it('includes both types of fees when present', () => {
+      const gasFeeInIMX = 0.123;
+      const secondaryFeeInGOG = 0.456;
+      const quoteWithSecondaryFees = {
+        quote: {
+          fees: [{
+            amount: { value: parseUnits(secondaryFeeInGOG.toString(), 18) },
+          }],
+        },
+      } as any;
+
+      const feesInFiat = calculateFeesFiat(
+        quoteWithSecondaryFees,
+        fromToken,
+        gasFeeToken,
+        conversions,
+        gasFeeInIMX.toString(),
+      );
+
+      expect(feesInFiat).toBe(0.08690334); // both values above summed.
+    });
+  });
+
   describe('sortTokensByAmount', () => {
     it('should sort tokens by amount', () => {
       const tokens: GetBalanceResult[] = [

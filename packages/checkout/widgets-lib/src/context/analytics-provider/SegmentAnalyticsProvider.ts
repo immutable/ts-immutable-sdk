@@ -13,6 +13,7 @@ export enum UserJourney {
   SALE = 'PrimarySale',
   ADD_TOKENS = 'AddTokens',
   PURCHASE = 'Purchase',
+  TRANSFER = 'Transfer',
 }
 
 export type AnalyticsControlTypes =

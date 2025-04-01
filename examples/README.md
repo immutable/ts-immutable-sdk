@@ -22,6 +22,8 @@
 - [Adding examples](#adding-examples)
 - [End to end testing](#end-to-end-testing)
 - [Using code examples in the docs site](#using-code-examples-in-the-docs-site)
+- [Generating Tutorials and Metadata](#generating-tutorials-and-metadata)
+
 <hr />
 
 # Introduction
@@ -413,3 +415,27 @@ You can now double check the code snippets in your `docs` branch are all pulling
 Once your `docs` PR is merged, Netlify should automatically build and deploy the docs site. If your updates are not reflected on the docs site within 10 minutes of the PR being merged, it's likely the build has failed in Netlify. Because we are now pulling in content dynamically for the code snippets, the GET requests to fetch the code examples can sometimes randomly timeout which fails the build. 
 
 If this happens you will need to log into the Netlify site, check the error and retry the build. Usually this will fix the deployment issue, otherwise follow up on the error message shown by Netlify.
+
+# Generating Tutorials and Metadata
+
+Whenever you add a new example app, or update an existing example app, you can use the prompts in the `prompt.txt` files in each `examples/product` folder to generate the tutorials and metadata for the example apps using Cursor AI.
+
+These AI generated tutorials and metadata files are then piped through to the docs site in the CI/CD pipeline, where they are used to display the example apps and their code walkthroughs. If you don't follow these steps, your example app will not be displayed on the docs site.
+
+There is a single prompt for each product as we expect the examples to follow a similar structure and format, therefore the prompt to generate the tutorials and metadata is the same for each product. You can specify which example app you want the prompt to generate the tutorials and metadata for by adding the app name to the prompt as shown below.
+
+These prompts are designed to be used with Cursor IDE Composer Agent mode.
+
+Follow these steps to generate the tutorials and metadata for the example apps:
+
+1. Delete the existing tutorial.md and metadata.json files in the example app you are wanting to generate the tutorials and metadata for.
+2. Open the Composer window in Cursor IDE (Claude 3.7-sonnet-thinking).
+3. Press the `+` button clear the context of the composer window.
+4. Open the `prompt.txt` file in the examples/product folder you are wanting to generate the tutorials and metadata for e.g. `examples/passport/prompt.txt`.
+5. Copy and pate the prompt into the composer window, or attach it as a file.
+6. After adding the prompt, in the composer window, type `app name: <name of the example app>` e.g. `app name: login-with-nextjs` where the app name is the folder name of the example app in the examples/product folder you are wanting to generate the tutorials and metadata for.
+7. Press enter and let the AI generate the tutorials and metadata.
+8. Review the generated tutorials and metadata.
+9. If you're happy with the generated tutorials and metadata, you can commit and push the changes to your branch in the `ts-immutable-sdk` repo.
+
+Once you have merged your branch into main, the tutorials and metadata will be automatically piped to the docs site and displayed in the example apps section.

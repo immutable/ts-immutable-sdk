@@ -1,0 +1,11 @@
+{
+    "features": [
+        "login-with-etherjs",
+        "login-with-identity-only",
+        "login-with-passport",
+        "logout",
+        "logout-with-redirect-mode",
+        "logout-with-silent-mode"
+    ],
+    "order": 1
+}

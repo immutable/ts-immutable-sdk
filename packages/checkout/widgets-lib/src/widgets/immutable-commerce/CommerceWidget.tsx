@@ -48,6 +48,7 @@ import {
   initialCommerceState,
 } from './context/CommerceContext';
 import PurchaseWidget from '../purchase/PurchaseWidget';
+import TransferWidget from '../transfer/TransferWidget';
 
 export type CommerceWidgetInputs = {
   checkout: Checkout;
@@ -321,6 +322,14 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
               )}
               {view.type === CommerceFlowType.ONRAMP && (
                 <OnRampWidget
+                  config={widgetsConfig}
+                  {...(view.data.params || {})}
+                  {...(view.data.config || {})}
+                  showBackButton={showBackButton}
+                />
+              )}
+              {view.type === CommerceFlowType.TRANSFER && (
+                <TransferWidget
                   config={widgetsConfig}
                   {...(view.data.params || {})}
                   {...(view.data.config || {})}

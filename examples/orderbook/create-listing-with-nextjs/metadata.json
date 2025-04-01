@@ -1,0 +1,8 @@
+{
+  "title": "Create Listing with Next.js",
+  "description": "Learn how to create listings for ERC721 and ERC1155 tokens using the Immutable Orderbook SDK with Next.js",
+  "keywords": ["Immutable", "SDK", "Orderbook", "Create Listing", "ERC721", "ERC1155", "Next.js"],
+  "tech_stack": ["Next.js", "TypeScript", "Immutable SDK", "ethers.js"],
+  "product": "Orderbook",
+  "programming_language": "TypeScript"
+} 

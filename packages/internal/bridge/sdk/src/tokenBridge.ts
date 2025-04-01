@@ -1005,6 +1005,7 @@ export class TokenBridge {
       symbol: sourceAxelar.symbol,
       gasLimit: destinationChainGaslimit,
       gasMultiplier,
+      minGasPrice: 1000000000, // 1 gwei
     };
 
     let axiosResponse: AxiosResponse;

@@ -3,7 +3,7 @@ import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
 import {
-  Box, ButtCon, Heading, Icon, OptionKey, Tooltip,
+  Box, ButtCon, Heading, Icon, OptionKey, Tooltip, Body,
 } from '@biom3/react';
 import { isAddressSanctioned, TokenInfo, WidgetTheme } from '@imtbl/checkout-sdk';
 
@@ -18,7 +18,8 @@ import { amountInputValidation as textInputValidator } from '../../../lib/valida
 import { SwapContext } from '../context/SwapContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import {
-  calculateCryptoToFiat, formatZeroAmount, getDefaultTokenImage, isNativeToken, tokenValueFormat,
+  calculateCryptoToFiat, calculateFeesFiat, formatZeroAmount,
+  getDefaultTokenImage, isNativeToken, tokenValueFormat,
 } from '../../../lib/utils';
 import {
   DEFAULT_TOKEN_DECIMALS,
@@ -35,14 +36,12 @@ import {
   validateToAmount,
   validateToToken,
 } from '../functions/SwapValidator';
-import { Fees } from '../../../components/Fees/Fees';
 import { SwapButton } from './SwapButton';
 import { SwapFormData } from './swapFormTypes';
 import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
 import { useInterval } from '../../../lib/hooks/useInterval';
 import { NotEnoughImx } from '../../../components/NotEnoughImx/NotEnoughImx';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
-import { UnableToSwap } from './UnableToSwap';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import useDebounce from '../../../lib/hooks/useDebounce';
 import { CancellablePromise } from '../../../lib/async/cancellablePromise';
@@ -54,6 +53,7 @@ import { processQuoteToken } from '../functions/processQuoteToken';
 import { formatQuoteConversionRate } from '../functions/swapConversionRate';
 import { PrefilledSwapForm, SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
+import { Fees } from './Fees';
 
 enum SwapDirection {
   FROM = 'FROM',
@@ -122,9 +122,15 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
 
   // Quote
   const [quote, setQuote] = useState<TransactionResponse | null>(null);
+  const [quoteError, setQuoteError] = useState<string>('');
   const [gasFeeValue, setGasFeeValue] = useState<string>('');
   const [gasFeeToken, setGasFeeToken] = useState<TokenInfo | undefined>(undefined);
-  const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
+
+  const feeFiatValue = useMemo(() => {
+    if (!gasFeeToken || !quote || !fromToken) return null;
+    return calculateFeesFiat(quote, fromToken, gasFeeToken, cryptoFiatState.conversions, gasFeeValue);
+  }, [quote, cryptoFiatState.conversions, gasFeeToken, gasFeeValue, fromToken]);
+
   const [tokensOptionsFrom, setTokensOptionsForm] = useState<CoinSelectorOptionProps[]>([]);
   const formattedFees = useMemo(
     () => (quote ? formatSwapFees(quote, cryptoFiatState, t) : []),
@@ -148,7 +154,6 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
 
   // Drawers
   const [showNotEnoughImxDrawer, setShowNotEnoughImxDrawer] = useState(false);
-  const [showUnableToSwapDrawer, setShowUnableToSwapDrawer] = useState(false);
   const [showNetworkSwitchDrawer, setShowNetworkSwitchDrawer] = useState(false);
 
   const [showTxnRejectedState, setShowTxnRejectedState] = useState(false);
@@ -217,9 +222,8 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     network,
   ]);
 
-  const openUnableToSwapDrawer = useCallback((error: any) => {
-    setShowNotEnoughImxDrawer(false);
-    setShowUnableToSwapDrawer(true);
+  const onQuoteError = useCallback((error: any) => {
+    setQuoteError(error.message);
     track({
       userJourney: UserJourney.SWAP,
       screen: 'SwapCoins',
@@ -262,6 +266,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     setFromTokenError('');
     setToAmountError('');
     setToTokenError('');
+    setQuoteError('');
   };
 
   const resetQuote = () => {
@@ -270,7 +275,6 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     }
     setConversionAmount('');
     setConversionToken(null);
-    setGasFeeFiatValue('');
     setQuote(null);
   };
 
@@ -324,11 +328,6 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         address: gasToken?.address,
         icon: gasToken?.icon,
       });
-      setGasFeeFiatValue(calculateCryptoToFiat(
-        gasFee,
-        gasToken?.symbol || '',
-        cryptoFiatState.conversions,
-      ));
 
       setToAmount(
         formatZeroAmount(
@@ -349,7 +348,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         console.error('Error fetching quote.', error);
 
         resetQuote();
-        openUnableToSwapDrawer(error);
+        onQuoteError(error);
       }
     }
 
@@ -406,12 +405,6 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         icon: gasToken?.icon,
       });
 
-      setGasFeeFiatValue(calculateCryptoToFiat(
-        gasFee,
-        gasToken?.symbol || '',
-        cryptoFiatState.conversions,
-      ));
-
       setFromAmount(
         formatZeroAmount(
           tokenValueFormat(formatUnits(
@@ -425,7 +418,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     } catch (error: any) {
       if (!error.cancelled) {
         resetQuote();
-        openUnableToSwapDrawer(error);
+        onQuoteError(error);
       }
     }
 
@@ -741,7 +734,6 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
   };
 
   const openNotEnoughImxDrawer = () => {
-    setShowUnableToSwapDrawer(false);
     setShowNotEnoughImxDrawer(true);
   };
 
@@ -766,7 +758,8 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     if (validateToTokenError) setToTokenError(validateToTokenError);
     let isSwapFormValid = true;
     if (
-      validateFromTokenError
+      quoteError
+      || validateFromTokenError
       || validateToTokenError
       || (validateFromAmountError && direction === SwapDirection.FROM)
       || (validateToAmountError && direction === SwapDirection.TO)) isSwapFormValid = false;
@@ -1062,11 +1055,9 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
             />
           </Box>
         </Box>
-        {!isPassportProvider(provider) && (
         <Fees
-          gasFeeFiatValue={gasFeeFiatValue}
+          feeFiatValue={feeFiatValue}
           gasFeeToken={gasFeeToken}
-          gasFeeValue={gasFeeValue}
           fees={formattedFees}
           onFeesClick={() => {
             track({
@@ -1081,8 +1072,28 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
           }}
           loading={loading}
         />
-        )}
       </Box>
+      {quoteError && (
+        <Box sx={{
+          paddingX: 'base.spacing.x4',
+          pt: 'base.spacing.x3',
+        }}
+        >
+          <Body
+            size="xSmall"
+            weight="bold"
+            sx={{
+              color: 'base.color.text.status.fatal.primary',
+            }}
+            rc={<div />}
+          >
+            Unable to swap this token
+          </Body>
+          <Body size="xxSmall">
+            This token pairing isn&apos;t available to swap right now. Try another selection.
+          </Body>
+        </Box>
+      )}
       {!autoProceed && (
         <SwapButton
           validator={SwapFormValidator}
@@ -1120,16 +1131,6 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
           });
         }}
         onCloseDrawer={() => setShowNotEnoughImxDrawer(false)}
-      />
-      <UnableToSwap
-        visible={showUnableToSwapDrawer}
-        onCloseDrawer={() => {
-          setShowUnableToSwapDrawer(false);
-          setFromToken(undefined);
-          setFromAmount('');
-          setToToken(undefined);
-          setToAmount('');
-        }}
       />
       <NetworkSwitchDrawer
         visible={showNetworkSwitchDrawer}
