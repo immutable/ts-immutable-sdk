@@ -1861,6 +1861,9 @@ importers:
 
   packages/internal/toolkit:
     dependencies:
+      '@imtbl/metrics':
+        specifier: workspace:*
+        version: link:../metrics
       '@imtbl/x-client':
         specifier: workspace:*
         version: link:../../x-client
@@ -2394,6 +2397,9 @@ importers:
       '@imtbl/generated-clients':
         specifier: workspace:*
         version: link:../internal/generated-clients
+      '@imtbl/metrics':
+        specifier: workspace:*
+        version: link:../internal/metrics
       '@imtbl/toolkit':
         specifier: workspace:*
         version: link:../internal/toolkit
