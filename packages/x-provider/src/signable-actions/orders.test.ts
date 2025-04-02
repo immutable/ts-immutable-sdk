@@ -1,7 +1,7 @@
 import { UnsignedOrderRequest, GetSignableCancelOrderRequest } from '@imtbl/x-client';
 import { imx } from '@imtbl/generated-clients';
 import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
-import { parseEther } from 'ethers';
+import { parseEther } from 'ethers/lib/utils';
 import { cancelOrder, createOrder } from './orders';
 import { generateSigners, privateKey1, testConfig } from '../test/helpers';
 

@@ -1,7 +1,7 @@
 import {
   AnyToken, Contracts, EncodingApi, ERC721Token, ImmutableXConfiguration, MintsApi,
 } from '@imtbl/x-client';
-import { Signer } from 'ethers';
+import { BigNumber, Signer } from 'ethers';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 
 async function getWithdrawalBalance(
@@ -21,7 +21,7 @@ async function getETHWithdrawalBalance(
   signer: Signer,
   ownerKey: string,
   config: ImmutableXConfiguration,
-): Promise<bigint> {
+): Promise<BigNumber> {
   const assetType = await getEncodeAssetInfo('asset', 'ETH', config);
   return await getWithdrawalBalance(
     signer,
@@ -36,7 +36,7 @@ async function getERC20WithdrawalBalance(
   ownerKey: string,
   tokenAddress: string,
   config: ImmutableXConfiguration,
-): Promise<bigint> {
+): Promise<BigNumber> {
   const assetType = await getEncodeAssetInfo('asset', 'ERC20', config, {
     token_address: tokenAddress,
   });
@@ -55,7 +55,7 @@ async function getERC721WithdrawalBalance(
   encodingApi: EncodingApi,
   mintsApi: MintsApi,
   config: ImmutableXConfiguration,
-): Promise<bigint> {
+): Promise<BigNumber> {
   try {
     const mintableToken = await mintsApi
       .getMintableTokenDetailsByClientTokenId({
@@ -111,7 +111,7 @@ export async function getWithdrawalBalanceWorkflow(
   encodingApi: EncodingApi,
   mintsApi: MintsApi,
   config: ImmutableXConfiguration,
-): Promise<bigint> {
+): Promise<BigNumber> {
   switch (token.type) {
     case 'ETH':
       return await getETHWithdrawalBalance(
@@ -146,7 +146,7 @@ export async function getWithdrawalBalances(
   ethAddress: string,
   token: AnyToken,
   config: ImmutableXConfiguration,
-): Promise<{ v3Balance: bigint; v4Balance: bigint }> {
+): Promise<{ v3Balance: BigNumber; v4Balance: BigNumber }> {
   const encodingApi = new EncodingApi(config.apiConfiguration);
   const mintsApi = new MintsApi(config.apiConfiguration);
 
@@ -179,7 +179,7 @@ export async function getWithdrawalBalancesERC721(
   token: AnyToken,
   config: ImmutableXConfiguration,
   mintsApi: MintsApi,
-): Promise<{ v3Balance: bigint; v4Balance: bigint }> {
+): Promise<{ v3Balance: BigNumber; v4Balance: BigNumber }> {
   const encodingApi = new EncodingApi(config.apiConfiguration);
 
   const v3Balance = await getWithdrawalBalanceWorkflow(

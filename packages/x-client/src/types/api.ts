@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable max-len */
 import { imx } from '@imtbl/generated-clients';
+import { providers } from 'ethers';
 
-export type { TransactionResponse } from 'ethers';
+type TransactionResponse = providers.TransactionResponse;
+
+export type { TransactionResponse };
 
 /**
  * Need to specifically export the classes and interfaces from the generated

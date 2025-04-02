@@ -5,6 +5,7 @@ import {
   NftTransferDetails,
   StarkSigner,
   TokenAmount,
+  TransactionResponse,
   UnsignedExchangeTransferRequest,
   UnsignedOrderRequest,
   UnsignedTransferRequest,
@@ -14,7 +15,7 @@ import {
   imx,
   ImxApiClients,
 } from '@imtbl/generated-clients';
-import { BrowserProvider, TransactionResponse } from 'ethers';
+import { providers } from 'ethers-v5';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import AuthManager from '../authManager';
 import GuardianClient from '../guardian';
@@ -105,9 +106,9 @@ export class PassportImxProvider implements IMXProvider {
       const user = await this.authManager.getUser();
       // The user will be present because the factory validates it
       const magicRpcProvider = await this.magicAdapter.login(user!.idToken!);
-      const browserProvider = new BrowserProvider(magicRpcProvider);
+      const browserProvider = new providers.Web3Provider(magicRpcProvider);
 
-      const ethSigner = await browserProvider.getSigner();
+      const ethSigner = browserProvider.getSigner();
       const starkSigner = await getStarkSigner(ethSigner);
 
       return { ethSigner, starkSigner };

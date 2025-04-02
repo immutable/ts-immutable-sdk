@@ -5,9 +5,10 @@ import {
   MintsApi,
   signRegisterEthAddress,
   StarkSigner,
+  TransactionResponse,
 } from '@imtbl/x-client';
 import * as encUtils from 'enc-utils';
-import { Signer, TransactionResponse } from 'ethers';
+import { Signer } from 'ethers';
 import { ProviderConfiguration } from '../../config';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import { isRegisteredOnChain } from '../registration';
@@ -64,7 +65,7 @@ async function executeERC721RegisterAndWithdraw(
     ethSigner,
   );
 
-  const populatedTransaction = await contract.registerAndWithdrawNft.populateTransaction(
+  const populatedTransaction = await contract.populateTransaction.registerAndWithdrawNft(
     etherKey,
     starkPublicKey,
     registrationStarkSignature,
@@ -108,7 +109,7 @@ async function executeMintableERC721RegisterAndWithdraw(
     ethSigner,
   );
 
-  const populatedTransaction = await contract.registerWithdrawAndMint.populateTransaction(
+  const populatedTransaction = await contract.populateTransaction.registerWithdrawAndMint(
     etherKey,
     starkPublicKey,
     starkSignature,
@@ -172,7 +173,7 @@ async function executeMintableERC721Withdrawal(
     ethSigner,
   );
 
-  const populatedTransaction = await contract.withdrawAndMint.populateTransaction(
+  const populatedTransaction = await contract.populateTransaction.withdrawAndMint(
     ownerKey,
     assetType.asset_type,
     mintingBlob,
@@ -197,7 +198,7 @@ async function executeERC721Withdrawal(
     ethSigner,
   );
 
-  const populatedTransaction = await contract.withdrawNft.populateTransaction(
+  const populatedTransaction = await contract.populateTransaction.withdrawNft(
     ownerKey,
     assetType.asset_type,
     token.tokenId,
@@ -269,7 +270,7 @@ export async function completeERC721WithdrawalAction({
     config.immutableXConfig,
     mintsApi,
   );
-  if (v3Balance > 0) {
+  if (v3Balance.gt(0)) {
     const isRegistered = await isRegisteredOnChain(
       starkPublicKey,
       ethSigner,
@@ -290,7 +291,7 @@ export async function completeERC721WithdrawalAction({
   }
 
   // if v4 balance is NOT zero, the withdrawal was prepared using eth address (using v2/withdrawals API)
-  if (v4Balance > 0) {
+  if (v4Balance.gt(0)) {
     return completeERC721Withdrawal(mintsApi, ethSigner, ethAddress, token, config.immutableXConfig);
   }
 

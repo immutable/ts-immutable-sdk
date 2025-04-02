@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { keccak256, Signer, toUtf8Bytes } from 'ethers';
+import { Signer } from 'ethers';
+import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
 import {
   MintRequest,
   MintsApi,

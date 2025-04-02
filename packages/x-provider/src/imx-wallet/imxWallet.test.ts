@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { Environment } from '@imtbl/config';
-import { BrowserProvider } from 'ethers';
+import { providers } from 'ethers';
 import { RequestEventType, ResponseEventType } from './events';
 import { connect, disconnect } from './imxWallet';
 import { postRequestMessage } from './postRequestMessage';
@@ -16,7 +16,7 @@ describe('imxWallet', () => {
   const env = Environment.SANDBOX;
   const signature = 'The signature';
   const address = '0x1234';
-  let l1Provider: BrowserProvider;
+  let l1Provider: providers.Web3Provider;
 
   beforeEach(() => {
     l1Provider = {
@@ -24,7 +24,7 @@ describe('imxWallet', () => {
         getAddress: jest.fn().mockResolvedValue(address),
         signMessage: jest.fn().mockResolvedValue(signature),
       }),
-    } as unknown as BrowserProvider;
+    } as unknown as providers.Web3Provider;
   });
 
   afterEach(() => jest.clearAllMocks());

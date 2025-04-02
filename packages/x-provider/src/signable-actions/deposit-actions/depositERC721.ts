@@ -4,8 +4,8 @@ import {
   ERC721Token,
   EthSigner,
   ImmutableXConfiguration,
+  TransactionResponse,
 } from '@imtbl/x-client';
-import { TransactionResponse } from 'ethers';
 import { validateChain } from '../helpers';
 import { Signers } from '../types';
 import { ProviderConfiguration } from '../../config';
@@ -35,7 +35,7 @@ async function executeDepositERC721(
     config.ethConfiguration.coreContractAddress,
     ethSigner,
   );
-  const populatedTransaction = await coreContract.depositNft.populateTransaction(
+  const populatedTransaction = await coreContract.populateTransaction.depositNft(
     starkPublicKey,
     assetType,
     vaultId,

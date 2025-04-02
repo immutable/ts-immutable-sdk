@@ -5,9 +5,10 @@ import {
   ERC20Token,
   ImmutableXConfiguration,
   StarkSigner,
+  TransactionResponse,
   signRegisterEthAddress,
 } from '@imtbl/x-client';
-import { Signer, TransactionResponse } from 'ethers';
+import { Signer } from 'ethers';
 import { isRegisteredOnChain } from '../registration';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import { validateChain } from '../helpers';
@@ -46,7 +47,7 @@ export async function executeRegisterAndWithdrawAllFungible(
     ethSigner,
   );
 
-  const populatedTransaction = await contract.registerAndWithdrawAll.populateTransaction(
+  const populatedTransaction = await contract.populateTransaction.registerAndWithdrawAll(
     etherKey,
     starkPublicKey,
     starkSignature,
@@ -70,7 +71,7 @@ export async function executeWithdrawAllFungible(
     ethSigner,
   );
 
-  const populatedTransaction = await contract.withdrawAll.populateTransaction(
+  const populatedTransaction = await contract.populateTransaction.withdrawAll(
     await ethSigner.getAddress(),
     starkPublicKey,
     assetType,
@@ -90,7 +91,7 @@ export async function executeWithdrawFungible(
     ethSigner,
   );
 
-  const populatedTransaction = await contract.withdraw.populateTransaction(
+  const populatedTransaction = await contract.populateTransaction.withdraw(
     await ethSigner.getAddress(),
     assetType,
   );
@@ -127,7 +128,7 @@ export async function completeERC20WithdrawalAction({
     token_address: token.tokenAddress,
   });
 
-  if (v3Balance > 0) {
+  if (v3Balance.gt(0)) {
     const isRegistered = await isRegisteredOnChain(
       starkPublicKey,
       ethSigner,
@@ -145,7 +146,7 @@ export async function completeERC20WithdrawalAction({
     );
   }
 
-  if (v4Balance > 0) {
+  if (v4Balance.gt(0)) {
     return executeWithdrawFungible(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
   }
 
