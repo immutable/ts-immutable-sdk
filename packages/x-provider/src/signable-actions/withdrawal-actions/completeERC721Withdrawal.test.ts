@@ -1,6 +1,8 @@
-import { Contracts, TransactionResponse } from '@imtbl/x-client';
+import { Contracts } from '@imtbl/x-client';
 import { imx } from '@imtbl/generated-clients';
 import * as encUtils from 'enc-utils';
+import { TransactionResponse } from '@ethersproject/providers';
+import { BigNumber } from '@ethersproject/bignumber';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import {
   getSignableRegistrationOnchain,
@@ -68,9 +70,9 @@ describe('completeERC721Withdrawal action', () => {
     });
     it('should complete ERC721 withdrawal with on-chain registered user', async () => {
       (Contracts.CoreV4.connect as jest.Mock).mockReturnValue({
-        getWithdrawalBalance: jest.fn().mockReturnValue(BigInt('1')),
-        withdrawAndMint: {
-          populateTransaction: jest.fn().mockResolvedValue(transactionResponse),
+        getWithdrawalBalance: jest.fn().mockReturnValue(BigNumber.from('1')),
+        populateTransaction: {
+          withdrawAndMint: jest.fn().mockResolvedValue(transactionResponse),
         },
       });
       (isRegisteredOnChain as jest.Mock).mockResolvedValue(true);
@@ -81,11 +83,11 @@ describe('completeERC721Withdrawal action', () => {
     });
     it('should complete ERC721 withdrawal with unregistered user', async () => {
       (Contracts.CoreV4.connect as jest.Mock).mockReturnValue({
-        getWithdrawalBalance: jest.fn().mockReturnValue(BigInt('1')),
+        getWithdrawalBalance: jest.fn().mockReturnValue(BigNumber.from('1')),
       });
       (Contracts.RegistrationV4.connect as jest.Mock).mockReturnValue({
-        registerWithdrawAndMint: {
-          populateTransaction: jest
+        populateTransaction: {
+          registerWithdrawAndMint: jest
             .fn()
             .mockResolvedValue(transactionResponse),
         },
@@ -128,9 +130,9 @@ describe('completeERC721Withdrawal action', () => {
 
     it('should complete ERC721 withdrawal with on-chain registered user', async () => {
       (Contracts.CoreV4.connect as jest.Mock).mockReturnValue({
-        getWithdrawalBalance: jest.fn().mockReturnValue(BigInt('1')),
-        withdrawNft: {
-          populateTransaction: jest.fn().mockResolvedValue(transactionResponse),
+        getWithdrawalBalance: jest.fn().mockReturnValue(BigNumber.from('1')),
+        populateTransaction: {
+          withdrawNft: jest.fn().mockResolvedValue(transactionResponse),
         },
       });
       (isRegisteredOnChain as jest.Mock).mockResolvedValue(true);
@@ -140,11 +142,11 @@ describe('completeERC721Withdrawal action', () => {
 
     it('should complete ERC721 withdrawal with unregistered user', async () => {
       (Contracts.CoreV4.connect as jest.Mock).mockReturnValue({
-        getWithdrawalBalance: jest.fn().mockReturnValue(BigInt('1')),
+        getWithdrawalBalance: jest.fn().mockReturnValue(BigNumber.from('1')),
       });
       (Contracts.RegistrationV4.connect as jest.Mock).mockReturnValue({
-        registerAndWithdrawNft: {
-          populateTransaction: jest
+        populateTransaction: {
+          registerAndWithdrawNft: jest
             .fn()
             .mockResolvedValue(transactionResponse),
         },
