@@ -1,8 +1,7 @@
-import { Contracts } from '@imtbl/x-client';
+import { Contracts, TransactionResponse } from '@imtbl/x-client';
 import { imx } from '@imtbl/generated-clients';
 import * as encUtils from 'enc-utils';
-import { TransactionResponse } from '@ethersproject/providers';
-import { BigNumber } from '@ethersproject/bignumber';
+import { BigNumber } from 'ethers-v5';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import {
   getSignableRegistrationOnchain,
