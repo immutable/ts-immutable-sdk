@@ -5,6 +5,7 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {    
+    "@ethereumjs/wallet": "^2.0.4",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/bytes": "^5.7.0",
@@ -19,7 +20,6 @@
     "crypto": "1.0.1",
     "elliptic": "^6.6.1",
     "enc-utils": "^3.0.0",
-    "ethereumjs-wallet": "^1.0.2",
     "ethers-v5": "npm:ethers@5.7.2",
     "hash.js": "^1.1.7"
   },
