@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { Signer } from 'ethers';
-import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
+import { Signer, utils } from 'ethers-v5';
 import {
   MintRequest,
   MintsApi,
@@ -46,7 +45,7 @@ export async function mintingWorkflow(
     auth_signature: '',
   };
 
-  const hash = keccak256(toUtf8Bytes(JSON.stringify(signablePayload)));
+  const hash = utils.keccak256(utils.toUtf8Bytes(JSON.stringify(signablePayload)));
   const authSignature = await signRaw(hash, signer);
 
   const apiPayload: MintRequest = {

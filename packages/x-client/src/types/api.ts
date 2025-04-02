@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable max-len */
 import { imx } from '@imtbl/generated-clients';
-import { providers } from 'ethers';
+import { providers } from 'ethers-v5';
 
 type TransactionResponse = providers.TransactionResponse;
 

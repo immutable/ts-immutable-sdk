@@ -6,8 +6,7 @@ import {
   ImmutableXConfiguration,
   TransactionResponse,
 } from '@imtbl/x-client';
-import { BigNumber } from 'ethers';
-import { parseUnits } from 'ethers/lib/utils';
+import { BigNumber, utils } from 'ethers-v5';
 import { validateChain } from '../helpers';
 import { Signers } from '../types';
 import { ProviderConfiguration } from '../../config';
@@ -53,7 +52,7 @@ export async function depositEth({
   const data: ETHTokenData = {
     decimals: 18,
   };
-  const amount = parseUnits(deposit.amount, 'wei');
+  const amount = utils.parseUnits(deposit.amount, 'wei');
   const imxConfig = config.immutableXConfig;
   const depositsApi = new imx.DepositsApi(imxConfig.apiConfiguration);
   const encodingApi = new imx.EncodingApi(imxConfig.apiConfiguration);

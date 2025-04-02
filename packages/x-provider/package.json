@@ -15,7 +15,7 @@
     "@metamask/detect-provider": "^2.0.0",
     "axios": "^1.6.5",
     "enc-utils": "^3.0.0",
-    "ethers": "^5.7.2",
+    "ethers-v5": "npm:ethers@5.7.2",
     "magic-sdk": "^29.0.2",
     "oidc-client-ts": "2.4.0"
   },

@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { Environment } from '@imtbl/config';
-import { providers } from 'ethers';
+import { providers } from 'ethers-v5';
 import { RequestEventType, ResponseEventType } from './events';
 import { connect, disconnect } from './imxWallet';
 import { postRequestMessage } from './postRequestMessage';

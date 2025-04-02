@@ -1,7 +1,7 @@
 import { UnsignedOrderRequest, GetSignableCancelOrderRequest } from '@imtbl/x-client';
 import { imx } from '@imtbl/generated-clients';
 import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
-import { parseEther } from 'ethers/lib/utils';
+import { utils } from 'ethers-v5';
 import { cancelOrder, createOrder } from './orders';
 import { generateSigners, privateKey1, testConfig } from '../test/helpers';
 
@@ -13,7 +13,7 @@ describe('Orders', () => {
   describe('createOrder()', () => {
     let getSignableOrderMock: jest.Mock;
     let createOrderMock: jest.Mock;
-    const buyAmount = parseEther('30000').toString();
+    const buyAmount = utils.parseEther('30000').toString();
     const signableOrderRequest: UnsignedOrderRequest = {
       sell: {
         tokenAddress: '0x10',

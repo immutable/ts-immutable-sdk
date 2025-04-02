@@ -1,7 +1,7 @@
 import {
   AnyToken, Contracts, EncodingApi, ERC721Token, ImmutableXConfiguration, MintsApi,
 } from '@imtbl/x-client';
-import { BigNumber, Signer } from 'ethers';
+import { BigNumber, Signer } from 'ethers-v5';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 
 async function getWithdrawalBalance(

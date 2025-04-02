@@ -1,6 +1,6 @@
 import detectEthereumProvider from '@metamask/detect-provider';
 
-import { providers } from 'ethers';
+import { providers } from 'ethers-v5';
 import { MetamaskConnectParams } from './types';
 import { connectProvider, isRequestableProvider } from './rpc';
 

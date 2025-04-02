@@ -2,7 +2,7 @@
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
 import * as encUtils from 'enc-utils';
-import { Wallet } from 'ethers';
+import { Wallet } from 'ethers-v5';
 import {
   generateLegacyStarkPrivateKey,
   generateStarkPrivateKey,

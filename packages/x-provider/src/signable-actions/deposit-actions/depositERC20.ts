@@ -6,7 +6,7 @@ import {
   EthSigner,
   TransactionResponse,
 } from '@imtbl/x-client';
-import { parseUnits } from 'ethers/lib/utils';
+import { utils } from 'ethers-v5';
 import { Signers } from '../types';
 import { ProviderConfiguration } from '../../config';
 import { validateChain } from '../helpers';
@@ -69,7 +69,7 @@ export async function depositERC20({
     token_address: deposit.tokenAddress,
   };
 
-  const amount = parseUnits(deposit.amount, 0); // 0 to always use undecimalized value
+  const amount = utils.parseUnits(deposit.amount, 0); // 0 to always use undecimalized value
 
   // Approve whether an amount of token from an account can be spent by a third-party account
   const tokenContract = Contracts.IERC20.connect(
