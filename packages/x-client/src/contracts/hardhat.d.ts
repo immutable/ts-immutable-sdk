@@ -4,10 +4,9 @@
 
 import { ethers } from "ethers";
 import {
-  DeployContractOptions,
   FactoryOptions,
   HardhatEthersHelpers as HardhatEthersHelpersBase,
-} from "@nomicfoundation/hardhat-ethers/types";
+} from "@nomiclabs/hardhat-ethers/types";
 
 import * as Contracts from ".";
 
@@ -44,103 +43,38 @@ declare module "hardhat/types/runtime" {
 
     getContractAt(
       name: "IERC20",
-      address: string | ethers.Addressable,
+      address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IERC20>;
     getContractAt(
       name: "IERC721",
-      address: string | ethers.Addressable,
+      address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IERC721>;
     getContractAt(
       name: "IERC165",
-      address: string | ethers.Addressable,
+      address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IERC165>;
     getContractAt(
       name: "Core",
-      address: string | ethers.Addressable,
+      address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.Core>;
     getContractAt(
       name: "Registration",
-      address: string | ethers.Addressable,
+      address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.Registration>;
     getContractAt(
       name: "CoreV4",
-      address: string | ethers.Addressable,
+      address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.CoreV4>;
     getContractAt(
       name: "RegistrationV4",
-      address: string | ethers.Addressable,
+      address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.RegistrationV4>;
-
-    deployContract(
-      name: "IERC20",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IERC20>;
-    deployContract(
-      name: "IERC721",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IERC721>;
-    deployContract(
-      name: "IERC165",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IERC165>;
-    deployContract(
-      name: "Core",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.Core>;
-    deployContract(
-      name: "Registration",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.Registration>;
-    deployContract(
-      name: "CoreV4",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.CoreV4>;
-    deployContract(
-      name: "RegistrationV4",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.RegistrationV4>;
-
-    deployContract(
-      name: "IERC20",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IERC20>;
-    deployContract(
-      name: "IERC721",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IERC721>;
-    deployContract(
-      name: "IERC165",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IERC165>;
-    deployContract(
-      name: "Core",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.Core>;
-    deployContract(
-      name: "Registration",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.Registration>;
-    deployContract(
-      name: "CoreV4",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.CoreV4>;
-    deployContract(
-      name: "RegistrationV4",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.RegistrationV4>;
 
     // default types
@@ -150,22 +84,13 @@ declare module "hardhat/types/runtime" {
     ): Promise<ethers.ContractFactory>;
     getContractFactory(
       abi: any[],
-      bytecode: ethers.BytesLike,
+      bytecode: ethers.utils.BytesLike,
       signer?: ethers.Signer
     ): Promise<ethers.ContractFactory>;
     getContractAt(
       nameOrAbi: string | any[],
-      address: string | ethers.Addressable,
+      address: string,
       signer?: ethers.Signer
-    ): Promise<ethers.Contract>;
-    deployContract(
-      name: string,
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<ethers.Contract>;
-    deployContract(
-      name: string,
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<ethers.Contract>;
   }
 }

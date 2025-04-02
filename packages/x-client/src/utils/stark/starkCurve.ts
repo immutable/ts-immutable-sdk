@@ -5,8 +5,9 @@ import elliptic from 'elliptic';
 import * as encUtils from 'enc-utils';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
-import { hdkey } from '@ethereumjs/wallet';
-import { Signature, Signer } from 'ethers';
+import * as ethereumJsWallet from 'ethereumjs-wallet';
+import { splitSignature } from 'ethers/lib/utils';
+import { Signer } from 'ethers/lib/ethers';
 import { createStarkSigner } from './starkSigner';
 import * as legacy from './legacy/crypto';
 import { getStarkPublicKeyFromImx } from './getStarkPublicKeyFromImx';
@@ -156,13 +157,8 @@ export function checkIfHashedKeyIsAboveLimit(keySeed: BN) {
 }
 
 export function getPrivateKeyFromPath(seed: string, path: string): BN {
-  const seedArrayIterable = seed.slice(2).match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16));
-  if (!seedArrayIterable) {
-    throw new Error('Seed is not a valid hex string');
-  }
-  const uint8ArrayFromHexString = Uint8Array.from(seedArrayIterable);
-  const privateKey = hdkey.EthereumHDKey
-    .fromMasterSeed(uint8ArrayFromHexString) // assuming seed is '0x...'
+  const privateKey = ethereumJsWallet.hdkey
+    .fromMasterSeed(Buffer.from(seed.slice(2), 'hex')) // assuming seed is '0x...'
     .derivePath(path)
     .getWallet()
     .getPrivateKey();
@@ -286,8 +282,8 @@ export async function generateLegacyStarkPrivateKey(
   signer: Signer,
 ): Promise<string> {
   const address = (await signer.getAddress()).toLowerCase();
-  const signature = await signer.signMessage(legacy.DEFAULT_SIGNATURE_BYTES);
-  const seed = Signature.from(signature).s;
+  const signature = await signer.signMessage(legacy.DEFAULT_SIGNATURE_MESSAGE);
+  const seed = splitSignature(signature).s;
   const path = legacy.getAccountPath(
     legacy.DEFAULT_ACCOUNT_LAYER,
     legacy.DEFAULT_ACCOUNT_APPLICATION,

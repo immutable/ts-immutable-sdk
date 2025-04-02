@@ -1,4 +1,4 @@
-import { Eip1193Provider } from 'ethers';
+import { providers } from 'ethers';
 
 export const WALLET_ACTION = {
   // TODO: remove once fixed - consider using an enum
@@ -8,13 +8,12 @@ export const WALLET_ACTION = {
   CONNECT: 'eth_requestAccounts',
 };
 
-type ExternalProvider = Eip1193Provider;
-type RequestableProvider = ExternalProvider & {
-  request: NonNullable<ExternalProvider['request']>;
+type RequestableProvider = providers.ExternalProvider & {
+  request: NonNullable<providers.ExternalProvider['request']>;
 };
 
 export function isRequestableProvider(
-  provider: ExternalProvider,
+  provider: providers.ExternalProvider,
 ): provider is RequestableProvider {
   return !!provider?.request;
 }

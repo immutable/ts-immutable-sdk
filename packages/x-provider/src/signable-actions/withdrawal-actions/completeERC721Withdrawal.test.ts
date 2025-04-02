@@ -1,7 +1,6 @@
-import { Contracts } from '@imtbl/x-client';
+import { Contracts, TransactionResponse } from '@imtbl/x-client';
 import { imx } from '@imtbl/generated-clients';
 import * as encUtils from 'enc-utils';
-import { TransactionResponse } from 'ethers';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import {
   getSignableRegistrationOnchain,

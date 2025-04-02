@@ -1,8 +1,8 @@
 /* eslint-disable max-len */
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
-import { Wallet } from 'ethers';
 import * as encUtils from 'enc-utils';
+import { Wallet } from 'ethers';
 import {
   generateLegacyStarkPrivateKey,
   generateStarkPrivateKey,

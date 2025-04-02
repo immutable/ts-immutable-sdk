@@ -4,11 +4,12 @@ import {
   ERC20Amount,
   EthConfiguration,
   EthSigner,
+  TransactionResponse,
 } from '@imtbl/x-client';
-import { parseUnits, TransactionResponse } from 'ethers';
-import { validateChain } from '../helpers';
+import { parseUnits } from 'ethers/lib/utils';
 import { Signers } from '../types';
 import { ProviderConfiguration } from '../../config';
+import { validateChain } from '../helpers';
 
 interface ERC20TokenData {
   decimals: number;
@@ -34,7 +35,7 @@ async function executeDepositERC20(
     ethSigner,
   );
 
-  const populatedTransaction = await coreContract.depositERC20.populateTransaction(
+  const populatedTransaction = await coreContract.populateTransaction.depositERC20(
     starkPublicKey,
     assetType,
     vaultId,
@@ -75,7 +76,7 @@ export async function depositERC20({
     deposit.tokenAddress,
     ethSigner,
   );
-  const approveTransaction = await tokenContract.approve.populateTransaction(
+  const approveTransaction = await tokenContract.populateTransaction.approve(
     ethConfiguration.coreContractAddress,
     amount,
   );

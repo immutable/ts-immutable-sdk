@@ -25,7 +25,7 @@ export default defineConfig((options) => {
       target: 'es2022',
       minify: true,
       bundle: true,
-      noExternal: ['@uniswap/swap-router-contracts'],
+      noExternal: ['@uniswap/swap-router-contracts', 'ethereumjs-wallet'],
       treeshake: true,
       esbuildPlugins: [
         nodeModulesPolyfillPlugin({
@@ -33,7 +33,7 @@ export default defineConfig((options) => {
             Buffer: true,
             process: true,
           },
-          modules: ['crypto', 'buffer', 'process']
+          modules: ['crypto', 'buffer', 'process', 'assert']
         }),
         replace({ 
           '__SDK_VERSION__': pkg.version, 

@@ -1,6 +1,7 @@
 import BN from 'bn.js';
 import * as encUtils from 'enc-utils';
-import { Signer, toUtf8Bytes } from 'ethers';
+import { toUtf8Bytes, Signer } from 'ethers';
+import { Signer as EthersV5Signer } from 'ethers-v5';
 import { track } from '@imtbl/metrics';
 
 type SignatureOptions = {
@@ -41,7 +42,7 @@ function deserializeSignature(sig: string, size = 64): SignatureOptions {
 
 export async function signRaw(
   payload: string,
-  signer: Signer,
+  signer: Signer | EthersV5Signer,
 ): Promise<string> {
   const address = await signer.getAddress();
   track('xProvider', 'log', {
@@ -116,7 +117,7 @@ type IMXAuthorisationHeaders = {
 };
 
 export async function generateIMXAuthorisationHeaders(
-  ethSigner: Signer,
+  ethSigner: Signer | EthersV5Signer,
 ): Promise<IMXAuthorisationHeaders> {
   const timestamp = Math.floor(Date.now() / 1000).toString();
   const signature = await signRaw(timestamp, ethSigner);
@@ -129,7 +130,7 @@ export async function generateIMXAuthorisationHeaders(
 
 export async function signMessage(
   message: string,
-  signer: Signer,
+  signer: Signer | EthersV5Signer,
 ): Promise<{ message: string; ethAddress: string; ethSignature: string }> {
   const ethAddress = await signer.getAddress();
   const ethSignature = await signRaw(message, signer);

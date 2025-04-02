@@ -4,21 +4,11 @@ import BN from 'bn.js';
 import elliptic from 'elliptic';
 import hashJS from 'hash.js';
 
-import { toUtf8String } from 'ethers';
 import { constantPointsHex } from './points';
 import { Instruction, InstructionWithFee } from './types';
 
 const DEFAULT_ACCOUNT_MAPPING_KEY = 'STARKWARE_ACCOUNT_MAPPING';
-// const DEFAULT_SIGNATURE_MESSAGE = 'Only sign this request if you’ve initiated an action with Immutable X.';
-// non-english systems may not encode this correctly
-const DEFAULT_SIGNATURE_BYTES = new Uint8Array([
-  79, 110, 108, 121, 32, 115, 105, 103, 110, 32, 116, 104, 105, 115, 32, 114,
-  101, 113, 117, 101, 115, 116, 32, 105, 102, 32, 121, 111, 117, 226, 128, 153,
-  118, 101, 32, 105, 110, 105, 116, 105, 97, 116, 101, 100, 32, 97, 110, 32,
-  97, 99, 116, 105, 111, 110, 32, 119, 105, 116, 104, 32, 73, 109, 109, 117,
-  116, 97, 98, 108, 101, 32, 88, 46,
-]);
-const DEFAULT_SIGNATURE_MESSAGE = toUtf8String(DEFAULT_SIGNATURE_BYTES);
+const DEFAULT_SIGNATURE_MESSAGE = 'Only sign this request if you’ve initiated an action with Immutable X.';
 
 const DEFAULT_ACCOUNT_LAYER = 'starkex';
 const DEFAULT_ACCOUNT_APPLICATION = 'immutablex';
@@ -105,7 +95,6 @@ export {
   DEFAULT_ACCOUNT_INDEX,
   DEFAULT_ACCOUNT_LAYER,
   DEFAULT_ACCOUNT_MAPPING_KEY,
-  DEFAULT_SIGNATURE_BYTES,
   DEFAULT_SIGNATURE_MESSAGE,
   instructionEncodingMap,
   MAX_ECDSA_BN,
