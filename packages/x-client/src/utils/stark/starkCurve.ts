@@ -1,12 +1,14 @@
 /* eslint-disable spaced-comment */
+import { Signer } from '@ethersproject/abstract-signer';
+import { splitSignature } from '@ethersproject/bytes';
 import hash from 'hash.js';
 // @ts-ignore - elliptic types cause build to break...
 import elliptic from 'elliptic';
 import * as encUtils from 'enc-utils';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
+// import { hdkey } from 'ethereumjs-wallet';
 import * as ethereumJsWallet from 'ethereumjs-wallet';
-import { Signer, utils } from 'ethers-v5';
 import { createStarkSigner } from './starkSigner';
 import * as legacy from './legacy/crypto';
 import { getStarkPublicKeyFromImx } from './getStarkPublicKeyFromImx';
@@ -282,7 +284,7 @@ export async function generateLegacyStarkPrivateKey(
 ): Promise<string> {
   const address = (await signer.getAddress()).toLowerCase();
   const signature = await signer.signMessage(legacy.DEFAULT_SIGNATURE_MESSAGE);
-  const seed = utils.splitSignature(signature).s;
+  const seed = splitSignature(signature).s;
   const path = legacy.getAccountPath(
     legacy.DEFAULT_ACCOUNT_LAYER,
     legacy.DEFAULT_ACCOUNT_APPLICATION,

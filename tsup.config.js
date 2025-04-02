@@ -25,7 +25,7 @@ export default defineConfig((options) => {
       target: 'es2022',
       minify: true,
       bundle: true,
-      noExternal: ['@uniswap/swap-router-contracts', 'ethereumjs-wallet'],
+      noExternal: ['@uniswap/swap-router-contracts'],
       treeshake: true,
       esbuildPlugins: [
         nodeModulesPolyfillPlugin({
