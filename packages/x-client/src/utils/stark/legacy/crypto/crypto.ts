@@ -6,7 +6,7 @@ import BN from 'bn.js';
 // @ts-ignore
 import elliptic from 'elliptic';
 import * as encUtils from 'enc-utils';
-import * as ethereumJsWallet from 'ethereumjs-wallet';
+import { hdkey } from '@ethereumjs/wallet';
 import hashJS from 'hash.js';
 import assert from 'assert';
 
@@ -87,8 +87,14 @@ export function getKeyPair(privateKey: string): elliptic.ec.KeyPair {
 }
 
 export function getPrivateKeyFromPath(seed: string, path: string): string {
-  return ethereumJsWallet.hdkey
-    .fromMasterSeed(Buffer.from(seed.slice(2), 'hex')) // assuming seed is '0x...'
+  const seedArrayIterable = seed.slice(2).match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16));
+  if (!seedArrayIterable) {
+    throw new Error('Seed is not a valid hex string');
+  }
+  const uint8ArrayFromHexString = Uint8Array.from(seedArrayIterable);
+
+  return hdkey.EthereumHDKey
+    .fromMasterSeed(uint8ArrayFromHexString) // assuming seed is '0x...'
     .derivePath(path)
     .getWallet()
     .getPrivateKeyString();
