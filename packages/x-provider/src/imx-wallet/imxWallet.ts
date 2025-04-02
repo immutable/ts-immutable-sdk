@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { providers } from 'ethers';
+import { providers } from 'ethers-v5';
 import {
   ConnectRequest,
   ConnectResponse,

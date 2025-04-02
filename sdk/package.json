@@ -17,8 +17,6 @@
     "stream": "^0.0.3"
   },
   "devDependencies": {
-    "crypto": "^1.0.1",
-    "esbuild-plugins-node-modules-polyfill": "^1.6.7",
     "eslint": "^8.40.0",
     "tsup": "8.3.0",
     "typescript": "^5.6.2"

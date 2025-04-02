@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { ethers } from 'ethers-v5';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { connect } from './metaMask';
 import { WALLET_ACTION } from './rpc';

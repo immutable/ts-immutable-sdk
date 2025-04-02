@@ -56,12 +56,9 @@ describe('Deposit ETH', () => {
       });
 
       (Contracts.CoreV4.connect as jest.Mock).mockReturnValue({
-        registerAndDepositEth: {
-          populateTransaction: async () => 'test',
-        },
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        'deposit(uint256,uint256,uint256)': {
-          populateTransaction: async () => 'test',
+        populateTransaction: {
+          registerAndDepositEth: async () => 'test',
+          'deposit(uint256,uint256,uint256)': async () => 'test',
         },
       });
     });

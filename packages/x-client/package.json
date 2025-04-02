@@ -20,7 +20,7 @@
     "elliptic": "^6.6.1",
     "enc-utils": "^3.0.0",
     "ethereumjs-wallet": "^1.0.2",
-    "ethers": "^5.7.2",
+    "ethers-v5": "npm:ethers@5.7.2",
     "hash.js": "^1.1.7"
   },
   "devDependencies": {

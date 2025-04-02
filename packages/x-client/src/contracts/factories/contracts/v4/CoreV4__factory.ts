@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer, utils } from "ethers";
+import { Contract, Signer, utils } from "ethers-v5";
 import type { Provider } from "@ethersproject/providers";
 import type { CoreV4, CoreV4Interface } from "../../../contracts/v4/CoreV4";
 

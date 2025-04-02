@@ -2,7 +2,7 @@ import {
   StarkSigner,
   TransactionResponse,
 } from '@imtbl/x-client';
-import { Signer } from 'ethers';
+import { Signer } from 'ethers-v5';
 import { ProviderConfiguration } from '../../config';
 import { isRegisteredOnChain } from '../registration';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';

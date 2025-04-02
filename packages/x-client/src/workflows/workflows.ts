@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { Signer } from 'ethers';
+import { Signer } from 'ethers-v5';
 import {
   CollectionsApi,
   ExchangesApi,

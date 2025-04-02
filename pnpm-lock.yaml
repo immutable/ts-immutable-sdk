@@ -2381,9 +2381,9 @@ importers:
       ethereumjs-wallet:
         specifier: ^1.0.2
         version: 1.0.2
-      ethers:
-        specifier: ^5.7.2
-        version: 5.8.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ethers-v5:
+        specifier: npm:ethers@5.7.2
+        version: ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       hash.js:
         specifier: ^1.1.7
         version: 1.1.7
@@ -2451,9 +2451,9 @@ importers:
       enc-utils:
         specifier: ^3.0.0
         version: 3.0.0
-      ethers:
-        specifier: ^5.7.2
-        version: 5.8.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ethers-v5:
+        specifier: npm:ethers@5.7.2
+        version: ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       magic-sdk:
         specifier: ^29.0.5
         version: 29.0.5
@@ -2592,12 +2592,6 @@ importers:
         specifier: ^0.0.3
         version: 0.0.3
     devDependencies:
-      crypto:
-        specifier: ^1.0.1
-        version: 1.0.1
-      esbuild-plugins-node-modules-polyfill:
-        specifier: ^1.6.7
-        version: 1.6.7(esbuild@0.23.1)
       eslint:
         specifier: ^8.40.0
         version: 8.57.0

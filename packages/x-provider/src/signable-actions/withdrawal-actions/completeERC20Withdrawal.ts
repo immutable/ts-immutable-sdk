@@ -8,7 +8,7 @@ import {
   TransactionResponse,
   signRegisterEthAddress,
 } from '@imtbl/x-client';
-import { Signer } from 'ethers';
+import { Signer } from 'ethers-v5';
 import { isRegisteredOnChain } from '../registration';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import { validateChain } from '../helpers';

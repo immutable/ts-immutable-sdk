@@ -9,7 +9,7 @@ import type {
   PopulatedTransaction,
   Signer,
   utils,
-} from "ethers";
+} from "ethers-v5";
 import type { FunctionFragment, Result } from "@ethersproject/abi";
 import type { Listener, Provider } from "@ethersproject/providers";
 import type {

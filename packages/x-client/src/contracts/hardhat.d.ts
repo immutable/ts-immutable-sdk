@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { ethers } from "ethers";
+import { ethers } from "ethers-v5";
 import {
   FactoryOptions,
   HardhatEthersHelpers as HardhatEthersHelpersBase,

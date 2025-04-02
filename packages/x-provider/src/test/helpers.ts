@@ -1,6 +1,6 @@
 import { ImmutableXConfiguration, StarkSigner } from '@imtbl/x-client';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { Signer } from 'ethers';
+import { Signer } from 'ethers-v5';
 import { Signers } from '../signable-actions/types';
 import { ProviderConfiguration } from '../config';
 

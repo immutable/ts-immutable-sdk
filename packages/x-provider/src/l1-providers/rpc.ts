@@ -1,4 +1,4 @@
-import { providers } from 'ethers';
+import { providers } from 'ethers-v5';
 
 export const WALLET_ACTION = {
   // TODO: remove once fixed - consider using an enum

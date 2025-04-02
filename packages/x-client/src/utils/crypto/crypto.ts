@@ -3,7 +3,7 @@ import BN from 'bn.js';
 // @ts-ignore
 import elliptic from 'elliptic';
 import * as encUtils from 'enc-utils';
-import { Signer, utils } from 'ethers/lib/ethers';
+import { Signer, utils } from 'ethers-v5';
 import { StarkSigner } from '../../types';
 import { starkEcOrder } from '../stark/starkCurve';
 
