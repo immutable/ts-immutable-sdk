@@ -53,12 +53,6 @@ export async function signRaw(
   const buffer = encoder.encode(payload);
   const message = new TextDecoder('utf-8').decode(buffer);
 
-  const buffer2 = Buffer.from(payload, 'utf8');
-  const message2 = new TextDecoder('utf-8').decode(buffer2);
-
-  console.log('signRaw.message', { message });
-  console.log('signRaw.message2', { message2 });
-
   const signature = deserializeSignature(await signer.signMessage(message));
   return serializeEthSignature(signature);
 }
