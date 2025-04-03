@@ -5075,6 +5075,7 @@ __metadata:
     "@imtbl/x-client": 0.0.0
     "@imtbl/x-provider": 0.0.0
     "@magic-ext/oidc": 12.0.5
+    "@magic-sdk/commons": ^25.0.5
     "@magic-sdk/provider": ^29.0.5
     "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-typescript": ^11.1.6
