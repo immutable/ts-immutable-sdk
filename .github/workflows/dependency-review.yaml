@@ -2,13 +2,13 @@ name: 'Dependency Review'
 on:
   push:
     branches:
-      - main
+      - legacy-v1
   pull_request:
     branches:
-      - main
+      - legacy-v1
   merge_group:
     branches:
-      - main
+      - legacy-v1
   workflow_dispatch:
 
 permissions:
