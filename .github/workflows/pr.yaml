@@ -119,9 +119,6 @@ jobs:
       - name: Prepare tests
         run: yarn prepare:tests
 
-      - name: Install SDK at current version for @tests/checkout-widgets-nextjs
-        run: yarn workspace @tests/checkout-widgets-nextjs add @imtbl/sdk@$(npm view @imtbl/sdk version)
-
       - name: Build @tests/checkout-widgets-nextjs
         run: yarn workspace @tests/checkout-widgets-nextjs build
 
