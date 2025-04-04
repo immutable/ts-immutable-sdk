@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## Copyright (C) 2017, Oleksandr Kucherenko
-## Last revisit: 2017-09-29 
+## Last revisit: 2017-09-29
 ## Bug fixes: 2021-06-09, @slmingol changes applied
 
 # For help:
@@ -82,11 +82,11 @@ function latest_revision(){
 
 ## parse last found tag, extract it PARTS
 function parse_last(){
-  
+
   local lastPosition=$(expr ${#PARTS[@]} - 1)
   local position=$lastPosition
   local num=${PARTS[position]}
-  
+
   # Check if pre-release tag
   if [ "${num##*[!0-9]*}" ]
   then
@@ -204,7 +204,7 @@ TAG_HASH=$(tag_hash $TAG)
 HEAD_HASH=$(head_hash)
 
 # Enforce v1 versioning - if the highest tag starts with v2 or higher, use the highest v1 tag instead
-if [[ "$TOP_TAG" =~ ^[2-9]\. ]]; then
+if [[ "$TOP_TAG" =~ ^[2-9]\. || "$TOP_TAG" =~ ^prerelease-[2-9]\. ]]; then
   TOP_TAG=$(git tag --list "1.*" 2>/dev/null | sort -V | tail -n1 2>/dev/null)
   if [[ -z "$TOP_TAG" ]]; then
     TOP_TAG="1.0.0"  # Fallback to 1.0.0 if no v1 tags exist
