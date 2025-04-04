@@ -91,7 +91,7 @@ export class CheckoutConfiguration {
     this.isBridgeEnabled = config.bridge?.enable ?? DEFAULT_BRIDGE_ENABLED;
     this.publishableKey = config.publishableKey ?? '<no-publishable-key>';
 
-    this.networkMap = networkMap(this.isProduction, this.isDevelopment);
+    this.networkMap = config.overrides?.networkMap ?? networkMap(this.isProduction, this.isDevelopment);
 
     this.remote = new RemoteConfigFetcher(httpClient, {
       isDevelopment: this.isDevelopment,
