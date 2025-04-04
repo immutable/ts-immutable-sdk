@@ -1,4 +1,4 @@
-import { Signer as EthSigner } from 'ethers';
+import { Signer as EthSigner } from 'ethers-v5';
 
 export type { EthSigner };
 

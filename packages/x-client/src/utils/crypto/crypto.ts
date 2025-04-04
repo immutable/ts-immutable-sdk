@@ -3,7 +3,7 @@ import BN from 'bn.js';
 // @ts-ignore
 import elliptic from 'elliptic';
 import * as encUtils from 'enc-utils';
-import { Signer, solidityPackedKeccak256 } from 'ethers';
+import { Signer, utils } from 'ethers-v5';
 import { StarkSigner } from '../../types';
 import { starkEcOrder } from '../stark/starkCurve';
 
@@ -48,7 +48,12 @@ export async function signRaw(
   payload: string,
   signer: Signer,
 ): Promise<string> {
-  const signature = deserializeSignature(await signer.signMessage(payload));
+  // prevent utf-8 encoding issues
+  const encoder = new TextEncoder();
+  const buffer = encoder.encode(payload);
+  const message = new TextDecoder('utf-8').decode(buffer);
+
+  const signature = deserializeSignature(await signer.signMessage(message));
   return serializeEthSignature(signature);
 }
 
@@ -104,7 +109,7 @@ export async function signRegisterEthAddress(
   ethAddress: string,
   starkPublicKey: string,
 ): Promise<string> {
-  const hash: string = solidityPackedKeccak256(
+  const hash: string = utils.solidityKeccak256(
     ['string', 'address', 'uint256'],
     ['UserRegistration:', ethAddress, starkPublicKey],
   );

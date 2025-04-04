@@ -4,8 +4,9 @@ import {
   ETHAmount,
   EthSigner,
   ImmutableXConfiguration,
+  TransactionResponse,
 } from '@imtbl/x-client';
-import { parseUnits, TransactionResponse } from 'ethers';
+import { BigNumber, utils } from 'ethers-v5';
 import { validateChain } from '../helpers';
 import { Signers } from '../types';
 import { ProviderConfiguration } from '../../config';
@@ -22,7 +23,7 @@ type DepositEthParams = {
 
 async function executeDepositEth(
   ethSigner: EthSigner,
-  amount: bigint,
+  amount: BigNumber,
   assetType: string,
   starkPublicKey: string,
   vaultId: number,
@@ -33,11 +34,9 @@ async function executeDepositEth(
     ethSigner,
   );
 
-  const populatedTransaction = await coreContract['deposit(uint256,uint256,uint256)'].populateTransaction(
-    starkPublicKey,
-    assetType,
-    vaultId,
-  );
+  const populatedTransaction = await coreContract.populateTransaction[
+    'deposit(uint256,uint256,uint256)'
+  ](starkPublicKey, assetType, vaultId);
 
   return ethSigner.sendTransaction({ ...populatedTransaction, value: amount });
 }
@@ -53,7 +52,7 @@ export async function depositEth({
   const data: ETHTokenData = {
     decimals: 18,
   };
-  const amount = parseUnits(deposit.amount, 'wei');
+  const amount = utils.parseUnits(deposit.amount, 'wei');
   const imxConfig = config.immutableXConfig;
   const depositsApi = new imx.DepositsApi(imxConfig.apiConfiguration);
   const encodingApi = new imx.EncodingApi(imxConfig.apiConfiguration);

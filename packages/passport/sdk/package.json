@@ -7,6 +7,8 @@
   "dependencies": {
     "@0xsequence/abi": "^2.0.25",
     "@0xsequence/core": "^2.0.25",
+    "@ethersproject/abstract-provider": "^5.8.0",
+    "@ethersproject/providers": "^5.7.2",
     "@imtbl/config": "workspace:*",
     "@imtbl/generated-clients": "workspace:*",
     "@imtbl/metrics": "workspace:*",
@@ -18,6 +20,7 @@
     "@metamask/detect-provider": "^2.0.0",
     "axios": "^1.6.5",
     "ethers": "^6.13.4",
+    "ethers-v5": "npm:ethers@5.7.2",
     "events": "^3.3.0",
     "jwt-decode": "^3.1.2",
     "localforage": "^1.10.0",

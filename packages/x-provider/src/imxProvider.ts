@@ -9,8 +9,8 @@ import {
   NftTransferDetails,
   TokenAmount,
   UnsignedTransferRequest,
+  TransactionResponse,
 } from '@imtbl/x-client';
-import { TransactionResponse } from 'ethers';
 
 export interface IMXProvider {
   /**

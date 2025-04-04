@@ -62,11 +62,9 @@ describe('Deposit ERC721', () => {
 
       (Contracts.CoreV4.connect as jest.Mock).mockReturnValue({
         registerUser: async () => 'test',
-        approve: {
-          populateTransaction: async () => 'test',
-        },
-        depositNft: {
-          populateTransaction: async () => 'test',
+        populateTransaction: {
+          approve: async () => 'test',
+          depositNft: async () => 'test',
         },
       });
     });

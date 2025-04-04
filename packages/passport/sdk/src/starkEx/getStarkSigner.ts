@@ -1,4 +1,4 @@
-import { Signer } from 'ethers';
+import { Signer } from 'ethers-v5';
 import {
   createStarkSigner,
   generateLegacyStarkPrivateKey,

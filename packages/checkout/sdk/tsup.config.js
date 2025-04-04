@@ -33,7 +33,7 @@ export default defineConfig((options) => {
             Buffer: true,
             process: true,
           },
-          modules: ['crypto', 'buffer', 'process']
+          fallback: 'error'
         }),
         replace({ 
           '__SDK_VERSION__': pkg.version, 

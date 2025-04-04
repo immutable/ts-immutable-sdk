@@ -1,6 +1,8 @@
 import BN from 'bn.js';
 import * as encUtils from 'enc-utils';
-import { Signer } from 'ethers';
+import { toUtf8Bytes, Signer } from 'ethers';
+import { Signer as EthersV5Signer } from 'ethers-v5';
+import { track } from '@imtbl/metrics';
 
 type SignatureOptions = {
   r: BN;
@@ -40,9 +42,72 @@ function deserializeSignature(sig: string, size = 64): SignatureOptions {
 
 export async function signRaw(
   payload: string,
-  signer: Signer,
+  signer: Signer | EthersV5Signer,
 ): Promise<string> {
-  const signature = deserializeSignature(await signer.signMessage(payload));
+  const address = await signer.getAddress();
+  track('xProvider', 'log', {
+    address,
+    param: 'signRaw.payload',
+    val: payload,
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'signRaw.toUtf8Bytes',
+    val: toUtf8Bytes(payload).toString(),
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'signRaw.payload.normalize() === payload',
+    val: payload === payload.normalize(),
+  });
+
+  // prevent utf-8 encoding issues
+  const encoder = new TextEncoder();
+  const buffer = encoder.encode(payload);
+  // use this message to sign
+  const message = new TextDecoder('utf-8').decode(buffer);
+
+  const buffer2 = Buffer.from(payload, 'utf8');
+  const message2 = new TextDecoder('utf-8').decode(buffer2);
+
+  // compare message utf8 bytes with payload.normalize()
+  track('xProvider', 'log', {
+    address,
+    param: 'signRaw.message === payload.normalize()',
+    val: message === payload.normalize(),
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'signRaw.message2 === payload.normalize()',
+    val: message2 === payload.normalize(),
+  });
+
+  // output utf8 bytes
+  track('xProvider', 'log', {
+    address,
+    param: 'signRaw.message',
+    val: message,
+    bytes: toUtf8Bytes(message).toString(),
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'signRaw.message2',
+    val: message2,
+    bytes: toUtf8Bytes(message2).toString(),
+  });
+  // compare utf8 bytes output
+  track('xProvider', 'log', {
+    address,
+    param: 'signRaw.toUtf8Bytes === toUtf8Bytes(message)',
+    val: toUtf8Bytes(payload).toString() === toUtf8Bytes(message).toString(),
+  });
+  track('xProvider', 'log', {
+    address,
+    param: 'signRaw.toUtf8Bytes === toUtf8Bytes(message2)',
+    val: toUtf8Bytes(payload).toString() === toUtf8Bytes(message2).toString(),
+  });
+
+  const signature = deserializeSignature(await signer.signMessage(toUtf8Bytes(message)));
   return serializeEthSignature(signature);
 }
 
@@ -52,7 +117,7 @@ type IMXAuthorisationHeaders = {
 };
 
 export async function generateIMXAuthorisationHeaders(
-  ethSigner: Signer,
+  ethSigner: Signer | EthersV5Signer,
 ): Promise<IMXAuthorisationHeaders> {
   const timestamp = Math.floor(Date.now() / 1000).toString();
   const signature = await signRaw(timestamp, ethSigner);
@@ -65,7 +130,7 @@ export async function generateIMXAuthorisationHeaders(
 
 export async function signMessage(
   message: string,
-  signer: Signer,
+  signer: Signer | EthersV5Signer,
 ): Promise<{ message: string; ethAddress: string; ethSignature: string }> {
   const ethAddress = await signer.getAddress();
   const ethSignature = await signRaw(message, signer);

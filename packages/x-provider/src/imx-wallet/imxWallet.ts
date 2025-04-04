@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { BrowserProvider, toUtf8Bytes } from 'ethers';
+import { providers } from 'ethers-v5';
 import {
   ConnectRequest,
   ConnectResponse,
@@ -20,12 +20,12 @@ const DEFAULT_CONNECTION_MESSAGE = 'Only sign this request if you’ve initiated
 const CONNECTION_FAILED_ERROR = 'The L2 IMX Wallet connection has failed';
 
 export async function connect(
-  l1Provider: BrowserProvider,
+  l1Provider: providers.Web3Provider,
   env: Environment,
 ): Promise<ImxSigner> {
-  const l1Signer = await l1Provider.getSigner();
+  const l1Signer = l1Provider.getSigner();
   const address = await l1Signer.getAddress();
-  const signature = await l1Signer.signMessage(toUtf8Bytes(DEFAULT_CONNECTION_MESSAGE));
+  const signature = await l1Signer.signMessage(DEFAULT_CONNECTION_MESSAGE);
   const iframe = await getOrSetupIFrame(env);
 
   return new Promise((resolve, reject) => {

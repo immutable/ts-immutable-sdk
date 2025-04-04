@@ -1,4 +1,4 @@
-import { getDefaultProvider, Wallet } from 'ethers';
+import { getDefaultProvider, Wallet } from 'ethers-v5';
 import { signMessage, signRaw, signRegisterEthAddress } from './crypto';
 import { generateLegacyStarkPrivateKey } from '../stark/starkCurve';
 import { createStarkSigner } from '../stark/starkSigner';

@@ -1,4 +1,6 @@
 /* eslint-disable spaced-comment */
+import { Signer } from '@ethersproject/abstract-signer';
+import { splitSignature } from '@ethersproject/bytes';
 import hash from 'hash.js';
 // @ts-ignore - elliptic types cause build to break...
 import elliptic from 'elliptic';
@@ -6,7 +8,7 @@ import * as encUtils from 'enc-utils';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
 import { hdkey } from '@ethereumjs/wallet';
-import { Signature, Signer, toUtf8Bytes } from 'ethers';
+import { hexToBytes } from '@ethereumjs/util';
 import { createStarkSigner } from './starkSigner';
 import * as legacy from './legacy/crypto';
 import { getStarkPublicKeyFromImx } from './getStarkPublicKeyFromImx';
@@ -156,13 +158,8 @@ export function checkIfHashedKeyIsAboveLimit(keySeed: BN) {
 }
 
 export function getPrivateKeyFromPath(seed: string, path: string): BN {
-  const seedArrayIterable = seed.slice(2).match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16));
-  if (!seedArrayIterable) {
-    throw new Error('Seed is not a valid hex string');
-  }
-  const uint8ArrayFromHexString = Uint8Array.from(seedArrayIterable);
   const privateKey = hdkey.EthereumHDKey
-    .fromMasterSeed(uint8ArrayFromHexString) // assuming seed is '0x...'
+    .fromMasterSeed(hexToBytes(seed))
     .derivePath(path)
     .getWallet()
     .getPrivateKey();
@@ -286,8 +283,8 @@ export async function generateLegacyStarkPrivateKey(
   signer: Signer,
 ): Promise<string> {
   const address = (await signer.getAddress()).toLowerCase();
-  const signature = await signer.signMessage(toUtf8Bytes(legacy.DEFAULT_SIGNATURE_MESSAGE));
-  const seed = Signature.from(signature).s;
+  const signature = await signer.signMessage(legacy.DEFAULT_SIGNATURE_MESSAGE);
+  const seed = splitSignature(signature).s;
   const path = legacy.getAccountPath(
     legacy.DEFAULT_ACCOUNT_LAYER,
     legacy.DEFAULT_ACCOUNT_APPLICATION,
