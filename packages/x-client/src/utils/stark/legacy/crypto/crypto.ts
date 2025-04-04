@@ -1,14 +1,15 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-plusplus */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import assert from 'assert';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
 // @ts-ignore
 import elliptic from 'elliptic';
 import * as encUtils from 'enc-utils';
-import { hdkey } from '@ethereumjs/wallet';
+// import { hdkey } from 'ethereumjs-wallet';
+import * as ethereumJsWallet from 'ethereumjs-wallet';
 import hashJS from 'hash.js';
-import assert from 'assert';
 
 import {
   MISSING_HEX_PREFIX,
@@ -87,14 +88,8 @@ export function getKeyPair(privateKey: string): elliptic.ec.KeyPair {
 }
 
 export function getPrivateKeyFromPath(seed: string, path: string): string {
-  const seedArrayIterable = seed.slice(2).match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16));
-  if (!seedArrayIterable) {
-    throw new Error('Seed is not a valid hex string');
-  }
-  const uint8ArrayFromHexString = Uint8Array.from(seedArrayIterable);
-
-  return hdkey.EthereumHDKey
-    .fromMasterSeed(uint8ArrayFromHexString) // assuming seed is '0x...'
+  return ethereumJsWallet.hdkey
+    .fromMasterSeed(Buffer.from(seed.slice(2), 'hex')) // assuming seed is '0x...'
     .derivePath(path)
     .getWallet()
     .getPrivateKeyString();
