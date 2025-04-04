@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
-  "dependencies": {    
-    "ethereumjs-wallet": "^1.0.2",
+  "dependencies": {
+    "@ethereumjs/util": "^9.1.0",
+    "@ethereumjs/wallet": "^2.0.4",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/bytes": "^5.7.0",

@@ -7,8 +7,8 @@ import elliptic from 'elliptic';
 import * as encUtils from 'enc-utils';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
-// import { hdkey } from 'ethereumjs-wallet';
-import * as ethereumJsWallet from 'ethereumjs-wallet';
+import { hdkey } from '@ethereumjs/wallet';
+import { hexToBytes } from '@ethereumjs/util';
 import { createStarkSigner } from './starkSigner';
 import * as legacy from './legacy/crypto';
 import { getStarkPublicKeyFromImx } from './getStarkPublicKeyFromImx';
@@ -158,8 +158,8 @@ export function checkIfHashedKeyIsAboveLimit(keySeed: BN) {
 }
 
 export function getPrivateKeyFromPath(seed: string, path: string): BN {
-  const privateKey = ethereumJsWallet.hdkey
-    .fromMasterSeed(Buffer.from(seed.slice(2), 'hex')) // assuming seed is '0x...'
+  const privateKey = hdkey.EthereumHDKey
+    .fromMasterSeed(hexToBytes(seed))
     .derivePath(path)
     .getWallet()
     .getPrivateKey();
