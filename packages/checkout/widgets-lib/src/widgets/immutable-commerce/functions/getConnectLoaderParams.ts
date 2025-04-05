@@ -1,16 +1,8 @@
 import {
-  ChainId, Checkout, CommerceFlowType, WrappedBrowserProvider,
+  Checkout, CommerceFlowType, WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import { ConnectLoaderParams } from '../../../components/ConnectLoader/ConnectLoader';
-import { getL1ChainId, getL2ChainId } from '../../../lib/networkUtils';
 import { View } from '../../../context/view-context/ViewContext';
-
-/**
- * Get the chain id for the checkout
- */
-const getChainId = (checkout: Checkout) => (checkout.config.isProduction
-  ? ChainId.IMTBL_ZKEVM_MAINNET
-  : ChainId.IMTBL_ZKEVM_TESTNET);
 
 /**
  * Get the connect loader params for the widget
@@ -27,10 +19,10 @@ export function getConnectLoaderParams(
       return {
         checkout,
         browserProvider,
-        targetChainId: getChainId(checkout),
+        targetChainId: checkout.config.l2ChainId,
         allowedChains: [
-          getL1ChainId(checkout.config),
-          getL2ChainId(checkout.config),
+          checkout.config.l1ChainId,
+          checkout.config.l2ChainId,
         ],
       };
     case CommerceFlowType.ONRAMP:
@@ -38,10 +30,10 @@ export function getConnectLoaderParams(
       return {
         checkout,
         browserProvider,
-        targetChainId: getChainId(checkout),
+        targetChainId: checkout.config.l2ChainId,
         allowedChains: [
-          getL1ChainId(checkout.config),
-          getL2ChainId(checkout.config),
+          checkout.config.l1ChainId,
+          checkout.config.l2ChainId,
         ],
       };
     case CommerceFlowType.SALE:
@@ -50,8 +42,8 @@ export function getConnectLoaderParams(
       return {
         checkout,
         browserProvider,
-        targetChainId: getChainId(checkout),
-        allowedChains: [getL2ChainId(checkout.config)],
+        targetChainId: checkout.config.l2ChainId,
+        allowedChains: [checkout.config.l2ChainId],
       };
     default:
       return {} as ConnectLoaderParams;

@@ -41,6 +41,7 @@ describe('fetchL1Representation', () => {
 
     const result = await fetchL1Representation(
       {
+        l1ChainId: ChainId.SEPOLIA,
         remote: {
           getConfig: jest.fn().mockResolvedValue({
             [ChainId.SEPOLIA]: '0x2Fa06C6672dDCc066Ab04631192738799231dE4a',
@@ -82,6 +83,7 @@ describe('fetchL1Representation', () => {
     const requiredL2Address = '';
     const result = await fetchL1Representation(
       {
+        l1ChainId: ChainId.SEPOLIA,
         remote: {
           getConfig: jest.fn().mockResolvedValue({
             [ChainId.SEPOLIA]: '0xIMX_ADDRESS',

@@ -12,7 +12,7 @@ import { FeeData } from 'ethers';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { Transaction } from '../../../lib/clients';
 import { getChainNameById } from '../../../lib/chains';
-import { WITHDRAWAL_CLAIM_GAS_LIMIT, getL1ChainId } from '../../../lib';
+import { WITHDRAWAL_CLAIM_GAS_LIMIT } from '../../../lib';
 import { isPassportProvider } from '../../../lib/provider';
 import { isNativeToken } from '../../../lib/utils';
 import { NotEnoughEthToWithdraw } from '../../../components/Transactions/NotEnoughEthToWithdraw';
@@ -95,7 +95,6 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
     }
 
     let providerToUse = from?.browserProvider;
-    const l1ChainId = getL1ChainId(checkout.config);
 
     setTxProcessing(true);
 
@@ -155,7 +154,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
     try {
       const balancesResult = await checkout.getAllBalances({
         provider: providerToUse,
-        chainId: l1ChainId,
+        chainId: checkout.config.l1ChainId,
       });
 
       const ethBalance = balancesResult.balances.find((balance) => isNativeToken(balance.token.address));
@@ -173,11 +172,11 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
     // check that provider is connected to L1
     const network = await providerToUse.getNetwork();
 
-    if (Number(network.chainId) !== l1ChainId) {
+    if (Number(network.chainId) !== checkout.config.l1ChainId) {
       try {
         const switchNetworkResult = await checkout.switchNetwork({
           provider: providerToUse,
-          chainId: l1ChainId,
+          chainId: checkout.config.l1ChainId,
         });
         providerToUse = switchNetworkResult.provider;
       } catch (err) {
@@ -263,7 +262,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
     >
       <SimpleTextBody
         heading={
-          `${t('views.CLAIM_WITHDRAWAL.content.heading')} ${getChainNameById(getL1ChainId(checkout.config))}`
+          `${t('views.CLAIM_WITHDRAWAL.content.heading')} ${getChainNameById(checkout.config.l1ChainId)}`
         }
       >
         <Box sx={{ display: 'flex', flexWrap: 'wrap', pb: 'base.spacing.x1' }}>

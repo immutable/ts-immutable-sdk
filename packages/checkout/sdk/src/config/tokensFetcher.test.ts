@@ -1,6 +1,6 @@
 import { Environment } from '@imtbl/config';
 import { AxiosResponse } from 'axios';
-import { ChainId, RemoteConfiguration } from '../types';
+import { ChainId, ChainSlug, RemoteConfiguration } from '../types';
 import { RemoteConfigFetcher } from './remoteConfigFetcher';
 import { ENV_DEVELOPMENT } from '../env';
 import { HttpClient } from '../api/http';
@@ -19,10 +19,7 @@ describe('TokensFetcher', () => {
 
   beforeEach(() => {
     mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
-    mockedConfigClient = new RemoteConfigFetcher(mockedHttpClient, {
-      isDevelopment: true,
-      isProduction: false,
-    }) as jest.Mocked<RemoteConfigFetcher>;
+    mockedConfigClient = new RemoteConfigFetcher(mockedHttpClient, 'testEndpoint') as jest.Mocked<RemoteConfigFetcher>;
 
     mockedConfigClient.getConfig.mockResolvedValue({
       [ChainId.IMTBL_ZKEVM_TESTNET]: 'native',
@@ -109,11 +106,11 @@ describe('TokensFetcher', () => {
           const fetcher = new TokensFetcher(
             mockedHttpClient,
             mockedConfigClient,
-            {
-              isDevelopment: env === ENV_DEVELOPMENT,
-              isProduction:
-                env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
-            },
+            'baseUrl',
+            // eslint-disable-next-line no-nested-ternary
+            env === ENV_DEVELOPMENT ? ChainSlug.IMTBL_ZKEVM_DEVNET
+              : env === Environment.SANDBOX ? ChainSlug.IMTBL_ZKEVM_TESTNET
+                : ChainSlug.IMTBL_ZKEVM_MAINNET,
           );
 
           const chainsTokenConfig = await fetcher.getChainTokensConfig();
@@ -193,11 +190,11 @@ describe('TokensFetcher', () => {
           const fetcher = new TokensFetcher(
             mockedHttpClient,
             mockedConfigClient,
-            {
-              isDevelopment: env === ENV_DEVELOPMENT,
-              isProduction:
-                env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
-            },
+            'baseUrl',
+            // eslint-disable-next-line no-nested-ternary
+            env === ENV_DEVELOPMENT ? ChainSlug.IMTBL_ZKEVM_DEVNET
+              : env === Environment.SANDBOX ? ChainSlug.IMTBL_ZKEVM_TESTNET
+                : ChainSlug.IMTBL_ZKEVM_MAINNET,
           );
 
           expect(await fetcher.getChainTokensConfig()).toEqual({});

@@ -1,4 +1,4 @@
-import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../../config';
+import { CheckoutConfiguration } from '../../../config';
 import { ChainId, GetBalanceResult } from '../../../types';
 import { TokenBalanceResult } from '../types';
 
@@ -11,8 +11,8 @@ export const getBalancesByChain = (
 } => {
   const balances = { l1balances: [], l2balances: [] };
 
-  const l1balancesResult = tokenBalances.get(getL1ChainId(config));
-  const l2balancesResult = tokenBalances.get(getL2ChainId(config));
+  const l1balancesResult = tokenBalances.get(config.l1ChainId);
+  const l2balancesResult = tokenBalances.get(config.l2ChainId);
 
   // If there are no l1 balance then cannot bridge
   if (!l1balancesResult) return balances;

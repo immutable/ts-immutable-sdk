@@ -8,7 +8,7 @@ import {
   TokenFilterTypes,
   TokenInfo,
 } from '../types';
-import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../config';
+import { CheckoutConfiguration } from '../config';
 import { ERC20ABI, NATIVE } from '../env';
 import { CheckoutErrorType, withCheckoutError } from '../errors';
 import { isMatchingAddress } from '../utils/utils';
@@ -33,8 +33,8 @@ export const getTokenAllowList = async (
   let onRampConfig: OnRampConfig;
   let blockedTokens: string[];
 
-  const targetChainId = chainId ?? getL1ChainId(config);
-  const dexChainId = getL2ChainId(config);
+  const targetChainId = chainId ?? config.l1ChainId;
+  const dexChainId = config.l2ChainId;
 
   switch (type) {
     case TokenFilterTypes.SWAP:

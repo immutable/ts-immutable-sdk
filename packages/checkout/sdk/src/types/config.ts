@@ -1,14 +1,20 @@
 import { Environment, ModuleConfiguration } from '@imtbl/config';
 import { ExchangeOverrides, SecondaryFee } from '@imtbl/dex-sdk';
 import { Passport } from '@imtbl/passport';
+import { BridgeInstance } from '@imtbl/bridge-sdk';
 import { TokenBridgeInfo, TokenInfo } from './tokenInfo';
-import { ChainId } from './chains';
+import { ChainId, ChainSlug } from './chains';
+import { NetworkMap } from './network';
 
 export interface CheckoutOverrides {
-  environment?: Environment;
-  [key: string]: unknown;
+  remoteEndpoint?: string;
+  baseUrl?: string;
+  chainSlug?: ChainSlug;
+  bridgeInstance?: BridgeInstance;
+  l1ChainId?: ChainId;
+  l2ChainId?: ChainId;
+  networkMap?: NetworkMap;
 }
-
 interface CheckoutFeatureConfiguration {
   enable: boolean;
 }

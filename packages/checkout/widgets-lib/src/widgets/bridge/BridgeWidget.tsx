@@ -13,9 +13,6 @@ import {
 } from 'react';
 import {
   BridgeConfiguration,
-  ETH_MAINNET_TO_ZKEVM_MAINNET,
-  ETH_SEPOLIA_TO_ZKEVM_DEVNET,
-  ETH_SEPOLIA_TO_ZKEVM_TESTNET,
   TokenBridge,
 } from '@imtbl/bridge-sdk';
 import { useTranslation } from 'react-i18next';
@@ -25,7 +22,6 @@ import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { StatusView } from '../../components/Status/StatusView';
 import { StatusType } from '../../components/Status/StatusType';
-import { getL1ChainId, getL2ChainId } from '../../lib';
 import { Transactions } from '../../components/Transactions/Transactions';
 import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { TopUpView } from '../../views/top-up/TopUpView';
@@ -108,22 +104,18 @@ export default function BridgeWidget({
       checkout,
       browserProvider: browserProvider ?? null,
       tokenBridge: (() => {
-        let bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_TESTNET;
-        if (checkout.config.isDevelopment) bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_DEVNET;
-        if (checkout.config.isProduction) bridgeInstance = ETH_MAINNET_TO_ZKEVM_MAINNET;
-
         // Root provider is always L1
         const rootProvider = new JsonRpcProvider(
-          checkout.config.networkMap.get(getL1ChainId(checkout.config))?.rpcUrls[0],
+          checkout.config.networkMap.get(checkout.config.l1ChainId)?.rpcUrls[0],
         );
 
         // Child provider is always L2
         const childProvider = new JsonRpcProvider(
-          checkout.config.networkMap.get(getL2ChainId(checkout.config))?.rpcUrls[0],
+          checkout.config.networkMap.get(checkout.config.l2ChainId)?.rpcUrls[0],
         );
         const bridgeConfiguration = new BridgeConfiguration({
           baseConfig: new ImmutableConfiguration({ environment: checkout.config.environment }),
-          bridgeInstance,
+          bridgeInstance: checkout.config.bridgeInstance,
           rootProvider,
           childProvider,
         });

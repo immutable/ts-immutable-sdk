@@ -13,7 +13,7 @@ import {
   getBridgeFeeEstimate,
 } from './bridgeGasEstimate';
 import * as instance from '../instance';
-import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../config';
+import { CheckoutConfiguration } from '../config';
 
 const DUMMY_WALLET_ADDRESS = '0x0000000000000000000000000000000000000001';
 const DEFAULT_TOKEN_DECIMALS = 18;
@@ -22,8 +22,8 @@ async function bridgeToL2GasEstimator(
   readOnlyProviders: Map<ChainId, JsonRpcProvider>,
   config: CheckoutConfiguration,
 ): Promise<GasEstimateBridgeToL2Result> {
-  const fromChainId = getL1ChainId(config);
-  const toChainId = getL2ChainId(config);
+  const fromChainId = config.l1ChainId;
+  const toChainId = config.l2ChainId;
 
   const provider = readOnlyProviders.get(fromChainId);
   if (!provider) throw new Error(`Missing JsonRpcProvider for chain id: ${fromChainId}`);
@@ -68,7 +68,7 @@ async function bridgeToL2GasEstimator(
 async function swapGasEstimator(
   config: CheckoutConfiguration,
 ): Promise<GasEstimateSwapResult> {
-  const chainId = getL2ChainId(config);
+  const chainId = config.l2ChainId;
 
   const gasEstimateTokensConfig = (await config.remote.getConfig(
     'gasEstimateTokens',

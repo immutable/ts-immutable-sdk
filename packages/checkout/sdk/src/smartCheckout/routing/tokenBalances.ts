@@ -1,5 +1,5 @@
 import { JsonRpcProvider } from 'ethers';
-import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
+import { CheckoutConfiguration } from '../../config';
 import {
   ChainId, GetAllBalancesResult, AvailableRoutingOptions,
 } from '../../types';
@@ -22,14 +22,14 @@ export const getAllTokenBalances = async (
       error: new CheckoutError('No L1 or L2 provider available', CheckoutErrorType.PROVIDER_ERROR),
       balances: [],
     };
-    chainBalances.set(getL1ChainId(config), noProviderResult);
-    chainBalances.set(getL2ChainId(config), noProviderResult);
+    chainBalances.set(config.l1ChainId, noProviderResult);
+    chainBalances.set(config.l2ChainId, noProviderResult);
     return chainBalances;
   }
 
   // Only get L1 Balances if we can bridge
   if (availableRoutingOptions.bridge) {
-    const chainId = getL1ChainId(config);
+    const chainId = config.l1ChainId;
     if (readOnlyProviders.has(chainId)) {
       chainBalancePromises.set(chainId, getAllBalances(
         config,
@@ -38,7 +38,7 @@ export const getAllTokenBalances = async (
         chainId,
       ));
     } else {
-      chainBalances.set(getL1ChainId(config), {
+      chainBalances.set(config.l1ChainId, {
         success: false,
         error: new CheckoutError(`No L1 provider available for ${chainId}`, CheckoutErrorType.PROVIDER_ERROR),
         balances: [],
@@ -46,7 +46,7 @@ export const getAllTokenBalances = async (
     }
   }
 
-  const chainId = getL2ChainId(config);
+  const chainId = config.l2ChainId;
   if (readOnlyProviders.has(chainId)) {
     chainBalancePromises.set(chainId, getAllBalances(
       config,
@@ -55,7 +55,7 @@ export const getAllTokenBalances = async (
       chainId,
     ));
   } else {
-    chainBalances.set(getL2ChainId(config), {
+    chainBalances.set(config.l2ChainId, {
       success: false,
       error: new CheckoutError(`No L2 provider available for ${chainId}`, CheckoutErrorType.PROVIDER_ERROR),
       balances: [],

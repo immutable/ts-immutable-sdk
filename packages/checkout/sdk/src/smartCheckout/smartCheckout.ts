@@ -20,6 +20,7 @@ import { Allowance } from './allowance/types';
 import { BalanceCheckResult, BalanceRequirement } from './balanceCheck/types';
 import { measureAsyncExecution } from '../logger/debugLogger';
 import { WrappedBrowserProvider } from '../types';
+import { AvailabilityService } from '../availability';
 
 export const overrideBalanceCheckResult = (
   balanceCheckResult: BalanceCheckResult,
@@ -88,6 +89,7 @@ const processRoutes = async (
 export const smartCheckout = async (
   config: CheckoutConfiguration,
   provider: WrappedBrowserProvider,
+  availability: AvailabilityService,
   itemRequirements: ItemRequirement[],
   transactionOrGasAmount?: FulfillmentTransaction | GasAmount,
   routingOptions?: AvailableRoutingOptions,
@@ -155,7 +157,7 @@ export const smartCheckout = async (
   const availableRoutingOptions = await measureAsyncExecution<AvailableRoutingOptions>(
     config,
     'Time to fetch available routing options',
-    getAvailableRoutingOptions(config, provider),
+    getAvailableRoutingOptions(config, provider, availability),
   );
   if (routingOptions?.onRamp === false) availableRoutingOptions.onRamp = false;
   if (routingOptions?.swap === false) availableRoutingOptions.swap = false;

@@ -1,6 +1,5 @@
 import React, { Suspense } from 'react';
 import {
-  ChainId,
   IMTBLWidgetEvents,
   SaleItem,
   SaleWidgetParams,
@@ -15,7 +14,6 @@ import {
   ConnectLoader,
   ConnectLoaderParams,
 } from '../../components/ConnectLoader/ConnectLoader';
-import { getL2ChainId } from '../../lib';
 import { isValidWalletProvider } from '../../lib/validations/widgetValidators';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
@@ -119,12 +117,10 @@ export class Sale extends Base<WidgetType.SALE> {
 
     const { t } = i18n;
     const connectLoaderParams: ConnectLoaderParams = {
-      targetChainId: this.checkout.config.isProduction
-        ? ChainId.IMTBL_ZKEVM_MAINNET
-        : ChainId.IMTBL_ZKEVM_TESTNET,
+      targetChainId: this.checkout.config.l2ChainId,
       browserProvider: this.browserProvider,
       checkout: this.checkout,
-      allowedChains: [getL2ChainId(this.checkout!.config)],
+      allowedChains: [this.checkout.config.l1ChainId, this.checkout.config.l2ChainId],
     };
     const config = this.strongConfig();
 

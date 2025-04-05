@@ -16,7 +16,6 @@ import {
   OnRampEventType,
   OnRampSuccess,
   OnRampFailed,
-  ChainId,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback,
@@ -46,7 +45,6 @@ import {
   ViewActions,
   ViewContext,
 } from '../../../../context/view-context/ViewContext';
-import { getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
 import { LoadingView } from '../../../../views/loading/LoadingView';
 import ConnectWidget from '../../../connect/ConnectWidget';
 import SwapWidget from '../../../swap/SwapWidget';
@@ -142,7 +140,7 @@ export function FundingRouteExecute({
           tokenAddress: step.fundingItem.token.address,
           amount: step.fundingItem.fundsRequired.formattedAmount,
         });
-        if (Number(network.chainId) === getL1ChainId(checkout!.config)) {
+        if (network.chainId === checkout.config.l1ChainId) {
           setView(FundingRouteExecuteViews.EXECUTE_BRIDGE);
           return;
         }
@@ -158,7 +156,7 @@ export function FundingRouteExecute({
           toTokenAddress: requiredTokenAddress,
           autoProceed: true,
         });
-        if (Number(network.chainId) === getL2ChainId(checkout!.config)) {
+        if (network.chainId === checkout.config.l2ChainId) {
           setView(FundingRouteExecuteViews.EXECUTE_SWAP);
           return;
         }
@@ -328,9 +326,7 @@ export function FundingRouteExecute({
       {view === FundingRouteExecuteViews.SWITCH_NETWORK_ETH && (
         <ConnectWidget
           config={config}
-          targetChainId={
-            checkout!.config.isProduction ? ChainId.ETHEREUM : ChainId.SEPOLIA
-          }
+          targetChainId={checkout!.config.l1ChainId}
           browserProvider={provider}
           checkout={checkout!}
           deepLink={ConnectWidgetViews.SWITCH_NETWORK}
@@ -339,11 +335,7 @@ export function FundingRouteExecute({
       {view === FundingRouteExecuteViews.SWITCH_NETWORK_ZKEVM && (
         <ConnectWidget
           config={config}
-          targetChainId={
-            checkout!.config.isProduction
-              ? ChainId.IMTBL_ZKEVM_MAINNET
-              : ChainId.IMTBL_ZKEVM_TESTNET
-          }
+          targetChainId={checkout!.config.l2ChainId}
           browserProvider={provider}
           checkout={checkout!}
           deepLink={ConnectWidgetViews.SWITCH_NETWORK}

@@ -1,28 +1,18 @@
-import { Environment } from '@imtbl/config';
 import axios from 'axios';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { ENV_DEVELOPMENT, IMMUTABLE_API_BASE_URL } from '../env';
 
 export type AvailabilityService = {
   checkDexAvailability: () => Promise<boolean>
 };
 
 export const availabilityService = (
-  isDevelopment: boolean,
-  isProduction: boolean,
+  postEndpoint: string,
 ) => {
-  const postEndpoint = () => {
-    if (isDevelopment) return IMMUTABLE_API_BASE_URL[ENV_DEVELOPMENT];
-    if (isProduction) return IMMUTABLE_API_BASE_URL[Environment.PRODUCTION];
-
-    return IMMUTABLE_API_BASE_URL[Environment.SANDBOX];
-  };
-
   const checkDexAvailability = async (): Promise<boolean> => {
     let response;
 
     try {
-      response = await axios.post(`${postEndpoint()}/v1/availability/checkout/swap`);
+      response = await axios.post(`${postEndpoint}/v1/availability/checkout/swap`);
     } catch (err: any) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx

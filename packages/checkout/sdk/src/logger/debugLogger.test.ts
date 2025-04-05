@@ -1,4 +1,4 @@
-/* eslint-disable import/no-cycle */
+import { Environment } from '@imtbl/config';
 import { CheckoutConfiguration } from '../config';
 import { debugLogger, measureAsyncExecution } from './debugLogger';
 
@@ -8,7 +8,7 @@ describe('debugLogger', () => {
   });
 
   it('should call underlying function and return result of the promise', async () => {
-    const testCheckoutConfig = { isProduction: false } as CheckoutConfiguration;
+    const testCheckoutConfig = { environment: Environment.SANDBOX } as CheckoutConfiguration;
     const debugString = 'Test Debug String';
     const mockResult = 'Mock Result';
     const mockPromise = new Promise<string>((resolve) => {
@@ -19,7 +19,7 @@ describe('debugLogger', () => {
   });
 
   it('should call console if production false', () => {
-    const testCheckoutConfig = { isProduction: false } as CheckoutConfiguration;
+    const testCheckoutConfig = { environment: Environment.SANDBOX } as CheckoutConfiguration;
     const consoleDebugSpy = jest.spyOn(console, 'info').mockImplementation();
     const debugString = 'Test Debug String';
     debugLogger(testCheckoutConfig, debugString, 1);
@@ -28,7 +28,7 @@ describe('debugLogger', () => {
   });
 
   it('should not call console if production', () => {
-    const testCheckoutConfig = { isProduction: true } as CheckoutConfiguration;
+    const testCheckoutConfig = { environment: Environment.PRODUCTION } as CheckoutConfiguration;
     const consoleDebugSpy = jest.spyOn(console, 'info').mockImplementation();
     const debugString = 'Test Debug String';
     debugLogger(testCheckoutConfig, debugString, 1);

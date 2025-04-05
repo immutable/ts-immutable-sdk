@@ -1,9 +1,10 @@
 /* eslint-disable import/no-cycle */
+import { Environment } from '@imtbl/config';
 import { CheckoutConfiguration } from '../config';
 
 export const debugLogger = (config: CheckoutConfiguration, debugString: string, seconds: number) => {
   // eslint-disable-next-line no-console
-  if (!config.isProduction) console.info(debugString, seconds);
+  if (config.environment !== Environment.PRODUCTION) console.info(debugString, seconds);
 };
 
 export const measureAsyncExecution = async <T>(

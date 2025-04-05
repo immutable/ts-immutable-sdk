@@ -1,13 +1,10 @@
-import { availabilityService } from '../../availability';
-import { CheckoutConfiguration } from '../../config';
+import { AvailabilityService } from '../../availability';
 
 export const isOnRampAvailable = async (): Promise<boolean> => true;
 
 export const isSwapAvailable = async (
-  config: CheckoutConfiguration,
+  availability: AvailabilityService,
 ): Promise<boolean> => {
-  const availability = availabilityService(config.isDevelopment, config.isProduction);
-
   try {
     return await availability.checkDexAvailability();
   } catch {

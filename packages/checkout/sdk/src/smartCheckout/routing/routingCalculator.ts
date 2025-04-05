@@ -17,8 +17,6 @@ import { TokenBalanceResult } from './types';
 import { getAllTokenBalances } from './tokenBalances';
 import {
   CheckoutConfiguration,
-  getL1ChainId,
-  getL2ChainId,
 } from '../../config';
 import { createReadOnlyProviders } from '../../readOnlyProviders/readOnlyProvider';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
@@ -105,7 +103,7 @@ export const getSwapFundingSteps = async (
   if (insufficientRequirement === undefined) return fundingSteps;
   if (swapTokenAllowList === undefined) return fundingSteps;
 
-  const tokenBalanceResult = tokenBalances.get(getL2ChainId(config));
+  const tokenBalanceResult = tokenBalances.get(config.l2ChainId);
   if (!tokenBalanceResult) return fundingSteps;
   if (tokenBalanceResult.error !== undefined || !tokenBalanceResult.success) return fundingSteps;
 
@@ -139,8 +137,8 @@ export const getBridgeAndSwapFundingSteps = async (
 ): Promise<BridgeAndSwapRoute[]> => {
   if (!insufficientRequirement) return [];
 
-  const l1balancesResult = tokenBalances.get(getL1ChainId(config));
-  const l2balancesResult = tokenBalances.get(getL2ChainId(config));
+  const l1balancesResult = tokenBalances.get(config.l1ChainId);
+  const l2balancesResult = tokenBalances.get(config.l2ChainId);
 
   // If there are no l1 balance then cannot bridge
   if (!l1balancesResult) return [];

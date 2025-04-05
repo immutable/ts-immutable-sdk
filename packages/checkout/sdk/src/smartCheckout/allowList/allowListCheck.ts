@@ -1,4 +1,4 @@
-import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
+import { CheckoutConfiguration } from '../../config';
 import { getTokenAllowList } from '../../tokens';
 import {
   AvailableRoutingOptions,
@@ -43,7 +43,7 @@ export const allowListCheckForBridge = async (
   availableRoutingOptions: AvailableRoutingOptions,
 ) : Promise<TokenInfo[]> => {
   if (availableRoutingOptions.bridge) {
-    const chainId = getL1ChainId(config);
+    const chainId = config.l1ChainId;
     const allowedTokens = (await getTokenAllowList(config, { type: TokenFilterTypes.BRIDGE, chainId })).tokens;
     const balances = tokenBalances.get(chainId);
     return filterTokens(allowedTokens, balances);
@@ -59,7 +59,7 @@ export const allowListCheckForSwap = async (
 ) : Promise<TokenInfo[]> => {
   if (availableRoutingOptions.swap) {
     const allowedTokens = (await getTokenAllowList(config, { type: TokenFilterTypes.SWAP })).tokens;
-    const balances = tokenBalances.get(getL2ChainId(config));
+    const balances = tokenBalances.get(config.l2ChainId);
     return filterTokens(allowedTokens, balances);
   }
 

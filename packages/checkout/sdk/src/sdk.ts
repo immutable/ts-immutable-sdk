@@ -104,14 +104,8 @@ export class Checkout {
     this.httpClient = new HttpClient(config);
     this.config = new CheckoutConfiguration(config, this.httpClient);
     this.fiatRampService = new FiatRampService(this.config);
-    this.readOnlyProviders = new Map<
-    ChainId,
-    JsonRpcProvider
-    >();
-    this.availability = availabilityService(
-      this.config.isDevelopment,
-      this.config.isProduction,
-    );
+    this.readOnlyProviders = new Map<ChainId, JsonRpcProvider>();
+    this.availability = availabilityService(this.config.baseUrl);
     this.passport = config.passport;
 
     // Initialise injected providers via EIP-6963
@@ -495,6 +489,7 @@ export class Checkout {
     return await buy.buy(
       this.config,
       browserProvider,
+      this.availability,
       params.orders,
       params.overrides,
     );
@@ -522,7 +517,7 @@ export class Checkout {
       params.provider,
     );
 
-    return await sell.sell(this.config, browserProvider, params.orders);
+    return await sell.sell(this.config, browserProvider, this.availability, params.orders);
   }
 
   /**
@@ -587,6 +582,7 @@ export class Checkout {
     return await smartCheckout.smartCheckout(
       this.config,
       browserProvider,
+      this.availability,
       itemRequirements,
       params.transactionOrGasAmount,
       params.routingOptions,

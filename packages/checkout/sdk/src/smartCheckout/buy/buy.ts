@@ -12,7 +12,7 @@ import { mr } from '@imtbl/generated-clients';
 import { track } from '@imtbl/metrics';
 import { TransactionRequest, TransactionResponse } from 'ethers';
 import * as instance from '../../instance';
-import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
+import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import {
   ItemType,
@@ -39,6 +39,7 @@ import { getAllBalances, resetBlockscoutClientMap } from '../../balances';
 import { debugLogger, measureAsyncExecution } from '../../logger/debugLogger';
 import { sendTransaction } from '../../transaction';
 import { WrappedBrowserProvider } from '../../types';
+import { AvailabilityService } from '../../availability';
 
 export const getItemRequirement = (
   type: ItemType,
@@ -89,6 +90,7 @@ export const getTransactionOrGas = (
 export const buy = async (
   config: CheckoutConfiguration,
   provider: WrappedBrowserProvider,
+  availability: AvailabilityService,
   orders: Array<BuyOrder>,
   overrides: BuyOverrides = {
     waitFulfillmentSettlements: true,
@@ -119,8 +121,8 @@ export const buy = async (
 
   // Prefetch balances and store them in memory
   resetBlockscoutClientMap();
-  getAllBalances(config, provider, fulfillerAddress, getL1ChainId(config));
-  getAllBalances(config, provider, fulfillerAddress, getL2ChainId(config));
+  getAllBalances(config, provider, fulfillerAddress, config.l1ChainId);
+  getAllBalances(config, provider, fulfillerAddress, config.l2ChainId);
 
   const { id, takerFees, fillAmount } = orders[0];
 
@@ -277,6 +279,7 @@ export const buy = async (
     smartCheckout(
       config,
       provider,
+      availability,
       itemRequirements,
       getTransactionOrGas(
         gasLimit,

@@ -1,6 +1,6 @@
 import { Amount, Fee } from '@imtbl/dex-sdk';
 import { formatUnits } from 'ethers';
-import { CheckoutConfiguration, getL2ChainId } from '../../../config';
+import { CheckoutConfiguration } from '../../../config';
 import {
   AvailableRoutingOptions,
   ChainId,
@@ -327,7 +327,7 @@ export const swapRoute = async (
 
   const requiredToken = getRequiredToken(balanceRequirement);
 
-  const chainId = getL2ChainId(config);
+  const chainId = config.l2ChainId;
   const l2TokenBalanceResult = tokenBalanceResults.get(chainId);
   if (!l2TokenBalanceResult) return fundingSteps;
   const l2Balances = l2TokenBalanceResult.balances;
@@ -335,7 +335,7 @@ export const swapRoute = async (
 
   const quotes = await quoteFetcher(
     config,
-    getL2ChainId(config),
+    config.l2ChainId,
     walletAddress,
     requiredToken,
     swappableTokens,

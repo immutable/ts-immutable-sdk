@@ -1,5 +1,5 @@
 import { formatUnits, JsonRpcProvider } from 'ethers';
-import { CheckoutConfiguration, getL2ChainId } from '../../../config';
+import { CheckoutConfiguration } from '../../../config';
 import {
   AvailableRoutingOptions,
   BridgeFundingStep,
@@ -120,7 +120,7 @@ const modifyTokenBalancesWithBridgedAmount = (
 
   const updatedBalances = Array.from(balanceMap.values());
   modifiedTokenBalances.set(
-    getL2ChainId(config),
+    config.l2ChainId,
     {
       success: true,
       balances: updatedBalances,
