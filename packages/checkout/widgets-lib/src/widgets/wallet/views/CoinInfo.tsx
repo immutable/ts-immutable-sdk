@@ -23,6 +23,7 @@ export function CoinInfo() {
       userJourney: UserJourney.WALLET,
       screen: 'CoinInfo',
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

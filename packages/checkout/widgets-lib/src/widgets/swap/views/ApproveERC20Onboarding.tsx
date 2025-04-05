@@ -61,6 +61,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         swapFormInfo: data.swapFormInfo,
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Get symbol from swap info for approve amount text
@@ -94,6 +95,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         },
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewDispatch]);
 
   const handleExceptions = (err, swapFormData:PrefilledSwapForm) => {
@@ -203,6 +205,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     } finally {
       setLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     checkout,
     provider,
@@ -234,6 +237,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
       )}
       </SimpleTextBody>
     ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [data.swapFormInfo, fromToken, isPassport],
   );
 
@@ -245,6 +249,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         : 'views.APPROVE_ERC20.approveSpending.footer.buttonText')}
       onActionClick={handleApproveSpendingClick}
     />
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   ), [rejectedSpending, handleApproveSpendingClick, loading]);
 
   /* ----------------- */
@@ -305,6 +310,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     } finally {
       setLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     checkout,
     provider,
@@ -331,6 +337,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         : 'views.APPROVE_ERC20.approveSwap.footer.buttonText')}
       onActionClick={handleApproveSwapClick}
     />
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   ), [rejectedSwap, handleApproveSwapClick, loading]);
 
   return (

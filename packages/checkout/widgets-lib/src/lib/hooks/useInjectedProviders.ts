@@ -102,6 +102,7 @@ export const useInjectedProviders = ({ checkout }: UseInjectedProvidersParams) =
 
     filterAndProcessProviders(injectedProviders);
     return () => cancelSubscription();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout]);
 
   return {

@@ -94,6 +94,7 @@ export function PayWithCoins() {
       },
       onTxnStepExecuteAll,
     );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signResponse, environment]);
 
   const executeUserInitiatedTransaction = useCallback(() => {
@@ -135,6 +136,7 @@ export function PayWithCoins() {
         />
       ),
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     filteredTransactions,
     currentTransactionIndex,
@@ -142,6 +144,7 @@ export function PayWithCoins() {
     environment,
   ]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_COINS), []); // checkoutPrimarySalePayWithCoinsViewed
 
   useEffect(() => {
@@ -154,6 +157,7 @@ export function PayWithCoins() {
       prevTransactionIndexRef.current = currentTransactionIndex;
       executeUserInitiatedTransaction();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filteredTransactions, currentTransactionIndex, provider]);
 
   useEffect(() => {
@@ -163,6 +167,7 @@ export function PayWithCoins() {
       processing.current = true;
       executeAllTransactions();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signResponse, provider]);
 
   useEffect(() => {
@@ -192,6 +197,7 @@ export function PayWithCoins() {
         },
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [executeResponse]);
 
   return null;

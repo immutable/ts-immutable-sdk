@@ -111,6 +111,7 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
         },
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [history]);
 
   const handleProviderUpdated = useMemo(
@@ -162,6 +163,7 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
         },
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [flowParams]);
 
   /**
@@ -182,6 +184,7 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
         },
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [flowParams.flow]);
 
   /**

@@ -131,6 +131,7 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
       const checkoutUrl = await getNFTCheckoutURL();
       setIframeSrc(checkoutUrl);
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { iframeSrc };

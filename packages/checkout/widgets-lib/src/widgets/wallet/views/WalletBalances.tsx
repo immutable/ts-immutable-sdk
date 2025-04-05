@@ -78,6 +78,7 @@ export function WalletBalances({
       userJourney: UserJourney.WALLET,
       screen: 'WalletBalances',
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -86,7 +87,7 @@ export function WalletBalances({
       if (!cryptoFiatDispatch) return;
       if (!network) return;
 
-      const tokenSymbols = await fetchTokenSymbols(checkout, Number(network.chainId));
+      const tokenSymbols = await fetchTokenSymbols(checkout, network.chainId);
 
       cryptoFiatDispatch({
         payload: {
@@ -95,7 +96,7 @@ export function WalletBalances({
         },
       });
     })();
-  }, [checkout, cryptoFiatDispatch, network?.chainId]);
+  }, [checkout, cryptoFiatDispatch, network]);
 
   useEffect(() => {
     let totalAmount = 0.0;

@@ -150,6 +150,7 @@ export function TopUpView({
       );
       setBridgeFeesInFiat(est);
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout !== undefined]);
 
   // Onramp fees estimation
@@ -160,6 +161,7 @@ export function TopUpView({
       const onRampFees = getOnRampFeeEstimation(onRampFeesEstimate);
       setOnRampFeesPercentage(onRampFees);
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout !== undefined]);
 
   const localTrack = (
@@ -348,6 +350,7 @@ export function TopUpView({
         isEnabled: showBridgeOption,
       },
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [showBridgeOption, showOnrampOption, showSwapOption],
   );
 

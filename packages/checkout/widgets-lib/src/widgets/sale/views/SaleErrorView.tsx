@@ -247,6 +247,7 @@ export function SaleErrorView({
       inputValue: StateMachineInput.ERROR,
       children: <HandoverContent {...getErrorViewProps()} />,
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentErrorType, environment]);
 
   return null;

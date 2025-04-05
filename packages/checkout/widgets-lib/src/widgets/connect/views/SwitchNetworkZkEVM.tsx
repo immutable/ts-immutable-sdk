@@ -27,6 +27,7 @@ export function SwitchNetworkZkEVM() {
       userJourney: UserJourney.CONNECT,
       screen: 'SwitchNetworkZkEVM',
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -61,6 +62,7 @@ export function SwitchNetworkZkEVM() {
     return () => {
       removeChainChangedListener(provider, checkCorrectNetwork);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout, provider]);
 
   const switchNetwork = useCallback(async () => {
@@ -154,6 +156,7 @@ export function SwitchNetworkZkEVM() {
     } catch (err: any) {
       setButtonTextKey(t('views.SWITCH_NETWORK.zkEVM.button.retryText'));
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [provider, checkout]);
 
   return (

@@ -61,6 +61,7 @@ export function WalletNetworkButton({
     }
 
     return walletProviderDetail?.info.name;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [walletProviderDetail, walletConnectPeerName, walletProvider]);
 
   useEffect(() => {

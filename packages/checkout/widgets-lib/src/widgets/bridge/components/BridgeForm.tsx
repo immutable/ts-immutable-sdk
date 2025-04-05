@@ -138,6 +138,7 @@ export function BridgeForm(props: BridgeFormProps) {
         );
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     tokenBalances,
     cryptoFiatState.conversions,
@@ -168,12 +169,14 @@ export function BridgeForm(props: BridgeFormProps) {
         amount: '',
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [amount, token, tokenBalances]);
 
   const selectedOption = useMemo(
     () => (formToken && formToken.token
       ? formatTokenOptionsId(formToken.token.symbol, formToken.token.address)
       : undefined),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [formToken, tokenBalances, cryptoFiatState.conversions, formatTokenOptionsId],
   );
 
@@ -196,6 +199,7 @@ export function BridgeForm(props: BridgeFormProps) {
         },
       });
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout, from, to]);
 
   const canFetchEstimates = (silently: boolean): boolean => {
@@ -255,6 +259,7 @@ export function BridgeForm(props: BridgeFormProps) {
       formToken.token.symbol,
       cryptoFiatState.conversions,
     ));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formAmount, formToken]);
 
   const bridgeFormValidator = useCallback((): boolean => {
@@ -297,6 +302,7 @@ export function BridgeForm(props: BridgeFormProps) {
         },
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     checkout,
     from?.browserProvider,

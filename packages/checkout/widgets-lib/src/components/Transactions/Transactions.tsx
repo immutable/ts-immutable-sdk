@@ -284,6 +284,7 @@ export function Transactions({
         setShowWalletDrawer(false);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [checkout],
   );
 
@@ -330,6 +331,7 @@ export function Transactions({
       tokens: await getTokensDetails(tokensWithChainSlug),
       transactions: localTxs.result,
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [from, getTransactionsDetails]);
 
   const { providers } = useInjectedProviders({ checkout });
@@ -360,6 +362,7 @@ export function Transactions({
 
       setLoading(false);
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [from, checkout]);
 
   useEffect(() => {
@@ -367,6 +370,7 @@ export function Transactions({
       userJourney: UserJourney.BRIDGE,
       screen: 'Transactions',
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

@@ -92,7 +92,7 @@ export function TransferForm({
       if (typeof optionKey !== 'string') throw new Error('Invalid token address');
       setViewState((s) => ({ ...s, tokenAddress: optionKey, amountError: '' }));
     },
-    [tokenOptions, token],
+    [track, setViewState],
   );
 
   const handleMaxButtonClick = useCallback(() => {
@@ -111,22 +111,22 @@ export function TransferForm({
       if (!token.balance) throw new Error('Token balance not found');
       return { ...s, amount: token.balance.fullBalance };
     });
-  }, [tokenOptions, token]);
+  }, [token, track, setViewState]);
 
   const handleRecipientAddressChange = useCallback((value: string) => {
     setViewState((s) => ({ ...s, toAddress: value, toAddressError: '' }));
-  }, []);
+  }, [setViewState]);
 
   const handleAmountChange = useCallback((value: string) => {
     setViewState((s) => ({ ...s, amount: value, amountError: '' }));
-  }, []);
+  }, [setViewState]);
 
   const selectSubtext = useMemo(() => {
     if (!token) return '';
     return `${t('views.TRANSFER.content.availableBalancePrefix')} ${
       token.balance?.formattedAmount
     }`;
-  }, [token]);
+  }, [t, token]);
 
   const isButtonDisabled = useMemo(
     () => !viewState.amount || !viewState.toAddress || !token,

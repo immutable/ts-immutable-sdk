@@ -21,6 +21,7 @@ export function ClaimWithdrawalInProgress({ transactionResponse }: ClaimWithdraw
       userJourney: UserJourney.BRIDGE,
       screen: 'ClaimWithdrawalInProgress',
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -68,6 +69,7 @@ export function ClaimWithdrawalInProgress({ transactionResponse }: ClaimWithdraw
         });
       }
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transactionResponse]);
 
   return <LoadingView loadingText={t('views.CLAIM_WITHDRAWAL.IN_PROGRESS.loading.text')} />;

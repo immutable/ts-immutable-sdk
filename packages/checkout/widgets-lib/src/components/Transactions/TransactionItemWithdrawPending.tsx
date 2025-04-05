@@ -68,6 +68,7 @@ export function TransactionItemWithdrawPending({
     }
     const timeDiffDays = timeDiffHours / 24; // days
     return relativeTimeFormat.format(Math.ceil(timeDiffDays), 'day');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateNowUnixMs, translation[1].language]);
 
   const withdrawalReadyToClaim = withdrawalReadyDate ? withdrawalReadyDate.getTime() < dateNowUnixMs : false;
@@ -75,6 +76,7 @@ export function TransactionItemWithdrawPending({
     () => (withdrawalReadyToClaim === true
       ? translation.t('views.TRANSACTIONS.status.withdrawalPending.withdrawalReadyText')
       : `${translation.t('views.TRANSACTIONS.status.withdrawalPending.withdrawalDelayText')} ${delayTimeString}`),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [delayTimeString, translation[1].language],
   );
 

@@ -56,6 +56,7 @@ export function SelectForm({
       onSelectChange(option.id);
       setCoinSelectorOpen(false);
     },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   })), [options, onSelectChange, setCoinSelectorOpen]);
 
   const getSelectedOption = () => {
@@ -76,6 +77,7 @@ export function SelectForm({
       controlType: 'Select',
       action: 'Opened',
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setCoinSelectorOpen, track]);
 
   return (

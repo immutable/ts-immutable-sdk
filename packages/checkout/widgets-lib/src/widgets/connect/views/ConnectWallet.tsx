@@ -40,6 +40,7 @@ export function ConnectWallet({
       userJourney: UserJourney.CONNECT,
       screen: 'ConnectWallet',
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

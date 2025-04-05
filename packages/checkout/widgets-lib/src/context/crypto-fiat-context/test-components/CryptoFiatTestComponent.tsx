@@ -17,6 +17,7 @@ export function CryptoFiatTestComponent({ tokenSymbols }: CryptoFiatTestComponen
         },
       });
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cryptoFiatDispatch]);
 
   return (

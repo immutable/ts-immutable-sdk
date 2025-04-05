@@ -101,7 +101,7 @@ export function OrderReview({
 
   const fundingBalance = useMemo(
     () => fundingBalances[selectedCurrencyIndex],
-    [fundingBalances, selectedCurrencyIndex, provider],
+    [fundingBalances, selectedCurrencyIndex],
   );
 
   useEffect(() => {
@@ -142,6 +142,7 @@ export function OrderReview({
         t,
       ),
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fundingBalance, conversions, provider]);
 
   useEffect(() => {
@@ -173,6 +174,7 @@ export function OrderReview({
         },
       ],
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gasFees, fundingBalance, conversions]);
 
   // Trigger page loaded event

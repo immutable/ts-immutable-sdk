@@ -32,6 +32,7 @@ export function WalletNetworkSelectionView({
       userJourney: UserJourney.BRIDGE,
       screen: 'WalletNetworkSelection',
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

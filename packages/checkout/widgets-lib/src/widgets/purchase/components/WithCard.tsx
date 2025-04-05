@@ -49,12 +49,8 @@ export function WithCard(props: WithCardProps) {
   const { environment } = checkout.config;
   const executeTxn = signResponse?.transactions.find((txn) => txn.methodCall.startsWith('execute'));
 
-  if (!signResponse || !executeTxn) {
-    return null;
-  }
-
   const nftData: TransakNFTData[] = useMemo(
-    () => signResponse.order.products.map((product) => ({
+    () => (signResponse?.order.products ?? []).map((product) => ({
       collectionAddress: product.collectionAddress,
       imageURL: product.image,
       nftName: product.name,
@@ -65,6 +61,10 @@ export function WithCard(props: WithCardProps) {
     })),
     [signResponse],
   );
+
+  if (!signResponse || !executeTxn) {
+    return null;
+  }
 
   return (
     <TransakIframe

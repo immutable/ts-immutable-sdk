@@ -168,6 +168,7 @@ export default function SwapWidget({
     }
 
     return true;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout, provider]);
 
   useEffect(() => {
@@ -193,6 +194,7 @@ export default function SwapWidget({
         showSwapView();
       }
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout, provider]);
 
   useEffect(() => {
@@ -215,6 +217,7 @@ export default function SwapWidget({
         },
       });
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout, provider]);
 
   useEffect(() => {
@@ -261,6 +264,7 @@ export default function SwapWidget({
     }
 
     return optionsArray;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

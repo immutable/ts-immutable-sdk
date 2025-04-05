@@ -136,6 +136,7 @@ export function Review({
         toTokenAddress: data.toTokenAddress,
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const getFromAmountAndRoute = async () => {
@@ -188,6 +189,7 @@ export function Review({
   const getRouteIntervalIdRef = useInterval(getFromAmountAndRoute, 20000);
   useEffect(() => {
     getFromAmountAndRoute();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const { totalFees, totalFeesUsd } = useMemo(
@@ -250,6 +252,7 @@ export function Review({
         {t('views.ADD_TOKENS.fees.zeroFees')}
       </Body>
     );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalFeesUsd]);
 
   const formattedDuration = route
@@ -387,6 +390,7 @@ export function Review({
         showHandover(AddTokensHandoverStep.FAIL, { axelarscanUrl });
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     route,
     squid,

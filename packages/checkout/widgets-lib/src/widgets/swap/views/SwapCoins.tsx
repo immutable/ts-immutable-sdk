@@ -76,12 +76,14 @@ export function SwapCoins({
         toTokenAddress,
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (hasZeroBalance(tokenBalances, IMX_TOKEN_SYMBOL) && !isPassportProvider(provider)) {
       setShowNotEnoughImxDrawer(true);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenBalances]);
 
   return (

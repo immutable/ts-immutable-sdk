@@ -131,6 +131,7 @@ export function WalletAndNetworkSelector() {
         || (providerDetail.info.rdns === WalletProviderRdns.PASSPORT
           && fromWallet?.providerDetail?.info?.rdns !== WalletProviderRdns.PASSPORT)
       ))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   ), [providers, fromNetwork, fromWallet]);
 
   useEffect(() => {
@@ -143,6 +144,7 @@ export function WalletAndNetworkSelector() {
         to: null,
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [from, to]);
 
   function clearToWalletSelections() {
@@ -215,6 +217,7 @@ export function WalletAndNetworkSelector() {
 
       await handleFromWalletConnectionSuccess(connectedProvider);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [checkout],
   );
 
@@ -236,6 +239,7 @@ export function WalletAndNetworkSelector() {
         },
       });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [checkout, fromWalletBrowserProvider],
   );
 
@@ -255,6 +259,7 @@ export function WalletAndNetworkSelector() {
         },
       });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [checkout, toWalletBrowserProvider],
   );
 
@@ -276,6 +281,7 @@ export function WalletAndNetworkSelector() {
         chainId: theToNetwork,
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fromWalletAddress, fromNetwork]);
 
   const handleWalletConnectToWalletConnection = useCallback(
@@ -299,6 +305,7 @@ export function WalletAndNetworkSelector() {
           });
         });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [handleSettingToNetwork],
   );
 
@@ -353,6 +360,7 @@ export function WalletAndNetworkSelector() {
         console.error(error);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       fromWalletProviderName,
       fromWalletBrowserProvider,
@@ -435,6 +443,7 @@ export function WalletAndNetworkSelector() {
         view: { type: BridgeWidgetViews.BRIDGE_FORM },
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     fromWallet,
     fromWalletBrowserProvider,

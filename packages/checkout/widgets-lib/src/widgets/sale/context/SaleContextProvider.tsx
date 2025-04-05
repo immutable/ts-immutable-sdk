@@ -230,6 +230,7 @@ export function SaleContextProvider(props: {
         },
       });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 
@@ -243,6 +244,7 @@ export function SaleContextProvider(props: {
     };
 
     getUserInfo();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [provider]);
 
   useEffect(() => {
@@ -260,6 +262,7 @@ export function SaleContextProvider(props: {
       const assessment = await fetchRiskAssessment([address], checkout.config);
       setRiskAssessment(assessment);
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout, provider]);
 
   const {
@@ -329,6 +332,7 @@ export function SaleContextProvider(props: {
       });
     },
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [paymentMethod, setPaymentMethod, executeResponse],
   );
 
@@ -349,17 +353,20 @@ export function SaleContextProvider(props: {
         },
       });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [[paymentMethod, executeResponse, tokenIds]],
   );
 
   useEffect(() => {
     if (!signError) return;
     goToErrorView(signError.type, signError.data);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signError]);
 
   useEffect(() => {
     if (!orderQuoteError) return;
     goToErrorView(orderQuoteError.type, orderQuoteError.data);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderQuoteError]);
 
   useEffect(() => {
@@ -415,6 +422,7 @@ export function SaleContextProvider(props: {
       hideExcludedPaymentTypes,
       riskAssessment,
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       config,
       environment,

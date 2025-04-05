@@ -114,6 +114,7 @@ export const useTransakEvents = (props: UseTransakEventsProps) => {
         },
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleEvents = useCallback((event: TransakEvent) => {
@@ -141,6 +142,7 @@ export const useTransakEvents = (props: UseTransakEventsProps) => {
       default:
         break;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleMessageEvent = useCallback(
@@ -156,6 +158,7 @@ export const useTransakEvents = (props: UseTransakEventsProps) => {
 
       console.log('@@@ Transak event', event); // eslint-disable-line no-console
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [ref],
   );
 
@@ -165,6 +168,7 @@ export const useTransakEvents = (props: UseTransakEventsProps) => {
       clearTimeout(timeout.current);
       window.removeEventListener('message', handleMessageEvent);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

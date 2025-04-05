@@ -339,6 +339,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       }
       return undefined;
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [items, environmentId, environment, provider],
   );
 
@@ -419,6 +420,7 @@ export const useSignOrder = (input: SignOrderInput) => {
 
       return executeResponse.transactions;
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       provider,
       executeTransaction,
@@ -463,6 +465,7 @@ export const useSignOrder = (input: SignOrderInput) => {
 
       return success;
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentTransactionIndex, provider, filteredTransactions],
   );
 

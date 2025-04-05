@@ -37,6 +37,7 @@ export function RouteFees({
       },
       prefix: '',
     })) ?? [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [routeData],
   );
 
@@ -54,6 +55,7 @@ export function RouteFees({
       },
       prefix: '',
     })) ?? [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [routeData],
   );
 

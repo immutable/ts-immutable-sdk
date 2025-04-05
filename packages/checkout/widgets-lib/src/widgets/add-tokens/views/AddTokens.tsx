@@ -288,6 +288,7 @@ export function AddTokens({
 
       await identifyUser(identify, toProvider!, { anonymousId });
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toProvider, lockedToProvider]);
 
   const toChain = useMemo(
@@ -310,6 +311,7 @@ export function AddTokens({
     }).then((ctx) => {
       trackFlow('commerce', `addTokensLoaded_${ctx.event.messageId}`);
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, isSwapAvailable]);
 
   useEffect(() => {
@@ -321,6 +323,7 @@ export function AddTokens({
     resetRoutes();
     setInsufficientBalance(false);
     setSelectedRouteData(undefined);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fromAddress]);
 
   useEffect(() => {
@@ -395,12 +398,14 @@ export function AddTokens({
         setFetchingRoutes(false);
       }
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [balances, squid, selectedToken, selectedAmount]);
 
   useEffect(() => {
     if (!selectedRouteData && routes.length > 0) {
       setSelectedRouteData(routes[0]);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routes]);
 
   useEffect(() => {
@@ -421,6 +426,7 @@ export function AddTokens({
       }
     };
     fetchOnRampTokens();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout, id]);
 
   const sendRequestOnRampEvent = async () => {
@@ -478,6 +484,7 @@ export function AddTokens({
     if (toProvider && payWithCardClicked) {
       sendRequestOnRampEvent();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toProvider, payWithCardClicked]);
 
   const handleRouteClick = (route: RouteData) => {
@@ -634,6 +641,7 @@ export function AddTokens({
         preselectedToken: experiments[AddTokensExperiments.PRESELECTED_TOKEN] || 'none',
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, experiments]);
 
   useEffect(() => {

@@ -29,6 +29,7 @@ export function TokenImage({
           || (theme && getDefaultTokenImage(environment, theme))
           || ''
       : src),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [src, error],
   );
 

@@ -162,11 +162,13 @@ export default function ConnectWidget({
         } as ConnectWidgetView,
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deepLink, sendCloseEventOverride, environment]);
 
   useEffect(() => {
     if (viewState.view.type !== SharedViews.ERROR_VIEW) return;
     sendConnectFailedEvent(eventTarget, viewState.view.error.message);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewState]);
 
   useEffect(() => {
@@ -177,6 +179,7 @@ export default function ConnectWidget({
         WalletConnectManager.getInstance() as unknown as IWalletConnectManager,
       );
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isWalletConnectEnabled, ethereumProvider]);
 
   const handleConnectSuccess = useCallback(async () => {
@@ -210,6 +213,7 @@ export default function ConnectWidget({
       return;
     }
     sendConnectSuccessEvent(eventTarget, provider, walletProviderName ?? undefined, walletProviderInfo);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [provider, identify]);
 
   return (

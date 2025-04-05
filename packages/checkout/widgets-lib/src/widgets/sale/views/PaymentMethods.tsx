@@ -103,12 +103,15 @@ export function PaymentMethods() {
         },
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentMethod]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => sendPageView(SaleWidgetViews.PAYMENT_METHODS), []); // checkoutPrimarySalePaymentMethodsViewed
   useEffect(() => {
     if (!invalidParameters) return;
     goToErrorView(SaleErrorTypes.INVALID_PARAMETERS);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [invalidParameters]);
 
   return (

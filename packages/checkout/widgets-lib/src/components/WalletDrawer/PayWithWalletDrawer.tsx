@@ -62,6 +62,7 @@ export function PayWithWalletDrawer({
         <MenuItem.Label>{t('drawers.wallet.payWithCard')}</MenuItem.Label>
       </MenuItem>
     );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onClose, onPayWithCard]);
 
   return (

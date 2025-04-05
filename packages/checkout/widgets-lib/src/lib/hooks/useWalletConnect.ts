@@ -145,6 +145,7 @@ export const useWalletConnect = () => {
         openModal(ethereumProvider, resolve, reject);
       }
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ethereumProvider, walletConnectModal, isWalletConnectEnabled]);
 
   const getWalletLogoUrl = useCallback(async () => await WalletConnectManager.getInstance().getWalletLogoUrl(), []);

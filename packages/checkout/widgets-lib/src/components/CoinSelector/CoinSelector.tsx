@@ -43,6 +43,7 @@ export function CoinSelector({
       return options;
     }
     return filterOptions(searchValue, options);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [options, searchValue, filterOptions]);
 
   const handleCloseDrawer = () => {

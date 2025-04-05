@@ -174,6 +174,7 @@ export function FundingRouteExecute({
         setView(FundingRouteExecuteViews.EXECUTE_ON_RAMP);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [provider, checkout],
   );
 
@@ -186,6 +187,7 @@ export function FundingRouteExecute({
     } catch (err) {
       sendFailEvent(err);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fundingRouteStep]);
 
   const onCloseWidget = () => {
@@ -296,6 +298,7 @@ export function FundingRouteExecute({
         handleCustomEvent,
       );
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -305,6 +308,7 @@ export function FundingRouteExecute({
         eventTarget,
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout]);
 
   return (

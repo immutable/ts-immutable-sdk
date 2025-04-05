@@ -43,6 +43,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
       userJourney: UserJourney.BRIDGE,
       screen: 'ClaimWithdrawal',
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [txProcessing, setTxProcessing] = useState(false);
@@ -213,6 +214,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
     } finally {
       setTxProcessing(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenBridge, from, withdrawalResponse]);
 
   return (
