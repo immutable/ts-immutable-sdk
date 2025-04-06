@@ -11,6 +11,7 @@ export interface CheckoutOverrides {
   chainSlug?: ChainSlug;
   baseUrl?: string;
   l2ChainId?: ChainId;
+  remoteConfigEndpoint?: string;
   [key: string]: unknown;
 }
 

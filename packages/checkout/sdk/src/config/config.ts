@@ -4,6 +4,7 @@ import {
 } from '../types';
 import { RemoteConfigFetcher } from './remoteConfigFetcher';
 import {
+  CHECKOUT_CDN_BASE_URL,
   DEFAULT_BRIDGE_ENABLED,
   DEFAULT_ON_RAMP_ENABLED,
   DEFAULT_SWAP_ENABLED,
@@ -44,12 +45,6 @@ const getChainSlug = (prod: boolean, dev: boolean) => {
   return ChainSlug.IMTBL_ZKEVM_TESTNET;
 };
 
-// **************************************************** //
-// This is duplicated in the widget-lib project.        //
-// We are not exposing these functions given that this  //
-// to keep the Checkout SDK interface as minimal as     //
-// possible.                                            //
-// **************************************************** //
 export const getL1ChainId = (config: CheckoutConfiguration): ChainId => {
   // DevMode and Sandbox will both use Sepolia.
   if (!config.isProduction) return ChainId.SEPOLIA;
@@ -61,8 +56,12 @@ export const getL2ChainId = (config: CheckoutConfiguration): ChainId => {
   if (config.isProduction) return ChainId.IMTBL_ZKEVM_MAINNET;
   return ChainId.IMTBL_ZKEVM_TESTNET;
 };
-// **************************************************** //
-// **************************************************** //
+
+const getRemoteConfigEndpoint = (prod: boolean, dev: boolean) => {
+  if (dev) return CHECKOUT_CDN_BASE_URL[ENV_DEVELOPMENT];
+  if (prod) return CHECKOUT_CDN_BASE_URL[Environment.PRODUCTION];
+  return CHECKOUT_CDN_BASE_URL[Environment.SANDBOX];
+};
 
 export class CheckoutConfiguration {
   // This is a hidden feature that is only available
@@ -113,9 +112,11 @@ export class CheckoutConfiguration {
 
     this.networkMap = config.overrides?.networkMap ?? networkMap(this.isProduction, this.isDevelopment);
 
+    const remoteConfigEndpoint = config.overrides?.remoteConfigEndpoint
+      ?? getRemoteConfigEndpoint(this.isProduction, this.isDevelopment);
+
     this.remote = new RemoteConfigFetcher(httpClient, {
-      isDevelopment: this.isDevelopment,
-      isProduction: this.isProduction,
+      remoteConfigEndpoint,
     });
 
     this.tokens = new TokensFetcher(httpClient, this.remote, {
