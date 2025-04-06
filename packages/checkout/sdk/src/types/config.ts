@@ -2,12 +2,14 @@ import { Environment, ModuleConfiguration } from '@imtbl/config';
 import { ExchangeOverrides, SecondaryFee } from '@imtbl/dex-sdk';
 import { Passport } from '@imtbl/passport';
 import { TokenBridgeInfo, TokenInfo } from './tokenInfo';
-import { ChainId } from './chains';
+import { ChainId, ChainSlug } from './chains';
 import { NetworkMap } from './network';
 
 export interface CheckoutOverrides {
   environment?: Environment;
   networkMap?: NetworkMap;
+  chainSlug?: ChainSlug;
+  baseUrl?: string;
   [key: string]: unknown;
 }
 
