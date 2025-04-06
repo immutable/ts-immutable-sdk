@@ -1,12 +1,16 @@
 import { Environment } from '@imtbl/config';
-import { CheckoutModuleConfiguration, ChainId, NetworkMap } from '../types';
+import {
+  CheckoutModuleConfiguration, ChainId, NetworkMap, ChainSlug,
+} from '../types';
 import { RemoteConfigFetcher } from './remoteConfigFetcher';
 import {
   DEFAULT_BRIDGE_ENABLED,
   DEFAULT_ON_RAMP_ENABLED,
   DEFAULT_SWAP_ENABLED,
   DEV_CHAIN_ID_NETWORK_MAP,
+  ENV_DEVELOPMENT,
   globalPackageVersion,
+  IMMUTABLE_API_BASE_URL,
   PRODUCTION_CHAIN_ID_NETWORK_MAP,
   SANDBOX_CHAIN_ID_NETWORK_MAP,
 } from '../env';
@@ -26,6 +30,18 @@ const networkMap = (prod: boolean, dev: boolean) => {
   if (dev) return DEV_CHAIN_ID_NETWORK_MAP;
   if (prod) return PRODUCTION_CHAIN_ID_NETWORK_MAP;
   return SANDBOX_CHAIN_ID_NETWORK_MAP;
+};
+
+const getBaseUrl = (prod: boolean, dev: boolean) => {
+  if (dev) return IMMUTABLE_API_BASE_URL[ENV_DEVELOPMENT];
+  if (prod) return IMMUTABLE_API_BASE_URL[Environment.PRODUCTION];
+  return IMMUTABLE_API_BASE_URL[Environment.SANDBOX];
+};
+
+const getChainSlug = (prod: boolean, dev: boolean) => {
+  if (dev) return ChainSlug.IMTBL_ZKEVM_DEVNET;
+  if (prod) return ChainSlug.IMTBL_ZKEVM_MAINNET;
+  return ChainSlug.IMTBL_ZKEVM_TESTNET;
 };
 
 // **************************************************** //
@@ -99,8 +115,8 @@ export class CheckoutConfiguration {
     });
 
     this.tokens = new TokensFetcher(httpClient, this.remote, {
-      isDevelopment: this.isDevelopment,
-      isProduction: this.isProduction,
+      baseUrl: config.overrides?.baseUrl ?? getBaseUrl(this.isProduction, this.isDevelopment),
+      chainSlug: config.overrides?.chainSlug ?? getChainSlug(this.isProduction, this.isDevelopment),
     });
 
     this.overrides = config.overrides ?? {};
