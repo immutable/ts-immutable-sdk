@@ -1,6 +1,6 @@
 import { Environment } from '@imtbl/config';
 import { AxiosResponse } from 'axios';
-import { ChainId, RemoteConfiguration } from '../types';
+import { ChainId, ChainSlug, RemoteConfiguration } from '../types';
 import { RemoteConfigFetcher } from './remoteConfigFetcher';
 import { ENV_DEVELOPMENT } from '../env';
 import { HttpClient } from '../api/http';
@@ -110,9 +110,8 @@ describe('TokensFetcher', () => {
             mockedHttpClient,
             mockedConfigClient,
             {
-              isDevelopment: env === ENV_DEVELOPMENT,
-              isProduction:
-                env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
+              baseUrl: env === ENV_DEVELOPMENT ? 'devUrl' : 'nonDevUrl',
+              chainSlug: env === Environment.PRODUCTION ? ChainSlug.IMTBL_ZKEVM_MAINNET : ChainSlug.IMTBL_ZKEVM_TESTNET,
             },
           );
 
@@ -194,9 +193,8 @@ describe('TokensFetcher', () => {
             mockedHttpClient,
             mockedConfigClient,
             {
-              isDevelopment: env === ENV_DEVELOPMENT,
-              isProduction:
-                env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
+              baseUrl: env === ENV_DEVELOPMENT ? 'devUrl' : 'nonDevUrl',
+              chainSlug: env === Environment.PRODUCTION ? ChainSlug.IMTBL_ZKEVM_MAINNET : ChainSlug.IMTBL_ZKEVM_TESTNET,
             },
           );
 
