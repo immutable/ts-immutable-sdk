@@ -20,8 +20,7 @@ describe('TokensFetcher', () => {
   beforeEach(() => {
     mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     mockedConfigClient = new RemoteConfigFetcher(mockedHttpClient, {
-      isDevelopment: true,
-      isProduction: false,
+      remoteConfigEndpoint: 'configUrl',
     }) as jest.Mocked<RemoteConfigFetcher>;
 
     mockedConfigClient.getConfig.mockResolvedValue({
