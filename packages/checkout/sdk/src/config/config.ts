@@ -89,6 +89,10 @@ export class CheckoutConfiguration {
 
   readonly publishableKey: string;
 
+  readonly l1ChainId: ChainId;
+
+  readonly l2ChainId: ChainId;
+
   readonly overrides: CheckoutModuleConfiguration['overrides'];
 
   constructor(config: CheckoutModuleConfiguration, httpClient: HttpClient) {
@@ -118,6 +122,9 @@ export class CheckoutConfiguration {
       baseUrl: config.overrides?.baseUrl ?? getBaseUrl(this.isProduction, this.isDevelopment),
       chainSlug: config.overrides?.chainSlug ?? getChainSlug(this.isProduction, this.isDevelopment),
     });
+
+    this.l1ChainId = getL1ChainId(this);
+    this.l2ChainId = config.overrides?.l2ChainId ?? getL2ChainId(this);
 
     this.overrides = config.overrides ?? {};
   }

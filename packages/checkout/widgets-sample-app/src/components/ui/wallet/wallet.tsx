@@ -1,32 +1,80 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AddTokensEventType,
   Checkout,
   OnRampEventType,
   OrchestrationEventType,
   WalletEventType,
-  WalletProviderName,
+  ChainSlug,
+  ChainName,
+  ChainId,
   WidgetTheme,
   WidgetType,
+  Widget,
 } from "@imtbl/checkout-sdk";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import { Environment } from "@imtbl/config";
+import { passport } from "../../../utils/passport";
+
+const ZKEVM_NATIVE_TOKEN = {
+  name: "IMX",
+  symbol: "IMX",
+  decimals: 18,
+  address: "native",
+};
+
+const DEV_CHAIN_ID_NETWORK_MAP = new Map([
+  [
+    ChainId.SEPOLIA,
+    {
+      chainIdHex: `0x${ChainId.SEPOLIA.toString(16)}`,
+      chainName: ChainName.SEPOLIA,
+      rpcUrls: ["https://checkout-api.dev.immutable.com/v1/rpc/eth-sepolia"],
+      nativeCurrency: {
+        name: "Sep Eth",
+        symbol: "ETH",
+        decimals: 18,
+      },
+      blockExplorerUrls: ["https://sepolia.etherscan.io/"],
+    },
+  ],
+  [
+    ChainId.IMTBL_ZKEVM_DEVNET,
+    {
+      chainIdHex: `0x${ChainId.IMTBL_ZKEVM_DEVNET.toString(16)}`,
+      chainName: ChainName.IMTBL_ZKEVM_DEVNET,
+      rpcUrls: ["https://rpc.dev.immutable.com"],
+      nativeCurrency: ZKEVM_NATIVE_TOKEN,
+    },
+  ],
+]);
 
 function WalletUI() {
-  const checkout = useMemo(
-    () =>
-      new Checkout({
-        baseConfig: { environment: Environment.SANDBOX },
-      }),
-    []
-  );
-  const factory = useMemo(() => new WidgetsFactory(checkout, {}), [checkout]);
-  const wallet = useMemo(() => factory.create(WidgetType.WALLET), [factory]);
-  const addTokens = useMemo(
-    () => factory.create(WidgetType.ADD_TOKENS),
-    [factory]
-  );
-  const onRamp = useMemo(() => factory.create(WidgetType.ONRAMP), [factory]);
+  const [wallet, setWallet] = useState<Widget<WidgetType.WALLET> | null>(null);
+  const [addTokens, setAddTokens] = useState<Widget<WidgetType.ADD_TOKENS> | null>(null);
+  const [onRamp, setOnRamp] = useState<Widget<WidgetType.ONRAMP> | null>(null);
+
+  useEffect(() => {
+    passport.connectEvm().then(() => {
+      const checkout = new Checkout({
+        baseConfig: {
+          environment: Environment.SANDBOX,
+        },
+        passport,
+        overrides: {
+          networkMap: DEV_CHAIN_ID_NETWORK_MAP,
+          baseUrl: "https://api.dev.immutable.com",
+          chainSlug: ChainSlug.IMTBL_ZKEVM_DEVNET,
+          l2ChainId: ChainId.IMTBL_ZKEVM_DEVNET,
+        }
+      });
+      const factory = new WidgetsFactory(checkout, { theme: WidgetTheme.DARK });
+      setWallet(factory.create(WidgetType.WALLET));
+      setAddTokens(factory.create(WidgetType.ADD_TOKENS));
+      setOnRamp(factory.create(WidgetType.ONRAMP));
+    })
+  }, []);
+  
 
   // Use this to connect to a wallet and skip connect loader
   // useEffect(() => {
@@ -50,23 +98,24 @@ function WalletUI() {
   // }, [checkout]);
 
   const unmount = () => {
-    wallet.unmount();
+    wallet?.unmount();
   };
   const mount = () => {
-    wallet.mount("wallet");
+    wallet?.mount("wallet");
   };
   const update = (theme: WidgetTheme) => {
-    wallet.update({ config: { theme } });
-    addTokens.update({ config: { theme } });
-    onRamp.update({ config: { theme } });
+    wallet?.update({ config: { theme } });
+    addTokens?.update({ config: { theme } });
+    onRamp?.update({ config: { theme } });
   };
   const updateLanguage = (language: any) => {
-    wallet.update({ config: { language } });
-    addTokens.update({ config: { language } });
-    onRamp.update({ config: { language } });
+    wallet?.update({ config: { language } });
+    addTokens?.update({ config: { language } });
+    onRamp?.update({ config: { language } });
   };
 
   useEffect(() => {
+    if (!wallet || !addTokens || !onRamp) return;
     mount();
     wallet.addListener(WalletEventType.NETWORK_SWITCH, (data) => {
       console.log("NETWORK_SWITCH", data);
@@ -98,7 +147,7 @@ function WalletUI() {
     onRamp.addListener(OnRampEventType.CLOSE_WIDGET, () => {
       onRamp.unmount();
     });
-  }, []);
+  }, [wallet, addTokens, onRamp]);
 
   return (
     <div>

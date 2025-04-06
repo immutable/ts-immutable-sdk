@@ -14,7 +14,6 @@ import { useTranslation } from 'react-i18next';
 import { ChainId, Checkout, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { FooterLogo } from '../Footer/FooterLogo';
-import { getL1ChainId } from '../../lib';
 import { getChainNameById } from '../../lib/chains';
 import {
   isMetaMaskProvider,
@@ -51,7 +50,7 @@ export function NetworkSwitchDrawer({
   );
 
   const targetChainName = getChainNameById(targetChainId);
-  const showEthImage = targetChainId === getL1ChainId(checkout.config);
+  const showEthImage = targetChainId === checkout.config.l1ChainId;
 
   const handleSwitchNetwork = useCallback(async () => {
     if (!checkout) return;

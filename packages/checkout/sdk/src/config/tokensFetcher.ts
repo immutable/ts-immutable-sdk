@@ -189,8 +189,10 @@ export class TokensFetcher {
   }
 
   private async fetchIMXTokenMappings() {
-    return (await this.remoteConfig.getConfig(
+    const i = await this.remoteConfig.getConfig(
       'imxAddressMapping',
-    )) as ImxAddressConfig;
+    ) as ImxAddressConfig;
+    i['15003'] = 'native'; // devnet
+    return i;
   }
 }

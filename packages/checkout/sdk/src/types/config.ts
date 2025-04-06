@@ -10,6 +10,7 @@ export interface CheckoutOverrides {
   networkMap?: NetworkMap;
   chainSlug?: ChainSlug;
   baseUrl?: string;
+  l2ChainId?: ChainId;
   [key: string]: unknown;
 }
 
