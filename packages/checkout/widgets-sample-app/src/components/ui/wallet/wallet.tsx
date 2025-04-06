@@ -1,13 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AddTokensEventType,
   Checkout,
   OnRampEventType,
   OrchestrationEventType,
   WalletEventType,
-  ChainSlug,
-  ChainName,
-  ChainId,
   WidgetTheme,
   WidgetType,
   Widget,
@@ -15,39 +12,6 @@ import {
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import { Environment } from "@imtbl/config";
 import { passport } from "../../../utils/passport";
-
-const ZKEVM_NATIVE_TOKEN = {
-  name: "IMX",
-  symbol: "IMX",
-  decimals: 18,
-  address: "native",
-};
-
-const DEV_CHAIN_ID_NETWORK_MAP = new Map([
-  [
-    ChainId.SEPOLIA,
-    {
-      chainIdHex: `0x${ChainId.SEPOLIA.toString(16)}`,
-      chainName: ChainName.SEPOLIA,
-      rpcUrls: ["https://checkout-api.dev.immutable.com/v1/rpc/eth-sepolia"],
-      nativeCurrency: {
-        name: "Sep Eth",
-        symbol: "ETH",
-        decimals: 18,
-      },
-      blockExplorerUrls: ["https://sepolia.etherscan.io/"],
-    },
-  ],
-  [
-    ChainId.IMTBL_ZKEVM_DEVNET,
-    {
-      chainIdHex: `0x${ChainId.IMTBL_ZKEVM_DEVNET.toString(16)}`,
-      chainName: ChainName.IMTBL_ZKEVM_DEVNET,
-      rpcUrls: ["https://rpc.dev.immutable.com"],
-      nativeCurrency: ZKEVM_NATIVE_TOKEN,
-    },
-  ],
-]);
 
 function WalletUI() {
   const [wallet, setWallet] = useState<Widget<WidgetType.WALLET> | null>(null);
@@ -61,12 +25,6 @@ function WalletUI() {
           environment: Environment.SANDBOX,
         },
         passport,
-        overrides: {
-          networkMap: DEV_CHAIN_ID_NETWORK_MAP,
-          baseUrl: "https://api.dev.immutable.com",
-          chainSlug: ChainSlug.IMTBL_ZKEVM_DEVNET,
-          l2ChainId: ChainId.IMTBL_ZKEVM_DEVNET,
-        }
       });
       const factory = new WidgetsFactory(checkout, { theme: WidgetTheme.DARK });
       setWallet(factory.create(WidgetType.WALLET));
