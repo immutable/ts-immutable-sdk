@@ -6,6 +6,8 @@ This prompt helps you:
 2. Update an existing feature implementation
 3. Safely handle manually edited code
 
+Make sure to always write tests first. You must do Test Driven Development. Go over the test file and check if the test exist for {feature name}. If not, make the tests, then proceed with the feature page implementation.
+If the tests aren't passing, fix the feature page until all of the tests are passing.
 **IMPORTANT**: Before running this prompt:
 - If the {feature name} in the features.json file has the field of 'manually-edited' as true, the prompt will alert you before making changes
 - To add a new feature, specify the feature name that doesn't exist yet

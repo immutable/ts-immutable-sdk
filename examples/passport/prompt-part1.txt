@@ -1,5 +1,6 @@
 ## Immutable Passport SDK Example App Generator - Part 1: Create the App
 
+Make sure to always write tests first. You must do Test Driven Development.
 # Overview
 This prompt helps you create a new React example app that demonstrates the {feature name} feature of the Immutable Passport SDK. The output will be a fully functional, self-contained example with proper documentation and adherence to best practices.
 
@@ -88,8 +89,19 @@ The feature name in the features.json file will always be {feature name}
 The manually-edited field will always be false if you're the one who's generating the feature.
 Set the order field to be {total number of apps under product (e.g. passport, checkout, etc)} + 1
 
+# Step 3: Testing Files
+COPY OVER THE RELEVANT E2E TEST FILES (INCLUDING SETUP, ETC) FROM OTHER EXAMPLE APPS SUCH AS LOGIN-WITH-NEXTJS
 
-# Step 3: Component Implementation
+- Add the following dependencies to package.json:
+  - @playwright/test
+
+- Test all pages renders perfectly
+- Test {feature name} functionality thoroughly with all possible scenarios. (If it's Passport specific, this is not required)
+- Test all {feature name} handling and cleanup
+- Explicitly validate that components render without errors
+- Use act() for all asynchronous operations
+
+# Step 4: Component Implementation
 
 ## Critical Import/Export Requirements
 For ALL component files:
@@ -126,7 +138,7 @@ Create minimal, functional redirect and logout pages:
 - Go to the features.json file and check for the silent login field.
 - If {feature name} has the silent login field as true, go through all of the pages in the app and change all login modes to silent login.
 
-# Step 3: Documentation
+# Step 5: Documentation
 IMPORTANT: Ensure that the command for installation, etc uses pnpm not npm.
 Create a comprehensive README.md including:
 - {feature name} feature description and purpose
@@ -136,19 +148,7 @@ Create a comprehensive README.md including:
 - References to official documentation
 - {feature name} cleanup best practices
 
-# Step 4: Testing Files
-COPY OVER THE RELEVANT E2E TEST FILES (INCLUDING SETUP, ETC) FROM OTHER EXAMPLE APPS SUCH AS LOGIN-WITH-NEXTJS
-
-- Add the following dependencies to package.json:
-  - @playwright/test
-
-- Test all pages renders perfectly
-- Test {feature name} functionality thoroughly with all possible scenarios. (If it's Passport specific, this is not required)
-- Test all {feature name} handling and cleanup
-- Explicitly validate that components render without errors
-- Use act() for all asynchronous operations
-
-# Step 5: Implementation Guidelines
+# Step 6: Implementation Guidelines
 IMPORTANT: MAKE SURE THAT THE PASSPORT SDK IS INITIALIZED CORRECTLY IN THE SETUPDEFAULT.TS FILE. REFER TO OTHER EXAMPLE APPS LIKE LOGIN-WITH-NEXTJS FOR THE CORRECT SETUP.
 ## SDK Usage Best Practices
 - Use only documented public SDK methods
