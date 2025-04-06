@@ -38,7 +38,7 @@ import {
   getProviderSlugFromRdns,
   isPassportProvider,
 } from '../../../lib/provider';
-import { addProviderListenersForWidgetRoot, getL1ChainId } from '../../../lib';
+import { addProviderListenersForWidgetRoot } from '../../../lib';
 import {
   listItemVariants,
   listVariants,
@@ -96,7 +96,7 @@ export function WalletList(props: WalletListProps) {
 
   // Don't allow Passport if targetChainId is L1
   const passportProviderDetail = useMemo(
-    () => targetChainId !== getL1ChainId(checkout!.config)
+    () => targetChainId !== checkout!.config.l1ChainId
       && providers
         .filter((provider) => !blocklistWalletRdns.includes(provider.info.rdns))
         .find((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT),

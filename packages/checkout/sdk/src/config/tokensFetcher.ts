@@ -1,4 +1,3 @@
-import { Environment } from '@imtbl/config';
 import { AxiosResponse } from 'axios';
 import {
   ChainId,
@@ -7,7 +6,6 @@ import {
   ImxAddressConfig,
   TokenBridgeInfo,
 } from '../types';
-import { ENV_DEVELOPMENT, IMMUTABLE_API_BASE_URL } from '../env';
 import { HttpClient } from '../api/http';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { RemoteConfigFetcher } from './remoteConfigFetcher';
@@ -35,8 +33,8 @@ type TokensEndpointResponse = {
 };
 
 export type RemoteConfigParams = {
-  isDevelopment: boolean;
-  isProduction: boolean;
+  baseUrl: string;
+  chainSlug: ChainSlug;
 };
 
 export class TokensFetcher {
@@ -44,9 +42,9 @@ export class TokensFetcher {
 
   private remoteConfig: RemoteConfigFetcher;
 
-  private readonly isDevelopment: boolean;
+  private readonly baseUrl: string;
 
-  private readonly isProduction: boolean;
+  private readonly chainSlug: ChainSlug;
 
   private tokensCache: ChainTokensConfig | undefined;
 
@@ -55,23 +53,11 @@ export class TokensFetcher {
     remoteConfig: RemoteConfigFetcher,
     params: RemoteConfigParams,
   ) {
-    this.isDevelopment = params.isDevelopment;
-    this.isProduction = params.isProduction;
+    this.baseUrl = params.baseUrl;
+    this.chainSlug = params.chainSlug;
     this.httpClient = httpClient;
     this.remoteConfig = remoteConfig;
   }
-
-  private getBaseUrl = () => {
-    if (this.isDevelopment) return IMMUTABLE_API_BASE_URL[ENV_DEVELOPMENT];
-    if (this.isProduction) return IMMUTABLE_API_BASE_URL[Environment.PRODUCTION];
-    return IMMUTABLE_API_BASE_URL[Environment.SANDBOX];
-  };
-
-  private getChainSlug = () => {
-    if (this.isDevelopment) return ChainSlug.IMTBL_ZKEVM_DEVNET;
-    if (this.isProduction) return ChainSlug.IMTBL_ZKEVM_MAINNET;
-    return ChainSlug.IMTBL_ZKEVM_TESTNET;
-  };
 
   private async loadTokens(): Promise<ChainTokensConfig | undefined> {
     if (this.tokensCache) {
@@ -81,7 +67,7 @@ export class TokensFetcher {
     let response: AxiosResponse;
     try {
       response = await this.httpClient.get(
-        `${this.getBaseUrl()}/v1/chains/${this.getChainSlug()}/tokens?verification_status=verified&is_canonical=true`,
+        `${this.baseUrl}/v1/chains/${this.chainSlug}/tokens?verification_status=verified&is_canonical=true`,
       );
     } catch (err: any) {
       throw new CheckoutError(
@@ -203,8 +189,8 @@ export class TokensFetcher {
   }
 
   private async fetchIMXTokenMappings() {
-    return (await this.remoteConfig.getConfig(
+    return await this.remoteConfig.getConfig(
       'imxAddressMapping',
-    )) as ImxAddressConfig;
+    ) as ImxAddressConfig;
   }
 }

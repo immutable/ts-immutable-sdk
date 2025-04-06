@@ -46,7 +46,6 @@ import {
   ViewActions,
   ViewContext,
 } from '../../../../context/view-context/ViewContext';
-import { getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
 import { LoadingView } from '../../../../views/loading/LoadingView';
 import ConnectWidget from '../../../connect/ConnectWidget';
 import SwapWidget from '../../../swap/SwapWidget';
@@ -142,7 +141,7 @@ export function FundingRouteExecute({
           tokenAddress: step.fundingItem.token.address,
           amount: step.fundingItem.fundsRequired.formattedAmount,
         });
-        if (Number(network.chainId) === getL1ChainId(checkout!.config)) {
+        if (Number(network.chainId) === checkout!.config.l1ChainId) {
           setView(FundingRouteExecuteViews.EXECUTE_BRIDGE);
           return;
         }
@@ -158,7 +157,7 @@ export function FundingRouteExecute({
           toTokenAddress: requiredTokenAddress,
           autoProceed: true,
         });
-        if (Number(network.chainId) === getL2ChainId(checkout!.config)) {
+        if (Number(network.chainId) === checkout!.config.l2ChainId) {
           setView(FundingRouteExecuteViews.EXECUTE_SWAP);
           return;
         }
