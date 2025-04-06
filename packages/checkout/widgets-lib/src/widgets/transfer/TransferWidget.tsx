@@ -22,7 +22,6 @@ import {
 } from '../../context/crypto-fiat-context/CryptoFiatContext';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { sendTokens, loadBalances } from './functions';
-import { getL2ChainId } from '../../lib';
 import { TransferComplete } from './TransferComplete';
 import { SendingTokens } from './SendingTokens';
 import { AwaitingApproval } from './AwaitingApproval';
@@ -154,7 +153,7 @@ function TransferWidgetInner(props: TransferWidgetInputs) {
       setViewState({
         type: 'COMPLETE',
         receipt,
-        chainId: getL2ChainId(viewState.checkout.config),
+        chainId: viewState.checkout.config.l2ChainId,
         checkout: viewState.checkout,
         provider: viewState.provider,
         allowedBalances: viewState.allowedBalances,
