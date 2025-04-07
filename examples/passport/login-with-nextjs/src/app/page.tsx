@@ -18,12 +18,6 @@ export default function Home() {
       <Button       
       className="mb-1"
       size="medium" 
-      rc={<NextLink href="/login-with-passport-bridge" />}>
-        Login with Passport Bridge
-      </Button>
-      <Button       
-      className="mb-1"
-      size="medium" 
       rc={<NextLink href="/login-with-etherjs" />}>
         Login with EtherJS
       </Button> 
