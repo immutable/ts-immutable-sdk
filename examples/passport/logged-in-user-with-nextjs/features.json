@@ -1,8 +1,23 @@
 {
     "features": [
-        "linked-addresses-with-passport",
-        "user-info-with-passport",
-        "verify-tokens-with-nextjs"
+        {
+            "feature": "linked-addresses-with-passport",
+            "manually-edited": true,
+            "silent-login": true,
+            "silent-logout": true
+        },
+        {
+            "feature": "user-info-with-passport",
+            "manually-edited": true,
+            "silent-login": true,
+            "silent-logout": true
+        },
+        {
+            "feature": "verify-tokens-with-nextjs",
+            "manually-edited": true,
+            "silent-login": true,
+            "silent-logout": true
+        }
     ],
     "order": 2
 }
