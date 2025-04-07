@@ -12,9 +12,13 @@
   "dependencies": {
     "@biom3/react": "^0.25.21",
     "@imtbl/sdk": "workspace:*",
+    "@tanstack/react-query": "^5.51.11",
     "next": "14.2.25",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "siwe": "^3.0.0",
+    "viem": "2.x",
+    "wagmi": "^2.11.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.45.3",

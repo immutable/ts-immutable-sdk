@@ -10,7 +10,8 @@ test.describe("home page", () => {
     const buttonNames = [
       "Linked Addresses with Passport",
       "User Info with Passport",
-      "Verify Tokens with NextJS"
+      "Verify Tokens with NextJS",
+      "Link External Wallet"
     ];
 
     for (const name of buttonNames) {
@@ -48,6 +49,16 @@ test.describe("sub-pages navigation", () => {
     await expect(page.getByRole("row", { name: /Account Address/ })).toBeVisible();
     await expect(page.getByRole("row", { name: /ID Token/ })).toBeVisible();
     await expect(page.getByRole("row", { name: /Access Token/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Return to Examples" })).toBeVisible();
+  });
+
+  test("Check Link External Wallet", async ({ page }) => {
+    await page.click("text=Link External Wallet");
+    await expect(page.getByRole("heading", { name: "Link External Wallet" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Login|Logged In/ })).toBeVisible();
+    await expect(page.getByRole("row", { name: /Is Logged In/ })).toBeVisible();
+    await expect(page.getByRole("row", { name: /Account Address/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Connect Wallet" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Return to Examples" })).toBeVisible();
   });
 });
