@@ -1,4 +1,4 @@
-## Immutable Passport SDK Example App Generator - Part 2: Adding or Updating {feature name}
+## Immutable Contracts SDK Example App Generator - Part 2: Adding or Updating {feature name}
 
 ### Usage Instructions
 This prompt helps you:
@@ -6,14 +6,16 @@ This prompt helps you:
 2. Update an existing feature implementation
 3. Safely handle manually edited code
 
+Make sure to always write tests first. You must do Test Driven Development. Go over the test file and check if the test exist for {feature name}. If not, make the tests, then proceed with the feature page implementation.
+If the tests aren't passing, fix the feature page until all of the tests are passing.
 **IMPORTANT**: Before running this prompt:
-- If the feature file contains the comment `/* MANUALLY EDITED - DO NOT OVERWRITE */`, the prompt will alert you before making changes
+- If the {feature name} in the features.json file has the field of 'manually-edited' as true, the prompt will alert you before making changes
 - To add a new feature, specify the feature name that doesn't exist yet
 - To update a feature, specify the existing feature name to be updated
 
 ### Initial Analysis
 1. Check if `src/app/{feature name}/page.tsx` already exists:
-   - If it exists, look for the `/* MANUALLY EDITED - DO NOT OVERWRITE */` comment
+   - If it exists, in the features.json file, check if it has the field of 'manually-edited' as true
    - If manually edited, alert the engineer and request confirmation before proceeding
    - If not manually edited or if confirmation received, proceed with update
    - If it doesn't exist, prepare to create a new implementation
@@ -23,7 +25,7 @@ This prompt helps you:
    - Verify any shared state or context requirements
    - Identify any dependencies in the existing codebase
 
-3. Read the complete Passport SDK documentation for the {feature name} feature at https://docs.immutable.com/docs/zkEVM/products/passport.
+3. Read the complete Contracts SDK documentation for the {feature name} feature at https://docs.immutable.com/docs/zkEVM/products/Contracts.
 
 IMPORTANT: We have an internal UI Library called Biom3. Make sure that you thoroughly understand all of the components. DON'T ASSUME that a component exists. ALWAYS DOUBLE CHECK BEFORE YOU IMPORT OR USE ANYTHING
 IF THE COMPONENT THAT YOU WANT DOESN'T EXIST IN BIOM3, ALWAYS USE NORMAL CSS/HTML AND NEVER ASSUME. (https://github.com/immutable/biom3 | https://immutable.atlassian.net/wiki/spaces/DS/pages/2335965298/BIOME+Docs)
@@ -35,7 +37,11 @@ IF THE COMPONENT THAT YOU WANT DOESN'T EXIST IN BIOM3, ALWAYS USE NORMAL CSS/HTM
    - Implement the feature with proper error handling, loading states, and UI
    - Update any navigation components to include the new feature (if applicable)
    - Listen to additional {feature name} specific requirements given by the user via the chat window
-   - Ensure that Passport login/wallet connect is implemented properly. If not sure, refer to other Passport example apps for reference.
+   - Ensure that Contracts login/wallet connect is implemented properly. If not sure, refer to other Contracts example apps for reference.
+
+## Silent Login mode (If Applicable)
+- Go to the features.json file and check for the silent login field.
+- If {feature name} has the silent login field as true, go through all of the pages in the app and change all login modes to silent login.
 
 2. For UPDATING existing implementation:
    - Preserve any custom imports or components specific to the app
@@ -44,7 +50,7 @@ IF THE COMPONENT THAT YOU WANT DOESN'T EXIST IN BIOM3, ALWAYS USE NORMAL CSS/HTM
    - Preserve any custom logic that extends beyond the standard implementation
 
 3. For any implementation:
-   - Verify all SDK objects before use: `if (!passportInstance) return;`
+   - Verify all SDK objects before use: `if (!ContractsInstance) return;`
    - Use optional chaining: `instance?.method?.()`
    - Wrap SDK calls in try/catch with appropriate error handling
    - Display meaningful error messages to users
@@ -59,7 +65,25 @@ IF THE COMPONENT THAT YOU WANT DOESN'T EXIST IN BIOM3, ALWAYS USE NORMAL CSS/HTM
 6. Structure UI with semantic HTML and Biom3 components
 7. Implement clear loading, success, and error states
 
-### Code Quality Checklist
+IF the requested {feature name} is related to event handling (IGNORE THIS IF {feature name} IS UNRELATED TO EVENT HANDLING):
+- Include examples of handling these events:
+ - connect
+ - disconnect
+ - chainChanged
+ - accountsChanged
+ - any other relevant Contracts events
+
+ ## Event Handling Best Practices
+ - Demonstrate proper event listener setup and cleanup
+ - Show different types of events (connect, disconnect, chainChanged, etc.)
+ - Display event data in UI for user feedback
+ - Include comprehensive error handling
+ - ALWAYS check if the provider exists before adding event listeners
+ - Use try/catch blocks around all event handler operations
+ - Implement robust cleanup of all event listeners in useEffect return functions
+ - Verify connection state changes are properly tracked and displayed
+
+### Code Quality Checklist 
 - [ ] All SDK objects checked for existence before use
 - [ ] All async operations wrapped in try/catch
 - [ ] Event listeners properly removed in cleanup functions
@@ -87,10 +111,5 @@ To update an existing feature implementation:
 2. Specify the existing feature name to update
 3. The generator will update the implementation while preserving app-specific customizations
 
-### Protecting Manual Edits
-If you've made manual edits to a feature implementation that you want to protect:
-1. Add the comment `/* MANUALLY EDITED - DO NOT OVERWRITE */` at the top of the file
-2. The generator will alert you before overwriting manually edited files
-```
 
 This comprehensive guide will help you safely add or update feature implementations while respecting existing code and manual edits.

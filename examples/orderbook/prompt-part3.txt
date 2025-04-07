@@ -1,208 +1,84 @@
-## Immutable Orderbook SDK Example App Generator - Part 3: Testing and Validation
+## Immutable Orderbook SDK Example App Generator - Part 3: Styling {feature name}
 
-# Step 1: Validation Checklist
-Before proceeding with testing and running the rest of the prompt, verify ALL of these items:
+### Usage Instructions
+This prompt helps you:
+1. Review other example apps' styling to establish a consistent visual standard
+2. Update the existing {feature name} example app's styling (UI/UX) to match this standard
+3. Implement Biom3 UI Library components correctly and consistently
 
-- [ ] Code follows existing structure and naming conventions
-- [ ] E2E Tests exist for {feature name} feature
-- [ ] All routes and pages are implemented correctly
-- [ ] ALL imports are valid and components are properly exported
-- [ ] No circular dependencies exist between components
-- [ ] Error handling is implemented for ALL asynchronous operations and events
-- [ ] Environment variables are documented in .env.example
-- [ ] Events are properly defined and handled
-- [ ] Event listeners and subscriptions are properly cleaned up
-- [ ] Components render without errors in all possible states
+### Setup and Resources
+1. First, locate other example apps in the codebase to use as reference:
+   - Navigate to the examples/ directory to find other feature implementations
+   - Open at least 2-3 other example apps to compare their styling approaches
 
-# Step 2: Testing Process
-IMPORTANT: TESTS MUST PASS WITH SUFFICIENT COVERAGE BEFORE PROCEEDING. DO NOT SKIP THIS STEP UNDER ANY CIRCUMSTANCES.
-IMPORTANT: REMOVE ALL TESTS THAT WOULD BE TOO COMPLICATED TO BE TESTED IN AN E2E TESTING SCENARIO(REMOVE Orderbook SPECIFIC TEST THAT REQUIRES AUTHENTICATION THROUGH Orderbook POP-UPS). FOCUS ON ENSURING THAT ALL PAGES CAN RENDER PROPERLY.
-## Unit Tests and Coverage Validation
-Run the unit tests to ensure all {feature name} functionality works correctly:
+2. Access Biom3 UI Library documentation:
+   - GitHub: https://github.com/immutable/biom3
+   - Internal docs: https://immutable.atlassian.net/wiki/spaces/DS/pages/2335965298/BIOME+Docs
+   - Note which components are commonly used across example apps
 
-1. Navigate to the {feature name}-with-nextjs directory:
-   ```
-   cd examples/orderbook/{feature name}-with-nextjs
-   ```
+### Styling Audit Checklist
+Systematically review the {feature name} example app against these specific criteria:
 
-2. Install dependencies:
-   ```
-   pnpm install
-   ```
+1. **Layout and Structure**
+   - Container widths and responsive behavior
+   - Spacing between sections and components (margin/padding)
+   - Alignment of elements (left/center/right)
+   - Overall page structure and component organization
+   - Buttons are center-aligned
+   - There are no gray card backgrounds. Always use Biom3 if applicable, otherwise, if not available, use normal HTML/TailwindCSS but ensure that it has the same look as Biom3 UI
+2. **Typography**
+   - Font families, sizes, and weights
+   - Text colors and contrast
+   - Heading hierarchy (h1, h2, h3, etc.)
+   - Text alignment and line spacing
 
-3. Run the tests:
-   ```
-   pnpm test
-   ```
+3. **Color Usage**
+   - Primary, secondary, and accent colors
+   - Background colors
+   - Border colors
+   - Consistent use of the Immutable color palette
 
-4. If any tests fail, understand the errors, find the causes of the errors, and fix the issues. Once you've fixed the issues, run the tests again. DO NOT PROCEED until all tests pass.
+4. **Component Implementation**
+   - Button styles, sizes, and variants
+   - Form elements (inputs, selects, checkboxes)
+   - Card and container components
+   - Navigation elements
 
-5. Check the test coverage:
-   ```
-   pnpm test:coverage
-   ```
+5. **Interactive Elements**
+   - Hover, active, and focus states
+   - Loading states and animations
+   - Error and success states
+   - Transitions and micro-interactions
 
-6. Verify that coverage meets or exceeds 70% for line coverage:
-   - If coverage is below 70%, add additional tests to increase coverage
-   - DO NOT PROCEED until coverage exceeds 70%
+### Implementation Process
+1. For each inconsistency identified in the audit:
+   - Document the specific issue
+   - Find the corresponding implementation in reference apps
+   - Note which Biom3 component should be used (if applicable)
 
-7. Verify that all event-related tests are checking:
-   - Event listener setup
-   - Event listener cleanup
-   - Event data handling
-   - UI updates in response to events
+2. Prioritize changes:
+   - First address structural/layout issues
+   - Then implement Biom3 components to replace custom styling
+   - Finally refine spacing, typography, and visual details
 
-## Build Validation
-After tests pass with required coverage, verify that the app builds correctly:
+3. For each Biom3 component implementation:
+   - Check the documentation for proper usage
+   - Review how other example apps implement the same component
+   - Ensure props and variants match the established pattern
 
-1. Build the app:
-   ```
-   pnpm build
-   ```
+### Documentation and Validation
+1. Create a brief summary of changes made:
+   - Components replaced or updated
+   - Major styling modifications
+   - Any deviations from other examples (with justification)
 
-2. If the build fails, fix the issues and rebuild.
-   - Repeat the testing process if significant changes were made
-   - DO NOT PROCEED until the build succeeds
+2. Final validation:
+   - Compare side-by-side with other example apps
+   - Verify responsive behavior across different screen sizes
+   - Ensure accessibility standards are maintained
+   - Check if the spacing, padding, margins all look good (as the best UI/UX designer, you be the judge). If not, fix it.
+   - Check if the Button is center aligned under its container.
 
-## Development Testing
-ONLY PROCEED TO THIS STEP IF:
-- ALL tests pass
-- Test coverage is AT LEAST 70%
-- The app builds successfully
-
-Start the development server and test the app functionality:
-
-1. Start the server:
-   ```
-   pnpm dev
-   ```
-
-2. Manually test these scenarios:
-   - Complete login flow works without errors
-   - Redirect handling works correctly
-   - Logout flow completes successfully
-   - All event handlers function as expected (connect, disconnect, chainChanged, accountsChanged) (IF APPLICABLE)
-   - UI correctly reflects all {feature name} state changes
-   - No error messages appear in the console during normal operation
-   - Event listeners are properly cleaned up (check with React DevTools)
-
-3. Check the browser console for any errors during the entire process
-
-4. Verify all {feature name} functionality is handled and displayed correctly
-
-5. If any issues are found, fix them and REPEAT THE ENTIRE TESTING PROCESS from Step 2, including tests and coverage validation
-
-6. Check React DevTools for any component errors or unexpected re-renders
-
-## Production Build Testing
-ONLY PROCEED TO THIS STEP IF:
-- ALL tests pass
-- Test coverage is AT LEAST 70%
-- The app builds successfully
-- Development testing shows no issues
-
-Test the production build of the application:
-
-1. Start the production server:
-   ```
-   pnpm start
-   ```
-
-2. Verify that the production build works correctly:
-   - All pages load without errors
-   - Events are properly handled
-   - UI reflects event state changes
-   - No console errors appear
-
-3. If issues are found in the production build, fix them and REPEAT THE ENTIRE TESTING PROCESS from Step 2, including tests, coverage validation, and build verification.
-
-# Step 3: Event-Specific Testing (if applicable)
-
-## Connect Event
-- [ ] Test that the connect event is properly captured and displayed
-- [ ] Verify connection state changes are shown in the UI
-- [ ] Confirm cleanup of connect event listeners
-
-## Disconnect Event
-- [ ] Test that the disconnect event is properly captured and displayed
-- [ ] Verify UI updates when disconnection occurs
-- [ ] Confirm cleanup of disconnect event listeners
-
-## Chain Changed Event
-- [ ] Test that chain changes are properly captured and displayed
-- [ ] Verify UI updates with chain information
-- [ ] Confirm cleanup of chainChanged event listeners
-
-## Accounts Changed Event
-- [ ] Test that account changes are properly captured and displayed
-- [ ] Verify UI updates with account information
-- [ ] Confirm cleanup of accountsChanged event listeners
-
-## Other Events
-- [ ] Test any other events implemented in the app
-- [ ] Verify proper event handling and UI updates
-- [ ] Confirm cleanup of all other event listeners
-
-# Step 4: Error Handling Testing
-
-## Edge Cases
-Test these edge cases to ensure proper error handling (if applicable):
-
-- [ ] Provider not connected when attempting to add event listeners
-- [ ] Events firing with unexpected or missing data
-- [ ] Multiple rapid events firing in succession
-- [ ] Component unmounting while events are firing
-- [ ] Network disconnection during event handling
-
-## Error Recovery
-Verify that the app properly recovers from errors (if applicable):
-
-- [ ] App doesn't crash when events fail
-- [ ] Error states are displayed to the user
-- [ ] User can retry after errors
-- [ ] Event listeners are still properly cleaned up after errors
-
-# Step 5: Performance Testing
-
-## Event Handling Performance
-Check that event handling performs efficiently (if applicable):
-
-- [ ] Events are processed without noticeable delay
-- [ ] UI updates quickly in response to events
-- [ ] No memory leaks from event listeners (check with Chrome DevTools Memory tab)
-- [ ] No excessive re-renders when events fire (check with React DevTools Profiler)
-
-# Step 6: Documentation Validation
-
-## README Verification
-Ensure the README.md includes:
-
-- [ ] Clear description of the {feature name} features
-- [ ] Complete setup instructions
-- [ ] Detailed usage examples for each {feature name} type
-- [ ] Troubleshooting information for common issues
-- [ ] Best practices for {feature name} handling and cleanup
-
-# Step 7: Final Checklist
-
-Before considering the app complete, confirm ALL of these items:
-
-- [ ] All tests pass with >70% coverage (MANDATORY - do not proceed if this is not met)
-- [ ] App builds successfully for production (MANDATORY - do not proceed if this is not met)
-- [ ] All pages and routes work correctly
-- [ ] {feature name} handling works properly in both development and production builds
-- [ ] Error handling is robust and user-friendly
-- [ ] {feature name} listeners are properly cleaned up in all scenarios
-- [ ] Documentation is complete and accurate
-- [ ] Code follows best practices and standards
-- [ ] UI is clean, intuitive, and demonstrates the {feature name} clearly
-- [ ] No console errors or warnings during normal operation
-
-# CRITICAL VALIDATION REQUIREMENT
-The following sequence MUST be followed in this exact order:
-1. Tests must pass
-2. Coverage must be at least 70%
-3. Build must succeed
-4. Only then can you run the app in development or production
-
-IF ANY STEP FAILS, you MUST fix issues and restart from step 1 (run tests again) 
+### Final Check
+Go through the entire {feature name} example app one more time and compare with other example apps for consistency. If inconsistencies remain, revisit the audit checklist and address each item until the styling is fully aligned with other examples.
+Check if the spacing, padding, margins all look good. If not, fix it.
