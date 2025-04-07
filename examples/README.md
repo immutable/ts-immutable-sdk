@@ -21,9 +21,9 @@
 - [Contribution guidelines](#contribution-guidelines)
 - [Adding examples](#adding-examples)
 - [End to end testing](#end-to-end-testing)
-- [Generating OR Updating a new feature in an existing example app using Cursor](#generating-or-updating-a-new-feature-in-an-existing-example-app-using-cursor)
+- [Generating examples apps using Cursor](#generating-example-apps-using-cursor)
 - [Using code examples in the docs site](#using-code-examples-in-the-docs-site)
-- [Generating Tutorials and Metadata](#generating-tutorials-and-metadata)
+- [Generating Tutorials and Metadata with cursor](#generating-tutorials-and-metadata-with-cursor)
 
 <hr />
 
@@ -327,7 +327,7 @@ Run your tests
 pnpm test
 ```
 
-# Generating OR Updating a new feature in an existing example app using Cursor
+# Generating example apps using cursor
 
 1) Open the product folder under /examples/{product}
 
@@ -377,8 +377,6 @@ feature name: <name>
 Then Cursor will build out the example app's setup, etc.
 IF Cursor doesn't run build at the end, manually type on the chat window 'run build'.
 
-
-
 IMPORTANT: For any prompts, if cursor is not done with its operations but it has reached 25 tool calls, you will need to manually type "continue" on the chat window for cursor to continue building.
 
 ## Understanding the Prompt Files
@@ -411,9 +409,11 @@ The example generation process uses three different prompt files, each with a sp
 
 **Typical Workflow:**
 1. Use prompt-part1.txt to create a new app (only once per app)
-2. Use prompt-part2.txt to implement each feature in the app
-3. Use prompt-part3.txt to fix the app's UI/UX styling and make it look consistent to other example apps.
-4. Use prompt-part4.txt after each feature implementation to test and validate
+1. Use prompt-part2.txt to implement each feature in the app
+1. Use prompt-part3.txt to fix the app's UI/UX styling and make it look consistent to other example apps.
+1. Use prompt-part4.txt after each feature implementation to test and validate
+1. Once you've generated the example app or feature, you should manually review the implementation and the UI. It's likely you will need to make some manual adjustments to get the app to function and look like our other example apps because the cursor can not reliably get it 100% correct. 
+1. Once you're happy with your example app or feature, you need to [re-run the tutorial generation prompt](#generating-tutorials-and-metadata-with-cursor) for your example app before creating your PR so the new example app or feature is piped into the docs site with it's corresponding tutorial.
 
 # Using code examples in the docs site
 
@@ -505,7 +505,7 @@ Once your `docs` PR is merged, Netlify should automatically build and deploy the
 
 If this happens you will need to log into the Netlify site, check the error and retry the build. Usually this will fix the deployment issue, otherwise follow up on the error message shown by Netlify.
 
-# Generating Tutorials and Metadata
+# Generating tutorials and metadata with cursor
 
 Whenever you add a new example app, or update an existing example app, you can use the prompts in the `prompt.txt` files in each `examples/product` folder to generate the tutorials and metadata for the example apps using Cursor AI.
 
