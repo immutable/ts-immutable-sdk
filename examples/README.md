@@ -357,15 +357,15 @@ Here, cursor will check and fix pages with styling issues to ensure that it look
 
 10) Once the styling changes have been made, under the same directory as prompt-part2.txt, open prompt-part4.txt and copy all of its contents.
 
-9) Paste it on to a new Cursor window and in the chat window you can type: 
+11) Paste it on to a new Cursor window and in the chat window you can type: 
 app name: <app name(if exists)>
 feature name: <name of the feature>
 
-10) Cursor will then run tests and build until everything passes and renders properly.
+12) Cursor will then run tests and build until everything passes and renders properly.
 
-11) When the prompt is done running, make sure to double check if the tests are comprehensive enough and also check if the feature page was built properly using best practices.
+13) When the prompt is done running, make sure to double check if the tests are comprehensive enough and also check if the feature page was built properly using best practices.
 
-12) Run `pnpm dev` and check every page's styling. If something looks off, you can manually fix it.
+14) Run `pnpm dev` and check every page's styling. If something looks off, you can manually fix it.
 
 ## If an App Doesn't Exist Yet
 

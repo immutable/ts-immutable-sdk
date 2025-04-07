@@ -158,7 +158,7 @@ IMPORTANT: MAKE SURE THAT THE PASSPORT SDK IS INITIALIZED CORRECTLY IN THE SETUP
 - Add robust error handling for all {feature name} and operations
 - Add TypeScript type guards for any SDK properties that might be undefined
 
-# Step 6: Final Checks
+# Step 7: Final Checks
 - Ensure that the app can build.
 - Ensure that all of the components, etc are used appropriately.
 - run `pnpm build` and ensure that the setup is perfect.
