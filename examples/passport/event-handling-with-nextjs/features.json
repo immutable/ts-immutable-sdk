@@ -1,0 +1,11 @@
+{
+    "features": [
+        {
+            "feature": "event-handling",
+            "manually-edited": false,
+            "silent-login": true,
+            "silent-logout": true
+        }
+    ],
+    "order": 7
+} 
