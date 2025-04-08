@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Button, Heading, Stack, Body } from '@biom3/react';
 import { passportInstance } from '../utils/setupLogoutSilent';
-import { passport } from '@imtbl/sdk';
 import { Provider, ProviderEvent } from '@imtbl/sdk/passport';
 
 
@@ -120,22 +119,6 @@ export default function EventHandlingPage() {
     }
   };
 
-  // Get current chain info
-  const getChainInfo = async () => {
-    if (!provider) return;
-    
-    try {
-      setLoading(true);
-      const currentChainId = await provider.request({ method: 'eth_chainId' });
-      setChainId(currentChainId);
-    } catch (error) {
-      console.error('Chain info error:', error);
-      logEvent('chain_info_error', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Manually request accounts
   const requestAccounts = async () => {
     if (!provider) return;
@@ -192,7 +175,7 @@ export default function EventHandlingPage() {
         )}
       </Stack>
       
-      <Stack direction="row" gap="space.medium">
+      <Stack direction="row" gap="space.large">
         <Button 
           onClick={handleLogin} 
           disabled={isLoggedIn || loading}
@@ -208,8 +191,8 @@ export default function EventHandlingPage() {
         </Button>
       </Stack>
       
-      {isLoggedIn && (
-        
+      {isLoggedIn && (   
+        <Stack direction="row" gap="space.large">
           <Button 
             onClick={requestAccounts}
             disabled={loading}
@@ -217,7 +200,7 @@ export default function EventHandlingPage() {
           >
             Request Accounts
           </Button>
-
+        </Stack>
       )}
 
       <Stack gap="space.medium">
