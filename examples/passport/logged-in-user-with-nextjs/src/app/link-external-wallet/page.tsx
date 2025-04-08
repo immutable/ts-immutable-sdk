@@ -77,13 +77,6 @@ export default function LinkExternalWallet() {
     try {
       // Generate a nonce for the signature
       const nonce = generateNonce();
-      
-      // Use 'External' as the wallet type as per documentation
-      const walletType = 'External';
-      
-      console.log('External wallet address:', externalWalletAddress);
-      console.log('Passport address:', accountAddress);
-      
       // Ensure addresses are in the correct format - lowercase 0x-prefixed
       const formattedExternalWalletAddress = externalWalletAddress.toLowerCase() as `0x${string}`;
       const formattedPassportAddress = accountAddress.toLowerCase() as `0x${string}`;
@@ -127,9 +120,7 @@ export default function LinkExternalWallet() {
           nonce
         }
       });
-      
-      console.log('Generated signature:', signature);
-      console.log('Connector ID:', connector.id);
+
       setLinkingStatus('Linking wallet...');
       
       // Call the linkExternalWallet method to link the wallet
