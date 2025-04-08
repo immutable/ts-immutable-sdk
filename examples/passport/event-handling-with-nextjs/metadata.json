@@ -1,8 +1,0 @@
-{
-  "title": "Event Handling with NextJS",
-  "description": "A comprehensive example demonstrating how to handle Passport SDK events in a Next.js application.",
-  "keywords": ["Immutable", "SDK", "Passport", "Events", "Event Handling", "Authentication", "Login", "Logout", "Network", "Account"],
-  "tech_stack": ["NextJS", "TypeScript", "React"],
-  "product": "Passport",
-  "programming_language": "TypeScript"
-} 

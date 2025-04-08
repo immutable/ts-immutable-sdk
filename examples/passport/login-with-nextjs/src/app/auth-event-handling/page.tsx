@@ -1,153 +1,73 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Button, Heading, Stack, Body, Badge } from '@biom3/react';
-import { passportInstance } from '../utils/setupDefault';
+import { useEffect, useState, useCallback } from 'react';
+import { Button, Heading, Stack, Body } from '@biom3/react';
+import { passportInstance } from '../utils/setupLogoutSilent';
 import { passport } from '@imtbl/sdk';
+import { Provider, ProviderEvent } from '@imtbl/sdk/passport';
 
-// Define the event constants as specified in Immutable documentation
-const ProviderEvent = {
-  ACCOUNTS_CHANGED: 'accountsChanged',
-  CHAIN_CHANGED: 'chainChanged',
-  CONNECT: 'connect',
-  DISCONNECT: 'disconnect',
-  MESSAGE: 'message'
-};
 
 export default function EventHandlingPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [provider, setProvider] = useState<any>(null);
+  const [provider, setProvider] = useState<Provider | undefined>(undefined);
   const [events, setEvents] = useState<Array<{event: string, data: string, timestamp: string}>>([]);
   const [address, setAddress] = useState<string>('');
   const [chainId, setChainId] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [accountsState, setAccountsState] = useState<string[]>([]);
+
   // Add a new event to the event log
-  const logEvent = (eventName: string, data: any) => {
-    // Get a readable event name for display
-    let displayEventName = eventName;
-    
-    // Map enum constants to readable names if needed
-    if (eventName === ProviderEvent.ACCOUNTS_CHANGED) displayEventName = 'accountsChanged';
-    if (eventName === ProviderEvent.CHAIN_CHANGED) displayEventName = 'chainChanged';
-    if (eventName === ProviderEvent.CONNECT) displayEventName = 'connect';
-    if (eventName === ProviderEvent.DISCONNECT) displayEventName = 'disconnect';
-    if (eventName === ProviderEvent.MESSAGE) displayEventName = 'message';
-    
+  const logEvent = useCallback((eventName: string, data: any) => {
     setEvents(prev => [
       {
-        event: displayEventName,
+        event: eventName,
         data: JSON.stringify(data, null, 2),
         timestamp: new Date().toLocaleTimeString()
       },
       ...prev
     ].slice(0, 10)); // Keep only the last 10 events
-  };
-
-  // Check login status on mount
-  useEffect(() => {
-    const checkLoginStatus = async () => {
-      try {
-        const userProfile = await passportInstance.getUserInfo();
-        if (userProfile) {
-          setIsLoggedIn(true);
-          
-          // Get provider and user info
-          const provider = await passportInstance.connectEvm();
-          setProvider(provider);
-          
-          if (provider) {
-            // Get accounts
-            const accounts = await provider.request({ method: 'eth_accounts' });
-            if (accounts && accounts.length > 0) {
-              setAddress(accounts[0]);
-              // Keep accountsState in sync
-              setAccountsState(accounts);
-            }
-            
-            // Get chain ID
-            const chainId = await provider.request({ method: 'eth_chainId' });
-            setChainId(chainId);
-          }
-        }
-      } catch (error) {
-        console.error('Error checking login status:', error);
-      }
-    };
-    
-    checkLoginStatus();
   }, []);
 
-  // Setup event listeners when provider is available
+  // Handler for accountsChanged event
+  const handleAccountsChanged = useCallback((accounts: string[]) => {
+    console.log('accounts changed:', accounts);
+    setAccountsState(accounts);
+    logEvent(ProviderEvent.ACCOUNTS_CHANGED, { accounts });
+    
+    if (accounts.length === 0) {
+      // User has disconnected their account
+      setIsLoggedIn(false);
+      setAddress('');
+    } else {
+      setAddress(accounts[0]);
+    }
+  }, [logEvent]);
+
+  // Initialize provider on mount
+  useEffect(() => {
+    const fetchPassportProvider = async () => {
+      const provider = await passportInstance.connectEvm();
+      setProvider(provider);
+    };
+    
+    fetchPassportProvider();
+  }, []);
+
+  // Set up accountsChanged event listener
   useEffect(() => {
     if (!provider) return;
     
-    const handleConnect = (connectInfo: any) => {
-      logEvent('connect', connectInfo);
-      setIsLoggedIn(true);
-    };
-    
-    const handleDisconnect = (error: any) => {
-      logEvent('disconnect', error);
-      setIsLoggedIn(false);
-      setAddress('');
-      setChainId('');
-    };
-    
-    const handleChainChanged = (chainId: string) => {
-      logEvent('chainChanged', { chainId });
-      setChainId(chainId);
-      
-      // Optional: Reload the page when chain changes to ensure all state is fresh
-      // window.location.reload();
-    };
-    
-    const handleAccountsChanged = (accounts: string[]) => {
-      console.log('accounts', accounts);
-      setAccountsState(accounts);
-      logEvent('accountsChanged', { accounts });
-      if (accounts.length === 0) {
-        // User has disconnected their account
-        setIsLoggedIn(false);
-        setAddress('');
-      } else {
-        setAddress(accounts[0]);
-      }
-    };
-    
-    const handleMessage = (message: any) => {
-      logEvent('message', message);
-    };
-    
-    // Register event listeners using ProviderEvent enum from SDK
-    provider.on(ProviderEvent.CONNECT, handleConnect);
-    provider.on(ProviderEvent.DISCONNECT, handleDisconnect);
-    provider.on(ProviderEvent.CHAIN_CHANGED, handleChainChanged);
+    // Register event listener
     provider.on(ProviderEvent.ACCOUNTS_CHANGED, handleAccountsChanged);
-    provider.on(ProviderEvent.MESSAGE, handleMessage);
     
-    // Log that event listeners were registered
-    logEvent('listeners_registered', { 
-      events: [
-        ProviderEvent.CONNECT,
-        ProviderEvent.DISCONNECT,
-        ProviderEvent.CHAIN_CHANGED,
-        ProviderEvent.ACCOUNTS_CHANGED,
-        ProviderEvent.MESSAGE
-      ]
-    });
+    // Log that event listener was registered
+    logEvent('provider_event_registered', { event: ProviderEvent.ACCOUNTS_CHANGED });
     
-    // Cleanup function to remove event listeners
+    // Cleanup function to remove event listener
     return () => {
-      if (provider) {
-        provider.removeListener(ProviderEvent.CONNECT, handleConnect);
-        provider.removeListener(ProviderEvent.DISCONNECT, handleDisconnect);
-        provider.removeListener(ProviderEvent.CHAIN_CHANGED, handleChainChanged);
-        provider.removeListener(ProviderEvent.ACCOUNTS_CHANGED, handleAccountsChanged);
-        provider.removeListener(ProviderEvent.MESSAGE, handleMessage);
-      }
+      provider.removeListener(ProviderEvent.ACCOUNTS_CHANGED, handleAccountsChanged);
     };
-  }, [provider]); // Only re-run when provider changes
+  }, [provider, handleAccountsChanged, logEvent]);
 
   // Handle login
   const handleLogin = async () => {
@@ -164,10 +84,8 @@ export default function EventHandlingPage() {
         const accounts = await provider.request({ method: 'eth_requestAccounts' });
         if (accounts && accounts.length > 0) {
           setAddress(accounts[0]);
-          // Manually update accountsState since the event might not fire during initial login
           setAccountsState(accounts);
-          
-          // Manually log the accounts information as if the event fired
+          // Log the accounts change manually since the event might not fire
           logEvent(ProviderEvent.ACCOUNTS_CHANGED, { accounts });
         }
         
@@ -177,7 +95,6 @@ export default function EventHandlingPage() {
       }
       
       setIsLoggedIn(true);
-      logEvent('login', { success: true });
     } catch (error) {
       console.error('Login error:', error);
       logEvent('login_error', error);
@@ -194,9 +111,7 @@ export default function EventHandlingPage() {
       setIsLoggedIn(false);
       setAddress('');
       setChainId('');
-      // Clear accounts state on logout
       setAccountsState([]);
-      logEvent('logout', { success: true });
     } catch (error) {
       console.error('Logout error:', error);
       logEvent('logout_error', error);
@@ -205,21 +120,17 @@ export default function EventHandlingPage() {
     }
   };
 
-  // Trigger a custom event (switch chain request)
-  const requestChainSwitch = async () => {
+  // Get current chain info
+  const getChainInfo = async () => {
     if (!provider) return;
     
     try {
       setLoading(true);
-      // Request to switch to Ethereum mainnet (chain ID 0x1)
-      await provider.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: '0x1' }],
-      });
-      logEvent('request_chain_switch', { chainId: '0x1' });
+      const currentChainId = await provider.request({ method: 'eth_chainId' });
+      setChainId(currentChainId);
     } catch (error) {
-      console.error('Chain switch error:', error);
-      logEvent('chain_switch_error', error);
+      console.error('Chain info error:', error);
+      logEvent('chain_info_error', error);
     } finally {
       setLoading(false);
     }
@@ -237,6 +148,7 @@ export default function EventHandlingPage() {
       logEvent('request_accounts', { accounts });
       if (accounts && accounts.length > 0) {
         setAddress(accounts[0]);
+        setAccountsState(accounts);
       }
     } catch (error) {
       console.error('Request accounts error:', error);
@@ -297,14 +209,7 @@ export default function EventHandlingPage() {
       </Stack>
       
       {isLoggedIn && (
-        <Stack direction="row" gap="space.medium">
-          <Button 
-            onClick={requestChainSwitch}
-            disabled={loading}
-            variant="tertiary"
-          >
-            Switch to Ethereum Chain
-          </Button>
+        
           <Button 
             onClick={requestAccounts}
             disabled={loading}
@@ -312,7 +217,7 @@ export default function EventHandlingPage() {
           >
             Request Accounts
           </Button>
-        </Stack>
+
       )}
 
       <Stack gap="space.medium">
