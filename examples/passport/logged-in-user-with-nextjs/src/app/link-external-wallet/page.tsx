@@ -5,10 +5,9 @@ import { Button, Heading, Table, Link } from '@biom3/react';
 import NextLink from 'next/link';
 import { passportInstance } from '../utils/setupDefault';
 import { generateNonce } from 'siwe';
-import { useConnect, useSignTypedData, useAccount, useDisconnect } from 'wagmi';
+import { useConnect, useSignTypedData } from 'wagmi';
 import { config } from '../utils/wagmiConfig';
-import { injected, metaMask } from 'wagmi/connectors';
-import { immutableZkEvmTestnet } from 'wagmi/chains';
+import { metaMask } from 'wagmi/connectors';
 
 export default function LinkExternalWallet() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -18,12 +17,12 @@ export default function LinkExternalWallet() {
   const [isLinking, setIsLinking] = useState<boolean>(false);
   const [linkingStatus, setLinkingStatus] = useState<string>('');
   const [linkingError, setLinkingError] = useState<string | null>(null);
-  
-  const { connectAsync, connectors } = useConnect({
+  const [linkedAddresses, setLinkedAddresses] = useState<string[]>([]);
+
+  const { connectAsync } = useConnect({
     config
   });
-  const connector = connectors[0];
-  const { disconnect } = useDisconnect();
+
   const { signTypedDataAsync } = useSignTypedData();
 
   const loginWithPassport = async () => {
@@ -131,6 +130,8 @@ export default function LinkExternalWallet() {
         nonce
       });
       
+      const linkedAddresses = await passportInstance.getLinkedAddresses();
+      setLinkedAddresses(linkedAddresses);
       setLinkingStatus('Wallet linked successfully!');
       setIsLinking(false);
     } catch (error: any) {
@@ -178,6 +179,12 @@ export default function LinkExternalWallet() {
             <Table.Row>
               <Table.Cell><b>Status</b></Table.Cell>
               <Table.Cell>{linkingStatus}</Table.Cell>
+            </Table.Row>
+          )}
+          {linkedAddresses.length > 0 && (
+            <Table.Row>
+              <Table.Cell><b>Linked Addresses</b></Table.Cell>
+              <Table.Cell>{linkedAddresses.join(', ')}</Table.Cell>
             </Table.Row>
           )}
           {linkingError && (
