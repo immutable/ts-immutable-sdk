@@ -1,0 +1,19 @@
+{
+  "extends": "next/core-web-vitals",
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-shadow": "off",
+    "@typescript-eslint/comma-dangle": "off",
+    "react/no-unescaped-entities": "off",
+    "react-hooks/exhaustive-deps": "off",
+    "react/jsx-one-expression-per-line": "off",
+    "react/jsx-no-constructed-context-values": "off",
+    "no-console": "off",
+    "no-trailing-spaces": "off",
+    "max-len": "off",
+    "eol-last": "off",
+    "object-curly-newline": "off"
+  },
+  "ignorePatterns": ["node_modules/", "next.config.mjs"]
+} 
