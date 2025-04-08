@@ -1,12 +1,12 @@
 import { createConfig, http } from 'wagmi';
-import { immutableZkEvmTestnet } from 'wagmi/chains';
-import { injected } from 'wagmi/connectors';
+import { immutableZkEvmTestnet, immutableZkEvm } from 'wagmi/chains';
+import { injected, metaMask, safe } from 'wagmi/connectors';
 
 // create the Wagmi config for Immutable zkEVM Testnet
 export const config = createConfig({
-  chains: [immutableZkEvmTestnet],
-  connectors: [injected()],
+  chains: [immutableZkEvm],
+  connectors: [injected(), metaMask(), safe()],
   transports: {
-    [immutableZkEvmTestnet.id]: http(),
+    [immutableZkEvm.id]: http(),
   },
 });

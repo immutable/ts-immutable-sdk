@@ -10,7 +10,7 @@ export default function AppWrapper({
   }: Readonly<{
     children: React.ReactNode;
   }>) {
-    const [queryClient] = useState(() => new QueryClient());
+    const queryClient = new QueryClient()
     
     return (
       <div className="flex-container">

@@ -7,7 +7,7 @@ import { passportInstance } from '../utils/setupDefault';
 import { generateNonce } from 'siwe';
 import { useConnect, useSignTypedData, useAccount, useDisconnect } from 'wagmi';
 import { config } from '../utils/wagmiConfig';
-import { injected } from 'wagmi/connectors';
+import { injected, metaMask } from 'wagmi/connectors';
 import { immutableZkEvmTestnet } from 'wagmi/chains';
 
 export default function LinkExternalWallet() {
@@ -52,10 +52,8 @@ export default function LinkExternalWallet() {
     }
 
     try {
-      // First disconnect any existing connection to ensure a clean state
-      disconnect();
-      
-      const result = await connectAsync({ connector: injected() });
+      // Use metaMask connector specifically instead of generic injected
+      const result = await connectAsync({ connector: metaMask() });
       if (result?.accounts?.[0]) {
         setWalletConnected(true);
         setExternalWalletAddress(result.accounts[0]);
@@ -93,7 +91,7 @@ export default function LinkExternalWallet() {
       // Sign the message using EIP-712
       const signature = await signTypedDataAsync({
         domain: {
-          chainId: BigInt(immutableZkEvmTestnet.id)
+          chainId: BigInt(1)
         },
         types: {
           EIP712Domain: [
@@ -131,12 +129,12 @@ export default function LinkExternalWallet() {
       });
       
       console.log('Generated signature:', signature);
-
+      console.log('Connector ID:', connector.id);
       setLinkingStatus('Linking wallet...');
       
       // Call the linkExternalWallet method to link the wallet
       const result = await passportInstance.linkExternalWallet({
-        type: connector.id,
+        type: "External",
         walletAddress: formattedExternalWalletAddress,
         signature,
         nonce
@@ -200,13 +198,14 @@ export default function LinkExternalWallet() {
         </Table.Body>
       </Table>
       
-      <div className="mt-4 flex gap-6">
+
         <Button
           size="medium"
           onClick={connectWallet}
           disabled={!isLoggedIn || walletConnected}>
           Connect Wallet
         </Button>
+
         {walletConnected && (
           <Button
             size="medium"
@@ -216,7 +215,7 @@ export default function LinkExternalWallet() {
             {isLinking ? 'Linking...' : 'Link Wallet'}
           </Button>
         )}
-      </div>
+
       
       <div className="mt-4">
         <Link rc={<NextLink href="/" />}>Return to Examples</Link>
