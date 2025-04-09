@@ -409,11 +409,11 @@ The example generation process uses three different prompt files, each with a sp
 
 **Typical Workflow:**
 1. Use example-app-1-create-app-template.txt to create a new app (only once per app)
-1. Use example-app-2-add-feature.txt to implement each feature in the app
-1. Use example-app-3-fix-ui.txt to fix the app's UI/UX styling and make it look consistent to other example apps.
-1. Use example-app-4-testing.txt after each feature implementation to test and validate
-1. Once you've generated the example app or feature, you should manually review the implementation and the UI. It's likely you will need to make some manual adjustments to get the app to function and look like our other example apps because the cursor can not reliably get it 100% correct. 
-1. Once you're happy with your example app or feature, you need to [re-run the tutorial generation prompt](#generating-tutorials-and-metadata-with-cursor) for your example app before creating your PR so the new example app or feature is piped into the docs site with it's corresponding tutorial.
+2. Use example-app-2-add-feature.txt to implement each feature in the app
+3. Use example-app-3-fix-ui.txt to fix the app's UI/UX styling and make it look consistent to other example apps.
+4. Use example-app-4-testing.txt after each feature implementation to test and validate
+5. Once you've generated the example app or feature, you should manually review the implementation and the UI. It's likely you will need to make some manual adjustments to get the app to function and look like our other example apps because the cursor can not reliably get it 100% correct. 
+6. Once you're happy with your example app or feature, you need to [re-run the tutorial generation prompt](#generating-tutorials-and-metadata-with-cursor) for your example app before creating your PR so the new example app or feature is piped into the docs site with it's corresponding tutorial.
 
 # Using code examples in the docs site
 
@@ -507,7 +507,7 @@ If this happens you will need to log into the Netlify site, check the error and 
 
 # Generating tutorials and metadata with cursor
 
-Whenever you add a new example app, or update an existing example app, you can use the prompts in the `tutorial-generation-prompt.txt` files in each `examples/product/_prompts` folder to generate the tutorials and metadata for the example apps using Cursor AI.
+Whenever you add a new example app, or update an existing example app, you can use the prompts in the `tutorial-generation-prompt.txt` OR `{product}-initialisation-tutorial-prompt.txt` files in each `examples/product/_prompts` folder to generate the tutorials and metadata for the example apps using Cursor AI.
 
 These AI generated tutorials and metadata files are then piped through to the docs site in the CI/CD pipeline, where they are used to display the example apps and their code walkthroughs. If you don't follow these steps, your example app will not be displayed on the docs site.
 
@@ -520,7 +520,7 @@ Follow these steps to generate the tutorials and metadata for the example apps:
 1. Delete the existing tutorial.md and metadata.json files in the example app you are wanting to generate the tutorials and metadata for.
 2. Open the Composer window in Cursor IDE (Claude 3.7-sonnet-thinking).
 3. Press the `+` button clear the context of the composer window.
-4. Open the `tutorial-generation-prompt.txt` file in the examples/product/_prompts folder you are wanting to generate the tutorials and metadata for e.g. `examples/passport/_prompts/tutorial-generation-prompt.txt`.
+4. Open the `tutorial-generation-prompt.txt` OR `{product}-initialisation-tutorial-prompt.txt` file in the examples/product/_prompts folder you are wanting to generate the tutorials and metadata for e.g. `examples/passport/_prompts/tutorial-generation-prompt.txt`.
 5. Copy and pate the prompt into the composer window, or attach it as a file.
 6. After adding the prompt, in the composer window, type `app name: <name of the example app>` e.g. `app name: login-with-nextjs` where the app name is the folder name of the example app in the examples/product folder you are wanting to generate the tutorials and metadata for.
 7. Press enter and let the AI generate the tutorials and metadata.
