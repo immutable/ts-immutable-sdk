@@ -146,6 +146,8 @@ export default function LinkExternalWallet() {
         }
       }
 
+      console.log('dataToSign', dataToSign);
+
       if (typeof window === 'undefined' || !window.ethereum) {
         throw new Error('MetaMask not installed');
       }
@@ -155,6 +157,8 @@ export default function LinkExternalWallet() {
         method: 'eth_signTypedData_v4',
         params: [formattedExternalWalletAddress, JSON.stringify(dataToSign)]
       });
+
+      console.log('signature', signature);
 
       // Import and use our signature validation function
       const { validateSignatureComprehensive } = await import('../utils/validateEIP712Signature');
@@ -166,13 +170,19 @@ export default function LinkExternalWallet() {
         window.ethereum // pass the provider for contract wallet validation if needed
       );
 
+      console.log('isValid', isValid);
+
       if (!isValid) {
         throw new Error('Invalid signature');
       }
 
       setLinkingStatus('Linking wallet...');
-
       
+      console.log('linkExternalWallet type:', "External");
+      console.log('linkExternalWallet walletAddress:', formattedExternalWalletAddress);
+      console.log('linkExternalWallet signature:', signature);
+      console.log('linkExternalWallet nonce:', nonce);
+
       // Call the linkExternalWallet method to link the wallet
       const result = await passportInstance.linkExternalWallet({
         type: "External",
