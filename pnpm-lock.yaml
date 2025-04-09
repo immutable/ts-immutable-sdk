@@ -706,7 +706,7 @@ importers:
         specifier: ^5.6.2
         version: 5.6.2
 
-  examples/passport/passport-setup-with-nextjs:
+  examples/passport/setup-with-nextjs:
     dependencies:
       '@biom3/react':
         specifier: ^0.25.21
