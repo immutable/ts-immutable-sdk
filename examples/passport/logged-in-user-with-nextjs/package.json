@@ -16,9 +16,7 @@
     "next": "14.2.25",
     "react": "^18",
     "react-dom": "^18",
-    "siwe": "^3.0.0",
-    "viem": "2.x",
-    "wagmi": "^2.11.3"
+    "siwe": "^3.0.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.45.3",
