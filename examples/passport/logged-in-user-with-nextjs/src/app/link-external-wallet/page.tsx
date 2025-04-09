@@ -136,7 +136,7 @@ export default function LinkExternalWallet() {
         },
         primaryType: "LinkWallet",
         domain: {
-          chainId: 13473,
+          chainId: 1,
         },
         message: {
           walletAddress: formattedExternalWalletAddress,
