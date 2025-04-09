@@ -1,0 +1,102 @@
+Task Overview
+Create comprehensive documentation for examples that demonstrate different Passport SDK initialization patterns and configurations. For the specified example app, you will create:
+A comprehensive tutorial.md file
+A metadata.json file
+
+## Preparation
+Before starting:
+- Refer to this website at all times to fully understand Passport SDK initialization: https://docs.immutable.com/products/zkevm/passport/setup/#2-configure-passport
+
+For the specified example app in examples/passport/{app name} that doesn't already have both tutorial.md and metadata.json:
+
+### Analysis Phase
+- Review all code files in the example app directory
+- Focus on identifying different Passport initialization patterns and configurations
+- Document how each configuration affects Passport behavior
+- Note all frameworks and dependencies used
+
+### Pay special attention to:
+- Different Passport instance configurations
+- Scope variations
+- Popup overlay settings
+- Login/Logout behavior modifications
+- Silent authentication patterns
+
+In <app name>, create tutorial.md
+Create a tutorial.md file with the following structure:
+Introduction
+Brief overview of the app's purpose in demonstrating Passport setup options
+Overview of different configuration patterns demonstrated
+
+Link to GitHub repository using the required format
+<div class="display-none">
+# Passport Setup with NextJS
+</div>
+
+[App description]
+
+<div class="button-component">
+[View app on Github](<link>) <span class="button-component-arrow">→</span>
+</div>
+
+### Configuration Patterns Overview
+- List each Passport configuration pattern demonstrated
+- Explain the purpose and use case for each configuration
+
+### Implementation Details
+For each configuration pattern:
+- Configuration Name: Brief description of what this configuration achieves
+- Source Code: Link to relevant source code file
+- Configuration Details: Code snippet showing the configuration
+- Behavior Explanation: Clear explanation of how this configuration affects Passport behavior
+- Use Cases: When to use this configuration pattern
+
+### Key configurations to document:
+1. Default Configuration
+2. Disabled Popup Overlays
+3. Minimal Scopes
+4. All Scopes
+5. Silent Logout
+6. Selective Overlay Disabling
+
+### Running the App
+- Prerequisites (including environment variables)
+- Step-by-step setup instructions using pnpm
+- Testing different configurations
+
+### Summary
+- Overview of configuration patterns covered
+- Best practices for choosing configurations
+- Key considerations when setting up Passport
+
+In <app name>, create metadata.json
+Create a metadata.json file with:
+{
+  "title": "Setup",
+  "description": "Demonstrates various Passport SDK initialization patterns and configurations",
+  "keywords": ["Immutable", "SDK", "Passport", "Setup", "Configuration", "Authentication"],
+  "tech_stack": ["Next.js", "TypeScript"],
+  "product": "Passport",
+  "programming_language": "TypeScript"
+}
+
+### Documentation Guidelines
+- Focus on explaining configuration differences and their impacts
+- Include clear code examples for each configuration
+- Explain when to use each configuration pattern
+- Document behavior differences between configurations
+- Highlight security considerations for each pattern
+- Use proper markdown formatting throughout
+- Include relevant code snippets with proper syntax highlighting
+- Ensure all GitHub links are correct
+- Verify all configuration patterns are documented
+
+### Final Verification
+- All configuration patterns are documented
+- Each pattern's behavior is clearly explained
+- Setup instructions are complete and accurate
+- Code snippets are properly formatted
+- All links are functional
+- Documentation follows required formatting
+
+This prompt will help create focused documentation that explains the various ways to configure and initialize the Passport SDK, making it easier for developers to choose the right configuration for their needs.
