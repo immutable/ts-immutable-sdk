@@ -7,8 +7,6 @@ export default function AppWrapper({
   }: Readonly<{
     children: React.ReactNode;
   }>) {
-    const queryClient = new QueryClient()
-    
     return (
       <div className="flex-container">
         <BiomeCombinedProviders>
