@@ -329,9 +329,9 @@ pnpm test
 
 # Generating example apps using cursor
 
-1) Open the product folder under /examples/{product}
+1) Open the product folder under /examples/{product}/_prompts
 
-2) Under the {product} directory, open the example-app-2-add-feature.txt file.
+2) Under the {product}/_prompts directory, open the example-app-2-add-feature.txt file.
 
 3) Copy all of the content in the example-app-2-add-feature.txt file.
 
@@ -507,7 +507,7 @@ If this happens you will need to log into the Netlify site, check the error and 
 
 # Generating tutorials and metadata with cursor
 
-Whenever you add a new example app, or update an existing example app, you can use the prompts in the `tutorial-generation-prompt.txt` files in each `examples/product` folder to generate the tutorials and metadata for the example apps using Cursor AI.
+Whenever you add a new example app, or update an existing example app, you can use the prompts in the `tutorial-generation-prompt.txt` files in each `examples/product/_prompts` folder to generate the tutorials and metadata for the example apps using Cursor AI.
 
 These AI generated tutorials and metadata files are then piped through to the docs site in the CI/CD pipeline, where they are used to display the example apps and their code walkthroughs. If you don't follow these steps, your example app will not be displayed on the docs site.
 
@@ -520,7 +520,7 @@ Follow these steps to generate the tutorials and metadata for the example apps:
 1. Delete the existing tutorial.md and metadata.json files in the example app you are wanting to generate the tutorials and metadata for.
 2. Open the Composer window in Cursor IDE (Claude 3.7-sonnet-thinking).
 3. Press the `+` button clear the context of the composer window.
-4. Open the `tutorial-generation-prompt.txt` file in the examples/product folder you are wanting to generate the tutorials and metadata for e.g. `examples/passport/tutorial-generation-prompt.txt`.
+4. Open the `tutorial-generation-prompt.txt` file in the examples/product/_prompts folder you are wanting to generate the tutorials and metadata for e.g. `examples/passport/_prompts/tutorial-generation-prompt.txt`.
 5. Copy and pate the prompt into the composer window, or attach it as a file.
 6. After adding the prompt, in the composer window, type `app name: <name of the example app>` e.g. `app name: login-with-nextjs` where the app name is the folder name of the example app in the examples/product folder you are wanting to generate the tutorials and metadata for.
 7. Press enter and let the AI generate the tutorials and metadata.
