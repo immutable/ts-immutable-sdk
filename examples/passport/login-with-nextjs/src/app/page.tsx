@@ -39,5 +39,11 @@ export default function Home() {
       rc={<NextLink href="/logout-with-silent-mode" />}>
         Logout with Silent Mode
       </Button> 
+      <Button       
+      className="mb-1"
+      size="medium" 
+      rc={<NextLink href="/auth-event-handling" />}>
+        Auth Event Handling
+      </Button> 
   </>);
 }
