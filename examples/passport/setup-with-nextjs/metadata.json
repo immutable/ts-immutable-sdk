@@ -1,0 +1,8 @@
+{
+  "title": "Setup",
+  "description": "Demonstrates various Passport SDK initialization patterns and configurations",
+  "keywords": ["Immutable", "SDK", "Passport", "Setup", "Configuration", "Authentication", "Next.js", "Overlays", "Scopes", "Silent Logout"],
+  "tech_stack": ["Next.js", "TypeScript", "Biom3"],
+  "product": "Passport",
+  "programming_language": "TypeScript"
+} 

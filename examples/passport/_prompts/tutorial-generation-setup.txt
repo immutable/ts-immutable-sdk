@@ -30,7 +30,7 @@ Overview of different configuration patterns demonstrated
 
 Link to GitHub repository using the required format
 <div class="display-none">
-# [Title]
+# Passport Setup with NextJS
 </div>
 
 [App description]
@@ -72,7 +72,7 @@ For each configuration pattern:
 In <app name>, create metadata.json
 Create a metadata.json file with:
 {
-  "title": "Passport Setup with Next.js",
+  "title": "Setup",
   "description": "Demonstrates various Passport SDK initialization patterns and configurations",
   "keywords": ["Immutable", "SDK", "Passport", "Setup", "Configuration", "Authentication"],
   "tech_stack": ["Next.js", "TypeScript"],
