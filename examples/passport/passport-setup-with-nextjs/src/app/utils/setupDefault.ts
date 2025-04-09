@@ -70,10 +70,10 @@ export const passportInstanceWithSilentLogout = new passport.Passport({
   logoutMode: 'silent',
 });
 
-// Passport instance for production environment
-export const passportInstanceForProduction = new passport.Passport({
+// Passport instance with only the generic popup overlay disabled
+export const passportInstanceWithGenericOverlayDisabled = new passport.Passport({
   baseConfig: {
-    environment: config.Environment.PRODUCTION,
+    environment: config.Environment.SANDBOX,
     publishableKey: process.env.NEXT_PUBLIC_PUBLISHABLE_KEY || '<YOUR_PUBLISHABLE_KEY>',
   },
   clientId: process.env.NEXT_PUBLIC_CLIENT_ID || '<YOUR_CLIENT_ID>',
@@ -81,6 +81,25 @@ export const passportInstanceForProduction = new passport.Passport({
   logoutRedirectUri: 'http://localhost:3000/logout',
   audience: 'platform_api',
   scope: 'openid offline_access email transact',
+  popupOverlayOptions: {
+    disableGenericPopupOverlay: true, // Only disable generic
+    disableBlockedPopupOverlay: false,
+  },
 });
 
-
+// Passport instance with only the blocked popup overlay disabled
+export const passportInstanceWithBlockedOverlayDisabled = new passport.Passport({
+  baseConfig: {
+    environment: config.Environment.SANDBOX,
+    publishableKey: process.env.NEXT_PUBLIC_PUBLISHABLE_KEY || '<YOUR_PUBLISHABLE_KEY>',
+  },
+  clientId: process.env.NEXT_PUBLIC_CLIENT_ID || '<YOUR_CLIENT_ID>',
+  redirectUri: 'http://localhost:3000/redirect',
+  logoutRedirectUri: 'http://localhost:3000/logout',
+  audience: 'platform_api',
+  scope: 'openid offline_access email transact',
+  popupOverlayOptions: {
+    disableGenericPopupOverlay: false,
+    disableBlockedPopupOverlay: true, // Only disable blocked
+  },
+}); 

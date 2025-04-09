@@ -1,21 +1,26 @@
-import React from 'react';
-import { AppWrapper } from './utils/wrapper';
-import './globals.css';
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import AppWrapper from "./utils/wrapper";
 
-export const metadata = {
-  title: 'Passport Setup Options Example',
-  description: 'Explore different setup options for Immutable Passport',
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "Passport SDK - Passport Setup with NextJS",
+  description: "Examples of different Passport setup configurations with NextJS",
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="en">
-      <body>
-        <AppWrapper>{children}</AppWrapper>
+      <body className={inter.className}>
+        <AppWrapper>
+          {children}
+        </AppWrapper>
       </body>
     </html>
   );

@@ -1,33 +1,24 @@
 'use client';
 
-import React, { useEffect, Suspense } from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAppContext } from '../utils/wrapper';
-
-function LogoutContent() {
-  const router = useRouter();
-  const { setIsAuthenticated, setUserInfo } = useAppContext();
-
-  useEffect(() => {
-    // Clear authentication state
-    setIsAuthenticated(false);
-    setUserInfo(null);
-    
-    // Redirect to homepage
-    router.push('/');
-  }, [router, setIsAuthenticated, setUserInfo]);
-
-  return (
-    <div className="container">
-      <h1>Logging out...</h1>
-    </div>
-  );
-}
 
 export default function Logout() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Since logoutMode is 'silent' in setupDefault for the relevant instances,
+    // Passport handles the logout silently.
+    // This page exists primarily as the target for logoutRedirectUri.
+    // We can redirect the user back to the home page after logout is complete.
+    console.log("Logout page reached. Redirecting to home.");
+    router.push('/');
+  }, [router]);
+
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <LogoutContent />
-    </Suspense>
+    <main>
+      <h1>Logging out...</h1>
+      <p>You are being logged out.</p>
+    </main>
   );
 } 

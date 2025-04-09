@@ -1,165 +1,107 @@
-# Passport Setup Options Example
+# Passport SDK - Passport Setup with Next.js Example
 
-This example demonstrates different Immutable Passport setup configurations and how they affect the behavior of your application. You can explore various setup options such as popup overlay settings, scope configurations, and logout modes.
+This example demonstrates various ways to initialize and configure the Immutable Passport SDK within a Next.js application. It showcases how different configuration options can affect Passport's behavior, particularly around UI overlays and logout modes.
 
-## Features
+Each configuration is presented on its own dedicated page, accessible from the home page.
 
-- Standard Passport configuration
-- Disabled popup overlays configuration
-- Minimal scopes configuration
-- Complete scopes configuration
-- Silent logout mode configuration
-- Production environment configuration
+Refer to the official [Passport Setup Documentation](https://docs.immutable.com/products/zkEVM/passport/setup) for more details.
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js v20 or later
-- pnpm (recommended)
+- pnpm (or npm/yarn)
 
-### Installation
+### Setup
 
-1. Clone the repository
-2. Navigate to the example directory:
-   ```bash
-   cd examples/passport/passport-setup-with-nextjs
-   ```
-3. Install dependencies:
-   ```bash
-   pnpm install
-   ```
-4. Create a `.env.local` file based on `.env.example`:
-   ```bash
-   cp .env.example .env.local
-   ```
-5. Update the environment variables in `.env.local` with your Passport client details from Immutable Hub
+1.  **Clone the repository:**
 
-### Running the Example
+    ```bash
+    git clone https://github.com/immutable/ts-immutable-sdk.git
+    cd ts-immutable-sdk/examples/passport/passport-setup-with-nextjs
+    ```
 
-Start the development server:
+2.  **Install dependencies:**
+
+    ```bash
+    pnpm install
+    ```
+
+3.  **Set up environment variables:**
+
+    Copy the example environment file:
+
+    ```bash
+    cp .env.example .env
+    ```
+
+    Log in to the [Immutable Hub](https://hub.immutable.com/), create a new project (or use an existing one) for Immutable zkEVM Testnet.
+
+    Navigate to the "Passport" section within your project environment:
+
+    *   Create a new Passport Client:
+        *   **Application Type:** Web
+        *   **Application Name:** Passport Setup Example (or similar)
+        *   **Redirect URLs:** `http://localhost:3000/redirect`
+        *   **Logout URLs:** `http://localhost:3000/logout`
+    *   Navigate to the "API Keys" section.
+
+    Update the `.env` file with your:
+
+    *   `NEXT_PUBLIC_CLIENT_ID`: Your Passport Client ID.
+    *   `NEXT_PUBLIC_PUBLISHABLE_KEY`: Your Publishable API Key.
+
+## Running the Example
 
 ```bash
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser. Click the links to navigate to pages demonstrating each Passport setup configuration.
 
-## Setup Options Explained
+## Project Structure
 
-### Standard Configuration
+-   `/src/app/page.tsx`: Main landing page with links to each configuration test page.
+-   `/src/app/passport-setup-default/page.tsx`: Page for the default configuration.
+-   `/src/app/passport-setup-disabled-overlays/page.tsx`: Page for the disabled overlays configuration.
+-   `/src/app/passport-setup-minimal-scopes/page.tsx`: Page for the minimal scopes configuration.
+-   `/src/app/passport-setup-all-scopes/page.tsx`: Page for the all scopes configuration.
+-   `/src/app/passport-setup-silent-logout/page.tsx`: Page for the silent logout configuration.
+-   `/src/app/passport-setup-generic-overlay-disabled/page.tsx`: Page for the generic overlay disabled configuration.
+-   `/src/app/passport-setup-blocked-overlay-disabled/page.tsx`: Page for the blocked overlay disabled configuration.
+-   `/src/app/redirect/page.tsx`: Handles the Passport login callback.
+-   `/src/app/logout/page.tsx`: Handles the Passport logout redirect.
+-   `/src/app/utils/setupDefault.ts`: Contains the various `Passport` instance initializations with different configurations.
+-   `/src/app/utils/wrapper.tsx`: Provides the application context, including the Passport provider.
 
-Default Passport setup with standard settings:
+## Key Configurations Demonstrated
 
-```typescript
-const passportInstance = new passport.Passport({
-  baseConfig: {
-    environment: config.Environment.SANDBOX,
-    publishableKey: process.env.NEXT_PUBLIC_PUBLISHABLE_KEY,
-  },
-  clientId: process.env.NEXT_PUBLIC_CLIENT_ID,
-  redirectUri: 'http://localhost:3000/redirect',
-  logoutRedirectUri: 'http://localhost:3000/logout',
-  audience: 'platform_api',
-  scope: 'openid offline_access email transact',
-});
-```
+The example app allows you to test the following configurations, each on its own dedicated page accessed via the home page links:
 
-### Disabled Popup Overlays
+-   **Default Configuration** (`/passport-setup-default`)
+-   **Popup Overlays Disabled** (`/passport-setup-disabled-overlays`)
+-   **Minimal Scopes** (`/passport-setup-minimal-scopes`)
+-   **All Scopes** (`/passport-setup-all-scopes`)
+-   **Silent Logout Mode** (`/passport-setup-silent-logout`)
+-   **Generic Popup Overlay Disabled** (`/passport-setup-generic-overlay-disabled`)
+-   **Blocked Popup Overlay Disabled** (`/passport-setup-blocked-overlay-disabled`)
 
-Passport configured with popup overlays disabled:
+By logging in and out on each page, you can observe the specific behavior of that Passport instance configuration.
 
-```typescript
-const passportInstanceWithDisabledOverlays = new passport.Passport({
-  baseConfig: {
-    environment: config.Environment.SANDBOX,
-    publishableKey: process.env.NEXT_PUBLIC_PUBLISHABLE_KEY,
-  },
-  clientId: process.env.NEXT_PUBLIC_CLIENT_ID,
-  redirectUri: 'http://localhost:3000/redirect',
-  logoutRedirectUri: 'http://localhost:3000/logout',
-  audience: 'platform_api',
-  scope: 'openid offline_access email transact',
-  popupOverlayOptions: {
-    disableGenericPopupOverlay: true,
-    disableBlockedPopupOverlay: true,
-  },
-});
-```
+## Feature Management
 
-### Minimal Scopes
+### Adding New Features/Configurations
+To add a new configuration example:
+1. Add the new Passport instance initialization to `src/app/utils/setupDefault.ts`.
+2. Create a new directory `src/app/passport-setup-{key}` (e.g., `passport-setup-new-config`).
+3. Create a `page.tsx` file within the new directory, copying the structure from an existing configuration page (like `passport-setup-default/page.tsx`).
+4. Update the new `page.tsx` to import and use the correct Passport instance from `setupDefault.ts` and set the correct `description`.
+5. Add the new route key, description, and path to `instanceRoutes` in `src/app/page.tsx` to generate the link.
 
-Passport configured with only required scopes:
+### Updating Features
+To update an existing configuration's behavior:
+1. Modify the corresponding Passport instance initialization in `src/app/utils/setupDefault.ts`.
+2. Update the logic within the specific configuration's page file (e.g., `src/app/passport-setup-default/page.tsx`) if necessary.
 
-```typescript
-const passportInstanceWithMinimalScopes = new passport.Passport({
-  baseConfig: {
-    environment: config.Environment.SANDBOX,
-    publishableKey: process.env.NEXT_PUBLIC_PUBLISHABLE_KEY,
-  },
-  clientId: process.env.NEXT_PUBLIC_CLIENT_ID,
-  redirectUri: 'http://localhost:3000/redirect',
-  logoutRedirectUri: 'http://localhost:3000/logout',
-  audience: 'platform_api',
-  scope: 'openid offline_access', // Minimal required scopes
-});
-```
-
-### Silent Logout
-
-Passport configured with silent logout mode:
-
-```typescript
-const passportInstanceWithSilentLogout = new passport.Passport({
-  baseConfig: {
-    environment: config.Environment.SANDBOX,
-    publishableKey: process.env.NEXT_PUBLIC_PUBLISHABLE_KEY,
-  },
-  clientId: process.env.NEXT_PUBLIC_CLIENT_ID,
-  redirectUri: 'http://localhost:3000/redirect',
-  logoutRedirectUri: 'http://localhost:3000/logout',
-  audience: 'platform_api',
-  scope: 'openid offline_access email transact',
-  logoutMode: 'silent',
-});
-```
-
-## Observed Behaviors
-
-### Popup Overlays
-
-- **Standard Configuration**: Shows both generic and blocked popup overlays
-- **Disabled Overlays**: Does not show any overlays during login/transaction processes
-
-### Scopes
-
-- **Minimal Scopes**: Limited user information available, no email or transaction capabilities
-- **Full Scopes**: Complete user information including email and transaction capabilities
-
-### Logout Modes
-
-- **Standard Logout**: Redirects to the logout page upon logout
-- **Silent Logout**: Performs logout without redirecting, staying on the current page
-
-## Testing
-
-Run the tests with:
-
-```bash
-pnpm test
-```
-
-## Learn More
-
-- [Immutable Passport Documentation](https://docs.immutable.com/products/zkevm/passport/setup/)
-- [Next.js Documentation](https://nextjs.org/docs)
-
-## Troubleshooting
-
-### Common Issues
-
-- **Authentication Errors**: Ensure your client ID and redirect URIs are properly configured in Immutable Hub
-- **Popup Blocked**: Check browser settings to allow popups from your application domain
-- **Scope Issues**: Make sure you're requesting the correct scopes required for your application
-
-If you encounter persistent issues, check the browser console for detailed error messages. 
+This comprehensive guide will help you safely add or update feature implementations while respecting existing code and manual edits. 

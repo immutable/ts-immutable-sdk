@@ -1,10 +1,4 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-  // Disable static site generation for our dynamic pages
-  experimental: {
-    missingSuspenseWithCSRBailout: false,
-  },
-};
+const nextConfig = {};
 
-export default nextConfig; 
+export default nextConfig;

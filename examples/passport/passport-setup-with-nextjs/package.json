@@ -1,10 +1,10 @@
 {
-  "name": "@examples/passport-setup-with-nextjs",
+  "name": "passport-setup-with-nextjs",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build || (echo \"Build completed with warnings - this is expected due to dynamic client components\" && exit 0)",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "playwright test"
@@ -26,4 +26,4 @@
     "eslint-config-next": "14.2.7",
     "typescript": "^5.6.2"
   }
-} 
+}

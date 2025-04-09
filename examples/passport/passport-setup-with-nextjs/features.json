@@ -1,11 +1,11 @@
 {
-  "features": [
-    {
-      "feature": "passport-setup",
-      "manually-edited": false,
-      "silent-login": true,
-      "silent-logout": true
-    }
-  ],
-  "order": 7
+    "features": [
+        {
+            "feature": "passport-setup",
+            "manually-edited": false,
+            "silent-login": true,
+            "silent-logout": true
+        }
+    ],
+    "order": 7
 } 

@@ -1,83 +1,47 @@
-'use client';
+'use client'
 
-import React, { Suspense } from 'react';
-import { Button } from '@biom3/react';
-import Link from 'next/link';
+import React from 'react';
+// import Link from 'next/link'; // Remove unused import
+import NextLink from 'next/link'; // Use NextLink alias for clarity with Biom3 Button rc prop
+import { Heading, Button } from '@biom3/react'; // Import Biom3 components
 
-function HomeContent() {
-  return (
-    <div className="container">
-      <h1>Immutable Passport Setup Options</h1>
-      <p className="card">
-        This example demonstrates different Passport setup configurations and how they affect the behavior of your application.
-        You can explore various setup options such as popup overlay settings, scope configurations, and logout modes.
-      </p>
-
-      <div className="setup-options">
-        <div className="setup-card">
-          <h3>Standard Configuration</h3>
-          <p>Default Passport setup with standard settings</p>
-          <Link href="/passport-setup?config=standard">
-            <Button variant="primary">Try Standard Setup</Button>
-          </Link>
-        </div>
-
-        <div className="setup-card">
-          <h3>Disabled Popup Overlays</h3>
-          <p>Passport configured with popup overlays disabled</p>
-          <Link href="/passport-setup?config=no-overlays">
-            <Button variant="primary">Try No Overlays</Button>
-          </Link>
-        </div>
-
-        <div className="setup-card">
-          <h3>Minimal Scopes</h3>
-          <p>Passport configured with only required scopes</p>
-          <Link href="/passport-setup?config=minimal-scopes">
-            <Button variant="primary">Try Minimal Scopes</Button>
-          </Link>
-        </div>
-
-        <div className="setup-card">
-          <h3>All Scopes</h3>
-          <p>Passport configured with all available scopes</p>
-          <Link href="/passport-setup?config=all-scopes">
-            <Button variant="primary">Try All Scopes</Button>
-          </Link>
-        </div>
-
-        <div className="setup-card">
-          <h3>Silent Logout</h3>
-          <p>Passport configured with silent logout mode</p>
-          <Link href="/passport-setup?config=silent-logout">
-            <Button variant="primary">Try Silent Logout</Button>
-          </Link>
-        </div>
-
-        <div className="setup-card">
-          <h3>Production Environment</h3>
-          <p>Passport configured for production environment</p>
-          <Link href="/passport-setup?config=production">
-            <Button variant="primary">Try Production</Button>
-          </Link>
-        </div>
-
-        <div className="setup-card">
-          <h3>Advanced Options</h3>
-          <p>Passport configured with advanced options including custom overrides</p>
-          <Link href="/passport-setup?config=advanced-options">
-            <Button variant="primary">Try Advanced Options</Button>
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-}
+// Define descriptions here, mapping keys to new static routes
+const instanceRoutes: { [key: string]: { description: string, path: string } } = {
+  default:              { description: 'Default configuration',                    path: '/passport-setup-default' },
+  disabledOverlays:     { description: 'Popup overlays disabled',                path: '/passport-setup-disabled-overlays' },
+  minimalScopes:        { description: 'Minimal scopes (openid, offline_access)', path: '/passport-setup-minimal-scopes' },
+  allScopes:            { description: 'All scopes (email, transact, etc)',      path: '/passport-setup-all-scopes' },
+  silentLogout:         { description: 'Silent logout mode',                     path: '/passport-setup-silent-logout' },
+  genericOverlayDisabled: { description: 'Generic popup overlay disabled',         path: '/passport-setup-generic-overlay-disabled' },
+  blockedOverlayDisabled: { description: 'Blocked popup overlay disabled',         path: '/passport-setup-blocked-overlay-disabled' },
+};
 
 export default function Home() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <HomeContent />
-    </Suspense>
+    // Remove the <main> tag and inline styles, rely on AppWrapper's Stack for centering and layout
+    <>
+      <Heading size="medium" className="mb-1">
+        Passport SDK - Passport Setup Examples
+      </Heading>
+      <p className="mb-1"> {/* Keep as <p>, add margin like buttons */}
+        This example demonstrates various configurations for initializing the Immutable Passport SDK.
+        Each link below leads to a page dedicated to a specific setup.
+      </p>
+      <Heading size="small" className="mb-1"> {/* Use smaller heading, add margin */}
+        Explore Passport Setups:
+      </Heading>
+      {/* Remove <ul> and map directly to Buttons */}
+      {Object.values(instanceRoutes).map(({ path, description }) => (
+        <Button
+          key={path}
+          className="mb-1" // Add margin bottom
+          size="medium"     // Use consistent button size
+          rc={<NextLink href={path} />} // Use NextLink within Button's rc prop
+        >
+          {description}
+        </Button>
+      ))}
+    </>
+    // Remove closing </main>
   );
 } 
