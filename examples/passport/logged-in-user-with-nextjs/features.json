@@ -20,7 +20,7 @@
         },
         {
             "feature": "link-external-wallet",
-            "manually-edited": false,
+            "manually-edited": true,
             "silent-login": true,
             "silent-logout": true
         }
