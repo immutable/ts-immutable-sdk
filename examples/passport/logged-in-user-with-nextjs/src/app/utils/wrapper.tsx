@@ -1,6 +1,5 @@
 'use client';
 import { BiomeCombinedProviders, Stack } from '@biom3/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 
 export default function AppWrapper({
@@ -12,13 +11,11 @@ export default function AppWrapper({
     
     return (
       <div className="flex-container">
-        <QueryClientProvider client={queryClient}>
-          <BiomeCombinedProviders>
-            <Stack alignItems="center">
-              { children }
-            </Stack>
-          </BiomeCombinedProviders>
-        </QueryClientProvider>
+        <BiomeCombinedProviders>
+          <Stack alignItems="center">
+            { children }
+          </Stack>
+        </BiomeCombinedProviders>
       </div>
     );
 }
