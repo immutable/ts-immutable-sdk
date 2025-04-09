@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Button, Heading, Stack, Body } from '@biom3/react';
+import { Button, Heading, Stack, Body, Table, Link } from '@biom3/react';
+import NextLink from 'next/link';
 import { passportInstance } from '../utils/setupLogoutSilent';
 import { Provider, ProviderEvent } from '@imtbl/sdk/passport';
 
@@ -37,20 +38,42 @@ export default function EventHandlingPage() {
       // User has disconnected their account
       setIsLoggedIn(false);
       setAddress('');
+      setChainId(''); // Clear chainId on disconnect
     } else {
       setAddress(accounts[0]);
+      // Potentially fetch chainId again if needed, or assume it hasn't changed
     }
   }, [logEvent]);
 
   // Initialize provider on mount
   useEffect(() => {
     const fetchPassportProvider = async () => {
-      const provider = await passportInstance.connectEvm();
-      setProvider(provider);
+      // Check if user is already logged in
+      const user = await passportInstance.getUserInfo();
+      if (user) {
+        const provider = await passportInstance.connectEvm();
+        setProvider(provider);
+        if (provider) {
+          const accounts = await provider.request({ method: 'eth_accounts' });
+          if (accounts && accounts.length > 0) {
+            setAddress(accounts[0]);
+            setAccountsState(accounts);
+            logEvent('initial_accounts', { accounts });
+            const chainId = await provider.request({ method: 'eth_chainId' });
+            setChainId(chainId);
+            logEvent('initial_chain_id', { chainId });
+          }
+        }
+        setIsLoggedIn(true);
+      } else {
+        // Optionally connectEvm even if not logged in to set up listeners early
+        // const provider = await passportInstance.connectEvm();
+        // setProvider(provider);
+      }
     };
     
     fetchPassportProvider();
-  }, []);
+  }, [logEvent]); // Added logEvent dependency
 
   // Set up accountsChanged event listener
   useEffect(() => {
@@ -96,7 +119,7 @@ export default function EventHandlingPage() {
       setIsLoggedIn(true);
     } catch (error) {
       console.error('Login error:', error);
-      logEvent('login_error', error);
+      logEvent('login_error', { message: error instanceof Error ? error.message : String(error) });
     } finally {
       setLoading(false);
     }
@@ -111,106 +134,99 @@ export default function EventHandlingPage() {
       setAddress('');
       setChainId('');
       setAccountsState([]);
+      setProvider(undefined); // Clear provider on logout
+      logEvent('logout_success', {}); // Log successful logout
     } catch (error) {
       console.error('Logout error:', error);
-      logEvent('logout_error', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Manually request accounts
-  const requestAccounts = async () => {
-    if (!provider) return;
-    
-    try {
-      setLoading(true);
-      const accounts = await provider.request({ 
-        method: 'eth_requestAccounts' 
-      });
-      logEvent('request_accounts', { accounts });
-      if (accounts && accounts.length > 0) {
-        setAddress(accounts[0]);
-        setAccountsState(accounts);
-      }
-    } catch (error) {
-      console.error('Request accounts error:', error);
-      logEvent('request_accounts_error', error);
+      logEvent('logout_error', { message: error instanceof Error ? error.message : String(error) });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Stack gap="space.large">
-      <Heading>Passport SDK - Event Handling Example</Heading>
+    <>
+      <Heading size="medium" className="mb-1">Passport SDK - Event Handling Example</Heading>
       
-      <Stack gap="space.medium">
-        <Body>Status: {isLoggedIn ? 'Logged In' : 'Logged Out'}</Body>
-        
-        {isLoggedIn && address && (
-          <Stack gap="space.small">
-            <Body weight="bold">Connected Account:</Body>
-            <code>{address}</code>
-          </Stack>
-        )}
-        
-        {isLoggedIn && chainId && (
-          <Stack gap="space.small">
-            <Body weight="bold">Chain ID:</Body>
-            <code>{chainId}</code>
-          </Stack>
-        )}
-        {accountsState && accountsState.length > 0 && (
-          <Stack gap="space.small">
-            <Body weight="bold">Accounts:</Body>
-            <div>
-              {accountsState.map((account, idx) => (
-                <div key={idx} style={{ marginBottom: "4px" }}>
-                  <code>{account}</code> {idx === 0 && <span style={{ fontSize: "12px", color: "#666" }}>(active)</span>}
-                </div>
-              ))}
-            </div>
-          </Stack>
-        )}
-      </Stack>
+      {/* Buttons Section */}
       
-      <Stack direction="row" gap="space.large">
+      {!isLoggedIn && (
         <Button 
           onClick={handleLogin} 
-          disabled={isLoggedIn || loading}
+          disabled={loading}
+          className="mb-1"
+          size="medium"
         >
-          Login {loading && !isLoggedIn ? '...' : ''}
+          Login {loading ? '...' : ''}
         </Button>
+      )}
+      {isLoggedIn && (
         <Button 
           onClick={handleLogout} 
-          disabled={!isLoggedIn || loading}
-          variant="secondary"
+          disabled={loading}
+          className="mb-1"
+          size="medium"
         >
-          Logout {loading && isLoggedIn ? '...' : ''}
+          {loading ? 'Logging out...' : 'Logout'} 
         </Button>
-      </Stack>
-      
-      {isLoggedIn && (   
-        <Stack direction="row" gap="space.large">
-          <Button 
-            onClick={requestAccounts}
-            disabled={loading}
-            variant="tertiary"
-          >
-            Request Accounts
-          </Button>
-        </Stack>
       )}
 
-      <Stack gap="space.medium">
+      {/* State Data Table */}
+      {(isLoggedIn || accountsState.length > 0) && (
+        <>
+          <Table>
+            <Table.Head>
+              <Table.Row>
+                <Table.Cell>Key</Table.Cell>
+                <Table.Cell>Value</Table.Cell>
+              </Table.Row>
+            </Table.Head>
+            <Table.Body>
+              <Table.Row>
+                <Table.Cell>Status</Table.Cell>
+                <Table.Cell>{isLoggedIn ? 'Logged In' : 'Logged Out'}</Table.Cell>
+              </Table.Row>
+              {address && (
+                <Table.Row>
+                  <Table.Cell>Address</Table.Cell>
+                  <Table.Cell><code>{address}</code></Table.Cell>
+                </Table.Row>
+              )}
+              {chainId && (
+                <Table.Row>
+                  <Table.Cell>Chain ID</Table.Cell>
+                  <Table.Cell><code>{chainId}</code></Table.Cell>
+                </Table.Row>
+              )}
+               {accountsState.length > 0 && (
+                <Table.Row>
+                  <Table.Cell>Accounts ({accountsState.length})</Table.Cell>
+                  <Table.Cell>
+                    <div style={{ maxHeight: '100px', overflowY: 'auto'}}>
+                      {accountsState.map((account, idx) => (
+                        <div key={idx} style={{ marginBottom: "4px" }}>
+                          <code>{account}</code> {idx === 0 && <span style={{ fontSize: "12px", color: "#666" }}>(active)</span>}
+                        </div>
+                      ))}
+                    </div>
+                  </Table.Cell>
+                </Table.Row>
+              )}
+            </Table.Body>
+          </Table>
+        </>
+      )}
+      <br />
+      {/* Event Log Section */}
+      <>
         <Heading size="small">Event Log:</Heading>
         <div className="event-log" style={{ 
           maxHeight: '300px', 
           overflowY: 'auto', 
           border: '1px solid #ddd',
           borderRadius: '4px',
-          padding: '12px'
+          padding: '12px',
+          width: '100%'
         }}>
           {events.length === 0 ? (
             <Body>No events logged yet</Body>
@@ -223,13 +239,26 @@ export default function EventHandlingPage() {
                 borderRadius: '4px' 
               }}>
                 <Stack direction="row" gap="space.xsmall" alignItems="center">
-                  <div className="event-tag">{event.event}</div>
+                  {/* Use a more distinct tag style */}
+                  <span style={{ 
+                    backgroundColor: '#e0e0e0', 
+                    padding: '2px 6px', 
+                    borderRadius: '4px', 
+                    fontSize: '12px',
+                    fontWeight: 'bold'
+                  }}>
+                    {event.event}
+                  </span>
                   <Body size="small" color="secondary">{event.timestamp}</Body>
                 </Stack>
                 <pre style={{ 
-                  marginTop: '4px', 
+                  marginTop: '8px', 
                   overflow: 'auto',
-                  fontSize: '12px'
+                  fontSize: '12px',
+                  backgroundColor: '#fff', // White background for pre
+                  padding: '8px',
+                  borderRadius: '4px',
+                  border: '1px solid #eee'
                 }}>
                   {event.data}
                 </pre>
@@ -237,7 +266,9 @@ export default function EventHandlingPage() {
             ))
           )}
         </div>
-      </Stack>
-    </Stack>
+      </>
+      <br />
+      <Link rc={<NextLink href="/" />}>Return to Examples</Link>
+    </>
   );
 } 
