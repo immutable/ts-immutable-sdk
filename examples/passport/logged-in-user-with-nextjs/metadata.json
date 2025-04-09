@@ -1,8 +1,8 @@
 {
   "title": "User Information after Logging In with NextJS",
-  "description": "Example of retrieving and displaying user data after authentication with Immutable Passport in a NextJS application",
-  "keywords": ["Immutable", "SDK", "Passport", "NextJS", "User Info", "Linked Addresses", "Tokens"],
-  "tech_stack": ["NextJS", "TypeScript", "React"],
+  "description": "Example app demonstrating how to access user profile data, linked addresses, auth tokens, and link external wallets after authentication with Immutable Passport in a Next.js application.",
+  "keywords": ["Immutable", "SDK", "Passport", "NextJS", "Authentication", "User Profile", "Linked Addresses", "External Wallet"],
+  "tech_stack": ["Next.js", "TypeScript", "React Query"],
   "product": "Passport",
   "programming_language": "TypeScript"
 } 

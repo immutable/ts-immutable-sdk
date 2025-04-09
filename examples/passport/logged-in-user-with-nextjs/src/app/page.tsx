@@ -27,5 +27,11 @@ export default function Home() {
       rc={<NextLink href="/verify-tokens-with-nextjs" />}>
         Verify Tokens with NextJS
       </Button> 
+      <Button       
+      className="mb-1"
+      size="medium" 
+      rc={<NextLink href="/link-external-wallet" />}>
+        Link External Wallet
+      </Button> 
   </>);
 }
