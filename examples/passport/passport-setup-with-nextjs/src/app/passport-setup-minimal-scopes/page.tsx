@@ -1,12 +1,10 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Button, Heading, Table, Link as BiomLink } from '@biom3/react';
+import { Button, Heading, Table, Link } from '@biom3/react';
 import NextLink from 'next/link';
 import { passportInstanceWithMinimalScopes as specificInstance } from '../utils/setupDefault';
 import { UserProfile } from '@imtbl/sdk/passport';
-
-const description = 'Minimal Scopes (openid, offline_access)';
 
 export default function PassportSetupMinimalScopesPage() {
   const [userInfo, setUserInfo] = useState<UserProfile | null>(null);
@@ -104,8 +102,8 @@ export default function PassportSetupMinimalScopesPage() {
 
   return (
     <>
-      <Heading size="medium" className="mb-1">Passport Setup: {description}</Heading>
-      <p className="mb-1">Testing Passport behavior using the <strong>{description}</strong> configuration.</p>
+      <Heading size="medium" className="mb-1">Passport Setup: Minimal Scopes (openid, offline_access)</Heading>
+      <p className="mb-1">Testing Passport behavior using the <strong>Minimal Scopes (openid, offline_access)</strong> configuration.</p>
       {!isClientReady && error && (
         <p className="mb-1" style={{ color: 'red' }}>
           <strong>Configuration Error:</strong> {error}
@@ -115,13 +113,13 @@ export default function PassportSetupMinimalScopesPage() {
         <>
           <div className="mb-1">
             {!isSessionActive && (
-              <Button onClick={handleLogin} disabled={loading} variant="primary" className="mb-1">
-                {loading ? 'Processing...' : 'Login'}
+              <Button onClick={handleLogin} disabled={loading} className="mb-1">
+                {loading ? 'Logging in...' : 'Login'}
               </Button>
             )}
             {isSessionActive && (
-              <Button onClick={handleLogout} disabled={loading} variant="secondary">
-                {loading ? 'Processing...' : 'Logout'}
+              <Button onClick={handleLogout} disabled={loading} className="mb-1">
+                {loading ? 'Logging out...' : 'Logout'}
               </Button>
             )}
           </div>
@@ -161,7 +159,7 @@ export default function PassportSetupMinimalScopesPage() {
               </Table>
             </>
           )}
-          <BiomLink rc={<NextLink href="/" />} className="mb-1">Return to Examples</BiomLink>
+          <Link rc={<NextLink href="/" />} className="mb-1">Return to Examples</Link>
         </>
       )}
     </>

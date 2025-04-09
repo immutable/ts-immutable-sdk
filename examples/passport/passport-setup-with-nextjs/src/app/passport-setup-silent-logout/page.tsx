@@ -1,12 +1,10 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Button, Heading, Table, Link as BiomLink } from '@biom3/react';
+import { Button, Heading, Table, Link } from '@biom3/react';
 import NextLink from 'next/link';
 import { passportInstanceWithSilentLogout as specificInstance } from '../utils/setupDefault';
 import { UserProfile } from '@imtbl/sdk/passport';
-
-const description = 'Silent Logout Mode';
 
 export default function PassportSetupSilentLogoutPage() {
   const [userInfo, setUserInfo] = useState<UserProfile | null>(null);
@@ -104,8 +102,8 @@ export default function PassportSetupSilentLogoutPage() {
 
   return (
     <>
-      <Heading size="medium" className="mb-1">Passport Setup: {description}</Heading>
-      <p className="mb-1">Testing Passport behavior using the <strong>{description}</strong> configuration. Logout should happen without a popup.</p>
+      <Heading size="medium" className="mb-1">Passport Setup: Silent Logout Mode</Heading>
+      <p className="mb-1">Testing Passport behavior using the <strong>Silent Logout Mode</strong> configuration. Logout should happen without a popup.</p>
       {!isClientReady && error && (
         <p className="mb-1" style={{ color: 'red' }}>
           <strong>Configuration Error:</strong> {error}
@@ -114,8 +112,8 @@ export default function PassportSetupSilentLogoutPage() {
       {isClientReady && (
         <>
           <div className="mb-1">
-            {!isSessionActive && <Button onClick={handleLogin} disabled={loading} variant="primary" className="mb-1">{loading ? 'Processing...' : 'Login'}</Button>}
-            {isSessionActive && <Button onClick={handleLogout} disabled={loading} variant="secondary">Logout (Silent)</Button>}
+            {!isSessionActive && <Button onClick={handleLogin} disabled={loading} className="mb-1">{loading ? 'Logging in...' : 'Login'}</Button>}
+            {isSessionActive && <Button onClick={handleLogout} disabled={loading} className="mb-1">Logout (Silent)</Button>}
           </div>
           {isSessionActive && <p className="mb-1" style={{ fontStyle: 'italic', color: '#6c757d' }}>An existing session was detected. Please <strong>Logout</strong> first to test the specific <strong>Login</strong> behavior for this configuration.</p>}
           {loading && <p className="mb-1">Loading...</p>}
@@ -147,7 +145,7 @@ export default function PassportSetupSilentLogoutPage() {
               </Table>
             </>
           )}
-          <BiomLink rc={<NextLink href="/" />} className="mb-1">Return to Examples</BiomLink>
+          <Link rc={<NextLink href="/" />} className="mb-1">Return to Examples</Link>
         </>
       )}
     </>
