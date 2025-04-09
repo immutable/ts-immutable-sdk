@@ -55,10 +55,10 @@ test.describe("sub-pages navigation", () => {
   test("Check Link External Wallet", async ({ page }) => {
     await page.click("text=Link External Wallet");
     await expect(page.getByRole("heading", { name: "Link External Wallet" })).toBeVisible();
-    await expect(page.getByRole("button", { name: /Login|Logged In/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Login with Passport" })).toBeVisible();
     await expect(page.getByRole("row", { name: /Is Logged In/ })).toBeVisible();
     await expect(page.getByRole("row", { name: /Account Address/ })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Connect Wallet" })).toBeVisible();
+    await expect(page.getByRole("row", { name: /External Wallet/ })).toBeVisible();
     await expect(page.getByRole("link", { name: "Return to Examples" })).toBeVisible();
   });
 });

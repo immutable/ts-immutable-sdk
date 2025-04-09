@@ -104,8 +104,8 @@ export default function LinkExternalWallet() {
       // Generate a nonce for the signature
       const nonce = generateNonce();
       // Ensure addresses are in the correct format - lowercase 0x-prefixed
-      const formattedExternalWalletAddress = externalWalletAddress.toLowerCase() as `0x${string}`;
-      const formattedPassportAddress = accountAddress.toLowerCase() as `0x${string}`;
+      const metamaskAddress = externalWalletAddress.toLowerCase() as `0x${string}`;
+      const passportAddress = accountAddress.toLowerCase() as `0x${string}`;
       
       const dataToSign = {
         types: {
@@ -136,62 +136,52 @@ export default function LinkExternalWallet() {
         },
         primaryType: "LinkWallet",
         domain: {
-          chainId: 1,
+          chainId: 1, // Must be set to 1 for Ethereum Mainnet
         },
         message: {
-          walletAddress: formattedExternalWalletAddress,
-          immutablePassportAddress: formattedPassportAddress,
+          walletAddress: metamaskAddress,
+          immutablePassportAddress: passportAddress,
           condition: "I agree to link this wallet to my Immutable Passport account.",
           nonce
         }
       }
 
-      console.log('dataToSign', dataToSign);
-
       if (typeof window === 'undefined' || !window.ethereum) {
         throw new Error('MetaMask not installed');
       }
 
-      // Sign the message using window.ethereum directly
-      const signature = await window.ethereum.request({
-        method: 'eth_signTypedData_v4',
-        params: [formattedExternalWalletAddress, JSON.stringify(dataToSign)]
-      });
+      let signature: string;
 
-      console.log('signature', signature);
+      try {
+         // Metamask must be connected to Ethereum Mainnet
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x1' }], // chainId must be in hexadecimal format
+        });
 
-      // Import and use our signature validation function
-      const { validateSignatureComprehensive } = await import('../utils/validateEIP712Signature');
-      
-      const isValid = await validateSignatureComprehensive(
-        formattedExternalWalletAddress, // the signer address
-        dataToSign, // the payload
-        signature,
-        window.ethereum // pass the provider for contract wallet validation if needed
-      );
+        // Now request the signature
+        signature = await window.ethereum.request({
+          method: 'eth_signTypedData_v4',
+          params: [metamaskAddress, JSON.stringify(dataToSign)]
+        });
 
-      console.log('isValid', isValid);
-
-      if (!isValid) {
-        throw new Error('Invalid signature');
+      } catch (error) {
+        console.error('Error signing message:', error);
+        setLinkingError('Failed to sign message');
+        setLinkingStatus('Make sure you have MetaMask installed and connected to Ethereum Mainnet');
+        setIsLinking(false);
+        return
       }
-
+     
       setLinkingStatus('Linking wallet...');
       
-      console.log('linkExternalWallet type:', "External");
-      console.log('linkExternalWallet walletAddress:', formattedExternalWalletAddress);
-      console.log('linkExternalWallet signature:', signature);
-      console.log('linkExternalWallet nonce:', nonce);
-
       // Call the linkExternalWallet method to link the wallet
       const result = await passportInstance.linkExternalWallet({
         type: "External",
-        walletAddress: formattedExternalWalletAddress,
+        walletAddress: metamaskAddress,
         signature,
         nonce
       });
-
-      console.log('result', result);
       
       const linkedAddresses = await passportInstance.getLinkedAddresses();
       setLinkedAddresses(linkedAddresses);
@@ -266,12 +256,7 @@ export default function LinkExternalWallet() {
             <Table.Cell><b>External Wallet</b></Table.Cell>
             <Table.Cell>{externalWalletAddress || 'Not connected'}</Table.Cell>
           </Table.Row>
-          {linkingStatus && (
-            <Table.Row>
-              <Table.Cell><b>Status</b></Table.Cell>
-              <Table.Cell>{linkingStatus}</Table.Cell>
-            </Table.Row>
-          )}
+          
           {linkedAddresses.length > 0 && (
             <Table.Row>
               <Table.Cell><b>Linked Addresses</b></Table.Cell>
@@ -282,6 +267,12 @@ export default function LinkExternalWallet() {
             <Table.Row>
               <Table.Cell><b>Error</b></Table.Cell>
               <Table.Cell>{linkingError}</Table.Cell>
+            </Table.Row>
+          )}
+          {linkingStatus && (
+            <Table.Row>
+              <Table.Cell><b>Message</b></Table.Cell>
+              <Table.Cell>{linkingStatus}</Table.Cell>
             </Table.Row>
           )}
         </Table.Body>
