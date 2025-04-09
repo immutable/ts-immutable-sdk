@@ -331,9 +331,9 @@ pnpm test
 
 1) Open the product folder under /examples/{product}
 
-2) Under the {product} directory, open the prompt-part2.txt file.
+2) Under the {product} directory, open the example-app-2-add-feature.txt file.
 
-3) Copy all of the content in the prompt-part2.txt file.
+3) Copy all of the content in the example-app-2-add-feature.txt file.
 
 4) Paste it on to Cursor. Make sure that you're using Agent mode and the model to be used is Claude 3.7 (Thinking)
 
@@ -347,7 +347,7 @@ the <feature name> has the manually-edited field value as true in the feature.js
 
 7) If the flag above exists, it will ask for a confirmation, otherwise, it will use best practices to update the existing feature page.
 
-8) Once the feature page is completed, under the same directory as prompt-part2.txt, open prompt-part3.txt and copy all of its contents.
+8) Once the feature page is completed, under the same directory as example-app-2-add-feature.txt, open example-app-3-fix-ui.txt and copy all of its contents.
 
 9) Paste it on to a new Cursor window and in the chat window you can type: 
 
@@ -355,7 +355,7 @@ feature name: <name of the feature>
 
 Here, cursor will check and fix pages with styling issues to ensure that it looks consistent with other example apps.
 
-10) Once the styling changes have been made, under the same directory as prompt-part2.txt, open prompt-part4.txt and copy all of its contents.
+10) Once the styling changes have been made, under the same directory as example-app-2-add-feature.txt, open example-app-4-testing.txt and copy all of its contents.
 
 11) Paste it on to a new Cursor window and in the chat window you can type: 
 app name: <app name(if exists)>
@@ -369,7 +369,7 @@ feature name: <name of the feature>
 
 ## If an App Doesn't Exist Yet
 
-You must create the app first by going to the prompt-part1.txt file and paste it on to Cursor's chat window and use Agent Mode + Claude 3.7 Sonnet Thinking.
+You must create the app first by going to the example-app-1-create-app-template.txt file and paste it on to Cursor's chat window and use Agent Mode + Claude 3.7 Sonnet Thinking.
 
 In the chat window, type in:
 feature name: <name>
@@ -383,35 +383,35 @@ IMPORTANT: For any prompts, if cursor is not done with its operations but it has
 
 The example generation process uses three different prompt files, each with a specific purpose:
 
-### prompt-part1.txt
+### example-app-1-create-app-template.txt
 - **Purpose**: Creates the initial app structure and boilerplate
 - **When to use**: Only when you need to create a completely new example app
 - **What it does**: Sets up the project structure, configuration files, basic components, and placeholder pages
 - **Output**: A functioning but minimal app with no implemented features
 
-### prompt-part2.txt
+### example-app-2-add-feature.txt
 - **Purpose**: Implements or updates a specific feature within an existing app
-- **When to use**: After creating an app with prompt-part1.txt, or when adding/updating features
+- **When to use**: After creating an app with example-app-1-create-app-template.txt, or when adding/updating features
 - **What it does**: Creates or modifies the feature implementation with proper error handling, UI states, and best practices
 - **Output**: A fully implemented feature page within the app structure
 
-### prompt-part3.txt
+### example-app-3-fix-ui.txt
 - **Purpose**: Apply styling changes to the given example app if possible to ensure styling consistency with other example apps
-- **When to use**: After running prompt-part2.txt to implement a feature
+- **When to use**: After running example-app-2-add-feature.txt to implement a feature
 - **What it does**: Modifies the example app's UI/UX to ensure that the app looks consistent with other example apps
 - **Output**: A fully implemented feature page within the app structure with consistent UI/UX looks.
 
-### prompt-part4.txt
+### example-app-4-testing.txt
 - **Purpose**: Tests, validates, and fixes issues in the implementation
-- **When to use**: After running prompt-part2.txt to implement a feature
+- **When to use**: After running example-app-2-add-feature.txt to implement a feature
 - **What it does**: Runs tests, checks coverage, builds the app, and fixes any detected issues
 - **Output**: A tested, validated feature ready for use
 
 **Typical Workflow:**
-1. Use prompt-part1.txt to create a new app (only once per app)
-1. Use prompt-part2.txt to implement each feature in the app
-1. Use prompt-part3.txt to fix the app's UI/UX styling and make it look consistent to other example apps.
-1. Use prompt-part4.txt after each feature implementation to test and validate
+1. Use example-app-1-create-app-template.txt to create a new app (only once per app)
+1. Use example-app-2-add-feature.txt to implement each feature in the app
+1. Use example-app-3-fix-ui.txt to fix the app's UI/UX styling and make it look consistent to other example apps.
+1. Use example-app-4-testing.txt after each feature implementation to test and validate
 1. Once you've generated the example app or feature, you should manually review the implementation and the UI. It's likely you will need to make some manual adjustments to get the app to function and look like our other example apps because the cursor can not reliably get it 100% correct. 
 1. Once you're happy with your example app or feature, you need to [re-run the tutorial generation prompt](#generating-tutorials-and-metadata-with-cursor) for your example app before creating your PR so the new example app or feature is piped into the docs site with it's corresponding tutorial.
 
@@ -507,7 +507,7 @@ If this happens you will need to log into the Netlify site, check the error and 
 
 # Generating tutorials and metadata with cursor
 
-Whenever you add a new example app, or update an existing example app, you can use the prompts in the `prompt.txt` files in each `examples/product` folder to generate the tutorials and metadata for the example apps using Cursor AI.
+Whenever you add a new example app, or update an existing example app, you can use the prompts in the `tutorial-generation-prompt.txt` files in each `examples/product` folder to generate the tutorials and metadata for the example apps using Cursor AI.
 
 These AI generated tutorials and metadata files are then piped through to the docs site in the CI/CD pipeline, where they are used to display the example apps and their code walkthroughs. If you don't follow these steps, your example app will not be displayed on the docs site.
 
@@ -520,7 +520,7 @@ Follow these steps to generate the tutorials and metadata for the example apps:
 1. Delete the existing tutorial.md and metadata.json files in the example app you are wanting to generate the tutorials and metadata for.
 2. Open the Composer window in Cursor IDE (Claude 3.7-sonnet-thinking).
 3. Press the `+` button clear the context of the composer window.
-4. Open the `prompt.txt` file in the examples/product folder you are wanting to generate the tutorials and metadata for e.g. `examples/passport/prompt.txt`.
+4. Open the `tutorial-generation-prompt.txt` file in the examples/product folder you are wanting to generate the tutorials and metadata for e.g. `examples/passport/tutorial-generation-prompt.txt`.
 5. Copy and pate the prompt into the composer window, or attach it as a file.
 6. After adding the prompt, in the composer window, type `app name: <name of the example app>` e.g. `app name: login-with-nextjs` where the app name is the folder name of the example app in the examples/product folder you are wanting to generate the tutorials and metadata for.
 7. Press enter and let the AI generate the tutorials and metadata.
