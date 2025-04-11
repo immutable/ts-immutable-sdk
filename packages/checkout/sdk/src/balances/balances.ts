@@ -323,9 +323,12 @@ export const getAllBalances = async (
         getBlockscoutBalance(config, address!, chainId, tokens),
       );
     } catch (error) {
-      // Blockscout rate limiting, fallback to RPC node
+      // Blockscout rate limiting or errors, fallback to RPC node
       if ((error as CheckoutError).type === CheckoutErrorType.GET_INDEXER_BALANCE_ERROR
-        && (error as CheckoutError).data?.error?.code === HttpStatusCode.TooManyRequests) {
+        && (
+          (error as CheckoutError).data?.error?.code === HttpStatusCode.TooManyRequests
+          || (error as CheckoutError).data?.error?.code === HttpStatusCode.InternalServerError
+        )) {
         return getTokenBalances(config, provider, walletAddress, chainId, tokens);
       }
       throw error;
