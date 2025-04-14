@@ -23,12 +23,9 @@ This tutorial demonstrates how to implement NFT listing fulfillment using the Im
 
 ### Fulfill ERC721 Listing
 
-**Feature Name**: Fulfill an active ERC721 listing on the Immutable orderbook.
+Fulfills an active listing for an ERC721 token on the Orderbook.
 
-**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/fulfill-listing-with-nextjs/src/app/fulfill-listing-with-erc721/page.tsx)
-
-**Implementation**:
-```typescript
+```typescript title="Fulfill ERC721 Listing" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-listing-with-nextjs/src/app/fulfill-listing-with-erc721/page.tsx"
 const fulfillERC721Listing = async (listingID: string) => {
   const { actions } = await orderbookSDK.fulfillOrder(
     listingID,
@@ -48,16 +45,13 @@ const fulfillERC721Listing = async (listingID: string) => {
 };
 ```
 
-**Explanation**: The code first calls the `fulfillOrder` method from the Orderbook SDK, passing the listing ID, the buyer's wallet address, and optional taker ecosystem fees. The method returns a set of actions that need to be executed to complete the fulfillment. The code then iterates through these actions, builds transactions for actions of type `TRANSACTION`, and sends them using the connected wallet's signer. This process handles all the necessary on-chain interactions to complete the purchase of the NFT.
+The code first calls the `fulfillOrder` method from the Orderbook SDK, passing the listing ID, the buyer's wallet address, and optional taker ecosystem fees. The method returns a set of actions that need to be executed to complete the fulfillment. The code then iterates through these actions, builds transactions for actions of type `TRANSACTION`, and sends them using the connected wallet's signer. This process handles all the necessary on-chain interactions to complete the purchase of the NFT.
 
 ### Fulfill ERC1155 Listing
 
-**Feature Name**: Fulfill an active ERC1155 listing with specific unit amounts on the Immutable orderbook.
+Fulfills an active listing for a specific quantity of an ERC1155 token on the Orderbook.
 
-**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/fulfill-listing-with-nextjs/src/app/fulfill-listing-with-erc1155/page.tsx)
-
-**Implementation**:
-```typescript
+```typescript title="Fulfill ERC1155 Listing" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-listing-with-nextjs/src/app/fulfill-listing-with-erc1155/page.tsx"
 const fulfillERC1155Listing = async (
   listingID: string,
   unitsToFill?: string, // Number of units to fill
@@ -81,7 +75,7 @@ const fulfillERC1155Listing = async (
 };
 ```
 
-**Explanation**: Similar to the ERC721 fulfillment, this function calls the `fulfillOrder` method but includes an additional parameter for the number of units to fulfill. This is particularly important for ERC1155 tokens where a single listing might offer multiple units of the same NFT. The function processes the returned actions in the same way, building and sending transactions to complete the purchase. The implementation also waits for one confirmation of the transaction to ensure it's properly included in the blockchain.
+Similar to the ERC721 fulfillment, this function calls the `fulfillOrder` method but includes an additional parameter for the number of units to fulfill. This is particularly important for ERC1155 tokens where a single listing might offer multiple units of the same NFT. The function processes the returned actions in the same way, building and sending transactions to complete the purchase. The implementation also waits for one confirmation of the transaction to ensure it's properly included in the blockchain.
 
 ## Running the App
 

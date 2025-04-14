@@ -21,15 +21,11 @@ This example app demonstrates how to create NFT listings using the Immutable Ord
 
 ### Create Listing for ERC721 Tokens
 
-**Feature Name**: Create a listing for an ERC721 token.
-
-**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-listing-with-nextjs/src/app/create-listing-with-erc721/page.tsx)
-
-**Implementation**:
+Creates a listing on the Orderbook for a specific ERC721 token.
 
 1. Prepare the ERC721 listing:
 
-```typescript
+```typescript title="Prepare ERC721 Listing" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-listing-with-nextjs/src/app/create-listing-with-erc721/page.tsx"
 const prepareERC721Listing = async (): Promise<orderbook.PrepareListingResponse> => {
   // build the sell item
   const sell: ERC721Item = {
@@ -65,7 +61,7 @@ const prepareERC721Listing = async (): Promise<orderbook.PrepareListingResponse>
 
 2. Sign and submit approval for the listing:
 
-```typescript
+```typescript title="Sign and Submit Approval" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-listing-with-nextjs/src/app/create-listing-with-erc721/page.tsx"
 export const signAndSubmitApproval = async (
   provider: BrowserProvider,
   listing: orderbook.PrepareListingResponse,
@@ -92,7 +88,7 @@ export const signAndSubmitApproval = async (
 
 3. Sign the listing:
 
-```typescript
+```typescript title="Sign Listing" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-listing-with-nextjs/src/app/create-listing-with-erc721/page.tsx"
 export const signListing = async (
   provider: BrowserProvider,
   listing: orderbook.PrepareListingResponse,
@@ -120,7 +116,7 @@ export const signListing = async (
 
 4. Create the listing:
 
-```typescript
+```typescript title="Create Listing" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-listing-with-nextjs/src/app/create-listing-with-erc721/page.tsx"
 export const createListing = async (
   client: orderbook.Orderbook,
   preparedListing: orderbook.PrepareListingResponse,
@@ -146,8 +142,6 @@ export const createListing = async (
 };
 ```
 
-**Explanation**: 
-
 The ERC721 listing workflow consists of four main steps:
 
 1. **Prepare the listing**: This involves specifying what you're selling (an ERC721 token) and what you want in return (either Native currency or an ERC20 token).
@@ -160,15 +154,11 @@ The ERC721 listing workflow consists of four main steps:
 
 ### Create Listing for ERC1155 Tokens
 
-**Feature Name**: Create a listing for an ERC1155 token.
-
-**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-listing-with-nextjs/src/app/create-listing-with-erc1155/page.tsx)
-
-**Implementation**:
+Creates a listing on the Orderbook for a specific quantity of an ERC1155 token.
 
 The implementation for ERC1155 tokens is similar to ERC721, with the main difference being the inclusion of a quantity (amount) parameter for the tokens being sold:
 
-```typescript
+```typescript title="Prepare ERC1155 Listing" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-listing-with-nextjs/src/app/create-listing-with-erc1155/page.tsx"
 const prepareERC1155Listing = async (): Promise<orderbook.PrepareListingResponse> => {
   // build the sell item
   const sell: ERC1155Item = {
@@ -202,8 +192,6 @@ const prepareERC1155Listing = async (): Promise<orderbook.PrepareListingResponse
   return await orderbookSDK.prepareListing(prepareListingParams);
 };
 ```
-
-**Explanation**:
 
 The key difference when creating an ERC1155 listing is that you must specify the quantity (amount) of tokens to sell. ERC1155 tokens are semi-fungible, meaning multiple tokens can share the same ID. This allows sellers to list a specific quantity of tokens from their collection.
 
