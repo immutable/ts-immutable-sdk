@@ -21,31 +21,22 @@ This tutorial demonstrates how to integrate Immutable Passport's wallet connecti
 
 ### Wallet Connection
 
-**Feature Name**: Connect to a user's Ethereum wallet through Passport.
+Establishes a connection to the user's wallet using Passport.
 
-**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-transactions-with-nextjs/src/transaction.ts)
-
-**Implementation**:
-
-```typescript
+```typescript title="Connect Wallet" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-transactions-with-nextjs/src/transaction.ts"
 const provider = await passportInstance.connectEvm();
 const browserProvider = new BrowserProvider(provider);
 const signer = await browserProvider.getSigner();
 const [userAddress] = await provider.request({ method: 'eth_requestAccounts' });
 ```
 
-**Explanation**: 
 The application uses Passport's `connectEvm()` method to establish a connection to the user's wallet. This method returns a provider that can be used with ethers.js. The code then creates a BrowserProvider using this provider, gets a signer for transactions, and retrieves the user's Ethereum address.
 
 ### Transaction Execution
 
-**Feature Name**: Execute smart contract transactions (ERC-721 token transfer).
+Shows how to execute transactions, specifically an ERC-721 token transfer, using the connected wallet.
 
-**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-transactions-with-nextjs/src/transaction.ts)
-
-**Implementation**:
-
-```typescript
+```typescript title="Execute Transaction" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-transactions-with-nextjs/src/transaction.ts"
 const abi = ['function safeTransferFrom(address from, address to, uint256 tokenId)'];
 const contract = new ethers.Contract(erc721Address, abi, signer);
 
@@ -58,7 +49,6 @@ try {
 }
 ```
 
-**Explanation**: 
 The application demonstrates how to interact with an ERC-721 smart contract for transferring NFTs. It creates a contract instance using ethers.js, then calls the `safeTransferFrom` method to transfer a token from the user's address to another address. The code also includes error handling and transaction receipt verification.
 
 ## Running the App
@@ -69,31 +59,31 @@ The application demonstrates how to interact with an ERC-721 smart contract for 
 2. An account on [Immutable Hub](https://hub.immutable.com/) for obtaining API keys
 3. A created testnet collection with minted tokens on Immutable zkEVM
 
-### Environment Setup
+### Setting up the Environment
 
-1. Clone the repository
-2. Create a `.env.local` file in the project root with the following variables:
+1. Copy `.env.example` to `.env.local` and fill in:
    ```
-   NEXT_PUBLIC_PUBLISHABLE_KEY=your_publishable_key_from_hub
-   NEXT_PUBLIC_CLIENT_ID=your_client_id_from_hub
-   NEXT_PUBLIC_TO_ADDRESS=address_to_send_nft_to
-   NEXT_PUBLIC_ERC721_ADDRESS=your_testnet_collection_address
-   NEXT_PUBLIC_TOKEN_ID=token_id_to_send
+   NEXT_PUBLIC_PUBLISHABLE_KEY=your_publishable_key
+   NEXT_PUBLIC_CLIENT_ID=your_client_id
    ```
 
-### Installation and Startup
+2. Configure your Hub application:
+   - Add `http://localhost:3000/redirect` as a redirect URI
+   - Add `http://localhost:3000/logout` as a logout URI
+
+### Running Locally
 
 1. Install dependencies:
-   ```
+   ```bash
    pnpm install
    ```
 
 2. Start the development server:
-   ```
+   ```bash
    pnpm dev
    ```
 
-3. Open your browser to [http://localhost:3000](http://localhost:3000)
+3. Open your browser to http://localhost:3000
 
 ### Using the App
 

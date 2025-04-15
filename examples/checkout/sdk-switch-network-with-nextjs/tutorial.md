@@ -23,13 +23,9 @@ This example demonstrates how to use the Immutable Checkout SDK to connect to Me
 
 ### Connect to MetaMask
 
-**Feature Name**: Connect to MetaMask wallet using the Checkout SDK.
+Connects to the user's MetaMask wallet using the Checkout SDK.
 
-**Source Code**: [switch-with-metamask/page.tsx](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-switch-network-with-nextjs/src/app/switch-with-metamask/page.tsx)
-
-**Implementation**:
-
-```typescript
+```typescript title="Connect to MetaMask" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-switch-network-with-nextjs/src/app/switch-with-metamask/page.tsx"
 // Create a provider given one of the default wallet provider names
 const walletProviderName = checkout.WalletProviderName.METAMASK;
 const providerRes = await checkoutSDK.createProvider({
@@ -49,17 +45,13 @@ const isConnectedRes = await checkoutSDK.checkIsWalletConnected({
 });
 ```
 
-**Explanation**: The implementation first creates a provider for MetaMask using `createProvider()` with the METAMASK wallet provider name. Then it connects to the provider with `connect()`, requesting wallet permissions. Finally, it checks if the wallet is connected using `checkIsWalletConnected()`.
+The implementation first creates a provider for MetaMask using `createProvider()` with the METAMASK wallet provider name. Then it connects to the provider with `connect()`, requesting wallet permissions. Finally, it checks if the wallet is connected using `checkIsWalletConnected()`.
 
 ### Switch Networks
 
-**Feature Name**: Switch between different blockchain networks using the Checkout SDK.
+Switches the connected wallet between different supported blockchain networks.
 
-**Source Code**: [switch-with-metamask/page.tsx](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-switch-network-with-nextjs/src/app/switch-with-metamask/page.tsx)
-
-**Implementation**:
-
-```typescript
+```typescript title="Switch Network" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-switch-network-with-nextjs/src/app/switch-with-metamask/page.tsx"
 // Switch to Immutable zkEVM Testnet and update the provider
 const chainId = checkout.ChainId.IMTBL_ZKEVM_TESTNET;
 const switchResponse = await checkoutSDK.switchNetwork({ 
@@ -71,38 +63,30 @@ const switchResponse = await checkoutSDK.switchNetwork({
 setConnectedProvider(switchResponse.provider);
 ```
 
-**Explanation**: The implementation uses `switchNetwork()` to change the connected wallet's network to the specified chain ID. In this example, buttons are provided to switch between Sepolia Testnet and Immutable zkEVM Testnet. After switching, the provider is updated with the new network connection.
+The implementation uses `switchNetwork()` to change the connected wallet's network to the specified chain ID. In this example, buttons are provided to switch between Sepolia Testnet and Immutable zkEVM Testnet. After switching, the provider is updated with the new network connection.
 
 ### Get Network Information
 
-**Feature Name**: Retrieve and display information about the currently connected network.
+Retrieves and displays details about the currently connected blockchain network.
 
-**Source Code**: [switch-with-metamask/page.tsx](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-switch-network-with-nextjs/src/app/switch-with-metamask/page.tsx)
-
-**Implementation**:
-
-```typescript
+```typescript title="Get Network Info" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-switch-network-with-nextjs/src/app/switch-with-metamask/page.tsx"
 // Get the network details
 const info = await checkoutSDK.getNetworkInfo({ provider });
 ```
 
-**Explanation**: The app uses `getNetworkInfo()` to retrieve details about the currently connected network, including the network name, chain ID, and native currency symbol. This information is then displayed in a table to provide users with visibility into which network they're currently connected to.
+The app uses `getNetworkInfo()` to retrieve details about the currently connected network, including the network name, chain ID, and native currency symbol. This information is then displayed in a table to provide users with visibility into which network they're currently connected to.
 
 ### Get Supported Networks
 
-**Feature Name**: Retrieve a list of supported networks from the Checkout SDK.
+Fetches and displays a list of all networks supported by the Checkout SDK.
 
-**Source Code**: [switch-with-metamask/page.tsx](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-switch-network-with-nextjs/src/app/switch-with-metamask/page.tsx)
-
-**Implementation**:
-
-```typescript
+```typescript title="Get Supported Networks" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-switch-network-with-nextjs/src/app/switch-with-metamask/page.tsx"
 // Get the list of default supported networks
 const type = checkout.NetworkFilterTypes.ALL;
 const supportedNetworks = await checkoutSDK.getNetworkAllowList({ type });
 ```
 
-**Explanation**: The implementation uses `getNetworkAllowList()` with the `ALL` filter type to retrieve a list of all supported networks. This list is then displayed to the user, providing information about which networks they can switch to using the SDK.
+The implementation uses `getNetworkAllowList()` with the `ALL` filter type to retrieve a list of all supported networks. This list is then displayed to the user, providing information about which networks they can switch to using the SDK.
 
 ## Running the App
 

@@ -21,13 +21,9 @@ This example app demonstrates how to fulfill a bid using the Immutable Orderbook
 
 ### Fulfill Bid for ERC721
 
-**Feature Name**: Fulfill bid for ERC721 tokens.
+Fulfills an existing bid for a specific ERC721 token.
 
-**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-bid-with-nextjs/src/app/fulfill-bid-with-erc721/page.tsx)
-
-**Implementation**:
-
-```typescript
+```typescript title="Fulfill ERC721 Bid" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-bid-with-nextjs/src/app/fulfill-bid-with-erc721/page.tsx"
 const fulfillERC721Bid = async (bidID: string) => {
   const { actions } = await orderbookSDK.fulfillOrder(
     bidID,
@@ -47,8 +43,6 @@ const fulfillERC721Bid = async (bidID: string) => {
 };
 ```
 
-**Explanation**: 
-
 The code demonstrates how to fulfill a bid for an ERC721 token. The process involves:
 
 1. Calling the `fulfillOrder` method from the Orderbook SDK, passing:
@@ -65,13 +59,9 @@ The code demonstrates how to fulfill a bid for an ERC721 token. The process invo
 
 ### Fulfill Bid for ERC1155
 
-**Feature Name**: Fulfill bid for ERC1155 tokens, including partial fulfillment.
+Fulfills an existing bid for a specific quantity of an ERC1155 token, allowing for partial fulfillment.
 
-**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-bid-with-nextjs/src/app/fulfill-bid-with-erc1155/page.tsx)
-
-**Implementation**:
-
-```typescript
+```typescript title="Fulfill ERC1155 Bid" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-bid-with-nextjs/src/app/fulfill-bid-with-erc1155/page.tsx"
 const fulfillERC1155Bid = async (
   bidID: string,
   unitsToFill?: string, // Number of units to fill
@@ -94,8 +84,6 @@ const fulfillERC1155Bid = async (
   }
 };
 ```
-
-**Explanation**: 
 
 The code demonstrates how to fulfill a bid for an ERC1155 token, with additional support for partial fulfillment. The process involves:
 

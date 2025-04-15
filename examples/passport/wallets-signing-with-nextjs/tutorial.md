@@ -23,15 +23,13 @@ This example demonstrates how to use the Passport SDK to sign messages using two
 
 ### Sign with EIP-712
 
-**Feature Name**: EIP-712 Typed Data Signing allows users to sign structured, typed data in a readable format.
+EIP-712 Typed Data Signing allows users to sign structured, typed data in a readable format.
+This section shows how to use Passport to sign structured, typed data adhering to the EIP-712 standard, presenting the data in a human-readable format within the signing prompt.
 
-**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-signing-with-nextjs/app/sign-with-eip712/page.tsx)
-
-**Implementation**:
 
 First, we need to create a Passport provider and connect it to the browser's Ethereum provider:
 
-```typescript
+```typescript title="Create Passport provider" reference=examples/passport/wallets-signing-with-nextjs/app/sign-with-eip712/page.tsx#passport-wallets-nextjs-sign-eip712-create
 // fetch the Passport provider from the Passport instance
 const [passportProvider, setPassportProvider] = useState<Provider>();
 
@@ -54,7 +52,7 @@ To sign a typed data message, the app:
 1. Creates a structured typed data payload using the EIP-712 format
 2. Uses the Passport provider to sign the message
 
-```typescript
+```typescript title="Sign EIP-712 message" reference=examples/passport/wallets-signing-with-nextjs/app/sign-with-eip712/page.tsx#passport-wallets-nextjs-sign-eip712-signmessage
 const signMessage = async () => {
   if (!browserProvider) return;
 
@@ -104,7 +102,7 @@ const signMessage = async () => {
 
 To verify the signature:
 
-```typescript
+```typescript title="Verify EIP-712 signature" reference=examples/passport/wallets-signing-with-nextjs/app/sign-with-eip712/page.tsx#passport-wallets-nextjs-sign-eip712-verifysignature
 const isValidTypedDataSignature = async (
   address: string, //The Passport wallet address returned from eth_requestAccounts
   payload: string, //The stringified payload
@@ -128,15 +126,14 @@ const isValidTypedDataSignature = async (
 
 ### Sign with ERC-191
 
-**Feature Name**: ERC-191 Personal Signing allows users to sign simple text messages.
+ERC-191 Personal Signing allows users to sign simple text messages.
+This section demonstrates signing simple string messages using the ERC-191 standard (often referred to as `personal_sign`).
 
-**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-signing-with-nextjs/app/sign-with-erc191/page.tsx)
-
-**Implementation**:
 
 Similar to the EIP-712 implementation, we first set up the Passport provider:
 
-```typescript
+```typescript title="Create Passport provider" reference=examples/passport/wallets-signing-with-nextjs/app/sign-with-erc191/page.tsx#passport-wallets-nextjs-sign-erc191-create
+
 // fetch the Passport provider from the Passport instance
 const [passportProvider, setPassportProvider] = useState<Provider>();
 
@@ -156,7 +153,7 @@ const browserProvider = useMemo(() => passportProvider ?
 
 To sign a personal message:
 
-```typescript
+```typescript title="Sign personal message (ERC-191)" reference=examples/passport/wallets-signing-with-nextjs/app/sign-with-erc191/page.tsx#passport-wallets-nextjs-sign-erc191-signmessage
 const signMessage = async () => {
   if (!browserProvider) return;
 
@@ -202,7 +199,7 @@ const signMessage = async () => {
 
 To verify the signature:
 
-```typescript
+```typescript title="Verify personal signature (ERC-191)" reference=examples/passport/wallets-signing-with-nextjs/app/sign-with-erc191/page.tsx#passport-wallets-nextjs-sign-erc191-verifysignature
 const isValidERC191Signature = async (
   address: string, // The wallet address returned from eth_requestAccounts
   payload: string, // The message string

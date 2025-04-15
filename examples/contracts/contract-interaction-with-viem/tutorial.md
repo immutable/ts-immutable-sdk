@@ -21,13 +21,9 @@ This example demonstrates how to interact with Immutable ERC721 contracts using 
 
 ### Batch Mint ERC721 by ID
 
-**Feature Name**: Batch minting of ERC721 tokens with specific token IDs
+Batch mints ERC721 tokens with specific, predefined token IDs using Viem.
 
-**Source Code**: [batch-mint-erc721-by-id.ts](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/contracts/contract-interaction-with-viem/batch-mint-erc721-by-id.ts)
-
-**Implementation**:
-
-```typescript
+```typescript title="Batch Mint by ID" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/contracts/contract-interaction-with-viem/batch-mint-erc721-by-id.ts"
 export const batchMintERC721ByID = async (
   privateKey: `0x${string}`,
   contractAddress: `0x${string}`,
@@ -83,8 +79,6 @@ export const batchMintERC721ByID = async (
 };
 ```
 
-**Explanation**:
-
 This code demonstrates how to batch mint ERC721 tokens by specific token IDs using the Viem library:
 
 1. It sets up a connection to the Immutable zkEVM testnet.
@@ -96,13 +90,9 @@ This code demonstrates how to batch mint ERC721 tokens by specific token IDs usi
 
 ### Batch Mint ERC721 by Quantity
 
-**Feature Name**: Batch minting of ERC721 tokens by quantity
+Batch mints a specified quantity of ERC721 tokens, letting the contract assign sequential IDs.
 
-**Source Code**: [batch-mint-erc721-by-quantity.ts](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/contracts/contract-interaction-with-viem/batch-mint-erc721-by-quantity.ts)
-
-**Implementation**:
-
-```typescript
+```typescript title="Batch Mint by Quantity" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/contracts/contract-interaction-with-viem/batch-mint-erc721-by-quantity.ts"
 export const batchMintERC721ByQuantity = async (
   privateKey: `0x${string}`,
   contractAddress: `0x${string}`,
@@ -157,8 +147,6 @@ export const batchMintERC721ByQuantity = async (
   return txHash;
 };
 ```
-
-**Explanation**:
 
 This code demonstrates how to batch mint ERC721 tokens by quantity using the Viem library:
 

@@ -24,40 +24,31 @@ This tutorial demonstrates how to integrate the Immutable Checkout SDK into a Ne
 
 ### Retrieving Supported Wallet Providers
 
-**Feature Name**: Get a list of all supported wallet providers.
+Gets a list of all wallet providers supported by the Checkout SDK.
 
-**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-connect-with-nextjs/src/app/connect-with-metamask/page.tsx)
-
-**Implementation**:
-```typescript
+```typescript title="Get Supported Wallets" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-connect-with-nextjs/src/app/connect-with-metamask/page.tsx"
 const type = checkout.WalletFilterTypes.ALL;
 const allowListRes = await checkoutSDK.getWalletAllowList({ type });
 ```
 
-**Explanation**: This code uses the Checkout SDK to fetch a list of all supported wallet providers. The `WalletFilterTypes.ALL` parameter specifies that all wallet types should be returned, rather than filtering for a specific type. The result is an array of wallet information that includes the provider name and other relevant details.
+This code uses the Checkout SDK to fetch a list of all supported wallet providers. The `WalletFilterTypes.ALL` parameter specifies that all wallet types should be returned, rather than filtering for a specific type. The result is an array of wallet information that includes the provider name and other relevant details.
 
 ### Creating a MetaMask Provider
 
-**Feature Name**: Create a provider for connecting to MetaMask.
+Creates a specific provider instance for interacting with the MetaMask wallet.
 
-**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-connect-with-nextjs/src/app/connect-with-metamask/page.tsx)
-
-**Implementation**:
-```typescript
+```typescript title="Create MetaMask Provider" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-connect-with-nextjs/src/app/connect-with-metamask/page.tsx"
 const walletProviderName = checkout.WalletProviderName.METAMASK;
 const providerRes = await checkoutSDK.createProvider({ walletProviderName });
 ```
 
-**Explanation**: This code creates a provider specifically for MetaMask by using the `createProvider` method and specifying `WalletProviderName.METAMASK`. The provider returned can be used for connecting to the wallet and performing wallet-related operations.
+This code creates a provider specifically for MetaMask by using the `createProvider` method and specifying `WalletProviderName.METAMASK`. The provider returned can be used for connecting to the wallet and performing wallet-related operations.
 
 ### Connecting to MetaMask
 
-**Feature Name**: Connect to MetaMask wallet with or without permissions.
+Establishes a connection to the user's MetaMask wallet, optionally requesting permissions.
 
-**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-connect-with-nextjs/src/app/connect-with-metamask/page.tsx)
-
-**Implementation**:
-```typescript
+```typescript title="Connect to MetaMask" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-connect-with-nextjs/src/app/connect-with-metamask/page.tsx"
 // With permissions
 const connectRes = await checkoutSDK.connect({ 
   provider: providerRes.provider,
@@ -70,22 +61,19 @@ const connectRes = await checkoutSDK.connect({
 });
 ```
 
-**Explanation**: These code snippets demonstrate two ways to connect to the MetaMask wallet. The first method uses `requestWalletPermissions: true` to explicitly request user permissions, which shows a MetaMask popup asking for permission to view accounts. The second method connects without requesting explicit permissions, which may use cached permissions if they exist.
+These code snippets demonstrate two ways to connect to the MetaMask wallet. The first method uses `requestWalletPermissions: true` to explicitly request user permissions, which shows a MetaMask popup asking for permission to view accounts. The second method connects without requesting explicit permissions, which may use cached permissions if they exist.
 
 ### Checking Connection Status
 
-**Feature Name**: Check if a wallet is connected and get the wallet address.
+Checks if a wallet is currently connected via the provider and retrieves the address if it is.
 
-**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-connect-with-nextjs/src/app/connect-with-metamask/page.tsx)
-
-**Implementation**:
-```typescript
+```typescript title="Check Connection Status" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout/sdk-connect-with-nextjs/src/app/connect-with-metamask/page.tsx"
 const isConnectedRes = await checkoutSDK.checkIsWalletConnected({
   provider: providerRes.provider
 });
 ```
 
-**Explanation**: This code checks if the wallet is currently connected using the `checkIsWalletConnected` method. The result includes an `isConnected` boolean flag and the connected wallet's address if a connection exists.
+This code checks if the wallet is currently connected using the `checkIsWalletConnected` method. The result includes an `isConnected` boolean flag and the connected wallet's address if a connection exists.
 
 ## Running the App
 

@@ -1,11 +1,15 @@
 <div class="display-none">
+
 # Passport Setup with NextJS
+
 </div>
 
 Learn how to initialize and configure the Immutable Passport SDK in a Next.js application with various configuration options. This example demonstrates different initialization patterns that affect UI overlays, scope settings, and logout behavior.
 
 <div class="button-component">
+
 [View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport/setup-with-nextjs) <span class="button-component-arrow">→</span>
+
 </div>
 
 ## Configuration Patterns Overview
@@ -23,12 +27,9 @@ This example demonstrates the following Passport configuration patterns:
 
 ### Default Configuration
 
-**Description**: Standard initialization of the Passport SDK with default settings.
+Standard initialization of the Passport SDK with default settings.
 
-**Source Code**: [setupDefault.ts](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/setup-with-nextjs/src/app/utils/setupDefault.ts#L4-L14)
-
-**Configuration Details**:
-```typescript
+```typescript title="Default Configuration" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/setup-with-nextjs/src/app/utils/setupDefault.ts"
 const passportInstance = new passport.Passport({
   baseConfig: {
     environment: config.Environment.SANDBOX,
@@ -51,12 +52,9 @@ const passportInstance = new passport.Passport({
 
 ### Disabled Popup Overlays
 
-**Description**: Configuration that disables all popup overlays.
+This configuration disables both generic and blocked popup overlays, which are normally shown when popup windows are opened or blocked.
 
-**Source Code**: [setupDefault.ts](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/setup-with-nextjs/src/app/utils/setupDefault.ts#L17-L30)
-
-**Configuration Details**:
-```typescript
+```typescript title="Disabled Popup Overlays" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/setup-with-nextjs/src/app/utils/setupDefault.ts"
 const passportInstanceWithDisabledOverlays = new passport.Passport({
   baseConfig: {
     environment: config.Environment.SANDBOX,
@@ -80,12 +78,9 @@ const passportInstanceWithDisabledOverlays = new passport.Passport({
 
 ### Minimal Scopes
 
-**Description**: Configuration using only the minimum required scopes.
+Configuration using only the minimum required scopes.
 
-**Source Code**: [setupDefault.ts](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/setup-with-nextjs/src/app/utils/setupDefault.ts#L33-L43)
-
-**Configuration Details**:
-```typescript
+```typescript title="Minimal Scopes" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/setup-with-nextjs/src/app/utils/setupDefault.ts"
 const passportInstanceWithMinimalScopes = new passport.Passport({
   baseConfig: {
     environment: config.Environment.SANDBOX,
@@ -108,12 +103,9 @@ const passportInstanceWithMinimalScopes = new passport.Passport({
 
 ### All Scopes
 
-**Description**: Configuration with all available scopes.
+Configuration with all available scopes.
 
-**Source Code**: [setupDefault.ts](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/setup-with-nextjs/src/app/utils/setupDefault.ts#L46-L56)
-
-**Configuration Details**:
-```typescript
+```typescript title="All Scopes" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/setup-with-nextjs/src/app/utils/setupDefault.ts"
 const passportInstanceWithAllScopes = new passport.Passport({
   baseConfig: {
     environment: config.Environment.SANDBOX,
@@ -136,12 +128,9 @@ const passportInstanceWithAllScopes = new passport.Passport({
 
 ### Silent Logout
 
-**Description**: Configuration using silent logout mode.
+Configuration using silent logout mode.
 
-**Source Code**: [setupDefault.ts](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/setup-with-nextjs/src/app/utils/setupDefault.ts#L59-L70)
-
-**Configuration Details**:
-```typescript
+```typescript title="Silent Logout" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/setup-with-nextjs/src/app/utils/setupDefault.ts"
 const passportInstanceWithSilentLogout = new passport.Passport({
   baseConfig: {
     environment: config.Environment.SANDBOX,
@@ -165,12 +154,9 @@ const passportInstanceWithSilentLogout = new passport.Passport({
 
 ### Generic Overlay Disabled
 
-**Description**: Configuration with only the generic popup overlay disabled.
+Configuration with only the generic popup overlay disabled.
 
-**Source Code**: [setupDefault.ts](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/setup-with-nextjs/src/app/utils/setupDefault.ts#L73-L86)
-
-**Configuration Details**:
-```typescript
+```typescript title="Generic Overlay Disabled" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/setup-with-nextjs/src/app/utils/setupDefault.ts"
 const passportInstanceWithGenericOverlayDisabled = new passport.Passport({
   baseConfig: {
     environment: config.Environment.SANDBOX,
@@ -196,12 +182,9 @@ const passportInstanceWithGenericOverlayDisabled = new passport.Passport({
 
 ### Blocked Overlay Disabled
 
-**Description**: Configuration with only the blocked popup overlay disabled.
+Configuration with only the blocked popup overlay disabled.
 
-**Source Code**: [setupDefault.ts](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/setup-with-nextjs/src/app/utils/setupDefault.ts#L89-L102)
-
-**Configuration Details**:
-```typescript
+```typescript title="Blocked Overlay Disabled" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/setup-with-nextjs/src/app/utils/setupDefault.ts"
 const passportInstanceWithBlockedOverlayDisabled = new passport.Passport({
   baseConfig: {
     environment: config.Environment.SANDBOX,
