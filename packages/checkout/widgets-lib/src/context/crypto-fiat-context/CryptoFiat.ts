@@ -43,9 +43,9 @@ export const getCryptoToFiatConversion = async (
   }
 };
 
-type TokenPriceResponse = {
+export type TokenPriceResponse = {
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  result: { symbol: string; usd_price: string }[];
+  result: { symbol: string; token_address: string; usd_price: string }[];
 };
 
 async function getUSDConversionsForAll(environment: Environment) {
