@@ -33,7 +33,6 @@ import {
   SwapSuccessView,
   SwapWidgetViews,
 } from '../../context/view-context/SwapViewContextTypes';
-import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { DEFAULT_BALANCE_RETRY_POLICY, getL2ChainId } from '../../lib';
 import { StatusView } from '../../components/Status/StatusView';
@@ -79,7 +78,6 @@ export default function SwapWidget({
   } = useContext(EventTargetContext);
 
   const {
-    environment,
     theme,
     isOnRampEnabled,
     isSwapEnabled,
@@ -270,156 +268,154 @@ export default function SwapWidget({
       (
         <ViewContext.Provider value={viewReducerValues}>
           <SwapContext.Provider value={swapReducerValues}>
-            <CryptoFiatProvider environment={environment}>
-              {viewState.view.type === SharedViews.LOADING_VIEW && (
-              <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
-              )}
-              {viewState.view.type === SwapWidgetViews.SWAP && (
-              <SwapCoins
-                theme={theme}
-                cancelAutoProceed={cancelAutoProceed}
-                fromAmount={viewState.view.data?.fromAmount ?? fromAmount}
-                toAmount={viewState.view.data?.toAmount ?? toAmount}
-                fromTokenAddress={viewState.view.data?.fromTokenAddress ?? fromTokenAddress}
-                toTokenAddress={viewState.view.data?.toTokenAddress ?? toTokenAddress}
-                showBackButton={showBackButton}
-              />
-              )}
-              {viewState.view.type === SwapWidgetViews.IN_PROGRESS && (
-              <SwapInProgress
-                transactionResponse={viewState.view.data.transactionResponse}
-                swapForm={viewState.view.data.swapForm}
-              />
-              )}
-              {viewState.view.type === SwapWidgetViews.APPROVE_ERC20 && (
-              <ApproveERC20Onboarding data={viewState.view.data} />
-              )}
-              {viewState.view.type === SwapWidgetViews.SUCCESS && (
-              <StatusView
-                statusText={t('views.SWAP.success.text')}
-                actionText={t('views.SWAP.success.actionText')}
-                onRenderEvent={() => {
-                  page({
-                    userJourney: UserJourney.SWAP,
-                    screen: 'SwapSuccess',
-                    extras: {
-                      fromTokenAddress: viewState.view.data?.fromTokenAddress,
-                      fromAmount: viewState.view.data?.fromAmount,
-                      toTokenAddress: viewState.view.data?.toTokenAddress,
-                      toAmount: viewState.view.data?.toAmount,
+            {viewState.view.type === SharedViews.LOADING_VIEW && (
+            <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
+            )}
+            {viewState.view.type === SwapWidgetViews.SWAP && (
+            <SwapCoins
+              theme={theme}
+              cancelAutoProceed={cancelAutoProceed}
+              fromAmount={viewState.view.data?.fromAmount ?? fromAmount}
+              toAmount={viewState.view.data?.toAmount ?? toAmount}
+              fromTokenAddress={viewState.view.data?.fromTokenAddress ?? fromTokenAddress}
+              toTokenAddress={viewState.view.data?.toTokenAddress ?? toTokenAddress}
+              showBackButton={showBackButton}
+            />
+            )}
+            {viewState.view.type === SwapWidgetViews.IN_PROGRESS && (
+            <SwapInProgress
+              transactionResponse={viewState.view.data.transactionResponse}
+              swapForm={viewState.view.data.swapForm}
+            />
+            )}
+            {viewState.view.type === SwapWidgetViews.APPROVE_ERC20 && (
+            <ApproveERC20Onboarding data={viewState.view.data} />
+            )}
+            {viewState.view.type === SwapWidgetViews.SUCCESS && (
+            <StatusView
+              statusText={t('views.SWAP.success.text')}
+              actionText={t('views.SWAP.success.actionText')}
+              onRenderEvent={() => {
+                page({
+                  userJourney: UserJourney.SWAP,
+                  screen: 'SwapSuccess',
+                  extras: {
+                    fromTokenAddress: viewState.view.data?.fromTokenAddress,
+                    fromAmount: viewState.view.data?.fromAmount,
+                    toTokenAddress: viewState.view.data?.toTokenAddress,
+                    toAmount: viewState.view.data?.toAmount,
+                  },
+                });
+                sendSwapSuccessEvent(
+                  eventTarget,
+                  (viewState.view as SwapSuccessView).data.transactionHash,
+                );
+              }}
+              onActionClick={() => sendSwapWidgetCloseEvent(eventTarget)}
+              statusType={StatusType.SUCCESS}
+              testId="success-view"
+            />
+            )}
+            {viewState.view.type === SwapWidgetViews.FAIL && (
+            <StatusView
+              statusText={t('views.SWAP.failed.text')}
+              actionText={t('views.SWAP.failed.actionText')}
+              onRenderEvent={() => {
+                page({
+                  userJourney: UserJourney.SWAP,
+                  screen: 'SwapFailed',
+                });
+                sendSwapFailedEvent(eventTarget, 'Transaction failed');
+              }}
+              onActionClick={() => {
+                if (viewState.view.type === SwapWidgetViews.FAIL) {
+                  viewDispatch({
+                    payload: {
+                      type: ViewActions.UPDATE_VIEW,
+                      view: {
+                        type: SwapWidgetViews.SWAP,
+                        data: viewState.view.data,
+                      },
                     },
                   });
-                  sendSwapSuccessEvent(
-                    eventTarget,
-                    (viewState.view as SwapSuccessView).data.transactionHash,
-                  );
-                }}
-                onActionClick={() => sendSwapWidgetCloseEvent(eventTarget)}
-                statusType={StatusType.SUCCESS}
-                testId="success-view"
-              />
-              )}
-              {viewState.view.type === SwapWidgetViews.FAIL && (
-              <StatusView
-                statusText={t('views.SWAP.failed.text')}
-                actionText={t('views.SWAP.failed.actionText')}
-                onRenderEvent={() => {
-                  page({
-                    userJourney: UserJourney.SWAP,
-                    screen: 'SwapFailed',
-                  });
-                  sendSwapFailedEvent(eventTarget, 'Transaction failed');
-                }}
-                onActionClick={() => {
-                  if (viewState.view.type === SwapWidgetViews.FAIL) {
-                    viewDispatch({
-                      payload: {
-                        type: ViewActions.UPDATE_VIEW,
-                        view: {
-                          type: SwapWidgetViews.SWAP,
-                          data: viewState.view.data,
-                        },
-                      },
-                    });
-                  }
-                }}
-                statusType={StatusType.FAILURE}
-                onCloseClick={() => sendSwapWidgetCloseEvent(eventTarget)}
-                testId="fail-view"
-              />
-              )}
-              {viewState.view.type === SwapWidgetViews.PRICE_SURGE && (
-              <StatusView
-                statusText={t('views.SWAP.rejected.text')}
-                actionText={t('views.SWAP.rejected.actionText')}
-                onRenderEvent={() => {
-                  page({
-                    userJourney: UserJourney.SWAP,
-                    screen: 'PriceSurge',
-                  });
-                  sendSwapRejectedEvent(eventTarget, 'Price surge');
-                }}
-                onActionClick={() => {
-                  if (viewState.view.type === SwapWidgetViews.PRICE_SURGE) {
-                    viewDispatch({
-                      payload: {
-                        type: ViewActions.UPDATE_VIEW,
-                        view: {
-                          type: SwapWidgetViews.SWAP,
-                          data: viewState.view.data,
-                        },
-                      },
-                    });
-                  }
-                }}
-                statusType={StatusType.WARNING}
-                onCloseClick={() => sendSwapWidgetCloseEvent(eventTarget)}
-                testId="price-surge-view"
-              />
-              )}
-              {viewState.view.type === SharedViews.ERROR_VIEW && (
-              <ErrorView
-                actionText={t('views.ERROR_VIEW.actionText')}
-                onActionClick={async () => {
-                  setErrorViewLoading(true);
-                  const data = viewState.view as ErrorViewType;
-
-                  if (!data.tryAgain) {
-                    showSwapView();
-                    setErrorViewLoading(false);
-                    return;
-                  }
-
-                  if (await data.tryAgain()) showSwapView();
-                  setErrorViewLoading(false);
-                }}
-                onCloseClick={() => sendSwapWidgetCloseEvent(eventTarget)}
-                errorEventActionLoading={errorViewLoading}
-              />
-              )}
-              {viewState.view.type === SwapWidgetViews.SERVICE_UNAVAILABLE && (
-              <ServiceUnavailableErrorView
-                onCloseClick={() => sendSwapWidgetCloseEvent(eventTarget)}
-                onBackButtonClick={() => {
+                }
+              }}
+              statusType={StatusType.FAILURE}
+              onCloseClick={() => sendSwapWidgetCloseEvent(eventTarget)}
+              testId="fail-view"
+            />
+            )}
+            {viewState.view.type === SwapWidgetViews.PRICE_SURGE && (
+            <StatusView
+              statusText={t('views.SWAP.rejected.text')}
+              actionText={t('views.SWAP.rejected.actionText')}
+              onRenderEvent={() => {
+                page({
+                  userJourney: UserJourney.SWAP,
+                  screen: 'PriceSurge',
+                });
+                sendSwapRejectedEvent(eventTarget, 'Price surge');
+              }}
+              onActionClick={() => {
+                if (viewState.view.type === SwapWidgetViews.PRICE_SURGE) {
                   viewDispatch({
-                    payload: { type: ViewActions.UPDATE_VIEW, view: { type: SwapWidgetViews.SWAP } },
+                    payload: {
+                      type: ViewActions.UPDATE_VIEW,
+                      view: {
+                        type: SwapWidgetViews.SWAP,
+                        data: viewState.view.data,
+                      },
+                    },
                   });
-                }}
+                }
+              }}
+              statusType={StatusType.WARNING}
+              onCloseClick={() => sendSwapWidgetCloseEvent(eventTarget)}
+              testId="price-surge-view"
+            />
+            )}
+            {viewState.view.type === SharedViews.ERROR_VIEW && (
+            <ErrorView
+              actionText={t('views.ERROR_VIEW.actionText')}
+              onActionClick={async () => {
+                setErrorViewLoading(true);
+                const data = viewState.view as ErrorViewType;
+
+                if (!data.tryAgain) {
+                  showSwapView();
+                  setErrorViewLoading(false);
+                  return;
+                }
+
+                if (await data.tryAgain()) showSwapView();
+                setErrorViewLoading(false);
+              }}
+              onCloseClick={() => sendSwapWidgetCloseEvent(eventTarget)}
+              errorEventActionLoading={errorViewLoading}
+            />
+            )}
+            {viewState.view.type === SwapWidgetViews.SERVICE_UNAVAILABLE && (
+            <ServiceUnavailableErrorView
+              onCloseClick={() => sendSwapWidgetCloseEvent(eventTarget)}
+              onBackButtonClick={() => {
+                viewDispatch({
+                  payload: { type: ViewActions.UPDATE_VIEW, view: { type: SwapWidgetViews.SWAP } },
+                });
+              }}
+            />
+            )}
+            {viewState.view.type === SharedViews.TOP_UP_VIEW && (
+              <TopUpView
+                analytics={{ userJourney: UserJourney.SWAP }}
+                checkout={checkout}
+                provider={provider}
+                widgetEvent={IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT}
+                showOnrampOption={isOnRampEnabled}
+                showSwapOption={isSwapEnabled}
+                showBridgeOption={isBridgeEnabled}
+                onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
               />
-              )}
-              {viewState.view.type === SharedViews.TOP_UP_VIEW && (
-                <TopUpView
-                  analytics={{ userJourney: UserJourney.SWAP }}
-                  checkout={checkout}
-                  provider={provider}
-                  widgetEvent={IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT}
-                  showOnrampOption={isOnRampEnabled}
-                  showSwapOption={isSwapEnabled}
-                  showBridgeOption={isBridgeEnabled}
-                  onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
-                />
-              )}
-            </CryptoFiatProvider>
+            )}
           </SwapContext.Provider>
         </ViewContext.Provider>
         )
