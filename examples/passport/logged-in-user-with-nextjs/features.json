@@ -17,6 +17,12 @@
             "manually-edited": true,
             "silent-login": true,
             "silent-logout": true
+        },
+        {
+            "feature": "link-external-wallet",
+            "manually-edited": true,
+            "silent-login": true,
+            "silent-logout": true
         }
     ],
     "order": 3
