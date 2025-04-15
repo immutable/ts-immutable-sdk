@@ -16,7 +16,7 @@ export function useCryptoUSDConversion(environment: Environment | undefined) {
         setConversions(data);
         setError(null);
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to fetch conversions'));
+        setError(err instanceof Error ? err : new Error(`Failed to fetch conversions: ${err}`));
       } finally {
         setLoading(false);
       }
