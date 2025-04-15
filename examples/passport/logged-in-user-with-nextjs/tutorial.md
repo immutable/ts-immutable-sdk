@@ -21,63 +21,35 @@ This example demonstrates how to access user information after a successful logi
 
 ## SDK Integration Details
 
-### Retrieving Linked Addresses
-**Feature Name**: Get Linked Addresses - Retrieves all blockchain addresses linked to the user's Passport account.
+### Linked Addresses with Passport
 
-**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/logged-in-user-with-nextjs/src/app/linked-addresses-with-passport/page.tsx)
+Retrieves all blockchain addresses associated with the logged-in user's Passport account.
 
-**Implementation**:
-```typescript
+```typescript title="Get Linked Addresses" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/logged-in-user-with-nextjs/src/app/linked-addresses-with-passport/page.tsx"
 const addresses = await passportInstance.getLinkedAddresses();
 ```
+After connecting to Passport and logging in, this code retrieves all blockchain addresses linked to the user's Passport account. These addresses can represent different wallets that the user has associated with their Immutable account.
 
-**Explanation**: After a user logs in with Passport, this code retrieves all blockchain addresses associated with their account. These addresses can be used to identify the user across different blockchain networks supported by Immutable.
+### User Profile Information
 
-### Accessing User Profile Information
-**Feature Name**: Get User Info - Retrieves the user's profile information from Passport.
+Fetches the user's profile details like email, nickname, and unique identifier.
 
-**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/logged-in-user-with-nextjs/src/app/user-info-with-passport/page.tsx)
-
-**Implementation**:
-```typescript
+```typescript title="Get User Info" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/logged-in-user-with-nextjs/src/app/user-info-with-passport/page.tsx"
 const userProfileData = await passportInstance.getUserInfo();
 ```
+This function retrieves the user's profile information from Passport, including their email, nickname, and unique subject identifier. The app then displays this information in a table format.
 
-**Explanation**: This code fetches the user's profile information from Passport after successful authentication. The profile data includes details such as email, nickname, and a unique subject identifier, which can be used to identify the user in your application.
+### Token Verification
 
-### Getting Authentication Tokens
-**Feature Name**: Get ID and Access Tokens - Retrieves authentication tokens from Passport.
+Retrieves and explains the purpose of ID and access tokens for the authenticated user.
 
-**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/logged-in-user-with-nextjs/src/app/verify-tokens-with-nextjs/page.tsx)
-
-**Implementation**:
-```typescript
-// Get ID Token
+```typescript title="Get Tokens" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/logged-in-user-with-nextjs/src/app/verify-tokens-with-nextjs/page.tsx"
 const idToken = await passportInstance.getIdToken();
 
 // Get Access Token
 const accessToken = await passportInstance.getAccessToken();
 ```
-
-**Explanation**: These tokens are essential for authenticating requests to Immutable services. The ID token contains verified user information, while the access token provides authorization to access protected resources and APIs.
-
-### Linking External Wallets
-**Feature Name**: Link External Wallet - Connects and links an external wallet (like MetaMask) to a Passport account.
-
-**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/logged-in-user-with-nextjs/src/app/link-external-wallet/page.tsx)
-
-**Implementation**:
-```typescript
-// Link an external wallet to the Passport account
-const result = await passportInstance.linkExternalWallet({
-  type: "External",
-  walletAddress: metamaskAddress,
-  signature,
-  nonce
-});
-```
-
-**Explanation**: This feature allows users to link their existing external wallets (like MetaMask) to their Passport account. The process involves generating a typed data signature with the external wallet to prove ownership, then sending this signature along with the wallet address to the Passport service for linking.
+These functions retrieve the ID token and access token for the authenticated user. The ID token contains user identity information, while the access token is used for authorization when making API requests to Immutable services. These tokens can be verified on the client side to ensure they are valid.
 
 ## Running the App
 

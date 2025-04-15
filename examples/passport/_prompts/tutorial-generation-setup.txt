@@ -30,13 +30,17 @@ Overview of different configuration patterns demonstrated
 
 Link to GitHub repository using the required format
 <div class="display-none">
+
 # Passport Setup with NextJS
+
 </div>
 
 [App description]
 
 <div class="button-component">
+
 [View app on Github](<link>) <span class="button-component-arrow">→</span>
+
 </div>
 
 ### Configuration Patterns Overview
@@ -46,9 +50,12 @@ Link to GitHub repository using the required format
 ### Implementation Details
 For each configuration pattern:
 - Configuration Name: Brief description of what this configuration achieves
-- Source Code: Link to relevant source code file
-- Configuration Details: Code snippet showing the configuration
-- Behavior Explanation: Clear explanation of how this configuration affects Passport behavior
+- Brief description of what the configuration does. 
+- Code snippets showing how the instance is configured (CodeBlock should be linked to the relevant github repo) IMPORTANT: related snippets should be under a single code block rather than dividing them across multiple codeblocks. However, pls ensure that you only include the relevant snippets (method calls, etc) and not Next.js specific features(states, etc WHEN it's irrelevant) to ensure that the focus is to the most most important code snippet relevant to the feature.
+    - Example structure: ```typescript title="<configuration name>" manualLink="<github repo link containing the code snippet(don't specify the line, just the file's link)>"
+                                <code snippet>
+                        ```
+- Clear explanation of how the code works
 - Use Cases: When to use this configuration pattern
 
 ### Key configurations to document:
