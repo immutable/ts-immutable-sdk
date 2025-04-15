@@ -100,6 +100,14 @@ export default function LinkExternalWallet() {
     setLinkingStatus('Generating signature...');
     setLinkingError(null);
 
+    let linkedAddresses = await passportInstance.getLinkedAddresses();
+    if (linkedAddresses.includes(externalWalletAddress)) {
+      setLinkedAddresses(linkedAddresses);
+      setLinkingStatus('Wallet already linked');
+      setIsLinking(false);
+      return;
+    }
+
     try {
       // Generate a nonce for the signature
       const nonce = generateNonce();
@@ -183,7 +191,7 @@ export default function LinkExternalWallet() {
         nonce
       });
       
-      const linkedAddresses = await passportInstance.getLinkedAddresses();
+      linkedAddresses = await passportInstance.getLinkedAddresses();
       setLinkedAddresses(linkedAddresses);
       setLinkingStatus('Wallet linked successfully!');
       setIsLinking(false);
