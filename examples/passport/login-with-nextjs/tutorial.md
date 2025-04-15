@@ -23,36 +23,32 @@ This example demonstrates various login and logout implementations using the Imm
 ## SDK Integration Details
 
 ### Login with EthersJS
-**Feature Name**: Login with EthersJS allows users to connect their wallet and authenticate using EthersJS provider.
 
-**Source Code**: [login-with-etherjs/page.tsx](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/login-with-nextjs/src/app/login-with-etherjs/page.tsx)
+Integrates Passport authentication with EthersJS for wallet connection and interaction.
 
-**Implementation**:
-```typescript
+```typescript title="Login with EthersJS" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/login-with-nextjs/src/app/login-with-etherjs/page.tsx"
 const passportProvider = await passportInstance.connectEvm();
 const web3Provider = new BrowserProvider(passportProvider);
 const accounts = await web3Provider.send('eth_requestAccounts', []);
 ```
 
-**Explanation**: This implementation uses EthersJS's BrowserProvider to interact with the Passport provider. It requests user accounts and manages the connection state, displaying the connected account address when successful.
+This implementation uses EthersJS's BrowserProvider to interact with the Passport provider. It requests user accounts and manages the connection state, displaying the connected account address when successful.
 
 ### Identity-only Login
-**Feature Name**: Login without wallet connection, focusing on user identity authentication.
 
-**Source Code**: [login-with-identity-only/page.tsx](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/login-with-nextjs/src/app/login-with-identity-only/page.tsx)
+Allows users to log in and retrieve profile information without connecting a blockchain wallet.
 
-**Implementation**:
-```typescript
+```typescript title="Identity-only Login" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/login-with-nextjs/src/app/login-with-identity-only/page.tsx"
 const profile: passport.UserProfile | null = await passportInstance.login();
 ```
 
-**Explanation**: This implementation demonstrates how to authenticate users without requiring a wallet connection. It retrieves the user's profile information including email and subject ID.
+This implementation demonstrates how to authenticate users without requiring a wallet connection. It retrieves the user's profile information including email and subject ID.
 
 ### Logout
-**Feature Name**: Standard logout functionality
-**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/login-with-nextjs/src/app/logout-with-redirect-mode/page.tsx)
-**Implementation**:
-```typescript
+
+Provides a standard method to log the user out of the Passport session.
+
+```typescript title="Standard Logout" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/login-with-nextjs/src/app/logout-with-redirect-mode/page.tsx"
 const logout = async () => {
   if (!passportInstance || !isLoggedIn) return;
   try {
@@ -64,14 +60,14 @@ const logout = async () => {
   }
 };
 ```
-**Explanation**: The standard logout implementation disconnects the user from Passport using the `logout()` method. This ends the user's session and clears any authentication state.
+The standard logout implementation disconnects the user from Passport using the `logout()` method. This ends the user's session and clears any authentication state.
 
 
 ### Logout with Redirect Mode
-**Feature Name**: Logout with redirect to a specific page
-**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/login-with-nextjs/src/app/utils/setupLogoutRedirect.ts)
-**Implementation**:
-```typescript
+
+Configures Passport to redirect the user to a specified URL after logout.
+
+```typescript title="Configure Redirect Logout" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/login-with-nextjs/src/app/utils/setupLogoutRedirect.ts"
 export const passportInstance = new passport.Passport({
     baseConfig: {
       environment: config.Environment.SANDBOX,
@@ -86,28 +82,24 @@ export const passportInstance = new passport.Passport({
     scope: 'openid offline_access email transact',
   });
 ```
-**Explanation**: This configuration sets up Passport to use 'redirect' mode for logout. When `logout()` is called, the user will be redirected to the specified `logoutRedirectUri` after being logged out.
+This configuration sets up Passport to use 'redirect' mode for logout. When `logout()` is called, the user will be redirected to the specified `logoutRedirectUri` after being logged out.
 
 
 ### Silent Logout
-**Feature Name**: Logout implementation that silently signs out the user without redirects.
 
-**Source Code**: [logout-with-silent-mode/page.tsx](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/login-with-nextjs/src/app/logout-with-silent-mode/page.tsx)
+Implements a logout process that happens in the background without redirecting the user's main window.
 
-**Implementation**:
-```typescript
+```typescript title="Silent Logout" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/login-with-nextjs/src/app/logout-with-silent-mode/page.tsx"
 await passportInstance.logout();
 ```
 
-**Explanation**: This implementation shows how to implement a silent logout that disconnects the user without redirecting to another page, providing a seamless user experience.
+This implementation shows how to implement a silent logout that disconnects the user without redirecting to another page, providing a seamless user experience.
 
 ### Authentication Event Handling
-**Feature Name**: Handling authentication-related events such as account changes.
 
-**Source Code**: [auth-event-handling/page.tsx](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/login-with-nextjs/src/app/auth-event-handling/page.tsx)
+Demonstrates how to listen for and react to authentication events like account changes.
 
-**Implementation**:
-```typescript
+```typescript title="Handle Account Changes" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/login-with-nextjs/src/app/auth-event-handling/page.tsx"
 provider.on(ProviderEvent.ACCOUNTS_CHANGED, handleAccountsChanged);
 
 const handleAccountsChanged = (accounts: string[]) => {
@@ -122,7 +114,7 @@ const handleAccountsChanged = (accounts: string[]) => {
 };
 ```
 
-**Explanation**: This implementation shows how to listen for and handle authentication events, specifically the `ACCOUNTS_CHANGED` event. It updates the application state when accounts are changed or disconnected, maintaining synchronization between the wallet state and the application.
+This implementation shows how to listen for and handle authentication events, specifically the `ACCOUNTS_CHANGED` event. It updates the application state when accounts are changed or disconnected, maintaining synchronization between the wallet state and the application.
 
 ## Running the App
 
