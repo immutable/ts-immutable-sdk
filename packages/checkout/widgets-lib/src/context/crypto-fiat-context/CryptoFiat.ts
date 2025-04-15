@@ -43,16 +43,28 @@ export const getCryptoToFiatConversion = async (
   }
 };
 
+type TokenPriceResponse = {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  result: { symbol: string; usd_price: string }[];
+};
+
 async function getUSDConversionsForAll(environment: Environment) {
   const apiUrl = `${IMMUTABLE_API_BASE_URL[environment]}/checkout/v1/token-prices`;
-  const response = await axios.get(apiUrl);
+  const response = await axios.get<TokenPriceResponse>(apiUrl);
 
   const { data } = response;
 
   const result: CryptoFiatConvertReturn = {};
-  for (const token of data) {
-    result[token.symbol] = { usd: token.usd_price };
+  const tokens = data.result || [];
+  for (const token of tokens) {
+    result[token.symbol.toLowerCase()] = { usd: +token.usd_price };
   }
+
+  // if the result has wimx, then add imx to the result
+  if (result.wimx) {
+    result.imx = result.wimx;
+  }
+
   return result;
 }
 
