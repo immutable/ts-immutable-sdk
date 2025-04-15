@@ -50,10 +50,12 @@ IMPORTANT: The app's description will come before the "View app on Github" link.
 > IMPORTANT: Focus on how the example app uses each feature. Do NOT include Orderbook/Checkout/Contracts/Passport SDK initialization and Orderbook/Checkout/Contracts/Passport Provider Creation instructions - focus only on the example-specific implementation details.
 #### SDK Integration Details
 For each Passport feature demonstrated in this example app (Note: This section should match the feature mentioned in the features overview section):
-- **Feature Name**: Brief description of what the feature does. 
-- **Source Code**: Link to the source code file in the GitHub repository. Structure: "Source Code: [source code file](source code file link)"
-- **Implementation**: Code snippets showing how the feature is implemented
-- **Explanation**: Clear explanation of how the code works
+- Brief description of what the feature does. 
+- Code snippets showing how the feature is implemented (CodeBlock should be linked to the relevant github repo) IMPORTANT: related snippets should be under a single code block rather than dividing them across multiple codeblocks. However, pls ensure that you only include the relevant snippets (method calls, etc) and not Next.js specific features(states, etc WHEN it's irrelevant) to ensure that the focus is to the most most important code snippet relevant to the feature.
+    - Example structure: ```typescript title="<feature name>" manualLink="<github repo link containing the code snippet(don't specify the line, just the file's link)>"
+                                <code snippet>
+                        ```
+- Clear explanation of how the code works
 
 
 #### Running the App

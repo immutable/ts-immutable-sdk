@@ -22,13 +22,11 @@ This example app demonstrates how to integrate Immutable Passport with different
 
 ### Connect with EIP-1193
 
-**Feature Name**: Connect with EIP-1193
+This implementation demonstrates how to connect to Immutable Passport using the EIP-1193 standard interface. It first fetches the Passport provider using `passportInstance.connectEvm()`. To trigger the login flow, it calls the `request` method with `eth_requestAccounts`. The implementation also listens for the `ACCOUNTS_CHANGED` event to update the UI when the connected accounts change.
 
-**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-connect-with-nextjs/app/connect-with-eip1193/page.tsx)
+Fetch the Passport provider from the Passport instance:
 
-**Implementation**:
-
-```typescript
+```typescript title="Create Passport provider" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-connect-with-nextjs/app/connect-with-eip1193/page.tsx"
 // fetch the Passport provider from the Passport instance
 const [passportProvider, setPassportProvider] = useState<Provider>();
 
@@ -39,27 +37,31 @@ useEffect(() => {
   };
   fetchPassportProvider();
 }, []);
+```
 
+Call `eth_requestAccounts` to trigger the Passport login flow:
+
+```typescript title="Request accounts" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-connect-with-nextjs/app/connect-with-eip1193/page.tsx"
 // calling eth_requestAccounts triggers the Passport login flow
 const accounts = await passportProvider?.request({ method: 'eth_requestAccounts' });
+```
 
+Listen to the `ACCOUNTS_CHANGED` event and update the accounts state when it changes:
+
+```typescript title="Handle account changes" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-connect-with-nextjs/app/connect-with-eip1193/page.tsx"
 // listen to the ACCOUNTS_CHANGED event and update the accounts state when it changes
 passportProvider?.on(ProviderEvent.ACCOUNTS_CHANGED, (accounts: string[]) => {
   setAccountsState(accounts);
 });
 ```
 
-**Explanation**: This implementation demonstrates how to connect to Immutable Passport using the EIP-1193 standard interface. It first fetches the Passport provider using `passportInstance.connectEvm()`. To trigger the login flow, it calls the `request` method with `eth_requestAccounts`. The implementation also listens for the `ACCOUNTS_CHANGED` event to update the UI when the connected accounts change.
-
 ### Connect with ethers.js
 
-**Feature Name**: Connect with ethers.js
+This implementation shows how to connect to Immutable Passport using ethers.js. It first fetches the Passport provider using `passportInstance.connectEvm()`, then creates an ethers.js `BrowserProvider` by passing the Passport provider to it. To trigger the login flow, it calls the `send` method on the browser provider with `eth_requestAccounts`. This approach allows developers to use the familiar ethers.js API while still connecting through Passport.
 
-**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-connect-with-nextjs/app/connect-with-etherjs/page.tsx)
+Fetch the Passport provider and create the ethers.js `BrowserProvider`:
+```typescript title="Create Passport provider and BrowserProvider" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-connect-with-nextjs/app/connect-with-etherjs/page.tsx"
 
-**Implementation**:
-
-```typescript
 // fetch the Passport provider from the Passport instance
 const [passportProvider, setPassportProvider] = useState<Provider>();
 
@@ -71,24 +73,22 @@ useEffect(() => {
   fetchPassportProvider();
 }, []);
 
-// create the BrowserProvider using the Passport provider
 const browserProvider = useMemo(() => passportProvider ? new BrowserProvider(passportProvider) : undefined, [passportProvider]);
+```
+
+Call `eth_requestAccounts` via the `BrowserProvider`:
+```typescript title="Request accounts via ethers.js" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-connect-with-nextjs/app/connect-with-etherjs/page.tsx"
 
 // calling eth_requestAccounts triggers the Passport login flow
 const accounts = await browserProvider.send('eth_requestAccounts', []);
 ```
 
-**Explanation**: This implementation shows how to connect to Immutable Passport using ethers.js. It first fetches the Passport provider using `passportInstance.connectEvm()`, then creates an ethers.js `BrowserProvider` by passing the Passport provider to it. To trigger the login flow, it calls the `send` method on the browser provider with `eth_requestAccounts`. This approach allows developers to use the familiar ethers.js API while still connecting through Passport.
-
 ### Connect with Wagmi
 
-**Feature Name**: Connect with Wagmi
+This implementation demonstrates how to connect to Immutable Passport using the Wagmi library. It first initializes Passport by calling `passportInstance.connectEvm()`, which makes Passport available as a connector option to Wagmi. The app then filters the available connectors to show only Passport and uses Wagmi's `connect` function to connect to it. For logout, it first disconnects from Wagmi and then calls `passportInstance.logout()`. This approach allows developers to use the comprehensive Wagmi hooks API with Passport.
 
-**Source Code**: [source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-connect-with-nextjs/app/connect-with-wagmi/page.tsx)
-
-**Implementation**:
-
-```typescript
+Initialize Passport for Wagmi compatibility (`page.tsx`):
+```typescript title="Initialize Passport for Wagmi" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-connect-with-nextjs/app/connect-with-wagmi/page.tsx"
 // Main page setup
 useEffect(() => {
   const init = async () => {
@@ -98,23 +98,26 @@ useEffect(() => {
   
   init();
 }, []);
+```
 
-// In wallet-options.tsx
+Filter connectors and connect using Wagmi (`wallet-options.tsx`):
+```typescript title="Filter and connect Wagmi" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-connect-with-nextjs/app/connect-with-wagmi/wallet-options.tsx"
 // filter the available connectors to show only Passport
 setFilteredConnectors(connectors.filter((connector) => 
   connector.name.includes('Immutable Passport')));
 
 // connect Wagmi to Passport
 connect({ connector });
+```
 
+Disconnect Wagmi and logout Passport (`account.tsx`):
+```typescript title="Disconnect Wagmi and logout" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/wallets-connect-with-nextjs/app/connect-with-wagmi/account.tsx"
 // In account.tsx
 // disconnect Wagmi from Passport
 disconnect();
 // logout from Passport
 await passportInstance.logout();
 ```
-
-**Explanation**: This implementation demonstrates how to connect to Immutable Passport using the Wagmi library. It first initializes Passport by calling `passportInstance.connectEvm()`, which makes Passport available as a connector option to Wagmi. The app then filters the available connectors to show only Passport and uses Wagmi's `connect` function to connect to it. For logout, it first disconnects from Wagmi and then calls `passportInstance.logout()`. This approach allows developers to use the comprehensive Wagmi hooks API with Passport.
 
 ## Running the App
 

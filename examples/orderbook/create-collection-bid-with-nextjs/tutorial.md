@@ -21,15 +21,11 @@ This tutorial demonstrates how to create collection bids for both ERC721 and ERC
 
 ### Create a Collection Bid for an ERC721 Collection
 
-**Feature Name**: Create a bid for any NFT in an ERC721 collection.
-
-**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/create-collection-bid-with-nextjs/src/app/create-collection-bid-with-erc721/page.tsx)
-
-**Implementation**:
+Creates a bid on the Orderbook for any NFT within a specified ERC721 collection.
 
 First, the application prepares the collection bid by defining the buy and sell items:
 
-```typescript
+```typescript title="Prepare ERC721 Collection Bid" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/create-collection-bid-with-nextjs/src/app/create-collection-bid-with-erc721/page.tsx"
 const prepareERC721CollectionBid =
   async (): Promise<orderbook.PrepareCollectionBidResponse> => {
     // build the sell item
@@ -60,7 +56,7 @@ const prepareERC721CollectionBid =
 
 Then it handles approvals, signing, and submitting the collection bid:
 
-```typescript
+```typescript title="Create ERC721 Collection Bid" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/create-collection-bid-with-nextjs/src/app/create-collection-bid-with-erc721/page.tsx"
 const createER721CollectionBid = async () => {
   setCollectionBidErrorState(null);
   setLoadingState(true);
@@ -103,8 +99,6 @@ const createER721CollectionBid = async () => {
 };
 ```
 
-**Explanation**:
-
 The code creates a collection bid for any NFT in an ERC721 collection by:
 1. Defining what the user is selling (ERC20 tokens) and what they want to buy (NFTs from an ERC721 collection)
 2. Calling the `prepareCollectionBid` method to get approval actions and order components
@@ -114,15 +108,11 @@ The code creates a collection bid for any NFT in an ERC721 collection by:
 
 ### Create a Collection Bid for an ERC1155 Collection
 
-**Feature Name**: Create a bid for any NFT in an ERC1155 collection.
-
-**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/create-collection-bid-with-nextjs/src/app/create-collection-bid-with-erc1155/page.tsx)
-
-**Implementation**:
+Creates a bid on the Orderbook for a specified quantity of any NFT within an ERC1155 collection.
 
 First, the application prepares the collection bid by defining the buy and sell items:
 
-```typescript
+```typescript title="Prepare ERC1155 Collection Bid" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/create-collection-bid-with-nextjs/src/app/create-collection-bid-with-erc1155/page.tsx"
 const prepareERC1155CollectionBid =
   async (): Promise<orderbook.PrepareCollectionBidResponse> => {
     // build the sell item
@@ -153,7 +143,7 @@ const prepareERC1155CollectionBid =
 
 The creation process for ERC1155 collection bids follows the same pattern as ERC721:
 
-```typescript
+```typescript title="Create ERC1155 Collection Bid" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/create-collection-bid-with-nextjs/src/app/create-collection-bid-with-erc1155/page.tsx"
 const createER1155CollectionBid = async () => {
   setCollectionBidErrorState(null);
   setLoadingState(true);
@@ -195,8 +185,6 @@ const createER1155CollectionBid = async () => {
   setLoadingState(false);
 };
 ```
-
-**Explanation**:
 
 The code creates a collection bid for any NFT in an ERC1155 collection by:
 1. Defining what the user is selling (ERC20 tokens) and what they want to buy (NFTs from an ERC1155 collection)
