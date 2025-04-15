@@ -268,7 +268,6 @@ export default function SwapWidget({
       (
         <ViewContext.Provider value={viewReducerValues}>
           <SwapContext.Provider value={swapReducerValues}>
-            {/* <CryptoFiatProvider environment={environment}> */}
             {viewState.view.type === SharedViews.LOADING_VIEW && (
             <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
             )}
@@ -417,7 +416,6 @@ export default function SwapWidget({
                 onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
               />
             )}
-            {/* </CryptoFiatProvider> */}
           </SwapContext.Provider>
         </ViewContext.Provider>
         )
