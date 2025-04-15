@@ -10,7 +10,6 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Base } from '../BaseWidgetRoot';
 import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
-import { getL1ChainId, getL2ChainId } from '../../lib';
 import { isValidAddress, isValidAmount } from '../../lib/validations/widgetValidators';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
@@ -82,7 +81,7 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
       walletProviderName: this.parameters.walletProviderName,
       browserProvider: this.browserProvider,
       checkout: this.checkout,
-      allowedChains: [getL1ChainId(this.checkout.config), getL2ChainId(this.checkout.config)],
+      allowedChains: [this.checkout.config.l1ChainId, this.checkout.config.l2ChainId],
     };
 
     this.reactRoot.render(

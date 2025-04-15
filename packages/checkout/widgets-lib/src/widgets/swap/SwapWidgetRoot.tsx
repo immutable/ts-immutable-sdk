@@ -11,7 +11,6 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Base } from '../BaseWidgetRoot';
 import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
-import { getL2ChainId } from '../../lib';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/validations/widgetValidators';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
@@ -84,7 +83,7 @@ export class Swap extends Base<WidgetType.SWAP> {
       walletProviderName: this.parameters.walletProviderName,
       browserProvider: this.browserProvider,
       checkout: this.checkout,
-      allowedChains: [getL2ChainId(this.checkout!.config)],
+      allowedChains: [this.checkout.config.l2ChainId],
     };
 
     this.reactRoot!.render(

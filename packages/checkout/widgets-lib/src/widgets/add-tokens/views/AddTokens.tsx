@@ -37,7 +37,6 @@ import {
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
-import { getL2ChainId } from '../../../lib';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import {
   AddTokensActions,
@@ -410,7 +409,7 @@ export function AddTokens({
       try {
         const tokenResponse = await checkout.getTokenAllowList({
           type: TokenFilterTypes.ONRAMP,
-          chainId: getL2ChainId(checkout.config),
+          chainId: checkout.config.l2ChainId,
         });
 
         if (tokenResponse?.tokens.length > 0) {
