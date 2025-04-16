@@ -97,7 +97,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     });
   }, [viewDispatch]);
 
-  const handleExceptions = (err: any, swapFormData:PrefilledSwapForm) => {
+  const handleExceptions = (err: any, swapFormData: PrefilledSwapForm) => {
     if (err instanceof CheckoutError
       && err.type === CheckoutErrorType.TRANSACTION_FAILED
       && err.message.startsWith('execution reverted: "STF"')) {
@@ -202,7 +202,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         setRejectedSpending(true);
         return;
       }
-      handleExceptions(err, data.swapFormInfo as PrefilledSwapForm);
+      handleExceptions(err, data.swapFormInfo);
     } finally {
       setLoading(false);
     }
@@ -304,7 +304,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         setRejectedSwap(true);
         return;
       }
-      handleExceptions(err, data.swapFormInfo); // here
+      handleExceptions(err, data.swapFormInfo);
     } finally {
       setLoading(false);
     }
