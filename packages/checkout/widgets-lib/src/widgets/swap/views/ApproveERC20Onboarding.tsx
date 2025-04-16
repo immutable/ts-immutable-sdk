@@ -2,8 +2,9 @@ import { Box } from '@biom3/react';
 import {
   useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
-import { CheckoutErrorType, TokenInfo } from '@imtbl/checkout-sdk';
+import { CheckoutError, CheckoutErrorType, TokenInfo } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
+import { TransactionRequest } from 'ethers';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendSwapWidgetCloseEvent } from '../SwapWidgetEvents';
@@ -96,8 +97,10 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     });
   }, [viewDispatch]);
 
-  const handleExceptions = (err, swapFormData:PrefilledSwapForm) => {
-    if (err.type === CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT) {
+  const handleExceptions = (err: any, swapFormData: PrefilledSwapForm) => {
+    if (err instanceof CheckoutError
+      && err.type === CheckoutErrorType.TRANSACTION_FAILED
+      && err.message.startsWith('execution reverted: "STF"')) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -138,7 +141,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     });
   };
 
-  const prepareTransaction = (transaction, isGasFree = false) => ({
+  const prepareTransaction = (transaction: TransactionRequest, isGasFree = false) => ({
     ...transaction,
     gasPrice: (isGasFree ? BigInt(0) : undefined),
   });
@@ -164,7 +167,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
       showErrorView();
       return;
     }
-    if (actionDisabled) return;
+    if (actionDisabled || !data.approveTransaction) return;
 
     setActionDisabled(true);
     try {
@@ -199,7 +202,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         setRejectedSpending(true);
         return;
       }
-      handleExceptions(err, data.swapFormInfo as PrefilledSwapForm);
+      handleExceptions(err, data.swapFormInfo);
     } finally {
       setLoading(false);
     }
@@ -301,7 +304,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         setRejectedSwap(true);
         return;
       }
-      handleExceptions(err, data.swapFormInfo as PrefilledSwapForm);
+      handleExceptions(err, data.swapFormInfo);
     } finally {
       setLoading(false);
     }
