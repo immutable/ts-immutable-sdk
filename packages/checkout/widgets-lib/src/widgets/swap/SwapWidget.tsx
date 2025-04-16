@@ -353,6 +353,7 @@ export default function SwapWidget({
                 page({
                   userJourney: UserJourney.SWAP,
                   screen: 'PriceSurge',
+                  extras: viewState.view.data,
                 });
                 sendSwapRejectedEvent(eventTarget, 'Price surge');
               }}
