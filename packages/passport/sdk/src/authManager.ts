@@ -76,13 +76,12 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
     automaticSilentRenew: false, // Disabled until https://github.com/authts/oidc-client-ts/issues/430 has been resolved
     scope: oidcConfiguration.scope,
     userStore,
+    extraQueryParams: {
+      ...config.extraQueryParams,
+      ...(oidcConfiguration.audience ? { audience: oidcConfiguration.audience } : {}),
+    },
   };
 
-  if (oidcConfiguration.audience) {
-    baseConfiguration.extraQueryParams = {
-      audience: oidcConfiguration.audience,
-    };
-  }
   return baseConfiguration;
 };
 
