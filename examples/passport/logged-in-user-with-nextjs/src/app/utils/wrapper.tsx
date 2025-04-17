@@ -1,6 +1,7 @@
 'use client';
 import { BiomeCombinedProviders, Stack } from '@biom3/react';
 
+
 export default function AppWrapper({
     children,
   }: Readonly<{
@@ -8,11 +9,11 @@ export default function AppWrapper({
   }>) {
     return (
       <div className="flex-container">
-          <BiomeCombinedProviders>
+        <BiomeCombinedProviders>
           <Stack alignItems="center">
-          { children }
-           </Stack>
-          </BiomeCombinedProviders>
-    </div>
+            { children }
+          </Stack>
+        </BiomeCombinedProviders>
+      </div>
     );
 }
