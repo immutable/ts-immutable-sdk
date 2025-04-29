@@ -1,6 +1,5 @@
 import { Passport } from "@imtbl/passport";
 import { Environment } from "@imtbl/config";
-import * as x from "@imtbl/x-client";
 
 const baseConfig = {
   environment: Environment.SANDBOX,
