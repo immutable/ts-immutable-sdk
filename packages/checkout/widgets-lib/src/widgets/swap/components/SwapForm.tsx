@@ -26,7 +26,6 @@ import {
   NATIVE,
   DEFAULT_TOKEN_VALIDATION_DECIMALS,
   ESTIMATE_DEBOUNCE,
-  getL2ChainId,
 } from '../../../lib';
 import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
 import {
@@ -844,7 +843,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       const currentChainId = await (provider.provider as any).send('eth_chainId', []);
       // eslint-disable-next-line radix
       const parsedChainId = parseInt(currentChainId.toString());
-      if (parsedChainId !== getL2ChainId(checkout.config)) {
+      if (parsedChainId !== checkout.config.l2ChainId) {
         setShowNetworkSwitchDrawer(true);
         return;
       }
@@ -1126,7 +1125,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       />
       <NetworkSwitchDrawer
         visible={showNetworkSwitchDrawer}
-        targetChainId={getL2ChainId(checkout?.config!)}
+        targetChainId={checkout?.config.l2ChainId!}
         provider={provider!}
         checkout={checkout!}
         onCloseDrawer={() => setShowNetworkSwitchDrawer(false)}

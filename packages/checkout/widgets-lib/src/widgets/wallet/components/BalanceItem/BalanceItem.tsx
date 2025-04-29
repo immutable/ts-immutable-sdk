@@ -14,7 +14,6 @@ import { ShowMenuItem } from './BalanceItemStyles';
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { WalletContext } from '../../context/WalletContext';
 import { orchestrationEvents } from '../../../../lib/orchestrationEvents';
-import { getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
 import { formatZeroAmount, tokenValueFormat } from '../../../../lib/utils';
 import { ConnectLoaderContext } from '../../../../context/connect-loader-context/ConnectLoaderContext';
 import { isPassportProvider } from '../../../../lib/provider';
@@ -60,11 +59,11 @@ export function BalanceItem({
       if (!checkout) return;
       const onRampTokens = checkout.getTokenAllowList({
         type: TokenFilterTypes.ONRAMP,
-        chainId: getL2ChainId(checkout.config),
+        chainId: checkout.config.l2ChainId,
       });
       const swapTokens = checkout.getTokenAllowList({
         type: TokenFilterTypes.SWAP,
-        chainId: getL2ChainId(checkout.config),
+        chainId: checkout.config.l2ChainId,
       });
 
       const [onRampAllowedTokensResult, swapAllowedTokensResult] = await Promise.all([onRampTokens, swapTokens]);
@@ -84,18 +83,18 @@ export function BalanceItem({
     setIsAddTokensEnabled(enableAddCoin);
 
     const enableBuyCoin = !enableAddCoin
-      && currentChainId === getL2ChainId(checkout.config)
+      && currentChainId === checkout.config.l2ChainId
       && (supportedTopUps?.isOnRampEnabled ?? true);
     setIsOnRampEnabled(enableBuyCoin);
 
     const enableMoveCoin = !enableAddCoin
-      && (currentChainId === getL1ChainId(checkout.config)
-        || currentChainId === getL2ChainId(checkout.config))
+      && (currentChainId === checkout.config.l1ChainId
+        || currentChainId === checkout.config.l2ChainId)
       && (supportedTopUps?.isBridgeEnabled ?? true);
     setIsBridgeEnabled(enableMoveCoin);
 
     const enableSwapCoin = !enableAddCoin
-      && currentChainId === getL2ChainId(checkout.config)
+      && currentChainId === checkout.config.l2ChainId
       && (supportedTopUps?.isSwapEnabled ?? true)
       && (supportedTopUps?.isSwapAvailable ?? true);
     setIsSwapEnabled(enableSwapCoin);

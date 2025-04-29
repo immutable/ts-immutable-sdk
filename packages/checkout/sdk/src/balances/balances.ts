@@ -238,20 +238,19 @@ export const getBalances = async (
     });
 
   const balanceResults = await Promise.allSettled(allBalancePromises);
-  const balances = (balanceResults.filter(
-    (result) => result.status === 'fulfilled',
-  ) as PromiseFulfilledResult<GetBalanceResult>[]
-  ).map((result) => {
-    const resp = result;
-    const { token } = resp.value;
-    // For some reason isNativeToken always returns undefined.
-    // We have spent way too much time figuring out why this is happening.
-    // That we have given up -- keep it as it is for now.
-    if (!token.address || isMatchingAddress(token.address, NATIVE)) resp.value.token.address = NATIVE;
-    return resp.value;
-  });
 
-  return { balances };
+  return balanceResults.reduce((acc, resp) => {
+    if (resp.status !== 'fulfilled' || resp.value.balance === 0n) return acc;
+
+    const { value: result } = resp;
+
+    if (!result.token.address || isMatchingAddress(result.token.address, NATIVE)) {
+      result.token.address = NATIVE;
+    }
+
+    acc.balances.push(result);
+    return acc;
+  }, { balances: new Array<GetBalanceResult>() });
 };
 
 const getTokenBalances = async (
