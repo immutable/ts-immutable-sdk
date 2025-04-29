@@ -54,6 +54,8 @@ export class PassportConfiguration {
 
   readonly popupOverlayOptions: PopupOverlayOptions;
 
+  readonly extraQueryParams: Record<string, string>;
+
   constructor({
     baseConfig,
     overrides,
@@ -61,6 +63,7 @@ export class PassportConfiguration {
     jsonRpcReferrer,
     forceScwDeployBeforeMessageSignature,
     popupOverlayOptions,
+    extraQueryParams,
     ...oidcConfiguration
   }: PassportModuleConfiguration) {
     validateConfiguration(oidcConfiguration, [
@@ -75,7 +78,7 @@ export class PassportConfiguration {
       disableGenericPopupOverlay: false,
       disableBlockedPopupOverlay: false,
     };
-
+    this.extraQueryParams = extraQueryParams || {};
     if (overrides) {
       validateConfiguration(
         overrides,

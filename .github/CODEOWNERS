@@ -22,5 +22,5 @@ package.json @immutable/passport
 /packages/minting-backend @shineli1984
 /packages/webhook @shineli1984
 /packages/game-bridge @immutable/gamesdk
-/examples @immutable/passport
+/examples @immutable/devgrowth
 **/package.json @immutable/passport

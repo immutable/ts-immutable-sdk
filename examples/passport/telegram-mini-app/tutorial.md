@@ -21,12 +21,9 @@ This tutorial demonstrates how to integrate Immutable Passport into a Telegram M
 
 ### Device Flow Authentication
 
-**Feature Name**: Device Flow Authentication is a login flow designed for devices where the user might have limited input capabilities or when redirects aren't possible. In this context, it's used because Telegram Mini Apps have special requirements for opening external links.
+Implements a secure login method designed for Telegram Mini Apps, ensuring support across all devices.
 
-**Source Code**: [Connect.tsx](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/telegram-mini-app/app/components/Connect.tsx)
-
-**Implementation**:
-```typescript
+```typescript title="Device Flow Login" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/telegram-mini-app/app/components/Connect.tsx"
 // Use loginWithDeviceFlow as the login method for Telegram Mini App to ensure support for all devices
 const deviceFlowParams = await passportInstance.loginWithDeviceFlow();
 // Open the device flow url using the openLink function on the telegram sdk
@@ -46,16 +43,13 @@ const [userAddress] = await provider.request({
 setWalletAddress(userAddress);
 ```
 
-**Explanation**: The application uses the device flow authentication method, which is ideal for Telegram Mini Apps. When a user clicks the "Sign in with Passport" button, the app first calls `loginWithDeviceFlow()` to get authentication parameters. It then opens the authentication URL using Telegram's `WebApp.openLink()` function, which handles external links in a Telegram-friendly way. After the user completes authentication in this external window, the app calls `loginWithDeviceFlowCallback()` to wait for and confirm the successful authentication. Finally, it connects to the EVM network and retrieves the user's wallet address for further interactions.
+The application uses the device flow authentication method, which is ideal for Telegram Mini Apps. When a user clicks the "Sign in with Passport" button, the app first calls `loginWithDeviceFlow()` to get authentication parameters. It then opens the authentication URL using Telegram's `WebApp.openLink()` function, which handles external links in a Telegram-friendly way. After the user completes authentication in this external window, the app calls `loginWithDeviceFlowCallback()` to wait for and confirm the successful authentication. Finally, it connects to the EVM network and retrieves the user's wallet address for further interactions.
 
 ### NFT Transfers
 
-**Feature Name**: NFT Transfer allows users to transfer NFT assets to other wallet addresses directly from within the Telegram Mini App.
+Allows users to transfer NFT assets to other wallet addresses directly from within the Telegram Mini App.
 
-**Source Code**: [TransferAsset.tsx](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/telegram-mini-app/app/components/TransferAsset.tsx)
-
-**Implementation**:
-```typescript
+```typescript title="NFT Transfer" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/passport/telegram-mini-app/app/components/TransferAsset.tsx"
 // Setup the contract ABI with the safeTransferFrom function for transferring assets
 const abi = [
   "function safeTransferFrom(address from, address to, uint256 token_id)",
@@ -73,7 +67,7 @@ try {
 }
 ```
 
-**Explanation**: After a user has authenticated, they can transfer NFT assets to other addresses. The app presents a form where users can input the collection address, token ID, and recipient address. When the user submits this information, the app creates a contract instance using ethers.js with a minimal ABI that includes only the `safeTransferFrom` function. It then gets the signer from the provider (which was initialized during authentication) and calls the transfer function. The app displays success or error messages based on the transaction result.
+After a user has authenticated, they can transfer NFT assets to other addresses. The app presents a form where users can input the collection address, token ID, and recipient address. When the user submits this information, the app creates a contract instance using ethers.js with a minimal ABI that includes only the `safeTransferFrom` function. It then gets the signer from the provider (which was initialized during authentication) and calls the transfer function. The app displays success or error messages based on the transaction result.
 
 ## Running the App
 

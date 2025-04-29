@@ -21,14 +21,10 @@ This example demonstrates how to create bids for ERC721 and ERC1155 tokens using
 
 ### Create Bid for ERC721 Tokens
 
-**Feature Name**: Create a bid for ERC721 tokens using ERC20 tokens as payment.
-
-**Source Code**: [Source Code](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/create-bid-with-nextjs/src/app/create-bid-with-erc721/page.tsx)
-
-**Implementation**:
+Creates a bid on the Orderbook for a specific ERC721 token, offering ERC20 tokens as payment.
 
 Preparing an ERC721 bid:
-```typescript
+```typescript title="Prepare ERC721 Bid" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/create-bid-with-nextjs/src/app/create-bid-with-erc721/page.tsx"
 const prepareERC721Bid = async (): Promise<orderbook.PrepareBidResponse> => {
   // build the sell item
   const sell: ERC20Item = {
@@ -57,7 +53,7 @@ const prepareERC721Bid = async (): Promise<orderbook.PrepareBidResponse> => {
 ```
 
 Creating the bid:
-```typescript
+```typescript title="Create ERC721 Bid" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/create-bid-with-nextjs/src/app/create-bid-with-erc721/page.tsx"
 const createER721Bid = async () => {
   // prepare the bid
   const preparedBid = await prepareERC721Bid();
@@ -81,8 +77,6 @@ const createER721Bid = async () => {
 };
 ```
 
-**Explanation**: 
-
 When creating a bid for an ERC721 token, the app first prepares the bid by specifying the ERC20 tokens the user is willing to spend (sell) and the ERC721 token they want to buy. The `prepareBid` function of the Orderbook SDK then returns the necessary information to complete the bid.
 
 The process involves three main steps:
@@ -92,14 +86,10 @@ The process involves three main steps:
 
 ### Create Bid for ERC1155 Tokens
 
-**Feature Name**: Create a bid for ERC1155 tokens using ERC20 tokens as payment.
-
-**Source Code**: [Source Code](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/create-bid-with-nextjs/src/app/create-bid-with-erc1155/page.tsx)
-
-**Implementation**:
+Creates a bid on the Orderbook for a specific quantity of an ERC1155 token, offering ERC20 tokens.
 
 Preparing an ERC1155 bid:
-```typescript
+```typescript title="Prepare ERC1155 Bid" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/create-bid-with-nextjs/src/app/create-bid-with-erc1155/page.tsx"
 const prepareERC1155Bid = async (): Promise<orderbook.PrepareBidResponse> => {
   // build the sell item
   const sell: ERC20Item = {
@@ -129,7 +119,7 @@ const prepareERC1155Bid = async (): Promise<orderbook.PrepareBidResponse> => {
 ```
 
 Creating the bid:
-```typescript
+```typescript title="Create ERC1155 Bid" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/create-bid-with-nextjs/src/app/create-bid-with-erc1155/page.tsx"
 const createER1155Bid = async () => {
   // prepare the bid
   const preparedBid = await prepareERC1155Bid();
@@ -152,8 +142,6 @@ const createER1155Bid = async () => {
   );
 };
 ```
-
-**Explanation**: 
 
 The process for creating a bid for ERC1155 tokens is similar to that for ERC721 tokens. The main difference is that with ERC1155 tokens, users can specify a quantity of tokens they want to buy using the `amount` property in the buy item.
 

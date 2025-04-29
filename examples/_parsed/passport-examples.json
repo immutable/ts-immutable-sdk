@@ -20,7 +20,7 @@
       ],
       "product": "Passport",
       "programming_language": "TypeScript",
-      "sidebar_order": 2
+      "sidebar_order": 3
     }
   },
   "login-with-nextjs": {
@@ -43,6 +43,33 @@
         "NextJS",
         "TypeScript",
         "React"
+      ],
+      "product": "Passport",
+      "programming_language": "TypeScript",
+      "sidebar_order": 2
+    }
+  },
+  "setup-with-nextjs": {
+    "tutorial": "setup-with-nextjs.md",
+    "metadata": {
+      "title": "Setup",
+      "description": "Demonstrates various Passport SDK initialization patterns and configurations",
+      "keywords": [
+        "Immutable",
+        "SDK",
+        "Passport",
+        "Setup",
+        "Configuration",
+        "Authentication",
+        "Next.js",
+        "Overlays",
+        "Scopes",
+        "Silent Logout"
+      ],
+      "tech_stack": [
+        "Next.js",
+        "TypeScript",
+        "Biom3"
       ],
       "product": "Passport",
       "programming_language": "TypeScript",
@@ -71,7 +98,7 @@
       ],
       "product": "Passport",
       "programming_language": "TypeScript",
-      "sidebar_order": 6
+      "sidebar_order": 7
     }
   },
   "wallets-connect-with-nextjs": {
@@ -99,7 +126,7 @@
       ],
       "product": "Passport",
       "programming_language": "TypeScript",
-      "sidebar_order": 3
+      "sidebar_order": 4
     }
   },
   "wallets-signing-with-nextjs": {
@@ -123,7 +150,7 @@
       ],
       "product": "Passport",
       "programming_language": "TypeScript",
-      "sidebar_order": 5
+      "sidebar_order": 6
     }
   },
   "wallets-transactions-with-nextjs": {
@@ -146,7 +173,7 @@
       ],
       "product": "Passport",
       "programming_language": "TypeScript",
-      "sidebar_order": 4
+      "sidebar_order": 5
     }
   }
 }

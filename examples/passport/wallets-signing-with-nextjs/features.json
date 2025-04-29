@@ -1,7 +1,17 @@
 {
     "features": [
-        "sign-with-eip712",
-        "sign-with-erc191"
+        {
+            "feature": "sign-with-eip712",
+            "manually-edited": true,
+            "silent-login": true,
+            "silent-logout": true
+        },
+        {
+            "feature": "sign-with-erc191",
+            "manually-edited": true,
+            "silent-login": true,
+            "silent-logout": true
+        }
     ],
-    "order": 5
+    "order": 6
 }

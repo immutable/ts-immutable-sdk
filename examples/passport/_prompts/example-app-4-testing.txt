@@ -1,0 +1,199 @@
+## Immutable Passport SDK Example App Generator - Part 3: Testing and Validation
+
+# Step 1: Validation Checklist
+Before proceeding with testing and running the rest of the prompt, verify ALL of these items:
+
+- [ ] Code follows existing structure and naming conventions
+- [ ] E2E Tests exist for {feature name} feature
+- [ ] All routes and pages are implemented correctly
+- [ ] ALL imports are valid and components are properly exported
+- [ ] No circular dependencies exist between components
+- [ ] Error handling is implemented for ALL asynchronous operations and events
+- [ ] Environment variables are documented in .env.example
+- [ ] Events are properly defined and handled
+- [ ] Event listeners and subscriptions are properly cleaned up
+- [ ] Components render without errors in all possible states
+
+# Step 2: Testing Process
+IMPORTANT: TESTS MUST PASS BEFORE PROCEEDING. DO NOT SKIP THIS STEP UNDER ANY CIRCUMSTANCES.
+IMPORTANT: REMOVE ALL TESTS THAT WOULD BE TOO COMPLICATED TO BE TESTED IN AN E2E TESTING SCENARIO(REMOVE PASSPORT SPECIFIC TEST THAT REQUIRES AUTHENTICATION THROUGH PASSPORT POP-UPS). FOCUS ON ENSURING THAT ALL PAGES CAN RENDER PROPERLY.
+## Unit Tests 
+Run the unit tests to ensure all {feature name} functionality works correctly:
+
+1. Navigate to the {feature name}-with-nextjs directory:
+   ```
+   cd examples/passport/{feature name}-with-nextjs
+   ```
+
+2. Install dependencies:
+   ```
+   pnpm install
+   ```
+
+3. Run the tests:
+   ```
+   pnpm test
+   ```
+
+4. If any tests fail, understand the errors, find the causes of the errors, and fix the issues. Once you've fixed the issues, run the tests again. DO NOT PROCEED until all tests pass.
+
+
+5. Verify that all event-related tests are checking:
+   - Event listener setup
+   - Event listener cleanup
+   - Event data handling
+   - UI updates in response to events
+
+## Build Validation
+After tests pass and all page can render, verify that the app builds correctly:
+
+1. Build the app:
+   ```
+   pnpm build
+   ```
+
+2. If the build fails, fix the issues and rebuild.
+   - Repeat the testing process if significant changes were made
+   - DO NOT PROCEED until the build succeeds
+   - If there's any lint issues, never turn off linting in the ESLINT CONFIG FILE. Instead, fix the issues.
+
+## Development Testing
+ONLY PROCEED TO THIS STEP IF:
+- ALL tests pass
+- The app builds successfully
+
+Start the development server and test the app functionality:
+
+1. Start the server:
+   ```
+   pnpm dev
+   ```
+
+2. Manually test these scenarios:
+   - Complete login flow works without errors
+   - Redirect handling works correctly
+   - Logout flow completes successfully
+   - All event handlers function as expected (connect, disconnect, chainChanged, accountsChanged) (IF APPLICABLE)
+   - UI correctly reflects all {feature name} state changes
+   - No error messages appear in the console during normal operation
+   - Event listeners are properly cleaned up (check with React DevTools)
+
+3. Check the browser console for any errors during the entire process
+
+4. Verify all {feature name} functionality is handled and displayed correctly
+
+5. If any issues are found, fix them and REPEAT THE ENTIRE TESTING PROCESS from Step 2, including tests page rendering validation
+
+6. Check React DevTools for any component errors or unexpected re-renders
+
+## Production Build Testing
+ONLY PROCEED TO THIS STEP IF:
+- ALL tests pass
+- The app builds successfully
+- Development testing shows no issues
+
+Test the production build of the application:
+
+1. Build the production server:
+   ```
+   pnpm build
+   ```
+
+2. Verify that the production build works correctly:
+   - All pages load without errors
+   - Events are properly handled
+   - UI reflects event state changes
+   - No console errors appear
+
+3. If issues are found in the production build, fix them and REPEAT THE ENTIRE TESTING PROCESS from Step 2, including tests, page rendering validation, and build verification.
+
+# Step 3: Event-Specific Testing (if applicable)
+
+## Connect Event
+- [ ] Test that the connect event is properly captured and displayed
+- [ ] Verify connection state changes are shown in the UI
+- [ ] Confirm cleanup of connect event listeners
+
+## Disconnect Event
+- [ ] Test that the disconnect event is properly captured and displayed
+- [ ] Verify UI updates when disconnection occurs
+- [ ] Confirm cleanup of disconnect event listeners
+
+## Chain Changed Event
+- [ ] Test that chain changes are properly captured and displayed
+- [ ] Verify UI updates with chain information
+- [ ] Confirm cleanup of chainChanged event listeners
+
+## Accounts Changed Event
+- [ ] Test that account changes are properly captured and displayed
+- [ ] Verify UI updates with account information
+- [ ] Confirm cleanup of accountsChanged event listeners
+
+## Other Events
+- [ ] Test any other events implemented in the app
+- [ ] Verify proper event handling and UI updates
+- [ ] Confirm cleanup of all other event listeners
+
+# Step 4: Error Handling Testing
+
+## Edge Cases
+Test these edge cases to ensure proper error handling (if applicable):
+
+- [ ] Provider not connected when attempting to add event listeners
+- [ ] Events firing with unexpected or missing data
+- [ ] Multiple rapid events firing in succession
+- [ ] Component unmounting while events are firing
+- [ ] Network disconnection during event handling
+
+## Error Recovery
+Verify that the app properly recovers from errors (if applicable):
+
+- [ ] App doesn't crash when events fail
+- [ ] Error states are displayed to the user
+- [ ] User can retry after errors
+- [ ] Event listeners are still properly cleaned up after errors
+
+# Step 5: Performance Testing
+
+## Event Handling Performance
+Check that event handling performs efficiently (if applicable):
+
+- [ ] Events are processed without noticeable delay
+- [ ] UI updates quickly in response to events
+- [ ] No memory leaks from event listeners (check with Chrome DevTools Memory tab)
+- [ ] No excessive re-renders when events fire (check with React DevTools Profiler)
+
+# Step 6: Documentation Validation
+
+## README Verification
+Ensure the README.md includes:
+
+- [ ] Clear description of the {feature name} features
+- [ ] Complete setup instructions
+- [ ] Detailed usage examples for each {feature name} type
+- [ ] Troubleshooting information for common issues
+- [ ] Best practices for {feature name} handling and cleanup
+
+# Step 7: Final Checklist
+
+Before considering the app complete, confirm ALL of these items:
+
+- [ ] All tests pass with all pages rendering successfully
+- [ ] App builds successfully for production (MANDATORY - do not proceed if this is not met)
+- [ ] All pages and routes work correctly
+- [ ] {feature name} handling works properly in both development and production builds
+- [ ] Error handling is robust and user-friendly
+- [ ] {feature name} listeners are properly cleaned up in all scenarios
+- [ ] Documentation is complete and accurate
+- [ ] Code follows best practices and standards
+- [ ] UI is clean, intuitive, and demonstrates the {feature name} clearly
+- [ ] No console errors or warnings during normal operation
+
+# CRITICAL VALIDATION REQUIREMENT
+The following sequence MUST be followed in this exact order:
+1. Tests must pass
+2. ALL PAGES MUST BE TESTED SO THAT THEY ALL RENDER SUCCESSFULLY
+3. Build must succeed
+4. Only then can you run the app in development or production
+
+IF ANY STEP FAILS, you MUST fix issues and restart from step 1 (run tests again) 
