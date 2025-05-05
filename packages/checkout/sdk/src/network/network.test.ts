@@ -41,6 +41,17 @@ const zkevmNetworkInfo = {
   nativeCurrency: ZKEVM_NATIVE_SANDBOX_TOKEN,
 };
 
+const unrecognisedChainError = {
+  error: {
+    data: {
+      originalError: {
+        message: 'Provider error',
+        code: 4902,
+      },
+    },
+  },
+};
+
 jest.mock('../api/http', () => ({
   // eslint-disable-next-line @typescript-eslint/naming-convention
   HttpClient: jest.fn().mockImplementation(() => ({
@@ -234,10 +245,7 @@ describe('network functions', () => {
       (WrappedBrowserProvider as unknown as jest.Mock).mockReturnValue({
         send: jest
           .fn()
-          .mockRejectedValue({
-            message: 'Provider error',
-            code: 4902,
-          }),
+          .mockRejectedValue(unrecognisedChainError),
         ethereumProvider: {
           isMetaMask: true,
         },
@@ -291,7 +299,7 @@ describe('network functions', () => {
         .mockReturnValueOnce({
           send: jest
             .fn()
-            .mockRejectedValueOnce({ code: 4902 })
+            .mockRejectedValueOnce(unrecognisedChainError)
             .mockResolvedValueOnce({}),
           ethereumProvider: {
             isMetaMask: true,
