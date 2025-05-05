@@ -75,9 +75,8 @@ export function SwitchNetworkZkEVM() {
 
     if (!provider.send) return;
 
-    const currentChainId = await provider.send('eth_chainId', []);
-    // eslint-disable-next-line radix
-    const parsedChainId = Number(currentChainId.toString());
+    const currentChainId = await provider.send('eth_chainId', []) as `0x${string}`;
+    const parsedChainId = Number(currentChainId);
 
     if (parsedChainId === checkout.config.l2ChainId) {
       connectDispatch({
@@ -102,7 +101,7 @@ export function SwitchNetworkZkEVM() {
     try {
       let walletName = '';
       if (isWalletConnectProvider(provider)) {
-        walletName = (provider.provider as any)?.session?.peer?.metadata?.name.toLowerCase();
+        walletName = (provider.ethereumProvider as any)?.session?.peer?.metadata?.name.toLowerCase();
       }
       if (walletName.includes('metamask')) {
         try {
