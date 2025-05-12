@@ -68,6 +68,7 @@ const initRequest = 'init';
 const initRequestId = '1';
 
 let passportClient: passport.Passport | null;
+let passportInitData: string | null = null;
 let providerInstance: provider.IMXProvider | null;
 let zkEvmProviderInstance: passport.Provider | null;
 let versionInfo: VersionInfo | null;
@@ -222,7 +223,8 @@ window.callFunction = async (jsonData: string) => {
         const request = JSON.parse(data);
         const redirect: string | null = request?.redirectUri;
         const logoutMode: 'silent' | 'redirect' = request?.isSilentLogout === true ? 'silent' : 'redirect';
-        if (!passportClient) {
+        if (!passportClient || passportInitData !== data) {
+          passportInitData = data;
           console.log(`Connecting to ${request.environment} environment`);
 
           let passportConfig: passport.PassportModuleConfiguration;
@@ -242,6 +244,7 @@ window.callFunction = async (jsonData: string) => {
               scope,
               crossSdkBridgeEnabled: true,
               logoutMode,
+              extraQueryParams: request.extraQueryParams,
               overrides: {
                 authenticationDomain: 'https://auth.dev.immutable.com',
                 magicPublishableApiKey: 'pk_live_4058236363130CA9', // Public key
@@ -277,6 +280,7 @@ window.callFunction = async (jsonData: string) => {
               crossSdkBridgeEnabled: true,
               jsonRpcReferrer: 'http://imtblgamesdk.local',
               logoutMode,
+              extraQueryParams: request.extraQueryParams,
             };
           }
 
