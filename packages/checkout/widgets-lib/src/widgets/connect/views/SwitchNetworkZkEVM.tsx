@@ -10,7 +10,7 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { ConnectActions, ConnectContext } from '../context/ConnectContext';
 import { ViewContext, ViewActions } from '../../../context/view-context/ViewContext';
-import { addChainChangedListener, getL2ChainId, removeChainChangedListener } from '../../../lib';
+import { addChainChangedListener, removeChainChangedListener } from '../../../lib';
 import { ImmutablePlanetHero } from '../../../components/Hero/ImmutablePlanetHero';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
@@ -36,7 +36,7 @@ export function SwitchNetworkZkEVM() {
       const currentChainId = await provider.send('eth_chainId', []);
       // eslint-disable-next-line radix
       const parsedChainId = Number(currentChainId.toString());
-      if (parsedChainId === getL2ChainId(checkout.config)) {
+      if (parsedChainId === checkout.config.l2ChainId) {
         connectDispatch({
           payload: {
             type: ConnectActions.SET_PROVIDER,
@@ -75,11 +75,10 @@ export function SwitchNetworkZkEVM() {
 
     if (!provider.send) return;
 
-    const currentChainId = await provider.send('eth_chainId', []);
-    // eslint-disable-next-line radix
-    const parsedChainId = Number(currentChainId.toString());
+    const currentChainId = await provider.send('eth_chainId', []) as `0x${string}`;
+    const parsedChainId = Number(currentChainId);
 
-    if (parsedChainId === getL2ChainId(checkout.config)) {
+    if (parsedChainId === checkout.config.l2ChainId) {
       connectDispatch({
         payload: {
           type: ConnectActions.SET_PROVIDER,
@@ -102,13 +101,13 @@ export function SwitchNetworkZkEVM() {
     try {
       let walletName = '';
       if (isWalletConnectProvider(provider)) {
-        walletName = (provider.provider as any)?.session?.peer?.metadata?.name.toLowerCase();
+        walletName = (provider.ethereumProvider as any)?.session?.peer?.metadata?.name.toLowerCase();
       }
       if (walletName.includes('metamask')) {
         try {
           await checkout.addNetwork({
             provider,
-            chainId: getL2ChainId(checkout.config),
+            chainId: checkout.config.l2ChainId,
           });
           connectDispatch({
             payload: {
@@ -134,7 +133,7 @@ export function SwitchNetworkZkEVM() {
 
       const switchRes = await checkout.switchNetwork({
         provider,
-        chainId: getL2ChainId(checkout.config),
+        chainId: checkout.config.l2ChainId,
       });
       connectDispatch({
         payload: {

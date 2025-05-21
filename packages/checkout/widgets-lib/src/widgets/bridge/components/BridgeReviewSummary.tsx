@@ -29,8 +29,6 @@ import {
   IMX_TOKEN_SYMBOL,
   NATIVE,
   addChainChangedListener,
-  getL1ChainId,
-  getL2ChainId,
   networkName,
   removeChainChangedListener,
 } from '../../../lib';
@@ -119,7 +117,7 @@ export function BridgeReviewSummary() {
 
   const isTransfer = useMemo(() => from?.network === to?.network, [from, to]);
   const isDeposit = useMemo(
-    () => (getL2ChainId(checkout.config) === to?.network),
+    () => (checkout.config.l2ChainId === to?.network),
     [from, to, checkout],
   );
   const insufficientFundsForGas = useMemo(() => {
@@ -637,7 +635,7 @@ export function BridgeReviewSummary() {
         onCloseDrawer={() => setShowNotEnoughGasDrawer(false)}
         walletAddress={from?.walletAddress || ''}
         tokenSymbol={
-            from?.network === getL1ChainId(checkout?.config)
+            from?.network === checkout.config.l1ChainId
               ? ETH_TOKEN_SYMBOL
               : IMX_TOKEN_SYMBOL
           }

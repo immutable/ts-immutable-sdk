@@ -131,6 +131,7 @@ describe('AuthManager', () => {
       expect(UserManager).toBeCalledWith({
         authority: config.authenticationDomain,
         client_id: config.oidcConfiguration.clientId,
+        extraQueryParams: {},
         mergeClaims: true,
         automaticSilentRenew: false,
         metadata: {

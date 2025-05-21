@@ -1,0 +1,193 @@
+## Immutable Orderbook SDK Example App Generator - Part 1: Create the App
+
+Make sure to always write tests first. You must do Test Driven Development.
+# Overview
+This prompt helps you create a new React example app that demonstrates the {feature name} feature of the Immutable Orderbook SDK. The output will be a fully functional, self-contained example with proper documentation and adherence to best practices.
+
+# App Information
+- Feature name: {feature name}
+- Framework: nextjs
+
+## UI Best Practices
+- Always ensure that you ONLY use available Biom3 Components without assuming they exist. (Text and Spinner DOES NOT exist in the Biom3 UI Library)
+- Use standard HTML elements (h1, h2, h3, p) for text content. 
+- Use Biom3 Button and other UI components as documented
+- Show clear loading/error states
+- Keep UI simple and focused on demonstrating the {feature name}
+
+## Critical Error Prevention
+- Always check if objects exist before accessing their properties or methods
+- Use optional chaining when accessing potentially undefined properties: obj?.prop?.method?.()
+- Wrap all {feature name} setup and teardown in try/catch blocks
+- Test component mounting/unmounting thoroughly to catch cleanup issues
+
+## ALWAYS READ THIS BEFORE YOU DO ANYTHING
+- DO NOT call methods that don't exist on the SDK instances
+- DO NOT try to import types that aren't explicitly exported
+- DO NOT forget to clean up {feature name} setup and teardown
+- DO NOT use custom components or providers unless necessary
+- DO NOT modify dependency versions in package.json
+- DO NOT use inconsistent import methods (mixing default and named imports)
+- DO NOT forget to include 'use client' directive in client components
+- DO NOT assume any property or method exists without checking first 
+- DO NOT MAKE ANY TUTORIAL/METADATA FILE FOR THE {feature name} EXAMPLE APP
+- NEVER ADD `"ignoreDuringBuilds": true` TO .eslintrc.json 
+- ALways do lint checks and never turn it off when building.
+- NEVER FORGET TO RUN BUILD ONCE YOU'RE DONE WITH EVERYTHING ELSE. THIS IS VERY VERY VERY IMPORTANT TO ENSURE THAT EVERYTHING WORKS.
+
+
+# Step 1: Core Setup
+Create a new example app named {feature name}-with-nextjs in /examples/orderbook/ with this structure:
+
+```
+/examples/orderbook/{feature name}-with-nextjs/
+├── src/app/
+│ ├── page.tsx # Main landing page with feature links
+│ ├── {feature name}/page.tsx # Primary feature implementation
+│ ├── redirect/page.tsx # Auth redirect handler
+│ ├── logout/page.tsx # Logout functionality
+│ ├── utils/ # Shared utilities
+│ │ ├── setupDefault.ts # SDK initialization
+│ │ └── wrapper.tsx # App context wrapper
+│ ├── layout.tsx # App layout with wrapper
+│ └── globals.css # Basic styles
+├── tests # Test directory
+│ └── base.spec.ts # E2E Test file
+├── README.md # Documentation
+├── package.json # Dependencies
+├── next.config.mjs # Next.js config
+├── tsconfig.json # TypeScript config
+├── .env.example # Environment variables
+├── .gitignore # Git ignore file
+├── playwright.config.ts # Playwright configuration
+|── eslintrc.json                   # ESLint configuration
+|── babel.config.jest.js            # Babel config for tests
+└── features.json                   # JSON file showcasing the feature present in the {feature name} app
+```
+Copy these essential files from an existing example (e.g., login-with-nextjs):
+- package.json (update the name to "{feature name}-with-nextjs", but keep ALL dependency versions the same)
+- next.config.mjs
+- tsconfig.json
+- .env.example
+- .gitignore
+- src/app/utils/setupDefault.ts
+- src/app/utils/wrapper.tsx
+- src/app/layout.tsx (modify to use AppWrapper)
+- src/app/globals.css
+- playwright.config.ts
+- .eslintrc.json
+
+IMPORTANT: Ensure that you've gone through the Orderbook SDK Documentation and have a very deep understanding of the SDK before you start.
+IMPORTANT: We have an internal UI Library called Biom3. Make sure that you thoroughly understand all of the components. DON'T ASSUME that a component exists. ALWAYS DOUBLE CHECK BEFORE YOU IMPORT OR USE ANYTHING
+IF THE COMPONENT THAT YOU WANT DOESN'T EXIST IN BIOM3, ALWAYS USE NORMAL CSS/HTML AND NEVER ASSUME. (https://github.com/immutable/biom3 | https://immutable.atlassian.net/wiki/spaces/DS/pages/2335965298/BIOME+Docs)
+
+# Step 2: Features.json creation (IMPORTANT: This must be done before you make components, etc. Without this file, you're not allowed to make components/pages.)
+Take a look at another example apps' (such as login-with-nextjs) features.json file and understand the structure.
+Once that's done, create the features.json file in the {feature name} example app root directory
+Make sure that IF {feature name} is to showcase login functionality, set silent-login/silent-logout to false. Otherwise, set it to true.
+The feature name in the features.json file will always be {feature name}
+The manually-edited field will always be false if you're the one who's generating the feature.
+Set the order field to be {total number of apps under product (e.g. Orderbook, checkout, etc)} + 1
+
+# Step 3: Testing Files
+COPY OVER THE RELEVANT E2E TEST FILES (INCLUDING SETUP, ETC) FROM OTHER EXAMPLE APPS SUCH AS LOGIN-WITH-NEXTJS
+
+- Add the following dependencies to package.json:
+  - @playwright/test
+
+- Test all pages renders perfectly
+- Test {feature name} functionality thoroughly with all possible scenarios. (If it's Orderbook specific, this is not required)
+- Test all {feature name} handling and cleanup
+- Explicitly validate that components render without errors
+- Use act() for all asynchronous operations
+
+# Step 4: Component Implementation
+
+## Critical Import/Export Requirements
+For ALL component files:
+- ALWAYS use default exports for page components (export default function ComponentName)
+- ALWAYS import React explicitly if using JSX fragments (<>...</>): import React from 'react'
+- Verify all imports are correctly spelled and point to existing files
+- When importing from libraries, verify the component exists in that library
+- For Next.js client components, always include 'use client' at the top of the file
+
+IMPORTANT: MAKE SURE THAT THE Orderbook SDK IS INITIALIZED CORRECTLY IN THE SETUPDEFAULT.TS FILE. REFER TO OTHER EXAMPLE APPS LIKE LOGIN-WITH-NEXTJS FOR THE CORRECT SETUP.
+IMPORTANT: DON'T IMPLEMENT THE {feature name} AT ALL. JUST SETUP THE PROJECT STRUCTURE AND DOCUMENTATION.
+
+## Main Landing Page (src/app/page.tsx)
+Create a simple landing page with:
+- Brief description of the Orderbook {feature name} features
+- Link to the {feature name} implementation page
+- Clear, concise UI using standard HTML (h1, h2, p) and Biom3 Button components
+
+## Redirect and Logout Pages
+Create minimal, functional redirect and logout pages:
+- Ensure the redirect page properly handles the authentication callback
+- Implement robust error handling for failed auth callbacks
+- For the logout page, implement proper token cleanup
+- VERIFY that all components used in these pages are properly imported
+
+## Feature Implementation (src/app/{feature name}/page.tsx)
+- THIS PAGE SHOULD JUST BE A PLACEHOLDER FOR NOW. IT SHOULD NOT IMPLEMENT ANY FUNCTIONALITY.
+
+## setupDefault modification (If Applicable)
+- Go to the features.json file and check for the silent logout field.
+- If {feature name} has the silent logout field as true, ensure that the 'logoutMode' field in the setupDefault file is set to 'silent'
+
+## Silent Login mode (If Applicable)
+- Go to the features.json file and check for the silent login field.
+- If {feature name} has the silent login field as true, go through all of the pages in the app and change all login modes to silent login.
+
+# Step 5: Documentation
+IMPORTANT: Ensure that the command for installation, etc uses pnpm not npm.
+Create a comprehensive README.md including:
+- {feature name} feature description and purpose
+- Setup instructions including environment variables
+- Usage instructions with code examples for all {feature name} types
+- Common issues and troubleshooting
+- References to official documentation
+- {feature name} cleanup best practices
+
+# Step 6: Implementation Guidelines
+IMPORTANT: MAKE SURE THAT THE Orderbook SDK IS INITIALIZED CORRECTLY IN THE SETUPDEFAULT.TS FILE. REFER TO OTHER EXAMPLE APPS LIKE LOGIN-WITH-NEXTJS FOR THE CORRECT SETUP.
+## SDK Usage Best Practices
+- Use only documented public SDK methods
+- If using internal properties, document with comments and type assertions
+- Always implement proper cleanup in useEffect hooks
+- Use local type definitions instead of importing non-exported types
+- Add robust error handling for all {feature name} and operations
+- Add TypeScript type guards for any SDK properties that might be undefined
+
+# Step 7: Final Checks
+- Ensure that the app can build.
+- Ensure that all of the components, etc are used appropriately.
+- run `pnpm build` and ensure that the setup is perfect.
+- Ensure that there's no problem in all files. Make sure that when using a component, you use the available properties and values.
+- Features.json exists and everything make sense
+- Always check for the login/logout mode if they are consistent with the features.json file.
+
+## UI Best Practices
+- Always ensure that you ONLY use available Biom3 Components without assuming they exist. (Text and Spinner DOES NOT exist in the Biom3 UI Library)
+- Use standard HTML elements (h1, h2, h3, p) for text content. 
+- Use Biom3 Button and other UI components as documented
+- Show clear loading/error states
+- Keep UI simple and focused on demonstrating the {feature name}
+
+## Critical Error Prevention
+- Always check if objects exist before accessing their properties or methods
+- Use optional chaining when accessing potentially undefined properties: obj?.prop?.method?.()
+- Wrap all {feature name} setup and teardown in try/catch blocks
+- Test component mounting/unmounting thoroughly to catch cleanup issues
+
+## ALWAYS READ THIS BEFORE YOU DO ANYTHING
+- DO NOT call methods that don't exist on the SDK instances
+- DO NOT try to import types that aren't explicitly exported
+- DO NOT forget to clean up {feature name} setup and teardown
+- DO NOT use custom components or providers unless necessary
+- DO NOT modify dependency versions in package.json
+- DO NOT use inconsistent import methods (mixing default and named imports)
+- DO NOT forget to include 'use client' directive in client components
+- DO NOT assume any property or method exists without checking first 
+- DO NOT MAKE ANY TUTORIAL/METADATA FILE FOR THE {feature name} EXAMPLE APP
+- NEVER ADD `"ignoreDuringBuilds": true` TO .eslintrc.json 
+- ALways do lint checks and never turn it off when building.

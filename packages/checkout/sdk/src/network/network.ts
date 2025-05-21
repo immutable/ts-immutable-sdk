@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { JsonRpcProvider } from 'ethers';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import {
@@ -132,9 +131,16 @@ export async function getNetworkInfo(
   );
 }
 
+/**
+ * Errors in ethers v6 are broken - https://github.com/ethers-io/ethers.js/issues/4576
+ * You get "Error: could not coalesce error....".
+ * This is a workaround to check if the error is an unrecognised chain error.
+ * */
+const isUnrecognisedChainError = (err: any) => err.error?.data?.originalError?.code === UNRECOGNISED_CHAIN_ERROR_CODE;
+
 export async function switchWalletNetwork(
   config: CheckoutConfiguration,
-  provider: JsonRpcProvider | WrappedBrowserProvider,
+  provider: WrappedBrowserProvider,
   chainId: ChainId,
 ): Promise<SwitchNetworkResult> {
   const { networkMap } = config;
@@ -144,7 +150,7 @@ export async function switchWalletNetwork(
   });
 
   if (
-    !allowedNetworks.networks.some((network) => Number(network.chainId) === chainId)
+    !allowedNetworks.networks.some((network) => network.chainId === chainId)
   ) {
     throw new CheckoutError(
       `Chain:${chainId} is not a supported chain`,
@@ -152,7 +158,7 @@ export async function switchWalletNetwork(
     );
   }
 
-  if ('ethereumProvider' in provider && provider.ethereumProvider?.isPassport) {
+  if (provider.ethereumProvider?.isPassport) {
     throw new CheckoutError(
       'Switching networks with Passport provider is not supported',
       CheckoutErrorType.SWITCH_NETWORK_UNSUPPORTED,
@@ -161,29 +167,15 @@ export async function switchWalletNetwork(
 
   // WT-1146 - Refer to the README in this folder for explanation on the switch network flow
   try {
-    if (provider && 'ethereumProvider' in provider) {
-      await switchNetworkInWallet(networkMap, provider, chainId);
-    } else {
-      throw new CheckoutError(
-        'Incorrect provider type',
-        CheckoutErrorType.PROVIDER_ERROR,
-      );
-    }
-  } catch (err: any) {
+    await switchNetworkInWallet(networkMap, provider, chainId);
+  } catch (err) {
     // eslint-disable-next-line no-console
     console.error(err);
-    if (err.code === UNRECOGNISED_CHAIN_ERROR_CODE) {
+    if (isUnrecognisedChainError(err)) {
       try {
-        if ('ethereumProvider' in provider) {
-          await addNetworkToWallet(networkMap, provider, chainId);
-        } else {
-          throw new CheckoutError(
-            'Incorrect provider type',
-            CheckoutErrorType.PROVIDER_ERROR,
-          );
-        }
+        await addNetworkToWallet(networkMap, provider, chainId);
         // eslint-disable-next-line @typescript-eslint/no-shadow
-      } catch (err: any) {
+      } catch (err) {
         throw new CheckoutError(
           'User cancelled add network request',
           CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
@@ -209,10 +201,10 @@ export async function switchWalletNetwork(
     );
   }
 
-  const networkInfo: NetworkInfo = await getNetworkInfo(config, newProvider);
+  const networkInfo = await getNetworkInfo(config, newProvider);
 
   return {
     network: networkInfo,
     provider: newProvider,
-  } as SwitchNetworkResult;
+  };
 }

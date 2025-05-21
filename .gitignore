@@ -6,6 +6,7 @@ cache/
 .DS_Store
 .vscode
 .parcel-cache
+.next/
 
 .env
 .env.local

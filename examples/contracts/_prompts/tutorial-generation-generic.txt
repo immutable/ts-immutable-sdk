@@ -1,6 +1,6 @@
 # Example Apps Documentation Generator
 ## Task Overview
-Analyze all example apps in the /examples/checkout/ directory and create documentation files for each example app that doesn't already have them. For each example app, you will create:
+Analyze the /examples/contracts/{app name} directory and create documentation files for the example app. For the specified example app, you will create:
 1. A comprehensive tutorial.md file
 2. A metadata.json file
 
@@ -8,14 +8,14 @@ Analyze all example apps in the /examples/checkout/ directory and create documen
 Before starting:
 - Read through all SDK documentation (in the /sdk and /packages folders)
 - Understand the SDK's key features, functionality, and integration patterns
-- Focus on the Checkout SDK the most. That's your area of specialty.
+- Focus on the Passport SDK the most. That's your area of specialty.
 
 ## Process for Each Example App
-For each subdirectory in /examples/checkout/ that doesn't already have both tutorial.md and metadata.json:
-    
+For the specified example app in /examples/contracts/{app name} that doesn't already have both tutorial.md and metadata.json:
+
 ### 1. Analysis Phase
 - Read all code files in the example app directory
-- Identify which Checkout features are being demonstrated. ONLY include the features that are demonstrated in the features.json file if there's one.
+- Identify which Contracts features are being demonstrated. ONLY include the features that are demonstrated in the features.json file if there's one.
 - Understand the app's architecture, components, and data flow
 - Note all frameworks, libraries, and dependencies used
 
@@ -44,15 +44,17 @@ IMPORTANT: The "View app on Github" link must be wrapped in a <div class="button
 IMPORTANT: The app's description will come before the "View app on Github" link.
 
 #### Features Overview (REMEMBER THAT INITIALIZING THE ORDERBOOK/CHECKOUT/CONTRACTS/PASSPORT SDK IS NOT A FEATURE)
-- Bulleted list of all Checkout features demonstrated in this example app
+- Bulleted list of all Contracts features demonstrated in this example app
 
 > IMPORTANT: Focus on how the example app uses each feature. Do NOT include Orderbook/Checkout/Contracts/Passport SDK initialization and Orderbook/Checkout/Contracts/Passport Provider Creation instructions - focus only on the example-specific implementation details.
 #### SDK Integration Details
-For each Checkout feature demonstrated in this example app (Note: This section should match the feature mentioned in the features overview section):
-- **Feature Name**: Brief description of what the feature does.
-- **Source Code**: Link to the source code file in the GitHub repository. Structure: "Source Code: [source code file](source code file link)"
-- **Implementation**: Code snippets showing how the feature is implemented
-- **Explanation**: Clear explanation of how the code works
+For each Contracts feature demonstrated in this example app (Note: This section should match the feature mentioned in the features overview section):
+- Brief description of what the feature does. 
+- Code snippets showing how the feature is implemented (CodeBlock should be linked to the relevant github repo) IMPORTANT: related snippets should be under a single code block rather than dividing them across multiple codeblocks. However, pls ensure that you only include the relevant snippets (method calls, etc) and not Next.js specific features(states, etc WHEN it's irrelevant) to ensure that the focus is to the most most important code snippet relevant to the feature.
+    - Example structure: ```typescript title="<feature name>" manualLink="<github repo link containing the code snippet(don't specify the line, just the file's link)>"
+                                <code snippet>
+                        ```
+- Clear explanation of how the code works
 
 
 #### Running the App
@@ -78,7 +80,7 @@ Create a metadata.json file in the example app's root with the following structu
 "keywords": ["Immutable", "SDK", "[Feature1]", "[Feature2]", "..."],
 "tech_stack": ["[Framework]", "[Library]", "..."],
 "product": "[Passport/Checkout/Orderbook/etc]",
-"programming_language": "[TypeScript/JavaScript/etc]",
+"programming_language": "[TypeScript/JavaScript/etc]"
 }
 
 

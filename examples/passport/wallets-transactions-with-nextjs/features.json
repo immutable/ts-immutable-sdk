@@ -1,7 +1,17 @@
 {
     "features": [
-        "wallet-connection",
-        "transaction-execution"
+        {
+            "feature": "wallet-connection",
+            "manually-edited": true,
+            "silent-login": true,
+            "silent-logout": true
+        },
+        {
+            "feature": "transaction-execution",
+            "manually-edited": true,
+            "silent-login": true,
+            "silent-logout": true
+        }
     ],
-    "order": 4
+    "order": 5
 }

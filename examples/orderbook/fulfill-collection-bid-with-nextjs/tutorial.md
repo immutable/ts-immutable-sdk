@@ -19,15 +19,11 @@ This example app demonstrates how to fulfill collection bids for both ERC721 and
 
 ## SDK Integration Details
 
-### Feature: Fulfill Collection Bid for ERC721
+### Fulfill Collection Bid for ERC721
 
-**Feature Name**: Allow sellers to fulfill ERC721 collection bids by providing a specific token ID that matches the collection.
+Allows a seller to fulfill an active collection bid for an ERC721 collection by providing a specific token ID they own.
 
-**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/fulfill-collection-bid-with-nextjs/src/app/fulfill-collection-bid-with-erc721/page.tsx)
-
-**Implementation**:
-
-```typescript
+```typescript title="Fulfill ERC721 Collection Bid" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/fulfill-collection-bid-with-nextjs/src/app/fulfill-collection-bid-with-erc721/page.tsx"
 const fulfillERC721CollectionBid = async (
   collectionBidID: string,
   tokenID: string
@@ -52,8 +48,6 @@ const fulfillERC721CollectionBid = async (
 }
 ```
 
-**Explanation**:
-
 The code above fulfills an ERC721 collection bid by:
 
 1. Calling the `fulfillOrder` method from the Orderbook SDK with the collection bid ID, the seller's wallet address, any taker ecosystem fees (marketplace fees), the amount (always '1' for ERC721), and the token ID to fulfill.
@@ -61,15 +55,11 @@ The code above fulfills an ERC721 collection bid by:
 3. For each transaction action, the code builds the transaction and sends it using the signer obtained through Passport.
 4. The transaction is confirmed by waiting for 1 block confirmation.
 
-### Feature: Fulfill Collection Bid for ERC1155
+### Fulfill Collection Bid for ERC1155
 
-**Feature Name**: Allow sellers to fulfill ERC1155 collection bids by providing a specific token ID and amount of units.
+Allows a seller to fulfill an active collection bid for an ERC1155 collection by providing a specific token ID and the quantity of units to sell.
 
-**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/fulfill-collection-bid-with-nextjs/src/app/fulfill-collection-bid-with-erc1155/page.tsx)
-
-**Implementation**:
-
-```typescript
+```typescript title="Fulfill ERC1155 Collection Bid" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/orderbook/fulfill-collection-bid-with-nextjs/src/app/fulfill-collection-bid-with-erc1155/page.tsx"
 const fulfillERC1155CollectionBid = async (
   collectionBidID: string,
   amount: string,
@@ -94,8 +84,6 @@ const fulfillERC1155CollectionBid = async (
   }
 }
 ```
-
-**Explanation**:
 
 The code for fulfilling an ERC1155 collection bid is similar to the ERC721 version but with a key difference:
 

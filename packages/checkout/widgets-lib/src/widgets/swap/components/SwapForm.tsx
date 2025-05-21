@@ -16,7 +16,6 @@ import { UserJourney, useAnalytics } from '../../../context/analytics-provider/S
 import { NetworkSwitchDrawer } from '../../../components/NetworkSwitchDrawer/NetworkSwitchDrawer';
 import { amountInputValidation as textInputValidator } from '../../../lib/validations/amountInputValidations';
 import { SwapContext } from '../context/SwapContext';
-import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import {
   calculateCryptoToFiat, calculateFeesFiat, formatZeroAmount,
   getDefaultTokenImage, isNativeToken, tokenValueFormat,
@@ -27,7 +26,6 @@ import {
   NATIVE,
   DEFAULT_TOKEN_VALIDATION_DECIMALS,
   ESTIMATE_DEBOUNCE,
-  getL2ChainId,
 } from '../../../lib';
 import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
 import {
@@ -54,6 +52,7 @@ import { formatQuoteConversionRate } from '../functions/swapConversionRate';
 import { PrefilledSwapForm, SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
 import { Fees } from './Fees';
+import { useCryptoUSDConversion } from '../../../lib/hooks/useCryptoUSDConversion';
 
 enum SwapDirection {
   FROM = 'FROM',
@@ -96,7 +95,8 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     ? NATIVE
     : `${symbol.toLowerCase()}-${address!.toLowerCase()}`), []);
 
-  const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
+  // const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
+  const { conversions: usdConversions } = useCryptoUSDConversion(checkout?.config.environment);
   const { viewDispatch } = useContext(ViewContext);
 
   const [direction, setDirection] = useState<SwapDirection>(SwapDirection.FROM);
@@ -128,13 +128,13 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
 
   const feeFiatValue = useMemo(() => {
     if (!gasFeeToken || !quote || !fromToken) return null;
-    return calculateFeesFiat(quote, fromToken, gasFeeToken, cryptoFiatState.conversions, gasFeeValue);
-  }, [quote, cryptoFiatState.conversions, gasFeeToken, gasFeeValue, fromToken]);
+    return calculateFeesFiat(quote, fromToken, gasFeeToken, usdConversions, gasFeeValue);
+  }, [quote, usdConversions, gasFeeToken, gasFeeValue, fromToken]);
 
   const [tokensOptionsFrom, setTokensOptionsForm] = useState<CoinSelectorOptionProps[]>([]);
   const formattedFees = useMemo(
-    () => (quote ? formatSwapFees(quote, cryptoFiatState, t) : []),
-    [quote, cryptoFiatState, t],
+    () => (quote ? formatSwapFees(quote, usdConversions, t) : []),
+    [quote, usdConversions, t],
   );
   const [conversionToken, setConversionToken] = useState<TokenInfo | null>(null);
   const [conversionAmount, setConversionAmount] = useState<string>('');
@@ -171,10 +171,10 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
           icon: tokenBalance.token.icon,
           balance: {
             formattedAmount: tokenValueFormat(tokenBalance.formattedBalance),
-            formattedFiatAmount: cryptoFiatState.conversions.size === 0 ? formatZeroAmount('') : calculateCryptoToFiat(
+            formattedFiatAmount: usdConversions.size === 0 ? formatZeroAmount('') : calculateCryptoToFiat(
               tokenBalance.formattedBalance,
               tokenBalance.token.symbol || '',
-              cryptoFiatState.conversions,
+              usdConversions,
             ),
           },
         } as CoinSelectorOptionProps),
@@ -210,7 +210,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
   }, [
     tokenBalances,
     allowedTokens,
-    cryptoFiatState.conversions,
+    usdConversions,
     data?.fromTokenAddress,
     data?.toTokenAddress,
     setFromToken,
@@ -248,15 +248,6 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
         icon: token.icon,
       } as CoinSelectorOptionProps),
     ), [allowedTokens, fromToken]);
-
-  useEffect(() => {
-    cryptoFiatDispatch({
-      payload: {
-        type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
-        tokenSymbols: allowedTokens.map((token) => token.symbol),
-      },
-    });
-  }, [cryptoFiatDispatch, allowedTokens]);
 
   // ------------------//
   //    FETCH QUOTES   //
@@ -540,9 +531,9 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     setFromFiatValue(calculateCryptoToFiat(
       fromAmount,
       fromToken.symbol,
-      cryptoFiatState.conversions,
+      usdConversions,
     ));
-  }, [fromAmount, fromToken, cryptoFiatState.conversions]);
+  }, [fromAmount, fromToken, usdConversions]);
 
   const onFromSelectChange = useCallback((value: OptionKey) => {
     const selected = tokenBalances
@@ -852,7 +843,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       const currentChainId = await (provider.provider as any).send('eth_chainId', []);
       // eslint-disable-next-line radix
       const parsedChainId = parseInt(currentChainId.toString());
-      if (parsedChainId !== getL2ChainId(checkout.config)) {
+      if (parsedChainId !== checkout.config.l2ChainId) {
         setShowNetworkSwitchDrawer(true);
         return;
       }
@@ -1134,7 +1125,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       />
       <NetworkSwitchDrawer
         visible={showNetworkSwitchDrawer}
-        targetChainId={getL2ChainId(checkout?.config!)}
+        targetChainId={checkout?.config.l2ChainId!}
         provider={provider!}
         checkout={checkout!}
         onCloseDrawer={() => setShowNetworkSwitchDrawer(false)}

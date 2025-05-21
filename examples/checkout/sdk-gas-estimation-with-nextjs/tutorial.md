@@ -20,19 +20,16 @@ This example app demonstrates how to use the Immutable Checkout SDK to estimate 
 ## SDK Integration Details
 
 ### Gas Estimation for Transactions
-**Feature Name**: Using the Checkout SDK to estimate gas fees for swap and bridge transactions.
 
-**Source Code**: [Source code file](https://github.com/immutable/ts-immutable-sdk/blob/main/examples/checkout/sdk-gas-estimation-with-nextjs/src/app/gas-estimation-with-metamask/page.tsx)
+Uses the Checkout SDK to estimate gas fees for swap and bridge transactions.
 
-**Implementation**:
-```typescript
+```typescript title="Estimate Gas" manualLink="https://github.com/immutable/ts-immutable-sdk/blob/main/examples/checkout/sdk-gas-estimation-with-nextjs/src/app/gas-estimation-with-metamask/page.tsx"
 // Get gas estimate for Swap type of transaction
 const swapEstimate = await checkoutSDK.gasEstimate({ gasEstimateType: checkout.GasEstimateType.SWAP });
 // Get gas estimate for Bridge type of transaction
 const bridgeEstimate = await checkoutSDK.gasEstimate({ gasEstimateType: checkout.GasEstimateType.BRIDGE_TO_L2 });
 ```
 
-**Explanation**: 
 The code demonstrates how to use the Checkout SDK's `gasEstimate` method to calculate estimated gas fees for different transaction types. The example shows two types of gas estimations:
 
 1. **Swap Gas Estimation**: Calculates the estimated fees for a token swap transaction, providing total fees and token information.

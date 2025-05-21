@@ -4,7 +4,6 @@ import axios, { AxiosResponse } from 'axios';
 import {
   concat,
   Contract, getAddress, keccak256, Provider, toBeHex, toQuantity, TransactionRequest,
-  zeroPadValue,
   AbiCoder,
   ZeroAddress,
 } from 'ethers';
@@ -885,7 +884,7 @@ export class TokenBridge {
     const commandHash = keccak256(command);
     const gatewayCallApprovedSlot = keccak256(concat([
       commandHash,
-      toBeHex(zeroPadValue(toBeHex(SLOT_POS_CONTRACT_CALL_APPROVED), 32)),
+      SLOT_POS_CONTRACT_CALL_APPROVED,
     ]));
 
     // Encode execute data
