@@ -47,7 +47,7 @@
   "packageManager": "pnpm@9.12.0",
   "pnpm": {
     "overrides": {
-      "oidc-client-ts": "git+https://github.com/authts/oidc-client-ts.git#main"
+      "oidc-client-ts": "git+https://github.com/nattb8/oidc-client-ts.git#main"
     }
   },
   "private": true,
