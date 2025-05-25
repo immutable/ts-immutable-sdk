@@ -1,3 +1,4 @@
+// biome-ignore lint/style/useImportType: <explanation>
 import {
   ErrorResponse,
   ErrorTimeout,
@@ -15,6 +16,7 @@ import DeviceCredentialsManager from './storage/device_credentials_manager';
 import logger from './utils/logger';
 import { isTokenExpired } from './utils/token';
 import { PassportError, PassportErrorType, withPassportError } from './errors/passportError';
+// biome-ignore lint/style/useImportType: <explanation>
 import {
   PassportMetadata,
   User,
@@ -29,7 +31,7 @@ import {
   UserImx,
   isUserImx,
 } from './types';
-import { PassportConfiguration } from './config';
+import type { PassportConfiguration } from './config';
 import Overlay from './overlay';
 import { LocalForageAsyncStorage } from './storage/LocalForageAsyncStorage';
 
@@ -45,6 +47,7 @@ const authorizeEndpoint = '/authorize';
 const getAuthConfiguration = (config: PassportConfiguration): UserManagerSettings => {
   const { authenticationDomain, oidcConfiguration } = config;
 
+  // biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
   let store;
   if (config.crossSdkBridgeEnabled) {
     store = new LocalForageAsyncStorage('ImmutableSDKPassport', localForage.INDEXEDDB);
@@ -72,7 +75,7 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
       userinfo_endpoint: `${authenticationDomain}/userinfo`,
       end_session_endpoint: endSessionEndpoint.toString(),
     },
-    mergeClaimsStrategy: { array: 'merge' }, // Based on this migration guide https://github.com/authts/oidc-client-ts/blob/4519663add35b41bb257b40737a7bf1ab5b813e9/docs/migration.md?plain=1#L16
+    mergeClaimsStrategy: { array: 'merge' }, // Based on this migration guide https://github.com/authts/oidc-client-ts/blob/main/docs/migration.md?plain=1#L16
     automaticSilentRenew: false, // Disabled until https://github.com/authts/oidc-client-ts/issues/430 has been resolved
     scope: oidcConfiguration.scope,
     userStore,
@@ -228,7 +231,7 @@ export default class AuthManager {
             }
 
             // Popup was blocked; append the blocked popup overlay to allow the user to try again.
-            let popupHasBeenOpened: boolean = false;
+            let popupHasBeenOpened = false;
             const overlay = new Overlay(this.config.popupOverlayOptions, true);
             overlay.append(
               async () => {
@@ -483,51 +486,71 @@ export default class AuthManager {
    * Refreshes the token and returns the user.
    * If the token is already being refreshed, returns the existing promise.
    */
-  private async refreshTokenAndUpdatePromise(): Promise<User | null> {
+  private refreshTokenAndUpdatePromise(): Promise<User | null> {
     if (this.refreshingPromise) return this.refreshingPromise;
 
-    // eslint-disable-next-line no-async-promise-executor
-    this.refreshingPromise = new Promise(async (resolve, reject) => {
-      try {
-        const newOidcUser = await this.userManager.signinSilent();
-        if (newOidcUser) {
-          resolve(AuthManager.mapOidcUserToDomainModel(newOidcUser));
-          return;
-        }
-        resolve(null);
-      } catch (err) {
-        let passportErrorType = PassportErrorType.AUTHENTICATION_ERROR;
-        let errorMessage = 'Failed to refresh token';
-        let removeUser = true;
-
-        if (err instanceof ErrorTimeout) {
-          passportErrorType = PassportErrorType.SILENT_LOGIN_ERROR;
-          errorMessage = `${errorMessage}: ${err.message}`;
-          removeUser = false;
-        } else if (err instanceof ErrorResponse) {
-          passportErrorType = PassportErrorType.NOT_LOGGED_IN_ERROR;
-          errorMessage = `${errorMessage}: ${err.message || err.error_description}`;
-        } else if (err instanceof Error) {
-          errorMessage = `${errorMessage}: ${err.message}`;
-        } else if (typeof err === 'string') {
-          errorMessage = `${errorMessage}: ${err}`;
-        }
-
-        if (removeUser) {
-          try {
-            await this.userManager.removeUser();
-          } catch (removeUserError) {
-            if (removeUserError instanceof Error) {
-              errorMessage = `${errorMessage}: Failed to remove user: ${removeUserError.message}`;
-            }
+    const promise = new Promise<User | null>((resolve, reject) => {
+      this.userManager.signinSilent()
+        .then((newOidcUser) => {
+          if (newOidcUser) {
+            resolve(AuthManager.mapOidcUserToDomainModel(newOidcUser));
+          } else {
+            resolve(null);
           }
-        }
+        })
+        .catch((err) => {
+          let passportErrorType = PassportErrorType.AUTHENTICATION_ERROR;
+          let errorMessage = 'Failed to refresh token';
+          let shouldRemoveUser = true;
 
-        reject(new PassportError(errorMessage, passportErrorType));
-      } finally {
-        this.refreshingPromise = null; // Reset the promise after completion
-      }
+          if (err instanceof ErrorTimeout) {
+            passportErrorType = PassportErrorType.SILENT_LOGIN_ERROR;
+            errorMessage = `${errorMessage}: ${err.message}`;
+            shouldRemoveUser = false;
+          } else if (err instanceof ErrorResponse) {
+            passportErrorType = PassportErrorType.NOT_LOGGED_IN_ERROR;
+            errorMessage = `${errorMessage}: ${err.message || err.error_description}`;
+          } else if (err instanceof Error) {
+            errorMessage = `${errorMessage}: ${err.message}`;
+          } else if (typeof err === 'string') {
+            errorMessage = `${errorMessage}: ${err}`;
+          }
+
+          if (shouldRemoveUser) {
+            this.userManager.removeUser()
+              .catch((removeUserError) => {
+                if (removeUserError instanceof Error) {
+                  errorMessage = `${errorMessage}: Failed to remove user: ${removeUserError.message}`;
+                }
+                logger.warn('Error during user removal in refresh token failure', removeUserError);
+              })
+              .finally(() => { // Ensures reject is called after the attempt to remove user
+                reject(new PassportError(errorMessage, passportErrorType));
+              });
+          } else {
+            reject(new PassportError(errorMessage, passportErrorType));
+          }
+        });
     });
+
+    this.refreshingPromise = promise;
+
+    // Ensure the instance variable is cleared *after* this specific promise settles.
+    // It's important to return the original promise.
+    this.refreshingPromise
+      .finally(() => {
+        // Check if the current refreshingPromise is the one we just processed
+        // This is to avoid nullifying a newer promise if a new refresh started
+        // while this one was in its finally block.
+        if (this.refreshingPromise === promise) {
+          this.refreshingPromise = null;
+        }
+      })
+      .catch(() => {
+        // This catch is to prevent an unhandled rejection from .finally()
+        // if 'promise' itself rejected. The actual rejection of 'promise'
+        // should be handled by its consumers.
+      });
 
     return this.refreshingPromise;
   }
