@@ -41,8 +41,36 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
+      - name: Inspect oidc-client-ts dependency
+        shell: bash
+        run: |
+          echo "Looking for oidc-client-ts in node_modules..."
+          if [ -d "node_modules/oidc-client-ts" ]; then
+            echo "Found oidc-client-ts in root node_modules."
+            TARGET_OIDC_PATH="node_modules/oidc-client-ts"
+          elif [ -d "packages/passport/sdk/node_modules/oidc-client-ts" ]; then
+            echo "Found oidc-client-ts in packages/passport/sdk/node_modules."
+            TARGET_OIDC_PATH="packages/passport/sdk/node_modules/oidc-client-ts"
+          elif [ -d "node_modules/.pnpm/github.com+nattb8+oidc-client-ts@980de802dbb1cd28e8738b7293e8fc64d9783456/node_modules/oidc-client-ts" ]; then
+            # Path for pnpm when fetching from git, the hash might change, adjust if needed
+            echo "Found oidc-client-ts in pnpm store-like path."
+            TARGET_OIDC_PATH="node_modules/.pnpm/github.com+nattb8+oidc-client-ts@980de802dbb1cd28e8738b7293e8fc64d9783456/node_modules/oidc-client-ts"
+          else
+            echo "ERROR: oidc-client-ts not found in expected locations. Listing common node_modules structures:"
+            ls -R node_modules/.pnpm | head -n 50
+            exit 1
+          fi
+          echo "--- Listing contents of $TARGET_OIDC_PATH ---"
+          ls -R $TARGET_OIDC_PATH
+          echo "--- Contents of $TARGET_OIDC_PATH/package.json ---"
+          cat $TARGET_OIDC_PATH/package.json
+          echo "--- Contents of $TARGET_OIDC_PATH/dist/types/oidc-client-ts.d.ts (first 50 lines) ---"
+          head -n 50 $TARGET_OIDC_PATH/dist/types/oidc-client-ts.d.ts || echo "File $TARGET_OIDC_PATH/dist/types/oidc-client-ts.d.ts not found"
+          echo "--- Grepping for UserManager in $TARGET_OIDC_PATH/dist/types/oidc-client-ts.d.ts ---"
+          grep -i "UserManager" $TARGET_OIDC_PATH/dist/types/oidc-client-ts.d.ts || echo "UserManager not found in $TARGET_OIDC_PATH/dist/types/oidc-client-ts.d.ts"
+
       - name: Build, Lint & Test
-        run: pnpm --if-present nx affected -t build,lint,test 
+        run: pnpm --if-present nx affected -t build,lint,test
 
   build-lint-test-examples:
     name: Build, Lint & Test Examples
