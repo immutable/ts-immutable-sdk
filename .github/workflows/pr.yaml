@@ -69,6 +69,9 @@ jobs:
           echo "--- Grepping for UserManager in $TARGET_OIDC_PATH/dist/types/oidc-client-ts.d.ts ---"
           grep -i "UserManager" $TARGET_OIDC_PATH/dist/types/oidc-client-ts.d.ts || echo "UserManager not found in $TARGET_OIDC_PATH/dist/types/oidc-client-ts.d.ts"
 
+      - name: Reset Nx Cache
+        run: pnpm nx reset
+
       - name: Build, Lint & Test
         run: pnpm --if-present nx affected -t build,lint,test
 
