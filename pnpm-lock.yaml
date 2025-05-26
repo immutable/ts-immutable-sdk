@@ -1934,7 +1934,7 @@ importers:
         version: 29.0.5
       oidc-client-ts:
         specifier: git+https://github.com/nattb8/oidc-client-ts.git#main
-        version: https://codeload.github.com/nattb8/oidc-client-ts/tar.gz/980de802dbb1cd28e8738b7293e8fc64d9783456
+        version: https://codeload.github.com/nattb8/oidc-client-ts/tar.gz/2fa83268258f7b9375b590a991eb1697a1162ad0
     devDependencies:
       '@swc/core':
         specifier: ^1.3.36
@@ -2169,7 +2169,7 @@ importers:
         version: 29.0.5
       oidc-client-ts:
         specifier: git+https://github.com/nattb8/oidc-client-ts.git#main
-        version: https://codeload.github.com/nattb8/oidc-client-ts/tar.gz/980de802dbb1cd28e8738b7293e8fc64d9783456
+        version: https://codeload.github.com/nattb8/oidc-client-ts/tar.gz/2fa83268258f7b9375b590a991eb1697a1162ad0
       uuid:
         specifier: ^8.3.2
         version: 8.3.2
@@ -2467,7 +2467,7 @@ importers:
         version: 29.0.5
       oidc-client-ts:
         specifier: git+https://github.com/nattb8/oidc-client-ts.git#main
-        version: https://codeload.github.com/nattb8/oidc-client-ts/tar.gz/980de802dbb1cd28e8738b7293e8fc64d9783456
+        version: https://codeload.github.com/nattb8/oidc-client-ts/tar.gz/2fa83268258f7b9375b590a991eb1697a1162ad0
     devDependencies:
       '@swc/core':
         specifier: ^1.3.36
@@ -13403,8 +13403,8 @@ packages:
   ohash@1.1.3:
     resolution: {integrity: sha512-zuHHiGTYTA1sYJ/wZN+t5HKZaH23i4yI1HMwbuXm24Nid7Dv0KcuRlKoNKS9UNfAVSBlnGLcuQrnOKWOZoEGaw==}
 
-  oidc-client-ts@https://codeload.github.com/nattb8/oidc-client-ts/tar.gz/980de802dbb1cd28e8738b7293e8fc64d9783456:
-    resolution: {tarball: https://codeload.github.com/nattb8/oidc-client-ts/tar.gz/980de802dbb1cd28e8738b7293e8fc64d9783456}
+  oidc-client-ts@https://codeload.github.com/nattb8/oidc-client-ts/tar.gz/2fa83268258f7b9375b590a991eb1697a1162ad0:
+    resolution: {tarball: https://codeload.github.com/nattb8/oidc-client-ts/tar.gz/2fa83268258f7b9375b590a991eb1697a1162ad0}
     version: 3.2.1
     engines: {node: '>=18'}
 
@@ -20263,7 +20263,7 @@ snapshots:
       jwt-decode: 3.1.2
       localforage: 1.10.0
       magic-sdk: 29.0.5
-      oidc-client-ts: https://codeload.github.com/nattb8/oidc-client-ts/tar.gz/980de802dbb1cd28e8738b7293e8fc64d9783456
+      oidc-client-ts: https://codeload.github.com/nattb8/oidc-client-ts/tar.gz/2fa83268258f7b9375b590a991eb1697a1162ad0
       uuid: 8.3.2
     transitivePeerDependencies:
       - bufferutil
@@ -20307,7 +20307,7 @@ snapshots:
       enc-utils: 3.0.0
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       magic-sdk: 29.0.5
-      oidc-client-ts: https://codeload.github.com/nattb8/oidc-client-ts/tar.gz/980de802dbb1cd28e8738b7293e8fc64d9783456
+      oidc-client-ts: https://codeload.github.com/nattb8/oidc-client-ts/tar.gz/2fa83268258f7b9375b590a991eb1697a1162ad0
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -20349,7 +20349,7 @@ snapshots:
       enc-utils: 3.0.0
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       magic-sdk: 29.0.5
-      oidc-client-ts: https://codeload.github.com/nattb8/oidc-client-ts/tar.gz/980de802dbb1cd28e8738b7293e8fc64d9783456
+      oidc-client-ts: https://codeload.github.com/nattb8/oidc-client-ts/tar.gz/2fa83268258f7b9375b590a991eb1697a1162ad0
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -33622,7 +33622,7 @@ snapshots:
 
   ohash@1.1.3: {}
 
-  oidc-client-ts@https://codeload.github.com/nattb8/oidc-client-ts/tar.gz/980de802dbb1cd28e8738b7293e8fc64d9783456:
+  oidc-client-ts@https://codeload.github.com/nattb8/oidc-client-ts/tar.gz/2fa83268258f7b9375b590a991eb1697a1162ad0:
     dependencies:
       jwt-decode: 4.0.0
 
