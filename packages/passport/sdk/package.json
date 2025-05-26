@@ -22,7 +22,7 @@
     "jwt-decode": "^3.1.2",
     "localforage": "^1.10.0",
     "magic-sdk": "^29.0.5",
-    "oidc-client-ts": "2.4.0",
+    "oidc-client-ts": "file:./vendor/oidc-client-ts",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
@@ -79,7 +79,7 @@
   "scripts": {
     "build": "pnpm transpile && pnpm typegen",
     "transpile": "tsup src/index.ts --config ../../../tsup.config.js",
-    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
+    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types --traceResolution",
     "pack:root": "pnpm pack --pack-destination $(dirname $(pnpm root -w))",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest",

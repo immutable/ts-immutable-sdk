@@ -4,6 +4,7 @@ import { nodeModulesPolyfillPlugin } from 'esbuild-plugins-node-modules-polyfill
 import { replace } from 'esbuild-plugin-replace';
 import pkg from './package.json' assert { type: 'json' };
 
+
 export default defineConfig((options) => {
   if (options.watch) {
     // Watch mode

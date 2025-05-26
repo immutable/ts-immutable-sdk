@@ -1,5 +1,4 @@
 node_modules/
-dist/
 coverage/
 cache/
 .idea/
@@ -35,3 +34,10 @@ examples/**/test-results/
 tests/**/.env
 tests/**/playwright-report/
 tests/**/test-results/
+
+# Build output
+**/dist/
+
+# Un-ignore the vendored oidc-client-ts dist directory
+!packages/passport/sdk/vendor/oidc-client-ts/dist/
+!packages/passport/sdk/vendor/oidc-client-ts/dist/**
