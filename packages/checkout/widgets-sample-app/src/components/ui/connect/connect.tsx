@@ -1,12 +1,53 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Checkout, ConnectEventType, WalletProviderRdns, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { ChainId, ChainName, ChainSlug, Checkout, CheckoutModuleConfiguration, ConnectEventType, WalletProviderRdns, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
 
+const ZKEVM_NATIVE_TOKEN = {
+  name: "IMX",
+  symbol: "IMX",
+  decimals: 18,
+  address: "native",
+};
+
+const DEV_CHAIN_ID_NETWORK_MAP = new Map([
+  [
+    ChainId.SEPOLIA,
+    {
+      chainIdHex: `0x${ChainId.SEPOLIA.toString(16)}`,
+      chainName: ChainName.SEPOLIA,
+      rpcUrls: ["https://checkout-api.dev.immutable.com/v1/rpc/eth-sepolia"],
+      nativeCurrency: {
+        name: "Sep Eth",
+        symbol: "ETH",
+        decimals: 18,
+      },
+      blockExplorerUrls: ["https://sepolia.etherscan.io/"],
+    },
+  ],
+  [
+    ChainId.IMTBL_ZKEVM_DEVNET,
+    {
+      chainIdHex: `0x${ChainId.IMTBL_ZKEVM_DEVNET.toString(16)}`,
+      chainName: ChainName.IMTBL_ZKEVM_DEVNET,
+      rpcUrls: ["https://rpc.dev.immutable.com"],
+      nativeCurrency: ZKEVM_NATIVE_TOKEN,
+    },
+  ],
+]);
+
+const overrides: CheckoutModuleConfiguration["overrides"] = {
+    baseUrl: "https://api.dev.immutable.com",
+    chainSlug: ChainSlug.IMTBL_ZKEVM_DEVNET,
+    l2ChainId: ChainId.IMTBL_ZKEVM_DEVNET,
+    networkMap: DEV_CHAIN_ID_NETWORK_MAP,
+    remoteConfigEndpoint: "https://checkout-api.dev.immutable.com",
+  };
+
 const CONNECT_TARGET_ID = "connect-widget-target";
 function ConnectUI() {
-  const checkout = useMemo(() => new Checkout({ baseConfig: { environment: Environment.SANDBOX } }), []);
+  const checkout = useMemo(() => new Checkout({ baseConfig: { environment: Environment.SANDBOX }, overrides }), []);
   const [factory, setFactory] = useState<ImmutableCheckoutWidgets.WidgetsFactory>();
   const connect = useMemo(() => {
     if(!factory) return;
