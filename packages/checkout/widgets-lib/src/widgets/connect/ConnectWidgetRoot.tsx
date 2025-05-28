@@ -1,9 +1,7 @@
 import React, { Suspense } from 'react';
 import {
-  ChainId,
   ConnectWidgetParams, IMTBLWidgetEvents, WidgetProperties, WidgetType,
 } from '@imtbl/checkout-sdk';
-import { Environment } from '@imtbl/config';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { LoadingView } from '../../views/loading/LoadingView';
@@ -28,29 +26,15 @@ export class Connect extends Base<WidgetType.CONNECT> {
   protected getValidatedParameters(params: ConnectWidgetParams): ConnectWidgetParams {
     const validatedParams = params;
 
-    // validating targetChainId per environment
-    if (!params.targetChainId
-      && this.checkout.config.isProduction) {
-      validatedParams.targetChainId = ChainId.IMTBL_ZKEVM_MAINNET;
-    } else if (params.targetChainId
-      && this.checkout.config.isProduction
-      && (params.targetChainId !== ChainId.ETHEREUM && params.targetChainId !== ChainId.IMTBL_ZKEVM_MAINNET)
-    ) {
-      // eslint-disable-next-line max-len, no-console
-      console.warn(`Cannot set targetChainId to ${params.targetChainId} in ${Environment.PRODUCTION} environment, defaulting to ${getChainNameById(ChainId.IMTBL_ZKEVM_MAINNET)}, chainId ${ChainId.IMTBL_ZKEVM_MAINNET}`);
-      validatedParams.targetChainId = ChainId.IMTBL_ZKEVM_MAINNET;
-    }
+    const { l1ChainId, l2ChainId, environment } = this.checkout.config;
 
-    if (!params.targetChainId
-      && this.checkout.config.environment === Environment.SANDBOX) {
-      validatedParams.targetChainId = ChainId.IMTBL_ZKEVM_TESTNET;
-    } else if (params.targetChainId
-      && this.checkout.config.environment === Environment.SANDBOX
-      && (params.targetChainId !== ChainId.SEPOLIA && params.targetChainId !== ChainId.IMTBL_ZKEVM_TESTNET)
-    ) {
+    // validating targetChainId per environment
+    if (!params.targetChainId) {
+      validatedParams.targetChainId = l2ChainId;
+    } else if (![l1ChainId, l2ChainId].includes(params.targetChainId)) {
       // eslint-disable-next-line max-len, no-console
-      console.warn(`Cannot set targetChainId to ${params.targetChainId} in ${Environment.SANDBOX} environment, defaulting to ${getChainNameById(ChainId.IMTBL_ZKEVM_TESTNET)}, chainId ${ChainId.IMTBL_ZKEVM_TESTNET}`);
-      validatedParams.targetChainId = ChainId.IMTBL_ZKEVM_TESTNET;
+      console.warn(`Cannot set targetChainId to ${params.targetChainId} in ${environment} environment, defaulting to ${getChainNameById(l2ChainId)}, chainId ${l2ChainId}`);
+      validatedParams.targetChainId = l2ChainId;
     }
 
     return params;
