@@ -27,6 +27,14 @@ export default function Home() {
       rc={<NextLink href="/login-with-identity-only" />}>
         Login with Identity only
       </Button> 
+      {process.env.NEXT_PUBLIC_DEVNET_CLIENT_ID && (
+        <Button       
+        className="mb-1"
+        size="medium" 
+        rc={<NextLink href="/login-devnet-identity-only" />}>
+          Login on Devnet with Identity only
+        </Button> 
+      )}
       <Button       
       className="mb-1"
       size="medium" 
