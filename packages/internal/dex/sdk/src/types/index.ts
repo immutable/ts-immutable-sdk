@@ -73,6 +73,7 @@ export type Quote = {
   amountWithMaxSlippage: Amount;
   slippage: number;
   fees: Fee[];
+  priceImpact: string;
 };
 
 /**

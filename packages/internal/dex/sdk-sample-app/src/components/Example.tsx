@@ -5,40 +5,41 @@ import { ConnectAccount } from './ConnectAccount';
 import { AmountInput, AmountOutput } from './AmountInput';
 import { SecondaryFeeInput } from './SecondaryFeeInput';
 import { FeeBreakdown } from './FeeBreakdown';
-import { BrowserProvider, formatEther, parseEther, TransactionReceipt } from 'ethers';
+import { BrowserProvider, formatEther, parseEther, parseUnits, TransactionReceipt } from 'ethers';
 
 type Token = {
   symbol: string;
   address: string;
+  decimals: number;
 };
 
 type TradeType = 'exactInput' | 'exactOutput';
 
 type mapping = {
-  [address: string]: string;
+  [address: string]: Token;
 };
 
 const mainnetTokens: Token[] = [
-  { symbol: 'IMX', address: 'native' },
-  { symbol: 'ETH', address: '0x52a6c53869ce09a731cd772f245b97a4401d3348' },
-  { symbol: 'USDC', address: '0x6de8aCC0D406837030CE4dd28e7c08C5a96a30d2' },
+  { symbol: 'IMX', address: 'native', decimals: 18 },
+  { symbol: 'ETH', address: '0x52A6c53869Ce09a731CD772f245b97A4401d3348', decimals: 18 },
+  { symbol: 'USDC', address: '0x6de8aCC0D406837030CE4dd28e7c08C5a96a30d2', decimals: 6 },
 ];
 
 const testnetTokens: Token[] = [
-  { symbol: 'IMX', address: 'native' },
-  { symbol: 'WIMX', address: '0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439' },
-  { symbol: 'zkTDR', address: '0x6531F7B9158d78Ca78b46799c4Fd65C2Af8Ae506' },
-  { symbol: 'zkPSP', address: '0x88B35dF96CbEDF2946586147557F7D5D0CCE7e5c' },
-  { symbol: 'zkWLT', address: '0x8A5b0470ee48248bEb7D1E745c1EbA0DCA77215e' },
-  { symbol: 'zkSRE', address: '0x43566cAB87CC147C95e2895E7b972E19993520e4' },
-  { symbol: 'zkCORE', address: '0x4B96E7b7eA673A996F140d5De411a97b7eab934E' },
-  { symbol: 'zkWAT', address: '0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2' },
-  { symbol: 'zkCATS', address: '0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c' },
-  { symbol: 'zkYEET', address: '0x8AC26EfCbf5D700b37A27aA00E6934e6904e7B8e' },
+  { symbol: 'IMX', address: 'native', decimals: 18 },
+  { symbol: 'WIMX', address: '0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439', decimals: 18 },
+  { symbol: 'zkTDR', address: '0x6531F7B9158d78Ca78b46799c4Fd65C2Af8Ae506', decimals: 18 },
+  { symbol: 'zkPSP', address: '0x88B35dF96CbEDF2946586147557F7D5D0CCE7e5c', decimals: 18 },
+  { symbol: 'zkWLT', address: '0x8A5b0470ee48248bEb7D1E745c1EbA0DCA77215e', decimals: 18 },
+  { symbol: 'zkSRE', address: '0x43566cAB87CC147C95e2895E7b972E19993520e4', decimals: 18 },
+  { symbol: 'zkCORE', address: '0x4B96E7b7eA673A996F140d5De411a97b7eab934E', decimals: 18 },
+  { symbol: 'zkWAT', address: '0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2', decimals: 18 },
+  { symbol: 'zkCATS', address: '0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c', decimals: 18 },
+  { symbol: 'zkYEET', address: '0x8AC26EfCbf5D700b37A27aA00E6934e6904e7B8e', decimals: 18 },
 ];
 
 /// @dev Update this to change tokens used in the app
-const allTokens = testnetTokens;
+const allTokens = mainnetTokens;
 
 const buildExchange = (secondaryFeeRecipient: string, secondaryFeePercentage: number) => {
   if (secondaryFeeRecipient && secondaryFeePercentage) {
@@ -56,6 +57,11 @@ const buildExchange = (secondaryFeeRecipient: string, secondaryFeePercentage: nu
   return new Exchange(configuration);
 };
 
+const addressToTokenMapping = allTokens.reduce((acc, token) => {
+  acc[token.address] = token;
+  return acc;
+}, {} as mapping);
+
 export function Example() {
   const [ethereumAccount, setEthereumAccount] = useState<string | null>(null);
   const [isFetching, setIsFetching] = useState(false);
@@ -72,10 +78,6 @@ export function Example() {
   const [inputToken, setInputToken] = useState<Token>(allTokens[0]);
   const [outputToken, setOutputToken] = useState<Token>(allTokens[1]);
 
-  const addressToSymbolMapping = allTokens.reduce((acc, token) => {
-    acc[token.address] = token.symbol!;
-    return acc;
-  }, {} as mapping);
 
   if (ethereumAccount === null) {
     return <ConnectAccount setAccount={setEthereumAccount} />;
@@ -95,13 +97,13 @@ export function Example() {
               ethereumAccount,
               tokenInAddress,
               tokenOutAddress,
-              parseEther(`${inputAmount}`),
+              parseUnits(`${inputAmount}`, inputToken.decimals),
             )
           : await exchange.getUnsignedSwapTxFromAmountOut(
               ethereumAccount,
               tokenInAddress,
               tokenOutAddress,
-              parseEther(`${outputAmount}`),
+              parseUnits(`${outputAmount}`, outputToken.decimals),
             );
 
       setResult(txn);
@@ -193,7 +195,8 @@ export function Example() {
             onChange={(e) => {
               setInputToken({
                 address: e.target.value,
-                symbol: addressToSymbolMapping[e.target.value],
+                symbol: addressToTokenMapping[e.target.value].symbol,
+                decimals: addressToTokenMapping[e.target.value].decimals,
               });
               setResult(null);
               setSwapTransaction(null);
@@ -218,7 +221,8 @@ export function Example() {
             onChange={(e) => {
               setOutputToken({
                 address: e.target.value,
-                symbol: addressToSymbolMapping[e.target.value],
+                symbol: addressToTokenMapping[e.target.value].symbol,
+                decimals: addressToTokenMapping[e.target.value].decimals,
               });
               setResult(null);
               setSwapTransaction(null);
@@ -257,19 +261,20 @@ export function Example() {
         <>
           <h3>
             Expected amount: {formatEther(result.quote.amount.value)}{' '}
-            {`${addressToSymbolMapping[result.quote.amount.token.address]}`}
+            {`${addressToTokenMapping[result.quote.amount.token.address].symbol}`}
           </h3>
           <h3>
             {tradeType === 'exactInput' ? 'Minimum' : 'Maximum'} amount:{' '}
             {formatEther(result.quote.amountWithMaxSlippage.value)}{' '}
-            {`${addressToSymbolMapping[result.quote.amountWithMaxSlippage.token.address]}`}
+            {`${addressToTokenMapping[result.quote.amountWithMaxSlippage.token.address].symbol}`}
           </h3>
 
           <h3>Slippage: {result.quote.slippage}%</h3>
+          <h3>Price Impact: {result.quote.priceImpact}%</h3>
           {result.approval && <h3>Approval Gas Estimate: {showGasEstimate(result.approval)}</h3>}
           <h3>Swap Gas estimate: {showGasEstimate(result.swap)}</h3>
 
-          <FeeBreakdown fees={result.quote.fees} addressMap={addressToSymbolMapping} />
+          <FeeBreakdown fees={result.quote.fees} tokenMap={addressToTokenMapping} />
 
           <>
             <button

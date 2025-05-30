@@ -1,4 +1,4 @@
-import { TradeType } from '@uniswap/sdk-core';
+import { Fraction, TradeType } from '@uniswap/sdk-core';
 import { BigNumberish, Interface, JsonRpcProvider } from 'ethers';
 import { DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError } from './errors';
 import { calculateGasFee, fetchGasPrice } from './lib/transactionUtils/gas';
@@ -37,10 +37,12 @@ const toPublicQuote = (
   amountWithMaxSlippage: CoinAmount<Coin>,
   slippage: number,
   fees: Fees,
+  priceImpact: Fraction,
 ): Quote => ({
   amount: toPublicAmount(amount),
   amountWithMaxSlippage: toPublicAmount(amountWithMaxSlippage),
   slippage,
+  priceImpact: priceImpact.toFixed(10),
   fees: fees.withAmounts().map((fee) => ({
     ...fee,
     amount: toPublicAmount(fee.amount),
@@ -224,6 +226,7 @@ export class Exchange {
       amountWithMaxSlippage: toPublicAmount(otherTokenCoinAmount),
       slippage: 0,
       fees: [],
+      priceImpact: '0',
     };
 
     const wimxInterface = WIMX__factory.createInterface();
@@ -317,7 +320,7 @@ export class Exchange {
       secondaryFees,
     );
 
-    const { quotedAmount, quotedAmountWithMaxSlippage } = prepareUserQuote(
+    const { quotedAmount, quotedAmountWithMaxSlippage, priceImpact } = prepareUserQuote(
       this.nativeTokenService,
       adjustedQuote,
       slippagePercent,
@@ -340,7 +343,7 @@ export class Exchange {
       ? await getApproval(this.provider, fromAddress, preparedApproval, gasPrice)
       : null;
 
-    const quote = toPublicQuote(quotedAmount, quotedAmountWithMaxSlippage, slippagePercent, fees);
+    const quote = toPublicQuote(quotedAmount, quotedAmountWithMaxSlippage, slippagePercent, fees, priceImpact);
 
     return { quote, approval, swap };
   }

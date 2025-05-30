@@ -43,6 +43,7 @@ export const prepareUserQuote = (
   return {
     quotedAmount,
     quotedAmountWithMaxSlippage,
+    priceImpact: routerQuote.priceImpact,
   };
 };
 

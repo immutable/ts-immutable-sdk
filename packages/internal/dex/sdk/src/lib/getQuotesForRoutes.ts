@@ -1,5 +1,5 @@
 import { Route, SwapQuoter } from '@uniswap/v3-sdk';
-import { TradeType, Token } from '@uniswap/sdk-core';
+import { TradeType, Token, Price, Fraction } from '@uniswap/sdk-core';
 import { AbiCoder } from 'ethers';
 import { CoinAmount, ERC20 } from '../types';
 import {
@@ -19,6 +19,7 @@ export type QuoteResult = {
   amountIn: CoinAmount<ERC20>;
   amountOut: CoinAmount<ERC20>;
   tradeType: TradeType;
+  priceImpact: Fraction;
 };
 
 export async function getQuotesForRoutes(
@@ -64,15 +65,28 @@ export async function getQuotesForRoutes(
         const quoteAmount = decodedQuoteResult[amountIndex];
         if (typeof quoteAmount !== 'bigint') throw new Error('Expected BigNumber');
 
-        const input = uniswapTokenToERC20(routes[i].input);
-        const output = uniswapTokenToERC20(routes[i].output);
+        const route = routes[i];
+        const { midPrice, input, output } = route;
+        const inputToken = uniswapTokenToERC20(input);
+        const outputToken = uniswapTokenToERC20(output);
+
+        const amountIn = tradeType === TradeType.EXACT_INPUT ? amountSpecified : newAmount(quoteAmount, inputToken);
+        const amountOut = tradeType === TradeType.EXACT_INPUT ? newAmount(quoteAmount, outputToken) : amountSpecified;
+
+        const executionPrice = new Price(
+          input,
+          output,
+          amountIn.value.toString(),
+          amountOut.value.toString(),
+        );
 
         quoteResults.push({
-          route: routes[i],
-          amountIn: tradeType === TradeType.EXACT_INPUT ? amountSpecified : newAmount(quoteAmount, input),
-          amountOut: tradeType === TradeType.EXACT_INPUT ? newAmount(quoteAmount, output) : amountSpecified,
+          route,
+          amountIn,
+          amountOut,
           gasEstimate: BigInt(decodedQuoteResult[gasEstimateIndex]),
           tradeType,
+          priceImpact: executionPrice.subtract(midPrice.asFraction).divide(midPrice.asFraction).multiply(100),
         });
       }
     } catch {
