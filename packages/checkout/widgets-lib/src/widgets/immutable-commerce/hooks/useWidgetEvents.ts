@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import {
   IMTBLWidgetEvents,
+  ConnectEventType,
   OrchestrationEvent,
   OrchestrationEventType,
   RequestOnrampEvent,
@@ -88,6 +89,14 @@ export function useWidgetEvents(
 
       if (isOrchestrationEvent(customEvent)) {
         handleOrchestrationEvent(customEvent);
+        return;
+      }
+
+      // ignore walletconnect provider updated event on CONNECT
+      // we are not sure why this event is being emitted on connect and it is not possible to map it to a CommerceEventDetail
+      // there is no harm in ignoring it as the provider is available to the consumer on success event and it is currently not consumed anywhere
+      const isConnectProviderUpdatedEvent = customEvent.detail.type === ConnectEventType.WALLETCONNECT_PROVIDER_UPDATED;
+      if (isConnectProviderUpdatedEvent) {
         return;
       }
 
