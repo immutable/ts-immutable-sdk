@@ -4,10 +4,10 @@ const immutableTestnetChainID = 13473; // You can optionally retrieve the chain 
 const immutableMainnetChainID = 13371
 
 const baseConfig = new ImmutableConfiguration({
-  environment: Environment.SANDBOX,
+  environment: Environment.PRODUCTION,
 });
 
 export const configuration = {
-  chainId: immutableTestnetChainID,
+  chainId: immutableMainnetChainID,
   baseConfig,
 };
