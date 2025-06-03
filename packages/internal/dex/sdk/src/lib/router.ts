@@ -9,6 +9,7 @@ import { fetchValidPools } from './poolUtils/fetchValidPools';
 import { ERC20Pair } from './poolUtils/generateERC20Pairs';
 import { DEFAULT_MAX_HOPS } from '../constants/router';
 import type { Multicall } from '../contracts/types';
+import { BlockTag } from './multicall';
 
 export type RoutingContracts = {
   multicall: string;
@@ -34,6 +35,7 @@ export class Router {
     otherToken: ERC20,
     tradeType: TradeType,
     maxHops: number = DEFAULT_MAX_HOPS,
+    blockTag: BlockTag = 'latest',
   ): Promise<QuoteResult> {
     const [tokenIn, tokenOut] = this.determineERC20InAndERC20Out(tradeType, amountSpecified, otherToken);
 
@@ -45,6 +47,7 @@ export class Router {
       erc20Pair,
       this.routingTokens,
       this.routingContracts.coreFactory,
+      blockTag,
     );
 
     const noValidPools = pools.length === 0;
@@ -63,13 +66,14 @@ export class Router {
     }
 
     // Get the best quote from all of the given routes
-    return await this.getBestQuoteFromRoutes(routes, amountSpecified, tradeType);
+    return await this.getBestQuoteFromRoutes(routes, amountSpecified, tradeType, blockTag);
   }
 
   private async getBestQuoteFromRoutes(
     routes: Route<Token, Token>[],
     amountSpecified: CoinAmount<ERC20>,
     tradeType: TradeType,
+    blockTag: BlockTag,
   ): Promise<QuoteResult> {
     const quotes = await getQuotesForRoutes(
       this.provider,
@@ -77,19 +81,24 @@ export class Router {
       routes,
       amountSpecified,
       tradeType,
+      blockTag,
     );
-    if (quotes.length === 0) {
+
+    const lowPriceImpactQuotes = quotes.filter((quote) =>
+      quote.priceImpact.lessThan(1) && quote.priceImpact.greaterThan(-1));
+
+    if (lowPriceImpactQuotes.length === 0) {
       throw new NoRoutesAvailableError();
     }
 
     // We want to maximise the amountOut for the EXACT_INPUT type
     if (tradeType === TradeType.EXACT_INPUT) {
-      return this.bestQuoteForAmountIn(quotes);
+      return this.bestQuoteForAmountIn(lowPriceImpactQuotes);
     }
 
     // We want to minimise the amountIn for the EXACT_OUTPUT type
     if (tradeType === TradeType.EXACT_OUTPUT) {
-      return this.bestQuoteForAmountOut(quotes);
+      return this.bestQuoteForAmountOut(lowPriceImpactQuotes);
     }
 
     throw new Error('Invalid trade type');
