@@ -46,6 +46,7 @@ describe('fetchPools', () => {
         [WETH_TEST_TOKEN, IMX_TEST_TOKEN],
         [],
         TEST_V3_CORE_FACTORY_ADDRESS,
+        'latest',
       )).rejects.toThrow(new ProviderCallError('failed multicall: an rpc error message'));
     });
   });
@@ -112,6 +113,7 @@ describe('fetchPools', () => {
         [WETH_TEST_TOKEN, IMX_TEST_TOKEN],
         [],
         TEST_V3_CORE_FACTORY_ADDRESS,
+        'latest',
       );
 
       expect(pools).toHaveLength(0);
@@ -236,6 +238,7 @@ describe('fetchPools', () => {
         [WETH_TEST_TOKEN, IMX_TEST_TOKEN],
         [],
         TEST_V3_CORE_FACTORY_ADDRESS,
+        'latest',
       );
 
       expect(pools).toHaveLength(0);
@@ -363,6 +366,7 @@ describe('fetchPools', () => {
         [WETH_TEST_TOKEN, IMX_TEST_TOKEN],
         [],
         TEST_V3_CORE_FACTORY_ADDRESS,
+        'latest',
       );
 
       expect(pools).toHaveLength(4);
