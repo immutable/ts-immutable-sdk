@@ -7,7 +7,7 @@ import { erc20ToUniswapToken, poolEquals, uniswapTokenToERC20 } from './utils';
 import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
 import { ERC20Pair } from './poolUtils/generateERC20Pairs';
-import { DEFAULT_MAX_HOPS } from '../constants/router';
+import { DEFAULT_MAX_HOPS, DEFAULT_MAX_PRICE_IMPACT } from '../constants/router';
 import type { Multicall } from '../contracts/types';
 import { BlockTag } from './multicall';
 
@@ -34,8 +34,10 @@ export class Router {
     amountSpecified: CoinAmount<ERC20>,
     otherToken: ERC20,
     tradeType: TradeType,
-    maxHops: number = DEFAULT_MAX_HOPS,
+    maxHops = DEFAULT_MAX_HOPS,
+    maxPriceImpact = DEFAULT_MAX_PRICE_IMPACT,
     blockTag: BlockTag = 'latest',
+
   ): Promise<QuoteResult> {
     const [tokenIn, tokenOut] = this.determineERC20InAndERC20Out(tradeType, amountSpecified, otherToken);
 
@@ -66,7 +68,7 @@ export class Router {
     }
 
     // Get the best quote from all of the given routes
-    return await this.getBestQuoteFromRoutes(routes, amountSpecified, tradeType, blockTag);
+    return await this.getBestQuoteFromRoutes(routes, amountSpecified, tradeType, blockTag, maxPriceImpact);
   }
 
   private async getBestQuoteFromRoutes(
@@ -74,6 +76,7 @@ export class Router {
     amountSpecified: CoinAmount<ERC20>,
     tradeType: TradeType,
     blockTag: BlockTag,
+    maxPriceImpact: number,
   ): Promise<QuoteResult> {
     const quotes = await getQuotesForRoutes(
       this.provider,
@@ -85,7 +88,7 @@ export class Router {
     );
 
     const lowPriceImpactQuotes = quotes.filter((quote) =>
-      quote.priceImpact.lessThan(1) && quote.priceImpact.greaterThan(-1));
+      quote.priceImpact.lessThan(maxPriceImpact) && quote.priceImpact.greaterThan(maxPriceImpact * -1));
 
     if (lowPriceImpactQuotes.length === 0) {
       throw new NoRoutesAvailableError();

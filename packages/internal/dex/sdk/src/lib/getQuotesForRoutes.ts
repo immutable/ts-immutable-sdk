@@ -48,6 +48,13 @@ export function parseQuoteResult(
 
   const priceImpact = executionPrice.subtract(midPrice.asFraction).divide(midPrice.asFraction).multiply(100);
 
+  // console.log({
+  //   midprice: midPrice.toSignificant(10),
+  //   executionPrice: executionPrice.toSignificant(10),
+  //   priceImpact: priceImpact.toSignificant(10),
+  //   route: route.tokenPath.map((token) => token.symbol),
+  // });
+
   return {
     route,
     amountIn,
