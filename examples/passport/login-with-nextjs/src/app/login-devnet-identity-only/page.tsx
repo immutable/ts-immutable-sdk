@@ -16,6 +16,7 @@ export default function UserProfileInfo() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [email, setEmail] = useState<string | null>(null);
   const [passportId, setPassportId] = useState<string | null>(null);
+  const [devrevToken, setDevrevToken] = useState<string | null>(null);
 
   const loginWithIdentiy = useCallback(async () => {
     if (!passportInstance) return;
@@ -27,9 +28,10 @@ export default function UserProfileInfo() {
         const accessToken = await passportInstance.getAccessToken();
 
         if (accessToken) {
+          console.log(accessToken);
           const decodedToken = jwt_decode<IdTokenPayload>(accessToken);
           setPassportId(decodedToken.sub || null);
-          console.log(accessToken);
+          console.log(decodedToken);
         }
 
         // Make API call with access token
@@ -47,8 +49,33 @@ export default function UserProfileInfo() {
             });
             const data = await response.json();
             console.log('Support API Response:', data);
+            setDevrevToken(data.access_token || null);
+
+            // Decode and log DevRev token claims
+            if (data.access_token) {
+              const decodedDevRevToken = jwt_decode<IdTokenPayload>(data.access_token);
+              console.log('DevRev Token Claims:', {
+                sub: decodedDevRevToken.sub,
+                aud: decodedDevRevToken.aud,
+                exp: decodedDevRevToken.exp,
+                iat: decodedDevRevToken.iat,
+                iss: decodedDevRevToken.iss,
+                jti: decodedDevRevToken.jti,
+                'http://devrev.ai/clientid': decodedDevRevToken['http://devrev.ai/clientid'],
+                'http://devrev.ai/devrev_don': decodedDevRevToken['http://devrev.ai/devrev_don'],
+                'http://devrev.ai/devrevid': decodedDevRevToken['http://devrev.ai/devrevid'],
+                'http://devrev.ai/displayname': decodedDevRevToken['http://devrev.ai/displayname'],
+                'http://devrev.ai/email': decodedDevRevToken['http://devrev.ai/email'],
+                'http://devrev.ai/is_verified': decodedDevRevToken['http://devrev.ai/is_verified'],
+                'http://devrev.ai/parent_jti': decodedDevRevToken['http://devrev.ai/parent_jti'],
+                'http://devrev.ai/revuid': decodedDevRevToken['http://devrev.ai/revuid'],
+                'http://devrev.ai/session_tokentype': decodedDevRevToken['http://devrev.ai/session_tokentype'],
+                'http://devrev.ai/tokentype': decodedDevRevToken['http://devrev.ai/tokentype']
+              });
+            }
           } catch (error) {
             console.error('Error calling support API:', error);
+            setDevrevToken(null);
           }
         }
 
