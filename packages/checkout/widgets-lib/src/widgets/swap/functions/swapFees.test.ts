@@ -24,6 +24,7 @@ describe('formatSwapFees', () => {
         amountWithMaxSlippage: {} as Amount,
         slippage: 0,
         fees: [],
+        priceImpact: 0,
       } as Quote,
       swap: {
         gasFeeEstimate: {

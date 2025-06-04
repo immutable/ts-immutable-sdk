@@ -47,6 +47,7 @@ describe('constructBridgeRequirements', () => {
             basisPoints: 0,
           },
         ],
+        priceImpact: 0,
       },
     };
 

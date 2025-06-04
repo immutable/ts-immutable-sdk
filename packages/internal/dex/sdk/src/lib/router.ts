@@ -9,6 +9,7 @@ import { fetchValidPools } from './poolUtils/fetchValidPools';
 import { ERC20Pair } from './poolUtils/generateERC20Pairs';
 import { DEFAULT_MAX_HOPS } from '../constants/router';
 import type { Multicall } from '../contracts/types';
+import { BlockTag } from './multicall';
 
 export type RoutingContracts = {
   multicall: string;
@@ -33,7 +34,9 @@ export class Router {
     amountSpecified: CoinAmount<ERC20>,
     otherToken: ERC20,
     tradeType: TradeType,
-    maxHops: number = DEFAULT_MAX_HOPS,
+    maxHops = DEFAULT_MAX_HOPS,
+    blockTag: BlockTag = 'latest',
+
   ): Promise<QuoteResult> {
     const [tokenIn, tokenOut] = this.determineERC20InAndERC20Out(tradeType, amountSpecified, otherToken);
 
@@ -45,6 +48,7 @@ export class Router {
       erc20Pair,
       this.routingTokens,
       this.routingContracts.coreFactory,
+      blockTag,
     );
 
     const noValidPools = pools.length === 0;
@@ -63,13 +67,14 @@ export class Router {
     }
 
     // Get the best quote from all of the given routes
-    return await this.getBestQuoteFromRoutes(routes, amountSpecified, tradeType);
+    return await this.getBestQuoteFromRoutes(routes, amountSpecified, tradeType, blockTag);
   }
 
   private async getBestQuoteFromRoutes(
     routes: Route<Token, Token>[],
     amountSpecified: CoinAmount<ERC20>,
     tradeType: TradeType,
+    blockTag: BlockTag,
   ): Promise<QuoteResult> {
     const quotes = await getQuotesForRoutes(
       this.provider,
@@ -77,7 +82,9 @@ export class Router {
       routes,
       amountSpecified,
       tradeType,
+      blockTag,
     );
+
     if (quotes.length === 0) {
       throw new NoRoutesAvailableError();
     }
