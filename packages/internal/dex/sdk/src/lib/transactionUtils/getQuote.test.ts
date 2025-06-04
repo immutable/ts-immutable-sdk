@@ -1,4 +1,4 @@
-import { TradeType } from '@uniswap/sdk-core';
+import { Percent, TradeType } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { formatEther, parseEther } from 'ethers';
 import { Fees } from '../fees';
@@ -138,6 +138,7 @@ describe('prepareUserQuote', () => {
         gasEstimate,
         route,
         tradeType: TradeType.EXACT_INPUT,
+        priceImpact: new Percent(0, 100),
       };
 
       const userQuote = prepareUserQuote(nativeTokenService, quoteResult, DEFAULT_SLIPPAGE, tokenOfQuotedAmount);
@@ -156,6 +157,7 @@ describe('prepareUserQuote', () => {
         gasEstimate,
         route,
         tradeType: TradeType.EXACT_OUTPUT,
+        priceImpact: new Percent(0, 100),
       };
 
       const userQuote = prepareUserQuote(nativeTokenService, quoteResult, DEFAULT_SLIPPAGE, tokenOfQuotedAmount);
@@ -175,6 +177,7 @@ describe('prepareUserQuote', () => {
         gasEstimate,
         route,
         tradeType: TradeType.EXACT_INPUT,
+        priceImpact: new Percent(0, 100),
       };
       const userQuote = prepareUserQuote(nativeTokenService, quoteResult, DEFAULT_SLIPPAGE, tokenOfQuotedAmount);
       expectERC20(userQuote.quotedAmount.token);
@@ -193,6 +196,7 @@ describe('prepareUserQuote', () => {
         gasEstimate,
         route,
         tradeType: TradeType.EXACT_INPUT,
+        priceImpact: new Percent(0, 100),
       };
 
       const userQuote = prepareUserQuote(nativeTokenService, quoteResult, DEFAULT_SLIPPAGE, tokenOfQuotedAmount);

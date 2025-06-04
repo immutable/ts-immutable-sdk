@@ -9,8 +9,15 @@ const DEFAULT_GAS_QUOTE = 2_000_000;
 
 type Address = string;
 
+export type BlockTag = 'latest' | `0x${string}`;
+
 export type SingleContractCallOptions = {
   gasRequired: number;
+  blockTag: BlockTag;
+};
+
+export type MulticallOptions = {
+  blockTag: BlockTag;
 };
 
 export type MulticallResponse = {
@@ -23,6 +30,7 @@ export async function multicallSingleCallDataMultipleContracts(
   multicallContract: Multicall,
   functionName: string,
   addresses: Address[],
+  options?: MulticallOptions,
 ): Promise<MulticallResponse> {
   // Encode args - generate calldata for contract
   const contractIFace = UniswapV3Pool__factory.createInterface();
@@ -44,6 +52,10 @@ export async function multicallSingleCallDataMultipleContracts(
     });
   }
 
+  // Use block number if provided, otherwise use latest block
+  if (options?.blockTag) {
+    return multicallContract.multicall.staticCall(calls, { blockTag: options.blockTag });
+  }
   return multicallContract.multicall.staticCall(calls);
 }
 
@@ -67,6 +79,10 @@ export async function multicallMultipleCallDataSingContract(
     };
   }
 
+  // Use block number if provided, otherwise use latest block
+  if (options?.blockTag) {
+    return multicallContract.multicall.staticCall(calls, { blockTag: options.blockTag });
+  }
   return multicallContract.multicall.staticCall(calls);
 }
 

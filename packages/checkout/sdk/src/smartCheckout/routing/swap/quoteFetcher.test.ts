@@ -46,6 +46,7 @@ describe('quoteFetcher', () => {
             basisPoints: 0,
           },
         ],
+        priceImpact: 0,
       },
       approval: null,
     };
@@ -98,6 +99,7 @@ describe('quoteFetcher', () => {
             basisPoints: 0,
           },
         ],
+        priceImpact: 0,
       },
     };
 

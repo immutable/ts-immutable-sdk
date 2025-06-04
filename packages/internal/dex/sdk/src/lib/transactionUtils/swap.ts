@@ -535,5 +535,6 @@ export function adjustQuoteWithFees(
     amountIn: adjustedAmountIn,
     amountOut: ourQuote.amountOut,
     tradeType: ourQuote.tradeType,
+    priceImpact: ourQuote.priceImpact,
   };
 }

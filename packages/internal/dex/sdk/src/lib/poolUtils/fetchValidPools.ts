@@ -6,18 +6,18 @@ import { generatePossiblePoolsFromERC20Pair } from './generatePossiblePoolsFromE
 import { ERC20Pair } from './generateERC20Pairs';
 import { Multicall, UniswapV3Pool__factory } from '../../contracts/types';
 import { UniswapV3PoolInterface } from '../../contracts/types/UniswapV3Pool';
-import { MulticallResponse, multicallSingleCallDataMultipleContracts } from '../multicall';
+import { BlockTag, MulticallResponse, multicallSingleCallDataMultipleContracts } from '../multicall';
 
 export type Slot0 = {
   sqrtPriceX96: bigint;
   tick: number;
-
   observationIndex: number;
   observationCardinality: number;
   observationCardinalityNext: number;
   feeProtocol: number;
   unlocked: boolean;
 };
+
 const liquidityFuncString = 'liquidity';
 const slot0FuncString = 'slot0';
 const noDataResult = '0x';
@@ -29,6 +29,7 @@ export const fetchValidPools = async (
   erc20Pair: ERC20Pair,
   commonRoutingERC20s: ERC20[],
   factoryAddress: string,
+  blockTag: BlockTag,
 ): Promise<Pool[]> => {
   const poolIDs = generatePossiblePoolsFromERC20Pair(
     erc20Pair,
@@ -47,11 +48,13 @@ export const fetchValidPools = async (
         multicallContract,
         slot0FuncString,
         poolAddresses,
+        { blockTag },
       ),
       multicallSingleCallDataMultipleContracts(
         multicallContract,
         liquidityFuncString,
         poolAddresses,
+        { blockTag },
       ),
     ]);
   } catch (e) {

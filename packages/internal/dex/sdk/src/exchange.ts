@@ -36,11 +36,13 @@ const toPublicQuote = (
   amount: CoinAmount<Coin>,
   amountWithMaxSlippage: CoinAmount<Coin>,
   slippage: number,
+  priceImpact: number,
   fees: Fees,
 ): Quote => ({
   amount: toPublicAmount(amount),
   amountWithMaxSlippage: toPublicAmount(amountWithMaxSlippage),
   slippage,
+  priceImpact,
   fees: fees.withAmounts().map((fee) => ({
     ...fee,
     amount: toPublicAmount(fee.amount),
@@ -223,6 +225,7 @@ export class Exchange {
       amount: toPublicAmount(otherTokenCoinAmount),
       amountWithMaxSlippage: toPublicAmount(otherTokenCoinAmount),
       slippage: 0,
+      priceImpact: 0,
       fees: [],
     };
 
@@ -340,7 +343,13 @@ export class Exchange {
       ? await getApproval(this.provider, fromAddress, preparedApproval, gasPrice)
       : null;
 
-    const quote = toPublicQuote(quotedAmount, quotedAmountWithMaxSlippage, slippagePercent, fees);
+    const quote = toPublicQuote(
+      quotedAmount,
+      quotedAmountWithMaxSlippage,
+      slippagePercent,
+      Number(adjustedQuote.priceImpact.toSignificant(10)),
+      fees,
+    );
 
     return { quote, approval, swap };
   }
