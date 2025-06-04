@@ -7,9 +7,6 @@ export const DEFAULT_DEADLINE_SECONDS: number = 60 * 15;
 // most swaps will be able to resolve with 3 hops
 export const DEFAULT_MAX_HOPS: number = 3;
 
-// 25% default max price impact
-export const DEFAULT_MAX_PRICE_IMPACT: number = 25;
-
 // after 10 hops, it is very unlikely a route will be available
 export const MAX_MAX_HOPS: number = 10;
 

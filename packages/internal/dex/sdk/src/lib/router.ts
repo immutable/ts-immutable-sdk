@@ -7,7 +7,7 @@ import { erc20ToUniswapToken, poolEquals, uniswapTokenToERC20 } from './utils';
 import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
 import { ERC20Pair } from './poolUtils/generateERC20Pairs';
-import { DEFAULT_MAX_HOPS, DEFAULT_MAX_PRICE_IMPACT } from '../constants/router';
+import { DEFAULT_MAX_HOPS } from '../constants/router';
 import type { Multicall } from '../contracts/types';
 import { BlockTag } from './multicall';
 
@@ -35,7 +35,6 @@ export class Router {
     otherToken: ERC20,
     tradeType: TradeType,
     maxHops = DEFAULT_MAX_HOPS,
-    maxPriceImpact = DEFAULT_MAX_PRICE_IMPACT,
     blockTag: BlockTag = 'latest',
 
   ): Promise<QuoteResult> {
@@ -68,7 +67,7 @@ export class Router {
     }
 
     // Get the best quote from all of the given routes
-    return await this.getBestQuoteFromRoutes(routes, amountSpecified, tradeType, blockTag, maxPriceImpact);
+    return await this.getBestQuoteFromRoutes(routes, amountSpecified, tradeType, blockTag);
   }
 
   private async getBestQuoteFromRoutes(
@@ -76,7 +75,6 @@ export class Router {
     amountSpecified: CoinAmount<ERC20>,
     tradeType: TradeType,
     blockTag: BlockTag,
-    maxPriceImpact: number,
   ): Promise<QuoteResult> {
     const quotes = await getQuotesForRoutes(
       this.provider,
@@ -87,21 +85,18 @@ export class Router {
       blockTag,
     );
 
-    const lowPriceImpactQuotes = quotes.filter((quote) =>
-      quote.priceImpact.lessThan(maxPriceImpact) && quote.priceImpact.greaterThan(maxPriceImpact * -1));
-
-    if (lowPriceImpactQuotes.length === 0) {
+    if (quotes.length === 0) {
       throw new NoRoutesAvailableError();
     }
 
     // We want to maximise the amountOut for the EXACT_INPUT type
     if (tradeType === TradeType.EXACT_INPUT) {
-      return this.bestQuoteForAmountIn(lowPriceImpactQuotes);
+      return this.bestQuoteForAmountIn(quotes);
     }
 
     // We want to minimise the amountIn for the EXACT_OUTPUT type
     if (tradeType === TradeType.EXACT_OUTPUT) {
-      return this.bestQuoteForAmountOut(lowPriceImpactQuotes);
+      return this.bestQuoteForAmountOut(quotes);
     }
 
     throw new Error('Invalid trade type');
