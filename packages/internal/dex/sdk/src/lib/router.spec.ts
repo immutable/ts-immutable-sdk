@@ -12,7 +12,8 @@ import { newAmountFromString } from '../test/utils';
 import { ERC20 } from '../types';
 
 describe('Router', () => {
-  it('calculates the price impact for a route', async () => {
+  // Unskip to run the test against the real RPC
+  it.skip('calculates the price impact for a route', async () => {
     const contracts = CONTRACTS_FOR_CHAIN_ID[IMMUTABLE_MAINNET_CHAIN_ID];
     const provider = new JsonRpcProvider(IMMUTABLE_MAINNET_RPC_URL, IMMUTABLE_MAINNET_CHAIN_ID);
     const multicall = Multicall__factory.connect(contracts.multicall, provider);
