@@ -71,6 +71,7 @@ describe('swapRoute', () => {
                 basisPoints: 0,
               },
             ],
+            priceImpact: 0,
           },
           approval: {
             value: BigInt(1),
@@ -125,6 +126,7 @@ describe('swapRoute', () => {
                 basisPoints: 0,
               },
             ],
+            priceImpact: 0,
           },
           approval: {
             value: BigInt(1),

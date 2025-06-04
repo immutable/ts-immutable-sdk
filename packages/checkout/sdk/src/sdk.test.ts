@@ -1079,6 +1079,7 @@ describe('Connect', () => {
             },
             value: BigInt('1050000000000000000'), // Example value with 5% max slippage
           },
+          priceImpact: 0,
         },
         swapReceipt: {
           to: '0xRecipientAddress',
