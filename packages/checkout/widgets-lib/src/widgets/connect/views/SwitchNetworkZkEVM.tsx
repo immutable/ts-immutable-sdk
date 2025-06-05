@@ -33,8 +33,7 @@ export function SwitchNetworkZkEVM() {
     if (!provider || !checkout) return;
 
     const checkCorrectNetwork = async () => {
-      const currentChainId = await provider.send('eth_chainId', []);
-      // eslint-disable-next-line radix
+      const currentChainId = await provider.getNetwork().then((n) => n.chainId);
       const parsedChainId = Number(currentChainId.toString());
       if (parsedChainId === checkout.config.l2ChainId) {
         connectDispatch({
@@ -151,6 +150,8 @@ export function SwitchNetworkZkEVM() {
         },
       });
     } catch (err: any) {
+      // eslint-disable-next-line no-console
+      console.error(err);
       setButtonTextKey(t('views.SWITCH_NETWORK.zkEVM.button.retryText'));
     }
   }, [provider, checkout]);
