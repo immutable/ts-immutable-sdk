@@ -1100,7 +1100,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
           <Body size="xxSmall">
             {quoteError instanceof PriceImpactError
               // eslint-disable-next-line max-len, @typescript-eslint/quotes
-              ? `Your swap amount is too large for current market conditions. This means you'd get a less favorable exchange rate. Please try a smaller amount.`
+              ? `Your swap amount is too large for current market conditions. This means you'd get a less favorable exchange rate. Try a smaller amount.`
               : 'This token pairing is not available to swap right now. Try another selection.'}
           </Body>
         </Box>
