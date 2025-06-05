@@ -6,7 +6,6 @@ import {
   Dispatch, SetStateAction, useContext, useMemo, useCallback,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CoinSelectorOptionProps } from '../../components/CoinSelector/CoinSelectorOption';
 import { SelectInput } from '../../components/FormComponents/SelectInput/SelectInput';
 import { TextInputForm } from '../../components/FormComponents/TextInputForm/TextInputForm';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
@@ -44,13 +43,14 @@ export function TransferForm({
 
   const tokenOptions = useMemo(
     () =>
-      viewState.allowedBalances.map<CoinSelectorOptionProps>(
+      viewState.allowedBalances.map(
         (tokenBalance) => ({
           id: getOptionKey(tokenBalance.token),
           name: tokenBalance.token.name,
           symbol: tokenBalance.token.symbol,
           defaultTokenImage: tokenBalance.token.icon || 'TODO',
           balance: {
+            fullBalance: tokenBalance.formattedBalance,
             formattedAmount: tokenValueFormat(tokenBalance.formattedBalance),
             formattedFiatAmount: getFiatAmount(cryptoFiatState, tokenBalance),
           },
@@ -104,12 +104,12 @@ export function TransferForm({
       userJourney: UserJourney.TRANSFER,
       control: 'Max',
       controlType: 'Button',
-      extras: { token: token.id, amount: token.balance.formattedAmount },
+      extras: { token: token.id, amount: token.balance.fullBalance },
     });
 
     setViewState((s) => {
       if (!token.balance) throw new Error('Token balance not found');
-      return { ...s, amount: token.balance.formattedAmount };
+      return { ...s, amount: token.balance.fullBalance };
     });
   }, [tokenOptions, token]);
 

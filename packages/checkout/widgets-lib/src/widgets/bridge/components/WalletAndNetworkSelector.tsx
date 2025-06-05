@@ -22,7 +22,6 @@ import {
   isPassportProvider,
   isWalletConnectProvider,
 } from '../../../lib/provider';
-import { getL1ChainId, getL2ChainId } from '../../../lib';
 import { getChainNameById } from '../../../lib/chains';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { abbreviateAddress } from '../../../lib/addressUtils';
@@ -85,9 +84,9 @@ export function WalletAndNetworkSelector() {
   } as unknown as WalletChangeEvent : null;
 
   // calculating l1/l2 chains to work with based on Checkout environment
-  const l1NetworkChainId = getL1ChainId(checkout.config);
+  const l1NetworkChainId = checkout.config.l1ChainId;
   const l1NetworkName = getChainNameById(l1NetworkChainId);
-  const imtblZkEvmNetworkChainId = getL2ChainId(checkout.config);
+  const imtblZkEvmNetworkChainId = checkout.config.l2ChainId;
   const imtblZkEvmNetworkName = getChainNameById(imtblZkEvmNetworkChainId);
 
   /** From wallet and from network local state */

@@ -6,7 +6,7 @@ import * as encUtils from 'enc-utils';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
 import { hdkey } from '@ethereumjs/wallet';
-import { Signature, Signer } from 'ethers';
+import { Signature, Signer, toUtf8Bytes } from 'ethers';
 import { createStarkSigner } from './starkSigner';
 import * as legacy from './legacy/crypto';
 import { getStarkPublicKeyFromImx } from './getStarkPublicKeyFromImx';
@@ -286,7 +286,7 @@ export async function generateLegacyStarkPrivateKey(
   signer: Signer,
 ): Promise<string> {
   const address = (await signer.getAddress()).toLowerCase();
-  const signature = await signer.signMessage(legacy.DEFAULT_SIGNATURE_MESSAGE);
+  const signature = await signer.signMessage(toUtf8Bytes(legacy.DEFAULT_SIGNATURE_MESSAGE));
   const seed = Signature.from(signature).s;
   const path = legacy.getAccountPath(
     legacy.DEFAULT_ACCOUNT_LAYER,

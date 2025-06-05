@@ -1,0 +1,17 @@
+{
+    "features": [
+        {
+            "feature": "device-flow-authentication",
+            "manually-edited": true,
+            "silent-login": true,
+            "silent-logout": true
+        },
+        {
+            "feature": "nft-transfers",
+            "manually-edited": true,
+            "silent-login": true,
+            "silent-logout": true
+        }
+    ],
+    "order": 7
+}

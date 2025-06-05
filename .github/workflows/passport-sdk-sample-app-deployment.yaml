@@ -31,13 +31,13 @@ jobs:
           fetch-depth: 0
 
       - name: setup
-        uses: ./.github/actions/setup
+        uses: ./.github/actions/setup   
+
+      - name: Initialize and install current @latest sdk versions on npm
+        run: pnpm --filter @imtbl/sdk... exec sh -c "jq --arg version \"$(npm view @imtbl/metrics versions --json | jq -r '.[-1]')\" '.version = \$version' package.json > package.tmp.json && mv package.tmp.json package.json" && pnpm i
 
       - name: Build Static Passport sample app
         run: pnpm nx run @imtbl/passport-sdk-sample-app:build --skip-nx-cache
-
-      - name: Update SDK version
-        run: pnpm --filter @imtbl/passport-sdk-sample-app update-sdk-version
 
       - name: Upload to S3
         run: |

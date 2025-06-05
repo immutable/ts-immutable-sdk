@@ -21,6 +21,7 @@ const config: Config = {
   },
   coveragePathIgnorePatterns:['node_modules', 'src/contracts/', 'src/test/'],
   transformIgnorePatterns: [],
+  setupFiles: ['<rootDir>/jest.setup.js'],
 };
 
 export default config;

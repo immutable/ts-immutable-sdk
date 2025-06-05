@@ -114,12 +114,7 @@ export default function ConnectWidget({
 
   const { identify, page, user } = useAnalytics();
 
-  let targetChain = targetChainId;
-  if (!targetChain) {
-    targetChain = checkout.config.isProduction
-      ? ChainId.IMTBL_ZKEVM_MAINNET
-      : ChainId.IMTBL_ZKEVM_TESTNET;
-  }
+  const targetChain = targetChainId ?? checkout.config.l2ChainId;
 
   useEffect(() => {
     if (!browserProvider) return;

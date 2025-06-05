@@ -1,4 +1,4 @@
-import { TradeType } from '@uniswap/sdk-core';
+import { Fraction, TradeType } from '@uniswap/sdk-core';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
@@ -76,6 +76,15 @@ export const USDC_TEST_TOKEN: ERC20 = {
   decimals: 6,
   symbol: 'USDC',
   name: 'USD Coin',
+  type: 'erc20',
+};
+
+export const USDT_TEST_TOKEN: ERC20 = {
+  chainId: TEST_CHAIN_ID,
+  address: '0xF72fFE2f7F1Abc7f7C83623C4a690Cf9133325fc',
+  decimals: 6,
+  symbol: 'USDT',
+  name: 'Tether USD',
   type: 'erc20',
 };
 
@@ -458,6 +467,7 @@ export function mockRouterImplementation(params: MockParams) {
         amountOut,
         tradeType,
         gasEstimate: TEST_TRANSACTION_GAS_USAGE,
+        priceImpact: new Fraction(1),
       };
 
       return trade;

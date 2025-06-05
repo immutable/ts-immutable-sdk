@@ -21,14 +21,17 @@
 - [Contribution guidelines](#contribution-guidelines)
 - [Adding examples](#adding-examples)
 - [End to end testing](#end-to-end-testing)
+- [Generating examples apps using Cursor](#generating-example-apps-using-cursor)
 - [Using code examples in the docs site](#using-code-examples-in-the-docs-site)
+- [Generating Tutorials and Metadata with cursor](#generating-tutorials-and-metadata-with-cursor)
+
 <hr />
 
 # Introduction
 
 The example apps in this examples directory are compiled and tested as part of our CI CD pipeline. The goal of this is to ensure the examples found here are always able to run against the latest version of the Immutable Typescript SDK. 
 
-Selected portions of code from these example apps are then displayed as code snippets in our docs site, which means our code snippets in the docs are inherently always accurate as well. How to include the code from here in the docs site is explained below. 
+Selected portions of code from these example apps are then displayed as code snippets in our docs site, which means our code snippets in the docs are inherently always accurate as well. How to include the code from here in the docs site is explained below.
 
 These example apps can also be used directly as a reference and run locally to test and develop with.
 
@@ -323,6 +326,95 @@ Run your tests
 ```bash
 pnpm test
 ```
+
+# Generating example apps using cursor
+
+1) Open the product folder under /examples/{product}/_prompts
+
+2) Under the {product}/_prompts directory, open the example-app-2-add-feature.txt file.
+
+3) Copy all of the content in the example-app-2-add-feature.txt file.
+
+4) Paste it on to Cursor. Make sure that you're using Agent mode and the model to be used is Claude 3.7 (Thinking)
+
+5) After pasting the prompt, in the chat window you can type: 
+app name: <app name(if exists)>
+feature name: <name of the feature>
+and cursor will generate the feature page in the given app.
+
+6) To update an existing feature, the prompt will identify if the given <feature name> exists in the <app name> directory. If it does, it will check if 
+the <feature name> has the manually-edited field value as true in the feature.json file.
+
+7) If the flag above exists, it will ask for a confirmation, otherwise, it will use best practices to update the existing feature page.
+
+8) Once the feature page is completed, under the same directory as example-app-2-add-feature.txt, open example-app-3-fix-ui.txt and copy all of its contents.
+
+9) Paste it on to a new Cursor window and in the chat window you can type: 
+
+feature name: <name of the feature>
+
+Here, cursor will check and fix pages with styling issues to ensure that it looks consistent with other example apps.
+
+10) Once the styling changes have been made, under the same directory as example-app-2-add-feature.txt, open example-app-4-testing.txt and copy all of its contents.
+
+11) Paste it on to a new Cursor window and in the chat window you can type: 
+app name: <app name(if exists)>
+feature name: <name of the feature>
+
+12) Cursor will then run tests and build until everything passes and renders properly.
+
+13) When the prompt is done running, make sure to double check if the tests are comprehensive enough and also check if the feature page was built properly using best practices.
+
+14) Run `pnpm dev` and check every page's styling. If something looks off, you can manually fix it.
+
+## If an App Doesn't Exist Yet
+
+You must create the app first by going to the example-app-1-create-app-template.txt file and paste it on to Cursor's chat window and use Agent Mode + Claude 3.7 Sonnet Thinking.
+
+In the chat window, type in:
+feature name: <name>
+
+Then Cursor will build out the example app's setup, etc.
+IF Cursor doesn't run build at the end, manually type on the chat window 'run build'.
+
+IMPORTANT: For any prompts, if cursor is not done with its operations but it has reached 25 tool calls, you will need to manually type "continue" on the chat window for cursor to continue building.
+
+## Understanding the Prompt Files
+
+The example generation process uses three different prompt files, each with a specific purpose:
+
+### example-app-1-create-app-template.txt
+- **Purpose**: Creates the initial app structure and boilerplate
+- **When to use**: Only when you need to create a completely new example app
+- **What it does**: Sets up the project structure, configuration files, basic components, and placeholder pages
+- **Output**: A functioning but minimal app with no implemented features
+
+### example-app-2-add-feature.txt
+- **Purpose**: Implements or updates a specific feature within an existing app
+- **When to use**: After creating an app with example-app-1-create-app-template.txt, or when adding/updating features
+- **What it does**: Creates or modifies the feature implementation with proper error handling, UI states, and best practices
+- **Output**: A fully implemented feature page within the app structure
+
+### example-app-3-fix-ui.txt
+- **Purpose**: Apply styling changes to the given example app if possible to ensure styling consistency with other example apps
+- **When to use**: After running example-app-2-add-feature.txt to implement a feature
+- **What it does**: Modifies the example app's UI/UX to ensure that the app looks consistent with other example apps
+- **Output**: A fully implemented feature page within the app structure with consistent UI/UX looks.
+
+### example-app-4-testing.txt
+- **Purpose**: Tests, validates, and fixes issues in the implementation
+- **When to use**: After running example-app-2-add-feature.txt to implement a feature
+- **What it does**: Runs tests, checks coverage, builds the app, and fixes any detected issues
+- **Output**: A tested, validated feature ready for use
+
+**Typical Workflow:**
+1. Use example-app-1-create-app-template.txt to create a new app (only once per app)
+2. Use example-app-2-add-feature.txt to implement each feature in the app
+3. Use example-app-3-fix-ui.txt to fix the app's UI/UX styling and make it look consistent to other example apps.
+4. Use example-app-4-testing.txt after each feature implementation to test and validate
+5. Once you've generated the example app or feature, you should manually review the implementation and the UI. It's likely you will need to make some manual adjustments to get the app to function and look like our other example apps because the cursor can not reliably get it 100% correct. 
+6. Once you're happy with your example app or feature, you need to [re-run the tutorial generation prompt](#generating-tutorials-and-metadata-with-cursor) for your example app before creating your PR so the new example app or feature is piped into the docs site with it's corresponding tutorial.
+
 # Using code examples in the docs site
 
 Creating and using code snippets is relatively straight forward. You can pull in a whole file or by adding some comments you can pull in just a particular few lines of a file as necessary.
@@ -366,7 +458,6 @@ It's very simple to use the code snippet in the docs site, you just add a code b
 
 ````md
 ```tsx reference=examples/checkout/sdk-connect-with-nextjs/src/app/connect-with-metamask/page.tsx#get-wallet-allow-list title="Get the wallet allow list"
-```
 ```
 ````
 Or if you want to display the whole file just don't include a `#` label at the end of the file reference e.g.
@@ -413,3 +504,27 @@ You can now double check the code snippets in your `docs` branch are all pulling
 Once your `docs` PR is merged, Netlify should automatically build and deploy the docs site. If your updates are not reflected on the docs site within 10 minutes of the PR being merged, it's likely the build has failed in Netlify. Because we are now pulling in content dynamically for the code snippets, the GET requests to fetch the code examples can sometimes randomly timeout which fails the build. 
 
 If this happens you will need to log into the Netlify site, check the error and retry the build. Usually this will fix the deployment issue, otherwise follow up on the error message shown by Netlify.
+
+# Generating tutorials and metadata with cursor
+
+Whenever you add a new example app, or update an existing example app, you can use the prompts in the `tutorial-generation-generic.txt` OR `tutorial-generation-{product}.txt` files in each `examples/product/_prompts` folder to generate the tutorials and metadata for the example apps using Cursor AI.
+
+These AI generated tutorials and metadata files are then piped through to the docs site in the CI/CD pipeline, where they are used to display the example apps and their code walkthroughs. If you don't follow these steps, your example app will not be displayed on the docs site.
+
+There is a single prompt for each product as we expect the examples to follow a similar structure and format, therefore the prompt to generate the tutorials and metadata is the same for each product. You can specify which example app you want the prompt to generate the tutorials and metadata for by adding the app name to the prompt as shown below.
+
+These prompts are designed to be used with Cursor IDE Composer Agent mode.
+
+Follow these steps to generate the tutorials and metadata for the example apps:
+
+1. Delete the existing tutorial.md and metadata.json files in the example app you are wanting to generate the tutorials and metadata for.
+2. Open the Composer window in Cursor IDE (Claude 3.7-sonnet-thinking).
+3. Press the `+` button clear the context of the composer window.
+4. Open the `tutorial-generation-generic.txt` OR `tutorial-generation-{product}.txt` file in the examples/product/_prompts folder you are wanting to generate the tutorials and metadata for e.g. `examples/passport/_prompts/tutorial-generation-generic.txt`.
+5. Copy and pate the prompt into the composer window, or attach it as a file.
+6. After adding the prompt, in the composer window, type `app name: <name of the example app>` e.g. `app name: login-with-nextjs` where the app name is the folder name of the example app in the examples/product folder you are wanting to generate the tutorials and metadata for.
+7. Press enter and let the AI generate the tutorials and metadata.
+8. Review the generated tutorials and metadata.
+9. If you're happy with the generated tutorials and metadata, you can commit and push the changes to your branch in the `ts-immutable-sdk` repo.
+
+Once you have merged your branch into main, the tutorials and metadata will be automatically piped to the docs site and displayed in the example apps section.

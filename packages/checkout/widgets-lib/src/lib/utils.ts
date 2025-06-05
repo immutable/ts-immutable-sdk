@@ -1,10 +1,10 @@
 import {
-  ChainId, CheckoutConfiguration, GetBalanceResult, NetworkInfo, WidgetTheme,
+  ChainId, CheckoutConfiguration, GetBalanceResult, NetworkInfo, TokenInfo, WidgetTheme,
   WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
-import { Contract } from 'ethers';
-import { getL1ChainId, getL2ChainId } from './networkUtils';
+import { Contract, formatUnits } from 'ethers';
+import { TransactionResponse } from '@imtbl/dex-sdk';
 import {
   CHECKOUT_CDN_BASE_URL,
   DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS,
@@ -24,7 +24,7 @@ export const sortTokensByAmount = (
 ) => tokens.sort((a, b) => {
   // make sure IMX is at the top of the list
   if (
-    chainId === getL2ChainId(config)
+    chainId === config.l2ChainId
     && a.token.symbol.toLowerCase() === 'imx'
     && b.token.symbol.toLowerCase() !== 'imx'
   ) {
@@ -32,7 +32,7 @@ export const sortTokensByAmount = (
   }
 
   if (
-    chainId === getL2ChainId(config)
+    chainId === config.l2ChainId
     && b.token.symbol.toLowerCase() === 'imx'
     && a.token.symbol.toLowerCase() !== 'imx'
   ) {
@@ -56,10 +56,10 @@ export const sortNetworksCompareFn = (
   config: CheckoutConfiguration,
 ) => {
   // make sure zkEVM at start of the list then L1
-  if (Number(a.chainId) === getL2ChainId(config)) {
+  if (Number(a.chainId) === config.l2ChainId) {
     return -1;
   }
-  if (Number(a.chainId) === getL1ChainId(config)) {
+  if (Number(a.chainId) === config.l1ChainId) {
     return 0;
   }
   return 1;
@@ -86,6 +86,40 @@ export const calculateCryptoToFiat = (
   const parsedAmount = parseFloat(amount);
   if (parseFloat(amount) === 0 || Number.isNaN(parsedAmount)) return zeroString;
   return formatFiatString(parsedAmount * conversion, maxDecimals);
+};
+
+const calculateCryptoToFiatBigInt = (
+  amount: bigint,
+  token: TokenInfo,
+  conversions: Map<string, number>,
+) => {
+  const formattedAmount = formatUnits(amount, token.decimals);
+  return calculateCryptoToFiat(formattedAmount, token.symbol, conversions, '0.00', 10);
+};
+
+export const calculateFeesFiat = (
+  quote: TransactionResponse,
+  fromToken: TokenInfo,
+  gasFeeToken: TokenInfo,
+  conversions: Map<string, number>,
+  gasFeeValue: string,
+) => {
+  const gasFeeEstimateFiat = calculateCryptoToFiat(
+    gasFeeValue,
+    gasFeeToken.symbol,
+    conversions,
+    '0.00',
+    10,
+  );
+
+  const secondaryFeesTotal = quote.quote.fees?.reduce((acc, fee) => acc + fee.amount.value, 0n);
+  const secondaryFeesFiat = calculateCryptoToFiatBigInt(
+    secondaryFeesTotal,
+    fromToken,
+    conversions,
+  );
+
+  return Number(gasFeeEstimateFiat) + Number(secondaryFeesFiat);
 };
 
 export const formatZeroAmount = (

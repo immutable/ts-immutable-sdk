@@ -24,6 +24,7 @@ describe('formatSwapFees', () => {
         amountWithMaxSlippage: {} as Amount,
         slippage: 0,
         fees: [],
+        priceImpact: 0,
       } as Quote,
       swap: {
         gasFeeEstimate: {
@@ -42,7 +43,7 @@ describe('formatSwapFees', () => {
     (calculateCryptoToFiat as jest.Mock).mockReturnValue('FiatValue:1');
     (tokenValueFormat as jest.Mock).mockReturnValue('Formatted:1');
 
-    const fees = formatSwapFees(mockGasFeeQuote, cryptoFiatState, mockTranslate);
+    const fees = formatSwapFees(mockGasFeeQuote, cryptoFiatState.conversions, mockTranslate);
     expect(fees).toEqual([
       {
         label: 'drawers.feesBreakdown.fees.swapGasFee.label',
@@ -90,7 +91,7 @@ describe('formatSwapFees', () => {
       conversions: {},
     } as CryptoFiatState;
 
-    const fees = formatSwapFees(mockSecondaryFeeQuote, cryptoFiatState, mockTranslate);
+    const fees = formatSwapFees(mockSecondaryFeeQuote, cryptoFiatState.conversions, mockTranslate);
     expect(fees).toEqual([
       {
         label: 'drawers.feesBreakdown.fees.swapSecondaryFee.label',

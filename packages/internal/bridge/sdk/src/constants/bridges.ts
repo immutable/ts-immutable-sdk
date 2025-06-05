@@ -52,7 +52,7 @@ export const SLOT_PREFIX_CONTRACT_CALL_APPROVED = '0x07b0d4304f82012bd3b70b1d531
 /**
  * @constant {string} SLOT_POS_CONTRACT_CALL_APPROVED - The position of the storage slot to store contract call approved mapping.
  */
-export const SLOT_POS_CONTRACT_CALL_APPROVED = 4;
+export const SLOT_POS_CONTRACT_CALL_APPROVED = '0x0000000000000000000000000000000000000000000000000000000000000004';
 
 /**
  * @typedef {Object} childWIMXs - Child Wrapped IMX address for the testnet & mainnet.

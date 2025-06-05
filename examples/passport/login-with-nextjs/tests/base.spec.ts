@@ -13,7 +13,8 @@ test.describe("home page", () => {
       "Login with EtherJS",
       "Login with Identity only",
       "Logout with Redirect Mode",
-      "Logout with Silent Mode"
+      "Logout with Silent Mode",
+      "Auth Event Handling"
     ];
     
     for (const name of buttonNames) {
@@ -66,4 +67,10 @@ test.describe("sub-pages navigation", () => {
     await expect(page.getByRole("button", { name: /Login|Logout/ })).toBeVisible();
     await expect(page.getByRole("link", { name: "Return to Examples" })).toBeVisible();
     });
+
+  test("Check Auth Event Handling", async ({ page }) => {
+    await page.click("text=Auth Event Handling");
+    await expect(page.getByRole("heading", { name: "Passport SDK - Event Handling Example" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Return to Examples" })).toBeVisible();
+  });
 });

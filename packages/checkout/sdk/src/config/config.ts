@@ -1,12 +1,17 @@
 import { Environment } from '@imtbl/config';
-import { CheckoutModuleConfiguration, ChainId, NetworkMap } from '../types';
+import {
+  CheckoutModuleConfiguration, ChainId, NetworkMap, ChainSlug,
+} from '../types';
 import { RemoteConfigFetcher } from './remoteConfigFetcher';
 import {
+  CHECKOUT_CDN_BASE_URL,
   DEFAULT_BRIDGE_ENABLED,
   DEFAULT_ON_RAMP_ENABLED,
   DEFAULT_SWAP_ENABLED,
   DEV_CHAIN_ID_NETWORK_MAP,
+  ENV_DEVELOPMENT,
   globalPackageVersion,
+  IMMUTABLE_API_BASE_URL,
   PRODUCTION_CHAIN_ID_NETWORK_MAP,
   SANDBOX_CHAIN_ID_NETWORK_MAP,
 } from '../env';
@@ -28,12 +33,18 @@ const networkMap = (prod: boolean, dev: boolean) => {
   return SANDBOX_CHAIN_ID_NETWORK_MAP;
 };
 
-// **************************************************** //
-// This is duplicated in the widget-lib project.        //
-// We are not exposing these functions given that this  //
-// to keep the Checkout SDK interface as minimal as     //
-// possible.                                            //
-// **************************************************** //
+const getBaseUrl = (prod: boolean, dev: boolean) => {
+  if (dev) return IMMUTABLE_API_BASE_URL[ENV_DEVELOPMENT];
+  if (prod) return IMMUTABLE_API_BASE_URL[Environment.PRODUCTION];
+  return IMMUTABLE_API_BASE_URL[Environment.SANDBOX];
+};
+
+const getChainSlug = (prod: boolean, dev: boolean) => {
+  if (dev) return ChainSlug.IMTBL_ZKEVM_DEVNET;
+  if (prod) return ChainSlug.IMTBL_ZKEVM_MAINNET;
+  return ChainSlug.IMTBL_ZKEVM_TESTNET;
+};
+
 export const getL1ChainId = (config: CheckoutConfiguration): ChainId => {
   // DevMode and Sandbox will both use Sepolia.
   if (!config.isProduction) return ChainId.SEPOLIA;
@@ -45,8 +56,12 @@ export const getL2ChainId = (config: CheckoutConfiguration): ChainId => {
   if (config.isProduction) return ChainId.IMTBL_ZKEVM_MAINNET;
   return ChainId.IMTBL_ZKEVM_TESTNET;
 };
-// **************************************************** //
-// **************************************************** //
+
+const getRemoteConfigEndpoint = (prod: boolean, dev: boolean) => {
+  if (dev) return CHECKOUT_CDN_BASE_URL[ENV_DEVELOPMENT];
+  if (prod) return CHECKOUT_CDN_BASE_URL[Environment.PRODUCTION];
+  return CHECKOUT_CDN_BASE_URL[Environment.SANDBOX];
+};
 
 export class CheckoutConfiguration {
   // This is a hidden feature that is only available
@@ -73,6 +88,10 @@ export class CheckoutConfiguration {
 
   readonly publishableKey: string;
 
+  readonly l1ChainId: ChainId;
+
+  readonly l2ChainId: ChainId;
+
   readonly overrides: CheckoutModuleConfiguration['overrides'];
 
   constructor(config: CheckoutModuleConfiguration, httpClient: HttpClient) {
@@ -91,17 +110,22 @@ export class CheckoutConfiguration {
     this.isBridgeEnabled = config.bridge?.enable ?? DEFAULT_BRIDGE_ENABLED;
     this.publishableKey = config.publishableKey ?? '<no-publishable-key>';
 
-    this.networkMap = networkMap(this.isProduction, this.isDevelopment);
+    this.networkMap = config.overrides?.networkMap ?? networkMap(this.isProduction, this.isDevelopment);
+
+    const remoteConfigEndpoint = config.overrides?.remoteConfigEndpoint
+      ?? getRemoteConfigEndpoint(this.isProduction, this.isDevelopment);
 
     this.remote = new RemoteConfigFetcher(httpClient, {
-      isDevelopment: this.isDevelopment,
-      isProduction: this.isProduction,
+      remoteConfigEndpoint,
     });
 
     this.tokens = new TokensFetcher(httpClient, this.remote, {
-      isDevelopment: this.isDevelopment,
-      isProduction: this.isProduction,
+      baseUrl: config.overrides?.baseUrl ?? getBaseUrl(this.isProduction, this.isDevelopment),
+      chainSlug: config.overrides?.chainSlug ?? getChainSlug(this.isProduction, this.isDevelopment),
     });
+
+    this.l1ChainId = getL1ChainId(this);
+    this.l2ChainId = config.overrides?.l2ChainId ?? getL2ChainId(this);
 
     this.overrides = config.overrides ?? {};
   }
