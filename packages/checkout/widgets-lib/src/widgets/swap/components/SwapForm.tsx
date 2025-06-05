@@ -303,10 +303,6 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       quoteResult = processSecondaryFees(fromToken, quoteResult);
       quoteResult = processQuoteToken(toToken, quoteResult);
 
-      if (Math.abs(quoteResult.quote.priceImpact) >= MAX_PRICE_IMPACT_PERCENTAGE) {
-        throw new PriceImpactError(quoteResult.quote.priceImpact);
-      }
-
       const estimate = quoteResult.swap.gasFeeEstimate;
       let gasFeeTotal = BigInt(estimate?.value || 0);
       if (quoteResult.approval?.gasFeeEstimate) {
@@ -344,6 +340,10 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
           ),
         ),
       );
+
+      if (Math.abs(quoteResult.quote.priceImpact) >= MAX_PRICE_IMPACT_PERCENTAGE) {
+        throw new PriceImpactError(quoteResult.quote.priceImpact);
+      }
 
       resetFormErrors();
     } catch (error: any) {
@@ -385,10 +385,6 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       let quoteResult = processGasFree(provider, resolved[0]);
       quoteResult = processSecondaryFees(fromToken, quoteResult);
 
-      if (Math.abs(quoteResult.quote.priceImpact) >= MAX_PRICE_IMPACT_PERCENTAGE) {
-        throw new PriceImpactError(quoteResult.quote.priceImpact);
-      }
-
       const estimate = quoteResult.swap.gasFeeEstimate;
       let gasFeeTotal = BigInt(estimate?.value || 0);
       if (quoteResult.approval?.gasFeeEstimate) {
@@ -421,6 +417,10 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
           )),
         ),
       );
+
+      if (Math.abs(quoteResult.quote.priceImpact) >= MAX_PRICE_IMPACT_PERCENTAGE) {
+        throw new PriceImpactError(quoteResult.quote.priceImpact);
+      }
 
       resetFormErrors();
     } catch (error: any) {
@@ -1095,11 +1095,12 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
             }}
             rc={<div />}
           >
-            {quoteError instanceof PriceImpactError ? 'Price impact is too high' : 'Unable to swap this token'}
+            {quoteError instanceof PriceImpactError ? 'High Price impact' : 'Unable to swap this token'}
           </Body>
           <Body size="xxSmall">
             {quoteError instanceof PriceImpactError
-              ? 'The price impact of this swap is too high. Try a smaller amount.'
+              // eslint-disable-next-line max-len, @typescript-eslint/quotes
+              ? `Your swap amount is too large for current market conditions. This means you'd get a less favorable exchange rate. Please try a smaller amount.`
               : 'This token pairing is not available to swap right now. Try another selection.'}
           </Body>
         </Box>
