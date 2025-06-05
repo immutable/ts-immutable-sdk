@@ -54,6 +54,8 @@ import { TransactionRejected } from '../../../components/TransactionRejected/Tra
 import { Fees } from './Fees';
 import { useCryptoUSDConversion } from '../../../lib/hooks/useCryptoUSDConversion';
 
+const MAX_PRICE_IMPACT_PERCENTAGE = 15;
+
 enum SwapDirection {
   FROM = 'FROM',
   TO = 'TO',
@@ -73,6 +75,13 @@ export interface SwapFromProps {
   data?: SwapFormData;
   theme: WidgetTheme;
   cancelAutoProceed: () => void;
+}
+
+class PriceImpactError extends Error {
+  constructor(readonly priceImpact: number) {
+    super(`Price impact is too high: ${priceImpact}`);
+    this.name = 'PriceImpactError';
+  }
 }
 
 export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
@@ -122,7 +131,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
 
   // Quote
   const [quote, setQuote] = useState<TransactionResponse | null>(null);
-  const [quoteError, setQuoteError] = useState<string>('');
+  const [quoteError, setQuoteError] = useState<Error | null>(null);
   const [gasFeeValue, setGasFeeValue] = useState<string>('');
   const [gasFeeToken, setGasFeeToken] = useState<TokenInfo | undefined>(undefined);
 
@@ -223,7 +232,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
   ]);
 
   const onQuoteError = useCallback((error: any) => {
-    setQuoteError(error.message);
+    setQuoteError(error);
     track({
       userJourney: UserJourney.SWAP,
       screen: 'SwapCoins',
@@ -257,7 +266,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     setFromTokenError('');
     setToAmountError('');
     setToTokenError('');
-    setQuoteError('');
+    setQuoteError(null);
   };
 
   const resetQuote = () => {
@@ -293,6 +302,10 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       let quoteResult = processGasFree(provider, resolved[0]);
       quoteResult = processSecondaryFees(fromToken, quoteResult);
       quoteResult = processQuoteToken(toToken, quoteResult);
+
+      if (Math.abs(quoteResult.quote.priceImpact) >= MAX_PRICE_IMPACT_PERCENTAGE) {
+        throw new PriceImpactError(quoteResult.quote.priceImpact);
+      }
 
       const estimate = quoteResult.swap.gasFeeEstimate;
       let gasFeeTotal = BigInt(estimate?.value || 0);
@@ -372,6 +385,10 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       let quoteResult = processGasFree(provider, resolved[0]);
       quoteResult = processSecondaryFees(fromToken, quoteResult);
 
+      if (Math.abs(quoteResult.quote.priceImpact) >= MAX_PRICE_IMPACT_PERCENTAGE) {
+        throw new PriceImpactError(quoteResult.quote.priceImpact);
+      }
+
       const estimate = quoteResult.swap.gasFeeEstimate;
       let gasFeeTotal = BigInt(estimate?.value || 0);
       if (quoteResult.approval?.gasFeeEstimate) {
@@ -409,7 +426,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     } catch (error: any) {
       if (!error.cancelled) {
         resetQuote();
-        onQuoteError(error);
+        onQuoteError(error instanceof Error ? error : new Error(error));
       }
     }
 
@@ -1078,10 +1095,12 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
             }}
             rc={<div />}
           >
-            Unable to swap this token
+            {quoteError instanceof PriceImpactError ? 'Price impact is too high' : 'Unable to swap this token'}
           </Body>
           <Body size="xxSmall">
-            This token pairing isn&apos;t available to swap right now. Try another selection.
+            {quoteError instanceof PriceImpactError
+              ? 'The price impact of this swap is too high. Try a smaller amount.'
+              : 'This token pairing is not available to swap right now. Try another selection.'}
           </Body>
         </Box>
       )}
