@@ -215,7 +215,7 @@ export function WalletList(props: WalletListProps) {
 
   const connectCallback = async (ethereumProvider: EthereumProvider) => {
     if (ethereumProvider.connected && ethereumProvider.session) {
-      const browserProvider = new WrappedBrowserProvider(ethereumProvider, 'any');
+      const browserProvider = new WrappedBrowserProvider(ethereumProvider);
       selectBrowserProvider(browserProvider, 'walletconnect');
 
       if (ethereumProvider.chainId !== targetChainId) {
